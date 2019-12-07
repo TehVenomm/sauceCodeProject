@@ -16,11 +16,6 @@ public class SymbolTexture : MonoBehaviour
 
 	private IEnumerator m_CoroutineLoadSymbol;
 
-	public SymbolTexture()
-		: this()
-	{
-	}
-
 	public void Initilize(SymbolTable.SymbolType type)
 	{
 		symbolType = type;
@@ -43,7 +38,6 @@ public class SymbolTexture : MonoBehaviour
 
 	public void SetColor(int colorIndex)
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		m_Texture.color = Singleton<SymbolTable>.I.GetColor(symbolType, colorIndex);
 	}
 
@@ -61,16 +55,16 @@ public class SymbolTexture : MonoBehaviour
 	{
 		CancelLoadSymbol();
 		m_CoroutineLoadSymbol = CoroutineLoadSymbol();
-		if (this.get_gameObject().get_activeInHierarchy())
+		if (base.gameObject.activeInHierarchy)
 		{
-			this.StartCoroutine(_Update());
+			StartCoroutine(_Update());
 		}
 	}
 
 	private IEnumerator CoroutineLoadSymbol()
 	{
 		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_symbol = (symbolType != SymbolTable.SymbolType.FRAME_OUTLINE) ? load_queue.LoadSymbol(symbolId) : load_queue.LoadSymbolFrame(symbolId);
+		LoadObject lo_symbol = (symbolType == SymbolTable.SymbolType.FRAME_OUTLINE) ? load_queue.LoadSymbolFrame(symbolId) : load_queue.LoadSymbol(symbolId);
 		while (load_queue.IsLoading())
 		{
 			yield return null;

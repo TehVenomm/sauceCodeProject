@@ -69,10 +69,10 @@ public class SmithGrowSkillSelect : SkillSelectBaseSecond
 	{
 		base.UpdateUI();
 		SetVisibleEmptySkillType(is_visible: false);
-		SetActive((Enum)UI.BTN_DECISION, is_visible: false);
-		SetActive((Enum)UI.BTN_SKILL_DECISION, is_visible: true);
-		SetLabelText((Enum)UI.STR_SKILL_DECISION, base.sectionData.GetText("STR_DECISION"));
-		SetLabelText((Enum)UI.STR_SKILL_DECISION_R, base.sectionData.GetText("STR_DECISION"));
+		SetActive(UI.BTN_DECISION, is_visible: false);
+		SetActive(UI.BTN_SKILL_DECISION, is_visible: true);
+		SetLabelText(UI.STR_SKILL_DECISION, base.sectionData.GetText("STR_DECISION"));
+		SetLabelText(UI.STR_SKILL_DECISION_R, base.sectionData.GetText("STR_DECISION"));
 	}
 
 	protected override void SetInventoryIsEmptyParam()
@@ -111,7 +111,7 @@ public class SmithGrowSkillSelect : SkillSelectBaseSecond
 		}
 		m_generatedIconList.Clear();
 		UpdateNewIconInfo();
-		SetDynamicList((Enum)inventoryUI, (string)null, num, reset, (Func<int, bool>)delegate(int i)
+		SetDynamicList(inventoryUI, null, num, reset, delegate(int i)
 		{
 			SortCompareData sortCompareData2 = inventory.datas[i];
 			if (sortCompareData2 == null || !sortCompareData2.IsPriority(inventory.sortSettings.orderTypeAsc))
@@ -123,12 +123,8 @@ public class SmithGrowSkillSelect : SkillSelectBaseSecond
 			{
 				return false;
 			}
-			if (!skillItemInfo2.IsLevelMax())
-			{
-				return true;
-			}
-			return skillItemInfo2.IsEnableExceed();
-		}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+			return !skillItemInfo2.IsLevelMax() || skillItemInfo2.IsEnableExceed();
+		}, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			SortCompareData sortCompareData = inventory.datas[i];
 			if (sortCompareData != null && sortCompareData.IsPriority(inventory.sortSettings.orderTypeAsc))
@@ -160,14 +156,14 @@ public class SmithGrowSkillSelect : SkillSelectBaseSecond
 	private void SetEnabledUIModelRenderTexture(Enum ctrl_enum, bool enabled)
 	{
 		Transform ctrl = GetCtrl(ctrl_enum);
-		if (!Object.op_Implicit(ctrl))
+		if (!ctrl)
 		{
 			return;
 		}
 		UIModelRenderTexture component = ctrl.GetComponent<UIModelRenderTexture>();
-		if (Object.op_Implicit(component))
+		if ((bool)component)
 		{
-			component.set_enabled(enabled);
+			component.enabled = enabled;
 			if (!enabled)
 			{
 				component.Clear();

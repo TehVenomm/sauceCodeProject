@@ -21,11 +21,6 @@ public class TabDepthBtn : MonoBehaviour
 
 	public STATE currentState;
 
-	public TabDepthBtn()
-		: this()
-	{
-	}
-
 	protected virtual string GetBtnSelectedSprite()
 	{
 		return "PartyBtn_on_02";
@@ -38,13 +33,13 @@ public class TabDepthBtn : MonoBehaviour
 
 	protected virtual string GetTabSelectedSprite()
 	{
-		string text = m_labelSprite.spriteName.Replace("off", "on");
+		m_labelSprite.spriteName.Replace("off", "on");
 		return m_labelSprite.spriteName.Replace("off", "on");
 	}
 
 	protected virtual string GetTabUnSelectedSprite()
 	{
-		string text = m_labelSprite.spriteName.Replace("off", "on");
+		m_labelSprite.spriteName.Replace("off", "on");
 		return m_labelSprite.spriteName.Replace("on", "off");
 	}
 
@@ -78,9 +73,9 @@ public class TabDepthBtn : MonoBehaviour
 
 	protected virtual void SetTab()
 	{
-		int depth = (currentState != 0) ? startDepth : GetDepthOffSet();
-		string normalSprite = (currentState != 0) ? GetBtnUnSelectedSprite() : GetBtnSelectedSprite();
-		string spriteName = (currentState != 0) ? GetTabUnSelectedSprite() : GetTabSelectedSprite();
+		int depth = (currentState == STATE.SELECTED) ? GetDepthOffSet() : startDepth;
+		string normalSprite = (currentState == STATE.SELECTED) ? GetBtnSelectedSprite() : GetBtnUnSelectedSprite();
+		string spriteName = (currentState == STATE.SELECTED) ? GetTabSelectedSprite() : GetTabUnSelectedSprite();
 		m_backGroundSprite.depth = depth;
 		m_buttonObject.normalSprite = normalSprite;
 		m_buttonObject.SetState(UIButtonColor.State.Normal, immediate: true);

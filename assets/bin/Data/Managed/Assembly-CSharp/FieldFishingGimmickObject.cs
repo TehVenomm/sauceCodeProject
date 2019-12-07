@@ -19,14 +19,16 @@ public class FieldFishingGimmickObject : FieldGatherGimmickObject
 
 	public static string[] GetEffectNames(int index)
 	{
-		List<string> list = new List<string>();
-		list.Add("ef_btl_target_fishing_01");
-		list.Add("ef_btl_fishing_03");
+		List<string> obj = new List<string>
+		{
+			"ef_btl_target_fishing_01",
+			"ef_btl_fishing_03"
+		};
 		InGameSettingsManager.FishingParam fishingParam = MonoBehaviourSingleton<InGameSettingsManager>.I.fishingParam;
-		list.Add(fishingParam.omenEffect[index]);
-		list.Add(fishingParam.hookEffect[index]);
-		list.Add("ef_btl_target_fishing_02");
-		return list.ToArray();
+		obj.Add(fishingParam.omenEffect[index]);
+		obj.Add(fishingParam.hookEffect[index]);
+		obj.Add("ef_btl_target_fishing_02");
+		return obj.ToArray();
 	}
 
 	public static int GetModelIndex(string value2)
@@ -43,8 +45,8 @@ public class FieldFishingGimmickObject : FieldGatherGimmickObject
 			{
 				continue;
 			}
-			string text = array2[0];
-			if (text != null && text == "mi")
+			string a = array2[0];
+			if (a == "mi")
 			{
 				int result = 0;
 				if (int.TryParse(array2[1], out result))
@@ -75,8 +77,8 @@ public class FieldFishingGimmickObject : FieldGatherGimmickObject
 			string[] array2 = array[i].Split(':');
 			if (array2 != null && array2.Length == 2)
 			{
-				string text = array2[0];
-				if (text != null && text == "mi")
+				string a = array2[0];
+				if (a == "mi")
 				{
 					int.TryParse(array2[1], out _modelIndex);
 				}
@@ -106,23 +108,14 @@ public class FieldFishingGimmickObject : FieldGatherGimmickObject
 
 	public override bool StartAction(Player player, bool isSend)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 		if (!base.StartAction(player, isSend))
 		{
 			return false;
 		}
-		Vector3 val = player._transform.get_position() - m_transform.get_position();
-		if (val.get_sqrMagnitude() < sqlRadius)
+		Vector3 vector = player._transform.position - m_transform.position;
+		if (vector.sqrMagnitude < sqlRadius)
 		{
-			player._transform.set_position(m_transform.get_position() + val.get_normalized() * radius * 0.9f);
+			player._transform.position = m_transform.position + vector.normalized * radius * 0.9f;
 		}
 		return true;
 	}

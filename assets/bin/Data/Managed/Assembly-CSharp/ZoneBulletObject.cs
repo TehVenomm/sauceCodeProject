@@ -33,72 +33,53 @@ public class ZoneBulletObject : MonoBehaviour
 
 	private bool isInitialized;
 
-	private Vector3 tmpVector = default(Vector3);
+	private Vector3 tmpVector;
 
 	private Character.HealData healData;
 
 	private Dictionary<int, float> validSecCollection = new Dictionary<int, float>();
 
-	public ZoneBulletObject()
-		: this()
-	{
-	}//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-	//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-
-
 	public void Initialize(Player player, BulletData bullet, Vector3 position, SkillInfo.SkillParam skill, bool isHealDamgeEnemy, bool isOwner)
 	{
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0238: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023e: Expected O, but got Unknown
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			Log.Error(LOG.INGAME, "StageObjectManager is invalid. Can't initialize PresentBulletObject.");
 			return;
 		}
-		ownerPlayer = ((!isOwner) ? null : player);
+		ownerPlayer = (isOwner ? player : null);
 		usePlayer = player;
 		bulletData = bullet;
 		skillParam = skill;
 		healValue = ((bulletData.dataZone.type == BulletData.BulletZone.TYPE.HEAL) ? skill.supportValue[0] : 0);
 		lifeTime = skill.supportTime[0];
 		intervalTime = bullet.dataZone.intervalTime;
-		this.get_gameObject().set_name(OBJ_NAME + skill.tableData.id);
-		cachedPlayerTransform = player.get_transform();
-		cachedTransform = this.get_transform();
+		base.gameObject.name = OBJ_NAME + skill.tableData.id;
+		cachedPlayerTransform = player.transform;
+		cachedTransform = base.transform;
 		cachedTransform.SetParent(MonoBehaviourSingleton<StageObjectManager>.I._transform);
-		cachedTransform.set_position(position);
-		cachedTransform.set_localScale(Vector3.get_one());
+		cachedTransform.position = position;
+		cachedTransform.localScale = Vector3.one;
 		if (MonoBehaviourSingleton<EffectManager>.IsValid())
 		{
 			cachedEffectTransform = EffectManager.GetEffect(bulletData.data.effectName, MonoBehaviourSingleton<EffectManager>.I._transform);
-			if (!object.ReferenceEquals(cachedEffectTransform, null))
+			if ((object)cachedEffectTransform != null)
 			{
-				cachedEffectTransform.set_position(cachedTransform.get_position() + bulletData.data.dispOffset);
-				cachedEffectTransform.set_localRotation(Quaternion.Euler(bulletData.data.dispRotation));
+				cachedEffectTransform.position = cachedTransform.position + bulletData.data.dispOffset;
+				cachedEffectTransform.localRotation = Quaternion.Euler(bulletData.data.dispRotation);
 			}
 		}
-		this.get_gameObject().set_layer(31);
+		base.gameObject.layer = 31;
 		ignoreLayerMask |= 41984;
 		ignoreLayerMask |= 20480;
 		ignoreLayerMask |= 2490880;
-		cachedCollider = this.get_gameObject().AddComponent<SphereCollider>();
-		cachedCollider.set_radius(bulletData.data.radius);
-		cachedCollider.set_isTrigger(true);
-		cachedCollider.set_enabled(true);
+		cachedCollider = base.gameObject.AddComponent<SphereCollider>();
+		cachedCollider.radius = bulletData.data.radius;
+		cachedCollider.isTrigger = true;
+		cachedCollider.enabled = true;
 		validSecCollection.Clear();
 		if (isHealDamgeEnemy && healValue > 0)
 		{
-			GameObject val = new GameObject(HEALATK_NAME);
-			HealAttackZoneObject healAttackZoneObject = val.AddComponent<HealAttackZoneObject>();
-			healAttackZoneObject.Setup(ownerPlayer, cachedTransform, bullet, skill);
+			new GameObject(HEALATK_NAME).AddComponent<HealAttackZoneObject>().Setup(ownerPlayer, cachedTransform, bullet, skill);
 		}
 		healData = new Character.HealData(healValue, bulletData.dataZone.healType, HEAL_EFFECT_TYPE.BASIS, new List<int>
 		{
@@ -114,10 +95,6 @@ public class ZoneBulletObject : MonoBehaviour
 
 	private void Update()
 	{
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 		if (!isInitialized)
 		{
 			return;
@@ -126,17 +103,17 @@ public class ZoneBulletObject : MonoBehaviour
 		{
 			if (usePlayer != null && !usePlayer.isDead)
 			{
-				tmpVector = cachedPlayerTransform.get_position();
+				tmpVector = cachedPlayerTransform.position;
 				tmpVector.y = bulletData.data.dispOffset.y;
-				cachedTransform.set_position(tmpVector);
-				cachedEffectTransform.set_position(tmpVector);
+				cachedTransform.position = tmpVector;
+				cachedEffectTransform.position = tmpVector;
 			}
 			else
 			{
 				lifeTime = 0f;
 			}
 		}
-		lifeTime -= Time.get_deltaTime();
+		lifeTime -= Time.deltaTime;
 		if (lifeTime <= 0f)
 		{
 			OnDisappear();
@@ -151,19 +128,19 @@ public class ZoneBulletObject : MonoBehaviour
 		skillParam = null;
 		cachedPlayerTransform = null;
 		cachedTransform = null;
-		if (!object.ReferenceEquals(cachedCollider, null))
+		if ((object)cachedCollider != null)
 		{
-			cachedCollider.set_enabled(false);
+			cachedCollider.enabled = false;
 		}
 		cachedCollider = null;
-		if (cachedEffectTransform != null && cachedEffectTransform.get_gameObject() != null)
+		if (cachedEffectTransform != null && cachedEffectTransform.gameObject != null)
 		{
-			EffectManager.ReleaseEffect(cachedEffectTransform.get_gameObject());
+			EffectManager.ReleaseEffect(cachedEffectTransform.gameObject);
 		}
 		cachedEffectTransform = null;
-		if (!object.ReferenceEquals(this.get_gameObject(), null))
+		if ((object)base.gameObject != null)
 		{
-			Object.Destroy(this.get_gameObject());
+			Object.Destroy(base.gameObject);
 		}
 		isInitialized = false;
 	}
@@ -171,7 +148,7 @@ public class ZoneBulletObject : MonoBehaviour
 	private void OnTriggerEnter(Collider collider)
 	{
 		Player player = _GetValidPlayer(collider);
-		if (!object.ReferenceEquals(player, null))
+		if ((object)player != null)
 		{
 			if (!validSecCollection.ContainsKey(player.id))
 			{
@@ -187,7 +164,7 @@ public class ZoneBulletObject : MonoBehaviour
 	private void OnTriggerStay(Collider collider)
 	{
 		Player player = _GetValidPlayer(collider);
-		if (object.ReferenceEquals(player, null))
+		if ((object)player == null)
 		{
 			return;
 		}
@@ -195,13 +172,10 @@ public class ZoneBulletObject : MonoBehaviour
 		{
 			validSecCollection.Add(player.id, 0f);
 		}
-		int id;
-		Dictionary<int, float> dictionary;
-		(dictionary = validSecCollection)[id = player.id] = dictionary[id] + Time.get_deltaTime();
+		validSecCollection[player.id] += Time.deltaTime;
 		if (validSecCollection[player.id] >= intervalTime)
 		{
-			int id2;
-			(dictionary = validSecCollection)[id2 = player.id] = dictionary[id2] - intervalTime;
+			validSecCollection[player.id] -= intervalTime;
 			if (healValue > 0)
 			{
 				player.OnHealReceive(healData);
@@ -216,7 +190,7 @@ public class ZoneBulletObject : MonoBehaviour
 	private void OnTriggerExit(Collider collider)
 	{
 		Player player = _GetValidPlayer(collider);
-		if (!object.ReferenceEquals(player, null) && validSecCollection.ContainsKey(player.id))
+		if ((object)player != null && validSecCollection.ContainsKey(player.id))
 		{
 			validSecCollection.Remove(player.id);
 		}
@@ -224,13 +198,13 @@ public class ZoneBulletObject : MonoBehaviour
 
 	private Player _GetValidPlayer(Collider collider)
 	{
-		int layer = collider.get_gameObject().get_layer();
+		int layer = collider.gameObject.layer;
 		if (((1 << layer) & ignoreLayerMask) > 0)
 		{
 			return null;
 		}
-		Player component = collider.get_gameObject().GetComponent<Player>();
-		if (object.ReferenceEquals(component, null))
+		Player component = collider.gameObject.GetComponent<Player>();
+		if ((object)component == null)
 		{
 			return null;
 		}
@@ -238,7 +212,7 @@ public class ZoneBulletObject : MonoBehaviour
 		{
 			return component;
 		}
-		if (!object.ReferenceEquals(ownerPlayer, null) && component.isNpc)
+		if ((object)ownerPlayer != null && component.isNpc)
 		{
 			return component;
 		}

@@ -3,7 +3,6 @@ using GooglePlayGames.Native.Cwrapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -13,39 +12,13 @@ namespace GooglePlayGames.Native.PInvoke
 	{
 		private static readonly string sServiceId = ReadServiceId();
 
-		[CompilerGenerated]
-		private static Func<IntPtr, NativeStartAdvertisingResult> _003C_003Ef__mg_0024cache0;
-
-		[CompilerGenerated]
-		private static Func<IntPtr, NativeConnectionRequest> _003C_003Ef__mg_0024cache1;
-
-		[CompilerGenerated]
-		private static NearbyConnectionTypes.StartAdvertisingCallback _003C_003Ef__mg_0024cache2;
-
-		[CompilerGenerated]
-		private static NearbyConnectionTypes.ConnectionRequestCallback _003C_003Ef__mg_0024cache3;
-
-		[CompilerGenerated]
-		private static Func<IntPtr, NativeConnectionResponse> _003C_003Ef__mg_0024cache4;
-
-		[CompilerGenerated]
-		private static NearbyConnectionTypes.ConnectionResponseCallback _003C_003Ef__mg_0024cache5;
-
 		public string AppBundleId
 		{
 			get
 			{
-				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000b: Expected O, but got Unknown
-				AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-				try
+				using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
 				{
-					AndroidJavaObject @static = val.GetStatic<AndroidJavaObject>("currentActivity");
-					return @static.Call<string>("getPackageName", new object[0]);
-				}
-				finally
-				{
-					((IDisposable)val)?.Dispose();
+					return androidJavaClass.GetStatic<AndroidJavaObject>("currentActivity").Call<string>("getPackageName", Array.Empty<object>());
 				}
 			}
 		}
@@ -74,8 +47,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal void StartAdvertising(string name, List<NativeAppIdentifier> appIds, long advertisingDuration, Action<long, NativeStartAdvertisingResult> advertisingCallback, Action<long, NativeConnectionRequest> connectionRequestCallback)
 		{
-			NearbyConnections.NearbyConnections_StartAdvertising(SelfPtr(), name, (from id in appIds
-			select id.AsPointer()).ToArray(), new UIntPtr((ulong)appIds.Count), advertisingDuration, InternalStartAdvertisingCallback, Callbacks.ToIntPtr(advertisingCallback, NativeStartAdvertisingResult.FromPointer), InternalConnectionRequestCallback, Callbacks.ToIntPtr(connectionRequestCallback, NativeConnectionRequest.FromPointer));
+			NearbyConnections.NearbyConnections_StartAdvertising(SelfPtr(), name, appIds.Select((NativeAppIdentifier id) => id.AsPointer()).ToArray(), new UIntPtr((ulong)appIds.Count), advertisingDuration, InternalStartAdvertisingCallback, Callbacks.ToIntPtr(advertisingCallback, NativeStartAdvertisingResult.FromPointer), InternalConnectionRequestCallback, Callbacks.ToIntPtr(connectionRequestCallback, NativeConnectionRequest.FromPointer));
 		}
 
 		[MonoPInvokeCallback(typeof(NearbyConnectionTypes.StartAdvertisingCallback))]
@@ -153,38 +125,24 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal static string ReadServiceId()
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Expected O, but got Unknown
-			Debug.Log((object)"Initializing ServiceId property!!!!");
-			AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-			try
+			Debug.Log("Initializing ServiceId property!!!!");
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
 			{
-				AndroidJavaObject @static = val.GetStatic<AndroidJavaObject>("currentActivity");
-				try
+				using (AndroidJavaObject androidJavaObject = androidJavaClass.GetStatic<AndroidJavaObject>("currentActivity"))
 				{
-					string text = @static.Call<string>("getPackageName", new object[0]);
-					AndroidJavaObject val2 = @static.Call<AndroidJavaObject>("getPackageManager", new object[0]);
-					AndroidJavaObject val3 = val2.Call<AndroidJavaObject>("getApplicationInfo", new object[2]
+					string text = androidJavaObject.Call<string>("getPackageName", Array.Empty<object>());
+					string text2 = androidJavaObject.Call<AndroidJavaObject>("getPackageManager", Array.Empty<object>()).Call<AndroidJavaObject>("getApplicationInfo", new object[2]
 					{
 						text,
 						128
-					});
-					AndroidJavaObject val4 = val3.Get<AndroidJavaObject>("metaData");
-					string text2 = val4.Call<string>("getString", new object[1]
-					{
-						"com.google.android.gms.nearby.connection.SERVICE_ID"
-					});
-					Debug.Log((object)("SystemId from Manifest: " + text2));
+					}).Get<AndroidJavaObject>("metaData")
+						.Call<string>("getString", new object[1]
+						{
+							"com.google.android.gms.nearby.connection.SERVICE_ID"
+						});
+					Debug.Log("SystemId from Manifest: " + text2);
 					return text2;
 				}
-				finally
-				{
-					((IDisposable)@static)?.Dispose();
-				}
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
 			}
 		}
 	}

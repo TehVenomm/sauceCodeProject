@@ -57,9 +57,4 @@ public class SoundID : MonoBehaviour
 	{
 		RESULT_COUNTER = 90000001
 	}
-
-	public SoundID()
-		: this()
-	{
-	}
 }

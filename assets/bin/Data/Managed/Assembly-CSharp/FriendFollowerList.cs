@@ -35,9 +35,9 @@ public class FriendFollowerList : FollowListBase
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_FOLLOW_NUMBER_ROOT, is_visible: true);
-		SetLabelText((Enum)UI.LBL_FOLLOW_NUMBER_NOW, m_currentFollowerCount.ToString());
-		SetLabelText((Enum)UI.LBL_FOLLOW_NUMBER_MAX, m_maxFollowerCount.ToString());
+		SetActive(UI.OBJ_FOLLOW_NUMBER_ROOT, is_visible: true);
+		SetLabelText(UI.LBL_FOLLOW_NUMBER_NOW, m_currentFollowerCount.ToString());
+		SetLabelText(UI.LBL_FOLLOW_NUMBER_MAX, m_maxFollowerCount.ToString());
 		ListUI();
 	}
 
@@ -54,11 +54,10 @@ public class FriendFollowerList : FollowListBase
 			}
 			if (GameDefine.ACTIVE_DEGREE)
 			{
-				UIGrid component = GetCtrl(UI.GRD_LIST).GetComponent<UIGrid>();
-				component.cellHeight = GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
+				GetCtrl(UI.GRD_LIST).GetComponent<UIGrid>().cellHeight = GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 			}
 			CleanItemList();
-			SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, currentPageItemLength, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+			SetDynamicList(UI.GRD_LIST, GetListItemName, currentPageItemLength, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 			{
 				SetListItem(i, t, is_recycle, currentList[i]);
 			});
@@ -72,7 +71,11 @@ public class FriendFollowerList : FollowListBase
 
 	private int GetPageItemLength(int currentPage)
 	{
-		return (currentPage + 1 != pageNumMax || m_currentFollowerCount % 10 <= 0) ? 10 : (m_currentFollowerCount % 10);
+		if (currentPage + 1 != pageNumMax || m_currentFollowerCount % 10 <= 0)
+		{
+			return 10;
+		}
+		return m_currentFollowerCount % 10;
 	}
 
 	private int GetChunkIndex(int pageIndex)
@@ -81,7 +84,7 @@ public class FriendFollowerList : FollowListBase
 		{
 			return 0;
 		}
-		return Mathf.FloorToInt((float)(pageIndex * 10 / m_chunkSize));
+		return Mathf.FloorToInt(pageIndex * 10 / m_chunkSize);
 	}
 
 	protected override void SendGetList(int page, Action<bool> callback)
@@ -95,7 +98,7 @@ public class FriendFollowerList : FollowListBase
 				if (is_success)
 				{
 					m_chunkSize = recv_data.chunkSize;
-					m_currentFollowerCount = ((recv_data.totalFollowers <= 0) ? recv_data.follow.Count : recv_data.totalFollowers);
+					m_currentFollowerCount = ((recv_data.totalFollowers > 0) ? recv_data.totalFollowers : recv_data.follow.Count);
 					int num = chunkIndex * m_chunkSize;
 					int i = 0;
 					for (int count = recv_data.follow.Count; i < count; i++)

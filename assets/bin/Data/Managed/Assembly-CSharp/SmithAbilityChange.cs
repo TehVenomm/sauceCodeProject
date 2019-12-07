@@ -1,5 +1,4 @@
 using Network;
-using System;
 using UnityEngine;
 
 public class SmithAbilityChange : GameSection
@@ -34,11 +33,11 @@ public class SmithAbilityChange : GameSection
 	public override void Initialize()
 	{
 		equipItemInfo = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>().selectEquipData;
-		Transform val = SetPrefab((Enum)UI.OBJ_ABILITY_LIST_ROOT, "AbilityChangeAbilityList");
-		abilityList = val.get_gameObject().AddComponent<AbilityChangeAbilityList>();
+		Transform transform = SetPrefab(UI.OBJ_ABILITY_LIST_ROOT, "AbilityChangeAbilityList");
+		abilityList = transform.gameObject.AddComponent<AbilityChangeAbilityList>();
 		abilityList.uiVisible = true;
-		SetLabelText((Enum)UI.STR_DECISION_REFLECT, base.sectionData.GetText("STR_DECISION"));
-		SetLabelText((Enum)UI.STR_LIST_REFLECT, base.sectionData.GetText("STR_LIST"));
+		SetLabelText(UI.STR_DECISION_REFLECT, base.sectionData.GetText("STR_DECISION"));
+		SetLabelText(UI.STR_LIST_REFLECT, base.sectionData.GetText("STR_LIST"));
 		base.Initialize();
 	}
 
@@ -57,25 +56,20 @@ public class SmithAbilityChange : GameSection
 
 	public override void UpdateUI()
 	{
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		SetFontStyle((Enum)UI.STR_TITLE_MONEY, 2);
+		SetFontStyle(UI.STR_TITLE_MONEY, FontStyle.Italic);
 		abilityList.SetParameter(equipItemInfo);
 		int needMoney = GetNeedMoney();
-		SetLabelText((Enum)UI.LBL_GOLD, needMoney.ToString());
-		Color color = Color.get_white();
+		SetLabelText(UI.LBL_GOLD, needMoney.ToString());
+		Color color = Color.white;
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money < needMoney)
 		{
-			color = Color.get_red();
+			color = Color.red;
 		}
-		SetColor((Enum)UI.LBL_GOLD, color);
+		SetColor(UI.LBL_GOLD, color);
 		bool is_visible = equipItemInfo.tableData.IsEquipableAbilityItem();
-		SetActive((Enum)UI.BTN_USE_ABILITY_ITEM, is_visible);
-		SetActive((Enum)UI.BTN_DECISION, abilityList.EnableAbilityChange);
-		SetActive((Enum)UI.OBJ_NEED_MONEY, abilityList.EnableAbilityChange);
+		SetActive(UI.BTN_USE_ABILITY_ITEM, is_visible);
+		SetActive(UI.BTN_DECISION, abilityList.EnableAbilityChange);
+		SetActive(UI.OBJ_NEED_MONEY, abilityList.EnableAbilityChange);
 	}
 
 	private int GetNeedMoney()
@@ -106,8 +100,7 @@ public class SmithAbilityChange : GameSection
 		{
 			if (error == Error.None)
 			{
-				SmithManager.SmithGrowData smithGrowData = MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();
-				smithGrowData.selectEquipData = model;
+				MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>().selectEquipData = model;
 				MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
 				GameSection.ResumeEvent(is_resume: true);
 			}

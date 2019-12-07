@@ -19,10 +19,10 @@ namespace Network
 
 		public string CreateUrl()
 		{
-			string uri = $"ws://{host}/{path}";
-			UriBuilder uriBuilder = new UriBuilder(uri);
-			uriBuilder.Port = port;
-			return uriBuilder.Uri.ToString();
+			return new UriBuilder($"ws://{host}/{path}")
+			{
+				Port = port
+			}.Uri.ToString();
 		}
 
 		public override bool Equals(object obj)
@@ -30,7 +30,11 @@ namespace Network
 			ChatChannel chatChannel = obj as ChatChannel;
 			if (chatChannel != null)
 			{
-				return channel == chatChannel.channel && host == chatChannel.host && path == chatChannel.path && port == chatChannel.port;
+				if (channel == chatChannel.channel && host == chatChannel.host && path == chatChannel.path)
+				{
+					return port == chatChannel.port;
+				}
+				return false;
 			}
 			return false;
 		}

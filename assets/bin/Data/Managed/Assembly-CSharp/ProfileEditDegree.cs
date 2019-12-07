@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -102,9 +101,9 @@ public class ProfileEditDegree : GameSection
 
 	private WORD_TAB currentTab;
 
-	private Color[] selectColors = (Color[])new Color[2];
+	private Color[] selectColors = new Color[2];
 
-	private Color[] normalColors = (Color[])new Color[2];
+	private Color[] normalColors = new Color[2];
 
 	public override IEnumerable<string> requireDataTable
 	{
@@ -116,39 +115,27 @@ public class ProfileEditDegree : GameSection
 
 	public override void Initialize()
 	{
-		//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
 		currentDegrees = MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds.ToList();
 		showAll = true;
 		currentTab = WORD_TAB.PREFIX;
 		SpoileColor();
 		DegreeTable.DegreeData data = Singleton<DegreeTable>.I.GetData((uint)currentDegrees[0]);
-		currentSelectData = ((data.type != DEGREE_TYPE.SPECIAL_FRAME) ? Singleton<DegreeTable>.I.GetData((uint)currentDegrees[1]) : null);
+		currentSelectData = ((data.type == DEGREE_TYPE.SPECIAL_FRAME) ? null : Singleton<DegreeTable>.I.GetData((uint)currentDegrees[1]));
 		List<DegreeTable.DegreeData> all = Singleton<DegreeTable>.I.GetAll();
 		all.Sort((DegreeTable.DegreeData a, DegreeTable.DegreeData b) => (int)(a.id - b.id));
-		allNounData = (from x in all
-		where x.type == DEGREE_TYPE.NOUN
-		select x).ToList();
-		allConData = (from x in all
-		where x.type == DEGREE_TYPE.CONJUNCTION
-		select x).ToList();
-		userHaveNounData = (from x in allNounData
-		where x.IsUnlcok(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds)
-		select x).ToList();
-		userHaveConData = (from x in allConData
-		where x.IsUnlcok(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds)
-		select x).ToList();
+		allNounData = all.Where((DegreeTable.DegreeData x) => x.type == DEGREE_TYPE.NOUN).ToList();
+		allConData = all.Where((DegreeTable.DegreeData x) => x.type == DEGREE_TYPE.CONJUNCTION).ToList();
+		userHaveNounData = allNounData.Where((DegreeTable.DegreeData x) => x.IsUnlcok(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds)).ToList();
+		userHaveConData = allConData.Where((DegreeTable.DegreeData x) => x.IsUnlcok(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds)).ToList();
 		userHaveFrameData = (from x in all
-		where x.type == DEGREE_TYPE.FRAME
-		where x.IsUnlcok(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds)
-		select x).ToList();
+			where x.type == DEGREE_TYPE.FRAME
+			where x.IsUnlcok(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds)
+			select x).ToList();
 		currentPage = 1;
 		currentPlate = GetCtrl(UI.OBJ_DEGREE_PLATE_ROOT).GetComponent<DegreePlate>();
 		arrowTrans = GetCtrl(UI.SPR_TAB_SELECTING);
-		arrowLocalPos = arrowTrans.get_localPosition();
-		arrowlocalScale = arrowTrans.get_localScale();
+		arrowLocalPos = arrowTrans.localPosition;
+		arrowlocalScale = arrowTrans.localScale;
 		base.Initialize();
 	}
 
@@ -183,11 +170,11 @@ public class ProfileEditDegree : GameSection
 		base.UpdateUI();
 		if (currentTab == WORD_TAB.CONJUNCTION)
 		{
-			currentShowData = ((!showAll) ? userHaveConData : allConData);
+			currentShowData = (showAll ? allConData : userHaveConData);
 		}
 		else
 		{
-			currentShowData = ((!showAll) ? userHaveNounData : allNounData);
+			currentShowData = (showAll ? allNounData : userHaveNounData);
 		}
 		maxPage = currentShowData.Count / GameDefine.DEGREE_WORD_CHANGE_LIST_COUNT;
 		if (currentShowData.Count % GameDefine.DEGREE_FRAME_CHANGE_LIST_COUNT > 0)
@@ -199,14 +186,14 @@ public class ProfileEditDegree : GameSection
 		{
 			maxPage = 1;
 			currentPage = 1;
-			SetLabelText((Enum)UI.LBL_PREFIX, string.Empty);
-			SetLabelText((Enum)UI.LBL_CONJUNCTION, string.Empty);
-			SetLabelText((Enum)UI.LBL_SUFFIX, string.Empty);
-			SetLabelText((Enum)UI.LBL_PAGE_MAX, maxPage.ToString());
-			SetLabelText((Enum)UI.LBL_PAGE_NOW, currentPage.ToString());
-			SetActive((Enum)UI.OBJ_ARROW_ACTIVE_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_ARROW_INACTIVE_ROOT, is_visible: true);
-			SetActive((Enum)UI.LBL_NO_SELECTABLE_FRAME, is_visible: true);
+			SetLabelText(UI.LBL_PREFIX, "");
+			SetLabelText(UI.LBL_CONJUNCTION, "");
+			SetLabelText(UI.LBL_SUFFIX, "");
+			SetLabelText(UI.LBL_PAGE_MAX, maxPage.ToString());
+			SetLabelText(UI.LBL_PAGE_NOW, currentPage.ToString());
+			SetActive(UI.OBJ_ARROW_ACTIVE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_ARROW_INACTIVE_ROOT, is_visible: true);
+			SetActive(UI.LBL_NO_SELECTABLE_FRAME, is_visible: true);
 			currentPlate.Initialize(currentDegrees, isButton: false, delegate
 			{
 			});
@@ -216,28 +203,28 @@ public class ProfileEditDegree : GameSection
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_PREFIX, Singleton<DegreeTable>.I.GetData((uint)currentDegrees[1]).name);
-			SetLabelText((Enum)UI.LBL_CONJUNCTION, Singleton<DegreeTable>.I.GetData((uint)currentDegrees[2]).name);
-			SetLabelText((Enum)UI.LBL_SUFFIX, Singleton<DegreeTable>.I.GetData((uint)currentDegrees[3]).name);
-			SetLabelText((Enum)UI.LBL_SORT, (!showAll) ? StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 21u) : StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 20u));
-			SetLabelText((Enum)UI.LBL_PAGE_MAX, maxPage.ToString());
-			SetLabelText((Enum)UI.LBL_PAGE_NOW, currentPage.ToString());
-			SetActive((Enum)UI.OBJ_ARROW_ACTIVE_ROOT, maxPage > 1);
-			SetActive((Enum)UI.OBJ_ARROW_INACTIVE_ROOT, maxPage == 1);
-			SetActive((Enum)UI.LBL_NO_SELECTABLE_FRAME, is_visible: false);
+			SetLabelText(UI.LBL_PREFIX, Singleton<DegreeTable>.I.GetData((uint)currentDegrees[1]).name);
+			SetLabelText(UI.LBL_CONJUNCTION, Singleton<DegreeTable>.I.GetData((uint)currentDegrees[2]).name);
+			SetLabelText(UI.LBL_SUFFIX, Singleton<DegreeTable>.I.GetData((uint)currentDegrees[3]).name);
+			SetLabelText(UI.LBL_SORT, showAll ? StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 20u) : StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 21u));
+			SetLabelText(UI.LBL_PAGE_MAX, maxPage.ToString());
+			SetLabelText(UI.LBL_PAGE_NOW, currentPage.ToString());
+			SetActive(UI.OBJ_ARROW_ACTIVE_ROOT, maxPage > 1);
+			SetActive(UI.OBJ_ARROW_INACTIVE_ROOT, maxPage == 1);
+			SetActive(UI.LBL_NO_SELECTABLE_FRAME, is_visible: false);
 			currentPlate.Initialize(currentDegrees, isButton: false, delegate
 			{
 			});
 			int item_num = Mathf.Min(GameDefine.DEGREE_WORD_CHANGE_LIST_COUNT, currentShowData.Count - (currentPage - 1) * GameDefine.DEGREE_WORD_CHANGE_LIST_COUNT);
 			SetGrid(UI.GRD_WORD_LIST, "DegreeWordList", item_num, reset: false, delegate(int i, Transform t, bool b)
 			{
-				t.get_gameObject().AddComponent<UIDragScrollView>();
+				t.gameObject.AddComponent<UIDragScrollView>();
 				int index = i + (currentPage - 1) * GameDefine.DEGREE_WORD_CHANGE_LIST_COUNT;
 				DegreeTable.DegreeData degreeData = currentShowData[index];
 				SetEvent(t, "SELECT", degreeData);
 				if (degreeData.IsUnlcok(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds))
 				{
-					SetButtonSprite(t, (currentDegrees[(int)currentTab] != degreeData.id) ? WORD_LIST_SPRITE_NAME[0] : WORD_LIST_SPRITE_NAME[1]);
+					SetButtonSprite(t, (currentDegrees[(int)currentTab] == degreeData.id) ? WORD_LIST_SPRITE_NAME[1] : WORD_LIST_SPRITE_NAME[0]);
 				}
 				else
 				{
@@ -374,97 +361,75 @@ public class ProfileEditDegree : GameSection
 			{
 				RequestEvent("[BACK]");
 			}
-		}, string.Empty);
+		});
 	}
 
 	private void SetDegreeDetail()
 	{
 		if (currentSelectData == null)
 		{
-			SetLabelText((Enum)UI.LBL_SELECTED_DEGREE_NAME, "---");
-			SetLabelText((Enum)UI.LBL_SELECTED_DEGREE_REQUIREMENT, "---");
+			SetLabelText(UI.LBL_SELECTED_DEGREE_NAME, "---");
+			SetLabelText(UI.LBL_SELECTED_DEGREE_REQUIREMENT, "---");
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_SELECTED_DEGREE_NAME, (!currentSelectData.IsSecretName(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds)) ? currentSelectData.name : "???");
-			SetLabelText((Enum)UI.LBL_SELECTED_DEGREE_REQUIREMENT, (!currentSelectData.IsSecretText(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds)) ? currentSelectData.requirementText : "???");
+			SetLabelText(UI.LBL_SELECTED_DEGREE_NAME, currentSelectData.IsSecretName(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds) ? "???" : currentSelectData.name);
+			SetLabelText(UI.LBL_SELECTED_DEGREE_REQUIREMENT, currentSelectData.IsSecretText(MonoBehaviourSingleton<UserInfoManager>.I.unlockedDegreeIds) ? "???" : currentSelectData.requirementText);
 		}
 	}
 
 	private void SetTab(WORD_TAB selectTab, DEGREE_TYPE frameType)
 	{
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0236: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0307: Unknown result type (might be due to invalid IL or missing references)
 		if (frameType != DEGREE_TYPE.SPECIAL_FRAME)
 		{
-			SetButtonSprite((Enum)UI.BTN_PREFIX, TAB_SPRITE_NAME[(selectTab == WORD_TAB.PREFIX) ? 1 : 0], with_press: false);
-			SetButtonSprite((Enum)UI.BTN_CONJUNCTION, TAB_SPRITE_NAME[(selectTab == WORD_TAB.CONJUNCTION) ? 1 : 0], with_press: false);
-			SetButtonSprite((Enum)UI.BTN_SUFFIX, TAB_SPRITE_NAME[(selectTab == WORD_TAB.SUFFIX) ? 1 : 0], with_press: false);
-			SetButtonEnabled((Enum)UI.BTN_PREFIX, selectTab != WORD_TAB.PREFIX);
-			SetButtonEnabled((Enum)UI.BTN_CONJUNCTION, selectTab != WORD_TAB.CONJUNCTION);
-			SetButtonEnabled((Enum)UI.BTN_SUFFIX, selectTab != WORD_TAB.SUFFIX);
-			GetCtrl(UI.LBL_PREFIX).GetComponent<UILabel>().color = ((selectTab == WORD_TAB.PREFIX) ? selectColors[0] : normalColors[0]);
-			GetCtrl(UI.LBL_PREFIX).GetComponent<UILabel>().effectColor = ((selectTab == WORD_TAB.PREFIX) ? selectColors[1] : normalColors[1]);
-			GetCtrl(UI.LBL_CONJUNCTION).GetComponent<UILabel>().color = ((selectTab == WORD_TAB.CONJUNCTION) ? selectColors[0] : normalColors[0]);
-			GetCtrl(UI.LBL_CONJUNCTION).GetComponent<UILabel>().effectColor = ((selectTab == WORD_TAB.CONJUNCTION) ? selectColors[1] : normalColors[1]);
-			GetCtrl(UI.LBL_SUFFIX).GetComponent<UILabel>().color = ((selectTab == WORD_TAB.SUFFIX) ? selectColors[0] : normalColors[0]);
-			GetCtrl(UI.LBL_SUFFIX).GetComponent<UILabel>().effectColor = ((selectTab == WORD_TAB.SUFFIX) ? selectColors[1] : normalColors[1]);
-			SetActive((Enum)UI.SPR_PREFIX_SELECT, selectTab == WORD_TAB.PREFIX);
-			SetActive((Enum)UI.SPR_CONJUNCTION_SELECT, selectTab == WORD_TAB.CONJUNCTION);
-			SetActive((Enum)UI.SPR_SUFFIX_SELECT, selectTab == WORD_TAB.SUFFIX);
-			arrowTrans.get_gameObject().SetActive(true);
+			SetButtonSprite(UI.BTN_PREFIX, TAB_SPRITE_NAME[(selectTab == WORD_TAB.PREFIX) ? 1 : 0]);
+			SetButtonSprite(UI.BTN_CONJUNCTION, TAB_SPRITE_NAME[(selectTab == WORD_TAB.CONJUNCTION) ? 1 : 0]);
+			SetButtonSprite(UI.BTN_SUFFIX, TAB_SPRITE_NAME[(selectTab == WORD_TAB.SUFFIX) ? 1 : 0]);
+			SetButtonEnabled(UI.BTN_PREFIX, selectTab != WORD_TAB.PREFIX);
+			SetButtonEnabled(UI.BTN_CONJUNCTION, selectTab != WORD_TAB.CONJUNCTION);
+			SetButtonEnabled(UI.BTN_SUFFIX, selectTab != WORD_TAB.SUFFIX);
+			GetCtrl(UI.LBL_PREFIX).GetComponent<UILabel>().color = ((selectTab != WORD_TAB.PREFIX) ? normalColors[0] : selectColors[0]);
+			GetCtrl(UI.LBL_PREFIX).GetComponent<UILabel>().effectColor = ((selectTab != WORD_TAB.PREFIX) ? normalColors[1] : selectColors[1]);
+			GetCtrl(UI.LBL_CONJUNCTION).GetComponent<UILabel>().color = ((selectTab != WORD_TAB.CONJUNCTION) ? normalColors[0] : selectColors[0]);
+			GetCtrl(UI.LBL_CONJUNCTION).GetComponent<UILabel>().effectColor = ((selectTab != WORD_TAB.CONJUNCTION) ? normalColors[1] : selectColors[1]);
+			GetCtrl(UI.LBL_SUFFIX).GetComponent<UILabel>().color = ((selectTab != WORD_TAB.SUFFIX) ? normalColors[0] : selectColors[0]);
+			GetCtrl(UI.LBL_SUFFIX).GetComponent<UILabel>().effectColor = ((selectTab != WORD_TAB.SUFFIX) ? normalColors[1] : selectColors[1]);
+			SetActive(UI.SPR_PREFIX_SELECT, selectTab == WORD_TAB.PREFIX);
+			SetActive(UI.SPR_CONJUNCTION_SELECT, selectTab == WORD_TAB.CONJUNCTION);
+			SetActive(UI.SPR_SUFFIX_SELECT, selectTab == WORD_TAB.SUFFIX);
+			arrowTrans.gameObject.SetActive(value: true);
 			switch (selectTab)
 			{
 			default:
-				arrowTrans.set_parent(GetCtrl(UI.BTN_PREFIX));
+				arrowTrans.parent = GetCtrl(UI.BTN_PREFIX);
 				break;
 			case WORD_TAB.CONJUNCTION:
-				arrowTrans.set_parent(GetCtrl(UI.BTN_CONJUNCTION));
+				arrowTrans.parent = GetCtrl(UI.BTN_CONJUNCTION);
 				break;
 			case WORD_TAB.SUFFIX:
-				arrowTrans.set_parent(GetCtrl(UI.BTN_SUFFIX));
+				arrowTrans.parent = GetCtrl(UI.BTN_SUFFIX);
 				break;
 			}
-			arrowTrans.set_localPosition(arrowLocalPos);
-			arrowTrans.set_localScale(arrowlocalScale);
+			arrowTrans.localPosition = arrowLocalPos;
+			arrowTrans.localScale = arrowlocalScale;
 		}
 		else
 		{
-			SetSprite((Enum)UI.BTN_PREFIX, TAB_SPRITE_NAME[2]);
-			SetSprite((Enum)UI.BTN_CONJUNCTION, TAB_SPRITE_NAME[2]);
-			SetSprite((Enum)UI.BTN_SUFFIX, TAB_SPRITE_NAME[2]);
-			SetButtonEnabled((Enum)UI.BTN_PREFIX, is_enabled: false);
-			SetButtonEnabled((Enum)UI.BTN_CONJUNCTION, is_enabled: false);
-			SetButtonEnabled((Enum)UI.BTN_SUFFIX, is_enabled: false);
-			SetActive((Enum)UI.SPR_PREFIX_SELECT, is_visible: false);
-			SetActive((Enum)UI.SPR_CONJUNCTION_SELECT, is_visible: false);
-			SetActive((Enum)UI.SPR_SUFFIX_SELECT, is_visible: false);
-			arrowTrans.get_gameObject().SetActive(false);
+			SetSprite(UI.BTN_PREFIX, TAB_SPRITE_NAME[2]);
+			SetSprite(UI.BTN_CONJUNCTION, TAB_SPRITE_NAME[2]);
+			SetSprite(UI.BTN_SUFFIX, TAB_SPRITE_NAME[2]);
+			SetButtonEnabled(UI.BTN_PREFIX, is_enabled: false);
+			SetButtonEnabled(UI.BTN_CONJUNCTION, is_enabled: false);
+			SetButtonEnabled(UI.BTN_SUFFIX, is_enabled: false);
+			SetActive(UI.SPR_PREFIX_SELECT, is_visible: false);
+			SetActive(UI.SPR_CONJUNCTION_SELECT, is_visible: false);
+			SetActive(UI.SPR_SUFFIX_SELECT, is_visible: false);
+			arrowTrans.gameObject.SetActive(value: false);
 		}
 	}
 
 	private void SpoileColor()
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 		UILabel component = GetCtrl(UI.LBL_PREFIX).GetComponent<UILabel>();
 		UILabel component2 = GetCtrl(UI.LBL_CONJUNCTION).GetComponent<UILabel>();
 		selectColors[0] = component.color;

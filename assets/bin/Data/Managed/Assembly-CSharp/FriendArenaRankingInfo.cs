@@ -1,5 +1,4 @@
 using Network;
-using System;
 using UnityEngine;
 
 public class FriendArenaRankingInfo : FriendInfo
@@ -80,7 +79,7 @@ public class FriendArenaRankingInfo : FriendInfo
 			dataFollowing = friendCharaInfo.following;
 		}
 		nowSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-		isFollowerList = Object.op_Implicit(Object.FindObjectOfType(typeof(FriendFollowerList)));
+		isFollowerList = Object.FindObjectOfType(typeof(FriendFollowerList));
 		InitializeBase();
 	}
 
@@ -102,12 +101,12 @@ public class FriendArenaRankingInfo : FriendInfo
 		base.UpdateUI();
 		if (data.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
-			SetActive((Enum)UI.BTN_FOLLOW, is_visible: false);
-			SetActive((Enum)UI.BTN_UNFOLLOW, is_visible: false);
-			SetActive((Enum)UI.OBJ_BLACKLIST_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_BLACKLIST_ROOT, is_visible: false);
-			SetActive((Enum)UI.BTN_BLACKLIST_IN, is_visible: false);
-			SetActive((Enum)UI.BTN_BLACKLIST_OUT, is_visible: false);
+			SetActive(UI.BTN_FOLLOW, is_visible: false);
+			SetActive(UI.BTN_UNFOLLOW, is_visible: false);
+			SetActive(UI.OBJ_BLACKLIST_ROOT, is_visible: false);
+			SetActive(UI.OBJ_BLACKLIST_ROOT, is_visible: false);
+			SetActive(UI.BTN_BLACKLIST_IN, is_visible: false);
+			SetActive(UI.BTN_BLACKLIST_OUT, is_visible: false);
 		}
 	}
 }

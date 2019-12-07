@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -170,32 +169,30 @@ public abstract class EquipGenerateBase : EquipMaterialBase
 		{
 			equipItemExceedParamAll = new EquipItemExceedParamTable.EquipItemExceedParamAll();
 		}
-		SetLabelText((Enum)UI.LBL_NAME, table_data.name);
-		SetLabelText((Enum)UI.LBL_LV_NOW, "1");
-		SetLabelText((Enum)UI.LBL_LV_MAX, table_data.maxLv.ToString());
+		SetLabelText(UI.LBL_NAME, table_data.name);
+		SetLabelText(UI.LBL_LV_NOW, "1");
+		SetLabelText(UI.LBL_LV_MAX, table_data.maxLv.ToString());
 		int num = (int)table_data.baseAtk + (int)equipItemExceedParamAll.atk;
 		int elemAtk = equipItemExceedParamAll.GetElemAtk(table_data.atkElement);
-		SetElementSprite((Enum)UI.SPR_ELEM, equipItemExceedParamAll.GetElemAtkType(table_data.atkElement));
-		SetLabelText((Enum)UI.LBL_ATK, num.ToString());
-		SetLabelText((Enum)UI.LBL_ELEM, elemAtk.ToString());
-		int num2 = (int)table_data.baseDef + (int)equipItemExceedParamAll.def;
-		SetLabelText((Enum)UI.LBL_DEF, num2.ToString());
+		SetElementSprite(UI.SPR_ELEM, equipItemExceedParamAll.GetElemAtkType(table_data.atkElement));
+		SetLabelText(UI.LBL_ATK, num.ToString());
+		SetLabelText(UI.LBL_ELEM, elemAtk.ToString());
+		SetLabelText(text: ((int)table_data.baseDef + (int)equipItemExceedParamAll.def).ToString(), label_enum: UI.LBL_DEF);
 		int elemDef = equipItemExceedParamAll.GetElemDef(table_data.defElement);
-		SetDefElementSprite((Enum)UI.SPR_ELEM_DEF, equipItemExceedParamAll.GetElemDefType(table_data.defElement));
-		SetLabelText((Enum)UI.LBL_ELEM_DEF, elemDef.ToString());
-		int num3 = (int)table_data.baseHp + (int)equipItemExceedParamAll.hp;
-		SetLabelText((Enum)UI.LBL_HP, num3.ToString());
-		SetActive((Enum)UI.SPR_IS_EVOLVE, table_data.IsEvolve());
-		SetEquipmentTypeIcon((Enum)UI.SPR_TYPE_ICON, (Enum)UI.SPR_TYPE_ICON_BG, (Enum)UI.SPR_TYPE_ICON_RARITY, table_data);
-		SetLabelText((Enum)UI.LBL_SELL, table_data.sale.ToString());
+		SetDefElementSprite(UI.SPR_ELEM_DEF, equipItemExceedParamAll.GetElemDefType(table_data.defElement));
+		SetLabelText(UI.LBL_ELEM_DEF, elemDef.ToString());
+		SetLabelText(text: ((int)table_data.baseHp + (int)equipItemExceedParamAll.hp).ToString(), label_enum: UI.LBL_HP);
+		SetActive(UI.SPR_IS_EVOLVE, table_data.IsEvolve());
+		SetEquipmentTypeIcon(UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, table_data);
+		SetLabelText(UI.LBL_SELL, table_data.sale.ToString());
 		if (smithType != SmithType.EVOLVE)
 		{
 			SetSkillIconButton(UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButton", table_data, GetSkillSlotData(table_data, 0), null);
-			if (table_data.fixedAbility.Length > 0)
+			if (table_data.fixedAbility.Length != 0)
 			{
-				string allAbilityName = string.Empty;
-				string allAp = string.Empty;
-				string allAbilityDesc = string.Empty;
+				string allAbilityName = "";
+				string allAp = "";
+				string allAbilityDesc = "";
 				SetTable(UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", table_data.fixedAbility.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 				{
 					EquipItemAbility equipItemAbility = new EquipItemAbility((uint)table_data.fixedAbility[i].id, table_data.fixedAbility[i].pt);
@@ -209,12 +206,12 @@ public abstract class EquipGenerateBase : EquipMaterialBase
 					allAp += equipItemAbility.GetAP();
 					allAbilityDesc += equipItemAbility.GetDescription();
 				});
-				SetActive((Enum)UI.STR_NON_ABILITY, is_visible: false);
+				SetActive(UI.STR_NON_ABILITY, is_visible: false);
 				PreCacheAbilityDetail(allAbilityName, allAp, allAbilityDesc);
 			}
 			else
 			{
-				SetActive((Enum)UI.STR_NON_ABILITY, is_visible: true);
+				SetActive(UI.STR_NON_ABILITY, is_visible: true);
 			}
 		}
 	}
@@ -288,15 +285,14 @@ public abstract class EquipGenerateBase : EquipMaterialBase
 
 	protected virtual void OnQuery_ABILITY_DATA_POPUP()
 	{
-		object[] array = GameSection.GetEventData() as object[];
-		int num = (int)array[0];
-		EquipItemTable.EquipItemData equipTableData = GetEquipTableData();
-		EquipItem.Ability ability = equipTableData.fixedAbility[num];
-		Transform targetTrans = array[1] as Transform;
+		object[] obj = GameSection.GetEventData() as object[];
+		int num = (int)obj[0];
+		EquipItem.Ability ability = GetEquipTableData().fixedAbility[num];
+		Transform targetTrans = obj[1] as Transform;
 		EquipItemAbility abilityDetailText = new EquipItemAbility((uint)ability.id, ability.pt);
 		if (abilityDetailPopUp == null)
 		{
-			abilityDetailPopUp = CreateAndGetAbilityDetail((Enum)UI.OBJ_DETAIL_ROOT);
+			abilityDetailPopUp = CreateAndGetAbilityDetail(UI.OBJ_DETAIL_ROOT);
 		}
 		abilityDetailPopUp.ShowAbilityDetail(targetTrans);
 		abilityDetailPopUp.SetAbilityDetailText(abilityDetailText);
@@ -326,7 +322,7 @@ public abstract class EquipGenerateBase : EquipMaterialBase
 	{
 		if (abilityDetailPopUp == null)
 		{
-			abilityDetailPopUp = CreateAndGetAbilityDetail((Enum)UI.OBJ_DETAIL_ROOT);
+			abilityDetailPopUp = CreateAndGetAbilityDetail(UI.OBJ_DETAIL_ROOT);
 		}
 		abilityDetailPopUp.PreCacheAbilityDetail(name, ap, desc);
 	}

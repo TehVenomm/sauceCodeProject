@@ -2,31 +2,12 @@ using AOT;
 using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.OurUtils;
 using System;
-using System.Runtime.CompilerServices;
 
 namespace GooglePlayGames.Native.PInvoke
 {
 	internal class VideoManager
 	{
 		private readonly GameServices mServices;
-
-		[CompilerGenerated]
-		private static Func<IntPtr, GetCaptureCapabilitiesResponse> _003C_003Ef__mg_0024cache0;
-
-		[CompilerGenerated]
-		private static GooglePlayGames.Native.Cwrapper.VideoManager.CaptureCapabilitiesCallback _003C_003Ef__mg_0024cache1;
-
-		[CompilerGenerated]
-		private static Func<IntPtr, GetCaptureStateResponse> _003C_003Ef__mg_0024cache2;
-
-		[CompilerGenerated]
-		private static GooglePlayGames.Native.Cwrapper.VideoManager.CaptureStateCallback _003C_003Ef__mg_0024cache3;
-
-		[CompilerGenerated]
-		private static Func<IntPtr, IsCaptureAvailableResponse> _003C_003Ef__mg_0024cache4;
-
-		[CompilerGenerated]
-		private static GooglePlayGames.Native.Cwrapper.VideoManager.IsCaptureAvailableCallback _003C_003Ef__mg_0024cache5;
 
 		internal int NumCaptureModes => 2;
 

@@ -136,7 +136,7 @@ public class ItemSortData : SortCompareData
 			uint num2 = ElementTypeToMinorSortValue(GetIconElement());
 			num += num2 << 6;
 			uint rarity = (uint)GetRarity();
-			return num + (rarity << 0);
+			return num + rarity;
 		}
 		return GetTableID();
 	}

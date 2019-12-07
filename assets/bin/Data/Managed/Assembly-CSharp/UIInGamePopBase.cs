@@ -28,11 +28,6 @@ public class UIInGamePopBase : MonoBehaviour
 
 	private float lockTimer;
 
-	public UIInGamePopBase()
-		: this()
-	{
-	}
-
 	protected virtual void Awake()
 	{
 		if (isPopMenu)
@@ -45,8 +40,8 @@ public class UIInGamePopBase : MonoBehaviour
 			{
 				buttonSprite.spriteName = buttonSpriteName[0];
 			}
-			icons[0].SetActive(true);
-			icons[1].SetActive(false);
+			icons[0].SetActive(value: true);
+			icons[1].SetActive(value: false);
 		}
 		else
 		{
@@ -58,8 +53,8 @@ public class UIInGamePopBase : MonoBehaviour
 			{
 				buttonSprite.spriteName = buttonSpriteName[1];
 			}
-			icons[0].SetActive(false);
-			icons[1].SetActive(true);
+			icons[0].SetActive(value: false);
+			icons[1].SetActive(value: true);
 		}
 	}
 
@@ -89,8 +84,8 @@ public class UIInGamePopBase : MonoBehaviour
 			{
 				buttonSprite.spriteName = buttonSpriteName[0];
 			}
-			icons[0].SetActive(true);
-			icons[1].SetActive(false);
+			icons[0].SetActive(value: true);
+			icons[1].SetActive(value: false);
 			SoundManager.PlaySystemSE(SoundID.UISE.MENU_OPEN);
 		}
 		else
@@ -103,8 +98,8 @@ public class UIInGamePopBase : MonoBehaviour
 			{
 				buttonSprite.spriteName = buttonSpriteName[1];
 			}
-			icons[0].SetActive(false);
-			icons[1].SetActive(true);
+			icons[0].SetActive(value: false);
+			icons[1].SetActive(value: true);
 			SoundManager.PlaySystemSE(SoundID.UISE.CANCEL);
 		}
 	}
@@ -113,7 +108,7 @@ public class UIInGamePopBase : MonoBehaviour
 	{
 		if (isLockReq)
 		{
-			lockTimer -= Time.get_deltaTime();
+			lockTimer -= Time.deltaTime;
 			if (!(lockTimer > 0f))
 			{
 				panelChange.Lock();

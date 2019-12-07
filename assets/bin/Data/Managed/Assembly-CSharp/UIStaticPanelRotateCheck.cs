@@ -11,18 +11,13 @@ public class UIStaticPanelRotateCheck : MonoBehaviour
 
 	protected UIAnchor[] anchors;
 
-	public UIStaticPanelRotateCheck()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 		{
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
 		}
-		anchors = this.GetComponentsInChildren<UIAnchor>();
+		anchors = GetComponentsInChildren<UIAnchor>();
 		updateCount = 0;
 		updateAnchors = true;
 		panel.widgetsAreStatic = false;
@@ -59,9 +54,9 @@ public class UIStaticPanelRotateCheck : MonoBehaviour
 			int i = 0;
 			for (int num = anchors.Length; i < num; i++)
 			{
-				anchors[i].set_enabled(true);
+				anchors[i].enabled = true;
 			}
-			this.GetComponentsInChildren<UIRect>(true, Temporary.uiRectList);
+			GetComponentsInChildren(includeInactive: true, Temporary.uiRectList);
 			int j = 0;
 			for (int count = Temporary.uiRectList.Count; j < count; j++)
 			{

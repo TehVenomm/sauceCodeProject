@@ -50,23 +50,22 @@ public class UIKeyNavigation : MonoBehaviour
 	{
 		get
 		{
-			if (this.get_enabled() && this.get_gameObject().get_activeInHierarchy())
+			if (base.enabled && base.gameObject.activeInHierarchy)
 			{
-				Collider component = this.GetComponent<Collider>();
+				Collider component = GetComponent<Collider>();
 				if (component != null)
 				{
-					return component.get_enabled();
+					return component.enabled;
 				}
-				Collider2D component2 = this.GetComponent<Collider2D>();
-				return component2 != null && component2.get_enabled();
+				Collider2D component2 = GetComponent<Collider2D>();
+				if (component2 != null)
+				{
+					return component2.enabled;
+				}
+				return false;
 			}
 			return false;
 		}
-	}
-
-	public UIKeyNavigation()
-		: this()
-	{
 	}
 
 	protected virtual void OnEnable()
@@ -83,7 +82,7 @@ public class UIKeyNavigation : MonoBehaviour
 		mStarted = true;
 		if (startsSelected && isColliderEnabled)
 		{
-			UICamera.hoveredObject = this.get_gameObject();
+			UICamera.hoveredObject = base.gameObject;
 		}
 	}
 
@@ -94,22 +93,25 @@ public class UIKeyNavigation : MonoBehaviour
 
 	private static bool IsActive(GameObject go)
 	{
-		if (Object.op_Implicit(go) && go.get_activeInHierarchy())
+		if ((bool)go && go.activeInHierarchy)
 		{
 			Collider component = go.GetComponent<Collider>();
 			if (component != null)
 			{
-				return component.get_enabled();
+				return component.enabled;
 			}
 			Collider2D component2 = go.GetComponent<Collider2D>();
-			return component2 != null && component2.get_enabled();
+			if (component2 != null)
+			{
+				return component2.enabled;
+			}
+			return false;
 		}
 		return false;
 	}
 
 	public GameObject GetLeft()
 	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		if (IsActive(onLeft))
 		{
 			return onLeft;
@@ -118,12 +120,11 @@ public class UIKeyNavigation : MonoBehaviour
 		{
 			return null;
 		}
-		return Get(Vector3.get_left(), 1f, 2f);
+		return Get(Vector3.left, 1f, 2f);
 	}
 
 	public GameObject GetRight()
 	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		if (IsActive(onRight))
 		{
 			return onRight;
@@ -132,12 +133,11 @@ public class UIKeyNavigation : MonoBehaviour
 		{
 			return null;
 		}
-		return Get(Vector3.get_right(), 1f, 2f);
+		return Get(Vector3.right, 1f, 2f);
 	}
 
 	public GameObject GetUp()
 	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		if (IsActive(onUp))
 		{
 			return onUp;
@@ -146,12 +146,11 @@ public class UIKeyNavigation : MonoBehaviour
 		{
 			return null;
 		}
-		return Get(Vector3.get_up(), 2f);
+		return Get(Vector3.up, 2f);
 	}
 
 	public GameObject GetDown()
 	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		if (IsActive(onDown))
 		{
 			return onDown;
@@ -160,28 +159,14 @@ public class UIKeyNavigation : MonoBehaviour
 		{
 			return null;
 		}
-		return Get(Vector3.get_down(), 2f);
+		return Get(Vector3.down, 2f);
 	}
 
 	public GameObject Get(Vector3 myDir, float x = 1f, float y = 1f)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		Transform transform = this.get_transform();
+		Transform transform = base.transform;
 		myDir = transform.TransformDirection(myDir);
-		Vector3 center = GetCenter(this.get_gameObject());
+		Vector3 center = GetCenter(base.gameObject);
 		float num = float.MaxValue;
 		GameObject result = null;
 		for (int i = 0; i < list.size; i++)
@@ -196,17 +181,16 @@ public class UIKeyNavigation : MonoBehaviour
 			{
 				continue;
 			}
-			Vector3 val = GetCenter(uIKeyNavigation.get_gameObject()) - center;
-			float num2 = Vector3.Dot(myDir, val.get_normalized());
-			if (!(num2 < 0.707f))
+			Vector3 direction = GetCenter(uIKeyNavigation.gameObject) - center;
+			if (!(Vector3.Dot(myDir, direction.normalized) < 0.707f))
 			{
-				val = transform.InverseTransformDirection(val);
-				val.x *= x;
-				val.y *= y;
-				float sqrMagnitude = val.get_sqrMagnitude();
+				direction = transform.InverseTransformDirection(direction);
+				direction.x *= x;
+				direction.y *= y;
+				float sqrMagnitude = direction.sqrMagnitude;
 				if (!(sqrMagnitude > num))
 				{
-					result = uIKeyNavigation.get_gameObject();
+					result = uIKeyNavigation.gameObject;
 					num = sqrMagnitude;
 				}
 			}
@@ -216,121 +200,100 @@ public class UIKeyNavigation : MonoBehaviour
 
 	protected static Vector3 GetCenter(GameObject go)
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
 		UIWidget component = go.GetComponent<UIWidget>();
-		UICamera uICamera = UICamera.FindCameraForLayer(go.get_layer());
+		UICamera uICamera = UICamera.FindCameraForLayer(go.layer);
 		if (uICamera != null)
 		{
-			Vector3 val = go.get_transform().get_position();
+			Vector3 vector = go.transform.position;
 			if (component != null)
 			{
 				Vector3[] worldCorners = component.worldCorners;
-				val = (worldCorners[0] + worldCorners[2]) * 0.5f;
+				vector = (worldCorners[0] + worldCorners[2]) * 0.5f;
 			}
-			val = uICamera.cachedCamera.WorldToScreenPoint(val);
-			val.z = 0f;
-			return val;
+			vector = uICamera.cachedCamera.WorldToScreenPoint(vector);
+			vector.z = 0f;
+			return vector;
 		}
 		if (component != null)
 		{
 			Vector3[] worldCorners2 = component.worldCorners;
 			return (worldCorners2[0] + worldCorners2[2]) * 0.5f;
 		}
-		return go.get_transform().get_position();
+		return go.transform.position;
 	}
 
 	public virtual void OnNavigate(KeyCode key)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Expected I4, but got Unknown
 		if (!UIPopupList.isOpen)
 		{
-			GameObject val = null;
-			switch (key - 273)
+			GameObject gameObject = null;
+			switch (key)
 			{
-			case 3:
-				val = GetLeft();
+			case KeyCode.LeftArrow:
+				gameObject = GetLeft();
 				break;
-			case 2:
-				val = GetRight();
+			case KeyCode.RightArrow:
+				gameObject = GetRight();
 				break;
-			case 0:
-				val = GetUp();
+			case KeyCode.UpArrow:
+				gameObject = GetUp();
 				break;
-			case 1:
-				val = GetDown();
+			case KeyCode.DownArrow:
+				gameObject = GetDown();
 				break;
 			}
-			if (val != null)
+			if (gameObject != null)
 			{
-				UICamera.hoveredObject = val;
+				UICamera.hoveredObject = gameObject;
 			}
 		}
 	}
 
 	public virtual void OnKey(KeyCode key)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0003: Invalid comparison between Unknown and I4
-		if ((int)key != 9)
+		if (key != KeyCode.Tab)
 		{
 			return;
 		}
-		GameObject val = onTab;
-		if (val == null)
+		GameObject gameObject = onTab;
+		if (gameObject == null)
 		{
-			if (UICamera.GetKey(304) || UICamera.GetKey(303))
+			if (UICamera.GetKey(KeyCode.LeftShift) || UICamera.GetKey(KeyCode.RightShift))
 			{
-				val = GetLeft();
-				if (val == null)
+				gameObject = GetLeft();
+				if (gameObject == null)
 				{
-					val = GetUp();
+					gameObject = GetUp();
 				}
-				if (val == null)
+				if (gameObject == null)
 				{
-					val = GetDown();
+					gameObject = GetDown();
 				}
-				if (val == null)
+				if (gameObject == null)
 				{
-					val = GetRight();
+					gameObject = GetRight();
 				}
 			}
 			else
 			{
-				val = GetRight();
-				if (val == null)
+				gameObject = GetRight();
+				if (gameObject == null)
 				{
-					val = GetDown();
+					gameObject = GetDown();
 				}
-				if (val == null)
+				if (gameObject == null)
 				{
-					val = GetUp();
+					gameObject = GetUp();
 				}
-				if (val == null)
+				if (gameObject == null)
 				{
-					val = GetLeft();
+					gameObject = GetLeft();
 				}
 			}
 		}
-		if (val != null)
+		if (gameObject != null)
 		{
-			UICamera.selectedObject = val;
+			UICamera.selectedObject = gameObject;
 		}
 	}
 

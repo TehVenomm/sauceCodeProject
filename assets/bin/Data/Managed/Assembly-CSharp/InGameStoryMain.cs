@@ -9,11 +9,11 @@ public class InGameStoryMain : StoryMain
 		{
 			if (MonoBehaviourSingleton<StageManager>.I.stageObject != null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.stageObject.get_gameObject().SetActive(false);
+				MonoBehaviourSingleton<StageManager>.I.stageObject.gameObject.SetActive(value: false);
 			}
 			if (MonoBehaviourSingleton<StageManager>.I.skyObject != null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.skyObject.get_gameObject().SetActive(false);
+				MonoBehaviourSingleton<StageManager>.I.skyObject.gameObject.SetActive(value: false);
 			}
 		}
 		base.Initialize();
@@ -25,16 +25,16 @@ public class InGameStoryMain : StoryMain
 		{
 			if (MonoBehaviourSingleton<StageManager>.I.stageObject != null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.stageObject.get_gameObject().SetActive(true);
+				MonoBehaviourSingleton<StageManager>.I.stageObject.gameObject.SetActive(value: true);
 			}
 			if (MonoBehaviourSingleton<StageManager>.I.skyObject != null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.skyObject.get_gameObject().SetActive(true);
+				MonoBehaviourSingleton<StageManager>.I.skyObject.gameObject.SetActive(value: true);
 			}
 		}
 		if (MonoBehaviourSingleton<StoryDirector>.IsValid())
 		{
-			Object.Destroy(MonoBehaviourSingleton<StoryDirector>.I.get_gameObject());
+			Object.Destroy(MonoBehaviourSingleton<StoryDirector>.I.gameObject);
 		}
 		base.OnDestroy();
 	}

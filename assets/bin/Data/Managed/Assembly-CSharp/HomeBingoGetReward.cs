@@ -1,5 +1,4 @@
 using Network;
-using System;
 using UnityEngine;
 
 public class HomeBingoGetReward : GameSection
@@ -54,7 +53,7 @@ public class HomeBingoGetReward : GameSection
 		texInnerModelRenderTexture_ = UIModelRenderTexture.Get(texInnerModel_);
 		texInnerModelTexture_ = texInnerModel_.GetComponent<UITexture>();
 		glowModel_ = Utility.Find(base._transform, "LIB_00000003");
-		SetLabelText((Enum)UI.LBL_TITLE, eventData.name);
+		SetLabelText(UI.LBL_TITLE, eventData.name);
 	}
 
 	public override void UpdateUI()
@@ -66,10 +65,10 @@ public class HomeBingoGetReward : GameSection
 
 	private void UpdateRewardIcon(DeliveryRewardTable.DeliveryRewardData[] rewards)
 	{
-		if (rewards != null && rewards.Length > 0)
+		if (rewards != null && rewards.Length != 0)
 		{
 			int exp = 0;
-			SetGrid(UI.GRD_REWARD, string.Empty, rewards.Length, reset: false, delegate(int index, Transform t, bool is_recycle)
+			SetGrid(UI.GRD_REWARD, "", rewards.Length, reset: false, delegate(int index, Transform t, bool is_recycle)
 			{
 				DeliveryRewardTable.DeliveryRewardData.Reward reward = rewards[index].reward;
 				bool is_visible = false;
@@ -93,7 +92,7 @@ public class HomeBingoGetReward : GameSection
 	{
 		if (null != glowModel_)
 		{
-			glowModel_.get_gameObject().SetActive(false);
+			glowModel_.gameObject.SetActive(value: false);
 		}
 		GameSection.BackSection();
 	}

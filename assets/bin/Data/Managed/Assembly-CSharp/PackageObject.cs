@@ -19,13 +19,6 @@ public class PackageObject
 
 	public bool unloadAllLoadedObjects;
 
-	public PackageObject()
-	{
-		refCount = 0;
-		linkPackages = new BetterList<PackageObject>();
-		obj = null;
-	}
-
 	public static void ClearPoolObjects()
 	{
 		rymTPool<PackageObject>.Clear();
@@ -47,13 +40,20 @@ public class PackageObject
 
 	public static void Release(ref PackageObject obj)
 	{
-		AssetBundle val = obj.obj as AssetBundle;
-		if (val != null)
+		AssetBundle assetBundle = obj.obj as AssetBundle;
+		if (assetBundle != null)
 		{
-			val.Unload(false);
+			assetBundle.Unload(unloadAllLoadedObjects: false);
 		}
 		obj.Reset();
 		rymTPool<PackageObject>.Release(ref obj);
+	}
+
+	public PackageObject()
+	{
+		refCount = 0;
+		linkPackages = new BetterList<PackageObject>();
+		obj = null;
 	}
 
 	public void Reset()

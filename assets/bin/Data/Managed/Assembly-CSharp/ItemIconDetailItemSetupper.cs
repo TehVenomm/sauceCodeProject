@@ -13,10 +13,10 @@ public class ItemIconDetailItemSetupper : ItemIconDetailSetuperBase
 		base.Set();
 		ItemTable.ItemData itemData = data[0] as ItemTable.ItemData;
 		int num = (int)data[1];
-		bool flag = (bool)data[2];
+		bool num2 = (bool)data[2];
 		SetName(itemData.name);
 		SetVisibleBG(is_visible: true);
-		if (flag)
+		if (num2)
 		{
 			SetActiveInfo(0);
 			lblNum.text = num.ToString();
@@ -26,7 +26,7 @@ public class ItemIconDetailItemSetupper : ItemIconDetailSetuperBase
 			}
 			else
 			{
-				lblEndDate.text = string.Empty;
+				lblEndDate.text = "";
 			}
 		}
 		else

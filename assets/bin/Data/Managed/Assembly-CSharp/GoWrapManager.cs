@@ -9,8 +9,8 @@ public class GoWrapManager : MonoBehaviourSingleton<GoWrapManager>, IGoWrapDeleg
 	private void Start()
 	{
 		GoWrap.INSTANCE.setDelegate(this);
-		GoWrap.INSTANCE.initGoWrap(this.get_name());
-		this.get_gameObject().AddComponent<GoWrapComponent>();
+		GoWrap.INSTANCE.initGoWrap(base.name);
+		base.gameObject.AddComponent<GoWrapComponent>();
 		List<string> list = new List<string>();
 		list.Add("unity");
 		GoWrap.INSTANCE.setCustomUrlSchemes(list);
@@ -36,8 +36,7 @@ public class GoWrapManager : MonoBehaviourSingleton<GoWrapManager>, IGoWrapDeleg
 		if (!GameSaveData.instance.IsPushedTrackTutorialBit(stepName))
 		{
 			string text = stepName.ToString();
-			string text2 = "track_" + text;
-			if (PlayerPrefs.GetInt(text2, 0) == 0)
+			if (PlayerPrefs.GetInt("track_" + text, 0) == 0)
 			{
 				GoWrap.INSTANCE.trackEvent(text, category);
 				GameSaveData.instance.SetPushedTrackTutorialBit(stepName);
@@ -50,8 +49,7 @@ public class GoWrapManager : MonoBehaviourSingleton<GoWrapManager>, IGoWrapDeleg
 		if (!GameSaveData.instance.IsPushedTrackTutorialBit(stepName))
 		{
 			string text = stepName.ToString();
-			string text2 = "track_" + text;
-			if (PlayerPrefs.GetInt(text2, 0) == 0)
+			if (PlayerPrefs.GetInt("track_" + text, 0) == 0)
 			{
 				GoWrap.INSTANCE.trackEvent(text, category, values);
 				GameSaveData.instance.SetPushedTrackTutorialBit(stepName);
@@ -63,7 +61,7 @@ public class GoWrapManager : MonoBehaviourSingleton<GoWrapManager>, IGoWrapDeleg
 	{
 		Protocol.Force(delegate
 		{
-			Debug.LogWarning((object)"SendStatusTracking Called!");
+			Debug.LogWarning("SendStatusTracking Called!");
 			AnalyticTrackingPointModel.RequestSendForm postData = new AnalyticTrackingPointModel.RequestSendForm
 			{
 				name = _stepName.ToString(),
@@ -76,8 +74,8 @@ public class GoWrapManager : MonoBehaviourSingleton<GoWrapManager>, IGoWrapDeleg
 				{
 					call_back(obj);
 				}
-				Debug.LogWarning((object)"SendStatusTracking Bit Success!");
-			}, string.Empty);
+				Debug.LogWarning("SendStatusTracking Bit Success!");
+			});
 		});
 	}
 
@@ -190,7 +188,7 @@ public class GoWrapManager : MonoBehaviourSingleton<GoWrapManager>, IGoWrapDeleg
 	{
 		if (url.StartsWith("unity:"))
 		{
-			WebViewManager.ProcessGotoEvent(url.Replace("unity:", string.Empty));
+			WebViewManager.ProcessGotoEvent(url.Replace("unity:", ""));
 		}
 	}
 

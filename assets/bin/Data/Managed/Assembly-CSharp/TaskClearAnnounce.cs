@@ -23,7 +23,7 @@ public class TaskClearAnnounce : UIBehaviour
 		{
 			return;
 		}
-		Transform child = this.get_transform().GetChild(0);
+		Transform child = base.transform.GetChild(0);
 		if (!(child == null))
 		{
 			ResourceLink component = child.GetComponent<ResourceLink>();
@@ -44,19 +44,18 @@ public class TaskClearAnnounce : UIBehaviour
 
 	private void Start()
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_EFFECT);
 		if (ctrl != null)
 		{
-			ctrl.set_localScale(Vector3.get_zero());
+			ctrl.localScale = Vector3.zero;
 		}
 		StoreAudioClip();
 	}
 
 	public void Play(string announce, string reward, Action onComplete)
 	{
-		UIWidget component = base.GetComponent<UIWidget>((Enum)UI.WGT_ANCHOR_POINT);
-		UITweenCtrl component2 = base.GetComponent<UITweenCtrl>((Enum)UI.OBJ_TWEENCTRL);
+		UIWidget component = GetComponent<UIWidget>(UI.WGT_ANCHOR_POINT);
+		UITweenCtrl component2 = GetComponent<UITweenCtrl>(UI.OBJ_TWEENCTRL);
 		if (component == null || component2 == null)
 		{
 			if (onComplete != null)
@@ -70,8 +69,8 @@ public class TaskClearAnnounce : UIBehaviour
 		component.bottomAnchor.Set(1f, -130f);
 		component.topAnchor.Set(1f, -105f);
 		component.UpdateAnchors();
-		SetLabelText((Enum)UI.LBL_ANNOUNCE, announce);
-		SetLabelText((Enum)UI.LBL_REWARD, reward);
+		SetLabelText(UI.LBL_ANNOUNCE, announce);
+		SetLabelText(UI.LBL_REWARD, reward);
 		component2.Reset();
 		component2.Play(forward: true, delegate
 		{

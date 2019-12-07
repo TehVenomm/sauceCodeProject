@@ -38,7 +38,7 @@ public class AttackHitChecker
 			hitRecord.target = hit_param.toObject;
 			list.Add(hitRecord);
 		}
-		hitRecord.lastHitTime = Time.get_time();
+		hitRecord.lastHitTime = Time.time;
 		hitRecord.hitCount++;
 	}
 
@@ -57,7 +57,7 @@ public class AttackHitChecker
 					{
 						return false;
 					}
-					if (Time.get_time() - hitRecord.lastHitTime <= info.hitIntervalTime)
+					if (Time.time - hitRecord.lastHitTime <= info.hitIntervalTime)
 					{
 						return false;
 					}
@@ -83,17 +83,13 @@ public class AttackHitChecker
 
 	public void ClearHitInfo(string infoName)
 	{
-		List<HitRecord> list = attackHitList.Get(infoName);
-		if (!object.ReferenceEquals(list, null))
-		{
-			list.Clear();
-		}
+		attackHitList.Get(infoName)?.Clear();
 	}
 
 	public void ClearTarget(AttackInfo info, StageObject target)
 	{
 		List<HitRecord> list = attackHitList.Get(info.name);
-		if (object.ReferenceEquals(list, null))
+		if (list == null)
 		{
 			return;
 		}

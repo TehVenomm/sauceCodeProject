@@ -23,13 +23,13 @@ public class CrystalShopBundleNotice : GameSection
 	{
 		if (purchaseData != null)
 		{
-			SetLabelText((Enum)UI.LBL_BONUS_NAME, purchaseData.productName);
+			SetLabelText(UI.LBL_BONUS_NAME, purchaseData.productName);
 			StringBuilder sb = new StringBuilder();
 			int count = purchaseData.bundle.Length;
 			int index = 0;
 			Array.ForEach(purchaseData.bundle, delegate(ShopReceiver.PaymentPurchaseData.PaymentItemData o)
 			{
-				index++;
+				int num = ++index;
 				if (index < count)
 				{
 					sb.AppendLine(o.name);
@@ -39,7 +39,7 @@ public class CrystalShopBundleNotice : GameSection
 					sb.Append(o.name);
 				}
 			});
-			SetLabelText((Enum)UI.ProvisionalLabel, sb.ToString());
+			SetLabelText(UI.ProvisionalLabel, sb.ToString());
 			UpdateAnchors();
 		}
 	}

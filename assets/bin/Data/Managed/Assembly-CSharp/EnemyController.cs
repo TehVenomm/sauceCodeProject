@@ -64,16 +64,16 @@ public class EnemyController : ControllerBase
 		base.OnChangeEnableControll(enable);
 		if (enable)
 		{
-			if (isStart && this.get_enabled() && enemy != null && mainCoroutine == null)
+			if (isStart && base.enabled && enemy != null && mainCoroutine == null)
 			{
 				startWaitTime = parameter.startWaitTime;
 				mainCoroutine = AIMain();
-				this.StartCoroutine(mainCoroutine);
+				StartCoroutine(mainCoroutine);
 			}
 		}
 		else if (mainCoroutine != null)
 		{
-			this.StopAllCoroutines();
+			StopAllCoroutines();
 			mainCoroutine = null;
 		}
 	}
@@ -83,10 +83,10 @@ public class EnemyController : ControllerBase
 		base.OnActReaction();
 		if (IsEnableControll() && mainCoroutine != null)
 		{
-			this.StopAllCoroutines();
+			StopAllCoroutines();
 			startWaitTime = parameter.afterReactionWaitTime;
 			mainCoroutine = AIMain();
-			this.StartCoroutine(mainCoroutine);
+			StartCoroutine(mainCoroutine);
 		}
 		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
@@ -112,7 +112,7 @@ public class EnemyController : ControllerBase
 	public void Reset()
 	{
 		base.brain.ResetInitialized();
-		this.StopAllCoroutines();
+		StopAllCoroutines();
 		mainCoroutine = null;
 	}
 
@@ -123,14 +123,6 @@ public class EnemyController : ControllerBase
 
 	protected override void Update()
 	{
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
 		base.Update();
 		if (!enemy.isHiding || (!enemy.IsOriginal() && !enemy.IsCoopNone()))
 		{
@@ -145,17 +137,16 @@ public class EnemyController : ControllerBase
 			StageObject targetObjectOfNearest = base.brain.targetCtrl.GetTargetObjectOfNearest();
 			if (targetObjectOfNearest != null)
 			{
-				Vector2 val = targetObjectOfNearest._position.ToVector2XZ();
-				Vector2 val2 = enemy._position.ToVector2XZ();
-				float num = Vector2.Distance(val, val2);
-				if (num <= enemy.turnUpDistance)
+				Vector2 a = targetObjectOfNearest._position.ToVector2XZ();
+				Vector2 b = enemy._position.ToVector2XZ();
+				if (Vector2.Distance(a, b) <= enemy.turnUpDistance)
 				{
 					enemy.TurnUp();
 				}
 			}
 			turnUpTimer = 0f;
 		}
-		turnUpTimer += Time.get_deltaTime();
+		turnUpTimer += Time.deltaTime;
 	}
 
 	private IEnumerator AIMain()
@@ -170,20 +161,20 @@ public class EnemyController : ControllerBase
 		}
 		if (startWaitTime > 0f)
 		{
-			yield return (object)new WaitForSeconds(startWaitTime);
+			yield return new WaitForSeconds(startWaitTime);
 		}
 		base.brain.HandleEvent(BRAIN_EVENT.END_ENEMY_ACTION);
-		while (this.get_enabled())
+		while (base.enabled)
 		{
 			while (character.IsMirror())
 			{
-				yield return (object)new WaitForSeconds(1f);
+				yield return new WaitForSeconds(1f);
 			}
 			while (enemy.isHiding || enemy.IsHideMotionPlaying())
 			{
 				yield return null;
 			}
-			yield return this.StartCoroutine(OnAction());
+			yield return StartCoroutine(OnAction());
 			yield return 0;
 		}
 		mainCoroutine = null;
@@ -197,11 +188,11 @@ public class EnemyController : ControllerBase
 			is_action = true;
 			if (base.brain.isNonActive)
 			{
-				yield return this.StartCoroutine(OnRotate());
+				yield return StartCoroutine(OnRotate());
 			}
 			else
 			{
-				yield return this.StartCoroutine(OnRotateOfAction());
+				yield return StartCoroutine(OnRotateOfAction());
 			}
 			while (character.actionID == Character.ACTION_ID.ROTATE)
 			{
@@ -213,11 +204,11 @@ public class EnemyController : ControllerBase
 			is_action = true;
 			if (base.brain.isNonActive)
 			{
-				yield return this.StartCoroutine(OnMove());
+				yield return StartCoroutine(OnMove());
 			}
 			else
 			{
-				yield return this.StartCoroutine(OnMoveOfAction());
+				yield return StartCoroutine(OnMoveOfAction());
 			}
 			while (character.actionID == Character.ACTION_ID.MOVE)
 			{
@@ -227,7 +218,7 @@ public class EnemyController : ControllerBase
 		if (base.brain.weaponCtrl.IsAttack())
 		{
 			is_action = true;
-			yield return this.StartCoroutine(OnAttackOfAction());
+			yield return StartCoroutine(OnAttackOfAction());
 		}
 		if (is_action)
 		{
@@ -237,25 +228,24 @@ public class EnemyController : ControllerBase
 
 	public IEnumerator OnRotateOfAction()
 	{
-		EnemyActionController.ActionInfo actInfo = enemyBrain.actionCtrl.nowAction;
-		if (actInfo.data.isRotate)
+		if (enemyBrain.actionCtrl.nowAction.data.isRotate)
 		{
-			yield return this.StartCoroutine(OnRotateToTarget());
+			yield return StartCoroutine(OnRotateToTarget());
 		}
 	}
 
 	public IEnumerator OnMoveOfAction()
 	{
-		EnemyActionController.ActionInfo actInfo = enemyBrain.actionCtrl.nowAction;
-		if (actInfo.data.isMove && !(base.brain.targetCtrl.GetDistance() < (float)actInfo.data.atkRange))
+		EnemyActionController.ActionInfo nowAction = enemyBrain.actionCtrl.nowAction;
+		if (nowAction.data.isMove && !(base.brain.targetCtrl.GetDistance() < (float)nowAction.data.atkRange))
 		{
 			if (base.brain.param.moveParam.enableActionMoveHoming)
 			{
-				yield return this.StartCoroutine(OnMoveHoming());
+				yield return StartCoroutine(OnMoveHoming());
 			}
 			else
 			{
-				yield return this.StartCoroutine(OnMoveToTarget());
+				yield return StartCoroutine(OnMoveToTarget());
 			}
 		}
 	}
@@ -265,63 +255,66 @@ public class EnemyController : ControllerBase
 		EnemyActionTable.EnemyActionData nowActData = enemyBrain.actionCtrl.nowAction.data;
 		if (nowActData.lotteryWaitInterval > 0f)
 		{
-			nowActData.lotteryWaitTime = Time.get_time();
+			nowActData.lotteryWaitTime = Time.time;
 		}
 		int j = 0;
-		for (int i = nowActData.combiActionTypeInfos.Length; j < i; j++)
+		int i = nowActData.combiActionTypeInfos.Length;
+		while (j < i)
 		{
 			EnemyActionTable.ActionTypeInfo actionTypeInfo = nowActData.combiActionTypeInfos[j];
 			switch (actionTypeInfo.type)
 			{
 			case EnemyActionTable.ACTION_TYPE.STEP:
-				yield return this.StartCoroutine(OnStep());
+				yield return StartCoroutine(OnStep());
 				break;
 			case EnemyActionTable.ACTION_TYPE.STEP_BACK:
-				yield return this.StartCoroutine(OnStep(is_back: true));
+				yield return StartCoroutine(OnStep(is_back: true));
 				break;
 			case EnemyActionTable.ACTION_TYPE.ROTATE:
-				yield return this.StartCoroutine(OnRotateToTarget());
+				yield return StartCoroutine(OnRotateToTarget());
 				break;
 			case EnemyActionTable.ACTION_TYPE.MOVE:
-				yield return this.StartCoroutine(OnMoveToTarget());
+				yield return StartCoroutine(OnMoveToTarget());
 				break;
 			case EnemyActionTable.ACTION_TYPE.MOVE_HOMING:
-				yield return this.StartCoroutine(OnMoveHoming());
+				yield return StartCoroutine(OnMoveHoming());
 				break;
 			case EnemyActionTable.ACTION_TYPE.ATTACK:
-				yield return this.StartCoroutine(OnAtk(actionTypeInfo));
+				yield return StartCoroutine(OnAtk(actionTypeInfo));
 				break;
 			case EnemyActionTable.ACTION_TYPE.ANGRY:
-				yield return this.StartCoroutine(OnAngry(actionTypeInfo, nowActData.angryId));
+				yield return StartCoroutine(OnAngry(actionTypeInfo, nowActData.angryId));
 				break;
 			case EnemyActionTable.ACTION_TYPE.MOVE_SIDE:
-				yield return this.StartCoroutine(OnMoveSideways());
+				yield return StartCoroutine(OnMoveSideways());
 				break;
 			case EnemyActionTable.ACTION_TYPE.MOVE_POINT:
-				yield return this.StartCoroutine(OnMovePoint());
+				yield return StartCoroutine(OnMovePoint());
 				break;
 			case EnemyActionTable.ACTION_TYPE.MOVE_LOOKAT:
-				yield return this.StartCoroutine(OnMoveLookAt());
+				yield return StartCoroutine(OnMoveLookAt());
 				break;
 			}
+			int num = j + 1;
+			j = num;
 		}
 		while (!character.IsChangeableAction(Character.ACTION_ID.NONE))
 		{
 			yield return 0;
 		}
-		float time2 = nowActData.afterWaitTime;
+		float num2 = nowActData.afterWaitTime;
 		if (enemyParameter != null)
 		{
-			time2 += enemyParameter.baseAfterWaitTime;
-			time2 += GetAfterWaitTimeByLv(enemy.enemyLevel);
+			num2 += enemyParameter.baseAfterWaitTime;
+			num2 += GetAfterWaitTimeByLv(enemy.enemyLevel);
 		}
 		if (enemy.packetSender != null)
 		{
-			time2 = enemy.packetSender.GetWaitTime(time2);
+			num2 = enemy.packetSender.GetWaitTime(num2);
 		}
-		if (time2 > 0f)
+		if (num2 > 0f)
 		{
-			yield return (object)new WaitForSeconds(time2);
+			yield return new WaitForSeconds(num2);
 		}
 	}
 
@@ -376,7 +369,7 @@ public class EnemyController : ControllerBase
 		{
 			yield return 0;
 		}
-		character.ActAttack(actionTypeInfo.id, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+		character.ActAttack(actionTypeInfo.id);
 	}
 
 	public IEnumerator OnAngry(EnemyActionTable.ActionTypeInfo actionTypeInfo, uint angryId)
@@ -424,17 +417,17 @@ public class EnemyController : ControllerBase
 		float distance = base.brain.targetCtrl.GetDistance();
 		if (!(distance < character.moveStopRange))
 		{
-			float len = distance + base.brain.param.moveParam.moveOverDistance;
-			if (len >= base.brain.param.moveParam.moveMaxLength)
+			float num = distance + base.brain.param.moveParam.moveOverDistance;
+			if (num >= base.brain.param.moveParam.moveMaxLength)
 			{
-				len = base.brain.param.moveParam.moveMaxLength;
+				num = base.brain.param.moveParam.moveMaxLength;
 			}
-			float alteredLength = 0f;
-			if (enemyBrain.actionCtrl.GetMoveMaxLength(ref alteredLength))
+			float length = 0f;
+			if (enemyBrain.actionCtrl.GetMoveMaxLength(ref length))
 			{
-				len = alteredLength;
+				num = length;
 			}
-			character.ActMoveToTarget(len);
+			character.ActMoveToTarget(num);
 		}
 	}
 
@@ -444,14 +437,12 @@ public class EnemyController : ControllerBase
 		{
 			yield return 0;
 		}
-		Vector3 vec_target = base.brain.moveCtrl.targetPos - character._position;
-		vec_target.y = 0f;
-		if (!(vec_target == Vector3.get_zero()))
+		Vector3 vector = base.brain.moveCtrl.targetPos - character._position;
+		vector.y = 0f;
+		if (!(vector == Vector3.zero))
 		{
-			Quaternion val = Quaternion.LookRotation(vec_target);
-			Vector3 eulerAngles = val.get_eulerAngles();
-			float direction = eulerAngles.y;
-			character.ActRotateToDirection(direction);
+			float y = Quaternion.LookRotation(vector).eulerAngles.y;
+			character.ActRotateToDirection(y);
 		}
 	}
 
@@ -461,18 +452,18 @@ public class EnemyController : ControllerBase
 		{
 			yield return 0;
 		}
-		Vector3 vec_target = base.brain.moveCtrl.targetPos - character._position;
-		vec_target.y = 0f;
-		float max_length = base.brain.param.moveParam.moveMaxLength;
-		if (max_length > 0f)
+		Vector3 b = base.brain.moveCtrl.targetPos - character._position;
+		b.y = 0f;
+		float moveMaxLength = base.brain.param.moveParam.moveMaxLength;
+		if (moveMaxLength > 0f)
 		{
-			float magnitude = vec_target.get_magnitude();
-			if (magnitude > max_length)
+			float magnitude = b.magnitude;
+			if (magnitude > moveMaxLength)
 			{
-				vec_target *= max_length / magnitude;
+				b *= moveMaxLength / magnitude;
 			}
 		}
-		character.ActMoveToPosition(character._position + vec_target);
+		character.ActMoveToPosition(character._position + b);
 	}
 
 	public IEnumerator OnMoveHoming()
@@ -485,8 +476,7 @@ public class EnemyController : ControllerBase
 		{
 			base.brain.opponentMem.Update();
 		}
-		float distance = base.brain.targetCtrl.GetDistance();
-		if (!(distance < character.moveStopRange))
+		if (!(base.brain.targetCtrl.GetDistance() < character.moveStopRange))
 		{
 			character.ActMoveHoming(base.brain.param.moveParam.moveHomingMaxLength);
 		}

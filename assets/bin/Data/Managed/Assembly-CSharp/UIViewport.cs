@@ -15,55 +15,40 @@ public class UIViewport : MonoBehaviour
 
 	private Camera mCam;
 
-	public UIViewport()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
-		mCam = this.GetComponent<Camera>();
+		mCam = GetComponent<Camera>();
 		if (sourceCamera == null)
 		{
-			sourceCamera = Camera.get_main();
+			sourceCamera = Camera.main;
 		}
 	}
 
 	private void LateUpdate()
 	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
 		if (!(topLeft != null) || !(bottomRight != null))
 		{
 			return;
 		}
-		if (topLeft.get_gameObject().get_activeInHierarchy())
+		if (topLeft.gameObject.activeInHierarchy)
 		{
-			Vector3 val = sourceCamera.WorldToScreenPoint(topLeft.get_position());
-			Vector3 val2 = sourceCamera.WorldToScreenPoint(bottomRight.get_position());
-			Rect val3 = default(Rect);
-			val3._002Ector(val.x / (float)Screen.get_width(), val2.y / (float)Screen.get_height(), (val2.x - val.x) / (float)Screen.get_width(), (val.y - val2.y) / (float)Screen.get_height());
-			float num = fullSize * val3.get_height();
-			if (val3 != mCam.get_rect())
+			Vector3 vector = sourceCamera.WorldToScreenPoint(topLeft.position);
+			Vector3 vector2 = sourceCamera.WorldToScreenPoint(bottomRight.position);
+			Rect rect = new Rect(vector.x / (float)Screen.width, vector2.y / (float)Screen.height, (vector2.x - vector.x) / (float)Screen.width, (vector.y - vector2.y) / (float)Screen.height);
+			float num = fullSize * rect.height;
+			if (rect != mCam.rect)
 			{
-				mCam.set_rect(val3);
+				mCam.rect = rect;
 			}
-			if (mCam.get_orthographicSize() != num)
+			if (mCam.orthographicSize != num)
 			{
-				mCam.set_orthographicSize(num);
+				mCam.orthographicSize = num;
 			}
-			mCam.set_enabled(true);
+			mCam.enabled = true;
 		}
 		else
 		{
-			mCam.set_enabled(false);
+			mCam.enabled = false;
 		}
 	}
 }

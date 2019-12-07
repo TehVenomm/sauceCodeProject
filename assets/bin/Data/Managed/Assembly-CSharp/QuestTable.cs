@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class QuestTable : Singleton<QuestTable>
@@ -216,16 +215,16 @@ public class QuestTable : Singleton<QuestTable>
 			grade = reader.ReadInt32();
 			difficulty = (DIFFICULTY_TYPE)reader.ReadInt32();
 			sortPriority = reader.ReadInt32();
-			locationNumber = reader.ReadString(string.Empty);
-			questNumber = reader.ReadString(string.Empty);
-			questText = reader.ReadString(string.Empty);
+			locationNumber = reader.ReadString();
+			questNumber = reader.ReadString();
+			questText = reader.ReadString();
 			appearQuestId = reader.ReadUInt32();
 			appearDeliveryId = reader.ReadUInt32();
 			rushId = reader.ReadUInt32();
 			mapId = reader.ReadUInt32();
 			for (int i = 0; i < 1; i++)
 			{
-				stageName[i] = reader.ReadString(string.Empty);
+				stageName[i] = reader.ReadString();
 			}
 			for (int j = 0; j < 3; j++)
 			{
@@ -304,7 +303,7 @@ public class QuestTable : Singleton<QuestTable>
 
 		public override string ToString()
 		{
-			return "questID:" + questID + ", questType:" + questType + ", questStyle:" + questStyle + ", rarity:" + rarity + ", getType:" + getType + ", eventId:" + eventId + ", grade:" + grade + ", difficulty:" + difficulty + ", sortPriority:" + sortPriority + ", locationNumber:" + locationNumber + ", questNumber:" + questNumber + ", questText:" + questText + ", appearQuestId:" + appearQuestId + ", appearDeliveryId:" + appearDeliveryId + ", mapId:" + mapId + ", limitTime:" + limitTime + ", cantSale:" + cantSale + ", forceDefeat:" + forceDefeat + ", storyId:" + storyId + ", seriesNum:" + seriesNum;
+			return "questID:" + questID + ", questType:" + questType + ", questStyle:" + questStyle + ", rarity:" + rarity + ", getType:" + getType + ", eventId:" + eventId + ", grade:" + grade + ", difficulty:" + difficulty + ", sortPriority:" + sortPriority + ", locationNumber:" + locationNumber + ", questNumber:" + questNumber + ", questText:" + questText + ", appearQuestId:" + appearQuestId + ", appearDeliveryId:" + appearDeliveryId + ", mapId:" + mapId + ", limitTime:" + limitTime + ", cantSale:" + cantSale.ToString() + ", forceDefeat:" + forceDefeat.ToString() + ", storyId:" + storyId + ", seriesNum:" + seriesNum;
 		}
 	}
 
@@ -342,15 +341,6 @@ public class QuestTable : Singleton<QuestTable>
 	private UIntKeyTable<QuestTableData> questTable;
 
 	private UIntKeyTable<MissionTableData> missionTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<QuestTableData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<QuestTableData> _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<MissionTableData> _003C_003Ef__mg_0024cache2;
 
 	public static UIntKeyTable<QuestTableData> CreateQuestTableCSV(string csv_text)
 	{
@@ -474,12 +464,9 @@ public class QuestTable : Singleton<QuestTable>
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
 			uint questId = quest_item.infoData.questData.tableData.questID;
-			num2 = (from g in MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList
-			where g.questId == (int)questId
-			select g).Count();
+			num2 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where((GuildRequestItem g) => g.questId == (int)questId).Count();
 		}
-		int num3 = num - num2;
-		return Mathf.Max(num3, 0);
+		return Mathf.Max(num - num2, 0);
 	}
 
 	public MissionTableData GetMissionData(uint id)
@@ -509,7 +496,7 @@ public class QuestTable : Singleton<QuestTable>
 			if (!is_find)
 			{
 				EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)table.GetMainEnemyID());
-				if (enemyData != null && enemyData.type == enemy && (!difficulty.HasValue || (difficulty.GetValueOrDefault() == table.difficulty && difficulty.HasValue)))
+				if (enemyData != null && enemyData.type == enemy && (!difficulty.HasValue || difficulty == table.difficulty))
 				{
 					int num = 0;
 					int num2 = type.Length;
@@ -519,8 +506,7 @@ public class QuestTable : Singleton<QuestTable>
 						{
 							return;
 						}
-						QUEST_TYPE? qUEST_TYPE = type[num];
-						if (qUEST_TYPE.HasValue && table.questType == type[num])
+						if (type[num].HasValue && table.questType == type[num])
 						{
 							break;
 						}

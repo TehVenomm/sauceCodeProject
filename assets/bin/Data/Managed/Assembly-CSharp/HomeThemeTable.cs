@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 
 public class HomeThemeTable : Singleton<HomeThemeTable>, IDataTable
 {
@@ -59,9 +58,6 @@ public class HomeThemeTable : Singleton<HomeThemeTable>, IDataTable
 	private UIntKeyTable<HomeThemeData> homeThemeDataTable;
 
 	private string currentHomeTheme;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<HomeThemeData> _003C_003Ef__mg_0024cache0;
 
 	public string CurrentHomeTheme => currentHomeTheme;
 

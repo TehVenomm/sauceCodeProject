@@ -45,17 +45,21 @@ public class UIButton : UIButtonColor
 	{
 		get
 		{
-			if (!this.get_enabled())
+			if (!base.enabled)
 			{
 				return false;
 			}
-			Collider component = this.get_gameObject().GetComponent<Collider>();
-			if (Object.op_Implicit(component) && component.get_enabled())
+			Collider component = base.gameObject.GetComponent<Collider>();
+			if ((bool)component && component.enabled)
 			{
 				return true;
 			}
-			Collider2D component2 = this.GetComponent<Collider2D>();
-			return Object.op_Implicit(component2) && component2.get_enabled();
+			Collider2D component2 = GetComponent<Collider2D>();
+			if ((bool)component2)
+			{
+				return component2.enabled;
+			}
+			return false;
 		}
 		set
 		{
@@ -63,32 +67,30 @@ public class UIButton : UIButtonColor
 			{
 				return;
 			}
-			Collider component = this.get_gameObject().GetComponent<Collider>();
+			Collider component = base.gameObject.GetComponent<Collider>();
 			if (component != null)
 			{
-				component.set_enabled(value);
-				UIButton[] components = this.GetComponents<UIButton>();
-				UIButton[] array = components;
-				foreach (UIButton uIButton in array)
+				component.enabled = value;
+				UIButton[] components = GetComponents<UIButton>();
+				for (int i = 0; i < components.Length; i++)
 				{
-					uIButton.SetState((!value) ? State.Disabled : State.Normal, immediate: false);
+					components[i].SetState((!value) ? State.Disabled : State.Normal, immediate: false);
 				}
 				return;
 			}
-			Collider2D component2 = this.GetComponent<Collider2D>();
+			Collider2D component2 = GetComponent<Collider2D>();
 			if (component2 != null)
 			{
-				component2.set_enabled(value);
-				UIButton[] components2 = this.GetComponents<UIButton>();
-				UIButton[] array2 = components2;
-				foreach (UIButton uIButton2 in array2)
+				component2.enabled = value;
+				UIButton[] components = GetComponents<UIButton>();
+				for (int i = 0; i < components.Length; i++)
 				{
-					uIButton2.SetState((!value) ? State.Disabled : State.Normal, immediate: false);
+					components[i].SetState((!value) ? State.Disabled : State.Normal, immediate: false);
 				}
 			}
 			else
 			{
-				this.set_enabled(value);
+				base.enabled = value;
 			}
 		}
 	}
@@ -176,7 +178,7 @@ public class UIButton : UIButtonColor
 		{
 			if (mInitDone)
 			{
-				OnHover(UICamera.hoveredObject == this.get_gameObject());
+				OnHover(UICamera.hoveredObject == base.gameObject);
 			}
 		}
 		else
@@ -187,7 +189,7 @@ public class UIButton : UIButtonColor
 
 	protected override void OnDragOver()
 	{
-		if (isEnabled && (dragHighlight || UICamera.currentTouch.pressed == this.get_gameObject()))
+		if (isEnabled && (dragHighlight || UICamera.currentTouch.pressed == base.gameObject))
 		{
 			base.OnDragOver();
 		}
@@ -195,7 +197,7 @@ public class UIButton : UIButtonColor
 
 	protected override void OnDragOut()
 	{
-		if (isEnabled && (dragHighlight || UICamera.currentTouch.pressed == this.get_gameObject()))
+		if (isEnabled && (dragHighlight || UICamera.currentTouch.pressed == base.gameObject))
 		{
 			base.OnDragOut();
 		}
@@ -203,7 +205,7 @@ public class UIButton : UIButtonColor
 
 	protected virtual void OnClick()
 	{
-		if (current == null && isEnabled && TutorialMessage.IsActiveButton(this.get_gameObject()))
+		if (current == null && isEnabled && TutorialMessage.IsActiveButton(base.gameObject))
 		{
 			current = this;
 			EventDelegate.Execute(onClick);
@@ -222,7 +224,7 @@ public class UIButton : UIButtonColor
 				SetSprite(mNormalSprite);
 				break;
 			case State.Hover:
-				SetSprite((!string.IsNullOrEmpty(hoverSprite)) ? hoverSprite : mNormalSprite);
+				SetSprite(string.IsNullOrEmpty(hoverSprite) ? mNormalSprite : hoverSprite);
 				break;
 			case State.Pressed:
 				SetSprite(pressedSprite);
@@ -240,7 +242,7 @@ public class UIButton : UIButtonColor
 				SetSprite(mNormalSprite2D);
 				break;
 			case State.Hover:
-				SetSprite((!(hoverSprite2D == null)) ? hoverSprite2D : mNormalSprite2D);
+				SetSprite((hoverSprite2D == null) ? mNormalSprite2D : hoverSprite2D);
 				break;
 			case State.Pressed:
 				SetSprite(pressedSprite2D);
@@ -280,9 +282,9 @@ public class UIButton : UIButtonColor
 	{
 		if (!isCheckNeedButtonEffect)
 		{
-			if (this.GetComponent<UINoAuto>() == null && null == this.GetComponent<UIButtonEffect>())
+			if (GetComponent<UINoAuto>() == null && null == GetComponent<UIButtonEffect>())
 			{
-				AutoAddButtonEffect = this.get_gameObject().AddComponent<UIButtonEffect>();
+				AutoAddButtonEffect = base.gameObject.AddComponent<UIButtonEffect>();
 			}
 			isCheckNeedButtonEffect = true;
 		}
@@ -295,7 +297,7 @@ public class UIButton : UIButtonColor
 		{
 			if (AutoAddButtonEffect != null)
 			{
-				Object.Destroy(AutoAddButtonEffect);
+				UnityEngine.Object.Destroy(AutoAddButtonEffect);
 				AutoAddButtonEffect = null;
 			}
 			isCheckNeedButtonEffect = false;

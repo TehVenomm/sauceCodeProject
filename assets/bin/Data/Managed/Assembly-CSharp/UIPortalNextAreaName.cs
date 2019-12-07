@@ -15,7 +15,7 @@ public class UIPortalNextAreaName : MonoBehaviourSingleton<UIPortalNextAreaName>
 	protected TweenAlpha noticeTween;
 
 	[SerializeField]
-	protected Vector3 offset;
+	protected Vector3 offset = Vector3.zero;
 
 	protected PortalObject portal;
 
@@ -24,15 +24,13 @@ public class UIPortalNextAreaName : MonoBehaviourSingleton<UIPortalNextAreaName>
 	protected override void Awake()
 	{
 		base.Awake();
-		nameLabel.fontStyle = 2;
-		noticeObject.SetActive(false);
-		this.get_gameObject().SetActive(FieldManager.IsValidInGameNoQuest());
+		nameLabel.fontStyle = FontStyle.Italic;
+		noticeObject.SetActive(value: false);
+		base.gameObject.SetActive(FieldManager.IsValidInGameNoQuest());
 	}
 
 	private void Update()
 	{
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid() || !MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
 			return;
@@ -47,13 +45,13 @@ public class UIPortalNextAreaName : MonoBehaviourSingleton<UIPortalNextAreaName>
 		for (int count = MonoBehaviourSingleton<InGameProgress>.I.portalObjectList.Count; i < count; i++)
 		{
 			PortalObject portalObject = MonoBehaviourSingleton<InGameProgress>.I.portalObjectList[i];
-			if (portalObject.isFull && portalObject.portalData.dstMapID != 0 && Vector3.Distance(portalObject._transform.get_position(), self._position) < 10f)
+			if (portalObject.isFull && portalObject.portalData.dstMapID != 0 && Vector3.Distance(portalObject._transform.position, self._position) < 10f)
 			{
 				portalReq = portalObject;
 				break;
 			}
 		}
-		if (portal == portalReq || noticeTween.get_isActiveAndEnabled())
+		if (portal == portalReq || noticeTween.isActiveAndEnabled)
 		{
 			return;
 		}
@@ -74,12 +72,12 @@ public class UIPortalNextAreaName : MonoBehaviourSingleton<UIPortalNextAreaName>
 				{
 					nameLabel.text = portalReq.portalData.placeText;
 				}
-				noticeObject.SetActive(true);
+				noticeObject.SetActive(value: true);
 				noticeTween.PlayForward();
 			}
 			else
 			{
-				noticeObject.SetActive(false);
+				noticeObject.SetActive(value: false);
 			}
 			portal = portalReq;
 		}
@@ -91,16 +89,9 @@ public class UIPortalNextAreaName : MonoBehaviourSingleton<UIPortalNextAreaName>
 
 	private void LateUpdate()
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 		if (!(portal == null))
 		{
-			Vector3 position = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToScreenPoint(portal._transform.get_position() + offset));
+			Vector3 position = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToScreenPoint(portal._transform.position + offset));
 			if (position.z >= 0f)
 			{
 				position.z = 0f;
@@ -109,7 +100,7 @@ public class UIPortalNextAreaName : MonoBehaviourSingleton<UIPortalNextAreaName>
 			{
 				position.z = -100f;
 			}
-			base._transform.set_position(position);
+			base._transform.position = position;
 		}
 	}
 }

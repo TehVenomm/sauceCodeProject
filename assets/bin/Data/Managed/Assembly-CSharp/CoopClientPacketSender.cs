@@ -9,14 +9,9 @@ public class CoopClientPacketSender : MonoBehaviour
 		set;
 	}
 
-	public CoopClientPacketSender()
-		: this()
-	{
-	}
-
 	protected virtual void Awake()
 	{
-		coopClient = this.get_gameObject().GetComponent<CoopClient>();
+		coopClient = base.gameObject.GetComponent<CoopClient>();
 	}
 
 	protected virtual void Start()
@@ -38,14 +33,7 @@ public class CoopClientPacketSender : MonoBehaviour
 		model.id = 1003;
 		model.status = (int)coopClient.status;
 		model.joinType = (int)coopClient.joinType;
-		Send(model, promise: true, to_client_id, null, delegate
-		{
-			if (model.status != (int)coopClient.status)
-			{
-				return false;
-			}
-			return true;
-		});
+		Send(model, promise: true, to_client_id, null, (Coop_Model_Base send_model) => (model.status == (int)coopClient.status) ? true : false);
 	}
 
 	public void SendClientBecameHost(int to_client_id = 0)

@@ -24,7 +24,17 @@ public class UIAtlas : MonoBehaviour
 
 		public float paddingBottom;
 
-		public bool hasPadding => paddingLeft != 0f || paddingRight != 0f || paddingTop != 0f || paddingBottom != 0f;
+		public bool hasPadding
+		{
+			get
+			{
+				if (paddingLeft == 0f && paddingRight == 0f && paddingTop == 0f)
+				{
+					return paddingBottom != 0f;
+				}
+				return true;
+			}
+		}
 	}
 
 	private enum Coordinates
@@ -65,7 +75,11 @@ public class UIAtlas : MonoBehaviour
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? material : mReplacement.spriteMaterial;
+			if (!(mReplacement != null))
+			{
+				return material;
+			}
+			return mReplacement.spriteMaterial;
 		}
 		set
 		{
@@ -98,7 +112,7 @@ public class UIAtlas : MonoBehaviour
 			if (mPMA == -1)
 			{
 				Material spriteMaterial = this.spriteMaterial;
-				mPMA = ((spriteMaterial != null && spriteMaterial.get_shader() != null && spriteMaterial.get_shader().get_name().Contains("Premultiplied")) ? 1 : 0);
+				mPMA = ((spriteMaterial != null && spriteMaterial.shader != null && spriteMaterial.shader.name.Contains("Premultiplied")) ? 1 : 0);
 			}
 			return mPMA == 1;
 		}
@@ -131,13 +145,31 @@ public class UIAtlas : MonoBehaviour
 		}
 	}
 
-	public Texture texture => (mReplacement != null) ? mReplacement.texture : ((!(material != null)) ? null : material.get_mainTexture());
+	public Texture texture
+	{
+		get
+		{
+			if (!(mReplacement != null))
+			{
+				if (!(material != null))
+				{
+					return null;
+				}
+				return material.mainTexture;
+			}
+			return mReplacement.texture;
+		}
+	}
 
 	public float pixelSize
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? mPixelSize : mReplacement.pixelSize;
+			if (!(mReplacement != null))
+			{
+				return mPixelSize;
+			}
+			return mReplacement.pixelSize;
 		}
 		set
 		{
@@ -188,11 +220,6 @@ public class UIAtlas : MonoBehaviour
 		}
 	}
 
-	public UIAtlas()
-		: this()
-	{
-	}
-
 	public UISpriteData GetSprite(string name)
 	{
 		if (mReplacement != null)
@@ -220,7 +247,11 @@ public class UIAtlas : MonoBehaviour
 					return mSprites[value];
 				}
 				MarkSpriteListAsChanged();
-				return (!mSpriteIndices.TryGetValue(name, out value)) ? null : mSprites[value];
+				if (!mSpriteIndices.TryGetValue(name, out value))
+				{
+					return null;
+				}
+				return mSprites[value];
 			}
 			int i = 0;
 			for (int count = mSprites.Count; i < count; i++)
@@ -249,7 +280,11 @@ public class UIAtlas : MonoBehaviour
 					list.Add(item.name);
 				}
 			}
-			return (list.Count <= 0) ? null : list[Random.Range(0, list.Count)];
+			if (list.Count <= 0)
+			{
+				return null;
+			}
+			return list[UnityEngine.Random.Range(0, list.Count)];
 		}
 		return startsWith;
 	}
@@ -294,7 +329,7 @@ public class UIAtlas : MonoBehaviour
 
 	public BetterList<string> GetListOfSprites(string match)
 	{
-		if (Object.op_Implicit(mReplacement))
+		if ((bool)mReplacement)
 		{
 			return mReplacement.GetListOfSprites(match);
 		}
@@ -360,7 +395,11 @@ public class UIAtlas : MonoBehaviour
 		{
 			return true;
 		}
-		return mReplacement != null && mReplacement.References(atlas);
+		if (!(mReplacement != null))
+		{
+			return false;
+		}
+		return mReplacement.References(atlas);
 	}
 
 	public static bool CheckIfRelated(UIAtlas a, UIAtlas b)
@@ -369,7 +408,11 @@ public class UIAtlas : MonoBehaviour
 		{
 			return false;
 		}
-		return a == b || a.References(b) || b.References(a);
+		if (!(a == b) && !a.References(b))
+		{
+			return b.References(a);
+		}
+		return true;
 	}
 
 	public void MarkAsChanged()
@@ -418,23 +461,15 @@ public class UIAtlas : MonoBehaviour
 
 	private bool Upgrade()
 	{
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		if (Object.op_Implicit(mReplacement))
+		if ((bool)mReplacement)
 		{
 			return mReplacement.Upgrade();
 		}
-		if (mSprites.Count == 0 && sprites.Count > 0 && Object.op_Implicit(material))
+		if (mSprites.Count == 0 && sprites.Count > 0 && (bool)material)
 		{
-			Texture mainTexture = material.get_mainTexture();
-			int width = (!(mainTexture != null)) ? 512 : mainTexture.get_width();
-			int height = (!(mainTexture != null)) ? 512 : mainTexture.get_height();
+			Texture mainTexture = material.mainTexture;
+			int width = (mainTexture != null) ? mainTexture.width : 512;
+			int height = (mainTexture != null) ? mainTexture.height : 512;
 			for (int i = 0; i < sprites.Count; i++)
 			{
 				Sprite sprite = sprites[i];
@@ -447,18 +482,18 @@ public class UIAtlas : MonoBehaviour
 				}
 				UISpriteData uISpriteData = new UISpriteData();
 				uISpriteData.name = sprite.name;
-				uISpriteData.x = Mathf.RoundToInt(outer.get_xMin());
-				uISpriteData.y = Mathf.RoundToInt(outer.get_yMin());
-				uISpriteData.width = Mathf.RoundToInt(outer.get_width());
-				uISpriteData.height = Mathf.RoundToInt(outer.get_height());
-				uISpriteData.paddingLeft = Mathf.RoundToInt(sprite.paddingLeft * outer.get_width());
-				uISpriteData.paddingRight = Mathf.RoundToInt(sprite.paddingRight * outer.get_width());
-				uISpriteData.paddingBottom = Mathf.RoundToInt(sprite.paddingBottom * outer.get_height());
-				uISpriteData.paddingTop = Mathf.RoundToInt(sprite.paddingTop * outer.get_height());
-				uISpriteData.borderLeft = Mathf.RoundToInt(inner.get_xMin() - outer.get_xMin());
-				uISpriteData.borderRight = Mathf.RoundToInt(outer.get_xMax() - inner.get_xMax());
-				uISpriteData.borderBottom = Mathf.RoundToInt(outer.get_yMax() - inner.get_yMax());
-				uISpriteData.borderTop = Mathf.RoundToInt(inner.get_yMin() - outer.get_yMin());
+				uISpriteData.x = Mathf.RoundToInt(outer.xMin);
+				uISpriteData.y = Mathf.RoundToInt(outer.yMin);
+				uISpriteData.width = Mathf.RoundToInt(outer.width);
+				uISpriteData.height = Mathf.RoundToInt(outer.height);
+				uISpriteData.paddingLeft = Mathf.RoundToInt(sprite.paddingLeft * outer.width);
+				uISpriteData.paddingRight = Mathf.RoundToInt(sprite.paddingRight * outer.width);
+				uISpriteData.paddingBottom = Mathf.RoundToInt(sprite.paddingBottom * outer.height);
+				uISpriteData.paddingTop = Mathf.RoundToInt(sprite.paddingTop * outer.height);
+				uISpriteData.borderLeft = Mathf.RoundToInt(inner.xMin - outer.xMin);
+				uISpriteData.borderRight = Mathf.RoundToInt(outer.xMax - inner.xMax);
+				uISpriteData.borderBottom = Mathf.RoundToInt(outer.yMax - inner.yMax);
+				uISpriteData.borderTop = Mathf.RoundToInt(inner.yMin - outer.yMin);
 				mSprites.Add(uISpriteData);
 			}
 			sprites.Clear();

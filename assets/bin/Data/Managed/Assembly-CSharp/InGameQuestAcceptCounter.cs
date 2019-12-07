@@ -1,5 +1,3 @@
-using System;
-
 public class InGameQuestAcceptCounter : QuestAcceptCounter
 {
 	protected new enum UI
@@ -147,9 +145,9 @@ public class InGameQuestAcceptCounter : QuestAcceptCounter
 		GetCtrl(UI.BTN_EVENT).GetComponent<UIScreenRotationHandler>().InvokeRotate();
 		GetCtrl(UI.SPR_BG_FRAME).GetComponent<UIScreenRotationHandler>().InvokeRotate();
 		UpdateAnchors();
-		if (GetCtrl(UI.SCR_DELIVERY_QUEST).get_gameObject().get_activeInHierarchy())
+		if (GetCtrl(UI.SCR_DELIVERY_QUEST).gameObject.activeInHierarchy)
 		{
-			ScrollViewResetPosition((Enum)UI.SCR_DELIVERY_QUEST);
+			ScrollViewResetPosition(UI.SCR_DELIVERY_QUEST);
 		}
 	}
 
@@ -157,11 +155,11 @@ public class InGameQuestAcceptCounter : QuestAcceptCounter
 	{
 		if (base.transferUI != null)
 		{
-			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
 		}
 		else
 		{
-			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
 		}
 		if (!isInActiveRotate)
 		{

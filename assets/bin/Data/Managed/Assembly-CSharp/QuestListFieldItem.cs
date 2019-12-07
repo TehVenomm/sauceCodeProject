@@ -27,12 +27,9 @@ public class QuestListFieldItem : UIBehaviour
 		SetActive(transform, UI.OBJ_FIELD_ICON, is_visible: true);
 		SetLabelText(transform, UI.LBL_FIELD_NAME, field_name);
 		SetLabelText(transform, UI.LBL_FIELD_ENEMY_NAME, point_data.pointViewTable.itemDetailText);
-		UITexture component = FindCtrl(transform, UI.TEX_FIELD).GetComponent<UITexture>();
-		ResourceLoad.LoadGatherPointIconTexture(component, point_data.pointViewTable.iconID);
+		ResourceLoad.LoadGatherPointIconTexture(FindCtrl(transform, UI.TEX_FIELD).GetComponent<UITexture>(), point_data.pointViewTable.iconID);
 		SetActive(transform, UI.TEX_FIELD_SUB, is_visible: true);
-		Transform val = FindCtrl(transform, UI.TEX_FIELD_SUB);
-		UITexture component2 = val.GetComponent<UITexture>();
-		ResourceLoad.LoadGatherPointIconTexture(component2, point_data.pointViewTable.iconID);
+		ResourceLoad.LoadGatherPointIconTexture(FindCtrl(transform, UI.TEX_FIELD_SUB).GetComponent<UITexture>(), point_data.pointViewTable.iconID);
 	}
 
 	protected void SetUpEnemy(EnemyTable.EnemyData field_enemy_table)
@@ -44,8 +41,7 @@ public class QuestListFieldItem : UIBehaviour
 		if (field_enemy_table != null)
 		{
 			int iconId = field_enemy_table.iconId;
-			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, null, FindCtrl(transform, UI.OBJ_ENEMY), field_enemy_table.element);
-			itemIcon.SetEnableCollider(is_enable: false);
+			ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, null, FindCtrl(transform, UI.OBJ_ENEMY), field_enemy_table.element).SetEnableCollider(is_enable: false);
 		}
 	}
 
@@ -56,8 +52,7 @@ public class QuestListFieldItem : UIBehaviour
 		SetActive(transform, UI.TEX_FIELD_SUB, is_visible: false);
 		SetLabelText(transform, UI.LBL_FIELD_NAME, _field_data.mapData.mapName);
 		SetActive(transform, UI.LBL_FIELD_NAME, is_visible: true);
-		UITexture component = FindCtrl(transform, UI.TEX_FIELD).GetComponent<UITexture>();
-		ResourceLoad.LoadFieldIconTexture(component, _field_data.mapData);
+		ResourceLoad.LoadFieldIconTexture(FindCtrl(transform, UI.TEX_FIELD).GetComponent<UITexture>(), _field_data.mapData);
 		SetActive(transform, UI.TEX_FIELD, is_visible: true);
 	}
 
@@ -66,7 +61,7 @@ public class QuestListFieldItem : UIBehaviour
 		Transform transform = base._transform;
 		if (transform == null)
 		{
-			transform = this.get_transform();
+			transform = base.transform;
 		}
 		return transform;
 	}

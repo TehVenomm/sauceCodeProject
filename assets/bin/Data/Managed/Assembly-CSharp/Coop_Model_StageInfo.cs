@@ -47,7 +47,7 @@ public class Coop_Model_StageInfo : Coop_Model_Base
 
 	public List<FieldSupplyGimmickInfo> supplyGimmickInfos = new List<FieldSupplyGimmickInfo>();
 
-	public Vector3 enemyPos = Vector3.get_zero();
+	public Vector3 enemyPos = Vector3.zero;
 
 	public float rushLimitTime = -1f;
 
@@ -63,8 +63,6 @@ public class Coop_Model_StageInfo : Coop_Model_Base
 
 	public Coop_Model_StageInfo()
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		base.packetType = PACKET_TYPE.STAGE_INFO;
 	}
 }

@@ -58,7 +58,7 @@ public class UIntKeyTable<T> : UIntKeyTableBase
 				list.AddRange(lists[i]);
 			}
 		}
-		list.Sort((Item a, Item b) => (a.key < b.key) ? (-1) : ((a.key != b.key) ? 1 : 0));
+		list.Sort((Item a, Item b) => (a.key >= b.key) ? ((a.key != b.key) ? 1 : 0) : (-1));
 		int j = 0;
 		for (int count = list.Count; j < count; j++)
 		{

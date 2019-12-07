@@ -1,5 +1,4 @@
 using rhyme;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -22,11 +21,6 @@ public class EffectStock : MonoBehaviour
 
 	private EffectCtrl ctrl;
 
-	public EffectStock()
-		: this()
-	{
-	}
-
 	public bool IsLoop()
 	{
 		if (fx != null)
@@ -42,20 +36,14 @@ public class EffectStock : MonoBehaviour
 
 	private void Awake()
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		Transform transform = this.get_transform();
-		defaultPosition = transform.get_localPosition();
-		defaultRotation = transform.get_localRotation();
-		defaultScale = transform.get_localScale();
-		defaultLayer = this.get_gameObject().get_layer();
-		this.GetComponentsInChildren<Component>(true, defaultComponents);
-		fx = this.GetComponent<rymFX>();
-		ctrl = this.GetComponent<EffectCtrl>();
+		Transform transform = base.transform;
+		defaultPosition = transform.localPosition;
+		defaultRotation = transform.localRotation;
+		defaultScale = transform.localScale;
+		defaultLayer = base.gameObject.layer;
+		GetComponentsInChildren(includeInactive: true, defaultComponents);
+		fx = GetComponent<rymFX>();
+		ctrl = GetComponent<EffectCtrl>();
 	}
 
 	public void Stock()
@@ -64,21 +52,21 @@ public class EffectStock : MonoBehaviour
 		{
 			return;
 		}
-		this.GetComponentsInChildren<Component>(true, Temporary.componentList);
+		GetComponentsInChildren(includeInactive: true, Temporary.componentList);
 		int num = 0;
 		int count = defaultComponents.Count;
 		int i = 0;
 		for (int count2 = Temporary.componentList.Count; i < count2; i++)
 		{
-			Component val = Temporary.componentList[i];
-			if (!(val != null))
+			Component component = Temporary.componentList[i];
+			if (!(component != null))
 			{
 				continue;
 			}
 			int j;
 			for (j = num; j < count; j++)
 			{
-				if (defaultComponents[j] == val)
+				if (defaultComponents[j] == component)
 				{
 					if (j == num)
 					{
@@ -89,13 +77,13 @@ public class EffectStock : MonoBehaviour
 			}
 			if (j == count)
 			{
-				if (val is Transform)
+				if (component is Transform)
 				{
-					Object.DestroyImmediate(val.get_gameObject());
+					Object.DestroyImmediate(component.gameObject);
 				}
 				else
 				{
-					Object.DestroyImmediate(val);
+					Object.DestroyImmediate(component);
 				}
 			}
 			Temporary.componentList[i] = null;
@@ -103,21 +91,16 @@ public class EffectStock : MonoBehaviour
 		Temporary.componentList.Clear();
 		if (fx != null && rymFXManager.DestroyFxDelegate != null)
 		{
-			rymFXManager.DestroyFxDelegate.Invoke(fx);
+			rymFXManager.DestroyFxDelegate(fx);
 		}
 		stocking = true;
 	}
 
-	public unsafe void Recycle(Transform parent, int layer = -1)
+	public void Recycle(Transform parent, int layer = -1)
 	{
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013b: Expected O, but got Unknown
-		Transform transform = this.get_transform();
-		transform.set_parent(null);
-		this.get_gameObject().SetActive(true);
+		Transform transform = base.transform;
+		transform.parent = null;
+		base.gameObject.SetActive(value: true);
 		if (layer == -1)
 		{
 			layer = defaultLayer;
@@ -126,36 +109,36 @@ public class EffectStock : MonoBehaviour
 		int i = 0;
 		for (int count = defaultComponents.Count; i < count; i++)
 		{
-			Component val = defaultComponents[i];
-			if (val is Trail)
+			Component component = defaultComponents[i];
+			if (component is Trail)
 			{
-				Trail trail = val as Trail;
-				trail.set_enabled(true);
-				trail.Reset();
-				trail.emit = true;
+				Trail obj = component as Trail;
+				obj.enabled = true;
+				obj.Reset();
+				obj.emit = true;
 			}
-			else if (val is Renderer)
+			else if (component is Renderer)
 			{
-				(val as Renderer).set_enabled(true);
+				(component as Renderer).enabled = true;
 			}
-			else if (val is Animator)
+			else if (component is Animator)
 			{
-				Animator val2 = val as Animator;
-				val2.set_enabled(true);
-				RuntimeAnimatorController runtimeAnimatorController = val2.get_runtimeAnimatorController();
-				val2.set_runtimeAnimatorController(null);
-				val2.set_runtimeAnimatorController(runtimeAnimatorController);
+				Animator obj2 = component as Animator;
+				obj2.enabled = true;
+				RuntimeAnimatorController runtimeAnimatorController = obj2.runtimeAnimatorController;
+				obj2.runtimeAnimatorController = null;
+				obj2.runtimeAnimatorController = runtimeAnimatorController;
 			}
 		}
-		transform.set_localPosition(defaultPosition);
-		transform.set_localRotation(defaultRotation);
-		transform.set_localScale(defaultScale);
+		transform.localPosition = defaultPosition;
+		transform.localRotation = defaultRotation;
+		transform.localScale = defaultScale;
 		Utility.Attach(parent, transform);
 		if (fx != null)
 		{
 			fx.LoopEnd = false;
-			GetTextureFunc getTextureDelegate = rymFXManager.GetTextureDelegate;
-			rymFXManager.GetTextureDelegate = new GetTextureFunc((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+			rymFXManager.GetTextureFunc getTextureDelegate = rymFXManager.GetTextureDelegate;
+			rymFXManager.GetTextureDelegate = GetTexture;
 			fx.ResetImmediate();
 			rymFXManager.GetTextureDelegate = getTextureDelegate;
 		}

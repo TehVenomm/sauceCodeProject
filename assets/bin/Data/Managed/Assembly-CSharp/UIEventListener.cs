@@ -51,26 +51,25 @@ public class UIEventListener : MonoBehaviour
 	{
 		get
 		{
-			Collider component = this.GetComponent<Collider>();
+			Collider component = GetComponent<Collider>();
 			if (component != null)
 			{
-				return component.get_enabled();
+				return component.enabled;
 			}
-			Collider2D component2 = this.GetComponent<Collider2D>();
-			return component2 != null && component2.get_enabled();
+			Collider2D component2 = GetComponent<Collider2D>();
+			if (component2 != null)
+			{
+				return component2.enabled;
+			}
+			return false;
 		}
-	}
-
-	public UIEventListener()
-		: this()
-	{
 	}
 
 	private void OnSubmit()
 	{
 		if (isColliderEnabled && onSubmit != null)
 		{
-			onSubmit(this.get_gameObject());
+			onSubmit(base.gameObject);
 		}
 	}
 
@@ -78,7 +77,7 @@ public class UIEventListener : MonoBehaviour
 	{
 		if (isColliderEnabled && onClick != null)
 		{
-			onClick(this.get_gameObject());
+			onClick(base.gameObject);
 		}
 	}
 
@@ -86,7 +85,7 @@ public class UIEventListener : MonoBehaviour
 	{
 		if (isColliderEnabled && onDoubleClick != null)
 		{
-			onDoubleClick(this.get_gameObject());
+			onDoubleClick(base.gameObject);
 		}
 	}
 
@@ -94,7 +93,7 @@ public class UIEventListener : MonoBehaviour
 	{
 		if (isColliderEnabled && onHover != null)
 		{
-			onHover(this.get_gameObject(), isOver);
+			onHover(base.gameObject, isOver);
 		}
 	}
 
@@ -102,7 +101,7 @@ public class UIEventListener : MonoBehaviour
 	{
 		if (isColliderEnabled && onPress != null)
 		{
-			onPress(this.get_gameObject(), isPressed);
+			onPress(base.gameObject, isPressed);
 		}
 	}
 
@@ -110,7 +109,7 @@ public class UIEventListener : MonoBehaviour
 	{
 		if (isColliderEnabled && onSelect != null)
 		{
-			onSelect(this.get_gameObject(), selected);
+			onSelect(base.gameObject, selected);
 		}
 	}
 
@@ -118,7 +117,7 @@ public class UIEventListener : MonoBehaviour
 	{
 		if (isColliderEnabled && onScroll != null)
 		{
-			onScroll(this.get_gameObject(), delta);
+			onScroll(base.gameObject, delta);
 		}
 	}
 
@@ -126,16 +125,15 @@ public class UIEventListener : MonoBehaviour
 	{
 		if (onDragStart != null)
 		{
-			onDragStart(this.get_gameObject());
+			onDragStart(base.gameObject);
 		}
 	}
 
 	private void OnDrag(Vector2 delta)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (onDrag != null)
 		{
-			onDrag(this.get_gameObject(), delta);
+			onDrag(base.gameObject, delta);
 		}
 	}
 
@@ -143,7 +141,7 @@ public class UIEventListener : MonoBehaviour
 	{
 		if (isColliderEnabled && onDragOver != null)
 		{
-			onDragOver(this.get_gameObject());
+			onDragOver(base.gameObject);
 		}
 	}
 
@@ -151,7 +149,7 @@ public class UIEventListener : MonoBehaviour
 	{
 		if (isColliderEnabled && onDragOut != null)
 		{
-			onDragOut(this.get_gameObject());
+			onDragOut(base.gameObject);
 		}
 	}
 
@@ -159,7 +157,7 @@ public class UIEventListener : MonoBehaviour
 	{
 		if (onDragEnd != null)
 		{
-			onDragEnd(this.get_gameObject());
+			onDragEnd(base.gameObject);
 		}
 	}
 
@@ -167,16 +165,15 @@ public class UIEventListener : MonoBehaviour
 	{
 		if (isColliderEnabled && onDrop != null)
 		{
-			onDrop(this.get_gameObject(), go);
+			onDrop(base.gameObject, go);
 		}
 	}
 
 	private void OnKey(KeyCode key)
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 		if (isColliderEnabled && onKey != null)
 		{
-			onKey(this.get_gameObject(), key);
+			onKey(base.gameObject, key);
 		}
 	}
 
@@ -184,7 +181,7 @@ public class UIEventListener : MonoBehaviour
 	{
 		if (isColliderEnabled && onTooltip != null)
 		{
-			onTooltip(this.get_gameObject(), show);
+			onTooltip(base.gameObject, show);
 		}
 	}
 

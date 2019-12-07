@@ -1,22 +1,9 @@
 using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class ResourceLoad : DisableNotifyMonoBehaviour
 {
 	public BetterList<ResourceObject> list;
-
-	[CompilerGenerated]
-	private static ResourceManager.LoadComplateDelegate _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static ResourceManager.LoadErrorDelegate _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static ResourceManager.LoadComplateDelegate _003C_003Ef__mg_0024cache2;
-
-	[CompilerGenerated]
-	private static ResourceManager.LoadErrorDelegate _003C_003Ef__mg_0024cache3;
 
 	public bool destroyNotify
 	{
@@ -99,10 +86,10 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 
 	public static ResourceLoad GetResourceLoad(MonoBehaviour mono_behaviour, bool destroy_notify = false)
 	{
-		ResourceLoad resourceLoad = mono_behaviour.get_gameObject().GetComponent<ResourceLoad>();
+		ResourceLoad resourceLoad = mono_behaviour.gameObject.GetComponent<ResourceLoad>();
 		if (resourceLoad == null)
 		{
-			resourceLoad = mono_behaviour.get_gameObject().AddComponent<ResourceLoad>();
+			resourceLoad = mono_behaviour.gameObject.AddComponent<ResourceLoad>();
 			resourceLoad.SetNotifyMaster(MonoBehaviourSingleton<ResourceManager>.I);
 			resourceLoad.destroyNotify = destroy_notify;
 		}
@@ -207,7 +194,7 @@ public class ResourceLoad : DisableNotifyMonoBehaviour
 
 	public static void LoadFieldIconTexture(UITexture ui_tex, FieldMapTable.FieldMapTableData fieldData)
 	{
-		string empty = string.Empty;
+		string text = "";
 		LoadIconTexture(name: (!fieldData.IsExistQuestIconId()) ? ResourceName.GetQuestIcon(fieldData.stageName) : ResourceName.GetQuestIcon((int)fieldData.questIconId), mono_behaviour: ui_tex, category: RESOURCE_CATEGORY.QUEST_ICON, load_start_callback: delegate
 		{
 			ui_tex.mainTexture = null;

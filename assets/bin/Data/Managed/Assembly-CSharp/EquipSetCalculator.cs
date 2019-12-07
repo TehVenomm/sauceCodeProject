@@ -46,7 +46,7 @@ public class EquipSetCalculator
 
 	public void SetEquipSet(EquipSetInfo equipSet, int setNo, bool isUnique = false)
 	{
-		if (!object.ReferenceEquals(equipSet, null))
+		if (equipSet != null)
 		{
 			List<CharaInfo.EquipItem> list = null;
 			list = ((!isUnique) ? equipSet.ConvertSelfEquipSetItemList(setNo, isAddNull: true) : equipSet.ConvertSelfUniqueEquipSetItemList(setNo, isAddNull: true));
@@ -56,19 +56,19 @@ public class EquipSetCalculator
 
 	public void SetEquipSet(List<CharaInfo.EquipItem> equips, bool isAddNull = false)
 	{
-		if (!object.ReferenceEquals(equips, null))
+		if (equips != null)
 		{
 			_Reset();
 			for (int i = 0; i < equips.Count; i++)
 			{
-				SetEquipItem(equips[i], (!isAddNull) ? (-1) : i);
+				SetEquipItem(equips[i], isAddNull ? i : (-1));
 			}
 		}
 	}
 
 	public void SetEquipItem(CharaInfo.EquipItem item, int index)
 	{
-		if (object.ReferenceEquals(item, null))
+		if (item == null)
 		{
 			if (index != -1)
 			{
@@ -78,7 +78,7 @@ public class EquipSetCalculator
 			return;
 		}
 		EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)item.eId);
-		if (object.ReferenceEquals(equipItemData, null))
+		if (equipItemData == null)
 		{
 			return;
 		}
@@ -139,7 +139,7 @@ public class EquipSetCalculator
 		SP_ATTACK_TYPE spAttackType = SP_ATTACK_TYPE.NONE;
 		for (int i = 0; i < 7; i++)
 		{
-			if (object.ReferenceEquals(equipValues[i], null))
+			if (equipValues[i] == null)
 			{
 				continue;
 			}
@@ -274,11 +274,13 @@ public class EquipSetCalculator
 				cachedFactor.constAtks[6] += skillSupport.value;
 				break;
 			case BuffParam.BUFFTYPE.ATTACK_ALLELEMENT:
+			{
 				for (int num7 = 0; num7 < 6; num7++)
 				{
 					cachedFactor.constAtks[num7 + 1] += skillSupport.value;
 				}
 				break;
+			}
 			case BuffParam.BUFFTYPE.ATTACK_DOWN_NORMAL:
 				cachedFactor.constAtks[0] -= skillSupport.value;
 				break;
@@ -301,11 +303,13 @@ public class EquipSetCalculator
 				cachedFactor.constAtks[6] -= skillSupport.value;
 				break;
 			case BuffParam.BUFFTYPE.ATTACK_DOWN_ALLELEMENT:
+			{
 				for (int num6 = 0; num6 < 6; num6++)
 				{
 					cachedFactor.constAtks[num6 + 1] -= skillSupport.value;
 				}
 				break;
+			}
 			case BuffParam.BUFFTYPE.ATKUP_RATE_NORMAL:
 				cachedFactor.atkRate[0] += (float)skillSupport.value * 0.01f;
 				break;
@@ -331,11 +335,13 @@ public class EquipSetCalculator
 				cachedFactor.atkRate[0] += (float)skillSupport.value * 0.01f;
 				goto case BuffParam.BUFFTYPE.ATKUP_RATE_ALLELEMENT;
 			case BuffParam.BUFFTYPE.ATKUP_RATE_ALLELEMENT:
+			{
 				for (int num5 = 0; num5 < 6; num5++)
 				{
 					cachedFactor.atkRate[num5 + 1] += (float)skillSupport.value * 0.01f;
 				}
 				break;
+			}
 			case BuffParam.BUFFTYPE.ATKDOWN_RATE_NORMAL:
 				cachedFactor.atkRate[0] -= (float)skillSupport.value * 0.01f;
 				break;
@@ -358,11 +364,13 @@ public class EquipSetCalculator
 				cachedFactor.atkRate[6] -= (float)skillSupport.value * 0.01f;
 				break;
 			case BuffParam.BUFFTYPE.ATKDOWN_RATE_ALLELEMENT:
+			{
 				for (int num4 = 0; num4 < 6; num4++)
 				{
 					cachedFactor.atkRate[num4 + 1] -= (float)skillSupport.value * 0.01f;
 				}
 				break;
+			}
 			case BuffParam.BUFFTYPE.DEFENCE_NORMAL:
 				cachedFactor.constDefs[0] += skillSupport.value;
 				break;
@@ -385,11 +393,13 @@ public class EquipSetCalculator
 				cachedFactor.constDefs[6] += skillSupport.value;
 				break;
 			case BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT:
+			{
 				for (int num3 = 0; num3 < 6; num3++)
 				{
 					cachedFactor.constDefs[num3 + 1] += skillSupport.value;
 				}
 				break;
+			}
 			case BuffParam.BUFFTYPE.DEFENCE_DOWN_NORMAL:
 				cachedFactor.constDefs[0] -= skillSupport.value;
 				break;
@@ -412,11 +422,13 @@ public class EquipSetCalculator
 				cachedFactor.constDefs[6] -= skillSupport.value;
 				break;
 			case BuffParam.BUFFTYPE.DEFENCE_DOWN_ALLELEMENT:
+			{
 				for (int num2 = 0; num2 < 6; num2++)
 				{
 					cachedFactor.constDefs[num2 + 1] -= skillSupport.value;
 				}
 				break;
+			}
 			case BuffParam.BUFFTYPE.DEFUP_RATE_NORMAL:
 				cachedFactor.defRate[0] += (float)skillSupport.value * 0.01f;
 				break;
@@ -439,11 +451,13 @@ public class EquipSetCalculator
 				cachedFactor.defRate[6] += (float)skillSupport.value * 0.01f;
 				break;
 			case BuffParam.BUFFTYPE.DEFUP_RATE_ALLELEMENT:
+			{
 				for (int num = 0; num < 6; num++)
 				{
 					cachedFactor.defRate[num + 1] += (float)skillSupport.value * 0.01f;
 				}
 				break;
+			}
 			case BuffParam.BUFFTYPE.DEFDOWN_RATE_NORMAL:
 				cachedFactor.defRate[0] -= (float)skillSupport.value * 0.01f;
 				break;
@@ -466,11 +480,13 @@ public class EquipSetCalculator
 				cachedFactor.defRate[6] -= (float)skillSupport.value * 0.01f;
 				break;
 			case BuffParam.BUFFTYPE.DEFDOWN_RATE_ALLELEMENT:
+			{
 				for (int n = 0; n < 6; n++)
 				{
 					cachedFactor.defRate[n + 1] -= (float)skillSupport.value * 0.01f;
 				}
 				break;
+			}
 			case BuffParam.BUFFTYPE.TOLERANCE_FIRE:
 				cachedFactor.constTols[0] += skillSupport.value;
 				break;
@@ -490,11 +506,13 @@ public class EquipSetCalculator
 				cachedFactor.constTols[5] += skillSupport.value;
 				break;
 			case BuffParam.BUFFTYPE.TOLERANCE_ALLELEMENT:
+			{
 				for (int m = 0; m < 6; m++)
 				{
 					cachedFactor.constTols[m] += skillSupport.value;
 				}
 				break;
+			}
 			case BuffParam.BUFFTYPE.TOLERANCE_DOWN_FIRE:
 				cachedFactor.constTols[0] -= skillSupport.value;
 				break;
@@ -514,11 +532,13 @@ public class EquipSetCalculator
 				cachedFactor.constTols[5] -= skillSupport.value;
 				break;
 			case BuffParam.BUFFTYPE.TOLERANCE_DOWN_ALLELEMENT:
+			{
 				for (int l = 0; l < 6; l++)
 				{
 					cachedFactor.constTols[l] -= skillSupport.value;
 				}
 				break;
+			}
 			case BuffParam.BUFFTYPE.TOLUP_RATE_FIRE:
 				cachedFactor.tolRate[0] += (float)skillSupport.value * 0.01f;
 				break;
@@ -538,11 +558,13 @@ public class EquipSetCalculator
 				cachedFactor.tolRate[5] += (float)skillSupport.value * 0.01f;
 				break;
 			case BuffParam.BUFFTYPE.TOLUP_RATE_ALLELEMENT:
+			{
 				for (int k = 0; k < 6; k++)
 				{
 					cachedFactor.tolRate[k] += (float)skillSupport.value * 0.01f;
 				}
 				break;
+			}
 			case BuffParam.BUFFTYPE.TOLDOWN_RATE_FIRE:
 				cachedFactor.tolRate[0] -= (float)skillSupport.value * 0.01f;
 				break;
@@ -562,11 +584,13 @@ public class EquipSetCalculator
 				cachedFactor.tolRate[5] -= (float)skillSupport.value * 0.01f;
 				break;
 			case BuffParam.BUFFTYPE.TOLDOWN_RATE_ALLELEMENT:
+			{
 				for (int j = 0; j < 6; j++)
 				{
 					cachedFactor.tolRate[j] -= (float)skillSupport.value * 0.01f;
 				}
 				break;
+			}
 			}
 		}
 	}

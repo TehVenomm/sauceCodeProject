@@ -17,8 +17,6 @@ public class BulletControllerHealingHoming : BulletControllerHoming
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam _skillInfoParam, Vector3 pos, Quaternion rot)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(bullet, _skillInfoParam, pos, rot);
 		BulletData.BulletHealingHoming dataHealingHomingBullet = bullet.dataHealingHomingBullet;
 		if (dataHealingHomingBullet != null)
@@ -27,15 +25,15 @@ public class BulletControllerHealingHoming : BulletControllerHoming
 			m_isIgnoreColliderExceptTarget = dataHealingHomingBullet.isIgnoreColliderExceptTarget;
 			m_isAlreadyDoneHitProcess = false;
 			m_buffIdList = dataHealingHomingBullet.buffIds;
-			Utility.SetLayerWithChildren(this.get_transform(), dataHealingHomingBullet.defaultGenerateLayer);
-			m_effectAnimator = this.GetComponentInChildren<Animator>();
+			Utility.SetLayerWithChildren(base.transform, dataHealingHomingBullet.defaultGenerateLayer);
+			m_effectAnimator = GetComponentInChildren<Animator>();
 		}
 	}
 
 	public override bool IsHit(Collider collider)
 	{
 		StageObject targetObject = base.targetObject;
-		if (m_isIgnoreColliderExceptTarget && targetObject != null && targetObject.get_name() != collider.get_name())
+		if (m_isIgnoreColliderExceptTarget && targetObject != null && targetObject.name != collider.name)
 		{
 			return false;
 		}
@@ -49,7 +47,7 @@ public class BulletControllerHealingHoming : BulletControllerHoming
 			m_isAlreadyDoneHitProcess = true;
 			PlayOnHitAnimation();
 			HealAction();
-			Player component = collider.get_gameObject().GetComponent<Player>();
+			Player component = collider.gameObject.GetComponent<Player>();
 			AddBuffAction(component);
 			base.OnHit(collider);
 		}

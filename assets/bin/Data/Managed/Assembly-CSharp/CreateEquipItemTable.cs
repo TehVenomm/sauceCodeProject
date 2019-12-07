@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 public class CreateEquipItemTable : Singleton<CreateEquipItemTable>, IDataTable
 {
@@ -50,12 +49,6 @@ public class CreateEquipItemTable : Singleton<CreateEquipItemTable>, IDataTable
 	}
 
 	private UIntKeyTable<CreateEquipItemData> tableData;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<CreateEquipItemData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<CreateEquipItemData> _003C_003Ef__mg_0024cache1;
 
 	public void CreateTable(string csv_text)
 	{
@@ -111,8 +104,8 @@ public class CreateEquipItemTable : Singleton<CreateEquipItemTable>, IDataTable
 		});
 		list.Sort(delegate(CreateEquipItemData l, CreateEquipItemData r)
 		{
-			int num = (l.pickupPriority != 0) ? l.pickupPriority : 100;
-			int num2 = (r.pickupPriority != 0) ? r.pickupPriority : 100;
+			int num = (l.pickupPriority == 0) ? 100 : l.pickupPriority;
+			int num2 = (r.pickupPriority == 0) ? 100 : r.pickupPriority;
 			int num3 = num - num2;
 			if (num3 == 0)
 			{
@@ -125,11 +118,9 @@ public class CreateEquipItemTable : Singleton<CreateEquipItemTable>, IDataTable
 
 	public CreateEquipItemData[] GetSortedCreateEquipItemsByPart(uint materialId)
 	{
-		CreateEquipItemData[] creatableEquipItem2 = Singleton<CreateEquipItemTable>.I.GetCreatableEquipItem(materialId);
-		return creatableEquipItem2.OrderBy(delegate(CreateEquipItemData creatableEquipItem)
+		return Singleton<CreateEquipItemTable>.I.GetCreatableEquipItem(materialId).OrderBy(delegate(CreateEquipItemData creatableEquipItem)
 		{
-			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(creatableEquipItem.equipItemID);
-			switch (equipItemData.type)
+			switch (Singleton<EquipItemTable>.I.GetEquipItemData(creatableEquipItem.equipItemID).type)
 			{
 			case EQUIPMENT_TYPE.ONE_HAND_SWORD:
 			case EQUIPMENT_TYPE.TWO_HAND_SWORD:
@@ -163,8 +154,7 @@ public class CreateEquipItemTable : Singleton<CreateEquipItemTable>, IDataTable
 		for (int num = creatableEquipItem.Length; i < num; i++)
 		{
 			CreateEquipItemData createEquipItemData = creatableEquipItem[i];
-			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(createEquipItemData.equipItemID);
-			if (equipItemData.type == type)
+			if (Singleton<EquipItemTable>.I.GetEquipItemData(createEquipItemData.equipItemID).type == type)
 			{
 				return createEquipItemData;
 			}

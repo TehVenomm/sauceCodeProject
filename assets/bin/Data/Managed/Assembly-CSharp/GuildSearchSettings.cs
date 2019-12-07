@@ -1,5 +1,4 @@
 using Network;
-using System;
 
 public class GuildSearchSettings : GameSection
 {
@@ -14,7 +13,7 @@ public class GuildSearchSettings : GameSection
 
 	public override void Initialize()
 	{
-		SetActive((Enum)UI.LBL_DEFAULT, string.IsNullOrEmpty(mSearchKeywork));
+		SetActive(UI.LBL_DEFAULT, string.IsNullOrEmpty(mSearchKeywork));
 		SetInput(UI.IPT_NAME, mSearchKeywork, 16, OnChangeKeywork);
 		base.Initialize();
 	}
@@ -31,10 +30,10 @@ public class GuildSearchSettings : GameSection
 
 	protected void OnChangeKeywork()
 	{
-		string inputValue = GetInputValue((Enum)UI.IPT_NAME);
-		inputValue = inputValue.Replace(" ", string.Empty);
-		inputValue = inputValue.Replace("\u3000", string.Empty);
-		SetActive((Enum)UI.LBL_DEFAULT, string.IsNullOrEmpty(inputValue));
+		string inputValue = GetInputValue(UI.IPT_NAME);
+		inputValue = inputValue.Replace(" ", "");
+		inputValue = inputValue.Replace("\u3000", "");
+		SetActive(UI.LBL_DEFAULT, string.IsNullOrEmpty(inputValue));
 		mSearchKeywork = inputValue;
 	}
 }

@@ -20,52 +20,52 @@ namespace Com.Google.Android.Gms.Games.Stats
 
 		public float getAverageSessionLength()
 		{
-			return InvokeCall<float>("getAverageSessionLength", "()F", new object[0]);
+			return InvokeCall<float>("getAverageSessionLength", "()F", Array.Empty<object>());
 		}
 
 		public float getChurnProbability()
 		{
-			return InvokeCall<float>("getChurnProbability", "()F", new object[0]);
+			return InvokeCall<float>("getChurnProbability", "()F", Array.Empty<object>());
 		}
 
 		public int getDaysSinceLastPlayed()
 		{
-			return InvokeCall<int>("getDaysSinceLastPlayed", "()I", new object[0]);
+			return InvokeCall<int>("getDaysSinceLastPlayed", "()I", Array.Empty<object>());
 		}
 
 		public int getNumberOfPurchases()
 		{
-			return InvokeCall<int>("getNumberOfPurchases", "()I", new object[0]);
+			return InvokeCall<int>("getNumberOfPurchases", "()I", Array.Empty<object>());
 		}
 
 		public int getNumberOfSessions()
 		{
-			return InvokeCall<int>("getNumberOfSessions", "()I", new object[0]);
+			return InvokeCall<int>("getNumberOfSessions", "()I", Array.Empty<object>());
 		}
 
 		public float getSessionPercentile()
 		{
-			return InvokeCall<float>("getSessionPercentile", "()F", new object[0]);
+			return InvokeCall<float>("getSessionPercentile", "()F", Array.Empty<object>());
 		}
 
 		public float getSpendPercentile()
 		{
-			return InvokeCall<float>("getSpendPercentile", "()F", new object[0]);
+			return InvokeCall<float>("getSpendPercentile", "()F", Array.Empty<object>());
 		}
 
 		public float getSpendProbability()
 		{
-			return InvokeCall<float>("getSpendProbability", "()F", new object[0]);
+			return InvokeCall<float>("getSpendProbability", "()F", Array.Empty<object>());
 		}
 
 		public float getHighSpenderProbability()
 		{
-			return InvokeCall<float>("getHighSpenderProbability", "()F", new object[0]);
+			return InvokeCall<float>("getHighSpenderProbability", "()F", Array.Empty<object>());
 		}
 
 		public float getTotalSpendNext28Days()
 		{
-			return InvokeCall<float>("getTotalSpendNext28Days", "()F", new object[0]);
+			return InvokeCall<float>("getTotalSpendNext28Days", "()F", Array.Empty<object>());
 		}
 	}
 }

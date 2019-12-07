@@ -29,6 +29,11 @@ namespace BestHTTP.Decompression.Zlib
 				Flavor = flavor;
 			}
 
+			public static Config Lookup(CompressionLevel level)
+			{
+				return Table[(int)level];
+			}
+
 			static Config()
 			{
 				Table = new Config[10]
@@ -45,11 +50,6 @@ namespace BestHTTP.Decompression.Zlib
 					new Config(32, 258, 258, 4096, DeflateFlavor.Slow)
 				};
 			}
-
-			public static Config Lookup(CompressionLevel level)
-			{
-				return Table[(int)level];
-			}
 		}
 
 		private static readonly int MEM_LEVEL_MAX = 9;
@@ -62,14 +62,14 @@ namespace BestHTTP.Decompression.Zlib
 		{
 			"need dictionary",
 			"stream end",
-			string.Empty,
+			"",
 			"file error",
 			"stream error",
 			"data error",
 			"insufficient memory",
 			"buffer error",
 			"incompatible version",
-			string.Empty
+			""
 		};
 
 		private static readonly int PRESET_DICT = 32;
@@ -301,7 +301,15 @@ namespace BestHTTP.Decompression.Zlib
 		{
 			short num = tree[n * 2];
 			short num2 = tree[m * 2];
-			return num < num2 || (num == num2 && depth[n] <= depth[m]);
+			if (num >= num2)
+			{
+				if (num == num2)
+				{
+					return depth[n] <= depth[m];
+				}
+				return false;
+			}
+			return true;
 		}
 
 		internal void scan_tree(short[] tree, int max_code)
@@ -534,7 +542,11 @@ namespace BestHTTP.Decompression.Zlib
 					return true;
 				}
 			}
-			return last_lit == lit_bufsize - 1 || last_lit == lit_bufsize;
+			if (last_lit != lit_bufsize - 1)
+			{
+				return last_lit == lit_bufsize;
+			}
+			return true;
 		}
 
 		internal void send_compressed_block(short[] ltree, short[] dtree)
@@ -594,7 +606,7 @@ namespace BestHTTP.Decompression.Zlib
 			{
 				num2 += dyn_ltree[i * 2];
 			}
-			data_type = (sbyte)((num2 <= num >> 2) ? Z_ASCII : Z_BINARY);
+			data_type = (sbyte)((num2 > num >> 2) ? Z_BINARY : Z_ASCII);
 		}
 
 		internal void bi_flush()
@@ -645,7 +657,7 @@ namespace BestHTTP.Decompression.Zlib
 
 		internal void flush_block_only(bool eof)
 		{
-			_tr_flush_block((block_start < 0) ? (-1) : block_start, strstart - block_start, eof);
+			_tr_flush_block((block_start >= 0) ? block_start : (-1), strstart - block_start, eof);
 			block_start = strstart;
 			_codec.flush_pending();
 		}
@@ -696,9 +708,17 @@ namespace BestHTTP.Decompression.Zlib
 			flush_block_only(flush == FlushType.Finish);
 			if (_codec.AvailableBytesOut == 0)
 			{
-				return (flush == FlushType.Finish) ? BlockState.FinishStarted : BlockState.NeedMore;
+				if (flush != FlushType.Finish)
+				{
+					return BlockState.NeedMore;
+				}
+				return BlockState.FinishStarted;
 			}
-			return (flush != FlushType.Finish) ? BlockState.BlockDone : BlockState.FinishDone;
+			if (flush != FlushType.Finish)
+			{
+				return BlockState.BlockDone;
+			}
+			return BlockState.FinishDone;
 		}
 
 		internal void _tr_stored_block(int buf, int stored_len, bool eof)
@@ -831,7 +851,7 @@ namespace BestHTTP.Decompression.Zlib
 					prev[strstart & w_mask] = head[ins_h];
 					head[ins_h] = (short)strstart;
 				}
-				if ((long)num != 0 && ((strstart - num) & 0xFFFF) <= w_size - MIN_LOOKAHEAD && compressionStrategy != CompressionStrategy.HuffmanOnly)
+				if (num != 0L && ((strstart - num) & 0xFFFF) <= w_size - MIN_LOOKAHEAD && compressionStrategy != CompressionStrategy.HuffmanOnly)
 				{
 					match_length = longest_match(num);
 				}
@@ -886,7 +906,11 @@ namespace BestHTTP.Decompression.Zlib
 				}
 				return BlockState.NeedMore;
 			}
-			return (flush != FlushType.Finish) ? BlockState.BlockDone : BlockState.FinishDone;
+			if (flush != FlushType.Finish)
+			{
+				return BlockState.BlockDone;
+			}
+			return BlockState.FinishDone;
 		}
 
 		internal BlockState DeflateSlow(FlushType flush)
@@ -990,7 +1014,11 @@ namespace BestHTTP.Decompression.Zlib
 				}
 				return BlockState.NeedMore;
 			}
-			return (flush != FlushType.Finish) ? BlockState.BlockDone : BlockState.FinishDone;
+			if (flush != FlushType.Finish)
+			{
+				return BlockState.BlockDone;
+			}
+			return BlockState.FinishDone;
 		}
 
 		internal int longest_match(int cur_match)
@@ -1101,7 +1129,7 @@ namespace BestHTTP.Decompression.Zlib
 			pendingCount = 0;
 			nextPending = 0;
 			Rfc1950BytesEmitted = false;
-			status = ((!WantRfc1950HeaderBytes) ? BUSY_STATE : INIT_STATE);
+			status = (WantRfc1950HeaderBytes ? INIT_STATE : BUSY_STATE);
 			_codec._Adler32 = Adler.Adler32(0u, null, 0, 0);
 			last_flush = 0;
 			_InitializeTreeData();
@@ -1118,7 +1146,11 @@ namespace BestHTTP.Decompression.Zlib
 			head = null;
 			prev = null;
 			window = null;
-			return (status == BUSY_STATE) ? (-3) : 0;
+			if (status != BUSY_STATE)
+			{
+				return 0;
+			}
+			return -3;
 		}
 
 		private void SetDeflater()
@@ -1143,7 +1175,7 @@ namespace BestHTTP.Decompression.Zlib
 			if (compressionLevel != level)
 			{
 				Config config = Config.Lookup(level);
-				if (config.Flavor != this.config.Flavor && _codec.TotalBytesIn != 0)
+				if (config.Flavor != this.config.Flavor && _codec.TotalBytesIn != 0L)
 				{
 					result = _codec.Deflate(FlushType.Partial);
 				}
@@ -1300,7 +1332,11 @@ namespace BestHTTP.Decompression.Zlib
 			pending[pendingCount++] = (byte)(_codec._Adler32 & 0xFF);
 			_codec.flush_pending();
 			Rfc1950BytesEmitted = true;
-			return (pendingCount == 0) ? 1 : 0;
+			if (pendingCount == 0)
+			{
+				return 1;
+			}
+			return 0;
 		}
 	}
 }

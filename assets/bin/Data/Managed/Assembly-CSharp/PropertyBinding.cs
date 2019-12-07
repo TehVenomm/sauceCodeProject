@@ -31,17 +31,12 @@ public class PropertyBinding : MonoBehaviour
 
 	private object mLastValue;
 
-	public PropertyBinding()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
 		UpdateTarget();
 		if (update == UpdateCondition.OnStart)
 		{
-			this.set_enabled(false);
+			base.enabled = false;
 		}
 	}
 
@@ -98,7 +93,7 @@ public class PropertyBinding : MonoBehaviour
 		}
 		else
 		{
-			if (source.GetPropertyType() != target.GetPropertyType())
+			if (!(source.GetPropertyType() == target.GetPropertyType()))
 			{
 				return;
 			}

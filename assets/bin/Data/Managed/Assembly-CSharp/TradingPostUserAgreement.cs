@@ -1,5 +1,3 @@
-using System;
-
 public class TradingPostUserAgreement : GameSection
 {
 	private enum UI
@@ -15,14 +13,14 @@ public class TradingPostUserAgreement : GameSection
 	public override void Initialize()
 	{
 		SetSupportEncoding(UI.MESSAGE, isEnable: true);
-		SetLabelText((Enum)UI.MESSAGE, base.sectionData.GetText("STR_MESSAGE"));
-		SetLabelText((Enum)UI.LBL_BTN_0, base.sectionData.GetText("TEXT_BTN_BACK"));
-		SetLabelText((Enum)UI.LBL_BTN_0_R, base.sectionData.GetText("TEXT_BTN_BACK"));
-		SetLabelText((Enum)UI.LBL_BTN_2, base.sectionData.GetText("TEXT_BTN_CONTINUE"));
-		SetLabelText((Enum)UI.LBL_BTN_2_R, base.sectionData.GetText("TEXT_BTN_CONTINUE"));
+		SetLabelText(UI.MESSAGE, base.sectionData.GetText("STR_MESSAGE"));
+		SetLabelText(UI.LBL_BTN_0, base.sectionData.GetText("TEXT_BTN_BACK"));
+		SetLabelText(UI.LBL_BTN_0_R, base.sectionData.GetText("TEXT_BTN_BACK"));
+		SetLabelText(UI.LBL_BTN_2, base.sectionData.GetText("TEXT_BTN_CONTINUE"));
+		SetLabelText(UI.LBL_BTN_2_R, base.sectionData.GetText("TEXT_BTN_CONTINUE"));
 		if (TradingPostManager.IsAcceptUserAgreement())
 		{
-			SetActive((Enum)UI.OBJ_FRAME, is_visible: false);
+			SetActive(UI.OBJ_FRAME, is_visible: false);
 		}
 		base.Initialize();
 	}
@@ -44,7 +42,7 @@ public class TradingPostUserAgreement : GameSection
 			MonoBehaviourSingleton<TradingPostManager>.I.SendRequestUserAgreement(delegate(bool success)
 			{
 				MonoBehaviourSingleton<TradingPostManager>.I.isCheckUserAgreementSuccess = success;
-				if (!TradingPostManager.IsFulfillRequirement() && MonoBehaviourSingleton<TradingPostManager>.I.startSectionName != "HomeTop")
+				if (!TradingPostManager.IsFulfillRequirement() && !MonoBehaviourSingleton<GoGameSettingsManager>.I.tradingpostStartSection.Contains(MonoBehaviourSingleton<TradingPostManager>.I.startSectionName))
 				{
 					GameSection.ChangeStayEvent("LA");
 				}

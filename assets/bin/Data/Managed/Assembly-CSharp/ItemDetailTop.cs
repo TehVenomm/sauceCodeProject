@@ -216,9 +216,9 @@ public class ItemDetailTop : GameSection
 				{
 					GameSaveData.instance.RemoveNewIconAndSave(ITEM_ICON_TYPE.ACCESSORY, data.GetUniqID());
 				}
-				this.StartCoroutine(SendGetInfos());
+				StartCoroutine(SendGetInfos());
 			}
-		}, string.Empty);
+		});
 	}
 
 	private IEnumerator SendGetInfos()
@@ -246,11 +246,9 @@ public class ItemDetailTop : GameSection
 			yield return null;
 		}
 		bool isRecvQuest = false;
-		QuestAcceptChallengeRoomCondition.ChallengeSearchRequestParam sendParam = new QuestAcceptChallengeRoomCondition.ChallengeSearchRequestParam
-		{
-			enemyLevel = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.QUEST_ITEM_LEVEL_MAX
-		};
-		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeList(sendParam, delegate
+		QuestAcceptChallengeRoomCondition.ChallengeSearchRequestParam challengeSearchRequestParam = new QuestAcceptChallengeRoomCondition.ChallengeSearchRequestParam();
+		challengeSearchRequestParam.enemyLevel = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.QUEST_ITEM_LEVEL_MAX;
+		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeList(challengeSearchRequestParam, delegate
 		{
 			isRecvQuest = true;
 		}, isSave: false);
@@ -295,16 +293,16 @@ public class ItemDetailTop : GameSection
 			{
 				List<ItemDestination> list = new List<ItemDestination>();
 				List<ItemDestination> list2 = new List<ItemDestination>();
-				QuestTable.QuestTableData[] array = happenQuestTableFromItemID;
-				foreach (QuestTable.QuestTableData questTableData2 in array)
+				QuestTable.QuestTableData[] recommendData = happenQuestTableFromItemID;
+				foreach (QuestTable.QuestTableData questTableData2 in recommendData)
 				{
 					FieldMapTable.FieldMapTableData[] fieldMapTableFromQuestIdWithClosedField = Singleton<QuestToFieldTable>.I.GetFieldMapTableFromQuestIdWithClosedField(questTableData2.questID);
 					if (fieldMapTableFromQuestIdWithClosedField == null)
 					{
 						continue;
 					}
-					FieldMapTable.FieldMapTableData[] array2 = fieldMapTableFromQuestIdWithClosedField;
-					foreach (FieldMapTable.FieldMapTableData fieldMapTableData in array2)
+					FieldMapTable.FieldMapTableData[] array = fieldMapTableFromQuestIdWithClosedField;
+					foreach (FieldMapTable.FieldMapTableData fieldMapTableData in array)
 					{
 						if (Singleton<ItemToFieldTable>.I.IsOpenMap(fieldMapTableData))
 						{
@@ -328,9 +326,9 @@ public class ItemDetailTop : GameSection
 				}
 				list2.AddRange(list);
 				int num2 = Mathf.Min(list2.Count, num);
-				for (int l = 0; l < num2; l++)
+				for (int k = 0; k < num2; k++)
 				{
-					m_ItemDestinations.Add(list2[l]);
+					m_ItemDestinations.Add(list2[k]);
 				}
 			}
 		}
@@ -341,9 +339,9 @@ public class ItemDetailTop : GameSection
 			if (distinctQuestFromItemID != null)
 			{
 				int num3 = Mathf.Min(num, distinctQuestFromItemID.Length);
-				for (int m = 0; m < num3; m++)
+				for (int l = 0; l < num3; l++)
 				{
-					QuestTable.QuestTableData questTableData3 = distinctQuestFromItemID[m];
+					QuestTable.QuestTableData questTableData3 = distinctQuestFromItemID[l];
 					if (questTableData3 != null)
 					{
 						m_ItemDestinations.Add(new ItemDestination
@@ -381,8 +379,8 @@ public class ItemDetailTop : GameSection
 			ItemToFieldTable.CandidateField[] candidateField = Singleton<ItemToFieldTable>.I.GetCandidateField(tableID, num, isExcludeNotPlayable: true);
 			if (candidateField != null)
 			{
-				ItemToFieldTable.CandidateField[] array3 = candidateField;
-				foreach (ItemToFieldTable.CandidateField candidateField2 in array3)
+				ItemToFieldTable.CandidateField[] array2 = candidateField;
+				foreach (ItemToFieldTable.CandidateField candidateField2 in array2)
 				{
 					m_ItemDestinations.Add(new ItemDestination
 					{
@@ -394,36 +392,35 @@ public class ItemDetailTop : GameSection
 			}
 		}
 		AddPointShopIfNeed();
-		if (!IsItemBossMaterial(tableID))
+		if (IsItemBossMaterial(tableID))
 		{
-			return;
-		}
-		int num6 = 0;
-		int count = m_ItemDestinations.Count;
-		EnemyTable.EnemyData enemyData;
-		while (true)
-		{
-			if (num6 >= count)
+			int m = 0;
+			for (int count = m_ItemDestinations.Count; m < count; m++)
 			{
-				return;
-			}
-			ItemDestination itemDestination = m_ItemDestinations[num6];
-			if (itemDestination != null)
-			{
-				enemyData = SearchEnemyData(itemDestination.quest);
-				if (enemyData != null)
+				ItemDestination itemDestination = m_ItemDestinations[m];
+				if (itemDestination != null)
 				{
-					break;
+					EnemyTable.EnemyData enemyData = SearchEnemyData(itemDestination.quest);
+					if (enemyData != null)
+					{
+						AddChallengeQuestIfNeed(enemyData);
+						m_ItemDestinations.Insert(0, new ItemDestination
+						{
+							type = ItemDestination.TYPE.GachaQuest,
+							enemy_species = enemyData.enemySpecies
+						});
+						break;
+					}
 				}
 			}
-			num6++;
 		}
-		AddChallengeQuestIfNeed(enemyData);
-		m_ItemDestinations.Insert(0, new ItemDestination
+		if (TradingPostManager.IsItemValid(data.GetTableID()))
 		{
-			type = ItemDestination.TYPE.GachaQuest,
-			enemy_species = enemyData.enemySpecies
-		});
+			m_ItemDestinations.Insert(0, new ItemDestination
+			{
+				type = ItemDestination.TYPE.TradingPostQuest
+			});
+		}
 	}
 
 	private int GetQuestNum(QuestTable.QuestTableData q)
@@ -436,12 +433,9 @@ public class ItemDetailTop : GameSection
 		int num2 = 0;
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
-			num2 = (from g in MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList
-			where g.questId == (int)q.questID
-			select g).Count();
+			num2 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where((GuildRequestItem g) => g.questId == (int)q.questID).Count();
 		}
-		int num3 = num - num2;
-		return Mathf.Max(num3, 0);
+		return Mathf.Max(num - num2, 0);
 	}
 
 	private void AddChallengeQuestIfNeed(EnemyTable.EnemyData enemyData)
@@ -453,8 +447,7 @@ public class ItemDetailTop : GameSection
 		{
 			if (num < count)
 			{
-				EnemyTable.EnemyData enemyData2 = SearchEnemyData(Singleton<QuestTable>.I.GetQuestData((uint)challengeList[num].questId));
-				if (enemyData2.enemySpecies == enemyData.enemySpecies)
+				if (SearchEnemyData(Singleton<QuestTable>.I.GetQuestData((uint)challengeList[num].questId)).enemySpecies == enemyData.enemySpecies)
 				{
 					break;
 				}
@@ -533,16 +526,16 @@ public class ItemDetailTop : GameSection
 	public override void UpdateUI()
 	{
 		string key = "TEXT_BTN_SELL";
-		SetLabelText((Enum)UI.STR_BTN_SELL, base.sectionData.GetText(key));
-		SetLabelText((Enum)UI.STR_BTN_SELL_D, base.sectionData.GetText(key));
+		SetLabelText(UI.STR_BTN_SELL, base.sectionData.GetText(key));
+		SetLabelText(UI.STR_BTN_SELL_D, base.sectionData.GetText(key));
 		detailBase = SetPrefab(GetCtrl(UI.OBJ_DETAIL_ROOT), "ItemDetailBase");
-		SetActive((Enum)UI.OBJ_SCROLL_BAR, is_visible: true);
+		SetActive(UI.OBJ_SCROLL_BAR, is_visible: true);
 		if (detailBase != null)
 		{
-			SetFontStyle(detailBase, UI.STR_TITLE, 2);
-			SetFontStyle(detailBase, UI.STR_SELL, 2);
-			SetFontStyle(detailBase, UI.STR_NEED, 2);
-			SetFontStyle(detailBase, UI.STR_HAVE, 2);
+			SetFontStyle(detailBase, UI.STR_TITLE, FontStyle.Italic);
+			SetFontStyle(detailBase, UI.STR_SELL, FontStyle.Italic);
+			SetFontStyle(detailBase, UI.STR_NEED, FontStyle.Italic);
+			SetFontStyle(detailBase, UI.STR_HAVE, FontStyle.Italic);
 			SetActive(detailBase, UI.STR_SELL, data.CanSale());
 			SetDepth(detailBase, UI.SCR_HOWTO, base.baseDepth + 1);
 			SetLabelText(detailBase, UI.LBL_NAME, data.GetName());
@@ -561,35 +554,17 @@ public class ItemDetailTop : GameSection
 			}
 			num = itemData.enemyIconID;
 			num2 = itemData.enemyIconID2;
-			ITEM_ICON_TYPE iconType = data.GetIconType();
-			int iconID = data.GetIconID();
-			RARITY_TYPE? rarity = data.GetRarity();
-			Transform parent = FindCtrl(detailBase, UI.OBJ_ICON_ROOT);
-			ELEMENT_TYPE iconElement = data.GetIconElement();
-			EQUIPMENT_TYPE? iconMagiEnableType = data.GetIconMagiEnableType();
-			int num3 = -1;
-			string event_name = null;
-			int event_data = 0;
-			bool is_new = false;
-			int toggle_group = -1;
-			bool is_select = false;
-			string icon_under_text = null;
-			bool is_equipping = false;
-			int enemy_icon_id = num;
-			int enemy_icon_id2 = num2;
-			GET_TYPE getType = data.GetGetType();
-			ItemIcon itemIcon = ItemIcon.Create(iconType, iconID, rarity, parent, iconElement, iconMagiEnableType, num3, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text: false, getType);
-			itemIcon.SetEnableCollider(is_enable: false);
+			ItemIcon.Create(data.GetIconType(), data.GetIconID(), data.GetRarity(), FindCtrl(detailBase, UI.OBJ_ICON_ROOT), data.GetIconElement(), data.GetIconMagiEnableType(), -1, null, 0, is_new: false, -1, is_select: false, null, is_equipping: false, num, num2, disable_rarity_text: false, data.GetGetType()).SetEnableCollider(is_enable: false);
 			int count = m_ItemDestinations.Count;
 			Transform ctrl = GetCtrl(UI.GRD_HOWTO);
-			if (Object.op_Implicit(ctrl))
+			if ((bool)ctrl)
 			{
 				int i = 0;
-				for (int childCount = ctrl.get_childCount(); i < childCount; i++)
+				for (int childCount = ctrl.childCount; i < childCount; i++)
 				{
 					Transform child = ctrl.GetChild(0);
-					child.set_parent(null);
-					Object.Destroy(child.get_gameObject());
+					child.parent = null;
+					UnityEngine.Object.Destroy(child.gameObject);
 				}
 			}
 			SetTable(detailBase, UI.GRD_HOWTO, "QuestListItem", count, reset: true, CreateListItem, UpdateListItem);
@@ -597,17 +572,17 @@ public class ItemDetailTop : GameSection
 			SetActive(detailBase, UI.STR_NOT_HOWTO, is_visible);
 			string empty = string.Empty;
 			int id = 2;
-			RARITY_TYPE rarity2 = RARITY_TYPE.A;
+			RARITY_TYPE rarity = RARITY_TYPE.A;
 			if (itemData.type == ITEM_TYPE.LAPIS)
 			{
-				rarity2 = itemData.rarity;
-				id = ((!Singleton<EquipItemExceedTable>.I.IsFreeLapis(rarity2, itemData.id, itemData.eventId)) ? 1 : 0);
+				rarity = itemData.rarity;
+				id = ((!Singleton<EquipItemExceedTable>.I.IsFreeLapis(rarity, itemData.id, itemData.eventId)) ? 1 : 0);
 				if (Singleton<LimitedEquipItemExceedTable>.I.IsLimitedLapis(itemData.id))
 				{
 					id = 8;
 				}
 			}
-			empty = string.Format(StringTable.Get(STRING_CATEGORY.ITEM_DETAIL, (uint)id), rarity2.ToString());
+			empty = string.Format(StringTable.Get(STRING_CATEGORY.ITEM_DETAIL, (uint)id), rarity.ToString());
 			SetLabelText(detailBase, UI.STR_NOT_HOWTO, empty);
 			SetActive(detailBase, UI.SPR_NEED, GetNeedNum().HasValue);
 			if (GetNeedNum().HasValue)
@@ -615,8 +590,8 @@ public class ItemDetailTop : GameSection
 				UIBehaviour.SetMaterialNumText(FindCtrl(detailBase, UI.LBL_HAVE_NUM), FindCtrl(detailBase, UI.LBL_NEED_NUM), data.GetNum(), GetNeedNum().Value);
 			}
 		}
-		SetActive((Enum)UI.BTN_DETAIL_SELL, CanSell() && MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
-		SetActive((Enum)UI.BTN_SEARCH_TP, is_visible: false);
+		SetActive(UI.BTN_DETAIL_SELL, CanSell() && MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
+		SetActive(UI.BTN_SEARCH_TP, is_visible: false);
 	}
 
 	private Transform CreateListItem(int index, Transform t)
@@ -690,7 +665,7 @@ public class ItemDetailTop : GameSection
 			QuestListFieldItem questListFieldItem = t.GetComponent<QuestListFieldItem>();
 			if (questListFieldItem == null)
 			{
-				questListFieldItem = t.get_gameObject().AddComponent<QuestListFieldItem>();
+				questListFieldItem = t.gameObject.AddComponent<QuestListFieldItem>();
 			}
 			questListFieldItem.InitUI();
 			if (itemDetailToFieldEnemyData != null)
@@ -700,8 +675,7 @@ public class ItemDetailTop : GameSection
 			}
 			else if (itemDetailToFieldPointData != null)
 			{
-				string text5 = base.sectionData.GetText("STR_GATHER_FIELD_NAME");
-				string field_name = string.Format(text5, recommend_field.mapData.mapName);
+				string field_name = string.Format(base.sectionData.GetText("STR_GATHER_FIELD_NAME"), recommend_field.mapData.mapName);
 				questListFieldItem.SetUpGather(field_name, itemDetailToFieldPointData);
 			}
 			SetEvent(t, "JUMP_FIELD", i);
@@ -717,8 +691,7 @@ public class ItemDetailTop : GameSection
 				SetActive(t, UI.OBJ_ENEMY, is_visible: true);
 				SetLabelText(t, UI.LBL_FIELD_ENEMY_NAME, enemyData.name);
 				int iconId = enemyData.iconId;
-				ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element);
-				itemIcon.SetEnableCollider(is_enable: false);
+				ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element).SetEnableCollider(is_enable: false);
 				SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
 				SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData.element);
 				SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
@@ -727,8 +700,7 @@ public class ItemDetailTop : GameSection
 				{
 					FieldMapTable.FieldMapTableData field = itemDestination.field;
 					SetLabelText(t, UI.LBL_FIELD_NAME, field.mapName);
-					UITexture component = FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>();
-					ResourceLoad.LoadFieldIconTexture(component, field);
+					ResourceLoad.LoadFieldIconTexture(FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>(), field);
 				}
 			}
 			SetEvent(t, "UNKNOWN_RECOMMEND", 0);
@@ -747,11 +719,9 @@ public class ItemDetailTop : GameSection
 			if (enemyData3 != null)
 			{
 				int iconId3 = enemyData3.iconId;
-				ItemIcon itemIcon3 = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId3, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData3.element);
-				itemIcon3.SetEnableCollider(is_enable: false);
+				ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId3, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData3.element).SetEnableCollider(is_enable: false);
 			}
-			UITexture component3 = FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>();
-			ResourceLoad.LoadFieldIconTexture(component3, field3);
+			ResourceLoad.LoadFieldIconTexture(FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>(), field3);
 			SetEvent(t, "JUMP_FIELD", i);
 			break;
 		}
@@ -767,16 +737,14 @@ public class ItemDetailTop : GameSection
 				string text2 = $"{text}{enemyData2.name}";
 				SetLabelText(t, UI.LBL_FIELD_ENEMY_NAME, text2);
 				int iconId2 = enemyData2.iconId;
-				ItemIcon itemIcon2 = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId2, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData2.element);
-				itemIcon2.SetEnableCollider(is_enable: false);
+				ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId2, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData2.element).SetEnableCollider(is_enable: false);
 				SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData2.element != ELEMENT_TYPE.MAX);
 				SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData2.element);
 				SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData2.weakElement);
 				SetActive(t, UI.STR_NON_WEAK_ELEMENT, enemyData2.weakElement == ELEMENT_TYPE.MAX);
 				FieldMapTable.FieldMapTableData field2 = itemDestination.field;
 				SetLabelText(t, UI.LBL_FIELD_NAME, field2.mapName);
-				UITexture component2 = FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>();
-				ResourceLoad.LoadFieldIconTexture(component2, field2);
+				ResourceLoad.LoadFieldIconTexture(FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>(), field2);
 			}
 			SetEvent(t, "UNKNOWN_RECOMMEND", 0);
 			break;
@@ -835,9 +803,8 @@ public class ItemDetailTop : GameSection
 			{
 				SetActive(t, UI.OBJ_ENEMY, is_visible: true);
 				int iconId4 = enemyData5.iconId;
-				RARITY_TYPE? rarity = (quest.questType != QUEST_TYPE.ORDER) ? null : new RARITY_TYPE?(quest.rarity);
-				ItemIcon itemIcon4 = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId4, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData5.element);
-				itemIcon4.SetEnableCollider(is_enable: false);
+				RARITY_TYPE? rarity = (quest.questType == QUEST_TYPE.ORDER) ? new RARITY_TYPE?(quest.rarity) : null;
+				ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId4, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData5.element).SetEnableCollider(is_enable: false);
 				SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData5.element != ELEMENT_TYPE.MAX);
 				SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData5.element);
 				SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData5.weakElement);
@@ -864,15 +831,15 @@ public class ItemDetailTop : GameSection
 		case ItemDestination.TYPE.GuildRequest:
 			if (MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem != null && MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem.Length >= 3)
 			{
-				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_1, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[0]));
-				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_2, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[1]));
-				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_3, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[2]));
+				SetSprite(UI.SPR_EMBLEM_LAYER_1, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[0]));
+				SetSprite(UI.SPR_EMBLEM_LAYER_2, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[1]));
+				SetSprite(UI.SPR_EMBLEM_LAYER_3, GuildItemManager.I.GetItemSprite(MonoBehaviourSingleton<GuildManager>.I.guildStatData.emblem[2]));
 			}
 			else
 			{
-				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_1, string.Empty);
-				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_2, string.Empty);
-				SetSprite((Enum)UI.SPR_EMBLEM_LAYER_3, string.Empty);
+				SetSprite(UI.SPR_EMBLEM_LAYER_1, "");
+				SetSprite(UI.SPR_EMBLEM_LAYER_2, "");
+				SetSprite(UI.SPR_EMBLEM_LAYER_3, "");
 			}
 			SetEvent(t, "OPEN_SEND_DIALOG", null);
 			break;
@@ -893,8 +860,7 @@ public class ItemDetailTop : GameSection
 		SetActive(t, is_visible: true);
 		if (table.questType == QUEST_TYPE.ORDER)
 		{
-			int questNum = GetQuestNum(table);
-			SetLabelText(t, UI.LBL_ORDER_NUM, questNum.ToString());
+			SetLabelText(text: GetQuestNum(table).ToString(), root: t, label_enum: UI.LBL_ORDER_NUM);
 		}
 		SetActive(t, UI.OBJ_ICON, is_visible: false);
 		SetLabelText(t, UI.LBL_QUEST_TYPE, table.questType.ToString());
@@ -931,9 +897,8 @@ public class ItemDetailTop : GameSection
 		{
 			SetActive(t, UI.OBJ_ENEMY, is_visible: true);
 			int iconId = enemyData.iconId;
-			RARITY_TYPE? rarity = (table.questType != QUEST_TYPE.ORDER) ? null : new RARITY_TYPE?(table.rarity);
-			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element);
-			itemIcon.SetEnableCollider(is_enable: false);
+			RARITY_TYPE? rarity = (table.questType == QUEST_TYPE.ORDER) ? new RARITY_TYPE?(table.rarity) : null;
+			ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element).SetEnableCollider(is_enable: false);
 			SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
 			SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData.element);
 			SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
@@ -952,8 +917,7 @@ public class ItemDetailTop : GameSection
 
 	private void UpdateJumpSeriesArenaButton(int i, Transform t, ItemDestination destination)
 	{
-		ItemDetailSeriesArena component = t.GetComponent<ItemDetailSeriesArena>();
-		component.SetUpItem(t);
+		t.GetComponent<ItemDetailSeriesArena>().SetUpItem(t);
 		SetEvent(t, "SERIES_ARENA", i);
 	}
 
@@ -966,9 +930,7 @@ public class ItemDetailTop : GameSection
 			SetActive(t, is_visible: false);
 			return;
 		}
-		Network.EventData eventData = (from e in MonoBehaviourSingleton<QuestManager>.I.eventList
-		where e.eventId == deliveryData.eventID
-		select e).FirstOrDefault();
+		Network.EventData eventData = MonoBehaviourSingleton<QuestManager>.I.eventList.Where((Network.EventData e) => e.eventId == deliveryData.eventID).FirstOrDefault();
 		if (eventData == null)
 		{
 			SetActive(t, is_visible: false);
@@ -982,10 +944,9 @@ public class ItemDetailTop : GameSection
 		if (enemyData != null)
 		{
 			int iconId = enemyData.iconId;
-			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element);
-			itemIcon.SetEnableCollider(is_enable: false);
+			ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, null, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element).SetEnableCollider(is_enable: false);
 		}
-		UITexture component = FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>();
+		FindCtrl(t, UI.TEX_FIELD).GetComponent<UITexture>();
 		SetEvent(t, "JUMP_EVENT", i);
 	}
 
@@ -1010,8 +971,7 @@ public class ItemDetailTop : GameSection
 	{
 		SetEvent(t, "SELLECT_POINT_SHOP", i);
 		SetPointShopIcon(t);
-		ItemDetailPointShopItem component = t.GetComponent<ItemDetailPointShopItem>();
-		component.SetUpItemDetailItem(pointShopData.item, pointShopData.shop, (uint)pointShopData.shop.pointShopId, pointShopData.item.needPoint <= pointShopData.shop.userPoint);
+		t.GetComponent<ItemDetailPointShopItem>().SetUpItemDetailItem(pointShopData.item, pointShopData.shop, (uint)pointShopData.shop.pointShopId, pointShopData.item.needPoint <= pointShopData.shop.userPoint);
 	}
 
 	protected virtual void SetPointShopIcon(Transform t)
@@ -1022,8 +982,7 @@ public class ItemDetailTop : GameSection
 
 	private void OnBuy(PointShopItem item, int num)
 	{
-		string boughtMessage = PointShopManager.GetBoughtMessage(item, num);
-		GameSection.SetEventData(boughtMessage);
+		GameSection.SetEventData(PointShopManager.GetBoughtMessage(item, num));
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<UserInfoManager>.I.PointShopManager.SendPointShopBuy(item, selectedPointShopdata.shop, num, delegate(bool isSuccess)
 		{
@@ -1034,6 +993,18 @@ public class ItemDetailTop : GameSection
 			RefreshUI();
 			GameSection.ResumeEvent(isSuccess);
 		});
+	}
+
+	private void OnQuery_SEARCH_IN_TP()
+	{
+		if (!TradingPostManager.IsTradingEnable())
+		{
+			TradingPostManager.ShowUnavailableDialog();
+		}
+		else
+		{
+			MonoBehaviourSingleton<TradingPostManager>.I.SetTradingPostFindData((int)data.GetTableID());
+		}
 	}
 
 	protected void OnQuery_JUMP_QUEST()
@@ -1143,9 +1114,8 @@ public class ItemDetailTop : GameSection
 		if (num < m_ItemDestinations.Count)
 		{
 			ItemDestination destination = m_ItemDestinations[num];
-			List<Network.EventData> list = new List<Network.EventData>(MonoBehaviourSingleton<QuestManager>.I.eventList);
-			Network.EventData eventData = list.Find((Network.EventData e) => e.eventId == destination.quest.eventId);
-			DeliveryTable.DeliveryData deliveryTableDataFromQuestId = Singleton<DeliveryTable>.I.GetDeliveryTableDataFromQuestId(destination.quest.questID);
+			new List<Network.EventData>(MonoBehaviourSingleton<QuestManager>.I.eventList).Find((Network.EventData e) => e.eventId == destination.quest.eventId);
+			Singleton<DeliveryTable>.I.GetDeliveryTableDataFromQuestId(destination.quest.questID);
 			string goingHomeEvent = GameSection.GetGoingHomeEvent();
 			jump_event_list_datas = new EventData[3]
 			{
@@ -1181,8 +1151,7 @@ public class ItemDetailTop : GameSection
 			}
 			if (table.IsEventData)
 			{
-				List<Network.EventData> list = new List<Network.EventData>(MonoBehaviourSingleton<QuestManager>.I.eventList);
-				Network.EventData eventData = list.Find((Network.EventData e) => e.eventId == table.eventId);
+				Network.EventData eventData = new List<Network.EventData>(MonoBehaviourSingleton<QuestManager>.I.eventList).Find((Network.EventData e) => e.eventId == table.eventId);
 				string goingHomeEvent = GameSection.GetGoingHomeEvent();
 				if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(table.mapID) && eventData.readPrologueStory)
 				{
@@ -1324,13 +1293,12 @@ public class ItemDetailTop : GameSection
 		int index = (int)GameSection.GetEventData();
 		selectedPointShopDestination = m_ItemDestinations[index];
 		PointShopData pointShopData = selectedPointShopdata = selectedPointShopDestination.pointShopData;
-		object eventData = new object[3]
+		GameSection.SetEventData(new object[3]
 		{
 			selectedPointShopdata.item,
 			selectedPointShopdata.shop,
 			new Action<PointShopItem, int>(OnBuy)
-		};
-		GameSection.SetEventData(eventData);
+		});
 		if (selectedPointShopdata.shop.userPoint < selectedPointShopdata.item.needPoint)
 		{
 			GameSection.ChangeEvent("SHORTAGE_POINT");
@@ -1377,6 +1345,8 @@ public class ItemDetailTop : GameSection
 			}
 		}
 		base.OnNotify(flags);
+		SetSupportEncoding(UI.LBL_CHALLENGE_ON_MESSAGE, isEnable: true);
+		SetSupportEncoding(UI.LBL_CHALLENGE_OFF_MESSAGE, isEnable: true);
 	}
 
 	protected override NOTIFY_FLAG GetUpdateUINotifyFlags()
@@ -1392,7 +1362,7 @@ public class ItemDetailTop : GameSection
 			int num = int.Parse(s);
 			if (num > 0)
 			{
-				this.StartCoroutine(CRSendDonateRequest((int)data.GetTableID(), data.GetName(), string.Empty, num));
+				StartCoroutine(CRSendDonateRequest((int)data.GetTableID(), data.GetName(), "", num));
 			}
 		}
 		catch
@@ -1402,7 +1372,7 @@ public class ItemDetailTop : GameSection
 
 	private IEnumerator CRSendDonateRequest(int itemID, string itemName, string request, int numRequest)
 	{
-		yield return (object)new WaitUntil((Func<bool>)(() => !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible()));
+		yield return new WaitUntil(() => !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible());
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest(itemID, itemName, request, numRequest, delegate(bool success)
 		{

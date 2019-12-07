@@ -4,7 +4,6 @@ using GooglePlayGames.OurUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
@@ -66,9 +65,8 @@ namespace GooglePlayGames.Native.PInvoke
 
 			internal List<NativeEvent> Data()
 			{
-				IntPtr[] source = PInvokeUtilities.OutParamsToArray((IntPtr[] out_arg, UIntPtr out_size) => GooglePlayGames.Native.Cwrapper.EventManager.EventManager_FetchAllResponse_GetData(SelfPtr(), out_arg, out_size));
-				return (from ptr in source
-				select new NativeEvent(ptr)).ToList();
+				return (from ptr in PInvokeUtilities.OutParamsToArray((IntPtr[] out_arg, UIntPtr out_size) => GooglePlayGames.Native.Cwrapper.EventManager.EventManager_FetchAllResponse_GetData(SelfPtr(), out_arg, out_size))
+					select new NativeEvent(ptr)).ToList();
 			}
 
 			internal bool RequestSucceeded()
@@ -92,18 +90,6 @@ namespace GooglePlayGames.Native.PInvoke
 		}
 
 		private readonly GameServices mServices;
-
-		[CompilerGenerated]
-		private static Func<IntPtr, FetchAllResponse> _003C_003Ef__mg_0024cache0;
-
-		[CompilerGenerated]
-		private static GooglePlayGames.Native.Cwrapper.EventManager.FetchAllCallback _003C_003Ef__mg_0024cache1;
-
-		[CompilerGenerated]
-		private static Func<IntPtr, FetchResponse> _003C_003Ef__mg_0024cache2;
-
-		[CompilerGenerated]
-		private static GooglePlayGames.Native.Cwrapper.EventManager.FetchCallback _003C_003Ef__mg_0024cache3;
 
 		internal EventManager(GameServices services)
 		{

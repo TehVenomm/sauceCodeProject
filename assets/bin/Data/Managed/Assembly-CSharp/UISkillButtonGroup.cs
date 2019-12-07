@@ -63,12 +63,12 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 			return;
 		}
 		DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
-		Transform parent = this.get_gameObject().get_transform().get_parent();
+		Transform parent = base.gameObject.transform.parent;
 		if (!(parent != null))
 		{
 			return;
 		}
-		UIWidget component = parent.get_gameObject().GetComponent<UIWidget>();
+		UIWidget component = parent.gameObject.GetComponent<UIWidget>();
 		if (component != null)
 		{
 			if (SpecialDeviceManager.IsPortrait)
@@ -120,7 +120,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 		int num = changeEndAnimTweens.Length;
 		for (int i = 0; i < num; i++)
 		{
-			changeEndAnimTweens[i].set_enabled(false);
+			changeEndAnimTweens[i].enabled = false;
 			changeEndAnimTweens[i].Sample(1f, isFinished: true);
 		}
 		num = skillButtons.Count;
@@ -176,7 +176,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 		int j = array.Length - num;
 		for (int count = skillButtons.Count; j < count; j++)
 		{
-			skillButtons[num3].get_gameObject().SetActive(false);
+			skillButtons[num3].gameObject.SetActive(value: false);
 			skillButtons[num3].SetButtonIndex(-1);
 			num3++;
 		}
@@ -190,7 +190,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 			}
 			if (array[k].slotType == SKILL_SLOT_TYPE.ATTACK || array[k].slotType == SKILL_SLOT_TYPE.SUPPORT || array[k].slotType == SKILL_SLOT_TYPE.HEAL)
 			{
-				skillButtons[num3].get_gameObject().SetActive(true);
+				skillButtons[num3].gameObject.SetActive(value: true);
 				SkillInfo.SkillParam skillParam = target.skillInfo.GetSkillParam(target.skillInfo.weaponOffset + num4);
 				if (skillParam != null && skillParam.tableData.type == array[k].slotType)
 				{
@@ -210,7 +210,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 	{
 		if (!IsEnable())
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 		}
 	}
 
@@ -224,8 +224,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 		{
 			return false;
 		}
-		SelfController selfController = target.controller as SelfController;
-		if (selfController == null)
+		if (target.controller as SelfController == null)
 		{
 			return false;
 		}
@@ -238,10 +237,10 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 
 	public void ChangeAnimStart()
 	{
-		if (this.get_gameObject().get_activeInHierarchy())
+		if (base.gameObject.activeInHierarchy)
 		{
 			isChangeAnimStartWait = true;
-			this.StartCoroutine(_ChangeAnimStart());
+			StartCoroutine(_ChangeAnimStart());
 		}
 	}
 
@@ -262,7 +261,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 		}
 		for (int j = 0; j < k; j++)
 		{
-			while (changeStartAnimTweens[j].get_isActiveAndEnabled())
+			while (changeStartAnimTweens[j].isActiveAndEnabled)
 			{
 				yield return null;
 			}
@@ -278,7 +277,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 
 	public void ChangeAnimEnd()
 	{
-		if (!this.get_gameObject().get_activeInHierarchy())
+		if (!base.gameObject.activeInHierarchy)
 		{
 			int num = changeEndAnimTweens.Length;
 			for (int i = 0; i < num; i++)
@@ -293,7 +292,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 		}
 		else
 		{
-			this.StartCoroutine(_ChangeAnimEnd());
+			StartCoroutine(_ChangeAnimEnd());
 		}
 	}
 
@@ -306,7 +305,7 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 		}
 		for (int j = 0; j < k; j++)
 		{
-			while (changeEndAnimTweens[j].get_isActiveAndEnabled())
+			while (changeEndAnimTweens[j].isActiveAndEnabled)
 			{
 				yield return null;
 			}
@@ -335,11 +334,11 @@ public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 
 	public void DoEnable()
 	{
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 	}
 
 	public void DoDisable()
 	{
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 }

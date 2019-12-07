@@ -2,7 +2,6 @@ using AOT;
 using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.OurUtils;
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
@@ -23,8 +22,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 			internal NativePlayerStats PlayerStats()
 			{
-				IntPtr selfPointer = GooglePlayGames.Native.Cwrapper.StatsManager.StatsManager_FetchForPlayerResponse_GetData(SelfPtr());
-				return new NativePlayerStats(selfPointer);
+				return new NativePlayerStats(GooglePlayGames.Native.Cwrapper.StatsManager.StatsManager_FetchForPlayerResponse_GetData(SelfPtr()));
 			}
 
 			protected override void CallDispose(HandleRef selfPointer)
@@ -43,12 +41,6 @@ namespace GooglePlayGames.Native.PInvoke
 		}
 
 		private readonly GameServices mServices;
-
-		[CompilerGenerated]
-		private static Func<IntPtr, FetchForPlayerResponse> _003C_003Ef__mg_0024cache0;
-
-		[CompilerGenerated]
-		private static GooglePlayGames.Native.Cwrapper.StatsManager.FetchForPlayerCallback _003C_003Ef__mg_0024cache1;
 
 		internal StatsManager(GameServices services)
 		{

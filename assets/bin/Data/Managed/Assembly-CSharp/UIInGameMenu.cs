@@ -32,7 +32,7 @@ public class UIInGameMenu : MonoBehaviourSingleton<UIInGameMenu>
 	protected override void Awake()
 	{
 		base.Awake();
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 
 	public void Initialize()
@@ -40,10 +40,10 @@ public class UIInGameMenu : MonoBehaviourSingleton<UIInGameMenu>
 		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
 		if (MonoBehaviourSingleton<QuestManager>.I.IsExplore())
 		{
-			partyMenuUI.SetActive(true);
-			normalMenuUI.SetActive(false);
-			happenMenuUI.SetActive(false);
-			retryableMenuUI.SetActive(false);
+			partyMenuUI.SetActive(value: true);
+			normalMenuUI.SetActive(value: false);
+			happenMenuUI.SetActive(value: false);
+			retryableMenuUI.SetActive(value: false);
 			string text = MonoBehaviourSingleton<PartyManager>.I.GetPartyNumber();
 			if (string.IsNullOrEmpty(text))
 			{
@@ -56,10 +56,10 @@ public class UIInGameMenu : MonoBehaviourSingleton<UIInGameMenu>
 		}
 		else if (questData != null && (questData.questType == QUEST_TYPE.HAPPEN || questData.questType == QUEST_TYPE.SERIES_ARENA))
 		{
-			partyMenuUI.SetActive(false);
-			normalMenuUI.SetActive(false);
-			happenMenuUI.SetActive(true);
-			retryableMenuUI.SetActive(false);
+			partyMenuUI.SetActive(value: false);
+			normalMenuUI.SetActive(value: false);
+			happenMenuUI.SetActive(value: true);
+			retryableMenuUI.SetActive(value: false);
 			QuestInfoData.Mission[] array = null;
 			array = QuestInfoData.CreateMissionData(questData);
 			if (array != null)
@@ -76,23 +76,23 @@ public class UIInGameMenu : MonoBehaviourSingleton<UIInGameMenu>
 		}
 		else if (questData != null && questData.questType == QUEST_TYPE.ARENA)
 		{
-			partyMenuUI.SetActive(false);
-			normalMenuUI.SetActive(false);
-			happenMenuUI.SetActive(false);
-			retryableMenuUI.SetActive(true);
+			partyMenuUI.SetActive(value: false);
+			normalMenuUI.SetActive(value: false);
+			happenMenuUI.SetActive(value: false);
+			retryableMenuUI.SetActive(value: true);
 		}
 		else
 		{
-			partyMenuUI.SetActive(false);
-			normalMenuUI.SetActive(true);
-			happenMenuUI.SetActive(false);
-			retryableMenuUI.SetActive(false);
+			partyMenuUI.SetActive(value: false);
+			normalMenuUI.SetActive(value: true);
+			happenMenuUI.SetActive(value: false);
+			retryableMenuUI.SetActive(value: false);
 		}
 		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.mainChat.HideAll();
 		}
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 	}
 
 	public void OnClickClose()
@@ -103,14 +103,14 @@ public class UIInGameMenu : MonoBehaviourSingleton<UIInGameMenu>
 
 	public void Close()
 	{
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 
 	public void OnClickOption()
 	{
 		if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameMenu.OnClickOption", this.get_gameObject(), "OPTION");
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameMenu.OnClickOption", base.gameObject, "OPTION");
 		}
 	}
 
@@ -125,16 +125,16 @@ public class UIInGameMenu : MonoBehaviourSingleton<UIInGameMenu>
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 			if (self != null && self.rescueTime > 0f)
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRetire", this.get_gameObject(), "RETIRE", StringTable.Get(STRING_CATEGORY.IN_GAME, 1008u));
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRetire", base.gameObject, "RETIRE", StringTable.Get(STRING_CATEGORY.IN_GAME, 1008u));
 			}
 			else
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRetire", this.get_gameObject(), "RETIRE", StringTable.Get(STRING_CATEGORY.IN_GAME, 1009u));
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRetire", base.gameObject, "RETIRE", StringTable.Get(STRING_CATEGORY.IN_GAME, 1009u));
 			}
 		}
 		else
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameMenu.OnClickRetire", this.get_gameObject(), "RETIRE");
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameMenu.OnClickRetire", base.gameObject, "RETIRE");
 		}
 	}
 
@@ -150,7 +150,7 @@ public class UIInGameMenu : MonoBehaviourSingleton<UIInGameMenu>
 	{
 		if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameMenu.OnClickRetry", this.get_gameObject(), "RETRY");
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameMenu.OnClickRetry", base.gameObject, "RETRY");
 		}
 	}
 }

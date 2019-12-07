@@ -75,16 +75,14 @@ public class GuildRequestManager : MonoBehaviourSingleton<GuildRequestManager>
 	public TimeSpan CalcTimeSpanFromPoint(int point)
 	{
 		ServerConstDefine constDefine = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine;
-		float num = (float)point / (float)constDefine.GUILD_POINT_PER_MIN;
-		int seconds = (int)(num * 60f);
+		int seconds = (int)((float)point / (float)constDefine.GUILD_POINT_PER_MIN * 60f);
 		return new TimeSpan(0, 0, seconds);
 	}
 
 	public int CalcPointFromTimeSpan(TimeSpan time)
 	{
 		ServerConstDefine constDefine = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine;
-		double num = time.TotalMinutes * (double)constDefine.GUILD_POINT_PER_MIN;
-		return (int)num;
+		return (int)(time.TotalMinutes * (double)constDefine.GUILD_POINT_PER_MIN);
 	}
 
 	public void SetList()
@@ -124,7 +122,7 @@ public class GuildRequestManager : MonoBehaviourSingleton<GuildRequestManager>
 				guildRequestData = ret.result;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGuildRequestStart(QuestInfoData questInfoData, bool isQuestItem, Action<bool> call_back)
@@ -138,7 +136,7 @@ public class GuildRequestManager : MonoBehaviourSingleton<GuildRequestManager>
 		{
 			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGuildRequestComplete(Action<GuildRequestCompleteModel.Param> call_back)
@@ -154,7 +152,7 @@ public class GuildRequestManager : MonoBehaviourSingleton<GuildRequestManager>
 				completeData = ret.result;
 			}
 			call_back(completeData);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGuildRequestCompleteAll(Action<GuildRequestCompleteModel.Param> call_back)
@@ -167,7 +165,7 @@ public class GuildRequestManager : MonoBehaviourSingleton<GuildRequestManager>
 				completeData = ret.result;
 			}
 			call_back(completeData);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGuildRequestExtendAndSortie(QuestInfoData questInfoData, bool isQuestItem, Action<bool> call_back)
@@ -182,7 +180,7 @@ public class GuildRequestManager : MonoBehaviourSingleton<GuildRequestManager>
 		{
 			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGuildRequestExtend(Action<bool> call_back)
@@ -194,7 +192,7 @@ public class GuildRequestManager : MonoBehaviourSingleton<GuildRequestManager>
 		{
 			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGuildRequestRetire(Action<bool> call_back)
@@ -205,7 +203,7 @@ public class GuildRequestManager : MonoBehaviourSingleton<GuildRequestManager>
 		{
 			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void RegisterGuildRequestLocalNotification()

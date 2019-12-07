@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 
 public class GuildInformationStep1 : GameSection
@@ -64,67 +63,67 @@ public class GuildInformationStep1 : GameSection
 	{
 		if (string.IsNullOrEmpty(mCreateRequest.GuildName))
 		{
-			mCreateRequest.SetGuildName(string.Empty);
+			mCreateRequest.SetGuildName("");
 		}
 		SetInput(UI.IPT_NAME, mCreateRequest.GuildName, 30, OnChangeGuildName);
 		if (string.IsNullOrEmpty(mCreateRequest.GuildTag))
 		{
-			mCreateRequest.SetGuildTag(string.Empty);
+			mCreateRequest.SetGuildTag("");
 		}
 		SetInput(UI.IPT_TAG, mCreateRequest.GuildTag, 4, OnChangeGuildTag);
 		if (string.IsNullOrEmpty(mCreateRequest.GuildDescribe))
 		{
-			mCreateRequest.SetGuildDescribe(string.Empty);
+			mCreateRequest.SetGuildDescribe("");
 		}
 		SetInput(UI.IPT_DESCRIBE, mCreateRequest.GuildDescribe, 256, OnChangeGuildDescribe);
 		UpdateEmblems();
-		SetTouchAndRelease((Enum)UI.BTN_INFO, "TAG_INFO_SHOW", "TAG_INFO_HIDE", (object)null);
-		SetActive((Enum)UI.SPR_TAG, is_visible: false);
+		SetTouchAndRelease(UI.BTN_INFO, "TAG_INFO_SHOW", "TAG_INFO_HIDE");
+		SetActive(UI.SPR_TAG, is_visible: false);
 		bool flag = MonoBehaviourSingleton<GuildManager>.I.guildData != null && MonoBehaviourSingleton<GuildManager>.I.guildData.clanId != -1;
-		SetActive((Enum)UI.BTN_NEXT, !flag);
-		SetActive((Enum)UI.BTN_NEXT_UPDATE, flag);
+		SetActive(UI.BTN_NEXT, !flag);
+		SetActive(UI.BTN_NEXT_UPDATE, flag);
 	}
 
 	protected virtual void OnChangeGuildName()
 	{
-		if (!FindCtrl(base._transform, UI.LBL_INPUT).get_gameObject().get_activeInHierarchy())
+		if (!FindCtrl(base._transform, UI.LBL_INPUT).gameObject.activeInHierarchy)
 		{
-			SetActive((Enum)UI.LBL_INPUT, is_visible: true);
+			SetActive(UI.LBL_INPUT, is_visible: true);
 		}
-		string inputValue = GetInputValue((Enum)UI.IPT_NAME);
+		string inputValue = GetInputValue(UI.IPT_NAME);
 		if (string.IsNullOrEmpty(inputValue))
 		{
-			SetActive((Enum)UI.LBL_DEFAULT_INPUT_NAME, is_visible: true);
-			if (FindCtrl(base._transform, UI.IPT_NAME).get_gameObject().get_activeInHierarchy())
+			SetActive(UI.LBL_DEFAULT_INPUT_NAME, is_visible: true);
+			if (FindCtrl(base._transform, UI.IPT_NAME).gameObject.activeInHierarchy)
 			{
-				SetActive((Enum)UI.LBL_INPUT, is_visible: false);
+				SetActive(UI.LBL_INPUT, is_visible: false);
 			}
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_DEFAULT_INPUT_NAME, is_visible: false);
+			SetActive(UI.LBL_DEFAULT_INPUT_NAME, is_visible: false);
 		}
 		mCreateRequest.SetGuildName(inputValue);
 	}
 
 	protected virtual void OnChangeGuildTag()
 	{
-		string inputValue = GetInputValue((Enum)UI.IPT_TAG);
+		string inputValue = GetInputValue(UI.IPT_TAG);
 		inputValue = inputValue.ToUpper();
-		SetLabelText((Enum)UI.LBL_INPUT_TAG, inputValue);
+		SetLabelText(UI.LBL_INPUT_TAG, inputValue);
 		mCreateRequest.SetGuildTag(inputValue);
 	}
 
 	protected virtual void OnChangeGuildDescribe()
 	{
-		string inputValue = GetInputValue((Enum)UI.IPT_DESCRIBE);
+		string inputValue = GetInputValue(UI.IPT_DESCRIBE);
 		if (string.IsNullOrEmpty(inputValue))
 		{
-			SetActive((Enum)UI.LBL_DEFAULT_INPUT_DESCRIBE, is_visible: true);
+			SetActive(UI.LBL_DEFAULT_INPUT_DESCRIBE, is_visible: true);
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_DEFAULT_INPUT_DESCRIBE, is_visible: false);
+			SetActive(UI.LBL_DEFAULT_INPUT_DESCRIBE, is_visible: false);
 		}
 		inputValue = inputValue.Replace("\n", "\\n");
 		mCreateRequest.SetGuildDescribe(inputValue);
@@ -136,27 +135,27 @@ public class GuildInformationStep1 : GameSection
 		{
 			mCreateRequest.SetEmblemID(0, GuildManager.sDefaultEmblemIDLayer1);
 		}
-		SetSprite((Enum)UI.SPR_GUILD_EMBLEM_1, GuildItemManager.I.GetItemSprite(mCreateRequest.EmblemLayerIDs[0]));
+		SetSprite(UI.SPR_GUILD_EMBLEM_1, GuildItemManager.I.GetItemSprite(mCreateRequest.EmblemLayerIDs[0]));
 		if (mCreateRequest.EmblemLayerIDs[1] == -1)
 		{
 			mCreateRequest.SetEmblemID(1, GuildManager.sDefaultEmblemIDLayer2);
 		}
-		SetSprite((Enum)UI.SPR_GUILD_EMBLEM_2, GuildItemManager.I.GetItemSprite(mCreateRequest.EmblemLayerIDs[1]));
+		SetSprite(UI.SPR_GUILD_EMBLEM_2, GuildItemManager.I.GetItemSprite(mCreateRequest.EmblemLayerIDs[1]));
 		if (mCreateRequest.EmblemLayerIDs[2] == -1)
 		{
 			mCreateRequest.SetEmblemID(2, GuildManager.sDefaultEmblemIDLayer3);
 		}
-		SetSprite((Enum)UI.SPR_GUILD_EMBLEM_3, GuildItemManager.I.GetItemSprite(mCreateRequest.EmblemLayerIDs[2]));
+		SetSprite(UI.SPR_GUILD_EMBLEM_3, GuildItemManager.I.GetItemSprite(mCreateRequest.EmblemLayerIDs[2]));
 	}
 
 	private void OnQuery_TAG_INFO_SHOW()
 	{
-		SetActive((Enum)UI.SPR_TAG, is_visible: true);
+		SetActive(UI.SPR_TAG, is_visible: true);
 	}
 
 	private void OnQuery_TAG_INFO_HIDE()
 	{
-		SetActive((Enum)UI.SPR_TAG, is_visible: false);
+		SetActive(UI.SPR_TAG, is_visible: false);
 	}
 
 	private void OnQuery_RANDOM_EMBLEM()

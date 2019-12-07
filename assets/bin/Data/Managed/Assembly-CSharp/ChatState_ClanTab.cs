@@ -46,12 +46,12 @@ public class ChatState_ClanTab : ChatState
 		}
 		if (m_manager.CurrentData.itemList.Count == 0)
 		{
-			MonoBehaviourSingleton<ClanMatchingManager>.I.ChatGetNewMessage(100, string.Empty);
+			MonoBehaviourSingleton<ClanMatchingManager>.I.ChatGetNewMessage(100);
 		}
 		else if (m_manager.CurrentData.newestIndex >= 0)
 		{
 			ChatItem chatItem = m_manager.CurrentData.itemList[m_manager.CurrentData.newestIndex];
-			if (chatItem.get_gameObject().get_activeSelf() && chatItem.chatItemId == MonoBehaviourSingleton<ClanMatchingManager>.I.ChatGetLatestCacheId())
+			if (chatItem.gameObject.activeSelf && chatItem.chatItemId == MonoBehaviourSingleton<ClanMatchingManager>.I.ChatGetLatestCacheId())
 			{
 				MonoBehaviourSingleton<ClanMatchingManager>.I.ChatGetNewMessage(100, chatItem.chatItemId);
 			}
@@ -145,6 +145,6 @@ public class ChatState_ClanTab : ChatState
 	{
 		m_manager.ResetCacheData(MainChat.CHAT_TYPE.CLAN);
 		MonoBehaviourSingleton<ClanMatchingManager>.I.ChatResetCache();
-		MonoBehaviourSingleton<ClanMatchingManager>.I.ChatGetNewMessage(100, string.Empty);
+		MonoBehaviourSingleton<ClanMatchingManager>.I.ChatGetNewMessage(100);
 	}
 }

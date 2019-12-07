@@ -47,24 +47,24 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 		int i = 0;
 		for (int num = starAnim.Length; i < num; i++)
 		{
-			starAnim[i].set_enabled(false);
+			starAnim[i].enabled = false;
 			starAnim[i].ResetToBeginning();
 		}
 		int j = 0;
 		for (int num2 = effAnim.Length; j < num2; j++)
 		{
-			effAnim[j].set_enabled(false);
+			effAnim[j].enabled = false;
 			effAnim[j].Sample(1f, isFinished: true);
 		}
 		int k = 0;
 		for (int num3 = loopAnim.Length; k < num3; k++)
 		{
-			loopAnim[k].set_enabled(false);
+			loopAnim[k].enabled = false;
 		}
 		int l = 0;
 		for (int num4 = endAnim.Length; l < num4; l++)
 		{
-			endAnim[l].set_enabled(false);
+			endAnim[l].enabled = false;
 		}
 		OnAfterInitAnimation();
 	}
@@ -98,20 +98,20 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 
 	protected bool AnnounceStart()
 	{
-		if (!this.get_gameObject().get_activeInHierarchy())
+		if (!base.gameObject.activeInHierarchy)
 		{
 			return false;
 		}
 		if (routineWork != null)
 		{
-			this.StopCoroutine(routineWork);
+			StopCoroutine(routineWork);
 		}
 		else if (panelChange != null)
 		{
 			panelChange.UnLock();
 		}
 		routineWork = Direction();
-		this.StartCoroutine(routineWork);
+		StartCoroutine(routineWork);
 		return true;
 	}
 
@@ -121,7 +121,7 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 		int k = 0;
 		for (int num = endAnim.Length; k < num; k++)
 		{
-			endAnim[k].set_enabled(false);
+			endAnim[k].enabled = false;
 		}
 		int l = 0;
 		for (int num2 = starAnim.Length; l < num2; l++)
@@ -141,7 +141,7 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 			loopAnim[n].ResetToBeginning();
 			loopAnim[n].PlayForward();
 		}
-		yield return (object)new WaitForSeconds(GetDispSec());
+		yield return new WaitForSeconds(GetDispSec());
 		int num5 = 0;
 		for (int num6 = endAnim.Length; num5 < num6; num5++)
 		{
@@ -151,7 +151,7 @@ public class UIAnnounceBase<T> : MonoBehaviourSingleton<T> where T : DisableNoti
 		int j = 0;
 		for (int i = endAnim.Length; j < i; j++)
 		{
-			while (endAnim[j].get_enabled())
+			while (endAnim[j].enabled)
 			{
 				yield return null;
 			}

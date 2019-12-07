@@ -60,7 +60,7 @@ public class BarrierBulletObject : StageObject
 
 	public void Initialize(BulletObject bulletObj)
 	{
-		this.get_gameObject().set_layer(31);
+		base.gameObject.layer = 31;
 		this.bulletObj = bulletObj;
 		owner = (bulletObj.stageObject as Player);
 		if (owner != null)
@@ -88,9 +88,9 @@ public class BarrierBulletObject : StageObject
 				id = 1000000 + result;
 			}
 		}
-		base._rigidbody = this.GetComponent<Rigidbody>();
-		base._rigidbody.set_useGravity(false);
-		base._rigidbody.set_isKinematic(true);
+		base._rigidbody = GetComponent<Rigidbody>();
+		base._rigidbody.useGravity = false;
+		base._rigidbody.isKinematic = true;
 		if (bulletObj != null && bulletObj.bulletEffect != null)
 		{
 			effectColorCtrl = bulletObj.bulletEffect.GetComponent<EffectColorCtrl>();
@@ -118,8 +118,7 @@ public class BarrierBulletObject : StageObject
 			}
 		}
 		effectNameInBarrier = bulletObj.bulletData.dataBarrier.effectNameInBarrier;
-		BarrierBulletObject activeBulletBarrierObject = owner.activeBulletBarrierObject;
-		if (activeBulletBarrierObject != null)
+		if (owner.activeBulletBarrierObject != null)
 		{
 			owner.activeBulletBarrierObject.bulletObj.ForceBreak();
 		}
@@ -194,7 +193,6 @@ public class BarrierBulletObject : StageObject
 
 	public override void OnAttackedHitFix(AttackedHitStatusFix status)
 	{
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
 		hp = status.afterHP;
 		if (!bulletObj.IsEnable())
 		{
@@ -218,8 +216,7 @@ public class BarrierBulletObject : StageObject
 		}
 		else if (!string.IsNullOrEmpty(status.attackInfo.remainEffectName))
 		{
-			Transform effect = EffectManager.GetEffect(status.attackInfo.remainEffectName, base._transform);
-			effect.set_position(status.hitPos);
+			EffectManager.GetEffect(status.attackInfo.remainEffectName, base._transform).position = status.hitPos;
 		}
 	}
 

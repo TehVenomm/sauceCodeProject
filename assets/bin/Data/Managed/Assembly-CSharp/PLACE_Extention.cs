@@ -4,45 +4,35 @@ internal static class PLACE_Extention
 {
 	public static Vector2 GetVector2(this PLACE place)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		switch (place)
 		{
 		case PLACE.FRONT:
-			return Vector2.get_up();
+			return Vector2.up;
 		case PLACE.RIGHT:
-			return Vector2.get_right();
+			return Vector2.right;
 		case PLACE.LEFT:
-			return Vector2.get_left();
+			return Vector2.left;
 		case PLACE.BACK:
-			return Vector2.get_down();
+			return Vector2.down;
 		default:
-			return Vector2.get_zero();
+			return Vector2.zero;
 		}
 	}
 
 	public static Vector3 GetVector3(this PLACE place)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		switch (place)
 		{
 		case PLACE.FRONT:
-			return Vector3.get_forward();
+			return Vector3.forward;
 		case PLACE.RIGHT:
-			return Vector3.get_right();
+			return Vector3.right;
 		case PLACE.LEFT:
-			return Vector3.get_left();
+			return Vector3.left;
 		case PLACE.BACK:
-			return Vector3.get_back();
+			return Vector3.back;
 		default:
-			return Vector3.get_zero();
+			return Vector3.zero;
 		}
 	}
 

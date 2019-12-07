@@ -8,16 +8,6 @@ public class QuestCollection
 		private set;
 	}
 
-	public QuestCollection()
-	{
-		enemyTypeListAry = new List<ENEMY_TYPE>[3];
-		int i = 0;
-		for (int num = enemyTypeListAry.Length; i < num; i++)
-		{
-			enemyTypeListAry[i] = new List<ENEMY_TYPE>();
-		}
-	}
-
 	public List<ENEMY_TYPE> GetEnemyTypeList(QUEST_TYPE type)
 	{
 		return _GetEnemyTypeList(type);
@@ -38,6 +28,16 @@ public class QuestCollection
 			});
 		}
 		return ret;
+	}
+
+	public QuestCollection()
+	{
+		enemyTypeListAry = new List<ENEMY_TYPE>[3];
+		int i = 0;
+		for (int num = enemyTypeListAry.Length; i < num; i++)
+		{
+			enemyTypeListAry[i] = new List<ENEMY_TYPE>();
+		}
 	}
 
 	public void Collect(ENEMY_TYPE type, QUEST_TYPE quest_type)

@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class AccountManager : MonoBehaviourSingleton<AccountManager>
 {
+	[Serializable]
 	public class Account
 	{
 		public string token;
@@ -32,7 +33,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 
 	public bool appClose;
 
-	public string closedNotice = string.Empty;
+	public string closedNotice = "";
 
 	public bool openRefundForm;
 
@@ -101,6 +102,11 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			SaveData.SetData(SaveData.Key.Account, account);
 		}
 		account = SaveData.GetData<Account>(SaveData.Key.Account);
+		Account accountOnServer = ServerAccountSaveData.instance.GetAccountOnServer(NetworkManager.APP_HOST);
+		if (accountOnServer != null)
+		{
+			account = accountOnServer;
+		}
 		if (flag)
 		{
 			SaveData.Save();
@@ -108,6 +114,16 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 		}
 		NetworkNative.setCookieToken(account.token);
 		NetworkNative.setSidToken(account.token);
+	}
+
+	public void GetLastLoginAccountOnServer()
+	{
+		Account accountOnServer = ServerAccountSaveData.instance.GetAccountOnServer(NetworkManager.APP_HOST);
+		if (accountOnServer != null)
+		{
+			account = accountOnServer;
+			SaveAccount(account.userHash, account.token);
+		}
 	}
 
 	public void SaveAccount(string user_hash, string token = null)
@@ -129,6 +145,10 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			NetworkNative.setCookieToken(account.token);
 			NetworkNative.setSidToken(account.token);
 			Native.getList();
+		}
+		if (!string.IsNullOrEmpty(account.userHash))
+		{
+			ServerAccountSaveData.instance.UpdateAccount(NetworkManager.APP_HOST, account);
 		}
 		SaveData.SetData(SaveData.Key.Account, account);
 		SaveData.Save();
@@ -189,6 +209,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 					{
 						if (btn == "YES")
 						{
+							ServerAccountSaveData.instance.RemoveAccount(NetworkManager.APP_HOST);
 							GameSceneEvent.PopStay();
 							ResetAccount();
 							TutorialReadData.SaveAsEmptyData();
@@ -244,7 +265,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				});
 				break;
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendRegistCreate(Action<bool> call_back)
@@ -278,7 +299,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				};
 				MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Account_Register", "Account", values);
 				MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_1_login_screen, "Tutorial");
-				Debug.LogWarning((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_1_login_screen.ToString()));
+				Debug.LogWarning("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_1_login_screen.ToString());
 				MonoBehaviourSingleton<GoWrapManager>.I.SendStatusTracking(TRACK_TUTORIAL_STEP_BIT.tutorial_1_login_screen, "Tutorial");
 				call_back(is_success);
 			}
@@ -297,7 +318,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 					}
 				});
 			}
-		}, string.Empty);
+		});
 	}
 
 	private void RecommendUpdateCheck(Action call_back)
@@ -331,7 +352,8 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				{
 					if (logInBonus[i].priority > 0)
 					{
-						logInBonusLimitedCount++;
+						int logInBonusLimitedCount = this.logInBonusLimitedCount;
+						this.logInBonusLimitedCount = logInBonusLimitedCount + 1;
 					}
 				}
 				IsRecvLogInBonus = true;
@@ -340,7 +362,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			{
 				callback(obj);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void DisplayLogInBonusSection()
@@ -381,15 +403,19 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Account_Register", "Account", values);
 			}
 			call_back(is_success);
-		}, string.Empty);
+		});
 	}
 
-	public void SendRegistAuthRob(string email, string password, Action<bool> call_back)
+	public void SendRegistAuthRob(string email, string password, Action<bool> call_back, string uid = "")
 	{
 		MonoBehaviourSingleton<NetworkManager>.I.tokenTemp = null;
 		RegistAuthRobModel.RequestSendForm requestSendForm = new RegistAuthRobModel.RequestSendForm();
 		requestSendForm.email = email;
-		requestSendForm.password = password;
+		if (!string.IsNullOrEmpty(password))
+		{
+			requestSendForm.password = password;
+		}
+		requestSendForm.uid = uid;
 		requestSendForm.d = NetworkNative.getUniqueDeviceId();
 		bool is_success = false;
 		Protocol.Send(RegistAuthRobModel.URL, requestSendForm, delegate(RegistAuthRobModel ret)
@@ -403,7 +429,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				SaveAccount(ret.result.uh);
 			}
 			call_back(is_success);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRegistChangePasswordRob(string currentPassword, string newPassword, string newPasswordConfirm, Action<bool> call_back)
@@ -420,7 +446,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				is_success = true;
 			}
 			call_back(is_success);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRegistChangeSecretQuestion(string password, int secretQuestionType, string secretQuestionAnswer, Action<bool> call_back)
@@ -437,7 +463,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				is_success = true;
 			}
 			call_back(is_success);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRegistCreateGoogleAccount(string account, string key, string password, string confirmPassword, Action<bool> call_back)
@@ -456,7 +482,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result);
 			}
 			call_back(is_success);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRegistAuthGoogle(string account, string key, string password, Action<bool> call_back)
@@ -480,7 +506,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				SaveAccount(ret.result.uh);
 			}
 			call_back(is_success);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRegistChangePasswordGoogle(string currentPassword, string newPassword, string newPasswordConfirm, Action<bool> call_back)
@@ -497,13 +523,17 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				is_success = true;
 			}
 			call_back(is_success);
-		}, string.Empty);
+		});
 	}
 
-	public void SendRegistAuthFacebook(string access_token, Action<bool> call_back)
+	public void SendRegistAuthFacebook(string access_token, Action<bool> call_back, string uid = null)
 	{
 		RegistAuthFacebookModel.RequestSendForm requestSendForm = new RegistAuthFacebookModel.RequestSendForm();
 		requestSendForm.accessToken = access_token;
+		if (!string.IsNullOrEmpty(uid))
+		{
+			requestSendForm.uid = uid;
+		}
 		requestSendForm.d = NetworkNative.getUniqueDeviceId();
 		bool is_success = false;
 		Protocol.Send(RegistAuthFacebookModel.URL, requestSendForm, delegate(RegistAuthFacebookModel ret)
@@ -532,7 +562,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Account_Register", "Account", values);
 			}
 			call_back(is_success);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRegistLinkFacebook(string access_token, Action<bool, RegistLinkFacebookModel> call_back)
@@ -548,7 +578,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result);
 			}
 			call_back(is_success, ret);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRegistOverrideFacebook(string access_token, Action<bool> call_back)
@@ -565,7 +595,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result);
 			}
 			call_back(is_success);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRegistUnlinkFacebook(Action<bool> call_back)
@@ -579,7 +609,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result);
 			}
 			call_back(is_success);
-		}, string.Empty);
+		});
 	}
 
 	public void SendTrackInviteFacebook(string access_token, List<string> list, Action<bool> call_back)
@@ -594,7 +624,7 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				is_success = true;
 			}
 			call_back(is_success);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRegistLogout(Action<bool, RegistLogoutModel> call_back)
@@ -607,7 +637,59 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 				is_success = true;
 			}
 			call_back(is_success, ret);
-		}, string.Empty);
+		});
+	}
+
+	public void SendLinkRob(string email, string password, Action<bool, LinkRobModel> call_back)
+	{
+		LinkRobModel.RequestSendForm requestSendForm = new LinkRobModel.RequestSendForm();
+		requestSendForm.email = email;
+		requestSendForm.password = password;
+		bool is_success = false;
+		Protocol.Send(LinkRobModel.URL, requestSendForm, delegate(LinkRobModel ret)
+		{
+			if (ret.Error == Error.None)
+			{
+				is_success = true;
+				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result);
+			}
+			call_back(is_success, ret);
+		});
+	}
+
+	public void SendRegistIgnoreCloudData(string email, Action<bool> call_back)
+	{
+		RegistLinkRobIgnoreCloudModel.RequestSendForm requestSendForm = new RegistLinkRobIgnoreCloudModel.RequestSendForm();
+		requestSendForm.email = email;
+		bool is_success = false;
+		Protocol.Send(RegistLinkRobIgnoreCloudModel.URL, requestSendForm, delegate(RegistLinkRobIgnoreCloudModel ret)
+		{
+			if (ret.Error == Error.None)
+			{
+				is_success = true;
+				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result);
+			}
+			call_back(is_success);
+		});
+	}
+
+	public void SendLinkRobWithCloudData(string email, Action<bool> call_back)
+	{
+		RegistLinkRobUseCloudDataModel.RequestSendForm requestSendForm = new RegistLinkRobUseCloudDataModel.RequestSendForm();
+		requestSendForm.email = email;
+		requestSendForm.d = NetworkNative.getUniqueDeviceId();
+		bool is_success = false;
+		Protocol.Send(RegistLinkRobUseCloudDataModel.URL, requestSendForm, delegate(RegistLinkRobUseCloudDataModel ret)
+		{
+			if (ret.Error == Error.None)
+			{
+				is_success = true;
+				MonoBehaviourSingleton<UserInfoManager>.I.SetRecvUserInfo(ret.result.userInfo);
+				MonoBehaviourSingleton<UserInfoManager>.I.SetNewsID(ret.result.newsId);
+				SaveAccount(ret.result.uh);
+			}
+			call_back(is_success);
+		});
 	}
 
 	private void OpenMessageDialog(Error msg_id, Action<string> callback)
@@ -643,5 +725,36 @@ public class AccountManager : MonoBehaviourSingleton<AccountManager>
 			}
 		}
 		IsRecvLogInBonus = true;
+	}
+
+	public bool ChangingServer()
+	{
+		return !string.IsNullOrEmpty(MonoBehaviourSingleton<AppMain>.I.uid);
+	}
+
+	public void SendChangeServerInfo(Action<bool> call_back)
+	{
+		if (!string.IsNullOrEmpty(MonoBehaviourSingleton<AppMain>.I.email))
+		{
+			SendRegistAuthRob(MonoBehaviourSingleton<AppMain>.I.email, null, call_back, MonoBehaviourSingleton<AppMain>.I.uid);
+		}
+		else if (MonoBehaviourSingleton<FBManager>.I.isLoggedIn)
+		{
+			SendRegistAuthFacebook(MonoBehaviourSingleton<FBManager>.I.accessToken, call_back, MonoBehaviourSingleton<AppMain>.I.uid);
+		}
+		else
+		{
+			MonoBehaviourSingleton<FBManager>.I.LoginWithReadPermission(delegate(bool success, string b)
+			{
+				if (success)
+				{
+					SendRegistAuthFacebook(MonoBehaviourSingleton<FBManager>.I.accessToken, call_back, MonoBehaviourSingleton<AppMain>.I.uid);
+				}
+				else
+				{
+					call_back(obj: false);
+				}
+			});
+		}
 	}
 }

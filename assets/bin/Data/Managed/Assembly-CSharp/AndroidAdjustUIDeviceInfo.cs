@@ -48,21 +48,19 @@ public class AndroidAdjustUIDeviceInfo : DeviceIndividualInfo
 
 	public AndroidAdjustUIDeviceInfo()
 	{
-		Rect val = default(Rect);
-		val._002Ector(0.05f, 0.03f, 0.055f, 0.115f);
-		Rect val2 = default(Rect);
-		val2._002Ector(0.05f, 0.1f, 0.055f, 0.06f);
+		Rect rect = new Rect(0.05f, 0.03f, 0.055f, 0.115f);
+		Rect rect2 = new Rect(0.05f, 0.1f, 0.055f, 0.06f);
 		int num = (int)DeviceIndividualInfo.shorterSide;
 		int num2 = (int)DeviceIndividualInfo.longerSide;
-		WebViewHelpPortrait.Set((int)((float)num * val2.get_xMin()), (int)((float)num * val2.get_width()), (int)((float)num2 * val2.get_height()), (int)((float)num2 * val2.get_yMin()));
+		WebViewHelpPortrait.Set((int)((float)num * rect2.xMin), (int)((float)num * rect2.width), (int)((float)num2 * rect2.height), (int)((float)num2 * rect2.yMin));
 		int num3 = (int)((float)num2 / 840f * (-45.4f * adjustCoefficient));
-		WebViewInfoPortrait.Set((int)((float)num * val.get_xMin()), (int)((float)num * val.get_width()), (int)((float)num2 * val.get_height()) + num3, (int)((float)num2 * val.get_yMin()));
+		WebViewInfoPortrait.Set((int)((float)num * rect.xMin), (int)((float)num * rect.width), (int)((float)num2 * rect.height) + num3, (int)((float)num2 * rect.yMin));
 		float num4 = (float)num2 / 840f;
 		int num5 = (int)(num4 * (-27.3f * adjustCoefficient));
 		int num6 = (int)(num4 * (-36.4f * adjustCoefficient));
 		int num7 = (int)(num4 * -30f);
 		int num8 = (int)(num4 * -10f);
-		WebViewInfoLandscape.Set((int)((float)num * val.get_xMin()) + num5, (int)((float)num * val.get_width()) + num6, (int)((float)num2 * val.get_height()) + num7, (int)((float)num2 * val.get_yMin()) + num8);
+		WebViewInfoLandscape.Set((int)((float)num * rect.xMin) + num5, (int)((float)num * rect.width) + num6, (int)((float)num2 * rect.height) + num7, (int)((float)num2 * rect.yMin) + num8);
 		SkillButtonAnchorPortrait.Set(-208, -108, -380, -150);
 		SkillButtonAnchorLandscape.Set(-208, -103, -448, -92);
 		ChatButtonAnchorPortrait.Set(-41, 480, 323, 400);

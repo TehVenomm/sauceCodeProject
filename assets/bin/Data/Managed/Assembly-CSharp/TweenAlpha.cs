@@ -35,10 +35,6 @@ public class TweenAlpha : UITweener
 	{
 		get
 		{
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 			if (!mCached)
 			{
 				Cache();
@@ -49,29 +45,16 @@ public class TweenAlpha : UITweener
 			}
 			if (mSr != null)
 			{
-				Color color = mSr.get_color();
-				return color.a;
+				return mSr.color.a;
 			}
-			float result;
-			if (mMat != null)
+			if (!(mMat != null))
 			{
-				Color color2 = mMat.get_color();
-				result = color2.a;
+				return 1f;
 			}
-			else
-			{
-				result = 1f;
-			}
-			return result;
+			return mMat.color.a;
 		}
 		set
 		{
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
 			if (!mCached)
 			{
 				Cache();
@@ -82,15 +65,15 @@ public class TweenAlpha : UITweener
 			}
 			else if (mSr != null)
 			{
-				Color color = mSr.get_color();
+				Color color = mSr.color;
 				color.a = value;
-				mSr.set_color(color);
+				mSr.color = color;
 			}
 			else if (mMat != null)
 			{
-				Color color2 = mMat.get_color();
+				Color color2 = mMat.color;
 				color2.a = value;
-				mMat.set_color(color2);
+				mMat.color = color2;
 			}
 		}
 	}
@@ -98,18 +81,18 @@ public class TweenAlpha : UITweener
 	private void Cache()
 	{
 		mCached = true;
-		mRect = this.GetComponent<UIRect>();
-		mSr = this.GetComponent<SpriteRenderer>();
+		mRect = GetComponent<UIRect>();
+		mSr = GetComponent<SpriteRenderer>();
 		if (mRect == null && mSr == null)
 		{
-			Renderer component = this.GetComponent<Renderer>();
+			Renderer component = GetComponent<Renderer>();
 			if (component != null)
 			{
-				mMat = component.get_material();
+				mMat = component.material;
 			}
 			if (mMat == null)
 			{
-				mRect = this.GetComponentInChildren<UIRect>();
+				mRect = GetComponentInChildren<UIRect>();
 			}
 		}
 	}
@@ -127,7 +110,7 @@ public class TweenAlpha : UITweener
 		if (duration <= 0f)
 		{
 			tweenAlpha.Sample(1f, isFinished: true);
-			tweenAlpha.set_enabled(false);
+			tweenAlpha.enabled = false;
 		}
 		return tweenAlpha;
 	}

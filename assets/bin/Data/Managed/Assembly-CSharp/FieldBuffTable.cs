@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class FieldBuffTable : Singleton<FieldBuffTable>, IDataTable
 {
@@ -17,7 +16,7 @@ public class FieldBuffTable : Singleton<FieldBuffTable>, IDataTable
 		{
 			data.id = key;
 			csv_reader.Pop(ref data.name);
-			string value = string.Empty;
+			string value = "";
 			csv_reader.Pop(ref value);
 			string[] array = value.Split(':');
 			data.buffTableIds.Clear();
@@ -35,9 +34,6 @@ public class FieldBuffTable : Singleton<FieldBuffTable>, IDataTable
 	}
 
 	private UIntKeyTable<FieldBuffData> dataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<FieldBuffData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string text)
 	{

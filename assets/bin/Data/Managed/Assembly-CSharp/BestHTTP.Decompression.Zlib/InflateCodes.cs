@@ -79,7 +79,7 @@ namespace BestHTTP.Decompression.Zlib
 			num = blocks.bitb;
 			num2 = blocks.bitk;
 			int num5 = blocks.writeAt;
-			int num6 = (num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1);
+			int num6 = (num5 < blocks.readAt) ? (blocks.readAt - num5 - 1) : (blocks.end - num5);
 			while (true)
 			{
 				switch (mode)
@@ -99,10 +99,10 @@ namespace BestHTTP.Decompression.Zlib
 						num = blocks.bitb;
 						num2 = blocks.bitk;
 						num5 = blocks.writeAt;
-						num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
+						num6 = ((num5 < blocks.readAt) ? (blocks.readAt - num5 - 1) : (blocks.end - num5));
 						if (r != 0)
 						{
-							mode = ((r != 1) ? 9 : 7);
+							mode = ((r == 1) ? 7 : 9);
 							break;
 						}
 					}
@@ -113,8 +113,8 @@ namespace BestHTTP.Decompression.Zlib
 					goto case 1;
 				case 1:
 				{
-					int num8;
-					for (num8 = need; num2 < num8; num2 += 8)
+					int num7;
+					for (num7 = need; num2 < num7; num2 += 8)
 					{
 						if (num4 != 0)
 						{
@@ -131,30 +131,30 @@ namespace BestHTTP.Decompression.Zlib
 						blocks.writeAt = num5;
 						return blocks.Flush(r);
 					}
-					int num11 = (tree_index + (num & InternalInflateConstants.InflateMask[num8])) * 3;
-					num >>= tree[num11 + 1];
-					num2 -= tree[num11 + 1];
-					int num12 = tree[num11];
-					if (num12 == 0)
+					int num8 = (tree_index + (num & InternalInflateConstants.InflateMask[num7])) * 3;
+					num >>= tree[num8 + 1];
+					num2 -= tree[num8 + 1];
+					int num9 = tree[num8];
+					if (num9 == 0)
 					{
-						lit = tree[num11 + 2];
+						lit = tree[num8 + 2];
 						mode = 6;
 						break;
 					}
-					if ((num12 & 0x10) != 0)
+					if ((num9 & 0x10) != 0)
 					{
-						bitsToGet = (num12 & 0xF);
-						len = tree[num11 + 2];
+						bitsToGet = (num9 & 0xF);
+						len = tree[num8 + 2];
 						mode = 2;
 						break;
 					}
-					if ((num12 & 0x40) == 0)
+					if ((num9 & 0x40) == 0)
 					{
-						need = num12;
-						tree_index = num11 / 3 + tree[num11 + 2];
+						need = num9;
+						tree_index = num8 / 3 + tree[num8 + 2];
 						break;
 					}
-					if ((num12 & 0x20) != 0)
+					if ((num9 & 0x20) != 0)
 					{
 						mode = 7;
 						break;
@@ -172,8 +172,8 @@ namespace BestHTTP.Decompression.Zlib
 				}
 				case 2:
 				{
-					int num8;
-					for (num8 = bitsToGet; num2 < num8; num2 += 8)
+					int num7;
+					for (num7 = bitsToGet; num2 < num7; num2 += 8)
 					{
 						if (num4 != 0)
 						{
@@ -190,9 +190,9 @@ namespace BestHTTP.Decompression.Zlib
 						blocks.writeAt = num5;
 						return blocks.Flush(r);
 					}
-					len += (num & InternalInflateConstants.InflateMask[num8]);
-					num >>= num8;
-					num2 -= num8;
+					len += (num & InternalInflateConstants.InflateMask[num7]);
+					num >>= num7;
+					num2 -= num7;
 					need = dbits;
 					tree = dtree;
 					tree_index = dtree_index;
@@ -201,8 +201,8 @@ namespace BestHTTP.Decompression.Zlib
 				}
 				case 3:
 				{
-					int num8;
-					for (num8 = need; num2 < num8; num2 += 8)
+					int num7;
+					for (num7 = need; num2 < num7; num2 += 8)
 					{
 						if (num4 != 0)
 						{
@@ -219,21 +219,21 @@ namespace BestHTTP.Decompression.Zlib
 						blocks.writeAt = num5;
 						return blocks.Flush(r);
 					}
-					int num11 = (tree_index + (num & InternalInflateConstants.InflateMask[num8])) * 3;
-					num >>= tree[num11 + 1];
-					num2 -= tree[num11 + 1];
-					int num12 = tree[num11];
-					if ((num12 & 0x10) != 0)
+					int num8 = (tree_index + (num & InternalInflateConstants.InflateMask[num7])) * 3;
+					num >>= tree[num8 + 1];
+					num2 -= tree[num8 + 1];
+					int num9 = tree[num8];
+					if ((num9 & 0x10) != 0)
 					{
-						bitsToGet = (num12 & 0xF);
-						dist = tree[num11 + 2];
+						bitsToGet = (num9 & 0xF);
+						dist = tree[num8 + 2];
 						mode = 4;
 						break;
 					}
-					if ((num12 & 0x40) == 0)
+					if ((num9 & 0x40) == 0)
 					{
-						need = num12;
-						tree_index = num11 / 3 + tree[num11 + 2];
+						need = num9;
+						tree_index = num8 / 3 + tree[num8 + 2];
 						break;
 					}
 					mode = 9;
@@ -249,8 +249,8 @@ namespace BestHTTP.Decompression.Zlib
 				}
 				case 4:
 				{
-					int num8;
-					for (num8 = bitsToGet; num2 < num8; num2 += 8)
+					int num7;
+					for (num7 = bitsToGet; num2 < num7; num2 += 8)
 					{
 						if (num4 != 0)
 						{
@@ -267,9 +267,9 @@ namespace BestHTTP.Decompression.Zlib
 						blocks.writeAt = num5;
 						return blocks.Flush(r);
 					}
-					dist += (num & InternalInflateConstants.InflateMask[num8]);
-					num >>= num8;
-					num2 -= num8;
+					dist += (num & InternalInflateConstants.InflateMask[num7]);
+					num >>= num7;
+					num2 -= num7;
 					mode = 5;
 					goto case 5;
 				}
@@ -286,18 +286,18 @@ namespace BestHTTP.Decompression.Zlib
 							if (num5 == blocks.end && blocks.readAt != 0)
 							{
 								num5 = 0;
-								num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
+								num6 = ((num5 < blocks.readAt) ? (blocks.readAt - num5 - 1) : (blocks.end - num5));
 							}
 							if (num6 == 0)
 							{
 								blocks.writeAt = num5;
 								r = blocks.Flush(r);
 								num5 = blocks.writeAt;
-								num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
+								num6 = ((num5 < blocks.readAt) ? (blocks.readAt - num5 - 1) : (blocks.end - num5));
 								if (num5 == blocks.end && blocks.readAt != 0)
 								{
 									num5 = 0;
-									num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
+									num6 = ((num5 < blocks.readAt) ? (blocks.readAt - num5 - 1) : (blocks.end - num5));
 								}
 								if (num6 == 0)
 								{
@@ -328,18 +328,18 @@ namespace BestHTTP.Decompression.Zlib
 						if (num5 == blocks.end && blocks.readAt != 0)
 						{
 							num5 = 0;
-							num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
+							num6 = ((num5 < blocks.readAt) ? (blocks.readAt - num5 - 1) : (blocks.end - num5));
 						}
 						if (num6 == 0)
 						{
 							blocks.writeAt = num5;
 							r = blocks.Flush(r);
 							num5 = blocks.writeAt;
-							num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
+							num6 = ((num5 < blocks.readAt) ? (blocks.readAt - num5 - 1) : (blocks.end - num5));
 							if (num5 == blocks.end && blocks.readAt != 0)
 							{
 								num5 = 0;
-								num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
+								num6 = ((num5 < blocks.readAt) ? (blocks.readAt - num5 - 1) : (blocks.end - num5));
 							}
 							if (num6 == 0)
 							{
@@ -368,7 +368,7 @@ namespace BestHTTP.Decompression.Zlib
 					blocks.writeAt = num5;
 					r = blocks.Flush(r);
 					num5 = blocks.writeAt;
-					num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
+					num6 = ((num5 < blocks.readAt) ? (blocks.readAt - num5 - 1) : (blocks.end - num5));
 					if (blocks.readAt != blocks.writeAt)
 					{
 						blocks.bitb = num;
@@ -414,218 +414,222 @@ namespace BestHTTP.Decompression.Zlib
 
 		internal int InflateFast(int bl, int bd, int[] tl, int tl_index, int[] td, int td_index, InflateBlocks s, ZlibCodec z)
 		{
-			int num = z.NextIn;
-			int num2 = z.AvailableBytesIn;
-			int num3 = s.bitb;
-			int num4 = s.bitk;
-			int num5 = s.writeAt;
-			int num6 = (num5 >= s.readAt) ? (s.end - num5) : (s.readAt - num5 - 1);
-			int num7 = InternalInflateConstants.InflateMask[bl];
-			int num8 = InternalInflateConstants.InflateMask[bd];
-			int num14;
+			int nextIn = z.NextIn;
+			int num = z.AvailableBytesIn;
+			int num2 = s.bitb;
+			int num3 = s.bitk;
+			int num4 = s.writeAt;
+			int num5 = (num4 < s.readAt) ? (s.readAt - num4 - 1) : (s.end - num4);
+			int num6 = InternalInflateConstants.InflateMask[bl];
+			int num7 = InternalInflateConstants.InflateMask[bd];
+			int num12;
 			while (true)
 			{
-				if (num4 < 20)
+				if (num3 < 20)
 				{
-					num2--;
-					num3 |= (z.InputBuffer[num++] & 0xFF) << num4;
-					num4 += 8;
+					num--;
+					num2 |= (z.InputBuffer[nextIn++] & 0xFF) << num3;
+					num3 += 8;
 					continue;
 				}
-				int num10 = num3 & num7;
-				int num11 = (tl_index + num10) * 3;
-				int num12;
-				if ((num12 = tl[num11]) == 0)
+				int num8 = num2 & num6;
+				int[] array = tl;
+				int num9 = tl_index;
+				int num10 = (num9 + num8) * 3;
+				int num11;
+				if ((num11 = array[num10]) == 0)
 				{
-					num3 >>= tl[num11 + 1];
-					num4 -= tl[num11 + 1];
-					s.window[num5++] = (byte)tl[num11 + 2];
-					num6--;
+					num2 >>= array[num10 + 1];
+					num3 -= array[num10 + 1];
+					s.window[num4++] = (byte)array[num10 + 2];
+					num5--;
 				}
 				else
 				{
 					while (true)
 					{
-						num3 >>= tl[num11 + 1];
-						num4 -= tl[num11 + 1];
-						if ((num12 & 0x10) != 0)
+						num2 >>= array[num10 + 1];
+						num3 -= array[num10 + 1];
+						if ((num11 & 0x10) != 0)
 						{
-							num12 &= 0xF;
-							num14 = tl[num11 + 2] + (num3 & InternalInflateConstants.InflateMask[num12]);
-							num3 >>= num12;
-							for (num4 -= num12; num4 < 15; num4 += 8)
+							num11 &= 0xF;
+							num12 = array[num10 + 2] + (num2 & InternalInflateConstants.InflateMask[num11]);
+							num2 >>= num11;
+							for (num3 -= num11; num3 < 15; num3 += 8)
 							{
-								num2--;
-								num3 |= (z.InputBuffer[num++] & 0xFF) << num4;
+								num--;
+								num2 |= (z.InputBuffer[nextIn++] & 0xFF) << num3;
 							}
-							num10 = (num3 & num8);
-							num11 = (td_index + num10) * 3;
-							num12 = td[num11];
+							num8 = (num2 & num7);
+							array = td;
+							num9 = td_index;
+							num10 = (num9 + num8) * 3;
+							num11 = array[num10];
 							while (true)
 							{
-								num3 >>= td[num11 + 1];
-								num4 -= td[num11 + 1];
-								if ((num12 & 0x10) != 0)
+								num2 >>= array[num10 + 1];
+								num3 -= array[num10 + 1];
+								if ((num11 & 0x10) != 0)
 								{
 									break;
 								}
-								if ((num12 & 0x40) == 0)
+								if ((num11 & 0x40) == 0)
 								{
-									num10 += td[num11 + 2];
-									num10 += (num3 & InternalInflateConstants.InflateMask[num12]);
-									num11 = (td_index + num10) * 3;
-									num12 = td[num11];
+									num8 += array[num10 + 2];
+									num8 += (num2 & InternalInflateConstants.InflateMask[num11]);
+									num10 = (num9 + num8) * 3;
+									num11 = array[num10];
 									continue;
 								}
 								z.Message = "invalid distance code";
-								num14 = z.AvailableBytesIn - num2;
-								num14 = ((num4 >> 3 >= num14) ? num14 : (num4 >> 3));
-								num2 += num14;
-								num -= num14;
-								num4 -= num14 << 3;
-								s.bitb = num3;
-								s.bitk = num4;
-								z.AvailableBytesIn = num2;
-								z.TotalBytesIn += num - z.NextIn;
-								z.NextIn = num;
-								s.writeAt = num5;
+								num12 = z.AvailableBytesIn - num;
+								num12 = ((num3 >> 3 < num12) ? (num3 >> 3) : num12);
+								num += num12;
+								nextIn -= num12;
+								num3 -= num12 << 3;
+								s.bitb = num2;
+								s.bitk = num3;
+								z.AvailableBytesIn = num;
+								z.TotalBytesIn += nextIn - z.NextIn;
+								z.NextIn = nextIn;
+								s.writeAt = num4;
 								return -3;
 							}
-							for (num12 &= 0xF; num4 < num12; num4 += 8)
+							for (num11 &= 0xF; num3 < num11; num3 += 8)
 							{
-								num2--;
-								num3 |= (z.InputBuffer[num++] & 0xFF) << num4;
+								num--;
+								num2 |= (z.InputBuffer[nextIn++] & 0xFF) << num3;
 							}
-							int num17 = td[num11 + 2] + (num3 & InternalInflateConstants.InflateMask[num12]);
-							num3 >>= num12;
-							num4 -= num12;
-							num6 -= num14;
-							int num18;
-							if (num5 >= num17)
+							int num13 = array[num10 + 2] + (num2 & InternalInflateConstants.InflateMask[num11]);
+							num2 >>= num11;
+							num3 -= num11;
+							num5 -= num12;
+							int num14;
+							if (num4 >= num13)
 							{
-								num18 = num5 - num17;
-								if (num5 - num18 > 0 && 2 > num5 - num18)
+								num14 = num4 - num13;
+								if (num4 - num14 > 0 && 2 > num4 - num14)
 								{
-									s.window[num5++] = s.window[num18++];
-									s.window[num5++] = s.window[num18++];
-									num14 -= 2;
+									s.window[num4++] = s.window[num14++];
+									s.window[num4++] = s.window[num14++];
+									num12 -= 2;
 								}
 								else
 								{
-									Array.Copy(s.window, num18, s.window, num5, 2);
-									num5 += 2;
-									num18 += 2;
-									num14 -= 2;
+									Array.Copy(s.window, num14, s.window, num4, 2);
+									num4 += 2;
+									num14 += 2;
+									num12 -= 2;
 								}
 							}
 							else
 							{
-								num18 = num5 - num17;
+								num14 = num4 - num13;
 								do
 								{
-									num18 += s.end;
+									num14 += s.end;
 								}
-								while (num18 < 0);
-								num12 = s.end - num18;
-								if (num14 > num12)
+								while (num14 < 0);
+								num11 = s.end - num14;
+								if (num12 > num11)
 								{
-									num14 -= num12;
-									if (num5 - num18 > 0 && num12 > num5 - num18)
+									num12 -= num11;
+									if (num4 - num14 > 0 && num11 > num4 - num14)
 									{
 										do
 										{
-											s.window[num5++] = s.window[num18++];
+											s.window[num4++] = s.window[num14++];
 										}
-										while (--num12 != 0);
+										while (--num11 != 0);
 									}
 									else
 									{
-										Array.Copy(s.window, num18, s.window, num5, num12);
-										num5 += num12;
-										num18 += num12;
-										num12 = 0;
+										Array.Copy(s.window, num14, s.window, num4, num11);
+										num4 += num11;
+										num14 += num11;
+										num11 = 0;
 									}
-									num18 = 0;
+									num14 = 0;
 								}
 							}
-							if (num5 - num18 > 0 && num14 > num5 - num18)
+							if (num4 - num14 > 0 && num12 > num4 - num14)
 							{
 								do
 								{
-									s.window[num5++] = s.window[num18++];
+									s.window[num4++] = s.window[num14++];
 								}
-								while (--num14 != 0);
+								while (--num12 != 0);
 							}
 							else
 							{
-								Array.Copy(s.window, num18, s.window, num5, num14);
-								num5 += num14;
-								num18 += num14;
-								num14 = 0;
+								Array.Copy(s.window, num14, s.window, num4, num12);
+								num4 += num12;
+								num14 += num12;
+								num12 = 0;
 							}
 							break;
 						}
-						if ((num12 & 0x40) == 0)
+						if ((num11 & 0x40) == 0)
 						{
-							num10 += tl[num11 + 2];
-							num10 += (num3 & InternalInflateConstants.InflateMask[num12]);
-							num11 = (tl_index + num10) * 3;
-							if ((num12 = tl[num11]) == 0)
+							num8 += array[num10 + 2];
+							num8 += (num2 & InternalInflateConstants.InflateMask[num11]);
+							num10 = (num9 + num8) * 3;
+							if ((num11 = array[num10]) == 0)
 							{
-								num3 >>= tl[num11 + 1];
-								num4 -= tl[num11 + 1];
-								s.window[num5++] = (byte)tl[num11 + 2];
-								num6--;
+								num2 >>= array[num10 + 1];
+								num3 -= array[num10 + 1];
+								s.window[num4++] = (byte)array[num10 + 2];
+								num5--;
 								break;
 							}
 							continue;
 						}
-						if ((num12 & 0x20) != 0)
+						if ((num11 & 0x20) != 0)
 						{
-							num14 = z.AvailableBytesIn - num2;
-							num14 = ((num4 >> 3 >= num14) ? num14 : (num4 >> 3));
-							num2 += num14;
-							num -= num14;
-							num4 -= num14 << 3;
-							s.bitb = num3;
-							s.bitk = num4;
-							z.AvailableBytesIn = num2;
-							z.TotalBytesIn += num - z.NextIn;
-							z.NextIn = num;
-							s.writeAt = num5;
+							num12 = z.AvailableBytesIn - num;
+							num12 = ((num3 >> 3 < num12) ? (num3 >> 3) : num12);
+							num += num12;
+							nextIn -= num12;
+							num3 -= num12 << 3;
+							s.bitb = num2;
+							s.bitk = num3;
+							z.AvailableBytesIn = num;
+							z.TotalBytesIn += nextIn - z.NextIn;
+							z.NextIn = nextIn;
+							s.writeAt = num4;
 							return 1;
 						}
 						z.Message = "invalid literal/length code";
-						num14 = z.AvailableBytesIn - num2;
-						num14 = ((num4 >> 3 >= num14) ? num14 : (num4 >> 3));
-						num2 += num14;
-						num -= num14;
-						num4 -= num14 << 3;
-						s.bitb = num3;
-						s.bitk = num4;
-						z.AvailableBytesIn = num2;
-						z.TotalBytesIn += num - z.NextIn;
-						z.NextIn = num;
-						s.writeAt = num5;
+						num12 = z.AvailableBytesIn - num;
+						num12 = ((num3 >> 3 < num12) ? (num3 >> 3) : num12);
+						num += num12;
+						nextIn -= num12;
+						num3 -= num12 << 3;
+						s.bitb = num2;
+						s.bitk = num3;
+						z.AvailableBytesIn = num;
+						z.TotalBytesIn += nextIn - z.NextIn;
+						z.NextIn = nextIn;
+						s.writeAt = num4;
 						return -3;
 					}
 				}
-				if (num6 < 258 || num2 < 10)
+				if (num5 < 258 || num < 10)
 				{
 					break;
 				}
 			}
-			num14 = z.AvailableBytesIn - num2;
-			num14 = ((num4 >> 3 >= num14) ? num14 : (num4 >> 3));
-			num2 += num14;
-			num -= num14;
-			num4 -= num14 << 3;
-			s.bitb = num3;
-			s.bitk = num4;
-			z.AvailableBytesIn = num2;
-			z.TotalBytesIn += num - z.NextIn;
-			z.NextIn = num;
-			s.writeAt = num5;
+			num12 = z.AvailableBytesIn - num;
+			num12 = ((num3 >> 3 < num12) ? (num3 >> 3) : num12);
+			num += num12;
+			nextIn -= num12;
+			num3 -= num12 << 3;
+			s.bitb = num2;
+			s.bitk = num3;
+			z.AvailableBytesIn = num;
+			z.TotalBytesIn += nextIn - z.NextIn;
+			z.NextIn = nextIn;
+			s.writeAt = num4;
 			return 0;
 		}
 	}

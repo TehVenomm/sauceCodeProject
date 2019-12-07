@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class TradingPostInventoryDialog : ItemStorageTop
 {
 	private enum UI
@@ -48,8 +46,7 @@ public class TradingPostInventoryDialog : ItemStorageTop
 
 	protected override void InitializeCaption()
 	{
-		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
-		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
+		UITweenCtrl component = GetCtrl(UI.OBJ_CAPTION_3).gameObject.GetComponent<UITweenCtrl>();
 		if (component != null)
 		{
 			component.Reset();

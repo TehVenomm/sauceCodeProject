@@ -68,15 +68,13 @@ public class StatusEnemyList : GameSection
 		currentPageIndex = 0;
 		popupIndex = 0;
 		achievementCounter = MonoBehaviourSingleton<AchievementManager>.I.monsterCollectionList;
-		SetText((Enum)UI.STR_MONSTER, "NORMAL");
-		SetText((Enum)UI.STR_BIGMONSTER, "HAPPEN");
-		SetText((Enum)UI.STR_RAREMONSTER, "HAPPEN_RARE");
-		SetText((Enum)UI.STR_FIELDMONSTER, "FIELD_CHANGE");
+		SetText(UI.STR_MONSTER, "NORMAL");
+		SetText(UI.STR_BIGMONSTER, "HAPPEN");
+		SetText(UI.STR_RAREMONSTER, "HAPPEN_RARE");
+		SetText(UI.STR_FIELDMONSTER, "FIELD_CHANGE");
 		uint[] openRegionIdList = MonoBehaviourSingleton<WorldMapManager>.I.GetOpenRegionIdList();
-		unlockRegion = (from x in openRegionIdList
-		select Singleton<RegionTable>.I.GetData(x)).ToList();
-		fields = (from x in unlockRegion
-		select x.regionName).ToList();
+		unlockRegion = openRegionIdList.Select((uint x) => Singleton<RegionTable>.I.GetData(x)).ToList();
+		fields = unlockRegion.Select((RegionTable.Data x) => x.regionName).ToList();
 		InitializeCaption();
 		base.Initialize();
 	}
@@ -100,8 +98,8 @@ public class StatusEnemyList : GameSection
 			return false;
 		}
 		currentPageIndex = pageIndex;
-		SetPageNumText((Enum)UI.LBL_PAGE_MAX, maxPageNum);
-		SetLabelText((Enum)UI.LBL_TARGET_FIELD, fields[popupIndex]);
+		SetPageNumText(UI.LBL_PAGE_MAX, maxPageNum);
+		SetLabelText(UI.LBL_TARGET_FIELD, fields[popupIndex]);
 		UpdateRegion();
 		UpdateInventory();
 		UpdateAnchors();
@@ -129,8 +127,8 @@ public class StatusEnemyList : GameSection
 	{
 		uint regionId = unlockRegion.First((RegionTable.Data x) => x.regionName == fields[popupIndex]).regionId;
 		currentRegionCollectionItems = (from data in Singleton<EnemyCollectionTable>.I.GetEnemyCollectionDataByRegion(regionId)
-		orderby data.id
-		select data).ToList();
+			orderby data.id
+			select data).ToList();
 		int num = 0;
 		foreach (EnemyCollectionTable.EnemyCollectionData item in currentRegionCollectionItems)
 		{
@@ -139,42 +137,31 @@ public class StatusEnemyList : GameSection
 				num++;
 			}
 		}
-		SetLabelText((Enum)UI.LBL_CURRENT_NUM, $"{num}/{currentRegionCollectionItems.Count}");
+		SetLabelText(UI.LBL_CURRENT_NUM, $"{num}/{currentRegionCollectionItems.Count}");
 	}
 
 	private void UpdateInventory()
 	{
-		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable = from x in currentRegionCollectionItems
-		where x.collectionType == COLLECTION_TYPE.NORMAL
-		select x;
-		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable2 = from x in currentRegionCollectionItems
-		where x.collectionType == COLLECTION_TYPE.HAPPEN
-		select x;
-		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable3 = from x in currentRegionCollectionItems
-		where x.collectionType == COLLECTION_TYPE.HAPPEN_RARE
-		select x;
-		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable4 = from x in currentRegionCollectionItems
-		where x.collectionType == COLLECTION_TYPE.FIELD_CHANGE
-		select x;
+		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable = currentRegionCollectionItems.Where((EnemyCollectionTable.EnemyCollectionData x) => x.collectionType == COLLECTION_TYPE.NORMAL);
+		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable2 = currentRegionCollectionItems.Where((EnemyCollectionTable.EnemyCollectionData x) => x.collectionType == COLLECTION_TYPE.HAPPEN);
+		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable3 = currentRegionCollectionItems.Where((EnemyCollectionTable.EnemyCollectionData x) => x.collectionType == COLLECTION_TYPE.HAPPEN_RARE);
+		IEnumerable<EnemyCollectionTable.EnemyCollectionData> enumerable4 = currentRegionCollectionItems.Where((EnemyCollectionTable.EnemyCollectionData x) => x.collectionType == COLLECTION_TYPE.FIELD_CHANGE);
 		regionCollectionSortItems = enumerable.Concat(enumerable2).Concat(enumerable3).Concat(enumerable4)
 			.ToList();
-		int num = Mathf.Max(enumerable.Count(), enumerable2.Count());
-		num = Mathf.Max(num, enumerable3.Count());
-		num = Mathf.Max(num, enumerable4.Count());
-		int num2 = Mathf.CeilToInt((float)num / (float)ONE_PAGE_EQUIP_NUM);
-		SetPageNumText((Enum)UI.LBL_PAGE_MAX, num2);
+		int num = Mathf.CeilToInt((float)Mathf.Max(Mathf.Max(Mathf.Max(enumerable.Count(), enumerable2.Count()), enumerable3.Count()), enumerable4.Count()) / (float)ONE_PAGE_EQUIP_NUM);
+		SetPageNumText(UI.LBL_PAGE_MAX, num);
 		if (currentPageIndex < 0)
 		{
-			currentPageIndex = num2 - 1;
+			currentPageIndex = num - 1;
 		}
-		if (currentPageIndex >= num2)
+		if (currentPageIndex >= num)
 		{
 			currentPageIndex = 0;
 		}
 		int start = currentPageIndex * ONE_PAGE_EQUIP_NUM;
 		if (currentRegionCollectionItems != null && currentRegionCollectionItems.Count != 0)
 		{
-			SetPageNumText((Enum)UI.LBL_PAGE_NOW, currentPageIndex + 1);
+			SetPageNumText(UI.LBL_PAGE_NOW, currentPageIndex + 1);
 			CreateIcon(enumerable, UI.GRD_NORMAL_INVENTORY, start);
 			CreateIcon(enumerable2, UI.GRD_BIG_INVENTORY, start);
 			CreateIcon(enumerable3, UI.GRD_RARE_INVENTORY, start);
@@ -190,8 +177,8 @@ public class StatusEnemyList : GameSection
 			int num = Mathf.Min(indexItems.Count, ONE_PAGE_EQUIP_NUM);
 			if (num > 0)
 			{
-				SetActive((Enum)targetType, is_visible: true);
-				SetDynamicList((Enum)targetType, "EnemyCollectionIcon", num, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool isRecycle)
+				SetActive(targetType, is_visible: true);
+				SetDynamicList(targetType, "EnemyCollectionIcon", num, reset: false, null, null, delegate(int i, Transform t, bool isRecycle)
 				{
 					SetActive(t, is_visible: true);
 					bool flag = achievementCounter.Find((AchievementCounter x) => x.subType == indexItems[i].id) == null;
@@ -213,12 +200,12 @@ public class StatusEnemyList : GameSection
 			}
 			else
 			{
-				SetActive((Enum)targetType, is_visible: false);
+				SetActive(targetType, is_visible: false);
 			}
 		}
 		else
 		{
-			SetActive((Enum)targetType, is_visible: false);
+			SetActive(targetType, is_visible: false);
 		}
 	}
 
@@ -235,11 +222,11 @@ public class StatusEnemyList : GameSection
 	{
 		if (popup == null)
 		{
-			popup = GetCtrl(UI.POP_TARGET_FIELD).GetComponentInChildren<UIScrollablePopupList>(true).get_transform();
+			popup = GetCtrl(UI.POP_TARGET_FIELD).GetComponentInChildren<UIScrollablePopupList>(includeInactive: true).transform;
 		}
 		if (!(popup == null))
 		{
-			popup.get_gameObject().SetActive(true);
+			popup.gameObject.SetActive(value: true);
 			bool[] array = new bool[fields.Count];
 			for (int i = 0; i < array.Length; i++)
 			{
@@ -259,7 +246,7 @@ public class StatusEnemyList : GameSection
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_2);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
-		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
+		UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
 		if (component != null)
 		{
 			component.Reset();

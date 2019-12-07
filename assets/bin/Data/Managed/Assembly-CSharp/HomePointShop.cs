@@ -57,7 +57,7 @@ public class HomePointShop : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	public IEnumerator DoInitialize()
@@ -98,8 +98,6 @@ public class HomePointShop : GameSection
 
 	protected void UpdateNPC()
 	{
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 		string empty = string.Empty;
 		NPCMessageTable.Section section = Singleton<NPCMessageTable>.I.GetSection(base.sectionData.sectionName + "_TEXT");
 		if (section != null)
@@ -108,11 +106,11 @@ public class HomePointShop : GameSection
 			if (message != null)
 			{
 				empty = message.message;
-				SetRenderNPCModel((Enum)UI.TEX_NPCMODEL, message.npc, message.pos, message.rot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.questCenterNPCFOV, (Action<NPCLoader>)delegate(NPCLoader loader)
+				SetRenderNPCModel(UI.TEX_NPCMODEL, message.npc, message.pos, message.rot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.questCenterNPCFOV, delegate(NPCLoader loader)
 				{
 					loader.GetAnimator().Play(message.animationStateName);
 				});
-				SetLabelText((Enum)UI.LBL_NPC_MESSAGE, empty);
+				SetLabelText(UI.LBL_NPC_MESSAGE, empty);
 			}
 		}
 	}
@@ -132,27 +130,26 @@ public class HomePointShop : GameSection
 
 	private void ViewNormalTab()
 	{
-		SetActive((Enum)UI.OBJ_NORMAL, is_visible: true);
-		SetActive((Enum)UI.OBJ_TAB_ROOT, is_visible: true);
-		SetActive((Enum)UI.OBJ_ON_TAB_NORMAL, is_visible: true);
-		SetActive((Enum)UI.OBJ_ON_TAB_EVENT, is_visible: false);
-		SetActive((Enum)UI.OBJ_EVENT_LIST, is_visible: false);
+		SetActive(UI.OBJ_NORMAL, is_visible: true);
+		SetActive(UI.OBJ_TAB_ROOT, is_visible: true);
+		SetActive(UI.OBJ_ON_TAB_NORMAL, is_visible: true);
+		SetActive(UI.OBJ_ON_TAB_EVENT, is_visible: false);
+		SetActive(UI.OBJ_EVENT_LIST, is_visible: false);
 		PointShop shop = pointShop.First((PointShop x) => !x.isEvent);
 		currentPointShopItem = GetBuyableItemList();
 		if (filter != null)
 		{
 			filter.DoFiltering(ref currentPointShopItem);
 		}
-		SetLabelText((Enum)UI.LBL_NORMAL_POINT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), shop.userPoint));
-		UITexture component = GetCtrl(UI.TEX_NORMAL_POINT_ICON).GetComponent<UITexture>();
-		ResourceLoad.LoadPointIconImageTexture(component, (uint)shop.pointShopId);
+		SetLabelText(UI.LBL_NORMAL_POINT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), shop.userPoint));
+		ResourceLoad.LoadPointIconImageTexture(GetCtrl(UI.TEX_NORMAL_POINT_ICON).GetComponent<UITexture>(), (uint)shop.pointShopId);
 		maxPage = currentPointShopItem.Count / GameDefine.POINT_SHOP_LIST_COUNT;
 		if (currentPointShopItem.Count % GameDefine.POINT_SHOP_LIST_COUNT > 0)
 		{
 			maxPage++;
 		}
-		SetLabelText((Enum)UI.LBL_ARROW_NOW, (maxPage <= 0) ? "0" : currentPage.ToString());
-		SetLabelText((Enum)UI.LBL_ARROW_MAX, maxPage.ToString());
+		SetLabelText(UI.LBL_ARROW_NOW, (maxPage > 0) ? currentPage.ToString() : "0");
+		SetLabelText(UI.LBL_ARROW_MAX, maxPage.ToString());
 		int item_num = Mathf.Min(GameDefine.POINT_SHOP_LIST_COUNT, currentPointShopItem.Count - (currentPage - 1) * GameDefine.POINT_SHOP_LIST_COUNT);
 		SetGrid(UI.GRD_NORMAL, "PointShopListItem", item_num, reset: true, delegate(int i, Transform t, bool b)
 		{
@@ -165,8 +162,7 @@ public class HomePointShop : GameSection
 				new Action<PointShopItem, int>(OnBuy)
 			};
 			SetEvent(t, "CONFIRM_BUY", event_data);
-			PointShopItemList component2 = t.GetComponent<PointShopItemList>();
-			component2.SetUp(pointShopItem, (uint)shop.pointShopId, pointShopItem.needPoint <= shop.userPoint);
+			t.GetComponent<PointShopItemList>().SetUp(pointShopItem, (uint)shop.pointShopId, pointShopItem.needPoint <= shop.userPoint);
 			int num = -1;
 			REWARD_TYPE type = (REWARD_TYPE)pointShopItem.type;
 			if (type == REWARD_TYPE.ITEM)
@@ -177,20 +173,18 @@ public class HomePointShop : GameSection
 			SetActive(t, UI.LBL_HAVE, num >= 0);
 		});
 		bool flag = pointShop.Any((PointShop x) => x.isEvent);
-		SetActive((Enum)UI.OBJ_EVENT_NON_ACTIVE, !flag);
-		SetActive((Enum)UI.BTN_EVENT, flag);
+		SetActive(UI.OBJ_EVENT_NON_ACTIVE, !flag);
+		SetActive(UI.BTN_EVENT, flag);
 	}
 
 	private void ViewEventTab()
 	{
-		SetActive((Enum)UI.OBJ_NORMAL, is_visible: false);
-		SetActive((Enum)UI.OBJ_TAB_ROOT, is_visible: true);
-		SetActive((Enum)UI.OBJ_ON_TAB_NORMAL, is_visible: false);
-		SetActive((Enum)UI.OBJ_ON_TAB_EVENT, is_visible: true);
-		SetActive((Enum)UI.OBJ_EVENT_LIST, is_visible: true);
-		List<PointShop> current = (from x in pointShop
-		where x.isEvent
-		select x).ToList();
+		SetActive(UI.OBJ_NORMAL, is_visible: false);
+		SetActive(UI.OBJ_TAB_ROOT, is_visible: true);
+		SetActive(UI.OBJ_ON_TAB_NORMAL, is_visible: false);
+		SetActive(UI.OBJ_ON_TAB_EVENT, is_visible: true);
+		SetActive(UI.OBJ_EVENT_LIST, is_visible: true);
+		List<PointShop> current = pointShop.Where((PointShop x) => x.isEvent).ToList();
 		SetGrid(UI.GRD_EVENT_LIST, "PointShopEventList", current.Count, reset: true, delegate(int i, Transform t, bool b)
 		{
 			PointShop pointShop = current[i];
@@ -200,13 +194,12 @@ public class HomePointShop : GameSection
 			ResourceLoad.LoadPointIconImageTexture(component2, (uint)pointShop.pointShopId);
 			ResourceLoad.LoadPointShopBannerTexture(component, (uint)pointShop.pointShopId);
 			SetEvent(FindCtrl(t, UI.TEX_EVENT_LIST_BANNER), "EVENT_SHOP", pointShop);
-			int num = (from x in pointShop.items
-			where x.isBuyable
-			where x.type != 8 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedStamp(x.itemId)
-			where x.type != 9 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedDegree(x.itemId)
-			where x.type != 7 || !MonoBehaviourSingleton<GlobalSettingsManager>.I.IsUnlockedAvatar(x.itemId)
-			select x).Count();
-			bool flag = num == 0;
+			bool flag = (from x in pointShop.items
+				where x.isBuyable
+				where x.type != 8 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedStamp(x.itemId)
+				where x.type != 9 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedDegree(x.itemId)
+				where x.type != 7 || !MonoBehaviourSingleton<GlobalSettingsManager>.I.IsUnlockedAvatar(x.itemId)
+				select x).Count() == 0;
 			SetActive(t, UI.LBL_EVENT_LIST_SOLD_OUT, flag);
 			SetButtonEnabled(t, UI.TEX_EVENT_LIST_BANNER, !flag);
 			SetLabelText(t, UI.LBL_EVENT_LIST_REMAINING_TIME, pointShop.expire);
@@ -215,10 +208,9 @@ public class HomePointShop : GameSection
 
 	private void OnQuery_CONFIRM_BUY()
 	{
-		object[] array = GameSection.GetEventData() as object[];
-		PointShopItem pointShopItem = array[0] as PointShopItem;
-		PointShop pointShop = array[1] as PointShop;
-		if (pointShop.userPoint < pointShopItem.needPoint)
+		object[] obj = GameSection.GetEventData() as object[];
+		PointShopItem pointShopItem = obj[0] as PointShopItem;
+		if ((obj[1] as PointShop).userPoint < pointShopItem.needPoint)
 		{
 			GameSection.ChangeEvent("SHORTAGE_POINT");
 		}
@@ -243,8 +235,7 @@ public class HomePointShop : GameSection
 
 	private void OnBuy(PointShopItem item, int num)
 	{
-		string boughtMessage = PointShopManager.GetBoughtMessage(item, num);
-		GameSection.SetEventData(boughtMessage);
+		GameSection.SetEventData(PointShopManager.GetBoughtMessage(item, num));
 		GameSection.StayEvent();
 		PointShop pointShop = this.pointShop.First((PointShop x) => x.items.Contains(item));
 		MonoBehaviourSingleton<UserInfoManager>.I.PointShopManager.SendPointShopBuy(item, pointShop, num, delegate(bool isSuccess)
@@ -300,13 +291,11 @@ public class HomePointShop : GameSection
 
 	private List<PointShopItem> GetBuyableItemList()
 	{
-		return (from x in (from x in pointShop
-		where !x.isEvent
-		select x).SelectMany((PointShop x) => x.items)
-		where x.isBuyable
-		where x.type != 8 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedStamp(x.itemId)
-		where x.type != 9 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedDegree(x.itemId)
-		where x.type != 7 || !MonoBehaviourSingleton<GlobalSettingsManager>.I.IsUnlockedAvatar(x.itemId)
-		select x).ToList();
+		return (from x in pointShop.Where((PointShop x) => !x.isEvent).SelectMany((PointShop x) => x.items)
+			where x.isBuyable
+			where x.type != 8 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedStamp(x.itemId)
+			where x.type != 9 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedDegree(x.itemId)
+			where x.type != 7 || !MonoBehaviourSingleton<GlobalSettingsManager>.I.IsUnlockedAvatar(x.itemId)
+			select x).ToList();
 	}
 }

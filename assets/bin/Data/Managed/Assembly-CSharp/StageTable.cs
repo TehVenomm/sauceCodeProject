@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 public class StageTable : Singleton<StageTable>, IDataTable
 {
 	public class StageData
@@ -41,9 +39,6 @@ public class StageTable : Singleton<StageTable>, IDataTable
 			return true;
 		}
 	}
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackStringKeyReadCSV<StageData> _003C_003Ef__mg_0024cache0;
 
 	public StringKeyTable<StageData> dataTable
 	{

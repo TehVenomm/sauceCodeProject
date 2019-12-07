@@ -37,7 +37,7 @@ public class UIFieldBossInfo : MonoBehaviourSingleton<UIFieldBossInfo>
 	public void SetActive(bool isActive)
 	{
 		active = isActive;
-		this.get_gameObject().SetActive(isActive);
+		base.gameObject.SetActive(isActive);
 	}
 
 	public void FadeIn(float delay, float duration, Action onComplete)
@@ -52,10 +52,10 @@ public class UIFieldBossInfo : MonoBehaviourSingleton<UIFieldBossInfo>
 
 	private IEnumerator DoFade(float delay, float duration, float start, float end, Action onComplete)
 	{
-		TweenAlpha.Begin(this.get_gameObject(), 0f, start);
-		yield return (object)new WaitForSeconds(delay);
-		TweenAlpha.Begin(this.get_gameObject(), duration, end);
-		yield return (object)new WaitForSeconds(duration);
+		TweenAlpha.Begin(base.gameObject, 0f, start);
+		yield return new WaitForSeconds(delay);
+		TweenAlpha.Begin(base.gameObject, duration, end);
+		yield return new WaitForSeconds(duration);
 		onComplete?.Invoke();
 	}
 }

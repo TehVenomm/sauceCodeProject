@@ -59,6 +59,30 @@ public class ResourceSizeInfo
 		}
 	}
 
+	public static IEnumerator ReInit(int manifestVersion = -1)
+	{
+		_instance = null;
+		if (manifestVersion == -1)
+		{
+			manifestVersion = MonoBehaviourSingleton<ResourceManager>.I.manifestVersion;
+		}
+		ResourceSizeInfo instance = GetInstance();
+		if (manifestVersion > instance.currentManifestVersion)
+		{
+			yield return instance.LoadSizeInfo();
+			instance.assetDict.Clear();
+			foreach (AssetBundleInfoCollection.Info assetBundle in instance.assetInfo.assetBundles)
+			{
+				instance.assetDict[assetBundle.assetBundleName] = assetBundle;
+			}
+			instance.currentManifestVersion = manifestVersion;
+			if (instance.predownloadTable == null)
+			{
+				yield return instance.LoadPredownloadTable();
+			}
+		}
+	}
+
 	private IEnumerator LoadSizeInfo()
 	{
 		MonoBehaviourSingleton<ResourceManager>.I.LoadSizeInfoManifest();
@@ -71,20 +95,20 @@ public class ResourceSizeInfo
 		{
 			hash = MonoBehaviourSingleton<ResourceManager>.I.sizeInfoManifest.GetAssetBundleHash(RESOURCE_CATEGORY.ASSETBUNDLEINFO.ToAssetBundleName());
 		}
-		if (hash.get_isValid())
+		if (hash.isValid)
 		{
-			LoadingQueue load_queue = new LoadingQueue(MonoBehaviourSingleton<AppMain>.I);
-			LoadObject lo = load_queue.Load(RESOURCE_CATEGORY.ASSETBUNDLEINFO, "assetbundleinfo");
-			yield return load_queue.Wait();
+			LoadingQueue loadingQueue = new LoadingQueue(MonoBehaviourSingleton<AppMain>.I);
+			LoadObject lo = loadingQueue.Load(RESOURCE_CATEGORY.ASSETBUNDLEINFO, "assetbundleinfo");
+			yield return loadingQueue.Wait();
 			assetInfo = (lo.loadedObject as AssetBundleInfoCollection);
 		}
 	}
 
 	public IEnumerator LoadPredownloadTable()
 	{
-		LoadingQueue loading_queue = new LoadingQueue(MonoBehaviourSingleton<AppMain>.I);
-		LoadObject lo_table = loading_queue.Load(RESOURCE_CATEGORY.TABLE, "PredownloadTable");
-		yield return loading_queue.Wait();
+		LoadingQueue loadingQueue = new LoadingQueue(MonoBehaviourSingleton<AppMain>.I);
+		LoadObject lo_table = loadingQueue.Load(RESOURCE_CATEGORY.TABLE, "PredownloadTable");
+		yield return loadingQueue.Wait();
 		predownloadTable = (lo_table.loadedObject as PredownloadTable);
 	}
 
@@ -202,5 +226,26 @@ public class ResourceSizeInfo
 	public static bool IsCached(AssetBundleInfoCollection.Info data)
 	{
 		return MonoBehaviourSingleton<ResourceManager>.I.IsCached(data.assetBundleName);
+	}
+
+	public static bool IsValid()
+	{
+		if (_instance == null)
+		{
+			return false;
+		}
+		if (!MonoBehaviourSingleton<ResourceManager>.IsValid())
+		{
+			return false;
+		}
+		if (MonoBehaviourSingleton<ResourceManager>.I.sizeInfoManifest == null)
+		{
+			return false;
+		}
+		if (_instance.assetInfo == null)
+		{
+			return false;
+		}
+		return true;
 	}
 }

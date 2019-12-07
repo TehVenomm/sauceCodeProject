@@ -1,6 +1,5 @@
 using Network;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -8,17 +7,15 @@ public class GuildRequestAcceptSelect : QuestAcceptSelect
 {
 	public override void UpdateUI()
 	{
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 		base.UpdateUI();
-		SetActive((Enum)UI.BTN_PARTY, is_visible: false);
-		SetActive((Enum)UI.TWN_DIFFICULT_STAR, is_visible: false);
-		GetCtrl(UI.BTN_GUILD_REQUEST).set_localPosition(new Vector3(0f, 0f, 0f));
-		SetLabelText((Enum)UI.LBL_LIMIT_TIME, "--:--");
+		SetActive(UI.BTN_PARTY, is_visible: false);
+		SetActive(UI.TWN_DIFFICULT_STAR, is_visible: false);
+		GetCtrl(UI.BTN_GUILD_REQUEST).localPosition = new Vector3(0f, 0f, 0f);
+		SetLabelText(UI.LBL_LIMIT_TIME, "--:--");
 		RARITY_TYPE rarity = questInfo.questData.tableData.rarity;
-		SetActive((Enum)UI.LBL_GUILD_REQUEST_NEED_POINT, is_visible: true);
-		string format = StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 6u);
-		string text = string.Format(format, MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedPoint(rarity), MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedTimeWithFormat(rarity));
-		SetLabelText((Enum)UI.LBL_GUILD_REQUEST_NEED_POINT, text);
+		SetActive(UI.LBL_GUILD_REQUEST_NEED_POINT, is_visible: true);
+		string text = string.Format(StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 6u), MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedPoint(rarity), MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedTimeWithFormat(rarity));
+		SetLabelText(UI.LBL_GUILD_REQUEST_NEED_POINT, text);
 	}
 
 	protected override void OnQuery_GUILD_REQUEST()
@@ -35,9 +32,8 @@ public class GuildRequestAcceptSelect : QuestAcceptSelect
 
 	protected virtual void OnQuery_GuildRequestSortieMessage_YES()
 	{
-		GuildRequestItem selectedItem = MonoBehaviourSingleton<GuildRequestManager>.I.GetSelectedItem();
-		List<GameSectionHistory.HistoryData> historyList = MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList();
-		bool flag = historyList.Any((GameSectionHistory.HistoryData h) => h.sectionName == "QuestAcceptChallengeCounter" || h.sectionName == "GuildRequestChallengeCounter");
+		MonoBehaviourSingleton<GuildRequestManager>.I.GetSelectedItem();
+		bool flag = MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList().Any((GameSectionHistory.HistoryData h) => h.sectionName == "QuestAcceptChallengeCounter" || h.sectionName == "GuildRequestChallengeCounter");
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestStart(questInfo, !flag, delegate(bool isSuccess)
 		{

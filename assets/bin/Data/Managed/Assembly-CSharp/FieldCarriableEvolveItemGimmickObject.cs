@@ -10,7 +10,7 @@ public class FieldCarriableEvolveItemGimmickObject : FieldCarriableGimmickObject
 	public void Use2Evolve(FieldCarriableGimmickObject gimmick)
 	{
 		gimmick.Evolve();
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 
 	public override bool HasDeploied()

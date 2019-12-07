@@ -71,27 +71,27 @@ public class FriendMessageList : FollowListBase
 
 	public override void ListUI()
 	{
-		SetLabelText((Enum)UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText((Enum)UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText((Enum)UI.LBL_SORT, StringTable.Get(STRING_CATEGORY.USER_SORT, (uint)m_currentSortType));
+		SetLabelText(UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.LBL_SORT, StringTable.Get(STRING_CATEGORY.USER_SORT, (uint)m_currentSortType));
 		FriendMessageUserListModel.MessageUserInfo[] array = recvdata.ToArray();
 		if (array == null || array.Length == 0)
 		{
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.GRD_LIST, is_visible: false);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: true);
-			SetLabelText((Enum)UI.LBL_NOW, "0");
-			SetLabelText((Enum)UI.LBL_MAX, "0");
+			SetActive(UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_LIST, is_visible: false);
+			SetActive(UI.OBJ_ACTIVE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, is_visible: true);
+			SetLabelText(UI.LBL_NOW, "0");
+			SetLabelText(UI.LBL_MAX, "0");
 		}
 		else
 		{
-			SetPageNumText((Enum)UI.LBL_NOW, nowPage + 1);
-			SetPageNumText((Enum)UI.LBL_MAX, pageNumMax);
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
-			SetActive((Enum)UI.GRD_LIST, is_visible: true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
+			SetPageNumText(UI.LBL_NOW, nowPage + 1);
+			SetPageNumText(UI.LBL_MAX, pageNumMax);
+			SetActive(UI.STR_NON_LIST, is_visible: false);
+			SetActive(UI.GRD_LIST, is_visible: true);
+			SetActive(UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
+			SetActive(UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
 			UpdateDynamicList();
 		}
 	}
@@ -113,20 +113,24 @@ public class FriendMessageList : FollowListBase
 				base.ScrollGrid.cellHeight = GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 			}
 			CleanItemList();
-			SetDynamicList((Enum)UI.GRD_LIST, "FollowListBaseItem", pageItemLength, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+			SetDynamicList(UI.GRD_LIST, "FollowListBaseItem", pageItemLength, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 			{
 				FriendMessageUserListModel.MessageUserInfo messageUserInfo = info[i];
-				string clanId = (messageUserInfo.userClanData == null) ? "0" : messageUserInfo.userClanData.cId;
+				string clanId = (messageUserInfo.userClanData != null) ? messageUserInfo.userClanData.cId : "0";
 				SetFollowStatus(t, messageUserInfo.userId, following: true, follower: true, clanId);
-				SetCharaInfo(messageUserInfo, i, t, is_recycle, 0 == messageUserInfo.userId);
-				SetBadge(t, messageUserInfo.noReadNum, 3, -10, -6);
+				SetCharaInfo(messageUserInfo, i, t, is_recycle, messageUserInfo.userId == 0);
+				SetBadge(t, messageUserInfo.noReadNum, SpriteAlignment.TopRight, -10, -6);
 			});
 		}
 	}
 
 	private int GetPageItemLength(int currentPage)
 	{
-		return (currentPage + 1 < pageNumMax || recvdata.Count % 10 <= 0) ? 10 : (recvdata.Count % 10);
+		if (currentPage + 1 < pageNumMax || recvdata.Count % 10 <= 0)
+		{
+			return 10;
+		}
+		return recvdata.Count % 10;
 	}
 
 	protected override void SendGetList(int page, Action<bool> callback = null)
@@ -163,8 +167,8 @@ public class FriendMessageList : FollowListBase
 	public void OnQuery_DIRECT_VIEW_MESSAGE()
 	{
 		int num = (int)GameSection.GetEventData();
-		FriendMessageUserListModel.MessageUserInfo[] array = recvdata.ToArray();
-		int pageItemLength = GetPageItemLength(nowPage);
+		recvdata.ToArray();
+		GetPageItemLength(nowPage);
 		int num2 = nowPage * 10;
 		if (recvdata != null && num2 + num >= 0 && recvdata.Count > num2 + num)
 		{
@@ -214,9 +218,17 @@ public class FriendMessageList : FollowListBase
 		if (recvdata != null)
 		{
 			FriendMessageUserListModel.MessageUserInfo[] array = recvdata.ToArray();
-			return array == null || array.Length == 0;
+			if (array != null)
+			{
+				return array.Length == 0;
+			}
+			return true;
 		}
-		return (recvdata == null) ? true : false;
+		if (recvdata != null)
+		{
+			return false;
+		}
+		return true;
 	}
 
 	protected override void OnQuery_JOIN_FRIEND()

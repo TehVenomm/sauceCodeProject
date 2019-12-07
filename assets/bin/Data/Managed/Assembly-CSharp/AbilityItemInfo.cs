@@ -1,6 +1,5 @@
 using Network;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 public class AbilityItemInfo : ItemInfoBase<AbilityItem>
@@ -27,7 +26,7 @@ public class AbilityItemInfo : ItemInfoBase<AbilityItem>
 
 	public EquipItemInfo GetEquipItem()
 	{
-		if (equipUniqueId == 0)
+		if (equipUniqueId == 0L)
 		{
 			return null;
 		}
@@ -48,14 +47,14 @@ public class AbilityItemInfo : ItemInfoBase<AbilityItem>
 		ItemTable.ItemData itemTableData = GetItemTableData();
 		if (itemTableData == null)
 		{
-			return string.Empty;
+			return "";
 		}
 		return itemTableData.name;
 	}
 
 	public string GetDescription()
 	{
-		string text = string.Empty;
+		string text = "";
 		for (int i = 0; i < info.Count; i++)
 		{
 			text += info[i].format;
@@ -78,11 +77,11 @@ public class AbilityItemInfo : ItemInfoBase<AbilityItem>
 		{
 			AbilityItemLotTable.AbilityItemLot abilityItemLot = null;
 			ABILITY_TYPE aBILITY_TYPE = ABILITY_TYPE.NONE;
-			string text = string.Empty;
-			string enableText = string.Empty;
-			string spAttackTypeText = string.Empty;
+			string text = "";
+			string enableText = "";
+			string spAttackTypeText = "";
 			int val = 0;
-			string format = string.Empty;
+			string format = "";
 			int unlockEventId = 0;
 			if (datum.abilityItemLotId > 0)
 			{
@@ -138,7 +137,7 @@ public class AbilityItemInfo : ItemInfoBase<AbilityItem>
 			else
 			{
 				abilityInfoWithFormat.type = ABILITY_TYPE.NEED_UPDATE;
-				abilityInfoWithFormat.target = string.Empty;
+				abilityInfoWithFormat.target = "";
 				abilityInfoWithFormat.value = 0;
 			}
 			list.Add(abilityInfoWithFormat);
@@ -156,10 +155,12 @@ public class AbilityItemInfo : ItemInfoBase<AbilityItem>
 		{
 			return null;
 		}
-		AbilityDataTable.AbilityData.AbilityInfo.Enable enable = new AbilityDataTable.AbilityData.AbilityInfo.Enable();
-		enable.type = (ABILITY_ENABLE_TYPE)Enum.Parse(typeof(ABILITY_ENABLE_TYPE), _enableText);
-		enable.SpAtkEnableTypeBit = ConvertAbilityEnableType2SpAtkEnableTypeBit(enable.type);
-		return enable;
+		AbilityDataTable.AbilityData.AbilityInfo.Enable obj = new AbilityDataTable.AbilityData.AbilityInfo.Enable
+		{
+			type = (ABILITY_ENABLE_TYPE)Enum.Parse(typeof(ABILITY_ENABLE_TYPE), _enableText)
+		};
+		obj.SpAtkEnableTypeBit = ConvertAbilityEnableType2SpAtkEnableTypeBit(obj.type);
+		return obj;
 	}
 
 	private static AbilityDataTable.AbilityData.AbilityInfo.Enable MakeAbilityEnableDataAsSpAtkTypeBit(string _spAttackTypeText)
@@ -173,10 +174,11 @@ public class AbilityItemInfo : ItemInfoBase<AbilityItem>
 		{
 			return null;
 		}
-		AbilityDataTable.AbilityData.AbilityInfo.Enable enable = new AbilityDataTable.AbilityData.AbilityInfo.Enable();
-		enable.type = ABILITY_ENABLE_TYPE.WEAPON_SP_TYPE;
-		enable.SpAtkEnableTypeBit = num;
-		return enable;
+		return new AbilityDataTable.AbilityData.AbilityInfo.Enable
+		{
+			type = ABILITY_ENABLE_TYPE.WEAPON_SP_TYPE,
+			SpAtkEnableTypeBit = num
+		};
 	}
 
 	public static int ConvertAbilityEnableType2SpAtkEnableTypeBit(ABILITY_ENABLE_TYPE _type)
@@ -208,27 +210,14 @@ public class AbilityItemInfo : ItemInfoBase<AbilityItem>
 		{
 			return num;
 		}
-		IEnumerator enumerator = Enum.GetValues(typeof(SP_ATK_ENABLE_TYPE_BIT)).GetEnumerator();
-		try
+		foreach (object value in Enum.GetValues(typeof(SP_ATK_ENABLE_TYPE_BIT)))
 		{
-			while (enumerator.MoveNext())
+			if (_input_text.Contains(value.ToString()))
 			{
-				object current = enumerator.Current;
-				if (_input_text.Contains(current.ToString()))
-				{
-					num |= (int)current;
-				}
-			}
-			return num;
-		}
-		finally
-		{
-			IDisposable disposable;
-			if ((disposable = (enumerator as IDisposable)) != null)
-			{
-				disposable.Dispose();
+				num |= (int)value;
 			}
 		}
+		return num;
 	}
 
 	public static InventoryList<AbilityItemInfo, AbilityItem> CreateList(List<AbilityItem> recv_list)

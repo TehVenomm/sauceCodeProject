@@ -19,11 +19,6 @@ public class EquipModelHQTable : ScriptableObject
 
 	public Data[] weaponDatas;
 
-	public EquipModelHQTable()
-		: this()
-	{
-	}
-
 	public byte GetWeaponFlag(int id)
 	{
 		byte result = 0;

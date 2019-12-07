@@ -7,8 +7,8 @@ public class ItemDetailAbilityLotteryList : SmithAbilityChangeLotteryList
 	protected override IEnumerator DoInitialize()
 	{
 		bool wait = true;
-		CreateEquipItemTable.CreateEquipItemData createEquipItemTable = GameSection.GetEventData() as CreateEquipItemTable.CreateEquipItemData;
-		MonoBehaviourSingleton<SmithManager>.I.SendGetAbilityListPreGenerate(createEquipItemTable.id, delegate(Error error, List<SmithGetAbilityListForCreateModel.Param> list)
+		CreateEquipItemTable.CreateEquipItemData createEquipItemData = GameSection.GetEventData() as CreateEquipItemTable.CreateEquipItemData;
+		MonoBehaviourSingleton<SmithManager>.I.SendGetAbilityListPreGenerate(createEquipItemData.id, delegate(Error error, List<SmithGetAbilityListForCreateModel.Param> list)
 		{
 			wait = false;
 			SetAbilities(list);

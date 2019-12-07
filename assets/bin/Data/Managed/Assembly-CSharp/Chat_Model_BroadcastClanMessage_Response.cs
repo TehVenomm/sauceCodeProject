@@ -69,8 +69,8 @@ public class Chat_Model_BroadcastClanMessage_Response : Chat_Model_Base
 		string timeStampServer = str.Substring(164, 16);
 		string senderId = str.Substring(180, 32);
 		string[] array = str.Substring(212).Split(':');
-		string text2 = (array.Length != 2) ? string.Empty : array[0];
-		string message = (array.Length != 2) ? string.Empty : array[1];
+		string text2 = (array.Length == 2) ? array[0] : string.Empty;
+		string message = (array.Length == 2) ? array[1] : string.Empty;
 		if (int.Parse(text) == 0)
 		{
 			Chat_Model_BroadcastClanMessage_Response chat_Model_BroadcastClanMessage_Response = new Chat_Model_BroadcastClanMessage_Response();
@@ -83,9 +83,8 @@ public class Chat_Model_BroadcastClanMessage_Response : Chat_Model_Base
 			chat_Model_BroadcastClanMessage_Response.SenderId = senderId;
 			chat_Model_BroadcastClanMessage_Response.SenderName = text2;
 			chat_Model_BroadcastClanMessage_Response.Message = message;
-			Chat_Model_BroadcastClanMessage_Response chat_Model_BroadcastClanMessage_Response2 = chat_Model_BroadcastClanMessage_Response;
-			chat_Model_BroadcastClanMessage_Response2.SetErrorType(text);
-			return chat_Model_BroadcastClanMessage_Response2;
+			chat_Model_BroadcastClanMessage_Response.SetErrorType(text);
+			return chat_Model_BroadcastClanMessage_Response;
 		}
 		return null;
 	}

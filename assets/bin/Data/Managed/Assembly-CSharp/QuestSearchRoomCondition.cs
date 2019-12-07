@@ -1,6 +1,5 @@
 using Network;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -74,19 +73,6 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 
 		public int questTypeBit;
 
-		public SearchRequestParam()
-		{
-			order = 0;
-			rarityBit = 8388607;
-			elementBit = 8388607;
-			enemyMinLevelIndex = 0;
-			enemyMaxLevelIndex = 0;
-			isCs = 1;
-			isFs = 1;
-			enemySpeciesIndex = 0;
-			questTypeBit = 21;
-		}
-
 		public int GetEnemySpeciesId(string name)
 		{
 			return Singleton<GachaSearchEnemyTable>.I.GetEnemySpeciesId(name);
@@ -135,14 +121,26 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 			int enemySpeciesId = GetEnemySpeciesId(targetEnemySpeciesName);
 			if (enemySpeciesId > 0)
 			{
-				EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)item.infoData.questData.tableData.GetMainEnemyID());
-				if (enemyData.enemySpecies == enemySpeciesId)
+				if (Singleton<EnemyTable>.I.GetEnemyData((uint)item.infoData.questData.tableData.GetMainEnemyID()).enemySpecies == enemySpeciesId)
 				{
 					return true;
 				}
 				return false;
 			}
 			return true;
+		}
+
+		public SearchRequestParam()
+		{
+			order = 0;
+			rarityBit = 8388607;
+			elementBit = 8388607;
+			enemyMinLevelIndex = 0;
+			enemyMaxLevelIndex = 0;
+			isCs = 1;
+			isFs = 1;
+			enemySpeciesIndex = 0;
+			questTypeBit = 21;
 		}
 	}
 
@@ -231,8 +229,8 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 			searchRequest.enemyLevelMax = enemyLevelList[enemyLevelList.Count - 1];
 			searchRequest.enemyMaxLevelIndex = enemyLevelList.Count - 1;
 		}
-		SetActive((Enum)UI.OBJ_SEARCH, is_visible: true);
-		SetActive((Enum)UI.OBJ_MY_SEARCH, is_visible: false);
+		SetActive(UI.OBJ_SEARCH, is_visible: true);
+		SetActive(UI.OBJ_MY_SEARCH, is_visible: false);
 		GameSection.SetEventData(false);
 		base.Initialize();
 	}
@@ -265,7 +263,7 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 	{
 		for (int i = 0; i < rarityButton.Length; i++)
 		{
-			SetEvent((Enum)rarityButton[i], "RARITY", i);
+			SetEvent(rarityButton[i], "RARITY", i);
 		}
 	}
 
@@ -273,7 +271,7 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 	{
 		for (int i = 0; i < elementButton.Length; i++)
 		{
-			SetEvent((Enum)elementButton[i], "ELEMENT", i);
+			SetEvent(elementButton[i], "ELEMENT", i);
 		}
 	}
 
@@ -323,53 +321,25 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 
 	private void UpdateRarityToggles()
 	{
-		Array values = Enum.GetValues(typeof(RARITY_TYPE));
-		IEnumerator enumerator = values.GetEnumerator();
-		try
+		foreach (RARITY_TYPE value in Enum.GetValues(typeof(RARITY_TYPE)))
 		{
-			while (enumerator.MoveNext())
-			{
-				RARITY_TYPE rARITY_TYPE = (RARITY_TYPE)enumerator.Current;
-				SetToggle(GetRairtyToggleTransform((int)rARITY_TYPE), (searchRequest.rarityBit & (1 << (int)rARITY_TYPE)) != 0);
-			}
-		}
-		finally
-		{
-			IDisposable disposable;
-			if ((disposable = (enumerator as IDisposable)) != null)
-			{
-				disposable.Dispose();
-			}
+			SetToggle(GetRairtyToggleTransform((int)value), (searchRequest.rarityBit & (1 << (int)value)) != 0);
 		}
 	}
 
 	private Transform GetRairtyToggleTransform(int rarity)
 	{
-		return GetCtrl(rarityButton[rarity]).get_parent();
+		return GetCtrl(rarityButton[rarity]).parent;
 	}
 
 	private void UpdateElementToggles()
 	{
-		Array values = Enum.GetValues(typeof(ELEMENT_TYPE));
-		IEnumerator enumerator = values.GetEnumerator();
-		try
+		foreach (ELEMENT_TYPE value in Enum.GetValues(typeof(ELEMENT_TYPE)))
 		{
-			while (enumerator.MoveNext())
+			Transform elementToggleTransform = GetElementToggleTransform((int)value);
+			if (elementToggleTransform != null)
 			{
-				ELEMENT_TYPE eLEMENT_TYPE = (ELEMENT_TYPE)enumerator.Current;
-				Transform elementToggleTransform = GetElementToggleTransform((int)eLEMENT_TYPE);
-				if (elementToggleTransform != null)
-				{
-					SetToggle(elementToggleTransform, (searchRequest.elementBit & (1 << (int)eLEMENT_TYPE)) != 0);
-				}
-			}
-		}
-		finally
-		{
-			IDisposable disposable;
-			if ((disposable = (enumerator as IDisposable)) != null)
-			{
-				disposable.Dispose();
+				SetToggle(elementToggleTransform, (searchRequest.elementBit & (1 << (int)value)) != 0);
 			}
 		}
 	}
@@ -380,19 +350,19 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 		{
 			return null;
 		}
-		return GetCtrl(elementButton[elementIndex]).get_parent();
+		return GetCtrl(elementButton[elementIndex]).parent;
 	}
 
 	private void UpdateEnemyMinLevel()
 	{
 		int enemyMinLevelIndex = searchRequest.enemyMinLevelIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_MIN_LEVEL, enemyLevelNames[enemyMinLevelIndex]);
+		SetLabelText(UI.LBL_TARGET_MIN_LEVEL, enemyLevelNames[enemyMinLevelIndex]);
 	}
 
 	private void UpdateEnemyMaxLevel()
 	{
 		int enemyMaxLevelIndex = searchRequest.enemyMaxLevelIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_MAX_LEVEL, enemyLevelNames[enemyMaxLevelIndex]);
+		SetLabelText(UI.LBL_TARGET_MAX_LEVEL, enemyLevelNames[enemyMaxLevelIndex]);
 	}
 
 	private void UpdateEnemySpecies()
@@ -401,7 +371,7 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 		FilterSpeciesPopupOnElement(sortedTargetSpeciesData);
 		UpdateSelectingEnemySpecies();
 		int enemySpeciesIndex = searchRequest.enemySpeciesIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_ENEMY_TYPE, enemySpeciesNames[enemySpeciesIndex]);
+		SetLabelText(UI.LBL_TARGET_ENEMY_TYPE, enemySpeciesNames[enemySpeciesIndex]);
 	}
 
 	private void FilterSpeciesPopupOnRarity(GachaSearchEnemyTable.GachaSearchEnemyData[] targetData = null)
@@ -533,8 +503,7 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 			}
 			int enemyMinLevelIndex = searchRequest.enemyMinLevelIndex;
 			List<string> list = new List<string>(enemyLevelNames);
-			int pARTY_SEARCH_QUEST_EXTRA_LEVEL_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_EXTRA_LEVEL_MAX;
-			if (pARTY_SEARCH_QUEST_EXTRA_LEVEL_MAX > 0)
+			if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_EXTRA_LEVEL_MAX > 0)
 			{
 				list.RemoveAt(list.Count - 1);
 			}
@@ -651,7 +620,7 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 		for (int i = 0; i < rarityButton.Length; i++)
 		{
 			int num2 = i;
-			if ((searchRequest.rarityBit & (1 << num2)) != 0 && GetCtrl(rarityButton[i]).get_gameObject().get_activeInHierarchy())
+			if ((searchRequest.rarityBit & (1 << num2)) != 0 && GetCtrl(rarityButton[i]).gameObject.activeInHierarchy)
 			{
 				num |= 1 << num2;
 			}
@@ -661,7 +630,7 @@ public class QuestSearchRoomCondition : QuestSearchRoomConditionBase
 		for (int j = 0; j < elementButton.Length; j++)
 		{
 			int num4 = j;
-			if ((searchRequest.elementBit & (1 << num4)) != 0 && GetCtrl(elementButton[j]).get_gameObject().get_activeInHierarchy())
+			if ((searchRequest.elementBit & (1 << num4)) != 0 && GetCtrl(elementButton[j]).gameObject.activeInHierarchy)
 			{
 				num3 |= 1 << num4;
 			}

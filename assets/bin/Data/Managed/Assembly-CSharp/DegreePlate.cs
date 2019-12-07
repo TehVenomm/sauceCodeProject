@@ -19,97 +19,90 @@ public class DegreePlate : MonoBehaviour
 
 	private string mFrameName;
 
-	public DegreePlate()
-		: this()
-	{
-	}
-
 	public static void Create(MonoBehaviour call_mono, List<int> degreeIds, bool isButton, Action<DegreePlate> onFinish)
 	{
 		ResourceObject cachedResourceObject = MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedResourceObject(RESOURCE_CATEGORY.UI, "DegreePlate");
 		if (cachedResourceObject != null)
 		{
-			DegreePlate component = (Object.Instantiate(cachedResourceObject.obj) as GameObject).GetComponent<DegreePlate>();
-			component.Initialize(degreeIds, isButton, onFinish);
+			(UnityEngine.Object.Instantiate(cachedResourceObject.obj) as GameObject).GetComponent<DegreePlate>().Initialize(degreeIds, isButton, onFinish);
 		}
 		else
 		{
 			MonoBehaviourSingleton<ResourceManager>.I.Load(ResourceLoad.GetResourceLoad(call_mono, destroy_notify: true), RESOURCE_CATEGORY.UI, "DegreePlate", delegate(ResourceManager.LoadRequest x, ResourceObject[] y)
 			{
 				y[0].refCount++;
-				DegreePlate component2 = (Object.Instantiate(y[0].obj) as GameObject).GetComponent<DegreePlate>();
-				component2.Initialize(degreeIds, isButton, onFinish);
+				(UnityEngine.Object.Instantiate(y[0].obj) as GameObject).GetComponent<DegreePlate>().Initialize(degreeIds, isButton, onFinish);
 			}, null);
 		}
 	}
 
 	public void Initialize(List<int> degreeIds, bool isButton, Action<DegreePlate> onFinish)
 	{
-		this.StartCoroutine(DoInitialize(degreeIds, isButton, onFinish));
+		StartCoroutine(DoInitialize(degreeIds, isButton, onFinish));
 	}
 
 	private IEnumerator DoInitialize(List<int> degreeIds, bool isButton, Action<DegreePlate> onFinish)
 	{
-		if (degreeIds == null || degreeIds.Count != 4)
+		if (degreeIds == null || 4 != degreeIds.Count)
 		{
 			onFinish?.Invoke(null);
 			yield break;
 		}
-		DegreeTable.DegreeData frameData = Singleton<DegreeTable>.I.GetData((uint)degreeIds[0]);
-		if (frameData == null || (frameData.type != DEGREE_TYPE.FRAME && frameData.type != DEGREE_TYPE.SPECIAL_FRAME))
+		DegreeTable.DegreeData data = Singleton<DegreeTable>.I.GetData((uint)degreeIds[0]);
+		if (data == null || (data.type != DEGREE_TYPE.FRAME && data.type != DEGREE_TYPE.SPECIAL_FRAME))
 		{
 			onFinish?.Invoke(null);
 			yield break;
 		}
-		string degreeText;
-		if (frameData.type == DEGREE_TYPE.SPECIAL_FRAME)
+		string text;
+		if (data.type == DEGREE_TYPE.SPECIAL_FRAME)
 		{
-			degreeText = string.Empty;
+			text = "";
 		}
 		else
 		{
-			DegreeTable.DegreeData data = Singleton<DegreeTable>.I.GetData((uint)degreeIds[1]);
-			DegreeTable.DegreeData data2 = Singleton<DegreeTable>.I.GetData((uint)degreeIds[2]);
-			DegreeTable.DegreeData data3 = Singleton<DegreeTable>.I.GetData((uint)degreeIds[3]);
-			degreeText = data.name + " " + data2.name + " " + data3.name;
+			DegreeTable.DegreeData data2 = Singleton<DegreeTable>.I.GetData((uint)degreeIds[1]);
+			DegreeTable.DegreeData data3 = Singleton<DegreeTable>.I.GetData((uint)degreeIds[2]);
+			DegreeTable.DegreeData data4 = Singleton<DegreeTable>.I.GetData((uint)degreeIds[3]);
+			text = data2.name + " " + data3.name + " " + data4.name;
 		}
-		mText.text = degreeText;
-		mText.get_gameObject().SetActive(false);
-		yield return this.StartCoroutine(_SetFrame(ResourceName.GetDegreeFrameName(degreeIds[0])));
-		mText.get_gameObject().SetActive(true);
+		mText.text = text;
+		mText.gameObject.SetActive(value: false);
+		yield return StartCoroutine(_SetFrame(ResourceName.GetDegreeFrameName(degreeIds[0])));
+		mText.gameObject.SetActive(value: true);
 		SetEnableButtonCollider(isButton);
 		onFinish?.Invoke(this);
 	}
 
 	public void SetFrame(int degreeId)
 	{
-		this.StartCoroutine(_SetFrame(ResourceName.GetDegreeFrameName(degreeId)));
+		StartCoroutine(_SetFrame(ResourceName.GetDegreeFrameName(degreeId)));
 	}
 
 	public void SetUnknownFrame()
 	{
-		this.StartCoroutine(_SetFrame("DF_UNKNOWN"));
+		StartCoroutine(_SetFrame("DF_UNKNOWN"));
 	}
 
 	private IEnumerator _SetFrame(string frameName)
 	{
 		if (!(mFrameName == frameName))
 		{
-			LoadingQueue load = new LoadingQueue(this);
-			LoadObject frameTexture = load.Load(isEventAsset: true, RESOURCE_CATEGORY.DEGREE_FRAME, frameName);
-			mFrame.set_enabled(false);
-			if (load.IsLoading())
+			LoadingQueue loadingQueue = new LoadingQueue(this);
+			LoadObject frameTexture = loadingQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.DEGREE_FRAME, frameName);
+			mFrame.enabled = false;
+			if (loadingQueue.IsLoading())
 			{
-				yield return load.Wait();
+				yield return loadingQueue.Wait();
 			}
 			mFrame.mainTexture = (frameTexture.loadedObject as Texture);
 			mFrameName = frameName;
-			mFrame.set_enabled(true);
+			mFrame.enabled = true;
 		}
 	}
 
 	public void SetEnableButtonCollider(bool enable)
 	{
-		this.get_transform().GetComponent<Collider>().set_enabled(enable);
+		base.transform.GetComponent<Collider>().enabled = enable;
 	}
 }

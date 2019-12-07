@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class ItemDetailAccessory : SkillInfoBase
@@ -41,7 +40,7 @@ public class ItemDetailAccessory : SkillInfoBase
 			SetLabelText(detailBase, UI.LBL_NAME, info.tableData.name);
 			SetLabelText(detailBase, UI.LBL_DESCRIPTION, info.tableData.descriptPart);
 			SetAccessoryRarityIcon(FindCtrl(detailBase, UI.SPR_SKILL_TYPE_ICON_BG), FindCtrl(detailBase, UI.SPR_SKILL_TYPE_ICON_RARITY), info.tableData);
-			SetRenderAccessoryModel((Enum)UI.TEX_MODEL, info.tableData.accessoryId, info.tableData.detailScale, rotation: true, light_rotation: false);
+			SetRenderAccessoryModel(UI.TEX_MODEL, info.tableData.accessoryId, info.tableData.detailScale);
 		}
 	}
 }

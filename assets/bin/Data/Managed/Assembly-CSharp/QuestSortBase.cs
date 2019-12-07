@@ -1,5 +1,3 @@
-using System;
-
 public class QuestSortBase : SortBase
 {
 	private enum UI
@@ -109,22 +107,21 @@ public class QuestSortBase : SortBase
 		int i = 0;
 		for (int num = enemyButton.Length; i < num; i++)
 		{
-			SetActive(GetCtrl(enemyButton[i]).get_parent(), is_visible: false);
+			SetActive(GetCtrl(enemyButton[i]).parent, is_visible: false);
 		}
-		QuestCollection questCollection = MonoBehaviourSingleton<QuestManager>.I.questCollection;
-		questCollection.GetEnemyTypeList(QUEST_TYPE.ORDER)?.ForEach(delegate(ENEMY_TYPE _enemy)
+		MonoBehaviourSingleton<QuestManager>.I.questCollection.GetEnemyTypeList(QUEST_TYPE.ORDER)?.ForEach(delegate(ENEMY_TYPE _enemy)
 		{
 			int num7 = (int)(_enemy - 1);
-			SetActive(GetCtrl(enemyButton[num7]).get_parent(), is_visible: true);
+			SetActive(GetCtrl(enemyButton[num7]).parent, is_visible: true);
 		});
-		base.GetComponent<UIGrid>((Enum)UI.GRD_ENEMY).Reposition();
+		GetComponent<UIGrid>(UI.GRD_ENEMY).Reposition();
 		UpdateAnchors();
 		int j = 0;
 		for (int num2 = enemyButton.Length; j < num2; j++)
 		{
 			bool value = (sortOrder.type & (1 << j)) != 0;
-			SetEvent((Enum)enemyButton[j], "ENEMY", j);
-			SetToggle(GetCtrl(enemyButton[j]).get_parent(), value);
+			SetEvent(enemyButton[j], "ENEMY", j);
+			SetToggle(GetCtrl(enemyButton[j]).parent, value);
 		}
 		int num3 = 1035;
 		int k = 0;
@@ -134,12 +131,12 @@ public class QuestSortBase : SortBase
 			if ((num5 & num3) != 0)
 			{
 				bool value2 = sortOrder.requirement == (SORT_REQUIREMENT)num5;
-				SetEvent((Enum)requirementButton[k], "REQUIREMENT", num5);
-				SetToggle((Enum)requirementButton[k], value2);
+				SetEvent(requirementButton[k], "REQUIREMENT", num5);
+				SetToggle(requirementButton[k], value2);
 			}
 			else
 			{
-				SetActive((Enum)requirementButton[k], is_visible: false);
+				SetActive(requirementButton[k], is_visible: false);
 			}
 		}
 		int l = 0;
@@ -150,8 +147,8 @@ public class QuestSortBase : SortBase
 			{
 				value3 = true;
 			}
-			SetEvent((Enum)ascButton[l], "ORDER_TYPE", l);
-			SetToggle((Enum)ascButton[l], value3);
+			SetEvent(ascButton[l], "ORDER_TYPE", l);
+			SetToggle(ascButton[l], value3);
 		}
 	}
 
@@ -170,6 +167,6 @@ public class QuestSortBase : SortBase
 			value = false;
 			sortOrder.type -= num2;
 		}
-		SetToggle(GetCtrl(enemyButton[num]).get_parent(), value);
+		SetToggle(GetCtrl(enemyButton[num]).parent, value);
 	}
 }

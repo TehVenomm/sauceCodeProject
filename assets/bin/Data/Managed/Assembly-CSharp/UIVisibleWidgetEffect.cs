@@ -14,11 +14,6 @@ public class UIVisibleWidgetEffect : MonoBehaviour
 
 	private int setRendererQueue = -1;
 
-	public UIVisibleWidgetEffect()
-		: this()
-	{
-	}
-
 	public static void Set(UIPanel panel, UIWidget widget, string effect_name, string current_section_name)
 	{
 		if (widget == null)
@@ -36,7 +31,7 @@ public class UIVisibleWidgetEffect : MonoBehaviour
 		}
 		if (uIVisibleWidgetEffect == null)
 		{
-			uIVisibleWidgetEffect = widget.get_gameObject().AddComponent<UIVisibleWidgetEffect>();
+			uIVisibleWidgetEffect = widget.gameObject.AddComponent<UIVisibleWidgetEffect>();
 		}
 		uIVisibleWidgetEffect.panel = panel;
 		uIVisibleWidgetEffect.widget = widget;
@@ -58,15 +53,14 @@ public class UIVisibleWidgetEffect : MonoBehaviour
 
 	private void LateUpdate()
 	{
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		if (sectionName == MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection() != null && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection().state == UIBehaviour.STATE.OPEN && (panel == null || panel.IsVisible(widget.cachedTransform.get_position())))
+		if (sectionName == MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection() != null && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection().state == UIBehaviour.STATE.OPEN && (panel == null || panel.IsVisible(widget.cachedTransform.position)))
 		{
 			if (effect == null)
 			{
 				effect = EffectManager.GetUIEffect(effectName, widget.cachedTransform, 0f, 1, widget);
 				if (effect == null)
 				{
-					this.set_enabled(false);
+					base.enabled = false;
 				}
 				else
 				{
@@ -97,11 +91,10 @@ public class UIVisibleWidgetEffect : MonoBehaviour
 	{
 		if (effect != null && setRendererQueue != -1)
 		{
-			Renderer[] componentsInChildren = effect.GetComponentsInChildren<Renderer>(true);
-			Renderer[] array = componentsInChildren;
-			foreach (Renderer val in array)
+			Renderer[] componentsInChildren = effect.GetComponentsInChildren<Renderer>(includeInactive: true);
+			for (int i = 0; i < componentsInChildren.Length; i++)
 			{
-				val.get_material().set_renderQueue(setRendererQueue);
+				componentsInChildren[i].material.renderQueue = setRendererQueue;
 			}
 		}
 	}

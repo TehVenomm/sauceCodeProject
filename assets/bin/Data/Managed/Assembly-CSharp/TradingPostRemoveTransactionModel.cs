@@ -5,5 +5,5 @@ public class TradingPostRemoveTransactionModel : BaseModel
 		public int transactionId;
 	}
 
-	public static string URL = "/ajax/trading-post/remove-item";
+	public static string URL = "ajax/trading-post/remove-item";
 }

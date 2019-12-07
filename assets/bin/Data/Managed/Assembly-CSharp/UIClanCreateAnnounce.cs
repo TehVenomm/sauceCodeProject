@@ -39,7 +39,7 @@ public class UIClanCreateAnnounce : UIInGameSelfAnnounce
 		string sE = ResourceName.GetSE(40000011);
 		if (!string.IsNullOrEmpty(sE))
 		{
-			ResourceLink component = this.get_gameObject().GetComponent<ResourceLink>();
+			ResourceLink component = base.gameObject.GetComponent<ResourceLink>();
 			if (!(component == null))
 			{
 				m_audioClip = component.Get<AudioClip>(sE);
@@ -170,13 +170,13 @@ public class UIClanCreateAnnounce : UIInGameSelfAnnounce
 		{
 			if (m_coroutine == null)
 			{
-				m_coroutine = this.StartCoroutine(DelayPlay());
+				m_coroutine = StartCoroutine(DelayPlay());
 			}
 			return;
 		}
 		if (isForcePlay && m_coroutine != null)
 		{
-			this.StopCoroutine(m_coroutine);
+			StopCoroutine(m_coroutine);
 			m_coroutine = null;
 		}
 		Play(callback);
@@ -203,29 +203,29 @@ public class UIClanCreateAnnounce : UIInGameSelfAnnounce
 	{
 		if (m_coroutine != null)
 		{
-			this.StopCoroutine(m_coroutine);
+			StopCoroutine(m_coroutine);
 			m_coroutine = null;
 		}
 	}
 
 	private void SetTypeSprite(eType type)
 	{
-		string empty = string.Empty;
+		string text = "";
 		switch (type)
 		{
 		default:
 			return;
 		case eType.Create:
-			empty = "ClanFormationTxt";
+			text = "ClanFormationTxt";
 			break;
 		case eType.LevelUp:
-			empty = "ClanLevelupTxt";
+			text = "ClanLevelupTxt";
 			break;
 		}
 		int i = 0;
 		for (int num = announceSpr.Length; i < num; i++)
 		{
-			announceSpr[i].spriteName = empty;
+			announceSpr[i].spriteName = text;
 			announceSpr[i].SetDirty();
 		}
 	}

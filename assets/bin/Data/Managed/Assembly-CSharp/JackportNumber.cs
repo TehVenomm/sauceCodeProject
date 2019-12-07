@@ -32,18 +32,8 @@ public class JackportNumber : MonoBehaviour
 
 	private readonly string numberDot = "number_dot";
 
-	public JackportNumber()
-		: this()
-	{
-	}
-
 	public void ShowNumber(string strValue)
 	{
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
 		int num = numberList.Length;
 		strValue = long.Parse(strValue).ToString();
 		int length = strValue.Length;
@@ -53,28 +43,28 @@ public class JackportNumber : MonoBehaviour
 			{
 				int num2 = int.Parse(strValue[length - 1 - i].ToString());
 				numberList[i].spriteName = jackportNumbers[num2];
-				numberList[i].get_gameObject().SetActive(true);
+				numberList[i].gameObject.SetActive(value: true);
 			}
 			else
 			{
-				numberList[i].get_gameObject().SetActive(false);
+				numberList[i].gameObject.SetActive(value: false);
 			}
 		}
 		for (int j = 0; j < dotList.Length; j++)
 		{
-			dotList[j].get_gameObject().SetActive(false);
+			dotList[j].gameObject.SetActive(value: false);
 		}
 		int num3 = 0;
 		int num4 = 0;
 		for (int k = 0; k < length; k++)
 		{
-			numberList[k].get_transform().set_localPosition(new Vector3((float)(-num3), 0f, 0f));
+			numberList[k].transform.localPosition = new Vector3(-num3, 0f, 0f);
 			numberList[k].height = sprHeight;
 			if (k % 3 == 2 && k < length - 1)
 			{
 				num3 += numberList[k].width;
-				dotList[num4].get_gameObject().SetActive(true);
-				dotList[num4].set_localPosition(new Vector3((float)(-num3), (float)(-sprHeight + spaceWidth), 0f));
+				dotList[num4].gameObject.SetActive(value: true);
+				dotList[num4].localPosition = new Vector3(-num3, -sprHeight + spaceWidth, 0f);
 				num4++;
 				num3 += spaceWidth;
 			}
@@ -83,8 +73,8 @@ public class JackportNumber : MonoBehaviour
 				num3 += numberList[k].width;
 			}
 		}
-		Vector3 localPosition = this.get_transform().get_localPosition();
+		Vector3 localPosition = base.transform.localPosition;
 		localPosition.x = (float)num3 / 2f;
-		this.get_transform().set_localPosition(localPosition);
+		base.transform.localPosition = localPosition;
 	}
 }

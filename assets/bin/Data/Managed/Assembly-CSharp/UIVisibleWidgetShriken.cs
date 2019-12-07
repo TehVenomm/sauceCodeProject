@@ -12,11 +12,6 @@ public class UIVisibleWidgetShriken : MonoBehaviour
 
 	private Transform[] children;
 
-	public UIVisibleWidgetShriken()
-		: this()
-	{
-	}
-
 	public static void Set(UIPanel panel, UIWidget widget)
 	{
 		Set(panel, widget, null);
@@ -31,7 +26,7 @@ public class UIVisibleWidgetShriken : MonoBehaviour
 		UIVisibleWidgetShriken uIVisibleWidgetShriken = widget.GetComponent<UIVisibleWidgetShriken>();
 		if (uIVisibleWidgetShriken == null)
 		{
-			uIVisibleWidgetShriken = widget.get_gameObject().AddComponent<UIVisibleWidgetShriken>();
+			uIVisibleWidgetShriken = widget.gameObject.AddComponent<UIVisibleWidgetShriken>();
 		}
 		uIVisibleWidgetShriken.panel = panel;
 		uIVisibleWidgetShriken.widget = widget;
@@ -39,12 +34,12 @@ public class UIVisibleWidgetShriken : MonoBehaviour
 		{
 			uIVisibleWidgetShriken.sectionName = (current_section_name ?? MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName());
 		}
-		if (uIVisibleWidgetShriken.get_transform().get_childCount() > 0)
+		if (uIVisibleWidgetShriken.transform.childCount > 0)
 		{
-			uIVisibleWidgetShriken.children = (Transform[])new Transform[uIVisibleWidgetShriken.get_transform().get_childCount()];
-			for (int i = 0; i < uIVisibleWidgetShriken.get_transform().get_childCount(); i++)
+			uIVisibleWidgetShriken.children = new Transform[uIVisibleWidgetShriken.transform.childCount];
+			for (int i = 0; i < uIVisibleWidgetShriken.transform.childCount; i++)
 			{
-				uIVisibleWidgetShriken.children[i] = uIVisibleWidgetShriken.get_transform().GetChild(i);
+				uIVisibleWidgetShriken.children[i] = uIVisibleWidgetShriken.transform.GetChild(i);
 			}
 		}
 	}
@@ -68,14 +63,13 @@ public class UIVisibleWidgetShriken : MonoBehaviour
 			bool active = IsVisibleCompletely(panel, widget);
 			for (int i = 0; i < children.Length; i++)
 			{
-				children[i].get_gameObject().SetActive(active);
+				children[i].gameObject.SetActive(active);
 			}
 		}
 	}
 
 	public bool IsVisibleCompletely(UIPanel p, UIWidget w)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		if (p == null || w == null)
 		{
 			return true;

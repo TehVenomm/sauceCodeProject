@@ -78,8 +78,8 @@ public class FriendArenaRankingFriend : FriendArenaRanking
 		base.UpdateOwnButton();
 		if (eventData != null && (recvList == null || recvList.Count <= 4))
 		{
-			SetActive((Enum)UI.BTN_OWN, is_visible: false);
-			SetActive((Enum)UI.OBJ_OWN_OFF, is_visible: false);
+			SetActive(UI.BTN_OWN, is_visible: false);
+			SetActive(UI.OBJ_OWN_OFF, is_visible: false);
 		}
 	}
 

@@ -30,16 +30,17 @@ namespace Network
 
 		public DonateInfo ParseDonateInfo()
 		{
-			DonateInfo donateInfo = new DonateInfo();
-			donateInfo.id = id;
-			donateInfo.nickName = nickName;
-			donateInfo.materialName = itemName;
-			donateInfo.userId = userId;
-			donateInfo.msg = msg;
-			donateInfo.itemId = itemId;
-			donateInfo.itemNum = itemNum;
-			donateInfo.quantity = quantity;
-			return donateInfo;
+			return new DonateInfo
+			{
+				id = id,
+				nickName = nickName,
+				materialName = itemName,
+				userId = userId,
+				msg = msg,
+				itemId = itemId,
+				itemNum = itemNum,
+				quantity = quantity
+			};
 		}
 	}
 }

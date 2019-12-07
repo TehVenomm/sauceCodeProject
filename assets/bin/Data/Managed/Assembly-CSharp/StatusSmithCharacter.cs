@@ -29,14 +29,9 @@ public class StatusSmithCharacter : MonoBehaviour
 		protected set;
 	}
 
-	public StatusSmithCharacter()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		_transform = this.get_transform();
+		_transform = base.transform;
 	}
 
 	private IEnumerator Start()
@@ -47,16 +42,16 @@ public class StatusSmithCharacter : MonoBehaviour
 		{
 			yield return null;
 		}
-		this.get_gameObject().SetActive(isActive);
+		base.gameObject.SetActive(isActive);
 		animator = loader.GetAnimator();
 		if (!(animator == null))
 		{
-			animator.get_gameObject().AddComponent<RootMotionProxy>();
+			animator.gameObject.AddComponent<RootMotionProxy>();
 			InitAnim();
-			OutGameSettingsManager.StatusScene param = MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene;
-			_transform.set_position(param.smithNPCPos);
-			_transform.set_eulerAngles(param.smithNPCRot);
-			_transform.set_localScale(Vector3.get_one() * param.smithSize);
+			OutGameSettingsManager.StatusScene statusScene = MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene;
+			_transform.position = statusScene.smithNPCPos;
+			_transform.eulerAngles = statusScene.smithNPCRot;
+			_transform.localScale = Vector3.one * statusScene.smithSize;
 			isComplete = true;
 		}
 	}
@@ -65,9 +60,9 @@ public class StatusSmithCharacter : MonoBehaviour
 	{
 		if (isUnique)
 		{
-			return Singleton<NPCTable>.I.GetNPCData(36).LoadModel(this.get_gameObject(), need_shadow: true, enable_light_probe: true, null, useSpecialModel: false);
+			return Singleton<NPCTable>.I.GetNPCData(36).LoadModel(base.gameObject, need_shadow: true, enable_light_probe: true, null, useSpecialModel: false);
 		}
-		return Singleton<NPCTable>.I.GetNPCData(4).LoadModel(this.get_gameObject(), need_shadow: true, enable_light_probe: true, null, useSpecialModel: false);
+		return Singleton<NPCTable>.I.GetNPCData(4).LoadModel(base.gameObject, need_shadow: true, enable_light_probe: true, null, useSpecialModel: false);
 	}
 
 	protected void InitAnim()
@@ -84,7 +79,7 @@ public class StatusSmithCharacter : MonoBehaviour
 		}
 		else
 		{
-			this.get_gameObject().SetActive(active);
+			base.gameObject.SetActive(active);
 		}
 	}
 }

@@ -8,11 +8,6 @@ public class InventoryList<T, RECV_DATA> where T : ItemInfoBase<RECV_DATA>, new(
 		private set;
 	}
 
-	public InventoryList()
-	{
-		list = new LinkedList<T>();
-	}
-
 	public LinkedListNode<T> GetFirstNode()
 	{
 		return list.First;
@@ -32,13 +27,12 @@ public class InventoryList<T, RECV_DATA> where T : ItemInfoBase<RECV_DATA>, new(
 	{
 		for (LinkedListNode<T> linkedListNode = list.First; linkedListNode != null; linkedListNode = linkedListNode.Next)
 		{
-			T value = linkedListNode.Value;
-			if (value.uniqueID == uniq_id)
+			if (linkedListNode.Value.uniqueID == uniq_id)
 			{
 				return linkedListNode.Value;
 			}
 		}
-		return (T)null;
+		return null;
 	}
 
 	public uint GetTableID(string str_uniq_id)
@@ -50,11 +44,9 @@ public class InventoryList<T, RECV_DATA> where T : ItemInfoBase<RECV_DATA>, new(
 		ulong num = ulong.Parse(str_uniq_id);
 		for (LinkedListNode<T> linkedListNode = list.First; linkedListNode != null; linkedListNode = linkedListNode.Next)
 		{
-			T value = linkedListNode.Value;
-			if (value.uniqueID == num)
+			if (linkedListNode.Value.uniqueID == num)
 			{
-				T value2 = linkedListNode.Value;
-				return value2.tableID;
+				return linkedListNode.Value.tableID;
 			}
 		}
 		return 0u;
@@ -66,12 +58,9 @@ public class InventoryList<T, RECV_DATA> where T : ItemInfoBase<RECV_DATA>, new(
 		LinkedListNode<T> first = this.list.First;
 		while (first != null)
 		{
-			T value = first.Value;
-			if (value.tableID == table_id)
+			if (first.Value.tableID == table_id)
 			{
-				List<ulong> list2 = list;
-				T value2 = first.Value;
-				list2.Add(value2.uniqueID);
+				list.Add(first.Value.uniqueID);
 			}
 		}
 		if (list.Count > 0)
@@ -81,11 +70,16 @@ public class InventoryList<T, RECV_DATA> where T : ItemInfoBase<RECV_DATA>, new(
 		return null;
 	}
 
+	public InventoryList()
+	{
+		list = new LinkedList<T>();
+	}
+
 	public T Add(RECV_DATA item)
 	{
 		if (item == null)
 		{
-			return (T)null;
+			return null;
 		}
 		T val = new T();
 		val.SetValue(item);
@@ -97,7 +91,7 @@ public class InventoryList<T, RECV_DATA> where T : ItemInfoBase<RECV_DATA>, new(
 	{
 		if (item == null)
 		{
-			return (T)null;
+			return null;
 		}
 		ulong uniq_id2 = ulong.Parse(uniq_id);
 		T val = Overwrite(uniq_id2, item);
@@ -117,9 +111,9 @@ public class InventoryList<T, RECV_DATA> where T : ItemInfoBase<RECV_DATA>, new(
 		{
 			item_list.ForEach(delegate(RECV_DATA item)
 			{
-				T value = new T();
-				value.SetValue(item);
-				list.AddLast(value);
+				T val = new T();
+				val.SetValue(item);
+				list.AddLast(val);
 			});
 		}
 	}
@@ -133,16 +127,14 @@ public class InventoryList<T, RECV_DATA> where T : ItemInfoBase<RECV_DATA>, new(
 	{
 		for (LinkedListNode<T> linkedListNode = list.First; linkedListNode != null; linkedListNode = linkedListNode.Next)
 		{
-			T value = linkedListNode.Value;
-			if (value.uniqueID == uniq_id)
+			if (linkedListNode.Value.uniqueID == uniq_id)
 			{
 				linkedListNode.Value = new T();
-				T value2 = linkedListNode.Value;
-				value2.SetValue(item);
+				linkedListNode.Value.SetValue(item);
 				return linkedListNode.Value;
 			}
 		}
-		return (T)null;
+		return null;
 	}
 
 	public void Delete(ulong unique_id)
@@ -152,8 +144,7 @@ public class InventoryList<T, RECV_DATA> where T : ItemInfoBase<RECV_DATA>, new(
 		{
 			if (linkedListNode != null)
 			{
-				T value = linkedListNode.Value;
-				if (value.uniqueID == unique_id)
+				if (linkedListNode.Value.uniqueID == unique_id)
 				{
 					break;
 				}
@@ -168,7 +159,6 @@ public class InventoryList<T, RECV_DATA> where T : ItemInfoBase<RECV_DATA>, new(
 	public List<T> GetAll()
 	{
 		List<T> list = new List<T>(GetCount());
-		int num = 0;
 		for (LinkedListNode<T> linkedListNode = GetFirstNode(); linkedListNode != null; linkedListNode = linkedListNode.Next)
 		{
 			list.Add(linkedListNode.Value);

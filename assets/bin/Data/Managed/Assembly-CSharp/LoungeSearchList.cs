@@ -43,13 +43,13 @@ public class LoungeSearchList : GameSection
 	{
 		if (!LoungeMatchingManager.IsValidNotEmptyList())
 		{
-			SetActive((Enum)UI.GRD_LOUNGE, is_visible: false);
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_LOUNGE, is_visible: false);
+			SetActive(UI.STR_NON_LIST, is_visible: true);
 			return;
 		}
 		lounges = MonoBehaviourSingleton<LoungeMatchingManager>.I.lounges.ToArray();
-		SetActive((Enum)UI.GRD_LOUNGE, is_visible: true);
-		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		SetActive(UI.GRD_LOUNGE, is_visible: true);
+		SetActive(UI.STR_NON_LIST, is_visible: false);
 		SetGrid(UI.GRD_LOUNGE, "LoungeSearchListItem", lounges.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
 			SetEvent(t, "SELECT_LOUNGE", i);
@@ -61,12 +61,12 @@ public class LoungeSearchList : GameSection
 	public override void Initialize()
 	{
 		MonoBehaviourSingleton<LoungeMatchingManager>.I.ResetLoungeSearchRequest();
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		yield return this.StartCoroutine(Reload());
+		yield return StartCoroutine(Reload());
 		base.Initialize();
 	}
 
@@ -127,7 +127,7 @@ public class LoungeSearchList : GameSection
 	private void OnQuery_RELOAD()
 	{
 		GameSection.StayEvent();
-		this.StartCoroutine(Reload(delegate(bool b)
+		StartCoroutine(Reload(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b);
 		}));
@@ -150,10 +150,9 @@ public class LoungeSearchList : GameSection
 
 	private void SetStamp(Transform root, int stampId)
 	{
-		StampTable.Data data = Singleton<StampTable>.I.GetData((uint)stampId);
-		if (data != null)
+		if (Singleton<StampTable>.I.GetData((uint)stampId) != null)
 		{
-			this.StartCoroutine(LoadStamp(root, stampId));
+			StartCoroutine(LoadStamp(root, stampId));
 		}
 	}
 
@@ -168,7 +167,7 @@ public class LoungeSearchList : GameSection
 		if (lo_stamp.loadedObject != null)
 		{
 			Texture2D texture = lo_stamp.loadedObject as Texture2D;
-			SetActive((Enum)UI.OBJ_SYMBOL, is_visible: true);
+			SetActive(UI.OBJ_SYMBOL, is_visible: true);
 			SetTexture(root, UI.TEX_STAMP, texture);
 		}
 	}

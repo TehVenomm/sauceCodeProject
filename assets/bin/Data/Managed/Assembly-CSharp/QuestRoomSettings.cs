@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 
 public class QuestRoomSettings : GameSection
@@ -34,13 +33,13 @@ public class QuestRoomSettings : GameSection
 		MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(null);
 		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
 		{
-			SetActive((Enum)UI.OBJ_LOCK_LOUNGE, is_visible: true);
-			SetActive((Enum)UI.OBJ_LOCK, is_visible: false);
+			SetActive(UI.OBJ_LOCK_LOUNGE, is_visible: true);
+			SetActive(UI.OBJ_LOCK, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_LOCK_LOUNGE, is_visible: false);
-			SetActive((Enum)UI.OBJ_LOCK, is_visible: true);
+			SetActive(UI.OBJ_LOCK_LOUNGE, is_visible: false);
+			SetActive(UI.OBJ_LOCK, is_visible: true);
 		}
 		base.Initialize();
 	}
@@ -55,20 +54,20 @@ public class QuestRoomSettings : GameSection
 	{
 		if (setting.level > 0)
 		{
-			SetActive((Enum)UI.STR_NON_CONDITION_TOTAL, is_visible: false);
-			SetActive((Enum)UI.LBL_LEVEL, is_visible: true);
-			SetLabelText((Enum)UI.LBL_LEVEL, setting.level.ToString());
+			SetActive(UI.STR_NON_CONDITION_TOTAL, is_visible: false);
+			SetActive(UI.LBL_LEVEL, is_visible: true);
+			SetLabelText(UI.LBL_LEVEL, setting.level.ToString());
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_LEVEL, is_visible: false);
-			SetActive((Enum)UI.STR_NON_CONDITION_TOTAL, is_visible: true);
+			SetActive(UI.LBL_LEVEL, is_visible: false);
+			SetActive(UI.STR_NON_CONDITION_TOTAL, is_visible: true);
 		}
 	}
 
 	private void UpdateSelectFrame()
 	{
-		QuestRoomSettingsOption component = base.GetComponent<QuestRoomSettingsOption>((Enum)UI.OBJ_OPTION);
+		QuestRoomSettingsOption component = GetComponent<QuestRoomSettingsOption>(UI.OBJ_OPTION);
 		if (component != null)
 		{
 			component.SetShowOption(is_enable: true);

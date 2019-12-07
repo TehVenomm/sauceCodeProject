@@ -15,13 +15,12 @@ public class CommonDialogMaintenance : CommonDialog
 		{
 			try
 			{
-				double unixTimeStamp = long.Parse(desc.data.ToString());
-				DateTime dateTime = UnixTimeStampToDateTime(unixTimeStamp);
-				SetLabelText((Enum)UI.MESSAGE, string.Format(desc.text, GetFormartedText(dateTime.Day) + "/" + GetFormartedText(dateTime.Month) + ", " + GetFormartedText(dateTime.Hour) + ":" + GetFormartedText(dateTime.Minute)));
+				DateTime dateTime = UnixTimeStampToDateTime(long.Parse(desc.data.ToString()));
+				SetLabelText(UI.MESSAGE, string.Format(desc.text, GetFormartedText(dateTime.Day) + "/" + GetFormartedText(dateTime.Month) + ", " + GetFormartedText(dateTime.Hour) + ":" + GetFormartedText(dateTime.Minute)));
 			}
 			catch
 			{
-				SetLabelText((Enum)UI.MESSAGE, desc.text);
+				SetLabelText(UI.MESSAGE, desc.text);
 			}
 		}
 	}
@@ -33,6 +32,6 @@ public class CommonDialogMaintenance : CommonDialog
 
 	private string GetFormartedText(int num)
 	{
-		return string.Format((num <= 9) ? ("0{" + 0 + "}") : ("{" + 0 + "}"), num);
+		return string.Format((num > 9) ? ("{" + 0 + "}") : ("0{" + 0 + "}"), num);
 	}
 }

@@ -41,40 +41,32 @@ public class UIFieldName : MonoBehaviour
 
 	public TweenAlpha tweenTop;
 
-	public UIFieldName()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
 		if (!(null == nameLabelU) && !(null == nameLabelD) && !(null == labelRoot) && !(null == tweenCtrl) && !(null == bgLight) && !(null == bgBlack) && !(null == bgLine) && !(null == tweenTop))
 		{
 			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
 			if (fieldMapData == null)
 			{
-				this.get_gameObject().SetActive(false);
+				base.gameObject.SetActive(value: false);
 				return;
 			}
 			if (string.Compare(fieldMapData.stageName, 0, "FI", 0, 2) != 0)
 			{
-				this.get_gameObject().SetActive(false);
+				base.gameObject.SetActive(value: false);
 				return;
 			}
 			if (QuestManager.IsValidInGameWaveMatch())
 			{
-				this.get_gameObject().SetActive(false);
+				base.gameObject.SetActive(value: false);
 				return;
 			}
 			nameLabelU.text = fieldMapData.mapName;
 			nameLabelD.text = fieldMapData.mapName;
 			float num = nameLabelU.width;
-			Vector3 localPosition = labelRoot.get_localPosition();
+			Vector3 localPosition = labelRoot.localPosition;
 			localPosition.x += num * 0.5f;
-			labelRoot.set_localPosition(localPosition);
+			labelRoot.localPosition = localPosition;
 			float num2 = num - 120f;
 			float num3 = (float)bgLight.width + num2;
 			bgLight.width = (int)num3;
@@ -84,8 +76,8 @@ public class UIFieldName : MonoBehaviour
 			bgLineWidth = 0f;
 			bgLine.width = (int)bgLineWidth;
 			bgLineWidthStep = bgLineWidthMax / 12f;
-			nameLabelU.fontStyle = 2;
-			nameLabelD.fontStyle = 2;
+			nameLabelU.fontStyle = FontStyle.Italic;
+			nameLabelD.fontStyle = FontStyle.Italic;
 			phase = Phase.StartWait;
 			waitSeconds = 0.8f;
 			initialized = true;
@@ -98,8 +90,8 @@ public class UIFieldName : MonoBehaviour
 		{
 			phase = Phase.FadeIn;
 			waitSeconds = 1.2f;
-			UITweenCtrl.Reset(tweenCtrl.get_transform());
-			UITweenCtrl.Play(tweenCtrl.get_transform(), forward: true, null, is_input_block: false);
+			UITweenCtrl.Reset(tweenCtrl.transform);
+			UITweenCtrl.Play(tweenCtrl.transform, forward: true, null, is_input_block: false);
 		}
 	}
 
@@ -133,7 +125,7 @@ public class UIFieldName : MonoBehaviour
 	{
 		if (0f >= waitSeconds)
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 			phase = Phase.None;
 		}
 	}
@@ -142,7 +134,7 @@ public class UIFieldName : MonoBehaviour
 	{
 		if (initialized)
 		{
-			waitSeconds -= Time.get_deltaTime();
+			waitSeconds -= Time.deltaTime;
 			switch (phase)
 			{
 			case Phase.None:

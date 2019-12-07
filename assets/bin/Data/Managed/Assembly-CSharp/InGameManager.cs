@@ -1,3 +1,4 @@
+using App.Scripts.GoGame.Optimization;
 using Network;
 using System;
 using System.Collections;
@@ -116,11 +117,9 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 
 		public bool IsCountUpAtDefeatFieldEnemy()
 		{
-			bool? flag = isCountUpAtKillFieldEnemy;
-			if (flag.HasValue)
+			if (isCountUpAtKillFieldEnemy.HasValue)
 			{
-				bool? flag2 = isCountUpAtKillFieldEnemy;
-				return flag2.Value;
+				return isCountUpAtKillFieldEnemy.Value;
 			}
 			int i = 0;
 			for (int count = conditionTypes.Count; i < count; i++)
@@ -489,27 +488,47 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 
 	public bool IsQuestInField()
 	{
-		return isQuestHappen || isQuestGate || isQuestPortal || isQuestFromGimmick;
+		if (!isQuestHappen && !isQuestGate && !isQuestPortal)
+		{
+			return isQuestFromGimmick;
+		}
+		return true;
 	}
 
 	public bool IsQuestInPortal()
 	{
-		return isQuestGate || isQuestPortal;
+		if (!isQuestGate)
+		{
+			return isQuestPortal;
+		}
+		return true;
 	}
 
 	public static bool IsReentry()
 	{
-		return IsValidRush() || FieldManager.IsValidInGameNoQuest() || QuestManager.IsValidInGameExplore() || QuestManager.IsValidInGameSeries() || QuestManager.IsValidInGameWaveMatch();
+		if (!IsValidRush() && !FieldManager.IsValidInGameNoQuest() && !QuestManager.IsValidInGameExplore() && !QuestManager.IsValidInGameSeries())
+		{
+			return QuestManager.IsValidInGameWaveMatch();
+		}
+		return true;
 	}
 
 	public static bool IsReentryNotLeaveParty()
 	{
-		return IsValidRush() || QuestManager.IsValidInGameExplore() || QuestManager.IsValidInGameSeries() || QuestManager.IsValidInGameWaveMatch();
+		if (!IsValidRush() && !QuestManager.IsValidInGameExplore() && !QuestManager.IsValidInGameSeries())
+		{
+			return QuestManager.IsValidInGameWaveMatch();
+		}
+		return true;
 	}
 
 	public static bool IsReentryMapId()
 	{
-		return IsValidRush() || QuestManager.IsValidInGameExplore() || QuestManager.IsValidInGameSeries() || QuestManager.IsValidInGameWaveMatch();
+		if (!IsValidRush() && !QuestManager.IsValidInGameExplore() && !QuestManager.IsValidInGameSeries())
+		{
+			return QuestManager.IsValidInGameWaveMatch();
+		}
+		return true;
 	}
 
 	public bool IsRush()
@@ -519,7 +538,11 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 
 	public static bool IsValidRush()
 	{
-		return MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.IsRush();
+		if (MonoBehaviourSingleton<InGameManager>.IsValid())
+		{
+			return MonoBehaviourSingleton<InGameManager>.I.IsRush();
+		}
+		return false;
 	}
 
 	public void ClearRush()
@@ -705,7 +728,11 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 
 	public bool IsArenaTimeAttack()
 	{
-		return HasArenaInfo() && arenaInfo.arenaData.rank == ARENA_RANK.S;
+		if (HasArenaInfo())
+		{
+			return arenaInfo.arenaData.rank == ARENA_RANK.S;
+		}
+		return false;
 	}
 
 	public ARENA_CONDITION[] GetArenaConditions()
@@ -886,14 +913,16 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 	public static int GetArrowCameraType(string key)
 	{
 		int result = 1;
-		switch (key)
+		if (!(key == "typea"))
 		{
-		case "typea":
+			if (key == "typeb")
+			{
+				result = 1;
+			}
+		}
+		else
+		{
 			result = 0;
-			break;
-		case "typeb":
-			result = 1;
-			break;
 		}
 		return result;
 	}
@@ -945,8 +974,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 		else if (IsRush())
 		{
 			int questId = rushInfo.waves[0].questId;
-			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)questId);
-			result = questData.limitTime;
+			result = Singleton<QuestTable>.I.GetQuestData((uint)questId).limitTime;
 			if (intervalTransferInfo != null && intervalTransferInfo.remaindTime >= 0f)
 			{
 				result = intervalTransferInfo.remaindTime;
@@ -985,8 +1013,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 		{
 			if (MonoBehaviourSingleton<QuestManager>.I.IsExplore())
 			{
-				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
-				uint mapId = questData.mapId;
+				uint mapId = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID).mapId;
 				result = (MonoBehaviourSingleton<FieldManager>.I.currentMapID == mapId);
 				if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsExploreBossDead())
 				{
@@ -995,8 +1022,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 			}
 			else
 			{
-				QuestTable.QuestTableData questData2 = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
-				result = (questData2.enemyID[MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex] > 0);
+				result = (Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID).enemyID[MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex] > 0);
 			}
 		}
 		else if (FieldManager.IsValidInGame())
@@ -1019,7 +1045,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 		int i = 0;
 		for (int num = componentsInChildren.Length; i < num; i++)
 		{
-			if (componentsInChildren[i].get_gameObject().get_layer() == 18 || componentsInChildren[i].get_gameObject().get_layer() == 9 || componentsInChildren[i].get_gameObject().get_layer() == 21)
+			if (componentsInChildren[i].gameObject.layer == 18 || componentsInChildren[i].gameObject.layer == 9 || componentsInChildren[i].gameObject.layer == 21)
 			{
 				flag = true;
 				break;
@@ -1043,57 +1069,57 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 		}
 		if (MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeries() || MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeriesArena())
 		{
-			this.StartCoroutine(InitializeEnemyPopForSeries());
+			StartCoroutine(InitializeEnemyPopForSeries());
 			yield break;
 		}
-		List<FieldMapTable.EnemyPopTableData> enemy_pop_list = Singleton<FieldMapTable>.I.GetEnemyPopList(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
-		if (enemy_pop_list == null || enemy_pop_list.Count <= 0)
+		List<FieldMapTable.EnemyPopTableData> enemyPopList = Singleton<FieldMapTable>.I.GetEnemyPopList(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
+		if (enemyPopList == null || enemyPopList.Count <= 0)
 		{
 			yield break;
 		}
-		uint quest_enemy_id = 0u;
-		int quest_enemy_lv = 0;
+		uint num = 0u;
+		int num2 = 0;
 		if (QuestManager.IsValidInGame())
 		{
-			quest_enemy_id = (uint)MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyID();
-			quest_enemy_lv = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyLv();
+			num = (uint)MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyID();
+			num2 = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyLv();
 		}
 		if (HasArenaInfo())
 		{
-			quest_enemy_lv = arenaInfo.arenaData.level;
+			num2 = arenaInfo.arenaData.level;
 		}
 		List<uint> enemy_list = new List<uint>();
 		int load_count = 0;
 		int i = 0;
-		for (int count = enemy_pop_list.Count; i < count; i++)
+		for (int count = enemyPopList.Count; i < count; i++)
 		{
-			FieldMapTable.EnemyPopTableData enemyPopTableData = enemy_pop_list[i];
+			FieldMapTable.EnemyPopTableData enemyPopTableData = enemyPopList[i];
 			if (enemyPopTableData == null)
 			{
 				continue;
 			}
-			uint num;
+			uint num3;
 			int enemy_lv;
 			if (enemyPopTableData.enemyID != 0)
 			{
-				num = enemyPopTableData.enemyID;
+				num3 = enemyPopTableData.enemyID;
 				enemy_lv = (int)enemyPopTableData.enemyLv;
 			}
 			else
 			{
-				if (quest_enemy_id == 0)
+				if (num == 0)
 				{
 					continue;
 				}
-				num = quest_enemy_id;
-				enemy_lv = quest_enemy_lv;
+				num3 = num;
+				enemy_lv = num2;
 			}
-			if (!enemy_list.Contains(num))
+			if (!enemy_list.Contains(num3))
 			{
 				enemy_list.Add(enemyPopTableData.enemyID);
-				MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(0, Vector3.get_zero(), 0f, (int)num, enemy_lv, enemyPopTableData.bossFlag, enemyPopTableData.bigMonsterFlag, set_ai: true, willStock: true, delegate(Enemy o)
+				MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(0, Vector3.zero, 0f, (int)num3, enemy_lv, enemyPopTableData.bossFlag, enemyPopTableData.bigMonsterFlag, set_ai: true, willStock: true, delegate(Enemy o)
 				{
-					o.get_gameObject().SetActive(false);
+					o.gameObject.SetActive(value: false);
 					MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(o);
 					load_count++;
 				});
@@ -1105,20 +1131,91 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 		}
 	}
 
+	public IEnumerator InitializeEnemyPop_GG_Optimize(Action callBack, Action effectCallBack)
+	{
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid() || !MonoBehaviourSingleton<FieldManager>.IsValid())
+		{
+			yield break;
+		}
+		if (MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeries() || MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeriesArena())
+		{
+			StartCoroutine(InitializeEnemyPopForSeries());
+			yield break;
+		}
+		List<FieldMapTable.EnemyPopTableData> enemyPopList = Singleton<FieldMapTable>.I.GetEnemyPopList(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
+		if (enemyPopList == null || enemyPopList.Count <= 0)
+		{
+			yield break;
+		}
+		uint num = 0u;
+		int num2 = 0;
+		if (QuestManager.IsValidInGame())
+		{
+			num = (uint)MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyID();
+			num2 = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyLv();
+		}
+		if (HasArenaInfo())
+		{
+			num2 = arenaInfo.arenaData.level;
+		}
+		List<uint> enemy_list = new List<uint>();
+		int load_count = 0;
+		int i = 0;
+		for (int count = enemyPopList.Count; i < count; i++)
+		{
+			FieldMapTable.EnemyPopTableData enemyPopTableData = enemyPopList[i];
+			if (enemyPopTableData == null)
+			{
+				continue;
+			}
+			uint num3;
+			int enemy_lv;
+			if (enemyPopTableData.enemyID != 0)
+			{
+				num3 = enemyPopTableData.enemyID;
+				enemy_lv = (int)enemyPopTableData.enemyLv;
+			}
+			else
+			{
+				if (num == 0)
+				{
+					continue;
+				}
+				num3 = num;
+				enemy_lv = num2;
+			}
+			if (!enemy_list.Contains(num3))
+			{
+				enemy_list.Add(enemyPopTableData.enemyID);
+				MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy_GG_Optimize(0, Vector3.zero, 0f, (int)num3, enemy_lv, enemyPopTableData.bossFlag, enemyPopTableData.bigMonsterFlag, set_ai: true, willStock: true, delegate(Enemy o)
+				{
+					o.gameObject.SetActive(value: false);
+					MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(o);
+					load_count++;
+				}, isOverrideScale: false, effectCallBack, enemyPopTableData.bossFlag);
+			}
+		}
+		while (load_count < enemy_list.Count)
+		{
+			yield return null;
+		}
+		callBack();
+	}
+
 	private IEnumerator InitializeEnemyPopForSeries()
 	{
-		QuestManager questMgr = MonoBehaviourSingleton<QuestManager>.I;
-		int count = questMgr.GetCurrentQuestSeriesNum();
+		QuestManager i = MonoBehaviourSingleton<QuestManager>.I;
+		int count = i.GetCurrentQuestSeriesNum();
 		int loadCount = 0;
-		for (int i = 0; i < count; i++)
+		for (int j = 0; j < count; j++)
 		{
-			uint currentQuestEnemyID = (uint)questMgr.GetCurrentQuestEnemyID(i);
-			int currentQuestEnemyLv = questMgr.GetCurrentQuestEnemyLv(i);
+			uint currentQuestEnemyID = (uint)i.GetCurrentQuestEnemyID(j);
+			int currentQuestEnemyLv = i.GetCurrentQuestEnemyLv(j);
 			if (currentQuestEnemyID != 0 && currentQuestEnemyLv > 0)
 			{
-				MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(0, Vector3.get_zero(), 0f, (int)currentQuestEnemyID, currentQuestEnemyLv, is_boss: true, is_big_monster: true, set_ai: true, willStock: true, delegate(Enemy o)
+				MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(0, Vector3.zero, 0f, (int)currentQuestEnemyID, currentQuestEnemyLv, is_boss: true, is_big_monster: true, set_ai: true, willStock: true, delegate(Enemy o)
 				{
-					o.get_gameObject().SetActive(false);
+					o.gameObject.SetActive(value: false);
 					MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(o);
 					loadCount++;
 				});
@@ -1141,9 +1238,9 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			bool isLoading = true;
-			MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(0, Vector3.get_zero(), 0f, enemyId, enemyLv, is_boss: false, is_big_monster: false, set_ai: true, willStock: true, delegate(Enemy o)
+			MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(0, Vector3.zero, 0f, enemyId, enemyLv, is_boss: false, is_big_monster: false, set_ai: true, willStock: true, delegate(Enemy o)
 			{
-				o.get_gameObject().SetActive(false);
+				o.gameObject.SetActive(value: false);
 				MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(o);
 				isLoading = false;
 			});
@@ -1159,9 +1256,9 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			bool isLoading = true;
-			MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyForSummonAttack(0, Vector3.get_zero(), 0f, enemyId, enemyLv, willStock: true, delegate(Enemy o)
+			MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyForSummonAttack(0, Vector3.zero, 0f, enemyId, enemyLv, willStock: true, delegate(Enemy o)
 			{
-				o.get_gameObject().SetActive(false);
+				o.gameObject.SetActive(value: false);
 				MonoBehaviourSingleton<StageObjectManager>.I.enemySummonStokeList.Add(o);
 				isLoading = false;
 			});
@@ -1174,7 +1271,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 
 	public GameObject CreateBossDropObject(int rarity)
 	{
-		GameObject val = null;
+		GameObject gameObject = null;
 		switch (rarity)
 		{
 		case 2:
@@ -1182,20 +1279,20 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 			int k = 0;
 			for (int count3 = bossDropRegionBreakCaches.Count; k < count3; k++)
 			{
-				if (!bossDropRegionBreakCaches[k].get_activeSelf())
+				if (!bossDropRegionBreakCaches[k].activeSelf)
 				{
-					val = bossDropRegionBreakCaches[k];
-					val.SetActive(true);
+					gameObject = bossDropRegionBreakCaches[k];
+					gameObject.SetActive(value: true);
 					break;
 				}
 			}
-			if (val == null)
+			if (gameObject == null)
 			{
-				Transform val4 = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropRegionBreak, MonoBehaviourSingleton<StageObjectManager>.I._transform);
-				if (val4 != null)
+				Transform transform3 = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropRegionBreak, MonoBehaviourSingleton<StageObjectManager>.I._transform);
+				if (transform3 != null)
 				{
-					val = val4.get_gameObject();
-					bossDropRegionBreakCaches.Add(val);
+					gameObject = transform3.gameObject;
+					bossDropRegionBreakCaches.Add(gameObject);
 				}
 			}
 			break;
@@ -1205,20 +1302,20 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 			int j = 0;
 			for (int count2 = bossDropRCaches.Count; j < count2; j++)
 			{
-				if (!bossDropRCaches[j].get_activeSelf())
+				if (!bossDropRCaches[j].activeSelf)
 				{
-					val = bossDropRCaches[j];
-					val.SetActive(true);
+					gameObject = bossDropRCaches[j];
+					gameObject.SetActive(value: true);
 					break;
 				}
 			}
-			if (val == null)
+			if (gameObject == null)
 			{
-				Transform val3 = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropR, MonoBehaviourSingleton<StageObjectManager>.I._transform);
-				if (val3 != null)
+				Transform transform2 = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropR, MonoBehaviourSingleton<StageObjectManager>.I._transform);
+				if (transform2 != null)
 				{
-					val = val3.get_gameObject();
-					bossDropRCaches.Add(val);
+					gameObject = transform2.gameObject;
+					bossDropRCaches.Add(gameObject);
 				}
 			}
 			break;
@@ -1228,26 +1325,26 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 			int i = 0;
 			for (int count = bossDropNCaches.Count; i < count; i++)
 			{
-				if (!bossDropNCaches[i].get_activeSelf())
+				if (!bossDropNCaches[i].activeSelf)
 				{
-					val = bossDropNCaches[i];
-					val.SetActive(true);
+					gameObject = bossDropNCaches[i];
+					gameObject.SetActive(value: true);
 					break;
 				}
 			}
-			if (val == null)
+			if (gameObject == null)
 			{
-				Transform val2 = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropN, MonoBehaviourSingleton<StageObjectManager>.I._transform);
-				if (val2 != null)
+				Transform transform = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropN, MonoBehaviourSingleton<StageObjectManager>.I._transform);
+				if (transform != null)
 				{
-					val = val2.get_gameObject();
-					bossDropNCaches.Add(val);
+					gameObject = transform.gameObject;
+					bossDropNCaches.Add(gameObject);
 				}
 			}
 			break;
 		}
 		}
-		return val;
+		return gameObject;
 	}
 
 	public void CreateDropObject(Coop_Model_EnemyDefeat model, List<DropDeliveryInfo> deliveryList, List<DropItemInfo> itemList)
@@ -1361,7 +1458,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 		int i = 0;
 		for (int count = dropCaches.Count; i < count; i++)
 		{
-			Object.Destroy(dropCaches[i]);
+			UnityEngine.Object.Destroy(dropCaches[i]);
 		}
 		dropCaches.Clear();
 	}
@@ -1404,19 +1501,19 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 		int i = 0;
 		for (int count = caches.Count; i < count; i++)
 		{
-			if (caches[i] != null && !caches[i].get_activeSelf())
+			if (caches[i] != null && !caches[i].activeSelf)
 			{
-				GameObject val = caches[i];
-				val.SetActive(true);
-				return val;
+				GameObject gameObject = caches[i];
+				gameObject.SetActive(value: true);
+				return gameObject;
 			}
 		}
-		Transform val2 = ResourceUtility.Realizes(prefab, MonoBehaviourSingleton<StageObjectManager>.I._transform);
-		if (val2 != null)
+		Transform transform = ResourceUtility.Realizes(prefab, MonoBehaviourSingleton<StageObjectManager>.I._transform);
+		if (transform != null)
 		{
-			GameObject gameObject = val2.get_gameObject();
-			caches.Add(gameObject);
-			return gameObject;
+			GameObject gameObject2 = transform.gameObject;
+			caches.Add(gameObject2);
+			return gameObject2;
 		}
 		return null;
 	}
@@ -1451,9 +1548,9 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 			}
 			if (flag != MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(deliveryInfo[i].id) && MonoBehaviourSingleton<UIAnnounceBand>.IsValid())
 			{
-				string empty = string.Empty;
-				empty = ((!DeliveryManager.IsDeliveryBingo((uint)deliveryInfo[i].id)) ? StringTable.Get(STRING_CATEGORY.DELIVERY_COMPLETE, 0u) : StringTable.Get(STRING_CATEGORY.DELIVERY_COMPLETE, 2u));
-				MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(deliveryInfo[i].name, empty);
+				string text = "";
+				text = ((!DeliveryManager.IsDeliveryBingo((uint)deliveryInfo[i].id)) ? StringTable.Get(STRING_CATEGORY.DELIVERY_COMPLETE, 0u) : StringTable.Get(STRING_CATEGORY.DELIVERY_COMPLETE, 2u));
+				MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(deliveryInfo[i].name, text);
 				SoundManager.PlayOneshotJingle(40000030);
 				MonoBehaviourSingleton<CoopManager>.I.coopStage.fieldRewardPool.SendFieldDrop();
 			}
@@ -1510,8 +1607,8 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 			if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && !keep_dead)
 			{
 				int currentRushStandupHpPer = MonoBehaviourSingleton<InGameManager>.I.GetCurrentRushStandupHpPer();
-				int num = (int)((float)player.hpMax * ((float)currentRushStandupHpPer / 100f));
-				player.hp = Mathf.Max(player.hp, num);
+				int b = (int)((float)player.hpMax * ((float)currentRushStandupHpPer / 100f));
+				player.hp = Mathf.Max(player.hp, b);
 			}
 			IntervalTransferInfo.PlayerInfo playerInfo = new IntervalTransferInfo.PlayerInfo();
 			playerInfo.id = player.id;
@@ -1553,19 +1650,17 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 
 	public void SetIntervalTransferSelf()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
 		if (!(selfCacheObject != null))
 		{
 			selfCacheObject = new GameObject();
-			selfCacheObject.set_name("SelfCacheObject");
-			selfCacheObject.get_transform().set_parent(MonoBehaviourSingleton<AppMain>.I._transform);
+			selfCacheObject.name = "SelfCacheObject";
+			selfCacheObject.transform.parent = MonoBehaviourSingleton<AppMain>.I._transform;
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 			self.OnCached();
-			GameObject gameObject = self.get_gameObject();
-			gameObject.get_transform().set_parent(selfCacheObject.get_transform());
-			gameObject.get_gameObject().set_name("SelfCache");
-			gameObject.get_gameObject().SetActive(false);
+			GameObject gameObject = self.gameObject;
+			gameObject.transform.parent = selfCacheObject.transform;
+			gameObject.gameObject.name = "SelfCache";
+			gameObject.gameObject.SetActive(value: false);
 		}
 	}
 
@@ -1573,7 +1668,8 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 	{
 		if (!(selfCacheObject == null))
 		{
-			Object.Destroy(selfCacheObject);
+			MonoBehaviourSingleton<GoGameCacheManager>.I.CacheSelfPlayerModel();
+			UnityEngine.Object.Destroy(selfCacheObject);
 			selfCacheObject = null;
 		}
 	}
@@ -1583,7 +1679,7 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 		if (updateIntervalTransferInfoRemaindTime == null)
 		{
 			updateIntervalTransferInfoRemaindTime = UpdateIntervalTransferInfoRemaindTime();
-			this.StartCoroutine(updateIntervalTransferInfoRemaindTime);
+			StartCoroutine(updateIntervalTransferInfoRemaindTime);
 		}
 	}
 
@@ -1591,18 +1687,18 @@ public class InGameManager : MonoBehaviourSingleton<InGameManager>
 	{
 		if (updateIntervalTransferInfoRemaindTime != null)
 		{
-			this.StopCoroutine(updateIntervalTransferInfoRemaindTime);
+			StopCoroutine(updateIntervalTransferInfoRemaindTime);
 			updateIntervalTransferInfoRemaindTime = null;
 		}
 	}
 
 	private IEnumerator UpdateIntervalTransferInfoRemaindTime()
 	{
-		float startTime = Time.get_realtimeSinceStartup();
+		float startTime = Time.realtimeSinceStartup;
 		float startRemaindTime = intervalTransferInfo.remaindTime;
 		while (intervalTransferInfo != null)
 		{
-			intervalTransferInfo.remaindTime = startRemaindTime - (Time.get_realtimeSinceStartup() - startTime);
+			intervalTransferInfo.remaindTime = startRemaindTime - (Time.realtimeSinceStartup - startTime);
 			yield return null;
 		}
 	}

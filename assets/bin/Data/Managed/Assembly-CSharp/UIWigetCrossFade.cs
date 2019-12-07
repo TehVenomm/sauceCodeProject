@@ -24,11 +24,6 @@ public class UIWigetCrossFade : MonoBehaviour
 
 	private float processSec;
 
-	public UIWigetCrossFade()
-		: this()
-	{
-	}
-
 	public void Play()
 	{
 		if (!bUpdate && !targetWidget.IsNullOrEmpty())
@@ -38,7 +33,7 @@ public class UIWigetCrossFade : MonoBehaviour
 			fadeState = eFadeState.Idle;
 			for (int i = 0; i < targetWidget.Length; i++)
 			{
-				targetWidget[i].alpha = ((i != targetIndex) ? 0f : 1f);
+				targetWidget[i].alpha = ((i == targetIndex) ? 1f : 0f);
 			}
 		}
 	}
@@ -67,7 +62,7 @@ public class UIWigetCrossFade : MonoBehaviour
 		{
 		case eFadeState.In:
 		{
-			processSec += Time.get_deltaTime();
+			processSec += Time.deltaTime;
 			float num2 = processSec / kFadeSec;
 			if (num2 > 1f)
 			{
@@ -82,7 +77,7 @@ public class UIWigetCrossFade : MonoBehaviour
 			break;
 		}
 		case eFadeState.Idle:
-			processSec += Time.get_deltaTime();
+			processSec += Time.deltaTime;
 			if (processSec >= kIdleSec)
 			{
 				processSec = 0f;
@@ -91,7 +86,7 @@ public class UIWigetCrossFade : MonoBehaviour
 			break;
 		case eFadeState.Out:
 		{
-			processSec += Time.get_deltaTime();
+			processSec += Time.deltaTime;
 			float num = 1f - processSec / kFadeSec;
 			if (num < 0f)
 			{

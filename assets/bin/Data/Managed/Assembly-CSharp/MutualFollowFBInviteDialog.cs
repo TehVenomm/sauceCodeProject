@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +22,7 @@ public class MutualFollowFBInviteDialog : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -44,8 +43,8 @@ public class MutualFollowFBInviteDialog : GameSection
 		}
 		SetInput(UI.IPT_NAME, string.Empty, 0, delegate
 		{
-			string inputValue = GetInputValue((Enum)UI.IPT_NAME);
-			SetWrapContentFilterText((Enum)UI.WRP_LIST, inputValue);
+			string inputValue = GetInputValue(UI.IPT_NAME);
+			SetWrapContentFilterText(UI.WRP_LIST, inputValue);
 		});
 		base.Initialize();
 	}
@@ -64,39 +63,34 @@ public class MutualFollowFBInviteDialog : GameSection
 		int j = 0;
 		SetWrapContentFilter(UI.WRP_LIST, "MutualFollowFBInviteListItem", friendList.Count, reset: false, delegate(int i, Transform t, bool b)
 		{
-			FBManager.FriendData friendData2 = friendList[++j];
+			FBManager.FriendData friendData2 = friendList[j++];
 			SetLabelText(t, UI.LBL_NAME, friendData2.name);
 			SetDownloadTexture(t, UI.TEX_AVATAR, friendData2.picture.data.url);
 			SetEvent(t, "SELECT", i);
 		}, delegate(int i, string s)
 		{
 			FBManager.FriendData friendData = friendList[i];
-			if (friendData.name.ContainIgnoreCase(s) || s.ContainIgnoreCase(friendData.name))
-			{
-				return true;
-			}
-			return false;
+			return (friendData.name.ContainIgnoreCase(s) || s.ContainIgnoreCase(friendData.name)) ? true : false;
 		});
 	}
 
 	private void _UpdateSelected()
 	{
-		SetLabelText((Enum)UI.LBL_SELECTED, string.Format(base.sectionData.GetText("FRIEND_SELECTED"), selectedList.Count));
+		SetLabelText(UI.LBL_SELECTED, string.Format(base.sectionData.GetText("FRIEND_SELECTED"), selectedList.Count));
 	}
 
 	private void _UpdateNumFriend(FBManager.InvitableFriendInfo invitable_friend_info, FBManager.FriendInfo friend_info)
 	{
-		List<FBManager.FriendData> data = friend_info.data;
-		SetLabelText((Enum)UI.LBL_SELECTED_NUM, string.Format(base.sectionData.GetText("FRIEND_NUM"), friend_info.data.Count, invitable_friend_info.data.Count));
+		_ = friend_info.data;
+		SetLabelText(UI.LBL_SELECTED_NUM, string.Format(base.sectionData.GetText("FRIEND_NUM"), friend_info.data.Count, invitable_friend_info.data.Count));
 	}
 
 	private void OnQuery_SELECT()
 	{
-		int num = (int)GameSection.GetEventData();
-		Transform ctrl = GetCtrl(UI.WRP_LIST);
-		Transform child = ctrl.GetChild(num);
+		int index = (int)GameSection.GetEventData();
+		Transform child = GetCtrl(UI.WRP_LIST).GetChild(index);
 		SetActive(child, UI.OBJ_SELECT, is_visible: true);
-		FBManager.FriendData item = MonoBehaviourSingleton<FBManager>.I.invitableFriendInfo.data[num];
+		FBManager.FriendData item = MonoBehaviourSingleton<FBManager>.I.invitableFriendInfo.data[index];
 		if (selectedList.Contains(item))
 		{
 			selectedList.Remove(item);
@@ -112,8 +106,6 @@ public class MutualFollowFBInviteDialog : GameSection
 
 	private void OnQuery_SELECTALL()
 	{
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Expected O, but got Unknown
 		int count = selectedList.Count;
 		selectedList.Clear();
 		bool is_visible = false;
@@ -122,31 +114,16 @@ public class MutualFollowFBInviteDialog : GameSection
 			selectedList.AddRange(MonoBehaviourSingleton<FBManager>.I.invitableFriendInfo.data);
 			is_visible = true;
 		}
-		Transform ctrl = GetCtrl(UI.WRP_LIST);
-		IEnumerator enumerator = ctrl.GetEnumerator();
-		try
+		foreach (Transform item in GetCtrl(UI.WRP_LIST))
 		{
-			while (enumerator.MoveNext())
-			{
-				Transform root = enumerator.Current;
-				SetActive(root, UI.OBJ_SELECT, is_visible);
-			}
-		}
-		finally
-		{
-			IDisposable disposable;
-			if ((disposable = (enumerator as IDisposable)) != null)
-			{
-				disposable.Dispose();
-			}
+			SetActive(item, UI.OBJ_SELECT, is_visible);
 		}
 		_UpdateSelected();
 	}
 
 	private void OnQuery_INVITE()
 	{
-		List<string> list = (from o in selectedList
-		select o.id).ToList();
+		List<string> list = selectedList.Select((FBManager.FriendData o) => o.id).ToList();
 		if (list.Count > 0)
 		{
 			Dictionary<string, object> dictionary = new Dictionary<string, object>();
@@ -154,7 +131,7 @@ public class MutualFollowFBInviteDialog : GameSection
 			MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("invite_friend", "Social", dictionary);
 			GameSection.ChangeEvent("INVITE_SUCCESS");
 			GameSection.StayEvent();
-			MonoBehaviourSingleton<FBManager>.I.AppRequest(base.sectionData.GetText("INVITE_MESSAGE"), list, string.Empty, string.Empty, delegate(bool req_success, FBManager.AppRequestResult ret)
+			MonoBehaviourSingleton<FBManager>.I.AppRequest(base.sectionData.GetText("INVITE_MESSAGE"), list, "", "", delegate(bool req_success, FBManager.AppRequestResult ret)
 			{
 				if (req_success)
 				{

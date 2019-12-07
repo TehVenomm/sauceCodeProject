@@ -3,29 +3,20 @@ using UnityEngine;
 [RequireComponent(typeof(UIWidget))]
 public class UISetTweenInitializer : MonoBehaviour
 {
-	public UISetTweenInitializer()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		if (!Application.get_isPlaying())
+		if (!Application.isPlaying)
 		{
 			return;
 		}
-		Transform transform = this.get_transform();
-		UIWidget component = this.GetComponent<UIWidget>();
+		Transform transform = base.transform;
+		UIWidget component = GetComponent<UIWidget>();
 		if (component == null)
 		{
 			return;
 		}
-		UITweener[] components = this.GetComponents<UITweener>();
-		if (components == null || components.Length <= 0)
+		UITweener[] components = GetComponents<UITweener>();
+		if (components == null || components.Length == 0)
 		{
 			return;
 		}
@@ -48,17 +39,17 @@ public class UISetTweenInitializer : MonoBehaviour
 				else if (uITweener is TweenPosition)
 				{
 					TweenPosition tweenPosition = uITweener as TweenPosition;
-					transform.set_localPosition(tweenPosition.from);
+					transform.localPosition = tweenPosition.from;
 				}
 				else if (uITweener is TweenRotation)
 				{
 					TweenRotation tweenRotation = uITweener as TweenRotation;
-					transform.set_localEulerAngles(tweenRotation.from);
+					transform.localEulerAngles = tweenRotation.from;
 				}
 				else if (uITweener is TweenScale)
 				{
 					TweenScale tweenScale = uITweener as TweenScale;
-					transform.set_localScale(tweenScale.from);
+					transform.localScale = tweenScale.from;
 				}
 				else if (uITweener is TweenWidth)
 				{

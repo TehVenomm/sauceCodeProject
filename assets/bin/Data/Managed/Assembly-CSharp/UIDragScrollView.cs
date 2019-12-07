@@ -17,14 +17,9 @@ public class UIDragScrollView : MonoBehaviour
 
 	private bool mStarted;
 
-	public UIDragScrollView()
-		: this()
-	{
-	}
-
 	private void OnEnable()
 	{
-		mTrans = this.get_transform();
+		mTrans = base.transform;
 		if (scrollView == null && draggablePanel != null)
 		{
 			scrollView = draggablePanel;
@@ -60,11 +55,10 @@ public class UIDragScrollView : MonoBehaviour
 
 	private void AttachUIButtonEffect()
 	{
-		UIButton component = this.GetComponent<UIButton>();
-		if (component != null && this.GetComponent<UINoAuto>() == null && component.GetComponent<UIButtonEffect>() == null)
+		UIButton component = GetComponent<UIButton>();
+		if (component != null && GetComponent<UINoAuto>() == null && component.GetComponent<UIButtonEffect>() == null)
 		{
-			UIButtonEffect uIButtonEffect = component.get_gameObject().AddComponent<UIButtonEffect>();
-			uIButtonEffect.isSimple = true;
+			component.gameObject.AddComponent<UIButtonEffect>().isSimple = true;
 		}
 	}
 
@@ -75,7 +69,7 @@ public class UIDragScrollView : MonoBehaviour
 			mScroll = scrollView;
 			mAutoFind = false;
 		}
-		if (Object.op_Implicit(scrollView) && this.get_enabled() && NGUITools.GetActive(this.get_gameObject()))
+		if ((bool)scrollView && base.enabled && NGUITools.GetActive(base.gameObject))
 		{
 			scrollView.Press(pressed);
 			if (!pressed && mAutoFind)
@@ -88,7 +82,7 @@ public class UIDragScrollView : MonoBehaviour
 
 	private void OnDrag(Vector2 delta)
 	{
-		if (Object.op_Implicit(scrollView) && NGUITools.GetActive(this))
+		if ((bool)scrollView && NGUITools.GetActive(this))
 		{
 			scrollView.Drag();
 		}
@@ -96,7 +90,7 @@ public class UIDragScrollView : MonoBehaviour
 
 	private void OnScroll(float delta)
 	{
-		if (Object.op_Implicit(scrollView) && NGUITools.GetActive(this))
+		if ((bool)scrollView && NGUITools.GetActive(this))
 		{
 			scrollView.Scroll(delta);
 		}
@@ -104,8 +98,7 @@ public class UIDragScrollView : MonoBehaviour
 
 	public void OnPan(Vector2 delta)
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		if (Object.op_Implicit(scrollView) && NGUITools.GetActive(this))
+		if ((bool)scrollView && NGUITools.GetActive(this))
 		{
 			scrollView.OnPan(delta);
 		}

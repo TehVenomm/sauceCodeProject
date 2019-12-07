@@ -214,7 +214,7 @@ namespace GooglePlayGames.BasicApi
 		public IUserProfile[] GetFriends()
 		{
 			LogUsage();
-			return (IUserProfile[])new IUserProfile[0];
+			return new IUserProfile[0];
 		}
 
 		public IntPtr GetApiClient()

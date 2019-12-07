@@ -20,17 +20,8 @@ public class QuestRoomSettingsOption : MonoBehaviour
 
 	public UITexture tex;
 
-	public QuestRoomSettingsOption()
-		: this()
-	{
-	}
-
 	public void SetShowOption(bool is_enable)
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
 		int num = (lbls != null) ? lbls.Length : 0;
 		if (is_enable)
 		{
@@ -39,10 +30,10 @@ public class QuestRoomSettingsOption : MonoBehaviour
 			{
 				if (lbls[i] != null)
 				{
-					lbls[i].color = Color.get_white();
+					lbls[i].color = Color.white;
 				}
 			}
-			btn.GetComponent<BoxCollider>().set_enabled(true);
+			btn.GetComponent<BoxCollider>().enabled = true;
 			btn.normalSprite = (btn.pressedSprite = buttonSpriteName[0]);
 			spr.spriteName = frameSpriteName[0];
 			tex.color = texEnableColor;
@@ -57,7 +48,7 @@ public class QuestRoomSettingsOption : MonoBehaviour
 					lbls[j].color = disableColor;
 				}
 			}
-			btn.GetComponent<BoxCollider>().set_enabled(false);
+			btn.GetComponent<BoxCollider>().enabled = false;
 			btn.normalSprite = (btn.pressedSprite = buttonSpriteName[1]);
 			spr.spriteName = frameSpriteName[1];
 			tex.color = disableColor;

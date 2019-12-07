@@ -2,8 +2,7 @@ public class State_Action : State
 {
 	public override void Enter(StateMachine fsm, Brain brain)
 	{
-		EnemyBrain enemyBrain = brain as EnemyBrain;
-		EnemyActionController.ActionInfo nowAction = enemyBrain.actionCtrl.nowAction;
+		EnemyActionController.ActionInfo nowAction = (brain as EnemyBrain).actionCtrl.nowAction;
 		if (nowAction.data.isRotate)
 		{
 			fsm.subFsm.ChangeState(STATE_TYPE.ROTATE);

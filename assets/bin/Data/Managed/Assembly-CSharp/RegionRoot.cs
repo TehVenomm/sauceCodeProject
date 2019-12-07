@@ -17,11 +17,6 @@ public class RegionRoot : MonoBehaviour
 		protected set;
 	}
 
-	public RegionRoot()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		if (subRegionIDs == null)

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
@@ -91,31 +90,31 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 
 	public void Open(string url, Action<string> _onClose = null)
 	{
-		Debug.Log((object)url);
+		Debug.Log(url);
 		onClose = _onClose;
-		webViewObject = this.get_gameObject().AddComponent<WebViewObject>();
-		webViewObject.Init(string.Empty, string.Empty, string.Empty);
+		webViewObject = base.gameObject.AddComponent<WebViewObject>();
+		webViewObject.Init();
 		webViewObject.EvaluateJS("var appVersion='" + NetworkNative.getNativeVersionName() + "';");
 		webViewObject.SetCookie(NetworkManager.APP_HOST, "apv", NetworkNative.getNativeVersionName());
-		if (MonoBehaviourSingleton<AccountManager>.I.account.token != string.Empty)
+		if (MonoBehaviourSingleton<AccountManager>.I.account.token != "")
 		{
 			string[] array = MonoBehaviourSingleton<AccountManager>.I.account.token.Split('=');
 			webViewObject.SetCookie(NetworkManager.APP_HOST, array[0], array[1]);
 		}
-		webViewObject.SetCookie(NetworkManager.APP_HOST, "dm", SystemInfo.get_deviceModel());
+		webViewObject.SetCookie(NetworkManager.APP_HOST, "dm", SystemInfo.deviceModel);
 		webViewObject.LoadURL(url);
 		webViewObject.SetVisibility(v: true);
-		int num = Screen.get_width();
-		int num2 = Screen.get_height();
+		int num = Screen.width;
+		int num2 = Screen.height;
 		if (MonoBehaviourSingleton<AppMain>.IsValid())
 		{
 			num = MonoBehaviourSingleton<AppMain>.I.defaultScreenWidth;
 			num2 = MonoBehaviourSingleton<AppMain>.I.defaultScreenHeight;
 		}
-		int left = (int)((float)num * m_Margine.get_xMin());
-		int top = (int)((float)num2 * m_Margine.get_yMin());
-		int right = (int)((float)num * m_Margine.get_width());
-		int bottom = (int)((float)num2 * m_Margine.get_height());
+		int left = (int)((float)num * m_Margine.xMin);
+		int top = (int)((float)num2 * m_Margine.yMin);
+		int right = (int)((float)num * m_Margine.width);
+		int bottom = (int)((float)num2 * m_Margine.height);
 		if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.NeedModifyWebView)
 		{
 			DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
@@ -137,17 +136,17 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 					top = specialDeviceInfo.WebViewInfoLandscape.top;
 					right = specialDeviceInfo.WebViewInfoLandscape.right;
 					bottom = specialDeviceInfo.WebViewInfoLandscape.bottom;
-					Transform val = Utility.FindChild(this.get_gameObject().get_transform(), "Window");
-					if (val != null)
+					Transform transform = Utility.FindChild(base.gameObject.transform, "Window");
+					if (transform != null)
 					{
-						UIWidget component = val.GetComponent<UIWidget>();
+						UIWidget component = transform.GetComponent<UIWidget>();
 						if (component != null)
 						{
 							component.leftAnchor.absolute = specialDeviceInfo.WebViewInfoAnchorLandscape.left;
 							component.rightAnchor.absolute = specialDeviceInfo.WebViewInfoAnchorLandscape.right;
 							component.bottomAnchor.absolute = specialDeviceInfo.WebViewInfoAnchorLandscape.bottom;
 							component.topAnchor.absolute = specialDeviceInfo.WebViewInfoAnchorLandscape.top;
-							Utility.UpdateAllAnchors(this.get_gameObject());
+							Utility.UpdateAllAnchors(base.gameObject);
 						}
 					}
 					break;
@@ -172,50 +171,52 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 		}
 		if (msg.StartsWith("mailto:"))
 		{
-			Debug.Log((object)("[mailto]:" + msg));
+			Debug.Log("[mailto]:" + msg);
 			Application.OpenURL(msg);
 		}
 		if (msg.StartsWith("browser:"))
 		{
-			string text = msg.Replace("browser:", string.Empty);
-			Debug.Log((object)("[browser]:" + text));
+			string text = msg.Replace("browser:", "");
+			Debug.Log("[browser]:" + text);
 			Application.OpenURL(text);
 		}
 		if (msg.StartsWith("checkPurchase:"))
 		{
-			bool flag = (int.Parse(msg.Replace("checkPurchase:", string.Empty)) == 1) ? true : false;
-			Debug.Log((object)("[checkPurchase]:" + flag));
-			Native.RestorePurchasedItem(flag);
+			bool showErrorDialog = (int.Parse(msg.Replace("checkPurchase:", "")) == 1) ? true : false;
+			Debug.Log("[checkPurchase]:" + showErrorDialog.ToString());
+			Native.RestorePurchasedItem(showErrorDialog);
 		}
 		if (msg.StartsWith("openOpinionBox:"))
 		{
-			Debug.Log((object)"[openOpinionBox]:");
+			Debug.Log("[openOpinionBox]:");
 			Close(msg);
 			MonoBehaviourSingleton<GameSceneManager>.I.OpinionBox();
 		}
 		if (msg.StartsWith("close:"))
 		{
-			Debug.Log((object)"[close]:");
+			Debug.Log("[close]:");
 			Close(msg);
 		}
 		if (msg.StartsWith("movie:"))
 		{
-			string text2 = msg.Replace("movie:", string.Empty);
-			Debug.Log((object)("[movie]:" + text2));
-			switch (text2)
+			string text2 = msg.Replace("movie:", "");
+			Debug.Log("[movie]:" + text2);
+			if (!(text2 == "tutorial"))
 			{
-			case "tutorial":
+				if (text2 == "skill")
+				{
+					webViewObject.onDestroy = delegate
+					{
+						Utility.PlayFullScreenMovie("tutorial_skill.mp4");
+					};
+				}
+			}
+			else
+			{
 				webViewObject.onDestroy = delegate
 				{
 					Utility.PlayFullScreenMovie("tutorial_move.mp4");
 				};
-				break;
-			case "skill":
-				webViewObject.onDestroy = delegate
-				{
-					Utility.PlayFullScreenMovie("tutorial_skill.mp4");
-				};
-				break;
 			}
 			Close(msg);
 		}
@@ -228,183 +229,157 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 
 	public static void ProcessGotoEvent(string msg)
 	{
-		string text = msg.Replace("goto:", string.Empty);
-		string[] array = text.Split('/');
-		string text2 = array[0];
-		string text3 = (array.Length <= 1) ? null : array[1];
-		Debug.Log((object)("[goto]:" + text2 + "/" + text3));
+		string[] array = msg.Replace("goto:", "").Split('/');
+		string text = array[0];
+		string text2 = (array.Length > 1) ? array[1] : null;
+		Debug.Log("[goto]:" + text + "/" + text2);
 		string goingHomeEvent = GameSection.GetGoingHomeEvent();
 		EventData[] array2 = null;
-		if (text2 != null)
+		switch (text)
 		{
-			if (_003C_003Ef__switch_0024mapB == null)
+		case "gacha":
+			array2 = new EventData[1]
 			{
-				Dictionary<string, int> dictionary = new Dictionary<string, int>(13);
-				dictionary.Add("gacha", 0);
-				dictionary.Add("magi_gacha", 1);
-				dictionary.Add("inn", 2);
-				dictionary.Add("quest", 3);
-				dictionary.Add("event_quest", 4);
-				dictionary.Add("gacha_quest", 5);
-				dictionary.Add("explore_quest", 6);
-				dictionary.Add("point_shop", 7);
-				dictionary.Add("bingo", 8);
-				dictionary.Add("arena", 9);
-				dictionary.Add("wave_quest", 10);
-				dictionary.Add("promotion", 11);
-				dictionary.Add("event_trial", 12);
-				_003C_003Ef__switch_0024mapB = dictionary;
-			}
-			if (_003C_003Ef__switch_0024mapB.TryGetValue(text2, out int value))
+				new EventData("MAIN_MENU_SHOP", null)
+			};
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+			return;
+		case "magi_gacha":
+			array2 = new EventData[2]
 			{
-				switch (value)
-				{
-				case 0:
-					array2 = new EventData[1]
-					{
-						new EventData("MAIN_MENU_SHOP", null)
-					};
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
-					return;
-				case 1:
-					array2 = new EventData[2]
-					{
-						new EventData("MAIN_MENU_SHOP", null),
-						new EventData("MAGI_GACHA", null)
-					};
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
-					return;
-				case 2:
-					array2 = new EventData[1]
-					{
-						new EventData("MAIN_MENU_STUDIO", null)
-					};
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
-					return;
-				case 3:
-					array2 = new EventData[2]
-					{
-						new EventData(goingHomeEvent, null),
-						new EventData("QUEST_COUNTER", null)
-					};
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
-					return;
-				case 4:
-				{
-					int result4 = 0;
-					array2 = ((!int.TryParse(text3, out result4)) ? new EventData[2]
-					{
-						new EventData(goingHomeEvent, null),
-						new EventData("TO_EVENT", null)
-					} : new EventData[3]
-					{
-						new EventData(goingHomeEvent, null),
-						new EventData("TO_EVENT", null),
-						new EventData("SELECT", result4)
-					});
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
-					return;
-				}
-				case 5:
-					array2 = new EventData[3]
-					{
-						new EventData(goingHomeEvent, null),
-						new EventData("GACHA_QUEST_COUNTER", null),
-						new EventData("TO_GACHA_QUEST_COUNTER", null)
-					};
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
-					return;
-				case 6:
-				{
-					int result2 = 0;
-					array2 = ((!int.TryParse(text3, out result2)) ? new EventData[2]
-					{
-						new EventData(goingHomeEvent, null),
-						new EventData("EXPLORE", null)
-					} : new EventData[3]
-					{
-						new EventData(goingHomeEvent, null),
-						new EventData("EXPLORE", null),
-						new EventData("SELECT_EXPLORE", result2)
-					});
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
-					return;
-				}
-				case 7:
-					array2 = new EventData[2]
-					{
-						new EventData(goingHomeEvent, null),
-						new EventData("POINT_SHOP_FROM_BUTTON", null)
-					};
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
-					return;
-				case 8:
-					array2 = new EventData[2]
-					{
-						new EventData(goingHomeEvent, null),
-						new EventData("BINGO", true)
-					};
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
-					return;
-				case 9:
-				{
-					EventData eventData = ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level >= 50) ? new EventData("SELECT_ARENA", null) : new EventData("SELECT_DISABLE_ARENA", null);
-					array2 = new EventData[3]
-					{
-						new EventData(goingHomeEvent, null),
-						new EventData("TO_EVENT", null),
-						eventData
-					};
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
-					return;
-				}
-				case 10:
-				{
-					int result3 = 0;
-					array2 = ((!int.TryParse(text3, out result3)) ? new EventData[2]
-					{
-						new EventData(goingHomeEvent, null),
-						new EventData("TO_EVENT", null)
-					} : new EventData[3]
-					{
-						new EventData(goingHomeEvent, null),
-						new EventData("TO_EVENT", null),
-						new EventData("SELECT_WAVE", result3)
-					});
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
-					return;
-				}
-				case 11:
-					array2 = new EventData[2]
-					{
-						new EventData(goingHomeEvent, null),
-						new EventData("FRIEND_PROMOTION", null)
-					};
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
-					return;
-				case 12:
-				{
-					int result = 0;
-					array2 = ((!int.TryParse(text3, out result)) ? new EventData[2]
-					{
-						new EventData(goingHomeEvent, null),
-						new EventData("TO_EVENT", null)
-					} : new EventData[3]
-					{
-						new EventData(goingHomeEvent, null),
-						new EventData("TO_EVENT", null),
-						new EventData("SELECT_TRIAL", result)
-					});
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
-					return;
-				}
-				}
-			}
+				new EventData("MAIN_MENU_SHOP", null),
+				new EventData("MAGI_GACHA", null)
+			};
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+			return;
+		case "inn":
+			array2 = new EventData[1]
+			{
+				new EventData("MAIN_MENU_STUDIO", null)
+			};
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+			return;
+		case "quest":
+			array2 = new EventData[2]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("QUEST_COUNTER", null)
+			};
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+			return;
+		case "event_quest":
+		{
+			int result = 0;
+			array2 = ((!int.TryParse(text2, out result)) ? new EventData[2]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("TO_EVENT", null)
+			} : new EventData[3]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("TO_EVENT", null),
+				new EventData("SELECT", result)
+			});
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+			return;
 		}
-		if (text2.StartsWith("login_bonus:"))
+		case "gacha_quest":
+			array2 = new EventData[3]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("GACHA_QUEST_COUNTER", null),
+				new EventData("TO_GACHA_QUEST_COUNTER", null)
+			};
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+			return;
+		case "explore_quest":
 		{
-			string s = text2.Replace("login_bonus:", string.Empty);
-			int.TryParse(s, out int result5);
+			int result3 = 0;
+			array2 = ((!int.TryParse(text2, out result3)) ? new EventData[2]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("EXPLORE", null)
+			} : new EventData[3]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("EXPLORE", null),
+				new EventData("SELECT_EXPLORE", result3)
+			});
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+			return;
+		}
+		case "point_shop":
+			array2 = new EventData[2]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("POINT_SHOP_FROM_BUTTON", null)
+			};
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+			return;
+		case "bingo":
+			array2 = new EventData[2]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("BINGO", true)
+			};
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+			return;
+		case "arena":
+		{
+			EventData eventData = ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level >= 50) ? new EventData("SELECT_ARENA", null) : new EventData("SELECT_DISABLE_ARENA", null);
+			array2 = new EventData[3]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("TO_EVENT", null),
+				eventData
+			};
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+			return;
+		}
+		case "wave_quest":
+		{
+			int result4 = 0;
+			array2 = ((!int.TryParse(text2, out result4)) ? new EventData[2]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("TO_EVENT", null)
+			} : new EventData[3]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("TO_EVENT", null),
+				new EventData("SELECT_WAVE", result4)
+			});
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+			return;
+		}
+		case "promotion":
+			array2 = new EventData[2]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("FRIEND_PROMOTION", null)
+			};
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+			return;
+		case "event_trial":
+		{
+			int result2 = 0;
+			array2 = ((!int.TryParse(text2, out result2)) ? new EventData[2]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("TO_EVENT", null)
+			} : new EventData[3]
+			{
+				new EventData(goingHomeEvent, null),
+				new EventData("TO_EVENT", null),
+				new EventData("SELECT_TRIAL", result2)
+			});
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+			return;
+		}
+		}
+		if (text.StartsWith("login_bonus:"))
+		{
+			int.TryParse(text.Replace("login_bonus:", ""), out int result5);
 			if (result5 != 0)
 			{
 				array2 = new EventData[2]
@@ -415,16 +390,16 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
 			}
 		}
-		else if (text2.StartsWith("gacha_equip:"))
+		else if (text.StartsWith("gacha_equip:"))
 		{
-			string text4 = text2.Replace("gacha_equip:", string.Empty);
+			string text3 = text.Replace("gacha_equip:", "");
 			int[] array3 = new int[3]
 			{
 				-1,
 				-1,
 				-1
 			};
-			string[] array4 = text4.Split(':');
+			string[] array4 = text3.Split(':');
 			int i = 0;
 			for (int num = array4.Length; i < num; i++)
 			{
@@ -446,7 +421,7 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 
 	public void Close(string result)
 	{
-		Object.Destroy(webViewObject);
+		UnityEngine.Object.Destroy(webViewObject);
 		webViewObject = null;
 		try
 		{
@@ -455,9 +430,9 @@ public class WebViewManager : MonoBehaviourSingleton<WebViewManager>
 				onClose(result);
 			}
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
+			Debug.LogError(message);
 		}
 		finally
 		{

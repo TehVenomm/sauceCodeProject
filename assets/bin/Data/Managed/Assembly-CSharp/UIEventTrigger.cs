@@ -36,19 +36,18 @@ public class UIEventTrigger : MonoBehaviour
 	{
 		get
 		{
-			Collider component = this.GetComponent<Collider>();
+			Collider component = GetComponent<Collider>();
 			if (component != null)
 			{
-				return component.get_enabled();
+				return component.enabled;
 			}
-			Collider2D component2 = this.GetComponent<Collider2D>();
-			return component2 != null && component2.get_enabled();
+			Collider2D component2 = GetComponent<Collider2D>();
+			if (component2 != null)
+			{
+				return component2.enabled;
+			}
+			return false;
 		}
-	}
-
-	public UIEventTrigger()
-		: this()
-	{
 	}
 
 	private void OnHover(bool isOver)

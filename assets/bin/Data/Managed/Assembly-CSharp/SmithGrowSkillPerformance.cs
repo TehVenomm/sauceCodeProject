@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -41,8 +40,8 @@ public class SmithGrowSkillPerformance : GameSection
 		isGreat = (bool)array[1];
 		materials = (array[2] as SkillItemInfo[]);
 		isExceed = (bool)array[3];
-		SetToggle((Enum)UI.TGL_DIRECTION, value: true);
-		this.StartCoroutine(DoInitialize());
+		SetToggle(UI.TGL_DIRECTION, value: true);
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -50,16 +49,16 @@ public class SmithGrowSkillPerformance : GameSection
 		SkillItemInfo skillItemInfo = resultData.itemData as SkillItemInfo;
 		magiLoader = new GameObject("magimodel").AddComponent<ItemLoader>();
 		int wait = 1;
-		magiLoader.LoadSkillItem(skillItemInfo.tableID, magiLoader.get_transform(), magiLoader.get_gameObject().get_layer(), delegate
+		magiLoader.LoadSkillItem(skillItemInfo.tableID, magiLoader.transform, magiLoader.gameObject.layer, delegate
 		{
-			magiLoader.nodeMain.get_gameObject().SetActive(false);
+			magiLoader.nodeMain.gameObject.SetActive(value: false);
 			wait--;
 		});
 		wait++;
 		magiSymbolLoader = new GameObject("magisymbol").AddComponent<ItemLoader>();
-		magiSymbolLoader.LoadSkillItemSymbol(skillItemInfo.tableID, magiSymbolLoader.get_transform(), magiSymbolLoader.get_gameObject().get_layer(), delegate
+		magiSymbolLoader.LoadSkillItemSymbol(skillItemInfo.tableID, magiSymbolLoader.transform, magiSymbolLoader.gameObject.layer, delegate
 		{
-			magiSymbolLoader.nodeMain.get_gameObject().SetActive(false);
+			magiSymbolLoader.nodeMain.gameObject.SetActive(value: false);
 			wait--;
 		});
 		LoadingQueue loadingQueue = new LoadingQueue(this);
@@ -71,9 +70,9 @@ public class SmithGrowSkillPerformance : GameSection
 			materialLoadObjects[i] = loadingQueue.Load(RESOURCE_CATEGORY.ITEM_MODEL, ResourceName.GetSkillItemModel(skillItemData.modelID));
 		}
 		wait++;
-		NPCTable.NPCData npcData = Singleton<NPCTable>.I.GetNPCData(3);
+		NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData(3);
 		GameObject npcRoot = new GameObject("NPC");
-		npcData.LoadModel(npcRoot, need_shadow: false, enable_light_probe: true, delegate
+		nPCData.LoadModel(npcRoot, need_shadow: false, enable_light_probe: true, delegate
 		{
 			wait--;
 		}, useSpecialModel: false);
@@ -83,24 +82,23 @@ public class SmithGrowSkillPerformance : GameSection
 		{
 			yield return null;
 		}
-		Object directionObject = lo_direction.loadedObject;
-		Transform directionTransform = ResourceUtility.Realizes(directionObject, MonoBehaviourSingleton<StageManager>.I.stageObject);
-		GameObject[] materialObjects = (GameObject[])new GameObject[materials.Length];
+		Transform transform = ResourceUtility.Realizes(lo_direction.loadedObject, MonoBehaviourSingleton<StageManager>.I.stageObject);
+		GameObject[] array = new GameObject[materials.Length];
 		for (int j = 0; j < materials.Length; j++)
 		{
 			SkillItemTable.SkillItemData skillItemData2 = Singleton<SkillItemTable>.I.GetSkillItemData(materials[j].tableID);
-			Transform val = ResourceUtility.Realizes(materialLoadObjects[j].loadedObject);
-			PlayerLoader.SetEquipColor(val, skillItemData2.modelColor.ToColor());
-			materialObjects[j] = val.get_gameObject();
+			Transform transform2 = ResourceUtility.Realizes(materialLoadObjects[j].loadedObject);
+			PlayerLoader.SetEquipColor(transform2, skillItemData2.modelColor.ToColor());
+			array[j] = transform2.gameObject;
 		}
-		magiLoader.nodeMain.get_gameObject().SetActive(true);
-		magiSymbolLoader.nodeMain.get_gameObject().SetActive(true);
-		SkillGrowDirector d = directionTransform.GetComponent<SkillGrowDirector>();
-		d.Init();
-		d.SetNPC(npcRoot);
-		d.SetMagiModel(magiLoader.get_gameObject(), magiSymbolLoader.get_gameObject(), materialObjects);
-		d.SetMaterials(materials);
-		director = d;
+		magiLoader.nodeMain.gameObject.SetActive(value: true);
+		magiSymbolLoader.nodeMain.gameObject.SetActive(value: true);
+		SkillGrowDirector component = transform.GetComponent<SkillGrowDirector>();
+		component.Init();
+		component.SetNPC(npcRoot);
+		component.SetMagiModel(magiLoader.gameObject, magiSymbolLoader.gameObject, array);
+		component.SetMaterials(materials);
+		director = component;
 		base.Initialize();
 	}
 
@@ -113,28 +111,28 @@ public class SmithGrowSkillPerformance : GameSection
 	public override void UpdateUI()
 	{
 		SkillItemInfo skillItemInfo = resultData.itemData as SkillItemInfo;
-		SetActive((Enum)UI.OBJ_GREAT, shouldShowGreatEffect);
+		SetActive(UI.OBJ_GREAT, shouldShowGreatEffect);
 		if (shouldShowGreatEffect)
 		{
-			PlayTween((Enum)UI.OBJ_GREAT, forward: true, (EventDelegate.Callback)delegate
+			PlayTween(UI.OBJ_GREAT, forward: true, delegate
 			{
 				DispatchEvent("SKIP");
-			}, is_input_block: false, 0);
+			}, is_input_block: false);
 			SoundManager.PlayOneShotSE(40000066);
 		}
-		SetLabelText((Enum)UI.LBL_GET_EXP, (skillItemInfo.exp - resultData.beforeExp).ToString());
+		SetLabelText(UI.LBL_GET_EXP, (skillItemInfo.exp - resultData.beforeExp).ToString());
 	}
 
 	public override void Exit()
 	{
-		if (Object.op_Implicit(director))
+		if ((bool)director)
 		{
 			director.Reset();
-			Object.Destroy(director.get_gameObject());
+			Object.Destroy(director.gameObject);
 		}
-		if (Object.op_Implicit(magiLoader))
+		if ((bool)magiLoader)
 		{
-			Object.Destroy(magiLoader.get_gameObject());
+			Object.Destroy(magiLoader.gameObject);
 		}
 		base.Exit();
 	}
@@ -164,7 +162,7 @@ public class SmithGrowSkillPerformance : GameSection
 		{
 			shouldShowGreatEffect = true;
 		}
-		SetToggle((Enum)UI.TGL_DIRECTION, value: false);
+		SetToggle(UI.TGL_DIRECTION, value: false);
 		RefreshUI();
 		if (!shouldShowGreatEffect)
 		{

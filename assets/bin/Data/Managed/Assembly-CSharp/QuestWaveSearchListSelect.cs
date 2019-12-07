@@ -62,13 +62,13 @@ public class QuestWaveSearchListSelect : QuestSearchListSelectBase
 	{
 		if (!PartyManager.IsValidNotEmptyList())
 		{
-			SetActive((Enum)UI.GRD_QUEST, is_visible: false);
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_QUEST, is_visible: false);
+			SetActive(UI.STR_NON_LIST, is_visible: true);
 			return;
 		}
 		PartyModel.Party[] partys = MonoBehaviourSingleton<PartyManager>.I.partys.ToArray();
-		SetActive((Enum)UI.GRD_QUEST, is_visible: true);
-		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		SetActive(UI.GRD_QUEST, is_visible: true);
+		SetActive(UI.STR_NON_LIST, is_visible: false);
 		SetGrid(UI.GRD_QUEST, "QuestWaveSearchListSelectItem", partys.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
 			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)partys[i].quest.questId);
@@ -95,7 +95,7 @@ public class QuestWaveSearchListSelect : QuestSearchListSelectBase
 		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
 		if (enemyData != null)
 		{
-			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, questData.rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element);
+			ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, questData.rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element);
 		}
 	}
 

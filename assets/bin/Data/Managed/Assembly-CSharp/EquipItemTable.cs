@@ -1,7 +1,6 @@
 using Network;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
@@ -46,7 +45,7 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 	{
 		public class Obtained
 		{
-			public string category = string.Empty;
+			public string category = "";
 
 			public int flag = -1;
 
@@ -86,8 +85,7 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 					int i = 0;
 					for (int length = text.Length; i < length; i++)
 					{
-						char c = text[i];
-						int num2 = c - 65;
+						int num2 = text[i] - 65;
 						int num3 = length - i;
 						if (num3 > 0)
 						{
@@ -248,7 +246,7 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 				array[i] = _skillSlot[i];
 			}
 			EquipItemExceedParamTable.EquipItemExceedParamAll equipItemExceedParamAll = Singleton<EquipItemExceedParamTable>.I.GetEquipItemExceedParamAll(exceedID, (uint)exceed_cnt);
-			if (equipItemExceedParamAll != null && equipItemExceedParamAll.skillSlot.Length > 0)
+			if (equipItemExceedParamAll != null && equipItemExceedParamAll.skillSlot.Length != 0)
 			{
 				Array.Resize(ref array, num + equipItemExceedParamAll.skillSlot.Length);
 				for (int j = 0; j < equipItemExceedParamAll.skillSlot.Length; j++)
@@ -298,18 +296,25 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 
 		public bool IsWeapon()
 		{
-			return type >= EQUIPMENT_TYPE.ONE_HAND_SWORD && type <= EQUIPMENT_TYPE.ARROW;
+			if (type >= EQUIPMENT_TYPE.ONE_HAND_SWORD)
+			{
+				return type <= EQUIPMENT_TYPE.ARROW;
+			}
+			return false;
 		}
 
 		public bool IsVisual()
 		{
-			return type >= EQUIPMENT_TYPE.VISUAL_ARMOR && type <= EQUIPMENT_TYPE.VISUAL_LEG;
+			if (type >= EQUIPMENT_TYPE.VISUAL_ARMOR)
+			{
+				return type <= EQUIPMENT_TYPE.VISUAL_LEG;
+			}
+			return false;
 		}
 
 		public bool IsEvolve()
 		{
-			bool? flag = isEvolve;
-			if (!flag.HasValue)
+			if (!isEvolve.HasValue)
 			{
 				isEvolve = (GetEvolveTable() != null);
 			}
@@ -366,8 +371,11 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 
 		public bool IsRevertable()
 		{
-			ItemTable.ItemData rootLithograph = GetRootLithograph();
-			return rootLithograph != null && getType == GET_TYPE.PAY;
+			if (GetRootLithograph() != null)
+			{
+				return getType == GET_TYPE.PAY;
+			}
+			return false;
 		}
 
 		public ItemTable.ItemData GetRootLithograph()
@@ -381,8 +389,7 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 			int num = rootMaterials.Length;
 			for (int j = 0; j < num; j++)
 			{
-				NeedMaterial needMaterial = rootMaterials[j];
-				uint itemID = needMaterial.itemID;
+				uint itemID = rootMaterials[j].itemID;
 				ItemTable.ItemData itemData = i.GetItemData(itemID);
 				if (itemData.type == ITEM_TYPE.LITHOGRAPH)
 				{
@@ -394,8 +401,7 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 
 		public NeedMaterial[] GetRootMaterials()
 		{
-			EquipItemData rootEquipTable = GetRootEquipTable();
-			uint equipId = rootEquipTable.id;
+			uint equipId = GetRootEquipTable().id;
 			return Singleton<CreateEquipItemTable>.I.GetCreateItemDataByEquipItem(equipId)?.needMaterial;
 		}
 
@@ -541,15 +547,27 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 				EquipItemExceedParamTable.EquipItemExceedParamAll exceedParam = GetExceedParam((uint)exceed_cnt);
 				if (exceedParam != null)
 				{
-					return (ELEMENT_TYPE)((!flag) ? exceedParam.GetElemDefType(defElement) : exceedParam.GetElemAtkType(atkElement));
+					if (!flag)
+					{
+						return (ELEMENT_TYPE)exceedParam.GetElemDefType(defElement);
+					}
+					return (ELEMENT_TYPE)exceedParam.GetElemAtkType(atkElement);
 				}
 			}
-			return (ELEMENT_TYPE)((!flag) ? GetElemDefType() : GetElemAtkType());
+			if (!flag)
+			{
+				return (ELEMENT_TYPE)GetElemDefType();
+			}
+			return (ELEMENT_TYPE)GetElemAtkType();
 		}
 
 		public ELEMENT_TYPE GetTargetElementPriorityToTable()
 		{
-			return (ELEMENT_TYPE)((!IsWeapon()) ? GetElemDefTypePriorityToTable() : GetElemAtkTypePriorityToTable());
+			if (!IsWeapon())
+			{
+				return (ELEMENT_TYPE)GetElemDefTypePriorityToTable();
+			}
+			return (ELEMENT_TYPE)GetElemAtkTypePriorityToTable();
 		}
 
 		public void GetMaxAtk(out int _atk, out int _elem_atk, out ELEMENT_TYPE _element)
@@ -595,7 +613,11 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 
 		public bool CanCollecting()
 		{
-			return obtained.category.Length > 0 && obtained.flag >= 0 && obtained.flag < 64 && !IsShadow();
+			if (obtained.category.Length > 0 && obtained.flag >= 0 && obtained.flag < 64)
+			{
+				return !IsShadow();
+			}
+			return false;
 		}
 
 		public EquipItemExceedParamTable.EquipItemExceedParamAll GetExceedParam(uint exceed)
@@ -605,12 +627,6 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 
 		public static bool cb(CSVReader csv_reader, EquipItemData data, ref uint key)
 		{
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
 			data.id = key;
 			csv_reader.Pop(ref data.appVer);
 			csv_reader.Pop(ref data.type);
@@ -628,7 +644,7 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 			{
 				num = (int)Enum.Parse(typeof(ELEMENT_TYPE), value);
 			}
-			if (!(bool)csv_reader.PopColor24(ref data.modelColor0))
+			if (!csv_reader.PopColor24(ref data.modelColor0))
 			{
 				if (num != -1)
 				{
@@ -640,7 +656,7 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 				}
 			}
 			csv_reader.PopColor24(ref data.modelColor1);
-			if (!(bool)csv_reader.PopColor24(ref data.modelColor2))
+			if (!csv_reader.PopColor24(ref data.modelColor2))
 			{
 				if (num != -1)
 				{
@@ -654,7 +670,7 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 			csv_reader.Pop(ref data.effectID);
 			data.effectParam = 1f;
 			csv_reader.Pop(ref data.effectParam);
-			if (!(bool)csv_reader.PopColor24(ref data.effectColor))
+			if (!csv_reader.PopColor24(ref data.effectColor))
 			{
 				if (num != -1)
 				{
@@ -738,10 +754,10 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 			}
 			csv_reader.Pop(ref data.sale);
 			csv_reader.Pop(ref data.listId);
-			string value4 = string.Empty;
+			string value4 = "";
 			csv_reader.Pop(ref value4);
 			data.obtained = new Obtained(value4);
-			if (!(bool)csv_reader.Pop(ref data.damageDistanceId))
+			if (!csv_reader.Pop(ref data.damageDistanceId))
 			{
 				if (data.type == EQUIPMENT_TYPE.ARROW)
 				{
@@ -779,15 +795,6 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 
 	private List<EquipItemData> equipList;
 
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<EquipItemData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<EquipItemData> _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<EquipItemData> _003C_003Ef__mg_0024cache2;
-
 	public void CreateTable(string csv_table)
 	{
 		equipItemTable = TableUtility.CreateUIntKeyTable<EquipItemData>(csv_table, EquipItemData.cb, "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId,exAttackType");
@@ -806,12 +813,20 @@ public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 
 	public bool IsWeapon(EQUIPMENT_TYPE type)
 	{
-		return type >= EQUIPMENT_TYPE.ONE_HAND_SWORD && type <= EQUIPMENT_TYPE.ARROW;
+		if (type >= EQUIPMENT_TYPE.ONE_HAND_SWORD)
+		{
+			return type <= EQUIPMENT_TYPE.ARROW;
+		}
+		return false;
 	}
 
 	public bool IsVisual(EQUIPMENT_TYPE type)
 	{
-		return type >= EQUIPMENT_TYPE.VISUAL_ARMOR && type <= EQUIPMENT_TYPE.VISUAL_LEG;
+		if (type >= EQUIPMENT_TYPE.VISUAL_ARMOR)
+		{
+			return type <= EQUIPMENT_TYPE.VISUAL_LEG;
+		}
+		return false;
 	}
 
 	public void CreateTableForEquipList()

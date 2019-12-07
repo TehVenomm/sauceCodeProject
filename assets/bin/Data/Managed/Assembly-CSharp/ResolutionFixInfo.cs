@@ -31,7 +31,7 @@ public class ResolutionFixInfo
 
 	public string Note;
 
-	public string Path = string.Empty;
+	public string Path = "";
 
 	public bool IsLockMyObj;
 
@@ -59,7 +59,7 @@ public class ResolutionFixInfo
 		{
 			if (PanelFix != null)
 			{
-				return Object.op_Implicit(PanelFix.GetComponent<FixedPanelNGUI>());
+				return PanelFix.GetComponent<FixedPanelNGUI>();
 			}
 			return false;
 		}

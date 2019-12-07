@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class EnemyTable : Singleton<EnemyTable>, IDataTable
 {
@@ -116,15 +115,6 @@ public class EnemyTable : Singleton<EnemyTable>, IDataTable
 
 	private UIntKeyTable<EnemyData> enemyTable;
 
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<EnemyData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<EnemyData> _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<EnemyData> _003C_003Ef__mg_0024cache2;
-
 	public void CreateTable(string csv_text)
 	{
 		enemyTable = TableUtility.CreateUIntKeyTable<EnemyData>(csv_text, EnemyData.cb, "id,enemyCollectionId,appVer,name,type,enemySpecies,lv,actionId,iconID,modelID,animID,modelScale,baseEffectName,baseEffectNode,active,element,weakElement,hp,atk,convertRegionKey,aimMarkerRate,effectEnemyKey,personality,growId,weatherChangeEffect,exActionId,exActionCondition,exActionConditionValue");
@@ -182,5 +172,20 @@ public class EnemyTable : Singleton<EnemyTable>, IDataTable
 			return string.Empty;
 		}
 		return enemyData.name;
+	}
+
+	public bool IsAvailable()
+	{
+		return enemyTable != null;
+	}
+
+	public List<EnemyData> GetAllEnemyDatas()
+	{
+		List<EnemyData> datas = new List<EnemyData>();
+		enemyTable.ForEach(delegate(EnemyData data)
+		{
+			datas.Add(data);
+		});
+		return datas;
 	}
 }

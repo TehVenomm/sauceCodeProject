@@ -52,17 +52,12 @@ public class ChatWebSocketConnection : MonoBehaviour, IChatConnection
 
 	public event ChatRoom.OnDisconnect onDisconnect;
 
-	public ChatWebSocketConnection()
-		: this()
-	{
-	}
-
 	public void Setup(string host, int port, string path, bool autoReconnect = true)
 	{
 		UriBuilder uriBuilder = new UriBuilder("ws", host, port, path);
 		uri = uriBuilder.Uri.ToString();
 		this.autoReconnect = autoReconnect;
-		chatWebSocket = (Utility.CreateGameObjectAndComponent("ChatWebSocket", this.get_transform()) as ChatWebSocket);
+		chatWebSocket = (Utility.CreateGameObjectAndComponent("ChatWebSocket", base.transform) as ChatWebSocket);
 	}
 
 	private void OnWebSocketClosed()
@@ -83,12 +78,12 @@ public class ChatWebSocketConnection : MonoBehaviour, IChatConnection
 	private void Reconnect(int count)
 	{
 		reconnecting = true;
-		this.StartCoroutine(TryReconnect(count));
+		StartCoroutine(TryReconnect(count));
 	}
 
 	private IEnumerator TryReconnect(int count)
 	{
-		for (float time = RECONNECT_WAIT_SEC * (float)(RECONNECT_RETRY_LIMIT - count + 1); time > 0f; time -= Time.get_deltaTime())
+		for (float time = RECONNECT_WAIT_SEC * (float)(RECONNECT_RETRY_LIMIT - count + 1); time > 0f; time -= Time.deltaTime)
 		{
 			yield return null;
 		}
@@ -125,11 +120,11 @@ public class ChatWebSocketConnection : MonoBehaviour, IChatConnection
 		}
 		if (isConnectProcessing)
 		{
-			this.StartCoroutine(WaitConnectProcess(onFinished));
+			StartCoroutine(WaitConnectProcess(onFinished));
 			return;
 		}
 		chatWebSocket.ReceivePacketAction = OnReceivePacket;
-		m_ConnectProcess = this.StartCoroutine(ConnectProcess(onFinished));
+		m_ConnectProcess = StartCoroutine(ConnectProcess(onFinished));
 	}
 
 	public void Disconnect(Action onFinished = null)
@@ -143,7 +138,7 @@ public class ChatWebSocketConnection : MonoBehaviour, IChatConnection
 			joined = false;
 			if ((onFinished != null || this.onDisconnect != null) && !AppMain.isApplicationQuit)
 			{
-				this.StartCoroutine(WaitClose(onFinished));
+				StartCoroutine(WaitClose(onFinished));
 			}
 		}
 		else
@@ -332,7 +327,23 @@ public class ChatWebSocketConnection : MonoBehaviour, IChatConnection
 			}
 			break;
 		}
+		case CHAT_PACKET_TYPE.TRADING_POST_SOLD:
+		{
+			Log.Error("Recv : TradingPostSoldModel");
+			Debug.Log("Recv : TradingPostSoldModel");
+			TradingPostSoldModel tradingPostSoldModel = packet.model as TradingPostSoldModel;
+			if (tradingPostSoldModel != null)
+			{
+				OnReceiveTradingPostSold(tradingPostSoldModel);
+			}
+			else
+			{
+				Log.Error("Failed parse: TradingPostSoldModel");
+			}
+			break;
 		}
+		}
+		Debug.Log("Recv Pack " + (int)packet.model.packetType);
 	}
 
 	private void OnJoin(ChatPacket packet)
@@ -371,12 +382,12 @@ public class ChatWebSocketConnection : MonoBehaviour, IChatConnection
 			int.TryParse(s, out result2);
 			if (this.onReceiveStamp != null)
 			{
-				this.onReceiveStamp(result, packet.SenderName, result2, string.Empty);
+				this.onReceiveStamp(result, packet.SenderName, result2, "");
 			}
 		}
 		else if (this.onReceiveText != null)
 		{
-			this.onReceiveText(result, packet.SenderName, packet.Message, string.Empty);
+			this.onReceiveText(result, packet.SenderName, packet.Message, "");
 		}
 	}
 
@@ -436,6 +447,23 @@ public class ChatWebSocketConnection : MonoBehaviour, IChatConnection
 		MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_DARK_MARKET);
 	}
 
+	private void OnReceiveTradingPostSold(TradingPostSoldModel packet)
+	{
+		string soldNum = packet.soldNum;
+		MonoBehaviourSingleton<TradingPostManager>.I.UpdateTradingPostSoldCount(1);
+		MonoBehaviourSingleton<TradingPostManager>.I.SetTradingPostLastSold(soldNum);
+		MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_TRADING_POST_SOLD);
+	}
+
+	private void OnReceiveTradingPostSold(int soldNum)
+	{
+		if (soldNum != 0)
+		{
+			MonoBehaviourSingleton<TradingPostManager>.I.UpdateTradingPostSoldCount(soldNum);
+		}
+		MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_TRADING_POST_SOLD);
+	}
+
 	private IEnumerator ConnectProcess(Action<bool> onFinished)
 	{
 		if (!MonoBehaviourSingleton<UserInfoManager>.IsValid())
@@ -444,12 +472,12 @@ public class ChatWebSocketConnection : MonoBehaviour, IChatConnection
 			yield break;
 		}
 		isConnectProcessing = true;
-		string fromId = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id.ToString();
-		chatWebSocket.Connect(uri, fromId, 0);
+		string from_id = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id.ToString();
+		chatWebSocket.Connect(uri, from_id, 0);
 		float waitTimeRest = CONNECTION_TRY_TIMEOUT;
 		while (!chatWebSocket.IsConnected() && chatWebSocket.CurrentConnectionStatus != ChatWebSocket.CONNECTION_STATUS.ERROR && waitTimeRest > 0f)
 		{
-			waitTimeRest -= Time.get_deltaTime();
+			waitTimeRest -= Time.deltaTime;
 			yield return null;
 		}
 		m_ConnectProcess = null;
@@ -475,7 +503,7 @@ public class ChatWebSocketConnection : MonoBehaviour, IChatConnection
 	{
 		if (m_ConnectProcess != null)
 		{
-			this.StopCoroutine(m_ConnectProcess);
+			StopCoroutine(m_ConnectProcess);
 		}
 		m_ConnectProcess = null;
 		isConnectProcessing = false;
@@ -486,8 +514,7 @@ public class ChatWebSocketConnection : MonoBehaviour, IChatConnection
 		int result = -1;
 		if (msg.Contains(STAMP_SYMBOL_BEGIN))
 		{
-			string s = msg.Substring(STAMP_SYMBOL_BEGIN.Length, 8);
-			int.TryParse(s, out result);
+			int.TryParse(msg.Substring(STAMP_SYMBOL_BEGIN.Length, 8), out result);
 		}
 		return result;
 	}
@@ -495,9 +522,9 @@ public class ChatWebSocketConnection : MonoBehaviour, IChatConnection
 	private void OnDestroy()
 	{
 		Disconnect();
-		if (Object.op_Implicit(chatWebSocket))
+		if ((bool)chatWebSocket)
 		{
-			Object.Destroy(chatWebSocket.get_gameObject());
+			UnityEngine.Object.Destroy(chatWebSocket.gameObject);
 		}
 	}
 

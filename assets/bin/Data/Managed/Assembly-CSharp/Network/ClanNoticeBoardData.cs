@@ -2,15 +2,15 @@ namespace Network
 {
 	public class ClanNoticeBoardData
 	{
-		public string clanId = string.Empty;
+		public string clanId = "";
 
-		public string contributorUserId = string.Empty;
+		public string contributorUserId = "";
 
-		public string contributorUserName = string.Empty;
+		public string contributorUserName = "";
 
 		public int version = -1;
 
-		public string body = string.Empty;
+		public string body = "";
 
 		public EndDate updatedAt;
 

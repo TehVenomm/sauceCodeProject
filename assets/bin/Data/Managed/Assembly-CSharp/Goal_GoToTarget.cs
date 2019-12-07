@@ -4,7 +4,7 @@ public class Goal_GoToTarget : GoalComposite
 {
 	private const float FAULT_LENGTH = 3f;
 
-	private Vector3 targetPos = Vector3.get_zero();
+	private Vector3 targetPos = Vector3.zero;
 
 	protected override GOAL_TYPE GetGoalType()
 	{
@@ -13,15 +13,6 @@ public class Goal_GoToTarget : GoalComposite
 
 	protected override void Activate(Brain brain)
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
 		SetStatus(STATUS.ACTIVE);
 		if (!brain.targetCtrl.IsAliveTarget())
 		{
@@ -33,8 +24,7 @@ public class Goal_GoToTarget : GoalComposite
 		if (!brain.moveCtrl.CanSeekToOpponent(targetPos, num))
 		{
 			PLACE place = Utility.Coin() ? PLACE.RIGHT : PLACE.LEFT;
-			RaycastHit seekHit = brain.moveCtrl.seekHit;
-			Vector3 position = seekHit.get_transform().get_position();
+			Vector3 position = brain.moveCtrl.seekHit.transform.position;
 			AddSubGoal<Goal_MoveToAround>().SetParam(place, position, num);
 		}
 		else if (!brain.targetCtrl.IsArrivalAttackPosition())
@@ -49,7 +39,6 @@ public class Goal_GoToTarget : GoalComposite
 
 	protected override STATUS Process(Brain brain)
 	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 		STATUS status = UpdateSubGoals(brain);
 		SetStatus(status);
 		if (!brain.targetCtrl.IsAliveTarget())
@@ -69,7 +58,6 @@ public class Goal_GoToTarget : GoalComposite
 
 	public override string ToStringGoal()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		string str = $" target={targetPos}";
 		return base.ToStringGoal() + str;
 	}

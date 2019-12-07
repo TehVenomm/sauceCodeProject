@@ -50,19 +50,15 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 	protected override void Awake()
 	{
 		base.Awake();
-		packetReceiver = this.get_gameObject().AddComponent<CoopNetworkPacketReceiver>();
+		packetReceiver = base.gameObject.AddComponent<CoopNetworkPacketReceiver>();
 	}
 
 	private void Update()
 	{
 		packetReceiver.OnUpdate();
-		if (CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected())
+		if (CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected() && Time.time - MonoBehaviourSingleton<KtbWebSocket>.I.packetSendTime >= 20f)
 		{
-			float num = Time.get_time() - MonoBehaviourSingleton<KtbWebSocket>.I.packetSendTime;
-			if (num >= 20f)
-			{
-				Alive();
-			}
+			Alive();
 		}
 	}
 
@@ -80,9 +76,7 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 
 	private void Logd(string str, params object[] objs)
 	{
-		if (!Log.enabled)
-		{
-		}
+		_ = Log.enabled;
 	}
 
 	public void SetRegisterSID(int sid)
@@ -96,19 +90,20 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 
 	private string GetRelayServerPath(string path, int port)
 	{
-		UriBuilder uriBuilder = new UriBuilder(path);
-		uriBuilder.Port = port;
-		return uriBuilder.Uri.ToString();
+		return new UriBuilder(path)
+		{
+			Port = port
+		}.Uri.ToString();
 	}
 
 	public void Connect(ConnectData conn_data, Action<bool> call_back)
 	{
-		this.StartCoroutine(RequestCoroutineConnect(conn_data, call_back));
+		StartCoroutine(RequestCoroutineConnect(conn_data, call_back));
 	}
 
 	private IEnumerator RequestCoroutineConnect(ConnectData conn_data, Action<bool> call_back)
 	{
-		yield return this.StartCoroutine(RequestCoroutineClose(1000));
+		yield return StartCoroutine(RequestCoroutineClose(1000));
 		if (string.IsNullOrEmpty(conn_data.path))
 		{
 			Logd("Connect fail. nothing connection path...");
@@ -124,13 +119,13 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 		foreach (int port in conn_data.ports)
 		{
 			float timeoutTimer = 15f;
-			string connectPath = GetRelayServerPath(conn_data.path, port);
-			Logd("Connect. path={0}", connectPath);
-			MonoBehaviourSingleton<KtbWebSocket>.I.Connect(connectPath, conn_data.fromId, conn_data.ackPrefix);
+			string relayServerPath = GetRelayServerPath(conn_data.path, port);
+			Logd("Connect. path={0}", relayServerPath);
+			MonoBehaviourSingleton<KtbWebSocket>.I.Connect(relayServerPath, conn_data.fromId, conn_data.ackPrefix);
 			while (!MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected() && 0f < timeoutTimer && MonoBehaviourSingleton<KtbWebSocket>.I.CurrentConnectionStatus != CoopWebSocketSingleton<KtbWebSocket>.CONNECTION_STATUS.ERROR)
 			{
-				timeoutTimer -= Time.get_deltaTime();
-				yield return (object)new WaitForEndOfFrame();
+				timeoutTimer -= Time.deltaTime;
+				yield return new WaitForEndOfFrame();
 			}
 			if (MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected())
 			{
@@ -145,7 +140,7 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 	public void Close(ushort code = 1000, string msg = "Bye!", Action call_back = null)
 	{
 		Logd("Close.");
-		this.StartCoroutine(RequestCoroutineClose(code, msg, call_back));
+		StartCoroutine(RequestCoroutineClose(code, msg, call_back));
 	}
 
 	private IEnumerator RequestCoroutineClose(ushort code = 1000, string msg = "Bye!", Action call_back = null)
@@ -155,7 +150,7 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 			MonoBehaviourSingleton<KtbWebSocket>.I.Close(code, msg);
 			while (MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected())
 			{
-				yield return (object)new WaitForEndOfFrame();
+				yield return new WaitForEndOfFrame();
 			}
 		}
 		Clear();
@@ -335,7 +330,7 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 	{
 		if (sendId > 0)
 		{
-			this.StartCoroutine(CoroutineSyncSend(sendId));
+			StartCoroutine(CoroutineSyncSend(sendId));
 		}
 	}
 
@@ -344,7 +339,7 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 		while (!MonoBehaviourSingleton<KtbWebSocket>.I.IsCompleteSend(id) && MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected())
 		{
 			Logd("Sync send. id={0}", id);
-			yield return (object)new WaitForEndOfFrame();
+			yield return new WaitForEndOfFrame();
 		}
 	}
 
@@ -474,13 +469,14 @@ public class CoopNetworkManager : MonoBehaviourSingleton<CoopNetworkManager>
 
 	public static CoopPacket CreateLoopBackRoomLeavedPacket()
 	{
-		Coop_Model_RoomLeaved coop_Model_RoomLeaved = new Coop_Model_RoomLeaved();
-		coop_Model_RoomLeaved.id = 1000;
-		coop_Model_RoomLeaved.cid = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId;
-		coop_Model_RoomLeaved.token = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.userToken;
-		coop_Model_RoomLeaved.stgid = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.stageId;
-		coop_Model_RoomLeaved.stghostid = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId;
-		return CoopPacket.Create(coop_Model_RoomLeaved, -1000, -2000, promise: false, -8989);
+		return CoopPacket.Create(new Coop_Model_RoomLeaved
+		{
+			id = 1000,
+			cid = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId,
+			token = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.userToken,
+			stgid = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.stageId,
+			stghostid = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId
+		}, -1000, -2000, promise: false, -8989);
 	}
 
 	public void LoopBackRoomLeave(bool is_force = false)

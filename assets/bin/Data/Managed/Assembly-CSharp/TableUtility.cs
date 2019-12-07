@@ -73,7 +73,7 @@ public class TableUtility
 		while (cSVReader.NextLine())
 		{
 			string value = string.Empty;
-			if (!(bool)cSVReader.Pop(ref value))
+			if (!cSVReader.Pop(ref value))
 			{
 				continue;
 			}
@@ -85,7 +85,7 @@ public class TableUtility
 				{
 					return false;
 				}
-				bool flag = !table.Add(key, val);
+				table.Add(key, val);
 			}
 			if (progress != null)
 			{
@@ -415,7 +415,7 @@ public class TableUtility
 		if (!string.IsNullOrEmpty(buff))
 		{
 			string[] array2 = buff.Split(charSeparators, StringSplitOptions.RemoveEmptyEntries);
-			if (array2 != null && array2.Length > 0)
+			if (array2 != null && array2.Length != 0)
 			{
 				array = new int[array2.Length];
 				for (int i = 0; i < array2.Length; i++)

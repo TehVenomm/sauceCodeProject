@@ -21,41 +21,35 @@ namespace MsgPack
 
 		protected override Quaternion UnpackFromCore(Unpacker unpacker)
 		{
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			if (!unpacker.get_IsArrayHeader())
+			if (!unpacker.IsArrayHeader)
 			{
 				throw SerializationExceptions.NewIsNotArrayHeader();
 			}
-			int itemsCount = UnpackHelpers.GetItemsCount(unpacker);
-			if (itemsCount != 4)
+			if (UnpackHelpers.GetItemsCount(unpacker) != 4)
 			{
 				throw SerializationExceptions.NewIsNotArrayHeader();
 			}
-			if (!unpacker.get_IsArrayHeader())
+			if (!unpacker.IsArrayHeader)
 			{
 				throw SerializationExceptions.NewIsNotArrayHeader();
 			}
-			float num = default(float);
-			if (!unpacker.ReadSingle(ref num))
+			if (!unpacker.ReadSingle(out float result))
 			{
 				throw SerializationExceptions.NewMissingItem(0);
 			}
-			float num2 = default(float);
-			if (!unpacker.ReadSingle(ref num2))
+			if (!unpacker.ReadSingle(out float result2))
 			{
 				throw SerializationExceptions.NewMissingItem(1);
 			}
-			float num3 = default(float);
-			if (!unpacker.ReadSingle(ref num3))
+			if (!unpacker.ReadSingle(out float result3))
 			{
 				throw SerializationExceptions.NewMissingItem(2);
 			}
-			float num4 = default(float);
-			if (!unpacker.ReadSingle(ref num4))
+			if (!unpacker.ReadSingle(out float result4))
 			{
 				throw SerializationExceptions.NewMissingItem(2);
 			}
-			return new Quaternion(num, num2, num3, num4);
+			return new Quaternion(result, result2, result3, result4);
 		}
 	}
 }

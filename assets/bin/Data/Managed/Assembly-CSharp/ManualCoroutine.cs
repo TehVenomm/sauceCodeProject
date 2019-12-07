@@ -73,7 +73,7 @@ public class ManualCoroutine
 	{
 		while (true)
 		{
-			if (instance == null || !active || !mono.get_enabled())
+			if (instance == null || !active || !mono.enabled)
 			{
 				yield return null;
 				continue;

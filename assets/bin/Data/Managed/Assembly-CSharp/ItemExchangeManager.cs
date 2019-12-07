@@ -17,7 +17,11 @@ public class ItemExchangeManager : MonoBehaviourSingleton<ItemExchangeManager>
 
 	public bool IsExchangeScene()
 	{
-		return MonoBehaviourSingleton<GameSceneManager>.I.ExistHistory("ItemStorageTop") || MonoBehaviourSingleton<GameSceneManager>.I.ExistHistory("ItemStorageSell");
+		if (!MonoBehaviourSingleton<GameSceneManager>.I.ExistHistory("ItemStorageTop"))
+		{
+			return MonoBehaviourSingleton<GameSceneManager>.I.ExistHistory("ItemStorageSell");
+		}
+		return true;
 	}
 
 	public void SendInventorySellItem(List<string> uids, List<int> nums, Action<bool> call_back)
@@ -33,7 +37,7 @@ public class ItemExchangeManager : MonoBehaviourSingleton<ItemExchangeManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInventorySellEquipItem(List<string> uids, Action<bool> call_back)
@@ -48,7 +52,7 @@ public class ItemExchangeManager : MonoBehaviourSingleton<ItemExchangeManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInventorySellSkillItem(List<string> uids, Action<bool> call_back)
@@ -77,7 +81,7 @@ public class ItemExchangeManager : MonoBehaviourSingleton<ItemExchangeManager>
 				}
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendSellQuest(List<string> uids, List<int> nums, Action<bool, SellQuestItemReward, List<uint>> call_back)
@@ -125,7 +129,7 @@ public class ItemExchangeManager : MonoBehaviourSingleton<ItemExchangeManager>
 				});
 			}
 			call_back(arg, ret.result.reward, is_nothing_remains_quest);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInventorySellAbilityItem(List<string> uids, Action<bool> call_back)
@@ -137,7 +141,7 @@ public class ItemExchangeManager : MonoBehaviourSingleton<ItemExchangeManager>
 		{
 			ulong uniq_id = ulong.Parse(str_uniq_id);
 			AbilityItemInfo abilityItem = MonoBehaviourSingleton<InventoryManager>.I.GetAbilityItem(uniq_id);
-			if (abilityItem != null && abilityItem.equipUniqueId != 0)
+			if (abilityItem != null && abilityItem.equipUniqueId != 0L)
 			{
 				is_attach = true;
 			}
@@ -154,6 +158,6 @@ public class ItemExchangeManager : MonoBehaviourSingleton<ItemExchangeManager>
 				}
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 }

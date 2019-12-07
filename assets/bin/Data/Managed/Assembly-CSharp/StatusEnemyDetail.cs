@@ -140,7 +140,7 @@ public class StatusEnemyDetail : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	public IEnumerator DoInitialize()
@@ -173,13 +173,14 @@ public class StatusEnemyDetail : GameSection
 		enemyCollectionData = Singleton<EnemyCollectionTable>.I.GetEnemyCollectionData(enemyCollectionId);
 		regionData = Singleton<RegionTable>.I.GetData(enemyCollectionData.regionId);
 		achievementCounter = MonoBehaviourSingleton<AchievementManager>.I.monsterCollectionList;
-		SetText((Enum)UI.STR_TOTAL_DEFEAT_TITLE, "TOTAL_DEFEAT");
-		SetLabelText(text: string.Format(base.sectionData.GetText("AREA_DEFEAT"), regionData.regionName), label_enum: UI.STR_FIELD_DEFEAT_TITLE);
-		SetText((Enum)UI.STR_FLAVOR_TITLE, "FLAVOR_TITLE");
-		SetText((Enum)UI.STR_BREAK_REWARD_TITLE, "BREAK_REWARD_TITLE");
-		SetText((Enum)UI.STR_REWARD_TITLE, "DEFEAT_REWARD_TITLE");
+		SetText(UI.STR_TOTAL_DEFEAT_TITLE, "TOTAL_DEFEAT");
+		string text = string.Format(base.sectionData.GetText("AREA_DEFEAT"), regionData.regionName);
+		SetLabelText(UI.STR_FIELD_DEFEAT_TITLE, text);
+		SetText(UI.STR_FLAVOR_TITLE, "FLAVOR_TITLE");
+		SetText(UI.STR_BREAK_REWARD_TITLE, "BREAK_REWARD_TITLE");
+		SetText(UI.STR_REWARD_TITLE, "DEFEAT_REWARD_TITLE");
 		OnQuery_TO_FRONT();
-		string foundationName = string.Empty;
+		string text2 = "";
 		popMapIds = new List<uint>();
 		if (enemyCollectionData.collectionType == COLLECTION_TYPE.NORMAL)
 		{
@@ -190,17 +191,16 @@ public class StatusEnemyDetail : GameSection
 				if (fieldMapData != null)
 				{
 					popMapIds.AddRange(Singleton<FieldMapTable>.I.GetTargetEnemyPopMapIDs(item.id));
-					if (string.IsNullOrEmpty(foundationName))
+					if (string.IsNullOrEmpty(text2))
 					{
-						foundationName = ResourceName.GetFoundationName(fieldMapData.stageName);
+						text2 = ResourceName.GetFoundationName(fieldMapData.stageName);
 					}
 				}
 			}
 		}
 		else
 		{
-			List<EnemyTable.EnemyData> enemyDataByEnemyCollectionId = Singleton<EnemyTable>.I.GetEnemyDataByEnemyCollectionId(enemyCollectionId);
-			foreach (EnemyTable.EnemyData item2 in enemyDataByEnemyCollectionId)
+			foreach (EnemyTable.EnemyData item2 in Singleton<EnemyTable>.I.GetEnemyDataByEnemyCollectionId(enemyCollectionId))
 			{
 				IEnumerable<QuestTable.QuestTableData> enemyAppearQuestData = Singleton<QuestTable>.I.GetEnemyAppearQuestData(item2.id);
 				if (enemyAppearQuestData != null)
@@ -214,9 +214,9 @@ public class StatusEnemyDetail : GameSection
 							foreach (FieldMapTable.FieldMapTableData fieldMapTableData in array2)
 							{
 								popMapIds.Add(fieldMapTableData.mapID);
-								if (string.IsNullOrEmpty(foundationName))
+								if (string.IsNullOrEmpty(text2))
 								{
-									foundationName = enemyAppearQuestData.FirstOrDefault().GetFoundationName();
+									text2 = enemyAppearQuestData.FirstOrDefault().GetFoundationName();
 								}
 							}
 						}
@@ -226,72 +226,68 @@ public class StatusEnemyDetail : GameSection
 		}
 		if (popMapIds != null)
 		{
-			popMapIds = (from x in popMapIds
-			where MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledMap((int)x)
-			select x).ToList();
+			popMapIds = popMapIds.Where((uint x) => MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledMap((int)x)).ToList();
 		}
-		if (string.IsNullOrEmpty(foundationName))
+		if (string.IsNullOrEmpty(text2))
 		{
-			foundationName = base.sectionData.GetText("DEFAULT_STGE_NAME");
+			text2 = base.sectionData.GetText("DEFAULT_STGE_NAME");
 		}
 		sameMonsterCounter = (from x in achievementCounter
-		where x.Count != 0
-		where Singleton<EnemyCollectionTable>.I.GetEnemyCollectionData((uint)x.subType).enemySpeciesId == enemyCollectionData.enemySpeciesId
-		select x).ToList();
-		SetLabelText((Enum)UI.LBL_ENEMY_NAME, enemyData.name);
+			where x.Count != 0
+			where Singleton<EnemyCollectionTable>.I.GetEnemyCollectionData((uint)x.subType).enemySpeciesId == enemyCollectionData.enemySpeciesId
+			select x).ToList();
+		SetLabelText(UI.LBL_ENEMY_NAME, enemyData.name);
 		SetFrame(GetCtrl(UI.OBJ_FRAME), (int)enemyCollectionData.collectionType);
 		isUnknown = !sameMonsterCounter.Any((AchievementCounter x) => x.subType == enemyCollectionId);
-		SetActive((Enum)UI.OBJ_UNKNOWN, isUnknown);
-		SetActive((Enum)UI.LBL_UNKNOWN_WEAKPOINT, isUnknown || enemyData.weakElement == ELEMENT_TYPE.MAX);
-		SetActive((Enum)UI.LBL_ELEMENT, isUnknown || enemyData.element == ELEMENT_TYPE.MAX);
-		SetActive((Enum)UI.SPR_WEAK_ELEMENT, !isUnknown);
-		SetActive((Enum)UI.SPR_ELEMENT, !isUnknown);
+		SetActive(UI.OBJ_UNKNOWN, isUnknown);
+		SetActive(UI.LBL_UNKNOWN_WEAKPOINT, isUnknown || enemyData.weakElement == ELEMENT_TYPE.MAX);
+		SetActive(UI.LBL_ELEMENT, isUnknown || enemyData.element == ELEMENT_TYPE.MAX);
+		SetActive(UI.SPR_WEAK_ELEMENT, !isUnknown);
+		SetActive(UI.SPR_ELEMENT, !isUnknown);
 		InitRenderTexture(UI.TEX_ENEMY_MODEL);
-		bool activeAppearButton = !isUnknown && popMapIds != null && popMapIds.Any();
-		SetActive((Enum)UI.OBJ_APPEAR_MAP_ON, activeAppearButton);
-		SetActive((Enum)UI.OBJ_APPEAR_MAP_OFF, !activeAppearButton);
+		bool flag = !isUnknown && popMapIds != null && popMapIds.Any();
+		SetActive(UI.OBJ_APPEAR_MAP_ON, flag);
+		SetActive(UI.OBJ_APPEAR_MAP_OFF, !flag);
 		if (isUnknown)
 		{
-			SetRenderEnemyModel((Enum)UI.TEX_ENEMY_MODEL, enemyData.id, foundationName, OutGameSettingsManager.EnemyDisplayInfo.SCENE.GACHA, (Action<bool, EnemyLoader>)null, UIModelRenderTexture.ENEMY_MOVE_TYPE.STOP, is_Howl: true);
-			enemyModelRenderTexture = base.GetComponent<UIModelRenderTexture>((Enum)UI.TEX_ENEMY_MODEL);
-			UITexture component = base.GetComponent<UITexture>((Enum)UI.TEX_ENEMY_MODEL);
-			component.color = Color.get_black();
-			SetActive((Enum)UI.TEX_ENEMYICON, is_visible: false);
-			SetText((Enum)UI.LBL_ENEMY_NAME, "???");
-			SetText((Enum)UI.LBL_REWARD_LIST, "???");
-			SetText((Enum)UI.LBL_BREAK_REWARD_LIST, "???");
-			SetText((Enum)UI.LBL_FLAVOR_TEXT, "???");
-			SetText((Enum)UI.LBL_UNKNOWN_WEAKPOINT, "?");
-			SetText((Enum)UI.LBL_ELEMENT, "?");
-			SetLabelText((Enum)UI.LBL_FIELD_DEFEAT, "0");
-			SetLabelText((Enum)UI.LBL_TOTAL_DEFEAT, "0");
+			SetRenderEnemyModel(UI.TEX_ENEMY_MODEL, enemyData.id, text2, OutGameSettingsManager.EnemyDisplayInfo.SCENE.GACHA, null, UIModelRenderTexture.ENEMY_MOVE_TYPE.STOP);
+			enemyModelRenderTexture = GetComponent<UIModelRenderTexture>(UI.TEX_ENEMY_MODEL);
+			GetComponent<UITexture>(UI.TEX_ENEMY_MODEL).color = Color.black;
+			SetActive(UI.TEX_ENEMYICON, is_visible: false);
+			SetText(UI.LBL_ENEMY_NAME, "???");
+			SetText(UI.LBL_REWARD_LIST, "???");
+			SetText(UI.LBL_BREAK_REWARD_LIST, "???");
+			SetText(UI.LBL_FLAVOR_TEXT, "???");
+			SetText(UI.LBL_UNKNOWN_WEAKPOINT, "?");
+			SetText(UI.LBL_ELEMENT, "?");
+			SetLabelText(UI.LBL_FIELD_DEFEAT, "0");
+			SetLabelText(UI.LBL_TOTAL_DEFEAT, "0");
 		}
 		else
 		{
-			SetRenderEnemyModel((Enum)UI.TEX_ENEMY_MODEL, enemyData.id, foundationName, OutGameSettingsManager.EnemyDisplayInfo.SCENE.GACHA, (Action<bool, EnemyLoader>)null, UIModelRenderTexture.ENEMY_MOVE_TYPE.DONT_MOVE, is_Howl: true);
-			enemyModelRenderTexture = base.GetComponent<UIModelRenderTexture>((Enum)UI.TEX_ENEMY_MODEL);
-			UITexture component2 = base.GetComponent<UITexture>((Enum)UI.TEX_ENEMY_MODEL);
-			component2.color = Color.get_white();
-			SetActive((Enum)UI.TEX_ENEMYICON, is_visible: true);
-			SetEnemyIcon((Enum)UI.TEX_ENEMYICON, enemyData.iconId);
-			SetElementSprite((Enum)UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
-			SetElementSprite((Enum)UI.SPR_ELEMENT, (int)enemyData.element);
+			SetRenderEnemyModel(UI.TEX_ENEMY_MODEL, enemyData.id, text2, OutGameSettingsManager.EnemyDisplayInfo.SCENE.GACHA, null, UIModelRenderTexture.ENEMY_MOVE_TYPE.DONT_MOVE);
+			enemyModelRenderTexture = GetComponent<UIModelRenderTexture>(UI.TEX_ENEMY_MODEL);
+			GetComponent<UITexture>(UI.TEX_ENEMY_MODEL).color = Color.white;
+			SetActive(UI.TEX_ENEMYICON, is_visible: true);
+			SetEnemyIcon(UI.TEX_ENEMYICON, enemyData.iconId);
+			SetElementSprite(UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
+			SetElementSprite(UI.SPR_ELEMENT, (int)enemyData.element);
 			if (enemyData.weakElement == ELEMENT_TYPE.MAX)
 			{
-				SetText((Enum)UI.LBL_UNKNOWN_WEAKPOINT, "NONE_WEAK_POINT");
+				SetText(UI.LBL_UNKNOWN_WEAKPOINT, "NONE_WEAK_POINT");
 			}
 			if (enemyData.element == ELEMENT_TYPE.MAX)
 			{
-				SetText((Enum)UI.LBL_ELEMENT, "NONE_WEAK_POINT");
+				SetText(UI.LBL_ELEMENT, "NONE_WEAK_POINT");
 			}
-			SetLabelText((Enum)UI.LBL_ENEMY_NAME, enemyData.name);
-			SetLabelText((Enum)UI.LBL_REWARD_LIST, GetDefeatRewardText());
-			SetLabelText((Enum)UI.LBL_BREAK_REWARD_LIST, GetBreakRewardText());
-			SetLabelText((Enum)UI.LBL_FLAVOR_TEXT, enemyCollectionData.flavorText);
-			SetLabelText((Enum)UI.LBL_FIELD_DEFEAT, sameMonsterCounter.First((AchievementCounter x) => x.subType == enemyCollectionData.id).count);
-			SetLabelText((Enum)UI.LBL_TOTAL_DEFEAT, sameMonsterCounter.Sum((AchievementCounter x) => x.Count).ToString());
+			SetLabelText(UI.LBL_ENEMY_NAME, enemyData.name);
+			SetLabelText(UI.LBL_REWARD_LIST, GetDefeatRewardText());
+			SetLabelText(UI.LBL_BREAK_REWARD_LIST, GetBreakRewardText());
+			SetLabelText(UI.LBL_FLAVOR_TEXT, enemyCollectionData.flavorText);
+			SetLabelText(UI.LBL_FIELD_DEFEAT, sameMonsterCounter.First((AchievementCounter x) => x.subType == enemyCollectionData.id).count);
+			SetLabelText(UI.LBL_TOTAL_DEFEAT, sameMonsterCounter.Sum((AchievementCounter x) => x.Count).ToString());
 		}
-		eventListener = base.GetComponent<UIEventListener>((Enum)UI.TEX_ENEMY_MODEL);
+		eventListener = GetComponent<UIEventListener>(UI.TEX_ENEMY_MODEL);
 		if (eventListener != null)
 		{
 			UIEventListener uIEventListener = eventListener;
@@ -325,7 +321,7 @@ public class StatusEnemyDetail : GameSection
 		}
 		foreach (KeyValuePair<UI, string> uI_COLOR_CHANGE_TARGET in UI_COLOR_CHANGE_TARGETS)
 		{
-			SetSprite((Enum)uI_COLOR_CHANGE_TARGET.Key, string.Format(uI_COLOR_CHANGE_TARGET.Value, RARITY_FUTTER[rarity]));
+			SetSprite(uI_COLOR_CHANGE_TARGET.Key, string.Format(uI_COLOR_CHANGE_TARGET.Value, RARITY_FUTTER[rarity]));
 		}
 	}
 
@@ -340,28 +336,11 @@ public class StatusEnemyDetail : GameSection
 
 	private void OnDrag(GameObject obj, Vector2 delta)
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Expected O, but got Unknown
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		if (!(enemyModelRenderTexture == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable())
 		{
-			IEnumerator enumerator = enemyModelRenderTexture.GetModelTransform().get_parent().GetEnumerator();
-			try
+			foreach (Transform item in enemyModelRenderTexture.GetModelTransform().parent)
 			{
-				while (enumerator.MoveNext())
-				{
-					Transform val = enumerator.Current;
-					val.Rotate(GameDefine.GetCharaRotateVector(delta));
-				}
-			}
-			finally
-			{
-				IDisposable disposable;
-				if ((disposable = (enumerator as IDisposable)) != null)
-				{
-					disposable.Dispose();
-				}
+				item.Rotate(GameDefine.GetCharaRotateVector(delta));
 			}
 		}
 	}
@@ -370,8 +349,8 @@ public class StatusEnemyDetail : GameSection
 	{
 		if (!reInitialize)
 		{
-			SetActive((Enum)UI.OBJ_FLAVOR, is_visible: true);
-			SetActive((Enum)UI.OBJ_FRONT, is_visible: false);
+			SetActive(UI.OBJ_FLAVOR, is_visible: true);
+			SetActive(UI.OBJ_FRONT, is_visible: false);
 		}
 	}
 
@@ -379,8 +358,8 @@ public class StatusEnemyDetail : GameSection
 	{
 		if (!reInitialize)
 		{
-			SetActive((Enum)UI.OBJ_FLAVOR, is_visible: false);
-			SetActive((Enum)UI.OBJ_FRONT, is_visible: true);
+			SetActive(UI.OBJ_FLAVOR, is_visible: false);
+			SetActive(UI.OBJ_FRONT, is_visible: true);
 		}
 	}
 
@@ -437,7 +416,7 @@ public class StatusEnemyDetail : GameSection
 
 	private string GetDefeatRewardText()
 	{
-		string text = string.Empty;
+		string text = "";
 		List<uint> list = new List<uint>();
 		foreach (EnemyFieldDropItemTable.EnemyFieldDropItemData enemyDatum in Singleton<EnemyFieldDropItemTable>.I.GetEnemyData(enemyData.id))
 		{
@@ -461,7 +440,7 @@ public class StatusEnemyDetail : GameSection
 
 	private string GetBreakRewardText()
 	{
-		string text = string.Empty;
+		string text = "";
 		List<uint> list = new List<uint>();
 		foreach (EnemyFieldDropItemTable.EnemyFieldDropItemData enemyDatum in Singleton<EnemyFieldDropItemTable>.I.GetEnemyData(enemyData.id))
 		{

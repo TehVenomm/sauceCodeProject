@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class CommunityDialogBase : GameSection
@@ -16,17 +15,14 @@ public class CommunityDialogBase : GameSection
 
 	public override void Initialize()
 	{
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "HomeScene")
 		{
-			SetActive((Enum)UI.BTN_EXIT, is_visible: false);
-			UISprite component = base.GetComponent<UISprite>((Enum)UI.SPR_FRAME);
+			SetActive(UI.BTN_EXIT, is_visible: false);
+			UISprite component = GetComponent<UISprite>(UI.SPR_FRAME);
 			int height = component.height;
 			component.height = height - 90;
-			Vector3 localPosition = component.get_transform().get_localPosition();
-			component.get_transform().set_localPosition(new Vector3(localPosition.x, localPosition.y - 45f, localPosition.x));
+			Vector3 localPosition = component.transform.localPosition;
+			component.transform.localPosition = new Vector3(localPosition.x, localPosition.y - 45f, localPosition.x);
 		}
 		base.Initialize();
 	}
@@ -38,20 +34,20 @@ public class CommunityDialogBase : GameSection
 	public override void UpdateUI()
 	{
 		bool flag = MonoBehaviourSingleton<UserInfoManager>.I.clanDisplayType != 0 && (int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level >= 15;
-		SetActive((Enum)UI.BTN_CLAN_ON, flag);
-		SetActive((Enum)UI.BTN_CLAN_OFF, !flag);
+		SetActive(UI.BTN_CLAN_ON, flag);
+		SetActive(UI.BTN_CLAN_OFF, !flag);
 		if (flag && MonoBehaviourSingleton<UserInfoManager>.I.clanDisplayType == DISPLAY_TYPE.NEW)
 		{
-			SetActive((Enum)UI.SPR_NEW_ICON, is_visible: true);
+			SetActive(UI.SPR_NEW_ICON, is_visible: true);
 		}
 		else
 		{
-			SetActive((Enum)UI.SPR_NEW_ICON, is_visible: false);
+			SetActive(UI.SPR_NEW_ICON, is_visible: false);
 		}
-		string text = (!MonoBehaviourSingleton<UserInfoManager>.I.IsRegisteredClan()) ? "旅団" : "旅団情報";
+		MonoBehaviourSingleton<UserInfoManager>.I.IsRegisteredClan();
 		bool flag2 = (int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level >= 15;
-		SetActive((Enum)UI.BTN_LOUNGE, flag2);
-		SetActive((Enum)UI.BTN_LOUNGE_OFF, !flag2);
+		SetActive(UI.BTN_LOUNGE, flag2);
+		SetActive(UI.BTN_LOUNGE_OFF, !flag2);
 	}
 
 	private void OnQuery_CLAN()
@@ -72,11 +68,11 @@ public class CommunityDialogBase : GameSection
 		if (MonoBehaviourSingleton<UserInfoManager>.I.clanDisplayType == DISPLAY_TYPE.NONE)
 		{
 			GameSection.SetEventData(StringTable.Get(STRING_CATEGORY.CLAN_ERROR, 0u));
-			return;
 		}
-		string format = StringTable.Get(STRING_CATEGORY.CLAN_ERROR, 1u);
-		string eventData = string.Format(format, 15.ToString());
-		GameSection.SetEventData(eventData);
+		else
+		{
+			GameSection.SetEventData(string.Format(StringTable.Get(STRING_CATEGORY.CLAN_ERROR, 1u), 15.ToString()));
+		}
 	}
 
 	private void OnQuery_LOUNGE()

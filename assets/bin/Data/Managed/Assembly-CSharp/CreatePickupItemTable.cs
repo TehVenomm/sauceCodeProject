@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class CreatePickupItemTable : Singleton<CreatePickupItemTable>, IDataTable
 {
@@ -45,9 +44,6 @@ public class CreatePickupItemTable : Singleton<CreatePickupItemTable>, IDataTabl
 	}
 
 	private UIntKeyTable<CreatePickupItemData> pickupTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<CreatePickupItemData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string csv_text)
 	{

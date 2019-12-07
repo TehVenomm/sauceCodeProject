@@ -21,22 +21,6 @@ public class FieldSonarObject : FieldGimmickObject
 
 	public override void UpdateTargetMarker(bool isNear)
 	{
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 		if (isNear && self != null && self.IsChangeableAction((Character.ACTION_ID)35))
 		{
@@ -48,16 +32,15 @@ public class FieldSonarObject : FieldGimmickObject
 			if (targetMarker != null)
 			{
 				Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-				Vector3 position = cameraTransform.get_position();
-				Quaternion rotation = cameraTransform.get_rotation();
-				Vector3 val = position - _transform.get_position();
-				Vector3 pos = val.get_normalized() + Vector3.get_up() + _transform.get_position();
+				Vector3 position = cameraTransform.position;
+				Quaternion rotation = cameraTransform.rotation;
+				Vector3 pos = (position - _transform.position).normalized + Vector3.up + _transform.position;
 				targetMarker.Set(pos, rotation);
 			}
 		}
 		else if (targetMarker != null)
 		{
-			EffectManager.ReleaseEffect(targetMarker.get_gameObject());
+			EffectManager.ReleaseEffect(targetMarker.gameObject);
 		}
 	}
 
@@ -78,7 +61,7 @@ public class FieldSonarObject : FieldGimmickObject
 	{
 		if (IsValidSonar())
 		{
-			this.StartCoroutine(ActSonar());
+			StartCoroutine(ActSonar());
 		}
 	}
 
@@ -86,17 +69,17 @@ public class FieldSonarObject : FieldGimmickObject
 	{
 		if (sonarEffect != null)
 		{
-			if (sonarEffect.get_gameObject() != null)
+			if (sonarEffect.gameObject != null)
 			{
-				Object.Destroy(sonarEffect.get_gameObject());
+				Object.Destroy(sonarEffect.gameObject);
 			}
 			sonarEffect = null;
 		}
 		if (sonarTouchEffect != null)
 		{
-			if (sonarTouchEffect.get_gameObject() != null)
+			if (sonarTouchEffect.gameObject != null)
 			{
-				Object.Destroy(sonarTouchEffect.get_gameObject());
+				Object.Destroy(sonarTouchEffect.gameObject);
 			}
 			sonarTouchEffect = null;
 		}
@@ -110,8 +93,8 @@ public class FieldSonarObject : FieldGimmickObject
 
 	protected override void Awake()
 	{
-		_transform = this.get_transform();
-		Utility.SetLayerWithChildren(this.get_transform(), 19);
+		_transform = base.transform;
+		Utility.SetLayerWithChildren(base.transform, 19);
 	}
 
 	private IEnumerator ActSonar()
@@ -122,11 +105,11 @@ public class FieldSonarObject : FieldGimmickObject
 		{
 			sonarTouchEffect = EffectManager.GetEffect("ef_btl_sonar_02", modelTrans);
 		}
-		sonarTouchEffect.get_gameObject().SetActive(true);
-		yield return (object)new WaitForSeconds(0.9f);
+		sonarTouchEffect.gameObject.SetActive(value: true);
+		yield return new WaitForSeconds(0.9f);
 		if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("FieldSonarObject.OnTriggerEnter", this.get_gameObject(), "EXPLOREMAP", ExploreMap.OPEN_MAP_TYPE.SONAR);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("FieldSonarObject.OnTriggerEnter", base.gameObject, "EXPLOREMAP", ExploreMap.OPEN_MAP_TYPE.SONAR);
 		}
 		acting = false;
 	}

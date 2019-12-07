@@ -8,12 +8,7 @@ public class UIOracleStockIconController : MonoBehaviour
 	[SerializeField]
 	private UISprite stockSprite;
 
-	public bool Stocked => stockSprite.get_gameObject().get_activeSelf();
-
-	public UIOracleStockIconController()
-		: this()
-	{
-	}
+	public bool Stocked => stockSprite.gameObject.activeSelf;
 
 	public void Initialize(int index, int depth, bool stocked = false)
 	{
@@ -24,9 +19,9 @@ public class UIOracleStockIconController : MonoBehaviour
 
 	public void Stock(bool enable)
 	{
-		if (enable != stockSprite.get_gameObject().get_activeSelf())
+		if (enable != stockSprite.gameObject.activeSelf)
 		{
-			stockSprite.get_gameObject().SetActive(enable);
+			stockSprite.gameObject.SetActive(enable);
 		}
 	}
 }

@@ -1,5 +1,4 @@
 using Network;
-using System;
 using UnityEngine;
 
 public class QuestAcceptChallengeRoomCondition : QuestSearchRoomCondition
@@ -45,12 +44,6 @@ public class QuestAcceptChallengeRoomCondition : QuestSearchRoomCondition
 
 		public int enemyLevel;
 
-		public ChallengeSearchRequestParam()
-		{
-			enemyLevelIndex = 0;
-			enemyLevel = 0;
-		}
-
 		public override bool IsMatchLevel(QuestItemInfo item)
 		{
 			QuestTable.QuestTableData tableData = item.infoData.questData.tableData;
@@ -59,6 +52,12 @@ public class QuestAcceptChallengeRoomCondition : QuestSearchRoomCondition
 				return true;
 			}
 			return false;
+		}
+
+		public ChallengeSearchRequestParam()
+		{
+			enemyLevelIndex = 0;
+			enemyLevel = 0;
 		}
 	}
 
@@ -134,8 +133,7 @@ public class QuestAcceptChallengeRoomCondition : QuestSearchRoomCondition
 
 	protected override void CreateEnemyLevelPopText()
 	{
-		int qUEST_ITEM_LEVEL_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.QUEST_ITEM_LEVEL_MAX;
-		int num = qUEST_ITEM_LEVEL_MAX / 10 + 1;
+		int num = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.QUEST_ITEM_LEVEL_MAX / 10 + 1;
 		for (int i = 1; i < num; i++)
 		{
 			enemyLevelList.Add(10 * i);
@@ -149,7 +147,7 @@ public class QuestAcceptChallengeRoomCondition : QuestSearchRoomCondition
 	private void UpdateEnemyLevel()
 	{
 		int enemyLevelIndex = challengeRequest.enemyLevelIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_LEVEL, enemyLevelNames[enemyLevelIndex]);
+		SetLabelText(UI.LBL_TARGET_LEVEL, enemyLevelNames[enemyLevelIndex]);
 	}
 
 	private void OnQuery_TARGET_LEVEL()

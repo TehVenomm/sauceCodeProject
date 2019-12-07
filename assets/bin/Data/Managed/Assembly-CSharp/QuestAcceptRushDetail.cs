@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -129,34 +128,33 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 	public override void Initialize()
 	{
 		base.Initialize();
-		UITexture component = GetCtrl(UI.TEX_RUSH_IMAGE).GetComponent<UITexture>();
-		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.RUSH_QUEST_ICON, ResourceName.GetRushQuestIconName((int)info.GetQuestData().rushIconId));
+		ResourceLoad.LoadWithSetUITexture(GetCtrl(UI.TEX_RUSH_IMAGE).GetComponent<UITexture>(), RESOURCE_CATEGORY.RUSH_QUEST_ICON, ResourceName.GetRushQuestIconName((int)info.GetQuestData().rushIconId));
 		if ((base.isComplete || isNotice) && !isCompletedEventDelivery)
 		{
-			SetActive((Enum)UI.BTN_JOIN, is_visible: false);
-			SetActive((Enum)UI.BTN_CREATE, is_visible: false);
-			SetActive((Enum)UI.BTN_AUTO_MATCHING, is_visible: false);
-			SetActive((Enum)UI.BTN_JOIN_OFF, is_visible: false);
-			SetActive((Enum)UI.BTN_CREATE_OFF, is_visible: false);
-			SetActive((Enum)UI.BTN_AUTO_MATCHING_OFF, is_visible: false);
+			SetActive(UI.BTN_JOIN, is_visible: false);
+			SetActive(UI.BTN_CREATE, is_visible: false);
+			SetActive(UI.BTN_AUTO_MATCHING, is_visible: false);
+			SetActive(UI.BTN_JOIN_OFF, is_visible: false);
+			SetActive(UI.BTN_CREATE_OFF, is_visible: false);
+			SetActive(UI.BTN_AUTO_MATCHING_OFF, is_visible: false);
 		}
 		else
 		{
-			this.StartCoroutine(StartPredownload());
+			StartCoroutine(StartPredownload());
 		}
 	}
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_DROP_REWARD, is_visible: true);
-		SetActive((Enum)UI.OBJ_CLEAR_REWARD, is_visible: true);
+		SetActive(UI.OBJ_DROP_REWARD, is_visible: true);
+		SetActive(UI.OBJ_CLEAR_REWARD, is_visible: true);
 		base.UpdateUI();
 		questTableData = info.GetQuestData();
 		if (questTableData != null)
 		{
 			int num = (int)questTableData.limitTime;
-			SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num / 60:D2}:{num % 60:D2}");
-			SetLabelText((Enum)UI.LBL_RUSH_LEVEL, string.Empty);
+			SetLabelText(UI.LBL_LIMIT_TIME, $"{num / 60:D2}:{num % 60:D2}");
+			SetLabelText(UI.LBL_RUSH_LEVEL, "");
 			SetSprite(baseRoot, UI.SPR_WINDOW, "RequestWindowBase_Rush");
 			SetSprite(baseRoot, UI.SPR_MESSAGE_BG, "Checkhukidashi_Rush");
 			SetDifficultySprite();
@@ -195,20 +193,20 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 
 	private void UpdateRewardInfo()
 	{
-		SetActive((Enum)UI.OBJ_CLEAR_ICON_ROOT, !isShowDropInfo);
-		SetActive((Enum)UI.OBJ_DROP_ICON_ROOT, isShowDropInfo);
-		SetActive((Enum)UI.OBJ_CLEAR_REWARD, !isShowDropInfo);
-		SetActive((Enum)UI.OBJ_DROP_REWARD, isShowDropInfo);
-		SetActive((Enum)UI.OBJ_COMPLETE_ROOT, !isShowDropInfo);
+		SetActive(UI.OBJ_CLEAR_ICON_ROOT, !isShowDropInfo);
+		SetActive(UI.OBJ_DROP_ICON_ROOT, isShowDropInfo);
+		SetActive(UI.OBJ_CLEAR_REWARD, !isShowDropInfo);
+		SetActive(UI.OBJ_DROP_REWARD, isShowDropInfo);
+		SetActive(UI.OBJ_COMPLETE_ROOT, !isShowDropInfo);
 	}
 
 	private void OnQuery_SWITCH_SUBMISSION()
 	{
-		if (Object.op_Implicit(targetFrame) && Object.op_Implicit(submissionFrame))
+		if ((bool)targetFrame && (bool)submissionFrame)
 		{
-			bool activeSelf = targetFrame.get_gameObject().get_activeSelf();
-			targetFrame.get_gameObject().SetActive(!activeSelf);
-			submissionFrame.get_gameObject().SetActive(activeSelf);
+			bool activeSelf = targetFrame.gameObject.activeSelf;
+			targetFrame.gameObject.SetActive(!activeSelf);
+			submissionFrame.gameObject.SetActive(activeSelf);
 			isCompletedEventDelivery = true;
 			RefreshUI();
 		}
@@ -239,18 +237,18 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 
 	protected IEnumerator StartPredownload()
 	{
-		SetActive((Enum)UI.BTN_JOIN, is_visible: false);
-		SetActive((Enum)UI.BTN_CREATE, is_visible: false);
-		SetActive((Enum)UI.BTN_AUTO_MATCHING, is_visible: false);
-		SetActive((Enum)UI.BTN_JOIN_OFF, is_visible: false);
-		SetActive((Enum)UI.BTN_CREATE_OFF, is_visible: false);
-		SetActive((Enum)UI.BTN_AUTO_MATCHING_OFF, is_visible: false);
+		SetActive(UI.BTN_JOIN, is_visible: false);
+		SetActive(UI.BTN_CREATE, is_visible: false);
+		SetActive(UI.BTN_AUTO_MATCHING, is_visible: false);
+		SetActive(UI.BTN_JOIN_OFF, is_visible: false);
+		SetActive(UI.BTN_CREATE_OFF, is_visible: false);
+		SetActive(UI.BTN_AUTO_MATCHING_OFF, is_visible: false);
 		List<ResourceInfo> list = new List<ResourceInfo>();
-		List<QuestTable.QuestTableData> targetQuest = QuestTable.GetSameRushQuestData(info.GetQuestData().rushId);
-		targetQuest.Remove(info.GetQuestData());
-		foreach (QuestTable.QuestTableData item2 in targetQuest)
+		List<QuestTable.QuestTableData> sameRushQuestData = QuestTable.GetSameRushQuestData(info.GetQuestData().rushId);
+		sameRushQuestData.Remove(info.GetQuestData());
+		foreach (QuestTable.QuestTableData item in sameRushQuestData)
 		{
-			uint mapId = item2.mapId;
+			uint mapId = item.mapId;
 			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(mapId);
 			if (fieldMapData == null)
 			{
@@ -287,7 +285,7 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 					list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, data.useEffects[i]));
 				}
 			}
-			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)item2.enemyID[0]);
+			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)item.enemyID[0]);
 			int modelId = enemyData.modelId;
 			string enemyBody = ResourceName.GetEnemyBody(modelId);
 			string enemyMaterial = ResourceName.GetEnemyMaterial(modelId);
@@ -306,16 +304,16 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 		if (list.Find((ResourceInfo x) => !MonoBehaviourSingleton<ResourceManager>.I.IsCached(x.category, x.packageName)) != null)
 		{
 			List<string> assetNames = new List<string>();
-			foreach (ResourceInfo item3 in list)
+			foreach (ResourceInfo item2 in list)
 			{
-				if (!string.IsNullOrEmpty(item3.packageName) && !MonoBehaviourSingleton<ResourceManager>.I.IsCached(item3.category, item3.packageName))
+				if (!string.IsNullOrEmpty(item2.packageName) && !MonoBehaviourSingleton<ResourceManager>.I.IsCached(item2.category, item2.packageName))
 				{
-					assetNames.Add(item3.category.ToAssetBundleName(item3.packageName));
+					assetNames.Add(item2.category.ToAssetBundleName(item2.packageName));
 				}
 			}
-			SetActive((Enum)UI.BTN_JOIN_OFF, is_visible: true);
-			SetActive((Enum)UI.BTN_CREATE_OFF, is_visible: true);
-			SetActive((Enum)UI.BTN_AUTO_MATCHING_OFF, is_visible: true);
+			SetActive(UI.BTN_JOIN_OFF, is_visible: true);
+			SetActive(UI.BTN_CREATE_OFF, is_visible: true);
+			SetActive(UI.BTN_AUTO_MATCHING_OFF, is_visible: true);
 			yield return ResourceSizeInfo.Init();
 			string act = null;
 			yield return ResourceSizeInfo.OpenConfirmDialog(ResourceSizeInfo.GetAssetsSizeMB(assetNames.ToArray()), 3002u, CommonDialog.TYPE.YES_NO, delegate(string str)
@@ -332,24 +330,24 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 				yield break;
 			}
 			LoadingQueue load_queue = new LoadingQueue(this);
-			foreach (ResourceInfo item in list)
+			foreach (ResourceInfo item3 in list)
 			{
-				if (!string.IsNullOrEmpty(item.packageName) && !MonoBehaviourSingleton<ResourceManager>.I.IsCached(item.category, item.packageName))
+				if (!string.IsNullOrEmpty(item3.packageName) && !MonoBehaviourSingleton<ResourceManager>.I.IsCached(item3.category, item3.packageName))
 				{
 					ResourceManager.downloadOnly = true;
-					load_queue.Load(item.category, item.packageName, null);
+					load_queue.Load(item3.category, item3.packageName, null);
 					ResourceManager.downloadOnly = false;
 					yield return load_queue.Wait();
 				}
 			}
 		}
-		bool pushEnable = true;
-		SetActive((Enum)UI.BTN_JOIN, pushEnable);
-		SetActive((Enum)UI.BTN_CREATE, pushEnable);
-		SetActive((Enum)UI.BTN_AUTO_MATCHING, pushEnable);
-		SetActive((Enum)UI.BTN_JOIN_OFF, !pushEnable);
-		SetActive((Enum)UI.BTN_CREATE_OFF, !pushEnable);
-		SetActive((Enum)UI.BTN_AUTO_MATCHING_OFF, !pushEnable);
+		bool flag = true;
+		SetActive(UI.BTN_JOIN, flag);
+		SetActive(UI.BTN_CREATE, flag);
+		SetActive(UI.BTN_AUTO_MATCHING, flag);
+		SetActive(UI.BTN_JOIN_OFF, !flag);
+		SetActive(UI.BTN_CREATE_OFF, !flag);
+		SetActive(UI.BTN_AUTO_MATCHING_OFF, !flag);
 	}
 
 	private void OnQuery_AUTO_MATCHING()
@@ -370,7 +368,7 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 			else if (maxRetryCount > 0)
 			{
 				retryCount++;
-				this.StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
+				StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
 			}
 			else if (!isJoined)
 			{
@@ -386,7 +384,7 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 
 	private IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
 	{
-		yield return (object)new WaitForSeconds(time);
+		yield return new WaitForSeconds(time);
 		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, isExplore: false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
 		{
 			if (!is_success)
@@ -402,7 +400,7 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 				else
 				{
 					retryCount++;
-					this.StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
+					StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
 				}
 			}
 			else if (!isJoined)
@@ -441,6 +439,6 @@ public class QuestAcceptRushDetail : QuestDeliveryDetail
 	private void SetDifficultySprite()
 	{
 		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryID);
-		SetActive((Enum)UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
+		SetActive(UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
 	}
 }

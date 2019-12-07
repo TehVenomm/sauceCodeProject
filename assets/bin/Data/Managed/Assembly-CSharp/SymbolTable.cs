@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class SymbolTable : Singleton<SymbolTable>, IDataTable
@@ -65,12 +64,6 @@ public class SymbolTable : Singleton<SymbolTable>, IDataTable
 	}
 
 	private UIntKeyTable<SymbolData> symbolTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<SymbolData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<SymbolData> _003C_003Ef__mg_0024cache1;
 
 	public int[] markIDs
 	{
@@ -146,12 +139,6 @@ public class SymbolTable : Singleton<SymbolTable>, IDataTable
 
 	public void ConvertTable()
 	{
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
 		List<int> list = new List<int>();
 		List<DisplayOrderData> list2 = new List<DisplayOrderData>();
 		List<int> list3 = new List<int>();
@@ -189,15 +176,15 @@ public class SymbolTable : Singleton<SymbolTable>, IDataTable
 			}
 			if (data.hasMarkColor)
 			{
-				list8.Add(Color32.op_Implicit(data.markColor));
+				list8.Add(data.markColor);
 			}
 			if (data.hasFrameColor)
 			{
-				list9.Add(Color32.op_Implicit(data.frameColor));
+				list9.Add(data.frameColor);
 			}
 			if (data.hasPatternColor)
 			{
-				list10.Add(Color32.op_Implicit(data.patternColor));
+				list10.Add(data.patternColor);
 			}
 		}
 		markIDs = list.ToArray();
@@ -241,14 +228,12 @@ public class SymbolTable : Singleton<SymbolTable>, IDataTable
 
 	public Color GetColor(SymbolType type, int index)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 		Color[] colors = GetColors(type);
 		if (colors != null && colors.Length > index)
 		{
 			return colors[index];
 		}
-		return Color.get_white();
+		return Color.white;
 	}
 
 	public int GetSymbolID(SymbolType type, int index)
@@ -308,14 +293,11 @@ public class SymbolTable : Singleton<SymbolTable>, IDataTable
 
 	public int[] SymbolSort(List<DisplayOrderData> data)
 	{
-		DisplayOrderData[] source = (from s in data
-		group s by s.sort into g
-		orderby g.Key
-		select g).SelectMany((IGrouping<int, DisplayOrderData> g) => from s in g
-		orderby s.order
-		select s).ToArray();
-		return (from s in source
-		select s.num).ToArray();
+		return (from s in (from s in data
+				group s by s.sort into g
+				orderby g.Key
+				select g).SelectMany((IGrouping<int, DisplayOrderData> g) => g.OrderBy((DisplayOrderData s) => s.order)).ToArray()
+			select s.num).ToArray();
 	}
 
 	public Color[] GetColors(SymbolType type)

@@ -118,8 +118,6 @@ namespace BestHTTP
 		{
 			get
 			{
-				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0032: Expected O, but got Unknown
 				if (Data == null)
 				{
 					return null;
@@ -129,7 +127,7 @@ namespace BestHTTP
 					return texture;
 				}
 				texture = new Texture2D(0, 0);
-				texture.LoadImage(Data);
+				texture.LoadRawTextureData(Data);
 				return texture;
 			}
 		}
@@ -273,8 +271,7 @@ namespace BestHTTP
 
 		public bool HasHeader(string headerName)
 		{
-			List<string> headerValues = GetHeaderValues(headerName);
-			if (headerValues == null)
+			if (GetHeaderValues(headerName) == null)
 			{
 				return false;
 			}
@@ -283,12 +280,7 @@ namespace BestHTTP
 
 		public HTTPRange GetRange()
 		{
-			List<string> headerValues = GetHeaderValues("content-range");
-			if (headerValues == null)
-			{
-				throw null;
-			}
-			string[] array = headerValues[0].Split(new char[3]
+			string[] array = (GetHeaderValues("content-range") ?? throw null)[0].Split(new char[3]
 			{
 				' ',
 				'-',
@@ -298,7 +290,7 @@ namespace BestHTTP
 			{
 				return new HTTPRange(int.Parse(array[2]));
 			}
-			return new HTTPRange(int.Parse(array[1]), int.Parse(array[2]), (!(array[3] != "*")) ? (-1) : int.Parse(array[3]));
+			return new HTTPRange(int.Parse(array[1]), int.Parse(array[2]), (array[3] != "*") ? int.Parse(array[3]) : (-1));
 		}
 
 		protected string ReadTo(Stream stream, byte blocker)
@@ -420,7 +412,7 @@ namespace BestHTTP
 		protected byte[] DecodeStream(Stream streamToDecode)
 		{
 			streamToDecode.Seek(0L, SeekOrigin.Begin);
-			List<string> list = (!IsFromCache) ? GetHeaderValues("content-encoding") : null;
+			List<string> list = IsFromCache ? null : GetHeaderValues("content-encoding");
 			Stream stream = null;
 			if (list == null)
 			{

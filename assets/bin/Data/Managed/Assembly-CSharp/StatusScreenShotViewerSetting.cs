@@ -1,5 +1,3 @@
-using System;
-
 public class StatusScreenShotViewerSetting : GameSection
 {
 	public enum UI
@@ -33,15 +31,15 @@ public class StatusScreenShotViewerSetting : GameSection
 		for (int i = 0; i < toggle.Length; i++)
 		{
 			bool value = (filter & (1 << i)) != 0;
-			SetEvent((Enum)toggle[i], "FILTER", i);
-			SetToggle(GetCtrl(toggle[i]).get_parent(), value);
+			SetEvent(toggle[i], "FILTER", i);
+			SetToggle(GetCtrl(toggle[i]).parent, value);
 		}
 	}
 
 	private void OnQuery_FILTER()
 	{
 		OnQueryEvent_Filter(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl(toggle[_index]).get_parent(), _is_enable);
+		SetToggle(GetCtrl(toggle[_index]).parent, _is_enable);
 	}
 
 	private void OnQuery_OK()

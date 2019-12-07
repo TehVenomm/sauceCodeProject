@@ -111,11 +111,11 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 		{
 			yield return null;
 		}
-		this.get_gameObject().AddComponent<ClanLvUnlockManager>();
-		HomeCamera = this.get_gameObject().AddComponent<HomeCamera>();
-		IHomePeople = this.get_gameObject().AddComponent<ClanPeople>();
-		HomeFeatureBanner = this.get_gameObject().AddComponent<HomeFeatureBanner>();
-		TableSet = this.get_gameObject().AddComponent<LoungeTableSet>();
+		base.gameObject.AddComponent<ClanLvUnlockManager>();
+		HomeCamera = base.gameObject.AddComponent<HomeCamera>();
+		IHomePeople = base.gameObject.AddComponent<ClanPeople>();
+		HomeFeatureBanner = base.gameObject.AddComponent<HomeFeatureBanner>();
+		TableSet = base.gameObject.AddComponent<LoungeTableSet>();
 		while (!HomeCamera.isInitialized || !IHomePeople.isInitialized || !TableSet.isInitialized)
 		{
 			yield return null;
@@ -125,7 +125,7 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 		IsInitialized = true;
 		if (sendInfoSpan.IsReady())
 		{
-			yield return this.StartCoroutine(SendLoungeInfoForce());
+			yield return StartCoroutine(SendLoungeInfoForce());
 		}
 		if (MonoBehaviourSingleton<ClanMatchingManager>.IsValid())
 		{
@@ -144,16 +144,16 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 			}
 			while (!MonoBehaviourSingleton<ClanMatchingManager>.I.IsConnected())
 			{
-				bool isInHome = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "HomeTop";
-				bool isInLounge = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "LoungeTop";
-				if (isInHome || isInLounge)
+				bool num = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "HomeTop";
+				bool flag = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "LoungeTop";
+				if (num | flag)
 				{
 					break;
 				}
 				yield return null;
 			}
 		}
-		yield return this.StartCoroutine(CreateLoungePlayerFromSlotInfo());
+		yield return StartCoroutine(CreateLoungePlayerFromSlotInfo());
 		if (ClanMatchingManager.IsValidInClan())
 		{
 			MonoBehaviourSingleton<ClanMatchingManager>.I.SendInClanBase();
@@ -171,9 +171,8 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 		{
 			if (data[i].userInfo != null && data[i].userInfo.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 			{
-				LoungeMemberStatus status = MonoBehaviourSingleton<ClanMatchingManager>.I.loungeMemberStatus[data[i].userInfo.userId];
-				LoungeMemberStatus.MEMBER_STATUS partyStatus = status.GetStatus();
-				if (partyStatus == LoungeMemberStatus.MEMBER_STATUS.LOUNGE || partyStatus == LoungeMemberStatus.MEMBER_STATUS.QUEST_READY)
+				LoungeMemberStatus.MEMBER_STATUS status = MonoBehaviourSingleton<ClanMatchingManager>.I.loungeMemberStatus[data[i].userInfo.userId].GetStatus();
+				if (status == LoungeMemberStatus.MEMBER_STATUS.LOUNGE || status == LoungeMemberStatus.MEMBER_STATUS.QUEST_READY)
 				{
 					IHomePeople.CastToLoungePeople().CreateLoungePlayer(data[i], useMovingEntry: false);
 					yield return null;
@@ -184,14 +183,14 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 
 	private IEnumerator CreateCharacterRoomJoined(int userId)
 	{
-		yield return this.StartCoroutine(SendLoungeInfoForce());
-		PartyModel.SlotInfo slot = MonoBehaviourSingleton<ClanMatchingManager>.I.GetSlotInfoByUserId(userId);
-		if (slot != null && IHomePeople != null && IHomePeople.CastToLoungePeople().CreateLoungePlayer(slot, useMovingEntry: true))
+		yield return StartCoroutine(SendLoungeInfoForce());
+		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<ClanMatchingManager>.I.GetSlotInfoByUserId(userId);
+		if (slotInfoByUserId != null && IHomePeople != null && IHomePeople.CastToLoungePeople().CreateLoungePlayer(slotInfoByUserId, useMovingEntry: true))
 		{
-			SetAnnounce(new LoungeAnnounce.AnnounceData(LoungeAnnounce.ANNOUNCE_TYPE.JOIN_LOUNGE, slot.userInfo.name));
+			SetAnnounce(new LoungeAnnounce.AnnounceData(LoungeAnnounce.ANNOUNCE_TYPE.JOIN_LOUNGE, slotInfoByUserId.userInfo.name));
 			if (MonoBehaviourSingleton<ClanNetworkManager>.IsValid())
 			{
-				MonoBehaviourSingleton<ClanNetworkManager>.I.JoinNotification(slot.userInfo);
+				MonoBehaviourSingleton<ClanNetworkManager>.I.JoinNotification(slotInfoByUserId.userInfo);
 			}
 		}
 	}
@@ -215,7 +214,7 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 		case LoungeMemberStatus.MEMBER_STATUS.LOUNGE:
 			SendRoomPosition(userId);
 			NeedLoungeQuestBalloonUpdate = true;
-			this.StartCoroutine(CreatePlayerOnChangedStatus(userId));
+			StartCoroutine(CreatePlayerOnChangedStatus(userId));
 			break;
 		}
 	}
@@ -223,9 +222,9 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 	private IEnumerator CreatePlayerOnChangedStatus(int userId)
 	{
 		yield return SendLoungeInfoForce();
-		PartyModel.SlotInfo slot = MonoBehaviourSingleton<ClanMatchingManager>.I.GetSlotInfoByUserId(userId);
-		IHomePeople.CastToLoungePeople().CreateLoungePlayer(slot, useMovingEntry: true);
-		IHomePeople.CastToLoungePeople().ChangeEquipLoungePlayer(slot, useMovingEntry: true);
+		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<ClanMatchingManager>.I.GetSlotInfoByUserId(userId);
+		IHomePeople.CastToLoungePeople().CreateLoungePlayer(slotInfoByUserId, useMovingEntry: true);
+		IHomePeople.CastToLoungePeople().ChangeEquipLoungePlayer(slotInfoByUserId, useMovingEntry: true);
 	}
 
 	private void CreatePartyAnnounce(int userId)
@@ -238,12 +237,12 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 
 	private void SetAnnounce(LoungeAnnounce.AnnounceData data)
 	{
-		if (!object.ReferenceEquals(data, null))
+		if (data != null)
 		{
 			clanAnnounceQueue.Enqueue(data);
-			if (object.ReferenceEquals(loungeAnnounceCoroutine, null))
+			if (loungeAnnounceCoroutine == null)
 			{
-				loungeAnnounceCoroutine = this.StartCoroutine(ShowAnnounce());
+				loungeAnnounceCoroutine = StartCoroutine(ShowAnnounce());
 			}
 		}
 	}
@@ -258,9 +257,9 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 		}
 		while (clanAnnounceQueue.Count > 0)
 		{
-			LoungeAnnounce.AnnounceData annouceData = clanAnnounceQueue.Dequeue();
+			LoungeAnnounce.AnnounceData data = clanAnnounceQueue.Dequeue();
 			bool wait = true;
-			announce.Play(annouceData, delegate
+			announce.Play(data, delegate
 			{
 				wait = false;
 			});
@@ -268,7 +267,7 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 			{
 				yield return null;
 			}
-			yield return (object)new WaitForSeconds(0.3f);
+			yield return new WaitForSeconds(0.3f);
 		}
 		loungeAnnounceCoroutine = null;
 	}
@@ -277,7 +276,7 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 	{
 		if (sendInfoSpan.IsReady())
 		{
-			this.StartCoroutine(SendLoungeInfoForce());
+			StartCoroutine(SendLoungeInfoForce());
 		}
 		if (MonoBehaviourSingleton<ClanMatchingManager>.I.partyData == null)
 		{
@@ -309,7 +308,7 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 	{
 		if (!pause)
 		{
-			this.StartCoroutine(ResumeApp());
+			StartCoroutine(ResumeApp());
 		}
 	}
 
@@ -327,7 +326,7 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 		{
 			DestoryMembersOnResume();
 			yield return null;
-			this.StartCoroutine(CreateMembersOnResume());
+			StartCoroutine(CreateMembersOnResume());
 			yield return null;
 			ResetAllMemberAction();
 		}
@@ -362,15 +361,13 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 			{
 				continue;
 			}
-			PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<ClanMatchingManager>.I.GetSlotInfoByUserId(userId);
-			if (slotInfoByUserId == null)
+			if (MonoBehaviourSingleton<ClanMatchingManager>.I.GetSlotInfoByUserId(userId) == null)
 			{
 				IHomePeople.CastToLoungePeople().DestroyLoungePlayer(userId);
 			}
 			else if (MonoBehaviourSingleton<ClanMatchingManager>.I.loungeMemberStatus != null)
 			{
-				LoungeMemberStatus loungeMemberStatus = MonoBehaviourSingleton<ClanMatchingManager>.I.loungeMemberStatus[userId];
-				LoungeMemberStatus.MEMBER_STATUS status = loungeMemberStatus.GetStatus();
+				LoungeMemberStatus.MEMBER_STATUS status = MonoBehaviourSingleton<ClanMatchingManager>.I.loungeMemberStatus[userId].GetStatus();
 				if (status == LoungeMemberStatus.MEMBER_STATUS.QUEST || status == LoungeMemberStatus.MEMBER_STATUS.FIELD)
 				{
 					IHomePeople.CastToLoungePeople().DestroyLoungePlayer(userId);
@@ -397,11 +394,11 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 			{
 				continue;
 			}
-			LoungeMemberStatus status = MonoBehaviourSingleton<ClanMatchingManager>.I.loungeMemberStatus[userId];
-			if (status != null)
+			LoungeMemberStatus loungeMemberStatus = MonoBehaviourSingleton<ClanMatchingManager>.I.loungeMemberStatus[userId];
+			if (loungeMemberStatus != null)
 			{
-				LoungeMemberStatus.MEMBER_STATUS partyStatus = status.GetStatus();
-				if (partyStatus == LoungeMemberStatus.MEMBER_STATUS.LOUNGE || partyStatus == LoungeMemberStatus.MEMBER_STATUS.QUEST_READY)
+				LoungeMemberStatus.MEMBER_STATUS status = loungeMemberStatus.GetStatus();
+				if (status == LoungeMemberStatus.MEMBER_STATUS.LOUNGE || status == LoungeMemberStatus.MEMBER_STATUS.QUEST_READY)
 				{
 					IHomePeople.CastToLoungePeople().CreateLoungePlayer(slots[i], useMovingEntry: false);
 					IHomePeople.CastToLoungePeople().ChangeEquipLoungePlayer(slots[i], useMovingEntry: false);
@@ -426,7 +423,7 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 	{
 		if (userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
-			this.StartCoroutine(CreateCharacterRoomJoined(userId));
+			StartCoroutine(CreateCharacterRoomJoined(userId));
 		}
 	}
 
@@ -441,14 +438,13 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 			}
 			if (id != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 			{
-				this.StartCoroutine(SendLoungeInfoForce());
+				StartCoroutine(SendLoungeInfoForce());
 			}
 		}
 	}
 
 	public void OnRecvRoomMove(int id, Vector3 targetPos)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		if (IHomePeople != null)
 		{
 			IHomePeople.CastToLoungePeople().MoveLoungePlayer(id, targetPos);
@@ -457,7 +453,6 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 
 	public void OnRecvRoomPosition(int id, Vector3 targetPos, LOUNGE_ACTION_TYPE type)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		if (IHomePeople != null)
 		{
 			IHomePeople.CastToLoungePeople().SetInitialPositionLoungePlayer(id, targetPos, type);
@@ -567,12 +562,9 @@ public class ClanManager : MonoBehaviourSingleton<ClanManager>, IHomeManager
 
 	private void SendRoomPosition(int cid)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 		if (IHomePeople != null && !(IHomePeople.selfChara == null))
 		{
-			Vector3 position = IHomePeople.selfChara._transform.get_position();
+			Vector3 position = IHomePeople.selfChara._transform.position;
 			LOUNGE_ACTION_TYPE actionType = IHomePeople.selfChara.GetActionType();
 			MonoBehaviourSingleton<LoungeNetworkManager>.I.RoomPosition(cid, position, actionType);
 		}

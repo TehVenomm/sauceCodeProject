@@ -1,6 +1,7 @@
 using Network;
 using System;
 using System.Globalization;
+using UnityEngine;
 
 public class ClanNoticeBoard : GameSection
 {
@@ -17,35 +18,35 @@ public class ClanNoticeBoard : GameSection
 	public override void UpdateUI()
 	{
 		bool is_visible = MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsLeader() || MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsSubLeader();
-		SetActive((Enum)UI.BTN_EDIT, is_visible);
-		if (!MonoBehaviourSingleton<ClanManager>.IsValid() || MonoBehaviourSingleton<ClanManager>.I.noticeBoardData == null || MonoBehaviourSingleton<ClanManager>.I.noticeBoardData.contributorUserName == string.Empty)
+		SetActive(UI.BTN_EDIT, is_visible);
+		if (!MonoBehaviourSingleton<ClanManager>.IsValid() || MonoBehaviourSingleton<ClanManager>.I.noticeBoardData == null || MonoBehaviourSingleton<ClanManager>.I.noticeBoardData.contributorUserName == "")
 		{
-			SetActive((Enum)UI.LBL_UPDATE_AT, is_visible: false);
-			SetActive((Enum)UI.LBL_MESSAGE, is_visible: false);
-			SetActive((Enum)UI.LBL_EDITED_BY, is_visible: false);
-			SetActive((Enum)UI.LBL_UPDATE_AT, is_visible: false);
-			SetActive((Enum)UI.SPR_STATUS, is_visible: false);
-			SetActive((Enum)UI.LBL_NO_MESSAGE, is_visible: true);
-			SetFontStyle((Enum)UI.LBL_NO_MESSAGE, 2);
+			SetActive(UI.LBL_UPDATE_AT, is_visible: false);
+			SetActive(UI.LBL_MESSAGE, is_visible: false);
+			SetActive(UI.LBL_EDITED_BY, is_visible: false);
+			SetActive(UI.LBL_UPDATE_AT, is_visible: false);
+			SetActive(UI.SPR_STATUS, is_visible: false);
+			SetActive(UI.LBL_NO_MESSAGE, is_visible: true);
+			SetFontStyle(UI.LBL_NO_MESSAGE, FontStyle.Italic);
 			return;
 		}
-		SetActive((Enum)UI.LBL_UPDATE_AT, is_visible: true);
-		SetActive((Enum)UI.LBL_MESSAGE, is_visible: true);
-		SetActive((Enum)UI.LBL_EDITED_BY, is_visible: true);
-		SetActive((Enum)UI.LBL_UPDATE_AT, is_visible: true);
+		SetActive(UI.LBL_UPDATE_AT, is_visible: true);
+		SetActive(UI.LBL_MESSAGE, is_visible: true);
+		SetActive(UI.LBL_EDITED_BY, is_visible: true);
+		SetActive(UI.LBL_UPDATE_AT, is_visible: true);
 		SetStatusSprite(MonoBehaviourSingleton<ClanManager>.I.noticeBoardData.contributorUserClan);
-		SetLabelText((Enum)UI.LBL_UPDATE_AT, MonoBehaviourSingleton<ClanManager>.I.noticeBoardData.updatedAt.ConvToDateTime().ToString("yyyy/MM/dd HH:mm", new CultureInfo("ja-JP")));
-		SetLabelText((Enum)UI.LBL_EDITED_BY, MonoBehaviourSingleton<ClanManager>.I.noticeBoardData.contributorUserName);
-		bool flag = MonoBehaviourSingleton<ClanManager>.I.noticeBoardData.body == null || MonoBehaviourSingleton<ClanManager>.I.noticeBoardData.body == string.Empty;
-		SetActive((Enum)UI.LBL_NO_MESSAGE, flag);
-		SetActive((Enum)UI.LBL_MESSAGE, !flag);
+		SetLabelText(UI.LBL_UPDATE_AT, MonoBehaviourSingleton<ClanManager>.I.noticeBoardData.updatedAt.ConvToDateTime().ToString("yyyy/MM/dd HH:mm", new CultureInfo("ja-JP")));
+		SetLabelText(UI.LBL_EDITED_BY, MonoBehaviourSingleton<ClanManager>.I.noticeBoardData.contributorUserName);
+		bool flag = MonoBehaviourSingleton<ClanManager>.I.noticeBoardData.body == null || MonoBehaviourSingleton<ClanManager>.I.noticeBoardData.body == "";
+		SetActive(UI.LBL_NO_MESSAGE, flag);
+		SetActive(UI.LBL_MESSAGE, !flag);
 		if (flag)
 		{
-			SetFontStyle((Enum)UI.LBL_NO_MESSAGE, 2);
+			SetFontStyle(UI.LBL_NO_MESSAGE, FontStyle.Italic);
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_MESSAGE, MonoBehaviourSingleton<ClanManager>.I.noticeBoardData.body);
+			SetLabelText(UI.LBL_MESSAGE, MonoBehaviourSingleton<ClanManager>.I.noticeBoardData.body);
 		}
 	}
 
@@ -53,17 +54,17 @@ public class ClanNoticeBoard : GameSection
 	{
 		if (userClan.IsLeader())
 		{
-			SetActive((Enum)UI.SPR_STATUS, is_visible: true);
-			SetSprite((Enum)UI.SPR_STATUS, "Clan_HeadmasterIcon");
+			SetActive(UI.SPR_STATUS, is_visible: true);
+			SetSprite(UI.SPR_STATUS, "Clan_HeadmasterIcon");
 		}
 		else if (userClan.IsSubLeader())
 		{
-			SetActive((Enum)UI.SPR_STATUS, is_visible: true);
-			SetSprite((Enum)UI.SPR_STATUS, "Clan_DeputyHeadmasterIcon");
+			SetActive(UI.SPR_STATUS, is_visible: true);
+			SetSprite(UI.SPR_STATUS, "Clan_DeputyHeadmasterIcon");
 		}
 		else
 		{
-			SetActive((Enum)UI.SPR_STATUS, is_visible: false);
+			SetActive(UI.SPR_STATUS, is_visible: false);
 		}
 	}
 

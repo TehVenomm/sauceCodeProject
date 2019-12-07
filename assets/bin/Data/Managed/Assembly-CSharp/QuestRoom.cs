@@ -140,7 +140,11 @@ public class QuestRoom : GameSection
 
 		public bool IsSameRoomState(ROOM_USER_STATE state, int user_id)
 		{
-			return state == roomState && userID == user_id;
+			if (state == roomState)
+			{
+				return userID == user_id;
+			}
+			return false;
 		}
 	}
 
@@ -262,11 +266,11 @@ public class QuestRoom : GameSection
 
 		private IEnumerator LoadStamp(int stampId)
 		{
-			LoadingQueue load_queue = new LoadingQueue(behaviour);
-			LoadObject lo_stamp = load_queue.LoadChatStamp(stampId);
-			yield return load_queue.Wait();
-			Texture2D tex = lo_stamp.loadedObject as Texture2D;
-			chatStampTexture.mainTexture = tex;
+			LoadingQueue loadingQueue = new LoadingQueue(behaviour);
+			LoadObject lo_stamp = loadingQueue.LoadChatStamp(stampId);
+			yield return loadingQueue.Wait();
+			Texture2D mainTexture = lo_stamp.loadedObject as Texture2D;
+			chatStampTexture.mainTexture = mainTexture;
 			PlayTween(chatStampTween);
 		}
 
@@ -282,28 +286,20 @@ public class QuestRoom : GameSection
 
 		private void FitTextBG()
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			UISprite uISprite = chatTextBG;
-			Vector2 printedSize = chatTextLabel.printedSize;
-			uISprite.width = Mathf.CeilToInt(printedSize.x) + 34;
+			chatTextBG.width = Mathf.CeilToInt(chatTextLabel.printedSize.x) + 34;
 		}
 
 		private void MoveTextBG()
 		{
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
 			float num = -150f;
 			float num2 = -68f;
 			float num3 = 128f;
 			float num4 = 390f;
-			Vector3 localPosition = chatTextBG.get_transform().get_localPosition();
+			Vector3 localPosition = chatTextBG.transform.localPosition;
 			if ((float)chatTextBG.width < num3)
 			{
 				localPosition.x = 0f - (float)chatTextBG.width * 0.5f;
-				chatTextBG.get_transform().set_localPosition(localPosition);
+				chatTextBG.transform.localPosition = localPosition;
 				return;
 			}
 			if (position == 0)
@@ -325,12 +321,12 @@ public class QuestRoom : GameSection
 			{
 				localPosition.x = -(chatTextBG.width - 68);
 			}
-			chatTextBG.get_transform().set_localPosition(localPosition);
+			chatTextBG.transform.localPosition = localPosition;
 		}
 
 		private void PlayTween(UITweener tween)
 		{
-			tween.get_gameObject().SetActive(true);
+			tween.gameObject.SetActive(value: true);
 			tween.ResetToBeginning();
 			tween.PlayForward();
 		}
@@ -355,7 +351,7 @@ public class QuestRoom : GameSection
 		private void Reset(UITweener balloonRoot)
 		{
 			balloonRoot.ResetToBeginning();
-			balloonRoot.get_gameObject().SetActive(false);
+			balloonRoot.gameObject.SetActive(value: false);
 		}
 	}
 
@@ -455,7 +451,7 @@ public class QuestRoom : GameSection
 		{
 			isRandomSearch = MonoBehaviourSingleton<PartyManager>.I.randomMatchingInfo.usedSearchRandomMatching;
 		}
-		observer = this.get_gameObject().AddComponent<QuestRoomObserver>().Initialize(flag, is_entry_pass, delegate(string dispatch_event_name)
+		observer = base.gameObject.AddComponent<QuestRoomObserver>().Initialize(flag, is_entry_pass, delegate(string dispatch_event_name)
 		{
 			DispatchEvent(dispatch_event_name);
 		}, delegate(string change_event_name)
@@ -482,16 +478,16 @@ public class QuestRoom : GameSection
 				canShowRepeatQuest = (questData.questType == QUEST_TYPE.ORDER);
 			}
 			preDownloadCoroutine = StartPredownload();
-			this.StartCoroutine(preDownloadCoroutine);
+			StartCoroutine(preDownloadCoroutine);
 		}
 		else
 		{
 			MonoBehaviourSingleton<StatusManager>.I.ClearEventEquipSet();
 		}
-		SetActive((Enum)UI.OBJ_QUEST_INFO, !isExplore && !isRush && !isWaveMatch && !isWaveMatchEvent);
-		SetActive((Enum)UI.OBJ_EXPLORE_INFO, isExplore);
-		SetActive((Enum)UI.OBJ_RUSH_INFO, isRush);
-		SetActive((Enum)UI.OBJ_WAVE_MATCH_INFO, isWaveMatch || isWaveMatchEvent);
+		SetActive(UI.OBJ_QUEST_INFO, !isExplore && !isRush && !isWaveMatch && !isWaveMatchEvent);
+		SetActive(UI.OBJ_EXPLORE_INFO, isExplore);
+		SetActive(UI.OBJ_RUSH_INFO, isRush);
+		SetActive(UI.OBJ_WAVE_MATCH_INFO, isWaveMatch || isWaveMatchEvent);
 		roomUserModelInfo = new RoomUserModelInfo[4];
 		for (int i = 0; i < 4; i++)
 		{
@@ -534,7 +530,7 @@ public class QuestRoom : GameSection
 		}
 		if (canShowRepeatQuest && selfUserId == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId())
 		{
-			this.StartCoroutine(SetDeaultRepeat());
+			StartCoroutine(SetDeaultRepeat());
 		}
 		else
 		{
@@ -548,8 +544,8 @@ public class QuestRoom : GameSection
 		bool wait = true;
 		MonoBehaviourSingleton<PartyManager>.I.SendRepeat(MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest, delegate
 		{
-			SetActive((Enum)UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-			SetActive((Enum)UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			SetActive(UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			SetActive(UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
 			wait = false;
 		});
 		while (wait)
@@ -567,7 +563,7 @@ public class QuestRoom : GameSection
 			return;
 		}
 		MonoBehaviourSingleton<StatusManager>.I.ClearEventEquipSet();
-		this.StartCoroutine(DoExit());
+		StartCoroutine(DoExit());
 	}
 
 	private IEnumerator DoExit()
@@ -612,14 +608,14 @@ public class QuestRoom : GameSection
 		}
 		if (preDownloadCoroutine != null)
 		{
-			this.StopCoroutine(preDownloadCoroutine);
+			StopCoroutine(preDownloadCoroutine);
 		}
 		base.OnDestroy();
 	}
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.BTN_BACK_2, is_visible: false);
+		SetActive(UI.BTN_BACK_2, is_visible: false);
 		if (!PartyManager.IsValidInParty() || questData == null)
 		{
 			return;
@@ -632,7 +628,7 @@ public class QuestRoom : GameSection
 		{
 			return;
 		}
-		SetLabelText((Enum)UI.LBL_QUEST_NAME, questData.questText);
+		SetLabelText(UI.LBL_QUEST_NAME, questData.questText);
 		int num = 0;
 		QuestTable.QuestTableData questTableData = null;
 		if (isExplore)
@@ -651,18 +647,17 @@ public class QuestRoom : GameSection
 		{
 			num2 = (int)enemyData.weakElement;
 		}
-		SetElementSprite((Enum)UI.SPR_WEAK, num2);
-		SetActive((Enum)UI.LBL_NON_WEAK, num2 == 6);
+		SetElementSprite(UI.SPR_WEAK, num2);
+		SetActive(UI.LBL_NON_WEAK, num2 == 6);
 		if (isExplore)
 		{
-			SetLabelText((Enum)UI.LBL_EXPLORE_NAME, questTableData.questText);
-			SetElementSprite((Enum)UI.SPR_WEAK_EXPLORE, num2);
-			SetActive((Enum)UI.LBL_NON_WEAK_EXPLORE, num2 == 6);
-			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY));
-			itemIcon.SetDepth(7);
-			SetElementSprite((Enum)UI.SPR_ENM_ELEMENT, (int)enemyData.element);
+			SetLabelText(UI.LBL_EXPLORE_NAME, questTableData.questText);
+			SetElementSprite(UI.SPR_WEAK_EXPLORE, num2);
+			SetActive(UI.LBL_NON_WEAK_EXPLORE, num2 == 6);
+			ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY)).SetDepth(7);
+			SetElementSprite(UI.SPR_ENM_ELEMENT, (int)enemyData.element);
 			int num3 = (int)questTableData.limitTime;
-			SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num3 / 60:D2}:{num3 % 60:D2}");
+			SetLabelText(UI.LBL_LIMIT_TIME, $"{num3 / 60:D2}:{num3 % 60:D2}");
 		}
 		if (isRush)
 		{
@@ -676,17 +671,17 @@ public class QuestRoom : GameSection
 				}
 			}
 			int num4 = (int)questData.limitTime;
-			SetLabelText((Enum)UI.LBL_RUSH_LIMIT_TIME, $"{num4 / 60:D2}:{num4 % 60:D2}");
-			SetLabelText((Enum)UI.LBL_RUSH_NAME, questData.questText);
-			SetActive((Enum)UI.LBL_RUSH_FLOORNUMBER, is_visible: false);
+			SetLabelText(UI.LBL_RUSH_LIMIT_TIME, $"{num4 / 60:D2}:{num4 % 60:D2}");
+			SetLabelText(UI.LBL_RUSH_NAME, questData.questText);
+			SetActive(UI.LBL_RUSH_FLOORNUMBER, is_visible: false);
 		}
 		if (isWaveMatch || isWaveMatchEvent)
 		{
 			int num5 = (int)questData.limitTime;
-			SetLabelText((Enum)UI.LBL_WM_TITLE, questData.questText);
-			SetLabelText((Enum)UI.LBL_WM_LIMIT_TIME, $"{num5 / 60:D2}:{num5 % 60:D2}");
-			SetActive((Enum)UI.LBL_WM_TYPE, isWaveMatch);
-			SetActive((Enum)UI.LBL_WM_EVENT_TYPE, isWaveMatchEvent);
+			SetLabelText(UI.LBL_WM_TITLE, questData.questText);
+			SetLabelText(UI.LBL_WM_LIMIT_TIME, $"{num5 / 60:D2}:{num5 % 60:D2}");
+			SetActive(UI.LBL_WM_TYPE, isWaveMatch);
+			SetActive(UI.LBL_WM_EVENT_TYPE, isWaveMatchEvent);
 		}
 		DeliveryTable.DeliveryData deliveryData = null;
 		if (isExplore)
@@ -697,14 +692,14 @@ public class QuestRoom : GameSection
 		{
 			deliveryData = Singleton<DeliveryTable>.I.GetDeliveryTableDataFromQuestId(questData.questID);
 		}
-		SetActive((Enum)UI.SPR_TYPE_DIFFICULTY, (deliveryData != null && deliveryData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
-		SetLabelText((Enum)UI.LBL_ROOM_ID, MonoBehaviourSingleton<PartyManager>.I.GetPartyNumber());
-		SetGrid(UI.GRD_PLAYER_INFO, string.Empty, 4, reset: false, delegate(int i, Transform t)
+		SetActive(UI.SPR_TYPE_DIFFICULTY, (deliveryData != null && deliveryData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
+		SetLabelText(UI.LBL_ROOM_ID, MonoBehaviourSingleton<PartyManager>.I.GetPartyNumber());
+		SetGrid(UI.GRD_PLAYER_INFO, "", 4, reset: false, delegate(int i, Transform t)
 		{
 			string prefab_name = (i != MonoBehaviourSingleton<PartyManager>.I.GetSlotIndex(selfUserId)) ? "QuestRoomUserInfo" : "QuestRoomUserInfoSelf";
-			Transform val = Realizes(prefab_name, t, check_panel: false);
-			SetupChatBalloon(val, i);
-			return val;
+			Transform transform = Realizes(prefab_name, t, check_panel: false);
+			SetupChatBalloon(transform, i);
+			return transform;
 		}, delegate(int i, Transform t, bool is_recycle)
 		{
 			UpdateRoomUserInfo(t, i);
@@ -712,28 +707,27 @@ public class QuestRoom : GameSection
 			SetEvent(t, UI.BTN_FRAME, "MEMBER_DETAIL", i);
 			UpdateChatBalloon(i);
 		});
-		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<PartyManager>.I.GetSlotInfoByUserId(selfUserId);
-		bool is_active2 = slotInfoByUserId.status == 21;
-		bool flag = selfUserId == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId();
-		bool flag2 = MonoBehaviourSingleton<PartyManager>.I.GetStatus() >= PARTY_STATUS.PLAYING;
-		if (flag)
+		bool is_active2 = MonoBehaviourSingleton<PartyManager>.I.GetSlotInfoByUserId(selfUserId).status == 21;
+		bool num6 = selfUserId == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId();
+		bool flag = MonoBehaviourSingleton<PartyManager>.I.GetStatus() >= PARTY_STATUS.PLAYING;
+		if (num6)
 		{
-			SetActive((Enum)UI.BTN_READY, is_visible: false);
-			SetActive((Enum)UI.BTN_READY_BACK, is_visible: false);
-			SetActive((Enum)UI.BTN_OWNER_READY, is_visible: true);
-			SetActive((Enum)UI.BTN_INVITE, is_visible: true);
-			bool flag3 = MonoBehaviourSingleton<PartyManager>.IsValid() && MonoBehaviourSingleton<PartyManager>.I.partySetting != null && MonoBehaviourSingleton<PartyManager>.I.partySetting.isLock;
-			SetActive((Enum)UI.BTN_CHANGE_PUBLIC, flag3);
-			SetActive((Enum)UI.BTN_CHANGE_PUBLIC_OFF, !flag3);
+			SetActive(UI.BTN_READY, is_visible: false);
+			SetActive(UI.BTN_READY_BACK, is_visible: false);
+			SetActive(UI.BTN_OWNER_READY, is_visible: true);
+			SetActive(UI.BTN_INVITE, is_visible: true);
+			bool flag2 = MonoBehaviourSingleton<PartyManager>.IsValid() && MonoBehaviourSingleton<PartyManager>.I.partySetting != null && MonoBehaviourSingleton<PartyManager>.I.partySetting.isLock;
+			SetActive(UI.BTN_CHANGE_PUBLIC, flag2);
+			SetActive(UI.BTN_CHANGE_PUBLIC_OFF, !flag2);
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_READY, !flag2);
-			SetActive((Enum)UI.BTN_READY_BACK, !flag2);
-			SetActive((Enum)UI.BTN_OWNER_READY, flag2);
-			if (!flag2)
+			SetActive(UI.BTN_READY, !flag);
+			SetActive(UI.BTN_READY_BACK, !flag);
+			SetActive(UI.BTN_OWNER_READY, flag);
+			if (!flag)
 			{
-				SetToggleButton((Enum)UI.TGL_READY, is_active2, (Action<bool>)delegate(bool is_active)
+				SetToggleButton(UI.TGL_READY, is_active2, delegate(bool is_active)
 				{
 					if (is_active)
 					{
@@ -745,30 +739,30 @@ public class QuestRoom : GameSection
 					}
 				});
 			}
-			SetActive((Enum)UI.BTN_INVITE, is_visible: false);
-			SetActive((Enum)UI.BTN_CHANGE_PUBLIC, is_visible: false);
-			SetActive((Enum)UI.BTN_CHANGE_PUBLIC_OFF, is_visible: false);
+			SetActive(UI.BTN_INVITE, is_visible: false);
+			SetActive(UI.BTN_CHANGE_PUBLIC, is_visible: false);
+			SetActive(UI.BTN_CHANGE_PUBLIC_OFF, is_visible: false);
 		}
 		if (questData.questType == QUEST_TYPE.GATE)
 		{
 			string format = StringTable.Get(STRING_CATEGORY.GATE_QUEST_NAME, 0u);
-			string text = string.Empty;
+			string text = "";
 			if (enemyData != null)
 			{
 				text = string.Format(format, questData.GetMainEnemyLv(), enemyData.name);
 			}
-			SetLabelText((Enum)UI.LBL_QUEST_NAME, text);
+			SetLabelText(UI.LBL_QUEST_NAME, text);
 		}
 		openAfterUpdate = false;
 		if (canShowRepeatQuest)
 		{
-			SetActive((Enum)UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-			SetActive((Enum)UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			SetActive(UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			SetActive(UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_REPEAT_OFF, is_visible: false);
-			SetActive((Enum)UI.BTN_REPEAT_ON, is_visible: false);
+			SetActive(UI.BTN_REPEAT_OFF, is_visible: false);
+			SetActive(UI.BTN_REPEAT_ON, is_visible: false);
 		}
 	}
 
@@ -831,9 +825,9 @@ public class QuestRoom : GameSection
 			int ownerUserId = MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId();
 			bool flag = org.userId == ownerUserId;
 			bool flag2 = slotInfoByIndex.status == 21;
-			bool flag3 = slotInfoByIndex.status == 30;
-			bool flag4 = MonoBehaviourSingleton<PartyManager>.I.IsEquipChangeByIndex(index);
-			rOOM_USER_STATE = (flag3 ? RoomUserModelInfo.ROOM_USER_STATE.BATTLE : (flag ? (flag4 ? RoomUserModelInfo.ROOM_USER_STATE.EQUIP_CHANGE : RoomUserModelInfo.ROOM_USER_STATE.NONE) : (flag4 ? RoomUserModelInfo.ROOM_USER_STATE.EQUIP_CHANGE : ((!flag2) ? RoomUserModelInfo.ROOM_USER_STATE.STAY : RoomUserModelInfo.ROOM_USER_STATE.READY))));
+			bool num = slotInfoByIndex.status == 30;
+			bool flag3 = MonoBehaviourSingleton<PartyManager>.I.IsEquipChangeByIndex(index);
+			rOOM_USER_STATE = (num ? RoomUserModelInfo.ROOM_USER_STATE.BATTLE : (flag ? (flag3 ? RoomUserModelInfo.ROOM_USER_STATE.EQUIP_CHANGE : RoomUserModelInfo.ROOM_USER_STATE.NONE) : (flag3 ? RoomUserModelInfo.ROOM_USER_STATE.EQUIP_CHANGE : ((!flag2) ? RoomUserModelInfo.ROOM_USER_STATE.STAY : RoomUserModelInfo.ROOM_USER_STATE.READY))));
 			SetActive(trans, UI.SPR_WEAPON_1, is_visible: false);
 			SetActive(trans, UI.SPR_WEAPON_2, is_visible: false);
 			SetActive(trans, UI.SPR_WEAPON_3, is_visible: false);
@@ -848,16 +842,16 @@ public class QuestRoom : GameSection
 						SetActive(trans, weaponIcon[weapon_index], is_visible: true);
 						int equipmentTypeIndex = UIBehaviour.GetEquipmentTypeIndex(equipItemData.type);
 						SetSprite(trans, weaponIcon[weapon_index], ITEM_TYPE_ICON_SPRITE_NAME[equipmentTypeIndex]);
-						weapon_index++;
+						int num4 = ++weapon_index;
 					}
 				}
 			});
 			EquipSetCalculator otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(index);
-			bool flag5 = roomUserModelInfo[index].userID != org.userId;
-			bool flag6 = !component.IsAllSameEquip(org);
-			if (flag5 || flag6 || openAfterUpdate)
+			bool num2 = roomUserModelInfo[index].userID != org.userId;
+			bool flag4 = !component.IsAllSameEquip(org);
+			if ((num2 | flag4) || openAfterUpdate)
 			{
-				if (flag6)
+				if (flag4)
 				{
 					otherEquipSetCalculator.SetEquipSet(org.equipSet);
 				}
@@ -880,8 +874,8 @@ public class QuestRoom : GameSection
 			SetLabelText(trans, UI.LBL_NAME, Utility.GetNameWithColoredClanTag(clanInfo.tag, org.name, org.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, isSameTeam));
 			SetLabelText(trans, UI.LBL_LV, org.level.ToString());
 		}
-		int num = org?.userId ?? 0;
-		if (!roomUserModelInfo[index].IsSameRoomState(rOOM_USER_STATE, num) || openAfterUpdate)
+		int num3 = org?.userId ?? 0;
+		if (!roomUserModelInfo[index].IsSameRoomState(rOOM_USER_STATE, num3) || openAfterUpdate)
 		{
 			if (rOOM_USER_STATE == RoomUserModelInfo.ROOM_USER_STATE.EMPTY)
 			{
@@ -907,19 +901,19 @@ public class QuestRoom : GameSection
 			ActiveAndTween(trans, UI.SPR_USER_EQUIP_CHANGE, rOOM_USER_STATE == RoomUserModelInfo.ROOM_USER_STATE.EQUIP_CHANGE);
 		}
 		roomUserModelInfo[index].Reset();
-		roomUserModelInfo[index].SetInfo(component, rOOM_USER_STATE, num);
+		roomUserModelInfo[index].SetInfo(component, rOOM_USER_STATE, num3);
 	}
 
 	private void SetupChatBalloon(Transform t, int index)
 	{
-		ChatBalloon chatBalloon = balloons[index];
+		ChatBalloon obj = balloons[index];
 		UIPanel component = FindCtrl(t, UI.OBJ_CHAT).GetComponent<UIPanel>();
 		UITweener component2 = FindCtrl(t, UI.OBJ_TEXT_TWEEN).GetComponent<UITweener>();
 		UITweener component3 = FindCtrl(t, UI.OBJ_STAMP_TWEEN).GetComponent<UITweener>();
 		UILabel component4 = FindCtrl(t, UI.LBL_CHAT_TEXT).GetComponent<UILabel>();
 		UISprite component5 = FindCtrl(t, UI.SPR_CHAT_TEXT_BG).GetComponent<UISprite>();
 		UITexture component6 = FindCtrl(t, UI.TEX_CHAT_STAMP).GetComponent<UITexture>();
-		chatBalloon.Init(component, component2, component3, component4, component5, component6);
+		obj.Init(component, component2, component3, component4, component5, component6);
 	}
 
 	private void UpdateChatBalloon(int index)
@@ -956,8 +950,8 @@ public class QuestRoom : GameSection
 		partySetting.level = partySetting.reserveLimitLevel;
 		MonoBehaviourSingleton<PartyManager>.I.SendEdit(partySetting, delegate(bool isSuccess)
 		{
-			SetActive((Enum)UI.BTN_CHANGE_PUBLIC, is_visible: false);
-			SetActive((Enum)UI.BTN_CHANGE_PUBLIC_OFF, is_visible: true);
+			SetActive(UI.BTN_CHANGE_PUBLIC, is_visible: false);
+			SetActive(UI.BTN_CHANGE_PUBLIC_OFF, is_visible: true);
 			GameSection.ResumeEvent(isSuccess);
 		});
 	}
@@ -1096,7 +1090,7 @@ public class QuestRoom : GameSection
 		}
 		else if (observer.fromSearchSection)
 		{
-			GameSection.ChangeEvent((!observer.isEntryPass) ? "BACK_ROOM_SEARCH" : "BACK_ROOM_PASS_ENTRY");
+			GameSection.ChangeEvent(observer.isEntryPass ? "BACK_ROOM_PASS_ENTRY" : "BACK_ROOM_SEARCH");
 		}
 		else if (isExplore)
 		{
@@ -1204,8 +1198,8 @@ public class QuestRoom : GameSection
 		}
 		if ((notify_flags & NOTIFY_FLAG.RECEIVE_COOP_ROOM_UPDATE) != (NOTIFY_FLAG)0L && canShowRepeatQuest)
 		{
-			SetActive((Enum)UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-			SetActive((Enum)UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			SetActive(UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			SetActive(UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
 		}
 		base.OnNotify(notify_flags);
 	}
@@ -1287,7 +1281,7 @@ public class QuestRoom : GameSection
 		{
 			if (!TutorialStep.HasAllTutorialCompleted())
 			{
-				component.get_gameObject().SetActive(false);
+				component.gameObject.SetActive(value: false);
 			}
 			else if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
 			{
@@ -1298,7 +1292,7 @@ public class QuestRoom : GameSection
 			}
 			else
 			{
-				component.get_gameObject().SetActive(false);
+				component.gameObject.SetActive(value: false);
 			}
 		}
 	}
@@ -1309,19 +1303,19 @@ public class QuestRoom : GameSection
 		{
 			if ((flag & MainChat.NOTIFY_FLAG.ARRIVED_MESSAGE) != 0)
 			{
-				SetBadge((Enum)UI.BTN_CHAT, MonoBehaviourSingleton<UIManager>.I.mainChat.GetPendingQueueNumWithoutRoom(), 1, 5, -10, is_scale_normalize: false);
+				SetBadge(UI.BTN_CHAT, MonoBehaviourSingleton<UIManager>.I.mainChat.GetPendingQueueNumWithoutRoom(), SpriteAlignment.TopLeft, 5, -10);
 			}
 			if ((flag & MainChat.NOTIFY_FLAG.CLOSE_WINDOW) != 0)
 			{
-				GetCtrl(UI.BTN_CHAT).get_gameObject().SetActive(true);
+				GetCtrl(UI.BTN_CHAT).gameObject.SetActive(value: true);
 			}
 			if ((flag & MainChat.NOTIFY_FLAG.OPEN_WINDOW) != 0)
 			{
-				GetCtrl(UI.BTN_CHAT).get_gameObject().SetActive(false);
+				GetCtrl(UI.BTN_CHAT).gameObject.SetActive(value: false);
 			}
 			if ((flag & MainChat.NOTIFY_FLAG.OPEN_WINDOW_INPUT_ONLY) != 0)
 			{
-				GetCtrl(UI.BTN_CHAT).get_gameObject().SetActive(false);
+				GetCtrl(UI.BTN_CHAT).gameObject.SetActive(value: false);
 			}
 		}
 	}
@@ -1373,36 +1367,36 @@ public class QuestRoom : GameSection
 		{
 			yield break;
 		}
-		string stageName = fieldMapData.stageName;
-		if (string.IsNullOrEmpty(stageName))
+		string text = fieldMapData.stageName;
+		if (string.IsNullOrEmpty(text))
 		{
-			stageName = "ST011D_01";
+			text = "ST011D_01";
 		}
-		StageTable.StageData stageData = Singleton<StageTable>.I.GetData(stageName);
-		if (stageData == null)
+		StageTable.StageData data = Singleton<StageTable>.I.GetData(text);
+		if (data == null)
 		{
 			yield break;
 		}
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.STAGE_SCENE, stageData.scene));
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.STAGE_SKY, stageData.sky));
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, stageData.cameraLinkEffect));
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, stageData.cameraLinkEffectY0));
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, stageData.rootEffect));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.STAGE_SCENE, data.scene));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.STAGE_SKY, data.sky));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, data.cameraLinkEffect));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, data.cameraLinkEffectY0));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, data.rootEffect));
 		for (int j = 0; j < 8; j++)
 		{
-			list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, stageData.useEffects[j]));
+			list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, data.useEffects[j]));
 		}
 		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.enemyID[0]);
-		int bodyId = enemyData.modelId;
-		string bodyName = ResourceName.GetEnemyBody(bodyId);
-		string mateName = ResourceName.GetEnemyMaterial(bodyId);
-		string animName = ResourceName.GetEnemyAnim(enemyData.animId);
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_MODEL, bodyName));
-		if (!string.IsNullOrEmpty(mateName))
+		int modelId = enemyData.modelId;
+		string enemyBody = ResourceName.GetEnemyBody(modelId);
+		string enemyMaterial = ResourceName.GetEnemyMaterial(modelId);
+		string enemyAnim = ResourceName.GetEnemyAnim(enemyData.animId);
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_MODEL, enemyBody));
+		if (!string.IsNullOrEmpty(enemyMaterial))
 		{
-			list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_MATERIAL, bodyName));
+			list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_MATERIAL, enemyBody));
 		}
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_ANIM, animName));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.ENEMY_ANIM, enemyAnim));
 		LoadingQueue load_queue = new LoadingQueue(this);
 		foreach (ResourceInfo item in list)
 		{
@@ -1418,43 +1412,43 @@ public class QuestRoom : GameSection
 		{
 			yield break;
 		}
-		GlobalSettingsManager.LinkResources globalResources = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources;
-		InGameSettingsManager.UseResources useResources2 = globalResources.inGameCommonResources;
-		for (int k = 0; k < useResources2.effects.Length; k++)
+		GlobalSettingsManager.LinkResources linkResources = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources;
+		InGameSettingsManager.UseResources inGameCommonResources = linkResources.inGameCommonResources;
+		for (int k = 0; k < inGameCommonResources.effects.Length; k++)
 		{
-			list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, useResources2.effects[k]));
+			list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, inGameCommonResources.effects[k]));
 		}
-		for (int l = 0; l < useResources2.uiEffects.Length; l++)
+		for (int l = 0; l < inGameCommonResources.uiEffects.Length; l++)
 		{
-			list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_UI, useResources2.uiEffects[l]));
+			list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_UI, inGameCommonResources.uiEffects[l]));
 		}
-		useResources2 = globalResources.inGameQuestResources;
-		for (int m = 0; m < useResources2.effects.Length; m++)
+		inGameCommonResources = linkResources.inGameQuestResources;
+		for (int m = 0; m < inGameCommonResources.effects.Length; m++)
 		{
-			list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, useResources2.effects[m]));
+			list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, inGameCommonResources.effects[m]));
 		}
-		for (int n = 0; n < useResources2.uiEffects.Length; n++)
+		for (int n = 0; n < inGameCommonResources.uiEffects.Length; n++)
 		{
-			list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_UI, useResources2.uiEffects[n]));
+			list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_UI, inGameCommonResources.uiEffects[n]));
 		}
-		for (int num = 0; num < globalResources.stunnedEffectList.Length; num++)
+		for (int num = 0; num < linkResources.stunnedEffectList.Length; num++)
 		{
-			list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.stunnedEffectList[num]));
+			list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.stunnedEffectList[num]));
 		}
-		for (int num2 = 0; num2 < globalResources.charmEffectList.Length; num2++)
+		for (int num2 = 0; num2 < linkResources.charmEffectList.Length; num2++)
 		{
-			list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.charmEffectList[num2]));
+			list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.charmEffectList[num2]));
 		}
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.battleStartEffectName));
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.changeWeaponEffectName));
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.spActionStartEffectName));
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.arrowBleedOtherEffectName));
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.shadowSealingEffectName));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.battleStartEffectName));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.changeWeaponEffectName));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.spActionStartEffectName));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.arrowBleedOtherEffectName));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.shadowSealingEffectName));
 		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_pl_frozen_01"));
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.enemyParalyzeHitEffectName));
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.enemyPoisonHitEffectName));
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.enemyFreezeHitEffectName));
-		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.enemyOtherSimpleHitEffectName));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.enemyParalyzeHitEffectName));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.enemyPoisonHitEffectName));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.enemyFreezeHitEffectName));
+		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.enemyOtherSimpleHitEffectName));
 		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_wsk_bow_01_04"));
 		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_enm_flinch_01"));
 		list.Add(new ResourceInfo(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_enm_shock_01"));
@@ -1468,7 +1462,7 @@ public class QuestRoom : GameSection
 			if (!string.IsNullOrEmpty(list[i].packageName) && MonoBehaviourSingleton<ResourceManager>.I.cache.PreloadedInGameResouces.Count < 64)
 			{
 				RESOURCE_CATEGORY category = list[i].category;
-				if (category == RESOURCE_CATEGORY.EFFECT_UI || category == RESOURCE_CATEGORY.EFFECT_ACTION)
+				if (category == RESOURCE_CATEGORY.EFFECT_ACTION || category == RESOURCE_CATEGORY.EFFECT_UI)
 				{
 					load_queue.CacheEffect(list[i].category, list[i].packageName);
 					yield return load_queue.Wait();
@@ -1485,8 +1479,8 @@ public class QuestRoom : GameSection
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<PartyManager>.I.SendRepeat(!MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest, delegate(bool is_success)
 			{
-				SetActive((Enum)UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-				SetActive((Enum)UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+				SetActive(UI.BTN_REPEAT_OFF, !MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+				SetActive(UI.BTN_REPEAT_ON, MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
 				GameSaveData.instance.defaultRepeatPartyOn = MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest;
 				GameSection.ResumeEvent(is_success);
 			});

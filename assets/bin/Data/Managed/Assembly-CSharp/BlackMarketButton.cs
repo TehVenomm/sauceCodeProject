@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class BlackMarketButton : UIBehaviour
@@ -26,12 +25,11 @@ public class BlackMarketButton : UIBehaviour
 		{
 			timeLbl = GetCtrl(UI.TIME_COUNTDOWN_TXT).GetComponent<UILabel>();
 		}
-		PlayTween((Enum)UI.OBJ_TWEEN, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		PlayTween(UI.OBJ_TWEEN, forward: true, null, is_input_block: false);
 		OnInvitationBtnOpen(MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite || MonoBehaviourSingleton<UserInfoManager>.I.ExistsRallyInvite);
 		if (!string.IsNullOrEmpty(GameSaveData.instance.resetMarketTime))
 		{
-			int num = (int)GoGameTimeManager.GetRemainTime(GameSaveData.instance.resetMarketTime).TotalSeconds;
-			if (num > 0)
+			if ((int)GoGameTimeManager.GetRemainTime(GameSaveData.instance.resetMarketTime).TotalSeconds > 0)
 			{
 				UpdateDrakMarketState(isOpen: true);
 			}
@@ -49,7 +47,7 @@ public class BlackMarketButton : UIBehaviour
 
 	public void OnInvitationBtnOpen(bool isOpen)
 	{
-		PlayTween((Enum)UI.OBJ_TWEEN, isOpen, (EventDelegate.Callback)null, is_input_block: true, 1);
+		PlayTween(UI.OBJ_TWEEN, isOpen, null, is_input_block: true, 1);
 	}
 
 	public void InitTime(int time)
@@ -58,7 +56,7 @@ public class BlackMarketButton : UIBehaviour
 		{
 			timeLbl = GetCtrl(UI.TIME_COUNTDOWN_TXT).GetComponent<UILabel>();
 		}
-		SetActive((Enum)UI.SPR_NOTE_UPDATE, GameSaveData.instance.canShowNoteDarkMarket);
+		SetActive(UI.SPR_NOTE_UPDATE, GameSaveData.instance.canShowNoteDarkMarket);
 		UpdateDrakMarketState(isOpen: true);
 	}
 
@@ -68,12 +66,11 @@ public class BlackMarketButton : UIBehaviour
 		{
 			timeLbl = GetCtrl(UI.TIME_COUNTDOWN_TXT).GetComponent<UILabel>();
 		}
-		int num = (int)GoGameTimeManager.GetRemainTime(GameSaveData.instance.resetMarketTime).TotalSeconds;
-		if (num > 0)
+		if ((int)GoGameTimeManager.GetRemainTime(GameSaveData.instance.resetMarketTime).TotalSeconds > 0)
 		{
 			GameSaveData.instance.canShowNoteDarkMarket = true;
-			SetActive((Enum)UI.SPR_NOTE_UPDATE, is_visible: true);
-			MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 37u), string.Empty);
+			SetActive(UI.SPR_NOTE_UPDATE, is_visible: true);
+			MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 37u), "");
 			UpdateDrakMarketState(isOpen: true);
 		}
 		else
@@ -87,14 +84,14 @@ public class BlackMarketButton : UIBehaviour
 		isDarkMarketOpen = isOpen;
 		if (!isOpen)
 		{
-			SetActive((Enum)UI.BTN_CLOSE, is_visible: true);
-			SetActive((Enum)UI.BTN_OPEN, is_visible: false);
+			SetActive(UI.BTN_CLOSE, is_visible: true);
+			SetActive(UI.BTN_OPEN, is_visible: false);
 			timeLbl.text = "Preparing...";
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_CLOSE, is_visible: false);
-			SetActive((Enum)UI.BTN_OPEN, is_visible: true);
+			SetActive(UI.BTN_CLOSE, is_visible: false);
+			SetActive(UI.BTN_OPEN, is_visible: true);
 		}
 	}
 
@@ -110,7 +107,7 @@ public class BlackMarketButton : UIBehaviour
 	{
 		if (timer < 0.25f)
 		{
-			timer += Time.get_deltaTime();
+			timer += Time.deltaTime;
 		}
 		if (timer < 0.25f)
 		{
@@ -134,6 +131,6 @@ public class BlackMarketButton : UIBehaviour
 
 	public void UpdateNoteMarket()
 	{
-		SetActive((Enum)UI.SPR_NOTE_UPDATE, GameSaveData.instance.canShowNoteDarkMarket);
+		SetActive(UI.SPR_NOTE_UPDATE, GameSaveData.instance.canShowNoteDarkMarket);
 	}
 }

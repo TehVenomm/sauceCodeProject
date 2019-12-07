@@ -116,7 +116,7 @@ public class ChatChannelInputPanel
 		{
 			if (number[i] >= 0)
 			{
-				num += Mathf.RoundToInt((float)number[i] * Mathf.Pow(10f, (float)i));
+				num += Mathf.RoundToInt((float)number[i] * Mathf.Pow(10f, i));
 			}
 		}
 		if (onOK != null)

@@ -1,5 +1,3 @@
-using System;
-
 public class QuestInvitationInGameButton : UIBehaviour
 {
 	private enum UI
@@ -9,13 +7,13 @@ public class QuestInvitationInGameButton : UIBehaviour
 
 	protected override void OnOpen()
 	{
-		PlayTween((Enum)UI.OBJ_TWEEN, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		PlayTween(UI.OBJ_TWEEN, forward: true, null, is_input_block: false);
 		base.OnOpen();
 	}
 
 	public void SetDisableButton(bool flag)
 	{
-		UIButton componentInChildren = this.GetComponentInChildren<UIButton>();
+		UIButton componentInChildren = GetComponentInChildren<UIButton>();
 		if (componentInChildren != null)
 		{
 			componentInChildren.isEnabled = !flag;

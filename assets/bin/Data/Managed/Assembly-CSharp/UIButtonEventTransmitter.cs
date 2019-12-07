@@ -4,16 +4,11 @@ public class UIButtonEventTransmitter : MonoBehaviour
 {
 	public GameObject transmit_target;
 
-	public UIButtonEventTransmitter()
-		: this()
-	{
-	}
-
 	private void OnPress(bool isPressed)
 	{
 		if (transmit_target != null)
 		{
-			transmit_target.SendMessage("OnPress", (object)isPressed, 1);
+			transmit_target.SendMessage("OnPress", isPressed, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
@@ -21,7 +16,7 @@ public class UIButtonEventTransmitter : MonoBehaviour
 	{
 		if (transmit_target != null)
 		{
-			transmit_target.SendMessage("OnHover", (object)isOver, 1);
+			transmit_target.SendMessage("OnHover", isOver, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 }

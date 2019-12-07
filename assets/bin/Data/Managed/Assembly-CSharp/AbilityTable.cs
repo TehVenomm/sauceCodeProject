@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 
 public class AbilityTable : Singleton<AbilityTable>, IDataTable
 {
@@ -24,13 +23,13 @@ public class AbilityTable : Singleton<AbilityTable>, IDataTable
 			data.id = key;
 			csv_reader.Pop(ref data.name);
 			csv_reader.Pop(ref data.iconId);
-			string value = string.Empty;
+			string value = "";
 			csv_reader.Pop(ref value);
 			if (!string.IsNullOrEmpty(value) && DateTime.TryParse(value, out DateTime result))
 			{
 				data.startDate = result;
 			}
-			string value2 = string.Empty;
+			string value2 = "";
 			csv_reader.Pop(ref value2);
 			if (!string.IsNullOrEmpty(value2) && DateTime.TryParse(value2, out result))
 			{
@@ -65,12 +64,6 @@ public class AbilityTable : Singleton<AbilityTable>, IDataTable
 	public const int INFO_MAX = 3;
 
 	private UIntKeyTable<Ability> abilityTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<Ability> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<Ability> _003C_003Ef__mg_0024cache1;
 
 	public void CreateTable(string csv_text)
 	{

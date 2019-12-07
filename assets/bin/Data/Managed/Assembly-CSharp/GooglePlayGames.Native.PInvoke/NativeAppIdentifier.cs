@@ -6,13 +6,13 @@ namespace GooglePlayGames.Native.PInvoke
 {
 	internal class NativeAppIdentifier : BaseReferenceHolder
 	{
+		[DllImport("gpg")]
+		internal static extern IntPtr NearbyUtils_ConstructAppIdentifier(string appId);
+
 		internal NativeAppIdentifier(IntPtr pointer)
 			: base(pointer)
 		{
 		}
-
-		[DllImport("gpg")]
-		internal static extern IntPtr NearbyUtils_ConstructAppIdentifier(string appId);
 
 		internal string Id()
 		{

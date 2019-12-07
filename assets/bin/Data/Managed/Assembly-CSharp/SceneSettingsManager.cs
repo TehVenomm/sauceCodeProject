@@ -52,7 +52,7 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 	private const string COLIDER_ROOT_NAME = "Collider";
 
 	[Tooltip("フォグカラ\u30fc")]
-	public Color fogColor = Color.get_white();
+	public Color fogColor = Color.white;
 
 	[Tooltip("フォグ開始距離。フォグモ\u30fcドLinearでのみ使用")]
 	public float linearFogStart;
@@ -102,7 +102,7 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 	[Tooltip("フォグ強制ON")]
 	public bool forceFogON;
 
-	public Object[] linkResources;
+	public UnityEngine.Object[] linkResources;
 
 	[Tooltip("マップの内外情報保存フラグ")]
 	public bool saveInsideCollider = true;
@@ -152,13 +152,11 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 
 	protected override void Awake()
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
 		ApplyScene(isEditorAmbientColor: false);
 		ParseObjectName();
 		addWaveTargetList.Clear();
-		gObjContainCollidersScale = this.get_transform().get_localScale();
+		gObjContainCollidersScale = base.transform.localScale;
 		if (GObjContainColliders == null)
 		{
 			GObjContainColliders = OnGetGObjContainColliders();
@@ -167,51 +165,21 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 
 	private void ParseObjectName()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Expected O, but got Unknown
-		IEnumerator enumerator = this.get_transform().GetEnumerator();
-		try
+		foreach (Transform item in base.transform)
 		{
-			while (enumerator.MoveNext())
+			if (item.name.Contains("Objects"))
 			{
-				Transform val = enumerator.Current;
-				if (val.get_name().Contains("Objects"))
+				foreach (Transform item2 in item)
 				{
-					IEnumerator enumerator2 = val.GetEnumerator();
-					try
+					if (item2.name.Contains("bingoboard"))
 					{
-						while (enumerator2.MoveNext())
-						{
-							Transform val2 = enumerator2.Current;
-							if (val2.get_name().Contains("bingoboard"))
-							{
-								m_bingoBoardObject = val2.get_gameObject();
-							}
-							if (val2.get_name().Contains("block"))
-							{
-								m_bingoBlockObject = val2.get_gameObject();
-							}
-						}
+						m_bingoBoardObject = item2.gameObject;
 					}
-					finally
+					if (item2.name.Contains("block"))
 					{
-						IDisposable disposable;
-						if ((disposable = (enumerator2 as IDisposable)) != null)
-						{
-							disposable.Dispose();
-						}
+						m_bingoBlockObject = item2.gameObject;
 					}
 				}
-			}
-		}
-		finally
-		{
-			IDisposable disposable2;
-			if ((disposable2 = (enumerator as IDisposable)) != null)
-			{
-				disposable2.Dispose();
 			}
 		}
 	}
@@ -224,7 +192,6 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 
 	public void InitializeScene()
 	{
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		ApplyScene(isEditorAmbientColor: false);
 		ParseObjectName();
 		addWaveTargetList.Clear();
@@ -238,32 +205,24 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 
 	public void ApplyScene(bool isEditorAmbientColor)
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		if (Application.get_isPlaying())
+		if (Application.isPlaying)
 		{
 			isEditorAmbientColor = false;
 		}
-		RenderSettings.set_fog(false);
+		RenderSettings.fog = false;
 		if (!isEditorAmbientColor)
 		{
-			RenderSettings.set_ambientLight(ambientColor);
+			RenderSettings.ambientLight = ambientColor;
 		}
 		else
 		{
-			RenderSettings.set_ambientLight(editorAmbientColor);
+			RenderSettings.ambientLight = editorAmbientColor;
 		}
 		weatherController.Init();
 	}
 
 	public void ApplyStageMaterial()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 		ShaderGlobal.fogColor = fogColor;
 		ShaderGlobal.fogNear = linearFogStart;
 		ShaderGlobal.fogFar = linearFogEnd;
@@ -276,45 +235,20 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 		ShaderGlobal.npcAmbientColor = npcAmbientColor;
 		if (MonoBehaviourSingleton<GlobalSettingsManager>.IsValid())
 		{
-			MonoBehaviourSingleton<GlobalSettingsManager>.I.npcLightDirection.set_localEulerAngles(npcLightDir);
+			MonoBehaviourSingleton<GlobalSettingsManager>.I.npcLightDirection.localEulerAngles = npcLightDir;
 		}
 	}
 
 	public static void ApplyEffect(rymFX fx, bool force)
 	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		if (!(fx == null) && (force || fx.BaseColor.a == 0f))
 		{
-			Color val = fx.BaseColor = ((!MonoBehaviourSingleton<SceneSettingsManager>.IsValid()) ? Color.get_white() : MonoBehaviourSingleton<SceneSettingsManager>.I.effectColor);
+			Color color = fx.BaseColor = ((!MonoBehaviourSingleton<SceneSettingsManager>.IsValid()) ? Color.white : MonoBehaviourSingleton<SceneSettingsManager>.I.effectColor);
 		}
 	}
 
 	public void ApplyRaiseCollider()
 	{
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<GlobalSettingsManager>.IsValid())
 		{
 			return;
@@ -324,37 +258,26 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 		{
 			return;
 		}
-		Transform val = null;
-		val = ((!QuestManager.IsValidInGameWaveMatch()) ? Utility.FindChild(this.get_transform(), "Colliders") : base._transform);
-		if (val != null)
+		Transform transform = null;
+		transform = ((!QuestManager.IsValidInGameWaveMatch()) ? Utility.FindChild(base.transform, "Colliders") : base._transform);
+		if (transform != null)
 		{
-			BoxCollider[] componentsInChildren = val.GetComponentsInChildren<BoxCollider>(true);
+			BoxCollider[] componentsInChildren = transform.GetComponentsInChildren<BoxCollider>(includeInactive: true);
 			if (!componentsInChildren.IsNullOrEmpty())
 			{
 				int i = 0;
 				for (int num = componentsInChildren.Length; i < num; i++)
 				{
-					BoxCollider val2 = componentsInChildren[i];
-					Vector3 size = val2.get_size();
-					if (!(size.y > inGameFieldSetting.raiseWallColliderSizeY))
+					BoxCollider boxCollider = componentsInChildren[i];
+					if (!(boxCollider.size.y > inGameFieldSetting.raiseWallColliderSizeY))
 					{
-						BoxCollider obj = val2;
-						Vector3 size2 = val2.get_size();
-						float x = size2.x;
-						float raiseWallColliderSizeY = inGameFieldSetting.raiseWallColliderSizeY;
-						Vector3 size3 = val2.get_size();
-						obj.set_size(new Vector3(x, raiseWallColliderSizeY, size3.z));
-						BoxCollider obj2 = val2;
-						Vector3 center = val2.get_center();
-						float x2 = center.x;
-						float raiseWallColliderOffsetY = inGameFieldSetting.raiseWallColliderOffsetY;
-						Vector3 center2 = val2.get_center();
-						obj2.set_center(new Vector3(x2, raiseWallColliderOffsetY, center2.z));
+						boxCollider.size = new Vector3(boxCollider.size.x, inGameFieldSetting.raiseWallColliderSizeY, boxCollider.size.z);
+						boxCollider.center = new Vector3(boxCollider.center.x, inGameFieldSetting.raiseWallColliderOffsetY, boxCollider.center.z);
 					}
 				}
 			}
 		}
-		MeshCollider[] componentsInChildren2 = this.GetComponentsInChildren<MeshCollider>(true);
+		MeshCollider[] componentsInChildren2 = GetComponentsInChildren<MeshCollider>(includeInactive: true);
 		if (componentsInChildren2.IsNullOrEmpty())
 		{
 			return;
@@ -362,45 +285,39 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 		int j = 0;
 		for (int num2 = componentsInChildren2.Length; j < num2; j++)
 		{
-			Transform transform = componentsInChildren2[j].get_transform();
-			Vector3 localScale = transform.get_localScale();
-			if (!(localScale.y > inGameFieldSetting.raiseWallColliderScaleY))
+			Transform transform2 = componentsInChildren2[j].transform;
+			if (!(transform2.localScale.y > inGameFieldSetting.raiseWallColliderScaleY))
 			{
-				Transform obj3 = transform;
-				Vector3 localScale2 = transform.get_localScale();
-				float x3 = localScale2.x;
-				float raiseWallColliderScaleY = inGameFieldSetting.raiseWallColliderScaleY;
-				Vector3 localScale3 = transform.get_localScale();
-				obj3.set_localScale(new Vector3(x3, raiseWallColliderScaleY, localScale3.z));
+				transform2.localScale = new Vector3(transform2.localScale.x, inGameFieldSetting.raiseWallColliderScaleY, transform2.localScale.z);
 			}
 		}
 	}
 
-	public static T GetLinkResource<T>(string name) where T : Object
+	public static T GetLinkResource<T>(string name) where T : UnityEngine.Object
 	{
 		if (!MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
 		{
-			return (T)(object)null;
+			return null;
 		}
-		Object[] array = MonoBehaviourSingleton<SceneSettingsManager>.I.linkResources;
+		UnityEngine.Object[] array = MonoBehaviourSingleton<SceneSettingsManager>.I.linkResources;
 		if (array == null)
 		{
-			return (T)(object)null;
+			return null;
 		}
 		int i = 0;
 		for (int num = array.Length; i < num; i++)
 		{
-			if (array[i] != null && array[i].get_name() == name)
+			if (array[i] != null && array[i].name == name)
 			{
 				return array[i] as T;
 			}
 		}
-		return (T)(object)null;
+		return null;
 	}
 
 	public void ChangeWeather(float changingTime, float duration)
 	{
-		this.StartCoroutine(DoChangeWeather(changingTime, duration));
+		StartCoroutine(DoChangeWeather(changingTime, duration));
 	}
 
 	private IEnumerator DoChangeWeather(float changingTime, float duration)
@@ -410,7 +327,7 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 		weatherController.OnStartWeatherChange();
 		while (timer3 < changingTime)
 		{
-			timer3 += Time.get_deltaTime();
+			timer3 += Time.deltaTime;
 			weatherController.Update(timer3 / changingTime);
 			yield return null;
 		}
@@ -418,14 +335,14 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 		timer3 = 0f;
 		while (timer3 < duration && !WeatherForceReturn)
 		{
-			timer3 += Time.get_deltaTime();
+			timer3 += Time.deltaTime;
 			yield return null;
 		}
 		timer3 = 0f;
 		weatherController.OnStartReturnToOriginal();
 		while (timer3 < changingTime)
 		{
-			timer3 += Time.get_deltaTime();
+			timer3 += Time.deltaTime;
 			weatherController.Update(1f - timer3 / changingTime);
 			yield return null;
 		}
@@ -440,10 +357,10 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 		}
 		for (int i = 0; i < waveTargets.Length; i++)
 		{
-			GameObject val = waveTargets[i];
-			if (val != null && val.get_name() == name)
+			GameObject gameObject = waveTargets[i];
+			if (gameObject != null && gameObject.name == name)
 			{
-				return val;
+				return gameObject;
 			}
 		}
 		return null;
@@ -464,10 +381,10 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 			int i = 0;
 			for (int count = addWaveTargetList.Count; i < count; i++)
 			{
-				GameObject val = addWaveTargetList[i];
-				if (val != null)
+				GameObject gameObject = addWaveTargetList[i];
+				if (gameObject != null)
 				{
-					val.SetActive(false);
+					gameObject.SetActive(value: false);
 				}
 			}
 		}
@@ -478,17 +395,17 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 		int j = 0;
 		for (int num = waveTargets.Length; j < num; j++)
 		{
-			GameObject val2 = waveTargets[j];
-			if (val2 != null)
+			GameObject gameObject2 = waveTargets[j];
+			if (gameObject2 != null)
 			{
-				val2.SetActive(false);
+				gameObject2.SetActive(value: false);
 			}
 		}
 	}
 
 	public void SetEventItemCount(List<EventItemCounts> list)
 	{
-		if (list == null || list.Count <= 0 || this.homeInfoCountData == null || this.homeInfoCountData.Length <= 0)
+		if (list == null || list.Count <= 0 || this.homeInfoCountData == null || this.homeInfoCountData.Length == 0)
 		{
 			return;
 		}
@@ -511,31 +428,31 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 
 	private void _ExecEventItemCount(EventItemCounts eic, HomeInfoCountData hicd)
 	{
-		int num = eic.rewardGrade;
+		int value = eic.rewardGrade;
 		if (hicd.gradeToValue != null)
 		{
-			for (int num2 = hicd.gradeToValue.Length - 1; num2 >= 0; num2--)
+			for (int num = hicd.gradeToValue.Length - 1; num >= 0; num--)
 			{
-				if (eic.rewardGrade >= hicd.gradeToValue[num2].threshold)
+				if (eic.rewardGrade >= hicd.gradeToValue[num].threshold)
 				{
-					num = hicd.gradeToValue[num2].value;
+					value = hicd.gradeToValue[num].value;
 					break;
 				}
 			}
 		}
 		if (hicd.animator != null)
 		{
-			hicd.animator.SetInteger("Value", num);
+			hicd.animator.SetInteger("Value", value);
 		}
 	}
 
 	public void SwitchBingoObjectsActivation(bool _isActive)
 	{
-		if (m_bingoBoardObject != null && m_bingoBoardObject.get_activeSelf() != _isActive)
+		if (m_bingoBoardObject != null && m_bingoBoardObject.activeSelf != _isActive)
 		{
 			m_bingoBoardObject.SetActive(_isActive);
 		}
-		if (m_bingoBlockObject != null && m_bingoBlockObject.get_activeSelf() != _isActive)
+		if (m_bingoBlockObject != null && m_bingoBlockObject.activeSelf != _isActive)
 		{
 			m_bingoBlockObject.SetActive(_isActive);
 		}
@@ -545,7 +462,7 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 	{
 		if (!objectsByProgress.IsNullOrEmpty() && objectsByProgress.Length > progress)
 		{
-			objectsByProgress[progress].SetActive(true);
+			objectsByProgress[progress].SetActive(value: true);
 		}
 	}
 
@@ -561,24 +478,24 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 
 	private GameObject OnGetGObjContainColliders()
 	{
-		if (this.get_transform().get_childCount() <= 0)
+		if (base.transform.childCount <= 0)
 		{
 			return null;
 		}
-		Transform[] componentsInChildren = this.get_gameObject().GetComponentsInChildren<Transform>(true);
-		if (componentsInChildren == null || componentsInChildren.Length <= 0)
+		Transform[] componentsInChildren = base.gameObject.GetComponentsInChildren<Transform>(includeInactive: true);
+		if (componentsInChildren == null || componentsInChildren.Length == 0)
 		{
 			return null;
 		}
 		Transform[] array = componentsInChildren;
-		foreach (Transform val in array)
+		foreach (Transform transform in array)
 		{
-			if (!(val == null) && val.get_gameObject().get_name().Equals(colliderNameToCompare) && val.get_childCount() > 0)
+			if (!(transform == null) && transform.gameObject.name.Equals(colliderNameToCompare) && transform.childCount > 0)
 			{
-				Collider[] componentsInChildren2 = val.GetComponentsInChildren<Collider>(true);
-				if (componentsInChildren2 != null && componentsInChildren2.Length > 0)
+				Collider[] componentsInChildren2 = transform.GetComponentsInChildren<Collider>(includeInactive: true);
+				if (componentsInChildren2 != null && componentsInChildren2.Length != 0)
 				{
-					return val.get_gameObject();
+					return transform.gameObject;
 				}
 			}
 		}
@@ -587,23 +504,25 @@ public class SceneSettingsManager : MonoBehaviourSingleton<SceneSettingsManager>
 
 	public void OnResizeGObjContainColliders(Vector3 size)
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
 		if (GObjContainColliders == null)
 		{
 			GObjContainColliders = OnGetGObjContainColliders();
 		}
-		if (!(GObjContainColliders == null) && !(size == Vector3.get_zero()) && (!MonoBehaviourSingleton<GoGameSettingsManager>.IsValid() || !(MonoBehaviourSingleton<GoGameSettingsManager>.I.colliderOfMapScale == GObjContainColliders.get_transform().get_localScale())))
+		if (GObjContainColliders == null || size == Vector3.zero)
 		{
-			Vector3 localScale = GObjContainColliders.get_transform().get_localScale();
-			size.x = localScale.x;
-			size.z = localScale.z;
-			GObjContainColliders.get_transform().set_localScale(size);
+			return;
 		}
+		if (MonoBehaviourSingleton<GoGameSettingsManager>.IsValid())
+		{
+			_ = MonoBehaviourSingleton<GoGameSettingsManager>.I.colliderOfMapScale;
+			if (MonoBehaviourSingleton<GoGameSettingsManager>.I.colliderOfMapScale == GObjContainColliders.transform.localScale)
+			{
+				return;
+			}
+		}
+		Vector3 localScale = GObjContainColliders.transform.localScale;
+		size.x = localScale.x;
+		size.z = localScale.z;
+		GObjContainColliders.transform.localScale = size;
 	}
 }

@@ -57,7 +57,7 @@ public class SmithGrowSkill : ItemDetailSkill
 
 	private int needGold;
 
-	private Color goldColor = Color.get_white();
+	private Color goldColor = Color.white;
 
 	protected UI inventoryUI;
 
@@ -77,8 +77,6 @@ public class SmithGrowSkill : ItemDetailSkill
 
 	public override void Initialize()
 	{
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		skillItem = (GameSection.GetEventData() as SkillItemInfo);
 		GameSection.SetEventData(new object[2]
 		{
@@ -86,7 +84,7 @@ public class SmithGrowSkill : ItemDetailSkill
 			skillItem
 		});
 		materialSkillItem = new List<SkillItemInfo>();
-		UILabel component = base.GetComponent<UILabel>((Enum)UI.LBL_GOLD);
+		UILabel component = GetComponent<UILabel>(UI.LBL_GOLD);
 		if (component != null)
 		{
 			goldColor = component.color;
@@ -102,8 +100,8 @@ public class SmithGrowSkill : ItemDetailSkill
 
 	public override void UpdateUI()
 	{
-		SetFontStyle((Enum)UI.STR_TITLE_MATERIAL, 2);
-		SetFontStyle((Enum)UI.STR_TITLE_MONEY, 2);
+		SetFontStyle(UI.STR_TITLE_MATERIAL, FontStyle.Italic);
+		SetFontStyle(UI.STR_TITLE_MONEY, FontStyle.Italic);
 		if (detailBase != null)
 		{
 			SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, is_visible: false);
@@ -113,18 +111,11 @@ public class SmithGrowSkill : ItemDetailSkill
 			InitInventory();
 		}
 		bool is_visible = inventory == null || inventory.datas == null || inventory.datas.Length <= 1;
-		SetActive((Enum)UI.STR_NON_MATERIAL, is_visible);
+		SetActive(UI.STR_NON_MATERIAL, is_visible);
 		UpdateMaterial();
 		SetupEnableInventoryUI();
 		int base_item_index = Array.FindIndex(inventory.datas, (SortCompareData data) => data.GetUniqID() == skillItem.uniqueID);
-		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, reset: false, (Func<int, bool>)delegate(int i)
-		{
-			if (i == base_item_index)
-			{
-				return false;
-			}
-			return true;
-		}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList(inventoryUI, null, inventory.datas.Length, reset: false, (int i) => (i != base_item_index) ? true : false, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			SkillItemSortData item = inventory.datas[i] as SkillItemSortData;
 			int num = materialSkillItem.FindIndex((SkillItemInfo material) => material.uniqueID == item.GetUniqID());
@@ -150,7 +141,7 @@ public class SmithGrowSkill : ItemDetailSkill
 
 	private SkillItemInfo ParamCopy(SkillItemInfo _ref, bool is_level_up = false)
 	{
-		int lv = is_level_up ? (_ref.level + 1) : _ref.level;
+		int lv = (!is_level_up) ? _ref.level : (_ref.level + 1);
 		SkillItemInfo skillItemInfo = new SkillItemInfo(0, (int)_ref.tableID, lv, _ref.exceedCnt);
 		skillItemInfo.uniqueID = _ref.uniqueID;
 		skillItemInfo.exp = _ref.exp;
@@ -162,18 +153,16 @@ public class SmithGrowSkill : ItemDetailSkill
 
 	private void UpdateMaterial()
 	{
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		SetLabelText((Enum)UI.LBL_SELECT_NUM, (10 - materialSkillItem.Count).ToString());
+		SetLabelText(UI.LBL_SELECT_NUM, (10 - materialSkillItem.Count).ToString());
 		needGold = (int)(skillItem.growCost * (float)materialSkillItem.Count);
-		SetLabelText((Enum)UI.LBL_GOLD, needGold.ToString("N0"));
+		SetLabelText(UI.LBL_GOLD, needGold.ToString("N0"));
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money < needGold)
 		{
-			SetColor((Enum)UI.LBL_GOLD, Color.get_red());
+			SetColor(UI.LBL_GOLD, Color.red);
 		}
 		else
 		{
-			SetColor((Enum)UI.LBL_GOLD, goldColor);
+			SetColor(UI.LBL_GOLD, goldColor);
 		}
 		int exp = 0;
 		SkillItemInfo data = ParamCopy(skillItem);
@@ -245,7 +234,11 @@ public class SmithGrowSkill : ItemDetailSkill
 		{
 			return false;
 		}
-		return !item.IsFavorite() && item.GetUniqID() != skillItem.uniqueID;
+		if (!item.IsFavorite())
+		{
+			return item.GetUniqID() != skillItem.uniqueID;
+		}
+		return false;
 	}
 
 	private void OnQuery_MATERIAL()
@@ -333,7 +326,7 @@ public class SmithGrowSkill : ItemDetailSkill
 				}
 				if (!reset)
 				{
-					select_index++;
+					int num3 = ++select_index;
 				}
 			}
 		});
@@ -384,10 +377,10 @@ public class SmithGrowSkill : ItemDetailSkill
 	{
 		if (toggleIndex != -1)
 		{
-			Transform val = GetCtrl(UI.GRD_INVENTORY).Find(toggleIndex.ToString());
-			if (val != null)
+			Transform transform = GetCtrl(UI.GRD_INVENTORY).Find(toggleIndex.ToString());
+			if (transform != null)
 			{
-				val.GetComponentInChildren<UIToggle>().value = false;
+				transform.GetComponentInChildren<UIToggle>().value = false;
 				toggleIndex = -1;
 			}
 		}
@@ -406,11 +399,11 @@ public class SmithGrowSkill : ItemDetailSkill
 		int i = 0;
 		for (int num = switchInventoryAry.Length; i < num; i++)
 		{
-			SetActive((Enum)switchInventoryAry[i], is_visible: false);
+			SetActive(switchInventoryAry[i], is_visible: false);
 		}
-		SetActive((Enum)switchInventoryAry[inventoryUIIndex], is_visible: true);
+		SetActive(switchInventoryAry[inventoryUIIndex], is_visible: true);
 		inventoryUI = switchInventoryAry[inventoryUIIndex];
-		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, inventoryUI == UI.GRD_INVENTORY);
+		SetToggle(UI.TGL_CHANGE_INVENTORY, inventoryUI == UI.GRD_INVENTORY);
 	}
 
 	protected ItemIcon CreateItemIconDetail(ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity, SkillItemSortData item_data, bool is_show_main_status, Transform parent = null, string event_name = null, int event_data = 0, bool is_new = false, int toggle_group = -1, int select_number = -1, bool is_equipping = false)

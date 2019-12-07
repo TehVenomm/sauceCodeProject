@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -93,7 +92,7 @@ public class CommonDialog : GameSection
 		SetTransferUI(GetTransferUIName(), typeof(UI));
 		InitDialog(GameSceneEvent.current.userData);
 		base.Initialize();
-		PlayTween((Enum)UI.OBJ_FRAME, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		PlayTween(UI.OBJ_FRAME, forward: true, null, is_input_block: false);
 	}
 
 	protected string[] GetTexts(object[] args, STRING_CATEGORY message_categoly = STRING_CATEGORY.COMMON_DIALOG)
@@ -123,7 +122,7 @@ public class CommonDialog : GameSection
 		}
 		int num3 = currentSectionTypeParams.Length;
 		string[] array2 = new string[num3 - 1];
-		if (args != null && args.Length > 0)
+		if (args != null && args.Length != 0)
 		{
 			array2[0] = StringTable.Format(message_categoly, uint.Parse(currentSectionTypeParams[1]), args);
 		}
@@ -148,29 +147,24 @@ public class CommonDialog : GameSection
 
 	protected virtual void InitDialog(object data_object)
 	{
-		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
 		InitUI();
 		Desc desc = data_object as Desc;
 		if (desc == null)
 		{
 			string[] texts = GetTexts(data_object as object[]);
-			desc = new Desc(TYPE.YES_NO_CANCEL, (texts.Length <= 0) ? "message" : texts[0], (texts.Length <= 1) ? "YES" : texts[1], (texts.Length <= 2) ? "NO" : texts[2], (texts.Length <= 3) ? "CANCEL" : texts[3]);
+			desc = new Desc(TYPE.YES_NO_CANCEL, (texts.Length != 0) ? texts[0] : "message", (texts.Length > 1) ? texts[1] : "YES", (texts.Length > 2) ? texts[2] : "NO", (texts.Length > 3) ? texts[3] : "CANCEL");
 		}
 		string text = desc.text;
 		if (text.StartsWith("[BB]"))
 		{
 			text = text.Substring(4);
-			UILabel component = base.GetComponent<UILabel>((Enum)UI.MESSAGE);
+			UILabel component = GetComponent<UILabel>(UI.MESSAGE);
 			if (component != null)
 			{
 				component.supportEncoding = true;
 			}
 		}
-		SetLabelText((Enum)UI.MESSAGE, text);
+		SetLabelText(UI.MESSAGE, text);
 		Transform ctrl = GetCtrl(UI.BG);
 		int num = GetHeight(UI.MESSAGE) + 20;
 		if (num < 96)
@@ -178,16 +172,13 @@ public class CommonDialog : GameSection
 			num = 96;
 		}
 		int num2 = 20 + num - 96;
-		int height = GetHeight(UI.BG);
-		float num3 = num2;
-		Vector3 localScale = ctrl.get_localScale();
-		int height2 = height + (int)(num3 / localScale.y);
-		SetHeight((Enum)UI.BG, height2);
-		Vector3 localPosition = ctrl.get_localPosition();
+		int height = GetHeight(UI.BG) + (int)((float)num2 / ctrl.localScale.y);
+		SetHeight(UI.BG, height);
+		Vector3 localPosition = ctrl.localPosition;
 		localPosition.y += (float)num2 * 0.5f;
-		ctrl.set_localPosition(localPosition);
+		ctrl.localPosition = localPosition;
 		UpdateAnchors();
-		Debug.Log((object)("dialog type: " + desc.type));
+		Debug.Log("dialog type: " + desc.type);
 		switch (desc.type)
 		{
 		case TYPE.OK:
@@ -195,14 +186,14 @@ public class CommonDialog : GameSection
 			{
 				desc.btnText[0] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u);
 			}
-			SetActive((Enum)UI.SPR_BTN_0, is_visible: false);
-			SetLabelText((Enum)UI.LBL_BTN_1, desc.btnText[0]);
-			SetLabelText((Enum)UI.LBL_BTN_1_R, desc.btnText[0]);
-			SetEventName((Enum)UI.SPR_BTN_1, "OK");
-			SetFullScreenButton((Enum)UI.SPR_BTN_1);
-			SetButtonSprite((Enum)UI.SPR_BTN_1, BTN_SPRITE_NAME[1], with_press: true);
-			SetActive((Enum)UI.OBJ_SPACE, is_visible: false);
-			SetActive((Enum)UI.SPR_BTN_2, is_visible: false);
+			SetActive(UI.SPR_BTN_0, is_visible: false);
+			SetLabelText(UI.LBL_BTN_1, desc.btnText[0]);
+			SetLabelText(UI.LBL_BTN_1_R, desc.btnText[0]);
+			SetEventName(UI.SPR_BTN_1, "OK");
+			SetFullScreenButton(UI.SPR_BTN_1);
+			SetButtonSprite(UI.SPR_BTN_1, BTN_SPRITE_NAME[1], with_press: true);
+			SetActive(UI.OBJ_SPACE, is_visible: false);
+			SetActive(UI.SPR_BTN_2, is_visible: false);
 			backKeyEvent = "OK";
 			break;
 		case TYPE.YES_NO:
@@ -214,16 +205,16 @@ public class CommonDialog : GameSection
 			{
 				desc.btnText[1] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 102u);
 			}
-			SetLabelText((Enum)UI.LBL_BTN_0, desc.btnText[1]);
-			SetLabelText((Enum)UI.LBL_BTN_0_R, desc.btnText[1]);
-			SetEventName((Enum)UI.SPR_BTN_0, "NO");
-			SetButtonSprite((Enum)UI.SPR_BTN_0, BTN_SPRITE_NAME[2], with_press: true);
-			SetActive((Enum)UI.SPR_BTN_1, is_visible: false);
-			SetActive((Enum)UI.OBJ_SPACE, is_visible: true);
-			SetLabelText((Enum)UI.LBL_BTN_2, desc.btnText[0]);
-			SetLabelText((Enum)UI.LBL_BTN_2_R, desc.btnText[0]);
-			SetEventName((Enum)UI.SPR_BTN_2, "YES");
-			SetButtonSprite((Enum)UI.SPR_BTN_2, BTN_SPRITE_NAME[1], with_press: true);
+			SetLabelText(UI.LBL_BTN_0, desc.btnText[1]);
+			SetLabelText(UI.LBL_BTN_0_R, desc.btnText[1]);
+			SetEventName(UI.SPR_BTN_0, "NO");
+			SetButtonSprite(UI.SPR_BTN_0, BTN_SPRITE_NAME[2], with_press: true);
+			SetActive(UI.SPR_BTN_1, is_visible: false);
+			SetActive(UI.OBJ_SPACE, is_visible: true);
+			SetLabelText(UI.LBL_BTN_2, desc.btnText[0]);
+			SetLabelText(UI.LBL_BTN_2_R, desc.btnText[0]);
+			SetEventName(UI.SPR_BTN_2, "YES");
+			SetButtonSprite(UI.SPR_BTN_2, BTN_SPRITE_NAME[1], with_press: true);
 			backKeyEvent = "NO";
 			break;
 		case TYPE.YES_NO_CANCEL:
@@ -238,27 +229,23 @@ public class CommonDialog : GameSection
 			{
 				desc.btnText[1] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 102u);
 			}
-			SetLabelText((Enum)UI.LBL_BTN_0, desc.btnText[1]);
-			SetLabelText((Enum)UI.LBL_BTN_0_R, desc.btnText[1]);
-			SetEventName((Enum)UI.SPR_BTN_0, "NO");
-			SetActive((Enum)UI.SPR_BTN_1, is_visible: false);
-			SetActive((Enum)UI.OBJ_SPACE, is_visible: true);
-			SetLabelText((Enum)UI.LBL_BTN_2, desc.btnText[0]);
-			SetLabelText((Enum)UI.LBL_BTN_2_R, desc.btnText[0]);
-			SetEventName((Enum)UI.SPR_BTN_2, "YES");
+			SetLabelText(UI.LBL_BTN_0, desc.btnText[1]);
+			SetLabelText(UI.LBL_BTN_0_R, desc.btnText[1]);
+			SetEventName(UI.SPR_BTN_0, "NO");
+			SetActive(UI.SPR_BTN_1, is_visible: false);
+			SetActive(UI.OBJ_SPACE, is_visible: true);
+			SetLabelText(UI.LBL_BTN_2, desc.btnText[0]);
+			SetLabelText(UI.LBL_BTN_2_R, desc.btnText[0]);
+			SetEventName(UI.SPR_BTN_2, "YES");
 			backKeyEvent = "NO";
 			break;
 		}
-		base.GetComponent<UITable>((Enum)UI.TBL_BTN).Reposition();
+		GetComponent<UITable>(UI.TBL_BTN).Reposition();
 		SoundManager.PlaySystemSE(openingSound);
 	}
 
 	protected virtual void SetupThreeButton(Desc data)
 	{
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
 		if (string.IsNullOrEmpty(data.btnText[0]))
 		{
 			data.btnText[0] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 101u);
@@ -271,23 +258,23 @@ public class CommonDialog : GameSection
 		{
 			data.btnText[2] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 103u);
 		}
-		SetLabelText((Enum)UI.LBL_BTN_0, data.btnText[0]);
-		SetLabelText((Enum)UI.LBL_BTN_0_R, data.btnText[0]);
-		SetEventName((Enum)UI.SPR_BTN_0, "YES");
-		SetButtonSprite((Enum)UI.SPR_BTN_0, BTN_SPRITE_NAME[3], with_press: true);
-		base.GetComponent<UILabel>((Enum)UI.LBL_BTN_0).gradientBottom = NGUIMath.IntToColor(-2644481);
-		base.GetComponent<UILabel>((Enum)UI.LBL_BTN_0).effectColor = NGUIMath.IntToColor(957678335);
-		SetLabelText((Enum)UI.LBL_BTN_1, data.btnText[1]);
-		SetLabelText((Enum)UI.LBL_BTN_1_R, data.btnText[1]);
-		SetEventName((Enum)UI.SPR_BTN_1, "NO");
-		SetButtonSprite((Enum)UI.SPR_BTN_1, BTN_SPRITE_NAME[3], with_press: true);
-		base.GetComponent<UILabel>((Enum)UI.LBL_BTN_1).gradientBottom = NGUIMath.IntToColor(-2644481);
-		base.GetComponent<UILabel>((Enum)UI.LBL_BTN_1).effectColor = NGUIMath.IntToColor(957678335);
-		SetActive((Enum)UI.OBJ_SPACE, is_visible: false);
-		SetLabelText((Enum)UI.LBL_BTN_2, data.btnText[2]);
-		SetLabelText((Enum)UI.LBL_BTN_2_R, data.btnText[2]);
-		SetEventName((Enum)UI.SPR_BTN_2, "CANCEL");
-		SetButtonSprite((Enum)UI.SPR_BTN_2, BTN_SPRITE_NAME[1], with_press: true);
+		SetLabelText(UI.LBL_BTN_0, data.btnText[0]);
+		SetLabelText(UI.LBL_BTN_0_R, data.btnText[0]);
+		SetEventName(UI.SPR_BTN_0, "YES");
+		SetButtonSprite(UI.SPR_BTN_0, BTN_SPRITE_NAME[3], with_press: true);
+		GetComponent<UILabel>(UI.LBL_BTN_0).gradientBottom = NGUIMath.IntToColor(-2644481);
+		GetComponent<UILabel>(UI.LBL_BTN_0).effectColor = NGUIMath.IntToColor(957678335);
+		SetLabelText(UI.LBL_BTN_1, data.btnText[1]);
+		SetLabelText(UI.LBL_BTN_1_R, data.btnText[1]);
+		SetEventName(UI.SPR_BTN_1, "NO");
+		SetButtonSprite(UI.SPR_BTN_1, BTN_SPRITE_NAME[3], with_press: true);
+		GetComponent<UILabel>(UI.LBL_BTN_1).gradientBottom = NGUIMath.IntToColor(-2644481);
+		GetComponent<UILabel>(UI.LBL_BTN_1).effectColor = NGUIMath.IntToColor(957678335);
+		SetActive(UI.OBJ_SPACE, is_visible: false);
+		SetLabelText(UI.LBL_BTN_2, data.btnText[2]);
+		SetLabelText(UI.LBL_BTN_2_R, data.btnText[2]);
+		SetEventName(UI.SPR_BTN_2, "CANCEL");
+		SetButtonSprite(UI.SPR_BTN_2, BTN_SPRITE_NAME[1], with_press: true);
 		backKeyEvent = "CANCEL";
 	}
 }

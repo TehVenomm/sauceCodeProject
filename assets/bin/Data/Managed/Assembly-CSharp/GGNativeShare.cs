@@ -8,20 +8,20 @@ public class GGNativeShare : MonoBehaviourSingleton<GGNativeShare>
 
 	public void ShareScreenshotWithText()
 	{
-		string text = Application.get_persistentDataPath() + "/" + ScreenshotName;
+		string text = Application.persistentDataPath + "/" + ScreenshotName;
 		if (File.Exists(text))
 		{
 			File.Delete(text);
 		}
-		Application.CaptureScreenshot(ScreenshotName);
-		this.StartCoroutine(delayedShare(text));
+		ScreenCapture.CaptureScreenshot(ScreenshotName);
+		StartCoroutine(delayedShare(text));
 	}
 
 	private IEnumerator delayedShare(string screenShotPath)
 	{
 		while (!File.Exists(screenShotPath))
 		{
-			yield return (object)new WaitForSeconds(0.05f);
+			yield return new WaitForSeconds(0.05f);
 		}
 		new NativeShare().AddFile(screenShotPath).Share();
 	}

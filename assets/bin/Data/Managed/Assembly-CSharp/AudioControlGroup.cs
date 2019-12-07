@@ -48,11 +48,8 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 
 	public static AudioControlGroup Create(CullingTypes type = CullingTypes.NONE, int LimitNum = int.MaxValue)
 	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Expected O, but got Unknown
-		GameObject val = new GameObject("AudioControlGroup");
-		AudioControlGroup audioControlGroup = val.AddComponent<AudioControlGroup>();
-		audioControlGroup._transform.set_parent(MonoBehaviourSingleton<SoundManager>.I._transform);
+		AudioControlGroup audioControlGroup = new GameObject("AudioControlGroup").AddComponent<AudioControlGroup>();
+		audioControlGroup._transform.parent = MonoBehaviourSingleton<SoundManager>.I._transform;
 		audioControlGroup.Setup(type, LimitNum);
 		return audioControlGroup;
 	}
@@ -134,7 +131,7 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 		return m_dicPlayingAudio.ContainsKey(clip_id);
 	}
 
-	public AudioObject CreateAudio(AudioClip clip, int clip_id, float volume, bool loop, AudioMixerGroup mixer_group, bool is3DSound = false, DisableNotifyMonoBehaviour master = null, Transform _parent = null, Vector3? initPos = default(Vector3?))
+	public AudioObject CreateAudio(AudioClip clip, int clip_id, float volume, bool loop, AudioMixerGroup mixer_group, bool is3DSound = false, DisableNotifyMonoBehaviour master = null, Transform _parent = null, Vector3? initPos = null)
 	{
 		if (clip == null)
 		{
@@ -146,7 +143,7 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 			return null;
 		}
 		PrepareKeyOn(clip_id);
-		Transform parent = (!(_parent == null)) ? _parent : base._transform;
+		Transform parent = (_parent == null) ? base._transform : _parent;
 		return m_lastAudio = AudioObject.Create(clip, clip_id, volume, loop, mixer_group, this, is3DSound, master, parent, initPos);
 	}
 
@@ -201,10 +198,9 @@ public class AudioControlGroup : DisableNotifyMonoBehaviour
 			m_lastAudio.Stop(fadeout_frames);
 			m_lastAudio = null;
 		}
-		Dictionary<int, PlayingAudioList>.ValueCollection values = m_dicPlayingAudio.Values;
-		foreach (PlayingAudioList item in values)
+		foreach (PlayingAudioList value in m_dicPlayingAudio.Values)
 		{
-			item.StopAll(fadeout_frames);
+			value.StopAll(fadeout_frames);
 		}
 	}
 }

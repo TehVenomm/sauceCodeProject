@@ -17,20 +17,8 @@ public class UIBurstBulletIconController : MonoBehaviour
 	[SerializeField]
 	private UISprite m_bulletIcon;
 
-	public UIBurstBulletIconController()
-		: this()
-	{
-	}//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-
-
 	public bool Initialize(InitParam _param)
 	{
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
 		if (_param == null)
 		{
 			return false;
@@ -41,20 +29,28 @@ public class UIBurstBulletIconController : MonoBehaviour
 		}
 		m_baseIcon.depth = _param.DepthOffset + _param.IconIndex * 2;
 		m_bulletIcon.depth = _param.DepthOffset + _param.IconIndex * 2 + 1;
-		this.get_transform().set_localPosition(BULLET_ICON_POS_INTERVAL * (float)_param.IconIndex);
-		this.get_transform().set_localRotation(Quaternion.Euler(Vector3.get_zero()));
-		this.get_transform().set_localScale(Vector3.get_one());
+		base.transform.localPosition = BULLET_ICON_POS_INTERVAL * _param.IconIndex;
+		base.transform.localRotation = Quaternion.Euler(Vector3.zero);
+		base.transform.localScale = Vector3.one;
 		return true;
 	}
 
 	public bool SetVisibleAllIcon()
 	{
-		return SwitchVisibleIcon(m_baseIcon, _isVisible: true) && SwitchVisibleIcon(m_bulletIcon, _isVisible: true);
+		if (SwitchVisibleIcon(m_baseIcon, _isVisible: true))
+		{
+			return SwitchVisibleIcon(m_bulletIcon, _isVisible: true);
+		}
+		return false;
 	}
 
 	public bool SetInvisibleAllIcon()
 	{
-		return SwitchVisibleIcon(m_baseIcon, _isVisible: false) && SwitchVisibleIcon(m_bulletIcon, _isVisible: false);
+		if (SwitchVisibleIcon(m_baseIcon, _isVisible: false))
+		{
+			return SwitchVisibleIcon(m_bulletIcon, _isVisible: false);
+		}
+		return false;
 	}
 
 	public bool SetVisibleBulletIcon()
@@ -69,11 +65,11 @@ public class UIBurstBulletIconController : MonoBehaviour
 
 	private bool SwitchVisibleIcon(UISprite _sprite, bool _isVisible)
 	{
-		if (_sprite == null || _sprite.get_enabled() == _isVisible)
+		if (_sprite == null || _sprite.enabled == _isVisible)
 		{
 			return false;
 		}
-		_sprite.set_enabled(_isVisible);
+		_sprite.enabled = _isVisible;
 		return true;
 	}
 }

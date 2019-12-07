@@ -58,11 +58,11 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 
 	public InGameProgress.PROGRESS_END_TYPE progressEndType;
 
-	public string rushRemainTimeToString = string.Empty;
+	public string rushRemainTimeToString = "";
 
 	public float arenaElapsedTime;
 
-	public string arenaRemainTimeToString = string.Empty;
+	public string arenaRemainTimeToString = "";
 
 	public List<PlayerRecord> players
 	{
@@ -112,7 +112,7 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 		enemies = new List<EnemyRecord>();
 	}
 
-	public PlayerRecord GetPlayer(int id, int? user_id = default(int?))
+	public PlayerRecord GetPlayer(int id, int? user_id = null)
 	{
 		int num = -1;
 		if (user_id.HasValue)
@@ -209,7 +209,7 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 	{
 		if (sync_host.id >= 0)
 		{
-			int? user_id = (sync_host.charaInfo == null) ? null : new int?(sync_host.charaInfo.userId);
+			int? user_id = (sync_host.charaInfo != null) ? new int?(sync_host.charaInfo.userId) : null;
 			PlayerRecord player = GetPlayer(sync_host.id, user_id);
 			player.givenTotalDamage = sync_host.givenTotalDamage;
 			player.isNPC = sync_host.isNPC;
@@ -302,11 +302,6 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 
 	public void OnInGameEnd(bool is_victory)
 	{
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
 		isVictory = is_victory;
 		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
@@ -320,14 +315,7 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 			});
 			players = list;
 		}
-		players.Sort(delegate(PlayerRecord a, PlayerRecord b)
-		{
-			if (a.givenTotalDamage != b.givenTotalDamage)
-			{
-				return (a.givenTotalDamage <= b.givenTotalDamage) ? 1 : (-1);
-			}
-			return a.id - b.id;
-		});
+		players.Sort((PlayerRecord a, PlayerRecord b) => (a.givenTotalDamage != b.givenTotalDamage) ? ((a.givenTotalDamage <= b.givenTotalDamage) ? 1 : (-1)) : (a.id - b.id));
 		List<PlayerRecord> list2 = new List<PlayerRecord>();
 		for (int i = 0; i < 8 && i < players.Count; i++)
 		{
@@ -345,11 +333,10 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 			}
 			if (playerRecord != null && stageObject != null)
 			{
-				Vector3 position = stageObject._transform.get_position();
+				Vector3 position = stageObject._transform.position;
 				position.y = 0f;
 				pickupPlayerPos = position;
-				Vector3 eulerAngles = stageObject._transform.get_eulerAngles();
-				pickupPlayerRot = eulerAngles.y;
+				pickupPlayerRot = stageObject._transform.eulerAngles.y;
 				pickupPlayer = playerRecord;
 			}
 		}
@@ -364,12 +351,8 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 
 	public PlayerLoader[] CreatePlayerModels()
 	{
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
 		DeletePlayerModels();
-		int anim_id = (!isVictory) ? 91 : (-1);
+		int anim_id = isVictory ? (-1) : 91;
 		List<PlayerRecord> list = players.FindAll((PlayerRecord x) => x.isShowModel);
 		if (!isVictory)
 		{
@@ -386,21 +369,21 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 		for (int count = list.Count; i < count; i++)
 		{
 			PlayerRecord playerRecord = list[i];
-			Transform val = Utility.CreateGameObject("Player:" + i, MonoBehaviourSingleton<StageManager>.I._transform);
-			array[i] = val.get_gameObject().AddComponent<PlayerLoader>();
+			Transform transform = Utility.CreateGameObject("Player:" + i, MonoBehaviourSingleton<StageManager>.I._transform);
+			array[i] = transform.gameObject.AddComponent<PlayerLoader>();
 			array[i].StartLoad(playerRecord.playerLoadInfo, -1, anim_id, need_anim_event: false, need_foot_stamp: false, need_shadow: true, enable_light_probes: true, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: false, need_dev_frame_instantiate: false, ShaderGlobal.GetCharacterShaderType(), null);
 			int num = MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerPoss.Length;
 			if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid() && pickupPlayer == null && i < num)
 			{
-				val.set_position(MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerPoss[i]);
-				val.set_eulerAngles(new Vector3(0f, MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerRots[i], 0f));
+				transform.position = MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerPoss[i];
+				transform.eulerAngles = new Vector3(0f, MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerRots[i], 0f);
 			}
 		}
 		if (pickupPlayer != null)
 		{
-			Transform transform = array[0].get_transform();
-			transform.set_position(pickupPlayerPos);
-			transform.set_eulerAngles(new Vector3(0f, pickupPlayerRot, 0f));
+			Transform transform2 = array[0].transform;
+			transform2.position = pickupPlayerPos;
+			transform2.eulerAngles = new Vector3(0f, pickupPlayerRot, 0f);
 		}
 		playerModels = array;
 		return playerModels;
@@ -408,14 +391,14 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 
 	public void CreatePlayerModelsAsync(Action<PlayerLoader[]> callback)
 	{
-		this.StartCoroutine(DoCreatePlayerModelsAsync(callback));
+		StartCoroutine(DoCreatePlayerModelsAsync(callback));
 	}
 
 	private IEnumerator DoCreatePlayerModelsAsync(Action<PlayerLoader[]> callback)
 	{
 		DeletePlayerModels();
 		yield return null;
-		int anim_type = (!isVictory) ? 91 : (-1);
+		int anim_type = isVictory ? (-1) : 91;
 		List<PlayerRecord> player_records = players.FindAll((PlayerRecord x) => x.isShowModel);
 		if (!isVictory)
 		{
@@ -431,29 +414,32 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 		}
 		PlayerLoader[] player_loaders = new PlayerLoader[player_records.Count];
 		int j = 0;
-		for (int i = player_records.Count; j < i; j++)
+		int i = player_records.Count;
+		while (j < i)
 		{
-			PlayerRecord player_record = player_records[j];
+			PlayerRecord playerRecord = player_records[j];
 			Transform player_t = Utility.CreateGameObject("Player:" + j, MonoBehaviourSingleton<StageManager>.I._transform);
-			player_loaders[j] = player_t.get_gameObject().AddComponent<PlayerLoader>();
-			player_loaders[j].StartLoad(player_record.playerLoadInfo, -1, anim_type, need_anim_event: false, need_foot_stamp: false, need_shadow: true, enable_light_probes: true, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: false, need_dev_frame_instantiate: false, ShaderGlobal.GetCharacterShaderType(), null);
+			player_loaders[j] = player_t.gameObject.AddComponent<PlayerLoader>();
+			player_loaders[j].StartLoad(playerRecord.playerLoadInfo, -1, anim_type, need_anim_event: false, need_foot_stamp: false, need_shadow: true, enable_light_probes: true, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: false, need_dev_frame_instantiate: false, ShaderGlobal.GetCharacterShaderType(), null);
 			while (player_loaders[j].isLoading)
 			{
 				yield return null;
 			}
-			int poss_max = MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerPoss.Length;
-			if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid() && pickupPlayer == null && j < poss_max)
+			int num = MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerPoss.Length;
+			if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid() && pickupPlayer == null && j < num)
 			{
-				player_t.set_position(MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerPoss[j]);
-				player_t.set_eulerAngles(new Vector3(0f, MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerRots[j], 0f));
+				player_t.position = MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerPoss[j];
+				player_t.eulerAngles = new Vector3(0f, MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.playerRots[j], 0f);
 			}
 			yield return null;
+			int num2 = j + 1;
+			j = num2;
 		}
 		if (pickupPlayer != null)
 		{
-			Transform transform = player_loaders[0].get_transform();
-			transform.set_position(pickupPlayerPos);
-			transform.set_eulerAngles(new Vector3(0f, pickupPlayerRot, 0f));
+			Transform transform = player_loaders[0].transform;
+			transform.position = pickupPlayerPos;
+			transform.eulerAngles = new Vector3(0f, pickupPlayerRot, 0f);
 		}
 		yield return null;
 		playerModels = player_loaders;
@@ -471,7 +457,7 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 		{
 			if (playerModels[i] != null)
 			{
-				Object.DestroyImmediate(playerModels[i].get_gameObject());
+				UnityEngine.Object.DestroyImmediate(playerModels[i].gameObject);
 				playerModels[i] = null;
 			}
 		}
@@ -531,11 +517,7 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 		players.Sort(delegate(PlayerRecord a, PlayerRecord b)
 		{
 			int num = b.givenTotalDamage - a.givenTotalDamage;
-			if (num != 0)
-			{
-				return num;
-			}
-			return a.id - b.id;
+			return (num != 0) ? num : (a.id - b.id);
 		});
 		enemies.Clear();
 		EnemyRecord enemyRecord = new EnemyRecord();
@@ -587,7 +569,7 @@ public class InGameRecorder : MonoBehaviourSingleton<InGameRecorder>
 		}
 		if (pickupPlayer == null)
 		{
-			string text = string.Empty;
+			string text = "";
 			foreach (PlayerRecord player2 in players)
 			{
 				text = text + player2.charaInfo.name + "(id=" + player2.id + ",userId=" + player2.charaInfo.userId + ")\n";

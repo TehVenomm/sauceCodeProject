@@ -31,99 +31,55 @@ public class ItemDetailSingleSellConfirm : GameSection
 		item = (array[0] as SortCompareData);
 		num = (int)array[1];
 		price = (int)array[2];
-		callSection = ((!(array[3] is ItemDetailEquip.CURRENT_SECTION)) ? null : (array[3] as ItemDetailEquip.CURRENT_SECTION?));
-		setNo = ((!(array[4] is int)) ? null : ((int?)array[4]));
+		callSection = ((array[3] is ItemDetailEquip.CURRENT_SECTION) ? (array[3] as ItemDetailEquip.CURRENT_SECTION?) : null);
+		setNo = ((array[4] is int) ? ((int?)array[4]) : null);
 		is_exchange = false;
 		base.Initialize();
 	}
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.LBL_ITEM_NAME, item.GetName());
-		SetLabelText((Enum)UI.LBL_TOTAL, $"{price:N0}");
-		int num = 0;
-		int num2 = 0;
+		SetLabelText(UI.LBL_ITEM_NAME, item.GetName());
+		SetLabelText(UI.LBL_TOTAL, $"{price:N0}");
+		int enemy_icon_id = 0;
+		int enemy_icon_id2 = 0;
 		if (item is ItemSortData)
 		{
 			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(item.GetTableID());
 			if (itemData != null)
 			{
-				num = itemData.enemyIconID;
-				num2 = itemData.enemyIconID2;
+				enemy_icon_id = itemData.enemyIconID;
+				enemy_icon_id2 = itemData.enemyIconID2;
 			}
 		}
-		ITEM_ICON_TYPE iconType = item.GetIconType();
-		int iconID = item.GetIconID();
-		RARITY_TYPE? rarity = item.GetRarity();
-		Transform ctrl = GetCtrl(UI.OBJ_ICON_ROOT);
-		ELEMENT_TYPE iconElement = item.GetIconElement();
-		EQUIPMENT_TYPE? iconMagiEnableType = item.GetIconMagiEnableType();
-		int num3 = this.num;
-		string event_name = null;
-		int event_data = -1;
-		bool is_new = false;
-		int toggle_group = -1;
-		bool is_select = false;
-		string icon_under_text = null;
-		bool is_equipping = false;
-		int enemy_icon_id = num;
-		int enemy_icon_id2 = num2;
-		GET_TYPE getType = item.GetGetType();
-		ItemIcon itemIcon = ItemIcon.Create(iconType, iconID, rarity, ctrl, iconElement, iconMagiEnableType, num3, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text: false, getType);
-		itemIcon.SetRewardBG(is_visible: true);
+		ItemIcon.Create(item.GetIconType(), item.GetIconID(), item.GetRarity(), GetCtrl(UI.OBJ_ICON_ROOT), item.GetIconElement(), item.GetIconMagiEnableType(), num, null, -1, is_new: false, -1, is_select: false, null, is_equipping: false, enemy_icon_id, enemy_icon_id2, disable_rarity_text: false, item.GetGetType()).SetRewardBG(is_visible: true);
 		base.UpdateUI();
 	}
 
 	private void sellConfirm(Action<bool> callback)
 	{
-		int? num = setNo;
-		if (num.HasValue)
+		if (!setNo.HasValue || !callSection.HasValue)
 		{
-			ItemDetailEquip.CURRENT_SECTION? cURRENT_SECTION = callSection;
-			if (cURRENT_SECTION.HasValue)
-			{
-				ItemDetailEquip.CURRENT_SECTION? cURRENT_SECTION2 = callSection;
-				switch (cURRENT_SECTION2.Value)
-				{
-				case ItemDetailEquip.CURRENT_SECTION.STATUS_TOP:
-				case ItemDetailEquip.CURRENT_SECTION.STATUS_EQUIP:
-				case ItemDetailEquip.CURRENT_SECTION.STATUS_AVATAR:
-				{
-					int? num2 = setNo;
-					int value = num2.Value;
-					MonoBehaviourSingleton<StatusManager>.I.CheckChangeEquip(value, delegate(bool is_success)
-					{
-						if (callback != null)
-						{
-							callback(is_success);
-						}
-					});
-					break;
-				}
-				default:
-					if (callback != null)
-					{
-						callback(obj: true);
-					}
-					break;
-				}
-				return;
-			}
+			Debug.LogWarning("data = null : setNo =null? " + (!setNo.HasValue).ToString() + " : callsection=null? " + (!callSection.HasValue).ToString());
+			callback(obj: false);
+			return;
 		}
-		object[] obj = new object[4]
+		ItemDetailEquip.CURRENT_SECTION value = callSection.Value;
+		if (value == ItemDetailEquip.CURRENT_SECTION.STATUS_TOP || value == ItemDetailEquip.CURRENT_SECTION.STATUS_EQUIP || value == ItemDetailEquip.CURRENT_SECTION.STATUS_AVATAR)
 		{
-			"data = null : setNo =null? ",
-			null,
-			null,
-			null
-		};
-		int? num3 = setNo;
-		obj[1] = !num3.HasValue;
-		obj[2] = " : callsection=null? ";
-		ItemDetailEquip.CURRENT_SECTION? cURRENT_SECTION3 = callSection;
-		obj[3] = !cURRENT_SECTION3.HasValue;
-		Debug.LogWarning((object)string.Concat(obj));
-		callback(obj: false);
+			int value2 = setNo.Value;
+			MonoBehaviourSingleton<StatusManager>.I.CheckChangeEquip(value2, delegate(bool is_success)
+			{
+				if (callback != null)
+				{
+					callback(is_success);
+				}
+			});
+		}
+		else if (callback != null)
+		{
+			callback(obj: true);
+		}
 	}
 
 	public void OnQuery_YES()
@@ -163,7 +119,7 @@ public class ItemDetailSingleSellConfirm : GameSection
 			{
 				if (!b)
 				{
-					Debug.LogWarning((object)"sellConfirm = false");
+					Debug.LogWarning("sellConfirm = false");
 					GameSection.ResumeEvent(is_resume: false);
 				}
 				else

@@ -1,5 +1,4 @@
 using Network;
-using System;
 
 public class LoungeSearchSettings : LoungeConditionSettings
 {
@@ -42,7 +41,7 @@ public class LoungeSearchSettings : LoungeConditionSettings
 		{
 			order = 0;
 			label = LOUNGE_LABEL.NONE;
-			loungeName = string.Empty;
+			loungeName = "";
 		}
 
 		public SearchRequestParam(int order, LOUNGE_LABEL label, string loungeName)
@@ -73,8 +72,8 @@ public class LoungeSearchSettings : LoungeConditionSettings
 		{
 			labelIndex = (int)searchRequest.label;
 		}
-		SetActive((Enum)UI.LBL_DEFAULT, string.IsNullOrEmpty(searchRequest.loungeName));
-		SetInput((Enum)UI.IPT_NAME, searchRequest.loungeName, 16, (EventDelegate.Callback)((LoungeConditionSettings)this).OnChangeLoungeName);
+		SetActive(UI.LBL_DEFAULT, string.IsNullOrEmpty(searchRequest.loungeName));
+		SetInput(UI.IPT_NAME, searchRequest.loungeName, 16, OnChangeLoungeName);
 		GameSection.SetEventData(false);
 		InitializeBase();
 	}
@@ -98,10 +97,10 @@ public class LoungeSearchSettings : LoungeConditionSettings
 
 	protected override void OnChangeLoungeName()
 	{
-		string inputValue = GetInputValue((Enum)UI.IPT_NAME);
-		inputValue = inputValue.Replace(" ", string.Empty);
-		inputValue = inputValue.Replace("\u3000", string.Empty);
-		SetActive((Enum)UI.LBL_DEFAULT, string.IsNullOrEmpty(inputValue));
+		string inputValue = GetInputValue(UI.IPT_NAME);
+		inputValue = inputValue.Replace(" ", "");
+		inputValue = inputValue.Replace("\u3000", "");
+		SetActive(UI.LBL_DEFAULT, string.IsNullOrEmpty(inputValue));
 		searchRequest.SetLoungeName(inputValue);
 	}
 

@@ -16,12 +16,12 @@ public class EscapePointObject : StageObject
 	protected override void Awake()
 	{
 		base.Awake();
-		Utility.SetLayerWithChildren(this.get_transform(), 31);
+		Utility.SetLayerWithChildren(base.transform, 31);
 	}
 
 	private void OnTriggerStay(Collider collider)
 	{
-		if (collider.get_gameObject().get_layer() == 10)
+		if (collider.gameObject.layer == 10)
 		{
 			isEnemyOnEscapePoint = true;
 		}
@@ -29,7 +29,7 @@ public class EscapePointObject : StageObject
 
 	private void OnTriggerExit(Collider collider)
 	{
-		if (collider.get_gameObject().get_layer() == 10)
+		if (collider.gameObject.layer == 10)
 		{
 			isEnemyOnEscapePoint = false;
 		}

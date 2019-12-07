@@ -54,15 +54,11 @@ public class UIBehaviour : MonoBehaviour
 
 		public void Update()
 		{
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			if (label.width > width)
 			{
 				label.overflowMethod = UILabel.Overflow.ShrinkContent;
 				label.width = width;
-				UILabel uILabel = label;
-				Vector2 printedSize = label.printedSize;
-				uILabel.height = Mathf.RoundToInt(printedSize.y);
+				label.height = Mathf.RoundToInt(label.printedSize.y);
 			}
 			else if (label.width < width)
 			{
@@ -220,7 +216,7 @@ public class UIBehaviour : MonoBehaviour
 
 	private const string MATERIAL_INFO_PREFAB_NAME = "MaterialInfo";
 
-	private static readonly Color32 buffGreen = new Color32((byte)0, byte.MaxValue, (byte)128, byte.MaxValue);
+	private static readonly Color32 buffGreen = new Color32(0, byte.MaxValue, 128, byte.MaxValue);
 
 	private static readonly string[] enemyIconGradeFrameName = new string[7]
 	{
@@ -386,11 +382,6 @@ public class UIBehaviour : MonoBehaviour
 		}
 	}
 
-	public UIBehaviour()
-		: this()
-	{
-	}
-
 	public bool IsCtrlEmpty()
 	{
 		return ctrls == null;
@@ -398,19 +389,23 @@ public class UIBehaviour : MonoBehaviour
 
 	public virtual bool IsTransitioning()
 	{
-		return state == STATE.TO_OPEN || state == STATE.TO_CLOSE;
+		if (state != STATE.TO_OPEN)
+		{
+			return state == STATE.TO_CLOSE;
+		}
+		return true;
 	}
 
 	private void SetUIVisible(bool b)
 	{
-		if (collectUI == null || collectUI.get_gameObject().get_activeSelf() == b)
+		if (collectUI == null || collectUI.gameObject.activeSelf == b)
 		{
 			return;
 		}
-		collectUI.get_gameObject().SetActive(b);
+		collectUI.gameObject.SetActive(b);
 		if (b && collectUI != null)
 		{
-			UIVirtualScreen componentInChildren = collectUI.get_gameObject().GetComponentInChildren<UIVirtualScreen>();
+			UIVirtualScreen componentInChildren = collectUI.gameObject.GetComponentInChildren<UIVirtualScreen>();
 			if (componentInChildren != null)
 			{
 				componentInChildren.InitWidget();
@@ -428,7 +423,7 @@ public class UIBehaviour : MonoBehaviour
 
 	protected virtual void Awake()
 	{
-		_transform = this.get_transform();
+		_transform = base.transform;
 		uiFirstUpdate = true;
 		MonoBehaviourSingleton<UIManager>.I.uiList.Add(this);
 	}
@@ -439,7 +434,7 @@ public class UIBehaviour : MonoBehaviour
 		{
 			return;
 		}
-		this.get_gameObject().GetComponentsInChildren<UIGameSceneEventSender>(Temporary.uiGameSceneEventSender);
+		base.gameObject.GetComponentsInChildren(Temporary.uiGameSceneEventSender);
 		int i = 0;
 		for (int count = Temporary.uiGameSceneEventSender.Count; i < count; i++)
 		{
@@ -447,7 +442,7 @@ public class UIBehaviour : MonoBehaviour
 		}
 		Temporary.uiGameSceneEventSender.Clear();
 		transitions = new List<UITransition>();
-		this.get_gameObject().GetComponentsInChildren<UITransition>(transitions);
+		base.gameObject.GetComponentsInChildren(transitions);
 		if (collectUI == null)
 		{
 			string collectUIName = GetCollectUIName();
@@ -464,14 +459,14 @@ public class UIBehaviour : MonoBehaviour
 		{
 			resourceLink = collectUI.GetComponent<ResourceLink>();
 			uiPanels = new List<UIPanel>();
-			this.get_gameObject().GetComponentsInChildren<UIPanel>(true, uiPanels);
+			base.gameObject.GetComponentsInChildren(includeInactive: true, uiPanels);
 			uiPanelDepths = new int[uiPanels.Count];
 			int j = 0;
 			for (int count2 = uiPanels.Count; j < count2; j++)
 			{
 				uiPanelDepths[j] = uiPanels[j].depth;
 			}
-			Type type = Type.GetType(collectUI.get_name() + "+UI");
+			Type type = Type.GetType(collectUI.name + "+UI");
 			if (type == null && sectionData != null)
 			{
 				type = Type.GetType(sectionData.sectionName + "+UI");
@@ -486,7 +481,7 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void OnEvent(string event_name, object event_data, string check_app_ver)
 	{
-		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIBehaviour", this.get_gameObject(), event_name, event_data, check_app_ver);
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIBehaviour", base.gameObject, event_name, event_data, check_app_ver);
 	}
 
 	protected virtual void OnDestroy()
@@ -503,7 +498,7 @@ public class UIBehaviour : MonoBehaviour
 				PrefabData prefabData = prefabs.buffer[i];
 				if (prefabData.inactiveObject != null)
 				{
-					Object.DestroyImmediate(prefabData.inactiveObject);
+					UnityEngine.Object.DestroyImmediate(prefabData.inactiveObject);
 					prefabData.inactiveObject = null;
 				}
 			}
@@ -514,17 +509,17 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetTransferUI(string ui_name, Type enum_type)
 	{
-		Transform val = MonoBehaviourSingleton<UIManager>.I.Find(ui_name);
-		if (val == null)
+		Transform transform = MonoBehaviourSingleton<UIManager>.I.Find(ui_name);
+		if (transform == null)
 		{
 			Log.Error(LOG.UI, ui_name + " is not found.");
 			return;
 		}
-		transferUI = val.get_gameObject().GetComponent<UIBehaviour>();
+		transferUI = transform.gameObject.GetComponent<UIBehaviour>();
 		if (transferUI != null)
 		{
 			transferUI.CreateCtrlsArray(enum_type);
-			transferUI.GetComponentsInChildren<UIGameSceneEventSender>(true, Temporary.uiGameSceneEventSender);
+			transferUI.GetComponentsInChildren(includeInactive: true, Temporary.uiGameSceneEventSender);
 			int i = 0;
 			for (int count = Temporary.uiGameSceneEventSender.Count; i < count; i++)
 			{
@@ -547,7 +542,7 @@ public class UIBehaviour : MonoBehaviour
 			return;
 		}
 		int num = Enum.GetNames(enum_type).Length;
-		ctrls = (Transform[])new Transform[num];
+		ctrls = new Transform[num];
 	}
 
 	public Transform GetCtrl(Enum label_enum)
@@ -580,7 +575,7 @@ public class UIBehaviour : MonoBehaviour
 			prefabs = new BetterList<PrefabData>();
 		}
 		PrefabData prefabData = new PrefabData();
-		prefabData.name = prefab.get_name();
+		prefabData.name = prefab.name;
 		prefabData.prefab = prefab;
 		prefabData.inactiveObject = inactive_object;
 		prefabs.Add(prefabData);
@@ -617,10 +612,10 @@ public class UIBehaviour : MonoBehaviour
 		{
 			return null;
 		}
-		Transform val = parent.Find(prefab_name);
-		if (val != null)
+		Transform transform = parent.Find(prefab_name);
+		if (transform != null)
 		{
-			return val;
+			return transform;
 		}
 		return Realizes(prefab_name, parent, check_panel);
 	}
@@ -629,7 +624,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (prefabs == null || parent == null)
 		{
-			Debug.LogWarning((object)"Relizesに失敗しました");
+			Debug.LogWarning("Relizesに失敗しました");
 			return null;
 		}
 		return _Realizes(GetPrefabData(prefab_name), parent, check_panel);
@@ -641,14 +636,14 @@ public class UIBehaviour : MonoBehaviour
 		{
 			return null;
 		}
-		Transform val = prefab_data.Realizes(parent);
-		if (val == null)
+		Transform transform = prefab_data.Realizes(parent);
+		if (transform == null)
 		{
 			return null;
 		}
 		if (check_panel)
 		{
-			UIPanel componentInChildren = val.GetComponentInChildren<UIPanel>();
+			UIPanel componentInChildren = transform.GetComponentInChildren<UIPanel>();
 			if (componentInChildren != null)
 			{
 				UIPanel componentInParent = parent.GetComponentInParent<UIPanel>();
@@ -658,7 +653,7 @@ public class UIBehaviour : MonoBehaviour
 				}
 			}
 		}
-		return val;
+		return transform;
 	}
 
 	protected Transform FindCtrl(Transform root, Enum enum_value)
@@ -705,7 +700,7 @@ public class UIBehaviour : MonoBehaviour
 		{
 			return null;
 		}
-		if (index < 0 || index >= t.get_childCount())
+		if (index < 0 || index >= t.childCount)
 		{
 			return null;
 		}
@@ -726,7 +721,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (!(t == null))
 		{
-			t.get_gameObject().SetActive(is_visible);
+			t.gameObject.SetActive(is_visible);
 		}
 	}
 
@@ -737,7 +732,7 @@ public class UIBehaviour : MonoBehaviour
 		{
 			return false;
 		}
-		return ctrl.get_gameObject().get_activeSelf();
+		return ctrl.gameObject.activeSelf;
 	}
 
 	protected void InitDeactive(Enum ctrl_enum)
@@ -754,7 +749,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (uiFirstUpdate && !(t == null))
 		{
-			t.get_gameObject().SetActive(false);
+			t.gameObject.SetActive(value: false);
 		}
 	}
 
@@ -772,7 +767,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (t == null)
 		{
-			return (COMPONENT)(object)null;
+			return null;
 		}
 		return t.GetComponent<COMPONENT>();
 	}
@@ -791,7 +786,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (!(t == null))
 		{
-			t.GetComponent<COMPONENT>().set_enabled(is_enabled);
+			t.GetComponent<COMPONENT>().enabled = is_enabled;
 		}
 	}
 
@@ -880,18 +875,13 @@ public class UIBehaviour : MonoBehaviour
 
 	private UILabel _GetLabel(Transform root, Enum label_enum)
 	{
-		Transform val = (!(root == null)) ? FindCtrl(root, label_enum) : GetCtrl(label_enum);
-		if (object.ReferenceEquals(val, null))
-		{
-			return null;
-		}
-		return val.GetComponent<UILabel>();
+		return ((root == null) ? GetCtrl(label_enum) : FindCtrl(root, label_enum))?.GetComponent<UILabel>();
 	}
 
 	protected void SetSupportEncoding(Transform root, Enum label_enum, bool isEnable)
 	{
 		UILabel uILabel = _GetLabel(root, label_enum);
-		if (!object.ReferenceEquals(uILabel, null))
+		if ((object)uILabel != null)
 		{
 			uILabel.supportEncoding = isEnable;
 		}
@@ -900,7 +890,7 @@ public class UIBehaviour : MonoBehaviour
 	protected void SetSupportEncoding(Enum label_enum, bool isEnable)
 	{
 		UILabel uILabel = _GetLabel(null, label_enum);
-		if (!object.ReferenceEquals(uILabel, null))
+		if ((object)uILabel != null)
 		{
 			uILabel.supportEncoding = isEnable;
 		}
@@ -908,12 +898,7 @@ public class UIBehaviour : MonoBehaviour
 
 	protected bool IsSupportEncoding(Enum label_enum)
 	{
-		UILabel uILabel = _GetLabel(null, label_enum);
-		if (object.ReferenceEquals(uILabel, null))
-		{
-			return false;
-		}
-		return uILabel.supportEncoding;
+		return _GetLabel(null, label_enum)?.supportEncoding ?? false;
 	}
 
 	protected string GetLabel(Transform root, Enum label_enum)
@@ -968,7 +953,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (t == null)
 		{
-			return string.Empty;
+			return "";
 		}
 		return t.GetComponent<UILabel>().text;
 	}
@@ -1030,9 +1015,6 @@ public class UIBehaviour : MonoBehaviour
 
 	public static void SetMaterialNumText(Transform have_t, Transform need_t, int have_num, int need_num)
 	{
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 		if (have_t == null || need_t == null)
 		{
 			return;
@@ -1044,11 +1026,11 @@ public class UIBehaviour : MonoBehaviour
 			UIWidget component3 = component2.GetComponent<UIWidget>();
 			if (have_num >= need_num)
 			{
-				component3.color = Color32.op_Implicit(buffGreen);
+				component3.color = buffGreen;
 			}
 			else
 			{
-				component3.color = Color.get_red();
+				component3.color = Color.red;
 			}
 			component.text = have_num.ToString();
 			component2.text = need_num.ToString();
@@ -1057,19 +1039,16 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetFontStyle(Transform root, Enum label_enum, FontStyle font_style)
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		SetFontStyle(FindCtrl(root, label_enum), font_style);
 	}
 
 	protected void SetFontStyle(Enum label_enum, FontStyle font_style)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		SetFontStyle(GetCtrl(label_enum), font_style);
 	}
 
 	protected void SetFontStyle(Transform t, FontStyle font_style)
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 		if (!(t == null))
 		{
 			UILabel component = t.GetComponent<UILabel>();
@@ -1092,9 +1071,6 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetStatusBuffText(Transform t, int value, bool expression_include)
 	{
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 		if (!(t == null))
 		{
 			uint num = 0u;
@@ -1108,11 +1084,11 @@ public class UIBehaviour : MonoBehaviour
 			component.text = text;
 			if (value < 0)
 			{
-				component.color = Color.get_red();
+				component.color = Color.red;
 			}
 			else
 			{
-				component.color = Color32.op_Implicit(buffGreen);
+				component.color = buffGreen;
 			}
 		}
 	}
@@ -1226,9 +1202,9 @@ public class UIBehaviour : MonoBehaviour
 		string text = component.value;
 		if (component.label.maxLineCount == 1)
 		{
-			text = text.Replace("\\n", string.Empty);
-			text = text.Replace("\n", string.Empty);
-			text = text.Replace("\r", string.Empty);
+			text = text.Replace("\\n", "");
+			text = text.Replace("\n", "");
+			text = text.Replace("\r", "");
 		}
 		return text;
 	}
@@ -1253,19 +1229,16 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetColor(Enum label_enum, Color color)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		SetColor(GetCtrl(label_enum), color);
 	}
 
 	protected void SetColor(Transform root, Enum label_enum, Color color)
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		SetColor(FindCtrl(root, label_enum), color);
 	}
 
 	protected void SetColor(Transform t, Color color)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		if (!(t == null))
 		{
 			t.GetComponent<UIWidget>().color = color;
@@ -1274,23 +1247,19 @@ public class UIBehaviour : MonoBehaviour
 
 	protected Color GetColor(Enum label_enum)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		return GetColor(GetCtrl(label_enum));
 	}
 
 	protected Color GetColor(Transform root, Enum label_enum)
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		return GetColor(FindCtrl(root, label_enum));
 	}
 
 	protected Color GetColor(Transform t)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		if (t == null)
 		{
-			return Color.get_white();
+			return Color.white;
 		}
 		return t.GetComponent<UIWidget>().color;
 	}
@@ -1507,7 +1476,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (!(t == null))
 		{
-			UIButton component = t.get_gameObject().GetComponent<UIButton>();
+			UIButton component = t.gameObject.GetComponent<UIButton>();
 			component.isEnabled = is_enabled;
 			if (uiUpdateInstant && !is_enabled)
 			{
@@ -1532,17 +1501,15 @@ public class UIBehaviour : MonoBehaviour
 		{
 			return;
 		}
-		UIButton button = t.get_gameObject().GetComponent<UIButton>();
+		UIButton button = t.gameObject.GetComponent<UIButton>();
 		button.isEnabled = is_enabled;
 		if (uiUpdateInstant && !is_enabled)
 		{
 			button.UpdateColor(instant: true);
 			if (is_update_child_label)
 			{
-				UILabel[] componentsInChildren = t.GetComponentsInChildren<UILabel>();
-				Array.ForEach(componentsInChildren, delegate(UILabel child)
+				Array.ForEach(t.GetComponentsInChildren<UILabel>(), delegate(UILabel child)
 				{
-					//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 					child.color = button.disabledColor;
 				});
 			}
@@ -1563,11 +1530,11 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (!(t == null))
 		{
-			UIButton component = t.get_gameObject().GetComponent<UIButton>();
+			UIButton component = t.gameObject.GetComponent<UIButton>();
 			if (!(component == null))
 			{
 				component.isEnabled = is_enabled;
-				component.set_enabled(is_enabled);
+				component.enabled = is_enabled;
 				component.SetState(UIButtonColor.State.Normal, immediate: true);
 			}
 		}
@@ -1585,14 +1552,11 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetButtonColor(Transform t, bool is_enabled, bool is_instant)
 	{
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 		if (t == null)
 		{
 			return;
 		}
-		UIButton component = t.get_gameObject().GetComponent<UIButton>();
+		UIButton component = t.gameObject.GetComponent<UIButton>();
 		if (!(component == null))
 		{
 			component.GetComponent<UIButtonColor>().SetState(component.state, instant: false);
@@ -1623,7 +1587,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (!(t == null))
 		{
-			UILongTouch.Set(t.get_gameObject(), event_name, event_data);
+			UILongTouch.Set(t.gameObject, event_name, event_data);
 		}
 	}
 
@@ -1641,7 +1605,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (!(t == null))
 		{
-			UIButtonRepeater.SetRepeatButton(t.get_gameObject(), event_name, event_data);
+			UIButtonRepeater.SetRepeatButton(t.gameObject, event_name, event_data);
 		}
 	}
 
@@ -1676,7 +1640,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (!(t == null))
 		{
-			UITouchAndRelease.Set(t.get_gameObject(), touch_event_name, release_event_name, event_data);
+			UITouchAndRelease.Set(t.gameObject, touch_event_name, release_event_name, event_data);
 		}
 	}
 
@@ -1689,7 +1653,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (!(t == null))
 		{
-			UITouchAndRelease.NoEventRelease(t.get_gameObject());
+			UITouchAndRelease.NoEventRelease(t.gameObject);
 		}
 	}
 
@@ -1705,25 +1669,16 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetFullScreenButton(Transform t)
 	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		if (!(t == null))
 		{
-			UIWidget component = t.GetComponent<UIWidget>();
-			component.autoResizeBoxCollider = false;
-			BoxCollider component2 = t.GetComponent<BoxCollider>();
-			BoxCollider obj = component2;
-			float num = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth * 2;
-			float num2 = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight * 2;
-			Vector3 size = component2.get_size();
-			obj.set_size(new Vector3(num, num2, size.z));
+			t.GetComponent<UIWidget>().autoResizeBoxCollider = false;
+			BoxCollider component = t.GetComponent<BoxCollider>();
+			component.size = new Vector3(MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth * 2, MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight * 2, component.size.z);
 		}
 	}
 
 	protected void SetBadge(Enum button_enum, int num, SpriteAlignment align, int offset_x = 5, int offset_y = 5, bool is_scale_normalize = false)
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 		if (!(MonoBehaviourSingleton<UIManager>.I.common == null))
 		{
 			Transform ctrl = GetCtrl(button_enum);
@@ -1733,7 +1688,6 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetBadge(Transform t, int num, SpriteAlignment align, int offset_x = 5, int offset_y = 5, bool is_scale_normalize = false)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		if (!(t == null))
 		{
 			MonoBehaviourSingleton<UIManager>.I.common.AttachBadge(t.GetComponent<UIWidget>(), num, align, offset_x, offset_y, is_scale_normalize);
@@ -1759,7 +1713,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (!(t_widget == null))
 		{
-			UIVisibleWidgetEffect.Set((!(t_panel != null)) ? null : t_panel.GetComponent<UIPanel>(), t_widget.GetComponent<UIWidget>(), ui_effect_name, (!(sectionData != null)) ? null : sectionData.sectionName);
+			UIVisibleWidgetEffect.Set((t_panel != null) ? t_panel.GetComponent<UIPanel>() : null, t_widget.GetComponent<UIWidget>(), ui_effect_name, (sectionData != null) ? sectionData.sectionName : null);
 		}
 	}
 
@@ -1767,7 +1721,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (!(t_widget == null))
 		{
-			UIVisibleWidgetEffect.OneShot((!(t_panel != null)) ? null : t_panel.GetComponent<UIPanel>(), t_widget.GetComponent<UIWidget>(), ui_effect_name, (!(sectionData != null)) ? null : sectionData.sectionName);
+			UIVisibleWidgetEffect.OneShot((t_panel != null) ? t_panel.GetComponent<UIPanel>() : null, t_widget.GetComponent<UIWidget>(), ui_effect_name, (sectionData != null) ? sectionData.sectionName : null);
 		}
 	}
 
@@ -1816,7 +1770,7 @@ public class UIBehaviour : MonoBehaviour
 			UIGameSceneEventSender uIGameSceneEventSender = t.GetComponent<UIGameSceneEventSender>();
 			if (uIGameSceneEventSender == null)
 			{
-				uIGameSceneEventSender = t.get_gameObject().AddComponent<UIGameSceneEventSender>();
+				uIGameSceneEventSender = t.gameObject.AddComponent<UIGameSceneEventSender>();
 			}
 			uIGameSceneEventSender.eventName = event_name;
 			uIGameSceneEventSender.eventData = event_data;
@@ -1825,19 +1779,16 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void MoveRelativeScrollView(Enum ctrl_enum, Vector3 value)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		MoveRelativeScrollView(GetCtrl(ctrl_enum), value);
 	}
 
 	protected void MoveRelativeScrollView(Transform root, Enum ctrl_enum, Vector3 value)
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		MoveRelativeScrollView(FindCtrl(root, ctrl_enum), value);
 	}
 
 	protected void MoveRelativeScrollView(Transform t, Vector3 _pos)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		if (!(t == null))
 		{
 			t.GetComponent<UIScrollView>().MoveRelative(_pos);
@@ -1877,10 +1828,10 @@ public class UIBehaviour : MonoBehaviour
 		if (!(t == null))
 		{
 			UIScrollView component = t.GetComponent<UIScrollView>();
-			bool enabled = component.get_enabled();
-			component.set_enabled(true);
+			bool enabled = component.enabled;
+			component.enabled = true;
 			component.ResetPosition();
-			component.set_enabled(enabled);
+			component.enabled = enabled;
 		}
 	}
 
@@ -1974,7 +1925,7 @@ public class UIBehaviour : MonoBehaviour
 			UIProgressWork uIProgressWork = t.GetComponent<UIProgressWork>();
 			if (uIProgressWork == null)
 			{
-				uIProgressWork = t.get_gameObject().AddComponent<UIProgressWork>();
+				uIProgressWork = t.gameObject.AddComponent<UIProgressWork>();
 			}
 			if (max > -1)
 			{
@@ -2034,7 +1985,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (!(t == null))
 		{
-			UICenterOnChildCtrl.Get(t.get_gameObject()).onCenter = func;
+			UICenterOnChildCtrl.Get(t.gameObject).onCenter = func;
 		}
 	}
 
@@ -2052,7 +2003,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (!(t == null))
 		{
-			UICenterOnChildCtrl.Get(t.get_gameObject()).onFinished = func;
+			UICenterOnChildCtrl.Get(t.gameObject).onFinished = func;
 		}
 	}
 
@@ -2147,10 +2098,10 @@ public class UIBehaviour : MonoBehaviour
 			string elemSpriteName = GetElemSpriteName(elen_type);
 			if (string.IsNullOrEmpty(elemSpriteName))
 			{
-				component.set_enabled(false);
+				component.enabled = false;
 				return;
 			}
-			component.set_enabled(true);
+			component.enabled = true;
 			SetSprite(t, elemSpriteName);
 		}
 	}
@@ -2177,10 +2128,10 @@ public class UIBehaviour : MonoBehaviour
 			string elemDefSpriteName = GetElemDefSpriteName(elen_type);
 			if (string.IsNullOrEmpty(elemDefSpriteName))
 			{
-				component.set_enabled(false);
+				component.enabled = false;
 				return;
 			}
-			component.set_enabled(true);
+			component.enabled = true;
 			SetSprite(t, elemDefSpriteName);
 		}
 	}
@@ -2235,12 +2186,12 @@ public class UIBehaviour : MonoBehaviour
 		{
 			return false;
 		}
-		UICenterOnChildCtrl uICenterOnChildCtrl = UICenterOnChildCtrl.Get(t.get_gameObject());
+		UICenterOnChildCtrl uICenterOnChildCtrl = UICenterOnChildCtrl.Get(t.gameObject);
 		if (uICenterOnChildCtrl == null)
 		{
 			return false;
 		}
-		if (index < 0 || t.get_childCount() <= index)
+		if (index < 0 || t.childCount <= index)
 		{
 			return false;
 		}
@@ -2259,7 +2210,7 @@ public class UIBehaviour : MonoBehaviour
 
 	protected bool SetCenter(Transform root, Enum table_enum)
 	{
-		return Object.op_Implicit(GetCenter(FindCtrl(root, table_enum)));
+		return GetCenter(FindCtrl(root, table_enum));
 	}
 
 	protected Transform GetCenter(Transform t)
@@ -2268,7 +2219,7 @@ public class UIBehaviour : MonoBehaviour
 		{
 			return null;
 		}
-		UICenterOnChildCtrl uICenterOnChildCtrl = UICenterOnChildCtrl.Get(t.get_gameObject());
+		UICenterOnChildCtrl uICenterOnChildCtrl = UICenterOnChildCtrl.Get(t.gameObject);
 		if (uICenterOnChildCtrl == null)
 		{
 			return null;
@@ -2278,15 +2229,15 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetScrollArrows(Transform parent, Enum prev_enum, Enum next_enum, int index, int length, Enum prev_btn_enum = null, Enum next_btn_enum = null)
 	{
-		Transform prev_btn = (prev_btn_enum == null) ? null : FindCtrl(parent, prev_btn_enum);
-		Transform next_btn = (next_btn_enum == null) ? null : FindCtrl(parent, next_btn_enum);
+		Transform prev_btn = (prev_btn_enum != null) ? FindCtrl(parent, prev_btn_enum) : null;
+		Transform next_btn = (next_btn_enum != null) ? FindCtrl(parent, next_btn_enum) : null;
 		SetScrollArrows(FindCtrl(parent, prev_enum), FindCtrl(parent, next_enum), index, length, prev_btn, next_btn);
 	}
 
 	protected void SetScrollArrows(Enum prev_enum, Enum next_enum, int index, int length, Enum prev_btn_enum = null, Enum next_btn_enum = null)
 	{
-		Transform prev_btn = (prev_btn_enum == null) ? null : GetCtrl(prev_btn_enum);
-		Transform next_btn = (next_btn_enum == null) ? null : GetCtrl(next_btn_enum);
+		Transform prev_btn = (prev_btn_enum != null) ? GetCtrl(prev_btn_enum) : null;
+		Transform next_btn = (next_btn_enum != null) ? GetCtrl(next_btn_enum) : null;
 		SetScrollArrows(GetCtrl(prev_enum), GetCtrl(next_enum), index, length, prev_btn, next_btn);
 	}
 
@@ -2326,17 +2277,12 @@ public class UIBehaviour : MonoBehaviour
 
 	public void SetTextTalk(Transform t, List<string[]> texts, Action page_end_call_back = null, Action<string, string> tag_call_back = null, int num_per_sec = 0)
 	{
-		if (t == null)
+		if (!(t == null) && !(t.GetComponent<UILabel>() == null))
 		{
-			return;
-		}
-		UILabel component = t.GetComponent<UILabel>();
-		if (!(component == null))
-		{
-			TextTalk component2 = t.GetComponent<TextTalk>();
-			if (!(component2 == null))
+			TextTalk component = t.GetComponent<TextTalk>();
+			if (!(component == null))
 			{
-				component2.Initialize(t, texts, page_end_call_back, tag_call_back, num_per_sec);
+				component.Initialize(t, texts, page_end_call_back, tag_call_back, num_per_sec);
 			}
 		}
 	}
@@ -2358,22 +2304,16 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetRenderPlayerModel(Enum ui_texture_enum, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback = null)
 	{
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		SetRenderPlayerModel(GetCtrl(ui_texture_enum), info, anim_id, pos, rot, is_priority_visual_equip, onload_callback);
 	}
 
 	protected void SetRenderPlayerModel(Transform root, Enum ui_texture_enum, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback = null)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		SetRenderPlayerModel(FindCtrl(root, ui_texture_enum), info, anim_id, pos, rot, is_priority_visual_equip, onload_callback);
 	}
 
 	protected void SetRenderPlayerModel(Transform t, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback = null)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		if (!(t == null))
 		{
 			UIModelRenderTexture.Get(t).InitPlayer(t.GetComponent<UITexture>(), info, anim_id, pos, rot, is_priority_visual_equip, onload_callback);
@@ -2382,37 +2322,29 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetRenderPlayerModelOneShot(Transform root, Enum ui_texture_enum, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback = null)
 	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = FindCtrl(root, ui_texture_enum);
-		if (val != null)
+		Transform transform = FindCtrl(root, ui_texture_enum);
+		if (transform != null)
 		{
-			UIModelRenderTexture uIModelRenderTexture = UIModelRenderTexture.Get(val);
+			UIModelRenderTexture uIModelRenderTexture = UIModelRenderTexture.Get(transform);
 			if (uIModelRenderTexture != null)
 			{
-				uIModelRenderTexture.InitPlayerOneShot(val.GetComponent<UITexture>(), info, anim_id, pos, rot, is_priority_visual_equip, onload_callback);
+				uIModelRenderTexture.InitPlayerOneShot(transform.GetComponent<UITexture>(), info, anim_id, pos, rot, is_priority_visual_equip, onload_callback);
 			}
 		}
 	}
 
 	protected void ForceSetRenderPlayerModel(Enum ui_texture_enum, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback = null)
 	{
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		ForceSetRenderPlayerModel(GetCtrl(ui_texture_enum), info, anim_id, pos, rot, is_priority_visual_equip, onload_callback);
 	}
 
 	protected void ForceSetRenderPlayerModel(Transform root, Enum ui_texture_enum, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback = null)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		ForceSetRenderPlayerModel(FindCtrl(root, ui_texture_enum), info, anim_id, pos, rot, is_priority_visual_equip, onload_callback);
 	}
 
 	protected void ForceSetRenderPlayerModel(Transform t, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback = null)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		if (t == null)
 		{
 			onload_callback?.Invoke(null);
@@ -2434,22 +2366,16 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetRenderNPCModel(Enum ui_texture_enum, int npc_id, Vector3 pos, Vector3 rot, float fov = -1f, Action<NPCLoader> onload_callback = null)
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 		SetRenderNPCModel(GetCtrl(ui_texture_enum), npc_id, pos, rot, fov, onload_callback);
 	}
 
 	protected void SetRenderNPCModel(Transform root, Enum ui_texture_enum, int npc_id, Vector3 pos, Vector3 rot, float fov = -1f, Action<NPCLoader> onload_callback = null)
 	{
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		SetRenderNPCModel(FindCtrl(root, ui_texture_enum), npc_id, pos, rot, fov, onload_callback);
 	}
 
 	protected void SetRenderNPCModel(Transform t, int npc_id, Vector3 pos, Vector3 rot, float fov = -1f, Action<NPCLoader> onload_callback = null)
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 		if (!(t == null))
 		{
 			UIModelRenderTexture.Get(t).InitNPC(t.GetComponent<UITexture>(), npc_id, pos, rot, fov, onload_callback);
@@ -2693,7 +2619,7 @@ public class UIBehaviour : MonoBehaviour
 			UIRenderTexture component2 = t.GetComponent<UIRenderTexture>();
 			if (component2 != null)
 			{
-				Object.DestroyImmediate(component2);
+				UnityEngine.Object.DestroyImmediate(component2);
 			}
 		}
 	}
@@ -2742,7 +2668,7 @@ public class UIBehaviour : MonoBehaviour
 		Transform ctrl = GetCtrl(ctrl_enum);
 		if (!(ctrl == null))
 		{
-			ctrl.get_gameObject().set_tag("Dirty");
+			ctrl.gameObject.tag = "Dirty";
 		}
 	}
 
@@ -2762,7 +2688,7 @@ public class UIBehaviour : MonoBehaviour
 		{
 			return false;
 		}
-		return t.get_gameObject().get_tag() == "Dirty";
+		return t.gameObject.tag == "Dirty";
 	}
 
 	protected void SetSkillIconButton(Transform root, Enum ui_widget_enum, string skill_button_prefab_name, EquipItemTable.EquipItemData equip_item_table, SkillSlotUIData[] skill_tables, string button_event_name = "SKILL_ICON_BUTTON", int button_event_data = 0)
@@ -2781,13 +2707,13 @@ public class UIBehaviour : MonoBehaviour
 		{
 			return;
 		}
-		t.get_gameObject().SetActive(true);
+		t.gameObject.SetActive(value: true);
 		if (string.IsNullOrEmpty(prefab_name))
 		{
 			return;
 		}
-		Transform val = t.Find(prefab_name);
-		if (val == null)
+		Transform transform = t.Find(prefab_name);
+		if (transform == null)
 		{
 			PrefabData prefabData = GetPrefabData(prefab_name);
 			if (prefabData == null)
@@ -2795,96 +2721,93 @@ public class UIBehaviour : MonoBehaviour
 				Log.Error(LOG.UI, "{0} not found.", prefab_name);
 				return;
 			}
-			val = prefabData.Realizes(t);
+			transform = prefabData.Realizes(t);
 		}
-		Transform val2 = val.Find("SPR_BTN_ENABLE_BG");
-		Transform val3 = val.Find("SPR_BTN_DISABLE_BG");
-		Transform val4 = val2.Find("OBJ_SKILL_SLOT");
+		Transform transform2 = transform.Find("SPR_BTN_ENABLE_BG");
+		Transform transform3 = transform.Find("SPR_BTN_DISABLE_BG");
+		Transform transform4 = transform2.Find("OBJ_SKILL_SLOT");
 		if (equip_item_table == null || slot_data == null)
 		{
-			if (val != null)
+			if (transform != null)
 			{
-				SetEnabled<UIButton>(val, is_enabled: false);
+				SetEnabled<UIButton>(transform, is_enabled: false);
 				int i = 0;
-				for (int childCount = val4.get_childCount(); i < childCount; i++)
+				for (int childCount = transform4.childCount; i < childCount; i++)
 				{
-					Transform child = val4.GetChild(i);
-					UISprite component = this.GetComponent<UISprite>(child);
-					if (component != null)
+					Transform child = transform4.GetChild(i);
+					if (GetComponent<UISprite>(child) != null)
 					{
 						SetEnabled<UISprite>(child, is_enabled: false);
 					}
 				}
 			}
-			val2.get_gameObject().SetActive(false);
-			val3.get_gameObject().SetActive(true);
+			transform2.gameObject.SetActive(value: false);
+			transform3.gameObject.SetActive(value: true);
 			return;
 		}
-		val2.get_gameObject().SetActive(true);
-		val3.get_gameObject().SetActive(false);
+		transform2.gameObject.SetActive(value: true);
+		transform3.gameObject.SetActive(value: false);
 		if (!string.IsNullOrEmpty(button_event_name))
 		{
-			SetEnabled<UIButton>(val, is_enabled: true);
-			SetEvent(val, button_event_name, button_event_data);
-			val.GetComponent<BoxCollider>().set_enabled(true);
+			SetEnabled<UIButton>(transform, is_enabled: true);
+			SetEvent(transform, button_event_name, button_event_data);
+			transform.GetComponent<BoxCollider>().enabled = true;
 		}
 		else
 		{
-			SetEnabled<UIButton>(val, is_enabled: false);
-			val.GetComponent<BoxCollider>().set_enabled(false);
+			SetEnabled<UIButton>(transform, is_enabled: false);
+			transform.GetComponent<BoxCollider>().enabled = false;
 		}
-		UIWidget component2 = this.GetComponent<UIWidget>(val);
-		if (!component2.isAnchored)
+		UIWidget component = GetComponent<UIWidget>(transform);
+		if (!component.isAnchored)
 		{
-			Vector2 val5 = default(Vector2);
-			val5._002Ector((float)(component2.width >> 1), (float)(component2.height >> 1));
-			component2.SetAnchor(t.get_gameObject(), (int)(0f - val5.x), (int)(0f - val5.y), (int)val5.x, (int)val5.y);
+			Vector2 vector = new Vector2(component.width >> 1, component.height >> 1);
+			component.SetAnchor(t.gameObject, (int)(0f - vector.x), (int)(0f - vector.y), (int)vector.x, (int)vector.y);
 		}
-		if (val.GetComponent<UIDragScrollView>() == null)
+		if (transform.GetComponent<UIDragScrollView>() == null)
 		{
-			UIScrollView componentInParent = val.GetComponentInParent<UIScrollView>();
+			UIScrollView componentInParent = transform.GetComponentInParent<UIScrollView>();
 			if (componentInParent != null)
 			{
-				UIDragScrollView uIDragScrollView = val.get_gameObject().AddComponent<UIDragScrollView>();
-				uIDragScrollView.scrollView = componentInParent;
-				if (val.GetComponent<UICenterOnClickChild>() == null)
+				transform.gameObject.AddComponent<UIDragScrollView>().scrollView = componentInParent;
+				if (transform.GetComponent<UICenterOnClickChild>() == null)
 				{
-					val.get_gameObject().AddComponent<UICenterOnClickChild>();
+					transform.gameObject.AddComponent<UICenterOnClickChild>();
 				}
 			}
 		}
 		int j = 0;
-		for (int childCount2 = val4.get_childCount(); j < childCount2; j++)
+		for (int childCount2 = transform4.childCount; j < childCount2; j++)
 		{
-			Transform val6 = val4.Find(j.ToString());
+			Transform transform5 = transform4.Find(j.ToString());
 			if (j < slot_data.Length)
 			{
-				val6.get_gameObject().SetActive(true);
-				UISprite component3 = val6.GetComponent<UISprite>();
-				component3.set_enabled(true);
+				transform5.gameObject.SetActive(value: true);
+				UISprite component2 = transform5.GetComponent<UISprite>();
+				component2.enabled = true;
 				bool is_attached = slot_data[j].itemData != null && slot_data[j].slotData.slotType == slot_data[j].itemData.tableData.type;
-				SetSkillIcon(component3, slot_data[j].slotData.slotType, is_attached, is_button_icon: true);
+				SetSkillIcon(component2, slot_data[j].slotData.slotType, is_attached, is_button_icon: true);
 			}
-			else if (val6 != null)
+			else if (transform5 != null)
 			{
-				val6.get_gameObject().SetActive(false);
+				transform5.gameObject.SetActive(value: false);
 			}
 		}
-		UIGrid component4 = val4.GetComponent<UIGrid>();
-		if (component4 != null)
+		UIGrid component3 = transform4.GetComponent<UIGrid>();
+		if (component3 != null)
 		{
-			component4.Reposition();
+			component3.Reposition();
 		}
 	}
 
 	public void SetSkillIcon(Enum ui_enum, SKILL_SLOT_TYPE slot_type, bool is_attached, bool is_button_icon)
 	{
-		SetSkillIcon(this.GetComponent<UISprite>(ui_enum), slot_type, is_attached, is_button_icon);
+		SetSkillIcon(GetComponent<UISprite>(ui_enum), slot_type, is_attached, is_button_icon);
 	}
 
 	public void SetSkillIcon(Transform root, Enum ui_enum, SKILL_SLOT_TYPE slot_type, bool is_attached, bool is_button_icon)
 	{
-		SetSkillIcon(this.GetComponent<UISprite>(root, ui_enum), slot_type, is_attached, is_button_icon);
+		SetSkillIcon(GetComponent<UISprite>(root, ui_enum), slot_type, is_attached, is_button_icon);
 	}
 
 	public void SetSkillIcon(UISprite sprite, SKILL_SLOT_TYPE slot_type, bool is_attached, bool is_button_icon)
@@ -3088,7 +3011,11 @@ public class UIBehaviour : MonoBehaviour
 			num = MAGI_TYPE_ICON_SPRITE_NAME.Length - 1;
 		}
 		string arg = MAGI_TYPE_ICON_SPRITE_NAME[num];
-		return (!is_enable) ? $"{arg}_off" : $"{arg}_on";
+		if (!is_enable)
+		{
+			return $"{arg}_off";
+		}
+		return $"{arg}_on";
 	}
 
 	public static int GetEquipmentTypeIndex(EQUIPMENT_TYPE type)
@@ -3104,24 +3031,18 @@ public class UIBehaviour : MonoBehaviour
 
 	public static void SetRarityColorType(int rarity, UIWidget w)
 	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 		if (!(w == null))
 		{
 			switch (rarity)
 			{
 			case 0:
-				w.color = Color32.op_Implicit(new Color32((byte)184, (byte)243, byte.MaxValue, byte.MaxValue));
+				w.color = new Color32(184, 243, byte.MaxValue, byte.MaxValue);
 				break;
 			case 1:
-				w.color = Color32.op_Implicit(new Color32(byte.MaxValue, (byte)165, (byte)131, byte.MaxValue));
+				w.color = new Color32(byte.MaxValue, 165, 131, byte.MaxValue);
 				break;
 			default:
-				w.color = Color32.op_Implicit(new Color32(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue));
+				w.color = new Color32(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
 				break;
 			}
 		}
@@ -3129,7 +3050,7 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetAbilityItemEvent(Transform t, int index, List<Transform> touchAndReleaseList)
 	{
-		SetTouchAndRelease(t.GetComponentInChildren<UIButton>().get_transform(), "ABILITY_DATA_POPUP", "RELEASE_ABILITY", new object[2]
+		SetTouchAndRelease(t.GetComponentInChildren<UIButton>().transform, "ABILITY_DATA_POPUP", "RELEASE_ABILITY", new object[2]
 		{
 			index,
 			t
@@ -3159,9 +3080,9 @@ public class UIBehaviour : MonoBehaviour
 			if (!(touchAndReleaseList[i] == null))
 			{
 				UIButton componentInChildren = touchAndReleaseList[i].GetComponentInChildren<UIButton>();
-				if (Object.op_Implicit(componentInChildren))
+				if ((bool)componentInChildren)
 				{
-					NoEventReleaseTouchAndRelease(componentInChildren.get_transform());
+					NoEventReleaseTouchAndRelease(componentInChildren.transform);
 				}
 			}
 		}
@@ -3193,17 +3114,17 @@ public class UIBehaviour : MonoBehaviour
 
 	public Transform CreateMaterialInfo(Transform parent)
 	{
-		Transform val = null;
-		GameObject val2 = GameObject.FindGameObjectWithTag("MaterialInfo");
-		if (val2 != null)
+		Transform transform = null;
+		GameObject gameObject = GameObject.FindGameObjectWithTag("MaterialInfo");
+		if (gameObject != null)
 		{
-			MaterialInfo component = val2.GetComponent<MaterialInfo>();
+			MaterialInfo component = gameObject.GetComponent<MaterialInfo>();
 			if (component != null && component.nowSectionName == sectionData.sectionName)
 			{
-				val = val2.get_transform();
+				transform = gameObject.transform;
 			}
 		}
-		if (val == null)
+		if (transform == null)
 		{
 			PrefabData prefabData = GetPrefabData("MaterialInfo");
 			if (prefabData == null)
@@ -3211,21 +3132,21 @@ public class UIBehaviour : MonoBehaviour
 				Log.Error(LOG.UI, "{0} not found.", "MaterialInfo");
 				return null;
 			}
-			val = prefabData.Realizes(parent);
-			val.get_gameObject().set_tag("MaterialInfo");
+			transform = prefabData.Realizes(parent);
+			transform.gameObject.tag = "MaterialInfo";
 		}
-		return val;
+		return transform;
 	}
 
 	protected void DeleteMaterialInfo()
 	{
-		GameObject val = GameObject.FindGameObjectWithTag("MaterialInfo");
-		if (val != null)
+		GameObject gameObject = GameObject.FindGameObjectWithTag("MaterialInfo");
+		if (gameObject != null)
 		{
-			MaterialInfo component = val.GetComponent<MaterialInfo>();
+			MaterialInfo component = gameObject.GetComponent<MaterialInfo>();
 			if (component != null && component.nowSectionName == sectionData.sectionName)
 			{
-				Object.DestroyImmediate(val);
+				UnityEngine.Object.DestroyImmediate(gameObject);
 			}
 		}
 	}
@@ -3284,10 +3205,6 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetLabelCompareParam(Transform t_after, int after_value, int before_value, string set_after_value_string)
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 		if (t_after == null)
 		{
 			return;
@@ -3298,15 +3215,15 @@ public class UIBehaviour : MonoBehaviour
 			component.text = set_after_value_string;
 			if (before_value > after_value)
 			{
-				t_after.GetComponent<UIWidget>().color = Color.get_red();
+				t_after.GetComponent<UIWidget>().color = Color.red;
 			}
 			else if (before_value < after_value)
 			{
-				t_after.GetComponent<UIWidget>().color = Color32.op_Implicit(buffGreen);
+				t_after.GetComponent<UIWidget>().color = buffGreen;
 			}
 			else
 			{
-				t_after.GetComponent<UIWidget>().color = Color.get_white();
+				t_after.GetComponent<UIWidget>().color = Color.white;
 			}
 		}
 	}
@@ -3323,12 +3240,6 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetLabelDiffParam(Transform now_t, int after_value, Transform diff_t, int before_value, Transform default_t, string diff_format = null)
 	{
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
 		int num = after_value - before_value;
 		if (num == 0)
 		{
@@ -3376,7 +3287,7 @@ public class UIBehaviour : MonoBehaviour
 		UILabel component2 = diff_t.GetComponent<UILabel>();
 		if (!(component2 == null))
 		{
-			string text = ((num <= 0) ? string.Empty : "+") + num;
+			string text = ((num > 0) ? "+" : "") + num;
 			if (!string.IsNullOrEmpty(diff_format))
 			{
 				text = string.Format(diff_format, text);
@@ -3385,13 +3296,13 @@ public class UIBehaviour : MonoBehaviour
 			SetActive(diff_t, is_visible: true);
 			if (num < 0)
 			{
-				component2.color = Color.get_red();
-				component.color = Color.get_red();
+				component2.color = Color.red;
+				component.color = Color.red;
 			}
 			else if (num > 0)
 			{
-				component2.color = Color32.op_Implicit(buffGreen);
-				component.color = Color32.op_Implicit(buffGreen);
+				component2.color = buffGreen;
+				component.color = buffGreen;
 			}
 		}
 	}
@@ -3427,7 +3338,7 @@ public class UIBehaviour : MonoBehaviour
 
 	protected string GetInputText(Enum ui_enum)
 	{
-		UIInput component = this.GetComponent<UIInput>(ui_enum);
+		UIInput component = GetComponent<UIInput>(ui_enum);
 		if (component == null)
 		{
 			return string.Empty;
@@ -3539,42 +3450,42 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetTable(Enum table_ctrl_enum, string item_prefab_name, int item_num, bool reset, Action<int, Transform, bool> item_init_func)
 	{
-		this.SetItemList<UITable>(GetCtrl(table_ctrl_enum), item_prefab_name, item_num, reset, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, item_init_func, is_dynamic: false);
+		SetItemList<UITable>(GetCtrl(table_ctrl_enum), item_prefab_name, item_num, reset, null, null, item_init_func, is_dynamic: false);
 	}
 
 	protected void SetTable(Enum table_ctrl_enum, string item_prefab_name, int item_num, bool reset, Func<int, Transform, Transform> create_item_func, Action<int, Transform, bool> item_init_func)
 	{
-		this.SetItemList<UITable>(GetCtrl(table_ctrl_enum), item_prefab_name, item_num, reset, (Func<int, bool>)null, create_item_func, item_init_func, is_dynamic: false);
+		SetItemList<UITable>(GetCtrl(table_ctrl_enum), item_prefab_name, item_num, reset, null, create_item_func, item_init_func, is_dynamic: false);
 	}
 
 	protected void SetTable(Transform root, Enum table_ctrl_enum, string item_prefab_name, int item_num, bool reset, Action<int, Transform, bool> item_init_func)
 	{
-		this.SetItemList<UITable>(FindCtrl(root, table_ctrl_enum), item_prefab_name, item_num, reset, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, item_init_func, is_dynamic: false);
+		SetItemList<UITable>(FindCtrl(root, table_ctrl_enum), item_prefab_name, item_num, reset, null, null, item_init_func, is_dynamic: false);
 	}
 
 	protected void SetTable(Transform root, Enum table_ctrl_enum, string item_prefab_name, int item_num, bool reset, Func<int, Transform, Transform> create_item_func, Action<int, Transform, bool> item_init_func)
 	{
-		this.SetItemList<UITable>(FindCtrl(root, table_ctrl_enum), item_prefab_name, item_num, reset, (Func<int, bool>)null, create_item_func, item_init_func, is_dynamic: false);
+		SetItemList<UITable>(FindCtrl(root, table_ctrl_enum), item_prefab_name, item_num, reset, null, create_item_func, item_init_func, is_dynamic: false);
 	}
 
 	protected void SetGrid(Enum grid_ctrl_enum, string item_prefab_name, int item_num, bool reset, Action<int, Transform, bool> item_init_func)
 	{
-		this.SetItemList<UIGrid>(GetCtrl(grid_ctrl_enum), item_prefab_name, item_num, reset, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, item_init_func, is_dynamic: false);
+		SetItemList<UIGrid>(GetCtrl(grid_ctrl_enum), item_prefab_name, item_num, reset, null, null, item_init_func, is_dynamic: false);
 	}
 
 	protected void SetGrid(Enum grid_ctrl_enum, string item_prefab_name, int item_num, bool reset, Func<int, Transform, Transform> create_item_func, Action<int, Transform, bool> item_init_func)
 	{
-		this.SetItemList<UIGrid>(GetCtrl(grid_ctrl_enum), item_prefab_name, item_num, reset, (Func<int, bool>)null, create_item_func, item_init_func, is_dynamic: false);
+		SetItemList<UIGrid>(GetCtrl(grid_ctrl_enum), item_prefab_name, item_num, reset, null, create_item_func, item_init_func, is_dynamic: false);
 	}
 
 	protected void SetGrid(Transform root, Enum grid_ctrl_enum, string item_prefab_name, int item_num, bool reset, Action<int, Transform, bool> item_init_func)
 	{
-		this.SetItemList<UIGrid>(FindCtrl(root, grid_ctrl_enum), item_prefab_name, item_num, reset, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, item_init_func, is_dynamic: false);
+		SetItemList<UIGrid>(FindCtrl(root, grid_ctrl_enum), item_prefab_name, item_num, reset, null, null, item_init_func, is_dynamic: false);
 	}
 
 	protected void SetGrid(Transform root, Enum grid_ctrl_enum, string item_prefab_name, int item_num, bool reset, Func<int, Transform, Transform> create_item_func, Action<int, Transform, bool> item_init_func)
 	{
-		this.SetItemList<UIGrid>(FindCtrl(root, grid_ctrl_enum), item_prefab_name, item_num, reset, (Func<int, bool>)null, create_item_func, item_init_func, is_dynamic: false);
+		SetItemList<UIGrid>(FindCtrl(root, grid_ctrl_enum), item_prefab_name, item_num, reset, null, create_item_func, item_init_func, is_dynamic: false);
 	}
 
 	protected void SetDynamicList(Transform root, Enum grid_ctrl_enum, string item_prefab_name, int item_num, bool reset, Func<int, bool> check_item_func, Func<int, Transform, Transform> create_item_func, Action<int, Transform, bool> item_init_func)
@@ -3589,32 +3500,32 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void SetDynamicList(Transform t, string item_prefab_name, int item_num, bool reset, Func<int, bool> check_item_func, Func<int, Transform, Transform> create_item_func, Action<int, Transform, bool> item_init_func)
 	{
-		this.SetItemList<UIGrid>(t, item_prefab_name, item_num, reset, check_item_func, create_item_func, item_init_func, is_dynamic: true);
+		SetItemList<UIGrid>(t, item_prefab_name, item_num, reset, check_item_func, create_item_func, item_init_func, is_dynamic: true);
 	}
 
 	protected void SetWrapContent(Enum grid_ctrl_enum, string item_prefab_name, int item_num, bool reset, Action<int, Transform, bool> item_init_func)
 	{
-		this.SetItemList<UIWrapContent>(GetCtrl(grid_ctrl_enum), item_prefab_name, item_num, reset, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, item_init_func, is_dynamic: false);
+		SetItemList<UIWrapContent>(GetCtrl(grid_ctrl_enum), item_prefab_name, item_num, reset, null, null, item_init_func, is_dynamic: false);
 	}
 
 	protected void SetWrapContent(Enum grid_ctrl_enum, string item_prefab_name, int item_num, bool reset, Func<int, Transform, Transform> create_item_func, Action<int, Transform, bool> item_init_func)
 	{
-		this.SetItemList<UIWrapContent>(GetCtrl(grid_ctrl_enum), item_prefab_name, item_num, reset, (Func<int, bool>)null, create_item_func, item_init_func, is_dynamic: false);
+		SetItemList<UIWrapContent>(GetCtrl(grid_ctrl_enum), item_prefab_name, item_num, reset, null, create_item_func, item_init_func, is_dynamic: false);
 	}
 
 	protected void SetWrapContent(Transform root, Enum grid_ctrl_enum, string item_prefab_name, int item_num, bool reset, Action<int, Transform, bool> item_init_func)
 	{
-		this.SetItemList<UIWrapContent>(FindCtrl(root, grid_ctrl_enum), item_prefab_name, item_num, reset, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, item_init_func, is_dynamic: false);
+		SetItemList<UIWrapContent>(FindCtrl(root, grid_ctrl_enum), item_prefab_name, item_num, reset, null, null, item_init_func, is_dynamic: false);
 	}
 
 	protected void SetSimpleContent(Enum grid_ctrl_enum, string item_prefab_name, int item_num, bool reset, Func<int, bool> check_item_func, Func<int, Transform, Transform> create_item_func, Action<int, Transform, bool> item_init_func)
 	{
-		this.SetItemList<SimpleContent>(GetCtrl(grid_ctrl_enum), item_prefab_name, item_num, reset, check_item_func, create_item_func, item_init_func, is_dynamic: false);
+		SetItemList<SimpleContent>(GetCtrl(grid_ctrl_enum), item_prefab_name, item_num, reset, check_item_func, create_item_func, item_init_func, is_dynamic: false);
 	}
 
 	protected void SetWrapContentFilter(Enum grid_ctrl_enum, string item_prefab_name, int item_num, bool reset, Action<int, Transform, bool> item_init_func, Func<int, string, bool> filter_item_func)
 	{
-		this.SetItemList<UIWrapContentFilter>(GetCtrl(grid_ctrl_enum), item_prefab_name, item_num, reset, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, item_init_func, is_dynamic: false);
+		SetItemList<UIWrapContentFilter>(GetCtrl(grid_ctrl_enum), item_prefab_name, item_num, reset, null, null, item_init_func, is_dynamic: false);
 	}
 
 	public void SetWrapContentFilterText(Transform root, Enum enum_lbl, string text)
@@ -3641,11 +3552,7 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void AddItemList(Transform item_list_transform, string item_prefab_name, int item_num, Func<int, bool> check_item_func, Func<int, Transform, Transform> create_item_func, Action<int, Transform, bool> init_item_func)
 	{
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Expected O, but got Unknown
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-		UIGrid component = item_list_transform.get_gameObject().GetComponent<UIGrid>();
+		UIGrid component = item_list_transform.gameObject.GetComponent<UIGrid>();
 		PrefabData prefabData = null;
 		if (!string.IsNullOrEmpty(item_prefab_name))
 		{
@@ -3657,11 +3564,11 @@ public class UIBehaviour : MonoBehaviour
 			}
 		}
 		UICenterOnChild component2 = item_list_transform.GetComponent<UICenterOnChild>();
-		UIScrollView component3 = item_list_transform.get_parent().get_gameObject().GetComponent<UIScrollView>();
+		UIScrollView component3 = item_list_transform.parent.gameObject.GetComponent<UIScrollView>();
 		UIPanel uIPanel = null;
 		if (component3 != null)
 		{
-			component3.set_enabled(true);
+			component3.enabled = true;
 			uIPanel = component3.GetComponent<UIPanel>();
 		}
 		for (int i = 0; i < item_num; i++)
@@ -3670,21 +3577,21 @@ public class UIBehaviour : MonoBehaviour
 			{
 				continue;
 			}
-			Transform val;
+			Transform transform;
 			if (prefabData != null || create_item_func != null)
 			{
-				val = null;
+				transform = null;
 				if (create_item_func != null)
 				{
-					val = create_item_func(i, item_list_transform);
+					transform = create_item_func(i, item_list_transform);
 				}
-				if (val == null && prefabData != null)
+				if (transform == null && prefabData != null)
 				{
-					val = _Realizes(prefabData, item_list_transform, check_panel: true);
+					transform = _Realizes(prefabData, item_list_transform, check_panel: true);
 				}
-				if (val != null && uIPanel != null)
+				if (transform != null && uIPanel != null)
 				{
-					UIPanel componentInChildren = val.GetComponentInChildren<UIPanel>();
+					UIPanel componentInChildren = transform.GetComponentInChildren<UIPanel>();
 					if (componentInChildren != null)
 					{
 						componentInChildren.depth = uIPanel.depth + 1;
@@ -3693,49 +3600,40 @@ public class UIBehaviour : MonoBehaviour
 			}
 			else
 			{
-				GameObject val2 = new GameObject();
-				val2.set_layer(5);
-				val = val2.get_transform();
-				val.set_parent(item_list_transform);
-				val.set_localPosition(Vector3.get_zero());
-				val.set_localScale(Vector3.get_one());
+				GameObject gameObject = new GameObject();
+				gameObject.layer = 5;
+				transform = gameObject.transform;
+				transform.parent = item_list_transform;
+				transform.localPosition = Vector3.zero;
+				transform.localScale = Vector3.one;
 				if (component3 != null)
 				{
-					val2.AddComponent<UIDragScrollView>().scrollView = component3;
+					gameObject.AddComponent<UIDragScrollView>().scrollView = component3;
 				}
 			}
 			if (component2 != null)
 			{
-				UIUtility.AddCenterOnClickChild(val);
+				UIUtility.AddCenterOnClickChild(transform);
 			}
-			if (val == null)
+			if (transform == null)
 			{
 				return;
 			}
-			val.set_name(i.ToString());
-			init_item_func(i, val, arg3: false);
-			UIUtility.UpdateAnchors(val);
+			transform.name = i.ToString();
+			init_item_func(i, transform, arg3: false);
+			UIUtility.UpdateAnchors(transform);
 		}
 		component.Reposition();
 	}
 
 	private void SetItemList<T>(Transform item_list_transform, string item_prefab_name, int item_num, bool reset, Func<int, bool> check_item_func, Func<int, Transform, Transform> create_item_func, Action<int, Transform, bool> init_item_func, bool is_dynamic) where T : Component
 	{
-		//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0193: Expected O, but got Unknown
-		//IL_0262: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Expected O, but got Unknown
-		//IL_0284: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0290: Unknown result type (might be due to invalid IL or missing references)
-		//IL_044c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05d2: Unknown result type (might be due to invalid IL or missing references)
 		if (item_list_transform == null)
 		{
 			return;
 		}
-		T component = item_list_transform.get_gameObject().GetComponent<T>();
-		if ((object)component == null)
+		T component = item_list_transform.gameObject.GetComponent<T>();
+		if ((UnityEngine.Object)component == (UnityEngine.Object)null)
 		{
 			return;
 		}
@@ -3753,17 +3651,17 @@ public class UIBehaviour : MonoBehaviour
 				return;
 			}
 		}
-		UIScrollView component2 = item_list_transform.get_parent().get_gameObject().GetComponent<UIScrollView>();
+		UIScrollView component2 = item_list_transform.parent.gameObject.GetComponent<UIScrollView>();
 		UIPanel uIPanel = null;
 		if (component2 != null)
 		{
-			component2.set_enabled(true);
+			component2.enabled = true;
 			uIPanel = component2.GetComponent<UIPanel>();
 		}
 		UICenterOnChild component3 = item_list_transform.GetComponent<UICenterOnChild>();
-		if (item_list_transform.get_gameObject().get_tag() == "Dirty")
+		if (item_list_transform.gameObject.tag == "Dirty")
 		{
-			item_list_transform.get_gameObject().set_tag("Untagged");
+			item_list_transform.gameObject.tag = "Untagged";
 			reset = true;
 		}
 		else if (uiFirstUpdate)
@@ -3775,7 +3673,7 @@ public class UIBehaviour : MonoBehaviour
 		{
 			uIDynamicList = UIDynamicList.Set(component2, item_num, prefabData?.prefab, component3 != null, create_item_func, init_item_func);
 		}
-		int childCount = item_list_transform.get_childCount();
+		int childCount = item_list_transform.childCount;
 		int num = 0;
 		int num2 = 0;
 		for (int i = 0; i < item_num; i++)
@@ -3785,34 +3683,36 @@ public class UIBehaviour : MonoBehaviour
 				continue;
 			}
 			bool arg;
-			Transform val2;
+			Transform transform;
 			if (num >= childCount)
 			{
 				arg = false;
 				if (uIDynamicList != null)
 				{
-					GameObject val = new GameObject();
-					val.set_layer(5);
-					UIWidget uIWidget = val.AddComponent<UIWidget>();
+					GameObject obj = new GameObject
+					{
+						layer = 5
+					};
+					UIWidget uIWidget = obj.AddComponent<UIWidget>();
 					uIWidget.SetDimensions((int)uIGrid.cellWidth, (int)uIGrid.cellHeight);
-					val2 = val.get_transform();
-					val2.SetParent(item_list_transform, false);
+					transform = obj.transform;
+					transform.SetParent(item_list_transform, worldPositionStays: false);
 					uIDynamicList.AddItemWidget(uIWidget);
 				}
 				else if (prefabData != null || create_item_func != null)
 				{
-					val2 = null;
+					transform = null;
 					if (create_item_func != null)
 					{
-						val2 = create_item_func(i, item_list_transform);
+						transform = create_item_func(i, item_list_transform);
 					}
-					if (val2 == null && prefabData != null)
+					if (transform == null && prefabData != null)
 					{
-						val2 = _Realizes(prefabData, item_list_transform, check_panel: true);
+						transform = _Realizes(prefabData, item_list_transform, check_panel: true);
 					}
-					if (val2 != null && uIPanel != null)
+					if (transform != null && uIPanel != null)
 					{
-						UIPanel componentInChildren = val2.GetComponentInChildren<UIPanel>();
+						UIPanel componentInChildren = transform.GetComponentInChildren<UIPanel>();
 						if (componentInChildren != null)
 						{
 							componentInChildren.depth = uIPanel.depth + 1;
@@ -3821,66 +3721,66 @@ public class UIBehaviour : MonoBehaviour
 				}
 				else
 				{
-					GameObject val3 = new GameObject();
-					val3.set_layer(5);
-					val2 = val3.get_transform();
-					val2.set_parent(item_list_transform);
-					val2.set_localPosition(Vector3.get_zero());
-					val2.set_localScale(Vector3.get_one());
+					GameObject gameObject = new GameObject();
+					gameObject.layer = 5;
+					transform = gameObject.transform;
+					transform.parent = item_list_transform;
+					transform.localPosition = Vector3.zero;
+					transform.localScale = Vector3.one;
 					if (component2 != null)
 					{
-						val3.AddComponent<UIDragScrollView>().scrollView = component2;
+						gameObject.AddComponent<UIDragScrollView>().scrollView = component2;
 					}
 				}
 				if (component3 != null)
 				{
-					UIUtility.AddCenterOnClickChild(val2);
+					UIUtility.AddCenterOnClickChild(transform);
 				}
 			}
 			else
 			{
 				arg = true;
-				val2 = item_list_transform.GetChild(num);
-				if (component2 != null && component2.get_transform().GetChild(0) != null)
+				transform = item_list_transform.GetChild(num);
+				if (component2 != null && component2.transform.GetChild(0) != null)
 				{
-					UITweenAddToChildrenCtrl component4 = component2.get_transform().GetChild(0).GetComponent<UITweenAddToChildrenCtrl>();
-					if (component4 != null && component4.get_enabled() && val2.GetComponent<UITweenAddCtrlChild>() != null)
+					UITweenAddToChildrenCtrl component4 = component2.transform.GetChild(0).GetComponent<UITweenAddToChildrenCtrl>();
+					if (component4 != null && component4.enabled && transform.GetComponent<UITweenAddCtrlChild>() != null)
 					{
-						val2 = val2.GetChild(0);
+						transform = transform.GetChild(0);
 					}
 				}
-				val2.get_gameObject().SetActive(true);
+				transform.gameObject.SetActive(value: true);
 				if (uIDynamicList != null)
 				{
-					uIDynamicList.AddItemWidget(val2.GetComponent<UIWidget>());
+					uIDynamicList.AddItemWidget(transform.GetComponent<UIWidget>());
 				}
 				num++;
 			}
-			if (val2 == null)
+			if (transform == null)
 			{
 				return;
 			}
-			val2.set_name(i.ToString());
+			transform.name = i.ToString();
 			if (uIDynamicList == null)
 			{
-				init_item_func(i, val2, arg);
-				UIUtility.UpdateAnchors(val2);
+				init_item_func(i, transform, arg);
+				UIUtility.UpdateAnchors(transform);
 			}
-			if (val2.get_gameObject().get_activeSelf())
+			if (transform.gameObject.activeSelf)
 			{
 				num2++;
 			}
 		}
 		for (int num3 = childCount - 1; num3 >= num; num3--)
 		{
-			Object.DestroyImmediate(item_list_transform.GetChild(num3).get_gameObject());
+			UnityEngine.Object.DestroyImmediate(item_list_transform.GetChild(num3).gameObject);
 		}
 		UITweenAddToChildrenCtrl uITweenAddToChildrenCtrl = null;
 		if (uITable != null)
 		{
 			if (reset && uITable.keepWithinPanel && uITable.pivot == UIWidget.Pivot.TopLeft)
 			{
-				uITable.get_transform().set_localPosition(new Vector3(-9999f, 9999f, 0f));
+				uITable.transform.localPosition = new Vector3(-9999f, 9999f, 0f);
 			}
 			uITable.Reposition();
 			uITweenAddToChildrenCtrl = uITable.GetComponent<UITweenAddToChildrenCtrl>();
@@ -3889,7 +3789,7 @@ public class UIBehaviour : MonoBehaviour
 		{
 			if (reset && uIGrid.keepWithinPanel && uIGrid.pivot == UIWidget.Pivot.TopLeft)
 			{
-				uIGrid.get_transform().set_localPosition(new Vector3(-9999f, 9999f, 0f));
+				uIGrid.transform.localPosition = new Vector3(-9999f, 9999f, 0f);
 			}
 			uIGrid.Reposition();
 			if (component2 != null)
@@ -3907,7 +3807,7 @@ public class UIBehaviour : MonoBehaviour
 			ActivateScrollBarCollider(component2, activate: true);
 			if ((component2.canMoveHorizontally && !component2.shouldMoveHorizontally) || (component2.canMoveVertically && !component2.shouldMoveVertically))
 			{
-				component2.set_enabled(false);
+				component2.enabled = false;
 				if (component2.showScrollBars != 0)
 				{
 					if (component2.horizontalScrollBar != null)
@@ -3932,7 +3832,7 @@ public class UIBehaviour : MonoBehaviour
 			if (component2 != null && reset)
 			{
 				component2.ResetPosition();
-				component2.MoveAbsolute(Vector3.get_zero());
+				component2.MoveAbsolute(Vector3.zero);
 			}
 		}
 		if (uIWrapContent != null)
@@ -3991,11 +3891,11 @@ public class UIBehaviour : MonoBehaviour
 		{
 			if (forward)
 			{
-				t.get_gameObject().set_tag("Dirty");
+				t.gameObject.tag = "Dirty";
 			}
 			else
 			{
-				t.get_gameObject().set_tag("Untagged");
+				t.gameObject.tag = "Untagged";
 			}
 			UITweenCtrl.Play(t, forward, callback, is_input_block, tween_ctrl_id);
 		}
@@ -4017,11 +3917,11 @@ public class UIBehaviour : MonoBehaviour
 		{
 			if (forward)
 			{
-				t.get_gameObject().set_tag("Dirty");
+				t.gameObject.tag = "Dirty";
 			}
 			else
 			{
-				t.get_gameObject().set_tag("Untagged");
+				t.gameObject.tag = "Untagged";
 			}
 			UITweenCtrl.Skip(t, forward, tween_ctrl_id);
 		}
@@ -4041,7 +3941,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		if (!(t == null))
 		{
-			t.get_gameObject().set_tag("Untagged");
+			t.gameObject.tag = "Untagged";
 			UITweenCtrl.Reset(t, tween_ctrl_id);
 		}
 	}
@@ -4058,15 +3958,15 @@ public class UIBehaviour : MonoBehaviour
 
 	protected void InitUITweener<T>(Transform t, bool is_enable, EventDelegate.Callback on_finish = null) where T : UITweener
 	{
-		T component = this.GetComponent<T>(t);
-		if (!(component == null))
+		T component = GetComponent<T>(t);
+		if (!((UnityEngine.Object)component == (UnityEngine.Object)null))
 		{
 			component.ResetToBeginning();
 			if (on_finish != null)
 			{
 				component.SetOnFinished(on_finish);
 			}
-			component.set_enabled(is_enable);
+			component.enabled = is_enable;
 		}
 	}
 
@@ -4193,7 +4093,7 @@ public class UIBehaviour : MonoBehaviour
 		{
 			transferUI.RefreshUI();
 		}
-		else if (collectUI == null || collectUI.get_gameObject().get_activeInHierarchy())
+		else if (collectUI == null || collectUI.gameObject.activeInHierarchy)
 		{
 			UpdateUI();
 		}
@@ -4201,7 +4101,7 @@ public class UIBehaviour : MonoBehaviour
 
 	public virtual void UpdateUI()
 	{
-		if (!this.get_gameObject().get_activeInHierarchy())
+		if (!base.gameObject.activeInHierarchy)
 		{
 			Log.Error(LOG.UI, "UpdateUI : activeInHierarchy = false");
 		}
@@ -4238,30 +4138,29 @@ public class UIBehaviour : MonoBehaviour
 	public void PlayAudio(int se_id, float volume, int config_id, bool as_jingle)
 	{
 		string sE = ResourceName.GetSE(se_id);
-		int config_id2 = (config_id == 0) ? se_id : config_id;
-		AudioClip val = resourceLink.Get<AudioClip>(sE);
-		if (val == null)
+		int config_id2 = (config_id != 0) ? config_id : se_id;
+		AudioClip audioClip = resourceLink.Get<AudioClip>(sE);
+		if (audioClip == null)
 		{
 			Log.Error("AudioClip{0}がありません", sE);
 		}
 		else if (as_jingle)
 		{
-			SoundManager.PlayUISE(val, volume, loop: false, null, config_id2);
+			SoundManager.PlayUISE(audioClip, volume, loop: false, null, config_id2);
 		}
 		else
 		{
-			SoundManager.PlayOneshotJingle(val, se_id);
+			SoundManager.PlayOneshotJingle(audioClip, se_id);
 		}
 	}
 
 	public void CacheAudio(LoadingQueue load_queue)
 	{
-		Type type = Type.GetType(this.get_name() + "+AUDIO");
+		Type type = Type.GetType(base.name + "+AUDIO");
 		if (type != null)
 		{
 			int[] array = (int[])Enum.GetValues(type);
-			int[] array2 = array;
-			foreach (int se_id in array2)
+			foreach (int se_id in array)
 			{
 				load_queue.CacheSE(se_id);
 			}
@@ -4272,7 +4171,7 @@ public class UIBehaviour : MonoBehaviour
 	{
 		int num = 1 + (list.Length - 1) / numInPage;
 		int num2 = numInPage * (nowPage - 1);
-		int num3 = (nowPage != num) ? numInPage : (list.Length - num2);
+		int num3 = (nowPage == num) ? (list.Length - num2) : numInPage;
 		T[] array = new T[num3];
 		Array.Copy(list, num2, array, 0, num3);
 		return array;
@@ -4284,13 +4183,13 @@ public class UIBehaviour : MonoBehaviour
 		{
 			return;
 		}
-		GameObject gameObject = scroll_view.verticalScrollBar.get_gameObject();
+		GameObject gameObject = scroll_view.verticalScrollBar.gameObject;
 		if (gameObject != null)
 		{
 			Collider component = gameObject.GetComponent<Collider>();
 			if (component != null)
 			{
-				component.set_enabled(activate);
+				component.enabled = activate;
 			}
 		}
 	}

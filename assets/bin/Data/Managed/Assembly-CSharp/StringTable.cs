@@ -21,14 +21,17 @@ public class StringTable : Singleton<StringTable>, IDataTable
 		{
 			return "ERR::STRING_NOT_FOUND";
 		}
-		StringTable i = Singleton<StringTable>.I;
-		UIntKeyTable<string> uIntKeyTable = i.stringKeyTable.Get(category.ToString());
+		UIntKeyTable<string> uIntKeyTable = Singleton<StringTable>.I.stringKeyTable.Get(category.ToString());
 		if (uIntKeyTable == null)
 		{
 			return "ERR::STRING_NOT_FOUND";
 		}
 		string text = uIntKeyTable.Get(id);
-		return (text != null) ? text : "ERR::STRING_NOT_FOUND";
+		if (text != null)
+		{
+			return text;
+		}
+		return "ERR::STRING_NOT_FOUND";
 	}
 
 	public static string[] GetAllInCategory(STRING_CATEGORY category)
@@ -38,8 +41,7 @@ public class StringTable : Singleton<StringTable>, IDataTable
 		{
 			return texts.ToArray();
 		}
-		StringTable i = Singleton<StringTable>.I;
-		UIntKeyTable<string> uIntKeyTable = i.stringKeyTable.Get(category.ToString());
+		UIntKeyTable<string> uIntKeyTable = Singleton<StringTable>.I.stringKeyTable.Get(category.ToString());
 		if (uIntKeyTable == null)
 		{
 			return texts.ToArray();
@@ -65,8 +67,7 @@ public class StringTable : Singleton<StringTable>, IDataTable
 		{
 			return keys.ToArray();
 		}
-		StringTable i = Singleton<StringTable>.I;
-		UIntKeyTable<string> uIntKeyTable = i.stringKeyTable.Get(category.ToString());
+		UIntKeyTable<string> uIntKeyTable = Singleton<StringTable>.I.stringKeyTable.Get(category.ToString());
 		if (uIntKeyTable == null)
 		{
 			return keys.ToArray();
@@ -85,8 +86,7 @@ public class StringTable : Singleton<StringTable>, IDataTable
 		{
 			return categoryMap;
 		}
-		StringTable i2 = Singleton<StringTable>.I;
-		UIntKeyTable<string> uIntKeyTable = i2.stringKeyTable.Get(category.ToString());
+		UIntKeyTable<string> uIntKeyTable = Singleton<StringTable>.I.stringKeyTable.Get(category.ToString());
 		if (uIntKeyTable == null)
 		{
 			return categoryMap;
@@ -107,14 +107,17 @@ public class StringTable : Singleton<StringTable>, IDataTable
 		{
 			return "ERR::STRING_NOT_FOUND";
 		}
-		StringTable i = Singleton<StringTable>.I;
-		UIntKeyTable<string> uIntKeyTable = i.stringKeyTable.Get("ERROR_DIALOG");
+		UIntKeyTable<string> uIntKeyTable = Singleton<StringTable>.I.stringKeyTable.Get("ERROR_DIALOG");
 		if (uIntKeyTable == null)
 		{
 			return GetErrorCodeText(0u);
 		}
 		string text = uIntKeyTable.Get(id);
-		return (text != null) ? text : "ERR::STRING_NOT_FOUND";
+		if (text != null)
+		{
+			return text;
+		}
+		return "ERR::STRING_NOT_FOUND";
 	}
 
 	public static string GetErrorMessage(uint id)
@@ -133,8 +136,7 @@ public class StringTable : Singleton<StringTable>, IDataTable
 		{
 			return "ERR::STRING_NOT_FOUND";
 		}
-		StringTable i = Singleton<StringTable>.I;
-		UIntKeyTable<string> uIntKeyTable = i.stringKeyTable.Get(category.ToString());
+		UIntKeyTable<string> uIntKeyTable = Singleton<StringTable>.I.stringKeyTable.Get(category.ToString());
 		if (uIntKeyTable == null)
 		{
 			return "ERR::STRING_NOT_FOUND";
@@ -159,7 +161,7 @@ public class StringTable : Singleton<StringTable>, IDataTable
 			csv = Resources.Load<TextAsset>("Internal/internal__TABLE__StringTable");
 			encrypted = true;
 		}
-		CreateTable(csv.get_text(), encrypted);
+		CreateTable(csv.text, encrypted);
 	}
 
 	public void CreateTable(string csv_text)
@@ -190,7 +192,7 @@ public class StringTable : Singleton<StringTable>, IDataTable
 				uint value2 = 0u;
 				bool flag = cSVReader.Pop(ref value2);
 				string value3 = string.Empty;
-				bool flag2 = cSVReader.Pop(ref value3);
+				_ = (bool)cSVReader.Pop(ref value3);
 				if (flag && value3.Length != 0)
 				{
 					uIntKeyTable.Add(value2, value3);

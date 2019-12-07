@@ -45,7 +45,11 @@ public class DataLoadRequest
 	{
 		get
 		{
-			return processCompressedBinaryData != null && enableLoadBinary;
+			if (processCompressedBinaryData != null)
+			{
+				return enableLoadBinary;
+			}
+			return false;
 		}
 		set
 		{
@@ -77,14 +81,6 @@ public class DataLoadRequest
 
 	public event Func<string, bool> onVerifyError;
 
-	public DataLoadRequest(string name, IDataTableRequestHash hash, string directory, bool downloadOnly)
-	{
-		this.name = name;
-		this.hash = hash;
-		this.directory = directory;
-		this.downloadOnly = downloadOnly;
-	}
-
 	public string GetName()
 	{
 		if (enableLoadBinaryData)
@@ -101,6 +97,14 @@ public class DataLoadRequest
 			return hashBinary;
 		}
 		return hash;
+	}
+
+	public DataLoadRequest(string name, IDataTableRequestHash hash, string directory, bool downloadOnly)
+	{
+		this.name = name;
+		this.hash = hash;
+		this.directory = directory;
+		this.downloadOnly = downloadOnly;
 	}
 
 	public void Reset()

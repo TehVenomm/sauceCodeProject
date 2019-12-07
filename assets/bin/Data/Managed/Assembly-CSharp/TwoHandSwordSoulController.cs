@@ -38,11 +38,6 @@ public class TwoHandSwordSoulController : IWeaponController
 
 	public float TwoHandSwordBoostAttackSpeed => twoHandSwordBoostAttackSpeed;
 
-	public TwoHandSwordSoulController()
-	{
-		m_owner = null;
-	}
-
 	public void SetIaiState(eIaiState _state)
 	{
 		iaiState = _state;
@@ -62,6 +57,11 @@ public class TwoHandSwordSoulController : IWeaponController
 		}
 	}
 
+	public TwoHandSwordSoulController()
+	{
+		m_owner = null;
+	}
+
 	public void Init(Player _player)
 	{
 		m_owner = _player;
@@ -78,24 +78,17 @@ public class TwoHandSwordSoulController : IWeaponController
 
 	public void Update()
 	{
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
 		switch (iaiState)
 		{
 		case eIaiState.In:
-			iaiCounter += Time.get_deltaTime();
+			iaiCounter += Time.deltaTime;
 			if (iaiCounter >= m_actionInfo.soulIaiInSec)
 			{
-				m_owner.SetEnableNodeRenderer(string.Empty, enable: false);
+				m_owner.SetEnableNodeRenderer("", enable: false);
 				m_owner.EventMoveEnd();
 				m_owner.SetEnableEventMove(_isEnable: true);
 				m_owner.SetEnableAddForce(_isEnable: false);
-				m_owner.SetEventMoveVelocity(Vector3.get_forward() * GetIaiMoveSpeed(m_owner.ChargeRate) * m_owner.buffParam.GetDistanceRateIai());
+				m_owner.SetEventMoveVelocity(Vector3.forward * GetIaiMoveSpeed(m_owner.ChargeRate) * m_owner.buffParam.GetDistanceRateIai());
 				m_owner.SetVelocity(Quaternion.LookRotation(m_owner.GetTransformForward()) * m_owner.EventMoveVelocity, Character.VELOCITY_TYPE.EVENT_MOVE);
 				m_owner.SetEventMoveTimeCount(m_actionInfo.soulIaiMoveSec);
 				iaiCounter = 0f;
@@ -103,10 +96,10 @@ public class TwoHandSwordSoulController : IWeaponController
 			}
 			break;
 		case eIaiState.Hide:
-			iaiCounter += Time.get_deltaTime();
+			iaiCounter += Time.deltaTime;
 			if (iaiCounter >= m_actionInfo.soulIaiHideSec)
 			{
-				m_owner.SetEnableNodeRenderer(string.Empty, enable: true);
+				m_owner.SetEnableNodeRenderer("", enable: true);
 				m_owner.SetNextTrigger();
 				iaiCounter = 0f;
 				SetIaiState(eIaiState.None);
@@ -210,11 +203,19 @@ public class TwoHandSwordSoulController : IWeaponController
 
 	public bool IsComboFinishAttackId(int attackId)
 	{
-		return attackId == 14 || attackId == m_actionInfo.Soul_LongAttackFinishId;
+		if (attackId != 14)
+		{
+			return attackId == m_actionInfo.Soul_LongAttackFinishId;
+		}
+		return true;
 	}
 
 	public bool IsSpAttackId(int attackId)
 	{
-		return attackId == 96 || attackId == m_actionInfo.Soul_LongSpAttackId;
+		if (attackId != 96)
+		{
+			return attackId == m_actionInfo.Soul_LongSpAttackId;
+		}
+		return true;
 	}
 }

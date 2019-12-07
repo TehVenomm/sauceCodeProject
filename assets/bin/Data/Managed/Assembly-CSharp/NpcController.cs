@@ -41,24 +41,84 @@ public class NpcController : ControllerBase
 		private set;
 	}
 
-	private bool isAttack => player != null && player.actionID == Character.ACTION_ID.ATTACK;
+	private bool isAttack
+	{
+		get
+		{
+			if (!(player != null))
+			{
+				return false;
+			}
+			return player.actionID == Character.ACTION_ID.ATTACK;
+		}
+	}
 
-	private bool isGuard => player != null && player.actionID == (Character.ACTION_ID)19;
+	private bool isGuard
+	{
+		get
+		{
+			if (!(player != null))
+			{
+				return false;
+			}
+			return player.actionID == (Character.ACTION_ID)19;
+		}
+	}
 
-	private bool isMove => player != null && player.actionID == Character.ACTION_ID.MOVE;
+	private bool isMove
+	{
+		get
+		{
+			if (!(player != null))
+			{
+				return false;
+			}
+			return player.actionID == Character.ACTION_ID.MOVE;
+		}
+	}
 
-	private bool isChangeableAttack => player != null && player.IsChangeableAction(Character.ACTION_ID.ATTACK);
+	private bool isChangeableAttack
+	{
+		get
+		{
+			if (!(player != null))
+			{
+				return false;
+			}
+			return player.IsChangeableAction(Character.ACTION_ID.ATTACK);
+		}
+	}
 
-	private bool isChangeableSpecialAction => player != null && player.IsChangeableAction((Character.ACTION_ID)33);
+	private bool isChangeableSpecialAction
+	{
+		get
+		{
+			if (!(player != null))
+			{
+				return false;
+			}
+			return player.IsChangeableAction((Character.ACTION_ID)33);
+		}
+	}
 
-	private StageObject target => (!(base.brain != null)) ? null : base.brain.targetCtrl.GetCurrentTarget();
+	private StageObject target
+	{
+		get
+		{
+			if (!(base.brain != null))
+			{
+				return null;
+			}
+			return base.brain.targetCtrl.GetCurrentTarget();
+		}
+	}
 
 	protected override void Awake()
 	{
 		base.Awake();
 		player = (character as Player);
 		npcBrain = AttachBrain<NpcBrain>();
-		nonPlayer = this.get_gameObject().GetComponent<NonPlayer>();
+		nonPlayer = base.gameObject.GetComponent<NonPlayer>();
 	}
 
 	protected override void Start()
@@ -96,17 +156,17 @@ public class NpcController : ControllerBase
 		base.OnChangeEnableControll(enable);
 		if (enable)
 		{
-			if (isStart && this.get_enabled() && player != null && mainCoroutine == null)
+			if (isStart && base.enabled && player != null && mainCoroutine == null)
 			{
 				startWaitTime = parameter.startWaitTime;
 				mainCoroutine = AIMain();
-				this.StartCoroutine(mainCoroutine);
+				StartCoroutine(mainCoroutine);
 			}
 			return;
 		}
 		if (mainCoroutine != null)
 		{
-			this.StopAllCoroutines();
+			StopAllCoroutines();
 			mainCoroutine = null;
 		}
 		if (isGuard)
@@ -120,10 +180,10 @@ public class NpcController : ControllerBase
 		base.OnActReaction();
 		if (IsEnableControll() && mainCoroutine != null)
 		{
-			this.StopAllCoroutines();
+			StopAllCoroutines();
 			startWaitTime = parameter.afterReactionWaitTime;
 			mainCoroutine = AIMain();
-			this.StartCoroutine(mainCoroutine);
+			StartCoroutine(mainCoroutine);
 		}
 	}
 
@@ -143,24 +203,24 @@ public class NpcController : ControllerBase
 		}
 		if (startWaitTime > 0f)
 		{
-			yield return (object)new WaitForSeconds(startWaitTime);
+			yield return new WaitForSeconds(startWaitTime);
 		}
-		while (this.get_enabled())
+		while (base.enabled)
 		{
 			while (player.IsMirror())
 			{
-				yield return (object)new WaitForSeconds(1f);
+				yield return new WaitForSeconds(1f);
 			}
 			OnMove();
 			OnWeapon();
-			float time = 0f;
+			float num = 0f;
 			if (player.packetSender != null)
 			{
-				time = player.packetSender.GetWaitTime(0f);
+				num = player.packetSender.GetWaitTime(0f);
 			}
-			if (time > 0f)
+			if (num > 0f)
 			{
-				yield return (object)new WaitForSeconds(time);
+				yield return new WaitForSeconds(num);
 			}
 			else
 			{
@@ -180,8 +240,6 @@ public class NpcController : ControllerBase
 
 	private void OnMove()
 	{
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
 		bool flag = false;
 		if (base.brain.moveCtrl.IsAvoid())
 		{
@@ -213,91 +271,41 @@ public class NpcController : ControllerBase
 
 	private void OnMoveStick(Vector2 stick_vec, Vector3 target_pos)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 position = this.get_transform().get_position();
-		Vector3 val = target_pos - position;
-		val.y = 0f;
-		val.Normalize();
-		Vector3 val2 = Quaternion.Euler(0f, 90f, 0f) * val;
-		Vector3 val3 = val;
-		Vector3 val4 = val2 * stick_vec.x * selfParameter.moveSideSpeed + val3 * stick_vec.y * selfParameter.moveForwardSpeed;
-		character.ActMoveVelocity(val4, selfParameter.moveForwardSpeed);
-		character.SetLerpRotation(val4);
+		Vector3 position = base.transform.position;
+		Vector3 vector = target_pos - position;
+		vector.y = 0f;
+		vector.Normalize();
+		Vector3 a = Quaternion.Euler(0f, 90f, 0f) * vector;
+		Vector3 a2 = vector;
+		Vector3 vector2 = a * stick_vec.x * selfParameter.moveSideSpeed + a2 * stick_vec.y * selfParameter.moveForwardSpeed;
+		character.ActMoveVelocity(vector2, selfParameter.moveForwardSpeed);
+		character.SetLerpRotation(vector2);
 	}
 
 	private void OnAvoid(PLACE avoid_place)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 		if (!(target == null))
 		{
-			Vector3 val = target._transform.get_position() - character._transform.get_position();
-			val.y = 0f;
-			Quaternion val2 = Quaternion.LookRotation(val);
-			Vector3 val3 = Vector3.get_zero();
+			Vector3 forward = target._transform.position - character._transform.position;
+			forward.y = 0f;
+			Quaternion rotation = Quaternion.LookRotation(forward);
+			Vector3 b = Vector3.zero;
 			switch (avoid_place)
 			{
 			case PLACE.FRONT:
-				val3 = val2 * Vector3.get_forward();
+				b = rotation * Vector3.forward;
 				break;
 			case PLACE.BACK:
-				val3 = val2 * Vector3.get_back();
+				b = rotation * Vector3.back;
 				break;
 			case PLACE.LEFT:
-				val3 = val2 * Vector3.get_left();
+				b = rotation * Vector3.left;
 				break;
 			case PLACE.RIGHT:
-				val3 = val2 * Vector3.get_right();
+				b = rotation * Vector3.right;
 				break;
 			}
-			character.LookAt(character._transform.get_position() + val3);
+			character.LookAt(character._transform.position + b);
 			player.ActAvoid();
 		}
 	}
@@ -364,7 +372,7 @@ public class NpcController : ControllerBase
 		}
 		else if (isChangeableAttack)
 		{
-			character.ActAttack(0, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+			character.ActAttack(0);
 			base.brain.weaponCtrl.ComboOff();
 			base.brain.weaponCtrl.SetBeforeAttackId(0);
 		}
@@ -389,14 +397,14 @@ public class NpcController : ControllerBase
 		if (player.isControllable)
 		{
 			player.SetEnableTap(enable: true);
-			player.ActAttack(0, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+			player.ActAttack(0);
 			if (base.brain.weaponCtrl.IsSpecial())
 			{
 				base.brain.weaponCtrl.SetChargeRate(1f);
 			}
 			else
 			{
-				base.brain.weaponCtrl.SetChargeRate(Random.get_value());
+				base.brain.weaponCtrl.SetChargeRate(Random.value);
 			}
 		}
 		else if (player.enableInputCharge && player.GetChargingRate() >= base.brain.weaponCtrl.chargeRate)
@@ -430,22 +438,6 @@ public class NpcController : ControllerBase
 
 	private void UpdateRegionTarget()
 	{
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
 		if (player == null)
 		{
 			return;
@@ -467,20 +459,15 @@ public class NpcController : ControllerBase
 		}
 		TargetPoint targetPoint = null;
 		float num = float.MaxValue;
-		Vector3 position = player._transform.get_position();
-		Vector2 val = position.ToVector2XZ();
-		Vector2 forwardXZ = player.forwardXZ;
-		forwardXZ.Normalize();
+		Vector2 b = player._transform.position.ToVector2XZ();
+		player.forwardXZ.Normalize();
 		int i = 0;
 		for (int num2 = targetPoints.Length; i < num2; i++)
 		{
 			TargetPoint targetPoint2 = targetPoints[i];
-			if (targetPoint2.get_gameObject().get_activeInHierarchy())
+			if (targetPoint2.gameObject.activeInHierarchy)
 			{
-				Vector3 targetPoint3 = targetPoint2.GetTargetPoint();
-				Vector2 val2 = targetPoint3.ToVector2XZ();
-				Vector2 val3 = val2 - val;
-				float sqrMagnitude = val3.get_sqrMagnitude();
+				float sqrMagnitude = (targetPoint2.GetTargetPoint().ToVector2XZ() - b).sqrMagnitude;
 				if (targetPoint == null || sqrMagnitude < num)
 				{
 					targetPoint = targetPoint2;
@@ -498,9 +485,9 @@ public class NpcController : ControllerBase
 	{
 		if (nonPlayer != null)
 		{
-			nonPlayer = this.get_gameObject().GetComponent<NonPlayer>();
+			nonPlayer = base.gameObject.GetComponent<NonPlayer>();
 		}
-		Debug.Log((object)"UseSkill");
+		Debug.Log("UseSkill");
 		nonPlayer.NPCSkillAction(0);
 	}
 

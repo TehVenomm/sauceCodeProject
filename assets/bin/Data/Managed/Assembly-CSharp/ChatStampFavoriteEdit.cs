@@ -40,11 +40,6 @@ public class ChatStampFavoriteEdit : MonoBehaviour
 
 	private bool initialized;
 
-	public ChatStampFavoriteEdit()
-		: this()
-	{
-	}
-
 	private IEnumerator DoOpen()
 	{
 		if (!initialized)
@@ -62,7 +57,7 @@ public class ChatStampFavoriteEdit : MonoBehaviour
 			favoriteIcons = new List<Transform>();
 			unlockIcons = new List<Transform>();
 		}
-		selectedIcon = CreateStampItem(selectedIconRoot.get_transform()).GetComponent<ChatStampListItem>();
+		selectedIcon = CreateStampItem(selectedIconRoot.transform).GetComponent<ChatStampListItem>();
 		selectedIcon.SetActiveComponents(isActive: false);
 		CreateFavoriteStampList();
 		InitFavoriteStampList();
@@ -72,19 +67,19 @@ public class ChatStampFavoriteEdit : MonoBehaviour
 
 	public void Open()
 	{
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		tweenCtrl.Play();
 		currentFavorite = MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.ToArray();
 		currentUnlockStamps = Singleton<StampTable>.I.GetUnlockStamps(MonoBehaviourSingleton<UserInfoManager>.I);
 		SetBlocker(isTopActive: true);
-		this.StartCoroutine(DoOpen());
+		StartCoroutine(DoOpen());
 	}
 
 	public void Close(bool update)
 	{
 		tweenCtrl.Play(forward: false, delegate
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 		});
 		if (update)
 		{
@@ -105,7 +100,7 @@ public class ChatStampFavoriteEdit : MonoBehaviour
 	{
 		for (int i = favoriteIcons.Count; i < MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count; i++)
 		{
-			Transform item = CreateStampItem(favoriteGrid.get_transform());
+			Transform item = CreateStampItem(favoriteGrid.transform);
 			favoriteIcons.Add(item);
 		}
 		favoriteGrid.Reposition();
@@ -115,7 +110,7 @@ public class ChatStampFavoriteEdit : MonoBehaviour
 	{
 		for (int i = unlockIcons.Count; i < currentUnlockStamps.Count; i++)
 		{
-			Transform item = CreateStampItem(unlockGrid.get_transform());
+			Transform item = CreateStampItem(unlockGrid.transform);
 			unlockIcons.Add(item);
 		}
 		unlockGrid.Reposition();
@@ -150,11 +145,10 @@ public class ChatStampFavoriteEdit : MonoBehaviour
 
 	private Transform CreateStampItem(Transform parent)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = ResourceUtility.Realizes(mChatStampPrefab, 5);
-		val.set_parent(parent);
-		val.set_localScale(Vector3.get_one());
-		return val;
+		Transform transform = ResourceUtility.Realizes(mChatStampPrefab, 5);
+		transform.parent = parent;
+		transform.localScale = Vector3.one;
+		return transform;
 	}
 
 	private void InitStampItem(int stampId, Transform iTransform, Action onClick)
@@ -185,19 +179,19 @@ public class ChatStampFavoriteEdit : MonoBehaviour
 				component.GetComponent<UITweenCtrl>().Reset();
 				component.GetComponent<UITweenCtrl>().Play();
 				currentFavorite[num] = num2;
-				component = favoriteIcons[num].GetComponent<ChatStampListItem>();
-				component.Init(num2);
-				component.GetComponent<UITweenCtrl>().Reset();
-				component.GetComponent<UITweenCtrl>().Play();
+				ChatStampListItem component2 = favoriteIcons[num].GetComponent<ChatStampListItem>();
+				component2.Init(num2);
+				component2.GetComponent<UITweenCtrl>().Reset();
+				component2.GetComponent<UITweenCtrl>().Play();
 			}
 		}
 		else
 		{
 			currentFavorite[selectFavoriteStampIndex] = stampId;
-			ChatStampListItem component2 = favoriteIcons[selectFavoriteStampIndex].GetComponent<ChatStampListItem>();
-			component2.Init(stampId);
-			component2.GetComponent<UITweenCtrl>().Reset();
-			component2.GetComponent<UITweenCtrl>().Play();
+			ChatStampListItem component3 = favoriteIcons[selectFavoriteStampIndex].GetComponent<ChatStampListItem>();
+			component3.Init(stampId);
+			component3.GetComponent<UITweenCtrl>().Reset();
+			component3.GetComponent<UITweenCtrl>().Play();
 		}
 		SetBlocker(isTopActive: true);
 	}
@@ -214,8 +208,7 @@ public class ChatStampFavoriteEdit : MonoBehaviour
 
 	private void SetSelectedFavoriteIcon(Transform selectIcon, int stampId)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		selectedIcon.get_transform().set_localPosition(selectIcon.get_localPosition());
+		selectedIcon.transform.localPosition = selectIcon.localPosition;
 		selectedIcon.Init(stampId);
 	}
 

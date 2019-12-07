@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
@@ -57,7 +55,11 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 				{
 					return false;
 				}
-				return type == abilityInfo.type && target == abilityInfo.target && value.value == abilityInfo.value.value;
+				if (type == abilityInfo.type && target == abilityInfo.target)
+				{
+					return value.value == abilityInfo.value.value;
+				}
+				return false;
 			}
 
 			public override int GetHashCode()
@@ -127,7 +129,7 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 				bool flag = m_cashedAbility.IsActive();
 				for (int j = 0; j < m_cashedInfo.Length; j++)
 				{
-					m_cashedInfo[j].type = ((!flag) ? ABILITY_TYPE.TIME_LIMIT : m_info[j].type);
+					m_cashedInfo[j].type = (flag ? m_info[j].type : ABILITY_TYPE.TIME_LIMIT);
 				}
 				return m_cashedInfo;
 			}
@@ -147,14 +149,14 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 				data.m_info[i] = new AbilityInfo();
 				CSVReader.PopResult result = csv_reader.PopEnum(ref data.m_info[i].type, ABILITY_TYPE.NONE);
 				csv_reader.Pop(ref data.m_info[i].target);
-				string value = string.Empty;
+				string value = "";
 				CSVReader.PopResult result2 = csv_reader.Pop(ref value);
 				int num = ParseSpAtkEnableTypeBit(value);
 				csv_reader.Pop(ref data.m_info[i].value);
 				if (!CSVReader.PopResult.IsParseSucceeded(result))
 				{
 					data.m_info[i].type = ABILITY_TYPE.NEED_UPDATE;
-					data.m_info[i].target = string.Empty;
+					data.m_info[i].target = "";
 				}
 				if (CSVReader.PopResult.IsParseSucceeded(result2) && num != 0)
 				{
@@ -223,27 +225,14 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 			{
 				return num;
 			}
-			IEnumerator enumerator = Enum.GetValues(typeof(SP_ATK_ENABLE_TYPE_BIT)).GetEnumerator();
-			try
+			foreach (object value in Enum.GetValues(typeof(SP_ATK_ENABLE_TYPE_BIT)))
 			{
-				while (enumerator.MoveNext())
+				if (_input_text.Contains(value.ToString()))
 				{
-					object current = enumerator.Current;
-					if (_input_text.Contains(current.ToString()))
-					{
-						num |= (int)current;
-					}
-				}
-				return num;
-			}
-			finally
-			{
-				IDisposable disposable;
-				if ((disposable = (enumerator as IDisposable)) != null)
-				{
-					disposable.Dispose();
+					num |= (int)value;
 				}
 			}
+			return num;
 		}
 
 		public static string CBSecondKey(CSVReader csv, int table_data_num)
@@ -308,14 +297,14 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 			id = key1;
 			this.key2 = key2;
 			needAP = reader.ReadInt32();
-			name = reader.ReadString(string.Empty);
-			description = reader.ReadString(string.Empty);
+			name = reader.ReadString();
+			description = reader.ReadString();
 			m_info = new AbilityInfo[3];
 			for (int i = 0; i < 3; i++)
 			{
 				AbilityInfo abilityInfo = new AbilityInfo();
 				abilityInfo.type = (ABILITY_TYPE)reader.ReadInt32();
-				abilityInfo.target = reader.ReadString(string.Empty);
+				abilityInfo.target = reader.ReadString();
 				abilityInfo.value = reader.ReadInt32();
 				m_info[i] = abilityInfo;
 			}
@@ -346,7 +335,7 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 			{
 				return false;
 			}
-			bool flag = (id.value == abilityData.id.value && needAP.value == abilityData.needAP.value && name == abilityData.name && description == abilityData.description && key2 == abilityData.key2 && info == null && abilityData.info == null) || (info != null && null != abilityData.info);
+			bool flag = (id.value == abilityData.id.value && needAP.value == abilityData.needAP.value && name == abilityData.name && description == abilityData.description && key2 == abilityData.key2 && info == null && abilityData.info == null) || (info != null && abilityData.info != null);
 			if (info != null)
 			{
 				for (int i = 0; i < info.Length; i++)
@@ -371,18 +360,6 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 	public const int INFO_MAX = 3;
 
 	private DoubleUIntKeyTable<AbilityData> abilityDataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<AbilityData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<AbilityData> _003C_003Ef__mg_0024cache2;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache3;
 
 	public static DoubleUIntKeyTable<AbilityData> CreateTableCSV(string csv_text)
 	{
@@ -536,13 +513,11 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 
 	public string GenerateAbilityDescriptionPreGrant(uint ability_id, int minAp, int maxAp)
 	{
-		AbilityData minimumAbilityData = GetMinimumAbilityData(ability_id);
-		string descriptionPreGrant = minimumAbilityData.descriptionPreGrant;
-		string message = descriptionPreGrant;
+		string descriptionPreGrant = GetMinimumAbilityData(ability_id).descriptionPreGrant;
 		AbilityData.AbilityInfo[] info = GetAbilityData(ability_id, minAp).info;
-		message = ReplaceDescription(message, info, "@s_");
+		descriptionPreGrant = ReplaceDescription(descriptionPreGrant, info, "@s_");
 		AbilityData.AbilityInfo[] info2 = GetAbilityData(ability_id, maxAp).info;
-		return ReplaceDescription(message, info2, "@e_");
+		return ReplaceDescription(descriptionPreGrant, info2, "@e_");
 	}
 
 	private string ReplaceDescription(string message, AbilityData.AbilityInfo[] infos, string wordPreFix)
@@ -552,14 +527,12 @@ public class AbilityDataTable : Singleton<AbilityDataTable>, IDataTable
 			return message;
 		}
 		string text = message;
-		Regex regex = new Regex(wordPreFix + "(\\w+)_@");
-		MatchCollection matchCollection = regex.Matches(message);
+		MatchCollection matchCollection = new Regex(wordPreFix + "(\\w+)_@").Matches(message);
 		int i = 0;
 		for (int count = matchCollection.Count; i < count; i++)
 		{
 			string value = matchCollection[i].Value;
-			string[] array = Regex.Split(value, "_");
-			string s = array[1];
+			string s = Regex.Split(value, "_")[1];
 			string replacement = "1";
 			if (int.TryParse(s, out int result))
 			{

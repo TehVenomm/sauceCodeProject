@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class Picker : GameSection
@@ -39,18 +38,18 @@ public class Picker : GameSection
 		{
 			SetLabelText(t, UI.LBL_PICKER, desc.text[i]);
 		});
-		UIWrapContent component = base.GetComponent<UIWrapContent>((Enum)UI.GRD_PICKER);
+		UIWrapContent component = GetComponent<UIWrapContent>(UI.GRD_PICKER);
 		if (component != null)
 		{
-			component.set_enabled(desc.enableLoop);
+			component.enabled = desc.enableLoop;
 		}
-		SetCenterOnChildFunc((Enum)UI.GRD_PICKER, (UICenterOnChild.OnCenterCallback)OnCenter);
-		SetCenter((Enum)UI.GRD_PICKER, selectIndex, is_instant: false);
+		SetCenterOnChildFunc(UI.GRD_PICKER, OnCenter);
+		SetCenter(UI.GRD_PICKER, selectIndex);
 	}
 
 	public void OnCenter(GameObject go)
 	{
-		if (int.TryParse(go.get_name(), out int result))
+		if (int.TryParse(go.name, out int result))
 		{
 			selectIndex = result;
 		}

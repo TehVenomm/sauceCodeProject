@@ -46,7 +46,7 @@ public class InformationDialog : WebViewDialog
 	private void OnQuery_CLOSE()
 	{
 		GameSection.StayEvent();
-		this.StartCoroutine(GetDiff(delegate(bool b)
+		StartCoroutine(GetDiff(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b);
 		}));

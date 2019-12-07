@@ -19,8 +19,7 @@ public class BasicGatherPointObject : GatherPointObject
 						QuestCompleteReward.AccessoryItem accessoryItem = list.fieldGather.accessoryItem[i];
 						bool is_rare = false;
 						MonoBehaviourSingleton<UIDropAnnounce>.I.Announce(UIDropAnnounce.DropAnnounceInfo.CreateAccessoryItemInfo((uint)accessoryItem.accessoryId, accessoryItem.num, out is_rare));
-						int se_id = 40000154;
-						SoundManager.PlayOneShotUISE(se_id);
+						SoundManager.PlayOneShotUISE(40000154);
 					}
 					int j = 0;
 					for (int count2 = list.fieldGather.skillItem.Count; j < count2; j++)
@@ -28,8 +27,7 @@ public class BasicGatherPointObject : GatherPointObject
 						QuestCompleteReward.SkillItem skillItem = list.fieldGather.skillItem[j];
 						bool is_rare2 = false;
 						MonoBehaviourSingleton<UIDropAnnounce>.I.Announce(UIDropAnnounce.DropAnnounceInfo.CreateSkillItemInfo((uint)skillItem.skillItemId, skillItem.num, out is_rare2));
-						int se_id2 = 40000154;
-						SoundManager.PlayOneShotUISE(se_id2);
+						SoundManager.PlayOneShotUISE(40000154);
 					}
 					int k = 0;
 					for (int count3 = list.fieldGather.equipItem.Count; k < count3; k++)
@@ -37,8 +35,7 @@ public class BasicGatherPointObject : GatherPointObject
 						QuestCompleteReward.EquipItem equipItem = list.fieldGather.equipItem[k];
 						bool is_rare3 = false;
 						MonoBehaviourSingleton<UIDropAnnounce>.I.Announce(UIDropAnnounce.DropAnnounceInfo.CreateEquipItemInfo((uint)equipItem.equipItemId, equipItem.num, out is_rare3));
-						int se_id3 = 40000154;
-						SoundManager.PlayOneShotUISE(se_id3);
+						SoundManager.PlayOneShotUISE(40000154);
 					}
 					int l = 0;
 					for (int count4 = list.fieldGather.item.Count; l < count4; l++)
@@ -46,8 +43,7 @@ public class BasicGatherPointObject : GatherPointObject
 						QuestCompleteReward.Item item = list.fieldGather.item[l];
 						bool is_rare4 = false;
 						MonoBehaviourSingleton<UIDropAnnounce>.I.Announce(UIDropAnnounce.DropAnnounceInfo.CreateItemInfo((uint)item.itemId, item.num, out is_rare4));
-						int se_id4 = (!is_rare4) ? 40000153 : 40000154;
-						SoundManager.PlayOneShotUISE(se_id4);
+						SoundManager.PlayOneShotUISE(is_rare4 ? 40000154 : 40000153);
 					}
 				}
 			});

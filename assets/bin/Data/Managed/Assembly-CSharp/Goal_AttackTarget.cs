@@ -9,14 +9,6 @@ public class Goal_AttackTarget : GoalComposite
 
 	protected override void Activate(Brain brain)
 	{
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 		SetStatus(STATUS.ACTIVE);
 		if (!brain.targetCtrl.IsAliveTarget())
 		{
@@ -37,8 +29,7 @@ public class Goal_AttackTarget : GoalComposite
 			{
 				float len = 3f;
 				PLACE place = Utility.Coin() ? PLACE.RIGHT : PLACE.LEFT;
-				RaycastHit seekHit = brain.moveCtrl.seekHit;
-				Vector3 position = seekHit.get_transform().get_position();
+				Vector3 position = brain.moveCtrl.seekHit.transform.position;
 				AddSubGoal<Goal_MoveToAround>().SetParam(place, position, len);
 				return;
 			}

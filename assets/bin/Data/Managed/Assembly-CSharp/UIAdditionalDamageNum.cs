@@ -47,18 +47,10 @@ public class UIAdditionalDamageNum : UIDamageNum
 
 	public bool Initialize(Vector3 pos, int damage, DAMAGE_COLOR color, int groupOffset, UIDamageNum originalDamage, int effective)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-		base.worldPos = pos;
-		ref Vector3 worldPos = ref base.worldPos;
+		worldPos = pos;
 		worldPos.y += offsetY;
-		float num = (float)Screen.get_height() / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
-		float num2 = (float)Screen.get_width() / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth;
+		float num = (float)Screen.height / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
+		float num2 = (float)Screen.width / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth;
 		higthOffset_f = (float)(damadeNum.height * groupOffset) * heightOffsetRatio * num;
 		widthOffset = (float)damadeNum.width * 0.2f * (float)groupOffset * num2;
 		if (null != damageNormal && null != damageGood && null != damageBad)
@@ -66,18 +58,18 @@ public class UIAdditionalDamageNum : UIDamageNum
 			float num3 = 1f;
 			if (effective == 0)
 			{
-				damageNormal.SetActive(true);
-				damageGood.SetActive(false);
-				damageBad.SetActive(false);
+				damageNormal.SetActive(value: true);
+				damageGood.SetActive(value: false);
+				damageBad.SetActive(value: false);
 				animPos = animPosNormal;
 				animScale = animScaleNormal;
 				damadeNum = damageNumNormal;
 			}
 			else if (0 < effective)
 			{
-				damageNormal.SetActive(false);
-				damageGood.SetActive(true);
-				damageBad.SetActive(false);
+				damageNormal.SetActive(value: false);
+				damageGood.SetActive(value: true);
+				damageBad.SetActive(value: false);
 				animPos = animPosGood;
 				animScale = animScaleGood;
 				damadeNum = damageNumGood;
@@ -85,9 +77,9 @@ public class UIAdditionalDamageNum : UIDamageNum
 			}
 			else
 			{
-				damageNormal.SetActive(false);
-				damageGood.SetActive(false);
-				damageBad.SetActive(true);
+				damageNormal.SetActive(value: false);
+				damageGood.SetActive(value: false);
+				damageBad.SetActive(value: true);
 				animPos = animPosBad;
 				animScale = animScaleBad;
 				damadeNum = damageNumBad;
@@ -101,7 +93,7 @@ public class UIAdditionalDamageNum : UIDamageNum
 			animScale.from = new Vector3(1f, 1f, 1f);
 			animScale.to = new Vector3(1f, 1f, 1f);
 		}
-		if (!SetPosFromWorld(base.worldPos))
+		if (!SetPosFromWorld(worldPos))
 		{
 			return false;
 		}
@@ -117,7 +109,7 @@ public class UIAdditionalDamageNum : UIDamageNum
 		{
 			animScale.ResetToBeginning();
 		}
-		this.StartCoroutine(DirectionNumber());
+		StartCoroutine(DirectionNumber());
 		return true;
 	}
 
@@ -133,14 +125,14 @@ public class UIAdditionalDamageNum : UIDamageNum
 		}
 		if (animPos != null)
 		{
-			while (animPos.get_enabled())
+			while (animPos.enabled)
 			{
 				yield return null;
 			}
 		}
 		if (animScale != null)
 		{
-			while (animScale.get_enabled())
+			while (animScale.enabled)
 			{
 				yield return null;
 			}

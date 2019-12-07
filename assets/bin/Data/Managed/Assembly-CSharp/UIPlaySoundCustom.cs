@@ -30,18 +30,17 @@ public class UIPlaySoundCustom : MonoBehaviour
 
 	private const float pitch = 1f;
 
-	public UIPlaySoundCustom()
-		: this()
-	{
-	}
-
 	private bool DoesNeedToFindSource()
 	{
 		if (SEType != SoundID.UISE.INVALID)
 		{
 			return false;
 		}
-		return (SEID > 0) ? true : false;
+		if (SEID <= 0)
+		{
+			return false;
+		}
+		return true;
 	}
 
 	private void FindSource()
@@ -51,24 +50,21 @@ public class UIPlaySoundCustom : MonoBehaviour
 		{
 			return;
 		}
-		Transform parent = this.get_gameObject().get_transform().get_parent();
+		Transform parent = base.gameObject.transform.parent;
 		ResourceLink component;
 		while (true)
 		{
-			if (!(parent != null) || parent.get_name() == "UI Root")
+			if (parent != null && !(parent.name == "UI Root"))
 			{
-				return;
-			}
-			component = parent.GetComponent<ResourceLink>();
-			if (component != null)
-			{
-				AudioClip val = component.Get<AudioClip>(SEName);
-				if (val != null)
+				component = parent.GetComponent<ResourceLink>();
+				if (component != null && component.Get<AudioClip>(SEName) != null)
 				{
 					break;
 				}
+				parent = parent.transform.parent;
+				continue;
 			}
-			parent = parent.get_transform().get_parent();
+			return;
 		}
 		ResourceLink = component;
 	}

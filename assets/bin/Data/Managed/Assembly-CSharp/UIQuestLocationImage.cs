@@ -16,17 +16,12 @@ public class UIQuestLocationImage : MonoBehaviour
 
 	private Action onLoadComplete;
 
-	public UIQuestLocationImage()
-		: this()
-	{
-	}
-
 	public static void Set(UITexture ui_texture, int qli_id, Action on_load_start, Action on_load_complete)
 	{
 		UIQuestLocationImage uIQuestLocationImage = ui_texture.GetComponent<UIQuestLocationImage>();
 		if (uIQuestLocationImage == null)
 		{
-			uIQuestLocationImage = ui_texture.get_gameObject().AddComponent<UIQuestLocationImage>();
+			uIQuestLocationImage = ui_texture.gameObject.AddComponent<UIQuestLocationImage>();
 		}
 		uIQuestLocationImage.Load(ui_texture, qli_id, on_load_start, on_load_complete);
 	}
@@ -38,7 +33,7 @@ public class UIQuestLocationImage : MonoBehaviour
 		onLoadStart = on_load_start;
 		onLoadComplete = on_load_complete;
 		DeleteImage();
-		this.StartCoroutine(coroutine = DoLoad());
+		StartCoroutine(coroutine = DoLoad());
 	}
 
 	private IEnumerator DoLoad()
@@ -47,31 +42,31 @@ public class UIQuestLocationImage : MonoBehaviour
 		{
 			onLoadStart();
 		}
-		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_image = load_queue.Load(RESOURCE_CATEGORY.QUEST_LOCATION_IMAGE, ResourceName.GetQuestLocationImage(id));
-		if (load_queue.IsLoading())
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject lo_image = loadingQueue.Load(RESOURCE_CATEGORY.QUEST_LOCATION_IMAGE, ResourceName.GetQuestLocationImage(id));
+		if (loadingQueue.IsLoading())
 		{
-			yield return load_queue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		image = ResourceUtility.Realizes(lo_image.loadedObject, MonoBehaviourSingleton<StageManager>.I._transform, 5);
-		QuestLocationImage c = image.GetComponent<QuestLocationImage>();
-		if (c == null)
+		QuestLocationImage component = image.GetComponent<QuestLocationImage>();
+		if (component == null)
 		{
 			yield break;
 		}
 		int w = uiTexture.width;
 		int h = uiTexture.height;
 		UIRenderTexture.ToRealSize(ref w, ref h);
-		c.Init(w, h);
-		Camera cam = image.GetComponent<Camera>();
-		if (cam == null)
+		component.Init(w, h);
+		Camera component2 = image.GetComponent<Camera>();
+		if (component2 == null)
 		{
 			yield break;
 		}
-		RenderTexture tex = cam.get_targetTexture();
-		if (!(tex == null))
+		RenderTexture targetTexture = component2.targetTexture;
+		if (!(targetTexture == null))
 		{
-			uiTexture.mainTexture = tex;
+			uiTexture.mainTexture = targetTexture;
 			FloatInterpolator anim = new FloatInterpolator();
 			anim.Set(0.25f, 0f, 1f, Curves.easeLinear, 0f);
 			anim.Play();
@@ -92,7 +87,7 @@ public class UIQuestLocationImage : MonoBehaviour
 	{
 		if (coroutine != null)
 		{
-			this.StopCoroutine(coroutine);
+			StopCoroutine(coroutine);
 			coroutine = null;
 		}
 		if (uiTexture != null)
@@ -102,7 +97,7 @@ public class UIQuestLocationImage : MonoBehaviour
 		}
 		if (image != null)
 		{
-			Object.DestroyImmediate(image.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(image.gameObject);
 			image = null;
 		}
 	}
@@ -111,7 +106,7 @@ public class UIQuestLocationImage : MonoBehaviour
 	{
 		if (coroutine == null && image == null && uiTexture != null && id > -1)
 		{
-			this.StartCoroutine(coroutine = DoLoad());
+			StartCoroutine(coroutine = DoLoad());
 		}
 	}
 

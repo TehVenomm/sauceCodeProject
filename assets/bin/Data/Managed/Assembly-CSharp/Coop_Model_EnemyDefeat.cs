@@ -51,9 +51,9 @@ public class Coop_Model_EnemyDefeat : Coop_Model_Base
 
 	public override string ToString()
 	{
-		string str_dropIds = string.Empty;
-		string str_dropItemIds = string.Empty;
-		string str_dropNums = string.Empty;
+		string str_dropIds = "";
+		string str_dropItemIds = "";
+		string str_dropNums = "";
 		if (dropIds != null)
 		{
 			dropIds.ForEach(delegate(int id)
@@ -75,22 +75,19 @@ public class Coop_Model_EnemyDefeat : Coop_Model_Base
 				str_dropNums = str_dropNums + id + ",";
 			});
 		}
-		string empty = string.Empty;
-		string text = empty;
-		empty = text + ",sid=" + sid + ",eid=" + eid;
-		text = empty;
-		empty = text + ",exp=" + exp + ",money=" + money + ",portalPoint=" + ppt;
-		text = empty;
-		empty = text + ",keyid=" + defeatKeyId + ",sig=" + sig;
-		empty = empty + ",rewardId=" + rewardId;
-		empty = empty + ",rewardId2=" + rewardId2;
-		empty = empty + ",dropIds=" + str_dropIds.Trim(',');
-		empty = empty + ",dropItemIds=" + str_dropItemIds.Trim(',');
-		empty = empty + ",dropNums=" + str_dropNums.Trim(',');
-		empty = empty + ",deliverBitFlag=" + deliver;
-		empty = empty + ",deliverBoostBitFlag=" + boostBit;
-		empty = empty + ",deliverBoostNum=" + boostNum;
-		empty = empty + ",boxType=" + boxType;
-		return base.ToString() + empty;
+		string text = "";
+		text = text + ",sid=" + sid + ",eid=" + eid;
+		text = text + ",exp=" + exp + ",money=" + money + ",portalPoint=" + ppt;
+		text = text + ",keyid=" + defeatKeyId + ",sig=" + sig;
+		text = text + ",rewardId=" + rewardId;
+		text = text + ",rewardId2=" + rewardId2;
+		text = text + ",dropIds=" + str_dropIds.Trim(',');
+		text = text + ",dropItemIds=" + str_dropItemIds.Trim(',');
+		text = text + ",dropNums=" + str_dropNums.Trim(',');
+		text = text + ",deliverBitFlag=" + deliver;
+		text = text + ",deliverBoostBitFlag=" + boostBit;
+		text = text + ",deliverBoostNum=" + boostNum;
+		text = text + ",boxType=" + boxType;
+		return base.ToString() + text;
 	}
 }

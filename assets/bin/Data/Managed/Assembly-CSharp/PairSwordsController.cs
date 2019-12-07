@@ -70,7 +70,7 @@ public class PairSwordsController : IObserver, IWeaponController
 
 	protected bool isCombineMode;
 
-	protected Quaternion combineEffectRotation = Quaternion.get_identity();
+	protected Quaternion combineEffectRotation = Quaternion.identity;
 
 	protected Vector3 combineEffectScale = new Vector3(1.5f, 1.5f, 1.5f);
 
@@ -155,11 +155,10 @@ public class PairSwordsController : IObserver, IWeaponController
 
 	public void GetEffectTransStartShotLaser()
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<EffectManager>.IsValid() && effectTransStartShotLaser == null)
 		{
 			effectTransStartShotLaser = EffectManager.GetEffect(pairSwordsInfo.Soul_EffectForWaitingLaser, owner._transform);
-			effectTransStartShotLaser.set_localPosition(OFFSET_LASER_WAIT_EFFECT);
+			effectTransStartShotLaser.localPosition = OFFSET_LASER_WAIT_EFFECT;
 		}
 	}
 
@@ -184,12 +183,12 @@ public class PairSwordsController : IObserver, IWeaponController
 		effectAnimatorOnWeaponList.Clear();
 		int currentWeaponElement = owner.GetCurrentWeaponElement();
 		string name = pairSwordsInfo.Soul_EffectsForWeapon[currentWeaponElement];
-		Transform val = Utility.Find(owner.FindNode("R_Wep"), name);
-		Transform val2 = Utility.Find(owner.FindNode("L_Wep"), name);
-		effectTransOnWeaponList.Add(val);
-		effectTransOnWeaponList.Add(val2);
-		effectAnimatorOnWeaponList.Add(val.GetComponent<Animator>());
-		effectAnimatorOnWeaponList.Add(val2.GetComponent<Animator>());
+		Transform transform = Utility.Find(owner.FindNode("R_Wep"), name);
+		Transform transform2 = Utility.Find(owner.FindNode("L_Wep"), name);
+		effectTransOnWeaponList.Add(transform);
+		effectTransOnWeaponList.Add(transform2);
+		effectAnimatorOnWeaponList.Add(transform.GetComponent<Animator>());
+		effectAnimatorOnWeaponList.Add(transform2.GetComponent<Animator>());
 	}
 
 	public void Update()
@@ -221,7 +220,7 @@ public class PairSwordsController : IObserver, IWeaponController
 			SetChargeState(CHARGE_STATE.NONE);
 			break;
 		}
-		timerForSpActionGaugeDecreaseAfterHit += Time.get_deltaTime();
+		timerForSpActionGaugeDecreaseAfterHit += Time.deltaTime;
 		UpdateSpActionGauge();
 		UpdateEffectOnWeapon();
 	}
@@ -241,23 +240,23 @@ public class PairSwordsController : IObserver, IWeaponController
 				return;
 			}
 			float num2 = 1f + owner.GetSpGaugeDecreasingRate();
-			owner.spActionGauge[owner.weaponIndex] -= pairSwordsInfo.boostGaugeDecreasePerSecond * num2 * Time.get_deltaTime();
+			owner.spActionGauge[owner.weaponIndex] -= pairSwordsInfo.boostGaugeDecreasePerSecond * num2 * Time.deltaTime;
 			break;
 		}
 		case SP_ATTACK_TYPE.SOUL:
 			if ((chargeState == CHARGE_STATE.LASER_SHOT || chargeState == CHARGE_STATE.LASER_LOOP) && isEventShotLaserExec)
 			{
-				spActionGauge -= pairSwordsInfo.Soul_GaugeDecreaseShootingLaserPerSecond * Time.get_deltaTime();
+				spActionGauge -= pairSwordsInfo.Soul_GaugeDecreaseShootingLaserPerSecond * Time.deltaTime;
 			}
 			else if (timerForSpActionGaugeDecreaseAfterHit >= pairSwordsInfo.Soul_TimeForGaugeDecreaseAfterHit && !owner.IsStone() && (!IsComboLvMax() || !(timerForSpActionGaugeDecreaseAfterHit < pairSwordsInfo.Soul_TimeForGaugeDecreaseAfterHitOnComboLvMax)))
 			{
 				if (chargeState == CHARGE_STATE.LOOP || (chargeState == CHARGE_STATE.LASER_SHOT && !isEventShotLaserExec))
 				{
-					spActionGauge -= pairSwordsInfo.Soul_GaugeDecreaseWaitingLaserPerSecond * Time.get_deltaTime();
+					spActionGauge -= pairSwordsInfo.Soul_GaugeDecreaseWaitingLaserPerSecond * Time.deltaTime;
 				}
 				else
 				{
-					spActionGauge -= pairSwordsInfo.Soul_GaugeDecreasePerSecond * Time.get_deltaTime();
+					spActionGauge -= pairSwordsInfo.Soul_GaugeDecreasePerSecond * Time.deltaTime;
 				}
 			}
 			break;
@@ -268,7 +267,7 @@ public class PairSwordsController : IObserver, IWeaponController
 				return;
 			}
 			float num = 1f + owner.GetSpGaugeDecreasingRate();
-			owner.spActionGauge[owner.weaponIndex] -= pairSwordsInfo.Burst_BoostGaugeDecreasePerSecond * num * Time.get_deltaTime();
+			owner.spActionGauge[owner.weaponIndex] -= pairSwordsInfo.Burst_BoostGaugeDecreasePerSecond * num * Time.deltaTime;
 			break;
 		}
 		case SP_ATTACK_TYPE.ORACLE:
@@ -278,7 +277,7 @@ public class PairSwordsController : IObserver, IWeaponController
 			}
 			if (owner.enableInputCharge)
 			{
-				spActionGauge -= pairSwordsInfo.Oracle_SpGaugeDecreasePerSecond * (1f + owner.GetSpGaugeDecreasingRate()) * Time.get_deltaTime();
+				spActionGauge -= pairSwordsInfo.Oracle_SpGaugeDecreasePerSecond * (1f + owner.GetSpGaugeDecreasingRate()) * Time.deltaTime;
 				if (spActionGauge <= 0f)
 				{
 					owner.SetChargeRelease(1f);
@@ -286,7 +285,7 @@ public class PairSwordsController : IObserver, IWeaponController
 			}
 			else
 			{
-				spActionGauge += pairSwordsInfo.Oracle_SpGaugeIncreasePerSecond * (1f + owner.GetSpGaugeDecreasingRate()) * Time.get_deltaTime();
+				spActionGauge += pairSwordsInfo.Oracle_SpGaugeIncreasePerSecond * (1f + owner.GetSpGaugeDecreasingRate()) * Time.deltaTime;
 			}
 			break;
 		}
@@ -295,11 +294,6 @@ public class PairSwordsController : IObserver, IWeaponController
 
 	private void UpdateEffectOnWeapon()
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
 		if (effectAnimatorOnWeaponList.IsNullOrEmpty())
 		{
 			return;
@@ -310,8 +304,7 @@ public class PairSwordsController : IObserver, IWeaponController
 			{
 				continue;
 			}
-			AnimatorStateInfo currentAnimatorStateInfo = effectAnimatorOnWeaponList[i].GetCurrentAnimatorStateInfo(0);
-			int fullPathHash = currentAnimatorStateInfo.get_fullPathHash();
+			int fullPathHash = effectAnimatorOnWeaponList[i].GetCurrentAnimatorStateInfo(0).fullPathHash;
 			if (IsComboLvMax())
 			{
 				if (fullPathHash != HASH_EFFECT_ON_WEAPON_FULL)
@@ -324,9 +317,9 @@ public class PairSwordsController : IObserver, IWeaponController
 			{
 				effectAnimatorOnWeaponList[i].Play(HASH_EFFECT_ON_WEAPON_DEFAULT);
 			}
-			Vector3 localScale = effectTransOnWeaponList[i].get_localScale();
+			Vector3 localScale = effectTransOnWeaponList[i].localScale;
 			localScale.z = GetGaugeRate();
-			effectTransOnWeaponList[i].set_localScale(localScale);
+			effectTransOnWeaponList[i].localScale = localScale;
 		}
 	}
 
@@ -337,10 +330,9 @@ public class PairSwordsController : IObserver, IWeaponController
 
 	public void OnLaserEnd(bool isPacket = false)
 	{
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<EffectManager>.IsValid() && effectTransStartShotLaser != null)
 		{
-			EffectManager.ReleaseEffect(effectTransStartShotLaser.get_gameObject());
+			EffectManager.ReleaseEffect(effectTransStartShotLaser.gameObject);
 			effectTransStartShotLaser = null;
 		}
 		ClearLaserBullet();
@@ -658,11 +650,11 @@ public class PairSwordsController : IObserver, IWeaponController
 		{
 			if (owner is Self)
 			{
-				EffectManager.ReleaseEffect(oracleRushLoopEffect.get_gameObject());
+				EffectManager.ReleaseEffect(oracleRushLoopEffect.gameObject);
 			}
 			else
 			{
-				EffectManager.ReleaseEffect(oracleRushLoopEffect.get_gameObject(), isPlayEndAnimation: false, immediate: true);
+				EffectManager.ReleaseEffect(oracleRushLoopEffect.gameObject, isPlayEndAnimation: false, immediate: true);
 			}
 			oracleRushLoopEffect = null;
 		}
@@ -670,11 +662,11 @@ public class PairSwordsController : IObserver, IWeaponController
 		{
 			if (owner is Self)
 			{
-				EffectManager.ReleaseEffect(oracleRushEffect.get_gameObject());
+				EffectManager.ReleaseEffect(oracleRushEffect.gameObject);
 			}
 			else
 			{
-				EffectManager.ReleaseEffect(oracleRushEffect.get_gameObject(), isPlayEndAnimation: false, immediate: true);
+				EffectManager.ReleaseEffect(oracleRushEffect.gameObject, isPlayEndAnimation: false, immediate: true);
 			}
 			oracleRushEffect = null;
 		}
@@ -702,7 +694,7 @@ public class PairSwordsController : IObserver, IWeaponController
 	{
 		if (isCtrlActive && !owner.isDead && (IsAbleToShotSoulLaser() || (owner.attackID == pairSwordsInfo.Soul_SpLaserWaitAttackId && chargeState == CHARGE_STATE.NONE)))
 		{
-			owner.ActAttack(pairSwordsInfo.Soul_SpLaserShotAttackId, send_packet: true, sync_immediately: true, string.Empty, string.Empty);
+			owner.ActAttack(pairSwordsInfo.Soul_SpLaserShotAttackId, send_packet: true, sync_immediately: true);
 			SetChargeState(CHARGE_STATE.LASER_SHOT);
 			if (owner.playerSender != null)
 			{
@@ -784,18 +776,24 @@ public class PairSwordsController : IObserver, IWeaponController
 
 	public bool IsBurstGroundSpecialAttack()
 	{
-		return owner.attackID >= 36 && owner.attackID <= 39;
+		if (owner.attackID >= 36)
+		{
+			return owner.attackID <= 39;
+		}
+		return false;
 	}
 
 	public int GetBurstAttackId()
 	{
-		return (!isCombineMode) ? 30 : 33;
+		if (!isCombineMode)
+		{
+			return 30;
+		}
+		return 33;
 	}
 
 	public bool IsOverrideHitEffect(ref EnemyHitTypeTable.TypeData _type, ref Vector3 _scale)
 	{
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
 		if (!owner.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.BURST))
 		{
 			return false;
@@ -821,19 +819,19 @@ public class PairSwordsController : IObserver, IWeaponController
 	{
 		if (owner.attackID == 32)
 		{
-			owner.ActAttack(35, send_packet: true, sync_immediately: true, string.Empty, string.Empty);
+			owner.ActAttack(35, send_packet: true, sync_immediately: true);
 			effectFlag = false;
 			return true;
 		}
 		if (!isCombineMode)
 		{
-			owner.ActAttack(34, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+			owner.ActAttack(34);
 			effectFlag = true;
 			return true;
 		}
 		if (owner.actionID != Character.ACTION_ID.ATTACK || owner.attackID == 21 || owner.attackID == 34 || owner.attackID == 35)
 		{
-			owner.ActAttack(36, _motionStateName: (owner.actionID == Character.ACTION_ID.ATTACK) ? string.Empty : "attack_36_start", send_packet: true, sync_immediately: false, _motionLayerName: string.Empty);
+			owner.ActAttack(36, send_packet: true, sync_immediately: false, "", (owner.actionID != Character.ACTION_ID.ATTACK) ? "attack_36_start" : "");
 			effectFlag = false;
 			return true;
 		}
@@ -842,15 +840,6 @@ public class PairSwordsController : IObserver, IWeaponController
 
 	public void CombineBurst(bool isCombine)
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
 		if (isCombineMode != isCombine && owner.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.BURST))
 		{
 			isCombineMode = isCombine;
@@ -861,12 +850,12 @@ public class PairSwordsController : IObserver, IWeaponController
 			}
 			else
 			{
-				owner.loader.CombineBurstPairSword(isCombine: false, Vector3.get_zero(), Quaternion.get_identity());
+				owner.loader.CombineBurstPairSword(isCombine: false, Vector3.zero, Quaternion.identity);
 			}
 			SoundManager.PlayOneShotSE(10000042, owner._position);
 			if (owner.loader != null && owner.loader.wepR != null)
 			{
-				EffectManager.OneShot("ef_btl_wsk3_twinsword_01_00", owner.loader.wepR.get_position(), combineEffectRotation, combineEffectScale);
+				EffectManager.OneShot("ef_btl_wsk3_twinsword_01_00", owner.loader.wepR.position, combineEffectRotation, combineEffectScale);
 			}
 			if (owner.playerSender != null)
 			{
@@ -877,50 +866,32 @@ public class PairSwordsController : IObserver, IWeaponController
 
 	public void ActAerialAvoid(Vector3 inputVec)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 		Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-		Vector3 right = cameraTransform.get_right();
-		Vector3 forward = cameraTransform.get_forward();
+		Vector3 right = cameraTransform.right;
+		Vector3 forward = cameraTransform.forward;
 		forward.y = 0f;
 		forward.Normalize();
-		Vector3 val = owner._transform.get_position() + (right * inputVec.x + forward * inputVec.y);
-		owner._transform.LookAt(val);
+		Vector3 worldPosition = owner._transform.position + (right * inputVec.x + forward * inputVec.y);
+		owner._transform.LookAt(worldPosition);
 	}
 
 	public bool IsOracleAttackId(int id)
 	{
-		return 40 <= id && id <= 45;
+		if (40 <= id)
+		{
+			return id <= 45;
+		}
+		return false;
 	}
 
 	public void EventShotOracleRush(AnimEventData.EventData data)
 	{
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0215: Unknown result type (might be due to invalid IL or missing references)
 		spActionGauge -= pairSwordsInfo.Oracle_SpGaugeRushDecrease * (1f + owner.GetSpGaugeDecreasingRate());
 		if (owner is Self)
 		{
 			if (oracleRushLoopEffect != null)
 			{
-				EffectManager.ReleaseEffect(oracleRushLoopEffect.get_gameObject());
+				EffectManager.ReleaseEffect(oracleRushLoopEffect.gameObject);
 				oracleRushLoopEffect = null;
 			}
 			oracleRushLoopEffect = EffectManager.GetEffect("ef_btl_wsk4_twinsword_03", owner._transform);
@@ -936,11 +907,11 @@ public class PairSwordsController : IObserver, IWeaponController
 			}
 			if (attackInfo != null)
 			{
-				AnimEventShot animEventShot = AnimEventShot.Create(owner, data, attackInfo, Vector3.get_zero());
+				AnimEventShot animEventShot = AnimEventShot.Create(owner, data, attackInfo, Vector3.zero);
 				oracleRushEffect = animEventShot.bulletEffect;
 				if (oracleRushEffect != null)
 				{
-					oracleRushEffect.get_transform().set_localRotation(Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
+					oracleRushEffect.transform.localRotation = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
 				}
 			}
 		}
@@ -949,24 +920,19 @@ public class PairSwordsController : IObserver, IWeaponController
 			string effect_name = (!(spActionGauge < 0f)) ? $"ef_btl_wsk4_twinsword_01_{owner.GetCurrentWeaponElement():D2}" : "ef_btl_wsk4_twinsword_01";
 			if (oracleRushEffect != null)
 			{
-				EffectManager.ReleaseEffect(oracleRushEffect.get_gameObject(), isPlayEndAnimation: false, immediate: true);
+				EffectManager.ReleaseEffect(oracleRushEffect.gameObject, isPlayEndAnimation: false, immediate: true);
 				oracleRushEffect = null;
 			}
 			oracleRushEffect = EffectManager.GetEffect(effect_name);
-			Vector3 val = default(Vector3);
-			val._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-			Transform obj = oracleRushEffect;
-			Matrix4x4 localToWorldMatrix = owner._transform.get_localToWorldMatrix();
-			obj.set_position(localToWorldMatrix.MultiplyPoint3x4(val));
-			oracleRushEffect.set_rotation(owner._rotation * Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
+			Vector3 point = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+			oracleRushEffect.position = owner._transform.localToWorldMatrix.MultiplyPoint3x4(point);
+			oracleRushEffect.rotation = owner._rotation * Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
 		}
 	}
 
 	public void JustAvoid(bool force = false)
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		if (hasJustAvoid && !force)
+		if (!(!hasJustAvoid | force))
 		{
 			return;
 		}
@@ -1013,11 +979,11 @@ public class PairSwordsController : IObserver, IWeaponController
 		{
 			if (owner is Self)
 			{
-				EffectManager.ReleaseEffect(oracleSpEffect.get_gameObject());
+				EffectManager.ReleaseEffect(oracleSpEffect.gameObject);
 			}
 			else
 			{
-				EffectManager.ReleaseEffect(oracleSpEffect.get_gameObject(), isPlayEndAnimation: false, immediate: true);
+				EffectManager.ReleaseEffect(oracleSpEffect.gameObject, isPlayEndAnimation: false, immediate: true);
 			}
 			oracleSpEffect = null;
 		}

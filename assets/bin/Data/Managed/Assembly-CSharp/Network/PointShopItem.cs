@@ -17,8 +17,28 @@ namespace Network
 
 		public bool hasLimit => limit != -1;
 
-		public bool isBuyable => !hasLimit || limit > buyCount;
+		public bool isBuyable
+		{
+			get
+			{
+				if (hasLimit)
+				{
+					return limit > buyCount;
+				}
+				return true;
+			}
+		}
 
-		public POINT_SHOP_ITEM_LIMIT_TYPE limitPeriodType => (POINT_SHOP_ITEM_LIMIT_TYPE)(Enum.IsDefined(typeof(POINT_SHOP_ITEM_LIMIT_TYPE), limitType) ? limitType : 0);
+		public POINT_SHOP_ITEM_LIMIT_TYPE limitPeriodType
+		{
+			get
+			{
+				if (!Enum.IsDefined(typeof(POINT_SHOP_ITEM_LIMIT_TYPE), limitType))
+				{
+					return POINT_SHOP_ITEM_LIMIT_TYPE.NONE;
+				}
+				return (POINT_SHOP_ITEM_LIMIT_TYPE)limitType;
+			}
+		}
 	}
 }

@@ -67,7 +67,11 @@ public class SmithCreateSortData : SortCompareData
 
 	public override ELEMENT_TYPE GetIconElement()
 	{
-		return (ELEMENT_TYPE)((!createData.equipTableData.IsWeapon()) ? createData.equipTableData.GetElemDefTypePriorityToTable() : createData.equipTableData.GetElemAtkTypePriorityToTable());
+		if (!createData.equipTableData.IsWeapon())
+		{
+			return (ELEMENT_TYPE)createData.equipTableData.GetElemDefTypePriorityToTable();
+		}
+		return (ELEMENT_TYPE)createData.equipTableData.GetElemAtkTypePriorityToTable();
 	}
 
 	public override int GetItemType()
@@ -107,17 +111,16 @@ public class SmithCreateSortData : SortCompareData
 
 	public override uint GetMainorSortWeight()
 	{
-		uint num = 0u;
-		uint num2 = EquipmentTypeToMinorSortValue(createData.equipTableData.type);
-		num += num2 << 26;
+		uint num = EquipmentTypeToMinorSortValue(createData.equipTableData.type);
+		uint num2 = 0 + (num << 26);
 		uint num3 = ElementTypeToMinorSortValue(GetIconElement());
-		num += num3 << 23;
+		uint num4 = num2 + (num3 << 23);
 		uint rarity = (uint)GetRarity();
-		num += rarity << 20;
+		uint num5 = num4 + (rarity << 20);
 		uint spAttackType = (uint)createData.equipTableData.spAttackType;
-		num += spAttackType << 15;
+		uint num6 = num5 + (spAttackType << 15);
 		uint typeToMinorSortValue = GetTypeToMinorSortValue(GetGetType());
-		return num + (typeToMinorSortValue << 7);
+		return num6 + (typeToMinorSortValue << 7);
 	}
 
 	public ItemIconDetail.ICON_STATUS GetIconStatus()
@@ -135,23 +138,17 @@ public class SmithCreateSortData : SortCompareData
 
 	public override int getEquipFilterPay()
 	{
-		int num = 0;
-		num = MonoBehaviourSingleton<InventoryManager>.I.IsHaveingMaterialAndPayAndObtained(createData);
-		return num & 3;
+		return MonoBehaviourSingleton<InventoryManager>.I.IsHaveingMaterialAndPayAndObtained(createData) & 3;
 	}
 
 	public override int getEquipFilterCreatable()
 	{
-		int num = 0;
-		num = MonoBehaviourSingleton<InventoryManager>.I.IsHaveingMaterialAndPayAndObtained(createData);
-		return num & 0xC;
+		return MonoBehaviourSingleton<InventoryManager>.I.IsHaveingMaterialAndPayAndObtained(createData) & 0xC;
 	}
 
 	public override int getEquipFilterObtained()
 	{
-		int num = 0;
-		num = MonoBehaviourSingleton<InventoryManager>.I.IsHaveingMaterialAndPayAndObtained(createData);
-		return num & 0x30;
+		return MonoBehaviourSingleton<InventoryManager>.I.IsHaveingMaterialAndPayAndObtained(createData) & 0x30;
 	}
 
 	public override bool getEquipFilterPayAndCreatable(int filter)
@@ -159,12 +156,11 @@ public class SmithCreateSortData : SortCompareData
 		int num = 0;
 		int num2 = 0;
 		int num3 = 0;
-		int num4 = 0;
-		num = MonoBehaviourSingleton<InventoryManager>.I.IsHaveingMaterialAndPayAndObtained(createData);
-		num2 = (num & 3);
-		num3 = (num & 0xC);
-		num4 = (num & 0x30);
-		if ((filter & num2) == 0 || (filter & num3) == 0 || (filter & num4) == 0)
+		int num4 = MonoBehaviourSingleton<InventoryManager>.I.IsHaveingMaterialAndPayAndObtained(createData);
+		num = (num4 & 3);
+		num2 = (num4 & 0xC);
+		num3 = (num4 & 0x30);
+		if ((filter & num) == 0 || (filter & num2) == 0 || (filter & num3) == 0)
 		{
 			return true;
 		}

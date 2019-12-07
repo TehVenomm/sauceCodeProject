@@ -217,11 +217,11 @@ public abstract class EquipMaterialBase : SmithEquipBase
 			if (equipTableData != null)
 			{
 				bool active = equipTableData.damageDistanceId >= 0;
-				ctrl.get_gameObject().SetActive(active);
+				ctrl.gameObject.SetActive(active);
 			}
 			else
 			{
-				ctrl.get_gameObject().SetActive(false);
+				ctrl.gameObject.SetActive(value: false);
 			}
 		}
 		base.Initialize();
@@ -237,71 +237,71 @@ public abstract class EquipMaterialBase : SmithEquipBase
 	{
 		if (smithType == SmithType.GENERATE || smithType == SmithType.SKILL_GROW)
 		{
-			SetActive((Enum)UI.BTN_EXCEED, is_visible: false);
-			SetActive((Enum)UI.BTN_SHADOW_EVOLVE, is_visible: false);
+			SetActive(UI.BTN_EXCEED, is_visible: false);
+			SetActive(UI.BTN_SHADOW_EVOLVE, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_EXCEED, GetEquipData().tableData.exceedID != 0 && !GetEquipData().tableData.IsShadow());
-			SetActive((Enum)UI.BTN_SHADOW_EVOLVE, GetEquipData().tableData.IsShadow());
+			SetActive(UI.BTN_EXCEED, GetEquipData().tableData.exceedID != 0 && !GetEquipData().tableData.IsShadow());
+			SetActive(UI.BTN_SHADOW_EVOLVE, GetEquipData().tableData.IsShadow());
 			int exceed = GetEquipData().exceed;
-			SetActive((Enum)UI.SPR_COUNT_0_ON, exceed > 0);
-			SetActive((Enum)UI.SPR_COUNT_1_ON, exceed > 1);
-			SetActive((Enum)UI.SPR_COUNT_2_ON, exceed > 2);
-			SetActive((Enum)UI.SPR_COUNT_3_ON, exceed > 3);
+			SetActive(UI.SPR_COUNT_0_ON, exceed > 0);
+			SetActive(UI.SPR_COUNT_1_ON, exceed > 1);
+			SetActive(UI.SPR_COUNT_2_ON, exceed > 2);
+			SetActive(UI.SPR_COUNT_3_ON, exceed > 3);
 		}
-		SetActive((Enum)UI.BTN_LIST, smithType == SmithType.GENERATE);
-		SetActive((Enum)UI.OBJ_ITEM_INFO_ROOT, smithType != SmithType.GROW);
-		SetActive((Enum)UI.OBJ_AIM_GROW, smithType == SmithType.GROW);
-		SetActive((Enum)UI.OBJ_EVOLVE_ROOT, smithType == SmithType.EVOLVE);
-		SetLabelText((Enum)UI.STR_DECISION, base.sectionData.GetText("STR_DECISION"));
-		SetLabelText((Enum)UI.STR_DECISION_REFLECT, base.sectionData.GetText("STR_DECISION"));
-		SetLabelText((Enum)UI.STR_INACTIVE, base.sectionData.GetText("STR_INACTIVE"));
-		SetLabelText((Enum)UI.STR_INACTIVE_REFLECT, base.sectionData.GetText("STR_INACTIVE"));
+		SetActive(UI.BTN_LIST, smithType == SmithType.GENERATE);
+		SetActive(UI.OBJ_ITEM_INFO_ROOT, smithType != SmithType.GROW);
+		SetActive(UI.OBJ_AIM_GROW, smithType == SmithType.GROW);
+		SetActive(UI.OBJ_EVOLVE_ROOT, smithType == SmithType.EVOLVE);
+		SetLabelText(UI.STR_DECISION, base.sectionData.GetText("STR_DECISION"));
+		SetLabelText(UI.STR_DECISION_REFLECT, base.sectionData.GetText("STR_DECISION"));
+		SetLabelText(UI.STR_INACTIVE, base.sectionData.GetText("STR_INACTIVE"));
+		SetLabelText(UI.STR_INACTIVE_REFLECT, base.sectionData.GetText("STR_INACTIVE"));
 		InitNeedMaterialData();
 		if (!string.IsNullOrEmpty(CreateItemDetailPrefabName()))
 		{
 			detailBase = SetPrefab(GetCtrl(UI.OBJ_DETAIL_ROOT), CreateItemDetailPrefabName());
 			if (detailBase != null)
 			{
-				SetFontStyle(detailBase, UI.STR_TITLE_ITEM_INFO, 2);
-				SetFontStyle(detailBase, UI.STR_TITLE_SKILL_SLOT, 2);
-				SetFontStyle(detailBase, UI.STR_TITLE_STATUS, 2);
-				SetFontStyle(detailBase, UI.STR_TITLE_ABILITY, 2);
-				SetFontStyle(detailBase, UI.STR_TITLE_SELL, 2);
-				SetFontStyle(detailBase, UI.STR_TITLE_ELEMENT, 2);
-				SetFontStyle(detailBase, UI.STR_TITLE_ATK, 2);
-				SetFontStyle(detailBase, UI.STR_TITLE_ELEM, 2);
-				SetFontStyle(detailBase, UI.STR_TITLE_DEF, 2);
-				SetFontStyle(detailBase, UI.STR_TITLE_ELEM_DEF, 2);
-				SetFontStyle(detailBase, UI.STR_TITLE_HP, 2);
+				SetFontStyle(detailBase, UI.STR_TITLE_ITEM_INFO, FontStyle.Italic);
+				SetFontStyle(detailBase, UI.STR_TITLE_SKILL_SLOT, FontStyle.Italic);
+				SetFontStyle(detailBase, UI.STR_TITLE_STATUS, FontStyle.Italic);
+				SetFontStyle(detailBase, UI.STR_TITLE_ABILITY, FontStyle.Italic);
+				SetFontStyle(detailBase, UI.STR_TITLE_SELL, FontStyle.Italic);
+				SetFontStyle(detailBase, UI.STR_TITLE_ELEMENT, FontStyle.Italic);
+				SetFontStyle(detailBase, UI.STR_TITLE_ATK, FontStyle.Italic);
+				SetFontStyle(detailBase, UI.STR_TITLE_ELEM, FontStyle.Italic);
+				SetFontStyle(detailBase, UI.STR_TITLE_DEF, FontStyle.Italic);
+				SetFontStyle(detailBase, UI.STR_TITLE_ELEM_DEF, FontStyle.Italic);
+				SetFontStyle(detailBase, UI.STR_TITLE_HP, FontStyle.Italic);
 				SetActive(detailBase, UI.BTN_SELL, is_visible: false);
 				SetActive(detailBase, UI.BTN_GROW, is_visible: false);
 				SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, is_visible: false);
-				SetActive((Enum)UI.OBJ_DETAIL_BASE_ROOT, is_visible: false);
-				SetSprite(detailBase, UI.SPR_SP_ATTACK_TYPE, (!GetEquipTableData().IsWeapon()) ? string.Empty : GetEquipTableData().spAttackType.GetSmallFrameSpriteName());
+				SetActive(UI.OBJ_DETAIL_BASE_ROOT, is_visible: false);
+				SetSprite(detailBase, UI.SPR_SP_ATTACK_TYPE, GetEquipTableData().IsWeapon() ? GetEquipTableData().spAttackType.GetSmallFrameSpriteName() : "");
 			}
 		}
 		else
 		{
-			SetFontStyle((Enum)UI.STR_TITLE_ITEM_INFO, 2);
-			SetFontStyle((Enum)UI.STR_TITLE_SKILL_SLOT, 2);
-			SetFontStyle((Enum)UI.STR_TITLE_STATUS, 2);
-			SetFontStyle((Enum)UI.STR_TITLE_ABILITY, 2);
-			SetFontStyle((Enum)UI.STR_TITLE_SELL, 2);
-			SetFontStyle((Enum)UI.STR_TITLE_ELEMENT, 2);
-			SetFontStyle((Enum)UI.STR_TITLE_ATK, 2);
-			SetFontStyle((Enum)UI.STR_TITLE_ELEM, 2);
-			SetFontStyle((Enum)UI.STR_TITLE_DEF, 2);
-			SetFontStyle((Enum)UI.STR_TITLE_ELEM_DEF, 2);
-			SetFontStyle((Enum)UI.STR_TITLE_HP, 2);
-			SetSprite((Enum)UI.SPR_SP_ATTACK_TYPE, (!GetEquipTableData().IsWeapon()) ? string.Empty : GetEquipTableData().spAttackType.GetSmallFrameSpriteName());
+			SetFontStyle(UI.STR_TITLE_ITEM_INFO, FontStyle.Italic);
+			SetFontStyle(UI.STR_TITLE_SKILL_SLOT, FontStyle.Italic);
+			SetFontStyle(UI.STR_TITLE_STATUS, FontStyle.Italic);
+			SetFontStyle(UI.STR_TITLE_ABILITY, FontStyle.Italic);
+			SetFontStyle(UI.STR_TITLE_SELL, FontStyle.Italic);
+			SetFontStyle(UI.STR_TITLE_ELEMENT, FontStyle.Italic);
+			SetFontStyle(UI.STR_TITLE_ATK, FontStyle.Italic);
+			SetFontStyle(UI.STR_TITLE_ELEM, FontStyle.Italic);
+			SetFontStyle(UI.STR_TITLE_DEF, FontStyle.Italic);
+			SetFontStyle(UI.STR_TITLE_ELEM_DEF, FontStyle.Italic);
+			SetFontStyle(UI.STR_TITLE_HP, FontStyle.Italic);
+			SetSprite(UI.SPR_SP_ATTACK_TYPE, GetEquipTableData().IsWeapon() ? GetEquipTableData().spAttackType.GetSmallFrameSpriteName() : "");
 		}
-		SetFontStyle((Enum)UI.STR_TITLE_MATERIAL, 2);
-		SetFontStyle((Enum)UI.STR_TITLE_MONEY, 2);
+		SetFontStyle(UI.STR_TITLE_MATERIAL, FontStyle.Italic);
+		SetFontStyle(UI.STR_TITLE_MONEY, FontStyle.Italic);
 		bool flag = IsHavingMaterialAndMoney();
-		SetActive((Enum)UI.BTN_DECISION, flag);
-		SetActive((Enum)UI.BTN_INACTIVE, !flag);
+		SetActive(UI.BTN_DECISION, flag);
+		SetActive(UI.BTN_INACTIVE, !flag);
 		base.UpdateUI();
 	}
 
@@ -324,8 +324,7 @@ public abstract class EquipMaterialBase : SmithEquipBase
 			{
 				list.Add(needMaterial[i].itemID);
 			}
-			LinkedListNode<ItemInfo> node;
-			for (node = MonoBehaviourSingleton<InventoryManager>.I.itemInventory.GetFirstNode(); node != null; node = node.Next)
+			for (LinkedListNode<ItemInfo> node = MonoBehaviourSingleton<InventoryManager>.I.itemInventory.GetFirstNode(); node != null; node = node.Next)
 			{
 				uint find_id = 0u;
 				list.ForEach(delegate(uint id)
@@ -380,20 +379,13 @@ public abstract class EquipMaterialBase : SmithEquipBase
 
 	protected override void NeededMaterial()
 	{
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.GRD_NEED_MATERIAL);
-		while (ctrl.get_childCount() != 0)
+		while (ctrl.childCount != 0)
 		{
 			Transform child = ctrl.GetChild(0);
-			child.set_parent(null);
-			child.get_gameObject().SetActive(false);
-			Object.Destroy(child.get_gameObject());
+			child.parent = null;
+			child.gameObject.SetActive(value: false);
+			UnityEngine.Object.Destroy(child.gameObject);
 		}
 		int needEquipSize = 0;
 		int num = 0;
@@ -413,41 +405,34 @@ public abstract class EquipMaterialBase : SmithEquipBase
 				EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(needEquip[i].equipItemID);
 				if (equipItemData != null)
 				{
-					ITEM_ICON_TYPE itemIconType = ItemIcon.GetItemIconType(equipItemData.type);
-					EquipItemTable.EquipItemData equip_table = equipItemData;
-					int have_num = haveEquipNum[i];
-					int num2 = needEquip[i].num;
-					string event_name = "EQUIP";
-					int event_data = i;
-					GET_TYPE getType = equipItemData.getType;
-					ItemIconEquipMaterial itemIconEquipMaterial = ItemIconEquipMaterial.CreateEquipMaterialIcon(itemIconType, equip_table, t, have_num, num2, event_name, event_data, is_new: false, getType);
+					ItemIconEquipMaterial itemIconEquipMaterial = ItemIconEquipMaterial.CreateEquipMaterialIcon(ItemIcon.GetItemIconType(equipItemData.type), equipItemData, t, haveEquipNum[i], needEquip[i].num, "EQUIP", i, is_new: false, equipItemData.getType);
 					itemIconEquipMaterial.SelectUniqueID(selectedUniqueIdList[i]);
 					SetLongTouch(itemIconEquipMaterial.transform, "EQUIP", i);
 				}
 			}
 			else if (i < needItemSize && needMaterial != null)
 			{
-				int num3 = i - needEquipSize;
-				ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(needMaterial[num3].itemID);
+				int num2 = i - needEquipSize;
+				ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(needMaterial[num2].itemID);
 				if (itemData != null)
 				{
-					ItemIcon itemIcon = ItemIconMaterial.CreateMaterialIcon(ItemIcon.GetItemIconType(itemData.type), itemData, t, haveMaterialNum[num3], needMaterial[num3].num, "MATERIAL", num3);
-					SetLongTouch(itemIcon.transform, "MATERIAL", num3);
-					SetEvent(t, "MATERIAL", num3);
+					ItemIcon itemIcon = ItemIconMaterial.CreateMaterialIcon(ItemIcon.GetItemIconType(itemData.type), itemData, t, haveMaterialNum[num2], needMaterial[num2].num, "MATERIAL", num2);
+					SetLongTouch(itemIcon.transform, "MATERIAL", num2);
+					SetEvent(t, "MATERIAL", num2);
 				}
 			}
 		});
-		SetLabelText((Enum)UI.LBL_GOLD, needMoney.ToString("N0"));
-		Color color = Color.get_white();
+		SetLabelText(UI.LBL_GOLD, needMoney.ToString("N0"));
+		Color color = Color.white;
 		if (needMaterial == null && needEquip == null)
 		{
-			color = Color.get_gray();
+			color = Color.gray;
 		}
 		else if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money < needMoney)
 		{
-			color = Color.get_red();
+			color = Color.red;
 		}
-		SetColor((Enum)UI.LBL_GOLD, color);
+		SetColor(UI.LBL_GOLD, color);
 	}
 
 	protected bool IsHavingMaterialAndMoney()
@@ -478,15 +463,7 @@ public abstract class EquipMaterialBase : SmithEquipBase
 		else
 		{
 			EquipItemTable.EquipItemData equipTableData = GetEquipTableData();
-			if (smithType == SmithType.EVOLVE)
-			{
-				SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
-				equipItemAbility = new EquipItemAbility(smithData.selectEquipData.ability[num].id, -1);
-			}
-			else
-			{
-				equipItemAbility = new EquipItemAbility((uint)equipTableData.fixedAbility[num].id, -1);
-			}
+			equipItemAbility = ((smithType != SmithType.EVOLVE) ? new EquipItemAbility((uint)equipTableData.fixedAbility[num].id, -1) : new EquipItemAbility(MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>().selectEquipData.ability[num].id, -1));
 		}
 		if (equipItemAbility == null)
 		{
@@ -504,7 +481,7 @@ public abstract class EquipMaterialBase : SmithEquipBase
 
 	protected override void EquipImg()
 	{
-		SetRenderEquipModel((Enum)UI.TEX_DETAIL_BASE_MODEL, GetEquipTableData().id, -1, -1, 1f);
+		SetRenderEquipModel(UI.TEX_DETAIL_BASE_MODEL, GetEquipTableData().id);
 	}
 
 	protected virtual string GetEquipItemName()

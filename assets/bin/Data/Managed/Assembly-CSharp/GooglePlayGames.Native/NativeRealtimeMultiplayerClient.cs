@@ -434,8 +434,7 @@ namespace GooglePlayGames.Native
 				}
 				mRoom = Misc.CheckNotNull(room);
 				mNativeParticipants = mRoom.Participants().ToDictionary((GooglePlayGames.Native.PInvoke.MultiplayerParticipant p) => p.Id());
-				mParticipants = (from p in mNativeParticipants.Values
-				select p.AsParticipant()).ToDictionary((Participant p) => p.ParticipantId);
+				mParticipants = mNativeParticipants.Values.Select((GooglePlayGames.Native.PInvoke.MultiplayerParticipant p) => p.AsParticipant()).ToDictionary((Participant p) => p.ParticipantId);
 			}
 
 			internal sealed override void OnRoomStatusChanged(NativeRealTimeRoom room)
@@ -470,9 +469,7 @@ namespace GooglePlayGames.Native
 
 			internal sealed override List<Participant> GetConnectedParticipants()
 			{
-				List<Participant> list = (from p in mParticipants.Values
-				where p.IsConnectedToRoom
-				select p).ToList();
+				List<Participant> list = mParticipants.Values.Where((Participant p) => p.IsConnectedToRoom).ToList();
 				list.Sort();
 				return list;
 			}
@@ -756,34 +753,24 @@ namespace GooglePlayGames.Native
 					value.Dispose();
 				}
 				mNativeParticipants = dictionary;
-				mParticipants = (from p in mNativeParticipants.Values
-				select p.AsParticipant()).ToDictionary((Participant p) => p.ParticipantId);
-				Logger.d("Updated participant statuses: " + string.Join(",", (from p in mParticipants.Values
-				select p.ToString()).ToArray()));
+				mParticipants = mNativeParticipants.Values.Select((GooglePlayGames.Native.PInvoke.MultiplayerParticipant p) => p.AsParticipant()).ToDictionary((Participant p) => p.ParticipantId);
+				Logger.d("Updated participant statuses: " + string.Join(",", mParticipants.Values.Select((Participant p) => p.ToString()).ToArray()));
 				if (list2.Contains(GetSelf().ParticipantId))
 				{
 					Logger.w("Player was disconnected from the multiplayer session.");
 				}
 				string selfId = GetSelf().ParticipantId;
-				list = (from peerId in list
-				where !peerId.Equals(selfId)
-				select peerId).ToList();
-				list2 = (from peerId in list2
-				where !peerId.Equals(selfId)
-				select peerId).ToList();
+				list = list.Where((string peerId) => !peerId.Equals(selfId)).ToList();
+				list2 = list2.Where((string peerId) => !peerId.Equals(selfId)).ToList();
 				if (list.Count > 0)
 				{
 					list.Sort();
-					mSession.OnGameThreadListener().PeersConnected((from peer in list
-					where !peer.Equals(selfId)
-					select peer).ToArray());
+					mSession.OnGameThreadListener().PeersConnected(list.Where((string peer) => !peer.Equals(selfId)).ToArray());
 				}
 				if (list2.Count > 0)
 				{
 					list2.Sort();
-					mSession.OnGameThreadListener().PeersDisconnected((from peer in list2
-					where !peer.Equals(selfId)
-					select peer).ToArray());
+					mSession.OnGameThreadListener().PeersDisconnected(list2.Where((string peer) => !peer.Equals(selfId)).ToArray());
 				}
 			}
 
@@ -990,8 +977,7 @@ namespace GooglePlayGames.Native
 				{
 					mCurrentSession = newRoom;
 					mCurrentSession.ShowingUI = true;
-					RealtimeRoomConfig config;
-					GooglePlayGames.Native.PInvoke.RealTimeEventListenerHelper helper;
+					GooglePlayGames.Native.PInvoke.RealTimeEventListenerHelper helper = default(GooglePlayGames.Native.PInvoke.RealTimeEventListenerHelper);
 					mRealtimeManager.ShowPlayerSelectUI(minOpponents, maxOppponents, allowAutomatching: true, delegate(PlayerSelectUIResponse response)
 					{
 						mCurrentSession.ShowingUI = false;
@@ -1007,7 +993,7 @@ namespace GooglePlayGames.Native
 							{
 								realtimeRoomConfigBuilder.SetVariant(variant);
 								realtimeRoomConfigBuilder.PopulateFromUIResponse(response);
-								config = realtimeRoomConfigBuilder.Build();
+								RealtimeRoomConfig config = realtimeRoomConfigBuilder.Build();
 								try
 								{
 									helper = HelperForSession(newRoom);
@@ -1139,7 +1125,7 @@ namespace GooglePlayGames.Native
 				else
 				{
 					mCurrentSession = newRoom;
-					GooglePlayGames.Native.PInvoke.RealTimeEventListenerHelper helper;
+					GooglePlayGames.Native.PInvoke.RealTimeEventListenerHelper helper = default(GooglePlayGames.Native.PInvoke.RealTimeEventListenerHelper);
 					mRealtimeManager.FetchInvitations(delegate(RealtimeManager.FetchInvitationsResponse response)
 					{
 						if (!response.RequestSucceeded())
@@ -1260,7 +1246,11 @@ namespace GooglePlayGames.Native
 
 		private static T WithDefault<T>(T presented, T defaultValue) where T : class
 		{
-			return (presented == null) ? defaultValue : presented;
+			if (presented == null)
+			{
+				return defaultValue;
+			}
+			return presented;
 		}
 	}
 }

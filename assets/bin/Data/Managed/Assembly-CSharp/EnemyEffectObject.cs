@@ -22,11 +22,6 @@ public class EnemyEffectObject : MonoBehaviour
 
 	public string UniqueName => m_uniqueName;
 
-	public EnemyEffectObject()
-		: this()
-	{
-	}
-
 	public void Initialize(Enemy enemy, EnemyRegionWork regionWork, int deleteCondition, string uniqueName)
 	{
 		m_targetEnemy = enemy;
@@ -42,7 +37,7 @@ public class EnemyEffectObject : MonoBehaviour
 			m_targetEnemy.OnNotifyDeleteEnemyEffect(this);
 			m_targetEnemy = null;
 		}
-		EffectManager.ReleaseEffect(this.get_gameObject());
+		EffectManager.ReleaseEffect(base.gameObject);
 		m_isDeleted = true;
 	}
 

@@ -34,25 +34,15 @@ public class SimplePingPongAlpha : MonoBehaviour
 
 	private float addValue;
 
-	private Color color = default(Color);
-
-	public SimplePingPongAlpha()
-		: this()
-	{
-	}//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-	//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-
+	private Color color;
 
 	public void Initialize()
 	{
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
 		if (state == eState.None)
 		{
 			from = LimitValue(from);
 			to = LimitValue(to);
-			addValue = ((sec != 0f) ? ((to - from) / sec) : 0f);
+			addValue = ((sec == 0f) ? 0f : ((to - from) / sec));
 			color = target.color;
 			state = eState.Idle;
 		}
@@ -74,7 +64,7 @@ public class SimplePingPongAlpha : MonoBehaviour
 		}
 		nowCount = 0;
 		state = eState.Forward;
-		target.get_gameObject().SetActive(true);
+		target.gameObject.SetActive(value: true);
 	}
 
 	private void Update()
@@ -83,7 +73,7 @@ public class SimplePingPongAlpha : MonoBehaviour
 		{
 			return;
 		}
-		float value = addValue * Time.get_deltaTime();
+		float value = addValue * Time.deltaTime;
 		if (state == eState.Forward)
 		{
 			if (AddValue(value))
@@ -101,7 +91,7 @@ public class SimplePingPongAlpha : MonoBehaviour
 			{
 				if (endDisable)
 				{
-					target.get_gameObject().SetActive(false);
+					target.gameObject.SetActive(value: false);
 				}
 				state = eState.Idle;
 			}
@@ -114,17 +104,14 @@ public class SimplePingPongAlpha : MonoBehaviour
 
 	private void SetValue(float value)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		color.a = value;
 		target.color = color;
 	}
 
 	private bool AddValue(float value)
 	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		bool result = false;
-		ref Color reference = ref color;
-		reference.a += value;
+		color.a += value;
 		if (color.a >= to)
 		{
 			color.a = to;
@@ -136,10 +123,8 @@ public class SimplePingPongAlpha : MonoBehaviour
 
 	private bool SubValue(float value)
 	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		bool result = false;
-		ref Color reference = ref color;
-		reference.a -= value;
+		color.a -= value;
 		if (color.a <= from)
 		{
 			color.a = from;

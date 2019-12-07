@@ -31,18 +31,17 @@ public class UIPlaySound : MonoBehaviour
 	{
 		get
 		{
-			if (!this.get_enabled())
+			if (!base.enabled)
 			{
 				return false;
 			}
-			UIButton component = this.GetComponent<UIButton>();
-			return component == null || component.isEnabled;
+			UIButton component = GetComponent<UIButton>();
+			if (!(component == null))
+			{
+				return component.isEnabled;
+			}
+			return true;
 		}
-	}
-
-	public UIPlaySound()
-		: this()
-	{
 	}
 
 	private void OnEnable()

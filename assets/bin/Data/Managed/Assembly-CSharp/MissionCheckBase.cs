@@ -4,10 +4,6 @@ public class MissionCheckBase
 
 	protected int missionParam;
 
-	protected MissionCheckBase()
-	{
-	}
-
 	public static MissionCheckBase CreateMissionCheck(QuestTable.MissionTableData data)
 	{
 		MissionCheckBase missionCheckBase = null;
@@ -56,6 +52,10 @@ public class MissionCheckBase
 		}
 		missionCheckBase.Initialize(data.missionRequire, data.missionParam);
 		return missionCheckBase;
+	}
+
+	protected MissionCheckBase()
+	{
 	}
 
 	protected virtual void Initialize(MISSION_REQUIRE require, int param)

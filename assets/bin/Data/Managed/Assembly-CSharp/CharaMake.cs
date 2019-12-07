@@ -188,58 +188,19 @@ public class CharaMake : GameSection
 
 	public static void GetCameraPosRot(out Vector3 cam_pos, out Vector3 cam_zoom_pos, out Vector3 cam_rot, bool is_non_title_scene)
 	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
 		cam_pos = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.mainCameraPos;
 		cam_rot = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.mainCameraRot;
 		cam_zoom_pos = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.zoomCameraPos;
 		if (is_non_title_scene)
 		{
 			float num = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.playerRot;
-			float num2 = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaEditScene.playerRot;
-			float num3 = num2 - num;
-			Vector3 val = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaEditScene.playerPos;
-			Vector3 val2 = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.playerPos;
-			Quaternion val3 = Quaternion.AngleAxis(num3, Vector3.get_up());
-			cam_pos = val3 * (cam_pos - val2) + val;
-			cam_zoom_pos = val3 * (cam_zoom_pos - val2) + val;
-			Quaternion val4 = Quaternion.AngleAxis(num3, Vector3.get_up()) * Quaternion.Euler(cam_rot);
-			cam_rot = val4.get_eulerAngles();
+			float angle = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaEditScene.playerRot - num;
+			Vector3 b = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaEditScene.playerPos;
+			Vector3 b2 = MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.playerPos;
+			Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.up);
+			cam_pos = rotation * (cam_pos - b2) + b;
+			cam_zoom_pos = rotation * (cam_zoom_pos - b2) + b;
+			cam_rot = (Quaternion.AngleAxis(angle, Vector3.up) * Quaternion.Euler(cam_rot)).eulerAngles;
 		}
 	}
 
@@ -255,7 +216,7 @@ public class CharaMake : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private void GetEditType(object[] event_data)
@@ -275,7 +236,7 @@ public class CharaMake : GameSection
 			{
 				yield return null;
 			}
-			Object.Destroy(MonoBehaviourSingleton<PredownloadManager>.I);
+			UnityEngine.Object.Destroy(MonoBehaviourSingleton<PredownloadManager>.I);
 		}
 		int i = 0;
 		for (int num = lists.Length; i < num; i++)
@@ -284,7 +245,7 @@ public class CharaMake : GameSection
 		}
 		if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.NeedCharaMakeModelAnchor)
 		{
-			UIWidget component = base.GetComponent<UIWidget>((Enum)UI.TEX_MODEL);
+			UIWidget component = GetComponent<UIWidget>(UI.TEX_MODEL);
 			if (component != null)
 			{
 				DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
@@ -295,14 +256,14 @@ public class CharaMake : GameSection
 				component.UpdateAnchors();
 			}
 		}
-		object[] event_data = GameSection.GetEventData() as object[];
-		if (event_data != null)
+		object[] array = GameSection.GetEventData() as object[];
+		if (array != null)
 		{
 			nonFirstCharaMake = true;
 			isTermsEnable = true;
-			UserInfo userInfo = event_data[0] as UserInfo;
-			UserStatus userStatus = event_data[1] as UserStatus;
-			GetEditType(event_data);
+			UserInfo userInfo = array[0] as UserInfo;
+			UserStatus userStatus = array[1] as UserStatus;
+			GetEditType(array);
 			sexID = userStatus.sex;
 			lists[0].index = FaceTypeToIndex(userStatus.faceId);
 			skinColorID = userStatus.skinId;
@@ -328,25 +289,25 @@ public class CharaMake : GameSection
 			shadow = PlayerLoader.CreateShadow(MonoBehaviourSingleton<StageManager>.I.stageObject, fixedY0: false);
 			if (shadow != null)
 			{
-				shadow.set_position(playerPos + new Vector3(0f, 0.005f, 0f));
+				shadow.position = playerPos + new Vector3(0f, 0.005f, 0f);
 			}
 		}
 		LoadingQueue load_queue = new LoadingQueue(this);
 		ResourceManager.enableCache = false;
-		int voice_type_count = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVoiceTypeCount;
+		int playerVoiceTypeCount = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVoiceTypeCount;
 		voices = new LoadObject[2][];
 		for (int j = 0; j < 2; j++)
 		{
-			voices[j] = new LoadObject[voice_type_count];
-			for (int k = 0; k < voice_type_count; k++)
+			voices[j] = new LoadObject[playerVoiceTypeCount];
+			for (int k = 0; k < playerVoiceTypeCount; k++)
 			{
 				int num2 = VOICE_ID_CANDIDATE.Length;
-				string[] array = new string[num2];
+				string[] array2 = new string[num2];
 				for (int l = 0; l < num2; l++)
 				{
-					array[l] = ResourceName.GetActionVoiceName(j, k, VOICE_ID_CANDIDATE[l]);
+					array2[l] = ResourceName.GetActionVoiceName(j, k, VOICE_ID_CANDIDATE[l]);
 				}
-				voices[j][k] = load_queue.Load(RESOURCE_CATEGORY.SOUND_VOICE, ResourceName.GetActionVoicePackageName(j, k), array);
+				voices[j][k] = load_queue.Load(RESOURCE_CATEGORY.SOUND_VOICE, ResourceName.GetActionVoicePackageName(j, k), array2);
 			}
 		}
 		ResourceManager.enableCache = true;
@@ -359,16 +320,15 @@ public class CharaMake : GameSection
 		skinColorScroll = GetCtrl(UI.SCR_SKIN_COLOR_LIST).GetComponent<UIScrollView>();
 		if (IsNeedScrollSkinColor())
 		{
-			UIGrid component2 = GetCtrl(UI.GRD_SKIN_COLOR_LIST).GetComponent<UIGrid>();
-			component2.pivot = UIWidget.Pivot.Left;
+			GetCtrl(UI.GRD_SKIN_COLOR_LIST).GetComponent<UIGrid>().pivot = UIWidget.Pivot.Left;
 		}
-		SetGrid(item_num: hasVisuals.hasHairColorIndexes.Length, grid_ctrl_enum: UI.GRD_HAIR_COLOR_LIST, item_prefab_name: null, reset: true, create_item_func: CreateColorItem, item_init_func: InitHairColorItem);
+		int item_num2 = hasVisuals.hasHairColorIndexes.Length;
+		SetGrid(UI.GRD_HAIR_COLOR_LIST, null, item_num2, reset: true, CreateColorItem, InitHairColorItem);
 		SelectHairColor(hairColorID);
 		hairColorScroll = GetCtrl(UI.SCR_HAIR_COLOR_LIST).GetComponent<UIScrollView>();
 		if (IsNeedScrollHairColor())
 		{
-			UIGrid component3 = GetCtrl(UI.GRD_HAIR_COLOR_LIST).GetComponent<UIGrid>();
-			component3.pivot = UIWidget.Pivot.Left;
+			GetCtrl(UI.GRD_HAIR_COLOR_LIST).GetComponent<UIGrid>().pivot = UIWidget.Pivot.Left;
 		}
 		LoadModel();
 		while ((playerLoader != null && playerLoader.isLoading) || load_queue.IsLoading())
@@ -390,75 +350,32 @@ public class CharaMake : GameSection
 			}
 		}
 		ResetLayout();
-		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 1)
-		{
-		}
+		_ = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep;
+		_ = 1;
 		base.Initialize();
 	}
 
 	private void ResetLayout()
 	{
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
 		if (editType == EDIT_TYPE.Name)
 		{
-			SetActive((Enum)UI.OBJ_INPUT_NAME_GG, is_visible: false);
-			GetCtrl(UI.OBJ_PAGE_BUTTONS).get_gameObject().SetActive(false);
-			GetCtrl(UI.SPR_PAGE_CURSOR).get_gameObject().SetActive(false);
-			GetCtrl(UI.CharaLine).get_gameObject().SetActive(false);
+			SetActive(UI.OBJ_INPUT_NAME_GG, is_visible: false);
+			GetCtrl(UI.OBJ_PAGE_BUTTONS).gameObject.SetActive(value: false);
+			GetCtrl(UI.SPR_PAGE_CURSOR).gameObject.SetActive(value: false);
+			GetCtrl(UI.CharaLine).gameObject.SetActive(value: false);
 			MovePage(4);
 		}
 		else if (editType == EDIT_TYPE.Appearance)
 		{
-			SetActive((Enum)UI.OBJ_INPUT_NAME_GG, is_visible: false);
+			SetActive(UI.OBJ_INPUT_NAME_GG, is_visible: false);
 			Transform ctrl = GetCtrl(UI.SelectGender);
-			Vector3 localPosition = ctrl.get_localPosition();
-			float x = localPosition.x;
-			Vector3 localPosition2 = ctrl.get_localPosition();
-			float num = localPosition2.y - 90f;
-			Vector3 localPosition3 = ctrl.get_localPosition();
-			Vector3 localPosition4 = default(Vector3);
-			localPosition4._002Ector(x, num, localPosition3.z);
-			ctrl.set_localPosition(localPosition4);
+			Vector3 vector2 = ctrl.localPosition = new Vector3(ctrl.localPosition.x, ctrl.localPosition.y - 90f, ctrl.localPosition.z);
 			Transform ctrl2 = GetCtrl(UI.OBJ_GENDERS_ON);
-			Vector3 localPosition5 = ctrl2.get_localPosition();
-			float x2 = localPosition5.x;
-			Vector3 localPosition6 = ctrl2.get_localPosition();
-			float num2 = localPosition6.y - 90f;
-			Vector3 localPosition7 = ctrl2.get_localPosition();
-			Vector3 localPosition8 = default(Vector3);
-			localPosition8._002Ector(x2, num2, localPosition7.z);
-			ctrl2.set_localPosition(localPosition8);
+			Vector3 vector4 = ctrl2.localPosition = new Vector3(ctrl2.localPosition.x, ctrl2.localPosition.y - 90f, ctrl2.localPosition.z);
 			Transform ctrl3 = GetCtrl(UI.OBJ_GENDERS_OFF);
-			Vector3 localPosition9 = ctrl3.get_localPosition();
-			float x3 = localPosition9.x;
-			Vector3 localPosition10 = ctrl3.get_localPosition();
-			float num3 = localPosition10.y - 90f;
-			Vector3 localPosition11 = ctrl3.get_localPosition();
-			Vector3 localPosition12 = default(Vector3);
-			localPosition12._002Ector(x3, num3, localPosition11.z);
-			ctrl3.set_localPosition(localPosition12);
+			Vector3 vector6 = ctrl3.localPosition = new Vector3(ctrl3.localPosition.x, ctrl3.localPosition.y - 90f, ctrl3.localPosition.z);
 		}
-		GetCtrl(UI.BTN_BACK).get_gameObject().SetActive(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep > 2);
+		GetCtrl(UI.BTN_BACK).gameObject.SetActive(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep > 2);
 	}
 
 	protected override void OnDestroy()
@@ -466,7 +383,7 @@ public class CharaMake : GameSection
 		base.OnDestroy();
 		if (shadow != null)
 		{
-			Object.DestroyImmediate(shadow.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(shadow.gameObject);
 			shadow = null;
 		}
 	}
@@ -475,11 +392,11 @@ public class CharaMake : GameSection
 	{
 		if (nonFirstCharaMake)
 		{
-			SetSprite((Enum)UI.SPR_FRAME, "CharacterEdit");
+			SetSprite(UI.SPR_FRAME, "CharacterEdit");
 		}
 		Transform ctrl = GetCtrl(UI.OBJ_PAGE_BUTTONS);
 		int i = 0;
-		for (int childCount = ctrl.get_childCount(); i < childCount; i++)
+		for (int childCount = ctrl.childCount; i < childCount; i++)
 		{
 			Transform child = ctrl.GetChild(i);
 			SetEvent(child, "MOVE_PAGE", i);
@@ -487,7 +404,7 @@ public class CharaMake : GameSection
 			SetActive(child, UI.SPR_OFF, i != (int)page);
 		}
 		SetCellWidth(UI.GRD_PAGES, MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth, reposition: true);
-		SetCenter((Enum)UI.GRD_PAGES, (int)page, is_instant: false);
+		SetCenter(UI.GRD_PAGES, (int)page);
 		UpdateLists();
 		SetToggleGroup(UI.OBJ_GENDERS_ON, UI.OBJ_GENDERS_OFF, sexID, "SEX");
 		SetToggleGroup(UI.OBJ_SKIN_COLORS_ON, UI.OBJ_SKIN_COLORS_OFF, skinColorID, "SKIN_COLOR");
@@ -497,12 +414,12 @@ public class CharaMake : GameSection
 		if (editType == EDIT_TYPE.Name)
 		{
 			SetInput(UI.IPT_NAME, base.sectionData.GetText("DEFAULT_NAME_TEXT"), 14, OnChangeName);
-			inputName = base.GetComponent<UINameInput>((Enum)UI.IPT_NAME);
+			inputName = GetComponent<UINameInput>(UI.IPT_NAME);
 		}
 		else
 		{
 			SetInput(UI.IPT_NAME_GG, base.sectionData.GetText("DEFAULT_NAME_TEXT"), 14, OnChangeName);
-			inputName = base.GetComponent<UINameInput>((Enum)UI.IPT_NAME_GG);
+			inputName = GetComponent<UINameInput>(UI.IPT_NAME_GG);
 		}
 		inputName.CreateCaret(is_enable: true);
 		bool value = false;
@@ -512,10 +429,8 @@ public class CharaMake : GameSection
 			OnChangeName();
 			if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
 			{
-				DateTime now = TimeManager.GetNow();
-				if (!DateTime.TryParse(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.editNameAt.date, out DateTime _))
-				{
-				}
+				TimeManager.GetNow();
+				DateTime.TryParse(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.editNameAt.date, out DateTime _);
 			}
 			defaultUserName = string.Empty;
 		}
@@ -524,69 +439,58 @@ public class CharaMake : GameSection
 			inputName.SetName("Colopl");
 			OnChangeName();
 		}
-		SetToggle((Enum)UI.TGL_INPUT_LIMITER, value);
-		SetLabelText((Enum)UI.STR_CHANGEABLE_STATUS2, base.sectionData.GetText("STR_CHANGEABLE_STATUS"));
+		SetToggle(UI.TGL_INPUT_LIMITER, value);
+		SetLabelText(UI.STR_CHANGEABLE_STATUS2, base.sectionData.GetText("STR_CHANGEABLE_STATUS"));
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep < 2)
 		{
-			SetActive((Enum)UI.TGL_VISIBLE_EQUIP_BUTTON, is_visible: false);
+			SetActive(UI.TGL_VISIBLE_EQUIP_BUTTON, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.TGL_VISIBLE_EQUIP_BUTTON, is_visible: true);
-			SetToggleButton((Enum)UI.TGL_VISIBLE_EQUIP_BUTTON, isShowMyEquip, (Action<bool>)delegate(bool is_active)
+			SetActive(UI.TGL_VISIBLE_EQUIP_BUTTON, is_visible: true);
+			SetToggleButton(UI.TGL_VISIBLE_EQUIP_BUTTON, isShowMyEquip, delegate(bool is_active)
 			{
 				isShowMyEquip = is_active;
 				LoadModel();
 			});
 		}
-		SetActive((Enum)UI.TERMS_OF_SERVICE, !nonFirstCharaMake);
-		SetActive((Enum)UI.SPR_CHECK, isTermsEnable);
-		SetActive((Enum)UI.SPR_CHECK_OFF, !isTermsEnable);
+		SetActive(UI.TERMS_OF_SERVICE, !nonFirstCharaMake);
+		SetActive(UI.SPR_CHECK, isTermsEnable);
+		SetActive(UI.SPR_CHECK_OFF, !isTermsEnable);
 		LoadModel();
 	}
 
 	private void LateUpdate()
 	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 		if (cameraAnim.IsPlaying())
 		{
-			MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_position(cameraAnim.Update());
+			MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.position = cameraAnim.Update();
 		}
 		if (playerRotAnim.IsPlaying() && playerLoader != null)
 		{
-			playerLoader.get_transform().set_rotation(playerRotAnim.Update());
+			playerLoader.transform.rotation = playerRotAnim.Update();
 		}
 	}
 
 	private void SetSpriteColors(UI ctrl, Color[] colors)
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl2 = GetCtrl(ctrl);
 		if (ctrl2 == null)
 		{
 			return;
 		}
 		int i = 0;
-		for (int childCount = ctrl2.get_childCount(); i < childCount; i++)
+		for (int childCount = ctrl2.childCount; i < childCount; i++)
 		{
-			Color val = colors[i];
+			Color color = colors[i];
 			Transform child = ctrl2.GetChild(i);
-			SetColor(ctrl2.GetChild(i), val);
-			UIButton component = base.GetComponent<UIButton>(child);
+			SetColor(ctrl2.GetChild(i), color);
+			UIButton component = GetComponent<UIButton>(child);
 			if (component != null)
 			{
-				component.hover = val;
-				component.pressed = val;
-				component.disabledColor = val;
+				component.hover = color;
+				component.pressed = color;
+				component.disabledColor = color;
 			}
 		}
 	}
@@ -597,37 +501,37 @@ public class CharaMake : GameSection
 		Transform ctrl = GetCtrl(ui);
 		if (ctrl != null)
 		{
-			Transform val = ctrl.Find("CharaMakeList");
-			if (val != null)
+			Transform transform = ctrl.Find("CharaMakeList");
+			if (transform != null)
 			{
-				val.get_gameObject().set_name("CharaMakeList_Destroy");
-				Object.Destroy(val.get_gameObject());
+				transform.gameObject.name = "CharaMakeList_Destroy";
+				UnityEngine.Object.Destroy(transform.gameObject);
 			}
 		}
-		Transform val2 = SetPrefab((Enum)ui, "CharaMakeList");
-		SetEvent(val2, UI.BTN_LIST_PREV, "LIST_PREV", (int)ui);
-		SetEvent(val2, UI.BTN_LIST_NEXT, "LIST_NEXT", (int)ui);
-		SetGrid(val2, UI.GRD_LIST, "CharaMakeListItem", item_num, reset: false, delegate(int i, Transform c, bool b)
+		Transform transform2 = SetPrefab(ui, "CharaMakeList");
+		SetEvent(transform2, UI.BTN_LIST_PREV, "LIST_PREV", (int)ui);
+		SetEvent(transform2, UI.BTN_LIST_NEXT, "LIST_NEXT", (int)ui);
+		SetGrid(transform2, UI.GRD_LIST, "CharaMakeListItem", item_num, reset: false, delegate(int i, Transform c, bool b)
 		{
 			cb(i, c);
 		});
-		SetCenterOnChildFunc(val2, UI.GRD_LIST, OnCenterListItem);
-		SetCenter(val2, UI.GRD_LIST, listInfo.index);
-		listInfo.tansform = val2.get_parent();
+		SetCenterOnChildFunc(transform2, UI.GRD_LIST, OnCenterListItem);
+		SetCenter(transform2, UI.GRD_LIST, listInfo.index);
+		listInfo.tansform = transform2.parent;
 		listInfo.max = item_num;
 	}
 
 	private void UpdateLists()
 	{
 		GlobalSettingsManager.HasVisuals hasVisuals = MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals;
-		int item_num = (!IsWoman()) ? hasVisuals.hasManFaceIndexes.Length : hasVisuals.hasWomanFaceIndexes.Length;
+		int item_num = IsWoman() ? hasVisuals.hasWomanFaceIndexes.Length : hasVisuals.hasManFaceIndexes.Length;
 		SetList(LIST.FACETYPE, UI.OBJ_LIST_FACETYPE, item_num, delegate(int i, Transform c)
 		{
 			int faceIndex = hasVisuals.GetFaceIndex(IsWoman(), i);
 			string faceName = Singleton<AvatarTable>.I.GetFaceName(IsWoman(), faceIndex);
 			SetLabelText(c, UI.LBL_LISTITEM, faceName);
 		});
-		int item_num2 = (!IsWoman()) ? hasVisuals.hasManHeadIndexes.Length : hasVisuals.hasWomanHeadIndexes.Length;
+		int item_num2 = IsWoman() ? hasVisuals.hasWomanHeadIndexes.Length : hasVisuals.hasManHeadIndexes.Length;
 		SetList(LIST.HAIRSTYLE, UI.OBJ_LIST_HAIRSTYLE, item_num2, delegate(int i, Transform c)
 		{
 			int headIndex = hasVisuals.GetHeadIndex(IsWoman(), i);
@@ -643,7 +547,7 @@ public class CharaMake : GameSection
 		if (!(ctrl == null) && !(ctrl2 == null))
 		{
 			int i = 0;
-			for (int childCount = ctrl.get_childCount(); i < childCount; i++)
+			for (int childCount = ctrl.childCount; i < childCount; i++)
 			{
 				string text = StringTable.Get(STRING_CATEGORY.CHARA_MAKE, (uint)(30000 + 1000 * sexID + i));
 				Transform child = ctrl.GetChild(i);
@@ -663,21 +567,21 @@ public class CharaMake : GameSection
 			return;
 		}
 		int i = 0;
-		for (int childCount = ctrl.get_childCount(); i < childCount; i++)
+		for (int childCount = ctrl.childCount; i < childCount; i++)
 		{
-			ctrl.GetChild(i).get_gameObject().SetActive(i == value);
+			ctrl.GetChild(i).gameObject.SetActive(i == value);
 			Transform child = ctrl2.GetChild(i);
 			if (event_name != null)
 			{
 				SetEvent(child, event_name, i);
 			}
-			child.get_gameObject().SetActive(i != value);
+			child.gameObject.SetActive(i != value);
 		}
 	}
 
 	private void LoadModel()
 	{
-		DeleteRenderTexture((Enum)UI.TEX_MODEL);
+		DeleteRenderTexture(UI.TEX_MODEL);
 		int sex = sexID;
 		int face_type_id = IndexToFaceType(lists[0].index);
 		int skin_color_id = skinColorID;
@@ -700,40 +604,23 @@ public class CharaMake : GameSection
 		{
 			SetDefultEquip(playerLoadInfo, sex);
 		}
-		int num2 = -1;
+		int use_hair_overlay = -1;
 		if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid())
 		{
-			num2 = ((!MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.isChangeHairShader) ? (-1) : num);
+			use_hair_overlay = (MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.isChangeHairShader ? num : (-1));
 		}
 		InitRenderTexture(UI.TEX_MODEL, 0f, link_main_camera: true);
-		playerLoader = GetRenderTextureModelTransform(UI.TEX_MODEL).get_gameObject().AddComponent<PlayerLoader>();
-		PlayerLoader obj = playerLoader;
-		PlayerLoadInfo player_load_info = playerLoadInfo;
-		int layer = playerLoader.get_gameObject().get_layer();
-		int anim_id = 98;
-		bool need_anim_event = false;
-		bool need_foot_stamp = false;
-		bool need_shadow = false;
-		bool enable_light_probes = !nonFirstCharaMake;
-		bool need_action_voice = false;
-		bool need_high_reso_tex = false;
-		bool need_res_ref_count = false;
-		bool need_dev_frame_instantiate = true;
-		SHADER_TYPE shader_type = SHADER_TYPE.NORMAL;
-		PlayerLoader.OnCompleteLoad callback = delegate
+		playerLoader = GetRenderTextureModelTransform(UI.TEX_MODEL).gameObject.AddComponent<PlayerLoader>();
+		playerLoader.StartLoad(playerLoadInfo, playerLoader.gameObject.layer, 98, need_anim_event: false, need_foot_stamp: false, need_shadow: false, !nonFirstCharaMake, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: false, need_dev_frame_instantiate: true, SHADER_TYPE.NORMAL, delegate
 		{
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			if (!(playerLoader.animator == null))
 			{
-				playerLoader.get_transform().set_position(playerPos);
-				playerLoader.get_transform().set_eulerAngles(new Vector3(0f, playerRot, 0f));
-				PlayerAnimCtrl.Get(playerLoader.animator, (sex != 0) ? PLCA.IDLE_01_F : PLCA.IDLE_01);
+				playerLoader.transform.position = playerPos;
+				playerLoader.transform.eulerAngles = new Vector3(0f, playerRot, 0f);
+				PlayerAnimCtrl.Get(playerLoader.animator, (sex == 0) ? PLCA.IDLE_01 : PLCA.IDLE_01_F);
 				EnableRenderTexture(UI.TEX_MODEL);
 			}
-		};
-		int use_hair_overlay = num2;
-		obj.StartLoad(player_load_info, layer, anim_id, need_anim_event, need_foot_stamp, need_shadow, enable_light_probes, need_action_voice, need_high_reso_tex, need_res_ref_count, need_dev_frame_instantiate, shader_type, callback, enable_eye_blick: true, use_hair_overlay);
+		}, enable_eye_blick: true, use_hair_overlay);
 	}
 
 	private void SetDefultEquip(PlayerLoadInfo load_info, int sex)
@@ -746,23 +633,17 @@ public class CharaMake : GameSection
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		if (!(playerLoader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && page != PAGE.CONFIRM)
 		{
-			playerLoader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
-			Vector3 eulerAngles = playerLoader.get_transform().get_eulerAngles();
-			playerRot = eulerAngles.y;
+			playerLoader.transform.Rotate(GameDefine.GetCharaRotateVector(touch_info));
+			playerRot = playerLoader.transform.eulerAngles.y;
 		}
 	}
 
 	private void OnCenterListItem(GameObject go)
 	{
-		int n = int.Parse(go.get_name());
-		Transform t = go.get_transform().get_parent().get_parent()
-			.get_parent()
-			.get_parent();
+		int n = int.Parse(go.name);
+		Transform t = go.transform.parent.parent.parent.parent;
 		ListInfo listInfo = Array.Find(lists, (ListInfo o) => o.tansform == t);
 		ChangeValue(ref listInfo.index, n);
 	}
@@ -785,21 +666,19 @@ public class CharaMake : GameSection
 
 	private void OnChangeName()
 	{
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
 		string inputNameGG = GetInputNameGG();
-		inputNameGG = inputNameGG.Replace(" ", string.Empty);
-		inputNameGG = inputNameGG.Replace("\u3000", string.Empty);
+		inputNameGG = inputNameGG.Replace(" ", "");
+		inputNameGG = inputNameGG.Replace("\u3000", "");
 		if (inputNameGG.Length == 0)
 		{
 			if (inputName != null)
 			{
 				inputName.InActiveName();
 			}
-			SetColor((Enum)UI.LBL_CONFIRM_NAME, Color.get_red());
-			SetLabelText((Enum)UI.LBL_CONFIRM_NAME, base.sectionData.GetText("NO_NAME"));
-			SetActive((Enum)UI.BTN_YES, is_visible: false);
-			SetActive((Enum)UI.BTN_YES_OFF, is_visible: true);
+			SetColor(UI.LBL_CONFIRM_NAME, Color.red);
+			SetLabelText(UI.LBL_CONFIRM_NAME, base.sectionData.GetText("NO_NAME"));
+			SetActive(UI.BTN_YES, is_visible: false);
+			SetActive(UI.BTN_YES_OFF, is_visible: true);
 			return;
 		}
 		if (inputName != null)
@@ -807,17 +686,17 @@ public class CharaMake : GameSection
 			inputName.ActiveName();
 			inputName.SetName(inputNameGG);
 		}
-		SetColor((Enum)UI.LBL_CONFIRM_NAME, Color.get_white());
-		SetLabelText((Enum)UI.LBL_CONFIRM_NAME, inputNameGG);
+		SetColor(UI.LBL_CONFIRM_NAME, Color.white);
+		SetLabelText(UI.LBL_CONFIRM_NAME, inputNameGG);
 		if (isTermsEnable)
 		{
-			SetActive((Enum)UI.BTN_YES, is_visible: true);
-			SetActive((Enum)UI.BTN_YES_OFF, is_visible: false);
+			SetActive(UI.BTN_YES, is_visible: true);
+			SetActive(UI.BTN_YES_OFF, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_YES, is_visible: false);
-			SetActive((Enum)UI.BTN_YES_OFF, is_visible: true);
+			SetActive(UI.BTN_YES, is_visible: false);
+			SetActive(UI.BTN_YES_OFF, is_visible: true);
 		}
 	}
 
@@ -852,8 +731,7 @@ public class CharaMake : GameSection
 
 	private void OnQuery_CONFIRM()
 	{
-		string inputNameGG = GetInputNameGG();
-		if (inputNameGG.Length == 0)
+		if (GetInputNameGG().Length == 0)
 		{
 			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "Please enter your character name."), delegate
 			{
@@ -958,14 +836,14 @@ public class CharaMake : GameSection
 			}
 			else
 			{
-				this.StartCoroutine(IECloseDialog());
+				StartCoroutine(IECloseDialog());
 			}
 		});
 	}
 
 	private IEnumerator IECloseDialog()
 	{
-		yield return (object)new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		GameSection.BackSection();
 	}
 
@@ -996,7 +874,7 @@ public class CharaMake : GameSection
 	{
 		if (page != (PAGE)n)
 		{
-			this.StartCoroutine(WaitForTrack(n));
+			StartCoroutine(WaitForTrack(n));
 		}
 	}
 
@@ -1016,48 +894,22 @@ public class CharaMake : GameSection
 
 	private void MovePageOld(int n)
 	{
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0276: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027c: Unknown result type (might be due to invalid IL or missing references)
 		if (page == (PAGE)n)
 		{
 			return;
 		}
 		PAGE pAGE = page;
 		page = (PAGE)n;
-		SetCenter((Enum)UI.GRD_PAGES, n, is_instant: false);
-		Vector3 val;
-		switch (page)
+		SetCenter(UI.GRD_PAGES, n);
+		PAGE pAGE2 = page;
+		Vector3 vector = ((uint)(pAGE2 - 1) <= 2u) ? zoomCameraPos : mainCameraPos;
+		if (cameraAnim.endValue != vector)
 		{
-		default:
-			val = mainCameraPos;
-			break;
-		case PAGE.FACE:
-		case PAGE.HAIR:
-		case PAGE.VOICE:
-			val = zoomCameraPos;
-			break;
-		}
-		if (cameraAnim.endValue != val)
-		{
-			cameraAnim.Set(0.5f, MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_position(), val);
+			cameraAnim.Set(0.5f, MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.position, vector);
 			cameraAnim.Play();
 		}
 		Transform child = GetCtrl(UI.OBJ_PAGE_BUTTONS).GetChild(n);
-		GetCtrl(UI.SPR_PAGE_CURSOR).set_position(child.get_position());
+		GetCtrl(UI.SPR_PAGE_CURSOR).position = child.position;
 		if (pAGE != PAGE.MAX)
 		{
 			Transform child2 = GetCtrl(UI.OBJ_PAGE_BUTTONS).GetChild((int)pAGE);
@@ -1069,12 +921,12 @@ public class CharaMake : GameSection
 		switch (page)
 		{
 		case PAGE.FACE:
-			skinColorScroll.set_enabled(IsNeedScrollSkinColor());
-			hairColorScroll.set_enabled(false);
+			skinColorScroll.enabled = IsNeedScrollSkinColor();
+			hairColorScroll.enabled = false;
 			break;
 		case PAGE.HAIR:
-			skinColorScroll.set_enabled(false);
-			hairColorScroll.set_enabled(IsNeedScrollHairColor());
+			skinColorScroll.enabled = false;
+			hairColorScroll.enabled = IsNeedScrollHairColor();
 			break;
 		}
 		switch (page)
@@ -1085,7 +937,7 @@ public class CharaMake : GameSection
 		default:
 			if (page == PAGE.VOICE)
 			{
-				this.StartCoroutine(DoVoiceChangePlayVoice());
+				StartCoroutine(DoVoiceChangePlayVoice());
 			}
 			break;
 		case PAGE.CONFIRM:
@@ -1093,7 +945,7 @@ public class CharaMake : GameSection
 			string inputNameGG = GetInputNameGG();
 			if (inputNameGG.Length == 0)
 			{
-				int num = Random.Range(0, MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.presetPlayerNameCount);
+				int num = UnityEngine.Random.Range(0, MonoBehaviourSingleton<OutGameSettingsManager>.I.charaMakeScene.presetPlayerNameCount);
 				inputNameGG = StringTable.Get(STRING_CATEGORY.CHARA_MAKE, (uint)(40000 + 1000 * sexID + num));
 				if (inputName != null)
 				{
@@ -1101,7 +953,7 @@ public class CharaMake : GameSection
 					OnChangeName();
 				}
 			}
-			playerRotAnim.Set(0.5f, playerLoader.get_transform().get_rotation(), Quaternion.AngleAxis(initPlayerRot, Vector3.get_up()));
+			playerRotAnim.Set(0.5f, playerLoader.transform.rotation, Quaternion.AngleAxis(initPlayerRot, Vector3.up));
 			playerRot = initPlayerRot;
 			playerRotAnim.Play();
 			break;
@@ -1111,7 +963,7 @@ public class CharaMake : GameSection
 
 	private IEnumerator DoVoiceChangePlayVoice()
 	{
-		yield return (object)new WaitForSeconds(0.25f);
+		yield return new WaitForSeconds(0.25f);
 		PlayDefaultVoice();
 	}
 
@@ -1124,18 +976,17 @@ public class CharaMake : GameSection
 		}
 		int num = sexID;
 		int num2 = voiceTypeID;
-		int num3 = num2;
-		if (num3 >= voices[num].Length)
+		if (num2 >= voices[num].Length)
 		{
-			num3 = 0;
+			num2 = 0;
 		}
-		LoadObject loadObject = voices[num][num3];
+		LoadObject loadObject = voices[num][num2];
 		if (loadObject != null && loadObject.loadedObjects[id] != null)
 		{
-			AudioClip val = loadObject.loadedObjects[id].obj as AudioClip;
-			if (val != null)
+			AudioClip audioClip = loadObject.loadedObjects[id].obj as AudioClip;
+			if (audioClip != null)
 			{
-				voiceAudioObject = SoundManager.PlayUISE(val, 1f, loop: false, null);
+				voiceAudioObject = SoundManager.PlayUISE(audioClip, 1f, loop: false, null);
 			}
 		}
 	}
@@ -1147,7 +998,7 @@ public class CharaMake : GameSection
 
 	private void PlayVoiceRandom()
 	{
-		int id = Random.Range(0, VOICE_ID_CANDIDATE.Length);
+		int id = UnityEngine.Random.Range(0, VOICE_ID_CANDIDATE.Length);
 		PlayVoice(id);
 	}
 
@@ -1196,15 +1047,14 @@ public class CharaMake : GameSection
 		}
 		if (num >= MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVoiceTypeCount)
 		{
-			num = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVoiceTypeCount - 1;
+			_ = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVoiceTypeCount;
 		}
 		GameSection.StayEvent();
 		SendEditFigure(delegate(bool is_success)
 		{
 			GameSection.ResumeEvent(is_success);
-			if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 2)
-			{
-			}
+			_ = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep;
+			_ = 2;
 			if (!nonFirstCharaMake)
 			{
 				int id = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
@@ -1229,13 +1079,13 @@ public class CharaMake : GameSection
 		requestSendForm.name = inputNameGG;
 		Protocol.Send(OptionCheckUniqueNameModel.URL, requestSendForm, delegate(OptionEditFigureModel ret)
 		{
-			bool flag = ret.Error == Error.None;
-			GameSection.ResumeEvent(flag);
-			if (flag)
+			bool num = ret.Error == Error.None;
+			GameSection.ResumeEvent(num);
+			if (num)
 			{
 				MovePage(nextPage);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendEditFigure(Action<bool> call_back)
@@ -1266,17 +1116,16 @@ public class CharaMake : GameSection
 				break;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	private void OnQuery_TERMS()
 	{
-		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 1)
-		{
-		}
+		_ = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep;
+		_ = 1;
 		isTermsEnable = !isTermsEnable;
-		SetActive((Enum)UI.SPR_CHECK, isTermsEnable);
-		SetActive((Enum)UI.SPR_CHECK_OFF, !isTermsEnable);
+		SetActive(UI.SPR_CHECK, isTermsEnable);
+		SetActive(UI.SPR_CHECK_OFF, !isTermsEnable);
 		OnChangeName();
 	}
 
@@ -1285,7 +1134,7 @@ public class CharaMake : GameSection
 		Transform ctrl = GetCtrl(ctrl_enum);
 		if (null != ctrl)
 		{
-			UIButtonEffect component = ctrl.get_gameObject().GetComponent<UIButtonEffect>();
+			UIButtonEffect component = ctrl.gameObject.GetComponent<UIButtonEffect>();
 			if (null != component)
 			{
 				component.ResetAnim();
@@ -1301,7 +1150,7 @@ public class CharaMake : GameSection
 			GameSectionHistory.HistoryData historyData = historyList[0];
 			for (int i = 0; i < historyList.Count; i++)
 			{
-				Debug.LogWarning((object)historyList[i].sceneName);
+				Debug.LogWarning(historyList[i].sceneName);
 			}
 			if (historyData.sceneName == "Smith")
 			{
@@ -1331,18 +1180,14 @@ public class CharaMake : GameSection
 
 	private Transform CreateColorItem(int index, Transform parent)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = ResourceUtility.Realizes(colorListItem, 5);
-		val.set_parent(parent);
-		val.set_localScale(Vector3.get_one());
-		return val;
+		Transform transform = ResourceUtility.Realizes(colorListItem, 5);
+		transform.parent = parent;
+		transform.localScale = Vector3.one;
+		return transform;
 	}
 
 	private void InitSkinColorItem(int index, Transform iTransform, bool isRecycle)
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 		UIScrollView component = GetCtrl(UI.SCR_HAIR_COLOR_LIST).GetComponent<UIScrollView>();
 		int num = MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals.hasSkinColorIndexes[index];
 		Color skinColor = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetSkinColor(num);
@@ -1353,10 +1198,8 @@ public class CharaMake : GameSection
 
 	private void SelectSkinColor(int id)
 	{
-		Transform ctrl = GetCtrl(UI.GRD_SKIN_COLOR_LIST);
-		CharaMakeColorListItem[] componentsInChildren = ctrl.GetComponentsInChildren<CharaMakeColorListItem>();
-		CharaMakeColorListItem[] array = componentsInChildren;
-		foreach (CharaMakeColorListItem charaMakeColorListItem in array)
+		CharaMakeColorListItem[] componentsInChildren = GetCtrl(UI.GRD_SKIN_COLOR_LIST).GetComponentsInChildren<CharaMakeColorListItem>();
+		foreach (CharaMakeColorListItem charaMakeColorListItem in componentsInChildren)
 		{
 			if (id == charaMakeColorListItem.id)
 			{
@@ -1371,9 +1214,6 @@ public class CharaMake : GameSection
 
 	private void InitHairColorItem(int index, Transform iTransform, bool isRecycle)
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 		UIScrollView component = GetCtrl(UI.SCR_HAIR_COLOR_LIST).GetComponent<UIScrollView>();
 		int num = MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals.hasHairColorIndexes[index];
 		Color hairColor = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetHairColor(num);
@@ -1384,10 +1224,8 @@ public class CharaMake : GameSection
 
 	private void SelectHairColor(int id)
 	{
-		Transform ctrl = GetCtrl(UI.GRD_HAIR_COLOR_LIST);
-		CharaMakeColorListItem[] componentsInChildren = ctrl.GetComponentsInChildren<CharaMakeColorListItem>();
-		CharaMakeColorListItem[] array = componentsInChildren;
-		foreach (CharaMakeColorListItem charaMakeColorListItem in array)
+		CharaMakeColorListItem[] componentsInChildren = GetCtrl(UI.GRD_HAIR_COLOR_LIST).GetComponentsInChildren<CharaMakeColorListItem>();
+		foreach (CharaMakeColorListItem charaMakeColorListItem in componentsInChildren)
 		{
 			if (id == charaMakeColorListItem.id)
 			{
@@ -1402,14 +1240,12 @@ public class CharaMake : GameSection
 
 	private bool IsNeedScrollSkinColor()
 	{
-		int num = MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals.hasSkinColorIndexes.Length;
-		return num > 12;
+		return MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals.hasSkinColorIndexes.Length > 12;
 	}
 
 	private bool IsNeedScrollHairColor()
 	{
-		int num = MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals.hasHairColorIndexes.Length;
-		return num > 12;
+		return MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals.hasHairColorIndexes.Length > 12;
 	}
 
 	private bool IsWoman()
@@ -1463,11 +1299,10 @@ public class CharaMake : GameSection
 	private int FaceTypeToIndex(int faceType)
 	{
 		GlobalSettingsManager.HasVisuals hasVisuals = MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals;
-		int[] array = (!IsWoman()) ? hasVisuals.hasManFaceIndexes : hasVisuals.hasWomanFaceIndexes;
+		int[] array = IsWoman() ? hasVisuals.hasWomanFaceIndexes : hasVisuals.hasManFaceIndexes;
 		for (int i = 0; i < array.Length; i++)
 		{
-			int num = array[i];
-			if (num == faceType)
+			if (array[i] == faceType)
 			{
 				return i;
 			}
@@ -1478,11 +1313,10 @@ public class CharaMake : GameSection
 	private int HeadToIndex(int head)
 	{
 		GlobalSettingsManager.HasVisuals hasVisuals = MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals;
-		int[] array = (!IsWoman()) ? hasVisuals.hasManHeadIndexes : hasVisuals.hasWomanHeadIndexes;
+		int[] array = IsWoman() ? hasVisuals.hasWomanHeadIndexes : hasVisuals.hasManHeadIndexes;
 		for (int i = 0; i < array.Length; i++)
 		{
-			int num = array[i];
-			if (num == head)
+			if (array[i] == head)
 			{
 				return i;
 			}
@@ -1492,38 +1326,36 @@ public class CharaMake : GameSection
 
 	private int IndexToFaceType(int index)
 	{
-		GlobalSettingsManager.HasVisuals hasVisuals = MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals;
-		return hasVisuals.GetFaceIndex(IsWoman(), index);
+		return MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals.GetFaceIndex(IsWoman(), index);
 	}
 
 	private int IndexToHead(int index)
 	{
-		GlobalSettingsManager.HasVisuals hasVisuals = MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals;
-		return hasVisuals.GetHeadIndex(IsWoman(), index);
+		return MonoBehaviourSingleton<GlobalSettingsManager>.I.hasVisuals.GetHeadIndex(IsWoman(), index);
 	}
 
 	private string GetInputNameGG()
 	{
 		if (editType == EDIT_TYPE.Name)
 		{
-			return GetInputValue((Enum)UI.IPT_NAME);
+			return GetInputValue(UI.IPT_NAME);
 		}
 		if (editType == EDIT_TYPE.Appearance)
 		{
 			return MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name;
 		}
-		return GetInputValue((Enum)UI.IPT_NAME_GG);
+		return GetInputValue(UI.IPT_NAME_GG);
 	}
 
 	private void SetInputNameGG(string name)
 	{
 		if (editType == EDIT_TYPE.Name)
 		{
-			SetInputValue((Enum)UI.IPT_NAME, name);
+			SetInputValue(UI.IPT_NAME, name);
 		}
 		else
 		{
-			SetInputValue((Enum)UI.IPT_NAME_GG, name);
+			SetInputValue(UI.IPT_NAME_GG, name);
 		}
 	}
 }

@@ -24,7 +24,5 @@ public interface IFieldGimmickCannon : IFieldGimmickObject
 
 	void Shot();
 
-	new void UpdateTargetMarker(bool isNear);
-
 	void ApplyCannonVector(Vector3 cannonVec);
 }

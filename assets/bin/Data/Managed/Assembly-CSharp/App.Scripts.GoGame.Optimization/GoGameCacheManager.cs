@@ -25,9 +25,30 @@ namespace App.Scripts.GoGame.Optimization
 			public HashSet<string> accUIDs;
 		}
 
+		public class PlayerModelTransform
+		{
+			public Transform wepR;
+
+			public Transform wepL;
+
+			public Transform face;
+
+			public Transform hair;
+
+			public Transform body;
+
+			public Transform head;
+
+			public Transform arm;
+
+			public Transform leg;
+		}
+
 		private Transform CacheContainer;
 
 		private PlayerModelData _selfPlayerModelData;
+
+		private PlayerModelTransform _selfPlayerModelTransform;
 
 		private readonly Dictionary<RESOURCE_CATEGORY, Dictionary<string, Object>> _selfPlayerResourceCache = new Dictionary<RESOURCE_CATEGORY, Dictionary<string, Object>>();
 
@@ -39,14 +60,13 @@ namespace App.Scripts.GoGame.Optimization
 
 		protected override void Awake()
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			base.Awake();
 			if (CacheContainer != null)
 			{
-				Object.DestroyImmediate(CacheContainer.get_gameObject());
+				Object.DestroyImmediate(CacheContainer.gameObject);
 			}
-			CacheContainer = new GameObject("CacheContainer").get_transform();
-			CacheContainer.set_parent(base._transform);
+			CacheContainer = new GameObject("CacheContainer").transform;
+			CacheContainer.parent = base._transform;
 		}
 
 		protected override void OnDestroySingleton()
@@ -61,7 +81,7 @@ namespace App.Scripts.GoGame.Optimization
 			{
 				if (objCach.Value != null)
 				{
-					Object.DestroyImmediate(objCach.Value.get_gameObject());
+					Object.DestroyImmediate(objCach.Value.gameObject);
 				}
 			}
 			objCaches.Clear();
@@ -84,9 +104,9 @@ namespace App.Scripts.GoGame.Optimization
 				dictionary.Add(resourceName, loadedObject);
 				return;
 			}
-			Object val = dictionary[resourceName];
+			Object obj = dictionary[resourceName];
 			dictionary[resourceName] = loadedObject;
-			Object.Destroy(val);
+			Object.Destroy(obj);
 		}
 
 		public bool IsSelfPlayerResourceCached(RESOURCE_CATEGORY resourceCategory, string resourceName)
@@ -95,7 +115,11 @@ namespace App.Scripts.GoGame.Optimization
 			{
 				return false;
 			}
-			return _selfPlayerResourceCache.ContainsKey(resourceCategory) && _selfPlayerResourceCache[resourceCategory].ContainsKey(resourceName);
+			if (_selfPlayerResourceCache.ContainsKey(resourceCategory))
+			{
+				return _selfPlayerResourceCache[resourceCategory].ContainsKey(resourceName);
+			}
+			return false;
 		}
 
 		public bool IsSelfPlayerResourceCached(RESOURCE_CATEGORY resourceCategory, string packageName, string[] resourceNames)
@@ -109,7 +133,124 @@ namespace App.Scripts.GoGame.Optimization
 
 		public Object GetSelfPlayerResourceCache(RESOURCE_CATEGORY resourceCategory, string resourceName)
 		{
-			return (!IsSelfPlayerResourceCached(resourceCategory, resourceName)) ? null : _selfPlayerResourceCache[resourceCategory][resourceName];
+			if (!IsSelfPlayerResourceCached(resourceCategory, resourceName))
+			{
+				return null;
+			}
+			return _selfPlayerResourceCache[resourceCategory][resourceName];
+		}
+
+		public void CacheSelfPlayerModel()
+		{
+			if (_selfPlayerModelData != null)
+			{
+				if (!string.IsNullOrEmpty(_selfPlayerModelData.wepnName))
+				{
+					CacheObj(_selfPlayerModelData.wepnName + "R", _selfPlayerModelTransform.wepR);
+					CacheObj(_selfPlayerModelData.wepnName + "L", _selfPlayerModelTransform.wepL);
+				}
+				if (!string.IsNullOrEmpty(_selfPlayerModelData.faceName))
+				{
+					CacheObj(_selfPlayerModelData.faceName, _selfPlayerModelTransform.face);
+				}
+				if (!string.IsNullOrEmpty(_selfPlayerModelData.hairName))
+				{
+					CacheObj(_selfPlayerModelData.hairName, _selfPlayerModelTransform.hair);
+				}
+				if (!string.IsNullOrEmpty(_selfPlayerModelData.bodyName))
+				{
+					CacheObj(_selfPlayerModelData.bodyName, _selfPlayerModelTransform.body);
+				}
+				if (!string.IsNullOrEmpty(_selfPlayerModelData.headName))
+				{
+					CacheObj(_selfPlayerModelData.headName, _selfPlayerModelTransform.head);
+				}
+				if (!string.IsNullOrEmpty(_selfPlayerModelData.armName))
+				{
+					CacheObj(_selfPlayerModelData.armName, _selfPlayerModelTransform.arm);
+				}
+				if (!string.IsNullOrEmpty(_selfPlayerModelData.legName))
+				{
+					CacheObj(_selfPlayerModelData.legName, _selfPlayerModelTransform.leg);
+				}
+			}
+		}
+
+		private void SafeDestroy(Object obj)
+		{
+			if (obj != null)
+			{
+				Object.Destroy(obj);
+			}
+		}
+
+		private void SafeDestroy(Transform transform)
+		{
+			if (transform != null)
+			{
+				Object.Destroy(transform.gameObject);
+			}
+		}
+
+		public void ClearCacheSelfPlayerModelNotUse(PlayerModelData newData)
+		{
+			if (_selfPlayerModelData != null)
+			{
+				if (!string.IsNullOrEmpty(_selfPlayerModelData.wepnName) && _selfPlayerModelData.wepnName != newData.wepnName)
+				{
+					SafeDestroy(RetrieveObj(_selfPlayerModelData.wepnName + "R"));
+					SafeDestroy(RetrieveObj(_selfPlayerModelData.wepnName + "L"));
+				}
+				if (!string.IsNullOrEmpty(_selfPlayerModelData.faceName) && _selfPlayerModelData.faceName != newData.faceName)
+				{
+					SafeDestroy(RetrieveObj(_selfPlayerModelData.faceName));
+				}
+				if (!string.IsNullOrEmpty(_selfPlayerModelData.hairName) && _selfPlayerModelData.hairName != newData.hairName)
+				{
+					SafeDestroy(RetrieveObj(_selfPlayerModelData.hairName));
+				}
+				if (!string.IsNullOrEmpty(_selfPlayerModelData.bodyName) && _selfPlayerModelData.bodyName != newData.bodyName)
+				{
+					SafeDestroy(RetrieveObj(_selfPlayerModelData.bodyName));
+				}
+				if (!string.IsNullOrEmpty(_selfPlayerModelData.headName) && _selfPlayerModelData.headName != newData.headName)
+				{
+					SafeDestroy(RetrieveObj(_selfPlayerModelData.headName));
+				}
+				if (!string.IsNullOrEmpty(_selfPlayerModelData.armName) && _selfPlayerModelData.armName != newData.armName)
+				{
+					SafeDestroy(RetrieveObj(_selfPlayerModelData.armName));
+				}
+				if (!string.IsNullOrEmpty(_selfPlayerModelData.legName) && _selfPlayerModelData.legName != newData.legName)
+				{
+					SafeDestroy(RetrieveObj(_selfPlayerModelData.legName));
+				}
+			}
+		}
+
+		public void SaveCacheSelfPlayerModel(Self self)
+		{
+			_selfPlayerModelData = new PlayerModelData
+			{
+				faceName = self.loader.faceCacheName,
+				hairName = self.loader.hairCacheName,
+				bodyName = self.loader.bodyCacheName,
+				headName = self.loader.headCacheName,
+				armName = self.loader.armCacheName,
+				legName = self.loader.legCacheName,
+				wepnName = self.loader.weaponCacheName
+			};
+			_selfPlayerModelTransform = new PlayerModelTransform
+			{
+				wepR = self.loader.wepR,
+				wepL = self.loader.wepL,
+				face = self.loader.face,
+				hair = self.loader.hair,
+				body = self.loader.body,
+				head = self.loader.head,
+				arm = self.loader.arm,
+				leg = self.loader.leg
+			};
 		}
 
 		public static bool ShouldCacheStage(string id)
@@ -141,20 +282,31 @@ namespace App.Scripts.GoGame.Optimization
 
 		public static bool HasCacheObj(string id)
 		{
-			return objCaches.ContainsKey(id) && objCaches[id] != null;
+			if (string.IsNullOrEmpty(id))
+			{
+				return false;
+			}
+			if (objCaches.ContainsKey(id))
+			{
+				return objCaches[id] != null;
+			}
+			return false;
 		}
 
 		public static void CacheObj(string id, Transform obj)
 		{
-			obj.get_gameObject().SetActive(false);
-			obj.set_parent(MonoBehaviourSingleton<GoGameCacheManager>.I.CacheContainer);
-			if (objCaches.ContainsKey(id))
+			if (!(obj == null))
 			{
-				objCaches[id] = obj;
-			}
-			else
-			{
-				objCaches.Add(id, obj);
+				obj.gameObject.SetActive(value: false);
+				obj.parent = MonoBehaviourSingleton<GoGameCacheManager>.I.CacheContainer;
+				if (objCaches.ContainsKey(id))
+				{
+					objCaches[id] = obj;
+				}
+				else
+				{
+					objCaches.Add(id, obj);
+				}
 			}
 		}
 
@@ -172,43 +324,41 @@ namespace App.Scripts.GoGame.Optimization
 		{
 			if (objCaches.ContainsKey(id))
 			{
-				Transform val = objCaches[id];
-				val.get_gameObject().SetActive(true);
+				Transform transform = objCaches[id];
+				transform.gameObject.SetActive(value: true);
 				if (parent != null)
 				{
-					val.set_parent(parent);
+					transform.parent = parent;
 				}
 				objCaches.Remove(id);
-				return val;
+				return transform;
 			}
 			return null;
 		}
 
 		public static void CacheLightMap(string id, Transform obj)
 		{
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 			SceneParameter sceneParameter = obj.GetComponent<SceneParameter>();
 			if (sceneParameter == null)
 			{
-				sceneParameter = obj.get_gameObject().AddComponent<SceneParameter>();
+				sceneParameter = obj.gameObject.AddComponent<SceneParameter>();
 			}
-			LightmapData[] lightmaps = LightmapSettings.get_lightmaps();
-			if (lightmaps != null && lightmaps.Length > 0)
+			LightmapData[] lightmaps = LightmapSettings.lightmaps;
+			if (lightmaps != null && lightmaps.Length != 0)
 			{
 				int num = lightmaps.Length;
-				Texture2D[] array = (Texture2D[])new Texture2D[num];
-				Texture2D[] array2 = (Texture2D[])new Texture2D[num];
+				Texture2D[] array = new Texture2D[num];
+				Texture2D[] array2 = new Texture2D[num];
 				for (int i = 0; i < num; i++)
 				{
-					array[i] = lightmaps[i].get_lightmapColor();
-					array2[i] = lightmaps[i].get_lightmapDir();
+					array[i] = lightmaps[i].lightmapColor;
+					array2[i] = lightmaps[i].lightmapDir;
 				}
 				sceneParameter.lightmapsFar = array;
 				sceneParameter.lightmapsNear = array2;
-				sceneParameter.lightmapMode = LightmapSettings.get_lightmapsMode();
+				sceneParameter.lightmapMode = LightmapSettings.lightmapsMode;
 			}
-			sceneParameter.lightProbes = LightmapSettings.get_lightProbes();
+			sceneParameter.lightProbes = LightmapSettings.lightProbes;
 			if (lightMapCaches.ContainsKey(id))
 			{
 				lightMapCaches[id] = sceneParameter;

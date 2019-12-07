@@ -42,11 +42,10 @@ public class FieldGimmickCannonSpecial : FieldGimmickCannonBase
 
 	public override void OnBoard(Player player)
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		base.OnBoard(player);
 		if (m_seIdOnBoard > 0)
 		{
-			SoundManager.PlayOneShotSE(m_seIdOnBoard, base._transform.get_position());
+			SoundManager.PlayOneShotSE(m_seIdOnBoard, base._transform.position);
 		}
 		m_owner.SetCannonChargeMax(MonoBehaviourSingleton<InGameSettingsManager>.I.cannonParam.chargeTimeMaxForSpecial);
 	}
@@ -59,9 +58,6 @@ public class FieldGimmickCannonSpecial : FieldGimmickCannonBase
 
 	public override void Shot()
 	{
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Expected O, but got Unknown
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsReadyForShot() || (m_owner is Self && !m_owner.IsCannonFullCharged()))
 		{
 			return;
@@ -73,18 +69,16 @@ public class FieldGimmickCannonSpecial : FieldGimmickCannonBase
 			initParamCannonBeam.attacker = m_owner;
 			initParamCannonBeam.atkInfo = attackHitInfo;
 			initParamCannonBeam.launchTrans = m_launchTrans;
-			GameObject val = new GameObject("AttackCannonBeam");
-			AttackCannonBeam attackCannonBeam = val.AddComponent<AttackCannonBeam>();
-			attackCannonBeam.Initialize(initParamCannonBeam);
+			new GameObject("AttackCannonBeam").AddComponent<AttackCannonBeam>().Initialize(initParamCannonBeam);
 			if (attackHitInfo.bulletData != null && attackHitInfo.bulletData.data != null)
 			{
 				m_durationChangeCamera = attackHitInfo.bulletData.data.appearTime;
 			}
 			if (m_seIdShot > 0)
 			{
-				SoundManager.PlayOneShotSE(m_seIdShot, m_launchTrans.get_position());
+				SoundManager.PlayOneShotSE(m_seIdShot, m_launchTrans.position);
 			}
-			this.StartCoroutine(DelayCameraChange());
+			StartCoroutine(DelayCameraChange());
 			StartCoolTime();
 			SetState(STATE.COOLTIME);
 		}
@@ -96,11 +90,11 @@ public class FieldGimmickCannonSpecial : FieldGimmickCannonBase
 		{
 			yield break;
 		}
-		yield return (object)new WaitForSeconds(m_delayChangeCamera);
+		yield return new WaitForSeconds(m_delayChangeCamera);
 		if (!(m_owner == null) && MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
 			MonoBehaviourSingleton<InGameCameraManager>.I.SetCameraMode(InGameCameraManager.CAMERA_MODE.CANNON_BEAM);
-			yield return (object)new WaitForSeconds(m_durationChangeCamera);
+			yield return new WaitForSeconds(m_durationChangeCamera);
 			if (!(m_owner == null))
 			{
 				MonoBehaviourSingleton<InGameCameraManager>.I.SetCameraMode(InGameCameraManager.CAMERA_MODE.CANNON_BEAM_CHARGE);
@@ -129,10 +123,9 @@ public class FieldGimmickCannonSpecial : FieldGimmickCannonBase
 
 	protected override void UpdateStateReady()
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 		if (m_owner != null && m_seIdChargeMax > 0 && m_owner.IsCannonFullCharged() && !isPlayedChargeMaxSE)
 		{
-			SoundManager.PlayOneShotSE(m_seIdChargeMax, base._transform.get_position());
+			SoundManager.PlayOneShotSE(m_seIdChargeMax, base._transform.position);
 			isPlayedChargeMaxSE = true;
 		}
 		if (IsRemainCoolTime())
@@ -147,19 +140,14 @@ public class FieldGimmickCannonSpecial : FieldGimmickCannonBase
 
 	public void StartCharge()
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<EffectManager>.IsValid())
 		{
 			m_effectChargeTrans = EffectManager.GetEffect(NAME_EFFECT_CHARGE, m_launchTrans);
-			Transform effectChargeTrans = m_effectChargeTrans;
-			effectChargeTrans.set_position(effectChargeTrans.get_position() + OFFSET_BEAM_CHARGE_EFFECT);
+			m_effectChargeTrans.position += OFFSET_BEAM_CHARGE_EFFECT;
 		}
 		if (m_seIdCharge > 0)
 		{
-			SoundManager.PlayOneShotSE(m_seIdCharge, base._transform.get_position());
+			SoundManager.PlayOneShotSE(m_seIdCharge, base._transform.position);
 		}
 	}
 
@@ -167,7 +155,7 @@ public class FieldGimmickCannonSpecial : FieldGimmickCannonBase
 	{
 		if (MonoBehaviourSingleton<EffectManager>.IsValid() && m_effectChargeTrans != null)
 		{
-			EffectManager.ReleaseEffect(m_effectChargeTrans.get_gameObject());
+			EffectManager.ReleaseEffect(m_effectChargeTrans.gameObject);
 		}
 		if (m_owner != null)
 		{

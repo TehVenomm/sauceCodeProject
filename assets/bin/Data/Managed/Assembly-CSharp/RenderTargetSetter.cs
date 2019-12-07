@@ -17,24 +17,18 @@ public class RenderTargetSetter : MonoBehaviour
 	private TextureSetInfo[] infos;
 
 	[SerializeField]
-	private CameraEvent cameraEvent = 11;
+	private CameraEvent cameraEvent = CameraEvent.AfterForwardOpaque;
 
 	private RenderTexture renderTexture;
 
 	private GrabCommand grabCommand;
-
-	public RenderTargetSetter()
-		: this()
-	{
-	}//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-
 
 	private void OnDestroy()
 	{
 		renderTexture = null;
 		if (grabCommand != null)
 		{
-			grabCommand.releaseRenderTexture(this.get_gameObject());
+			grabCommand.releaseRenderTexture(base.gameObject);
 		}
 	}
 
@@ -48,13 +42,13 @@ public class RenderTargetSetter : MonoBehaviour
 		{
 			yield return null;
 		}
-		grabCommand = MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().GetComponent<GrabCommand>();
+		grabCommand = MonoBehaviourSingleton<AppMain>.I.mainCamera.gameObject.GetComponent<GrabCommand>();
 		if (grabCommand == null)
 		{
-			grabCommand = MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().AddComponent<GrabCommand>();
+			grabCommand = MonoBehaviourSingleton<AppMain>.I.mainCamera.gameObject.AddComponent<GrabCommand>();
 			grabCommand.ApplyCommandBuffer(cameraEvent);
 		}
-		renderTexture = grabCommand.useRenderTexture(this.get_gameObject());
+		renderTexture = grabCommand.useRenderTexture(base.gameObject);
 		for (int i = 0; i < infos.Length; i++)
 		{
 			if (infos[i].targetRenderer == null || string.IsNullOrEmpty(infos[i].texturePropertyName))
@@ -63,11 +57,11 @@ public class RenderTargetSetter : MonoBehaviour
 			}
 			TextureSetInfo textureSetInfo = infos[i];
 			Renderer targetRenderer = textureSetInfo.targetRenderer;
-			for (int j = 0; j < targetRenderer.get_sharedMaterials().Length; j++)
+			for (int j = 0; j < targetRenderer.sharedMaterials.Length; j++)
 			{
-				if (targetRenderer.get_sharedMaterials()[j].HasProperty(textureSetInfo.texturePropertyName))
+				if (targetRenderer.sharedMaterials[j].HasProperty(textureSetInfo.texturePropertyName))
 				{
-					targetRenderer.get_sharedMaterials()[j].SetTexture(textureSetInfo.texturePropertyName, renderTexture);
+					targetRenderer.sharedMaterials[j].SetTexture(textureSetInfo.texturePropertyName, renderTexture);
 				}
 			}
 		}

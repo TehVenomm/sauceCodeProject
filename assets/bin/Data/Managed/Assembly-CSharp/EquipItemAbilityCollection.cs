@@ -103,7 +103,7 @@ public class EquipItemAbilityCollection
 			return "-";
 		}
 		int num = equip[index];
-		return string.Format((num < 0) ? "{0}" : "+{0}", num);
+		return string.Format((num >= 0) ? "+{0}" : "{0}", num);
 	}
 
 	public int GetSwapBalance()
@@ -124,6 +124,10 @@ public class EquipItemAbilityCollection
 			return false;
 		}
 		AbilityTable.Ability ability = Singleton<AbilityTable>.I.GetAbility(this.ability.id);
-		return !abilityData.HasNeedUpdateAbility() && ability.IsActive();
+		if (!abilityData.HasNeedUpdateAbility())
+		{
+			return ability.IsActive();
+		}
+		return false;
 	}
 }

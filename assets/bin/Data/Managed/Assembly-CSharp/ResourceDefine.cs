@@ -97,97 +97,97 @@ public static class ResourceDefine
 
 	public static readonly string[] suffix = new string[91]
 	{
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
 		"_at",
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty,
-		string.Empty
+		"",
+		"",
+		"",
+		"",
+		""
 	};
 
 	public static readonly string[][] rootPaths = new string[91][]
@@ -597,109 +597,109 @@ public static class ResourceDefine
 	{
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[2]
 		{
-			string.Empty,
-			string.Empty
+			"",
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[2]
 		{
-			string.Empty,
-			string.Empty
+			"",
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[8]
 		{
@@ -714,127 +714,127 @@ public static class ResourceDefine
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[8]
 		{
@@ -849,54 +849,54 @@ public static class ResourceDefine
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[4]
 		{
-			string.Empty,
-			string.Empty,
-			string.Empty,
-			string.Empty
+			"",
+			"",
+			"",
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[2]
 		{
@@ -905,56 +905,56 @@ public static class ResourceDefine
 		},
 		new string[2]
 		{
-			string.Empty,
-			string.Empty
+			"",
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[8]
 		{
@@ -969,15 +969,15 @@ public static class ResourceDefine
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		},
 		new string[8]
 		{
@@ -992,7 +992,7 @@ public static class ResourceDefine
 		},
 		new string[1]
 		{
-			string.Empty
+			""
 		}
 	};
 
@@ -1300,14 +1300,13 @@ public static class ResourceDefine
 			"assets/app/external/externalresources/character/player/model/leg/leg4/",
 			"assets/app/external/externalresources/character/player/model/leg/leg9/"
 		},
-		new string[6]
+		new string[5]
 		{
 			"assets/app/external/externalresources/character/player/model/wep/wep00/",
 			"assets/app/external/externalresources/character/player/model/wep/wep01/",
 			"assets/app/external/externalresources/character/player/model/wep/wep02/",
 			"assets/app/external/externalresources/character/player/model/wep/wep04/",
-			"assets/app/external/externalresources/character/player/model/wep/wep05/",
-			"assets/app/external/externalresources/character/player/model/wep/wep19/"
+			"assets/app/external/externalresources/character/player/model/wep/wep05/"
 		},
 		new string[1]
 		{
@@ -1408,10 +1407,71 @@ public static class ResourceDefine
 		{
 			"assets/app/external/externalresources/stage/object/"
 		},
-		new string[2]
+		new string[63]
 		{
 			"assets/app/external/stagescenes/",
-			"assets/app/external/stagescenes/fi086d_001/"
+			"assets/app/external/stagescenes/fi011d_001/",
+			"assets/app/external/stagescenes/fi011d_002/",
+			"assets/app/external/stagescenes/fi011d_003/",
+			"assets/app/external/stagescenes/fi011d_004/",
+			"assets/app/external/stagescenes/fi011d_005/",
+			"assets/app/external/stagescenes/fi011d_006/",
+			"assets/app/external/stagescenes/fi011d_007/",
+			"assets/app/external/stagescenes/fi011d_008/",
+			"assets/app/external/stagescenes/fi011d_011/",
+			"assets/app/external/stagescenes/fi011d_012/",
+			"assets/app/external/stagescenes/fi011d_013/",
+			"assets/app/external/stagescenes/fi011d_014/",
+			"assets/app/external/stagescenes/fi011d_101/",
+			"assets/app/external/stagescenes/fi011d_102/",
+			"assets/app/external/stagescenes/fi011d_111/",
+			"assets/app/external/stagescenes/fi011d_112/",
+			"assets/app/external/stagescenes/fi011d_201/",
+			"assets/app/external/stagescenes/fi011d_211/",
+			"assets/app/external/stagescenes/fi011d_301/",
+			"assets/app/external/stagescenes/fi011d_311/",
+			"assets/app/external/stagescenes/fi011d_401/",
+			"assets/app/external/stagescenes/fi011d_411/",
+			"assets/app/external/stagescenes/fi011d_901/",
+			"assets/app/external/stagescenes/fi011n_002/",
+			"assets/app/external/stagescenes/fi011n_003/",
+			"assets/app/external/stagescenes/fi011n_004/",
+			"assets/app/external/stagescenes/fi011n_102/",
+			"assets/app/external/stagescenes/fi011s_005/",
+			"assets/app/external/stagescenes/fi011s_006/",
+			"assets/app/external/stagescenes/fi011s_007/",
+			"assets/app/external/stagescenes/fi011s_008/",
+			"assets/app/external/stagescenes/fi021d_001/",
+			"assets/app/external/stagescenes/fi021d_002/",
+			"assets/app/external/stagescenes/fi086d_001/",
+			"assets/app/external/stagescenes/fi191d_615/",
+			"assets/app/external/stagescenes/fi191d_616/",
+			"assets/app/external/stagescenes/fi191d_617/",
+			"assets/app/external/stagescenes/fi191d_618/",
+			"assets/app/external/stagescenes/fi191d_619/",
+			"assets/app/external/stagescenes/fi191d_620/",
+			"assets/app/external/stagescenes/fi191d_621/",
+			"assets/app/external/stagescenes/fi191d_622/",
+			"assets/app/external/stagescenes/fi191d_623/",
+			"assets/app/external/stagescenes/fi191d_624/",
+			"assets/app/external/stagescenes/fi191d_625/",
+			"assets/app/external/stagescenes/fi191d_626/",
+			"assets/app/external/stagescenes/fi191d_627/",
+			"assets/app/external/stagescenes/fi191d_628/",
+			"assets/app/external/stagescenes/fi191d_629/",
+			"assets/app/external/stagescenes/fi191d_630/",
+			"assets/app/external/stagescenes/fi191d_631/",
+			"assets/app/external/stagescenes/fi191d_632/",
+			"assets/app/external/stagescenes/fi191d_633/",
+			"assets/app/external/stagescenes/fi191d_634/",
+			"assets/app/external/stagescenes/fi191d_635/",
+			"assets/app/external/stagescenes/fi191d_636/",
+			"assets/app/external/stagescenes/fi191d_637/",
+			"assets/app/external/stagescenes/ga001d_01/",
+			"assets/app/external/stagescenes/ga001d_02/",
+			"assets/app/external/stagescenes/ga001d_03/",
+			"assets/app/external/stagescenes/ga001d_03_2/",
+			"assets/app/external/stagescenes/ga001d_03_test/"
 		},
 		new string[1]
 		{
@@ -1434,8 +1494,9 @@ public static class ResourceDefine
 		{
 			"assets/app/external/externalresources/system/"
 		},
-		new string[15]
+		new string[16]
 		{
+			"assets/app/external/externalresources/table/enemypredownload/",
 			"assets/app/external/externalresources/table/gamescene/",
 			"assets/app/external/externalresources/table/highquality/",
 			"assets/app/external/externalresources/table/ingame/",

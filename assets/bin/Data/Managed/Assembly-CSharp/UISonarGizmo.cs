@@ -36,13 +36,13 @@ public class UISonarGizmo : UIStatusGizmoBase
 			_sonar = value;
 			if (_sonar != null)
 			{
-				this.get_gameObject().SetActive(true);
-				portalTransform = value.get_transform();
+				base.gameObject.SetActive(value: true);
+				portalTransform = value.transform;
 				UpdateParam();
 			}
 			else
 			{
-				this.get_gameObject().SetActive(false);
+				base.gameObject.SetActive(value: false);
 			}
 		}
 	}
@@ -52,50 +52,25 @@ public class UISonarGizmo : UIStatusGizmoBase
 		base.OnEnable();
 		if (arrow != null)
 		{
-			arrowTransform = arrow.get_transform();
+			arrowTransform = arrow.transform;
 		}
 	}
 
 	protected override void UpdateParam()
 	{
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-		if (sonar == null || !sonar.get_gameObject().get_activeSelf())
+		if (sonar == null || !sonar.gameObject.activeSelf)
 		{
-			SetActiveSafe(statusSprite.get_gameObject(), active: false);
+			SetActiveSafe(statusSprite.gameObject, active: false);
 			SetActiveSafe(arrow, active: false);
 			return;
 		}
-		Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, portalTransform.get_position() + offset);
+		Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, portalTransform.position + offset);
 		screenZ = screenUIPosition.z;
 		screenUIPosition.z = 0f;
 		float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
-		Vector3 val = screenUIPosition;
+		Vector3 a = screenUIPosition;
 		bool flag = false;
-		float num2 = Screen.get_width();
+		float num2 = Screen.width;
 		if (screenUIPosition.x < screenSideOffset * num)
 		{
 			screenUIPosition.x = screenSideOffset * num;
@@ -113,31 +88,30 @@ public class UISonarGizmo : UIStatusGizmoBase
 		}
 		if (flag)
 		{
-			SetActiveSafe(statusSprite.get_gameObject(), active: true);
+			SetActiveSafe(statusSprite.gameObject, active: true);
 			SetActiveSafe(arrow, active: true);
-			Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
-			Vector3 val3 = transform.get_position() - val2;
-			if (val3.get_sqrMagnitude() >= 2E-05f)
+			Vector3 vector = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
+			if ((transform.position - vector).sqrMagnitude >= 2E-05f)
 			{
-				transform.set_position(val2);
+				transform.position = vector;
 			}
 			if (arrowTransform != null)
 			{
-				Vector3 val4 = val - screenUIPosition;
-				if (val4 != Vector3.get_zero())
+				Vector3 vector2 = a - screenUIPosition;
+				if (vector2 != Vector3.zero)
 				{
-					float num3 = 90f - Vector3.Angle(Vector3.get_right(), val4);
-					arrowTransform.set_eulerAngles(new Vector3(0f, 0f, num3));
+					float z = 90f - Vector3.Angle(Vector3.right, vector2);
+					arrowTransform.eulerAngles = new Vector3(0f, 0f, z);
 				}
 				else
 				{
-					arrowTransform.set_eulerAngles(new Vector3(0f, 0f, 0f));
+					arrowTransform.eulerAngles = new Vector3(0f, 0f, 0f);
 				}
 			}
 		}
 		else
 		{
-			SetActiveSafe(statusSprite.get_gameObject(), active: false);
+			SetActiveSafe(statusSprite.gameObject, active: false);
 			SetActiveSafe(arrow, active: false);
 		}
 	}

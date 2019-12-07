@@ -38,7 +38,7 @@ public class ItemDetailLithographSellConfirm : ItemStorageSellConfirm
 		num = (int)array[1];
 		List<SortCompareData> list = new List<SortCompareData>();
 		list.Add(item);
-		if (MonoBehaviourSingleton<GameSceneManager>.I.GetHierarchyList().Exists((GameSectionHierarchy.HierarchyData x) => x.section.get_name() == "ItemStorageSell"))
+		if (MonoBehaviourSingleton<GameSceneManager>.I.GetHierarchyList().Exists((GameSectionHierarchy.HierarchyData x) => x.section.name == "ItemStorageSell"))
 		{
 			GameSection.SetEventData(new object[3]
 			{
@@ -84,13 +84,9 @@ public class ItemDetailLithographSellConfirm : ItemStorageSellConfirm
 			{
 				num = equipItemExceedData.exchangeItemId;
 			}
-			if (num != 0)
+			if (num != 0 && Singleton<ItemTable>.I.GetItemData(num) != null)
 			{
-				ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(num);
-				if (itemData != null)
-				{
-					list.Add(new NeedMaterial(num, this.num));
-				}
+				list.Add(new NeedMaterial(num, this.num));
 			}
 		}
 		return list.ToArray();

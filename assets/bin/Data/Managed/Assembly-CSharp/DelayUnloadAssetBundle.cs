@@ -28,7 +28,7 @@ public class DelayUnloadAssetBundle
 	{
 		if (obj.assetBundle != null)
 		{
-			obj.assetBundle.Unload(false);
+			obj.assetBundle.Unload(unloadAllLoadedObjects: false);
 		}
 		obj.Reset();
 		rymTPool<DelayUnloadAssetBundle>.Release(ref obj);

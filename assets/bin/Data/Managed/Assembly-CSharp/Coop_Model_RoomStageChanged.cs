@@ -21,14 +21,14 @@ public class Coop_Model_RoomStageChanged : Coop_Model_Base
 
 	public override string ToString()
 	{
-		string empty = string.Empty;
-		empty = empty + ",cid=" + cid;
-		empty = empty + ",sid=" + sid;
-		empty = empty + ",pstgid=" + pstgid;
-		empty = empty + ",pstghostid=" + pstghostid;
-		empty = empty + ",stgid=" + stgid;
-		empty = empty + ",stgidx=" + stgidx;
-		empty = empty + ",stghostid=" + stghostid;
-		return base.ToString() + empty;
+		string arg = "";
+		arg = arg + ",cid=" + cid;
+		arg = arg + ",sid=" + sid;
+		arg = arg + ",pstgid=" + pstgid;
+		arg = arg + ",pstghostid=" + pstghostid;
+		arg = arg + ",stgid=" + stgid;
+		arg = arg + ",stgidx=" + stgidx;
+		arg = arg + ",stghostid=" + stghostid;
+		return base.ToString() + arg;
 	}
 }

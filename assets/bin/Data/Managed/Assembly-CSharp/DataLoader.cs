@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class DataLoader : MonoBehaviour
 {
@@ -16,11 +17,6 @@ public class DataLoader : MonoBehaviour
 	private const int DL_MAX = 5;
 
 	private int downloadCount;
-
-	public DataLoader()
-		: this()
-	{
-	}
 
 	private void Awake()
 	{
@@ -38,7 +34,7 @@ public class DataLoader : MonoBehaviour
 
 	public bool IsLoading(string name)
 	{
-		return null != requestList.Find((DataLoadRequest o) => o.name == name);
+		return requestList.Find((DataLoadRequest o) => o.name == name) != null;
 	}
 
 	public bool IsLoading()
@@ -53,7 +49,7 @@ public class DataLoader : MonoBehaviour
 
 	public void Request(DataLoadRequest req)
 	{
-		this.StartCoroutine(Load(req, req.downloadOnly, useQueue: false));
+		StartCoroutine(Load(req, req.downloadOnly, useQueue: false));
 	}
 
 	public void Request(List<DataLoadRequest> reqs)
@@ -62,13 +58,13 @@ public class DataLoader : MonoBehaviour
 		requestList.AddRange(reqs);
 		reqs.ForEach(delegate(DataLoadRequest o)
 		{
-			this.StartCoroutine(Load(o, o.downloadOnly, useQueue: true));
+			StartCoroutine(Load(o, o.downloadOnly, useQueue: true));
 		});
 	}
 
 	public void RequestManifest(DataLoadRequest req)
 	{
-		this.StartCoroutine(Load(req, req.downloadOnly, useQueue: false, forceDownload: true));
+		StartCoroutine(Load(req, req.downloadOnly, useQueue: false, forceDownload: true));
 	}
 
 	private void RemoveQueue(DataLoadRequest req)
@@ -90,22 +86,22 @@ public class DataLoader : MonoBehaviour
 				yield return null;
 			}
 		}
-		DataTableLoadError error2 = DataTableLoadError.None;
+		DataTableLoadError error = DataTableLoadError.None;
 		byte[] bytes = null;
-		if (!cache.IsCached(req) || forceDownload)
+		if (!cache.IsCached(req) | forceDownload)
 		{
 			IEnumerator download = Download(req, delegate(byte[] b)
 			{
 				bytes = b;
 			}, delegate(DataTableLoadError e)
 			{
-				error2 = e;
+				error = e;
 			});
 			while (download.MoveNext())
 			{
 				yield return download.Current;
 			}
-			if (error2 != 0)
+			if (error != 0)
 			{
 				if (useQueue)
 				{
@@ -118,7 +114,7 @@ public class DataLoader : MonoBehaviour
 				}
 				else
 				{
-					req.OnError(error2);
+					req.OnError(error);
 				}
 				yield break;
 			}
@@ -126,7 +122,6 @@ public class DataLoader : MonoBehaviour
 		if (downloadOnly)
 		{
 			bool wait = true;
-			DataTableLoadError error;
 			ThreadPoolWrapper.QueueUserWorkItem(delegate
 			{
 				try
@@ -149,13 +144,13 @@ public class DataLoader : MonoBehaviour
 			{
 				yield return null;
 			}
-			if (error2 == DataTableLoadError.None)
+			if (error == DataTableLoadError.None)
 			{
 				req.OnComplete();
 			}
 			else
 			{
-				req.OnError(error2);
+				req.OnError(error);
 			}
 			if (useQueue)
 			{
@@ -169,13 +164,13 @@ public class DataLoader : MonoBehaviour
 		{
 			loading = LoadCompressedBinary(req, bytes, delegate(DataTableLoadError e)
 			{
-				error2 = e;
+				error = e;
 			}, useQueue);
 			while (loading.MoveNext())
 			{
 				yield return loading.Current;
 			}
-			if (error2 != 0)
+			if (error != 0)
 			{
 				if (useQueue)
 				{
@@ -190,7 +185,7 @@ public class DataLoader : MonoBehaviour
 		{
 			loading = LoadCompressedTextWithSignature(req, bytes, delegate(DataTableLoadError e)
 			{
-				error2 = e;
+				error = e;
 			}, useQueue);
 		}
 		while (loading.MoveNext())
@@ -198,9 +193,9 @@ public class DataLoader : MonoBehaviour
 			yield return loading.Current;
 		}
 		sw.Stop();
-		if (error2 != 0)
+		if (error != 0)
 		{
-			req.OnError(error2);
+			req.OnError(error);
 		}
 		else
 		{
@@ -408,17 +403,19 @@ public class DataLoader : MonoBehaviour
 			yield return null;
 		}
 		downloadCount++;
-		string host = NetworkManager.TABLE_HOST + MonoBehaviourSingleton<ResourceManager>.I.tableIndex.ToString() + "/";
-		WWW www = new WWW(host + req.path);
+		string str = NetworkManager.TABLE_HOST + MonoBehaviourSingleton<ResourceManager>.I.tableIndex.ToString() + "/";
+		UnityWebRequest www = new UnityWebRequest(str + req.path);
+		www.downloadHandler = new DownloadHandlerBuffer();
+		www.SendWebRequest();
 		float progress = 0f;
 		float timeOut = 15f;
-		while (!www.get_isDone())
+		while (!www.isDone)
 		{
 			yield return null;
-			timeOut -= Time.get_unscaledDeltaTime();
-			if (www.get_progress() != progress)
+			timeOut -= Time.unscaledDeltaTime;
+			if (www.downloadProgress != progress)
 			{
-				progress = www.get_progress();
+				progress = www.downloadProgress;
 				timeOut = 15f;
 			}
 			if (timeOut < 0f)
@@ -429,9 +426,9 @@ public class DataLoader : MonoBehaviour
 				yield break;
 			}
 		}
-		if (!string.IsNullOrEmpty(www.get_error()))
+		if (!string.IsNullOrEmpty(www.error))
 		{
-			if (www.get_error().Contains("404"))
+			if (www.error.Contains("404"))
 			{
 				onError(DataTableLoadError.AssetNotFoundError);
 			}
@@ -444,10 +441,10 @@ public class DataLoader : MonoBehaviour
 		}
 		else
 		{
-			byte[] bytes = www.get_bytes();
+			byte[] data = www.downloadHandler.data;
 			www.Dispose();
 			downloadCount--;
-			onComplete(bytes);
+			onComplete(data);
 		}
 	}
 

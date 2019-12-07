@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -70,7 +69,7 @@ public class MainMenu : UIBehaviour
 	{
 		Transform ctrl = GetCtrl(UI.SCR_MENU);
 		homeButton = Utility.FindChild(ctrl, "BtnHome");
-		SetActive((Enum)UI.SPR_NEW_MAP, is_visible: false);
+		SetActive(UI.SPR_NEW_MAP, is_visible: false);
 		mapCheckSpan = new SpanTimer(2f);
 	}
 
@@ -80,14 +79,14 @@ public class MainMenu : UIBehaviour
 		{
 			if (!isPopMenu)
 			{
-				ResetTween((Enum)UI.TWN_POP_MENU, 0);
+				ResetTween(UI.TWN_POP_MENU);
 			}
 			isPopMenu = !isPopMenu;
 			if (TutorialStep.HasAllTutorialCompleted())
 			{
 				PlayerPrefs.SetInt("IS_POP_FOOTER_MENU", isPopMenu ? 1 : 0);
 			}
-			PlayTween((Enum)UI.TWN_POP_MENU, isPopMenu, (EventDelegate.Callback)null, is_input_block: true, 0);
+			PlayTween(UI.TWN_POP_MENU, isPopMenu);
 			RefreshUI();
 		}
 	}
@@ -107,41 +106,40 @@ public class MainMenu : UIBehaviour
 	public void UpdateMainMenu()
 	{
 		string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-		string currentSceneName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName();
-		MAIN_SCENE mAIN_SCENE = GameDefine.SceneNameToEnum(currentSceneName);
+		MAIN_SCENE mAIN_SCENE = GameDefine.SceneNameToEnum(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName());
 		if ((mAIN_SCENE != nowScene && mAIN_SCENE != MAIN_SCENE.MAX) || (nowScene == MAIN_SCENE.HOME && currentSectionName == "StoryMain"))
 		{
 			if (mAIN_SCENE == MAIN_SCENE.HOME || mAIN_SCENE == MAIN_SCENE.LOUNGE || mAIN_SCENE == MAIN_SCENE.CLAN)
 			{
 				if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA1))
 				{
-					ResetTween((Enum)UI.TWN_POP_MENU, 0);
+					ResetTween(UI.TWN_POP_MENU);
 					isPopMenu = true;
-					SkipTween((Enum)UI.TWN_POP_MENU, forward: true, 0);
+					SkipTween(UI.TWN_POP_MENU);
 				}
 				else if (!TutorialStep.HasAllTutorialCompleted() || !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA1) || !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA2) || !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP) || !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM))
 				{
-					ResetTween((Enum)UI.TWN_POP_MENU, 0);
+					ResetTween(UI.TWN_POP_MENU);
 					isPopMenu = false;
-					SkipTween((Enum)UI.TWN_POP_MENU, forward: false, 0);
+					SkipTween(UI.TWN_POP_MENU, forward: false);
 				}
 				else
 				{
-					ResetTween((Enum)UI.TWN_POP_MENU, 0);
+					ResetTween(UI.TWN_POP_MENU);
 					isPopMenu = (PlayerPrefs.GetInt("IS_POP_FOOTER_MENU", 0) == 1);
-					SkipTween((Enum)UI.TWN_POP_MENU, isPopMenu, 0);
+					SkipTween(UI.TWN_POP_MENU, isPopMenu);
 				}
 			}
 			else
 			{
-				ResetTween((Enum)UI.TWN_POP_MENU, 0);
+				ResetTween(UI.TWN_POP_MENU);
 				isPopMenu = true;
-				SkipTween((Enum)UI.TWN_POP_MENU, forward: true, 0);
+				SkipTween(UI.TWN_POP_MENU);
 			}
 			if (_delegate == null)
 			{
 				_delegate = new EventDelegate(POP_MENU);
-				UIButton component = base.GetComponent<UIButton>((Enum)UI.BTN_POP_MENU);
+				UIButton component = GetComponent<UIButton>(UI.BTN_POP_MENU);
 				if (!component.onClick.Contains(_delegate))
 				{
 					component.onClick.Add(_delegate);
@@ -152,9 +150,9 @@ public class MainMenu : UIBehaviour
 		}
 		else
 		{
-			ResetTween((Enum)UI.TWN_POP_MENU, 0);
+			ResetTween(UI.TWN_POP_MENU);
 			isPopMenu = true;
-			SkipTween((Enum)UI.TWN_POP_MENU, forward: true, 0);
+			SkipTween(UI.TWN_POP_MENU);
 			UpdateNewMapUI();
 		}
 	}
@@ -169,8 +167,8 @@ public class MainMenu : UIBehaviour
 				return;
 			}
 			Transform ctrl = GetCtrl(UI.SPR_NEW_MAP);
-			bool activeSelf = ctrl.get_gameObject().get_activeSelf();
-			bool flag2 = MonoBehaviourSingleton<WorldMapManager>.I.ExistRegionDirection();
+			bool activeSelf = ctrl.gameObject.activeSelf;
+			MonoBehaviourSingleton<WorldMapManager>.I.ExistRegionDirection();
 			if (!activeSelf)
 			{
 				TweenAlpha component = ctrl.GetComponent<TweenAlpha>();
@@ -180,7 +178,7 @@ public class MainMenu : UIBehaviour
 		}
 		else
 		{
-			SetActive((Enum)UI.SPR_NEW_MAP, is_visible: false);
+			SetActive(UI.SPR_NEW_MAP, is_visible: false);
 		}
 		if (mapCheckSpan != null)
 		{
@@ -195,67 +193,65 @@ public class MainMenu : UIBehaviour
 
 	public override void UpdateUI()
 	{
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
 		if (base.uiFirstUpdate)
 		{
-			SetActive((Enum)UI.OBJ_GACHA_DECO_ROOT, is_visible: false);
+			SetActive(UI.OBJ_GACHA_DECO_ROOT, is_visible: false);
 		}
 		if (homeButton != null)
 		{
-			homeButton.get_gameObject().SetActive(false);
+			homeButton.gameObject.SetActive(value: false);
 		}
-		SetActive((Enum)UI.BTN_LOUNGE, is_visible: false);
-		SetActive((Enum)UI.BTN_CLAN, is_visible: false);
+		SetActive(UI.BTN_LOUNGE, is_visible: false);
+		SetActive(UI.BTN_CLAN, is_visible: false);
 		if (LoungeMatchingManager.IsValidInLounge())
 		{
-			SetActive((Enum)UI.BTN_LOUNGE, is_visible: true);
+			SetActive(UI.BTN_LOUNGE, is_visible: true);
 		}
 		else if (ClanMatchingManager.IsValidInClan())
 		{
-			SetActive((Enum)UI.BTN_CLAN, is_visible: true);
+			SetActive(UI.BTN_CLAN, is_visible: true);
 		}
 		else if (homeButton != null)
 		{
-			homeButton.get_gameObject().SetActive(true);
+			homeButton.gameObject.SetActive(value: true);
 		}
-		SetToggle((Enum)UI.TGL_POP_MENU, isPopMenu);
-		SetColor((Enum)UI.OBJ_ANCHOR_MENU, Color.get_clear());
-		SetColor((Enum)UI.OBJ_ANCHOR_POP_MENU, Color.get_white());
+		SetToggle(UI.TGL_POP_MENU, isPopMenu);
+		SetColor(UI.OBJ_ANCHOR_MENU, Color.clear);
+		SetColor(UI.OBJ_ANCHOR_POP_MENU, Color.white);
 		UpdateSceneButtons(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName());
 		int badgeTotalNum = MonoBehaviourSingleton<SmithManager>.I.GetBadgeTotalNum();
 		if (isPopMenu)
 		{
 			SetActive(base.collectUI, is_visible: false);
 			SetActive(base.collectUI, is_visible: true);
-			SetBadge((Enum)UI._SPR_STUDIO_ACTIVE, badgeTotalNum, 1, 8, -8, is_scale_normalize: true);
-			SetBadge((Enum)UI._SPR_STUDIO_INACTIVE, badgeTotalNum, 1, 8, -8, is_scale_normalize: true);
-			SetBadge((Enum)UI.SPR_POP_MENU_ACTIVE, 0, 1, 5, 5, is_scale_normalize: false);
+			SetBadge(UI._SPR_STUDIO_ACTIVE, badgeTotalNum, SpriteAlignment.TopLeft, 8, -8, is_scale_normalize: true);
+			SetBadge(UI._SPR_STUDIO_INACTIVE, badgeTotalNum, SpriteAlignment.TopLeft, 8, -8, is_scale_normalize: true);
+			SetBadge(UI.SPR_POP_MENU_ACTIVE, 0, SpriteAlignment.TopLeft);
 			if (MonoBehaviourSingleton<UserInfoManager>.I.needShowOneTimesOfferSS)
 			{
-				SetActive((Enum)UI.SPR_SPECIAL_OFFER, is_visible: true);
-				SetActive((Enum)UI.SPR_SPECIAL_OFFER_LEFT, is_visible: false);
+				SetActive(UI.SPR_SPECIAL_OFFER, is_visible: true);
+				SetActive(UI.SPR_SPECIAL_OFFER_LEFT, is_visible: false);
 			}
 			else
 			{
-				SetActive((Enum)UI.SPR_SPECIAL_OFFER, is_visible: false);
-				SetActive((Enum)UI.SPR_SPECIAL_OFFER_LEFT, is_visible: false);
+				SetActive(UI.SPR_SPECIAL_OFFER, is_visible: false);
+				SetActive(UI.SPR_SPECIAL_OFFER_LEFT, is_visible: false);
 			}
 		}
 		else
 		{
-			SetBadge((Enum)UI._SPR_STUDIO_ACTIVE, 0, 1, 5, 5, is_scale_normalize: false);
-			SetBadge((Enum)UI._SPR_STUDIO_INACTIVE, 0, 1, 5, 5, is_scale_normalize: false);
-			SetBadge((Enum)UI.SPR_POP_MENU_ACTIVE, badgeTotalNum, 1, 5, 5, is_scale_normalize: true);
+			SetBadge(UI._SPR_STUDIO_ACTIVE, 0, SpriteAlignment.TopLeft);
+			SetBadge(UI._SPR_STUDIO_INACTIVE, 0, SpriteAlignment.TopLeft);
+			SetBadge(UI.SPR_POP_MENU_ACTIVE, badgeTotalNum, SpriteAlignment.TopLeft, 5, 5, is_scale_normalize: true);
 			if (MonoBehaviourSingleton<UserInfoManager>.I.needShowOneTimesOfferSS)
 			{
-				SetActive((Enum)UI.SPR_SPECIAL_OFFER, is_visible: false);
-				SetActive((Enum)UI.SPR_SPECIAL_OFFER_LEFT, is_visible: true);
+				SetActive(UI.SPR_SPECIAL_OFFER, is_visible: false);
+				SetActive(UI.SPR_SPECIAL_OFFER_LEFT, is_visible: true);
 			}
 			else
 			{
-				SetActive((Enum)UI.SPR_SPECIAL_OFFER, is_visible: false);
-				SetActive((Enum)UI.SPR_SPECIAL_OFFER_LEFT, is_visible: false);
+				SetActive(UI.SPR_SPECIAL_OFFER, is_visible: false);
+				SetActive(UI.SPR_SPECIAL_OFFER_LEFT, is_visible: false);
 			}
 		}
 		UpdateNewMapUI();
@@ -269,9 +265,9 @@ public class MainMenu : UIBehaviour
 	private void UpdateSceneButton(MAIN_SCENE now, MAIN_SCENE check, UI active_ui, UI active_decoration, UI inactive_ui)
 	{
 		bool flag = now == check;
-		SetActive((Enum)active_ui, flag);
-		SetActive((Enum)active_decoration, flag);
-		SetActive((Enum)inactive_ui, !flag);
+		SetActive(active_ui, flag);
+		SetActive(active_decoration, flag);
+		SetActive(inactive_ui, !flag);
 		if (flag)
 		{
 			activeSceneButton = GetCtrl(active_ui);
@@ -331,16 +327,16 @@ public class MainMenu : UIBehaviour
 
 	public void SetMenuButtonEnable(bool is_enable)
 	{
-		SetButtonEnabled((Enum)UI.BTN_POP_MENU, is_enable);
+		SetButtonEnabled(UI.BTN_POP_MENU, is_enable);
 	}
 
 	public void UpdateGachaDeco(GachaDeco data)
 	{
-		bool flag = gachaDecoInfo == null && data != null;
+		bool num = gachaDecoInfo == null && data != null;
 		gachaDecoInfo = data;
-		if (flag)
+		if (num)
 		{
-			this.StartCoroutine(DoGachaDeco());
+			StartCoroutine(DoGachaDeco());
 		}
 	}
 
@@ -359,15 +355,15 @@ public class MainMenu : UIBehaviour
 			if (visible_info != null)
 			{
 				wait = true;
-				PlayTween((Enum)UI.OBJ_GACHA_DECO_ROOT, forward: false, (EventDelegate.Callback)delegate
+				PlayTween(UI.OBJ_GACHA_DECO_ROOT, forward: false, delegate
 				{
 					wait = false;
-				}, is_input_block: false, 0);
+				}, is_input_block: false);
 				while (wait)
 				{
 					yield return null;
 				}
-				SetActive((Enum)UI.OBJ_GACHA_DECO_ROOT, is_visible: false);
+				SetActive(UI.OBJ_GACHA_DECO_ROOT, is_visible: false);
 			}
 			if (gachaDecoInfo == null)
 			{
@@ -400,28 +396,28 @@ public class MainMenu : UIBehaviour
 			{
 				yield return load_queue.Wait();
 			}
-			Texture2D tex = lo_tex.loadedObject as Texture2D;
-			if (!(tex != null))
+			Texture2D texture2D = lo_tex.loadedObject as Texture2D;
+			if (!(texture2D != null))
 			{
 				continue;
 			}
-			SetActive((Enum)UI.OBJ_GACHA_DECO_ROOT, is_visible: true);
+			SetActive(UI.OBJ_GACHA_DECO_ROOT, is_visible: true);
 			for (int i = 0; i < icon_type_count; i++)
 			{
 				Transform gachaDecoIcon = GetGachaDecoIcon(i);
 				if (gachaDecoIcon != null)
 				{
-					gachaDecoIcon.get_gameObject().SetActive(icon_type == i);
+					gachaDecoIcon.gameObject.SetActive(icon_type == i);
 				}
 			}
-			SetTexture((Enum)UI.TEX_GACHA_DECO_IMAGE, tex);
-			SetWidth((Enum)UI.TEX_GACHA_DECO_IMAGE, tex.get_width());
-			SetHeight((Enum)UI.TEX_GACHA_DECO_IMAGE, tex.get_height());
+			SetTexture(UI.TEX_GACHA_DECO_IMAGE, texture2D);
+			SetWidth(UI.TEX_GACHA_DECO_IMAGE, texture2D.width);
+			SetHeight(UI.TEX_GACHA_DECO_IMAGE, texture2D.height);
 			wait = true;
-			PlayTween((Enum)UI.OBJ_GACHA_DECO_ROOT, forward: true, (EventDelegate.Callback)delegate
+			PlayTween(UI.OBJ_GACHA_DECO_ROOT, forward: true, delegate
 			{
 				wait = false;
-			}, is_input_block: false, 0);
+			}, is_input_block: false);
 			while (wait)
 			{
 				yield return null;

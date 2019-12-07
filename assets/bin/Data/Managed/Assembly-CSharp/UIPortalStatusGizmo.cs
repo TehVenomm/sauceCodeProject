@@ -47,13 +47,13 @@ public class UIPortalStatusGizmo : UIStatusGizmoBase
 			if (_portal != null)
 			{
 				_portal.uiGizmo = this;
-				this.get_gameObject().SetActive(true);
-				portalTransform = value.get_transform();
+				base.gameObject.SetActive(value: true);
+				portalTransform = value.transform;
 				UpdateParam();
 			}
 			else
 			{
-				this.get_gameObject().SetActive(false);
+				base.gameObject.SetActive(value: false);
 			}
 		}
 	}
@@ -63,43 +63,18 @@ public class UIPortalStatusGizmo : UIStatusGizmoBase
 		base.OnEnable();
 		if (arrow != null)
 		{
-			arrowTransform = arrow.get_transform();
+			arrowTransform = arrow.transform;
 		}
 	}
 
 	protected override void UpdateParam()
 	{
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0230: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0235: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0242: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0244: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0249: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0262: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0281: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0283: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0285: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0299: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02de: Unknown result type (might be due to invalid IL or missing references)
-		if (portal == null || !portal.get_gameObject().get_activeSelf())
+		if (portal == null || !portal.gameObject.activeSelf)
 		{
-			SetActiveSafe(statusSprite.get_gameObject(), active: false);
+			SetActiveSafe(statusSprite.gameObject, active: false);
 			SetActiveSafe(arrow, active: false);
-			SetActiveSafe(addTween.get_gameObject(), active: false);
-			SetActiveSafe(fullTween.get_gameObject(), active: false);
+			SetActiveSafe(addTween.gameObject, active: false);
+			SetActiveSafe(fullTween.gameObject, active: false);
 			return;
 		}
 		if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.NeedModifyPlayerStatusGizmo)
@@ -115,13 +90,13 @@ public class UIPortalStatusGizmo : UIStatusGizmoBase
 				screenBottomOffset = SpecialDeviceManager.SpecialDeviceInfo.UIPortalGizmoScreenBottomOffsetLandscape;
 			}
 		}
-		Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, portalTransform.get_position() + offset);
+		Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, portalTransform.position + offset);
 		screenZ = screenUIPosition.z;
 		screenUIPosition.z = 0f;
 		float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
-		Vector3 val = screenUIPosition;
+		Vector3 a = screenUIPosition;
 		bool flag = false;
-		float num2 = Screen.get_width();
+		float num2 = Screen.width;
 		if (screenUIPosition.x < screenSideOffset * num)
 		{
 			screenUIPosition.x = screenSideOffset * num;
@@ -139,25 +114,24 @@ public class UIPortalStatusGizmo : UIStatusGizmoBase
 		}
 		if (flag)
 		{
-			SetActiveSafe(statusSprite.get_gameObject(), active: true);
+			SetActiveSafe(statusSprite.gameObject, active: true);
 			SetActiveSafe(arrow, active: true);
-			Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
-			Vector3 val3 = transform.get_position() - val2;
-			if (val3.get_sqrMagnitude() >= 2E-05f)
+			Vector3 vector = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
+			if ((transform.position - vector).sqrMagnitude >= 2E-05f)
 			{
-				transform.set_position(val2);
+				transform.position = vector;
 			}
 			if (arrowTransform != null)
 			{
-				Vector3 val4 = val - screenUIPosition;
-				if (val4 != Vector3.get_zero())
+				Vector3 vector2 = a - screenUIPosition;
+				if (vector2 != Vector3.zero)
 				{
-					float num3 = 90f - Vector3.Angle(Vector3.get_right(), val4);
-					arrowTransform.set_eulerAngles(new Vector3(0f, 0f, num3));
+					float z = 90f - Vector3.Angle(Vector3.right, vector2);
+					arrowTransform.eulerAngles = new Vector3(0f, 0f, z);
 				}
 				else
 				{
-					arrowTransform.set_eulerAngles(new Vector3(0f, 0f, 0f));
+					arrowTransform.eulerAngles = new Vector3(0f, 0f, 0f);
 				}
 			}
 			bool flag2 = false;
@@ -176,13 +150,12 @@ public class UIPortalStatusGizmo : UIStatusGizmoBase
 						statusSprite.spriteName = "Ingame_portal_vitalsign_red";
 						break;
 					}
-					float num4 = (float)portal.nowPoint / (float)portal.maxPoint;
-					int num5 = (int)(num4 * (float)MonoBehaviourSingleton<InGameSettingsManager>.I.portal.pointRankNum);
-					if (num5 >= MonoBehaviourSingleton<InGameSettingsManager>.I.portal.pointRankNum - 1)
+					int num3 = (int)((float)portal.nowPoint / (float)portal.maxPoint * (float)MonoBehaviourSingleton<InGameSettingsManager>.I.portal.pointRankNum);
+					if (num3 >= MonoBehaviourSingleton<InGameSettingsManager>.I.portal.pointRankNum - 1)
 					{
-						num5 = MonoBehaviourSingleton<InGameSettingsManager>.I.portal.pointRankNum - 2;
+						num3 = MonoBehaviourSingleton<InGameSettingsManager>.I.portal.pointRankNum - 2;
 					}
-					statusSprite.spriteName = string.Format("Ingame_portal_vitalsign_red_{0}", num5.ToString("D2"));
+					statusSprite.spriteName = string.Format("Ingame_portal_vitalsign_red_{0}", num3.ToString("D2"));
 					break;
 				}
 				case PortalObject.VIEW_TYPE.TO_HOME:
@@ -198,30 +171,30 @@ public class UIPortalStatusGizmo : UIStatusGizmoBase
 			}
 			if (flag2)
 			{
-				SetActiveSafe(fullTween.get_gameObject(), active: true);
+				SetActiveSafe(fullTween.gameObject, active: true);
 				fullTween.Play();
 			}
 			else
 			{
-				SetActiveSafe(fullTween.get_gameObject(), active: false);
+				SetActiveSafe(fullTween.gameObject, active: false);
 			}
 		}
 		else
 		{
-			SetActiveSafe(statusSprite.get_gameObject(), active: false);
+			SetActiveSafe(statusSprite.gameObject, active: false);
 			SetActiveSafe(arrow, active: false);
-			SetActiveSafe(addTween.get_gameObject(), active: false);
-			SetActiveSafe(fullTween.get_gameObject(), active: false);
+			SetActiveSafe(addTween.gameObject, active: false);
+			SetActiveSafe(fullTween.gameObject, active: false);
 		}
 	}
 
 	public void OnGetPortalPoint()
 	{
-		SetActiveSafe(addTween.get_gameObject(), active: true);
+		SetActiveSafe(addTween.gameObject, active: true);
 		addTween.Reset();
 		addTween.Play(forward: true, delegate
 		{
-			SetActiveSafe(fullTween.get_gameObject(), active: false);
+			SetActiveSafe(fullTween.gameObject, active: false);
 		});
 	}
 }

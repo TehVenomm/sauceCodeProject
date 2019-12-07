@@ -21,7 +21,7 @@ public class InGameQuestEventSelectList : QuestEventSelectList
 
 	protected override IEnumerator DoInitialize()
 	{
-		SetActive((Enum)UI.OBJ_IMAGE, is_visible: false);
+		SetActive(UI.OBJ_IMAGE, is_visible: false);
 		GetDeliveryList();
 		EndInitialize();
 		yield break;
@@ -43,7 +43,7 @@ public class InGameQuestEventSelectList : QuestEventSelectList
 			Reposition(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
 		}
 		isInActiveRotate = false;
-		SetActive((Enum)UI.BTN_INGAME_INFO, !string.IsNullOrEmpty(eventData.linkName));
+		SetActive(UI.BTN_INGAME_INFO, !string.IsNullOrEmpty(eventData.linkName));
 		base.UpdateUI();
 	}
 
@@ -57,14 +57,12 @@ public class InGameQuestEventSelectList : QuestEventSelectList
 		GetCtrl(UI.SPR_BG_FRAME).GetComponent<UIScreenRotationHandler>().InvokeRotate();
 		GetCtrl(UI.SCR_DELIVERY_QUEST).GetComponent<UIScreenRotationHandler>().InvokeRotate();
 		UpdateAnchors();
-		UIScrollView component = GetCtrl(UI.SCR_DELIVERY_QUEST).GetComponent<UIScrollView>();
-		component.ResetPosition();
+		GetCtrl(UI.SCR_DELIVERY_QUEST).GetComponent<UIScrollView>().ResetPosition();
 		AppMain i2 = MonoBehaviourSingleton<AppMain>.I;
 		i2.onDelayCall = (Action)Delegate.Combine(i2.onDelayCall, (Action)delegate
 		{
 			RefreshUI();
-			UIPanel component2 = GetCtrl(UI.SCR_DELIVERY_QUEST).GetComponent<UIPanel>();
-			component2.Refresh();
+			GetCtrl(UI.SCR_DELIVERY_QUEST).GetComponent<UIPanel>().Refresh();
 		});
 	}
 
@@ -72,11 +70,11 @@ public class InGameQuestEventSelectList : QuestEventSelectList
 	{
 		if (base.transferUI != null)
 		{
-			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
 		}
 		else
 		{
-			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
 		}
 		if (!isInActiveRotate)
 		{
@@ -86,7 +84,6 @@ public class InGameQuestEventSelectList : QuestEventSelectList
 
 	protected override void OnQuery_INFO()
 	{
-		string eventData = string.Format(WebViewManager.NewsWithLinkParamFormatFromInGame, base.eventData.linkName);
-		GameSection.SetEventData(eventData);
+		GameSection.SetEventData(string.Format(WebViewManager.NewsWithLinkParamFormatFromInGame, eventData.linkName));
 	}
 }

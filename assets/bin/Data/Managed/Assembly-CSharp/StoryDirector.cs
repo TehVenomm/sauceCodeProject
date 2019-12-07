@@ -139,7 +139,7 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 
 	private Vector3Interpolator cameraPosAnim = new Vector3Interpolator();
 
-	private Vector3[] cameraPositions = (Vector3[])new Vector3[8];
+	private Vector3[] cameraPositions = new Vector3[8];
 
 	public ShakeInterpolator cameraShakeAnim = new ShakeInterpolator();
 
@@ -163,8 +163,6 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 
 	public void StartScript(int script_id, UITexture location_tex, UITexture effect_tex, IStoryEventReceiver event_receiver)
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		locationTex = location_tex;
 		effectTex = effect_tex;
 		eventReceiver = event_receiver;
@@ -172,27 +170,27 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 		{
 			cameraPositions[i] = new Vector3(0f, 0f, 0f);
 		}
-		this.StartCoroutine(DoScript(script_id));
+		StartCoroutine(DoScript(script_id));
 	}
 
 	private IEnumerator DoScript(int script_id)
 	{
-		yield return this.StartCoroutine(ParseScript(script_id));
-		yield return this.StartCoroutine(LoadScriptResources());
+		yield return StartCoroutine(ParseScript(script_id));
+		yield return StartCoroutine(LoadScriptResources());
 		while (isLoading)
 		{
 			yield return null;
 		}
-		yield return this.StartCoroutine(RunScript());
+		yield return StartCoroutine(RunScript());
 	}
 
 	private IEnumerator ParseScript(int script_id)
 	{
 		isLoading = true;
-		string scriptName = ResourceName.GetStoryScript(script_id);
+		string storyScript = ResourceName.GetStoryScript(script_id);
 		bool loading = true;
 		string text = null;
-		MonoBehaviourSingleton<DataTableManager>.I.LoadStory(scriptName, delegate(string x)
+		MonoBehaviourSingleton<DataTableManager>.I.LoadStory(storyScript, delegate(string x)
 		{
 			text = x;
 			loading = false;
@@ -202,29 +200,29 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 			yield return null;
 		}
 		isRunning = true;
-		CSVReader csv = new CSVReader(text, "cmd,p0,p1,p2,p3,jp");
-		while (csv.NextLine())
+		CSVReader cSVReader = new CSVReader(text, "cmd,p0,p1,p2,p3,jp");
+		while (cSVReader.NextLine())
 		{
-			StoryScript storyScript = new StoryScript();
-			csv.Pop(ref storyScript.cmd);
-			if (!string.IsNullOrEmpty(storyScript.cmd))
+			StoryScript storyScript2 = new StoryScript();
+			cSVReader.Pop(ref storyScript2.cmd);
+			if (!string.IsNullOrEmpty(storyScript2.cmd))
 			{
-				csv.Pop(ref storyScript.p0);
-				csv.Pop(ref storyScript.p1);
-				csv.Pop(ref storyScript.p2);
-				csv.Pop(ref storyScript.p3);
-				csv.Pop(ref storyScript.msg);
-				scriptCommands.Add(storyScript);
+				cSVReader.Pop(ref storyScript2.p0);
+				cSVReader.Pop(ref storyScript2.p1);
+				cSVReader.Pop(ref storyScript2.p2);
+				cSVReader.Pop(ref storyScript2.p3);
+				cSVReader.Pop(ref storyScript2.msg);
+				scriptCommands.Add(storyScript2);
 			}
 		}
 	}
 
 	private IEnumerator LoadScriptResources()
 	{
-		Transform camera_t = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
-		initCameraPos = camera_t.get_position();
+		Transform mainCameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
+		initCameraPos = mainCameraTransform.position;
 		cameraPosAnim.Set(initCameraPos);
-		LoadingQueue load_queue = new LoadingQueue(this);
+		LoadingQueue loadingQueue = new LoadingQueue(this);
 		int i;
 		for (int j = 0; j < scriptCommands.Count; j++)
 		{
@@ -238,7 +236,7 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 			case "EFF_SHOW_POS":
 				if (effectPrefabs.Get(p) == null)
 				{
-					LoadObject value = load_queue.LoadEffect(RESOURCE_CATEGORY.EFFECT_ACTION, p);
+					LoadObject value = loadingQueue.LoadEffect(RESOURCE_CATEGORY.EFFECT_ACTION, p);
 					effectPrefabs.Add(p, value);
 					if (effectRenderTex == null)
 					{
@@ -251,7 +249,7 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 				try
 				{
 					int se_id = int.Parse(p);
-					load_queue.CacheSE(se_id);
+					loadingQueue.CacheSE(se_id);
 				}
 				catch
 				{
@@ -264,7 +262,7 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 					try
 					{
 						int voice_id = int.Parse(p3);
-						load_queue.CacheVoice(voice_id);
+						loadingQueue.CacheVoice(voice_id);
 					}
 					catch
 					{
@@ -275,13 +273,15 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 			case "CHR_LOAD":
 			{
 				int num = -1;
-				for (i = 0; (float)i < 4f; i++)
+				i = 0;
+				while ((float)i < 4f)
 				{
 					if (charas.Find((StoryCharacter o) => o.id == i) == null)
 					{
 						num = i;
 						break;
 					}
+					int num2 = ++i;
 				}
 				if (num == -1)
 				{
@@ -310,656 +310,615 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 	private IEnumerator RunScript()
 	{
 		Transform camera_t = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
-		for (int cmd_row = 0; cmd_row < scriptCommands.Count; cmd_row++)
+		int cmd_row = 0;
+		Vector3 vector2 = default(Vector3);
+		Vector3 vector3 = default(Vector3);
+		while (cmd_row < scriptCommands.Count)
 		{
 			string cmd = scriptCommands[cmd_row].cmd;
-			string p0 = scriptCommands[cmd_row].p0;
+			string p4 = scriptCommands[cmd_row].p0;
 			string p = scriptCommands[cmd_row].p1;
 			string p2 = scriptCommands[cmd_row].p2;
 			string p3 = scriptCommands[cmd_row].p3;
 			string msg = scriptCommands[cmd_row].msg;
-			if (cmd != null)
+			Vector3 vector;
+			int i;
+			switch (cmd)
 			{
-				if (_003C_003Ef__switch_0024map0 == null)
+			case "WAIT":
+			{
+				float time2 = string.IsNullOrEmpty(p4) ? 0f : float.Parse(p4);
+				while (true)
 				{
-					Dictionary<string, int> dictionary = new Dictionary<string, int>(28);
-					dictionary.Add("WAIT", 0);
-					dictionary.Add("FADE_IN", 1);
-					dictionary.Add("FADE_OUT", 2);
-					dictionary.Add("CHR_EASE", 3);
-					dictionary.Add("EFF_SHOW", 4);
-					dictionary.Add("EFF_SHOW_POS", 5);
-					dictionary.Add("EFF_STOP", 6);
-					dictionary.Add("SE_PLAY", 7);
-					dictionary.Add("BGM_CHANGE", 8);
-					dictionary.Add("CHR_SHOW", 9);
-					dictionary.Add("CHR_HIDE", 10);
-					dictionary.Add("CHR_ROT", 11);
-					dictionary.Add("CHR_POSE", 12);
-					dictionary.Add("CHR_STAND", 13);
-					dictionary.Add("CHR_STAND_POS", 14);
-					dictionary.Add("CHR_SCALE", 15);
-					dictionary.Add("CHR_FACE", 16);
-					dictionary.Add("CAM_SET", 17);
-					dictionary.Add("CAM_MOV", 18);
-					dictionary.Add("CAM_PAN", 19);
-					dictionary.Add("CHR_ALIAS", 20);
-					dictionary.Add("MSG", 21);
-					dictionary.Add("BG", 22);
-					dictionary.Add("HIGE_POS", 23);
-					dictionary.Add("FADE_IN_TIME", 24);
-					dictionary.Add("FADE_OUT_TIME", 25);
-					dictionary.Add("CAM_SHAKE", 26);
-					dictionary.Add("CAM_SHAKE_STOP", 27);
-					_003C_003Ef__switch_0024map0 = dictionary;
-				}
-				if (_003C_003Ef__switch_0024map0.TryGetValue(cmd, out int value))
-				{
-					Vector3 val2;
-					switch (value)
+					yield return null;
+					if (time2 > 0f)
 					{
-					case 0:
-					{
-						float time = (!string.IsNullOrEmpty(p0)) ? float.Parse(p0) : 0f;
-						while (true)
-						{
-							yield return null;
-							if (time > 0f)
-							{
-								time -= Time.get_deltaTime();
-							}
-							else if (!MonoBehaviourSingleton<ResourceManager>.I.isLoading && !InstantiateManager.isBusy && !MonoBehaviourSingleton<TransitionManager>.I.isTransing && !(charas.Find((StoryCharacter o) => o.isMoving) != null) && !cameraPosAnim.IsPlaying())
-							{
-								break;
-							}
-						}
-						break;
+						time2 -= Time.deltaTime;
 					}
-					case 1:
-						eventReceiver.FadeIn();
-						break;
-					case 2:
+					else if (!MonoBehaviourSingleton<ResourceManager>.I.isLoading && !InstantiateManager.isBusy && !MonoBehaviourSingleton<TransitionManager>.I.isTransing && !(charas.Find((StoryCharacter o) => o.isMoving) != null) && !cameraPosAnim.IsPlaying())
 					{
-						Color fadeout_color = Color.get_black();
-						switch (p0)
-						{
-						case "BLUE":
-							fadeout_color = Color.get_blue();
-							break;
-						case "WHITE":
-							fadeout_color = Color.get_white();
-							break;
-						case "RED":
-							fadeout_color = Color.get_red();
-							break;
-						case "YELLOW":
-							fadeout_color = Color.get_yellow();
-							break;
-						}
-						eventReceiver.FadeOut(fadeout_color);
 						break;
-					}
-					case 3:
-					{
-						StoryCharacter.EaseDir type = (!(p == "L")) ? StoryCharacter.EaseDir.RIGHT : StoryCharacter.EaseDir.LEFT;
-						bool forward = (!(p2 == "IN")) ? true : false;
-						StoryCharacter chara = FindChara(p0);
-						if (chara != null)
-						{
-							while (chara.isLoading)
-							{
-								yield return null;
-							}
-							chara.PlayTween(type, forward);
-						}
-						break;
-					}
-					case 4:
-					{
-						LoadObject load_obj = effectPrefabs.Get(p0);
-						if (load_obj != null)
-						{
-							while (load_obj.isLoading)
-							{
-								yield return null;
-							}
-							Transform effect = ResourceUtility.Realizes(load_obj.loadedObject, effectRenderTex.modelTransform, 1);
-							Vector3 pos = Vector3.get_zero();
-							StoryCharacter chara2 = FindChara(p);
-							if (chara2 != null)
-							{
-								pos = chara2.model.get_position();
-							}
-							Vector3 position = camera_t.get_position();
-							pos.y = position.y;
-							effect.set_position(pos);
-							if (float.TryParse(p2, out float scale))
-							{
-								effect.set_localScale(new Vector3(scale, scale, scale));
-							}
-						}
-						break;
-					}
-					case 5:
-					{
-						LoadObject load_obj2 = effectPrefabs.Get(p0);
-						if (load_obj2 != null)
-						{
-							while (load_obj2.isLoading)
-							{
-								yield return null;
-							}
-							Transform effect2 = ResourceUtility.Realizes(load_obj2.loadedObject, effectRenderTex.modelTransform, 1);
-							float x = 0f;
-							float y = 0f;
-							float.TryParse(p, out x);
-							if (float.TryParse(p2, out y))
-							{
-								float num7 = y;
-								Vector3 position2 = camera_t.get_position();
-								y = num7 + position2.y;
-							}
-							effect2.set_position(new Vector3(x, y, 3.5f));
-							if (float.TryParse(p3, out float scale2))
-							{
-								effect2.set_localScale(new Vector3(scale2, scale2, scale2));
-							}
-						}
-						break;
-					}
-					case 6:
-					{
-						Transform val = effectRenderTex.modelTransform.Find(p0);
-						if (val != null)
-						{
-							Object.Destroy(val.get_gameObject());
-						}
-						break;
-					}
-					case 7:
-					{
-						int se_id = int.Parse(p0);
-						SoundManager.PlayOneShotUISE(se_id);
-						break;
-					}
-					case 8:
-					{
-						int requestBGMID = int.Parse(p0);
-						MonoBehaviourSingleton<SoundManager>.I.requestBGMID = requestBGMID;
-						break;
-					}
-					case 9:
-					{
-						StoryCharacter chara3 = FindChara(p0);
-						if (chara3 != null)
-						{
-							while (chara3.isLoading)
-							{
-								yield return null;
-							}
-							FadeCharacter(fadein: true, chara3);
-							yield return (object)new WaitForSeconds(MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.charaFadeTime);
-						}
-						break;
-					}
-					case 10:
-					{
-						StoryCharacter chara4 = FindChara(p0);
-						if (chara4 != null)
-						{
-							while (chara4.isLoading)
-							{
-								yield return null;
-							}
-							FadeCharacter(fadein: false, chara4);
-							yield return (object)new WaitForSeconds(MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.charaFadeTime);
-						}
-						break;
-					}
-					case 11:
-					{
-						StoryCharacter storyCharacter6 = FindChara(p0);
-						if (storyCharacter6 != null)
-						{
-							float result3 = 0.5f;
-							if (!string.IsNullOrEmpty(p2))
-							{
-								float.TryParse(p2, out result3);
-							}
-							float result4;
-							if (string.IsNullOrEmpty(p))
-							{
-								storyCharacter6.RotateDefault(result3);
-							}
-							else if (p == "F")
-							{
-								storyCharacter6.RotateFront(result3);
-							}
-							else if (float.TryParse(p, out result4))
-							{
-								storyCharacter6.RotateAngle(result4, result3);
-							}
-						}
-						break;
-					}
-					case 12:
-					{
-						StoryCharacter storyCharacter4 = FindChara(p0);
-						if (storyCharacter4 != null)
-						{
-							storyCharacter4.RequestPose(p);
-						}
-						break;
-					}
-					case 13:
-					{
-						StoryCharacter storyCharacter2 = FindChara(p0);
-						if (storyCharacter2 != null)
-						{
-							storyCharacter2.SetStandPosition(p, doesSetImmidiate: true);
-						}
-						break;
-					}
-					case 14:
-					{
-						StoryCharacter storyCharacter9 = FindChara(p0);
-						if (storyCharacter9 != null)
-						{
-							float result5 = 0f;
-							float result6 = 0f;
-							float result7 = 0.3f;
-							if (!string.IsNullOrEmpty(p))
-							{
-								float.TryParse(p, out result5);
-							}
-							if (!string.IsNullOrEmpty(p2))
-							{
-								float.TryParse(p2, out result6);
-							}
-							if (!string.IsNullOrEmpty(p3))
-							{
-								float.TryParse(p3, out result7);
-							}
-							storyCharacter9.SetPosition(result5, result6, result7);
-						}
-						break;
-					}
-					case 15:
-					{
-						StoryCharacter storyCharacter5 = FindChara(p0);
-						if (storyCharacter5 != null)
-						{
-							val2 = default(Vector3);
-							val2.x = float.Parse(p);
-							val2.y = float.Parse(p);
-							val2.z = float.Parse(p);
-							Vector3 modelScale = val2;
-							storyCharacter5.SetModelScale(modelScale);
-						}
-						break;
-					}
-					case 16:
-					{
-						StoryCharacter storyCharacter3 = FindChara(p0);
-						if (storyCharacter3 != null)
-						{
-							storyCharacter3.RequestFace(p, p2);
-						}
-						break;
-					}
-					case 17:
-					{
-						int num3 = int.Parse(p0);
-						if (0 <= num3 && cameraPositions.Length > num3)
-						{
-							float num4 = float.Parse(p);
-							float num5 = float.Parse(p2);
-							float num6 = float.Parse(p3);
-							cameraPositions[num3] = new Vector3(num4, num5, num6);
-						}
-						break;
-					}
-					case 18:
-					{
-						float result = 0.3f;
-						if (!string.IsNullOrEmpty(p))
-						{
-							float.TryParse(p, out result);
-						}
-						int num2 = int.Parse(p0);
-						if (0 <= num2 && cameraPositions.Length > num2)
-						{
-							Vector3Interpolator vector3Interpolator = cameraPosAnim;
-							float time3 = result;
-							Vector3 end_value = cameraPositions[num2];
-							val2 = default(Vector3);
-							vector3Interpolator.Set(time3, end_value, null, val2);
-							cameraPosAnim.Play();
-						}
-						break;
-					}
-					case 19:
-					{
-						StoryCharacter storyCharacter8 = FindChara(p0);
-						if (storyCharacter8 != null)
-						{
-							int charaShowCount = GetCharaShowCount();
-							switch (charaShowCount)
-							{
-							case 1:
-							{
-								val2 = storyCharacter8.model.get_position();
-								Vector3 end_value2 = default(Vector3);
-								end_value2.x = val2.x;
-								Transform val3 = (!(p == "F")) ? Utility.Find(storyCharacter8.model, "Neck") : Utility.Find(storyCharacter8.model, "Spine01");
-								if (val3 != null)
-								{
-									Vector3 position3 = val3.get_position();
-									end_value2.y = position3.y;
-								}
-								else
-								{
-									end_value2.y = initCameraPos.y;
-								}
-								if (p == "N")
-								{
-									end_value2.z = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.cameraPanNearZ;
-								}
-								else if (p == "F")
-								{
-									end_value2.z = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.cameraPanFarZ;
-								}
-								else
-								{
-									end_value2.z = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.cameraPanNormalZ;
-								}
-								cameraPosAnim.Set(0.3f, end_value2);
-								cameraPosAnim.Play();
-								break;
-							}
-							case 2:
-								cameraPosAnim.Set(0.3f, MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.duoCameraPos);
-								cameraPosAnim.Play();
-								break;
-							default:
-								if (3 <= charaShowCount)
-								{
-									cameraPosAnim.Set(0.3f, MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.trioCameraPos);
-									cameraPosAnim.Play();
-								}
-								break;
-							}
-						}
-						else
-						{
-							Vector3 end_value3 = default(Vector3);
-							end_value3.x = 0f;
-							end_value3.y = initCameraPos.y;
-							end_value3.z = 0f;
-							cameraPosAnim.Set(0.3f, end_value3);
-							cameraPosAnim.Play();
-						}
-						break;
-					}
-					case 20:
-					{
-						StoryCharacter storyCharacter7 = FindChara(p0);
-						if (storyCharacter7 != null)
-						{
-							storyCharacter7.SetAliasName(p);
-						}
-						break;
-					}
-					case 21:
-					{
-						MSG_TYPE msg_type = MSG_TYPE.NORMAL;
-						if (p == "M" || p == "MONOLOGUE")
-						{
-							msg_type = MSG_TYPE.MONOLOGUE;
-						}
-						waitMessage = true;
-						StoryCharacter storyCharacter = FindChara(p0);
-						msg = GetReplacedText(msg);
-						LabelOption labelOption = null;
-						if (!string.IsNullOrEmpty(p3))
-						{
-							string[] array = p3.Split(',');
-							if (array != null && array.Length > 0)
-							{
-								labelOption = new LabelOption();
-								string[] array2 = array;
-								for (int i = 0; i < array2.Length; i++)
-								{
-									string text4 = array2[i];
-									string text3 = p3.ToUpper();
-									if (text3.IndexOf("BBCODE") >= 0)
-									{
-										labelOption.BBCode = true;
-									}
-									if (text3.IndexOf("CENTER") >= 0)
-									{
-										labelOption.Alignment = NGUIText.Alignment.Center;
-									}
-									if (text3.IndexOf("RIGHT") >= 0)
-									{
-										labelOption.Alignment = NGUIText.Alignment.Right;
-									}
-									if (text3.IndexOf("LEFT") >= 0)
-									{
-										labelOption.Alignment = NGUIText.Alignment.Left;
-									}
-									if (text3.IndexOf("FONTSIZE") < 0 || text3.IndexOf('=') < 0)
-									{
-										continue;
-									}
-									string[] array3 = text3.Split('=');
-									if (array3 != null && array3.Length >= 2)
-									{
-										string s = array3[1].Trim();
-										int result2 = 20;
-										if (int.TryParse(s, out result2))
-										{
-											labelOption.FontSize = result2;
-										}
-									}
-								}
-							}
-						}
-						POS pOS = POS.NONE;
-						if (storyCharacter != null)
-						{
-							pOS = storyCharacter.dir;
-						}
-						if (pOS != 0 && tailPos != 0)
-						{
-							pOS = tailPos;
-						}
-						eventReceiver.AddMessage((!(storyCharacter != null)) ? p0 : storyCharacter.displayName, msg, pOS, msg_type, labelOption);
-						if (!string.IsNullOrEmpty(p2))
-						{
-							int voice_id = int.Parse(p2);
-							SoundManager.PlayVoice(voice_id);
-						}
-						break;
-					}
-					case 22:
-					{
-						bool isFirstLoad = false;
-						LoadingQueue load_queue = new LoadingQueue(this);
-						if (locationRednerTex != null)
-						{
-							locationRednerTex.Release();
-						}
-						else
-						{
-							isFirstLoad = true;
-						}
-						int loc_image_id = int.Parse(p0);
-						int loc_sky_id = int.Parse(p);
-						ResourceManager.enableCache = false;
-						LoadObject lo_loc_image = (loc_image_id <= 0) ? null : load_queue.Load(RESOURCE_CATEGORY.STORY_LOCATION_IMAGE, ResourceName.GetStoryLocationImage(loc_image_id));
-						LoadObject lo_loc_sky = (loc_sky_id <= 0) ? null : load_queue.Load(RESOURCE_CATEGORY.STORY_LOCATION_SKY, ResourceName.GetStoryLocationSky(loc_sky_id));
-						yield return load_queue.Wait();
-						ResourceManager.enableCache = true;
-						locationRednerTex = UIRenderTexture.Get(locationTex, -1f, link_main_camera: false, 0);
-						locationRednerTex.Disable();
-						locationRednerTex.orthographicSize = (float)locationTex.height * 0.5f * 0.01f;
-						locationRednerTex.modelTransform.set_position(new Vector3(0f, 0f, 10f));
-						locationRoot = Utility.CreateGameObject("LocationRoot", locationRednerTex.modelTransform, locationRednerTex.renderLayer);
-						locationRoot.set_localPosition(new Vector3(0f, 0f, 3f));
-						locationRoot.set_localScale(new Vector3(0.01f, 0.01f, 1f));
-						if (lo_loc_image != null)
-						{
-							locationImageRoot = Utility.CreateGameObject("LocationImageRoot", locationRoot, locationRednerTex.renderLayer);
-							locationImage = ResourceUtility.Realizes(lo_loc_image.loadedObject, locationImageRoot, locationRednerTex.renderLayer);
-						}
-						if (lo_loc_sky != null)
-						{
-							locationSky = ResourceUtility.Realizes(lo_loc_sky.loadedObject, locationRoot, locationRednerTex.renderLayer);
-							locationSky.set_localPosition(new Vector3(0f, 0f, 1f));
-						}
-						locationRednerTex.Enable();
-						if (isFirstLoad)
-						{
-							eventReceiver.EndLoadFirstBG();
-						}
-						break;
-					}
-					case 23:
-					{
-						string text = p0;
-						tailPos = POS.NONE;
-						if (!string.IsNullOrEmpty(text))
-						{
-							if (text.Equals("L"))
-							{
-								tailPos = POS.LEFT;
-							}
-							else if (text.Equals("C"))
-							{
-								tailPos = POS.CENTER;
-							}
-							else if (text.Equals("R"))
-							{
-								tailPos = POS.RIGHT;
-							}
-						}
-						else
-						{
-							Log.Error(LOG.EXCEPTION, "{0}コマンドのパラムに値がセットされていません。", cmd);
-						}
-						break;
-					}
-					case 24:
-					{
-						float fade_time = 1f;
-						if (!string.IsNullOrEmpty(p))
-						{
-							fade_time = float.Parse(p);
-						}
-						eventReceiver.FadeIn(fade_time);
-						break;
-					}
-					case 25:
-					{
-						Color fadeout_color2 = Color.get_black();
-						float fade_time2 = 1f;
-						if (!string.IsNullOrEmpty(p))
-						{
-							fade_time2 = float.Parse(p);
-						}
-						if (p0 != null)
-						{
-							if (!(p0 == "BLUE"))
-							{
-								if (!(p0 == "WHITE"))
-								{
-									if (!(p0 == "RED"))
-									{
-										if (p0 == "YELLOW")
-										{
-											fadeout_color2 = Color.get_yellow();
-										}
-									}
-									else
-									{
-										fadeout_color2 = Color.get_red();
-									}
-								}
-								else
-								{
-									fadeout_color2 = Color.get_white();
-								}
-							}
-							else
-							{
-								fadeout_color2 = Color.get_blue();
-							}
-						}
-						eventReceiver.FadeOut(fadeout_color2, fade_time2);
-						break;
-					}
-					case 26:
-					{
-						string text2 = p0;
-						float num = 0f;
-						cameraShakeAnim.loopType = Interpolator.LOOP.NONE;
-						if (!string.IsNullOrEmpty(p))
-						{
-							num = float.Parse(p);
-							if (num == 0f)
-							{
-								cameraShakeAnim.loopType = Interpolator.LOOP.REPETE;
-								num = 1f;
-							}
-						}
-						else
-						{
-							Log.Error(LOG.EXCEPTION, "{0}コマンドの時間がセットされていません。", cmd);
-						}
-						Vector3 add_value = default(Vector3);
-						add_value._002Ector(0.05f, 0.1f, 1f);
-						if (text2.Equals("S"))
-						{
-							add_value._002Ector(0.005f, 0.0125f, 1f);
-						}
-						else if (text2.Equals("M"))
-						{
-							add_value._002Ector(0.01f, 0.025f, 1f);
-						}
-						else if (text2.Equals("L"))
-						{
-							add_value._002Ector(0.02f, 0.05f, 1f);
-						}
-						cameraShakeAnim.Set(num, Vector3.get_zero(), Vector3.get_zero(), null, add_value);
-						cameraShakeAnim.Play();
-						break;
-					}
-					case 27:
-					{
-						float time2 = (!string.IsNullOrEmpty(p0)) ? float.Parse(p0) : 0f;
-						while (true)
-						{
-							yield return null;
-							if (time2 > 0f)
-							{
-								time2 -= Time.get_deltaTime();
-							}
-							else if (!MonoBehaviourSingleton<ResourceManager>.I.isLoading && !InstantiateManager.isBusy && !MonoBehaviourSingleton<TransitionManager>.I.isTransing && !(charas.Find((StoryCharacter o) => o.isMoving) != null) && !cameraPosAnim.IsPlaying())
-							{
-								break;
-							}
-						}
-						cameraShakeAnim.Stop();
-						break;
-					}
 					}
 				}
+				break;
+			}
+			case "FADE_IN":
+				eventReceiver.FadeIn();
+				break;
+			case "FADE_OUT":
+			{
+				Color fadeout_color2 = Color.black;
+				switch (p4)
+				{
+				case "BLUE":
+					fadeout_color2 = Color.blue;
+					break;
+				case "WHITE":
+					fadeout_color2 = Color.white;
+					break;
+				case "RED":
+					fadeout_color2 = Color.red;
+					break;
+				case "YELLOW":
+					fadeout_color2 = Color.yellow;
+					break;
+				}
+				eventReceiver.FadeOut(fadeout_color2);
+				break;
+			}
+			case "CHR_EASE":
+			{
+				StoryCharacter.EaseDir type = (!(p == "L")) ? StoryCharacter.EaseDir.RIGHT : StoryCharacter.EaseDir.LEFT;
+				bool forward2 = (!(p2 == "IN")) ? true : false;
+				StoryCharacter chara2 = FindChara(p4);
+				if (chara2 != null)
+				{
+					while (chara2.isLoading)
+					{
+						yield return null;
+					}
+					chara2.PlayTween(type, forward2);
+				}
+				break;
+			}
+			case "EFF_SHOW":
+			{
+				LoadObject load_obj = effectPrefabs.Get(p4);
+				if (load_obj != null)
+				{
+					while (load_obj.isLoading)
+					{
+						yield return null;
+					}
+					Transform transform = ResourceUtility.Realizes(load_obj.loadedObject, effectRenderTex.modelTransform, 1);
+					Vector3 position = Vector3.zero;
+					StoryCharacter storyCharacter3 = FindChara(p);
+					if (storyCharacter3 != null)
+					{
+						position = storyCharacter3.model.position;
+					}
+					position.y = camera_t.position.y;
+					transform.position = position;
+					if (float.TryParse(p2, out float result3))
+					{
+						transform.localScale = new Vector3(result3, result3, result3);
+					}
+				}
+				break;
+			}
+			case "EFF_SHOW_POS":
+			{
+				LoadObject load_obj = effectPrefabs.Get(p4);
+				if (load_obj != null)
+				{
+					while (load_obj.isLoading)
+					{
+						yield return null;
+					}
+					Transform transform4 = ResourceUtility.Realizes(load_obj.loadedObject, effectRenderTex.modelTransform, 1);
+					float result9 = 0f;
+					float result10 = 0f;
+					float.TryParse(p, out result9);
+					if (float.TryParse(p2, out result10))
+					{
+						result10 += camera_t.position.y;
+					}
+					transform4.position = new Vector3(result9, result10, 3.5f);
+					if (float.TryParse(p3, out float result11))
+					{
+						transform4.localScale = new Vector3(result11, result11, result11);
+					}
+				}
+				break;
+			}
+			case "EFF_STOP":
+			{
+				Transform transform2 = effectRenderTex.modelTransform.Find(p4);
+				if (transform2 != null)
+				{
+					Object.Destroy(transform2.gameObject);
+				}
+				break;
+			}
+			case "SE_PLAY":
+				SoundManager.PlayOneShotUISE(int.Parse(p4));
+				break;
+			case "BGM_CHANGE":
+			{
+				int requestBGMID = int.Parse(p4);
+				MonoBehaviourSingleton<SoundManager>.I.requestBGMID = requestBGMID;
+				break;
+			}
+			case "CHR_SHOW":
+			{
+				StoryCharacter chara2 = FindChara(p4);
+				if (chara2 != null)
+				{
+					while (chara2.isLoading)
+					{
+						yield return null;
+					}
+					FadeCharacter(fadein: true, chara2);
+					yield return new WaitForSeconds(MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.charaFadeTime);
+				}
+				break;
+			}
+			case "CHR_HIDE":
+			{
+				StoryCharacter chara2 = FindChara(p4);
+				if (chara2 != null)
+				{
+					while (chara2.isLoading)
+					{
+						yield return null;
+					}
+					FadeCharacter(fadein: false, chara2);
+					yield return new WaitForSeconds(MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.charaFadeTime);
+				}
+				break;
+			}
+			case "CHR_ROT":
+			{
+				StoryCharacter storyCharacter5 = FindChara(p4);
+				if (storyCharacter5 != null)
+				{
+					float result4 = 0.5f;
+					if (!string.IsNullOrEmpty(p2))
+					{
+						float.TryParse(p2, out result4);
+					}
+					float result5;
+					if (string.IsNullOrEmpty(p))
+					{
+						storyCharacter5.RotateDefault(result4);
+					}
+					else if (p == "F")
+					{
+						storyCharacter5.RotateFront(result4);
+					}
+					else if (float.TryParse(p, out result5))
+					{
+						storyCharacter5.RotateAngle(result5, result4);
+					}
+				}
+				break;
+			}
+			case "CHR_POSE":
+			{
+				StoryCharacter storyCharacter8 = FindChara(p4);
+				if (storyCharacter8 != null)
+				{
+					storyCharacter8.RequestPose(p);
+				}
+				break;
+			}
+			case "CHR_STAND":
+			{
+				StoryCharacter storyCharacter = FindChara(p4);
+				if (storyCharacter != null)
+				{
+					storyCharacter.SetStandPosition(p, doesSetImmidiate: true);
+				}
+				break;
+			}
+			case "CHR_STAND_POS":
+			{
+				StoryCharacter storyCharacter6 = FindChara(p4);
+				if (storyCharacter6 != null)
+				{
+					float result6 = 0f;
+					float result7 = 0f;
+					float result8 = 0.3f;
+					if (!string.IsNullOrEmpty(p))
+					{
+						float.TryParse(p, out result6);
+					}
+					if (!string.IsNullOrEmpty(p2))
+					{
+						float.TryParse(p2, out result7);
+					}
+					if (!string.IsNullOrEmpty(p3))
+					{
+						float.TryParse(p3, out result8);
+					}
+					storyCharacter6.SetPosition(result6, result7, result8);
+				}
+				break;
+			}
+			case "CHR_SCALE":
+			{
+				StoryCharacter storyCharacter4 = FindChara(p4);
+				if (storyCharacter4 != null)
+				{
+					vector = default(Vector3);
+					vector.x = float.Parse(p);
+					vector.y = float.Parse(p);
+					vector.z = float.Parse(p);
+					Vector3 modelScale = vector;
+					storyCharacter4.SetModelScale(modelScale);
+				}
+				break;
+			}
+			case "CHR_FACE":
+			{
+				StoryCharacter storyCharacter7 = FindChara(p4);
+				if (storyCharacter7 != null)
+				{
+					storyCharacter7.RequestFace(p, p2);
+				}
+				break;
+			}
+			case "CAM_SET":
+			{
+				int num5 = int.Parse(p4);
+				if (0 <= num5 && cameraPositions.Length > num5)
+				{
+					float x = float.Parse(p);
+					float y = float.Parse(p2);
+					float z = float.Parse(p3);
+					cameraPositions[num5] = new Vector3(x, y, z);
+				}
+				break;
+			}
+			case "CAM_MOV":
+			{
+				float result = 0.3f;
+				if (!string.IsNullOrEmpty(p))
+				{
+					float.TryParse(p, out result);
+				}
+				int num = int.Parse(p4);
+				if (0 <= num && cameraPositions.Length > num)
+				{
+					Vector3Interpolator vector3Interpolator = cameraPosAnim;
+					float time3 = result;
+					Vector3 end_value = cameraPositions[num];
+					vector = default(Vector3);
+					vector3Interpolator.Set(time3, end_value, null, vector);
+					cameraPosAnim.Play();
+				}
+				break;
+			}
+			case "CAM_PAN":
+			{
+				StoryCharacter storyCharacter10 = FindChara(p4);
+				if (storyCharacter10 != null)
+				{
+					int charaShowCount = GetCharaShowCount();
+					if (1 == charaShowCount)
+					{
+						vector2.x = storyCharacter10.model.position.x;
+						Transform transform3 = (!(p == "F")) ? Utility.Find(storyCharacter10.model, "Neck") : Utility.Find(storyCharacter10.model, "Spine01");
+						if (transform3 != null)
+						{
+							vector2.y = transform3.position.y;
+						}
+						else
+						{
+							vector2.y = initCameraPos.y;
+						}
+						if (p == "N")
+						{
+							vector2.z = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.cameraPanNearZ;
+						}
+						else if (p == "F")
+						{
+							vector2.z = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.cameraPanFarZ;
+						}
+						else
+						{
+							vector2.z = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.cameraPanNormalZ;
+						}
+						Vector3Interpolator vector3Interpolator2 = cameraPosAnim;
+						Vector3 end_value2 = vector2;
+						vector = default(Vector3);
+						vector3Interpolator2.Set(0.3f, end_value2, null, vector);
+						cameraPosAnim.Play();
+					}
+					else if (2 == charaShowCount)
+					{
+						Vector3Interpolator vector3Interpolator3 = cameraPosAnim;
+						Vector3 duoCameraPos = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.duoCameraPos;
+						vector = default(Vector3);
+						vector3Interpolator3.Set(0.3f, duoCameraPos, null, vector);
+						cameraPosAnim.Play();
+					}
+					else if (3 <= charaShowCount)
+					{
+						Vector3Interpolator vector3Interpolator4 = cameraPosAnim;
+						Vector3 trioCameraPos = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.trioCameraPos;
+						vector = default(Vector3);
+						vector3Interpolator4.Set(0.3f, trioCameraPos, null, vector);
+						cameraPosAnim.Play();
+					}
+				}
+				else
+				{
+					vector3.x = 0f;
+					vector3.y = initCameraPos.y;
+					vector3.z = 0f;
+					Vector3Interpolator vector3Interpolator5 = cameraPosAnim;
+					Vector3 end_value3 = vector3;
+					vector = default(Vector3);
+					vector3Interpolator5.Set(0.3f, end_value3, null, vector);
+					cameraPosAnim.Play();
+				}
+				break;
+			}
+			case "CHR_ALIAS":
+			{
+				StoryCharacter storyCharacter9 = FindChara(p4);
+				if (storyCharacter9 != null)
+				{
+					storyCharacter9.SetAliasName(p);
+				}
+				break;
+			}
+			case "MSG":
+			{
+				MSG_TYPE msg_type = MSG_TYPE.NORMAL;
+				if (p == "M" || p == "MONOLOGUE")
+				{
+					msg_type = MSG_TYPE.MONOLOGUE;
+				}
+				waitMessage = true;
+				StoryCharacter storyCharacter2 = FindChara(p4);
+				msg = GetReplacedText(msg);
+				LabelOption labelOption = null;
+				if (!string.IsNullOrEmpty(p3))
+				{
+					string[] array = p3.Split(',');
+					if (array != null && array.Length != 0)
+					{
+						labelOption = new LabelOption();
+						string[] array2 = array;
+						for (i = 0; i < array2.Length; i++)
+						{
+							_ = array2[i];
+							string text2 = p3.ToUpper();
+							if (text2.IndexOf("BBCODE") >= 0)
+							{
+								labelOption.BBCode = true;
+							}
+							if (text2.IndexOf("CENTER") >= 0)
+							{
+								labelOption.Alignment = NGUIText.Alignment.Center;
+							}
+							if (text2.IndexOf("RIGHT") >= 0)
+							{
+								labelOption.Alignment = NGUIText.Alignment.Right;
+							}
+							if (text2.IndexOf("LEFT") >= 0)
+							{
+								labelOption.Alignment = NGUIText.Alignment.Left;
+							}
+							if (text2.IndexOf("FONTSIZE") < 0 || text2.IndexOf('=') < 0)
+							{
+								continue;
+							}
+							string[] array3 = text2.Split('=');
+							if (array3 != null && array3.Length >= 2)
+							{
+								string s = array3[1].Trim();
+								int result2 = 20;
+								if (int.TryParse(s, out result2))
+								{
+									labelOption.FontSize = result2;
+								}
+							}
+						}
+					}
+				}
+				POS pOS = POS.NONE;
+				if (storyCharacter2 != null)
+				{
+					pOS = storyCharacter2.dir;
+				}
+				if (pOS != 0 && tailPos != 0)
+				{
+					pOS = tailPos;
+				}
+				eventReceiver.AddMessage((storyCharacter2 != null) ? storyCharacter2.displayName : p4, msg, pOS, msg_type, labelOption);
+				if (!string.IsNullOrEmpty(p2))
+				{
+					SoundManager.PlayVoice(int.Parse(p2));
+				}
+				break;
+			}
+			case "BG":
+			{
+				bool forward2 = false;
+				LoadingQueue loadingQueue = new LoadingQueue(this);
+				if (locationRednerTex != null)
+				{
+					locationRednerTex.Release();
+				}
+				else
+				{
+					forward2 = true;
+				}
+				int num3 = int.Parse(p4);
+				int num4 = int.Parse(p);
+				ResourceManager.enableCache = false;
+				LoadObject load_obj = (num3 > 0) ? loadingQueue.Load(RESOURCE_CATEGORY.STORY_LOCATION_IMAGE, ResourceName.GetStoryLocationImage(num3)) : null;
+				LoadObject lo_loc_sky = (num4 > 0) ? loadingQueue.Load(RESOURCE_CATEGORY.STORY_LOCATION_SKY, ResourceName.GetStoryLocationSky(num4)) : null;
+				yield return loadingQueue.Wait();
+				ResourceManager.enableCache = true;
+				locationRednerTex = UIRenderTexture.Get(locationTex, -1f, link_main_camera: false, 0);
+				locationRednerTex.Disable();
+				locationRednerTex.orthographicSize = (float)locationTex.height * 0.5f * 0.01f;
+				locationRednerTex.modelTransform.position = new Vector3(0f, 0f, 10f);
+				locationRoot = Utility.CreateGameObject("LocationRoot", locationRednerTex.modelTransform, locationRednerTex.renderLayer);
+				locationRoot.localPosition = new Vector3(0f, 0f, 3f);
+				locationRoot.localScale = new Vector3(0.01f, 0.01f, 1f);
+				if (load_obj != null)
+				{
+					locationImageRoot = Utility.CreateGameObject("LocationImageRoot", locationRoot, locationRednerTex.renderLayer);
+					locationImage = ResourceUtility.Realizes(load_obj.loadedObject, locationImageRoot, locationRednerTex.renderLayer);
+				}
+				if (lo_loc_sky != null)
+				{
+					locationSky = ResourceUtility.Realizes(lo_loc_sky.loadedObject, locationRoot, locationRednerTex.renderLayer);
+					locationSky.localPosition = new Vector3(0f, 0f, 1f);
+				}
+				locationRednerTex.Enable();
+				if (forward2)
+				{
+					eventReceiver.EndLoadFirstBG();
+				}
+				break;
+			}
+			case "HIGE_POS":
+			{
+				string text = p4;
+				tailPos = POS.NONE;
+				if (!string.IsNullOrEmpty(text))
+				{
+					if (text.Equals("L"))
+					{
+						tailPos = POS.LEFT;
+					}
+					else if (text.Equals("C"))
+					{
+						tailPos = POS.CENTER;
+					}
+					else if (text.Equals("R"))
+					{
+						tailPos = POS.RIGHT;
+					}
+				}
+				else
+				{
+					Log.Error(LOG.EXCEPTION, "{0}コマンドのパラムに値がセットされていません。", cmd);
+				}
+				break;
+			}
+			case "FADE_IN_TIME":
+			{
+				float fade_time = 1f;
+				if (!string.IsNullOrEmpty(p))
+				{
+					fade_time = float.Parse(p);
+				}
+				eventReceiver.FadeIn(fade_time);
+				break;
+			}
+			case "FADE_OUT_TIME":
+			{
+				Color fadeout_color = Color.black;
+				float fade_time2 = 1f;
+				if (!string.IsNullOrEmpty(p))
+				{
+					fade_time2 = float.Parse(p);
+				}
+				if (!(p4 == "BLUE"))
+				{
+					if (!(p4 == "WHITE"))
+					{
+						if (!(p4 == "RED"))
+						{
+							if (p4 == "YELLOW")
+							{
+								fadeout_color = Color.yellow;
+							}
+						}
+						else
+						{
+							fadeout_color = Color.red;
+						}
+					}
+					else
+					{
+						fadeout_color = Color.white;
+					}
+				}
+				else
+				{
+					fadeout_color = Color.blue;
+				}
+				eventReceiver.FadeOut(fadeout_color, fade_time2);
+				break;
+			}
+			case "CAM_SHAKE":
+			{
+				string text3 = p4;
+				float num2 = 0f;
+				cameraShakeAnim.loopType = Interpolator.LOOP.NONE;
+				if (!string.IsNullOrEmpty(p))
+				{
+					num2 = float.Parse(p);
+					if (num2 == 0f)
+					{
+						cameraShakeAnim.loopType = Interpolator.LOOP.REPETE;
+						num2 = 1f;
+					}
+				}
+				else
+				{
+					Log.Error(LOG.EXCEPTION, "{0}コマンドの時間がセットされていません。", cmd);
+				}
+				Vector3 add_value = new Vector3(0.05f, 0.1f, 1f);
+				if (text3.Equals("S"))
+				{
+					add_value = new Vector3(0.005f, 0.0125f, 1f);
+				}
+				else if (text3.Equals("M"))
+				{
+					add_value = new Vector3(0.01f, 0.025f, 1f);
+				}
+				else if (text3.Equals("L"))
+				{
+					add_value = new Vector3(0.02f, 0.05f, 1f);
+				}
+				cameraShakeAnim.Set(num2, Vector3.zero, Vector3.zero, null, add_value);
+				cameraShakeAnim.Play();
+				break;
+			}
+			case "CAM_SHAKE_STOP":
+			{
+				float time2 = string.IsNullOrEmpty(p4) ? 0f : float.Parse(p4);
+				while (true)
+				{
+					yield return null;
+					if (time2 > 0f)
+					{
+						time2 -= Time.deltaTime;
+					}
+					else if (!MonoBehaviourSingleton<ResourceManager>.I.isLoading && !InstantiateManager.isBusy && !MonoBehaviourSingleton<TransitionManager>.I.isTransing && !(charas.Find((StoryCharacter o) => o.isMoving) != null) && !cameraPosAnim.IsPlaying())
+					{
+						break;
+					}
+				}
+				cameraShakeAnim.Stop();
+				break;
+			}
 			}
 			while (waitMessage)
 			{
 				yield return null;
 			}
+			i = cmd_row + 1;
+			cmd_row = i;
 		}
 		isRunning = false;
 		FocusChara(null);
@@ -977,9 +936,7 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 		{
 			charas.ForEach(delegate(StoryCharacter o)
 			{
-				//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-				TweenColor.Begin(o.uiTex.get_gameObject(), 0.1f, (!(o == pickup_chara) && !(pickup_chara == null)) ? new Color(0.5f, 0.5f, 0.5f, 1f) : new Color(1f, 1f, 1f, 1f));
+				TweenColor.Begin(o.uiTex.gameObject, 0.1f, (o == pickup_chara || pickup_chara == null) ? new Color(1f, 1f, 1f, 1f) : new Color(0.5f, 0.5f, 0.5f, 1f));
 			});
 		}
 	}
@@ -1006,7 +963,7 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 		{
 			if (o.IsShow())
 			{
-				i++;
+				int num = ++i;
 			}
 		});
 		return i;
@@ -1014,50 +971,33 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 
 	private void LateUpdate()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
 		if (!isRunning)
 		{
 			return;
 		}
 		Transform mainCameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
-		Vector3 val = cameraPosAnim.Update();
-		mainCameraTransform.set_position(val);
+		Vector3 a = mainCameraTransform.position = cameraPosAnim.Update();
 		if (cameraShakeAnim.IsPlaying())
 		{
-			Vector3 val2 = cameraShakeAnim.Update();
-			mainCameraTransform.set_position(val + val2);
+			Vector3 b = cameraShakeAnim.Update();
+			mainCameraTransform.position = a + b;
 			if (locationRoot != null)
 			{
-				locationRoot.get_transform().set_localPosition(new Vector3(0f, 0f, 3f) + val2);
+				locationRoot.transform.localPosition = new Vector3(0f, 0f, 3f) + b;
 			}
 		}
 		else if (locationRoot != null)
 		{
-			locationRoot.set_localPosition(new Vector3(0f, 0f, 3f));
+			locationRoot.localPosition = new Vector3(0f, 0f, 3f);
 		}
 		if (locationImage != null)
 		{
-			Vector3 localPosition = locationImage.get_localPosition();
-			localPosition.x = (0f - val.x) * 50f;
-			localPosition.y = (initCameraPos.y - val.y) * 50f;
-			locationImage.set_localPosition(localPosition);
-			float num = val.z * 0.1f + 1f;
-			locationImageRoot.set_localScale(new Vector3(num, num, 1f));
+			Vector3 localPosition = locationImage.localPosition;
+			localPosition.x = (0f - a.x) * 50f;
+			localPosition.y = (initCameraPos.y - a.y) * 50f;
+			locationImage.localPosition = localPosition;
+			float num = a.z * 0.1f + 1f;
+			locationImageRoot.localScale = new Vector3(num, num, 1f);
 		}
 	}
 
@@ -1077,7 +1017,7 @@ public class StoryDirector : MonoBehaviourSingleton<StoryDirector>
 	{
 		if (null != locationRoot)
 		{
-			locationRoot.get_gameObject().SetActive(false);
+			locationRoot.gameObject.SetActive(value: false);
 		}
 	}
 }

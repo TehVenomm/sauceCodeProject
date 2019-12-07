@@ -22,22 +22,13 @@ public class LoungeTableSet : MonoBehaviour
 		private set;
 	}
 
-	public LoungeTableSet()
-		: this()
-	{
-	}
-
 	public ChairPoint GetNearSitPoint(Vector3 pos)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		float num = float.MaxValue;
 		ChairPoint result = null;
 		for (int i = 0; i < chairSitPoints.Count; i++)
 		{
-			float num2 = Vector3.Distance(pos, chairSitPoints[i].get_transform().get_position());
+			float num2 = Vector3.Distance(pos, chairSitPoints[i].transform.position);
 			if (num > num2)
 			{
 				result = chairSitPoints[i];
@@ -49,18 +40,12 @@ public class LoungeTableSet : MonoBehaviour
 
 	public TablePoint GetNearTablePoint()
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 		float num = float.MaxValue;
 		TablePoint result = null;
-		Vector3 val = (!MonoBehaviourSingleton<LoungeManager>.IsValid()) ? MonoBehaviourSingleton<ClanManager>.I.IHomePeople.selfChara.get_transform().get_position() : MonoBehaviourSingleton<LoungeManager>.I.IHomePeople.selfChara.get_transform().get_position();
+		Vector3 a = (!MonoBehaviourSingleton<LoungeManager>.IsValid()) ? MonoBehaviourSingleton<ClanManager>.I.IHomePeople.selfChara.transform.position : MonoBehaviourSingleton<LoungeManager>.I.IHomePeople.selfChara.transform.position;
 		for (int i = 0; i < tablePoints.Count; i++)
 		{
-			float num2 = Vector3.Distance(val, tablePoints[i].get_transform().get_position());
+			float num2 = Vector3.Distance(a, tablePoints[i].transform.position);
 			if (num > num2)
 			{
 				result = tablePoints[i];
@@ -72,26 +57,26 @@ public class LoungeTableSet : MonoBehaviour
 
 	private IEnumerator Start()
 	{
-		yield return this.StartCoroutine(CreateTable());
-		yield return this.StartCoroutine(CreateChair());
+		yield return StartCoroutine(CreateTable());
+		yield return StartCoroutine(CreateChair());
 		isInitialized = true;
 	}
 
 	private IEnumerator CreateTable()
 	{
-		string TablePointsName = (!MonoBehaviourSingleton<LoungeManager>.IsValid()) ? "ClanTablePoints" : "LoungeTablePoints";
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject loadTablePoints = loadQueue.Load(RESOURCE_CATEGORY.SYSTEM, "SystemOutGame", new string[1]
+		string text = (!MonoBehaviourSingleton<LoungeManager>.IsValid()) ? "ClanTablePoints" : "LoungeTablePoints";
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject loadTablePoints = loadingQueue.Load(RESOURCE_CATEGORY.SYSTEM, "SystemOutGame", new string[1]
 		{
-			TablePointsName
+			text
 		});
-		if (loadQueue.IsLoading())
+		if (loadingQueue.IsLoading())
 		{
-			yield return loadQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
-		Transform tablePoint = ResourceUtility.Realizes(loadTablePoints.loadedObject, this.get_transform());
+		Transform transform = ResourceUtility.Realizes(loadTablePoints.loadedObject, base.transform);
 		tablePoints = new List<TablePoint>(2);
-		Utility.ForEach(tablePoint, delegate(Transform o)
+		Utility.ForEach(transform, delegate(Transform o)
 		{
 			if (o.GetComponent<TablePoint>() != null)
 			{
@@ -103,21 +88,21 @@ public class LoungeTableSet : MonoBehaviour
 
 	private IEnumerator CreateChair()
 	{
-		string ChairPointsName = (!MonoBehaviourSingleton<LoungeManager>.IsValid()) ? "ClanChairPoints" : "LoungeChairPoints";
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject loadChairPoints = loadQueue.Load(RESOURCE_CATEGORY.SYSTEM, "SystemOutGame", new string[1]
+		string text = (!MonoBehaviourSingleton<LoungeManager>.IsValid()) ? "ClanChairPoints" : "LoungeChairPoints";
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject loadChairPoints = loadingQueue.Load(RESOURCE_CATEGORY.SYSTEM, "SystemOutGame", new string[1]
 		{
-			ChairPointsName
+			text
 		});
-		if (loadQueue.IsLoading())
+		if (loadingQueue.IsLoading())
 		{
-			yield return loadQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
-		Transform chairPoint = ResourceUtility.Realizes(loadChairPoints.loadedObject, this.get_transform());
+		Transform transform = ResourceUtility.Realizes(loadChairPoints.loadedObject, base.transform);
 		chairSitPoints = new List<ChairPoint>(8);
-		Utility.ForEach(chairPoint, delegate(Transform o)
+		Utility.ForEach(transform, delegate(Transform o)
 		{
-			if (o.get_name().StartsWith("SIT"))
+			if (o.name.StartsWith("SIT"))
 			{
 				chairSitPoints.Add(o.GetComponent<ChairPoint>());
 			}

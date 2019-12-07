@@ -20,7 +20,6 @@ public class ChatPacketReceiver : MonoBehaviour
 	public List<ChatPacket> packets => m_packets;
 
 	public ChatPacketReceiver()
-		: this()
 	{
 		stopPacketUpdate = false;
 	}

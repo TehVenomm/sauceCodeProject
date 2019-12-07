@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -87,7 +86,7 @@ public class RegionMapDescriptionList : GameSection
 		}
 		UpdateTable();
 		bool is_visible = MonoBehaviourSingleton<FieldManager>.I.currentMapID != mapData.mapId;
-		SetActive((Enum)UI.BTN_TO_FIELD, is_visible);
+		SetActive(UI.BTN_TO_FIELD, is_visible);
 		base.UpdateUI();
 	}
 
@@ -95,10 +94,9 @@ public class RegionMapDescriptionList : GameSection
 	{
 		FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(mapData.mapId);
 		string mapName = fieldMapData.mapName;
-		SetLabelText((Enum)UI.LBL_MAP_NAME, mapName);
-		SetLabelText((Enum)UI.LBL_MAP_NAME_D, mapName);
-		UITexture component = GetCtrl(UI.TEX_FIELD).GetComponent<UITexture>();
-		ResourceLoad.LoadFieldIconTexture(component, fieldMapData);
+		SetLabelText(UI.LBL_MAP_NAME, mapName);
+		SetLabelText(UI.LBL_MAP_NAME_D, mapName);
+		ResourceLoad.LoadFieldIconTexture(GetCtrl(UI.TEX_FIELD).GetComponent<UITexture>(), fieldMapData);
 		Dictionary<int, string> borderIndexTitleDic = new Dictionary<int, string>(3);
 		int count = deliveryDataAndUIdList.Count;
 		int count2 = enemyDataList.Count;
@@ -124,10 +122,10 @@ public class RegionMapDescriptionList : GameSection
 		int enemyStartIndex = count + count3 + num;
 		ClearTable();
 		int num2 = count + count3 + count2 + num;
-		SetActive((Enum)UI.LBL_NON_LIST, num2 <= 0);
-		SetTable(UI.TBL_ALL, string.Empty, num2, reset: true, delegate(int i, Transform parent)
+		SetActive(UI.LBL_NON_LIST, num2 <= 0);
+		SetTable(UI.TBL_ALL, "", num2, reset: true, delegate(int i, Transform parent)
 		{
-			Transform result = null;
+			Transform transform = null;
 			if (borderIndexTitleDic.ContainsKey(i))
 			{
 				return Realizes("RegionMapDescriptionBorderItem", parent);
@@ -140,14 +138,10 @@ public class RegionMapDescriptionList : GameSection
 			{
 				return Realizes("RegionMapDescriptionHappenItem", parent);
 			}
-			if (i >= deliveryStartIndex)
-			{
-				return Realizes("RegionMapDescriptionDeliveryItem", parent);
-			}
-			return result;
+			return (i >= deliveryStartIndex) ? Realizes("RegionMapDescriptionDeliveryItem", parent) : transform;
 		}, delegate(int i, Transform t, bool is_recycle)
 		{
-			string value = string.Empty;
+			string value = "";
 			if (borderIndexTitleDic.TryGetValue(i, out value))
 			{
 				SetLabelText(t, UI.LBL_BORDER_TITLE, value);
@@ -251,9 +245,7 @@ public class RegionMapDescriptionList : GameSection
 		int i = 0;
 		for (int count = enemyDataList.Count; i < count; i++)
 		{
-			List<uint> list = enemyIdList;
-			EnemyDataForDisplay enemyDataForDisplay = enemyDataList[i];
-			if (list.Contains(enemyDataForDisplay.data.id))
+			if (enemyIdList.Contains(enemyDataList[i].data.id))
 			{
 				return true;
 			}
@@ -277,8 +269,7 @@ public class RegionMapDescriptionList : GameSection
 			uint num = enemyPopList[i].enemyLv;
 			if (num == 0)
 			{
-				int num2 = enemyData.level;
-				num = (uint)num2;
+				num = (uint)(int)enemyData.level;
 			}
 			if (dictionary.TryGetValue(enemyData.id, out HashSet<uint> value))
 			{
@@ -302,7 +293,7 @@ public class RegionMapDescriptionList : GameSection
 		RegionMapDescriptionDeliveryItem regionMapDescriptionDeliveryItem = t.GetComponent<RegionMapDescriptionDeliveryItem>();
 		if (regionMapDescriptionDeliveryItem == null)
 		{
-			regionMapDescriptionDeliveryItem = t.get_gameObject().AddComponent<RegionMapDescriptionDeliveryItem>();
+			regionMapDescriptionDeliveryItem = t.gameObject.AddComponent<RegionMapDescriptionDeliveryItem>();
 		}
 		regionMapDescriptionDeliveryItem.InitUI();
 		regionMapDescriptionDeliveryItem.Setup(t, deliveryDataAndUId.data);
@@ -326,9 +317,9 @@ public class RegionMapDescriptionList : GameSection
 			});
 			return;
 		}
-		bool flag = FieldManager.IsValidInGame();
-		bool flag2 = data.clearEventID != 0;
-		if (flag)
+		bool num = FieldManager.IsValidInGame();
+		_ = data.clearEventID;
+		if (num)
 		{
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<CoopManager>.I.coopStage.fieldRewardPool.SendFieldDrop(delegate(bool b)
@@ -424,14 +415,14 @@ public class RegionMapDescriptionList : GameSection
 		RegionMapDescriptionHappenItem regionMapDescriptionHappenItem = t.GetComponent<RegionMapDescriptionHappenItem>();
 		if (regionMapDescriptionHappenItem == null)
 		{
-			regionMapDescriptionHappenItem = t.get_gameObject().AddComponent<RegionMapDescriptionHappenItem>();
+			regionMapDescriptionHappenItem = t.gameObject.AddComponent<RegionMapDescriptionHappenItem>();
 		}
 		regionMapDescriptionHappenItem.InitUI();
 		regionMapDescriptionHappenItem.SetUp(happenData);
 		SetEvent(t, "SELECT_HAPPEN", new object[4]
 		{
 			(int)happenData.questID,
-			string.Empty,
+			"",
 			false,
 			mapData
 		});
@@ -442,28 +433,28 @@ public class RegionMapDescriptionList : GameSection
 		RegionMapDescriptionEnemyItem regionMapDescriptionEnemyItem = t.GetComponent<RegionMapDescriptionEnemyItem>();
 		if (regionMapDescriptionEnemyItem == null)
 		{
-			regionMapDescriptionEnemyItem = t.get_gameObject().AddComponent<RegionMapDescriptionEnemyItem>();
+			regionMapDescriptionEnemyItem = t.gameObject.AddComponent<RegionMapDescriptionEnemyItem>();
 		}
 		regionMapDescriptionEnemyItem.InitUI();
 		regionMapDescriptionEnemyItem.SetUpEnemyOnly(enemyData.data, enemyData.level);
 		SetEvent(t, "SELECT_HAPPEN", new object[2]
 		{
 			(int)enemyData.data.id,
-			string.Empty
+			""
 		});
 	}
 
 	private void ClearTable()
 	{
 		Transform ctrl = GetCtrl(UI.TBL_ALL);
-		if (Object.op_Implicit(ctrl))
+		if ((bool)ctrl)
 		{
 			int i = 0;
-			for (int childCount = ctrl.get_childCount(); i < childCount; i++)
+			for (int childCount = ctrl.childCount; i < childCount; i++)
 			{
 				Transform child = ctrl.GetChild(0);
-				child.set_parent(null);
-				Object.Destroy(child.get_gameObject());
+				child.parent = null;
+				Object.Destroy(child.gameObject);
 			}
 		}
 	}
@@ -481,8 +472,7 @@ public class RegionMapDescriptionList : GameSection
 
 	public void OnQuery_TO_REGION_MAP()
 	{
-		FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(mapData.mapId);
-		GameSection.SetEventData(fieldMapData.regionId);
+		GameSection.SetEventData(Singleton<FieldMapTable>.I.GetFieldMapData(mapData.mapId).regionId);
 	}
 
 	private void OnScreenRotate(bool isPortrait)
@@ -534,9 +524,9 @@ public class RegionMapDescriptionList : GameSection
 		}
 		GetCtrl(UI.SPR_BG_FRAME).GetComponent<UIRect>().UpdateAnchors();
 		UpdateAnchors();
-		if (GetCtrl(UI.SCR_ALL).get_gameObject().get_activeInHierarchy())
+		if (GetCtrl(UI.SCR_ALL).gameObject.activeInHierarchy)
 		{
-			ScrollViewResetPosition((Enum)UI.SCR_ALL);
+			ScrollViewResetPosition(UI.SCR_ALL);
 		}
 	}
 

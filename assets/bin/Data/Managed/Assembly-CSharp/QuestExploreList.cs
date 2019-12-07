@@ -37,7 +37,7 @@ public class QuestExploreList : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine("DoInitialize");
+		StartCoroutine("DoInitialize");
 	}
 
 	private IEnumerator DoInitialize()
@@ -51,20 +51,20 @@ public class QuestExploreList : GameSection
 		{
 			yield return null;
 		}
-		List<Network.EventData> allEventList = new List<Network.EventData>(MonoBehaviourSingleton<QuestManager>.I.eventList);
+		List<Network.EventData> list = new List<Network.EventData>(MonoBehaviourSingleton<QuestManager>.I.eventList);
 		eventList = new List<Network.EventData>();
-		for (int i = 0; i < allEventList.Count; i++)
+		for (int i = 0; i < list.Count; i++)
 		{
-			if (allEventList[i].eventType == 4)
+			if (list[i].eventType == 4)
 			{
-				eventList.Add(allEventList[i]);
+				eventList.Add(list[i]);
 			}
 		}
-		for (int j = 0; j < allEventList.Count; j++)
+		for (int j = 0; j < list.Count; j++)
 		{
-			if (allEventList[j].eventType == 12)
+			if (list[j].eventType == 12)
 			{
-				eventList.Add(allEventList[j]);
+				eventList.Add(list[j]);
 			}
 		}
 		RemoveEndedEvents();
@@ -105,22 +105,22 @@ public class QuestExploreList : GameSection
 		RemoveEndedEvents();
 		if (eventList == null || eventList.Count == 0)
 		{
-			SetActive((Enum)UI.STR_EVENT_NON_LIST, is_visible: true);
+			SetActive(UI.STR_EVENT_NON_LIST, is_visible: true);
 			return;
 		}
-		SetActive((Enum)UI.STR_EVENT_NON_LIST, is_visible: false);
-		SetDynamicList((Enum)UI.GRD_EVENT_QUEST, "QuestEventListSelectItem", eventList.Count, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetActive(UI.STR_EVENT_NON_LIST, is_visible: false);
+		SetDynamicList(UI.GRD_EVENT_QUEST, "QuestEventListSelectItem", eventList.Count, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			Network.EventData eventData = eventList[i];
-			Texture2D val = null;
+			Texture2D texture2D = null;
 			if (bannerTable.TryGetValue(eventData.bannerId, out LoadObject value))
 			{
-				val = (value.loadedObject as Texture2D);
-				if (val != null)
+				texture2D = (value.loadedObject as Texture2D);
+				if (texture2D != null)
 				{
 					Transform t2 = FindCtrl(t, UI.TEX_EVENT_BANNER);
 					SetActive(t2, is_visible: true);
-					SetTexture(t2, val);
+					SetTexture(t2, texture2D);
 					SetActive(t, UI.LBL_NO_BANNER, is_visible: false);
 				}
 				else
@@ -152,7 +152,7 @@ public class QuestExploreList : GameSection
 			bool is_visible = !flag2 && !eventData.readPrologueStory;
 			SetActive(t, UI.SPR_NEW, is_visible);
 			SetActive(t, UI.SPR_CLEARED, flag2);
-			SetBadge(FindCtrl(t, UI.TEX_EVENT_BANNER), MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableEventDeliveryNum(eventData.eventId), 1, 16, -3);
+			SetBadge(FindCtrl(t, UI.TEX_EVENT_BANNER), MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableEventDeliveryNum(eventData.eventId), SpriteAlignment.TopLeft, 16, -3);
 		});
 	}
 
@@ -163,7 +163,7 @@ public class QuestExploreList : GameSection
 
 	private void Update()
 	{
-		nextUpdate -= Time.get_deltaTime();
+		nextUpdate -= Time.deltaTime;
 		if (nextUpdate < 0f)
 		{
 			RefreshUI();
@@ -206,26 +206,22 @@ public class QuestExploreList : GameSection
 			{
 				if (success)
 				{
-					if (ev.prologueStoryId > 0)
+					if (ev.prologueStoryId > 0 && base.sectionData.GetEventData("STORY") != null)
 					{
-						GameSceneTables.EventData eventData = base.sectionData.GetEventData("STORY");
-						if (eventData != null)
+						string goingHomeEvent = GameSection.GetGoingHomeEvent();
+						EventData[] array = new EventData[3]
 						{
-							string goingHomeEvent = GameSection.GetGoingHomeEvent();
-							EventData[] array = new EventData[3]
-							{
-								new EventData(goingHomeEvent, null),
-								new EventData("EXPLORE", null),
-								new EventData("SELECT_EXPLORE", ev.eventId)
-							};
-							GameSection.ChangeStayEvent("STORY", new object[4]
-							{
-								ev.prologueStoryId,
-								string.Empty,
-								string.Empty,
-								array
-							});
-						}
+							new EventData(goingHomeEvent, null),
+							new EventData("EXPLORE", null),
+							new EventData("SELECT_EXPLORE", ev.eventId)
+						};
+						GameSection.ChangeStayEvent("STORY", new object[4]
+						{
+							ev.prologueStoryId,
+							"",
+							"",
+							array
+						});
 					}
 					ev.readPrologueStory = true;
 				}

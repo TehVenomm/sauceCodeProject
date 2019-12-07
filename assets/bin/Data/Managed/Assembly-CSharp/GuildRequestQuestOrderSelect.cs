@@ -117,8 +117,7 @@ public class GuildRequestQuestOrderSelect : QuestOrderSelect
 			GameSection.StopEvent();
 			return;
 		}
-		QuestInfoData infoData = questGridDatas[num].questSortData.itemData.infoData;
-		GameSection.SetEventData(infoData);
+		GameSection.SetEventData(questGridDatas[num].questSortData.itemData.infoData);
 		isScrollViewReady = false;
 	}
 

@@ -18,7 +18,11 @@ public class SmithGrowItemSelect : SmithEquipSelectBase
 
 	protected override SortBase.DIALOG_TYPE GetDialogType(bool isWeapon)
 	{
-		return (!isWeapon) ? SortBase.DIALOG_TYPE.TYPE_FILTERABLE_ARMOR : SortBase.DIALOG_TYPE.TYPE_FILTERABLE_WEAPON;
+		if (!isWeapon)
+		{
+			return SortBase.DIALOG_TYPE.TYPE_FILTERABLE_ARMOR;
+		}
+		return SortBase.DIALOG_TYPE.TYPE_FILTERABLE_WEAPON;
 	}
 
 	public override void Initialize()
@@ -34,8 +38,8 @@ public class SmithGrowItemSelect : SmithEquipSelectBase
 
 	public override void UpdateUI()
 	{
-		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).get_parent(), is_visible: false);
-		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).get_parent(), is_visible: false);
+		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).parent, is_visible: false);
+		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).parent, is_visible: false);
 		if (MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>() == null)
 		{
 			MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();
@@ -45,7 +49,7 @@ public class SmithGrowItemSelect : SmithEquipSelectBase
 
 	protected override string GetSelectTypeText()
 	{
-		return base.sectionData.GetText((smithType != SmithType.GROW) ? "TYPE_EVOLVE" : "TYPE_GROW");
+		return base.sectionData.GetText((smithType == SmithType.GROW) ? "TYPE_GROW" : "TYPE_EVOLVE");
 	}
 
 	protected override void OnOpen()
@@ -88,7 +92,7 @@ public class SmithGrowItemSelect : SmithEquipSelectBase
 		MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType = base.selectInventoryType;
 		MonoBehaviourSingleton<SmithManager>.I.CreateLocalInventory();
 		selectInventoryIndex = -1;
-		localInventoryEquipData = sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortWithPayCheckData>(MonoBehaviourSingleton<SmithManager>.I.localInventoryEquipData as EquipItemInfo[]);
+		SortCompareData[] array = localInventoryEquipData = sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortWithPayCheckData>(MonoBehaviourSingleton<SmithManager>.I.localInventoryEquipData as EquipItemInfo[]);
 	}
 
 	protected override bool sorting()
@@ -149,10 +153,9 @@ public class SmithGrowItemSelect : SmithEquipSelectBase
 		if (sortCompareData != null)
 		{
 			ulong uniqID = sortCompareData.GetUniqID();
-			if (uniqID != 0)
+			if (uniqID != 0L)
 			{
-				SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
-				smithData.selectEquipData = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uniqID);
+				MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>().selectEquipData = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uniqID);
 			}
 			base.OnQuery_TRY_ON();
 			if (flag)
@@ -200,10 +203,9 @@ public class SmithGrowItemSelect : SmithEquipSelectBase
 			return;
 		}
 		ulong uniqID = sortCompareData.GetUniqID();
-		if (uniqID != 0)
+		if (uniqID != 0L)
 		{
-			SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
-			smithData.selectEquipData = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uniqID);
+			MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>().selectEquipData = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uniqID);
 		}
 		base.OnQueryDetail();
 	}

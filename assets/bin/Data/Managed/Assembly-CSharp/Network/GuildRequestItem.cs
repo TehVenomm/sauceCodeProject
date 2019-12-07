@@ -105,9 +105,7 @@ namespace Network
 			{
 				return false;
 			}
-			bool flag = false;
-			flag = (GetHoundRemainTime().TotalSeconds > 0.0);
-			return !flag;
+			return !(GetHoundRemainTime().TotalSeconds > 0.0);
 		}
 
 		public bool IsSortieing()
@@ -117,9 +115,7 @@ namespace Network
 
 		public bool IsComplete()
 		{
-			double totalSeconds = GetQuestRemainTime().TotalSeconds;
-			int num = (int)totalSeconds;
-			return num <= 0;
+			return (int)GetQuestRemainTime().TotalSeconds <= 0;
 		}
 	}
 }

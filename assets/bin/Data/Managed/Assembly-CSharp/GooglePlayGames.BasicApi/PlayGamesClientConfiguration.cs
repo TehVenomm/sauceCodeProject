@@ -133,7 +133,11 @@ namespace GooglePlayGames.BasicApi
 
 			internal string[] getScopes()
 			{
-				return (mScopes != null) ? mScopes.ToArray() : new string[0];
+				if (mScopes != null)
+				{
+					return mScopes.ToArray();
+				}
+				return new string[0];
 			}
 
 			internal MatchDelegate GetMatchDelegate()

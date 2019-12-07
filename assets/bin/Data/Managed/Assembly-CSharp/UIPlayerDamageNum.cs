@@ -32,7 +32,7 @@ public class UIPlayerDamageNum : MonoBehaviour
 	protected TweenScale animScale;
 
 	[Tooltip("表示高さオフセット")]
-	public Vector3 offset = Vector3.get_zero();
+	public Vector3 offset = Vector3.zero;
 
 	[Tooltip("ダメ\u30fcジカラ\u30fc")]
 	public LabelColor damageColor;
@@ -55,14 +55,17 @@ public class UIPlayerDamageNum : MonoBehaviour
 
 	public bool enable;
 
-	public float AlphaRate => (!(damadeNum != null)) ? 0f : damadeNum.alpha;
-
-	public UIPlayerDamageNum()
-		: this()
+	public float AlphaRate
 	{
-	}//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-
+		get
+		{
+			if (!(damadeNum != null))
+			{
+				return 0f;
+			}
+			return damadeNum.alpha;
+		}
+	}
 
 	public void EnableAutoDelete()
 	{
@@ -86,18 +89,6 @@ public class UIPlayerDamageNum : MonoBehaviour
 
 	public bool Initialize(Character _chara, int damage, DAMAGE_COLOR color, ELEMENT_TYPE element, bool isAutoPlay = true)
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
 		chara = _chara;
 		higthOffset = damadeNum.height;
 		if (!SetPosFromWorld(chara._position + offset, bUpdatePosY: true))
@@ -133,19 +124,19 @@ public class UIPlayerDamageNum : MonoBehaviour
 		if (animPos != null)
 		{
 			animPos.ResetToBeginning();
-			animPos.set_enabled(false);
+			animPos.enabled = false;
 		}
 		if (animAlpha != null)
 		{
 			animAlpha.ResetToBeginning();
-			animAlpha.set_enabled(false);
+			animAlpha.enabled = false;
 		}
 		if (animScale != null)
 		{
 			animScale.ResetToBeginning();
-			animScale.set_enabled(false);
+			animScale.enabled = false;
 		}
-		this.get_transform().set_localScale(Vector3.get_zero());
+		base.transform.localScale = Vector3.zero;
 		if (isAutoPlay)
 		{
 			Play();
@@ -169,21 +160,21 @@ public class UIPlayerDamageNum : MonoBehaviour
 		}
 		if (animPos != null)
 		{
-			while (animPos.get_enabled())
+			while (animPos.enabled)
 			{
 				yield return null;
 			}
 		}
 		if (animAlpha != null)
 		{
-			while (animAlpha.get_enabled())
+			while (animAlpha.enabled)
 			{
 				yield return null;
 			}
 		}
 		if (animScale != null)
 		{
-			while (animScale.get_enabled())
+			while (animScale.enabled)
 			{
 				yield return null;
 			}
@@ -193,10 +184,7 @@ public class UIPlayerDamageNum : MonoBehaviour
 
 	private void LateUpdate()
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		if (isPlaying && enable && !(chara == null) && !SetPosFromWorld(chara._transform.get_position() + offset, bUpdatePosY: false))
+		if (isPlaying && enable && !(chara == null) && !SetPosFromWorld(chara._transform.position + offset, bUpdatePosY: false))
 		{
 			OnFinishAnimation();
 		}
@@ -210,60 +198,49 @@ public class UIPlayerDamageNum : MonoBehaviour
 		isPlaying = false;
 		if (isAutoDelete)
 		{
-			Object.Destroy(this.get_gameObject());
+			UnityEngine.Object.Destroy(base.gameObject);
 			isAutoDelete = false;
 		}
 	}
 
 	private bool SetPosFromWorld(Vector3 world_pos, bool bUpdatePosY)
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
 			return false;
 		}
-		Vector3 val = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(world_pos);
-		val.y += (float)higthOffset;
-		if (val.z < 0f)
+		Vector3 position = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(world_pos);
+		position.y += higthOffset;
+		if (position.z < 0f)
 		{
 			return false;
 		}
-		val.z = 0f;
-		Vector3 position = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
+		position.z = 0f;
+		Vector3 position2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(position);
 		if (!bUpdatePosY)
 		{
-			Vector3 position2 = this.get_gameObject().get_transform().get_position();
-			position.y = position2.y;
+			position2.y = base.gameObject.transform.position.y;
 		}
-		this.get_gameObject().get_transform().set_position(position);
+		base.gameObject.transform.position = position2;
 		return true;
 	}
 
 	public void Play()
 	{
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 		isPlaying = true;
 		if (animPos != null)
 		{
-			animPos.set_enabled(true);
+			animPos.enabled = true;
 		}
 		if (animAlpha != null)
 		{
-			animAlpha.set_enabled(true);
+			animAlpha.enabled = true;
 		}
 		if (animScale != null)
 		{
-			animScale.set_enabled(true);
+			animScale.enabled = true;
 		}
-		this.get_transform().set_localScale(Vector3.get_one());
-		this.StartCoroutine(DirectionNumber());
+		base.transform.localScale = Vector3.one;
+		StartCoroutine(DirectionNumber());
 	}
 }

@@ -1,7 +1,5 @@
 using Network;
-using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class TaskTop : GameSection
@@ -68,12 +66,6 @@ public class TaskTop : GameSection
 
 	private List<TaskData>[] taskDataLists = new List<TaskData>[2];
 
-	[CompilerGenerated]
-	private static Comparison<TaskData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static Comparison<TaskData> _003C_003Ef__mg_0024cache1;
-
 	public override IEnumerable<string> requireDataTable
 	{
 		get
@@ -85,7 +77,7 @@ public class TaskTop : GameSection
 	public override void Initialize()
 	{
 		gridTransform = GetCtrl(UI.GRD_INVENTORY);
-		scrollView = base.GetComponent<UIScrollView>((Enum)UI.SCR_INVENTORY);
+		scrollView = GetComponent<UIScrollView>(UI.SCR_INVENTORY);
 		InitTaskDataLists();
 		SendTaskList();
 		base.Initialize();
@@ -128,7 +120,7 @@ public class TaskTop : GameSection
 		{
 			if (a.tableData == null || b.tableData == null)
 			{
-				Debug.LogError((object)("<color=red>" + ((a.tableData != null) ? b.info.taskId : a.info.taskId) + " not found</color>"));
+				Debug.LogError("<color=red>" + ((a.tableData == null) ? a.info.taskId : b.info.taskId) + " not found</color>");
 				return -1;
 			}
 			return a.tableData.orderNo - b.tableData.orderNo;
@@ -138,10 +130,11 @@ public class TaskTop : GameSection
 
 	private TaskData CreateTaskData(TaskInfo info)
 	{
-		TaskData taskData = new TaskData();
-		taskData.info = info;
-		taskData.tableData = Singleton<TaskTable>.I.Get((uint)info.taskId);
-		return taskData;
+		return new TaskData
+		{
+			info = info,
+			tableData = Singleton<TaskTable>.I.Get((uint)info.taskId)
+		};
 	}
 
 	private void InsertTaskData(SHOW_TYPE type, TaskData data)
@@ -158,19 +151,19 @@ public class TaskTop : GameSection
 	public override void UpdateUI()
 	{
 		pageMaxNum = taskDataLists[(int)showType].Count / 10 + 1;
-		SetLabelText((Enum)UI.LBL_PAGE_MAX, pageMaxNum.ToString());
-		SetLabelText((Enum)UI.LBL_CURRENT_NUM, taskDataLists[1].Count.ToString());
+		SetLabelText(UI.LBL_PAGE_MAX, pageMaxNum.ToString());
+		SetLabelText(UI.LBL_CURRENT_NUM, taskDataLists[1].Count.ToString());
 		bool flag = currentPageIndex != 0;
-		SetActive((Enum)UI.BTN_ACHIEVE_LIST_L, flag);
-		SetActive((Enum)UI.BTN_ACHIEVE_LIST_L_ADD, flag);
-		SetActive((Enum)UI.BTN_INACTIVE_ACHIEVE_LIST_L, !flag);
+		SetActive(UI.BTN_ACHIEVE_LIST_L, flag);
+		SetActive(UI.BTN_ACHIEVE_LIST_L_ADD, flag);
+		SetActive(UI.BTN_INACTIVE_ACHIEVE_LIST_L, !flag);
 		bool flag2 = currentPageIndex + 1 < pageMaxNum;
-		SetActive((Enum)UI.BTN_ACHIEVE_LIST_R, flag2);
-		SetActive((Enum)UI.BTN_ACHIEVE_LIST_R_ADD, flag2);
-		SetActive((Enum)UI.BTN_INACTIVE_ACHIEVE_LIST_R, !flag2);
+		SetActive(UI.BTN_ACHIEVE_LIST_R, flag2);
+		SetActive(UI.BTN_ACHIEVE_LIST_R_ADD, flag2);
+		SetActive(UI.BTN_INACTIVE_ACHIEVE_LIST_R, !flag2);
 		string text = base.sectionData.GetText(STRING_KEY[(int)showType]);
-		SetLabelText((Enum)UI.LBL_SHOW_TYPE, text);
-		SetLabelText((Enum)UI.LBL_PAGE_NOW, (currentPageIndex + 1).ToString());
+		SetLabelText(UI.LBL_SHOW_TYPE, text);
+		SetLabelText(UI.LBL_PAGE_NOW, (currentPageIndex + 1).ToString());
 		UpdateInventory();
 		if (scrollView != null)
 		{
@@ -199,19 +192,18 @@ public class TaskTop : GameSection
 
 	private void InitListItem(TaskData data, Transform root)
 	{
-		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(root, UI.OBJ_CLEARED_ITEM, data.info.status == 2 || data.info.status == 3);
 		SetActive(root, UI.OBJ_NOT_CLEARED_ITEM, data.info.status == 1);
-		Transform val = FindCtrl(root, UI.SPR_GAUGE);
-		int num = (data.tableData == null) ? int.MaxValue : data.tableData.goalNum;
+		Transform transform = FindCtrl(root, UI.SPR_GAUGE);
+		int num = (data.tableData != null) ? data.tableData.goalNum : int.MaxValue;
 		int num2 = (data.tableData != null) ? data.tableData.rewardNum : 0;
 		int num3 = (data.tableData != null) ? data.tableData.itemId : 0;
-		string text = (data.tableData == null) ? string.Empty : data.tableData.title;
-		string text2 = (data.tableData == null) ? string.Empty : data.tableData.detail;
+		string text = (data.tableData != null) ? data.tableData.title : "";
+		string text2 = (data.tableData != null) ? data.tableData.detail : "";
 		REWARD_TYPE rEWARD_TYPE = (data.tableData != null) ? data.tableData.rewardType : REWARD_TYPE.NONE;
-		if (val != null)
+		if (transform != null)
 		{
-			val.set_localScale(new Vector3(Mathf.Clamp((float)data.info.progress / (float)num, 0f, 1f), 1f, 1f));
+			transform.localScale = new Vector3(Mathf.Clamp((float)data.info.progress / (float)num, 0f, 1f), 1f, 1f);
 		}
 		SetLabelText(root, UI.LBL_GAUGE, data.info.progress.ToString() + "/" + num.ToString());
 		SetLabelText(root, UI.LBL_CONDITION, text);
@@ -226,26 +218,26 @@ public class TaskTop : GameSection
 			SetLabelText(root, UI.LBL_ITEM, "x" + num2.ToString());
 		}
 		ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(rEWARD_TYPE, (uint)num3, FindCtrl(root, UI.OBJ_ICON_ROOT));
-		SetMaterialInfo(itemIcon._transform, rEWARD_TYPE, (uint)num3, scrollView.get_transform());
+		SetMaterialInfo(itemIcon._transform, rEWARD_TYPE, (uint)num3, scrollView.transform);
 		UIButton component = root.GetComponent<UIButton>();
 		if (component != null)
 		{
-			component.tweenTarget = itemIcon.get_gameObject();
+			component.tweenTarget = itemIcon.gameObject;
 		}
-		GameObject gameObject = FindCtrl(root, UI.SPR_NOT_RECIEVED).get_gameObject();
-		GameObject gameObject2 = FindCtrl(root, UI.SPR_RECIEVED).get_gameObject();
+		GameObject gameObject = FindCtrl(root, UI.SPR_NOT_RECIEVED).gameObject;
+		GameObject gameObject2 = FindCtrl(root, UI.SPR_RECIEVED).gameObject;
 		if (data.info.status == 2)
 		{
 			SetButtonEnabled(root, is_enabled: true);
 			SetEvent(root, "RECEIVE_REWARD", data);
-			gameObject.SetActive(true);
-			gameObject2.SetActive(false);
+			gameObject.SetActive(value: true);
+			gameObject2.SetActive(value: false);
 		}
 		else if (data.info.status == 3)
 		{
 			SetButtonEnabled(root, is_enabled: false);
-			gameObject.SetActive(false);
-			gameObject2.SetActive(true);
+			gameObject.SetActive(value: false);
+			gameObject2.SetActive(value: true);
 		}
 		else
 		{
@@ -298,7 +290,7 @@ public class TaskTop : GameSection
 				taskDataLists[0].Remove(data);
 				UpdateUI();
 				GameSection.ResumeEvent(is_resume: true);
-			}, string.Empty);
+			});
 		}
 	}
 
@@ -320,6 +312,6 @@ public class TaskTop : GameSection
 	{
 		Protocol.Send<TaskListModel>(TaskListModel.URL, delegate
 		{
-		}, string.Empty);
+		});
 	}
 }

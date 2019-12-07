@@ -14,22 +14,17 @@ public class UITweenCtrl : MonoBehaviour
 
 	public int id => _id;
 
-	public UITweenCtrl()
-		: this()
-	{
-	}
-
 	public static void Set(Transform root)
 	{
 		UITweenCtrl component = root.GetComponent<UITweenCtrl>();
 		if (!(component != null))
 		{
-			component = root.get_gameObject().AddComponent<UITweenCtrl>();
+			component = root.gameObject.AddComponent<UITweenCtrl>();
 			UITweener[] componentsInChildren = root.GetComponentsInChildren<UITweener>();
 			int i = 0;
 			for (int num = componentsInChildren.Length; i < num; i++)
 			{
-				componentsInChildren[i].set_enabled(false);
+				componentsInChildren[i].enabled = false;
 			}
 			component.tweens = componentsInChildren;
 		}
@@ -103,8 +98,7 @@ public class UITweenCtrl : MonoBehaviour
 
 	public static void SetDurationWithRate(Transform root, float rate, int tween_ctrl_id = 0)
 	{
-		UITweenCtrl uITweenCtrl = SearchTweenCtrl(root, tween_ctrl_id);
-		UITweener[] array = uITweenCtrl.tweens;
+		UITweener[] array = SearchTweenCtrl(root, tween_ctrl_id).tweens;
 		for (int i = 0; i < array.Length; i++)
 		{
 			array[i].duration *= rate;
@@ -113,7 +107,7 @@ public class UITweenCtrl : MonoBehaviour
 
 	private void Awake()
 	{
-		if (tweens != null && tweens.Length > 0)
+		if (tweens != null && tweens.Length != 0)
 		{
 			FillInTheBlanks();
 			Reset();
@@ -137,7 +131,7 @@ public class UITweenCtrl : MonoBehaviour
 			return;
 		}
 		isPlaying = true;
-		uiTable = this.get_gameObject().GetComponentInParent<UITable>();
+		uiTable = base.gameObject.GetComponentInParent<UITable>();
 		if (onFinished != null)
 		{
 			EventDelegate.Add(target_tweens[0].onFinished, onFinished, oneShot: true);
@@ -193,7 +187,7 @@ public class UITweenCtrl : MonoBehaviour
 			return;
 		}
 		isPlaying = false;
-		uiTable = this.get_gameObject().GetComponentInParent<UITable>();
+		uiTable = base.gameObject.GetComponentInParent<UITable>();
 		EventDelegate.Set(target_tweens[0].onFinished, OnFinished);
 		int i = 0;
 		for (int num = target_tweens.Length; i < num; i++)

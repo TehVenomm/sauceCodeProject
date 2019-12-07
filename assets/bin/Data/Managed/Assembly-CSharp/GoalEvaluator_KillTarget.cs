@@ -11,13 +11,11 @@ public class GoalEvaluator_KillTarget : GoalEvaluator
 		{
 			return 0f;
 		}
-		float num = 0f;
 		StageObject currentTarget = brain.targetCtrl.GetCurrentTarget();
-		float num2 = EvaluateDistanceWithObject(brain, currentTarget);
-		float num3 = EvaluateDangerWithTargetCondition(brain, currentTarget);
-		float num4 = EvaluateDangerWithTargetPlace(brain, currentTarget);
-		num += (1f - num2) * (1f - num3 * num4);
-		return num * base.bias;
+		float num = EvaluateDistanceWithObject(brain, currentTarget);
+		float num2 = EvaluateDangerWithTargetCondition(brain, currentTarget);
+		float num3 = EvaluateDangerWithTargetPlace(brain, currentTarget);
+		return (0f + (1f - num) * (1f - num2 * num3)) * base.bias;
 	}
 
 	public override void SetGoal(Brain brain, Goal_Think think)

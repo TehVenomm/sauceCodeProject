@@ -40,8 +40,16 @@ public class TradingPostActiveHistory : GameSection
 		if (eventData is int && (int)eventData == 1)
 		{
 			_viewType = VIEW_TYPE.HISTORY;
+			if (MonoBehaviourSingleton<TradingPostManager>.I.tradingPostSoldNum > 0)
+			{
+				MonoBehaviourSingleton<TradingPostManager>.I.RemoveTradingPostSoldCount();
+			}
+			if (TradingPostManager.IsNewTradingPostSold())
+			{
+				MonoBehaviourSingleton<TradingPostManager>.I.SaveTradingPostLastSoldTime();
+			}
 		}
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 		base.Initialize();
 	}
 
@@ -69,9 +77,9 @@ public class TradingPostActiveHistory : GameSection
 
 	public override void UpdateUI()
 	{
-		List<TradingPostTransactionLog.ActiveLog> showLogs = (_viewType != 0) ? loginfo.historyList : loginfo.activeList;
-		SetActive((Enum)UI.OBJ_ON_TAB_ACTIVE, _viewType == VIEW_TYPE.ACTIVE);
-		SetActive((Enum)UI.OBJ_ON_TAB_HISTORY, _viewType == VIEW_TYPE.HISTORY);
+		List<TradingPostTransactionLog.ActiveLog> showLogs = (_viewType == VIEW_TYPE.ACTIVE) ? loginfo.activeList : loginfo.historyList;
+		SetActive(UI.OBJ_ON_TAB_ACTIVE, _viewType == VIEW_TYPE.ACTIVE);
+		SetActive(UI.OBJ_ON_TAB_HISTORY, _viewType == VIEW_TYPE.HISTORY);
 		SetGrid(UI.GRD_POST, "TradingPostListLogItem", showLogs.Count, reset: true, delegate(int i, Transform t, bool b)
 		{
 			TradingPostTransactionLog.ActiveLog activeLog = showLogs[i];
@@ -79,28 +87,28 @@ public class TradingPostActiveHistory : GameSection
 			SetLabelText(t, UI.LBL_QUATITY, activeLog.quantity);
 			SetLabelText(t, UI.LBL_PRICE, activeLog.price);
 			SetLabelText(t, UI.LBL_TRANSACTION, string.Format(base.sectionData.GetText("STR_TRANSACTION_ID"), activeLog.transactionId));
-			string empty = string.Empty;
+			string text = "";
 			if (_viewType == VIEW_TYPE.ACTIVE)
 			{
-				empty = TimeManager.GetRemainTimeToText(activeLog.expiredTime, 2);
+				text = TimeManager.GetRemainTimeToText(activeLog.expiredTime, 2);
 				SetLabelText(t, UI.LBL_STATUS_TEXT, base.sectionData.GetText("STR_EXPIRED"));
 				SetEvent(t, "REMOVE", i);
 			}
 			else
 			{
-				SetEvent(t, string.Empty, i);
+				SetEvent(t, "", i);
 				if (DateTime.TryParse(activeLog.createdAt, out DateTime result))
 				{
-					empty = TimeManager.GetRemainTimeToText(TimeManager.GetNow() - result, 2);
+					text = TimeManager.GetRemainTimeToText(TimeManager.GetNow() - result, 2);
 				}
 				else
 				{
-					empty = "Can not parse time";
-					Debug.LogError((object)empty);
+					text = "Can not parse time";
+					Debug.LogError(text);
 				}
 				SetLabelText(t, UI.LBL_STATUS_TEXT, base.sectionData.GetText("STR_STATUS_" + activeLog.status));
 			}
-			SetLabelText(t, UI.LBL_DAY, empty);
+			SetLabelText(t, UI.LBL_DAY, text);
 			ItemInfo item = ItemInfo.CreateItemInfo(activeLog.itemId);
 			ItemSortData itemSortData = new ItemSortData();
 			itemSortData.SetItem(item);
@@ -111,7 +119,7 @@ public class TradingPostActiveHistory : GameSection
 	private void OnQuery_REMOVE()
 	{
 		int index = (int)GameSection.GetEventData();
-		List<TradingPostTransactionLog.ActiveLog> list = (_viewType != 0) ? loginfo.historyList : loginfo.activeList;
+		List<TradingPostTransactionLog.ActiveLog> list = (_viewType == VIEW_TYPE.ACTIVE) ? loginfo.activeList : loginfo.historyList;
 		currentLog = list[index];
 	}
 
@@ -169,14 +177,11 @@ public class TradingPostActiveHistory : GameSection
 		{
 		case ITEM_ICON_TYPE.ITEM:
 		case ITEM_ICON_TYPE.QUEST_ITEM:
-		{
-			ulong uniqID = data.GetUniqID();
-			if (uniqID != 0)
+			if (data.GetUniqID() != 0L)
 			{
 				is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, data.GetUniqID());
 			}
 			break;
-		}
 		default:
 			is_new = true;
 			break;
@@ -186,28 +191,21 @@ public class TradingPostActiveHistory : GameSection
 		int enemy_icon_id = 0;
 		if (iTEM_ICON_TYPE == ITEM_ICON_TYPE.ITEM)
 		{
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(data.GetTableID());
-			enemy_icon_id = itemData.enemyIconID;
+			enemy_icon_id = Singleton<ItemTable>.I.GetItemData(data.GetTableID()).enemyIconID;
 		}
 		ItemIcon itemIcon = null;
-		if (data.GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
+		itemIcon = ((data.GetIconType() != ITEM_ICON_TYPE.QUEST_ITEM) ? ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, num, "DROP", event_data, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id) : ItemIcon.Create(new ItemIcon.ItemIconCreateParam
 		{
-			ItemIcon.ItemIconCreateParam itemIconCreateParam = new ItemIcon.ItemIconCreateParam();
-			itemIconCreateParam.icon_type = data.GetIconType();
-			itemIconCreateParam.icon_id = data.GetIconID();
-			itemIconCreateParam.rarity = data.GetRarity();
-			itemIconCreateParam.parent = holder;
-			itemIconCreateParam.element = data.GetIconElement();
-			itemIconCreateParam.magi_enable_equip_type = data.GetIconMagiEnableType();
-			itemIconCreateParam.num = data.GetNum();
-			itemIconCreateParam.enemy_icon_id = enemy_icon_id;
-			itemIconCreateParam.questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST;
-			itemIcon = ItemIcon.Create(itemIconCreateParam);
-		}
-		else
-		{
-			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, num, "DROP", event_data, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id);
-		}
+			icon_type = data.GetIconType(),
+			icon_id = data.GetIconID(),
+			rarity = data.GetRarity(),
+			parent = holder,
+			element = data.GetIconElement(),
+			magi_enable_equip_type = data.GetIconMagiEnableType(),
+			num = data.GetNum(),
+			enemy_icon_id = enemy_icon_id,
+			questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST
+		}));
 		itemIcon.SetRewardBG(is_visible: false);
 		SetMaterialInfo(itemIcon.transform, data.GetMaterialType(), data.GetTableID(), GetCtrl(UI.PNL_MATERIAL_INFO));
 	}

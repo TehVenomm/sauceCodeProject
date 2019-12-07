@@ -115,7 +115,7 @@ public class SortSettings
 			{
 				sortSettings.requirement = SortBase.SORT_REQUIREMENT.ELEMENT;
 			}
-			else if ((sortSettings.requirement & sORT_REQUIREMENT) == (SortBase.SORT_REQUIREMENT)0)
+			else if ((sortSettings.requirement & sORT_REQUIREMENT) == 0)
 			{
 				if (sortSettings.requirement == SortBase.SORT_REQUIREMENT.ATK)
 				{
@@ -166,7 +166,7 @@ public class SortSettings
 			{
 				sortSettings.requirement = SortBase.SORT_REQUIREMENT.ELEMENT;
 			}
-			else if ((sortSettings.requirement & sORT_REQUIREMENT2) == (SortBase.SORT_REQUIREMENT)0)
+			else if ((sortSettings.requirement & sORT_REQUIREMENT2) == 0)
 			{
 				if (sortSettings.requirement == SortBase.SORT_REQUIREMENT.ATK)
 				{
@@ -258,7 +258,11 @@ public class SortSettings
 
 	private static int GetSortBitOrderTypeAsc(bool order_type_asc)
 	{
-		return order_type_asc ? 1 : 0;
+		if (!order_type_asc)
+		{
+			return 0;
+		}
+		return 1;
 	}
 
 	private static int GetSortBitEquipFilter(int equipfilter)
@@ -292,8 +296,8 @@ public class SortSettings
 	public static bool GetMemorySortData(SETTINGS_TYPE settings_type, ref SortSettings ret)
 	{
 		string sortBit = GameSaveData.instance.GetSortBit(settings_type);
-		bool flag = !string.IsNullOrEmpty(sortBit);
-		if (flag)
+		bool num = !string.IsNullOrEmpty(sortBit);
+		if (num)
 		{
 			ret.settingsType = GetSettingsTypeBySortBit(sortBit);
 			ret.dialogType = GetDialogTypeBySortBit(sortBit);
@@ -303,12 +307,10 @@ public class SortSettings
 			ret.orderTypeAsc = GetOrderTypeAscBySortBit(sortBit);
 			ret.equipFilter = (int)GetEquipFilterBySortBit(sortBit);
 			ret.element = (int)GetElementBySortBit(sortBit);
+			return num;
 		}
-		else
-		{
-			ret.settingsType = settings_type;
-		}
-		return flag;
+		ret.settingsType = settings_type;
+		return num;
 	}
 
 	public static void DeleteMemorySortData(SETTINGS_TYPE settings_type)
@@ -379,19 +381,20 @@ public class SortSettings
 
 	public SortSettings Clone()
 	{
-		SortSettings sortSettings = new SortSettings();
-		sortSettings.dialogType = dialogType;
-		sortSettings.rarity = rarity;
-		sortSettings.type = type;
-		sortSettings.requirement = requirement;
-		sortSettings.orderTypeAsc = orderTypeAsc;
-		sortSettings.settingsType = settingsType;
-		sortSettings.equipSetInfo = equipSetInfo;
-		sortSettings.indivComparison = indivComparison;
-		sortSettings.equipFilter = equipFilter;
-		sortSettings.element = element;
-		sortSettings.TYPE_ALL = TYPE_ALL;
-		return sortSettings;
+		return new SortSettings
+		{
+			dialogType = dialogType,
+			rarity = rarity,
+			type = type,
+			requirement = requirement,
+			orderTypeAsc = orderTypeAsc,
+			settingsType = settingsType,
+			equipSetInfo = equipSetInfo,
+			indivComparison = indivComparison,
+			equipFilter = equipFilter,
+			element = element,
+			TYPE_ALL = TYPE_ALL
+		};
 	}
 
 	public SORT_DATA[] CreateSortAry<T, SORT_DATA>(T[] target_ary) where SORT_DATA : SortCompareData, new()

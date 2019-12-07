@@ -104,16 +104,16 @@ public class InGameFieldQuestConfirm : GameSection
 			return;
 		}
 		int mainEnemyLv = questData.GetMainEnemyLv();
-		SetLabelText((Enum)UI.LBL_NAME, enemyData.name);
-		SetLabelText((Enum)UI.NUM_LV, mainEnemyLv.ToString());
-		SetElementSprite((Enum)UI.STR_ELEM, (int)enemyData.weakElement);
+		SetLabelText(UI.LBL_NAME, enemyData.name);
+		SetLabelText(UI.NUM_LV, mainEnemyLv.ToString());
+		SetElementSprite(UI.STR_ELEM, (int)enemyData.weakElement);
 		if (enemyData.weakElement != ELEMENT_TYPE.MAX)
 		{
-			SetActive((Enum)UI.STR_WEAK_NONE, is_visible: false);
+			SetActive(UI.STR_WEAK_NONE, is_visible: false);
 		}
 		int num = (int)(questData.limitTime / 60f);
 		int num2 = (int)(questData.limitTime % 60f);
-		SetLabelText((Enum)UI.NUM_TIMER, $"{num:D2}:{num2:D2}");
+		SetLabelText(UI.NUM_TIMER, $"{num:D2}:{num2:D2}");
 		UI[] array = new UI[10]
 		{
 			UI.OBJ_DIFFICULT_STAR_1,
@@ -131,13 +131,13 @@ public class InGameFieldQuestConfirm : GameSection
 		int i = 0;
 		for (int num4 = array.Length; i < num4; i++)
 		{
-			SetActive((Enum)array[i], i < num3);
+			SetActive(array[i], i < num3);
 		}
-		PlayTween((Enum)UI.TWN_DIFFICULT_STAR, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		PlayTween(UI.TWN_DIFFICULT_STAR, forward: true, null, is_input_block: false);
 		QuestInfoData.Mission[] array2 = QuestInfoData.CreateMissionData(questData);
 		if (array2 != null)
 		{
-			GetCtrl(UI.MISSION).get_gameObject().SetActive(true);
+			GetCtrl(UI.MISSION).gameObject.SetActive(value: true);
 			UI[] array3 = new UI[3]
 			{
 				UI.MISSION_LABEL_01,
@@ -160,26 +160,26 @@ public class InGameFieldQuestConfirm : GameSection
 			for (int j = 0; j < num5; j++)
 			{
 				QuestInfoData.Mission mission = array2[j];
-				SetActive((Enum)array4[j], CLEAR_STATUS.CLEAR == mission.state);
-				SetActive((Enum)array5[j], CLEAR_STATUS.CLEAR != mission.state);
-				SetLabelText((Enum)array3[j], mission.tableData.missionText);
+				SetActive(array4[j], CLEAR_STATUS.CLEAR == mission.state);
+				SetActive(array5[j], CLEAR_STATUS.CLEAR != mission.state);
+				SetLabelText(array3[j], mission.tableData.missionText);
 			}
 		}
 		if (desc.reward != null)
 		{
 			Array.Sort(desc.reward, (QuestInfoData.Quest.Reward l, QuestInfoData.Quest.Reward r) => l.priority - r.priority);
 		}
-		SetFontStyle((Enum)UI.LBL_NAME, 2);
-		SetFontStyle((Enum)UI.NUM_LV, 2);
-		SetFontStyle((Enum)UI.LBL_LV, 2);
+		SetFontStyle(UI.LBL_NAME, FontStyle.Italic);
+		SetFontStyle(UI.NUM_LV, FontStyle.Italic);
+		SetFontStyle(UI.LBL_LV, FontStyle.Italic);
 		countAnimStep = 0;
 		timeLimit = MonoBehaviourSingleton<InGameSettingsManager>.I.happenQuestDirection.confirmUITime;
 		prevTime = -1;
 		isAnswer = false;
 		Update();
 		UpdateAnchors();
-		PlayTween((Enum)UI.OBJ_FRAME, forward: true, (EventDelegate.Callback)null, is_input_block: true, 0);
-		PlayTween((Enum)UI.COUNT_ANIM_0, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		PlayTween(UI.OBJ_FRAME);
+		PlayTween(UI.COUNT_ANIM_0, forward: true, null, is_input_block: false);
 	}
 
 	public override void Exit()
@@ -193,12 +193,11 @@ public class InGameFieldQuestConfirm : GameSection
 
 	private void Update()
 	{
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
 		if (isAnswer)
 		{
 			return;
 		}
-		timeLimit -= Time.get_deltaTime();
+		timeLimit -= Time.deltaTime;
 		if (timeLimit <= 0f)
 		{
 			timeLimit = 0f;
@@ -213,38 +212,38 @@ public class InGameFieldQuestConfirm : GameSection
 		case 0:
 			if (num < 10)
 			{
-				ResetTween((Enum)UI.COUNT_ANIM_0, 0);
-				PlayTween((Enum)UI.COUNT_ANIM_1, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+				ResetTween(UI.COUNT_ANIM_0);
+				PlayTween(UI.COUNT_ANIM_1, forward: true, null, is_input_block: false);
 				countAnimStep++;
 			}
 			break;
 		case 1:
 			if (num < 6)
 			{
-				ResetTween((Enum)UI.COUNT_ANIM_1, 0);
-				PlayTween((Enum)UI.COUNT_ANIM_2, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
-				SetColor((Enum)UI.LBL_TIME, Color.get_red());
+				ResetTween(UI.COUNT_ANIM_1);
+				PlayTween(UI.COUNT_ANIM_2, forward: true, null, is_input_block: false);
+				SetColor(UI.LBL_TIME, Color.red);
 				countAnimStep++;
 			}
 			break;
 		case 2:
 			if (prevTime != num)
 			{
-				ResetTween((Enum)UI.COUNT_ANIM_2, 0);
-				PlayTween((Enum)UI.COUNT_ANIM_2, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+				ResetTween(UI.COUNT_ANIM_2);
+				PlayTween(UI.COUNT_ANIM_2, forward: true, null, is_input_block: false);
 			}
 			break;
 		}
 		if (prevTime != num)
 		{
-			SetLabelText((Enum)UI.LBL_TIME, num.ToString());
+			SetLabelText(UI.LBL_TIME, num.ToString());
 			prevTime = num;
 		}
 		if (!(timeLimit > 0f) && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && !MonoBehaviourSingleton<InGameProgress>.I.endHappenQuestDirection)
 		{
-			ResetTween((Enum)UI.COUNT_ANIM_0, 0);
-			ResetTween((Enum)UI.COUNT_ANIM_1, 0);
-			ResetTween((Enum)UI.COUNT_ANIM_2, 0);
+			ResetTween(UI.COUNT_ANIM_0);
+			ResetTween(UI.COUNT_ANIM_1);
+			ResetTween(UI.COUNT_ANIM_2);
 			OnQuery_YES();
 			MonoBehaviourSingleton<GameSceneManager>.I.ChangeSectionBack();
 		}
@@ -252,24 +251,6 @@ public class InGameFieldQuestConfirm : GameSection
 
 	private void OnScreenRotate(bool is_portrait)
 	{
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.BOSS_INFO_MAIN);
 		Transform ctrl2 = GetCtrl(UI.BOSS_INFO_SUB);
 		Transform ctrl3 = GetCtrl(UI.BTN_FRAME);
@@ -277,34 +258,34 @@ public class InGameFieldQuestConfirm : GameSection
 		Transform ctrl5 = GetCtrl(UI.TIME);
 		Transform ctrl6 = GetCtrl(UI.SPR_BTN_0);
 		Transform ctrl7 = GetCtrl(UI.SPR_BTN_2);
-		Vector3 localPosition = ctrl.get_localPosition();
-		Vector3 localPosition2 = ctrl2.get_localPosition();
-		Vector3 localPosition3 = ctrl3.get_localPosition();
-		Vector3 localPosition4 = ctrl4.get_localPosition();
+		Vector3 localPosition = ctrl.localPosition;
+		Vector3 localPosition2 = ctrl2.localPosition;
+		Vector3 localPosition3 = ctrl3.localPosition;
+		Vector3 localPosition4 = ctrl4.localPosition;
 		if (is_portrait)
 		{
-			ctrl.set_parent(GetCtrl(UI.PORTRAIT_MAIN));
-			ctrl2.set_parent(GetCtrl(UI.PORTRAIT_SUB));
-			ctrl3.set_parent(GetCtrl(UI.PORTRAIT_BTN));
-			ctrl4.set_parent(GetCtrl(UI.PORTRAIT_MISSION));
-			ctrl5.set_localPosition(GetCtrl(UI.PORTRAIT_TIME).get_localPosition());
-			ctrl6.set_localPosition(GetCtrl(UI.PORTRAIT_BTN_0).get_localPosition());
-			ctrl7.set_localPosition(GetCtrl(UI.PORTRAIT_BTN_2).get_localPosition());
+			ctrl.parent = GetCtrl(UI.PORTRAIT_MAIN);
+			ctrl2.parent = GetCtrl(UI.PORTRAIT_SUB);
+			ctrl3.parent = GetCtrl(UI.PORTRAIT_BTN);
+			ctrl4.parent = GetCtrl(UI.PORTRAIT_MISSION);
+			ctrl5.localPosition = GetCtrl(UI.PORTRAIT_TIME).localPosition;
+			ctrl6.localPosition = GetCtrl(UI.PORTRAIT_BTN_0).localPosition;
+			ctrl7.localPosition = GetCtrl(UI.PORTRAIT_BTN_2).localPosition;
 		}
 		else
 		{
-			ctrl.set_parent(GetCtrl(UI.LANDSCAPE_MAIN));
-			ctrl2.set_parent(GetCtrl(UI.LANDSCAPE_SUB));
-			ctrl3.set_parent(GetCtrl(UI.LANDSCAPE_BTN));
-			ctrl4.set_parent(GetCtrl(UI.LANDSCAPE_MISSION));
-			ctrl5.set_localPosition(GetCtrl(UI.LANDSCAPE_TIME).get_localPosition());
-			ctrl6.set_localPosition(GetCtrl(UI.LANDSCAPE_BTN_0).get_localPosition());
-			ctrl7.set_localPosition(GetCtrl(UI.LANDSCAPE_BTN_2).get_localPosition());
+			ctrl.parent = GetCtrl(UI.LANDSCAPE_MAIN);
+			ctrl2.parent = GetCtrl(UI.LANDSCAPE_SUB);
+			ctrl3.parent = GetCtrl(UI.LANDSCAPE_BTN);
+			ctrl4.parent = GetCtrl(UI.LANDSCAPE_MISSION);
+			ctrl5.localPosition = GetCtrl(UI.LANDSCAPE_TIME).localPosition;
+			ctrl6.localPosition = GetCtrl(UI.LANDSCAPE_BTN_0).localPosition;
+			ctrl7.localPosition = GetCtrl(UI.LANDSCAPE_BTN_2).localPosition;
 		}
-		ctrl.set_localPosition(localPosition);
-		ctrl2.set_localPosition(localPosition2);
-		ctrl3.set_localPosition(localPosition3);
-		ctrl4.set_localPosition(localPosition4);
+		ctrl.localPosition = localPosition;
+		ctrl2.localPosition = localPosition2;
+		ctrl3.localPosition = localPosition3;
+		ctrl4.localPosition = localPosition4;
 	}
 
 	private void OnQuery_YES()

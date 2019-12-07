@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class MenuTop : GameSection
 {
@@ -12,7 +13,8 @@ public class MenuTop : GameSection
 		HELP,
 		CONFIG,
 		STORAGE,
-		SPR_BADGE
+		SPR_BADGE,
+		DOWNLOAD_ENEMY
 	}
 
 	protected override NOTIFY_FLAG GetUpdateUINotifyFlags()
@@ -22,9 +24,9 @@ public class MenuTop : GameSection
 
 	public override void UpdateUI()
 	{
-		SetBadge((Enum)UI.INFO, GameSaveData.instance.IsShowNewsNotification() ? 1 : 0, 3, -4, -4, is_scale_normalize: false);
-		SetBadge((Enum)UI.PRESENT_BTN, MonoBehaviourSingleton<PresentManager>.I.presentNum, 3, -4, -4, is_scale_normalize: false);
-		SetBadge((Enum)UI.FRIEND, MonoBehaviourSingleton<FriendManager>.I.noReadMessageNum, 3, -4, -4, is_scale_normalize: false);
+		SetBadge(UI.INFO, GameSaveData.instance.IsShowNewsNotification() ? 1 : 0, SpriteAlignment.TopRight, -4, -4);
+		SetBadge(UI.PRESENT_BTN, MonoBehaviourSingleton<PresentManager>.I.presentNum, SpriteAlignment.TopRight, -4, -4);
+		SetBadge(UI.FRIEND, MonoBehaviourSingleton<FriendManager>.I.noReadMessageNum, SpriteAlignment.TopRight, -4, -4);
 	}
 
 	public void OnQuery_FRIEND()

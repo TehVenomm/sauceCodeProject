@@ -19,13 +19,13 @@ public class Lounge_Model_MemberField : Coop_Model_Base
 
 	public override string ToString()
 	{
-		string empty = string.Empty;
-		empty = empty + ",cid=" + cid;
-		empty = empty + ",fid=" + fid;
-		empty = empty + ",fmid=" + fmid;
-		empty = empty + ",pid=" + pid;
-		empty = empty + ",qid=" + qid;
-		empty = empty + ",host=" + h;
-		return base.ToString() + empty;
+		string arg = "";
+		arg = arg + ",cid=" + cid;
+		arg = arg + ",fid=" + fid;
+		arg = arg + ",fmid=" + fmid;
+		arg = arg + ",pid=" + pid;
+		arg = arg + ",qid=" + qid;
+		arg = arg + ",host=" + h.ToString();
+		return base.ToString() + arg;
 	}
 }

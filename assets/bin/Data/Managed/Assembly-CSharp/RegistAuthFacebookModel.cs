@@ -9,6 +9,8 @@ public class RegistAuthFacebookModel : BaseModel
 	{
 		public string accessToken;
 
+		public string uid;
+
 		public string d;
 	}
 

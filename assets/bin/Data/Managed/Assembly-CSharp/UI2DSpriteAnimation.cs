@@ -19,7 +19,7 @@ public class UI2DSpriteAnimation : MonoBehaviour
 
 	private float mUpdate;
 
-	public bool isPlaying => this.get_enabled();
+	public bool isPlaying => base.enabled;
 
 	public int framesPerSecond
 	{
@@ -33,32 +33,27 @@ public class UI2DSpriteAnimation : MonoBehaviour
 		}
 	}
 
-	public UI2DSpriteAnimation()
-		: this()
-	{
-	}
-
 	public void Play()
 	{
-		if (frames == null || frames.Length <= 0)
+		if (frames == null || frames.Length == 0)
 		{
 			return;
 		}
-		if (!this.get_enabled() && !loop)
+		if (!base.enabled && !loop)
 		{
-			int num = (framerate <= 0) ? (mIndex - 1) : (mIndex + 1);
+			int num = (framerate > 0) ? (mIndex + 1) : (mIndex - 1);
 			if (num < 0 || num >= frames.Length)
 			{
 				mIndex = ((framerate < 0) ? (frames.Length - 1) : 0);
 			}
 		}
-		this.set_enabled(true);
+		base.enabled = true;
 		UpdateSprite();
 	}
 
 	public void Pause()
 	{
-		this.set_enabled(false);
+		base.enabled = false;
 	}
 
 	public void ResetToBeginning()
@@ -76,7 +71,7 @@ public class UI2DSpriteAnimation : MonoBehaviour
 	{
 		if (frames == null || frames.Length == 0)
 		{
-			this.set_enabled(false);
+			base.enabled = false;
 		}
 		else
 		{
@@ -84,14 +79,14 @@ public class UI2DSpriteAnimation : MonoBehaviour
 			{
 				return;
 			}
-			float num = (!ignoreTimeScale) ? Time.get_time() : RealTime.time;
+			float num = ignoreTimeScale ? RealTime.time : Time.time;
 			if (mUpdate < num)
 			{
 				mUpdate = num;
-				int num2 = (framerate <= 0) ? (mIndex - 1) : (mIndex + 1);
+				int num2 = (framerate > 0) ? (mIndex + 1) : (mIndex - 1);
 				if (!loop && (num2 < 0 || num2 >= frames.Length))
 				{
-					this.set_enabled(false);
+					base.enabled = false;
 					return;
 				}
 				mIndex = NGUIMath.RepeatIndex(num2, frames.Length);
@@ -104,22 +99,22 @@ public class UI2DSpriteAnimation : MonoBehaviour
 	{
 		if (mUnitySprite == null && mNguiSprite == null)
 		{
-			mUnitySprite = this.GetComponent<SpriteRenderer>();
-			mNguiSprite = this.GetComponent<UI2DSprite>();
+			mUnitySprite = GetComponent<SpriteRenderer>();
+			mNguiSprite = GetComponent<UI2DSprite>();
 			if (mUnitySprite == null && mNguiSprite == null)
 			{
-				this.set_enabled(false);
+				base.enabled = false;
 				return;
 			}
 		}
-		float num = (!ignoreTimeScale) ? Time.get_time() : RealTime.time;
+		float num = ignoreTimeScale ? RealTime.time : Time.time;
 		if (framerate != 0)
 		{
 			mUpdate = num + Mathf.Abs(1f / (float)framerate);
 		}
 		if (mUnitySprite != null)
 		{
-			mUnitySprite.set_sprite(frames[mIndex]);
+			mUnitySprite.sprite = frames[mIndex];
 		}
 		else if (mNguiSprite != null)
 		{

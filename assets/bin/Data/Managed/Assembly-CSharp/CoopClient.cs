@@ -165,7 +165,6 @@ public class CoopClient : MonoBehaviour
 	}
 
 	public CoopClient()
-		: this()
 	{
 		status = CLIENT_STATUS.NONE;
 		slotIndex = -1;
@@ -174,7 +173,7 @@ public class CoopClient : MonoBehaviour
 
 	protected virtual void Awake()
 	{
-		packetReceiver = this.get_gameObject().AddComponent<CoopClientPacketReceiver>();
+		packetReceiver = base.gameObject.AddComponent<CoopClientPacketReceiver>();
 	}
 
 	protected virtual void Update()
@@ -184,14 +183,12 @@ public class CoopClient : MonoBehaviour
 
 	protected virtual void Logd(string str, params object[] objs)
 	{
-		if (!Log.enabled)
-		{
-		}
+		_ = Log.enabled;
 	}
 
 	public override string ToString()
 	{
-		return "CoopClient[" + slotIndex + "](" + status + "/" + isPartyOwner + "/" + isStageHost + ").userId=" + userId;
+		return "CoopClient[" + slotIndex + "](" + status + "/" + isPartyOwner.ToString() + "/" + isStageHost.ToString() + ").userId=" + userId;
 	}
 
 	public void Clear()
@@ -200,7 +197,7 @@ public class CoopClient : MonoBehaviour
 		isLeave = false;
 		clientId = 0;
 		userId = 0;
-		userToken = string.Empty;
+		userToken = "";
 		slotIndex = -1;
 		userInfo = null;
 		isPartyOwner = false;
@@ -270,7 +267,7 @@ public class CoopClient : MonoBehaviour
 	public void Deactivate()
 	{
 		userId = 0;
-		userToken = string.Empty;
+		userToken = "";
 		slotIndex = -1;
 		userInfo = null;
 		Logd("Deactivate.");
@@ -329,7 +326,11 @@ public class CoopClient : MonoBehaviour
 
 	public bool IsPlayingStage()
 	{
-		return status == CLIENT_STATUS.STAGE_REQUEST || status == CLIENT_STATUS.BATTLE_START;
+		if (status != CLIENT_STATUS.STAGE_REQUEST)
+		{
+			return status == CLIENT_STATUS.BATTLE_START;
+		}
+		return true;
 	}
 
 	public bool IsStageStart()
@@ -417,21 +418,15 @@ public class CoopClient : MonoBehaviour
 
 	public void PopCachePlayer(StageObject.COOP_MODE_TYPE coop_mode = StageObject.COOP_MODE_TYPE.NONE)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			return;
 		}
 		int num = 0;
-		Vector3 appearPosGuest = Vector3.get_zero();
+		Vector3 appearPosGuest = Vector3.zero;
 		if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
 		{
-			appearPosGuest = MonoBehaviourSingleton<StageObjectManager>.I.boss._transform.get_position();
+			appearPosGuest = MonoBehaviourSingleton<StageObjectManager>.I.boss._transform.position;
 		}
 		if (cachePlayerID != 0 && !IsPlayerPop())
 		{
@@ -441,7 +436,7 @@ public class CoopClient : MonoBehaviour
 			if (player != null)
 			{
 				MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(player);
-				player.get_gameObject().SetActive(true);
+				player.gameObject.SetActive(value: true);
 				SetPlayerID(num);
 				player.SetAppearPosGuest(appearPosGuest);
 				if (coop_mode != 0)
@@ -458,7 +453,7 @@ public class CoopClient : MonoBehaviour
 			if (player2 != null)
 			{
 				MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(player2);
-				player2.get_gameObject().SetActive(true);
+				player2.gameObject.SetActive(value: true);
 				player2.SetAppearPosGuest(appearPosGuest);
 				if (coop_mode != 0)
 				{
@@ -490,8 +485,7 @@ public class CoopClient : MonoBehaviour
 				MonoBehaviourSingleton<QuestManager>.I.UpdateExploreHostDCTime(30f);
 			}
 		}
-		string text = StringTable.Format(STRING_CATEGORY.IN_GAME, id, GetPlayerName());
-		UIInGamePopupDialog.PushOpen(text, is_important: false);
+		UIInGamePopupDialog.PushOpen(StringTable.Format(STRING_CATEGORY.IN_GAME, id, GetPlayerName()), is_important: false);
 	}
 
 	public virtual bool OnRecvClientStatus(Coop_Model_ClientStatus model, CoopPacket packet)
@@ -518,7 +512,7 @@ public class CoopClient : MonoBehaviour
 					if (!(player == null) && player.coopClientId == clientId && player.isWaitBattleStart)
 					{
 						MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(player);
-						player.get_gameObject().SetActive(true);
+						player.gameObject.SetActive(value: true);
 						player.ActBattleStart();
 					}
 				}

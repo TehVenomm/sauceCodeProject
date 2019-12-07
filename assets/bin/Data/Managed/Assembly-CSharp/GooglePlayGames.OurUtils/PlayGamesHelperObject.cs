@@ -21,22 +21,15 @@ namespace GooglePlayGames.OurUtils
 
 		private static List<Action<bool>> sFocusCallbackList = new List<Action<bool>>();
 
-		public PlayGamesHelperObject()
-			: this()
-		{
-		}
-
 		public static void CreateObject()
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Expected O, but got Unknown
 			if (!(instance != null))
 			{
-				if (Application.get_isPlaying())
+				if (Application.isPlaying)
 				{
-					GameObject val = new GameObject("PlayGames_QueueRunner");
-					Object.DontDestroyOnLoad(val);
-					instance = val.AddComponent<PlayGamesHelperObject>();
+					GameObject gameObject = new GameObject("PlayGames_QueueRunner");
+					UnityEngine.Object.DontDestroyOnLoad(gameObject);
+					instance = gameObject.AddComponent<PlayGamesHelperObject>();
 				}
 				else
 				{
@@ -48,7 +41,7 @@ namespace GooglePlayGames.OurUtils
 
 		public void Awake()
 		{
-			Object.DontDestroyOnLoad(this.get_gameObject());
+			UnityEngine.Object.DontDestroyOnLoad(base.gameObject);
 		}
 
 		public void OnDisable()
@@ -114,7 +107,7 @@ namespace GooglePlayGames.OurUtils
 				}
 				catch (Exception ex)
 				{
-					Debug.LogError((object)("Exception in OnApplicationFocus:" + ex.Message + "\n" + ex.StackTrace));
+					Debug.LogError("Exception in OnApplicationFocus:" + ex.Message + "\n" + ex.StackTrace);
 				}
 			}
 		}
@@ -129,7 +122,7 @@ namespace GooglePlayGames.OurUtils
 				}
 				catch (Exception ex)
 				{
-					Debug.LogError((object)("Exception in OnApplicationPause:" + ex.Message + "\n" + ex.StackTrace));
+					Debug.LogError("Exception in OnApplicationPause:" + ex.Message + "\n" + ex.StackTrace);
 				}
 			}
 		}

@@ -41,11 +41,6 @@ public class TextTalk : MonoBehaviour
 
 	private Action<string, string> tagCallback;
 
-	public TextTalk()
-		: this()
-	{
-	}
-
 	public void Initialize(Transform lbl_t, List<string[]> _text_list, Action page_end_call_back = null, Action<string, string> tag_call_back = null, int num_per_sec = 0)
 	{
 		if (!(lbl_t == null) && _text_list != null && _text_list.Count != 0)
@@ -58,7 +53,7 @@ public class TextTalk : MonoBehaviour
 				page = 0;
 				textList = _text_list;
 				text = textList[page++];
-				speed = Mathf.Max(1f, (num_per_sec != 0) ? ((float)num_per_sec) : 30f);
+				speed = Mathf.Max(1f, (num_per_sec == 0) ? 30f : ((float)num_per_sec));
 				sb.Remove(0, sb.ToString().Length);
 				textIndex = 0;
 				textCount = 0;
@@ -78,12 +73,20 @@ public class TextTalk : MonoBehaviour
 
 	public bool IsComplete()
 	{
-		return isStart && isComplete;
+		if (isStart)
+		{
+			return isComplete;
+		}
+		return false;
 	}
 
 	public bool IsTalking()
 	{
-		return isStart && !isComplete;
+		if (isStart)
+		{
+			return !isComplete;
+		}
+		return false;
 	}
 
 	public void SkipOneStep()
@@ -140,7 +143,7 @@ public class TextTalk : MonoBehaviour
 		{
 			return;
 		}
-		float num = Time.get_deltaTime();
+		float num = Time.deltaTime;
 		if (breakTime > 0f)
 		{
 			breakTime -= num;
@@ -186,7 +189,7 @@ public class TextTalk : MonoBehaviour
 				}
 				break;
 			}
-			int num3 = textCount;
+			_ = textCount;
 			textCount = analyzer.Analyze(text[textIndex], textIndex, textCount);
 			if (!analyzer.IsFindTag())
 			{

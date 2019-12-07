@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
 
@@ -23,9 +21,9 @@ public class FortuneWheelMotionBlur : ImageEffectBase
 
 	protected override void Start()
 	{
-		_camera = this.get_gameObject().GetComponent<Camera>();
+		_camera = base.gameObject.GetComponent<Camera>();
 		_resultTexture = result.GetComponent<UITexture>();
-		_root = GameObject.Find("UI_Root").get_gameObject().GetComponent<UIRoot>();
+		_root = GameObject.Find("UI_Root").gameObject.GetComponent<UIRoot>();
 		base.Start();
 	}
 
@@ -48,31 +46,26 @@ public class FortuneWheelMotionBlur : ImageEffectBase
 
 	private void OnPreCull()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Expected O, but got Unknown
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0175: Expected O, but got Unknown
-		RenderTexture.set_active(_camera.get_targetTexture());
+		RenderTexture.active = _camera.targetTexture;
 		GL.Begin(4);
-		GL.Clear(true, true, Color.get_clear());
+		GL.Clear(clearDepth: true, clearColor: true, Color.clear);
 		GL.End();
-		RenderTexture.set_active(null);
-		Transform parent = this.get_gameObject().get_transform().get_parent();
-		SetLayerRecursive(parent.get_gameObject(), 4);
+		RenderTexture.active = null;
+		Transform parent = base.gameObject.transform.parent;
+		SetLayerRecursive(parent.gameObject, 4);
 		_resultTexture.width = _root.manualWidth;
 		_resultTexture.height = _root.manualHeight;
-		if (_srcRT == null || _srcRT.get_width() != _camera.get_pixelWidth() || _srcRT.get_height() != _camera.get_pixelHeight())
+		if (_srcRT == null || _srcRT.width != _camera.pixelWidth || _srcRT.height != _camera.pixelHeight)
 		{
-			_srcRT = new RenderTexture(_camera.get_pixelWidth(), _camera.get_pixelHeight(), 24);
-			_srcRT.set_hideFlags(61);
+			_srcRT = new RenderTexture(_camera.pixelWidth, _camera.pixelHeight, 24);
+			_srcRT.hideFlags = HideFlags.HideAndDontSave;
 			_srcRT.Create();
 		}
-		_camera.set_targetTexture(_srcRT);
-		if (_dstRT == null || _dstRT.get_width() != _srcRT.get_width() || _dstRT.get_height() != _srcRT.get_height())
+		_camera.targetTexture = _srcRT;
+		if (_dstRT == null || _dstRT.width != _srcRT.width || _dstRT.height != _srcRT.height)
 		{
-			_dstRT = new RenderTexture(_camera.get_pixelWidth(), _camera.get_pixelHeight(), 24);
-			_dstRT.set_hideFlags(61);
+			_dstRT = new RenderTexture(_camera.pixelWidth, _camera.pixelHeight, 24);
+			_dstRT.hideFlags = HideFlags.HideAndDontSave;
 			_dstRT.Create();
 			Graphics.Blit(_srcRT, _dstRT);
 		}
@@ -90,27 +83,12 @@ public class FortuneWheelMotionBlur : ImageEffectBase
 
 	private void SetLayerRecursive(GameObject obj, int layer)
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Expected O, but got Unknown
 		if (!(obj == null))
 		{
-			obj.set_layer(layer);
-			IEnumerator enumerator = obj.get_transform().GetEnumerator();
-			try
+			obj.layer = layer;
+			foreach (Transform item in obj.transform)
 			{
-				while (enumerator.MoveNext())
-				{
-					Transform val = enumerator.Current;
-					SetLayerRecursive(val.get_gameObject(), layer);
-				}
-			}
-			finally
-			{
-				IDisposable disposable;
-				if ((disposable = (enumerator as IDisposable)) != null)
-				{
-					disposable.Dispose();
-				}
+				SetLayerRecursive(item.gameObject, layer);
 			}
 		}
 	}

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class ProductDataTable : Singleton<ProductDataTable>, IDataTable
 {
@@ -51,9 +50,6 @@ public class ProductDataTable : Singleton<ProductDataTable>, IDataTable
 	}
 
 	public List<PackInfo> packs;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackStringKeyReadCSV<ProductData> _003C_003Ef__mg_0024cache0;
 
 	public StringKeyTable<ProductData> dataTable
 	{

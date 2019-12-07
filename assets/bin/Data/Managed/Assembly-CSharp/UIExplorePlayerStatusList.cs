@@ -8,11 +8,6 @@ public class UIExplorePlayerStatusList : MonoBehaviour
 
 	private ExploreStatus exploreStatus;
 
-	public UIExplorePlayerStatusList()
-		: this()
-	{
-	}
-
 	public void Initialize(ExploreStatus exploreStatus)
 	{
 		if (this.exploreStatus != exploreStatus)
@@ -42,7 +37,7 @@ public class UIExplorePlayerStatusList : MonoBehaviour
 	{
 		for (int i = 0; i < statuses.Length; i++)
 		{
-			statuses[i].get_gameObject().SetActive(false);
+			statuses[i].gameObject.SetActive(value: false);
 		}
 		List<ExplorePlayerStatus> enabledPlayerStatusList = exploreStatus.GetEnabledPlayerStatusList();
 		bool flag = false;

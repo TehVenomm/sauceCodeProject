@@ -61,7 +61,7 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 
 	private Vector3 targetPos;
 
-	private Vector3 prefabDefaultScale = Vector3.get_one();
+	private Vector3 prefabDefaultScale = Vector3.one;
 
 	public Transform _transform
 	{
@@ -86,13 +86,6 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 		get;
 		set;
 	}
-
-	public FieldDropObject()
-		: this()
-	{
-	}//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-
 
 	public static FieldDropObject Create(Coop_Model_EnemyDefeat model, List<InGameManager.DropDeliveryInfo> deliveryList, List<InGameManager.DropItemInfo> itemList)
 	{
@@ -183,64 +176,44 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 
 	public static FieldDropObject CreateTreasureBox(Coop_Model_EnemyDefeat model, List<InGameManager.DropDeliveryInfo> deliveryList, List<InGameManager.DropItemInfo> itemList, UIDropAnnounce.COLOR color)
 	{
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-		GameObject val = MonoBehaviourSingleton<InGameManager>.I.CreateTreasureBox(color);
-		FieldDropObject fieldDropObject = val.GetComponent<FieldDropObject>();
+		GameObject gameObject = MonoBehaviourSingleton<InGameManager>.I.CreateTreasureBox(color);
+		FieldDropObject fieldDropObject = gameObject.GetComponent<FieldDropObject>();
 		if (fieldDropObject == null)
 		{
-			fieldDropObject = val.AddComponent<FieldDropObject>();
+			fieldDropObject = gameObject.AddComponent<FieldDropObject>();
 		}
 		fieldDropObject.itemInfo = itemList;
 		fieldDropObject.deliveryInfo = deliveryList;
 		fieldDropObject.rewardId = model.rewardId;
 		fieldDropObject.isRare = (color == UIDropAnnounce.COLOR.RARE);
-		Vector3 zero = Vector3.get_zero();
+		Vector3 b = Vector3.zero;
 		if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
 		{
 			InGameSettingsManager.FieldDropItem fieldDrop = MonoBehaviourSingleton<InGameSettingsManager>.I.fieldDrop;
-			float value = Random.get_value();
-			float value2 = Random.get_value();
-			float value3 = Random.get_value();
-			float num = (!(Random.get_value() > 0.5f)) ? 1f : (-1f);
-			float num2 = (!(Random.get_value() > 0.5f)) ? 1f : (-1f);
-			zero._002Ector(Mathf.Lerp(fieldDrop.offsetMin.x, fieldDrop.offsetMax.x, value) * num, Mathf.Lerp(fieldDrop.offsetMin.y, fieldDrop.offsetMax.y, value2), Mathf.Lerp(fieldDrop.offsetMin.z, fieldDrop.offsetMax.z, value3) * num2);
+			float value = Random.value;
+			float value2 = Random.value;
+			float value3 = Random.value;
+			float num = (Random.value > 0.5f) ? (-1f) : 1f;
+			float num2 = (Random.value > 0.5f) ? (-1f) : 1f;
+			b = new Vector3(Mathf.Lerp(fieldDrop.offsetMin.x, fieldDrop.offsetMax.x, value) * num, Mathf.Lerp(fieldDrop.offsetMin.y, fieldDrop.offsetMax.y, value2), Mathf.Lerp(fieldDrop.offsetMin.z, fieldDrop.offsetMax.z, value3) * num2);
 		}
-		Vector3 val2 = default(Vector3);
-		val2._002Ector((float)model.x, 0f, (float)model.z);
-		Vector3 target = val2 + zero;
+		Vector3 vector = new Vector3(model.x, 0f, model.z);
+		Vector3 target = vector + b;
 		int obstacleMask = AIUtility.GetObstacleMask();
 		RaycastHit hit = default(RaycastHit);
-		if (AIUtility.RaycastForTargetPos(val2, target, obstacleMask, out hit))
+		if (AIUtility.RaycastForTargetPos(vector, target, obstacleMask, out hit))
 		{
-			Vector3 point = hit.get_point();
-			float x = point.x;
-			float y = target.y;
-			Vector3 point2 = hit.get_point();
-			target._002Ector(x, y, point2.z);
+			target = new Vector3(hit.point.x, target.y, hit.point.z);
 		}
-		fieldDropObject.Drop(val2, target);
+		fieldDropObject.Drop(vector, target);
 		return fieldDropObject;
 	}
 
 	private void Awake()
 	{
-		_transform = this.get_transform();
+		_transform = base.transform;
 		parameter = MonoBehaviourSingleton<InGameSettingsManager>.I.fieldDrop;
-		animator = this.get_gameObject().GetComponentInChildren<Animator>();
+		animator = base.gameObject.GetComponentInChildren<Animator>();
 		if (startAnimHash == -1)
 		{
 			startAnimHash = Animator.StringToHash("Base Layer.Pop");
@@ -261,14 +234,11 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 
 	private void OnEnable()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		if (!isDelete)
 		{
-			prefabDefaultScale = _transform.get_localScale();
+			prefabDefaultScale = _transform.localScale;
 		}
-		_transform.set_localScale(prefabDefaultScale);
+		_transform.localScale = prefabDefaultScale;
 		isDelete = false;
 	}
 
@@ -290,7 +260,7 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		if (targetObject.isInitialized && !isOpend && animationStep != AnimationStep.MOVE_TO_TARGET_POS && animationStep != AnimationStep.OPEN && IsSelfAttack(collider.get_gameObject()))
+		if (targetObject.isInitialized && !isOpend && animationStep != AnimationStep.MOVE_TO_TARGET_POS && animationStep != AnimationStep.OPEN && IsSelfAttack(collider.gameObject))
 		{
 			OpenDropObject();
 		}
@@ -299,7 +269,7 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 	public bool IsSelfAttack(GameObject obj)
 	{
 		IAttackCollider component = obj.GetComponent<IAttackCollider>();
-		if (object.ReferenceEquals(component, null))
+		if (component == null)
 		{
 			return false;
 		}
@@ -308,7 +278,7 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 			return false;
 		}
 		StageObject fromObject = component.GetFromObject();
-		if (object.ReferenceEquals(fromObject, null))
+		if ((object)fromObject == null)
 		{
 			return false;
 		}
@@ -317,7 +287,6 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 
 	public void OpenDropObject()
 	{
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 		if (!isOpend)
 		{
 			isOpend = true;
@@ -327,7 +296,7 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 				animEventProcessor.CrossFade(openAnimHash, 0f);
 			}
 			effect = EffectManager.GetEffect("ef_btl_treasurebox_01");
-			effect.set_position(_transform.get_position());
+			effect.position = _transform.position;
 			rymFX component = effect.GetComponent<rymFX>();
 			if (component != null)
 			{
@@ -353,47 +322,9 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 
 	private void LateUpdate()
 	{
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0234: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0254: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0273: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0283: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0288: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
 		if (targetObject == null)
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 			return;
 		}
 		if (animEventProcessor != null)
@@ -404,12 +335,10 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 		{
 		case AnimationStep.MOVE_TO_TARGET_POS:
 		{
-			animationTimer += Time.get_deltaTime();
-			Vector3 position2 = Vector3.Lerp(dropPos, targetPos, animationTimer / MOVE_TO_TARGET_TIME);
-			float x = position2.x;
-			Vector3 position3 = _transform.get_position();
-			position2._002Ector(x, position3.y, position2.z);
-			_transform.set_position(position2);
+			animationTimer += Time.deltaTime;
+			Vector3 vector2 = Vector3.Lerp(dropPos, targetPos, animationTimer / MOVE_TO_TARGET_TIME);
+			vector2 = new Vector3(vector2.x, _transform.position.y, vector2.z);
+			_transform.position = vector2;
 			if (animationTimer >= MOVE_TO_TARGET_TIME)
 			{
 				animationStep = AnimationStep.DROP_TO_GROUND;
@@ -417,11 +346,9 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 			break;
 		}
 		case AnimationStep.DROP_TO_GROUND:
-		{
-			AnimatorStateInfo currentAnimatorStateInfo2 = animator.GetCurrentAnimatorStateInfo(0);
-			if (currentAnimatorStateInfo2.get_fullPathHash() == endAnimHash)
+			if (animator.GetCurrentAnimatorStateInfo(0).fullPathHash == endAnimHash)
 			{
-				targetPoint = this.GetComponent<TargetPoint>();
+				targetPoint = GetComponent<TargetPoint>();
 				animationStep = AnimationStep.NONE;
 			}
 			if (isRare)
@@ -433,54 +360,52 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 				SoundManager.PlayOneShotUISE(10000062);
 			}
 			break;
-		}
 		case AnimationStep.OPEN:
 		{
 			AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-			if (currentAnimatorStateInfo.get_fullPathHash() == openAnimHash && currentAnimatorStateInfo.get_normalizedTime() > 0.99f)
+			if (currentAnimatorStateInfo.fullPathHash == openAnimHash && currentAnimatorStateInfo.normalizedTime > 0.99f)
 			{
 				animationStep = AnimationStep.NONE;
 				if (effect != null)
 				{
-					EffectManager.ReleaseEffect(effect.get_gameObject());
+					EffectManager.ReleaseEffect(effect.gameObject);
 				}
-				this.get_gameObject().SetActive(false);
+				base.gameObject.SetActive(value: false);
 			}
 			break;
 		}
 		case AnimationStep.GET:
 			if (distanceAnim.IsPlaying())
 			{
-				moveTime += Time.get_deltaTime();
-				Bounds bounds = targetObject._collider.get_bounds();
-				Vector3 center = bounds.get_center();
-				Vector3 val = _transform.get_position() - center;
-				float magnitude = val.get_magnitude();
+				moveTime += Time.deltaTime;
+				Vector3 center = targetObject._collider.bounds.center;
+				Vector3 vector = _transform.position - center;
+				float magnitude = vector.magnitude;
 				if (distance < magnitude)
 				{
 					distance = magnitude;
 				}
-				val = val.get_normalized() * distance * (1f - distanceAnim.Update());
-				Vector3 val2 = Quaternion.AngleAxis(moveTime * speedAnim.Update(), Vector3.get_up()) * val;
-				Vector3 position = center + val2;
-				_transform.set_position(position);
-				Vector3 localScale = Vector3.get_one() * scaleAnim.Update();
+				vector = vector.normalized * distance * (1f - distanceAnim.Update());
+				Vector3 b = Quaternion.AngleAxis(moveTime * speedAnim.Update(), Vector3.up) * vector;
+				Vector3 position = center + b;
+				_transform.position = position;
+				Vector3 localScale = Vector3.one * scaleAnim.Update();
 				if (distanceAnim.IsPlaying())
 				{
-					_transform.set_localScale(localScale);
+					_transform.localScale = localScale;
 				}
 			}
 			else
 			{
-				Transform val3 = EffectManager.GetEffect("ef_btl_mpdrop_01");
-				val3.set_position(_transform.get_position());
-				rymFX component = val3.GetComponent<rymFX>();
+				Transform transform = EffectManager.GetEffect("ef_btl_mpdrop_01");
+				transform.position = _transform.position;
+				rymFX component = transform.GetComponent<rymFX>();
 				if (component != null)
 				{
 					component.AutoDelete = true;
 					component.LoopEnd = true;
 				}
-				this.get_gameObject().SetActive(false);
+				base.gameObject.SetActive(value: false);
 			}
 			break;
 		}
@@ -488,17 +413,12 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 
 	public virtual void Drop(Vector3 _dropPos, Vector3 _targetPos)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 		isOpend = false;
 		animationTimer = 0f;
 		animationStep = AnimationStep.MOVE_TO_TARGET_POS;
 		targetObject = MonoBehaviourSingleton<StageObjectManager>.I.self;
 		dropPos = _dropPos;
-		_transform.set_position(_dropPos);
+		_transform.position = _dropPos;
 		targetPos = _targetPos;
 		if (animEventProcessor != null)
 		{
@@ -508,10 +428,6 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 
 	public void Delete(bool is_get)
 	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 		if (!isDelete)
 		{
 			isDelete = true;
@@ -519,8 +435,7 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 			if (is_get)
 			{
 				targetObject = MonoBehaviourSingleton<StageObjectManager>.I.self;
-				Bounds bounds = targetObject._collider.get_bounds();
-				distance = Vector3.Distance(bounds.get_center(), _transform.get_position());
+				distance = Vector3.Distance(targetObject._collider.bounds.center, _transform.position);
 				distanceAnim.Set(parameter.getAnimTime, 0f, 1f, parameter.distanceAnim, 0f);
 				distanceAnim.Play();
 				speedAnim.Set(parameter.getAnimTime, 0f, parameter.rotateSpeed, parameter.rotateSpeedAnim, 0f);
@@ -533,7 +448,7 @@ public class FieldDropObject : MonoBehaviour, IAnimEvent
 			}
 			else
 			{
-				this.get_gameObject().SetActive(false);
+				base.gameObject.SetActive(value: false);
 			}
 		}
 	}

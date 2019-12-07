@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class ChatAppeal : UIBehaviour
@@ -26,8 +25,8 @@ public class ChatAppeal : UIBehaviour
 	{
 		rootPosition = root;
 		isAdjustment = isAdjustmentPos;
-		SetActive((Enum)UI.OBJ_TWEEN_ROOT, is_visible: true);
-		SetLabelText((Enum)UI.LBL_CHAT, text);
+		SetActive(UI.OBJ_TWEEN_ROOT, is_visible: true);
+		SetLabelText(UI.LBL_CHAT, text);
 		TweenScale component = GetCtrl(UI.OBJ_TWEEN_ROOT).GetComponent<TweenScale>();
 		component.SetOnFinished(OnFinish);
 		component.ResetToBeginning();
@@ -36,41 +35,28 @@ public class ChatAppeal : UIBehaviour
 
 	private void OnFinish()
 	{
-		SetActive((Enum)UI.OBJ_TWEEN_ROOT, is_visible: false);
+		SetActive(UI.OBJ_TWEEN_ROOT, is_visible: false);
 		rootPosition = null;
 	}
 
 	private void SetPosition()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = rootPosition.get_position();
+		Vector3 position = rootPosition.position;
 		if (isAdjustment)
 		{
-			val += new Vector3(0f, 2.5f, 0f);
+			position += new Vector3(0f, 2.5f, 0f);
 		}
-		val = MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToScreenPoint(val);
-		val = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
-		if (val.z >= 0f)
+		position = MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToScreenPoint(position);
+		position = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(position);
+		if (position.z >= 0f)
 		{
-			val.z = 0f;
-			GetCtrl(UI.OBJ_TWEEN_ROOT).set_position(val);
-			SetActive((Enum)UI.OBJ_TWEEN_ROOT, is_visible: true);
+			position.z = 0f;
+			GetCtrl(UI.OBJ_TWEEN_ROOT).position = position;
+			SetActive(UI.OBJ_TWEEN_ROOT, is_visible: true);
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_TWEEN_ROOT, is_visible: false);
+			SetActive(UI.OBJ_TWEEN_ROOT, is_visible: false);
 		}
 	}
 }

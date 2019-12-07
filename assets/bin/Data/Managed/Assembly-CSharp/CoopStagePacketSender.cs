@@ -9,14 +9,9 @@ public class CoopStagePacketSender : MonoBehaviour
 		set;
 	}
 
-	public CoopStagePacketSender()
-		: this()
-	{
-	}
-
 	protected virtual void Awake()
 	{
-		coopStage = this.get_gameObject().GetComponent<CoopStage>();
+		coopStage = base.gameObject.GetComponent<CoopStage>();
 	}
 
 	protected virtual void Start()
@@ -58,10 +53,10 @@ public class CoopStagePacketSender : MonoBehaviour
 		coop_Model_StagePlayerPop.id = 1002;
 		coop_Model_StagePlayerPop.sid = player.id;
 		coop_Model_StagePlayerPop.isSelf = (player is Self);
-		NonPlayer nonPlayer = player as NonPlayer;
+		NonPlayer x = player as NonPlayer;
 		if (player.createInfo != null)
 		{
-			if (nonPlayer == null)
+			if (x == null)
 			{
 				coop_Model_StagePlayerPop.charaInfo = player.createInfo.charaInfo;
 			}
@@ -73,10 +68,6 @@ public class CoopStagePacketSender : MonoBehaviour
 
 	public void SendStageInfo(int to_client_id = 0)
 	{
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_StageInfo model = new Coop_Model_StageInfo();
 		model.id = 1002;
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
@@ -99,7 +90,7 @@ public class CoopStagePacketSender : MonoBehaviour
 				Coop_Model_StageInfo.GimmickInfo item = new Coop_Model_StageInfo.GimmickInfo
 				{
 					id = o.id,
-					enable = o.get_gameObject().get_activeSelf()
+					enable = o.gameObject.activeSelf
 				};
 				model.gimmicks.Add(item);
 			});
@@ -119,10 +110,10 @@ public class CoopStagePacketSender : MonoBehaviour
 					model.supplyGimmickInfos.Add(fieldSupplyGimmickObject.GetSupplyGimmickInfo());
 				}
 			});
-			model.enemyPos = Vector3.get_zero();
+			model.enemyPos = Vector3.zero;
 			if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
 			{
-				model.enemyPos = MonoBehaviourSingleton<StageObjectManager>.I.boss._transform.get_position();
+				model.enemyPos = MonoBehaviourSingleton<StageObjectManager>.I.boss._transform.position;
 			}
 		}
 		if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && MonoBehaviourSingleton<InGameProgress>.IsValid())
@@ -271,9 +262,7 @@ public class CoopStagePacketSender : MonoBehaviour
 		Coop_Model_StageSyncPlayerRecord coop_Model_StageSyncPlayerRecord = new Coop_Model_StageSyncPlayerRecord();
 		coop_Model_StageSyncPlayerRecord.id = 1002;
 		coop_Model_StageSyncPlayerRecord.rec = record;
-		Coop_Model_StageSyncPlayerRecord model = coop_Model_StageSyncPlayerRecord;
-		bool promise2 = promise;
-		Send(model, promise2, to_client_id, null, onPreResend);
+		Send(coop_Model_StageSyncPlayerRecord, promise, to_client_id, null, onPreResend);
 	}
 
 	public void SendEnemyBossEscape(int sid, bool promise)

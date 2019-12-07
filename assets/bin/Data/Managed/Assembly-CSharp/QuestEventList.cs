@@ -160,7 +160,7 @@ public class QuestEventList : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine("DoInitialize");
+		StartCoroutine("DoInitialize");
 	}
 
 	private IEnumerator DoInitialize()
@@ -204,19 +204,20 @@ public class QuestEventList : GameSection
 		}
 		if (isCarnival)
 		{
-			yield return this.StartCoroutine(GetCurrentCarnivalStatus());
-			int CARNIVAL_BG_ID = 10017100;
+			yield return StartCoroutine(GetCurrentCarnivalStatus());
+			int banner_id = 10017100;
 			if (MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.carnivalEventId > 0)
 			{
-				CARNIVAL_BG_ID = MonoBehaviourSingleton<QuestManager>.I.carnivalEventId;
+				banner_id = MonoBehaviourSingleton<QuestManager>.I.carnivalEventId;
 			}
-			string resourceName = ResourceName.GetEventBG(CARNIVAL_BG_ID);
-			LoadObject eventBG = loadingQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.EVENT_BG, resourceName);
+			string eventBG2 = ResourceName.GetEventBG(banner_id);
+			LoadObject eventBG = loadingQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.EVENT_BG, eventBG2);
 			if (loadingQueue.IsLoading())
 			{
 				yield return loadingQueue.Wait();
 			}
-			SetTexture(texture: eventBG.loadedObject as Texture2D, texture_enum: UI.TEX_CARNIVAL_BG);
+			Texture2D texture = eventBG.loadedObject as Texture2D;
+			SetTexture(UI.TEX_CARNIVAL_BG, texture);
 			SetCarnivalPointInfo();
 		}
 		base.Initialize();
@@ -225,7 +226,7 @@ public class QuestEventList : GameSection
 
 	private void SetCarnivalPointInfo()
 	{
-		SetActive((Enum)UI.OBJ_CARNIVAL_STATUS, currentCarnivalData != null);
+		SetActive(UI.OBJ_CARNIVAL_STATUS, currentCarnivalData != null);
 		if (currentCarnivalData == null)
 		{
 			return;
@@ -233,10 +234,10 @@ public class QuestEventList : GameSection
 		QuestCarnivalPointModel.Param param = currentCarnivalData;
 		carnivalStatus = (CARNIVAL_STATUS)param.status;
 		bool flag = false;
-		string empty = string.Empty;
-		string empty2 = string.Empty;
-		string text = string.Empty;
-		string text2 = string.Empty;
+		string text = "";
+		string text2 = "";
+		string text3 = "";
+		string text4 = "";
 		bool flag2 = param.rank > 0;
 		if (param.status == 1)
 		{
@@ -247,20 +248,20 @@ public class QuestEventList : GameSection
 			}
 			else
 			{
-				text = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 42u);
+				text3 = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 42u);
 			}
-			empty = param.point.ToString("N0") + " pt";
-			empty2 = param.pointForNextClass.ToString("N0") + " pt";
-			SetActive((Enum)UI.SPR_CARNIVAL_END, is_visible: false);
+			text = param.point.ToString("N0") + " pt";
+			text2 = param.pointForNextClass.ToString("N0") + " pt";
+			SetActive(UI.SPR_CARNIVAL_END, is_visible: false);
 		}
 		else if (param.status == 2)
 		{
 			flag = false;
-			empty = param.point.ToString("N0") + " pt";
-			empty2 = "-------";
-			text = "-------";
-			text2 = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 38u);
-			SetActive((Enum)UI.SPR_CARNIVAL_END, is_visible: true);
+			text = param.point.ToString("N0") + " pt";
+			text2 = "-------";
+			text3 = "-------";
+			text4 = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 38u);
+			SetActive(UI.SPR_CARNIVAL_END, is_visible: true);
 		}
 		else
 		{
@@ -271,19 +272,19 @@ public class QuestEventList : GameSection
 			}
 			else
 			{
-				text = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 42u);
+				text3 = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 42u);
 			}
-			empty = param.point.ToString("N0") + " pt";
-			empty2 = "-------";
-			text2 = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 39u);
-			SetActive((Enum)UI.SPR_CARNIVAL_END, is_visible: true);
+			text = param.point.ToString("N0") + " pt";
+			text2 = "-------";
+			text4 = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 39u);
+			SetActive(UI.SPR_CARNIVAL_END, is_visible: true);
 		}
-		SetActive((Enum)UI.LBL_CURRENT_RANK, !flag);
-		SetActive((Enum)UI.OBJ_RANK_ROOT, flag);
-		SetLabelText((Enum)UI.LBL_CURRENT_POINT, empty);
-		SetLabelText((Enum)UI.LBL_NEXT_POINT, empty2);
-		SetLabelText((Enum)UI.LBL_CURRENT_RANK, text);
-		SetLabelText((Enum)UI.LBL_CARNIVAL_STATUS, text2);
+		SetActive(UI.LBL_CURRENT_RANK, !flag);
+		SetActive(UI.OBJ_RANK_ROOT, flag);
+		SetLabelText(UI.LBL_CURRENT_POINT, text);
+		SetLabelText(UI.LBL_NEXT_POINT, text2);
+		SetLabelText(UI.LBL_CURRENT_RANK, text3);
+		SetLabelText(UI.LBL_CARNIVAL_STATUS, text4);
 	}
 
 	private void SetSpriteRank(int value)
@@ -297,26 +298,25 @@ public class QuestEventList : GameSection
 			int num = length - 1;
 			if (i > num)
 			{
-				SetActive((Enum)rankNumbers[i], is_visible: false);
+				SetActive(rankNumbers[i], is_visible: false);
 				continue;
 			}
-			SetActive((Enum)rankNumbers[i], is_visible: true);
+			SetActive(rankNumbers[i], is_visible: true);
 			int num2 = int.Parse(text[i].ToString());
-			SetSprite((Enum)rankNumbers[num - i], SPR_RANKING_NUMBER[num2]);
+			SetSprite(rankNumbers[num - i], SPR_RANKING_NUMBER[num2]);
 		}
 	}
 
 	private IEnumerator GetCurrentCarnivalStatus()
 	{
 		bool isRequest = true;
-		Protocol.Send<QuestCarnivalPointModel.RequestSendForm, QuestCarnivalPointModel>(postData: new QuestCarnivalPointModel.RequestSendForm
-		{
-			eid = MonoBehaviourSingleton<QuestManager>.I.carnivalEventId
-		}, url: QuestCarnivalPointModel.URL, callBack: (Action<QuestCarnivalPointModel>)delegate(QuestCarnivalPointModel result)
+		QuestCarnivalPointModel.RequestSendForm requestSendForm = new QuestCarnivalPointModel.RequestSendForm();
+		requestSendForm.eid = MonoBehaviourSingleton<QuestManager>.I.carnivalEventId;
+		Protocol.Send(QuestCarnivalPointModel.URL, requestSendForm, delegate(QuestCarnivalPointModel result)
 		{
 			isRequest = false;
 			currentCarnivalData = result.result;
-		}, getParam: string.Empty);
+		});
 		while (isRequest)
 		{
 			yield return null;
@@ -381,8 +381,8 @@ public class QuestEventList : GameSection
 	{
 		bool is_visible = IsActive(UI.OBJ_QUEST_LIST_ROOT);
 		bool is_visible2 = IsActive(UI.OBJ_CARNIVAL_LIST_ROOT);
-		SetActive((Enum)UI.OBJ_QUEST_LIST_ROOT, is_visible: true);
-		SetActive((Enum)UI.OBJ_CARNIVAL_LIST_ROOT, is_visible: true);
+		SetActive(UI.OBJ_QUEST_LIST_ROOT, is_visible: true);
+		SetActive(UI.OBJ_CARNIVAL_LIST_ROOT, is_visible: true);
 		_UpdateEvent();
 		_UpdatePresent();
 		if (isCarnival)
@@ -405,8 +405,8 @@ public class QuestEventList : GameSection
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_QUEST_LIST_ROOT, is_visible);
-			SetActive((Enum)UI.OBJ_CARNIVAL_LIST_ROOT, is_visible2);
+			SetActive(UI.OBJ_QUEST_LIST_ROOT, is_visible);
+			SetActive(UI.OBJ_CARNIVAL_LIST_ROOT, is_visible2);
 		}
 	}
 
@@ -417,14 +417,13 @@ public class QuestEventList : GameSection
 			hasNewEvent[0] = false;
 			EVENT_DISPLAY_PLACE lastPlace = EVENT_DISPLAY_PLACE.NONE;
 			float offsetY = 0f;
-			SetSimpleContent(UI.OBJ_EVENT_ROOT, string.Empty, eventList.Count, reset: false, delegate(int i)
-			{
-				EventListData eventListData3 = eventList[i];
-				return eventListData3.placeEnum != EVENT_DISPLAY_PLACE.PRESENT && eventListData3.placeEnum != EVENT_DISPLAY_PLACE.NONE;
-			}, delegate(int i, Transform parent)
+			SetSimpleContent(UI.OBJ_EVENT_ROOT, "", eventList.Count, reset: false, delegate(int i)
 			{
 				EventListData eventListData2 = eventList[i];
-				switch (eventListData2.placeEnum)
+				return eventListData2.placeEnum != EVENT_DISPLAY_PLACE.PRESENT && eventListData2.placeEnum != EVENT_DISPLAY_PLACE.NONE;
+			}, delegate(int i, Transform parent)
+			{
+				switch (eventList[i].placeEnum)
 				{
 				case EVENT_DISPLAY_PLACE.NONE:
 				case EVENT_DISPLAY_PLACE.PRESENT:
@@ -443,128 +442,134 @@ public class QuestEventList : GameSection
 				}
 			}, delegate(int i, Transform t, bool is_recycle)
 			{
-				//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-				//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-				if (!(t == null))
+				if (t == null)
 				{
-					EventListData eventListData = eventList[i];
-					_SetupItem(eDispTab.Event, t, eventListData);
-					if (lastPlace == EVENT_DISPLAY_PLACE.LEFT_EVENT && eventListData.placeEnum != EVENT_DISPLAY_PLACE.RIGHT_EVENT)
-					{
-						if (offsetY == 0f)
-						{
-							offsetY -= kItemBBoxHeight * 0.5f;
-						}
-						else
-						{
-							offsetY -= kItemBBoxHeight;
-						}
-					}
-					else if (lastPlace == EVENT_DISPLAY_PLACE.LEFT_CONTENTS && eventListData.placeEnum != EVENT_DISPLAY_PLACE.RIGHT_CONTENTS)
-					{
-						if (offsetY == 0f)
-						{
-							offsetY -= kItemSBoxHeight * 0.5f;
-						}
-						else
-						{
-							offsetY -= kItemSBoxHeight;
-						}
-					}
-					Vector3 localPosition = t.get_localPosition();
-					if (eventListData.placeEnum == EVENT_DISPLAY_PLACE.LEFT_EVENT || eventListData.placeEnum == EVENT_DISPLAY_PLACE.LEFT_CONTENTS)
-					{
-						localPosition.x = kItemLeftPosX;
-					}
-					else if (eventListData.placeEnum == EVENT_DISPLAY_PLACE.RIGHT_EVENT || eventListData.placeEnum == EVENT_DISPLAY_PLACE.RIGHT_CONTENTS)
-					{
-						localPosition.x = kItemRightPosX;
-					}
-					else
-					{
-						localPosition.x = 0f;
-					}
-					float num;
-					float num2;
-					switch (eventListData.placeEnum)
-					{
-					case EVENT_DISPLAY_PLACE.LEFT_EVENT:
-					case EVENT_DISPLAY_PLACE.RIGHT_EVENT:
-						num = kItemBBoxHeight;
-						num2 = kItemBBoxHeight * 0.5f;
-						break;
-					case EVENT_DISPLAY_PLACE.LEFT_CONTENTS:
-					case EVENT_DISPLAY_PLACE.RIGHT_CONTENTS:
-						num = kItemSBoxHeight;
-						num2 = kItemSBoxHeight * 0.5f;
-						break;
-					default:
-						num = kItemNormalHeight;
-						num2 = kItemNormalHeight * 0.5f;
-						break;
-					}
+					return;
+				}
+				EventListData eventListData = eventList[i];
+				_SetupItem(eDispTab.Event, t, eventListData);
+				if (lastPlace == EVENT_DISPLAY_PLACE.LEFT_EVENT && eventListData.placeEnum != EVENT_DISPLAY_PLACE.RIGHT_EVENT)
+				{
 					if (offsetY == 0f)
 					{
-						localPosition.y = 0f;
+						offsetY -= kItemBBoxHeight * 0.5f;
 					}
 					else
 					{
-						localPosition.y = offsetY - num2;
+						offsetY -= kItemBBoxHeight;
 					}
-					t.set_localPosition(localPosition);
-					switch (eventListData.placeEnum)
-					{
-					default:
-						if (offsetY == 0f)
-						{
-							offsetY -= num2;
-						}
-						else
-						{
-							offsetY -= num;
-						}
-						break;
-					case EVENT_DISPLAY_PLACE.LEFT_EVENT:
-					case EVENT_DISPLAY_PLACE.LEFT_CONTENTS:
-						break;
-					}
-					lastPlace = eventListData.placeEnum;
 				}
+				else if (lastPlace == EVENT_DISPLAY_PLACE.LEFT_CONTENTS && eventListData.placeEnum != EVENT_DISPLAY_PLACE.RIGHT_CONTENTS)
+				{
+					if (offsetY == 0f)
+					{
+						offsetY -= kItemSBoxHeight * 0.5f;
+					}
+					else
+					{
+						offsetY -= kItemSBoxHeight;
+					}
+				}
+				Vector3 localPosition = t.localPosition;
+				if (eventListData.placeEnum == EVENT_DISPLAY_PLACE.LEFT_EVENT || eventListData.placeEnum == EVENT_DISPLAY_PLACE.LEFT_CONTENTS)
+				{
+					localPosition.x = kItemLeftPosX;
+				}
+				else if (eventListData.placeEnum == EVENT_DISPLAY_PLACE.RIGHT_EVENT || eventListData.placeEnum == EVENT_DISPLAY_PLACE.RIGHT_CONTENTS)
+				{
+					localPosition.x = kItemRightPosX;
+				}
+				else
+				{
+					localPosition.x = 0f;
+				}
+				float num;
+				float num2;
+				switch (eventListData.placeEnum)
+				{
+				case EVENT_DISPLAY_PLACE.LEFT_EVENT:
+				case EVENT_DISPLAY_PLACE.RIGHT_EVENT:
+					num = kItemBBoxHeight;
+					num2 = kItemBBoxHeight * 0.5f;
+					break;
+				case EVENT_DISPLAY_PLACE.LEFT_CONTENTS:
+				case EVENT_DISPLAY_PLACE.RIGHT_CONTENTS:
+					num = kItemSBoxHeight;
+					num2 = kItemSBoxHeight * 0.5f;
+					break;
+				default:
+					num = kItemNormalHeight;
+					num2 = kItemNormalHeight * 0.5f;
+					break;
+				}
+				if (offsetY == 0f)
+				{
+					localPosition.y = 0f;
+				}
+				else
+				{
+					localPosition.y = offsetY - num2;
+				}
+				t.localPosition = localPosition;
+				EVENT_DISPLAY_PLACE placeEnum = eventListData.placeEnum;
+				if (placeEnum <= EVENT_DISPLAY_PLACE.RIGHT_EVENT)
+				{
+					if (placeEnum != EVENT_DISPLAY_PLACE.LEFT_EVENT)
+					{
+						if (placeEnum == EVENT_DISPLAY_PLACE.RIGHT_EVENT)
+						{
+						}
+						goto IL_0212;
+					}
+				}
+				else if (placeEnum != EVENT_DISPLAY_PLACE.LEFT_CONTENTS)
+				{
+					_ = 51;
+					goto IL_0212;
+				}
+				goto IL_023d;
+				IL_0212:
+				if (offsetY == 0f)
+				{
+					offsetY -= num2;
+				}
+				else
+				{
+					offsetY -= num;
+				}
+				goto IL_023d;
+				IL_023d:
+				lastPlace = eventListData.placeEnum;
 			});
-			SetActive((Enum)eventNewSprite, hasNewEvent[0]);
+			SetActive(eventNewSprite, hasNewEvent[0]);
 		}
 	}
 
 	private void _UpdatePresent()
 	{
 		hasNewEvent[1] = false;
-		SetDynamicList((Enum)UI.GRD_EVENT_QUEST, "QuestEventListItemNormal", eventList.Count, reset: false, (Func<int, bool>)delegate(int i)
-		{
-			EventListData eventListData = eventList[i];
-			return eventListData.placeEnum == EVENT_DISPLAY_PLACE.PRESENT;
-		}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList(UI.GRD_EVENT_QUEST, "QuestEventListItemNormal", eventList.Count, reset: false, (int i) => eventList[i].placeEnum == EVENT_DISPLAY_PLACE.PRESENT, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			if (!(t == null))
 			{
 				_SetupItem(eDispTab.Present, t, eventList[i]);
 			}
 		});
-		SetActive((Enum)presentNewSprite, hasNewEvent[1]);
+		SetActive(presentNewSprite, hasNewEvent[1]);
 	}
 
 	private void _UpdateCarnival()
 	{
 		hasNewEvent[2] = false;
 		Transform ctrl = GetCtrl(UI.TBL_CARNIVAL_QUEST);
-		if (Object.op_Implicit(ctrl))
+		if ((bool)ctrl)
 		{
 			int j = 0;
-			for (int childCount = ctrl.get_childCount(); j < childCount; j++)
+			for (int childCount = ctrl.childCount; j < childCount; j++)
 			{
 				Transform child = ctrl.GetChild(0);
-				child.set_parent(null);
-				Object.Destroy(child.get_gameObject());
+				child.parent = null;
+				UnityEngine.Object.Destroy(child.gameObject);
 			}
 		}
 		List<EventListData> carnivalEvents = new List<EventListData>();
@@ -585,7 +590,7 @@ public class QuestEventList : GameSection
 		{
 			itemNum = 1;
 		}
-		SetTable(UI.TBL_CARNIVAL_QUEST, string.Empty, itemNum, reset: false, delegate(int i, Transform parent)
+		SetTable(UI.TBL_CARNIVAL_QUEST, "", itemNum, reset: false, delegate(int i, Transform parent)
 		{
 			Transform result = null;
 			if (i == 0)
@@ -633,18 +638,18 @@ public class QuestEventList : GameSection
 						break;
 					case EVENT_DISPLAY_PLACE.CARNIVAL_SMALL_BOX:
 					{
-						Transform val = null;
+						Transform transform = null;
 						if (isLeftSmallBox)
 						{
 							SetActive(t, UI.OBJ_RIGHT_SMALL_BOX, is_visible: false);
-							val = FindCtrl(t, UI.OBJ_LEFT_SMALL_BOX);
+							transform = FindCtrl(t, UI.OBJ_LEFT_SMALL_BOX);
 						}
 						else
 						{
 							SetActive(t, UI.OBJ_RIGHT_SMALL_BOX, is_visible: true);
-							val = FindCtrl(t, UI.OBJ_RIGHT_SMALL_BOX);
+							transform = FindCtrl(t, UI.OBJ_RIGHT_SMALL_BOX);
 						}
-						_SetupItem(eDispTab.Carnival, val, eventListData);
+						_SetupItem(eDispTab.Carnival, transform, eventListData);
 						isLeftSmallBox = !isLeftSmallBox;
 						break;
 					}
@@ -652,29 +657,26 @@ public class QuestEventList : GameSection
 				}
 			}
 		});
-		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_CARNIVAL_QUEST);
-		component.set_enabled(true);
+		UIScrollView component = GetComponent<UIScrollView>(UI.SCR_CARNIVAL_QUEST);
+		component.enabled = true;
 		component.ResetPosition();
 		RepositionCarnivalTable();
-		SetActive((Enum)UI.SPR_CARNIVAL_NEW, hasNewEvent[2]);
+		SetActive(UI.SPR_CARNIVAL_NEW, hasNewEvent[2]);
 	}
 
 	private void RepositionCarnivalTable()
 	{
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		UITable component = base.GetComponent<UITable>((Enum)UI.TBL_CARNIVAL_QUEST);
-		if (Object.op_Implicit(component))
+		UITable component = GetComponent<UITable>(UI.TBL_CARNIVAL_QUEST);
+		if ((bool)component)
 		{
 			component.Reposition();
 			List<Transform> childList = component.GetChildList();
 			int i = 0;
 			for (int count = childList.Count; i < count; i++)
 			{
-				Vector3 localPosition = childList[i].get_localPosition();
+				Vector3 localPosition = childList[i].localPosition;
 				localPosition.x = 0f;
-				childList[i].set_localPosition(localPosition);
+				childList[i].localPosition = localPosition;
 			}
 		}
 	}
@@ -694,11 +696,11 @@ public class QuestEventList : GameSection
 		int bannerId = GetBannerId(e);
 		if (bannerTable.TryGetValue(bannerId, out LoadObject value))
 		{
-			Texture2D val = value.loadedObject as Texture2D;
-			if (val != null)
+			Texture2D texture2D = value.loadedObject as Texture2D;
+			if (texture2D != null)
 			{
 				Transform t2 = FindCtrl(t, UI.TEX_EVENT_BANNER);
-				SetTexture(t2, val);
+				SetTexture(t2, texture2D);
 				SetActive(t2, is_visible: true);
 			}
 		}
@@ -721,7 +723,7 @@ public class QuestEventList : GameSection
 			case EVENT_TYPE.RUSH:
 			case EVENT_TYPE.WAVE:
 			case EVENT_TYPE.TRIAL:
-				SetEvent(t, (!isInGame) ? ChangeEventTypeToSelectEventName(e.eventTypeEnum) : kBackHomeEvent, ChoiceEventData(e));
+				SetEvent(t, isInGame ? kBackHomeEvent : ChangeEventTypeToSelectEventName(e.eventTypeEnum), ChoiceEventData(e));
 				break;
 			case EVENT_TYPE.ARENA:
 				SetArenaItem(t, e);
@@ -824,7 +826,7 @@ public class QuestEventList : GameSection
 			stringBuilder.Append(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 43u));
 			stringBuilder.Append(" / [-]");
 		}
-		stringBuilder.Append((e.GetRest() >= kRedRestTime) ? "[000000]" : "[FF0000]");
+		stringBuilder.Append((e.GetRest() < kRedRestTime) ? "[FF0000]" : "[000000]");
 		stringBuilder.Append(UIUtility.TimeFormatWithUnit(e.GetRest()));
 		stringBuilder.Append(" " + StringTable.Get(STRING_CATEGORY.TIME, 4u));
 		stringBuilder.Append("[-]");
@@ -886,48 +888,48 @@ public class QuestEventList : GameSection
 	{
 		if (checkUpdate != null)
 		{
-			this.StopCoroutine(checkUpdate);
+			StopCoroutine(checkUpdate);
 		}
 		List<EventListData> list = eventList.FindAll((EventListData x) => x.HasEndDate());
 		if (list == null || list.Count == 0)
 		{
 			float updateTime = 86400f;
-			checkUpdate = this.StartCoroutine(DoCheck(updateTime));
+			checkUpdate = StartCoroutine(DoCheck(updateTime));
 		}
 		else
 		{
 			int num = list.Min((EventListData data) => data.GetRest());
-			float updateTime = (!((float)num < UPDATE_INTERVAL_SEC)) ? ((float)num) : UPDATE_INTERVAL_SEC;
-			checkUpdate = this.StartCoroutine(DoCheck(updateTime));
+			float updateTime = ((float)num < UPDATE_INTERVAL_SEC) ? UPDATE_INTERVAL_SEC : ((float)num);
+			checkUpdate = StartCoroutine(DoCheck(updateTime));
 		}
 	}
 
 	private IEnumerator DoCheck(float updateTime)
 	{
-		yield return (object)new WaitForSeconds(updateTime);
+		yield return new WaitForSeconds(updateTime);
 		RefreshUI();
 	}
 
 	private void ChangeTab()
 	{
 		bool flag = dispTab == eDispTab.Carnival;
-		SetActive((Enum)UI.OBJ_QUEST_LIST_ROOT, !flag);
-		SetActive((Enum)UI.OBJ_CARNIVAL_LIST_ROOT, flag);
-		SetActive((Enum)UI.OBJ_TWO_TAB, !isCarnival);
-		SetActive((Enum)UI.OBJ_THREE_TAB, isCarnival);
-		SetActive((Enum)eventOn, dispTab == eDispTab.Event);
-		SetActive((Enum)presentOn, dispTab == eDispTab.Present);
+		SetActive(UI.OBJ_QUEST_LIST_ROOT, !flag);
+		SetActive(UI.OBJ_CARNIVAL_LIST_ROOT, flag);
+		SetActive(UI.OBJ_TWO_TAB, !isCarnival);
+		SetActive(UI.OBJ_THREE_TAB, isCarnival);
+		SetActive(eventOn, dispTab == eDispTab.Event);
+		SetActive(presentOn, dispTab == eDispTab.Present);
 		if (isCarnival)
 		{
-			SetActive((Enum)UI.OBJ_THREE_RIGHT_ON, dispTab == eDispTab.Carnival);
+			SetActive(UI.OBJ_THREE_RIGHT_ON, dispTab == eDispTab.Carnival);
 		}
-		SetActive((Enum)UI.OBJ_EVENT_ROOT, dispTab == eDispTab.Event);
-		SetActive((Enum)UI.GRD_EVENT_QUEST, dispTab == eDispTab.Present);
+		SetActive(UI.OBJ_EVENT_ROOT, dispTab == eDispTab.Event);
+		SetActive(UI.GRD_EVENT_QUEST, dispTab == eDispTab.Present);
 		DispEventNonListLabel();
 		UIScrollView component = GetCtrl(UI.SCR_EVENT_QUEST).GetComponent<UIScrollView>();
 		if (component != null)
 		{
-			component.set_enabled(true);
+			component.enabled = true;
 			component.ResetPosition();
 		}
 	}
@@ -939,8 +941,8 @@ public class QuestEventList : GameSection
 
 	private void DispEventNonListLabel()
 	{
-		Transform val = (dispTab != 0) ? GetCtrl(UI.GRD_EVENT_QUEST) : GetCtrl(UI.OBJ_EVENT_ROOT);
-		SetActive((Enum)UI.STR_EVENT_NON_LIST, (!(val != null) || val.get_childCount() <= 0) ? true : false);
+		Transform transform = (dispTab == eDispTab.Event) ? GetCtrl(UI.OBJ_EVENT_ROOT) : GetCtrl(UI.GRD_EVENT_QUEST);
+		SetActive(UI.STR_EVENT_NON_LIST, (!(transform != null) || transform.childCount <= 0) ? true : false);
 	}
 
 	private bool IsLoadEBI2(EventListData e)
@@ -1011,9 +1013,17 @@ public class QuestEventList : GameSection
 		bool flag = IsLoadEBI2(e);
 		if (!e.enableEvent && e.eventTypeEnum != EVENT_TYPE.ARENA)
 		{
-			return (!flag) ? ResourceName.GetEventBanner(bannerId, "_close") : ResourceName.GetEventBannerVer2(bannerId, "_close");
+			if (!flag)
+			{
+				return ResourceName.GetEventBanner(bannerId, "_close");
+			}
+			return ResourceName.GetEventBannerVer2(bannerId, "_close");
 		}
-		return (!flag) ? ResourceName.GetEventBanner(bannerId) : ResourceName.GetEventBannerVer2(bannerId);
+		if (!flag)
+		{
+			return ResourceName.GetEventBanner(bannerId);
+		}
+		return ResourceName.GetEventBannerVer2(bannerId);
 	}
 
 	private Network.EventData ChoiceEventData(EventListData eld)
@@ -1074,9 +1084,7 @@ public class QuestEventList : GameSection
 	private void OnQuery_SELECT_DISABLE()
 	{
 		EventListData ev = GameSection.GetEventData() as EventListData;
-		Network.EventData eventData = (from e in MonoBehaviourSingleton<QuestManager>.I.eventList
-		where ev.preEventId == e.eventId
-		select e).First();
+		Network.EventData eventData = MonoBehaviourSingleton<QuestManager>.I.eventList.Where((Network.EventData e) => ev.preEventId == e.eventId).First();
 		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)ev.preDeliveryId);
 		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, string.Format(StringTable.Get(STRING_CATEGORY.QUEST_DELIVERY, 5u), ev.name, eventData.name, deliveryTableData.name)), delegate
 		{
@@ -1164,8 +1172,7 @@ public class QuestEventList : GameSection
 			{
 				arg = currentCarnivalData.linkName;
 			}
-			string eventData = string.Format(WebViewManager.NewsWithLinkParamFormat, arg);
-			GameSection.SetEventData(eventData);
+			GameSection.SetEventData(string.Format(WebViewManager.NewsWithLinkParamFormat, arg));
 		}
 	}
 
@@ -1201,34 +1208,30 @@ public class QuestEventList : GameSection
 			{
 				if (success)
 				{
-					if (ev.prologueStoryId > 0)
+					if (ev.prologueStoryId > 0 && base.sectionData.GetEventData("STORY") != null)
 					{
-						GameSceneTables.EventData eventData = base.sectionData.GetEventData("STORY");
-						if (eventData != null)
+						string goingHomeEvent = GameSection.GetGoingHomeEvent();
+						EventData[] array = null;
+						array = ((ev.eventTypeEnum != EVENT_TYPE.ARENA) ? new EventData[4]
 						{
-							string goingHomeEvent = GameSection.GetGoingHomeEvent();
-							EventData[] array = null;
-							array = ((ev.eventTypeEnum != EVENT_TYPE.ARENA) ? new EventData[4]
-							{
-								new EventData(goingHomeEvent, null),
-								new EventData("EVENT_COUNTER", null),
-								(dispTab != 0) ? new EventData("TAB_PRESENT", null) : new EventData("TAB_EVENT", null),
-								new EventData(ChangeEventTypeToSelectEventName(ev.eventTypeEnum), ev.eventId)
-							} : new EventData[4]
-							{
-								new EventData(goingHomeEvent, null),
-								new EventData("EVENT_COUNTER", null),
-								(dispTab != 0) ? new EventData("TAB_PRESENT", null) : new EventData("TAB_EVENT", null),
-								new EventData("SELECT_ARENA", ev)
-							});
-							GameSection.ChangeStayEvent("STORY", new object[4]
-							{
-								ev.prologueStoryId,
-								string.Empty,
-								string.Empty,
-								array
-							});
-						}
+							new EventData(goingHomeEvent, null),
+							new EventData("EVENT_COUNTER", null),
+							(dispTab == eDispTab.Event) ? new EventData("TAB_EVENT", null) : new EventData("TAB_PRESENT", null),
+							new EventData(ChangeEventTypeToSelectEventName(ev.eventTypeEnum), ev.eventId)
+						} : new EventData[4]
+						{
+							new EventData(goingHomeEvent, null),
+							new EventData("EVENT_COUNTER", null),
+							(dispTab == eDispTab.Event) ? new EventData("TAB_EVENT", null) : new EventData("TAB_PRESENT", null),
+							new EventData("SELECT_ARENA", ev)
+						});
+						GameSection.ChangeStayEvent("STORY", new object[4]
+						{
+							ev.prologueStoryId,
+							"",
+							"",
+							array
+						});
 					}
 					ev.readPrologueStory = true;
 				}

@@ -120,20 +120,13 @@ public class CutScenePlayer : MonoBehaviour
 		private set;
 	}
 
-	public CutScenePlayer()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Expected O, but got Unknown
-		_transform = this.get_transform();
-		GameObject val = new GameObject("CameraController");
-		val.get_transform().set_parent(_transform);
-		cameraAnimator = val.AddComponent<Animator>();
-		cameraAnimatorTransform = cameraAnimator.get_transform();
+		_transform = base.transform;
+		GameObject gameObject = new GameObject("CameraController");
+		gameObject.transform.parent = _transform;
+		cameraAnimator = gameObject.AddComponent<Animator>();
+		cameraAnimatorTransform = cameraAnimator.transform;
 		for (int i = 0; i < 30; i++)
 		{
 			CUT_STATE_HASH[i] = Animator.StringToHash("Cut_" + i.ToString("D3"));
@@ -143,7 +136,7 @@ public class CutScenePlayer : MonoBehaviour
 
 	public void Init(string cutSceneDataPath, Action<bool> _onComplete)
 	{
-		this.StartCoroutine(InitImpl(cutSceneDataPath, _onComplete));
+		StartCoroutine(InitImpl(cutSceneDataPath, _onComplete));
 	}
 
 	private IEnumerator InitImpl(string cutSceneDataPath, Action<bool> _onComplete)
@@ -176,11 +169,11 @@ public class CutScenePlayer : MonoBehaviour
 			if (cameras[k] == null)
 			{
 				CutSceneCamera cutSceneCamera = new CutSceneCamera();
-				GameObject val = new GameObject("cut_scene_camera_ " + k.ToString());
-				cutSceneCamera.camera = val.AddComponent<Camera>();
-				cutSceneCamera.transform = val.get_transform();
-				cutSceneCamera.transform.set_parent(_transform);
-				val.SetActive(false);
+				GameObject gameObject = new GameObject("cut_scene_camera_ " + k.ToString());
+				cutSceneCamera.camera = gameObject.AddComponent<Camera>();
+				cutSceneCamera.transform = gameObject.transform;
+				cutSceneCamera.transform.parent = _transform;
+				gameObject.SetActive(value: false);
 				cameras[k] = cutSceneCamera;
 			}
 		}
@@ -194,13 +187,13 @@ public class CutScenePlayer : MonoBehaviour
 			CutSceneData.ActorData actorData = cutSceneData.actorData[l];
 			actorInfo[l] = new ActorInfo();
 			actorInfo[l].keyData = actorData;
-			actorInfo[l].obj = Object.Instantiate<GameObject>(actorData.prefab);
-			actorInfo[l].obj.get_transform().set_parent(_transform);
+			actorInfo[l].obj = UnityEngine.Object.Instantiate(actorData.prefab);
+			actorInfo[l].obj.transform.parent = _transform;
 			actorInfo[l].animator = actorInfo[l].obj.GetComponent<Animator>();
-			actorInfo[l].animator.set_cullingMode(0);
-			actorInfo[l].animator.set_runtimeAnimatorController(actorData.animatorController);
+			actorInfo[l].animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+			actorInfo[l].animator.runtimeAnimatorController = actorData.animatorController;
 			actorInfo[l].animator.Rebind();
-			actorInfo[l].obj.SetActive(false);
+			actorInfo[l].obj.SetActive(value: false);
 		}
 		for (int m = 0; m < cutSceneData.effectKeyData.Count; m++)
 		{
@@ -225,28 +218,15 @@ public class CutScenePlayer : MonoBehaviour
 	{
 		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform != null)
 		{
-			MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_gameObject().SetActive(true);
+			MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.gameObject.SetActive(value: true);
 		}
 	}
 
 	public void Play(Action _onComplete = null)
 	{
-		//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0724: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0729: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0733: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0738: Unknown result type (might be due to invalid IL or missing references)
 		if (cutSceneData == null)
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameMain", this.get_gameObject(), "HOME");
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameMain", base.gameObject, "HOME");
 			_onComplete?.Invoke();
 			return;
 		}
@@ -260,11 +240,11 @@ public class CutScenePlayer : MonoBehaviour
 		{
 			SoundManager.RequestBGM(cutSceneData.bgm);
 		}
-		cameraAnimator.set_cullingMode(0);
-		cameraAnimator.set_runtimeAnimatorController(cutSceneData.cameraController);
+		cameraAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+		cameraAnimator.runtimeAnimatorController = cutSceneData.cameraController;
 		cameraAnimator.Play(CUT_STATE_HASH[cutNo]);
 		UpdateCamera();
-		MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_gameObject().SetActive(false);
+		MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.gameObject.SetActive(value: false);
 		for (int k = 0; k < this.playerInfo.Length; k++)
 		{
 			this.playerInfo[k] = null;
@@ -323,17 +303,17 @@ public class CutScenePlayer : MonoBehaviour
 				}
 			}
 			PlayerInfo playerInfo = new PlayerInfo();
-			playerInfo.obj = player.get_gameObject();
+			playerInfo.obj = player.gameObject;
 			playerInfo.animator = player.animator;
-			playerInfo.originalController = player.animator.get_runtimeAnimatorController();
+			playerInfo.originalController = player.animator.runtimeAnimatorController;
 			playerInfo.keyData = playerData;
 			player.ActIdle();
-			player._collider.set_enabled(false);
-			player._rigidbody.set_constraints(126);
-			player._transform.set_position(playerData.startPos);
-			player._transform.set_rotation(Quaternion.AngleAxis(playerData.startAngleY, Vector3.get_up()));
-			player.animator.set_cullingMode(0);
-			player.animator.set_runtimeAnimatorController(playerData.controller);
+			player._collider.enabled = false;
+			player._rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+			player._transform.position = playerData.startPos;
+			player._transform.rotation = Quaternion.AngleAxis(playerData.startAngleY, Vector3.up);
+			player.animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+			player.animator.runtimeAnimatorController = playerData.controller;
 			player.animator.Rebind();
 			this.playerInfo[l] = playerInfo;
 		}
@@ -344,92 +324,78 @@ public class CutScenePlayer : MonoBehaviour
 				continue;
 			}
 			List<StageObject> playerList = MonoBehaviourSingleton<StageObjectManager>.I.playerList;
-			int i;
-			for (i = 0; i < playerList.Count; i++)
+			int j = 0;
+			while (j < playerList.Count)
 			{
-				PlayerInfo playerInfo2 = Array.Find(this.playerInfo, delegate(PlayerInfo info)
+				if (Array.Find(this.playerInfo, (PlayerInfo info) => info != null && info.obj == playerList[j].gameObject) == null)
 				{
-					if (info == null)
-					{
-						return false;
-					}
-					return info.obj == playerList[i].get_gameObject();
-				});
-				if (playerInfo2 == null)
-				{
-					playerList[i].get_gameObject().SetActive(false);
+					playerList[j].gameObject.SetActive(value: false);
 				}
+				int num3 = ++j;
 			}
 			List<StageObject> npcList = MonoBehaviourSingleton<StageObjectManager>.I.nonplayerList;
-			int j;
-			for (j = 0; j < npcList.Count; j++)
+			int i = 0;
+			while (i < npcList.Count)
 			{
-				PlayerInfo playerInfo3 = Array.Find(this.playerInfo, delegate(PlayerInfo info)
+				if (Array.Find(this.playerInfo, (PlayerInfo info) => info != null && info.obj == npcList[i].gameObject) == null)
 				{
-					if (info == null)
-					{
-						return false;
-					}
-					return info.obj == npcList[j].get_gameObject();
-				});
-				if (playerInfo3 == null)
-				{
-					npcList[j].get_gameObject().SetActive(false);
+					npcList[i].gameObject.SetActive(value: false);
 				}
+				int num3 = ++i;
 			}
 		}
 		if (cutSceneData.enemyData != null && MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			CutSceneData.EnemyData enemyData = cutSceneData.enemyData;
 			EnemyInfo enemyInfo = new EnemyInfo();
-			Debug.Log((object)enemyData.startPos.y);
+			Debug.Log(enemyData.startPos.y);
 			Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-			enemyInfo.obj = boss.get_gameObject();
+			enemyInfo.obj = boss.gameObject;
 			enemyInfo.animator = boss.animator;
-			enemyInfo.originalController = boss.animator.get_runtimeAnimatorController();
+			enemyInfo.originalController = boss.animator.runtimeAnimatorController;
 			enemyInfo.keyData = enemyData;
 			this.enemyInfo = enemyInfo;
 			if (boss.controller != null)
 			{
-				boss.controller.set_enabled(false);
+				boss.controller.enabled = false;
 				if (boss._rigidbody != null)
 				{
-					boss._rigidbody.set_constraints(126);
+					boss._rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 				}
 			}
 			boss.ActIdle();
-			boss.animator.set_cullingMode(0);
-			boss.animator.set_runtimeAnimatorController(enemyData.controller);
+			boss.animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+			boss.animator.runtimeAnimatorController = enemyData.controller;
 			boss.animator.Rebind();
-			boss._transform.set_position(enemyData.startPos);
-			boss._transform.set_rotation(Quaternion.AngleAxis(enemyData.startAngleY, Vector3.get_up()));
+			boss._transform.position = enemyData.startPos;
+			boss._transform.rotation = Quaternion.AngleAxis(enemyData.startAngleY, Vector3.up);
 			boss.animator.Play(CUT_STATE_HASH[cutNo]);
 		}
-		for (int num3 = 0; num3 < actorInfo.Length; num3++)
+		for (int num4 = 0; num4 < actorInfo.Length; num4++)
 		{
-			if (actorInfo[num3] == null)
+			if (actorInfo[num4] == null)
 			{
 				continue;
 			}
-			actorInfo[num3].obj.SetActive(true);
-			bool flag = actorInfo[num3].animator.HasState(0, CUT_STATE_HASH[cutNo]);
+			actorInfo[num4].obj.SetActive(value: true);
+			bool flag = actorInfo[num4].animator.HasState(0, CUT_STATE_HASH[cutNo]);
 			if (flag)
 			{
-				actorInfo[num3].obj.SetActive(flag);
-				CutSceneData.ActorData keyData = actorInfo[num3].keyData;
+				actorInfo[num4].obj.SetActive(flag);
+				CutSceneData.ActorData keyData = actorInfo[num4].keyData;
 				Transform parentNode = GetParentNode(keyData.attachmentType, keyData.nodeName);
 				if (parentNode != null)
 				{
-					actorInfo[num3].obj.get_transform().set_parent(parentNode);
+					actorInfo[num4].obj.transform.parent = parentNode;
 				}
-				actorInfo[num3].obj.get_transform().set_localPosition(keyData.position);
-				actorInfo[num3].obj.get_transform().set_localRotation(Quaternion.Euler(keyData.rotation));
-				SkinnedMeshRenderer[] componentsInChildren = actorInfo[num3].obj.GetComponentsInChildren<SkinnedMeshRenderer>();
-				for (int num4 = 0; num4 < componentsInChildren.Length; num4++)
+				actorInfo[num4].obj.transform.localPosition = keyData.position;
+				actorInfo[num4].obj.transform.localRotation = Quaternion.Euler(keyData.rotation);
+				SkinnedMeshRenderer[] componentsInChildren = actorInfo[num4].obj.GetComponentsInChildren<SkinnedMeshRenderer>();
+				for (int num5 = 0; num5 < componentsInChildren.Length; num5++)
 				{
-					componentsInChildren[num4].set_localBounds(new Bounds(Vector3.get_zero(), Vector3.get_one() * 10000f));
+					componentsInChildren[num5].localBounds = new Bounds(Vector3.zero, Vector3.one * 10000f);
 				}
-				actorInfo[num3].animator.Play(CUT_STATE_HASH[cutNo]);
+				actorInfo[num4].animator.Play(CUT_STATE_HASH[cutNo]);
 			}
 		}
 	}
@@ -440,7 +406,7 @@ public class CutScenePlayer : MonoBehaviour
 		{
 			UpdateCamera();
 			oldTime = playingTime;
-			playingTime += Time.get_deltaTime();
+			playingTime += Time.deltaTime;
 			UpdatePlayer();
 			UpdateEnemy();
 			UpdateActor();
@@ -456,14 +422,7 @@ public class CutScenePlayer : MonoBehaviour
 
 	private void UpdateCamera()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-		AnimatorStateInfo currentAnimatorStateInfo = cameraAnimator.GetCurrentAnimatorStateInfo(0);
-		if (currentAnimatorStateInfo.get_normalizedTime() >= 1f)
+		if (cameraAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
 		{
 			cutNo++;
 			if (cameraAnimator.HasState(0, CUT_STATE_HASH[cutNo]))
@@ -483,14 +442,12 @@ public class CutScenePlayer : MonoBehaviour
 		int num = cutNo % 2;
 		for (int i = 0; i < cameras.Length; i++)
 		{
-			cameras[i].camera.get_gameObject().SetActive(num == i);
+			cameras[i].camera.gameObject.SetActive(num == i);
 		}
 		CutSceneCamera activeCamera = GetActiveCamera();
-		activeCamera.transform.set_position(cameraAnimatorTransform.get_position());
-		activeCamera.transform.set_rotation(cameraAnimatorTransform.get_rotation());
-		Camera camera = activeCamera.camera;
-		Vector3 localScale = cameraAnimatorTransform.get_localScale();
-		camera.set_fieldOfView(localScale.x);
+		activeCamera.transform.position = cameraAnimatorTransform.position;
+		activeCamera.transform.rotation = cameraAnimatorTransform.rotation;
+		activeCamera.camera.fieldOfView = cameraAnimatorTransform.localScale.x;
 	}
 
 	private void EndCutScene()
@@ -503,7 +460,7 @@ public class CutScenePlayer : MonoBehaviour
 		if (MonoBehaviourSingleton<GameSceneManager>.IsValid() && hasStory)
 		{
 			string goingHomeEvent = GameSection.GetGoingHomeEvent();
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameMain", this.get_gameObject(), "STORY", new object[4]
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameMain", base.gameObject, "STORY", new object[4]
 			{
 				cutSceneData.storyId,
 				0,
@@ -515,27 +472,18 @@ public class CutScenePlayer : MonoBehaviour
 
 	private void UpdatePlayer()
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < playerInfo.Length; i++)
 		{
-			if (playerInfo[i] != null)
+			if (playerInfo[i] != null && playerInfo[i].animator.GetCurrentAnimatorStateInfo(0).shortNameHash != CUT_STATE_HASH[cutNo])
 			{
-				AnimatorStateInfo currentAnimatorStateInfo = playerInfo[i].animator.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_shortNameHash() != CUT_STATE_HASH[cutNo])
-				{
-					playerInfo[i].animator.Play(CUT_STATE_HASH[cutNo]);
-				}
+				playerInfo[i].animator.Play(CUT_STATE_HASH[cutNo]);
 			}
 		}
 	}
 
 	private void UpdateEnemy()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		AnimatorStateInfo currentAnimatorStateInfo = enemyInfo.animator.GetCurrentAnimatorStateInfo(0);
-		if (currentAnimatorStateInfo.get_shortNameHash() != CUT_STATE_HASH[cutNo])
+		if (enemyInfo.animator.GetCurrentAnimatorStateInfo(0).shortNameHash != CUT_STATE_HASH[cutNo])
 		{
 			enemyInfo.animator.Play(CUT_STATE_HASH[cutNo]);
 		}
@@ -543,11 +491,6 @@ public class CutScenePlayer : MonoBehaviour
 
 	private void UpdateActor()
 	{
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < this.actorInfo.Length; i++)
 		{
 			ActorInfo actorInfo = this.actorInfo[i];
@@ -557,24 +500,23 @@ public class CutScenePlayer : MonoBehaviour
 			}
 			if (actorInfo.animator.HasState(0, CUT_STATE_HASH[cutNo]))
 			{
-				actorInfo.obj.SetActive(true);
-				AnimatorStateInfo currentAnimatorStateInfo = actorInfo.animator.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_shortNameHash() != CUT_STATE_HASH[cutNo])
+				actorInfo.obj.SetActive(value: true);
+				if (actorInfo.animator.GetCurrentAnimatorStateInfo(0).shortNameHash != CUT_STATE_HASH[cutNo])
 				{
 					actorInfo.animator.Play(CUT_STATE_HASH[cutNo]);
 					CutSceneData.ActorData keyData = actorInfo.keyData;
 					Transform parentNode = GetParentNode(keyData.attachmentType, keyData.nodeName);
 					if (parentNode != null)
 					{
-						actorInfo.obj.get_transform().set_parent(parentNode);
+						actorInfo.obj.transform.parent = parentNode;
 					}
-					actorInfo.obj.get_transform().set_localPosition(keyData.position);
-					actorInfo.obj.get_transform().set_localRotation(Quaternion.Euler(keyData.rotation));
+					actorInfo.obj.transform.localPosition = keyData.position;
+					actorInfo.obj.transform.localRotation = Quaternion.Euler(keyData.rotation);
 				}
 			}
 			else
 			{
-				actorInfo.obj.SetActive(false);
+				actorInfo.obj.SetActive(value: false);
 			}
 		}
 	}
@@ -618,7 +560,7 @@ public class CutScenePlayer : MonoBehaviour
 			{
 				if (playerInfo[i] != null && playerInfo[i].keyData.type == tYPE)
 				{
-					return playerInfo[i].obj.get_transform();
+					return playerInfo[i].obj.transform;
 				}
 			}
 		}
@@ -629,7 +571,7 @@ public class CutScenePlayer : MonoBehaviour
 	{
 		if (actorInfo != null && index < actorInfo.Length && actorInfo[index] != null && actorInfo[index].obj != null)
 		{
-			return actorInfo[index].obj.get_transform();
+			return actorInfo[index].obj.transform;
 		}
 		return null;
 	}
@@ -640,11 +582,11 @@ public class CutScenePlayer : MonoBehaviour
 		{
 			return null;
 		}
-		int childCount = root.get_childCount();
+		int childCount = root.childCount;
 		for (int i = 0; i < childCount; i++)
 		{
 			Transform child = root.GetChild(i);
-			if (child.get_name() == name)
+			if (child.name == name)
 			{
 				return child;
 			}
@@ -663,56 +605,50 @@ public class CutScenePlayer : MonoBehaviour
 		{
 			return null;
 		}
-		Transform val = null;
+		Transform transform = null;
 		switch (attachmentType)
 		{
 		case CutSceneData.ATTACHMENT_TYPE.CAMERA:
-		{
-			CutSceneCamera activeCamera = GetActiveCamera();
-			val = activeCamera.transform;
+			transform = GetActiveCamera().transform;
 			break;
-		}
 		case CutSceneData.ATTACHMENT_TYPE.MY_CHARACTER:
 		case CutSceneData.ATTACHMENT_TYPE.PLAYER_1:
 		case CutSceneData.ATTACHMENT_TYPE.PLAYER_2:
 		case CutSceneData.ATTACHMENT_TYPE.PLAYER_3:
-			val = GetPlayerNode(attachmentType);
+			transform = GetPlayerNode(attachmentType);
 			break;
 		case CutSceneData.ATTACHMENT_TYPE.ENEMY:
 			if (enemyInfo != null && enemyInfo.obj != null)
 			{
-				val = enemyInfo.obj.get_transform();
+				transform = enemyInfo.obj.transform;
 			}
 			break;
 		case CutSceneData.ATTACHMENT_TYPE.ACTOR_1:
-			val = GetActorTransform(0);
+			transform = GetActorTransform(0);
 			break;
 		case CutSceneData.ATTACHMENT_TYPE.ACTOR_2:
-			val = GetActorTransform(1);
+			transform = GetActorTransform(1);
 			break;
 		case CutSceneData.ATTACHMENT_TYPE.ACTOR_3:
-			val = GetActorTransform(2);
+			transform = GetActorTransform(2);
 			break;
 		case CutSceneData.ATTACHMENT_TYPE.ACTOR_4:
-			val = GetActorTransform(3);
+			transform = GetActorTransform(3);
 			break;
 		}
-		if (val != null)
+		if (transform != null)
 		{
 			if (string.IsNullOrEmpty(nodeName))
 			{
-				return val;
+				return transform;
 			}
-			return FindChildTransform(val, nodeName);
+			return FindChildTransform(transform, nodeName);
 		}
 		return null;
 	}
 
 	private void UpdateEffect()
 	{
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < this.effectInfo.Length; i++)
 		{
 			EffectInfo effectInfo = this.effectInfo[i];
@@ -722,8 +658,8 @@ public class CutScenePlayer : MonoBehaviour
 				Transform effect = EffectManager.GetEffect(effectInfo.keyData.effectId, parentNode);
 				if (effect != null)
 				{
-					effect.set_localPosition(effectInfo.keyData.position);
-					effect.set_localRotation(Quaternion.Euler(effectInfo.keyData.rotation));
+					effect.localPosition = effectInfo.keyData.position;
+					effect.localRotation = Quaternion.Euler(effectInfo.keyData.rotation);
 				}
 				effectInfo.isPlayed = true;
 			}

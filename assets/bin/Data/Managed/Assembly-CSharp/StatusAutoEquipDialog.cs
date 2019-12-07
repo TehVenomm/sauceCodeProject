@@ -228,7 +228,7 @@ public class StatusAutoEquipDialog : GameSection
 			{
 				ELEMENT_TYPE eLEMENT_TYPE = ChangeElementToMasterDefineElement(elementIndex, condition);
 				int elemAtkType = weaponItemInfoList[i].GetElemAtkType();
-				if ((eLEMENT_TYPE != (ELEMENT_TYPE)elemAtkType && condition == ELEMENT_CONDITION.EQUAL) || ((eLEMENT_TYPE == (ELEMENT_TYPE)elemAtkType || elemAtkType == 6) && condition == ELEMENT_CONDITION.DISADVANTAGEOUS))
+				if ((eLEMENT_TYPE != (ELEMENT_TYPE)elemAtkType && condition == ELEMENT_CONDITION.EQUAL) || ((eLEMENT_TYPE == (ELEMENT_TYPE)elemAtkType || 6 == elemAtkType) && condition == ELEMENT_CONDITION.DISADVANTAGEOUS))
 				{
 					continue;
 				}
@@ -300,17 +300,9 @@ public class StatusAutoEquipDialog : GameSection
 		int num2 = -1;
 		for (int i = 0; i < items.Length; i++)
 		{
-			if (validAbilityWeaponType && weaponIndex != 0 && !HasFixAbilityWithWeaponType(items[i], weaponIndex, checkOnlyFixAbility))
+			if ((validAbilityWeaponType && weaponIndex != 0 && !HasFixAbilityWithWeaponType(items[i], weaponIndex, checkOnlyFixAbility)) || (validElement && elementIndex != 0 && ChangeElementToMasterDefineElement(elementIndex, ELEMENT_CONDITION.EFFECTIVE_DEF) != (ELEMENT_TYPE)items[i].GetElemDefType()))
 			{
 				continue;
-			}
-			if (validElement && elementIndex != 0)
-			{
-				ELEMENT_TYPE eLEMENT_TYPE = ChangeElementToMasterDefineElement(elementIndex, ELEMENT_CONDITION.EFFECTIVE_DEF);
-				if (eLEMENT_TYPE != (ELEMENT_TYPE)items[i].GetElemDefType())
-				{
-					continue;
-				}
 			}
 			int num3 = 0;
 			int num4 = 0;
@@ -349,19 +341,19 @@ public class StatusAutoEquipDialog : GameSection
 				num2 = num4;
 			}
 		}
-		if (equipItemInfo == null && validElement && validAbilityWeaponType && checkOnlyFixAbility)
+		if ((equipItemInfo == null && validElement) & validAbilityWeaponType & checkOnlyFixAbility)
 		{
 			equipItemInfo = GetEquipMaxDef(items, validElement: true, validAbilityWeaponType: true, checkOnlyFixAbility: false);
 		}
-		else if (equipItemInfo == null && validElement && validAbilityWeaponType && !checkOnlyFixAbility)
+		else if (((equipItemInfo == null && validElement) & validAbilityWeaponType) && !checkOnlyFixAbility)
 		{
 			equipItemInfo = GetEquipMaxDef(items, validElement: false, validAbilityWeaponType: true, checkOnlyFixAbility: true);
 		}
-		else if (equipItemInfo == null && !validElement && validAbilityWeaponType && checkOnlyFixAbility)
+		else if ((equipItemInfo == null && !validElement) & validAbilityWeaponType & checkOnlyFixAbility)
 		{
 			equipItemInfo = GetEquipMaxDef(items, validElement: false, validAbilityWeaponType: true, checkOnlyFixAbility: false);
 		}
-		else if (equipItemInfo == null && !validElement && validAbilityWeaponType && !checkOnlyFixAbility)
+		else if (((equipItemInfo == null && !validElement) & validAbilityWeaponType) && !checkOnlyFixAbility)
 		{
 			equipItemInfo = GetEquipMaxDef(items, validElement: true, validAbilityWeaponType: false, checkOnlyFixAbility: false);
 		}
@@ -377,8 +369,7 @@ public class StatusAutoEquipDialog : GameSection
 		int result = 0;
 		for (int i = 0; i < uiArray.Length; i++)
 		{
-			Transform ctrl = GetCtrl(uiArray[i]);
-			UIToggle component = ctrl.GetComponent<UIToggle>();
+			UIToggle component = GetCtrl(uiArray[i]).GetComponent<UIToggle>();
 			if (!(component == null) && component.value)
 			{
 				result = i;

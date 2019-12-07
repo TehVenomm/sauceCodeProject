@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public abstract class SkillSelectBase : ItemDetailSkill
@@ -98,19 +97,19 @@ public abstract class SkillSelectBase : ItemDetailSkill
 
 	public override void UpdateUI()
 	{
-		SetFontStyle((Enum)UI.STR_TITLE_ITEM_INFO, 2);
-		SetFontStyle((Enum)UI.STR_TITLE_DESCRIPTION, 2);
-		SetFontStyle((Enum)UI.STR_TITLE_STATUS, 2);
-		SetFontStyle((Enum)UI.STR_TITLE_SELL, 2);
-		SetActive((Enum)UI.BTN_DECISION, is_visible: true);
-		SetActive((Enum)UI.BTN_SKILL_DECISION, is_visible: false);
-		SetLabelText((Enum)UI.STR_DECISION_R, base.sectionData.GetText("STR_DECISION"));
-		SetActive((Enum)UI.BTN_CHANGE_INVENTORY, is_visible: false);
+		SetFontStyle(UI.STR_TITLE_ITEM_INFO, FontStyle.Italic);
+		SetFontStyle(UI.STR_TITLE_DESCRIPTION, FontStyle.Italic);
+		SetFontStyle(UI.STR_TITLE_STATUS, FontStyle.Italic);
+		SetFontStyle(UI.STR_TITLE_SELL, FontStyle.Italic);
+		SetActive(UI.BTN_DECISION, is_visible: true);
+		SetActive(UI.BTN_SKILL_DECISION, is_visible: false);
+		SetLabelText(UI.STR_DECISION_R, base.sectionData.GetText("STR_DECISION"));
+		SetActive(UI.BTN_CHANGE_INVENTORY, is_visible: false);
 		if (inventory == null || updateInventory)
 		{
 			selectIndex = GetInventoryFirstIndex();
 			inventory = CreateInventory();
-			if (inventory.datas.Length > 0)
+			if (inventory.datas.Length != 0)
 			{
 				if (selectSkillItem == null)
 				{
@@ -135,8 +134,8 @@ public abstract class SkillSelectBase : ItemDetailSkill
 			updateInventory = false;
 		}
 		SetInventoryIsEmptyParam();
-		SetLabelText((Enum)UI.LBL_SORT, inventory.sortSettings.GetSortLabel());
-		SetToggle((Enum)UI.TGL_ICON_ASC, inventory.sortSettings.orderTypeAsc);
+		SetLabelText(UI.LBL_SORT, inventory.sortSettings.GetSortLabel());
+		SetToggle(UI.TGL_ICON_ASC, inventory.sortSettings.orderTypeAsc);
 		UpdateInventoryUI();
 		UpdateParam();
 	}
@@ -159,13 +158,13 @@ public abstract class SkillSelectBase : ItemDetailSkill
 
 	protected void _SetupDetailBase()
 	{
-		SetActive((Enum)UI.OBJ_SKILL_INFO_ROOT, is_visible: false);
+		SetActive(UI.OBJ_SKILL_INFO_ROOT, is_visible: false);
 		base.SetupDetailBase();
 	}
 
 	protected void _SetupSkillInfoRoot()
 	{
-		SetActive((Enum)UI.OBJ_SKILL_INFO_ROOT, is_visible: true);
+		SetActive(UI.OBJ_SKILL_INFO_ROOT, is_visible: true);
 		detailBase = GetCtrl(UI.OBJ_SKILL_INFO_ROOT);
 	}
 
@@ -184,15 +183,11 @@ public abstract class SkillSelectBase : ItemDetailSkill
 		SetupEnableInventoryUI();
 		m_generatedIconList.Clear();
 		UpdateNewIconInfo();
-		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length, reset: false, (Func<int, bool>)delegate(int i)
+		SetDynamicList(inventoryUI, null, inventory.datas.Length, reset: false, delegate(int i)
 		{
 			SortCompareData sortCompareData2 = inventory.datas[i];
-			if (sortCompareData2 == null || !sortCompareData2.IsPriority(inventory.sortSettings.orderTypeAsc))
-			{
-				return false;
-			}
-			return true;
-		}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+			return (sortCompareData2 != null && sortCompareData2.IsPriority(inventory.sortSettings.orderTypeAsc)) ? true : false;
+		}, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			SortCompareData sortCompareData = inventory.datas[i];
 			if (sortCompareData != null && sortCompareData.IsPriority(inventory.sortSettings.orderTypeAsc))
@@ -311,11 +306,11 @@ public abstract class SkillSelectBase : ItemDetailSkill
 		int i = 0;
 		for (int num = switchInventoryAry.Length; i < num; i++)
 		{
-			SetActive((Enum)switchInventoryAry[i], is_visible: false);
+			SetActive(switchInventoryAry[i], is_visible: false);
 		}
-		SetActive((Enum)switchInventoryAry[inventoryUIIndex], is_visible: true);
+		SetActive(switchInventoryAry[inventoryUIIndex], is_visible: true);
 		inventoryUI = switchInventoryAry[inventoryUIIndex];
-		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, inventoryUI == UI.GRD_INVENTORY);
+		SetToggle(UI.TGL_CHANGE_INVENTORY, inventoryUI == UI.GRD_INVENTORY);
 	}
 
 	protected virtual void OnQuery_CHANGE_INVENTORY()

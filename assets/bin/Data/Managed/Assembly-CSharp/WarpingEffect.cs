@@ -12,11 +12,6 @@ public class WarpingEffect : MonoBehaviour
 	[SerializeField]
 	protected Material atlasMaterial;
 
-	public WarpingEffect()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		if (atlasMaterial != null && sprite != null && sprite.atlas != null && sprite.atlas.spriteMaterial != null && atlasMaterial != sprite.atlas.spriteMaterial)

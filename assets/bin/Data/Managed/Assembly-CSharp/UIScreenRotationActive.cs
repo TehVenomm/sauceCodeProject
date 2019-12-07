@@ -10,6 +10,6 @@ public class UIScreenRotationActive : UIScreenRotationHandler
 
 	protected override void OnScreenRotate(bool is_portrait)
 	{
-		target.SetActive(!(activeIfPortrait ^ is_portrait));
+		target.SetActive(activeIfPortrait == is_portrait);
 	}
 }

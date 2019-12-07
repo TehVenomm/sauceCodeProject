@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
@@ -13,6 +12,7 @@ public class ClanTop : HomeBase
 		BTN_STORAGE,
 		BTN_MISSION,
 		BTN_TICKET,
+		BTN_TRADING_POST,
 		BTN_CHAT,
 		OBJ_BALOON_ROOT,
 		OBJ_MENU_GIFT_ON,
@@ -55,8 +55,9 @@ public class ClanTop : HomeBase
 	public override void Initialize()
 	{
 		chairBtn = GetCtrl(UI.BTN_CHAIR);
-		this.get_gameObject().AddComponent<ClanTopBalloonControl>();
+		base.gameObject.AddComponent<ClanTopBalloonControl>();
 		base.Initialize();
+		SetActive(UI.BTN_TRADING_POST, TradingPostManager.IsTradingEnable());
 	}
 
 	public override void StartSection()
@@ -78,9 +79,9 @@ public class ClanTop : HomeBase
 
 	protected override void UpdateUIOfTutorial()
 	{
-		bool flag = HomeTutorialManager.ShouldRunGachaTutorial();
-		bool flag2 = TutorialStep.HasAllTutorialCompleted();
-		bool visible = !flag && flag2;
+		bool num = HomeTutorialManager.ShouldRunGachaTutorial();
+		bool flag = TutorialStep.HasAllTutorialCompleted();
+		bool visible = !num && flag;
 		UpdateCommunityButton(visible);
 		base.UpdateUIOfTutorial();
 	}
@@ -105,14 +106,12 @@ public class ClanTop : HomeBase
 
 	protected override void SetIconAndBalloon()
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<StageManager>.I.stageObject != null)
 		{
-			Transform val = MonoBehaviourSingleton<StageManager>.I.stageObject.Find("Icons/LOUNGE_QUEST_ICON_POS");
-			if (val != null)
+			Transform transform = MonoBehaviourSingleton<StageManager>.I.stageObject.Find("Icons/BINGO_ICON_POS");
+			if (transform != null)
 			{
-				loungeQuestIconPos = val.get_position();
+				loungeQuestIconPos = transform.position;
 			}
 		}
 		CreateClanBoardIcon();
@@ -134,9 +133,9 @@ public class ClanTop : HomeBase
 
 	private void Update()
 	{
-		if (!(chairBtn == null) && chairBtn.get_gameObject().get_activeSelf() && !(nearChairPoint == null) && nearChairPoint.sittingChara != null)
+		if (!(chairBtn == null) && chairBtn.gameObject.activeSelf && !(nearChairPoint == null) && nearChairPoint.sittingChara != null)
 		{
-			SetActive((Enum)UI.BTN_CHAIR, is_visible: false);
+			SetActive(UI.BTN_CHAIR, is_visible: false);
 		}
 	}
 
@@ -152,17 +151,16 @@ public class ClanTop : HomeBase
 
 	protected override void SetActiveAreaEventButton(string btnName, bool active)
 	{
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		if (btnName != null && btnName == "BTN_CHAIR" && MonoBehaviourSingleton<ClanManager>.IsValid())
+		if (btnName == "BTN_CHAIR" && MonoBehaviourSingleton<ClanManager>.IsValid())
 		{
-			nearChairPoint = MonoBehaviourSingleton<ClanManager>.I.TableSet.GetNearSitPoint(MonoBehaviourSingleton<ClanManager>.I.IHomePeople.selfChara._transform.get_position());
+			nearChairPoint = MonoBehaviourSingleton<ClanManager>.I.TableSet.GetNearSitPoint(MonoBehaviourSingleton<ClanManager>.I.IHomePeople.selfChara._transform.position);
 			if (nearChairPoint.sittingChara != null)
 			{
-				SetActive((Enum)UI.BTN_CHAIR, is_visible: false);
+				SetActive(UI.BTN_CHAIR, is_visible: false);
 			}
 			else
 			{
-				SetActive((Enum)UI.BTN_CHAIR, active);
+				SetActive(UI.BTN_CHAIR, active);
 			}
 		}
 	}
@@ -189,44 +187,44 @@ public class ClanTop : HomeBase
 	private void OnQuery_MENU_ACTION()
 	{
 		bool flag = !IsActive(UI.SPR_MENU_GG);
-		SetActive((Enum)UI.SPR_MENU_GG, flag);
-		SetActive((Enum)UI.BTN_MENU_GG_ON, !flag);
-		SetActive((Enum)UI.OBJ_MENU_GIFT_ON, IsActive(UI.BTN_MENU_GG_ON));
-		SetActive((Enum)UI.BTN_MENU_GG_OFF, flag);
+		SetActive(UI.SPR_MENU_GG, flag);
+		SetActive(UI.BTN_MENU_GG_ON, !flag);
+		SetActive(UI.OBJ_MENU_GIFT_ON, IsActive(UI.BTN_MENU_GG_ON));
+		SetActive(UI.BTN_MENU_GG_OFF, flag);
 		if (flag)
 		{
 			if (GameSaveData.instance.IsShowNewsNotification())
 			{
-				SetBadge((Enum)UI.BTN_GOWRAP_GG, -1, 3, 0, -8, is_scale_normalize: false);
+				SetBadge(UI.BTN_GOWRAP_GG, -1, SpriteAlignment.TopRight, 0, -8);
 			}
 			else
 			{
-				SetBadge((Enum)UI.BTN_GOWRAP_GG, 0, 3, 0, 0, is_scale_normalize: false);
+				SetBadge(UI.BTN_GOWRAP_GG, 0, SpriteAlignment.TopRight, 0, 0);
 			}
 			if (isHighlightPurchase)
 			{
-				SetBadge((Enum)UI.BTN_CRYSTAL_SHOP_GG, -1, 3, 0, -8, is_scale_normalize: false);
+				SetBadge(UI.BTN_CRYSTAL_SHOP_GG, -1, SpriteAlignment.TopRight, 0, -8);
 			}
 			else
 			{
-				SetBadge((Enum)UI.BTN_CRYSTAL_SHOP_GG, 0, 3, 0, -8, is_scale_normalize: false);
+				SetBadge(UI.BTN_CRYSTAL_SHOP_GG, 0, SpriteAlignment.TopRight, 0, -8);
 			}
 			if (isHighlightPikeShop)
 			{
-				SetBadge((Enum)UI.BTN_POINT_SHOP_GG, -1, 3, 0, -8, is_scale_normalize: false);
+				SetBadge(UI.BTN_POINT_SHOP_GG, -1, SpriteAlignment.TopRight, 0, -8);
 			}
 			else
 			{
-				SetBadge((Enum)UI.BTN_POINT_SHOP_GG, 0, 3, 0, -8, is_scale_normalize: false);
+				SetBadge(UI.BTN_POINT_SHOP_GG, 0, SpriteAlignment.TopRight, 0, -8);
 			}
 		}
 		else if (isHighlightPurchase || GameSaveData.instance.IsShowNewsNotification() || isHighlightPikeShop || ShouldEnableGiftIcon())
 		{
-			SetActive((Enum)UI.OBJ_MENU_GIFT_ON, is_visible: true);
+			SetActive(UI.OBJ_MENU_GIFT_ON, is_visible: true);
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_MENU_GIFT_ON, is_visible: false);
+			SetActive(UI.OBJ_MENU_GIFT_ON, is_visible: false);
 		}
 	}
 
@@ -270,16 +268,16 @@ public class ClanTop : HomeBase
 		{
 			if (GameSaveData.instance.IsShowNewsNotification())
 			{
-				SetBadge((Enum)UI.BTN_GOWRAP_GG, -1, 3, 0, -8, is_scale_normalize: false);
+				SetBadge(UI.BTN_GOWRAP_GG, -1, SpriteAlignment.TopRight, 0, -8);
 			}
 			else
 			{
-				SetBadge((Enum)UI.BTN_GOWRAP_GG, 0, 3, 0, -8, is_scale_normalize: false);
+				SetBadge(UI.BTN_GOWRAP_GG, 0, SpriteAlignment.TopRight, 0, -8);
 			}
 		}
 		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification() && !isHighlightPikeShop && !ShouldEnableGiftIcon())
 		{
-			SetActive((Enum)UI.OBJ_MENU_GIFT_ON, is_visible: false);
+			SetActive(UI.OBJ_MENU_GIFT_ON, is_visible: false);
 		}
 	}
 
@@ -290,16 +288,16 @@ public class ClanTop : HomeBase
 		{
 			if (isHighlightPurchase)
 			{
-				SetBadge((Enum)UI.BTN_CRYSTAL_SHOP_GG, -1, 3, 0, -8, is_scale_normalize: false);
+				SetBadge(UI.BTN_CRYSTAL_SHOP_GG, -1, SpriteAlignment.TopRight, 0, -8);
 			}
 			else
 			{
-				SetBadge((Enum)UI.BTN_CRYSTAL_SHOP_GG, 0, 3, 0, -8, is_scale_normalize: false);
+				SetBadge(UI.BTN_CRYSTAL_SHOP_GG, 0, SpriteAlignment.TopRight, 0, -8);
 			}
 		}
 		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification() && !isHighlightPikeShop && !ShouldEnableGiftIcon())
 		{
-			SetActive((Enum)UI.OBJ_MENU_GIFT_ON, is_visible: false);
+			SetActive(UI.OBJ_MENU_GIFT_ON, is_visible: false);
 		}
 	}
 
@@ -307,11 +305,11 @@ public class ClanTop : HomeBase
 	{
 		if (IsActive(UI.SPR_MENU_GG))
 		{
-			SetBadge((Enum)UI.BTN_POINT_SHOP_GG, 0, 3, 0, -8, is_scale_normalize: false);
+			SetBadge(UI.BTN_POINT_SHOP_GG, 0, SpriteAlignment.TopRight, 0, -8);
 		}
 		else if (!isHighlightPurchase && !GameSaveData.instance.IsShowNewsNotification() && !ShouldEnableGiftIcon())
 		{
-			SetActive((Enum)UI.OBJ_MENU_GIFT_ON, is_visible: false);
+			SetActive(UI.OBJ_MENU_GIFT_ON, is_visible: false);
 		}
 		isHighlightPikeShop = false;
 	}
@@ -409,8 +407,7 @@ public class ClanTop : HomeBase
 			ProductData productData = MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList[num];
 			if (productData.productType == 1)
 			{
-				int num2 = @string.IndexOf(productData.productId);
-				if (num2 < 0)
+				if (@string.IndexOf(productData.productId) < 0)
 				{
 					isHighlightPurchase = true;
 					return;
@@ -418,20 +415,15 @@ public class ClanTop : HomeBase
 			}
 			else if (productData.productType == 2)
 			{
-				int num3 = string2.IndexOf(productData.productId);
-				if (num3 < 0)
+				if (string2.IndexOf(productData.productId) < 0)
 				{
 					isHighlightPurchase = true;
 					return;
 				}
 			}
-			else if (productData.productType == 3)
+			else if (productData.productType == 3 && string3.IndexOf(productData.productId) < 0)
 			{
-				int num4 = string3.IndexOf(productData.productId);
-				if (num4 < 0)
-				{
-					break;
-				}
+				break;
 			}
 			num++;
 		}
@@ -459,7 +451,7 @@ public class ClanTop : HomeBase
 					PlayerPrefs.SetInt("Pike_Shop_Event", 0);
 				}
 			}
-		}, string.Empty);
+		});
 		yield break;
 	}
 }

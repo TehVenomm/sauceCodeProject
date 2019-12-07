@@ -47,16 +47,26 @@ public class UITextList : MonoBehaviour
 	{
 		get
 		{
-			if (mParagraphs == null && !mHistory.TryGetValue(this.get_name(), out mParagraphs))
+			if (mParagraphs == null && !mHistory.TryGetValue(base.name, out mParagraphs))
 			{
 				mParagraphs = new BetterList<Paragraph>();
-				mHistory.Add(this.get_name(), mParagraphs);
+				mHistory.Add(base.name, mParagraphs);
 			}
 			return mParagraphs;
 		}
 	}
 
-	public bool isValid => textLabel != null && textLabel.ambigiousFont != null;
+	public bool isValid
+	{
+		get
+		{
+			if (textLabel != null)
+			{
+				return textLabel.ambigiousFont != null;
+			}
+			return false;
+		}
+	}
 
 	public float scrollValue
 	{
@@ -80,7 +90,17 @@ public class UITextList : MonoBehaviour
 		}
 	}
 
-	protected float lineHeight => (!(textLabel != null)) ? 20f : ((float)textLabel.fontSize + textLabel.effectiveSpacingY);
+	protected float lineHeight
+	{
+		get
+		{
+			if (!(textLabel != null))
+			{
+				return 20f;
+			}
+			return (float)textLabel.fontSize + textLabel.effectiveSpacingY;
+		}
+	}
 
 	protected int scrollHeight
 	{
@@ -95,11 +115,6 @@ public class UITextList : MonoBehaviour
 		}
 	}
 
-	public UITextList()
-		: this()
-	{
-	}
-
 	public void Clear()
 	{
 		paragraphs.Clear();
@@ -110,7 +125,7 @@ public class UITextList : MonoBehaviour
 	{
 		if (textLabel == null)
 		{
-			textLabel = this.GetComponentInChildren<UILabel>();
+			textLabel = GetComponentInChildren<UILabel>();
 		}
 		if (scrollBar != null)
 		{
@@ -215,7 +230,7 @@ public class UITextList : MonoBehaviour
 			UIScrollBar uIScrollBar = scrollBar as UIScrollBar;
 			if (uIScrollBar != null)
 			{
-				uIScrollBar.barSize = ((mTotalLines != 0) ? (1f - (float)scrollHeight / (float)mTotalLines) : 1f);
+				uIScrollBar.barSize = ((mTotalLines == 0) ? 1f : (1f - (float)scrollHeight / (float)mTotalLines));
 			}
 		}
 		UpdateVisibleText();
@@ -229,7 +244,7 @@ public class UITextList : MonoBehaviour
 		}
 		if (mTotalLines == 0)
 		{
-			textLabel.text = string.Empty;
+			textLabel.text = "";
 			return;
 		}
 		int num = Mathf.FloorToInt((float)textLabel.height / lineHeight);

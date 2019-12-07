@@ -41,12 +41,6 @@ public class State_NonActive : State
 
 	public override void HandleEvent(StateMachine fsm, Brain brain, BRAIN_EVENT ev, object param = null)
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 		if (ev != BRAIN_EVENT.ATTACKED_HIT)
 		{
 			return;
@@ -65,12 +59,7 @@ public class State_NonActive : State
 				continue;
 			}
 			Brain brain2 = allyObjectList[i].controller.brain;
-			if (brain2 == null)
-			{
-				continue;
-			}
-			Vector3 val = allyObjectList[i]._position - position;
-			if (val.get_sqrMagnitude() < brain.param.scoutParam.scoutingAudibilitySqr)
+			if (!(brain2 == null) && (allyObjectList[i]._position - position).sqrMagnitude < brain.param.scoutParam.scoutingAudibilitySqr)
 			{
 				if (brain2.owner != null)
 				{

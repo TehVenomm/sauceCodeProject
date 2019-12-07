@@ -15,11 +15,6 @@ public class PointShopItemList : MonoBehaviour
 
 	public Transform itemIconRoot;
 
-	public PointShopItemList()
-		: this()
-	{
-	}
-
 	public void SetUp(PointShopItem item, uint pointId, bool isChangable)
 	{
 		SetUpText(item, isChangable);
@@ -29,8 +24,6 @@ public class PointShopItemList : MonoBehaviour
 
 	protected void SetUpText(PointShopItem item, bool isChangable)
 	{
-		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
 		itemName.text = item.name;
 		if (item.hasLimit)
 		{
@@ -55,7 +48,7 @@ public class PointShopItemList : MonoBehaviour
 			tradeNum.text = StringTable.Get(STRING_CATEGORY.POINT_SHOP, 0u);
 		}
 		pointNum.text = string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), item.needPoint);
-		pointNum.color = ((!isChangable) ? Color.get_red() : Color.get_white());
+		pointNum.color = (isChangable ? Color.white : Color.red);
 		remainingTime.text = item.expire;
 	}
 
@@ -66,7 +59,6 @@ public class PointShopItemList : MonoBehaviour
 
 	protected void SetUpItemIcon(PointShopItem item)
 	{
-		ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)item.type, (uint)item.itemId, itemIconRoot);
-		itemIcon.SetEnableCollider(is_enable: false);
+		ItemIcon.CreateRewardItemIcon((REWARD_TYPE)item.type, (uint)item.itemId, itemIconRoot).SetEnableCollider(is_enable: false);
 	}
 }

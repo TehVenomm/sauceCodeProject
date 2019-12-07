@@ -82,9 +82,9 @@ public abstract class DeviceIndividualInfo
 
 	public float TitleTopCameraSize = 3f;
 
-	public Vector3 TitleTopBGScale = Vector3.get_one();
+	public Vector3 TitleTopBGScale = Vector3.one;
 
-	public Vector3 OpeningCutScale = Vector3.get_one();
+	public Vector3 OpeningCutScale = Vector3.one;
 
 	public virtual bool HasSafeArea => false;
 
@@ -124,9 +124,9 @@ public abstract class DeviceIndividualInfo
 
 	public virtual bool NeedModifyStoryAnchor => false;
 
-	protected static float longerSide => (Screen.get_width() <= Screen.get_height()) ? Screen.get_height() : Screen.get_width();
+	protected static float longerSide => (Screen.width > Screen.height) ? Screen.width : Screen.height;
 
-	protected static float shorterSide => (Screen.get_width() >= Screen.get_height()) ? Screen.get_height() : Screen.get_width();
+	protected static float shorterSide => (Screen.width < Screen.height) ? Screen.width : Screen.height;
 
 	public virtual void OnStart()
 	{

@@ -27,7 +27,7 @@ namespace Network
 
 		public static string ShapeSize(int size)
 		{
-			string empty = string.Empty;
+			string text = "";
 			if (size < 10)
 			{
 				return "0.0" + size.ToString();
@@ -36,8 +36,8 @@ namespace Network
 			{
 				return "0." + size.ToString();
 			}
-			empty = size.ToString();
-			return empty.Insert(empty.Length - 2, ".");
+			text = size.ToString();
+			return text.Insert(text.Length - 2, ".");
 		}
 	}
 }

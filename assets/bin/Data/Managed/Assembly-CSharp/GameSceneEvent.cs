@@ -19,6 +19,13 @@ public class GameSceneEvent
 
 	public object userData;
 
+	public static void Initialize()
+	{
+		ResetCurrent();
+		stay = null;
+		stayStack = null;
+	}
+
 	public GameSceneEvent()
 	{
 		_Init();
@@ -30,13 +37,6 @@ public class GameSceneEvent
 		eventName = e.eventName;
 		sender = e.sender;
 		userData = e.userData;
-	}
-
-	public static void Initialize()
-	{
-		ResetCurrent();
-		stay = null;
-		stayStack = null;
 	}
 
 	public void _Init()

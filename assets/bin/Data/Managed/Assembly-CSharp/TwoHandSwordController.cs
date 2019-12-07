@@ -45,29 +45,149 @@ public class TwoHandSwordController : IObserver, IWeaponController
 
 	public TwoHandSwordOracleController oracleCtrl => m_thsOracleCtrl;
 
-	public float TwoHandSwordBoostAttackSpeed => (m_thsSoulCtrl != null) ? m_thsSoulCtrl.TwoHandSwordBoostAttackSpeed : 0f;
+	public float TwoHandSwordBoostAttackSpeed
+	{
+		get
+		{
+			if (m_thsSoulCtrl != null)
+			{
+				return m_thsSoulCtrl.TwoHandSwordBoostAttackSpeed;
+			}
+			return 0f;
+		}
+	}
 
-	public int[] GetAllCurrentRestBulletCount => (m_thsBurstCtrl != null) ? m_thsBurstCtrl.GetAllCurrentRestBulletCount : null;
+	public int[] GetAllCurrentRestBulletCount
+	{
+		get
+		{
+			if (m_thsBurstCtrl != null)
+			{
+				return m_thsBurstCtrl.GetAllCurrentRestBulletCount;
+			}
+			return null;
+		}
+	}
 
-	public int FirstReloadActionAtkID => (m_thsBurstCtrl != null) ? m_thsBurstCtrl.FirstReloadActionAtkID : (-1);
+	public int FirstReloadActionAtkID
+	{
+		get
+		{
+			if (m_thsBurstCtrl != null)
+			{
+				return m_thsBurstCtrl.FirstReloadActionAtkID;
+			}
+			return -1;
+		}
+	}
 
-	public int CurrentRestBulletCount => (m_thsBurstCtrl != null) ? m_thsBurstCtrl.CurrentRestBulletCount : 0;
+	public int CurrentRestBulletCount
+	{
+		get
+		{
+			if (m_thsBurstCtrl != null)
+			{
+				return m_thsBurstCtrl.CurrentRestBulletCount;
+			}
+			return 0;
+		}
+	}
 
-	public int CurrentMaxBulletCount => (m_thsBurstCtrl != null) ? m_thsBurstCtrl.CurrentMaxBulletCount : 0;
+	public int CurrentMaxBulletCount
+	{
+		get
+		{
+			if (m_thsBurstCtrl != null)
+			{
+				return m_thsBurstCtrl.CurrentMaxBulletCount;
+			}
+			return 0;
+		}
+	}
 
-	public bool IsReadyForShoot => m_thsBurstCtrl != null && m_thsBurstCtrl.IsReadyForShoot;
+	public bool IsReadyForShoot
+	{
+		get
+		{
+			if (m_thsBurstCtrl != null)
+			{
+				return m_thsBurstCtrl.IsReadyForShoot;
+			}
+			return false;
+		}
+	}
 
-	public bool IsShootingNow => m_thsBurstCtrl != null && m_thsBurstCtrl.IsShootingNow;
+	public bool IsShootingNow
+	{
+		get
+		{
+			if (m_thsBurstCtrl != null)
+			{
+				return m_thsBurstCtrl.IsShootingNow;
+			}
+			return false;
+		}
+	}
 
-	public bool IsReloadingNow => m_thsBurstCtrl != null && m_thsBurstCtrl.IsReloadingNow;
+	public bool IsReloadingNow
+	{
+		get
+		{
+			if (m_thsBurstCtrl != null)
+			{
+				return m_thsBurstCtrl.IsReloadingNow;
+			}
+			return false;
+		}
+	}
 
-	public bool IsHit3rdComboAttack => m_thsBurstCtrl != null && m_thsBurstCtrl.IsHit3rdComboAttack;
+	public bool IsHit3rdComboAttack
+	{
+		get
+		{
+			if (m_thsBurstCtrl != null)
+			{
+				return m_thsBurstCtrl.IsHit3rdComboAttack;
+			}
+			return false;
+		}
+	}
 
-	public bool IsHitAvoidAttack => m_thsBurstCtrl != null && m_thsBurstCtrl.IsHitAvoidAttack;
+	public bool IsHitAvoidAttack
+	{
+		get
+		{
+			if (m_thsBurstCtrl != null)
+			{
+				return m_thsBurstCtrl.IsHitAvoidAttack;
+			}
+			return false;
+		}
+	}
 
-	public bool IsEnableChangeReloadMotionSpeed => m_thsBurstCtrl != null && m_thsBurstCtrl.IsEnableChangeReloadMotionSpeed;
+	public bool IsEnableChangeReloadMotionSpeed
+	{
+		get
+		{
+			if (m_thsBurstCtrl != null)
+			{
+				return m_thsBurstCtrl.IsEnableChangeReloadMotionSpeed;
+			}
+			return false;
+		}
+	}
 
-	public bool IsEnableTransitionFromAvoidAtk => m_thsBurstCtrl != null && m_thsBurstCtrl.IsEnableTransitionFromAvoidAtk;
+	public bool IsEnableTransitionFromAvoidAtk
+	{
+		get
+		{
+			if (m_thsBurstCtrl != null)
+			{
+				return m_thsBurstCtrl.IsEnableTransitionFromAvoidAtk;
+			}
+			return false;
+		}
+	}
 
 	public TwoHandSwordController()
 	{
@@ -269,8 +389,6 @@ public class TwoHandSwordController : IObserver, IWeaponController
 
 	public bool GetSpGaugeIncreaseValue(AttackHitInfo.ATTACK_TYPE _atkType, int _attackId, float _attackRate, SoulEnergyController _soulEnergyCtrl, Vector3 _hitPosition, float _chargeRate, ref float _gaugeMax, ref float _increaseValue)
 	{
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
 		if (m_owner == null)
 		{
 			return false;
@@ -296,7 +414,7 @@ public class TwoHandSwordController : IObserver, IWeaponController
 		}
 		if (spAttackType == SP_ATTACK_TYPE.SOUL)
 		{
-			if (object.ReferenceEquals(_soulEnergyCtrl, null))
+			if (_soulEnergyCtrl == null)
 			{
 				return false;
 			}
@@ -313,7 +431,7 @@ public class TwoHandSwordController : IObserver, IWeaponController
 				}
 				soulEnergy = _soulEnergyCtrl.Get(GetIaiGaugeIncreaseValue(_chargeRate));
 			}
-			if (!object.ReferenceEquals(soulEnergy, null))
+			if (soulEnergy != null)
 			{
 				if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
 				{

@@ -7,9 +7,4 @@ public class TablePoint : MonoBehaviour
 	public Vector3 cameraRotation;
 
 	public float cameraFov;
-
-	public TablePoint()
-		: this()
-	{
-	}
 }

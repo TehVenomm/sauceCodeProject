@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class EvolveEquipItemTable : Singleton<EvolveEquipItemTable>, IDataTable
 {
@@ -58,12 +57,6 @@ public class EvolveEquipItemTable : Singleton<EvolveEquipItemTable>, IDataTable
 	}
 
 	private UIntKeyTable<EvolveEquipItemData> tableData;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<EvolveEquipItemData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<EvolveEquipItemData> _003C_003Ef__mg_0024cache1;
 
 	public void CreateTable(string csv_text)
 	{

@@ -7,7 +7,7 @@ public class MultiThreadTaskRunner
 {
 	private class TaskParam
 	{
-		public string name = string.Empty;
+		public string name = "";
 
 		public Action act;
 	}
@@ -22,7 +22,7 @@ public class MultiThreadTaskRunner
 
 	private volatile bool stopAllThreads;
 
-	private const int THREAD_COUNT = 3;
+	private const int THREAD_COUNT = 1;
 
 	public bool isWorking
 	{
@@ -50,7 +50,7 @@ public class MultiThreadTaskRunner
 		{
 			workingCount = 0;
 			stopAllThreads = false;
-			int num = 3;
+			int num = 1;
 			threads = new Thread[num];
 			for (int i = 0; i < num; i++)
 			{
@@ -109,7 +109,7 @@ public class MultiThreadTaskRunner
 		{
 			if (!(ex is ThreadAbortException))
 			{
-				Debug.LogError((object)("MultiThreadTaskRunner : " + ex.ToString()));
+				Debug.LogError("MultiThreadTaskRunner : " + ex.ToString());
 			}
 		}
 	}

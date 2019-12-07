@@ -7,11 +7,6 @@ public class UIButtonActivate : MonoBehaviour
 
 	public bool state = true;
 
-	public UIButtonActivate()
-		: this()
-	{
-	}
-
 	private void OnClick()
 	{
 		if (target != null)

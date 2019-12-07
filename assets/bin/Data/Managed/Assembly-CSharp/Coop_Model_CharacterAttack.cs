@@ -4,11 +4,11 @@ public class Coop_Model_CharacterAttack : Coop_Model_ObjectSyncPositionBase
 {
 	public int attack_id;
 
-	public string motionLayerName = string.Empty;
+	public string motionLayerName = "";
 
-	public string motionStateName = string.Empty;
+	public string motionStateName = "";
 
-	public Vector3 act_pos = Vector3.get_zero();
+	public Vector3 act_pos = Vector3.zero;
 
 	public bool act_pos_f;
 
@@ -18,8 +18,6 @@ public class Coop_Model_CharacterAttack : Coop_Model_ObjectSyncPositionBase
 
 	public Coop_Model_CharacterAttack()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		base.packetType = PACKET_TYPE.CHARACTER_ATTACK;
 	}
 

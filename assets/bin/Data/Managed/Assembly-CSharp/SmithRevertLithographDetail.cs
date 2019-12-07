@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -48,9 +47,9 @@ public class SmithRevertLithographDetail : ItemSellConfirm
 		if (sellData != null)
 		{
 			DrawIcon();
-			SetActive((Enum)UI.BTN_CENTER, is_visible: false);
-			SetActive((Enum)UI.BTN_0, is_visible: true);
-			SetActive((Enum)UI.BTN_1, is_visible: true);
+			SetActive(UI.BTN_CENTER, is_visible: false);
+			SetActive(UI.BTN_0, is_visible: true);
+			SetActive(UI.BTN_1, is_visible: true);
 		}
 	}
 
@@ -78,21 +77,19 @@ public class SmithRevertLithographDetail : ItemSellConfirm
 				SetActive(t, is_visible: false);
 			}
 		});
-		SetActive((Enum)UI.STR_NON_REWARD, lithographArr.Length == 0);
+		SetActive(UI.STR_NON_REWARD, lithographArr.Length == 0);
 	}
 
 	public void OnQuery_YES()
 	{
-		string eventData = string.Format(StringTable.Get(STRING_CATEGORY.SMITH, 12u), MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SMITH_RESTORE_USE_CRYSTAL);
-		GameSection.SetEventData(eventData);
+		GameSection.SetEventData(string.Format(StringTable.Get(STRING_CATEGORY.SMITH, 12u), MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SMITH_RESTORE_USE_CRYSTAL));
 	}
 
 	private void OnQuery_SmithRevertLithographConfirm_YES()
 	{
 		if (GameSection.CheckCrystal(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SMITH_RESTORE_USE_CRYSTAL))
 		{
-			string eventData = StringTable.Format(STRING_CATEGORY.SMITH, 13u, lithographArr[0].name);
-			GameSection.SetEventData(eventData);
+			GameSection.SetEventData(StringTable.Format(STRING_CATEGORY.SMITH, 13u, lithographArr[0].name));
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<SmithManager>.I.SendRevertLithograph(equipData.GetUniqID(), delegate(bool is_success)
 			{

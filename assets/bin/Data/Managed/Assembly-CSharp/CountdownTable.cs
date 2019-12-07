@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 
 public class CountdownTable : Singleton<CountdownTable>, IDataTable
 {
@@ -36,9 +35,6 @@ public class CountdownTable : Singleton<CountdownTable>, IDataTable
 	}
 
 	private UIntKeyTable<CountdownData> countdownDataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<CountdownData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string csv_text)
 	{

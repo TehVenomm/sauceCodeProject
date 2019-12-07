@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -71,38 +70,33 @@ public class SmithUseAbilityItemList : GameSection
 		{
 			inventory = new ItemStorageTop.AbilityItemInventory();
 		}
-		SetActive((Enum)UI.OBJ_BTN_SELL_MODE, !isSellMode);
-		SetActive((Enum)UI.OBJ_SELL_MODE_ROOT, isSellMode);
-		SetLabelText((Enum)UI.LBL_MAX_HAVE_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxAbilityItem.ToString());
-		SetLabelText((Enum)UI.LBL_NOW_HAVE_NUM, inventory.datas.Length.ToString());
-		SetActive((Enum)UI.GRD_INVENTORY, is_visible: false);
-		SetActive((Enum)UI.GRD_INVENTORY_SMALL, is_visible: false);
-		SetLabelText((Enum)UI.LBL_SORT, inventory.sortSettings.GetSortLabel());
-		SetToggle((Enum)UI.TGL_ICON_ASC, inventory.sortSettings.orderTypeAsc);
+		SetActive(UI.OBJ_BTN_SELL_MODE, !isSellMode);
+		SetActive(UI.OBJ_SELL_MODE_ROOT, isSellMode);
+		SetLabelText(UI.LBL_MAX_HAVE_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxAbilityItem.ToString());
+		SetLabelText(UI.LBL_NOW_HAVE_NUM, inventory.datas.Length.ToString());
+		SetActive(UI.GRD_INVENTORY, is_visible: false);
+		SetActive(UI.GRD_INVENTORY_SMALL, is_visible: false);
+		SetLabelText(UI.LBL_SORT, inventory.sortSettings.GetSortLabel());
+		SetToggle(UI.TGL_ICON_ASC, inventory.sortSettings.orderTypeAsc);
 		if (isSellMode)
 		{
-			SetLabelText((Enum)UI.LBL_MAX_SELECT_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX.ToString());
-			SetLabelText((Enum)UI.LBL_SELECT_NUM, sellItemData.Count.ToString());
+			SetLabelText(UI.LBL_MAX_SELECT_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX.ToString());
+			SetLabelText(UI.LBL_SELECT_NUM, sellItemData.Count.ToString());
 			int num = 0;
 			foreach (AbilityItemSortData sellItemDatum in sellItemData)
 			{
 				num += sellItemDatum.itemData.GetItemTableData().price;
 			}
-			SetLabelText((Enum)UI.LBL_TOTAL, num.ToString());
+			SetLabelText(UI.LBL_TOTAL, num.ToString());
 		}
 		UI currentInventoryRoot = GetCurrentInventoryRoot();
-		SetActive((Enum)currentInventoryRoot, is_visible: true);
-		SetDynamicList((Enum)currentInventoryRoot, (string)null, inventory.datas.Length, reset: false, (Func<int, bool>)delegate(int i)
+		SetActive(currentInventoryRoot, is_visible: true);
+		SetDynamicList(currentInventoryRoot, null, inventory.datas.Length, reset: false, delegate(int i)
 		{
 			SortCompareData sortCompareData = inventory.datas[i];
-			if (sortCompareData == null || !sortCompareData.IsPriority(inventory.sortSettings.orderTypeAsc))
-			{
-				return false;
-			}
-			return true;
-		}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycre)
+			return (sortCompareData != null && sortCompareData.IsPriority(inventory.sortSettings.orderTypeAsc)) ? true : false;
+		}, null, delegate(int i, Transform t, bool is_recycre)
 		{
-			SmithUseAbilityItemList smithUseAbilityItemList = this;
 			AbilityItemSortData abilityItem = inventory.datas[i] as AbilityItemSortData;
 			int num2 = sellItemData.FindIndex((AbilityItemSortData x) => x.GetUniqID() == abilityItem.GetUniqID());
 			ItemIcon itemIcon = CreateIcon(abilityItem, t, i);
@@ -116,10 +110,10 @@ public class SmithUseAbilityItemList : GameSection
 					(itemIcon as ItemIconDetail).setupperMaterial.SetDescription(abilityItem.itemData.GetDescription());
 					(itemIcon as ItemIconDetail).setupperMaterial.SetActiveInfo(1);
 				}
-				itemIcon.textLabel.get_gameObject().SetActive(true);
+				itemIcon.textLabel.gameObject.SetActive(value: true);
 				if (isSellMode)
 				{
-					itemIcon.selectFrame.get_gameObject().SetActive(num2 >= 0);
+					itemIcon.selectFrame.gameObject.SetActive(num2 >= 0);
 					if (num2 >= 0)
 					{
 						if (itemIcon is ItemIconDetail)
@@ -132,10 +126,10 @@ public class SmithUseAbilityItemList : GameSection
 						}
 					}
 				}
-				SetEvent(itemIcon.transform, (!flag) ? "LESS_RARITY" : "SELECT_ITEM", abilityItem);
+				SetEvent(itemIcon.transform, flag ? "SELECT_ITEM" : "LESS_RARITY", abilityItem);
 			}
 		});
-		SetActive((Enum)UI.BTN_CHANGE, is_visible: false);
+		SetActive(UI.BTN_CHANGE, is_visible: false);
 		UpdateAnchors();
 		base.UpdateUI();
 	}
@@ -157,7 +151,7 @@ public class SmithUseAbilityItemList : GameSection
 	private void OnQuery_CHANGE_INVENTORY()
 	{
 		currentShowInventoryMode = SHOW_INVENTORY_MODE.MAIN_STATUS;
-		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, value: true);
+		SetToggle(UI.TGL_CHANGE_INVENTORY, value: true);
 		RefreshUI();
 	}
 
@@ -234,7 +228,7 @@ public class SmithUseAbilityItemList : GameSection
 	{
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		SetLabelText(ctrl, UI.LBL_CAPTION, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 26u));
-		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
+		UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
 		if (component != null)
 		{
 			component.Reset();
@@ -249,7 +243,11 @@ public class SmithUseAbilityItemList : GameSection
 
 	private UI GetCurrentInventoryRoot()
 	{
-		return (currentShowInventoryMode != 0) ? UI.GRD_INVENTORY_SMALL : UI.GRD_INVENTORY;
+		if (currentShowInventoryMode != 0)
+		{
+			return UI.GRD_INVENTORY_SMALL;
+		}
+		return UI.GRD_INVENTORY;
 	}
 
 	private void ChangeSellModeSelectItem(AbilityItemSortData abilityItem)
@@ -279,7 +277,7 @@ public class SmithUseAbilityItemList : GameSection
 		{
 			ulong uniqueId = itemIcon.GetUniqID;
 			int num = sellItemData.FindIndex((AbilityItemSortData x) => x.GetUniqID() == uniqueId);
-			itemIcon.selectFrame.get_gameObject().SetActive(num >= 0);
+			itemIcon.selectFrame.gameObject.SetActive(num >= 0);
 			if (itemIcon is ItemIconDetail)
 			{
 				(itemIcon as ItemIconDetail).setupperEquip.SetupSelectNumberSprite(num + 1);
@@ -294,14 +292,14 @@ public class SmithUseAbilityItemList : GameSection
 
 	private void SetSellInfoView()
 	{
-		SetLabelText((Enum)UI.LBL_MAX_SELECT_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX.ToString());
-		SetLabelText((Enum)UI.LBL_SELECT_NUM, sellItemData.Count.ToString());
+		SetLabelText(UI.LBL_MAX_SELECT_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.SELL_SELECT_MAX.ToString());
+		SetLabelText(UI.LBL_SELECT_NUM, sellItemData.Count.ToString());
 		int num = 0;
 		foreach (AbilityItemSortData sellItemDatum in sellItemData)
 		{
 			num += sellItemDatum.itemData.GetItemTableData().price;
 		}
-		SetLabelText((Enum)UI.LBL_TOTAL, num.ToString());
+		SetLabelText(UI.LBL_TOTAL, num.ToString());
 	}
 
 	private void OnCloseDialog_AbilityItemSellIncludeRareConfirm()

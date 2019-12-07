@@ -36,13 +36,13 @@ public class PlayingSoundList
 			playingObjects.Add(so.clipId, new List<AudioObject>(20));
 		}
 		playingObjects[so.clipId].Add(so);
-		playingSENum++;
+		int num = ++playingSENum;
 	}
 
 	public void RemoveSE(AudioObject so)
 	{
 		playingObjects[so.clipId].Remove(so);
-		playingSENum--;
+		int num = --playingSENum;
 	}
 
 	public bool canPlay(int clip_id)
@@ -53,7 +53,7 @@ public class PlayingSoundList
 		{
 			num = seData.intervalLimit;
 		}
-		float time = Time.get_time();
+		float time = Time.time;
 		if (playingObjects.ContainsKey(clip_id))
 		{
 			int count = playingObjects[clip_id].Count;

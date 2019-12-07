@@ -27,7 +27,7 @@ public class HomeNPCArenaSoldier : HomeNPCCharacter
 		{
 			if (!isTurned)
 			{
-				this.StartCoroutine(PlayThroughTurn());
+				StartCoroutine(PlayThroughTurn());
 				isTurned = true;
 			}
 		}
@@ -41,8 +41,7 @@ public class HomeNPCArenaSoldier : HomeNPCCharacter
 	{
 		animCtrl.Play(PLCA.THROUGH_TURN);
 		int turnSign = (base.npcInfo.scaleX > 0f) ? 1 : (-1);
-		Vector3 eulerAngles = base._transform.get_eulerAngles();
-		float beforeTurnRot = eulerAngles.y;
+		float beforeTurnRot = base._transform.eulerAngles.y;
 		while (rotatedDegree <= 90f)
 		{
 			rotatedDegree += 3.6f;
@@ -50,8 +49,8 @@ public class HomeNPCArenaSoldier : HomeNPCCharacter
 			{
 				rotatedDegree = 90f;
 			}
-			float rotateY = beforeTurnRot + rotatedDegree * (float)turnSign;
-			base._transform.set_rotation(Quaternion.Euler(0f, rotateY, 0f));
+			float y = beforeTurnRot + rotatedDegree * (float)turnSign;
+			base._transform.rotation = Quaternion.Euler(0f, y, 0f);
 			yield return null;
 		}
 	}

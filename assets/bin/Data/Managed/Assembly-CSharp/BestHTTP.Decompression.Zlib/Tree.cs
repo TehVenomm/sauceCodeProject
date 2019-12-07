@@ -972,7 +972,11 @@ namespace BestHTTP.Decompression.Zlib
 
 		internal static int DistanceCode(int dist)
 		{
-			return (dist >= 256) ? _dist_code[256 + SharedUtils.URShift(dist, 7)] : _dist_code[dist];
+			if (dist >= 256)
+			{
+				return _dist_code[256 + SharedUtils.URShift(dist, 7)];
+			}
+			return _dist_code[dist];
 		}
 
 		internal void gen_bitlen(DeflateManager s)

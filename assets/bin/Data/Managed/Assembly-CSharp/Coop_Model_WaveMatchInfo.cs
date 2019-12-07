@@ -17,12 +17,12 @@ public class Coop_Model_WaveMatchInfo : Coop_Model_Base
 
 	public override string ToString()
 	{
-		string empty = string.Empty;
-		empty = empty + ",no=" + no;
-		empty = empty + ",popGuardSec=" + popGuardSec;
-		empty = empty + ",intervalSec=" + intervalSec;
-		empty = empty + ",isFinal=" + isFinal;
-		empty = empty + ",isFinal=" + finalNo;
-		return base.ToString() + empty;
+		string arg = "";
+		arg = arg + ",no=" + no;
+		arg = arg + ",popGuardSec=" + popGuardSec;
+		arg = arg + ",intervalSec=" + intervalSec;
+		arg = arg + ",isFinal=" + isFinal;
+		arg = arg + ",isFinal=" + finalNo;
+		return base.ToString() + arg;
 	}
 }

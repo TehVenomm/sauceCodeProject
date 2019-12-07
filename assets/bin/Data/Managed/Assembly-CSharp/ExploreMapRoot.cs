@@ -21,13 +21,13 @@ public class ExploreMapRoot : MonoBehaviour
 	private UITexture map;
 
 	[SerializeField]
-	private Color unusedColor;
+	private Color unusedColor = Color.black;
 
 	[SerializeField]
-	private Color passedColor;
+	private Color passedColor = Color.black;
 
 	[SerializeField]
-	private Color warpColor;
+	private Color warpColor = Color.black;
 
 	[SerializeField]
 	private float _portraitSonarOffset = 0.9f;
@@ -86,17 +86,6 @@ public class ExploreMapRoot : MonoBehaviour
 		}
 	}
 
-	public ExploreMapRoot()
-		: this()
-	{
-	}//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-	//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-	//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-
-
 	public ExploreMapLocation FindLocation(int id)
 	{
 		return Array.Find(locations, (ExploreMapLocation l) => l.mapId == id);
@@ -110,22 +99,21 @@ public class ExploreMapRoot : MonoBehaviour
 		{
 			return null;
 		}
-		int locationIndex = GetLocationIndex(exploreMapLocation.get_name());
-		int locationIndex2 = GetLocationIndex(exploreMapLocation2.get_name());
+		int locationIndex = GetLocationIndex(exploreMapLocation.name);
+		int locationIndex2 = GetLocationIndex(exploreMapLocation2.name);
 		int num = Mathf.Min(locationIndex, locationIndex2);
-		int num2 = Mathf.Max(locationIndex, locationIndex2);
-		string str = "Portal" + num.ToString() + "_" + num2.ToString();
-		return this.get_transform().Find("Road/" + str);
+		string str2 = string.Concat(str3: Mathf.Max(locationIndex, locationIndex2).ToString(), str0: "Portal", str1: num.ToString(), str2: "_");
+		return base.transform.Find("Road/" + str2);
 	}
 
 	public Transform FindNode(int mapId, out Vector3 offset, out bool isBattle)
 	{
-		offset._002Ector(0f, 0f, 0f);
+		offset = new Vector3(0f, 0f, 0f);
 		isBattle = false;
 		ExploreMapLocation exploreMapLocation = FindLocation(mapId);
 		if (null != exploreMapLocation)
 		{
-			return exploreMapLocation.get_transform();
+			return exploreMapLocation.transform;
 		}
 		if (MonoBehaviourSingleton<QuestManager>.I.GetExploreBossBatlleMapId() == mapId)
 		{
@@ -133,7 +121,7 @@ public class ExploreMapRoot : MonoBehaviour
 			exploreMapLocation = FindLocation(MonoBehaviourSingleton<QuestManager>.I.GetExploreBossAppearMapId());
 			if (exploreMapLocation != null)
 			{
-				return exploreMapLocation.get_transform();
+				return exploreMapLocation.transform;
 			}
 		}
 		return null;
@@ -141,23 +129,20 @@ public class ExploreMapRoot : MonoBehaviour
 
 	public void UpdatePortals(bool isMiniMap)
 	{
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < portals.Length; i++)
 		{
-			Transform val = portals[i];
-			string name = val.get_name();
+			Transform transform = portals[i];
+			string name = transform.name;
 			FieldMapTable.PortalTableData portalData = GetPortalData(name);
 			if (portalData == null)
 			{
 				continue;
 			}
-			val.get_gameObject().SetActive(true);
-			UITexture[] componentsInChildren = val.GetComponentsInChildren<UITexture>();
+			transform.gameObject.SetActive(value: true);
+			UITexture[] componentsInChildren = transform.GetComponentsInChildren<UITexture>();
 			if (componentsInChildren == null || componentsInChildren.Length == 0)
 			{
-				val.get_gameObject().SetActive(false);
+				transform.gameObject.SetActive(value: false);
 			}
 			else if (MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledPortal(portalData.portalID))
 			{
@@ -170,16 +155,13 @@ public class ExploreMapRoot : MonoBehaviour
 			else
 			{
 				componentsInChildren[0].color = unusedColor;
-				val.get_gameObject().SetActive(isMiniMap);
+				transform.gameObject.SetActive(isMiniMap);
 			}
 		}
 	}
 
 	public void SetMarkers(Transform[] markers, bool isMiniMap)
 	{
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 		int[] exploreDisplayIndices = MonoBehaviourSingleton<QuestManager>.I.GetExploreDisplayIndices();
 		for (int i = 0; i < markers.Length; i++)
 		{
@@ -189,23 +171,23 @@ public class ExploreMapRoot : MonoBehaviour
 			{
 				continue;
 			}
-			Transform val = markers[num];
+			Transform transform = markers[num];
 			Vector3 offset;
 			bool isBattle;
-			Transform val2 = FindNode(exploreMapId, out offset, out isBattle);
-			if (null != val2)
+			Transform transform2 = FindNode(exploreMapId, out offset, out isBattle);
+			if (null != transform2)
 			{
-				val.get_gameObject().SetActive(true);
-				Utility.Attach(val2, val.get_transform());
+				transform.gameObject.SetActive(value: true);
+				Utility.Attach(transform2, transform.transform);
 				if (isMiniMap)
 				{
-					val.GetComponent<ExplorePlayerMarkerMini>().SetIndex(num);
+					transform.GetComponent<ExplorePlayerMarkerMini>().SetIndex(num);
 				}
 				else
 				{
-					val.GetComponent<ExplorePlayerMarker>().SetIndex(num);
+					transform.GetComponent<ExplorePlayerMarker>().SetIndex(num);
 				}
-				val.set_localPosition(val.get_localPosition() + offset);
+				transform.localPosition += offset;
 				showBattleMarker |= isBattle;
 			}
 		}
@@ -213,27 +195,23 @@ public class ExploreMapRoot : MonoBehaviour
 
 	public Vector3 GetPositionOnMap(int mapId)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		if (mapId < 0)
 		{
-			return Vector3.get_zero();
+			return Vector3.zero;
 		}
 		Vector3 offset;
 		bool isBattle;
-		Transform val = FindNode(mapId, out offset, out isBattle);
-		if (val == null)
+		Transform transform = FindNode(mapId, out offset, out isBattle);
+		if (transform == null)
 		{
-			return Vector3.get_zero();
+			return Vector3.zero;
 		}
-		return val.get_localPosition();
+		return transform.localPosition;
 	}
 
 	private static int GetLocationIndex(string name)
 	{
-		string s = name.Replace("Location", string.Empty);
-		return int.Parse(s);
+		return int.Parse(name.Replace("Location", ""));
 	}
 
 	public int[] GetMapIDsFromLocationNumbers(int[] numbers)
@@ -258,15 +236,7 @@ public class ExploreMapRoot : MonoBehaviour
 		}
 		ExploreMapLocation exploreMapLocation = _locations[num];
 		ExploreMapLocation loc = _locations[num2];
-		List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID((uint)exploreMapLocation.mapId);
-		return portalListByMapID.Find(delegate(FieldMapTable.PortalTableData o)
-		{
-			if (o.dstMapID == loc.mapId)
-			{
-				return true;
-			}
-			return false;
-		});
+		return Singleton<FieldMapTable>.I.GetPortalListByMapID((uint)exploreMapLocation.mapId).Find((FieldMapTable.PortalTableData o) => (o.dstMapID == loc.mapId) ? true : false);
 	}
 
 	public uint GetPortalID(string portalName)
@@ -280,20 +250,12 @@ public class ExploreMapRoot : MonoBehaviour
 		}
 		ExploreMapLocation exploreMapLocation = _locations[num];
 		ExploreMapLocation loc = _locations[num2];
-		List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID((uint)exploreMapLocation.mapId);
-		return portalListByMapID.Find(delegate(FieldMapTable.PortalTableData o)
-		{
-			if (o.dstMapID == loc.mapId)
-			{
-				return true;
-			}
-			return false;
-		})?.portalID ?? 0;
+		return Singleton<FieldMapTable>.I.GetPortalListByMapID((uint)exploreMapLocation.mapId).Find((FieldMapTable.PortalTableData o) => (o.dstMapID == loc.mapId) ? true : false)?.portalID ?? 0;
 	}
 
 	public static int[] GetLocationNumbers(string portalName)
 	{
-		string[] array = portalName.Replace("Portal", string.Empty).Split('_');
+		string[] array = portalName.Replace("Portal", "").Split('_');
 		return new int[2]
 		{
 			int.Parse(array[0]),
@@ -353,7 +315,11 @@ public class ExploreMapRoot : MonoBehaviour
 		{
 			return 1f;
 		}
-		return (!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait) ? _landscapeScale : _portraitScale;
+		if (!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
+		{
+			return _landscapeScale;
+		}
+		return _portraitScale;
 	}
 
 	public float GetSonarOffset()
@@ -362,19 +328,24 @@ public class ExploreMapRoot : MonoBehaviour
 		{
 			return 1f;
 		}
-		return (!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait) ? _landscaleSonarOffset : _portraitSonarOffset;
+		if (!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
+		{
+			return _landscaleSonarOffset;
+		}
+		return _portraitSonarOffset;
 	}
 
 	public Vector2 GetSonarScale()
 	{
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 		{
-			return Vector2.get_one();
+			return Vector2.one;
 		}
-		return (!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait) ? _landscaleSonarScale : _portraitSonarScale;
+		if (!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
+		{
+			return _landscaleSonarScale;
+		}
+		return _portraitSonarScale;
 	}
 
 	public float GetSonarFov()
@@ -383,6 +354,10 @@ public class ExploreMapRoot : MonoBehaviour
 		{
 			return _portraitSonarFov;
 		}
-		return (!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait) ? _landscapeSonarFov : _portraitSonarFov;
+		if (!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
+		{
+			return _landscapeSonarFov;
+		}
+		return _portraitSonarFov;
 	}
 }

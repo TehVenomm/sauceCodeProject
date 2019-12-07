@@ -22,7 +22,7 @@ public class MetaAI
 		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Count; j < count; j++)
 		{
 			Player player = MonoBehaviourSingleton<StageObjectManager>.I.playerList[j] as Player;
-			if (object.ReferenceEquals(player, null))
+			if ((object)player == null)
 			{
 				continue;
 			}
@@ -57,7 +57,7 @@ public class MetaAI
 		}
 		for (int k = 0; k < 8; k++)
 		{
-			if (!object.ReferenceEquals(needRescuePlayer[k], null))
+			if ((object)needRescuePlayer[k] != null)
 			{
 				OnRescuePlayer(needRescuePlayer[k]);
 			}

@@ -19,12 +19,12 @@ public class Coop_Model_StagePlayerPop : Coop_Model_Base
 
 	public override string ToString()
 	{
-		string empty = string.Empty;
-		empty = empty + ",sid=" + sid;
-		empty = empty + ",isSelf=" + isSelf;
-		empty = empty + ",charaInfo=" + charaInfo;
-		empty = empty + ",extentionInfo=" + extentionInfo;
-		empty = empty + ",transferInfo=" + transferInfo;
-		return base.ToString() + empty;
+		string arg = "";
+		arg = arg + ",sid=" + sid;
+		arg = arg + ",isSelf=" + isSelf.ToString();
+		arg = arg + ",charaInfo=" + charaInfo;
+		arg = arg + ",extentionInfo=" + extentionInfo;
+		arg = arg + ",transferInfo=" + transferInfo;
+		return base.ToString() + arg;
 	}
 }

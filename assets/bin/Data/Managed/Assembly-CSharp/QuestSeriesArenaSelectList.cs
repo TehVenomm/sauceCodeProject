@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -66,7 +65,7 @@ public class QuestSeriesArenaSelectList : QuestSeriesArenaEventList
 	{
 		eventData = MonoBehaviourSingleton<QuestManager>.I._GetEventData(eventId);
 		seriesArenaTopData = MonoBehaviourSingleton<DeliveryManager>.I.FindSeriesArenaTopData();
-		yield return this.StartCoroutine(LoadSeriesArenaTopBanner());
+		yield return StartCoroutine(LoadSeriesArenaTopBanner());
 		GetDeliveryList();
 		EndInitialize();
 	}
@@ -96,8 +95,7 @@ public class QuestSeriesArenaSelectList : QuestSeriesArenaEventList
 		}
 		deliveryList.Sort(new SeriesArenaSort());
 		int num = 0;
-		int count = stories.Count;
-		if (count > 0)
+		if (stories.Count > 0)
 		{
 			num++;
 		}
@@ -112,18 +110,23 @@ public class QuestSeriesArenaSelectList : QuestSeriesArenaEventList
 			questStartIndex++;
 		}
 		Transform ctrl = GetCtrl(UI.TBL_DELIVERY_QUEST);
-		if (Object.op_Implicit(ctrl))
+		if ((bool)ctrl)
 		{
 			int l = 0;
-			for (int childCount = ctrl.get_childCount(); l < childCount; l++)
+			for (int childCount = ctrl.childCount; l < childCount; l++)
 			{
 				Transform child = ctrl.GetChild(0);
-				child.set_parent(null);
-				Object.Destroy(child.get_gameObject());
+				child.parent = null;
+				Object.Destroy(child.gameObject);
 			}
 		}
-		bool flag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, reset: false, delegate(int i, Transform parent)
+		if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
+		{
+			_ = MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
+		}
+		else
+			_ = 0;
+		SetTable(UI.TBL_DELIVERY_QUEST, "", num2, reset: false, delegate(int i, Transform parent)
 		{
 			Transform result = null;
 			if (i >= questStartIndex)
@@ -150,8 +153,7 @@ public class QuestSeriesArenaSelectList : QuestSeriesArenaEventList
 				}
 			}
 		});
-		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-		component.set_enabled(true);
+		GetComponent<UIScrollView>(UI.SCR_DELIVERY_QUEST).enabled = true;
 		RepositionTable();
 	}
 
@@ -191,7 +193,7 @@ public class QuestSeriesArenaSelectList : QuestSeriesArenaEventList
 		QuestRequestItemSeriesArena questRequestItemSeriesArena = t.GetComponent<QuestRequestItemSeriesArena>();
 		if (questRequestItemSeriesArena == null)
 		{
-			questRequestItemSeriesArena = t.get_gameObject().AddComponent<QuestRequestItemSeriesArena>();
+			questRequestItemSeriesArena = t.gameObject.AddComponent<QuestRequestItemSeriesArena>();
 		}
 		questRequestItemSeriesArena.InitUI();
 		questRequestItemSeriesArena.Setup(t, info);
@@ -206,9 +208,9 @@ public class QuestSeriesArenaSelectList : QuestSeriesArenaEventList
 	{
 		int index = (int)GameSection.GetEventData();
 		DeliveryTable.DeliveryData data = deliveryList[index].data;
-		bool flag = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)data.id);
+		bool num = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)data.id);
 		Delivery notClearDelivery = GetNotClearDelivery(data.id);
-		if (flag)
+		if (num)
 		{
 			changeToDeliveryClearEvent = true;
 			bool is_tutorial = !TutorialStep.HasFirstDeliveryCompleted();

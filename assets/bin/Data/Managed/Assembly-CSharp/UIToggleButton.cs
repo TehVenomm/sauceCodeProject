@@ -11,20 +11,15 @@ public class UIToggleButton : MonoBehaviour
 
 	public Action<bool> onChanged;
 
-	public UIToggleButton()
-		: this()
-	{
-	}
-
 	public void Initialize()
 	{
 		if (!(activeButton == null) && !(inactiveButton == null))
 		{
 			EventDelegate item = new EventDelegate(OnChange);
-			activeButton.get_gameObject().SetActive(isActive);
+			activeButton.gameObject.SetActive(isActive);
 			activeButton.onClick.Clear();
 			activeButton.onClick.Add(item);
-			inactiveButton.get_gameObject().SetActive(!isActive);
+			inactiveButton.gameObject.SetActive(!isActive);
 			inactiveButton.onClick.Clear();
 			inactiveButton.onClick.Add(item);
 		}
@@ -35,11 +30,11 @@ public class UIToggleButton : MonoBehaviour
 		isActive = !isActive;
 		if (activeButton != null)
 		{
-			activeButton.get_gameObject().SetActive(isActive);
+			activeButton.gameObject.SetActive(isActive);
 		}
 		if (inactiveButton != null)
 		{
-			inactiveButton.get_gameObject().SetActive(!isActive);
+			inactiveButton.gameObject.SetActive(!isActive);
 		}
 	}
 

@@ -16,12 +16,13 @@ public class ManualCoroutineList
 		while (true)
 		{
 			int num = list.FindIndex((ManualCoroutine o) => o.id == id);
-			if (num == -1)
+			if (num != -1)
 			{
-				break;
+				list[num].Clear();
+				list.RemoveAt(num);
+				continue;
 			}
-			list[num].Clear();
-			list.RemoveAt(num);
+			break;
 		}
 	}
 
@@ -86,7 +87,7 @@ public class ManualCoroutineList
 		{
 			if (o.id == id && o.active && o.isEnabled)
 			{
-				count++;
+				int num = ++count;
 			}
 		});
 		return count;

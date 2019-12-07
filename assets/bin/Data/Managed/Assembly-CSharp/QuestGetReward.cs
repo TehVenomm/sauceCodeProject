@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -74,14 +73,14 @@ public class QuestGetReward : GameSection
 	{
 		if (reward == null)
 		{
-			SetActive((Enum)UI.OBJ_FRAME, is_visible: false);
+			SetActive(UI.OBJ_FRAME, is_visible: false);
 			return;
 		}
-		SetFullScreenButton((Enum)UI.BTN_CENTER);
-		SetActive((Enum)UI.OBJ_FRAME, is_visible: true);
-		SetLabelText((Enum)UI.LBL_GOLD, reward.money.ToString("N0"));
-		SetLabelText((Enum)UI.LBL_CRYSTAL, reward.crystal.ToString("N0"));
-		SetLabelText((Enum)UI.LBL_EXP, reward.exp.ToString("N0"));
+		SetFullScreenButton(UI.BTN_CENTER);
+		SetActive(UI.OBJ_FRAME, is_visible: true);
+		SetLabelText(UI.LBL_GOLD, reward.money.ToString("N0"));
+		SetLabelText(UI.LBL_CRYSTAL, reward.crystal.ToString("N0"));
+		SetLabelText(UI.LBL_EXP, reward.exp.ToString("N0"));
 		int num = (reward.crystal > 0) ? 1 : 0;
 		int num2 = reward.item.Count + reward.equipItem.Count + reward.skillItem.Count + reward.accessoryItem.Count + num;
 		int num3 = num + reward.item.Count;
@@ -135,7 +134,7 @@ public class QuestGetReward : GameSection
 				data[j].rarity = equipItemData.rarity;
 				data[j].element = equipItemData.GetTargetElementPriorityToTable();
 				data[j].magi_enable_equip_type = null;
-				data[j].num = ((equipItem.num != 1) ? equipItem.num : (-1));
+				data[j].num = ((equipItem.num == 1) ? (-1) : equipItem.num);
 				data[j].enemy_icon_id = 0;
 				data[j].enemy_icon_id2 = 0;
 				data[j].getType = equipItemData.getType;
@@ -152,7 +151,7 @@ public class QuestGetReward : GameSection
 				data[j].rarity = skillItemData.rarity;
 				data[j].element = ELEMENT_TYPE.MAX;
 				data[j].magi_enable_equip_type = skillItemData.GetEnableEquipType();
-				data[j].num = ((skillItem.num != 1) ? skillItem.num : (-1));
+				data[j].num = ((skillItem.num == 1) ? (-1) : skillItem.num);
 				data[j].enemy_icon_id = 0;
 				data[j].enemy_icon_id2 = 0;
 				data[j].getType = GET_TYPE.PAY;
@@ -169,13 +168,13 @@ public class QuestGetReward : GameSection
 				data[j].rarity = data2.rarity;
 				data[j].element = ELEMENT_TYPE.MAX;
 				data[j].magi_enable_equip_type = null;
-				data[j].num = ((accessoryItem.num != 1) ? accessoryItem.num : (-1));
+				data[j].num = ((accessoryItem.num == 1) ? (-1) : accessoryItem.num);
 				data[j].enemy_icon_id = 0;
 				data[j].enemy_icon_id2 = 0;
 				data[j].getType = data2.getType;
 			}
 		}
-		SetGrid(UI.GRD_ICON, string.Empty, num2, reset: false, delegate(int i, Transform t, bool is_recycle)
+		SetGrid(UI.GRD_ICON, "", num2, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
 			ItemIcon itemIcon = ItemIcon.Create(data[i].icon_type, data[i].icon_id, data[i].rarity, t, data[i].element, data[i].magi_enable_equip_type, data[i].num, "REWARD", i, is_new: false, -1, is_select: false, null, is_equipping: false, data[i].enemy_icon_id, data[i].enemy_icon_id2, disable_rarity_text: false, data[i].getType);
 			SetMaterialInfo(itemIcon.transform, data[i].reward_type, data[i].item_id);

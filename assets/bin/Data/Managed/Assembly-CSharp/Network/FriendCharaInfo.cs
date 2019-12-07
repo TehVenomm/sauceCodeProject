@@ -12,7 +12,7 @@ namespace Network
 
 			public int targetParam;
 
-			public string conditionParam = string.Empty;
+			public string conditionParam = "";
 		}
 
 		public bool following;

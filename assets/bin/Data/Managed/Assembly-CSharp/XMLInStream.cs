@@ -77,7 +77,7 @@ public class XMLInStream
 				return this;
 			}
 		}
-		Debug.LogError((object)("No child node named: " + tag + " in node " + current.tag));
+		Debug.LogError("No child node named: " + tag + " in node " + current.tag);
 		return null;
 	}
 
@@ -85,7 +85,7 @@ public class XMLInStream
 	{
 		if (current.parent == null)
 		{
-			Debug.LogError((object)("No parent node for tag: " + current.tag));
+			Debug.LogError("No parent node for tag: " + current.tag);
 			return null;
 		}
 		current = current.parent;
@@ -163,14 +163,14 @@ public class XMLInStream
 			{
 				Content(out value6);
 			}
-			value6 = value6.Replace("[", string.Empty).Replace("]", string.Empty);
+			value6 = value6.Replace("[", "").Replace("]", "");
 			string[] array = value6.Split(',');
 			value2 = (float)GetDouble(array[0]);
 			value3 = (float)GetDouble(array[1]);
 			value4 = (float)GetDouble(array[2]);
 			value5 = (float)GetDouble(array[3]);
 		}
-		value._002Ector(value2, value3, value4, value5);
+		value = new Color(value2, value3, value4, value5);
 		return this;
 	}
 
@@ -203,12 +203,12 @@ public class XMLInStream
 			{
 				Content(out value4);
 			}
-			value4 = value4.Replace("[", string.Empty).Replace("]", string.Empty).Replace(" ", string.Empty);
+			value4 = value4.Replace("[", "").Replace("]", "").Replace(" ", "");
 			string[] array = value4.Split(',');
 			value2 = (float)GetDouble(array[0]);
 			value3 = (float)GetDouble(array[1]);
 		}
-		value._002Ector(value2, value3);
+		value = new Vector2(value2, value3);
 		return this;
 	}
 
@@ -242,13 +242,13 @@ public class XMLInStream
 			{
 				Content(out value5);
 			}
-			value5 = value5.Replace("[", string.Empty).Replace("]", string.Empty).Replace(" ", string.Empty);
+			value5 = value5.Replace("[", "").Replace("]", "").Replace(" ", "");
 			string[] array = value5.Split(',');
 			value2 = (float)GetDouble(array[0]);
 			value3 = (float)GetDouble(array[1]);
 			value4 = (float)GetDouble(array[2]);
 		}
-		value._002Ector(value2, value3, value4);
+		value = new Vector3(value2, value3, value4);
 		return this;
 	}
 
@@ -284,14 +284,14 @@ public class XMLInStream
 			{
 				Content(out value6);
 			}
-			value6 = value6.Replace("[", string.Empty).Replace("]", string.Empty);
+			value6 = value6.Replace("[", "").Replace("]", "");
 			string[] array = value6.Split(',');
 			value2 = (float)GetDouble(array[0]);
 			value3 = (float)GetDouble(array[1]);
 			value4 = (float)GetDouble(array[2]);
 			value5 = (float)GetDouble(array[3]);
 		}
-		value._002Ector(value2, value3, value4, value5);
+		value = new Quaternion(value2, value3, value4, value5);
 		return this;
 	}
 
@@ -327,14 +327,14 @@ public class XMLInStream
 			{
 				Content(out value6);
 			}
-			value6 = value6.Replace("[", string.Empty).Replace("]", string.Empty);
+			value6 = value6.Replace("[", "").Replace("]", "");
 			string[] array = value6.Split(',');
 			value2 = (float)GetDouble(array[0]);
 			value3 = (float)GetDouble(array[1]);
 			value4 = (float)GetDouble(array[2]);
 			value5 = (float)GetDouble(array[3]);
 		}
-		value._002Ector(value2, value3, value4, value5);
+		value = new Vector4(value2, value3, value4, value5);
 		return this;
 	}
 
@@ -370,14 +370,14 @@ public class XMLInStream
 			{
 				Content(out value6);
 			}
-			value6 = value6.Replace("[", string.Empty).Replace("]", string.Empty);
+			value6 = value6.Replace("[", "").Replace("]", "");
 			string[] array = value6.Split(',');
 			value2 = (float)GetDouble(array[0]);
 			value3 = (float)GetDouble(array[1]);
 			value4 = (float)GetDouble(array[2]);
 			value5 = (float)GetDouble(array[3]);
 		}
-		value._002Ector(value2, value3, value4, value5);
+		value = new Rect(value2, value3, value4, value5);
 		return this;
 	}
 
@@ -533,7 +533,7 @@ public class XMLInStream
 		{
 			return current.attributes[name];
 		}
-		Debug.LogError((object)("Attribute " + name + " don't exist in node " + current.tag));
+		Debug.LogError("Attribute " + name + " don't exist in node " + current.tag);
 		return null;
 	}
 

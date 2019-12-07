@@ -13,8 +13,7 @@ public class ClanCreateDialog : ClanSettings
 
 	private void OnQuery_ClanCreateConfirmDialog_YES()
 	{
-		int crystal = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
-		if (crystal < MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.CLAN_CREATE_COST)
+		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal < MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.CLAN_CREATE_COST)
 		{
 			GameSection.ChangeEvent("COST_ERROR");
 			return;

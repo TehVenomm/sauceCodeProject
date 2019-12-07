@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class ClanAnnounce : LoungeAnnounce
 {
@@ -13,7 +14,7 @@ public class ClanAnnounce : LoungeAnnounce
 
 	public override void Play(ANNOUNCE_TYPE type, string userName, Action onComplete)
 	{
-		SetActive((Enum)UI.WGT_ANCHOR_POINT, is_visible: true);
+		SetActive(UI.WGT_ANCHOR_POINT, is_visible: true);
 		if (widget == null || tweenCtrl == null)
 		{
 			if (onComplete != null)
@@ -27,25 +28,25 @@ public class ClanAnnounce : LoungeAnnounce
 		case ANNOUNCE_TYPE.CREATED_PARTY:
 		{
 			string text3 = StringTable.Get(STRING_CATEGORY.CLAN, 0u);
-			SetLabelText((Enum)UI.LBL_ANNOUNCE, text3);
+			SetLabelText(UI.LBL_ANNOUNCE, text3);
 			break;
 		}
 		case ANNOUNCE_TYPE.JOIN_LOUNGE:
 		{
 			string text2 = StringTable.Get(STRING_CATEGORY.CLAN, 1u);
-			SetLabelText((Enum)UI.LBL_ANNOUNCE, text2);
+			SetLabelText(UI.LBL_ANNOUNCE, text2);
 			break;
 		}
 		case ANNOUNCE_TYPE.LEAVED_LOUNGE:
 		{
 			string text = StringTable.Get(STRING_CATEGORY.CLAN, 2u);
-			SetLabelText((Enum)UI.LBL_ANNOUNCE, text);
+			SetLabelText(UI.LBL_ANNOUNCE, text);
 			break;
 		}
 		}
-		SetLabelText((Enum)UI.LBL_USER_NAME, userName);
-		SetFontStyle((Enum)UI.LBL_ANNOUNCE, 2);
-		SetFontStyle((Enum)UI.LBL_USER_NAME, 2);
+		SetLabelText(UI.LBL_USER_NAME, userName);
+		SetFontStyle(UI.LBL_ANNOUNCE, FontStyle.Italic);
+		SetFontStyle(UI.LBL_USER_NAME, FontStyle.Italic);
 		tweenCtrl.Reset();
 		tweenCtrl.Play(forward: true, delegate
 		{

@@ -1,7 +1,6 @@
 using Network;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class NpcLevelSpecialTable : Singleton<NpcLevelSpecialTable>, IDataTable
 {
@@ -19,10 +18,10 @@ public class NpcLevelSpecialTable : Singleton<NpcLevelSpecialTable>, IDataTable
 		public static bool cb_special(CSVReader csv, NpcLevelSpecialData data, ref uint key1)
 		{
 			data.id = key1;
-			string value = string.Empty;
+			string value = "";
 			csv.Pop(ref value);
 			data.npcids = TableUtility.ParseStringToIntArray(value);
-			value = string.Empty;
+			value = "";
 			csv.Pop(ref value);
 			data.questids = TableUtility.ParseStringToIntArray(value);
 			csv.Pop(ref data.lv);
@@ -98,9 +97,6 @@ public class NpcLevelSpecialTable : Singleton<NpcLevelSpecialTable>, IDataTable
 	}
 
 	private UIntKeyTable<NpcLevelSpecialData> dataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<NpcLevelSpecialData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string csv_text)
 	{

@@ -6,7 +6,7 @@ public class DebugScene : GameSection
 	{
 		if (MonoBehaviourSingleton<HomeManager>.IsValid())
 		{
-			Object.Destroy(MonoBehaviourSingleton<HomeManager>.I.get_gameObject());
+			Object.Destroy(MonoBehaviourSingleton<HomeManager>.I.gameObject);
 		}
 		base.Initialize();
 	}

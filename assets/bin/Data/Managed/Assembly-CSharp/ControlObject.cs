@@ -6,13 +6,11 @@ public class ControlObject : DisableNotifyMonoBehaviour
 	{
 		get
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			return base._transform.get_position();
+			return base._transform.position;
 		}
 		set
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			base._transform.set_position(value);
+			base._transform.position = value;
 		}
 	}
 
@@ -20,13 +18,11 @@ public class ControlObject : DisableNotifyMonoBehaviour
 	{
 		get
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			return base._transform.get_rotation();
+			return base._transform.rotation;
 		}
 		set
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			base._transform.set_rotation(value);
+			base._transform.rotation = value;
 		}
 	}
 
@@ -34,13 +30,11 @@ public class ControlObject : DisableNotifyMonoBehaviour
 	{
 		get
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			return base._transform.get_forward();
+			return base._transform.forward;
 		}
 		set
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			base._transform.set_forward(value);
+			base._transform.forward = value;
 		}
 	}
 
@@ -48,13 +42,11 @@ public class ControlObject : DisableNotifyMonoBehaviour
 	{
 		get
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			return base._transform.get_right();
+			return base._transform.right;
 		}
 		set
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			base._transform.set_right(value);
+			base._transform.right = value;
 		}
 	}
 
@@ -62,19 +54,16 @@ public class ControlObject : DisableNotifyMonoBehaviour
 	{
 		get
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			return base._transform.get_up();
+			return base._transform.up;
 		}
 		set
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			base._transform.set_up(value);
+			base._transform.up = value;
 		}
 	}
 
 	public virtual void _LookAt(Vector3 pos)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		base._transform.LookAt(pos);
 	}
 }

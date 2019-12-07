@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 
 public class AbilityItemLotTable : Singleton<AbilityItemLotTable>, IDataTable
 {
@@ -35,8 +34,7 @@ public class AbilityItemLotTable : Singleton<AbilityItemLotTable>, IDataTable
 		{
 			data.id = key;
 			csv_reader.Pop(ref data.itemId);
-			CSVReader.PopResult result = csv_reader.PopEnum(ref data.abilityType, ABILITY_TYPE.NONE);
-			if (!CSVReader.PopResult.IsParseSucceeded(result))
+			if (!CSVReader.PopResult.IsParseSucceeded(csv_reader.PopEnum(ref data.abilityType, ABILITY_TYPE.NONE)))
 			{
 				data.abilityType = ABILITY_TYPE.NEED_UPDATE;
 			}
@@ -58,12 +56,6 @@ public class AbilityItemLotTable : Singleton<AbilityItemLotTable>, IDataTable
 	public const int INFO_MAX = 3;
 
 	private UIntKeyTable<AbilityItemLot> abilityItemLot;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<AbilityItemLot> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<AbilityItemLot> _003C_003Ef__mg_0024cache1;
 
 	public void CreateTable(string csv_text)
 	{

@@ -138,7 +138,7 @@ public class FriendSeriesArenaRanking : FollowListBase
 	{
 		nowPage = 0;
 		eventData = MonoBehaviourSingleton<DeliveryManager>.I.FindSeriesArenaTopData();
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	public override void UpdateUI()
@@ -195,23 +195,21 @@ public class FriendSeriesArenaRanking : FollowListBase
 		yield return GetCurrentCarnivalStatus();
 		yield return GetBorderInfo();
 		SetSelfInfo();
-		SetActive((Enum)UI.BTN_BORDER, is_visible: false);
-		SetActive((Enum)UI.BTN_TOP_PLAYER, is_visible: true);
-		SetActive((Enum)UI.BTN_FOLLOWER, is_visible: true);
-		SetActive((Enum)UI.SPR_INACTIVE_BORDER, is_visible: true);
-		SetActive((Enum)UI.SPR_INACTIVE_TOP_PLAYER, is_visible: false);
-		SetActive((Enum)UI.SPR_INACTIVE_FOLLOWER, is_visible: false);
+		SetActive(UI.BTN_BORDER, is_visible: false);
+		SetActive(UI.BTN_TOP_PLAYER, is_visible: true);
+		SetActive(UI.BTN_FOLLOWER, is_visible: true);
+		SetActive(UI.SPR_INACTIVE_BORDER, is_visible: true);
+		SetActive(UI.SPR_INACTIVE_TOP_PLAYER, is_visible: false);
+		SetActive(UI.SPR_INACTIVE_FOLLOWER, is_visible: false);
 		currentTab = RANKING_TAB.NONE;
 		ChangeTab(RANKING_TAB.BORDER);
-		SetLabelText((Enum)UI.LBL_EVENT_NAME, currentCarnivalData.eventName);
+		SetLabelText(UI.LBL_EVENT_NAME, currentCarnivalData.eventName);
 		isInitializeSend = false;
 		base.Initialize();
 	}
 
 	private void SetSelfInfo()
 	{
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
 		UserInfo userInfo = MonoBehaviourSingleton<UserInfoManager>.I.userInfo;
 		UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
 		Transform ctrl = GetCtrl(UI.ROOT_MYSCORE);
@@ -228,15 +226,15 @@ public class FriendSeriesArenaRanking : FollowListBase
 		if (target != currentTab)
 		{
 			bool flag = target == RANKING_TAB.BORDER;
-			SetActive((Enum)UI.OBJ_FULL_LIST, !flag);
-			SetActive((Enum)UI.OBJ_BORDER_LIST, flag);
+			SetActive(UI.OBJ_FULL_LIST, !flag);
+			SetActive(UI.OBJ_BORDER_LIST, flag);
 			ResetScroll(flag);
 			ChangeRankingTabButtonEnabled(target);
 			ChangeTitle(target);
 			ChangeRankData(target);
-			SetActive((Enum)UI.SPR_HEADER_BORDER, target == RANKING_TAB.BORDER);
-			SetActive((Enum)UI.SPR_HEADER_TOP_PLAYER, target == RANKING_TAB.TOP_PLAYER);
-			SetActive((Enum)UI.SPR_HEADER_FOLLOWER, target == RANKING_TAB.FOLLOWER);
+			SetActive(UI.SPR_HEADER_BORDER, target == RANKING_TAB.BORDER);
+			SetActive(UI.SPR_HEADER_TOP_PLAYER, target == RANKING_TAB.TOP_PLAYER);
+			SetActive(UI.SPR_HEADER_FOLLOWER, target == RANKING_TAB.FOLLOWER);
 			currentTab = target;
 		}
 	}
@@ -261,51 +259,51 @@ public class FriendSeriesArenaRanking : FollowListBase
 	{
 		if (currentTab == RANKING_TAB.BORDER)
 		{
-			SetActive((Enum)UI.BTN_BORDER, is_visible: true);
-			SetActive((Enum)UI.SPR_INACTIVE_BORDER, is_visible: false);
+			SetActive(UI.BTN_BORDER, is_visible: true);
+			SetActive(UI.SPR_INACTIVE_BORDER, is_visible: false);
 		}
 		else if (currentTab == RANKING_TAB.TOP_PLAYER)
 		{
-			SetActive((Enum)UI.BTN_TOP_PLAYER, is_visible: true);
-			SetActive((Enum)UI.SPR_INACTIVE_TOP_PLAYER, is_visible: false);
+			SetActive(UI.BTN_TOP_PLAYER, is_visible: true);
+			SetActive(UI.SPR_INACTIVE_TOP_PLAYER, is_visible: false);
 		}
 		else if (currentTab == RANKING_TAB.FOLLOWER)
 		{
-			SetActive((Enum)UI.BTN_FOLLOWER, is_visible: true);
-			SetActive((Enum)UI.SPR_INACTIVE_FOLLOWER, is_visible: false);
+			SetActive(UI.BTN_FOLLOWER, is_visible: true);
+			SetActive(UI.SPR_INACTIVE_FOLLOWER, is_visible: false);
 		}
 		switch (target)
 		{
 		case RANKING_TAB.BORDER:
-			SetActive((Enum)UI.BTN_BORDER, is_visible: false);
-			SetActive((Enum)UI.SPR_INACTIVE_BORDER, is_visible: true);
+			SetActive(UI.BTN_BORDER, is_visible: false);
+			SetActive(UI.SPR_INACTIVE_BORDER, is_visible: true);
 			break;
 		case RANKING_TAB.TOP_PLAYER:
-			SetActive((Enum)UI.BTN_TOP_PLAYER, is_visible: false);
-			SetActive((Enum)UI.SPR_INACTIVE_TOP_PLAYER, is_visible: true);
+			SetActive(UI.BTN_TOP_PLAYER, is_visible: false);
+			SetActive(UI.SPR_INACTIVE_TOP_PLAYER, is_visible: true);
 			break;
 		case RANKING_TAB.FOLLOWER:
-			SetActive((Enum)UI.BTN_FOLLOWER, is_visible: false);
-			SetActive((Enum)UI.SPR_INACTIVE_FOLLOWER, is_visible: true);
+			SetActive(UI.BTN_FOLLOWER, is_visible: false);
+			SetActive(UI.SPR_INACTIVE_FOLLOWER, is_visible: true);
 			break;
 		}
 	}
 
 	private void ChangeTitle(RANKING_TAB target)
 	{
-		SetActive((Enum)UI.SPR_TITLE_BORDER, is_visible: false);
-		SetActive((Enum)UI.SPR_TITLE_TOP_PLAYER, is_visible: false);
-		SetActive((Enum)UI.SPR_TITLE_FOLLOWER, is_visible: false);
+		SetActive(UI.SPR_TITLE_BORDER, is_visible: false);
+		SetActive(UI.SPR_TITLE_TOP_PLAYER, is_visible: false);
+		SetActive(UI.SPR_TITLE_FOLLOWER, is_visible: false);
 		switch (target)
 		{
 		case RANKING_TAB.BORDER:
-			SetActive((Enum)UI.SPR_TITLE_BORDER, is_visible: true);
+			SetActive(UI.SPR_TITLE_BORDER, is_visible: true);
 			break;
 		case RANKING_TAB.TOP_PLAYER:
-			SetActive((Enum)UI.SPR_TITLE_TOP_PLAYER, is_visible: true);
+			SetActive(UI.SPR_TITLE_TOP_PLAYER, is_visible: true);
 			break;
 		default:
-			SetActive((Enum)UI.SPR_TITLE_FOLLOWER, is_visible: true);
+			SetActive(UI.SPR_TITLE_FOLLOWER, is_visible: true);
 			break;
 		}
 	}
@@ -316,7 +314,7 @@ public class FriendSeriesArenaRanking : FollowListBase
 		uIScrollView = ((!isBorder) ? GetCtrl(UI.SCR_LIST).GetComponent<UIScrollView>() : GetCtrl(UI.SCR_BORDER_LIST).GetComponent<UIScrollView>());
 		if (uIScrollView != null)
 		{
-			uIScrollView.set_enabled(true);
+			uIScrollView.enabled = true;
 			uIScrollView.ResetPosition();
 		}
 	}
@@ -359,13 +357,12 @@ public class FriendSeriesArenaRanking : FollowListBase
 
 	private void UpdateBorderList()
 	{
-		DegreePlate component = GetCtrl(UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds, isButton: false, null);
-		SetDynamicList((Enum)UI.GRD_BORDER_LIST, "FriendSeriesArenaBorderListItem", currentRankData.Count, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		GetCtrl(UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>().Initialize(MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds, isButton: false, null);
+		SetDynamicList(UI.GRD_BORDER_LIST, "FriendSeriesArenaBorderListItem", currentRankData.Count, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			SetBorderItem(i, t, currentRankData[i]);
 		});
-		SetActive((Enum)UI.STR_BORDER_NON_LIST, currentRankData.Count <= 0);
+		SetActive(UI.STR_BORDER_NON_LIST, currentRankData.Count <= 0);
 		ResetScroll(isBorder: true);
 	}
 
@@ -388,7 +385,7 @@ public class FriendSeriesArenaRanking : FollowListBase
 		if (topPlayerInfo == null)
 		{
 			GameSection.StayEvent();
-			this.StartCoroutine(GetTopPlayerInfo(delegate
+			StartCoroutine(GetTopPlayerInfo(delegate
 			{
 				ChangeTab(RANKING_TAB.TOP_PLAYER);
 				GameSection.ResumeEvent(is_resume: true);
@@ -404,8 +401,7 @@ public class FriendSeriesArenaRanking : FollowListBase
 
 	protected virtual void OnQuery_INFO_REWARD()
 	{
-		string text = string.Format(WebViewManager.NewsWithLinkParamFormat, eventData.linkName);
-		GameSection.SetEventData(text);
+		GameSection.SetEventData(string.Format(WebViewManager.NewsWithLinkParamFormat, eventData.linkName));
 	}
 
 	private void OnQuery_FOLLOWER()
@@ -413,7 +409,7 @@ public class FriendSeriesArenaRanking : FollowListBase
 		if (followerRankInfo == null)
 		{
 			GameSection.StayEvent();
-			this.StartCoroutine(GetFollowerInfo(delegate
+			StartCoroutine(GetFollowerInfo(delegate
 			{
 				ChangeTab(RANKING_TAB.FOLLOWER);
 				GameSection.ResumeEvent(is_resume: true);
@@ -430,14 +426,13 @@ public class FriendSeriesArenaRanking : FollowListBase
 	private IEnumerator GetCurrentCarnivalStatus()
 	{
 		bool isRequest = true;
-		Protocol.Send<QuestCarnivalPointModel.RequestSendForm, QuestCarnivalPointModel>(postData: new QuestCarnivalPointModel.RequestSendForm
-		{
-			eid = MonoBehaviourSingleton<DeliveryManager>.I.FindSeriesArenaTopData().eventId
-		}, url: QuestCarnivalPointModel.URL, callBack: (Action<QuestCarnivalPointModel>)delegate(QuestCarnivalPointModel result)
+		QuestCarnivalPointModel.RequestSendForm requestSendForm = new QuestCarnivalPointModel.RequestSendForm();
+		requestSendForm.eid = MonoBehaviourSingleton<DeliveryManager>.I.FindSeriesArenaTopData().eventId;
+		Protocol.Send(QuestCarnivalPointModel.URL, requestSendForm, delegate(QuestCarnivalPointModel result)
 		{
 			isRequest = false;
 			currentCarnivalData = result.result;
-		}, getParam: string.Empty);
+		});
 		while (isRequest)
 		{
 			yield return null;
@@ -447,15 +442,14 @@ public class FriendSeriesArenaRanking : FollowListBase
 	private IEnumerator GetTopPlayerInfo(Action callBack)
 	{
 		bool isRequest = true;
-		Protocol.Send<CarnivalTopRankingModel.RequestSendForm, CarnivalTopRankingModel>(postData: new CarnivalTopRankingModel.RequestSendForm
-		{
-			num = 100,
-			sa = 1
-		}, url: CarnivalTopRankingModel.URL, callBack: (Action<CarnivalTopRankingModel>)delegate(CarnivalTopRankingModel result)
+		CarnivalTopRankingModel.RequestSendForm requestSendForm = new CarnivalTopRankingModel.RequestSendForm();
+		requestSendForm.num = 100;
+		requestSendForm.sa = 1;
+		Protocol.Send(CarnivalTopRankingModel.URL, requestSendForm, delegate(CarnivalTopRankingModel result)
 		{
 			isRequest = false;
 			topPlayerInfo = result.result;
-		}, getParam: string.Empty);
+		});
 		while (isRequest)
 		{
 			yield return null;
@@ -466,14 +460,13 @@ public class FriendSeriesArenaRanking : FollowListBase
 	private IEnumerator GetFollowerInfo(Action callBack)
 	{
 		bool isRequest = true;
-		Protocol.Send<CarnivalFriendRankingModel.RequestSendForm, CarnivalFriendRankingModel>(postData: new CarnivalFriendRankingModel.RequestSendForm
-		{
-			sa = 1
-		}, url: CarnivalFriendRankingModel.URL, callBack: (Action<CarnivalFriendRankingModel>)delegate(CarnivalFriendRankingModel result)
+		CarnivalFriendRankingModel.RequestSendForm requestSendForm = new CarnivalFriendRankingModel.RequestSendForm();
+		requestSendForm.sa = 1;
+		Protocol.Send(CarnivalFriendRankingModel.URL, requestSendForm, delegate(CarnivalFriendRankingModel result)
 		{
 			isRequest = false;
 			followerRankInfo = result.result;
-		}, getParam: string.Empty);
+		});
 		while (isRequest)
 		{
 			yield return null;
@@ -484,14 +477,13 @@ public class FriendSeriesArenaRanking : FollowListBase
 	private IEnumerator GetBorderInfo()
 	{
 		bool isRequest = true;
-		Protocol.Send<CarnivalBorderRankingModel.RequestSendForm, CarnivalBorderRankingModel>(postData: new CarnivalBorderRankingModel.RequestSendForm
-		{
-			sa = 1
-		}, url: CarnivalBorderRankingModel.URL, callBack: (Action<CarnivalBorderRankingModel>)delegate(CarnivalBorderRankingModel result)
+		CarnivalBorderRankingModel.RequestSendForm requestSendForm = new CarnivalBorderRankingModel.RequestSendForm();
+		requestSendForm.sa = 1;
+		Protocol.Send(CarnivalBorderRankingModel.URL, requestSendForm, delegate(CarnivalBorderRankingModel result)
 		{
 			isRequest = false;
 			borderInfo = result.result;
-		}, getParam: string.Empty);
+		});
 		while (isRequest)
 		{
 			yield return null;

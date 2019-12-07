@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class ArenaTable : Singleton<ArenaTable>, IDataTable
@@ -61,7 +60,7 @@ public class ArenaTable : Singleton<ArenaTable>, IDataTable
 					QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)num2);
 					if (questData == null)
 					{
-						Debug.LogError((object)("ArenaTableに存在しないクエストId: " + questIds[i] + "が設定されています"));
+						Debug.LogError("ArenaTableに存在しないクエストId: " + questIds[i] + "が設定されています");
 					}
 					else
 					{
@@ -80,9 +79,6 @@ public class ArenaTable : Singleton<ArenaTable>, IDataTable
 	public const int CONDITION_NUM = 3;
 
 	private UIntKeyTable<ArenaData> arenaDataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<ArenaData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string csv_text)
 	{

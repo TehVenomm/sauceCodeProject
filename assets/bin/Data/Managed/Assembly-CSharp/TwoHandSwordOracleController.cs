@@ -99,7 +99,11 @@ public class TwoHandSwordOracleController : IWeaponController
 
 	public static bool IsOracleLayerAttackId(int attackId)
 	{
-		return 60 <= attackId && attackId <= 64;
+		if (60 <= attackId)
+		{
+			return attackId <= 64;
+		}
+		return false;
 	}
 
 	public bool IsEnableChangeActionByLongTap()
@@ -123,10 +127,7 @@ public class TwoHandSwordOracleController : IWeaponController
 			{
 				int num = 64;
 				string motionLayerName = owner.GetMotionLayerName(owner.attackMode, owner.spAttackType, num);
-				Player player = owner;
-				int id = num;
-				string motionLayerName2 = motionLayerName;
-				player.ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName2, string.Empty);
+				owner.ActAttack(num, send_packet: true, sync_immediately: false, motionLayerName);
 				return true;
 			}
 		}
@@ -187,11 +188,11 @@ public class TwoHandSwordOracleController : IWeaponController
 			eventData2.id = AnimEventFormat.ID.SE_ONESHOT;
 			eventData2.stringArgs = new string[1]
 			{
-				string.Empty
+				""
 			};
 			eventData2.intArgs = new int[1]
 			{
-				(!isMax) ? oracleActionInfo.normalVernierSeId : oracleActionInfo.maxVernierSeId
+				isMax ? oracleActionInfo.maxVernierSeId : oracleActionInfo.normalVernierSeId
 			};
 			owner.OnAnimEvent(eventData2);
 		}
@@ -237,8 +238,8 @@ public class TwoHandSwordOracleController : IWeaponController
 	{
 		bool flag = isHorizontalAttack;
 		bool flag2 = false;
-		Self self = owner as Self;
-		if (flag && self != null && (!isTapHorizontalAttack || (oracleActionInfo.needHitHorizontal && !isHitHorizontalAttack)))
+		Self x = owner as Self;
+		if (flag && x != null && (!isTapHorizontalAttack || (oracleActionInfo.needHitHorizontal && !isHitHorizontalAttack)))
 		{
 			flag = false;
 		}
@@ -261,7 +262,11 @@ public class TwoHandSwordOracleController : IWeaponController
 		{
 			SetHorizontalNextMotion(flag2);
 		}
-		return flag && self != null;
+		if (flag)
+		{
+			return x != null;
+		}
+		return false;
 	}
 
 	private bool EnableHorizontalNext()
@@ -324,7 +329,7 @@ public class TwoHandSwordOracleController : IWeaponController
 				return 1f * owner.buffParam.GetOracleThsHorizontalSpeedRate();
 			}
 			int num = countHorizontal - 1;
-			InGameSettingsManager.Player.OracleTwoHandSwordActionInfo.HorizontalSpinInfo[] array = (!isHorizontalMax) ? oracleActionInfo.horizontalSpinInfoList : oracleActionInfo.horizontalMaxSpinInfoList;
+			InGameSettingsManager.Player.OracleTwoHandSwordActionInfo.HorizontalSpinInfo[] array = isHorizontalMax ? oracleActionInfo.horizontalMaxSpinInfoList : oracleActionInfo.horizontalSpinInfoList;
 			if (num < array.Length)
 			{
 				return array[num].spinSpeedRate * owner.buffParam.GetOracleThsHorizontalSpeedRate();
@@ -353,7 +358,7 @@ public class TwoHandSwordOracleController : IWeaponController
 			return false;
 		}
 		int num = countHorizontal - 1;
-		InGameSettingsManager.Player.OracleTwoHandSwordActionInfo.HorizontalSpinInfo[] array = (!isHorizontalMax) ? oracleActionInfo.horizontalSpinInfoList : oracleActionInfo.horizontalMaxSpinInfoList;
+		InGameSettingsManager.Player.OracleTwoHandSwordActionInfo.HorizontalSpinInfo[] array = isHorizontalMax ? oracleActionInfo.horizontalMaxSpinInfoList : oracleActionInfo.horizontalSpinInfoList;
 		if (num < array.Length)
 		{
 			value = array[num].damageRate;

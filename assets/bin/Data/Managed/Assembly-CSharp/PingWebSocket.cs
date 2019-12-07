@@ -22,11 +22,6 @@ public class PingWebSocket : MonoBehaviour
 
 	public event Action<double> OnPong;
 
-	public PingWebSocket()
-		: this()
-	{
-	}
-
 	public void Connect(string relayServer)
 	{
 		sock = new WebSocket(new Uri(relayServer));

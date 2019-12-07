@@ -14,26 +14,24 @@ public class MutualFollowFBConnectDialog : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(LoadTopBanner());
+		StartCoroutine(LoadTopBanner());
 		base.Initialize();
 	}
 
 	private IEnumerator LoadTopBanner()
 	{
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.COMMON, "IMG_00000001");
-		if (loadQueue.IsLoading())
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject lo_image = loadingQueue.Load(RESOURCE_CATEGORY.COMMON, "IMG_00000001");
+		if (loadingQueue.IsLoading())
 		{
-			yield return loadQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		if (lo_image.loadedObject == null)
 		{
 			yield return null;
 		}
-		Texture bannerImg = lo_image.loadedObject as Texture;
-		Transform banner = GetCtrl(UI.SPR_MUTUAL_FOLLOW_BANNER);
-		UITexture uiTexture = banner.GetComponent<UITexture>();
-		uiTexture.mainTexture = bannerImg;
+		Texture mainTexture = lo_image.loadedObject as Texture;
+		GetCtrl(UI.SPR_MUTUAL_FOLLOW_BANNER).GetComponent<UITexture>().mainTexture = mainTexture;
 	}
 
 	private void OnQuery_CONNECT()

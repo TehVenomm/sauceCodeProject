@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class SETable : Singleton<SETable>, IDataTable
@@ -62,9 +61,6 @@ public class SETable : Singleton<SETable>, IDataTable
 	}
 
 	public UIntKeyTable<Data> seTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTableFromInternal(string encrypted_csv_text)
 	{

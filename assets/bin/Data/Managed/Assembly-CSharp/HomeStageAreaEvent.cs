@@ -38,12 +38,12 @@ public class HomeStageAreaEvent : HomeStageEventBase
 	protected override void Awake()
 	{
 		base.Awake();
-		_transform = this.get_transform();
-		_collider = this.GetComponent<SphereCollider>();
+		_transform = base.transform;
+		_collider = GetComponent<SphereCollider>();
 		if (!(_collider == null))
 		{
-			defaultRadius = _collider.get_radius();
-			_collider.set_radius(_collider.get_radius() + noticeRange);
+			defaultRadius = _collider.radius;
+			_collider.radius += noticeRange;
 		}
 	}
 }

@@ -97,13 +97,13 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 	{
 		foreach (Coroutine item3 in remainTimeCoroutine)
 		{
-			this.StopCoroutine(item3);
+			StopCoroutine(item3);
 		}
 		remainTimeCoroutine = new List<Coroutine>();
 		if (!(daily < 0f) && !(weekly < 0f))
 		{
-			Coroutine item = this.StartCoroutine(CheckUpdateDeliveryItem(daily));
-			Coroutine item2 = this.StartCoroutine(CheckUpdateDeliveryItem(weekly));
+			Coroutine item = StartCoroutine(CheckUpdateDeliveryItem(daily));
+			Coroutine item2 = StartCoroutine(CheckUpdateDeliveryItem(weekly));
 			remainTimeCoroutine.Add(item);
 			remainTimeCoroutine.Add(item2);
 			dailyUpdateRemainTime = daily;
@@ -113,7 +113,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 
 	private IEnumerator CheckUpdateDeliveryItem(float remainTime)
 	{
-		yield return (object)new WaitForSeconds(remainTime);
+		yield return new WaitForSeconds(remainTime);
 		while (Protocol.isBusy)
 		{
 			yield return null;
@@ -151,7 +151,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 				continue;
 			}
 			DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)delivery[i].dId);
-			if (deliveryTableData == null || deliveryTableData.needs == null || deliveryTableData.needs.Length <= 0)
+			if (deliveryTableData == null || deliveryTableData.needs == null || deliveryTableData.needs.Length == 0)
 			{
 				continue;
 			}
@@ -200,7 +200,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 	public bool IsClearDelivery(uint deliveryId)
 	{
 		CLEAR_STATUS clearStatusDelivery = GetClearStatusDelivery(deliveryId);
-		if (clearStatusDelivery == CLEAR_STATUS.CLEAR || clearStatusDelivery == CLEAR_STATUS.ALL_CLEAR)
+		if ((uint)(clearStatusDelivery - 3) <= 1u)
 		{
 			return true;
 		}
@@ -373,13 +373,9 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 		for (int count = this.delivery.Count; i < count; i++)
 		{
 			Delivery delivery = this.delivery[i];
-			if (delivery.dId != 0)
+			if (delivery.dId != 0 && Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)delivery.dId).eventID == eventId)
 			{
-				DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)delivery.dId);
-				if (deliveryTableData.eventID == eventId)
-				{
-					return false;
-				}
+				return false;
 			}
 		}
 		return true;
@@ -468,7 +464,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 						}
 						if (condition == null || condition(data, deliveryTableData))
 						{
-							num++;
+							int i = ++num;
 						}
 					}
 				}
@@ -596,7 +592,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 			return StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 11u);
 		}
 		TimeSpan timeSpan = dateTime.Subtract(now);
-		StringBuilder stringBuilder = new StringBuilder(string.Empty);
+		StringBuilder stringBuilder = new StringBuilder("");
 		if (timeSpan.Days > 0)
 		{
 			stringBuilder.Append(string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 9u), timeSpan.Days));
@@ -789,9 +785,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 			this.clearStatusDelivery.Add(clearStatusDelivery);
 		}
 		int num2 = clearStatusDelivery.needCount[need_index];
-		List<int> needCount;
-		int index;
-		(needCount = clearStatusDelivery.needCount)[index = need_index] = needCount[index] + add_num;
+		clearStatusDelivery.needCount[need_index] += add_num;
 		if (clearStatusDelivery.needCount[need_index] > (int)deliveryTableData.needs[need_index].needNum)
 		{
 			clearStatusDelivery.needCount[need_index] = (int)deliveryTableData.needs[need_index].needNum;
@@ -894,7 +888,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 				break;
 			}
 			call_back(arg, arg2);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDeliveryUpdate(Action<bool> call_back)
@@ -907,7 +901,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetClearStatusList(List<DELIVERY_CONDITION_TYPE> condiditionTypeList, Action<bool, DeliveryGetClearStatusModel.Param> call_back)
@@ -928,7 +922,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 				arg = true;
 			}
 			call_back(arg, ret.result);
-		}, string.Empty);
+		});
 	}
 
 	public void UpdateClearStatuses(List<ClearStatusDelivery> clearStatusUpdateList)
@@ -952,11 +946,11 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 				CheckCompletableClearStatus(clearStatusDelivery);
 				continue;
 			}
-			bool flag = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(clearStatusDelivery.deliveryId);
+			bool num = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(clearStatusDelivery.deliveryId);
 			clearStatusDelivery2.deliveryId = clearStatusDelivery.deliveryId;
 			clearStatusDelivery2.deliveryStatus = clearStatusDelivery.deliveryStatus;
 			clearStatusDelivery2.needCount = clearStatusDelivery.needCount;
-			if (flag)
+			if (num)
 			{
 				break;
 			}
@@ -976,7 +970,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 				arg = true;
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendEventNormalList(Action<bool> call_back)
@@ -991,7 +985,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 				eventNormalListData = ret.result;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public EventNormalListData GetEventNormalListData(int regionId)
@@ -1026,7 +1020,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 			}
 			isUpdateEventListData = true;
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public bool IsCarnivalEvent(int eventId)
@@ -1077,7 +1071,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDebugSetDeliveryCountByDeliveryId(int deliveryId, int cnt0, int cnt1, int cnt2, int cnt3, int cnt4, Action<bool> call_back)
@@ -1104,7 +1098,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	private void DirtyDelivery()
@@ -1158,12 +1152,12 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 		{
 			diff.update.ForEach(delegate(Delivery data)
 			{
-				Delivery delivery = this.delivery.Find((Delivery list_data) => list_data.uId == data.uId);
-				delivery.uId = data.uId;
-				delivery.dId = data.dId;
-				delivery.type = data.type;
-				delivery.limit = data.limit;
-				delivery.order = data.order;
+				Delivery obj = delivery.Find((Delivery list_data) => list_data.uId == data.uId);
+				obj.uId = data.uId;
+				obj.dId = data.dId;
+				obj.type = data.type;
+				obj.limit = data.limit;
+				obj.order = data.order;
 				bool flag2 = false;
 				if (data.dId != 0)
 				{
@@ -1253,9 +1247,9 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 			DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)data.deliveryId);
 			if (!deliveryTableData.IsStoryDelivery() && deliveryTableData.GetConditionType() != 0 && !IsDefeatFieldConditionType(deliveryTableData.GetConditionType()) && !IsDeliveryArena(deliveryTableData) && MonoBehaviourSingleton<UIAnnounceBand>.IsValid())
 			{
-				string empty = string.Empty;
-				empty = ((!IsDeliveryBingo(deliveryTableData)) ? StringTable.Get(STRING_CATEGORY.DELIVERY_COMPLETE, 1u) : StringTable.Get(STRING_CATEGORY.DELIVERY_COMPLETE, 2u));
-				MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(deliveryTableData.name, empty);
+				string text = "";
+				text = ((!IsDeliveryBingo(deliveryTableData)) ? StringTable.Get(STRING_CATEGORY.DELIVERY_COMPLETE, 1u) : StringTable.Get(STRING_CATEGORY.DELIVERY_COMPLETE, 2u));
+				MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(deliveryTableData.name, text);
 				SoundManager.PlayOneshotJingle(40000030);
 			}
 		}
@@ -1307,7 +1301,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 	{
 		if (m_coroutinePortal == null)
 		{
-			m_coroutinePortal = this.StartCoroutine(CheckPortalOpen());
+			m_coroutinePortal = StartCoroutine(CheckPortalOpen());
 		}
 	}
 
@@ -1322,13 +1316,13 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 		{
 			if (m_coroutine != null)
 			{
-				this.StopCoroutine(m_coroutine);
+				StopCoroutine(m_coroutine);
 			}
 			if (deliveryTableData.IsEvent())
 			{
 				m_compDeliveryId = delivery_id;
 			}
-			m_coroutine = this.StartCoroutine(CheckRequestHomeReturn());
+			m_coroutine = StartCoroutine(CheckRequestHomeReturn());
 		}
 	}
 
@@ -1446,7 +1440,7 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 			}
 			yield return null;
 		}
-		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameMain", this.get_gameObject(), "CLEARED_RETURN");
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameMain", base.gameObject, "CLEARED_RETURN");
 		m_coroutine = null;
 	}
 
@@ -1484,12 +1478,11 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 			if ((FieldManager.IsOpenPortalClearOrder(portalData) || FieldManager.IsOpenPortal(portalData)) && GameSaveData.instance.isNewReleasePortal(portalObjectList[i].portalID))
 			{
 				PortalObject portalObject = portalObjectList[i];
-				portalObjectList[i] = PortalObject.Create(portalObject.portalInfo, portalObject._transform.get_parent());
-				PortalUnlockEvent portalUnlockEvent = MonoBehaviourSingleton<InGameManager>.I.get_gameObject().AddComponent<PortalUnlockEvent>();
-				portalUnlockEvent.AddPortal(portalObjectList[i]);
+				portalObjectList[i] = PortalObject.Create(portalObject.portalInfo, portalObject._transform.parent);
+				MonoBehaviourSingleton<InGameManager>.I.gameObject.AddComponent<PortalUnlockEvent>().AddPortal(portalObjectList[i]);
 				GameSaveData.instance.newReleasePortals.Remove(portalObjectList[i].portalID);
 				MonoBehaviourSingleton<MiniMap>.I.Detach(portalObject);
-				Object.Destroy(portalObject.get_gameObject());
+				UnityEngine.Object.Destroy(portalObject.gameObject);
 				flag = true;
 			}
 		}
@@ -1548,14 +1541,18 @@ public class DeliveryManager : MonoBehaviourSingleton<DeliveryManager>
 		{
 			return true;
 		}
-		return type != DELIVERY_TYPE.ONCE && type != DELIVERY_TYPE.SUB_EVENT;
+		if (type != DELIVERY_TYPE.ONCE)
+		{
+			return type != DELIVERY_TYPE.SUB_EVENT;
+		}
+		return false;
 	}
 
 	public bool IsDefeatFieldConditionType(DELIVERY_CONDITION_TYPE conditionType)
 	{
-		List<DELIVERY_CONDITION_TYPE> list = new List<DELIVERY_CONDITION_TYPE>();
-		list.Add(DELIVERY_CONDITION_TYPE.DEFEAT_FIELD_ENEMY_ID);
-		List<DELIVERY_CONDITION_TYPE> list2 = list;
-		return list2.Contains(conditionType);
+		return new List<DELIVERY_CONDITION_TYPE>
+		{
+			DELIVERY_CONDITION_TYPE.DEFEAT_FIELD_ENEMY_ID
+		}.Contains(conditionType);
 	}
 }

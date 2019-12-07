@@ -29,11 +29,6 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 		private set;
 	}
 
-	public AchievementManager()
-	{
-		equipItemCollectionList = new List<EquipItemCollection>();
-	}
-
 	public List<AchievementCounter> GetAchievementCounterList()
 	{
 		return achievementCounterList;
@@ -94,6 +89,11 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 			return false;
 		}
 		return _GetEquipItemCollection(equipItem.obtained.category)?.CheckBit(equipItem.obtained.flag) ?? false;
+	}
+
+	public AchievementManager()
+	{
+		equipItemCollectionList = new List<EquipItemCollection>();
 	}
 
 	public string GetRewardName(REWARD_TYPE rewardType, uint itemId, uint num, uint param0)
@@ -268,8 +268,8 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 		}
 		if (diff.update != null)
 		{
-			int i;
-			for (i = 0; i < diff.update.Count; i++)
+			int i = 0;
+			while (i < diff.update.Count)
 			{
 				TaskInfo taskInfo = taskInfos.Find((TaskInfo info) => info.taskId == diff.update[i].taskId);
 				MonoBehaviourSingleton<NativeGameService>.I.SetAchievementStep(diff.update[i].taskId, diff.update[i].progress, taskInfo.progress);
@@ -277,10 +277,10 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 				taskInfo.progress = diff.update[i].progress;
 				taskInfo.status = diff.update[i].status;
 				taskInfo.taskId = diff.update[i].taskId;
-				if (taskInfo.status == 2)
-				{
-				}
+				_ = taskInfo.status;
+				_ = 2;
 				flag = true;
+				int num = ++i;
 			}
 		}
 		if (flag)
@@ -299,11 +299,11 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 		while (achievedTask.Count != 0)
 		{
 			TaskInfo taskInfo = achievedTask.Dequeue();
-			TaskTable.TaskData tableData = Singleton<TaskTable>.I.Get((uint)taskInfo.taskId);
-			if (tableData != null)
+			TaskTable.TaskData taskData = Singleton<TaskTable>.I.Get((uint)taskInfo.taskId);
+			if (taskData != null)
 			{
 				bool wait = true;
-				taskClearAnnounce.Play(tableData.title, tableData.GetRewardString(), delegate
+				taskClearAnnounce.Play(taskData.title, taskData.GetRewardString(), delegate
 				{
 					wait = false;
 				});
@@ -311,7 +311,7 @@ public class AchievementManager : MonoBehaviourSingleton<AchievementManager>
 				{
 					yield return null;
 				}
-				yield return (object)new WaitForSeconds(0.3f);
+				yield return new WaitForSeconds(0.3f);
 			}
 		}
 		yield return null;

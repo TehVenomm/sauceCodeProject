@@ -7,7 +7,8 @@ public static class SaveData
 	{
 		Account,
 		DevelopHost,
-		Game
+		Game,
+		ServerAccount
 	}
 
 	private static Dictionary<string, string> m_SaveDataString = new Dictionary<string, string>();
@@ -19,23 +20,16 @@ public static class SaveData
 
 	private static string GetString(Key key, string defaultValue = "")
 	{
-		object result;
-		if (m_SaveDataString.ContainsKey(key.ToString()))
+		if (!m_SaveDataString.ContainsKey(key.ToString()))
 		{
-			result = m_SaveDataString[key.ToString()];
+			return m_SaveDataString[key.ToString()] = CryptoPrefs.GetString(key.ToString(), defaultValue);
 		}
-		else
-		{
-			string @string = CryptoPrefs.GetString(key.ToString(), defaultValue);
-			m_SaveDataString[key.ToString()] = @string;
-			result = @string;
-		}
-		return (string)result;
+		return m_SaveDataString[key.ToString()];
 	}
 
 	public static void SetData<T>(Key key, T data)
 	{
-		string val = JsonUtility.ToJson((object)data);
+		string val = JsonUtility.ToJson(data);
 		SetString(key, val);
 	}
 
@@ -47,8 +41,7 @@ public static class SaveData
 			{
 				return new T();
 			}
-			string @string = GetString(key, string.Empty);
-			return JsonUtility.FromJson<T>(@string);
+			return JsonUtility.FromJson<T>(GetString(key));
 		}
 		catch
 		{
@@ -58,7 +51,11 @@ public static class SaveData
 
 	public static bool HasKey(Key key)
 	{
-		return m_SaveDataString.ContainsKey(key.ToString()) || CryptoPrefs.HasKey(key.ToString()) || PlayerPrefs.HasKey(key.ToString());
+		if (!m_SaveDataString.ContainsKey(key.ToString()) && !CryptoPrefs.HasKey(key.ToString()))
+		{
+			return PlayerPrefs.HasKey(key.ToString());
+		}
+		return true;
 	}
 
 	public static void DeleteKey(Key key)

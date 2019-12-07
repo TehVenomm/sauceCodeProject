@@ -148,7 +148,17 @@ namespace BestHTTP
 			internal set;
 		}
 
-		public Uri CurrentUri => (!IsRedirected) ? Uri : RedirectUri;
+		public Uri CurrentUri
+		{
+			get
+			{
+				if (!IsRedirected)
+				{
+					return Uri;
+				}
+				return RedirectUri;
+			}
+		}
 
 		public HTTPResponse Response
 		{
@@ -255,8 +265,6 @@ namespace BestHTTP
 
 		public void AddField(string fieldName, string value)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Expected O, but got Unknown
 			if (FieldsImpl == null)
 			{
 				FieldsImpl = new WWWForm();
@@ -266,8 +274,6 @@ namespace BestHTTP
 
 		public void AddBinaryData(string fieldName, byte[] contents)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Expected O, but got Unknown
 			if (FieldsImpl == null)
 			{
 				FieldsImpl = new WWWForm();
@@ -309,7 +315,11 @@ namespace BestHTTP
 
 		public bool HasHeader(string name)
 		{
-			return Headers != null && Headers.ContainsKey(name);
+			if (Headers != null)
+			{
+				return Headers.ContainsKey(name);
+			}
+			return false;
 		}
 
 		public string GetFirstHeaderValue(string name)
@@ -349,7 +359,7 @@ namespace BestHTTP
 			}
 			if (!HasHeader("Connection"))
 			{
-				AddHeader("Connection", (!IsKeepAlive) ? "Close, TE" : "Keep-Alive, TE");
+				AddHeader("Connection", IsKeepAlive ? "Keep-Alive, TE" : "Close, TE");
 			}
 			if (!HasHeader("TE"))
 			{
@@ -359,8 +369,8 @@ namespace BestHTTP
 			int num = (entityBody != null) ? entityBody.Length : 0;
 			if (RawData == null)
 			{
-				byte[] array = (FieldsImpl == null) ? null : FieldsImpl.get_data();
-				if (array != null && array.Length > 0 && !HasHeader("Content-Type"))
+				byte[] array = (FieldsImpl != null) ? FieldsImpl.data : null;
+				if (array != null && array.Length != 0 && !HasHeader("Content-Type"))
 				{
 					AddHeader("Content-Type", "application/x-www-form-urlencoded");
 				}
@@ -418,7 +428,15 @@ namespace BestHTTP
 
 		internal byte[] GetEntityBody()
 		{
-			return (RawData != null) ? RawData : ((FieldsImpl == null) ? null : FieldsImpl.get_data());
+			if (RawData != null)
+			{
+				return RawData;
+			}
+			if (FieldsImpl == null)
+			{
+				return null;
+			}
+			return FieldsImpl.data;
 		}
 
 		internal bool SendOutTo(Stream stream)
@@ -431,8 +449,8 @@ namespace BestHTTP
 				binaryWriter.Write(EOL);
 				SendHeaders(binaryWriter);
 				binaryWriter.Write(EOL);
-				byte[] array = (RawData != null) ? RawData : ((FieldsImpl == null) ? null : FieldsImpl.get_data());
-				if (array != null && array.Length > 0)
+				byte[] array = (RawData != null) ? RawData : ((FieldsImpl != null) ? FieldsImpl.data : null);
+				if (array != null && array.Length != 0)
 				{
 					binaryWriter.Write(array, 0, array.Length);
 				}
@@ -458,7 +476,7 @@ namespace BestHTTP
 				}
 				catch (Exception ex)
 				{
-					Debug.LogError((object)$"{ex.Message}: {ex.StackTrace}");
+					Debug.LogError($"{ex.Message}: {ex.StackTrace}");
 				}
 			}
 		}
@@ -474,7 +492,7 @@ namespace BestHTTP
 			}
 			catch (Exception ex)
 			{
-				Debug.LogError((object)$"{ex.Message}: {ex.StackTrace}");
+				Debug.LogError($"{ex.Message}: {ex.StackTrace}");
 			}
 		}
 

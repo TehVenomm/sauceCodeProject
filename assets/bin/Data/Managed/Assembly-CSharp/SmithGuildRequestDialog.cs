@@ -1,5 +1,4 @@
 using Network;
-using System;
 using UnityEngine;
 
 public class SmithGuildRequestDialog : GameSection
@@ -39,46 +38,47 @@ public class SmithGuildRequestDialog : GameSection
 
 	public override void StartSection()
 	{
-		m_Input.SendMessage("OnSelect", (object)true);
+		m_Input.SendMessage("OnSelect", true);
 	}
 
 	public override void UpdateUI()
 	{
-		SetInputSubmitEvent((Enum)UI.IPT_POST, new EventDelegate(delegate
+		SetInputSubmitEvent(UI.IPT_POST, new EventDelegate(delegate
 		{
 			OnTouchPost();
 		}));
-		SetActive((Enum)UI.OBJ_TARGET, is_visible: true);
-		SetActive((Enum)UI.OBJ_OWNER, is_visible: false);
-		SetInputValue((Enum)UI.IPT_POST, base.sectionData.GetText("TEXT_HELP"));
-		SetInputLabel((Enum)UI.IPT_POST, base.sectionData.GetText("TEXT_HELP"));
-		SetLabelText((Enum)UI.LBL_USER_NAME, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name);
-		SetLabelText((Enum)UI.LBL_MATERIAL_NAME, data.GetName());
+		SetActive(UI.OBJ_TARGET, is_visible: true);
+		SetActive(UI.OBJ_OWNER, is_visible: false);
+		SetInputValue(UI.IPT_POST, base.sectionData.GetText("TEXT_HELP"));
+		SetInputLabel(UI.IPT_POST, base.sectionData.GetText("TEXT_HELP"));
+		SetLabelText(UI.LBL_USER_NAME, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name);
+		SetLabelText(UI.LBL_MATERIAL_NAME, data.GetName());
 		SetLabelText(UI.LBL_QUATITY, data.GetNum());
 		SetLabelText(UI.LBL_DONATE_NUM, data.GetNum());
 		SetLabelText(UI.LBL_DONATE_MAX, needNum);
-		SetButtonEnabled((Enum)UI.BTN_GIFT, is_enabled: false);
-		SetSliderValue((Enum)UI.SLD_PROGRESS, (float)data.GetNum() / (float)needNum);
+		SetButtonEnabled(UI.BTN_GIFT, is_enabled: false);
+		SetSliderValue(UI.SLD_PROGRESS, (float)data.GetNum() / (float)needNum);
 		Transform ctrl = GetCtrl(UI.OBJ_MATERIAL_ICON);
-		Item item = new Item();
-		item.uniqId = "0";
-		item.itemId = (int)data.GetTableID();
-		item.num = data.GetNum();
-		ItemInfo item2 = ItemInfo.CreateItemInfo(item);
+		ItemInfo item = ItemInfo.CreateItemInfo(new Item
+		{
+			uniqId = "0",
+			itemId = (int)data.GetTableID(),
+			num = data.GetNum()
+		});
 		ItemSortData itemSortData = new ItemSortData();
-		itemSortData.SetItem(item2);
+		itemSortData.SetItem(item);
 		SetItemIcon(ctrl, itemSortData, ctrl);
 	}
 
 	private void OnTouchPost()
 	{
-		SetLabelText((Enum)UI.LBL_CHAT_MESSAGE, m_Input.value);
+		SetLabelText(UI.LBL_CHAT_MESSAGE, m_Input.value);
 	}
 
 	private void OnQuery_SUBMIT()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest((int)data.GetTableID(), data.GetName(), GetLabelText((Enum)UI.LBL_CHAT_MESSAGE), needNum - data.GetNum(), delegate(bool success)
+		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest((int)data.GetTableID(), data.GetName(), GetLabelText(UI.LBL_CHAT_MESSAGE), needNum - data.GetNum(), delegate(bool success)
 		{
 			if (success)
 			{
@@ -95,7 +95,6 @@ public class SmithGuildRequestDialog : GameSection
 		ELEMENT_TYPE element = ELEMENT_TYPE.MAX;
 		EQUIPMENT_TYPE? magi_enable_icon_type = null;
 		int icon_id = -1;
-		int num = -1;
 		if (data != null)
 		{
 			iTEM_ICON_TYPE = data.GetIconType();
@@ -103,25 +102,19 @@ public class SmithGuildRequestDialog : GameSection
 			rarity = data.GetRarity();
 			element = data.GetIconElement();
 			magi_enable_icon_type = data.GetIconMagiEnableType();
-			num = data.GetNum();
-			if (num == 1)
-			{
-				num = -1;
-			}
+			data.GetNum();
+			_ = 1;
 		}
 		bool is_new = false;
 		switch (iTEM_ICON_TYPE)
 		{
 		case ITEM_ICON_TYPE.ITEM:
 		case ITEM_ICON_TYPE.QUEST_ITEM:
-		{
-			ulong uniqID = data.GetUniqID();
-			if (uniqID != 0)
+			if (data.GetUniqID() != 0L)
 			{
 				is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, data.GetUniqID());
 			}
 			break;
-		}
 		default:
 			is_new = true;
 			break;
@@ -131,28 +124,21 @@ public class SmithGuildRequestDialog : GameSection
 		int enemy_icon_id = 0;
 		if (iTEM_ICON_TYPE == ITEM_ICON_TYPE.ITEM)
 		{
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(data.GetTableID());
-			enemy_icon_id = itemData.enemyIconID;
+			enemy_icon_id = Singleton<ItemTable>.I.GetItemData(data.GetTableID()).enemyIconID;
 		}
 		ItemIcon itemIcon = null;
-		if (data.GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
+		itemIcon = ((data.GetIconType() != ITEM_ICON_TYPE.QUEST_ITEM) ? ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, -1, "DROP", 0, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id) : ItemIcon.Create(new ItemIcon.ItemIconCreateParam
 		{
-			ItemIcon.ItemIconCreateParam itemIconCreateParam = new ItemIcon.ItemIconCreateParam();
-			itemIconCreateParam.icon_type = data.GetIconType();
-			itemIconCreateParam.icon_id = data.GetIconID();
-			itemIconCreateParam.rarity = data.GetRarity();
-			itemIconCreateParam.parent = holder;
-			itemIconCreateParam.element = data.GetIconElement();
-			itemIconCreateParam.magi_enable_equip_type = data.GetIconMagiEnableType();
-			itemIconCreateParam.num = data.GetNum();
-			itemIconCreateParam.enemy_icon_id = enemy_icon_id;
-			itemIconCreateParam.questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST;
-			itemIcon = ItemIcon.Create(itemIconCreateParam);
-		}
-		else
-		{
-			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, -1, "DROP", 0, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id);
-		}
+			icon_type = data.GetIconType(),
+			icon_id = data.GetIconID(),
+			rarity = data.GetRarity(),
+			parent = holder,
+			element = data.GetIconElement(),
+			magi_enable_equip_type = data.GetIconMagiEnableType(),
+			num = data.GetNum(),
+			enemy_icon_id = enemy_icon_id,
+			questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST
+		}));
 		SetMaterialInfo(itemIcon.transform, data.GetMaterialType(), data.GetTableID(), parent_scroll);
 	}
 }

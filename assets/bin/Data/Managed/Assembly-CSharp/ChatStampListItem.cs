@@ -28,11 +28,6 @@ public class ChatStampListItem : MonoBehaviour
 		protected set;
 	}
 
-	public ChatStampListItem()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		UIButton component = m_Texture.GetComponent<UIButton>();
@@ -57,9 +52,9 @@ public class ChatStampListItem : MonoBehaviour
 
 	public void SetActiveComponents(bool isActive)
 	{
-		if (!isDummy || !isActive)
+		if (!(isDummy && isActive))
 		{
-			m_Colider.set_enabled(isActive);
+			m_Colider.enabled = isActive;
 			m_Texture.alpha = (isActive ? 1 : 0);
 		}
 	}
@@ -76,9 +71,9 @@ public class ChatStampListItem : MonoBehaviour
 	{
 		CancelLoadStamp();
 		m_CoroutineLoadStamp = CoroutineLoadStamp();
-		if (this.get_gameObject().get_activeInHierarchy())
+		if (base.gameObject.activeInHierarchy)
 		{
-			this.StartCoroutine(_Update());
+			StartCoroutine(_Update());
 		}
 	}
 

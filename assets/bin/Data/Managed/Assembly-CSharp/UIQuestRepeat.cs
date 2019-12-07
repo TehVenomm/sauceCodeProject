@@ -10,16 +10,16 @@ public class UIQuestRepeat : MonoBehaviourSingleton<UIQuestRepeat>
 
 	public void OnVictory()
 	{
-		repeatStatus.get_gameObject().SetActive(false);
-		repeatOffBtn.get_gameObject().SetActive(false);
+		repeatStatus.gameObject.SetActive(value: false);
+		repeatOffBtn.gameObject.SetActive(value: false);
 	}
 
 	public void InitData()
 	{
 		if (PartyManager.IsValidInParty() && MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId())
 		{
-			repeatStatus.get_gameObject().SetActive(MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-			repeatOffBtn.get_gameObject().SetActive(MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			repeatStatus.gameObject.SetActive(MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+			repeatOffBtn.gameObject.SetActive(MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
 		}
 	}
 
@@ -30,8 +30,8 @@ public class UIQuestRepeat : MonoBehaviourSingleton<UIQuestRepeat>
 		{
 			if (is_success)
 			{
-				repeatStatus.get_gameObject().SetActive(false);
-				repeatOffBtn.get_gameObject().SetActive(false);
+				repeatStatus.gameObject.SetActive(value: false);
+				repeatOffBtn.gameObject.SetActive(value: false);
 				GameSaveData.instance.defaultRepeatPartyOn = false;
 			}
 			else

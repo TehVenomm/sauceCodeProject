@@ -130,10 +130,9 @@ public class AbilityItemSortData : SortCompareData
 
 	public override uint GetMainorSortWeight()
 	{
-		uint num = 0u;
-		uint num2 = ElementTypeToMinorSortValue(GetIconElement());
-		num += num2 << 27;
+		uint num = ElementTypeToMinorSortValue(GetIconElement());
+		uint num2 = 0 + (num << 27);
 		uint rarity = (uint)GetRarity();
-		return num + (rarity << 21);
+		return num2 + (rarity << 21);
 	}
 }

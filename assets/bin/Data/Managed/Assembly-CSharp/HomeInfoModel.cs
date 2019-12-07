@@ -34,6 +34,8 @@ public class HomeInfoModel : BaseModel
 
 		public int pointShopBanner;
 
+		public bool tradingEnable;
+
 		public int tradingDay;
 
 		public int tradingStatus;
@@ -45,6 +47,8 @@ public class HomeInfoModel : BaseModel
 		public int tradingSellMinGem;
 
 		public int tradingSellMaxGem;
+
+		public string tradingLastSold;
 
 		public bool isOneTimesOfferActive;
 

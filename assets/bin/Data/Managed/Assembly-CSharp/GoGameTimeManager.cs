@@ -23,7 +23,7 @@ public class GoGameTimeManager : MonoBehaviourSingleton<GoGameTimeManager>
 	protected override void Awake()
 	{
 		base.Awake();
-		Time.set_timeScale(1f);
+		Time.timeScale = 1f;
 	}
 
 	public void SetStop(STOP_FLAG flag, bool is_stop)
@@ -36,7 +36,7 @@ public class GoGameTimeManager : MonoBehaviourSingleton<GoGameTimeManager>
 		{
 			stopFlags &= ~flag;
 		}
-		Time.set_timeScale((!IsStop()) ? 1f : 0f);
+		Time.timeScale = (IsStop() ? 0f : 1f);
 	}
 
 	public bool IsStop()
@@ -64,7 +64,7 @@ public class GoGameTimeManager : MonoBehaviourSingleton<GoGameTimeManager>
 
 	public static string GetRemainTimeToText(TimeSpan span, int digitNum = 3)
 	{
-		string text = string.Empty;
+		string text = "";
 		if (span.Seconds > 0)
 		{
 			span = span.Add(TimeSpan.FromMinutes(1.0));
@@ -85,7 +85,7 @@ public class GoGameTimeManager : MonoBehaviourSingleton<GoGameTimeManager>
 			text += string.Format(StringTable.Get(STRING_CATEGORY.TIME, 2u), span.Minutes);
 			num++;
 		}
-		if (text == string.Empty)
+		if (text == "")
 		{
 			return string.Format(StringTable.Get(STRING_CATEGORY.TIME, 2u), 0);
 		}
@@ -113,7 +113,7 @@ public class GoGameTimeManager : MonoBehaviourSingleton<GoGameTimeManager>
 
 	private void Update()
 	{
-		elapsedTime += Time.get_unscaledDeltaTime();
+		elapsedTime += Time.unscaledDeltaTime;
 	}
 
 	public static DateTime CombineDateAndTime(DateTime date, DateTime time)

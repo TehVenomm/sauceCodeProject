@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -66,24 +65,10 @@ public class FixedPanelNGUI : MonoBehaviour
 
 	private BeginStaticUI[] m_beginStaticUI;
 
-	public FixedPanelNGUI()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		aspect = (float)Screen.get_width() / (float)Screen.get_height();
-		FixedNGUIThrowIphoneX component = this.GetComponent<FixedNGUIThrowIphoneX>();
+		aspect = (float)Screen.width / (float)Screen.height;
+		FixedNGUIThrowIphoneX component = GetComponent<FixedNGUIThrowIphoneX>();
 		resulotion = default(Vector2);
 		if (IsIphoneX())
 		{
@@ -107,7 +92,7 @@ public class FixedPanelNGUI : MonoBehaviour
 		{
 			if (Root == null)
 			{
-				Root = GameObject.Find("UI_Root").get_transform();
+				Root = GameObject.Find("UI_Root").transform;
 			}
 			if (Root != null)
 			{
@@ -119,40 +104,34 @@ public class FixedPanelNGUI : MonoBehaviour
 
 	private void Start()
 	{
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
 		if (!(aspect < BASERATIO))
 		{
 			return;
 		}
 		if (m_mainChild == null)
 		{
-			m_mainChild = this.get_transform();
+			m_mainChild = base.transform;
 		}
 		findParent();
 		if (IsIphoneX())
 		{
-			detectCameraParent = checkCameraParent(this.get_gameObject());
+			detectCameraParent = checkCameraParent(base.gameObject);
 			if (detectCameraParent)
 			{
-				Transform parent = m_parent;
-				parent.set_localPosition(parent.get_localPosition() + Vector3.get_down() * GetOffseMoveHeightIfIphoneX(resulotion.y) / 2f);
+				m_parent.localPosition += Vector3.down * GetOffseMoveHeightIfIphoneX(resulotion.y) / 2f;
 			}
 		}
 		if (checkExistComponent() || FixedPanelAction == FixedPanelAction.NONE)
 		{
-			this.StartCoroutine(fixedNGUI());
+			StartCoroutine(fixedNGUI());
 		}
 	}
 
 	public static bool checkCameraParent(GameObject obj)
 	{
-		while (obj.get_transform().get_parent() != null)
+		while (obj.transform.parent != null)
 		{
-			obj = obj.get_transform().get_parent().get_gameObject();
+			obj = obj.transform.parent.gameObject;
 			if (obj.GetComponent<Camera>() != null)
 			{
 				return true;
@@ -163,30 +142,15 @@ public class FixedPanelNGUI : MonoBehaviour
 
 	private bool checkExistComponent()
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Expected O, but got Unknown
 		Transform parent = m_parent;
-		while (parent.get_transform().get_parent() != null && parent.get_transform().get_parent() != Root && parent.get_transform().get_parent().get_name() != "AppMain")
+		while (parent.transform.parent != null && parent.transform.parent != Root && parent.transform.parent.name != "AppMain")
 		{
-			parent = parent.get_transform().get_parent();
-			IEnumerator enumerator = parent.GetEnumerator();
-			try
+			parent = parent.transform.parent;
+			foreach (Transform item in parent)
 			{
-				while (enumerator.MoveNext())
+				if (item != base.transform && item.GetComponent<FixedPanelNGUI>() != null)
 				{
-					Transform val = enumerator.Current;
-					if (val != this.get_transform() && val.GetComponent<FixedPanelNGUI>() != null)
-					{
-						return false;
-					}
-				}
-			}
-			finally
-			{
-				IDisposable disposable;
-				if ((disposable = (enumerator as IDisposable)) != null)
-				{
-					disposable.Dispose();
+					return false;
 				}
 			}
 		}
@@ -195,89 +159,74 @@ public class FixedPanelNGUI : MonoBehaviour
 
 	private void findParent()
 	{
-		m_parent = this.get_transform();
+		m_parent = base.transform;
 		if (m_depthParent > 0)
 		{
 			for (int i = 0; i < m_depthParent; i++)
 			{
-				m_parent = m_parent.get_parent();
+				m_parent = m_parent.parent;
 			}
 		}
 	}
 
 	private IEnumerator fixedNGUI()
 	{
-		Vector3 localScale = Vector3.get_one() * ratio;
+		Vector3 localScale = Vector3.one * ratio;
 		if (!(aspect < BASERATIO))
 		{
 			yield break;
 		}
 		lockUI(isLock: false);
-		List<Vector3> oldPosition = new List<Vector3>();
-		IEnumerator enumerator = m_mainChild.GetEnumerator();
-		try
+		List<Vector3> list = new List<Vector3>();
+		foreach (Transform item in m_mainChild)
 		{
-			while (enumerator.MoveNext())
-			{
-				Transform val = enumerator.Current;
-				oldPosition.Add(val.get_position());
-			}
-		}
-		finally
-		{
-			IDisposable disposable;
-			IDisposable disposable2 = disposable = (enumerator as IDisposable);
-			if (disposable != null)
-			{
-				disposable2.Dispose();
-			}
+			list.Add(item.position);
 		}
 		findListPositionLockTransform();
-		bool isContinue = true;
+		bool flag = true;
 		switch (FixedPanelAction)
 		{
 		case FixedPanelAction.NONE:
-			isContinue = false;
+			flag = false;
 			break;
 		case FixedPanelAction.FIX_SIZE:
-			m_parent.set_localScale(localScale);
+			m_parent.localScale = localScale;
 			break;
 		}
-		if (isContinue)
+		if (flag)
 		{
-			for (int i = 0; i < oldPosition.Count; i++)
+			for (int i = 0; i < list.Count; i++)
 			{
 				Transform child = m_mainChild.GetChild(i);
 				UIRect component = child.GetComponent<UIRect>();
 				if (component != null && component.isAnchoredHorizontally)
 				{
-					child.set_position(oldPosition[i]);
+					child.position = list[i];
 					continue;
 				}
-				Vector3 localPosition = m_mainChild.GetChild(i).get_localPosition();
-				m_mainChild.GetChild(i).set_localPosition(new Vector3(localPosition.x, localPosition.y / ratioHeight, localPosition.z));
+				Vector3 localPosition = m_mainChild.GetChild(i).localPosition;
+				m_mainChild.GetChild(i).localPosition = new Vector3(localPosition.x, localPosition.y / ratioHeight, localPosition.z);
 			}
 		}
 		fixLockScale(ratio);
 		fixScaleChilds(ratio);
-		yield return this.StartCoroutine(fixedLockTransform(ratio));
+		yield return StartCoroutine(fixedLockTransform(ratio));
 		UpdateAnchor();
 		FixOffsetHeigh();
 		if (anchorCheat != null)
 		{
-			anchorCheat.SetAnchor(null);
+			anchorCheat.SetAnchor((Transform)null);
 		}
 	}
 
 	private void findListPositionLockTransform()
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 		if (m_lockPosition != null)
 		{
 			m_listOldLockPosition = new List<Vector3>();
 			for (int i = 0; i < m_lockPosition.Length; i++)
 			{
-				m_listOldLockPosition.Add(m_lockPosition[i].get_position());
+				m_listOldLockPosition.Add(m_lockPosition[i].position);
 			}
 		}
 	}
@@ -289,32 +238,26 @@ public class FixedPanelNGUI : MonoBehaviour
 		{
 			for (int i = 0; i < m_lockPosition.Length; i++)
 			{
-				m_lockPosition[i].set_position(m_listOldLockPosition[i]);
+				m_lockPosition[i].position = m_listOldLockPosition[i];
 			}
 		}
 	}
 
 	private void fixLockScale(float ratio)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		Transform[] lockScaleUI = m_lockScaleUI;
-		foreach (Transform val in lockScaleUI)
+		for (int i = 0; i < lockScaleUI.Length; i++)
 		{
-			Transform obj = val;
-			obj.set_localScale(obj.get_localScale() / ratio);
+			lockScaleUI[i].localScale /= ratio;
 		}
 	}
 
 	private void fixScaleChilds(float ratio)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		Transform[] scaleUIChilds = m_scaleUIChilds;
-		foreach (Transform val in scaleUIChilds)
+		for (int i = 0; i < scaleUIChilds.Length; i++)
 		{
-			Transform obj = val;
-			obj.set_localScale(obj.get_localScale() * ratio);
+			scaleUIChilds[i].localScale *= ratio;
 		}
 	}
 
@@ -344,7 +287,7 @@ public class FixedPanelNGUI : MonoBehaviour
 
 	private void saveBeginStaticUI()
 	{
-		if (m_unlockStatic == null || m_unlockStatic.Length <= 0)
+		if (m_unlockStatic == null || m_unlockStatic.Length == 0)
 		{
 			return;
 		}
@@ -379,12 +322,12 @@ public class FixedPanelNGUI : MonoBehaviour
 			{
 				if (isLock)
 				{
-					beginStaticUI.UiStatic.set_enabled(true);
+					beginStaticUI.UiStatic.enabled = true;
 					beginStaticUI.UIPanel.widgetsAreStatic = beginStaticUI.BeginStatic;
 				}
 				else
 				{
-					beginStaticUI.UiStatic.set_enabled(false);
+					beginStaticUI.UiStatic.enabled = false;
 					beginStaticUI.UIPanel.widgetsAreStatic = false;
 				}
 			}
@@ -392,12 +335,12 @@ public class FixedPanelNGUI : MonoBehaviour
 			{
 				if (isLock)
 				{
-					beginStaticUI.UIRotationStatic.set_enabled(true);
+					beginStaticUI.UIRotationStatic.enabled = true;
 					beginStaticUI.UIPanel.widgetsAreStatic = beginStaticUI.BeginStatic;
 				}
 				else
 				{
-					beginStaticUI.UIRotationStatic.set_enabled(false);
+					beginStaticUI.UIRotationStatic.enabled = false;
 					beginStaticUI.UIPanel.widgetsAreStatic = false;
 				}
 			}
@@ -406,14 +349,6 @@ public class FixedPanelNGUI : MonoBehaviour
 
 	public void FixOffsetHeigh()
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
 		if (m_fixOffsetPosition == null)
 		{
 			return;
@@ -423,11 +358,9 @@ public class FixedPanelNGUI : MonoBehaviour
 		{
 			if (!fixOffsetHeigh.IsOnlyInphoneX || (fixOffsetHeigh.IsOnlyInphoneX && IsIphoneX()))
 			{
-				Transform objectMove = fixOffsetHeigh.ObjectMove;
-				objectMove.set_localPosition(objectMove.get_localPosition() + fixOffsetHeigh.OffsetHeigh * Vector3.get_up());
+				fixOffsetHeigh.ObjectMove.localPosition += fixOffsetHeigh.OffsetHeigh * Vector3.up;
 			}
-			Transform objectMove2 = fixOffsetHeigh.ObjectMove;
-			objectMove2.set_localPosition(objectMove2.get_localPosition() + fixOffsetHeigh.OffsetWidt * Vector3.get_right());
+			fixOffsetHeigh.ObjectMove.localPosition += fixOffsetHeigh.OffsetWidt * Vector3.right;
 		}
 	}
 
@@ -438,9 +371,9 @@ public class FixedPanelNGUI : MonoBehaviour
 			return;
 		}
 		Transform[] updateNewAnchor = m_updateNewAnchor;
-		foreach (Transform val in updateNewAnchor)
+		for (int i = 0; i < updateNewAnchor.Length; i++)
 		{
-			UIRect component = val.GetComponent<UIRect>();
+			UIRect component = updateNewAnchor[i].GetComponent<UIRect>();
 			if (component != null)
 			{
 				component.UpdateAnchors();
@@ -450,61 +383,53 @@ public class FixedPanelNGUI : MonoBehaviour
 
 	public static bool CheckResolutionCanFix()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		float num = (float)Screen.get_width() / (float)Screen.get_height();
+		float num = (float)Screen.width / (float)Screen.height;
 		Vector2 resolutionFixed = GetResolutionFixed();
-		float num2 = resolutionFixed.x / resolutionFixed.y;
-		float num3 = num2 / BASERATIO;
+		_ = resolutionFixed.x / resolutionFixed.y / BASERATIO;
 		return num < BASERATIO;
 	}
 
 	public static float GetScaleResolution()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		float num = (float)Screen.get_width() / (float)Screen.get_height();
+		float num = (float)Screen.width / (float)Screen.height;
 		Vector2 resolutionFixed = GetResolutionFixed();
-		float num2 = resolutionFixed.x / resolutionFixed.y;
-		float num3 = num2 / BASERATIO;
+		_ = resolutionFixed.x / resolutionFixed.y / BASERATIO;
 		return num / BASERATIO;
 	}
 
 	public static Vector2 GetResolutionFixed(bool isThrowIphoneX = false)
 	{
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		float num = Screen.get_width();
-		float num2 = Screen.get_height();
+		float num = Screen.width;
+		float num2 = Screen.height;
+		float x;
 		float num3;
-		float num4;
 		if (num > num2)
 		{
-			num3 = 854f;
-			num4 = num2 / num * 854f;
+			x = 854f;
+			num3 = num2 / num * 854f;
 		}
 		else
 		{
-			num4 = 854f;
-			num3 = num / num2 * 854f;
+			num3 = 854f;
+			x = num / num2 * 854f;
 		}
 		if (!isThrowIphoneX && IsIphoneX())
 		{
-			float offseMoveHeightIfIphoneX = GetOffseMoveHeightIfIphoneX(num4);
-			num4 -= offseMoveHeightIfIphoneX;
+			float offseMoveHeightIfIphoneX = GetOffseMoveHeightIfIphoneX(num3);
+			num3 -= offseMoveHeightIfIphoneX;
 		}
-		return new Vector2(num3, num4);
+		return new Vector2(x, num3);
 	}
 
 	public static float GetOffseMoveHeightIfIphoneX(float screenHeight)
 	{
-		float num = 75f;
-		return num * (screenHeight / 2436f);
+		return 75f * (screenHeight / 2436f);
 	}
 
 	public static bool IsIphoneX()
 	{
-		float num = Screen.get_width();
-		float num2 = Screen.get_height();
+		_ = Screen.width;
+		_ = Screen.height;
 		return false;
 	}
 }

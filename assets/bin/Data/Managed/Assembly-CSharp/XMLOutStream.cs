@@ -19,7 +19,7 @@ public class XMLOutStream
 
 	public string Serialize(bool newlines)
 	{
-		string str = string.Empty;
+		string str = "";
 		if (newlines)
 		{
 			str = "\n";
@@ -164,14 +164,14 @@ public class XMLOutStream
 
 	public XMLOutStream Content(Rect value)
 	{
-		Content("[" + value.get_x() + "," + value.get_y() + "," + value.get_width() + "," + value.get_height() + "]");
+		Content("[" + value.x + "," + value.y + "," + value.width + "," + value.height + "]");
 		return this;
 	}
 
 	public XMLOutStream Content(string tag, Rect value)
 	{
-		Start(tag).Attribute("x", value.get_x()).Attribute("y", value.get_y()).Attribute("width", value.get_width())
-			.Attribute("height", value.get_height())
+		Start(tag).Attribute("x", value.x).Attribute("y", value.y).Attribute("width", value.width)
+			.Attribute("height", value.height)
 			.End();
 		return this;
 	}

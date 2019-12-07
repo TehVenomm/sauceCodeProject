@@ -126,14 +126,14 @@ public class FriendArenaRanking : FriendArenaRankingBase
 	{
 		if (eventData == null)
 		{
-			SetLabelText((Enum)UI.LBL_ARENA_NAME, string.Empty);
-			SetLabelText((Enum)UI.LBL_END_DATE, string.Empty);
+			SetLabelText(UI.LBL_ARENA_NAME, "");
+			SetLabelText(UI.LBL_END_DATE, "");
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_ARENA_NAME, eventData.name);
+			SetLabelText(UI.LBL_ARENA_NAME, eventData.name);
 			string endDateString = QuestUtility.GetEndDateString(eventData);
-			SetLabelText((Enum)UI.LBL_END_DATE, endDateString);
+			SetLabelText(UI.LBL_END_DATE, endDateString);
 		}
 	}
 
@@ -171,9 +171,9 @@ public class FriendArenaRanking : FriendArenaRankingBase
 			if (is_success)
 			{
 				recvList = ChangeData(CreateFriendCharaInfoList(recv_data));
-				base.rankingDataList = recv_data;
+				rankingDataList = recv_data;
 				CacheLists(recvList, recv_data);
-				List<ArenaRankingData> rankingDataList = base.rankingDataList;
+				_ = rankingDataList;
 			}
 			callback(is_success);
 		});

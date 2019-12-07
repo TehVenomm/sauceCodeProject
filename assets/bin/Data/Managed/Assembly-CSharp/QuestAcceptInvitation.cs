@@ -136,7 +136,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 
 	protected override void SendSearchRequest(Action onFinish, Action<bool> cb)
 	{
-		this.StartCoroutine(GetInvitedList(onFinish, cb));
+		StartCoroutine(GetInvitedList(onFinish, cb));
 	}
 
 	private IEnumerator GetInvitedList(Action onFinish, Action<bool> cb)
@@ -187,7 +187,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			yield return null;
 		}
 		onFinish();
-		cb?.Invoke(partySuccess_ && loungeSuccess_ && rallySuccess_ && guildInviteSuccess_ && guildDonateInviteSuccess_);
+		cb?.Invoke(((partySuccess_ & loungeSuccess_ & rallySuccess_) && guildInviteSuccess_) & guildDonateInviteSuccess_);
 	}
 
 	public override void UpdateUI()
@@ -200,19 +200,19 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		}
 		if (!PartyManager.IsValidNotEmptyList() && !LoungeMatchingManager.IsValidNotEmptyList() && !LoungeMatchingManager.IsValidNotEmptyRallyList() && !GuildManager.IsValidNotEmptyInviteList() && !GuildManager.IsValidNotEmptyDonateInviteList())
 		{
-			SetActive((Enum)UI.GRD_QUEST, is_visible: false);
-			SetActive((Enum)UI.TBL_QUEST, is_visible: false);
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_QUEST, is_visible: false);
+			SetActive(UI.TBL_QUEST, is_visible: false);
+			SetActive(UI.STR_NON_LIST, is_visible: true);
 			return;
 		}
 		parties = MonoBehaviourSingleton<PartyManager>.I.partys.ToArray();
 		lounges = MonoBehaviourSingleton<LoungeMatchingManager>.I.lounges.ToArray();
 		rallyInvites = MonoBehaviourSingleton<LoungeMatchingManager>.I.rallyInvite.ToArray();
-		guildInvites = ((!MonoBehaviourSingleton<GuildManager>.IsValid() || MonoBehaviourSingleton<GuildManager>.I.guildInviteList == null) ? new GuildInvitedModel.GuildInvitedInfo[0] : MonoBehaviourSingleton<GuildManager>.I.guildInviteList.ToArray());
+		guildInvites = ((MonoBehaviourSingleton<GuildManager>.IsValid() && MonoBehaviourSingleton<GuildManager>.I.guildInviteList != null) ? MonoBehaviourSingleton<GuildManager>.I.guildInviteList.ToArray() : new GuildInvitedModel.GuildInvitedInfo[0]);
 		guildDonateInvites = MonoBehaviourSingleton<GuildManager>.I.donateInviteList.ToArray();
-		SetActive((Enum)UI.TBL_QUEST, is_visible: true);
-		SetActive((Enum)UI.GRD_QUEST, is_visible: true);
-		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		SetActive(UI.TBL_QUEST, is_visible: true);
+		SetActive(UI.GRD_QUEST, is_visible: true);
+		SetActive(UI.STR_NON_LIST, is_visible: false);
 		UpdateTable();
 	}
 
@@ -232,16 +232,16 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		if (ctrl != null)
 		{
 			int j = 0;
-			for (int childCount = ctrl.get_childCount(); j < childCount; j++)
+			for (int childCount = ctrl.childCount; j < childCount; j++)
 			{
 				Transform child = ctrl.GetChild(0);
-				child.set_parent(null);
-				Object.Destroy(child.get_gameObject());
+				child.parent = null;
+				UnityEngine.Object.Destroy(child.gameObject);
 			}
 		}
-		SetTable(UI.TBL_QUEST, string.Empty, item_num, reset: true, delegate(int i, Transform parent)
+		SetTable(UI.TBL_QUEST, "", item_num, reset: true, delegate(int i, Transform parent)
 		{
-			Transform val = null;
+			Transform transform = null;
 			if (i >= guildDonateInviteStartIndex)
 			{
 				int index5 = i - guildDonateInviteStartIndex;
@@ -256,11 +256,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			{
 				return Realizes("LoungeMemberListItem", parent);
 			}
-			if (i >= partyStartIndex)
-			{
-				return Realizes("QuestInvitationListItem", parent);
-			}
-			return Realizes("LoungeSearchListItem", parent);
+			return (i >= partyStartIndex) ? Realizes("QuestInvitationListItem", parent) : Realizes("LoungeSearchListItem", parent);
 		}, delegate(int i, Transform t, bool is_recycle)
 		{
 			SetActive(t, is_visible: true);
@@ -289,8 +285,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 				InitLounge(i, t);
 			}
 		});
-		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_QUEST);
-		component.set_enabled(true);
+		GetComponent<UIScrollView>(UI.SCR_QUEST).enabled = true;
 		RepositionTable();
 	}
 
@@ -343,23 +338,20 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			SetToggle(t, UI.OBJ_ORDER_QUEST_INFO_ROOT, value: false);
 		}
 		SetEvent(t, "SELECT_ROOM", index);
-		Transform val = FindCtrl(t, uI);
-		SetEnemyIconGradeFrame(val, UI.SPR_ORDER_RARITY_FRAME, questTableData);
-		SetQuestData(questTableData, val);
+		Transform transform = FindCtrl(t, uI);
+		SetEnemyIconGradeFrame(transform, UI.SPR_ORDER_RARITY_FRAME, questTableData);
+		SetQuestData(questTableData, transform);
 		SetPartyData(parties[index], t);
 		SetMemberIcon(t, questTableData);
 	}
 
 	private void InitRally(int index, Transform t)
 	{
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 		SetEvent(t, "JOIN_MAP", index);
 		LoungeModel.SlotInfo slotInfo = rallyInvites[index];
 		CharaInfo userInfo = slotInfo.userInfo;
 		FollowLoungeMember followLoungeMember = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetFollowLoungeMember(userInfo.userId);
-		EquipSetCalculator otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(index + 4);
-		otherEquipSetCalculator.SetEquipSet(slotInfo.userInfo.equipSet);
+		MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(index + 4).SetEquipSet(slotInfo.userInfo.equipSet);
 		SetRenderPlayerModel(t, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(userInfo, need_weapon: false, need_helm: true, need_leg: false, is_priority_visual_equip: true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), is_priority_visual_equip: true);
 		SetLabelText(t, UI.LBL_NAME, userInfo.name);
 		SetLabelText(t, UI.LBL_LEVEL, userInfo.level.ToString());
@@ -367,8 +359,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		SetActive(t, UI.SPR_ICON_HOST, userInfo.userId == MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData.ownerUserId);
 		SetPlayingStatus(t, userInfo.userId);
 		SetActive(t, UI.SPR_ICON_FIRST_MET, MonoBehaviourSingleton<LoungeMatchingManager>.I.CheckFirstMet(userInfo.userId));
-		DegreePlate component = FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(userInfo.selectedDegrees, isButton: false, delegate
+		FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>().Initialize(userInfo.selectedDegrees, isButton: false, delegate
 		{
 			RepositionTable();
 		});
@@ -428,7 +419,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint)loungeMemberStatus.fieldMapId);
 			if (fieldMapData == null)
 			{
-				SetLabelText(root, UI.LBL_AREA_NAME, string.Empty);
+				SetLabelText(root, UI.LBL_AREA_NAME, "");
 				break;
 			}
 			RegionTable.Data data = Singleton<RegionTable>.I.GetData(fieldMapData.regionId);
@@ -483,15 +474,14 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		}
 		else
 		{
-			SetSprite(t, UI.SPR_EMBLEM_LAYER_1, string.Empty);
-			SetSprite(t, UI.SPR_EMBLEM_LAYER_2, string.Empty);
-			SetSprite(t, UI.SPR_EMBLEM_LAYER_3, string.Empty);
+			SetSprite(t, UI.SPR_EMBLEM_LAYER_1, "");
+			SetSprite(t, UI.SPR_EMBLEM_LAYER_2, "");
+			SetSprite(t, UI.SPR_EMBLEM_LAYER_3, "");
 		}
-		double num = info.expired / 1000.0 - DateTimeToTimestampSeconds();
-		if (!(num < 1.0) && info.itemNum < info.quantity)
+		if (!(info.expired / 1000.0 - DateTimeToTimestampSeconds() < 1.0) && info.itemNum < info.quantity)
 		{
 			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == info.itemId, 1);
-			bool flag = info.itemNum >= info.quantity;
+			bool num = info.itemNum >= info.quantity;
 			SetLabelText(t, UI.LBL_CHAT_MESSAGE, info.msg);
 			SetLabelText(t, UI.LBL_USER_NAME, info.nickName);
 			SetLabelText(t, UI.LBL_MATERIAL_NAME, info.itemName);
@@ -499,7 +489,7 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			SetLabelText(t, UI.LBL_DONATE_NUM, info.itemNum);
 			SetLabelText(t, UI.LBL_DONATE_MAX, info.quantity);
 			SetSliderValue(t, UI.SLD_PROGRESS, (float)info.itemNum / (float)info.quantity);
-			if (!flag && itemNum > 0 && info.itemNum < info.quantity)
+			if (!num && itemNum > 0 && info.itemNum < info.quantity)
 			{
 				SetButtonEvent(t, UI.BTN_GIFT, new EventDelegate(delegate
 				{
@@ -510,15 +500,16 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			{
 				SetButtonEnabled(t, UI.BTN_GIFT, is_enabled: false);
 			}
-			Transform val = FindCtrl(t, UI.OBJ_MATERIAL_ICON);
-			Item item = new Item();
-			item.uniqId = "0";
-			item.itemId = info.itemId;
-			item.num = info.itemNum;
-			ItemInfo item2 = ItemInfo.CreateItemInfo(item);
+			Transform transform = FindCtrl(t, UI.OBJ_MATERIAL_ICON);
+			ItemInfo item = ItemInfo.CreateItemInfo(new Item
+			{
+				uniqId = "0",
+				itemId = info.itemId,
+				num = info.itemNum
+			});
 			ItemSortData itemSortData = new ItemSortData();
-			itemSortData.SetItem(item2);
-			SetItemIcon(val, itemSortData, val);
+			itemSortData.SetItem(item);
+			SetItemIcon(transform, itemSortData, transform);
 		}
 	}
 
@@ -543,9 +534,9 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		}
 		else
 		{
-			SetSprite(t, UI.SPR_EMBLEM_LAYER_1, string.Empty);
-			SetSprite(t, UI.SPR_EMBLEM_LAYER_2, string.Empty);
-			SetSprite(t, UI.SPR_EMBLEM_LAYER_3, string.Empty);
+			SetSprite(t, UI.SPR_EMBLEM_LAYER_1, "");
+			SetSprite(t, UI.SPR_EMBLEM_LAYER_2, "");
+			SetSprite(t, UI.SPR_EMBLEM_LAYER_3, "");
 		}
 		SetLabelText(t, UI.LBL_HOST_NAME, guildInvitedInfo.admin);
 		SetLabelText(t, UI.LBL_USER_INVITE, guildInvitedInfo.sender + "'s recruiting");
@@ -559,7 +550,6 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		ELEMENT_TYPE element = ELEMENT_TYPE.MAX;
 		EQUIPMENT_TYPE? magi_enable_icon_type = null;
 		int icon_id = -1;
-		int num = -1;
 		if (data != null)
 		{
 			iTEM_ICON_TYPE = data.GetIconType();
@@ -567,25 +557,19 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 			rarity = data.GetRarity();
 			element = data.GetIconElement();
 			magi_enable_icon_type = data.GetIconMagiEnableType();
-			num = data.GetNum();
-			if (num == 1)
-			{
-				num = -1;
-			}
+			data.GetNum();
+			_ = 1;
 		}
 		bool is_new = false;
 		switch (iTEM_ICON_TYPE)
 		{
 		case ITEM_ICON_TYPE.ITEM:
 		case ITEM_ICON_TYPE.QUEST_ITEM:
-		{
-			ulong uniqID = data.GetUniqID();
-			if (uniqID != 0)
+			if (data.GetUniqID() != 0L)
 			{
 				is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, data.GetUniqID());
 			}
 			break;
-		}
 		default:
 			is_new = true;
 			break;
@@ -595,28 +579,21 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 		int enemy_icon_id = 0;
 		if (iTEM_ICON_TYPE == ITEM_ICON_TYPE.ITEM)
 		{
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(data.GetTableID());
-			enemy_icon_id = itemData.enemyIconID;
+			enemy_icon_id = Singleton<ItemTable>.I.GetItemData(data.GetTableID()).enemyIconID;
 		}
 		ItemIcon itemIcon = null;
-		if (data.GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
+		itemIcon = ((data.GetIconType() != ITEM_ICON_TYPE.QUEST_ITEM) ? ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, -1, "DROP", 0, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id) : ItemIcon.Create(new ItemIcon.ItemIconCreateParam
 		{
-			ItemIcon.ItemIconCreateParam itemIconCreateParam = new ItemIcon.ItemIconCreateParam();
-			itemIconCreateParam.icon_type = data.GetIconType();
-			itemIconCreateParam.icon_id = data.GetIconID();
-			itemIconCreateParam.rarity = data.GetRarity();
-			itemIconCreateParam.parent = holder;
-			itemIconCreateParam.element = data.GetIconElement();
-			itemIconCreateParam.magi_enable_equip_type = data.GetIconMagiEnableType();
-			itemIconCreateParam.num = data.GetNum();
-			itemIconCreateParam.enemy_icon_id = enemy_icon_id;
-			itemIconCreateParam.questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST;
-			itemIcon = ItemIcon.Create(itemIconCreateParam);
-		}
-		else
-		{
-			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, -1, "DROP", 0, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id);
-		}
+			icon_type = data.GetIconType(),
+			icon_id = data.GetIconID(),
+			rarity = data.GetRarity(),
+			parent = holder,
+			element = data.GetIconElement(),
+			magi_enable_equip_type = data.GetIconMagiEnableType(),
+			num = data.GetNum(),
+			enemy_icon_id = enemy_icon_id,
+			questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST
+		}));
 		SetMaterialInfo(itemIcon.transform, data.GetMaterialType(), data.GetTableID(), parent_scroll);
 	}
 
@@ -714,10 +691,9 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 
 	private void SetStamp(Transform root, int stampId)
 	{
-		StampTable.Data data = Singleton<StampTable>.I.GetData((uint)stampId);
-		if (data != null)
+		if (Singleton<StampTable>.I.GetData((uint)stampId) != null)
 		{
-			this.StartCoroutine(LoadStamp(root, stampId));
+			StartCoroutine(LoadStamp(root, stampId));
 		}
 	}
 
@@ -739,19 +715,16 @@ public class QuestAcceptInvitation : QuestSearchListSelect
 
 	private void RepositionTable()
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		UITable component = base.GetComponent<UITable>((Enum)UI.TBL_QUEST);
+		UITable component = GetComponent<UITable>(UI.TBL_QUEST);
 		if (!(component == null))
 		{
 			component.Reposition();
 			List<Transform> childList = component.GetChildList();
 			for (int i = 0; i < childList.Count; i++)
 			{
-				Vector3 localPosition = childList[i].get_localPosition();
+				Vector3 localPosition = childList[i].localPosition;
 				localPosition.x = 0f;
-				childList[i].set_localPosition(localPosition);
+				childList[i].localPosition = localPosition;
 			}
 		}
 	}

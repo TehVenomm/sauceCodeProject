@@ -81,7 +81,11 @@ public abstract class InterpolatorBase<T> : Interpolator
 		{
 			return true;
 		}
-		return play && time > 0f;
+		if (play)
+		{
+			return time > 0f;
+		}
+		return false;
 	}
 
 	public void Update(float dt)
@@ -138,7 +142,7 @@ public abstract class InterpolatorBase<T> : Interpolator
 
 	public T Update()
 	{
-		Update(Time.get_deltaTime());
+		Update(Time.deltaTime);
 		return Get();
 	}
 

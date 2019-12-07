@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public static class NGUITools
@@ -17,15 +16,156 @@ public static class NGUITools
 
 	private static AudioClip mLastClip;
 
-	private static Vector3[] mSides = (Vector3[])new Vector3[4];
+	private static Vector3[] mSides = new Vector3[4];
 
-	public static KeyCode[] keys;
-
-	[CompilerGenerated]
-	private static Comparison<UIWidget> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static Comparison<UIPanel> _003C_003Ef__mg_0024cache1;
+	public static KeyCode[] keys = new KeyCode[145]
+	{
+		KeyCode.Backspace,
+		KeyCode.Tab,
+		KeyCode.Clear,
+		KeyCode.Return,
+		KeyCode.Pause,
+		KeyCode.Escape,
+		KeyCode.Space,
+		KeyCode.Exclaim,
+		KeyCode.DoubleQuote,
+		KeyCode.Hash,
+		KeyCode.Dollar,
+		KeyCode.Ampersand,
+		KeyCode.Quote,
+		KeyCode.LeftParen,
+		KeyCode.RightParen,
+		KeyCode.Asterisk,
+		KeyCode.Plus,
+		KeyCode.Comma,
+		KeyCode.Minus,
+		KeyCode.Period,
+		KeyCode.Slash,
+		KeyCode.Alpha0,
+		KeyCode.Alpha1,
+		KeyCode.Alpha2,
+		KeyCode.Alpha3,
+		KeyCode.Alpha4,
+		KeyCode.Alpha5,
+		KeyCode.Alpha6,
+		KeyCode.Alpha7,
+		KeyCode.Alpha8,
+		KeyCode.Alpha9,
+		KeyCode.Colon,
+		KeyCode.Semicolon,
+		KeyCode.Less,
+		KeyCode.Equals,
+		KeyCode.Greater,
+		KeyCode.Question,
+		KeyCode.At,
+		KeyCode.LeftBracket,
+		KeyCode.Backslash,
+		KeyCode.RightBracket,
+		KeyCode.Caret,
+		KeyCode.Underscore,
+		KeyCode.BackQuote,
+		KeyCode.A,
+		KeyCode.B,
+		KeyCode.C,
+		KeyCode.D,
+		KeyCode.E,
+		KeyCode.F,
+		KeyCode.G,
+		KeyCode.H,
+		KeyCode.I,
+		KeyCode.J,
+		KeyCode.K,
+		KeyCode.L,
+		KeyCode.M,
+		KeyCode.N,
+		KeyCode.O,
+		KeyCode.P,
+		KeyCode.Q,
+		KeyCode.R,
+		KeyCode.S,
+		KeyCode.T,
+		KeyCode.U,
+		KeyCode.V,
+		KeyCode.W,
+		KeyCode.X,
+		KeyCode.Y,
+		KeyCode.Z,
+		KeyCode.Delete,
+		KeyCode.Keypad0,
+		KeyCode.Keypad1,
+		KeyCode.Keypad2,
+		KeyCode.Keypad3,
+		KeyCode.Keypad4,
+		KeyCode.Keypad5,
+		KeyCode.Keypad6,
+		KeyCode.Keypad7,
+		KeyCode.Keypad8,
+		KeyCode.Keypad9,
+		KeyCode.KeypadPeriod,
+		KeyCode.KeypadDivide,
+		KeyCode.KeypadMultiply,
+		KeyCode.KeypadMinus,
+		KeyCode.KeypadPlus,
+		KeyCode.KeypadEnter,
+		KeyCode.KeypadEquals,
+		KeyCode.UpArrow,
+		KeyCode.DownArrow,
+		KeyCode.RightArrow,
+		KeyCode.LeftArrow,
+		KeyCode.Insert,
+		KeyCode.Home,
+		KeyCode.End,
+		KeyCode.PageUp,
+		KeyCode.PageDown,
+		KeyCode.F1,
+		KeyCode.F2,
+		KeyCode.F3,
+		KeyCode.F4,
+		KeyCode.F5,
+		KeyCode.F6,
+		KeyCode.F7,
+		KeyCode.F8,
+		KeyCode.F9,
+		KeyCode.F10,
+		KeyCode.F11,
+		KeyCode.F12,
+		KeyCode.F13,
+		KeyCode.F14,
+		KeyCode.F15,
+		KeyCode.Numlock,
+		KeyCode.CapsLock,
+		KeyCode.ScrollLock,
+		KeyCode.RightShift,
+		KeyCode.LeftShift,
+		KeyCode.RightControl,
+		KeyCode.LeftControl,
+		KeyCode.RightAlt,
+		KeyCode.LeftAlt,
+		KeyCode.Mouse3,
+		KeyCode.Mouse4,
+		KeyCode.Mouse5,
+		KeyCode.Mouse6,
+		KeyCode.JoystickButton0,
+		KeyCode.JoystickButton1,
+		KeyCode.JoystickButton2,
+		KeyCode.JoystickButton3,
+		KeyCode.JoystickButton4,
+		KeyCode.JoystickButton5,
+		KeyCode.JoystickButton6,
+		KeyCode.JoystickButton7,
+		KeyCode.JoystickButton8,
+		KeyCode.JoystickButton9,
+		KeyCode.JoystickButton10,
+		KeyCode.JoystickButton11,
+		KeyCode.JoystickButton12,
+		KeyCode.JoystickButton13,
+		KeyCode.JoystickButton14,
+		KeyCode.JoystickButton15,
+		KeyCode.JoystickButton16,
+		KeyCode.JoystickButton17,
+		KeyCode.JoystickButton18,
+		KeyCode.JoystickButton19
+	};
 
 	public static float soundVolume
 	{
@@ -49,32 +189,26 @@ public static class NGUITools
 		}
 	}
 
-	public static bool fileAccess => (int)Application.get_platform() != 5 && (int)Application.get_platform() != 3;
+	public static bool fileAccess => false;
 
 	public static string clipboard
 	{
 		get
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Expected O, but got Unknown
-			TextEditor val = new TextEditor();
-			val.Paste();
-			return val.get_content().get_text();
+			TextEditor textEditor = new TextEditor();
+			textEditor.Paste();
+			return textEditor.content.text;
 		}
 		set
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Expected O, but got Unknown
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Expected O, but got Unknown
-			TextEditor val = new TextEditor();
-			val.set_content(new GUIContent(value));
-			val.OnFocus();
-			val.Copy();
+			TextEditor textEditor = new TextEditor();
+			textEditor.content = new GUIContent(value);
+			textEditor.OnFocus();
+			textEditor.Copy();
 		}
 	}
 
-	public static Vector2 screenSize => new Vector2((float)Screen.get_width(), (float)Screen.get_height());
+	public static Vector2 screenSize => new Vector2(Screen.width, Screen.height);
 
 	public static AudioSource PlaySound(AudioClip clip)
 	{
@@ -98,14 +232,14 @@ public static class NGUITools
 		volume *= soundVolume;
 		if (clip != null && volume > 0.01f)
 		{
-			if (mListener == null || !NGUITools.GetActive(mListener))
+			if (mListener == null || !GetActive(mListener))
 			{
-				AudioListener[] array = Object.FindObjectsOfType(typeof(AudioListener)) as AudioListener[];
+				AudioListener[] array = UnityEngine.Object.FindObjectsOfType(typeof(AudioListener)) as AudioListener[];
 				if (array != null)
 				{
 					for (int i = 0; i < array.Length; i++)
 					{
-						if (NGUITools.GetActive(array[i]))
+						if (GetActive(array[i]))
 						{
 							mListener = array[i];
 							break;
@@ -114,28 +248,28 @@ public static class NGUITools
 				}
 				if (mListener == null)
 				{
-					Camera val = Camera.get_main();
-					if (val == null)
+					Camera camera = Camera.main;
+					if (camera == null)
 					{
-						val = (Object.FindObjectOfType(typeof(Camera)) as Camera);
+						camera = (UnityEngine.Object.FindObjectOfType(typeof(Camera)) as Camera);
 					}
-					if (val != null)
+					if (camera != null)
 					{
-						mListener = val.get_gameObject().AddComponent<AudioListener>();
+						mListener = camera.gameObject.AddComponent<AudioListener>();
 					}
 				}
 			}
-			if (mListener != null && mListener.get_enabled() && GetActive(mListener.get_gameObject()))
+			if (mListener != null && mListener.enabled && GetActive(mListener.gameObject))
 			{
-				AudioSource val2 = mListener.GetComponent<AudioSource>();
-				if (val2 == null)
+				AudioSource audioSource = mListener.GetComponent<AudioSource>();
+				if (audioSource == null)
 				{
-					val2 = mListener.get_gameObject().AddComponent<AudioSource>();
+					audioSource = mListener.gameObject.AddComponent<AudioSource>();
 				}
-				val2.set_priority(50);
-				val2.set_pitch(pitch);
-				val2.PlayOneShot(clip, volume);
-				return val2;
+				audioSource.priority = 50;
+				audioSource.pitch = pitch;
+				audioSource.PlayOneShot(clip, volume);
+				return audioSource;
 			}
 		}
 		return null;
@@ -147,27 +281,27 @@ public static class NGUITools
 		{
 			return min;
 		}
-		return Random.Range(min, max + 1);
+		return UnityEngine.Random.Range(min, max + 1);
 	}
 
 	public static string GetHierarchy(GameObject obj)
 	{
 		if (obj == null)
 		{
-			return string.Empty;
+			return "";
 		}
-		string text = obj.get_name();
-		while (obj.get_transform().get_parent() != null)
+		string text = obj.name;
+		while (obj.transform.parent != null)
 		{
-			obj = obj.get_transform().get_parent().get_gameObject();
-			text = obj.get_name() + "\\" + text;
+			obj = obj.transform.parent.gameObject;
+			text = obj.name + "\\" + text;
 		}
 		return text;
 	}
 
 	public static T[] FindActive<T>() where T : Component
 	{
-		return Object.FindObjectsOfType(typeof(T)) as T[];
+		return UnityEngine.Object.FindObjectsOfType(typeof(T)) as T[];
 	}
 
 	public static Camera FindCameraForLayer(int layer)
@@ -177,22 +311,22 @@ public static class NGUITools
 		for (int i = 0; i < UICamera.list.size; i++)
 		{
 			cachedCamera = UICamera.list.buffer[i].cachedCamera;
-			if (Object.op_Implicit(cachedCamera) && (cachedCamera.get_cullingMask() & num) != 0)
+			if ((bool)cachedCamera && (cachedCamera.cullingMask & num) != 0)
 			{
 				return cachedCamera;
 			}
 		}
-		cachedCamera = Camera.get_main();
-		if (Object.op_Implicit(cachedCamera) && (cachedCamera.get_cullingMask() & num) != 0)
+		cachedCamera = Camera.main;
+		if ((bool)cachedCamera && (cachedCamera.cullingMask & num) != 0)
 		{
 			return cachedCamera;
 		}
-		Camera[] array = (Camera[])new Camera[Camera.get_allCamerasCount()];
+		Camera[] array = new Camera[Camera.allCamerasCount];
 		int allCameras = Camera.GetAllCameras(array);
 		for (int j = 0; j < allCameras; j++)
 		{
 			cachedCamera = array[j];
-			if (Object.op_Implicit(cachedCamera) && cachedCamera.get_enabled() && (cachedCamera.get_cullingMask() & num) != 0)
+			if ((bool)cachedCamera && cachedCamera.enabled && (cachedCamera.cullingMask & num) != 0)
 			{
 				return cachedCamera;
 			}
@@ -212,10 +346,10 @@ public static class NGUITools
 			return;
 		}
 		Collider component = go.GetComponent<Collider>();
-		BoxCollider val = component as BoxCollider;
-		if (val != null)
+		BoxCollider boxCollider = component as BoxCollider;
+		if (boxCollider != null)
 		{
-			UpdateWidgetCollider(val, considerInactive);
+			UpdateWidgetCollider(boxCollider, considerInactive);
 		}
 		else
 		{
@@ -229,11 +363,11 @@ public static class NGUITools
 				UpdateWidgetCollider(component2, considerInactive);
 				return;
 			}
-			UICamera uICamera = UICamera.FindCameraForLayer(go.get_layer());
+			UICamera uICamera = UICamera.FindCameraForLayer(go.layer);
 			if (uICamera != null && (uICamera.eventType == UICamera.EventType.World_2D || uICamera.eventType == UICamera.EventType.UI_2D))
 			{
 				component2 = go.AddComponent<BoxCollider2D>();
-				component2.set_isTrigger(true);
+				component2.isTrigger = true;
 				UIWidget component3 = go.GetComponent<UIWidget>();
 				if (component3 != null)
 				{
@@ -243,14 +377,14 @@ public static class NGUITools
 			}
 			else
 			{
-				val = go.AddComponent<BoxCollider>();
-				val.set_isTrigger(true);
+				boxCollider = go.AddComponent<BoxCollider>();
+				boxCollider.isTrigger = true;
 				UIWidget component4 = go.GetComponent<UIWidget>();
 				if (component4 != null)
 				{
 					component4.autoResizeBoxCollider = true;
 				}
-				UpdateWidgetCollider(val, considerInactive);
+				UpdateWidgetCollider(boxCollider, considerInactive);
 			}
 		}
 	}
@@ -281,31 +415,11 @@ public static class NGUITools
 
 	public static void UpdateWidgetCollider(BoxCollider box, bool considerInactive)
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0178: Unknown result type (might be due to invalid IL or missing references)
 		if (!(box != null))
 		{
 			return;
 		}
-		GameObject gameObject = box.get_gameObject();
+		GameObject gameObject = box.gameObject;
 		UIWidget component = gameObject.GetComponent<UIWidget>();
 		if (component != null)
 		{
@@ -313,63 +427,42 @@ public static class NGUITools
 			if (drawRegion.x != 0f || drawRegion.y != 0f || drawRegion.z != 1f || drawRegion.w != 1f)
 			{
 				Vector4 drawingDimensions = component.drawingDimensions;
-				box.set_center(new Vector3((drawingDimensions.x + drawingDimensions.z) * 0.5f, (drawingDimensions.y + drawingDimensions.w) * 0.5f));
-				box.set_size(new Vector3(drawingDimensions.z - drawingDimensions.x, drawingDimensions.w - drawingDimensions.y));
+				box.center = new Vector3((drawingDimensions.x + drawingDimensions.z) * 0.5f, (drawingDimensions.y + drawingDimensions.w) * 0.5f);
+				box.size = new Vector3(drawingDimensions.z - drawingDimensions.x, drawingDimensions.w - drawingDimensions.y);
 			}
 			else
 			{
 				Vector3[] localCorners = component.localCorners;
-				box.set_center(Vector3.Lerp(localCorners[0], localCorners[2], 0.5f));
-				box.set_size(localCorners[2] - localCorners[0]);
+				box.center = Vector3.Lerp(localCorners[0], localCorners[2], 0.5f);
+				box.size = localCorners[2] - localCorners[0];
 			}
 		}
 		else
 		{
-			Bounds val = NGUIMath.CalculateRelativeWidgetBounds(gameObject.get_transform(), considerInactive);
-			box.set_center(val.get_center());
-			Vector3 size = val.get_size();
-			float x = size.x;
-			Vector3 size2 = val.get_size();
-			box.set_size(new Vector3(x, size2.y, 0f));
+			Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(gameObject.transform, considerInactive);
+			box.center = bounds.center;
+			box.size = new Vector3(bounds.size.x, bounds.size.y, 0f);
 		}
 	}
 
 	public static void UpdateWidgetCollider(BoxCollider2D box, bool considerInactive)
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 		if (box != null)
 		{
-			GameObject gameObject = box.get_gameObject();
+			GameObject gameObject = box.gameObject;
 			UIWidget component = gameObject.GetComponent<UIWidget>();
 			if (component != null)
 			{
 				Vector3[] localCorners = component.localCorners;
-				box.set_offset(Vector2.op_Implicit(Vector3.Lerp(localCorners[0], localCorners[2], 0.5f)));
-				box.set_size(Vector2.op_Implicit(localCorners[2] - localCorners[0]));
-				return;
+				box.offset = Vector3.Lerp(localCorners[0], localCorners[2], 0.5f);
+				box.size = localCorners[2] - localCorners[0];
 			}
-			Bounds val = NGUIMath.CalculateRelativeWidgetBounds(gameObject.get_transform(), considerInactive);
-			box.set_offset(Vector2.op_Implicit(val.get_center()));
-			Vector3 size = val.get_size();
-			float x = size.x;
-			Vector3 size2 = val.get_size();
-			box.set_size(new Vector2(x, size2.y));
+			else
+			{
+				Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(gameObject.transform, considerInactive);
+				box.offset = bounds.center;
+				box.size = new Vector2(bounds.size.x, bounds.size.y);
+			}
 		}
 	}
 
@@ -387,13 +480,13 @@ public static class NGUITools
 		return text;
 	}
 
-	public static string GetTypeName(Object obj)
+	public static string GetTypeName(UnityEngine.Object obj)
 	{
 		if (obj == null)
 		{
 			return "Null";
 		}
-		string text = ((object)obj).GetType().ToString();
+		string text = obj.GetType().ToString();
 		if (text.StartsWith("UI"))
 		{
 			text = text.Substring(2);
@@ -405,11 +498,11 @@ public static class NGUITools
 		return text;
 	}
 
-	public static void RegisterUndo(Object obj, string name)
+	public static void RegisterUndo(UnityEngine.Object obj, string name)
 	{
 	}
 
-	public static void SetDirty(Object obj)
+	public static void SetDirty(UnityEngine.Object obj)
 	{
 	}
 
@@ -420,40 +513,32 @@ public static class NGUITools
 
 	public static GameObject AddChild(GameObject parent, bool undo)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		GameObject val = new GameObject();
+		GameObject gameObject = new GameObject();
 		if (parent != null)
 		{
-			Transform transform = val.get_transform();
-			transform.set_parent(parent.get_transform());
-			transform.set_localPosition(Vector3.get_zero());
-			transform.set_localRotation(Quaternion.get_identity());
-			transform.set_localScale(Vector3.get_one());
-			val.set_layer(parent.get_layer());
+			Transform transform = gameObject.transform;
+			transform.parent = parent.transform;
+			transform.localPosition = Vector3.zero;
+			transform.localRotation = Quaternion.identity;
+			transform.localScale = Vector3.one;
+			gameObject.layer = parent.layer;
 		}
-		return val;
+		return gameObject;
 	}
 
 	public static GameObject AddChild(GameObject parent, GameObject prefab)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		GameObject val = Object.Instantiate<GameObject>(prefab);
-		if (val != null && parent != null)
+		GameObject gameObject = UnityEngine.Object.Instantiate(prefab);
+		if (gameObject != null && parent != null)
 		{
-			Transform transform = val.get_transform();
-			transform.set_parent(parent.get_transform());
-			transform.set_localPosition(Vector3.get_zero());
-			transform.set_localRotation(Quaternion.get_identity());
-			transform.set_localScale(Vector3.get_one());
-			val.set_layer(parent.get_layer());
+			Transform transform = gameObject.transform;
+			transform.parent = parent.transform;
+			transform.localPosition = Vector3.zero;
+			transform.localRotation = Quaternion.identity;
+			transform.localScale = Vector3.one;
+			gameObject.layer = parent.layer;
 		}
-		return val;
+		return gameObject;
 	}
 
 	public static int CalculateRaycastDepth(GameObject go)
@@ -463,7 +548,7 @@ public static class NGUITools
 		{
 			return component.raycastDepth;
 		}
-		go.GetComponentsInChildren<UIWidget>(Temporary.uiWidgetList);
+		go.GetComponentsInChildren(Temporary.uiWidgetList);
 		if (Temporary.uiWidgetList.Count == 0)
 		{
 			return 0;
@@ -472,7 +557,7 @@ public static class NGUITools
 		int i = 0;
 		for (int count = Temporary.uiWidgetList.Count; i < count; i++)
 		{
-			if (Temporary.uiWidgetList[i].get_enabled())
+			if (Temporary.uiWidgetList[i].enabled)
 			{
 				num = Mathf.Min(num, Temporary.uiWidgetList[i].raycastDepth);
 			}
@@ -483,7 +568,7 @@ public static class NGUITools
 
 	public static int CalculateNextDepth(GameObject go)
 	{
-		if (Object.op_Implicit(go))
+		if ((bool)go)
 		{
 			int num = -1;
 			UIWidget[] componentsInChildren = go.GetComponentsInChildren<UIWidget>();
@@ -499,7 +584,7 @@ public static class NGUITools
 
 	public static int CalculateNextDepth(GameObject go, bool ignoreChildrenWithColliders)
 	{
-		if (Object.op_Implicit(go) && ignoreChildrenWithColliders)
+		if ((bool)go && ignoreChildrenWithColliders)
 		{
 			int num = -1;
 			UIWidget[] componentsInChildren = go.GetComponentsInChildren<UIWidget>();
@@ -524,19 +609,19 @@ public static class NGUITools
 			UIPanel component = go.GetComponent<UIPanel>();
 			if (component != null)
 			{
-				UIPanel[] componentsInChildren = go.GetComponentsInChildren<UIPanel>(true);
-				foreach (UIPanel uIPanel in componentsInChildren)
+				UIPanel[] componentsInChildren = go.GetComponentsInChildren<UIPanel>(includeInactive: true);
+				for (int i = 0; i < componentsInChildren.Length; i++)
 				{
-					uIPanel.depth += adjustment;
+					componentsInChildren[i].depth += adjustment;
 				}
 				return 1;
 			}
-			component = NGUITools.FindInParents<UIPanel>(go);
+			component = FindInParents<UIPanel>(go);
 			if (component == null)
 			{
 				return 0;
 			}
-			UIWidget[] componentsInChildren2 = go.GetComponentsInChildren<UIWidget>(true);
+			UIWidget[] componentsInChildren2 = go.GetComponentsInChildren<UIWidget>(includeInactive: true);
 			int j = 0;
 			for (int num = componentsInChildren2.Length; j < num; j++)
 			{
@@ -585,7 +670,7 @@ public static class NGUITools
 
 	public static void NormalizeWidgetDepths()
 	{
-		NormalizeWidgetDepths(NGUITools.FindActive<UIWidget>());
+		NormalizeWidgetDepths(FindActive<UIWidget>());
 	}
 
 	public static void NormalizeWidgetDepths(GameObject go)
@@ -618,7 +703,7 @@ public static class NGUITools
 
 	public static void NormalizePanelDepths()
 	{
-		UIPanel[] array = NGUITools.FindActive<UIPanel>();
+		UIPanel[] array = FindActive<UIPanel>();
 		int num = array.Length;
 		if (num <= 0)
 		{
@@ -652,22 +737,12 @@ public static class NGUITools
 
 	public static UIPanel CreateUI(Transform trans, bool advanced3D, int layer)
 	{
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0201: Invalid comparison between Unknown and I4
-		//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020e: Invalid comparison between Unknown and I4
-		//IL_027b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0399: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a4: Unknown result type (might be due to invalid IL or missing references)
-		UIRoot uIRoot = (!(trans != null)) ? null : NGUITools.FindInParents<UIRoot>(trans.get_gameObject());
+		UIRoot uIRoot = (trans != null) ? FindInParents<UIRoot>(trans.gameObject) : null;
 		if (uIRoot == null && UIRoot.list.Count > 0)
 		{
 			foreach (UIRoot item in UIRoot.list)
 			{
-				if (item.get_gameObject().get_layer() == layer)
+				if (item.gameObject.layer == layer)
 				{
 					uIRoot = item;
 					break;
@@ -680,11 +755,11 @@ public static class NGUITools
 			for (int count = UIPanel.list.Count; i < count; i++)
 			{
 				UIPanel uIPanel = UIPanel.list[i];
-				GameObject gameObject = uIPanel.get_gameObject();
-				if ((int)gameObject.get_hideFlags() == 0 && gameObject.get_layer() == layer)
+				GameObject gameObject = uIPanel.gameObject;
+				if (gameObject.hideFlags == HideFlags.None && gameObject.layer == layer)
 				{
-					trans.set_parent(uIPanel.get_transform());
-					trans.set_localScale(Vector3.get_one());
+					trans.parent = uIPanel.transform;
+					trans.localScale = Vector3.one;
 					return uIPanel;
 				}
 			}
@@ -692,7 +767,7 @@ public static class NGUITools
 		if (uIRoot != null)
 		{
 			UICamera componentInChildren = uIRoot.GetComponentInChildren<UICamera>();
-			if (componentInChildren != null && componentInChildren.GetComponent<Camera>().get_orthographic() == advanced3D)
+			if (componentInChildren != null && componentInChildren.GetComponent<Camera>().orthographic == advanced3D)
 			{
 				trans = null;
 				uIRoot = null;
@@ -700,8 +775,8 @@ public static class NGUITools
 		}
 		if (uIRoot == null)
 		{
-			GameObject val = AddChild(null, undo: false);
-			uIRoot = val.AddComponent<UIRoot>();
+			GameObject gameObject2 = AddChild(null, undo: false);
+			uIRoot = gameObject2.AddComponent<UIRoot>();
 			if (layer == -1)
 			{
 				layer = LayerMask.NameToLayer("UI");
@@ -710,76 +785,76 @@ public static class NGUITools
 			{
 				layer = LayerMask.NameToLayer("2D UI");
 			}
-			val.set_layer(layer);
+			gameObject2.layer = layer;
 			if (advanced3D)
 			{
-				val.set_name("UI Root (3D)");
+				gameObject2.name = "UI Root (3D)";
 				uIRoot.scalingStyle = UIRoot.Scaling.Constrained;
 			}
 			else
 			{
-				val.set_name("UI Root");
+				gameObject2.name = "UI Root";
 				uIRoot.scalingStyle = UIRoot.Scaling.Flexible;
 			}
 		}
 		UIPanel uIPanel2 = uIRoot.GetComponentInChildren<UIPanel>();
 		if (uIPanel2 == null)
 		{
-			Camera[] array = NGUITools.FindActive<Camera>();
+			Camera[] array = FindActive<Camera>();
 			float num = -1f;
 			bool flag = false;
-			int num2 = 1 << uIRoot.get_gameObject().get_layer();
-			foreach (Camera val2 in array)
+			int num2 = 1 << uIRoot.gameObject.layer;
+			foreach (Camera camera in array)
 			{
-				if ((int)val2.get_clearFlags() == 2 || (int)val2.get_clearFlags() == 1)
+				if (camera.clearFlags == CameraClearFlags.Color || camera.clearFlags == CameraClearFlags.Skybox)
 				{
 					flag = true;
 				}
-				num = Mathf.Max(num, val2.get_depth());
-				val2.set_cullingMask(val2.get_cullingMask() & ~num2);
+				num = Mathf.Max(num, camera.depth);
+				camera.cullingMask &= ~num2;
 			}
-			Camera val3 = NGUITools.AddChild<Camera>(uIRoot.get_gameObject(), undo: false);
-			val3.get_gameObject().AddComponent<UICamera>();
-			val3.set_clearFlags((!flag) ? 2 : 3);
-			val3.set_backgroundColor(Color.get_grey());
-			val3.set_cullingMask(num2);
-			val3.set_depth(num + 1f);
+			Camera camera2 = AddChild<Camera>(uIRoot.gameObject, undo: false);
+			camera2.gameObject.AddComponent<UICamera>();
+			camera2.clearFlags = (flag ? CameraClearFlags.Depth : CameraClearFlags.Color);
+			camera2.backgroundColor = Color.grey;
+			camera2.cullingMask = num2;
+			camera2.depth = num + 1f;
 			if (advanced3D)
 			{
-				val3.set_nearClipPlane(0.1f);
-				val3.set_farClipPlane(4f);
-				val3.get_transform().set_localPosition(new Vector3(0f, 0f, -700f));
+				camera2.nearClipPlane = 0.1f;
+				camera2.farClipPlane = 4f;
+				camera2.transform.localPosition = new Vector3(0f, 0f, -700f);
 			}
 			else
 			{
-				val3.set_orthographic(true);
-				val3.set_orthographicSize(1f);
-				val3.set_nearClipPlane(-10f);
-				val3.set_farClipPlane(10f);
+				camera2.orthographic = true;
+				camera2.orthographicSize = 1f;
+				camera2.nearClipPlane = -10f;
+				camera2.farClipPlane = 10f;
 			}
-			AudioListener[] array2 = NGUITools.FindActive<AudioListener>();
+			AudioListener[] array2 = FindActive<AudioListener>();
 			if (array2 == null || array2.Length == 0)
 			{
-				val3.get_gameObject().AddComponent<AudioListener>();
+				camera2.gameObject.AddComponent<AudioListener>();
 			}
-			uIPanel2 = uIRoot.get_gameObject().AddComponent<UIPanel>();
+			uIPanel2 = uIRoot.gameObject.AddComponent<UIPanel>();
 		}
 		if (trans != null)
 		{
-			while (trans.get_parent() != null)
+			while (trans.parent != null)
 			{
-				trans = trans.get_parent();
+				trans = trans.parent;
 			}
-			if (IsChild(trans, uIPanel2.get_transform()))
+			if (IsChild(trans, uIPanel2.transform))
 			{
-				uIPanel2 = trans.get_gameObject().AddComponent<UIPanel>();
+				uIPanel2 = trans.gameObject.AddComponent<UIPanel>();
 			}
 			else
 			{
-				trans.set_parent(uIPanel2.get_transform());
-				trans.set_localScale(Vector3.get_one());
-				trans.set_localPosition(Vector3.get_zero());
-				SetChildLayer(uIPanel2.cachedTransform, uIPanel2.cachedGameObject.get_layer());
+				trans.parent = uIPanel2.transform;
+				trans.localScale = Vector3.one;
+				trans.localPosition = Vector3.zero;
+				SetChildLayer(uIPanel2.cachedTransform, uIPanel2.cachedGameObject.layer);
 			}
 		}
 		return uIPanel2;
@@ -787,50 +862,50 @@ public static class NGUITools
 
 	public static void SetChildLayer(Transform t, int layer)
 	{
-		for (int i = 0; i < t.get_childCount(); i++)
+		for (int i = 0; i < t.childCount; i++)
 		{
 			Transform child = t.GetChild(i);
-			child.get_gameObject().set_layer(layer);
+			child.gameObject.layer = layer;
 			SetChildLayer(child, layer);
 		}
 	}
 
 	public static T AddChild<T>(GameObject parent) where T : Component
 	{
-		GameObject val = AddChild(parent);
-		val.set_name(GetTypeName<T>());
-		return val.AddComponent<T>();
+		GameObject gameObject = AddChild(parent);
+		gameObject.name = GetTypeName<T>();
+		return gameObject.AddComponent<T>();
 	}
 
 	public static T AddChild<T>(GameObject parent, bool undo) where T : Component
 	{
-		GameObject val = AddChild(parent, undo);
-		val.set_name(GetTypeName<T>());
-		return val.AddComponent<T>();
+		GameObject gameObject = AddChild(parent, undo);
+		gameObject.name = GetTypeName<T>();
+		return gameObject.AddComponent<T>();
 	}
 
 	public static T AddWidget<T>(GameObject go) where T : UIWidget
 	{
 		int depth = CalculateNextDepth(go);
-		T result = NGUITools.AddChild<T>(go);
-		result.width = 100;
-		result.height = 100;
-		result.depth = depth;
-		return result;
+		T val = AddChild<T>(go);
+		val.width = 100;
+		val.height = 100;
+		val.depth = depth;
+		return val;
 	}
 
 	public static T AddWidget<T>(GameObject go, int depth) where T : UIWidget
 	{
-		T result = NGUITools.AddChild<T>(go);
-		result.width = 100;
-		result.height = 100;
-		result.depth = depth;
-		return result;
+		T val = AddChild<T>(go);
+		val.width = 100;
+		val.height = 100;
+		val.depth = depth;
+		return val;
 	}
 
 	public static UISprite AddSprite(GameObject go, UIAtlas atlas, string spriteName)
 	{
-		UISpriteData uISpriteData = (!(atlas != null)) ? null : atlas.GetSprite(spriteName);
+		UISpriteData uISpriteData = (atlas != null) ? atlas.GetSprite(spriteName) : null;
 		UISprite uISprite = AddWidget<UISprite>(go);
 		uISprite.type = ((uISpriteData != null && uISpriteData.hasBorder) ? UIBasicSprite.Type.Sliced : UIBasicSprite.Type.Simple);
 		uISprite.atlas = atlas;
@@ -840,33 +915,33 @@ public static class NGUITools
 
 	public static GameObject GetRoot(GameObject go)
 	{
-		Transform val = go.get_transform();
+		Transform transform = go.transform;
 		while (true)
 		{
-			Transform parent = val.get_parent();
+			Transform parent = transform.parent;
 			if (parent == null)
 			{
 				break;
 			}
-			val = parent;
+			transform = parent;
 		}
-		return val.get_gameObject();
+		return transform.gameObject;
 	}
 
 	public static T FindInParents<T>(GameObject go) where T : Component
 	{
 		if (go == null)
 		{
-			return (T)(object)null;
+			return null;
 		}
 		T component = go.GetComponent<T>();
-		if ((object)component == null)
+		if ((UnityEngine.Object)component == (UnityEngine.Object)null)
 		{
-			Transform parent = go.get_transform().get_parent();
-			while (parent != null && (object)component == null)
+			Transform parent = go.transform.parent;
+			while (parent != null && (UnityEngine.Object)component == (UnityEngine.Object)null)
 			{
-				component = parent.get_gameObject().GetComponent<T>();
-				parent = parent.get_parent();
+				component = parent.gameObject.GetComponent<T>();
+				parent = parent.parent;
 			}
 		}
 		return component;
@@ -876,105 +951,105 @@ public static class NGUITools
 	{
 		if (trans == null)
 		{
-			return (T)(object)null;
+			return null;
 		}
 		return trans.GetComponentInParent<T>();
 	}
 
-	public static void Destroy(Object obj)
+	public static void Destroy(UnityEngine.Object obj)
 	{
-		if (!Object.op_Implicit(obj))
+		if (!obj)
 		{
 			return;
 		}
 		if (obj is Transform)
 		{
-			Transform val = obj as Transform;
-			GameObject gameObject = val.get_gameObject();
-			if (Application.get_isPlaying())
+			Transform transform = obj as Transform;
+			GameObject gameObject = transform.gameObject;
+			if (Application.isPlaying)
 			{
-				val.set_parent(null);
-				Object.Destroy(gameObject);
+				transform.parent = null;
+				UnityEngine.Object.Destroy(gameObject);
 			}
 			else
 			{
-				Object.DestroyImmediate(gameObject);
+				UnityEngine.Object.DestroyImmediate(gameObject);
 			}
 		}
 		else if (obj is GameObject)
 		{
-			GameObject val2 = obj as GameObject;
-			Transform transform = val2.get_transform();
-			if (Application.get_isPlaying())
+			GameObject gameObject2 = obj as GameObject;
+			Transform transform2 = gameObject2.transform;
+			if (Application.isPlaying)
 			{
-				transform.set_parent(null);
-				Object.Destroy(val2);
+				transform2.parent = null;
+				UnityEngine.Object.Destroy(gameObject2);
 			}
 			else
 			{
-				Object.DestroyImmediate(val2);
+				UnityEngine.Object.DestroyImmediate(gameObject2);
 			}
 		}
-		else if (Application.get_isPlaying())
+		else if (Application.isPlaying)
 		{
-			Object.Destroy(obj);
+			UnityEngine.Object.Destroy(obj);
 		}
 		else
 		{
-			Object.DestroyImmediate(obj);
+			UnityEngine.Object.DestroyImmediate(obj);
 		}
 	}
 
 	public static void DestroyChildren(this Transform t)
 	{
-		bool isPlaying = Application.get_isPlaying();
-		while (t.get_childCount() != 0)
+		bool isPlaying = Application.isPlaying;
+		while (t.childCount != 0)
 		{
 			Transform child = t.GetChild(0);
 			if (isPlaying)
 			{
-				child.set_parent(null);
-				Object.Destroy(child.get_gameObject());
+				child.parent = null;
+				UnityEngine.Object.Destroy(child.gameObject);
 			}
 			else
 			{
-				Object.DestroyImmediate(child.get_gameObject());
+				UnityEngine.Object.DestroyImmediate(child.gameObject);
 			}
 		}
 	}
 
-	public static void DestroyImmediate(Object obj)
+	public static void DestroyImmediate(UnityEngine.Object obj)
 	{
 		if (obj != null)
 		{
-			if (Application.get_isEditor())
+			if (Application.isEditor)
 			{
-				Object.DestroyImmediate(obj);
+				UnityEngine.Object.DestroyImmediate(obj);
 			}
 			else
 			{
-				Object.Destroy(obj);
+				UnityEngine.Object.Destroy(obj);
 			}
 		}
 	}
 
 	public static void Broadcast(string funcName)
 	{
-		GameObject[] array = Object.FindObjectsOfType(typeof(GameObject)) as GameObject[];
+		GameObject[] array = UnityEngine.Object.FindObjectsOfType(typeof(GameObject)) as GameObject[];
 		int i = 0;
 		for (int num = array.Length; i < num; i++)
 		{
-			array[i].SendMessage(funcName, 1);
+			array[i].SendMessage(funcName, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
 	public static void Broadcast(string funcName, object param)
 	{
-		GameObject[] array = Object.FindObjectsOfType(typeof(GameObject)) as GameObject[];
+		GameObject[] array = UnityEngine.Object.FindObjectsOfType(typeof(GameObject)) as GameObject[];
 		int i = 0;
 		for (int num = array.Length; i < num; i++)
 		{
-			array[i].SendMessage(funcName, param, 1);
+			array[i].SendMessage(funcName, param, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
@@ -990,7 +1065,7 @@ public static class NGUITools
 			{
 				return true;
 			}
-			child = child.get_parent();
+			child = child.parent;
 		}
 		return false;
 	}
@@ -1002,31 +1077,29 @@ public static class NGUITools
 
 	private static void Activate(Transform t, bool compatibilityMode)
 	{
-		SetActiveSelf(t.get_gameObject(), state: true);
+		SetActiveSelf(t.gameObject, state: true);
 		if (!compatibilityMode)
 		{
 			return;
 		}
 		int i = 0;
-		for (int childCount = t.get_childCount(); i < childCount; i++)
+		for (int childCount = t.childCount; i < childCount; i++)
 		{
-			Transform child = t.GetChild(i);
-			if (child.get_gameObject().get_activeSelf())
+			if (t.GetChild(i).gameObject.activeSelf)
 			{
 				return;
 			}
 		}
 		int j = 0;
-		for (int childCount2 = t.get_childCount(); j < childCount2; j++)
+		for (int childCount2 = t.childCount; j < childCount2; j++)
 		{
-			Transform child2 = t.GetChild(j);
-			Activate(child2, compatibilityMode: true);
+			Activate(t.GetChild(j), compatibilityMode: true);
 		}
 	}
 
 	private static void Deactivate(Transform t)
 	{
-		SetActiveSelf(t.get_gameObject(), state: false);
+		SetActiveSelf(t.gameObject, state: false);
 	}
 
 	public static void SetActive(GameObject go, bool state)
@@ -1036,16 +1109,16 @@ public static class NGUITools
 
 	public static void SetActive(GameObject go, bool state, bool compatibilityMode)
 	{
-		if (Object.op_Implicit(go))
+		if ((bool)go)
 		{
 			if (state)
 			{
-				Activate(go.get_transform(), compatibilityMode);
-				CallCreatePanel(go.get_transform());
+				Activate(go.transform, compatibilityMode);
+				CallCreatePanel(go.transform);
 			}
 			else
 			{
-				Deactivate(go.get_transform());
+				Deactivate(go.transform);
 			}
 		}
 	}
@@ -1060,7 +1133,7 @@ public static class NGUITools
 			component.CreatePanel();
 		}
 		int i = 0;
-		for (int childCount = t.get_childCount(); i < childCount; i++)
+		for (int childCount = t.childCount; i < childCount; i++)
 		{
 			CallCreatePanel(t.GetChild(i));
 		}
@@ -1068,23 +1141,21 @@ public static class NGUITools
 
 	public static void SetActiveChildren(GameObject go, bool state)
 	{
-		Transform transform = go.get_transform();
+		Transform transform = go.transform;
 		if (state)
 		{
 			int i = 0;
-			for (int childCount = transform.get_childCount(); i < childCount; i++)
+			for (int childCount = transform.childCount; i < childCount; i++)
 			{
-				Transform child = transform.GetChild(i);
-				Activate(child);
+				Activate(transform.GetChild(i));
 			}
 		}
 		else
 		{
 			int j = 0;
-			for (int childCount2 = transform.get_childCount(); j < childCount2; j++)
+			for (int childCount2 = transform.childCount; j < childCount2; j++)
 			{
-				Transform child2 = transform.GetChild(j);
-				Deactivate(child2);
+				Deactivate(transform.GetChild(j));
 			}
 		}
 	}
@@ -1092,21 +1163,33 @@ public static class NGUITools
 	[Obsolete("Use NGUITools.GetActive instead")]
 	public static bool IsActive(Behaviour mb)
 	{
-		return mb != null && mb.get_enabled() && mb.get_gameObject().get_activeInHierarchy();
+		if (mb != null && mb.enabled)
+		{
+			return mb.gameObject.activeInHierarchy;
+		}
+		return false;
 	}
 
 	[DebuggerHidden]
 	[DebuggerStepThrough]
 	public static bool GetActive(Behaviour mb)
 	{
-		return Object.op_Implicit(mb) && mb.get_enabled() && mb.get_gameObject().get_activeInHierarchy();
+		if ((bool)mb && mb.enabled)
+		{
+			return mb.gameObject.activeInHierarchy;
+		}
+		return false;
 	}
 
 	[DebuggerHidden]
 	[DebuggerStepThrough]
 	public static bool GetActive(GameObject go)
 	{
-		return Object.op_Implicit(go) && go.get_activeInHierarchy();
+		if ((bool)go)
+		{
+			return go.activeInHierarchy;
+		}
+		return false;
 	}
 
 	[DebuggerHidden]
@@ -1118,19 +1201,17 @@ public static class NGUITools
 
 	public static void SetLayer(GameObject go, int layer)
 	{
-		go.set_layer(layer);
-		Transform transform = go.get_transform();
+		go.layer = layer;
+		Transform transform = go.transform;
 		int i = 0;
-		for (int childCount = transform.get_childCount(); i < childCount; i++)
+		for (int childCount = transform.childCount; i < childCount; i++)
 		{
-			Transform child = transform.GetChild(i);
-			SetLayer(child.get_gameObject(), layer);
+			SetLayer(transform.GetChild(i).gameObject, layer);
 		}
 	}
 
 	public static Vector3 Round(Vector3 v)
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 		v.x = Mathf.Round(v.x);
 		v.y = Mathf.Round(v.y);
 		v.z = Mathf.Round(v.z);
@@ -1139,10 +1220,6 @@ public static class NGUITools
 
 	public static void MakePixelPerfect(Transform t)
 	{
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		UIWidget component = t.GetComponent<UIWidget>();
 		if (component != null)
 		{
@@ -1150,11 +1227,11 @@ public static class NGUITools
 		}
 		if (t.GetComponent<UIAnchor>() == null && t.GetComponent<UIRoot>() == null)
 		{
-			t.set_localPosition(Round(t.get_localPosition()));
-			t.set_localScale(Round(t.get_localScale()));
+			t.localPosition = Round(t.localPosition);
+			t.localScale = Round(t.localScale);
 		}
 		int i = 0;
-		for (int childCount = t.get_childCount(); i < childCount; i++)
+		for (int childCount = t.childCount; i < childCount; i++)
 		{
 			MakePixelPerfect(t.GetChild(i));
 		}
@@ -1166,7 +1243,7 @@ public static class NGUITools
 		{
 			return false;
 		}
-		string path = Application.get_persistentDataPath() + "/" + fileName;
+		string path = Application.persistentDataPath + "/" + fileName;
 		if (bytes == null)
 		{
 			if (File.Exists(path))
@@ -1182,7 +1259,7 @@ public static class NGUITools
 		}
 		catch (Exception ex)
 		{
-			Debug.LogError((object)ex.Message);
+			UnityEngine.Debug.LogError(ex.Message);
 			return false;
 		}
 		fileStream.Write(bytes, 0, bytes.Length);
@@ -1196,7 +1273,7 @@ public static class NGUITools
 		{
 			return null;
 		}
-		string path = Application.get_persistentDataPath() + "/" + fileName;
+		string path = Application.persistentDataPath + "/" + fileName;
 		if (File.Exists(path))
 		{
 			return File.ReadAllBytes(path);
@@ -1206,7 +1283,6 @@ public static class NGUITools
 
 	public static Color ApplyPMA(Color c)
 	{
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 		if (c.a != 1f)
 		{
 			c.r *= c.a;
@@ -1229,14 +1305,12 @@ public static class NGUITools
 	[Obsolete("Use NGUIText.EncodeColor instead")]
 	public static string EncodeColor(Color c)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 		return NGUIText.EncodeColor24(c);
 	}
 
 	[Obsolete("Use NGUIText.ParseColor instead")]
 	public static Color ParseColor(string text, int offset)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		return NGUIText.ParseColor24(text, offset);
 	}
 
@@ -1249,7 +1323,7 @@ public static class NGUITools
 	public static T AddMissingComponent<T>(this GameObject go) where T : Component
 	{
 		T val = go.GetComponent<T>();
-		if ((object)val == null)
+		if ((UnityEngine.Object)val == (UnityEngine.Object)null)
 		{
 			val = go.AddComponent<T>();
 		}
@@ -1258,7 +1332,7 @@ public static class NGUITools
 
 	public static Vector3[] GetSides(this Camera cam)
 	{
-		return cam.GetSides(Mathf.Lerp(cam.get_nearClipPlane(), cam.get_farClipPlane(), 0.5f), null);
+		return cam.GetSides(Mathf.Lerp(cam.nearClipPlane, cam.farClipPlane, 0.5f), null);
 	}
 
 	public static Vector3[] GetSides(this Camera cam, float depth)
@@ -1268,88 +1342,41 @@ public static class NGUITools
 
 	public static Vector3[] GetSides(this Camera cam, Transform relativeTo)
 	{
-		return cam.GetSides(Mathf.Lerp(cam.get_nearClipPlane(), cam.get_farClipPlane(), 0.5f), relativeTo);
+		return cam.GetSides(Mathf.Lerp(cam.nearClipPlane, cam.farClipPlane, 0.5f), relativeTo);
 	}
 
 	public static Vector3[] GetSides(this Camera cam, float depth, Transform relativeTo)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0212: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0217: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0253: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-		if (cam.get_orthographic())
+		if (cam.orthographic)
 		{
-			float orthographicSize = cam.get_orthographicSize();
+			float orthographicSize = cam.orthographicSize;
 			float num = 0f - orthographicSize;
 			float num2 = orthographicSize;
-			float num3 = 0f - orthographicSize;
-			float num4 = orthographicSize;
-			Rect rect = cam.get_rect();
+			float y = 0f - orthographicSize;
+			float y2 = orthographicSize;
+			Rect rect = cam.rect;
 			Vector2 screenSize = NGUITools.screenSize;
-			float num5 = screenSize.x / screenSize.y;
-			num5 *= rect.get_width() / rect.get_height();
-			num *= num5;
-			num2 *= num5;
-			Transform transform = cam.get_transform();
-			Quaternion rotation = transform.get_rotation();
-			Vector3 position = transform.get_position();
-			int num6 = Mathf.RoundToInt(screenSize.x);
-			int num7 = Mathf.RoundToInt(screenSize.y);
-			if ((num6 & 1) == 1)
+			float num3 = screenSize.x / screenSize.y;
+			num3 *= rect.width / rect.height;
+			num *= num3;
+			num2 *= num3;
+			Transform transform = cam.transform;
+			Quaternion rotation = transform.rotation;
+			Vector3 position = transform.position;
+			int num4 = Mathf.RoundToInt(screenSize.x);
+			int num5 = Mathf.RoundToInt(screenSize.y);
+			if ((num4 & 1) == 1)
 			{
 				position.x -= 1f / screenSize.x;
 			}
-			if ((num7 & 1) == 1)
+			if ((num5 & 1) == 1)
 			{
 				position.y += 1f / screenSize.y;
 			}
 			mSides[0] = rotation * new Vector3(num, 0f, depth) + position;
-			mSides[1] = rotation * new Vector3(0f, num4, depth) + position;
+			mSides[1] = rotation * new Vector3(0f, y2, depth) + position;
 			mSides[2] = rotation * new Vector3(num2, 0f, depth) + position;
-			mSides[3] = rotation * new Vector3(0f, num3, depth) + position;
+			mSides[3] = rotation * new Vector3(0f, y, depth) + position;
 		}
 		else
 		{
@@ -1370,7 +1397,7 @@ public static class NGUITools
 
 	public static Vector3[] GetWorldCorners(this Camera cam)
 	{
-		float depth = Mathf.Lerp(cam.get_nearClipPlane(), cam.get_farClipPlane(), 0.5f);
+		float depth = Mathf.Lerp(cam.nearClipPlane, cam.farClipPlane, 0.5f);
 		return cam.GetWorldCorners(depth, null);
 	}
 
@@ -1381,78 +1408,31 @@ public static class NGUITools
 
 	public static Vector3[] GetWorldCorners(this Camera cam, Transform relativeTo)
 	{
-		return cam.GetWorldCorners(Mathf.Lerp(cam.get_nearClipPlane(), cam.get_farClipPlane(), 0.5f), relativeTo);
+		return cam.GetWorldCorners(Mathf.Lerp(cam.nearClipPlane, cam.farClipPlane, 0.5f), relativeTo);
 	}
 
 	public static Vector3[] GetWorldCorners(this Camera cam, float depth, Transform relativeTo)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-		if (cam.get_orthographic())
+		if (cam.orthographic)
 		{
-			float orthographicSize = cam.get_orthographicSize();
+			float orthographicSize = cam.orthographicSize;
 			float num = 0f - orthographicSize;
 			float num2 = orthographicSize;
-			float num3 = 0f - orthographicSize;
-			float num4 = orthographicSize;
-			Rect rect = cam.get_rect();
+			float y = 0f - orthographicSize;
+			float y2 = orthographicSize;
+			Rect rect = cam.rect;
 			Vector2 screenSize = NGUITools.screenSize;
-			float num5 = screenSize.x / screenSize.y;
-			num5 *= rect.get_width() / rect.get_height();
-			num *= num5;
-			num2 *= num5;
-			Transform transform = cam.get_transform();
-			Quaternion rotation = transform.get_rotation();
-			Vector3 position = transform.get_position();
-			mSides[0] = rotation * new Vector3(num, num3, depth) + position;
-			mSides[1] = rotation * new Vector3(num, num4, depth) + position;
-			mSides[2] = rotation * new Vector3(num2, num4, depth) + position;
-			mSides[3] = rotation * new Vector3(num2, num3, depth) + position;
+			float num3 = screenSize.x / screenSize.y;
+			num3 *= rect.width / rect.height;
+			num *= num3;
+			num2 *= num3;
+			Transform transform = cam.transform;
+			Quaternion rotation = transform.rotation;
+			Vector3 position = transform.position;
+			mSides[0] = rotation * new Vector3(num, y, depth) + position;
+			mSides[1] = rotation * new Vector3(num, y2, depth) + position;
+			mSides[2] = rotation * new Vector3(num2, y2, depth) + position;
+			mSides[3] = rotation * new Vector3(num2, y, depth) + position;
 		}
 		else
 		{
@@ -1483,379 +1463,350 @@ public static class NGUITools
 		{
 			text = text.Substring(num + 1);
 		}
-		return (!string.IsNullOrEmpty(method)) ? (text + "/" + method) : text;
+		if (!string.IsNullOrEmpty(method))
+		{
+			return text + "/" + method;
+		}
+		return text;
 	}
 
 	public static void Execute<T>(GameObject go, string funcName) where T : Component
 	{
 		T[] components = go.GetComponents<T>();
-		T[] array = components;
-		for (int i = 0; i < array.Length; i++)
+		foreach (T val in components)
 		{
-			T val = array[i];
-			((object)val).GetType().GetMethod(funcName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.Invoke(val, null);
+			MethodInfo method = val.GetType().GetMethod(funcName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			if (method != null)
+			{
+				method.Invoke(val, null);
+			}
 		}
 	}
 
 	public static void ExecuteAll<T>(GameObject root, string funcName) where T : Component
 	{
 		Execute<T>(root, funcName);
-		Transform transform = root.get_transform();
+		Transform transform = root.transform;
 		int i = 0;
-		for (int childCount = transform.get_childCount(); i < childCount; i++)
+		for (int childCount = transform.childCount; i < childCount; i++)
 		{
-			ExecuteAll<T>(transform.GetChild(i).get_gameObject(), funcName);
+			ExecuteAll<T>(transform.GetChild(i).gameObject, funcName);
 		}
 	}
 
 	public static void ImmediatelyCreateDrawCalls(GameObject root)
 	{
-		NGUITools.ExecuteAll<UIWidget>(root, "Start");
-		NGUITools.ExecuteAll<UIPanel>(root, "Start");
-		NGUITools.ExecuteAll<UIWidget>(root, "Update");
-		NGUITools.ExecuteAll<UIPanel>(root, "Update");
-		NGUITools.ExecuteAll<UIPanel>(root, "LateUpdate");
+		ExecuteAll<UIWidget>(root, "Start");
+		ExecuteAll<UIPanel>(root, "Start");
+		ExecuteAll<UIWidget>(root, "Update");
+		ExecuteAll<UIPanel>(root, "Update");
+		ExecuteAll<UIPanel>(root, "LateUpdate");
 	}
 
 	public static string KeyToCaption(KeyCode key)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0184: Expected I4, but got Unknown
-		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030d: Expected I4, but got Unknown
-		//IL_030d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032d: Expected I4, but got Unknown
-		//IL_032d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0333: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0336: Invalid comparison between Unknown and I4
-		//IL_033b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_033e: Invalid comparison between Unknown and I4
-		switch (key - 256)
+		switch (key)
 		{
-		default:
-			switch (key - 32)
-			{
-			default:
-				switch (key - 8)
-				{
-				default:
-					if ((int)key != 0)
-					{
-						if ((int)key != 19)
-						{
-							if ((int)key == 27)
-							{
-								return "Esc";
-							}
-							return null;
-						}
-						return "PS";
-					}
-					return null;
-				case 0:
-					return "BS";
-				case 1:
-					return "Tab";
-				case 4:
-					return "Clr";
-				case 5:
-					return "NT";
-				}
-			case 0:
-				return "SP";
-			case 1:
-				return "!";
-			case 2:
-				return "\"";
-			case 3:
-				return "#";
-			case 4:
-				return "$";
-			case 6:
-				return "&";
-			case 7:
-				return "'";
-			case 8:
-				return "(";
-			case 9:
-				return ")";
-			case 10:
-				return "*";
-			case 11:
-				return "+";
-			case 12:
-				return ",";
-			case 13:
-				return "-";
-			case 14:
-				return ".";
-			case 15:
-				return "/";
-			case 16:
-				return "0";
-			case 17:
-				return "1";
-			case 18:
-				return "2";
-			case 19:
-				return "3";
-			case 20:
-				return "4";
-			case 21:
-				return "5";
-			case 22:
-				return "6";
-			case 23:
-				return "7";
-			case 24:
-				return "8";
-			case 25:
-				return "9";
-			case 26:
-				return ":";
-			case 27:
-				return ";";
-			case 28:
-				return "<";
-			case 29:
-				return "=";
-			case 30:
-				return ">";
-			case 31:
-				return "?";
-			case 32:
-				return "@";
-			case 59:
-				return "[";
-			case 60:
-				return "\\";
-			case 61:
-				return "]";
-			case 62:
-				return "^";
-			case 63:
-				return "_";
-			case 64:
-				return "`";
-			case 65:
-				return "A";
-			case 66:
-				return "B";
-			case 67:
-				return "C";
-			case 68:
-				return "D";
-			case 69:
-				return "E";
-			case 70:
-				return "F";
-			case 71:
-				return "G";
-			case 72:
-				return "H";
-			case 73:
-				return "I";
-			case 74:
-				return "J";
-			case 75:
-				return "K";
-			case 76:
-				return "L";
-			case 77:
-				return "M";
-			case 78:
-				return "N0";
-			case 79:
-				return "O";
-			case 80:
-				return "P";
-			case 81:
-				return "Q";
-			case 82:
-				return "R";
-			case 83:
-				return "S";
-			case 84:
-				return "T";
-			case 85:
-				return "U";
-			case 86:
-				return "V";
-			case 87:
-				return "W";
-			case 88:
-				return "X";
-			case 89:
-				return "Y";
-			case 90:
-				return "Z";
-			case 95:
-				return "Del";
-			}
-		case 0:
-			return "K0";
-		case 1:
-			return "K1";
-		case 2:
-			return "K2";
-		case 3:
-			return "K3";
-		case 4:
-			return "K4";
-		case 5:
-			return "K5";
-		case 6:
-			return "K6";
-		case 7:
-			return "K7";
-		case 8:
-			return "K8";
-		case 9:
-			return "K9";
-		case 10:
-			return ".";
-		case 11:
-			return "/";
-		case 12:
-			return "*";
-		case 13:
-			return "-";
-		case 14:
-			return "+";
-		case 15:
+		case KeyCode.None:
+			return null;
+		case KeyCode.Backspace:
+			return "BS";
+		case KeyCode.Tab:
+			return "Tab";
+		case KeyCode.Clear:
+			return "Clr";
+		case KeyCode.Return:
 			return "NT";
-		case 16:
+		case KeyCode.Pause:
+			return "PS";
+		case KeyCode.Escape:
+			return "Esc";
+		case KeyCode.Space:
+			return "SP";
+		case KeyCode.Exclaim:
+			return "!";
+		case KeyCode.DoubleQuote:
+			return "\"";
+		case KeyCode.Hash:
+			return "#";
+		case KeyCode.Dollar:
+			return "$";
+		case KeyCode.Ampersand:
+			return "&";
+		case KeyCode.Quote:
+			return "'";
+		case KeyCode.LeftParen:
+			return "(";
+		case KeyCode.RightParen:
+			return ")";
+		case KeyCode.Asterisk:
+			return "*";
+		case KeyCode.Plus:
+			return "+";
+		case KeyCode.Comma:
+			return ",";
+		case KeyCode.Minus:
+			return "-";
+		case KeyCode.Period:
+			return ".";
+		case KeyCode.Slash:
+			return "/";
+		case KeyCode.Alpha0:
+			return "0";
+		case KeyCode.Alpha1:
+			return "1";
+		case KeyCode.Alpha2:
+			return "2";
+		case KeyCode.Alpha3:
+			return "3";
+		case KeyCode.Alpha4:
+			return "4";
+		case KeyCode.Alpha5:
+			return "5";
+		case KeyCode.Alpha6:
+			return "6";
+		case KeyCode.Alpha7:
+			return "7";
+		case KeyCode.Alpha8:
+			return "8";
+		case KeyCode.Alpha9:
+			return "9";
+		case KeyCode.Colon:
+			return ":";
+		case KeyCode.Semicolon:
+			return ";";
+		case KeyCode.Less:
+			return "<";
+		case KeyCode.Equals:
 			return "=";
-		case 17:
+		case KeyCode.Greater:
+			return ">";
+		case KeyCode.Question:
+			return "?";
+		case KeyCode.At:
+			return "@";
+		case KeyCode.LeftBracket:
+			return "[";
+		case KeyCode.Backslash:
+			return "\\";
+		case KeyCode.RightBracket:
+			return "]";
+		case KeyCode.Caret:
+			return "^";
+		case KeyCode.Underscore:
+			return "_";
+		case KeyCode.BackQuote:
+			return "`";
+		case KeyCode.A:
+			return "A";
+		case KeyCode.B:
+			return "B";
+		case KeyCode.C:
+			return "C";
+		case KeyCode.D:
+			return "D";
+		case KeyCode.E:
+			return "E";
+		case KeyCode.F:
+			return "F";
+		case KeyCode.G:
+			return "G";
+		case KeyCode.H:
+			return "H";
+		case KeyCode.I:
+			return "I";
+		case KeyCode.J:
+			return "J";
+		case KeyCode.K:
+			return "K";
+		case KeyCode.L:
+			return "L";
+		case KeyCode.M:
+			return "M";
+		case KeyCode.N:
+			return "N0";
+		case KeyCode.O:
+			return "O";
+		case KeyCode.P:
+			return "P";
+		case KeyCode.Q:
+			return "Q";
+		case KeyCode.R:
+			return "R";
+		case KeyCode.S:
+			return "S";
+		case KeyCode.T:
+			return "T";
+		case KeyCode.U:
+			return "U";
+		case KeyCode.V:
+			return "V";
+		case KeyCode.W:
+			return "W";
+		case KeyCode.X:
+			return "X";
+		case KeyCode.Y:
+			return "Y";
+		case KeyCode.Z:
+			return "Z";
+		case KeyCode.Delete:
+			return "Del";
+		case KeyCode.Keypad0:
+			return "K0";
+		case KeyCode.Keypad1:
+			return "K1";
+		case KeyCode.Keypad2:
+			return "K2";
+		case KeyCode.Keypad3:
+			return "K3";
+		case KeyCode.Keypad4:
+			return "K4";
+		case KeyCode.Keypad5:
+			return "K5";
+		case KeyCode.Keypad6:
+			return "K6";
+		case KeyCode.Keypad7:
+			return "K7";
+		case KeyCode.Keypad8:
+			return "K8";
+		case KeyCode.Keypad9:
+			return "K9";
+		case KeyCode.KeypadPeriod:
+			return ".";
+		case KeyCode.KeypadDivide:
+			return "/";
+		case KeyCode.KeypadMultiply:
+			return "*";
+		case KeyCode.KeypadMinus:
+			return "-";
+		case KeyCode.KeypadPlus:
+			return "+";
+		case KeyCode.KeypadEnter:
+			return "NT";
+		case KeyCode.KeypadEquals:
+			return "=";
+		case KeyCode.UpArrow:
 			return "UP";
-		case 18:
+		case KeyCode.DownArrow:
 			return "DN";
-		case 19:
+		case KeyCode.RightArrow:
 			return "LT";
-		case 20:
+		case KeyCode.LeftArrow:
 			return "RT";
-		case 21:
+		case KeyCode.Insert:
 			return "Ins";
-		case 22:
+		case KeyCode.Home:
 			return "Home";
-		case 23:
+		case KeyCode.End:
 			return "End";
-		case 24:
+		case KeyCode.PageUp:
 			return "PU";
-		case 25:
+		case KeyCode.PageDown:
 			return "PD";
-		case 26:
+		case KeyCode.F1:
 			return "F1";
-		case 27:
+		case KeyCode.F2:
 			return "F2";
-		case 28:
+		case KeyCode.F3:
 			return "F3";
-		case 29:
+		case KeyCode.F4:
 			return "F4";
-		case 30:
+		case KeyCode.F5:
 			return "F5";
-		case 31:
+		case KeyCode.F6:
 			return "F6";
-		case 32:
+		case KeyCode.F7:
 			return "F7";
-		case 33:
+		case KeyCode.F8:
 			return "F8";
-		case 34:
+		case KeyCode.F9:
 			return "F9";
-		case 35:
+		case KeyCode.F10:
 			return "F10";
-		case 36:
+		case KeyCode.F11:
 			return "F11";
-		case 37:
+		case KeyCode.F12:
 			return "F12";
-		case 38:
+		case KeyCode.F13:
 			return "F13";
-		case 39:
+		case KeyCode.F14:
 			return "F14";
-		case 40:
+		case KeyCode.F15:
 			return "F15";
-		case 44:
+		case KeyCode.Numlock:
 			return "Num";
-		case 45:
+		case KeyCode.CapsLock:
 			return "Cap";
-		case 46:
+		case KeyCode.ScrollLock:
 			return "Scr";
-		case 47:
+		case KeyCode.RightShift:
 			return "RS";
-		case 48:
+		case KeyCode.LeftShift:
 			return "LS";
-		case 49:
+		case KeyCode.RightControl:
 			return "RC";
-		case 50:
+		case KeyCode.LeftControl:
 			return "LC";
-		case 51:
+		case KeyCode.RightAlt:
 			return "RA";
-		case 52:
+		case KeyCode.LeftAlt:
 			return "LA";
-		case 67:
+		case KeyCode.Mouse0:
 			return "M0";
-		case 68:
+		case KeyCode.Mouse1:
 			return "M1";
-		case 69:
+		case KeyCode.Mouse2:
 			return "M2";
-		case 70:
+		case KeyCode.Mouse3:
 			return "M3";
-		case 71:
+		case KeyCode.Mouse4:
 			return "M4";
-		case 72:
+		case KeyCode.Mouse5:
 			return "M5";
-		case 73:
+		case KeyCode.Mouse6:
 			return "M6";
-		case 74:
+		case KeyCode.JoystickButton0:
 			return "(A)";
-		case 75:
+		case KeyCode.JoystickButton1:
 			return "(B)";
-		case 76:
+		case KeyCode.JoystickButton2:
 			return "(X)";
-		case 77:
+		case KeyCode.JoystickButton3:
 			return "(Y)";
-		case 78:
+		case KeyCode.JoystickButton4:
 			return "(RB)";
-		case 79:
+		case KeyCode.JoystickButton5:
 			return "(LB)";
-		case 80:
+		case KeyCode.JoystickButton6:
 			return "(Back)";
-		case 81:
+		case KeyCode.JoystickButton7:
 			return "(Start)";
-		case 82:
+		case KeyCode.JoystickButton8:
 			return "(LS)";
-		case 83:
+		case KeyCode.JoystickButton9:
 			return "(RS)";
-		case 84:
+		case KeyCode.JoystickButton10:
 			return "J10";
-		case 85:
+		case KeyCode.JoystickButton11:
 			return "J11";
-		case 86:
+		case KeyCode.JoystickButton12:
 			return "J12";
-		case 87:
+		case KeyCode.JoystickButton13:
 			return "J13";
-		case 88:
+		case KeyCode.JoystickButton14:
 			return "J14";
-		case 89:
+		case KeyCode.JoystickButton15:
 			return "J15";
-		case 90:
+		case KeyCode.JoystickButton16:
 			return "J16";
-		case 91:
+		case KeyCode.JoystickButton17:
 			return "J17";
-		case 92:
+		case KeyCode.JoystickButton18:
 			return "J18";
-		case 93:
+		case KeyCode.JoystickButton19:
 			return "J19";
+		default:
+			return null;
 		}
-	}
-
-	static NGUITools()
-	{
-		KeyCode[] array = new KeyCode[145];
-		RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
-		keys = (KeyCode[])array;
 	}
 }

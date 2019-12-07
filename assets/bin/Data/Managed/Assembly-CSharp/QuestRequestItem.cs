@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -47,8 +46,6 @@ public class QuestRequestItem : UIBehaviour
 
 	public virtual void Setup(Transform t, DeliveryTable.DeliveryData info)
 	{
-		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0430: Unknown result type (might be due to invalid IL or missing references)
 		SetIcon(t, info);
 		SetDeliveryName(t, info);
 		bool is_visible = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)info.id);
@@ -80,16 +77,11 @@ public class QuestRequestItem : UIBehaviour
 		SetActive(t, UI.SPR_DROP_DIFFICULTY_RARE, info.GetDeliveryDropRarity() == DELIVERY_DROP_DIFFICULTY.RARE);
 		SetActive(t, UI.SPR_DROP_DIFFICULTY_SUPER_RARE, info.GetDeliveryDropRarity() == DELIVERY_DROP_DIFFICULTY.SUPER_RARE);
 		DeliveryDropRareTextColor componentInChildren = t.GetComponentInChildren<DeliveryDropRareTextColor>();
-		if (componentInChildren != null)
+		if (componentInChildren != null && GetComponent<UILabel>(t, UI.LBL_NEED_ITEM_NAME) != null)
 		{
-			UILabel component = base.GetComponent<UILabel>(t, (Enum)UI.LBL_NEED_ITEM_NAME);
-			if (component != null)
-			{
-				SetColor(t, UI.LBL_NEED_ITEM_NAME, componentInChildren.GetRarityColor(info.GetDeliveryDropRarity()));
-			}
+			SetColor(t, UI.LBL_NEED_ITEM_NAME, componentInChildren.GetRarityColor(info.GetDeliveryDropRarity()));
 		}
 		SetSprite(t, UI.SPR_FRAME, SPR_FRAME_TYPE[info.DeliveryTypeIndex()]);
-		int num = 0;
 		List<DeliveryRewardTable.DeliveryRewardData.Reward> list = new List<DeliveryRewardTable.DeliveryRewardData.Reward>();
 		DeliveryRewardTable.DeliveryRewardData[] deliveryRewardTableData = Singleton<DeliveryRewardTable>.I.GetDeliveryRewardTableData(info.id);
 		if (deliveryRewardTableData != null)
@@ -119,9 +111,7 @@ public class QuestRequestItem : UIBehaviour
 		{
 			if (list.Count >= 2)
 			{
-				list = (from x in list
-				orderby GetRewardPriority(x)
-				select x).ToList();
+				list = list.OrderBy((DeliveryRewardTable.DeliveryRewardData.Reward x) => GetRewardPriority(x)).ToList();
 			}
 			UI[] array2 = new UI[2]
 			{
@@ -148,12 +138,11 @@ public class QuestRequestItem : UIBehaviour
 		{
 			bool flag2 = questData.level > (int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level;
 			UIWidget[] componentsInChildren = FindCtrl(t, UI.SPR_FRAME).GetComponentsInChildren<UIWidget>();
-			UIWidget[] array3 = componentsInChildren;
-			foreach (UIWidget uIWidget in array3)
+			foreach (UIWidget uIWidget in componentsInChildren)
 			{
-				if (flag2 && !uIWidget.get_name().Contains("Mask"))
+				if (flag2 && !uIWidget.name.Contains("Mask"))
 				{
-					uIWidget.color = Color.get_gray();
+					uIWidget.color = Color.gray;
 				}
 			}
 			SetActive(t, UI.OBJ_LEVEL_LIMIT, flag2);
@@ -164,10 +153,10 @@ public class QuestRequestItem : UIBehaviour
 		{
 			SetActive(t, UI.OBJ_LEVEL_LIMIT, is_visible: false);
 		}
-		UIGrid component2 = base.GetComponent<UIGrid>(t, (Enum)UI.GRD_ICON_ROOT);
-		if (component2 != null)
+		UIGrid component = GetComponent<UIGrid>(t, UI.GRD_ICON_ROOT);
+		if (component != null)
 		{
-			component2.Reposition();
+			component.Reposition();
 		}
 	}
 
@@ -210,14 +199,11 @@ public class QuestRequestItem : UIBehaviour
 		case REWARD_TYPE.POINT_SHOP_POINT:
 			return 3;
 		case REWARD_TYPE.ITEM:
-		{
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(reward.item_id);
-			if (itemData.type == ITEM_TYPE.TICKET)
+			if (Singleton<ItemTable>.I.GetItemData(reward.item_id).type == ITEM_TYPE.TICKET)
 			{
 				return 1;
 			}
 			return 4;
-		}
 		default:
 			return 4;
 		}

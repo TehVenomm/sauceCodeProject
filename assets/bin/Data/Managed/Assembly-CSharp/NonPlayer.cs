@@ -106,12 +106,12 @@ public class NonPlayer : Player
 		{
 			return eNpcAllayState.CANNOT;
 		}
-		if (object.ReferenceEquals(base.controller, null) || object.ReferenceEquals(base.controller.brain, null) || object.ReferenceEquals(base.controller.brain.targetCtrl, null))
+		if ((object)base.controller == null || (object)base.controller.brain == null || base.controller.brain.targetCtrl == null)
 		{
 			return eNpcAllayState.CANNOT;
 		}
 		StageObject allyTarget = base.controller.brain.targetCtrl.GetAllyTarget();
-		if (!object.ReferenceEquals(allyTarget, null))
+		if ((object)allyTarget != null)
 		{
 			if (allyTarget == client)
 			{
@@ -139,7 +139,7 @@ public class NonPlayer : Player
 			}
 			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 			{
-				Debug.Log((object)"NPCSkillAction OnUses");
+				Debug.Log("NPCSkillAction OnUses");
 				MonoBehaviourSingleton<InGameProgress>.I.OnSkillUse(base.skillInfo.actSkillParam);
 			}
 		}
@@ -158,7 +158,7 @@ public class NonPlayer : Player
 		if (motion_id - 115 >= 0 && motion_id - 115 < Player.subMotionStateName.Length)
 		{
 			Character.stateNameBuilder.Length = 0;
-			Character.stateNameBuilder.Append((!(_layerName == string.Empty)) ? _layerName : "Base Layer.");
+			Character.stateNameBuilder.Append((_layerName == "") ? "Base Layer." : _layerName);
 			Character.stateNameBuilder.Append(Player.subMotionStateName[motion_id - 115]);
 			return Character.stateNameBuilder.ToString();
 		}
@@ -171,7 +171,7 @@ public class NonPlayer : Player
 
 	private static string _GetMotionStateName(int motion_id, string _layerName)
 	{
-		string value = (!string.IsNullOrEmpty(_layerName)) ? _layerName : "Base Layer.";
+		string value = string.IsNullOrEmpty(_layerName) ? "Base Layer." : _layerName;
 		if (motion_id < 115)
 		{
 			Character.stateNameBuilder.Length = 0;

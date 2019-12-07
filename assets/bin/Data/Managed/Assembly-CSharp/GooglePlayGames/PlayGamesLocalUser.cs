@@ -54,7 +54,7 @@ namespace GooglePlayGames
 
 		public new bool isFriend => true;
 
-		public new UserState state => 0;
+		public new UserState state => UserState.Online;
 
 		public new string AvatarURL
 		{
@@ -82,7 +82,11 @@ namespace GooglePlayGames
 					emailAddress = mPlatform.GetUserEmail();
 					emailAddress = (emailAddress ?? string.Empty);
 				}
-				return (!authenticated) ? string.Empty : emailAddress;
+				if (!authenticated)
+				{
+					return string.Empty;
+				}
+				return emailAddress;
 			}
 		}
 

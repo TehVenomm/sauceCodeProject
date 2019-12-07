@@ -49,49 +49,46 @@ public class ProfileTop : GameSection
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		if (!(playerLoader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && !(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "ProfileTop"))
 		{
-			playerLoader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
+			playerLoader.transform.Rotate(GameDefine.GetCharaRotateVector(touch_info));
 		}
 	}
 
 	private void OnDrag(GameObject obj, Vector2 move)
 	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		if (!(playerLoader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && !(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "ProfileTop"))
 		{
-			playerLoader.get_transform().Rotate(GameDefine.GetCharaRotateVector(move));
+			playerLoader.transform.Rotate(GameDefine.GetCharaRotateVector(move));
 		}
 	}
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
 		bool wait = true;
 		degree = GetCtrl(UI.OBJ_DEGREE_ROOT).GetComponent<DegreePlate>();
-		UserStatus status = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
-		EquipSetInfo equip_set = MonoBehaviourSingleton<StatusManager>.I.GetEquipSet(status.eSetNo);
-		uint visual_armor = uint.Parse(status.armorUniqId);
-		uint visual_helm = uint.Parse(status.helmUniqId);
-		uint visual_arm = uint.Parse(status.armUniqId);
-		uint visual_leg = uint.Parse(status.legUniqId);
-		bool is_show_helm = MonoBehaviourSingleton<StatusManager>.I.GetEquippingShowHelm(status.eSetNo) == 1;
-		PlayerLoadInfo load_info = new PlayerLoadInfo();
-		load_info.SetupLoadInfo(equip_set, 0uL, visual_armor, visual_helm, visual_arm, visual_leg, is_show_helm);
-		OutGameSettingsManager.ProfileScene param = MonoBehaviourSingleton<OutGameSettingsManager>.I.profileScene;
-		UIRenderTexture rt = InitRenderTexture(UI.TEX_MODEL, param.cameraFieldOfView);
-		if (!object.ReferenceEquals(rt, null))
+		UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
+		EquipSetInfo equipSet = MonoBehaviourSingleton<StatusManager>.I.GetEquipSet(userStatus.eSetNo);
+		uint num = uint.Parse(userStatus.armorUniqId);
+		uint num2 = uint.Parse(userStatus.helmUniqId);
+		uint num3 = uint.Parse(userStatus.armUniqId);
+		uint num4 = uint.Parse(userStatus.legUniqId);
+		bool flag = MonoBehaviourSingleton<StatusManager>.I.GetEquippingShowHelm(userStatus.eSetNo) == 1;
+		PlayerLoadInfo playerLoadInfo = new PlayerLoadInfo();
+		playerLoadInfo.SetupLoadInfo(equipSet, 0uL, num, num2, num3, num4, flag);
+		OutGameSettingsManager.ProfileScene profileScene = MonoBehaviourSingleton<OutGameSettingsManager>.I.profileScene;
+		UIRenderTexture uIRenderTexture = InitRenderTexture(UI.TEX_MODEL, profileScene.cameraFieldOfView);
+		if ((object)uIRenderTexture != null)
 		{
-			rt.nearClipPlane = param.nearClip;
+			uIRenderTexture.nearClipPlane = profileScene.nearClip;
 		}
 		EnableRenderTexture(UI.TEX_MODEL);
-		SetRenderPlayerModel((Enum)UI.TEX_MODEL, load_info, PLAYER_ANIM_TYPE.GetStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex), param.playerPos, new Vector3(0f, param.playerRot, 0f), is_show_helm, (Action<PlayerLoader>)delegate(PlayerLoader x)
+		SetRenderPlayerModel(UI.TEX_MODEL, playerLoadInfo, PLAYER_ANIM_TYPE.GetStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex), profileScene.playerPos, new Vector3(0f, profileScene.playerRot, 0f), flag, delegate(PlayerLoader x)
 		{
 			playerLoader = x;
 			wait = false;
@@ -112,26 +109,26 @@ public class ProfileTop : GameSection
 	public override void UpdateUI()
 	{
 		SetSupportEncoding(base._transform, UI.LBL_NAME, isEnable: true);
-		SetLabelText((Enum)UI.LBL_NAME, Utility.GetNameWithColoredClanTag(string.Empty, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, own: true, isSameTeam: true));
-		SetLabelText((Enum)UI.LBL_USER_ID, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.code);
-		SetLabelText((Enum)UI.LBL_COMMENT, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.comment);
-		SetLabelText((Enum)UI.LBL_LEVEL, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level.ToString());
+		SetLabelText(UI.LBL_NAME, Utility.GetNameWithColoredClanTag(string.Empty, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, own: true, isSameTeam: true));
+		SetLabelText(UI.LBL_USER_ID, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.code);
+		SetLabelText(UI.LBL_COMMENT, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.comment);
+		SetLabelText(UI.LBL_LEVEL, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level.ToString());
 		_UpdateFB();
-		SetActive((Enum)UI.BTN_DEGREE, GameDefine.ACTIVE_DEGREE);
+		SetActive(UI.BTN_DEGREE, GameDefine.ACTIVE_DEGREE);
 		if (GameDefine.ACTIVE_DEGREE)
 		{
 			degree.Initialize(MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds, isButton: false, delegate
 			{
-				degree.get_gameObject().SetActive(false);
-				degree.get_gameObject().SetActive(true);
+				degree.gameObject.SetActive(value: false);
+				degree.gameObject.SetActive(value: true);
 			});
 		}
 	}
 
 	private void _UpdateFB()
 	{
-		SetActive((Enum)UI.BTN_LOGIN, !MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUserFacebook);
-		SetActive((Enum)UI.BTN_DISCONNECT, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUserFacebook);
+		SetActive(UI.BTN_LOGIN, !MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUserFacebook);
+		SetActive(UI.BTN_DISCONNECT, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUserFacebook);
 	}
 
 	public override void OnNotify(NOTIFY_FLAG flags)
@@ -147,11 +144,11 @@ public class ProfileTop : GameSection
 	{
 		if (uiTexture != null)
 		{
-			Object.Destroy(uiTexture.get_gameObject());
+			UnityEngine.Object.Destroy(uiTexture.gameObject);
 		}
 		if (playerShadow != null)
 		{
-			Object.Destroy(playerShadow.get_gameObject());
+			UnityEngine.Object.Destroy(playerShadow.gameObject);
 		}
 		if (renderTexture != null)
 		{

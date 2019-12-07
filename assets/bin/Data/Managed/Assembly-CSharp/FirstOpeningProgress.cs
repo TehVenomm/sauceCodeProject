@@ -6,12 +6,6 @@ internal class FirstOpeningProgress : IProgress
 
 	private DataTableLoadProgress datatable;
 
-	public FirstOpeningProgress(List<DataLoadRequest> loadings)
-	{
-		predownload = new PredownloadProgress();
-		datatable = new DataTableLoadProgress(loadings);
-	}
-
 	public float GetProgress()
 	{
 		if (IsCompleted())
@@ -23,7 +17,17 @@ internal class FirstOpeningProgress : IProgress
 
 	public bool IsCompleted()
 	{
-		return datatable.IsCompleted() && predownload.IsCompleted();
+		if (datatable.IsCompleted())
+		{
+			return predownload.IsCompleted();
+		}
+		return false;
+	}
+
+	public FirstOpeningProgress(List<DataLoadRequest> loadings)
+	{
+		predownload = new PredownloadProgress();
+		datatable = new DataTableLoadProgress(loadings);
 	}
 
 	public bool IsVisible()

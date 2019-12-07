@@ -6,30 +6,20 @@ public class CircleShadow : MonoBehaviour
 
 	private Transform animTransform;
 
-	public CircleShadow()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		_transform = this.get_transform();
+		_transform = base.transform;
 	}
 
 	private void LateUpdate()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 position = _transform.get_position();
+		Vector3 position = _transform.position;
 		if (animTransform != null)
 		{
-			position = animTransform.get_position();
+			position = animTransform.position;
 		}
 		position.y = 0.005f;
-		_transform.set_position(position);
+		_transform.position = position;
 	}
 
 	public void setAnimTransform(Transform target)

@@ -32,7 +32,7 @@ public class Coop_Model_EventHappenQuestStatus : Coop_Model_Base
 
 	public override string ToString()
 	{
-		string status_str = string.Empty;
+		string status_str = "";
 		statusList.ForEach(delegate(Status s)
 		{
 			status_str += $"(type:{s.orderType},0:{s.order_0},1:{s.order_1},2:{s.order_2},now:{((s.orderType == 2) ? s.defeatEnemyNum : ((s.orderType == 3) ? s.remainingTime : 0))}";

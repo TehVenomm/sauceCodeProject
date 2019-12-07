@@ -115,7 +115,7 @@ namespace BestHTTP.Decompression.Zlib
 			int num3 = bitb;
 			int i = bitk;
 			int num4 = writeAt;
-			int num5 = (num4 >= readAt) ? (end - num4) : (readAt - num4 - 1);
+			int num5 = (num4 < readAt) ? (readAt - num4 - 1) : (end - num4);
 			while (true)
 			{
 				switch (mode)
@@ -139,16 +139,16 @@ namespace BestHTTP.Decompression.Zlib
 						writeAt = num4;
 						return Flush(r);
 					}
-					int num7 = num3 & 7;
-					last = (num7 & 1);
-					switch ((uint)num7 >> 1)
+					int num6 = num3 & 7;
+					last = (num6 & 1);
+					switch ((uint)num6 >> 1)
 					{
 					case 0u:
 						num3 >>= 3;
 						i -= 3;
-						num7 = (i & 7);
-						num3 >>= num7;
-						i -= num7;
+						num6 = (i & 7);
+						num3 >>= num6;
+						i -= num6;
 						mode = InflateBlockMode.LENS;
 						break;
 					case 1u:
@@ -237,18 +237,18 @@ namespace BestHTTP.Decompression.Zlib
 						if (num4 == end && readAt != 0)
 						{
 							num4 = 0;
-							num5 = ((num4 >= readAt) ? (end - num4) : (readAt - num4 - 1));
+							num5 = ((num4 < readAt) ? (readAt - num4 - 1) : (end - num4));
 						}
 						if (num5 == 0)
 						{
 							writeAt = num4;
 							r = Flush(r);
 							num4 = writeAt;
-							num5 = ((num4 >= readAt) ? (end - num4) : (readAt - num4 - 1));
+							num5 = ((num4 < readAt) ? (readAt - num4 - 1) : (end - num4));
 							if (num4 == end && readAt != 0)
 							{
 								num4 = 0;
-								num5 = ((num4 >= readAt) ? (end - num4) : (readAt - num4 - 1));
+								num5 = ((num4 < readAt) ? (readAt - num4 - 1) : (end - num4));
 							}
 							if (num5 == 0)
 							{
@@ -263,21 +263,21 @@ namespace BestHTTP.Decompression.Zlib
 						}
 					}
 					r = 0;
-					int num7 = left;
-					if (num7 > num2)
+					int num6 = left;
+					if (num6 > num2)
 					{
-						num7 = num2;
+						num6 = num2;
 					}
-					if (num7 > num5)
+					if (num6 > num5)
 					{
-						num7 = num5;
+						num6 = num5;
 					}
-					Array.Copy(_codec.InputBuffer, num, window, num4, num7);
-					num += num7;
-					num2 -= num7;
-					num4 += num7;
-					num5 -= num7;
-					if ((left -= num7) == 0)
+					Array.Copy(_codec.InputBuffer, num, window, num4, num6);
+					num += num6;
+					num2 -= num6;
+					num4 += num6;
+					num5 -= num6;
+					if ((left -= num6) == 0)
 					{
 						mode = ((last != 0) ? InflateBlockMode.DRY : InflateBlockMode.TYPE);
 					}
@@ -302,8 +302,8 @@ namespace BestHTTP.Decompression.Zlib
 						writeAt = num4;
 						return Flush(r);
 					}
-					int num7 = table = (num3 & 0x3FFF);
-					if ((num7 & 0x1F) > 29 || ((num7 >> 5) & 0x1F) > 29)
+					int num6 = table = (num3 & 0x3FFF);
+					if ((num6 & 0x1F) > 29 || ((num6 >> 5) & 0x1F) > 29)
 					{
 						mode = InflateBlockMode.BAD;
 						_codec.Message = "too many length or distance symbols";
@@ -316,14 +316,14 @@ namespace BestHTTP.Decompression.Zlib
 						writeAt = num4;
 						return Flush(r);
 					}
-					num7 = 258 + (num7 & 0x1F) + ((num7 >> 5) & 0x1F);
-					if (blens == null || blens.Length < num7)
+					num6 = 258 + (num6 & 0x1F) + ((num6 >> 5) & 0x1F);
+					if (blens == null || blens.Length < num6)
 					{
-						blens = new int[num7];
+						blens = new int[num6];
 					}
 					else
 					{
-						Array.Clear(blens, 0, num7);
+						Array.Clear(blens, 0, num6);
 					}
 					num3 >>= 14;
 					i -= 14;
@@ -361,10 +361,10 @@ namespace BestHTTP.Decompression.Zlib
 						blens[border[index++]] = 0;
 					}
 					bb[0] = 7;
-					int num7 = inftree.inflate_trees_bits(blens, bb, tb, hufts, _codec);
-					if (num7 != 0)
+					int num6 = inftree.inflate_trees_bits(blens, bb, tb, hufts, _codec);
+					if (num6 != 0)
 					{
-						r = num7;
+						r = num6;
 						if (r == -3)
 						{
 							blens = null;
@@ -384,15 +384,15 @@ namespace BestHTTP.Decompression.Zlib
 				}
 				case InflateBlockMode.DTREE:
 				{
-					int num7;
+					int num6;
 					while (true)
 					{
-						num7 = table;
-						if (index >= 258 + (num7 & 0x1F) + ((num7 >> 5) & 0x1F))
+						num6 = table;
+						if (index >= 258 + (num6 & 0x1F) + ((num6 >> 5) & 0x1F))
 						{
 							break;
 						}
-						for (num7 = bb[0]; i < num7; i += 8)
+						for (num6 = bb[0]; i < num6; i += 8)
 						{
 							if (num2 != 0)
 							{
@@ -409,18 +409,18 @@ namespace BestHTTP.Decompression.Zlib
 							writeAt = num4;
 							return Flush(r);
 						}
-						num7 = hufts[(tb[0] + (num3 & InternalInflateConstants.InflateMask[num7])) * 3 + 1];
-						int num11 = hufts[(tb[0] + (num3 & InternalInflateConstants.InflateMask[num7])) * 3 + 2];
-						if (num11 < 16)
+						num6 = hufts[(tb[0] + (num3 & InternalInflateConstants.InflateMask[num6])) * 3 + 1];
+						int num7 = hufts[(tb[0] + (num3 & InternalInflateConstants.InflateMask[num6])) * 3 + 2];
+						if (num7 < 16)
 						{
-							num3 >>= num7;
-							i -= num7;
-							blens[index++] = num11;
+							num3 >>= num6;
+							i -= num6;
+							blens[index++] = num7;
 							continue;
 						}
-						int num12 = (num11 != 18) ? (num11 - 14) : 7;
-						int num13 = (num11 != 18) ? 3 : 11;
-						for (; i < num7 + num12; i += 8)
+						int num8 = (num7 == 18) ? 7 : (num7 - 14);
+						int num9 = (num7 == 18) ? 11 : 3;
+						for (; i < num6 + num8; i += 8)
 						{
 							if (num2 != 0)
 							{
@@ -437,14 +437,14 @@ namespace BestHTTP.Decompression.Zlib
 							writeAt = num4;
 							return Flush(r);
 						}
-						num3 >>= num7;
-						i -= num7;
-						num13 += (num3 & InternalInflateConstants.InflateMask[num12]);
-						num3 >>= num12;
-						i -= num12;
-						num12 = index;
-						num7 = table;
-						if (num12 + num13 > 258 + (num7 & 0x1F) + ((num7 >> 5) & 0x1F) || (num11 == 16 && num12 < 1))
+						num3 >>= num6;
+						i -= num6;
+						num9 += (num3 & InternalInflateConstants.InflateMask[num8]);
+						num3 >>= num8;
+						i -= num8;
+						num8 = index;
+						num6 = table;
+						if (num8 + num9 > 258 + (num6 & 0x1F) + ((num6 >> 5) & 0x1F) || (num7 == 16 && num8 < 1))
 						{
 							blens = null;
 							mode = InflateBlockMode.BAD;
@@ -458,13 +458,13 @@ namespace BestHTTP.Decompression.Zlib
 							writeAt = num4;
 							return Flush(r);
 						}
-						num11 = ((num11 == 16) ? blens[num12 - 1] : 0);
+						num7 = ((num7 == 16) ? blens[num8 - 1] : 0);
 						do
 						{
-							blens[num12++] = num11;
+							blens[num8++] = num7;
 						}
-						while (--num13 != 0);
-						index = num12;
+						while (--num9 != 0);
+						index = num8;
 					}
 					tb[0] = -1;
 					int[] array5 = new int[1]
@@ -477,16 +477,16 @@ namespace BestHTTP.Decompression.Zlib
 					};
 					int[] array7 = new int[1];
 					int[] array8 = new int[1];
-					num7 = table;
-					num7 = inftree.inflate_trees_dynamic(257 + (num7 & 0x1F), 1 + ((num7 >> 5) & 0x1F), blens, array5, array6, array7, array8, hufts, _codec);
-					if (num7 != 0)
+					num6 = table;
+					num6 = inftree.inflate_trees_dynamic(257 + (num6 & 0x1F), 1 + ((num6 >> 5) & 0x1F), blens, array5, array6, array7, array8, hufts, _codec);
+					if (num6 != 0)
 					{
-						if (num7 == -3)
+						if (num6 == -3)
 						{
 							blens = null;
 							mode = InflateBlockMode.BAD;
 						}
-						r = num7;
+						r = num6;
 						bitb = num3;
 						bitk = i;
 						_codec.AvailableBytesIn = num2;
@@ -517,7 +517,7 @@ namespace BestHTTP.Decompression.Zlib
 					num3 = bitb;
 					i = bitk;
 					num4 = writeAt;
-					num5 = ((num4 >= readAt) ? (end - num4) : (readAt - num4 - 1));
+					num5 = ((num4 < readAt) ? (readAt - num4 - 1) : (end - num4));
 					if (last == 0)
 					{
 						mode = InflateBlockMode.TYPE;
@@ -529,7 +529,7 @@ namespace BestHTTP.Decompression.Zlib
 					writeAt = num4;
 					r = Flush(r);
 					num4 = writeAt;
-					num5 = ((num4 >= readAt) ? (end - num4) : (readAt - num4 - 1));
+					num5 = ((num4 < readAt) ? (readAt - num4 - 1) : (end - num4));
 					if (readAt != writeAt)
 					{
 						bitb = num3;
@@ -588,14 +588,18 @@ namespace BestHTTP.Decompression.Zlib
 
 		internal int SyncPoint()
 		{
-			return (mode == InflateBlockMode.LENS) ? 1 : 0;
+			if (mode != InflateBlockMode.LENS)
+			{
+				return 0;
+			}
+			return 1;
 		}
 
 		internal int Flush(int r)
 		{
 			for (int i = 0; i < 2; i++)
 			{
-				int num = (i != 0) ? (writeAt - readAt) : (((readAt > writeAt) ? end : writeAt) - readAt);
+				int num = (i != 0) ? (writeAt - readAt) : (((readAt <= writeAt) ? writeAt : end) - readAt);
 				if (num == 0)
 				{
 					if (r == -5)

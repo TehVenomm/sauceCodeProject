@@ -1,4 +1,4 @@
-using System;
+using UnityEngine;
 
 public class AbilityChangeAbilityList : UIBehaviour
 {
@@ -68,18 +68,18 @@ public class AbilityChangeAbilityList : UIBehaviour
 		{
 			return;
 		}
-		SetFontStyle((Enum)UI.STR_ABILITY, 2);
-		SetFontStyle((Enum)UI.LBL_NAME_1, 3);
-		SetFontStyle((Enum)UI.LBL_NAME_2, 3);
-		SetFontStyle((Enum)UI.LBL_NAME_3, 3);
-		SetLabelText((Enum)UI.LBL_NAME, equipItemInfo.tableData.name);
-		SetLabelText((Enum)UI.LBL_LV_NOW, equipItemInfo.level.ToString());
-		SetLabelText((Enum)UI.LBL_LV_MAX, equipItemInfo.tableData.maxLv.ToString());
-		SetEquipmentTypeIcon((Enum)UI.SPR_TYPE_ICON, (Enum)UI.SPR_TYPE_ICON_BG, (Enum)UI.SPR_TYPE_ICON_RARITY, equipItemInfo.tableData);
+		SetFontStyle(UI.STR_ABILITY, FontStyle.Italic);
+		SetFontStyle(UI.LBL_NAME_1, FontStyle.BoldAndItalic);
+		SetFontStyle(UI.LBL_NAME_2, FontStyle.BoldAndItalic);
+		SetFontStyle(UI.LBL_NAME_3, FontStyle.BoldAndItalic);
+		SetLabelText(UI.LBL_NAME, equipItemInfo.tableData.name);
+		SetLabelText(UI.LBL_LV_NOW, equipItemInfo.level.ToString());
+		SetLabelText(UI.LBL_LV_MAX, equipItemInfo.tableData.maxLv.ToString());
+		SetEquipmentTypeIcon(UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, equipItemInfo.tableData);
 		EquipItemAbility[] validAbility = equipItemInfo.GetValidAbility();
 		bool enableAbilityChange = false;
 		int num = 0;
-		int num2 = (validAbility.Length <= 3) ? validAbility.Length : 3;
+		int num2 = (validAbility.Length > 3) ? 3 : validAbility.Length;
 		for (num = 0; num < num2; num++)
 		{
 			if (equipItemInfo.IsFixedAbility(num))
@@ -102,17 +102,17 @@ public class AbilityChangeAbilityList : UIBehaviour
 		}
 		bool flag = abilityItemInfo != null;
 		bool flag2 = !equipItemInfo.tableData.IsEquipableAbilityItem() || !flag;
-		SetActive((Enum)UI.OBJ_ABILITY_ITEM_ITEM_ROOT, flag);
-		SetActive((Enum)UI.LBL_NO_ABILITY_ITEM, flag2);
+		SetActive(UI.OBJ_ABILITY_ITEM_ITEM_ROOT, flag);
+		SetActive(UI.LBL_NO_ABILITY_ITEM, flag2);
 		if (flag2)
 		{
 			if (!equipItemInfo.tableData.IsEquipableAbilityItem())
 			{
-				SetLabelText((Enum)UI.LBL_NO_ABILITY_ITEM, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 23u));
+				SetLabelText(UI.LBL_NO_ABILITY_ITEM, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 23u));
 			}
 			else
 			{
-				SetLabelText((Enum)UI.LBL_NO_ABILITY_ITEM, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 24u));
+				SetLabelText(UI.LBL_NO_ABILITY_ITEM, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 24u));
 			}
 		}
 		else
@@ -134,7 +134,7 @@ public class AbilityChangeAbilityList : UIBehaviour
 		};
 		if (0 <= index && 5 >= index)
 		{
-			SetActive((Enum)array[index], active);
+			SetActive(array[index], active);
 		}
 	}
 
@@ -181,17 +181,17 @@ public class AbilityChangeAbilityList : UIBehaviour
 		{
 			abilityData = Singleton<AbilityDataTable>.I.GetMinimumAbilityData(ability.id);
 		}
-		SetLabelText((Enum)uI, ability.GetName());
-		SetLabelText((Enum)uI2, ability.GetAP());
-		SetLabelText((Enum)uI3, abilityData.description);
+		SetLabelText(uI, ability.GetName());
+		SetLabelText(uI2, ability.GetAP());
+		SetLabelText(uI3, abilityData.description);
 	}
 
 	private void SetAbilityItemData()
 	{
 		if (abilityItemInfo != null)
 		{
-			SetLabelText((Enum)UI.LBL_ABILITY_ITEM_NAME, abilityItemInfo.GetName());
-			SetLabelText((Enum)UI.LBL_ABILITY_ITEM_DESC, abilityItemInfo.GetDescription());
+			SetLabelText(UI.LBL_ABILITY_ITEM_NAME, abilityItemInfo.GetName());
+			SetLabelText(UI.LBL_ABILITY_ITEM_DESC, abilityItemInfo.GetDescription());
 		}
 	}
 }

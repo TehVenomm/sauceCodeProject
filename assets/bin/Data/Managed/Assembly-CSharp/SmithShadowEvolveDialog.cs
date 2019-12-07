@@ -1,5 +1,4 @@
 using Network;
-using System;
 
 public class SmithShadowEvolveDialog : GameSection
 {
@@ -36,25 +35,26 @@ public class SmithShadowEvolveDialog : GameSection
 			bool flag = haveingItemNum >= num;
 			ItemIcon itemIcon = ItemIconMaterial.CreateMaterialIcon(ItemIcon.GetItemIconType(itemData.type), itemData, GetCtrl(UI.OBJ_ICON_ROOT), haveingItemNum, num, "MATERIAL");
 			SetMaterialInfo(itemIcon._transform, REWARD_TYPE.ITEM, itemData.id);
-			SetActive((Enum)UI.BTN_OK, flag);
-			SetActive((Enum)UI.BTN_INACTIVE, !flag);
+			SetActive(UI.BTN_OK, flag);
+			SetActive(UI.BTN_INACTIVE, !flag);
 			base.UpdateUI();
 		}
 	}
 
 	private SmithManager.ResultData CreateResultData()
 	{
-		SmithManager.ResultData resultData = new SmithManager.ResultData();
-		resultData.beforeRarity = (int)itemInfo.tableData.rarity;
-		resultData.beforeLevel = itemInfo.level;
-		resultData.beforeMaxLevel = itemInfo.tableData.maxLv;
-		resultData.beforeExceedCnt = itemInfo.exceed;
-		resultData.beforeAtk = itemInfo.atk;
-		resultData.beforeDef = itemInfo.def;
-		resultData.beforeHp = itemInfo.hp;
-		resultData.beforeElemAtk = itemInfo.elemAtk;
-		resultData.beforeElemDef = itemInfo.elemDef;
-		return resultData;
+		return new SmithManager.ResultData
+		{
+			beforeRarity = (int)itemInfo.tableData.rarity,
+			beforeLevel = itemInfo.level,
+			beforeMaxLevel = itemInfo.tableData.maxLv,
+			beforeExceedCnt = itemInfo.exceed,
+			beforeAtk = itemInfo.atk,
+			beforeDef = itemInfo.def,
+			beforeHp = itemInfo.hp,
+			beforeElemAtk = itemInfo.elemAtk,
+			beforeElemDef = itemInfo.elemDef
+		};
 	}
 
 	private void OnQuery_YES()
@@ -75,8 +75,7 @@ public class SmithShadowEvolveDialog : GameSection
 			if (error == Error.None)
 			{
 				result_data.itemData = info;
-				SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
-				smithData.selectEquipData = info;
+				MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>().selectEquipData = info;
 				MonoBehaviourSingleton<SmithManager>.I.CreateLocalInventory();
 				MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
 				GameSection.ResumeEvent(is_resume: true);

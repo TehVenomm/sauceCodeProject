@@ -13,7 +13,7 @@ namespace BestHTTP.Extensions
 			StringBuilder stringBuilder = new StringBuilder(bytes.Length);
 			foreach (byte b in bytes)
 			{
-				stringBuilder.Append((char)((b > 127) ? 63 : b));
+				stringBuilder.Append((char)((b <= 127) ? b : 63));
 			}
 			return stringBuilder.ToString();
 		}
@@ -24,7 +24,7 @@ namespace BestHTTP.Extensions
 			for (int i = 0; i < str.Length; i++)
 			{
 				char c = str[i];
-				array[i] = (byte)((c >= '\u0080') ? '?' : c);
+				array[i] = (byte)((c < '\u0080') ? c : '?');
 			}
 			return array;
 		}
@@ -136,9 +136,8 @@ namespace BestHTTP.Extensions
 			byte[] array = MD5.Create().ComputeHash(input);
 			StringBuilder stringBuilder = new StringBuilder();
 			byte[] array2 = array;
-			for (int i = 0; i < array2.Length; i++)
+			foreach (byte b in array2)
 			{
-				byte b = array2[i];
 				stringBuilder.Append(b.ToString("x2"));
 			}
 			return stringBuilder.ToString();
@@ -161,7 +160,7 @@ namespace BestHTTP.Extensions
 			{
 				pos++;
 			}
-			string result = (!needResult) ? null : str.Substring(num, pos - num);
+			string result = needResult ? str.Substring(num, pos - num) : null;
 			pos++;
 			return result;
 		}
@@ -204,15 +203,15 @@ namespace BestHTTP.Extensions
 				return null;
 			}
 			char[] array = new char[str.Length];
-			int num = 0;
+			int length = 0;
 			foreach (char c in str)
 			{
 				if (!char.IsWhiteSpace(c) && !char.IsControl(c))
 				{
-					array[num++] = char.ToLowerInvariant(c);
+					array[length++] = char.ToLowerInvariant(c);
 				}
 			}
-			return new string(array, 0, num);
+			return new string(array, 0, length);
 		}
 
 		internal static List<KeyValuePair> ParseOptionalHeader(this string str)
@@ -225,8 +224,7 @@ namespace BestHTTP.Extensions
 			int pos = 0;
 			while (pos < str.Length)
 			{
-				string key = str.Read(ref pos, (char ch) => ch != '=' && ch != ',').TrimAndLower();
-				KeyValuePair keyValuePair = new KeyValuePair(key);
+				KeyValuePair keyValuePair = new KeyValuePair(str.Read(ref pos, (char ch) => ch != '=' && ch != ',').TrimAndLower());
 				if (str[pos - 1] == '=')
 				{
 					keyValuePair.Value = str.ReadQuotedText(ref pos);
@@ -246,8 +244,7 @@ namespace BestHTTP.Extensions
 			int pos = 0;
 			while (pos < str.Length)
 			{
-				string key = str.Read(ref pos, (char ch) => ch != ',' && ch != ';').TrimAndLower();
-				KeyValuePair keyValuePair = new KeyValuePair(key);
+				KeyValuePair keyValuePair = new KeyValuePair(str.Read(ref pos, (char ch) => ch != ',' && ch != ';').TrimAndLower());
 				if (str[pos - 1] == ';')
 				{
 					str.Read(ref pos, '=', needResult: false);

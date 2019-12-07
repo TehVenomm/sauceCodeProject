@@ -16,10 +16,5 @@ namespace App.Scripts.GoGame
 		}
 
 		public GoOptDefinition[] Defines;
-
-		public AtlasPackDefinition()
-			: this()
-		{
-		}
 	}
 }

@@ -99,7 +99,7 @@ public class QuestArenaSelectList : QuestEventSelectList
 		}
 		if (eventData == null)
 		{
-			this.StartCoroutine(LoadDisableBanner());
+			StartCoroutine(LoadDisableBanner());
 			yield break;
 		}
 		if (MonoBehaviourSingleton<SoundManager>.IsValid())
@@ -109,28 +109,29 @@ public class QuestArenaSelectList : QuestEventSelectList
 		}
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isJoinedArenaRanking)
 		{
-			yield return this.StartCoroutine(SendGetMyRcord());
+			yield return StartCoroutine(SendGetMyRcord());
 		}
-		this.StartCoroutine(base.DoInitialize());
+		StartCoroutine(base.DoInitialize());
 	}
 
 	private IEnumerator LoadDisableBanner()
 	{
-		string resourceName = ResourceName.GetEventBG(10012200);
+		string eventBG = ResourceName.GetEventBG(10012200);
 		Hash128 hash = default(Hash128);
 		if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest != null)
 		{
-			hash = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(resourceName));
+			hash = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(eventBG));
 		}
-		if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest == null || hash.get_isValid())
+		if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest == null || hash.isValid)
 		{
-			LoadingQueue load_queue = new LoadingQueue(this);
-			LoadObject lo_bg = load_queue.Load(isEventAsset: true, RESOURCE_CATEGORY.EVENT_BG, resourceName);
-			if (load_queue.IsLoading())
+			LoadingQueue loadingQueue = new LoadingQueue(this);
+			LoadObject lo_bg = loadingQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.EVENT_BG, eventBG);
+			if (loadingQueue.IsLoading())
 			{
-				yield return load_queue.Wait();
+				yield return loadingQueue.Wait();
 			}
-			SetTexture(texture: lo_bg.loadedObject as Texture2D, texture_enum: UI.TEX_EVENT_BG);
+			Texture2D texture = lo_bg.loadedObject as Texture2D;
+			SetTexture(UI.TEX_EVENT_BG, texture);
 		}
 		EndInitialize();
 	}
@@ -139,8 +140,8 @@ public class QuestArenaSelectList : QuestEventSelectList
 	{
 		if (eventData == null)
 		{
-			SetActive((Enum)UI.BTN_INFO, is_visible: false);
-			SetActive((Enum)UI.LBL_SUB_TITLE, is_visible: false);
+			SetActive(UI.BTN_INFO, is_visible: false);
+			SetActive(UI.LBL_SUB_TITLE, is_visible: false);
 			UpdateTitle();
 			UpdateNoArenaTable();
 		}
@@ -194,8 +195,8 @@ public class QuestArenaSelectList : QuestEventSelectList
 			new EventData("AUTO_PROLOGUE", new object[4]
 			{
 				eventData.prologueStoryId,
-				string.Empty,
-				string.Empty,
+				"",
+				"",
 				array
 			})
 		};
@@ -228,22 +229,21 @@ public class QuestArenaSelectList : QuestEventSelectList
 
 	private void UpdateSubTitle()
 	{
-		SetActive((Enum)UI.LBL_SUB_TITLE, is_visible: false);
-		SetLabelText((Enum)UI.LBL_SUB_TITLE, eventData.name);
+		SetActive(UI.LBL_SUB_TITLE, is_visible: false);
+		SetLabelText(UI.LBL_SUB_TITLE, eventData.name);
 	}
 
 	private void UpdateTitle()
 	{
 		string text = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 27u);
-		SetLabelText((Enum)UI.LBL_LOCATION_NAME, text);
-		SetLabelText((Enum)UI.LBL_LOCATION_NAME_EFFECT, text);
+		SetLabelText(UI.LBL_LOCATION_NAME, text);
+		SetLabelText(UI.LBL_LOCATION_NAME_EFFECT, text);
 	}
 
 	protected override void UpdateTable()
 	{
 		int num = 0;
-		int count = stories.Count;
-		if (count > 0)
+		if (stories.Count > 0)
 		{
 			num++;
 		}
@@ -256,14 +256,14 @@ public class QuestArenaSelectList : QuestEventSelectList
 		}
 		if (notClearDevliveries == null || num2 == 0)
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
-			SetActive((Enum)UI.TBL_DELIVERY_QUEST, is_visible: false);
+			SetActive(UI.STR_DELIVERY_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_DELIVERY_QUEST, is_visible: false);
+			SetActive(UI.TBL_DELIVERY_QUEST, is_visible: false);
 			return;
 		}
-		SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: false);
-		SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
-		SetActive((Enum)UI.TBL_DELIVERY_QUEST, is_visible: true);
+		SetActive(UI.STR_DELIVERY_NON_LIST, is_visible: false);
+		SetActive(UI.GRD_DELIVERY_QUEST, is_visible: false);
+		SetActive(UI.TBL_DELIVERY_QUEST, is_visible: true);
 		int questStartIndex = 0;
 		questStartIndex++;
 		int completedStartIndex = notClearDevliveries.Count + questStartIndex;
@@ -274,18 +274,18 @@ public class QuestArenaSelectList : QuestEventSelectList
 			storyStartIndex++;
 		}
 		Transform ctrl = GetCtrl(UI.TBL_DELIVERY_QUEST);
-		if (Object.op_Implicit(ctrl))
+		if ((bool)ctrl)
 		{
 			int j = 0;
-			for (int childCount = ctrl.get_childCount(); j < childCount; j++)
+			for (int childCount = ctrl.childCount; j < childCount; j++)
 			{
 				Transform child = ctrl.GetChild(0);
-				child.set_parent(null);
-				Object.Destroy(child.get_gameObject());
+				child.parent = null;
+				UnityEngine.Object.Destroy(child.gameObject);
 			}
 		}
 		bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, reset: false, delegate(int i, Transform parent)
+		SetTable(UI.TBL_DELIVERY_QUEST, "", num2, reset: false, delegate(int i, Transform parent)
 		{
 			Transform result = null;
 			if (i >= storyStartIndex)
@@ -341,15 +341,14 @@ public class QuestArenaSelectList : QuestEventSelectList
 				}
 			}
 		});
-		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-		component.set_enabled(true);
+		GetComponent<UIScrollView>(UI.SCR_DELIVERY_QUEST).enabled = true;
 		RepositionTable();
 	}
 
 	protected void UpdateNoArenaTable()
 	{
 		int item_num = 1;
-		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, item_num, reset: false, delegate(int i, Transform parent)
+		SetTable(UI.TBL_DELIVERY_QUEST, "", item_num, reset: false, delegate(int i, Transform parent)
 		{
 			Transform result = null;
 			if (i == 0)
@@ -365,8 +364,7 @@ public class QuestArenaSelectList : QuestEventSelectList
 				InitGoToRankingButton(t);
 			}
 		});
-		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-		component.set_enabled(false);
+		GetComponent<UIScrollView>(UI.SCR_DELIVERY_QUEST).enabled = false;
 		RepositionTable();
 	}
 
@@ -379,7 +377,7 @@ public class QuestArenaSelectList : QuestEventSelectList
 			ArenaTable.ArenaData arenaData = deliveryTableData.GetArenaData();
 			if (arenaData == null)
 			{
-				Debug.LogError((object)(this.get_name() + " " + deliveryTableData.name + " : arenaDataが見つかりません"));
+				Debug.LogError(base.name + " " + deliveryTableData.name + " : arenaDataが見つかりません");
 			}
 			else
 			{
@@ -478,7 +476,7 @@ public class QuestArenaSelectList : QuestEventSelectList
 		QuestRequestItemArena questRequestItemArena = t.GetComponent<QuestRequestItemArena>();
 		if (questRequestItemArena == null)
 		{
-			questRequestItemArena = t.get_gameObject().AddComponent<QuestRequestItemArena>();
+			questRequestItemArena = t.gameObject.AddComponent<QuestRequestItemArena>();
 		}
 		questRequestItemArena.InitUI();
 		questRequestItemArena.Setup(t, info);
@@ -489,7 +487,7 @@ public class QuestArenaSelectList : QuestEventSelectList
 		QuestRequestItemArenaRankUp questRequestItemArenaRankUp = t.GetComponent<QuestRequestItemArenaRankUp>();
 		if (questRequestItemArenaRankUp == null)
 		{
-			questRequestItemArenaRankUp = t.get_gameObject().AddComponent<QuestRequestItemArenaRankUp>();
+			questRequestItemArenaRankUp = t.gameObject.AddComponent<QuestRequestItemArenaRankUp>();
 		}
 		questRequestItemArenaRankUp.InitUI();
 		questRequestItemArenaRankUp.Setup(t, info);
@@ -500,7 +498,7 @@ public class QuestArenaSelectList : QuestEventSelectList
 		QuestRequestItemArena questRequestItemArena = t.GetComponent<QuestRequestItemArena>();
 		if (questRequestItemArena == null)
 		{
-			questRequestItemArena = t.get_gameObject().AddComponent<QuestRequestItemArena>();
+			questRequestItemArena = t.gameObject.AddComponent<QuestRequestItemArena>();
 		}
 		questRequestItemArena.InitUI();
 		questRequestItemArena.SetupComplete(t, info, record);
@@ -592,8 +590,7 @@ public class QuestArenaSelectList : QuestEventSelectList
 
 	private void OnQuery_RANKING()
 	{
-		Network.EventData eventData = GameSection.GetEventData() as Network.EventData;
-		if (eventData == null)
+		if (!(GameSection.GetEventData() is Network.EventData))
 		{
 			EventData[] autoEvents = new EventData[2]
 			{
@@ -655,8 +652,8 @@ public class QuestArenaSelectList : QuestEventSelectList
 		GameSection.SetEventData(new object[4]
 		{
 			story.id,
-			string.Empty,
-			string.Empty,
+			"",
+			"",
 			array
 		});
 	}

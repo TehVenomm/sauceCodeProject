@@ -75,19 +75,15 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 	protected override void Awake()
 	{
 		base.Awake();
-		packetReceiver = this.get_gameObject().AddComponent<ClanPacketReceiver>();
+		packetReceiver = base.gameObject.AddComponent<ClanPacketReceiver>();
 	}
 
 	private void Update()
 	{
 		packetReceiver.OnUpdate();
-		if (CoopWebSocketSingleton<LoungeWebSocket>.IsValidConnected())
+		if (CoopWebSocketSingleton<LoungeWebSocket>.IsValidConnected() && Time.time - MonoBehaviourSingleton<LoungeWebSocket>.I.packetSendTime >= 20f)
 		{
-			float num = Time.get_time() - MonoBehaviourSingleton<LoungeWebSocket>.I.packetSendTime;
-			if (num >= 20f)
-			{
-				Alive();
-			}
+			Alive();
 		}
 	}
 
@@ -105,26 +101,25 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 
 	private void Logd(string str, params object[] objs)
 	{
-		if (!Log.enabled)
-		{
-		}
+		_ = Log.enabled;
 	}
 
 	private string GetRelayServerPath(string path, int port)
 	{
-		UriBuilder uriBuilder = new UriBuilder(path);
-		uriBuilder.Port = port;
-		return uriBuilder.Uri.ToString();
+		return new UriBuilder(path)
+		{
+			Port = port
+		}.Uri.ToString();
 	}
 
 	public void Connect(ConnectData conn_data, Action<bool> call_back)
 	{
-		this.StartCoroutine(RequestCoroutineConnect(conn_data, call_back));
+		StartCoroutine(RequestCoroutineConnect(conn_data, call_back));
 	}
 
 	private IEnumerator RequestCoroutineConnect(ConnectData conn_data, Action<bool> call_back)
 	{
-		yield return this.StartCoroutine(RequestCoroutineClose(1000));
+		yield return StartCoroutine(RequestCoroutineClose(1000));
 		if (string.IsNullOrEmpty(conn_data.path))
 		{
 			Logd("Connect fail. nothing connection path...");
@@ -140,13 +135,13 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 		foreach (int port in conn_data.ports)
 		{
 			float timeoutTimer = 15f;
-			string connectPath = GetRelayServerPath(conn_data.path, port);
-			Logd("Connect. path={0}", connectPath);
-			MonoBehaviourSingleton<LoungeWebSocket>.I.Connect(connectPath, conn_data.fromId, conn_data.ackPrefix);
+			string relayServerPath = GetRelayServerPath(conn_data.path, port);
+			Logd("Connect. path={0}", relayServerPath);
+			MonoBehaviourSingleton<LoungeWebSocket>.I.Connect(relayServerPath, conn_data.fromId, conn_data.ackPrefix);
 			while (!MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected() && 0f < timeoutTimer && MonoBehaviourSingleton<LoungeWebSocket>.I.CurrentConnectionStatus != CoopWebSocketSingleton<LoungeWebSocket>.CONNECTION_STATUS.ERROR)
 			{
-				timeoutTimer -= Time.get_deltaTime();
-				yield return (object)new WaitForEndOfFrame();
+				timeoutTimer -= Time.deltaTime;
+				yield return new WaitForEndOfFrame();
 			}
 			if (MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected())
 			{
@@ -161,7 +156,7 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 	public void Close(ushort code = 1000, string msg = "Bye!", Action call_back = null)
 	{
 		Logd("Close.");
-		this.StartCoroutine(RequestCoroutineClose(code, msg, call_back));
+		StartCoroutine(RequestCoroutineClose(code, msg, call_back));
 	}
 
 	private IEnumerator RequestCoroutineClose(ushort code = 1000, string msg = "Bye!", Action call_back = null)
@@ -171,7 +166,7 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 			MonoBehaviourSingleton<LoungeWebSocket>.I.Close(code, msg);
 			while (MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected())
 			{
-				yield return (object)new WaitForEndOfFrame();
+				yield return new WaitForEndOfFrame();
 			}
 		}
 		Clear();
@@ -272,8 +267,6 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 
 	public void RoomPosition(int targetUserId, Vector3 position, LOUNGE_ACTION_TYPE type)
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		Lounge_Model_RoomPosition lounge_Model_RoomPosition = new Lounge_Model_RoomPosition();
 		lounge_Model_RoomPosition.id = 1005;
 		lounge_Model_RoomPosition.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
@@ -286,7 +279,7 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 	{
 		if (chatConnection != null && !string.IsNullOrEmpty(userInfo.name))
 		{
-			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 10u, userInfo.name), string.Empty);
+			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 10u, userInfo.name));
 		}
 	}
 
@@ -294,7 +287,7 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 	{
 		if (sendId > 0)
 		{
-			this.StartCoroutine(CoroutineSyncSend(sendId));
+			StartCoroutine(CoroutineSyncSend(sendId));
 		}
 	}
 
@@ -303,7 +296,7 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 		while (!MonoBehaviourSingleton<LoungeWebSocket>.I.IsCompleteSend(id) && MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected())
 		{
 			Logd("Sync send. id={0}", id);
-			yield return (object)new WaitForEndOfFrame();
+			yield return new WaitForEndOfFrame();
 		}
 	}
 
@@ -336,7 +329,7 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 	{
 		if (model.id == -1)
 		{
-			Log.Warning(LOG.COOP, "ClanNetwork(" + MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected() + "): model.id not set...");
+			Log.Warning(LOG.COOP, "ClanNetwork(" + MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected().ToString() + "): model.id not set...");
 			return -1;
 		}
 		return Send(-2000, model, typeof(T), promise, onReceiveAck, onPreResend);
@@ -380,11 +373,12 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 
 	public static CoopPacket CreateLoopBackRoomLeavedPacket()
 	{
-		Lounge_Model_RoomLeaved lounge_Model_RoomLeaved = new Lounge_Model_RoomLeaved();
-		lounge_Model_RoomLeaved.id = 1000;
-		lounge_Model_RoomLeaved.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-		lounge_Model_RoomLeaved.token = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id.ToString();
-		return CoopPacket.Create(lounge_Model_RoomLeaved, -1000, -2000, promise: false, -8989);
+		return CoopPacket.Create(new Lounge_Model_RoomLeaved
+		{
+			id = 1000,
+			cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id,
+			token = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id.ToString()
+		}, -1000, -2000, promise: false, -8989);
 	}
 
 	public void LoopBackRoomLeave()
@@ -403,9 +397,6 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 
 	public bool OnRecvRoomJoined(Lounge_Model_RoomJoined model)
 	{
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
 		Logd("OnRecvRoomJoined. cid={0}", model.cid);
 		if (MonoBehaviourSingleton<ClanManager>.IsValid())
 		{
@@ -425,7 +416,7 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 			{
 				return true;
 			}
-			Vector3 position = MonoBehaviourSingleton<ClanManager>.I.IHomePeople.selfChara._transform.get_position();
+			Vector3 position = MonoBehaviourSingleton<ClanManager>.I.IHomePeople.selfChara._transform.position;
 			LOUNGE_ACTION_TYPE actionType = MonoBehaviourSingleton<ClanManager>.I.IHomePeople.selfChara.GetActionType();
 			RoomPosition(model.cid, position, actionType);
 		}
@@ -438,19 +429,15 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 				});
 			});
 		}
-		string empty = string.Empty;
+		_ = string.Empty;
 		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<ClanMatchingManager>.I.GetSlotInfoByUserId(model.cid);
 		if (slotInfoByUserId != null)
 		{
-			empty = slotInfoByUserId.userInfo.name;
+			_ = slotInfoByUserId.userInfo.name;
 		}
 		else if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
 		{
-			InGameRecorder.PlayerRecord playerByUserId = MonoBehaviourSingleton<InGameRecorder>.I.GetPlayerByUserId(model.cid);
-			if (playerByUserId != null)
-			{
-				empty = playerByUserId.charaInfo.name;
-			}
+			_ = MonoBehaviourSingleton<InGameRecorder>.I.GetPlayerByUserId(model.cid)?.charaInfo.name;
 		}
 		return true;
 	}
@@ -476,7 +463,7 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 			}
 			if (chatConnection != null && !string.IsNullOrEmpty(text))
 			{
-				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 11u, text), string.Empty);
+				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 11u, text));
 			}
 		}
 		if (FieldManager.IsValidInGame())
@@ -497,17 +484,13 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 
 	public bool OnRecvRoomPoisition(Lounge_Model_RoomPosition model)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		Logd("OnRecvRoomPosition. cid={0}, pos={1}", model.cid, model.pos);
-		this.StartCoroutine(ClanManagerRecvRoomPosition(model.cid, model.pos, model.aid));
+		StartCoroutine(ClanManagerRecvRoomPosition(model.cid, model.pos, model.aid));
 		return true;
 	}
 
 	private IEnumerator ClanManagerRecvRoomPosition(int userId, Vector3 pos, int aid)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 		while (!MonoBehaviourSingleton<ClanManager>.IsValid())
 		{
 			yield return null;
@@ -521,7 +504,6 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 
 	public bool OnRecvRoomMove(Lounge_Model_RoomMove model)
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 		Logd("OnRecvRoomMove. cid={0}", model.cid);
 		if (MonoBehaviourSingleton<ClanManager>.IsValid())
 		{
@@ -571,7 +553,7 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 		MonoBehaviourSingleton<ClanMatchingManager>.I.AFKKick(model.cid);
 		if (chatConnection != null)
 		{
-			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 19u, slotInfoByUserId.userInfo.name), string.Empty);
+			chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 19u, slotInfoByUserId.userInfo.name));
 		}
 		return true;
 	}
@@ -626,7 +608,7 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<ClanMatchingManager>.I.GetSlotInfoByUserId(model.user_id);
 		if (chatConnection != null)
 		{
-			chatConnection.OnReceiveMessage(model.user_id, slotInfoByUserId.userInfo.name, model.text, string.Empty);
+			chatConnection.OnReceiveMessage(model.user_id, slotInfoByUserId.userInfo.name, model.text);
 		}
 		if (MonoBehaviourSingleton<ClanManager>.IsValid())
 		{
@@ -645,7 +627,7 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<ClanMatchingManager>.I.GetSlotInfoByUserId(model.user_id);
 		if (chatConnection != null)
 		{
-			chatConnection.OnReceiveStamp(model.user_id, slotInfoByUserId.userInfo.name, model.stamp_id, string.Empty);
+			chatConnection.OnReceiveStamp(model.user_id, slotInfoByUserId.userInfo.name, model.stamp_id);
 		}
 		return true;
 	}
@@ -663,42 +645,44 @@ public class ClanNetworkManager : MonoBehaviourSingleton<ClanNetworkManager>
 		case LoungeMemberStatus.MEMBER_STATUS.LOUNGE:
 			switch (status)
 			{
+			case LoungeMemberStatus.MEMBER_STATUS.QUEST:
+				break;
 			case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
 				if (after.isHost)
 				{
-					chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 14u, slotInfoByUserId.userInfo.name), string.Empty);
+					chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 14u, slotInfoByUserId.userInfo.name));
 				}
 				break;
 			case LoungeMemberStatus.MEMBER_STATUS.FIELD:
-				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 15u, slotInfoByUserId.userInfo.name), string.Empty);
+				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 15u, slotInfoByUserId.userInfo.name));
 				break;
 			case LoungeMemberStatus.MEMBER_STATUS.ARENA:
-				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 20u, slotInfoByUserId.userInfo.name), string.Empty);
+				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 20u, slotInfoByUserId.userInfo.name));
 				break;
 			}
 			break;
 		case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
 			if (status == LoungeMemberStatus.MEMBER_STATUS.QUEST)
 			{
-				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 16u, slotInfoByUserId.userInfo.name), string.Empty);
+				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 16u, slotInfoByUserId.userInfo.name));
 			}
 			break;
 		case LoungeMemberStatus.MEMBER_STATUS.QUEST:
 			if (status == LoungeMemberStatus.MEMBER_STATUS.LOUNGE)
 			{
-				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 17u, slotInfoByUserId.userInfo.name), string.Empty);
+				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 17u, slotInfoByUserId.userInfo.name));
 			}
 			break;
 		case LoungeMemberStatus.MEMBER_STATUS.ARENA:
 			if (status == LoungeMemberStatus.MEMBER_STATUS.LOUNGE)
 			{
-				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 21u, slotInfoByUserId.userInfo.name), string.Empty);
+				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 21u, slotInfoByUserId.userInfo.name));
 			}
 			break;
 		default:
 			if (status == LoungeMemberStatus.MEMBER_STATUS.LOUNGE)
 			{
-				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 18u, slotInfoByUserId.userInfo.name), string.Empty);
+				chatConnection.OnReceiveNotification(StringTable.Format(STRING_CATEGORY.LOUNGE, 18u, slotInfoByUserId.userInfo.name));
 			}
 			break;
 		}

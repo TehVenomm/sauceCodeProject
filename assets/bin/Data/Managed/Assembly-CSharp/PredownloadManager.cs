@@ -136,10 +136,7 @@ public class PredownloadManager : MonoBehaviourSingleton<PredownloadManager>
 			}
 			while (loading_list.Count < 4 && loadedCount + loading_list.Count < totalCount)
 			{
-				List<LoadInfo> list = info_list;
-				int index;
-				info_index = (index = info_index) + 1;
-				LoadInfo loadInfo = list[index];
+				LoadInfo loadInfo = info_list[info_index++];
 				if (isOpening && info_index < tutorialCount && loadInfo.category != RESOURCE_CATEGORY.STAGE_SCENE)
 				{
 					ResourceManager.enableCache = true;
@@ -152,7 +149,7 @@ public class PredownloadManager : MonoBehaviourSingleton<PredownloadManager>
 				}
 				bool internalMode = ResourceManager.internalMode;
 				ResourceManager.internalMode = false;
-				LoadObject loadObject = (loadInfo.resourceNames == null || loadInfo.resourceNames.Length <= 0) ? loading_queue.Load(loadInfo.category, loadInfo.pakageName) : loading_queue.Load(loadInfo.category, loadInfo.pakageName, loadInfo.resourceNames);
+				LoadObject loadObject = (loadInfo.resourceNames == null || loadInfo.resourceNames.Length == 0) ? loading_queue.Load(loadInfo.category, loadInfo.pakageName) : loading_queue.Load(loadInfo.category, loadInfo.pakageName, loadInfo.resourceNames);
 				if (loadObject != null)
 				{
 					loading_list.Add(loadObject);

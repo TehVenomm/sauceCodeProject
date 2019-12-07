@@ -82,8 +82,8 @@ public class SlimeAnimation
 	public SlimeAnimation(SlimeController slime_controller)
 	{
 		slime = slime_controller;
-		slimeTransform = slime.get_transform();
-		slimeMaterial = slime.GetComponent<Renderer>().get_material();
+		slimeTransform = slime.transform;
+		slimeMaterial = slime.GetComponent<Renderer>().material;
 		posAnimator = new SlimeParamAnimator<SlimePosAnim, Vector3>(0.2f);
 		scaleAnimator = new SlimeParamAnimator<SlimeScaleAnim, Vector3>(0.1f);
 		colorAnimator = new SlimeParamAnimator<SlimeColorAnim, Color>(0.5f);
@@ -91,26 +91,18 @@ public class SlimeAnimation
 
 	public void Update()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
 		if (posAnimator.IsPlaying())
 		{
-			slimeTransform.set_localPosition(posAnimator.Update());
+			slimeTransform.localPosition = posAnimator.Update();
 		}
 		if (scaleAnimator.IsPlaying())
 		{
-			slimeTransform.set_localScale(scaleAnimator.Update());
+			slimeTransform.localScale = scaleAnimator.Update();
 		}
 		if (colorAnimator.IsPlaying())
 		{
 			Color color = colorAnimator.Update();
-			slimeMaterial.set_color(color);
+			slimeMaterial.color = color;
 			if (color.a <= 0.01f && isFadeOut)
 			{
 				slime.SetInvisible();
@@ -120,14 +112,10 @@ public class SlimeAnimation
 				slime.SetVisible();
 			}
 		}
-		else if (slime.IsVisible())
+		else if (slime.IsVisible() && slimeMaterial.color.a > 0f && isFadeOut)
 		{
-			Color color2 = slimeMaterial.get_color();
-			if (color2.a > 0f && isFadeOut)
-			{
-				slimeMaterial.set_color(colorAnimator.Update());
-				slime.SetInvisible();
-			}
+			slimeMaterial.color = colorAnimator.Update();
+			slime.SetInvisible();
 		}
 	}
 
@@ -142,56 +130,41 @@ public class SlimeAnimation
 
 	public void TouchOn(Action CallBackPos = null, Action CallBackScale = null, Action CallBackColor = null)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		posAnimator.SetAnimation(SLIME_ANIM_CURVE_ZERO, 1f, is_blend: true, slimeTransform.get_localPosition(), CallBackPos);
-		scaleAnimator.SetAnimation(slime.animFadeIn, slime.fadeInAnimTime, is_blend: true, slimeTransform.get_localScale(), CallBackScale);
-		colorAnimator.SetAnimation(AnimationCurve.Linear(0f, 0f, 1f, 0.5f), slime.fadeInColorAnimTime, is_blend: false, slimeMaterial.get_color(), CallBackColor);
+		posAnimator.SetAnimation(SLIME_ANIM_CURVE_ZERO, 1f, is_blend: true, slimeTransform.localPosition, CallBackPos);
+		scaleAnimator.SetAnimation(slime.animFadeIn, slime.fadeInAnimTime, is_blend: true, slimeTransform.localScale, CallBackScale);
+		colorAnimator.SetAnimation(AnimationCurve.Linear(0f, 0f, 1f, 0.5f), slime.fadeInColorAnimTime, is_blend: false, slimeMaterial.color, CallBackColor);
 		isFadeOut = false;
 	}
 
 	public void TouchOff(Action CallBackPos = null, Action CallBackScale = null, Action CallBackColor = null)
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		posAnimator.SetAnimation(slime.animFadeOut, slime.fadeOutAnimTime, is_blend: true, slimeTransform.get_localPosition(), CallBackPos);
-		scaleAnimator.SetAnimation(SLIME_ANIM_CURVE_ONE, 1f, is_blend: true, slimeTransform.get_localScale(), CallBackScale);
-		colorAnimator.SetAnimation(AnimationCurve.Linear(0f, 0.5f, 1f, 0f), slime.fadeOutColorAnimTime, is_blend: true, slimeMaterial.get_color(), CallBackColor);
+		posAnimator.SetAnimation(slime.animFadeOut, slime.fadeOutAnimTime, is_blend: true, slimeTransform.localPosition, CallBackPos);
+		scaleAnimator.SetAnimation(SLIME_ANIM_CURVE_ONE, 1f, is_blend: true, slimeTransform.localScale, CallBackScale);
+		colorAnimator.SetAnimation(AnimationCurve.Linear(0f, 0.5f, 1f, 0f), slime.fadeOutColorAnimTime, is_blend: true, slimeMaterial.color, CallBackColor);
 		isFadeOut = true;
 	}
 
 	public void Crush(Action CallBackPos = null, Action CallBackScale = null, Action CallBackColor = null)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		posAnimator.SetAnimation(SLIME_ANIM_CURVE_ZERO, 1f, is_blend: false, slimeTransform.get_localPosition(), CallBackPos);
-		scaleAnimator.SetAnimation(slime.animCrush, slime.crushAnimTime, is_blend: true, slimeTransform.get_localScale(), CallBackScale);
-		colorAnimator.SetAnimation(AnimationCurve.Linear(0f, 0.5f, 1f, 0f), slime.crushColorAnimTime, is_blend: false, slimeMaterial.get_color(), CallBackColor);
+		posAnimator.SetAnimation(SLIME_ANIM_CURVE_ZERO, 1f, is_blend: false, slimeTransform.localPosition, CallBackPos);
+		scaleAnimator.SetAnimation(slime.animCrush, slime.crushAnimTime, is_blend: true, slimeTransform.localScale, CallBackScale);
+		colorAnimator.SetAnimation(AnimationCurve.Linear(0f, 0.5f, 1f, 0f), slime.crushColorAnimTime, is_blend: false, slimeMaterial.color, CallBackColor);
 		isFadeOut = true;
 	}
 
 	public void ScaleUp(Action CallBackPos = null, Action CallBackScale = null, Action CallBackColor = null)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		posAnimator.SetAnimation(SLIME_ANIM_CURVE_ZERO, 1f, is_blend: true, slimeTransform.get_localPosition(), CallBackPos);
-		scaleAnimator.SetAnimation(AnimationCurve.Linear(0f, 1f, slime.scaleupAnimTime, slime.scaleupAnimMaxScale), slime.scaleupAnimTime, is_blend: true, slimeTransform.get_localScale(), CallBackScale);
-		colorAnimator.SetAnimation(SLIME_ANIM_CURVE_HALF, 1f, is_blend: false, slimeMaterial.get_color(), CallBackColor);
+		posAnimator.SetAnimation(SLIME_ANIM_CURVE_ZERO, 1f, is_blend: true, slimeTransform.localPosition, CallBackPos);
+		scaleAnimator.SetAnimation(AnimationCurve.Linear(0f, 1f, slime.scaleupAnimTime, slime.scaleupAnimMaxScale), slime.scaleupAnimTime, is_blend: true, slimeTransform.localScale, CallBackScale);
+		colorAnimator.SetAnimation(SLIME_ANIM_CURVE_HALF, 1f, is_blend: false, slimeMaterial.color, CallBackColor);
 		isFadeOut = false;
 	}
 
 	public void ScaleUpDown(Action CallBackPos = null, Action CallBackScale = null, Action CallBackColor = null)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		posAnimator.SetAnimation(SLIME_ANIM_CURVE_ZERO, 1f, is_blend: true, slimeTransform.get_localPosition(), CallBackPos);
-		scaleAnimator.SetAnimation(slime.animScaleUpDown, slime.scaleUpDownAnimTime, is_blend: true, slimeTransform.get_localScale(), CallBackScale);
-		colorAnimator.SetAnimation(SLIME_ANIM_CURVE_HALF, 1f, is_blend: false, slimeMaterial.get_color(), CallBackColor);
+		posAnimator.SetAnimation(SLIME_ANIM_CURVE_ZERO, 1f, is_blend: true, slimeTransform.localPosition, CallBackPos);
+		scaleAnimator.SetAnimation(slime.animScaleUpDown, slime.scaleUpDownAnimTime, is_blend: true, slimeTransform.localScale, CallBackScale);
+		colorAnimator.SetAnimation(SLIME_ANIM_CURVE_HALF, 1f, is_blend: false, slimeMaterial.color, CallBackColor);
 		isFadeOut = false;
 	}
 }

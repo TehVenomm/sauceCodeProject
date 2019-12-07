@@ -16,11 +16,10 @@ public class PuniConManager : MonoBehaviourSingleton<PuniConManager>
 
 	protected override void Awake()
 	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		Camera val = (!MonoBehaviourSingleton<UIManager>.IsValid()) ? MonoBehaviourSingleton<AppMain>.I.mainCamera : MonoBehaviourSingleton<UIManager>.I.uiCamera;
-		punicon.get_transform().set_position(val.get_transform().get_position());
-		punicon.uiCamera = val;
+		Camera camera = (!MonoBehaviourSingleton<UIManager>.IsValid()) ? MonoBehaviourSingleton<AppMain>.I.mainCamera : MonoBehaviourSingleton<UIManager>.I.uiCamera;
+		punicon.transform.position = camera.transform.position;
+		punicon.uiCamera = camera;
 		link_info = null;
 		InputManager.OnTouchOn = (InputManager.OnTouchDelegate)Delegate.Combine(InputManager.OnTouchOn, new InputManager.OnTouchDelegate(OnTouchOn));
 		InputManager.OnTouchOff = (InputManager.OnTouchDelegate)Delegate.Combine(InputManager.OnTouchOff, new InputManager.OnTouchDelegate(OnTouchOff));
@@ -41,10 +40,6 @@ public class PuniConManager : MonoBehaviourSingleton<PuniConManager>
 
 	public void Update()
 	{
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 		bool flag = !enableMultiTouch && MonoBehaviourSingleton<InputManager>.I.GetActiveInfoCount() >= 2;
 		if (link_info != null && (link_info.id == -1 || flag))
 		{
@@ -59,21 +54,19 @@ public class PuniConManager : MonoBehaviourSingleton<PuniConManager>
 		if (activeInfo != null)
 		{
 			link_info = activeInfo;
-			punicon.SetStartPosition(Vector2.op_Implicit(link_info.beginPosition));
+			punicon.SetStartPosition(link_info.beginPosition);
 			if (link_info.activeAxis)
 			{
-				punicon.SetEndPosition(Vector2.op_Implicit(link_info.position));
+				punicon.SetEndPosition(link_info.position);
 			}
 		}
 	}
 
 	public void OnTouchOn(InputManager.TouchInfo touch_info)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		if (link_info == null && enableMultiTouch)
 		{
-			punicon.SetStartPosition(Vector2.op_Implicit(touch_info.position));
+			punicon.SetStartPosition(touch_info.position);
 			link_info = touch_info;
 		}
 	}
@@ -89,11 +82,9 @@ public class PuniConManager : MonoBehaviourSingleton<PuniConManager>
 
 	public void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 		if (touch_info == link_info && (enableMultiTouch || MonoBehaviourSingleton<InputManager>.I.GetActiveInfoCount() < 2))
 		{
-			punicon.SetEndPosition(Vector2.op_Implicit(touch_info.position));
+			punicon.SetEndPosition(touch_info.position);
 		}
 	}
 
@@ -103,19 +94,15 @@ public class PuniConManager : MonoBehaviourSingleton<PuniConManager>
 
 	public void OnDoubleDrag(InputManager.TouchInfo touch_info0, InputManager.TouchInfo touch_info1)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 		if (enableMultiTouch)
 		{
 			if (touch_info0 == link_info && touch_info0.enable)
 			{
-				punicon.SetEndPosition(Vector2.op_Implicit(touch_info0.position));
+				punicon.SetEndPosition(touch_info0.position);
 			}
 			else if (touch_info1 == link_info && touch_info1.enable)
 			{
-				punicon.SetEndPosition(Vector2.op_Implicit(touch_info1.position));
+				punicon.SetEndPosition(touch_info1.position);
 			}
 		}
 	}

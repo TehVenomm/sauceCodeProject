@@ -17,26 +17,22 @@ namespace BestHTTP
 
 		public static SupportedProtocols GetProtocolFromUri(Uri uri)
 		{
-			switch (uri.Scheme.ToLowerInvariant())
+			string a = uri.Scheme.ToLowerInvariant();
+			if (a == "ws" || a == "wss")
 			{
-			case "ws":
-			case "wss":
 				return SupportedProtocols.WebSocket;
-			default:
-				return SupportedProtocols.HTTP;
 			}
+			return SupportedProtocols.HTTP;
 		}
 
 		public static bool IsSecureProtocol(Uri uri)
 		{
-			switch (uri.Scheme.ToLowerInvariant())
+			string a = uri.Scheme.ToLowerInvariant();
+			if (a == "https" || a == "wss")
 			{
-			case "https":
-			case "wss":
 				return true;
-			default:
-				return false;
 			}
+			return false;
 		}
 	}
 }

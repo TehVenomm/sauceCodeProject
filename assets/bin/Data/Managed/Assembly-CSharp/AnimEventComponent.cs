@@ -10,16 +10,11 @@ public class AnimEventComponent : MonoBehaviour
 
 	private AnimEventProcessor processer;
 
-	public AnimEventComponent()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
 		if (animator == null)
 		{
-			animator = this.get_gameObject().GetComponent<Animator>();
+			animator = base.gameObject.GetComponent<Animator>();
 		}
 		Run();
 	}

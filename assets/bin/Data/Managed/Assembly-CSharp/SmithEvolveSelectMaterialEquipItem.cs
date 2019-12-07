@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -58,7 +57,7 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 		selectedUniqueId = (ulong[])array[2];
 		equipIndex = (int)array[3];
 		data = Singleton<EquipItemTable>.I.GetEquipItemData(equipId);
-		string caption = (!data.IsWeapon()) ? base.sectionData.GetText("CAPTION_DEFENCE") : base.sectionData.GetText("CAPTION_WEAPON");
+		string caption = data.IsWeapon() ? base.sectionData.GetText("CAPTION_WEAPON") : base.sectionData.GetText("CAPTION_DEFENCE");
 		InitializeCaption(caption);
 		base.Initialize();
 	}
@@ -73,19 +72,19 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 		detailBase = GetCtrl(UI.OBJ_INFO_ROOT);
 		if (detailBase != null)
 		{
-			SetFontStyle(detailBase, UI.STR_TITLE, 2);
-			SetFontStyle(detailBase, UI.STR_SELL, 2);
-			SetFontStyle(detailBase, UI.STR_NEED, 2);
-			SetFontStyle(detailBase, UI.STR_HAVE, 2);
+			SetFontStyle(detailBase, UI.STR_TITLE, FontStyle.Italic);
+			SetFontStyle(detailBase, UI.STR_SELL, FontStyle.Italic);
+			SetFontStyle(detailBase, UI.STR_NEED, FontStyle.Italic);
+			SetFontStyle(detailBase, UI.STR_HAVE, FontStyle.Italic);
 			SetLabelText(detailBase, UI.LBL_NAME, data.name);
-			ItemIcon.ItemIconCreateParam itemIconCreateParam = new ItemIcon.ItemIconCreateParam();
-			itemIconCreateParam.icon_type = ItemIcon.GetItemIconType(data.type);
-			itemIconCreateParam.icon_id = data.GetIconID();
-			itemIconCreateParam.rarity = data.rarity;
-			itemIconCreateParam.parent = FindCtrl(detailBase, UI.OBJ_ICON_ROOT);
-			itemIconCreateParam.element = data.GetTargetElementPriorityToTable();
-			ItemIcon itemIcon = ItemIcon.Create(itemIconCreateParam);
-			itemIcon.SetEnableCollider(is_enable: false);
+			ItemIcon.Create(new ItemIcon.ItemIconCreateParam
+			{
+				icon_type = ItemIcon.GetItemIconType(data.type),
+				icon_id = data.GetIconID(),
+				rarity = data.rarity,
+				parent = FindCtrl(detailBase, UI.OBJ_ICON_ROOT),
+				element = data.GetTargetElementPriorityToTable()
+			}).SetEnableCollider(is_enable: false);
 			SetLabelText(detailBase, UI.LBL_NEED_LV, needLv.ToString());
 			SetLabelText(detailBase, UI.LBL_HAVE_NUM, MonoBehaviourSingleton<InventoryManager>.I.GetEquipItemNum(equipId).ToString());
 			SetLabelText(detailBase, UI.LBL_SELL, data.sale.ToString());
@@ -101,7 +100,7 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 			return;
 		}
 		SetLabelText(ctrl, UI.LBL_CAPTION, caption);
-		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
+		UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
 		if (component != null)
 		{
 			component.Reset();
@@ -143,7 +142,7 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 				inventory.Add(item);
 			}
 		});
-		localInventoryEquipData = sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortData>(inventory.ToArray());
+		SortCompareData[] array = localInventoryEquipData = sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortData>(inventory.ToArray());
 	}
 
 	protected override void LocalInventory()
@@ -151,10 +150,10 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 		SetupEnableInventoryUI();
 		if (localInventoryEquipData != null)
 		{
-			SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
+			SetLabelText(UI.LBL_SORT, sortSettings.GetSortLabel());
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
-			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length + 1, reset: false, (Func<int, bool>)delegate(int i)
+			SetDynamicList(InventoryUI, null, localInventoryEquipData.Length + 1, reset: false, delegate(int i)
 			{
 				if (i == 0)
 				{
@@ -162,12 +161,8 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 				}
 				int num2 = i - 1;
 				SortCompareData sortCompareData = localInventoryEquipData[num2];
-				if (sortCompareData == null || !sortCompareData.IsPriority(sortSettings.orderTypeAsc))
-				{
-					return false;
-				}
-				return true;
-			}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+				return (sortCompareData != null && sortCompareData.IsPriority(sortSettings.orderTypeAsc)) ? true : false;
+			}, null, delegate(int i, Transform t, bool is_recycle)
 			{
 				if (i == 0)
 				{
@@ -184,7 +179,7 @@ public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 					else
 					{
 						SetActive(t, is_visible: true);
-						EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(tableID);
+						Singleton<EquipItemTable>.I.GetEquipItemData(tableID);
 						EquipItemSortData equipItemSortData = localInventoryEquipData[num] as EquipItemSortData;
 						EquipItemInfo equipItemInfo = equipItemSortData.GetItemData() as EquipItemInfo;
 						ITEM_ICON_TYPE iconType = equipItemSortData.GetIconType();

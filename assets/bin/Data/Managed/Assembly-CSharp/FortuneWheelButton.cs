@@ -1,5 +1,3 @@
-using System;
-
 public class FortuneWheelButton : UIBehaviour
 {
 	private enum UI
@@ -11,7 +9,7 @@ public class FortuneWheelButton : UIBehaviour
 
 	protected override void OnOpen()
 	{
-		PlayTween((Enum)UI.OBJ_TWEEN, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		PlayTween(UI.OBJ_TWEEN, forward: true, null, is_input_block: false);
 		base.OnOpen();
 	}
 

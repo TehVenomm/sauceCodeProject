@@ -9,9 +9,6 @@ public class Goal_EnsureSafety : GoalComposite
 
 	protected override void Activate(Brain brain)
 	{
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
 		SetStatus(STATUS.ACTIVE);
 		RemoveAllSubGoals(brain);
 		if (brain.dangerRader != null && brain.dangerRader.AskDanger())

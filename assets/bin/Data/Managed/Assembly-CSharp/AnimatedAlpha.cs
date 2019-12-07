@@ -10,15 +10,10 @@ public class AnimatedAlpha : MonoBehaviour
 
 	private UIPanel mPanel;
 
-	public AnimatedAlpha()
-		: this()
-	{
-	}
-
 	private void OnEnable()
 	{
-		mWidget = this.GetComponent<UIWidget>();
-		mPanel = this.GetComponent<UIPanel>();
+		mWidget = GetComponent<UIWidget>();
+		mPanel = GetComponent<UIPanel>();
 		LateUpdate();
 	}
 

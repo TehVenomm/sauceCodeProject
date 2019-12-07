@@ -6,7 +6,7 @@ public static class WordWrap
 
 	public static string Convert(UILabel label, string orgText)
 	{
-		string final = string.Empty;
+		string final = "";
 		if (!label.Wrap(orgText, out final))
 		{
 			final = label.text;
@@ -20,13 +20,13 @@ public static class WordWrap
 		while (flag)
 		{
 			flag = false;
-			string text2 = string.Empty;
+			string text2 = "";
 			string[] array = text.Split('\n');
 			for (int i = 0; i < array.Length; i++)
 			{
 				if (0 < i)
 				{
-					text2 += '\n';
+					text2 += "\n";
 				}
 				string orgText2 = array[i];
 				string str = ConvertWrap(label, orgText2);
@@ -43,7 +43,7 @@ public static class WordWrap
 
 	private static string ConvertWrap(UILabel label, string orgText)
 	{
-		string final = string.Empty;
+		string final = "";
 		if (!label.Wrap(orgText, out final))
 		{
 			final = orgText;
@@ -52,7 +52,7 @@ public static class WordWrap
 		{
 			return final;
 		}
-		string text = string.Empty;
+		string text = "";
 		final = final.Replace("\n", "\n ");
 		string[] array = final.Split('\n');
 		for (int i = 0; i < array.Length; i++)

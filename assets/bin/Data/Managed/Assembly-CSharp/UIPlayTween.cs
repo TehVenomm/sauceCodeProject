@@ -44,11 +44,6 @@ public class UIPlayTween : MonoBehaviour
 
 	private bool mActivated;
 
-	public UIPlayTween()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		if (eventReceiver != null && EventDelegate.IsValid(onFinished))
@@ -63,7 +58,7 @@ public class UIPlayTween : MonoBehaviour
 		mStarted = true;
 		if (tweenTarget == null)
 		{
-			tweenTarget = this.get_gameObject();
+			tweenTarget = base.gameObject;
 		}
 	}
 
@@ -71,20 +66,20 @@ public class UIPlayTween : MonoBehaviour
 	{
 		if (mStarted)
 		{
-			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
+			OnHover(UICamera.IsHighlighted(base.gameObject));
 		}
 		if (UICamera.currentTouch != null)
 		{
 			if (trigger == Trigger.OnPress || trigger == Trigger.OnPressTrue)
 			{
-				mActivated = (UICamera.currentTouch.pressed == this.get_gameObject());
+				mActivated = (UICamera.currentTouch.pressed == base.gameObject);
 			}
 			if (trigger == Trigger.OnHover || trigger == Trigger.OnHoverTrue)
 			{
-				mActivated = (UICamera.currentTouch.current == this.get_gameObject());
+				mActivated = (UICamera.currentTouch.current == base.gameObject);
 			}
 		}
-		UIToggle component = this.GetComponent<UIToggle>();
+		UIToggle component = GetComponent<UIToggle>();
 		if (component != null)
 		{
 			EventDelegate.Add(component.onChange, OnToggle);
@@ -93,7 +88,7 @@ public class UIPlayTween : MonoBehaviour
 
 	private void OnDisable()
 	{
-		UIToggle component = this.GetComponent<UIToggle>();
+		UIToggle component = GetComponent<UIToggle>();
 		if (component != null)
 		{
 			EventDelegate.Remove(component.onChange, OnToggle);
@@ -110,7 +105,7 @@ public class UIPlayTween : MonoBehaviour
 
 	private void OnHover(bool isOver)
 	{
-		if (this.get_enabled() && (trigger == Trigger.OnHover || (trigger == Trigger.OnHoverTrue && isOver) || (trigger == Trigger.OnHoverFalse && !isOver)))
+		if (base.enabled && (trigger == Trigger.OnHover || (trigger == Trigger.OnHoverTrue && isOver) || (trigger == Trigger.OnHoverFalse && !isOver)))
 		{
 			mActivated = (isOver && trigger == Trigger.OnHover);
 			Play(isOver);
@@ -119,7 +114,7 @@ public class UIPlayTween : MonoBehaviour
 
 	private void OnDragOut()
 	{
-		if (this.get_enabled() && mActivated)
+		if (base.enabled && mActivated)
 		{
 			mActivated = false;
 			Play(forward: false);
@@ -128,7 +123,7 @@ public class UIPlayTween : MonoBehaviour
 
 	private void OnPress(bool isPressed)
 	{
-		if (this.get_enabled() && (trigger == Trigger.OnPress || (trigger == Trigger.OnPressTrue && isPressed) || (trigger == Trigger.OnPressFalse && !isPressed)))
+		if (base.enabled && (trigger == Trigger.OnPress || (trigger == Trigger.OnPressTrue && isPressed) || (trigger == Trigger.OnPressFalse && !isPressed)))
 		{
 			mActivated = (isPressed && trigger == Trigger.OnPress);
 			Play(isPressed);
@@ -137,7 +132,7 @@ public class UIPlayTween : MonoBehaviour
 
 	private void OnClick()
 	{
-		if (this.get_enabled() && trigger == Trigger.OnClick)
+		if (base.enabled && trigger == Trigger.OnClick)
 		{
 			Play(forward: true);
 		}
@@ -145,7 +140,7 @@ public class UIPlayTween : MonoBehaviour
 
 	private void OnDoubleClick()
 	{
-		if (this.get_enabled() && trigger == Trigger.OnDoubleClick)
+		if (base.enabled && trigger == Trigger.OnDoubleClick)
 		{
 			Play(forward: true);
 		}
@@ -153,7 +148,7 @@ public class UIPlayTween : MonoBehaviour
 
 	private void OnSelect(bool isSelected)
 	{
-		if (this.get_enabled() && (trigger == Trigger.OnSelect || (trigger == Trigger.OnSelectTrue && isSelected) || (trigger == Trigger.OnSelectFalse && !isSelected)))
+		if (base.enabled && (trigger == Trigger.OnSelect || (trigger == Trigger.OnSelectTrue && isSelected) || (trigger == Trigger.OnSelectFalse && !isSelected)))
 		{
 			mActivated = (isSelected && trigger == Trigger.OnSelect);
 			Play(isSelected);
@@ -162,7 +157,7 @@ public class UIPlayTween : MonoBehaviour
 
 	private void OnToggle()
 	{
-		if (this.get_enabled() && !(UIToggle.current == null) && (trigger == Trigger.OnActivate || (trigger == Trigger.OnActivateTrue && UIToggle.current.value) || (trigger == Trigger.OnActivateFalse && !UIToggle.current.value)))
+		if (base.enabled && !(UIToggle.current == null) && (trigger == Trigger.OnActivate || (trigger == Trigger.OnActivateTrue && UIToggle.current.value) || (trigger == Trigger.OnActivateFalse && !UIToggle.current.value)))
 		{
 			Play(UIToggle.current.value);
 		}
@@ -182,7 +177,7 @@ public class UIPlayTween : MonoBehaviour
 			UITweener uITweener = mTweens[i];
 			if (uITweener.tweenGroup == tweenGroup)
 			{
-				if (uITweener.get_enabled())
+				if (uITweener.enabled)
 				{
 					flag = false;
 					break;
@@ -206,16 +201,16 @@ public class UIPlayTween : MonoBehaviour
 	public void Play(bool forward)
 	{
 		mActive = 0;
-		GameObject val = (!(tweenTarget == null)) ? tweenTarget : this.get_gameObject();
-		if (!NGUITools.GetActive(val))
+		GameObject gameObject = (tweenTarget == null) ? base.gameObject : tweenTarget;
+		if (!NGUITools.GetActive(gameObject))
 		{
 			if (ifDisabledOnPlay != EnableCondition.EnableThenPlay)
 			{
 				return;
 			}
-			NGUITools.SetActive(val, state: true);
+			NGUITools.SetActive(gameObject, state: true);
 		}
-		mTweens = ((!includeChildren) ? val.GetComponents<UITweener>() : val.GetComponentsInChildren<UITweener>());
+		mTweens = (includeChildren ? gameObject.GetComponentsInChildren<UITweener>() : gameObject.GetComponents<UITweener>());
 		if (mTweens.Length == 0)
 		{
 			if (disableWhenFinished != 0)
@@ -237,10 +232,10 @@ public class UIPlayTween : MonoBehaviour
 			{
 				continue;
 			}
-			if (!flag && !NGUITools.GetActive(val))
+			if (!flag && !NGUITools.GetActive(gameObject))
 			{
 				flag = true;
-				NGUITools.SetActive(val, state: true);
+				NGUITools.SetActive(gameObject, state: true);
 			}
 			mActive++;
 			if (playDirection == Direction.Toggle)
@@ -249,7 +244,7 @@ public class UIPlayTween : MonoBehaviour
 				uITweener.Toggle();
 				continue;
 			}
-			if (resetOnPlay || (resetIfDisabled && !uITweener.get_enabled()))
+			if (resetOnPlay || (resetIfDisabled && !uITweener.enabled))
 			{
 				uITweener.Play(forward);
 				uITweener.ResetToBeginning();
@@ -267,7 +262,7 @@ public class UIPlayTween : MonoBehaviour
 			EventDelegate.Execute(onFinished);
 			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
 			{
-				eventReceiver.SendMessage(callWhenFinished, 1);
+				eventReceiver.SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
 			}
 			eventReceiver = null;
 			current = null;

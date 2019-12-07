@@ -100,13 +100,23 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 
 	private int m_visibleItemCount;
 
-	private ScrollItemListControllerBase CurrentCtrl => (m_currentTabType == UI_CTRL_TYPE.UNDEFINED) ? null : m_uiCtrlArray[(int)m_currentTabType];
+	private ScrollItemListControllerBase CurrentCtrl
+	{
+		get
+		{
+			if (m_currentTabType == UI_CTRL_TYPE.UNDEFINED)
+			{
+				return null;
+			}
+			return m_uiCtrlArray[(int)m_currentTabType];
+		}
+	}
 
 	public bool IsLoadingObject => m_isLoadingObject;
 
-	protected UIPanel RootPanel => m_rootPanel ?? (m_rootPanel = this.get_transform().GetChild(0).GetComponent<UIPanel>());
+	protected UIPanel RootPanel => m_rootPanel ?? (m_rootPanel = base.transform.GetChild(0).GetComponent<UIPanel>());
 
-	protected GameObject TabRootObject => m_tabRootObject ?? (m_tabRootObject = GetCtrl(UI.HEADER_TABS).get_gameObject());
+	protected GameObject TabRootObject => m_tabRootObject ?? (m_tabRootObject = GetCtrl(UI.HEADER_TABS).gameObject);
 
 	protected UIPanel ScrollViewPanel => m_scrollViewPanel ?? (m_scrollViewPanel = GetCtrl(UI.SCR_LIST).GetComponent<UIPanel>());
 
@@ -124,16 +134,16 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 
 	public void Initialize(InitParam _param)
 	{
-		this.StartCoroutine(InitCoroutine(_param));
+		StartCoroutine(InitCoroutine(_param));
 	}
 
 	private IEnumerator InitCoroutine(InitParam _param)
 	{
 		InitUI();
-		UIPanel[] panels = this.GetComponentsInChildren<UIPanel>(true);
-		for (int i = 0; i < panels.Length; i++)
+		UIPanel[] componentsInChildren = GetComponentsInChildren<UIPanel>(includeInactive: true);
+		for (int i = 0; i < componentsInChildren.Length; i++)
 		{
-			panels[i].depth += 6200;
+			componentsInChildren[i].depth += 6200;
 		}
 		SetRootAlpha(0f);
 		HideTabRootObj();
@@ -144,8 +154,7 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 		}
 		m_mainChat = _param.Mainchat;
 		m_onClick = _param.OnClick;
-		int tabCount = CreateMemberListUI(_param);
-		if (tabCount < 1)
+		if (CreateMemberListUI(_param) < 1)
 		{
 			yield break;
 		}
@@ -237,7 +246,7 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 	{
 		if (_enumerator != null)
 		{
-			this.StartCoroutine(_enumerator);
+			StartCoroutine(_enumerator);
 		}
 	}
 
@@ -282,7 +291,7 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 
 	private void SwitchTabRootObjActivation(bool _isActivate)
 	{
-		if (!(TabRootObject == null) && TabRootObject.get_activeSelf() != _isActivate)
+		if (!(TabRootObject == null) && TabRootObject.activeSelf != _isActivate)
 		{
 			TabRootObject.SetActive(_isActivate);
 		}
@@ -321,19 +330,19 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 		int itemListDataCount = m_uiCtrlArray[(int)m_currentTabType].GetItemListDataCount();
 		if (itemListDataCount == 0)
 		{
-			UiGrid.get_gameObject().SetActive(false);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: true);
-			SetLabelText((Enum)UI.LBL_NOW, "0");
-			SetLabelText((Enum)UI.LBL_MAX, "0");
+			UiGrid.gameObject.SetActive(value: false);
+			SetActive(UI.OBJ_ACTIVE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, is_visible: true);
+			SetLabelText(UI.LBL_NOW, "0");
+			SetLabelText(UI.LBL_MAX, "0");
 			OnCompleteAllItemLoading(itemListDataCount);
 		}
 		else
 		{
-			UiGrid.get_gameObject().SetActive(true);
+			UiGrid.gameObject.SetActive(value: true);
 			bool flag = m_uiCtrlArray[(int)m_currentTabType].MaxPageNum > 1;
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
+			SetActive(UI.OBJ_ACTIVE_ROOT, flag);
+			SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
 			UpdateDynamicList();
 		}
 	}
@@ -346,36 +355,26 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 			UiGrid.cellHeight = GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 		}
 		m_visibleItemCount = Mathf.FloorToInt(ScrollViewPanel.height / UiGrid.cellHeight);
-		object grid_ctrl_enum = UI.GRD_LIST;
-		string itemPrefabName = m_uiCtrlArray[(int)m_currentTabType].GetItemPrefabName();
-		int item_num = itemListDataCount;
-		ScrollItemListControllerBase obj = m_uiCtrlArray[(int)m_currentTabType];
-		SetDynamicList((Enum)grid_ctrl_enum, itemPrefabName, item_num, reset: false, null, null, obj.SetListItem);
+		SetDynamicList(UI.GRD_LIST, m_uiCtrlArray[(int)m_currentTabType].GetItemPrefabName(), itemListDataCount, reset: false, null, null, m_uiCtrlArray[(int)m_currentTabType].SetListItem);
 	}
 
 	private void OnScreenRotate(bool _isPortrait)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		Vector4 val = (!_isPortrait) ? WIDGET_ANCHOR_MAIN_FRAME_SPLIT_LANDSCAPE_SETTINGS : WIDGET_ANCHOR_MAIN_FRAME_DEFAULT_SETTINGS;
-		MainFramePanel.leftAnchor.Set(0f, val.x);
-		MainFramePanel.rightAnchor.Set(1f, val.y);
-		MainFramePanel.bottomAnchor.Set(0f, val.z);
-		MainFramePanel.topAnchor.Set(1f, val.w);
-		val = ((!_isPortrait) ? WIDGET_ANCHOR_BOT_BTN_ROOT_LANDSCAPE_SETTINGS : WIDGET_ANCHOR_BOT_BTN_ROOT_DEFAULT_SETTINGS);
-		WidgetBotButtonsRoot.leftAnchor.Set(0f, val.x);
-		WidgetBotButtonsRoot.rightAnchor.Set(1f, val.y);
-		WidgetBotButtonsRoot.bottomAnchor.Set(0f, val.z);
-		WidgetBotButtonsRoot.topAnchor.Set(0f, val.w);
+		Vector4 vector = _isPortrait ? WIDGET_ANCHOR_MAIN_FRAME_DEFAULT_SETTINGS : WIDGET_ANCHOR_MAIN_FRAME_SPLIT_LANDSCAPE_SETTINGS;
+		MainFramePanel.leftAnchor.Set(0f, vector.x);
+		MainFramePanel.rightAnchor.Set(1f, vector.y);
+		MainFramePanel.bottomAnchor.Set(0f, vector.z);
+		MainFramePanel.topAnchor.Set(1f, vector.w);
+		vector = (_isPortrait ? WIDGET_ANCHOR_BOT_BTN_ROOT_DEFAULT_SETTINGS : WIDGET_ANCHOR_BOT_BTN_ROOT_LANDSCAPE_SETTINGS);
+		WidgetBotButtonsRoot.leftAnchor.Set(0f, vector.x);
+		WidgetBotButtonsRoot.rightAnchor.Set(1f, vector.y);
+		WidgetBotButtonsRoot.bottomAnchor.Set(0f, vector.z);
+		WidgetBotButtonsRoot.topAnchor.Set(0f, vector.w);
 	}
 
 	public void ProcessBackKey()
 	{
-		if (Input.GetKeyUp(27))
+		if (Input.GetKeyUp(KeyCode.Escape))
 		{
 			OnClickBackButton();
 		}
@@ -420,11 +419,19 @@ public class HomeVariableMemberListController : UIBehaviour, IUpdatexecutor
 
 	public bool IsConnetingNetwork()
 	{
-		return CurrentCtrl != null && CurrentCtrl.IsRequestNextPageInfo;
+		if (CurrentCtrl != null)
+		{
+			return CurrentCtrl.IsRequestNextPageInfo;
+		}
+		return false;
 	}
 
 	public bool IsInitializing()
 	{
-		return IsConnetingNetwork() || IsLoadingObject;
+		if (!IsConnetingNetwork())
+		{
+			return IsLoadingObject;
+		}
+		return true;
 	}
 }

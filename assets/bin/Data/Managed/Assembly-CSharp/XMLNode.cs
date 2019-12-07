@@ -4,11 +4,11 @@ public class XMLNode
 {
 	public XMLNode parent;
 
-	public string tag = string.Empty;
+	public string tag = "";
 
 	public List<XMLNode> children = new List<XMLNode>();
 
-	public string content = string.Empty;
+	public string content = "";
 
 	public Dictionary<string, string> attributes = new Dictionary<string, string>();
 
@@ -19,12 +19,12 @@ public class XMLNode
 
 	public string Serialize(bool newlines, int spacesNumber)
 	{
-		string str = string.Empty;
-		string text = string.Empty;
-		string empty = string.Empty;
+		string str = "";
+		string text = "";
+		string str2 = "";
 		if (newlines)
 		{
-			empty += "  ";
+			str2 += "  ";
 			for (int i = 0; i < spacesNumber; i++)
 			{
 				text += " ";
@@ -32,24 +32,21 @@ public class XMLNode
 			str = "\n";
 		}
 		string text2 = text + "<" + tag;
-		string text3;
 		foreach (string key in attributes.Keys)
 		{
-			text3 = text2;
-			text2 = text3 + " " + key + "=\"" + attributes[key] + "\"";
+			text2 = text2 + " " + key + "=\"" + attributes[key] + "\"";
 		}
 		text2 += ">";
 		foreach (XMLNode child in children)
 		{
 			text2 = text2 + str + child.Serialize(newlines, spacesNumber + 2);
 		}
-		if (content != string.Empty)
+		if (content != "")
 		{
 			text2 += content;
 		}
 		text2 += str;
-		text3 = text2;
-		return text3 + text + "</" + tag + ">";
+		return text2 + text + "</" + tag + ">";
 	}
 
 	public void AddChild(XMLNode child)

@@ -2,11 +2,6 @@ using UnityEngine;
 
 public class AnimationDirectorProxy : MonoBehaviour
 {
-	public AnimationDirectorProxy()
-		: this()
-	{
-	}
-
 	private void __FUNCTION__InstantiatePrefab(string game_object_name)
 	{
 		if (AnimationDirector.I != null)

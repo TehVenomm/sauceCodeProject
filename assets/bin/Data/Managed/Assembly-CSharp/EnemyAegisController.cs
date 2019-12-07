@@ -19,9 +19,9 @@ public class EnemyAegisController : MonoBehaviour
 
 		public float scale;
 
-		public string effectName = string.Empty;
+		public string effectName = "";
 
-		public string nodeName = string.Empty;
+		public string nodeName = "";
 
 		public int nowNum;
 
@@ -45,7 +45,11 @@ public class EnemyAegisController : MonoBehaviour
 
 		public bool Equal(SyncParam s)
 		{
-			return nowNum == s.nowNum && nowHp == s.nowHp;
+			if (nowNum == s.nowNum)
+			{
+				return nowHp == s.nowHp;
+			}
+			return false;
 		}
 	}
 
@@ -76,29 +80,21 @@ public class EnemyAegisController : MonoBehaviour
 
 	public SyncParam syncParam => _syncParam;
 
-	public EnemyAegisController()
-		: this()
-	{
-	}
-
 	public void Init(Enemy enemy)
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		if (!object.ReferenceEquals(enemy, null))
+		if ((object)enemy != null)
 		{
 			owner = enemy;
-			cachedTransform = this.get_transform();
+			cachedTransform = base.transform;
 			isNeedUpdate = false;
 			nowAngle = 0f;
-			cachedTransform.set_localRotation(Quaternion.get_identity());
+			cachedTransform.localRotation = Quaternion.identity;
 		}
 	}
 
 	public void Generate(AnimEventData.EventData data)
 	{
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		if (!object.ReferenceEquals(owner, null))
+		if ((object)owner != null)
 		{
 			_setupParam.maxNum = data.intArgs[0];
 			_setupParam.maxHp = (int)((float)data.intArgs[1] * 0.01f * (float)owner.hpMax);
@@ -108,7 +104,7 @@ public class EnemyAegisController : MonoBehaviour
 			_setupParam.offset = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
 			_setupParam.scale = data.floatArgs[3];
 			_setupParam.effectName = data.stringArgs[0];
-			_setupParam.nodeName = ((data.stringArgs.Length <= 1) ? string.Empty : data.stringArgs[1]);
+			_setupParam.nodeName = ((data.stringArgs.Length > 1) ? data.stringArgs[1] : "");
 			_setupParam.nowNum = _setupParam.maxNum;
 			_setupParam.nowHp = _setupParam.maxHp;
 			Setup(_setupParam, announce: true);
@@ -117,18 +113,6 @@ public class EnemyAegisController : MonoBehaviour
 
 	public void Setup(SetupParam param, bool announce)
 	{
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Expected O, but got Unknown
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020c: Unknown result type (might be due to invalid IL or missing references)
 		_setupParam = param;
 		if (_setupParam.maxNum <= 0)
 		{
@@ -142,37 +126,36 @@ public class EnemyAegisController : MonoBehaviour
 		aegisParams.Clear();
 		Transform parent = owner.FindNode(_setupParam.nodeName);
 		cachedTransform.SetParent(parent);
-		cachedTransform.set_localPosition(Vector3.get_zero());
-		cachedTransform.set_localScale(Vector3.get_one());
+		cachedTransform.localPosition = Vector3.zero;
+		cachedTransform.localScale = Vector3.one;
 		float num = 360f / (float)_setupParam.maxNum;
 		float num2 = _setupParam.maxNum - _setupParam.nowNum;
 		bool flag = true;
 		for (int j = 0; j < _setupParam.maxNum; j++)
 		{
-			Transform val2;
+			Transform transform;
 			if (effectParentList.Count <= j)
 			{
-				GameObject val = new GameObject("Child");
-				val2 = val.get_transform();
-				val2.SetParent(cachedTransform);
-				val2.set_localPosition(Vector3.get_zero());
-				val2.set_localScale(Vector3.get_one());
-				val2.set_localRotation(Quaternion.get_identity());
-				effectParentList.Add(val2);
+				transform = new GameObject("Child").transform;
+				transform.SetParent(cachedTransform);
+				transform.localPosition = Vector3.zero;
+				transform.localScale = Vector3.one;
+				transform.localRotation = Quaternion.identity;
+				effectParentList.Add(transform);
 			}
 			else
 			{
-				val2 = effectParentList[j];
+				transform = effectParentList[j];
 			}
-			val2.set_localRotation(Quaternion.AngleAxis(num * (float)j, Vector3.get_up()));
+			transform.localRotation = Quaternion.AngleAxis(num * (float)j, Vector3.up);
 			if (!((float)j < num2))
 			{
 				AegisParam aegisParam2 = new AegisParam();
-				aegisParam2.hp = ((!flag) ? _setupParam.maxHp : _setupParam.nowHp);
-				aegisParam2.effect = EffectManager.GetEffect(_setupParam.effectName, val2);
-				aegisParam2.effect.set_localPosition(_setupParam.offset);
-				aegisParam2.effect.set_localScale(new Vector3(_setupParam.scale, _setupParam.scale, _setupParam.scale));
-				aegisParam2.effect.set_localRotation(Quaternion.get_identity());
+				aegisParam2.hp = (flag ? _setupParam.nowHp : _setupParam.maxHp);
+				aegisParam2.effect = EffectManager.GetEffect(_setupParam.effectName, transform);
+				aegisParam2.effect.localPosition = _setupParam.offset;
+				aegisParam2.effect.localScale = new Vector3(_setupParam.scale, _setupParam.scale, _setupParam.scale);
+				aegisParam2.effect.localRotation = Quaternion.identity;
 				aegisParams.Add(aegisParam2);
 				flag = false;
 			}
@@ -313,16 +296,14 @@ public class EnemyAegisController : MonoBehaviour
 
 	private void Update()
 	{
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		if (isNeedUpdate)
 		{
-			nowAngle += 50f * Time.get_deltaTime();
+			nowAngle += 50f * Time.deltaTime;
 			if (nowAngle >= 360f)
 			{
 				nowAngle -= 360f;
 			}
-			cachedTransform.set_localRotation(Quaternion.AngleAxis(nowAngle, Vector3.get_up()));
+			cachedTransform.localRotation = Quaternion.AngleAxis(nowAngle, Vector3.up);
 		}
 	}
 
@@ -338,11 +319,11 @@ public class EnemyAegisController : MonoBehaviour
 		}
 		aegisParams.Clear();
 		aegisParams = null;
-		if (!object.ReferenceEquals(effectParentList, null))
+		if (effectParentList != null)
 		{
 			for (int j = 0; j < effectParentList.Count; j++)
 			{
-				Object.Destroy(effectParentList[j].get_gameObject());
+				Object.Destroy(effectParentList[j].gameObject);
 			}
 			effectParentList.Clear();
 		}
@@ -359,9 +340,9 @@ public class EnemyAegisController : MonoBehaviour
 
 	private void _ReleaseEffect(ref Transform t, bool isPlayEndAnimation = true)
 	{
-		if (MonoBehaviourSingleton<EffectManager>.IsValid() && !object.ReferenceEquals(t, null))
+		if (MonoBehaviourSingleton<EffectManager>.IsValid() && (object)t != null)
 		{
-			EffectManager.ReleaseEffect(t.get_gameObject(), isPlayEndAnimation);
+			EffectManager.ReleaseEffect(t.gameObject, isPlayEndAnimation);
 			t = null;
 		}
 	}

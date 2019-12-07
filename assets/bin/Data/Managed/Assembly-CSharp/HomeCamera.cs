@@ -60,11 +60,6 @@ public class HomeCamera : MonoBehaviour
 		private set;
 	}
 
-	public HomeCamera()
-		: this()
-	{
-	}
-
 	public void ChangeView(VIEW_MODE view)
 	{
 		if (!IsValidChangeView(view))
@@ -77,7 +72,7 @@ public class HomeCamera : MonoBehaviour
 		{
 		case VIEW_MODE.SITTING:
 			this.viewMode = VIEW_MODE.SITTING;
-			this.StartCoroutine(DoSit(delegate
+			StartCoroutine(DoSit(delegate
 			{
 				isChanging = false;
 			}));
@@ -86,7 +81,7 @@ public class HomeCamera : MonoBehaviour
 			this.viewMode = VIEW_MODE.NORMAL;
 			if (viewMode == VIEW_MODE.SITTING)
 			{
-				this.StartCoroutine(DoStand(delegate
+				StartCoroutine(DoStand(delegate
 				{
 					isChanging = false;
 				}));
@@ -104,24 +99,14 @@ public class HomeCamera : MonoBehaviour
 
 	public void LateUpdate()
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 		if (chara == null)
 		{
 			chara = GetSelfCharacter();
 		}
 		if (IsValidCameraUpdate() && viewMode == VIEW_MODE.NORMAL)
 		{
-			targetPos = Vector3.get_zero();
-			cameraPos = Vector3.get_zero();
+			targetPos = Vector3.zero;
+			cameraPos = Vector3.zero;
 			GetTargetAndNormalCameraPosition(ref targetPos, ref cameraPos);
 			cameraPos = CheckCollision(targetPos, cameraPos);
 			UpdateCameraTransform(targetPos, cameraPos);
@@ -132,7 +117,7 @@ public class HomeCamera : MonoBehaviour
 	{
 		viewMode = VIEW_MODE.NORMAL;
 		targetCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
-		targetCameraTransform = targetCamera.get_transform();
+		targetCameraTransform = targetCamera.transform;
 		defaultFov = MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.outGameFieldOfView;
 		IHomeManager currentIHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
 		homeSceneParam = currentIHomeManager.GetSceneSetting();
@@ -179,15 +164,7 @@ public class HomeCamera : MonoBehaviour
 
 	private void GetTargetAndNormalCameraPosition(ref Vector3 targetPos, ref Vector3 cameraPos)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 initPos = Vector3.get_zero();
+		Vector3 initPos = Vector3.zero;
 		float cameraDistance = 0f;
 		float cameraHeight = 0f;
 		float targetHeight = 0f;
@@ -200,30 +177,15 @@ public class HomeCamera : MonoBehaviour
 
 	private Vector3 CheckCollision(Vector3 charaPos, Vector3 requestPos)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = requestPos - charaPos;
+		Vector3 vector = requestPos - charaPos;
 		float cameraDistance = GetCameraDistance();
 		float cameraDistanceMin = GetCameraDistanceMin();
 		float lerpTime = GetLerpTime();
-		RaycastHit val2 = default(RaycastHit);
-		Ray val3 = default(Ray);
-		val3._002Ector(charaPos, val.get_normalized());
-		if (Physics.Raycast(val3, ref val2, cameraDistance, 512))
+		RaycastHit hitInfo = default(RaycastHit);
+		Ray ray = new Ray(charaPos, vector.normalized);
+		if (Physics.Raycast(ray, out hitInfo, cameraDistance, 512))
 		{
-			float distance = val2.get_distance();
+			float distance = hitInfo.distance;
 			distance = Mathf.Max(distance, cameraDistanceMin);
 			distance -= cameraDistanceMin;
 			float num = cameraDistance - cameraDistanceMin;
@@ -232,16 +194,14 @@ public class HomeCamera : MonoBehaviour
 			{
 				num2 = lerpTime * (distance / num);
 			}
-			float num3 = num2 / lerpTime;
-			requestPos = charaPos + val3.get_direction() * Mathf.Lerp(cameraDistanceMin, cameraDistance, num3);
+			float t = num2 / lerpTime;
+			requestPos = charaPos + ray.direction * Mathf.Lerp(cameraDistanceMin, cameraDistance, t);
 		}
 		return requestPos;
 	}
 
 	private void GetNeededNormalCameraParam(ref Vector3 initPos, ref float cameraDistance, ref float cameraHeight, ref float targetHeight)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		initPos = homeSceneParam.selfInitPos;
 		cameraHeight = homeSceneParam.GetSelfCameraHeight();
 		targetHeight = homeSceneParam.selfCameraTagetHeight;
@@ -265,43 +225,27 @@ public class HomeCamera : MonoBehaviour
 
 	private void UpdateCameraTransform(Vector3 targetPos, Vector3 cameraPos)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		targetCameraTransform.set_position(cameraPos);
+		targetCameraTransform.position = cameraPos;
 		targetCameraTransform.LookAt(targetPos);
-		if (targetCamera.get_fieldOfView() != defaultFov)
+		if (targetCamera.fieldOfView != defaultFov)
 		{
-			targetCamera.set_fieldOfView(defaultFov);
+			targetCamera.fieldOfView = defaultFov;
 		}
 	}
 
 	private Vector3 GetNormalCameraPosition(Vector3 initPos, float cameraDistance, float cameraHeight, Vector3 targetPos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		Vector3 baseCameraPosition = GetBaseCameraPosition(initPos);
 		baseCameraPosition.z -= 2f;
-		Vector3 val = baseCameraPosition - targetPos;
-		val.y = 0f;
-		val.Normalize();
-		return val * cameraDistance + targetPos;
+		Vector3 a = baseCameraPosition - targetPos;
+		a.y = 0f;
+		a.Normalize();
+		return a * cameraDistance + targetPos;
 	}
 
 	private Vector3 GetTargetPositionForNormalCamera()
 	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		return chara._transform.get_position();
+		return chara._transform.position;
 	}
 
 	private HomeSelfCharacter GetSelfCharacter()
@@ -311,18 +255,8 @@ public class HomeCamera : MonoBehaviour
 
 	private Vector3 GetBaseCameraPosition(Vector3 target_pos)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 		Vector3 result = default(Vector3);
-		result = Quaternion.AngleAxis(homeSceneParam.selfCameraAngleY, Vector3.get_up()) * Vector3.get_forward() * homeSceneParam.selfCameraDistanceMax + target_pos;
+		result = Quaternion.AngleAxis(homeSceneParam.selfCameraAngleY, Vector3.up) * Vector3.forward * homeSceneParam.selfCameraDistanceMax + target_pos;
 		result.y += homeSceneParam.GetSelfCameraHeight();
 		return result;
 	}
@@ -353,72 +287,67 @@ public class HomeCamera : MonoBehaviour
 
 	private IEnumerator DoSit(Action callback = null)
 	{
-		beforeNormalCameraPos = targetCameraTransform.get_position();
-		beforeNormalCameraRot = targetCameraTransform.get_rotation();
-		beforeNormalCameraFov = targetCamera.get_fieldOfView();
-		TablePoint table = (!MonoBehaviourSingleton<LoungeManager>.IsValid()) ? MonoBehaviourSingleton<ClanManager>.I.TableSet.GetNearTablePoint() : MonoBehaviourSingleton<LoungeManager>.I.TableSet.GetNearTablePoint();
-		yield return this.StartCoroutine(LerpCamera(targetPos: table.cameraPosition, targetRot: Quaternion.Euler(table.cameraRotation), targetFov: table.cameraFov, prevPos: beforeNormalCameraPos, prevRot: beforeNormalCameraRot, prevFov: beforeNormalCameraFov));
+		beforeNormalCameraPos = targetCameraTransform.position;
+		beforeNormalCameraRot = targetCameraTransform.rotation;
+		beforeNormalCameraFov = targetCamera.fieldOfView;
+		TablePoint tablePoint = (!MonoBehaviourSingleton<LoungeManager>.IsValid()) ? MonoBehaviourSingleton<ClanManager>.I.TableSet.GetNearTablePoint() : MonoBehaviourSingleton<LoungeManager>.I.TableSet.GetNearTablePoint();
+		Vector3 cameraPosition = tablePoint.cameraPosition;
+		Quaternion targetRot = Quaternion.Euler(tablePoint.cameraRotation);
+		float cameraFov = tablePoint.cameraFov;
+		yield return StartCoroutine(LerpCamera(beforeNormalCameraPos, cameraPosition, beforeNormalCameraRot, targetRot, beforeNormalCameraFov, cameraFov));
 		callback?.Invoke();
 	}
 
 	private IEnumerator DoStand(Action callback = null)
 	{
-		Vector3 prevPos = targetCameraTransform.get_position();
-		Quaternion prevRot = targetCameraTransform.get_rotation();
-		float prevFov = targetCamera.get_fieldOfView();
+		Vector3 position = targetCameraTransform.position;
+		Quaternion rotation = targetCameraTransform.rotation;
+		float fieldOfView = targetCamera.fieldOfView;
 		Quaternion targetRot = beforeNormalCameraRot;
-		Vector3 targetPos = beforeNormalCameraPos;
+		Vector3 vector = beforeNormalCameraPos;
 		float targetFov = beforeNormalCameraFov;
-		yield return this.StartCoroutine(LerpCamera(prevPos, targetPos, prevRot, targetRot, prevFov, targetFov));
+		yield return StartCoroutine(LerpCamera(position, vector, rotation, targetRot, fieldOfView, targetFov));
 		callback?.Invoke();
 	}
 
 	private IEnumerator LerpCamera(Vector3 prevPos, Vector3 targetPos, Quaternion prevRot, Quaternion targetRot, float prevFov, float targetFov)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		bool wait3 = true;
 		float time = 0f;
 		OutGameSettingsManager.LoungeScene loungeSceneParam = homeSceneParam as OutGameSettingsManager.LoungeScene;
 		while (wait3)
 		{
-			time = Mathf.Min(time + Time.get_deltaTime(), 1f);
+			time = Mathf.Min(time + Time.deltaTime, 1f);
 			if (viewMode == VIEW_MODE.NORMAL)
 			{
-				Vector3 val = default(Vector3);
-				Vector3 val2 = default(Vector3);
-				GetTargetAndNormalCameraPosition(ref val, ref val2);
-				targetPos = val2;
-				Quaternion val3 = Quaternion.LookRotation(val - val2);
-				targetRot = val3;
+				Vector3 a = default(Vector3);
+				Vector3 vector = default(Vector3);
+				GetTargetAndNormalCameraPosition(ref a, ref vector);
+				targetPos = vector;
+				Quaternion quaternion = Quaternion.LookRotation(a - vector);
+				targetRot = quaternion;
 			}
-			if (targetCameraTransform.get_position() != targetPos)
+			if (targetCameraTransform.position != targetPos)
 			{
-				targetCameraTransform.set_position(Vector3.Lerp(prevPos, targetPos, EaseOutCube(time) * loungeSceneParam.sittingCameraEaseCoef));
+				targetCameraTransform.position = Vector3.Lerp(prevPos, targetPos, EaseOutCube(time) * loungeSceneParam.sittingCameraEaseCoef);
 				wait3 = true;
 			}
 			else
 			{
 				wait3 = false;
 			}
-			if (Quaternion.Angle(targetCameraTransform.get_rotation(), targetRot) > 0.1f)
+			if (Quaternion.Angle(targetCameraTransform.rotation, targetRot) > 0.1f)
 			{
-				targetCameraTransform.set_rotation(Quaternion.Slerp(prevRot, targetRot, EaseOutCube(time) * loungeSceneParam.sittingCameraEaseCoef));
+				targetCameraTransform.rotation = Quaternion.Slerp(prevRot, targetRot, EaseOutCube(time) * loungeSceneParam.sittingCameraEaseCoef);
 				wait3 = true;
 			}
 			else
 			{
 				wait3 = (wait3 ? true : false);
 			}
-			if (targetCamera.get_fieldOfView() != targetFov)
+			if (targetCamera.fieldOfView != targetFov)
 			{
-				targetCamera.set_fieldOfView(Mathf.Lerp(prevFov, targetFov, time));
+				targetCamera.fieldOfView = Mathf.Lerp(prevFov, targetFov, time);
 				wait3 = true;
 			}
 			else

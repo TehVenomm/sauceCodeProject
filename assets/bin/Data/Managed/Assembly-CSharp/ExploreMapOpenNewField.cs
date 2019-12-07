@@ -26,7 +26,7 @@ public class ExploreMapOpenNewField : GameSection
 
 	private ExploreMapRoot mapRoot_;
 
-	private Transform[] playerMarkers_ = (Transform[])new Transform[4];
+	private Transform[] playerMarkers_ = new Transform[4];
 
 	private Transform selfMarker_;
 
@@ -63,7 +63,7 @@ public class ExploreMapOpenNewField : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine("DoInitialize");
+		StartCoroutine("DoInitialize");
 	}
 
 	private IEnumerator DoInitialize()
@@ -106,7 +106,7 @@ public class ExploreMapOpenNewField : GameSection
 		}
 		if (loadedEncounterBossCutIn != null)
 		{
-			fieldQuestWarningRoot = ResourceUtility.Realizes(loadedEncounterBossCutIn.loadedObject).get_gameObject();
+			fieldQuestWarningRoot = ResourceUtility.Realizes(loadedEncounterBossCutIn.loadedObject).gameObject;
 			UIPanel componentInChildren = fieldQuestWarningRoot.GetComponentInChildren<UIPanel>();
 			if (componentInChildren != null)
 			{
@@ -125,19 +125,18 @@ public class ExploreMapOpenNewField : GameSection
 			component.startingRenderQueue = 2900;
 		}
 		map_ = ResourceUtility.Realizes(loadedExploreMap.loadedObject, mapFrame_);
-		Transform map = map_.Find("Map");
-		map.get_gameObject().SetActive(true);
+		map_.Find("Map").gameObject.SetActive(value: true);
 		mapRoot_ = map_.GetComponent<ExploreMapRoot>();
 		ExploreMapLocation[] locations = mapRoot_.locations;
 		for (int i = 0; i < locations.Length; i++)
 		{
-			Transform val = locations[i].get_transform().Find("ExploreSpotActive");
-			Transform val2 = locations[i].get_transform().Find("ExploreSpotInactive");
-			Transform val3 = locations[i].get_transform().Find("ExploreSpotSonar");
-			val.get_gameObject().SetActive(true);
-			val2.get_gameObject().SetActive(false);
+			Transform transform = locations[i].transform.Find("ExploreSpotActive");
+			Transform transform2 = locations[i].transform.Find("ExploreSpotInactive");
+			Transform transform3 = locations[i].transform.Find("ExploreSpotSonar");
+			transform.gameObject.SetActive(value: true);
+			transform2.gameObject.SetActive(value: false);
 			List<FieldMapTable.FieldGimmickPointTableData> fieldGimmickPointListByMapID = Singleton<FieldMapTable>.I.GetFieldGimmickPointListByMapID((uint)locations[i].mapId);
-			if (fieldGimmickPointListByMapID == null || !(val3 != null))
+			if (fieldGimmickPointListByMapID == null || !(transform3 != null))
 			{
 				continue;
 			}
@@ -145,9 +144,9 @@ public class ExploreMapOpenNewField : GameSection
 			{
 				if (fieldGimmickPointListByMapID[j].gimmickType == FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.SONAR)
 				{
-					val.get_gameObject().SetActive(false);
-					val2.get_gameObject().SetActive(false);
-					val3.get_gameObject().SetActive(true);
+					transform.gameObject.SetActive(value: false);
+					transform2.gameObject.SetActive(value: false);
+					transform3.gameObject.SetActive(value: true);
 				}
 			}
 		}
@@ -159,68 +158,68 @@ public class ExploreMapOpenNewField : GameSection
 			base.Initialize();
 			yield break;
 		}
-		ExploreMapFrame frame = mapFrame_.GetComponent<ExploreMapFrame>();
-		frame.SetMap(mapRoot_);
-		RegionTable.Data regionData = Singleton<RegionTable>.I.GetData(regionId);
-		if (regionData != null)
+		ExploreMapFrame component2 = mapFrame_.GetComponent<ExploreMapFrame>();
+		component2.SetMap(mapRoot_);
+		RegionTable.Data data = Singleton<RegionTable>.I.GetData(regionId);
+		if (data != null)
 		{
-			frame.SetCaption(regionData.regionName);
+			component2.SetCaption(data.regionName);
 		}
 		for (int k = 0; k < playerMarkers_.Length; k++)
 		{
 			playerMarkers_[k] = ResourceUtility.Realizes(loadedPlayerMarker.loadedObject, mapFrame_);
-			ExplorePlayerMarker component2 = playerMarkers_[k].GetComponent<ExplorePlayerMarker>();
-			if (null != component2)
+			ExplorePlayerMarker component3 = playerMarkers_[k].GetComponent<ExplorePlayerMarker>();
+			if (null != component3)
 			{
-				component2.SetIndex(k);
+				component3.SetIndex(k);
 			}
-			component2.get_gameObject().SetActive(false);
+			component3.gameObject.SetActive(value: false);
 		}
 		selfMarker_ = playerMarkers_[0];
-		Transform bg = mapFrame_.Find("BG");
-		bg.get_gameObject().SetActive(true);
-		bgEventListener = UIEventListener.Get(bg.get_gameObject());
-		mapFrame_.Find("TaptoSkip").get_gameObject().SetActive(!toBoss_);
-		mapFrame_.Find("CaptionRoot/Close").get_gameObject().SetActive(false);
+		Transform transform4 = mapFrame_.Find("BG");
+		transform4.gameObject.SetActive(value: true);
+		bgEventListener = UIEventListener.Get(transform4.gameObject);
+		mapFrame_.Find("TaptoSkip").gameObject.SetActive(!toBoss_);
+		mapFrame_.Find("CaptionRoot/Close").gameObject.SetActive(value: false);
 		mapRoot_.SetMarkers(playerMarkers_, isMiniMap: false);
-		ExploreStatus.TraceInfo[] traceHistory = MonoBehaviourSingleton<QuestManager>.I.GetBossTraceHistory();
-		if (traceHistory != null && traceHistory.Length > 0)
+		ExploreStatus.TraceInfo[] bossTraceHistory = MonoBehaviourSingleton<QuestManager>.I.GetBossTraceHistory();
+		if (bossTraceHistory != null && bossTraceHistory.Length != 0)
 		{
-			Transform val4 = ResourceUtility.Realizes(loadedFootprint.loadedObject, map_);
-			ExploreStatus.TraceInfo traceInfo = traceHistory[traceHistory.Length - 1];
+			Transform transform5 = ResourceUtility.Realizes(loadedFootprint.loadedObject, map_);
+			ExploreStatus.TraceInfo traceInfo = bossTraceHistory[bossTraceHistory.Length - 1];
 			Vector3 positionOnMap = mapRoot_.GetPositionOnMap(traceInfo.mapId);
-			val4.set_localPosition(new Vector3(positionOnMap.x + MarkerOffsetX, positionOnMap.y + MarkerOffsetY, positionOnMap.z));
-			val4.get_gameObject().SetActive(true);
-			if (traceHistory.Length > 1)
+			transform5.localPosition = new Vector3(positionOnMap.x + MarkerOffsetX, positionOnMap.y + MarkerOffsetY, positionOnMap.z);
+			transform5.gameObject.SetActive(value: true);
+			if (bossTraceHistory.Length > 1)
 			{
-				Transform val5 = ResourceUtility.Realizes(loadedFootprint.loadedObject, map_);
-				ExploreStatus.TraceInfo traceInfo2 = traceHistory[traceHistory.Length - 2];
+				Transform transform6 = ResourceUtility.Realizes(loadedFootprint.loadedObject, map_);
+				ExploreStatus.TraceInfo traceInfo2 = bossTraceHistory[bossTraceHistory.Length - 2];
 				Vector3 positionOnMap2 = mapRoot_.GetPositionOnMap(traceInfo2.mapId);
-				val5.set_localPosition(new Vector3(positionOnMap2.x + MarkerOffsetX, positionOnMap2.y + MarkerOffsetY, positionOnMap2.z));
-				val5.get_gameObject().SetActive(true);
+				transform6.localPosition = new Vector3(positionOnMap2.x + MarkerOffsetX, positionOnMap2.y + MarkerOffsetY, positionOnMap2.z);
+				transform6.gameObject.SetActive(value: true);
 			}
 		}
 		redCircle = ResourceUtility.Realizes(loadedCircle.loadedObject, map_);
-		redCircle.set_localScale(new Vector3(0.6f, 0.6f, 0.6f));
+		redCircle.localScale = new Vector3(0.6f, 0.6f, 0.6f);
 		battleIcon = ResourceUtility.Realizes(loadedBattleIcon.loadedObject, map_);
 		if (mapRoot_.showBattleMarker)
 		{
 			int exploreBossAppearMapId = MonoBehaviourSingleton<QuestManager>.I.GetExploreBossAppearMapId();
 			Vector3 positionOnMap3 = mapRoot_.GetPositionOnMap(exploreBossAppearMapId);
-			redCircle.set_localPosition(positionOnMap3);
-			battleIcon.set_localPosition(new Vector3(positionOnMap3.x + MarkerOffsetX, positionOnMap3.y + MarkerOffsetY, positionOnMap3.z));
-			TweenAlpha component3 = redCircle.GetComponent<TweenAlpha>();
-			if (null != component3)
+			redCircle.localPosition = positionOnMap3;
+			battleIcon.localPosition = new Vector3(positionOnMap3.x + MarkerOffsetX, positionOnMap3.y + MarkerOffsetY, positionOnMap3.z);
+			TweenAlpha component4 = redCircle.GetComponent<TweenAlpha>();
+			if (null != component4)
 			{
-				component3.from = component3.to;
+				component4.from = component4.to;
 			}
-			redCircle.get_gameObject().SetActive(true);
-			battleIcon.get_gameObject().SetActive(true);
+			redCircle.gameObject.SetActive(value: true);
+			battleIcon.gameObject.SetActive(value: true);
 		}
 		else
 		{
-			redCircle.get_gameObject().SetActive(false);
-			battleIcon.get_gameObject().SetActive(false);
+			redCircle.gameObject.SetActive(value: false);
+			battleIcon.gameObject.SetActive(value: false);
 		}
 		base.Initialize();
 	}
@@ -229,13 +228,13 @@ public class ExploreMapOpenNewField : GameSection
 	{
 		if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && !calledExit)
 		{
-			this.StopAllCoroutines();
+			StopAllCoroutines();
 			if (null != bgEventListener)
 			{
 				UIEventListener uIEventListener = bgEventListener;
 				uIEventListener.onClick = (UIEventListener.VoidDelegate)Delegate.Remove(uIEventListener.onClick, new UIEventListener.VoidDelegate(onClick));
 			}
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("ExploreMapOpenNewField", this.get_gameObject(), "INGAME_MAIN");
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("ExploreMapOpenNewField", base.gameObject, "INGAME_MAIN");
 			calledExit = true;
 		}
 	}
@@ -257,59 +256,57 @@ public class ExploreMapOpenNewField : GameSection
 		}
 		UIEventListener uIEventListener = bgEventListener;
 		uIEventListener.onClick = (UIEventListener.VoidDelegate)Delegate.Combine(uIEventListener.onClick, new UIEventListener.VoidDelegate(onClick));
-		this.StartCoroutine(DoExitEvent());
+		StartCoroutine(DoExitEvent());
 	}
 
 	private IEnumerator DoExitEvent()
 	{
-		selfMarker_.get_gameObject().SetActive(true);
-		Vector3 offset = new Vector3(0f, 0f, 0f);
-		Transform portalNode = mapRoot_.FindPortalNode(from_.mapId, to_.mapId);
-		if (null == portalNode)
+		selfMarker_.gameObject.SetActive(value: true);
+		Vector3 b = new Vector3(0f, 0f, 0f);
+		Transform transform = mapRoot_.FindPortalNode(from_.mapId, to_.mapId);
+		if (null == transform)
 		{
 			ExploreMapLocation exploreMapLocation = mapRoot_.FindLocation(from_.mapId);
 			ExploreMapLocation exploreMapLocation2 = mapRoot_.FindLocation(to_.mapId);
 			if (null != exploreMapLocation && null != exploreMapLocation2)
 			{
-				Vector3 val = (exploreMapLocation.get_transform().get_localPosition() + exploreMapLocation2.get_transform().get_localPosition()) * 0.5f;
-				val -= exploreMapLocation.get_transform().get_localPosition();
-				offset = val;
-				portalNode = exploreMapLocation.get_transform();
+				b = (exploreMapLocation.transform.localPosition + exploreMapLocation2.transform.localPosition) * 0.5f - exploreMapLocation.transform.localPosition;
+				transform = exploreMapLocation.transform;
 			}
 		}
-		if (null == portalNode)
+		if (null == transform)
 		{
-			yield return (object)new WaitForSeconds(0.1f);
+			yield return new WaitForSeconds(0.1f);
 			DispatchEvent("EXIT");
 			yield break;
 		}
 		if (null != from_)
 		{
-			if (fromBoss_ && null != portalNode)
+			if (fromBoss_ && null != transform)
 			{
-				Utility.Attach(portalNode, selfMarker_);
+				Utility.Attach(transform, selfMarker_);
 				selfMarker_.GetComponent<ExplorePlayerMarker>().SetIndex(0);
-				selfMarker_.set_localPosition(selfMarker_.get_localPosition() + offset);
+				selfMarker_.localPosition += b;
 			}
 			else
 			{
-				Utility.Attach(from_.get_transform(), selfMarker_);
+				Utility.Attach(from_.transform, selfMarker_);
 				selfMarker_.GetComponent<ExplorePlayerMarker>().SetIndex(0);
 			}
-			yield return (object)new WaitForSeconds(0.3f);
-			TweenScale.Begin(selfMarker_.get_gameObject(), 0.3f, Vector3.get_zero());
-			yield return (object)new WaitForSeconds(0.3f);
+			yield return new WaitForSeconds(0.3f);
+			TweenScale.Begin(selfMarker_.gameObject, 0.3f, Vector3.zero);
+			yield return new WaitForSeconds(0.3f);
 		}
 		else
 		{
-			selfMarker_.set_localScale(Vector3.get_zero());
-			yield return (object)new WaitForSeconds(0.3f);
+			selfMarker_.localScale = Vector3.zero;
+			yield return new WaitForSeconds(0.3f);
 		}
-		yield return (object)new WaitForSeconds(0.3f);
-		Utility.Attach(to_.get_transform(), selfMarker_);
+		yield return new WaitForSeconds(0.3f);
+		Utility.Attach(to_.transform, selfMarker_);
 		selfMarker_.GetComponent<ExplorePlayerMarker>().SetIndex(0);
-		TweenScale.Begin(selfMarker_.get_gameObject(), 0.3f, Vector3.get_one());
-		yield return (object)new WaitForSeconds(0.5f);
+		TweenScale.Begin(selfMarker_.gameObject, 0.3f, Vector3.one);
+		yield return new WaitForSeconds(0.5f);
 		if (toBoss_)
 		{
 			if (MonoBehaviourSingleton<UIInGameFieldQuestWarning>.IsValid())
@@ -319,11 +316,11 @@ public class ExploreMapOpenNewField : GameSection
 				{
 					if (fieldQuestWarningRoot != null)
 					{
-						Object.Destroy(fieldQuestWarningRoot);
+						UnityEngine.Object.Destroy(fieldQuestWarningRoot);
 					}
 				});
 			}
-			this.StartCoroutine(DoExitEncounterBossEvent());
+			StartCoroutine(DoExitEncounterBossEvent());
 		}
 		else
 		{
@@ -333,7 +330,7 @@ public class ExploreMapOpenNewField : GameSection
 
 	private IEnumerator DoExitEncounterBossEvent()
 	{
-		yield return (object)new WaitForSeconds(3f);
+		yield return new WaitForSeconds(3f);
 		DispatchEvent("EXIT");
 	}
 }

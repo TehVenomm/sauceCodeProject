@@ -1,20 +1,23 @@
-using System;
 using UnityEngine;
 
 public class AndroidClipBoard : iClipBoard
 {
-	public unsafe void SetClipBoard(string s)
+	public void SetClipBoard(string s)
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Expected O, but got Unknown
-		AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-		AndroidJavaObject activity = val.GetStatic<AndroidJavaObject>("currentActivity");
-		_003CSetClipBoard_003Ec__AnonStorey0 _003CSetClipBoard_003Ec__AnonStorey;
-		activity.Call("runOnUiThread", new object[1]
+		AndroidJavaClass androidJavaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+		AndroidJavaObject activity = androidJavaClass.GetStatic<AndroidJavaObject>("currentActivity");
+		activity.Call("runOnUiThread", (AndroidJavaRunnable)delegate
 		{
-			(object)new AndroidJavaRunnable((object)_003CSetClipBoard_003Ec__AnonStorey, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)
+			AndroidJavaObject androidJavaObject = activity.Call<AndroidJavaObject>("getSystemService", new object[1]
+			{
+				"clipboard"
+			});
+			AndroidJavaObject androidJavaObject2 = new AndroidJavaClass("android.content.ClipData").CallStatic<AndroidJavaObject>("newPlainText", new object[2]
+			{
+				"simple text",
+				s
+			});
+			androidJavaObject.Call("setPrimaryClip", androidJavaObject2);
 		});
 	}
 }

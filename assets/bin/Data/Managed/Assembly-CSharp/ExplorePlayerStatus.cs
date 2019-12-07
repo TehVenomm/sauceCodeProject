@@ -1,7 +1,6 @@
 using Network;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class ExplorePlayerStatus
 {
@@ -13,7 +12,17 @@ public class ExplorePlayerStatus
 
 	private CharaInfo charaInfo;
 
-	public bool isInitialized => weaponEquipItemData != null && coopClient != null;
+	public bool isInitialized
+	{
+		get
+		{
+			if (weaponEquipItemData != null)
+			{
+				return coopClient != null;
+			}
+			return false;
+		}
+	}
 
 	public int hp
 	{
@@ -141,7 +150,7 @@ public class ExplorePlayerStatus
 
 	public void SyncFromPlayer(Player player)
 	{
-		if (!Object.op_Implicit(player) || !player.isInitialized)
+		if (!player || !player.isInitialized)
 		{
 			return;
 		}
@@ -201,9 +210,9 @@ public class ExplorePlayerStatus
 		if (this.weaponEquipmentId != weaponEquipmentId)
 		{
 			this.weaponEquipmentId = weaponEquipmentId;
-			bool flag = weaponEquipItemData == null;
+			bool num = weaponEquipItemData == null;
 			weaponEquipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)weaponEquipmentId);
-			if (flag && this.onInitialize != null)
+			if (num && this.onInitialize != null)
 			{
 				this.onInitialize();
 			}
@@ -228,15 +237,17 @@ public class ExplorePlayerStatus
 		{
 			charaInfo = _charaInfo;
 		}
-		InGameRecorder.PlayerRecord playerRecord = new InGameRecorder.PlayerRecord();
-		playerRecord.id = ((!isSelf) ? charaInfo.userId : 0);
-		playerRecord.isNPC = false;
-		playerRecord.isSelf = isSelf;
-		playerRecord.charaInfo = charaInfo;
-		playerRecord.beforeLevel = charaInfo.level;
-		playerRecord.playerLoadInfo = PlayerLoadInfo.FromCharaInfo(charaInfo, need_weapon: true, need_helm: true, need_leg: true, is_priority_visual_equip: false);
-		playerRecord.animID = playerRecord.playerLoadInfo.weaponModelID / 1000;
-		playerRecord.givenTotalDamage = givenTotalDamage;
-		return playerRecord;
+		InGameRecorder.PlayerRecord obj = new InGameRecorder.PlayerRecord
+		{
+			id = ((!isSelf) ? charaInfo.userId : 0),
+			isNPC = false,
+			isSelf = isSelf,
+			charaInfo = charaInfo,
+			beforeLevel = charaInfo.level,
+			playerLoadInfo = PlayerLoadInfo.FromCharaInfo(charaInfo, need_weapon: true, need_helm: true, need_leg: true, is_priority_visual_equip: false)
+		};
+		obj.animID = obj.playerLoadInfo.weaponModelID / 1000;
+		obj.givenTotalDamage = givenTotalDamage;
+		return obj;
 	}
 }

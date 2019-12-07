@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -72,9 +71,7 @@ public class PointShopFilterBase : GameSection
 
 			public void DoFiltering(ref List<PointShopItem> list)
 			{
-				list = (from x in list
-				where !IsCondition(x)
-				select x).ToList();
+				list = list.Where((PointShopItem x) => !IsCondition(x)).ToList();
 			}
 
 			protected virtual bool IsCondition(PointShopItem item)
@@ -100,8 +97,7 @@ public class PointShopFilterBase : GameSection
 			{
 				if (item.type == 3)
 				{
-					ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)item.itemId);
-					return itemData.type == ITEM_TYPE.TICKET;
+					return Singleton<ItemTable>.I.GetItemData((uint)item.itemId).type == ITEM_TYPE.TICKET;
 				}
 				return false;
 			}
@@ -133,8 +129,7 @@ public class PointShopFilterBase : GameSection
 			{
 				if (item.type == 3)
 				{
-					ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)item.itemId);
-					return itemData.type == ITEM_TYPE.USE_ITEM;
+					return Singleton<ItemTable>.I.GetItemData((uint)item.itemId).type == ITEM_TYPE.USE_ITEM;
 				}
 				return false;
 			}
@@ -152,8 +147,7 @@ public class PointShopFilterBase : GameSection
 			{
 				if (item.type == 3)
 				{
-					ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)item.itemId);
-					return itemData.type == ITEM_TYPE.LITHOGRAPH;
+					return Singleton<ItemTable>.I.GetItemData((uint)item.itemId).type == ITEM_TYPE.LITHOGRAPH;
 				}
 				return false;
 			}
@@ -171,8 +165,7 @@ public class PointShopFilterBase : GameSection
 			{
 				if (item.type == 3)
 				{
-					ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)item.itemId);
-					return itemData.type == ITEM_TYPE.MATERIAL_METAL;
+					return Singleton<ItemTable>.I.GetItemData((uint)item.itemId).type == ITEM_TYPE.MATERIAL_METAL;
 				}
 				return false;
 			}
@@ -190,8 +183,7 @@ public class PointShopFilterBase : GameSection
 			{
 				if (item.type == 3)
 				{
-					ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)item.itemId);
-					switch (itemData.type)
+					switch (Singleton<ItemTable>.I.GetItemData((uint)item.itemId).type)
 					{
 					case ITEM_TYPE.MATERIAL_METAL:
 					case ITEM_TYPE.LITHOGRAPH:
@@ -328,25 +320,13 @@ public class PointShopFilterBase : GameSection
 					return itemData.rarity == rarity;
 				}
 				case 4:
-				{
-					EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)item.itemId);
-					return equipItemData.rarity == rarity;
-				}
+					return Singleton<EquipItemTable>.I.GetEquipItemData((uint)item.itemId).rarity == rarity;
 				case 6:
-				{
-					QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)item.itemId);
-					return questData.rarity == rarity;
-				}
+					return Singleton<QuestTable>.I.GetQuestData((uint)item.itemId).rarity == rarity;
 				case 5:
-				{
-					SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)item.itemId);
-					return skillItemData.rarity == rarity;
-				}
+					return Singleton<SkillItemTable>.I.GetSkillItemData((uint)item.itemId).rarity == rarity;
 				case 14:
-				{
-					AccessoryTable.AccessoryData data = Singleton<AccessoryTable>.I.GetData((uint)item.itemId);
-					return data.rarity == rarity;
-				}
+					return Singleton<AccessoryTable>.I.GetData((uint)item.itemId).rarity == rarity;
 				default:
 					return false;
 				}
@@ -367,17 +347,21 @@ public class PointShopFilterBase : GameSection
 			switch (category)
 			{
 			case CATEGORY.TYPE:
+			{
 				for (int j = 0; j < typeFilter.Length; j++)
 				{
 					num |= 1 << (int)typeFilter[j].type;
 				}
 				break;
+			}
 			case CATEGORY.RARITY:
+			{
 				for (int i = 0; i < rarityFilter.Length; i++)
 				{
 					num |= 1 << (int)rarityFilter[i].rarity;
 				}
 				break;
+			}
 			}
 			return num;
 		}
@@ -484,21 +468,21 @@ public class PointShopFilterBase : GameSection
 		Filter.CheckFilterBase[] typeFilter = this.filter.typeFilter;
 		foreach (Filter.CheckFilterBase checkFilterBase in typeFilter)
 		{
-			SetEvent((Enum)checkFilterBase.checkboxUI, "TYPE", (int)checkFilterBase.type);
+			SetEvent(checkFilterBase.checkboxUI, "TYPE", (int)checkFilterBase.type);
 			if (list != null)
 			{
 				bool flag = checkFilterBase.IsInclude(list);
-				SetActive((Enum)checkFilterBase.checkboxUI, flag);
-				SetActive(GetCtrl(checkFilterBase.checkboxUI).get_parent(), UI.SPR_GRAY, !flag);
+				SetActive(checkFilterBase.checkboxUI, flag);
+				SetActive(GetCtrl(checkFilterBase.checkboxUI).parent, UI.SPR_GRAY, !flag);
 			}
 		}
-		Filter.CheckFilterBase[] rarityFilter = this.filter.rarityFilter;
-		foreach (Filter.CheckFilterBase checkFilterBase2 in rarityFilter)
+		typeFilter = this.filter.rarityFilter;
+		foreach (Filter.CheckFilterBase checkFilterBase2 in typeFilter)
 		{
-			SetEvent((Enum)checkFilterBase2.checkboxUI, "RARITY", (int)checkFilterBase2.rarity);
+			SetEvent(checkFilterBase2.checkboxUI, "RARITY", (int)checkFilterBase2.rarity);
 		}
-		SetEvent((Enum)UI.BTN_ALL_DESELECT, "ALL", 0);
-		SetEvent((Enum)UI.BTN_ALL_SELECT, "ALL", 1);
+		SetEvent(UI.BTN_ALL_DESELECT, "ALL", 0);
+		SetEvent(UI.BTN_ALL_SELECT, "ALL", 1);
 		RefreshUI();
 		base.Initialize();
 	}
@@ -510,12 +494,12 @@ public class PointShopFilterBase : GameSection
 			Filter.CheckFilterBase[] rarityFilter = filter.rarityFilter;
 			foreach (Filter.CheckFilterBase checkFilterBase in rarityFilter)
 			{
-				SetToggle((Enum)checkFilterBase.checkboxUI, filter.IsCheck(Filter.CATEGORY.RARITY, (int)checkFilterBase.rarity));
+				SetToggle(checkFilterBase.checkboxUI, filter.IsCheck(Filter.CATEGORY.RARITY, (int)checkFilterBase.rarity));
 			}
-			Filter.CheckFilterBase[] typeFilter = filter.typeFilter;
-			foreach (Filter.CheckFilterBase checkFilterBase2 in typeFilter)
+			rarityFilter = filter.typeFilter;
+			foreach (Filter.CheckFilterBase checkFilterBase2 in rarityFilter)
 			{
-				SetToggle((Enum)checkFilterBase2.checkboxUI, filter.IsCheck(Filter.CATEGORY.TYPE, (int)checkFilterBase2.type));
+				SetToggle(checkFilterBase2.checkboxUI, filter.IsCheck(Filter.CATEGORY.TYPE, (int)checkFilterBase2.type));
 			}
 		}
 	}

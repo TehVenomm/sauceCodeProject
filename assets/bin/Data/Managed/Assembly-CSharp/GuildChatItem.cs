@@ -89,17 +89,6 @@ public class GuildChatItem : MonoBehaviour
 
 	public int senderId => senderId_;
 
-	public GuildChatItem()
-		: this()
-	{
-	}//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-	//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-	//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-
-
 	private void Init(string uuId, int chatId, int userId, string userName, bool isText, bool isNotification)
 	{
 		msgId_ = chatId;
@@ -107,13 +96,13 @@ public class GuildChatItem : MonoBehaviour
 		uuId_ = uuId;
 		isNotifi = isNotification;
 		isMyMessage = (userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
-		m_LabelSender.text = ((!isMyMessage) ? userName : string.Empty);
+		m_LabelSender.text = (isMyMessage ? string.Empty : userName);
 		CancelLoadStamp();
-		m_SpriteBase.get_gameObject().SetActive(isText && !isNotification);
-		m_LabelMessage.get_gameObject().SetActive(isText);
-		m_TexStamp.get_gameObject().SetActive(!isText);
-		m_NotificationSpriteBase.get_gameObject().SetActive(false);
-		m_LabelSender.get_gameObject().SetActive(!isNotification);
+		m_SpriteBase.gameObject.SetActive(isText && !isNotification);
+		m_LabelMessage.gameObject.SetActive(isText);
+		m_TexStamp.gameObject.SetActive(!isText);
+		m_NotificationSpriteBase.gameObject.SetActive(value: false);
+		m_LabelSender.gameObject.SetActive(!isNotification);
 		if (MonoBehaviourSingleton<GuildManager>.I.guildData != null && MonoBehaviourSingleton<GuildManager>.I.guildData.clanMasterId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
 			canPinMsg = true;
@@ -129,137 +118,80 @@ public class GuildChatItem : MonoBehaviour
 
 	public void Init(string desc)
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		Init(string.Empty, 0, -1, string.Empty, isText: true, isNotification: true);
+		Init(string.Empty, 0, -1, "", isText: true, isNotification: true);
 		m_LabelMessage.supportEncoding = true;
-		m_LabelMessage.color = Color.get_white();
-		m_LabelMessage.fontStyle = 2;
+		m_LabelMessage.color = Color.white;
+		m_LabelMessage.fontStyle = FontStyle.Italic;
 		SetMessage(desc);
 		UpdateWidgetSize(isText: true);
 	}
 
 	private void SetMessage(string message)
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0215: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0242: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0291: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0302: Unknown result type (might be due to invalid IL or missing references)
-		//IL_033c: Unknown result type (might be due to invalid IL or missing references)
 		m_LabelMessage.text = message;
 		m_LabelMessage.pivot = (isMyMessage ? UIWidget.Pivot.TopRight : UIWidget.Pivot.TopLeft);
 		if (isMyMessage)
 		{
 			Vector3 mESSAGE_LABEL_POSITION_SELF = MESSAGE_LABEL_POSITION_SELF;
-			float x = mESSAGE_LABEL_POSITION_SELF.x;
-			float num = m_LabelMessage.width;
-			Vector2 printedSize = m_LabelMessage.printedSize;
-			mESSAGE_LABEL_POSITION_SELF.x = x + (num - printedSize.x);
-			m_LabelMessage.get_transform().set_localPosition(mESSAGE_LABEL_POSITION_SELF);
+			mESSAGE_LABEL_POSITION_SELF.x += (float)m_LabelMessage.width - m_LabelMessage.printedSize.x;
+			m_LabelMessage.transform.localPosition = mESSAGE_LABEL_POSITION_SELF;
 		}
 		else
 		{
-			m_LabelMessage.get_transform().set_localPosition(MESSAGE_LABEL_POSITION_OTHER);
+			m_LabelMessage.transform.localPosition = MESSAGE_LABEL_POSITION_OTHER;
 		}
 		if (isNotifi)
 		{
-			m_LabelMessage.get_transform().set_localPosition(MESSAGE_LABEL_POSITION_NOTIFI);
+			m_LabelMessage.transform.localPosition = MESSAGE_LABEL_POSITION_NOTIFI;
 		}
-		GameObject val = (!isMyMessage) ? m_PivotMessaageLeft : m_PivotMessageRight;
+		GameObject gameObject = isMyMessage ? m_PivotMessageRight : m_PivotMessaageLeft;
 		UIWidget.Pivot pivot = isMyMessage ? UIWidget.Pivot.TopRight : UIWidget.Pivot.TopLeft;
-		string spriteName = (!isMyMessage) ? "ChatHukidashiBlue" : "ChatHukidashiMine";
+		string spriteName = isMyMessage ? "ChatHukidashiMine" : "ChatHukidashiBlue";
 		if (isNotifi)
 		{
-			Transform transform = val.get_transform();
-			Vector3 localPosition = val.get_transform().get_localPosition();
-			float x2 = localPosition.x;
-			Vector3 localPosition2 = val.get_transform().get_localPosition();
-			transform.set_localPosition(new Vector3(x2, 0f, localPosition2.z));
+			gameObject.transform.localPosition = new Vector3(gameObject.transform.localPosition.x, 0f, gameObject.transform.localPosition.z);
 		}
-		m_SpriteBase.get_transform().set_parent(val.get_transform());
+		m_SpriteBase.transform.parent = gameObject.transform;
 		m_SpriteBase.pivot = pivot;
-		m_SpriteBase.get_transform().set_localPosition(Vector3.get_zero());
+		m_SpriteBase.transform.localPosition = Vector3.zero;
 		m_SpriteBase.spriteName = spriteName;
-		UISprite spriteBase = m_SpriteBase;
-		Vector2 printedSize2 = m_LabelMessage.printedSize;
-		spriteBase.width = (int)(printedSize2.x + 50f);
-		UISprite spriteBase2 = m_SpriteBase;
-		Vector2 printedSize3 = m_LabelMessage.printedSize;
-		spriteBase2.height = (int)(printedSize3.y + 25f);
-		m_PinButton.get_transform().SetParent(val.get_transform());
+		m_SpriteBase.width = (int)(m_LabelMessage.printedSize.x + 50f);
+		m_SpriteBase.height = (int)(m_LabelMessage.printedSize.y + 25f);
+		m_PinButton.transform.SetParent(gameObject.transform);
 		if (isMyMessage)
 		{
-			m_PinButton.get_transform().set_localPosition(new Vector3(-55f, 0f, 0f));
-			m_BoxCollider.set_size(new Vector3((float)m_SpriteBase.width, (float)m_SpriteBase.height, 1f));
-			BoxCollider boxCollider = m_BoxCollider;
-			Vector3 localPosition3 = val.get_transform().get_localPosition();
-			boxCollider.set_center(new Vector3(localPosition3.x - (float)m_SpriteBase.width / 2f, (0f - (float)m_SpriteBase.height) / 2f, 0f));
+			m_PinButton.transform.localPosition = new Vector3(-55f, 0f, 0f);
+			m_BoxCollider.size = new Vector3(m_SpriteBase.width, m_SpriteBase.height, 1f);
+			m_BoxCollider.center = new Vector3(gameObject.transform.localPosition.x - (float)m_SpriteBase.width / 2f, (0f - (float)m_SpriteBase.height) / 2f, 0f);
 		}
 		else
 		{
-			m_PinButton.get_transform().set_localPosition(new Vector3(55f, 0f, 0f));
-			m_BoxCollider.set_size(new Vector3((float)m_SpriteBase.width, (float)m_SpriteBase.height, 1f));
-			BoxCollider boxCollider2 = m_BoxCollider;
-			Vector3 localPosition4 = val.get_transform().get_localPosition();
-			boxCollider2.set_center(new Vector3(localPosition4.x + (float)m_SpriteBase.width / 2f, (0f - (float)m_SpriteBase.height) / 2f - 16f, 0f));
+			m_PinButton.transform.localPosition = new Vector3(55f, 0f, 0f);
+			m_BoxCollider.size = new Vector3(m_SpriteBase.width, m_SpriteBase.height, 1f);
+			m_BoxCollider.center = new Vector3(gameObject.transform.localPosition.x + (float)m_SpriteBase.width / 2f, (0f - (float)m_SpriteBase.height) / 2f - 16f, 0f);
 		}
 	}
 
 	public void Init(string uuID, int chatId, int userId, string userName, int stampId)
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
 		Init(uuID, chatId, userId, userName, isText: false, isNotification: false);
-		GameObject val = (!isMyMessage) ? m_PivotStampLeft : m_PivotStampRight;
-		m_TexStamp.get_transform().set_parent(val.get_transform());
+		GameObject gameObject = isMyMessage ? m_PivotStampRight : m_PivotStampLeft;
+		m_TexStamp.transform.parent = gameObject.transform;
 		m_TexStamp.pivot = (isMyMessage ? UIWidget.Pivot.TopRight : UIWidget.Pivot.TopLeft);
-		m_TexStamp.get_transform().set_localPosition(Vector3.get_zero());
+		m_TexStamp.transform.localPosition = Vector3.zero;
 		RequestLoadStamp(stampId);
 		UpdateWidgetSize(isText: false);
-		m_PinButton.get_transform().SetParent(val.get_transform());
-		m_BoxCollider.set_size(new Vector3((float)m_TexStamp.width, (float)m_TexStamp.height, 1f));
+		m_PinButton.transform.SetParent(gameObject.transform);
+		m_BoxCollider.size = new Vector3(m_TexStamp.width, m_TexStamp.height, 1f);
 		if (isMyMessage)
 		{
-			m_PinButton.get_transform().set_localPosition(new Vector3(-40f, 0f, 0f));
-			BoxCollider boxCollider = m_BoxCollider;
-			Vector3 localPosition = val.get_transform().get_localPosition();
-			boxCollider.set_center(new Vector3(localPosition.x - (float)m_TexStamp.width / 2f, (0f - (float)m_TexStamp.height) / 2f, 0f));
+			m_PinButton.transform.localPosition = new Vector3(-40f, 0f, 0f);
+			m_BoxCollider.center = new Vector3(gameObject.transform.localPosition.x - (float)m_TexStamp.width / 2f, (0f - (float)m_TexStamp.height) / 2f, 0f);
 		}
 		else
 		{
-			m_PinButton.get_transform().set_localPosition(new Vector3(40f, 0f, 0f));
-			BoxCollider boxCollider2 = m_BoxCollider;
-			Vector3 localPosition2 = val.get_transform().get_localPosition();
-			boxCollider2.set_center(new Vector3(localPosition2.x + (float)m_TexStamp.width / 2f, (0f - (float)m_TexStamp.height) / 2f - 16f, 0f));
+			m_PinButton.transform.localPosition = new Vector3(40f, 0f, 0f);
+			m_BoxCollider.center = new Vector3(gameObject.transform.localPosition.x + (float)m_TexStamp.width / 2f, (0f - (float)m_TexStamp.height) / 2f - 16f, 0f);
 		}
 	}
 
@@ -272,7 +204,7 @@ public class GuildChatItem : MonoBehaviour
 		}
 		int num2 = 0;
 		int num3 = 0;
-		m_BoxCollider.set_enabled(true);
+		m_BoxCollider.enabled = true;
 		if (isText)
 		{
 			num2 = m_SpriteBase.height;
@@ -292,9 +224,9 @@ public class GuildChatItem : MonoBehaviour
 		this.stampId = stampId;
 		CancelLoadStamp();
 		m_CoroutineLoadStamp = CoroutineLoadStamp(stampId);
-		if (this.get_gameObject().get_activeInHierarchy())
+		if (base.gameObject.activeInHierarchy)
 		{
-			this.StartCoroutine(_Update());
+			StartCoroutine(_Update());
 		}
 	}
 
@@ -309,7 +241,7 @@ public class GuildChatItem : MonoBehaviour
 		if (lo_stamp.loadedObject != null)
 		{
 			Texture2D mainTexture = lo_stamp.loadedObject as Texture2D;
-			m_TexStamp.get_gameObject().SetActive(true);
+			m_TexStamp.gameObject.SetActive(value: true);
 			m_TexStamp.mainTexture = mainTexture;
 		}
 		m_CoroutineLoadStamp = null;
@@ -320,7 +252,7 @@ public class GuildChatItem : MonoBehaviour
 		if (m_CoroutineLoadStamp != null)
 		{
 			m_CoroutineLoadStamp = null;
-			m_TexStamp.get_gameObject().SetActive(false);
+			m_TexStamp.gameObject.SetActive(value: false);
 		}
 	}
 
@@ -342,19 +274,15 @@ public class GuildChatItem : MonoBehaviour
 
 	private void Update()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 		if (!checkLongPress)
 		{
 			return;
 		}
-		float num = Vector2.Distance(mousePosition, Vector2.op_Implicit(Input.get_mousePosition()));
-		if (num > 10f)
+		if (Vector2.Distance(mousePosition, Input.mousePosition) > 10f)
 		{
 			checkLongPress = false;
 		}
-		else if (Time.get_time() - startPressTime > 1f)
+		else if (Time.time - startPressTime > 1f)
 		{
 			checkLongPress = false;
 			ClanChatLogMessageData clanChatLogMessageData = new ClanChatLogMessageData();
@@ -372,24 +300,21 @@ public class GuildChatItem : MonoBehaviour
 				clanChatLogMessageData.type = 1;
 				clanChatLogMessageData.message = stampId.ToString();
 			}
-			m_PinButton.get_gameObject().GetComponent<UIGameSceneEventSender>().eventData = clanChatLogMessageData;
-			m_PinButton.get_gameObject().SetActive(true);
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("GuildChatItem", this.get_gameObject(), "HIDE_PIN_BTN", msgId_.ToString());
+			m_PinButton.gameObject.GetComponent<UIGameSceneEventSender>().eventData = clanChatLogMessageData;
+			m_PinButton.gameObject.SetActive(value: true);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("GuildChatItem", base.gameObject, "HIDE_PIN_BTN", msgId_.ToString());
 		}
 	}
 
 	private void OnPress(bool isDown)
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		if (canPinMsg)
 		{
 			if (isDown)
 			{
 				checkLongPress = true;
-				startPressTime = Time.get_time();
-				mousePosition = Vector2.op_Implicit(Input.get_mousePosition());
+				startPressTime = Time.time;
+				mousePosition = Input.mousePosition;
 			}
 			else
 			{
@@ -400,6 +325,6 @@ public class GuildChatItem : MonoBehaviour
 
 	public void HidePinButton()
 	{
-		m_PinButton.get_gameObject().SetActive(false);
+		m_PinButton.gameObject.SetActive(value: false);
 	}
 }

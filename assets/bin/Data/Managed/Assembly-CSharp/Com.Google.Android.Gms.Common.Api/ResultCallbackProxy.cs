@@ -39,8 +39,7 @@ namespace Com.Google.Android.Gms.Common.Api
 			}
 			else
 			{
-				ConstructorInfo constructor2 = typeof(R).GetConstructor(new Type[0]);
-				val = (R)constructor2.Invoke(new object[0]);
+				val = (R)typeof(R).GetConstructor(new Type[0]).Invoke(new object[0]);
 				Marshal.PtrToStructure(rawObject, val);
 			}
 			OnResult(val);

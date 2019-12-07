@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -79,19 +78,19 @@ public class SymbolMake : GameSection
 
 		public void Select()
 		{
-			colorScr.get_gameObject().SetActive(true);
-			colorGrd.get_gameObject().SetActive(true);
-			symbolGrd.get_gameObject().SetActive(true);
-			symbolScr.get_gameObject().SetActive(true);
+			colorScr.gameObject.SetActive(value: true);
+			colorGrd.gameObject.SetActive(value: true);
+			symbolGrd.gameObject.SetActive(value: true);
+			symbolScr.gameObject.SetActive(value: true);
 			pageTab.Select();
 		}
 
 		public void UnSelect()
 		{
-			colorScr.get_gameObject().SetActive(false);
-			colorGrd.get_gameObject().SetActive(false);
-			symbolGrd.get_gameObject().SetActive(false);
-			symbolScr.get_gameObject().SetActive(false);
+			colorScr.gameObject.SetActive(value: false);
+			colorGrd.gameObject.SetActive(value: false);
+			symbolGrd.gameObject.SetActive(value: false);
+			symbolScr.gameObject.SetActive(value: false);
 			pageTab.UnSelect();
 		}
 	}
@@ -130,7 +129,7 @@ public class SymbolMake : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -146,8 +145,8 @@ public class SymbolMake : GameSection
 		yield return load_queue.Wait();
 		LoadObject symbol_mark_item = load_queue.Load(RESOURCE_CATEGORY.UI, "ClanSymbolMark");
 		yield return load_queue.Wait();
-		Transform symbolItem = CreateResources(GetCtrl(UI.OBJ_SYMBOL), symbol_mark_item);
-		symbolMark = symbolItem.GetComponent<SymbolMarkCtrl>();
+		Transform transform = CreateResources(GetCtrl(UI.OBJ_SYMBOL), symbol_mark_item);
+		symbolMark = transform.GetComponent<SymbolMarkCtrl>();
 		symbolMark.Initilize();
 		CreatePage();
 		LoadSymbol();
@@ -163,46 +162,38 @@ public class SymbolMake : GameSection
 
 	private void SetSpriteColors(UI ctrl, Color[] colors)
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl2 = GetCtrl(ctrl);
 		if (ctrl2 == null)
 		{
 			return;
 		}
 		int i = 0;
-		for (int childCount = ctrl2.get_childCount(); i < childCount; i++)
+		for (int childCount = ctrl2.childCount; i < childCount; i++)
 		{
-			Color val = colors[i];
+			Color color = colors[i];
 			Transform child = ctrl2.GetChild(i);
-			SetColor(ctrl2.GetChild(i), val);
-			UIButton component = base.GetComponent<UIButton>(child);
+			SetColor(ctrl2.GetChild(i), color);
+			UIButton component = GetComponent<UIButton>(child);
 			if (component != null)
 			{
-				component.hover = val;
-				component.pressed = val;
-				component.disabledColor = val;
+				component.hover = color;
+				component.pressed = color;
+				component.disabledColor = color;
 			}
 		}
 	}
 
 	private ClanSymbolData createSymbolData()
 	{
-		ClanSymbolData clanSymbolData = new ClanSymbolData();
-		clanSymbolData.m = markPage.symbolId;
-		clanSymbolData.mo = markPage.colorId;
-		clanSymbolData.f = framePage.symbolId;
-		clanSymbolData.fo = framePage.colorId;
-		clanSymbolData.p = patternPage.symbolId;
-		clanSymbolData.po = patternPage.colorId;
-		return clanSymbolData;
+		return new ClanSymbolData
+		{
+			m = markPage.symbolId,
+			mo = markPage.colorId,
+			f = framePage.symbolId,
+			fo = framePage.colorId,
+			p = patternPage.symbolId,
+			po = patternPage.colorId
+		};
 	}
 
 	private void LoadSymbol()
@@ -234,8 +225,8 @@ public class SymbolMake : GameSection
 			{
 				selectPage.UnSelect();
 			}
-			string key = string.Empty;
-			string key2 = string.Empty;
+			string key = "";
+			string key2 = "";
 			switch (page)
 			{
 			case PAGE.MARK:
@@ -256,8 +247,8 @@ public class SymbolMake : GameSection
 			}
 			selectPage.Select();
 			SelectSymbolColor();
-			SetText((Enum)UI.LBL_LIST_MESSAGE, key);
-			SetText((Enum)UI.LBL_COLOR_MESSAGE, key2);
+			SetText(UI.LBL_LIST_MESSAGE, key);
+			SetText(UI.LBL_COLOR_MESSAGE, key2);
 		}
 	}
 
@@ -290,26 +281,22 @@ public class SymbolMake : GameSection
 
 	private Transform CreateResources(Transform parent, LoadObject item)
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		GameObject obj = item.loadedObject as GameObject;
-		Transform val = ResourceUtility.Realizes(obj, 5);
-		val.set_parent(parent);
-		val.set_localScale(Vector3.get_one());
-		val.set_localPosition(Vector3.get_zero());
-		return val;
+		Transform transform = ResourceUtility.Realizes(item.loadedObject as GameObject, 5);
+		transform.parent = parent;
+		transform.localScale = Vector3.one;
+		transform.localPosition = Vector3.zero;
+		return transform;
 	}
 
 	private void CreateColorList(PageInfo page)
 	{
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 		Color[] colors = Singleton<SymbolTable>.I.GetColors(page.symbolType);
 		int num = colors.Length;
 		for (int i = 0; i < num; i++)
 		{
-			Transform val = CreateResources(page.colorGrd.get_transform(), colorListItem);
-			val.set_name(i.ToString());
-			CharaMakeColorListItem component = val.GetComponent<CharaMakeColorListItem>();
+			Transform transform = CreateResources(page.colorGrd.transform, colorListItem);
+			transform.name = i.ToString();
+			CharaMakeColorListItem component = transform.GetComponent<CharaMakeColorListItem>();
 			component.Init(colors[i], i, page.colorScr);
 			SetEvent(component.uiEventSender, "SYMBOL_COLOR", i);
 		}
@@ -318,7 +305,7 @@ public class SymbolMake : GameSection
 		page.colorScr.ResetPosition();
 		if (num <= 8)
 		{
-			page.colorScr.set_enabled(false);
+			page.colorScr.enabled = false;
 		}
 	}
 
@@ -328,15 +315,14 @@ public class SymbolMake : GameSection
 		int num = sortSymbolIDs.Length;
 		for (int i = 0; i < num; i++)
 		{
-			Transform val = CreateResources(page.symbolGrd.get_transform(), symbolListItem);
-			val.set_name(i.ToString());
-			SymbolMakeListItem component = val.GetComponent<SymbolMakeListItem>();
+			Transform transform = CreateResources(page.symbolGrd.transform, symbolListItem);
+			transform.name = i.ToString();
+			SymbolMakeListItem component = transform.GetComponent<SymbolMakeListItem>();
 			component.Init(sortSymbolIDs[i], page.symbolType);
 			component.onButton = onClickSymbol;
 			if (page.symbolType == SymbolTable.SymbolType.FRAME)
 			{
-				Transform val2 = CreateResources(val, symbolListItem);
-				SymbolMakeListItem component2 = val2.GetComponent<SymbolMakeListItem>();
+				SymbolMakeListItem component2 = CreateResources(transform, symbolListItem).GetComponent<SymbolMakeListItem>();
 				component2.Init(sortSymbolIDs[i], SymbolTable.SymbolType.FRAME_OUTLINE);
 				component2.SetButtonActive(isActive: false);
 			}
@@ -346,7 +332,7 @@ public class SymbolMake : GameSection
 		page.symbolScr.ResetPosition();
 		if (num <= 8)
 		{
-			page.symbolScr.set_enabled(false);
+			page.symbolScr.enabled = false;
 		}
 	}
 
@@ -354,23 +340,23 @@ public class SymbolMake : GameSection
 	{
 		ClanSymbolData sym = MonoBehaviourSingleton<UserInfoManager>.I.userClan.sym;
 		markPage = new PageInfo();
-		markPage.pageTab = base.GetComponent<ClanSymbolTabController>((Enum)UI.OBJ_MARK);
-		markPage.colorScr = base.GetComponent<UIScrollView>((Enum)UI.SCR_MARK_COLOR_LIST);
-		markPage.colorGrd = base.GetComponent<UIGrid>((Enum)UI.GRD_MARK_COLOR_LIST);
-		markPage.symbolScr = base.GetComponent<UIScrollView>((Enum)UI.SCR_MARK_LIST);
-		markPage.symbolGrd = base.GetComponent<UIGrid>((Enum)UI.GRD_MARK_LIST);
+		markPage.pageTab = GetComponent<ClanSymbolTabController>(UI.OBJ_MARK);
+		markPage.colorScr = GetComponent<UIScrollView>(UI.SCR_MARK_COLOR_LIST);
+		markPage.colorGrd = GetComponent<UIGrid>(UI.GRD_MARK_COLOR_LIST);
+		markPage.symbolScr = GetComponent<UIScrollView>(UI.SCR_MARK_LIST);
+		markPage.symbolGrd = GetComponent<UIGrid>(UI.GRD_MARK_LIST);
 		framePage = new PageInfo();
-		framePage.pageTab = base.GetComponent<ClanSymbolTabController>((Enum)UI.OBJ_FRAME);
-		framePage.colorScr = base.GetComponent<UIScrollView>((Enum)UI.SCR_FRAME_COLOR_LIST);
-		framePage.colorGrd = base.GetComponent<UIGrid>((Enum)UI.GRD_FRAME_COLOR_LIST);
-		framePage.symbolScr = base.GetComponent<UIScrollView>((Enum)UI.SCR_FRAME_LIST);
-		framePage.symbolGrd = base.GetComponent<UIGrid>((Enum)UI.GRD_FRAME_LIST);
+		framePage.pageTab = GetComponent<ClanSymbolTabController>(UI.OBJ_FRAME);
+		framePage.colorScr = GetComponent<UIScrollView>(UI.SCR_FRAME_COLOR_LIST);
+		framePage.colorGrd = GetComponent<UIGrid>(UI.GRD_FRAME_COLOR_LIST);
+		framePage.symbolScr = GetComponent<UIScrollView>(UI.SCR_FRAME_LIST);
+		framePage.symbolGrd = GetComponent<UIGrid>(UI.GRD_FRAME_LIST);
 		patternPage = new PageInfo();
-		patternPage.pageTab = base.GetComponent<ClanSymbolTabController>((Enum)UI.OBJ_PATTERN);
-		patternPage.colorScr = base.GetComponent<UIScrollView>((Enum)UI.SCR_PATTERN_COLOR_LIST);
-		patternPage.colorGrd = base.GetComponent<UIGrid>((Enum)UI.GRD_PATTERN_COLOR_LIST);
-		patternPage.symbolScr = base.GetComponent<UIScrollView>((Enum)UI.SCR_PATTERN_LIST);
-		patternPage.symbolGrd = base.GetComponent<UIGrid>((Enum)UI.GRD_PATTERN_LIST);
+		patternPage.pageTab = GetComponent<ClanSymbolTabController>(UI.OBJ_PATTERN);
+		patternPage.colorScr = GetComponent<UIScrollView>(UI.SCR_PATTERN_COLOR_LIST);
+		patternPage.colorGrd = GetComponent<UIGrid>(UI.GRD_PATTERN_COLOR_LIST);
+		patternPage.symbolScr = GetComponent<UIScrollView>(UI.SCR_PATTERN_LIST);
+		patternPage.symbolGrd = GetComponent<UIGrid>(UI.GRD_PATTERN_LIST);
 		markPage.Initilize(sym.m, sym.mo, SymbolTable.SymbolType.MARK);
 		framePage.Initilize(sym.f, sym.fo, SymbolTable.SymbolType.FRAME);
 		patternPage.Initilize(sym.p, sym.po, SymbolTable.SymbolType.PATTERN);
@@ -385,10 +371,8 @@ public class SymbolMake : GameSection
 	private void SelectSymbolColor()
 	{
 		int colorId = selectPage.colorId;
-		Transform transform = selectPage.colorGrd.get_transform();
-		CharaMakeColorListItem[] componentsInChildren = transform.GetComponentsInChildren<CharaMakeColorListItem>();
-		CharaMakeColorListItem[] array = componentsInChildren;
-		foreach (CharaMakeColorListItem charaMakeColorListItem in array)
+		CharaMakeColorListItem[] componentsInChildren = selectPage.colorGrd.transform.GetComponentsInChildren<CharaMakeColorListItem>();
+		foreach (CharaMakeColorListItem charaMakeColorListItem in componentsInChildren)
 		{
 			if (colorId == charaMakeColorListItem.id)
 			{

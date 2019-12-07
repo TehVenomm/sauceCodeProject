@@ -43,9 +43,9 @@ public class HomeTopBonusTime : UIBehaviour
 
 	private int previousIndex = -1;
 
-	private string currentStartDate = string.Empty;
+	private string currentStartDate = "";
 
-	private string currentEndDate = string.Empty;
+	private string currentEndDate = "";
 
 	private bool isVisible;
 
@@ -55,7 +55,7 @@ public class HomeTopBonusTime : UIBehaviour
 
 	public void SetUp()
 	{
-		myTrans = this.get_transform();
+		myTrans = base.transform;
 		tweenCtrl = myTrans.GetComponent<UITweenCtrl>();
 		isFirst = true;
 		timeSlotEvents = MonoBehaviourSingleton<StatusManager>.I.timeSlotEvents;
@@ -100,7 +100,7 @@ public class HomeTopBonusTime : UIBehaviour
 
 	private void UpdateVisualIndex()
 	{
-		time += Time.get_deltaTime();
+		time += Time.deltaTime;
 		if (time >= ChangeIndexTime)
 		{
 			currentIndex++;
@@ -123,15 +123,6 @@ public class HomeTopBonusTime : UIBehaviour
 
 	private void TweenFirst()
 	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 		TweenPosition tween = FindCtrl(myTrans, UI.OBJ_TWEEN_BONUS_TIME).GetComponent<TweenPosition>();
 		Vector3 defaultFrom = default(Vector3);
 		if (tween != null)
@@ -146,8 +137,6 @@ public class HomeTopBonusTime : UIBehaviour
 			isActiveTap = false;
 			tweenCtrl.Play(forward: true, delegate
 			{
-				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 				tween.from = defaultFrom;
 				isActiveTap = true;
 			});
@@ -188,13 +177,12 @@ public class HomeTopBonusTime : UIBehaviour
 
 	private string GetTime(string date)
 	{
-		string[] array = date.Split(' ');
-		string[] array2 = array[1].Split(':');
-		if (int.TryParse(array2[0], out int result) && int.TryParse(array2[1], out int result2))
+		string[] array = date.Split(' ')[1].Split(':');
+		if (int.TryParse(array[0], out int result) && int.TryParse(array[1], out int result2))
 		{
 			return $"{result:d1}:{result2:d2}";
 		}
-		return $"{array2[0]:d1}:{array2[1]:d2}";
+		return $"{array[0]:d1}:{array[1]:d2}";
 	}
 
 	private Transform UpdatePlate()

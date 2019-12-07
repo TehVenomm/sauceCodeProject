@@ -11,12 +11,12 @@ namespace GooglePlayGames
 	{
 		public static void Create(Action<INearbyConnectionClient> callback)
 		{
-			if (Application.get_isEditor())
+			if (Application.isEditor)
 			{
-				Logger.d("Creating INearbyConnection in editor, using DummyClient.");
+				GooglePlayGames.OurUtils.Logger.d("Creating INearbyConnection in editor, using DummyClient.");
 				callback(new DummyNearbyConnectionClient());
 			}
-			Logger.d("Creating real INearbyConnectionClient");
+			GooglePlayGames.OurUtils.Logger.d("Creating real INearbyConnectionClient");
 			NativeNearbyConnectionClientFactory.Create(callback);
 		}
 
@@ -31,7 +31,7 @@ namespace GooglePlayGames
 			case NearbyConnectionsStatus.InitializationStatus.ERROR_VERSION_UPDATE_REQUIRED:
 				return InitializationStatus.VersionUpdateRequired;
 			default:
-				Logger.w("Unknown initialization status: " + status);
+				GooglePlayGames.OurUtils.Logger.w("Unknown initialization status: " + status);
 				return InitializationStatus.InternalError;
 			}
 		}

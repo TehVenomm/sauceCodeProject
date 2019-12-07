@@ -15,7 +15,7 @@ public class LoungeEntryPassRoom : QuestEntryPassRoom
 	private void OnQuery_LOUNGE()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendApply(string.Join(string.Empty, passCode), delegate(bool is_apply, Error ret_code)
+		MonoBehaviourSingleton<LoungeMatchingManager>.I.SendApply(string.Join("", passCode), delegate(bool is_apply, Error ret_code)
 		{
 			if (is_apply && !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(MonoBehaviourSingleton<PartyManager>.I.GetQuestId()))
 			{
@@ -26,7 +26,7 @@ public class LoungeEntryPassRoom : QuestEntryPassRoom
 					});
 				});
 			}
-			else if (ret_code == Error.WRN_PARTY_SEARCH_NOT_FOUND_PARTY || ret_code == Error.WRN_PARTY_OWNER_REJOIN)
+			else if ((uint)(ret_code - 32009) <= 1u)
 			{
 				GameSection.ChangeStayEvent("NOT_FOUND_PARTY");
 				GameSection.ResumeEvent(is_resume: true);

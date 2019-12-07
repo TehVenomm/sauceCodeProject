@@ -43,7 +43,7 @@ public class ChatHeaderButtonController : MonoBehaviour
 
 	private readonly Vector3 BG_SPRITE_POS = new Vector3(0f, -27.8f, 0f);
 
-	private readonly Color BASE_COLOR_ACTIVE = Color.get_white();
+	private readonly Color BASE_COLOR_ACTIVE = Color.white;
 
 	private readonly Color BASE_COLOR_DEACTIVE = new Color(0.5f, 0.5f, 0.5f, 1f);
 
@@ -85,28 +85,13 @@ public class ChatHeaderButtonController : MonoBehaviour
 
 	private int m_myButtonIndex;
 
-	private UIWidget ButtonWidget => m_buttonWidget ?? (m_buttonWidget = ((!(m_buttonObject == null)) ? m_buttonObject.GetComponent<UIWidget>() : null));
+	private UIWidget ButtonWidget => m_buttonWidget ?? (m_buttonWidget = ((m_buttonObject == null) ? null : m_buttonObject.GetComponent<UIWidget>()));
 
 	public MainChat.CHAT_TYPE MyChatType => m_myType;
 
 	public STATE CurrentState => m_currentState;
 
 	private int ButtonIndex => m_myButtonIndex;
-
-	public ChatHeaderButtonController()
-		: this()
-	{
-	}//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-	//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-	//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-	//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-	//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-	//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-
 
 	public bool Initialize(InitParam _param)
 	{
@@ -168,7 +153,7 @@ public class ChatHeaderButtonController : MonoBehaviour
 				m_buttonLabel.text = StringTable.Get(STRING_CATEGORY.CHAT, 9u);
 				break;
 			default:
-				m_buttonLabel.text = string.Empty;
+				m_buttonLabel.text = "";
 				break;
 			}
 			if (m_buttonLabel.text.Length <= 3)
@@ -184,15 +169,14 @@ public class ChatHeaderButtonController : MonoBehaviour
 
 	private void SetBgSprite(int _index)
 	{
-		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
 		if (!(m_backGroundSprite == null))
 		{
 			bool flag = 0 < _index && _index < 3;
 			bool flag2 = _index <= 0;
-			m_backGroundSprite.spriteName = ((!flag) ? SPRITE_NAME_SIDE : SPRITE_NAME_LEFT_MIDDLE);
-			m_backGroundSprite.width = ((!flag) ? 140 : 165);
+			m_backGroundSprite.spriteName = (flag ? SPRITE_NAME_LEFT_MIDDLE : SPRITE_NAME_SIDE);
+			m_backGroundSprite.width = (flag ? 165 : 140);
 			m_backGroundSprite.flip = (flag2 ? UIBasicSprite.Flip.Horizontally : UIBasicSprite.Flip.Nothing);
-			m_backGroundSprite.pivot = (flag ? UIWidget.Pivot.Center : ((!flag2) ? UIWidget.Pivot.Right : UIWidget.Pivot.Left));
+			m_backGroundSprite.pivot = (flag ? UIWidget.Pivot.Center : (flag2 ? UIWidget.Pivot.Left : UIWidget.Pivot.Right));
 			if (flag2)
 			{
 				ButtonWidget.leftAnchor.Set(0f, 14f);
@@ -208,13 +192,13 @@ public class ChatHeaderButtonController : MonoBehaviour
 				ButtonWidget.leftAnchor.Set(0f, 44f);
 				ButtonWidget.rightAnchor.Set(1f, -14f);
 			}
-			m_backGroundSprite.get_transform().set_localPosition(BG_SPRITE_POS);
+			m_backGroundSprite.transform.localPosition = BG_SPRITE_POS;
 		}
 	}
 
 	private void SetDepth()
 	{
-		int num = (CurrentState != STATE.SELECTED) ? (ButtonIndex * 3) : (ButtonIndex * 3 + 30);
+		int num = (CurrentState == STATE.SELECTED) ? (ButtonIndex * 3 + 30) : (ButtonIndex * 3);
 		if (m_backGroundSprite != null)
 		{
 			m_backGroundSprite.depth = num;
@@ -252,8 +236,6 @@ public class ChatHeaderButtonController : MonoBehaviour
 
 	public bool Select()
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsValidObjects())
 		{
 			return false;
@@ -274,8 +256,6 @@ public class ChatHeaderButtonController : MonoBehaviour
 
 	public bool UnSelect()
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsValidObjects())
 		{
 			return false;
@@ -292,8 +272,6 @@ public class ChatHeaderButtonController : MonoBehaviour
 
 	public void Deactivate()
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		if (IsValidObjects())
 		{
 			SetNextState(STATE.DEACTIVATE);
@@ -312,13 +290,13 @@ public class ChatHeaderButtonController : MonoBehaviour
 	public void Show()
 	{
 		UnSelect();
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 	}
 
 	public void Hide()
 	{
 		SetNextState(STATE.INVISIBLE);
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 		if (m_onInvisibleCallBack != null)
 		{
 			m_onInvisibleCallBack();
@@ -327,6 +305,10 @@ public class ChatHeaderButtonController : MonoBehaviour
 
 	private bool IsValidObjects()
 	{
-		return m_bgSprite != null && m_buttonObject != null && m_buttonLabel != null;
+		if (m_bgSprite != null && m_buttonObject != null)
+		{
+			return m_buttonLabel != null;
+		}
+		return false;
 	}
 }

@@ -57,46 +57,27 @@ public class EquipSetDetailTop : SkillInfoBase
 
 	public override void UpdateUI()
 	{
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		SetToggle((Enum)UI.TGL_WINDOW_TITLE, lookOnly);
-		SetActive((Enum)UI.BTN_ATTACH, !lookOnly);
-		SetActive((Enum)UI.BTN_DETACH, !lookOnly);
-		SetActive((Enum)UI.BTN_GROW, !lookOnly);
+		SetToggle(UI.TGL_WINDOW_TITLE, lookOnly);
+		SetActive(UI.BTN_ATTACH, !lookOnly);
+		SetActive(UI.BTN_DETACH, !lookOnly);
+		SetActive(UI.BTN_GROW, !lookOnly);
 		int num = equipAndSkill.Length;
 		Transform ctrl = GetCtrl(UI.TBL_SKILL_LIST);
 		for (int j = 0; j < num; j++)
 		{
-			if (j < ctrl.get_childCount())
+			if (j < ctrl.childCount)
 			{
 				Transform child = ctrl.GetChild(j);
-				Transform val = FindCtrl(child, UI.SPR_EQUIP_INDEX_ICON);
-				Vector3 localPosition = val.get_localPosition();
+				Transform transform = FindCtrl(child, UI.SPR_EQUIP_INDEX_ICON);
+				Vector3 localPosition = transform.localPosition;
 				localPosition.y = 0f;
-				Transform obj = child;
-				Vector3 localPosition2 = localPosition;
-				val.set_localPosition(localPosition2);
-				obj.set_localPosition(localPosition2);
-				Transform t3 = FindCtrl(child, UI.GRD_ATTACH_SKILL);
-				t3.DestroyChildren();
-				base.GetComponent<UITable>(child, (Enum)UI.TBL_SPACE).Reposition();
+				Vector3 vector3 = child.localPosition = (transform.localPosition = localPosition);
+				FindCtrl(child, UI.GRD_ATTACH_SKILL).DestroyChildren();
+				GetComponent<UITable>(child, UI.TBL_SPACE).Reposition();
 			}
 		}
 		SetTable(UI.TBL_SKILL_LIST, "EquipSetDetailTopItem", num, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
-			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
 			EquipSetDetailTop equipSetDetailTop = this;
 			EquipItemInfo item = equipAndSkill[i].equipItemInfo;
 			if (item == null || item.GetMaxSlot() == 0)
@@ -105,8 +86,7 @@ public class EquipSetDetailTop : SkillInfoBase
 			}
 			else
 			{
-				ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(item, sex, FindCtrl(t, UI.OBJ_ICON_ROOT));
-				itemIcon.SetEnableCollider(is_enable: false);
+				ItemIcon.CreateEquipItemIconByEquipItemInfo(item, sex, FindCtrl(t, UI.OBJ_ICON_ROOT)).SetEnableCollider(is_enable: false);
 				SetEquipIndexIcon(t, UI.SPR_EQUIP_INDEX_ICON, i);
 				SetLabelText(t, UI.LBL_EQUIP_NAME, item.tableData.name);
 				SetLabelText(t, UI.LBL_EQUIP_NOW_LV, item.level.ToString());
@@ -114,7 +94,6 @@ public class EquipSetDetailTop : SkillInfoBase
 				SkillSlotUIData[] slotData = equipAndSkill[i].skillSlotUIData;
 				SetGrid(t, UI.GRD_ATTACH_SKILL, "EquipSetDetailTopItem2", item.GetMaxSlot(), reset: true, delegate(int i2, Transform t2, bool is_recycle2)
 				{
-					//IL_0293: Unknown result type (might be due to invalid IL or missing references)
 					int num3 = (i << 16) + i2;
 					SkillItemInfo skillItemInfo = slotData[i2].itemData;
 					bool flag = skillItemInfo != null && slotData[i2].slotData.skill_id != 0 && skillItemInfo.tableData.type == slotData[i2].slotData.slotType;
@@ -126,7 +105,7 @@ public class EquipSetDetailTop : SkillInfoBase
 					equipSetDetailTop.SetToggle(t2, UI.TGL_ACTIVE_OBJ, skillItemInfo != null);
 					equipSetDetailTop.SetActive(t2, UI.LBL_NAME, is_visible: true);
 					equipSetDetailTop.SetActive(t2, UI.LBL_NAME_NOT_ENABLE_TYPE, is_visible: false);
-					equipSetDetailTop.SetEvent(t2, (!flag) ? "SLOT" : "SLOT_DETAIL", num3);
+					equipSetDetailTop.SetEvent(t2, flag ? "SLOT_DETAIL" : "SLOT", num3);
 					equipSetDetailTop.SetLongTouch(t2, "SLOT_DETAIL", num3);
 					if (skillItemInfo == null)
 					{
@@ -159,16 +138,12 @@ public class EquipSetDetailTop : SkillInfoBase
 					}
 				});
 			}
-			base.GetComponent<UITable>(t, (Enum)UI.TBL_SPACE).Reposition();
-			Vector3 localPosition3 = t.get_localPosition();
-			float y = localPosition3.y;
-			Vector3 localPosition4 = FindCtrl(t, UI.OBJ_SPACE).get_localPosition();
-			float y2 = localPosition4.y;
-			Vector3 localPosition5 = FindCtrl(t, UI.TBL_SPACE).get_localPosition();
-			float num2 = y2 + localPosition5.y;
-			Vector3 localPosition6 = FindCtrl(t, UI.SPR_EQUIP_INDEX_ICON).get_localPosition();
-			localPosition6.y = (num2 - y) * 0.5f;
-			FindCtrl(t, UI.SPR_EQUIP_INDEX_ICON).set_localPosition(localPosition6);
+			GetComponent<UITable>(t, UI.TBL_SPACE).Reposition();
+			float y = t.localPosition.y;
+			float num2 = FindCtrl(t, UI.OBJ_SPACE).localPosition.y + FindCtrl(t, UI.TBL_SPACE).localPosition.y;
+			Vector3 localPosition2 = FindCtrl(t, UI.SPR_EQUIP_INDEX_ICON).localPosition;
+			localPosition2.y = (num2 - y) * 0.5f;
+			FindCtrl(t, UI.SPR_EQUIP_INDEX_ICON).localPosition = localPosition2;
 		});
 	}
 

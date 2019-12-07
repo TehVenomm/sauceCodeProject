@@ -172,10 +172,8 @@ public class ArenaResultTop : QuestResultTop
 		m_group = MonoBehaviourSingleton<InGameManager>.I.GetCurrentArenaGroup();
 		m_isTimeAttack = MonoBehaviourSingleton<InGameManager>.I.IsArenaTimeAttack();
 		base.Initialize();
-		UITexture component = GetCtrl(UI.TEX_RANK_PRE).GetComponent<UITexture>();
-		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.ARENA_RANK_ICON, ResourceName.GetArenaRankIconName(m_rank));
-		UITexture component2 = GetCtrl(UI.TEX_RANK_NEW).GetComponent<UITexture>();
-		ResourceLoad.LoadWithSetUITexture(component2, RESOURCE_CATEGORY.ARENA_RANK_ICON, ResourceName.GetArenaRankIconName(m_rank + 1));
+		ResourceLoad.LoadWithSetUITexture(GetCtrl(UI.TEX_RANK_PRE).GetComponent<UITexture>(), RESOURCE_CATEGORY.ARENA_RANK_ICON, ResourceName.GetArenaRankIconName(m_rank));
+		ResourceLoad.LoadWithSetUITexture(GetCtrl(UI.TEX_RANK_NEW).GetComponent<UITexture>(), RESOURCE_CATEGORY.ARENA_RANK_ICON, ResourceName.GetArenaRankIconName(m_rank + 1));
 		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
 		{
 			MonoBehaviourSingleton<UIManager>.I.mainChat.HideOpenButton();
@@ -233,25 +231,25 @@ public class ArenaResultTop : QuestResultTop
 		allPointEvents = new PointEventCurrentData();
 		allPointEvents.pointRankingData = new PointEventCurrentData.PointResultData();
 		isVictory = (MonoBehaviourSingleton<QuestManager>.I.arenaCompData != null);
-		SetFullScreenButton((Enum)UI.BTN_SKIP_FULL_SCREEN);
-		SetActive((Enum)UI.BTN_NEXT, is_visible: false);
-		SetActive((Enum)UI.BTN_RETRY, is_visible: false);
-		SetActive((Enum)UI.OBJ_TIME, is_visible: false);
-		SetActive((Enum)UI.OBJ_CLEAR_EFFECT_ROOT, is_visible: false);
-		SetActive((Enum)UI.OBJ_CLEAR_EFFECT, is_visible: false);
-		SetActive((Enum)UI.OBJ_RANK_UP_ROOT, is_visible: false);
-		SetActive((Enum)UI.OBJ_CONGRATULATIONS_ROOT, is_visible: false);
+		SetFullScreenButton(UI.BTN_SKIP_FULL_SCREEN);
+		SetActive(UI.BTN_NEXT, is_visible: false);
+		SetActive(UI.BTN_RETRY, is_visible: false);
+		SetActive(UI.OBJ_TIME, is_visible: false);
+		SetActive(UI.OBJ_CLEAR_EFFECT_ROOT, is_visible: false);
+		SetActive(UI.OBJ_CLEAR_EFFECT, is_visible: false);
+		SetActive(UI.OBJ_RANK_UP_ROOT, is_visible: false);
+		SetActive(UI.OBJ_CONGRATULATIONS_ROOT, is_visible: false);
 		if (m_isTimeAttack)
 		{
-			SetActive((Enum)UI.OBJ_REMAIN_TIME, is_visible: false);
+			SetActive(UI.OBJ_REMAIN_TIME, is_visible: false);
 			if (isVictory)
 			{
-				SetActive((Enum)UI.OBJ_TIME, is_visible: true);
+				SetActive(UI.OBJ_TIME, is_visible: true);
 			}
 		}
 		string arg = string.Format(StringTable.Get(STRING_CATEGORY.ARENA, 1u), m_rank.ToString());
 		string arg2 = string.Format(StringTable.Get(STRING_CATEGORY.ARENA, 0u), m_group.ToString());
-		SetLabelText((Enum)UI.LBL_QUEST_NAME, $"{arg} {arg2}");
+		SetLabelText(UI.LBL_QUEST_NAME, $"{arg} {arg2}");
 		List<QuestCompleteRewardList> arenaRewards = MonoBehaviourSingleton<InGameManager>.I.arenaRewards;
 		int num = 0;
 		int num2 = 0;
@@ -265,22 +263,21 @@ public class ArenaResultTop : QuestResultTop
 			num2 += drop.money + breakReward.money + order.money;
 		}
 		int my_user_id = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-		InGameRecorder.PlayerRecord playerRecord = MonoBehaviourSingleton<InGameRecorder>.I.players.Find((InGameRecorder.PlayerRecord data) => data.charaInfo.userId == my_user_id);
-		if (playerRecord.beforeLevel >= Singleton<UserLevelTable>.I.GetMaxLevel())
+		if (MonoBehaviourSingleton<InGameRecorder>.I.players.Find((InGameRecorder.PlayerRecord data) => data.charaInfo.userId == my_user_id).beforeLevel >= Singleton<UserLevelTable>.I.GetMaxLevel())
 		{
 			num = 0;
 		}
-		SetLabelText((Enum)UI.LBL_EXP, num.ToString("N0"));
-		SetLabelText((Enum)UI.LBL_REWARD_GOLD, num2.ToString("N0"));
-		SetLabelText((Enum)UI.LBL_TIME, MonoBehaviourSingleton<InGameRecorder>.I.arenaRemainTimeToString);
-		SetLabelText((Enum)UI.LBL_CLEAR_TIME, InGameProgress.GetTimeWithMilliSecToString(0f));
-		SetActive((Enum)UI.SPR_BESTSCORE, is_visible: false);
+		SetLabelText(UI.LBL_EXP, num.ToString("N0"));
+		SetLabelText(UI.LBL_REWARD_GOLD, num2.ToString("N0"));
+		SetLabelText(UI.LBL_TIME, MonoBehaviourSingleton<InGameRecorder>.I.arenaRemainTimeToString);
+		SetLabelText(UI.LBL_CLEAR_TIME, InGameProgress.GetTimeWithMilliSecToString(0f));
+		SetActive(UI.SPR_BESTSCORE, is_visible: false);
 		if (isVictory)
 		{
-			SetLabelText((Enum)UI.LBL_BEFORE_TIME, InGameProgress.GetTimeWithMilliSecToString((float)(int)MonoBehaviourSingleton<QuestManager>.I.arenaCompData.previousClearMilliSec * 0.001f));
+			SetLabelText(UI.LBL_BEFORE_TIME, InGameProgress.GetTimeWithMilliSecToString((float)(int)MonoBehaviourSingleton<QuestManager>.I.arenaCompData.previousClearMilliSec * 0.001f));
 		}
 		bool flag = pointShopResultData.Count > 0;
-		SetActive((Enum)UI.OBJ_POINT_SHOP_RESULT_ROOT, flag);
+		SetActive(UI.OBJ_POINT_SHOP_RESULT_ROOT, flag);
 		if (flag)
 		{
 			SetGrid(UI.OBJ_POINT_SHOP_RESULT_ROOT, "QuestResultPointShop", pointShopResultData.Count, reset: true, delegate(int i, Transform t, bool b)
@@ -292,22 +289,20 @@ public class ArenaResultTop : QuestResultTop
 				{
 					SetLabelText(t, UI.LBL_NORMAL_GET_POINT_SHOP, string.Format("+" + StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.getPoint));
 					SetLabelText(t, UI.LBL_NORMAL_TOTAL_POINT_SHOP, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.totalPoint));
-					UITexture component2 = FindCtrl(t, UI.TEX_NORMAL_POINT_SHOP_ICON).GetComponent<UITexture>();
-					ResourceLoad.LoadPointIconImageTexture(component2, (uint)pointShopResultData.pointShopId);
+					ResourceLoad.LoadPointIconImageTexture(FindCtrl(t, UI.TEX_NORMAL_POINT_SHOP_ICON).GetComponent<UITexture>(), (uint)pointShopResultData.pointShopId);
 				}
 				SetActive(t, UI.OBJ_EVENT_POINT_SHOP_ROOT, pointShopResultData.isEvent);
 				if (pointShopResultData.isEvent)
 				{
 					SetLabelText(t, UI.LBL_EVENT_GET_POINT_SHOP, string.Format("+" + StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.getPoint));
 					SetLabelText(t, UI.LBL_EVENT_TOTAL_POINT_SHOP, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.totalPoint));
-					UITexture component3 = FindCtrl(t, UI.TEX_EVENT_POINT_SHOP_ICON).GetComponent<UITexture>();
-					ResourceLoad.LoadPointIconImageTexture(component3, (uint)pointShopResultData.pointShopId);
+					ResourceLoad.LoadPointIconImageTexture(FindCtrl(t, UI.TEX_EVENT_POINT_SHOP_ICON).GetComponent<UITexture>(), (uint)pointShopResultData.pointShopId);
 				}
 			});
 		}
 		if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.HasSafeArea)
 		{
-			UIVirtualScreen componentInChildren = this.GetComponentInChildren<UIVirtualScreen>();
+			UIVirtualScreen componentInChildren = GetComponentInChildren<UIVirtualScreen>();
 			UIWidget component = GetCtrl(UI.SHADOW).GetComponent<UIWidget>();
 			if (componentInChildren != null && component != null)
 			{
@@ -315,7 +310,7 @@ public class ArenaResultTop : QuestResultTop
 				component.height = (int)componentInChildren.ScreenHeightFull;
 			}
 		}
-		this.StartCoroutine(PlayAnimation());
+		StartCoroutine(PlayAnimation());
 	}
 
 	private void PlayAudio(AUDIO type)
@@ -331,10 +326,10 @@ public class ArenaResultTop : QuestResultTop
 		is_skip = false;
 		animState = RESULT_ANIM_STATE.TITLE;
 		PlayAudio(AUDIO.ADVENT);
-		PlayTween((Enum)UI.OBJ_TITLE, forward: true, (EventDelegate.Callback)delegate
+		PlayTween(UI.OBJ_TITLE, forward: true, delegate
 		{
 			animState = RESULT_ANIM_STATE.IDLE;
-		}, is_input_block: false, 0);
+		}, is_input_block: false);
 		while (animState != 0 && !is_skip)
 		{
 			yield return null;
@@ -343,29 +338,16 @@ public class ArenaResultTop : QuestResultTop
 		PlayAudio(AUDIO.ACHIEVEMENT);
 		if (pointShopResultData.Count > 0)
 		{
-			IEnumerator enumerator = GetCtrl(UI.OBJ_POINT_SHOP_RESULT_ROOT).get_transform().GetEnumerator();
-			try
+			foreach (Transform item in GetCtrl(UI.OBJ_POINT_SHOP_RESULT_ROOT).transform)
 			{
-				while (enumerator.MoveNext())
-				{
-					Transform t = enumerator.Current;
-					PlayTween(t);
-				}
-			}
-			finally
-			{
-				IDisposable disposable;
-				if ((disposable = (enumerator as IDisposable)) != null)
-				{
-					disposable.Dispose();
-				}
+				PlayTween(item);
 			}
 		}
-		PlayTween((Enum)UI.OBJ_EXP, forward: true, (EventDelegate.Callback)null, is_input_block: true, 0);
-		PlayTween((Enum)UI.OBJ_MONEY, forward: true, (EventDelegate.Callback)delegate
+		PlayTween(UI.OBJ_EXP);
+		PlayTween(UI.OBJ_MONEY, forward: true, delegate
 		{
 			animState = RESULT_ANIM_STATE.IDLE;
-		}, is_input_block: false, 0);
+		}, is_input_block: false);
 		while (animState != 0 && !is_skip)
 		{
 			yield return null;
@@ -373,11 +355,11 @@ public class ArenaResultTop : QuestResultTop
 		if (!m_isTimeAttack)
 		{
 			animState = RESULT_ANIM_STATE.REMAIN_TIME;
-			PlayTween((Enum)UI.OBJ_REMAIN_TIME, forward: true, (EventDelegate.Callback)delegate
+			PlayTween(UI.OBJ_REMAIN_TIME, forward: true, delegate
 			{
 				SoundManager.PlayOneShotUISE(40000228);
 				animState = RESULT_ANIM_STATE.IDLE;
-			}, is_input_block: false, 0);
+			}, is_input_block: false);
 			while (animState != 0 && !is_skip)
 			{
 				yield return null;
@@ -386,17 +368,16 @@ public class ArenaResultTop : QuestResultTop
 			{
 				if (m_rank == ARENA_RANK.SS)
 				{
-					SetActive((Enum)UI.OBJ_CONGRATULATIONS_ROOT, is_visible: true);
-					ResetTween((Enum)UI.OBJ_CONGRATULATIONS, 0);
+					SetActive(UI.OBJ_CONGRATULATIONS_ROOT, is_visible: true);
+					ResetTween(UI.OBJ_CONGRATULATIONS);
 					animState = RESULT_ANIM_STATE.CLEAR_EFFECT;
-					ParticleSystem particle2 = GetCtrl(UI.OBJ_CONGRATULATIONS_PARTICLE).GetComponent<ParticleSystem>();
-					particle2.GetComponent<ParticleSystemRenderer>().get_sharedMaterial().set_renderQueue(4000);
+					GetCtrl(UI.OBJ_CONGRATULATIONS_PARTICLE).GetComponent<ParticleSystem>().GetComponent<ParticleSystemRenderer>().sharedMaterial.renderQueue = 4000;
 					yield return null;
 					PlayAudio(AUDIO.ARRIVAL);
-					PlayTween((Enum)UI.OBJ_CONGRATULATIONS, forward: true, (EventDelegate.Callback)delegate
+					PlayTween(UI.OBJ_CONGRATULATIONS, forward: true, delegate
 					{
 						animState = RESULT_ANIM_STATE.IDLE;
-					}, is_input_block: true, 0);
+					});
 					while (animState != 0 && !is_skip)
 					{
 						yield return null;
@@ -404,17 +385,16 @@ public class ArenaResultTop : QuestResultTop
 				}
 				else
 				{
-					SetActive((Enum)UI.OBJ_RANK_UP_ROOT, is_visible: true);
-					ResetTween((Enum)UI.OBJ_RANK_UP, 0);
+					SetActive(UI.OBJ_RANK_UP_ROOT, is_visible: true);
+					ResetTween(UI.OBJ_RANK_UP);
 					animState = RESULT_ANIM_STATE.CLEAR_EFFECT;
-					ParticleSystem particle = GetCtrl(UI.OBJ_PARTICLE).GetComponent<ParticleSystem>();
-					particle.GetComponent<ParticleSystemRenderer>().get_sharedMaterial().set_renderQueue(4000);
+					GetCtrl(UI.OBJ_PARTICLE).GetComponent<ParticleSystem>().GetComponent<ParticleSystemRenderer>().sharedMaterial.renderQueue = 4000;
 					yield return null;
 					PlayAudio(AUDIO.ARRIVAL);
-					PlayTween((Enum)UI.OBJ_RANK_UP, forward: true, (EventDelegate.Callback)delegate
+					PlayTween(UI.OBJ_RANK_UP, forward: true, delegate
 					{
 						animState = RESULT_ANIM_STATE.IDLE;
-					}, is_input_block: true, 0);
+					});
 					while (animState != 0 && !is_skip)
 					{
 						yield return null;
@@ -425,7 +405,7 @@ public class ArenaResultTop : QuestResultTop
 		if (m_isTimeAttack)
 		{
 			animState = RESULT_ANIM_STATE.CLEAR_TIME_COUNT_UP;
-			this.StartCoroutine(PlayCountUpClearTimeAnim(MonoBehaviourSingleton<InGameRecorder>.I.arenaElapsedTime, delegate
+			StartCoroutine(PlayCountUpClearTimeAnim(MonoBehaviourSingleton<InGameRecorder>.I.arenaElapsedTime, delegate
 			{
 				animState = RESULT_ANIM_STATE.IDLE;
 			}));
@@ -437,11 +417,11 @@ public class ArenaResultTop : QuestResultTop
 			{
 				animState = RESULT_ANIM_STATE.BEST_SCORE;
 				PlayAudio(AUDIO.ARRIVAL);
-				SetActive((Enum)UI.SPR_BESTSCORE, is_visible: true);
-				PlayTween((Enum)UI.SPR_BESTSCORE, forward: true, (EventDelegate.Callback)delegate
+				SetActive(UI.SPR_BESTSCORE, is_visible: true);
+				PlayTween(UI.SPR_BESTSCORE, forward: true, delegate
 				{
 					animState = RESULT_ANIM_STATE.IDLE;
-				}, is_input_block: true, 0);
+				});
 				while (animState != 0 && !is_skip)
 				{
 					yield return null;
@@ -463,8 +443,8 @@ public class ArenaResultTop : QuestResultTop
 
 	private IEnumerator GetPointAnimation(Action callback)
 	{
-		int getPoint = allPointEvents.pointRankingData.getPoint;
-		int userPoint = allPointEvents.pointRankingData.userPoint;
+		_ = allPointEvents.pointRankingData.getPoint;
+		_ = allPointEvents.pointRankingData.userPoint;
 		yield return null;
 		callback();
 	}
@@ -479,15 +459,15 @@ public class ArenaResultTop : QuestResultTop
 			{
 				currentShowTime2 = targetTime;
 			}
-			int before = Mathf.FloorToInt(currentShowTime2);
-			float addingTime = Mathf.Max((targetTime - currentShowTime2) * CountDownCube(Time.get_deltaTime() * 4f), 1f);
-			currentShowTime2 += addingTime;
+			int num = Mathf.FloorToInt(currentShowTime2);
+			float num2 = Mathf.Max((targetTime - currentShowTime2) * CountDownCube(Time.deltaTime * 4f), 1f);
+			currentShowTime2 += num2;
 			currentShowTime2 = Mathf.Min(currentShowTime2, targetTime);
-			if (before < Mathf.FloorToInt(currentShowTime2))
+			if (num < Mathf.FloorToInt(currentShowTime2))
 			{
 				SoundManager.PlayOneShotUISE(40000012);
 			}
-			SetLabelText((Enum)UI.LBL_CLEAR_TIME, InGameProgress.GetTimeWithMilliSecToString(currentShowTime2));
+			SetLabelText(UI.LBL_CLEAR_TIME, InGameProgress.GetTimeWithMilliSecToString(currentShowTime2));
 		}
 		callBack?.Invoke();
 	}
@@ -499,19 +479,16 @@ public class ArenaResultTop : QuestResultTop
 
 	protected override void VisibleEndButton()
 	{
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		SetActive((Enum)UI.BTN_NEXT, animState == RESULT_ANIM_STATE.END);
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, animState != RESULT_ANIM_STATE.END);
+		SetActive(UI.BTN_NEXT, animState == RESULT_ANIM_STATE.END);
+		SetActive(UI.BTN_SKIP_FULL_SCREEN, animState != RESULT_ANIM_STATE.END);
 		if (m_isTimeAttack || MonoBehaviourSingleton<InGameRecorder>.I.progressEndType == InGameProgress.PROGRESS_END_TYPE.QUEST_RETIRE)
 		{
-			SetActive((Enum)UI.BTN_RETRY, animState == RESULT_ANIM_STATE.END);
+			SetActive(UI.BTN_RETRY, animState == RESULT_ANIM_STATE.END);
 			return;
 		}
-		SetActive((Enum)UI.BTN_RETRY, is_visible: false);
-		Vector3 localPosition = GetCtrl(UI.BTN_NEXT).get_localPosition();
-		GetCtrl(UI.BTN_NEXT).set_localPosition(new Vector3(0f, localPosition.y, localPosition.x));
+		SetActive(UI.BTN_RETRY, is_visible: false);
+		Vector3 localPosition = GetCtrl(UI.BTN_NEXT).localPosition;
+		GetCtrl(UI.BTN_NEXT).localPosition = new Vector3(0f, localPosition.y, localPosition.x);
 	}
 
 	private bool IsBreakRecord()
@@ -623,9 +600,9 @@ public class ArenaResultTop : QuestResultTop
 			eventRewardList.Add(item);
 		}
 		ResultReward[] array = resultRewards;
-		foreach (ResultReward resultReward in array)
+		for (int j = 0; j < array.Length; j++)
 		{
-			QuestCompleteReward eventReward = resultReward.eventReward;
+			QuestCompleteReward eventReward = array[j].eventReward;
 			for (int k = 0; k < eventReward.eventPrice.Count; k++)
 			{
 				for (int l = 0; l < eventRewardTitles.Count; l++)
@@ -703,17 +680,17 @@ public class ArenaResultTop : QuestResultTop
 		case RESULT_ANIM_STATE.TITLE:
 		case RESULT_ANIM_STATE.DROP:
 		case RESULT_ANIM_STATE.REMAIN_TIME:
-			SkipTween((Enum)UI.OBJ_TITLE, forward: true, 0);
-			SkipTween((Enum)UI.OBJ_POINT_SHOP_RESULT_ROOT, forward: true, 0);
-			SkipTween((Enum)UI.OBJ_EXP, forward: true, 0);
-			SkipTween((Enum)UI.OBJ_MONEY, forward: true, 0);
-			SkipTween((Enum)UI.OBJ_REMAIN_TIME, forward: true, 0);
+			SkipTween(UI.OBJ_TITLE);
+			SkipTween(UI.OBJ_POINT_SHOP_RESULT_ROOT);
+			SkipTween(UI.OBJ_EXP);
+			SkipTween(UI.OBJ_MONEY);
+			SkipTween(UI.OBJ_REMAIN_TIME);
 			break;
 		case RESULT_ANIM_STATE.BEST_SCORE:
-			SkipTween((Enum)UI.SPR_BESTSCORE, forward: true, 0);
+			SkipTween(UI.SPR_BESTSCORE);
 			break;
 		case RESULT_ANIM_STATE.CLEAR_EFFECT:
-			SkipTween((Enum)UI.OBJ_RANK_UP, forward: true, 0);
+			SkipTween(UI.OBJ_RANK_UP);
 			break;
 		}
 		is_skip = true;

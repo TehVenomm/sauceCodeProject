@@ -15,7 +15,7 @@ public class ExploreMiniMap : MonoBehaviourSingleton<ExploreMiniMap>
 
 	private Transform[] spotsSonar_;
 
-	private Transform[] playerMarkers_ = (Transform[])new Transform[4];
+	private Transform[] playerMarkers_ = new Transform[4];
 
 	private Transform selfMarker_;
 
@@ -26,7 +26,7 @@ public class ExploreMiniMap : MonoBehaviourSingleton<ExploreMiniMap>
 	protected override void Awake()
 	{
 		base.Awake();
-		this.get_gameObject().SetActive(MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsExplore() && !MonoBehaviourSingleton<QuestManager>.I.IsExploreBossMap());
+		base.gameObject.SetActive(MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsExplore() && !MonoBehaviourSingleton<QuestManager>.I.IsExploreBossMap());
 	}
 
 	public void Preload(LoadingQueue loadQueue)
@@ -38,26 +38,24 @@ public class ExploreMiniMap : MonoBehaviourSingleton<ExploreMiniMap>
 
 	public void Initialize()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = ResourceUtility.Realizes(loadedExploreMap_.loadedObject, base._transform);
-		val.set_localScale(new Vector3(0.3f, 0.3f, 1f));
-		mapRoot_ = val.GetComponent<ExploreMapRoot>();
+		Transform transform = ResourceUtility.Realizes(loadedExploreMap_.loadedObject, base._transform);
+		transform.localScale = new Vector3(0.3f, 0.3f, 1f);
+		mapRoot_ = transform.GetComponent<ExploreMapRoot>();
 		ExploreMapLocation[] locations = mapRoot_.locations;
-		spotsActive_ = (Transform[])new Transform[locations.Length];
-		spotsInactive_ = (Transform[])new Transform[locations.Length];
-		spotsSonar_ = (Transform[])new Transform[locations.Length];
+		spotsActive_ = new Transform[locations.Length];
+		spotsInactive_ = new Transform[locations.Length];
+		spotsSonar_ = new Transform[locations.Length];
 		for (int i = 0; i < locations.Length; i++)
 		{
-			spotsActive_[i] = locations[i].get_transform().Find("ExploreSpotActiveMini");
-			spotsInactive_[i] = locations[i].get_transform().Find("ExploreSpotInactiveMini");
-			spotsSonar_[i] = locations[i].get_transform().Find("ExploreSpotSonarMini");
+			spotsActive_[i] = locations[i].transform.Find("ExploreSpotActiveMini");
+			spotsInactive_[i] = locations[i].transform.Find("ExploreSpotInactiveMini");
+			spotsSonar_[i] = locations[i].transform.Find("ExploreSpotSonarMini");
 		}
 		for (int j = 0; j < 4; j++)
 		{
 			playerMarkers_[j] = ResourceUtility.Realizes(loadedMarker_.loadedObject, base._transform);
-			ExplorePlayerMarkerMini component = playerMarkers_[j].GetComponent<ExplorePlayerMarkerMini>();
-			component.SetIndex(j);
-			playerMarkers_[j].get_gameObject().SetActive(false);
+			playerMarkers_[j].GetComponent<ExplorePlayerMarkerMini>().SetIndex(j);
+			playerMarkers_[j].gameObject.SetActive(value: false);
 		}
 		selfMarker_ = playerMarkers_[0];
 		initialized_ = true;
@@ -65,11 +63,6 @@ public class ExploreMiniMap : MonoBehaviourSingleton<ExploreMiniMap>
 
 	private void LateUpdate()
 	{
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
 		if (!initialized_)
 		{
 			return;
@@ -85,11 +78,8 @@ public class ExploreMiniMap : MonoBehaviourSingleton<ExploreMiniMap>
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 			if (!(self == null))
 			{
-				Vector3 eulerAngles = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_eulerAngles();
-				float y = eulerAngles.y;
-				Vector3 localEulerAngles = self._transform.get_localEulerAngles();
-				float num = y - localEulerAngles.y;
-				selfMarker_.set_localEulerAngles(new Vector3(0f, 0f, num));
+				float z = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.eulerAngles.y - self._transform.localEulerAngles.y;
+				selfMarker_.localEulerAngles = new Vector3(0f, 0f, z);
 			}
 		}
 	}
@@ -99,8 +89,8 @@ public class ExploreMiniMap : MonoBehaviourSingleton<ExploreMiniMap>
 		ExploreMapLocation[] locations = mapRoot_.locations;
 		for (int i = 0; i < spotsActive_.Length; i++)
 		{
-			spotsActive_[i].get_gameObject().SetActive(true);
-			spotsInactive_[i].get_gameObject().SetActive(false);
+			spotsActive_[i].gameObject.SetActive(value: true);
+			spotsInactive_[i].gameObject.SetActive(value: false);
 			List<FieldMapTable.FieldGimmickPointTableData> fieldGimmickPointListByMapID = Singleton<FieldMapTable>.I.GetFieldGimmickPointListByMapID((uint)locations[i].mapId);
 			if (fieldGimmickPointListByMapID == null || !(spotsSonar_[i] != null))
 			{
@@ -110,20 +100,20 @@ public class ExploreMiniMap : MonoBehaviourSingleton<ExploreMiniMap>
 			{
 				if (fieldGimmickPointListByMapID[j].gimmickType == FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.SONAR)
 				{
-					spotsSonar_[i].get_gameObject().SetActive(true);
-					spotsActive_[i].get_gameObject().SetActive(false);
-					spotsInactive_[i].get_gameObject().SetActive(false);
+					spotsSonar_[i].gameObject.SetActive(value: true);
+					spotsActive_[i].gameObject.SetActive(value: false);
+					spotsInactive_[i].gameObject.SetActive(value: false);
 				}
 				else
 				{
-					spotsSonar_[i].get_gameObject().SetActive(false);
+					spotsSonar_[i].gameObject.SetActive(value: false);
 				}
 			}
 		}
 		mapRoot_.UpdatePortals(isMiniMap: true);
 		for (int k = 0; k < playerMarkers_.Length; k++)
 		{
-			playerMarkers_[k].get_gameObject().SetActive(false);
+			playerMarkers_[k].gameObject.SetActive(value: false);
 		}
 		mapRoot_.SetMarkers(playerMarkers_, isMiniMap: true);
 	}

@@ -26,11 +26,11 @@ public class AttackContinuationColliderProcessor : AttackColliderProcessor
 	public override void OnTriggerEnter(Collider to_collider)
 	{
 		base.OnTriggerEnter(to_collider);
-		if (base.fromCollider == null || base.fromObject == null || !base.fromCollider.get_enabled() || to_collider.get_gameObject() == base.fromCollider.get_gameObject())
+		if (base.fromCollider == null || base.fromObject == null || !base.fromCollider.enabled || to_collider.gameObject == base.fromCollider.gameObject)
 		{
 			return;
 		}
-		StageObject componentInParent = to_collider.get_gameObject().GetComponentInParent<StageObject>();
+		StageObject componentInParent = to_collider.gameObject.GetComponentInParent<StageObject>();
 		if (!(componentInParent == null))
 		{
 			float time = 0f;
@@ -48,7 +48,7 @@ public class AttackContinuationColliderProcessor : AttackColliderProcessor
 	public override void OnTriggerExit(Collider to_collider)
 	{
 		base.OnTriggerExit(to_collider);
-		StageObject componentInParent = to_collider.get_gameObject().GetComponentInParent<StageObject>();
+		StageObject componentInParent = to_collider.gameObject.GetComponentInParent<StageObject>();
 		if (componentInParent == null)
 		{
 			return;

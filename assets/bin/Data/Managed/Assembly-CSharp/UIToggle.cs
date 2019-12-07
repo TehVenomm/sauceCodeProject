@@ -59,7 +59,11 @@ public class UIToggle : UIWidgetContainer
 	{
 		get
 		{
-			return (!mStarted) ? startsActive : mIsActive;
+			if (!mStarted)
+			{
+				return startsActive;
+			}
+			return mIsActive;
 		}
 		set
 		{
@@ -67,7 +71,7 @@ public class UIToggle : UIWidgetContainer
 			{
 				startsActive = value;
 			}
-			else if (group == 0 || value || optionCanBeNone || !mStarted)
+			else if (((group == 0) | value) || optionCanBeNone || !mStarted)
 			{
 				Set(value);
 			}
@@ -78,13 +82,17 @@ public class UIToggle : UIWidgetContainer
 	{
 		get
 		{
-			Collider component = this.GetComponent<Collider>();
+			Collider component = GetComponent<Collider>();
 			if (component != null)
 			{
-				return component.get_enabled();
+				return component.enabled;
 			}
-			Collider2D component2 = this.GetComponent<Collider2D>();
-			return component2 != null && component2.get_enabled();
+			Collider2D component2 = GetComponent<Collider2D>();
+			if (component2 != null)
+			{
+				return component2.enabled;
+			}
+			return false;
 		}
 	}
 
@@ -131,7 +139,7 @@ public class UIToggle : UIWidgetContainer
 			startsChecked = false;
 			startsActive = true;
 		}
-		if (!Application.get_isPlaying())
+		if (!Application.isPlaying)
 		{
 			if (checkSprite != null && activeSprite == null)
 			{
@@ -143,9 +151,9 @@ public class UIToggle : UIWidgetContainer
 				activeAnimation = checkAnimation;
 				checkAnimation = null;
 			}
-			if (Application.get_isPlaying() && activeSprite != null)
+			if (Application.isPlaying && activeSprite != null)
 			{
-				activeSprite.alpha = ((!startsActive) ? 0f : 1f);
+				activeSprite.alpha = (startsActive ? 1f : 0f);
 			}
 			if (EventDelegate.IsValid(onChange))
 			{
@@ -166,7 +174,7 @@ public class UIToggle : UIWidgetContainer
 
 	private void OnClick()
 	{
-		if (this.get_enabled() && isColliderEnabled && UICamera.currentTouchID != -2)
+		if (base.enabled && isColliderEnabled && UICamera.currentTouchID != -2)
 		{
 			value = !value;
 		}
@@ -184,7 +192,7 @@ public class UIToggle : UIWidgetContainer
 			startsActive = state;
 			if (activeSprite != null)
 			{
-				activeSprite.alpha = ((!state) ? 0f : 1f);
+				activeSprite.alpha = (state ? 1f : 0f);
 			}
 		}
 		else
@@ -220,11 +228,11 @@ public class UIToggle : UIWidgetContainer
 			{
 				if (instantTween || !NGUITools.GetActive(this))
 				{
-					activeSprite.alpha = ((!mIsActive) ? 0f : 1f);
+					activeSprite.alpha = (mIsActive ? 1f : 0f);
 				}
 				else
 				{
-					TweenAlpha.Begin(activeSprite.get_gameObject(), 0.15f, (!mIsActive) ? 0f : 1f);
+					TweenAlpha.Begin(activeSprite.gameObject, 0.15f, mIsActive ? 1f : 0f);
 				}
 			}
 			if (current == null)
@@ -237,7 +245,7 @@ public class UIToggle : UIWidgetContainer
 				}
 				else if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
 				{
-					eventReceiver.SendMessage(functionName, (object)mIsActive, 1);
+					eventReceiver.SendMessage(functionName, mIsActive, SendMessageOptions.DontRequireReceiver);
 				}
 				current = uIToggle2;
 			}

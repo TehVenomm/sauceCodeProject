@@ -49,7 +49,7 @@ public class UIChatButtonBase : MonoBehaviourSingleton<UIChatButtonBase>
 		int i = 0;
 		for (int num = chatItem.Length; i < num; i++)
 		{
-			chatItem[i].get_gameObject().SetActive(pressed);
+			chatItem[i].gameObject.SetActive(pressed);
 		}
 	}
 

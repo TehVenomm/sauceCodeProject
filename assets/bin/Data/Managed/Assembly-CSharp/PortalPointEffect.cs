@@ -34,11 +34,6 @@ public class PortalPointEffect : MonoBehaviour
 		protected set;
 	}
 
-	public PortalPointEffect()
-		: this()
-	{
-	}
-
 	public static PortalPointEffect Create(PortalObject portal_object, Coop_Model_EnemyDefeat model)
 	{
 		if (model == null)
@@ -55,7 +50,7 @@ public class PortalPointEffect : MonoBehaviour
 		{
 			return null;
 		}
-		PortalPointEffect portalPointEffect = effect.get_gameObject().AddComponent<PortalPointEffect>();
+		PortalPointEffect portalPointEffect = effect.gameObject.AddComponent<PortalPointEffect>();
 		if (portalPointEffect != null)
 		{
 			portalPointEffect.Drop(portal_object, model);
@@ -65,61 +60,37 @@ public class PortalPointEffect : MonoBehaviour
 
 	private void Awake()
 	{
-		_transform = this.get_transform();
-		_rigidbody = this.GetComponent<Rigidbody>();
+		_transform = base.transform;
+		_rigidbody = GetComponent<Rigidbody>();
 		if (_rigidbody == null)
 		{
-			_rigidbody = this.get_gameObject().AddComponent<Rigidbody>();
+			_rigidbody = base.gameObject.AddComponent<Rigidbody>();
 		}
 		int layer = 19;
 		Utility.SetLayerWithChildren(_transform, layer);
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 
 	public void Drop(PortalObject portal_object, Coop_Model_EnemyDefeat model)
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
 		targetPortal = portal_object;
 		defeatModel = model;
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		parameter = MonoBehaviourSingleton<InGameSettingsManager>.I.portal.pointEffect;
-		Vector3 position = default(Vector3);
-		position._002Ector((float)model.x, 0f, (float)model.z);
-		_rigidbody.set_useGravity(false);
-		_transform.set_position(position);
+		Vector3 position = new Vector3(model.x, 0f, model.z);
+		_rigidbody.useGravity = false;
+		_transform.position = position;
 		anim.Set(parameter.popHeightAnimTime, 0f, parameter.popHeight, parameter.popHeightAnim, 0f);
 		anim.Play();
 		anim.Update(0f);
 		position.y = anim.Get();
-		_transform.set_position(position);
+		_transform.position = position;
 		animStep = 0;
 	}
 
 	private void FixedUpdate()
 	{
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-		if (isDelete || !Object.op_Implicit(targetPortal))
+		if (isDelete || !targetPortal)
 		{
 			return;
 		}
@@ -128,11 +99,11 @@ public class PortalPointEffect : MonoBehaviour
 		case 0:
 			if (anim.IsPlaying())
 			{
-				Vector3 position2 = _transform.get_position();
+				Vector3 position2 = _transform.position;
 				position2.y = anim.Update();
 				if (anim.IsPlaying())
 				{
-					_transform.set_position(position2);
+					_transform.position = position2;
 				}
 			}
 			else
@@ -141,32 +112,30 @@ public class PortalPointEffect : MonoBehaviour
 				anim.Set(parameter.getSpeedAnimTime, 0f, parameter.getSpeed, parameter.getSpeedAnim, 0f);
 				anim.Play();
 				anim.Update(0f);
-				Vector3 position3 = targetPortal._transform.get_position();
+				Vector3 position3 = targetPortal._transform.position;
 				position3.y += parameter.targetHeight;
-				Vector3 val2 = position3 - _transform.get_position();
-				_rigidbody.set_velocity(val2.get_normalized() * anim.Get());
+				Vector3 vector = position3 - _transform.position;
+				_rigidbody.velocity = vector.normalized * anim.Get();
 				SoundManager.PlayOneShotUISE(40000070);
 			}
 			break;
 		case 1:
 		{
-			Vector3 position = targetPortal._transform.get_position();
+			Vector3 position = targetPortal._transform.position;
 			position.y += parameter.targetHeight;
-			Vector3 val = position - _transform.get_position();
+			Vector3 lhs = position - _transform.position;
 			float num = anim.Update();
-			if (num * Time.get_fixedDeltaTime() >= val.get_magnitude())
+			if (num * Time.fixedDeltaTime >= lhs.magnitude)
 			{
 				OnHitTarget();
-				break;
 			}
-			float num2 = Vector3.Dot(val, _rigidbody.get_velocity());
-			if (num2 < 0f)
+			else if (Vector3.Dot(lhs, _rigidbody.velocity) < 0f)
 			{
 				OnHitTarget();
 			}
 			else
 			{
-				_rigidbody.set_velocity(val.get_normalized() * num);
+				_rigidbody.velocity = lhs.normalized * num;
 			}
 			break;
 		}
@@ -175,21 +144,17 @@ public class PortalPointEffect : MonoBehaviour
 
 	private void OnHitTarget()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 		if (!isDelete)
 		{
-			_rigidbody.set_velocity(Vector3.get_zero());
+			_rigidbody.velocity = Vector3.zero;
 			if (targetPortal != null)
 			{
-				Vector3 position = targetPortal._transform.get_position();
+				Vector3 position = targetPortal._transform.position;
 				position.y += parameter.targetHeight;
-				_transform.set_position(position);
+				_transform.position = position;
 				targetPortal.OnGetPortalPoint(defeatModel.ppt);
 			}
-			EffectManager.ReleaseEffect(this.get_gameObject());
+			EffectManager.ReleaseEffect(base.gameObject);
 			isDelete = true;
 		}
 	}

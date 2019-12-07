@@ -1,35 +1,22 @@
 using Network;
-using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class CrashlyticsReporter
 {
 	private static bool isEnable;
 
-	[CompilerGenerated]
-	private static LogCallback _003C_003Ef__mg_0024cache0;
-
-	public unsafe static void EnableReport()
+	public static void EnableReport()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
 		if (!isEnable)
 		{
-			if (_003C_003Ef__mg_0024cache0 == null)
-			{
-				_003C_003Ef__mg_0024cache0 = new LogCallback((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-			}
-			Application.RegisterLogCallback(_003C_003Ef__mg_0024cache0);
+			Application.logMessageReceived += HandleLog;
 			isEnable = true;
 		}
 	}
 
 	private static void HandleLog(string log, string stack, LogType type)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Invalid comparison between Unknown and I4
-		if ((int)type == 4)
+		if (type == LogType.Exception)
 		{
 			ReportException(log, stack);
 		}
@@ -105,10 +92,9 @@ public class CrashlyticsReporter
 	{
 		if (isEnable)
 		{
-			log = (log ?? string.Empty);
-			stack = (stack ?? string.Empty);
-			string report = log + "\n" + stack;
-			CrashlyticsWrapper.ReportException(report);
+			log = (log ?? "");
+			stack = (stack ?? "");
+			CrashlyticsWrapper.ReportException(log + "\n" + stack);
 		}
 	}
 }

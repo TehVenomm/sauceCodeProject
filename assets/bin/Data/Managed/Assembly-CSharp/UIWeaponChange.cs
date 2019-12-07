@@ -147,16 +147,14 @@ public class UIWeaponChange : UIInGamePopBase
 		InitAnim();
 		if (changeButton != null)
 		{
-			UIButtonEffect uIButtonEffect = changeButton.get_gameObject().AddComponent<UIButtonEffect>();
-			uIButtonEffect.isSimple = true;
+			changeButton.gameObject.AddComponent<UIButtonEffect>().isSimple = true;
 		}
 		for (int i = 0; i < this.weaponIcons.Length; i++)
 		{
 			WeaponIcons weaponIcons = this.weaponIcons[i];
 			if (weaponIcons.button != null)
 			{
-				UIButtonEffect uIButtonEffect2 = weaponIcons.button.get_gameObject().AddComponent<UIButtonEffect>();
-				uIButtonEffect2.isSimple = true;
+				weaponIcons.button.gameObject.AddComponent<UIButtonEffect>().isSimple = true;
 			}
 		}
 		bool flag = TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02);
@@ -180,21 +178,9 @@ public class UIWeaponChange : UIInGamePopBase
 
 	private void InitRally()
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
 		if (LoungeMatchingManager.IsValidInLounge() && !QuestManager.IsValidInGameArena())
 		{
-			rallyBtn.get_gameObject().SetActive(true);
+			rallyBtn.gameObject.SetActive(value: true);
 			autoBtn.GetComponent<TweenPosition>().to = new Vector3(0f, 410f, 0f);
 			btnRootGroup.GetComponent<TweenPosition>().from = new Vector3(0f, -40f, 0f);
 			btnFrameOver.GetComponent<TweenPosition>().to = new Vector3(-4f, 337f, 0f);
@@ -202,7 +188,7 @@ public class UIWeaponChange : UIInGamePopBase
 		}
 		else
 		{
-			rallyBtn.get_gameObject().SetActive(false);
+			rallyBtn.gameObject.SetActive(value: false);
 			autoBtn.GetComponent<TweenPosition>().to = new Vector3(0f, 355f, 0f);
 			btnRootGroup.GetComponent<TweenPosition>().from = new Vector3(0f, 24f, 0f);
 			btnFrameOver.GetComponent<TweenPosition>().to = new Vector3(0f, 280f, 0f);
@@ -212,8 +198,7 @@ public class UIWeaponChange : UIInGamePopBase
 
 	public void SetDisableRallyBtn(bool isDisable)
 	{
-		UIButton componentInChildren = rallyBtn.GetComponentInChildren<UIButton>();
-		componentInChildren.isEnabled = !isDisable;
+		rallyBtn.GetComponentInChildren<UIButton>().isEnabled = !isDisable;
 	}
 
 	private void InitAnim()
@@ -223,19 +208,19 @@ public class UIWeaponChange : UIInGamePopBase
 		{
 			if (weaponIcons[i].requestEffect != null)
 			{
-				weaponIcons[i].requestEffect.SetActive(false);
+				weaponIcons[i].requestEffect.SetActive(value: false);
 			}
 		}
 		int j = 0;
 		for (int num2 = changeStartAnimTweens.Length; j < num2; j++)
 		{
-			changeStartAnimTweens[j].set_enabled(false);
+			changeStartAnimTweens[j].enabled = false;
 			changeStartAnimTweens[j].Sample(1f, isFinished: true);
 		}
 		int k = 0;
 		for (int num3 = changeEndAnimTweens.Length; k < num3; k++)
 		{
-			changeEndAnimTweens[k].set_enabled(false);
+			changeEndAnimTweens[k].enabled = false;
 			changeEndAnimTweens[k].Sample(1f, isFinished: true);
 		}
 		if (animSprite != null)
@@ -278,9 +263,9 @@ public class UIWeaponChange : UIInGamePopBase
 	{
 		if (routineWork != null)
 		{
-			this.StopCoroutine(routineWork);
+			StopCoroutine(routineWork);
 			routineWork = null;
-			changeAnim.get_gameObject().SetActive(false);
+			changeAnim.gameObject.SetActive(value: false);
 			panelChange.Lock();
 			InitAnim();
 		}
@@ -294,7 +279,7 @@ public class UIWeaponChange : UIInGamePopBase
 
 	public void SetEnableChangeButton(bool enabled)
 	{
-		changeButton.set_enabled(enabled);
+		changeButton.enabled = enabled;
 		if (!enabled && isPopMenu)
 		{
 			OnClickPopMenu();
@@ -303,7 +288,7 @@ public class UIWeaponChange : UIInGamePopBase
 
 	public bool IsEnableChangeButton()
 	{
-		return changeButton.get_enabled();
+		return changeButton.enabled;
 	}
 
 	public override void OnClickPopMenu()
@@ -339,7 +324,7 @@ public class UIWeaponChange : UIInGamePopBase
 		{
 			if (weaponIcons[j].requestEffect != null)
 			{
-				weaponIcons[j].requestEffect.SetActive(false);
+				weaponIcons[j].requestEffect.SetActive(value: false);
 			}
 		}
 		requestCheck = false;
@@ -351,11 +336,11 @@ public class UIWeaponChange : UIInGamePopBase
 		{
 			return;
 		}
-		if (prevIndex != -1 && this.get_gameObject().get_activeInHierarchy())
+		if (prevIndex != -1 && base.gameObject.activeInHierarchy)
 		{
 			if (routineWork != null)
 			{
-				this.StopCoroutine(routineWork);
+				StopCoroutine(routineWork);
 				routineWork = null;
 			}
 			else
@@ -367,7 +352,7 @@ public class UIWeaponChange : UIInGamePopBase
 				OnClickPopMenu();
 			}
 			routineWork = ChangeAnim();
-			this.StartCoroutine(routineWork);
+			StartCoroutine(routineWork);
 		}
 		prevIndex = targetPlayer.weaponIndex;
 		prevUniqueEquipmentIndex = targetPlayer.uniqueEquipmentIndex;
@@ -375,11 +360,11 @@ public class UIWeaponChange : UIInGamePopBase
 
 	public void PlayEvolveIconAnim(Action cb)
 	{
-		if (this.get_gameObject().get_activeInHierarchy())
+		if (base.gameObject.activeInHierarchy)
 		{
 			if (routineWork != null)
 			{
-				this.StopCoroutine(routineWork);
+				StopCoroutine(routineWork);
 				routineWork = null;
 			}
 			else
@@ -391,7 +376,7 @@ public class UIWeaponChange : UIInGamePopBase
 				OnClickPopMenu();
 			}
 			routineWork = ChangeAnim(isChangeWeapon: false, cb);
-			this.StartCoroutine(routineWork);
+			StartCoroutine(routineWork);
 		}
 	}
 
@@ -405,11 +390,11 @@ public class UIWeaponChange : UIInGamePopBase
 			}
 			if (icon.weaponIcon != null)
 			{
-				icon.weaponIcon.get_gameObject().SetActive(false);
+				icon.weaponIcon.gameObject.SetActive(value: false);
 			}
 			if (icon.elementIconBase != null)
 			{
-				icon.elementIconBase.SetActive(false);
+				icon.elementIconBase.SetActive(value: false);
 			}
 			icon.isEnable = false;
 		}
@@ -433,7 +418,7 @@ public class UIWeaponChange : UIInGamePopBase
 			{
 				if (!is_top)
 				{
-					icon.weaponIcon.get_gameObject().SetActive(true);
+					icon.weaponIcon.gameObject.SetActive(value: true);
 				}
 				icon.weaponIcon.spriteName = WEAPONICON_PATH[(int)equipItemData.type];
 			}
@@ -470,7 +455,7 @@ public class UIWeaponChange : UIInGamePopBase
 		ChangeWeapon(weaponIcons[0].index);
 		if (weaponIcons[0].requestEffect != null)
 		{
-			weaponIcons[0].requestEffect.SetActive(true);
+			weaponIcons[0].requestEffect.SetActive(value: true);
 		}
 		requestCheck = true;
 	}
@@ -480,7 +465,7 @@ public class UIWeaponChange : UIInGamePopBase
 		ChangeWeapon(weaponIcons[1].index);
 		if (weaponIcons[1].requestEffect != null)
 		{
-			weaponIcons[1].requestEffect.SetActive(true);
+			weaponIcons[1].requestEffect.SetActive(value: true);
 		}
 		requestCheck = true;
 	}
@@ -490,7 +475,7 @@ public class UIWeaponChange : UIInGamePopBase
 		ChangeWeapon(weaponIcons[2].index);
 		if (weaponIcons[2].requestEffect != null)
 		{
-			weaponIcons[2].requestEffect.SetActive(true);
+			weaponIcons[2].requestEffect.SetActive(value: true);
 		}
 		requestCheck = true;
 	}
@@ -503,13 +488,13 @@ public class UIWeaponChange : UIInGamePopBase
 		}
 		changeBtnWepSprite.spriteName = weaponIcons[index].weaponIcon.spriteName;
 		changeBtnEleSprite.spriteName = weaponIcons[index].elementIcon.spriteName;
-		if (!weaponIcons[index].elementIconBase.get_activeSelf())
+		if (!weaponIcons[index].elementIconBase.activeSelf)
 		{
-			changeBtnEleObj.SetActive(false);
+			changeBtnEleObj.SetActive(value: false);
 		}
 		else
 		{
-			changeBtnEleObj.SetActive(true);
+			changeBtnEleObj.SetActive(value: true);
 		}
 	}
 
@@ -575,12 +560,12 @@ public class UIWeaponChange : UIInGamePopBase
 
 	private IEnumerator ChangeAnim(bool isChangeWeapon = true, Action cb = null)
 	{
-		yield return (object)new WaitForSeconds(animDelay);
+		yield return new WaitForSeconds(animDelay);
 		if (isChangeWeapon && MonoBehaviourSingleton<UISkillButtonGroup>.IsValid())
 		{
 			MonoBehaviourSingleton<UISkillButtonGroup>.I.ChangeAnimStart();
 		}
-		changeAnim.get_gameObject().SetActive(true);
+		changeAnim.gameObject.SetActive(value: true);
 		changeAnim.Play();
 		int l = changeStartAnimTweens.Length;
 		for (int m = 0; m < l; m++)
@@ -590,7 +575,7 @@ public class UIWeaponChange : UIInGamePopBase
 		}
 		for (int k = 0; k < l; k++)
 		{
-			while (changeStartAnimTweens[k].get_isActiveAndEnabled())
+			while (changeStartAnimTweens[k].isActiveAndEnabled)
 			{
 				yield return null;
 			}
@@ -607,9 +592,9 @@ public class UIWeaponChange : UIInGamePopBase
 				MonoBehaviourSingleton<UISkillButtonGroup>.I.ChangeAnimEnd();
 			}
 		}
-		else if (!object.ReferenceEquals(cb, null))
+		else
 		{
-			cb();
+			cb?.Invoke();
 		}
 		l = changeEndAnimTweens.Length;
 		for (int n = 0; n < l; n++)
@@ -617,9 +602,9 @@ public class UIWeaponChange : UIInGamePopBase
 			changeEndAnimTweens[n].ResetToBeginning();
 			changeEndAnimTweens[n].PlayForward();
 		}
-		for (int i = 0; i < l; i++)
+		for (int k = 0; k < l; k++)
 		{
-			while (changeEndAnimTweens[i].get_isActiveAndEnabled())
+			while (changeEndAnimTweens[k].isActiveAndEnabled)
 			{
 				yield return null;
 			}
@@ -628,7 +613,7 @@ public class UIWeaponChange : UIInGamePopBase
 		{
 			yield return null;
 		}
-		changeAnim.get_gameObject().SetActive(false);
+		changeAnim.gameObject.SetActive(value: false);
 		panelChange.Lock();
 		routineWork = null;
 	}

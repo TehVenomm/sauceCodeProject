@@ -39,7 +39,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 	protected override void SetInventoryIsEmptyParam()
 	{
 		bool is_empty = true;
-		if (inventory != null && inventory.datas.Length > 0 && equipItem != null)
+		if (inventory != null && inventory.datas.Length != 0 && equipItem != null)
 		{
 			SkillItemTable.SkillSlotData[] skillSlot = equipItem.tableData.GetSkillSlot(equipItem.exceed);
 			if (skillSlot != null && skillSlot.Length > slotIndex)
@@ -47,13 +47,9 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 				SKILL_SLOT_TYPE skill_slot_type = skillSlot[slotIndex].slotType;
 				Array.ForEach(inventory.datas, delegate(SortCompareData _data)
 				{
-					if (is_empty && _data != null)
+					if (is_empty && _data != null && (_data.GetItemData() as SkillItemInfo).tableData.type == skill_slot_type)
 					{
-						SkillItemInfo skillItemInfo = _data.GetItemData() as SkillItemInfo;
-						if (skillItemInfo.tableData.type == skill_slot_type)
-						{
-							is_empty = false;
-						}
+						is_empty = false;
 					}
 				});
 			}
@@ -85,7 +81,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 		{
 			equipStartIndex++;
 		}
-		SetDynamicList((Enum)inventoryUI, (string)null, inventory.datas.Length + 3, reset: false, (Func<int, bool>)delegate(int i)
+		SetDynamicList(inventoryUI, null, inventory.datas.Length + 3, reset: false, delegate(int i)
 		{
 			switch (i)
 			{
@@ -125,7 +121,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 				}
 			}
 			return flag2;
-		}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		}, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			switch (i)
 			{
@@ -220,8 +216,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 		SkillItemInfo skillItemInfo = sortCompareData.GetItemData() as SkillItemInfo;
 		if (IsEquipSetAttached(skillItemInfo))
 		{
-			List<EquipSetSkillData> equipSetSkill = skillItemInfo.equipSetSkill;
-			EquipSetSkillData equipSetSkillData = equipSetSkill.Find((EquipSetSkillData x) => x.equipSetNo == MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo());
+			EquipSetSkillData equipSetSkillData = skillItemInfo.equipSetSkill.Find((EquipSetSkillData x) => x.equipSetNo == MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo());
 			if (StatusManager.IsUnique())
 			{
 				equipSetSkillData = skillItemInfo.uniqueEquipSetSkill;
@@ -232,12 +227,12 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 		{
 			if (!IsEquipSetAttached(skillItemInfo))
 			{
-				GameSection.ChangeEvent((!flag) ? "EQUIP" : "EQUIP_DETAIL");
+				GameSection.ChangeEvent(flag ? "EQUIP_DETAIL" : "EQUIP");
 				CheckSendEquipSkill();
 			}
 			else
 			{
-				GameSection.ChangeEvent((!flag) ? "STEAL" : "STEAL_DETAIL", new object[5]
+				GameSection.ChangeEvent(flag ? "STEAL_DETAIL" : "STEAL", new object[5]
 				{
 					equipSkillItem.tableData.name,
 					equipSkillItem.level.ToString(),
@@ -249,7 +244,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 		}
 		else if (IsEquipSetAttached(skillItemInfo))
 		{
-			GameSection.ChangeEvent((!flag) ? "REPLACE" : "REPLACE_DETAIL", new object[3]
+			GameSection.ChangeEvent(flag ? "REPLACE_DETAIL" : "REPLACE", new object[3]
 			{
 				equipItemInfo.tableData.name,
 				sortCompareData.GetName(),
@@ -258,7 +253,7 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 		}
 		else
 		{
-			GameSection.ChangeEvent((!flag) ? "EQUIP" : "EQUIP_DETAIL");
+			GameSection.ChangeEvent(flag ? "EQUIP_DETAIL" : "EQUIP");
 			CheckSendEquipSkill();
 		}
 	}
@@ -299,21 +294,19 @@ public class ItemDetailEquipSkillSelect : SkillSelectBaseSecond
 			GameSection.ChangeEvent("COME_BACK");
 			Action action = delegate
 			{
-				SortCompareData sortCompareData = inventory.datas[selectIndex];
-				SkillItemInfo skillItemInfo = sortCompareData.GetItemData() as SkillItemInfo;
-				EQUIPMENT_TYPE? enableEquipType = skillItemInfo.tableData.GetEnableEquipType();
+				EQUIPMENT_TYPE? enableEquipType = (inventory.datas[selectIndex].GetItemData() as SkillItemInfo).tableData.GetEnableEquipType();
 				DispatchEvent("NOT_SKILL_ENABLE_TYPE", new object[1]
 				{
 					MonoBehaviourSingleton<StatusManager>.I.GetEquipItemGroupString(enableEquipType.Value)
 				});
 			};
-			if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentScreenName().Contains(this.get_name()))
+			if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentScreenName().Contains(base.name))
 			{
 				action();
 			}
 			else
 			{
-				this.StartCoroutine(DelayCall(action));
+				StartCoroutine(DelayCall(action));
 			}
 		}
 	}

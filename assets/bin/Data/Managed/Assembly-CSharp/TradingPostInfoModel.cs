@@ -10,7 +10,7 @@ public class TradingPostInfoModel : BaseModel
 		public int itemId;
 	}
 
-	public static string URL = "/ajax/trading-post/shop-list";
+	public static string URL = "ajax/trading-post/shop-list";
 
 	public List<TradingPostInfo> result = new List<TradingPostInfo>();
 }

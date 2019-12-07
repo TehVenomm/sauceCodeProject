@@ -1,5 +1,3 @@
-using System;
-
 public class AccountChangePasswordMail : AccountPopupAdjuster
 {
 	private enum UI
@@ -21,14 +19,13 @@ public class AccountChangePasswordMail : AccountPopupAdjuster
 	private void InputCallBack()
 	{
 		bool flag = CheckRegistData();
-		SetActive((Enum)UI.BTN_OK, flag);
-		SetActive((Enum)UI.BTN_INVALID, !flag);
+		SetActive(UI.BTN_OK, flag);
+		SetActive(UI.BTN_INVALID, !flag);
 	}
 
 	private bool CheckRegistData(bool is_send_event = false)
 	{
-		string inputText = GetInputText(UI.IPT_PASSWORD);
-		if (string.IsNullOrEmpty(inputText))
+		if (string.IsNullOrEmpty(GetInputText(UI.IPT_PASSWORD)))
 		{
 			CheckChangeEvent(is_send_event, "EMPTY", new object[1]
 			{
@@ -36,9 +33,9 @@ public class AccountChangePasswordMail : AccountPopupAdjuster
 			});
 			return false;
 		}
-		string inputText2 = GetInputText(UI.IPT_NEW_PASSWORD);
-		string inputText3 = GetInputText(UI.IPT_CONFIRM_NEW_PASSWORD);
-		if (string.IsNullOrEmpty(inputText2))
+		string inputText = GetInputText(UI.IPT_NEW_PASSWORD);
+		string inputText2 = GetInputText(UI.IPT_CONFIRM_NEW_PASSWORD);
+		if (string.IsNullOrEmpty(inputText))
 		{
 			CheckChangeEvent(is_send_event, "EMPTY", new object[1]
 			{
@@ -46,17 +43,17 @@ public class AccountChangePasswordMail : AccountPopupAdjuster
 			});
 			return false;
 		}
-		if (inputText2.Length < 8)
+		if (inputText.Length < 8)
 		{
 			CheckChangeEvent(is_send_event, "PASSWORD_TOO_SHORT");
 			return false;
 		}
-		if (inputText2 != inputText3)
+		if (inputText != inputText2)
 		{
 			CheckChangeEvent(is_send_event, "CONFIRM_PASSWORD_NOT_MATCH");
 			return false;
 		}
-		if (inputText2.Length > 255)
+		if (inputText.Length > 255)
 		{
 			CheckChangeEvent(is_send_event, "PASSWORD_TOO_LONG");
 			return false;

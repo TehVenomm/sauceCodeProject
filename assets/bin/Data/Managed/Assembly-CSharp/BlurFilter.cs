@@ -16,7 +16,7 @@ public class BlurFilter : FilterBase
 
 	private const int PASS_NUM = 3;
 
-	private Material[] _blurMaterial = (Material[])new Material[3];
+	private Material[] _blurMaterial = new Material[3];
 
 	private PostEffector postEffector;
 
@@ -70,19 +70,17 @@ public class BlurFilter : FilterBase
 
 	private Material CreateMaterial(string shaderName)
 	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Expected O, but got Unknown
-		Shader val = ResourceUtility.FindShader(shaderName);
-		if (val == null)
+		Shader shader = ResourceUtility.FindShader(shaderName);
+		if (shader == null)
 		{
 			return null;
 		}
-		return new Material(val);
+		return new Material(shader);
 	}
 
 	public override void StartFilter()
 	{
-		postEffector = this.get_gameObject().AddComponent<PostEffector>();
+		postEffector = base.gameObject.AddComponent<PostEffector>();
 		postEffector.SetFilter(this);
 	}
 
@@ -97,13 +95,9 @@ public class BlurFilter : FilterBase
 
 	public override void PostEffectProc(RenderTexture src, RenderTexture dest)
 	{
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
 		if (blurStrength <= strengthLowLimit)
 		{
-			Graphics.Blit(src, null);
+			Graphics.Blit((Texture)src, (RenderTexture)null);
 			return;
 		}
 		if (!isValid)
@@ -111,31 +105,31 @@ public class BlurFilter : FilterBase
 			Graphics.Blit(src, dest);
 			return;
 		}
-		int num = src.get_width() >> downsample;
-		int num2 = src.get_height() >> downsample;
-		RenderTexture val = RenderTexture.GetTemporary(num, num2, 0, src.get_format());
-		val.set_filterMode(1);
-		Graphics.Blit(src, val, blurMaterial[0]);
-		float num3 = 1f / (1f * (float)downsample);
+		int width = src.width >> downsample;
+		int height = src.height >> downsample;
+		RenderTexture renderTexture = RenderTexture.GetTemporary(width, height, 0, src.format);
+		renderTexture.filterMode = FilterMode.Bilinear;
+		Graphics.Blit(src, renderTexture, blurMaterial[0]);
+		float num = 1f / (1f * (float)downsample);
 		for (int i = 0; i < iterationNum; i++)
 		{
-			float num4 = i;
+			float num2 = i;
 			for (int j = 0; j < 3; j++)
 			{
-				blurMaterial[j].SetVector("_Parameter", new Vector4(blurStrength * num3 + num4, (0f - blurStrength) * num3 - num4, 0f, 0f));
+				blurMaterial[j].SetVector("_Parameter", new Vector4(blurStrength * num + num2, (0f - blurStrength) * num - num2, 0f, 0f));
 			}
-			RenderTexture temporary = RenderTexture.GetTemporary(num, num2, 0, src.get_format());
-			temporary.set_filterMode(1);
-			Graphics.Blit(val, temporary, blurMaterial[1]);
-			RenderTexture.ReleaseTemporary(val);
-			val = temporary;
-			temporary = RenderTexture.GetTemporary(num, num2, 0, src.get_format());
-			temporary.set_filterMode(1);
-			Graphics.Blit(val, temporary, blurMaterial[2]);
-			RenderTexture.ReleaseTemporary(val);
-			val = temporary;
+			RenderTexture temporary = RenderTexture.GetTemporary(width, height, 0, src.format);
+			temporary.filterMode = FilterMode.Bilinear;
+			Graphics.Blit(renderTexture, temporary, blurMaterial[1]);
+			RenderTexture.ReleaseTemporary(renderTexture);
+			renderTexture = temporary;
+			temporary = RenderTexture.GetTemporary(width, height, 0, src.format);
+			temporary.filterMode = FilterMode.Bilinear;
+			Graphics.Blit(renderTexture, temporary, blurMaterial[2]);
+			RenderTexture.ReleaseTemporary(renderTexture);
+			renderTexture = temporary;
 		}
-		Graphics.Blit(val, dest);
-		RenderTexture.ReleaseTemporary(val);
+		Graphics.Blit(renderTexture, dest);
+		RenderTexture.ReleaseTemporary(renderTexture);
 	}
 }

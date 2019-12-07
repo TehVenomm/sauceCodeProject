@@ -86,21 +86,21 @@ public class GuildSearchFriend : FollowListBase
 	{
 		if (clanFollowers == null || clanFollowers.Count == 0)
 		{
-			SetActive((Enum)UI.LBL_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.GRD_LIST, is_visible: false);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_PREV, is_enabled: false);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_NEXT, is_enabled: false);
-			SetLabelText((Enum)UI.LBL_NOW, "0");
-			SetLabelText((Enum)UI.LBL_MAX, "0");
+			SetActive(UI.LBL_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_LIST, is_visible: false);
+			SetButtonEnabled(UI.BTN_PAGE_PREV, is_enabled: false);
+			SetButtonEnabled(UI.BTN_PAGE_NEXT, is_enabled: false);
+			SetLabelText(UI.LBL_NOW, "0");
+			SetLabelText(UI.LBL_MAX, "0");
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_NOW, (nowPage + 1).ToString());
-			SetActive((Enum)UI.LBL_NON_LIST, is_visible: false);
-			SetActive((Enum)UI.GRD_LIST, is_visible: true);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_PREV, nowPage > 0);
-			SetButtonEnabled((Enum)UI.BTN_PAGE_NEXT, nowPage + 1 < pageNumMax);
-			SetDynamicList((Enum)UI.GRD_LIST, "GuildSearchFriendItem", clanFollowers.Count, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+			SetLabelText(UI.LBL_NOW, (nowPage + 1).ToString());
+			SetActive(UI.LBL_NON_LIST, is_visible: false);
+			SetActive(UI.GRD_LIST, is_visible: true);
+			SetButtonEnabled(UI.BTN_PAGE_PREV, nowPage > 0);
+			SetButtonEnabled(UI.BTN_PAGE_NEXT, nowPage + 1 < pageNumMax);
+			SetDynamicList(UI.GRD_LIST, "GuildSearchFriendItem", clanFollowers.Count, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 			{
 				GuildSearchFollowerRoomModel.GuildFollowerModel data = clanFollowers[i];
 				SetupListItem(data, i, t);
@@ -117,13 +117,10 @@ public class GuildSearchFriend : FollowListBase
 
 	private void SetFollowerInfo(GuildSearchFollowerRoomModel.GuildFollowerModel data, Transform t)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		SetRenderPlayerModel(t, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data.charInfo, need_weapon: false, need_helm: true, need_leg: false, is_priority_visual_equip: true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), is_priority_visual_equip: true);
 		SetLabelText(t, UI.LBL_NAME, data.charInfo.name);
 		SetLabelText(t, UI.LBL_LEVEL, data.charInfo.level.ToString());
-		DegreePlate component = FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(data.charInfo.selectedDegrees, isButton: false, delegate
+		FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>().Initialize(data.charInfo.selectedDegrees, isButton: false, delegate
 		{
 			GetCtrl(UI.GRD_LIST).GetComponent<UIGrid>().Reposition();
 		});

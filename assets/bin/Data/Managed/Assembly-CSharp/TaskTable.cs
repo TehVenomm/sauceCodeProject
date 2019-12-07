@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 
 public class TaskTable : Singleton<TaskTable>, IDataTable
 {
@@ -82,9 +81,6 @@ public class TaskTable : Singleton<TaskTable>, IDataTable
 	}
 
 	private UIntKeyTable<TaskData> taskDataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<TaskData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string csv_text)
 	{

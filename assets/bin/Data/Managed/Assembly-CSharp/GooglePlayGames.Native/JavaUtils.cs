@@ -14,13 +14,11 @@ namespace GooglePlayGames.Native
 
 		internal static AndroidJavaObject JavaObjectFromPointer(IntPtr jobject)
 		{
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Expected O, but got Unknown
 			if (jobject == IntPtr.Zero)
 			{
 				return null;
 			}
-			return IntPtrConstructor.Invoke(new object[1]
+			return (AndroidJavaObject)IntPtrConstructor.Invoke(new object[1]
 			{
 				jobject
 			});
@@ -38,7 +36,7 @@ namespace GooglePlayGames.Native
 				{
 					return null;
 				}
-				Logger.w("CallObjectMethod exception: " + ex);
+				GooglePlayGames.OurUtils.Logger.w("CallObjectMethod exception: " + ex);
 				return null;
 			}
 		}

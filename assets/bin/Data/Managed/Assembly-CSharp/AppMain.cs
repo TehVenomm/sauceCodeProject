@@ -3,6 +3,7 @@ using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.SceneManagement;
@@ -36,13 +37,21 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	private DateTime localPurchaseItemListRequestTime;
 
+	public ServerListTable.ServerData currentServer;
+
+	public string email;
+
+	public string fbId;
+
+	public string uid;
+
 	private bool changedResolution;
 
 	private IEnumerator changedResolutionWork;
 
 	private bool showingTableLoadError;
 
-	private static Version appVer;
+	private static Version appVer = null;
 
 	private readonly string[] RUNTIME_PERMISSIONS = new string[1]
 	{
@@ -73,7 +82,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		private set;
 	}
 
-	public static int totalReservedMemory => (int)Profiler.GetTotalAllocatedMemory() / 1048576;
+	public static int totalReservedMemory => (int)Profiler.GetTotalAllocatedMemoryLong() / 1048576;
 
 	public static bool needClearMemory => totalReservedMemory > amountMemoryClear;
 
@@ -137,10 +146,17 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		private set;
 	}
 
+	public void ClearChangeServerData()
+	{
+		currentServer = null;
+		email = null;
+		fbId = null;
+		uid = null;
+	}
+
 	public static void Startup()
 	{
-		string text = "Startup()";
-		Application.set_targetFrameRate(30);
+		Application.targetFrameRate = 30;
 		ShaderGlobal.Initialize();
 		EffectManager.Startup();
 	}
@@ -150,7 +166,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		mainCamera = _camera;
 		if (_camera != null)
 		{
-			mainCameraTransform = _camera.get_transform();
+			mainCameraTransform = _camera.transform;
 		}
 		else
 		{
@@ -180,11 +196,11 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 	protected override void Awake()
 	{
 		base.Awake();
-		Object.DontDestroyOnLoad(this);
+		UnityEngine.Object.DontDestroyOnLoad(this);
 		SpecialDeviceManager.StartUp();
 		CrashlyticsReporter.EnableReport();
-		this.defaultScreenWidth = Screen.get_width();
-		defaultScreenHeight = Screen.get_height();
+		this.defaultScreenWidth = Screen.width;
+		defaultScreenHeight = Screen.height;
 		if (this.defaultScreenWidth > defaultScreenHeight)
 		{
 			int defaultScreenWidth = this.defaultScreenWidth;
@@ -192,16 +208,15 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 			defaultScreenHeight = defaultScreenWidth;
 		}
 		SetupScreen();
-		UpdateResolution(Screen.get_width() < Screen.get_height());
+		UpdateResolution(Screen.width < Screen.height);
 		TitleTop.isFirstBoot = true;
 		GC.Collect();
 		long totalMemory = GC.GetTotalMemory(forceFullCollection: false);
-		int num = (int)(52428800 - totalMemory);
-		int num2 = Mathf.Max(num / 1024, 1);
+		int num = Mathf.Max((int)(52428800 - totalMemory) / 1024, 1);
 		object[] array = new object[1024];
 		for (int i = 0; i < array.Length; i++)
 		{
-			array[i] = new byte[num2];
+			array[i] = new byte[num];
 		}
 		array = null;
 		GC.Collect();
@@ -211,7 +226,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 	{
 		if (defaultScreenHeight > 854)
 		{
-			int num = (defaultScreenHeight <= 1280) ? 854 : 1280;
+			int num = (defaultScreenHeight > 1280) ? 1280 : 854;
 			mainScreenWidth = (int)((float)defaultScreenWidth * ((float)num / (float)defaultScreenHeight) + 0.1f);
 			mainScreenHeight = num;
 		}
@@ -242,12 +257,12 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 	private void Start()
 	{
 		CheckRuntimePermission();
-		this.StartCoroutine(OnDelayToInit());
+		StartCoroutine(OnDelayToInit());
 	}
 
 	private IEnumerator OnDelayToInit()
 	{
-		Screen.set_sleepTimeout(-1);
+		Screen.sleepTimeout = -1;
 		isInitialized = false;
 		isApplicationQuit = false;
 		isReset = false;
@@ -255,13 +270,23 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		Startup();
 		InitCollideLayers();
 		yield return null;
-		if ((int)Screen.get_orientation() == 0 || (int)Screen.get_orientation() == 1 || (int)Screen.get_orientation() == 3 || (int)Screen.get_orientation() == 3 || (int)Screen.get_orientation() == 4)
+		string text = Path.Combine(Application.temporaryCachePath, "assetbundles");
+		if (!Directory.Exists(text))
 		{
-			Screen.set_orientation(1);
+			Directory.CreateDirectory(text);
+		}
+		Cache cacheByPath = Caching.GetCacheByPath(text);
+		if (cacheByPath.valid)
+		{
+			Caching.currentCacheForWriting = cacheByPath;
+		}
+		if (Screen.orientation == ScreenOrientation.Unknown || Screen.orientation == ScreenOrientation.Portrait || Screen.orientation == ScreenOrientation.LandscapeLeft || Screen.orientation == ScreenOrientation.LandscapeLeft || Screen.orientation == ScreenOrientation.LandscapeRight)
+		{
+			Screen.orientation = ScreenOrientation.Portrait;
 		}
 		else
 		{
-			Screen.set_orientation(2);
+			Screen.orientation = ScreenOrientation.PortraitUpsideDown;
 		}
 		Utility.Initialize();
 		Temporary.Initialize();
@@ -269,7 +294,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		HomeSelfCharacter.CTRL = true;
 		appVer = NetworkNative.getNativeVersionFromName();
 		yield return null;
-		GameObject go = this.get_gameObject();
+		GameObject go = base.gameObject;
 		go.AddComponent<GoWrapManager>();
 		go.AddComponent<FCMManager>();
 		go.AddComponent<DefaultTimeUpdater>();
@@ -279,7 +304,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		go.AddComponent<GoGameCacheManager>();
 		yield return null;
 		DataTableManager dataTableManager = new GameObject("DataTableManager").AddComponent<DataTableManager>();
-		dataTableManager.get_transform().set_parent(base._transform);
+		dataTableManager.transform.parent = base._transform;
 		dataTableManager.onError += OnTableDownloadError;
 		ResourceManager.enableLoadDirect = false;
 		yield return null;
@@ -296,6 +321,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		yield return null;
 		Utility.CreateGameObjectAndComponent("EffectManager", base._transform);
 		yield return null;
+		ServerAccountSaveData.Load();
 		go.AddComponent<NetworkManager>();
 		go.AddComponent<ProtocolManager>();
 		go.AddComponent<AccountManager>();
@@ -306,6 +332,8 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		Utility.CreateGameObjectAndComponent("ShopReceiver", base._transform);
 		Utility.CreateGameObjectAndComponent("ChatManager", base._transform);
 		Utility.CreateGameObjectAndComponent("GGNativeShare", base._transform);
+		go.AddComponent<EnemyPredownloadManager>();
+		Application.backgroundLoadingPriority = ThreadPriority.Normal;
 		yield return null;
 		go.AddComponent<CoopApp>();
 		go.AddComponent<BootProcess>();
@@ -343,27 +371,27 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		}
 		if (changedResolutionWork != null)
 		{
-			this.StopCoroutine(changedResolutionWork);
+			StopCoroutine(changedResolutionWork);
 		}
 		changedResolutionWork = _UpdateResolution(num, num2);
-		this.StartCoroutine(changedResolutionWork);
+		StartCoroutine(changedResolutionWork);
 	}
 
 	private IEnumerator _UpdateResolution(int w, int h)
 	{
-		UIRenderTexture[] renderTextures = this.get_gameObject().GetComponentsInChildren<UIRenderTexture>(true);
+		UIRenderTexture[] renderTextures = base.gameObject.GetComponentsInChildren<UIRenderTexture>(includeInactive: true);
 		int i = 0;
 		for (int num = renderTextures.Length; i < num; i++)
 		{
-			renderTextures[i].set_enabled(false);
+			renderTextures[i].enabled = false;
 		}
-		Screen.SetResolution(w, h, true);
-		yield return (object)new WaitForEndOfFrame();
-		yield return (object)new WaitForEndOfFrame();
+		Screen.SetResolution(w, h, fullscreen: true);
+		yield return new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		int j = 0;
 		for (int num2 = renderTextures.Length; j < num2; j++)
 		{
-			renderTextures[j].set_enabled(true);
+			renderTextures[j].enabled = true;
 		}
 		changedResolutionWork = null;
 	}
@@ -380,7 +408,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	private void CreateDefaultCamera()
 	{
-		if (Camera.get_main() == null)
+		if (Camera.main == null)
 		{
 			ResourceUtility.Realizes(Resources.Load("System/DefaultMainCamera"), base._transform);
 		}
@@ -391,12 +419,12 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		if (pause_status)
 		{
 			GameSaveData.Save();
-			Screen.set_sleepTimeout(-2);
+			Screen.sleepTimeout = -2;
 			Native.CancelAllLocalNotification();
 			RegisterLocalNotify();
 			return;
 		}
-		Screen.set_sleepTimeout(-1);
+		Screen.sleepTimeout = -1;
 		if (isInitialized && !CheckInvitedClanBySNS() && !CheckInvitedPartyBySNS() && !CheckInvitedLoungeBySNS() && !CheckMutualFollowBySNS())
 		{
 			if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "HomeTop" || MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "LoungeTop" || MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "ClanTop")
@@ -414,10 +442,9 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	private bool CheckInvitedClanBySNS()
 	{
-		string @string = PlayerPrefs.GetString("ic");
-		if (!string.IsNullOrEmpty(@string))
+		if (!string.IsNullOrEmpty(PlayerPrefs.GetString("ic")))
 		{
-			PlayerPrefs.SetString("ic", string.Empty);
+			PlayerPrefs.SetString("ic", "");
 			if (MonoBehaviourSingleton<GameSceneManager>.I.IsExecutionAutoEvent() && TutorialStep.HasAllTutorialCompleted())
 			{
 				MonoBehaviourSingleton<GameSceneManager>.I.StopAutoEvent();
@@ -449,7 +476,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		if (!string.IsNullOrEmpty(@string))
 		{
 			MonoBehaviourSingleton<PartyManager>.I.InviteValue = @string;
-			PlayerPrefs.SetString("im", string.Empty);
+			PlayerPrefs.SetString("im", "");
 			if (MonoBehaviourSingleton<GameSceneManager>.I.IsExecutionAutoEvent() && TutorialStep.HasAllTutorialCompleted())
 			{
 				MonoBehaviourSingleton<GameSceneManager>.I.StopAutoEvent();
@@ -476,7 +503,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		if (!string.IsNullOrEmpty(@string))
 		{
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.InviteValue = @string;
-			PlayerPrefs.SetString("il", string.Empty);
+			PlayerPrefs.SetString("il", "");
 			if (MonoBehaviourSingleton<GameSceneManager>.I.IsExecutionAutoEvent() && TutorialStep.HasAllTutorialCompleted())
 			{
 				MonoBehaviourSingleton<GameSceneManager>.I.StopAutoEvent();
@@ -492,7 +519,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 			EventData[] array = null;
 			if (MonoBehaviourSingleton<LoungeManager>.IsValid())
 			{
-				this.StartCoroutine(SetAutoEventLoungeToLounge(@string));
+				StartCoroutine(SetAutoEventLoungeToLounge(@string));
 			}
 			else
 			{
@@ -515,10 +542,9 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		{
 			yield return null;
 		}
-		string[] values = inviteLoungeValue.Split('_');
-		if (!(values[0] == MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData.loungeNumber))
+		if (!(inviteLoungeValue.Split('_')[0] == MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData.loungeNumber))
 		{
-			EventData[] auto_event_data = new EventData[5]
+			EventData[] autoEvents = new EventData[5]
 			{
 				new EventData("MAIN_MENU_LOUNGE", null),
 				new EventData("LOUNGE_SETTINGS", null),
@@ -526,7 +552,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 				new EventData("LOUNGE", null),
 				new EventData("INVITED_LOUNGE", null)
 			};
-			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(auto_event_data);
+			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
 		}
 	}
 
@@ -536,7 +562,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		if (!string.IsNullOrEmpty(@string))
 		{
 			MonoBehaviourSingleton<FriendManager>.I.MutualFollowValue = @string;
-			PlayerPrefs.SetString("fc", string.Empty);
+			PlayerPrefs.SetString("fc", "");
 			if (MonoBehaviourSingleton<GameSceneManager>.I.IsExecutionAutoEvent() && TutorialStep.HasAllTutorialCompleted())
 			{
 				MonoBehaviourSingleton<GameSceneManager>.I.StopAutoEvent();
@@ -553,7 +579,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 			};
 			if (TutorialStep.HasAllTutorialCompleted())
 			{
-				PlayerPrefs.SetString("fc", string.Empty);
+				PlayerPrefs.SetString("fc", "");
 				MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
 				return true;
 			}
@@ -586,12 +612,12 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		return true;
 	}
 
-	public Coroutine ClearMemory(bool clearObjCaches, bool clearPreloaded)
+	public Coroutine ClearMemory(bool clearObjCaches, bool clearPreloaded, bool IsLowPriority = false)
 	{
-		return this.StartCoroutine(DoClearMemory(clearObjCaches, clearPreloaded));
+		return StartCoroutine(DoClearMemory(clearObjCaches, clearPreloaded, IsLowPriority));
 	}
 
-	private IEnumerator DoClearMemory(bool clearObjCaches, bool clearPreloaded)
+	private IEnumerator DoClearMemory(bool clearObjCaches, bool clearPreloaded, bool IsLowPriority)
 	{
 		while (isExecutingClearMemory)
 		{
@@ -606,8 +632,16 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 			}
 			if (clearObjCaches)
 			{
-				MonoBehaviourSingleton<ResourceManager>.I.cache.ClearPackageCaches();
-				MonoBehaviourSingleton<ResourceManager>.I.cache.ClearObjectCaches(clearPreloaded);
+				if (IsLowPriority)
+				{
+					yield return MonoBehaviourSingleton<ResourceManager>.I.cache.DoClearPackageCaches();
+					yield return MonoBehaviourSingleton<ResourceManager>.I.cache.DoClearObjectCaches(clearPreloaded);
+				}
+				else
+				{
+					MonoBehaviourSingleton<ResourceManager>.I.cache.ClearPackageCaches();
+					MonoBehaviourSingleton<ResourceManager>.I.cache.ClearObjectCaches(clearPreloaded);
+				}
 			}
 			MonoBehaviourSingleton<ResourceManager>.I.cache.ClearSENameDictionary();
 		}
@@ -622,7 +656,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	public Coroutine ClearEnemyAssets()
 	{
-		return this.StartCoroutine(DoClearEnemyAssets());
+		return StartCoroutine(DoClearEnemyAssets());
 	}
 
 	private IEnumerator DoClearEnemyAssets()
@@ -658,7 +692,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	public Coroutine UnloadUnusedAssets(bool need_gc_collect)
 	{
-		return this.StartCoroutine(DoUnloadUnusedAssets(need_gc_collect));
+		return StartCoroutine(DoUnloadUnusedAssets(need_gc_collect));
 	}
 
 	private IEnumerator DoUnloadUnusedAssets(bool need_gc_collect)
@@ -668,19 +702,19 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 			yield return null;
 		}
 		isExecutingUnloadUnusedAssets = true;
-		frameExecutedUnloadUnusedAssets = Time.get_frameCount();
+		frameExecutedUnloadUnusedAssets = Time.frameCount;
 		if (need_gc_collect)
 		{
 			GC.Collect();
-			yield return (object)new WaitForEndOfFrame();
-			yield return (object)new WaitForEndOfFrame();
-			yield return (object)new WaitForEndOfFrame();
+			yield return new WaitForEndOfFrame();
+			yield return new WaitForEndOfFrame();
+			yield return new WaitForEndOfFrame();
 		}
 		yield return Resources.UnloadUnusedAssets();
 		isExecutingUnloadUnusedAssets = false;
-		yield return (object)new WaitForEndOfFrame();
-		yield return (object)new WaitForEndOfFrame();
-		yield return (object)new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 	}
 
 	public void ClearPoolObjects()
@@ -705,7 +739,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 	{
 		if (MonoBehaviourSingleton<ResourceManager>.IsValid())
 		{
-			this.StartCoroutine(DoReset(need_clear_cache, need_predownload));
+			StartCoroutine(DoReset(need_clear_cache, need_predownload));
 		}
 	}
 
@@ -724,20 +758,20 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		{
 			MonoBehaviourSingleton<SoundManager>.I.requestBGMID = 0;
 			MonoBehaviourSingleton<SoundManager>.I.fadeOutTime = 1f;
-			yield return (object)new WaitForSeconds(1f);
+			yield return new WaitForSeconds(1f);
 		}
 		if (MonoBehaviourSingleton<PredownloadManager>.IsValid())
 		{
-			Object.DestroyImmediate(MonoBehaviourSingleton<PredownloadManager>.I);
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<PredownloadManager>.I);
 		}
 		if (MonoBehaviourSingleton<LoadingProcess>.IsValid())
 		{
-			Object.DestroyImmediate(MonoBehaviourSingleton<LoadingProcess>.I);
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<LoadingProcess>.I);
 		}
 		if (MonoBehaviourSingleton<DataTableManager>.IsValid())
 		{
 			MonoBehaviourSingleton<DataTableManager>.I.Clear();
-			Object.DestroyImmediate(MonoBehaviourSingleton<DataTableManager>.I);
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<DataTableManager>.I);
 		}
 		if (MonoBehaviourSingleton<ResourceManager>.IsValid())
 		{
@@ -757,11 +791,11 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 			}
 			yield return UnloadUnusedAssets(need_gc_collect: true);
 			PlayerPrefs.SetInt("AppMain.Reset", (need_clear_cache ? 1 : 0) | (need_predownload ? 2 : 0));
-			yield return this.StartCoroutine(ResourceManager.ClearCache());
-			yield return (object)new WaitForSeconds(1f);
+			yield return StartCoroutine(ResourceManager.ClearCache());
+			yield return new WaitForSeconds(1f);
 			if (need_predownload && Singleton<StringTable>.IsValid() && MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.loading != null)
 			{
-				this.get_gameObject().AddComponent<PredownloadManager>();
+				base.gameObject.AddComponent<PredownloadManager>();
 				while (MonoBehaviourSingleton<PredownloadManager>.I.totalCount == 0)
 				{
 					yield return null;
@@ -782,44 +816,43 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 			}
 			PlayerPrefs.SetInt("AppMain.Reset", 0);
 		}
-		this.get_gameObject().BroadcastMessage("OnApplicationQuit", 1);
-		MonoBehaviour[] monos = this.GetComponents<MonoBehaviour>();
-		for (int num = base._transform.get_childCount() - 1; num >= 0; num--)
+		base.gameObject.BroadcastMessage("OnApplicationQuit", SendMessageOptions.DontRequireReceiver);
+		MonoBehaviour[] components = GetComponents<MonoBehaviour>();
+		for (int num = base._transform.childCount - 1; num >= 0; num--)
 		{
-			base._transform.GetChild(num).get_gameObject().SetActive(false);
+			base._transform.GetChild(num).gameObject.SetActive(value: false);
 		}
-		MonoBehaviour[] array = monos;
-		foreach (MonoBehaviour val in array)
+		MonoBehaviour[] array = components;
+		foreach (MonoBehaviour monoBehaviour in array)
 		{
-			if (val != null && val != this)
+			if (monoBehaviour != null && monoBehaviour != this)
 			{
-				val.set_enabled(false);
+				monoBehaviour.enabled = false;
 			}
 		}
 		SetMainCamera(null);
-		for (int num2 = base._transform.get_childCount() - 1; num2 >= 0; num2--)
+		for (int num2 = base._transform.childCount - 1; num2 >= 0; num2--)
 		{
-			GameObject gameObject = base._transform.GetChild(num2).get_gameObject();
-			Object.DestroyImmediate(gameObject);
+			UnityEngine.Object.DestroyImmediate(base._transform.GetChild(num2).gameObject);
 		}
-		MonoBehaviour[] array2 = monos;
-		foreach (MonoBehaviour val2 in array2)
+		array = components;
+		foreach (MonoBehaviour monoBehaviour2 in array)
 		{
-			if (val2 != this)
+			if (monoBehaviour2 != this)
 			{
-				Object.DestroyImmediate(val2);
+				UnityEngine.Object.DestroyImmediate(monoBehaviour2);
 			}
 		}
 		CreateDefaultCamera();
-		yield return (object)new WaitForEndOfFrame();
-		yield return (object)new WaitForEndOfFrame();
-		yield return (object)new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		SingletonBase.RemoveAllInstance();
 		yield return Resources.UnloadUnusedAssets();
 		GC.Collect();
-		yield return (object)new WaitForEndOfFrame();
-		yield return (object)new WaitForEndOfFrame();
-		yield return (object)new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		MonoBehaviourSingleton<AppMain>.I.startScene = "Title";
 		Start();
 	}
@@ -875,7 +908,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	public static void Delay(float sec, Action func)
 	{
-		if (object.ReferenceEquals(MonoBehaviourSingleton<AppMain>.I, null))
+		if ((object)MonoBehaviourSingleton<AppMain>.I == null)
 		{
 			func();
 		}
@@ -887,7 +920,7 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	private IEnumerator _Delay(float sec, Action func)
 	{
-		yield return (object)new WaitForSeconds(sec);
+		yield return new WaitForSeconds(sec);
 		func();
 	}
 
@@ -912,7 +945,8 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		for (int i = 0; i < localNotificationGuildRequestTime.Count; i++)
 		{
 			DateTime dateTime = localNotificationGuildRequestTime[i];
-			int num = (int)new TimeSpan(dateTime.Ticks - DateTime.Now.Ticks).TotalSeconds;
+			TimeSpan timeSpan = new TimeSpan(dateTime.Ticks - DateTime.Now.Ticks);
+			int num = (int)timeSpan.TotalSeconds;
 			if (0 < num)
 			{
 				int num2 = i;
@@ -924,10 +958,10 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 					Native.RegisterLocalNotification(num2, title, body, num);
 				}
 				DateTime dateTime2 = dateTime.Add(new TimeSpan(6, 0, 0));
-				int hours2 = dateTime2.TimeOfDay.Hours;
-				if (hours2 >= 8)
+				if (dateTime2.TimeOfDay.Hours >= 8)
 				{
-					int afterSeconds = (int)new TimeSpan(dateTime2.Ticks - DateTime.Now.Ticks).TotalSeconds;
+					TimeSpan timeSpan2 = new TimeSpan(dateTime2.Ticks - DateTime.Now.Ticks);
+					int afterSeconds = (int)timeSpan2.TotalSeconds;
 					string body2 = StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 20u);
 					Native.RegisterLocalNotification(num2 + 100, title, body2, afterSeconds);
 				}
@@ -941,7 +975,8 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 		{
 			return;
 		}
-		int num = (int)new TimeSpan(localPurchaseItemListRequestTime.Ticks - DateTime.Now.Ticks).TotalSeconds;
+		TimeSpan timeSpan = new TimeSpan(localPurchaseItemListRequestTime.Ticks - DateTime.Now.Ticks);
+		int num = (int)timeSpan.TotalSeconds;
 		int id = 900001;
 		int num2 = 0;
 		if (MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.skuPopups.Count > 0)
@@ -994,12 +1029,12 @@ public class AppMain : MonoBehaviourSingleton<AppMain>
 
 	public void ChangeScene(string scene, string section, Action callback)
 	{
-		this.StartCoroutine(CRChangeScene(scene, section, callback));
+		StartCoroutine(CRChangeScene(scene, section, callback));
 	}
 
 	private IEnumerator CRChangeScene(string scene, string section, Action callback)
 	{
-		yield return (object)new WaitUntil((Func<bool>)(() => MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing));
+		yield return new WaitUntil(() => MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing);
 		callback?.Invoke();
 		MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene(scene, section);
 	}

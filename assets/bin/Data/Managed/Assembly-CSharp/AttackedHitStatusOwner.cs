@@ -152,13 +152,10 @@ public class AttackedHitStatusOwner
 	{
 		get
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			return origin.hostPos;
 		}
 		set
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			origin.hostPos = value;
 		}
 	}
@@ -239,13 +236,10 @@ public class AttackedHitStatusOwner
 	{
 		get
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			return origin.blowForce;
 		}
 		set
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			origin.blowForce = value;
 		}
 	}

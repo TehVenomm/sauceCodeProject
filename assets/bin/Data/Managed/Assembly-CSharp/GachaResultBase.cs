@@ -111,11 +111,12 @@ public abstract class GachaResultBase : GameSection
 
 	protected virtual IEnumerator LoadMultiResultUI(LoadingQueue loadQueue)
 	{
-		SetActive((Enum)UI.FOOTER_ROOT, is_visible: false);
-		SetActive((Enum)UI.FOOTER_GUARANTEE_ROOT, is_visible: false);
-		SetActive((Enum)UI.FOOTER_MULTI_RESULT_ROOT, is_visible: true);
+		SetActive(UI.FOOTER_ROOT, is_visible: false);
+		SetActive(UI.FOOTER_GUARANTEE_ROOT, is_visible: false);
+		SetActive(UI.FOOTER_MULTI_RESULT_ROOT, is_visible: true);
 		footerRoot = GetCtrl(UI.FOOTER_MULTI_RESULT_ROOT);
-		yield return LoadGachaButton(buttonName: CreateButtonName(), loadQueue: loadQueue, parent: FindCtrl(footerRoot, UI.BTN_NEXT));
+		string buttonName = CreateButtonName();
+		yield return LoadGachaButton(loadQueue, FindCtrl(footerRoot, UI.BTN_NEXT), buttonName);
 		SetEvent(FindCtrl(footerRoot, UI.BTN_NEXT).GetChild(0), "NEXT_PERFORMANCE", -1);
 		yield return LoadGachaGuaranteeCounter(loadQueue, nextGachaGuarantee, delegate(LoadObject lo_guarantee)
 		{
@@ -125,8 +126,7 @@ public abstract class GachaResultBase : GameSection
 
 	protected string CreateButtonName()
 	{
-		string str = MonoBehaviourSingleton<GachaManager>.I.CreateButtonBaseName(MonoBehaviourSingleton<GachaManager>.I.selectGacha, nextGachaGuarantee, resultScene: true);
-		return str + "_RESULT";
+		return MonoBehaviourSingleton<GachaManager>.I.CreateButtonBaseName(MonoBehaviourSingleton<GachaManager>.I.selectGacha, nextGachaGuarantee, resultScene: true) + "_RESULT";
 	}
 
 	protected IEnumerator LoadGachaButton(LoadingQueue loadQueue, Transform parent, string buttonName)
@@ -136,33 +136,33 @@ public abstract class GachaResultBase : GameSection
 		{
 			yield return loadQueue.Wait();
 		}
-		buttonObj = (Object.Instantiate(lo_button.loadedObject) as GameObject);
-		buttonObj.get_transform().set_parent(parent);
-		buttonObj.get_transform().set_name(parent.get_name());
-		buttonObj.get_transform().set_localScale(new Vector3(1f, 1f, 1f));
-		buttonObj.get_transform().set_localPosition(new Vector3(0f, 0f, 0f));
+		buttonObj = (UnityEngine.Object.Instantiate(lo_button.loadedObject) as GameObject);
+		buttonObj.transform.parent = parent;
+		buttonObj.transform.name = parent.name;
+		buttonObj.transform.localScale = new Vector3(1f, 1f, 1f);
+		buttonObj.transform.localPosition = new Vector3(0f, 0f, 0f);
 	}
 
 	protected IEnumerator LoadGachaGuaranteeCounter(LoadingQueue loadQueue, GachaGuaranteeCampaignInfo guarantee, Action<LoadObject> callback)
 	{
-		string imgName = string.Empty;
+		string text = "";
 		if (guarantee.IsValid())
 		{
-			imgName = guarantee.GetTitleImageName();
+			text = guarantee.GetTitleImageName();
 		}
 		GachaResult currentGachaResult = MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult();
 		if (currentGachaResult.detailButtonImg == null)
 		{
-			currentGachaResult.detailButtonImg = string.Empty;
+			currentGachaResult.detailButtonImg = "";
 		}
-		if (currentGachaResult.detailButtonImg != string.Empty)
+		if (currentGachaResult.detailButtonImg != "")
 		{
-			imgName = currentGachaResult.detailButtonImg;
+			text = currentGachaResult.detailButtonImg;
 		}
-		if (imgName != string.Empty)
+		if (text != "")
 		{
 			isExistDetailButton = true;
-			LoadObject loadObject = loadQueue.Load(RESOURCE_CATEGORY.GACHA_GUARANTEE_COUNTER, imgName);
+			LoadObject loadObject = loadQueue.Load(RESOURCE_CATEGORY.GACHA_GUARANTEE_COUNTER, text);
 			if (loadQueue.IsLoading())
 			{
 				yield return loadQueue.Wait();
@@ -195,13 +195,13 @@ public abstract class GachaResultBase : GameSection
 			SetGachaButtonActive(enableRetry: false);
 			return;
 		}
-		string empty = string.Empty;
+		string text = "";
 		if (MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId > 0)
 		{
 			int ticketId = MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId;
 			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == ticketId, 1);
 			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)ticketId);
-			empty = itemData.name + " " + MonoBehaviourSingleton<GachaManager>.I.selectGacha.needItemNum + StringTable.Get(STRING_CATEGORY.COMMON, 4000u) + "\n";
+			text = itemData.name + " " + MonoBehaviourSingleton<GachaManager>.I.selectGacha.needItemNum + StringTable.Get(STRING_CATEGORY.COMMON, 4000u) + "\n";
 			if (MonoBehaviourSingleton<GachaManager>.I.selectGacha.needItemNum > itemNum)
 			{
 				object[] event_data = new object[2]
@@ -215,11 +215,11 @@ public abstract class GachaResultBase : GameSection
 		}
 		else
 		{
-			empty = StringTable.Get(STRING_CATEGORY.COMMON, 100u) + " " + GetCrystalNum() + StringTable.Get(STRING_CATEGORY.COMMON, 3000u);
+			text = StringTable.Get(STRING_CATEGORY.COMMON, 100u) + " " + GetCrystalNum() + StringTable.Get(STRING_CATEGORY.COMMON, 3000u);
 		}
 		GameSection.SetEventData(new object[1]
 		{
-			empty
+			text
 		});
 	}
 
@@ -227,8 +227,7 @@ public abstract class GachaResultBase : GameSection
 	{
 		if (MonoBehaviourSingleton<GachaManager>.I.IsExistNextGachaResult())
 		{
-			GachaResult nextGachaResult = MonoBehaviourSingleton<GachaManager>.I.GetNextGachaResult();
-			if (nextGachaResult.reward[0].rewardType == 6)
+			if (MonoBehaviourSingleton<GachaManager>.I.GetNextGachaResult().reward[0].rewardType == 6)
 			{
 				GameSection.ChangeEvent("NEXT_PERFORMANCE_QUEST");
 			}
@@ -244,8 +243,7 @@ public abstract class GachaResultBase : GameSection
 	{
 		if (MonoBehaviourSingleton<GachaManager>.I.IsResultBonus())
 		{
-			GachaResult gachaResultBonus = MonoBehaviourSingleton<GachaManager>.I.gachaResultBonus;
-			if (gachaResultBonus.reward[0].rewardType == 6)
+			if (MonoBehaviourSingleton<GachaManager>.I.gachaResultBonus.reward[0].rewardType == 6)
 			{
 				GameSection.ChangeEvent("NEXT_PERFORMANCE_QUEST");
 			}
@@ -263,7 +261,11 @@ public abstract class GachaResultBase : GameSection
 		{
 			return MonoBehaviourSingleton<GachaManager>.I.selectGacha.crystalNum;
 		}
-		return (!nextGachaGuarantee.hasFreeGachaReward) ? MonoBehaviourSingleton<GachaManager>.I.selectGacha.crystalNum : 0;
+		if (!nextGachaGuarantee.hasFreeGachaReward)
+		{
+			return MonoBehaviourSingleton<GachaManager>.I.selectGacha.crystalNum;
+		}
+		return 0;
 	}
 
 	protected bool IsEnableEntry()
@@ -285,14 +287,13 @@ public abstract class GachaResultBase : GameSection
 
 	protected void SetGachaButtonActive(bool enableRetry)
 	{
-		Transform root = FindCtrl(buttonObj.get_transform(), (!enableRetry) ? UI.OBJ_GACHA_DISABLE_ROOT : UI.OBJ_GACHA_ENABLE_ROOT);
-		SetActive(buttonObj.get_transform(), UI.OBJ_GACHA_ENABLE_ROOT, enableRetry);
-		SetActive(buttonObj.get_transform(), UI.OBJ_GACHA_DISABLE_ROOT, !enableRetry);
-		int num = (MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId <= 0) ? GetCrystalNum() : MonoBehaviourSingleton<GachaManager>.I.selectGacha.needItemNum;
-		SetLabelText(root, UI.LBL_PRICE, num.ToString());
+		Transform root = FindCtrl(buttonObj.transform, enableRetry ? UI.OBJ_GACHA_ENABLE_ROOT : UI.OBJ_GACHA_DISABLE_ROOT);
+		SetActive(buttonObj.transform, UI.OBJ_GACHA_ENABLE_ROOT, enableRetry);
+		SetActive(buttonObj.transform, UI.OBJ_GACHA_DISABLE_ROOT, !enableRetry);
+		SetLabelText(text: ((MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId > 0) ? MonoBehaviourSingleton<GachaManager>.I.selectGacha.needItemNum : GetCrystalNum()).ToString(), root: root, label_enum: UI.LBL_PRICE);
 		if (!enableRetry)
 		{
-			SetButtonEnabled(buttonObj.get_transform(), is_enabled: false);
+			SetButtonEnabled(buttonObj.transform, is_enabled: false);
 		}
 	}
 }

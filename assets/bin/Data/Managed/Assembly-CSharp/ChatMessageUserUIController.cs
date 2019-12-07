@@ -38,6 +38,16 @@ public class ChatMessageUserUIController
 
 	public bool IsConnecting => m_isConnecting;
 
+	private void SetStartConnecting()
+	{
+		m_isConnecting = true;
+	}
+
+	private void SetEndConnecting()
+	{
+		m_isConnecting = false;
+	}
+
 	public ChatMessageUserUIController()
 	{
 	}
@@ -53,25 +63,15 @@ public class ChatMessageUserUIController
 		}
 	}
 
-	private void SetStartConnecting()
-	{
-		m_isConnecting = true;
-	}
-
-	private void SetEndConnecting()
-	{
-		m_isConnecting = false;
-	}
-
 	public IEnumerator LoadInternalResources(MonoBehaviour _coroutineExecutor)
 	{
 		if (!(m_userItemPrefab != null))
 		{
-			LoadingQueue load_queue = new LoadingQueue(_coroutineExecutor);
-			LoadObject loadObject_ListItem = load_queue.Load(RESOURCE_CATEGORY.UI, "FollowListBaseItem");
-			if (load_queue.IsLoading())
+			LoadingQueue loadingQueue = new LoadingQueue(_coroutineExecutor);
+			LoadObject loadObject_ListItem = loadingQueue.Load(RESOURCE_CATEGORY.UI, "FollowListBaseItem");
+			if (loadingQueue.IsLoading())
 			{
-				yield return load_queue.Wait();
+				yield return loadingQueue.Wait();
 			}
 			m_userItemPrefab = (loadObject_ListItem.loadedObject as GameObject);
 		}
@@ -113,40 +113,37 @@ public class ChatMessageUserUIController
 
 	protected void GenerateMessageUserList(List<FriendMessageUserListModel.MessageUserInfo> recv_data)
 	{
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
 		SetRootAlpha(0f);
 		RecycleItem();
-		int len = (recv_data != null) ? recv_data.Count : 0;
+		int len = recv_data?.Count ?? 0;
 		m_currentItemList = GetItemObjects(len, m_itemListParent);
 		int loadCompleteCount = 0;
 		for (int i = 0; i < len; i++)
 		{
 			HomeMutualFollowerListItem homeMutualFollowerListItem = m_currentItemList[i];
-			homeMutualFollowerListItem.get_transform().set_localPosition(Vector3.get_down() * ((float)i * 130f));
-			homeMutualFollowerListItem.get_transform().set_localScale(Vector3.get_one() * 0.98f);
-			HomeMutualFollowerListItem.InitParam initParam = new HomeMutualFollowerListItem.InitParam();
-			initParam.CharacterInfo = recv_data[i];
-			initParam.Index = i;
-			initParam.IsFollower = recv_data[i].follower;
-			initParam.IsFollowing = recv_data[i].following;
-			initParam.clanId = ((recv_data[i].userClanData == null) ? string.Empty : recv_data[i].userClanData.cId);
-			initParam.NoReadMsgNum = recv_data[i].noReadNum;
-			initParam.IsPermittedMessage = recv_data[i].isPermitted;
-			initParam.IsUseRenderTextureCharaModel = (!FieldManager.IsValidInField() && !FieldManager.IsValidInGame() && !FieldManager.IsValidInTutorial());
-			initParam.OnClickItem = OnClickItem;
-			initParam.OnCompleteLoading = delegate
+			homeMutualFollowerListItem.transform.localPosition = Vector3.down * ((float)i * 130f);
+			homeMutualFollowerListItem.transform.localScale = Vector3.one * 0.98f;
+			homeMutualFollowerListItem.Initialize(new HomeMutualFollowerListItem.InitParam
 			{
-				loadCompleteCount++;
-				int num = Mathf.Min(len, m_visibleItemCount);
-				if (loadCompleteCount >= num)
+				CharacterInfo = recv_data[i],
+				Index = i,
+				IsFollower = recv_data[i].follower,
+				IsFollowing = recv_data[i].following,
+				clanId = ((recv_data[i].userClanData != null) ? recv_data[i].userClanData.cId : ""),
+				NoReadMsgNum = recv_data[i].noReadNum,
+				IsPermittedMessage = recv_data[i].isPermitted,
+				IsUseRenderTextureCharaModel = (!FieldManager.IsValidInField() && !FieldManager.IsValidInGame() && !FieldManager.IsValidInTutorial()),
+				OnClickItem = OnClickItem,
+				OnCompleteLoading = delegate
 				{
-					SetRootAlpha(1f);
+					loadCompleteCount++;
+					int num = Mathf.Min(len, m_visibleItemCount);
+					if (loadCompleteCount >= num)
+					{
+						SetRootAlpha(1f);
+					}
 				}
-			};
-			homeMutualFollowerListItem.Initialize(initParam);
+			});
 		}
 	}
 
@@ -187,10 +184,10 @@ public class ChatMessageUserUIController
 		int num = _requestCount - list.Count;
 		for (int j = 0; j < num; j++)
 		{
-			Transform val = ResourceUtility.Realizes(m_userItemPrefab, _parentObj, 5);
-			if (!(val == null))
+			Transform transform = ResourceUtility.Realizes(m_userItemPrefab, _parentObj, 5);
+			if (!(transform == null))
 			{
-				HomeMutualFollowerListItem component = val.GetComponent<HomeMutualFollowerListItem>();
+				HomeMutualFollowerListItem component = transform.GetComponent<HomeMutualFollowerListItem>();
 				if (!(component == null))
 				{
 					list.Add(component);
@@ -244,7 +241,7 @@ public class ChatMessageUserUIController
 		for (int count = m_currentItemList.Count; i < count; i++)
 		{
 			m_currentItemList[i].CleanRenderTexture();
-			Object.Destroy(m_currentItemList[i].get_gameObject());
+			UnityEngine.Object.Destroy(m_currentItemList[i].gameObject);
 			m_currentItemList[i] = null;
 		}
 		m_currentItemList.Clear();

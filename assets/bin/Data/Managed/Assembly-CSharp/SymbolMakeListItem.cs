@@ -26,11 +26,6 @@ public class SymbolMakeListItem : MonoBehaviour
 		protected set;
 	}
 
-	public SymbolMakeListItem()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		m_Button.CacheDefaultColor();
@@ -58,7 +53,7 @@ public class SymbolMakeListItem : MonoBehaviour
 
 	public void SetButtonActive(bool isActive)
 	{
-		m_Colider.set_enabled(isActive);
-		m_Button.set_enabled(isActive);
+		m_Colider.enabled = isActive;
+		m_Button.enabled = isActive;
 	}
 }

@@ -39,38 +39,27 @@ public class SpotManager
 
 		public void Update(Camera camera)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			if (null != camera)
 			{
-				Vector3 val = camera.WorldToScreenPoint(originalPos);
-				val = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
-				val.z = 0f;
-				_transform.set_position(val);
+				Vector3 position = camera.WorldToScreenPoint(originalPos);
+				position = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(position);
+				position.z = 0f;
+				_transform.position = position;
 			}
 		}
 
 		public Vector2 GetScreenPos()
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 val = MonoBehaviourSingleton<UIManager>.I.uiCamera.WorldToViewportPoint(_transform.get_position());
-			return new Vector2(val.x, val.y);
+			Vector3 vector = MonoBehaviourSingleton<UIManager>.I.uiCamera.WorldToViewportPoint(_transform.position);
+			return new Vector2(vector.x, vector.y);
 		}
 
 		public void SetIconSprite(string iconObjectName, Texture2D icon, int iconWidth, int iconHeight)
 		{
-			Transform val = _transform.Find(iconObjectName);
-			if (!(val == null))
+			Transform transform = _transform.Find(iconObjectName);
+			if (!(transform == null))
 			{
-				UITexture component = val.get_gameObject().GetComponent<UITexture>();
+				UITexture component = transform.gameObject.GetComponent<UITexture>();
 				if (!(component == null))
 				{
 					component.mainTexture = icon;
@@ -82,39 +71,38 @@ public class SpotManager
 
 		public void ReleaseRegion(string name, Texture2D icon, string eventName)
 		{
-			Transform val = _transform.Find("LBL_NAME");
-			if (val != null)
+			Transform transform = _transform.Find("LBL_NAME");
+			if (transform != null)
 			{
-				UILabel component = val.GetComponent<UILabel>();
-				component.text = name;
+				transform.GetComponent<UILabel>().text = name;
 			}
-			Transform val2 = _transform.Find("SPR_ICON");
-			if (val2 == null)
+			Transform transform2 = _transform.Find("SPR_ICON");
+			if (transform2 == null)
 			{
 				return;
 			}
-			UITexture component2 = val2.get_gameObject().GetComponent<UITexture>();
-			if (!(component2 == null))
+			UITexture component = transform2.gameObject.GetComponent<UITexture>();
+			if (!(component == null))
 			{
-				component2.mainTexture = icon;
-				UIGameSceneEventSender component3 = _transform.Find("SPR_BUTTON").GetComponent<UIGameSceneEventSender>();
+				component.mainTexture = icon;
+				UIGameSceneEventSender component2 = _transform.Find("SPR_BUTTON").GetComponent<UIGameSceneEventSender>();
 				if (string.IsNullOrEmpty(eventName))
 				{
-					Object.Destroy(component3.get_gameObject());
+					UnityEngine.Object.Destroy(component2.gameObject);
 				}
 				else
 				{
-					component3.eventName = eventName;
+					component2.eventName = eventName;
 				}
 			}
 		}
 
 		public void UpdateDeliveryTargetMarker(bool isExistDelivery)
 		{
-			Transform val = _transform.Find("SPR_DELIVERY_TARGET");
-			if (val != null)
+			Transform transform = _transform.Find("SPR_DELIVERY_TARGET");
+			if (transform != null)
 			{
-				val.get_gameObject().SetActive(isExistDelivery);
+				transform.gameObject.SetActive(isExistDelivery);
 			}
 		}
 	}
@@ -151,7 +139,7 @@ public class SpotManager
 		}
 		else if (t != null)
 		{
-			spotRootTransform.set_parent(t);
+			spotRootTransform.parent = t;
 		}
 		return spotRootTransform;
 	}
@@ -167,7 +155,7 @@ public class SpotManager
 		{
 			if (spots[i] != null)
 			{
-				Object.Destroy(spots[i]._transform.get_gameObject());
+				UnityEngine.Object.Destroy(spots[i]._transform.gameObject);
 				spots[i] = null;
 			}
 		}
@@ -184,8 +172,6 @@ public class SpotManager
 
 	public Spot AddSpot(int id, string name, Vector3 pos, ICON_TYPE icon, string event_name, bool isNew = false, bool canUnlockNewPortal = false, bool viewEnemyPopBallon = false, object _event = null, Texture2D dungeon_icon = null, bool isExistDelivery = false, HAPPEN_CONDITION happenQuestCondition = HAPPEN_CONDITION.NONE, int mapNo = 0)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		CreateSpotRoot();
 		Spot spot = new Spot();
 		spot.id = id;
@@ -193,110 +179,108 @@ public class SpotManager
 		spot.type = icon;
 		spot.mapNo = mapNo;
 		spot._transform = ResourceUtility.Realizes(spotPrefab, spotRootTransform, 5);
-		Transform val = spot._transform.Find("LBL_NAME");
-		if (val != null)
+		Transform transform = spot._transform.Find("LBL_NAME");
+		if (transform != null)
 		{
-			UILabel component = val.GetComponent<UILabel>();
+			UILabel component = transform.GetComponent<UILabel>();
 			component.text = name;
-			component.get_gameObject().SetActive(icon != ICON_TYPE.NOT_OPENED);
-			Transform val2 = val.Find("SPR_NAME_BASE");
-			if (val2 != null)
+			component.gameObject.SetActive(icon != ICON_TYPE.NOT_OPENED);
+			Transform transform2 = transform.Find("SPR_NAME_BASE");
+			if (transform2 != null)
 			{
-				UITexture component2 = val2.GetComponent<UITexture>();
-				component2.width = component.width + 45;
+				transform2.GetComponent<UITexture>().width = component.width + 45;
 			}
 		}
 		if (mapNo > 0)
 		{
-			val = spot._transform.Find("LBL_LOCATION_NUMBER");
-			if (val != null)
+			transform = spot._transform.Find("LBL_LOCATION_NUMBER");
+			if (transform != null)
 			{
-				val.get_gameObject().SetActive(true);
-				UILabel component3 = val.get_gameObject().GetComponent<UILabel>();
-				component3.text = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 25u) + mapNo.ToString();
+				transform.gameObject.SetActive(value: true);
+				transform.gameObject.GetComponent<UILabel>().text = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 25u) + mapNo.ToString();
 			}
 		}
-		val = spot._transform.Find("SPR_TWN_NEW");
-		if (val != null)
+		transform = spot._transform.Find("SPR_TWN_NEW");
+		if (transform != null)
 		{
-			val.get_gameObject().SetActive(isNew);
+			transform.gameObject.SetActive(isNew);
 		}
-		val = spot._transform.Find("SPR_ICON_NEW");
-		if (val != null)
+		transform = spot._transform.Find("SPR_ICON_NEW");
+		if (transform != null)
 		{
-			val.get_gameObject().SetActive(icon == ICON_TYPE.NEW);
+			transform.gameObject.SetActive(icon == ICON_TYPE.NEW);
 		}
-		val = spot._transform.Find("SPR_ICON_CLEARED");
-		if (val != null)
+		transform = spot._transform.Find("SPR_ICON_CLEARED");
+		if (transform != null)
 		{
-			val.get_gameObject().SetActive(icon == ICON_TYPE.CLEARED);
+			transform.gameObject.SetActive(icon == ICON_TYPE.CLEARED);
 		}
-		val = spot._transform.Find("SPR_ICON_HOME");
-		if (val != null)
+		transform = spot._transform.Find("SPR_ICON_HOME");
+		if (transform != null)
 		{
-			val.get_gameObject().SetActive(icon == ICON_TYPE.HOME);
+			transform.gameObject.SetActive(icon == ICON_TYPE.HOME);
 		}
-		val = spot._transform.Find("SPR_ICON_NOT_OPENED");
-		if (val != null)
+		transform = spot._transform.Find("SPR_ICON_NOT_OPENED");
+		if (transform != null)
 		{
-			val.get_gameObject().SetActive(icon == ICON_TYPE.NOT_OPENED);
+			transform.gameObject.SetActive(icon == ICON_TYPE.NOT_OPENED);
 		}
-		val = spot._transform.Find("SPR_ICON_HARD");
-		if (val != null)
+		transform = spot._transform.Find("SPR_ICON_HARD");
+		if (transform != null)
 		{
-			val.get_gameObject().SetActive(icon == ICON_TYPE.HARD || icon == ICON_TYPE.HARD_NEW);
+			transform.gameObject.SetActive(icon == ICON_TYPE.HARD || icon == ICON_TYPE.HARD_NEW);
 			if (icon == ICON_TYPE.HARD)
 			{
-				Transform val3 = val.Find("DODAIADD");
-				if (null != val3)
+				Transform transform3 = transform.Find("DODAIADD");
+				if (null != transform3)
 				{
-					val3.get_gameObject().SetActive(false);
+					transform3.gameObject.SetActive(value: false);
 				}
 			}
 		}
-		val = spot._transform.Find("OBJ_NEW_PORTAL");
-		if (val != null)
+		transform = spot._transform.Find("OBJ_NEW_PORTAL");
+		if (transform != null)
 		{
-			val.get_gameObject().SetActive(canUnlockNewPortal);
+			transform.gameObject.SetActive(canUnlockNewPortal);
 		}
-		val = spot._transform.Find("OBJ_POP_PORTAL");
-		if (val != null)
+		transform = spot._transform.Find("OBJ_POP_PORTAL");
+		if (transform != null)
 		{
-			val.get_gameObject().SetActive(viewEnemyPopBallon);
+			transform.gameObject.SetActive(viewEnemyPopBallon);
 		}
-		val = spot._transform.Find("SPR_ICON_DUNGEON");
-		if (val != null)
+		transform = spot._transform.Find("SPR_ICON_DUNGEON");
+		if (transform != null)
 		{
-			UITexture component4 = val.GetComponent<UITexture>();
-			if (component4 != null && dungeon_icon != null && icon == ICON_TYPE.CHILD_REGION)
+			UITexture component2 = transform.GetComponent<UITexture>();
+			if (component2 != null && dungeon_icon != null && icon == ICON_TYPE.CHILD_REGION)
 			{
-				component4.mainTexture = dungeon_icon;
+				component2.mainTexture = dungeon_icon;
 			}
 		}
-		val = spot._transform.Find("SPR_DELIVERY_TARGET");
-		if (val != null)
+		transform = spot._transform.Find("SPR_DELIVERY_TARGET");
+		if (transform != null)
 		{
-			val.get_gameObject().SetActive(isExistDelivery);
+			transform.gameObject.SetActive(isExistDelivery);
 		}
-		val = spot._transform.Find("SPR_SUBMISSION_CLEARED");
-		if (val != null)
+		transform = spot._transform.Find("SPR_SUBMISSION_CLEARED");
+		if (transform != null)
 		{
-			val.get_gameObject().SetActive(happenQuestCondition == HAPPEN_CONDITION.ALL_CLEAR);
+			transform.gameObject.SetActive(happenQuestCondition == HAPPEN_CONDITION.ALL_CLEAR);
 		}
-		val = spot._transform.Find("SPR_SUBMISSION_NOT_CLEARED");
-		if (val != null)
+		transform = spot._transform.Find("SPR_SUBMISSION_NOT_CLEARED");
+		if (transform != null)
 		{
-			val.get_gameObject().SetActive(happenQuestCondition == HAPPEN_CONDITION.NOT_CLEAR);
+			transform.gameObject.SetActive(happenQuestCondition == HAPPEN_CONDITION.NOT_CLEAR);
 		}
-		UIGameSceneEventSender component5 = spot._transform.Find("SPR_BUTTON").GetComponent<UIGameSceneEventSender>();
+		UIGameSceneEventSender component3 = spot._transform.Find("SPR_BUTTON").GetComponent<UIGameSceneEventSender>();
 		if (string.IsNullOrEmpty(event_name))
 		{
-			Object.Destroy(component5.get_gameObject());
+			UnityEngine.Object.Destroy(component3.gameObject);
 		}
 		else
 		{
-			component5.eventName = event_name;
-			component5.eventData = _event;
+			component3.eventName = event_name;
+			component3.eventData = _event;
 		}
 		spots.Add(spot);
 		return spot;

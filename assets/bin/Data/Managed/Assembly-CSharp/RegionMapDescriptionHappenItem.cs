@@ -35,8 +35,7 @@ public class RegionMapDescriptionHappenItem : UIBehaviour
 		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)quest.GetMainEnemyID());
 		if (enemyData != null)
 		{
-			ClearStatusQuest clearStatusQuestData = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(quest.questID);
-			bool flag = clearStatusQuestData != null;
+			bool flag = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(quest.questID) != null;
 			int icon_id = 10999;
 			string text = "？？？？？";
 			string text2 = "？？";
@@ -46,8 +45,7 @@ public class RegionMapDescriptionHappenItem : UIBehaviour
 				text = enemyData.name;
 				text2 = quest.GetMainEnemyLv().ToString();
 			}
-			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, icon_id, null, FindCtrl(t, UI.OBJ_ENEMY));
-			itemIcon.SetDepth(7);
+			ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, icon_id, null, FindCtrl(t, UI.OBJ_ENEMY)).SetDepth(7);
 			SetElementSprite(t, UI.SPR_ENM_ELEMENT, (int)enemyData.element);
 			SetActive(t, UI.SPR_ENM_ELEMENT, flag);
 			SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
@@ -119,7 +117,7 @@ public class RegionMapDescriptionHappenItem : UIBehaviour
 		Transform transform = base._transform;
 		if (transform == null)
 		{
-			transform = this.get_transform();
+			transform = base.transform;
 		}
 		return transform;
 	}

@@ -20,67 +20,38 @@ public class TestRaycast : MonoBehaviour
 
 	public GameObject endObject;
 
-	public TestRaycast()
-		: this()
-	{
-	}
-
 	private void Update()
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 		if (!(checkObject == null) && !(endObject == null))
 		{
-			checkObject.get_transform().set_position(CheckWarpPos());
+			checkObject.transform.position = CheckWarpPos();
 		}
 	}
 
 	private Vector3 CheckWarpPos()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0396: Unknown result type (might be due to invalid IL or missing references)
-		//IL_039d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
-		SphereCollider val = this.GetComponent<Collider>() as SphereCollider;
-		float radius = val.get_radius();
-		Vector3 lossyScale = this.get_transform().get_lossyScale();
-		float num = radius * lossyScale.x;
-		Vector3 position = this.get_transform().get_position();
-		Vector3 position2 = endObject.get_transform().get_position();
+		float num = (GetComponent<Collider>() as SphereCollider).radius * base.transform.lossyScale.x;
+		Vector3 position = base.transform.position;
+		Vector3 position2 = endObject.transform.position;
 		position.y = num;
 		position2.y = num;
-		Vector3 val2 = position2 - position;
-		float magnitude = val2.get_magnitude();
+		Vector3 vector = position2 - position;
+		float magnitude = vector.magnitude;
 		float num2 = 5f;
 		float num3 = 2f;
 		if (num2 >= magnitude)
 		{
-			return this.get_transform().get_position();
+			return base.transform.position;
 		}
 		List<CastHitInfo> list = new List<CastHitInfo>();
-		RaycastHit[] array = Physics.SphereCastAll(position2, num, -val2, magnitude, 393728);
+		RaycastHit[] array = Physics.SphereCastAll(position2, num, -vector, magnitude, 393728);
 		int i = 0;
 		for (int num4 = array.Length; i < num4; i++)
 		{
 			CastHitInfo castHitInfo = new CastHitInfo();
-			castHitInfo.distance = array[i].get_distance();
+			castHitInfo.distance = array[i].distance;
 			castHitInfo.faceToEnd = true;
-			castHitInfo.collider = array[i].get_collider();
+			castHitInfo.collider = array[i].collider;
 			list.Add(castHitInfo);
 		}
 		CastHitInfo castHitInfo2 = new CastHitInfo();
@@ -88,14 +59,14 @@ public class TestRaycast : MonoBehaviour
 		castHitInfo2.faceToEnd = false;
 		castHitInfo2.collider = null;
 		list.Add(castHitInfo2);
-		array = Physics.SphereCastAll(position, num, val2, magnitude, 393728);
+		array = Physics.SphereCastAll(position, num, vector, magnitude, 393728);
 		int j = 0;
 		for (int num5 = array.Length; j < num5; j++)
 		{
 			CastHitInfo castHitInfo3 = new CastHitInfo();
-			castHitInfo3.distance = magnitude - array[j].get_distance();
+			castHitInfo3.distance = magnitude - array[j].distance;
 			castHitInfo3.faceToEnd = false;
-			castHitInfo3.collider = array[j].get_collider();
+			castHitInfo3.collider = array[j].collider;
 			list.Add(castHitInfo3);
 		}
 		CastHitInfo castHitInfo4 = new CastHitInfo();
@@ -105,16 +76,20 @@ public class TestRaycast : MonoBehaviour
 		list.Add(castHitInfo4);
 		list.Sort(delegate(CastHitInfo a, CastHitInfo b)
 		{
-			float num9 = a.distance - b.distance;
-			if (num9 == 0f)
+			float num8 = a.distance - b.distance;
+			if (num8 == 0f)
 			{
 				if (a.faceToEnd == b.faceToEnd)
 				{
 					return 0;
 				}
-				return a.faceToEnd ? 1 : (-1);
+				if (!a.faceToEnd)
+				{
+					return -1;
+				}
+				return 1;
 			}
-			return (num9 > 0f) ? 1 : (-1);
+			return (num8 > 0f) ? 1 : (-1);
 		});
 		int k = 0;
 		for (int count = list.Count; k < count; k++)
@@ -140,76 +115,53 @@ public class TestRaycast : MonoBehaviour
 				num6 = ((!castHitInfo5.faceToEnd) ? (num6 - 1) : (num6 + 1));
 			}
 		}
-		float num7 = magnitude;
-		for (int num8 = list.Count - 2; num8 >= 0; num8--)
+		float d = magnitude;
+		for (int num7 = list.Count - 2; num7 >= 0; num7--)
 		{
-			CastHitInfo castHitInfo7 = list[num8];
-			CastHitInfo castHitInfo8 = list[num8 + 1];
+			CastHitInfo castHitInfo7 = list[num7];
+			CastHitInfo castHitInfo8 = list[num7 + 1];
 			if (castHitInfo7.enable && castHitInfo8.enable && !castHitInfo7.faceToEnd && castHitInfo8.faceToEnd)
 			{
 				if (castHitInfo7.distance <= num2 && castHitInfo8.distance >= num2)
 				{
-					num7 = num2;
+					d = num2;
 					break;
 				}
 				if (castHitInfo7.distance >= num2)
 				{
-					num7 = castHitInfo7.distance;
+					d = castHitInfo7.distance;
 				}
 				else if (castHitInfo8.distance >= num2 - num3)
 				{
-					num7 = castHitInfo8.distance;
+					d = castHitInfo8.distance;
 					break;
 				}
 			}
 		}
-		return endObject.get_transform().get_position() - val2.get_normalized() * num7;
+		return endObject.transform.position - vector.normalized * d;
 	}
 
 	private Vector3 CheckWarpPos2()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0449: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0450: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0457: Unknown result type (might be due to invalid IL or missing references)
-		//IL_045c: Unknown result type (might be due to invalid IL or missing references)
-		SphereCollider val = this.GetComponent<Collider>() as SphereCollider;
-		float radius = val.get_radius();
-		Vector3 lossyScale = this.get_transform().get_lossyScale();
-		float num = radius * lossyScale.x;
-		Vector3 position = this.get_transform().get_position();
-		Vector3 position2 = endObject.get_transform().get_position();
+		float num = (GetComponent<Collider>() as SphereCollider).radius * base.transform.lossyScale.x;
+		Vector3 position = base.transform.position;
+		Vector3 position2 = endObject.transform.position;
 		position.y = num;
 		position2.y = num;
-		Vector3 val2 = position2 - position;
-		float magnitude = val2.get_magnitude();
+		Vector3 vector = position2 - position;
+		float magnitude = vector.magnitude;
 		float num2 = 5f;
 		if (num2 >= magnitude)
 		{
-			return this.get_transform().get_position();
+			return base.transform.position;
 		}
 		List<CastHitInfo> list = new List<CastHitInfo>();
-		RaycastHit[] array = Physics.SphereCastAll(position2, num, -val2, magnitude, 393728);
+		RaycastHit[] array = Physics.SphereCastAll(position2, num, -vector, magnitude, 393728);
 		int i = 0;
 		for (int num3 = array.Length; i < num3; i++)
 		{
 			CastHitInfo castHitInfo = new CastHitInfo();
-			castHitInfo.distance = array[i].get_distance();
+			castHitInfo.distance = array[i].distance;
 			castHitInfo.faceToEnd = true;
 			list.Add(castHitInfo);
 		}
@@ -217,12 +169,12 @@ public class TestRaycast : MonoBehaviour
 		castHitInfo2.distance = 0f;
 		castHitInfo2.faceToEnd = false;
 		list.Add(castHitInfo2);
-		array = Physics.SphereCastAll(position, num, val2, magnitude, 393728);
+		array = Physics.SphereCastAll(position, num, vector, magnitude, 393728);
 		int j = 0;
 		for (int num4 = array.Length; j < num4; j++)
 		{
 			CastHitInfo castHitInfo3 = new CastHitInfo();
-			castHitInfo3.distance = magnitude - array[j].get_distance();
+			castHitInfo3.distance = magnitude - array[j].distance;
 			castHitInfo3.faceToEnd = false;
 			list.Add(castHitInfo3);
 		}
@@ -239,15 +191,19 @@ public class TestRaycast : MonoBehaviour
 				{
 					return 0;
 				}
-				return a.faceToEnd ? 1 : (-1);
+				if (!a.faceToEnd)
+				{
+					return -1;
+				}
+				return 1;
 			}
 			return (num7 > 0f) ? 1 : (-1);
 		});
-		Debug.Log((object)"----------------------------------------");
+		Debug.Log("----------------------------------------");
 		int k = 0;
 		for (int count = list.Count; k < count; k++)
 		{
-			Debug.Log((object)("############ : " + list[k].distance + ", " + list[k].faceToEnd));
+			Debug.Log("############ : " + list[k].distance + ", " + list[k].faceToEnd.ToString());
 		}
 		int num5 = 0;
 		CastHitInfo castHitInfo5 = null;
@@ -289,11 +245,11 @@ public class TestRaycast : MonoBehaviour
 				num5++;
 			}
 		}
-		Debug.Log((object)"----------------------------------------");
+		Debug.Log("----------------------------------------");
 		int l = 0;
 		for (int count2 = list.Count; l < count2; l++)
 		{
-			Debug.Log((object)("############ : " + list[l].distance + ", " + list[l].faceToEnd));
+			Debug.Log("############ : " + list[l].distance + ", " + list[l].faceToEnd.ToString());
 		}
 		float num6 = magnitude;
 		int m = 0;
@@ -315,77 +271,44 @@ public class TestRaycast : MonoBehaviour
 				}
 			}
 		}
-		Debug.Log((object)("res : " + num6));
-		return endObject.get_transform().get_position() - val2.get_normalized() * num6;
+		Debug.Log("res : " + num6);
+		return endObject.transform.position - vector.normalized * num6;
 	}
 
 	private Vector3 CheckWarpPos3()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
 		float num = 5f;
-		SphereCollider val = this.GetComponent<Collider>() as SphereCollider;
-		Vector3 val2 = this.get_transform().get_position() - endObject.get_transform().get_position();
-		float magnitude = val2.get_magnitude();
+		SphereCollider sphereCollider = GetComponent<Collider>() as SphereCollider;
+		Vector3 direction = base.transform.position - endObject.transform.position;
+		float magnitude = direction.magnitude;
 		if (magnitude < num)
 		{
-			return endObject.get_transform().get_position();
+			return endObject.transform.position;
 		}
 		bool flag = true;
-		Vector3 position = endObject.get_transform().get_position();
-		float radius = val.get_radius();
-		Vector3 lossyScale = this.get_transform().get_lossyScale();
-		RaycastHit val3 = default(RaycastHit);
-		if (Physics.SphereCast(position, radius * lossyScale.x, val2, ref val3, magnitude, 393728) && val3.get_distance() < num)
+		if (Physics.SphereCast(endObject.transform.position, sphereCollider.radius * base.transform.lossyScale.x, direction, out RaycastHit hitInfo, magnitude, 393728) && hitInfo.distance < num)
 		{
 			flag = false;
 		}
 		if (flag)
 		{
-			return endObject.get_transform().get_position() + val2.get_normalized() * num;
+			return endObject.transform.position + direction.normalized * num;
 		}
-		Vector3 val4 = endObject.get_transform().get_position() - this.get_transform().get_position();
-		Vector3 position2 = this.get_transform().get_position();
-		float radius2 = val.get_radius();
-		Vector3 lossyScale2 = this.get_transform().get_lossyScale();
-		RaycastHit[] array = Physics.SphereCastAll(position2, radius2 * lossyScale2.x, val4, magnitude - num, 393728);
-		if (array.Length > 0)
+		Vector3 direction2 = endObject.transform.position - base.transform.position;
+		RaycastHit[] array = Physics.SphereCastAll(base.transform.position, sphereCollider.radius * base.transform.lossyScale.x, direction2, magnitude - num, 393728);
+		if (array.Length != 0)
 		{
 			float num2 = 0f;
 			int i = 0;
 			for (int num3 = array.Length; i < num3; i++)
 			{
-				if (num2 < array[i].get_distance())
+				if (num2 < array[i].distance)
 				{
-					num2 = array[i].get_distance();
+					num2 = array[i].distance;
 				}
 			}
-			return this.get_transform().get_position() + val4.get_normalized() * num2;
+			return base.transform.position + direction2.normalized * num2;
 		}
-		return endObject.get_transform().get_position();
+		return endObject.transform.position;
 	}
 }

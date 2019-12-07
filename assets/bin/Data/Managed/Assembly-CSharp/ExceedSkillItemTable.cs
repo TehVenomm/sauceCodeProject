@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class ExceedSkillItemTable : Singleton<ExceedSkillItemTable>, IDataTable
@@ -57,7 +56,7 @@ public class ExceedSkillItemTable : Singleton<ExceedSkillItemTable>, IDataTable
 		}
 	}
 
-	public static readonly Color color = Color.get_green();
+	public static readonly Color color = Color.green;
 
 	private UIntKeyTable<ExceedSkillItemData> exceedSkillItemTable;
 
@@ -68,9 +67,6 @@ public class ExceedSkillItemTable : Singleton<ExceedSkillItemTable>, IDataTable
 	private float[] sameSkillPointRates;
 
 	private float[] skillExceedRate;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<ExceedSkillItemData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string csv_text)
 	{
@@ -194,7 +190,7 @@ public class ExceedSkillItemTable : Singleton<ExceedSkillItemTable>, IDataTable
 		}
 		if ((int)type > basePoints.Length - 1)
 		{
-			Debug.LogError((object)"not define \"basePoints\" in ExceedSkillItemTable");
+			Debug.LogError("not define \"basePoints\" in ExceedSkillItemTable");
 			return 0;
 		}
 		return basePoints[(int)type];
@@ -208,7 +204,7 @@ public class ExceedSkillItemTable : Singleton<ExceedSkillItemTable>, IDataTable
 		}
 		if ((int)type > sameSkillPointRates.Length - 1)
 		{
-			Debug.LogError((object)"not define \"sameSkillPointRates\" in ExceedSkillItemTable");
+			Debug.LogError("not define \"sameSkillPointRates\" in ExceedSkillItemTable");
 			return 1f;
 		}
 		return sameSkillPointRates[(int)type];
@@ -222,7 +218,7 @@ public class ExceedSkillItemTable : Singleton<ExceedSkillItemTable>, IDataTable
 		}
 		if (exceedCnt < 0 || exceedCnt > skillExceedRate.Length - 1)
 		{
-			Debug.LogError((object)("OutOfRange exceedCnt:" + exceedCnt + " (not define skillExceedRate in ExceedSkillItemTable?)"));
+			Debug.LogError("OutOfRange exceedCnt:" + exceedCnt + " (not define skillExceedRate in ExceedSkillItemTable?)");
 			return 0f;
 		}
 		return skillExceedRate[exceedCnt];

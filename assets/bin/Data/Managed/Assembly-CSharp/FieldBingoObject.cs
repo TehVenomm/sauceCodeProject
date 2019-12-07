@@ -35,8 +35,8 @@ public class FieldBingoObject : FieldGimmickObject
 			string[] array2 = array[i].Split(':');
 			if (array2 != null && array2.Length == 2)
 			{
-				string text = array2[0];
-				if (text != null && text == "cdid")
+				string a = array2[0];
+				if (a == "cdid")
 				{
 					uint.TryParse(array2[1], out result);
 				}
@@ -54,12 +54,9 @@ public class FieldBingoObject : FieldGimmickObject
 		base.Initialize(pointData);
 		if (Singleton<NPCTable>.IsValid())
 		{
-			Singleton<NPCTable>.I.GetNPCData(npcId)?.LoadModel(this.get_gameObject(), need_shadow: true, enable_light_probe: true, delegate(Animator animator)
+			Singleton<NPCTable>.I.GetNPCData(npcId)?.LoadModel(base.gameObject, need_shadow: true, enable_light_probe: true, delegate(Animator animator)
 			{
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-				Transform transform = animator.get_gameObject().get_transform();
-				transform.set_localScale(transform.get_localScale() * npcScale);
+				animator.gameObject.transform.localScale *= npcScale;
 			}, useSpecialModel: false);
 		}
 	}
@@ -103,22 +100,6 @@ public class FieldBingoObject : FieldGimmickObject
 
 	public override void UpdateTargetMarker(bool isNear)
 	{
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 		if (isNear && self != null && self.IsChangeableAction((Character.ACTION_ID)39))
 		{
@@ -130,17 +111,16 @@ public class FieldBingoObject : FieldGimmickObject
 			if (targetMarker != null)
 			{
 				Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-				Vector3 position = cameraTransform.get_position();
-				Quaternion rotation = cameraTransform.get_rotation();
-				Vector3 val = position - _transform.get_position();
-				Vector3 pos = val.get_normalized() + Vector3.get_up() + _transform.get_position();
+				Vector3 position = cameraTransform.position;
+				Quaternion rotation = cameraTransform.rotation;
+				Vector3 pos = (position - _transform.position).normalized + Vector3.up + _transform.position;
 				pos.y += markerOffsetY;
 				targetMarker.Set(pos, rotation);
 			}
 		}
 		else if (targetMarker != null)
 		{
-			EffectManager.ReleaseEffect(targetMarker.get_gameObject());
+			EffectManager.ReleaseEffect(targetMarker.gameObject);
 		}
 	}
 
@@ -164,7 +144,7 @@ public class FieldBingoObject : FieldGimmickObject
 			SoundManager.PlaySystemSE(SoundID.UISE.POP_QUEST);
 			if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("FieldBingoObject", this.get_gameObject(), "BINGO", new object[2]
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("FieldBingoObject", base.gameObject, "BINGO", new object[2]
 				{
 					bingoId,
 					false
@@ -180,8 +160,8 @@ public class FieldBingoObject : FieldGimmickObject
 
 	protected override void Awake()
 	{
-		_transform = this.get_transform();
-		Utility.SetLayerWithChildren(this.get_transform(), 19);
+		_transform = base.transform;
+		Utility.SetLayerWithChildren(base.transform, 19);
 	}
 
 	private bool IsValidBingo()

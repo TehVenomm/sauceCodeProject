@@ -4,16 +4,16 @@ public class FriendBlackList : FollowListBase
 {
 	public override void Initialize()
 	{
-		SetActive((Enum)UI.BTN_SORT, is_visible: false);
+		SetActive(UI.BTN_SORT, is_visible: false);
 		titleType = TITLE_TYPE.BLACKLIST;
 		base.Initialize();
 	}
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_FOLLOW_NUMBER_ROOT, is_visible: true);
-		SetLabelText((Enum)UI.LBL_FOLLOW_NUMBER_NOW, MonoBehaviourSingleton<BlackListManager>.I.GetBlackListUserNum().ToString());
-		SetLabelText((Enum)UI.LBL_FOLLOW_NUMBER_MAX, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.BLACKLIST_MAX.ToString());
+		SetActive(UI.OBJ_FOLLOW_NUMBER_ROOT, is_visible: true);
+		SetLabelText(UI.LBL_FOLLOW_NUMBER_NOW, MonoBehaviourSingleton<BlackListManager>.I.GetBlackListUserNum().ToString());
+		SetLabelText(UI.LBL_FOLLOW_NUMBER_MAX, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.BLACKLIST_MAX.ToString());
 		ListUI();
 	}
 

@@ -42,7 +42,17 @@ public class ChatRoom
 		private set;
 	}
 
-	public bool HasConnect => connection != null && connection.isEstablished;
+	public bool HasConnect
+	{
+		get
+		{
+			if (connection != null)
+			{
+				return connection.isEstablished;
+			}
+			return false;
+		}
+	}
 
 	public IChatConnection connection
 	{

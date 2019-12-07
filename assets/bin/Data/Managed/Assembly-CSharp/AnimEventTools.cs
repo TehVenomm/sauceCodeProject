@@ -15,9 +15,4 @@ public class AnimEventTools : MonoBehaviour
 	public AnimEventData animEventData;
 
 	public AnimEventFormat.ID eventID;
-
-	public AnimEventTools()
-		: this()
-	{
-	}
 }

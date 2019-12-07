@@ -9,11 +9,6 @@ public class UIGameSceneEventSenderVersionRestriction : MonoBehaviour
 
 	public uint revision;
 
-	public UIGameSceneEventSenderVersionRestriction()
-		: this()
-	{
-	}
-
 	public string GetCheckApplicationVersionText()
 	{
 		return $"{major}.{minor}.{revision}";

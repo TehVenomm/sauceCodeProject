@@ -56,11 +56,11 @@ public class EventBannerView : UIBehaviour
 
 	private IEnumerator Start()
 	{
-		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_event_banner = load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.UI, "EventBanner");
-		if (load_queue.IsLoading())
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject lo_event_banner = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.UI, "EventBanner");
+		if (loadingQueue.IsLoading())
 		{
-			yield return load_queue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		mEventBannerPrefab = (lo_event_banner.loadedObject as GameObject);
 		AddPrefab(mEventBannerPrefab, lo_event_banner.PopInstantiatedGameObject());
@@ -75,8 +75,8 @@ public class EventBannerView : UIBehaviour
 		if (!(mEventBannerPrefab == null))
 		{
 			UpdateEventBannerAll();
-			sctList1 = base.GetComponent<UIScrollView>((Enum)UI.SCR_LIST1);
-			sctList2 = base.GetComponent<UIScrollView>((Enum)UI.SCR_LIST2);
+			sctList1 = GetComponent<UIScrollView>(UI.SCR_LIST1);
+			sctList2 = GetComponent<UIScrollView>(UI.SCR_LIST2);
 			base.UpdateUI();
 		}
 	}
@@ -106,28 +106,27 @@ public class EventBannerView : UIBehaviour
 		GetCtrl(UI.WRP_EVENT_BANNER2).DestroyChildren();
 		foreach (IEnumerator value in loadingRoutines.Values)
 		{
-			this.StopCoroutine(value);
+			StopCoroutine(value);
 		}
 		loadingRoutines.Clear();
 		UIWidget refWidget = base._transform.GetComponentInChildren<UIWidget>();
 		bannerNum1 = ((MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count > 1) ? 1 : MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count);
 		SetWrapContent(UI.WRP_EVENT_BANNER1, "EventBanner", bannerNum1, reset: true, delegate(int i, Transform t, bool is_recycle)
 		{
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 			EventBanner banner2 = MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList[i];
 			SetBannerEvent(t.GetChild(0), banner2);
 			Renderer r2 = t.GetComponentInChildren<Renderer>();
 			UIWidget uIWidget2 = refWidget;
 			uIWidget2.onRender = (UIDrawCall.OnRenderCallback)Delegate.Combine(uIWidget2.onRender, (UIDrawCall.OnRenderCallback)delegate(Material mat)
 			{
-				r2.get_material().set_renderQueue(mat.get_renderQueue());
+				r2.material.renderQueue = mat.renderQueue;
 			});
-			r2.get_material().set_color(Color.get_clear());
+			r2.material.color = Color.clear;
 			SetBanner(t, UI.NORMAL_CLOTH, enabled: false);
-			t.get_gameObject().SetActive(false);
+			t.gameObject.SetActive(value: false);
 			IEnumerator enumerator3 = LoadImg(t, banner2, i, mCenterIndex1);
 			loadingRoutines.Add(t, enumerator3);
-			this.StartCoroutine(enumerator3);
+			StartCoroutine(enumerator3);
 		});
 		bannerNum2 = MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count - bannerNum1;
 		if (bannerNum2 > 5)
@@ -136,21 +135,20 @@ public class EventBannerView : UIBehaviour
 		}
 		SetWrapContent(UI.WRP_EVENT_BANNER2, "EventBanner", bannerNum2, reset: true, delegate(int i, Transform t, bool is_recycle)
 		{
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 			EventBanner banner = MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList[i + bannerNum1];
 			SetBannerEvent(t.GetChild(0), banner);
 			Renderer r = t.GetComponentInChildren<Renderer>();
 			UIWidget uIWidget = refWidget;
 			uIWidget.onRender = (UIDrawCall.OnRenderCallback)Delegate.Combine(uIWidget.onRender, (UIDrawCall.OnRenderCallback)delegate(Material mat)
 			{
-				r.get_material().set_renderQueue(mat.get_renderQueue());
+				r.material.renderQueue = mat.renderQueue;
 			});
-			r.get_material().set_color(Color.get_clear());
+			r.material.color = Color.clear;
 			SetBanner(t, UI.NORMAL_CLOTH, enabled: false);
-			t.get_gameObject().SetActive(false);
+			t.gameObject.SetActive(value: false);
 			IEnumerator enumerator2 = LoadImg(t, banner, i, mCenterIndex2);
 			loadingRoutines.Add(t, enumerator2);
-			this.StartCoroutine(enumerator2);
+			StartCoroutine(enumerator2);
 		});
 		mCenterIndex1 = 0;
 		mCenterIndex2 = 0;
@@ -160,22 +158,22 @@ public class EventBannerView : UIBehaviour
 
 	private IEnumerator LoadImg(Transform t, EventBanner banner, int index, int centerIndex)
 	{
-		LoadingQueue load = new LoadingQueue(this);
-		LoadObject lo = (banner.LinkType != LINK_TYPE.NEWS) ? load.Load(isEventAsset: true, RESOURCE_CATEGORY.HOME_BANNER_IMAGE, ResourceName.GetHomeBannerImage(banner.bannerId)) : load.Load(isEventAsset: true, RESOURCE_CATEGORY.HOME_BANNER_IMAGE, ResourceName.GetHomeBannerImage(banner.bannerId) + "_result");
-		yield return load.Wait();
-		Transform bannerTrans = FindCtrl(t, UI.NORMAL_CLOTH);
-		Texture2D tex = lo.loadedObject as Texture2D;
-		bannerTrans.get_gameObject().SetActive(true);
-		bannerTrans.GetComponent<Cloth>().set_enabled(true);
-		Renderer r = bannerTrans.GetComponent<Renderer>();
-		Material mat = r.get_material();
-		mat.set_mainTexture(tex);
-		r.set_material(mat);
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject lo = (banner.LinkType != LINK_TYPE.NEWS) ? loadingQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.HOME_BANNER_IMAGE, ResourceName.GetHomeBannerImage(banner.bannerId)) : loadingQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.HOME_BANNER_IMAGE, ResourceName.GetHomeBannerImage(banner.bannerId) + "_result");
+		yield return loadingQueue.Wait();
+		Transform transform = FindCtrl(t, UI.NORMAL_CLOTH);
+		Texture2D mainTexture = lo.loadedObject as Texture2D;
+		transform.gameObject.SetActive(value: true);
+		transform.GetComponent<Cloth>().enabled = true;
+		Renderer component = transform.GetComponent<Renderer>();
+		Material mat = component.material;
+		mat.mainTexture = mainTexture;
+		component.material = mat;
 		yield return null;
 		if (index == centerIndex)
 		{
-			mat.set_color(Color.get_white());
-			t.get_gameObject().SetActive(true);
+			mat.color = Color.white;
+			t.gameObject.SetActive(value: true);
 		}
 		loadingRoutines.Remove(t);
 	}
@@ -215,9 +213,9 @@ public class EventBannerView : UIBehaviour
 			timer1 = 0f;
 			if (bannerNum1 > 1)
 			{
-				int num = (!forward) ? ((bannerNum1 + mCenterIndex1 - 1) % bannerNum1) : ((mCenterIndex1 + 1) % bannerNum1);
-				this.StartCoroutine(ChangeBanner(mCenterOnChild1.get_transform().GetChild(mCenterIndex1), mCenterOnChild1.get_transform().GetChild(num)));
-				mCenterIndex1 = num;
+				int index = forward ? ((mCenterIndex1 + 1) % bannerNum1) : ((bannerNum1 + mCenterIndex1 - 1) % bannerNum1);
+				StartCoroutine(ChangeBanner(mCenterOnChild1.transform.GetChild(mCenterIndex1), mCenterOnChild1.transform.GetChild(index)));
+				mCenterIndex1 = index;
 			}
 		}
 		if (targetBanner == 2)
@@ -225,9 +223,9 @@ public class EventBannerView : UIBehaviour
 			timer2 = 0f;
 			if (bannerNum2 > 1)
 			{
-				int num2 = (!forward) ? ((bannerNum2 + mCenterIndex2 - 1) % bannerNum2) : ((mCenterIndex2 + 1) % bannerNum2);
-				this.StartCoroutine(ChangeBanner(mCenterOnChild2.get_transform().GetChild(mCenterIndex2), mCenterOnChild2.get_transform().GetChild(num2)));
-				mCenterIndex2 = num2;
+				int index2 = forward ? ((mCenterIndex2 + 1) % bannerNum2) : ((bannerNum2 + mCenterIndex2 - 1) % bannerNum2);
+				StartCoroutine(ChangeBanner(mCenterOnChild2.transform.GetChild(mCenterIndex2), mCenterOnChild2.transform.GetChild(index2)));
+				mCenterIndex2 = index2;
 			}
 		}
 	}
@@ -243,7 +241,7 @@ public class EventBannerView : UIBehaviour
 			timer2 = 0f;
 			return;
 		}
-		timer2 += Time.get_deltaTime();
+		timer2 += Time.deltaTime;
 		if (timer2 >= 5f)
 		{
 			NextBanner(2);
@@ -252,43 +250,43 @@ public class EventBannerView : UIBehaviour
 
 	private IEnumerator ChangeBanner(Transform fromBanner, Transform toBanner)
 	{
-		Color c = Color.get_white();
-		Renderer fr = fromBanner.GetComponentInChildren<Renderer>();
-		Renderer tr = toBanner.GetComponentInChildren<Renderer>();
-		if (!(fr == null) && !(tr == null))
+		Color c = Color.white;
+		Renderer componentInChildren = fromBanner.GetComponentInChildren<Renderer>();
+		Renderer componentInChildren2 = toBanner.GetComponentInChildren<Renderer>();
+		if (!(componentInChildren == null) && !(componentInChildren2 == null))
 		{
-			Material fmat = fr.get_material();
-			Material tmat = tr.get_material();
-			tmat.set_color(c);
-			toBanner.GetComponentInChildren<Cloth>().set_enabled(true);
-			toBanner.get_gameObject().SetActive(true);
-			fromBanner.set_localPosition(new Vector3(0f, 0f, 0f));
-			toBanner.set_localPosition(new Vector3(0f, 0f, 0f));
+			Material fmat = componentInChildren.material;
+			Material tmat = componentInChildren2.material;
+			tmat.color = c;
+			toBanner.GetComponentInChildren<Cloth>().enabled = true;
+			toBanner.gameObject.SetActive(value: true);
+			fromBanner.localPosition = new Vector3(0f, 0f, 0f);
+			toBanner.localPosition = new Vector3(0f, 0f, 0f);
 			float time = 0.34f;
 			while (time > 0f)
 			{
-				time -= Time.get_deltaTime();
-				float alpha = c.a = time / 0.34f;
-				fmat.set_color(c);
-				c.a = 1f - alpha;
-				tmat.set_color(c);
+				time -= Time.deltaTime;
+				float num = c.a = time / 0.34f;
+				fmat.color = c;
+				c.a = 1f - num;
+				tmat.color = c;
 				yield return null;
 			}
 			c.a = 0f;
-			fmat.set_color(c);
-			fromBanner.GetComponentInChildren<Cloth>().set_enabled(false);
-			fromBanner.get_gameObject().SetActive(false);
+			fmat.color = c;
+			fromBanner.GetComponentInChildren<Cloth>().enabled = false;
+			fromBanner.gameObject.SetActive(value: false);
 		}
 	}
 
 	private void OnCenter1(GameObject obj)
 	{
-		mCenterIndex1 = int.Parse(obj.get_name());
+		mCenterIndex1 = int.Parse(obj.name);
 	}
 
 	private void OnCenter2(GameObject obj)
 	{
-		mCenterIndex2 = int.Parse(obj.get_name());
+		mCenterIndex2 = int.Parse(obj.name);
 	}
 
 	protected override void OnOpen()
@@ -300,8 +298,8 @@ public class EventBannerView : UIBehaviour
 
 	private void SetBanner(Transform t, UI enumValue, bool enabled)
 	{
-		Transform val = FindCtrl(t, enumValue);
-		val.get_gameObject().SetActive(enabled);
-		val.GetComponent<Cloth>().set_enabled(enabled);
+		Transform transform = FindCtrl(t, enumValue);
+		transform.gameObject.SetActive(enabled);
+		transform.GetComponent<Cloth>().enabled = enabled;
 	}
 }

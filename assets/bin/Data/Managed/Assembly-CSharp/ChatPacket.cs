@@ -35,8 +35,7 @@ public class ChatPacket
 	{
 		if (stream.IsString())
 		{
-			string str = stream.ToString();
-			return Parse(str);
+			return Parse(stream.ToString());
 		}
 		return null;
 	}
@@ -77,6 +76,8 @@ public class ChatPacket
 			return Chat_Model_ResetDarkMarket.Parse(str);
 		case CHAT_PACKET_TYPE.JACKPOT_WIN_UPDATE:
 			return Chat_Model_JackpotWin.Parse(str);
+		case CHAT_PACKET_TYPE.TRADING_POST_SOLD:
+			return TradingPostSoldModel.Parse(str);
 		default:
 			return new Chat_Model_Base();
 		}

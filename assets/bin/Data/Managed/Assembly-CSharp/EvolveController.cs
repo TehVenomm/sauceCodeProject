@@ -125,14 +125,14 @@ public class EvolveController
 			});
 			owner.ExecHealHp(healData);
 		}
-		if (!object.ReferenceEquals(typeAbstract.healTypes, null))
+		if (typeAbstract.healTypes != null)
 		{
 			for (int i = 0; i < typeAbstract.healTypes.Length; i++)
 			{
 				owner.DoHealType(typeAbstract.healTypes[i]);
 			}
 		}
-		if (!object.ReferenceEquals(typeAbstract.buffs, null) && typeAbstract.buffs.Length > 0)
+		if (typeAbstract.buffs != null && typeAbstract.buffs.Length != 0)
 		{
 			execBuffs = typeAbstract.buffs;
 			if (isSelf)
@@ -195,15 +195,15 @@ public class EvolveController
 
 	public bool Update()
 	{
-		DecreaseCurrentGauge(decreaseValue * Time.get_deltaTime());
+		DecreaseCurrentGauge(decreaseValue * Time.deltaTime);
 		return GetCurrentGauge() <= 0f;
 	}
 
 	private void ReleaseEffect(ref Transform t, bool isPlayEndAnimation = true)
 	{
-		if (MonoBehaviourSingleton<EffectManager>.IsValid() && !object.ReferenceEquals(t, null))
+		if (MonoBehaviourSingleton<EffectManager>.IsValid() && (object)t != null)
 		{
-			EffectManager.ReleaseEffect(t.get_gameObject(), isPlayEndAnimation);
+			EffectManager.ReleaseEffect(t.gameObject, isPlayEndAnimation);
 			t = null;
 		}
 	}
@@ -230,7 +230,7 @@ public class EvolveController
 
 	public int GetExecBuffValue(BuffParam.BUFFTYPE type)
 	{
-		if (object.ReferenceEquals(execBuffs, null))
+		if (execBuffs == null)
 		{
 			return 0;
 		}
@@ -387,7 +387,7 @@ public class EvolveController
 	{
 		AppMain.Delay(parameter.type10000.execEffectDelay, delegate
 		{
-			EffectManager.GetEffect("ef_btl_wex1_spear_01_01", owner.FindNode(string.Empty));
+			EffectManager.GetEffect("ef_btl_wex1_spear_01_01", owner.FindNode(""));
 		});
 		ReleaseEffect(ref execEffect);
 		execEffect = EffectManager.GetEffect("ef_btl_wex1_spear_01_02", owner.loader.wepR);
@@ -421,26 +421,22 @@ public class EvolveController
 
 	public void PlayLeviathanEffect()
 	{
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 		if (execEvolveId == 10000)
 		{
-			SoundManager.PlayOneShotSE(parameter.type10000.rushSeId, owner, owner.FindNode(string.Empty));
-			Transform effect = EffectManager.GetEffect("ef_btl_wex1_spear_01_03", owner.FindNode("Move"));
-			effect.set_localPosition(new Vector3(0f, 1f, 0f));
+			SoundManager.PlayOneShotSE(parameter.type10000.rushSeId, owner, owner.FindNode(""));
+			EffectManager.GetEffect("ef_btl_wex1_spear_01_03", owner.FindNode("Move")).localPosition = new Vector3(0f, 1f, 0f);
 		}
 	}
 
 	private InGameSettingsManager.Evolve.TypeAbstract _start10001()
 	{
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
 		ReleaseEffect(ref execEffect);
 		execEffect = EffectManager.GetEffect("ef_btl_ast1_twinsword_02", owner.loader.wepR);
 		ReleaseEffect(ref execEffect2);
 		execEffect2 = EffectManager.GetEffect("ef_btl_ast1_twinsword_02", owner.loader.wepL);
 		ReleaseEffect(ref execEffect3);
 		execEffect3 = EffectManager.GetEffect("ef_btl_ast1_twinsword_01", owner.FindNode("Spine01"));
-		execEffect3.set_localRotation(Quaternion.Euler(new Vector3(90f, -90f, 0f)));
+		execEffect3.localRotation = Quaternion.Euler(new Vector3(90f, -90f, 0f));
 		return parameter.type10001;
 	}
 
@@ -477,9 +473,7 @@ public class EvolveController
 		{
 			AppMain.Delay(1f, delegate
 			{
-				//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-				Transform effect = EffectManager.GetEffect("ef_btl_ast1_twinsword_03", owner.FindNode("Move"));
-				effect.set_localPosition(new Vector3(0f, 3.7f, 1.5f));
+				EffectManager.GetEffect("ef_btl_ast1_twinsword_03", owner.FindNode("Move")).localPosition = new Vector3(0f, 3.7f, 1.5f);
 			});
 		}
 	}

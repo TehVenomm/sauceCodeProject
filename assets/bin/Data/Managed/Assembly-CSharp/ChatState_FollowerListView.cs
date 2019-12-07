@@ -28,27 +28,24 @@ public class ChatState_FollowerListView : ChatState
 			yield break;
 		}
 		isInitializing = true;
-		LoadingQueue load_queue = new LoadingQueue(m_manager);
-		LoadObject lo = load_queue.Load(RESOURCE_CATEGORY.UI, WINDOW_PREFAB_NAME);
-		if (load_queue.IsLoading())
+		LoadingQueue loadingQueue = new LoadingQueue(m_manager);
+		LoadObject lo = loadingQueue.Load(RESOURCE_CATEGORY.UI, WINDOW_PREFAB_NAME);
+		if (loadingQueue.IsLoading())
 		{
-			yield return load_queue.Wait();
+			yield return loadingQueue.Wait();
 		}
-		GameObject go = lo.loadedObject as GameObject;
-		Transform newItem = ResourceUtility.Realizes(go, m_manager.get_transform(), 5);
-		m_ctrl = newItem.GetComponent<HomeVariableMemberListController>();
+		Transform transform = ResourceUtility.Realizes(lo.loadedObject as GameObject, m_manager.transform, 5);
+		m_ctrl = transform.GetComponent<HomeVariableMemberListController>();
 		if (m_ctrl == null)
 		{
 			m_manager.PopState();
 			EndInitialize();
 			yield break;
 		}
-		HomeVariableMemberListController.InitParam initParam = new HomeVariableMemberListController.InitParam
-		{
-			IsDisplayClanMember = false,
-			IsDisplayMutualFollower = true,
-			Mainchat = m_manager
-		};
+		HomeVariableMemberListController.InitParam initParam = new HomeVariableMemberListController.InitParam();
+		initParam.IsDisplayClanMember = false;
+		initParam.IsDisplayMutualFollower = true;
+		initParam.Mainchat = m_manager;
 		m_ctrl.Initialize(initParam);
 		while (m_ctrl.IsInitializing())
 		{
@@ -69,7 +66,7 @@ public class ChatState_FollowerListView : ChatState
 
 	public override void Exit()
 	{
-		Object.Destroy(m_ctrl.get_gameObject());
+		UnityEngine.Object.Destroy(m_ctrl.gameObject);
 		m_ctrl = null;
 	}
 }

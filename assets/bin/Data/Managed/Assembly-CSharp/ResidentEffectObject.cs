@@ -6,11 +6,6 @@ public class ResidentEffectObject : MonoBehaviour
 
 	public string UniqueName = string.Empty;
 
-	public ResidentEffectObject()
-		: this()
-	{
-	}
-
 	public void Initialize(SystemEffectSetting.Data effectData)
 	{
 		GroupID = effectData.groupID;

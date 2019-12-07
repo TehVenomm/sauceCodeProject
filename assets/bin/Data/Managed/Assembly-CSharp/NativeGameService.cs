@@ -1,7 +1,6 @@
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
@@ -18,7 +17,7 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 
 	private bool isFixed;
 
-	private new void Awake()
+	protected override void Awake()
 	{
 		switch (CryptoPrefs.GetInt("signin_game_service_auto"))
 		{
@@ -75,8 +74,8 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 				}
 				if (taskInos[num].progress > 0)
 				{
-					double num2 = (double)taskInos[num].progress * 100.0 / (double)data.goalNum;
-					Social.ReportProgress(data.key, num2, (Action<bool>)delegate
+					double progress = (double)taskInos[num].progress * 100.0 / (double)data.goalNum;
+					Social.ReportProgress(data.key, progress, delegate
 					{
 					});
 				}
@@ -114,7 +113,7 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 		{
 			isRunLogin = true;
 			PlayGamesPlatform.Activate();
-			Social.get_localUser().Authenticate((Action<bool>)delegate(bool success)
+			Social.localUser.Authenticate(delegate(bool success)
 			{
 				if (success)
 				{
@@ -122,7 +121,7 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 				}
 				else
 				{
-					((PlayGamesLocalUser)Social.get_localUser()).GetStats(delegate(CommonStatusCodes rc, PlayerStats stats)
+					((PlayGamesLocalUser)Social.localUser).GetStats(delegate(CommonStatusCodes rc, PlayerStats stats)
 					{
 						if (rc == CommonStatusCodes.SignInRequired || rc == CommonStatusCodes.ServiceDisabled)
 						{
@@ -143,7 +142,7 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 
 	private bool isConnected()
 	{
-		return Social.get_localUser().get_authenticated();
+		return Social.localUser.authenticated;
 	}
 
 	public void SetAchievementStep(int taskID, int currentStep, int oldStep)
@@ -158,14 +157,14 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 			int goalNum = byTask.goalNum;
 			if (currentStep < goalNum)
 			{
-				double num = (double)currentStep * 100.0 / (double)goalNum;
-				Social.ReportProgress(byTask.key, num, (Action<bool>)delegate
+				double progress = (double)currentStep * 100.0 / (double)goalNum;
+				Social.ReportProgress(byTask.key, progress, delegate
 				{
 				});
 			}
 			else
 			{
-				Social.ReportProgress(byTask.key, 100.0, (Action<bool>)delegate
+				Social.ReportProgress(byTask.key, 100.0, delegate
 				{
 				});
 			}
@@ -184,12 +183,13 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 	{
 		if (isConnected())
 		{
-			Social.LoadAchievementDescriptions((Action<IAchievementDescription[]>)delegate(IAchievementDescription[] descriptions)
+			Social.LoadAchievementDescriptions(delegate(IAchievementDescription[] descriptions)
 			{
-				if (descriptions.Length > 0)
+				if (descriptions.Length != 0)
 				{
-					foreach (IAchievementDescription val in descriptions)
+					for (int i = 0; i < descriptions.Length; i++)
 					{
+						_ = descriptions[i];
 					}
 				}
 			});
@@ -207,11 +207,8 @@ public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 			AchievementIdTable.AchievementIdData byTask = Singleton<AchievementIdTable>.I.GetByTask(taskID);
 			if (byTask != null)
 			{
-				Social.ReportProgress(byTask.key, 100.0, (Action<bool>)delegate(bool success)
+				Social.ReportProgress(byTask.key, 100.0, delegate
 				{
-					if (!success)
-					{
-					}
 				});
 			}
 		}

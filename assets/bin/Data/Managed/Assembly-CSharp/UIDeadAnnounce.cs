@@ -54,7 +54,7 @@ public class UIDeadAnnounce : UIAnnounceBase<UIDeadAnnounce>
 
 	public void Announce(ANNOUNCE_TYPE type, Player player)
 	{
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		if (AnnounceStart(player))
 		{
 			SetupAnnounce(type, player.charaName);
@@ -63,7 +63,7 @@ public class UIDeadAnnounce : UIAnnounceBase<UIDeadAnnounce>
 
 	public void Announce(ANNOUNCE_TYPE type, string charaName)
 	{
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		if (AnnounceStart())
 		{
 			SetupAnnounce(type, charaName);
@@ -72,25 +72,19 @@ public class UIDeadAnnounce : UIAnnounceBase<UIDeadAnnounce>
 
 	private void SetupAnnounce(ANNOUNCE_TYPE type, string charaName)
 	{
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
 		if (type == ANNOUNCE_TYPE.DEAD || type == ANNOUNCE_TYPE.RETIRE || type == ANNOUNCE_TYPE.STONE)
 		{
-			deadBack.SetActive(true);
-			deadEff.SetActive(true);
-			rescueBack.SetActive(false);
-			rescueEff.SetActive(false);
+			deadBack.SetActive(value: true);
+			deadEff.SetActive(value: true);
+			rescueBack.SetActive(value: false);
+			rescueEff.SetActive(value: false);
 		}
 		else
 		{
-			deadBack.SetActive(false);
-			deadEff.SetActive(false);
-			rescueBack.SetActive(true);
-			rescueEff.SetActive(true);
+			deadBack.SetActive(value: false);
+			deadEff.SetActive(value: false);
+			rescueBack.SetActive(value: true);
+			rescueEff.SetActive(value: true);
 		}
 		announceName.text = labelSettings[(int)type].text;
 		announceName.gradientTop = labelSettings[(int)type].topColor;
@@ -105,11 +99,11 @@ public class UIDeadAnnounce : UIAnnounceBase<UIDeadAnnounce>
 
 	protected override void OnStart()
 	{
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 
 	protected override void OnAfterAnimation()
 	{
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 }

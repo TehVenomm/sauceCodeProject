@@ -18,7 +18,7 @@ public class UIEnemyAnnounce : UIAnnounceBase<UIEnemyAnnounce>
 
 	public void RequestAnnounce(string enemyName, STRING_CATEGORY category, uint stringID)
 	{
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		if (AnnounceStart())
 		{
 			SetupAnnounceInfo(enemyName, category, stringID);
@@ -29,7 +29,7 @@ public class UIEnemyAnnounce : UIAnnounceBase<UIEnemyAnnounce>
 	{
 		if (IsAnnounce(type))
 		{
-			this.get_gameObject().SetActive(true);
+			base.gameObject.SetActive(value: true);
 			if (AnnounceStart())
 			{
 				SetupAnnounceInfo(enemy_name, STRING_CATEGORY.BUFF, (uint)type);
@@ -39,11 +39,9 @@ public class UIEnemyAnnounce : UIAnnounceBase<UIEnemyAnnounce>
 
 	public void EndBuff(string enemy_name, BuffParam.BUFFTYPE type)
 	{
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
 		if (IsAnnounce(type))
 		{
-			this.get_gameObject().SetActive(true);
+			base.gameObject.SetActive(value: true);
 			if (AnnounceStart())
 			{
 				stateNameBuilder.Length = 0;
@@ -62,8 +60,6 @@ public class UIEnemyAnnounce : UIAnnounceBase<UIEnemyAnnounce>
 
 	private void SetupAnnounceInfo(string enemyName, STRING_CATEGORY category, uint stringID)
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 		stateNameBuilder.Length = 0;
 		stateNameBuilder.Append(enemyName);
 		stateNameBuilder.Append(" ");
@@ -86,21 +82,18 @@ public class UIEnemyAnnounce : UIAnnounceBase<UIEnemyAnnounce>
 
 	public void RequestFieldBuffAnnounce()
 	{
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 		uint currentFieldBuffId = MonoBehaviourSingleton<FieldManager>.I.currentFieldBuffId;
 		if (currentFieldBuffId == 0)
 		{
 			return;
 		}
 		FieldBuffTable.FieldBuffData data = Singleton<FieldBuffTable>.I.GetData(currentFieldBuffId);
-		if (!object.ReferenceEquals(data, null))
+		if (data != null)
 		{
-			this.get_gameObject().SetActive(true);
+			base.gameObject.SetActive(value: true);
 			if (AnnounceStart())
 			{
-				string format = StringTable.Get(STRING_CATEGORY.IN_GAME, 150u);
-				string text = string.Format(format, data.name);
+				string text = string.Format(StringTable.Get(STRING_CATEGORY.IN_GAME, 150u), data.name);
 				announce.text = text;
 				announceEffect.text = text;
 				announce.fontStyle = style;
@@ -111,9 +104,7 @@ public class UIEnemyAnnounce : UIAnnounceBase<UIEnemyAnnounce>
 
 	public void RequestTextAnnounce(string text)
 	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		if (AnnounceStart())
 		{
 			announce.text = text;
@@ -125,11 +116,11 @@ public class UIEnemyAnnounce : UIAnnounceBase<UIEnemyAnnounce>
 
 	protected override void OnStart()
 	{
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 
 	protected override void OnAfterAnimation()
 	{
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 }

@@ -103,7 +103,7 @@ public class FortuneWheelTop : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -112,11 +112,11 @@ public class FortuneWheelTop : GameSection
 		jackportNumber = GetCtrl(UI.JACKPOT_NUMBER).GetComponent<JackportNumber>();
 		spinTicketNumber = GetCtrl(UI.SPIN_TICKET_NUM).GetComponent<SpinTicketNumber>();
 		spinHandle = GetCtrl(UI.SPIN_ICON_POINT_GROUP).GetComponent<FortuneWheelSpinHandle>();
-		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_quest_spinitem = load_queue.Load(RESOURCE_CATEGORY.UI, "JackpotSpinItem");
-		if (load_queue.IsLoading())
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject lo_quest_spinitem = loadingQueue.Load(RESOURCE_CATEGORY.UI, "JackpotSpinItem");
+		if (loadingQueue.IsLoading())
 		{
-			yield return load_queue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		m_SpinItemPrefab = (lo_quest_spinitem.loadedObject as GameObject);
 		bool wait = true;
@@ -135,7 +135,7 @@ public class FortuneWheelTop : GameSection
 			yield return null;
 		}
 		base.Initialize();
-		yield return (object)new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		MonoBehaviourSingleton<FortuneWheelManager>.I.OnJackpotWin += OnJackpotWinHandler;
 		MonoBehaviourSingleton<FortuneWheelManager>.I.OnRequestUpdateUI += OnRequestUpdateUIHandler;
 		spinHandle.IniSpin(MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.vaultInfo.itemList, m_SpinItemPrefab);
@@ -149,13 +149,13 @@ public class FortuneWheelTop : GameSection
 	{
 		if (force)
 		{
-			SetActive((Enum)UI.SPR_FREE_TXT, force);
-			SetActive((Enum)UI.SPIN_TICKET_NUM, !force);
+			SetActive(UI.SPR_FREE_TXT, force);
+			SetActive(UI.SPIN_TICKET_NUM, !force);
 		}
 		else
 		{
-			SetActive((Enum)UI.SPR_FREE_TXT, MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.vaultInfo.freeSpin);
-			SetActive((Enum)UI.SPIN_TICKET_NUM, !MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.vaultInfo.freeSpin);
+			SetActive(UI.SPR_FREE_TXT, MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.vaultInfo.freeSpin);
+			SetActive(UI.SPIN_TICKET_NUM, !MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.vaultInfo.freeSpin);
 		}
 	}
 
@@ -163,23 +163,23 @@ public class FortuneWheelTop : GameSection
 	{
 		foreach (FortuneWheelUserLog item in list)
 		{
-			Debug.Log((object)("item " + item.rewardString));
+			Debug.Log("item " + item.rewardString);
 		}
 	}
 
 	private void OnRequestUpdateUIHandler()
 	{
-		this.StartCoroutine(RequestRefreshUI());
+		StartCoroutine(RequestRefreshUI());
 	}
 
 	private void OnJackpotWinHandler(FortuneWheelManager.JackpotWinData data)
 	{
-		this.StartCoroutine(ShowJackpot(data));
+		StartCoroutine(ShowJackpot(data));
 	}
 
 	private IEnumerator ShowJackpot(FortuneWheelManager.JackpotWinData data)
 	{
-		yield return (object)new WaitForSeconds(2f);
+		yield return new WaitForSeconds(2f);
 		while (isSpinning)
 		{
 			yield return null;
@@ -189,13 +189,13 @@ public class FortuneWheelTop : GameSection
 
 	private IEnumerator RequestRefreshUI()
 	{
-		yield return (object)new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		RefreshUI();
 	}
 
 	private IEnumerator CloseWinJackpotDialog()
 	{
-		yield return (object)new WaitForSeconds(6f);
+		yield return new WaitForSeconds(6f);
 		GameSection.BackSection();
 	}
 
@@ -228,38 +228,42 @@ public class FortuneWheelTop : GameSection
 
 	private void DisableAllButton()
 	{
-		SetActive((Enum)UI.BTN_SPIN_X1_ENABLE, is_visible: false);
-		SetActive((Enum)UI.BTN_SPIN_X1_DISABLE, is_visible: true);
-		SetActive((Enum)UI.BTN_SPIN_X10_ENABLE, is_visible: false);
-		SetActive((Enum)UI.BTN_SPIN_X10_DISABLE, is_visible: true);
-		SetActive((Enum)UI.BTN_SPIN_X50_ENABLE, is_visible: false);
-		SetActive((Enum)UI.BTN_SPIN_X50_DISABLE, is_visible: true);
-		SetActive((Enum)UI.BTN_SPIN_X100_ENABLE, is_visible: false);
-		SetActive((Enum)UI.BTN_SPIN_X100_DISABLE, is_visible: true);
+		SetActive(UI.BTN_SPIN_X1_ENABLE, is_visible: false);
+		SetActive(UI.BTN_SPIN_X1_DISABLE, is_visible: true);
+		SetActive(UI.BTN_SPIN_X10_ENABLE, is_visible: false);
+		SetActive(UI.BTN_SPIN_X10_DISABLE, is_visible: true);
+		SetActive(UI.BTN_SPIN_X50_ENABLE, is_visible: false);
+		SetActive(UI.BTN_SPIN_X50_DISABLE, is_visible: true);
+		SetActive(UI.BTN_SPIN_X100_ENABLE, is_visible: false);
+		SetActive(UI.BTN_SPIN_X100_DISABLE, is_visible: true);
 	}
 
 	private void EnableSpinTypeButton(UI btnEnable, UI btnDisable)
 	{
-		SetActive((Enum)btnEnable, is_visible: true);
-		SetActive((Enum)btnDisable, is_visible: false);
+		SetActive(btnEnable, is_visible: true);
+		SetActive(btnDisable, is_visible: false);
 	}
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.LBL_CRYSTAL_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal.ToString("N0"));
-		SetLabelText((Enum)UI.LBL_GOLD_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money.ToString("N0"));
+		SetLabelText(UI.LBL_CRYSTAL_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal.ToString("N0"));
+		SetLabelText(UI.LBL_GOLD_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money.ToString("N0"));
 		UpdateLog(isSkipAnim: true);
 	}
 
 	private bool IsOpenWheel()
 	{
-		return MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData != null && MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.loyaltyPoint >= MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.loyaltyPointRequired && MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.isOpen;
+		if (MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData != null && MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.loyaltyPoint >= MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.loyaltyPointRequired)
+		{
+			return MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.isOpen;
+		}
+		return false;
 	}
 
 	private void SetWheelState(bool isOpen)
 	{
-		SetActive((Enum)UI.SPIN_UNLOCK_GROUP, isOpen);
-		SetActive((Enum)UI.SPIN_LOCK_GROUP, !isOpen);
+		SetActive(UI.SPIN_UNLOCK_GROUP, isOpen);
+		SetActive(UI.SPIN_LOCK_GROUP, !isOpen);
 		if (!isOpen)
 		{
 			SetActiveDay(MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.loyaltyPoint);
@@ -274,13 +278,13 @@ public class FortuneWheelTop : GameSection
 			Transform ctrl = GetCtrl(uI);
 			if (i < numDayActive)
 			{
-				SetActive(ctrl.get_transform(), UI.SPR_COUNT_DAY_ACTIVE, is_visible: true);
-				SetActive(ctrl.get_transform(), UI.SPR_COUNT_DAY_INACTIVE, is_visible: false);
+				SetActive(ctrl.transform, UI.SPR_COUNT_DAY_ACTIVE, is_visible: true);
+				SetActive(ctrl.transform, UI.SPR_COUNT_DAY_INACTIVE, is_visible: false);
 			}
 			else
 			{
-				SetActive(ctrl.get_transform(), UI.SPR_COUNT_DAY_ACTIVE, is_visible: false);
-				SetActive(ctrl.get_transform(), UI.SPR_COUNT_DAY_INACTIVE, is_visible: true);
+				SetActive(ctrl.transform, UI.SPR_COUNT_DAY_ACTIVE, is_visible: false);
+				SetActive(ctrl.transform, UI.SPR_COUNT_DAY_INACTIVE, is_visible: true);
 			}
 		}
 		SetActiveBarState(numDayActive);
@@ -322,8 +326,8 @@ public class FortuneWheelTop : GameSection
 			}
 			yield break;
 		}
-		yield return (object)new WaitForSeconds(0.5f);
-		yield return (object)new WaitForEndOfFrame();
+		yield return new WaitForSeconds(0.5f);
+		yield return new WaitForEndOfFrame();
 		if (!isUserSkip)
 		{
 			FortuneWheelUserLog item2 = GenerateRewardItem();
@@ -343,14 +347,13 @@ public class FortuneWheelTop : GameSection
 
 	private FortuneWheelUserLog GenerateRewardItem()
 	{
-		IEnumerable<FortuneWheelItem> source = from s in MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.vaultInfo.itemList
-		where s.id == MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.spinRewards[spinMultiRewardAddedIndex].spinItemId
-		select s;
-		FortuneWheelUserLog fortuneWheelUserLog = new FortuneWheelUserLog();
-		fortuneWheelUserLog.rewardId = source.First().rewardId;
-		fortuneWheelUserLog.rewardType = source.First().rewardType;
-		fortuneWheelUserLog.rewardNum = source.First().rewardNum;
-		return fortuneWheelUserLog;
+		IEnumerable<FortuneWheelItem> source = MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.vaultInfo.itemList.Where((FortuneWheelItem s) => s.id == MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData.spinRewards[spinMultiRewardAddedIndex].spinItemId);
+		return new FortuneWheelUserLog
+		{
+			rewardId = source.First().rewardId,
+			rewardType = source.First().rewardType,
+			rewardNum = source.First().rewardNum
+		};
 	}
 
 	private void CheckWinJackpot(FortuneWheelReward data)
@@ -368,7 +371,7 @@ public class FortuneWheelTop : GameSection
 
 	private void UpdateView()
 	{
-		this.StartCoroutine(IEUpdateView());
+		StartCoroutine(IEUpdateView());
 	}
 
 	private void UpdateLog(bool isSkipAnim = false)
@@ -399,8 +402,6 @@ public class FortuneWheelTop : GameSection
 			}
 			SetGrid(UI.GRD_REWARD_LOG, "FortuneWheelRewardLogItem", userLogList.Count, reset: true, delegate(int i, Transform t, bool b)
 			{
-				//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
 				FortuneWheelUserLog fortuneWheelUserLog = userLogList[i];
 				FortuneWheelRewardLogItem component2 = t.GetComponent<FortuneWheelRewardLogItem>();
 				if (fortuneWheelUserLog.rewardType == 550)
@@ -415,7 +416,7 @@ public class FortuneWheelTop : GameSection
 				{
 					if (i == userLogList.Count - 1)
 					{
-						t.set_localScale(new Vector3(0.5f, 0.5f, 0.5f));
+						t.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 						PlayTween(t, forward: true, delegate
 						{
 						}, is_input_block: false);
@@ -423,7 +424,7 @@ public class FortuneWheelTop : GameSection
 				}
 				else
 				{
-					t.set_localScale(Vector3.get_one());
+					t.localScale = Vector3.one;
 				}
 			});
 			UIScrollView component = GetCtrl(UI.SCR_USER_REWARD).GetComponent<UIScrollView>();
@@ -508,7 +509,7 @@ public class FortuneWheelTop : GameSection
 		{
 			if (!isSpinning && !spinMultiple)
 			{
-				Debug.Log((object)("Change Spintype = " + spinType));
+				Debug.Log("Change Spintype = " + spinType);
 				this.spinType = spinType;
 				SetButtonState();
 			}
@@ -524,7 +525,7 @@ public class FortuneWheelTop : GameSection
 		if (spinType != FortuneWheelManager.SPIN_TYPE.X1)
 		{
 			spinHandle.Skip();
-			this.StopCoroutine(IESpinMultiIMP(MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData));
+			StopCoroutine(IESpinMultiIMP(MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData));
 			isUserSkip = true;
 			isSpinning = false;
 			UpdateView();
@@ -538,7 +539,7 @@ public class FortuneWheelTop : GameSection
 
 	private IEnumerator IEBack()
 	{
-		yield return (object)new WaitForSeconds(2f);
+		yield return new WaitForSeconds(2f);
 		GameSection.ChangeEvent("OK");
 	}
 
@@ -632,7 +633,7 @@ public class FortuneWheelTop : GameSection
 			{
 				if (success)
 				{
-					this.StartCoroutine(IESpinMultiIMP(MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData));
+					StartCoroutine(IESpinMultiIMP(MonoBehaviourSingleton<FortuneWheelManager>.I.SpinData));
 				}
 				UpdateAfterSpin();
 				GameSection.ResumeEvent(is_resume: true);
@@ -654,7 +655,7 @@ public class FortuneWheelTop : GameSection
 				break;
 			}
 			SpinMulti(data, countMultipleSpin, SpinMultiEndAct);
-			yield return (object)new WaitForSeconds((spinType != FortuneWheelManager.SPIN_TYPE.X10) ? delayMuliSpin : delay10Spin);
+			yield return new WaitForSeconds((spinType == FortuneWheelManager.SPIN_TYPE.X10) ? delay10Spin : delayMuliSpin);
 		}
 		countMultipleSpin = 0;
 		spinMultiple = false;
@@ -694,7 +695,7 @@ public class FortuneWheelTop : GameSection
 
 	private void Update()
 	{
-		timeUpdate += Time.get_deltaTime();
+		timeUpdate += Time.deltaTime;
 		if (timeUpdate >= 10f)
 		{
 			timeUpdate = 0f;
@@ -717,12 +718,12 @@ public class FortuneWheelTop : GameSection
 
 	private void UpdateJackpot()
 	{
-		this.StartCoroutine(IEUpdateJackpot());
+		StartCoroutine(IEUpdateJackpot());
 	}
 
 	private IEnumerator IEUpdateJackpot()
 	{
-		yield return (object)new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		jackportNumber.ShowNumber(MonoBehaviourSingleton<FortuneWheelManager>.I.WheelData.vaultInfo.jackpot.ToString());
 	}
 
@@ -730,8 +731,8 @@ public class FortuneWheelTop : GameSection
 	{
 		if ((flags & NOTIFY_FLAG.CHANGED_SCENE) != (NOTIFY_FLAG)0L)
 		{
-			SetLabelText((Enum)UI.LBL_CRYSTAL_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal.ToString("N0"));
-			SetLabelText((Enum)UI.LBL_GOLD_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money.ToString("N0"));
+			SetLabelText(UI.LBL_CRYSTAL_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal.ToString("N0"));
+			SetLabelText(UI.LBL_GOLD_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money.ToString("N0"));
 			UpdateStat();
 		}
 	}

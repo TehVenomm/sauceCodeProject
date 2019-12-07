@@ -9,15 +9,11 @@ namespace GooglePlayGames.OurUtils
 		{
 			get
 			{
-				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000b: Expected O, but got Unknown
-				AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-				AndroidJavaObject @static = val.GetStatic<AndroidJavaObject>("currentActivity");
-				AndroidJavaObject val2 = @static.Call<AndroidJavaObject>("getPackageManager", new object[0]);
-				AndroidJavaObject val3 = null;
+				AndroidJavaObject androidJavaObject = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity").Call<AndroidJavaObject>("getPackageManager", Array.Empty<object>());
+				AndroidJavaObject androidJavaObject2 = null;
 				try
 				{
-					val3 = val2.Call<AndroidJavaObject>("getLaunchIntentForPackage", new object[1]
+					androidJavaObject2 = androidJavaObject.Call<AndroidJavaObject>("getLaunchIntentForPackage", new object[1]
 					{
 						"com.google.android.play.games"
 					});
@@ -26,7 +22,7 @@ namespace GooglePlayGames.OurUtils
 				{
 					return false;
 				}
-				return val3 != null;
+				return androidJavaObject2 != null;
 			}
 		}
 	}

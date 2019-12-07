@@ -118,7 +118,7 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 				SetActive(t, is_visible: false);
 			}
 		});
-		SetActive((Enum)UI.STR_NON_REWARD, reward_ary.Length == 0);
+		SetActive(UI.STR_NON_REWARD, reward_ary.Length == 0);
 	}
 
 	protected virtual NeedMaterial[] CreateNeedMaterialAry()
@@ -136,20 +136,16 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 				{
 					lapis_id = equipItemExceedData.exchangeItemId;
 				}
-				if (lapis_id != 0)
+				if (lapis_id != 0 && Singleton<ItemTable>.I.GetItemData(lapis_id) != null)
 				{
-					ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(lapis_id);
-					if (itemData != null)
+					NeedMaterial needMaterial = reward.Find((NeedMaterial regist_lapis) => regist_lapis.itemID == lapis_id);
+					if (needMaterial == null)
 					{
-						NeedMaterial needMaterial = reward.Find((NeedMaterial regist_lapis) => regist_lapis.itemID == lapis_id);
-						if (needMaterial == null)
-						{
-							reward.Add(new NeedMaterial(lapis_id, 1));
-						}
-						else
-						{
-							needMaterial.num++;
-						}
+						reward.Add(new NeedMaterial(lapis_id, 1));
+					}
+					else
+					{
+						needMaterial.num++;
 					}
 				}
 			}
@@ -192,7 +188,7 @@ public class ItemStorageSellConfirm : ItemSellConfirm
 			{
 				stringBuilder.AppendLine(base.sectionData.GetText("TEXT_INCLUDE_EXCEED_EQUIP"));
 			}
-			stringBuilder.AppendLine(string.Empty);
+			stringBuilder.AppendLine("");
 			stringBuilder.Append(base.sectionData.GetText("TEXT_GROW"));
 			GameSection.ChangeEvent("INCLUDE_RARE_CONFIRM", stringBuilder.ToString());
 		}

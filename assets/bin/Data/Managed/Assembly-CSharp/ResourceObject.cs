@@ -34,15 +34,6 @@ public class ResourceObject
 		}
 	}
 
-	public ResourceObject()
-	{
-		_refCount = 0;
-		package = null;
-		obj = null;
-		name = null;
-		willReleaseObjs = null;
-	}
-
 	public static void ClearPoolObjects()
 	{
 		rymTPool<ResourceObject>.Clear();
@@ -69,25 +60,25 @@ public class ResourceObject
 		case RESOURCE_CATEGORY.PLAYER_LEG:
 		case RESOURCE_CATEGORY.PLAYER_WEAPON:
 		{
-			GameObject val = resourceObject.obj as GameObject;
-			if (!(val != null))
+			GameObject gameObject = resourceObject.obj as GameObject;
+			if (!(gameObject != null))
 			{
 				break;
 			}
-			Renderer componentInChildren = val.GetComponentInChildren<Renderer>();
-			willReleaseList.Add(componentInChildren.get_sharedMaterial().get_mainTexture());
+			Renderer componentInChildren = gameObject.GetComponentInChildren<Renderer>();
+			willReleaseList.Add(componentInChildren.sharedMaterial.mainTexture);
 			if (componentInChildren is MeshRenderer)
 			{
 				MeshFilter component = componentInChildren.GetComponent<MeshFilter>();
 				if (component != null)
 				{
-					willReleaseList.Add(component.get_sharedMesh());
+					willReleaseList.Add(component.sharedMesh);
 				}
 			}
 			else if (componentInChildren is SkinnedMeshRenderer)
 			{
-				SkinnedMeshRenderer val2 = componentInChildren as SkinnedMeshRenderer;
-				willReleaseList.Add(val2.get_sharedMesh());
+				SkinnedMeshRenderer skinnedMeshRenderer = componentInChildren as SkinnedMeshRenderer;
+				willReleaseList.Add(skinnedMeshRenderer.sharedMesh);
 			}
 			break;
 		}
@@ -106,12 +97,21 @@ public class ResourceObject
 		{
 			for (int i = 0; i < resobj.willReleaseObjs.Length; i++)
 			{
-				Object.DestroyImmediate(resobj.willReleaseObjs[i], true);
+				Object.DestroyImmediate(resobj.willReleaseObjs[i], allowDestroyingAssets: true);
 				resobj.willReleaseObjs[i] = null;
 			}
 		}
 		resobj.Reset();
 		rymTPool<ResourceObject>.Release(ref resobj);
+	}
+
+	public ResourceObject()
+	{
+		_refCount = 0;
+		package = null;
+		obj = null;
+		name = null;
+		willReleaseObjs = null;
 	}
 
 	public void Reset()

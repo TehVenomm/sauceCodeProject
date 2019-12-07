@@ -13,15 +13,13 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public override void OnUpdate()
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		base.OnUpdate();
 		if (!(base.character is Self))
 		{
 			return;
 		}
 		Self self = base.character as Self;
-		cannonRotateTimer += Time.get_deltaTime();
+		cannonRotateTimer += Time.deltaTime;
 		if (self.IsOnCannonMode() && cannonRotateTimer >= 1f)
 		{
 			Coop_Model_PlayerCannonRotate coop_Model_PlayerCannonRotate = new Coop_Model_PlayerCannonRotate();
@@ -80,8 +78,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	private void _SendInitialize(Coop_Model_PlayerInitialize model, bool resend)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		model.id = base.owner.id;
 		if (!resend && actionHistoryData != null)
 		{
@@ -95,7 +91,7 @@ public class PlayerPacketSender : CharacterPacketSender
 		model.sid = player.id;
 		model.hp = player.hp;
 		model.healHp = player.healHp;
-		model.target_id = ((!(player.actionTarget != null)) ? (-1) : player.actionTarget.id);
+		model.target_id = ((player.actionTarget != null) ? player.actionTarget.id : (-1));
 		model.stopcounter = player.isStopCounter;
 		model.act_battle_start = false;
 		if (player.actionID == (Character.ACTION_ID)23)
@@ -143,21 +139,10 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnActAttackCombo(int id, string _motionLayerName, string _motionStateName = "")
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_PlayerAttackCombo coop_Model_PlayerAttackCombo = new Coop_Model_PlayerAttackCombo();
 		coop_Model_PlayerAttackCombo.id = base.owner.id;
 		coop_Model_PlayerAttackCombo.pos = base.owner._position;
-		Coop_Model_PlayerAttackCombo coop_Model_PlayerAttackCombo2 = coop_Model_PlayerAttackCombo;
-		Quaternion rotation = base.owner._rotation;
-		Vector3 eulerAngles = rotation.get_eulerAngles();
-		coop_Model_PlayerAttackCombo2.dir = eulerAngles.y;
+		coop_Model_PlayerAttackCombo.dir = base.owner._rotation.eulerAngles.y;
 		coop_Model_PlayerAttackCombo.attack_id = id;
 		coop_Model_PlayerAttackCombo.motionLayerName = _motionLayerName;
 		coop_Model_PlayerAttackCombo.motionStateName = _motionStateName;
@@ -172,28 +157,16 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnSetChargeRelease(float charge_rate, bool isChargeExRush)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_PlayerChargeRelease coop_Model_PlayerChargeRelease = new Coop_Model_PlayerChargeRelease();
 		coop_Model_PlayerChargeRelease.id = base.owner.id;
 		coop_Model_PlayerChargeRelease.SetSyncPosition(base.owner);
-		if (player.lerpRotateVec == Vector3.get_zero())
+		if (player.lerpRotateVec == Vector3.zero)
 		{
 			coop_Model_PlayerChargeRelease.lerp_dir = coop_Model_PlayerChargeRelease.dir;
 		}
 		else
 		{
-			Coop_Model_PlayerChargeRelease coop_Model_PlayerChargeRelease2 = coop_Model_PlayerChargeRelease;
-			Quaternion val = Quaternion.LookRotation(player.lerpRotateVec);
-			Vector3 eulerAngles = val.get_eulerAngles();
-			coop_Model_PlayerChargeRelease2.lerp_dir = eulerAngles.y;
+			coop_Model_PlayerChargeRelease.lerp_dir = Quaternion.LookRotation(player.lerpRotateVec).eulerAngles.y;
 		}
 		coop_Model_PlayerChargeRelease.charge_rate = charge_rate;
 		coop_Model_PlayerChargeRelease.act_pos = base.character.actionPosition;
@@ -208,28 +181,16 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnSetChargeExpandRelease(float chargeRate)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_PlayerChargeExpandRelease coop_Model_PlayerChargeExpandRelease = new Coop_Model_PlayerChargeExpandRelease();
 		coop_Model_PlayerChargeExpandRelease.id = base.owner.id;
 		coop_Model_PlayerChargeExpandRelease.SetSyncPosition(base.owner);
-		if (player.lerpRotateVec == Vector3.get_zero())
+		if (player.lerpRotateVec == Vector3.zero)
 		{
 			coop_Model_PlayerChargeExpandRelease.lerp_dir = coop_Model_PlayerChargeExpandRelease.dir;
 		}
 		else
 		{
-			Coop_Model_PlayerChargeExpandRelease coop_Model_PlayerChargeExpandRelease2 = coop_Model_PlayerChargeExpandRelease;
-			Quaternion val = Quaternion.LookRotation(player.lerpRotateVec);
-			Vector3 eulerAngles = val.get_eulerAngles();
-			coop_Model_PlayerChargeExpandRelease2.lerp_dir = eulerAngles.y;
+			coop_Model_PlayerChargeExpandRelease.lerp_dir = Quaternion.LookRotation(player.lerpRotateVec).eulerAngles.y;
 		}
 		coop_Model_PlayerChargeExpandRelease.charge_rate = chargeRate;
 		coop_Model_PlayerChargeExpandRelease.act_pos = base.character.actionPosition;
@@ -306,8 +267,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnRushAvoid(Vector3 inputVec)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_PlayerRushAvoid coop_Model_PlayerRushAvoid = new Coop_Model_PlayerRushAvoid();
 		coop_Model_PlayerRushAvoid.id = base.owner.id;
 		coop_Model_PlayerRushAvoid.inputVec = inputVec;
@@ -378,11 +337,7 @@ public class PlayerPacketSender : CharacterPacketSender
 				{
 					return false;
 				}
-				if (player.IsStone())
-				{
-					return false;
-				}
-				return true;
+				return (!player.IsStone()) ? true : false;
 			});
 		}
 	}
@@ -401,13 +356,13 @@ public class PlayerPacketSender : CharacterPacketSender
 	{
 		if (base.enableSend && base.owner.IsOriginal())
 		{
-			this.StartCoroutine(_OnDeadCountRequest(toClientId, deadPlayer));
+			StartCoroutine(_OnDeadCountRequest(toClientId, deadPlayer));
 		}
 	}
 
 	private IEnumerator _OnDeadCountRequest(int toClientId, Player deadPlayer)
 	{
-		yield return (object)new WaitForSeconds(1.5f);
+		yield return new WaitForSeconds(1.5f);
 		if (deadPlayer.rescueTime > 0f && !deadPlayer.IsPrayed() && !deadPlayer.isWaitingResurrectionHoming)
 		{
 			Coop_Model_PlayerDeadCount coop_Model_PlayerDeadCount = new Coop_Model_PlayerDeadCount();
@@ -444,11 +399,7 @@ public class PlayerPacketSender : CharacterPacketSender
 				{
 					return false;
 				}
-				if (player.hp == 0)
-				{
-					return false;
-				}
-				return true;
+				return (player.hp != 0) ? true : false;
 			});
 		}
 	}
@@ -514,11 +465,7 @@ public class PlayerPacketSender : CharacterPacketSender
 					return false;
 				}
 				Coop_Model_PlayerApplyChangeWeapon coop_Model_PlayerApplyChangeWeapon2 = send_model as Coop_Model_PlayerApplyChangeWeapon;
-				if (coop_Model_PlayerApplyChangeWeapon2.item.eId != player.weaponData.eId || coop_Model_PlayerApplyChangeWeapon2.index != player.weaponIndex)
-				{
-					return false;
-				}
-				return true;
+				return (coop_Model_PlayerApplyChangeWeapon2.item.eId == player.weaponData.eId && coop_Model_PlayerApplyChangeWeapon2.index == player.weaponIndex) ? true : false;
 			});
 		}
 		ClearActionHistory();
@@ -526,8 +473,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnActGather(GatherPointObject gather_point)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_PlayerGather coop_Model_PlayerGather = new Coop_Model_PlayerGather();
 		coop_Model_PlayerGather.id = base.owner.id;
 		coop_Model_PlayerGather.SetSyncPosition(base.owner);
@@ -543,8 +488,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnActSkillAction(int skill_index, SkillInfo.SkillParam skill_param)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_PlayerSkillAction coop_Model_PlayerSkillAction = new Coop_Model_PlayerSkillAction();
 		coop_Model_PlayerSkillAction.id = base.owner.id;
 		coop_Model_PlayerSkillAction.SetSyncPosition(base.owner);
@@ -630,8 +573,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnActSpecialAction(bool start_effect, bool isSuccess)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_PlayerSpecialAction coop_Model_PlayerSpecialAction = new Coop_Model_PlayerSpecialAction();
 		coop_Model_PlayerSpecialAction.id = base.owner.id;
 		coop_Model_PlayerSpecialAction.SetSyncPosition(base.owner);
@@ -668,10 +609,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnShotArrow(Vector3 shot_pos, Quaternion shot_rot, AttackInfo attack_info, bool is_sit_shot, bool is_aim_end)
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_PlayerShotArrow coop_Model_PlayerShotArrow = new Coop_Model_PlayerShotArrow();
 		coop_Model_PlayerShotArrow.id = base.owner.id;
 		coop_Model_PlayerShotArrow.SetSyncPosition(base.owner);
@@ -691,10 +628,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnShotSoulArrow(Vector3 shotPos, Quaternion bowRot, List<Vector3> targetPosList)
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_PlayerShotSoulArrow coop_Model_PlayerShotSoulArrow = new Coop_Model_PlayerShotSoulArrow();
 		coop_Model_PlayerShotSoulArrow.id = base.owner.id;
 		coop_Model_PlayerShotSoulArrow.SetSyncPosition(base.owner);
@@ -760,8 +693,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnSetPresentBullet(int presentBulletId, BulletData.BulletPresent.TYPE type, Vector3 position, string bulletName)
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		if (base.enableSend && base.owner.IsOriginal())
 		{
 			Coop_Model_PlayerSetPresentBullet coop_Model_PlayerSetPresentBullet = new Coop_Model_PlayerSetPresentBullet();
@@ -787,8 +718,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnShotZoneBullet(string bulletName, Vector3 position)
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		if (base.enableSend && base.owner.IsOriginal())
 		{
 			Coop_Model_PlayerShotZoneBullet coop_Model_PlayerShotZoneBullet = new Coop_Model_PlayerShotZoneBullet();
@@ -801,8 +730,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnShotDecoyBullet(int skIndex, int decoyId, string bulletName, Vector3 position)
 	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		if (base.enableSend && base.owner.IsOriginal())
 		{
 			Coop_Model_PlayerShotDecoyBullet coop_Model_PlayerShotDecoyBullet = new Coop_Model_PlayerShotDecoyBullet();
@@ -840,8 +767,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnCannonShot()
 	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		if (base.enableSend && base.owner.IsOriginal())
 		{
 			Coop_Model_PlayerCannonShot coop_Model_PlayerCannonShot = new Coop_Model_PlayerCannonShot();
@@ -854,8 +779,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnActSpAttackContinue()
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_PlayerSpecialActionContinue coop_Model_PlayerSpecialActionContinue = new Coop_Model_PlayerSpecialActionContinue();
 		coop_Model_PlayerSpecialActionContinue.id = base.owner.id;
 		coop_Model_PlayerSpecialActionContinue.SetSyncPosition(base.owner);
@@ -919,8 +842,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnJumpRize(Vector3 dir, int level)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		if (base.enableSend && base.owner.IsOriginal())
 		{
 			Coop_Model_PlayerJumpRize coop_Model_PlayerJumpRize = new Coop_Model_PlayerJumpRize();
@@ -933,8 +854,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnJumpEnd(Vector3 pos, bool isSuccess, float y)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		if (base.enableSend && base.owner.IsOriginal())
 		{
 			Coop_Model_PlayerJumpEnd coop_Model_PlayerJumpEnd = new Coop_Model_PlayerJumpEnd();
@@ -948,8 +867,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnSnatch(int enemyId, Vector3 hitPoint)
 	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		if (base.enableSend && base.owner.IsOriginal())
 		{
 			Coop_Model_PlayerSnatchPos coop_Model_PlayerSnatchPos = new Coop_Model_PlayerSnatchPos();
@@ -962,8 +879,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnSnatchMoveStart(Vector3 snatchPos)
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		if (base.enableSend && base.owner.IsOriginal())
 		{
 			Coop_Model_PlayerSnatchMoveStart coop_Model_PlayerSnatchMoveStart = new Coop_Model_PlayerSnatchMoveStart();
@@ -975,24 +890,13 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnSnatchMoveEnd(int triggerIndex = 0)
 	{
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_enabled() && base.owner.IsOriginal())
+		if (base.enabled && base.owner.IsOriginal())
 		{
 			Coop_Model_PlayerSnatchMoveEnd coop_Model_PlayerSnatchMoveEnd = new Coop_Model_PlayerSnatchMoveEnd();
 			coop_Model_PlayerSnatchMoveEnd.id = base.owner.id;
 			coop_Model_PlayerSnatchMoveEnd.SetSyncPosition(base.owner);
 			coop_Model_PlayerSnatchMoveEnd.pos = base.owner._position;
-			Coop_Model_PlayerSnatchMoveEnd coop_Model_PlayerSnatchMoveEnd2 = coop_Model_PlayerSnatchMoveEnd;
-			Quaternion rotation = base.owner._rotation;
-			Vector3 eulerAngles = rotation.get_eulerAngles();
-			coop_Model_PlayerSnatchMoveEnd2.dir = eulerAngles.y;
+			coop_Model_PlayerSnatchMoveEnd.dir = base.owner._rotation.eulerAngles.y;
 			coop_Model_PlayerSnatchMoveEnd.act_pos = base.character.actionPosition;
 			coop_Model_PlayerSnatchMoveEnd.act_pos_f = base.character.actionPositionFlag;
 			coop_Model_PlayerSnatchMoveEnd.triggerIndex = triggerIndex;
@@ -1049,10 +953,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnCreateWaveMatchDropObject(int managedId, uint dataId, Vector3 basePos, Vector3 offset, float sec)
 	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 		if (base.enableSend && base.owner.IsOriginal())
 		{
 			Coop_Model_WaveMatchDropCreate coop_Model_WaveMatchDropCreate = new Coop_Model_WaveMatchDropCreate();
@@ -1080,8 +980,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnActGatherGimmick(int id)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_PlayerGatherGimmick coop_Model_PlayerGatherGimmick = new Coop_Model_PlayerGatherGimmick();
 		coop_Model_PlayerGatherGimmick.id = base.owner.id;
 		coop_Model_PlayerGatherGimmick.SetSyncPosition(base.owner);
@@ -1122,8 +1020,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnActQuestGimmick(int id)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_PlayerQuestGimmick coop_Model_PlayerQuestGimmick = new Coop_Model_PlayerQuestGimmick();
 		coop_Model_PlayerQuestGimmick.id = base.owner.id;
 		coop_Model_PlayerQuestGimmick.SetSyncPosition(base.owner);
@@ -1161,8 +1057,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnActCoopFishingStart(int id)
 	{
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 		if (base.enableSend && base.owner.IsOriginal())
 		{
 			Coop_Model_PlayerCoopFishingStart coop_Model_PlayerCoopFishingStart = new Coop_Model_PlayerCoopFishingStart();
@@ -1177,8 +1071,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnActFlickAction(Vector3 inputVec)
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		Coop_Model_PlayerFlickAction coop_Model_PlayerFlickAction = new Coop_Model_PlayerFlickAction();
 		coop_Model_PlayerFlickAction.id = base.owner.id;
 		coop_Model_PlayerFlickAction.SetSyncPosition(base.owner);
@@ -1234,8 +1126,6 @@ public class PlayerPacketSender : CharacterPacketSender
 
 	public void OnRainShotChargeRelease(Vector3 pos, float rotY)
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		if (base.enableSend && base.owner.IsOriginal())
 		{
 			Coop_Model_PlayerRainShotChargeRelease coop_Model_PlayerRainShotChargeRelease = new Coop_Model_PlayerRainShotChargeRelease();

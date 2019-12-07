@@ -42,16 +42,21 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private bool dragHighlight;
 
-	private bool dualState => trigger == Trigger.OnPress || trigger == Trigger.OnHover;
-
-	public UIPlayAnimation()
-		: this()
+	private bool dualState
 	{
+		get
+		{
+			if (trigger != Trigger.OnPress)
+			{
+				return trigger == Trigger.OnHover;
+			}
+			return true;
+		}
 	}
 
 	private void Awake()
 	{
-		UIButton component = this.GetComponent<UIButton>();
+		UIButton component = GetComponent<UIButton>();
 		if (component != null)
 		{
 			dragHighlight = component.dragHighlight;
@@ -68,23 +73,23 @@ public class UIPlayAnimation : MonoBehaviour
 		mStarted = true;
 		if (target == null && animator == null)
 		{
-			animator = this.GetComponentInChildren<Animator>();
+			animator = GetComponentInChildren<Animator>();
 		}
 		if (animator != null)
 		{
-			if (animator.get_enabled())
+			if (animator.enabled)
 			{
-				animator.set_enabled(false);
+				animator.enabled = false;
 			}
 			return;
 		}
 		if (target == null)
 		{
-			target = this.GetComponentInChildren<Animation>();
+			target = GetComponentInChildren<Animation>();
 		}
-		if (target != null && target.get_enabled())
+		if (target != null && target.enabled)
 		{
-			target.set_enabled(false);
+			target.enabled = false;
 		}
 	}
 
@@ -92,20 +97,20 @@ public class UIPlayAnimation : MonoBehaviour
 	{
 		if (mStarted)
 		{
-			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
+			OnHover(UICamera.IsHighlighted(base.gameObject));
 		}
 		if (UICamera.currentTouch != null)
 		{
 			if (trigger == Trigger.OnPress || trigger == Trigger.OnPressTrue)
 			{
-				mActivated = (UICamera.currentTouch.pressed == this.get_gameObject());
+				mActivated = (UICamera.currentTouch.pressed == base.gameObject);
 			}
 			if (trigger == Trigger.OnHover || trigger == Trigger.OnHoverTrue)
 			{
-				mActivated = (UICamera.currentTouch.current == this.get_gameObject());
+				mActivated = (UICamera.currentTouch.current == base.gameObject);
 			}
 		}
-		UIToggle component = this.GetComponent<UIToggle>();
+		UIToggle component = GetComponent<UIToggle>();
 		if (component != null)
 		{
 			EventDelegate.Add(component.onChange, OnToggle);
@@ -114,7 +119,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnDisable()
 	{
-		UIToggle component = this.GetComponent<UIToggle>();
+		UIToggle component = GetComponent<UIToggle>();
 		if (component != null)
 		{
 			EventDelegate.Remove(component.onChange, OnToggle);
@@ -123,7 +128,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnHover(bool isOver)
 	{
-		if (this.get_enabled() && (trigger == Trigger.OnHover || (trigger == Trigger.OnHoverTrue && isOver) || (trigger == Trigger.OnHoverFalse && !isOver)))
+		if (base.enabled && (trigger == Trigger.OnHover || (trigger == Trigger.OnHoverTrue && isOver) || (trigger == Trigger.OnHoverFalse && !isOver)))
 		{
 			Play(isOver, dualState);
 		}
@@ -131,7 +136,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnPress(bool isPressed)
 	{
-		if (this.get_enabled() && (UICamera.currentTouchID >= -1 || UICamera.currentScheme == UICamera.ControlScheme.Controller) && (trigger == Trigger.OnPress || (trigger == Trigger.OnPressTrue && isPressed) || (trigger == Trigger.OnPressFalse && !isPressed)))
+		if (base.enabled && (UICamera.currentTouchID >= -1 || UICamera.currentScheme == UICamera.ControlScheme.Controller) && (trigger == Trigger.OnPress || (trigger == Trigger.OnPressTrue && isPressed) || (trigger == Trigger.OnPressFalse && !isPressed)))
 		{
 			Play(isPressed, dualState);
 		}
@@ -139,7 +144,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnClick()
 	{
-		if ((UICamera.currentTouchID >= -1 || UICamera.currentScheme == UICamera.ControlScheme.Controller) && this.get_enabled() && trigger == Trigger.OnClick)
+		if ((UICamera.currentTouchID >= -1 || UICamera.currentScheme == UICamera.ControlScheme.Controller) && base.enabled && trigger == Trigger.OnClick)
 		{
 			Play(forward: true, onlyIfDifferent: false);
 		}
@@ -147,7 +152,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnDoubleClick()
 	{
-		if ((UICamera.currentTouchID >= -1 || UICamera.currentScheme == UICamera.ControlScheme.Controller) && this.get_enabled() && trigger == Trigger.OnDoubleClick)
+		if ((UICamera.currentTouchID >= -1 || UICamera.currentScheme == UICamera.ControlScheme.Controller) && base.enabled && trigger == Trigger.OnDoubleClick)
 		{
 			Play(forward: true, onlyIfDifferent: false);
 		}
@@ -155,7 +160,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnSelect(bool isSelected)
 	{
-		if (this.get_enabled() && (trigger == Trigger.OnSelect || (trigger == Trigger.OnSelectTrue && isSelected) || (trigger == Trigger.OnSelectFalse && !isSelected)))
+		if (base.enabled && (trigger == Trigger.OnSelect || (trigger == Trigger.OnSelectTrue && isSelected) || (trigger == Trigger.OnSelectFalse && !isSelected)))
 		{
 			Play(isSelected, dualState);
 		}
@@ -163,7 +168,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnToggle()
 	{
-		if (this.get_enabled() && !(UIToggle.current == null) && (trigger == Trigger.OnActivate || (trigger == Trigger.OnActivateTrue && UIToggle.current.value) || (trigger == Trigger.OnActivateFalse && !UIToggle.current.value)))
+		if (base.enabled && !(UIToggle.current == null) && (trigger == Trigger.OnActivate || (trigger == Trigger.OnActivateTrue && UIToggle.current.value) || (trigger == Trigger.OnActivateFalse && !UIToggle.current.value)))
 		{
 			Play(UIToggle.current.value, dualState);
 		}
@@ -171,9 +176,9 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnDragOver()
 	{
-		if (this.get_enabled() && dualState)
+		if (base.enabled && dualState)
 		{
-			if (UICamera.currentTouch.dragged == this.get_gameObject())
+			if (UICamera.currentTouch.dragged == base.gameObject)
 			{
 				Play(forward: true, onlyIfDifferent: true);
 			}
@@ -186,7 +191,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnDragOut()
 	{
-		if (this.get_enabled() && dualState && UICamera.hoveredObject != this.get_gameObject())
+		if (base.enabled && dualState && UICamera.hoveredObject != base.gameObject)
 		{
 			Play(forward: false, onlyIfDifferent: true);
 		}
@@ -194,7 +199,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	private void OnDrop(GameObject go)
 	{
-		if (this.get_enabled() && trigger == Trigger.OnPress && UICamera.currentTouch.dragged != this.get_gameObject())
+		if (base.enabled && trigger == Trigger.OnPress && UICamera.currentTouch.dragged != base.gameObject)
 		{
 			Play(forward: false, onlyIfDifferent: true);
 		}
@@ -207,7 +212,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	public void Play(bool forward, bool onlyIfDifferent)
 	{
-		if (!Object.op_Implicit(target) && !Object.op_Implicit(animator))
+		if (!target && !animator)
 		{
 			return;
 		}
@@ -219,13 +224,13 @@ public class UIPlayAnimation : MonoBehaviour
 			}
 			mActivated = forward;
 		}
-		if (clearSelection && UICamera.selectedObject == this.get_gameObject())
+		if (clearSelection && UICamera.selectedObject == base.gameObject)
 		{
 			UICamera.selectedObject = null;
 		}
 		int num = 0 - playDirection;
-		Direction direction = (Direction)((!forward) ? num : ((int)playDirection));
-		ActiveAnimation activeAnimation = (!Object.op_Implicit(target)) ? ActiveAnimation.Play(animator, clipName, direction, ifDisabledOnPlay, disableWhenFinished) : ActiveAnimation.Play(target, clipName, direction, ifDisabledOnPlay, disableWhenFinished);
+		Direction direction = (Direction)(forward ? ((int)playDirection) : num);
+		ActiveAnimation activeAnimation = target ? ActiveAnimation.Play(target, clipName, direction, ifDisabledOnPlay, disableWhenFinished) : ActiveAnimation.Play(animator, clipName, direction, ifDisabledOnPlay, disableWhenFinished);
 		if (activeAnimation != null)
 		{
 			if (resetOnPlay)
@@ -257,7 +262,7 @@ public class UIPlayAnimation : MonoBehaviour
 			EventDelegate.Execute(onFinished);
 			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
 			{
-				eventReceiver.SendMessage(callWhenFinished, 1);
+				eventReceiver.SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
 			}
 			eventReceiver = null;
 			current = null;

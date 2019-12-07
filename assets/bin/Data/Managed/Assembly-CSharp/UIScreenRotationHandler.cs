@@ -7,11 +7,6 @@ public abstract class UIScreenRotationHandler : MonoBehaviour
 
 	private bool prevIsPortrait;
 
-	protected UIScreenRotationHandler()
-		: this()
-	{
-	}
-
 	protected abstract void OnScreenRotate(bool is_portrait);
 
 	private void Awake()

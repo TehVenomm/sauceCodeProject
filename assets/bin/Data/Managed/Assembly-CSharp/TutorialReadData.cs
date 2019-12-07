@@ -104,14 +104,14 @@ public class TutorialReadData
 
 	public static void SaveAsEmptyData()
 	{
-		string text = JSONSerializer.Serialize(new SaveData());
-		PlayerPrefs.SetString("TutorialProgress", text);
+		string value = JSONSerializer.Serialize(new SaveData());
+		PlayerPrefs.SetString("TutorialProgress", value);
 	}
 
 	public void Save()
 	{
-		string text = JSONSerializer.Serialize(m_SaveData);
-		PlayerPrefs.SetString("TutorialProgress", text);
+		string value = JSONSerializer.Serialize(m_SaveData);
+		PlayerPrefs.SetString("TutorialProgress", value);
 	}
 
 	public static bool HasSave()
@@ -146,12 +146,10 @@ public class TutorialReadData
 
 	public static TutorialReadData CreateAndLoad()
 	{
-		SaveData saveData = null;
 		if (HasSave())
 		{
 			string @string = PlayerPrefs.GetString("TutorialProgress");
-			saveData = JSONSerializer.Deserialize<SaveData>(@string);
-			if (saveData == null)
+			if (JSONSerializer.Deserialize<SaveData>(@string) == null)
 			{
 				Log.Error("JSONSerializer.Deserialize<TutorialReadData.SaveData> {0}", @string);
 				return null;
@@ -159,7 +157,7 @@ public class TutorialReadData
 		}
 		else
 		{
-			saveData = new SaveData();
+			new SaveData();
 		}
 		TutorialReadData tutorialReadData = new TutorialReadData();
 		tutorialReadData.LoadSaveData();

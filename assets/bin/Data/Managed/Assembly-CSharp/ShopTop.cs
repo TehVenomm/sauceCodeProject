@@ -210,9 +210,9 @@ public class ShopTop : SkillInfoBase
 					return null;
 				}
 				return (from g in gachaGuaranteeCampaignInfos
-				where g.gachaId == gachaId
-				where g.IsValid()
-				select g).FirstOrDefault();
+					where g.gachaId == gachaId
+					where g.IsValid()
+					select g).FirstOrDefault();
 			}
 
 			public GachaFriendPromotionInfo GetGachaFriendPromotionInfo(int gachaId)
@@ -268,7 +268,7 @@ public class ShopTop : SkillInfoBase
 
 	private const int PAGE_GACHA_MAGI = 1;
 
-	private string selectProductId = string.Empty;
+	private string selectProductId = "";
 
 	private bool isPurchase;
 
@@ -328,10 +328,10 @@ public class ShopTop : SkillInfoBase
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA1))
 		{
 			MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_8_gacha, "Tutorial");
-			Debug.LogWarning((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_8_gacha.ToString()));
+			Debug.LogWarning("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_8_gacha.ToString());
 			MonoBehaviourSingleton<GoWrapManager>.I.SendStatusTracking(TRACK_TUTORIAL_STEP_BIT.tutorial_8_gacha, "Tutorial");
 		}
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -372,7 +372,6 @@ public class ShopTop : SkillInfoBase
 		gachaModelInfo = new List<GachaModelInfo>();
 		MonoBehaviourSingleton<GachaManager>.I.gachaData.types.ForEach(delegate(GachaList.GachaType data)
 		{
-			_003CDoInitialize_003Ec__Iterator0 _003CDoInitialize_003Ec__Iterator = this;
 			GACHA_TYPE gacha_type = data.ViewType;
 			GachaModelInfo add_data = gachaModelInfo.Find((GachaModelInfo g) => g.type == gacha_type);
 			if (add_data == null)
@@ -383,48 +382,12 @@ public class ShopTop : SkillInfoBase
 				add_data.gachaDataInfo = new List<GachaModelInfo.GachaDataInfo>();
 				gachaModelInfo.Add(add_data);
 			}
-			if (gacha_type != GACHA_TYPE.QUEST)
+			switch (gacha_type)
 			{
-				if (gacha_type == GACHA_TYPE.SKILL)
-				{
-					add_data.sortPriority = 2;
-					data.groups.ForEach(delegate(GachaList.GachaGroup groups)
-					{
-						GachaModelInfo.GachaDataInfo gacha_data_info2 = new GachaModelInfo.GachaDataInfo();
-						gacha_data_info2.showPickupIndex = 0;
-						gacha_data_info2.groupID = groups.group;
-						gacha_data_info2.bannerImg = groups.bannerImg;
-						gacha_data_info2.url = groups.url;
-						gacha_data_info2.gachas = groups.gachas;
-						gacha_data_info2.gachaGuaranteeCampaignInfos = groups.gachaGuaranteeCampaignInfo;
-						gacha_data_info2.note = groups.note;
-						gacha_data_info2.priority = groups.priority;
-						gacha_data_info2.counter = groups.counter;
-						Debug.Log((object)("Gacha Info Counter: " + gacha_data_info2.counter));
-						gacha_data_info2.expireAt = groups.expireAt;
-						if (gacha_data_info2.gachas != null && gacha_data_info2.gachas[0] != null)
-						{
-							gacha_data_info2.buttonImgId = groups.gachas[0].buttonImg;
-						}
-						gacha_data_info2.pickup = new List<PickUp>();
-						groups.pickupLineups.ForEach(delegate(GachaList.GachaLineup pickup_data)
-						{
-							gacha_data_info2.pickup.Add(new PickUpSkill(pickup_data.orderNo, pickup_data.itemId, pickup_data.anim));
-						});
-						add_data.gachaDataInfo.Add(gacha_data_info2);
-					});
-				}
-				else
-				{
-					add_data.sortPriority = 3;
-				}
-			}
-			else
-			{
+			case GACHA_TYPE.QUEST:
 				add_data.sortPriority = 1;
 				data.groups.ForEach(delegate(GachaList.GachaGroup groups)
 				{
-					_003CDoInitialize_003Ec__Iterator0 _003CDoInitialize_003Ec__Iterator2 = _003CDoInitialize_003Ec__Iterator;
 					GachaModelInfo.GachaDataInfo gacha_data_info = new GachaModelInfo.GachaDataInfo();
 					gacha_data_info.showPickupIndex = 0;
 					gacha_data_info.groupID = groups.group;
@@ -436,7 +399,7 @@ public class ShopTop : SkillInfoBase
 					gacha_data_info.note = groups.note;
 					gacha_data_info.priority = groups.priority;
 					gacha_data_info.counter = groups.counter;
-					Debug.Log((object)("Gacha Info Counter: " + gacha_data_info.counter));
+					Debug.Log("Gacha Info Counter: " + gacha_data_info.counter);
 					gacha_data_info.expireAt = groups.expireAt;
 					if (gacha_data_info.gachas != null && gacha_data_info.gachas[0] != null)
 					{
@@ -445,7 +408,6 @@ public class ShopTop : SkillInfoBase
 					gacha_data_info.pickup = new List<PickUp>();
 					groups.pickupLineups.ForEach(delegate(GachaList.GachaLineup pickup_data)
 					{
-						_003CDoInitialize_003Ec__Iterator0 _003CDoInitialize_003Ec__Iterator3 = _003CDoInitialize_003Ec__Iterator2;
 						int reward_pri = -1;
 						uint reward_id = 0u;
 						pickup_data.sellItems.ForEach(delegate(QuestItem.SellItem reward_data)
@@ -462,16 +424,48 @@ public class ShopTop : SkillInfoBase
 						});
 						uint equip = 0u;
 						CreateEquipItemTable.CreateEquipItemData[] creatableEquipItem = Singleton<CreateEquipItemTable>.I.GetCreatableEquipItem(reward_id);
-						if (creatableEquipItem != null && creatableEquipItem.Length > 0)
+						if (creatableEquipItem != null && creatableEquipItem.Length != 0)
 						{
 							equip = creatableEquipItem[0].equipItemID;
 						}
 						gacha_data_info.pickup.Add(new PickUpQuest(pickup_data.orderNo, pickup_data.itemId, reward_id, equip));
-						_003CDoInitialize_003Ec__Iterator2._0024this.CacheQuestAudio((uint)pickup_data.itemId, load_queue);
+						CacheQuestAudio((uint)pickup_data.itemId, load_queue);
 					});
 					gacha_data_info.pickup.Sort((PickUp l, PickUp r) => l.orderNo - r.orderNo);
 					add_data.gachaDataInfo.Add(gacha_data_info);
 				});
+				break;
+			case GACHA_TYPE.SKILL:
+				add_data.sortPriority = 2;
+				data.groups.ForEach(delegate(GachaList.GachaGroup groups)
+				{
+					GachaModelInfo.GachaDataInfo gacha_data_info2 = new GachaModelInfo.GachaDataInfo();
+					gacha_data_info2.showPickupIndex = 0;
+					gacha_data_info2.groupID = groups.group;
+					gacha_data_info2.bannerImg = groups.bannerImg;
+					gacha_data_info2.url = groups.url;
+					gacha_data_info2.gachas = groups.gachas;
+					gacha_data_info2.gachaGuaranteeCampaignInfos = groups.gachaGuaranteeCampaignInfo;
+					gacha_data_info2.note = groups.note;
+					gacha_data_info2.priority = groups.priority;
+					gacha_data_info2.counter = groups.counter;
+					Debug.Log("Gacha Info Counter: " + gacha_data_info2.counter);
+					gacha_data_info2.expireAt = groups.expireAt;
+					if (gacha_data_info2.gachas != null && gacha_data_info2.gachas[0] != null)
+					{
+						gacha_data_info2.buttonImgId = groups.gachas[0].buttonImg;
+					}
+					gacha_data_info2.pickup = new List<PickUp>();
+					groups.pickupLineups.ForEach(delegate(GachaList.GachaLineup pickup_data)
+					{
+						gacha_data_info2.pickup.Add(new PickUpSkill(pickup_data.orderNo, pickup_data.itemId, pickup_data.anim));
+					});
+					add_data.gachaDataInfo.Add(gacha_data_info2);
+				});
+				break;
+			default:
+				add_data.sortPriority = 3;
+				break;
 			}
 			add_data.gachaDataInfo.Sort((GachaModelInfo.GachaDataInfo l, GachaModelInfo.GachaDataInfo r) => r.priority - l.priority);
 		});
@@ -528,7 +522,7 @@ public class ShopTop : SkillInfoBase
 
 	private bool CheckShowPopUp(DateTime startDate, string campaignDetailImg)
 	{
-		if (campaignDetailImg == string.Empty)
+		if (campaignDetailImg == "")
 		{
 			return false;
 		}
@@ -537,8 +531,7 @@ public class ShopTop : SkillInfoBase
 			MonoBehaviourSingleton<GachaManager>.I.SetTimeShowShopAdvertisement(startDate);
 			return true;
 		}
-		DateTime timeShowShopAdvertisement = MonoBehaviourSingleton<GachaManager>.I.GetTimeShowShopAdvertisement();
-		if (timeShowShopAdvertisement < startDate)
+		if (MonoBehaviourSingleton<GachaManager>.I.GetTimeShowShopAdvertisement() < startDate)
 		{
 			MonoBehaviourSingleton<GachaManager>.I.SetTimeShowShopAdvertisement(startDate);
 			return true;
@@ -548,7 +541,7 @@ public class ShopTop : SkillInfoBase
 
 	private void ShowPopUp(string popupImageName)
 	{
-		if (popupImageName != string.Empty)
+		if (popupImageName != "")
 		{
 			EventData[] autoEvents = new EventData[1]
 			{
@@ -566,8 +559,7 @@ public class ShopTop : SkillInfoBase
 			List<GachaModelInfo.GachaDataInfo> gachaDataInfo = gachaModelInfo[i].gachaDataInfo;
 			for (int j = 0; j < gachaDataInfo.Count; j++)
 			{
-				GachaModelInfo.GachaDataInfo gachaDataInfo2 = gachaDataInfo[j];
-				List<GachaGuaranteeCampaignInfo> list2 = gachaDataInfo2.gachaGuaranteeCampaignInfos.FindAll((GachaGuaranteeCampaignInfo g) => g.IsStepUp());
+				List<GachaGuaranteeCampaignInfo> list2 = gachaDataInfo[j].gachaGuaranteeCampaignInfos.FindAll((GachaGuaranteeCampaignInfo g) => g.IsStepUp());
 				if (list2 != null)
 				{
 					list.AddRange(list2);
@@ -587,7 +579,7 @@ public class ShopTop : SkillInfoBase
 				for (int k = 0; k < gachaModelInfo[i].gachaDataInfo[j].gachas.Count; k++)
 				{
 					GachaList.Gacha gacha2 = gachaModelInfo[i].gachaDataInfo[j].gachas[k];
-					if (!(gacha2.campaignDetailImg == string.Empty))
+					if (!(gacha2.campaignDetailImg == ""))
 					{
 						DateTime startDateTime = gacha2.GetStartDateTime();
 						if (gacha == null || !(gacha.GetStartDateTime() >= startDateTime))
@@ -613,7 +605,7 @@ public class ShopTop : SkillInfoBase
 		for (int i = 0; i < count; i++)
 		{
 			GachaGuaranteeCampaignInfo gachaGuaranteeCampaignInfo2 = stepUpInfos[i];
-			if (!(gachaGuaranteeCampaignInfo2.campaignDetailImg == string.Empty))
+			if (!(gachaGuaranteeCampaignInfo2.campaignDetailImg == ""))
 			{
 				DateTime startDateTime = gachaGuaranteeCampaignInfo2.GetStartDateTime();
 				if (gachaGuaranteeCampaignInfo == null || !(gachaGuaranteeCampaignInfo.GetStartDateTime() >= startDateTime))
@@ -686,42 +678,38 @@ public class ShopTop : SkillInfoBase
 			return;
 		}
 		Transform ctrl = GetCtrl(UI.SCR_LIST_2);
-		if (!(ctrl != null) || ctrl.get_childCount() <= 0)
+		if (!(ctrl != null) || ctrl.childCount <= 0)
 		{
 			return;
 		}
 		int i = 0;
-		for (int childCount = ctrl.get_childCount(); i < childCount; i++)
+		for (int childCount = ctrl.childCount; i < childCount; i++)
 		{
 			Transform child = ctrl.GetChild(i);
-			if (child.get_name().Contains("enemy_tex_"))
+			int result2;
+			if (child.name.Contains("enemy_tex_"))
 			{
-				string s = child.get_name().Remove(0, "enemy_tex_".Length);
-				if (int.TryParse(s, out int result))
+				if (int.TryParse(child.name.Remove(0, "enemy_tex_".Length), out int result))
 				{
 					Transform root = GetCtrl(UI.SCR_LIST_2).Find("enemy_tex_" + result);
 					DeleteRenderTexture(root, UI.TEX_ENEMY_MODEL);
 					SetVisibleWidgetEffect(UI.SCR_LIST_2, root, UI.TEX_ENEMY_MODEL, null);
 				}
 			}
-			else if (child.get_name().Contains("skill_tex_"))
+			else if (child.name.Contains("skill_tex_") && int.TryParse(child.name.Remove(0, "skill_tex_".Length), out result2))
 			{
-				string s2 = child.get_name().Remove(0, "skill_tex_".Length);
-				if (int.TryParse(s2, out int result2))
-				{
-					Transform root2 = GetCtrl(UI.SCR_LIST_2).Find("skill_tex_" + result2);
-					DeleteRenderTexture(root2, UI.TEX_SKILL_NPC_MODEL);
-					DeleteRenderTexture(root2, UI.TEX_SKILL_SUB_NPC_MODEL);
-					DeleteRenderTexture(root2, UI.TEX_SKILL_BANNER);
-				}
+				Transform root2 = GetCtrl(UI.SCR_LIST_2).Find("skill_tex_" + result2);
+				DeleteRenderTexture(root2, UI.TEX_SKILL_NPC_MODEL);
+				DeleteRenderTexture(root2, UI.TEX_SKILL_SUB_NPC_MODEL);
+				DeleteRenderTexture(root2, UI.TEX_SKILL_BANNER);
 			}
 		}
 	}
 
 	private void SetGachaChangeButton(int pageIndex)
 	{
-		SetActive((Enum)UI.BTN_QUEST_GACHA, pageIndex != 0);
-		SetActive((Enum)UI.BTN_MAGI_GACHA, pageIndex == 0);
+		SetActive(UI.BTN_QUEST_GACHA, pageIndex != 0);
+		SetActive(UI.BTN_MAGI_GACHA, pageIndex == 0);
 	}
 
 	private void SetGachaListUI()
@@ -752,11 +740,7 @@ public class ShopTop : SkillInfoBase
 				}
 				return null;
 			}
-			if (i == count)
-			{
-				return Realizes("GachaDescriptionItem", p);
-			}
-			return null;
+			return (i == count) ? Realizes("GachaDescriptionItem", p) : null;
 		}, delegate(int i, Transform t, bool b)
 		{
 			if (i < count)
@@ -786,7 +770,7 @@ public class ShopTop : SkillInfoBase
 			else if (i == count)
 			{
 				FindCtrl(t, UI.LBL_GACHA_DESCRIPTION).GetComponent<UILabel>().supportEncoding = true;
-				string str = (!string.IsNullOrEmpty(this.gachaModelInfo[pageIndex].url)) ? StringTable.Get(STRING_CATEGORY.SHOP, (uint)(GameDefine.GACHA_VIEW_PROBABILITY + pageIndex)) : null;
+				string str = string.IsNullOrEmpty(this.gachaModelInfo[pageIndex].url) ? null : StringTable.Get(STRING_CATEGORY.SHOP, (uint)(GameDefine.GACHA_VIEW_PROBABILITY + pageIndex));
 				SetLabelText(t, UI.LBL_GACHA_DESCRIPTION, StringTable.Get(STRING_CATEGORY.SHOP, (uint)(10 + pageIndex)) + str);
 				SetActive(t, UI.BTN_VIEW_PROBABIRITY, !string.IsNullOrEmpty(this.gachaModelInfo[pageIndex].url));
 			}
@@ -801,7 +785,7 @@ public class ShopTop : SkillInfoBase
 		if (flag)
 		{
 			string bannerImg = gacha_info.bannerImg;
-			Coroutine item = this.StartCoroutine(LoadGachaBanner(t, UI.TEX_GACHA_BANNER, bannerImg));
+			Coroutine item = StartCoroutine(LoadGachaBanner(t, UI.TEX_GACHA_BANNER, bannerImg));
 			coroutineList.Add(item);
 			SetButtonEnabled(FindCtrl(t, UI.BTN_GACHA_BANNER), !string.IsNullOrEmpty(gacha_info.url));
 			SetEvent(FindCtrl(t, UI.BTN_GACHA_BANNER), "GACHA_BANNER", gacha_info);
@@ -810,38 +794,31 @@ public class ShopTop : SkillInfoBase
 
 	private void SetGachaNote(Transform t, GachaModelInfo.GachaDataInfo gacha_info)
 	{
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
 		if (!string.IsNullOrEmpty(gacha_info.note))
 		{
-			FindCtrl(t, UI.SPR_NOTE_BG).get_gameObject().SetActive(true);
-			FindCtrl(t, UI.LBL_NOTE).get_gameObject().SetActive(true);
+			FindCtrl(t, UI.SPR_NOTE_BG).gameObject.SetActive(value: true);
+			FindCtrl(t, UI.LBL_NOTE).gameObject.SetActive(value: true);
 			if (gacha_info.note.Contains("\\n"))
 			{
 				gacha_info.note = gacha_info.note.Replace("\\n", "\n");
-				int num = gacha_info.note.Length - gacha_info.note.Replace("\n", string.Empty).Length;
+				int num = gacha_info.note.Length - gacha_info.note.Replace("\n", "").Length;
 				if (num > 0)
 				{
-					Transform val = FindCtrl(t, UI.OBJ_BTN_ROOT);
-					Vector3 localPosition = val.get_transform().get_localPosition();
-					val.get_transform().set_localPosition(new Vector3(localPosition.x, -204f - (float)(num + 1) * 16f, localPosition.z));
-					UIWidget component = t.get_gameObject().GetComponent<UIWidget>();
-					component.height = 471 + (num + 1) * 16;
+					Transform transform = FindCtrl(t, UI.OBJ_BTN_ROOT);
+					Vector3 localPosition = transform.transform.localPosition;
+					transform.transform.localPosition = new Vector3(localPosition.x, -204f - (float)(num + 1) * 16f, localPosition.z);
+					t.gameObject.GetComponent<UIWidget>().height = 471 + (num + 1) * 16;
 				}
 			}
 			SetLabelText(t, UI.LBL_NOTE, gacha_info.note);
 		}
 		else
 		{
-			FindCtrl(t, UI.SPR_NOTE_BG).get_gameObject().SetActive(false);
-			FindCtrl(t, UI.LBL_NOTE).get_gameObject().SetActive(false);
-			Transform val2 = FindCtrl(t, UI.OBJ_BTN_ROOT);
-			Vector3 localPosition2 = val2.get_transform().get_localPosition();
-			val2.get_transform().set_localPosition(new Vector3(localPosition2.x, -188f, localPosition2.z));
+			FindCtrl(t, UI.SPR_NOTE_BG).gameObject.SetActive(value: false);
+			FindCtrl(t, UI.LBL_NOTE).gameObject.SetActive(value: false);
+			Transform transform2 = FindCtrl(t, UI.OBJ_BTN_ROOT);
+			Vector3 localPosition2 = transform2.transform.localPosition;
+			transform2.transform.localPosition = new Vector3(localPosition2.x, -188f, localPosition2.z);
 		}
 	}
 
@@ -864,9 +841,7 @@ public class ShopTop : SkillInfoBase
 		for (int k = 0; k < subGroupIds.Count; k++)
 		{
 			int subGroupId = subGroupIds[k];
-			List<GachaList.Gacha> list2 = (from g in gacha_info.gachas
-			where g.subGroup == subGroupId
-			select g).ToList();
+			List<GachaList.Gacha> list2 = gacha_info.gachas.Where((GachaList.Gacha g) => g.subGroup == subGroupId).ToList();
 			GachaList.Gacha gacha2 = list2.First();
 			int requiredItemId = gacha2.requiredItemId;
 			int item = k + ticketTitleIndexList.Count;
@@ -884,18 +859,16 @@ public class ShopTop : SkillInfoBase
 		gachaBtn.Add(FindCtrl(parent, UI.GRD_BTN).GetComponent<UITable>());
 		int tableListCount = subGroupIds.Count + ticketTitleIndexList.Count;
 		bool isHaveGachaTicket = false;
-		bool flag = true;
 		int requireItemId = num;
 		if (gachaModelInfo[pageIndex].type == GACHA_TYPE.QUEST && num > 0)
 		{
 			isHaveGachaTicket = true;
-			flag = false;
 			tableListCount++;
 		}
 		int ticketNumOfGroup = 0;
 		SetTable(parent, UI.GRD_BTN, "GachaButtonItemTwoLine", tableListCount, reset: false, delegate(int i, Transform t)
 		{
-			if (gachaModelInfo[pageIndex].type == GACHA_TYPE.QUEST && isHaveGachaTicket && i == tableListCount - 1)
+			if (((gachaModelInfo[pageIndex].type == GACHA_TYPE.QUEST) & isHaveGachaTicket) && i == tableListCount - 1)
 			{
 				return Realizes("GachaTicketNumOwned", t);
 			}
@@ -905,36 +878,28 @@ public class ShopTop : SkillInfoBase
 				{
 					return Realizes("GachaTicketTitleCounterS", t);
 				}
-				Transform val = Realizes("GachaTicketTitle", t);
-				ticketTitleRootList.Add(val);
-				return val;
+				Transform transform = Realizes("GachaTicketTitle", t);
+				ticketTitleRootList.Add(transform);
+				return transform;
 			}
-			if (promotionGachaIndexList.Contains(i))
-			{
-				return Realizes("GachaButtonItemFriendPromotion", t);
-			}
-			return null;
+			return promotionGachaIndexList.Contains(i) ? Realizes("GachaButtonItemFriendPromotion", t) : null;
 		}, delegate(int i, Transform t, bool is_recycle)
 		{
-			//IL_036c: Unknown result type (might be due to invalid IL or missing references)
-			if (gachaModelInfo[pageIndex].type == GACHA_TYPE.QUEST && isHaveGachaTicket && i == tableListCount - 1)
+			if (((gachaModelInfo[pageIndex].type == GACHA_TYPE.QUEST) & isHaveGachaTicket) && i == tableListCount - 1)
 			{
 				if (ticketNumOfGroup >= 0)
 				{
 					SetSupportEncoding(t, UI.LBL_MORE_TICKET, isEnable: true);
 					SetLabelText(t, UI.LBL_CRYSTAL_NUM, ticketNumOfGroup.ToString());
 					ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)requireItemId);
-					UITexture component = FindCtrl(t, UI.TEX_TICKET_HAVE).GetComponent<UITexture>();
-					ResourceLoad.LoadItemIconTexture(component, itemData.iconID);
+					ResourceLoad.LoadItemIconTexture(FindCtrl(t, UI.TEX_TICKET_HAVE).GetComponent<UITexture>(), itemData.iconID);
 				}
 			}
 			else
 			{
 				int index = CreateGachaSubGroupIndex(i, ticketTitleIndexList);
 				int subGroupId2 = subGroupIds[index];
-				List<GachaList.Gacha> list3 = (from g in gacha_info.gachas
-				where g.subGroup == subGroupId2
-				select g).ToList();
+				List<GachaList.Gacha> list3 = gacha_info.gachas.Where((GachaList.Gacha g) => g.subGroup == subGroupId2).ToList();
 				GachaList.Gacha gacha3 = list3.First();
 				if (ticketTitleIndexList.Exists((int x) => x == i))
 				{
@@ -975,22 +940,20 @@ public class ShopTop : SkillInfoBase
 					SetUpGachaButtonGrid(t, list3, gacha_info, gachaGuaranteeCampaignInfo);
 					if (gachaGuaranteeCampaignInfo != null)
 					{
-						FindCtrl(t, UI.SPR_LINE).set_localPosition(new Vector3(0f, -40f, 0f));
+						FindCtrl(t, UI.SPR_LINE).localPosition = new Vector3(0f, -40f, 0f);
 					}
 					List<GachaList.Gacha> list4 = new List<GachaList.Gacha>();
-					list4 = (from g in list3
-					where g.detailButtonImg != string.Empty
-					select g).ToList();
-					bool flag2 = gachaGuaranteeCampaignInfo != null || list4.Count > 0;
-					SetActive(t, UI.SPR_LINE, i == tableListCount - 1 && !flag2);
-					if (gacha3.caption != string.Empty)
+					list4 = list3.Where((GachaList.Gacha g) => g.detailButtonImg != "").ToList();
+					bool flag = gachaGuaranteeCampaignInfo != null || list4.Count > 0;
+					SetActive(t, UI.SPR_LINE, i == tableListCount - 1 && !flag);
+					if (gacha3.caption != "")
 					{
 						SetLabelText(t, UI.LBL_GACHA_CAPTION, gacha3.caption);
 						SetSupportEncoding(t, UI.LBL_GACHA_CAPTION, isEnable: true);
-						UIWidget component2 = base.GetComponent<UIWidget>(t, (Enum)UI.SPR_GACHA_BUTTON_BG);
-						int height = component2.height;
+						UIWidget component = GetComponent<UIWidget>(t, UI.SPR_GACHA_BUTTON_BG);
+						int height = component.height;
 						int num2 = gacha3.caption.Count((char c) => c == '\n') + 1;
-						component2.height = height + 19 * num2;
+						component.height = height + 19 * num2;
 					}
 				}
 			}
@@ -1010,51 +973,40 @@ public class ShopTop : SkillInfoBase
 			}
 		}
 		int item_num = subGroupGachas.Count() + gachaEventTitleCount;
-		SetGrid(t, UI.GRD_BTN_INNER, "GachaButtonRoot", item_num, reset: false, delegate(int gridIdx, Transform gridTrans)
+		SetGrid(t, UI.GRD_BTN_INNER, "GachaButtonRoot", item_num, reset: false, (int gridIdx, Transform gridTrans) => (gridIdx < gachaEventTitleCount) ? (IsTitleMini(gachaInfo, subGroupGachas) ? Realizes("GachaEventTitleMini", gridTrans) : Realizes("GachaEventTitle", gridTrans)) : null, delegate(int gridIdx, Transform gridTrans, bool gridIsRecycle)
 		{
 			if (gridIdx < gachaEventTitleCount)
 			{
-				if (IsTitleMini(gachaInfo, subGroupGachas))
-				{
-					return Realizes("GachaEventTitleMini", gridTrans);
-				}
-				return Realizes("GachaEventTitle", gridTrans);
-			}
-			return null;
-		}, delegate(int gridIdx, Transform gridTrans, bool gridIsRecycle)
-		{
-			if (gridIdx < gachaEventTitleCount)
-			{
-				Coroutine item = this.StartCoroutine(LoadGachaEventTitle(gridTrans, UI.TEX_GACHA_EVENT_TITLE, gachaEventTitleName));
+				Coroutine item = StartCoroutine(LoadGachaEventTitle(gridTrans, UI.TEX_GACHA_EVENT_TITLE, gachaEventTitleName));
 				coroutineList.Add(item);
 			}
 			else
 			{
 				GachaList.Gacha gacha = subGroupGachas[gridIdx - gachaEventTitleCount];
-				string empty = string.Empty;
+				string text = "";
 				if (!gacha.IsOncePurchase())
 				{
-					empty = ((gacha.requiredItemId == 0) ? ("× " + gacha.crystalNum.ToString()) : ("× " + gacha.needItemNum.ToString()));
+					text = ((gacha.requiredItemId == 0) ? ("× " + gacha.crystalNum.ToString()) : ("× " + gacha.needItemNum.ToString()));
 				}
 				else
 				{
-					empty = "$" + gacha.yenIncludeTax.ToString();
+					text = "$" + gacha.yenIncludeTax.ToString();
 					if (_nativeStoreList != null)
 					{
-						empty = _nativeStoreList.getProduct(gacha.productId).price;
+						text = _nativeStoreList.getProduct(gacha.productId).price;
 					}
 				}
-				string empty2 = string.Empty;
+				string empty = string.Empty;
 				if (gachaInfo.counter == 0 && gacha.requiredItemId != 0)
 				{
-					empty2 = "BTN_GACHA_TICKET1_Skaku_VER2";
+					empty = "BTN_GACHA_TICKET1_Skaku_VER2";
 				}
 				else
 				{
 					bool flag = gachaGuaranteeInfo != null && gacha.gachaId == gachaGuaranteeInfo.gachaId;
-					empty2 = CreateButtonName(gacha, (!flag) ? null : gachaGuaranteeInfo);
+					empty = CreateButtonName(gacha, flag ? gachaGuaranteeInfo : null);
 				}
-				Coroutine item2 = this.StartCoroutine(LoadGachaButton(gridTrans, empty2, empty, gacha.gachaId, gachaInfo.gachas.IndexOf(gacha)));
+				Coroutine item2 = StartCoroutine(LoadGachaButton(gridTrans, empty, text, gacha.gachaId, gachaInfo.gachas.IndexOf(gacha)));
 				coroutineList.Add(item2);
 			}
 		});
@@ -1062,8 +1014,7 @@ public class ShopTop : SkillInfoBase
 
 	private string CreateButtonName(GachaList.Gacha gacha, GachaGuaranteeCampaignInfo guarantee)
 	{
-		string str = MonoBehaviourSingleton<GachaManager>.I.CreateButtonBaseName(gacha, guarantee);
-		return str + "_VER2";
+		return MonoBehaviourSingleton<GachaManager>.I.CreateButtonBaseName(gacha, guarantee) + "_VER2";
 	}
 
 	private bool IsTitleMini(GachaModelInfo.GachaDataInfo gachaInfo, List<GachaList.Gacha> subGroupGachas)
@@ -1091,9 +1042,7 @@ public class ShopTop : SkillInfoBase
 
 	private void SetGachaDetailUI(Transform t, GachaModelInfo.GachaDataInfo gachaInfo, List<GachaList.Gacha> subGroupGachas, GachaGuaranteeCampaignInfo gachaGuaranteeInfo)
 	{
-		List<GachaList.Gacha> detailImgGachas = (from g in subGroupGachas
-		where g.detailButtonImg != string.Empty
-		select g).ToList();
+		List<GachaList.Gacha> detailImgGachas = subGroupGachas.Where((GachaList.Gacha g) => g.detailButtonImg != "").ToList();
 		bool flag = gachaGuaranteeInfo != null;
 		if (detailImgGachas.Count == 0 && !flag)
 		{
@@ -1101,47 +1050,43 @@ public class ShopTop : SkillInfoBase
 			SetActive(t, UI.OBJ_GUARANTEE_FOOTER_ROOT, is_visible: false);
 			return;
 		}
-		string empty = string.Empty;
-		string empty2 = string.Empty;
-		string empty3 = string.Empty;
-		string event_data = string.Empty;
+		string text = "";
+		string text2 = "";
+		string text3 = "";
+		string event_data = "";
 		List<GachaList.Gacha> source;
 		if (flag)
 		{
-			source = (from g in gachaInfo.gachas
-			where g.gachaId == gachaGuaranteeInfo.gachaId
-			select g).ToList();
-			empty = gachaGuaranteeInfo.GetTitleImageName();
-			empty2 = gachaGuaranteeInfo.endAt;
-			empty3 = gachaGuaranteeInfo.link;
+			source = gachaInfo.gachas.Where((GachaList.Gacha g) => g.gachaId == gachaGuaranteeInfo.gachaId).ToList();
+			text = gachaGuaranteeInfo.GetTitleImageName();
+			text2 = gachaGuaranteeInfo.endAt;
+			text3 = gachaGuaranteeInfo.link;
 		}
 		else
 		{
-			source = (from g in detailImgGachas
-			where g.detailButtonImg == detailImgGachas[0].GetTitleImageName()
-			select g).ToList();
-			empty = detailImgGachas[0].GetTitleImageName();
-			empty2 = detailImgGachas[0].endDate;
-			empty3 = detailImgGachas[0].link;
+			source = detailImgGachas.Where((GachaList.Gacha g) => g.detailButtonImg == detailImgGachas[0].GetTitleImageName()).ToList();
+			text = detailImgGachas[0].GetTitleImageName();
+			text2 = detailImgGachas[0].endDate;
+			text3 = detailImgGachas[0].link;
 			event_data = detailImgGachas[0].description;
 		}
-		bool flag2 = subGroupGachas.Contains(source.First());
-		bool flag3 = subGroupGachas.Contains(source.Last());
-		if (flag2)
+		bool num = subGroupGachas.Contains(source.First());
+		bool flag2 = subGroupGachas.Contains(source.Last());
+		if (num)
 		{
 			SetActive(t, UI.OBJ_GUARANTEE_HEADER_ROOT, is_visible: true);
-			this.StartCoroutine(LoadGachaGuaranteeCounter(t, UI.BTN_GUARANTEE_COUNT_DOWN, gachaGuaranteeInfo.GetImageCount(), empty));
+			StartCoroutine(LoadGachaGuaranteeCounter(t, UI.BTN_GUARANTEE_COUNT_DOWN, gachaGuaranteeInfo.GetImageCount(), text));
 			if (!flag || !gachaGuaranteeInfo.IsItemConfirmed())
 			{
-				Transform val = FindCtrl(t, UI.BTN_GUARANTEE_COUNT_DOWN);
-				val.GetComponent<UIButton>().set_enabled(true);
-				if (empty3 == string.Empty)
+				Transform transform = FindCtrl(t, UI.BTN_GUARANTEE_COUNT_DOWN);
+				transform.GetComponent<UIButton>().enabled = true;
+				if (text3 == "")
 				{
-					SetEvent(val, "GUARANTEE_GACHA_DETAIL", event_data);
+					SetEvent(transform, "GUARANTEE_GACHA_DETAIL", event_data);
 				}
 				else
 				{
-					SetEvent(val, "GUARANTEE_GACHA_DETAIL_WEB", empty3);
+					SetEvent(transform, "GUARANTEE_GACHA_DETAIL_WEB", text3);
 				}
 			}
 			else
@@ -1149,10 +1094,10 @@ public class ShopTop : SkillInfoBase
 				switch (gachaGuaranteeInfo.type)
 				{
 				default:
-					FindCtrl(t, UI.BTN_GUARANTEE_COUNT_DOWN).GetComponent<UIButton>().set_enabled(false);
+					FindCtrl(t, UI.BTN_GUARANTEE_COUNT_DOWN).GetComponent<UIButton>().enabled = false;
 					break;
 				case 5:
-					FindCtrl(t, UI.BTN_GUARANTEE_COUNT_DOWN).GetComponent<UIButton>().set_enabled(true);
+					FindCtrl(t, UI.BTN_GUARANTEE_COUNT_DOWN).GetComponent<UIButton>().enabled = true;
 					SetEvent(FindCtrl(t, UI.BTN_GUARANTEE_COUNT_DOWN), "SKILL_DETAIL", new object[2]
 					{
 						ItemDetailEquip.CURRENT_SECTION.SHOP_TOP,
@@ -1161,7 +1106,7 @@ public class ShopTop : SkillInfoBase
 					break;
 				case 14:
 				{
-					FindCtrl(t, UI.BTN_GUARANTEE_COUNT_DOWN).GetComponent<UIButton>().set_enabled(true);
+					FindCtrl(t, UI.BTN_GUARANTEE_COUNT_DOWN).GetComponent<UIButton>().enabled = true;
 					AccessorySortData accessorySortData = new AccessorySortData();
 					AccessoryInfo accessoryInfo = new AccessoryInfo();
 					accessoryInfo.SetValue((uint)gachaGuaranteeInfo.itemId);
@@ -1180,18 +1125,18 @@ public class ShopTop : SkillInfoBase
 		{
 			SetActive(t, UI.OBJ_GUARANTEE_HEADER_ROOT, is_visible: false);
 		}
-		if (flag3)
+		if (flag2)
 		{
 			SetActive(t, UI.OBJ_GUARANTEE_FOOTER_ROOT, is_visible: true);
-			string text = StringTable.Get(STRING_CATEGORY.SHOP, 15u);
-			SetLabelText(t, UI.TEX_GUARANTEE_TIME, string.Format(empty2));
-			if (empty3 == string.Empty)
+			StringTable.Get(STRING_CATEGORY.SHOP, 15u);
+			SetLabelText(t, UI.TEX_GUARANTEE_TIME, string.Format(text2));
+			if (text3 == "")
 			{
 				SetEvent(FindCtrl(t, UI.BTN_GUARANTEE_DETAIL), "GUARANTEE_GACHA_DETAIL", event_data);
 			}
 			else
 			{
-				SetEvent(FindCtrl(t, UI.BTN_GUARANTEE_DETAIL), "GUARANTEE_GACHA_DETAIL_WEB", empty3);
+				SetEvent(FindCtrl(t, UI.BTN_GUARANTEE_DETAIL), "GUARANTEE_GACHA_DETAIL_WEB", text3);
 			}
 		}
 		else
@@ -1220,12 +1165,12 @@ public class ShopTop : SkillInfoBase
 			GachaUIInfo gachaUIInfo = gachaUIInfoList[i];
 			if (gachaUIInfo.gachaModelInfo.type == GACHA_TYPE.QUEST)
 			{
-				Coroutine item = this.StartCoroutine(UpdateQuestList(gachaUIInfo.index, gachaUIInfo.parent));
+				Coroutine item = StartCoroutine(UpdateQuestList(gachaUIInfo.index, gachaUIInfo.parent));
 				coroutineList.Add(item);
 			}
 			else if (gachaUIInfo.gachaModelInfo.type == GACHA_TYPE.SKILL)
 			{
-				Coroutine item2 = this.StartCoroutine(UpdateSkillList(gachaUIInfo.index, gachaUIInfo.parent));
+				Coroutine item2 = StartCoroutine(UpdateSkillList(gachaUIInfo.index, gachaUIInfo.parent));
 				coroutineList.Add(item2);
 			}
 		}
@@ -1238,7 +1183,7 @@ public class ShopTop : SkillInfoBase
 		{
 			gachaBtn[i].Reposition();
 		}
-		base.GetComponent<UITable>((Enum)UI.TBL_LIST).Reposition();
+		GetComponent<UITable>(UI.TBL_LIST).Reposition();
 	}
 
 	public override void UpdateUI()
@@ -1246,12 +1191,12 @@ public class ShopTop : SkillInfoBase
 		UIWidget component = GetCtrl(UI.SPR_BG_BLACK).GetComponent<UIWidget>();
 		if (SpecialDeviceManager.HasSpecialDeviceInfo)
 		{
-			UIVirtualScreen componentInChildren = this.get_transform().GetComponentInChildren<UIVirtualScreen>();
-			Debug.Log((object)this.get_transform().get_name());
-			Debug.Log((object)componentInChildren);
+			UIVirtualScreen componentInChildren = base.transform.GetComponentInChildren<UIVirtualScreen>();
+			Debug.Log(base.transform.name);
+			Debug.Log(componentInChildren);
 			if (componentInChildren != null)
 			{
-				Debug.Log((object)component);
+				Debug.Log(component);
 				component.width = (int)componentInChildren.ScreenWidthFull;
 				component.height = (int)componentInChildren.ScreenHeightFull;
 			}
@@ -1266,23 +1211,18 @@ public class ShopTop : SkillInfoBase
 	private IEnumerator LoadEnemyModel(Transform t, Enum _enum, uint enemy_id, string foundation_name, ELEMENT_TYPE element_type, bool is_Howl)
 	{
 		yield return null;
-		OutGameSettingsManager.EnemyDisplayInfo.SCENE target_scene = OutGameSettingsManager.EnemyDisplayInfo.SCENE.GACHA;
-		SetRenderEnemyModel(t, _enum, enemy_id, foundation_name, target_scene, delegate(bool ret, EnemyLoader loader)
+		SetRenderEnemyModel(t, _enum, enemy_id, foundation_name, OutGameSettingsManager.EnemyDisplayInfo.SCENE.GACHA, delegate(bool ret, EnemyLoader loader)
 		{
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			if (ret && !object.ReferenceEquals(loader, null) && !object.ReferenceEquals(loader.body, null))
+			if (ret && (object)loader != null && (object)loader.body != null)
 			{
-				SkinnedMeshRenderer[] componentsInChildren = loader.body.GetComponentsInChildren<SkinnedMeshRenderer>(true);
-				if (!object.ReferenceEquals(componentsInChildren, null) && componentsInChildren.Length != 0)
+				SkinnedMeshRenderer[] componentsInChildren = loader.body.GetComponentsInChildren<SkinnedMeshRenderer>(includeInactive: true);
+				if (componentsInChildren != null && componentsInChildren.Length != 0)
 				{
-					foreach (SkinnedMeshRenderer val in componentsInChildren)
+					foreach (SkinnedMeshRenderer obj in componentsInChildren)
 					{
-						Bounds localBounds = val.get_localBounds();
-						localBounds.set_center(Vector3.get_zero());
-						val.set_localBounds(localBounds);
+						Bounds localBounds = obj.localBounds;
+						localBounds.center = Vector3.zero;
+						obj.localBounds = localBounds;
 					}
 				}
 			}
@@ -1339,8 +1279,8 @@ public class ShopTop : SkillInfoBase
 			pattern_index = 4;
 			break;
 		}
-		int banner_id = (int)table.id;
-		LoadObject lo_image = loadQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.SHOP_IMG, ResourceName.GetSkillGachaBannerImage(banner_id));
+		int id = (int)table.id;
+		LoadObject lo_image = loadQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.SHOP_IMG, ResourceName.GetSkillGachaBannerImage(id));
 		if (loadQueue.IsLoading())
 		{
 			yield return loadQueue.Wait();
@@ -1349,26 +1289,26 @@ public class ShopTop : SkillInfoBase
 		{
 			yield return null;
 		}
-		Transform banner = FindCtrl(t, root_enum);
-		if (!(banner != null))
+		Transform transform = FindCtrl(t, root_enum);
+		if (!(transform != null))
 		{
 			yield break;
 		}
-		Transform val = SetPrefab(banner, "GachaSkillBannerAnim");
-		if (!(val != null))
+		Transform transform2 = SetPrefab(transform, "GachaSkillBannerAnim");
+		if (!(transform2 != null))
 		{
 			yield break;
 		}
-		GachaSkillBannerAnim component = val.GetComponent<GachaSkillBannerAnim>();
+		GachaSkillBannerAnim component = transform2.GetComponent<GachaSkillBannerAnim>();
 		if (component != null)
 		{
 			component.Init(pattern_index, table, lo_image.loadedObject as Texture, pickup.gachaAnim);
 			if (gacha_info.pickup.Count == 1 || MonoBehaviourSingleton<GachaManager>.I.IsTutorialSkillGacha())
 			{
-				bool is_skip = gacha_info.isFirstSkillListDirection;
-				component.Entry(is_skip, delegate
+				bool is_skip2 = gacha_info.isFirstSkillListDirection;
+				component.Entry(is_skip2, delegate
 				{
-					PLCA default_anim2 = (!is_skip) ? PLCA.SKILL_GACHA_TOP_SLIDE_END : PLCA.SKILL_GACHA_TOP;
+					PLCA default_anim2 = is_skip2 ? PLCA.SKILL_GACHA_TOP : PLCA.SKILL_GACHA_TOP_SLIDE_END;
 					PlayerAnimCtrl.Get(gacha_info.npcLoader.animator, default_anim2);
 				});
 				gacha_info.isFirstSkillListDirection = false;
@@ -1379,10 +1319,10 @@ public class ShopTop : SkillInfoBase
 			}
 			else
 			{
-				bool is_skip2 = gacha_info.isFirstSkillListDirection;
-				component.Entry(is_skip2, delegate
+				bool is_skip = gacha_info.isFirstSkillListDirection;
+				component.Entry(is_skip, delegate
 				{
-					PLCA default_anim = (!is_skip2) ? PLCA.SKILL_GACHA_TOP_SLIDE_END : PLCA.SKILL_GACHA_TOP;
+					PLCA default_anim = is_skip ? PLCA.SKILL_GACHA_TOP : PLCA.SKILL_GACHA_TOP_SLIDE_END;
 					PlayerAnimCtrl.Get(gacha_info.npcLoader.animator, default_anim);
 				});
 				gacha_info.isFirstSkillListDirection = false;
@@ -1417,13 +1357,11 @@ public class ShopTop : SkillInfoBase
 		{
 			loadQueue = new LoadingQueue(this);
 		}
-		string empty = string.Empty;
-		if (detailButtonImg == string.Empty)
+		if (detailButtonImg == "")
 		{
 			detailButtonImg = "GGC_000000000";
 		}
-		string imgName = detailButtonImg;
-		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.GACHA_GUARANTEE_COUNTER, imgName);
+		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.GACHA_GUARANTEE_COUNTER, detailButtonImg);
 		if (loadQueue.IsLoading())
 		{
 			yield return loadQueue.Wait();
@@ -1457,63 +1395,64 @@ public class ShopTop : SkillInfoBase
 		{
 			loadQueue = new LoadingQueue(this);
 		}
-		while (t.get_childCount() != 0)
+		while (t.childCount != 0)
 		{
 			Transform child = t.GetChild(0);
-			child.set_parent(null);
-			child.get_gameObject().SetActive(false);
-			Object.Destroy(child.get_gameObject());
+			child.parent = null;
+			child.gameObject.SetActive(value: false);
+			UnityEngine.Object.Destroy(child.gameObject);
 		}
 		LoadObject lo_button = loadQueue.Load(RESOURCE_CATEGORY.GACHA_BUTTON, buttonImg);
 		if (loadQueue.IsLoading())
 		{
 			yield return loadQueue.Wait();
 		}
-		GameObject button = Object.Instantiate(lo_button.loadedObject) as GameObject;
-		button.get_transform().set_parent(t);
-		button.get_transform().set_name(UI.BTN_GACHA.ToString());
-		button.get_transform().set_localScale(new Vector3(1f, 1f, 1f));
-		button.get_transform().set_localPosition(new Vector3(0f, 0f, 0f));
+		GameObject obj = UnityEngine.Object.Instantiate(lo_button.loadedObject) as GameObject;
+		obj.transform.parent = t;
+		obj.transform.name = UI.BTN_GACHA.ToString();
+		obj.transform.localScale = new Vector3(1f, 1f, 1f);
+		obj.transform.localPosition = new Vector3(0f, 0f, 0f);
 		SetLabelText(t, UI.TXT_GACHA_ITEM_NUM, strItemNum);
-		SetEvent(event_data: new int[2]
+		int[] event_data = new int[2]
 		{
 			gachaId,
 			gachaIndex
-		}, t: FindCtrl(t, UI.BTN_GACHA), event_name: "GACHA");
+		};
+		SetEvent(FindCtrl(t, UI.BTN_GACHA), "GACHA", event_data);
 		RepositionTables();
 	}
 
 	private IEnumerator UpdateSkillList(int index, Transform t)
 	{
-		GachaModelInfo gacha_model_info = gachaModelInfo[pageIndex];
-		GachaModelInfo.GachaDataInfo gacha_info = gacha_model_info.gachaDataInfo[index];
-		int show_pickup_index = gacha_info.showPickupIndex;
-		bool first_update = false;
-		Transform skill_tex_trans = GetCtrl(UI.SCR_LIST_2).Find("skill_tex_" + index);
-		if (skill_tex_trans == null)
+		GachaModelInfo gachaModelInfo = this.gachaModelInfo[pageIndex];
+		GachaModelInfo.GachaDataInfo gacha_info = gachaModelInfo.gachaDataInfo[index];
+		int showPickupIndex = gacha_info.showPickupIndex;
+		bool flag = false;
+		Transform transform = GetCtrl(UI.SCR_LIST_2).Find("skill_tex_" + index);
+		if (transform == null)
 		{
-			first_update = true;
-			skill_tex_trans = Realizes("GachaSkillListItem2", GetCtrl(UI.SCR_LIST_2));
-			skill_tex_trans.set_name("skill_tex_" + index);
+			flag = true;
+			transform = Realizes("GachaSkillListItem2", GetCtrl(UI.SCR_LIST_2));
+			transform.name = "skill_tex_" + index;
 		}
-		skill_tex_trans.GetComponent<UIScrollOutSideObject>().SetTargetTransform(FindCtrl(t, UI.OBJ_SKILL_MODEL_ROOT));
-		base.GetComponent<UIPanel>((Enum)UI.SCR_LIST_2).depth = base.GetComponent<UIPanel>((Enum)UI.SCR_LIST).depth - 1;
-		PickUpSkill pickup = gacha_info.pickup[show_pickup_index] as PickUpSkill;
-		SkillItemTable.SkillItemData skill_table = Singleton<SkillItemTable>.I.GetSkillItemData(pickup.skillID);
-		SetLabelText(t, UI.LBL_SKILL_ITEM_NAME, skill_table.name);
-		SetLabelText(t, UI.LBL_TYPE_NAME, MonoBehaviourSingleton<StatusManager>.I.GetSkillItemGroupString(skill_table.type));
-		SetSkillSlotTypeIcon(t, UI.SPR_EQUIP_TYPE_ICON, UI.SPR_RARITY_BG, UI.SPR_RARITY_ICON, skill_table);
-		Coroutine coroutine_LoadSkillModel = this.StartCoroutine(LoadNPCModel(skill_tex_trans, UI.TEX_SKILL_NPC_MODEL, UI.TEX_SKILL_SUB_NPC_MODEL, gacha_info));
-		Coroutine coroutine_LoadSkillBanner = this.StartCoroutine(LoadSkillBanner(skill_tex_trans, UI.OBJ_SKILL_BANNER, UI.TEX_SKILL_BANNER, skill_table, gacha_info, pickup));
-		coroutineList.Add(coroutine_LoadSkillModel);
-		coroutineList.Add(coroutine_LoadSkillBanner);
+		transform.GetComponent<UIScrollOutSideObject>().SetTargetTransform(FindCtrl(t, UI.OBJ_SKILL_MODEL_ROOT));
+		GetComponent<UIPanel>(UI.SCR_LIST_2).depth = GetComponent<UIPanel>(UI.SCR_LIST).depth - 1;
+		PickUpSkill pickUpSkill = gacha_info.pickup[showPickupIndex] as PickUpSkill;
+		SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData(pickUpSkill.skillID);
+		SetLabelText(t, UI.LBL_SKILL_ITEM_NAME, skillItemData.name);
+		SetLabelText(t, UI.LBL_TYPE_NAME, MonoBehaviourSingleton<StatusManager>.I.GetSkillItemGroupString(skillItemData.type));
+		SetSkillSlotTypeIcon(t, UI.SPR_EQUIP_TYPE_ICON, UI.SPR_RARITY_BG, UI.SPR_RARITY_ICON, skillItemData);
+		Coroutine item = StartCoroutine(LoadNPCModel(transform, UI.TEX_SKILL_NPC_MODEL, UI.TEX_SKILL_SUB_NPC_MODEL, gacha_info));
+		Coroutine item2 = StartCoroutine(LoadSkillBanner(transform, UI.OBJ_SKILL_BANNER, UI.TEX_SKILL_BANNER, skillItemData, gacha_info, pickUpSkill));
+		coroutineList.Add(item);
+		coroutineList.Add(item2);
 		if (index > 0)
 		{
-			if (first_update)
+			if (flag)
 			{
 				SetActive(t, UI.OBJ_SKILL_INFO_ROOT, is_visible: false);
 			}
-			yield return (object)new WaitForSeconds((float)index);
+			yield return new WaitForSeconds(index);
 			SetActive(t, UI.OBJ_SKILL_INFO_ROOT, is_visible: true);
 		}
 		if (string.IsNullOrEmpty(gacha_info.expireAt))
@@ -1527,79 +1466,79 @@ public class ShopTop : SkillInfoBase
 
 	private IEnumerator UpdateQuestList(int index, Transform t)
 	{
-		GachaModelInfo gacha_model_info = gachaModelInfo[pageIndex];
-		GachaModelInfo.GachaDataInfo gacha_info = gacha_model_info.gachaDataInfo[index];
-		int show_pickup_index = gacha_info.showPickupIndex;
-		PickUpQuest pickup = gacha_info.pickup[show_pickup_index] as PickUpQuest;
-		base.GetComponent<UIPanel>((Enum)UI.SCR_LIST_2).depth = base.GetComponent<UIPanel>((Enum)UI.SCR_LIST).depth - 1;
-		bool first_update = false;
+		GachaModelInfo gachaModelInfo = this.gachaModelInfo[pageIndex];
+		GachaModelInfo.GachaDataInfo gacha_info = gachaModelInfo.gachaDataInfo[index];
+		int showPickupIndex = gacha_info.showPickupIndex;
+		PickUpQuest pickUpQuest = gacha_info.pickup[showPickupIndex] as PickUpQuest;
+		GetComponent<UIPanel>(UI.SCR_LIST_2).depth = GetComponent<UIPanel>(UI.SCR_LIST).depth - 1;
+		bool flag = false;
 		Transform enemy_tex_trans = GetCtrl(UI.SCR_LIST_2).Find("enemy_tex_" + index);
 		if (enemy_tex_trans == null)
 		{
-			first_update = true;
+			flag = true;
 			enemy_tex_trans = Realizes("GachaListItem2", GetCtrl(UI.SCR_LIST_2));
-			enemy_tex_trans.set_name("enemy_tex_" + index);
+			enemy_tex_trans.name = "enemy_tex_" + index;
 		}
 		enemy_tex_trans.GetComponent<UIScrollOutSideObject>().SetTargetTransform(t);
-		string enemy_name = string.Empty;
-		string enemy_lv = string.Empty;
+		string text = string.Empty;
+		string text2 = string.Empty;
 		uint enemy_id = 0u;
 		string foundation_name = null;
-		ELEMENT_TYPE enemy_element_type = ELEMENT_TYPE.MAX;
-		RARITY_TYPE rarity = RARITY_TYPE.D;
-		QuestTable.QuestTableData quest_table = Singleton<QuestTable>.I.GetQuestData(pickup.questID);
-		if (quest_table != null)
+		ELEMENT_TYPE element_type = ELEMENT_TYPE.MAX;
+		RARITY_TYPE rARITY_TYPE = RARITY_TYPE.D;
+		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(pickUpQuest.questID);
+		if (questData != null)
 		{
-			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)quest_table.GetMainEnemyID());
+			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
 			if (enemyData != null)
 			{
 				enemy_id = enemyData.id;
-				enemy_name = enemyData.name;
-				enemy_element_type = enemyData.element;
-				foundation_name = quest_table.GetFoundationName();
-				enemy_lv = quest_table.GetMainEnemyLv().ToString();
-				rarity = quest_table.rarity;
+				text = enemyData.name;
+				element_type = enemyData.element;
+				foundation_name = questData.GetFoundationName();
+				text2 = questData.GetMainEnemyLv().ToString();
+				rARITY_TYPE = questData.rarity;
 			}
 		}
 		ClearRenderModel(enemy_tex_trans, UI.TEX_ENEMY_MODEL);
-		Coroutine coroutine_LoadEnemyModel = this.StartCoroutine(LoadEnemyModel(enemy_tex_trans, UI.TEX_ENEMY_MODEL, enemy_id, foundation_name, enemy_element_type, index == 0));
-		coroutineList.Add(coroutine_LoadEnemyModel);
-		SetLabelText(enemy_tex_trans, UI.LBL_ENEMY, enemy_name);
-		SetLabelText(enemy_tex_trans, UI.LBL_ENEMY_LV, enemy_lv);
-		SetActive(enemy_tex_trans, UI.SPR_RARITY_SSS, rarity == RARITY_TYPE.SSS);
-		SetActive(enemy_tex_trans, UI.SPR_RARITY_SS, rarity == RARITY_TYPE.SS);
-		SetActive(enemy_tex_trans, UI.SPR_RARITY_S, rarity == RARITY_TYPE.S);
-		SetActive(enemy_tex_trans, UI.SPR_RARITY_A, rarity == RARITY_TYPE.A);
-		SetActive(enemy_tex_trans, UI.SPR_RARITY_B, rarity == RARITY_TYPE.B);
+		Coroutine item = StartCoroutine(LoadEnemyModel(enemy_tex_trans, UI.TEX_ENEMY_MODEL, enemy_id, foundation_name, element_type, index == 0));
+		coroutineList.Add(item);
+		SetLabelText(enemy_tex_trans, UI.LBL_ENEMY, text);
+		SetLabelText(enemy_tex_trans, UI.LBL_ENEMY_LV, text2);
+		SetActive(enemy_tex_trans, UI.SPR_RARITY_SSS, rARITY_TYPE == RARITY_TYPE.SSS);
+		SetActive(enemy_tex_trans, UI.SPR_RARITY_SS, rARITY_TYPE == RARITY_TYPE.SS);
+		SetActive(enemy_tex_trans, UI.SPR_RARITY_S, rARITY_TYPE == RARITY_TYPE.S);
+		SetActive(enemy_tex_trans, UI.SPR_RARITY_A, rARITY_TYPE == RARITY_TYPE.A);
+		SetActive(enemy_tex_trans, UI.SPR_RARITY_B, rARITY_TYPE == RARITY_TYPE.B);
 		SetActive(t, UI.OBJ_REWARD_ICON_ROOT, is_visible: true);
-		if (pickup.materialID != 0)
+		if (pickUpQuest.materialID != 0)
 		{
 			int count = pickUpMaterialIDs.Count;
-			pickUpMaterialIDs.Add(pickup.materialID);
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(pickup.materialID);
+			pickUpMaterialIDs.Add(pickUpQuest.materialID);
+			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(pickUpQuest.materialID);
 			ItemIcon.Create(ITEM_ICON_TYPE.ITEM, itemData.iconID, itemData.rarity, FindCtrl(t, UI.OBJ_REWARD_ICON_ROOT), ELEMENT_TYPE.MAX, null, -1, "GACHA_EQUIP_LIST", count, is_new: false, -1, is_select: false, null, is_equipping: false, itemData.enemyIconID, itemData.enemyIconID2, disable_rarity_text: true);
 			gacha_info.rewardIconMaterialInfoID = itemData.id;
 		}
-		SetActive(t, UI.OBJ_REWARD_ICON_ROOT, pickup.materialID != 0);
-		UIVisibleWidgetShriken uvws = null;
-		UIWidget wgt_reward_effect = null;
-		Transform reward_effect = FindCtrl(t, UI.WGT_REWARD_EFFECT);
-		if (reward_effect != null)
+		SetActive(t, UI.OBJ_REWARD_ICON_ROOT, pickUpQuest.materialID != 0);
+		UIVisibleWidgetShriken x = null;
+		UIWidget widget = null;
+		Transform transform = FindCtrl(t, UI.WGT_REWARD_EFFECT);
+		if (transform != null)
 		{
-			uvws = reward_effect.GetComponent<UIVisibleWidgetShriken>();
-			wgt_reward_effect = reward_effect.GetComponent<UIWidget>();
+			x = transform.GetComponent<UIVisibleWidgetShriken>();
+			widget = transform.GetComponent<UIWidget>();
 		}
-		if (uvws == null)
+		if (x == null)
 		{
-			UIPanel component = base.GetComponent<UIPanel>((Enum)UI.SCR_LIST_2);
+			UIPanel component = GetComponent<UIPanel>(UI.SCR_LIST_2);
 			if (component != null)
 			{
-				UIVisibleWidgetShriken.Set(component, wgt_reward_effect);
+				UIVisibleWidgetShriken.Set(component, widget);
 			}
 		}
 		if (index >= 0)
 		{
-			if (first_update)
+			if (flag)
 			{
 				SetActive(enemy_tex_trans, UI.OBJ_QUEST_INFO_ROOT, is_visible: false);
 			}
@@ -1608,9 +1547,9 @@ public class ShopTop : SkillInfoBase
 				ItemIcon componentInChildren = t.GetComponentInChildren<ItemIcon>();
 				if (componentInChildren != null && gacha_info.rewardIconMaterialInfoID != 0)
 				{
-					if (pickup.materialID != 0)
+					if (pickUpQuest.materialID != 0)
 					{
-						SetMaterialInfo(componentInChildren.transform, REWARD_TYPE.ITEM, Singleton<ItemTable>.I.GetItemData(pickup.materialID).id, GetCtrl(UI.SCR_LIST));
+						SetMaterialInfo(componentInChildren.transform, REWARD_TYPE.ITEM, Singleton<ItemTable>.I.GetItemData(pickUpQuest.materialID).id, GetCtrl(UI.SCR_LIST));
 					}
 					else
 					{
@@ -1618,7 +1557,7 @@ public class ShopTop : SkillInfoBase
 					}
 				}
 			}
-			yield return (object)new WaitForSeconds((float)index);
+			yield return new WaitForSeconds(index);
 			SetActive(enemy_tex_trans, UI.OBJ_QUEST_INFO_ROOT, is_visible: true);
 		}
 		if (string.IsNullOrEmpty(gacha_info.expireAt))
@@ -1642,7 +1581,7 @@ public class ShopTop : SkillInfoBase
 		{
 			if (c != null)
 			{
-				this.StopCoroutine(c);
+				StopCoroutine(c);
 			}
 		});
 		coroutineList.Clear();
@@ -1668,8 +1607,7 @@ public class ShopTop : SkillInfoBase
 		DestoryListChild();
 		UpdateShowIndex(is_reset: true);
 		timer = 0f;
-		GachaModelInfo gachaModelInfo = this.gachaModelInfo[pageIndex];
-		gachaModelInfo.gachaDataInfo.ForEach(delegate(GachaModelInfo.GachaDataInfo data)
+		gachaModelInfo[pageIndex].gachaDataInfo.ForEach(delegate(GachaModelInfo.GachaDataInfo data)
 		{
 			data.isFirstSkillListDirection = true;
 			data.rewardIconMaterialInfoID = 0u;
@@ -1698,9 +1636,9 @@ public class ShopTop : SkillInfoBase
 	public void OnQuery_GACHA_EQUIP_LIST_FROM_NEWS()
 	{
 		object[] array = (object[])GameSection.GetEventData();
-		int num = (int)array[0];
-		int num2 = (int)array[1];
-		uint num3 = 0u;
+		_ = (int)array[0];
+		int num = (int)array[1];
+		uint num2 = 0u;
 		List<GachaModelInfo.GachaDataInfo> gachaDataInfo = gachaModelInfo[0].gachaDataInfo;
 		int i = 0;
 		for (int count = gachaDataInfo.Count; i < count; i++)
@@ -1714,39 +1652,39 @@ public class ShopTop : SkillInfoBase
 			for (int count2 = gachaDataInfo2.pickup.Count; j < count2; j++)
 			{
 				PickUpQuest pickUpQuest = gachaDataInfo2.pickup[j] as PickUpQuest;
-				if (pickUpQuest != null && pickUpQuest.questID == num2)
+				if (pickUpQuest != null && pickUpQuest.questID == num)
 				{
-					num3 = pickUpQuest.materialID;
+					num2 = pickUpQuest.materialID;
 					break;
 				}
 			}
-			if (num3 >= 1)
+			if (num2 >= 1)
 			{
 				break;
 			}
 		}
-		if (num3 == 0)
+		if (num2 == 0)
 		{
 			GameSection.ChangeEvent("EQUIP_NOT_EXIST");
 			return;
 		}
-		int num4 = (int)array[2];
-		if (num4 >= 0)
+		int num3 = (int)array[2];
+		if (num3 >= 0)
 		{
 			MonoBehaviourSingleton<GameSceneManager>.I.StopAutoEvent();
 			EventData[] autoEvents = new EventData[1]
 			{
 				new EventData("GACHA_DETAIL_MAX_PARAM_FROM_NEWS", new object[2]
 				{
-					num3,
-					num4
+					num2,
+					num3
 				})
 			};
 			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
 		}
 		GameSection.SetEventData(new object[1]
 		{
-			num3
+			num2
 		});
 	}
 
@@ -1759,19 +1697,17 @@ public class ShopTop : SkillInfoBase
 		{
 			type.groups.ForEach(delegate(GachaList.GachaGroup gr)
 			{
-				GachaList.Gacha gacha = (from g in gr.gachas
-				where g.productId == productId
-				select g).FirstOrDefault();
+				GachaList.Gacha gacha = gr.gachas.Where((GachaList.Gacha g) => g.productId == productId).FirstOrDefault();
 				if (gacha != null)
 				{
 					targetGacha = gacha;
 					targetIndex = (from ano in gr.gachas.Select((GachaList.Gacha g, int j) => new
-					{
-						Content = g,
-						Index = j
-					})
-					where ano.Content.gachaId == targetGacha.gachaId
-					select ano.Index).First();
+						{
+							Content = g,
+							Index = j
+						})
+						where ano.Content.gachaId == targetGacha.gachaId
+						select ano.Index).First();
 				}
 			});
 		});
@@ -1797,15 +1733,14 @@ public class ShopTop : SkillInfoBase
 			GameSection.ChangeEvent("GACHA_QUEST_TUTORIAL");
 			return;
 		}
-		GachaList.Gacha selectGacha = MonoBehaviourSingleton<GachaManager>.I.selectGacha;
-		if (selectGacha.IsEnd)
+		if (MonoBehaviourSingleton<GachaManager>.I.selectGacha.IsEnd)
 		{
 			RemoveEndDateModel();
 			ResetView();
 			GameSection.ChangeEvent("GACHA_END");
 			return;
 		}
-		string text = string.Empty;
+		string text = "";
 		if (MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId > 0)
 		{
 			int ticketId = MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId;
@@ -1844,8 +1779,7 @@ public class ShopTop : SkillInfoBase
 
 	protected void TutorialDoGacha()
 	{
-		int price_num = (MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId <= 0) ? MonoBehaviourSingleton<GachaManager>.I.selectGacha.crystalNum : MonoBehaviourSingleton<GachaManager>.I.selectGacha.needItemNum;
-		if (GameSection.CheckCrystal(price_num, MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId))
+		if (GameSection.CheckCrystal((MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId > 0) ? MonoBehaviourSingleton<GachaManager>.I.selectGacha.needItemNum : MonoBehaviourSingleton<GachaManager>.I.selectGacha.crystalNum, MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId))
 		{
 			Protocol.Force(delegate
 			{
@@ -1965,9 +1899,7 @@ public class ShopTop : SkillInfoBase
 			{
 				type.groups.ForEach(delegate(GachaList.GachaGroup gr)
 				{
-					IEnumerable<GachaList.Gacha> source = from g in gr.gachas
-					where g.productId == productId
-					select g;
+					IEnumerable<GachaList.Gacha> source = gr.gachas.Where((GachaList.Gacha g) => g.productId == productId);
 					if (source.Count() > 0)
 					{
 						GachaList.Gacha gacha = source.First();
@@ -2023,7 +1955,7 @@ public class ShopTop : SkillInfoBase
 		Protocol.Send(OnceStatusInfoModel.URL, delegate(OnceStatusInfoModel result)
 		{
 			CheckCrystalNum(result, onFinish);
-		}, string.Empty);
+		});
 	}
 
 	private void CheckCrystalNum(OnceStatusInfoModel ret, Action onFinish)
@@ -2052,7 +1984,7 @@ public class ShopTop : SkillInfoBase
 		{
 			if (timer < 5f)
 			{
-				timer += Time.get_deltaTime();
+				timer += Time.deltaTime;
 			}
 			if (!(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "ShopTop") && timer >= 5f)
 			{
@@ -2157,7 +2089,7 @@ public class ShopTop : SkillInfoBase
 	private void OnQuery_GUARANTEE_GACHA_DETAIL()
 	{
 		string text = (string)GameSection.GetEventData();
-		if (text == string.Empty)
+		if (text == "")
 		{
 			GameSection.StopEvent();
 		}

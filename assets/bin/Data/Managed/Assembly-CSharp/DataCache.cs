@@ -24,8 +24,7 @@ public class DataCache
 
 	public void Remove(DataLoadRequest req)
 	{
-		string cachePath = GetCachePath(req);
-		File.Delete(cachePath);
+		File.Delete(GetCachePath(req));
 	}
 
 	public void RemoveAll()
@@ -36,15 +35,13 @@ public class DataCache
 
 	public byte[] Load(DataLoadRequest req)
 	{
-		string cachePath = GetCachePath(req);
-		return File.ReadAllBytes(cachePath);
+		return File.ReadAllBytes(GetCachePath(req));
 	}
 
 	public void Save(DataLoadRequest req, byte[] data)
 	{
 		string[] files = Directory.GetFiles(cachePath, req.filename + "*");
-		string[] array = files;
-		foreach (string path in array)
+		foreach (string path in files)
 		{
 			try
 			{
@@ -55,8 +52,7 @@ public class DataCache
 				Log.Error(LOG.DATA_TABLE, "cache delete exception({0}): {1}\n{2}\n{3}", ex, req.filename, ex.Message, ex.StackTrace);
 			}
 		}
-		string cachePathGeneratedMD = GetCachePathGeneratedMD5(req, data);
-		File.WriteAllBytes(cachePathGeneratedMD, data);
+		File.WriteAllBytes(GetCachePathGeneratedMD5(req, data), data);
 	}
 
 	private string GetCachePath(DataLoadRequest req)

@@ -7,7 +7,7 @@ public class BaseModel
 	[Serializable]
 	public class AssetVersionInfo
 	{
-		public string name = string.Empty;
+		public string name = "";
 
 		public int version;
 	}
@@ -16,12 +16,12 @@ public class BaseModel
 	{
 		public bool flag;
 
-		public string ver = string.Empty;
+		public string ver = "";
 	}
 
 	public int error;
 
-	public string currentTime = string.Empty;
+	public string currentTime = "";
 
 	public int tutorial = -1;
 
@@ -41,7 +41,7 @@ public class BaseModel
 
 	public bool appClose;
 
-	public string closedNotice = string.Empty;
+	public string closedNotice = "";
 
 	public bool openRefundForm;
 
@@ -65,9 +65,8 @@ public class BaseModel
 
 	public void Apply()
 	{
-		if (tutorial >= 0)
-		{
-		}
+		_ = tutorial;
+		_ = 0;
 		if (assetManifestVersion > 0 && MonoBehaviourSingleton<ResourceManager>.IsValid())
 		{
 			MonoBehaviourSingleton<ResourceManager>.I.manifestVersion = assetManifestVersion;

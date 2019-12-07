@@ -30,9 +30,8 @@ public class ChatState_PersonalMsgView : ChatState
 			yield break;
 		}
 		isInitializing = true;
-		Object obj = Resources.Load(WINDOW_PREFAB_PATH);
-		Transform newItem = ResourceUtility.Realizes(obj, m_manager.get_transform(), 5);
-		m_friendMsg = newItem.GetComponent<FriendMessageUIController>();
+		Transform transform = ResourceUtility.Realizes(Resources.Load(WINDOW_PREFAB_PATH), m_manager.transform, 5);
+		m_friendMsg = transform.GetComponent<FriendMessageUIController>();
 		if (m_friendMsg == null)
 		{
 			m_manager.PopState();
@@ -56,7 +55,7 @@ public class ChatState_PersonalMsgView : ChatState
 
 	public override void Exit()
 	{
-		Object.Destroy(m_friendMsg.get_gameObject());
+		UnityEngine.Object.Destroy(m_friendMsg.gameObject);
 		m_friendMsg = null;
 	}
 }

@@ -179,16 +179,17 @@ public class EnemyParam : MonoBehaviour
 	[Tooltip("光輪のエフェクト大きさ調整(0の場合は無視する)")]
 	public float effectLightRingRadiusRate;
 
-	public EnemyParam()
-		: this()
-	{
-	}
-
 	public void SetParam(Enemy targetEnemy)
 	{
 		targetEnemy.SetResidentEffectSetting(residentEffectSetting);
-		targetEnemy.SetAttackInfos(Utility.CreateMergedArray((AttackInfo[])attackHitInfos, (AttackInfo[])attackContinuationInfos));
-		targetEnemy.convertAttackInfos = Utility.CreateMergedArray((AttackInfo[])convertAttackHitInfos, (AttackInfo[])convertAttackContinuationInfos);
+		AttackInfo[] array = attackHitInfos;
+		AttackInfo[] array_a = array;
+		array = attackContinuationInfos;
+		targetEnemy.SetAttackInfos(Utility.CreateMergedArray(array_a, array));
+		array = convertAttackHitInfos;
+		AttackInfo[] array_a2 = array;
+		array = convertAttackContinuationInfos;
+		targetEnemy.convertAttackInfos = Utility.CreateMergedArray(array_a2, array);
 		targetEnemy.regionInfos = regionInfos;
 		targetEnemy.convertRegionInfos = convertRegionInfos;
 		targetEnemy.moveRotateMinimumTime = moveRotateMinimumTime;
@@ -244,12 +245,12 @@ public class EnemyParam : MonoBehaviour
 		targetEnemy.deadReviveCountMax = deadReviveCountMax;
 		targetEnemy.forceActMovePoint = forceActMovePoint;
 		targetEnemy.stopMotionByDebuffNormalizedTime = stopMotionByDebuffNormalizedTime;
-		if (stampInfos != null && stampInfos.Length > 0)
+		if (stampInfos != null && stampInfos.Length != 0)
 		{
-			CharacterStampCtrl characterStampCtrl = this.get_gameObject().GetComponent<CharacterStampCtrl>();
+			CharacterStampCtrl characterStampCtrl = base.gameObject.GetComponent<CharacterStampCtrl>();
 			if (characterStampCtrl == null)
 			{
-				characterStampCtrl = this.get_gameObject().AddComponent<CharacterStampCtrl>();
+				characterStampCtrl = base.gameObject.AddComponent<CharacterStampCtrl>();
 			}
 			characterStampCtrl.Init(stampInfos, targetEnemy);
 		}

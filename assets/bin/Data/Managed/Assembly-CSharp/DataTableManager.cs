@@ -119,9 +119,29 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 
 	private List<KeyValuePair<string, string>> unresolvedDependencies = new List<KeyValuePair<string, string>>();
 
-	public bool shouldUpdateManifest => manifest == null || lastReceiveManifestVersion != manifest.version;
+	public bool shouldUpdateManifest
+	{
+		get
+		{
+			if (manifest != null)
+			{
+				return lastReceiveManifestVersion != manifest.version;
+			}
+			return true;
+		}
+	}
 
-	public int manifestVersion => (manifest == null) ? (-1) : manifest.version;
+	public int manifestVersion
+	{
+		get
+		{
+			if (manifest == null)
+			{
+				return -1;
+			}
+			return manifest.version;
+		}
+	}
 
 	public bool hasManifest => manifest != null;
 
@@ -139,7 +159,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 	{
 		base.Awake();
 		cache = new DataTableCache();
-		dataLoader = this.get_gameObject().AddComponent<DataLoader>();
+		dataLoader = base.gameObject.AddComponent<DataLoader>();
 		dataLoader.SetCache(new DataTableCache());
 		forceLoadCSV = false;
 		loadStatus = LoadStatus.NotInitialize;
@@ -147,9 +167,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 
 	public void OnReceiveTableManifestVersion(int version)
 	{
-		if (lastReceiveManifestVersion != version)
-		{
-		}
+		_ = lastReceiveManifestVersion;
 		lastReceiveManifestVersion = version;
 	}
 
@@ -483,7 +501,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 		requestSendForm.fileHash = filehash;
 		Protocol.Send<ReportVerifyModel.RequestSendForm, ReportVerifyModel>(ReportVerifyModel.URL, requestSendForm, delegate
 		{
-		}, string.Empty);
+		});
 	}
 
 	private void AfterAllLoad()
@@ -496,7 +514,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 
 	public void Clear()
 	{
-		this.StopAllCoroutines();
+		StopAllCoroutines();
 		tables.Clear();
 		erroredRequests.Clear();
 	}
@@ -794,16 +812,13 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 
 	public static string DecompressToString(byte[] bytes)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
 		string text = null;
 		using (MemoryStream memoryStream = new MemoryStream(bytes))
 		{
 			memoryStream.Seek(256L, SeekOrigin.Begin);
-			ZlibStream val = new ZlibStream((Stream)memoryStream, 1);
-			try
+			using (ZlibStream stream = new ZlibStream(memoryStream, CompressionMode.Decompress))
 			{
-				using (StreamReader streamReader = new StreamReader((Stream)val))
+				using (StreamReader streamReader = new StreamReader(stream))
 				{
 					try
 					{
@@ -815,10 +830,6 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 					}
 				}
 			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
-			}
 		}
 	}
 
@@ -826,31 +837,24 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 	{
 		return delegate(byte[] bytes)
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Expected O, but got Unknown
 			MemoryStream memoryStream = new MemoryStream();
-			using (MemoryStream memoryStream2 = new MemoryStream(bytes))
+			using (MemoryStream stream = new MemoryStream(bytes))
 			{
 				byte[] array = new byte[1024];
-				ZlibStream val = new ZlibStream((Stream)memoryStream2, 1);
-				try
+				using (ZlibStream zlibStream = new ZlibStream(stream, CompressionMode.Decompress))
 				{
 					try
 					{
 						int count;
-						while ((count = ((Stream)val).Read(array, 0, array.Length)) != 0)
+						while ((count = zlibStream.Read(array, 0, array.Length)) != 0)
 						{
 							memoryStream.Write(array, 0, count);
 						}
 					}
 					finally
 					{
-						((IDisposable)val)?.Dispose();
+						((IDisposable)zlibStream)?.Dispose();
 					}
-				}
-				finally
-				{
-					((IDisposable)val)?.Dispose();
 				}
 			}
 			memoryStream.Seek(0L, SeekOrigin.Begin);
@@ -866,7 +870,7 @@ public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 			MD5Hash tableHash = manifest.GetTableHash(allFileName);
 			stringBuilder.AppendLine($"{allFileName} : {tableHash.ToString()}");
 		}
-		Debug.Log((object)stringBuilder.ToString());
+		Debug.Log(stringBuilder.ToString());
 	}
 
 	public void ChangePriorityTop(string tableName)

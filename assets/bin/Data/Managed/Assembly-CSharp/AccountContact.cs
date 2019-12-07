@@ -56,12 +56,12 @@ public class AccountContact : GameSection
 		SetInput(UI.IPT_USER_NAME, string.Empty, 14, InputCallback);
 		SetInput(UI.IPT_USER_RANK, string.Empty, 14, InputCallback);
 		UpdateTargetAddressText();
-		SetActive((Enum)UI.OBJ_SECRET_QUESTION, is_visible: true);
+		SetActive(UI.OBJ_SECRET_QUESTION, is_visible: true);
 		secretQuestionIndex = 0;
-		SetPopupListText((Enum)UI.POP_SECRET_QUESTION, secreteQuestion, secretQuestionIndex);
-		SetPopupListOnChange((Enum)UI.POP_SECRET_QUESTION, (Enum)UI.LBL_SECRET_QUESTION, (EventDelegate.Callback)delegate
+		SetPopupListText(UI.POP_SECRET_QUESTION, secreteQuestion, secretQuestionIndex);
+		SetPopupListOnChange(UI.POP_SECRET_QUESTION, UI.LBL_SECRET_QUESTION, delegate
 		{
-			string text = base.GetComponent<UILabel>((Enum)UI.LBL_SECRET_QUESTION).text;
+			string text = GetComponent<UILabel>(UI.LBL_SECRET_QUESTION).text;
 			secretQuestionIndex = secreteQuestion.IndexOf(text);
 			isSelectedSecretQuestion = true;
 			InputCallback();
@@ -72,22 +72,22 @@ public class AccountContact : GameSection
 	{
 		int num = 0;
 		string text = string.Format(base.sectionData.GetText("STR_ADDRESS_TEXT"), base.sectionData.GetText(GET_TARGET_ADDRESS_TEXT[num]));
-		SetLabelText((Enum)UI.LBL_ADDRESS_TEXT, text);
+		SetLabelText(UI.LBL_ADDRESS_TEXT, text);
 	}
 
 	private void InputCallback()
 	{
 		bool flag = CheckInputData();
-		SetActive((Enum)UI.BTN_OK, flag);
-		SetActive((Enum)UI.BTN_INVALID, !flag);
+		SetActive(UI.BTN_OK, flag);
+		SetActive(UI.BTN_INVALID, !flag);
 	}
 
 	private bool CheckInputData(bool is_send_event = false)
 	{
-		string text = base.GetComponent<UILabel>((Enum)UI.LBL_ADDRESS).text;
-		string text2 = base.GetComponent<UILabel>((Enum)UI.LBL_SECRET_ANSER).text;
-		string text3 = base.GetComponent<UILabel>((Enum)UI.LBL_USER_NAME).text;
-		string text4 = base.GetComponent<UILabel>((Enum)UI.LBL_USER_RANK).text;
+		string text = GetComponent<UILabel>(UI.LBL_ADDRESS).text;
+		string text2 = GetComponent<UILabel>(UI.LBL_SECRET_ANSER).text;
+		string text3 = GetComponent<UILabel>(UI.LBL_USER_NAME).text;
+		string text4 = GetComponent<UILabel>(UI.LBL_USER_RANK).text;
 		if (string.IsNullOrEmpty(text))
 		{
 			CheckChangeEvent(is_send_event, "EMPTY", new object[1]
@@ -173,10 +173,10 @@ public class AccountContact : GameSection
 	{
 		if (CheckInputData(is_send_event: true))
 		{
-			string text = base.GetComponent<UILabel>((Enum)UI.LBL_ADDRESS).text;
-			string text2 = base.GetComponent<UILabel>((Enum)UI.LBL_SECRET_ANSER).text;
-			string text3 = base.GetComponent<UILabel>((Enum)UI.LBL_USER_NAME).text;
-			string text4 = base.GetComponent<UILabel>((Enum)UI.LBL_USER_RANK).text;
+			string text = GetComponent<UILabel>(UI.LBL_ADDRESS).text;
+			string text2 = GetComponent<UILabel>(UI.LBL_SECRET_ANSER).text;
+			string text3 = GetComponent<UILabel>(UI.LBL_USER_NAME).text;
+			string text4 = GetComponent<UILabel>(UI.LBL_USER_RANK).text;
 			string defaultUserAgent = NetworkNative.getDefaultUserAgent();
 			string nativeVersionName = NetworkNative.getNativeVersionName();
 			string value = "support@gogame.net";

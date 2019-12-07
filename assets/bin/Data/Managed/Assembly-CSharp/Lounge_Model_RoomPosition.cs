@@ -15,10 +15,9 @@ public class Lounge_Model_RoomPosition : Coop_Model_Base
 
 	public override string ToString()
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		string empty = string.Empty;
-		empty = empty + ",cid=" + cid;
-		empty = empty + ",pos=" + pos;
-		return base.ToString() + empty;
+		string arg = "";
+		arg = arg + ",cid=" + cid;
+		arg = arg + ",pos=" + pos;
+		return base.ToString() + arg;
 	}
 }

@@ -532,20 +532,13 @@ public class AtkAttribute
 
 	public string ToShortString()
 	{
-		string empty = string.Empty;
-		string text = empty;
-		empty = text + "n:" + normal + " ";
-		text = empty;
-		empty = text + "f:" + fire + " ";
-		text = empty;
-		empty = text + "w:" + water + " ";
-		text = empty;
-		empty = text + "t:" + thunder + " ";
-		text = empty;
-		empty = text + "s:" + soil + " ";
-		text = empty;
-		empty = text + "l:" + light + " ";
-		text = empty;
+		string text = "";
+		text = text + "n:" + normal + " ";
+		text = text + "f:" + fire + " ";
+		text = text + "w:" + water + " ";
+		text = text + "t:" + thunder + " ";
+		text = text + "s:" + soil + " ";
+		text = text + "l:" + light + " ";
 		return text + "d:" + dark + " ";
 	}
 }

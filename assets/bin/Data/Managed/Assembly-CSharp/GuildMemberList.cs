@@ -53,16 +53,14 @@ public class GuildMemberList : GameSection
 
 	public override void Initialize()
 	{
-		SetActive((Enum)UI.OBJ_GUILD_NUMBER_ROOT, is_visible: false);
-		this.StartCoroutine(DoInitialize());
+		SetActive(UI.OBJ_GUILD_NUMBER_ROOT, is_visible: false);
+		StartCoroutine(DoInitialize());
 	}
 
 	protected override void OnDestroy()
 	{
 		base.OnDestroy();
-		if (MonoBehaviourSingleton<ChatManager>.IsValid())
-		{
-		}
+		MonoBehaviourSingleton<ChatManager>.IsValid();
 	}
 
 	private IEnumerator DoInitialize()
@@ -81,16 +79,16 @@ public class GuildMemberList : GameSection
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_GUILD_NUMBER_ROOT, is_visible: true);
+		SetActive(UI.OBJ_GUILD_NUMBER_ROOT, is_visible: true);
 		SetLabelText(UI.LBL_GUILD_NUMBER_MAX, allMember.Count);
 		if (allMember == null || allMember.Count == 0)
 		{
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.GRD_LIST, is_visible: false);
+			SetActive(UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_LIST, is_visible: false);
 			return;
 		}
 		int online_count = 0;
-		SetDynamicList((Enum)UI.GRD_LIST, "GuildMemberListItem", allMember.Count, reset: true, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList(UI.GRD_LIST, "GuildMemberListItem", allMember.Count, reset: true, null, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			FriendCharaInfo member = allMember[i];
 			bool flag = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(member.userId);
@@ -98,7 +96,7 @@ public class GuildMemberList : GameSection
 			SetActive(t, UI.SPR_FOLLOW, !flag && member.following);
 			SetActive(t, UI.SPR_FOLLOWER, !flag && member.follower);
 			SetActive(t, UI.SPR_ICON_FIRST_MET, is_visible: false);
-			SetCharaInfo(member, i, t, is_recycle, 0 == member.userId);
+			SetCharaInfo(member, i, t, is_recycle, member.userId == 0);
 			bool flag2 = status.Any((int st) => st == member.userId);
 			if (flag2)
 			{
@@ -115,9 +113,9 @@ public class GuildMemberList : GameSection
 			SetActive(t, UI.OBJ_REQUEST_PENDING, requestMembers.Contains(member));
 			SetListItem(i, t, ListItemEvent, member);
 		});
-		SetLabelText((Enum)UI.LBL_GUILD_NUMBER_NOW, online_count.ToString());
-		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
-		SetActive((Enum)UI.GRD_LIST, is_visible: true);
+		SetLabelText(UI.LBL_GUILD_NUMBER_NOW, online_count.ToString());
+		SetActive(UI.STR_NON_LIST, is_visible: false);
+		SetActive(UI.GRD_LIST, is_visible: true);
 	}
 
 	protected virtual void GetListItem(Action<bool, object> callback)
@@ -133,8 +131,7 @@ public class GuildMemberList : GameSection
 			allMember.AddRange(members);
 			MonoBehaviourSingleton<GuildManager>.I.SendClanChatOnlineStatus(delegate(bool is_success, List<GuildMemberChatStatus> list)
 			{
-				status = (from o in list
-				select o.id).ToList();
+				status = list.Select((GuildMemberChatStatus o) => o.id).ToList();
 				callback(is_success, null);
 			});
 		});
@@ -147,10 +144,6 @@ public class GuildMemberList : GameSection
 
 	protected void SetCharaInfo(FriendCharaInfo data, int i, Transform t, bool is_recycle, bool isGM)
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
 		if (isGM)
 		{
 			SetRenderNPCModel(t, UI.TEX_MODEL, 0, new Vector3(0f, -1.49f, 1.87f), new Vector3(0f, 154f, 0f), 10f);
@@ -170,8 +163,7 @@ public class GuildMemberList : GameSection
 		SetLabelText(t, UI.LBL_ATK, finalStatus.GetAttacksSum().ToString());
 		SetLabelText(t, UI.LBL_DEF, finalStatus.defences[0].ToString());
 		SetLabelText(t, UI.LBL_HP, finalStatus.hp.ToString());
-		DegreePlate component = FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(data.selectedDegrees, isButton: false, delegate
+		FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>().Initialize(data.selectedDegrees, isButton: false, delegate
 		{
 			GetCtrl(UI.GRD_LIST).GetComponent<UIGrid>().Reposition();
 		});
@@ -213,16 +205,14 @@ public class GuildMemberList : GameSection
 
 	protected void OnQuery_GUILD_INFO()
 	{
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 		memberInfoData = (FriendCharaInfo)GameSection.GetEventData();
 		SetButton();
 		GameObject sender = GameSceneEvent.current.sender;
-		FindCtrl(base._transform, UI.SPR_GUILD_INFO).SetParent(FindCtrl(sender.get_transform(), UI.OBJ_GUILD_INFO));
-		FindCtrl(base._transform, UI.SPR_GUILD_INFO).set_localPosition(Vector3.get_zero());
-		FindCtrl(base._transform, UI.SPR_GUILD_INFO).set_localScale(Vector3.get_one());
-		Transform val = FindCtrl(base._transform, UI.SPR_GUILD_INFO);
-		SetActive(base._transform, UI.SPR_GUILD_INFO, !val.get_gameObject().get_activeSelf());
+		FindCtrl(base._transform, UI.SPR_GUILD_INFO).SetParent(FindCtrl(sender.transform, UI.OBJ_GUILD_INFO));
+		FindCtrl(base._transform, UI.SPR_GUILD_INFO).localPosition = Vector3.zero;
+		FindCtrl(base._transform, UI.SPR_GUILD_INFO).localScale = Vector3.one;
+		Transform transform = FindCtrl(base._transform, UI.SPR_GUILD_INFO);
+		SetActive(base._transform, UI.SPR_GUILD_INFO, !transform.gameObject.activeSelf);
 	}
 
 	private void SetButton()

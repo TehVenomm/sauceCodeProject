@@ -81,7 +81,7 @@ public class LoungeConditionSettings : GameSection
 			capacity = 8;
 			label = LOUNGE_LABEL.NONE;
 			isLock = false;
-			loungeName = string.Empty;
+			loungeName = "";
 		}
 
 		public CreateRequestParam(int stampId, int minLevel, int maxLevel, int capacity, LOUNGE_LABEL label, bool isLock, string name)
@@ -171,8 +171,8 @@ public class LoungeConditionSettings : GameSection
 
 	public override void Initialize()
 	{
-		SetActive((Enum)UI.OBJ_CHANGE, MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge());
-		SetActive((Enum)UI.OBJ_CREATE, !MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge());
+		SetActive(UI.OBJ_CHANGE, MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge());
+		SetActive(UI.OBJ_CREATE, !MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge());
 		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
 		{
 			GetCurrentLoungeSettings();
@@ -220,7 +220,7 @@ public class LoungeConditionSettings : GameSection
 			createRequest.SetLoungeName(base.sectionData.GetText("DEFAULT_LOUNGE_NAME"));
 		}
 		SetInput(UI.IPT_NAME, createRequest.loungeName, 16, OnChangeLoungeName);
-		this.StartCoroutine(LoadStampList());
+		StartCoroutine(LoadStampList());
 	}
 
 	protected void InitializeBase()
@@ -230,17 +230,16 @@ public class LoungeConditionSettings : GameSection
 
 	private IEnumerator LoadStampList()
 	{
-		SetActive((Enum)UI.SPR_STAMP_LIST, is_visible: false);
-		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_chat_stamp_listitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem");
-		if (load_queue.IsLoading())
+		SetActive(UI.SPR_STAMP_LIST, is_visible: false);
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject lo_chat_stamp_listitem = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem");
+		if (loadingQueue.IsLoading())
 		{
-			yield return load_queue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		stampListPrefab = (lo_chat_stamp_listitem.loadedObject as GameObject);
 		InitStamp();
-		Transform scroll = GetCtrl(UI.SCR_STAMP_LIST);
-		scroll.GetComponent<UIScrollView>().set_enabled(true);
+		GetCtrl(UI.SCR_STAMP_LIST).GetComponent<UIScrollView>().enabled = true;
 		InitializeBase();
 	}
 
@@ -256,11 +255,10 @@ public class LoungeConditionSettings : GameSection
 
 	private Transform CreateStampItem(int index, Transform parent)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = ResourceUtility.Realizes(stampListPrefab, 5);
-		val.set_parent(parent);
-		val.set_localScale(Vector3.get_one());
-		return val;
+		Transform transform = ResourceUtility.Realizes(stampListPrefab, 5);
+		transform.parent = parent;
+		transform.localScale = Vector3.one;
+		return transform;
 	}
 
 	private void InitStampItem(int index, Transform iTransform, bool isRecycle)
@@ -288,14 +286,12 @@ public class LoungeConditionSettings : GameSection
 
 	private void SetStampTextre(int id)
 	{
-		Transform ctrl = GetCtrl(UI.OBJ_STAMP);
-		ChatStampListItem component = ctrl.GetComponent<ChatStampListItem>();
-		component.Init(id);
+		GetCtrl(UI.OBJ_STAMP).GetComponent<ChatStampListItem>().Init(id);
 	}
 
 	private void SelectStamp(int id)
 	{
-		SetActive((Enum)UI.SPR_STAMP_LIST, is_visible: false);
+		SetActive(UI.SPR_STAMP_LIST, is_visible: false);
 		SetStampTextre(id);
 		createRequest.SetStampId(id);
 	}
@@ -382,44 +378,44 @@ public class LoungeConditionSettings : GameSection
 	private void UpdateMinLevel()
 	{
 		int index = minLevelIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_MIN_LEVEL, levelNames[index]);
+		SetLabelText(UI.LBL_TARGET_MIN_LEVEL, levelNames[index]);
 	}
 
 	private void UpdateMaxLevel()
 	{
 		int index = maxLevelIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_MAX_LEVEL, levelNames[index]);
+		SetLabelText(UI.LBL_TARGET_MAX_LEVEL, levelNames[index]);
 	}
 
 	private void UpdateCapacity()
 	{
 		int index = capacityIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_CAPACITY, capacityNames[index]);
+		SetLabelText(UI.LBL_TARGET_CAPACITY, capacityNames[index]);
 	}
 
 	protected void UpdateLabel()
 	{
 		int num = labelIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_LABEL, labels[num]);
+		SetLabelText(UI.LBL_TARGET_LABEL, labels[num]);
 	}
 
 	private void UpdateLock()
 	{
 		int index = lockIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_LOCK, lockNames[index]);
+		SetLabelText(UI.LBL_TARGET_LOCK, lockNames[index]);
 	}
 
 	protected virtual void OnChangeLoungeName()
 	{
-		string inputValue = GetInputValue((Enum)UI.IPT_NAME);
-		inputValue = inputValue.Replace(" ", string.Empty);
-		inputValue = inputValue.Replace("\u3000", string.Empty);
+		string inputValue = GetInputValue(UI.IPT_NAME);
+		inputValue = inputValue.Replace(" ", "");
+		inputValue = inputValue.Replace("\u3000", "");
 		createRequest.SetLoungeName(inputValue);
 	}
 
 	private void OnQuery_STAMP()
 	{
-		SetActive((Enum)UI.SPR_STAMP_LIST, is_visible: true);
+		SetActive(UI.SPR_STAMP_LIST, is_visible: true);
 	}
 
 	private void OnQuery_TARGET_MIN_LEVEL()

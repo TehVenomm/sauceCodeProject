@@ -58,7 +58,7 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 				if (param != 0)
 				{
 					ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)param);
-					text = text.Replace("{ITEM_NAME}", (itemData == null) ? string.Empty : itemData.name);
+					text = text.Replace("{ITEM_NAME}", (itemData != null) ? itemData.name : string.Empty);
 				}
 				break;
 			}
@@ -102,13 +102,9 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 				{
 					MonoBehaviourSingleton<InventoryManager>.I.ForAllQuestInvetory(delegate(QuestItemInfo quest_item)
 					{
-						if (!find_not_clear_quest && quest_item.infoData.questData.num != 0)
+						if (!find_not_clear_quest && quest_item.infoData.questData.num != 0 && MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.FindIndex((ClearStatusQuest clear_data) => clear_data.questId == quest_item.tableID && clear_data.questStatus >= 3) == -1)
 						{
-							int num2 = MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.FindIndex((ClearStatusQuest clear_data) => clear_data.questId == quest_item.tableID && clear_data.questStatus >= 3);
-							if (num2 == -1)
-							{
-								find_not_clear_quest = true;
-							}
+							find_not_clear_quest = true;
 						}
 					});
 					if (!find_not_clear_quest)
@@ -121,12 +117,11 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 				{
 					return false;
 				}
-				int num = MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.FindIndex((ClearStatusQuest clear_data) => clear_data.questId == param && clear_data.questStatus >= 3);
-				if (num == -1)
+				if (MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.FindIndex((ClearStatusQuest clear_data) => clear_data.questId == param && clear_data.questStatus >= 3) != -1)
 				{
-					break;
+					return false;
 				}
-				return false;
+				break;
 			}
 			case NPC_MESSAGE_TYPE.DELIVERY_QUEST:
 			case NPC_MESSAGE_TYPE.NEW_DELIVERY_QUEST:
@@ -161,13 +156,13 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 				});
 				Delivery[] deliveryList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList(do_sort: false);
 				Delivery delivery = null;
-				if (deliveryList.Length > 0 && param != 0)
+				if (deliveryList.Length != 0 && param != 0)
 				{
 					delivery = Array.Find(deliveryList, (Delivery data) => data.dId == param);
 				}
 				if (type == NPC_MESSAGE_TYPE.NEW_DELIVERY_QUEST)
 				{
-					if (param != 0 && find_clear_status)
+					if ((param != 0) & find_clear_status)
 					{
 						return false;
 					}
@@ -181,24 +176,26 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 				{
 					if (param != 0)
 					{
-						if (delivery != null)
+						if (delivery == null)
 						{
-							break;
+							return false;
 						}
-						return false;
+						break;
 					}
-					return deliveryList.Length > 0;
+					return deliveryList.Length != 0;
 				}
 				return find_not_clear;
 			}
 			case NPC_MESSAGE_TYPE.ATTACK_OVER:
 			case NPC_MESSAGE_TYPE.ATTACK_UNDER:
+			{
 				MonoBehaviourSingleton<StatusManager>.I.CalcSelfStatusParam(MonoBehaviourSingleton<StatusManager>.I.GetEquipSet(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.eSetNo), out int _atk, out int _, out int _);
 				if ((type == NPC_MESSAGE_TYPE.ATTACK_OVER && param > _atk) || (type == NPC_MESSAGE_TYPE.ATTACK_UNDER && param < _atk))
 				{
 					return false;
 				}
 				break;
+			}
 			case NPC_MESSAGE_TYPE.CRYSTAL_OVER:
 			case NPC_MESSAGE_TYPE.CRYSTAL_UNDER:
 			{
@@ -231,13 +228,13 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 			}
 			case NPC_MESSAGE_TYPE.LEVEL_UP:
 			{
-				bool flag = GameSaveData.instance.lvupMessageFlag == 1;
+				bool num = GameSaveData.instance.lvupMessageFlag == 1;
 				if (GameSaveData.instance.lvupMessageFlag != 0)
 				{
 					GameSaveData.instance.lvupMessageFlag = 0;
 					GameSaveData.Save();
 				}
-				if (!flag)
+				if (!num)
 				{
 					return false;
 				}
@@ -302,7 +299,7 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 			{
 				return ret;
 			}
-			int rnd = Random.Range(0, Mathf.Max(100, total));
+			int rnd = UnityEngine.Random.Range(0, Mathf.Max(100, total));
 			int index = -1;
 			int cnt = 0;
 			total = 0;
@@ -322,7 +319,7 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 			{
 				return priority[index];
 			}
-			return non_priority[Random.Range(0, non_priority.Count)];
+			return non_priority[UnityEngine.Random.Range(0, non_priority.Count)];
 		}
 
 		private int GetSelectPriority(NPC_MESSAGE_TYPE type)
@@ -343,10 +340,6 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 
 	public void CreateTable(string csv_text)
 	{
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0171: Unknown result type (might be due to invalid IL or missing references)
 		sections = new List<Section>();
 		CSVReader cSVReader = new CSVReader(csv_text, "section,type,prm,priority,npcid,anim,posX,posY,posZ,rotX,rotY,rotZ,jp,voiceId");
 		Section section = null;
@@ -423,6 +416,6 @@ public class NPCMessageTable : Singleton<NPCMessageTable>, IDataTable
 		{
 			return section.GetNPCMessage()?.message;
 		}
-		return sectionData.GetText("NPC_MESSAGE_" + Random.Range(0, 3));
+		return sectionData.GetText("NPC_MESSAGE_" + UnityEngine.Random.Range(0, 3));
 	}
 }

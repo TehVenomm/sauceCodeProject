@@ -26,37 +26,37 @@ public class AccountConflict : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		UserInfo user_info = MonoBehaviourSingleton<UserInfoManager>.I.userInfo;
-		UserStatus user_status = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
+		UserInfo userInfo = MonoBehaviourSingleton<UserInfoManager>.I.userInfo;
+		UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
 		Transform local = GetCtrl(UI.OBJ_LOCAL);
-		SetLabelText(local, UI.LBL_NAME, user_info.name);
-		SetLabelText(local, UI.LBL_DATE, user_info.lastLogin);
-		SetLabelText(local, UI.LBL_HUNTER_ID, user_info.code);
-		SetLabelText(local, UI.LBL_LEVEL, $"Lv.{user_status.level.ToString()}");
-		SetLabelText(local, UI.LBL_GEM, user_status.crystal.ToString());
-		SetLabelText(local, UI.LBL_GOLD, user_status.money.ToString());
+		SetLabelText(local, UI.LBL_NAME, userInfo.name);
+		SetLabelText(local, UI.LBL_DATE, userInfo.lastLogin);
+		SetLabelText(local, UI.LBL_HUNTER_ID, userInfo.code);
+		SetLabelText(local, UI.LBL_LEVEL, $"Lv.{userStatus.level.ToString()}");
+		SetLabelText(local, UI.LBL_GEM, userStatus.crystal.ToString());
+		SetLabelText(local, UI.LBL_GOLD, userStatus.money.ToString());
 		Transform cloud = GetCtrl(UI.OBJ_CLOUD);
-		RegistLinkFacebookModel.ExistInfoParam info = GameSection.GetEventData() as RegistLinkFacebookModel.ExistInfoParam;
-		if (info != null)
+		RegistLinkFacebookModel.ExistInfoParam existInfoParam = GameSection.GetEventData() as RegistLinkFacebookModel.ExistInfoParam;
+		if (existInfoParam != null)
 		{
-			SetLabelText(cloud, UI.LBL_NAME, info.name);
-			SetLabelText(cloud, UI.LBL_DATE, info.lastLogin);
-			SetLabelText(cloud, UI.LBL_HUNTER_ID, info.code);
-			SetLabelText(cloud, UI.LBL_LEVEL, $"Lv.{info.level}");
-			SetLabelText(cloud, UI.LBL_GEM, info.crystal);
-			SetLabelText(cloud, UI.LBL_GOLD, info.money);
+			SetLabelText(cloud, UI.LBL_NAME, existInfoParam.name);
+			SetLabelText(cloud, UI.LBL_DATE, existInfoParam.lastLogin);
+			SetLabelText(cloud, UI.LBL_HUNTER_ID, existInfoParam.code);
+			SetLabelText(cloud, UI.LBL_LEVEL, $"Lv.{existInfoParam.level}");
+			SetLabelText(cloud, UI.LBL_GEM, existInfoParam.crystal);
+			SetLabelText(cloud, UI.LBL_GOLD, existInfoParam.money);
 		}
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject lo_gem = loadQueue.LoadItemIcon(ResourceName.GetItemIcon(1));
-		LoadObject lo_gold = loadQueue.LoadItemIcon(ResourceName.GetItemIcon(2));
-		if (loadQueue.IsLoading())
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject lo_gem = loadingQueue.LoadItemIcon(ResourceName.GetItemIcon(1));
+		LoadObject lo_gold = loadingQueue.LoadItemIcon(ResourceName.GetItemIcon(2));
+		if (loadingQueue.IsLoading())
 		{
-			yield return loadQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		SetTexture(local, UI.TEX_GEM, lo_gem.loadedObject as Texture);
 		SetTexture(local, UI.TEX_GOLD, lo_gold.loadedObject as Texture);

@@ -10,7 +10,7 @@ public class MenuReset : GameSection
 	{
 		if (needClearCache && needPredownload)
 		{
-			this.StartCoroutine(ResetProc());
+			StartCoroutine(ResetProc());
 			base.Initialize();
 		}
 		else

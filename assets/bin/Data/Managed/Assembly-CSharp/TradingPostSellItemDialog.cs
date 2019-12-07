@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -41,7 +40,7 @@ public class TradingPostSellItemDialog : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 		base.Initialize();
 	}
 
@@ -66,46 +65,45 @@ public class TradingPostSellItemDialog : GameSection
 	public override void UpdateUI()
 	{
 		string key = "TEXT_SELL";
-		SetLabelText((Enum)UI.STR_TITLE_U, base.sectionData.GetText(key));
-		SetLabelText((Enum)UI.STR_TITLE_D, base.sectionData.GetText(key));
+		SetLabelText(UI.STR_TITLE_U, base.sectionData.GetText(key));
+		SetLabelText(UI.STR_TITLE_D, base.sectionData.GetText(key));
 		SetLabelText(UI.LBL_NUM_GEM, MonoBehaviourSingleton<TradingPostManager>.I.tradingPostSellItemData.itemQuantity);
 		TradingPostTable.ItemData itemData = Singleton<TradingPostTable>.I.GetItemData(MonoBehaviourSingleton<TradingPostManager>.I.tradingPostSellItemData.itemId);
-		SetProgressInt((Enum)UI.SLD_SALE_NUM, 1, 1, Mathf.Min(MonoBehaviourSingleton<TradingPostManager>.I.tradingPostSellItemData.itemQuantity, (int)itemData.maxQuantity), (EventDelegate.Callback)OnChangeSliderNum);
-		SetLabelText((Enum)UI.LBL_SALE_NUM, string.Format("{0,8:#,0}", GetProgressInt((Enum)UI.SLD_SALE_NUM)));
-		SetProgressInt((Enum)UI.SLD_SALE_PRICE, 1, MonoBehaviourSingleton<TradingPostManager>.I.tradingSellMinGem, MonoBehaviourSingleton<TradingPostManager>.I.tradingSellMaxGem, (EventDelegate.Callback)OnChangeSliderPrice);
-		SetLabelText((Enum)UI.STR_SALE_PRICE, GetPriceRate());
+		SetProgressInt(UI.SLD_SALE_NUM, 1, 1, Mathf.Min(MonoBehaviourSingleton<TradingPostManager>.I.tradingPostSellItemData.itemQuantity, (int)itemData.maxQuantity), OnChangeSliderNum);
+		SetLabelText(UI.LBL_SALE_NUM, string.Format("{0,8:#,0}", GetProgressInt(UI.SLD_SALE_NUM)));
+		SetProgressInt(UI.SLD_SALE_PRICE, 1, MonoBehaviourSingleton<TradingPostManager>.I.tradingSellMinGem, MonoBehaviourSingleton<TradingPostManager>.I.tradingSellMaxGem, OnChangeSliderPrice);
+		SetLabelText(UI.STR_SALE_PRICE, GetPriceRate());
 		SetLabelText(UI.LBL_BASE_PRICE, startingPrice.result.unitPrice);
-		SetLabelText((Enum)UI.STR_SOLD_COUNT, string.Format(base.sectionData.GetText("STR_NUM_PEOPLE_COUNT"), startingPrice.result.saleNumber));
+		SetLabelText(UI.STR_SOLD_COUNT, string.Format(base.sectionData.GetText("STR_NUM_PEOPLE_COUNT"), startingPrice.result.saleNumber));
 		SetSupportEncoding(UI.STR_SOLD_COUNT, isEnable: true);
 	}
 
 	private void OnQuery_SALE_NUM_MINUS()
 	{
-		SetProgressInt((Enum)UI.SLD_SALE_NUM, GetProgressInt((Enum)UI.SLD_SALE_NUM) - 1, -1, -1, (EventDelegate.Callback)null);
+		SetProgressInt(UI.SLD_SALE_NUM, GetProgressInt(UI.SLD_SALE_NUM) - 1);
 	}
 
 	private void OnQuery_SALE_NUM_PLUS()
 	{
-		SetProgressInt((Enum)UI.SLD_SALE_NUM, GetProgressInt((Enum)UI.SLD_SALE_NUM) + 1, -1, -1, (EventDelegate.Callback)null);
+		SetProgressInt(UI.SLD_SALE_NUM, GetProgressInt(UI.SLD_SALE_NUM) + 1);
 	}
 
 	private void OnQuery_SALE_PRICE_MINUS()
 	{
-		SetProgressInt((Enum)UI.SLD_SALE_PRICE, GetProgressInt((Enum)UI.SLD_SALE_PRICE) - 1, -1, -1, (EventDelegate.Callback)null);
+		SetProgressInt(UI.SLD_SALE_PRICE, GetProgressInt(UI.SLD_SALE_PRICE) - 1);
 	}
 
 	private void OnQuery_SALE_PRICE_PLUS()
 	{
-		SetProgressInt((Enum)UI.SLD_SALE_PRICE, GetProgressInt((Enum)UI.SLD_SALE_PRICE) + 1, -1, -1, (EventDelegate.Callback)null);
+		SetProgressInt(UI.SLD_SALE_PRICE, GetProgressInt(UI.SLD_SALE_PRICE) + 1);
 	}
 
 	private void OnQuery_SALE()
 	{
 		GameSection.StayEvent();
-		int progressInt = GetProgressInt((Enum)UI.SLD_SALE_NUM);
-		int progressInt2 = GetProgressInt((Enum)UI.SLD_SALE_PRICE);
-		float num = (float)progressInt2 / (float)progressInt;
-		MonoBehaviourSingleton<TradingPostManager>.I.SendRequestSellItem((int)MonoBehaviourSingleton<TradingPostManager>.I.tradingPostSellItemData.uniqID, GetProgressInt((Enum)UI.SLD_SALE_NUM), GetProgressInt((Enum)UI.SLD_SALE_PRICE), delegate(bool isSuccess)
+		int progressInt = GetProgressInt(UI.SLD_SALE_NUM);
+		_ = (float)GetProgressInt(UI.SLD_SALE_PRICE) / (float)progressInt;
+		MonoBehaviourSingleton<TradingPostManager>.I.SendRequestSellItem((int)MonoBehaviourSingleton<TradingPostManager>.I.tradingPostSellItemData.uniqID, GetProgressInt(UI.SLD_SALE_NUM), GetProgressInt(UI.SLD_SALE_PRICE), delegate(bool isSuccess)
 		{
 			MonoBehaviourSingleton<TradingPostManager>.I.isRefreshTradingPost = isSuccess;
 			GameSection.ResumeEvent(isSuccess);
@@ -114,30 +112,30 @@ public class TradingPostSellItemDialog : GameSection
 
 	protected int GetSliderNum()
 	{
-		return GetProgressInt((Enum)UI.SLD_SALE_NUM);
+		return GetProgressInt(UI.SLD_SALE_NUM);
 	}
 
 	protected int GetSliderPrice()
 	{
-		return GetProgressInt((Enum)UI.SLD_SALE_PRICE);
+		return GetProgressInt(UI.SLD_SALE_PRICE);
 	}
 
 	private void OnChangeSliderNum()
 	{
-		SetLabelText((Enum)UI.LBL_SALE_NUM, string.Format("{0,8:#,0}", GetProgressInt((Enum)UI.SLD_SALE_NUM)));
-		SetLabelText((Enum)UI.STR_SALE_PRICE, GetPriceRate());
+		SetLabelText(UI.LBL_SALE_NUM, string.Format("{0,8:#,0}", GetProgressInt(UI.SLD_SALE_NUM)));
+		SetLabelText(UI.STR_SALE_PRICE, GetPriceRate());
 	}
 
 	private void OnChangeSliderPrice()
 	{
-		SetLabelText((Enum)UI.STR_SALE_PRICE, GetPriceRate());
+		SetLabelText(UI.STR_SALE_PRICE, GetPriceRate());
 	}
 
 	protected string GetPriceRate()
 	{
-		int progressInt = GetProgressInt((Enum)UI.SLD_SALE_NUM);
-		int progressInt2 = GetProgressInt((Enum)UI.SLD_SALE_PRICE);
+		int progressInt = GetProgressInt(UI.SLD_SALE_NUM);
+		int progressInt2 = GetProgressInt(UI.SLD_SALE_PRICE);
 		float num = (float)progressInt2 / (float)progressInt;
-		return string.Format(base.sectionData.GetText("STR_SALE_PRICE"), progressInt2, (!(num >= 10f)) ? $"{num:#,0.00}" : $"{num:#,0.}");
+		return string.Format(base.sectionData.GetText("STR_SALE_PRICE"), progressInt2, (num >= 10f) ? $"{num:#,0.}" : $"{num:#,0.00}");
 	}
 }

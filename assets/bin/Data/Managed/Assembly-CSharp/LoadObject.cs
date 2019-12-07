@@ -19,19 +19,19 @@ public class LoadObject
 	{
 	}
 
-	public LoadObject(MonoBehaviour mono_behaviour, RESOURCE_CATEGORY category, string resource_name, bool cache_package = false)
+	public LoadObject(MonoBehaviour mono_behaviour, RESOURCE_CATEGORY category, string resource_name, bool cache_package = false, bool unload_bundle = false)
 	{
-		Load(mono_behaviour, category, resource_name, cache_package);
+		QuickLoad(mono_behaviour, category, resource_name, cache_package, unload_bundle);
 	}
 
 	public LoadObject(bool isEventAsset, MonoBehaviour mono_behaviour, RESOURCE_CATEGORY category, string resource_name, bool cache_package = false)
 	{
-		Load(isEventAsset, mono_behaviour, category, resource_name, cache_package);
+		QuickLoad(isEventAsset, mono_behaviour, category, resource_name, cache_package);
 	}
 
 	public LoadObject(MonoBehaviour mono_behaviour, RESOURCE_CATEGORY category, string package_name, string[] resource_names, bool cache_package = false)
 	{
-		Load(mono_behaviour, category, package_name, resource_names, cache_package);
+		QuickLoad(mono_behaviour, category, package_name, resource_names, cache_package);
 	}
 
 	public void Load(bool isEventAsset, MonoBehaviour mono_behaviour, RESOURCE_CATEGORY category, string resource_name, bool cache_package)
@@ -111,6 +111,90 @@ public class LoadObject
 		{
 			isLoading = true;
 			MonoBehaviourSingleton<ResourceManager>.I.Load(resLoad, category, package_name, resource_names, OnLoadComplate, OnLoadError, cache_package);
+		}
+		else
+		{
+			resLoad.SetReference(loadedObjects);
+		}
+	}
+
+	public void QuickLoad(bool isEventAsset, MonoBehaviour mono_behaviour, RESOURCE_CATEGORY category, string resource_name, bool cache_package, bool unload_asset = false)
+	{
+		isLoading = false;
+		if (!string.IsNullOrEmpty(resource_name))
+		{
+			if (resLoad == null)
+			{
+				resLoad = ResourceLoad.GetResourceLoad(mono_behaviour);
+			}
+			ResourceObject cachedResourceObject = MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedResourceObject(category, resource_name);
+			if (cachedResourceObject != null)
+			{
+				loadedObject = cachedResourceObject.obj;
+				resLoad.SetReference(cachedResourceObject);
+			}
+			if (loadedObject == null)
+			{
+				isLoading = true;
+				MonoBehaviourSingleton<ResourceManager>.I.LoadAssetBundle(isEventAsset, resLoad, category, resource_name, OnLoadComplate, OnLoadError, cache_package, unload_asset);
+			}
+		}
+	}
+
+	public void QuickLoad(MonoBehaviour mono_behaviour, RESOURCE_CATEGORY category, string resource_name, bool cache_package, bool unload_asset = false)
+	{
+		isLoading = false;
+		if (!string.IsNullOrEmpty(resource_name))
+		{
+			if (resLoad == null)
+			{
+				resLoad = ResourceLoad.GetResourceLoad(mono_behaviour);
+			}
+			ResourceObject cachedResourceObject = MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedResourceObject(category, resource_name);
+			if (cachedResourceObject != null)
+			{
+				loadedObject = cachedResourceObject.obj;
+				resLoad.SetReference(cachedResourceObject);
+			}
+			if (loadedObject == null)
+			{
+				isLoading = true;
+				MonoBehaviourSingleton<ResourceManager>.I.LoadAssetBundle(resLoad, category, resource_name, OnLoadComplate, OnLoadError, cache_package, unload_asset);
+			}
+		}
+	}
+
+	public void QuickLoad(MonoBehaviour mono_behaviour, RESOURCE_CATEGORY category, string package_name, string[] resource_names, bool cache_package = false, bool unload_asset = false)
+	{
+		isLoading = false;
+		if (resource_names != null && resource_names.Length >= 1)
+		{
+			loadedObjects = MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedResourceObjects(category, resource_names);
+			if (loadedObjects != null)
+			{
+				if (loadedObjects[0] != null)
+				{
+					loadedObject = loadedObjects[0].obj;
+				}
+				int i = 0;
+				for (int num = loadedObjects.Length; i < num; i++)
+				{
+					if (loadedObjects[i] == null)
+					{
+						loadedObjects = null;
+						break;
+					}
+				}
+			}
+		}
+		if (resLoad == null)
+		{
+			resLoad = ResourceLoad.GetResourceLoad(mono_behaviour);
+		}
+		if (loadedObjects == null)
+		{
+			isLoading = true;
+			MonoBehaviourSingleton<ResourceManager>.I.LoadAssetBundle(resLoad, category, package_name, resource_names, OnLoadComplate, OnLoadError, cache_package, unload_asset);
 		}
 		else
 		{

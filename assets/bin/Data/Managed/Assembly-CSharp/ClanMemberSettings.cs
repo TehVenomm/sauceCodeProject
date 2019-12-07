@@ -32,7 +32,7 @@ public class ClanMemberSettings : GameSection
 		{
 			userInfo = friendCharaInfo;
 		}
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -55,11 +55,9 @@ public class ClanMemberSettings : GameSection
 
 	public override void UpdateUI()
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		SetRenderPlayerModel((Enum)UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(userInfo, need_weapon: false, need_helm: true, need_leg: false, is_priority_visual_equip: true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), is_priority_visual_equip: true, (Action<PlayerLoader>)null);
-		SetLabelText((Enum)UI.LBL_NAME, userInfo.name);
-		SetLabelText((Enum)UI.LBL_LEVEL, userInfo.level.ToString());
+		SetRenderPlayerModel(UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(userInfo, need_weapon: false, need_helm: true, need_leg: false, is_priority_visual_equip: true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), is_priority_visual_equip: true);
+		SetLabelText(UI.LBL_NAME, userInfo.name);
+		SetLabelText(UI.LBL_LEVEL, userInfo.level.ToString());
 		SetStatusSprite(userInfo.userClanData);
 		UpdateStatus();
 	}
@@ -67,24 +65,24 @@ public class ClanMemberSettings : GameSection
 	private void UpdateStatus()
 	{
 		int num = selectedStatus;
-		SetLabelText((Enum)UI.LBL_TARGET_STATUS, dispStatuses[num]);
+		SetLabelText(UI.LBL_TARGET_STATUS, dispStatuses[num]);
 	}
 
 	private void SetStatusSprite(UserClanData userClan)
 	{
 		if (userClan.IsLeader())
 		{
-			SetActive((Enum)UI.SPR_STATUS, is_visible: true);
-			SetSprite((Enum)UI.SPR_STATUS, "Clan_HeadmasterIcon");
+			SetActive(UI.SPR_STATUS, is_visible: true);
+			SetSprite(UI.SPR_STATUS, "Clan_HeadmasterIcon");
 		}
 		else if (userClan.IsSubLeader())
 		{
-			SetActive((Enum)UI.SPR_STATUS, is_visible: true);
-			SetSprite((Enum)UI.SPR_STATUS, "Clan_DeputyHeadmasterIcon");
+			SetActive(UI.SPR_STATUS, is_visible: true);
+			SetSprite(UI.SPR_STATUS, "Clan_DeputyHeadmasterIcon");
 		}
 		else
 		{
-			SetActive((Enum)UI.SPR_STATUS, is_visible: false);
+			SetActive(UI.SPR_STATUS, is_visible: false);
 		}
 	}
 

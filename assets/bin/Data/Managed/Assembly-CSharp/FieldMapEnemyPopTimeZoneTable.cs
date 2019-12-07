@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class FieldMapEnemyPopTimeZoneTable : Singleton<FieldMapEnemyPopTimeZoneTable>, IDataTable
 {
@@ -46,15 +45,6 @@ public class FieldMapEnemyPopTimeZoneTable : Singleton<FieldMapEnemyPopTimeZoneT
 	}
 
 	private UIntKeyTable<FieldMapEnemyPopTimeZoneData> timeZoneDataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<FieldMapEnemyPopTimeZoneData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<FieldMapEnemyPopTimeZoneData> _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<FieldMapEnemyPopTimeZoneData> _003C_003Ef__mg_0024cache2;
 
 	public void CreateTable(string csv_text)
 	{

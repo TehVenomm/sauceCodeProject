@@ -54,7 +54,7 @@ namespace GooglePlayGames.Native.PInvoke
 			}
 			catch (Exception arg)
 			{
-				Debug.LogError((object)("Exception creating string from char array: " + arg));
+				Debug.LogError("Exception creating string from char array: " + arg);
 				return string.Empty;
 			}
 		}

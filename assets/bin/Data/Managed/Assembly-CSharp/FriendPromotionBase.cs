@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Text;
 using UnityEngine;
@@ -38,19 +37,19 @@ public class FriendPromotionBase : GameSection
 		}
 		promotionInfo = followLinkResult.promotionInfo;
 		string text = base.sectionData.GetText("TITLE");
-		SetLabelText((Enum)UI.LBL_TITLE, text);
-		SetLabelText((Enum)UI.LBL_TITLE_SHADOW, text);
+		SetLabelText(UI.LBL_TITLE, text);
+		SetLabelText(UI.LBL_TITLE_SHADOW, text);
 		SetSuccessNum(promotionInfo);
 		SetReceivedNum(promotionInfo);
 		string text2 = base.sectionData.GetText("DETAIL");
-		SetLabelText((Enum)UI.LBL_DETAIL, text2);
+		SetLabelText(UI.LBL_DETAIL, text2);
 		bool isPromotionEvent = promotionInfo.isPromotionEvent;
-		SetActive((Enum)UI.OBJ_SNS_AREA, isPromotionEvent);
-		SetActive((Enum)UI.LBL_CANT_INVITE, !isPromotionEvent);
+		SetActive(UI.OBJ_SNS_AREA, isPromotionEvent);
+		SetActive(UI.LBL_CANT_INVITE, !isPromotionEvent);
 		string message = followLinkResult.message;
 		linkMessage = string.Format(message, followLinkResult.link);
 		linkMessage = linkMessage.Replace("<BR>", "\n");
-		this.StartCoroutine(LoadTopBanner(promotionInfo.promotionBannerId));
+		StartCoroutine(LoadTopBanner(promotionInfo.promotionBannerId));
 		base.Initialize();
 	}
 
@@ -58,43 +57,41 @@ public class FriendPromotionBase : GameSection
 	{
 		string text = base.sectionData.GetText("SUCCESS_TITLE");
 		string text2 = base.sectionData.GetText("PEOPLE");
-		SetLabelText((Enum)UI.LBL_SUCCESS_NAME, text);
+		SetLabelText(UI.LBL_SUCCESS_NAME, text);
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.Append(promotionInfo.promotionCnt.ToString());
 		stringBuilder.Append("/");
 		stringBuilder.Append(promotionInfo.promotionMaxCnt.ToString());
 		stringBuilder.Append(text2);
-		SetLabelText((Enum)UI.LBL_SUCCESS_NUM, stringBuilder.ToString());
+		SetLabelText(UI.LBL_SUCCESS_NUM, stringBuilder.ToString());
 	}
 
 	private void SetReceivedNum(PromotionInfo promotionInfo)
 	{
 		string text = base.sectionData.GetText("RECEIVED_TITLE");
 		string text2 = base.sectionData.GetText("COUNT");
-		SetLabelText((Enum)UI.LBL_RECEIVED_NAME, text);
+		SetLabelText(UI.LBL_RECEIVED_NAME, text);
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.Append(promotionInfo.promotionReceivedCnt.ToString());
 		stringBuilder.Append("/");
 		stringBuilder.Append(promotionInfo.promotionCnt.ToString());
 		stringBuilder.Append(text2);
-		SetLabelText((Enum)UI.LBL_RECEIVED_NUM, stringBuilder.ToString());
+		SetLabelText(UI.LBL_RECEIVED_NUM, stringBuilder.ToString());
 	}
 
 	private IEnumerator LoadTopBanner(int bannerId)
 	{
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		string bannerName = ResourceName.GetFriendPromotionBannerImage(bannerId);
-		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.COMMON, bannerName);
-		if (loadQueue.IsLoading())
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		string friendPromotionBannerImage = ResourceName.GetFriendPromotionBannerImage(bannerId);
+		LoadObject lo_image = loadingQueue.Load(RESOURCE_CATEGORY.COMMON, friendPromotionBannerImage);
+		if (loadingQueue.IsLoading())
 		{
-			yield return loadQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		if (!(lo_image.loadedObject == null))
 		{
-			Texture bannerImg = lo_image.loadedObject as Texture;
-			Transform banner = GetCtrl(UI.SPR_BANNER);
-			UITexture uiTexture = banner.GetComponent<UITexture>();
-			uiTexture.mainTexture = bannerImg;
+			Texture mainTexture = lo_image.loadedObject as Texture;
+			GetCtrl(UI.SPR_BANNER).GetComponent<UITexture>().mainTexture = mainTexture;
 		}
 	}
 

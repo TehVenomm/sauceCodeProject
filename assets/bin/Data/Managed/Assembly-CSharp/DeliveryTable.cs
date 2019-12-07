@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 {
@@ -119,7 +118,11 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 				{
 					return false;
 				}
-				return conditionType == needData.conditionType && enemyId == needData.enemyId && mapId == needData.mapId && questId == needData.questId && rateType == needData.rateType && needName == needData.needName && needNum.value == needData.needNum.value;
+				if (conditionType == needData.conditionType && enemyId == needData.enemyId && mapId == needData.mapId && questId == needData.questId && rateType == needData.rateType && needName == needData.needName)
+				{
+					return needNum.value == needData.needNum.value;
+				}
+				return false;
 			}
 
 			public override int GetHashCode()
@@ -241,7 +244,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 				uint value3 = 0u;
 				uint value4 = 0u;
 				DELIVERY_RATE_TYPE value5 = DELIVERY_RATE_TYPE.RATE_10000;
-				string value6 = string.Empty;
+				string value6 = "";
 				uint value7 = 0u;
 				uint value8 = 0u;
 				csv_reader.PopEnum(ref value, DELIVERY_CONDITION_TYPE.NONE);
@@ -271,7 +274,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 				data.deliveryNumber = (data.id % 100u).ToString();
 			}
 			csv_reader.Pop(ref data.regionId);
-			string value9 = string.Empty;
+			string value9 = "";
 			csv_reader.Pop(ref value9);
 			data.tipsIdList = new List<int>();
 			int[] array = TableUtility.ParseStringToIntArray(value9);
@@ -286,9 +289,9 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 		public void LoadFromBinary(BinaryTableReader reader, ref uint key)
 		{
 			id = key;
-			locationNumber = reader.ReadString(string.Empty);
-			deliveryNumber = reader.ReadString(string.Empty);
-			name = reader.ReadString(string.Empty);
+			locationNumber = reader.ReadString();
+			deliveryNumber = reader.ReadString();
+			name = reader.ReadString();
 			type = (DELIVERY_TYPE)reader.ReadUInt32();
 			subType = (DELIVERY_SUB_TYPE)reader.ReadUInt32();
 			textType = (DELIVERY_TYPE)reader.ReadUInt32();
@@ -297,33 +300,32 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			fieldMode = (DIFFICULTY_MODE)reader.ReadUInt32();
 			difficulty = (DIFFICULTY_MODE)reader.ReadUInt32();
 			npcID = reader.ReadUInt32();
-			npcComment = reader.ReadString(string.Empty);
-			npcClearComment = reader.ReadString(string.Empty);
+			npcComment = reader.ReadString();
+			npcClearComment = reader.ReadString();
 			readScriptId = reader.ReadUInt32();
 			clearEventID = reader.ReadUInt32();
-			clearEventTitle = reader.ReadString(string.Empty);
+			clearEventTitle = reader.ReadString();
 			jumpType = reader.ReadInt32();
 			jumpMapID = reader.ReadInt32();
 			targetPortalID[0] = reader.ReadInt32();
 			targetPortalID[1] = reader.ReadInt32();
 			targetPortalID[2] = reader.ReadInt32();
-			placeName = reader.ReadString(string.Empty);
-			enemyName = reader.ReadString(string.Empty);
+			placeName = reader.ReadString();
+			enemyName = reader.ReadString();
 			appearQuestId = reader.ReadUInt32();
 			appearDeliveryId = reader.ReadUInt32();
 			List<NeedData> list = new List<NeedData>();
 			int i = 0;
 			for (int num = 5; i < num; i++)
 			{
-				DELIVERY_CONDITION_TYPE dELIVERY_CONDITION_TYPE = DELIVERY_CONDITION_TYPE.NONE;
 				uint num2 = 0u;
 				uint num3 = 0u;
 				uint questId = 0u;
 				DELIVERY_RATE_TYPE dELIVERY_RATE_TYPE = DELIVERY_RATE_TYPE.RATE_10000;
-				string empty = string.Empty;
+				string text = "";
 				uint num4 = 0u;
 				uint num5 = 0u;
-				dELIVERY_CONDITION_TYPE = (DELIVERY_CONDITION_TYPE)reader.ReadUInt32();
+				uint conditionType = reader.ReadUInt32();
 				num2 = reader.ReadUInt32();
 				num3 = reader.ReadUInt32();
 				if (i == 0)
@@ -331,10 +333,10 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 					questId = reader.ReadUInt32();
 				}
 				dELIVERY_RATE_TYPE = (DELIVERY_RATE_TYPE)reader.ReadUInt32();
-				empty = reader.ReadString(string.Empty);
+				text = reader.ReadString();
 				num4 = reader.ReadUInt32();
 				num5 = reader.ReadUInt32();
-				NeedData needData = new NeedData(dELIVERY_CONDITION_TYPE, num2, num3, questId, dELIVERY_RATE_TYPE, empty, num4, num5);
+				NeedData needData = new NeedData((DELIVERY_CONDITION_TYPE)conditionType, num2, num3, questId, dELIVERY_RATE_TYPE, text, num4, num5);
 				if (needData.IsValid())
 				{
 					list.Add(needData);
@@ -400,7 +402,11 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 
 		public bool IsEvent()
 		{
-			return type == DELIVERY_TYPE.EVENT || type == DELIVERY_TYPE.SUB_EVENT;
+			if (type != DELIVERY_TYPE.EVENT)
+			{
+				return type == DELIVERY_TYPE.SUB_EVENT;
+			}
+			return true;
 		}
 
 		public bool IsClearDialogInGame()
@@ -417,7 +423,11 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 			{
 				return true;
 			}
-			return type == DELIVERY_TYPE.EVENT || type == DELIVERY_TYPE.STORY;
+			if (type != DELIVERY_TYPE.EVENT)
+			{
+				return type == DELIVERY_TYPE.STORY;
+			}
+			return true;
 		}
 
 		public bool IsInvalidClearIngame()
@@ -797,17 +807,11 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 
 		public override string ToString()
 		{
-			return "id:" + id + ", locationNumber:" + locationNumber + ", deliveryNumber:" + deliveryNumber + ", name:" + name + ", type:" + type + ", subType:" + subType + ", textType:" + textType + ", eventID:" + eventID + ", fieldMode:" + fieldMode + ", difficulty:" + difficulty + ", eventFlag:" + eventFlag + ", npcID:" + npcID + ", npcComment:" + npcComment + ", npcClearComment:" + npcClearComment + ", readScriptId:" + readScriptId + ", clearEventID:" + clearEventID + ", clearEventTitle:" + clearEventTitle + ", jumpType:" + jumpType + ", jumpMapID:" + jumpMapID + ", targetPortalID[0]" + targetPortalID[0] + ", targetPortalID[1]:" + targetPortalID[1] + ", targetPortalID[2]:" + targetPortalID[2] + ", placeName:" + placeName + ", enemyName:" + enemyName + ", appearQuestId:" + appearQuestId + ", appearDeliveryId:" + appearDeliveryId;
+			return "id:" + id + ", locationNumber:" + locationNumber + ", deliveryNumber:" + deliveryNumber + ", name:" + name + ", type:" + type + ", subType:" + subType + ", textType:" + textType + ", eventID:" + eventID + ", fieldMode:" + fieldMode + ", difficulty:" + difficulty + ", eventFlag:" + eventFlag.ToString() + ", npcID:" + npcID + ", npcComment:" + npcComment + ", npcClearComment:" + npcClearComment + ", readScriptId:" + readScriptId + ", clearEventID:" + clearEventID + ", clearEventTitle:" + clearEventTitle + ", jumpType:" + jumpType + ", jumpMapID:" + jumpMapID + ", targetPortalID[0]" + targetPortalID[0] + ", targetPortalID[1]:" + targetPortalID[1] + ", targetPortalID[2]:" + targetPortalID[2] + ", placeName:" + placeName + ", enemyName:" + enemyName + ", appearQuestId:" + appearQuestId + ", appearDeliveryId:" + appearDeliveryId;
 		}
 	}
 
 	private UIntKeyTable<DeliveryData> tableData;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<DeliveryData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<DeliveryData> _003C_003Ef__mg_0024cache1;
 
 	public static UIntKeyTable<DeliveryData> CreateTableCSV(string csv_text)
 	{
@@ -882,9 +886,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 		DeliveryData deliveryTableDataFromQuestId = GetDeliveryTableDataFromQuestId(questId);
 		if (deliveryTableDataFromQuestId != null)
 		{
-			list.AddRange(from num in deliveryTableDataFromQuestId.tipsIdList
-			where num > 0
-			select num);
+			list.AddRange(deliveryTableDataFromQuestId.tipsIdList.Where((int num) => num > 0));
 		}
 		return list;
 	}
@@ -928,7 +930,7 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 		{
 			return null;
 		}
-		return tableData.Find((DeliveryData d) => d.needs.Length > 0 && d.needs[0].questId == questId);
+		return tableData.Find((DeliveryData d) => d.needs.Length != 0 && d.needs[0].questId == questId);
 	}
 
 	public int GetSortPriority(DELIVERY_TYPE type)
@@ -936,6 +938,17 @@ public class DeliveryTable : Singleton<DeliveryTable>, IDataTable
 		switch (type)
 		{
 		default:
+			_ = 99;
+			goto case DELIVERY_TYPE.EVENT;
+		case DELIVERY_TYPE.EVENT:
+		case (DELIVERY_TYPE)13:
+		case (DELIVERY_TYPE)14:
+		case (DELIVERY_TYPE)15:
+		case (DELIVERY_TYPE)16:
+		case (DELIVERY_TYPE)17:
+		case (DELIVERY_TYPE)18:
+		case (DELIVERY_TYPE)19:
+		case DELIVERY_TYPE.ETC:
 			return 5;
 		case DELIVERY_TYPE.WEEKLY:
 			return 4;

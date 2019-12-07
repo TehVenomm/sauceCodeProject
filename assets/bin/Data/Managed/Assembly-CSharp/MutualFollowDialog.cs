@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Text;
 using UnityEngine;
@@ -34,33 +33,33 @@ public class MutualFollowDialog : GameSection
 	public override void Initialize()
 	{
 		followLinkResult = MonoBehaviourSingleton<FriendManager>.I.followLinkResult;
-		SetLabelText((Enum)UI.LBL_FOLLOWER_NUM, followLinkResult.followCnt.ToString() + "/" + followLinkResult.followMaxCnt.ToString());
+		SetLabelText(UI.LBL_FOLLOWER_NUM, followLinkResult.followCnt.ToString() + "/" + followLinkResult.followMaxCnt.ToString());
 		string text = base.sectionData.GetText("REMAIN");
 		string text2 = base.sectionData.GetText("PEOPLE");
-		SetLabelText((Enum)UI.LBL_REMAIN_NUM, text + " " + followLinkResult.remainedCampaignNum.ToString() + " " + text2);
-		string empty = string.Empty;
+		SetLabelText(UI.LBL_REMAIN_NUM, text + " " + followLinkResult.remainedCampaignNum.ToString() + " " + text2);
+		string text3 = "";
 		SetLabelText(text: (followLinkResult.remainedLoungeFirstMetNum >= 0) ? (text + " " + followLinkResult.remainedLoungeFirstMetNum.ToString() + " " + text2) : base.sectionData.GetText("NON_CAMPAIN"), label_enum: UI.LBL_LOUNGE_REMAIN_NUM);
 		string message = followLinkResult.message;
 		linkMessage = string.Format(message, followLinkResult.link);
 		linkMessage = linkMessage.Replace("<BR>", "\n");
 		if (!MonoBehaviourSingleton<AccountManager>.I.usageLimitMode)
 		{
-			SetActive((Enum)UI.OBJ_AREA, is_visible: true);
-			SetActive((Enum)UI.OBJ_AREA2, is_visible: false);
-			SetActive((Enum)UI.LBL_SERVICE_MESSAGE, is_visible: false);
-			SetActive((Enum)UI.LBL_INVITE, is_visible: true);
-			this.StartCoroutine(LoadTopBanner());
+			SetActive(UI.OBJ_AREA, is_visible: true);
+			SetActive(UI.OBJ_AREA2, is_visible: false);
+			SetActive(UI.LBL_SERVICE_MESSAGE, is_visible: false);
+			SetActive(UI.LBL_INVITE, is_visible: true);
+			StartCoroutine(LoadTopBanner());
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_INVITE, is_visible: false);
-			SetActive((Enum)UI.OBJ_AREA, is_visible: false);
-			SetActive((Enum)UI.OBJ_AREA2, is_visible: false);
-			SetActive((Enum)UI.OBJ_LINE_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_TWITTER_ROOT, is_visible: false);
-			SetActive((Enum)UI.BTN_DETAIL, is_visible: false);
-			SetActive((Enum)UI.LBL_SERVICE_MESSAGE, is_visible: true);
-			SetLabelText((Enum)UI.LBL_SERVICE_MESSAGE, base.sectionData.GetText("SERVICE_LIMITED"));
+			SetActive(UI.LBL_INVITE, is_visible: false);
+			SetActive(UI.OBJ_AREA, is_visible: false);
+			SetActive(UI.OBJ_AREA2, is_visible: false);
+			SetActive(UI.OBJ_LINE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_TWITTER_ROOT, is_visible: false);
+			SetActive(UI.BTN_DETAIL, is_visible: false);
+			SetActive(UI.LBL_SERVICE_MESSAGE, is_visible: true);
+			SetLabelText(UI.LBL_SERVICE_MESSAGE, base.sectionData.GetText("SERVICE_LIMITED"));
 		}
 		base.Initialize();
 	}
@@ -78,10 +77,8 @@ public class MutualFollowDialog : GameSection
 		}
 		if (!(lo_image.loadedObject == null))
 		{
-			Texture bannerImg = lo_image.loadedObject as Texture;
-			Transform banner = GetCtrl(UI.SPR_MUTUAL_FOLLOW_BANNER);
-			UITexture uiTexture = banner.GetComponent<UITexture>();
-			uiTexture.mainTexture = bannerImg;
+			Texture mainTexture = lo_image.loadedObject as Texture;
+			GetCtrl(UI.SPR_MUTUAL_FOLLOW_BANNER).GetComponent<UITexture>().mainTexture = mainTexture;
 		}
 	}
 

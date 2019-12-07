@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Text;
 
 public class HomeLoginBonusNoticeBase : GameSection
@@ -25,13 +24,13 @@ public class HomeLoginBonusNoticeBase : GameSection
 	{
 		if (bonus != null)
 		{
-			SetLabelText((Enum)UI.LBL_BONUS_NAME, bonus.name);
+			SetLabelText(UI.LBL_BONUS_NAME, bonus.name);
 			StringBuilder sb = new StringBuilder();
 			int count = bonus.reward.Count;
 			int index = 0;
 			bonus.reward.ForEach(delegate(LoginBonus.LoginBonusReward o)
 			{
-				index++;
+				int num = ++index;
 				if (index < count)
 				{
 					sb.AppendLine(o.name);
@@ -41,7 +40,7 @@ public class HomeLoginBonusNoticeBase : GameSection
 					sb.Append(o.name);
 				}
 			});
-			SetLabelText((Enum)UI.ProvisionalLabel, sb.ToString());
+			SetLabelText(UI.ProvisionalLabel, sb.ToString());
 			UpdateAnchors();
 		}
 	}

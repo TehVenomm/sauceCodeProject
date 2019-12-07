@@ -39,11 +39,6 @@ public class WaveMatchDropObject : MonoBehaviour
 
 	protected WaveMatchDropTable.WaveMatchDropData tableData;
 
-	public WaveMatchDropObject()
-		: this()
-	{
-	}
-
 	public int GetId()
 	{
 		return id;
@@ -51,14 +46,7 @@ public class WaveMatchDropObject : MonoBehaviour
 
 	public void Initialize(int _id, Vector3 _pos, Vector3 _offset, float _sec, WaveMatchDropTable.WaveMatchDropData _data)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		this.set_name("WM_Drop:" + id.ToString());
+		base.name = "WM_Drop:" + id.ToString();
 		id = _id;
 		basePos = _pos;
 		targetPos = _pos + _offset;
@@ -66,13 +54,13 @@ public class WaveMatchDropObject : MonoBehaviour
 		dropTime = 0f;
 		tableData = _data;
 		cachedStageObjMgr = MonoBehaviourSingleton<StageObjectManager>.I;
-		cachedTransform = this.get_transform();
-		cachedTransform.set_localPosition(basePos);
-		cachedCollider = this.get_gameObject().AddComponent<SphereCollider>();
-		cachedCollider.set_radius(kColliderSize);
-		cachedCollider.set_isTrigger(true);
-		cachedCollider.set_enabled(false);
-		this.get_gameObject().set_layer(31);
+		cachedTransform = base.transform;
+		cachedTransform.localPosition = basePos;
+		cachedCollider = base.gameObject.AddComponent<SphereCollider>();
+		cachedCollider.radius = kColliderSize;
+		cachedCollider.isTrigger = true;
+		cachedCollider.enabled = false;
+		base.gameObject.layer = 31;
 		ignoreLayerMask |= 41984;
 		ignoreLayerMask |= 20480;
 		ignoreLayerMask |= 2490880;
@@ -95,27 +83,24 @@ public class WaveMatchDropObject : MonoBehaviour
 
 	private void _UpdateDrop()
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		dropTime += Time.get_deltaTime();
+		dropTime += Time.deltaTime;
 		float num = dropTime / kDropTime;
 		if (num > 1f)
 		{
 			num = 1f;
 		}
-		cachedTransform.set_localPosition(Vector3.Lerp(basePos, targetPos, num));
+		cachedTransform.localPosition = Vector3.Lerp(basePos, targetPos, num);
 		if (num >= 1f)
 		{
 			effectTrans = EffectManager.GetEffect("ef_btl_target_dropitem_01", cachedTransform);
-			cachedCollider.set_enabled(true);
+			cachedCollider.enabled = true;
 			state = eState.Idle;
 		}
 	}
 
 	private void _UpdateIdle()
 	{
-		lifeSpan -= Time.get_deltaTime();
+		lifeSpan -= Time.deltaTime;
 		if (lifeSpan <= 0f)
 		{
 			cachedStageObjMgr.RemoveWaveMatchDropObject(id);
@@ -127,23 +112,20 @@ public class WaveMatchDropObject : MonoBehaviour
 		state = eState.None;
 		if (cachedCollider != null)
 		{
-			cachedCollider.set_enabled(false);
+			cachedCollider.enabled = false;
 		}
 		EffectManager.ReleaseEffect(ref effectTrans);
-		if (this.get_gameObject() != null)
+		if (base.gameObject != null)
 		{
-			Object.Destroy(this.get_gameObject());
+			Object.Destroy(base.gameObject);
 		}
 	}
 
 	public virtual void OnPicked(Self self)
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		if (!tableData.getEffect.IsNullOrWhiteSpace())
 		{
-			EffectManager.OneShot(tableData.getEffect, self._position, Quaternion.get_identity());
+			EffectManager.OneShot(tableData.getEffect, self._position, Quaternion.identity);
 		}
 		if (tableData.getSE != 0)
 		{
@@ -162,12 +144,12 @@ public class WaveMatchDropObject : MonoBehaviour
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		int layer = collider.get_gameObject().get_layer();
-		if (((1 << layer) & ignoreLayerMask) > 0 || (layer == 8 && collider.get_gameObject().GetComponent<DangerRader>() != null))
+		int layer = collider.gameObject.layer;
+		if (((1 << layer) & ignoreLayerMask) > 0 || (layer == 8 && collider.gameObject.GetComponent<DangerRader>() != null))
 		{
 			return;
 		}
-		Self component = collider.get_gameObject().GetComponent<Self>();
+		Self component = collider.gameObject.GetComponent<Self>();
 		if (!(component == null))
 		{
 			OnPicked(component);

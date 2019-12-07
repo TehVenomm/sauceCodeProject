@@ -145,7 +145,7 @@ public class UIDropAnnounce : MonoBehaviourSingleton<UIDropAnnounce>
 	protected int announceMax = 1;
 
 	[SerializeField]
-	protected Color[] announceColor = (Color[])new Color[8]
+	protected Color[] announceColor = new Color[8]
 	{
 		new Color(1f, 1f, 1f),
 		new Color(1f, 0.5f, 0f),
@@ -174,19 +174,14 @@ public class UIDropAnnounce : MonoBehaviourSingleton<UIDropAnnounce>
 			{
 				panelChange.Lock();
 			}
-			announceDispItems[i].get_gameObject().SetActive(false);
+			announceDispItems[i].gameObject.SetActive(value: false);
 		}
 		announceDispItems.Clear();
 	}
 
 	public void Announce(DropAnnounceInfo info)
 	{
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-		if (!this.get_gameObject().get_activeInHierarchy())
+		if (!base.gameObject.activeInHierarchy)
 		{
 			return;
 		}
@@ -199,7 +194,7 @@ public class UIDropAnnounce : MonoBehaviourSingleton<UIDropAnnounce>
 		int i = 0;
 		for (int count = announceItems.Count; i < count; i++)
 		{
-			if (!announceItems[i].get_gameObject().get_activeSelf())
+			if (!announceItems[i].gameObject.activeSelf)
 			{
 				uIDropAnnounceItem = announceItems[i];
 				break;
@@ -207,10 +202,10 @@ public class UIDropAnnounce : MonoBehaviourSingleton<UIDropAnnounce>
 		}
 		if (uIDropAnnounceItem == null)
 		{
-			GameObject val = ResourceUtility.Instantiate<GameObject>(announceItem);
-			val.get_transform().set_parent(this.get_gameObject().get_transform());
-			val.get_transform().set_localScale(Vector3.get_one());
-			uIDropAnnounceItem = val.GetComponent<UIDropAnnounceItem>();
+			GameObject gameObject = ResourceUtility.Instantiate(announceItem);
+			gameObject.transform.parent = base.gameObject.transform;
+			gameObject.transform.localScale = Vector3.one;
+			uIDropAnnounceItem = gameObject.GetComponent<UIDropAnnounceItem>();
 			announceItems.Add(uIDropAnnounceItem);
 		}
 		if (panelChange != null)
@@ -218,15 +213,14 @@ public class UIDropAnnounce : MonoBehaviourSingleton<UIDropAnnounce>
 			panelChange.UnLock();
 		}
 		uIDropAnnounceItem.StartAnnounce(info.text, announceColor[(int)info.color], announceDispItems.Count > 0, OnEnd);
-		Vector3 zero = Vector3.get_zero();
+		Vector3 zero = Vector3.zero;
 		zero.y = (0f - announceItemSize) * (float)announceDispItems.Count;
-		uIDropAnnounceItem.get_transform().set_localPosition(zero);
+		uIDropAnnounceItem.transform.localPosition = zero;
 		announceDispItems.Add(uIDropAnnounceItem);
 	}
 
 	protected void OnEnd(UIDropAnnounceItem item)
 	{
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		announceDispItems.Remove(item);
 		int i = 0;
 		for (int count = announceDispItems.Count; i < count; i++)

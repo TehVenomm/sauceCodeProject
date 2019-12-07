@@ -39,11 +39,6 @@ public class UITutorialFieldHelper : MonoBehaviour
 
 	public static UITutorialFieldHelper I => instance;
 
-	public UITutorialFieldHelper()
-		: this()
-	{
-	}
-
 	public static bool IsValid()
 	{
 		return instance != null;
@@ -51,7 +46,11 @@ public class UITutorialFieldHelper : MonoBehaviour
 
 	public static bool IsCollectedFieldItem()
 	{
-		return instance != null && m_State == MessageState.BackHome;
+		if (instance != null)
+		{
+			return m_State == MessageState.BackHome;
+		}
+		return false;
 	}
 
 	private void Awake()
@@ -94,15 +93,15 @@ public class UITutorialFieldHelper : MonoBehaviour
 			if (UIInGameFieldMenu.IsValid())
 			{
 				UIInGameFieldMenu.I.SetDisableButtons(disable: true);
-				UIInGameFieldMenu.I.get_gameObject().SetActive(false);
+				UIInGameFieldMenu.I.gameObject.SetActive(value: false);
 			}
 			break;
 		case MessageState.BackHome:
 			if (UIInGameFieldMenu.IsValid())
 			{
-				tweenEndCtrl.get_gameObject().SetActive(true);
+				tweenEndCtrl.gameObject.SetActive(value: true);
 				UIInGameFieldMenu.I.SetDisableButtons(disable: true);
-				UIInGameFieldMenu.I.get_gameObject().SetActive(true);
+				UIInGameFieldMenu.I.gameObject.SetActive(value: true);
 				UIInGameFieldMenu.I.SetEnableButton("BTN_REQUEST", is_enable: true);
 			}
 			break;
@@ -118,8 +117,8 @@ public class UITutorialFieldHelper : MonoBehaviour
 			SetState(MessageState.CollectItemImg);
 			tweenEndCtrl.Play(forward: true, delegate
 			{
-				tweenStratCtrl.get_gameObject().SetActive(false);
-				tweenEndCtrl.get_gameObject().SetActive(false);
+				tweenStratCtrl.gameObject.SetActive(value: false);
+				tweenEndCtrl.gameObject.SetActive(value: false);
 			});
 		});
 		skilBtn.onClick.Clear();

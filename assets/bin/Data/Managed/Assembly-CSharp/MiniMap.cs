@@ -39,7 +39,7 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 	protected override void Awake()
 	{
 		base.Awake();
-		this.get_gameObject().SetActive((FieldManager.IsValidInGameNoQuest() && !MonoBehaviourSingleton<FieldManager>.I.isTutorialField) || QuestManager.IsValidInGameWaveMatch());
+		base.gameObject.SetActive((FieldManager.IsValidInGameNoQuest() && !MonoBehaviourSingleton<FieldManager>.I.isTutorialField) || QuestManager.IsValidInGameWaveMatch());
 		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 		{
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
@@ -72,7 +72,7 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 			return;
 		}
 		DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
-		UIWidget component = this.get_gameObject().GetComponent<UIWidget>();
+		UIWidget component = base.gameObject.GetComponent<UIWidget>();
 		if (component != null)
 		{
 			if (SpecialDeviceManager.IsPortrait)
@@ -95,14 +95,6 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 
 	private void LateUpdate()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			return;
@@ -112,15 +104,11 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 		{
 			return;
 		}
-		Vector3 position = self.get_transform().get_position();
+		Vector3 position = self.transform.position;
 		float x = position.x;
 		float z = position.z;
-		Transform transform = iconRoot.get_transform();
-		Vector3 eulerAngles = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_eulerAngles();
-		transform.set_localEulerAngles(new Vector3(0f, 0f, eulerAngles.y));
-		Transform obj = selfIcon;
-		Vector3 localEulerAngles = self._transform.get_localEulerAngles();
-		obj.set_localEulerAngles(new Vector3(0f, 0f, 0f - localEulerAngles.y));
+		iconRoot.transform.localEulerAngles = new Vector3(0f, 0f, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.eulerAngles.y);
+		selfIcon.localEulerAngles = new Vector3(0f, 0f, 0f - self._transform.localEulerAngles.y);
 		updateCount--;
 		if (updateCount <= 0)
 		{
@@ -139,7 +127,7 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 		{
 			return;
 		}
-		Transform transform = root_object.get_transform();
+		Transform transform = root_object.transform;
 		int i = 0;
 		for (int count = icons.Count; i < count; i++)
 		{
@@ -148,7 +136,7 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 				return;
 			}
 		}
-		string text = string.Empty;
+		string text = "";
 		int num = -1;
 		int num2 = -1;
 		MiniMapIcon miniMapIcon = null;
@@ -158,8 +146,7 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 		}
 		else if (root_object is Player)
 		{
-			Player player = root_object as Player;
-			if (!player.isInitialized)
+			if (!(root_object as Player).isInitialized)
 			{
 				return;
 			}
@@ -172,12 +159,7 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 		}
 		else if (root_object is Enemy)
 		{
-			if (!GameSaveData.instance.enableMinimapEnemy && !QuestManager.IsValidInGameWaveMatch())
-			{
-				return;
-			}
-			Enemy enemy = root_object as Enemy;
-			if (!enemy.isInitialized)
+			if ((!GameSaveData.instance.enableMinimapEnemy && !QuestManager.IsValidInGameWaveMatch()) || !(root_object as Enemy).isInitialized)
 			{
 				return;
 			}
@@ -225,18 +207,18 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 		{
 			if (num >= 0 && num < iconPrefabs.Length)
 			{
-				GameObject val = ResourceUtility.Instantiate<GameObject>(iconPrefabs[num]);
-				if (val != null)
+				GameObject gameObject = ResourceUtility.Instantiate(iconPrefabs[num]);
+				if (gameObject != null)
 				{
-					miniMapIcon = val.GetComponent<MiniMapIcon>();
+					miniMapIcon = gameObject.GetComponent<MiniMapIcon>();
 				}
 			}
 			if (num2 >= 0 && num2 < supplyIconPrefabs.Length)
 			{
-				GameObject val2 = ResourceUtility.Instantiate<GameObject>(supplyIconPrefabs[num2]);
-				if (val2 != null)
+				GameObject gameObject2 = ResourceUtility.Instantiate(supplyIconPrefabs[num2]);
+				if (gameObject2 != null)
 				{
-					miniMapIcon = val2.GetComponent<MiniMapIcon>();
+					miniMapIcon = gameObject2.GetComponent<MiniMapIcon>();
 				}
 			}
 		}
@@ -256,7 +238,7 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 
 	public void Detach(MonoBehaviour root_object)
 	{
-		Transform transform = root_object.get_transform();
+		Transform transform = root_object.transform;
 		int num = 0;
 		int count = icons.Count;
 		while (true)
@@ -275,27 +257,27 @@ public class MiniMap : MonoBehaviourSingleton<MiniMap>
 		if (root_object is Player)
 		{
 			playerIconStock.Add(icons[num]);
-			icons[num].get_gameObject().SetActive(false);
+			icons[num].gameObject.SetActive(value: false);
 		}
 		else if (root_object is Enemy)
 		{
 			enemyIconStock.Add(icons[num]);
-			icons[num].get_gameObject().SetActive(false);
+			icons[num].gameObject.SetActive(value: false);
 		}
 		else if (root_object is FieldWaveTargetObject)
 		{
 			waveTargetIconStock.Add(icons[num]);
-			icons[num].get_gameObject().SetActive(false);
+			icons[num].gameObject.SetActive(value: false);
 		}
 		else if (root_object is FieldSupplyGimmickObject)
 		{
 			FieldSupplyGimmickObject fieldSupplyGimmickObject = root_object as FieldSupplyGimmickObject;
 			supplyIconStocks[fieldSupplyGimmickObject.modelIndex].Add(icons[num]);
-			icons[num].get_gameObject().SetActive(false);
+			icons[num].gameObject.SetActive(value: false);
 		}
 		else
 		{
-			Object.Destroy(icons[num].get_gameObject());
+			Object.Destroy(icons[num].gameObject);
 		}
 		icons.Remove(icons[num]);
 	}

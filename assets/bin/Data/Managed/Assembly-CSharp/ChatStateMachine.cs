@@ -14,7 +14,17 @@ public class ChatStateMachine<T> where T : ChatState
 
 	private Type m_PrevStateType;
 
-	public Type CurrentStateType => (m_CurrentState == null) ? null : m_CurrentState.GetType();
+	public Type CurrentStateType
+	{
+		get
+		{
+			if (m_CurrentState == null)
+			{
+				return null;
+			}
+			return m_CurrentState.GetType();
+		}
+	}
 
 	public Type PrevStateType => m_PrevStateType;
 
@@ -54,7 +64,7 @@ public class ChatStateMachine<T> where T : ChatState
 		}
 		m_CurrentState.Update(deltaTime);
 		Type nextState = m_CurrentState.GetNextState();
-		if (m_CurrentState.GetType() == nextState)
+		if (!(m_CurrentState.GetType() != nextState))
 		{
 			return;
 		}
@@ -62,7 +72,7 @@ public class ChatStateMachine<T> where T : ChatState
 		m_CurrentState.Exit();
 		if (nextState == null)
 		{
-			m_CurrentState = (T)null;
+			m_CurrentState = null;
 			return;
 		}
 		m_CurrentState = CreateState(nextState);

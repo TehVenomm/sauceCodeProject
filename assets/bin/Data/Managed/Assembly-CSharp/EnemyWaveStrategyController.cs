@@ -33,7 +33,6 @@ public class EnemyWaveStrategyController
 
 	public bool IsArrivedTarget()
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		if (owner == null || owner.actionTarget == null)
 		{
 			return true;

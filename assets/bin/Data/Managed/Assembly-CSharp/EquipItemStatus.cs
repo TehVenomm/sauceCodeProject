@@ -76,9 +76,8 @@ public class EquipItemStatus : ItemStatus
 	public int GetEquipTypeDefBuf()
 	{
 		int equipmentTypeIndex = MonoBehaviourSingleton<StatusManager>.I.GetEquipmentTypeIndex(EQUIPMENT_TYPE.ARMOR);
-		int num = 0;
 		ItemStatus itemStatus = equipTypeBuff[equipmentTypeIndex];
-		return num + itemStatus.def;
+		return 0 + itemStatus.def;
 	}
 
 	public int GetAllAtkElem()

@@ -8,7 +8,7 @@ public class JSONNode : IJSONFieldValue
 
 	public bool isList;
 
-	public string listName = string.Empty;
+	public string listName = "";
 
 	public JSONNode()
 	{
@@ -81,20 +81,18 @@ public class JSONNode : IJSONFieldValue
 
 	public string Serialize()
 	{
-		if (fields_.Count == 1 && (fields_[0].name == string.Empty || fields_[0].name == null))
+		if (fields_.Count == 1 && (fields_[0].name == "" || fields_[0].name == null))
 		{
 			return fields_[0].value.Serialize();
 		}
 		string text = "{";
 		if (fields_.Count > 0)
 		{
-			string text2 = text;
-			text = text2 + "\"" + fields_[0].name + "\":" + fields_[0].value.Serialize();
+			text = text + "\"" + fields_[0].name + "\":" + fields_[0].value.Serialize();
 		}
 		for (int i = 1; i < fields_.Count; i++)
 		{
-			string text2 = text;
-			text = text2 + ",\"" + fields_[i].name + "\":" + fields_[i].value.Serialize();
+			text = text + ",\"" + fields_[i].name + "\":" + fields_[i].value.Serialize();
 		}
 		return text + "}";
 	}

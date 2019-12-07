@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class StatusToSmith : GameSection
@@ -26,8 +25,8 @@ public class StatusToSmith : GameSection
 
 	public override void UpdateUI()
 	{
-		SetBadge((Enum)UI.BTN_CREATE_WEAPON, MonoBehaviourSingleton<SmithManager>.I.smithBadgeData.GetAllWeaponBadgeNum(), 1, 7, -9, is_scale_normalize: true);
-		SetBadge((Enum)UI.BTN_CREATE_DEFENSE, MonoBehaviourSingleton<SmithManager>.I.smithBadgeData.GetAllDefenseBadgeNum(), 1, 7, -9, is_scale_normalize: true);
+		SetBadge(UI.BTN_CREATE_WEAPON, MonoBehaviourSingleton<SmithManager>.I.smithBadgeData.GetAllWeaponBadgeNum(), SpriteAlignment.TopLeft, 7, -9, is_scale_normalize: true);
+		SetBadge(UI.BTN_CREATE_DEFENSE, MonoBehaviourSingleton<SmithManager>.I.smithBadgeData.GetAllDefenseBadgeNum(), SpriteAlignment.TopLeft, 7, -9, is_scale_normalize: true);
 		base.UpdateUI();
 	}
 
@@ -111,8 +110,9 @@ public class StatusToSmith : GameSection
 	private void OnQuery_EXCHANGE()
 	{
 		Transform ctrl = GetCtrl(UI.BTN_EXCHANGE);
-		if (!(ctrl == null) && ctrl.get_gameObject().get_activeSelf())
+		if (!(ctrl == null))
 		{
+			_ = ctrl.gameObject.activeSelf;
 		}
 	}
 }

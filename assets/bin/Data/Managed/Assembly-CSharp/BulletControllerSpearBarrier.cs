@@ -16,12 +16,10 @@ public class BulletControllerSpearBarrier : BulletControllerBase
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam skillParam, Vector3 pos, Quaternion rot)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(bullet, skillParam, pos, rot);
 		bulletData = bullet;
-		this.get_gameObject().set_name(OBJECT_NAME);
-		this.get_gameObject().set_layer(31);
+		base.gameObject.name = OBJECT_NAME;
+		base.gameObject.layer = 31;
 		ignoreLayerMask |= 41984;
 		ignoreLayerMask |= 20480;
 		if (!bullet.data.isObjectHitDelete)
@@ -32,23 +30,21 @@ public class BulletControllerSpearBarrier : BulletControllerBase
 
 	public override void RegisterFromObject(StageObject obj)
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 		base.RegisterFromObject(obj);
 		owner = (obj as Player);
-		base._transform.set_position(obj._position);
-		base._transform.set_rotation(obj._rotation);
+		base._transform.position = obj._position;
+		base._transform.rotation = obj._rotation;
 		isRegistered = true;
 	}
 
 	public override bool IsHit(Collider collider)
 	{
-		int layer = collider.get_gameObject().get_layer();
+		int layer = collider.gameObject.layer;
 		if (((1 << layer) & ignoreLayerMask) > 0)
 		{
 			return false;
 		}
-		if (layer == 8 && collider.get_gameObject().GetComponent<DangerRader>() != null)
+		if (layer == 8 && collider.gameObject.GetComponent<DangerRader>() != null)
 		{
 			return false;
 		}
@@ -57,13 +53,11 @@ public class BulletControllerSpearBarrier : BulletControllerBase
 
 	public override void Update()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		base.timeCount += Time.get_deltaTime();
+		base.timeCount += Time.deltaTime;
 		if (owner != null)
 		{
-			base._transform.set_position(owner._position);
-			base._transform.set_rotation(owner._rotation);
+			base._transform.position = owner._position;
+			base._transform.rotation = owner._rotation;
 			if (!owner.isActSpecialAction)
 			{
 				bulletObject.ForceBreak();

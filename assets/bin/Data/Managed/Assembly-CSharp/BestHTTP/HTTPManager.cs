@@ -191,9 +191,9 @@ namespace BestHTTP
 						break;
 					case HTTPConnectionStates.WaitForProtocolShutdown:
 					{
-						WebSocketResponse webSocketResponse = hTTPConnection.CurrentRequest.Response as WebSocketResponse;
-						webSocketResponse.HandleEvents();
-						if (webSocketResponse.IsClosed)
+						WebSocketResponse obj = hTTPConnection.CurrentRequest.Response as WebSocketResponse;
+						obj.HandleEvents();
+						if (obj.IsClosed)
 						{
 							hTTPConnection.HandleCallback();
 							hTTPConnection.Dispose();

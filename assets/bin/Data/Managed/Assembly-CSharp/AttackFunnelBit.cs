@@ -76,26 +76,8 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 
 	public bool IsDeleted => m_isDeleted;
 
-	public AttackFunnelBit()
-		: this()
-	{
-	}
-
 	public virtual void Initialize(StageObject attacker, AttackInfo atkInfo, StageObject targetObj, Transform launchTrans, Vector3 offsetPos, Quaternion offsetRot)
 	{
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
 		m_attacker = attacker;
 		m_atkInfo = atkInfo;
 		AttackHitInfo attackHitInfo = atkInfo as AttackHitInfo;
@@ -113,17 +95,20 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 		m_funnelData = dataFunnel;
 		m_isDeleted = false;
 		m_finalAtkInfoName = dataFunnel.finalAtkInfoName;
-		m_cachedTransform = this.get_transform();
-		m_cachedTransform.set_parent((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
-		m_cachedTransform.set_position(launchTrans.get_position() + launchTrans.get_rotation() * offsetPos);
-		m_cachedTransform.set_rotation(launchTrans.get_rotation() * offsetRot);
-		m_cachedTransform.set_localScale(bulletData.data.timeStartScale);
-		Transform effect = EffectManager.GetEffect(bulletData.data.effectName, this.get_transform());
-		effect.set_localPosition(bulletData.data.dispOffset);
-		effect.set_localRotation(Quaternion.Euler(bulletData.data.dispRotation));
-		effect.set_localScale(Vector3.get_one());
-		m_effectObj = effect.get_gameObject();
-		m_effectAnimator = m_effectObj.GetComponent<Animator>();
+		m_cachedTransform = base.transform;
+		m_cachedTransform.parent = (MonoBehaviourSingleton<StageObjectManager>.IsValid() ? MonoBehaviourSingleton<StageObjectManager>.I._transform : MonoBehaviourSingleton<EffectManager>.I._transform);
+		m_cachedTransform.position = launchTrans.position + launchTrans.rotation * offsetPos;
+		m_cachedTransform.rotation = launchTrans.rotation * offsetRot;
+		m_cachedTransform.localScale = bulletData.data.timeStartScale;
+		Transform effect = EffectManager.GetEffect(bulletData.data.effectName, base.transform);
+		if (effect != null)
+		{
+			effect.localPosition = bulletData.data.dispOffset;
+			effect.localRotation = Quaternion.Euler(bulletData.data.dispRotation);
+			effect.localScale = Vector3.one;
+			m_effectObj = effect.gameObject;
+			m_effectAnimator = m_effectObj.GetComponent<Animator>();
+		}
 		RegisterObserver();
 		if (targetObj != null)
 		{
@@ -137,24 +122,23 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 
 	private void SetColliderByRadius(float _radius)
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 		if (!(_radius <= 0f))
 		{
 			m_radius = _radius;
-			m_capsuleCollider = this.get_gameObject().AddComponent<CapsuleCollider>();
-			m_capsuleCollider.set_center(new Vector3(0f, 0f, 0f));
-			m_capsuleCollider.set_direction(2);
-			m_capsuleCollider.set_isTrigger(true);
-			m_capsuleCollider.set_radius(m_radius);
-			m_capsuleCollider.set_height(m_radius * 2f);
-			Utility.SetLayerWithChildren(this.get_transform(), 31);
+			m_capsuleCollider = base.gameObject.AddComponent<CapsuleCollider>();
+			m_capsuleCollider.center = new Vector3(0f, 0f, 0f);
+			m_capsuleCollider.direction = 2;
+			m_capsuleCollider.isTrigger = true;
+			m_capsuleCollider.radius = m_radius;
+			m_capsuleCollider.height = m_radius * 2f;
+			Utility.SetLayerWithChildren(base.transform, 31);
 			SetTargetPoint();
 		}
 	}
 
 	private void SetTargetPoint()
 	{
-		m_targetPoint = this.get_gameObject().AddComponent<TargetPoint>();
+		m_targetPoint = base.gameObject.AddComponent<TargetPoint>();
 		m_targetPoint.isAimEnable = false;
 		m_targetPoint.isTargetEnable = false;
 	}
@@ -183,25 +167,11 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 
 	private void FuncMain()
 	{
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
 		if (IsDeleted)
 		{
 			return;
 		}
-		m_aliveTimer -= Time.get_deltaTime();
+		m_aliveTimer -= Time.deltaTime;
 		if (m_aliveTimer <= 0f)
 		{
 			RequestDestroy(isPlayFallEffect: false);
@@ -216,13 +186,13 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 		{
 		case 1:
 		{
-			Vector3 position = m_targetObject.get_transform().get_position();
+			Vector3 position = m_targetObject.transform.position;
 			position.y = GetFloatingHeight();
 			LookAtTarget(position);
-			Vector3 forward = m_cachedTransform.get_forward();
-			Vector3 val = m_cachedTransform.get_position() + forward * (m_moveSpeed * Time.get_deltaTime());
-			m_cachedTransform.set_position(val);
-			if (Vector3.Distance(position, val) <= GetAttackStartRange())
+			Vector3 forward = m_cachedTransform.forward;
+			Vector3 vector = m_cachedTransform.position + forward * (m_moveSpeed * Time.deltaTime);
+			m_cachedTransform.position = vector;
+			if (Vector3.Distance(position, vector) <= GetAttackStartRange())
 			{
 				m_attackIntervalTimer = m_funnelData.attackInterval;
 				ForwardState();
@@ -231,8 +201,8 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 		}
 		case 2:
 			RotateAroundTarget();
-			LookAtTarget(m_targetObject.get_transform().get_position());
-			m_attackIntervalTimer -= Time.get_deltaTime();
+			LookAtTarget(m_targetObject.transform.position);
+			m_attackIntervalTimer -= Time.deltaTime;
 			if (!(m_attackIntervalTimer > 0f))
 			{
 				m_attackIntervalTimer = m_funnelData.attackInterval;
@@ -251,80 +221,28 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 
 	private void RotateAroundTarget()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 		BulletData.BulletFunnel funnelData = m_funnelData;
 		float floatingHeight = GetFloatingHeight();
-		Vector3 position = m_targetObject.get_transform().get_position();
+		Vector3 position = m_targetObject.transform.position;
 		position.y = floatingHeight;
-		Vector3 position2 = m_cachedTransform.get_position();
+		Vector3 position2 = m_cachedTransform.position;
 		position2.y = floatingHeight;
-		Vector3 val = position2 - position;
-		val.Normalize();
-		val *= GetAttackStartRange();
-		val = Quaternion.AngleAxis(funnelData.rotateAngle, Vector3.get_up()) * val;
-		Vector3 val2 = position + val - m_cachedTransform.get_position();
-		m_cachedTransform.set_position(position2 + val2 * Time.get_deltaTime());
+		Vector3 point = position2 - position;
+		point.Normalize();
+		point *= GetAttackStartRange();
+		point = Quaternion.AngleAxis(funnelData.rotateAngle, Vector3.up) * point;
+		Vector3 a = position + point - m_cachedTransform.position;
+		m_cachedTransform.position = position2 + a * Time.deltaTime;
 	}
 
 	private void LookAtTarget(Vector3 targetPos)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 forward = m_cachedTransform.get_forward();
-		Vector3 position = m_cachedTransform.get_position();
-		Vector3 val = targetPos - position;
-		val.Normalize();
-		float num = m_aimAngleSpeed * Time.get_deltaTime();
-		float num2 = Vector3.Dot(forward, val);
+		Vector3 forward = m_cachedTransform.forward;
+		Vector3 position = m_cachedTransform.position;
+		Vector3 vector = targetPos - position;
+		vector.Normalize();
+		float num = m_aimAngleSpeed * Time.deltaTime;
+		float num2 = Vector3.Dot(forward, vector);
 		float num3 = Mathf.Acos(num2);
 		if (num2 < 1f && num < num3 && num3 >= 0.00174532924f)
 		{
@@ -332,19 +250,19 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 			Quaternion rotation;
 			if (num4 >= 1f)
 			{
-				rotation = Quaternion.LookRotation(val);
+				rotation = Quaternion.LookRotation(vector);
 			}
 			else
 			{
-				Quaternion val2 = Quaternion.LookRotation(forward);
-				Quaternion val3 = Quaternion.LookRotation(val);
-				rotation = Quaternion.Slerp(val2, val3, num4);
+				Quaternion a = Quaternion.LookRotation(forward);
+				Quaternion b = Quaternion.LookRotation(vector);
+				rotation = Quaternion.Slerp(a, b, num4);
 			}
-			m_cachedTransform.set_rotation(rotation);
+			m_cachedTransform.rotation = rotation;
 		}
 		else
 		{
-			m_cachedTransform.set_rotation(Quaternion.LookRotation(val));
+			m_cachedTransform.rotation = Quaternion.LookRotation(vector);
 		}
 	}
 
@@ -370,20 +288,11 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 
 	private void FuncSearch()
 	{
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
 		if (IsDeleted)
 		{
 			return;
 		}
-		m_aliveTimer -= Time.get_deltaTime();
+		m_aliveTimer -= Time.deltaTime;
 		if (m_aliveTimer <= 0f)
 		{
 			RequestDestroy(isPlayFallEffect: false);
@@ -395,14 +304,13 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 			return;
 		}
 		Transform cachedTransform = m_cachedTransform;
-		Vector3 position = cachedTransform.get_position() + cachedTransform.get_forward() * (m_moveSpeed * Time.get_deltaTime());
-		cachedTransform.set_position(position);
+		Vector3 vector = cachedTransform.position += cachedTransform.forward * (m_moveSpeed * Time.deltaTime);
 		float searchRange = m_funnelData.searchRange;
 		if (!(searchRange <= 0f) && MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
-			Vector2 zero = Vector2.get_zero();
-			zero.x = position.x;
-			zero.y = position.z;
+			Vector2 zero = Vector2.zero;
+			zero.x = vector.x;
+			zero.y = vector.z;
 			StageObject stageObject = SearchNearestTarget(zero, searchRange);
 			if (stageObject != null)
 			{
@@ -424,7 +332,7 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 			Destroy();
 			return;
 		}
-		m_effectDeleteAnimHash = Animator.StringToHash((!isPlayFallEffect) ? "END" : "BREAK");
+		m_effectDeleteAnimHash = Animator.StringToHash(isPlayFallEffect ? "BREAK" : "END");
 		if (m_effectAnimator.HasState(0, m_effectDeleteAnimHash))
 		{
 			m_effectAnimator.Play(m_effectDeleteAnimHash, 0, 0f);
@@ -432,31 +340,25 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 		}
 		else
 		{
-			Debug.LogWarning((object)"Not found delete animation!!");
+			Debug.LogWarning("Not found delete animation!!");
 			Destroy();
 		}
 	}
 
 	private void FuncDelete()
 	{
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		switch (m_state)
 		{
 		case 1:
-		{
 			if (m_effectAnimator == null)
 			{
 				ForwardState();
-				break;
 			}
-			AnimatorStateInfo currentAnimatorStateInfo = m_effectAnimator.GetCurrentAnimatorStateInfo(0);
-			if (currentAnimatorStateInfo.get_normalizedTime() >= 1f)
+			else if (m_effectAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
 			{
 				ForwardState();
 			}
 			break;
-		}
 		case 2:
 			Destroy();
 			ForwardState();
@@ -466,8 +368,6 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 
 	private void Destroy()
 	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		if (IsDeleted)
 		{
 			return;
@@ -478,8 +378,8 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 			Transform effect = EffectManager.GetEffect(m_landHitEffectName);
 			if (effect != null)
 			{
-				effect.set_position(m_cachedTransform.get_position());
-				effect.set_rotation(m_cachedTransform.get_rotation());
+				effect.position = m_cachedTransform.position;
+				effect.rotation = m_cachedTransform.rotation;
 			}
 		}
 		if (m_attacker != null)
@@ -492,7 +392,7 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 			m_attacker = null;
 		}
 		NotifyDestroy();
-		Object.Destroy(this.get_gameObject());
+		UnityEngine.Object.Destroy(base.gameObject);
 	}
 
 	private void OnDestroy()
@@ -529,23 +429,13 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 
 	private AnimEventShot CreateShot(BulletData bltData, AttackInfo atkInfo)
 	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 		if (m_attacker == null)
 		{
 			RequestDestroy();
 			return null;
 		}
-		Quaternion rotation = m_cachedTransform.get_rotation();
-		Vector3 pos = m_cachedTransform.get_position() + rotation * m_funnelData.offsetPosition;
+		Quaternion rotation = m_cachedTransform.rotation;
+		Vector3 pos = m_cachedTransform.position + rotation * m_funnelData.offsetPosition;
 		AnimEventShot animEventShot = AnimEventShot.CreateByExternalBulletData(bltData, m_attacker, atkInfo, pos, rotation, m_exAtk, m_attackMode, m_skillParam);
 		if (animEventShot == null)
 		{
@@ -558,13 +448,15 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 	protected virtual bool CheckTargetDead()
 	{
 		Player player = m_targetObject as Player;
-		return player == null || player.isDead;
+		if (!(player == null))
+		{
+			return player.isDead;
+		}
+		return true;
 	}
 
 	protected virtual StageObject SearchNearestTarget(Vector2 bulletPos, float searchRadius)
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 		float num = float.MaxValue;
 		float radius = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.radius;
 		StageObject result = null;
@@ -636,7 +528,7 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		if (!m_isDeleted && collider.get_gameObject().get_layer() == 14)
+		if (!m_isDeleted && collider.gameObject.layer == 14)
 		{
 			NotifyBroken();
 		}
@@ -644,7 +536,7 @@ public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 
 	private void OnTriggerStay(Collider collider)
 	{
-		if (!m_isDeleted && collider.get_gameObject().get_layer() == 14)
+		if (!m_isDeleted && collider.gameObject.layer == 14)
 		{
 			NotifyBroken();
 		}

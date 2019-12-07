@@ -14,11 +14,6 @@ public class MaterialInfoButton : MonoBehaviour
 
 	private bool touched;
 
-	public MaterialInfoButton()
-		: this()
-	{
-	}
-
 	public static void Set(Transform icon, Transform material_info, REWARD_TYPE reward_type, uint id, string section_name, Transform parentScroll)
 	{
 		UIButton componentInChildren = icon.GetComponentInChildren<UIButton>();
@@ -27,9 +22,9 @@ public class MaterialInfoButton : MonoBehaviour
 			MaterialInfoButton materialInfoButton = icon.GetComponent<MaterialInfoButton>();
 			if (materialInfoButton == null)
 			{
-				materialInfoButton = icon.get_gameObject().AddComponent<MaterialInfoButton>();
+				materialInfoButton = icon.gameObject.AddComponent<MaterialInfoButton>();
 			}
-			materialInfoButton.parentButton = componentInChildren.get_transform();
+			materialInfoButton.parentButton = componentInChildren.transform;
 			materialInfoButton.itemName = Utility.GetRewardName(reward_type, id);
 			materialInfoButton.parentScroll = parentScroll;
 			MaterialInfo component = material_info.GetComponent<MaterialInfo>();

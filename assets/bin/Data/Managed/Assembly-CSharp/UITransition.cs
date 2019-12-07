@@ -26,11 +26,6 @@ public class UITransition : MonoBehaviour
 
 	public bool isBusy => busyCount != 0;
 
-	public UITransition()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		InitTweens();
@@ -43,7 +38,7 @@ public class UITransition : MonoBehaviour
 			int i = 0;
 			for (int num = tweens.Length; i < num; i++)
 			{
-				tweens[i].set_enabled(false);
+				tweens[i].enabled = false;
 				tweens[i].AddOnFinished(new EventDelegate(OnFinished));
 			}
 		}
@@ -88,7 +83,7 @@ public class UITransition : MonoBehaviour
 		int j = 0;
 		for (int num = tweens.Length; j < num; j++)
 		{
-			tweens[j].set_enabled(true);
+			tweens[j].enabled = true;
 			tweens[j].ResetToBeginning();
 		}
 		if (!GameSceneManager.isAutoEventSkip || !isBusy)
@@ -130,13 +125,13 @@ public class UITransition : MonoBehaviour
 		case TYPE.CLOSE:
 			return closeTweens;
 		case TYPE.NEXT:
-			if (nextTweens != null && nextTweens.Length > 0)
+			if (nextTweens != null && nextTweens.Length != 0)
 			{
 				return nextTweens;
 			}
 			return closeTweens;
 		case TYPE.PREV:
-			if (prevTweens != null && prevTweens.Length > 0)
+			if (prevTweens != null && prevTweens.Length != 0)
 			{
 				return prevTweens;
 			}

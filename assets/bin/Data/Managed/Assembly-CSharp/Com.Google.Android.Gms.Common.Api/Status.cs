@@ -45,52 +45,52 @@ namespace Com.Google.Android.Gms.Common.Api
 
 		public string toString()
 		{
-			return InvokeCall<string>("toString", "()Ljava/lang/String;", new object[0]);
+			return InvokeCall<string>("toString", "()Ljava/lang/String;", Array.Empty<object>());
 		}
 
 		public int hashCode()
 		{
-			return InvokeCall<int>("hashCode", "()I", new object[0]);
+			return InvokeCall<int>("hashCode", "()I", Array.Empty<object>());
 		}
 
 		public bool isInterrupted()
 		{
-			return InvokeCall<bool>("isInterrupted", "()Z", new object[0]);
+			return InvokeCall<bool>("isInterrupted", "()Z", Array.Empty<object>());
 		}
 
 		public Status getStatus()
 		{
-			return InvokeCall<Status>("getStatus", "()Lcom/google/android/gms/common/api/Status;", new object[0]);
+			return InvokeCall<Status>("getStatus", "()Lcom/google/android/gms/common/api/Status;", Array.Empty<object>());
 		}
 
 		public bool isCanceled()
 		{
-			return InvokeCall<bool>("isCanceled", "()Z", new object[0]);
+			return InvokeCall<bool>("isCanceled", "()Z", Array.Empty<object>());
 		}
 
 		public int describeContents()
 		{
-			return InvokeCall<int>("describeContents", "()I", new object[0]);
+			return InvokeCall<int>("describeContents", "()I", Array.Empty<object>());
 		}
 
 		public object getResolution()
 		{
-			return InvokeCall<object>("getResolution", "()Landroid/app/PendingIntent;", new object[0]);
+			return InvokeCall<object>("getResolution", "()Landroid/app/PendingIntent;", Array.Empty<object>());
 		}
 
 		public int getStatusCode()
 		{
-			return InvokeCall<int>("getStatusCode", "()I", new object[0]);
+			return InvokeCall<int>("getStatusCode", "()I", Array.Empty<object>());
 		}
 
 		public string getStatusMessage()
 		{
-			return InvokeCall<string>("getStatusMessage", "()Ljava/lang/String;", new object[0]);
+			return InvokeCall<string>("getStatusMessage", "()Ljava/lang/String;", Array.Empty<object>());
 		}
 
 		public bool hasResolution()
 		{
-			return InvokeCall<bool>("hasResolution", "()Z", new object[0]);
+			return InvokeCall<bool>("hasResolution", "()Z", Array.Empty<object>());
 		}
 
 		public void startResolutionForResult(object arg_object_1, int arg_int_2)
@@ -105,7 +105,7 @@ namespace Com.Google.Android.Gms.Common.Api
 
 		public bool isSuccess()
 		{
-			return InvokeCall<bool>("isSuccess", "()Z", new object[0]);
+			return InvokeCall<bool>("isSuccess", "()Z", Array.Empty<object>());
 		}
 	}
 }

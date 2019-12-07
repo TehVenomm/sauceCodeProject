@@ -29,7 +29,17 @@ namespace BestHTTP.WebSocket
 			private set;
 		}
 
-		public bool IsOpen => webSocket != null && !webSocket.IsClosed;
+		public bool IsOpen
+		{
+			get
+			{
+				if (webSocket != null)
+				{
+					return !webSocket.IsClosed;
+				}
+				return false;
+			}
+		}
 
 		public bool StartPingThread
 		{
@@ -58,7 +68,7 @@ namespace BestHTTP.WebSocket
 			PingFrequency = 1000;
 			if (uri.Port == -1)
 			{
-				uri = new Uri(uri.Scheme + "://" + uri.Host + ":" + ((!uri.Scheme.Equals("wss", StringComparison.OrdinalIgnoreCase)) ? "80" : "443") + uri.PathAndQuery);
+				uri = new Uri(uri.Scheme + "://" + uri.Host + ":" + (uri.Scheme.Equals("wss", StringComparison.OrdinalIgnoreCase) ? "443" : "80") + uri.PathAndQuery);
 			}
 			InternalRequest = new HTTPRequest(uri, delegate(HTTPRequest req, HTTPResponse resp)
 			{

@@ -110,30 +110,30 @@ public class UIInGameMessageBar : MonoBehaviourSingleton<UIInGameMessageBar>
 	private void _AnnounceMesseage(string name, string messeage)
 	{
 		nameLabel.text = name;
-		messeageLabel.get_gameObject().SetActive(true);
+		messeageLabel.gameObject.SetActive(value: true);
 		messeageLabel.text = messeage;
-		texStamp.get_gameObject().SetActive(false);
+		texStamp.gameObject.SetActive(value: false);
 		_AnnounceStart();
 	}
 
 	private void _AnnounceStamp(string name, int stamp_id)
 	{
 		coroutineLoadStamp = CoroutineLoadStamp(name, stamp_id);
-		this.StartCoroutine(coroutineLoadStamp);
+		StartCoroutine(coroutineLoadStamp);
 	}
 
 	private IEnumerator CoroutineLoadStamp(string name, int stampId)
 	{
-		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_stamp = load_queue.LoadChatStamp(stampId);
-		yield return load_queue.Wait();
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject lo_stamp = loadingQueue.LoadChatStamp(stampId);
+		yield return loadingQueue.Wait();
 		if (!(lo_stamp.loadedObject == null))
 		{
-			Texture2D stamp = lo_stamp.loadedObject as Texture2D;
-			texStamp.get_gameObject().SetActive(true);
-			texStamp.mainTexture = stamp;
+			Texture2D mainTexture = lo_stamp.loadedObject as Texture2D;
+			texStamp.gameObject.SetActive(value: true);
+			texStamp.mainTexture = mainTexture;
 			nameLabel.text = name;
-			messeageLabel.get_gameObject().SetActive(false);
+			messeageLabel.gameObject.SetActive(value: false);
 			coroutineLoadStamp = null;
 			_AnnounceStart();
 		}
@@ -157,7 +157,7 @@ public class UIInGameMessageBar : MonoBehaviourSingleton<UIInGameMessageBar>
 		{
 			return;
 		}
-		lockTimer -= Time.get_deltaTime();
+		lockTimer -= Time.deltaTime;
 		if (lockTimer > 0f)
 		{
 			return;

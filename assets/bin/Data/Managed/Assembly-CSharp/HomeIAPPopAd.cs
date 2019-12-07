@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -10,26 +9,26 @@ public class HomeIAPPopAd : GameSection
 		TEX_MAIN
 	}
 
-	private string productId = string.Empty;
+	private string productId = "";
 
 	public override void Initialize()
 	{
 		productId = (GameSection.GetEventData() as string);
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		ProductDataTable.PackInfo pack_info = Singleton<ProductDataTable>.I.GetPack(productId);
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject loTex = loadQueue.Load(RESOURCE_CATEGORY.GACHA_POP_UP_ADVERTISEMENT, pack_info.popupAdsBanner);
-		if (loadQueue.IsLoading())
+		ProductDataTable.PackInfo pack = Singleton<ProductDataTable>.I.GetPack(productId);
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject loTex = loadingQueue.Load(RESOURCE_CATEGORY.GACHA_POP_UP_ADVERTISEMENT, pack.popupAdsBanner);
+		if (loadingQueue.IsLoading())
 		{
-			yield return loadQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		if (loTex.loadedObject != null)
 		{
-			SetTexture((Enum)UI.TEX_MAIN, loTex.loadedObject as Texture);
+			SetTexture(UI.TEX_MAIN, loTex.loadedObject as Texture);
 		}
 		base.Initialize();
 	}

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class BuyJackpotTicketDialog : GameSection
@@ -56,46 +55,39 @@ public class BuyJackpotTicketDialog : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.STR_TITLE_U, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText((Enum)UI.STR_TITLE_D, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText((Enum)UI.STR_SELECT_NUM, base.sectionData.GetText("STR_QUANTITY"));
-		SetProgressInt((Enum)UI.SLD_SELECT_NUM, nowSelected, 1, maxNum, (EventDelegate.Callback)OnChagenSlider);
+		SetLabelText(UI.STR_TITLE_U, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.STR_TITLE_D, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.STR_SELECT_NUM, base.sectionData.GetText("STR_QUANTITY"));
+		SetProgressInt(UI.SLD_SELECT_NUM, nowSelected, 1, maxNum, OnChagenSlider);
 	}
 
 	private void OnChagenSlider()
 	{
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		int progressInt = GetProgressInt((Enum)UI.SLD_SELECT_NUM);
-		SetLabelText((Enum)UI.LBL_SELECT_NUM, string.Format("{0,8:#,0}", progressInt));
-		SetLabelText((Enum)UI.LBL_BUY_BTN, string.Format(StringTable.Get(STRING_CATEGORY.DRAGON_VAULT, 4u), progressInt * jackpotTicketPrice));
-		Transform obj = sprGem;
-		Vector2 printedSize = lblBuy.printedSize;
-		obj.set_localPosition(Vector2.op_Implicit(new Vector2(printedSize.x / 2f + 15f, 3f)));
+		int progressInt = GetProgressInt(UI.SLD_SELECT_NUM);
+		SetLabelText(UI.LBL_SELECT_NUM, string.Format("{0,8:#,0}", progressInt));
+		SetLabelText(UI.LBL_BUY_BTN, string.Format(StringTable.Get(STRING_CATEGORY.DRAGON_VAULT, 4u), progressInt * jackpotTicketPrice));
+		sprGem.localPosition = new Vector2(lblBuy.printedSize.x / 2f + 15f, 3f);
 	}
 
 	private void OnQuery_SELECT_NUM_MINUS()
 	{
-		SetProgressInt((Enum)UI.SLD_SELECT_NUM, GetProgressInt((Enum)UI.SLD_SELECT_NUM) - 1, -1, -1, (EventDelegate.Callback)null);
+		SetProgressInt(UI.SLD_SELECT_NUM, GetProgressInt(UI.SLD_SELECT_NUM) - 1);
 	}
 
 	private void OnQuery_SELECT_NUM_PLUS()
 	{
-		SetProgressInt((Enum)UI.SLD_SELECT_NUM, GetProgressInt((Enum)UI.SLD_SELECT_NUM) + 1, -1, -1, (EventDelegate.Callback)null);
+		SetProgressInt(UI.SLD_SELECT_NUM, GetProgressInt(UI.SLD_SELECT_NUM) + 1);
 	}
 
 	protected int GetSliderNum()
 	{
-		return GetProgressInt((Enum)UI.SLD_SELECT_NUM);
+		return GetProgressInt(UI.SLD_SELECT_NUM);
 	}
 
 	private void OnQuery_BUY_TICKET()
 	{
 		int sliderNum = GetSliderNum();
-		float num = sliderNum * jackpotTicketPrice;
-		if (num > (float)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal)
+		if ((float)(sliderNum * jackpotTicketPrice) > (float)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal)
 		{
 			DispatchEvent("BUY_GEM", base.sectionData.GetText("STR_COMFIRM_BUY_GEM"));
 		}
@@ -105,10 +97,10 @@ public class BuyJackpotTicketDialog : GameSection
 			MonoBehaviourSingleton<FortuneWheelManager>.I.BuyTicket(sliderNum, delegate(bool b)
 			{
 				GameSection.ResumeEvent(is_resume: true);
-				DispatchEvent("JACKPOT_BUY_MESSAGE", base.sectionData.GetText((!b) ? "STR_BUY_FAILED" : "STR_BUY_SUCCESS"));
+				DispatchEvent("JACKPOT_BUY_MESSAGE", base.sectionData.GetText(b ? "STR_BUY_SUCCESS" : "STR_BUY_FAILED"));
 				MonoBehaviourSingleton<FortuneWheelManager>.I.RequestUpdateUI();
 			});
-			SetButtonEnabled((Enum)UI.BTN_BUY, is_enabled: false);
+			SetButtonEnabled(UI.BTN_BUY, is_enabled: false);
 		}
 	}
 

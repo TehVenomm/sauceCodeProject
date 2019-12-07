@@ -72,115 +72,86 @@ public static class Utility
 
 	public static Vector2 ToVector2XY(this Vector3 vector3)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		return new Vector2(vector3.x, vector3.y);
 	}
 
 	public static Vector2 ToVector2XZ(this Vector3 vector3)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		return new Vector2(vector3.x, vector3.z);
 	}
 
 	public static Vector3 ToVector3XY(this Vector2 vector2)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		return new Vector3(vector2.x, vector2.y);
 	}
 
 	public static Vector3 ToVector3XY(this Vector2 vector2, float z)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 		return new Vector3(vector2.x, vector2.y, z);
 	}
 
 	public static Vector3 ToVector3XZ(this Vector2 vector2)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		return new Vector3(vector2.x, 0f, vector2.y);
 	}
 
 	public static Color ToColor(this Vector3 vector3)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		return new Color(vector3.x, vector3.y, vector3.z);
 	}
 
 	public static Vector3 ToVector3(this Color color)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		return new Vector3(color.r, color.g, color.b);
 	}
 
 	public static Vector4 ToVector4(this Vector3 vec3)
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 		return new Vector4(vec3.x, vec3.y, vec3.z, 1f);
 	}
 
 	public static Vector4 ToVector4(this Vector3 vec3, float w)
 	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 		return new Vector4(vec3.x, vec3.y, vec3.z, w);
 	}
 
 	public static Vector2 ToVector2XY(this Vector4 vec4)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		return new Vector2(vec4.x, vec4.y);
 	}
 
 	public static Vector2 ToVector2ZW(this Vector4 vec4)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		return new Vector2(vec4.z, vec4.w);
 	}
 
 	public static Vector3 ToVector3(this Vector4 vec4)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 		return new Vector3(vec4.x, vec4.y, vec4.z);
 	}
 
 	public static Vector3 ToVector3XY(this Vector4 vec4)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		return new Vector3(vec4.x, vec4.y, 0f);
 	}
 
 	public static Vector3 GetNearPosOnLine(Vector3 pos_a, Vector3 pos_b, Vector3 pos_p)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 		float dist_ax = 0f;
 		return GetNearPosOnLine(pos_a, pos_b, pos_p, ref dist_ax);
 	}
 
 	public static Vector3 GetNearPosOnLine(Vector3 pos_a, Vector3 pos_b, Vector3 pos_p, ref float dist_ax)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = pos_b - pos_a;
-		val.Normalize();
-		dist_ax = Vector3.Dot(val, pos_p - pos_a);
-		return pos_a + val * dist_ax;
+		Vector3 vector = pos_b - pos_a;
+		vector.Normalize();
+		dist_ax = Vector3.Dot(vector, pos_p - pos_a);
+		return pos_a + vector * dist_ax;
 	}
 
 	public static string ToJoinString<T>(this T[] array, string split = ",", string format = null)
 	{
-		string text = string.Empty;
+		string text = "";
 		int i = 0;
 		for (int num = array.Length; i < num; i++)
 		{
@@ -191,7 +162,7 @@ public static class Utility
 
 	public static string ToJoinString<T>(this List<T> list, string split = ",", string format = null)
 	{
-		string text = string.Empty;
+		string text = "";
 		int i = 0;
 		for (int count = list.Count; i < count; i++)
 		{
@@ -202,28 +173,19 @@ public static class Utility
 
 	private static string _ToJoinString<T>(T element, string split, string format, bool last)
 	{
-		string empty = string.Empty;
-		empty = ((format != null && ((object)element) is int) ? (empty + ((int)(object)element).ToString(format)) : ((format == null || !(((object)element) is float)) ? (empty + element.ToString()) : (empty + ((float)(object)element).ToString(format))));
+		string str = "";
+		str = ((format != null && element is int) ? (str + ((int)(object)element).ToString(format)) : ((format == null || !(element is float)) ? (str + element.ToString()) : (str + ((float)(object)element).ToString(format))));
 		if (!last)
 		{
-			empty += split;
+			str += split;
 		}
-		return empty;
+		return str;
 	}
 
 	public static float Angle360(Vector2 p1, Vector2 p2)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 		float num = Vector2.Angle(p1, p2);
-		Vector3 val = Vector3.Cross(Vector2.op_Implicit(p1), Vector2.op_Implicit(p2));
-		if (val.z > 0f)
+		if (Vector3.Cross(p1, p2).z > 0f)
 		{
 			num = 360f - num;
 		}
@@ -232,17 +194,17 @@ public static class Utility
 
 	public static float Random(float value)
 	{
-		return Random.Range(0f, value);
+		return UnityEngine.Random.Range(0f, value);
 	}
 
 	public static int Random(int value)
 	{
-		return Random.Range(0, value);
+		return UnityEngine.Random.Range(0, value);
 	}
 
 	public static float SymmetryRandom(float value)
 	{
-		return Random.Range(0f - value, value);
+		return UnityEngine.Random.Range(0f - value, value);
 	}
 
 	public static T Lot<T>(T[] ary)
@@ -251,12 +213,12 @@ public static class Utility
 		{
 			return default(T);
 		}
-		return ary[Random.Range(0, ary.Length)];
+		return ary[UnityEngine.Random.Range(0, ary.Length)];
 	}
 
 	public static int LotIndex(int[] probabilities, int total_probabilities = 100)
 	{
-		int num = Random.Range(0, total_probabilities);
+		int num = UnityEngine.Random.Range(0, total_probabilities);
 		int i = 0;
 		int num2 = probabilities.Length;
 		int num3 = 0;
@@ -273,12 +235,12 @@ public static class Utility
 
 	public static bool Coin()
 	{
-		return Random.Range(0, 2) == 0;
+		return UnityEngine.Random.Range(0, 2) == 0;
 	}
 
 	public static bool Dice100(int per)
 	{
-		return Random.get_value() * 100f < (float)per;
+		return UnityEngine.Random.value * 100f < (float)per;
 	}
 
 	public static T[] CreateMergedArray<T>(T[] array_a, T[] array_b)
@@ -318,7 +280,6 @@ public static class Utility
 
 	public static Vector3 Mul(this Vector3 this_vector3, Vector3 mul_vector3)
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		this_vector3.x *= mul_vector3.x;
 		this_vector3.y *= mul_vector3.y;
 		this_vector3.z *= mul_vector3.z;
@@ -327,7 +288,6 @@ public static class Utility
 
 	public static Vector3 Div(this Vector3 this_vector3, Vector3 div_vector3)
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		this_vector3.x /= div_vector3.x;
 		this_vector3.y /= div_vector3.y;
 		this_vector3.z /= div_vector3.z;
@@ -336,26 +296,20 @@ public static class Utility
 
 	public static void Set(this Transform transform, Vector3 pos, Quaternion rot)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		transform.set_position(pos);
-		transform.set_rotation(rot);
+		transform.position = pos;
+		transform.rotation = rot;
 	}
 
 	public static void Set(this Transform transform, Vector3 pos, Vector3 rot)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		transform.set_position(pos);
-		transform.set_eulerAngles(rot);
+		transform.position = pos;
+		transform.eulerAngles = rot;
 	}
 
 	public static void CopyFrom(this Transform transform, Transform from_transform)
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		transform.set_position(from_transform.get_position());
-		transform.set_rotation(from_transform.get_rotation());
+		transform.position = from_transform.position;
+		transform.rotation = from_transform.rotation;
 	}
 
 	public static void SetActiveChildren(Transform parent, bool is_active)
@@ -363,21 +317,21 @@ public static class Utility
 		if (parent != null)
 		{
 			int i = 0;
-			for (int childCount = parent.get_childCount(); i < childCount; i++)
+			for (int childCount = parent.childCount; i < childCount; i++)
 			{
-				parent.GetChild(i).get_gameObject().SetActive(is_active);
+				parent.GetChild(i).gameObject.SetActive(is_active);
 			}
 		}
 	}
 
 	public static void ToggleActiveChildren(Transform parent, int index)
 	{
-		if (parent != null && index >= 0 && index < parent.get_childCount())
+		if (parent != null && index >= 0 && index < parent.childCount)
 		{
 			int i = 0;
-			for (int childCount = parent.get_childCount(); i < childCount; i++)
+			for (int childCount = parent.childCount; i < childCount; i++)
 			{
-				parent.GetChild(i).get_gameObject().SetActive(i == index);
+				parent.GetChild(i).gameObject.SetActive(i == index);
 			}
 		}
 	}
@@ -386,7 +340,7 @@ public static class Utility
 	{
 		if (t != null)
 		{
-			Object.Destroy(t.get_gameObject());
+			UnityEngine.Object.Destroy(t.gameObject);
 			t = null;
 		}
 	}
@@ -397,12 +351,12 @@ public static class Utility
 		{
 			return null;
 		}
-		Transform val = FindChild(transform, name);
-		if (val != null)
+		Transform transform2 = FindChild(transform, name);
+		if (transform2 != null)
 		{
-			return val;
+			return transform2;
 		}
-		if (transform.get_name() == name)
+		if (transform.name == name)
 		{
 			return transform;
 		}
@@ -415,18 +369,18 @@ public static class Utility
 		{
 			return null;
 		}
-		Transform val = transform.Find(name);
-		if (val != null)
+		Transform transform2 = transform.Find(name);
+		if (transform2 != null)
 		{
-			return val;
+			return transform2;
 		}
 		int i = 0;
-		for (int childCount = transform.get_childCount(); i < childCount; i++)
+		for (int childCount = transform.childCount; i < childCount; i++)
 		{
-			val = FindChild(transform.GetChild(i), name);
-			if (val != null)
+			transform2 = FindChild(transform.GetChild(i), name);
+			if (transform2 != null)
 			{
-				return val;
+				return transform2;
 			}
 		}
 		return null;
@@ -434,18 +388,18 @@ public static class Utility
 
 	public static Transform FindActiveChild(Transform transform, string name)
 	{
-		Transform val = transform.Find(name);
-		if (val != null && val.get_gameObject().get_activeSelf())
+		Transform transform2 = transform.Find(name);
+		if (transform2 != null && transform2.gameObject.activeSelf)
 		{
-			return val;
+			return transform2;
 		}
 		int i = 0;
-		for (int childCount = transform.get_childCount(); i < childCount; i++)
+		for (int childCount = transform.childCount; i < childCount; i++)
 		{
-			val = FindChild(transform.GetChild(i), name);
-			if (val != null && val.get_gameObject().get_activeSelf())
+			transform2 = FindChild(transform.GetChild(i), name);
+			if (transform2 != null && transform2.gameObject.activeSelf)
 			{
-				return val;
+				return transform2;
 			}
 		}
 		return null;
@@ -462,7 +416,7 @@ public static class Utility
 			return true;
 		}
 		int i = 0;
-		for (int childCount = transform.get_childCount(); i < childCount; i++)
+		for (int childCount = transform.childCount; i < childCount; i++)
 		{
 			if (ForEach(transform.GetChild(i), callback))
 			{
@@ -486,7 +440,7 @@ public static class Utility
 			Push(component);
 		}
 		int i = 0;
-		for (int childCount = transform.get_childCount(); i < childCount; i++)
+		for (int childCount = transform.childCount; i < childCount; i++)
 		{
 			_StackComponentInChildren(transform.GetChild(i), type);
 		}
@@ -494,55 +448,37 @@ public static class Utility
 
 	public static void Attach(Transform parent, Transform child)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 localPosition = child.get_localPosition();
-		Quaternion localRotation = child.get_localRotation();
-		Vector3 localScale = child.get_localScale();
-		child.set_parent(parent);
-		child.set_localPosition(localPosition);
-		child.set_localRotation(localRotation);
-		child.set_localScale(localScale);
+		Vector3 localPosition = child.localPosition;
+		Quaternion localRotation = child.localRotation;
+		Vector3 localScale = child.localScale;
+		child.parent = parent;
+		child.localPosition = localPosition;
+		child.localRotation = localRotation;
+		child.localScale = localScale;
 	}
 
 	public static Transform Insert(Transform child, bool transfom_delegate = false)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		GameObject val = new GameObject();
-		Transform transform = val.get_transform();
-		transform.set_parent(child.get_parent());
-		child.set_parent(transform);
+		Transform transform = new GameObject().transform;
+		transform.parent = child.parent;
+		child.parent = transform;
 		if (transfom_delegate)
 		{
-			transform.set_localPosition(child.get_localPosition());
-			transform.set_localRotation(child.get_localRotation());
-			transform.set_localScale(child.get_localScale());
-			child.set_localPosition(Vector3.get_zero());
-			child.set_localRotation(Quaternion.get_identity());
-			child.set_localScale(Vector3.get_one());
+			transform.localPosition = child.localPosition;
+			transform.localRotation = child.localRotation;
+			transform.localScale = child.localScale;
+			child.localPosition = Vector3.zero;
+			child.localRotation = Quaternion.identity;
+			child.localScale = Vector3.one;
 		}
 		return transform;
 	}
 
 	public static void SetLayerWithChildren(Transform transform, int layer)
 	{
-		transform.get_gameObject().set_layer(layer);
+		transform.gameObject.layer = layer;
 		int i = 0;
-		for (int childCount = transform.get_childCount(); i < childCount; i++)
+		for (int childCount = transform.childCount; i < childCount; i++)
 		{
 			SetLayerWithChildren(transform.GetChild(i), layer);
 		}
@@ -550,16 +486,16 @@ public static class Utility
 
 	public static void SetLayerWithChildren(Transform transform, int setLayer, int exceptLayer)
 	{
-		if (transform.get_gameObject().get_layer() != exceptLayer)
+		if (transform.gameObject.layer != exceptLayer)
 		{
-			transform.get_gameObject().set_layer(setLayer);
+			transform.gameObject.layer = setLayer;
 		}
-		for (int i = 0; i < transform.get_childCount(); i++)
+		for (int i = 0; i < transform.childCount; i++)
 		{
-			GameObject gameObject = transform.GetChild(i).get_gameObject();
-			if (gameObject.get_layer() != exceptLayer)
+			GameObject gameObject = transform.GetChild(i).gameObject;
+			if (gameObject.layer != exceptLayer)
 			{
-				gameObject.set_layer(setLayer);
+				gameObject.layer = setLayer;
 			}
 		}
 	}
@@ -570,7 +506,7 @@ public static class Utility
 		{
 			for (int num = 31; num >= i; num--)
 			{
-				Physics.IgnoreLayerCollision(num, i, true);
+				Physics.IgnoreLayerCollision(num, i, ignore: true);
 			}
 		}
 	}
@@ -580,7 +516,7 @@ public static class Utility
 		int i = 0;
 		for (int num = hit_layers.Length; i < num; i++)
 		{
-			Physics.IgnoreLayerCollision(target_layer, hit_layers[i], false);
+			Physics.IgnoreLayerCollision(target_layer, hit_layers[i], ignore: false);
 		}
 	}
 
@@ -589,7 +525,7 @@ public static class Utility
 		int i = 0;
 		for (int num = colliders.Length; i < num; i++)
 		{
-			if (!(colliders[i] == null) && !colliders[i].get_isTrigger() && colliders[i].get_enabled() && colliders[i].get_gameObject().get_activeInHierarchy())
+			if (!(colliders[i] == null) && !colliders[i].isTrigger && colliders[i].enabled && colliders[i].gameObject.activeInHierarchy)
 			{
 				Physics.IgnoreCollision(collider, colliders[i], ignore);
 			}
@@ -598,92 +534,67 @@ public static class Utility
 
 	public static Transform CreateGameObject(string name, Transform parent, int layer = -1)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		GameObject val = new GameObject(name);
-		Transform transform = val.get_transform();
+		GameObject gameObject = new GameObject(name);
+		Transform transform = gameObject.transform;
 		if (parent != null)
 		{
 			Attach(parent, transform);
 		}
 		if (layer != -1)
 		{
-			val.set_layer(layer);
+			gameObject.layer = layer;
 		}
 		return transform;
 	}
 
 	public static Component CreateGameObjectAndComponent(string name, Transform parent = null, int layer = -1)
 	{
-		Transform val = CreateGameObject(name, parent, layer);
+		Transform transform = CreateGameObject(name, parent, layer);
 		Type type = Type.GetType(name);
-		return val.get_gameObject().AddComponent(type);
+		return transform.gameObject.AddComponent(type);
 	}
 
 	public static T CreateGameObjectAndComponent<T>(Transform parent = null, int layer = -1) where T : Component
 	{
-		Transform val = CreateGameObject(typeof(T).Name, parent, layer);
-		return val.get_gameObject().AddComponent<T>();
+		return CreateGameObject(typeof(T).Name, parent, layer).gameObject.AddComponent<T>();
 	}
 
 	public static void CreateBoxColliderRing(Transform parent, float radius, int divide_num, float box_height = 3f, float box_thick = 3f)
 	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Expected O, but got Unknown
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
 		radius += box_thick;
 		float y = box_height * 0.5f;
-		BoxCollider val = null;
-		BoxCollider val2 = null;
-		BoxCollider val3 = null;
-		Transform val4 = null;
-		Transform val5 = null;
-		Transform val6 = null;
+		BoxCollider boxCollider = null;
+		BoxCollider x = null;
+		BoxCollider boxCollider2 = null;
+		Transform transform = null;
+		Transform transform2 = null;
+		Transform transform3 = null;
 		for (int i = 0; i < divide_num; i++)
 		{
-			float num = (float)i / (float)divide_num * (float)Math.PI * 2f;
-			val3 = CreateGameObjectAndComponent("BoxCollider", parent);
-			val6 = val3.get_transform();
-			Vector3 val7 = default(Vector3);
-			val7._002Ector(Mathf.Cos(num) * radius, 0f, Mathf.Sin(num) * radius);
-			val6.set_localPosition(val7);
-			val6.LookAt(val7 * 0.9f + parent.get_position());
-			val7.y = y;
-			val6.set_localPosition(val7);
-			if (val2 != null)
+			float f = (float)i / (float)divide_num * (float)Math.PI * 2f;
+			boxCollider2 = (BoxCollider)CreateGameObjectAndComponent("BoxCollider", parent);
+			transform3 = boxCollider2.transform;
+			Vector3 vector2 = transform3.localPosition = new Vector3(Mathf.Cos(f) * radius, 0f, Mathf.Sin(f) * radius);
+			transform3.LookAt(vector2 * 0.9f + parent.position);
+			vector2.y = y;
+			transform3.localPosition = vector2;
+			if (x != null)
 			{
-				Vector3 val8 = val6.get_localPosition() - val5.get_localPosition();
-				float magnitude = val8.get_magnitude();
-				val3.set_size(new Vector3(magnitude, box_height, box_thick));
+				float magnitude = (transform3.localPosition - transform2.localPosition).magnitude;
+				boxCollider2.size = new Vector3(magnitude, box_height, box_thick);
 			}
-			if (val == null)
+			if (boxCollider == null)
 			{
-				val = val3;
-				val4 = val6;
+				boxCollider = boxCollider2;
+				transform = transform3;
 			}
-			val2 = val3;
-			val5 = val6;
+			x = boxCollider2;
+			transform2 = transform3;
 		}
-		if (val != null)
+		if (boxCollider != null)
 		{
-			Vector3 val9 = val4.get_localPosition() - val5.get_localPosition();
-			float magnitude2 = val9.get_magnitude();
-			val.set_size(new Vector3(magnitude2, box_height, box_thick));
+			float magnitude2 = (transform.localPosition - transform2.localPosition).magnitude;
+			boxCollider.size = new Vector3(magnitude2, box_height, box_thick);
 		}
 	}
 
@@ -704,15 +615,15 @@ public static class Utility
 		StackComponentInChildren<C>(root);
 		while (true)
 		{
-			C val = Utility.Pop<C>();
-			if ((object)val == null)
+			C val = Pop<C>();
+			if ((UnityEngine.Object)val == (UnityEngine.Object)null)
 			{
 				break;
 			}
-			string name = val.get_name();
+			string name = val.name;
 			for (int i = 0; i < num; i++)
 			{
-				if ((object)array[i] == null && names[i] == name)
+				if ((UnityEngine.Object)array[i] == (UnityEngine.Object)null && names[i] == name)
 				{
 					array[i] = val;
 					break;
@@ -735,7 +646,7 @@ public static class Utility
 			{
 				continue;
 			}
-			Material[] materials = renderers[i].get_materials();
+			Material[] materials = renderers[i].materials;
 			int j = 0;
 			for (int num2 = materials.Length; j < num2; j++)
 			{
@@ -756,7 +667,7 @@ public static class Utility
 		int i = 0;
 		for (int num = renderers.Length; i < num; i++)
 		{
-			Material[] sharedMaterials = renderers[i].get_sharedMaterials();
+			Material[] sharedMaterials = renderers[i].sharedMaterials;
 			int j = 0;
 			for (int num2 = sharedMaterials.Length; j < num2; j++)
 			{
@@ -780,16 +691,15 @@ public static class Utility
 
 	public static float DecibelToVolume(float dB)
 	{
-		float num = -80f;
-		float num2 = 20f;
-		float num3 = Mathf.Clamp(dB, num, num2);
-		float num4 = Mathf.Pow(10f, num3 / num2);
-		return Mathf.Clamp01(num4);
+		float min = -80f;
+		float num = 20f;
+		float num2 = Mathf.Clamp(dB, min, num);
+		return Mathf.Clamp01(Mathf.Pow(10f, num2 / num));
 	}
 
 	public static float HorizontalToVerticalFOV(float Horizontal_fov)
 	{
-		float num = (float)Screen.get_height() / (float)Screen.get_width();
+		float num = (float)Screen.height / (float)Screen.width;
 		if (num < 1f)
 		{
 			num = 1f;
@@ -825,212 +735,95 @@ public static class Utility
 
 	public static Vector3 ClosestPointOnCollider(Collider to_collider, Vector3 point)
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0203: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0326: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0369: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0383: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0387: Unknown result type (might be due to invalid IL or missing references)
-		//IL_038c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0391: Unknown result type (might be due to invalid IL or missing references)
-		//IL_039a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_039f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ad: Unknown result type (might be due to invalid IL or missing references)
-		SphereCollider val = to_collider as SphereCollider;
-		if (val != null)
+		SphereCollider sphereCollider = to_collider as SphereCollider;
+		if (sphereCollider != null)
 		{
-			Matrix4x4 worldToLocalMatrix = val.get_transform().get_worldToLocalMatrix();
-			Vector3 val2 = worldToLocalMatrix.MultiplyPoint3x4(point);
-			val2 -= val.get_center();
-			val2.Normalize();
-			val2 *= val.get_radius();
-			val2 += val.get_center();
-			Matrix4x4 localToWorldMatrix = val.get_transform().get_localToWorldMatrix();
-			return localToWorldMatrix.MultiplyPoint3x4(val2);
+			Vector3 point2 = sphereCollider.transform.worldToLocalMatrix.MultiplyPoint3x4(point);
+			point2 -= sphereCollider.center;
+			point2.Normalize();
+			point2 *= sphereCollider.radius;
+			point2 += sphereCollider.center;
+			return sphereCollider.transform.localToWorldMatrix.MultiplyPoint3x4(point2);
 		}
-		CapsuleCollider val3 = to_collider as CapsuleCollider;
-		if (val3 != null)
+		CapsuleCollider capsuleCollider = to_collider as CapsuleCollider;
+		if (capsuleCollider != null)
 		{
-			Matrix4x4 worldToLocalMatrix2 = val3.get_transform().get_worldToLocalMatrix();
-			Vector3 val4 = worldToLocalMatrix2.MultiplyPoint3x4(point);
-			val4 -= val3.get_center();
-			float num = val4.get_Item(val3.get_direction());
-			float num2 = val3.get_height() * 0.5f - val3.get_radius();
+			Vector3 point3 = capsuleCollider.transform.worldToLocalMatrix.MultiplyPoint3x4(point);
+			point3 -= capsuleCollider.center;
+			float num = point3[capsuleCollider.direction];
+			float num2 = capsuleCollider.height * 0.5f - capsuleCollider.radius;
 			if (Mathf.Abs(num) > num2)
 			{
 				num = Mathf.Sign(num) * num2;
-				int direction;
-				val4.set_Item(direction = val3.get_direction(), val4.get_Item(direction) - num);
+				point3[capsuleCollider.direction] -= num;
 			}
 			else
 			{
-				val4.set_Item(val3.get_direction(), 0f);
+				point3[capsuleCollider.direction] = 0f;
 			}
-			val4.Normalize();
-			val4 *= val3.get_radius();
-			int direction2;
-			val4.set_Item(direction2 = val3.get_direction(), val4.get_Item(direction2) + num);
-			val4 += val3.get_center();
-			Matrix4x4 localToWorldMatrix2 = val3.get_transform().get_localToWorldMatrix();
-			return localToWorldMatrix2.MultiplyPoint3x4(val4);
+			point3.Normalize();
+			point3 *= capsuleCollider.radius;
+			point3[capsuleCollider.direction] += num;
+			point3 += capsuleCollider.center;
+			return capsuleCollider.transform.localToWorldMatrix.MultiplyPoint3x4(point3);
 		}
-		BoxCollider val5 = to_collider as BoxCollider;
-		if (val5 != null)
+		BoxCollider boxCollider = to_collider as BoxCollider;
+		if (boxCollider != null)
 		{
-			Matrix4x4 worldToLocalMatrix3 = val5.get_transform().get_worldToLocalMatrix();
-			Vector3 val6 = worldToLocalMatrix3.MultiplyPoint3x4(point);
-			val6 -= val5.get_center();
-			Vector3 zero = Vector3.get_zero();
-			float num3 = Mathf.Abs(val6.x);
-			Vector3 size = val5.get_size();
-			zero.x = num3 - size.x * 0.5f;
-			float num4 = Mathf.Abs(val6.y);
-			Vector3 size2 = val5.get_size();
-			zero.y = num4 - size2.y * 0.5f;
-			float num5 = Mathf.Abs(val6.z);
-			Vector3 size3 = val5.get_size();
-			zero.z = num5 - size3.z * 0.5f;
-			int num6 = -1;
+			Vector3 point4 = boxCollider.transform.worldToLocalMatrix.MultiplyPoint3x4(point);
+			point4 -= boxCollider.center;
+			Vector3 zero = Vector3.zero;
+			zero.x = Mathf.Abs(point4.x) - boxCollider.size.x * 0.5f;
+			zero.y = Mathf.Abs(point4.y) - boxCollider.size.y * 0.5f;
+			zero.z = Mathf.Abs(point4.z) - boxCollider.size.z * 0.5f;
+			int num3 = -1;
 			if (zero.x < 0f && zero.y < 0f && zero.z < 0f)
 			{
-				float num7 = 0f;
+				float num4 = 0f;
 				for (int i = 0; i < 3; i++)
 				{
-					if (i == 0 || num7 < zero.get_Item(i))
+					if (i == 0 || num4 < zero[i])
 					{
-						num6 = i;
-						num7 = zero.get_Item(i);
+						num3 = i;
+						num4 = zero[i];
 					}
 				}
 			}
-			if (zero.x > 0f || num6 == 0)
+			if (zero.x > 0f || num3 == 0)
 			{
-				float num8 = Mathf.Sign(val6.x);
-				Vector3 size4 = val5.get_size();
-				val6.x = num8 * size4.x * 0.5f;
+				point4.x = Mathf.Sign(point4.x) * boxCollider.size.x * 0.5f;
 			}
-			if (zero.y > 0f || num6 == 1)
+			if (zero.y > 0f || num3 == 1)
 			{
-				float num9 = Mathf.Sign(val6.y);
-				Vector3 size5 = val5.get_size();
-				val6.y = num9 * size5.y * 0.5f;
+				point4.y = Mathf.Sign(point4.y) * boxCollider.size.y * 0.5f;
 			}
-			if (zero.z > 0f || num6 == 2)
+			if (zero.z > 0f || num3 == 2)
 			{
-				float num10 = Mathf.Sign(val6.z);
-				Vector3 size6 = val5.get_size();
-				val6.z = num10 * size6.z * 0.5f;
+				point4.z = Mathf.Sign(point4.z) * boxCollider.size.z * 0.5f;
 			}
-			val6 += val5.get_center();
-			Matrix4x4 localToWorldMatrix3 = val5.get_transform().get_localToWorldMatrix();
-			return localToWorldMatrix3.MultiplyPoint3x4(val6);
+			point4 += boxCollider.center;
+			return boxCollider.transform.localToWorldMatrix.MultiplyPoint3x4(point4);
 		}
 		return to_collider.ClosestPointOnBounds(point);
 	}
 
 	public static Vector3 ClosestPointOnColliderFix(Collider to_collider, Vector3 point)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = Vector3.get_zero();
+		Vector3 b = Vector3.zero;
 		if (to_collider is BoxCollider)
 		{
-			val = (to_collider as BoxCollider).get_center();
+			b = (to_collider as BoxCollider).center;
 		}
 		else if (to_collider is SphereCollider)
 		{
-			val = (to_collider as SphereCollider).get_center();
+			b = (to_collider as SphereCollider).center;
 		}
 		else if (to_collider is CapsuleCollider)
 		{
-			val = (to_collider as CapsuleCollider).get_center();
+			b = (to_collider as CapsuleCollider).center;
 		}
-		Vector3 val2 = to_collider.get_transform().get_position() + val - point;
-		Vector3 normalized = val2.get_normalized();
-		RaycastHit val3 = default(RaycastHit);
-		if (!to_collider.Raycast(new Ray(point, normalized), ref val3, float.MaxValue))
+		Vector3 normalized = (to_collider.transform.position + b - point).normalized;
+		if (!to_collider.Raycast(new Ray(point, normalized), out RaycastHit _, float.MaxValue))
 		{
 			return point;
 		}
@@ -1050,7 +843,7 @@ public static class Utility
 	{
 		for (int i = 0; i < list.Count; i++)
 		{
-			Debug.Log((object)list[i].ToString());
+			Debug.Log(list[i].ToString());
 		}
 	}
 
@@ -1080,31 +873,18 @@ public static class Utility
 		else
 		{
 			int num = 0;
-			IEnumerator enumerator = listobj.GetEnumerator();
-			try
+			foreach (object item in listobj)
 			{
-				while (enumerator.MoveNext())
+				string @namespace = item.GetType().Namespace;
+				if (@namespace == null || !@namespace.ToString().StartsWith("System"))
 				{
-					object current = enumerator.Current;
-					string @namespace = current.GetType().Namespace;
-					if (@namespace == null || !@namespace.ToString().StartsWith("System"))
-					{
-						list.AddRange(Dump(current, parentName + "[" + num + "]"));
-					}
-					else
-					{
-						list.Add($"{parentName}[{num}]={current.ToString()}");
-					}
-					num++;
+					list.AddRange(Dump(item, parentName + "[" + num + "]"));
 				}
-			}
-			finally
-			{
-				IDisposable disposable;
-				if ((disposable = (enumerator as IDisposable)) != null)
+				else
 				{
-					disposable.Dispose();
+					list.Add($"{parentName}[{num}]={item.ToString()}");
 				}
+				num++;
 			}
 		}
 		return list.ToArray();
@@ -1118,8 +898,7 @@ public static class Utility
 		}
 		List<string> list = new List<string>();
 		FieldInfo[] fields = obj.GetType().GetFields();
-		FieldInfo[] array = fields;
-		foreach (FieldInfo fieldInfo in array)
+		foreach (FieldInfo fieldInfo in fields)
 		{
 			string text = parentName + "." + fieldInfo.Name;
 			object value = fieldInfo.GetValue(obj);
@@ -1147,9 +926,8 @@ public static class Utility
 
 	public static void PlayFullScreenMovie(string movieName)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		movieName = Application.get_temporaryCachePath() + "/" + movieName;
-		Handheld.PlayFullScreenMovie(movieName, Color.get_black(), 0);
+		movieName = Application.temporaryCachePath + "/" + movieName;
+		Handheld.PlayFullScreenMovie(movieName, Color.black, FullScreenMovieControlMode.Full);
 	}
 
 	public static float GetiOSVersion()
@@ -1159,62 +937,39 @@ public static class Utility
 
 	public static Vector3 GetScreenUIPosition(Camera camera, Transform cam_transform, Vector3 pos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-		Matrix4x4 worldToLocalMatrix = cam_transform.get_worldToLocalMatrix();
-		Vector3 val = worldToLocalMatrix.MultiplyPoint3x4(pos);
-		float z = val.z;
-		val.z = 0f;
-		float magnitude = val.get_magnitude();
+		Vector3 point = cam_transform.worldToLocalMatrix.MultiplyPoint3x4(pos);
+		float z = point.z;
+		point.z = 0f;
+		float magnitude = point.magnitude;
 		float num = 1f;
-		if (tempCameraInfo == null || tempCameraInfo.screenWidth != Screen.get_width() || tempCameraInfo.screenHeight != Screen.get_height() || tempCameraInfo.fov != camera.get_fieldOfView())
+		if (tempCameraInfo == null || tempCameraInfo.screenWidth != Screen.width || tempCameraInfo.screenHeight != Screen.height || tempCameraInfo.fov != camera.fieldOfView)
 		{
-			float num2 = (float)Screen.get_height() * 0.5f;
-			float num3 = Mathf.Sqrt((float)(Screen.get_height() * Screen.get_height() + Screen.get_width() * Screen.get_width())) * 0.5f;
-			float num4 = camera.get_fieldOfView() * 0.5f;
-			num = Mathf.Tan(num4 * ((float)Math.PI / 180f)) * num3 / num2;
+			float num2 = (float)Screen.height * 0.5f;
+			float num3 = Mathf.Sqrt(Screen.height * Screen.height + Screen.width * Screen.width) * 0.5f;
+			num = Mathf.Tan(camera.fieldOfView * 0.5f * ((float)Math.PI / 180f)) * num3 / num2;
 			tempCameraInfo = new TempCameraInfo();
-			tempCameraInfo.screenWidth = Screen.get_width();
-			tempCameraInfo.screenHeight = Screen.get_height();
-			tempCameraInfo.fov = camera.get_fieldOfView();
+			tempCameraInfo.screenWidth = Screen.width;
+			tempCameraInfo.screenHeight = Screen.height;
+			tempCameraInfo.fov = camera.fieldOfView;
 			tempCameraInfo.limitRate = num;
 		}
 		else
 		{
 			num = tempCameraInfo.limitRate;
 		}
-		float num5 = 1f;
-		float num6 = num5 * num;
-		if (z <= 0f || num6 < magnitude * num5 / z)
+		float num4 = 1f;
+		float num5 = num4 * num;
+		if (z <= 0f || num5 < magnitude * num4 / z)
 		{
-			val *= num6 / magnitude;
-			val.z = num5;
+			point *= num5 / magnitude;
+			point.z = num4;
 		}
 		else
 		{
-			val *= num5 / z;
-			val.z = num5;
+			point *= num4 / z;
+			point.z = num4;
 		}
-		Matrix4x4 localToWorldMatrix = cam_transform.get_localToWorldMatrix();
-		pos = localToWorldMatrix.MultiplyPoint3x4(val);
+		pos = cam_transform.localToWorldMatrix.MultiplyPoint3x4(point);
 		Vector3 result = camera.WorldToScreenPoint(pos);
 		result.z = z;
 		return result;
@@ -1222,17 +977,14 @@ public static class Utility
 
 	public static Color MakeColorByInt(int r, int g, int b, int a = 255)
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		Color result = default(Color);
-		result._002Ector((float)r / 255f, (float)g / 255f, (float)b / 255f, (float)a / 255f);
-		return result;
+		return new Color((float)r / 255f, (float)g / 255f, (float)b / 255f, (float)a / 255f);
 	}
 
 	public static IEnumerable<T> MultipleEnumerator<T>(params IEnumerable<T>[] paramArray)
 	{
-		foreach (IEnumerable<T> param in paramArray)
+		foreach (IEnumerable<T> enumerable in paramArray)
 		{
-			foreach (T item in param)
+			foreach (T item in enumerable)
 			{
 				yield return item;
 			}
@@ -1241,7 +993,7 @@ public static class Utility
 
 	public static IEnumerable<T> GetAllCompornent<T>(this Component root)
 	{
-		foreach (T item in MultipleEnumerator<T>(root.GetComponents<T>(), root.GetComponentsInChildren<T>(true)))
+		foreach (T item in MultipleEnumerator<T>(root.GetComponents<T>(), root.GetComponentsInChildren<T>(includeInactive: true)))
 		{
 			yield return item;
 		}
@@ -1249,7 +1001,7 @@ public static class Utility
 
 	public static IEnumerable<T> GetAllCompornent<T>(this GameObject root)
 	{
-		foreach (T item in MultipleEnumerator<T>(root.GetComponents<T>(), root.GetComponentsInChildren<T>(true)))
+		foreach (T item in MultipleEnumerator<T>(root.GetComponents<T>(), root.GetComponentsInChildren<T>(includeInactive: true)))
 		{
 			yield return item;
 		}
@@ -1466,7 +1218,7 @@ public static class Utility
 				return val;
 			}
 		}
-		return (T)null;
+		return null;
 	}
 
 	public static void SafeInvoke(this Action action)
@@ -1496,7 +1248,11 @@ public static class Utility
 
 	public static bool IsNullOrWhiteSpace(this string self)
 	{
-		return self == null || self.Trim() == string.Empty;
+		if (self != null)
+		{
+			return self.Trim() == "";
+		}
+		return true;
 	}
 
 	public static bool ContainIgnoreCase(this string self, string value)
@@ -1506,7 +1262,11 @@ public static class Utility
 
 	public static bool IsNullOrEmpty<T>(this IList<T> self)
 	{
-		return self == null || self.Count == 0;
+		if (self != null)
+		{
+			return self.Count == 0;
+		}
+		return true;
 	}
 
 	public static int ToInt32OrDefault(this string s, int defaultValue = 0)
@@ -1520,9 +1280,9 @@ public static class Utility
 
 	public static string AbsoluteToAssetPath(string absolutepath)
 	{
-		if (absolutepath.StartsWith(Application.get_dataPath()))
+		if (absolutepath.StartsWith(Application.dataPath))
 		{
-			return "Assets" + absolutepath.Substring(Application.get_dataPath().Length);
+			return "Assets" + absolutepath.Substring(Application.dataPath.Length);
 		}
 		return absolutepath;
 	}
@@ -1538,7 +1298,11 @@ public static class Utility
 
 	public static int Digit(int num)
 	{
-		return (num == 0) ? 1 : ((int)Mathf.Log10((float)num) + 1);
+		if (num != 0)
+		{
+			return (int)Mathf.Log10(num) + 1;
+		}
+		return 1;
 	}
 
 	public static string GetRewardName(REWARD_TYPE rewardType, uint itemId)
@@ -1557,49 +1321,28 @@ public static class Utility
 			break;
 		case REWARD_TYPE.ITEM:
 		case REWARD_TYPE.ABILITY_ITEM:
-		{
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(itemId);
-			result = itemData.name;
+			result = Singleton<ItemTable>.I.GetItemData(itemId).name;
 			break;
-		}
 		case REWARD_TYPE.EQUIP_ITEM:
-		{
-			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(itemId);
-			result = equipItemData.name;
+			result = Singleton<EquipItemTable>.I.GetEquipItemData(itemId).name;
 			break;
-		}
 		case REWARD_TYPE.SKILL_ITEM:
-		{
-			SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData(itemId);
-			result = skillItemData.name;
+			result = Singleton<SkillItemTable>.I.GetSkillItemData(itemId).name;
 			break;
-		}
 		case REWARD_TYPE.QUEST_ITEM:
-		{
-			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(itemId);
-			result = questData.questText;
+			result = Singleton<QuestTable>.I.GetQuestData(itemId).questText;
 			break;
-		}
 		case REWARD_TYPE.AVATAR:
-		{
-			AvatarTable.AvatarData data4 = Singleton<AvatarTable>.I.GetData(itemId);
-			result = data4.name;
+			result = Singleton<AvatarTable>.I.GetData(itemId).name;
 			break;
-		}
 		case REWARD_TYPE.STAMP:
-		{
-			StampTable.Data data3 = Singleton<StampTable>.I.GetData(itemId);
-			result = data3.desc;
+			result = Singleton<StampTable>.I.GetData(itemId).desc;
 			break;
-		}
 		case REWARD_TYPE.DEGREE:
-		{
-			DegreeTable.DegreeData data2 = Singleton<DegreeTable>.I.GetData(itemId);
-			result = data2.name;
+			result = Singleton<DegreeTable>.I.GetData(itemId).name;
 			break;
-		}
 		case REWARD_TYPE.POINT_SHOP_POINT:
-			result = StringTable.Get(STRING_CATEGORY.POINT_SHOP, (itemId != 1) ? 101u : 100u);
+			result = StringTable.Get(STRING_CATEGORY.POINT_SHOP, (itemId == 1) ? 100u : 101u);
 			break;
 		case REWARD_TYPE.ACCESSORY:
 		{
@@ -1665,10 +1408,10 @@ public static class Utility
 			{
 				component.UpdateAnchors();
 			}
-			int childCount = gameObject.get_transform().get_childCount();
+			int childCount = gameObject.transform.childCount;
 			for (int i = 0; i < childCount; i++)
 			{
-				UpdateAllAnchors(gameObject.get_transform().GetChild(i).get_gameObject());
+				UpdateAllAnchors(gameObject.transform.GetChild(i).gameObject);
 			}
 		}
 	}
@@ -1708,7 +1451,7 @@ public static class Utility
 
 	public static string GetNameWithColoredClanTag(string tag, string name, bool own, bool isSameTeam)
 	{
-		if (!own && (tag == null || tag == string.Empty || tag == string.Empty))
+		if (!own && (tag == null || tag == string.Empty || tag == ""))
 		{
 			return name;
 		}
@@ -1736,8 +1479,8 @@ public static class Utility
 
 	public static bool IsScreenHD()
 	{
-		int width = Screen.get_width();
-		int num = Screen.get_height();
+		int width = Screen.width;
+		int num = Screen.height;
 		if (width > num)
 		{
 			int num2 = width;
@@ -1758,19 +1501,19 @@ public static class Utility
 			return -1;
 		}
 		int @int = PlayerPrefs.GetInt("Tut_Weapon_Type");
-		Random.Range(1, 3);
+		UnityEngine.Random.Range(1, 3);
 		switch (@int)
 		{
 		case 0:
-			return Random.Range(1, 3);
+			return UnityEngine.Random.Range(1, 3);
 		case 1:
-			return Random.Range(5, 8);
+			return UnityEngine.Random.Range(5, 8);
 		case 2:
-			return Random.Range(8, 10);
+			return UnityEngine.Random.Range(8, 10);
 		case 4:
-			return Random.Range(10, 12);
+			return UnityEngine.Random.Range(10, 12);
 		case 5:
-			return Random.Range(12, 15);
+			return UnityEngine.Random.Range(12, 15);
 		default:
 			return -1;
 		}

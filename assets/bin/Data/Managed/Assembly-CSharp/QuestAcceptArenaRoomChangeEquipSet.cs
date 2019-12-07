@@ -1,5 +1,3 @@
-using System;
-
 public class QuestAcceptArenaRoomChangeEquipSet : QuestOffLineChangeEquipSet
 {
 	protected new enum UI
@@ -83,9 +81,9 @@ public class QuestAcceptArenaRoomChangeEquipSet : QuestOffLineChangeEquipSet
 
 	private void UpdateLimit()
 	{
-		SetLabelText((Enum)UI.LBL_LIMIT, QuestUtility.GetLimitText(arenaData));
+		SetLabelText(UI.LBL_LIMIT, QuestUtility.GetLimitText(arenaData));
 		bool flag = QuestUtility.JudgeLimit(arenaData, localEquipSet);
-		SetActive((Enum)UI.OBJ_OK, flag);
-		SetActive((Enum)UI.OBJ_NG, !flag);
+		SetActive(UI.OBJ_OK, flag);
+		SetActive(UI.OBJ_NG, !flag);
 	}
 }

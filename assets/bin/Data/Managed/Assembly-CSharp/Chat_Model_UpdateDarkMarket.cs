@@ -34,8 +34,7 @@ public class Chat_Model_UpdateDarkMarket : Chat_Model_Base
 		chat_Model_UpdateDarkMarket.payload = str.Substring(Chat_Model_Base.PAYLOAD_ORIGIN_INDEX);
 		chat_Model_UpdateDarkMarket.itemMarketId = str.Substring(40, 10);
 		chat_Model_UpdateDarkMarket.soldNum = str.Substring(50, 10);
-		Chat_Model_UpdateDarkMarket chat_Model_UpdateDarkMarket2 = chat_Model_UpdateDarkMarket;
-		chat_Model_UpdateDarkMarket2.SetErrorType("0");
-		return chat_Model_UpdateDarkMarket2;
+		chat_Model_UpdateDarkMarket.SetErrorType("0");
+		return chat_Model_UpdateDarkMarket;
 	}
 }

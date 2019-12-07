@@ -142,15 +142,19 @@ public class FieldRewardPool
 
 			public DefeatEnemy ToData()
 			{
-				DefeatEnemy defeatEnemy = new DefeatEnemy();
-				defeatEnemy.enemyId = enemyId;
-				defeatEnemy.sigInfo.defeatKeyId = sigInfo.defeatKeyId;
-				defeatEnemy.sigInfo.signature = sigInfo.signature;
-				defeatEnemy.sigInfo.sid = sigInfo.sid;
-				defeatEnemy.sigInfo.exp = sigInfo.exp;
-				defeatEnemy.sigInfo.money = sigInfo.money;
-				defeatEnemy.sigInfo.ppt = sigInfo.ppt;
-				return defeatEnemy;
+				return new DefeatEnemy
+				{
+					enemyId = enemyId,
+					sigInfo = 
+					{
+						defeatKeyId = sigInfo.defeatKeyId,
+						signature = sigInfo.signature,
+						sid = sigInfo.sid,
+						exp = sigInfo.exp,
+						money = sigInfo.money,
+						ppt = sigInfo.ppt
+					}
+				};
 			}
 		}
 
@@ -281,7 +285,7 @@ public class FieldRewardPool
 		}
 	}
 
-	private string fieldId = string.Empty;
+	private string fieldId = "";
 
 	private int mapId;
 
@@ -299,7 +303,7 @@ public class FieldRewardPool
 
 	public void Clear()
 	{
-		fieldId = string.Empty;
+		fieldId = "";
 		mapId = 0;
 		defeatList.Clear();
 		rewardList.Clear();
@@ -504,9 +508,9 @@ public class FieldRewardPool
 		{
 			savedata.rewardList.Add(new SaveData_1_0.SaveReward(r));
 		});
-		string text = JsonUtility.ToJson((object)savedata);
+		string value = JsonUtility.ToJson(savedata);
 		PlayerPrefs.SetString("FieldRewardPool.ver", "1.0");
-		PlayerPrefs.SetString("FieldRewardPool", text);
+		PlayerPrefs.SetString("FieldRewardPool", value);
 	}
 
 	public static bool HasSave()

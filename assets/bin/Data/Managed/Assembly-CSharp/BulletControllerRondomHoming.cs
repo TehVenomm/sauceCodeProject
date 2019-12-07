@@ -15,25 +15,13 @@ public class BulletControllerRondomHoming : BulletControllerHoming
 
 	protected override Vector3 GetTargetPos()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 position = base._transform.get_position();
+		Vector3 position = base._transform.position;
 		Enemy enemy = targetObject as Enemy;
 		if (targetNull || enemy == null || enemy.targetPoints == null || enemy.targetPoints.Length == 0)
 		{
 			return base.GetTargetPos();
 		}
-		Vector3 result = Vector3.get_zero();
+		Vector3 result = Vector3.zero;
 		if (!TryGetTargetPoint(enemy, out Vector3 targetPos))
 		{
 			targetNull = true;
@@ -48,15 +36,7 @@ public class BulletControllerRondomHoming : BulletControllerHoming
 
 	private bool TryGetTargetPoint(Enemy enemy, out Vector3 targetPos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
-		targetPos = Vector3.get_zero();
+		targetPos = Vector3.zero;
 		TargetPoint[] targetPoints = enemy.targetPoints;
 		if (targetIndex != -1)
 		{
@@ -78,8 +58,7 @@ public class BulletControllerRondomHoming : BulletControllerHoming
 		List<int> list = new List<int>();
 		for (int j = 0; j < targetPoints.Length; j++)
 		{
-			Vector3 targetPoint = targetPoints[j].GetTargetPoint();
-			if (targetPoint.y > 0f)
+			if (targetPoints[j].GetTargetPoint().y > 0f)
 			{
 				list.Add(j);
 			}
@@ -88,19 +67,17 @@ public class BulletControllerRondomHoming : BulletControllerHoming
 		{
 			return false;
 		}
-		list = (from i in list
-		orderby Guid.NewGuid()
-		select i).ToList();
-		TargetPoint targetPoint2 = null;
+		list = list.OrderBy((int i) => Guid.NewGuid()).ToList();
+		TargetPoint targetPoint = null;
 		int num = 0;
 		EnemyRegionWork[] regionWorks = enemy.regionWorks;
-		if (regionWorks != null || regionWorks.Length > 0)
+		if (regionWorks != null || regionWorks.Length != 0)
 		{
 			for (int k = 0; k < list.Count; k++)
 			{
 				num = list[k];
-				TargetPoint targetPoint3 = targetPoints[num];
-				if (!(targetPoint3 != null) || targetPoint3.regionID == -1)
+				TargetPoint targetPoint2 = targetPoints[num];
+				if (!(targetPoint2 != null) || targetPoint2.regionID == -1)
 				{
 					continue;
 				}
@@ -108,34 +85,42 @@ public class BulletControllerRondomHoming : BulletControllerHoming
 				{
 					EnemyRegionWork enemyRegionWork = regionWorks[l];
 					Enemy.RegionInfo regionInfo = regionWorks[l].regionInfo;
-					if (enemyRegionWork.regionId == targetPoint3.regionID)
+					if (enemyRegionWork.regionId == targetPoint2.regionID)
 					{
 						if (IsTargetablePoint(targetPoints[num], regionInfo, enemyRegionWork))
 						{
 							targetRegionWork = enemyRegionWork;
 							targetRegionInfo = regionInfo;
-							targetPoint2 = targetPoint3;
+							targetPoint = targetPoint2;
 						}
 						break;
 					}
 				}
-				if (targetPoint2 != null)
+				if (targetPoint != null)
 				{
 					break;
 				}
 			}
 		}
-		if (targetPoint2 == null)
+		if (targetPoint == null)
 		{
 			return false;
 		}
-		targetPos = targetPoint2.GetTargetPoint();
+		targetPos = targetPoint.GetTargetPoint();
 		targetIndex = num;
 		return true;
 	}
 
 	private bool IsTargetablePoint(TargetPoint targetPoint, Enemy.RegionInfo regionInfo, EnemyRegionWork regionWork)
 	{
-		return targetPoint.get_gameObject().get_activeInHierarchy() && (regionInfo.maxHP <= 0 || regionInfo.breakAfterHit || regionWork.hp.value > 0);
+		if (targetPoint.gameObject.activeInHierarchy)
+		{
+			if (regionInfo.maxHP > 0 && !regionInfo.breakAfterHit)
+			{
+				return regionWork.hp.value > 0;
+			}
+			return true;
+		}
+		return false;
 	}
 }

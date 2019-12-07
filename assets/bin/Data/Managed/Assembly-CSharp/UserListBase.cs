@@ -19,7 +19,7 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 	{
 		if (isInitializeSend)
 		{
-			this.StartCoroutine(DoInitialize());
+			StartCoroutine(DoInitialize());
 		}
 		else
 		{
@@ -50,7 +50,7 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 	{
 		if (isInitializeSendReopen)
 		{
-			this.StartCoroutine(DoInitializeReopen());
+			StartCoroutine(DoInitializeReopen());
 		}
 		else
 		{
@@ -86,8 +86,8 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 	{
 		bool wait = true;
 		bool is_success = true;
-		int send_page = (nowPage <= 0) ? (pageNumMax - 1) : (nowPage - 1);
-		SendGetList(send_page, delegate(bool b)
+		int page = (nowPage > 0) ? (nowPage - 1) : (pageNumMax - 1);
+		SendGetList(page, delegate(bool b)
 		{
 			wait = false;
 			is_success = b;
@@ -103,8 +103,8 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 	{
 		bool wait = true;
 		bool is_success = true;
-		int send_page = (nowPage < pageNumMax - 1) ? (nowPage + 1) : 0;
-		SendGetList(send_page, delegate(bool b)
+		int page = (nowPage < pageNumMax - 1) ? (nowPage + 1) : 0;
+		SendGetList(page, delegate(bool b)
 		{
 			wait = false;
 			is_success = b;
@@ -119,7 +119,7 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 	protected virtual void OnQuery_PAGE_PREV()
 	{
 		GameSection.StayEvent();
-		this.StartCoroutine(GetPrevPage(delegate(bool b)
+		StartCoroutine(GetPrevPage(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b);
 		}));
@@ -128,7 +128,7 @@ public abstract class UserListBase<T> : GameSection where T : CharaInfo
 	protected virtual void OnQuery_PAGE_NEXT()
 	{
 		GameSection.StayEvent();
-		this.StartCoroutine(GetNextPage(delegate(bool b)
+		StartCoroutine(GetNextPage(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b);
 		}));

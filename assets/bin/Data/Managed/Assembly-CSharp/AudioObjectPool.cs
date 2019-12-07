@@ -15,7 +15,7 @@ public class AudioObjectPool : MonoBehaviourSingleton<AudioObjectPool>
 	protected override void Awake()
 	{
 		base.Awake();
-		this.StartCoroutine(CreateStack());
+		StartCoroutine(CreateStack());
 	}
 
 	public static void StopAllLentObjects()
@@ -77,25 +77,26 @@ public class AudioObjectPool : MonoBehaviourSingleton<AudioObjectPool>
 	private IEnumerator CreateStack()
 	{
 		audio_object_stack = new AudioObject[20];
-		for (int i = 0; i < 20; i++)
+		int i = 0;
+		while (i < 20)
 		{
 			audio_object_stack[i] = CreateObject(i + 1);
-			audio_object_stack[i].get_transform().set_parent(this.get_transform());
-			audio_object_stack[i].get_gameObject().SetActive(false);
+			audio_object_stack[i].transform.parent = base.transform;
+			audio_object_stack[i].gameObject.SetActive(value: false);
 			yield return null;
+			int num = i + 1;
+			i = num;
 		}
 		SetCursorTail();
 	}
 
 	private AudioObject CreateObject(int managed_id)
 	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Expected O, but got Unknown
-		GameObject val = new GameObject("AudioObject");
-		AudioObject audioObject = val.AddComponent<AudioObject>();
-		AudioSource val2 = val.AddComponent<AudioSource>();
-		val2.set_playOnAwake(false);
-		AudioObject.Init(audioObject, val2, managed_id);
+		GameObject gameObject = new GameObject("AudioObject");
+		AudioObject audioObject = gameObject.AddComponent<AudioObject>();
+		AudioSource audioSource = gameObject.AddComponent<AudioSource>();
+		audioSource.playOnAwake = false;
+		AudioObject.Init(audioObject, audioSource, managed_id);
 		return audioObject;
 	}
 
@@ -112,10 +113,10 @@ public class AudioObjectPool : MonoBehaviourSingleton<AudioObjectPool>
 	{
 		if (CachedObjectCount > 0)
 		{
-			AudioObject audioObject = audio_object_stack[current_index];
-			audioObject.get_gameObject().SetActive(true);
+			AudioObject obj = audio_object_stack[current_index];
+			obj.gameObject.SetActive(value: true);
 			DownCursor();
-			return audioObject;
+			return obj;
 		}
 		return CreateObject(-1);
 	}
@@ -134,12 +135,12 @@ public class AudioObjectPool : MonoBehaviourSingleton<AudioObjectPool>
 		{
 			UpCursor();
 			audio_object_stack[current_index] = obj;
-			audio_object_stack[current_index].get_transform().set_parent(this.get_transform());
-			obj.get_gameObject().SetActive(false);
+			audio_object_stack[current_index].transform.parent = base.transform;
+			obj.gameObject.SetActive(value: false);
 		}
 		else
 		{
-			Object.Destroy(obj.get_gameObject());
+			UnityEngine.Object.Destroy(obj.gameObject);
 		}
 	}
 

@@ -17,7 +17,7 @@ public class GameSaveData
 
 	public float touchInGameLong = 0.5f;
 
-	public string graphicOptionKey = string.Empty;
+	public string graphicOptionKey = "";
 
 	public int voiceOption;
 
@@ -53,7 +53,7 @@ public class GameSaveData
 
 	public bool enableMinimapEnemy;
 
-	public string arrowCameraKey = string.Empty;
+	public string arrowCameraKey = "";
 
 	public int lastQusetID;
 
@@ -74,6 +74,8 @@ public class GameSaveData
 	public int recommendedDailyDeliveryCheckAtHome;
 
 	public int dayShowNewsNotification;
+
+	public ServerListTable.ServerData currentServer;
 
 	public bool isFinishTradingPostTutorial;
 
@@ -183,6 +185,13 @@ public class GameSaveData
 		return false;
 	}
 
+	public void SetCurrentServer(ServerListTable.ServerData server)
+	{
+		currentServer = server;
+		NetworkNative.setHost(currentServer.url);
+		Save();
+	}
+
 	public void SetPushTrackEquipTutorial(bool canPush)
 	{
 		canPushTrackEquipTutorial = canPush;
@@ -216,7 +225,7 @@ public class GameSaveData
 
 	public void AddCheckedSmithCreateRecipe(int[] ids)
 	{
-		if (ids == null || ids.Length <= 0)
+		if (ids == null || ids.Length == 0)
 		{
 			return;
 		}
@@ -248,9 +257,7 @@ public class GameSaveData
 			}
 			else
 			{
-				List<int> list;
-				int index;
-				(list = checkedSmithCreateRecipe)[index = num2] = (list[index] | num3);
+				checkedSmithCreateRecipe[num2] |= num3;
 			}
 		}
 	}
@@ -482,13 +489,13 @@ public class GameSaveData
 	public bool isNewClanScout(string cId, int expiredAt)
 	{
 		string item = cId + ":" + expiredAt;
-		bool flag = !newClanScoutList.Contains(item);
-		if (flag)
+		bool num = !newClanScoutList.Contains(item);
+		if (num)
 		{
 			newClanScoutList.Add(item);
 			Save();
 		}
-		return flag;
+		return num;
 	}
 
 	public bool isNewReleasePortal(uint id)

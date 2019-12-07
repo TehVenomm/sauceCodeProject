@@ -48,14 +48,9 @@ public class TweenBlur : MonoBehaviour
 		}
 	}
 
-	public TweenBlur()
-		: this()
-	{
-	}
-
 	private void LateUpdate()
 	{
-		timer += Time.get_deltaTime();
+		timer += Time.deltaTime;
 		if (timer < delay)
 		{
 			lod = from;
@@ -67,6 +62,6 @@ public class TweenBlur : MonoBehaviour
 			return;
 		}
 		lod = to;
-		this.set_enabled(false);
+		base.enabled = false;
 	}
 }

@@ -101,7 +101,7 @@ namespace BestHTTP.Decompression.Zlib
 				throw new ZlibException("Bad window size.");
 			}
 			wbits = w;
-			blocks = new InflateBlocks(codec, (!HandleRfc1950HeaderBytes) ? null : this, 1 << w);
+			blocks = new InflateBlocks(codec, HandleRfc1950HeaderBytes ? this : null, 1 << w);
 			Reset();
 			return 0;
 		}
@@ -161,7 +161,7 @@ namespace BestHTTP.Decompression.Zlib
 					}
 					else
 					{
-						mode = (((num3 & 0x20) != 0) ? InflateManagerMode.DICT4 : InflateManagerMode.BLOCKS);
+						mode = (((num3 & 0x20) == 0) ? InflateManagerMode.BLOCKS : InflateManagerMode.DICT4);
 					}
 					break;
 				}

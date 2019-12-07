@@ -21,16 +21,11 @@ public class ChatStampAll : MonoBehaviour
 
 	private bool initailized;
 
-	public ChatStampAll()
-		: this()
-	{
-	}
-
 	public void Open()
 	{
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		tweenCtrl.Play();
-		this.StartCoroutine(DoOpen());
+		StartCoroutine(DoOpen());
 	}
 
 	private IEnumerator DoOpen()
@@ -58,7 +53,7 @@ public class ChatStampAll : MonoBehaviour
 	{
 		tweenCtrl.Play(forward: false, delegate
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 		});
 	}
 
@@ -66,9 +61,9 @@ public class ChatStampAll : MonoBehaviour
 	{
 		for (int i = createIcons.Count; i < MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count + currentUnlockStamps.Count; i++)
 		{
-			Transform val = CreateStampItem(grid.get_transform());
-			val.set_name(i.ToString());
-			createIcons.Add(val);
+			Transform transform = CreateStampItem(grid.transform);
+			transform.name = i.ToString();
+			createIcons.Add(transform);
 		}
 		grid.Reposition();
 		scroll.ResetPosition();
@@ -100,11 +95,10 @@ public class ChatStampAll : MonoBehaviour
 
 	private Transform CreateStampItem(Transform parent)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = ResourceUtility.Realizes(mChatStampPrefab, 5);
-		val.set_parent(parent);
-		val.set_localScale(Vector3.get_one());
-		return val;
+		Transform transform = ResourceUtility.Realizes(mChatStampPrefab, 5);
+		transform.parent = parent;
+		transform.localScale = Vector3.one;
+		return transform;
 	}
 
 	private void InitStampItem(int stampId, Transform iTransform, Action onClick)

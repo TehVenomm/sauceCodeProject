@@ -19,7 +19,7 @@ public class ContinusAttackParam
 		{
 			if (effectTrans != null)
 			{
-				EffectManager.ReleaseEffect(effectTrans.get_gameObject());
+				EffectManager.ReleaseEffect(effectTrans.gameObject);
 				effectTrans = null;
 			}
 			if (eventCollider != null)
@@ -74,7 +74,7 @@ public class ContinusAttackParam
 		for (int num = m_continusAtkDataList.Count - 1; num >= 0; num--)
 		{
 			ContinusAtkData continusAtkData = m_continusAtkDataList[num];
-			continusAtkData.endTime -= Time.get_deltaTime();
+			continusAtkData.endTime -= Time.deltaTime;
 			if (continusAtkData.endTime <= 0f)
 			{
 				continusAtkData.Release();

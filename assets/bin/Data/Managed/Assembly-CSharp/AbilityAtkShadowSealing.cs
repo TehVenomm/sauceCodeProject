@@ -12,7 +12,7 @@ public class AbilityAtkShadowSealing : AbilityAtkWeapon
 			return null;
 		}
 		Enemy enemy = chara as Enemy;
-		if (object.ReferenceEquals(enemy, null))
+		if ((object)enemy == null)
 		{
 			return null;
 		}

@@ -1,5 +1,3 @@
-using System;
-
 public abstract class PPInputBase : GameSection
 {
 	protected enum UI
@@ -11,11 +9,11 @@ public abstract class PPInputBase : GameSection
 
 	public override void UpdateUI()
 	{
-		SetInput(UI.IPT_PW, string.Empty, 4, OnInputChange);
+		SetInput(UI.IPT_PW, "", 4, OnInputChange);
 	}
 
 	private void OnInputChange()
 	{
-		SetButtonEnabled((Enum)UI.BTN_OK, GetInputValue((Enum)UI.IPT_PW).Length == 4);
+		SetButtonEnabled(UI.BTN_OK, GetInputValue(UI.IPT_PW).Length == 4);
 	}
 }

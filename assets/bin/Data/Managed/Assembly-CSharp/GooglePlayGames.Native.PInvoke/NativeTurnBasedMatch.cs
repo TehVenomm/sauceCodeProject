@@ -81,7 +81,11 @@ namespace GooglePlayGames.Native.PInvoke
 		internal bool HasRematchId()
 		{
 			string text = RematchId();
-			return string.IsNullOrEmpty(text) || !text.Equals("(null)");
+			if (!string.IsNullOrEmpty(text))
+			{
+				return !text.Equals("(null)");
+			}
+			return true;
 		}
 
 		internal string RematchId()
@@ -179,7 +183,11 @@ namespace GooglePlayGames.Native.PInvoke
 			case Types.MatchStatus.PENDING_COMPLETION:
 				return GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch.MatchStatus.Complete;
 			case Types.MatchStatus.THEIR_TURN:
-				return (pendingParticipantId == null) ? GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch.MatchStatus.AutoMatching : GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch.MatchStatus.Active;
+				if (pendingParticipantId != null)
+				{
+					return GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch.MatchStatus.Active;
+				}
+				return GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch.MatchStatus.AutoMatching;
 			default:
 				return GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch.MatchStatus.Unknown;
 			}

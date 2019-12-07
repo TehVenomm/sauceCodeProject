@@ -10,11 +10,6 @@ public class EffectInfoComponent : MonoBehaviour
 	[Tooltip("WEATHER CHANGE用のカメラとのZ方向のoffset")]
 	public float CameraPosLinkOffsetZ;
 
-	public EffectInfoComponent()
-		: this()
-	{
-	}
-
 	public void SetLoopAudioObject(AudioObject ao)
 	{
 		if (loopAudioObject != null)

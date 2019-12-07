@@ -39,19 +39,6 @@ public abstract class ScrollItemListControllerBase
 
 	protected Action<int> OnCompleteAllItemLoading => m_onCompleteAllItemLoading;
 
-	public ScrollItemListControllerBase()
-	{
-	}
-
-	public ScrollItemListControllerBase(InitializeParameter _initParam)
-	{
-		ResetLoadCompleteCount();
-		m_onCompleteAllItemLoading = _initParam.OnCompleteAllItemLoading;
-		m_coroutineExecutor = _initParam.CoroutineExecutor;
-		m_currentPageNum = 1;
-		m_maxPageNum = ((_initParam.MaxPageNumber <= 0) ? 1 : _initParam.MaxPageNumber);
-	}
-
 	protected void StartRequest()
 	{
 		m_isRequestNextPageInfo = true;
@@ -70,6 +57,19 @@ public abstract class ScrollItemListControllerBase
 	protected void ResetLoadCompleteCount()
 	{
 		m_itemLoadCompleteCount = 0;
+	}
+
+	public ScrollItemListControllerBase()
+	{
+	}
+
+	public ScrollItemListControllerBase(InitializeParameter _initParam)
+	{
+		ResetLoadCompleteCount();
+		m_onCompleteAllItemLoading = _initParam.OnCompleteAllItemLoading;
+		m_coroutineExecutor = _initParam.CoroutineExecutor;
+		m_currentPageNum = 1;
+		m_maxPageNum = ((_initParam.MaxPageNumber <= 0) ? 1 : _initParam.MaxPageNumber);
 	}
 
 	public bool SetInitPageInfo()

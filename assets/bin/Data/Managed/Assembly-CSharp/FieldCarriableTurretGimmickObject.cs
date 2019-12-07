@@ -133,12 +133,9 @@ public class FieldCarriableTurretGimmickObject : FieldCarriableGimmickObject
 
 	protected override void OnEndCarry()
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		base.OnEndCarry();
-		EffectManager.OneShot(kPutEffectName, GetTransform().get_position(), GetTransform().get_rotation());
-		SoundManager.PlayOneShotSE(kPutSEId, GetTransform().get_position());
+		EffectManager.OneShot(kPutEffectName, GetTransform().position, GetTransform().rotation);
+		SoundManager.PlayOneShotSE(kPutSEId, GetTransform().position);
 	}
 
 	private void LateUpdate()
@@ -153,7 +150,7 @@ public class FieldCarriableTurretGimmickObject : FieldCarriableGimmickObject
 			}
 			else
 			{
-				coolTime -= Time.get_deltaTime();
+				coolTime -= Time.deltaTime;
 			}
 		}
 	}
@@ -178,26 +175,16 @@ public class FieldCarriableTurretGimmickObject : FieldCarriableGimmickObject
 
 	protected virtual void UpdateTarget()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
 		Enemy enemy = targetObject;
 		if (enemy != null)
 		{
-			float num = Vector3.Magnitude(enemy._transform.get_position() - GetTransform().get_position());
-			if (num > searchRange || !targetObject.HasValidTargetPoint())
+			if (Vector3.Magnitude(enemy._transform.position - GetTransform().position) > searchRange || !targetObject.HasValidTargetPoint())
 			{
 				targetObject = null;
 			}
 			else
 			{
-				targetingTime += Time.get_deltaTime();
+				targetingTime += Time.deltaTime;
 			}
 			return;
 		}
@@ -209,15 +196,15 @@ public class FieldCarriableTurretGimmickObject : FieldCarriableGimmickObject
 			{
 				continue;
 			}
-			float num2 = Vector3.Magnitude(enemy2._transform.get_position() - GetTransform().get_position());
-			if (num2 > searchRange)
+			float num = Vector3.Magnitude(enemy2._transform.position - GetTransform().position);
+			if (num > searchRange)
 			{
 				continue;
 			}
 			if (enemy != null)
 			{
-				float num3 = Vector3.Magnitude(enemy._transform.get_position() - GetTransform().get_position());
-				if (num2 > num3)
+				float num2 = Vector3.Magnitude(enemy._transform.position - GetTransform().position);
+				if (num > num2)
 				{
 					continue;
 				}
@@ -231,30 +218,15 @@ public class FieldCarriableTurretGimmickObject : FieldCarriableGimmickObject
 
 	protected virtual void UpdateHeadRotation()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 		if (!(targetObject == null) && !(cannonHead == null))
 		{
-			Vector3 position = cannonHead.get_position();
+			Vector3 position = cannonHead.position;
 			position.y = 0f;
-			Vector3 position2 = targetObject._transform.get_position();
+			Vector3 position2 = targetObject._transform.position;
 			position2.y = 0f;
-			Quaternion rotation = cannonHead.get_rotation();
-			Quaternion val = Quaternion.LookRotation(position2 - position, Vector3.get_up());
-			cannonHead.set_rotation(Quaternion.Lerp(rotation, val, targetingTime * rotationSpeed));
+			Quaternion rotation = cannonHead.rotation;
+			Quaternion b = Quaternion.LookRotation(position2 - position, Vector3.up);
+			cannonHead.rotation = Quaternion.Lerp(rotation, b, targetingTime * rotationSpeed);
 			if (targetingTime * rotationSpeed >= 1f)
 			{
 				isTargeting = true;
@@ -264,9 +236,6 @@ public class FieldCarriableTurretGimmickObject : FieldCarriableGimmickObject
 
 	protected virtual bool Shot()
 	{
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
 		if (cannonHead == null || cannonShotPos == null || targetObject == null || ownerPlayer == null || base.isCarrying || !isTargeting)
 		{
 			return false;
@@ -278,9 +247,9 @@ public class FieldCarriableTurretGimmickObject : FieldCarriableGimmickObject
 		}
 		if (shotSEId > 0)
 		{
-			SoundManager.PlayOneShotSE(shotSEId, cannonHead.get_position());
+			SoundManager.PlayOneShotSE(shotSEId, cannonHead.position);
 		}
-		AnimEventShot.Create(ownerPlayer, attackInfo, cannonShotPos.get_position(), cannonHead.get_rotation());
+		AnimEventShot.Create(ownerPlayer, attackInfo, cannonShotPos.position, cannonHead.rotation);
 		return true;
 	}
 

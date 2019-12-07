@@ -1,6 +1,7 @@
 using Network;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 {
@@ -13,6 +14,8 @@ public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 		public int itemQuantity;
 	}
 
+	public bool tradingEnable;
+
 	public int tradingDay;
 
 	public int tradingStatus;
@@ -24,6 +27,8 @@ public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 	public int tradingSellMinGem;
 
 	public int tradingSellMaxGem;
+
+	public string tradingLastSold;
 
 	public Dictionary<int, List<TradingPostInfo>> InfoDic = new Dictionary<int, List<TradingPostInfo>>();
 
@@ -65,14 +70,34 @@ public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 		set;
 	}
 
+	public int tradingPostSoldNum
+	{
+		get;
+		private set;
+	}
+
+	public string tradingPostLastSoldTime
+	{
+		get;
+		private set;
+	}
+
+	protected override void Awake()
+	{
+		base.Awake();
+		SetTradingPostLastSoldTime();
+	}
+
 	public void SetTradingPostInfo(HomeInfoModel.Param result)
 	{
+		tradingEnable = result.tradingEnable;
 		tradingDay = result.tradingDay;
 		tradingStatus = result.tradingStatus;
 		tradingAccept = result.tradingAccept;
 		tradingConditionDay = result.tradingConditionDay;
 		tradingSellMinGem = result.tradingSellMinGem;
 		tradingSellMaxGem = result.tradingSellMaxGem;
+		tradingLastSold = result.tradingLastSold;
 	}
 
 	public void SetTradingPostFindData(int itemId)
@@ -92,9 +117,40 @@ public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 		tradingPostSellItemData.itemQuantity = quantity;
 	}
 
+	public void UpdateTradingPostSoldCount(int soldNum)
+	{
+		tradingPostSoldNum = soldNum;
+	}
+
+	public void RemoveTradingPostSoldCount()
+	{
+		tradingPostSoldNum = 0;
+	}
+
 	public static bool IsItemValid(uint itemId)
 	{
-		return Singleton<TradingPostTable>.I.IsExistItemData(itemId) && !Singleton<TradingPostTable>.I.GetItemData(itemId).cantSell;
+		if (Singleton<TradingPostTable>.I.IsExistItemData(itemId))
+		{
+			return !Singleton<TradingPostTable>.I.GetItemData(itemId).cantSell;
+		}
+		return false;
+	}
+
+	public void SetTradingPostLastSold(string val)
+	{
+		tradingLastSold = val;
+	}
+
+	public void SetTradingPostLastSoldTime()
+	{
+		string @string = PlayerPrefs.GetString("TradingPost.LastSoldTime", "");
+		MonoBehaviourSingleton<TradingPostManager>.I.tradingPostLastSoldTime = @string;
+	}
+
+	public void SaveTradingPostLastSoldTime()
+	{
+		PlayerPrefs.SetString("TradingPost.LastSoldTime", tradingLastSold);
+		MonoBehaviourSingleton<TradingPostManager>.I.tradingPostLastSoldTime = tradingLastSold;
 	}
 
 	public void SendRequestInfo(int page, Action<bool, List<TradingPostInfo>> callback)
@@ -128,7 +184,7 @@ public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 			{
 				callback(arg, ret.result);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendRequestItemDetail(int itemId, int page, Action<bool, List<TradingPostDetail>> callback)
@@ -147,7 +203,7 @@ public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 			{
 				callback(arg, ret.result);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendRequestFindItem(int itemId, Action<bool, TradingPostInfo> callback)
@@ -156,12 +212,12 @@ public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 		requestSendForm.itemId = itemId;
 		Protocol.Send(TradingPostInfoModel.URL, requestSendForm, delegate(TradingPostInfoModel ret)
 		{
-			TradingPostInfo tradingPostInfo = (ret.result == null || ret.result.Count <= 0) ? null : ret.result[0];
+			TradingPostInfo tradingPostInfo = (ret.result != null && ret.result.Count > 0) ? ret.result[0] : null;
 			if (callback != null)
 			{
 				callback(tradingPostInfo != null, tradingPostInfo);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendRequestUserAgreement(Action<bool> callback)
@@ -180,7 +236,7 @@ public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 			{
 				callback(obj);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendRequestSellItem(int uid, int quantity, int price, Action<bool> callback)
@@ -197,7 +253,7 @@ public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 				obj = true;
 			}
 			callback(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRequestItemStartingAtPrice(int itemId, Action<bool, TradingPostItemStartingAtPriceModel> callback)
@@ -212,7 +268,7 @@ public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 				arg = true;
 			}
 			callback(arg, ret);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRequestBuyItem(int transactionId, Action<bool, Error> callback)
@@ -228,7 +284,7 @@ public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 				arg = true;
 			}
 			callback(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRequestRemoveTransaction(int transactionId, Action<bool, Error> callback)
@@ -243,7 +299,7 @@ public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 				arg = true;
 			}
 			callback(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRequestLogInfo(Action<bool, TradingPostTransactionLog> callback)
@@ -256,7 +312,19 @@ public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 				arg = true;
 			}
 			callback(arg, ret.result);
-		}, string.Empty);
+		});
+	}
+
+	public static void ShowUnavailableDialog()
+	{
+		MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, "This feature is not available now. Please come back later", StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u)), delegate
+		{
+		});
+	}
+
+	public static bool IsTradingEnable()
+	{
+		return MonoBehaviourSingleton<TradingPostManager>.I.tradingEnable;
 	}
 
 	public static bool IsPurchasedLicense()
@@ -276,11 +344,28 @@ public class TradingPostManager : MonoBehaviourSingleton<TradingPostManager>
 
 	public static bool IsFulfillRequirement()
 	{
-		return IsPurchasedLicense() || IsLoginRequireFinish();
+		if (!IsPurchasedLicense())
+		{
+			return IsLoginRequireFinish();
+		}
+		return true;
 	}
 
 	public static bool IsFinishTradingPostTutorial()
 	{
 		return GameSaveData.instance.isFinishTradingPostTutorial;
+	}
+
+	public static bool IsNewTradingPostSold()
+	{
+		if (!MonoBehaviourSingleton<TradingPostManager>.IsValid())
+		{
+			return false;
+		}
+		if (string.Equals(MonoBehaviourSingleton<TradingPostManager>.I.tradingPostLastSoldTime, MonoBehaviourSingleton<TradingPostManager>.I.tradingLastSold))
+		{
+			return false;
+		}
+		return true;
 	}
 }

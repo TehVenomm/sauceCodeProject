@@ -28,22 +28,19 @@ public class Goal_Attack : Goal
 		{
 		case BRAIN_EVENT.PLAY_MOTION:
 		{
-			int num2 = (int)param;
-			if (num2 >= 15 && num2 <= 114)
+			int num = (int)param;
+			if (num >= 15 && num <= 114)
 			{
 				SetStatus(STATUS.COMPLETED);
 			}
 			break;
 		}
 		case BRAIN_EVENT.END_ACTION:
-		{
-			int num = (int)param;
-			if (num == 6)
+			if ((int)param == 6)
 			{
 				SetStatus(STATUS.COMPLETED);
 			}
 			break;
-		}
 		}
 	}
 }

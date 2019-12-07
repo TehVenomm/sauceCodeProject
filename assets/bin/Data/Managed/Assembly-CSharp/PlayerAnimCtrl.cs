@@ -104,11 +104,6 @@ public class PlayerAnimCtrl : MonoBehaviour
 		set;
 	}
 
-	public PlayerAnimCtrl()
-		: this()
-	{
-	}
-
 	public static PlayerAnimCtrl Get(Animator _animator, PLCA default_anim, Action<PlayerAnimCtrl, PLCA> on_play = null, Action<PlayerAnimCtrl, PLCA> on_change = null, Action<PlayerAnimCtrl, PLCA> on_end = null)
 	{
 		if (_animator == null)
@@ -119,7 +114,7 @@ public class PlayerAnimCtrl : MonoBehaviour
 		PlayerAnimCtrl playerAnimCtrl = _animator.GetComponent<PlayerAnimCtrl>();
 		if (playerAnimCtrl == null)
 		{
-			playerAnimCtrl = _animator.get_gameObject().AddComponent<PlayerAnimCtrl>();
+			playerAnimCtrl = _animator.gameObject.AddComponent<PlayerAnimCtrl>();
 		}
 		playerAnimCtrl.animator = _animator;
 		playerAnimCtrl.onPlay = on_play;
@@ -171,18 +166,14 @@ public class PlayerAnimCtrl : MonoBehaviour
 
 	private void UpdateAnim()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		if (animator == null || animator.get_runtimeAnimatorController() == null)
+		if (animator == null || animator.runtimeAnimatorController == null)
 		{
 			return;
 		}
 		AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
 		AnimatorStateInfo nextAnimatorStateInfo = animator.GetNextAnimatorStateInfo(0);
 		int num = animStateHashs[68];
-		if (currentAnimatorStateInfo.get_fullPathHash() == num || nextAnimatorStateInfo.get_fullPathHash() == num)
+		if (currentAnimatorStateInfo.fullPathHash == num || nextAnimatorStateInfo.fullPathHash == num)
 		{
 			PLCA playingAnim;
 			if (lastAnimHash == 0)
@@ -201,7 +192,7 @@ public class PlayerAnimCtrl : MonoBehaviour
 			}
 		}
 		num = animStateHashs[(int)this.playingAnim];
-		if (currentAnimatorStateInfo.get_fullPathHash() != num && nextAnimatorStateInfo.get_fullPathHash() != num && currentAnimatorStateInfo.get_fullPathHash() != viaAnimHash && (loopAnimHash == 0 || (currentAnimatorStateInfo.get_fullPathHash() != loopAnimHash && nextAnimatorStateInfo.get_fullPathHash() != loopAnimHash)) && (lastAnimHash == 0 || (currentAnimatorStateInfo.get_fullPathHash() != lastAnimHash && nextAnimatorStateInfo.get_fullPathHash() != lastAnimHash)))
+		if (currentAnimatorStateInfo.fullPathHash != num && nextAnimatorStateInfo.fullPathHash != num && currentAnimatorStateInfo.fullPathHash != viaAnimHash && (loopAnimHash == 0 || (currentAnimatorStateInfo.fullPathHash != loopAnimHash && nextAnimatorStateInfo.fullPathHash != loopAnimHash)) && (lastAnimHash == 0 || (currentAnimatorStateInfo.fullPathHash != lastAnimHash && nextAnimatorStateInfo.fullPathHash != lastAnimHash)))
 		{
 			PlayAnimator(this.playingAnim);
 			if (onChange != null)
@@ -213,31 +204,27 @@ public class PlayerAnimCtrl : MonoBehaviour
 
 	public void SetMoveRunAnim(int sex)
 	{
-		moveAnim = ((sex != 0) ? PLCA.RUN_F : PLCA.RUN);
+		moveAnim = ((sex == 0) ? PLCA.RUN : PLCA.RUN_F);
 	}
 
 	private void PlayAnimator(PLCA anim, bool instant = false)
 	{
 		if (animator.HasState(0, animStateHashs[(int)anim]))
 		{
-			string text = animStateNames[(int)anim];
+			string stateName = animStateNames[(int)anim];
 			if (instant)
 			{
-				animator.Play(text);
+				animator.Play(stateName);
 			}
 			else
 			{
-				animator.CrossFade(text, transitionDuration, 0);
+				animator.CrossFade(stateName, transitionDuration, 0);
 			}
 		}
 	}
 
 	public void Play(PLCA anim, bool instant = false)
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 		if (playingAnim == anim)
 		{
 			lastAnimHash = 0;
@@ -251,7 +238,7 @@ public class PlayerAnimCtrl : MonoBehaviour
 		{
 			AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
 			AnimatorStateInfo nextAnimatorStateInfo = animator.GetNextAnimatorStateInfo(0);
-			if (currentAnimatorStateInfo.get_fullPathHash() == loopAnimHash || nextAnimatorStateInfo.get_fullPathHash() == loopAnimHash)
+			if (currentAnimatorStateInfo.fullPathHash == loopAnimHash || nextAnimatorStateInfo.fullPathHash == loopAnimHash)
 			{
 				animator.CrossFade(endAnimHash, transitionDuration, 0);
 				lastAnimHash = endAnimHash;
@@ -298,19 +285,19 @@ public class PlayerAnimCtrl : MonoBehaviour
 	{
 		if (!IsPlaying(anims))
 		{
-			Play(anims[Random.Range(0, anims.Length)], instant);
+			Play(anims[UnityEngine.Random.Range(0, anims.Length)], instant);
 		}
 	}
 
 	public void PlayIdleAnims(int sex, bool instant = false)
 	{
-		PLCA[] anims = (sex != 0) ? idleAnims_f : idleAnims_m;
+		PLCA[] anims = (sex == 0) ? idleAnims_m : idleAnims_f;
 		Play(anims, instant);
 	}
 
 	public void PlayRunAnim(int sex, bool instant = false)
 	{
-		Play((sex != 0) ? PLCA.RUN_F : PLCA.RUN, instant);
+		Play((sex == 0) ? PLCA.RUN : PLCA.RUN_F, instant);
 	}
 
 	public bool IsPlaying(PLCA[] anims)
@@ -329,20 +316,17 @@ public class PlayerAnimCtrl : MonoBehaviour
 
 	public bool IsPlayingIdleAnims(int sex)
 	{
-		PLCA[] anims = (sex != 0) ? idleAnims_f : idleAnims_m;
+		PLCA[] anims = (sex == 0) ? idleAnims_m : idleAnims_f;
 		return IsPlaying(anims);
 	}
 
 	public bool IsCurrentState(PLCA anim)
 	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 		if (PLCA.NORMAL > anim || (int)anim >= animStateHashs.Length)
 		{
 			return false;
 		}
-		AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-		if (currentAnimatorStateInfo.get_fullPathHash() != animStateHashs[(int)anim])
+		if (animator.GetCurrentAnimatorStateInfo(0).fullPathHash != animStateHashs[(int)anim])
 		{
 			return false;
 		}

@@ -40,10 +40,6 @@ public class BulletControllerTurretBit : BulletControllerFollow
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam skillParam, Vector3 pos, Quaternion rot)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(bullet, skillParam, pos, rot);
 		followOffset = bullet.dataTurretBit.followOffset;
 		attenuation = bullet.dataTurretBit.attenuation;
@@ -108,14 +104,6 @@ public class BulletControllerTurretBit : BulletControllerFollow
 
 	private bool UpdateTarget()
 	{
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
 		if (fromPlayer == null || fromPlayer.playerSender == null)
 		{
 			return false;
@@ -124,7 +112,7 @@ public class BulletControllerTurretBit : BulletControllerFollow
 		{
 			return false;
 		}
-		searchIntervalTimer -= Time.get_deltaTime();
+		searchIntervalTimer -= Time.deltaTime;
 		if (searchIntervalTimer > 0f)
 		{
 			return false;
@@ -139,8 +127,7 @@ public class BulletControllerTurretBit : BulletControllerFollow
 			Enemy enemy = MonoBehaviourSingleton<StageObjectManager>.I.enemyList[i] as Enemy;
 			if (!(enemy == null) && !enemy.isDead)
 			{
-				Vector3 val = enemy._position - base._transform.get_position();
-				float sqrMagnitude = val.get_sqrMagnitude();
+				float sqrMagnitude = (enemy._position - base._transform.position).sqrMagnitude;
 				if (num > sqrMagnitude && sqrMagnitude <= searchRangeSqr)
 				{
 					targetEnemy = enemy;
@@ -166,24 +153,14 @@ public class BulletControllerTurretBit : BulletControllerFollow
 		for (int num2 = targetEnemy.targetPoints.Length; j < num2; j++)
 		{
 			TargetPoint targetPoint = targetEnemy.targetPoints[j];
-			if (!targetPoint.get_enabled() || !targetPoint.get_gameObject().get_activeInHierarchy())
+			if (targetPoint.enabled && targetPoint.gameObject.activeInHierarchy && (targetPoint.regionID < 0 || targetPoint.regionID >= targetEnemy.regionWorks.Length || targetEnemy.regionWorks[targetPoint.regionID].enabled))
 			{
-				continue;
-			}
-			if (targetPoint.regionID >= 0 && targetPoint.regionID < targetEnemy.regionWorks.Length)
-			{
-				EnemyRegionWork enemyRegionWork = targetEnemy.regionWorks[targetPoint.regionID];
-				if (!enemyRegionWork.enabled)
+				float sqrMagnitude2 = (targetPoint._transform.position - base._transform.position).sqrMagnitude;
+				if (num > sqrMagnitude2)
 				{
-					continue;
+					this.targetPoint = targetPoint;
+					num = sqrMagnitude2;
 				}
-			}
-			Vector3 val2 = targetPoint._transform.get_position() - base._transform.get_position();
-			float sqrMagnitude2 = val2.get_sqrMagnitude();
-			if (num > sqrMagnitude2)
-			{
-				this.targetPoint = targetPoint;
-				num = sqrMagnitude2;
 			}
 		}
 		return true;
@@ -206,17 +183,9 @@ public class BulletControllerTurretBit : BulletControllerFollow
 
 	public void UpdateShot()
 	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 		if (!isEndDelay)
 		{
-			firstShotDelayTimer -= Time.get_deltaTime();
+			firstShotDelayTimer -= Time.deltaTime;
 			if (firstShotDelayTimer > 0f)
 			{
 				return;
@@ -225,9 +194,9 @@ public class BulletControllerTurretBit : BulletControllerFollow
 		}
 		if (!(targetEnemy == null))
 		{
-			Quaternion val = Quaternion.LookRotation(GetTargetPos() - base._transform.get_position());
-			base._transform.set_rotation(Quaternion.Lerp(base._transform.get_rotation(), val, lookAtInterpolate));
-			shotIntervalTimer -= Time.get_deltaTime();
+			Quaternion b = Quaternion.LookRotation(GetTargetPos() - base._transform.position);
+			base._transform.rotation = Quaternion.Lerp(base._transform.rotation, b, lookAtInterpolate);
+			shotIntervalTimer -= Time.deltaTime;
 			if (!(shotIntervalTimer > 0f))
 			{
 				shotIntervalTimer += shotInterval_Sec;
@@ -238,30 +207,25 @@ public class BulletControllerTurretBit : BulletControllerFollow
 
 	private Vector3 GetTargetPos()
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		if (targetEnemy == null)
 		{
-			return Vector3.get_zero();
+			return Vector3.zero;
 		}
 		if (targetPoint != null)
 		{
-			return targetPoint._transform.get_position();
+			return targetPoint._transform.position;
 		}
 		return targetEnemy._position;
 	}
 
 	private void CreateBullet(AttackInfo atkInfo, bool isFinal)
 	{
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		if (atkInfo != null)
 		{
 			BulletData bulletData = atkInfo.bulletData;
 			if (!(bulletData == null) && !(fromObject == null))
 			{
-				AnimEventShot.CreateByExternalBulletData(bulletData, fromObject, atkInfo, base._transform.get_position(), base._transform.get_rotation(), (!isFinal) ? exNormalAtk : exFinalAtk, exAttackMode, exSkillParam);
+				AnimEventShot.CreateByExternalBulletData(bulletData, fromObject, atkInfo, base._transform.position, base._transform.rotation, isFinal ? exFinalAtk : exNormalAtk, exAttackMode, exSkillParam);
 			}
 		}
 	}

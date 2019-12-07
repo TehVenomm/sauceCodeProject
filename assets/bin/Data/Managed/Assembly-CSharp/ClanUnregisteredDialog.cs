@@ -1,4 +1,4 @@
-using System;
+using UnityEngine;
 
 public class ClanUnregisteredDialog : ClanUnregisteredDialogBase
 {
@@ -16,6 +16,6 @@ public class ClanUnregisteredDialog : ClanUnregisteredDialogBase
 	{
 		base.UpdateUI();
 		int clanInviteNum = MonoBehaviourSingleton<UserInfoManager>.I.clanInviteNum;
-		SetBadge((Enum)UI.BTN_SCOUTED, clanInviteNum, 3, -15, -10, is_scale_normalize: false);
+		SetBadge(UI.BTN_SCOUTED, clanInviteNum, SpriteAlignment.TopRight, -15, -10);
 	}
 }

@@ -39,15 +39,8 @@ public class ZoomBlurFilter : MonoBehaviour
 		}
 	}
 
-	public ZoomBlurFilter()
-		: this()
-	{
-	}
-
 	public void SetBlurPram(float _power, Vector2 _center)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		blurPower = _power;
 		center = _center;
 	}
@@ -56,7 +49,7 @@ public class ZoomBlurFilter : MonoBehaviour
 	{
 		chacheTarget = true;
 		onCompleteChecheTarget = onComplete;
-		GameObject gameObject = MonoBehaviourSingleton<UIManager>.I.uiCamera.get_gameObject();
+		GameObject gameObject = MonoBehaviourSingleton<UIManager>.I.uiCamera.gameObject;
 		cacher = gameObject.GetComponent<RenderTargetCacher>();
 		if (null == cacher)
 		{
@@ -67,8 +60,6 @@ public class ZoomBlurFilter : MonoBehaviour
 
 	private void Awake()
 	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Expected O, but got Unknown
 		blurMaterial = new Material(ResourceUtility.FindShader("mobile/Custom/ImageEffect/RadialBlurFilter"));
 		Restore();
 	}
@@ -82,25 +73,24 @@ public class ZoomBlurFilter : MonoBehaviour
 		}
 		if (blurMaterial != null)
 		{
-			Object.Destroy(blurMaterial);
+			UnityEngine.Object.Destroy(blurMaterial);
 			blurMaterial = null;
 		}
 		if (null != cacher)
 		{
-			Object.Destroy(cacher);
+			UnityEngine.Object.Destroy(cacher);
 			cacher = null;
 		}
 	}
 
 	private void OnRenderImage(RenderTexture src, RenderTexture dst)
 	{
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
 		if (chacheTarget && null != cacher)
 		{
 			Graphics.Blit(cacher.GetTexture(), _cachedTexture);
 			Graphics.Blit(src, dst);
 			chacheTarget = false;
-			Object.Destroy(cacher);
+			UnityEngine.Object.Destroy(cacher);
 			cacher = null;
 			if (requestBlitFilterTexture)
 			{
@@ -121,7 +111,7 @@ public class ZoomBlurFilter : MonoBehaviour
 		{
 			blurMaterial.SetVector("_Origin", new Vector4(center.x, center.y, 0f, 0f));
 			blurMaterial.SetFloat("_Power", blurPower);
-			_filteredTexture.DiscardContents(true, true);
+			_filteredTexture.DiscardContents(discardColor: true, discardDepth: true);
 			if (_cachedTexture != null)
 			{
 				Graphics.Blit(_cachedTexture, _filteredTexture, blurMaterial);
@@ -136,30 +126,24 @@ public class ZoomBlurFilter : MonoBehaviour
 
 	public void Restore()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		RenderTextureFormat val = 4;
-		_filteredTexture = RenderTexture.GetTemporary(Screen.get_width(), Screen.get_height(), 0, val);
-		_cachedTexture = RenderTexture.GetTemporary(Screen.get_width(), Screen.get_height(), 0, val);
+		RenderTextureFormat format = RenderTextureFormat.RGB565;
+		_filteredTexture = RenderTexture.GetTemporary(Screen.width, Screen.height, 0, format);
+		_cachedTexture = RenderTexture.GetTemporary(Screen.width, Screen.height, 0, format);
 	}
 
 	public void StartBlurFilter(float powerStart, float powerEnd, float duration, Vector2 blurCenter, Action onComplete)
 	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(BlurFilterImpl(powerStart, powerEnd, duration, blurCenter, onComplete));
+		StartCoroutine(BlurFilterImpl(powerStart, powerEnd, duration, blurCenter, onComplete));
 	}
 
 	private IEnumerator BlurFilterImpl(float powerStart, float powerEnd, float duration, Vector2 blurCenter, Action onComplete)
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		float timer = 0f;
 		while (timer < duration)
 		{
-			timer += Time.get_deltaTime();
-			float currentPower = Mathf.Lerp(powerStart, powerEnd, timer / duration);
-			SetBlurPram(currentPower, blurCenter);
+			timer += Time.deltaTime;
+			float power = Mathf.Lerp(powerStart, powerEnd, timer / duration);
+			SetBlurPram(power, blurCenter);
 			yield return null;
 		}
 		onComplete?.Invoke();

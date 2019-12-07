@@ -1,6 +1,3 @@
-using Network;
-using System;
-
 public class GuildRequestContinue : GameSection
 {
 	private enum UI
@@ -11,19 +8,18 @@ public class GuildRequestContinue : GameSection
 	public override void UpdateUI()
 	{
 		string text = GameSection.GetEventData() as string;
-		SetLabelText((Enum)UI.MESSAGE, text);
+		SetLabelText(UI.MESSAGE, text);
 		base.UpdateUI();
 	}
 
 	private void OnQuery_YES()
 	{
-		GuildRequestItem selectedItem = MonoBehaviourSingleton<GuildRequestManager>.I.GetSelectedItem();
-		if (GameSection.CheckCrystal(selectedItem.crystalNum))
+		if (GameSection.CheckCrystal(MonoBehaviourSingleton<GuildRequestManager>.I.GetSelectedItem().crystalNum))
 		{
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestExtend(delegate(bool questCompleteData)
 			{
-				GameSection.ResumeEvent(is_resume: true);
+				GameSection.ResumeEvent(questCompleteData);
 				GameSection.SetEventData(questCompleteData);
 			});
 		}
@@ -34,7 +30,7 @@ public class GuildRequestContinue : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestRetire(delegate(bool questCompleteData)
 		{
-			GameSection.ResumeEvent(is_resume: true);
+			GameSection.ResumeEvent(questCompleteData);
 			GameSection.SetEventData(questCompleteData);
 		});
 	}

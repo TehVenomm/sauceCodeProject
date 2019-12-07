@@ -15,7 +15,11 @@ public class GrowRate
 		{
 			return false;
 		}
-		return rate.value == growRate.rate.value && add.value == growRate.add.value;
+		if (rate.value == growRate.rate.value)
+		{
+			return add.value == growRate.add.value;
+		}
+		return false;
 	}
 
 	public override int GetHashCode()

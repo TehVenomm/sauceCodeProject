@@ -122,17 +122,15 @@ public class AttackInfo
 
 	public static bool GetRateValue(bool val_a, bool val_b, float rate)
 	{
-		return (!(rate < 1f)) ? val_b : val_a;
+		if (!(rate < 1f))
+		{
+			return val_b;
+		}
+		return val_a;
 	}
 
 	public static Vector3 GetRateValue(Vector3 val_a, Vector3 val_b, float rate)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		return val_a + (val_b - val_a) * rate;
 	}
 }

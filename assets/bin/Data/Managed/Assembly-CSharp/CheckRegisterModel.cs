@@ -4,7 +4,7 @@ public class CheckRegisterModel : BaseModel
 {
 	public class Param
 	{
-		public string uh = string.Empty;
+		public string uh = "";
 
 		public int userId;
 
@@ -20,7 +20,7 @@ public class CheckRegisterModel : BaseModel
 
 		public bool termsCheck;
 
-		public string termsUpdateDay = string.Empty;
+		public string termsUpdateDay = "";
 
 		public bool recommendUpdate;
 	}

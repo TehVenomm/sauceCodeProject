@@ -29,7 +29,7 @@ public class UISkillButton : MonoBehaviour
 				isActive = false;
 				if (obj != null)
 				{
-					obj.SetActive(false);
+					obj.SetActive(value: false);
 				}
 			}
 		}
@@ -39,7 +39,7 @@ public class UISkillButton : MonoBehaviour
 			isActive = true;
 			if (obj != null)
 			{
-				obj.SetActive(true);
+				obj.SetActive(value: true);
 			}
 			if (alpha != null)
 			{
@@ -63,14 +63,14 @@ public class UISkillButton : MonoBehaviour
 		{
 			if (alpha != null)
 			{
-				while (alpha.get_enabled())
+				while (alpha.enabled)
 				{
 					yield return null;
 				}
 			}
 			if (scale != null)
 			{
-				while (scale.get_enabled())
+				while (scale.enabled)
 				{
 					yield return null;
 				}
@@ -78,7 +78,7 @@ public class UISkillButton : MonoBehaviour
 			work = null;
 			if (obj != null)
 			{
-				obj.SetActive(false);
+				obj.SetActive(value: false);
 			}
 			isActive = false;
 		}
@@ -128,17 +128,15 @@ public class UISkillButton : MonoBehaviour
 
 		public void Init(float btnSize)
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			this.btnSize = btnSize;
-			effectTransform = iconTexture.get_transform();
-			skillIconOnPos = effectTransform.get_localPosition();
+			effectTransform = iconTexture.transform;
+			skillIconOnPos = effectTransform.localPosition;
 		}
 
 		public void SetActive(bool isActive)
 		{
-			typeSprite.get_gameObject().SetActive(isActive);
-			iconTexture.get_gameObject().SetActive(isActive);
+			typeSprite.gameObject.SetActive(isActive);
+			iconTexture.gameObject.SetActive(isActive);
 		}
 
 		private void SetDepth(int depth)
@@ -163,30 +161,24 @@ public class UISkillButton : MonoBehaviour
 
 		public bool PlayEffect1(float dispPercent)
 		{
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			bool result = false;
 			if (gaugeEffect_1 == null)
 			{
 				gaugeEffect_1 = EffectManager.GetUIEffect(useEffectNames[0], effectTransform, -1f);
 				if (gaugeEffect_1 != null)
 				{
-					Vector3 localPosition = gaugeEffect_1.get_localPosition();
+					Vector3 localPosition = gaugeEffect_1.localPosition;
 					localPosition.x = btnSize * 2f;
-					gaugeEffect_1.set_localPosition(localPosition);
+					gaugeEffect_1.localPosition = localPosition;
 					result = true;
 				}
 			}
 			else
 			{
-				Vector3 localPosition2 = gaugeEffect_1.get_localPosition();
+				Vector3 localPosition2 = gaugeEffect_1.localPosition;
 				localPosition2.x = 0f;
 				localPosition2.y = (0f - btnSize) * dispPercent + btnSize * 0.5f;
-				gaugeEffect_1.set_localPosition(localPosition2);
+				gaugeEffect_1.localPosition = localPosition2;
 			}
 			return result;
 		}
@@ -216,7 +208,7 @@ public class UISkillButton : MonoBehaviour
 					result = true;
 				}
 			}
-			gaugeEffect_3.get_gameObject().SetActive(true);
+			gaugeEffect_3.gameObject.SetActive(value: true);
 			return result;
 		}
 
@@ -232,15 +224,12 @@ public class UISkillButton : MonoBehaviour
 
 		public void ReleaseEffect1()
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			if (!(gaugeEffect_1 == null))
 			{
-				Vector3 localPosition = gaugeEffect_1.get_localPosition();
+				Vector3 localPosition = gaugeEffect_1.localPosition;
 				localPosition.y = btnSize * 0.5f;
-				gaugeEffect_1.set_localPosition(localPosition);
-				EffectManager.ReleaseEffect(gaugeEffect_1.get_gameObject());
+				gaugeEffect_1.localPosition = localPosition;
+				EffectManager.ReleaseEffect(gaugeEffect_1.gameObject);
 				gaugeEffect_1 = null;
 			}
 		}
@@ -249,7 +238,7 @@ public class UISkillButton : MonoBehaviour
 		{
 			if (!(gaugeEffect_2 == null))
 			{
-				EffectManager.ReleaseEffect(gaugeEffect_2.get_gameObject());
+				EffectManager.ReleaseEffect(gaugeEffect_2.gameObject);
 				gaugeEffect_2 = null;
 			}
 		}
@@ -258,7 +247,7 @@ public class UISkillButton : MonoBehaviour
 		{
 			if (!(gaugeEffect_3 == null))
 			{
-				gaugeEffect_3.get_gameObject().SetActive(false);
+				gaugeEffect_3.gameObject.SetActive(value: false);
 			}
 		}
 
@@ -266,57 +255,51 @@ public class UISkillButton : MonoBehaviour
 		{
 			if (gaugeEffect_1 != null)
 			{
-				Object.Destroy(gaugeEffect_1.get_gameObject());
+				UnityEngine.Object.Destroy(gaugeEffect_1.gameObject);
 				gaugeEffect_1 = null;
 			}
 			if (gaugeEffect_2 != null)
 			{
-				Object.Destroy(gaugeEffect_2.get_gameObject());
+				UnityEngine.Object.Destroy(gaugeEffect_2.gameObject);
 				gaugeEffect_2 = null;
 			}
 			if (gaugeEffect_3 != null)
 			{
-				Object.Destroy(gaugeEffect_3.get_gameObject());
+				UnityEngine.Object.Destroy(gaugeEffect_3.gameObject);
 				gaugeEffect_3 = null;
 			}
 			if (gaugeEffect_Max != null)
 			{
-				Object.Destroy(gaugeEffect_Max.get_gameObject());
+				UnityEngine.Object.Destroy(gaugeEffect_Max.gameObject);
 				gaugeEffect_Max = null;
 			}
 		}
 
 		public void OnDisable()
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			iconTexture.get_transform().set_localPosition(skillIconOnPos);
-			iconTexture.get_transform().set_localScale(Vector3.get_one());
+			iconTexture.transform.localPosition = skillIconOnPos;
+			iconTexture.transform.localScale = Vector3.one;
 			iconTexture.alpha = 1f;
 			if (alphaTween != null)
 			{
-				alphaTween.set_enabled(false);
+				alphaTween.enabled = false;
 				alphaTween = null;
 			}
 			if (scaleTween != null)
 			{
-				scaleTween.set_enabled(false);
+				scaleTween.enabled = false;
 				scaleTween = null;
 			}
 		}
 
 		public void PlayTween()
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			Transform transform = iconTexture.get_transform();
-			Vector3 localPosition = iconTexture.get_transform().get_localPosition();
+			Transform transform = iconTexture.transform;
+			Vector3 localPosition = iconTexture.transform.localPosition;
 			localPosition.z = 0f;
-			transform.set_localPosition(localPosition);
-			alphaTween = TweenAlpha.Begin(transform.get_gameObject(), 0.5f, 0.01f);
-			scaleTween = TweenScale.Begin(transform.get_gameObject(), 0.5f, new Vector3(2f, 2f, 2f));
+			transform.localPosition = localPosition;
+			alphaTween = TweenAlpha.Begin(transform.gameObject, 0.5f, 0.01f);
+			scaleTween = TweenScale.Begin(transform.gameObject, 0.5f, new Vector3(2f, 2f, 2f));
 		}
 	}
 
@@ -445,25 +428,24 @@ public class UISkillButton : MonoBehaviour
 		protected set;
 	}
 
-	public UISkillButton()
-		: this()
-	{
-		buttonIndex = -1;
-	}
-
 	public UIHGauge GetCoolTimeGauge()
 	{
 		return skillGaugeMask;
+	}
+
+	public UISkillButton()
+	{
+		buttonIndex = -1;
 	}
 
 	private void Awake()
 	{
 		skillGauge1.maxEffect.Init(this);
 		skillGauge2.maxEffect.Init(this);
-		silenceBase.SetActive(false);
+		silenceBase.SetActive(value: false);
 		if (skillGaugeMask != null)
 		{
-			UIWidget component = skillGaugeMask.get_gameObject().GetComponent<UIWidget>();
+			UIWidget component = skillGaugeMask.gameObject.GetComponent<UIWidget>();
 			skillGauge1.Init(component.height);
 			skillGauge2.Init(component.height);
 		}
@@ -471,18 +453,17 @@ public class UISkillButton : MonoBehaviour
 		{
 			btnEnable = skillButton.isEnabled;
 		}
-		UIButtonEffect uIButtonEffect = this.get_gameObject().AddComponent<UIButtonEffect>();
-		uIButtonEffect.isSimple = true;
+		base.gameObject.AddComponent<UIButtonEffect>().isSimple = true;
 	}
 
 	private void OnDisable()
 	{
 		skillGauge1.maxEffect.Init(this);
 		skillGauge2.maxEffect.Init(this);
-		silenceBase.SetActive(false);
+		silenceBase.SetActive(value: false);
 		if (playSkill)
 		{
-			this.StopCoroutine(routineWork);
+			StopCoroutine(routineWork);
 			int depth = skillGaugeMask.GetComponent<UIWidget>().depth;
 			skillGauge1.MoveToFront(depth);
 			skillGauge2.MoveToFront(depth);
@@ -526,7 +507,11 @@ public class UISkillButton : MonoBehaviour
 		{
 			return GAUGE_GRADE.FIRST;
 		}
-		return (skillGauge1.percent != 0f) ? GAUGE_GRADE.FIRST : GAUGE_GRADE.SECOND;
+		if (skillGauge1.percent != 0f)
+		{
+			return GAUGE_GRADE.FIRST;
+		}
+		return GAUGE_GRADE.SECOND;
 	}
 
 	private void GetGauges(out SkillGauge activeGauge, out SkillGauge inactiveGauge)
@@ -556,14 +541,10 @@ public class UISkillButton : MonoBehaviour
 		}
 		skillGauge1.percent = 1f - target.skillInfo.GetPercentUseGauge(buttonIndex);
 		skillGauge2.percent = 1f - target.skillInfo.GetPercentUseGauge2nd(buttonIndex);
-		if (target.isUsingSecondGradeSkill)
+		if (target.isUsingSecondGradeSkill && target.skillInfo.GetSkillParam(buttonIndex).isUsingSecondGrade)
 		{
-			SkillInfo.SkillParam skillParam = target.skillInfo.GetSkillParam(buttonIndex);
-			if (skillParam.isUsingSecondGrade)
-			{
-				skillGauge1.percent = 1f;
-				skillGauge2.percent = 1f;
-			}
+			skillGauge1.percent = 1f;
+			skillGauge2.percent = 1f;
 		}
 		GetGauges(out SkillGauge activeGauge, out SkillGauge inactiveGauge);
 		if (activeGauge == null || inactiveGauge == null)
@@ -618,8 +599,8 @@ public class UISkillButton : MonoBehaviour
 			bool isGraphicOptOverLow = MonoBehaviourSingleton<InGameManager>.I.graphicOptionType > 0;
 			if (UpdateSkillGauge(activeGauge, inactiveGauge, isGraphicOptOverLow))
 			{
-				activeGauge.effectTransform.get_gameObject().SetActive(false);
-				activeGauge.effectTransform.get_gameObject().SetActive(true);
+				activeGauge.effectTransform.gameObject.SetActive(value: false);
+				activeGauge.effectTransform.gameObject.SetActive(value: true);
 			}
 		}
 	}
@@ -656,8 +637,7 @@ public class UISkillButton : MonoBehaviour
 				result = UpdateChargingGaugeEffect(activeGauge, num, isGraphicOptOverLow);
 			}
 		}
-		float percent = inactiveGauge.percent;
-		if (percent <= 0f)
+		if (inactiveGauge.percent <= 0f)
 		{
 			if (!inactiveGauge.isPrevGaugeMax)
 			{
@@ -681,11 +661,9 @@ public class UISkillButton : MonoBehaviour
 			skillGauge.ReleaseEffects();
 			return false;
 		}
-		bool flag = false;
-		flag |= skillGauge.PlayEffect1(percent);
-		flag |= skillGauge.PlayEffect2();
+		int result = 0 | (skillGauge.PlayEffect1(percent) ? 1 : 0) | (skillGauge.PlayEffect2() ? 1 : 0);
 		skillGauge.HideEffect3();
-		return flag;
+		return (byte)result != 0;
 	}
 
 	private bool UpdateFullChargedGaugeEffect(SkillGauge skillGauge, bool isGraphicOptOverLow)
@@ -695,26 +673,20 @@ public class UISkillButton : MonoBehaviour
 			skillGauge.ReleaseEffects();
 			return false;
 		}
-		bool flag = false;
 		skillGauge.ReleaseEffect1();
 		skillGauge.ReleaseEffect2();
-		return flag | skillGauge.PlayEffect3();
+		return (byte)(0 | (skillGauge.PlayEffect3() ? 1 : 0)) != 0;
 	}
 
 	private void PlayFullChargeEffect(SkillGauge skillGauge, bool isGraphicOptOverLow)
 	{
-		if (target.IsValidBuffSilence())
+		if (!target.IsValidBuffSilence())
 		{
-			return;
-		}
-		SoundManager.PlayOneShotUISE(gaugeMaxSEId);
-		if (isGraphicOptOverLow)
-		{
-			if (frame != null)
+			SoundManager.PlayOneShotUISE(gaugeMaxSEId);
+			if (isGraphicOptOverLow)
 			{
-				skillGauge.PlayEffectMax(frame);
+				skillGauge.maxEffect.Play(this);
 			}
-			skillGauge.maxEffect.Play(this);
 		}
 	}
 
@@ -727,7 +699,7 @@ public class UISkillButton : MonoBehaviour
 			{
 				flag = true;
 			}
-			if (silenceBase.get_activeInHierarchy() != flag)
+			if (silenceBase.activeInHierarchy != flag)
 			{
 				silenceBase.SetActive(flag);
 			}
@@ -760,7 +732,7 @@ public class UISkillButton : MonoBehaviour
 		}
 		if (skillIconOff != null)
 		{
-			skillIconOff.get_gameObject().SetActive(true);
+			skillIconOff.gameObject.SetActive(value: true);
 			ResourceLoad.LoadItemIconTexture(skillIconOff, data.iconID);
 		}
 		if (skillGauge1 != null && skillGauge1.iconTexture != null)
@@ -789,15 +761,15 @@ public class UISkillButton : MonoBehaviour
 		}
 		if (skillIconOff != null)
 		{
-			skillIconOff.get_gameObject().SetActive(false);
+			skillIconOff.gameObject.SetActive(value: false);
 		}
 		if (skillGauge1 != null)
 		{
-			skillGauge1.iconTexture.get_gameObject().SetActive(false);
+			skillGauge1.iconTexture.gameObject.SetActive(value: false);
 		}
 		if (skillGauge2 != null)
 		{
-			skillGauge2.iconTexture.get_gameObject().SetActive(false);
+			skillGauge2.iconTexture.gameObject.SetActive(value: false);
 		}
 		SetSlotType(type);
 		skillTypeOFF.alpha = 0.5f;
@@ -809,7 +781,7 @@ public class UISkillButton : MonoBehaviour
 		skillGauge2.MoveToFront(depth);
 		skillGauge1.maxEffect.Init(this);
 		skillGauge2.maxEffect.Init(this);
-		silenceBase.SetActive(false);
+		silenceBase.SetActive(value: false);
 		skillButton.isEnabled = false;
 		btnEnable = false;
 	}
@@ -948,19 +920,19 @@ public class UISkillButton : MonoBehaviour
 		{
 			if (routineWork != null)
 			{
-				this.StopCoroutine(routineWork);
+				StopCoroutine(routineWork);
 			}
 			routineWork = SkillStart(activeGauge, inactiveGauge);
-			this.StartCoroutine(routineWork);
+			StartCoroutine(routineWork);
 		}
 	}
 
 	private IEnumerator SkillStart(SkillGauge activeGauge, SkillGauge inactiveGauge)
 	{
 		playSkill = true;
-		yield return (object)new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		panelChange.UnLock();
-		yield return (object)new WaitForSeconds(1.5f);
+		yield return new WaitForSeconds(1.5f);
 		panelChange.Lock();
 		playSkill = false;
 		routineWork = null;

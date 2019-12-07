@@ -1,6 +1,5 @@
 using Network;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 public class EquipItemExceedParamTable : Singleton<EquipItemExceedParamTable>, IDataTable
@@ -213,12 +212,6 @@ public class EquipItemExceedParamTable : Singleton<EquipItemExceedParamTable>, I
 	}
 
 	private DoubleUIntKeyTable<EquipItemExceedParam> tableData;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<EquipItemExceedParam> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<EquipItemExceedParam> _003C_003Ef__mg_0024cache1;
 
 	public void CreateTable(string csv_text)
 	{

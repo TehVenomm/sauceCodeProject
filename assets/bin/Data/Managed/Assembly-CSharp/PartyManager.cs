@@ -32,7 +32,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 
 	private bool isChangeStarted;
 
-	private string inviteValue = string.Empty;
+	private string inviteValue = "";
 
 	public bool is_repeat_quest;
 
@@ -142,8 +142,8 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 	protected override void Awake()
 	{
 		base.Awake();
-		this.get_gameObject().AddComponent<PartyWebSocket>();
-		this.get_gameObject().AddComponent<PartyNetworkManager>();
+		base.gameObject.AddComponent<PartyWebSocket>();
+		base.gameObject.AddComponent<PartyNetworkManager>();
 	}
 
 	public void Dirty()
@@ -215,12 +215,20 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 
 	public static bool IsValidNotEmptyList()
 	{
-		return MonoBehaviourSingleton<PartyManager>.IsValid() && MonoBehaviourSingleton<PartyManager>.I.partys != null && MonoBehaviourSingleton<PartyManager>.I.partys.Count > 0;
+		if (MonoBehaviourSingleton<PartyManager>.IsValid() && MonoBehaviourSingleton<PartyManager>.I.partys != null)
+		{
+			return MonoBehaviourSingleton<PartyManager>.I.partys.Count > 0;
+		}
+		return false;
 	}
 
 	public static bool IsValidInParty()
 	{
-		return MonoBehaviourSingleton<PartyManager>.IsValid() && MonoBehaviourSingleton<PartyManager>.I.IsInParty();
+		if (MonoBehaviourSingleton<PartyManager>.IsValid())
+		{
+			return MonoBehaviourSingleton<PartyManager>.I.IsInParty();
+		}
+		return false;
 	}
 
 	public bool IsInParty()
@@ -230,42 +238,74 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 
 	public string GetPartyId()
 	{
-		return (partyData == null) ? string.Empty : partyData.id;
+		if (partyData == null)
+		{
+			return "";
+		}
+		return partyData.id;
 	}
 
 	public string GetPartyNumber()
 	{
-		return (partyData == null) ? string.Empty : partyData.partyNumber;
+		if (partyData == null)
+		{
+			return "";
+		}
+		return partyData.partyNumber;
 	}
 
 	public string GetInviteMessage()
 	{
-		return (inviteFriendInfo == null) ? string.Empty : inviteFriendInfo.inviteMessage;
+		if (inviteFriendInfo == null)
+		{
+			return "";
+		}
+		return inviteFriendInfo.inviteMessage;
 	}
 
 	public string GetInviteHelpURL()
 	{
-		return (inviteFriendInfo == null) ? string.Empty : inviteFriendInfo.linkUrl;
+		if (inviteFriendInfo == null)
+		{
+			return "";
+		}
+		return inviteFriendInfo.linkUrl;
 	}
 
 	public PARTY_STATUS GetStatus()
 	{
-		return (PARTY_STATUS)((partyData != null) ? partyData.status : 0);
+		if (partyData == null)
+		{
+			return PARTY_STATUS.NONE;
+		}
+		return (PARTY_STATUS)partyData.status;
 	}
 
 	public int GetOwnerUserId()
 	{
-		return (partyData != null) ? partyData.ownerUserId : 0;
+		if (partyData == null)
+		{
+			return 0;
+		}
+		return partyData.ownerUserId;
 	}
 
 	public uint GetQuestId()
 	{
-		return (uint)((partyData != null && partyData.quest != null) ? partyData.quest.questId : 0);
+		if (partyData == null || partyData.quest == null)
+		{
+			return 0u;
+		}
+		return (uint)partyData.quest.questId;
 	}
 
 	public int GetSlotIndex(int user_id)
 	{
-		return (partyData == null) ? (-1) : partyData.slotInfos.FindIndex((PartyModel.SlotInfo s) => s.userInfo != null && s.userInfo.userId == user_id);
+		if (partyData == null)
+		{
+			return -1;
+		}
+		return partyData.slotInfos.FindIndex((PartyModel.SlotInfo s) => s.userInfo != null && s.userInfo.userId == user_id);
 	}
 
 	public PartyModel.SlotInfo GetSlotInfoByIndex(int idx)
@@ -282,8 +322,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 		if (partyData != null)
 		{
 			int count = partyData.slotInfos.Count;
-			int memberCount = GetMemberCount();
-			return memberCount >= count;
+			return GetMemberCount() >= count;
 		}
 		return false;
 	}
@@ -308,7 +347,11 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 	public PartyModel.SlotInfo GetSlotInfoByUserId(int user_id)
 	{
 		int slotIndex = GetSlotIndex(user_id);
-		return (slotIndex < 0) ? null : GetSlotInfoByIndex(slotIndex);
+		if (slotIndex < 0)
+		{
+			return null;
+		}
+		return GetSlotInfoByIndex(slotIndex);
 	}
 
 	public bool IsEquipChangeByIndex(int idx)
@@ -334,7 +377,11 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 			Log.Error("IsPayingQuest :: PartyData is NULL");
 			return false;
 		}
-		return partyData.quest.paying != null && !partyData.quest.paying.free;
+		if (partyData.quest.paying != null)
+		{
+			return !partyData.quest.paying.free;
+		}
+		return false;
 	}
 
 	public List<int> GetMemberUserIdList(int my_userid = 0)
@@ -359,7 +406,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 
 	public static string GenerateToken()
 	{
-		return Guid.NewGuid().ToString().Replace("-", string.Empty);
+		return Guid.NewGuid().ToString().Replace("-", "");
 	}
 
 	public void SetFollowPartyMember(List<FollowPartyMember> _followPartyMember)
@@ -509,7 +556,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				UpdatePartyList(ret.result.partys);
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendSearchRandomMatching(Action<bool, Error> call_back)
@@ -548,7 +595,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 			{
 				call_back(arg, ret.Error);
 			}
-		}, string.Empty);
+		});
 	}
 
 	private void SaveGachaSearchSettings()
@@ -574,13 +621,13 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 		searchRequest.isFs = PlayerPrefs.GetInt("GACHA_SEARCH_PRIORITY_FS_KEY", 1);
 		searchRequest.isCs = PlayerPrefs.GetInt("GACHA_SEARCH_PRIORITY_CS_KEY", 1);
 		searchRequest.enemyLevelMin = PlayerPrefs.GetInt("GACHA_SEARCH_LEVEL_MIN_KEY", 1);
-		int num = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_LEVEL_MAX;
+		int defaultValue = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_LEVEL_MAX;
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_EXTRA_LEVEL_MAX > 0)
 		{
-			num = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_EXTRA_LEVEL_MAX;
+			defaultValue = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.PARTY_SEARCH_QUEST_EXTRA_LEVEL_MAX;
 		}
-		searchRequest.enemyLevelMax = PlayerPrefs.GetInt("GACHA_SEARCH_LEVEL_MAX_KEY", num);
-		searchRequest.targetEnemySpeciesName = PlayerPrefs.GetString("GACHA_SEARCH_SPECIES_KEY", (string)null);
+		searchRequest.enemyLevelMax = PlayerPrefs.GetInt("GACHA_SEARCH_LEVEL_MAX_KEY", defaultValue);
+		searchRequest.targetEnemySpeciesName = PlayerPrefs.GetString("GACHA_SEARCH_SPECIES_KEY", null);
 	}
 
 	public void SendRushSearch(Action<bool, Error> call_back, bool saveSettings)
@@ -610,7 +657,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				UpdatePartyList(ret.result.partys);
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRushSearchRandomMatching(Action<bool, Error> call_back)
@@ -642,7 +689,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 			{
 				call_back(arg, ret.Error);
 			}
-		}, string.Empty);
+		});
 	}
 
 	private void SaveRushSearchSettings()
@@ -682,7 +729,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				UpdatePartyList(ret.result.partys);
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SetPartySetting(PartySetting setting)
@@ -718,7 +765,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				}
 			}
 			call_back(arg, arg3, arg2, arg4);
-		}, string.Empty);
+		});
 	}
 
 	public void SendMatching(int questId, Action<Error, bool> call_back)
@@ -742,7 +789,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				break;
 			}
 			call_back(ret.Error, arg);
-		}, string.Empty);
+		});
 	}
 
 	public void SendCreate(int questId, PartySetting party_setting, Action<bool> call_back)
@@ -775,7 +822,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				break;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendApply(string partyNumber, Action<bool, Error> call_back, int questId = 0)
@@ -800,7 +847,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 			{
 				call_back(arg, ret.Error);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendEntry(string id, bool isLoungeBoard, Action<bool> call_back)
@@ -822,7 +869,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				Dirty();
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInfo(Action<bool> call_back)
@@ -853,7 +900,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				ClearParty();
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendIsEquip(bool isEquip, Action<bool> call_back)
@@ -874,7 +921,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendReady(bool enable_ready, Action<bool> call_back)
@@ -890,7 +937,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 			call_back(obj: false);
 			return;
 		}
-		PARTY_PLAYER_STATUS pARTY_PLAYER_STATUS = (!enable_ready) ? PARTY_PLAYER_STATUS.JOINED : PARTY_PLAYER_STATUS.READY;
+		PARTY_PLAYER_STATUS pARTY_PLAYER_STATUS = enable_ready ? PARTY_PLAYER_STATUS.READY : PARTY_PLAYER_STATUS.JOINED;
 		if (partyData.slotInfos[slotIndex].status == (int)pARTY_PLAYER_STATUS)
 		{
 			call_back(obj: true);
@@ -910,7 +957,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				Dirty();
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendLeave(Action<bool> call_back)
@@ -937,7 +984,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				Dirty();
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendEdit(PartySetting party_setting, Action<bool> call_back)
@@ -960,7 +1007,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInviteList(Action<bool, PartyInviteCharaInfo[]> call_back)
@@ -982,7 +1029,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				arg2 = ret.result.ToArray();
 			}
 			call_back(arg, arg2);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInvite(int[] userIds, Action<bool, int[]> call_back)
@@ -1010,7 +1057,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 			{
 				call_back(arg, null);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendInvitedParty(Action<bool> call_back, bool isResumed = false)
@@ -1029,7 +1076,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				}
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public PartyNetworkManager.ConnectData GetWebSockConnectData()
@@ -1044,17 +1091,18 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 		{
 			return null;
 		}
-		PartyNetworkManager.ConnectData connectData = new PartyNetworkManager.ConnectData();
-		connectData.path = partyServerData.wsHost;
-		connectData.ports = partyServerData.wsPorts;
-		connectData.fromId = id;
-		connectData.ackPrefix = slotIndex;
-		connectData.roomId = partyData.id;
-		connectData.owner = partyData.ownerUserId;
-		connectData.ownerToken = partyServerData.token;
-		connectData.uid = id;
-		connectData.signature = partyServerData.signature;
-		return connectData;
+		return new PartyNetworkManager.ConnectData
+		{
+			path = partyServerData.wsHost,
+			ports = partyServerData.wsPorts,
+			fromId = id,
+			ackPrefix = slotIndex,
+			roomId = partyData.id,
+			owner = partyData.ownerUserId,
+			ownerToken = partyServerData.token,
+			uid = id,
+			signature = partyServerData.signature
+		};
 	}
 
 	public void ConnectServer(Action<bool, bool> call_back = null)
@@ -1078,9 +1126,6 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 		{
 			MonoBehaviourSingleton<PartyNetworkManager>.I.ConnectAndRegist(webSockConnectData, delegate(bool is_connect, bool is_regist)
 			{
-				if (is_regist)
-				{
-				}
 				if (call_back != null)
 				{
 					call_back(is_connect, is_regist);
@@ -1115,7 +1160,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				{
 					call_back(arg, ret.Error);
 				}
-			}, string.Empty);
+			});
 		}
 	}
 
@@ -1140,7 +1185,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				is_repeat_quest = isOn;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetNextParty(Action<bool> call_back)
@@ -1166,7 +1211,7 @@ public class PartyManager : MonoBehaviourSingleton<PartyManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void UpdatePartyRepeat(PartyModel.Party party, List<FollowPartyMember> followPartyMember, PartyModel.PartyServer partyServer, PartyModel.InviteFriendInfo inviteFriendInfo, List<IsEquipPartyMember> isEquipList = null)

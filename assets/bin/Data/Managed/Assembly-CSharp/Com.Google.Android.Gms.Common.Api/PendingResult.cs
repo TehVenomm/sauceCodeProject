@@ -28,12 +28,12 @@ namespace Com.Google.Android.Gms.Common.Api
 
 		public R await()
 		{
-			return InvokeCall<R>("await", "()Lcom/google/android/gms/common/api/Result;", new object[0]);
+			return InvokeCall<R>("await", "()Lcom/google/android/gms/common/api/Result;", Array.Empty<object>());
 		}
 
 		public bool isCanceled()
 		{
-			return InvokeCall<bool>("isCanceled", "()Z", new object[0]);
+			return InvokeCall<bool>("isCanceled", "()Z", Array.Empty<object>());
 		}
 
 		public void cancel()

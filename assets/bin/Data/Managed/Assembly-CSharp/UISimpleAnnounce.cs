@@ -15,7 +15,7 @@ public class UISimpleAnnounce : UIAnnounceBase<UISimpleAnnounce>
 
 	public void Announce(string title, string contents)
 	{
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		if (AnnounceStart())
 		{
 			titleLabel.text = title;
@@ -25,11 +25,11 @@ public class UISimpleAnnounce : UIAnnounceBase<UISimpleAnnounce>
 
 	protected override void OnStart()
 	{
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 
 	protected override void OnAfterAnimation()
 	{
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 }

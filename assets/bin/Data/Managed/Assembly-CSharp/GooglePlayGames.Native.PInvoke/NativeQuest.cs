@@ -28,7 +28,7 @@ namespace GooglePlayGames.Native.PInvoke
 			get
 			{
 				long num = Quest.Quest_AcceptedTime(SelfPtr());
-				if (num == 0)
+				if (num == 0L)
 				{
 					return null;
 				}

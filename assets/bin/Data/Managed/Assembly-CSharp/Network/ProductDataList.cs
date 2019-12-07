@@ -19,24 +19,22 @@ namespace Network
 
 		public List<ProductData> GetGemList()
 		{
-			return (from o in shopList
-			where !o.isSpecial
-			select o).ToList();
+			return shopList.Where((ProductData o) => !o.isSpecial).ToList();
 		}
 
 		public List<ProductData> GetBundleList()
 		{
-			return (from o in shopList
-			where Singleton<ProductDataTable>.I.HasPack(o.productId)
-			select o).ToList();
+			return shopList.Where((ProductData o) => Singleton<ProductDataTable>.I.HasPack(o.productId)).ToList();
 		}
 
 		public bool HasPurchasedBundle()
 		{
-			List<ProductData> list = (from o in shopList
-			where Singleton<ProductDataTable>.I.HasPack(o.productId)
-			select o).ToList();
-			return list != null && list.Count < Singleton<ProductDataTable>.I.TotalPack();
+			List<ProductData> list = shopList.Where((ProductData o) => Singleton<ProductDataTable>.I.HasPack(o.productId)).ToList();
+			if (list != null)
+			{
+				return list.Count < Singleton<ProductDataTable>.I.TotalPack();
+			}
+			return false;
 		}
 	}
 }

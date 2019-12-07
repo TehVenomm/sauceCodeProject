@@ -12,8 +12,8 @@ public class ClanPeople : LoungePeople
 		{
 			base.loungePlayers = new List<LoungePlayer>(8);
 		}
-		peopleRoot = Utility.CreateGameObject("PeopleRoot", this.get_transform());
-		yield return this.StartCoroutine(LocateLoungePeople());
+		peopleRoot = Utility.CreateGameObject("PeopleRoot", base.transform);
+		yield return StartCoroutine(LocateLoungePeople());
 		base.isInitialized = true;
 		base.isPeopleInitialized = true;
 	}
@@ -23,19 +23,19 @@ public class ClanPeople : LoungePeople
 		OutGameSettingsManager.HomeScene.NPC[] npcs = MonoBehaviourSingleton<OutGameSettingsManager>.I.clanScene.npcs;
 		foreach (OutGameSettingsManager.HomeScene.NPC npc in npcs)
 		{
-			HomeCharacterBase chara;
+			HomeCharacterBase homeCharacterBase;
 			if (string.IsNullOrEmpty(npc.wayPointName))
 			{
-				chara = creater.CreateNPC(this, peopleRoot, npc);
+				homeCharacterBase = creater.CreateNPC(this, peopleRoot, npc);
 			}
 			else
 			{
-				yield return this.StartCoroutine(LoadLoungeWayPoint(npc.wayPointName));
-				chara = creater.CreateLoungeMoveNPC(this, peopleRoot, centerPoint, npc);
+				yield return StartCoroutine(LoadLoungeWayPoint(npc.wayPointName));
+				homeCharacterBase = creater.CreateLoungeMoveNPC(this, peopleRoot, centerPoint, npc);
 			}
-			if (chara != null)
+			if (homeCharacterBase != null)
 			{
-				base.charas.Add(chara);
+				base.charas.Add(homeCharacterBase);
 			}
 		}
 		while (IsLoadingCharacter())
@@ -55,16 +55,15 @@ public class ClanPeople : LoungePeople
 			return false;
 		}
 		CharaInfo userInfo = slotInfo.userInfo;
-		LoungePlayer loungePlayer = GetLoungePlayer(userInfo.userId);
-		if (loungePlayer != null)
+		if (GetLoungePlayer(userInfo.userId) != null)
 		{
 			return false;
 		}
 		int cLAN_BASE_MAX_DISP_MEMBER_NUM = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.CLAN_BASE_MAX_DISP_MEMBER_NUM;
-		LoungePlayer loungePlayer2 = (base.loungePlayers.Count <= cLAN_BASE_MAX_DISP_MEMBER_NUM - 1) ? creater.CreateLoungePlayer<LoungePlayer>(this, MonoBehaviourSingleton<OutGameSettingsManager>.I.clanScene, peopleRoot, userInfo, useMovingEntry) : creater.CreateLoungePlayer<LoungeLightweightPlayer>(this, MonoBehaviourSingleton<OutGameSettingsManager>.I.clanScene, peopleRoot, userInfo, useMovingEntry);
-		loungePlayer2.SetClanChatEvent();
-		base.charas.Add(loungePlayer2);
-		base.loungePlayers.Add(loungePlayer2);
+		LoungePlayer loungePlayer = (base.loungePlayers.Count <= cLAN_BASE_MAX_DISP_MEMBER_NUM - 1) ? creater.CreateLoungePlayer<LoungePlayer>(this, MonoBehaviourSingleton<OutGameSettingsManager>.I.clanScene, peopleRoot, userInfo, useMovingEntry) : creater.CreateLoungePlayer<LoungeLightweightPlayer>(this, MonoBehaviourSingleton<OutGameSettingsManager>.I.clanScene, peopleRoot, userInfo, useMovingEntry);
+		loungePlayer.SetClanChatEvent();
+		base.charas.Add(loungePlayer);
+		base.loungePlayers.Add(loungePlayer);
 		return true;
 	}
 }

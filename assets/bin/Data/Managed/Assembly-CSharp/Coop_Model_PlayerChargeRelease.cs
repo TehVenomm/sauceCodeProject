@@ -6,7 +6,7 @@ public class Coop_Model_PlayerChargeRelease : Coop_Model_ObjectSyncPositionBase
 
 	public float charge_rate;
 
-	public Vector3 act_pos = Vector3.get_zero();
+	public Vector3 act_pos = Vector3.zero;
 
 	public bool act_pos_f;
 
@@ -14,8 +14,6 @@ public class Coop_Model_PlayerChargeRelease : Coop_Model_ObjectSyncPositionBase
 
 	public Coop_Model_PlayerChargeRelease()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		base.packetType = PACKET_TYPE.PLAYER_CHARGE_RELEASE;
 	}
 

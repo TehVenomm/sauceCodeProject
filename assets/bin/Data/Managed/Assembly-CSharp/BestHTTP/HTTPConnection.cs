@@ -104,8 +104,8 @@ namespace BestHTTP
 						{
 							HTTPCacheService.SetHeaders(CurrentRequest);
 						}
-						bool flag3 = CurrentRequest.SendOutTo(Stream);
-						if (!flag3)
+						bool num = CurrentRequest.SendOutTo(Stream);
+						if (!num)
 						{
 							Close();
 							if (!flag)
@@ -114,7 +114,7 @@ namespace BestHTTP
 								retryCauses = RetryCauses.Reconnect;
 							}
 						}
-						if (flag3)
+						if (num)
 						{
 							if (!Receive() && !flag)
 							{
@@ -152,8 +152,7 @@ namespace BestHTTP
 										}
 										CurrentRequest.RedirectUri = GetRedirectUri(firstHeaderValue);
 										CurrentRequest.Response = null;
-										bool flag4 = true;
-										CurrentRequest.IsRedirected = flag4;
+										bool flag4 = CurrentRequest.IsRedirected = true;
 										flag2 = flag4;
 									}
 									break;
@@ -193,7 +192,7 @@ namespace BestHTTP
 				}
 				else
 				{
-					State = (flag2 ? HTTPConnectionStates.Redirected : ((Client != null) ? HTTPConnectionStates.WaitForRecycle : HTTPConnectionStates.Closed));
+					State = (flag2 ? HTTPConnectionStates.Redirected : ((Client == null) ? HTTPConnectionStates.Closed : HTTPConnectionStates.WaitForRecycle));
 				}
 				LastProcessTime = DateTime.UtcNow;
 			}
@@ -201,20 +200,12 @@ namespace BestHTTP
 
 		private void Connect()
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Expected O, but got Unknown
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Expected O, but got Unknown
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Expected O, but got Unknown
-			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Expected O, but got Unknown
 			Uri currentUri = CurrentRequest.CurrentUri;
 			if (Client == null)
 			{
 				Client = new TcpClient();
 			}
-			if (!Client.get_Connected())
+			if (!Client.Connected)
 			{
 				Client.Connect(currentUri.Host, currentUri.Port);
 			}
@@ -226,9 +217,9 @@ namespace BestHTTP
 			{
 				if (CurrentRequest.UseAlternateSSL)
 				{
-					TlsProtocolHandler val = new TlsProtocolHandler(Client.GetStream());
-					val.Connect(new LegacyTlsClient(new AlwaysValidVerifyer()));
-					Stream = val.get_Stream();
+					TlsProtocolHandler tlsProtocolHandler = new TlsProtocolHandler(Client.GetStream());
+					tlsProtocolHandler.Connect(new LegacyTlsClient(new AlwaysValidVerifyer()));
+					Stream = tlsProtocolHandler.Stream;
 					return;
 				}
 				SslStream sslStream = new SslStream(Client.GetStream(), leaveInnerStreamOpen: false, (object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors errors) => true);
@@ -312,8 +303,7 @@ namespace BestHTTP
 			catch (UriFormatException)
 			{
 				Uri uri2 = CurrentRequest.Uri;
-				UriBuilder uriBuilder = new UriBuilder(uri2.Scheme, uri2.Host, uri2.Port, location);
-				return uriBuilder.Uri;
+				return new UriBuilder(uri2.Scheme, uri2.Host, uri2.Port, location).Uri;
 			}
 		}
 

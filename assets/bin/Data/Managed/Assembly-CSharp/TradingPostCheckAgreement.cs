@@ -13,7 +13,7 @@ public class TradingPostCheckAgreement : GameSection
 			DispatchEvent("UA");
 			return;
 		}
-		if (!TradingPostManager.IsFulfillRequirement() && (!(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "HomeScene") || !(MonoBehaviourSingleton<TradingPostManager>.I.startSectionName == "HomeTop")))
+		if (!TradingPostManager.IsFulfillRequirement() && (!MonoBehaviourSingleton<GoGameSettingsManager>.I.tradingpostCurrentScene.Contains(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName()) || !MonoBehaviourSingleton<GoGameSettingsManager>.I.tradingpostStartSection.Contains(MonoBehaviourSingleton<TradingPostManager>.I.startSectionName)))
 		{
 			DispatchEvent("LA");
 			return;

@@ -33,7 +33,7 @@ public class CoopLocalServerEnemy
 
 	public bool IsReady()
 	{
-		return popTime <= Time.get_time();
+		return popTime <= Time.time;
 	}
 
 	public void Pop(int sid)
@@ -49,6 +49,6 @@ public class CoopLocalServerEnemy
 
 	public override string ToString()
 	{
-		return "sid=" + sid + ",idx=" + popIndex + ",enemyId=" + enemyId + ",popTime=" + popTime + "/" + IsReady();
+		return "sid=" + sid + ",idx=" + popIndex + ",enemyId=" + enemyId + ",popTime=" + popTime + "/" + IsReady().ToString();
 	}
 }

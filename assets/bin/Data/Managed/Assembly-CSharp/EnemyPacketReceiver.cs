@@ -14,13 +14,6 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 
 	protected override bool HandleCoopEvent(CoopPacket packet)
 	{
-		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0525: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0570: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0932: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0939: Unknown result type (might be due to invalid IL or missing references)
 		switch (packet.packetType)
 		{
 		case PACKET_TYPE.ENEMY_LOAD_COMPLETE:
@@ -74,7 +67,7 @@ public class EnemyPacketReceiver : CharacterPacketReceiver
 			enemy.buffParam.SetSyncParam(model16.buff_sync_param);
 			enemy.continusAttackParam.ApplySyncParam(model16.cntAtkSyncParam);
 			MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(enemy);
-			enemy.get_gameObject().SetActive(true);
+			enemy.gameObject.SetActive(value: true);
 			SetFilterMode(FILTER_MODE.NONE);
 			enemy.isCoopInitialized = true;
 			enemy.SetAppearPos(enemy._position);

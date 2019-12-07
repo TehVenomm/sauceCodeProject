@@ -1,5 +1,3 @@
-using System;
-
 public class ProfileEditComment : ConfigName
 {
 	private enum UI
@@ -26,7 +24,7 @@ public class ProfileEditComment : ConfigName
 
 	private void OnQuery_OK()
 	{
-		string text = GetInputValue((Enum)UI.IPT_TEXT);
+		string text = GetInputValue(UI.IPT_TEXT);
 		int num = text.IndexOf("\n");
 		if (num != -1)
 		{
@@ -34,7 +32,7 @@ public class ProfileEditComment : ConfigName
 			if (num2 != -1)
 			{
 				text = text.Remove(num2, text.Length - num2);
-				SetInputValue((Enum)UI.IPT_TEXT, text);
+				SetInputValue(UI.IPT_TEXT, text);
 			}
 		}
 		GameSection.StayEvent();

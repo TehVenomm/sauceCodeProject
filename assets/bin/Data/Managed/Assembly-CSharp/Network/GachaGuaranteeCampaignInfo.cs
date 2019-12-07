@@ -32,11 +32,11 @@ namespace Network
 
 		public string endAt;
 
-		public string description = string.Empty;
+		public string description = "";
 
-		public string detailButtonImg = string.Empty;
+		public string detailButtonImg = "";
 
-		public string link = string.Empty;
+		public string link = "";
 
 		public int userCount;
 
@@ -54,7 +54,11 @@ namespace Network
 
 		public bool IsValid()
 		{
-			return gachaId > 0 && guaranteeCampaignId > 0 && !IsGetInsentive();
+			if (gachaId > 0 && guaranteeCampaignId > 0)
+			{
+				return !IsGetInsentive();
+			}
+			return false;
 		}
 
 		public bool IsNextGuaranteed()
@@ -64,12 +68,16 @@ namespace Network
 
 		public bool IsGetInsentive()
 		{
-			return (IsSSConfirmed() || IsItemConfirmed()) && completeStatus;
+			if (IsSSConfirmed() || IsItemConfirmed())
+			{
+				return completeStatus;
+			}
+			return false;
 		}
 
 		public string GetButtonImageName()
 		{
-			if ((IsSSConfirmed() || IsItemConfirmed()) && IsNextGuaranteed() && buttonImg != string.Empty)
+			if ((IsSSConfirmed() || IsItemConfirmed()) && IsNextGuaranteed() && buttonImg != "")
 			{
 				return buttonImg;
 			}
@@ -77,7 +85,7 @@ namespace Network
 			{
 				return buttonImg;
 			}
-			return string.Empty;
+			return "";
 		}
 
 		public int GetStep()
@@ -97,7 +105,7 @@ namespace Network
 		public string GetTitleImageName()
 		{
 			int imageCount = GetImageCount();
-			if (detailButtonImg == string.Empty)
+			if (detailButtonImg == "")
 			{
 				detailButtonImg = "GGC_000000000";
 			}
@@ -136,7 +144,11 @@ namespace Network
 
 		public bool IsChangeableButtonAndOpenInfo()
 		{
-			return IsStepUp() || IsFever() || IsStepUpWithPresent();
+			if (!IsStepUp() && !IsFever())
+			{
+				return IsStepUpWithPresent();
+			}
+			return true;
 		}
 	}
 }

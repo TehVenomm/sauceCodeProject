@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class QuestToFieldTable : Singleton<QuestToFieldTable>, IDataTable
 {
@@ -31,18 +30,6 @@ public class QuestToFieldTable : Singleton<QuestToFieldTable>, IDataTable
 	}
 
 	private DoubleUIntKeyTable<QuestToFieldData> questToItemTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<QuestToFieldData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<QuestToFieldData> _003C_003Ef__mg_0024cache2;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache3;
 
 	public void CreateTable(string csv_text)
 	{

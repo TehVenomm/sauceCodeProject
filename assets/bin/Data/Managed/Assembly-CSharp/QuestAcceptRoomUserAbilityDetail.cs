@@ -5,7 +5,7 @@ public class QuestAcceptRoomUserAbilityDetail : EquipSetDetailAbilityTable
 	public override void Initialize()
 	{
 		object[] array = GameSection.GetEventData() as object[];
-		observer = this.get_gameObject().AddComponent<QuestRoomObserver>().Initialize((bool)array[1], (bool)array[2], delegate(string dispatch_event_name)
+		observer = base.gameObject.AddComponent<QuestRoomObserver>().Initialize((bool)array[1], (bool)array[2], delegate(string dispatch_event_name)
 		{
 			DispatchEvent(dispatch_event_name);
 		}, delegate(string change_event_name)

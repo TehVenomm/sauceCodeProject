@@ -79,47 +79,33 @@ public class SnatchController
 
 	public void Update()
 	{
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
 		if (!isCtrlActive)
 		{
 			return;
 		}
-		animStateTimer += Time.get_deltaTime();
+		animStateTimer += Time.deltaTime;
 		if (snatchTrans != null)
 		{
-			snatchTrans.set_rotation(owner._rotation);
+			snatchTrans.rotation = owner._rotation;
 		}
 		if (handTrans != null)
 		{
-			renderer.SetPositonStart(handTrans.get_position());
+			renderer.SetPositonStart(handTrans.position);
 		}
 		if (snatchTrans != null)
 		{
-			renderer.SetPositionEnd(snatchTrans.get_position());
+			renderer.SetPositionEnd(snatchTrans.position);
 		}
 		else if (snatchBulletTrans != null)
 		{
-			renderer.SetPositionEnd(snatchBulletTrans.get_position());
+			renderer.SetPositionEnd(snatchBulletTrans.position);
 		}
 		switch (state)
 		{
 		case STATE.NONE:
-		{
-			if (!(owner != null) || !(owner.animator != null))
+			if (owner != null && owner.animator != null && owner.animator.GetCurrentAnimatorStateInfo(0).shortNameHash == HASH_ANIMATOR_MOVE_LOOP)
 			{
-				break;
-			}
-			AnimatorStateInfo currentAnimatorStateInfo = owner.animator.GetCurrentAnimatorStateInfo(0);
-			int shortNameHash = currentAnimatorStateInfo.get_shortNameHash();
-			if (shortNameHash == HASH_ANIMATOR_MOVE_LOOP)
-			{
-				animStateTimerForMoveLoop += Time.get_deltaTime();
+				animStateTimerForMoveLoop += Time.deltaTime;
 				if (animStateTimerForMoveLoop > animStateTimeLimitForMoveLoop)
 				{
 					owner.SetNextTrigger();
@@ -127,7 +113,6 @@ public class SnatchController
 				}
 			}
 			break;
-		}
 		case STATE.SHOT:
 		case STATE.SHOT_RELEASE:
 			if (IsReached())
@@ -157,7 +142,7 @@ public class SnatchController
 			}
 			else if (owner.IsCoopNone() || owner.IsOriginal())
 			{
-				animStateTimerForMoveLoop += Time.get_deltaTime();
+				animStateTimerForMoveLoop += Time.deltaTime;
 				if (animStateTimerForMoveLoop > animStateTimeLimitForMoveLoop)
 				{
 					owner.OnSnatchMoveEnd();
@@ -180,28 +165,6 @@ public class SnatchController
 
 	public void OnHit(int enemyId, Vector3 hitPoint)
 	{
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
 		target = (MonoBehaviourSingleton<StageObjectManager>.I.FindEnemy(enemyId) as Enemy);
 		if (FieldManager.IsValidInGameNoBoss() && !owner.IsCoopNone() && !owner.IsOriginal())
 		{
@@ -216,23 +179,19 @@ public class SnatchController
 		{
 			SoundManager.PlayOneShotSE(ohsInfo.Soul_SnatchHitSeId, hitPoint);
 		}
-		string effect_name = (!owner.isBoostMode) ? ohsInfo.Soul_SnatchHitEffect : ohsInfo.Soul_SnatchHitEffectOnBoostMode;
-		EffectManager.OneShot(effect_name, hitPoint, Quaternion.get_identity());
+		EffectManager.OneShot(owner.isBoostMode ? ohsInfo.Soul_SnatchHitEffectOnBoostMode : ohsInfo.Soul_SnatchHitEffect, hitPoint, Quaternion.identity);
 		snatchTrans = EffectManager.GetEffect(ohsInfo.Soul_SnatchHitRemainEffect);
-		renderer.SetPositionEnd(snatchTrans.get_position());
-		Vector3 val = Vector3.get_zero();
-		Vector3 val2 = owner._position - hitPoint;
-		float magnitude = val2.get_magnitude();
-		if (magnitude > ohsInfo.Soul_MoveStopRange)
+		renderer.SetPositionEnd(snatchTrans.position);
+		Vector3 b = Vector3.zero;
+		if ((owner._position - hitPoint).magnitude > ohsInfo.Soul_MoveStopRange)
 		{
-			Vector3 val3 = owner._position - hitPoint;
-			val = val3.get_normalized() * ohsInfo.Soul_MoveStopRange;
+			b = (owner._position - hitPoint).normalized * ohsInfo.Soul_MoveStopRange;
 		}
-		snatchTrans.set_position(hitPoint + val);
-		snatchTrans.set_rotation(owner._rotation);
+		snatchTrans.position = hitPoint + b;
+		snatchTrans.rotation = owner._rotation;
 		if (target != null)
 		{
-			snatchTrans.set_parent(target._transform);
+			snatchTrans.parent = target._transform;
 			target.stackBuffCtrl.IncrementStackCount(StackBuffController.STACK_TYPE.SNATCH);
 		}
 		switch (state)
@@ -275,7 +234,7 @@ public class SnatchController
 	{
 		if (snatchTrans != null)
 		{
-			EffectManager.ReleaseEffect(snatchTrans.get_gameObject());
+			EffectManager.ReleaseEffect(snatchTrans.gameObject);
 			snatchTrans = null;
 		}
 		if (target != null)
@@ -312,12 +271,10 @@ public class SnatchController
 
 	public void SetSnatchBulletTrans(Transform trans)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		snatchBulletTrans = trans;
 		handTrans = owner.FindNode("L_Hand");
-		renderer.SetPositonStart(handTrans.get_position());
-		renderer.SetPositionEnd(trans.get_position());
+		renderer.SetPositonStart(handTrans.position);
+		renderer.SetPositionEnd(trans.position);
 		renderer.SetVisible();
 	}
 
@@ -328,30 +285,22 @@ public class SnatchController
 
 	public Vector3 GetSnatchPos()
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		if (snatchTrans == null)
 		{
-			return Vector3.get_zero();
+			return Vector3.zero;
 		}
-		Vector3 position = snatchTrans.get_position();
+		Vector3 position = snatchTrans.position;
 		position.y = 0f;
 		return position;
 	}
 
 	public bool GetSnatchPos(out Vector3 pos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		pos = Vector3.get_zero();
+		pos = Vector3.zero;
 		bool result = false;
 		if (isCtrlActive && snatchTrans != null)
 		{
-			pos = snatchTrans.get_position();
+			pos = snatchTrans.position;
 			pos.y = 0f;
 			result = true;
 		}

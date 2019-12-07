@@ -33,8 +33,7 @@ public class GuildRequestChallengeRoomCondition : QuestAcceptChallengeRoomCondit
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		UIButton component = GetCtrl(UI.POP_TARGET_LEVEL).GetComponent<UIButton>();
-		component.isEnabled = false;
+		GetCtrl(UI.POP_TARGET_LEVEL).GetComponent<UIButton>().isEnabled = false;
 	}
 
 	protected override ChallengeSearchRequestParam GetInitChallengeSearchParam()

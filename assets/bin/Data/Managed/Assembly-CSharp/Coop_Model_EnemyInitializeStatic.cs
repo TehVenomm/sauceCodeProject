@@ -8,14 +8,14 @@ public static class Coop_Model_EnemyInitializeStatic
 			for (int count = initialize_model.regions.Count; i < count && i < region_works.Length; i++)
 			{
 				Enemy.RegionWorkSyncData regionWorkSyncData = initialize_model.regions[i];
-				EnemyRegionWork enemyRegionWork = region_works[i];
-				enemyRegionWork.hp = regionWorkSyncData.hp;
-				enemyRegionWork.isBroke = regionWorkSyncData.isBroke;
-				enemyRegionWork.bleedList = regionWorkSyncData.bleedList;
-				enemyRegionWork.isShieldDamage = regionWorkSyncData.isShieldDamage;
-				enemyRegionWork.isShieldCriticalDamage = regionWorkSyncData.isShieldCriticalDamage;
-				enemyRegionWork.shadowSealingData = regionWorkSyncData.shadowSealingData;
-				enemyRegionWork.bombArrowDataHistory = regionWorkSyncData.bombArrowDataHistory;
+				EnemyRegionWork obj = region_works[i];
+				obj.hp = regionWorkSyncData.hp;
+				obj.isBroke = regionWorkSyncData.isBroke;
+				obj.bleedList = regionWorkSyncData.bleedList;
+				obj.isShieldDamage = regionWorkSyncData.isShieldDamage;
+				obj.isShieldCriticalDamage = regionWorkSyncData.isShieldCriticalDamage;
+				obj.shadowSealingData = regionWorkSyncData.shadowSealingData;
+				obj.bombArrowDataHistory = regionWorkSyncData.bombArrowDataHistory;
 			}
 		}
 	}

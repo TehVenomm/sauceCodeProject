@@ -103,8 +103,7 @@ namespace Network
 				}
 				string b = src.parts[i];
 				int index = ids.IndexOf(item);
-				string a = parts[index];
-				if (a != b)
+				if (parts[index] != b)
 				{
 					return false;
 				}

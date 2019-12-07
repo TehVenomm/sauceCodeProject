@@ -49,7 +49,7 @@ public class SmithExceedDialog : GameSection
 
 	private int selectIndex;
 
-	private Color paramColor = Color.get_white();
+	private Color paramColor = Color.white;
 
 	private int selectPageIndex;
 
@@ -81,31 +81,29 @@ public class SmithExceedDialog : GameSection
 
 	public override void Initialize()
 	{
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
 		smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
 		SetupExceedData();
 		exceedData = Singleton<EquipItemExceedTable>.I.GetEquipItemExceedDataIncludeLimited(itemTable);
 		selectPageIndex = 0;
 		int num = Mathf.CeilToInt((float)exceedData.exceed.Length / 3f);
 		maxPageIndex = num - 1;
-		SetLabelText((Enum)UI.LBL_SELECT_MAX, num.ToString());
-		SetLabelText((Enum)UI.LBL_SELECT_NOW, (selectPageIndex + 1).ToString());
+		SetLabelText(UI.LBL_SELECT_MAX, num.ToString());
+		SetLabelText(UI.LBL_SELECT_NOW, (selectPageIndex + 1).ToString());
 		if (num == 0)
 		{
-			SetActive((Enum)UI.OBJ_SELECT, is_visible: false);
+			SetActive(UI.OBJ_SELECT, is_visible: false);
 		}
 		else if (num <= 1)
 		{
-			SetActive((Enum)UI.BTN_AIM_R, is_visible: false);
-			SetActive((Enum)UI.BTN_AIM_L, is_visible: false);
+			SetActive(UI.BTN_AIM_R, is_visible: false);
+			SetActive(UI.BTN_AIM_L, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_AIM_R_INACTIVE, is_visible: false);
-			SetActive((Enum)UI.BTN_AIM_L_INACTIVE, is_visible: false);
+			SetActive(UI.BTN_AIM_R_INACTIVE, is_visible: false);
+			SetActive(UI.BTN_AIM_L_INACTIVE, is_visible: false);
 		}
-		UILabel component = base.GetComponent<UILabel>((Enum)UI.LBL_EXCEED_0);
+		UILabel component = GetComponent<UILabel>(UI.LBL_EXCEED_0);
 		if (component != null)
 		{
 			paramColor = component.color;
@@ -116,20 +114,16 @@ public class SmithExceedDialog : GameSection
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetActive((Enum)UI.SPR_COUNT_0_ON, exceedCount > 0);
-		SetActive((Enum)UI.SPR_COUNT_1_ON, exceedCount > 1);
-		SetActive((Enum)UI.SPR_COUNT_2_ON, exceedCount > 2);
-		SetActive((Enum)UI.SPR_COUNT_3_ON, exceedCount > 3);
-		SetLabelText((Enum)UI.LBL_SELECT_NOW, (selectPageIndex + 1).ToString());
+		SetActive(UI.SPR_COUNT_0_ON, exceedCount > 0);
+		SetActive(UI.SPR_COUNT_1_ON, exceedCount > 1);
+		SetActive(UI.SPR_COUNT_2_ON, exceedCount > 2);
+		SetActive(UI.SPR_COUNT_3_ON, exceedCount > 3);
+		SetLabelText(UI.LBL_SELECT_NOW, (selectPageIndex + 1).ToString());
 		UpdateBonusDetail();
 		bool is_only_lapis = true;
 		int item_num = exceedData.exceed.Length;
 		SetGrid(UI.GRD_LAPIS, "SmithExceedItem", item_num, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
-			//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
 			if (exceedCount >= 4)
 			{
 				SetActive(t, is_visible: false);
@@ -162,16 +156,16 @@ public class SmithExceedDialog : GameSection
 						int haveingItemNum = MonoBehaviourSingleton<InventoryManager>.I.GetHaveingItemNum(exceedNeedItem.itemId);
 						int num = (int)exceedNeedItem.num[exceedCount];
 						ItemIcon.GetIconShowData(REWARD_TYPE.ITEM, exceedNeedItem.itemId, out int _, out ITEM_ICON_TYPE icon_type, out RARITY_TYPE? _, out ELEMENT_TYPE _, out ELEMENT_TYPE _, out EQUIPMENT_TYPE? _, out int _, out int _, out GET_TYPE _);
-						Transform val = FindCtrl(t, UI.OBJ_MATERIAL_ICON_ROOT);
+						Transform transform = FindCtrl(t, UI.OBJ_MATERIAL_ICON_ROOT);
 						bool flag2 = haveingItemNum >= num;
-						ItemIcon itemIcon = ItemIconMaterial.CreateMaterialIcon(icon_type, itemData, val, haveingItemNum, num, (!flag2) ? "NEED" : "NEXT", i);
+						ItemIcon itemIcon = ItemIconMaterial.CreateMaterialIcon(icon_type, itemData, transform, haveingItemNum, num, flag2 ? "NEXT" : "NEED", i);
 						SetMaterialInfo(itemIcon._transform, REWARD_TYPE.ITEM, exceedNeedItem.itemId, GetCtrl(UI.SCR_LAPIS_ROOT));
 						ItemIconMaterial itemIconMaterial = itemIcon as ItemIconMaterial;
 						if (itemIconMaterial != null)
 						{
 							itemIconMaterial.SetVisibleBG(is_visible: false);
 						}
-						FindCtrl(val, UI.SPR_EXCEED_BTN_BG).set_parent(itemIcon._transform);
+						FindCtrl(transform, UI.SPR_EXCEED_BTN_BG).parent = itemIcon._transform;
 						SetActive(t, UI.SPR_EXCEED_GRAYOUT, !flag2);
 						if (itemData.endDate != default(DateTime))
 						{
@@ -186,12 +180,12 @@ public class SmithExceedDialog : GameSection
 						{
 							if (itemIcon.GetComponent<UINoAuto>() == null)
 							{
-								itemIcon.get_gameObject().AddComponent<UINoAuto>();
+								itemIcon.gameObject.AddComponent<UINoAuto>();
 							}
 							if (itemIcon.GetComponent<UIButtonScale>() == null)
 							{
-								UIButtonScale uIButtonScale = itemIcon.get_gameObject().AddComponent<UIButtonScale>();
-								uIButtonScale.hover = Vector3.get_one();
+								UIButtonScale uIButtonScale = itemIcon.gameObject.AddComponent<UIButtonScale>();
+								uIButtonScale.hover = Vector3.one;
 								uIButtonScale.pressed = UIButtonEffect.buttonScale_pressed;
 								uIButtonScale.duration = UIButtonEffect.buttonScale_duration;
 							}
@@ -201,48 +195,32 @@ public class SmithExceedDialog : GameSection
 			}
 		});
 		bool flag = exceedCount < 4;
-		SetActive((Enum)UI.OBJ_VALID_EXCEED_ROOT, flag);
-		SetActive((Enum)UI.OBJ_INVALID_EXCEED_ROOT, !flag);
-		int id = (!is_only_lapis) ? 6 : 5;
+		SetActive(UI.OBJ_VALID_EXCEED_ROOT, flag);
+		SetActive(UI.OBJ_INVALID_EXCEED_ROOT, !flag);
+		int id = is_only_lapis ? 5 : 6;
 		string text = StringTable.Get(STRING_CATEGORY.ITEM_DETAIL, (uint)id);
-		SetLabelText((Enum)UI.LBL_USE_MATERIAL_NAME, text);
+		SetLabelText(UI.LBL_USE_MATERIAL_NAME, text);
 	}
 
 	protected void UpdateBonusDetail(bool changeNextColor = true)
 	{
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-		SetActive((Enum)UI.SPR_EXCEED_0_ON, exceedCount > 0);
-		SetActive((Enum)UI.SPR_EXCEED_1_ON, exceedCount > 1);
-		SetActive((Enum)UI.SPR_EXCEED_2_ON, exceedCount > 2);
-		SetActive((Enum)UI.SPR_EXCEED_3_ON, exceedCount > 3);
+		SetActive(UI.SPR_EXCEED_0_ON, exceedCount > 0);
+		SetActive(UI.SPR_EXCEED_1_ON, exceedCount > 1);
+		SetActive(UI.SPR_EXCEED_2_ON, exceedCount > 2);
+		SetActive(UI.SPR_EXCEED_3_ON, exceedCount > 3);
 		EquipItemTable.EquipItemData equipItemData = itemTable;
-		Color color = (!changeNextColor || exceedCount != 0) ? paramColor : Color.get_yellow();
-		SetLabelText((Enum)UI.LBL_EXCEED_0, equipItemData.GetExceedParamName(1));
-		SetColor((Enum)UI.LBL_EXCEED_0, color);
-		color = ((!changeNextColor || exceedCount != 1) ? paramColor : Color.get_yellow());
-		SetLabelText((Enum)UI.LBL_EXCEED_1, equipItemData.GetExceedParamName(2));
-		SetColor((Enum)UI.LBL_EXCEED_1, color);
-		color = ((!changeNextColor || exceedCount != 2) ? paramColor : Color.get_yellow());
-		SetLabelText((Enum)UI.LBL_EXCEED_2, equipItemData.GetExceedParamName(3));
-		SetColor((Enum)UI.LBL_EXCEED_2, color);
-		color = ((!changeNextColor || exceedCount != 3) ? paramColor : Color.get_yellow());
-		SetLabelText((Enum)UI.LBL_EXCEED_3, equipItemData.GetExceedParamName(4));
-		SetColor((Enum)UI.LBL_EXCEED_3, color);
+		Color color = (changeNextColor && exceedCount == 0) ? Color.yellow : paramColor;
+		SetLabelText(UI.LBL_EXCEED_0, equipItemData.GetExceedParamName(1));
+		SetColor(UI.LBL_EXCEED_0, color);
+		color = ((changeNextColor && exceedCount == 1) ? Color.yellow : paramColor);
+		SetLabelText(UI.LBL_EXCEED_1, equipItemData.GetExceedParamName(2));
+		SetColor(UI.LBL_EXCEED_1, color);
+		color = ((changeNextColor && exceedCount == 2) ? Color.yellow : paramColor);
+		SetLabelText(UI.LBL_EXCEED_2, equipItemData.GetExceedParamName(3));
+		SetColor(UI.LBL_EXCEED_2, color);
+		color = ((changeNextColor && exceedCount == 3) ? Color.yellow : paramColor);
+		SetLabelText(UI.LBL_EXCEED_3, equipItemData.GetExceedParamName(4));
+		SetColor(UI.LBL_EXCEED_3, color);
 	}
 
 	private void OnQuery_NEXT()
@@ -279,7 +257,7 @@ public class SmithExceedDialog : GameSection
 		uint id = 7u;
 		if (itemData.type == ITEM_TYPE.LAPIS)
 		{
-			id = ((!Singleton<EquipItemExceedTable>.I.IsFreeLapis(itemData.rarity, itemData.id, itemData.eventId)) ? 4u : 3u);
+			id = (Singleton<EquipItemExceedTable>.I.IsFreeLapis(itemData.rarity, itemData.id, itemData.eventId) ? 3u : 4u);
 			if (Singleton<LimitedEquipItemExceedTable>.I.IsLimitedLapis(itemData.id))
 			{
 				id = 8u;
@@ -334,9 +312,9 @@ public class SmithExceedDialog : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<SmithManager>.I.SendExceedEquipItem(selectEquipData.uniqueID, itemId, delegate(Error err, EquipItemInfo exceed_equip_item)
 		{
-			bool flag = err == Error.None;
-			GameSection.ResumeEvent(flag);
-			if (flag)
+			bool num = err == Error.None;
+			GameSection.ResumeEvent(num);
+			if (num)
 			{
 				result_data.itemData = exceed_equip_item;
 				GameSection.SetEventData(result_data);

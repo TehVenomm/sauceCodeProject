@@ -42,9 +42,9 @@ public class InGameUtility
 
 	public const float COEFFICIENT_DAMAGE = 4.5f;
 
-	public static readonly Vector3 VECTOR3_ZERO = Vector3.get_zero();
+	public static readonly Vector3 VECTOR3_ZERO = Vector3.zero;
 
-	public static readonly Quaternion QUATERNION_IDENTITY = Quaternion.get_identity();
+	public static readonly Quaternion QUATERNION_IDENTITY = Quaternion.identity;
 
 	public static AtkAttribute CalcPlayerATK(PlayerAtkCalcData calcData)
 	{

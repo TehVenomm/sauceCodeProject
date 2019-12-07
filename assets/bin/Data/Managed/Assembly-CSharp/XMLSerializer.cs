@@ -8,8 +8,7 @@ public static class XMLSerializer
 {
 	public static T Deserialize<T>(string message) where T : new()
 	{
-		XMLInStream stream = new XMLInStream(message);
-		return (T)DeserializeObject(stream, typeof(T));
+		return (T)DeserializeObject(new XMLInStream(message), typeof(T));
 	}
 
 	public static string Serialize<T>(T message)
@@ -23,14 +22,8 @@ public static class XMLSerializer
 
 	private static void SerializeObject(XMLOutStream stream, Type type, object message)
 	{
-		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
 		FieldInfo[] fields = type.GetFields();
-		FieldInfo[] array = fields;
-		foreach (FieldInfo fieldInfo in array)
+		foreach (FieldInfo fieldInfo in fields)
 		{
 			switch (fieldInfo.FieldType.ToString())
 			{
@@ -69,8 +62,7 @@ public static class XMLSerializer
 			else if (fieldInfo.FieldType.IsGenericType)
 			{
 				Type type2 = fieldInfo.FieldType.GetGenericArguments()[0];
-				Type typeFromHandle = typeof(List<>);
-				Type type3 = typeFromHandle.MakeGenericType(type2);
+				Type type3 = typeof(List<>).MakeGenericType(type2);
 				PropertyInfo property = type3.GetProperty("Count");
 				PropertyInfo property2 = type3.GetProperty("Item");
 				int num = (int)property.GetValue(fieldInfo.GetValue(message), new object[0]);
@@ -87,12 +79,12 @@ public static class XMLSerializer
 			}
 			else if (fieldInfo.FieldType.IsArray)
 			{
-				object[] array2 = ToObjectArray((IEnumerable)fieldInfo.GetValue(message));
-				Type type4 = Type.GetTypeArray(array2)[0];
+				object[] array = ToObjectArray((IEnumerable)fieldInfo.GetValue(message));
+				Type type4 = Type.GetTypeArray(array)[0];
 				stream.Start(fieldInfo.Name);
-				for (int k = 0; k < array2.Length; k++)
+				for (int k = 0; k < array.Length; k++)
 				{
-					object message2 = array2[k];
+					object message2 = array[k];
 					SerializeListElement(stream, type4, message2, k);
 				}
 				stream.End();
@@ -109,33 +101,15 @@ public static class XMLSerializer
 	private static object[] ToObjectArray(IEnumerable enumerableObject)
 	{
 		List<object> list = new List<object>();
-		IEnumerator enumerator = enumerableObject.GetEnumerator();
-		try
+		foreach (object item in enumerableObject)
 		{
-			while (enumerator.MoveNext())
-			{
-				object current = enumerator.Current;
-				list.Add(current);
-			}
-		}
-		finally
-		{
-			IDisposable disposable;
-			if ((disposable = (enumerator as IDisposable)) != null)
-			{
-				disposable.Dispose();
-			}
+			list.Add(item);
 		}
 		return list.ToArray();
 	}
 
 	private static void SerializeListElement(XMLOutStream stream, Type type, object message, int i)
 	{
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
 		switch (type.ToString())
 		{
 		case "System.String":
@@ -173,21 +147,15 @@ public static class XMLSerializer
 
 	private static object DeserializeObject(XMLInStream stream, Type type)
 	{
-		//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0223: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0256: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0289: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
 		object obj = Activator.CreateInstance(type);
 		FieldInfo[] fields = type.GetFields();
-		FieldInfo[] array = fields;
-		Type containedType;
-		MethodInfo addMethod;
-		object list;
 		Type containedType2;
 		MethodInfo addMethod2;
 		object list2;
-		foreach (FieldInfo fieldInfo in array)
+		Type containedType;
+		MethodInfo addMethod;
+		object list;
+		foreach (FieldInfo fieldInfo in fields)
 		{
 			switch (fieldInfo.FieldType.ToString())
 			{
@@ -264,38 +232,36 @@ public static class XMLSerializer
 				}
 				else if (fieldInfo.FieldType.IsGenericType)
 				{
-					containedType = fieldInfo.FieldType.GetGenericArguments()[0];
-					Type typeFromHandle = typeof(List<>);
-					Type type2 = typeFromHandle.MakeGenericType(containedType);
-					addMethod = type2.GetMethod("Add");
-					list = Activator.CreateInstance(type2);
+					containedType2 = fieldInfo.FieldType.GetGenericArguments()[0];
+					Type type2 = typeof(List<>).MakeGenericType(containedType2);
+					addMethod2 = type2.GetMethod("Add");
+					list2 = Activator.CreateInstance(type2);
 					stream.Start(fieldInfo.Name).List("item", delegate(XMLInStream stream2)
 					{
-						object obj3 = DeserializeListElement(stream2, containedType);
-						addMethod.Invoke(list, new object[1]
+						object obj3 = DeserializeListElement(stream2, containedType2);
+						addMethod2.Invoke(list2, new object[1]
 						{
 							obj3
 						});
 					}).End();
-					fieldInfo.SetValue(obj, list);
+					fieldInfo.SetValue(obj, list2);
 				}
 				else if (fieldInfo.FieldType.IsArray)
 				{
-					containedType2 = fieldInfo.FieldType.GetElementType();
-					Type typeFromHandle2 = typeof(List<>);
-					Type type3 = typeFromHandle2.MakeGenericType(containedType2);
-					addMethod2 = type3.GetMethod("Add");
+					containedType = fieldInfo.FieldType.GetElementType();
+					Type type3 = typeof(List<>).MakeGenericType(containedType);
+					addMethod = type3.GetMethod("Add");
 					MethodInfo method = type3.GetMethod("ToArray");
-					list2 = Activator.CreateInstance(type3);
+					list = Activator.CreateInstance(type3);
 					stream.Start(fieldInfo.Name).List("item", delegate(XMLInStream stream2)
 					{
-						object obj2 = DeserializeListElement(stream2, containedType2);
-						addMethod2.Invoke(list2, new object[1]
+						object obj2 = DeserializeListElement(stream2, containedType);
+						addMethod.Invoke(list, new object[1]
 						{
 							obj2
 						});
 					}).End();
-					object value11 = method.Invoke(list2, new object[0]);
+					object value11 = method.Invoke(list, new object[0]);
 					fieldInfo.SetValue(obj, value11);
 				}
 				else
@@ -312,40 +278,53 @@ public static class XMLSerializer
 
 	private static object DeserializeListElement(XMLInStream stream, Type type)
 	{
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
 		switch (type.ToString())
 		{
 		case "System.String":
+		{
 			stream.Content(out string value9);
 			return value9;
+		}
 		case "System.Single":
+		{
 			stream.Content(out float value8);
 			return value8;
+		}
 		case "System.Int32":
+		{
 			stream.Content(out int value7);
 			return value7;
+		}
 		case "System.Boolean":
+		{
 			stream.Content(out bool value6);
 			return value6;
+		}
 		case "UnityEngine.Vector3":
+		{
 			stream.Content(out Vector3 value5);
 			return value5;
+		}
 		case "UnityEngine.Quaternion":
+		{
 			stream.Content(out Quaternion value4);
 			return value4;
+		}
 		case "UnityEngine.Color":
+		{
 			stream.Content(out Color value3);
 			return value3;
+		}
 		case "UnityEngine.Rect":
+		{
 			stream.Content(out Rect value2);
 			return value2;
+		}
 		case "UnityEngine.Vector2":
+		{
 			stream.Content(out Vector2 value);
 			return value;
+		}
 		default:
 			return DeserializeObject(stream, type);
 		}

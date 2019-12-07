@@ -25,13 +25,13 @@ public class EquipSetInfo
 
 	public EquipSetInfo(EquipSet recv_data)
 	{
-		item[0] = (string.IsNullOrEmpty(recv_data.weapon_0.uniqId) ? null : new EquipItemInfo(recv_data.weapon_0));
-		item[1] = (string.IsNullOrEmpty(recv_data.weapon_1.uniqId) ? null : new EquipItemInfo(recv_data.weapon_1));
-		item[2] = (string.IsNullOrEmpty(recv_data.weapon_2.uniqId) ? null : new EquipItemInfo(recv_data.weapon_2));
-		item[3] = (string.IsNullOrEmpty(recv_data.armor.uniqId) ? null : new EquipItemInfo(recv_data.armor));
-		item[4] = (string.IsNullOrEmpty(recv_data.helm.uniqId) ? null : new EquipItemInfo(recv_data.helm));
-		item[5] = (string.IsNullOrEmpty(recv_data.arm.uniqId) ? null : new EquipItemInfo(recv_data.arm));
-		item[6] = (string.IsNullOrEmpty(recv_data.leg.uniqId) ? null : new EquipItemInfo(recv_data.leg));
+		item[0] = ((!string.IsNullOrEmpty(recv_data.weapon_0.uniqId)) ? new EquipItemInfo(recv_data.weapon_0) : null);
+		item[1] = ((!string.IsNullOrEmpty(recv_data.weapon_1.uniqId)) ? new EquipItemInfo(recv_data.weapon_1) : null);
+		item[2] = ((!string.IsNullOrEmpty(recv_data.weapon_2.uniqId)) ? new EquipItemInfo(recv_data.weapon_2) : null);
+		item[3] = ((!string.IsNullOrEmpty(recv_data.armor.uniqId)) ? new EquipItemInfo(recv_data.armor) : null);
+		item[4] = ((!string.IsNullOrEmpty(recv_data.helm.uniqId)) ? new EquipItemInfo(recv_data.helm) : null);
+		item[5] = ((!string.IsNullOrEmpty(recv_data.arm.uniqId)) ? new EquipItemInfo(recv_data.arm) : null);
+		item[6] = ((!string.IsNullOrEmpty(recv_data.leg.uniqId)) ? new EquipItemInfo(recv_data.leg) : null);
 		name = recv_data.setName;
 		showHelm = recv_data.showHelm;
 		order = 0;
@@ -40,13 +40,13 @@ public class EquipSetInfo
 
 	public EquipSetInfo(EquipSetSimple recv_data)
 	{
-		item[0] = (string.IsNullOrEmpty(recv_data.weapon_0) ? null : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(recv_data.weapon_0)));
-		item[1] = (string.IsNullOrEmpty(recv_data.weapon_1) ? null : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(recv_data.weapon_1)));
-		item[2] = (string.IsNullOrEmpty(recv_data.weapon_2) ? null : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(recv_data.weapon_2)));
-		item[3] = (string.IsNullOrEmpty(recv_data.armor) ? null : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(recv_data.armor)));
-		item[4] = (string.IsNullOrEmpty(recv_data.helm) ? null : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(recv_data.helm)));
-		item[5] = (string.IsNullOrEmpty(recv_data.arm) ? null : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(recv_data.arm)));
-		item[6] = (string.IsNullOrEmpty(recv_data.leg) ? null : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(recv_data.leg)));
+		item[0] = ((!string.IsNullOrEmpty(recv_data.weapon_0)) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(recv_data.weapon_0)) : null);
+		item[1] = ((!string.IsNullOrEmpty(recv_data.weapon_1)) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(recv_data.weapon_1)) : null);
+		item[2] = ((!string.IsNullOrEmpty(recv_data.weapon_2)) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(recv_data.weapon_2)) : null);
+		item[3] = ((!string.IsNullOrEmpty(recv_data.armor)) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(recv_data.armor)) : null);
+		item[4] = ((!string.IsNullOrEmpty(recv_data.helm)) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(recv_data.helm)) : null);
+		item[5] = ((!string.IsNullOrEmpty(recv_data.arm)) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(recv_data.arm)) : null);
+		item[6] = ((!string.IsNullOrEmpty(recv_data.leg)) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(recv_data.leg)) : null);
 		name = recv_data.setName;
 		showHelm = recv_data.showHelm;
 		order = recv_data.order;
@@ -136,8 +136,7 @@ public class EquipSetInfo
 		{
 			if (equipItemInfo != null)
 			{
-				ItemStatus[] equipTypeSkillParam = equipItemInfo.GetEquipTypeSkillParam();
-				ItemStatus param = equipTypeSkillParam[equipmentTypeIndex + 1];
+				ItemStatus param = equipItemInfo.GetEquipTypeSkillParam()[equipmentTypeIndex + 1];
 				itemStatus.Add(param);
 			}
 		}
@@ -151,7 +150,7 @@ public class EquipSetInfo
 
 	public CharaInfo.EquipItem ConvertSelfEquipSetItem(int index, int setNo)
 	{
-		if (index >= item.Length || object.ReferenceEquals(item[index], null))
+		if (index >= item.Length || item[index] == null)
 		{
 			return null;
 		}
@@ -175,7 +174,7 @@ public class EquipSetInfo
 
 	public CharaInfo.EquipItem ConvertSelfUniqueEquipSetItem(int index, int setNo)
 	{
-		if (index >= item.Length || object.ReferenceEquals(item[index], null))
+		if (index >= item.Length || item[index] == null)
 		{
 			return null;
 		}
@@ -203,10 +202,10 @@ public class EquipSetInfo
 		int i = 0;
 		for (int num = item.Length; i < num; i++)
 		{
-			CharaInfo.EquipItem objA = ConvertSelfEquipSetItem(i, setNo);
-			if (!object.ReferenceEquals(objA, null) || isAddNull)
+			CharaInfo.EquipItem equipItem = ConvertSelfEquipSetItem(i, setNo);
+			if ((equipItem != null) | isAddNull)
 			{
-				list.Add(objA);
+				list.Add(equipItem);
 			}
 		}
 		return list;
@@ -218,10 +217,10 @@ public class EquipSetInfo
 		int i = 0;
 		for (int num = item.Length; i < num; i++)
 		{
-			CharaInfo.EquipItem objA = ConvertSelfUniqueEquipSetItem(i, setNo);
-			if (!object.ReferenceEquals(objA, null) || isAddNull)
+			CharaInfo.EquipItem equipItem = ConvertSelfUniqueEquipSetItem(i, setNo);
+			if ((equipItem != null) | isAddNull)
 			{
-				list.Add(objA);
+				list.Add(equipItem);
 			}
 		}
 		return list;

@@ -17,12 +17,12 @@ public class UILocalize : MonoBehaviour
 			{
 				return;
 			}
-			UIWidget component = this.GetComponent<UIWidget>();
+			UIWidget component = GetComponent<UIWidget>();
 			UILabel uILabel = component as UILabel;
 			UISprite uISprite = component as UISprite;
 			if (uILabel != null)
 			{
-				UIInput uIInput = NGUITools.FindInParents<UIInput>(uILabel.get_gameObject());
+				UIInput uIInput = NGUITools.FindInParents<UIInput>(uILabel.gameObject);
 				if (uIInput != null && uIInput.label == uILabel)
 				{
 					uIInput.defaultText = value;
@@ -34,8 +34,8 @@ public class UILocalize : MonoBehaviour
 			}
 			else if (uISprite != null)
 			{
-				UIButton uIButton = NGUITools.FindInParents<UIButton>(uISprite.get_gameObject());
-				if (uIButton != null && uIButton.tweenTarget == uISprite.get_gameObject())
+				UIButton uIButton = NGUITools.FindInParents<UIButton>(uISprite.gameObject);
+				if (uIButton != null && uIButton.tweenTarget == uISprite.gameObject)
 				{
 					uIButton.normalSprite = value;
 				}
@@ -43,11 +43,6 @@ public class UILocalize : MonoBehaviour
 				uISprite.MakePixelPerfect();
 			}
 		}
-	}
-
-	public UILocalize()
-		: this()
-	{
 	}
 
 	private void OnEnable()
@@ -72,7 +67,7 @@ public class UILocalize : MonoBehaviour
 		}
 		if (string.IsNullOrEmpty(key))
 		{
-			UILabel component = this.GetComponent<UILabel>();
+			UILabel component = GetComponent<UILabel>();
 			if (component != null)
 			{
 				key = component.text;

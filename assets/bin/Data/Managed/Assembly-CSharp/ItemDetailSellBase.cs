@@ -1,4 +1,4 @@
-using System;
+using UnityEngine;
 
 public class ItemDetailSellBase : GameSection
 {
@@ -37,45 +37,58 @@ public class ItemDetailSellBase : GameSection
 	{
 		bool uiUpdateInstant = base.uiUpdateInstant;
 		base.uiUpdateInstant = true;
-		SetButtonEnabled((Enum)UI.BTN_SALE_TP, TradingPostManager.IsItemValid(data.GetTableID()));
+		bool flag = TradingPostManager.IsItemValid(data.GetTableID());
+		SetActive(UI.BTN_SALE_TP, flag);
 		base.uiUpdateInstant = uiUpdateInstant;
 		string key = "TEXT_SELL";
-		SetLabelText((Enum)UI.LBL_CAPTION, base.sectionData.GetText(key));
-		SetLabelText((Enum)UI.STR_TITLE_U, base.sectionData.GetText(key));
-		SetLabelText((Enum)UI.STR_TITLE_D, base.sectionData.GetText(key));
+		SetLabelText(UI.LBL_CAPTION, base.sectionData.GetText(key));
+		SetLabelText(UI.STR_TITLE_U, base.sectionData.GetText(key));
+		SetLabelText(UI.STR_TITLE_D, base.sectionData.GetText(key));
 		string key2 = "TEXT_SELL_NUM";
-		SetLabelText((Enum)UI.STR_SALE_NUM, base.sectionData.GetText(key2));
-		SetProgressInt((Enum)UI.SLD_SALE_NUM, 1, 1, data.GetNum(), (EventDelegate.Callback)OnChagenSlider);
-		SetLabelText((Enum)UI.LBL_ITEM_NUM, data.GetNum().ToString());
-		SetLabelText((Enum)UI.LBL_MONEY, string.Format("{0, 8:#,0}", MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money));
+		SetLabelText(UI.STR_SALE_NUM, base.sectionData.GetText(key2));
+		SetProgressInt(UI.SLD_SALE_NUM, 1, 1, data.GetNum(), OnChagenSlider);
+		SetLabelText(UI.LBL_ITEM_NUM, data.GetNum().ToString());
+		SetLabelText(UI.LBL_MONEY, string.Format("{0, 8:#,0}", MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money));
 		string key3 = "STR_SELL_GOLD";
-		SetLabelText((Enum)UI.LBL_SELL_GOLD_U, base.sectionData.GetText(key3));
-		SetLabelText((Enum)UI.LBL_SELL_GOLD_D, base.sectionData.GetText(key3));
+		SetLabelText(UI.LBL_SELL_GOLD_U, base.sectionData.GetText(key3));
+		SetLabelText(UI.LBL_SELL_GOLD_D, base.sectionData.GetText(key3));
 		string key4 = "STR_SELL_TP";
-		SetLabelText((Enum)UI.LBL_SELL_TRADING_POST_U, base.sectionData.GetText(key4));
-		SetLabelText((Enum)UI.LBL_SELL_TRADING_POST_D, base.sectionData.GetText(key4));
+		SetLabelText(UI.LBL_SELL_TRADING_POST_U, base.sectionData.GetText(key4));
+		SetLabelText(UI.LBL_SELL_TRADING_POST_D, base.sectionData.GetText(key4));
+		if (flag)
+		{
+			UISprite component = GetCtrl(UI.SPR_SALE_FRAME).gameObject.GetComponent<UISprite>();
+			if (component != null)
+			{
+				component.height += GetCtrl(UI.BTN_SALE_TP).gameObject.GetComponent<UISprite>().height;
+			}
+			else
+			{
+				Debug.LogError("Sprite frame is null");
+			}
+		}
 	}
 
 	private void OnChagenSlider()
 	{
-		int progressInt = GetProgressInt((Enum)UI.SLD_SALE_NUM);
+		int progressInt = GetProgressInt(UI.SLD_SALE_NUM);
 		int num = data.GetSalePrice() * progressInt;
-		SetLabelText((Enum)UI.LBL_SALE_NUM, string.Format("{0,8:#,0}", progressInt));
-		SetLabelText((Enum)UI.LBL_SALE_PRICE, string.Format("{0,8:#,0}", num));
+		SetLabelText(UI.LBL_SALE_NUM, string.Format("{0,8:#,0}", progressInt));
+		SetLabelText(UI.LBL_SALE_PRICE, string.Format("{0,8:#,0}", num));
 	}
 
 	private void OnQuery_SALE_NUM_MINUS()
 	{
-		SetProgressInt((Enum)UI.SLD_SALE_NUM, GetProgressInt((Enum)UI.SLD_SALE_NUM) - 1, -1, -1, (EventDelegate.Callback)null);
+		SetProgressInt(UI.SLD_SALE_NUM, GetProgressInt(UI.SLD_SALE_NUM) - 1);
 	}
 
 	private void OnQuery_SALE_NUM_PLUS()
 	{
-		SetProgressInt((Enum)UI.SLD_SALE_NUM, GetProgressInt((Enum)UI.SLD_SALE_NUM) + 1, -1, -1, (EventDelegate.Callback)null);
+		SetProgressInt(UI.SLD_SALE_NUM, GetProgressInt(UI.SLD_SALE_NUM) + 1);
 	}
 
 	protected int GetSliderNum()
 	{
-		return GetProgressInt((Enum)UI.SLD_SALE_NUM);
+		return GetProgressInt(UI.SLD_SALE_NUM);
 	}
 }

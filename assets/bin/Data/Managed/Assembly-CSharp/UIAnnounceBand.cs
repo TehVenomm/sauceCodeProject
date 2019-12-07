@@ -31,7 +31,17 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 
 	private List<string> announceQueue = new List<string>();
 
-	private bool isStartable => !isDone && !isWait;
+	private bool isStartable
+	{
+		get
+		{
+			if (!isDone)
+			{
+				return !isWait;
+			}
+			return false;
+		}
+	}
 
 	protected override void Awake()
 	{
@@ -44,16 +54,16 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 		int i = 0;
 		for (int num = animStart.Length; i < num; i++)
 		{
-			animStart[i].set_enabled(false);
+			animStart[i].enabled = false;
 			animStart[i].Sample(1f, isFinished: true);
 		}
 		int j = 0;
 		for (int num2 = animEnd.Length; j < num2; j++)
 		{
-			animEnd[j].set_enabled(false);
+			animEnd[j].enabled = false;
 		}
-		this.get_gameObject().SetActive(false);
-		animRoot.SetActive(false);
+		base.gameObject.SetActive(value: false);
+		animRoot.SetActive(value: false);
 	}
 
 	protected override void OnDisable()
@@ -78,21 +88,21 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 
 	public void SetAnnounce(string messeage, string conditionTitle)
 	{
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		announceQueue.Add(messeage);
 		announceQueue.Add(conditionTitle);
 	}
 
 	private bool PlayAnnounce()
 	{
-		if (!this.get_gameObject().get_activeInHierarchy())
+		if (!base.gameObject.activeInHierarchy)
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 			return false;
 		}
 		if (announceQueue.Count > 0)
 		{
-			animRoot.SetActive(true);
+			animRoot.SetActive(value: true);
 			label.text = announceQueue[0];
 			label.supportEncoding = true;
 			announceQueue.RemoveAt(0);
@@ -100,7 +110,7 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 			announceQueue.RemoveAt(0);
 			isDone = true;
 			panelChange.UnLock();
-			this.StartCoroutine(Direction());
+			StartCoroutine(Direction());
 			return true;
 		}
 		return false;
@@ -110,8 +120,8 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 	{
 		if (!PlayAnnounce())
 		{
-			animRoot.SetActive(false);
-			this.get_gameObject().SetActive(false);
+			animRoot.SetActive(value: false);
+			base.gameObject.SetActive(value: false);
 			panelChange.Lock();
 			isDone = false;
 		}
@@ -131,23 +141,24 @@ public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 			animStart[n].PlayForward();
 		}
 		int l = 0;
-		for (int k = animStart.Length; l < k; l++)
+		int k;
+		for (k = animStart.Length; l < k; l++)
 		{
-			while (animStart[l].get_enabled())
+			while (animStart[l].enabled)
 			{
 				yield return null;
 			}
 		}
-		yield return (object)new WaitForSeconds(dispTime);
+		yield return new WaitForSeconds(dispTime);
 		int num3 = 0;
 		for (int num4 = animEnd.Length; num3 < num4; num3++)
 		{
 			animEnd[num3].PlayForward();
 		}
-		int j = 0;
-		for (int i = animEnd.Length; j < i; j++)
+		k = 0;
+		for (l = animEnd.Length; k < l; k++)
 		{
-			while (animEnd[j].get_enabled())
+			while (animEnd[k].enabled)
 			{
 				yield return null;
 			}

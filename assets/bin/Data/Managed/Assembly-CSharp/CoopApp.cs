@@ -2,24 +2,21 @@ using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class CoopApp : MonoBehaviourSingleton<CoopApp>
 {
 	protected override void Awake()
 	{
 		base.Awake();
-		this.get_gameObject().AddComponent<CoopManager>();
-		this.get_gameObject().AddComponent<KtbWebSocket>();
-		this.get_gameObject().AddComponent<CoopNetworkManager>();
-		this.get_gameObject().AddComponent<CoopOfflineManager>();
+		base.gameObject.AddComponent<CoopManager>();
+		base.gameObject.AddComponent<KtbWebSocket>();
+		base.gameObject.AddComponent<CoopNetworkManager>();
+		base.gameObject.AddComponent<CoopOfflineManager>();
 	}
 
 	private static void Logd(string str, params object[] objs)
 	{
-		if (!Log.enabled)
-		{
-		}
+		_ = Log.enabled;
 	}
 
 	public static void EnterQuestOnly(Action<bool> call_back = null)
@@ -464,8 +461,7 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 		ExploreStatus exploreStatus = MonoBehaviourSingleton<QuestManager>.I.GetExploreStatus();
 		if (MonoBehaviourSingleton<InGameManager>.I.IsRush())
 		{
-			PartyModel.Party partyData = MonoBehaviourSingleton<PartyManager>.I.partyData;
-			questId = partyData.quest.questId;
+			questId = MonoBehaviourSingleton<PartyManager>.I.partyData.quest.questId;
 		}
 		MonoBehaviourSingleton<QuestManager>.I.SendQuestStart(questId, eSetNo, currentQuestIsFreeJoin, delegate(bool is_start)
 		{
@@ -498,8 +494,7 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 		}
 		if (PartyManager.IsValidInParty())
 		{
-			PartyModel.Party partyData2 = MonoBehaviourSingleton<PartyManager>.I.partyData;
-			PartyModel.ExploreInfo explore = partyData2.quest.explore;
+			PartyModel.ExploreInfo explore = MonoBehaviourSingleton<PartyManager>.I.partyData.quest.explore;
 			if (explore != null)
 			{
 				MonoBehaviourSingleton<QuestManager>.I.SetExploreInfo(explore);
@@ -604,7 +599,7 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 
 	public static void QuestRetire(bool is_timeout, Action<bool> call_back = null)
 	{
-		string empty = string.Empty;
+		string roomId = "";
 		List<int> memIDs = null;
 		if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
 		{
@@ -615,7 +610,7 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 		{
 			logs = MonoBehaviourSingleton<CoopManager>.I.coopStage.battleUserLog.list;
 		}
-		MonoBehaviourSingleton<QuestManager>.I.SendQuestRetire(is_timeout, memIDs, empty, logs, call_back);
+		MonoBehaviourSingleton<QuestManager>.I.SendQuestRetire(is_timeout, memIDs, roomId, logs, call_back);
 	}
 
 	public static void ArenaRetire(bool isTimeout, Action<bool> callBack = null)
@@ -634,7 +629,7 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 		{
 			requestSendForm.enemyHp = MonoBehaviourSingleton<InGameRecorder>.I.GetTotalEnemyHP();
 		}
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && Object.op_Implicit(MonoBehaviourSingleton<StageObjectManager>.I.self))
+		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (bool)MonoBehaviourSingleton<StageObjectManager>.I.self)
 		{
 			requestSendForm.actioncount = MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.GetTaskCount();
 			MonoBehaviourSingleton<StageObjectManager>.I.self.taskChecker.Clear();
@@ -645,13 +640,13 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 	public void Leave(Action<bool> call_back = null, bool toHome = false, bool fieldRetire = false)
 	{
 		Logd("Leave. start");
-		this.StartCoroutine(LeaveCoroutine(call_back, toHome, fieldRetire));
+		StartCoroutine(LeaveCoroutine(call_back, toHome, fieldRetire));
 	}
 
 	public void LeaveWithParty(Action<bool> call_back = null, bool toHome = false, bool fieldRetire = false)
 	{
 		Logd("LeaveWithParty. start");
-		this.StartCoroutine(LeaveCoroutine(call_back, toHome, fieldRetire, isParty: true));
+		StartCoroutine(LeaveCoroutine(call_back, toHome, fieldRetire, isParty: true));
 	}
 
 	private IEnumerator LeaveCoroutine(Action<bool> call_back = null, bool toHome = false, bool fieldRetire = false, bool isParty = false)
@@ -659,43 +654,43 @@ public class CoopApp : MonoBehaviourSingleton<CoopApp>
 		bool is_success = true;
 		if (FieldManager.IsValidInField())
 		{
-			bool is_leaved = false;
-			bool wait = true;
+			bool is_leaved2 = false;
+			bool wait3 = true;
 			MonoBehaviourSingleton<FieldManager>.I.SendLeave(toHome, fieldRetire, delegate(bool is_leave)
 			{
-				wait = false;
-				is_leaved = is_leave;
+				wait3 = false;
+				is_leaved2 = is_leave;
 			});
-			while (wait)
+			while (wait3)
 			{
 				yield return null;
 			}
-			Logd("LeaveCoroutine. Field leaved:{0}", is_leaved);
-			is_success = is_leaved;
+			Logd("LeaveCoroutine. Field leaved:{0}", is_leaved2);
+			is_success = is_leaved2;
 		}
 		if (isParty && PartyManager.IsValidInParty())
 		{
-			bool is_leaved2 = false;
+			bool is_leaved = false;
 			bool wait2 = true;
 			MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate(bool is_leave)
 			{
 				wait2 = false;
-				is_leaved2 = is_leave;
+				is_leaved = is_leave;
 			});
 			while (wait2)
 			{
 				yield return null;
 			}
-			Logd("LeaveCoroutine. Party leaved:{0}", is_leaved2);
+			Logd("LeaveCoroutine. Party leaved:{0}", is_leaved);
 		}
 		if (MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected())
 		{
-			bool wait3 = true;
+			bool wait = true;
 			MonoBehaviourSingleton<CoopNetworkManager>.I.Close(1000, "Bye!", delegate
 			{
-				wait3 = false;
+				wait = false;
 			});
-			while (wait3)
+			while (wait)
 			{
 				yield return null;
 			}

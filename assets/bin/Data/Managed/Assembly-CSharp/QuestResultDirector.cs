@@ -23,15 +23,8 @@ public class QuestResultDirector : MonoBehaviour, AnimationEventProxy.IEvent
 		private set;
 	}
 
-	public QuestResultDirector()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Expected O, but got Unknown
 		if (QuestManager.IsValidTrial())
 		{
 			targetAnim = cameraAnimTrial;
@@ -44,30 +37,25 @@ public class QuestResultDirector : MonoBehaviour, AnimationEventProxy.IEvent
 		int i = 0;
 		for (int num = playerAnimTimings.Length; i < num; i++)
 		{
-			AnimationEvent val = new AnimationEvent();
-			val.set_functionName("OnEventInt");
-			val.set_intParameter(i);
-			val.set_time(playerAnimTimings[i]);
-			targetAnim.get_clip().AddEvent(val);
+			AnimationEvent animationEvent = new AnimationEvent();
+			animationEvent.functionName = "OnEventInt";
+			animationEvent.intParameter = i;
+			animationEvent.time = playerAnimTimings[i];
+			targetAnim.clip.AddEvent(animationEvent);
 		}
 	}
 
 	private void Update()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 		if (!(targetAnim == null))
 		{
-			Transform transform = targetAnim.get_transform();
-			MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_position(transform.get_position());
-			MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_rotation(transform.get_rotation());
-			Vector3 localScale = transform.get_localScale();
-			float x = localScale.x;
+			Transform transform = targetAnim.transform;
+			MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.position = transform.position;
+			MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.rotation = transform.rotation;
+			float x = transform.localScale.x;
 			if (x > 0f)
 			{
-				MonoBehaviourSingleton<AppMain>.I.mainCamera.set_fieldOfView(Utility.HorizontalToVerticalFOV(x));
+				MonoBehaviourSingleton<AppMain>.I.mainCamera.fieldOfView = Utility.HorizontalToVerticalFOV(x);
 			}
 		}
 	}
@@ -93,23 +81,23 @@ public class QuestResultDirector : MonoBehaviour, AnimationEventProxy.IEvent
 		if (!skip)
 		{
 			skip = true;
-			this.StartCoroutine(DoSkip());
+			StartCoroutine(DoSkip());
 		}
 	}
 
 	private IEnumerator DoSkip()
 	{
 		yield return MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.WHITE);
-		Time.set_timeScale(100f);
+		Time.timeScale = 100f;
 	}
 
 	private void OnDestroy()
 	{
 		if (targetAnim != null && skip)
 		{
-			targetAnim.get_clip().SampleAnimation(targetAnim.get_gameObject(), targetAnim.get_clip().get_length());
+			targetAnim.clip.SampleAnimation(targetAnim.gameObject, targetAnim.clip.length);
 			Update();
-			Time.set_timeScale(1f);
+			Time.timeScale = 1f;
 		}
 	}
 }

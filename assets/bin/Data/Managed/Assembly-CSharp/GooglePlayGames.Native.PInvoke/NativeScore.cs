@@ -46,8 +46,7 @@ namespace GooglePlayGames.Native.PInvoke
 			{
 				num = 0uL;
 			}
-			DateTime date = dateTime.AddMilliseconds(num);
-			return new PlayGamesScore(date, leaderboardId, GetRank(), selfPlayerId, GetValue(), GetMetadata());
+			return new PlayGamesScore(dateTime.AddMilliseconds(num), leaderboardId, GetRank(), selfPlayerId, GetValue(), GetMetadata());
 		}
 
 		internal static NativeScore FromPointer(IntPtr pointer)

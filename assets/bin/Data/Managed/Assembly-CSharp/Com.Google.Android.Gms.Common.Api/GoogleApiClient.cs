@@ -19,7 +19,7 @@ namespace Com.Google.Android.Gms.Common.Api
 
 		public object getContext()
 		{
-			return InvokeCall<object>("getContext", "()Landroid/content/Context;", new object[0]);
+			return InvokeCall<object>("getContext", "()Landroid/content/Context;", Array.Empty<object>());
 		}
 
 		public void connect()
@@ -48,12 +48,12 @@ namespace Com.Google.Android.Gms.Common.Api
 
 		public ConnectionResult blockingConnect()
 		{
-			return InvokeCall<ConnectionResult>("blockingConnect", "()Lcom/google/android/gms/common/ConnectionResult;", new object[0]);
+			return InvokeCall<ConnectionResult>("blockingConnect", "()Lcom/google/android/gms/common/ConnectionResult;", Array.Empty<object>());
 		}
 
 		public PendingResult<Status> clearDefaultAccountAndReconnect()
 		{
-			return InvokeCall<PendingResult<Status>>("clearDefaultAccountAndReconnect", "()Lcom/google/android/gms/common/api/PendingResult;", new object[0]);
+			return InvokeCall<PendingResult<Status>>("clearDefaultAccountAndReconnect", "()Lcom/google/android/gms/common/api/PendingResult;", Array.Empty<object>());
 		}
 
 		public ConnectionResult getConnectionResult(object arg_object_1)
@@ -66,12 +66,12 @@ namespace Com.Google.Android.Gms.Common.Api
 
 		public int getSessionId()
 		{
-			return InvokeCall<int>("getSessionId", "()I", new object[0]);
+			return InvokeCall<int>("getSessionId", "()I", Array.Empty<object>());
 		}
 
 		public bool isConnecting()
 		{
-			return InvokeCall<bool>("isConnecting", "()Z", new object[0]);
+			return InvokeCall<bool>("isConnecting", "()Z", Array.Empty<object>());
 		}
 
 		public bool isConnectionCallbacksRegistered(object arg_object_1)
@@ -130,12 +130,12 @@ namespace Com.Google.Android.Gms.Common.Api
 
 		public object getLooper()
 		{
-			return InvokeCall<object>("getLooper", "()Landroid/os/Looper;", new object[0]);
+			return InvokeCall<object>("getLooper", "()Landroid/os/Looper;", Array.Empty<object>());
 		}
 
 		public bool isConnected()
 		{
-			return InvokeCall<bool>("isConnected", "()Z", new object[0]);
+			return InvokeCall<bool>("isConnected", "()Z", Array.Empty<object>());
 		}
 	}
 }

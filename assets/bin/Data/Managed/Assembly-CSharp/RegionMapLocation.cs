@@ -49,9 +49,4 @@ public class RegionMapLocation : MonoBehaviour
 			_icon = value;
 		}
 	}
-
-	public RegionMapLocation()
-		: this()
-	{
-	}
 }

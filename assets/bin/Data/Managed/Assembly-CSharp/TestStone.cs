@@ -14,11 +14,10 @@ public class TestStone : BreakObject
 	protected override void Initialize()
 	{
 		base.Initialize();
-		Renderer componentInChildren = this.get_gameObject().GetComponentInChildren<MeshRenderer>();
+		Renderer componentInChildren = base.gameObject.GetComponentInChildren<MeshRenderer>();
 		if (componentInChildren != null)
 		{
-			SphereCollider val = componentInChildren.get_gameObject().AddComponent<SphereCollider>();
-			val.set_radius(2.2f);
+			componentInChildren.gameObject.AddComponent<SphereCollider>().radius = 2.2f;
 		}
 	}
 }

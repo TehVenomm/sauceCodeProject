@@ -8,8 +8,7 @@ public class Goal_ActSkill : Goal
 	protected override void Activate(Brain brain)
 	{
 		SetStatus(STATUS.ACTIVE);
-		AutoBrain autoBrain = brain as AutoBrain;
-		autoBrain.skillCtr.IsAct = true;
+		(brain as AutoBrain).skillCtr.IsAct = true;
 	}
 
 	protected override STATUS Process(Brain brain)
@@ -19,8 +18,7 @@ public class Goal_ActSkill : Goal
 
 	protected override void Terminate(Brain brain)
 	{
-		AutoBrain autoBrain = brain as AutoBrain;
-		autoBrain.skillCtr.IsAct = false;
+		(brain as AutoBrain).skillCtr.IsAct = false;
 	}
 
 	public override void HandleEvent(Brain brain, BRAIN_EVENT ev, object param)

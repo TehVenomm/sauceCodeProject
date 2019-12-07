@@ -13,11 +13,6 @@ public class PortalUnlockEvent : MonoBehaviour
 
 	private const float MOVE_TIME = 1.2f;
 
-	public PortalUnlockEvent()
-		: this()
-	{
-	}
-
 	public void AddPortal(PortalObject obj)
 	{
 		unlockedPortalList.Add(obj);
@@ -41,50 +36,51 @@ public class PortalUnlockEvent : MonoBehaviour
 		{
 			MonoBehaviourSingleton<StageObjectManager>.I.self.hitOffFlag |= StageObject.HIT_OFF_FLAG.UNLOCK_EVENT;
 		}
-		MonoBehaviourSingleton<InGameCameraManager>.I.set_enabled(false);
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject loadedEffect = loadQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_warp_lockbreak_01");
-		if (loadQueue.IsLoading())
+		MonoBehaviourSingleton<InGameCameraManager>.I.enabled = false;
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject loadedEffect = loadingQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_warp_lockbreak_01");
+		if (loadingQueue.IsLoading())
 		{
-			yield return loadQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
-		Object effectPrefab = loadedEffect.loadedObject;
+		UnityEngine.Object effectPrefab = loadedEffect.loadedObject;
 		Transform mainCameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
-		Vector3 cameraOriginalPostion = mainCameraTransform.get_position();
+		Vector3 cameraOriginalPostion = mainCameraTransform.position;
 		Vector3 cameraOffset = cameraOriginalPostion - MonoBehaviourSingleton<StageObjectManager>.I.self._position;
+		int i = 0;
 		float timer;
 		Vector3 cameraStartPos;
 		Vector3 targetCameraPos;
-		for (int i = 0; i < unlockedPortalList.Count; i++)
+		while (i < unlockedPortalList.Count)
 		{
 			timer = 0f;
-			cameraStartPos = mainCameraTransform.get_position();
-			targetCameraPos = unlockedPortalList[i]._transform.get_position() + cameraOffset;
+			cameraStartPos = mainCameraTransform.position;
+			targetCameraPos = unlockedPortalList[i]._transform.position + cameraOffset;
 			while (timer < 1.2f)
 			{
-				Vector3 newCameraPos = Vector3.Lerp(cameraStartPos, targetCameraPos, timer / 1.2f);
-				mainCameraTransform.set_position(newCameraPos);
-				timer += Time.get_deltaTime();
+				Vector3 vector2 = mainCameraTransform.position = Vector3.Lerp(cameraStartPos, targetCameraPos, timer / 1.2f);
+				timer += Time.deltaTime;
 				yield return null;
 			}
 			ResourceUtility.Realizes(effectPrefab, unlockedPortalList[i]._transform);
 			SoundManager.PlayOneShotUISE(40000159);
-			yield return (object)new WaitForSeconds(1.7f);
+			yield return new WaitForSeconds(1.7f);
 			unlockedPortalList[i].SetAndCreateView(viewTypes[i]);
-			yield return (object)new WaitForSeconds(0.5f);
+			yield return new WaitForSeconds(0.5f);
+			int num = i + 1;
+			i = num;
 		}
 		timer = 0f;
-		cameraStartPos = mainCameraTransform.get_position();
+		cameraStartPos = mainCameraTransform.position;
 		targetCameraPos = cameraOriginalPostion;
 		while (timer < 1.2f)
 		{
-			Vector3 newCameraPos2 = Vector3.Lerp(cameraStartPos, targetCameraPos, timer / 1.2f);
-			mainCameraTransform.set_position(newCameraPos2);
-			timer += Time.get_deltaTime();
+			Vector3 vector4 = mainCameraTransform.position = Vector3.Lerp(cameraStartPos, targetCameraPos, timer / 1.2f);
+			timer += Time.deltaTime;
 			yield return null;
 		}
 		onEndAllEventAction.SafeInvoke();
-		Object.Destroy(this);
+		UnityEngine.Object.Destroy(this);
 	}
 
 	private void OnDestroy()
@@ -104,7 +100,7 @@ public class PortalUnlockEvent : MonoBehaviour
 		}
 		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
-			MonoBehaviourSingleton<InGameCameraManager>.I.set_enabled(true);
+			MonoBehaviourSingleton<InGameCameraManager>.I.enabled = true;
 			MonoBehaviourSingleton<InGameCameraManager>.I.OnScreenRotate(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
 		}
 	}

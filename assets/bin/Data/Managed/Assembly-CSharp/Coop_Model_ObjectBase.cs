@@ -21,8 +21,7 @@ public class Coop_Model_ObjectBase : Coop_Model_Base
 
 	public virtual Vector3 GetObjectPosition()
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		return Vector3.get_zero();
+		return Vector3.zero;
 	}
 
 	public virtual bool IsHaveObjectPosition()

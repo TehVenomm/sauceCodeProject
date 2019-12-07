@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 {
@@ -30,6 +31,8 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 		}
 	}
 
+	public static string OLD_SERVER_URL = "http://appprd.dragonproject.gogame.net/";
+
 	public List<WWWInfo> wwwInfos = new List<WWWInfo>();
 
 	public string tokenTemp;
@@ -42,7 +45,24 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 
 	private bool isPreload;
 
-	public static string APP_HOST => "http://appprd.dragonproject.gogame.net/";
+	public static string APP_HOST
+	{
+		get
+		{
+			if (GameSaveData.instance == null)
+			{
+				return "";
+			}
+			if (GameSaveData.instance.currentServer == null)
+			{
+				return "";
+			}
+			return GameSaveData.instance.currentServer.url;
+		}
+		set
+		{
+		}
+	}
 
 	public static string IMG_HOST => "http://cdnprd.dragonproject.gogame.net/resources/";
 
@@ -73,39 +93,38 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 
 	public void Request<T>(string path, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		this.StartCoroutine(RequestCoroutine(path, call_back, get_param, token));
+		StartCoroutine(RequestCoroutine(path, call_back, get_param, token));
 	}
 
 	public IEnumerator RequestCoroutine<T>(string path, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		yield return this.StartCoroutine(RequestFormCoroutine(path, null, call_back, get_param, token));
+		yield return StartCoroutine(RequestFormCoroutine(path, null, call_back, get_param, token));
 	}
 
 	public void Request<T1, T2>(string path, T1 postData, Action<T2> call_back, string get_param = "", string token = "") where T2 : BaseModel, new()
 	{
-		this.StartCoroutine(RequestCoroutine(path, postData, call_back, get_param, token));
+		StartCoroutine(RequestCoroutine(path, postData, call_back, get_param, token));
 	}
 
 	public IEnumerator RequestCoroutine<T1, T2>(string path, T1 postData, Action<T2> call_back, string get_param = "", string token = "") where T2 : BaseModel, new()
 	{
-		WWWForm form = new WWWForm();
-		string data = JSONSerializer.Serialize(postData);
+		WWWForm wWWForm = new WWWForm();
+		string prm_text_to_encrypt = JSONSerializer.Serialize(postData);
 		AccountManager.Account account = MonoBehaviourSingleton<AccountManager>.I.account;
-		string key = (!string.IsNullOrEmpty(account.userHash)) ? account.userHash : "ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,";
-		string encrypt_data = Cipher.EncryptRJ128(key, "yCNBH$$rCNGvC+#f", data);
-		string data_to_send = string.IsNullOrEmpty(encrypt_data) ? string.Empty : encrypt_data;
-		form.AddField("data", data_to_send);
-		yield return this.StartCoroutine(RequestFormCoroutine(path, form, call_back, get_param, token));
+		string text = Cipher.EncryptRJ128(string.IsNullOrEmpty(account.userHash) ? "ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ," : account.userHash, "yCNBH$$rCNGvC+#f", prm_text_to_encrypt);
+		string value = (!string.IsNullOrEmpty(text)) ? text : "";
+		wWWForm.AddField("data", value);
+		yield return StartCoroutine(RequestFormCoroutine(path, wWWForm, call_back, get_param, token));
 	}
 
 	public void RequestForm<T>(string path, WWWForm form, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		this.StartCoroutine(RequestFormCoroutine(path, form, call_back, get_param, token));
+		StartCoroutine(RequestFormCoroutine(path, form, call_back, get_param, token));
 	}
 
 	public IEnumerator RequestFormCoroutine<T>(string path, WWWForm form, Action<T> call_back, string get_param = "", string token = "") where T : BaseModel, new()
 	{
-		yield return this.StartCoroutine(Request_Impl(path, form, call_back, delegate
+		yield return StartCoroutine(Request_Impl(path, form, call_back, delegate
 		{
 		}, get_param, token));
 	}
@@ -122,40 +141,40 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 	private Dictionary<string, string> GetHeader(WWWForm form)
 	{
 		Dictionary<string, string> dictionary = new Dictionary<string, string>();
-		foreach (string key in form.get_headers().Keys)
+		foreach (string key in form.headers.Keys)
 		{
-			dictionary.Add(key, form.get_headers()[key].ToString());
+			dictionary.Add(key, form.headers[key].ToString());
 		}
 		AccountManager.Account account = MonoBehaviourSingleton<AccountManager>.I.account;
-		dictionary["Cookie"] = (account.token ?? string.Empty);
+		dictionary["Cookie"] = (account.token ?? "");
 		dictionary["apv"] = NetworkNative.getNativeVersionName();
-		dictionary["amv"] = string.Empty;
+		dictionary["amv"] = "";
 		if (MonoBehaviourSingleton<ResourceManager>.IsValid())
 		{
 			dictionary["amv"] = MonoBehaviourSingleton<ResourceManager>.I.manifestVersion.ToString();
 		}
-		dictionary["aidx"] = string.Empty;
+		dictionary["aidx"] = "";
 		if (MonoBehaviourSingleton<ResourceManager>.IsValid())
 		{
 			dictionary["aidx"] = MonoBehaviourSingleton<ResourceManager>.I.assetIndex.ToString();
 		}
-		dictionary["tidx"] = string.Empty;
+		dictionary["tidx"] = "";
 		if (MonoBehaviourSingleton<ResourceManager>.IsValid())
 		{
 			dictionary["tidx"] = MonoBehaviourSingleton<ResourceManager>.I.tableIndex.ToString();
 		}
-		dictionary["tmv"] = string.Empty;
+		dictionary["tmv"] = "";
 		if (MonoBehaviourSingleton<DataTableManager>.IsValid())
 		{
 			dictionary["tmv"] = MonoBehaviourSingleton<DataTableManager>.I.manifestVersion.ToString();
 		}
-		dictionary[ServerConstDefine.CDV_KEY] = string.Empty;
+		dictionary[ServerConstDefine.CDV_KEY] = "";
 		if (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.userInfo != null)
 		{
 			dictionary[ServerConstDefine.CDV_KEY] = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.cdv.ToString();
 		}
 		dictionary["User-Agent"] = NetworkNative.getDefaultUserAgent();
-		dictionary["dm"] = SystemInfo.get_deviceModel();
+		dictionary["dm"] = SystemInfo.deviceModel;
 		return dictionary;
 	}
 
@@ -174,47 +193,51 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 		string url = GetUrl(path, get_param);
 		CrashlyticsReporter.SetAPIRequest(url);
 		CrashlyticsReporter.SetAPIRequestStatus(requesting: true);
-		byte[] data = form.get_data();
-		Dictionary<string, string> headers = GetHeader(form);
+		_ = form.data;
+		Dictionary<string, string> header = GetHeader(form);
 		string msg = GenerateErrorMsg(Error.Unknown);
 		AccountManager.Account account = MonoBehaviourSingleton<AccountManager>.I.account;
-		lastRequestTime = Time.get_time();
-		WWW www = new WWW(url, data, headers);
-		try
+		lastRequestTime = Time.time;
+		UnityWebRequest.ClearCookieCache();
+		using (UnityWebRequest www = UnityWebRequest.Post(url, form))
 		{
-			WWWInfo wwwinfo = new WWWInfo(www, _isAssetData: false, _isCached: false);
+			foreach (KeyValuePair<string, string> item in header)
+			{
+				www.SetRequestHeader(item.Key, item.Value);
+			}
+			www.SendWebRequest();
+			WWWInfo wwwinfo = new WWWInfo(null, _isAssetData: false, _isCached: false);
 			wwwInfos.Add(wwwinfo);
 			DateTime timeBegin = DateTime.Now;
 			while (true)
 			{
-				yield return (object)new WaitForEndOfFrame();
+				yield return new WaitForEndOfFrame();
 				if ((DateTime.Now - timeBegin).TotalSeconds > 15.0)
 				{
 					msg = GenerateErrorMsg(Error.TimeOut);
 					break;
 				}
-				if (!string.IsNullOrEmpty(www.get_error()))
+				if (!string.IsNullOrEmpty(www.error))
 				{
-					string txt = www.get_error();
+					string error = www.error;
 					int result = 0;
-					msg = ((!int.TryParse(txt.Substring(0, 3), out result)) ? GenerateErrorMsg(Error.DetectHttpError) : GenerateErrorMsg((Error)(200000 + result)));
+					msg = ((!int.TryParse(error.Substring(0, 3), out result)) ? GenerateErrorMsg(Error.DetectHttpError) : GenerateErrorMsg((Error)(200000 + result)));
 					break;
 				}
-				if (www.get_isDone())
+				if (www.isDone)
 				{
-					www.get_text();
+					_ = www.downloadHandler.text;
 					string text = null;
-					foreach (KeyValuePair<string, string> responseHeader in www.get_responseHeaders())
+					foreach (KeyValuePair<string, string> responseHeader in www.GetResponseHeaders())
 					{
 						string a = responseHeader.Key.ToLower();
 						if (string.IsNullOrEmpty(tokenTemp) && a == "set-cookie")
 						{
-							List<string> list = new List<string>(responseHeader.Value.Split(';'));
-							foreach (string item in list)
+							foreach (string item2 in new List<string>(responseHeader.Value.Split(';')))
 							{
-								if (item.Contains("robpt"))
+								if (item2.Contains("robpt"))
 								{
-									tokenTemp = item;
+									tokenTemp = item2;
 								}
 							}
 						}
@@ -233,12 +256,11 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 					byte[] array = null;
 					try
 					{
-						string prm_key = (!string.IsNullOrEmpty(account.userHash)) ? account.userHash : "ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,";
-						array = Cipher.DecryptRJ128Byte(prm_key, "yCNBH$$rCNGvC+#f", www.get_text());
+						array = Cipher.DecryptRJ128Byte(string.IsNullOrEmpty(account.userHash) ? "ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ," : account.userHash, "yCNBH$$rCNGvC+#f", www.downloadHandler.text);
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						flag = false;
 					}
 					if (!flag)
@@ -252,7 +274,7 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 						flag = true;
 						try
 						{
-							array = Cipher.DecryptRJ128Byte("ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,", "yCNBH$$rCNGvC+#f", www.get_text());
+							array = Cipher.DecryptRJ128Byte("ELqdT/y.pM#8+J##x7|3/tLb7jZhmqJ,", "yCNBH$$rCNGvC+#f", www.downloadHandler.text);
 						}
 						catch (Exception exc)
 						{
@@ -287,42 +309,46 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 						{
 							msg = GenerateErrorMsg(Error.UncompressFailed);
 						}
-						else if (text == null)
-						{
-							msg = GenerateErrorMsg(Error.SignatureIsNull);
-							Log.Error(LOG.NETWORK, "Signature is null");
-						}
 						else
 						{
-							bool flag3 = true;
-							bool flag4 = true;
-							try
+							_ = msg;
+							if (text == null)
 							{
-								flag4 = Cipher.verify(msg, text);
-							}
-							catch (Exception exc3)
-							{
-								Log.Exception(exc3);
-								flag3 = false;
-							}
-							if (!flag3)
-							{
-								msg = GenerateErrorMsg(Error.VerifySignatureFailed);
-							}
-							else if (!flag4)
-							{
-								msg = GenerateErrorMsg(Error.InvalidSignature);
+								msg = GenerateErrorMsg(Error.SignatureIsNull);
+								Log.Error(LOG.NETWORK, "Signature is null");
 							}
 							else
 							{
-								msg = Regex.Unescape(msg);
-								if (msg == "{\"error\":0,\"result\":[]}")
+								bool flag3 = true;
+								bool flag4 = true;
+								try
 								{
-									msg = GenerateErrorMsg(Error.EmptyRecord);
+									flag4 = Cipher.verify(msg, text);
 								}
-								if (msg.Contains("\"result\":[]"))
+								catch (Exception exc3)
 								{
-									msg = msg.Replace("\"result\":[]", "\"dummy\":[]");
+									Log.Exception(exc3);
+									flag3 = false;
+								}
+								if (!flag3)
+								{
+									msg = GenerateErrorMsg(Error.VerifySignatureFailed);
+								}
+								else if (!flag4)
+								{
+									msg = GenerateErrorMsg(Error.InvalidSignature);
+								}
+								else
+								{
+									msg = Regex.Unescape(msg);
+									if (msg == "{\"error\":0,\"result\":[]}")
+									{
+										msg = GenerateErrorMsg(Error.EmptyRecord);
+									}
+									if (msg.Contains("\"result\":[]"))
+									{
+										msg = msg.Replace("\"result\":[]", "\"dummy\":[]");
+									}
 								}
 							}
 						}
@@ -332,39 +358,32 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 			}
 			wwwInfos.Remove(wwwinfo);
 		}
-		finally
-		{
-			base._003C_003E__Finally0();
-		}
 		try
 		{
 			if (call_back != null)
 			{
-				T obj = new T();
+				T val = new T();
 				try
 				{
-					obj = JSONSerializer.Deserialize<T>(msg);
+					val = JSONSerializer.Deserialize<T>(msg);
 				}
-				catch (Exception ex2)
+				catch (Exception exception2)
 				{
-					string message = GenerateErrorMsg(Error.DecodeFailed);
-					obj = JSONSerializer.Deserialize<T>(message);
-					Debug.LogException(ex2);
+					val = JSONSerializer.Deserialize<T>(GenerateErrorMsg(Error.DecodeFailed));
+					Debug.LogException(exception2);
 				}
 				finally
 				{
-					if (obj.Error != 0)
-					{
-					}
-					obj.Apply();
+					_ = val.Error;
+					val.Apply();
 					CrashlyticsReporter.SetAPIRequestStatus(requesting: false);
-					call_back(obj);
+					call_back(val);
 				}
 			}
 		}
-		catch (Exception ex3)
+		catch (Exception exception3)
 		{
-			Debug.LogException(ex3);
+			Debug.LogException(exception3);
 			CrashlyticsReporter.SetAPIRequestStatus(requesting: false);
 			call_fatal();
 		}
@@ -378,8 +397,7 @@ public class NetworkManager : MonoBehaviourSingleton<NetworkManager>
 	public bool IsConnecting()
 	{
 		wwwInfos.RemoveAll((WWWInfo i) => i.www == null);
-		List<WWWInfo> list = wwwInfos.FindAll((WWWInfo i) => !i.isCached);
-		return list.Count > 0;
+		return wwwInfos.FindAll((WWWInfo i) => !i.isCached).Count > 0;
 	}
 
 	public static string GzUncompress(byte[] gzEncrypted)

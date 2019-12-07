@@ -150,7 +150,7 @@ public class CrystalShopTop : GameSection
 		i4.onBuyMaterialItem = (Action<ShopReceiver.PaymentPurchaseData>)Delegate.Combine(i4.onBuyMaterialItem, new Action<ShopReceiver.PaymentPurchaseData>(OnBuyMaterial));
 		ShopReceiver i5 = MonoBehaviourSingleton<ShopReceiver>.I;
 		i5.onGetProductDatas = (Action<StoreDataList>)Delegate.Combine(i5.onGetProductDatas, new Action<StoreDataList>(OnGetProductDatas));
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 		isPurchase = false;
 	}
 
@@ -171,23 +171,16 @@ public class CrystalShopTop : GameSection
 		}
 		else
 		{
-			List<string> list = (from o in MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList
-			select o.productId).ToList();
+			List<string> list = MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList.Select((ProductData o) => o.productId).ToList();
 			Native.GetProductDatas(string.Join("----", list.ToArray()));
 		}
 		while (!_isFinishGetNativeProductlist)
 		{
 			yield return null;
 		}
-		_purchaseGemList = (from o in MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList
-		where o.productType == 1
-		select o).ToList();
-		_purchaseBundleList = (from o in MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList
-		where o.productType == 2
-		select o).ToList();
-		_purchaseMaterialList = (from o in MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList
-		where o.productType == 3
-		select o).ToList();
+		_purchaseGemList = MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList.Where((ProductData o) => o.productType == 1).ToList();
+		_purchaseBundleList = MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList.Where((ProductData o) => o.productType == 2).ToList();
+		_purchaseMaterialList = MonoBehaviourSingleton<ShopManager>.I.purchaseItemList.shopList.Where((ProductData o) => o.productType == 3).ToList();
 		gemTab = GetCtrl(UI.OBJ_GEM_TAB);
 		bundleTab = GetCtrl(UI.OBJ_BUNDLE_TAB);
 		materialTab = GetCtrl(UI.OBJ_MATERIAL_TAB);
@@ -203,8 +196,8 @@ public class CrystalShopTop : GameSection
 				_currentPageIndex = num;
 			}
 		}
-		SetActive((Enum)UI.LBL_SERVICE_MESSAGE, MonoBehaviourSingleton<AccountManager>.I.usageLimitMode);
-		SetLabelText((Enum)UI.LBL_SERVICE_MESSAGE, string.Format(base.sectionData.GetText("SERVICE_LIMITED")));
+		SetActive(UI.LBL_SERVICE_MESSAGE, MonoBehaviourSingleton<AccountManager>.I.usageLimitMode);
+		SetLabelText(UI.LBL_SERVICE_MESSAGE, string.Format(base.sectionData.GetText("SERVICE_LIMITED")));
 		base.Initialize();
 	}
 
@@ -261,14 +254,10 @@ public class CrystalShopTop : GameSection
 		SetTable(gemTab, UI.TBL_LIST, "CrystalShopListItem", _purchaseGemList.Count, reset: false, delegate(int i, Transform p)
 		{
 			ProductData productData2 = _purchaseGemList[j];
-			if (MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.HasSpecial(productData2.productId) || (MonoBehaviourSingleton<GoGameSettingsManager>.IsValid() && MonoBehaviourSingleton<GoGameSettingsManager>.I.UseShopUI3(productData2.productId)))
-			{
-				return Realizes("CrystalShopListItem2", p);
-			}
-			return null;
+			return (MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.HasSpecial(productData2.productId) || (MonoBehaviourSingleton<GoGameSettingsManager>.IsValid() && MonoBehaviourSingleton<GoGameSettingsManager>.I.UseShopUI3(productData2.productId))) ? Realizes("CrystalShopListItem2", p) : null;
 		}, delegate(int i, Transform t, bool b)
 		{
-			ProductData productData = _purchaseGemList[++j];
+			ProductData productData = _purchaseGemList[j++];
 			SetSprite(t, UI.SPR_THUMB, productData.iconImg);
 			SetLabelText(t, UI.LBL_NAME, productData.name);
 			SetLabelText(t, UI.LBL_PRICE, string.Format(base.sectionData.GetText("PRICE"), productData.priceIncludeTax));
@@ -309,28 +298,21 @@ public class CrystalShopTop : GameSection
 
 	private void _viewBundleTab()
 	{
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-		//IL_041e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0428: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0441: Unknown result type (might be due to invalid IL or missing references)
-		//IL_044b: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(gemTab, is_visible: false);
 		SetActive(materialTab, is_visible: false);
 		SetActive(bundleTab, is_visible: true);
 		CheckOpenedBundleTab();
 		if (_purchaseBundleList.Count == 0)
 		{
-			SetActive((Enum)UI.OBJ_AIM, is_visible: false);
-			SetActive((Enum)UI.TEX_NPCMODEL, is_visible: false);
-			SetActive((Enum)UI.SPR_FRAME_DRAGON, is_visible: false);
-			SetActive((Enum)UI.LBL_NONE, is_visible: true);
+			SetActive(UI.OBJ_AIM, is_visible: false);
+			SetActive(UI.TEX_NPCMODEL, is_visible: false);
+			SetActive(UI.SPR_FRAME_DRAGON, is_visible: false);
+			SetActive(UI.LBL_NONE, is_visible: true);
 			return;
 		}
-		SetActive((Enum)UI.OBJ_AIM, is_visible: true);
-		SetActive((Enum)UI.TEX_NPCMODEL, is_visible: true);
-		SetActive((Enum)UI.SPR_FRAME_DRAGON, is_visible: true);
+		SetActive(UI.OBJ_AIM, is_visible: true);
+		SetActive(UI.TEX_NPCMODEL, is_visible: true);
+		SetActive(UI.SPR_FRAME_DRAGON, is_visible: true);
 		if (_currentPageIndex < _purchaseBundleList.Count)
 		{
 			ProductData productData = _purchaseBundleList[_currentPageIndex];
@@ -339,12 +321,12 @@ public class CrystalShopTop : GameSection
 			Utility.ToggleActiveChildren(_objBundle, _currentPageIndex);
 			UITexture sprw = FindCtrl(root, UI.SPR_WINDOW).GetComponent<UITexture>();
 			string shopImageName = ResourceName.GetShopImageName((int)pack.bundleImageId);
-			Hash128 val = default(Hash128);
+			Hash128 hash = default(Hash128);
 			if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest != null)
 			{
-				val = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.SHOP_IMG.ToAssetBundleName(shopImageName));
+				hash = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.SHOP_IMG.ToAssetBundleName(shopImageName));
 			}
-			if (!val.get_isValid())
+			if (!hash.isValid)
 			{
 				sprw.mainTexture = (Resources.Load("Texture/White") as Texture);
 			}
@@ -366,8 +348,8 @@ public class CrystalShopTop : GameSection
 				{
 					if (sprw != null)
 					{
-						spro.width = tex.get_width();
-						spro.height = tex.get_height();
+						spro.width = tex.width;
+						spro.height = tex.height;
 						spro.mainTexture = tex;
 					}
 				});
@@ -383,7 +365,7 @@ public class CrystalShopTop : GameSection
 				SetButtonEnabled(root, UI.BTN_BUY, is_enabled: false);
 				SetActive(root, UI.LBL_BUNDLE_PRICE, is_visible: false);
 				SetActive(root, UI.LBL_DAY_LEFT, is_visible: true);
-				SetLabelText(root, UI.LBL_DAY_LEFT, (productData.remainingDay <= 1) ? string.Format(base.sectionData.GetText("DAY_LEFT"), productData.remainingDay) : string.Format(base.sectionData.GetText("DAYS_LEFT"), productData.remainingDay));
+				SetLabelText(root, UI.LBL_DAY_LEFT, (productData.remainingDay > 1) ? string.Format(base.sectionData.GetText("DAYS_LEFT"), productData.remainingDay) : string.Format(base.sectionData.GetText("DAY_LEFT"), productData.remainingDay));
 			}
 			else
 			{
@@ -401,18 +383,18 @@ public class CrystalShopTop : GameSection
 				}
 			}
 		}
-		SetLabelText(UI.LBL_CURRENT, (_purchaseBundleList.Count <= 0) ? _currentPageIndex : (_currentPageIndex + 1));
+		SetLabelText(UI.LBL_CURRENT, (_purchaseBundleList.Count > 0) ? (_currentPageIndex + 1) : _currentPageIndex);
 		SetLabelText(UI.LBL_TOTAL, _purchaseBundleList.Count);
 		bool flag = _currentPageIndex > 0;
 		bool flag2 = _currentPageIndex < _purchaseBundleList.Count - 1;
-		SetColor((Enum)UI.SPR_AIM_L, (!flag) ? Color.get_clear() : Color.get_white());
-		SetColor((Enum)UI.SPR_AIM_R, (!flag2) ? Color.get_clear() : Color.get_white());
-		SetButtonEnabled((Enum)UI.BTN_AIM_L, flag);
-		SetButtonEnabled((Enum)UI.BTN_AIM_R, flag2);
-		SetActive((Enum)UI.BTN_AIM_L_INACTIVE, !flag);
-		SetActive((Enum)UI.BTN_AIM_R_INACTIVE, !flag2);
-		SetRepeatButton((Enum)UI.BTN_AIM_L, "AIM_L", (object)null);
-		SetRepeatButton((Enum)UI.BTN_AIM_R, "AIM_R", (object)null);
+		SetColor(UI.SPR_AIM_L, flag ? Color.white : Color.clear);
+		SetColor(UI.SPR_AIM_R, flag2 ? Color.white : Color.clear);
+		SetButtonEnabled(UI.BTN_AIM_L, flag);
+		SetButtonEnabled(UI.BTN_AIM_R, flag2);
+		SetActive(UI.BTN_AIM_L_INACTIVE, !flag);
+		SetActive(UI.BTN_AIM_R_INACTIVE, !flag2);
+		SetRepeatButton(UI.BTN_AIM_L, "AIM_L");
+		SetRepeatButton(UI.BTN_AIM_R, "AIM_R");
 		_updateNPC();
 	}
 
@@ -437,7 +419,7 @@ public class CrystalShopTop : GameSection
 			});
 			SetLabelText(t, UI.LBL_NAME, productData.name);
 			SetLabelText(t, UI.LBL_PRICE, text);
-			SetLabelText(t, UI.LBL_PRICE_OLD, (!(productData.oldPrice > 0.0)) ? string.Empty : string.Format(base.sectionData.GetText("PRICE_STRETCH"), productData.oldPrice));
+			SetLabelText(t, UI.LBL_PRICE_OLD, (productData.oldPrice > 0.0) ? string.Format(base.sectionData.GetText("PRICE_STRETCH"), productData.oldPrice) : string.Empty);
 			SetSupportEncoding(t, UI.LBL_PRICE_OLD, isEnable: true);
 			SetSupportEncoding(t, UI.LBL_PROMO, isEnable: true);
 			SetLabelText(t, UI.LBL_PROMO, productData.promo.Replace("\\n", "\n"));
@@ -485,15 +467,13 @@ public class CrystalShopTop : GameSection
 
 	private void _updateNPC()
 	{
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 		NPCMessageTable.Section section = Singleton<NPCMessageTable>.I.GetSection(base.sectionData.sectionName + "_TEXT");
 		if (section != null)
 		{
 			NPCMessageTable.Message message = section.GetNPCMessage();
 			if (message != null)
 			{
-				SetRenderNPCModel((Enum)UI.TEX_NPCMODEL, message.npc, message.pos, message.rot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.questCenterNPCFOV, (Action<NPCLoader>)delegate(NPCLoader loader)
+				SetRenderNPCModel(UI.TEX_NPCMODEL, message.npc, message.pos, message.rot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.questCenterNPCFOV, delegate(NPCLoader loader)
 				{
 					loader.GetAnimator().Play(message.animationStateName);
 				});
@@ -503,52 +483,22 @@ public class CrystalShopTop : GameSection
 
 	private void _disableChest()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Expected O, but got Unknown
 		if (!(_objBundle == null))
 		{
-			IEnumerator enumerator = _objBundle.GetEnumerator();
-			try
+			foreach (Transform item in _objBundle)
 			{
-				while (enumerator.MoveNext())
-				{
-					Transform root = enumerator.Current;
-					SetActiveModel(root, UI.OBJ_MODEL, active: false);
-				}
-			}
-			finally
-			{
-				IDisposable disposable;
-				if ((disposable = (enumerator as IDisposable)) != null)
-				{
-					disposable.Dispose();
-				}
+				SetActiveModel(item, UI.OBJ_MODEL, active: false);
 			}
 		}
 	}
 
 	private void _enableChest()
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Expected O, but got Unknown
 		if (!(_objBundle == null) && _viewType != 0 && _viewType != VIEW_TYPE.MATERIAL)
 		{
-			IEnumerator enumerator = _objBundle.GetEnumerator();
-			try
+			foreach (Transform item in _objBundle)
 			{
-				while (enumerator.MoveNext())
-				{
-					Transform root = enumerator.Current;
-					SetActiveModel(root, UI.OBJ_MODEL, active: true);
-				}
-			}
-			finally
-			{
-				IDisposable disposable;
-				if ((disposable = (enumerator as IDisposable)) != null)
-				{
-					disposable.Dispose();
-				}
+				SetActiveModel(item, UI.OBJ_MODEL, active: true);
 			}
 		}
 	}
@@ -807,7 +757,19 @@ public class CrystalShopTop : GameSection
 				MonoBehaviourSingleton<PresentManager>.I.SendGetPresent(0, delegate
 				{
 					_disableChest();
-					GameSection.ChangeStayEvent("SPECIAL_NOTICE", product_data);
+					if (!GameSceneEvent.IsStay())
+					{
+						GameSection.StayEvent();
+					}
+					if (product_data.skipId == "TradingPostLicense")
+					{
+						MonoBehaviourSingleton<TradingPostManager>.I.tradingStatus = 2;
+						GameSection.ChangeStayEvent("TRADING_POST_LICENSE");
+					}
+					else
+					{
+						GameSection.ChangeStayEvent("SPECIAL_NOTICE", product_data);
+					}
 					GameSection.ResumeEvent(is_resume: true);
 				});
 			}
@@ -875,7 +837,7 @@ public class CrystalShopTop : GameSection
 		{
 			_disableChest();
 			ProductDataTable.PackInfo pack = Singleton<ProductDataTable>.I.GetPack(purchaseData.productId);
-			GameSection.ChangeStayEvent(string.IsNullOrEmpty(pack.eventName) ? "BUNDLE_NOTICE" : pack.eventName, purchaseData);
+			GameSection.ChangeStayEvent((!string.IsNullOrEmpty(pack.eventName)) ? pack.eventName : "BUNDLE_NOTICE", purchaseData);
 			GameSection.ResumeEvent(is_resume: true);
 		};
 	}
@@ -894,7 +856,7 @@ public class CrystalShopTop : GameSection
 		Protocol.Send(OnceStatusInfoModel.URL, delegate(OnceStatusInfoModel result)
 		{
 			CheckCrystalNum(result, onFinish);
-		}, string.Empty);
+		});
 	}
 
 	private void SendRequestCurrentPresentAndShopList(Action onFinish)
@@ -927,25 +889,23 @@ public class CrystalShopTop : GameSection
 		int count = _purchaseMaterialList.Count;
 		for (int i = 0; i < count; i++)
 		{
-			int num = string2.IndexOf(_purchaseMaterialList[i].productId);
-			if (num < 0)
+			if (string2.IndexOf(_purchaseMaterialList[i].productId) < 0)
 			{
 				isHighlightMaterial = true;
 				break;
 			}
 		}
 		count = _purchaseBundleList.Count;
-		int num2 = 0;
+		int num = 0;
 		while (true)
 		{
-			if (num2 < count)
+			if (num < count)
 			{
-				int num3 = @string.IndexOf(_purchaseBundleList[num2].productId);
-				if (num3 < 0)
+				if (@string.IndexOf(_purchaseBundleList[num].productId) < 0)
 				{
 					break;
 				}
-				num2++;
+				num++;
 				continue;
 			}
 			return;
@@ -960,26 +920,25 @@ public class CrystalShopTop : GameSection
 		Transform t2 = FindCtrl(root, UI.BTN_BUNDLE_TAB);
 		if (isHighlightMaterial)
 		{
-			SetBadge(t, -1, 3, -8, -8);
+			SetBadge(t, -1, SpriteAlignment.TopRight, -8, -8);
 		}
 		else
 		{
-			SetBadge(t, 0, 3, -8, -8);
+			SetBadge(t, 0, SpriteAlignment.TopRight, -8, -8);
 		}
 		if (isHighlightBundle)
 		{
-			SetBadge(t2, -1, 3, -8, -8);
+			SetBadge(t2, -1, SpriteAlignment.TopRight, -8, -8);
 		}
 		else
 		{
-			SetBadge(t2, 0, 3, -8, -8);
+			SetBadge(t2, 0, SpriteAlignment.TopRight, -8, -8);
 		}
 		string text = PlayerPrefs.GetString("Purchase_Item_List_Tab_Gem", string.Empty);
 		int count = _purchaseGemList.Count;
 		for (int i = 0; i < count; i++)
 		{
-			int num = text.IndexOf(_purchaseGemList[i].productId);
-			if (num < 0)
+			if (text.IndexOf(_purchaseGemList[i].productId) < 0)
 			{
 				text = text + "/" + _purchaseGemList[i].productId;
 			}
@@ -993,21 +952,20 @@ public class CrystalShopTop : GameSection
 		Transform root = FindCtrl(materialTab, UI.SPR_BTN_BORDER);
 		Transform t = FindCtrl(root, UI.BTN_MATERIAL_TAB);
 		Transform t2 = FindCtrl(root, UI.BTN_BUNDLE_TAB);
-		SetBadge(t, 0, 3, -8, -8);
+		SetBadge(t, 0, SpriteAlignment.TopRight, -8, -8);
 		if (isHighlightBundle)
 		{
-			SetBadge(t2, -1, 3, -8, -8);
+			SetBadge(t2, -1, SpriteAlignment.TopRight, -8, -8);
 		}
 		else
 		{
-			SetBadge(t2, 0, 3, -8, -8);
+			SetBadge(t2, 0, SpriteAlignment.TopRight, -8, -8);
 		}
 		string text = PlayerPrefs.GetString("Purchase_Item_List_Tab_Material", string.Empty);
 		int count = _purchaseMaterialList.Count;
 		for (int i = 0; i < count; i++)
 		{
-			int num = text.IndexOf(_purchaseMaterialList[i].productId);
-			if (num < 0)
+			if (text.IndexOf(_purchaseMaterialList[i].productId) < 0)
 			{
 				text = text + "/" + _purchaseMaterialList[i].productId;
 			}
@@ -1023,19 +981,18 @@ public class CrystalShopTop : GameSection
 		Transform t2 = FindCtrl(root, UI.BTN_BUNDLE_TAB);
 		if (isHighlightMaterial)
 		{
-			SetBadge(t, -1, 3, -8, -8);
+			SetBadge(t, -1, SpriteAlignment.TopRight, -8, -8);
 		}
 		else
 		{
-			SetBadge(t, 0, 3, -8, -8);
+			SetBadge(t, 0, SpriteAlignment.TopRight, -8, -8);
 		}
-		SetBadge(t2, 0, 3, -8, -8);
+		SetBadge(t2, 0, SpriteAlignment.TopRight, -8, -8);
 		string text = PlayerPrefs.GetString("Purchase_Item_List_Tab_Bundle", string.Empty);
 		int count = _purchaseBundleList.Count;
 		for (int i = 0; i < count; i++)
 		{
-			int num = text.IndexOf(_purchaseBundleList[i].productId);
-			if (num < 0)
+			if (text.IndexOf(_purchaseBundleList[i].productId) < 0)
 			{
 				text = text + "/" + _purchaseBundleList[i].productId;
 			}

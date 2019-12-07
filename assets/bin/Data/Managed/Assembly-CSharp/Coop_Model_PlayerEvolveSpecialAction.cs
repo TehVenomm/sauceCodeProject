@@ -8,7 +8,7 @@ public class Coop_Model_PlayerEvolveSpecialAction : Coop_Model_ObjectSyncPositio
 	public override bool IsHandleable(StageObject owner)
 	{
 		Player player = owner as Player;
-		if (object.ReferenceEquals(player, null))
+		if ((object)player == null)
 		{
 			return true;
 		}

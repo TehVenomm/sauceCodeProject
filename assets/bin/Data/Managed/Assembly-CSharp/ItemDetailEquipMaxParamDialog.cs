@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -36,10 +35,8 @@ public class ItemDetailEquipMaxParamDialog : ItemDetailEquipDialog
 		GrowEquipItemTable.GrowEquipItemData growEquipItemData = Singleton<GrowEquipItemTable>.I.GetGrowEquipItemData(table_data.growID, (uint)table_data.maxLv);
 		int growParamAtk = growEquipItemData.GetGrowParamAtk(table_data.baseAtk);
 		int growParamDef = growEquipItemData.GetGrowParamDef(table_data.baseDef);
-		int[] growParamElemAtk = growEquipItemData.GetGrowParamElemAtk(table_data.atkElement);
-		int num = Mathf.Max(growParamElemAtk);
-		int[] growParamElemDef = growEquipItemData.GetGrowParamElemDef(table_data.defElement);
-		int num2 = Mathf.Max(growParamElemDef);
+		int num = Mathf.Max(growEquipItemData.GetGrowParamElemAtk(table_data.atkElement));
+		int num2 = Mathf.Max(growEquipItemData.GetGrowParamElemDef(table_data.defElement));
 		int growParamHp = growEquipItemData.GetGrowParamHp(table_data.baseHp);
 		SetActive(detailBase, UI.STR_LV, is_visible: true);
 		SetActive(detailBase, UI.STR_ONLY_VISUAL, is_visible: false);
@@ -61,38 +58,36 @@ public class ItemDetailEquipMaxParamDialog : ItemDetailEquipDialog
 
 	private void DisableMagiSlotButton()
 	{
-		Transform ctrl = GetCtrl(UI.OBJ_SKILL_BUTTON_ROOT);
-		Transform val = ctrl.Find("SkillIconButton");
-		SetEnabled<UIButton>(val, is_enabled: false);
-		val.GetComponent<BoxCollider>().set_enabled(false);
+		Transform transform = GetCtrl(UI.OBJ_SKILL_BUTTON_ROOT).Find("SkillIconButton");
+		SetEnabled<UIButton>(transform, is_enabled: false);
+		transform.GetComponent<BoxCollider>().enabled = false;
 	}
 
 	private void UpdatePaging()
 	{
 		bool is_visible = allEquipData.Count + allEquipData[currentEvolveStage].Count >= 2;
-		SetActive((Enum)UI.OBJ_EVOLVE_SELECT, is_visible: true);
-		SetActive((Enum)UI.OBJ_ARROW_BTN_ROOT, is_visible);
+		SetActive(UI.OBJ_EVOLVE_SELECT, is_visible: true);
+		SetActive(UI.OBJ_ARROW_BTN_ROOT, is_visible);
 		if (currentEvolveStage == 0)
 		{
-			SetActive((Enum)UI.LBL_EVOLVE_NORMAL, is_visible: true);
-			SetLabelText((Enum)UI.LBL_EVOLVE_NORMAL, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 13u));
-			SetActive((Enum)UI.LBL_EVOLVE_ATTRIBUTE, is_visible: false);
-			SetActive((Enum)UI.SPR_EVOLVE_ELEM, is_visible: false);
+			SetActive(UI.LBL_EVOLVE_NORMAL, is_visible: true);
+			SetLabelText(UI.LBL_EVOLVE_NORMAL, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 13u));
+			SetActive(UI.LBL_EVOLVE_ATTRIBUTE, is_visible: false);
+			SetActive(UI.SPR_EVOLVE_ELEM, is_visible: false);
 			return;
 		}
-		EquipItemTable.EquipItemData currentEquipItemData = GetCurrentEquipItemData();
-		int targetElementPriorityToTable = (int)currentEquipItemData.GetTargetElementPriorityToTable();
+		int targetElementPriorityToTable = (int)GetCurrentEquipItemData().GetTargetElementPriorityToTable();
 		bool flag = targetElementPriorityToTable == 6;
-		SetActive((Enum)UI.LBL_EVOLVE_NORMAL, flag);
-		SetActive((Enum)UI.LBL_EVOLVE_ATTRIBUTE, !flag);
-		SetActive((Enum)UI.SPR_EVOLVE_ELEM, !flag);
+		SetActive(UI.LBL_EVOLVE_NORMAL, flag);
+		SetActive(UI.LBL_EVOLVE_ATTRIBUTE, !flag);
+		SetActive(UI.SPR_EVOLVE_ELEM, !flag);
 		if (flag)
 		{
-			SetLabelText((Enum)UI.LBL_EVOLVE_NORMAL, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 14u), currentEvolveStage.ToString()));
+			SetLabelText(UI.LBL_EVOLVE_NORMAL, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 14u), currentEvolveStage.ToString()));
 			return;
 		}
-		SetLabelText((Enum)UI.LBL_EVOLVE_ATTRIBUTE, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 15u), currentEvolveStage.ToString()));
-		SetElementSprite((Enum)UI.SPR_EVOLVE_ELEM, targetElementPriorityToTable);
+		SetLabelText(UI.LBL_EVOLVE_ATTRIBUTE, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 15u), currentEvolveStage.ToString()));
+		SetElementSprite(UI.SPR_EVOLVE_ELEM, targetElementPriorityToTable);
 	}
 
 	private void OnQuery_NEXT_EVOLVE()

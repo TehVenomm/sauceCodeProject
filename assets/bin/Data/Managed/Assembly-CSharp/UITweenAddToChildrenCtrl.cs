@@ -10,56 +10,47 @@ public class UITweenAddToChildrenCtrl : MonoBehaviour
 
 	public int repetitionStartIndex = -1;
 
-	public UITweenAddToChildrenCtrl()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		if (baseTween == null)
 		{
-			baseTween = this.GetComponent<UITweener>();
+			baseTween = GetComponent<UITweener>();
 		}
 	}
 
 	[ContextMenu("TweenAdd")]
 	public void TweenAdd()
 	{
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Expected O, but got Unknown
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		if (!this.get_enabled() || baseTween == null)
+		if (!base.enabled || baseTween == null)
 		{
 			return;
 		}
-		int childCount = this.get_transform().get_childCount();
-		Transform[] array = (Transform[])new Transform[childCount];
+		int childCount = base.transform.childCount;
+		Transform[] array = new Transform[childCount];
 		for (int i = 0; i < childCount; i++)
 		{
-			array[i] = this.get_transform().GetChild(i);
+			array[i] = base.transform.GetChild(i);
 		}
 		for (int j = 0; j < childCount; j++)
 		{
-			Transform val = array[j];
-			if (val == null)
+			Transform transform = array[j];
+			if (transform == null)
 			{
 				return;
 			}
-			UITweenAddCtrlChild[] componentsInChildren = val.GetComponentsInChildren<UITweenAddCtrlChild>();
+			UITweenAddCtrlChild[] componentsInChildren = transform.GetComponentsInChildren<UITweenAddCtrlChild>();
 			if (componentsInChildren == null || componentsInChildren.Length == 0)
 			{
-				GameObject val2 = new GameObject(val.get_name());
-				val2.set_layer(5);
-				val2.get_transform().set_parent(val.get_transform().get_parent());
-				val2.get_transform().set_localPosition(val.get_transform().get_localPosition());
-				val2.get_transform().set_localScale(Vector3.get_one());
-				val2.AddComponent<UITweenAddCtrlChild>();
-				UIWidget component = val.GetComponent<UIWidget>();
+				GameObject gameObject = new GameObject(transform.name);
+				gameObject.layer = 5;
+				gameObject.transform.parent = transform.transform.parent;
+				gameObject.transform.localPosition = transform.transform.localPosition;
+				gameObject.transform.localScale = Vector3.one;
+				gameObject.AddComponent<UITweenAddCtrlChild>();
+				UIWidget component = transform.GetComponent<UIWidget>();
 				if (component != null)
 				{
-					UIWidget uIWidget = val2.AddComponent<UIWidget>();
+					UIWidget uIWidget = gameObject.AddComponent<UIWidget>();
 					uIWidget.width = component.width;
 					uIWidget.height = component.height;
 					uIWidget.keepAspectRatio = component.keepAspectRatio;
@@ -67,11 +58,10 @@ public class UITweenAddToChildrenCtrl : MonoBehaviour
 					uIWidget.depth = component.depth;
 					uIWidget.alpha = component.alpha;
 				}
-				val.get_transform().set_parent(val2.get_transform());
-				Component component2 = val.get_gameObject().GetComponent(((object)baseTween).GetType());
-				if (component2 == null)
+				transform.transform.parent = gameObject.transform;
+				if (transform.gameObject.GetComponent(baseTween.GetType()) == null)
 				{
-					component2 = val.get_gameObject().AddComponent(((object)baseTween).GetType());
+					transform.gameObject.AddComponent(baseTween.GetType());
 				}
 			}
 		}
@@ -90,33 +80,17 @@ public class UITweenAddToChildrenCtrl : MonoBehaviour
 
 	private void _InitTween(bool is_skip)
 	{
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-		if (!this.get_enabled())
+		if (!base.enabled)
 		{
 			return;
 		}
-		int childCount = this.get_transform().get_childCount();
+		int childCount = base.transform.childCount;
 		for (int i = 0; i < childCount; i++)
 		{
-			Transform child = this.get_transform().GetChild(i);
+			Transform child = base.transform.GetChild(i);
 			if (child != null)
 			{
-				Component componentInChildren = child.get_gameObject().GetComponentInChildren(((object)baseTween).GetType());
+				Component componentInChildren = child.gameObject.GetComponentInChildren(baseTween.GetType());
 				if (componentInChildren is TweenAlpha)
 				{
 					TweenAlpha tweenAlpha = componentInChildren as TweenAlpha;
@@ -179,14 +153,14 @@ public class UITweenAddToChildrenCtrl : MonoBehaviour
 
 	private void InitTween(UITweener new_tw, UITweener base_tw, int i, bool is_skip)
 	{
-		int num = (repetitionStartIndex <= -1) ? i : Mathf.Min(repetitionStartIndex, i);
+		int num = (repetitionStartIndex > -1) ? Mathf.Min(repetitionStartIndex, i) : i;
 		new_tw.animationCurve = base_tw.animationCurve;
 		new_tw.style = base_tw.style;
 		new_tw.duration = base_tw.duration + dispDuration * (float)num;
 		new_tw.delay = base_tw.delay + dispStartDelay * (float)num;
 		new_tw.ignoreTimeScale = base_tw.ignoreTimeScale;
 		new_tw.tweenGroup = base_tw.tweenGroup;
-		new_tw.set_enabled(true);
+		new_tw.enabled = true;
 		if (!is_skip)
 		{
 			new_tw.ResetToBeginning();

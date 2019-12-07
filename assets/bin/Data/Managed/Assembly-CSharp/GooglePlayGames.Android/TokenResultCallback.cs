@@ -20,9 +20,9 @@ namespace GooglePlayGames.Android
 			}
 		}
 
-		public string toString()
+		public new string toString()
 		{
-			return ((object)this).ToString();
+			return ToString();
 		}
 	}
 }

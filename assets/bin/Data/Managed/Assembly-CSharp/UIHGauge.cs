@@ -34,7 +34,6 @@ public class UIHGauge : MonoBehaviour
 	}
 
 	public UIHGauge()
-		: this()
 	{
 		nowPercent = 1f;
 	}
@@ -76,7 +75,7 @@ public class UIHGauge : MonoBehaviour
 	{
 		if (animPhase == ANIM_PHASE.WAIT)
 		{
-			animTime -= Time.get_deltaTime();
+			animTime -= Time.deltaTime;
 			if (animTime <= 0f)
 			{
 				animPhase = ANIM_PHASE.MOVE;
@@ -85,7 +84,7 @@ public class UIHGauge : MonoBehaviour
 		}
 		else if (animPhase == ANIM_PHASE.MOVE)
 		{
-			animTime -= Time.get_deltaTime();
+			animTime -= Time.deltaTime;
 			if (animTime <= 0f)
 			{
 				animPhase = ANIM_PHASE.NONE;
@@ -97,7 +96,7 @@ public class UIHGauge : MonoBehaviour
 
 	protected virtual void UpdateGauge()
 	{
-		if (!Object.op_Implicit(gaugeUI))
+		if (!gaugeUI)
 		{
 			return;
 		}
@@ -119,10 +118,10 @@ public class UIHGauge : MonoBehaviour
 
 	public Transform GetGaugeTransform()
 	{
-		if (Object.op_Implicit(gaugeUI))
+		if ((bool)gaugeUI)
 		{
-			return gaugeUI.get_gameObject().get_transform();
+			return gaugeUI.gameObject.transform;
 		}
-		return this.get_gameObject().get_transform();
+		return base.gameObject.transform;
 	}
 }

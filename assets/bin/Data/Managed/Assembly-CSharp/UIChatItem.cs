@@ -10,11 +10,6 @@ public class UIChatItem : MonoBehaviour
 
 	protected UIChatButtonBase chatButton;
 
-	public UIChatItem()
-		: this()
-	{
-	}
-
 	public void SetChatData(UIChatButtonBase parent, string str, int chat_id)
 	{
 		chatButton = parent;
@@ -23,7 +18,7 @@ public class UIChatItem : MonoBehaviour
 		{
 			chatText.text = str;
 		}
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 
 	private void OnDragOver(GameObject drag)

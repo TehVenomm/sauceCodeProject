@@ -10,11 +10,6 @@ public class QuestUserStatusIconController : MonoBehaviour
 	[SerializeField]
 	private UISprite[] m_statusIcons;
 
-	public QuestUserStatusIconController()
-		: this()
-	{
-	}
-
 	public void Initialize(InitParam _param)
 	{
 		ActivateIcons(_param.StatusBit);
@@ -31,7 +26,7 @@ public class QuestUserStatusIconController : MonoBehaviour
 			if (!(m_statusIcons[i] == null))
 			{
 				int num = 1 << i + 1;
-				m_statusIcons[i].get_gameObject().SetActive((num & _statusBit) != 0);
+				m_statusIcons[i].gameObject.SetActive((num & _statusBit) != 0);
 			}
 		}
 	}

@@ -115,7 +115,11 @@ public class EquipItemSortData : SortCompareData
 
 	public override bool CanSale()
 	{
-		return !IsEquipping() && !equipData.isFavorite;
+		if (!IsEquipping())
+		{
+			return !equipData.isFavorite;
+		}
+		return false;
 	}
 
 	public override int GetLevel()
@@ -145,19 +149,18 @@ public class EquipItemSortData : SortCompareData
 
 	public override uint GetMainorSortWeight()
 	{
-		uint num = 0u;
-		uint num2 = EquipmentTypeToMinorSortValue(equipData.tableData.type);
-		num += num2 << 26;
+		uint num = EquipmentTypeToMinorSortValue(equipData.tableData.type);
+		uint num2 = 0 + (num << 26);
 		uint num3 = ElementTypeToMinorSortValue(GetIconElement());
-		num += num3 << 23;
+		uint num4 = num2 + (num3 << 23);
 		uint rarity = (uint)GetRarity();
-		num += rarity << 20;
+		uint num5 = num4 + (rarity << 20);
 		uint spAttackType = (uint)equipData.tableData.spAttackType;
-		num += spAttackType << 15;
+		uint num6 = num5 + (spAttackType << 15);
 		uint level = (uint)equipData.level;
-		num += level << 8;
+		uint num7 = num6 + (level << 8);
 		uint typeToMinorSortValue = GetTypeToMinorSortValue(GetGetType());
-		return num + (typeToMinorSortValue << 7);
+		return num7 + (typeToMinorSortValue << 7);
 	}
 
 	public override bool IsUniqueEquipping()
@@ -182,13 +185,25 @@ public class EquipItemSortData : SortCompareData
 	{
 		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "StatusScene")
 		{
-			return MonoBehaviourSingleton<StatusManager>.I.IsEquippingLocal(equipData) || IsVisualEquip() || MonoBehaviourSingleton<StatusManager>.I.IsUniqueEquipping(equipData);
+			if (!MonoBehaviourSingleton<StatusManager>.I.IsEquippingLocal(equipData) && !IsVisualEquip())
+			{
+				return MonoBehaviourSingleton<StatusManager>.I.IsUniqueEquipping(equipData);
+			}
+			return true;
 		}
 		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "UniqueStatusScene")
 		{
-			return MonoBehaviourSingleton<StatusManager>.I.IsEquippingLocal(equipData) || IsVisualEquip() || MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipData);
+			if (!MonoBehaviourSingleton<StatusManager>.I.IsEquippingLocal(equipData) && !IsVisualEquip())
+			{
+				return MonoBehaviourSingleton<StatusManager>.I.IsEquipping(equipData);
+			}
+			return true;
 		}
-		return _EquipSomewhere() || IsVisualEquip();
+		if (!_EquipSomewhere())
+		{
+			return IsVisualEquip();
+		}
+		return true;
 	}
 
 	public override bool IsEquipSomewhere()
@@ -328,7 +343,7 @@ public class EquipItemSortData : SortCompareData
 			EvolveEquipItemTable.EvolveEquipItemData[] evolveEquipItemData = Singleton<EvolveEquipItemTable>.I.GetEvolveEquipItemData(equipData.tableID);
 			if (evolveEquipItemData == null)
 			{
-				Debug.LogWarning((object)("Evolve Data is Not Found. : BaseItemID = " + equipData.tableID));
+				Debug.LogWarning("Evolve Data is Not Found. : BaseItemID = " + equipData.tableID);
 				return false;
 			}
 			int i = 0;
@@ -341,6 +356,10 @@ public class EquipItemSortData : SortCompareData
 			}
 			return false;
 		}
-		return MonoBehaviourSingleton<InventoryManager>.I.IsHaveingMaterial(equipData.nextNeedTableData.needMaterial) && MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money >= equipData.nextNeedTableData.needMoney;
+		if (MonoBehaviourSingleton<InventoryManager>.I.IsHaveingMaterial(equipData.nextNeedTableData.needMaterial))
+		{
+			return MonoBehaviourSingleton<UserInfoManager>.I.userStatus.money >= equipData.nextNeedTableData.needMoney;
+		}
+		return false;
 	}
 }

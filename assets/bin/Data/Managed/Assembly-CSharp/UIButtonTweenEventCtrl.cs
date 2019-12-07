@@ -11,25 +11,25 @@ public class UIButtonTweenEventCtrl : UITweenCtrl
 
 	private void OnValidate()
 	{
-		if (tweens != null && tweens.Length > 0)
+		if (tweens != null && tweens.Length != 0)
 		{
 			Array.ForEach(tweens, delegate(UITweener t)
 			{
 				if (t != null)
 				{
 					base._TweenReset(t);
-					t.set_enabled(false);
+					t.enabled = false;
 				}
 			});
 		}
-		if (pushTweens != null && pushTweens.Length > 0)
+		if (pushTweens != null && pushTweens.Length != 0)
 		{
 			Array.ForEach(pushTweens, delegate(UITweener t)
 			{
 				if (t != null)
 				{
 					base._TweenReset(t);
-					t.set_enabled(false);
+					t.enabled = false;
 				}
 			});
 		}
@@ -42,10 +42,10 @@ public class UIButtonTweenEventCtrl : UITweenCtrl
 
 	private void Strat()
 	{
-		UIGameSceneEventSender uIGameSceneEventSender = this.get_gameObject().GetComponent<UIGameSceneEventSender>();
+		UIGameSceneEventSender uIGameSceneEventSender = base.gameObject.GetComponent<UIGameSceneEventSender>();
 		if (uIGameSceneEventSender == null)
 		{
-			uIGameSceneEventSender = this.get_gameObject().AddComponent<UIGameSceneEventSender>();
+			uIGameSceneEventSender = base.gameObject.AddComponent<UIGameSceneEventSender>();
 		}
 		if (string.IsNullOrEmpty(uIGameSceneEventSender.eventName))
 		{

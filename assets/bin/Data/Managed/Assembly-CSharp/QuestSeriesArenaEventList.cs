@@ -89,9 +89,9 @@ public class QuestSeriesArenaEventList : QuestEventSelectList
 			{
 				yield return null;
 			}
-			EventListData data = MonoBehaviourSingleton<DeliveryManager>.I.FindSeriesArenaTopData();
-			eventData = ChoiceEventData(data);
-			GameSection.SetEventData(data);
+			EventListData eventListData = MonoBehaviourSingleton<DeliveryManager>.I.FindSeriesArenaTopData();
+			eventData = ChoiceEventData(eventListData);
+			GameSection.SetEventData(eventListData);
 		}
 		if (MonoBehaviourSingleton<SoundManager>.IsValid() && MonoBehaviourSingleton<SoundManager>.I.playingBGMID != 3)
 		{
@@ -99,7 +99,7 @@ public class QuestSeriesArenaEventList : QuestEventSelectList
 			SoundManager.RequestBGM(134);
 		}
 		seriesArenaTopData = MonoBehaviourSingleton<DeliveryManager>.I.FindSeriesArenaTopData();
-		yield return this.StartCoroutine(LoadSeriesArenaTopBanner());
+		yield return StartCoroutine(LoadSeriesArenaTopBanner());
 		GetDeliveryList();
 		EndInitialize();
 	}
@@ -108,24 +108,25 @@ public class QuestSeriesArenaEventList : QuestEventSelectList
 	{
 		string resourceName = ResourceName.GetEventBG(seriesArenaTopData.bannerId);
 		Hash128 hash = default(Hash128);
-		if (MonoBehaviourSingleton<ResourceManager>.I.manifest != null)
+		if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest != null)
 		{
-			hash = MonoBehaviourSingleton<ResourceManager>.I.manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(resourceName));
+			hash = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(resourceName));
 		}
-		Utility.CreateGameObjectAndComponent("TheaterModeTable", this.get_gameObject().get_transform());
+		Utility.CreateGameObjectAndComponent("TheaterModeTable", base.gameObject.transform);
 		while (MonoBehaviourSingleton<TheaterModeTable>.I.isLoading)
 		{
 			yield return null;
 		}
-		if (MonoBehaviourSingleton<ResourceManager>.I.manifest == null || hash.get_isValid())
+		if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest == null || hash.isValid)
 		{
-			LoadingQueue load_queue = new LoadingQueue(this);
-			LoadObject lo_bg = load_queue.Load(isEventAsset: true, RESOURCE_CATEGORY.EVENT_BG, resourceName);
-			if (load_queue.IsLoading())
+			LoadingQueue loadingQueue = new LoadingQueue(this);
+			LoadObject lo_bg = loadingQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.EVENT_BG, resourceName);
+			if (loadingQueue.IsLoading())
 			{
-				yield return load_queue.Wait();
+				yield return loadingQueue.Wait();
 			}
-			SetTexture(texture: lo_bg.loadedObject as Texture2D, texture_enum: UI.TEX_EVENT_BG);
+			Texture2D texture = lo_bg.loadedObject as Texture2D;
+			SetTexture(UI.TEX_EVENT_BG, texture);
 		}
 	}
 
@@ -137,11 +138,11 @@ public class QuestSeriesArenaEventList : QuestEventSelectList
 		{
 			yield return loadingQueue.Wait();
 		}
-		Texture2D bannerTex = obj.loadedObject as Texture2D;
-		if (bannerTex != null)
+		Texture2D texture2D = obj.loadedObject as Texture2D;
+		if (texture2D != null)
 		{
 			Transform t2 = FindCtrl(t, UI.TEX_EVENT_BANNER);
-			SetTexture(t2, bannerTex);
+			SetTexture(t2, texture2D);
 			SetActive(t2, is_visible: true);
 		}
 	}
@@ -149,7 +150,7 @@ public class QuestSeriesArenaEventList : QuestEventSelectList
 	protected void UpdateNoArenaTable()
 	{
 		int item_num = 1;
-		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, item_num, reset: false, delegate(int i, Transform parent)
+		SetTable(UI.TBL_DELIVERY_QUEST, "", item_num, reset: false, delegate(int i, Transform parent)
 		{
 			Transform result = null;
 			if (i == 0)
@@ -165,8 +166,7 @@ public class QuestSeriesArenaEventList : QuestEventSelectList
 				InitGoToRankingButton(t);
 			}
 		});
-		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-		component.set_enabled(false);
+		GetComponent<UIScrollView>(UI.SCR_DELIVERY_QUEST).enabled = false;
 		RepositionTable();
 	}
 
@@ -216,8 +216,7 @@ public class QuestSeriesArenaEventList : QuestEventSelectList
 	protected override void UpdateTable()
 	{
 		int num = 0;
-		int count = stories.Count;
-		if (count > 0)
+		if (stories.Count > 0)
 		{
 			num++;
 		}
@@ -242,18 +241,18 @@ public class QuestSeriesArenaEventList : QuestEventSelectList
 			storyStartIndex++;
 		}
 		Transform ctrl = GetCtrl(UI.TBL_DELIVERY_QUEST);
-		if (Object.op_Implicit(ctrl))
+		if ((bool)ctrl)
 		{
 			int j = 0;
-			for (int childCount = ctrl.get_childCount(); j < childCount; j++)
+			for (int childCount = ctrl.childCount; j < childCount; j++)
 			{
 				Transform child = ctrl.GetChild(0);
-				child.set_parent(null);
-				Object.Destroy(child.get_gameObject());
+				child.parent = null;
+				UnityEngine.Object.Destroy(child.gameObject);
 			}
 		}
 		bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, reset: false, delegate(int i, Transform parent)
+		SetTable(UI.TBL_DELIVERY_QUEST, "", num2, reset: false, delegate(int i, Transform parent)
 		{
 			Transform result = null;
 			if (i >= storyStartIndex)
@@ -300,8 +299,7 @@ public class QuestSeriesArenaEventList : QuestEventSelectList
 				}
 			}
 		});
-		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-		component.set_enabled(true);
+		GetComponent<UIScrollView>(UI.SCR_DELIVERY_QUEST).enabled = true;
 		RepositionTable();
 	}
 
@@ -331,8 +329,8 @@ public class QuestSeriesArenaEventList : QuestEventSelectList
 		GameSection.SetEventData(new object[4]
 		{
 			story.id,
-			string.Empty,
-			string.Empty,
+			"",
+			"",
 			array
 		});
 	}
@@ -363,7 +361,7 @@ public class QuestSeriesArenaEventList : QuestEventSelectList
 	private void SetUpSeriesArenaListItem(Transform t, EventListData info)
 	{
 		int bannerId = info.bannerId;
-		this.StartCoroutine(LoadBanner(t, bannerId));
+		StartCoroutine(LoadBanner(t, bannerId));
 		SetActive(t, UI.SPR_ICON_NEW, info.leftBadgeEnum == BADGE_1_CATEGORY.NEW_EVENT);
 		SetActive(t, UI.SPR_ICON_EVENTREWARD, info.rightBadgeEnum == BADGE_2_CATEGORY.EVENT_REWARD);
 		bool flag = MonoBehaviourSingleton<QuestManager>.I.CheckEventMissionAllClear(info.eventId);
@@ -380,10 +378,8 @@ public class QuestSeriesArenaEventList : QuestEventSelectList
 			stringBuilder.Append("[000000]");
 			stringBuilder.Append("全依頼クリア");
 		}
-		QuestTable.QuestTableData eventQuestData = Singleton<QuestTable>.I.GetEventQuestData(info.eventId);
-		RARITY_TYPE rarity = eventQuestData.rarity;
-		UITexture component = FindCtrl(t, UI.TEX_ICON).GetComponent<UITexture>();
-		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.SERIES_ARENA_RANK_ICON, ResourceName.GetSeriesArenaRankIconName(rarity));
+		RARITY_TYPE rarity = Singleton<QuestTable>.I.GetEventQuestData(info.eventId).rarity;
+		ResourceLoad.LoadWithSetUITexture(FindCtrl(t, UI.TEX_ICON).GetComponent<UITexture>(), RESOURCE_CATEGORY.SERIES_ARENA_RANK_ICON, ResourceName.GetSeriesArenaRankIconName(rarity));
 		SetLabelText(t, UI.LBL_RIGHT_VALUE, stringBuilder.ToString());
 		SetSupportEncoding(t, UI.LBL_RIGHT_VALUE, isEnable: true);
 		SetActive(t, UI.LBL_RIGHT_VALUE, is_visible: true);

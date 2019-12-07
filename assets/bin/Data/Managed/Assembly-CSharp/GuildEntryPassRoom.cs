@@ -37,7 +37,7 @@ public class GuildEntryPassRoom : QuestEntryPassRoom
 		GameSection.StayEvent();
 		try
 		{
-			int clanId = int.Parse(string.Join(string.Empty, passCode));
+			int clanId = int.Parse(string.Join("", passCode));
 			MonoBehaviourSingleton<GuildManager>.I.SendSearchWithID(clanId, delegate(bool is_success, Error err)
 			{
 				GameSection.ResumeEvent(is_success);

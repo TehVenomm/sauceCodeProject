@@ -76,7 +76,11 @@ public class EnemyBrain : Brain
 
 	public override float GetScale()
 	{
-		return (enemy.enemyTableData == null) ? 1f : enemy.enemyTableData.modelScale;
+		if (enemy.enemyTableData == null)
+		{
+			return 1f;
+		}
+		return enemy.enemyTableData.modelScale;
 	}
 
 	public override Transform GetFront()
@@ -106,15 +110,15 @@ public class EnemyBrain : Brain
 
 	public override List<StageObject> GetAllyObjectList()
 	{
-		return (!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? new List<StageObject>() : MonoBehaviourSingleton<StageObjectManager>.I.enemyList;
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		{
+			return new List<StageObject>();
+		}
+		return MonoBehaviourSingleton<StageObjectManager>.I.enemyList;
 	}
 
 	private void SetNearWaveMatchTarget()
 	{
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 		if (base.fsm == null || base.targetCtrl == null)
 		{
 			return;
@@ -126,8 +130,7 @@ public class EnemyBrain : Brain
 			FieldWaveTargetObject fieldWaveTargetObject = MonoBehaviourSingleton<StageObjectManager>.I.waveTargetList[i] as FieldWaveTargetObject;
 			if (!(fieldWaveTargetObject == null) && !fieldWaveTargetObject.isDead)
 			{
-				Vector3 val = fieldWaveTargetObject._position - enemy._position;
-				float sqrMagnitude = val.get_sqrMagnitude();
+				float sqrMagnitude = (fieldWaveTargetObject._position - enemy._position).sqrMagnitude;
 				if (sqrMagnitude < num)
 				{
 					num = sqrMagnitude;
@@ -145,7 +148,6 @@ public class EnemyBrain : Brain
 
 	public void SetNearDecoyTarget()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 		if (base.targetCtrl != null)
 		{
 			StageObject nearestDecoyObject = AIUtility.GetNearestDecoyObject(base.owner._position);
@@ -172,14 +174,6 @@ public class EnemyBrain : Brain
 
 	public override void HandleEvent(BRAIN_EVENT ev, object param = null)
 	{
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
 		switch (ev)
 		{
 		case BRAIN_EVENT.END_ACTION:
@@ -203,9 +197,7 @@ public class EnemyBrain : Brain
 			AttackedHitStatusOwner attackedHitStatusOwner2 = (AttackedHitStatusOwner)param;
 			if (base.opponentMem != null && base.opponentMem.haveHateControl)
 			{
-				OpponentMemory opponentMem2 = base.opponentMem;
-				Vector3 val2 = attackedHitStatusOwner2.fromPos - attackedHitStatusOwner2.hitPos;
-				DISTANCE distance2 = opponentMem2.GetDistance(val2.get_sqrMagnitude());
+				DISTANCE distance2 = base.opponentMem.GetDistance((attackedHitStatusOwner2.fromPos - attackedHitStatusOwner2.hitPos).sqrMagnitude);
 				int num = (int)((float)attackedHitStatusOwner2.damage * base.opponentMem.hateParam.distanceAttackRatio[(int)distance2]);
 				if (isNPC(attackedHitStatusOwner2.fromObject))
 				{
@@ -221,9 +213,7 @@ public class EnemyBrain : Brain
 			if (base.opponentMem != null && base.opponentMem.haveHateControl)
 			{
 				int attackedWeakPointHate = base.opponentMem.hateParam.attackedWeakPointHate;
-				OpponentMemory opponentMem = base.opponentMem;
-				Vector3 val = attackedHitStatusOwner.fromPos - attackedHitStatusOwner.hitPos;
-				DISTANCE distance = opponentMem.GetDistance(val.get_sqrMagnitude());
+				DISTANCE distance = base.opponentMem.GetDistance((attackedHitStatusOwner.fromPos - attackedHitStatusOwner.hitPos).sqrMagnitude);
 				attackedWeakPointHate = (int)((float)attackedWeakPointHate * base.opponentMem.hateParam.distanceAttackRatio[(int)distance]);
 				if (isNPC(attackedHitStatusOwner.fromObject))
 				{
@@ -272,6 +262,10 @@ public class EnemyBrain : Brain
 	private bool isNPC(StageObject obj)
 	{
 		Player player = obj as Player;
-		return player != null && player.isNpc;
+		if (player != null)
+		{
+			return player.isNpc;
+		}
+		return false;
 	}
 }

@@ -2,31 +2,12 @@ using AOT;
 using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.OurUtils;
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
 {
 	internal class RealTimeEventListenerHelper : BaseReferenceHolder
 	{
-		[CompilerGenerated]
-		private static GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper.OnRoomStatusChangedCallback _003C_003Ef__mg_0024cache0;
-
-		[CompilerGenerated]
-		private static GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper.OnRoomConnectedSetChangedCallback _003C_003Ef__mg_0024cache1;
-
-		[CompilerGenerated]
-		private static GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper.OnP2PConnectedCallback _003C_003Ef__mg_0024cache2;
-
-		[CompilerGenerated]
-		private static GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper.OnP2PDisconnectedCallback _003C_003Ef__mg_0024cache3;
-
-		[CompilerGenerated]
-		private static GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper.OnParticipantStatusChangedCallback _003C_003Ef__mg_0024cache4;
-
-		[CompilerGenerated]
-		private static GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper.OnDataReceivedCallback _003C_003Ef__mg_0024cache5;
-
 		internal RealTimeEventListenerHelper(IntPtr selfPointer)
 			: base(selfPointer)
 		{
@@ -134,7 +115,7 @@ namespace GooglePlayGames.Native.PInvoke
 					if (action != null)
 					{
 						byte[] array = null;
-						if (dataLength.ToUInt64() != 0)
+						if (dataLength.ToUInt64() != 0L)
 						{
 							array = new byte[dataLength.ToUInt32()];
 							Marshal.Copy(data, array, 0, (int)dataLength.ToUInt32());
@@ -154,7 +135,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		private static IntPtr ToCallbackPointer(Action<NativeRealTimeRoom> callback)
 		{
-			Action<IntPtr> callback2 = delegate(IntPtr result)
+			return Callbacks.ToIntPtr((Action<IntPtr>)delegate(IntPtr result)
 			{
 				NativeRealTimeRoom nativeRealTimeRoom = NativeRealTimeRoom.FromPointer(result);
 				if (callback != null)
@@ -165,8 +146,7 @@ namespace GooglePlayGames.Native.PInvoke
 				{
 					nativeRealTimeRoom?.Dispose();
 				}
-			};
-			return Callbacks.ToIntPtr(callback2);
+			});
 		}
 
 		internal static RealTimeEventListenerHelper Create()

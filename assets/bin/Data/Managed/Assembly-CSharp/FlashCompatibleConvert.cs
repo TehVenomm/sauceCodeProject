@@ -3,11 +3,6 @@ using UnityEngine;
 
 public class FlashCompatibleConvert : MonoBehaviour
 {
-	public FlashCompatibleConvert()
-		: this()
-	{
-	}
-
 	public static int ToInt32(string s)
 	{
 		if (s == null)
@@ -151,6 +146,10 @@ public class FlashCompatibleConvert : MonoBehaviour
 
 	public static bool IsDigit(char c)
 	{
-		return c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9';
+		if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' && c != '6' && c != '7' && c != '8')
+		{
+			return c == '9';
+		}
+		return true;
 	}
 }

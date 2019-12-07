@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class EnemyHitMaterialTable : Singleton<EnemyHitMaterialTable>, IDataTable
@@ -54,9 +53,6 @@ public class EnemyHitMaterialTable : Singleton<EnemyHitMaterialTable>, IDataTabl
 
 	protected List<string> typeKeyTable = new List<string>();
 
-	[CompilerGenerated]
-	private static TableUtility.CallBackStringKeyReadCSV<MaterialData> _003C_003Ef__mg_0024cache0;
-
 	public StringKeyTable<MaterialData> dataTable
 	{
 		get;
@@ -65,7 +61,7 @@ public class EnemyHitMaterialTable : Singleton<EnemyHitMaterialTable>, IDataTabl
 
 	public void CreateTable(TextAsset stage_table_text_asset)
 	{
-		CreateTable(stage_table_text_asset.get_text());
+		CreateTable(stage_table_text_asset.text);
 	}
 
 	public void CreateTable(string csv)
@@ -83,7 +79,7 @@ public class EnemyHitMaterialTable : Singleton<EnemyHitMaterialTable>, IDataTabl
 				typeKeyTable.Add(key);
 			}
 		});
-		string text = string.Empty;
+		string text = "";
 		int i = 0;
 		for (int count = typeKeyTable.Count; i < count; i++)
 		{

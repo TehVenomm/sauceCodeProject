@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 
 public class QuestAcceptSeriesArenaDetail : QuestDeliveryDetail
@@ -114,14 +113,13 @@ public class QuestAcceptSeriesArenaDetail : QuestDeliveryDetail
 	public override void Initialize()
 	{
 		base.Initialize();
-		UITexture component = GetCtrl(UI.TEX_RUSH_IMAGE).GetComponent<UITexture>();
-		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.SERIES_ARENA_RANK_ICON, ResourceName.GetSeriesArenaRankIconName(info.GetQuestData().rarity));
+		ResourceLoad.LoadWithSetUITexture(GetCtrl(UI.TEX_RUSH_IMAGE).GetComponent<UITexture>(), RESOURCE_CATEGORY.SERIES_ARENA_RANK_ICON, ResourceName.GetSeriesArenaRankIconName(info.GetQuestData().rarity));
 	}
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_DROP_REWARD, is_visible: true);
-		SetActive((Enum)UI.OBJ_CLEAR_REWARD, is_visible: true);
+		SetActive(UI.OBJ_DROP_REWARD, is_visible: true);
+		SetActive(UI.OBJ_CLEAR_REWARD, is_visible: true);
 		base.UpdateUI();
 		UpdateTime();
 		SetSprite(baseRoot, UI.SPR_WINDOW, "RequestWindowBase_Arena");
@@ -135,17 +133,17 @@ public class QuestAcceptSeriesArenaDetail : QuestDeliveryDetail
 		if (clearStatusQuestData != null && clearStatusQuestData.clearTime > 0)
 		{
 			string text = QuestUtility.CreateTimeStringByMilliSecSeriesArena(clearStatusQuestData.clearTime);
-			SetLabelText((Enum)UI.LBL_LIMIT_TIME, text);
+			SetLabelText(UI.LBL_LIMIT_TIME, text);
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_RUSH_LEVEL, string.Empty);
+			SetLabelText(UI.LBL_RUSH_LEVEL, "");
 		}
 	}
 
 	protected override void UpdateNPC(string map_name, string enemy_name)
 	{
-		SetActive((Enum)UI.CHARA_ALL, is_visible: false);
+		SetActive(UI.CHARA_ALL, is_visible: false);
 	}
 
 	protected override void SetBaseFrame()
@@ -170,16 +168,16 @@ public class QuestAcceptSeriesArenaDetail : QuestDeliveryDetail
 
 	private void UpdateRewardInfo()
 	{
-		SetActive((Enum)UI.OBJ_CLEAR_ICON_ROOT, !isShowDropInfo);
-		SetActive((Enum)UI.OBJ_DROP_ICON_ROOT, isShowDropInfo);
-		SetActive((Enum)UI.OBJ_CLEAR_REWARD, !isShowDropInfo);
-		SetActive((Enum)UI.OBJ_DROP_REWARD, isShowDropInfo);
-		SetActive((Enum)UI.OBJ_COMPLETE_ROOT, !isShowDropInfo);
+		SetActive(UI.OBJ_CLEAR_ICON_ROOT, !isShowDropInfo);
+		SetActive(UI.OBJ_DROP_ICON_ROOT, isShowDropInfo);
+		SetActive(UI.OBJ_CLEAR_REWARD, !isShowDropInfo);
+		SetActive(UI.OBJ_DROP_REWARD, isShowDropInfo);
+		SetActive(UI.OBJ_COMPLETE_ROOT, !isShowDropInfo);
 	}
 
 	private void SetDifficultySprite()
 	{
 		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryID);
-		SetActive((Enum)UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
+		SetActive(UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
 	}
 }

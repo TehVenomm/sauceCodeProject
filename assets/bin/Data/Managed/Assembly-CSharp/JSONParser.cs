@@ -21,7 +21,7 @@ public class JSONParser
 		SkipWhitespace();
 		if (reader.Peek() != 123)
 		{
-			Debug.LogError((object)"malformed json: no starting '{'");
+			Debug.LogError("malformed json: no starting '{'");
 			return null;
 		}
 		reader.Read();
@@ -94,7 +94,7 @@ public class JSONParser
 	private string ReadFieldName()
 	{
 		SkipWhitespace();
-		string text = string.Empty;
+		string text = "";
 		char c = (char)reader.Peek();
 		bool flag = c == '\'' || c == '"';
 		SkipWhitespace();
@@ -103,11 +103,11 @@ public class JSONParser
 			switch (c)
 			{
 			case '}':
-				if (text == string.Empty)
+				if (text == "")
 				{
-					return string.Empty;
+					return "";
 				}
-				Debug.LogError((object)"malformed json: read '}' before reading ':'");
+				Debug.LogError("malformed json: read '}' before reading ':'");
 				return null;
 			case ':':
 				if (flag && (text.EndsWith("'") || text.EndsWith("\"")))
@@ -116,7 +116,7 @@ public class JSONParser
 				}
 				return text;
 			}
-			text += ((char)(ushort)reader.Read()).ToString();
+			text += ((char)reader.Read()).ToString();
 			SkipWhitespace();
 			c = (char)reader.Peek();
 		}
@@ -124,7 +124,7 @@ public class JSONParser
 
 	private double ReadNumber()
 	{
-		string text = string.Empty;
+		string text = "";
 		while (true)
 		{
 			int num = reader.Peek();
@@ -132,15 +132,14 @@ public class JSONParser
 			{
 				break;
 			}
-			text += ((char)(ushort)reader.Read()).ToString();
+			text += ((char)reader.Read()).ToString();
 		}
 		return FlashCompatibleConvert.ToDouble(text);
 	}
 
 	private bool ReadBoolean()
 	{
-		char c = (char)reader.Peek();
-		bool flag = c == 't';
+		bool flag = (ushort)reader.Peek() == 116;
 		for (int i = 0; i < 4; i++)
 		{
 			reader.Read();
@@ -162,7 +161,7 @@ public class JSONParser
 
 	private string ReadString()
 	{
-		string text = string.Empty;
+		string text = "";
 		bool flag = (ushort)reader.Peek() == 39;
 		reader.Read();
 		while (true)
@@ -172,7 +171,7 @@ public class JSONParser
 			{
 				break;
 			}
-			text += ((char)(ushort)reader.Read()).ToString();
+			text += ((char)reader.Read()).ToString();
 		}
 		reader.Read();
 		return text;

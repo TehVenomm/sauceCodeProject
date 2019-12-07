@@ -1,5 +1,3 @@
-using System;
-
 public class QuestAcceptArenaRoomUserEquipDetail : ItemDetailEquipDialog
 {
 	protected new enum UI
@@ -85,7 +83,7 @@ public class QuestAcceptArenaRoomUserEquipDetail : ItemDetailEquipDialog
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetActive((Enum)UI.BTN_CHANGE, is_visible: true);
+		SetActive(UI.BTN_CHANGE, is_visible: true);
 	}
 
 	protected override void OnQuery_SKILL_ICON_BUTTON()

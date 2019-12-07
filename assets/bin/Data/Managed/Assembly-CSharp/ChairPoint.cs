@@ -19,11 +19,6 @@ public class ChairPoint : MonoBehaviour
 		private set;
 	}
 
-	public ChairPoint()
-		: this()
-	{
-	}
-
 	public void SetSittingCharacter(HomePlayerCharacterBase chara)
 	{
 		sittingChara = chara;

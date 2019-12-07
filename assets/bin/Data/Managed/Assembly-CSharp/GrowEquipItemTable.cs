@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
@@ -207,15 +206,15 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 			{
 				uint value = 0u;
 				int value2 = 0;
-				CSVReader.PopResult popResult = csv_reader.Pop(ref value);
-				CSVReader.PopResult popResult2 = csv_reader.Pop(ref value2);
+				csv_reader.Pop(ref value);
+				csv_reader.Pop(ref value2);
 				if (value != 0 && value2 != 0)
 				{
 					list.Add(new NeedMaterial(value, value2));
 				}
 			}
 			data.needMaterial = list.ToArray();
-			CSVReader.PopResult popResult3 = csv_reader.Pop(ref data.needMoney);
+			csv_reader.Pop(ref data.needMoney);
 			return true;
 		}
 
@@ -298,24 +297,6 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 	private DoubleUIntKeyTable<GrowEquipItemNeedItemData> needTableData;
 
 	private DoubleUIntKeyTable<GrowEquipItemNeedItemData> needUniqueTableData;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<GrowEquipItemData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<GrowEquipItemData> _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<GrowEquipItemNeedItemData> _003C_003Ef__mg_0024cache2;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<GrowEquipItemNeedItemData> _003C_003Ef__mg_0024cache3;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<GrowEquipItemNeedItemData> _003C_003Ef__mg_0024cache4;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<GrowEquipItemNeedItemData> _003C_003Ef__mg_0024cache5;
 
 	public DoubleUIntKeyTable<GrowEquipItemData> GrowTableData => growTableData;
 
@@ -458,31 +439,31 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 			}
 		}
 		GrowEquipItemData growEquipItemData2 = new GrowEquipItemData();
-		float num = (float)(double)(lv - (uint)under.lv) / (float)(double)((uint)over.lv - (uint)under.lv);
+		float t = (float)(double)(lv - (uint)under.lv) / (float)(double)((uint)over.lv - (uint)under.lv);
 		growEquipItemData2.id = id;
 		growEquipItemData2.lv = lv;
 		growEquipItemData2.atk = new GrowRate();
-		growEquipItemData2.atk.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.atk.rate, (float)(int)over.atk.rate, num));
-		growEquipItemData2.atk.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.atk.add, (float)(int)over.atk.add, num));
+		growEquipItemData2.atk.rate = Mathf.FloorToInt(Mathf.Lerp((int)under.atk.rate, (int)over.atk.rate, t));
+		growEquipItemData2.atk.add = Mathf.FloorToInt(Mathf.Lerp((int)under.atk.add, (int)over.atk.add, t));
 		growEquipItemData2.def = new GrowRate();
-		growEquipItemData2.def.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.def.rate, (float)(int)over.def.rate, num));
-		growEquipItemData2.def.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.def.add, (float)(int)over.def.add, num));
+		growEquipItemData2.def.rate = Mathf.FloorToInt(Mathf.Lerp((int)under.def.rate, (int)over.def.rate, t));
+		growEquipItemData2.def.add = Mathf.FloorToInt(Mathf.Lerp((int)under.def.add, (int)over.def.add, t));
 		growEquipItemData2.hp = new GrowRate();
-		growEquipItemData2.hp.rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.hp.rate, (float)(int)over.hp.rate, num));
-		growEquipItemData2.hp.add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.hp.add, (float)(int)over.hp.add, num));
+		growEquipItemData2.hp.rate = Mathf.FloorToInt(Mathf.Lerp((int)under.hp.rate, (int)over.hp.rate, t));
+		growEquipItemData2.hp.add = Mathf.FloorToInt(Mathf.Lerp((int)under.hp.add, (int)over.hp.add, t));
 		growEquipItemData2.elemAtk = new GrowRate[6];
 		for (int k = 0; k < 6; k++)
 		{
 			growEquipItemData2.elemAtk[k] = new GrowRate();
-			growEquipItemData2.elemAtk[k].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemAtk[k].rate, (float)(int)over.elemAtk[k].rate, num));
-			growEquipItemData2.elemAtk[k].add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemAtk[k].add, (float)(int)over.elemAtk[k].add, num));
+			growEquipItemData2.elemAtk[k].rate = Mathf.FloorToInt(Mathf.Lerp((int)under.elemAtk[k].rate, (int)over.elemAtk[k].rate, t));
+			growEquipItemData2.elemAtk[k].add = Mathf.FloorToInt(Mathf.Lerp((int)under.elemAtk[k].add, (int)over.elemAtk[k].add, t));
 		}
 		growEquipItemData2.elemDef = new GrowRate[6];
 		for (int l = 0; l < 6; l++)
 		{
 			growEquipItemData2.elemDef[l] = new GrowRate();
-			growEquipItemData2.elemDef[l].rate = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemDef[l].rate, (float)(int)over.elemDef[l].rate, num));
-			growEquipItemData2.elemDef[l].add = Mathf.FloorToInt(Mathf.Lerp((float)(int)under.elemDef[l].add, (float)(int)over.elemDef[l].add, num));
+			growEquipItemData2.elemDef[l].rate = Mathf.FloorToInt(Mathf.Lerp((int)under.elemDef[l].rate, (int)over.elemDef[l].rate, t));
+			growEquipItemData2.elemDef[l].add = Mathf.FloorToInt(Mathf.Lerp((int)under.elemDef[l].add, (int)over.elemDef[l].add, t));
 		}
 		return growEquipItemData2;
 	}
@@ -536,12 +517,12 @@ public class GrowEquipItemTable : Singleton<GrowEquipItemTable>
 			{
 				if (over_need_material.itemID == material_data.itemID)
 				{
-					material_list.Add(new NeedMaterial(over_need_material.itemID, Mathf.FloorToInt(Mathf.Lerp((float)material_data.num, (float)over_need_material.num, lerp_value))));
+					material_list.Add(new NeedMaterial(over_need_material.itemID, Mathf.FloorToInt(Mathf.Lerp(material_data.num, over_need_material.num, lerp_value))));
 				}
 			});
 		});
 		growEquipItemNeedItemData2.needMaterial = material_list.ToArray();
-		growEquipItemNeedItemData2.needMoney = Mathf.FloorToInt(Mathf.Lerp((float)under.needMoney, (float)over.needMoney, lerp_value));
+		growEquipItemNeedItemData2.needMoney = Mathf.FloorToInt(Mathf.Lerp(under.needMoney, over.needMoney, lerp_value));
 		return growEquipItemNeedItemData2;
 	}
 

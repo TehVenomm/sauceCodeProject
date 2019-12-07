@@ -55,14 +55,9 @@ public class ResultExpGaugeCtrl : MonoBehaviour
 		private set;
 	}
 
-	public ResultExpGaugeCtrl()
-		: this()
-	{
-	}
-
 	public void InitDirection(Action<ResultExpGaugeCtrl> initialize_call = null)
 	{
-		progress = this.GetComponent<UISprite>();
+		progress = GetComponent<UISprite>();
 		initialize_call?.Invoke(this);
 		totalExp = getExp + startExp;
 		startLevel = nowLevel;
@@ -109,25 +104,25 @@ public class ResultExpGaugeCtrl : MonoBehaviour
 
 	public void UpdateCurveEvaluate()
 	{
-		bool flag = remainLevelUpCnt > 0;
-		float num = (int)levelTable.needExp - (int)nowLevelTable.needExp;
-		float num2 = flag ? num : ((nowLevel != startLevel) ? (totalExp - (float)(int)nowLevelTable.needExp) : getExp);
-		float num3 = (int)nowLevelTable.needExp;
+		bool num = remainLevelUpCnt > 0;
+		float num2 = (int)levelTable.needExp - (int)nowLevelTable.needExp;
+		float num3 = num ? num2 : ((nowLevel != startLevel) ? (totalExp - (float)(int)nowLevelTable.needExp) : getExp);
+		float num4 = (int)nowLevelTable.needExp;
 		if (nowLevel == startLevel)
 		{
-			num3 = startExp;
+			num4 = startExp;
 		}
-		float deltaTime = Time.get_deltaTime();
+		float deltaTime = Time.deltaTime;
 		time += deltaTime;
-		if (flag)
+		if (num)
 		{
-			float num4 = lvUpCurve.get_keys()[lvUpCurve.get_length() - 1].get_time();
-			addCountExpValue = lvUpCurve.Evaluate(Mathf.Clamp(time, 0f, num4)) * num2 + num3;
+			float max = lvUpCurve.keys[lvUpCurve.length - 1].time;
+			addCountExpValue = lvUpCurve.Evaluate(Mathf.Clamp(time, 0f, max)) * num3 + num4;
 		}
 		else
 		{
-			float num5 = lastDirectionCurve.get_keys()[lastDirectionCurve.get_length() - 1].get_time();
-			addCountExpValue = lastDirectionCurve.Evaluate(Mathf.Clamp(time, 0f, num5)) * num2 + num3;
+			float max2 = lastDirectionCurve.keys[lastDirectionCurve.length - 1].time;
+			addCountExpValue = lastDirectionCurve.Evaluate(Mathf.Clamp(time, 0f, max2)) * num3 + num4;
 		}
 	}
 

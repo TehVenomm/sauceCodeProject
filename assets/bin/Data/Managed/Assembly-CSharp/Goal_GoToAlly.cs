@@ -9,30 +9,18 @@ public class Goal_GoToAlly : GoalComposite
 
 	protected override void Activate(Brain brain)
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 		SetStatus(STATUS.ACTIVE);
 		if (!brain.targetCtrl.CanRescueOfTargetAlly())
 		{
 			SetStatus(STATUS.COMPLETED);
 			return;
 		}
-		StageObject allyTarget = brain.targetCtrl.GetAllyTarget();
-		Vector3 position = allyTarget._transform.get_position();
+		Vector3 position = brain.targetCtrl.GetAllyTarget()._transform.position;
 		float num = 3f;
 		if (!brain.moveCtrl.CanSeekToAlly(position, num))
 		{
 			PLACE place = Utility.Coin() ? PLACE.RIGHT : PLACE.LEFT;
-			RaycastHit seekHit = brain.moveCtrl.seekHit;
-			Vector3 position2 = seekHit.get_transform().get_position();
+			Vector3 position2 = brain.moveCtrl.seekHit.transform.position;
 			AddSubGoal<Goal_MoveToAround>().SetParam(place, position2, num);
 		}
 		else if (!brain.owner.IsArrivalPosition(position))

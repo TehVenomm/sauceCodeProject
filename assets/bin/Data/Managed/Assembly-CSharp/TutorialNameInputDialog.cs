@@ -25,10 +25,10 @@ public class TutorialNameInputDialog : GameSection
 	public override void Initialize()
 	{
 		sexId = (int)GameSection.GetEventData();
-		inputName = base.GetComponent<UINameInput>(GetCtrl(UI.OBJ_INPUT), (Enum)UI.IPT_NAME);
-		SetActive((Enum)UI.SPR_CHECK, isTermsEnable);
-		SetActive((Enum)UI.SPR_CHECK_OFF, !isTermsEnable);
-		SetButtonEnabled((Enum)UI.BTN_CONFIRM, is_enabled: false);
+		inputName = GetComponent<UINameInput>(GetCtrl(UI.OBJ_INPUT), UI.IPT_NAME);
+		SetActive(UI.SPR_CHECK, isTermsEnable);
+		SetActive(UI.SPR_CHECK_OFF, !isTermsEnable);
+		SetButtonEnabled(UI.BTN_CONFIRM, is_enabled: false);
 		initName = base.sectionData.GetText("DEFAULT_NAME_TEXT");
 		base.Initialize();
 	}
@@ -43,14 +43,14 @@ public class TutorialNameInputDialog : GameSection
 	private void OnQuery_TERMS()
 	{
 		isTermsEnable = !isTermsEnable;
-		SetActive((Enum)UI.SPR_CHECK, isTermsEnable);
-		SetActive((Enum)UI.SPR_CHECK_OFF, !isTermsEnable);
-		SetButtonEnabled((Enum)UI.BTN_CONFIRM, GetInputName().Length > 0 && isTermsEnable);
+		SetActive(UI.SPR_CHECK, isTermsEnable);
+		SetActive(UI.SPR_CHECK_OFF, !isTermsEnable);
+		SetButtonEnabled(UI.BTN_CONFIRM, GetInputName().Length > 0 && isTermsEnable);
 	}
 
 	protected void OnQuery_CONFIRM()
 	{
-		string text = GetInputName();
+		GetInputName();
 		SendEditFigure(delegate(bool success)
 		{
 			if (success)
@@ -80,7 +80,7 @@ public class TutorialNameInputDialog : GameSection
 			{
 				inputName.InActiveName();
 			}
-			SetButtonEnabled((Enum)UI.BTN_CONFIRM, is_enabled: false);
+			SetButtonEnabled(UI.BTN_CONFIRM, is_enabled: false);
 			return;
 		}
 		if (inputName != null)
@@ -88,20 +88,20 @@ public class TutorialNameInputDialog : GameSection
 			inputName.ActiveName();
 			inputName.SetName(text);
 		}
-		SetButtonEnabled((Enum)UI.BTN_CONFIRM, isTermsEnable);
+		SetButtonEnabled(UI.BTN_CONFIRM, isTermsEnable);
 	}
 
 	private string GetInputName()
 	{
-		return GetInputValue((Enum)UI.IPT_NAME);
+		return GetInputValue(UI.IPT_NAME);
 	}
 
 	public void SendEditFigure(Action<bool> call_back)
 	{
 		OptionEditFigureModel.RequestSendForm send_form = new OptionEditFigureModel.RequestSendForm();
 		send_form.sex = sexId;
-		string text = GetInputName().Replace(" ", string.Empty);
-		send_form.name = ((!(text == initName.Replace(" ", string.Empty))) ? text : "/colopl_rob");
+		string text = GetInputName().Replace(" ", "");
+		send_form.name = ((text == initName.Replace(" ", "")) ? "/colopl_rob" : text);
 		send_form.crystalCL = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
 		Protocol.Force(delegate
 		{
@@ -113,7 +113,7 @@ public class TutorialNameInputDialog : GameSection
 					obj = true;
 				}
 				call_back(obj);
-			}, string.Empty);
+			});
 		});
 		PlayerPrefs.SetString("Tut_Name", send_form.name);
 	}

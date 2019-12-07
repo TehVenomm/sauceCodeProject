@@ -5,15 +5,15 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 {
 	public class TargetInfo
 	{
-		public string name = string.Empty;
+		public string name = "";
 
 		public float radius;
 
-		public string iconName = string.Empty;
+		public string iconName = "";
 
 		public bool iconEvent;
 
-		public string dispName = string.Empty;
+		public string dispName = "";
 	}
 
 	private const int kDefaultModelIndex = 3;
@@ -66,8 +66,8 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 			{
 				continue;
 			}
-			string text = array2[0];
-			if (text != null && text == "mi")
+			string a = array2[0];
+			if (a == "mi")
 			{
 				int result = 0;
 				if (int.TryParse(array2[1], out result))
@@ -150,7 +150,7 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 		}
 		if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid() && m_gimmickType == FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.WAVE_TARGET3)
 		{
-			MonoBehaviourSingleton<SceneSettingsManager>.I.AddWaveTarget(this.get_gameObject());
+			MonoBehaviourSingleton<SceneSettingsManager>.I.AddWaveTarget(base.gameObject);
 		}
 	}
 
@@ -202,7 +202,7 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 			SphereCollider component = m_modelTrans.GetComponent<SphereCollider>();
 			if (!(component == null))
 			{
-				component.set_radius(radius);
+				component.radius = radius;
 			}
 		}
 	}
@@ -227,7 +227,7 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 			Enemy enemy = status.fromObject as Enemy;
 			if (!(enemy == null))
 			{
-				status.damage = ((!enemy.isWaveMatchBoss) ? param.enemyNormalDamage : param.enemyBossDamage);
+				status.damage = (enemy.isWaveMatchBoss ? param.enemyBossDamage : param.enemyNormalDamage);
 				status.afterHP = _nowHp - status.damage;
 				base.OnAttackedHitOwner(status);
 			}
@@ -236,15 +236,6 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 
 	public override void OnAttackedHitFix(AttackedHitStatusFix status)
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 		if (isDead || isBarrier)
 		{
 			return;
@@ -254,18 +245,14 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 		{
 			_nowHp = 0;
 			SoundManager.PlayOneShotSE(param.targetBreakSeId, status.hitPos);
-			if (!object.ReferenceEquals(this.get_gameObject(), null))
+			if ((object)base.gameObject != null)
 			{
-				Object.Destroy(this.get_gameObject());
+				Object.Destroy(base.gameObject);
 			}
 		}
 		else
 		{
-			string targetHitEffect = param.targetHitEffect;
-			Vector3 hitPos = status.hitPos;
-			float x = hitPos.x;
-			Vector3 hitPos2 = status.hitPos;
-			EffectManager.OneShot(targetHitEffect, new Vector3(x, 0f, hitPos2.z), Quaternion.get_identity(), param.targetHitEffectScale);
+			EffectManager.OneShot(param.targetHitEffect, new Vector3(status.hitPos.x, 0f, status.hitPos.z), Quaternion.identity, param.targetHitEffectScale);
 			SoundManager.PlayOneShotSE(param.targetHitSeId, status.hitPos);
 		}
 	}
@@ -317,7 +304,7 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 	{
 		if (param == null)
 		{
-			return string.Empty;
+			return "";
 		}
 		if (param.isEvent || info.iconEvent)
 		{
@@ -342,7 +329,7 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 	{
 		if (param == null)
 		{
-			return string.Empty;
+			return "";
 		}
 		if (param.isEvent || info.iconEvent)
 		{
@@ -362,7 +349,7 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 		{
 			return;
 		}
-		hateWaitSec -= Time.get_deltaTime();
+		hateWaitSec -= Time.deltaTime;
 		if (hateWaitSec > 0f)
 		{
 			return;
@@ -388,9 +375,9 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 		if (_nowHp <= 0)
 		{
 			_nowHp = 0;
-			if (!object.ReferenceEquals(this.get_gameObject(), null))
+			if ((object)base.gameObject != null)
 			{
-				Object.Destroy(this.get_gameObject());
+				Object.Destroy(base.gameObject);
 			}
 		}
 		if (max > 0)
@@ -425,7 +412,7 @@ public class FieldWaveTargetObject : StageObject, IFieldGimmickObject
 	{
 		if (barrierEffect != null)
 		{
-			EffectManager.ReleaseEffect(barrierEffect.get_gameObject());
+			EffectManager.ReleaseEffect(barrierEffect.gameObject);
 		}
 		base.OnDisable();
 	}

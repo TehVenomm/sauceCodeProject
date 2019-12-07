@@ -79,13 +79,7 @@ public static class Localization
 	}
 
 	[Obsolete("Localization is now always active. You no longer need to check this property.")]
-	public static bool isActive
-	{
-		get
-		{
-			return true;
-		}
-	}
+	public static bool isActive => true;
 
 	private static bool LoadDictionary(string value)
 	{
@@ -94,10 +88,10 @@ public static class Localization
 		{
 			if (loadFunction == null)
 			{
-				TextAsset val = Resources.Load<TextAsset>("Localization");
-				if (val != null)
+				TextAsset textAsset = Resources.Load<TextAsset>("Localization");
+				if (textAsset != null)
 				{
-					array = val.get_bytes();
+					array = textAsset.bytes;
 				}
 			}
 			else
@@ -120,10 +114,10 @@ public static class Localization
 		}
 		if (loadFunction == null)
 		{
-			TextAsset val2 = Resources.Load<TextAsset>(value);
-			if (val2 != null)
+			TextAsset textAsset2 = Resources.Load<TextAsset>(value);
+			if (textAsset2 != null)
 			{
-				array = val2.get_bytes();
+				array = textAsset2.bytes;
 			}
 		}
 		else
@@ -167,7 +161,7 @@ public static class Localization
 	public static void Load(TextAsset asset)
 	{
 		ByteReader byteReader = new ByteReader(asset);
-		Set(asset.get_name(), byteReader.ReadDictionary());
+		Set(asset.name, byteReader.ReadDictionary());
 	}
 
 	public static void Set(string languageName, byte[] bytes)
@@ -195,7 +189,7 @@ public static class Localization
 
 	public static bool LoadCSV(TextAsset asset, bool merge = false)
 	{
-		return LoadCSV(asset.get_bytes(), asset, merge);
+		return LoadCSV(asset.bytes, asset, merge);
 	}
 
 	public static bool LoadCSV(byte[] bytes, bool merge = false)
@@ -324,7 +318,7 @@ public static class Localization
 			mDictionary[text] = value;
 			if (newLanguages == null)
 			{
-				Debug.LogWarning((object)("Localization key '" + text + "' is already present"));
+				Debug.LogWarning("Localization key '" + text + "' is already present");
 			}
 		}
 		else
@@ -335,7 +329,7 @@ public static class Localization
 			}
 			catch (Exception ex)
 			{
-				Debug.LogError((object)("Unable to add '" + text + "' to the Localization dictionary.\n" + ex.Message));
+				Debug.LogError("Unable to add '" + text + "' to the Localization dictionary.\n" + ex.Message);
 			}
 		}
 	}
@@ -432,7 +426,7 @@ public static class Localization
 		}
 		if (mLanguages == null)
 		{
-			Debug.LogError((object)"No localization data present");
+			Debug.LogError("No localization data present");
 			return null;
 		}
 		string language = Localization.language;
@@ -451,7 +445,7 @@ public static class Localization
 		{
 			mLanguageIndex = 0;
 			mLanguage = mLanguages[0];
-			Debug.LogWarning((object)("Language not found: " + language));
+			Debug.LogWarning("Language not found: " + language);
 		}
 		string value;
 		string[] value2;
@@ -542,6 +536,10 @@ public static class Localization
 		{
 			return true;
 		}
-		return mDictionary.ContainsKey(key) || mOldDictionary.ContainsKey(key);
+		if (!mDictionary.ContainsKey(key))
+		{
+			return mOldDictionary.ContainsKey(key);
+		}
+		return true;
 	}
 }

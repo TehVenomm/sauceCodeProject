@@ -14,7 +14,7 @@ public class FieldModel : BaseModel
 
 		public string raidBossHp;
 
-		public string noticeText = string.Empty;
+		public string noticeText = "";
 
 		public int mapFlag;
 	}

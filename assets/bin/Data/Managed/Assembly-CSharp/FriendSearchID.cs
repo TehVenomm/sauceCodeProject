@@ -1,5 +1,4 @@
 using Network;
-using System;
 
 public class FriendSearchID : ConfigName
 {
@@ -28,7 +27,7 @@ public class FriendSearchID : ConfigName
 	private void OnQuery_OK()
 	{
 		GameSection.SetEventData(null);
-		string input_text = GetInputValue((Enum)UI.IPT_TEXT);
+		string input_text = GetInputValue(UI.IPT_TEXT);
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<FriendManager>.I.SendSearchID(input_text, delegate(bool is_success, FriendSearchResult recv_data)
 		{

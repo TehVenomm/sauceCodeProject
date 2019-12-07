@@ -63,10 +63,6 @@ public class DecoyTurretBitBulletObject : DecoyBulletObject
 
 	public override void Initialize(int playerId, int decoyId, BulletData bullet, Vector3 position, SkillInfo.SkillParam skill, bool isHit)
 	{
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(playerId, decoyId, bullet, position, skill, isHit);
 		dataTurretBit = bullet.dataDecoyTurretBit;
 		firstShotDelayTimer = dataTurretBit.firstShotDelay_Sec;
@@ -93,17 +89,17 @@ public class DecoyTurretBitBulletObject : DecoyBulletObject
 		}
 		exAttackMode = ownerPlayer.attackMode;
 		exSkillParam = ownerPlayer.skillInfo.actSkillParam;
-		Transform val = Utility.FindChild(cachedEffectTransform, dataTurretBit.chargeEffectParentNodename);
-		if (val == null)
+		Transform transform = Utility.FindChild(cachedEffectTransform, dataTurretBit.chargeEffectParentNodename);
+		if (transform == null)
 		{
-			val = cachedEffectTransform;
+			transform = cachedEffectTransform;
 		}
 		if (!string.IsNullOrEmpty(dataTurretBit.chargeEffectName))
 		{
 			cachedChargeEffectTransform = EffectManager.GetEffect(dataTurretBit.chargeEffectName, MonoBehaviourSingleton<EffectManager>.I._transform);
-			cachedChargeEffectTransform.SetParent(val);
-			cachedChargeEffectTransform.set_localPosition(dataTurretBit.chargeEffectDispOffset);
-			cachedChargeEffectTransform.set_localRotation(Quaternion.Euler(dataTurretBit.chargeEffectDispRotation));
+			cachedChargeEffectTransform.SetParent(transform);
+			cachedChargeEffectTransform.localPosition = dataTurretBit.chargeEffectDispOffset;
+			cachedChargeEffectTransform.localRotation = Quaternion.Euler(dataTurretBit.chargeEffectDispRotation);
 		}
 		rotateTransForm = Utility.FindChild(cachedEffectTransform, dataTurretBit.rotateNodeName);
 		if (rotateTransForm == null)
@@ -114,14 +110,6 @@ public class DecoyTurretBitBulletObject : DecoyBulletObject
 
 	private bool UpdateTarget()
 	{
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
 		if (ownerPlayer == null || ownerPlayer.playerSender == null)
 		{
 			return false;
@@ -130,7 +118,7 @@ public class DecoyTurretBitBulletObject : DecoyBulletObject
 		{
 			return false;
 		}
-		searchIntervalTimer -= Time.get_deltaTime();
+		searchIntervalTimer -= Time.deltaTime;
 		if (searchIntervalTimer > 0f)
 		{
 			return false;
@@ -145,8 +133,7 @@ public class DecoyTurretBitBulletObject : DecoyBulletObject
 			Enemy enemy = MonoBehaviourSingleton<StageObjectManager>.I.enemyList[i] as Enemy;
 			if (!(enemy == null) && !enemy.isDead)
 			{
-				Vector3 val = enemy._position - base._transform.get_position();
-				float sqrMagnitude = val.get_sqrMagnitude();
+				float sqrMagnitude = (enemy._position - base._transform.position).sqrMagnitude;
 				if (num > sqrMagnitude && sqrMagnitude <= searchRangeSqr)
 				{
 					targetEnemy = enemy;
@@ -172,24 +159,14 @@ public class DecoyTurretBitBulletObject : DecoyBulletObject
 		for (int num2 = targetEnemy.targetPoints.Length; j < num2; j++)
 		{
 			TargetPoint targetPoint = targetEnemy.targetPoints[j];
-			if (!targetPoint.get_enabled() || !targetPoint.get_gameObject().get_activeInHierarchy())
+			if (targetPoint.enabled && targetPoint.gameObject.activeInHierarchy && (targetPoint.regionID < 0 || targetPoint.regionID >= targetEnemy.regionWorks.Length || targetEnemy.regionWorks[targetPoint.regionID].enabled))
 			{
-				continue;
-			}
-			if (targetPoint.regionID >= 0 && targetPoint.regionID < targetEnemy.regionWorks.Length)
-			{
-				EnemyRegionWork enemyRegionWork = targetEnemy.regionWorks[targetPoint.regionID];
-				if (!enemyRegionWork.enabled)
+				float sqrMagnitude2 = (targetPoint._transform.position - base._transform.position).sqrMagnitude;
+				if (num > sqrMagnitude2)
 				{
-					continue;
+					this.targetPoint = targetPoint;
+					num = sqrMagnitude2;
 				}
-			}
-			Vector3 val2 = targetPoint._transform.get_position() - base._transform.get_position();
-			float sqrMagnitude2 = val2.get_sqrMagnitude();
-			if (num > sqrMagnitude2)
-			{
-				this.targetPoint = targetPoint;
-				num = sqrMagnitude2;
 			}
 		}
 		return true;
@@ -197,26 +174,15 @@ public class DecoyTurretBitBulletObject : DecoyBulletObject
 
 	public void UpdateShot()
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 		if (rotateTransForm == null)
 		{
 			return;
 		}
-		Vector3 targetPos = GetTargetPos();
-		Quaternion val = Quaternion.LookRotation(targetPos - rotateTransForm.get_position());
-		rotateTransForm.set_rotation(Quaternion.Lerp(rotateTransForm.get_rotation(), val, lookAtInterpolate));
+		Quaternion b = Quaternion.LookRotation(GetTargetPos() - rotateTransForm.position);
+		rotateTransForm.rotation = Quaternion.Lerp(rotateTransForm.rotation, b, lookAtInterpolate);
 		if (!isEndDelay)
 		{
-			firstShotDelayTimer -= Time.get_deltaTime();
+			firstShotDelayTimer -= Time.deltaTime;
 			if (firstShotDelayTimer > 0f)
 			{
 				return;
@@ -225,7 +191,7 @@ public class DecoyTurretBitBulletObject : DecoyBulletObject
 		}
 		if (!(targetEnemy == null))
 		{
-			shotIntervalTimer -= Time.get_deltaTime();
+			shotIntervalTimer -= Time.deltaTime;
 			if (!(shotIntervalTimer > 0f))
 			{
 				shotIntervalTimer += shotInterval_Sec;
@@ -236,16 +202,13 @@ public class DecoyTurretBitBulletObject : DecoyBulletObject
 
 	private Vector3 GetTargetPos()
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		if (targetEnemy == null)
 		{
-			return Vector3.get_zero();
+			return Vector3.zero;
 		}
 		if (targetPoint != null)
 		{
-			return targetPoint._transform.get_position();
+			return targetPoint._transform.position;
 		}
 		return targetEnemy._position;
 	}
@@ -255,27 +218,20 @@ public class DecoyTurretBitBulletObject : DecoyBulletObject
 		CreateBullet(finalAttackInfo, isFinal: true);
 		if (cachedChargeEffectTransform != null)
 		{
-			EffectManager.ReleaseEffect(cachedChargeEffectTransform.get_gameObject());
+			EffectManager.ReleaseEffect(cachedChargeEffectTransform.gameObject);
 		}
 		base.OnDisappear(isExplode);
 	}
 
 	private void CreateBullet(AttackInfo atkInfo, bool isFinal)
 	{
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 		if (atkInfo != null)
 		{
 			BulletData bulletData = atkInfo.bulletData;
 			if (!(bulletData == null) && !(ownerPlayer == null) && !(cachedEffectTransform == null))
 			{
-				Quaternion rot = Quaternion.LookRotation(GetTargetPos() - cachedEffectTransform.get_position());
-				AnimEventShot.CreateByExternalBulletData(bulletData, ownerPlayer, atkInfo, cachedEffectTransform.get_position(), rot, (!isFinal) ? exNormalAtk : exFinalAtk, exAttackMode, exSkillParam);
+				Quaternion rot = Quaternion.LookRotation(GetTargetPos() - cachedEffectTransform.position);
+				AnimEventShot.CreateByExternalBulletData(bulletData, ownerPlayer, atkInfo, cachedEffectTransform.position, rot, isFinal ? exFinalAtk : exNormalAtk, exAttackMode, exSkillParam);
 			}
 		}
 	}

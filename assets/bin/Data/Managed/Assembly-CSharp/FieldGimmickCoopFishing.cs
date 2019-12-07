@@ -14,7 +14,7 @@ public class FieldGimmickCoopFishing : FieldGatherGimmickObject
 
 	protected override void Awake()
 	{
-		SetTransform(this.get_transform());
+		SetTransform(base.transform);
 		isActive = true;
 	}
 
@@ -40,22 +40,6 @@ public class FieldGimmickCoopFishing : FieldGatherGimmickObject
 
 	public override void UpdateTargetMarker(bool isNear)
 	{
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 		if (isNear && self != null && self.IsChangeableAction((Character.ACTION_ID)41))
 		{
@@ -65,16 +49,15 @@ public class FieldGimmickCoopFishing : FieldGatherGimmickObject
 			}
 			if (targetMarker != null)
 			{
-				Vector3 position = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_position();
-				Quaternion rotation = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_rotation();
-				Vector3 val = position - m_transform.get_position();
-				Vector3 pos = val.get_normalized() + Vector3.get_up() + m_transform.get_position();
+				Vector3 position = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.position;
+				Quaternion rotation = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.rotation;
+				Vector3 pos = (position - m_transform.position).normalized + Vector3.up + m_transform.position;
 				targetMarker.Set(pos, rotation);
 			}
 		}
 		else if (targetMarker != null)
 		{
-			EffectManager.ReleaseEffect(targetMarker.get_gameObject());
+			EffectManager.ReleaseEffect(targetMarker.gameObject);
 		}
 	}
 
@@ -114,34 +97,24 @@ public class FieldGimmickCoopFishing : FieldGatherGimmickObject
 
 	public Vector3 GetCoopPos()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		if (owner == null)
 		{
-			return m_transform.get_position();
+			return m_transform.position;
 		}
-		return m_transform.get_position() + owner._forward * -1f;
+		return m_transform.position + owner._forward * -1f;
 	}
 
 	public Quaternion GetCoopRot()
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		if (owner == null)
 		{
-			return Quaternion.get_identity();
+			return Quaternion.identity;
 		}
-		return Quaternion.LookRotation(owner._forward, Vector3.get_up());
+		return Quaternion.LookRotation(owner._forward, Vector3.up);
 	}
 
 	public void SetPosition(Vector3 pos)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		m_transform.set_position(pos);
+		m_transform.position = pos;
 	}
 }

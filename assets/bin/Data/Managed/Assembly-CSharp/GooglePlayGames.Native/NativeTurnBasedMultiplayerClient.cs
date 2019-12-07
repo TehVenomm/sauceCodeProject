@@ -93,20 +93,19 @@ namespace GooglePlayGames.Native
 		{
 			mTurnBasedManager.GetAllTurnbasedMatches(delegate(TurnBasedManager.TurnBasedMatchesResponse allMatches)
 			{
-				int num = allMatches.MyTurnMatchesCount() + allMatches.TheirTurnMatchesCount() + allMatches.CompletedMatchesCount();
-				GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch[] array = new GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch[num];
-				int num2 = 0;
+				GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch[] array = new GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch[allMatches.MyTurnMatchesCount() + allMatches.TheirTurnMatchesCount() + allMatches.CompletedMatchesCount()];
+				int num = 0;
 				foreach (NativeTurnBasedMatch item in allMatches.MyTurnMatches())
 				{
-					array[num2++] = item.AsTurnBasedMatch(mNativeClient.GetUserId());
+					array[num++] = item.AsTurnBasedMatch(mNativeClient.GetUserId());
 				}
 				foreach (NativeTurnBasedMatch item2 in allMatches.TheirTurnMatches())
 				{
-					array[num2++] = item2.AsTurnBasedMatch(mNativeClient.GetUserId());
+					array[num++] = item2.AsTurnBasedMatch(mNativeClient.GetUserId());
 				}
 				foreach (NativeTurnBasedMatch item3 in allMatches.CompletedMatches())
 				{
-					array[num2++] = item3.AsTurnBasedMatch(mNativeClient.GetUserId());
+					array[num++] = item3.AsTurnBasedMatch(mNativeClient.GetUserId());
 				}
 				callback(array);
 			});

@@ -61,17 +61,12 @@ public class ClanChatWebSocketConnection : MonoBehaviour, IClanChatConnection
 
 	public event ClanChatRoom.OnReceiveUpdateStatus onReceiveUpdateStatus;
 
-	public ClanChatWebSocketConnection()
-		: this()
-	{
-	}
-
 	public void Setup(string host, int port, string path, bool autoReconnect = true)
 	{
 		UriBuilder uriBuilder = new UriBuilder("ws", host, port, path);
 		uri = uriBuilder.Uri.ToString();
 		this.autoReconnect = autoReconnect;
-		chatWebSocket = (Utility.CreateGameObjectAndComponent("ClanChatWebSocket", this.get_transform()) as ClanChatWebSocket);
+		chatWebSocket = (Utility.CreateGameObjectAndComponent("ClanChatWebSocket", base.transform) as ClanChatWebSocket);
 	}
 
 	private void OnWebSocketClosed()
@@ -92,12 +87,12 @@ public class ClanChatWebSocketConnection : MonoBehaviour, IClanChatConnection
 	private void Reconnect(int count)
 	{
 		reconnecting = true;
-		this.StartCoroutine(TryReconnect(count));
+		StartCoroutine(TryReconnect(count));
 	}
 
 	private IEnumerator TryReconnect(int count)
 	{
-		for (float time = RECONNECT_WAIT_SEC * (float)(RECONNECT_RETRY_LIMIT - count + 1); time > 0f; time -= Time.get_deltaTime())
+		for (float time = RECONNECT_WAIT_SEC * (float)(RECONNECT_RETRY_LIMIT - count + 1); time > 0f; time -= Time.deltaTime)
 		{
 			yield return null;
 		}
@@ -134,11 +129,11 @@ public class ClanChatWebSocketConnection : MonoBehaviour, IClanChatConnection
 		}
 		if (isConnectProcessing)
 		{
-			this.StartCoroutine(WaitConnectProcess(onFinished));
+			StartCoroutine(WaitConnectProcess(onFinished));
 			return;
 		}
 		chatWebSocket.ReceivePacketAction = OnReceivePacket;
-		m_ConnectProcess = this.StartCoroutine(ConnectProcess(onFinished));
+		m_ConnectProcess = StartCoroutine(ConnectProcess(onFinished));
 	}
 
 	public void Disconnect(Action onFinished = null)
@@ -152,7 +147,7 @@ public class ClanChatWebSocketConnection : MonoBehaviour, IClanChatConnection
 			joined = false;
 			if ((onFinished != null || this.onDisconnect != null) && !AppMain.isApplicationQuit)
 			{
-				this.StartCoroutine(WaitClose(onFinished));
+				StartCoroutine(WaitClose(onFinished));
 			}
 		}
 		else
@@ -354,17 +349,17 @@ public class ClanChatWebSocketConnection : MonoBehaviour, IClanChatConnection
 
 	private void OnReceiveUpdateStatus(ChatPacket packet)
 	{
-		Chat_Model_BroadcastClanStatus_Response chat_Model_BroadcastClanStatus_Response = packet.model as Chat_Model_BroadcastClanStatus_Response;
+		Chat_Model_BroadcastClanStatus_Response obj = packet.model as Chat_Model_BroadcastClanStatus_Response;
 		int result = 0;
 		int result2 = 0;
 		int result3 = 0;
 		int result4 = 0;
 		int result5 = 0;
-		int.TryParse(chat_Model_BroadcastClanStatus_Response.Type, out result);
-		int.TryParse(chat_Model_BroadcastClanStatus_Response.RoomId, out result2);
-		int.TryParse(chat_Model_BroadcastClanStatus_Response.Result, out result3);
-		int.TryParse(chat_Model_BroadcastClanStatus_Response.Status, out result4);
-		int.TryParse(chat_Model_BroadcastClanStatus_Response.Id, out result5);
+		int.TryParse(obj.Type, out result);
+		int.TryParse(obj.RoomId, out result2);
+		int.TryParse(obj.Result, out result3);
+		int.TryParse(obj.Status, out result4);
+		int.TryParse(obj.Id, out result5);
 		ClanUpdateStatusData clanUpdateStatusData = new ClanUpdateStatusData();
 		clanUpdateStatusData.id = result5;
 		clanUpdateStatusData.type = result;
@@ -373,6 +368,8 @@ public class ClanChatWebSocketConnection : MonoBehaviour, IClanChatConnection
 		clanUpdateStatusData.status = result4;
 		switch (result)
 		{
+		case 1:
+			break;
 		case 2:
 			if (this.onReceiveUpdateStatus != null)
 			{
@@ -384,6 +381,9 @@ public class ClanChatWebSocketConnection : MonoBehaviour, IClanChatConnection
 			{
 				this.onReceiveUpdateStatus(clanUpdateStatusData);
 			}
+			break;
+		default:
+			_ = 4;
 			break;
 		}
 	}
@@ -477,12 +477,12 @@ public class ClanChatWebSocketConnection : MonoBehaviour, IClanChatConnection
 			yield break;
 		}
 		isConnectProcessing = true;
-		string fromId = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id.ToString();
-		chatWebSocket.Connect(uri, fromId, 0);
+		string from_id = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id.ToString();
+		chatWebSocket.Connect(uri, from_id, 0);
 		float waitTimeRest = CONNECTION_TRY_TIMEOUT;
 		while (!chatWebSocket.IsConnected() && chatWebSocket.CurrentConnectionStatus != ClanChatWebSocket.CONNECTION_STATUS.ERROR && waitTimeRest > 0f)
 		{
-			waitTimeRest -= Time.get_deltaTime();
+			waitTimeRest -= Time.deltaTime;
 			yield return null;
 		}
 		m_ConnectProcess = null;
@@ -508,7 +508,7 @@ public class ClanChatWebSocketConnection : MonoBehaviour, IClanChatConnection
 	{
 		if (m_ConnectProcess != null)
 		{
-			this.StopCoroutine(m_ConnectProcess);
+			StopCoroutine(m_ConnectProcess);
 		}
 		m_ConnectProcess = null;
 		isConnectProcessing = false;
@@ -519,8 +519,7 @@ public class ClanChatWebSocketConnection : MonoBehaviour, IClanChatConnection
 		int result = -1;
 		if (msg.Contains(STAMP_SYMBOL_BEGIN))
 		{
-			string s = msg.Substring(STAMP_SYMBOL_BEGIN.Length, 8);
-			int.TryParse(s, out result);
+			int.TryParse(msg.Substring(STAMP_SYMBOL_BEGIN.Length, 8), out result);
 		}
 		return result;
 	}
@@ -528,9 +527,9 @@ public class ClanChatWebSocketConnection : MonoBehaviour, IClanChatConnection
 	private void OnDestroy()
 	{
 		Disconnect();
-		if (Object.op_Implicit(chatWebSocket))
+		if ((bool)chatWebSocket)
 		{
-			Object.Destroy(chatWebSocket.get_gameObject());
+			UnityEngine.Object.Destroy(chatWebSocket.gameObject);
 		}
 	}
 

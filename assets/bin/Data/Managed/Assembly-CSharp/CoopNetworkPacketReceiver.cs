@@ -23,24 +23,24 @@ public class CoopNetworkPacketReceiver : PacketReceiver
 		{
 			return;
 		}
-		List<CoopPacket> list = rymTPool<List<CoopPacket>>.Get();
-		if (list.Capacity < base.packets.Count)
+		List<CoopPacket> obj = rymTPool<List<CoopPacket>>.Get();
+		if (obj.Capacity < base.packets.Count)
 		{
-			list.Capacity = base.packets.Count;
+			obj.Capacity = base.packets.Count;
 		}
 		int i = 0;
 		for (int count = base.packets.Count; i < count; i++)
 		{
-			list.Add(base.packets[i]);
+			obj.Add(base.packets[i]);
 		}
 		int j = 0;
-		for (int count2 = list.Count; j < count2; j++)
+		for (int count2 = obj.Count; j < count2; j++)
 		{
 			if (base.stopPacketUpdate)
 			{
 				break;
 			}
-			CoopPacket coopPacket = list[j];
+			CoopPacket coopPacket = obj[j];
 			if (coopPacket.destObjectId == 1000)
 			{
 				if (HandleCoopEvent(coopPacket))
@@ -53,8 +53,8 @@ public class CoopNetworkPacketReceiver : PacketReceiver
 				AddDeleteQueue(coopPacket);
 			}
 		}
-		list.Clear();
-		rymTPool<List<CoopPacket>>.Release(ref list);
+		obj.Clear();
+		rymTPool<List<CoopPacket>>.Release(ref obj);
 		EraseUsedPacket();
 	}
 

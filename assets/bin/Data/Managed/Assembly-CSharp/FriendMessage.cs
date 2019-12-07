@@ -63,7 +63,7 @@ public class FriendMessage : GameSection
 			int i = 0;
 			for (int count = itemList.Count; i < count; i++)
 			{
-				Object.DestroyImmediate(itemList[i].get_gameObject());
+				UnityEngine.Object.DestroyImmediate(itemList[i].gameObject);
 			}
 			itemList.Clear();
 			Init();
@@ -71,19 +71,13 @@ public class FriendMessage : GameSection
 
 		public void MoveAll(float y)
 		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 localPosition = itemList[0].get_transform().get_localPosition();
+			Vector3 localPosition = itemList[0].transform.localPosition;
 			int i = 0;
 			for (int count = itemList.Count; i < count; i++)
 			{
-				Transform transform = itemList[i].get_transform();
-				Vector3 localPosition2 = transform.get_localPosition();
-				localPosition.y = localPosition2.y + y;
-				transform.set_localPosition(localPosition);
+				Transform transform = itemList[i].transform;
+				localPosition.y = transform.localPosition.y + y;
+				transform.localPosition = localPosition;
 			}
 		}
 	}
@@ -284,23 +278,23 @@ public class FriendMessage : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_quest_chatitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatItem");
-		LoadObject lo_chat_stamp_listitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem");
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject lo_quest_chatitem = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ChatItem");
+		LoadObject lo_chat_stamp_listitem = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem");
 		talkerName = GetTalkerName(MonoBehaviourSingleton<FriendManager>.I.talkUser.userId);
-		SetLabelText((Enum)UI.Title_U, talkerName);
-		SetLabelText((Enum)UI.Title_D, talkerName);
+		SetLabelText(UI.Title_U, talkerName);
+		SetLabelText(UI.Title_D, talkerName);
 		nowPage = 0;
 		loadedPage = -1;
-		itemListData = new MessageItemListData(GetCtrl(UI.OBJ_ROOM_ITEM_LIST_ROOT).get_gameObject());
-		if (load_queue.IsLoading())
+		itemListData = new MessageItemListData(GetCtrl(UI.OBJ_ROOM_ITEM_LIST_ROOT).gameObject);
+		if (loadingQueue.IsLoading())
 		{
-			yield return load_queue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		chatItemPrefab = (lo_quest_chatitem.loadedObject as GameObject);
 		chatStampListPrefab = (lo_chat_stamp_listitem.loadedObject as GameObject);
@@ -323,8 +317,8 @@ public class FriendMessage : GameSection
 		});
 		if (MonoBehaviourSingleton<FriendManager>.I.talkUser.userId == 0)
 		{
-			GetCtrl(UI.SCR_STAMP_LIST).get_gameObject().SetActive(false);
-			GetCtrl(UI.OBJ_POST_FRAME).get_gameObject().SetActive(false);
+			GetCtrl(UI.SCR_STAMP_LIST).gameObject.SetActive(value: false);
+			GetCtrl(UI.OBJ_POST_FRAME).gameObject.SetActive(value: false);
 		}
 		else
 		{
@@ -337,38 +331,13 @@ public class FriendMessage : GameSection
 
 	private void Update()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
 		if (!base.isInitialized)
 		{
 			return;
 		}
-		Vector4 baseClipRegion = ScrollView.panel.baseClipRegion;
-		float w = baseClipRegion.w;
-		Vector4 baseClipRegion2 = ScrollView.panel.baseClipRegion;
-		float num = w - baseClipRegion2.y;
-		Vector3 localPosition = DragScrollTrans.get_localPosition();
-		float num2 = num + localPosition.y;
-		Vector4 finalClipRegion = ScrollView.panel.finalClipRegion;
-		float w2 = finalClipRegion.w;
-		Vector2 clipOffset = ScrollView.panel.clipOffset;
-		float num3 = num2 - (w2 + clipOffset.y);
-		BoxCollider dragScrollCollider = DragScrollCollider;
-		Vector4 baseClipRegion3 = ScrollView.panel.baseClipRegion;
-		dragScrollCollider.set_center(Vector2.op_Implicit(new Vector2(baseClipRegion3.x, 0f - num3)));
-		interval += Time.get_deltaTime();
+		float num = ScrollView.panel.baseClipRegion.w - ScrollView.panel.baseClipRegion.y + DragScrollTrans.localPosition.y - (ScrollView.panel.finalClipRegion.w + ScrollView.panel.clipOffset.y);
+		DragScrollCollider.center = new Vector2(ScrollView.panel.baseClipRegion.x, 0f - num);
+		interval += Time.deltaTime;
 		if (IntervalSendGetNoRead <= interval)
 		{
 			interval = 0f;
@@ -381,21 +350,21 @@ public class FriendMessage : GameSection
 			hashSet.ExceptWith(postMessageList);
 			FriendMessageData[] array = new FriendMessageData[hashSet.Count];
 			hashSet.CopyTo(array);
-			long num4 = 0L;
+			long num2 = 0L;
 			if (0 < postMessageList.Count)
 			{
-				num4 = postMessageList[0].lid;
+				num2 = postMessageList[0].lid;
 			}
-			for (int num5 = array.Length - 1; num5 >= 0; num5--)
+			for (int num3 = array.Length - 1; num3 >= 0; num3--)
 			{
-				if (num4 > array[0].lid)
+				if (num2 > array[0].lid)
 				{
-					messageQueue.Enqueue(new PostMessageData(array[num5], _topPosition: true, _forceScroll: false));
+					messageQueue.Enqueue(new PostMessageData(array[num3], _topPosition: true, _forceScroll: false));
 				}
 			}
 			for (int i = 0; i < array.Length; i++)
 			{
-				if (num4 <= array[0].lid)
+				if (num2 <= array[0].lid)
 				{
 					bool forceScroll = i == array.Length - 1;
 					messageQueue.Enqueue(new PostMessageData(array[i], _topPosition: false, forceScroll));
@@ -460,7 +429,7 @@ public class FriendMessage : GameSection
 	private void OnQuery_SEND()
 	{
 		string text = GameSection.GetEventData() as string;
-		text = ((!string.IsNullOrEmpty(text)) ? text.Replace("\n", string.Empty) : string.Empty);
+		text = ((!string.IsNullOrEmpty(text)) ? text.Replace("\n", "") : "");
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<FriendManager>.I.SendFriendMessage(MonoBehaviourSingleton<FriendManager>.I.talkUser.userId, text, delegate(bool is_success)
 		{
@@ -489,7 +458,7 @@ public class FriendMessage : GameSection
 		if (data.message.StartsWith("[STAMP]"))
 		{
 			string message = data.message;
-			message = message.Replace("[STAMP]", string.Empty);
+			message = message.Replace("[STAMP]", "");
 			PostUIStamp(data.fromUserId, int.Parse(message), topPosition, forceScroll);
 		}
 		else
@@ -502,52 +471,36 @@ public class FriendMessage : GameSection
 	{
 		AddNextChatItem(delegate(ChatItem chatItem)
 		{
-			chatItem.Init(userId, talkerName, message, string.Empty);
+			chatItem.Init(userId, talkerName, message);
 		}, topPosition, forceScroll);
 	}
 
 	private void PostUIStamp(int userId, int stampId, bool topPosition, bool forceScroll)
 	{
-		if (IsValidStampId(stampId))
+		if (IsValidStampId(stampId) && Singleton<StampTable>.I.GetData((uint)stampId) != null)
 		{
-			StampTable.Data data = Singleton<StampTable>.I.GetData((uint)stampId);
-			if (data != null)
+			AddNextChatItem(delegate(ChatItem chatItem)
 			{
-				AddNextChatItem(delegate(ChatItem chatItem)
-				{
-					chatItem.Init(userId, talkerName, stampId, string.Empty);
-				}, topPosition, forceScroll);
-			}
+				chatItem.Init(userId, talkerName, stampId);
+			}, topPosition, forceScroll);
 		}
 	}
 
 	private void AddNextChatItem(Action<ChatItem> initializer, bool topPosition, bool forceScroll)
 	{
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018b: Unknown result type (might be due to invalid IL or missing references)
 		if (chatItemPrefab == null)
 		{
 			return;
 		}
 		MessageItemListData messageItemListData = itemListData;
 		ChatItem chatItem = null;
-		chatItem = ResourceUtility.Realizes(chatItemPrefab, messageItemListData.rootObject.get_transform(), 5).GetComponent<ChatItem>();
+		chatItem = ResourceUtility.Realizes(chatItemPrefab, messageItemListData.rootObject.transform, 5).GetComponent<ChatItem>();
 		if (topPosition)
 		{
 			initializer(chatItem);
 			float num = chatItem.height + 22f;
 			messageItemListData.basePosY += num;
-			chatItem.get_transform().set_localPosition(new Vector3(-15f, messageItemListData.basePosY, 0f));
+			chatItem.transform.localPosition = new Vector3(-15f, messageItemListData.basePosY, 0f);
 			messageItemListData.currentTotalHeight += num;
 		}
 		else
@@ -557,25 +510,15 @@ public class FriendMessage : GameSection
 				messageItemListData.currentTotalHeight += 22f;
 			}
 			float num2 = messageItemListData.currentTotalHeight - messageItemListData.basePosY;
-			chatItem.get_transform().set_localPosition(new Vector3(-15f, 0f - num2, 0f));
+			chatItem.transform.localPosition = new Vector3(-15f, 0f - num2, 0f);
 			initializer(chatItem);
 			messageItemListData.currentTotalHeight += chatItem.height;
 		}
 		UpdateDummyDragScroll();
 		if (!topPosition && forceScroll)
 		{
-			float currentTotalHeight = messageItemListData.currentTotalHeight;
-			Vector4 baseClipRegion = ScrollView.panel.baseClipRegion;
-			float num3 = currentTotalHeight + baseClipRegion.y;
-			Vector4 baseClipRegion2 = ScrollView.panel.baseClipRegion;
-			float num4 = num3 - baseClipRegion2.w * 0.5f;
-			Vector3 localPosition = ScrollViewTrans.get_localPosition();
-			float y = localPosition.y;
-			Vector2 clipOffset = ScrollView.panel.clipOffset;
-			float num5 = num4 + (y + clipOffset.y);
-			Vector2 clipSoftness = ScrollView.panel.clipSoftness;
-			float num6 = num5 + clipSoftness.y;
-			ForceScroll(num6 - messageItemListData.basePosY, useSpring: true);
+			float num3 = messageItemListData.currentTotalHeight + ScrollView.panel.baseClipRegion.y - ScrollView.panel.baseClipRegion.w * 0.5f + (ScrollViewTrans.localPosition.y + ScrollView.panel.clipOffset.y) + ScrollView.panel.clipSoftness.y;
+			ForceScroll(num3 - messageItemListData.basePosY, useSpring: true);
 		}
 		if (topPosition)
 		{
@@ -589,16 +532,6 @@ public class FriendMessage : GameSection
 
 	private void UpdateDummyDragScroll()
 	{
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
 		if (ScrollView.panel.height > CurrentTotalHeight)
 		{
 			DummyDragScroll.height = (int)(ScrollView.panel.height - 20f);
@@ -607,61 +540,35 @@ public class FriendMessage : GameSection
 		{
 			DummyDragScroll.height = (int)(CurrentTotalHeight - 20f);
 		}
-		Transform dragScrollTrans = DragScrollTrans;
-		Vector2 clipOffset = ScrollView.panel.clipOffset;
-		dragScrollTrans.set_localPosition(new Vector3(clipOffset.x, BasePosY - CurrentTotalHeight, 0f));
-		BoxCollider dragScrollCollider = DragScrollCollider;
-		Vector4 finalClipRegion = ScrollView.panel.finalClipRegion;
-		float z = finalClipRegion.z;
-		Vector4 finalClipRegion2 = ScrollView.panel.finalClipRegion;
-		float w = finalClipRegion2.w;
-		Vector2 clipSoftness = ScrollView.panel.clipSoftness;
-		dragScrollCollider.set_size(new Vector3(z, w - clipSoftness.y * 2f, 0f));
+		DragScrollTrans.localPosition = new Vector3(ScrollView.panel.clipOffset.x, BasePosY - CurrentTotalHeight, 0f);
+		DragScrollCollider.size = new Vector3(ScrollView.panel.finalClipRegion.z, ScrollView.panel.finalClipRegion.w - ScrollView.panel.clipSoftness.y * 2f, 0f);
 	}
 
 	private void ForceScroll(float newHeight, bool useSpring)
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 		ScrollView.DisableSpring();
 		if (useSpring)
 		{
-			SpringPanel.Begin(ScrollView.get_gameObject(), Vector3.get_up() * newHeight, 20f);
+			SpringPanel.Begin(ScrollView.gameObject, Vector3.up * newHeight, 20f);
 			return;
 		}
 		Vector2 clipOffset = ScrollView.panel.clipOffset;
-		Vector3 localPosition = ScrollViewTrans.get_localPosition();
-		float num = localPosition.y + clipOffset.y;
-		ScrollViewTrans.set_localPosition(Vector3.get_up() * newHeight);
+		float num = ScrollViewTrans.localPosition.y + clipOffset.y;
+		ScrollViewTrans.localPosition = Vector3.up * newHeight;
 		clipOffset.y = 0f - newHeight + num;
 		ScrollView.panel.clipOffset = clipOffset;
 	}
 
 	private void SetSliderLimit()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		UIPanel component = GetCtrl(UI.WGT_SLIDE_LIMIT).GetComponent<UIPanel>();
-		UIRect.AnchorPoint topAnchor = component.topAnchor;
-		Vector3 hOME_SLIDER_OPEN_POS = HOME_SLIDER_OPEN_POS;
-		topAnchor.absolute = (int)hOME_SLIDER_OPEN_POS.y + 9;
-		UIRect.AnchorPoint bottomAnchor = component.bottomAnchor;
-		Vector3 hOME_SLIDER_CLOSE_POS = HOME_SLIDER_CLOSE_POS;
-		bottomAnchor.absolute = (int)hOME_SLIDER_CLOSE_POS.y - 49;
+		component.topAnchor.absolute = (int)HOME_SLIDER_OPEN_POS.y + 9;
+		component.bottomAnchor.absolute = (int)HOME_SLIDER_CLOSE_POS.y - 49;
 	}
 
 	private void Reset()
 	{
-		Input.value = string.Empty;
+		Input.value = "";
 		InputFrame.Reset();
 		UpdateAnchors();
 		UpdateWindowSize();
@@ -669,45 +576,17 @@ public class FriendMessage : GameSection
 
 	public void UpdateWindowSize()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		float currentTotalHeight = CurrentTotalHeight;
-		Vector4 baseClipRegion = ScrollView.panel.baseClipRegion;
-		float num = currentTotalHeight + baseClipRegion.y;
-		Vector4 baseClipRegion2 = ScrollView.panel.baseClipRegion;
-		float num2 = num - baseClipRegion2.w * 0.5f;
-		Vector3 localPosition = ScrollViewTrans.get_localPosition();
-		float y = localPosition.y;
-		Vector2 clipOffset = ScrollView.panel.clipOffset;
-		float num3 = num2 + (y + clipOffset.y);
-		Vector2 clipSoftness = ScrollView.panel.clipSoftness;
-		ForceScroll(num3 + clipSoftness.y, useSpring: false);
+		ForceScroll(CurrentTotalHeight + ScrollView.panel.baseClipRegion.y - ScrollView.panel.baseClipRegion.w * 0.5f + (ScrollViewTrans.localPosition.y + ScrollView.panel.clipOffset.y) + ScrollView.panel.clipSoftness.y, useSpring: false);
 		UpdateDummyDragScroll();
 	}
 
 	private void OnDragFinished()
 	{
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<FriendManager>.I.messagePageMax - 1 > nowPage && nowPage == loadedPage && CurrentTotalHeight >= ScrollView.panel.height)
 		{
 			Bounds bounds = ScrollView.bounds;
-			Vector3 val = ScrollView.panel.CalculateConstrainOffset(Vector2.op_Implicit(bounds.get_min()), Vector2.op_Implicit(bounds.get_max()));
-			if (30f <= val.y)
+			Vector3 vector = ScrollView.panel.CalculateConstrainOffset(bounds.min, bounds.max);
+			if (30f <= vector.y)
 			{
 				nowPage++;
 				DispatchEvent("SEND_GET_MESSAGE_DETAIL");
@@ -755,8 +634,7 @@ public class FriendMessage : GameSection
 		{
 			return false;
 		}
-		StampTable.Data data = Singleton<StampTable>.I.GetData((uint)stampId);
-		if (data == null)
+		if (Singleton<StampTable>.I.GetData((uint)stampId) == null)
 		{
 			return false;
 		}
@@ -782,11 +660,10 @@ public class FriendMessage : GameSection
 
 	private Transform CreateStampItem(int index, Transform parent)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = ResourceUtility.Realizes(chatStampListPrefab, 5);
-		val.set_parent(parent);
-		val.set_localScale(Vector3.get_one());
-		return val;
+		Transform transform = ResourceUtility.Realizes(chatStampListPrefab, 5);
+		transform.parent = parent;
+		transform.localScale = Vector3.one;
+		return transform;
 	}
 
 	private void InitStampItem(int index, Transform iTransform, bool isRecycle)
@@ -810,7 +687,7 @@ public class FriendMessage : GameSection
 		if (value.Length != 0)
 		{
 			DispatchEvent("SEND", value);
-			Input.value = string.Empty;
+			Input.value = "";
 			InputFrame.FrameResize();
 		}
 	}
@@ -819,6 +696,6 @@ public class FriendMessage : GameSection
 	{
 		InputFrame.FrameResize();
 		string value = Input.value;
-		SetActive((Enum)UI.LBL_DEFAULT, string.IsNullOrEmpty(value));
+		SetActive(UI.LBL_DEFAULT, string.IsNullOrEmpty(value));
 	}
 }

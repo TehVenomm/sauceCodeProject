@@ -93,12 +93,12 @@ public class ItemStorageSell : ItemStorageTop
 		}
 	}
 
-	private new void InitializeCaption()
+	protected override void InitializeCaption()
 	{
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
-		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
+		UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
 		if (component != null)
 		{
 			component.Reset();
@@ -139,7 +139,11 @@ public class ItemStorageSell : ItemStorageTop
 
 	private bool IsEnableShowDetailByLongTap()
 	{
-		return tab == TAB_MODE.EQUIP || tab == TAB_MODE.SKILL;
+		if (tab != TAB_MODE.EQUIP)
+		{
+			return tab == TAB_MODE.SKILL;
+		}
+		return true;
 	}
 
 	protected override bool IsRequiredIconGrayOut(SortCompareData _data)

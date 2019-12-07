@@ -28,41 +28,34 @@ public class IceFloor : MonoBehaviour
 		set;
 	}
 
-	public IceFloor()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		_rigidbody = this.GetComponent<Rigidbody>();
-		_rigidbody.set_useGravity(false);
-		_rigidbody.set_isKinematic(true);
-		_collider = this.GetComponentInChildren<Collider>();
+		_rigidbody = GetComponent<Rigidbody>();
+		_rigidbody.useGravity = false;
+		_rigidbody.isKinematic = true;
+		_collider = GetComponentInChildren<Collider>();
 		if (_collider == null)
 		{
-			CapsuleCollider val = this.get_gameObject().AddComponent<CapsuleCollider>();
-			val.set_center(new Vector3(0f, 0f, 0f));
-			val.set_direction(2);
-			val.set_isTrigger(true);
-			_collider = val;
+			CapsuleCollider capsuleCollider = base.gameObject.AddComponent<CapsuleCollider>();
+			capsuleCollider.center = new Vector3(0f, 0f, 0f);
+			capsuleCollider.direction = 2;
+			capsuleCollider.isTrigger = true;
+			_collider = capsuleCollider;
 		}
 	}
 
 	public void SetCollider(float radius, float height = 2f)
 	{
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		CapsuleCollider val = _collider as CapsuleCollider;
-		if (val == null)
+		CapsuleCollider capsuleCollider = _collider as CapsuleCollider;
+		if (capsuleCollider == null)
 		{
-			val = (_collider = this.get_gameObject().AddComponent<CapsuleCollider>());
+			capsuleCollider = (CapsuleCollider)(_collider = base.gameObject.AddComponent<CapsuleCollider>());
 		}
-		val.set_center(new Vector3(0f, 0f, 0f));
-		val.set_direction(2);
-		val.set_radius(radius);
-		val.set_height(height);
-		val.set_isTrigger(true);
+		capsuleCollider.center = new Vector3(0f, 0f, 0f);
+		capsuleCollider.direction = 2;
+		capsuleCollider.radius = radius;
+		capsuleCollider.height = height;
+		capsuleCollider.isTrigger = true;
 	}
 
 	public void SetEffect(Transform eff)
@@ -75,12 +68,12 @@ public class IceFloor : MonoBehaviour
 		switch (state)
 		{
 		case STATE.UPDATE:
-			timer += Time.get_deltaTime();
+			timer += Time.deltaTime;
 			if (timer > duration)
 			{
 				if (_effect != null)
 				{
-					EffectManager.ReleaseEffect(_effect.get_gameObject());
+					EffectManager.ReleaseEffect(_effect.gameObject);
 				}
 				state = STATE.WAIT_FOR_END;
 			}
@@ -88,7 +81,7 @@ public class IceFloor : MonoBehaviour
 		case STATE.WAIT_FOR_END:
 			if (_effect == null)
 			{
-				Object.Destroy(this.get_gameObject());
+				Object.Destroy(base.gameObject);
 			}
 			break;
 		}
@@ -98,34 +91,34 @@ public class IceFloor : MonoBehaviour
 	{
 		for (int i = 0; i < hittingPlayerList.Count; i++)
 		{
-			hittingPlayerList[i].OnHitExitIceFloor(this.get_gameObject());
+			hittingPlayerList[i].OnHitExitIceFloor(base.gameObject);
 		}
 	}
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		StageObject componentInParent = collider.get_gameObject().GetComponentInParent<StageObject>();
+		StageObject componentInParent = collider.gameObject.GetComponentInParent<StageObject>();
 		if (!(componentInParent == null))
 		{
 			Player player = componentInParent as Player;
 			if (!(player == null))
 			{
 				hittingPlayerList.Add(player);
-				player.OnHitEnterIceFloor(this.get_gameObject());
+				player.OnHitEnterIceFloor(base.gameObject);
 			}
 		}
 	}
 
 	private void OnTriggerExit(Collider collider)
 	{
-		StageObject componentInParent = collider.get_gameObject().GetComponentInParent<StageObject>();
+		StageObject componentInParent = collider.gameObject.GetComponentInParent<StageObject>();
 		if (!(componentInParent == null))
 		{
 			Player player = componentInParent as Player;
 			if (!(player == null))
 			{
 				hittingPlayerList.Remove(player);
-				player.OnHitExitIceFloor(this.get_gameObject());
+				player.OnHitExitIceFloor(base.gameObject);
 			}
 		}
 	}

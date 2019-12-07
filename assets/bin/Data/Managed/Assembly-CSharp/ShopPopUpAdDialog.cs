@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -10,27 +9,27 @@ public class ShopPopUpAdDialog : GameSection
 		TEX_MAIN
 	}
 
-	private string textureName = string.Empty;
+	private string textureName = "";
 
 	public override void Initialize()
 	{
 		textureName = (GameSection.GetEventData() as string);
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject loTex = loadQueue.Load(RESOURCE_CATEGORY.GACHA_POP_UP_ADVERTISEMENT, textureName);
-		if (loadQueue.IsLoading())
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject loTex = loadingQueue.Load(RESOURCE_CATEGORY.GACHA_POP_UP_ADVERTISEMENT, textureName);
+		if (loadingQueue.IsLoading())
 		{
-			yield return loadQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		if (loTex.loadedObject != null)
 		{
-			SetTexture((Enum)UI.TEX_MAIN, loTex.loadedObject as Texture);
+			SetTexture(UI.TEX_MAIN, loTex.loadedObject as Texture);
 		}
-		PlayTween((Enum)UI.OBJ_FRAME, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		PlayTween(UI.OBJ_FRAME, forward: true, null, is_input_block: false);
 		base.Initialize();
 	}
 

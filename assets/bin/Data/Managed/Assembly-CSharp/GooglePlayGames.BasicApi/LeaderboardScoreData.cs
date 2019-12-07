@@ -21,7 +21,17 @@ namespace GooglePlayGames.BasicApi
 
 		private List<PlayGamesScore> mScores = new List<PlayGamesScore>();
 
-		public bool Valid => mStatus == ResponseStatus.Success || mStatus == ResponseStatus.SuccessWithStale;
+		public bool Valid
+		{
+			get
+			{
+				if (mStatus != ResponseStatus.Success)
+				{
+					return mStatus == ResponseStatus.SuccessWithStale;
+				}
+				return true;
+			}
+		}
 
 		public ResponseStatus Status
 		{
@@ -83,7 +93,7 @@ namespace GooglePlayGames.BasicApi
 			}
 		}
 
-		public IScore[] Scores => (IScore[])mScores.ToArray();
+		public IScore[] Scores => mScores.ToArray();
 
 		public ScorePageToken PrevPageToken
 		{

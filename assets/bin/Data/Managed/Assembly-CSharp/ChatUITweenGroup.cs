@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 public abstract class ChatUITweenGroup
 {
@@ -27,11 +26,21 @@ public abstract class ChatUITweenGroup
 
 	public bool isClosing => state == STATE.CLOSING;
 
-	public bool isTransitioning => isOpening || isClosing;
+	public bool isTransitioning
+	{
+		get
+		{
+			if (!isOpening)
+			{
+				return isClosing;
+			}
+			return true;
+		}
+	}
 
 	public ChatUITweenGroup(UIRect root)
 	{
-		if (Object.op_Implicit(root))
+		if ((bool)root)
 		{
 			this.root = root;
 		}
@@ -55,24 +64,24 @@ public abstract class ChatUITweenGroup
 
 	public void Open(Action on_finished)
 	{
-		if (!Object.op_Implicit(root))
+		if (!root)
 		{
 			state = STATE.OPENED;
 			return;
 		}
-		if (closeTween.get_enabled())
+		if (closeTween.enabled)
 		{
 			closeTween.SetOnFinished((EventDelegate)null);
 			closeTween.SetStartToCurrentValue();
 			closeTween.ResetToBeginning();
-			closeTween.set_enabled(false);
+			closeTween.enabled = false;
 		}
-		if (!openTween.get_gameObject().get_activeSelf())
+		if (!openTween.gameObject.activeSelf)
 		{
-			openTween.get_gameObject().SetActive(true);
+			openTween.gameObject.SetActive(value: true);
 		}
 		state = STATE.OPENING;
-		openTween.set_enabled(true);
+		openTween.enabled = true;
 		openTween.SetStartToCurrentValue();
 		openTween.ResetToBeginning();
 		openTween.SetOnFinished(delegate
@@ -86,7 +95,7 @@ public abstract class ChatUITweenGroup
 
 	public void OpenImmediately()
 	{
-		if (!Object.op_Implicit(root))
+		if (!root)
 		{
 			state = STATE.OPENED;
 			return;
@@ -97,32 +106,32 @@ public abstract class ChatUITweenGroup
 
 	public void Close(Action on_finished)
 	{
-		if (!Object.op_Implicit(root))
+		if (!root)
 		{
 			state = STATE.CLOSED;
 			return;
 		}
 		OnPreClose();
-		if (!openTween.get_gameObject().get_activeSelf())
+		if (!openTween.gameObject.activeSelf)
 		{
 			on_finished();
 			return;
 		}
-		if (openTween.get_enabled())
+		if (openTween.enabled)
 		{
 			openTween.SetOnFinished((EventDelegate)null);
 			openTween.SetStartToCurrentValue();
 			openTween.ResetToBeginning();
-			openTween.set_enabled(false);
+			openTween.enabled = false;
 		}
 		state = STATE.CLOSING;
-		closeTween.set_enabled(true);
+		closeTween.enabled = true;
 		closeTween.SetStartToCurrentValue();
 		closeTween.ResetToBeginning();
 		closeTween.SetOnFinished(delegate
 		{
 			state = STATE.CLOSED;
-			root.get_gameObject().SetActive(false);
+			root.gameObject.SetActive(value: false);
 			on_finished();
 		});
 		closeTween.PlayForward();
@@ -130,7 +139,7 @@ public abstract class ChatUITweenGroup
 
 	public void CloseImmediately()
 	{
-		if (!Object.op_Implicit(root))
+		if (!root)
 		{
 			state = STATE.CLOSED;
 			return;
@@ -152,7 +161,7 @@ public abstract class ChatUITweenGroup<T> : ChatUITweenGroup where T : UITweener
 		{
 			return null;
 		}
-		T val = base.rootRect.get_gameObject().AddComponent<T>();
+		T val = base.rootRect.gameObject.AddComponent<T>();
 		InitTween(val, isOpenTween);
 		return val;
 	}

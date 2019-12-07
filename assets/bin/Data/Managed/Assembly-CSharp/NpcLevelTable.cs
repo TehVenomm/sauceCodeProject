@@ -1,7 +1,6 @@
 using Network;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class NpcLevelTable : Singleton<NpcLevelTable>, IDataTable
@@ -84,16 +83,13 @@ public class NpcLevelTable : Singleton<NpcLevelTable>, IDataTable
 		public override string ToString()
 		{
 			string empty = string.Empty;
-			string text = empty;
-			empty = text + lv + "," + hp + "," + atk + "," + def;
+			empty = empty + lv + "," + hp + "," + atk + "," + def;
 			int i = 0;
 			for (int num = equipItems.Length; i < num; i++)
 			{
 				empty += ",";
-				text = empty;
-				empty = text + "[" + i + "]";
-				text = empty;
-				empty = text + "id=" + equipItems[i].eId + ",";
+				empty = empty + "[" + i + "]";
+				empty = empty + "id=" + equipItems[i].eId + ",";
 				empty = empty + "lv=" + equipItems[i].lv;
 			}
 			return empty;
@@ -103,9 +99,6 @@ public class NpcLevelTable : Singleton<NpcLevelTable>, IDataTable
 	private UIntKeyTable<List<NpcLevelData>> dataTable;
 
 	private List<uint> lvList = new List<uint>();
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<NpcLevelData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string csv)
 	{
@@ -136,7 +129,7 @@ public class NpcLevelTable : Singleton<NpcLevelTable>, IDataTable
 		{
 			return null;
 		}
-		int index = (int)(Random.get_value() * (float)npcLevelList.Count);
+		int index = (int)(UnityEngine.Random.value * (float)npcLevelList.Count);
 		return npcLevelList[index];
 	}
 

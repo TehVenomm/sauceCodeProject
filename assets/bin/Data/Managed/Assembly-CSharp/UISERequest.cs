@@ -9,9 +9,4 @@ public class UISERequest : MonoBehaviour
 	public float volume = 1f;
 
 	private const float pitch = 1f;
-
-	public UISERequest()
-		: this()
-	{
-	}
 }

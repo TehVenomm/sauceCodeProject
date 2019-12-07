@@ -86,7 +86,7 @@ public class StateMachine
 
 	public override string ToString()
 	{
-		string text = string.Empty + currentType;
+		string text = string.Concat(currentType);
 		if (_subFsm != null)
 		{
 			text = text + " > " + _subFsm.ToString();

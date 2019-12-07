@@ -24,7 +24,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal static IntPtr ToIntPtr<T>(Action<T> callback, Func<IntPtr, T> conversionFunction) where T : BaseReferenceHolder
 		{
-			Action<IntPtr> callback2 = delegate(IntPtr result)
+			return ToIntPtr((Action<IntPtr>)delegate(IntPtr result)
 			{
 				using (T obj = conversionFunction(result))
 				{
@@ -33,13 +33,12 @@ namespace GooglePlayGames.Native.PInvoke
 						callback(obj);
 					}
 				}
-			};
-			return ToIntPtr(callback2);
+			});
 		}
 
 		internal static IntPtr ToIntPtr<T, P>(Action<T, P> callback, Func<IntPtr, P> conversionFunction) where P : BaseReferenceHolder
 		{
-			Action<T, IntPtr> callback2 = delegate(T param1, IntPtr param2)
+			return ToIntPtr((Action<T, IntPtr>)delegate(T param1, IntPtr param2)
 			{
 				using (P arg = conversionFunction(param2))
 				{
@@ -48,8 +47,7 @@ namespace GooglePlayGames.Native.PInvoke
 						callback(param1, arg);
 					}
 				}
-			};
-			return ToIntPtr(callback2);
+			});
 		}
 
 		internal static IntPtr ToIntPtr(Delegate callback)
@@ -58,8 +56,7 @@ namespace GooglePlayGames.Native.PInvoke
 			{
 				return IntPtr.Zero;
 			}
-			GCHandle value = GCHandle.Alloc(callback);
-			return GCHandle.ToIntPtr(value);
+			return GCHandle.ToIntPtr(GCHandle.Alloc(callback));
 		}
 
 		internal static T IntPtrToTempCallback<T>(IntPtr handle) where T : class
@@ -71,7 +68,7 @@ namespace GooglePlayGames.Native.PInvoke
 		{
 			if (PInvokeUtilities.IsNull(handle))
 			{
-				return (T)null;
+				return null;
 			}
 			GCHandle gCHandle = GCHandle.FromIntPtr(handle);
 			try
@@ -115,7 +112,7 @@ namespace GooglePlayGames.Native.PInvoke
 		internal static void PerformInternalCallback(string callbackName, Type callbackType, IntPtr response, IntPtr userData)
 		{
 			Logger.d("Entering internal callback for " + callbackName);
-			Action<IntPtr> action = (callbackType != 0) ? IntPtrToTempCallback<Action<IntPtr>>(userData) : IntPtrToPermanentCallback<Action<IntPtr>>(userData);
+			Action<IntPtr> action = (callbackType == Type.Permanent) ? IntPtrToPermanentCallback<Action<IntPtr>>(userData) : IntPtrToTempCallback<Action<IntPtr>>(userData);
 			if (action != null)
 			{
 				try
@@ -135,7 +132,7 @@ namespace GooglePlayGames.Native.PInvoke
 			Action<T, IntPtr> action = null;
 			try
 			{
-				action = ((callbackType != 0) ? IntPtrToTempCallback<Action<T, IntPtr>>(userData) : IntPtrToPermanentCallback<Action<T, IntPtr>>(userData));
+				action = ((callbackType == Type.Permanent) ? IntPtrToPermanentCallback<Action<T, IntPtr>>(userData) : IntPtrToTempCallback<Action<T, IntPtr>>(userData));
 			}
 			catch (Exception ex)
 			{
@@ -191,7 +188,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal static byte[] IntPtrAndSizeToByteArray(IntPtr data, UIntPtr dataLength)
 		{
-			if (dataLength.ToUInt64() == 0)
+			if (dataLength.ToUInt64() == 0L)
 			{
 				return null;
 			}

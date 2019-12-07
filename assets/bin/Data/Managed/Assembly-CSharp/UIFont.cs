@@ -53,7 +53,11 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? mFont : mReplacement.bmFont;
+			if (!(mReplacement != null))
+			{
+				return mFont;
+			}
+			return mReplacement.bmFont;
 		}
 		set
 		{
@@ -72,7 +76,15 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			return (mReplacement != null) ? mReplacement.texWidth : ((mFont == null) ? 1 : mFont.texWidth);
+			if (!(mReplacement != null))
+			{
+				if (mFont == null)
+				{
+					return 1;
+				}
+				return mFont.texWidth;
+			}
+			return mReplacement.texWidth;
 		}
 		set
 		{
@@ -91,7 +103,15 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			return (mReplacement != null) ? mReplacement.texHeight : ((mFont == null) ? 1 : mFont.texHeight);
+			if (!(mReplacement != null))
+			{
+				if (mFont == null)
+				{
+					return 1;
+				}
+				return mFont.texHeight;
+			}
+			return mReplacement.texHeight;
 		}
 		set
 		{
@@ -106,20 +126,46 @@ public class UIFont : MonoBehaviour
 		}
 	}
 
-	public bool hasSymbols => (mReplacement != null) ? mReplacement.hasSymbols : (mSymbols != null && mSymbols.Count != 0);
+	public bool hasSymbols
+	{
+		get
+		{
+			if (!(mReplacement != null))
+			{
+				if (mSymbols != null)
+				{
+					return mSymbols.Count != 0;
+				}
+				return false;
+			}
+			return mReplacement.hasSymbols;
+		}
+	}
 
-	public List<BMSymbol> symbols => (!(mReplacement != null)) ? mSymbols : mReplacement.symbols;
+	public List<BMSymbol> symbols
+	{
+		get
+		{
+			if (!(mReplacement != null))
+			{
+				return mSymbols;
+			}
+			return mReplacement.symbols;
+		}
+	}
 
 	public UIAtlas atlas
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? mAtlas : mReplacement.atlas;
+			if (!(mReplacement != null))
+			{
+				return mAtlas;
+			}
+			return mReplacement.atlas;
 		}
 		set
 		{
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 			if (mReplacement != null)
 			{
 				mReplacement.atlas = value;
@@ -159,15 +205,15 @@ public class UIFont : MonoBehaviour
 			}
 			if (mMat != null)
 			{
-				if (mDynamicFont != null && mMat != mDynamicFont.get_material())
+				if (mDynamicFont != null && mMat != mDynamicFont.material)
 				{
-					mMat.set_mainTexture(mDynamicFont.get_material().get_mainTexture());
+					mMat.mainTexture = mDynamicFont.material.mainTexture;
 				}
 				return mMat;
 			}
 			if (mDynamicFont != null)
 			{
-				return mDynamicFont.get_material();
+				return mDynamicFont.material;
 			}
 			return null;
 		}
@@ -187,13 +233,7 @@ public class UIFont : MonoBehaviour
 	}
 
 	[Obsolete("Use UIFont.premultipliedAlphaShader instead")]
-	public bool premultipliedAlpha
-	{
-		get
-		{
-			return premultipliedAlphaShader;
-		}
-	}
+	public bool premultipliedAlpha => premultipliedAlphaShader;
 
 	public bool premultipliedAlphaShader
 	{
@@ -210,7 +250,7 @@ public class UIFont : MonoBehaviour
 			if (mPMA == -1)
 			{
 				Material material = this.material;
-				mPMA = ((material != null && material.get_shader() != null && material.get_shader().get_name().Contains("Premultiplied")) ? 1 : 0);
+				mPMA = ((material != null && material.shader != null && material.shader.name.Contains("Premultiplied")) ? 1 : 0);
 			}
 			return mPMA == 1;
 		}
@@ -231,7 +271,7 @@ public class UIFont : MonoBehaviour
 			if (mPacked == -1)
 			{
 				Material material = this.material;
-				mPacked = ((material != null && material.get_shader() != null && material.get_shader().get_name().Contains("Packed")) ? 1 : 0);
+				mPacked = ((material != null && material.shader != null && material.shader.name.Contains("Packed")) ? 1 : 0);
 			}
 			return mPacked == 1;
 		}
@@ -246,7 +286,11 @@ public class UIFont : MonoBehaviour
 				return mReplacement.texture;
 			}
 			Material material = this.material;
-			return (!(material != null)) ? null : (material.get_mainTexture() as Texture2D);
+			if (!(material != null))
+			{
+				return null;
+			}
+			return material.mainTexture as Texture2D;
 		}
 	}
 
@@ -254,22 +298,18 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 			if (mReplacement != null)
 			{
 				return mReplacement.uvRect;
 			}
-			return (!(mAtlas != null) || sprite == null) ? new Rect(0f, 0f, 1f, 1f) : mUVRect;
+			if (!(mAtlas != null) || sprite == null)
+			{
+				return new Rect(0f, 0f, 1f, 1f);
+			}
+			return mUVRect;
 		}
 		set
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			if (mReplacement != null)
 			{
 				mReplacement.uvRect = value;
@@ -286,7 +326,11 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? mFont.spriteName : mReplacement.spriteName;
+			if (!(mReplacement != null))
+			{
+				return mFont.spriteName;
+			}
+			return mReplacement.spriteName;
 		}
 		set
 		{
@@ -302,7 +346,17 @@ public class UIFont : MonoBehaviour
 		}
 	}
 
-	public bool isValid => mDynamicFont != null || mFont.isValid;
+	public bool isValid
+	{
+		get
+		{
+			if (!(mDynamicFont != null))
+			{
+				return mFont.isValid;
+			}
+			return true;
+		}
+	}
 
 	[Obsolete("Use UIFont.defaultSize instead")]
 	public int size
@@ -357,7 +411,7 @@ public class UIFont : MonoBehaviour
 				mSprite = mAtlas.GetSprite(mFont.spriteName);
 				if (mSprite == null)
 				{
-					mSprite = mAtlas.GetSprite(this.get_name());
+					mSprite = mAtlas.GetSprite(base.name);
 				}
 				if (mSprite == null)
 				{
@@ -413,13 +467,27 @@ public class UIFont : MonoBehaviour
 		}
 	}
 
-	public bool isDynamic => (!(mReplacement != null)) ? (mDynamicFont != null) : mReplacement.isDynamic;
+	public bool isDynamic
+	{
+		get
+		{
+			if (!(mReplacement != null))
+			{
+				return mDynamicFont != null;
+			}
+			return mReplacement.isDynamic;
+		}
+	}
 
 	public Font dynamicFont
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? mDynamicFont : mReplacement.dynamicFont;
+			if (!(mReplacement != null))
+			{
+				return mDynamicFont;
+			}
+			return mReplacement.dynamicFont;
 		}
 		set
 		{
@@ -443,17 +511,14 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			return (!(mReplacement != null)) ? mDynamicFontStyle : mReplacement.dynamicFontStyle;
+			if (!(mReplacement != null))
+			{
+				return mDynamicFontStyle;
+			}
+			return mReplacement.dynamicFontStyle;
 		}
 		set
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			if (mReplacement != null)
 			{
 				mReplacement.dynamicFontStyle = value;
@@ -470,40 +535,28 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (Object.op_Implicit(mReplacement))
+			if ((bool)mReplacement)
 			{
 				return mReplacement.dynamicTexture;
 			}
 			if (isDynamic)
 			{
-				return mDynamicFont.get_material().get_mainTexture();
+				return mDynamicFont.material.mainTexture;
 			}
 			return null;
 		}
 	}
 
-	public UIFont()
-		: this()
-	{
-	}//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-	//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-
-
 	private void Trim()
 	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		Texture texture = mAtlas.texture;
-		if (texture != null && mSprite != null)
+		if (mAtlas.texture != null && mSprite != null)
 		{
-			Rect val = NGUIMath.ConvertToPixels(mUVRect, this.texture.get_width(), this.texture.get_height(), round: true);
-			Rect val2 = default(Rect);
-			val2._002Ector((float)mSprite.x, (float)mSprite.y, (float)mSprite.width, (float)mSprite.height);
-			int xMin = Mathf.RoundToInt(val2.get_xMin() - val.get_xMin());
-			int yMin = Mathf.RoundToInt(val2.get_yMin() - val.get_yMin());
-			int xMax = Mathf.RoundToInt(val2.get_xMax() - val.get_xMin());
-			int yMax = Mathf.RoundToInt(val2.get_yMax() - val.get_yMin());
+			Rect rect = NGUIMath.ConvertToPixels(mUVRect, texture.width, texture.height, round: true);
+			Rect rect2 = new Rect(mSprite.x, mSprite.y, mSprite.width, mSprite.height);
+			int xMin = Mathf.RoundToInt(rect2.xMin - rect.xMin);
+			int yMin = Mathf.RoundToInt(rect2.yMin - rect.yMin);
+			int xMax = Mathf.RoundToInt(rect2.xMax - rect.xMin);
+			int yMax = Mathf.RoundToInt(rect2.yMax - rect.yMin);
 			mFont.Trim(xMin, yMin, xMax, yMax);
 		}
 	}
@@ -518,7 +571,11 @@ public class UIFont : MonoBehaviour
 		{
 			return true;
 		}
-		return mReplacement != null && mReplacement.References(font);
+		if (!(mReplacement != null))
+		{
+			return false;
+		}
+		return mReplacement.References(font);
 	}
 
 	public static bool CheckIfRelated(UIFont a, UIFont b)
@@ -527,11 +584,15 @@ public class UIFont : MonoBehaviour
 		{
 			return false;
 		}
-		if (a.isDynamic && b.isDynamic && a.dynamicFont.get_fontNames()[0] == b.dynamicFont.get_fontNames()[0])
+		if (a.isDynamic && b.isDynamic && a.dynamicFont.fontNames[0] == b.dynamicFont.fontNames[0])
 		{
 			return true;
 		}
-		return a == b || a.References(b) || b.References(a);
+		if (!(a == b) && !a.References(b))
+		{
+			return b.References(a);
+		}
+		return true;
 	}
 
 	public void MarkAsChanged()
@@ -546,7 +607,7 @@ public class UIFont : MonoBehaviour
 		for (int num = array.Length; i < num; i++)
 		{
 			UILabel uILabel = array[i];
-			if (uILabel.get_enabled() && NGUITools.GetActive(uILabel.get_gameObject()) && CheckIfRelated(this, uILabel.bitmapFont))
+			if (uILabel.enabled && NGUITools.GetActive(uILabel.gameObject) && CheckIfRelated(this, uILabel.bitmapFont))
 			{
 				UIFont bitmapFont = uILabel.bitmapFont;
 				uILabel.bitmapFont = null;
@@ -562,11 +623,6 @@ public class UIFont : MonoBehaviour
 
 	public void UpdateUVRect()
 	{
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
 		if (mAtlas == null)
 		{
 			return;
@@ -574,8 +630,8 @@ public class UIFont : MonoBehaviour
 		Texture texture = mAtlas.texture;
 		if (texture != null)
 		{
-			mUVRect = new Rect((float)(mSprite.x - mSprite.paddingLeft), (float)(mSprite.y - mSprite.paddingTop), (float)(mSprite.width + mSprite.paddingLeft + mSprite.paddingRight), (float)(mSprite.height + mSprite.paddingTop + mSprite.paddingBottom));
-			mUVRect = NGUIMath.ConvertToTexCoords(mUVRect, texture.get_width(), texture.get_height());
+			mUVRect = new Rect(mSprite.x - mSprite.paddingLeft, mSprite.y - mSprite.paddingTop, mSprite.width + mSprite.paddingLeft + mSprite.paddingRight, mSprite.height + mSprite.paddingTop + mSprite.paddingBottom);
+			mUVRect = NGUIMath.ConvertToTexCoords(mUVRect, texture.width, texture.height);
 			if (mSprite.hasPadding)
 			{
 				Trim();
@@ -639,8 +695,7 @@ public class UIFont : MonoBehaviour
 
 	public void AddSymbol(string sequence, string spriteName)
 	{
-		BMSymbol symbol = GetSymbol(sequence, createIfMissing: true);
-		symbol.spriteName = spriteName;
+		GetSymbol(sequence, createIfMissing: true).spriteName = spriteName;
 		MarkAsChanged();
 	}
 

@@ -30,7 +30,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 
 	private Coroutine afkCoroutine;
 
-	private string inviteValue = string.Empty;
+	private string inviteValue = "";
 
 	public Action<LoungeMemberStatus> OnChangeMemberStatus = delegate
 	{
@@ -162,8 +162,8 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	protected override void Awake()
 	{
 		base.Awake();
-		this.get_gameObject().AddComponent<LoungeWebSocket>();
-		this.get_gameObject().AddComponent<LoungeNetworkManager>();
+		base.gameObject.AddComponent<LoungeWebSocket>();
+		base.gameObject.AddComponent<LoungeNetworkManager>();
 	}
 
 	private void OnApplicationPause(bool pause)
@@ -257,8 +257,8 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
 		{
 			List<Party_Model_RegisterACK.UserInfo> data = (from x in MonoBehaviourSingleton<LoungeNetworkManager>.I.registerAck.GetConvertUserInfo()
-			where GetSlotInfoByUserId(x.userId) != null
-			select x).ToList();
+				where GetSlotInfoByUserId(x.userId) != null
+				select x).ToList();
 			loungeMemberStatus = new LoungeMemberesStatus(data);
 		}
 	}
@@ -286,23 +286,39 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 
 	public static bool IsValidNotEmptyRallyList()
 	{
-		return MonoBehaviourSingleton<LoungeMatchingManager>.IsValid() && MonoBehaviourSingleton<LoungeMatchingManager>.I.rallyInvite != null && MonoBehaviourSingleton<LoungeMatchingManager>.I.rallyInvite.Count > 0;
+		if (MonoBehaviourSingleton<LoungeMatchingManager>.IsValid() && MonoBehaviourSingleton<LoungeMatchingManager>.I.rallyInvite != null)
+		{
+			return MonoBehaviourSingleton<LoungeMatchingManager>.I.rallyInvite.Count > 0;
+		}
+		return false;
 	}
 
 	public static bool IsValidNotEmptyList()
 	{
-		return MonoBehaviourSingleton<LoungeMatchingManager>.IsValid() && MonoBehaviourSingleton<LoungeMatchingManager>.I.lounges != null && MonoBehaviourSingleton<LoungeMatchingManager>.I.lounges.Count > 0;
+		if (MonoBehaviourSingleton<LoungeMatchingManager>.IsValid() && MonoBehaviourSingleton<LoungeMatchingManager>.I.lounges != null)
+		{
+			return MonoBehaviourSingleton<LoungeMatchingManager>.I.lounges.Count > 0;
+		}
+		return false;
 	}
 
 	public static bool IsValidInLounge()
 	{
-		return MonoBehaviourSingleton<LoungeMatchingManager>.IsValid() && MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge();
+		if (MonoBehaviourSingleton<LoungeMatchingManager>.IsValid())
+		{
+			return MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge();
+		}
+		return false;
 	}
 
 	public bool IsUserInLounge(int user_id)
 	{
 		PartyModel.SlotInfo slotInfoByUserId = GetSlotInfoByUserId(user_id);
-		return IsValidInLounge() && slotInfoByUserId != null && slotInfoByUserId.userInfo != null;
+		if (IsValidInLounge() && slotInfoByUserId != null)
+		{
+			return slotInfoByUserId.userInfo != null;
+		}
+		return false;
 	}
 
 	public bool IsInLounge()
@@ -312,37 +328,65 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 
 	public string GetLoungeId()
 	{
-		return (loungeData == null) ? string.Empty : loungeData.id;
+		if (loungeData == null)
+		{
+			return "";
+		}
+		return loungeData.id;
 	}
 
 	public string GetLoungeNumber()
 	{
-		return (loungeData == null) ? string.Empty : loungeData.loungeNumber;
+		if (loungeData == null)
+		{
+			return "";
+		}
+		return loungeData.loungeNumber;
 	}
 
 	public string GetInviteMessage()
 	{
-		return (inviteFriendInfo == null) ? string.Empty : inviteFriendInfo.inviteMessage;
+		if (inviteFriendInfo == null)
+		{
+			return "";
+		}
+		return inviteFriendInfo.inviteMessage;
 	}
 
 	public string GetInviteHelpURL()
 	{
-		return (inviteFriendInfo == null) ? string.Empty : inviteFriendInfo.linkUrl;
+		if (inviteFriendInfo == null)
+		{
+			return "";
+		}
+		return inviteFriendInfo.linkUrl;
 	}
 
 	public PARTY_STATUS GetStatus()
 	{
-		return (PARTY_STATUS)((loungeData != null) ? loungeData.status : 0);
+		if (loungeData == null)
+		{
+			return PARTY_STATUS.NONE;
+		}
+		return (PARTY_STATUS)loungeData.status;
 	}
 
 	public int GetOwnerUserId()
 	{
-		return (loungeData != null) ? loungeData.ownerUserId : 0;
+		if (loungeData == null)
+		{
+			return 0;
+		}
+		return loungeData.ownerUserId;
 	}
 
 	public int GetSlotIndex(int user_id)
 	{
-		return (loungeData == null) ? (-1) : loungeData.slotInfos.FindIndex((PartyModel.SlotInfo s) => s.userInfo != null && s.userInfo.userId == user_id);
+		if (loungeData == null)
+		{
+			return -1;
+		}
+		return loungeData.slotInfos.FindIndex((PartyModel.SlotInfo s) => s.userInfo != null && s.userInfo.userId == user_id);
 	}
 
 	public PartyModel.SlotInfo GetSlotInfoByIndex(int idx)
@@ -357,7 +401,11 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	public PartyModel.SlotInfo GetSlotInfoByUserId(int user_id)
 	{
 		int slotIndex = GetSlotIndex(user_id);
-		return (slotIndex < 0) ? null : GetSlotInfoByIndex(slotIndex);
+		if (slotIndex < 0)
+		{
+			return null;
+		}
+		return GetSlotInfoByIndex(slotIndex);
 	}
 
 	public int GetMemberCount()
@@ -412,7 +460,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 
 	public static string GenerateToken()
 	{
-		return Guid.NewGuid().ToString().Replace("-", string.Empty);
+		return Guid.NewGuid().ToString().Replace("-", "");
 	}
 
 	public void SetFollowLoungeMember(List<FollowLoungeMember> _followLoungeMember)
@@ -454,7 +502,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 				UpdateLoungeList(ret.result.lounges);
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendSearchRandomMatching(Action<bool, Error> call_back)
@@ -484,7 +532,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			{
 				call_back(arg, ret.Error);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SetSearchRequest(LoungeSearchSettings.SearchRequestParam request = null)
@@ -508,7 +556,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	{
 		int order = 1;
 		LOUNGE_LABEL @int = (LOUNGE_LABEL)PlayerPrefs.GetInt("LOUNGE_SEARCH_LABEL_KEY", 0);
-		string @string = PlayerPrefs.GetString("LOUNGE_SEARCH_NAME_KEY", string.Empty);
+		string @string = PlayerPrefs.GetString("LOUNGE_SEARCH_NAME_KEY", "");
 		searchRequest = new LoungeSearchSettings.SearchRequestParam(order, @int, @string);
 	}
 
@@ -545,7 +593,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		int int3 = PlayerPrefs.GetInt("LOUNGE_CREATE_CAPACITY_KEY", 8);
 		LOUNGE_LABEL int4 = (LOUNGE_LABEL)PlayerPrefs.GetInt("LOUNGE_CREATE_LABEL_KEY", 0);
 		bool isLock = PlayerPrefs.GetInt("LOUNGE_CREATE_LOCK_KEY", 0) != 0;
-		string @string = PlayerPrefs.GetString("LOUNGE_CREATE_NAME_KEY", string.Empty);
+		string @string = PlayerPrefs.GetString("LOUNGE_CREATE_NAME_KEY", "");
 		createRequest = new LoungeConditionSettings.CreateRequestParam(@int, int2, maxLevel, int3, int4, isLock, @string);
 	}
 
@@ -583,7 +631,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 				break;
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendApply(string loungeNumber, Action<bool, Error> call_back)
@@ -605,7 +653,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			{
 				call_back(arg, ret.Error);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendEntry(string id, Action<bool> call_back)
@@ -624,7 +672,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 				Dirty();
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInfo(Action<bool> call_back, bool force = false)
@@ -667,7 +715,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 				ClearLounge();
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendLeave(Action<bool> call_back)
@@ -689,13 +737,13 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			Error error = ret.Error;
 			if (error == Error.None || error == Error.ERR_PARTY_NOT_FOUND_PARTY)
 			{
-				this.StartCoroutine(DoLeave(call_back, ret));
+				StartCoroutine(DoLeave(call_back, ret));
 			}
 			else
 			{
 				call_back(obj);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendEdit(LoungeModel.RequestEdit lounge_setting, Action<bool> call_back)
@@ -715,39 +763,35 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 				UpdateLounge(ret.result.lounge, ret.result.friend, ret.result.loungeServer, ret.result.inviteFriendInfo, ret.result.firstMetUserIds);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	private IEnumerator DoLeave(Action<bool> call_back, LoungeLeaveModel ret)
 	{
-		bool is_success = false;
+		bool obj = false;
 		Error error = ret.Error;
 		if (error == Error.None || error == Error.ERR_PARTY_NOT_FOUND_PARTY)
 		{
 			if (IsHostChange(ret.result.lounge, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id))
 			{
-				Lounge_Model_RoomHostChanged hostChange = new Lounge_Model_RoomHostChanged
-				{
-					id = 1005,
-					hostid = ret.result.lounge.ownerUserId
-				};
-				MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(hostChange);
+				Lounge_Model_RoomHostChanged lounge_Model_RoomHostChanged = new Lounge_Model_RoomHostChanged();
+				lounge_Model_RoomHostChanged.id = 1005;
+				lounge_Model_RoomHostChanged.hostid = ret.result.lounge.ownerUserId;
+				MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomHostChanged);
 				yield return 0;
 			}
-			is_success = true;
-			Lounge_Model_RoomLeaved packet = new Lounge_Model_RoomLeaved
-			{
-				id = 1005,
-				token = GenerateToken(),
-				cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
-			};
-			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(packet, promise: false, (Coop_Model_ACK ack) => true);
+			obj = true;
+			Lounge_Model_RoomLeaved lounge_Model_RoomLeaved = new Lounge_Model_RoomLeaved();
+			lounge_Model_RoomLeaved.id = 1005;
+			lounge_Model_RoomLeaved.token = GenerateToken();
+			lounge_Model_RoomLeaved.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
+			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomLeaved, promise: false, (Coop_Model_ACK ack) => true);
 			MonoBehaviourSingleton<ChatManager>.I.DestroyLoungeChat();
 			StopAFKCheck();
 			ClearLounge();
 			Dirty();
 		}
-		call_back(is_success);
+		call_back(obj);
 	}
 
 	private bool IsHostChange(LoungeModel.Lounge lounge, int leaveUserId)
@@ -786,7 +830,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 				arg2 = ret.result.ToArray();
 			}
 			call_back(arg, arg2);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInvite(int[] userIds, Action<bool, int[]> call_back)
@@ -814,7 +858,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			{
 				call_back(arg, null);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendInvitedLounge(Action<bool> call_back)
@@ -829,7 +873,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 				UpdateLoungeList(ret.result.lounges);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRoomParty(Action<bool, List<PartyModel.Party>> call_back)
@@ -842,7 +886,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			{
 				UpdateParties(ret.result.parties);
 				call_back(ret.Error == Error.None, ret.result.parties);
-			}, string.Empty);
+			});
 		}
 	}
 
@@ -870,7 +914,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 				MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(model);
 			}
 			call_back(flag);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRoomPartyAFKKick(int kickedUserId, Action<bool> call_back = null)
@@ -885,8 +929,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			{
 				if (ret.Error == Error.None)
 				{
-					PartyModel.SlotInfo slotInfo = ret.result.lounge.slotInfos.Find((PartyModel.SlotInfo s) => s.userInfo != null && s.userInfo.userId == kickedUserId);
-					if (slotInfo != null)
+					if (ret.result.lounge.slotInfos.Find((PartyModel.SlotInfo s) => s.userInfo != null && s.userInfo.userId == kickedUserId) != null)
 					{
 						loungeMemberStatus[kickedUserId].UpdateLastExecTime(TimeManager.GetNow().ToUniversalTime());
 					}
@@ -917,7 +960,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 				}
 			}
 			call_back(flag);
-		}, string.Empty);
+		});
 	}
 
 	public void SendSearchFollowerRoom(Action<bool, List<LoungeSearchFollowerRoomModel.LoungeFollowerModel>, List<int>> call_back)
@@ -925,7 +968,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		Protocol.Send(LoungeSearchFollowerRoomModel.URL, delegate(LoungeSearchFollowerRoomModel ret)
 		{
 			call_back(ret.Error == Error.None, ret.result.lounges, ret.result.firstMetUserIds);
-		}, string.Empty);
+		});
 	}
 
 	public void SendIsLounge()
@@ -1021,8 +1064,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			}
 			if (QuestManager.IsValidInGame())
 			{
-				string text = StringTable.Get(STRING_CATEGORY.IN_GAME, 140u);
-				UIInGamePopupDialog.PushOpen(text, is_important: false, 1.4f);
+				UIInGamePopupDialog.PushOpen(StringTable.Get(STRING_CATEGORY.IN_GAME, 140u), is_important: false, 1.4f);
 			}
 			ClearLounge();
 			MonoBehaviourSingleton<ChatManager>.I.DestroyLoungeChat();
@@ -1043,17 +1085,18 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		{
 			return null;
 		}
-		LoungeNetworkManager.ConnectData connectData = new LoungeNetworkManager.ConnectData();
-		connectData.path = loungeServerData.wsHost;
-		connectData.ports = loungeServerData.wsPorts;
-		connectData.fromId = id;
-		connectData.ackPrefix = slotIndex;
-		connectData.roomId = loungeData.id;
-		connectData.owner = loungeData.ownerUserId;
-		connectData.ownerToken = loungeServerData.token;
-		connectData.uid = id;
-		connectData.signature = loungeServerData.signature;
-		return connectData;
+		return new LoungeNetworkManager.ConnectData
+		{
+			path = loungeServerData.wsHost,
+			ports = loungeServerData.wsPorts,
+			fromId = id,
+			ackPrefix = slotIndex,
+			roomId = loungeData.id,
+			owner = loungeData.ownerUserId,
+			ownerToken = loungeServerData.token,
+			uid = id,
+			signature = loungeServerData.signature
+		};
 	}
 
 	public void ConnectServer()
@@ -1083,8 +1126,8 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		PlayerPrefs.SetInt("LOUNGE_CREATE_LEVEL_MAX_KEY", createRequest.maxLevel);
 		PlayerPrefs.SetInt("LOUNGE_CREATE_CAPACITY_KEY", createRequest.capacity);
 		PlayerPrefs.SetInt("LOUNGE_CREATE_LABEL_KEY", (int)createRequest.label);
-		int num = createRequest.isLock ? 1 : 0;
-		PlayerPrefs.SetInt("LOUNGE_CREATE_LOCK_KEY", num);
+		int value = createRequest.isLock ? 1 : 0;
+		PlayerPrefs.SetInt("LOUNGE_CREATE_LOCK_KEY", value);
 		PlayerPrefs.SetString("LOUNGE_CREATE_NAME_KEY", createRequest.loungeName);
 		PlayerPrefs.Save();
 	}
@@ -1183,9 +1226,9 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	{
 		if (afkCoroutine != null)
 		{
-			this.StopCoroutine(afkCoroutine);
+			StopCoroutine(afkCoroutine);
 		}
-		afkCoroutine = this.StartCoroutine(DoAFKCheck());
+		afkCoroutine = StartCoroutine(DoAFKCheck());
 	}
 
 	private IEnumerator DoAFKCheck()
@@ -1194,24 +1237,22 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 		{
 			yield break;
 		}
-		List<LoungeMemberStatus> allMember = loungeMemberStatus.GetAll();
-		if (allMember.IsNullOrEmpty() || !(from x in allMember
-		where x.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
-		select x).Any())
+		List<LoungeMemberStatus> all = loungeMemberStatus.GetAll();
+		if (all.IsNullOrEmpty() || !all.Where((LoungeMemberStatus x) => x.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id).Any())
 		{
 			yield break;
 		}
-		LoungeMemberStatus fastest = (from x in allMember
-		where x.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
-		where x.GetStatus() == LoungeMemberStatus.MEMBER_STATUS.LOUNGE
-		orderby x.lastExecTime
-		select x).FirstOrDefault();
+		LoungeMemberStatus fastest = (from x in all
+			where x.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
+			where x.GetStatus() == LoungeMemberStatus.MEMBER_STATUS.LOUNGE
+			orderby x.lastExecTime
+			select x).FirstOrDefault();
 		if (fastest != null)
 		{
-			double waitTime = (AFK_KICK_TIME - (TimeManager.GetNow().ToUniversalTime() - fastest.lastExecTime)).TotalSeconds;
-			if (waitTime > 0.0)
+			double totalSeconds = (AFK_KICK_TIME - (TimeManager.GetNow().ToUniversalTime() - fastest.lastExecTime)).TotalSeconds;
+			if (totalSeconds > 0.0)
 			{
-				yield return (object)new WaitForSeconds((float)waitTime);
+				yield return new WaitForSeconds((float)totalSeconds);
 			}
 			bool wait = true;
 			Protocol.Force(delegate
@@ -1233,7 +1274,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 	{
 		if (afkCoroutine != null)
 		{
-			this.StopCoroutine(afkCoroutine);
+			StopCoroutine(afkCoroutine);
 		}
 	}
 
@@ -1250,7 +1291,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void GetRallyList(Action<bool> call_back)
@@ -1287,7 +1328,7 @@ public class LoungeMatchingManager : MonoBehaviourSingleton<LoungeMatchingManage
 			{
 				call_back(flag);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public bool IsRallyUser(int userid)

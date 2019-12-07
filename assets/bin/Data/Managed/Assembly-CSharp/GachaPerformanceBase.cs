@@ -1,5 +1,3 @@
-using System;
-
 public class GachaPerformanceBase : GameSection
 {
 	public enum UI
@@ -30,29 +28,29 @@ public class GachaPerformanceBase : GameSection
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_RARITY_ROOT, is_visible: false);
+		SetActive(UI.OBJ_RARITY_ROOT, is_visible: false);
 	}
 
 	protected void ShowRarity(RARITY_TYPE rarity)
 	{
 		if (!AnimationDirector.I.IsSkip())
 		{
-			SetActive((Enum)UI.OBJ_RARITY_ROOT, is_visible: true);
+			SetActive(UI.OBJ_RARITY_ROOT, is_visible: true);
 			UI uI = rarityAnimRoot[(int)rarity];
 			int i = 0;
 			for (int num = rarityAnimRoot.Length; i < num; i++)
 			{
-				SetActive((Enum)rarityAnimRoot[i], rarityAnimRoot[i] == uI);
+				SetActive(rarityAnimRoot[i], rarityAnimRoot[i] == uI);
 			}
-			ResetTween((Enum)UI.OBJ_RARITY_TEXT_ROOT, 0);
-			ResetTween((Enum)rarityAnimRoot[(int)rarity], 0);
+			ResetTween(UI.OBJ_RARITY_TEXT_ROOT);
+			ResetTween(rarityAnimRoot[(int)rarity]);
 			if (rarity <= RARITY_TYPE.C)
 			{
-				ResetTween((Enum)UI.OBJ_RARITY_LIGHT, 0);
-				PlayTween((Enum)UI.OBJ_RARITY_LIGHT, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+				ResetTween(UI.OBJ_RARITY_LIGHT);
+				PlayTween(UI.OBJ_RARITY_LIGHT, forward: true, null, is_input_block: false);
 			}
-			PlayTween((Enum)rarityAnimRoot[(int)rarity], forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
-			PlayTween((Enum)UI.OBJ_RARITY_TEXT_ROOT, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+			PlayTween(rarityAnimRoot[(int)rarity], forward: true, null, is_input_block: false);
+			PlayTween(UI.OBJ_RARITY_TEXT_ROOT, forward: true, null, is_input_block: false);
 			if (AnimationDirector.I is QuestGachaDirectorBase)
 			{
 				(AnimationDirector.I as QuestGachaDirectorBase).PlayUIRarityEffect(rarity, GetCtrl(UI.OBJ_RARITY_ROOT), GetCtrl(uI));
@@ -69,9 +67,9 @@ public class GachaPerformanceBase : GameSection
 		int i = 0;
 		for (int num = rarityAnimRoot.Length; i < num; i++)
 		{
-			SetActive((Enum)rarityAnimRoot[i], is_visible: false);
+			SetActive(rarityAnimRoot[i], is_visible: false);
 		}
-		SetActive((Enum)UI.OBJ_RARITY_ROOT, is_visible: false);
+		SetActive(UI.OBJ_RARITY_ROOT, is_visible: false);
 	}
 
 	protected void End()
@@ -81,8 +79,8 @@ public class GachaPerformanceBase : GameSection
 
 	protected void OnQuery_SKIP()
 	{
-		SetActive((Enum)UI.BTN_SKIP, is_visible: false);
-		SetActive((Enum)UI.OBJ_RARITY_ROOT, is_visible: false);
+		SetActive(UI.BTN_SKIP, is_visible: false);
+		SetActive(UI.OBJ_RARITY_ROOT, is_visible: false);
 		AnimationDirector.I.Skip();
 	}
 
@@ -93,6 +91,6 @@ public class GachaPerformanceBase : GameSection
 
 	protected void ActivateButtonSkip()
 	{
-		SetActive((Enum)UI.BTN_SKIP, is_visible: true);
+		SetActive(UI.BTN_SKIP, is_visible: true);
 	}
 }

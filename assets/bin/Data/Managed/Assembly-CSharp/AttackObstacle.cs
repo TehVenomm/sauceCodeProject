@@ -24,21 +24,20 @@ public class AttackObstacle : StageObject
 
 	public void Initialize(AnimEventShot aminEventShot, float time)
 	{
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 		_animEventShot = aminEventShot;
 		int layer = 18;
-		Utility.SetLayerWithChildren(this.get_transform(), layer);
-		base._rigidbody = this.GetComponent<Rigidbody>();
-		base._rigidbody.set_useGravity(false);
-		base._rigidbody.set_isKinematic(true);
-		_colliderList = this.GetComponentsInChildren<Collider>();
+		Utility.SetLayerWithChildren(base.transform, layer);
+		base._rigidbody = GetComponent<Rigidbody>();
+		base._rigidbody.useGravity = false;
+		base._rigidbody.isKinematic = true;
+		_colliderList = GetComponentsInChildren<Collider>();
 		if (_colliderList.Length == 0)
 		{
-			CapsuleCollider val = this.get_gameObject().AddComponent<CapsuleCollider>();
-			val.set_center(new Vector3(0f, 0f, 0f));
-			val.set_direction(2);
-			_colliderList = (Collider[])new Collider[1];
-			_colliderList[0] = val;
+			CapsuleCollider capsuleCollider = base.gameObject.AddComponent<CapsuleCollider>();
+			capsuleCollider.center = new Vector3(0f, 0f, 0f);
+			capsuleCollider.direction = 2;
+			_colliderList = new Collider[1];
+			_colliderList[0] = capsuleCollider;
 		}
 		breakEnableTime = time;
 		keika = 0f;
@@ -53,10 +52,10 @@ public class AttackObstacle : StageObject
 		int i = 0;
 		for (int num = _colliderList.Length; i < num; i++)
 		{
-			_colliderList[i].set_isTrigger(false);
+			_colliderList[i].isTrigger = false;
 			if (!breakEnebleFlag)
 			{
-				_colliderList[i].set_enabled(false);
+				_colliderList[i].enabled = false;
 			}
 		}
 		isBreak = false;
@@ -70,7 +69,7 @@ public class AttackObstacle : StageObject
 		{
 			return;
 		}
-		keika += Time.get_deltaTime();
+		keika += Time.deltaTime;
 		if (!(keika > breakEnableTime))
 		{
 			return;
@@ -81,7 +80,7 @@ public class AttackObstacle : StageObject
 		{
 			if (_colliderList[i] != null)
 			{
-				_colliderList[i].set_enabled(true);
+				_colliderList[i].enabled = true;
 			}
 		}
 	}
@@ -120,7 +119,7 @@ public class AttackObstacle : StageObject
 		{
 			if (_colliderList[i] != null)
 			{
-				_colliderList[i].set_enabled(false);
+				_colliderList[i].enabled = false;
 			}
 		}
 		_animEventShot.OnDestroy();

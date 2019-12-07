@@ -45,9 +45,7 @@ namespace BestHTTP.Caching
 
 		private static Uri GetUriFromFileName(string fileName)
 		{
-			byte[] bytes = Convert.FromBase64String(fileName.Replace('-', '/'));
-			string uriString = bytes.AsciiToString();
-			return new Uri(uriString);
+			return new Uri(Convert.FromBase64String(fileName.Replace('-', '/')).AsciiToString());
 		}
 
 		private static void CheckSetup()
@@ -66,12 +64,12 @@ namespace BestHTTP.Caching
 		{
 			if (string.IsNullOrEmpty(CacheFolder))
 			{
-				CacheFolder = Path.Combine(Application.get_persistentDataPath(), "HTTPCache");
+				CacheFolder = Path.Combine(Application.persistentDataPath, "HTTPCache");
 				if (!Directory.Exists(CacheFolder))
 				{
 					Directory.CreateDirectory(CacheFolder);
 				}
-				LibraryPath = Path.Combine(Application.get_persistentDataPath(), "Library");
+				LibraryPath = Path.Combine(Application.persistentDataPath, "Library");
 			}
 		}
 
@@ -93,12 +91,12 @@ namespace BestHTTP.Caching
 					lock (Library)
 					{
 						HTTPCacheFileInfo value;
-						bool flag = Library.TryGetValue(uri, out value);
-						if (flag)
+						bool num = Library.TryGetValue(uri, out value);
+						if (num)
 						{
 							value.Delete();
 						}
-						if (flag)
+						if (num)
 						{
 							Library.Remove(uri);
 						}
@@ -187,8 +185,7 @@ namespace BestHTTP.Caching
 			{
 				return false;
 			}
-			List<string> headerValues3 = response.GetHeaderValues("content-range");
-			if (headerValues3 != null)
+			if (response.GetHeaderValues("content-range") != null)
 			{
 				return false;
 			}
@@ -253,8 +250,7 @@ namespace BestHTTP.Caching
 						{
 							try
 							{
-								string fileName = Path.GetFileName(files[i]);
-								DeleteEntity(GetUriFromFileName(fileName));
+								DeleteEntity(GetUriFromFileName(Path.GetFileName(files[i])));
 							}
 							catch
 							{
@@ -450,8 +446,7 @@ namespace BestHTTP.Caching
 			{
 				try
 				{
-					string fileName = Path.GetFileName(files[i]);
-					Uri uriFromFileName = GetUriFromFileName(fileName);
+					Uri uriFromFileName = GetUriFromFileName(Path.GetFileName(files[i]));
 					lock (Library)
 					{
 						if (!Library.ContainsKey(uriFromFileName))

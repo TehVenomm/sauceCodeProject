@@ -6,22 +6,17 @@ public class UISpriteAddShaderReplacer : MonoBehaviour
 
 	private UIManager.AtlasEntry entry;
 
-	public UISpriteAddShaderReplacer()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		sprite = this.GetComponent<UISprite>();
+		sprite = GetComponent<UISprite>();
 	}
 
 	public void Replace(string shaderName)
 	{
-		if (!Object.op_Implicit(sprite))
+		if (!sprite)
 		{
 			Awake();
-			if (!Object.op_Implicit(sprite))
+			if (!sprite)
 			{
 				return;
 			}

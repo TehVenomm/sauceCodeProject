@@ -1,5 +1,3 @@
-using System;
-
 public class HomeNoticeNewDelivery : QuestDeliveryDetail
 {
 	protected new enum UI
@@ -89,8 +87,8 @@ public class HomeNoticeNewDelivery : QuestDeliveryDetail
 
 	public override void UpdateUI()
 	{
-		ResetTween((Enum)UI.TWN_NEW_DELIVERY_ANIM, 0);
-		PlayTween((Enum)UI.TWN_NEW_DELIVERY_ANIM, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		ResetTween(UI.TWN_NEW_DELIVERY_ANIM);
+		PlayTween(UI.TWN_NEW_DELIVERY_ANIM, forward: true, null, is_input_block: false);
 		base.UpdateUI();
 	}
 }

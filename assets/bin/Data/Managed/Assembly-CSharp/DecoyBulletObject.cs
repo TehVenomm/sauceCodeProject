@@ -66,13 +66,6 @@ public class DecoyBulletObject : StageObject
 
 	public virtual void Initialize(int playerId, int decoyId, BulletData bullet, Vector3 position, SkillInfo.SkillParam skill, bool isHit)
 	{
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			Log.Error(LOG.INGAME, "StageObjectManager is invalid. Can't initialize DecoyBulletObject.");
@@ -80,17 +73,17 @@ public class DecoyBulletObject : StageObject
 		}
 		base.objectType = OBJECT_TYPE.DECOY;
 		StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(playerId);
-		if (!object.ReferenceEquals(stageObject, null))
+		if ((object)stageObject != null)
 		{
 			ownerPlayer = (stageObject as Player);
 		}
 		bulletData = bullet;
 		skillParam = skill;
 		hateInterval = 0f;
-		cachedTransform = this.get_transform();
+		cachedTransform = base.transform;
 		cachedTransform.SetParent(MonoBehaviourSingleton<StageObjectManager>.I._transform);
-		cachedTransform.set_position(position);
-		cachedTransform.set_localScale(Vector3.get_one());
+		cachedTransform.position = position;
+		cachedTransform.localScale = Vector3.one;
 		if (bulletData != null)
 		{
 			lifeTime = bulletData.data.appearTime;
@@ -102,23 +95,23 @@ public class DecoyBulletObject : StageObject
 			if (MonoBehaviourSingleton<EffectManager>.IsValid())
 			{
 				cachedEffectTransform = EffectManager.GetEffect(bulletData.data.effectName, MonoBehaviourSingleton<EffectManager>.I._transform);
-				cachedEffectTransform.set_position(cachedTransform.get_position() + bulletData.data.dispOffset);
-				cachedEffectTransform.set_localRotation(Quaternion.Euler(bulletData.data.dispRotation));
+				cachedEffectTransform.position = cachedTransform.position + bulletData.data.dispOffset;
+				cachedEffectTransform.localRotation = Quaternion.Euler(bulletData.data.dispRotation);
 			}
 		}
 		id = decoyId;
 		if (decoyId > 0)
 		{
-			this.get_gameObject().set_name(OBJ_NAME + decoyId);
-			this.get_gameObject().set_layer(12);
+			base.gameObject.name = OBJ_NAME + decoyId;
+			base.gameObject.layer = 12;
 			ignoreLayerMask |= -1073741824;
 		}
-		if (!object.ReferenceEquals(ownerPlayer, null) && isHit && skillParam != null)
+		if ((object)ownerPlayer != null && isHit && skillParam != null)
 		{
-			cachedCollider = this.get_gameObject().AddComponent<SphereCollider>();
-			cachedCollider.set_radius(bulletData.data.radius);
-			cachedCollider.set_isTrigger(true);
-			cachedCollider.set_enabled(true);
+			cachedCollider = base.gameObject.AddComponent<SphereCollider>();
+			cachedCollider.radius = bulletData.data.radius;
+			cachedCollider.isTrigger = true;
+			cachedCollider.enabled = true;
 			if (!string.IsNullOrEmpty(skillParam.tableData.attackInfoNames[0]))
 			{
 				atkInfo = FindAttackInfo(skillParam.tableData.attackInfoNames[0]);
@@ -142,26 +135,26 @@ public class DecoyBulletObject : StageObject
 		OnDisappear(isExplode: false);
 	}
 
-	protected new virtual void Update()
+	protected override void Update()
 	{
 		if (!isInitialized)
 		{
 			return;
 		}
-		dontHitSec -= Time.get_deltaTime();
+		dontHitSec -= Time.deltaTime;
 		if (hitInterval > 0f)
 		{
-			hitInterval -= Time.get_deltaTime();
+			hitInterval -= Time.deltaTime;
 		}
 		if (isEnableHateInterval)
 		{
-			hateInterval -= Time.get_deltaTime();
+			hateInterval -= Time.deltaTime;
 			if (hateInterval <= 0f)
 			{
 				HateCtrl();
 			}
 		}
-		lifeTime -= Time.get_deltaTime();
+		lifeTime -= Time.deltaTime;
 		if (isUseLifeTime && lifeTime <= 0f)
 		{
 			OnDisappear(isExplode: true);
@@ -170,38 +163,26 @@ public class DecoyBulletObject : StageObject
 
 	public virtual void OnDisappear(bool isExplode)
 	{
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		if (!object.ReferenceEquals(cachedEffectTransform, null) && !object.ReferenceEquals(cachedEffectTransform.get_gameObject(), null))
+		if ((object)cachedEffectTransform != null && (object)cachedEffectTransform.gameObject != null)
 		{
-			EffectManager.ReleaseEffect(cachedEffectTransform.get_gameObject());
+			EffectManager.ReleaseEffect(cachedEffectTransform.gameObject);
 		}
 		cachedEffectTransform = null;
-		if (isExplode && !object.ReferenceEquals(atkInfo, null))
+		if (isExplode && atkInfo != null)
 		{
-			StageObject stageObject = ownerPlayer;
-			if (object.ReferenceEquals(ownerPlayer, null))
+			StageObject stage_object = ownerPlayer;
+			if ((object)ownerPlayer == null)
 			{
-				stageObject = this;
+				stage_object = this;
 			}
-			StageObject stage_object = stageObject;
-			AttackInfo atk_info = atkInfo;
-			Vector3 position = cachedTransform.get_position();
-			Quaternion identity = Quaternion.get_identity();
-			AtkAttribute atkAttribute = exAtk;
-			SkillInfo.SkillParam exSkillParam = skillParam;
-			AnimEventShot.Create(stage_object, atk_info, position, identity, null, isScaling: true, null, null, atkAttribute, Player.ATTACK_MODE.NONE, null, exSkillParam);
+			AnimEventShot.Create(stage_object, atkInfo, cachedTransform.position, Quaternion.identity, null, isScaling: true, null, null, exAtk, Player.ATTACK_MODE.NONE, null, skillParam);
 		}
 		ownerPlayer = null;
 		atkInfo = null;
 		bulletData = null;
-		if (!object.ReferenceEquals(this.get_gameObject(), null))
+		if ((object)base.gameObject != null)
 		{
-			Object.Destroy(this.get_gameObject());
+			Object.Destroy(base.gameObject);
 		}
 	}
 
@@ -216,7 +197,7 @@ public class DecoyBulletObject : StageObject
 		{
 			return;
 		}
-		int layer = collider.get_gameObject().get_layer();
+		int layer = collider.gameObject.layer;
 		if (((1 << layer) & ignoreLayerMask) > 0 || hitInterval > 0f)
 		{
 			return;
@@ -224,7 +205,7 @@ public class DecoyBulletObject : StageObject
 		hitInterval = MonoBehaviourSingleton<InGameSettingsManager>.I.buff.decoyHitInterval;
 		if (!((hitNum -= 1f) > 0f))
 		{
-			if (!object.ReferenceEquals(ownerPlayer, null))
+			if ((object)ownerPlayer != null)
 			{
 				ownerPlayer.ExecExplodeDecoyBullet(id);
 			}
@@ -234,17 +215,17 @@ public class DecoyBulletObject : StageObject
 
 	public void HateCtrl()
 	{
-		if (object.ReferenceEquals(bulletData, null) || object.ReferenceEquals(GetDecoyData(bulletData), null))
+		if ((object)bulletData == null || GetDecoyData(bulletData) == null)
 		{
 			return;
 		}
 		Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-		if (object.ReferenceEquals(boss, null) || (!boss.IsOriginal() && !boss.IsCoopNone()))
+		if ((object)boss == null || (!boss.IsOriginal() && !boss.IsCoopNone()))
 		{
 			return;
 		}
 		EnemyBrain component = MonoBehaviourSingleton<StageObjectManager>.I.boss.GetComponent<EnemyBrain>();
-		if (object.ReferenceEquals(component, null))
+		if ((object)component == null)
 		{
 			return;
 		}
@@ -253,7 +234,7 @@ public class DecoyBulletObject : StageObject
 		{
 			num = (float)skillParam.supportValue[0] * 0.01f;
 		}
-		if (GetDecoyData(bulletData).addDecoyHate.Length > 0)
+		if (GetDecoyData(bulletData).addDecoyHate.Length != 0)
 		{
 			int i = 0;
 			for (int num2 = GetDecoyData(bulletData).addDecoyHate.Length; i < num2; i++)
@@ -266,7 +247,7 @@ public class DecoyBulletObject : StageObject
 				component.HandleEvent(BRAIN_EVENT.DECOY, hateInfo2);
 			}
 		}
-		if (!object.ReferenceEquals(ownerPlayer, null) && GetDecoyData(bulletData).addOwnerHate.Length > 0)
+		if ((object)ownerPlayer != null && GetDecoyData(bulletData).addOwnerHate.Length != 0)
 		{
 			int j = 0;
 			for (int num3 = GetDecoyData(bulletData).addOwnerHate.Length; j < num3; j++)
@@ -285,7 +266,7 @@ public class DecoyBulletObject : StageObject
 
 	public bool IsActive()
 	{
-		if (!this.get_gameObject().get_activeSelf())
+		if (!base.gameObject.activeSelf)
 		{
 			return false;
 		}

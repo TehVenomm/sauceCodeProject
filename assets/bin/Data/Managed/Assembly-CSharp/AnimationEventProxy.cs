@@ -13,11 +13,6 @@ public class AnimationEventProxy : MonoBehaviour
 
 	public IEvent listener;
 
-	public AnimationEventProxy()
-		: this()
-	{
-	}
-
 	private void OnEvent()
 	{
 		if (listener != null)

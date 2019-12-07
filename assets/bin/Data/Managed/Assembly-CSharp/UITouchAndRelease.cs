@@ -10,11 +10,6 @@ public class UITouchAndRelease : MonoBehaviour
 
 	private bool touched;
 
-	public UITouchAndRelease()
-		: this()
-	{
-	}
-
 	public static void Set(GameObject button, string touch_event_name, string release_event_name = null, object event_data = null)
 	{
 		if (!(button.GetComponent<UIButton>() == null))
@@ -33,7 +28,7 @@ public class UITouchAndRelease : MonoBehaviour
 	public static void NoEventRelease(GameObject button)
 	{
 		UITouchAndRelease component = button.GetComponent<UITouchAndRelease>();
-		if (Object.op_Implicit(component))
+		if ((bool)component)
 		{
 			component.touched = false;
 		}
@@ -68,7 +63,7 @@ public class UITouchAndRelease : MonoBehaviour
 			string text = (!is_touch) ? releaseEventName : touchEventName;
 			if (!string.IsNullOrEmpty(text))
 			{
-				UIGameSceneEventSender.SendEvent("UITouchAndRelease", this.get_gameObject(), text, eventData);
+				UIGameSceneEventSender.SendEvent("UITouchAndRelease", base.gameObject, text, eventData);
 			}
 		}
 	}

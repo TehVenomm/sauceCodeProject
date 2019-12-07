@@ -17,37 +17,29 @@ public class EffectPlayProcessor : MonoBehaviour
 		public string nodeName;
 
 		[Tooltip("オフセット座標")]
-		public Vector3 position = Vector3.get_zero();
+		public Vector3 position = Vector3.zero;
 
 		[Tooltip("回転")]
-		public Vector3 rotation = Vector3.get_zero();
+		public Vector3 rotation = Vector3.zero;
 
 		[Tooltip("スケ\u30fcル")]
 		public float scale = 1f;
 
 		public EffectSetting Clone()
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			EffectSetting effectSetting = new EffectSetting();
-			effectSetting.name = name;
-			effectSetting.effectName = effectName;
-			effectSetting.nodeName = nodeName;
-			effectSetting.position = position;
-			effectSetting.rotation = rotation;
-			effectSetting.scale = scale;
-			return effectSetting;
+			return new EffectSetting
+			{
+				name = name,
+				effectName = effectName,
+				nodeName = nodeName,
+				position = position,
+				rotation = rotation,
+				scale = scale
+			};
 		}
 	}
 
 	public EffectSetting[] effectSettings;
-
-	public EffectPlayProcessor()
-		: this()
-	{
-	}
 
 	public bool IsContainSetting(string setting_name)
 	{
@@ -103,10 +95,10 @@ public class EffectPlayProcessor : MonoBehaviour
 		int i = 0;
 		for (int count = settings.Count; i < count; i++)
 		{
-			Transform val = PlayEffect(settings[i], owner_node);
-			if (val != null)
+			Transform transform = PlayEffect(settings[i], owner_node);
+			if (transform != null)
 			{
-				list.Add(val);
+				list.Add(transform);
 			}
 		}
 		if (list.Count <= 0)
@@ -118,11 +110,6 @@ public class EffectPlayProcessor : MonoBehaviour
 
 	public Transform PlayEffect(EffectSetting setting, Transform owner_node = null)
 	{
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
 		if (setting == null)
 		{
 			return null;
@@ -133,24 +120,24 @@ public class EffectPlayProcessor : MonoBehaviour
 		}
 		if (owner_node == null)
 		{
-			owner_node = this.get_transform();
+			owner_node = base.transform;
 		}
-		Transform val = (!string.IsNullOrEmpty(setting.nodeName)) ? Utility.Find(owner_node, setting.nodeName) : owner_node;
-		if (val == null)
+		Transform transform = (!string.IsNullOrEmpty(setting.nodeName)) ? Utility.Find(owner_node, setting.nodeName) : owner_node;
+		if (transform == null)
 		{
-			val = owner_node;
+			transform = owner_node;
 		}
-		Transform effect = EffectManager.GetEffect(setting.effectName, val);
+		Transform effect = EffectManager.GetEffect(setting.effectName, transform);
 		if (effect != null)
 		{
-			effect.set_localPosition(setting.position);
-			effect.set_localRotation(Quaternion.Euler(setting.rotation));
+			effect.localPosition = setting.position;
+			effect.localRotation = Quaternion.Euler(setting.rotation);
 			float num = setting.scale;
 			if (num == 0f)
 			{
 				num = 1f;
 			}
-			effect.set_localScale(Vector3.get_one() * num);
+			effect.localScale = Vector3.one * num;
 		}
 		return effect;
 	}

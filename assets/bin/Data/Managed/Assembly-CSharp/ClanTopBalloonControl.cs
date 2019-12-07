@@ -27,25 +27,21 @@ public class ClanTopBalloonControl : UIBehaviour
 
 	private void InitBalloonObj()
 	{
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		m_clanDailyBalloon = MonoBehaviourSingleton<UIManager>.I.common.CreateQuestBalloon(UI_Common.BALLOON_TYPE.NEW_NORMAL_R, FindCtrl(this.get_transform(), UI.OBJ_BALOON_ROOT));
-		m_clanQuestBalloon = MonoBehaviourSingleton<UIManager>.I.common.CreateLoungeQuestBalloon(FindCtrl(this.get_transform(), UI.OBJ_BALOON_ROOT));
-		m_clanDailyBalloon.get_parent().get_gameObject().SetActive(false);
-		m_clanQuestBalloon.get_parent().get_gameObject().SetActive(false);
+		m_clanDailyBalloon = MonoBehaviourSingleton<UIManager>.I.common.CreateQuestBalloon(UI_Common.BALLOON_TYPE.NEW_NORMAL_R, FindCtrl(base.transform, UI.OBJ_BALOON_ROOT));
+		m_clanQuestBalloon = MonoBehaviourSingleton<UIManager>.I.common.CreateLoungeQuestBalloon(FindCtrl(base.transform, UI.OBJ_BALOON_ROOT));
+		m_clanDailyBalloon.parent.gameObject.SetActive(value: false);
+		m_clanQuestBalloon.parent.gameObject.SetActive(value: false);
 		if (MonoBehaviourSingleton<StageManager>.I.stageObject != null)
 		{
-			Transform val = MonoBehaviourSingleton<StageManager>.I.stageObject.Find("Icons/QUESTBOARD_ICON_POS");
-			if (val != null)
+			Transform transform = MonoBehaviourSingleton<StageManager>.I.stageObject.Find("Icons/QUESTBOARD_ICON_POS");
+			if (transform != null)
 			{
-				m_clanQuestBalloonPos = val.get_position();
+				m_clanQuestBalloonPos = transform.position;
 			}
-			val = MonoBehaviourSingleton<StageManager>.I.stageObject.Find("Icons/DAILY_ICON_POS");
-			if (val != null)
+			transform = MonoBehaviourSingleton<StageManager>.I.stageObject.Find("Icons/DAILY_ICON_POS");
+			if (transform != null)
 			{
-				m_clanDailyBalloonPos = val.get_position();
+				m_clanDailyBalloonPos = transform.position;
 			}
 		}
 	}
@@ -57,12 +53,10 @@ public class ClanTopBalloonControl : UIBehaviour
 
 	private void LateUpdate()
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		m_requesTimer += Time.get_deltaTime();
+		m_requesTimer += Time.deltaTime;
 		if (m_requesTimer >= 10f)
 		{
-			this.StartCoroutine(UpdateBalloon());
+			StartCoroutine(UpdateBalloon());
 			m_requesTimer = 0f;
 		}
 		SetBalloonPosition(m_clanDailyBalloon, m_clanDailyBalloonPos);
@@ -85,16 +79,16 @@ public class ClanTopBalloonControl : UIBehaviour
 		}
 		if (MonoBehaviourSingleton<ClanMatchingManager>.I.clanRoomParties != null && MonoBehaviourSingleton<ClanMatchingManager>.I.clanRoomParties.Count != 0 && MonoBehaviourSingleton<ClanMatchingManager>.I.userClanData.level >= 2)
 		{
-			if (!m_clanQuestBalloon.get_parent().get_gameObject().get_activeSelf())
+			if (!m_clanQuestBalloon.parent.gameObject.activeSelf)
 			{
-				m_clanQuestBalloon.get_parent().get_gameObject().SetActive(true);
+				m_clanQuestBalloon.parent.gameObject.SetActive(value: true);
 				ResetTween(m_clanQuestBalloon);
 				PlayTween(m_clanQuestBalloon, forward: true, null, is_input_block: false);
 			}
 		}
 		else
 		{
-			m_clanQuestBalloon.get_parent().get_gameObject().SetActive(false);
+			m_clanQuestBalloon.parent.gameObject.SetActive(value: false);
 		}
 		wait = true;
 		Protocol.Try(delegate
@@ -110,16 +104,16 @@ public class ClanTopBalloonControl : UIBehaviour
 		}
 		if (!IsDailyComplete())
 		{
-			if (!m_clanDailyBalloon.get_parent().get_gameObject().get_activeSelf())
+			if (!m_clanDailyBalloon.parent.gameObject.activeSelf)
 			{
-				m_clanDailyBalloon.get_parent().get_gameObject().SetActive(true);
+				m_clanDailyBalloon.parent.gameObject.SetActive(value: true);
 				ResetTween(m_clanDailyBalloon);
 				PlayTween(m_clanDailyBalloon, forward: true, null, is_input_block: false);
 			}
 		}
 		else
 		{
-			m_clanDailyBalloon.get_parent().get_gameObject().SetActive(false);
+			m_clanDailyBalloon.parent.gameObject.SetActive(value: false);
 		}
 		MonoBehaviourSingleton<ClanMatchingManager>.I.StartRequestClanData();
 	}
@@ -142,16 +136,11 @@ public class ClanTopBalloonControl : UIBehaviour
 
 	private void SetBalloonPosition(Transform balloon, Vector3 iconPos)
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		if (!(balloon == null))
 		{
 			Vector3 position = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToScreenPoint(iconPos));
-			position.z = ((!(position.z >= 0f)) ? (-100f) : 0f);
-			balloon.set_position(position);
+			position.z = ((position.z >= 0f) ? 0f : (-100f));
+			balloon.position = position;
 		}
 	}
 
@@ -161,6 +150,6 @@ public class ClanTopBalloonControl : UIBehaviour
 		{
 			questList = ret.result.deliveryList;
 			call_back(ret.Error == Error.None);
-		}, string.Empty);
+		});
 	}
 }

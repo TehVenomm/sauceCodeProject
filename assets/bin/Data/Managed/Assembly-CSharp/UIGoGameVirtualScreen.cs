@@ -11,11 +11,6 @@ public class UIGoGameVirtualScreen : MonoBehaviour
 
 	public static float screenWidth = 480f;
 
-	public UIGoGameVirtualScreen()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		InitWidget();
@@ -23,12 +18,10 @@ public class UIGoGameVirtualScreen : MonoBehaviour
 
 	public static void InitUIRoot(UIRoot root, bool isThrowIPX = false)
 	{
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		if (isThrowIPX)
 		{
-			float num = Screen.get_width();
-			float num2 = Screen.get_height();
+			float num = Screen.width;
+			float num2 = Screen.height;
 			if (num > num2)
 			{
 				screenWidth = 854f;
@@ -55,19 +48,16 @@ public class UIGoGameVirtualScreen : MonoBehaviour
 
 	public void InitWidget()
 	{
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		UIWidget uIWidget = this.get_gameObject().GetComponent<UIWidget>();
+		UIWidget uIWidget = base.gameObject.GetComponent<UIWidget>();
 		if (uIWidget == null)
 		{
-			uIWidget = this.get_gameObject().AddComponent<UIWidget>();
+			uIWidget = base.gameObject.AddComponent<UIWidget>();
 		}
 		if ((float)uIWidget.width != screenWidth || (float)uIWidget.height != screenHeight)
 		{
-			Vector3 localPosition = uIWidget.get_transform().get_localPosition();
+			Vector3 localPosition = uIWidget.transform.localPosition;
 			uIWidget.SetRect(screenWidth * -0.5f, screenHeight * -0.5f, screenWidth, screenHeight);
-			uIWidget.get_transform().set_localPosition(localPosition);
+			uIWidget.transform.localPosition = localPosition;
 			uIWidget.SetDirty();
 		}
 	}

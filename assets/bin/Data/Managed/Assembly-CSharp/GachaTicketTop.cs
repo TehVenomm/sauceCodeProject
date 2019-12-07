@@ -37,26 +37,26 @@ public class GachaTicketTop : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.STR_TITLE, StringTable.Get(STRING_CATEGORY.COMMON, 103u));
-		SetLabelText((Enum)UI.STR_TITLE_REFLECT, StringTable.Get(STRING_CATEGORY.COMMON, 103u));
+		SetLabelText(UI.STR_TITLE, StringTable.Get(STRING_CATEGORY.COMMON, 103u));
+		SetLabelText(UI.STR_TITLE_REFLECT, StringTable.Get(STRING_CATEGORY.COMMON, 103u));
 		List<ItemInfo> itemList = MonoBehaviourSingleton<InventoryManager>.I.GetItemList((ItemInfo x) => x.tableData.type == ITEM_TYPE.TICKET);
 		ExpiredItem[] showList = GetItemList(itemList).ToArray();
 		GetCtrl(UI.LBL_CAUTION).GetComponent<UILabel>().supportEncoding = true;
 		string text = StringTable.Get(STRING_CATEGORY.SHOP, 14u);
-		SetLabelText((Enum)UI.LBL_CAUTION, text);
-		SetActive((Enum)UI.BTN_TO_GACHA, MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() != "ShopScene");
-		SetActive((Enum)UI.GRD_LIST, showList.Length > 0);
-		SetActive((Enum)UI.STR_ORDER_NON_LIST, showList.Length == 0);
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, showList.Length > 0);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, showList.Length == 0);
+		SetLabelText(UI.LBL_CAUTION, text);
+		SetActive(UI.BTN_TO_GACHA, MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() != "ShopScene");
+		SetActive(UI.GRD_LIST, showList.Length != 0);
+		SetActive(UI.STR_ORDER_NON_LIST, showList.Length == 0);
+		SetActive(UI.OBJ_ACTIVE_ROOT, showList.Length != 0);
+		SetActive(UI.OBJ_INACTIVE_ROOT, showList.Length == 0);
 		if (showList.Length == 0)
 		{
-			SetLabelText((Enum)UI.LBL_MAX, "0");
-			SetLabelText((Enum)UI.LBL_NOW, "0");
+			SetLabelText(UI.LBL_MAX, "0");
+			SetLabelText(UI.LBL_NOW, "0");
 			UIScrollView component = GetCtrl(UI.SCR_LIST).GetComponent<UIScrollView>();
 			if (component != null)
 			{
-				component.set_enabled(false);
+				component.enabled = false;
 				component.verticalScrollBar.alpha = 0f;
 			}
 		}
@@ -64,12 +64,12 @@ public class GachaTicketTop : GameSection
 		{
 			pageMax = 1 + (showList.Length - 1) / 10;
 			bool flag = pageMax > 1;
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
-			SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
-			SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
+			SetActive(UI.OBJ_ACTIVE_ROOT, flag);
+			SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
+			SetLabelText(UI.LBL_MAX, pageMax.ToString());
+			SetLabelText(UI.LBL_NOW, nowPage.ToString());
 			int num = 10 * (nowPage - 1);
-			int num2 = (nowPage != pageMax) ? 10 : (showList.Length - num);
+			int num2 = (nowPage == pageMax) ? (showList.Length - num) : 10;
 			ExpiredItem[] array = new ExpiredItem[num2];
 			Array.Copy(showList, num, array, 0, num2);
 			showList = array;
@@ -77,23 +77,22 @@ public class GachaTicketTop : GameSection
 			{
 				ExpiredItem expiredItem = showList[i];
 				ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)expiredItem.itemId);
-				UITexture component2 = FindCtrl(t, UI.TEX_ICON).GetComponent<UITexture>();
-				ResourceLoad.LoadItemIconTexture(component2, itemData.iconID);
+				ResourceLoad.LoadItemIconTexture(FindCtrl(t, UI.TEX_ICON).GetComponent<UITexture>(), itemData.iconID);
 				SetLabelText(t, UI.LBL_NAME, itemData.name);
-				string empty = string.Empty;
-				string empty2 = string.Empty;
+				string text2 = "";
+				string text3 = "";
 				if (string.IsNullOrEmpty(expiredItem.expiredAt))
 				{
-					empty = "-";
-					empty2 = "-";
+					text2 = "-";
+					text3 = "-";
 				}
 				else
 				{
-					empty = expiredItem.expiredAt;
-					empty2 = TimeManager.GetRemainTimeToText(expiredItem.expiredAt, 1);
+					text2 = expiredItem.expiredAt;
+					text3 = TimeManager.GetRemainTimeToText(expiredItem.expiredAt, 1);
 				}
-				SetLabelText(t, UI.LBL_LIMIT, empty);
-				SetLabelText(t, UI.LBL_COUNTDOWN, empty2);
+				SetLabelText(t, UI.LBL_LIMIT, text2);
+				SetLabelText(t, UI.LBL_COUNTDOWN, text3);
 			});
 		}
 	}
@@ -125,7 +124,7 @@ public class GachaTicketTop : GameSection
 
 	private void OnQuery_PAGE_PREV()
 	{
-		nowPage = ((nowPage <= 1) ? pageMax : (nowPage - 1));
+		nowPage = ((nowPage > 1) ? (nowPage - 1) : pageMax);
 		RefreshUI();
 	}
 

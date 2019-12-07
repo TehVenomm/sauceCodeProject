@@ -2,13 +2,13 @@ public class GimmickObject : StageObject
 {
 	public static int GetID(string name)
 	{
-		string text = string.Empty;
+		string text = "";
 		int i = 0;
 		for (int length = name.Length; i < length; i++)
 		{
 			if (name[i] >= '0' && '9' >= name[i])
 			{
-				text += name[i];
+				text += name[i].ToString();
 			}
 		}
 		return int.Parse(text) + 200000;
@@ -17,7 +17,7 @@ public class GimmickObject : StageObject
 	protected override void Awake()
 	{
 		base.Awake();
-		Utility.SetLayerWithChildren(this.get_transform(), 18);
-		id = GetID(this.get_gameObject().get_name());
+		Utility.SetLayerWithChildren(base.transform, 18);
+		id = GetID(base.gameObject.name);
 	}
 }

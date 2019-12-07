@@ -21,24 +21,17 @@ public class UISpriteShaderReplacer : MonoBehaviour
 
 	private static Dictionary<UIAtlas, AtlasEntry> atlases = new Dictionary<UIAtlas, AtlasEntry>();
 
-	public UISpriteShaderReplacer()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		sprite = this.GetComponent<UISprite>();
+		sprite = GetComponent<UISprite>();
 	}
 
 	public void Replace(string shaderName)
 	{
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Expected O, but got Unknown
-		if (!Object.op_Implicit(sprite))
+		if (!sprite)
 		{
 			Awake();
-			if (!Object.op_Implicit(sprite))
+			if (!sprite)
 			{
 				return;
 			}
@@ -48,21 +41,21 @@ public class UISpriteShaderReplacer : MonoBehaviour
 			entry.refCount--;
 			entry = null;
 		}
-		if (atlases.TryGetValue(sprite.atlas, out entry) && !Object.op_Implicit(entry.atlas))
+		if (atlases.TryGetValue(sprite.atlas, out entry) && !entry.atlas)
 		{
 			atlases.Remove(sprite.atlas);
 			entry = null;
 		}
 		if (entry == null)
 		{
-			UIAtlas uIAtlas = ResourceUtility.Instantiate<UIAtlas>(sprite.atlas);
+			UIAtlas uIAtlas = ResourceUtility.Instantiate(sprite.atlas);
 			uIAtlas.spriteMaterial = new Material(uIAtlas.spriteMaterial);
-			uIAtlas.spriteMaterial.set_shader(ResourceUtility.FindShader(shaderName));
+			uIAtlas.spriteMaterial.shader = ResourceUtility.FindShader(shaderName);
 			entry = new AtlasEntry(uIAtlas);
 			atlases.Add(sprite.atlas, entry);
 			if (MonoBehaviourSingleton<AppMain>.IsValid())
 			{
-				uIAtlas.get_transform().set_parent(MonoBehaviourSingleton<AppMain>.I._transform);
+				uIAtlas.transform.parent = MonoBehaviourSingleton<AppMain>.I._transform;
 			}
 		}
 		entry.refCount++;
@@ -90,10 +83,10 @@ public class UISpriteShaderReplacer : MonoBehaviour
 			{
 				atlases.Remove(uIAtlas);
 			}
-			if (Object.op_Implicit(entry.atlas))
+			if ((bool)entry.atlas)
 			{
 				Object.Destroy(entry.atlas.spriteMaterial);
-				Object.Destroy(entry.atlas.get_gameObject());
+				Object.Destroy(entry.atlas.gameObject);
 			}
 		}
 	}

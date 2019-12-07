@@ -54,19 +54,13 @@ public class AnimEventProcessor
 
 	public void Update()
 	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01df: Unknown result type (might be due to invalid IL or missing references)
 		if (animator == null)
 		{
 			return;
 		}
 		bool flag = animator.IsInTransition(0);
-		AnimatorStateInfo info = (!flag) ? animator.GetCurrentAnimatorStateInfo(0) : animator.GetNextAnimatorStateInfo(0);
-		if ((curHash != info.get_fullPathHash() && !waitChange) || (curHash == info.get_fullPathHash() && waitChange))
+		AnimatorStateInfo info = flag ? animator.GetNextAnimatorStateInfo(0) : animator.GetCurrentAnimatorStateInfo(0);
+		if ((curHash != info.fullPathHash && !waitChange) || (curHash == info.fullPathHash && waitChange))
 		{
 			if (waitChange)
 			{
@@ -76,10 +70,10 @@ public class AnimEventProcessor
 			{
 				if (curDatas != null && lastSpeed > 0f)
 				{
-					float num = Time.get_deltaTime() * lastSpeed + lastNormalizedTime;
+					float num = Time.deltaTime * lastSpeed + lastNormalizedTime;
 					Forward(num - beginTime + curMargin);
 				}
-				OnChangeAnim(info.get_fullPathHash());
+				OnChangeAnim(info.fullPathHash);
 			}
 			if (curDatas == null)
 			{
@@ -98,33 +92,25 @@ public class AnimEventProcessor
 				changeTransition = true;
 				return;
 			}
-			ChangeAnimClip(ref info, nextAnimatorClipInfo[0].get_clip());
+			ChangeAnimClip(ref info, nextAnimatorClipInfo[0].clip);
 		}
 		else if (changeDelay)
 		{
 			AnimatorClipInfo[] array = (!changeTransition) ? animator.GetCurrentAnimatorClipInfo(0) : animator.GetNextAnimatorClipInfo(0);
-			if (array.Length <= 0)
+			if (array.Length == 0)
 			{
 				return;
 			}
-			ChangeAnimClip(ref info, array[0].get_clip());
+			ChangeAnimClip(ref info, array[0].clip);
 		}
-		if (waitChange || curDatas == null)
+		if (waitChange || curDatas == null || (flag && animator.GetCurrentAnimatorStateInfo(0).Equals(animator.GetNextAnimatorStateInfo(0))))
 		{
 			return;
 		}
-		if (flag)
+		float num2 = info.normalizedTime * curTimeScale;
+		if (animator.speed >= 0f)
 		{
-			AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-			if (((object)currentAnimatorStateInfo).Equals((object)animator.GetNextAnimatorStateInfo(0)))
-			{
-				return;
-			}
-		}
-		float num2 = info.get_normalizedTime() * curTimeScale;
-		if (animator.get_speed() >= 0f)
-		{
-			if (num2 >= lastTime && info.get_loop())
+			if (num2 >= lastTime && info.loop)
 			{
 				Forward(curLength);
 				beginTime = lastTime;
@@ -141,7 +127,7 @@ public class AnimEventProcessor
 				curIndex = 0;
 			}
 			lastNormalizedTime = num2;
-			lastSpeed = animator.get_speed();
+			lastSpeed = animator.speed;
 			Forward(num2 - beginTime + curMargin);
 		}
 	}
@@ -166,9 +152,9 @@ public class AnimEventProcessor
 
 	private void ChangeAnimClip(ref AnimatorStateInfo info, AnimationClip clip)
 	{
-		curLength = clip.get_length();
+		curLength = clip.length;
 		curTimeScale = curLength;
-		curMargin = 0.005f * (clip.get_length() / info.get_length());
+		curMargin = 0.005f * (clip.length / info.length);
 		beginTime = 0f;
 		lastTime = curLength;
 		lastNormalizedTime = 0f;
@@ -286,7 +272,7 @@ public class AnimEventProcessor
 			curTime = 0f;
 			curIndex = 0;
 			ignoreEventFlag = false;
-			animator.set_runtimeAnimatorController(anim_ctrl);
+			animator.runtimeAnimatorController = anim_ctrl;
 			animator.Rebind();
 			animEventData = anim_event;
 		}

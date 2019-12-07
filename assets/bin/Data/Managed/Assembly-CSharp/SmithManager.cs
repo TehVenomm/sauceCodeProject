@@ -197,7 +197,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 			int i = 0;
 			for (int num = tmp.Length; i < num; i++)
 			{
-				Debug.LogWarning((object)("[" + i + "] = " + (now[i] - tmp[i])));
+				Debug.LogWarning("[" + i + "] = " + (now[i] - tmp[i]));
 				tmp[i] = now[i];
 			}
 		}
@@ -303,7 +303,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 
 	public void CreateLocalInventory()
 	{
-		localInventoryEquipData = MonoBehaviourSingleton<InventoryManager>.I.GetEquipInventoryClone();
+		object[] array = localInventoryEquipData = MonoBehaviourSingleton<InventoryManager>.I.GetEquipInventoryClone();
 	}
 
 	private void DeleteLocalInventory()
@@ -313,7 +313,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 
 	public void UpdateLocalInventoryItem(EquipItemInfo item)
 	{
-		if (item == null || item.uniqueID == 0 || item.tableID == 0 || localInventoryEquipData == null || localInventoryEquipData.Length == 0 || !(localInventoryEquipData[0] is EquipItemInfo))
+		if (item == null || item.uniqueID == 0L || item.tableID == 0 || localInventoryEquipData == null || localInventoryEquipData.Length == 0 || !(localInventoryEquipData[0] is EquipItemInfo))
 		{
 			return;
 		}
@@ -475,7 +475,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 		{
 			EQUIPMENT_TYPE type = array[i];
 			SmithCreateItemInfo[] createEquipItemDataAry = Singleton<CreateEquipItemTable>.I.GetCreateEquipItemDataAry(type);
-			if (createEquipItemDataAry != null && createEquipItemDataAry.Length > 0)
+			if (createEquipItemDataAry != null && createEquipItemDataAry.Length != 0)
 			{
 				int j = 0;
 				for (int num2 = createEquipItemDataAry.Length; j < num2; j++)
@@ -687,7 +687,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				arg = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(ulong.Parse(ret.result.equipUniqId));
 			}
 			call_back(ret.Error, arg);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGrowEquipItem(ulong uid, int target_lv, Action<Error, EquipItemInfo> call_back)
@@ -723,7 +723,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_GROW);
 			}
 			call_back(ret.Error, equipItemInfo);
-		}, string.Empty);
+		});
 	}
 
 	public void SendEvolveEquipItem(ulong uid, uint evolve_id, ulong[] uniq_ids, Action<Error, EquipItemInfo> call_back)
@@ -769,7 +769,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_EVOLVE);
 			}
 			call_back(ret.Error, equipItemInfo);
-		}, string.Empty);
+		});
 	}
 
 	public void SendShadowEvolveEquipItem(ulong uid, uint itemId, Action<Error, EquipItemInfo> call_back)
@@ -798,7 +798,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_EVOLVE);
 			}
 			call_back(ret.Error, equipItemInfo);
-		}, string.Empty);
+		});
 	}
 
 	public void SendExceedEquipItem(ulong uid, uint itemId, Action<Error, EquipItemInfo> call_back)
@@ -823,7 +823,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_GROW);
 			}
 			call_back(ret.Error, equipItemInfo);
-		}, string.Empty);
+		});
 	}
 
 	public void SendAbilityChangeEquipItem(ulong euid, Action<Error, EquipItemInfo> call_back)
@@ -847,7 +847,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_ABILITY);
 			}
 			call_back(ret.Error, equipItemInfo);
-		}, string.Empty);
+		});
 	}
 
 	public void SendUseAbilityItem(ulong equipUniqueId, ulong abilityItemId, Action<Error, EquipItemInfo> call_back)
@@ -872,7 +872,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_ABILITY);
 			}
 			call_back(ret.Error, equipItemInfo);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetAbilityList(ulong equipUniqueId, Action<Error, List<SmithGetAbilityList.Param>> call_back)
@@ -887,7 +887,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				arg = ret.result;
 			}
 			call_back(ret.Error, arg);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetAbilityListPreGenerate(uint createId, Action<Error, List<SmithGetAbilityListForCreateModel.Param>> call_back)
@@ -902,7 +902,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				arg = ret.result;
 			}
 			call_back(ret.Error, arg);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGrowSkill(SkillItemInfo base_skill, SkillItemInfo[] material, Action<SkillItemInfo, bool> call_back)
@@ -959,7 +959,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_SKILL_GROW);
 			}
 			call_back(skillItemInfo, arg);
-		}, string.Empty);
+		});
 	}
 
 	public void SendExceedSkill(SkillItemInfo base_skill, SkillItemInfo[] material, Action<SkillItemInfo, bool> call_back)
@@ -989,7 +989,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_SKILL_GROW);
 			}
 			call_back(skillItemInfo, arg);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRevertLithograph(ulong euid, Action<bool> call_back)
@@ -1005,7 +1005,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void BackSection()
@@ -1027,7 +1027,7 @@ public class SmithManager : MonoBehaviourSingleton<SmithManager>
 		{
 			return;
 		}
-		if (section_name != null && (section_name == "SmithGrowItemSelect" || section_name == "SmithGrow" || section_name == "SmithCreateItemSelect" || section_name == "SmithCreateItem"))
+		if (section_name == "SmithGrowItemSelect" || section_name == "SmithGrow" || section_name == "SmithCreateItemSelect" || section_name == "SmithCreateItem")
 		{
 			if (MonoBehaviourSingleton<FilterManager>.IsValid() && !MonoBehaviourSingleton<FilterManager>.I.IsEnabledBlur())
 			{

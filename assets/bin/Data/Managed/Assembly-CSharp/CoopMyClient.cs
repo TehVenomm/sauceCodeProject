@@ -8,13 +8,13 @@ public class CoopMyClient : CoopClient
 
 	protected override void Awake()
 	{
-		packetSender = this.get_gameObject().AddComponent<CoopClientPacketSender>();
+		packetSender = base.gameObject.AddComponent<CoopClientPacketSender>();
 		base.Awake();
 	}
 
 	public override string ToString()
 	{
-		return "CoopMyClient[" + base.slotIndex + "](" + base.status + "/" + base.isPartyOwner + "/" + base.isStageHost + ").userId=" + base.userId;
+		return "CoopMyClient[" + base.slotIndex + "](" + base.status + "/" + base.isPartyOwner.ToString() + "/" + base.isStageHost.ToString() + ").userId=" + base.userId;
 	}
 
 	public override void Init(int client_id)
@@ -64,8 +64,7 @@ public class CoopMyClient : CoopClient
 		}
 		else if (!base.isBattleRetire && IsStageStart() && !MonoBehaviourSingleton<CoopManager>.I.coopRoom.isOfflinePlay && !MonoBehaviourSingleton<CoopManager>.I.coopStage.isQuestClose)
 		{
-			string text = StringTable.Get(STRING_CATEGORY.IN_GAME, 100u);
-			UIInGamePopupDialog.PushOpen(text, is_important: false);
+			UIInGamePopupDialog.PushOpen(StringTable.Get(STRING_CATEGORY.IN_GAME, 100u), is_important: false);
 			MonoBehaviourSingleton<GoWrapManager>.I.trackBattleDisconnect();
 		}
 	}

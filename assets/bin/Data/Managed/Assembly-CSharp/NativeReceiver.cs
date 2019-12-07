@@ -29,14 +29,14 @@ public class NativeReceiver : MonoBehaviourSingleton<NativeReceiver>
 
 	public void GCMRegistered(string RegistrationId)
 	{
-		Debug.Log((object)("============ GCMRegistered ==== " + RegistrationId));
+		Debug.Log("============ GCMRegistered ==== " + RegistrationId);
 	}
 
 	public void onAchievementUpdated(string json)
 	{
 		AchievementUpdated achievementUpdated = JSONSerializer.Deserialize<AchievementUpdated>(json);
-		Debug.Log((object)achievementUpdated.achievementId);
-		Debug.Log((object)achievementUpdated.statusCode);
+		Debug.Log(achievementUpdated.achievementId);
+		Debug.Log(achievementUpdated.statusCode);
 		if (achievementUpdated.statusCode == 0 || achievementUpdated.statusCode == 3003)
 		{
 			SendAchievementUnlock(achievementUpdated.achievementId);
@@ -66,32 +66,31 @@ public class NativeReceiver : MonoBehaviourSingleton<NativeReceiver>
 
 	public void notifyAnalytics(string data)
 	{
-		AnalyticsNotificationResult analyticsNotificationResult = JSONSerializer.Deserialize<AnalyticsNotificationResult>(data);
-		BootProcess.notifyFinishedAnalytics(analyticsNotificationResult.data);
+		BootProcess.notifyFinishedAnalytics(JSONSerializer.Deserialize<AnalyticsNotificationResult>(data).data);
 	}
 
 	public void ProcessReceivedNotification(string strParam)
 	{
-		string[] array = strParam.Split(',');
+		strParam.Split(',');
 		if (strParam[0].Equals("gc"))
 		{
-			EventData[] array2 = null;
+			EventData[] array = null;
 			if (strParam[1].Equals("magi"))
 			{
-				array2 = new EventData[1]
+				array = new EventData[1]
 				{
 					new EventData("MAIN_MENU_SHOP", null)
 				};
-				MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+				MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array);
 			}
 			else
 			{
-				array2 = new EventData[2]
+				array = new EventData[2]
 				{
 					new EventData("MAIN_MENU_SHOP", null),
 					new EventData("MAGI_GACHA", null)
 				};
-				MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array2);
+				MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(array);
 			}
 		}
 	}

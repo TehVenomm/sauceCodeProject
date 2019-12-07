@@ -12,7 +12,7 @@ public class UIQuestInfo : MonoBehaviourSingleton<UIQuestInfo>
 	{
 		if (MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo() || QuestManager.IsValidInGameWaveMatch() || QuestManager.IsValidInGameSeries() || QuestManager.IsValidInGameSeriesArena())
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 			return;
 		}
 		if (QuestManager.IsValidInGame() && !MonoBehaviourSingleton<InGameManager>.I.IsRush())
@@ -28,11 +28,11 @@ public class UIQuestInfo : MonoBehaviourSingleton<UIQuestInfo>
 		}
 		else
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 		}
 		if (MonoBehaviourSingleton<QuestManager>.I.IsExplore() || MonoBehaviourSingleton<InGameManager>.I.IsRush())
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 		}
 	}
 

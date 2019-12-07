@@ -46,6 +46,10 @@ public class AutoBrain : Brain
 
 	public override List<StageObject> GetTargetObjectList()
 	{
-		return (!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? new List<StageObject>() : MonoBehaviourSingleton<StageObjectManager>.I.enemyList;
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		{
+			return new List<StageObject>();
+		}
+		return MonoBehaviourSingleton<StageObjectManager>.I.enemyList;
 	}
 }

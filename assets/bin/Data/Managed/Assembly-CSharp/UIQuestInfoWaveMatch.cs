@@ -27,10 +27,10 @@ public class UIQuestInfoWaveMatch : MonoBehaviourSingleton<UIQuestInfoWaveMatch>
 	{
 		if (!QuestManager.IsValidInGameWaveMatch())
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 			return;
 		}
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		m_inGameProgress = MonoBehaviourSingleton<InGameProgress>.I;
 		isShowFraction = QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true);
 		remainingTimeForAlert = MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.remainingTimeForAlert;
@@ -39,7 +39,7 @@ public class UIQuestInfoWaveMatch : MonoBehaviourSingleton<UIQuestInfoWaveMatch>
 		{
 			tweenCtrl.Reset();
 		}
-		isEnableAlert = (MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsWaveStrategyMatch() && Object.op_Implicit(tweenCtrl));
+		isEnableAlert = (MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsWaveStrategyMatch() && (bool)tweenCtrl);
 		if (isShowFraction)
 		{
 			ShowWave(isShow: false);
@@ -89,6 +89,6 @@ public class UIQuestInfoWaveMatch : MonoBehaviourSingleton<UIQuestInfoWaveMatch>
 
 	public void ShowWave(bool isShow)
 	{
-		waveText.get_gameObject().SetActive(isShow);
+		waveText.gameObject.SetActive(isShow);
 	}
 }

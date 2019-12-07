@@ -32,8 +32,7 @@ public class SmithGrowResult : EquipResultBase
 
 	private void OnQuery_NEXT()
 	{
-		SmithManager.SmithGrowData smithGrowData = MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();
-		smithGrowData.selectEquipData = (resultData.itemData as EquipItemInfo);
+		MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>().selectEquipData = (resultData.itemData as EquipItemInfo);
 	}
 
 	private void OnQuery_NEXT_EVOLVE()

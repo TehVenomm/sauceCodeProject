@@ -39,10 +39,9 @@ namespace GooglePlayGames.Android
 		public PlatformConfiguration CreatePlatformConfiguration(PlayGamesClientConfiguration clientConfig)
 		{
 			AndroidPlatformConfiguration androidPlatformConfiguration = AndroidPlatformConfiguration.Create();
-			AndroidJavaObject activity = AndroidTokenClient.GetActivity();
-			try
+			using (AndroidJavaObject androidJavaObject = AndroidTokenClient.GetActivity())
 			{
-				androidPlatformConfiguration.SetActivity(activity.GetRawObject());
+				androidPlatformConfiguration.SetActivity(androidJavaObject.GetRawObject());
 				androidPlatformConfiguration.SetOptionalIntentHandlerForUI(delegate(IntPtr intent)
 				{
 					IntPtr intentRef = AndroidJNI.NewGlobalRef(intent);
@@ -62,12 +61,8 @@ namespace GooglePlayGames.Android
 				{
 					return androidPlatformConfiguration;
 				}
-				androidPlatformConfiguration.SetOptionalViewForPopups(CreateHiddenView(activity.GetRawObject()));
+				androidPlatformConfiguration.SetOptionalViewForPopups(CreateHiddenView(androidJavaObject.GetRawObject()));
 				return androidPlatformConfiguration;
-			}
-			finally
-			{
-				((IDisposable)activity)?.Dispose();
 			}
 		}
 
@@ -86,63 +81,40 @@ namespace GooglePlayGames.Android
 
 		private IntPtr CreateHiddenView(IntPtr activity)
 		{
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Expected O, but got Unknown
 			if (invisible == null || invisible.GetRawObject() == IntPtr.Zero)
 			{
-				invisible = new AndroidJavaObject("android.view.View", new object[1]
-				{
-					activity
-				});
-				invisible.Call("setVisibility", new object[1]
-				{
-					4
-				});
-				invisible.Call("setClickable", new object[1]
-				{
-					false
-				});
+				invisible = new AndroidJavaObject("android.view.View", activity);
+				invisible.Call("setVisibility", 4);
+				invisible.Call("setClickable", false);
 			}
 			return invisible.GetRawObject();
 		}
 
 		private static void LaunchBridgeIntent(IntPtr bridgedIntent)
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Expected O, but got Unknown
-			object[] array = new object[2];
-			jvalue[] array2 = AndroidJNIHelper.CreateJNIArgArray(array);
+			object[] args = new object[2];
+			jvalue[] array = AndroidJNIHelper.CreateJNIArgArray(args);
 			try
 			{
-				AndroidJavaClass val = new AndroidJavaClass("com.google.games.bridge.NativeBridgeActivity");
-				try
+				using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("com.google.games.bridge.NativeBridgeActivity"))
 				{
-					AndroidJavaObject activity = AndroidTokenClient.GetActivity();
-					try
+					using (AndroidJavaObject androidJavaObject = AndroidTokenClient.GetActivity())
 					{
-						IntPtr staticMethodID = AndroidJNI.GetStaticMethodID(val.GetRawClass(), "launchBridgeIntent", "(Landroid/app/Activity;Landroid/content/Intent;)V");
-						array2[0].l = activity.GetRawObject();
-						array2[1].l = bridgedIntent;
-						AndroidJNI.CallStaticVoidMethod(val.GetRawClass(), staticMethodID, array2);
+						IntPtr staticMethodID = AndroidJNI.GetStaticMethodID(androidJavaClass.GetRawClass(), "launchBridgeIntent", "(Landroid/app/Activity;Landroid/content/Intent;)V");
+						array[0].l = androidJavaObject.GetRawObject();
+						array[1].l = bridgedIntent;
+						AndroidJNI.CallStaticVoidMethod(androidJavaClass.GetRawClass(), staticMethodID, array);
 					}
-					finally
-					{
-						((IDisposable)activity)?.Dispose();
-					}
-				}
-				finally
-				{
-					((IDisposable)val)?.Dispose();
 				}
 			}
 			catch (Exception ex)
 			{
-				Logger.e("Exception launching bridge intent: " + ex.Message);
-				Logger.e(ex.ToString());
+				GooglePlayGames.OurUtils.Logger.e("Exception launching bridge intent: " + ex.Message);
+				GooglePlayGames.OurUtils.Logger.e(ex.ToString());
 			}
 			finally
 			{
-				AndroidJNIHelper.DeleteJNIArgArray(array, array2);
+				AndroidJNIHelper.DeleteJNIArgArray(args, array);
 			}
 		}
 
@@ -162,7 +134,7 @@ namespace GooglePlayGames.Android
 			{
 				resultCallback = new StatsResultCallback(delegate(int result, Com.Google.Android.Gms.Games.Stats.PlayerStats stats)
 				{
-					Debug.Log((object)("Result for getStats: " + result));
+					Debug.Log("Result for getStats: " + result);
 					GooglePlayGames.BasicApi.PlayerStats arg = null;
 					if (stats != null)
 					{
@@ -183,14 +155,13 @@ namespace GooglePlayGames.Android
 					callback((CommonStatusCodes)result, arg);
 				});
 			}
-			catch (Exception ex)
+			catch (Exception exception)
 			{
-				Debug.LogException(ex);
+				Debug.LogException(exception);
 				callback(CommonStatusCodes.DeveloperError, null);
 				return;
 			}
-			PendingResult<Stats_LoadPlayerStatsResultObject> pendingResult = Games.Stats.loadPlayerStats(arg_GoogleApiClient_, arg_bool_2: true);
-			pendingResult.setResultCallback(resultCallback);
+			Games.Stats.loadPlayerStats(arg_GoogleApiClient_, arg_bool_2: true).setResultCallback(resultCallback);
 		}
 	}
 }

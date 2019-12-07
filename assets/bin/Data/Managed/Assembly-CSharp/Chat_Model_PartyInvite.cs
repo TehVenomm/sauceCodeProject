@@ -27,17 +27,17 @@ public class Chat_Model_PartyInvite : Chat_Model_Base
 		chat_Model_PartyInvite.m_packetType = CHAT_PACKET_TYPE.PARTY_INVITE;
 		chat_Model_PartyInvite.payload = str.Substring(Chat_Model_Base.PAYLOAD_ORIGIN_INDEX);
 		chat_Model_PartyInvite.flag = str.Substring(40, 1);
-		Chat_Model_PartyInvite chat_Model_PartyInvite2 = chat_Model_PartyInvite;
-		chat_Model_PartyInvite2.SetErrorType("0");
-		return chat_Model_PartyInvite2;
+		chat_Model_PartyInvite.SetErrorType("0");
+		return chat_Model_PartyInvite;
 	}
 
 	public static Chat_Model_PartyInvite Create(string flag)
 	{
-		Chat_Model_PartyInvite chat_Model_PartyInvite = new Chat_Model_PartyInvite();
-		chat_Model_PartyInvite.flag = flag;
-		Chat_Model_PartyInvite chat_Model_PartyInvite2 = chat_Model_PartyInvite;
-		chat_Model_PartyInvite2.payload = chat_Model_PartyInvite2.Serialize();
-		return chat_Model_PartyInvite2;
+		Chat_Model_PartyInvite obj = new Chat_Model_PartyInvite
+		{
+			flag = flag
+		};
+		obj.payload = obj.Serialize();
+		return obj;
 	}
 }

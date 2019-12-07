@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class HomeTutorialManager : MonoBehaviour
@@ -46,20 +45,11 @@ public class HomeTutorialManager : MonoBehaviour
 		}
 	}
 
-	public HomeTutorialManager()
-		: this()
-	{
-	}//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-	//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-	//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-
-
 	public void OnDestroy()
 	{
 		if (dialog != null)
 		{
-			Object.Destroy(dialog.get_gameObject());
+			Object.Destroy(dialog.gameObject);
 		}
 	}
 
@@ -104,11 +94,11 @@ public class HomeTutorialManager : MonoBehaviour
 		is_loading = true;
 		if (DoesTutorial())
 		{
-			this.StartCoroutine(DoSetupFirstHome());
+			StartCoroutine(DoSetupFirstHome());
 		}
 		else if (DoesTutorialAfterGacha2())
 		{
-			this.StartCoroutine(DoSetupTutorialAfterGacha2());
+			StartCoroutine(DoSetupTutorialAfterGacha2());
 		}
 		else
 		{
@@ -118,21 +108,21 @@ public class HomeTutorialManager : MonoBehaviour
 
 	public void ExcuteDoSetupTutorialAfterGacha2()
 	{
-		this.StartCoroutine(DoSetupTutorialAfterGacha2());
+		StartCoroutine(DoSetupTutorialAfterGacha2());
 	}
 
 	private IEnumerator DoSetupFirstHome()
 	{
 		if (m_home_top == null)
 		{
-			m_home_top = this.GetComponent<HomeTop>();
+			m_home_top = GetComponent<HomeTop>();
 		}
-		LoadingQueue lo_queue = new LoadingQueue(this);
-		LoadObject obj_target_area = lo_queue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01");
-		LoadObject obj_tutorial_dialog = lo_queue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialHomeDialog");
-		if (lo_queue.IsLoading())
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject obj_target_area = loadingQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01");
+		LoadObject obj_tutorial_dialog = loadingQueue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialHomeDialog");
+		if (loadingQueue.IsLoading())
 		{
-			yield return lo_queue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		prefab_target_area = obj_target_area.loadedObject;
 		prefab_dialog = obj_tutorial_dialog.loadedObject;
@@ -146,14 +136,14 @@ public class HomeTutorialManager : MonoBehaviour
 	{
 		if (m_home_top == null)
 		{
-			m_home_top = this.GetComponent<HomeTop>();
+			m_home_top = GetComponent<HomeTop>();
 		}
-		LoadingQueue lo_queue = new LoadingQueue(this);
-		LoadObject obj_target_area = lo_queue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01");
-		LoadObject obj_tutorial_dialog = lo_queue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialHomeDialog");
-		if (lo_queue.IsLoading())
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject obj_target_area = loadingQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01");
+		LoadObject obj_tutorial_dialog = loadingQueue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialHomeDialog");
+		if (loadingQueue.IsLoading())
 		{
-			yield return lo_queue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		prefab_target_area = obj_target_area.loadedObject;
 		prefab_dialog = obj_tutorial_dialog.loadedObject;
@@ -165,21 +155,21 @@ public class HomeTutorialManager : MonoBehaviour
 	public void SetupGachaQuestTutorial()
 	{
 		is_loading = true;
-		this.StartCoroutine(DoSetupGachaQuestTutorial());
+		StartCoroutine(DoSetupGachaQuestTutorial());
 	}
 
 	private IEnumerator DoSetupGachaQuestTutorial()
 	{
 		if (m_home_top == null)
 		{
-			m_home_top = this.GetComponent<HomeTop>();
+			m_home_top = GetComponent<HomeTop>();
 		}
-		LoadingQueue lo_queue = new LoadingQueue(this);
-		LoadObject obj_target_area = lo_queue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01");
-		LoadObject obj_tutorial_dialog = lo_queue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialHomeDialog");
-		if (lo_queue.IsLoading())
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject obj_target_area = loadingQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01");
+		LoadObject obj_tutorial_dialog = loadingQueue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialHomeDialog");
+		if (loadingQueue.IsLoading())
 		{
-			yield return lo_queue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		prefab_target_area = obj_target_area.loadedObject;
 		prefab_dialog = obj_tutorial_dialog.loadedObject;
@@ -192,16 +182,15 @@ public class HomeTutorialManager : MonoBehaviour
 	{
 		if (MonoBehaviourSingleton<HomeManager>.IsValid() && MonoBehaviourSingleton<HomeManager>.I.IHomePeople != null)
 		{
-			List<HomeCharacterBase> charas = MonoBehaviourSingleton<HomeManager>.I.IHomePeople.charas;
-			charas.ForEach(delegate(HomeCharacterBase o)
+			MonoBehaviourSingleton<HomeManager>.I.IHomePeople.charas.ForEach(delegate(HomeCharacterBase o)
 			{
 				if (o is HomePlayerCharacter)
 				{
-					o.get_gameObject().SetActive(false);
+					o.gameObject.SetActive(value: false);
 					Transform namePlate = o.GetNamePlate();
 					if (null != namePlate)
 					{
-						o.GetNamePlate().get_gameObject().SetActive(false);
+						o.GetNamePlate().gameObject.SetActive(value: false);
 					}
 				}
 			});
@@ -210,14 +199,13 @@ public class HomeTutorialManager : MonoBehaviour
 
 	private void SetTargetAreaNPC(int npc_id)
 	{
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 		if (!(prefab_target_area == null) && MonoBehaviourSingleton<HomeManager>.IsValid() && MonoBehaviourSingleton<HomeManager>.I.IHomePeople != null)
 		{
 			HomeNPCCharacter homeNPCCharacter = MonoBehaviourSingleton<HomeManager>.I.IHomePeople.GetHomeNPCCharacter(npc_id);
 			if (!(homeNPCCharacter == null))
 			{
-				t_target_area = ResourceUtility.Realizes(prefab_target_area, homeNPCCharacter.get_transform());
-				t_target_area.set_position(homeNPCCharacter.get_transform().get_position());
+				t_target_area = ResourceUtility.Realizes(prefab_target_area, homeNPCCharacter.transform);
+				t_target_area.position = homeNPCCharacter.transform.position;
 			}
 		}
 	}
@@ -241,7 +229,7 @@ public class HomeTutorialManager : MonoBehaviour
 		case DialogType.AFTER_GACHA2:
 			if (dialog != null)
 			{
-				this.StartCoroutine(IEAfterGacha());
+				StartCoroutine(IEAfterGacha());
 			}
 			break;
 		}
@@ -254,8 +242,6 @@ public class HomeTutorialManager : MonoBehaviour
 
 	private IEnumerator SetupArrow(Vector3 position, bool isPamela = true)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		LoadingQueue loadingQueue = new LoadingQueue(this);
 		LoadObject loadedArrow = loadingQueue.Load(RESOURCE_CATEGORY.SYSTEM, "SystemCommon", new string[1]
 		{
@@ -265,15 +251,15 @@ public class HomeTutorialManager : MonoBehaviour
 		{
 			yield return loadingQueue.Wait();
 		}
-		Vector3 ARROW_SCALE = new Vector3(4f, 4f, 4f);
+		Vector3 localScale = new Vector3(4f, 4f, 4f);
 		if (isPamela)
 		{
 			if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2))
 			{
 				pamelaArrow = Utility.CreateGameObject("MdlArrow", MonoBehaviourSingleton<AppMain>.I._transform);
 				ResourceUtility.Realizes(loadedArrow.loadedObject, pamelaArrow);
-				pamelaArrow.set_localScale(ARROW_SCALE);
-				pamelaArrow.set_position(position);
+				pamelaArrow.localScale = localScale;
+				pamelaArrow.position = position;
 				dialog.OpenAfterGacha2();
 				dialog.OpenMessage(StringTable.Get(STRING_CATEGORY.TUTORIAL_NEW_STR, 1u).Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
 			}
@@ -282,8 +268,8 @@ public class HomeTutorialManager : MonoBehaviour
 		{
 			questArrow = Utility.CreateGameObject("MdlArrow", MonoBehaviourSingleton<AppMain>.I._transform);
 			ResourceUtility.Realizes(loadedArrow.loadedObject, questArrow);
-			questArrow.set_localScale(ARROW_SCALE);
-			questArrow.set_position(position);
+			questArrow.localScale = localScale;
+			questArrow.position = position;
 			dialog.OpenAfterGacha2();
 			dialog.OpenMessage(StringTable.Get(STRING_CATEGORY.TUTORIAL_NEW_STR, 2u).Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
 		}
@@ -306,16 +292,16 @@ public class HomeTutorialManager : MonoBehaviour
 			bool showMessage = false;
 			if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2))
 			{
-				yield return (object)new WaitForSeconds(2f);
+				yield return new WaitForSeconds(2f);
 				pamelaArrow = Utility.CreateGameObject("MdlArrow", MonoBehaviourSingleton<AppMain>.I._transform);
 				ResourceUtility.Realizes(loadedArrow.loadedObject, pamelaArrow);
-				pamelaArrow.set_localScale(ARROW_SCALE);
-				pamelaArrow.set_position(pamelaPosition);
-				yield return (object)new WaitForSeconds(0.5f);
+				pamelaArrow.localScale = ARROW_SCALE;
+				pamelaArrow.position = pamelaPosition;
+				yield return new WaitForSeconds(0.5f);
 				dialog.OpenAfterGacha2();
 				dialog.OpenMessage(StringTable.Get(STRING_CATEGORY.TUTORIAL_NEW_STR, 1u).Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
 				showMessage = true;
-				yield return (object)new WaitForSeconds(3.5f);
+				yield return new WaitForSeconds(3.5f);
 			}
 			if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_QUEST))
 			{
@@ -325,13 +311,13 @@ public class HomeTutorialManager : MonoBehaviour
 				}
 				questArrow = Utility.CreateGameObject("MdlArrow", MonoBehaviourSingleton<AppMain>.I._transform);
 				ResourceUtility.Realizes(loadedArrow.loadedObject, questArrow);
-				questArrow.set_localScale(ARROW_SCALE);
-				questArrow.set_position(questPosition);
-				yield return (object)new WaitForSeconds(0.5f);
+				questArrow.localScale = ARROW_SCALE;
+				questArrow.position = questPosition;
+				yield return new WaitForSeconds(0.5f);
 				dialog.OpenAfterGacha2();
 				dialog.OpenMessage(StringTable.Get(STRING_CATEGORY.TUTORIAL_NEW_STR, 2u).Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
 				showMessage = true;
-				yield return (object)new WaitForSeconds(3.5f);
+				yield return new WaitForSeconds(3.5f);
 			}
 			if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_MAINSTATUS))
 			{
@@ -340,10 +326,10 @@ public class HomeTutorialManager : MonoBehaviour
 					dialog.Close();
 				}
 				MonoBehaviourSingleton<UIManager>.I.mainStatus.SetTutArrowActive(isActive: true);
-				yield return (object)new WaitForSeconds(0.5f);
+				yield return new WaitForSeconds(0.5f);
 				dialog.OpenAfterGacha2();
 				dialog.OpenMessage(StringTable.Get(STRING_CATEGORY.TUTORIAL_NEW_STR, 3u).Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
-				yield return (object)new WaitForSeconds(3.5f);
+				yield return new WaitForSeconds(3.5f);
 			}
 			dialog.Close();
 		}
@@ -353,15 +339,15 @@ public class HomeTutorialManager : MonoBehaviour
 			{
 				pamelaArrow = Utility.CreateGameObject("MdlArrow", MonoBehaviourSingleton<AppMain>.I._transform);
 				ResourceUtility.Realizes(loadedArrow.loadedObject, pamelaArrow);
-				pamelaArrow.set_localScale(ARROW_SCALE);
-				pamelaArrow.set_position(pamelaPosition);
+				pamelaArrow.localScale = ARROW_SCALE;
+				pamelaArrow.position = pamelaPosition;
 			}
 			if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_QUEST))
 			{
 				questArrow = Utility.CreateGameObject("MdlArrow", MonoBehaviourSingleton<AppMain>.I._transform);
 				ResourceUtility.Realizes(loadedArrow.loadedObject, questArrow);
-				questArrow.set_localScale(ARROW_SCALE);
-				questArrow.set_position(questPosition);
+				questArrow.localScale = ARROW_SCALE;
+				questArrow.position = questPosition;
 			}
 			if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_MAINSTATUS))
 			{
@@ -391,11 +377,11 @@ public class HomeTutorialManager : MonoBehaviour
 	{
 		if (pamelaArrow != null)
 		{
-			Object.Destroy(pamelaArrow.get_gameObject());
+			Object.Destroy(pamelaArrow.gameObject);
 		}
 		if (questArrow != null)
 		{
-			Object.Destroy(questArrow.get_gameObject());
+			Object.Destroy(questArrow.gameObject);
 		}
 	}
 
@@ -403,11 +389,11 @@ public class HomeTutorialManager : MonoBehaviour
 	{
 		if (isPamela && pamelaArrow != null)
 		{
-			Object.Destroy(pamelaArrow.get_gameObject());
+			Object.Destroy(pamelaArrow.gameObject);
 		}
 		else if (!isPamela && questArrow != null)
 		{
-			Object.Destroy(questArrow.get_gameObject());
+			Object.Destroy(questArrow.gameObject);
 		}
 	}
 
@@ -432,7 +418,7 @@ public class HomeTutorialManager : MonoBehaviour
 	{
 		if (t_target_area != null)
 		{
-			t_target_area.get_gameObject().SetActive(false);
+			t_target_area.gameObject.SetActive(value: false);
 		}
 	}
 

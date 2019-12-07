@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class StatusEquipSetList : SkillInfoBase
@@ -52,7 +51,7 @@ public class StatusEquipSetList : SkillInfoBase
 		"ItemIconKind_Sword",
 		"ItemIconKind_Brade",
 		"ItemIconKind_Lance",
-		string.Empty,
+		"",
 		"ItemIconKind_Edge",
 		"ItemIconKind_Allow"
 	};
@@ -65,7 +64,7 @@ public class StatusEquipSetList : SkillInfoBase
 		"IconElementSoil",
 		"IconElementLight",
 		"IconElementDark",
-		string.Empty
+		""
 	};
 
 	public override void Initialize()
@@ -81,20 +80,17 @@ public class StatusEquipSetList : SkillInfoBase
 
 	public override void UpdateUI()
 	{
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		SetDynamicList((Enum)UI.GRD_SET_LIST, "StatusEquipSetListItem", equipSetMax, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool isRecycle)
+		SetDynamicList(UI.GRD_SET_LIST, "StatusEquipSetListItem", equipSetMax, reset: false, null, null, delegate(int i, Transform t, bool isRecycle)
 		{
 			SetEquipSetInfo(t, i);
 		});
 		if (!isInitializedScroll)
 		{
 			int num = Mathf.Max(0, equipSetNo - 1);
-			UIGrid component = base.GetComponent<UIGrid>((Enum)UI.GRD_SET_LIST);
+			UIGrid component = GetComponent<UIGrid>(UI.GRD_SET_LIST);
 			if (component != null)
 			{
-				MoveRelativeScrollView((Enum)UI.SCR_SET_LIST, Vector3.get_up() * component.cellHeight * (float)num);
+				MoveRelativeScrollView(UI.SCR_SET_LIST, Vector3.up * component.cellHeight * num);
 			}
 			isInitializedScroll = true;
 		}
@@ -111,8 +107,7 @@ public class StatusEquipSetList : SkillInfoBase
 
 	private void SetEquipSetInfo(Transform t, int setNo)
 	{
-		EquipSetCalculator equipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetEquipSetCalculator(setNo);
-		SimpleStatus finalStatus = equipSetCalculator.GetFinalStatus(0, MonoBehaviourSingleton<UserInfoManager>.I.userStatus);
+		SimpleStatus finalStatus = MonoBehaviourSingleton<StatusManager>.I.GetEquipSetCalculator(setNo).GetFinalStatus(0, MonoBehaviourSingleton<UserInfoManager>.I.userStatus);
 		SetLabelText(t, UI.LBL_SET_NAME, localEquipSet[setNo].name);
 		SetLabelText(t, UI.LBL_SET_NO, (setNo + 1).ToString());
 		SetLabelText(t, UI.LBL_HP, finalStatus.hp.ToString());
@@ -170,8 +165,7 @@ public class StatusEquipSetList : SkillInfoBase
 
 	private void OnQuery_CHANGE_SET()
 	{
-		int num = (int)GameSection.GetEventData();
-		GameSection.SetEventData(num);
+		GameSection.SetEventData((int)GameSection.GetEventData());
 	}
 
 	private void OnQuery_CHANGE_SET_NAME()

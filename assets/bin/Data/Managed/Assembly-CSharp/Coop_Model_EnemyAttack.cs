@@ -11,9 +11,8 @@ public class Coop_Model_EnemyAttack : Coop_Model_Base
 
 	public override string ToString()
 	{
-		string empty = string.Empty;
-		string text = empty;
-		empty = text + ",sid=" + sid + ",dmg=" + dmg;
-		return base.ToString() + empty;
+		string text = "";
+		text = text + ",sid=" + sid + ",dmg=" + dmg;
+		return base.ToString() + text;
 	}
 }

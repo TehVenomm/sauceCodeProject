@@ -20,7 +20,7 @@ internal class TagAnalyzer
 
 	protected virtual bool IsValidTag(string tag, int line, int column)
 	{
-		if (tag == null || (!(tag == "M") && !(tag == "F")))
+		if (!(tag == "M") && !(tag == "F"))
 		{
 			Log.Warning(LOG.OUTGAME, "Invalid tag : " + tag + " :: line " + (line + 1) + " : column " + column);
 			return false;
@@ -30,7 +30,11 @@ internal class TagAnalyzer
 
 	public bool IsFindTag()
 	{
-		return !string.IsNullOrEmpty(findTag) && !string.IsNullOrEmpty(findTagText);
+		if (!string.IsNullOrEmpty(findTag))
+		{
+			return !string.IsNullOrEmpty(findTagText);
+		}
+		return false;
 	}
 
 	public int Analyze(string text, int _line, int _column)
@@ -39,20 +43,20 @@ internal class TagAnalyzer
 		findTagText = string.Empty;
 		line = _line;
 		column = _column;
-		char c = text[column];
+		char num = text[column];
 		int length = text.Length;
 		int result = column;
-		if (c == '<' && !IsFindTag())
+		if (num == '<' && !IsFindTag())
 		{
-			char c2 = '\0';
-			int num = column + 1;
+			char c = '\0';
+			int num2 = column + 1;
 			StringBuilder stringBuilder = new StringBuilder();
-			while (c2 != '>' && num < length)
+			while (c != '>' && num2 < length)
 			{
-				c2 = text[num++];
-				if (c2 != '>')
+				c = text[num2++];
+				if (c != '>')
 				{
-					stringBuilder.Append(c2);
+					stringBuilder.Append(c);
 				}
 			}
 			if (IsValidTag(stringBuilder.ToString(), line, column))
@@ -61,29 +65,29 @@ internal class TagAnalyzer
 				StringBuilder stringBuilder2 = new StringBuilder();
 				StringBuilder stringBuilder3 = new StringBuilder();
 				bool flag = false;
-				while (!flag && num < length)
+				while (!flag && num2 < length)
 				{
-					c2 = text[num++];
-					if (c2 == '<')
+					c = text[num2++];
+					if (c == '<')
 					{
-						int num4 = num;
-						if (num4 >= length || text[num4++] != '/')
+						int num3 = num2;
+						if (num3 >= length || text[num3++] != '/')
 						{
 							continue;
 						}
-						char c3 = '\0';
-						while (c3 != '>' && num4 < length)
+						char c2 = '\0';
+						while (c2 != '>' && num3 < length)
 						{
-							c3 = text[num4++];
-							if (c3 != '>')
+							c2 = text[num3++];
+							if (c2 != '>')
 							{
-								stringBuilder3.Append(c3);
+								stringBuilder3.Append(c2);
 							}
 						}
 						if (stringBuilder3.ToString() == findTag)
 						{
 							flag = true;
-							num = num4;
+							num2 = num3;
 						}
 						else
 						{
@@ -92,15 +96,15 @@ internal class TagAnalyzer
 					}
 					else
 					{
-						stringBuilder2.Append(c2);
+						stringBuilder2.Append(c);
 					}
 				}
 				if (flag)
 				{
 					findTagText = stringBuilder2.ToString();
-					result = num;
+					result = num2;
 				}
-				else if (num >= length)
+				else if (num2 >= length)
 				{
 					Log.Error(LOG.OUTGAME, "did not end Tag Analyze till the end of line : tag = " + findTag + " : text = " + findTagText + " :: line " + (line + 1));
 					findTag = string.Empty;

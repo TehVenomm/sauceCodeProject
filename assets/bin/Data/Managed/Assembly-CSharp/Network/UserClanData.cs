@@ -55,7 +55,7 @@ namespace Network
 		public void Clear()
 		{
 			cId = "0";
-			name = string.Empty;
+			name = "";
 			stat = 0;
 			isInBase = 0;
 			level = 1;

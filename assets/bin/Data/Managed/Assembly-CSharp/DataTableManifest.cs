@@ -35,8 +35,7 @@ public class DataTableManifest
 
 	private uint GetNameHash(string name)
 	{
-		MD5Hash mD5Hash = MD5Hash.Calc(name);
-		return mD5Hash.GetUIntHashCode();
+		return MD5Hash.Calc(name).GetUIntHashCode();
 	}
 
 	public static DataTableManifest Create(string csv, int version)
@@ -63,10 +62,11 @@ public class DataTableManifest
 				}
 			}
 		}
-		DataTableManifest dataTableManifest = new DataTableManifest();
-		dataTableManifest.version = version;
-		dataTableManifest.dict = dictionary;
-		dataTableManifest.fileNames = list;
-		return dataTableManifest;
+		return new DataTableManifest
+		{
+			version = version,
+			dict = dictionary,
+			fileNames = list
+		};
 	}
 }

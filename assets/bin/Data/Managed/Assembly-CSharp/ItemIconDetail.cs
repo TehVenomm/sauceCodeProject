@@ -70,8 +70,7 @@ public class ItemIconDetail : ItemIcon
 	{
 		int sex = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex;
 		bool is_equipping = equipping_sp_index == 0;
-		EquipItemInfo equipItemInfo = item_data.GetItemData() as EquipItemInfo;
-		ItemIconDetail itemIconDetail = CreateEquipItemIconDetail(equipItemInfo, sex, parent, null, -1, event_name, event_data, is_new, toggle_group, select_number > -1, string.Empty, is_equipping);
+		ItemIconDetail itemIconDetail = CreateEquipItemIconDetail(item_data.GetItemData() as EquipItemInfo, sex, parent, null, -1, event_name, event_data, is_new, toggle_group, select_number > -1, string.Empty, is_equipping);
 		itemIconDetail.setupperEquip.Set(new object[6]
 		{
 			item_data.GetItemData() as EquipItemInfo,
@@ -82,7 +81,7 @@ public class ItemIconDetail : ItemIcon
 			select_number
 		});
 		itemIconDetail.SetFavoriteIcon(item_data.IsFavorite());
-		if (Object.op_Implicit(itemIconDetail.setupperEquip.lvRoot))
+		if ((bool)itemIconDetail.setupperEquip.lvRoot)
 		{
 			UILabel[] componentsInChildren = itemIconDetail.setupperEquip.lvRoot.GetComponentsInChildren<UILabel>();
 			itemIconDetail.SetEquipExt(item_data.equipData, componentsInChildren);
@@ -93,15 +92,7 @@ public class ItemIconDetail : ItemIcon
 	public static ItemIcon CreateSmithCreateEquipDetailIcon(ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity, SmithCreateSortData item_data, SkillSlotUIData[] skill_slot_data, bool is_show_main_status, Transform parent = null, string event_name = null, int event_data = 0, ICON_STATUS icon_status = ICON_STATUS.NONE, bool is_new = false, int toggle_group = -1, bool is_select = false, bool is_equipping = false, GET_TYPE getType = GET_TYPE.PAY)
 	{
 		SmithCreateItemInfo smithCreateItemInfo = item_data.GetItemData() as SmithCreateItemInfo;
-		GameObject itemIconDetailPrefab = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailPrefab;
-		ELEMENT_TYPE targetElementPriorityToTable = smithCreateItemInfo.equipTableData.GetTargetElementPriorityToTable();
-		EQUIPMENT_TYPE? magi_enable_icon_type = null;
-		int num = -1;
-		bool is_new2 = is_new;
-		bool is_select2 = is_select;
-		string empty = string.Empty;
-		bool is_equipping2 = is_equipping;
-		ItemIconDetail itemIconDetail = ItemIcon.CreateIcon<ItemIconDetail>(itemIconDetailPrefab, icon_type, icon_id, rarity, parent, targetElementPriorityToTable, magi_enable_icon_type, num, event_name, event_data, is_new2, toggle_group, is_select2, empty, is_equipping2, 0, 0, disable_rarity_text: false, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
+		ItemIconDetail itemIconDetail = ItemIcon.CreateIcon<ItemIconDetail>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailPrefab, icon_type, icon_id, rarity, parent, smithCreateItemInfo.equipTableData.GetTargetElementPriorityToTable(), null, -1, event_name, event_data, is_new, toggle_group, is_select, string.Empty, is_equipping, 0, 0, disable_rarity_text: false, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
 		EquipItemTable.EquipItemData equipTableData = item_data.createData.equipTableData;
 		itemIconDetail.setupperEquip.Set(new object[6]
 		{
@@ -117,17 +108,9 @@ public class ItemIconDetail : ItemIcon
 
 	public static ItemIcon CreateEquipAbilityIcon(ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity, EquipItemSortData item_data, SkillSlotUIData[] skill_slot_data, bool is_show_main_status, Transform parent = null, string event_name = null, int event_data = 0, ICON_STATUS icon_status = ICON_STATUS.NONE, bool is_new = false, int toggle_group = -1, bool is_select = false, int equipping_sp_index = -1, GET_TYPE getType = GET_TYPE.PAY)
 	{
-		bool flag = equipping_sp_index == 0;
+		bool is_equipping = equipping_sp_index == 0;
 		EquipItemInfo equipItemInfo = item_data.GetItemData() as EquipItemInfo;
-		GameObject itemIconDetailPrefab = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailPrefab;
-		ELEMENT_TYPE targetElementPriorityToTable = equipItemInfo.GetTargetElementPriorityToTable();
-		EQUIPMENT_TYPE? magi_enable_icon_type = null;
-		int num = -1;
-		bool is_new2 = is_new;
-		bool is_select2 = false;
-		string empty = string.Empty;
-		bool is_equipping = flag;
-		ItemIconDetail itemIconDetail = ItemIcon.CreateIcon<ItemIconDetail>(itemIconDetailPrefab, icon_type, icon_id, rarity, parent, targetElementPriorityToTable, magi_enable_icon_type, num, event_name, event_data, is_new2, toggle_group, is_select2, empty, is_equipping, 0, 0, disable_rarity_text: false, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
+		ItemIconDetail itemIconDetail = ItemIcon.CreateIcon<ItemIconDetail>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailPrefab, icon_type, icon_id, rarity, parent, equipItemInfo.GetTargetElementPriorityToTable(), null, -1, event_name, event_data, is_new, toggle_group, is_select: false, string.Empty, is_equipping, 0, 0, disable_rarity_text: false, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
 		itemIconDetail.setupperEquipAbility.Set(new object[5]
 		{
 			item_data.GetItemData() as EquipItemInfo,
@@ -137,7 +120,7 @@ public class ItemIconDetail : ItemIcon
 			equipping_sp_index
 		});
 		itemIconDetail.SetFavoriteIcon(item_data.IsFavorite());
-		if (Object.op_Implicit(itemIconDetail.setupperEquip.lvRoot))
+		if ((bool)itemIconDetail.setupperEquip.lvRoot)
 		{
 			UILabel[] componentsInChildren = itemIconDetail.setupperEquipAbility.lvRoot.GetComponentsInChildren<UILabel>();
 			itemIconDetail.SetEquipExt(item_data.equipData, componentsInChildren);
@@ -147,17 +130,9 @@ public class ItemIconDetail : ItemIcon
 
 	public static ItemIcon CreateEquipRevertLithographIcon(ITEM_ICON_TYPE icon_type, int icon_id, RARITY_TYPE? rarity, EquipItemSortData item_data, SkillSlotUIData[] skill_slot_data, bool is_show_main_status, Transform parent = null, string event_name = null, int event_data = 0, ICON_STATUS icon_status = ICON_STATUS.NONE, bool is_new = false, int toggle_group = -1, bool is_select = false, int equipping_sp_index = -1, GET_TYPE getType = GET_TYPE.PAY)
 	{
-		bool flag = equipping_sp_index == 0;
+		bool is_equipping = equipping_sp_index == 0;
 		EquipItemInfo equipItemInfo = item_data.GetItemData() as EquipItemInfo;
-		GameObject itemIconDetailPrefab = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailPrefab;
-		ELEMENT_TYPE targetElementPriorityToTable = equipItemInfo.GetTargetElementPriorityToTable();
-		EQUIPMENT_TYPE? magi_enable_icon_type = null;
-		int num = -1;
-		bool is_new2 = is_new;
-		bool is_select2 = false;
-		string empty = string.Empty;
-		bool is_equipping = flag;
-		ItemIconDetail itemIconDetail = ItemIcon.CreateIcon<ItemIconDetail>(itemIconDetailPrefab, icon_type, icon_id, rarity, parent, targetElementPriorityToTable, magi_enable_icon_type, num, event_name, event_data, is_new2, toggle_group, is_select2, empty, is_equipping, 0, 0, disable_rarity_text: false, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
+		ItemIconDetail itemIconDetail = ItemIcon.CreateIcon<ItemIconDetail>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailPrefab, icon_type, icon_id, rarity, parent, equipItemInfo.GetTargetElementPriorityToTable(), null, -1, event_name, event_data, is_new, toggle_group, is_select: false, string.Empty, is_equipping, 0, 0, disable_rarity_text: false, QUEST_ICON_SIZE_TYPE.DEFAULT, getType);
 		itemIconDetail.setupperEquipAbility.Set(new object[5]
 		{
 			item_data.GetItemData() as EquipItemInfo,
@@ -167,7 +142,7 @@ public class ItemIconDetail : ItemIcon
 			equipping_sp_index
 		});
 		itemIconDetail.SetFavoriteIcon(item_data.IsFavorite());
-		if (Object.op_Implicit(itemIconDetail.setupperEquip.lvRoot))
+		if ((bool)itemIconDetail.setupperEquip.lvRoot)
 		{
 			UILabel[] componentsInChildren = itemIconDetail.setupperEquipAbility.lvRoot.GetComponentsInChildren<UILabel>();
 			itemIconDetail.SetEquipExt(item_data.equipData, componentsInChildren);
@@ -224,7 +199,7 @@ public class ItemIconDetail : ItemIcon
 		return itemIconDetail;
 	}
 
-	public static ItemIconDetail CreateEquipItemIconDetail(EquipItemInfo equipItemInfo, int sex, Transform parent, EQUIPMENT_TYPE? magi_enable_icon_type = default(EQUIPMENT_TYPE?), int num = -1, string event_name = null, int event_data = 0, bool is_new = false, int toggle_group = -1, bool is_select = false, string icon_under_text = null, bool is_equipping = false, bool disable_rarity_text = false)
+	public static ItemIconDetail CreateEquipItemIconDetail(EquipItemInfo equipItemInfo, int sex, Transform parent, EQUIPMENT_TYPE? magi_enable_icon_type = null, int num = -1, string event_name = null, int event_data = 0, bool is_new = false, int toggle_group = -1, bool is_select = false, string icon_under_text = null, bool is_equipping = false, bool disable_rarity_text = false)
 	{
 		return ItemIcon.CreateEquipIconByEquipItemInfo<ItemIconDetail>(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.itemIconDetailPrefab, equipItemInfo, sex, parent, magi_enable_icon_type, num, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, disable_rarity_text);
 	}
@@ -243,7 +218,7 @@ public class ItemIconDetail : ItemIcon
 	{
 		if (spriteGrayout != null)
 		{
-			spriteGrayout.set_enabled(isActive);
+			spriteGrayout.enabled = isActive;
 		}
 	}
 }

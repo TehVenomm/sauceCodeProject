@@ -1,5 +1,4 @@
 using Network;
-using System;
 using UnityEngine;
 
 public class QuestAcceptSelect : QuestSelect
@@ -18,7 +17,7 @@ public class QuestAcceptSelect : QuestSelect
 	{
 		base.UpdateUI();
 		QuestItemInfo questItem = MonoBehaviourSingleton<InventoryManager>.I.GetQuestItem(questInfo.questData.tableData.questID);
-		SetActive((Enum)UI.OBJ_REWARD_ICON_ROOT, is_visible: false);
+		SetActive(UI.OBJ_REWARD_ICON_ROOT, is_visible: false);
 		if (questItem == null || questItem.sellItems == null || questItem.sellItems.Count <= 0)
 		{
 			return;
@@ -39,8 +38,8 @@ public class QuestAcceptSelect : QuestSelect
 					break;
 				}
 				int num3 = -1;
-				SetActive((Enum)UI.OBJ_REWARD_ICON_ROOT, is_visible: true);
-				ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(type, num2, FindCtrl(root, UI.OBJ_MATERIAL_ICON_ROOT), num3, "EQUIP_LIST", 0, is_new: false, -1, is_select: false, null, is_equipping: false, disable_rarity_text: true);
+				SetActive(UI.OBJ_REWARD_ICON_ROOT, is_visible: true);
+				ItemIcon.CreateRewardItemIcon(type, num2, FindCtrl(root, UI.OBJ_MATERIAL_ICON_ROOT), num3, "EQUIP_LIST", 0, is_new: false, -1, is_select: false, null, is_equipping: false, disable_rarity_text: true);
 				num++;
 				continue;
 			}

@@ -5,11 +5,6 @@ public class PostEffector : MonoBehaviour
 	[SerializeField]
 	private FilterBase filter;
 
-	public PostEffector()
-		: this()
-	{
-	}
-
 	public void SetFilter(FilterBase filter)
 	{
 		this.filter = filter;

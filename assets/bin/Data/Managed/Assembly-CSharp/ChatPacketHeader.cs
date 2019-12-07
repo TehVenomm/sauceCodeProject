@@ -47,7 +47,6 @@ public class ChatPacketHeader
 	{
 		string s = str.Substring(0, 2);
 		string s2 = str.Substring(2, 4);
-		string fromId = str.Substring(8, 32);
-		return new ChatPacketHeader(int.Parse(s), int.Parse(s2), fromId);
+		return new ChatPacketHeader(_fromId: str.Substring(8, 32), _version: int.Parse(s), _cmd: int.Parse(s2));
 	}
 }

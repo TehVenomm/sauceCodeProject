@@ -39,9 +39,7 @@ public class HomePlayerCharacter : HomePlayerCharacterBase
 			int hair_color_id = defaultHasHairColorIndexes[Random.Range(0, defaultHasHairColorIndexes.Length)];
 			playerLoadInfo.SetFace(num, face_type_id, skin_color_id);
 			playerLoadInfo.SetHair(num, hair_style_id, hair_color_id);
-			IHomeManager currentIHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
-			OutGameSettingsManager.HomeScene sceneSetting = currentIHomeManager.GetSceneSetting();
-			OutGameSettingsManager.HomeScene.RandomEquip randomEquip = sceneSetting.randomEquip;
+			OutGameSettingsManager.HomeScene.RandomEquip randomEquip = GameSceneGlobalSettings.GetCurrentIHomeManager().GetSceneSetting().randomEquip;
 			uint equip_body_item_id = (uint)Utility.Lot(randomEquip.bodys);
 			uint equip_head_item_id = (uint)Utility.Lot(randomEquip.helms);
 			uint equip_arm_item_id = (uint)Utility.Lot(randomEquip.arms);
@@ -61,7 +59,7 @@ public class HomePlayerCharacter : HomePlayerCharacterBase
 
 	protected override ModelLoaderBase LoadModel()
 	{
-		return Load(this, this.get_gameObject(), charaInfo, null);
+		return Load(this, base.gameObject, charaInfo, null);
 	}
 
 	protected override void InitAnim()
@@ -71,7 +69,7 @@ public class HomePlayerCharacter : HomePlayerCharacterBase
 		{
 			animCtrl.SetMoveRunAnim(sexType);
 		}
-		animator.set_speed(Random.Range(0.8f, 1.2f));
+		animator.speed = Random.Range(0.8f, 1.2f);
 	}
 
 	public override bool DispatchEvent()
@@ -86,7 +84,7 @@ public class HomePlayerCharacter : HomePlayerCharacterBase
 		}
 		if (GetFriendCharaInfo() != null)
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomePlayerCharacter", this.get_gameObject(), "HOME_FRIENDS", GetFriendCharaInfo());
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomePlayerCharacter", base.gameObject, "HOME_FRIENDS", GetFriendCharaInfo());
 			return true;
 		}
 		return false;

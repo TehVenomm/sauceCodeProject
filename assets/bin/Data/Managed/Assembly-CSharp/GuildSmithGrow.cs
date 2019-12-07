@@ -32,11 +32,9 @@ public class GuildSmithGrow : EquipMaterialBase
 	public override void Initialize()
 	{
 		smithType = SmithType.GROW;
-		SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
-		GameSection.SetEventData(smithData.selectEquipData);
+		GameSection.SetEventData(MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>().selectEquipData);
 		base.Initialize();
-		EquipItemInfo equipData = GetEquipData();
-		if (equipData != null)
+		if (GetEquipData() != null)
 		{
 			string text = base.sectionData.GetText("CAPTION_GUILD_REQUEST");
 			MonoBehaviourSingleton<UIManager>.I.common.AttachCaption(this, base.sectionData.backButtonIndex, text);
@@ -67,53 +65,41 @@ public class GuildSmithGrow : EquipMaterialBase
 
 	public override void UpdateUI()
 	{
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
 		base.UpdateUI();
 		int num = Mathf.Min(aimLv, GetEquipData().tableData.maxLv);
-		SetLabelText((Enum)UI.LBL_AIM_LV, num.ToString());
-		SetActive((Enum)UI.STR_ONLY_EXCEED, is_visible: false);
-		Color color = Color.get_red();
+		SetLabelText(UI.LBL_AIM_LV, num.ToString());
+		SetActive(UI.STR_ONLY_EXCEED, is_visible: false);
+		Color color = Color.red;
 		if (num == GetEquipData().level)
 		{
-			SetActive((Enum)UI.STR_ONLY_EXCEED, is_visible: true);
-			color = Color.get_gray();
+			SetActive(UI.STR_ONLY_EXCEED, is_visible: true);
+			color = Color.gray;
 		}
 		else if (IsHavingMaterialAndMoney() && num > GetEquipData().level)
 		{
-			color = Color.get_white();
+			color = Color.white;
 		}
-		SetColor((Enum)UI.LBL_AIM_LV, color);
+		SetColor(UI.LBL_AIM_LV, color);
 		bool flag = aimLv > GetEquipData().level + 1;
 		bool flag2 = aimLv < GetEquipData().tableData.maxLv;
-		SetColor((Enum)UI.SPR_AIM_L, (!flag) ? Color.get_clear() : Color.get_white());
-		SetColor((Enum)UI.SPR_AIM_R, (!flag2) ? Color.get_clear() : Color.get_white());
-		SetButtonEnabled((Enum)UI.BTN_AIM_L, flag);
-		SetButtonEnabled((Enum)UI.BTN_AIM_R, flag2);
-		SetActive((Enum)UI.BTN_AIM_L_INACTIVE, !flag);
-		SetActive((Enum)UI.BTN_AIM_R_INACTIVE, !flag2);
-		SetRepeatButton((Enum)UI.BTN_AIM_L, "AIM_L", (object)null);
-		SetRepeatButton((Enum)UI.BTN_AIM_R, "AIM_R", (object)null);
-		SetActive((Enum)UI.BTN_EXCEED, is_visible: false);
-		SetActive((Enum)UI.BTN_DECISION, is_visible: false);
-		SetActive((Enum)UI.BTN_INACTIVE, is_visible: false);
-		SetActive((Enum)UI.LBL_GOLD, is_visible: false);
-		SetActive((Enum)UI.LinePartsR01, is_visible: false);
+		SetColor(UI.SPR_AIM_L, flag ? Color.white : Color.clear);
+		SetColor(UI.SPR_AIM_R, flag2 ? Color.white : Color.clear);
+		SetButtonEnabled(UI.BTN_AIM_L, flag);
+		SetButtonEnabled(UI.BTN_AIM_R, flag2);
+		SetActive(UI.BTN_AIM_L_INACTIVE, !flag);
+		SetActive(UI.BTN_AIM_R_INACTIVE, !flag2);
+		SetRepeatButton(UI.BTN_AIM_L, "AIM_L");
+		SetRepeatButton(UI.BTN_AIM_R, "AIM_R");
+		SetActive(UI.BTN_EXCEED, is_visible: false);
+		SetActive(UI.BTN_DECISION, is_visible: false);
+		SetActive(UI.BTN_INACTIVE, is_visible: false);
+		SetActive(UI.LBL_GOLD, is_visible: false);
+		SetActive(UI.LinePartsR01, is_visible: false);
 	}
 
 	protected override void InitNeedMaterialData()
 	{
-		EquipItemInfo equipData = GetEquipData();
-		if (equipData != null)
+		if (GetEquipData() != null)
 		{
 			if (aimLv <= GetEquipData().tableData.maxLv)
 			{
@@ -211,8 +197,7 @@ public class GuildSmithGrow : EquipMaterialBase
 			SetLabelText(detailBase, UI.LBL_ELEM_DEF, elemDef.ToString());
 			SetActive(detailBase, UI.LBL_AFTER_DEF, is_visible: false);
 			SetActive(detailBase, UI.LBL_AFTER_ELEM_DEF, is_visible: false);
-			int hp = equipData.hp;
-			SetLabelText(detailBase, UI.LBL_HP, hp.ToString());
+			SetLabelText(text: equipData.hp.ToString(), root: detailBase, label_enum: UI.LBL_HP);
 			SetActive(detailBase, UI.LBL_AFTER_HP, is_visible: false);
 		}
 	}
@@ -223,7 +208,7 @@ public class GuildSmithGrow : EquipMaterialBase
 		if (modelID != id)
 		{
 			modelID = id;
-			SetRenderEquipModel((Enum)UI.TEX_MODEL, id, -1, -1, 1f);
+			SetRenderEquipModel(UI.TEX_MODEL, id);
 		}
 	}
 
@@ -262,7 +247,7 @@ public class GuildSmithGrow : EquipMaterialBase
 			if (terminateAimLv == aimLv && !terminating)
 			{
 				terminating = true;
-				TerminateRepeatButton((Enum)UI.BTN_AIM_R);
+				TerminateRepeatButton(UI.BTN_AIM_R);
 			}
 		}
 	}
@@ -423,7 +408,7 @@ public class GuildSmithGrow : EquipMaterialBase
 			int num = int.Parse(s);
 			if (num > 0 && chooseIndex >= 0)
 			{
-				this.StartCoroutine(CRSendDonateRequest(itemID, name, string.Empty, num));
+				StartCoroutine(CRSendDonateRequest(itemID, name, "", num));
 				chooseIndex = -1;
 			}
 		}
@@ -435,7 +420,7 @@ public class GuildSmithGrow : EquipMaterialBase
 
 	private IEnumerator CRSendDonateRequest(int itemID, string itemName, string request, int numRequest)
 	{
-		yield return (object)new WaitUntil((Func<bool>)(() => !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible()));
+		yield return new WaitUntil(() => !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible());
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest(itemID, itemName, request, numRequest, delegate(bool success)
 		{

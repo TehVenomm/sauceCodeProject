@@ -18,7 +18,7 @@ public class UIQuestInfoExplore : MonoBehaviourSingleton<UIQuestInfoExplore>
 
 	private void Start()
 	{
-		this.get_gameObject().SetActive(IsEnable());
+		base.gameObject.SetActive(IsEnable());
 		timeExplore.SetActive(!IsBoss());
 		timeInBattle.SetActive(IsBoss());
 		prevExploreBossBattle = IsBoss();
@@ -39,7 +39,11 @@ public class UIQuestInfoExplore : MonoBehaviourSingleton<UIQuestInfoExplore>
 
 	private bool IsEnable()
 	{
-		return QuestManager.IsValidInGame() && MonoBehaviourSingleton<QuestManager>.I.IsExplore();
+		if (QuestManager.IsValidInGame())
+		{
+			return MonoBehaviourSingleton<QuestManager>.I.IsExplore();
+		}
+		return false;
 	}
 
 	private bool IsBoss()

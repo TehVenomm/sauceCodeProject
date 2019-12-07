@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -68,9 +67,9 @@ public class ItemDetailSkill : SkillInfoBase
 			GameSaveData.instance.RemoveNewIconAndSave(ITEM_ICON_TYPE.SKILL_ATTACK, skillItemInfo.uniqueID);
 		}
 		bool flag = equipInfo != null;
-		SetActive((Enum)UI.BTN_CHANGE, flag);
-		SetActive((Enum)UI.BTN_GROW, ItemDetailEquip.CanSmithSection(callSection) && skillItemInfo != null && !skillItemInfo.IsLevelMax());
-		SetActive((Enum)UI.BTN_SELL, MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene() && !flag);
+		SetActive(UI.BTN_CHANGE, flag);
+		SetActive(UI.BTN_GROW, ItemDetailEquip.CanSmithSection(callSection) && skillItemInfo != null && !skillItemInfo.IsLevelMax());
+		SetActive(UI.BTN_SELL, MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene() && !flag);
 		base.Initialize();
 	}
 
@@ -96,10 +95,10 @@ public class ItemDetailSkill : SkillInfoBase
 	protected virtual void SetupDetailBase()
 	{
 		detailBase = SetPrefab(GetCtrl(UI.OBJ_DETAIL_ROOT), "ItemDetailSkillBase");
-		SetFontStyle(detailBase, UI.STR_TITLE_ITEM_INFO, 2);
-		SetFontStyle(detailBase, UI.STR_TITLE_DESCRIPTION, 2);
-		SetFontStyle(detailBase, UI.STR_TITLE_STATUS, 2);
-		SetFontStyle(detailBase, UI.STR_TITLE_SELL, 2);
+		SetFontStyle(detailBase, UI.STR_TITLE_ITEM_INFO, FontStyle.Italic);
+		SetFontStyle(detailBase, UI.STR_TITLE_DESCRIPTION, FontStyle.Italic);
+		SetFontStyle(detailBase, UI.STR_TITLE_STATUS, FontStyle.Italic);
+		SetFontStyle(detailBase, UI.STR_TITLE_SELL, FontStyle.Italic);
 	}
 
 	private void SkillParam(SkillItemInfo item)
@@ -111,7 +110,7 @@ public class ItemDetailSkill : SkillInfoBase
 		SetLabelText(detailBase, UI.LBL_SELL, item.sellPrice.ToString());
 		SetSupportEncoding(UI.LBL_DESCRIPTION, isEnable: true);
 		SetLabelText(detailBase, UI.LBL_DESCRIPTION, item.GetExplanationText(isShowExceed: true));
-		bool is_visible = (callSection & (ItemDetailEquip.CURRENT_SECTION.SMITH_CREATE | ItemDetailEquip.CURRENT_SECTION.SMITH_SKILL_MATERIAL | ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT | ItemDetailEquip.CURRENT_SECTION.UI_PARTS | ItemDetailEquip.CURRENT_SECTION.EQUIP_LIST)) == ItemDetailEquip.CURRENT_SECTION.NONE;
+		bool is_visible = (callSection & (ItemDetailEquip.CURRENT_SECTION.SMITH_CREATE | ItemDetailEquip.CURRENT_SECTION.SMITH_SKILL_MATERIAL | ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT | ItemDetailEquip.CURRENT_SECTION.UI_PARTS | ItemDetailEquip.CURRENT_SECTION.EQUIP_LIST)) == 0;
 		SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, is_visible);
 		ResetTween(detailBase, UI.TWN_FAVORITE);
 		ResetTween(detailBase, UI.TWN_UNFAVORITE);
@@ -126,8 +125,8 @@ public class ItemDetailSkill : SkillInfoBase
 			SetProgressInt(detailBase, UI.PRG_EXP_BAR, item.exp, item.expPrev, item.expNext);
 		}
 		SetSkillSlotTypeIcon(detailBase, UI.SPR_SKILL_TYPE_ICON, UI.SPR_SKILL_TYPE_ICON_BG, UI.SPR_SKILL_TYPE_ICON_RARITY, tableData);
-		SetRenderSkillItemModel((Enum)UI.TEX_MODEL, tableData.id, rotation: true, light_rotation: false);
-		SetRenderSkillItemSymbolModel((Enum)UI.TEX_INNER_MODEL, tableData.id, rotation: true);
+		SetRenderSkillItemModel(UI.TEX_MODEL, tableData.id);
+		SetRenderSkillItemSymbolModel(UI.TEX_INNER_MODEL, tableData.id);
 	}
 
 	private void SkillTableParam(SkillItemTable.SkillItemData table_data)
@@ -147,8 +146,8 @@ public class ItemDetailSkill : SkillInfoBase
 		SetLabelText(detailBase, UI.LBL_SELL, table_data.baseSell.ToString());
 		SetLabelText(detailBase, UI.LBL_DESCRIPTION, table_data.GetExplanationText(level));
 		SetActive(detailBase, UI.OBJ_FAVORITE_ROOT, is_visible: false);
-		SetRenderSkillItemModel((Enum)UI.TEX_MODEL, table_data.id, rotation: true, light_rotation: false);
-		SetRenderSkillItemSymbolModel((Enum)UI.TEX_INNER_MODEL, table_data.id, rotation: true);
+		SetRenderSkillItemModel(UI.TEX_MODEL, table_data.id);
+		SetRenderSkillItemSymbolModel(UI.TEX_INNER_MODEL, table_data.id);
 		SetProgressInt(detailBase, UI.PRG_EXP_BAR, 0);
 		SetSkillSlotTypeIcon(detailBase, UI.SPR_SKILL_TYPE_ICON, UI.SPR_SKILL_TYPE_ICON_BG, UI.SPR_SKILL_TYPE_ICON_RARITY, table_data);
 	}
@@ -161,8 +160,8 @@ public class ItemDetailSkill : SkillInfoBase
 		SetProgressInt(detailBase, UI.PRG_EXP_BAR, 0);
 		SetSkillSlotTypeIcon(detailBase, UI.SPR_SKILL_TYPE_ICON, UI.SPR_SKILL_TYPE_ICON_BG, UI.SPR_SKILL_TYPE_ICON_RARITY, null);
 		SetLabelText(detailBase, UI.LBL_DESCRIPTION, string.Empty);
-		ClearRenderModel((Enum)UI.TEX_MODEL);
-		ClearRenderModel((Enum)UI.TEX_INNER_MODEL);
+		ClearRenderModel(UI.TEX_MODEL);
+		ClearRenderModel(UI.TEX_INNER_MODEL);
 		SkillCompareParam(null, GetCompareItem());
 	}
 
@@ -220,7 +219,6 @@ public class ItemDetailSkill : SkillInfoBase
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<StatusManager>.I.SendInventorySkillLock(skillItemInfo.uniqueID, delegate(bool is_success, SkillItemInfo recv_item)
 			{
-				ItemDetailSkill itemDetailSkill = this;
 				if (is_success)
 				{
 					if (recv_item.isFavorite)

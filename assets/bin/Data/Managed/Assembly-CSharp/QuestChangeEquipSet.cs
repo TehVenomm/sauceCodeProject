@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -86,34 +85,36 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 	{
 		UserInfo userInfo = MonoBehaviourSingleton<UserInfoManager>.I.userInfo;
 		UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
-		InGameRecorder.PlayerRecord playerRecord = new InGameRecorder.PlayerRecord();
-		playerRecord.id = 0;
-		playerRecord.isNPC = false;
-		playerRecord.isSelf = true;
+		InGameRecorder.PlayerRecord obj = new InGameRecorder.PlayerRecord
+		{
+			id = 0,
+			isNPC = false,
+			isSelf = true
+		};
 		MonoBehaviourSingleton<StatusManager>.I.CreateLocalEquipSetData();
-		playerRecord.playerLoadInfo = CreatePlayerLoadInfo(userStatus.eSetNo);
-		playerRecord.animID = 90;
-		playerRecord.charaInfo = new CharaInfo();
-		playerRecord.charaInfo.userId = userInfo.id;
-		playerRecord.charaInfo.name = userInfo.name;
-		playerRecord.charaInfo.comment = userInfo.comment;
-		playerRecord.charaInfo.code = userInfo.code;
-		playerRecord.charaInfo.level = userStatus.level;
-		playerRecord.charaInfo.atk = userStatus.atk;
-		playerRecord.charaInfo.def = userStatus.def;
-		playerRecord.charaInfo.hp = userStatus.hp;
-		playerRecord.charaInfo.faceId = userStatus.faceId;
-		playerRecord.charaInfo.sex = userStatus.sex;
-		playerRecord.charaInfo.equipSet = null;
+		obj.playerLoadInfo = CreatePlayerLoadInfo(userStatus.eSetNo);
+		obj.animID = 90;
+		obj.charaInfo = new CharaInfo();
+		obj.charaInfo.userId = userInfo.id;
+		obj.charaInfo.name = userInfo.name;
+		obj.charaInfo.comment = userInfo.comment;
+		obj.charaInfo.code = userInfo.code;
+		obj.charaInfo.level = userStatus.level;
+		obj.charaInfo.atk = userStatus.atk;
+		obj.charaInfo.def = userStatus.def;
+		obj.charaInfo.hp = userStatus.hp;
+		obj.charaInfo.faceId = userStatus.faceId;
+		obj.charaInfo.sex = userStatus.sex;
+		obj.charaInfo.equipSet = null;
 		MonoBehaviourSingleton<StatusManager>.I.CreateLocalVisualEquipData();
 		StatusManager.LocalVisual localVisualEquip = MonoBehaviourSingleton<StatusManager>.I.GetLocalVisualEquip();
-		playerRecord.charaInfo.aId = (int)((localVisualEquip.visualItem[0] != null) ? localVisualEquip.visualItem[0].tableID : 0);
-		playerRecord.charaInfo.hId = (int)((localVisualEquip.visualItem[1] != null) ? localVisualEquip.visualItem[1].tableID : 0);
-		playerRecord.charaInfo.rId = (int)((localVisualEquip.visualItem[2] != null) ? localVisualEquip.visualItem[2].tableID : 0);
-		playerRecord.charaInfo.lId = (int)((localVisualEquip.visualItem[3] != null) ? localVisualEquip.visualItem[3].tableID : 0);
-		playerRecord.charaInfo.showHelm = (localVisualEquip.isVisibleHelm ? 1 : 0);
+		obj.charaInfo.aId = (int)((localVisualEquip.visualItem[0] != null) ? localVisualEquip.visualItem[0].tableID : 0);
+		obj.charaInfo.hId = (int)((localVisualEquip.visualItem[1] != null) ? localVisualEquip.visualItem[1].tableID : 0);
+		obj.charaInfo.rId = (int)((localVisualEquip.visualItem[2] != null) ? localVisualEquip.visualItem[2].tableID : 0);
+		obj.charaInfo.lId = (int)((localVisualEquip.visualItem[3] != null) ? localVisualEquip.visualItem[3].tableID : 0);
+		obj.charaInfo.showHelm = (localVisualEquip.isVisibleHelm ? 1 : 0);
 		equipSetMax = MonoBehaviourSingleton<StatusManager>.I.EquipSetNum();
-		return playerRecord;
+		return obj;
 	}
 
 	public override void UpdateUI()
@@ -169,9 +170,6 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 			int j = 0;
 			for (int num2 = localEquipSet.item.Length; j < num2; j++)
 			{
-				ITEM_ICON_TYPE iTEM_ICON_TYPE = ITEM_ICON_TYPE.NONE;
-				RARITY_TYPE? rARITY_TYPE = null;
-				ELEMENT_TYPE eLEMENT_TYPE = ELEMENT_TYPE.MAX;
 				int num3 = -1;
 				EquipItemInfo equipItemInfo = localEquipSet.item[j];
 				EquipItemTable.EquipItemData equipItemData = null;
@@ -198,9 +196,9 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 				{
 					if (equipItemData != null)
 					{
-						iTEM_ICON_TYPE = ItemIcon.GetItemIconType(equipItemData.type);
-						rARITY_TYPE = equipItemData.rarity;
-						eLEMENT_TYPE = equipItemData.GetTargetElementPriorityToTable();
+						ItemIcon.GetItemIconType(equipItemData.type);
+						_ = equipItemData.rarity;
+						equipItemData.GetTargetElementPriorityToTable();
 						num3 = equipItemData.GetIconID(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex);
 						SetActive(FindCtrl(transRoot, icons_level[j]), is_visible: false);
 					}
@@ -212,21 +210,21 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 					string text = string.Format(StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 1u), equipItemInfo.level.ToString());
 					SetLabelText(FindCtrl(transRoot, icons_level[j]), text);
 				}
-				Transform val = FindCtrl(transRoot, icons[j]);
-				val.GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
+				Transform transform = FindCtrl(transRoot, icons[j]);
+				transform.GetComponentsInChildren(includeInactive: true, Temporary.itemIconList);
 				int k = 0;
 				for (int count = Temporary.itemIconList.Count; k < count; k++)
 				{
-					Temporary.itemIconList[k].get_gameObject().SetActive(true);
+					Temporary.itemIconList[k].gameObject.SetActive(value: true);
 				}
 				Temporary.itemIconList.Clear();
-				ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, val, null, -1, "EQUIP", j);
+				ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, transform, null, -1, "EQUIP", j);
 				SetLongTouch(itemIcon.transform, "DETAIL", j);
 				SetEvent(FindCtrl(transRoot, icons_btn[j]), "DETAIL", j);
-				itemIcon.get_gameObject().SetActive(num3 != -1);
+				itemIcon.gameObject.SetActive(num3 != -1);
 				if (num3 != -1)
 				{
-					itemIcon.SetEquipExtInvertedColor(equipItemInfo, base.GetComponent<UILabel>((Enum)icons_level[j]));
+					itemIcon.SetEquipExtInvertedColor(equipItemInfo, GetComponent<UILabel>(icons_level[j]));
 				}
 				UpdateEquipSkillButton(equipItemInfo, j);
 			}
@@ -300,7 +298,7 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 			selfCharaEquipSetNo = equipSetMax - 1;
 		}
 		RefreshUI();
-		this.StartCoroutine(ReloadModelCoroutine());
+		StartCoroutine(ReloadModelCoroutine());
 	}
 
 	protected void OnQuery_EQUIP_SET_R()
@@ -311,7 +309,7 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 			selfCharaEquipSetNo = 0;
 		}
 		RefreshUI();
-		this.StartCoroutine(ReloadModelCoroutine());
+		StartCoroutine(ReloadModelCoroutine());
 	}
 
 	protected override void OnQuery_CHANGE_MODE()
@@ -345,10 +343,10 @@ public class QuestChangeEquipSet : QuestRoomUserInfoDetail
 		UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
 		localEquipSet = MonoBehaviourSingleton<StatusManager>.I.GetEquipSet(set_no);
 		StatusManager.LocalVisual localVisual = new StatusManager.LocalVisual();
-		localVisual.visualItem[0] = ((!isVisualMode) ? null : MonoBehaviourSingleton<InventoryManager>.I.GetEquipItem(ulong.Parse(userStatus.armorUniqId)));
-		localVisual.visualItem[1] = ((!isVisualMode) ? null : MonoBehaviourSingleton<InventoryManager>.I.GetEquipItem(ulong.Parse(userStatus.helmUniqId)));
-		localVisual.visualItem[2] = ((!isVisualMode) ? null : MonoBehaviourSingleton<InventoryManager>.I.GetEquipItem(ulong.Parse(userStatus.armUniqId)));
-		localVisual.visualItem[3] = ((!isVisualMode) ? null : MonoBehaviourSingleton<InventoryManager>.I.GetEquipItem(ulong.Parse(userStatus.legUniqId)));
+		localVisual.visualItem[0] = (isVisualMode ? MonoBehaviourSingleton<InventoryManager>.I.GetEquipItem(ulong.Parse(userStatus.armorUniqId)) : null);
+		localVisual.visualItem[1] = (isVisualMode ? MonoBehaviourSingleton<InventoryManager>.I.GetEquipItem(ulong.Parse(userStatus.helmUniqId)) : null);
+		localVisual.visualItem[2] = (isVisualMode ? MonoBehaviourSingleton<InventoryManager>.I.GetEquipItem(ulong.Parse(userStatus.armUniqId)) : null);
+		localVisual.visualItem[3] = (isVisualMode ? MonoBehaviourSingleton<InventoryManager>.I.GetEquipItem(ulong.Parse(userStatus.legUniqId)) : null);
 		localVisual.isVisibleHelm = (MonoBehaviourSingleton<StatusManager>.I.GetEquippingShowHelm(set_no) > 0);
 		playerLoadInfo.SetupLoadInfo(localEquipSet, 0uL, localVisual.VisialID(0), localVisual.VisialID(1), localVisual.VisialID(2), localVisual.VisialID(3), localVisual.isVisibleHelm);
 		return playerLoadInfo;

@@ -54,14 +54,12 @@ public class CryptoPrefs
 
 	public static bool HasKey(string key)
 	{
-		string hash = GetHash(key);
-		return PlayerPrefs.HasKey(hash);
+		return PlayerPrefs.HasKey(GetHash(key));
 	}
 
 	public static void DeleteKey(string key)
 	{
-		string hash = GetHash(key);
-		PlayerPrefs.DeleteKey(hash);
+		PlayerPrefs.DeleteKey(GetHash(key));
 	}
 
 	public static void DeleteAll()
@@ -76,47 +74,45 @@ public class CryptoPrefs
 
 	private static string Decrypt(string encString)
 	{
-		RijndaelManaged rijndaelManaged = new RijndaelManaged();
-		rijndaelManaged.Padding = PaddingMode.Zeros;
-		rijndaelManaged.Mode = CipherMode.CBC;
-		rijndaelManaged.KeySize = 128;
-		rijndaelManaged.BlockSize = 128;
-		RijndaelManaged rijndaelManaged2 = rijndaelManaged;
+		RijndaelManaged obj = new RijndaelManaged
+		{
+			Padding = PaddingMode.Zeros,
+			Mode = CipherMode.CBC,
+			KeySize = 128,
+			BlockSize = 128
+		};
 		byte[] bytes = Encoding.UTF8.GetBytes(sKEY);
 		byte[] rgbIV = Convert.FromBase64String(sIV);
-		ICryptoTransform transform = rijndaelManaged2.CreateDecryptor(bytes, rgbIV);
+		ICryptoTransform transform = obj.CreateDecryptor(bytes, rgbIV);
 		byte[] array = Convert.FromBase64String(encString);
 		byte[] array2 = new byte[array.Length];
-		MemoryStream stream = new MemoryStream(array);
-		CryptoStream cryptoStream = new CryptoStream(stream, transform, CryptoStreamMode.Read);
-		cryptoStream.Read(array2, 0, array2.Length);
+		new CryptoStream(new MemoryStream(array), transform, CryptoStreamMode.Read).Read(array2, 0, array2.Length);
 		return Encoding.UTF8.GetString(array2).TrimEnd(default(char));
 	}
 
 	private static string Encrypt(string rawString)
 	{
-		RijndaelManaged rijndaelManaged = new RijndaelManaged();
-		rijndaelManaged.Padding = PaddingMode.Zeros;
-		rijndaelManaged.Mode = CipherMode.CBC;
-		rijndaelManaged.KeySize = 128;
-		rijndaelManaged.BlockSize = 128;
-		RijndaelManaged rijndaelManaged2 = rijndaelManaged;
+		RijndaelManaged obj = new RijndaelManaged
+		{
+			Padding = PaddingMode.Zeros,
+			Mode = CipherMode.CBC,
+			KeySize = 128,
+			BlockSize = 128
+		};
 		byte[] bytes = Encoding.UTF8.GetBytes(sKEY);
 		byte[] rgbIV = Convert.FromBase64String(sIV);
-		ICryptoTransform transform = rijndaelManaged2.CreateEncryptor(bytes, rgbIV);
+		ICryptoTransform transform = obj.CreateEncryptor(bytes, rgbIV);
 		MemoryStream memoryStream = new MemoryStream();
 		CryptoStream cryptoStream = new CryptoStream(memoryStream, transform, CryptoStreamMode.Write);
 		byte[] bytes2 = Encoding.UTF8.GetBytes(rawString);
 		cryptoStream.Write(bytes2, 0, bytes2.Length);
 		cryptoStream.FlushFinalBlock();
-		byte[] inArray = memoryStream.ToArray();
-		return Convert.ToBase64String(inArray);
+		return Convert.ToBase64String(memoryStream.ToArray());
 	}
 
 	private static string GetHash(string key)
 	{
-		MD5 mD = new MD5CryptoServiceProvider();
-		byte[] array = mD.ComputeHash(Encoding.UTF8.GetBytes(key));
+		byte[] array = new MD5CryptoServiceProvider().ComputeHash(Encoding.UTF8.GetBytes(key));
 		StringBuilder stringBuilder = new StringBuilder();
 		for (int i = 0; i < array.Length; i++)
 		{

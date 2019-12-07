@@ -3,11 +3,6 @@ using UnityEngine;
 
 public class OpeningStartProcess : MonoBehaviour
 {
-	public OpeningStartProcess()
-		: this()
-	{
-	}
-
 	private IEnumerator Start()
 	{
 		yield return ResourceSizeInfo.Init();
@@ -28,24 +23,24 @@ public class OpeningStartProcess : MonoBehaviour
 		{
 			yield return null;
 		}
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<FieldManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<FieldManager>();
 		Singleton<FieldMapTable>.Create();
-		string csv3 = DataTableManager.Decrypt((lo_field_map_table.loadedObject as TextAsset).get_text());
-		Singleton<FieldMapTable>.I.CreateFieldMapTable(csv3);
-		csv3 = DataTableManager.Decrypt((lo_portal_table.loadedObject as TextAsset).get_text());
-		Singleton<FieldMapTable>.I.CreatePortalTable(csv3);
-		csv3 = DataTableManager.Decrypt((lo_enemy_pop_table.loadedObject as TextAsset).get_text());
-		Singleton<FieldMapTable>.I.CreateEnemyPopTable(csv3);
-		if (Camera.get_main() != null)
+		string csv_text = DataTableManager.Decrypt((lo_field_map_table.loadedObject as TextAsset).text);
+		Singleton<FieldMapTable>.I.CreateFieldMapTable(csv_text);
+		csv_text = DataTableManager.Decrypt((lo_portal_table.loadedObject as TextAsset).text);
+		Singleton<FieldMapTable>.I.CreatePortalTable(csv_text);
+		csv_text = DataTableManager.Decrypt((lo_enemy_pop_table.loadedObject as TextAsset).text);
+		Singleton<FieldMapTable>.I.CreateEnemyPopTable(csv_text);
+		if (Camera.main != null)
 		{
-			Object.DestroyImmediate(Camera.get_main().get_gameObject());
+			Object.DestroyImmediate(Camera.main.gameObject);
 		}
 		ResourceUtility.Realizes(lo_common_prefabs.loadedObjects[0].obj, MonoBehaviourSingleton<AppMain>.I._transform);
 		ResourceUtility.Realizes(lo_common_prefabs.loadedObjects[1].obj, MonoBehaviourSingleton<AppMain>.I._transform);
-		MonoBehaviourSingleton<AppMain>.I.SetMainCamera(Camera.get_main());
+		MonoBehaviourSingleton<AppMain>.I.SetMainCamera(Camera.main);
 		MonoBehaviourSingleton<AudioListenerManager>.I.SetFlag(AudioListenerManager.STATUS_FLAGS.CAMERA_MAIN_ACTIVE, isEnable: true);
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<WorldMapManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<FilterManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<WorldMapManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<FilterManager>();
 		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.INITIALIZE, is_disable: false);
 		MonoBehaviourSingleton<AppMain>.I.startScene = string.Empty;
 		MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Title", "Opening");

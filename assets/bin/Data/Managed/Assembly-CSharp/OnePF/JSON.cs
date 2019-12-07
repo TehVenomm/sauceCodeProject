@@ -372,29 +372,16 @@ namespace OnePF
 				{
 					bool flag = true;
 					builder.Append('{');
-					IEnumerator enumerator = obj.Keys.GetEnumerator();
-					try
+					foreach (object key in obj.Keys)
 					{
-						while (enumerator.MoveNext())
+						if (!flag)
 						{
-							object current = enumerator.Current;
-							if (!flag)
-							{
-								builder.Append(',');
-							}
-							SerializeString(current.ToString());
-							builder.Append(':');
-							SerializeValue(obj[current]);
-							flag = false;
+							builder.Append(',');
 						}
-					}
-					finally
-					{
-						IDisposable disposable;
-						if ((disposable = (enumerator as IDisposable)) != null)
-						{
-							disposable.Dispose();
-						}
+						SerializeString(key.ToString());
+						builder.Append(':');
+						SerializeValue(obj[key]);
+						flag = false;
 					}
 					builder.Append('}');
 				}
@@ -403,27 +390,14 @@ namespace OnePF
 				{
 					builder.Append('[');
 					bool flag = true;
-					IEnumerator enumerator = anArray.GetEnumerator();
-					try
+					foreach (object item in anArray)
 					{
-						while (enumerator.MoveNext())
+						if (!flag)
 						{
-							object current = enumerator.Current;
-							if (!flag)
-							{
-								builder.Append(',');
-							}
-							SerializeValue(current);
-							flag = false;
+							builder.Append(',');
 						}
-					}
-					finally
-					{
-						IDisposable disposable;
-						if ((disposable = (enumerator as IDisposable)) != null)
-						{
-							disposable.Dispose();
-						}
+						SerializeValue(item);
+						flag = false;
 					}
 					builder.Append(']');
 				}
@@ -432,8 +406,7 @@ namespace OnePF
 				{
 					builder.Append('"');
 					char[] array = str.ToCharArray();
-					char[] array2 = array;
-					foreach (char c in array2)
+					foreach (char c in array)
 					{
 						switch (c)
 						{
@@ -556,7 +529,7 @@ namespace OnePF
 			{
 				return Convert.ToString(fields[fieldName]);
 			}
-			return string.Empty;
+			return "";
 		}
 
 		public int ToInt(string fieldName)
@@ -606,167 +579,147 @@ namespace OnePF
 
 		public static implicit operator Vector2(JSON value)
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			return Vector2.op_Implicit(new Vector3(Convert.ToSingle(value["x"]), Convert.ToSingle(value["y"])));
+			return new Vector3(Convert.ToSingle(value["x"]), Convert.ToSingle(value["y"]));
 		}
 
 		public static explicit operator JSON(Vector2 value)
 		{
-			JSON jSON = new JSON();
-			jSON["x"] = value.x;
-			jSON["y"] = value.y;
-			return jSON;
+			return new JSON
+			{
+				["x"] = value.x,
+				["y"] = value.y
+			};
 		}
 
 		public static implicit operator Vector3(JSON value)
 		{
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			return new Vector3(Convert.ToSingle(value["x"]), Convert.ToSingle(value["y"]), Convert.ToSingle(value["z"]));
 		}
 
 		public static explicit operator JSON(Vector3 value)
 		{
-			JSON jSON = new JSON();
-			jSON["x"] = value.x;
-			jSON["y"] = value.y;
-			jSON["z"] = value.z;
-			return jSON;
+			return new JSON
+			{
+				["x"] = value.x,
+				["y"] = value.y,
+				["z"] = value.z
+			};
 		}
 
 		public static implicit operator Quaternion(JSON value)
 		{
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			return new Quaternion(Convert.ToSingle(value["x"]), Convert.ToSingle(value["y"]), Convert.ToSingle(value["z"]), Convert.ToSingle(value["w"]));
 		}
 
 		public static explicit operator JSON(Quaternion value)
 		{
-			JSON jSON = new JSON();
-			jSON["x"] = value.x;
-			jSON["y"] = value.y;
-			jSON["z"] = value.z;
-			jSON["w"] = value.w;
-			return jSON;
+			return new JSON
+			{
+				["x"] = value.x,
+				["y"] = value.y,
+				["z"] = value.z,
+				["w"] = value.w
+			};
 		}
 
 		public static implicit operator Color(JSON value)
 		{
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			return new Color(Convert.ToSingle(value["r"]), Convert.ToSingle(value["g"]), Convert.ToSingle(value["b"]), Convert.ToSingle(value["a"]));
 		}
 
 		public static explicit operator JSON(Color value)
 		{
-			JSON jSON = new JSON();
-			jSON["r"] = value.r;
-			jSON["g"] = value.g;
-			jSON["b"] = value.b;
-			jSON["a"] = value.a;
-			return jSON;
+			return new JSON
+			{
+				["r"] = value.r,
+				["g"] = value.g,
+				["b"] = value.b,
+				["a"] = value.a
+			};
 		}
 
 		public static implicit operator Color32(JSON value)
 		{
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			return new Color32(Convert.ToByte(value["r"]), Convert.ToByte(value["g"]), Convert.ToByte(value["b"]), Convert.ToByte(value["a"]));
 		}
 
 		public static explicit operator JSON(Color32 value)
 		{
-			JSON jSON = new JSON();
-			jSON["r"] = value.r;
-			jSON["g"] = value.g;
-			jSON["b"] = value.b;
-			jSON["a"] = value.a;
-			return jSON;
+			return new JSON
+			{
+				["r"] = value.r,
+				["g"] = value.g,
+				["b"] = value.b,
+				["a"] = value.a
+			};
 		}
 
 		public static implicit operator Rect(JSON value)
 		{
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			return new Rect((float)(int)Convert.ToByte(value["left"]), (float)(int)Convert.ToByte(value["top"]), (float)(int)Convert.ToByte(value["width"]), (float)(int)Convert.ToByte(value["height"]));
+			return new Rect((int)Convert.ToByte(value["left"]), (int)Convert.ToByte(value["top"]), (int)Convert.ToByte(value["width"]), (int)Convert.ToByte(value["height"]));
 		}
 
 		public static explicit operator JSON(Rect value)
 		{
-			JSON jSON = new JSON();
-			jSON["left"] = value.get_xMin();
-			jSON["top"] = value.get_yMax();
-			jSON["width"] = value.get_width();
-			jSON["height"] = value.get_height();
-			return jSON;
+			return new JSON
+			{
+				["left"] = value.xMin,
+				["top"] = value.yMax,
+				["width"] = value.width,
+				["height"] = value.height
+			};
 		}
 
 		public T[] ToArray<T>(string fieldName)
 		{
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
 			if (fields.ContainsKey(fieldName) && fields[fieldName] is IEnumerable)
 			{
 				List<T> list = new List<T>();
-				IEnumerator enumerator = (fields[fieldName] as IEnumerable).GetEnumerator();
-				try
+				foreach (object item in fields[fieldName] as IEnumerable)
 				{
-					while (enumerator.MoveNext())
+					if (list is List<string>)
 					{
-						object current = enumerator.Current;
-						if (list is List<string>)
-						{
-							(list as List<string>).Add(Convert.ToString(current));
-						}
-						else if (list is List<int>)
-						{
-							(list as List<int>).Add(Convert.ToInt32(current));
-						}
-						else if (list is List<float>)
-						{
-							(list as List<float>).Add(Convert.ToSingle(current));
-						}
-						else if (list is List<bool>)
-						{
-							(list as List<bool>).Add(Convert.ToBoolean(current));
-						}
-						else if (list is List<Vector2>)
-						{
-							(list as List<Vector2>).Add((JSON)current);
-						}
-						else if (list is List<Vector3>)
-						{
-							(list as List<Vector3>).Add((JSON)current);
-						}
-						else if (list is List<Rect>)
-						{
-							(list as List<Rect>).Add((JSON)current);
-						}
-						else if (list is List<Color>)
-						{
-							(list as List<Color>).Add((JSON)current);
-						}
-						else if (list is List<Color32>)
-						{
-							(list as List<Color32>).Add((JSON)current);
-						}
-						else if (list is List<Quaternion>)
-						{
-							(list as List<Quaternion>).Add((JSON)current);
-						}
-						else if (list is List<JSON>)
-						{
-							(list as List<JSON>).Add((JSON)current);
-						}
+						(list as List<string>).Add(Convert.ToString(item));
 					}
-				}
-				finally
-				{
-					IDisposable disposable;
-					if ((disposable = (enumerator as IDisposable)) != null)
+					else if (list is List<int>)
 					{
-						disposable.Dispose();
+						(list as List<int>).Add(Convert.ToInt32(item));
+					}
+					else if (list is List<float>)
+					{
+						(list as List<float>).Add(Convert.ToSingle(item));
+					}
+					else if (list is List<bool>)
+					{
+						(list as List<bool>).Add(Convert.ToBoolean(item));
+					}
+					else if (list is List<Vector2>)
+					{
+						(list as List<Vector2>).Add((JSON)item);
+					}
+					else if (list is List<Vector3>)
+					{
+						(list as List<Vector3>).Add((JSON)item);
+					}
+					else if (list is List<Rect>)
+					{
+						(list as List<Rect>).Add((JSON)item);
+					}
+					else if (list is List<Color>)
+					{
+						(list as List<Color>).Add((JSON)item);
+					}
+					else if (list is List<Color32>)
+					{
+						(list as List<Color32>).Add((JSON)item);
+					}
+					else if (list is List<Quaternion>)
+					{
+						(list as List<Quaternion>).Add((JSON)item);
+					}
+					else if (list is List<JSON>)
+					{
+						(list as List<JSON>).Add((JSON)item);
 					}
 				}
 				return list.ToArray();

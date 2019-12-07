@@ -7,8 +7,7 @@ public class Coop_Model_PlayerChangeWeapon : Coop_Model_ObjectBase
 
 	public override bool IsHandleable(StageObject owner)
 	{
-		Character character = owner as Character;
-		if (!character.IsChangeableAction((Character.ACTION_ID)27))
+		if (!(owner as Character).IsChangeableAction((Character.ACTION_ID)27))
 		{
 			return false;
 		}

@@ -31,15 +31,10 @@ public class RegionMapRoot : MonoBehaviour
 		{
 			if (_animator == null)
 			{
-				_animator = this.GetComponent<Animator>();
+				_animator = GetComponent<Animator>();
 			}
 			return _animator;
 		}
-	}
-
-	public RegionMapRoot()
-		: this()
-	{
 	}
 
 	public RegionMapLocation FindLocation(int id)
@@ -59,24 +54,24 @@ public class RegionMapRoot : MonoBehaviour
 
 	public void InitPortalStatus(Action onComplete)
 	{
-		this.StartCoroutine(InitPortalStatusImpl(onComplete));
+		StartCoroutine(InitPortalStatusImpl(onComplete));
 	}
 
 	private IEnumerator InitPortalStatusImpl(Action onComplete)
 	{
-		LoadingQueue loadQueue = new LoadingQueue(this);
+		LoadingQueue loadingQueue = new LoadingQueue(this);
 		UIntKeyTable<LoadObject> loadTextures = new UIntKeyTable<LoadObject>();
 		for (int i = 0; i < locations.Length; i++)
 		{
 			FieldMapTable.FieldMapTableData tableData = locations[i].tableData;
 			if (tableData != null && tableData.hasChildRegion && loadTextures.Get(tableData.iconId) == null)
 			{
-				loadTextures.Add(tableData.iconId, loadQueue.Load(RESOURCE_CATEGORY.DUNGEON_ICON, ResourceName.GetDungeonIcon(tableData.iconId)));
+				loadTextures.Add(tableData.iconId, loadingQueue.Load(RESOURCE_CATEGORY.DUNGEON_ICON, ResourceName.GetDungeonIcon(tableData.iconId)));
 			}
 		}
-		if (loadQueue.IsLoading())
+		if (loadingQueue.IsLoading())
 		{
-			yield return loadQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		for (int j = 0; j < locations.Length; j++)
 		{

@@ -83,14 +83,14 @@ public class FriendArenaRankingLast : FriendArenaRankingBase
 	{
 		if (nameEventData == null)
 		{
-			SetLabelText((Enum)UI.LBL_ARENA_NAME, string.Empty);
-			SetLabelText((Enum)UI.LBL_END_DATE, string.Empty);
+			SetLabelText(UI.LBL_ARENA_NAME, "");
+			SetLabelText(UI.LBL_END_DATE, "");
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_ARENA_NAME, nameEventData.name);
+			SetLabelText(UI.LBL_ARENA_NAME, nameEventData.name);
 			string endDateString = QuestUtility.GetEndDateString(nameEventData);
-			SetLabelText((Enum)UI.LBL_END_DATE, endDateString);
+			SetLabelText(UI.LBL_END_DATE, endDateString);
 		}
 	}
 

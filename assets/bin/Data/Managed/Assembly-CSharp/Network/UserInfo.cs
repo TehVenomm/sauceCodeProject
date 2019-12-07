@@ -7,11 +7,11 @@ namespace Network
 	{
 		public int id;
 
-		public string name = string.Empty;
+		public string name = "";
 
-		public string comment = string.Empty;
+		public string comment = "";
 
-		public string lastLogin = string.Empty;
+		public string lastLogin = "";
 
 		public int isParentPassSet;
 
@@ -27,11 +27,11 @@ namespace Network
 
 		public string advancedUserMail;
 
-		public string code = string.Empty;
+		public string code = "";
 
 		public bool inputInviteFlag;
 
-		public string birthday = string.Empty;
+		public string birthday = "";
 
 		public bool communityFlag;
 
@@ -69,7 +69,17 @@ namespace Network
 			}
 		}
 
-		public bool IsAdvanced => isAdvancedUser || isAdvancedUserGoogle;
+		public bool IsAdvanced
+		{
+			get
+			{
+				if (!isAdvancedUser)
+				{
+					return isAdvancedUserGoogle;
+				}
+				return true;
+			}
+		}
 
 		public bool IsModiedName => name != "/colopl_rob";
 	}

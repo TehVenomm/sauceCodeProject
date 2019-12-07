@@ -7,18 +7,13 @@ public class EffectObject : MonoBehaviour
 
 	public string effectName;
 
-	public EffectObject()
-		: this()
-	{
-	}
-
 	private IEnumerator Start()
 	{
 		while (wait)
 		{
 			yield return null;
 		}
-		EffectManager.GetEffect(effectName, this.get_transform());
+		EffectManager.GetEffect(effectName, base.transform);
 		yield return null;
 		Object.DestroyImmediate(this);
 	}

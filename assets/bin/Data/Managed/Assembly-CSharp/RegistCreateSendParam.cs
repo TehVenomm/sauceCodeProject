@@ -1,12 +1,12 @@
 public class RegistCreateSendParam
 {
-	public string d = string.Empty;
+	public string d = "";
 
-	public string fromCode = string.Empty;
+	public string fromCode = "";
 
-	public string fromParam = string.Empty;
+	public string fromParam = "";
 
-	public string fromAffiliate = string.Empty;
+	public string fromAffiliate = "";
 
 	public void SetAttribute(UserFromAttributeData data)
 	{

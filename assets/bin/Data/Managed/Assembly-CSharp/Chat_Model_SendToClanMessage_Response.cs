@@ -84,9 +84,8 @@ public class Chat_Model_SendToClanMessage_Response : Chat_Model_Base
 			chat_Model_SendToClanMessage_Response.SenderId = senderId;
 			chat_Model_SendToClanMessage_Response.Message = message;
 			chat_Model_SendToClanMessage_Response.SenderName = senderName;
-			Chat_Model_SendToClanMessage_Response chat_Model_SendToClanMessage_Response2 = chat_Model_SendToClanMessage_Response;
-			chat_Model_SendToClanMessage_Response2.SetErrorType(text);
-			return chat_Model_SendToClanMessage_Response2;
+			chat_Model_SendToClanMessage_Response.SetErrorType(text);
+			return chat_Model_SendToClanMessage_Response;
 		}
 		return null;
 	}

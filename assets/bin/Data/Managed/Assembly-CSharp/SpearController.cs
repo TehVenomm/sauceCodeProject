@@ -161,7 +161,11 @@ public class SpearController : IWeaponController
 	{
 		if (owner != null)
 		{
-			return Guarding && !owner.disableGuard;
+			if (Guarding)
+			{
+				return !owner.disableGuard;
+			}
+			return false;
 		}
 		return Guarding;
 	}
@@ -311,7 +315,7 @@ public class SpearController : IWeaponController
 			if (owner.isBoostMode)
 			{
 				float num4 = 0f;
-				num4 = ((!owner.enableInputCharge) ? (spearInfo.Soul_BoostModeGaugeDecreasePerSecond * Time.get_deltaTime()) : (spearInfo.Soul_BoostModeGaugeDecreasePerSecondOnSpActionCharging * Time.get_deltaTime()));
+				num4 = ((!owner.enableInputCharge) ? (spearInfo.Soul_BoostModeGaugeDecreasePerSecond * Time.deltaTime) : (spearInfo.Soul_BoostModeGaugeDecreasePerSecondOnSpActionCharging * Time.deltaTime));
 				float num5 = 1f + owner.GetSpGaugeDecreasingRate();
 				spActionGauge -= num4 * num5;
 				if (spActionGauge <= 0f)
@@ -324,7 +328,7 @@ public class SpearController : IWeaponController
 			if (owner.isActSpecialAction)
 			{
 				float num = 1f + owner.GetSpGaugeDecreasingRate();
-				spActionGauge -= spearInfo.burstSpearInfo.gaugeDecreaseOnSpAttackPerSecond * Time.get_deltaTime() * num;
+				spActionGauge -= spearInfo.burstSpearInfo.gaugeDecreaseOnSpAttackPerSecond * Time.deltaTime * num;
 				if (spActionGauge <= 0f)
 				{
 					spActionGauge = 0f;
@@ -334,7 +338,7 @@ public class SpearController : IWeaponController
 			else if (enableSpin)
 			{
 				float num2 = 1f + owner.GetSpGaugeDecreasingRate();
-				spActionGauge -= spearInfo.burstSpearInfo.gaugeDecreaseOnSpinPerSecond * Time.get_deltaTime() * num2;
+				spActionGauge -= spearInfo.burstSpearInfo.gaugeDecreaseOnSpinPerSecond * Time.deltaTime * num2;
 				if (spActionGauge <= 0f)
 				{
 					spActionGauge = 0f;
@@ -344,7 +348,7 @@ public class SpearController : IWeaponController
 			else
 			{
 				float num3 = 1f + owner.buffParam.GetGaugeIncreaseRate(SP_ATTACK_TYPE.BURST);
-				spActionGauge += spearInfo.burstSpearInfo.gaugeIncreasePerSecond * Time.get_deltaTime() * num3;
+				spActionGauge += spearInfo.burstSpearInfo.gaugeIncreasePerSecond * Time.deltaTime * num3;
 				if (spActionGauge >= owner.CurrentWeaponSpActionGaugeMax)
 				{
 					spActionGauge = owner.CurrentWeaponSpActionGaugeMax;
@@ -364,9 +368,9 @@ public class SpearController : IWeaponController
 			return;
 		}
 		float spinRate = GetSpinRate();
-		float num = Mathf.Lerp(spearInfo.burstSpearInfo.spinSpeedMin, spearInfo.burstSpearInfo.spinSpeedMax, spinRate);
-		spinNode.Rotate(0f, 0f, num);
-		spinTimer += Time.get_deltaTime();
+		float zAngle = Mathf.Lerp(spearInfo.burstSpearInfo.spinSpeedMin, spearInfo.burstSpearInfo.spinSpeedMax, spinRate);
+		spinNode.Rotate(0f, 0f, zAngle);
+		spinTimer += Time.deltaTime;
 		if (spinRate >= 1f)
 		{
 			if (!spinEffectCtrl.IsCurrentState(EFFECT_STATE_NAME_HASH_LOOP_2))
@@ -639,7 +643,11 @@ public class SpearController : IWeaponController
 		{
 			return false;
 		}
-		return owner.inputComboFlag && owner.inputComboID == spearInfo.Soul_SpAttackContinueId;
+		if (owner.inputComboFlag)
+		{
+			return owner.inputComboID == spearInfo.Soul_SpAttackContinueId;
+		}
+		return false;
 	}
 
 	public bool IsEnableBurstCombo()
@@ -663,7 +671,7 @@ public class SpearController : IWeaponController
 	{
 		if (MonoBehaviourSingleton<EffectManager>.IsValid() && !(bladeEffectTrans == null))
 		{
-			EffectManager.ReleaseEffect(bladeEffectTrans.get_gameObject());
+			EffectManager.ReleaseEffect(bladeEffectTrans.gameObject);
 			bladeEffectTrans = null;
 		}
 	}
@@ -672,7 +680,7 @@ public class SpearController : IWeaponController
 	{
 		if (!(spinEffectTrans == null))
 		{
-			EffectManager.ReleaseEffect(spinEffectTrans.get_gameObject());
+			EffectManager.ReleaseEffect(spinEffectTrans.gameObject);
 			spinEffectTrans = null;
 		}
 	}
@@ -779,8 +787,6 @@ public class SpearController : IWeaponController
 
 	public bool TryOverrideHitEffect(ref EnemyHitTypeTable.TypeData retTypeData, ref Vector3 scale)
 	{
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
 		if (!isCtrlActive)
 		{
 			return false;
@@ -813,11 +819,7 @@ public class SpearController : IWeaponController
 		{
 			int hitComboAttackId = spearInfo.burstSpearInfo.hitComboAttackId;
 			string motionLayerName = owner.GetMotionLayerName(Player.ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.BURST, hitComboAttackId);
-			Player player = owner;
-			int id = hitComboAttackId;
-			bool send_packet = true;
-			string motionLayerName2 = motionLayerName;
-			player.ActAttack(id, send_packet, sync_immediately: false, motionLayerName2, string.Empty);
+			owner.ActAttack(hitComboAttackId, send_packet: true, sync_immediately: false, motionLayerName);
 		}
 	}
 
@@ -850,12 +852,11 @@ public class SpearController : IWeaponController
 
 	public void OnWeaponActionEnd()
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		if (isCtrlActive)
 		{
 			if (spinNode != null)
 			{
-				spinNode.set_localRotation(InGameUtility.QUATERNION_IDENTITY);
+				spinNode.localRotation = InGameUtility.QUATERNION_IDENTITY;
 			}
 			enableSpin = false;
 			spinTimer = 0f;
@@ -904,18 +905,14 @@ public class SpearController : IWeaponController
 
 	public void OnFixPositionWeaponR_ON(Vector3 pos)
 	{
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 		if (isCtrlActive && owner.CheckSpAttackType(SP_ATTACK_TYPE.BURST))
 		{
-			Vector3 val = default(Vector3);
-			val._002Ector(pos.x, 0f, pos.z);
-			EffectManager.OneShot(throwGroundEffectName, val, Quaternion.get_identity());
+			Vector3 vector = new Vector3(pos.x, 0f, pos.z);
+			EffectManager.OneShot(throwGroundEffectName, vector, Quaternion.identity);
 			if (enableSpin)
 			{
 				spinGroundEffectTrans = EffectManager.GetEffect(spinThrowGroundEffectName);
-				spinGroundEffectTrans.set_position(val);
+				spinGroundEffectTrans.position = vector;
 			}
 		}
 	}
@@ -943,7 +940,11 @@ public class SpearController : IWeaponController
 	public static bool IsOracleAttackId(int attackId)
 	{
 		InGameSettingsManager.Player.SpearActionInfo.Oracle oracle = MonoBehaviourSingleton<InGameSettingsManager>.I.player.spearActionInfo.oracle;
-		return attackId >= oracle.comboAttackId && attackId <= oracle.reservedAttackId;
+		if (attackId >= oracle.comboAttackId)
+		{
+			return attackId <= oracle.reservedAttackId;
+		}
+		return false;
 	}
 
 	public bool CanConsumeOracleStock(int count = 0)
@@ -973,12 +974,15 @@ public class SpearController : IWeaponController
 	private bool LotFreeToUseStock()
 	{
 		float freeStockProbability = owner.buffParam.passive.freeStockProbability;
-		return freeStockProbability > 0f && Random.Range(0f, 1f) <= freeStockProbability;
+		if (freeStockProbability > 0f)
+		{
+			return UnityEngine.Random.Range(0f, 1f) <= freeStockProbability;
+		}
+		return false;
 	}
 
 	public void EventShotOracleSp(AnimEventData.EventData data)
 	{
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		if (oracleSpBullet != null)
 		{
 			DestroyOracleSp();
@@ -986,7 +990,7 @@ public class SpearController : IWeaponController
 		AttackInfo attackInfo = owner.FindAttackInfo(data.stringArgs[0]);
 		if (attackInfo != null)
 		{
-			oracleSpBullet = AnimEventShot.Create(owner, data, attackInfo, Vector3.get_zero());
+			oracleSpBullet = AnimEventShot.Create(owner, data, attackInfo, Vector3.zero);
 			if (oracleSpBullet != null)
 			{
 				oracleSpController = oracleSpBullet.GetComponent<BulletControllerOracleSpearSp>();
@@ -1025,7 +1029,7 @@ public class SpearController : IWeaponController
 		}
 		if (oracleGuardEffect != null)
 		{
-			EffectManager.ReleaseEffect(oracleGuardEffect.get_gameObject(), isPlayEnd, !isPlayEnd);
+			EffectManager.ReleaseEffect(oracleGuardEffect.gameObject, isPlayEnd, !isPlayEnd);
 			oracleGuardEffect = null;
 		}
 		oracleGuardEffect = EffectManager.GetEffect("ef_btl_wsk4_spear_guard", owner._transform);
@@ -1047,7 +1051,6 @@ public class SpearController : IWeaponController
 
 	public void GuardJust()
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		if (oracleGuardEffect != null)
 		{
 			Animator component = oracleGuardEffect.GetComponent<Animator>();
@@ -1061,7 +1064,6 @@ public class SpearController : IWeaponController
 
 	public void StartOracleGutsMode()
 	{
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 		if (!owner.IsValidBuff(BuffParam.BUFFTYPE.ORACLE_SPEAR_GUTS) && CanConsumeOracleStock())
 		{
 			consumedStockCounts = StockedCount;
@@ -1132,7 +1134,7 @@ public class SpearController : IWeaponController
 		Transform effect = EffectManager.GetEffect("ef_btl_wsk4_spear_stock", owner._transform);
 		if (effect != null)
 		{
-			EffectManager.ReleaseEffect(effect.get_gameObject());
+			EffectManager.ReleaseEffect(effect.gameObject);
 		}
 		if (owner.IsCoopNone() || owner.IsOriginal())
 		{

@@ -28,8 +28,7 @@ public class SortCompareData
 
 	public bool IsPriority(bool isAsc)
 	{
-		bool flag = sortingData >= 2305843009213693952L;
-		return flag != isAsc;
+		return sortingData >= 2305843009213693952L != isAsc;
 	}
 
 	protected int EquipmentTypeToSortBaseType(EQUIPMENT_TYPE type)
@@ -115,44 +114,39 @@ public class SortCompareData
 	public void Filtering(SortSettings settings)
 	{
 		bool flag = false;
-		if (!flag)
+		if (!flag && ((1 << (int)GetRarity()) & settings.rarity) == 0)
 		{
-			int num = 1 << (int)GetRarity();
-			if ((num & settings.rarity) == 0)
-			{
-				flag = true;
-			}
+			flag = true;
 		}
 		if (!flag && settings.dialogType != SortBase.DIALOG_TYPE.USE_ITEM)
 		{
 			if (settings.dialogType == SortBase.DIALOG_TYPE.MATERIAL)
 			{
-				int num2;
+				int num;
 				switch (GetItemType())
 				{
 				case 7:
-					num2 = 4;
+					num = 4;
 					break;
 				case 14:
-					num2 = 1;
+					num = 1;
 					break;
 				case 15:
-					num2 = 8;
+					num = 8;
 					break;
 				case 6:
-					num2 = 16;
+					num = 16;
 					break;
 				default:
-					num2 = 2;
+					num = 2;
 					break;
 				}
-				if ((settings.type & num2) == 0)
+				if ((settings.type & num) == 0)
 				{
 					flag = true;
 				}
-				ELEMENT_TYPE iconElement = GetIconElement();
-				int num3 = 1 << (int)GetIconElement();
-				if ((num3 & settings.element) == 0)
+				GetIconElement();
+				if (((1 << (int)GetIconElement()) & settings.element) == 0)
 				{
 					flag = true;
 				}
@@ -167,9 +161,8 @@ public class SortCompareData
 				{
 					flag = true;
 				}
-				ELEMENT_TYPE iconElement2 = GetIconElement();
-				int num4 = 1 << (int)GetIconElement();
-				if ((num4 & settings.element) == 0)
+				GetIconElement();
+				if (((1 << (int)GetIconElement()) & settings.element) == 0)
 				{
 					flag = true;
 				}
@@ -184,9 +177,8 @@ public class SortCompareData
 				{
 					flag = true;
 				}
-				ELEMENT_TYPE iconElement3 = GetIconElement();
-				int num5 = 1 << (int)GetIconElement();
-				if ((num5 & settings.element) == 0)
+				GetIconElement();
+				if (((1 << (int)GetIconElement()) & settings.element) == 0)
 				{
 					flag = true;
 				}
@@ -197,8 +189,7 @@ public class SortCompareData
 				{
 					flag = true;
 				}
-				int num6 = 1 << (int)GetIconElement();
-				if ((num6 & settings.element) == 0)
+				if (((1 << (int)GetIconElement()) & settings.element) == 0)
 				{
 					flag = true;
 				}
@@ -211,17 +202,16 @@ public class SortCompareData
 				}
 				if (GetIconElementSub() == ELEMENT_TYPE.MAX)
 				{
-					int num7 = 1 << (int)GetIconElement();
-					if ((num7 & settings.element) == 0)
+					if (((1 << (int)GetIconElement()) & settings.element) == 0)
 					{
 						flag = true;
 					}
 				}
 				else
 				{
-					int num8 = 1 << (int)GetIconElement();
-					int num9 = 1 << (int)GetIconElementSub();
-					if ((num8 & settings.element) == 0 && (num9 & settings.element) == 0)
+					int num2 = 1 << (int)GetIconElement();
+					int num3 = 1 << (int)GetIconElementSub();
+					if ((num2 & settings.element) == 0 && (num3 & settings.element) == 0)
 					{
 						flag = true;
 					}
@@ -233,8 +223,7 @@ public class SortCompareData
 				{
 					flag = true;
 				}
-				int num10 = 1 << (int)GetIconElement();
-				if ((num10 & settings.element) == 0)
+				if (((1 << (int)GetIconElement()) & settings.element) == 0)
 				{
 					flag = true;
 				}
@@ -263,42 +252,41 @@ public class SortCompareData
 		}
 	}
 
-	public unsafe static SORT_DATA[] CreateSortDataAry<ITEM_DATA, SORT_DATA>(ITEM_DATA[] data, SortSettings sort_settings, SortSettings.SortEquipSetInfo sort_equip_set_info = null) where SORT_DATA : SortCompareData, new()
+	public static SORT_DATA[] CreateSortDataAry<ITEM_DATA, SORT_DATA>(ITEM_DATA[] data, SortSettings sort_settings, SortSettings.SortEquipSetInfo sort_equip_set_info = null) where SORT_DATA : SortCompareData, new()
 	{
 		EquipItemStatus equipItemStatus = null;
 		if (sort_equip_set_info != null)
 		{
 			equipItemStatus = MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAllSkillParam(sort_equip_set_info.equipSetNo, sort_equip_set_info.isLocal, sort_equip_set_info.exclusionSlotIndex);
 		}
-		SORT_DATA[] equipItemSortAry = (SORT_DATA[])new SORT_DATA[data.Length];
-		int i;
-		for (i = 0; i < data.Length; i++)
+		SORT_DATA[] equipItemSortAry = new SORT_DATA[data.Length];
+		for (int i = 0; i < data.Length; i++)
 		{
-			equipItemSortAry[i] = (SORT_DATA)new SORT_DATA();
-			((SORT_DATA*)(&equipItemSortAry[i]))->SetItem(data[i]);
+			equipItemSortAry[i] = new SORT_DATA();
+			equipItemSortAry[i].SetItem(data[i]);
 			EquipItemStatus equipItemStatus2 = new EquipItemStatus(equipItemStatus);
 			if (equipItemStatus != null)
 			{
 				bool exclusion = false;
 				sort_equip_set_info?.exclusionUniqID.ForEach(delegate(ulong uniq_id)
 				{
-					if (!exclusion && ((SORT_DATA*)(&equipItemSortAry[i]))->GetUniqID() == uniq_id)
+					if (!exclusion && equipItemSortAry[i].GetUniqID() == uniq_id)
 					{
 						exclusion = true;
 					}
 				});
 				if (!exclusion)
 				{
-					equipItemStatus2.Add(((SORT_DATA*)(&equipItemSortAry[i]))->GetItemStatus());
+					equipItemStatus2.Add(equipItemSortAry[i].GetItemStatus());
 				}
 			}
-			((SORT_DATA*)(&equipItemSortAry[i]))->SetupSortingData(sort_settings.requirement, equipItemStatus2);
-			((SORT_DATA*)(&equipItemSortAry[i]))->Filtering(sort_settings);
+			equipItemSortAry[i].SetupSortingData(sort_settings.requirement, equipItemStatus2);
+			equipItemSortAry[i].Filtering(sort_settings);
 		}
-		return (SORT_DATA[])equipItemSortAry;
+		return equipItemSortAry;
 	}
 
-	public unsafe static void InitSortDataAry<SORT_DATA>(SORT_DATA[] sort_data, SortSettings sort_settings, SortSettings.SortEquipSetInfo sort_equip_set_info = null) where SORT_DATA : SortCompareData, new()
+	public static void InitSortDataAry<SORT_DATA>(SORT_DATA[] sort_data, SortSettings sort_settings, SortSettings.SortEquipSetInfo sort_equip_set_info = null) where SORT_DATA : SortCompareData, new()
 	{
 		EquipItemStatus equipItemStatus = null;
 		if (sort_equip_set_info != null)
@@ -308,13 +296,13 @@ public class SortCompareData
 		for (int i = 0; i < sort_data.Length; i++)
 		{
 			EquipItemStatus equipItemStatus2 = new EquipItemStatus(equipItemStatus);
-			SORT_DATA sortData = (SORT_DATA)sort_data[i];
+			SORT_DATA sortData = sort_data[i];
 			if (equipItemStatus != null)
 			{
 				bool exclusion = false;
 				sort_equip_set_info?.exclusionUniqID.ForEach(delegate(ulong uniq_id)
 				{
-					if (!exclusion && ((SORT_DATA*)(&sortData))->GetUniqID() == uniq_id)
+					if (!exclusion && sortData.GetUniqID() == uniq_id)
 					{
 						exclusion = true;
 					}
@@ -324,8 +312,8 @@ public class SortCompareData
 					equipItemStatus2.Add(sort_data[i].GetItemStatus());
 				}
 			}
-			((SORT_DATA*)(&sortData))->SetupSortingData(sort_settings.requirement, equipItemStatus2);
-			((SORT_DATA*)(&sortData))->Filtering(sort_settings);
+			sortData.SetupSortingData(sort_settings.requirement, equipItemStatus2);
+			sortData.Filtering(sort_settings);
 		}
 	}
 
@@ -496,10 +484,6 @@ public class SortCompareData
 
 	public int GetSortValueQuestResult()
 	{
-		int num = 0;
-		num += (IsLithograph() ? 100000 : 0);
-		num += ((GetIconType() == ITEM_ICON_TYPE.ABILITY_ITEM) ? 10000 : 0);
-		num += (int)(4 - m_category) * 100;
-		return (int)(num + GetRarity());
+		return (int)(0 + (IsLithograph() ? 100000 : 0) + ((GetIconType() == ITEM_ICON_TYPE.ABILITY_ITEM) ? 10000 : 0) + (int)(4 - m_category) * 100 + GetRarity());
 	}
 }

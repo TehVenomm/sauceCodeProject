@@ -6,7 +6,7 @@ namespace Network
 	{
 		public class RushTimeBonus
 		{
-			public string bonusName = string.Empty;
+			public string bonusName = "";
 
 			public int plusSec;
 		}

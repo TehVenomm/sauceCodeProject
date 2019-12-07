@@ -91,8 +91,7 @@ namespace BestHTTP.Authentication
 			{
 				ProtectedUris.Clear();
 			}
-			WWWAuthenticateHeaderParser wWWAuthenticateHeaderParser = new WWWAuthenticateHeaderParser(header);
-			foreach (KeyValuePair value in wWWAuthenticateHeaderParser.Values)
+			foreach (BestHTTP.Extensions.KeyValuePair value in new WWWAuthenticateHeaderParser(header).Values)
 			{
 				switch (value.Key)
 				{
@@ -155,23 +154,25 @@ namespace BestHTTP.Authentication
 					string empty = string.Empty;
 					string text = new Random(request.GetHashCode()).Next(int.MinValue, int.MaxValue).ToString("X8");
 					string text2 = NonceCount.ToString("X8");
-					switch (Algorithm.TrimAndLower())
+					string a = Algorithm.TrimAndLower();
+					if (!(a == "md5"))
 					{
-					case "md5":
-						empty = $"{request.Credentials.UserName}:{Realm}:{request.Credentials.Password}".CalculateMD5Hash();
-						break;
-					case "md5-sess":
+						if (!(a == "md5-sess"))
+						{
+							return string.Empty;
+						}
 						if (string.IsNullOrEmpty(HA1Sess))
 						{
 							HA1Sess = $"{request.Credentials.UserName}:{Realm}:{request.Credentials.Password}:{Nonce}:{text2}".CalculateMD5Hash();
 						}
 						empty = HA1Sess;
-						break;
-					default:
-						return string.Empty;
+					}
+					else
+					{
+						empty = $"{request.Credentials.UserName}:{Realm}:{request.Credentials.Password}".CalculateMD5Hash();
 					}
 					string empty2 = string.Empty;
-					string text3 = (QualityOfProtections == null) ? null : QualityOfProtections.TrimAndLower();
+					string text3 = (QualityOfProtections != null) ? QualityOfProtections.TrimAndLower() : null;
 					if (text3 == null)
 					{
 						string arg = (request.MethodType.ToString().ToUpper() + ":" + request.CurrentUri.PathAndQuery).CalculateMD5Hash();
@@ -201,7 +202,7 @@ namespace BestHTTP.Authentication
 					string text6 = $"Digest username=\"{request.Credentials.UserName}\", realm=\"{Realm}\", nonce=\"{Nonce}\", uri=\"{request.Uri.PathAndQuery}\", cnonce=\"{text}\", response=\"{empty2}\"";
 					if (text3 != null)
 					{
-						text6 += ", qop=\"" + text3 + "\", nc=" + text2;
+						text6 = text6 + ", qop=\"" + text3 + "\", nc=" + text2;
 					}
 					if (!string.IsNullOrEmpty(Opaque))
 					{

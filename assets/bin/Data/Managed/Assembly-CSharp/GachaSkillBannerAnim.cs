@@ -11,7 +11,7 @@ public class GachaSkillBannerAnim : UIBehaviour
 	{
 		if (pattern == null)
 		{
-			pattern = this.GetComponentsInChildren<GachaSkillBannerAnimPattern>();
+			pattern = GetComponentsInChildren<GachaSkillBannerAnimPattern>();
 		}
 		if (pattern == null || pattern.Length <= anim_index)
 		{
@@ -27,9 +27,9 @@ public class GachaSkillBannerAnim : UIBehaviour
 		{
 			pattern[i].Finish();
 		}
-		GachaSkillBannerAnimPattern gachaSkillBannerAnimPattern = pattern[anim_index];
+		GachaSkillBannerAnimPattern obj = pattern[anim_index];
 		targetIndex = anim_index;
-		gachaSkillBannerAnimPattern.Init(targetIndex, table, tex, anim);
+		obj.Init(targetIndex, table, tex, anim);
 	}
 
 	public void Entry(bool is_skip, EventDelegate.Callback end_callback)

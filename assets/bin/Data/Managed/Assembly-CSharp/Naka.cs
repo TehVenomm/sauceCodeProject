@@ -5,23 +5,17 @@ public class Naka : MonoBehaviour
 {
 	private class Msg
 	{
-		public Color color = Color.get_white();
+		public Color color = Color.white;
 
 		public string msg = string.Empty;
 
 		public Msg(string m)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			msg = m;
 		}
 
 		public Msg(string m, Color c)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			color = c;
 			msg = m;
 		}
@@ -35,20 +29,15 @@ public class Naka : MonoBehaviour
 
 	public Vector2 scrollPosition;
 
-	public Naka()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		if (isSpeedTestForEach)
 		{
-			this.get_gameObject().AddComponent<SpeedTest_ForEach>();
+			base.gameObject.AddComponent<SpeedTest_ForEach>();
 		}
 		if (isPacketTest)
 		{
-			this.get_gameObject().AddComponent<PacketTest>();
+			base.gameObject.AddComponent<PacketTest>();
 		}
 	}
 
@@ -64,31 +53,22 @@ public class Naka : MonoBehaviour
 	public static void Log(string str)
 	{
 		msg.Insert(0, new Msg(str));
-		Debug.Log((object)str);
+		Debug.Log(str);
 	}
 
 	public static void LogError(string str)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		msg.Insert(0, new Msg(str, Color.get_red()));
-		Debug.LogError((object)str);
+		msg.Insert(0, new Msg(str, Color.red));
+		Debug.LogError(str);
 	}
 
 	private void OnGUI()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		scrollPosition = GUILayout.BeginScrollView(scrollPosition, (GUILayoutOption[])new GUILayoutOption[2]
-		{
-			GUILayout.Width((float)(Screen.get_width() - 10)),
-			GUILayout.Height((float)Screen.get_height())
-		});
+		scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(Screen.width - 10), GUILayout.Height(Screen.height));
 		msg.ForEach(delegate(Msg m)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			GUI.set_color(m.color);
-			GUILayout.Label(m.msg, (GUILayoutOption[])new GUILayoutOption[0]);
+			GUI.color = m.color;
+			GUILayout.Label(m.msg);
 		});
 		GUILayout.EndScrollView();
 	}

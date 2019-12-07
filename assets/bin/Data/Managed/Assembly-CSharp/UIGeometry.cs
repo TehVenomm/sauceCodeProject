@@ -16,7 +16,17 @@ public class UIGeometry
 
 	public bool hasVertices => verts.size > 0;
 
-	public bool hasTransformed => mRtpVerts != null && mRtpVerts.size > 0 && mRtpVerts.size == verts.size;
+	public bool hasTransformed
+	{
+		get
+		{
+			if (mRtpVerts != null && mRtpVerts.size > 0)
+			{
+				return mRtpVerts.size == verts.size;
+			}
+			return false;
+		}
+	}
 
 	public void Clear()
 	{
@@ -28,20 +38,6 @@ public class UIGeometry
 
 	public void ApplyTransform(Matrix4x4 widgetToPanel, bool generateNormals = true)
 	{
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
 		if (verts.size > 0)
 		{
 			mRtpVerts.Clear();
@@ -52,10 +48,8 @@ public class UIGeometry
 			}
 			if (generateNormals)
 			{
-				Vector3 val = widgetToPanel.MultiplyVector(Vector3.get_back());
-				mRtpNormal = val.get_normalized();
-				Vector3 val2 = widgetToPanel.MultiplyVector(Vector3.get_right());
-				Vector3 normalized = val2.get_normalized();
+				mRtpNormal = widgetToPanel.MultiplyVector(Vector3.back).normalized;
+				Vector3 normalized = widgetToPanel.MultiplyVector(Vector3.right).normalized;
 				mRtpTan = new Vector4(normalized.x, normalized.y, normalized.z, -1f);
 			}
 		}
@@ -67,14 +61,6 @@ public class UIGeometry
 
 	public void WriteToBuffers(BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color32> c, BetterList<Vector3> n, BetterList<Vector4> t)
 	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
 		if (mRtpVerts == null || mRtpVerts.size <= 0)
 		{
 			return;

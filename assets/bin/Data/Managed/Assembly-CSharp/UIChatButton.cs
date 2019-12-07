@@ -22,8 +22,7 @@ public class UIChatButton : UIChatButtonBase
 		}
 		for (int i = 0; i < num; i++)
 		{
-			UIChatItem uIChatItem = chatItem[i];
-			uIChatItem.SetChatData(this, chatSayTexts[i], i);
+			chatItem[i].SetChatData(this, chatSayTexts[i], i);
 		}
 	}
 

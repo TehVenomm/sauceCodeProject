@@ -1,5 +1,3 @@
-using System;
-
 public class AdsWebViewDialog : WebViewDialog
 {
 	private enum UI
@@ -11,7 +9,7 @@ public class AdsWebViewDialog : WebViewDialog
 	public override void Initialize()
 	{
 		base.Initialize();
-		SetLabelText((Enum)UI.Title, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText((Enum)UI.Title_D, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.Title, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.Title_D, base.sectionData.GetText("STR_TITLE"));
 	}
 }

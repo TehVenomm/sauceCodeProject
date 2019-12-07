@@ -91,44 +91,36 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 		public Color GetSkinColor(int id)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			if (id < 0 || id >= skinColors.Length)
 			{
-				return Color.get_white();
+				return Color.white;
 			}
 			return skinColors[id];
 		}
 
 		public Color GetHairColor(int id)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			if (id < 0 || id >= hairColors.Length)
 			{
-				return Color.get_white();
+				return Color.white;
 			}
 			return hairColors[id];
 		}
 
 		public Color GetModelElementColor(int id)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			if (id < 0 || id >= modelElementColors.Length)
 			{
-				return Color.get_white();
+				return Color.white;
 			}
 			return modelElementColors[id];
 		}
 
 		public Color GetModelElementColor2(int id)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			if (id < 0 || id >= modelElementColors2.Length)
 			{
-				return Color.get_white();
+				return Color.white;
 			}
 			return modelElementColors2[id];
 		}
@@ -214,8 +206,7 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 		{
 			List<string> list = new List<string>();
 			FieldInfo[] fields = GetType().GetFields();
-			FieldInfo[] array = fields;
-			foreach (FieldInfo fieldInfo in array)
+			foreach (FieldInfo fieldInfo in fields)
 			{
 				object value = fieldInfo.GetValue(this);
 				if (value == null)
@@ -241,33 +232,30 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 		public Transform CreateShadow(float size, float body_radius, float scale, bool fixedY0, Transform parent = null, bool is_lightweight = false)
 		{
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			Transform val = (!is_lightweight) ? ResourceUtility.Realizes(shadowPrefab, parent) : ResourceUtility.Realizes(shadowPrefabLightweight, parent);
+			Transform transform = (!is_lightweight) ? ResourceUtility.Realizes(shadowPrefab, parent) : ResourceUtility.Realizes(shadowPrefabLightweight, parent);
 			size *= 0.5f;
-			val.set_localPosition(new Vector3(0f, 0.01f, 0f));
-			val.set_localEulerAngles(Vector3.get_zero());
-			val.set_localScale(new Vector3(size, size, size));
+			transform.localPosition = new Vector3(0f, 0.01f, 0f);
+			transform.localEulerAngles = Vector3.zero;
+			transform.localScale = new Vector3(size, size, size);
 			if (fixedY0)
 			{
-				val.get_gameObject().AddComponent<CircleShadow>();
+				transform.gameObject.AddComponent<CircleShadow>();
 			}
-			return val;
+			return transform;
 		}
 
 		public IEnumerator LoadIconPrefabs(MonoBehaviour mono)
 		{
-			LoadingQueue loadQueue = new LoadingQueue(mono);
-			LoadObject itemIconLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconPackageName, cache_package: true);
-			LoadObject itemIconDetailLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconDetailPackageName, cache_package: true);
-			LoadObject itemIconDetailSmallLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconDetailSmallPackageName, cache_package: true);
-			LoadObject itemIconMaterialLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconMaterialPackageName, cache_package: true);
-			LoadObject itemIconEquipMaterialLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, itemIconEquipMaterialPackageName, cache_package: true);
-			LoadObject accessoryIconLoadObject = loadQueue.Load(RESOURCE_CATEGORY.UI, accessoryIconPrefabPackageName, cache_package: true);
-			if (loadQueue.IsLoading())
+			LoadingQueue loadingQueue = new LoadingQueue(mono);
+			LoadObject itemIconLoadObject = loadingQueue.Load(RESOURCE_CATEGORY.UI, itemIconPackageName, cache_package: true);
+			LoadObject itemIconDetailLoadObject = loadingQueue.Load(RESOURCE_CATEGORY.UI, itemIconDetailPackageName, cache_package: true);
+			LoadObject itemIconDetailSmallLoadObject = loadingQueue.Load(RESOURCE_CATEGORY.UI, itemIconDetailSmallPackageName, cache_package: true);
+			LoadObject itemIconMaterialLoadObject = loadingQueue.Load(RESOURCE_CATEGORY.UI, itemIconMaterialPackageName, cache_package: true);
+			LoadObject itemIconEquipMaterialLoadObject = loadingQueue.Load(RESOURCE_CATEGORY.UI, itemIconEquipMaterialPackageName, cache_package: true);
+			LoadObject accessoryIconLoadObject = loadingQueue.Load(RESOURCE_CATEGORY.UI, accessoryIconPrefabPackageName, cache_package: true);
+			if (loadingQueue.IsLoading())
 			{
-				yield return loadQueue.Wait();
+				yield return loadingQueue.Wait();
 			}
 			itemIconPrefab = (itemIconLoadObject.loadedObject as GameObject);
 			itemIconDetailPrefab = (itemIconDetailLoadObject.loadedObject as GameObject);
@@ -320,14 +308,6 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 			public DisplayInfo(DisplayInfo displayInfo)
 			{
-				//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-				//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
 				zFromCamera = displayInfo.zFromCamera;
 				mainPos = new Vector3(displayInfo.mainPos.x, displayInfo.mainPos.y, displayInfo.mainPos.z);
 				mainRot = new Vector3(displayInfo.mainRot.x, displayInfo.mainRot.y, displayInfo.mainRot.z);
@@ -603,32 +583,32 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 				int rawId = Singleton<AvatarTable>.I.GetRawId(AvatarTable.Type.ManHead, index);
 				list.Add(rawId);
 			}
-			int[] array2 = hasWomanHeadIndexes;
-			foreach (int index2 in array2)
+			array = hasWomanHeadIndexes;
+			foreach (int index2 in array)
 			{
 				int rawId2 = Singleton<AvatarTable>.I.GetRawId(AvatarTable.Type.WomanHead, index2);
 				list.Add(rawId2);
 			}
-			int[] array3 = hasManFaceIndexes;
-			foreach (int index3 in array3)
+			array = hasManFaceIndexes;
+			foreach (int index3 in array)
 			{
 				int rawId3 = Singleton<AvatarTable>.I.GetRawId(AvatarTable.Type.ManFace, index3);
 				list.Add(rawId3);
 			}
-			int[] array4 = hasWomanFaceIndexes;
-			foreach (int index4 in array4)
+			array = hasWomanFaceIndexes;
+			foreach (int index4 in array)
 			{
 				int rawId4 = Singleton<AvatarTable>.I.GetRawId(AvatarTable.Type.WomanFace, index4);
 				list.Add(rawId4);
 			}
-			int[] array5 = hasSkinColorIndexes;
-			foreach (int index5 in array5)
+			array = hasSkinColorIndexes;
+			foreach (int index5 in array)
 			{
 				int rawId5 = Singleton<AvatarTable>.I.GetRawId(AvatarTable.Type.SkinColor, index5);
 				list.Add(rawId5);
 			}
-			int[] array6 = hasHairColorIndexes;
-			foreach (int index6 in array6)
+			array = hasHairColorIndexes;
+			foreach (int index6 in array)
 			{
 				int rawId6 = Singleton<AvatarTable>.I.GetRawId(AvatarTable.Type.HairColor, index6);
 				list.Add(rawId6);
@@ -831,41 +811,31 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 	private void Start()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		initLightRot = lightDirection.get_localRotation();
-		initNpcLightRot = npcLightDirection.get_localRotation();
+		initLightRot = lightDirection.localRotation;
+		initNpcLightRot = npcLightDirection.localRotation;
 		initAmbientColor = defaultAmbientColor;
-		AppMain.amountMemoryClear = SystemInfo.get_systemMemorySize() / AndroidMemoryClearDivider;
+		AppMain.amountMemoryClear = SystemInfo.systemMemorySize / AndroidMemoryClearDivider;
 	}
 
 	public void ResetLightRot()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		lightDirection.set_localRotation(initLightRot);
-		npcLightDirection.set_localRotation(initNpcLightRot);
+		lightDirection.localRotation = initLightRot;
+		npcLightDirection.localRotation = initNpcLightRot;
 	}
 
 	public void ResetAmbientColor()
 	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 		defaultAmbientColor = initAmbientColor;
 	}
 
 	public void LoadLinkResources(Action callback)
 	{
-		this.StartCoroutine(_LoadLinkResources(callback));
+		StartCoroutine(_LoadLinkResources(callback));
 	}
 
 	private IEnumerator _LoadLinkResources(Action callback)
 	{
-		yield return this.StartCoroutine(linkResources.LoadIconPrefabs(this));
+		yield return StartCoroutine(linkResources.LoadIconPrefabs(this));
 		callback();
 	}
 
@@ -929,38 +899,20 @@ public class GlobalSettingsManager : MonoBehaviourSingleton<GlobalSettingsManage
 
 	private void LateUpdate()
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		if (lightRot != lightDirection.get_localRotation())
+		if (lightRot != lightDirection.localRotation)
 		{
-			lightRot = lightDirection.get_localRotation();
-			Shader.SetGlobalVector("_light_dir", lightDirection.get_forward().ToVector4());
+			lightRot = lightDirection.localRotation;
+			Shader.SetGlobalVector("_light_dir", lightDirection.forward.ToVector4());
 		}
-		if (npcLightRot != npcLightDirection.get_localRotation())
+		if (npcLightRot != npcLightDirection.localRotation)
 		{
-			npcLightRot = npcLightDirection.get_localRotation();
-			Shader.SetGlobalVector("_npc_light_dir", npcLightDirection.get_forward().ToVector4());
+			npcLightRot = npcLightDirection.localRotation;
+			Shader.SetGlobalVector("_npc_light_dir", npcLightDirection.forward.ToVector4());
 		}
 		if (ambientColor != defaultAmbientColor)
 		{
 			ambientColor = defaultAmbientColor;
-			Shader.SetGlobalVector("_ambient_color", Color.op_Implicit(ambientColor));
+			Shader.SetGlobalVector("_ambient_color", ambientColor);
 		}
 	}
 

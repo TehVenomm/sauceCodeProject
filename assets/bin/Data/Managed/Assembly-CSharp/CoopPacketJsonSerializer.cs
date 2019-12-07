@@ -7,11 +7,11 @@ public class CoopPacketJsonSerializer : CoopPacketSerializer
 
 	public string ConvertUserToken(int client_id, int user_token_len)
 	{
-		string empty = string.Empty;
+		string text = "";
 		switch (client_id)
 		{
 		case -1000:
-			return string.Empty;
+			return "";
 		case -2000:
 			return " ";
 		default:
@@ -22,18 +22,15 @@ public class CoopPacketJsonSerializer : CoopPacketSerializer
 	public int ConvertClientId(string user_token)
 	{
 		int num = 0;
-		if (user_token != null)
+		if (user_token == null || user_token.Length != 0)
 		{
-			if (user_token == string.Empty)
-			{
-				return -1000;
-			}
 			if (user_token == " ")
 			{
 				return -2000;
 			}
+			return int.Parse(user_token);
 		}
-		return int.Parse(user_token);
+		return -1000;
 	}
 
 	public override PacketStream Serialize(CoopPacket packet)
@@ -50,14 +47,14 @@ public class CoopPacketJsonSerializer : CoopPacketSerializer
 	protected override void OnSerializeStringHeader(PacketStringStream stream, CoopPacketHeader header)
 	{
 		int user_token_len = (!(version == "00")) ? 1 : 11;
-		string empty = string.Empty;
-		empty += ConvertUserToken(header.from, user_token_len);
-		empty += ConvertUserToken(header.to, user_token_len);
-		empty += ((!header.promise) ? "0" : "1");
-		empty += header.sequenceNo.ToString().PadLeft(16);
-		string str = empty.Length.ToString("X4");
+		string str = "";
+		str += ConvertUserToken(header.from, user_token_len);
+		str += ConvertUserToken(header.to, user_token_len);
+		str += (header.promise ? "1" : "0");
+		str += header.sequenceNo.ToString().PadLeft(16);
+		string str2 = str.Length.ToString("X4");
+		stream.Write(str2);
 		stream.Write(str);
-		stream.Write(empty);
 	}
 
 	protected override void OnSerializeStringModel(PacketStringStream stream, Coop_Model_Base model)
@@ -96,8 +93,7 @@ public class CoopPacketJsonSerializer : CoopPacketSerializer
 	protected override Coop_Model_Base OnDeserializeStringModel(PacketStringStream stream, Type type, CoopPacketHeader header)
 	{
 		string message = stream.Read();
-		Coop_Model_Base coop_Model_Base = JSONSerializer.Deserialize<Coop_Model_Base>(message);
-		Type modelType = ((PACKET_TYPE)coop_Model_Base.c).GetModelType();
+		Type modelType = ((PACKET_TYPE)JSONSerializer.Deserialize<Coop_Model_Base>(message).c).GetModelType();
 		return JSONSerializer.Deserialize<Coop_Model_Base>(message, modelType);
 	}
 }

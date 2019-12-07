@@ -62,7 +62,7 @@ public class BattleUserLog
 			return;
 		}
 		int num = 0;
-		string empty = string.Empty;
+		string text = "";
 		int baseId = 0;
 		bool flag = false;
 		if (to_chara is Enemy)
@@ -73,7 +73,7 @@ public class BattleUserLog
 				return;
 			}
 			flag = (player.controller is NpcController);
-			empty = player.charaName;
+			text = player.charaName;
 			if (player is NonPlayer)
 			{
 				num = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.userId;
@@ -104,7 +104,7 @@ public class BattleUserLog
 				return;
 			}
 			num = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.userId;
-			empty = enemy.charaName;
+			text = enemy.charaName;
 			baseId = enemy.enemyID;
 		}
 		QuestCompleteModel.BattleUserLog battleUserLog = null;
@@ -121,13 +121,13 @@ public class BattleUserLog
 		{
 			battleUserLog = new QuestCompleteModel.BattleUserLog();
 			battleUserLog.userId = num;
-			battleUserLog.name = empty;
+			battleUserLog.name = text;
 			battleUserLog.baseId = baseId;
 			battleUserLog.objId = from_objid;
 			battleUserLog.isNpc = flag;
 			battleUserLog.hostUserId = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.userId;
 			battleUserLog.leaveCnt = MonoBehaviourSingleton<CoopManager>.I.coopRoom.roomLeaveCnt;
-			battleUserLog.startRemaindTime = ((!MonoBehaviourSingleton<InGameProgress>.IsValid()) ? 0f : MonoBehaviourSingleton<InGameProgress>.I.remaindTime);
+			battleUserLog.startRemaindTime = (MonoBehaviourSingleton<InGameProgress>.IsValid() ? MonoBehaviourSingleton<InGameProgress>.I.remaindTime : 0f);
 			list.Add(battleUserLog);
 		}
 		QuestCompleteModel.BattleUserLog.AtkInfo atkInfo = null;
@@ -155,10 +155,10 @@ public class BattleUserLog
 	{
 		list.ForEach(delegate(QuestCompleteModel.BattleUserLog user_log)
 		{
-			Debug.Log((object)$"###### name : {user_log.name}, userId : {user_log.userId}, baseId : {user_log.baseId}, objId : {user_log.objId}, isNpc : {user_log.isNpc}");
+			Debug.Log($"###### name : {user_log.name}, userId : {user_log.userId}, baseId : {user_log.baseId}, objId : {user_log.objId}, isNpc : {user_log.isNpc}");
 			user_log.atkInfos.ForEach(delegate(QuestCompleteModel.BattleUserLog.AtkInfo atk_info)
 			{
-				Debug.Log((object)$"atkinfo : {atk_info.name}, skillId : {atk_info.skillId}, count : {atk_info.count}, damage : {atk_info.damage}");
+				Debug.Log($"atkinfo : {atk_info.name}, skillId : {atk_info.skillId}, count : {atk_info.count}, damage : {atk_info.damage}");
 			});
 		});
 	}

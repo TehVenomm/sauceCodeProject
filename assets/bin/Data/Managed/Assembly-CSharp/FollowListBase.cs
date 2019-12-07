@@ -104,11 +104,11 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 
 	public override void Initialize()
 	{
-		SetActive((Enum)UI.SPR_TITLE_FOLLOW_LIST, titleType == TITLE_TYPE.FOLLOW);
-		SetActive((Enum)UI.SPR_TITLE_FOLLOWER_LIST, titleType == TITLE_TYPE.FOLLOWER);
-		SetActive((Enum)UI.SPR_TITLE_MESSAGE, titleType == TITLE_TYPE.MESSAGE);
-		SetActive((Enum)UI.SPR_TITLE_BLACKLIST, titleType == TITLE_TYPE.BLACKLIST);
-		SetActive((Enum)UI.OBJ_FOLLOW_NUMBER_ROOT, is_visible: false);
+		SetActive(UI.SPR_TITLE_FOLLOW_LIST, titleType == TITLE_TYPE.FOLLOW);
+		SetActive(UI.SPR_TITLE_FOLLOWER_LIST, titleType == TITLE_TYPE.FOLLOWER);
+		SetActive(UI.SPR_TITLE_MESSAGE, titleType == TITLE_TYPE.MESSAGE);
+		SetActive(UI.SPR_TITLE_BLACKLIST, titleType == TITLE_TYPE.BLACKLIST);
+		SetActive(UI.OBJ_FOLLOW_NUMBER_ROOT, is_visible: false);
 		if (IsHideSwitchInfoButton())
 		{
 			SetActive(base._transform, UI.OBJ_SWITCH_INFO, is_visible: false);
@@ -118,27 +118,26 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 
 	public virtual void ListUI()
 	{
-		SetLabelText((Enum)UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText((Enum)UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
-		FriendCharaInfo[] currentUserArray = GetCurrentUserArray();
-		if (currentUserArray.IsNullOrEmpty())
+		SetLabelText(UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
+		if (GetCurrentUserArray().IsNullOrEmpty())
 		{
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.GRD_LIST, is_visible: false);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: true);
-			SetLabelText((Enum)UI.LBL_NOW, "0");
-			SetLabelText((Enum)UI.LBL_MAX, "0");
+			SetActive(UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_LIST, is_visible: false);
+			SetActive(UI.OBJ_ACTIVE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, is_visible: true);
+			SetLabelText(UI.LBL_NOW, "0");
+			SetLabelText(UI.LBL_MAX, "0");
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_SORT, StringTable.Get(STRING_CATEGORY.USER_SORT, (uint)m_currentSortType));
-			SetPageNumText((Enum)UI.LBL_NOW, nowPage + 1);
-			SetPageNumText((Enum)UI.LBL_MAX, pageNumMax);
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
-			SetActive((Enum)UI.GRD_LIST, is_visible: true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
+			SetLabelText(UI.LBL_SORT, StringTable.Get(STRING_CATEGORY.USER_SORT, (uint)m_currentSortType));
+			SetPageNumText(UI.LBL_NOW, nowPage + 1);
+			SetPageNumText(UI.LBL_MAX, pageNumMax);
+			SetActive(UI.STR_NON_LIST, is_visible: false);
+			SetActive(UI.GRD_LIST, is_visible: true);
+			SetActive(UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
+			SetActive(UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
 			UpdateDynamicList();
 		}
 	}
@@ -152,7 +151,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 			ScrollGrid.cellHeight = GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 		}
 		CleanItemList();
-		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList(UI.GRD_LIST, GetListItemName, item_num, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			SetListItem(i, t, is_recycle, info[i]);
 		});
@@ -163,7 +162,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 		if (data != null)
 		{
 			SetFollowStatus(t, data.userId, data.following, data.follower, data.userClanData.cId);
-			SetCharaInfo(data, i, t, is_recycle, 0 == data.userId);
+			SetCharaInfo(data, i, t, is_recycle, data.userId == 0);
 			if (LoungeMatchingManager.IsValidInLounge())
 			{
 				SetActive(t, UI.SPR_ICON_FIRST_MET, MonoBehaviourSingleton<LoungeMatchingManager>.I.CheckFirstMet(data.userId));
@@ -173,10 +172,6 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 
 	protected virtual void SetCharaInfo(FriendCharaInfo data, int i, Transform t, bool is_recycle, bool isGM)
 	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 		if (isGM)
 		{
 			SetEvent(t, "DIRECT_VIEW_MESSAGE", i);
@@ -207,8 +202,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 		SetLabelText(t, UI.LBL_ATK, finalStatus.GetAttacksSum().ToString());
 		SetLabelText(t, UI.LBL_DEF, finalStatus.GetDefencesSum().ToString());
 		SetLabelText(t, UI.LBL_HP, finalStatus.hp.ToString());
-		DegreePlate component = FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(data.selectedDegrees, isButton: false, delegate
+		FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>().Initialize(data.selectedDegrees, isButton: false, delegate
 		{
 			ScrollGrid.Reposition();
 		});
@@ -227,13 +221,13 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 		{
 			is_visible = (clanId == MonoBehaviourSingleton<UserInfoManager>.I.userClan.cId);
 		}
-		bool flag2 = !flag && (following || follower);
+		bool flag2 = !flag && (following | follower);
 		SetActive(t, UI.SPR_BLACKLIST_ICON, flag);
 		SetActive(t, UI.OBJ_FOLLOW, flag2);
 		SetActive(t, UI.SPR_FOLLOW, flag2 && following);
 		SetActive(t, UI.SPR_FOLLOWER, flag2 && follower);
 		SetActive(t, UI.SPR_SAME_CLAN_ICON, is_visible);
-		UIGrid component = base.GetComponent<UIGrid>(t, (Enum)UI.GRD_FOLLOW_ARROW);
+		UIGrid component = GetComponent<UIGrid>(t, UI.GRD_FOLLOW_ARROW);
 		if (component != null)
 		{
 			component.Reposition();
@@ -353,16 +347,6 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 
 	private void SetJoinTextInfo(Transform _target, FriendCharaInfo.JoinInfo _joinStatus)
 	{
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
 		UILabel component = FindCtrl(_target, UI.ONLINE_TEXT).GetComponent<UILabel>();
 		UILabel component2 = FindCtrl(_target, UI.DETAIL_TEXT).GetComponent<UILabel>();
 		if (component != null)
@@ -371,7 +355,7 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 		}
 		if (component2 != null)
 		{
-			component2.text = string.Empty;
+			component2.text = "";
 		}
 		switch (_joinStatus.joinType)
 		{
@@ -443,7 +427,11 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 			return string.Empty;
 		}
 		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)_questId);
-		return (questData != null) ? questData.questText : string.Empty;
+		if (questData != null)
+		{
+			return questData.questText;
+		}
+		return string.Empty;
 	}
 
 	protected void SwitchInfoRootObject(Transform t, bool _activeFlag)
@@ -464,18 +452,15 @@ public abstract class FollowListBase : UserListBase<FriendCharaInfo>
 		UIButton component = FindCtrl(_t, UI.BTN_JOIN_BUTTON).GetComponent<UIButton>();
 		if (!(component == null))
 		{
-			switch (_status)
+			if ((uint)(_status - 2) <= 2u)
 			{
-			case ONLINE_STATUS.ONLINE_LOUNGE:
-			case ONLINE_STATUS.ONLINE_QUEST:
-			case ONLINE_STATUS.ONLINE_FIELD:
-				component.get_gameObject().SetActive(true);
-				break;
-			default:
-				component.get_gameObject().SetActive(false);
-				break;
+				component.gameObject.SetActive(value: true);
 			}
-			UIGameSceneEventSender componentInChildren = component.GetComponentInChildren<UIGameSceneEventSender>(true);
+			else
+			{
+				component.gameObject.SetActive(value: false);
+			}
+			UIGameSceneEventSender componentInChildren = component.GetComponentInChildren<UIGameSceneEventSender>(includeInactive: true);
 			if (componentInChildren != null)
 			{
 				componentInChildren.eventName = "JOIN_FRIEND";

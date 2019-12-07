@@ -1,5 +1,4 @@
 using Network;
-using System;
 
 public class QuestEntryPassRoom : GameSection
 {
@@ -39,12 +38,12 @@ public class QuestEntryPassRoom : GameSection
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.STR_NON_SETTINGS, is_visible: false);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_1, passCode[0]);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_2, passCode[1]);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_3, passCode[2]);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_4, passCode[3]);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_5, passCode[4]);
+		SetActive(UI.STR_NON_SETTINGS, is_visible: false);
+		SetLabelText(UI.LBL_INPUT_PASS_1, passCode[0]);
+		SetLabelText(UI.LBL_INPUT_PASS_2, passCode[1]);
+		SetLabelText(UI.LBL_INPUT_PASS_3, passCode[2]);
+		SetLabelText(UI.LBL_INPUT_PASS_4, passCode[3]);
+		SetLabelText(UI.LBL_INPUT_PASS_5, passCode[4]);
 	}
 
 	protected override void OnOpen()
@@ -141,7 +140,7 @@ public class QuestEntryPassRoom : GameSection
 			true
 		});
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<PartyManager>.I.SendApply(string.Join(string.Empty, passCode), delegate(bool is_apply, Error ret_code)
+		MonoBehaviourSingleton<PartyManager>.I.SendApply(string.Join("", passCode), delegate(bool is_apply, Error ret_code)
 		{
 			if (is_apply && !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(MonoBehaviourSingleton<PartyManager>.I.GetQuestId()))
 			{
@@ -152,7 +151,7 @@ public class QuestEntryPassRoom : GameSection
 					});
 				});
 			}
-			else if (ret_code == Error.WRN_PARTY_SEARCH_NOT_FOUND_PARTY || ret_code == Error.WRN_PARTY_OWNER_REJOIN)
+			else if ((uint)(ret_code - 32009) <= 1u)
 			{
 				GameSection.ChangeStayEvent("NOT_FOUND_PARTY");
 				GameSection.ResumeEvent(is_resume: true);

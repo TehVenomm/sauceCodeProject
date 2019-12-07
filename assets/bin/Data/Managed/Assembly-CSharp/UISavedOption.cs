@@ -11,18 +11,23 @@ public class UISavedOption : MonoBehaviour
 
 	private UIProgressBar mSlider;
 
-	private string key => (!string.IsNullOrEmpty(keyName)) ? keyName : ("NGUI State: " + this.get_name());
-
-	public UISavedOption()
-		: this()
+	private string key
 	{
+		get
+		{
+			if (!string.IsNullOrEmpty(keyName))
+			{
+				return keyName;
+			}
+			return "NGUI State: " + base.name;
+		}
 	}
 
 	private void Awake()
 	{
-		mList = this.GetComponent<UIPopupList>();
-		mCheck = this.GetComponent<UIToggle>();
-		mSlider = this.GetComponent<UIProgressBar>();
+		mList = GetComponent<UIPopupList>();
+		mCheck = GetComponent<UIToggle>();
+		mSlider = GetComponent<UIProgressBar>();
 	}
 
 	private void OnEnable()
@@ -50,12 +55,12 @@ public class UISavedOption : MonoBehaviour
 			return;
 		}
 		string string2 = PlayerPrefs.GetString(key);
-		UIToggle[] componentsInChildren = this.GetComponentsInChildren<UIToggle>(true);
+		UIToggle[] componentsInChildren = GetComponentsInChildren<UIToggle>(includeInactive: true);
 		int i = 0;
 		for (int num = componentsInChildren.Length; i < num; i++)
 		{
-			UIToggle uIToggle = componentsInChildren[i];
-			uIToggle.value = (uIToggle.get_name() == string2);
+			UIToggle obj = componentsInChildren[i];
+			obj.value = (obj.name == string2);
 		}
 	}
 
@@ -76,7 +81,7 @@ public class UISavedOption : MonoBehaviour
 			EventDelegate.Remove(mSlider.onChange, SaveProgress);
 			return;
 		}
-		UIToggle[] componentsInChildren = this.GetComponentsInChildren<UIToggle>(true);
+		UIToggle[] componentsInChildren = GetComponentsInChildren<UIToggle>(includeInactive: true);
 		int num = 0;
 		int num2 = componentsInChildren.Length;
 		UIToggle uIToggle;
@@ -94,7 +99,7 @@ public class UISavedOption : MonoBehaviour
 			}
 			return;
 		}
-		PlayerPrefs.SetString(key, uIToggle.get_name());
+		PlayerPrefs.SetString(key, uIToggle.name);
 	}
 
 	public void SaveSelection()

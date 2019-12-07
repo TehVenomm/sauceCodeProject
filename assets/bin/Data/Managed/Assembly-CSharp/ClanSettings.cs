@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -71,8 +70,8 @@ public class ClanSettings : GameSection
 			stampId = 1;
 			isLock = false;
 			label = CLAN_LABEL.NONE;
-			clanName = string.Empty;
-			clanTag = string.Empty;
+			clanName = "";
+			clanTag = "";
 		}
 
 		public CreateRequestParam(CLAN_LABEL label, bool isLock, string name, string comment, string tag)
@@ -135,13 +134,13 @@ public class ClanSettings : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	protected IEnumerator DoInitialize()
 	{
-		SetActive((Enum)UI.OBJ_CHANGE, MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsRegistered());
-		SetActive((Enum)UI.OBJ_CREATE, MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsNotRegistered());
+		SetActive(UI.OBJ_CHANGE, MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsRegistered());
+		SetActive(UI.OBJ_CREATE, MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsNotRegistered());
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsRegistered())
 		{
 			bool isWait = true;
@@ -181,19 +180,19 @@ public class ClanSettings : GameSection
 		{
 			createRequest.SetClanName(base.sectionData.GetText("DEFAULT_CLAN_NAME"));
 		}
-		SetInput(GetCtrl(UI.IPT_NAME), createRequest.clanName, 9, string.Empty, OnChangeClanName);
+		SetInput(GetCtrl(UI.IPT_NAME), createRequest.clanName, 9, "", OnChangeClanName);
 		if (string.IsNullOrEmpty(createRequest.comment))
 		{
 			createRequest.SetComment(base.sectionData.GetText("DEFAULT_CLAN_COMMENT"));
 		}
-		SetInput(GetCtrl(UI.IPT_COMMENT), createRequest.comment, 48, string.Empty, OnChangeComment);
+		SetInput(GetCtrl(UI.IPT_COMMENT), createRequest.comment, 48, "", OnChangeComment);
 		if (string.IsNullOrEmpty(createRequest.clanTag))
 		{
 			createRequest.SetClanTag(base.sectionData.GetText("DEFAULT_CLAN_TAG"));
 		}
-		SetInput(GetCtrl(UI.IPT_TAG), createRequest.clanTag, 4, string.Empty, OnChangeClanTag);
-		SetTouchAndRelease((Enum)UI.BTN_INFO, "TAG_INFO_SHOW", "TAG_INFO_HIDE", (object)null);
-		SetActive((Enum)UI.SPR_TAG, is_visible: false);
+		SetInput(GetCtrl(UI.IPT_TAG), createRequest.clanTag, 4, "", OnChangeClanTag);
+		SetTouchAndRelease(UI.BTN_INFO, "TAG_INFO_SHOW", "TAG_INFO_HIDE");
+		SetActive(UI.SPR_TAG, is_visible: false);
 		InitializeBase();
 	}
 
@@ -218,55 +217,55 @@ public class ClanSettings : GameSection
 	private void UpdateLock()
 	{
 		int index = lockIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_LOCK, lockNames[index]);
+		SetLabelText(UI.LBL_TARGET_LOCK, lockNames[index]);
 	}
 
 	protected void UpdateLabel()
 	{
 		if (labels == null)
 		{
-			Debug.LogError((object)"[UpdateLabel] labels are null");
+			Debug.LogError("[UpdateLabel] labels are null");
 			return;
 		}
 		int num = labelIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_LABEL, labels[num]);
+		SetLabelText(UI.LBL_TARGET_LABEL, labels[num]);
 	}
 
 	protected virtual void OnChangeClanName()
 	{
-		string inputValue = GetInputValue((Enum)UI.IPT_NAME);
-		inputValue = inputValue.Replace(" ", string.Empty);
-		inputValue = inputValue.Replace("\u3000", string.Empty);
-		inputValue = inputValue.Replace("\n", string.Empty);
+		string inputValue = GetInputValue(UI.IPT_NAME);
+		inputValue = inputValue.Replace(" ", "");
+		inputValue = inputValue.Replace("\u3000", "");
+		inputValue = inputValue.Replace("\n", "");
 		createRequest.SetClanName(inputValue);
-		SetActive((Enum)UI.LBL_NAME_DEFAULT, string.IsNullOrEmpty(inputValue));
-		SetActive((Enum)UI.BTN_NEXT, !string.IsNullOrEmpty(inputValue) && CheckValidClanTag());
-		SetActive((Enum)UI.BTN_NEXT_OFF, string.IsNullOrEmpty(inputValue) || !CheckValidClanTag());
-		SetActive((Enum)UI.BTN_CHANGE, !string.IsNullOrEmpty(inputValue) && CheckValidClanTag());
-		SetActive((Enum)UI.BTN_CHANGE_OFF, string.IsNullOrEmpty(inputValue) || !CheckValidClanTag());
+		SetActive(UI.LBL_NAME_DEFAULT, string.IsNullOrEmpty(inputValue));
+		SetActive(UI.BTN_NEXT, !string.IsNullOrEmpty(inputValue) && CheckValidClanTag());
+		SetActive(UI.BTN_NEXT_OFF, string.IsNullOrEmpty(inputValue) || !CheckValidClanTag());
+		SetActive(UI.BTN_CHANGE, !string.IsNullOrEmpty(inputValue) && CheckValidClanTag());
+		SetActive(UI.BTN_CHANGE_OFF, string.IsNullOrEmpty(inputValue) || !CheckValidClanTag());
 	}
 
 	protected virtual void OnChangeComment()
 	{
-		string inputValue = GetInputValue((Enum)UI.IPT_COMMENT);
-		inputValue = inputValue.Replace("\n", string.Empty);
+		string inputValue = GetInputValue(UI.IPT_COMMENT);
+		inputValue = inputValue.Replace("\n", "");
 		createRequest.SetComment(inputValue);
 	}
 
 	protected virtual void OnChangeClanTag()
 	{
-		string inputValue = GetInputValue((Enum)UI.IPT_TAG);
-		inputValue = inputValue.Replace(" ", string.Empty);
-		inputValue = inputValue.Replace("\u3000", string.Empty);
-		inputValue = inputValue.Replace("\n", string.Empty);
+		string inputValue = GetInputValue(UI.IPT_TAG);
+		inputValue = inputValue.Replace(" ", "");
+		inputValue = inputValue.Replace("\u3000", "");
+		inputValue = inputValue.Replace("\n", "");
 		inputValue = inputValue.ToUpper();
-		SetLabelText((Enum)UI.LBL_INPUT_TAG, inputValue);
+		SetLabelText(UI.LBL_INPUT_TAG, inputValue);
 		createRequest.SetClanTag(inputValue);
-		SetActive((Enum)UI.LBL_TAG_DEFAULT, string.IsNullOrEmpty(inputValue));
-		SetActive((Enum)UI.BTN_NEXT, !string.IsNullOrEmpty(inputValue) && !string.IsNullOrEmpty(createRequest.clanName));
-		SetActive((Enum)UI.BTN_NEXT_OFF, string.IsNullOrEmpty(inputValue) || string.IsNullOrEmpty(createRequest.clanName));
-		SetActive((Enum)UI.BTN_CHANGE, !string.IsNullOrEmpty(inputValue) && !string.IsNullOrEmpty(createRequest.clanName));
-		SetActive((Enum)UI.BTN_CHANGE_OFF, string.IsNullOrEmpty(inputValue) || string.IsNullOrEmpty(createRequest.clanName));
+		SetActive(UI.LBL_TAG_DEFAULT, string.IsNullOrEmpty(inputValue));
+		SetActive(UI.BTN_NEXT, !string.IsNullOrEmpty(inputValue) && !string.IsNullOrEmpty(createRequest.clanName));
+		SetActive(UI.BTN_NEXT_OFF, string.IsNullOrEmpty(inputValue) || string.IsNullOrEmpty(createRequest.clanName));
+		SetActive(UI.BTN_CHANGE, !string.IsNullOrEmpty(inputValue) && !string.IsNullOrEmpty(createRequest.clanName));
+		SetActive(UI.BTN_CHANGE_OFF, string.IsNullOrEmpty(inputValue) || string.IsNullOrEmpty(createRequest.clanName));
 	}
 
 	private void OnQuery_TARGET_LOCK()
@@ -304,7 +303,7 @@ public class ClanSettings : GameSection
 		}
 		if (labels == null)
 		{
-			Debug.LogError((object)"labels are null");
+			Debug.LogError("labels are null");
 			return;
 		}
 		bool[] array = new bool[labels.Length];
@@ -328,12 +327,12 @@ public class ClanSettings : GameSection
 
 	private void OnQuery_TAG_INFO_SHOW()
 	{
-		SetActive((Enum)UI.SPR_TAG, is_visible: true);
+		SetActive(UI.SPR_TAG, is_visible: true);
 	}
 
 	private void OnQuery_TAG_INFO_HIDE()
 	{
-		SetActive((Enum)UI.SPR_TAG, is_visible: false);
+		SetActive(UI.SPR_TAG, is_visible: false);
 	}
 
 	protected bool CheckValidClanTag()
@@ -343,6 +342,10 @@ public class ClanSettings : GameSection
 		{
 			return false;
 		}
-		return !clanTag.Contains(" ") && !clanTag.Contains("\u3000") && !clanTag.Contains("\n") && clanTag.Length <= 4;
+		if (!clanTag.Contains(" ") && !clanTag.Contains("\u3000") && !clanTag.Contains("\n"))
+		{
+			return clanTag.Length <= 4;
+		}
+		return false;
 	}
 }

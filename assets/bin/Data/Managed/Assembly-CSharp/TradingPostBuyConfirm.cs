@@ -1,5 +1,4 @@
 using Network;
-using System;
 using UnityEngine;
 
 public class TradingPostBuyConfirm : GameSection
@@ -31,7 +30,7 @@ public class TradingPostBuyConfirm : GameSection
 		SetLabelText(UI.LBL_COST_D, detail.price);
 		SetLabelText(UI.LBL_GEM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal);
 		SetLabelText(UI.LBL_QUATITY, detail.quantity);
-		SetLabelText((Enum)UI.LBL_NAME, detail.from);
+		SetLabelText(UI.LBL_NAME, detail.from);
 		ItemInfo item = ItemInfo.CreateItemInfo(detail.itemId);
 		ItemSortData itemSortData = new ItemSortData();
 		itemSortData.SetItem(item);
@@ -65,14 +64,11 @@ public class TradingPostBuyConfirm : GameSection
 		{
 		case ITEM_ICON_TYPE.ITEM:
 		case ITEM_ICON_TYPE.QUEST_ITEM:
-		{
-			ulong uniqID = data.GetUniqID();
-			if (uniqID != 0)
+			if (data.GetUniqID() != 0L)
 			{
 				is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, data.GetUniqID());
 			}
 			break;
-		}
 		default:
 			is_new = true;
 			break;
@@ -82,28 +78,21 @@ public class TradingPostBuyConfirm : GameSection
 		int enemy_icon_id = 0;
 		if (iTEM_ICON_TYPE == ITEM_ICON_TYPE.ITEM)
 		{
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(data.GetTableID());
-			enemy_icon_id = itemData.enemyIconID;
+			enemy_icon_id = Singleton<ItemTable>.I.GetItemData(data.GetTableID()).enemyIconID;
 		}
 		ItemIcon itemIcon = null;
-		if (data.GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
+		itemIcon = ((data.GetIconType() != ITEM_ICON_TYPE.QUEST_ITEM) ? ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, num, "DROP", event_data, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id) : ItemIcon.Create(new ItemIcon.ItemIconCreateParam
 		{
-			ItemIcon.ItemIconCreateParam itemIconCreateParam = new ItemIcon.ItemIconCreateParam();
-			itemIconCreateParam.icon_type = data.GetIconType();
-			itemIconCreateParam.icon_id = data.GetIconID();
-			itemIconCreateParam.rarity = data.GetRarity();
-			itemIconCreateParam.parent = holder;
-			itemIconCreateParam.element = data.GetIconElement();
-			itemIconCreateParam.magi_enable_equip_type = data.GetIconMagiEnableType();
-			itemIconCreateParam.num = data.GetNum();
-			itemIconCreateParam.enemy_icon_id = enemy_icon_id;
-			itemIconCreateParam.questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST;
-			itemIcon = ItemIcon.Create(itemIconCreateParam);
-		}
-		else
-		{
-			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, num, "DROP", event_data, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id);
-		}
+			icon_type = data.GetIconType(),
+			icon_id = data.GetIconID(),
+			rarity = data.GetRarity(),
+			parent = holder,
+			element = data.GetIconElement(),
+			magi_enable_equip_type = data.GetIconMagiEnableType(),
+			num = data.GetNum(),
+			enemy_icon_id = enemy_icon_id,
+			questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST
+		}));
 		itemIcon.SetRewardBG(is_visible: false);
 		SetMaterialInfo(itemIcon.transform, data.GetMaterialType(), data.GetTableID(), GetCtrl(UI.PNL_MATERIAL_INFO));
 	}

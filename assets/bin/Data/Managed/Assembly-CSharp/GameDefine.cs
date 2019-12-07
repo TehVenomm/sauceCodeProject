@@ -371,20 +371,26 @@ public static class GameDefine
 
 	public const string BANNDER_ID = "BANNDER_ID";
 
-	public static bool ACTIVE_DEGREE => MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds != null && MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds.Count == DEGREE_PART_COUNT;
+	public static bool ACTIVE_DEGREE
+	{
+		get
+		{
+			if (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds != null)
+			{
+				return MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds.Count == DEGREE_PART_COUNT;
+			}
+			return false;
+		}
+	}
 
 	public static Vector3 GetCharaRotateVector(InputManager.TouchInfo touch_info)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 		return GetCharaRotateVector(touch_info.move);
 	}
 
 	public static Vector3 GetCharaRotateVector(Vector2 move)
 	{
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 result = default(Vector3);
-		result._002Ector(0f, (0f - move.x) * 0.5f, 0f);
+		Vector3 result = new Vector3(0f, (0f - move.x) * 0.5f, 0f);
 		if (Mathf.Abs(result.y) > 35f)
 		{
 			result.y = Mathf.Sign(result.y) * 35f;
@@ -470,17 +476,10 @@ public static class GameDefine
 		{
 			return false;
 		}
-		switch (typeInt)
+		if ((uint)(typeInt - 1) <= 2u || (uint)(typeInt - 5) <= 2u)
 		{
-		case 1:
-		case 2:
-		case 3:
-		case 5:
-		case 6:
-		case 7:
 			return true;
-		default:
-			return false;
 		}
+		return false;
 	}
 }

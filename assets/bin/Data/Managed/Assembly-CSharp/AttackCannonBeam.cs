@@ -47,17 +47,17 @@ public class AttackCannonBeam : MonoBehaviour
 
 		private void FixedUpdate()
 		{
-			fixedTime += Time.get_fixedDeltaTime();
+			fixedTime += Time.fixedDeltaTime;
 		}
 
 		protected override void OnTriggerEnter(Collider collider)
 		{
-			hitLayer = collider.get_gameObject().get_layer();
+			hitLayer = collider.gameObject.layer;
 			if (((1 << hitLayer) & ignoreLayerMask) == 0)
 			{
 				if (hitLayer == 11)
 				{
-					hitEnemy = collider.get_gameObject().GetComponent<Enemy>();
+					hitEnemy = collider.gameObject.GetComponent<Enemy>();
 				}
 				isHit = true;
 				base.OnTriggerEnter(collider);
@@ -85,22 +85,8 @@ public class AttackCannonBeam : MonoBehaviour
 
 	private CannonBeamAttackObject m_attackObj;
 
-	public AttackCannonBeam()
-		: this()
-	{
-	}
-
 	public void Initialize(InitParamCannonBeam initParam)
 	{
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Expected O, but got Unknown
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
 		if (initParam.atkInfo == null)
 		{
 			return;
@@ -118,24 +104,23 @@ public class AttackCannonBeam : MonoBehaviour
 			if (data != null)
 			{
 				m_attacker = initParam.attacker;
-				m_cachedTransform = this.get_transform();
-				m_cachedTransform.set_parent((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
+				m_cachedTransform = base.transform;
+				m_cachedTransform.parent = (MonoBehaviourSingleton<StageObjectManager>.IsValid() ? MonoBehaviourSingleton<StageObjectManager>.I._transform : MonoBehaviourSingleton<EffectManager>.I._transform);
 				Transform launchTrans = initParam.launchTrans;
-				m_cachedTransform.set_position(launchTrans.get_position());
-				m_cachedTransform.set_rotation(launchTrans.get_rotation());
-				m_cachedTransform.set_localScale(data.timeStartScale);
+				m_cachedTransform.position = launchTrans.position;
+				m_cachedTransform.rotation = launchTrans.rotation;
+				m_cachedTransform.localScale = data.timeStartScale;
 				m_existTime = data.appearTime;
 				m_hasExistTime = (data.appearTime > 0f);
 				float radius = data.radius;
 				float capsuleHeight = data.capsuleHeight;
 				Vector3 hitOffset = data.hitOffset;
 				int ignoreLayerMask = 20736;
-				GameObject val = new GameObject("CannonBeamAttackObject");
-				CannonBeamAttackObject cannonBeamAttackObject = val.AddComponent<CannonBeamAttackObject>();
-				cannonBeamAttackObject.Initialize(m_attacker, m_cachedTransform, m_atkInfo, hitOffset, Vector3.get_zero(), radius, capsuleHeight, 14);
+				CannonBeamAttackObject cannonBeamAttackObject = new GameObject("CannonBeamAttackObject").AddComponent<CannonBeamAttackObject>();
+				cannonBeamAttackObject.Initialize(m_attacker, m_cachedTransform, m_atkInfo, hitOffset, Vector3.zero, radius, capsuleHeight, 14);
 				cannonBeamAttackObject.SetIgnoreLayerMask(ignoreLayerMask);
 				m_attackObj = cannonBeamAttackObject;
-				Transform val2 = m_effectTrans = EffectManager.GetEffect(data.effectName, launchTrans);
+				Transform transform = m_effectTrans = EffectManager.GetEffect(data.effectName, launchTrans);
 			}
 		}
 	}
@@ -144,21 +129,21 @@ public class AttackCannonBeam : MonoBehaviour
 	{
 		if (m_hasExistTime)
 		{
-			m_existTimer += Time.get_deltaTime();
+			m_existTimer += Time.deltaTime;
 			if (m_existTimer > m_existTime)
 			{
-				Object.Destroy(this.get_gameObject());
+				Object.Destroy(base.gameObject);
 			}
 		}
 	}
 
 	private void OnDestroy()
 	{
-		Transform parent = (!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform;
+		Transform parent = MonoBehaviourSingleton<StageObjectManager>.IsValid() ? MonoBehaviourSingleton<StageObjectManager>.I._transform : MonoBehaviourSingleton<EffectManager>.I._transform;
 		if (m_effectTrans != null)
 		{
-			m_effectTrans.set_parent(parent);
-			EffectManager.ReleaseEffect(m_effectTrans.get_gameObject());
+			m_effectTrans.parent = parent;
+			EffectManager.ReleaseEffect(m_effectTrans.gameObject);
 		}
 	}
 }

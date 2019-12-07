@@ -71,12 +71,12 @@ public class MissionCheckEqpip : MissionCheckBase
 			return checkWeapon.tableData.type != EQUIPMENT_TYPE.ARROW;
 		case MISSION_REQUIRE.MULTI_EQUIP:
 		{
-			bool flag = checkWeapon.tableData.type != baseWeapon.tableData.type;
-			if (flag)
+			bool num = checkWeapon.tableData.type != baseWeapon.tableData.type;
+			if (num)
 			{
 				isClear = true;
 			}
-			return flag;
+			return num;
 		}
 		default:
 			return false;

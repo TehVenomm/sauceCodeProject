@@ -62,8 +62,6 @@ public class EnemyPacketSender : CharacterPacketSender
 
 	public void SetupEnemyInitializeModel(Coop_Model_EnemyInitialize model, bool send_to, bool resend)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 		model.id = base.owner.id;
 		if (!resend && actionHistoryData != null)
 		{
@@ -87,7 +85,7 @@ public class EnemyPacketSender : CharacterPacketSender
 		model.SetRegionWorks(enemy.regionWorks);
 		model.nowAngryId = enemy.NowAngryID;
 		model.execAngryIds = enemy.ExecAngryIDList;
-		model.target_id = ((!(enemy.actionTarget != null)) ? (-1) : enemy.actionTarget.id);
+		model.target_id = ((enemy.actionTarget != null) ? enemy.actionTarget.id : (-1));
 		model.buff_sync_param = enemy.buffParam.CreateSyncParam();
 		model.cntAtkSyncParam = enemy.continusAttackParam.CreateSyncParam();
 		model.barrierHp = enemy.BarrierHp;
@@ -189,12 +187,7 @@ public class EnemyPacketSender : CharacterPacketSender
 					return false;
 				}
 				Coop_Model_EnemyReviveRegion coop_Model_EnemyReviveRegion2 = send_model as Coop_Model_EnemyReviveRegion;
-				EnemyRegionWork enemyRegionWork = enemy.regionWorks[coop_Model_EnemyReviveRegion2.region_id];
-				if ((int)enemyRegionWork.hp <= 0)
-				{
-					return false;
-				}
-				return true;
+				return ((int)enemy.regionWorks[coop_Model_EnemyReviveRegion2.region_id].hp > 0) ? true : false;
 			});
 		}
 		ClearActionHistory();
@@ -352,14 +345,14 @@ public class EnemyPacketSender : CharacterPacketSender
 		{
 			Coop_Model_EnemySyncTarget coop_Model_EnemySyncTarget = new Coop_Model_EnemySyncTarget();
 			coop_Model_EnemySyncTarget.id = base.owner.id;
-			coop_Model_EnemySyncTarget.targetId = ((!(target != null)) ? (-1) : target.id);
+			coop_Model_EnemySyncTarget.targetId = ((target != null) ? target.id : (-1));
 			SendBroadcast(coop_Model_EnemySyncTarget);
 		}
 	}
 
 	public void OnEnemyRegionNodeActivate(int[] regionIDs, bool isRandom = false, int randomSelectedID = -1)
 	{
-		if (this.get_enabled() && base.owner.IsOriginal())
+		if (base.enabled && base.owner.IsOriginal())
 		{
 			Coop_Model_EnemyRegionNodeActivate coop_Model_EnemyRegionNodeActivate = new Coop_Model_EnemyRegionNodeActivate();
 			coop_Model_EnemyRegionNodeActivate.id = base.owner.id;
@@ -372,11 +365,7 @@ public class EnemyPacketSender : CharacterPacketSender
 
 	public void OnSummonAttack(int enemyId, int attackId, Vector3 pos, Vector3 rot, int targetId)
 	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_enabled() && base.owner.IsOriginal())
+		if (base.enabled && base.owner.IsOriginal())
 		{
 			Coop_Model_EnemySummonAttack coop_Model_EnemySummonAttack = new Coop_Model_EnemySummonAttack();
 			coop_Model_EnemySummonAttack.id = base.owner.id;

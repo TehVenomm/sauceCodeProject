@@ -30,7 +30,7 @@ public class TimeManager : MonoBehaviourSingleton<TimeManager>
 			{
 				return MonoBehaviourSingleton<TimeManager>.I._timeScale;
 			}
-			return Time.get_timeScale();
+			return Time.timeScale;
 		}
 		set
 		{
@@ -39,7 +39,7 @@ public class TimeManager : MonoBehaviourSingleton<TimeManager>
 				MonoBehaviourSingleton<TimeManager>.I._timeScale = value;
 				if (!MonoBehaviourSingleton<TimeManager>.I.IsStop())
 				{
-					Time.set_timeScale(value);
+					Time.timeScale = value;
 				}
 			}
 		}
@@ -48,8 +48,8 @@ public class TimeManager : MonoBehaviourSingleton<TimeManager>
 	protected override void Awake()
 	{
 		base.Awake();
-		Time.set_timeScale(1f);
-		_timeScale = Time.get_timeScale();
+		Time.timeScale = 1f;
+		_timeScale = Time.timeScale;
 	}
 
 	public void SetStop(STOP_FLAG flag, bool is_stop)
@@ -62,7 +62,7 @@ public class TimeManager : MonoBehaviourSingleton<TimeManager>
 		{
 			stopFlags &= ~flag;
 		}
-		Time.set_timeScale((!IsStop()) ? _timeScale : 0f);
+		Time.timeScale = (IsStop() ? 0f : _timeScale);
 	}
 
 	public bool IsStop()
@@ -90,7 +90,7 @@ public class TimeManager : MonoBehaviourSingleton<TimeManager>
 
 	public static string GetRemainTimeToText(TimeSpan span, int digitNum = 3)
 	{
-		string text = string.Empty;
+		string text = "";
 		if (span.Seconds > 0)
 		{
 			span = span.Add(TimeSpan.FromMinutes(1.0));
@@ -111,7 +111,7 @@ public class TimeManager : MonoBehaviourSingleton<TimeManager>
 			text += string.Format(StringTable.Get(STRING_CATEGORY.TIME, 2u), span.Minutes);
 			num++;
 		}
-		if (text == string.Empty)
+		if (text == "")
 		{
 			return string.Format(StringTable.Get(STRING_CATEGORY.TIME, 2u), 0);
 		}
@@ -139,7 +139,7 @@ public class TimeManager : MonoBehaviourSingleton<TimeManager>
 
 	private void Update()
 	{
-		elapsedTime += Time.get_unscaledDeltaTime();
+		elapsedTime += Time.unscaledDeltaTime;
 	}
 
 	public static DateTime CombineDateAndTime(DateTime date, DateTime time)

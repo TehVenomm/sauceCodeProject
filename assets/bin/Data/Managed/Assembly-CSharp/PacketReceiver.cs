@@ -20,7 +20,6 @@ public class PacketReceiver : MonoBehaviour
 	public List<CoopPacket> packets => m_packets;
 
 	public PacketReceiver()
-		: this()
 	{
 		stopPacketUpdate = false;
 	}

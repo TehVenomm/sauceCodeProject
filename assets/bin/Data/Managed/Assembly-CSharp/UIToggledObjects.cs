@@ -16,11 +16,6 @@ public class UIToggledObjects : MonoBehaviour
 	[SerializeField]
 	private bool inverse;
 
-	public UIToggledObjects()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		if (target != null)
@@ -41,14 +36,13 @@ public class UIToggledObjects : MonoBehaviour
 				target = null;
 			}
 		}
-		UIToggle component = this.GetComponent<UIToggle>();
-		EventDelegate.Add(component.onChange, Toggle);
+		EventDelegate.Add(GetComponent<UIToggle>().onChange, Toggle);
 	}
 
 	public void Toggle()
 	{
 		bool value = UIToggle.current.value;
-		if (this.get_enabled())
+		if (base.enabled)
 		{
 			for (int i = 0; i < activate.Count; i++)
 			{

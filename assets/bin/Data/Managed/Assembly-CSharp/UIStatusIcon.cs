@@ -111,9 +111,9 @@ public class UIStatusIcon
 
 		public void SetTweenEnable(bool enable)
 		{
-			if (!object.ReferenceEquals(tween, null))
+			if ((object)tween != null)
 			{
-				tween.set_enabled(enable);
+				tween.enabled = enable;
 			}
 		}
 	}
@@ -128,9 +128,9 @@ public class UIStatusIcon
 		STATUS_TYPE.DAMAGE_MOTION_STOP
 	};
 
-	private readonly Color defaultTintColor = Color.get_white();
+	private readonly Color defaultTintColor = Color.white;
 
-	private readonly Color fieldBuffTintColor = Color32.op_Implicit(new Color32((byte)159, (byte)104, (byte)104, byte.MaxValue));
+	private readonly Color fieldBuffTintColor = new Color32(159, 104, 104, byte.MaxValue);
 
 	[SerializeField]
 	protected IconInfo[] statusIcons;
@@ -142,7 +142,6 @@ public class UIStatusIcon
 
 	public void UpDateStatusIcon()
 	{
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 		if (target == null)
 		{
 			return;
@@ -168,13 +167,12 @@ public class UIStatusIcon
 			statusIcons[k].isFieldBuff = false;
 			statusIcons[k].SetTweenEnable(enable: false);
 			statusIcons[k].icon.color = defaultTintColor;
-			statusIcons[k].icon.get_gameObject().SetActive(false);
+			statusIcons[k].icon.gameObject.SetActive(value: false);
 		}
 	}
 
 	private bool _SetStatusIcon(STATUS_TYPE type, int index, bool isFieldBuff)
 	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 		string iconSpriteNameByStatusType = GetIconSpriteNameByStatusType(type);
 		if (statusIcons[index].icon.atlas.GetSprite(iconSpriteNameByStatusType) == null)
 		{
@@ -183,7 +181,7 @@ public class UIStatusIcon
 		statusIcons[index].icon.spriteName = iconSpriteNameByStatusType;
 		statusIcons[index].icon.color = defaultTintColor;
 		statusIcons[index].SetTweenEnable(isFieldBuff);
-		statusIcons[index].icon.get_gameObject().SetActive(true);
+		statusIcons[index].icon.gameObject.SetActive(value: true);
 		return true;
 	}
 
@@ -205,17 +203,17 @@ public class UIStatusIcon
 			}
 			if (CheckStatus((STATUS_TYPE)num3, buffParam, nonBuff))
 			{
-				IconInfo iconInfo = statusIcons[num2];
+				IconInfo obj = statusIcons[num2];
 				string iconSpriteNameByStatusType = GetIconSpriteNameByStatusType((STATUS_TYPE)num3);
-				iconInfo.icon.spriteName = iconSpriteNameByStatusType;
-				iconInfo.icon.get_gameObject().SetActive(true);
+				obj.icon.spriteName = iconSpriteNameByStatusType;
+				obj.icon.gameObject.SetActive(value: true);
 				num2++;
 				result = num3;
 			}
 		}
 		for (int j = num2; j < num; j++)
 		{
-			statusIcons[j].icon.get_gameObject().SetActive(false);
+			statusIcons[j].icon.gameObject.SetActive(value: false);
 		}
 		return result;
 	}
@@ -254,15 +252,35 @@ public class UIStatusIcon
 		switch (type)
 		{
 		case STATUS_TYPE.PARALYZE:
-			return character.IsParalyze() && !isFieldBuff;
+			if (character.IsParalyze())
+			{
+				return !isFieldBuff;
+			}
+			return false;
 		case STATUS_TYPE.FREEZE:
-			return character.IsFreeze() && !isFieldBuff;
+			if (character.IsFreeze())
+			{
+				return !isFieldBuff;
+			}
+			return false;
 		case STATUS_TYPE.SHADOWSEALING:
-			return character.IsDebuffShadowSealing() && !isFieldBuff;
+			if (character.IsDebuffShadowSealing())
+			{
+				return !isFieldBuff;
+			}
+			return false;
 		case STATUS_TYPE.LIGHT_RING:
-			return character.IsLightRing() && !isFieldBuff;
+			if (character.IsLightRing())
+			{
+				return !isFieldBuff;
+			}
+			return false;
 		case STATUS_TYPE.CONCUSSION:
-			return character.IsConcussion() && !isFieldBuff;
+			if (character.IsConcussion())
+			{
+				return !isFieldBuff;
+			}
+			return false;
 		default:
 			return CheckStatus(type, character.buffParam, isFieldBuff);
 		}
@@ -270,7 +288,15 @@ public class UIStatusIcon
 
 	public static bool CheckStatus(STATUS_TYPE type, BuffParam buffParam, List<int> nonBuffStatus)
 	{
-		return CheckStatus(type, buffParam) || (nonBuffStatus != null && CheckStatus(type, nonBuffStatus));
+		if (!CheckStatus(type, buffParam))
+		{
+			if (nonBuffStatus != null)
+			{
+				return CheckStatus(type, nonBuffStatus);
+			}
+			return false;
+		}
+		return true;
 	}
 
 	private static bool CheckStatus(STATUS_TYPE type, List<int> nonBuffStatus)
@@ -303,39 +329,103 @@ public class UIStatusIcon
 		case STATUS_TYPE.MOVE_SPEED_DOWN:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.MOVE_SPEED_DOWN, isFieldBuff);
 		case STATUS_TYPE.ATTACK_NORMAL:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_NORMAL, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_NORMAL, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_NORMAL, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_NORMAL, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.ATTACK_FIRE:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_FIRE, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_FIRE, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_FIRE, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_FIRE, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.ATTACK_WATER:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_WATER, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_WATER, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_WATER, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_WATER, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.ATTACK_THUNDER:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_THUNDER, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_THUNDER, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_THUNDER, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_THUNDER, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.ATTACK_SOIL:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_SOIL, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_SOIL, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_SOIL, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_SOIL, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.ATTACK_LIGHT:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_LIGHT, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_LIGHT, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_LIGHT, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_LIGHT, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.ATTACK_DARK:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_DARK, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_DARK, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_DARK, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_DARK, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.ATTACK_ALLELEMENT:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_ALLELEMENT, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_ALLELEMENT, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATTACK_ALLELEMENT, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_ALLELEMENT, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.ATTACK_ALL:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.ATKUP_RATE_ALL, isFieldBuff);
 		case STATUS_TYPE.DEFENCE_NORMAL:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_NORMAL, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_NORMAL, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_NORMAL, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_NORMAL, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.DEFENCE_FIRE:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_FIRE, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_FIRE, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_FIRE, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_FIRE, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.DEFENCE_WATER:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_WATER, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_WATER, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_WATER, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_WATER, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.DEFENCE_THUNDER:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_THUNDER, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_THUNDER, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_THUNDER, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_THUNDER, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.DEFENCE_SOIL:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_SOIL, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_SOIL, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_SOIL, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_SOIL, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.DEFENCE_LIGHT:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_LIGHT, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_LIGHT, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_LIGHT, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_LIGHT, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.DEFENCE_DARK:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_DARK, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_DARK, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_DARK, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_DARK, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.DEFENCE_ALLELEMENT:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_ALLELEMENT, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFUP_RATE_ALLELEMENT, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.REGENERATE:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.REGENERATE, isFieldBuff);
 		case STATUS_TYPE.ELECTRIC_SHOCK:
@@ -353,7 +443,11 @@ public class UIStatusIcon
 		case STATUS_TYPE.BURNING_GUARD:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.BURN_GUARD, isFieldBuff);
 		case STATUS_TYPE.SUPER_ARMOR:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.SUPER_ARMOR, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.SHIELD_SUPER_ARMOR, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.SUPER_ARMOR, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.SHIELD_SUPER_ARMOR, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.DEFENCE_DOWN:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.DEFDOWN_RATE_NORMAL, isFieldBuff);
 		case STATUS_TYPE.DEF_DOWN_FIRE:
@@ -415,7 +509,11 @@ public class UIStatusIcon
 		case STATUS_TYPE.SKILL_HEAL_SPEEDUP:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.SKILL_HEAL_SPEEDUP, isFieldBuff);
 		case STATUS_TYPE.GAUGE_INCREASE_UP:
-			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.HEAT_GAUGE_INCREASE_UP, isFieldBuff) || buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.SOUL_GAUGE_INCREASE_UP, isFieldBuff);
+			if (!buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.HEAT_GAUGE_INCREASE_UP, isFieldBuff))
+			{
+				return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.SOUL_GAUGE_INCREASE_UP, isFieldBuff);
+			}
+			return true;
 		case STATUS_TYPE.SKILL_CHARGE_WHEN_DAMAGED:
 			return buffParam.IsValidBuffOrFieldBuff(BuffParam.BUFFTYPE.SKILL_CHARGE_WHEN_DAMAGED, isFieldBuff);
 		case STATUS_TYPE.INVINCIBLE_LIGHT:

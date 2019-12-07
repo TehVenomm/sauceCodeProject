@@ -31,11 +31,7 @@ public abstract class UITweener : MonoBehaviour
 	public Style style;
 
 	[HideInInspector]
-	public AnimationCurve animationCurve = new AnimationCurve((Keyframe[])new Keyframe[2]
-	{
-		new Keyframe(0f, 0f, 0f, 1f),
-		new Keyframe(1f, 1f, 1f, 0f)
-	});
+	public AnimationCurve animationCurve = new AnimationCurve(new Keyframe(0f, 0f, 0f, 1f), new Keyframe(1f, 1f, 1f, 0f));
 
 	[HideInInspector]
 	public bool ignoreTimeScale = true;
@@ -80,7 +76,7 @@ public abstract class UITweener : MonoBehaviour
 			if (mDuration != duration)
 			{
 				mDuration = duration;
-				mAmountPerDelta = Mathf.Abs((!(duration > 0f)) ? 1000f : (1f / duration)) * Mathf.Sign(mAmountPerDelta);
+				mAmountPerDelta = Mathf.Abs((duration > 0f) ? (1f / duration) : 1000f) * Mathf.Sign(mAmountPerDelta);
 			}
 			return mAmountPerDelta;
 		}
@@ -98,18 +94,17 @@ public abstract class UITweener : MonoBehaviour
 		}
 	}
 
-	public Direction direction => (!(amountPerDelta < 0f)) ? Direction.Forward : Direction.Reverse;
-
-	protected UITweener()
-		: this()
+	public Direction direction
 	{
-	}//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-	//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-	//IL_005b: Expected O, but got Unknown
-
+		get
+		{
+			if (!(amountPerDelta < 0f))
+			{
+				return Direction.Forward;
+			}
+			return Direction.Reverse;
+		}
+	}
 
 	private void Reset()
 	{
@@ -128,8 +123,8 @@ public abstract class UITweener : MonoBehaviour
 	private void Update()
 	{
 		bool flag = false;
-		float num = (!ignoreTimeScale) ? Time.get_deltaTime() : RealTime.deltaTime;
-		float num2 = (!ignoreTimeScale) ? Time.get_time() : RealTime.time;
+		float num = ignoreTimeScale ? RealTime.deltaTime : Time.deltaTime;
+		float num2 = ignoreTimeScale ? RealTime.time : Time.time;
 		if (!mStarted)
 		{
 			flag = true;
@@ -170,12 +165,12 @@ public abstract class UITweener : MonoBehaviour
 				Sample(mFactor, isFinished: false);
 				if (duration == 0f)
 				{
-					this.set_enabled(false);
+					base.enabled = false;
 				}
 				return;
 			}
 			Sample(mFactor, isFinished: true);
-			this.set_enabled(false);
+			base.enabled = false;
 			if (!(current == null))
 			{
 				return;
@@ -199,7 +194,7 @@ public abstract class UITweener : MonoBehaviour
 			}
 			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
 			{
-				eventReceiver.SendMessage(callWhenFinished, (object)this, 1);
+				eventReceiver.SendMessage(callWhenFinished, this, SendMessageOptions.DontRequireReceiver);
 			}
 			current = uITweener;
 		}
@@ -286,7 +281,7 @@ public abstract class UITweener : MonoBehaviour
 		{
 			num = 1f - BounceLogic(1f - num);
 		}
-		OnUpdate((animationCurve == null) ? num : animationCurve.Evaluate(num), isFinished);
+		OnUpdate((animationCurve != null) ? animationCurve.Evaluate(num) : num, isFinished);
 	}
 
 	private float BounceLogic(float val)
@@ -318,14 +313,14 @@ public abstract class UITweener : MonoBehaviour
 		{
 			mAmountPerDelta = 0f - mAmountPerDelta;
 		}
-		this.set_enabled(true);
+		base.enabled = true;
 		Update();
 	}
 
 	public void ResetToBeginning()
 	{
 		mStarted = false;
-		mFactor = ((!(amountPerDelta < 0f)) ? 0f : 1f);
+		mFactor = ((amountPerDelta < 0f) ? 1f : 0f);
 		Sample(mFactor, isFinished: false);
 	}
 
@@ -339,42 +334,36 @@ public abstract class UITweener : MonoBehaviour
 		{
 			mAmountPerDelta = Mathf.Abs(amountPerDelta);
 		}
-		this.set_enabled(true);
+		base.enabled = true;
 	}
 
 	protected abstract void OnUpdate(float factor, bool isFinished);
 
 	public static T Begin<T>(GameObject go, float duration, bool overrideAnimationCurve = true) where T : UITweener
 	{
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019f: Expected O, but got Unknown
 		T val = go.GetComponent<T>();
-		if (val != null && val.tweenGroup != 0)
+		if ((UnityEngine.Object)val != (UnityEngine.Object)null && val.tweenGroup != 0)
 		{
-			val = (T)null;
+			val = null;
 			T[] components = go.GetComponents<T>();
 			int i = 0;
 			for (int num = components.Length; i < num; i++)
 			{
 				val = components[i];
-				if (val != null && val.tweenGroup == 0)
+				if ((UnityEngine.Object)val != (UnityEngine.Object)null && val.tweenGroup == 0)
 				{
 					break;
 				}
-				val = (T)null;
+				val = null;
 			}
 		}
-		if (val == null)
+		if ((UnityEngine.Object)val == (UnityEngine.Object)null)
 		{
 			val = go.AddComponent<T>();
-			if (val == null)
+			if ((UnityEngine.Object)val == (UnityEngine.Object)null)
 			{
-				Debug.LogError((object)("Unable to add " + typeof(T) + " to " + NGUITools.GetHierarchy(go)), go);
-				return (T)null;
+				Debug.LogError("Unable to add " + typeof(T) + " to " + NGUITools.GetHierarchy(go), go);
+				return null;
 			}
 		}
 		val.mStarted = false;
@@ -384,15 +373,11 @@ public abstract class UITweener : MonoBehaviour
 		val.style = Style.Once;
 		if (overrideAnimationCurve)
 		{
-			val.animationCurve = new AnimationCurve((Keyframe[])new Keyframe[2]
-			{
-				new Keyframe(0f, 0f, 0f, 1f),
-				new Keyframe(1f, 1f, 1f, 0f)
-			});
+			val.animationCurve = new AnimationCurve(new Keyframe(0f, 0f, 0f, 1f), new Keyframe(1f, 1f, 1f, 0f));
 		}
 		val.eventReceiver = null;
 		val.callWhenFinished = null;
-		val.set_enabled(true);
+		val.enabled = true;
 		return val;
 	}
 

@@ -23,27 +23,18 @@ public class MapCylinder : MonoBehaviour
 		protected set;
 	}
 
-	public MapCylinder()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
-		_transform = this.get_transform();
-		meshRenderer = this.GetComponent<MeshRenderer>();
+		_transform = base.transform;
+		meshRenderer = GetComponent<MeshRenderer>();
 		if (meshRenderer != null)
 		{
-			meshRenderer.set_enabled(false);
+			meshRenderer.enabled = false;
 		}
 	}
 
 	private void Update()
 	{
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 		if (meshRenderer == null || !MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			return;
@@ -51,15 +42,14 @@ public class MapCylinder : MonoBehaviour
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 		if (!(self == null))
 		{
-			Vector3 val = self._transform.get_position() - _transform.get_position();
-			float magnitude = val.get_magnitude();
+			float magnitude = (self._transform.position - _transform.position).magnitude;
 			if (magnitude <= radius - hideLength)
 			{
-				meshRenderer.set_enabled(false);
+				meshRenderer.enabled = false;
 			}
 			else if (magnitude >= radius - showLength)
 			{
-				meshRenderer.set_enabled(true);
+				meshRenderer.enabled = true;
 			}
 		}
 	}

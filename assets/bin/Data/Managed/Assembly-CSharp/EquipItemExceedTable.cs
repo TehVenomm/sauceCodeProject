@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 public class EquipItemExceedTable : Singleton<EquipItemExceedTable>, IDataTable
 {
@@ -39,14 +38,15 @@ public class EquipItemExceedTable : Singleton<EquipItemExceedTable>, IDataTable
 
 		public EquipItemExceedData Clone()
 		{
-			EquipItemExceedData equipItemExceedData = new EquipItemExceedData();
-			equipItemExceedData.rarity = rarity;
-			equipItemExceedData.getType = getType;
-			equipItemExceedData.eventId = eventId;
-			equipItemExceedData.exchangeItemId = exchangeItemId;
-			equipItemExceedData.exchangeMoney = exchangeMoney;
-			equipItemExceedData.exceed = exceed;
-			return equipItemExceedData;
+			return new EquipItemExceedData
+			{
+				rarity = rarity,
+				getType = getType,
+				eventId = eventId,
+				exchangeItemId = exchangeItemId,
+				exchangeMoney = exchangeMoney,
+				exceed = exceed
+			};
 		}
 
 		public static uint cb_parse_first_key(string key_str)
@@ -80,8 +80,7 @@ public class EquipItemExceedTable : Singleton<EquipItemExceedTable>, IDataTable
 					{
 						csv_reader.Pop(ref item.num[j]);
 					}
-					ExceedNeedItem exceedNeedItem = list.Find((ExceedNeedItem _data) => _data.itemId == item.itemId);
-					if (exceedNeedItem == null)
+					if (list.Find((ExceedNeedItem _data) => _data.itemId == item.itemId) == null)
 					{
 						list.Add(item);
 					}
@@ -101,24 +100,6 @@ public class EquipItemExceedTable : Singleton<EquipItemExceedTable>, IDataTable
 	}
 
 	private DoubleUIntKeyTable<EquipItemExceedData> tableData;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<EquipItemExceedData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntParseKey _003C_003Ef__mg_0024cache2;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<EquipItemExceedData> _003C_003Ef__mg_0024cache3;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache4;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntParseKey _003C_003Ef__mg_0024cache5;
 
 	public void CreateTable(string csv_text)
 	{

@@ -137,83 +137,91 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			int type = (int)array[i];
 			if (IsWeapon((EQUIPMENT_TYPE)type))
 			{
-				ENABLE_EQUIP_TYPE_MAX++;
+				int num2 = ++ENABLE_EQUIP_TYPE_MAX;
 			}
 		}
 	}
 
 	private bool IsWeapon(EQUIPMENT_TYPE type)
 	{
-		return type >= EQUIPMENT_TYPE.ONE_HAND_SWORD && type <= EQUIPMENT_TYPE.ARROW;
+		if (type >= EQUIPMENT_TYPE.ONE_HAND_SWORD)
+		{
+			return type <= EQUIPMENT_TYPE.ARROW;
+		}
+		return false;
 	}
 
 	private bool IsArmor(EQUIPMENT_TYPE type)
 	{
-		return type >= EQUIPMENT_TYPE.ARMOR && type <= EQUIPMENT_TYPE.LEG;
+		if (type >= EQUIPMENT_TYPE.ARMOR)
+		{
+			return type <= EQUIPMENT_TYPE.LEG;
+		}
+		return false;
 	}
 
 	public void _LoadTable()
 	{
-		this.StartCoroutine(_LoadTableData());
+		StartCoroutine(_LoadTableData());
 	}
 
 	private IEnumerator _LoadTableData()
 	{
 		if (!initialized)
 		{
-			LoadingQueue load_queue = new LoadingQueue(this);
-			LoadObject lo_equip_model_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, "EquipModelTable");
-			LoadObject lo_equip_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, "EquipItemTable");
-			LoadObject lo_equip_exceed_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, "EquipItemExceedTable");
-			LoadObject lo_skill_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, "SkillItemTable");
-			LoadObject lo_ability_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, "AbilityTable");
-			LoadObject lo_ability_data_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, "AbilityDataTable");
-			LoadObject lo_ability_item_lot_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, "AbilityItemLotTable");
-			LoadObject lo_assigned_equipment_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, "AssignedEquipmentTable");
-			if (load_queue.IsLoading())
+			LoadingQueue loadingQueue = new LoadingQueue(this);
+			LoadObject lo_equip_model_table = loadingQueue.Load(RESOURCE_CATEGORY.TABLE, "EquipModelTable");
+			LoadObject lo_equip_table = loadingQueue.Load(RESOURCE_CATEGORY.TABLE, "EquipItemTable");
+			LoadObject lo_equip_exceed_table = loadingQueue.Load(RESOURCE_CATEGORY.TABLE, "EquipItemExceedTable");
+			LoadObject lo_skill_table = loadingQueue.Load(RESOURCE_CATEGORY.TABLE, "SkillItemTable");
+			LoadObject lo_ability_table = loadingQueue.Load(RESOURCE_CATEGORY.TABLE, "AbilityTable");
+			LoadObject lo_ability_data_table = loadingQueue.Load(RESOURCE_CATEGORY.TABLE, "AbilityDataTable");
+			LoadObject lo_ability_item_lot_table = loadingQueue.Load(RESOURCE_CATEGORY.TABLE, "AbilityItemLotTable");
+			LoadObject lo_assigned_equipment_table = loadingQueue.Load(RESOURCE_CATEGORY.TABLE, "AssignedEquipmentTable");
+			if (loadingQueue.IsLoading())
 			{
-				yield return load_queue.Wait();
+				yield return loadingQueue.Wait();
 			}
 			if (!Singleton<EquipModelTable>.IsValid())
 			{
 				Singleton<EquipModelTable>.Create();
 			}
-			Singleton<EquipModelTable>.I.CreateTable(lo_equip_model_table.loadedObject.get_text());
+			Singleton<EquipModelTable>.I.CreateTable(((TextAsset)lo_equip_model_table.loadedObject).text);
 			if (!Singleton<EquipItemTable>.IsValid())
 			{
 				Singleton<EquipItemTable>.Create();
 			}
-			Singleton<EquipItemTable>.I.CreateTable(lo_equip_table.loadedObject.get_text());
+			Singleton<EquipItemTable>.I.CreateTable(((TextAsset)lo_equip_table.loadedObject).text);
 			if (!Singleton<EquipItemExceedTable>.IsValid())
 			{
 				Singleton<EquipItemExceedTable>.Create();
 			}
-			Singleton<EquipItemExceedTable>.I.CreateTable(lo_equip_exceed_table.loadedObject.get_text());
+			Singleton<EquipItemExceedTable>.I.CreateTable(((TextAsset)lo_equip_exceed_table.loadedObject).text);
 			if (!Singleton<SkillItemTable>.IsValid())
 			{
 				Singleton<SkillItemTable>.Create();
 			}
-			Singleton<SkillItemTable>.I.CreateTable(lo_skill_table.loadedObject.get_text());
+			Singleton<SkillItemTable>.I.CreateTable(((TextAsset)lo_skill_table.loadedObject).text);
 			if (!Singleton<AbilityTable>.IsValid())
 			{
 				Singleton<AbilityTable>.Create();
 			}
-			Singleton<AbilityTable>.I.CreateTable(lo_ability_table.loadedObject.get_text());
+			Singleton<AbilityTable>.I.CreateTable(((TextAsset)lo_ability_table.loadedObject).text);
 			if (!Singleton<AbilityDataTable>.IsValid())
 			{
 				Singleton<AbilityDataTable>.Create();
 			}
-			Singleton<AbilityDataTable>.I.CreateTable(lo_ability_data_table.loadedObject.get_text());
+			Singleton<AbilityDataTable>.I.CreateTable(((TextAsset)lo_ability_data_table.loadedObject).text);
 			if (!Singleton<AbilityItemLotTable>.IsValid())
 			{
 				Singleton<AbilityItemLotTable>.Create();
 			}
-			Singleton<AbilityItemLotTable>.I.CreateTable(lo_ability_item_lot_table.loadedObject.get_text());
+			Singleton<AbilityItemLotTable>.I.CreateTable(((TextAsset)lo_ability_item_lot_table.loadedObject).text);
 			if (!Singleton<AssignedEquipmentTable>.IsValid())
 			{
 				Singleton<AssignedEquipmentTable>.Create();
 			}
-			Singleton<AssignedEquipmentTable>.I.CreateTable(lo_assigned_equipment_table.loadedObject.get_text());
+			Singleton<AssignedEquipmentTable>.I.CreateTable(((TextAsset)lo_assigned_equipment_table.loadedObject).text);
 			initialized = true;
 		}
 	}
@@ -337,7 +345,11 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 	{
 		if (GetLocalEquipSetNo() == -1)
 		{
-			return MonoBehaviourSingleton<UserInfoManager>.IsValid() ? MonoBehaviourSingleton<UserInfoManager>.I.userStatus.eSetNo : 0;
+			if (!MonoBehaviourSingleton<UserInfoManager>.IsValid())
+			{
+				return 0;
+			}
+			return MonoBehaviourSingleton<UserInfoManager>.I.userStatus.eSetNo;
 		}
 		return GetLocalEquipSetNo();
 	}
@@ -428,7 +440,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			ulong[] array = new ulong[7];
 			for (int j = 0; j < 7; j++)
 			{
-				array[j] = ((equipSetInfo.item[j] == null) ? 0 : equipSetInfo.item[j].uniqueID);
+				array[j] = ((equipSetInfo.item[j] != null) ? equipSetInfo.item[j].uniqueID : 0);
 			}
 			if (MonoBehaviourSingleton<StatusManager>.I.IsChangeEquipSetInfo(i, array, equipSetInfo.showHelm, equipSetInfo.acc))
 			{
@@ -533,8 +545,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		int i = 0;
 		for (int num5 = localVisual.visualItem.Length; i < num5; i++)
 		{
-			ulong num6 = (localVisual.visualItem[i] == null) ? 0 : localVisual.visualItem[i].uniqueID;
-			if (num6 != array[i])
+			if (((localVisual.visualItem[i] != null) ? localVisual.visualItem[i].uniqueID : 0) != array[i])
 			{
 				flag = true;
 				break;
@@ -558,7 +569,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	public void CheckChangeEquip(int equip_set_no, Action<bool> callback)
 	{
-		this.StartCoroutine(_CheckChangeEquipCoroutine(equip_set_no, callback));
+		StartCoroutine(_CheckChangeEquipCoroutine(equip_set_no, callback));
 	}
 
 	private IEnumerator _CheckChangeEquipCoroutine(int equip_set_no, Action<bool> callback)
@@ -593,7 +604,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			}
 			wait_equip = false;
 		});
-		while (wait_equip || wait_visual_equip)
+		while (wait_equip | wait_visual_equip)
 		{
 			if (recv_break)
 			{
@@ -652,7 +663,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	public bool IsEquipping(EquipItemInfo item, int set_no = -1)
 	{
-		if (item == null || item.uniqueID == 0)
+		if (item == null || item.uniqueID == 0L)
 		{
 			return false;
 		}
@@ -687,7 +698,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	private bool IsEquipping(int set_no, EquipItemInfo item, Action<int, int> callback = null)
 	{
-		if (item == null || item.uniqueID == 0)
+		if (item == null || item.uniqueID == 0L)
 		{
 			return false;
 		}
@@ -697,7 +708,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			int i = 0;
 			for (int num = equipSetInfo.item.Length; i < num; i++)
 			{
-				if (equipSetInfo.item[i] != null && equipSetInfo.item[i].uniqueID != 0 && equipSetInfo.item[i].uniqueID == item.uniqueID)
+				if (equipSetInfo.item[i] != null && equipSetInfo.item[i].uniqueID != 0L && equipSetInfo.item[i].uniqueID == item.uniqueID)
 				{
 					callback?.Invoke(set_no, i);
 					return true;
@@ -725,7 +736,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		int i = 0;
 		for (int num = equipSetInfo.item.Length; i < num; i++)
 		{
-			ulong num2 = (equipSetInfo.item[i] == null) ? 0 : equipSetInfo.item[i].uniqueID;
+			ulong num2 = (equipSetInfo.item[i] != null) ? equipSetInfo.item[i].uniqueID : 0;
 			if (change_equip_items[i] != num2)
 			{
 				return true;
@@ -745,8 +756,8 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		createPlayerInfo.extentionInfo = new StageObjectManager.CreatePlayerInfo.ExtentionInfo();
 		if (MonoBehaviourSingleton<FieldManager>.I.isTutorialField)
 		{
-			createPlayerInfo.charaInfo.name = ((!PlayerPrefs.HasKey("Tut_Name")) ? "???" : PlayerPrefs.GetString("Tut_Name"));
-			createPlayerInfo.charaInfo.comment = string.Empty;
+			createPlayerInfo.charaInfo.name = (PlayerPrefs.HasKey("Tut_Name") ? PlayerPrefs.GetString("Tut_Name") : "???");
+			createPlayerInfo.charaInfo.comment = "";
 			createPlayerInfo.charaInfo.hp = 200;
 			createPlayerInfo.charaInfo.atk = 100;
 			createPlayerInfo.charaInfo.def = 100;
@@ -898,7 +909,11 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		}
 		if (equipSet[set_no].showHelm == 2)
 		{
-			return (!MonoBehaviourSingleton<UserInfoManager>.IsValid()) ? 1 : MonoBehaviourSingleton<UserInfoManager>.I.userStatus.showHelm;
+			if (!MonoBehaviourSingleton<UserInfoManager>.IsValid())
+			{
+				return 1;
+			}
+			return MonoBehaviourSingleton<UserInfoManager>.I.userStatus.showHelm;
 		}
 		return equipSet[set_no].showHelm;
 	}
@@ -963,12 +978,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	public uint GetEquippingItemTableID(int equip_slot, int set_no = -1)
 	{
-		EquipItemInfo equippingItemInfo = GetEquippingItemInfo(equip_slot, set_no);
-		if (equippingItemInfo == null)
-		{
-			return 0u;
-		}
-		return equippingItemInfo.tableID;
+		return GetEquippingItemInfo(equip_slot, set_no)?.tableID ?? 0;
 	}
 
 	public EquipItemInfo GetEquipmentWeaponInfo(int equip_slot = 0, int set_no = -1)
@@ -1001,7 +1011,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 	public EquipItemStatus GetEquipSetAllSkillParam(int equip_set_no, bool is_local = false, params int[] exclusion_index)
 	{
 		EquipItemStatus equipItemStatus = new EquipItemStatus();
-		EquipSetInfo[] array = (!is_local) ? equipSet : localEquipSet;
+		EquipSetInfo[] array = is_local ? localEquipSet : equipSet;
 		if (array == null)
 		{
 			return null;
@@ -1154,7 +1164,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			if (data == null)
 			{
 				equip[index] = null;
-				index++;
+				int num6 = ++index;
 			}
 			else
 			{
@@ -1182,7 +1192,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 							int[] growParamElemAtk = growEquipItemData.GetGrowParamElemAtk(equipItemData.atkElement);
 							int[] growParamElemDef = growEquipItemData.GetGrowParamElemDef(equipItemData.defElement);
 							int j = 0;
-							for (int num6 = growParamElemAtk.Length; j < num6; j++)
+							for (int num7 = growParamElemAtk.Length; j < num7; j++)
 							{
 								equip[index].elemAtk[j] = growParamElemAtk[j];
 								equip[index].elemDef[j] = growParamElemDef[j];
@@ -1197,7 +1207,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 						int[] atkElement = equipItemData.atkElement;
 						int[] defElement = equipItemData.defElement;
 						int k = 0;
-						for (int num7 = atkElement.Length; k < num7; k++)
+						for (int num8 = atkElement.Length; k < num8; k++)
 						{
 							equip[index].elemAtk[k] = atkElement[k];
 							equip[index].elemDef[k] = defElement[k];
@@ -1211,7 +1221,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 						exceed_elem = exceedParam.atkElement;
 						exceed_elem2 = exceedParam.defElement;
 						int l = 0;
-						for (int num8 = equip[index].elemAtk.Length; l < num8; l++)
+						for (int num9 = equip[index].elemAtk.Length; l < num9; l++)
 						{
 							equip[index].elemAtk[l] += exceedParam.atkElement[l];
 							equip[index].elemDef[l] += exceedParam.defElement[l];
@@ -1238,55 +1248,55 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 									skill.atk += growSkillItemData.GetGrowParamAtk(skillItemData.baseAtk);
 									int[] growParamElemAtk2 = growSkillItemData.GetGrowParamElemAtk(skillItemData.atkElement);
 									int n = 0;
-									for (int num9 = growParamElemAtk2.Length; n < num9; n++)
+									for (int num10 = growParamElemAtk2.Length; n < num10; n++)
 									{
 										skill.elemAtk[n] += growParamElemAtk2[n];
 									}
 									skill.def += growSkillItemData.GetGrowParamDef(skillItemData.baseDef);
 									skill.hp += growSkillItemData.GetGrowParamHp(skillItemData.baseHp);
 									int[] growParamElemDef2 = growSkillItemData.GetGrowParamElemDef(skillItemData.defElement);
-									int num10 = 0;
-									for (int num11 = growParamElemDef2.Length; num10 < num11; num10++)
+									int num11 = 0;
+									for (int num12 = growParamElemDef2.Length; num11 < num12; num11++)
 									{
-										skill.elemDef[num10] += growParamElemDef2[num10];
+										skill.elemDef[num11] += growParamElemDef2[num11];
 									}
 								}
 								else
 								{
 									skill.atk += skillItemData.baseAtk;
 									int[] atkElement2 = skillItemData.atkElement;
-									int num12 = 0;
-									for (int num13 = atkElement2.Length; num12 < num13; num12++)
+									int num13 = 0;
+									for (int num14 = atkElement2.Length; num13 < num14; num13++)
 									{
-										skill.elemAtk[num12] += atkElement2[num12];
+										skill.elemAtk[num13] += atkElement2[num13];
 									}
 									skill.def += skillItemData.baseDef;
 									skill.hp += skillItemData.baseHp;
 									int[] defElement2 = skillItemData.defElement;
-									int num14 = 0;
-									for (int num15 = defElement2.Length; num14 < num15; num14++)
+									int num15 = 0;
+									for (int num16 = defElement2.Length; num15 < num16; num15++)
 									{
-										skill.elemDef[num14] += defElement2[num14];
+										skill.elemDef[num15] += defElement2[num15];
 									}
 								}
 								if (mainWeaponItemData != null && skillItemData.IsMatchSupportEquipType(mainWeaponItemData.type))
 								{
-									for (int num16 = 0; num16 < skillItemData.supportValue.Length; num16++)
+									for (int num17 = 0; num17 < skillItemData.supportValue.Length; num17++)
 									{
 										if (growSkillItemData != null)
 										{
-											skill.atk += growSkillItemData.GetGrowParamSupprtValue(skillItemData.supportValue, num16);
+											skill.atk += growSkillItemData.GetGrowParamSupprtValue(skillItemData.supportValue, num17);
 										}
 										else
 										{
-											skill.atk += skillItemData.supportValue[num16];
+											skill.atk += skillItemData.supportValue[num17];
 										}
 									}
 								}
 							}
 						}
 					}
-					index++;
+					int num6 = ++index;
 				}
 			}
 		});
@@ -1500,8 +1510,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		for (int num = item.tableData.useEffectTypes.Length; i < num; i++)
 		{
 			USE_ITEM_EFFECT_TYPE type = item.tableData.useEffectTypes[i];
-			BoostStatus boostStatus = GetBoostStatus(type);
-			if (boostStatus != null)
+			if (GetBoostStatus(type) != null)
 			{
 				return true;
 			}
@@ -1567,7 +1576,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 	{
 		if (localEquipSet == null || localEquipSetNo == -1)
 		{
-			Debug.LogWarning((object)"AccessoryOn() : invalid");
+			Debug.LogWarning("AccessoryOn() : invalid");
 			return;
 		}
 		localEquipSet[localEquipSetNo].acc.Clear();
@@ -1580,7 +1589,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 	{
 		if (localEquipSet == null || localEquipSetNo == -1)
 		{
-			Debug.LogWarning((object)"AccessoryOff() : invalid");
+			Debug.LogWarning("AccessoryOff() : invalid");
 		}
 		else
 		{
@@ -1612,7 +1621,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_CHANGE);
 			}
 			call_back(ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendEquipSetNo(int set_no, Action<Error> call_back)
@@ -1630,7 +1639,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_CHANGE);
 			}
 			call_back(ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendMainSetSkill(ulong equip_uniq_id, ulong skill_uniq_id, int slot_index, int setNo, Action<bool> call_back)
@@ -1640,8 +1649,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		requestSendForm.suid = skill_uniq_id.ToString();
 		requestSendForm.slot = slot_index;
 		requestSendForm.no = setNo;
-		EquipItemInfo equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(equip_uniq_id);
-		if (equipItemInfo == null)
+		if (MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(equip_uniq_id) == null)
 		{
 			call_back(obj: false);
 			return;
@@ -1672,7 +1680,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_SKILL_CHANGE);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDetachMainSkill(ulong equip_uniq_id, int slot, int setNo, Action<bool> call_back)
@@ -1690,7 +1698,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_SKILL_CHANGE);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDetachAllMainSkill(ulong equip_uniq_id, int _setNo, Action<bool> _callback)
@@ -1710,7 +1718,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			{
 				_callback(obj);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendDetachMainAllSkillFromEvery(int _setNo, Action<bool> _callback)
@@ -1729,7 +1737,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			{
 				_callback(obj);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendInventoryEquipLock(ulong equip_uniq_id, Action<bool, EquipItemInfo> call_back)
@@ -1747,7 +1755,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_FAVORITE);
 			}
 			call_back(arg, arg2);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInventorySkillLock(ulong skill_uniq_id, Action<bool, SkillItemInfo> call_back)
@@ -1765,7 +1773,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_SKILL_FAVORITE);
 			}
 			call_back(arg, arg2);
-		}, string.Empty);
+		});
 	}
 
 	public void SendVisualEquip(ulong armor_id, ulong helm_id, ulong arm_id, ulong leg_id, bool is_visible_helm, Action<bool> call_back)
@@ -1783,7 +1791,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void OnDiff(BaseModelDiff.DiffEquipSet diff)
@@ -1855,7 +1863,6 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 	public void OnDiff(BaseModelDiff.DiffAccessorySet diff)
 	{
 		bool flag = false;
-		bool flag2 = false;
 		if (Utility.IsExist(diff.add))
 		{
 			int i = 0;
@@ -1909,12 +1916,12 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_SET);
 			}
 			callback(flag);
-		}, string.Empty);
+		});
 	}
 
 	public EquipSetCalculator GetEquipSetCalculator(int setNo)
 	{
-		if (object.ReferenceEquals(equipSetCalc, null) || setNo >= equipSetCalc.Length)
+		if (equipSetCalc == null || setNo >= equipSetCalc.Length)
 		{
 			return null;
 		}
@@ -1923,7 +1930,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	public void ReplaceEquipItem(EquipSetInfo info, int setNo, int index)
 	{
-		if (!object.ReferenceEquals(equipSetCalc, null) && setNo < equipSetCalc.Length)
+		if (equipSetCalc != null && setNo < equipSetCalc.Length)
 		{
 			CharaInfo.EquipItem item = info.ConvertSelfEquipSetItem(index, setNo);
 			equipSetCalc[setNo].SetEquipItem(item, index);
@@ -1932,7 +1939,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	public void ReplaceEquipSet(EquipSetInfo info, int setNo)
 	{
-		if (!object.ReferenceEquals(equipSetCalc, null) && setNo < equipSetCalc.Length)
+		if (equipSetCalc != null && setNo < equipSetCalc.Length)
 		{
 			equipSetCalc[setNo].SetEquipSet(info, setNo);
 		}
@@ -1968,7 +1975,11 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	public static bool IsUnique()
 	{
-		return MonoBehaviourSingleton<StatusManager>.IsValid() && MonoBehaviourSingleton<StatusManager>.I.is_unique;
+		if (MonoBehaviourSingleton<StatusManager>.IsValid())
+		{
+			return MonoBehaviourSingleton<StatusManager>.I.is_unique;
+		}
+		return false;
 	}
 
 	public void InitUniqueEquip()
@@ -2131,7 +2142,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_CHANGE);
 			}
 			call_back(ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void OnDiff(BaseModelDiff.DiffUniqueEquipSet diff)
@@ -2239,7 +2250,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_SKILL_CHANGE);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendUniqueSetSkill(ulong equip_uniq_id, ulong skill_uniq_id, int slot_index, Action<bool> call_back)
@@ -2248,8 +2259,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		requestSendForm.euid = equip_uniq_id.ToString();
 		requestSendForm.suid = skill_uniq_id.ToString();
 		requestSendForm.slot = slot_index;
-		EquipItemInfo equipItemInfo = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(equip_uniq_id);
-		if (equipItemInfo == null)
+		if (MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(equip_uniq_id) == null)
 		{
 			call_back(obj: false);
 			return;
@@ -2280,7 +2290,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_SKILL_CHANGE);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendUniqueDetachSkill(ulong equip_uniq_id, int slot, Action<bool> call_back)
@@ -2297,14 +2307,18 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_SKILL_CHANGE);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public int GetCurrentUniqueEquipSetNo()
 	{
 		if (GetLocalEquipSetNo() == -1)
 		{
-			return MonoBehaviourSingleton<UserInfoManager>.IsValid() ? MonoBehaviourSingleton<UserInfoManager>.I.userStatus.ueSetNo : 0;
+			if (!MonoBehaviourSingleton<UserInfoManager>.IsValid())
+			{
+				return 0;
+			}
+			return MonoBehaviourSingleton<UserInfoManager>.I.userStatus.ueSetNo;
 		}
 		return GetLocalEquipSetNo();
 	}
@@ -2343,7 +2357,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			{
 				_callback(obj);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendDetachAllSkillFromEvery(int _setNo, Action<bool> _callback)
@@ -2380,7 +2394,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			{
 				_callback(obj);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendUniqueEquipSetName(string name, int setNo, Action<bool> callback)
@@ -2396,12 +2410,12 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_SET);
 			}
 			callback(flag);
-		}, string.Empty);
+		});
 	}
 
 	public bool IsUniqueEquipping(EquipItemInfo item, int set_no = -1)
 	{
-		if (item == null || item.uniqueID == 0)
+		if (item == null || item.uniqueID == 0L)
 		{
 			return false;
 		}
@@ -2422,7 +2436,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	private bool IsUniqueEquipping(int set_no, EquipItemInfo item, Action<int, int> callback = null)
 	{
-		if (item == null || item.uniqueID == 0)
+		if (item == null || item.uniqueID == 0L)
 		{
 			return false;
 		}
@@ -2432,7 +2446,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			int i = 0;
 			for (int num = equipSetInfo.item.Length; i < num; i++)
 			{
-				if (equipSetInfo.item[i] != null && equipSetInfo.item[i].uniqueID != 0 && equipSetInfo.item[i].uniqueID == item.uniqueID)
+				if (equipSetInfo.item[i] != null && equipSetInfo.item[i].uniqueID != 0L && equipSetInfo.item[i].uniqueID == item.uniqueID)
 				{
 					callback?.Invoke(set_no, i);
 					return true;
@@ -2444,7 +2458,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	public bool IsUniqueLocalEquipping(EquipItemInfo item, int set_no = -1)
 	{
-		if (item == null || item.uniqueID == 0)
+		if (item == null || item.uniqueID == 0L)
 		{
 			return false;
 		}
@@ -2461,7 +2475,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	private bool IsUniqueLocalEquipping(int set_no, EquipItemInfo item, Action<int, int> callback = null)
 	{
-		if (item == null || item.uniqueID == 0)
+		if (item == null || item.uniqueID == 0L)
 		{
 			return false;
 		}
@@ -2471,7 +2485,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			int i = 0;
 			for (int num = equipSetInfo.item.Length; i < num; i++)
 			{
-				if (equipSetInfo.item[i] != null && equipSetInfo.item[i].uniqueID != 0 && equipSetInfo.item[i].uniqueID == item.uniqueID)
+				if (equipSetInfo.item[i] != null && equipSetInfo.item[i].uniqueID != 0L && equipSetInfo.item[i].uniqueID == item.uniqueID)
 				{
 					callback?.Invoke(set_no, i);
 					return true;
@@ -2483,7 +2497,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	public void CheckChangeUniqueEquip(Action<bool> callback)
 	{
-		this.StartCoroutine(_CheckChangeUniqueEquipCoroutine(callback));
+		StartCoroutine(_CheckChangeUniqueEquipCoroutine(callback));
 	}
 
 	private IEnumerator _CheckChangeUniqueEquipCoroutine(Action<bool> callback)
@@ -2530,7 +2544,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			ulong[] array = new ulong[7];
 			for (int j = 0; j < 7; j++)
 			{
-				array[j] = ((equipSetInfo.item[j] == null) ? 0 : equipSetInfo.item[j].uniqueID);
+				array[j] = ((equipSetInfo.item[j] != null) ? equipSetInfo.item[j].uniqueID : 0);
 			}
 			if (MonoBehaviourSingleton<StatusManager>.I.IsChangeUniqueEquipSetInfo(i, array, equipSetInfo.showHelm, equipSetInfo.acc))
 			{
@@ -2578,7 +2592,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		int i = 0;
 		for (int num = equipSetInfo.item.Length; i < num; i++)
 		{
-			ulong num2 = (equipSetInfo.item[i] == null) ? 0 : equipSetInfo.item[i].uniqueID;
+			ulong num2 = (equipSetInfo.item[i] != null) ? equipSetInfo.item[i].uniqueID : 0;
 			if (change_equip_items[i] != num2)
 			{
 				return true;
@@ -2666,10 +2680,10 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			EquipItemInfo equipItemInfo2 = orderUniqueEquipSet.item[4];
 			EquipItemInfo equipItemInfo3 = orderUniqueEquipSet.item[5];
 			EquipItemInfo equipItemInfo4 = orderUniqueEquipSet.item[6];
-			string str_uniq_id = (equipItemInfo == null) ? "0" : equipItemInfo.uniqueID.ToString();
-			string str_uniq_id2 = (equipItemInfo2 == null) ? "0" : equipItemInfo2.uniqueID.ToString();
-			string str_uniq_id3 = (equipItemInfo3 == null) ? "0" : equipItemInfo3.uniqueID.ToString();
-			string str_uniq_id4 = (equipItemInfo4 == null) ? "0" : equipItemInfo4.uniqueID.ToString();
+			string str_uniq_id = (equipItemInfo != null) ? equipItemInfo.uniqueID.ToString() : "0";
+			string str_uniq_id2 = (equipItemInfo2 != null) ? equipItemInfo2.uniqueID.ToString() : "0";
+			string str_uniq_id3 = (equipItemInfo3 != null) ? equipItemInfo3.uniqueID.ToString() : "0";
+			string str_uniq_id4 = (equipItemInfo4 != null) ? equipItemInfo4.uniqueID.ToString() : "0";
 			createPlayerInfo.charaInfo.aId = (int)MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(str_uniq_id);
 			createPlayerInfo.charaInfo.hId = (int)MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(str_uniq_id2);
 			createPlayerInfo.charaInfo.rId = (int)MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.GetTableID(str_uniq_id3);
@@ -2747,7 +2761,6 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 	public void OnDiff(BaseModelDiff.DiffUniqueAccessorySet diff)
 	{
 		bool flag = false;
-		bool flag2 = false;
 		if (Utility.IsExist(diff.add))
 		{
 			int i = 0;
@@ -2815,7 +2828,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	public void ReplaceUniqueEquipSet(EquipSetInfo info, int setNo)
 	{
-		if (!object.ReferenceEquals(uniqueEquipSetCalc, null) && setNo < uniqueEquipSetCalc.Length)
+		if (uniqueEquipSetCalc != null && setNo < uniqueEquipSetCalc.Length)
 		{
 			uniqueEquipSetCalc[setNo].SetEquipSet(info, setNo, isUnique: true);
 		}
@@ -2839,7 +2852,15 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 		}
 		ulong equipItemUniqId = skillInfo.uniqueEquipSetSkill.equipItemUniqId;
 		int equipSlotNo = skillInfo.uniqueEquipSetSkill.equipSlotNo;
-		return skillInfo.isUniqueAttached && (equipItemUniqId != equipInfo.uniqueID || equipSlotNo != slotNo);
+		if (skillInfo.isUniqueAttached)
+		{
+			if (equipItemUniqId == equipInfo.uniqueID)
+			{
+				return equipSlotNo != slotNo;
+			}
+			return true;
+		}
+		return false;
 	}
 
 	public bool CopyEquipSetCheck(int setNo)
@@ -2871,8 +2892,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	public void CopyEquipSet(int setNo, Action<bool> call_back)
 	{
-		EquipSetInfo[] equipSets = GetEquipSets();
-		EquipSetInfo equipSetInfo = equipSets[setNo];
+		EquipSetInfo equipSetInfo = GetEquipSets()[setNo];
 		EquipSetInfo equipSetInfo2 = localEquipSet[localEquipSetNo];
 		List<ulong> list = new List<ulong>();
 		List<ulong> list2 = new List<ulong>();
@@ -2908,7 +2928,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 			for (int m = 0; m < num2; m++)
 			{
 				SkillItemInfo skillItem = equipItemInfo.GetSkillItem(m, setNo);
-				ulong item = (skillItem == null) ? 0 : skillItem.uniqueID;
+				ulong item = skillItem?.uniqueID ?? 0;
 				int num3 = m;
 				if (equipItemInfo.IsExceedSkillSlot(num3))
 				{
@@ -2942,7 +2962,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	public void ReplaceUniqueEquipItem(EquipSetInfo info, int setNo, int index)
 	{
-		if (!object.ReferenceEquals(uniqueEquipSetCalc, null) && setNo < uniqueEquipSetCalc.Length)
+		if (uniqueEquipSetCalc != null && setNo < uniqueEquipSetCalc.Length)
 		{
 			CharaInfo.EquipItem item = info.ConvertSelfUniqueEquipSetItem(index, setNo);
 			uniqueEquipSetCalc[setNo].SetEquipItem(item, index);
@@ -2968,7 +2988,7 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 
 	public EquipSetCalculator GetUniqueEquipSetCalculator(int setNo)
 	{
-		if (object.ReferenceEquals(uniqueEquipSetCalc, null) || setNo >= uniqueEquipSetCalc.Length || setNo < 0)
+		if (uniqueEquipSetCalc == null || setNo >= uniqueEquipSetCalc.Length || setNo < 0)
 		{
 			return null;
 		}
@@ -3019,17 +3039,12 @@ public class StatusManager : MonoBehaviourSingleton<StatusManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_EQUIP_CHANGE);
 			}
 			call_back(ret.Error == Error.None);
-		}, string.Empty);
+		});
 	}
 
 	public uint GetUniqueEquippingItemTableID(int equip_slot, int set_no = -1)
 	{
-		EquipItemInfo uniqueEquippingItemInfo = GetUniqueEquippingItemInfo(equip_slot, set_no);
-		if (uniqueEquippingItemInfo == null)
-		{
-			return 0u;
-		}
-		return uniqueEquippingItemInfo.tableID;
+		return GetUniqueEquippingItemInfo(equip_slot, set_no)?.tableID ?? 0;
 	}
 
 	public int GetUniqueEquippingShowHelm(int set_no = -1)

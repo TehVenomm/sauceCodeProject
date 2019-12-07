@@ -48,8 +48,7 @@ public class Chat_Model_BroadcastClanStatus_Response : Chat_Model_Base
 		chat_Model_BroadcastClanStatus_Response.Result = result;
 		chat_Model_BroadcastClanStatus_Response.Type = type;
 		chat_Model_BroadcastClanStatus_Response.Status = status;
-		Chat_Model_BroadcastClanStatus_Response chat_Model_BroadcastClanStatus_Response2 = chat_Model_BroadcastClanStatus_Response;
-		chat_Model_BroadcastClanStatus_Response2.SetErrorType("0");
-		return chat_Model_BroadcastClanStatus_Response2;
+		chat_Model_BroadcastClanStatus_Response.SetErrorType("0");
+		return chat_Model_BroadcastClanStatus_Response;
 	}
 }

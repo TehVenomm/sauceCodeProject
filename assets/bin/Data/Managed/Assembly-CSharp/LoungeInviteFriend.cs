@@ -62,7 +62,7 @@ public class LoungeInviteFriend : QuestAcceptRoomInviteFriend
 			{
 				nowPage = 0;
 				pageNumMax = ((recv_data == null) ? 1 : Mathf.CeilToInt((float)recv_data.Length / 10f));
-				inviteUsers = recv_data;
+				PartyInviteCharaInfo[] array = inviteUsers = recv_data;
 				SortArray();
 			}
 			if (callback != null)
@@ -93,7 +93,7 @@ public class LoungeInviteFriend : QuestAcceptRoomInviteFriend
 		SetActive(t, UI.OBJ_CANT_LOUNGE, flag);
 		bool flag2 = IsUserInSameLounge(info);
 		SetActive(t, UI.OBJ_IN_LOUNGE, flag2);
-		if (flag || flag2)
+		if (flag | flag2)
 		{
 			SetActive(t, UI.OBJ_INVITED, is_visible: false);
 			SetActive(t, UI.OBJ_NOT_PROGRESSED, is_visible: false);

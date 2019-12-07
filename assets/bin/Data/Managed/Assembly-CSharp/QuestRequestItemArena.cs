@@ -70,8 +70,7 @@ public class QuestRequestItemArena : QuestRequestItem
 
 	protected override void SetIcon(Transform t, DeliveryTable.DeliveryData info)
 	{
-		UITexture component = FindCtrl(t, UI.TEX_NPC).GetComponent<UITexture>();
-		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.ARENA_RANK_ICON, ResourceName.GetArenaRankIconName(arenaData.rank));
+		ResourceLoad.LoadWithSetUITexture(FindCtrl(t, UI.TEX_NPC).GetComponent<UITexture>(), RESOURCE_CATEGORY.ARENA_RANK_ICON, ResourceName.GetArenaRankIconName(arenaData.rank));
 	}
 
 	private void InitArenaData(DeliveryTable.DeliveryData info)

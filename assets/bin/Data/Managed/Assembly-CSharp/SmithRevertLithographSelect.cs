@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class SmithRevertLithographSelect : SmithEquipSelectBase
@@ -33,8 +32,8 @@ public class SmithRevertLithographSelect : SmithEquipSelectBase
 
 	public override void UpdateUI()
 	{
-		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).get_parent(), is_visible: false);
-		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).get_parent(), is_visible: false);
+		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).parent, is_visible: false);
+		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).parent, is_visible: false);
 		base.UpdateUI();
 	}
 
@@ -49,7 +48,7 @@ public class SmithRevertLithographSelect : SmithEquipSelectBase
 		MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType = base.selectInventoryType;
 		MonoBehaviourSingleton<SmithManager>.I.CreateLocalInventory();
 		selectInventoryIndex = -1;
-		localInventoryEquipData = sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortData>(MonoBehaviourSingleton<SmithManager>.I.localInventoryEquipData as EquipItemInfo[]);
+		SortCompareData[] array = localInventoryEquipData = sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortData>(MonoBehaviourSingleton<SmithManager>.I.localInventoryEquipData as EquipItemInfo[]);
 	}
 
 	protected override void LocalInventory()
@@ -57,10 +56,10 @@ public class SmithRevertLithographSelect : SmithEquipSelectBase
 		SetupEnableInventoryUI();
 		if (localInventoryEquipData != null)
 		{
-			SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
+			SetLabelText(UI.LBL_SORT, sortSettings.GetSortLabel());
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
-			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length, reset: false, (Func<int, bool>)delegate(int i)
+			SetDynamicList(InventoryUI, null, localInventoryEquipData.Length, reset: false, delegate(int i)
 			{
 				SortCompareData sortCompareData = localInventoryEquipData[i];
 				if (sortCompareData == null || !sortCompareData.IsPriority(sortSettings.orderTypeAsc))
@@ -68,13 +67,8 @@ public class SmithRevertLithographSelect : SmithEquipSelectBase
 					return false;
 				}
 				uint tableID = localInventoryEquipData[i].GetTableID();
-				EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(tableID);
-				if (!equipItemData.IsRevertable())
-				{
-					return false;
-				}
-				return true;
-			}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+				return Singleton<EquipItemTable>.I.GetEquipItemData(tableID).IsRevertable() ? true : false;
+			}, null, delegate(int i, Transform t, bool is_recycle)
 			{
 				if (localInventoryEquipData[i].GetTableID() == 0)
 				{
@@ -193,8 +187,7 @@ public class SmithRevertLithographSelect : SmithEquipSelectBase
 		else
 		{
 			uint tableID = equipItemSortData.GetTableID();
-			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(tableID);
-			if (!equipItemData.IsRevertable())
+			if (!Singleton<EquipItemTable>.I.GetEquipItemData(tableID).IsRevertable())
 			{
 				GameSection.StopEvent();
 			}
@@ -215,10 +208,9 @@ public class SmithRevertLithographSelect : SmithEquipSelectBase
 			return;
 		}
 		ulong uniqID = sortCompareData.GetUniqID();
-		if (uniqID != 0)
+		if (uniqID != 0L)
 		{
-			SmithManager.SmithGrowData smithGrowData = MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();
-			smithGrowData.selectEquipData = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uniqID);
+			MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>().selectEquipData = MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(uniqID);
 		}
 		base.OnQueryDetail();
 	}

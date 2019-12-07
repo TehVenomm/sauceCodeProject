@@ -1,5 +1,3 @@
-using System;
-
 public class OpinionBox : GameSection
 {
 	protected enum UI
@@ -16,7 +14,7 @@ public class OpinionBox : GameSection
 	protected virtual void OnQuery_SEND()
 	{
 		GameSection.StayEvent();
-		string text = GetInputValue((Enum)UI.IPT_TEXT);
+		string text = GetInputValue(UI.IPT_TEXT);
 		if (text.IsNullOrWhiteSpace())
 		{
 			text = text.Trim();

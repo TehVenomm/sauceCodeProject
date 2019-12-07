@@ -32,12 +32,12 @@ namespace BestHTTP.WebSocket.Frames
 		}
 
 		public WebSocketBinaryFrame(byte[] data)
-			: this(data, 0uL, (ulong)((data == null) ? 0 : data.Length), isFinal: true)
+			: this(data, 0uL, (ulong)((data != null) ? data.Length : 0), isFinal: true)
 		{
 		}
 
 		public WebSocketBinaryFrame(byte[] data, bool isFinal)
-			: this(data, 0uL, (ulong)((data == null) ? 0 : data.Length), isFinal)
+			: this(data, 0uL, (ulong)((data != null) ? data.Length : 0), isFinal)
 		{
 		}
 
@@ -69,7 +69,7 @@ namespace BestHTTP.WebSocket.Frames
 					byte[] bytes = BitConverter.GetBytes((ushort)Length);
 					if (BitConverter.IsLittleEndian)
 					{
-						Array.Reverse(bytes, 0, bytes.Length);
+						Array.Reverse((Array)bytes, 0, bytes.Length);
 					}
 					memoryStream.Write(bytes, 0, bytes.Length);
 				}
@@ -79,7 +79,7 @@ namespace BestHTTP.WebSocket.Frames
 					byte[] bytes2 = BitConverter.GetBytes(Length);
 					if (BitConverter.IsLittleEndian)
 					{
-						Array.Reverse(bytes2, 0, bytes2.Length);
+						Array.Reverse((Array)bytes2, 0, bytes2.Length);
 					}
 					memoryStream.Write(bytes2, 0, bytes2.Length);
 				}

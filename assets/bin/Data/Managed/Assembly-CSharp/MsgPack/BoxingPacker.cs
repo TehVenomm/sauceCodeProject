@@ -102,23 +102,10 @@ namespace MsgPack
 			if (dictionary != null)
 			{
 				writer.WriteMapHeader(dictionary.Count);
-				IDictionaryEnumerator enumerator = dictionary.GetEnumerator();
-				try
+				foreach (DictionaryEntry item in dictionary)
 				{
-					while (enumerator.MoveNext())
-					{
-						DictionaryEntry dictionaryEntry = (DictionaryEntry)enumerator.Current;
-						Pack(writer, dictionaryEntry.Key);
-						Pack(writer, dictionaryEntry.Value);
-					}
-				}
-				finally
-				{
-					IDisposable disposable;
-					if ((disposable = (enumerator as IDisposable)) != null)
-					{
-						disposable.Dispose();
-					}
+					Pack(writer, item.Key);
+					Pack(writer, item.Value);
 				}
 			}
 			else
@@ -173,9 +160,6 @@ namespace MsgPack
 
 		public object Unpack(MsgPackReader reader)
 		{
-			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0293: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c3: Unknown result type (might be due to invalid IL or missing references)
 			if (!reader.Read())
 			{
 				throw new FormatException();
@@ -258,28 +242,28 @@ namespace MsgPack
 				case 81:
 					if (reader.Length == 16)
 					{
-						float num3 = reader.ReadSingle();
-						float num4 = reader.ReadSingle();
-						float num5 = reader.ReadSingle();
-						float num6 = reader.ReadSingle();
-						return (object)new Quaternion(num3, num4, num5, num6);
+						float x2 = reader.ReadSingle();
+						float y2 = reader.ReadSingle();
+						float z = reader.ReadSingle();
+						float w = reader.ReadSingle();
+						return new Quaternion(x2, y2, z, w);
 					}
 					break;
 				case 86:
 					if (reader.Length == 12)
 					{
-						float num7 = reader.ReadSingle();
-						float num8 = reader.ReadSingle();
-						float num9 = reader.ReadSingle();
-						return (object)new Vector3(num7, num8, num9);
+						float x3 = reader.ReadSingle();
+						float y3 = reader.ReadSingle();
+						float z2 = reader.ReadSingle();
+						return new Vector3(x3, y3, z2);
 					}
 					break;
 				case 87:
 					if (reader.Length == 8)
 					{
-						float num = reader.ReadSingle();
-						float num2 = reader.ReadSingle();
-						return (object)new Vector2(num, num2);
+						float x = reader.ReadSingle();
+						float y = reader.ReadSingle();
+						return new Vector2(x, y);
 					}
 					break;
 				}

@@ -119,7 +119,7 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 		string sE = ResourceName.GetSE(40000017);
 		if (!string.IsNullOrEmpty(sE))
 		{
-			ResourceLink component = this.get_gameObject().GetComponent<ResourceLink>();
+			ResourceLink component = base.gameObject.GetComponent<ResourceLink>();
 			if (!(component == null))
 			{
 				m_AudioClip = component.Get<AudioClip>(sE);
@@ -176,8 +176,8 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 		}
 		for (; i < 3; i++)
 		{
-			m_upParamList[i].text = string.Empty;
-			m_upTitleList[i].text = string.Empty;
+			m_upParamList[i].text = "";
+			m_upTitleList[i].text = "";
 		}
 	}
 
@@ -232,13 +232,13 @@ public class UILevelUpAnnounce : UIInGameSelfAnnounce
 		{
 			if (m_coroutine == null)
 			{
-				m_coroutine = this.StartCoroutine("DelayPlay");
+				m_coroutine = StartCoroutine("DelayPlay");
 			}
 			return;
 		}
 		if (forcePlay && m_coroutine != null)
 		{
-			this.StopCoroutine(m_coroutine);
+			StopCoroutine(m_coroutine);
 			m_coroutine = null;
 		}
 		Play(callback);

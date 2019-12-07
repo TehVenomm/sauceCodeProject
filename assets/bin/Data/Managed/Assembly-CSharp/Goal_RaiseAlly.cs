@@ -22,8 +22,7 @@ public class Goal_RaiseAlly : GoalComposite
 		num *= 0.7f;
 		brain.moveCtrl.ChangeStopRange(num);
 		Character target = brain.targetCtrl.GetAllyTarget() as Character;
-		float lengthWithBetweenObject = AIUtility.GetLengthWithBetweenObject(brain.owner, target);
-		if (lengthWithBetweenObject < num)
+		if (AIUtility.GetLengthWithBetweenObject(brain.owner, target) < num)
 		{
 			AddSubGoal<Goal_Prayer>().SetPrayer(target, num);
 		}
@@ -53,8 +52,9 @@ public class Goal_RaiseAlly : GoalComposite
 	public override void HandleEvent(Brain brain, BRAIN_EVENT ev, object param = null)
 	{
 		base.HandleEvent(brain, ev, param);
-		if (ev == BRAIN_EVENT.BULLET_CATCH && !IsNowProcess(GOAL_TYPE.ENSURE_SAFETY) && brain.dangerRader != null && !brain.dangerRader.AskWillBulletHit())
+		if (ev == BRAIN_EVENT.BULLET_CATCH && !IsNowProcess(GOAL_TYPE.ENSURE_SAFETY) && brain.dangerRader != null)
 		{
+			brain.dangerRader.AskWillBulletHit();
 		}
 	}
 }

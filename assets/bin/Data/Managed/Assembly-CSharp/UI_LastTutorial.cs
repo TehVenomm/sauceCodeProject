@@ -11,18 +11,12 @@ public class UI_LastTutorial : MonoBehaviour
 	[SerializeField]
 	private UIButton lastTutorialButton;
 
-	public UI_LastTutorial()
-		: this()
-	{
-	}
-
 	public void OpenLastTutorial()
 	{
 		lastTutorialPanel.depth = 6500;
-		lastTutorialPanel.get_gameObject().SetActive(true);
+		lastTutorialPanel.gameObject.SetActive(value: true);
 		lastTutorialButton.onClick.Clear();
-		TweenAlpha tweenAlpha = TweenAlpha.Begin(lastTutorialSprite.get_gameObject(), 0.3f, 1f);
-		tweenAlpha.AddOnFinished(delegate
+		TweenAlpha.Begin(lastTutorialSprite.gameObject, 0.3f, 1f).AddOnFinished(delegate
 		{
 			lastTutorialButton.onClick.Add(new EventDelegate(CloseLastTutorial));
 		});
@@ -30,12 +24,11 @@ public class UI_LastTutorial : MonoBehaviour
 
 	public void CloseLastTutorial()
 	{
-		TweenAlpha tweenAlpha = TweenAlpha.Begin(lastTutorialSprite.get_gameObject(), 0.3f, 0f);
-		tweenAlpha.AddOnFinished(delegate
+		TweenAlpha.Begin(lastTutorialSprite.gameObject, 0.3f, 0f).AddOnFinished(delegate
 		{
 			if (!AppMain.isApplicationQuit)
 			{
-				Object.Destroy(this.get_gameObject());
+				Object.Destroy(base.gameObject);
 			}
 		});
 	}

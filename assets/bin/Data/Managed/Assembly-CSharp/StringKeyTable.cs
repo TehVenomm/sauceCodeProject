@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 public class StringKeyTable<T> : StringKeyTableBase
 {
@@ -10,6 +11,11 @@ public class StringKeyTable<T> : StringKeyTableBase
 	public T Get(string key)
 	{
 		return (T)_Get(key);
+	}
+
+	public List<Item>[] GetList()
+	{
+		return lists;
 	}
 
 	public void ForEach(Action<T> action)

@@ -267,16 +267,15 @@ namespace BestHTTP.Decompression.Zlib
 
 		private int EmitHeader()
 		{
-			byte[] array = (Comment != null) ? iso8859dash1.GetBytes(Comment) : null;
-			byte[] array2 = (FileName != null) ? iso8859dash1.GetBytes(FileName) : null;
+			byte[] array = (Comment == null) ? null : iso8859dash1.GetBytes(Comment);
+			byte[] array2 = (FileName == null) ? null : iso8859dash1.GetBytes(FileName);
 			int num = (Comment != null) ? (array.Length + 1) : 0;
 			int num2 = (FileName != null) ? (array2.Length + 1) : 0;
-			int num3 = 10 + num + num2;
-			byte[] array3 = new byte[num3];
-			int num4 = 0;
-			array3[num4++] = 31;
-			array3[num4++] = 139;
-			array3[num4++] = 8;
+			byte[] array3 = new byte[10 + num + num2];
+			int num3 = 0;
+			array3[num3++] = 31;
+			array3[num3++] = 139;
+			array3[num3++] = 8;
 			byte b = 0;
 			if (Comment != null)
 			{
@@ -286,27 +285,26 @@ namespace BestHTTP.Decompression.Zlib
 			{
 				b = (byte)(b ^ 8);
 			}
-			array3[num4++] = b;
+			array3[num3++] = b;
 			if (!LastModified.HasValue)
 			{
 				LastModified = DateTime.Now;
 			}
-			int value = (int)(LastModified.Value - _unixEpoch).TotalSeconds;
-			Array.Copy(BitConverter.GetBytes(value), 0, array3, num4, 4);
-			num4 += 4;
-			array3[num4++] = 0;
-			array3[num4++] = byte.MaxValue;
+			Array.Copy(BitConverter.GetBytes((int)(LastModified.Value - _unixEpoch).TotalSeconds), 0, array3, num3, 4);
+			num3 += 4;
+			array3[num3++] = 0;
+			array3[num3++] = byte.MaxValue;
 			if (num2 != 0)
 			{
-				Array.Copy(array2, 0, array3, num4, num2 - 1);
-				num4 += num2 - 1;
-				array3[num4++] = 0;
+				Array.Copy(array2, 0, array3, num3, num2 - 1);
+				num3 += num2 - 1;
+				array3[num3++] = 0;
 			}
 			if (num != 0)
 			{
-				Array.Copy(array, 0, array3, num4, num - 1);
-				num4 += num - 1;
-				array3[num4++] = 0;
+				Array.Copy(array, 0, array3, num3, num - 1);
+				num3 += num - 1;
+				array3[num3++] = 0;
 			}
 			_baseStream._stream.Write(array3, 0, array3.Length);
 			return array3.Length;

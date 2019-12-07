@@ -33,16 +33,9 @@ public class EffectSizeCtrl : MonoBehaviour
 
 	private Transform _transform;
 
-	public EffectSizeCtrl()
-		: this()
-	{
-	}//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-	//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-
-
 	private void Awake()
 	{
-		_transform = this.get_transform();
+		_transform = base.transform;
 	}
 
 	private void Destroy()
@@ -53,10 +46,9 @@ public class EffectSizeCtrl : MonoBehaviour
 
 	private void Update()
 	{
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 		if (isWorking)
 		{
-			execSec += Time.get_deltaTime();
+			execSec += Time.deltaTime;
 			float num = 0f;
 			if (execSec >= targetSec)
 			{
@@ -73,21 +65,19 @@ public class EffectSizeCtrl : MonoBehaviour
 			{
 				float num3 = firstScale * num2;
 				_scale.Set(num3, num3, num3);
-				_transform.set_localScale(_scale);
+				_transform.localScale = _scale;
 			}
 			int i = 0;
 			for (int count = this.particleInfo.Count; i < count; i++)
 			{
 				ParticleInfo particleInfo = this.particleInfo[i];
-				particleInfo.psr.set_lengthScale(particleInfo.firstLength * num2);
+				particleInfo.psr.lengthScale = particleInfo.firstLength * num2;
 			}
 		}
 	}
 
 	public void Work(float sec)
 	{
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
 		if (isWorking || sec == 0f)
 		{
 			return;
@@ -97,16 +87,15 @@ public class EffectSizeCtrl : MonoBehaviour
 		for (int num = particles.Length; i < num; i++)
 		{
 			ParticleSystemRenderer component = particles[i].GetComponent<ParticleSystemRenderer>();
-			if (!object.ReferenceEquals(component, null))
+			if ((object)component != null)
 			{
 				ParticleInfo particleInfo = new ParticleInfo();
 				particleInfo.psr = component;
-				particleInfo.firstLength = component.get_lengthScale();
+				particleInfo.firstLength = component.lengthScale;
 				this.particleInfo.Add(particleInfo);
 			}
 		}
-		Vector3 localScale = _transform.get_localScale();
-		firstScale = localScale.x;
+		firstScale = _transform.localScale.x;
 		execSec = 0f;
 		targetSec = sec;
 		isWorking = true;

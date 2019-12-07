@@ -23,16 +23,11 @@ public class UIForwardEvents : MonoBehaviour
 
 	public bool onScroll;
 
-	public UIForwardEvents()
-		: this()
-	{
-	}
-
 	private void OnHover(bool isOver)
 	{
 		if (onHover && target != null)
 		{
-			target.SendMessage("OnHover", (object)isOver, 1);
+			target.SendMessage("OnHover", isOver, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
@@ -40,7 +35,7 @@ public class UIForwardEvents : MonoBehaviour
 	{
 		if (onPress && target != null)
 		{
-			target.SendMessage("OnPress", (object)pressed, 1);
+			target.SendMessage("OnPress", pressed, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
@@ -48,7 +43,7 @@ public class UIForwardEvents : MonoBehaviour
 	{
 		if (onClick && target != null)
 		{
-			target.SendMessage("OnClick", 1);
+			target.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
@@ -56,7 +51,7 @@ public class UIForwardEvents : MonoBehaviour
 	{
 		if (onDoubleClick && target != null)
 		{
-			target.SendMessage("OnDoubleClick", 1);
+			target.SendMessage("OnDoubleClick", SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
@@ -64,16 +59,15 @@ public class UIForwardEvents : MonoBehaviour
 	{
 		if (onSelect && target != null)
 		{
-			target.SendMessage("OnSelect", (object)selected, 1);
+			target.SendMessage("OnSelect", selected, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
 	private void OnDrag(Vector2 delta)
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		if (onDrag && target != null)
 		{
-			target.SendMessage("OnDrag", (object)delta, 1);
+			target.SendMessage("OnDrag", delta, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
@@ -81,7 +75,7 @@ public class UIForwardEvents : MonoBehaviour
 	{
 		if (onDrop && target != null)
 		{
-			target.SendMessage("OnDrop", (object)go, 1);
+			target.SendMessage("OnDrop", go, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
@@ -89,7 +83,7 @@ public class UIForwardEvents : MonoBehaviour
 	{
 		if (onSubmit && target != null)
 		{
-			target.SendMessage("OnSubmit", 1);
+			target.SendMessage("OnSubmit", SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
@@ -97,7 +91,7 @@ public class UIForwardEvents : MonoBehaviour
 	{
 		if (onScroll && target != null)
 		{
-			target.SendMessage("OnScroll", (object)delta, 1);
+			target.SendMessage("OnScroll", delta, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 }

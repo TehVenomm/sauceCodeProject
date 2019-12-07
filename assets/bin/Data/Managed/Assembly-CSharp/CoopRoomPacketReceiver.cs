@@ -8,7 +8,7 @@ public class CoopRoomPacketReceiver : PacketReceiver
 
 	protected virtual void Awake()
 	{
-		coopRoom = this.get_gameObject().GetComponent<CoopRoom>();
+		coopRoom = base.gameObject.GetComponent<CoopRoom>();
 	}
 
 	protected override bool HandleCoopEvent(CoopPacket packet)
@@ -18,53 +18,49 @@ public class CoopRoomPacketReceiver : PacketReceiver
 		{
 		case PACKET_TYPE.ROOM_SYNC_ALL_PORTAL_POINT:
 		{
-			Coop_Model_RoomSyncAllPortalPoint model16 = packet.GetModel<Coop_Model_RoomSyncAllPortalPoint>();
-			coopRoom.OnRecvSyncAllPortalPoint(model16);
+			Coop_Model_RoomSyncAllPortalPoint model14 = packet.GetModel<Coop_Model_RoomSyncAllPortalPoint>();
+			coopRoom.OnRecvSyncAllPortalPoint(model14);
 			result = true;
 			break;
 		}
 		case PACKET_TYPE.ROOM_UPDATE_PORTAL_POINT:
 		{
-			Coop_Model_RoomUpdatePortalPoint model15 = packet.GetModel<Coop_Model_RoomUpdatePortalPoint>();
-			coopRoom.OnRecvRoomUpdatePortalPoint(model15);
+			Coop_Model_RoomUpdatePortalPoint model13 = packet.GetModel<Coop_Model_RoomUpdatePortalPoint>();
+			coopRoom.OnRecvRoomUpdatePortalPoint(model13);
 			result = true;
 			break;
 		}
 		case PACKET_TYPE.ROOM_SYNC_EXPLORE_BOSS:
 		{
-			Coop_Model_RoomSyncExploreBoss model14 = packet.GetModel<Coop_Model_RoomSyncExploreBoss>();
-			coopRoom.OnRecvSyncExploreBoss(model14);
+			Coop_Model_RoomSyncExploreBoss model12 = packet.GetModel<Coop_Model_RoomSyncExploreBoss>();
+			coopRoom.OnRecvSyncExploreBoss(model12);
 			result = true;
 			break;
 		}
 		case PACKET_TYPE.ROOM_SYNC_EXPLORE_BOSS_MAP:
 		{
-			Coop_Model_RoomSyncExploreBossMap model13 = packet.GetModel<Coop_Model_RoomSyncExploreBossMap>();
-			coopRoom.OnRecvSyncExploreBossMap(model13);
+			Coop_Model_RoomSyncExploreBossMap model11 = packet.GetModel<Coop_Model_RoomSyncExploreBossMap>();
+			coopRoom.OnRecvSyncExploreBossMap(model11);
 			result = true;
 			break;
 		}
 		case PACKET_TYPE.ROOM_EXPLORE_BOSS_DAMAGE:
 		{
-			Coop_Model_RoomExploreBossDamage model12 = packet.GetModel<Coop_Model_RoomExploreBossDamage>();
-			coopRoom.OnRecvExploreBossDamage(packet.fromClientId, model12);
+			Coop_Model_RoomExploreBossDamage model10 = packet.GetModel<Coop_Model_RoomExploreBossDamage>();
+			coopRoom.OnRecvExploreBossDamage(packet.fromClientId, model10);
 			result = true;
 			break;
 		}
 		case PACKET_TYPE.ROOM_EXPLORE_ALIVE:
-		{
-			Coop_Model_RoomExploreAlive model11 = packet.GetModel<Coop_Model_RoomExploreAlive>();
+			packet.GetModel<Coop_Model_RoomExploreAlive>();
 			coopRoom.OnRecvExploreAlive();
 			result = true;
 			break;
-		}
 		case PACKET_TYPE.ROOM_EXPLORE_ALIVE_REQUEST:
-		{
-			Coop_Model_RoomExploreAliveRequest model10 = packet.GetModel<Coop_Model_RoomExploreAliveRequest>();
+			packet.GetModel<Coop_Model_RoomExploreAliveRequest>();
 			coopRoom.OnRecvExploreAliveRequest();
 			result = true;
 			break;
-		}
 		case PACKET_TYPE.ROOM_EXPLORE_BOSS_DEAD:
 		{
 			Coop_Model_RoomExploreBossDead model9 = packet.GetModel<Coop_Model_RoomExploreBossDead>();

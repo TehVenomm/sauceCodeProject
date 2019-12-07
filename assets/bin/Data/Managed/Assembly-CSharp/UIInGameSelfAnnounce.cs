@@ -22,11 +22,6 @@ public class UIInGameSelfAnnounce : MonoBehaviour
 
 	private float lockTimer;
 
-	public UIInGameSelfAnnounce()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		SetVisible(isVisible: false);
@@ -68,7 +63,7 @@ public class UIInGameSelfAnnounce : MonoBehaviour
 	{
 		if (isLockReq)
 		{
-			lockTimer -= Time.get_deltaTime();
+			lockTimer -= Time.deltaTime;
 			if (!(lockTimer > 0f))
 			{
 				panelChange.Lock();
@@ -80,7 +75,7 @@ public class UIInGameSelfAnnounce : MonoBehaviour
 
 	private void SetVisible(bool isVisible)
 	{
-		if (!object.ReferenceEquals(visibleTargets, null) && visibleTargets.Count != 0)
+		if (visibleTargets != null && visibleTargets.Count != 0)
 		{
 			for (int i = 0; i < visibleTargets.Count; i++)
 			{

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class AccessorySortBase : SortBase
@@ -55,37 +54,36 @@ public class AccessorySortBase : SortBase
 		for (int num = rarityButton.Length; i < num; i++)
 		{
 			bool value = (sortOrder.rarity & (1 << i)) != 0;
-			SetEvent((Enum)rarityButton[i], "RARITY", i);
+			SetEvent(rarityButton[i], "RARITY", i);
 			Transform ctrl = GetCtrl(rarityButton[i]);
 			if (ctrl != null)
 			{
-				SetToggle(ctrl.get_parent(), value);
+				SetToggle(ctrl.parent, value);
 			}
 		}
 		int j = 0;
 		for (int num2 = requirementButton.Length; j < num2; j++)
 		{
-			UI? uI = requirementButton[j];
-			if (uI.HasValue)
+			if (requirementButton[j].HasValue)
 			{
 				int num3 = 1 << j;
 				bool value2 = sortOrder.requirement == (SORT_REQUIREMENT)num3;
-				SetEvent((Enum)(object)requirementButton[j], "REQUIREMENT", num3);
-				SetToggle((Enum)(object)requirementButton[j], value2);
+				SetEvent(requirementButton[j], "REQUIREMENT", num3);
+				SetToggle(requirementButton[j], value2);
 			}
 		}
 		int k = 0;
 		for (int num4 = ascButton.Length; k < num4; k++)
 		{
 			bool value3 = (k == 0 && sortOrder.orderTypeAsc) || (k == 1 && !sortOrder.orderTypeAsc);
-			SetEvent((Enum)ascButton[k], "ORDER_TYPE", k);
-			SetToggle((Enum)ascButton[k], value3);
+			SetEvent(ascButton[k], "ORDER_TYPE", k);
+			SetToggle(ascButton[k], value3);
 		}
 	}
 
 	private void OnQuery_RARITY()
 	{
 		OnQueryEvent_Rarity(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl(rarityButton[_index]).get_parent(), _is_enable);
+		SetToggle(GetCtrl(rarityButton[_index]).parent, _is_enable);
 	}
 }

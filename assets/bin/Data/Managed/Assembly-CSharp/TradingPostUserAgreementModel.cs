@@ -12,7 +12,7 @@ public class TradingPostUserAgreementModel : BaseModel
 		public int tradingAccept;
 	}
 
-	public static string URL = "/ajax/trading-post/user-agreement";
+	public static string URL = "ajax/trading-post/user-agreement";
 
 	public Result result = new Result();
 }

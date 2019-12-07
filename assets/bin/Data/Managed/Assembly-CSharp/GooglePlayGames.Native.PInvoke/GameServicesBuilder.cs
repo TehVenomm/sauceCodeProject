@@ -2,7 +2,6 @@ using AOT;
 using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.OurUtils;
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
@@ -12,18 +11,6 @@ namespace GooglePlayGames.Native.PInvoke
 		internal delegate void AuthFinishedCallback(Types.AuthOperation operation, CommonErrorStatus.AuthStatus status);
 
 		internal delegate void AuthStartedCallback(Types.AuthOperation operation);
-
-		[CompilerGenerated]
-		private static Builder.OnAuthActionFinishedCallback _003C_003Ef__mg_0024cache0;
-
-		[CompilerGenerated]
-		private static Builder.OnAuthActionStartedCallback _003C_003Ef__mg_0024cache1;
-
-		[CompilerGenerated]
-		private static Builder.OnTurnBasedMatchEventCallback _003C_003Ef__mg_0024cache2;
-
-		[CompilerGenerated]
-		private static Builder.OnMultiplayerInvitationEventCallback _003C_003Ef__mg_0024cache3;
 
 		private GameServicesBuilder(IntPtr selfPointer)
 			: base(selfPointer)
@@ -150,8 +137,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal static GameServicesBuilder Create()
 		{
-			IntPtr selfPointer = Builder.GameServices_Builder_Construct();
-			return new GameServicesBuilder(selfPointer);
+			return new GameServicesBuilder(Builder.GameServices_Builder_Construct());
 		}
 	}
 }

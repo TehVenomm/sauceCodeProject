@@ -13,7 +13,7 @@ public class StoryScene : GameSection
 		base.OnDestroy();
 		if (MonoBehaviourSingleton<StoryDirector>.IsValid())
 		{
-			Object.Destroy(MonoBehaviourSingleton<StoryDirector>.I.get_gameObject());
+			Object.Destroy(MonoBehaviourSingleton<StoryDirector>.I.gameObject);
 		}
 	}
 

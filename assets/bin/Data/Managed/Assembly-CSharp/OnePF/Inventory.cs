@@ -13,18 +13,16 @@ namespace OnePF
 		public Inventory(string json)
 		{
 			JSON jSON = new JSON(json);
-			foreach (object item in (List<object>)jSON.fields["purchaseMap"])
+			foreach (List<object> item in (List<object>)jSON.fields["purchaseMap"])
 			{
-				List<object> list = (List<object>)item;
-				string key = list[0].ToString();
-				Purchase value = new Purchase(list[1].ToString());
+				string key = item[0].ToString();
+				Purchase value = new Purchase(item[1].ToString());
 				_purchaseMap.Add(key, value);
 			}
-			foreach (object item2 in (List<object>)jSON.fields["skuMap"])
+			foreach (List<object> item2 in (List<object>)jSON.fields["skuMap"])
 			{
-				List<object> list2 = (List<object>)item2;
-				string key2 = list2[0].ToString();
-				SkuDetails value2 = new SkuDetails(list2[1].ToString());
+				string key2 = item2[0].ToString();
+				SkuDetails value2 = new SkuDetails(item2[1].ToString());
 				_skuMap.Add(key2, value2);
 			}
 		}

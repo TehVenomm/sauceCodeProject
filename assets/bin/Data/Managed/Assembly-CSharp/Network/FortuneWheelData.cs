@@ -18,6 +18,6 @@ namespace Network
 
 		public List<FortuneWheelReward> spinRewards;
 
-		public string lastUpdateTime = string.Empty;
+		public string lastUpdateTime = "";
 	}
 }

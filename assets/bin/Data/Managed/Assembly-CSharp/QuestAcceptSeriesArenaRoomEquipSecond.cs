@@ -102,7 +102,7 @@ public class QuestAcceptSeriesArenaRoomEquipSecond : UniqueStatusEquipSecond
 		{
 			migrationOldItem = old_item;
 			migrationSelectItem = select_item;
-			object eventData = GameSection.GetEventData();
+			GameSection.GetEventData();
 			GameSection.ChangeEvent("MIGRATION_SKILL_CONFIRM");
 		}
 		else

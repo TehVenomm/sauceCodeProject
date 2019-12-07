@@ -42,11 +42,11 @@ public class InGameDetailUseItemDialog : ItemDetailUseItemDialog
 	{
 		if (base.transferUI != null)
 		{
-			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
 		}
 		else
 		{
-			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
 		}
 		if (!isInActiveRotate)
 		{

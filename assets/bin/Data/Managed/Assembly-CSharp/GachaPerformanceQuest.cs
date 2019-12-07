@@ -1,5 +1,3 @@
-using System;
-
 public class GachaPerformanceQuest : GachaPerformanceBase, QuestGachaDirectorBase.ISectionCommand
 {
 	private new enum UI
@@ -22,9 +20,9 @@ public class GachaPerformanceQuest : GachaPerformanceBase, QuestGachaDirectorBas
 
 	protected override void OnOpen()
 	{
-		SetActive((Enum)UI.BTN_SKIP, is_visible: true);
+		SetActive(UI.BTN_SKIP, is_visible: true);
 		m_isReam = (AnimationDirector.I is QuestReamGachaDirector || AnimationDirector.I is QuestFeverGachaLegacyDirector);
-		SetActive((Enum)UI.BTN_SKIPALL, m_isReam);
+		SetActive(UI.BTN_SKIPALL, m_isReam);
 		if (AnimationDirector.I != null)
 		{
 			(AnimationDirector.I as QuestGachaDirectorBase).StartDirection(this);
@@ -33,19 +31,19 @@ public class GachaPerformanceQuest : GachaPerformanceBase, QuestGachaDirectorBas
 
 	void QuestGachaDirectorBase.ISectionCommand.OnShowRarity(RARITY_TYPE rarity)
 	{
-		SetActive((Enum)UI.BTN_SKIPALL, is_visible: false);
+		SetActive(UI.BTN_SKIPALL, is_visible: false);
 		ShowRarity(rarity);
 	}
 
 	void QuestGachaDirectorBase.ISectionCommand.OnHideRarity()
 	{
-		SetActive((Enum)UI.BTN_SKIPALL, m_isReam ? true : false);
+		SetActive(UI.BTN_SKIPALL, m_isReam ? true : false);
 		HideRarity();
 	}
 
 	void QuestGachaDirectorBase.ISectionCommand.OnEnd()
 	{
-		SetActive((Enum)UI.BTN_SKIPALL, is_visible: false);
+		SetActive(UI.BTN_SKIPALL, is_visible: false);
 		End();
 	}
 

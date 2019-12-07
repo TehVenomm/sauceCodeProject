@@ -233,16 +233,14 @@ public class ClanChatWebSocket : MonoBehaviourSingleton<ClanChatWebSocket>
 
 	public int Send(Chat_Model_Base model, Type type, int to_id, bool promise = true, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null)
 	{
-		int result = 0;
 		ChatPacket chatPacket = new ChatPacket();
 		ChatPacketHeader chatPacketHeader2 = chatPacket.header = new ChatPacketHeader(0, model.commandId, fromId);
 		chatPacket.model = model;
 		PacketStream stream = chatPacket.Serialize();
-		if (model.commandId != 502)
-		{
-		}
+		_ = model.commandId;
+		_ = 502;
 		NativeSend(stream);
-		return result;
+		return 0;
 	}
 
 	private void NativeSend(PacketStream stream)
@@ -281,7 +279,11 @@ public class ClanChatWebSocket : MonoBehaviourSingleton<ClanChatWebSocket>
 
 	public bool IsOpen()
 	{
-		return sock != null && sock.IsOpen;
+		if (sock == null)
+		{
+			return false;
+		}
+		return sock.IsOpen;
 	}
 
 	private void Update()

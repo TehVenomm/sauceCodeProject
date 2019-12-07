@@ -1,5 +1,3 @@
-using System;
-
 public class UniqueStatusSetNameEdit : ConfigName
 {
 	private enum UI
@@ -32,7 +30,7 @@ public class UniqueStatusSetNameEdit : ConfigName
 	private void OnQuery_OK()
 	{
 		GameSection.SetEventData(null);
-		string input_text = GetInputValue((Enum)UI.IPT_TEXT);
+		string input_text = GetInputValue(UI.IPT_TEXT);
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<StatusManager>.I.SendUniqueEquipSetName(input_text, setNo, delegate(bool is_success)
 		{

@@ -42,8 +42,7 @@ public class FriendTestFollow : GameSection
 							string names = string.Empty;
 							follow_list.ForEach(delegate(int user_id)
 							{
-								string text = names;
-								names = text + "「" + user_id + "」\n";
+								names = names + "「" + user_id + "」\n";
 							});
 							DispatchEvent("SUCCESS", names + "をフォロ\u30fcしました");
 						}

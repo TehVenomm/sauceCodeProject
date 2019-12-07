@@ -57,26 +57,8 @@ public class AttackUndead : MonoBehaviour
 
 	private float m_attackIntervalTimer;
 
-	public AttackUndead()
-		: this()
-	{
-	}
-
 	public void Initialize(StageObject attacker, AttackInfo atkInfo, StageObject targetObj, Transform launchTrans, Vector3 offsetPos, Quaternion offsetRot)
 	{
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
 		m_attacker = attacker;
 		m_atkInfo = atkInfo;
 		AttackHitInfo attackHitInfo = atkInfo as AttackHitInfo;
@@ -92,17 +74,20 @@ public class AttackUndead : MonoBehaviour
 		m_aimAngleSpeed = dataUndead.lookAtAngle * ((float)Math.PI / 180f);
 		m_undeadData = dataUndead;
 		m_isDeleted = false;
-		m_cachedTransform = this.get_transform();
-		m_cachedTransform.set_parent((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
-		m_cachedTransform.set_position(launchTrans.get_position() + launchTrans.get_rotation() * offsetPos);
-		m_cachedTransform.set_rotation(launchTrans.get_rotation() * offsetRot);
-		m_cachedTransform.set_localScale(bulletData.data.timeStartScale);
-		Transform effect = EffectManager.GetEffect(bulletData.data.effectName, this.get_transform());
-		effect.set_localPosition(bulletData.data.dispOffset);
-		effect.set_localRotation(Quaternion.Euler(bulletData.data.dispRotation));
-		effect.set_localScale(Vector3.get_one());
-		m_effectObj = effect.get_gameObject();
-		m_effectAnimator = m_effectObj.GetComponent<Animator>();
+		m_cachedTransform = base.transform;
+		m_cachedTransform.parent = (MonoBehaviourSingleton<StageObjectManager>.IsValid() ? MonoBehaviourSingleton<StageObjectManager>.I._transform : MonoBehaviourSingleton<EffectManager>.I._transform);
+		m_cachedTransform.position = launchTrans.position + launchTrans.rotation * offsetPos;
+		m_cachedTransform.rotation = launchTrans.rotation * offsetRot;
+		m_cachedTransform.localScale = bulletData.data.timeStartScale;
+		Transform effect = EffectManager.GetEffect(bulletData.data.effectName, base.transform);
+		if (effect != null)
+		{
+			effect.localPosition = bulletData.data.dispOffset;
+			effect.localRotation = Quaternion.Euler(bulletData.data.dispRotation);
+			effect.localScale = Vector3.one;
+			m_effectObj = effect.gameObject;
+			m_effectAnimator = m_effectObj.GetComponent<Animator>();
+		}
 		m_targetObject = targetObj;
 		RequestMain();
 	}
@@ -127,49 +112,11 @@ public class AttackUndead : MonoBehaviour
 
 	private void FuncMain()
 	{
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0289: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028a: Unknown result type (might be due to invalid IL or missing references)
 		if (m_isDeleted)
 		{
 			return;
 		}
-		m_aliveTimer -= Time.get_deltaTime();
+		m_aliveTimer -= Time.deltaTime;
 		if (m_aliveTimer <= 0f)
 		{
 			RequestDestroy();
@@ -180,20 +127,19 @@ public class AttackUndead : MonoBehaviour
 			RequestDestroy();
 			return;
 		}
-		Vector3 position = m_targetObject.get_transform().get_position();
+		Vector3 position = m_targetObject.transform.position;
 		switch (m_state)
 		{
 		case State.TRACKING:
 		{
 			position.y = m_undeadData.floatingHeight;
-			Vector3 val3 = position - m_cachedTransform.get_position();
-			Vector3 normalized2 = val3.get_normalized();
-			Vector3 val4 = m_cachedTransform.get_position() + normalized2 * m_moveSpeed * Time.get_deltaTime();
-			val4._002Ector(val4.x, val4.y + Mathf.Sin(Time.get_time()) * m_undeadData.floatingCoef, val4.z);
-			m_cachedTransform.set_position(val4);
+			Vector3 normalized2 = (position - m_cachedTransform.position).normalized;
+			Vector3 vector2 = m_cachedTransform.position + normalized2 * m_moveSpeed * Time.deltaTime;
+			vector2 = new Vector3(vector2.x, vector2.y + Mathf.Sin(Time.time) * m_undeadData.floatingCoef, vector2.z);
+			m_cachedTransform.position = vector2;
 			position.y = 0f;
-			val4.y = 0f;
-			if (Vector3.Distance(position, val4) <= m_undeadData.attackRange)
+			vector2.y = 0f;
+			if (Vector3.Distance(position, vector2) <= m_undeadData.attackRange)
 			{
 				m_attackIntervalTimer = m_undeadData.attackInterval;
 				ForwardState();
@@ -202,31 +148,30 @@ public class AttackUndead : MonoBehaviour
 		}
 		case State.ATTACK:
 		{
-			Vector3 val = m_cachedTransform.get_position();
+			Vector3 vector = m_cachedTransform.position;
 			position.y = 0f;
-			val.y = 0f;
-			if (Vector3.Distance(position, val) < 0.05f)
+			vector.y = 0f;
+			if (Vector3.Distance(position, vector) < 0.05f)
 			{
-				val = m_cachedTransform.get_position();
-				val._002Ector(val.x, val.y + Mathf.Sin(Time.get_time()) * m_undeadData.floatingCoef * 0.3f, val.z);
+				vector = m_cachedTransform.position;
+				vector = new Vector3(vector.x, vector.y + Mathf.Sin(Time.time) * m_undeadData.floatingCoef * 0.3f, vector.z);
 			}
 			else
 			{
 				position.y = m_undeadData.floatingHeight;
-				Vector3 val2 = position - m_cachedTransform.get_position();
-				Vector3 normalized = val2.get_normalized();
-				val = m_cachedTransform.get_position() + normalized * m_moveSpeed * Time.get_deltaTime();
-				val._002Ector(val.x, val.y + Mathf.Sin(Time.get_time()) * m_undeadData.floatingCoef, val.z);
+				Vector3 normalized = (position - m_cachedTransform.position).normalized;
+				vector = m_cachedTransform.position + normalized * m_moveSpeed * Time.deltaTime;
+				vector = new Vector3(vector.x, vector.y + Mathf.Sin(Time.time) * m_undeadData.floatingCoef, vector.z);
 			}
-			m_cachedTransform.set_position(val);
+			m_cachedTransform.position = vector;
 			position.y = 0f;
-			val.y = 0f;
-			if (Vector3.Distance(position, val) > m_undeadData.attackRange)
+			vector.y = 0f;
+			if (Vector3.Distance(position, vector) > m_undeadData.attackRange)
 			{
 				BackState();
 				break;
 			}
-			m_attackIntervalTimer -= Time.get_deltaTime();
+			m_attackIntervalTimer -= Time.deltaTime;
 			if (!(m_attackIntervalTimer > 0f))
 			{
 				m_attackIntervalTimer = m_undeadData.attackInterval;
@@ -247,12 +192,6 @@ public class AttackUndead : MonoBehaviour
 
 	private AnimEventShot CreateBullet()
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 		BulletData bulletData = m_atkInfo.bulletData;
 		if (bulletData == null)
 		{
@@ -267,8 +206,8 @@ public class AttackUndead : MonoBehaviour
 		{
 			return null;
 		}
-		Quaternion rotation = m_cachedTransform.get_rotation();
-		Vector3 position = m_cachedTransform.get_position();
+		Quaternion rotation = m_cachedTransform.rotation;
+		Vector3 position = m_cachedTransform.position;
 		AnimEventShot animEventShot = AnimEventShot.CreateByExternalBulletData(dataUndead.closeBullet, m_attacker, m_atkInfo, position, rotation);
 		if (animEventShot == null)
 		{
@@ -280,36 +219,12 @@ public class AttackUndead : MonoBehaviour
 
 	private void LookAtTarget(Vector3 targetPos)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 forward = m_cachedTransform.get_forward();
-		Vector3 position = m_cachedTransform.get_position();
-		Vector3 val = targetPos - position;
-		val.Normalize();
-		float num = m_aimAngleSpeed * Time.get_deltaTime();
-		float num2 = Vector3.Dot(forward, val);
+		Vector3 forward = m_cachedTransform.forward;
+		Vector3 position = m_cachedTransform.position;
+		Vector3 vector = targetPos - position;
+		vector.Normalize();
+		float num = m_aimAngleSpeed * Time.deltaTime;
+		float num2 = Vector3.Dot(forward, vector);
 		float num3 = Mathf.Acos(num2);
 		if (num2 < 1f && num < num3 && num3 >= 0.00174532924f)
 		{
@@ -317,15 +232,15 @@ public class AttackUndead : MonoBehaviour
 			Quaternion rotation;
 			if (num4 >= 1f)
 			{
-				rotation = Quaternion.LookRotation(val);
+				rotation = Quaternion.LookRotation(vector);
 			}
 			else
 			{
-				Quaternion val2 = Quaternion.LookRotation(forward);
-				Quaternion val3 = Quaternion.LookRotation(val);
-				rotation = Quaternion.Slerp(val2, val3, num4);
+				Quaternion a = Quaternion.LookRotation(forward);
+				Quaternion b = Quaternion.LookRotation(vector);
+				rotation = Quaternion.Slerp(a, b, num4);
 			}
-			m_cachedTransform.set_rotation(rotation);
+			m_cachedTransform.rotation = rotation;
 		}
 	}
 
@@ -349,31 +264,25 @@ public class AttackUndead : MonoBehaviour
 		}
 		else
 		{
-			Debug.LogWarning((object)"Not found delete animation!!");
+			Debug.LogWarning("Not found delete animation!!");
 			Destroy();
 		}
 	}
 
 	private void FuncDelete()
 	{
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 		switch (m_state)
 		{
 		case State.TRACKING:
-		{
 			if (m_effectAnimator == null)
 			{
 				ForwardState();
-				break;
 			}
-			AnimatorStateInfo currentAnimatorStateInfo = m_effectAnimator.GetCurrentAnimatorStateInfo(0);
-			if (currentAnimatorStateInfo.get_normalizedTime() >= 1f)
+			else if (m_effectAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
 			{
 				ForwardState();
 			}
 			break;
-		}
 		case State.ATTACK:
 			Destroy();
 			ForwardState();
@@ -383,8 +292,6 @@ public class AttackUndead : MonoBehaviour
 
 	private void Destroy()
 	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		if (m_isDeleted)
 		{
 			return;
@@ -395,11 +302,11 @@ public class AttackUndead : MonoBehaviour
 			Transform effect = EffectManager.GetEffect(m_landHitEffectName);
 			if (effect != null)
 			{
-				effect.set_position(m_cachedTransform.get_position());
-				effect.set_rotation(m_cachedTransform.get_rotation());
+				effect.position = m_cachedTransform.position;
+				effect.rotation = m_cachedTransform.rotation;
 			}
 		}
-		Object.Destroy(this.get_gameObject());
+		UnityEngine.Object.Destroy(base.gameObject);
 	}
 
 	private void OnDestroy()

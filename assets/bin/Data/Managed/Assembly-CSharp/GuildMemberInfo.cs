@@ -156,7 +156,7 @@ public class GuildMemberInfo : SkillInfoBase
 			dataFollowing = friendCharaInfo.following;
 		}
 		nowSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-		isFollowerList = Object.op_Implicit(Object.FindObjectOfType(typeof(FriendFollowerList)));
+		isFollowerList = UnityEngine.Object.FindObjectOfType(typeof(FriendFollowerList));
 		InitializeBase();
 	}
 
@@ -193,16 +193,15 @@ public class GuildMemberInfo : SkillInfoBase
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		if (!(loader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == nowSectionName)
 		{
-			loader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
+			loader.transform.Rotate(GameDefine.GetCharaRotateVector(touch_info));
 		}
 	}
 
 	public override void UpdateUI()
 	{
-		transRoot = SetPrefab((Enum)UI.OBJ_EQUIP_SET_ROOT, GetCreatePrefabName());
+		transRoot = SetPrefab(UI.OBJ_EQUIP_SET_ROOT, GetCreatePrefabName());
 		UpdateUserIDLabel();
 		UpdateHeader();
 		LoadModel();
@@ -248,8 +247,6 @@ public class GuildMemberInfo : SkillInfoBase
 
 	protected virtual void LoadModel()
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 		SetRenderPlayerModel(transRoot, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data, need_weapon: true, need_helm: true, need_leg: true, isVisualMode), PLAYER_ANIM_TYPE.GetStatus(data.sex), new Vector3(0f, -0.75f, 14f), new Vector3(0f, 180f, 0f), isVisualMode, delegate(PlayerLoader player_loader)
 		{
 			if (player_loader != null)
@@ -261,8 +258,7 @@ public class GuildMemberInfo : SkillInfoBase
 
 	protected virtual void CreateDegree()
 	{
-		DegreePlate component = GetCtrl(UI.OBJ_DEGREE_PLATE_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(SelectedDegrees, isButton: false, delegate
+		GetCtrl(UI.OBJ_DEGREE_PLATE_ROOT).GetComponent<DegreePlate>().Initialize(SelectedDegrees, isButton: false, delegate
 		{
 		});
 	}
@@ -296,13 +292,13 @@ public class GuildMemberInfo : SkillInfoBase
 						return;
 					}
 				}
-				Transform val = null;
+				Transform transform = null;
 				int num2 = -1;
 				if (equipItemData.IsWeapon())
 				{
-					val = FindCtrl(transRoot, icons[weapon_cnt]);
+					transform = FindCtrl(transRoot, icons[weapon_cnt]);
 					num2 = weapon_cnt;
-					weapon_cnt++;
+					int num3 = ++weapon_cnt;
 				}
 				else
 				{
@@ -331,19 +327,19 @@ public class GuildMemberInfo : SkillInfoBase
 					}
 					if (num2 != -1)
 					{
-						val = FindCtrl(transRoot, icons[num2]);
+						transform = FindCtrl(transRoot, icons[num2]);
 					}
 				}
-				if (!(val == null))
+				if (!(transform == null))
 				{
 					SetActive(FindCtrl(transRoot, icons[num2]), is_visible: true);
-					string event_name = (!isVisualMode) ? "DETAIL" : "VISUAL_DETAIL";
-					ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(equipItemData.type), equipItemData.GetIconID(GetCharaSex()), equipItemData.rarity, val, equipItemData.GetTargetElementPriorityToTable(), null, -1, event_name, num2);
+					string event_name = isVisualMode ? "VISUAL_DETAIL" : "DETAIL";
+					ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(equipItemData.type), equipItemData.GetIconID(GetCharaSex()), equipItemData.rarity, transform, equipItemData.GetTargetElementPriorityToTable(), null, -1, event_name, num2);
 					SetLongTouch(itemIcon.transform, event_name, num2);
 					SetEvent(FindCtrl(transRoot, icons_btn[num2]), event_name, num2);
 					SetLongTouch(FindCtrl(transRoot, icons_btn[num2]), event_name, num2);
 					EquipItemInfo info = new EquipItemInfo(equip_data);
-					itemIcon.SetEquipExtInvertedColor(info, base.GetComponent<UILabel>((Enum)icons_level[num2]));
+					itemIcon.SetEquipExtInvertedColor(info, GetComponent<UILabel>(icons_level[num2]));
 					SetActive(FindCtrl(transRoot, icons_level[num2]), !isVisualMode);
 					if (equip_data != null)
 					{
@@ -390,19 +386,19 @@ public class GuildMemberInfo : SkillInfoBase
 	protected void SetVisualModeIcon(int index, int table_id, EQUIPMENT_TYPE e_type, CharaInfo chara_info)
 	{
 		string event_name = "VISUAL_DETAIL";
-		Transform val = FindCtrl(transRoot, icons[index]);
+		Transform transform = FindCtrl(transRoot, icons[index]);
 		EquipItemTable.EquipItemData visualModeTargetTable = GetVisualModeTargetTable((uint)table_id, e_type, chara_info);
 		if (visualModeTargetTable != null)
 		{
-			val.GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
+			transform.GetComponentsInChildren(includeInactive: true, Temporary.itemIconList);
 			int i = 0;
 			for (int count = Temporary.itemIconList.Count; i < count; i++)
 			{
-				Temporary.itemIconList[i].get_gameObject().SetActive(true);
+				Temporary.itemIconList[i].gameObject.SetActive(value: true);
 			}
 			Temporary.itemIconList.Clear();
 			SetActive(FindCtrl(transRoot, icons[index]), is_visible: true);
-			ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(visualModeTargetTable.type), visualModeTargetTable.GetIconID(GetCharaSex()), visualModeTargetTable.rarity, val, visualModeTargetTable.GetTargetElementPriorityToTable(), null, -1, event_name, index);
+			ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(visualModeTargetTable.type), visualModeTargetTable.GetIconID(GetCharaSex()), visualModeTargetTable.rarity, transform, visualModeTargetTable.GetTargetElementPriorityToTable(), null, -1, event_name, index);
 			SetLongTouch(itemIcon.transform, event_name, index);
 			SetEvent(FindCtrl(transRoot, icons_btn[index]), event_name, index);
 			SetLongTouch(FindCtrl(transRoot, icons_btn[index]), event_name, index);
@@ -412,14 +408,6 @@ public class GuildMemberInfo : SkillInfoBase
 
 	protected void UpdateBottomButton()
 	{
-		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
 		SetActive(transRoot, UI.OBJ_FRIEND_INFO_ROOT, IsFriendInfo);
 		SetActive(transRoot, UI.OBJ_CHANGE_EQUIP_INFO_ROOT, !IsFriendInfo);
 		SetActive(transRoot, UI.BTN_MAGI, showMagiButton);
@@ -448,15 +436,9 @@ public class GuildMemberInfo : SkillInfoBase
 				SetActive(transRoot, UI.BTN_FOLLOW, is_visible: true);
 				if (!isFollowerListChengeTrans)
 				{
-					Transform val = FindCtrl(transRoot, UI.BTN_FOLLOW);
-					Transform obj = val;
-					Vector3 localPosition = val.get_localPosition();
-					float num = localPosition.x - 167f;
-					Vector3 localPosition2 = val.get_localPosition();
-					float num2 = localPosition2.y - 502f;
-					Vector3 localPosition3 = val.get_localPosition();
-					obj.set_localPosition(new Vector3(num, num2, localPosition3.z));
-					val.set_localScale(new Vector3(1f, 1f, 1f));
+					Transform transform = FindCtrl(transRoot, UI.BTN_FOLLOW);
+					transform.localPosition = new Vector3(transform.localPosition.x - 167f, transform.localPosition.y - 502f, transform.localPosition.z);
+					transform.localScale = new Vector3(1f, 1f, 1f);
 					isFollowerListChengeTrans = true;
 				}
 			}

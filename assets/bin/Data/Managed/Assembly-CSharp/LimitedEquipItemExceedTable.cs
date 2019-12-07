@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 public class LimitedEquipItemExceedTable : Singleton<LimitedEquipItemExceedTable>, IDataTable
 {
@@ -62,9 +61,6 @@ public class LimitedEquipItemExceedTable : Singleton<LimitedEquipItemExceedTable
 	}
 
 	private UIntKeyTable<LimitedEquipItemExceedData> limitedEquipItemExceedTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<LimitedEquipItemExceedData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string csv_text)
 	{

@@ -17,6 +17,12 @@ public class GoGameSettingsManager : MonoBehaviourSingleton<GoGameSettingsManage
 
 	public int limitAbility = 3;
 
+	public List<string> tradingpostCurrentScene = new List<string>();
+
+	public List<string> tradingpostStartSection = new List<string>();
+
+	public List<string> tradingPostDialogBlockerSection = new List<string>();
+
 	public bool UseShopUI3(string spriteName)
 	{
 		if (string.IsNullOrEmpty(spriteName) || itemsUseShopUI3 == null || itemsUseShopUI3.Count <= 0)
@@ -24,5 +30,10 @@ public class GoGameSettingsManager : MonoBehaviourSingleton<GoGameSettingsManage
 			return false;
 		}
 		return itemsUseShopUI3.Contains(spriteName);
+	}
+
+	public bool PreventUpdateDialogBlocker(string section_name)
+	{
+		return tradingPostDialogBlockerSection.Contains(section_name);
 	}
 }

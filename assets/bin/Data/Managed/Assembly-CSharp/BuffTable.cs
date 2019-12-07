@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 public class BuffTable : Singleton<BuffTable>, IDataTable
 {
 	public class BuffData
@@ -34,9 +32,6 @@ public class BuffTable : Singleton<BuffTable>, IDataTable
 	}
 
 	private UIntKeyTable<BuffData> dataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<BuffData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string text)
 	{

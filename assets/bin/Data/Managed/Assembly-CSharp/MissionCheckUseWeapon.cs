@@ -58,6 +58,10 @@ public class MissionCheckUseWeapon : MissionCheckBase
 				break;
 			}
 		}
-		return eQUIPMENT_TYPE != EQUIPMENT_TYPE.NONE && missionRequire != MISSION_REQUIRE.MULTI_EQUIP;
+		if (eQUIPMENT_TYPE != EQUIPMENT_TYPE.NONE)
+		{
+			return missionRequire != MISSION_REQUIRE.MULTI_EQUIP;
+		}
+		return false;
 	}
 }

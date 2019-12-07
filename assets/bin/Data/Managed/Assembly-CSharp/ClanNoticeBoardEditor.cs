@@ -1,5 +1,3 @@
-using System;
-
 public class ClanNoticeBoardEditor : GameSection
 {
 	protected enum UI
@@ -15,7 +13,7 @@ public class ClanNoticeBoardEditor : GameSection
 	protected virtual void OnQuery_SEND()
 	{
 		GameSection.StayEvent();
-		string text = GetInputValue((Enum)UI.IPT_TEXT);
+		string text = GetInputValue(UI.IPT_TEXT);
 		if (!string.IsNullOrEmpty(text))
 		{
 			text = text.Replace("\n", "\\n");

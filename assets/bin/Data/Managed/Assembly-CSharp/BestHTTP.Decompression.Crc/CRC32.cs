@@ -25,23 +25,6 @@ namespace BestHTTP.Decompression.Crc
 
 		public int Crc32Result => (int)(~_register);
 
-		public CRC32()
-			: this(reverseBits: false)
-		{
-		}
-
-		public CRC32(bool reverseBits)
-			: this(-306674912, reverseBits)
-		{
-		}
-
-		public CRC32(int polynomial, bool reverseBits)
-		{
-			this.reverseBits = reverseBits;
-			dwPolynomial = (uint)polynomial;
-			GenerateLookupTable();
-		}
-
 		public int GetCrc32(Stream input)
 		{
 			return GetCrc32AndCopy(input, null);
@@ -123,20 +106,21 @@ namespace BestHTTP.Decompression.Crc
 			{
 				if (reverseBits)
 				{
-					uint num2 = (_register >> 24) ^ b;
-					_register = ((_register << 8) ^ crc32Table[(num2 < 0) ? (num2 + 256) : num2]);
+					uint num = (_register >> 24) ^ b;
+					_register = ((_register << 8) ^ crc32Table[(num >= 0) ? num : (num + 256)]);
 				}
 				else
 				{
-					uint num3 = (_register & 0xFF) ^ b;
-					_register = ((_register >> 8) ^ crc32Table[(num3 < 0) ? (num3 + 256) : num3]);
+					uint num2 = (_register & 0xFF) ^ b;
+					_register = ((_register >> 8) ^ crc32Table[(num2 >= 0) ? num2 : (num2 + 256)]);
 				}
 			}
 		}
 
 		private static uint ReverseBits(uint data)
 		{
-			uint num = ((data & 0x55555555) << 1) | ((data >> 1) & 0x55555555);
+			uint num = data;
+			num = (((num & 0x55555555) << 1) | ((num >> 1) & 0x55555555));
 			num = (((num & 0x33333333) << 2) | ((num >> 2) & 0x33333333));
 			num = (((num & 0xF0F0F0F) << 4) | ((num >> 4) & 0xF0F0F0F));
 			return (num << 24) | ((num & 0xFF00) << 8) | ((num >> 8) & 0xFF00) | (num >> 24);
@@ -144,10 +128,10 @@ namespace BestHTTP.Decompression.Crc
 
 		private static byte ReverseBits(byte data)
 		{
-			uint num = (uint)(data * 131586);
+			int num = data * 131586;
 			uint num2 = 17055760u;
-			uint num3 = num & num2;
-			uint num4 = (num << 2) & (num2 << 1);
+			uint num3 = (uint)(num & (int)num2);
+			uint num4 = (uint)((num << 2) & (int)(num2 << 1));
 			return (byte)(16781313 * (num3 + num4) >> 24);
 		}
 
@@ -240,6 +224,23 @@ namespace BestHTTP.Decompression.Crc
 			while (num3 != 0);
 			num = (uint)((int)num ^ crc);
 			_register = ~num;
+		}
+
+		public CRC32()
+			: this(reverseBits: false)
+		{
+		}
+
+		public CRC32(bool reverseBits)
+			: this(-306674912, reverseBits)
+		{
+		}
+
+		public CRC32(int polynomial, bool reverseBits)
+		{
+			this.reverseBits = reverseBits;
+			dwPolynomial = (uint)polynomial;
+			GenerateLookupTable();
 		}
 
 		public void Reset()

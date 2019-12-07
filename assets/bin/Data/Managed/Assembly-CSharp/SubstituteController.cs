@@ -21,7 +21,7 @@ public class SubstituteController
 		}
 	}
 
-	public void Finalize()
+	public void TryFinalize()
 	{
 		owner = null;
 		End();
@@ -36,29 +36,24 @@ public class SubstituteController
 
 	public void Create(int num)
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Expected O, but got Unknown
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 		if (effectRoot == null)
 		{
 			effectRoot = new GameObject();
-			effectRoot.get_transform().SetParent(MonoBehaviourSingleton<EffectManager>.I._transform);
-			effectRoot.get_transform().set_localPosition(Vector3.get_zero());
-			effectRoot.get_transform().set_localScale(Vector3.get_one());
-			effectRoot.get_transform().set_localRotation(Quaternion.get_identity());
+			effectRoot.transform.SetParent(MonoBehaviourSingleton<EffectManager>.I._transform);
+			effectRoot.transform.localPosition = Vector3.zero;
+			effectRoot.transform.localScale = Vector3.one;
+			effectRoot.transform.localRotation = Quaternion.identity;
 		}
 		effectRoot.SetActive(owner.isActedBattleStart);
 		for (int i = 0; i < num; i++)
 		{
 			if (i < list.Count)
 			{
-				list[i].Create(effectRoot.get_transform());
+				list[i].Create(effectRoot.transform);
 				continue;
 			}
 			SubstituteEffect substituteEffect = new SubstituteEffect();
-			substituteEffect.Initialize(effectRoot.get_transform(), i, owner, (i != 0) ? list[i - 1] : null, info);
+			substituteEffect.Initialize(effectRoot.transform, i, owner, (i == 0) ? null : list[i - 1], info);
 			list.Add(substituteEffect);
 		}
 	}
@@ -104,10 +99,10 @@ public class SubstituteController
 
 	public void ActiveEffectRoot()
 	{
-		if (!(effectRoot == null) && !effectRoot.get_activeSelf())
+		if (!(effectRoot == null) && !effectRoot.activeSelf)
 		{
 			Update(isLerp: false);
-			effectRoot.SetActive(true);
+			effectRoot.SetActive(value: true);
 		}
 	}
 

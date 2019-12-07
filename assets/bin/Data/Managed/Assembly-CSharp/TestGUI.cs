@@ -45,9 +45,9 @@ public class TestGUI
 
 	private static float areaWidth;
 
-	private static float SCREEN_WIDTH_RATE => (float)Screen.get_width() / 480f;
+	private static float SCREEN_WIDTH_RATE => (float)Screen.width / 480f;
 
-	private static float SCREEN_HEIGHT_RATE => (float)Screen.get_height() / 800f;
+	private static float SCREEN_HEIGHT_RATE => (float)Screen.height / 800f;
 
 	private static float SMALL_BUTTON_HEIGHT => SCREEN_HEIGHT_RATE * 22f;
 
@@ -73,27 +73,23 @@ public class TestGUI
 		_Button(text, string.Empty, place, areaWidth, SMALL_BUTTON_HEIGHT, call_back, user_data);
 	}
 
-	public static void Label(string text, TextAnchor alignment = 4, PLACE place = PLACE.DEFAULT)
+	public static void Label(string text, TextAnchor alignment = TextAnchor.MiddleCenter, PLACE place = PLACE.DEFAULT)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		_Label(text, place, areaWidth, BUTTON_HEIGHT, alignment);
 	}
 
-	public static void SmallLabel(string text, TextAnchor alignment = 4, PLACE place = PLACE.DEFAULT)
+	public static void SmallLabel(string text, TextAnchor alignment = TextAnchor.MiddleCenter, PLACE place = PLACE.DEFAULT)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		_Label(text, place, areaWidth, SMALL_BUTTON_HEIGHT, alignment);
 	}
 
-	public static void TextField(ref string text, TextAnchor alignment = 4, PLACE place = PLACE.DEFAULT)
+	public static void TextField(ref string text, TextAnchor alignment = TextAnchor.MiddleCenter, PLACE place = PLACE.DEFAULT)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		_TextField(ref text, place, areaWidth, BUTTON_HEIGHT, alignment);
 	}
 
-	public static void SmallTextField(ref string text, TextAnchor alignment = 4, PLACE place = PLACE.DEFAULT)
+	public static void SmallTextField(ref string text, TextAnchor alignment = TextAnchor.MiddleCenter, PLACE place = PLACE.DEFAULT)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		_TextField(ref text, place, areaWidth, SMALL_BUTTON_HEIGHT, alignment);
 	}
 
@@ -117,23 +113,15 @@ public class TestGUI
 		float holizon_reduction_rate = 1f - 0.1f * (float)holizon_reduction_num;
 		BeginArea(area_type, holizon_reduction_rate);
 		GetAreaRect(area_type, out dialogRect);
-		float num = dialogRect.get_width() * 0.1f;
-		float num2 = num * (float)holizon_reduction_num;
-		areaWidth = dialogRect.get_width() - num2 - 20f;
+		float num = dialogRect.width * 0.1f * (float)holizon_reduction_num;
+		areaWidth = dialogRect.width - num - 20f;
 		isBeginDialog = true;
-		GUILayout.BeginVertical(GUIStyle.op_Implicit("Window"), (GUILayoutOption[])new GUILayoutOption[1]
-		{
-			GUILayout.Height(BUTTON_HEIGHT * (float)vertical_item + BUTTON_HEIGHT * 0.5f)
-		});
+		GUILayout.BeginVertical("Window", GUILayout.Height(BUTTON_HEIGHT * (float)vertical_item + BUTTON_HEIGHT * 0.5f));
 	}
 
 	public static void BeginModalDialog(AREA_TYPE area_type, int vertical_item, int holizon_reduction_num = 0)
 	{
-		GUILayout.BeginVertical(GUIStyle.op_Implicit("Box"), (GUILayoutOption[])new GUILayoutOption[2]
-		{
-			GUILayout.Width((float)Screen.get_width()),
-			GUILayout.Height((float)Screen.get_height())
-		});
+		GUILayout.BeginVertical("Box", GUILayout.Width(Screen.width), GUILayout.Height(Screen.height));
 		GUILayout.FlexibleSpace();
 		GUILayout.EndVertical();
 		EndArea();
@@ -156,11 +144,11 @@ public class TestGUI
 		}
 		if (style != null)
 		{
-			GUILayout.BeginHorizontal(GUIStyle.op_Implicit(style), (GUILayoutOption[])new GUILayoutOption[0]);
+			GUILayout.BeginHorizontal(style);
 		}
 		else
 		{
-			GUILayout.BeginHorizontal((GUILayoutOption[])new GUILayoutOption[0]);
+			GUILayout.BeginHorizontal();
 		}
 		splitNum.Add(split_num);
 	}
@@ -173,8 +161,7 @@ public class TestGUI
 
 	public static void Space()
 	{
-		float uIWidth = GetUIWidth(0f);
-		GUILayout.Space(uIWidth);
+		GUILayout.Space(GetUIWidth(0f));
 	}
 
 	public static void MenuSpace()
@@ -195,14 +182,14 @@ public class TestGUI
 	private static void _Button(string text, string event_name, PLACE flag, float width, float height, Action call_back, object user_data)
 	{
 		float uIWidth = GetUIWidth(width);
-		float num = (height != 0f) ? height : BUTTON_HEIGHT;
-		GUILayoutOption[] array = (GUILayoutOption[])new GUILayoutOption[2]
+		float height2 = (height == 0f) ? BUTTON_HEIGHT : height;
+		GUILayoutOption[] options = new GUILayoutOption[2]
 		{
 			GUILayout.Width(uIWidth),
-			GUILayout.Height(num)
+			GUILayout.Height(height2)
 		};
 		_Begin(flag);
-		if (GUILayout.Button(text, array) && !MonoBehaviourSingleton<UIManager>.I.IsDisable())
+		if (GUILayout.Button(text, options) && !MonoBehaviourSingleton<UIManager>.I.IsDisable())
 		{
 			call_back?.Invoke();
 			if (event_name.Length > 0)
@@ -219,22 +206,18 @@ public class TestGUI
 
 	private static void _Label(string text, PLACE flag, float width, float height, TextAnchor alignment)
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		float uIWidth = GetUIWidth(width);
-		float num = (height != 0f) ? height : BUTTON_HEIGHT;
-		GUIStyle val = new GUIStyle(GUI.get_skin().get_label());
-		val.set_alignment(alignment);
-		val.get_normal().set_textColor(Color.get_white());
-		GUILayoutOption[] array = (GUILayoutOption[])new GUILayoutOption[2]
+		float height2 = (height == 0f) ? BUTTON_HEIGHT : height;
+		GUIStyle gUIStyle = new GUIStyle(GUI.skin.label);
+		gUIStyle.alignment = alignment;
+		gUIStyle.normal.textColor = Color.white;
+		GUILayoutOption[] options = new GUILayoutOption[2]
 		{
 			GUILayout.Width(uIWidth),
-			GUILayout.Height(num)
+			GUILayout.Height(height2)
 		};
 		_Begin(flag);
-		GUILayout.Label(text, val, array);
+		GUILayout.Label(text, gUIStyle, options);
 		if (!isBegin)
 		{
 			EndArea();
@@ -244,22 +227,18 @@ public class TestGUI
 
 	private static void _TextField(ref string text, PLACE flag, float width, float height, TextAnchor alignment)
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		float uIWidth = GetUIWidth(width);
-		float num = (height != 0f) ? height : BUTTON_HEIGHT;
-		GUIStyle val = new GUIStyle(GUI.get_skin().get_textField());
-		val.set_alignment(alignment);
-		val.get_normal().set_textColor(Color.get_white());
-		GUILayoutOption[] array = (GUILayoutOption[])new GUILayoutOption[2]
+		float height2 = (height == 0f) ? BUTTON_HEIGHT : height;
+		GUIStyle gUIStyle = new GUIStyle(GUI.skin.textField);
+		gUIStyle.alignment = alignment;
+		gUIStyle.normal.textColor = Color.white;
+		GUILayoutOption[] options = new GUILayoutOption[2]
 		{
 			GUILayout.Width(uIWidth),
-			GUILayout.Height(num)
+			GUILayout.Height(height2)
 		};
 		_Begin(flag);
-		text = GUILayout.TextField(text, val, array);
+		text = GUILayout.TextField(text, gUIStyle, options);
 		if (!isBegin)
 		{
 			EndArea();
@@ -276,37 +255,37 @@ public class TestGUI
 		switch (flag)
 		{
 		case PLACE.LEFT_TOP:
-			GUILayout.BeginHorizontal((GUILayoutOption[])new GUILayoutOption[0]);
-			GUILayout.BeginVertical((GUILayoutOption[])new GUILayoutOption[0]);
+			GUILayout.BeginHorizontal();
+			GUILayout.BeginVertical();
 			break;
 		case PLACE.LEFT_MID:
 		case PLACE.LEFT_BOTTOM:
-			GUILayout.BeginHorizontal((GUILayoutOption[])new GUILayoutOption[0]);
-			GUILayout.BeginVertical((GUILayoutOption[])new GUILayoutOption[0]);
+			GUILayout.BeginHorizontal();
+			GUILayout.BeginVertical();
 			GUILayout.FlexibleSpace();
 			break;
 		case PLACE.CENTER_TOP:
-			GUILayout.BeginHorizontal((GUILayoutOption[])new GUILayoutOption[0]);
+			GUILayout.BeginHorizontal();
 			GUILayout.FlexibleSpace();
-			GUILayout.BeginVertical((GUILayoutOption[])new GUILayoutOption[0]);
+			GUILayout.BeginVertical();
 			break;
 		case PLACE.CENTER_MID:
 		case PLACE.CENTER_BOTTOM:
-			GUILayout.BeginHorizontal((GUILayoutOption[])new GUILayoutOption[0]);
+			GUILayout.BeginHorizontal();
 			GUILayout.FlexibleSpace();
-			GUILayout.BeginVertical((GUILayoutOption[])new GUILayoutOption[0]);
+			GUILayout.BeginVertical();
 			GUILayout.FlexibleSpace();
 			break;
 		case PLACE.RIGHT_TOP:
-			GUILayout.BeginHorizontal((GUILayoutOption[])new GUILayoutOption[0]);
+			GUILayout.BeginHorizontal();
 			GUILayout.FlexibleSpace();
-			GUILayout.BeginVertical((GUILayoutOption[])new GUILayoutOption[0]);
+			GUILayout.BeginVertical();
 			break;
 		case PLACE.RIGHT_MID:
 		case PLACE.RIGHT_BOTTOM:
-			GUILayout.BeginHorizontal((GUILayoutOption[])new GUILayoutOption[0]);
+			GUILayout.BeginHorizontal();
 			GUILayout.FlexibleSpace();
-			GUILayout.BeginVertical((GUILayoutOption[])new GUILayoutOption[0]);
+			GUILayout.BeginVertical();
 			GUILayout.FlexibleSpace();
 			break;
 		}
@@ -355,16 +334,15 @@ public class TestGUI
 
 	private static void BeginArea(AREA_TYPE area_type, float holizon_reduction_rate = 1f)
 	{
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 		isAreaSettings = true;
 		GetAreaRect(area_type, out Rect rect);
-		float width = rect.get_width();
-		rect.set_width(rect.get_width() * holizon_reduction_rate);
-		float num = width - rect.get_width();
-		rect.set_x(rect.get_x() + num * 0.5f);
+		float width = rect.width;
+		rect.width *= holizon_reduction_rate;
+		float num = width - rect.width;
+		rect.x += num * 0.5f;
 		if (!isBeginDialog)
 		{
-			areaWidth = rect.get_width();
+			areaWidth = rect.width;
 		}
 		GUILayout.BeginArea(rect);
 	}
@@ -380,59 +358,59 @@ public class TestGUI
 		default:
 			num = 0f;
 			num2 = 0f;
-			num3 = Screen.get_width();
-			num4 = Screen.get_height();
+			num3 = Screen.width;
+			num4 = Screen.height;
 			break;
 		case AREA_TYPE.CENTER:
-			num = (float)Screen.get_width() * 0.1f;
-			num2 = (float)Screen.get_height() * 0.3f;
-			num3 = (float)Screen.get_width() * 0.9f;
-			num4 = (float)Screen.get_height() * 0.7f;
+			num = (float)Screen.width * 0.1f;
+			num2 = (float)Screen.height * 0.3f;
+			num3 = (float)Screen.width * 0.9f;
+			num4 = (float)Screen.height * 0.7f;
 			break;
 		case AREA_TYPE.CENTER_LARGE:
-			num = (float)Screen.get_width() * 0.1f;
-			num2 = (float)Screen.get_height() * 0.15f;
-			num3 = (float)Screen.get_width() * 0.9f;
-			num4 = (float)Screen.get_height() * 0.85f;
+			num = (float)Screen.width * 0.1f;
+			num2 = (float)Screen.height * 0.15f;
+			num3 = (float)Screen.width * 0.9f;
+			num4 = (float)Screen.height * 0.85f;
 			break;
 		case AREA_TYPE.CENTER_JUMBO:
-			num = (float)Screen.get_width() * 0.1f;
-			num2 = (float)Screen.get_height() * 0.05f;
-			num3 = (float)Screen.get_width() * 0.9f;
-			num4 = (float)Screen.get_height() * 0.95f;
+			num = (float)Screen.width * 0.1f;
+			num2 = (float)Screen.height * 0.05f;
+			num3 = (float)Screen.width * 0.9f;
+			num4 = (float)Screen.height * 0.95f;
 			break;
 		case AREA_TYPE.MAXIMUM:
-			num = (float)Screen.get_width() * 0.1f;
+			num = (float)Screen.width * 0.1f;
 			num2 = 0f;
-			num3 = (float)Screen.get_width() * 0.9f;
-			num4 = Screen.get_height();
+			num3 = (float)Screen.width * 0.9f;
+			num4 = Screen.height;
 			break;
 		case AREA_TYPE.TOP:
-			num = (float)Screen.get_width() * 0.1f;
+			num = (float)Screen.width * 0.1f;
 			num2 = 0f;
-			num3 = (float)Screen.get_width() * 0.9f;
-			num4 = (float)Screen.get_height() * 0.5f;
+			num3 = (float)Screen.width * 0.9f;
+			num4 = (float)Screen.height * 0.5f;
 			break;
 		case AREA_TYPE.BOTTOM:
-			num = (float)Screen.get_width() * 0.1f;
-			num2 = (float)Screen.get_height() * 0.6f;
-			num3 = Screen.get_width();
-			num4 = Screen.get_height();
+			num = (float)Screen.width * 0.1f;
+			num2 = (float)Screen.height * 0.6f;
+			num3 = Screen.width;
+			num4 = Screen.height;
 			break;
 		case AREA_TYPE.LEFT:
 			num = 0f;
-			num2 = (float)Screen.get_height() * 0.1f;
-			num3 = (float)Screen.get_width() * 0.5f;
-			num4 = (float)Screen.get_height() * 0.9f;
+			num2 = (float)Screen.height * 0.1f;
+			num3 = (float)Screen.width * 0.5f;
+			num4 = (float)Screen.height * 0.9f;
 			break;
 		case AREA_TYPE.RIGHT:
-			num = (float)Screen.get_width() * 0.5f;
-			num2 = (float)Screen.get_height() * 0.1f;
-			num3 = Screen.get_width();
-			num4 = (float)Screen.get_height() * 0.9f;
+			num = (float)Screen.width * 0.5f;
+			num2 = (float)Screen.height * 0.1f;
+			num3 = Screen.width;
+			num4 = (float)Screen.height * 0.9f;
 			break;
 		}
-		rect._002Ector(num, num2, num3 - num, num4 - num2);
+		rect = new Rect(num, num2, num3 - num, num4 - num2);
 	}
 
 	private static void EndArea()
@@ -449,10 +427,10 @@ public class TestGUI
 		if (splitNum.Count > 0)
 		{
 			int num = splitNum[splitNum.Count - 1];
-			int num2 = (num <= 2) ? (num - 1) : (num - 2);
+			int num2 = (num > 2) ? (num - 2) : (num - 1);
 			float num3 = (num2 > 0) ? (num2 * 5 / num) : 0;
 			return areaWidth / (float)num - num3;
 		}
-		return (width != 0f) ? width : areaWidth;
+		return (width == 0f) ? areaWidth : width;
 	}
 }

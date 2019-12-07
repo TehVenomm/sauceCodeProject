@@ -4,8 +4,6 @@ public class PlayerAttackFunnelBit : AttackFunnelBit
 {
 	public override void Initialize(StageObject attacker, AttackInfo atkInfo, StageObject targetObj, Transform launchTrans, Vector3 offsetPos, Quaternion offsetRot)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(attacker, atkInfo, targetObj, launchTrans, offsetPos, offsetRot);
 		Player player = attacker as Player;
 		if (player != null)
@@ -21,13 +19,15 @@ public class PlayerAttackFunnelBit : AttackFunnelBit
 	protected override bool CheckTargetDead()
 	{
 		Enemy enemy = base.TargetObject as Enemy;
-		return enemy == null || enemy.isDead || !enemy.get_enabled() || !enemy.get_gameObject().get_activeInHierarchy();
+		if (!(enemy == null) && !enemy.isDead && enemy.enabled)
+		{
+			return !enemy.gameObject.activeInHierarchy;
+		}
+		return true;
 	}
 
 	protected override StageObject SearchNearestTarget(Vector2 bulletPos, float searchRadius)
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 		float num = float.MaxValue;
 		StageObject result = null;
 		int count = MonoBehaviourSingleton<StageObjectManager>.I.EnemyList.Count;

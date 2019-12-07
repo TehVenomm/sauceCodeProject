@@ -40,7 +40,7 @@ public abstract class HomePlayerCharacterBase : HomeCharacterBase
 		{
 			if (head == null && animator != null)
 			{
-				head = animator.get_transform().Find("PLC_Origin/Move/Root/Hip/Spine00/Spine01/Neck/Head");
+				head = animator.transform.Find("PLC_Origin/Move/Root/Hip/Spine00/Spine01/Neck/Head");
 			}
 			return head;
 		}
@@ -48,7 +48,11 @@ public abstract class HomePlayerCharacterBase : HomeCharacterBase
 
 	public virtual int GetUserId()
 	{
-		return (GetFriendCharaInfo() != null) ? GetFriendCharaInfo().userId : 0;
+		if (GetFriendCharaInfo() == null)
+		{
+			return 0;
+		}
+		return GetFriendCharaInfo().userId;
 	}
 
 	public override FriendCharaInfo GetFriendCharaInfo()
@@ -65,11 +69,11 @@ public abstract class HomePlayerCharacterBase : HomeCharacterBase
 	{
 		if (anim == PLCA.WALK)
 		{
-			animator.set_applyRootMotion(true);
+			animator.applyRootMotion = true;
 		}
 		else
 		{
-			animator.set_applyRootMotion((anim == anim_ctrl.moveAnim) ? true : false);
+			animator.applyRootMotion = ((anim == anim_ctrl.moveAnim) ? true : false);
 		}
 	}
 
@@ -77,9 +81,9 @@ public abstract class HomePlayerCharacterBase : HomeCharacterBase
 	{
 		if (chatAppeal != null && MonoBehaviourSingleton<ChatManager>.IsValid())
 		{
-			Object.DestroyImmediate(chatAppeal.get_gameObject());
+			Object.DestroyImmediate(chatAppeal.gameObject);
 			chatAppeal = null;
-			Object.DestroyImmediate(stampAppeal.get_gameObject());
+			Object.DestroyImmediate(stampAppeal.gameObject);
 			stampAppeal = null;
 			MonoBehaviourSingleton<ChatManager>.I.OnCreateLoungeChat -= RegistOnRecvChat;
 			MonoBehaviourSingleton<ChatManager>.I.OnDestroyLoungeChat -= UnRegistOnRecvChat;
@@ -102,7 +106,7 @@ public abstract class HomePlayerCharacterBase : HomeCharacterBase
 	{
 		isPlayingSitAnimation = true;
 		chairPoint.SetSittingCharacter(this);
-		Vector3 sitPos = chairPoint.get_transform().get_position();
+		Vector3 sitPos = chairPoint.transform.position;
 		if (animCtrl == null)
 		{
 			InitAnim();
@@ -110,75 +114,57 @@ public abstract class HomePlayerCharacterBase : HomeCharacterBase
 		while (true)
 		{
 			animCtrl.Play(PLCA.WALK);
-			Vector3 pos = base._transform.get_position();
-			Vector3 diff = sitPos - pos;
-			Vector2 val = diff.ToVector2XZ();
-			Vector2 dir = val.get_normalized();
-			Quaternion val2 = Quaternion.LookRotation(dir.ToVector3XZ());
-			Vector3 eulerAngles = val2.get_eulerAngles();
-			float rot2 = eulerAngles.y;
-			float vel = 0f;
-			Vector3 eulerAngles2 = base._transform.get_eulerAngles();
-			rot2 = Mathf.SmoothDampAngle(eulerAngles2.y, rot2, ref vel, 0.1f);
-			base._transform.set_eulerAngles(new Vector3(0f, rot2, 0f));
-			if (diff.get_magnitude() < 0.15f)
+			Vector3 position = base._transform.position;
+			Vector3 vector = sitPos - position;
+			float y = Quaternion.LookRotation(vector.ToVector2XZ().normalized.ToVector3XZ()).eulerAngles.y;
+			float currentVelocity = 0f;
+			y = Mathf.SmoothDampAngle(base._transform.eulerAngles.y, y, ref currentVelocity, 0.1f);
+			base._transform.eulerAngles = new Vector3(0f, y, 0f);
+			if (vector.magnitude < 0.15f)
 			{
 				break;
 			}
 			yield return null;
 		}
-		Vector3 position = chairPoint.dir.get_transform().get_position();
-		Vector3 val3 = position - sitPos;
-		Quaternion rotation = Quaternion.LookRotation(val3);
-		base._transform.set_rotation(rotation);
+		Quaternion rotation = Quaternion.LookRotation(chairPoint.dir.transform.position - sitPos);
+		base._transform.rotation = rotation;
 		isSit = true;
-		PLCA sitMotion2;
+		PLCA anim;
 		switch (chairPoint.chairType)
 		{
 		default:
-			sitMotion2 = ((sexType != 0) ? PLCA.SIT_F : PLCA.SIT);
+			anim = ((sexType == 0) ? PLCA.SIT : PLCA.SIT_F);
 			break;
 		case ChairPoint.CHAIR_TYPE.BENTCH:
-			sitMotion2 = ((sexType != 0) ? PLCA.SIT_BENCH_F : PLCA.SIT_BENCH);
+			anim = ((sexType == 0) ? PLCA.SIT_BENCH : PLCA.SIT_BENCH_F);
 			break;
 		case ChairPoint.CHAIR_TYPE.SOFA:
-			sitMotion2 = ((sexType != 0) ? PLCA.SIT_SOFA_F : PLCA.SIT_SOFA);
+			anim = ((sexType == 0) ? PLCA.SIT_SOFA : PLCA.SIT_SOFA_F);
 			break;
 		}
-		animCtrl.Play(sitMotion2);
-		while (true)
+		animCtrl.Play(anim);
+		while (1f < animCtrl.animator.GetCurrentAnimatorStateInfo(0).normalizedTime)
 		{
-			AnimatorStateInfo currentAnimatorStateInfo = animCtrl.animator.GetCurrentAnimatorStateInfo(0);
-			if (1f < currentAnimatorStateInfo.get_normalizedTime())
-			{
-				yield return null;
-				continue;
-			}
-			break;
+			yield return null;
 		}
-		while (true)
+		while (1f > animCtrl.animator.GetCurrentAnimatorStateInfo(0).normalizedTime)
 		{
-			AnimatorStateInfo currentAnimatorStateInfo2 = animCtrl.animator.GetCurrentAnimatorStateInfo(0);
-			if (!(1f > currentAnimatorStateInfo2.get_normalizedTime()))
-			{
-				break;
-			}
 			yield return null;
 		}
 		isPlayingSitAnimation = false;
 		switch (chairPoint.chairType)
 		{
 		default:
-			sitMotion2 = ((sexType != 0) ? PLCA.SIT_IDLE_F : PLCA.SIT_IDLE);
+			anim = ((sexType == 0) ? PLCA.SIT_IDLE : PLCA.SIT_IDLE_F);
 			break;
 		case ChairPoint.CHAIR_TYPE.BENTCH:
-			sitMotion2 = ((sexType != 0) ? PLCA.SIT_BENCH_IDLE_F : PLCA.SIT_BENCH_IDLE);
+			anim = ((sexType == 0) ? PLCA.SIT_BENCH_IDLE : PLCA.SIT_BENCH_IDLE_F);
 			break;
 		case ChairPoint.CHAIR_TYPE.SOFA:
-			sitMotion2 = ((sexType != 0) ? PLCA.SIT_SOFA_IDLE_F : PLCA.SIT_SOFA_IDLE);
+			anim = ((sexType == 0) ? PLCA.SIT_SOFA_IDLE : PLCA.SIT_SOFA_IDLE_F);
 			break;
 		}
-		animCtrl.Play(sitMotion2);
+		animCtrl.Play(anim);
 	}
 
 	protected virtual IEnumerator StandUp()
@@ -189,42 +175,30 @@ public abstract class HomePlayerCharacterBase : HomeCharacterBase
 		{
 			chairPoint.ResetSittingCharacter();
 		}
-		PLCA standUpMotion;
+		PLCA anim;
 		switch (chairPoint.chairType)
 		{
 		default:
-			standUpMotion = ((sexType != 0) ? PLCA.STAND_UP_F : PLCA.STAND_UP);
+			anim = ((sexType == 0) ? PLCA.STAND_UP : PLCA.STAND_UP_F);
 			break;
 		case ChairPoint.CHAIR_TYPE.BENTCH:
-			standUpMotion = ((sexType != 0) ? PLCA.STAND_BENCH_UP_F : PLCA.STAND_BENCH_UP);
+			anim = ((sexType == 0) ? PLCA.STAND_BENCH_UP : PLCA.STAND_BENCH_UP_F);
 			break;
 		case ChairPoint.CHAIR_TYPE.SOFA:
-			standUpMotion = ((sexType != 0) ? PLCA.STAND_SOFA_UP_F : PLCA.STAND_SOFA_UP);
+			anim = ((sexType == 0) ? PLCA.STAND_SOFA_UP : PLCA.STAND_SOFA_UP_F);
 			break;
 		}
-		animCtrl.Play(standUpMotion);
-		IHomeManager iHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
-		iHomeManager.HomeCamera.ChangeView(HomeCamera.VIEW_MODE.NORMAL);
+		animCtrl.Play(anim);
+		GameSceneGlobalSettings.GetCurrentIHomeManager().HomeCamera.ChangeView(HomeCamera.VIEW_MODE.NORMAL);
 		isSitting = false;
 		isStanding = true;
 		isPlayingStandAnimation = true;
-		while (true)
+		while (1f < animCtrl.animator.GetCurrentAnimatorStateInfo(0).normalizedTime)
 		{
-			AnimatorStateInfo currentAnimatorStateInfo = animCtrl.animator.GetCurrentAnimatorStateInfo(0);
-			if (1f < currentAnimatorStateInfo.get_normalizedTime())
-			{
-				yield return null;
-				continue;
-			}
-			break;
+			yield return null;
 		}
-		while (true)
+		while (1f > animCtrl.animator.GetCurrentAnimatorStateInfo(0).normalizedTime)
 		{
-			AnimatorStateInfo currentAnimatorStateInfo2 = animCtrl.animator.GetCurrentAnimatorStateInfo(0);
-			if (!(1f > currentAnimatorStateInfo2.get_normalizedTime()))
-			{
-				break;
-			}
 			yield return null;
 		}
 		isPlayingStandAnimation = false;
@@ -238,13 +212,13 @@ public abstract class HomePlayerCharacterBase : HomeCharacterBase
 		MonoBehaviourSingleton<ChatManager>.I.OnDestroyLoungeChat += UnRegistOnRecvChat;
 		MonoBehaviourSingleton<ChatManager>.I.OnCreateClanChat += RegistOnRecvChat;
 		MonoBehaviourSingleton<ChatManager>.I.OnDestroyClanChat += UnRegistOnRecvChat;
-		Transform val = MonoBehaviourSingleton<UIManager>.I.common.CreateStampAppeal();
-		stampAppeal = val.get_gameObject().AddComponent<StampAppeal>();
-		stampAppeal.collectUI = val;
+		Transform transform = MonoBehaviourSingleton<UIManager>.I.common.CreateStampAppeal();
+		stampAppeal = transform.gameObject.AddComponent<StampAppeal>();
+		stampAppeal.collectUI = transform;
 		stampAppeal.CreateCtrlsArray(typeof(StampAppeal.UI));
-		val = MonoBehaviourSingleton<UIManager>.I.common.CreateChatAppeal();
-		chatAppeal = val.get_gameObject().AddComponent<ChatAppeal>();
-		chatAppeal.collectUI = val;
+		transform = MonoBehaviourSingleton<UIManager>.I.common.CreateChatAppeal();
+		chatAppeal = transform.gameObject.AddComponent<ChatAppeal>();
+		chatAppeal.collectUI = transform;
 		chatAppeal.CreateCtrlsArray(typeof(ChatAppeal.UI));
 	}
 

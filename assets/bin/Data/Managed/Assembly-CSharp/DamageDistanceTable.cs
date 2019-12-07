@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class DamageDistanceTable : Singleton<DamageDistanceTable>, IDataTable
@@ -35,16 +34,16 @@ public class DamageDistanceTable : Singleton<DamageDistanceTable>, IDataTable
 			}
 			float num = distance - (float)damagePoint.distance;
 			float num2 = (float)damagePoint2.distance - (float)damagePoint.distance;
-			float num3 = 1f;
+			float t = 1f;
 			if (distance <= 0f)
 			{
-				num3 = 0f;
+				t = 0f;
 			}
 			else if (num2 > 0f)
 			{
-				num3 = num / num2;
+				t = num / num2;
 			}
-			return Mathf.Lerp((float)damagePoint.rate, (float)damagePoint2.rate, num3);
+			return Mathf.Lerp(damagePoint.rate, damagePoint2.rate, t);
 		}
 
 		public void CalcMaxRate()
@@ -52,7 +51,7 @@ public class DamageDistanceTable : Singleton<DamageDistanceTable>, IDataTable
 			for (int i = 0; i < points.Length; i++)
 			{
 				DamagePoint damagePoint = points[i];
-				max = Mathf.Max(max, (float)damagePoint.rate);
+				max = Mathf.Max(max, damagePoint.rate);
 			}
 		}
 
@@ -65,12 +64,6 @@ public class DamageDistanceTable : Singleton<DamageDistanceTable>, IDataTable
 	public const string NT = "id,startRate,distance0,rate0,distance1,rate1,distance2,rate2,distance3,rate3,distance4,rate4,distance5,rate5,distance6,rate6,distance7,rate7,distance8,rate8,distance9,rate9";
 
 	private UIntKeyTable<DamageDistanceData> dataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<DamageDistanceData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<DamageDistanceData> _003C_003Ef__mg_0024cache1;
 
 	public static bool cb(CSVReader csv_reader, DamageDistanceData data, ref uint key)
 	{
@@ -86,7 +79,7 @@ public class DamageDistanceTable : Singleton<DamageDistanceTable>, IDataTable
 			DamagePoint damagePoint2 = new DamagePoint();
 			CSVReader.PopResult result = csv_reader.Pop(ref damagePoint2.distance);
 			CSVReader.PopResult result2 = csv_reader.Pop(ref damagePoint2.rate);
-			if (!(bool)result || !(bool)result2 || (float)damagePoint2.distance <= 0f || num >= (float)damagePoint2.distance)
+			if (!result || !result2 || (float)damagePoint2.distance <= 0f || num >= (float)damagePoint2.distance)
 			{
 				break;
 			}
@@ -100,13 +93,13 @@ public class DamageDistanceTable : Singleton<DamageDistanceTable>, IDataTable
 
 	public void CreateTable(string csv_text)
 	{
-		dataTable = TableUtility.CreateUIntKeyTable<DamageDistanceData>(csv_text, DamageDistanceTable.cb, "id,startRate,distance0,rate0,distance1,rate1,distance2,rate2,distance3,rate3,distance4,rate4,distance5,rate5,distance6,rate6,distance7,rate7,distance8,rate8,distance9,rate9");
+		dataTable = TableUtility.CreateUIntKeyTable<DamageDistanceData>(csv_text, cb, "id,startRate,distance0,rate0,distance1,rate1,distance2,rate2,distance3,rate3,distance4,rate4,distance5,rate5,distance6,rate6,distance7,rate7,distance8,rate8,distance9,rate9");
 		dataTable.TrimExcess();
 	}
 
 	public void AddTable(string csv_text)
 	{
-		TableUtility.AddUIntKeyTable(dataTable, csv_text, DamageDistanceTable.cb, "id,startRate,distance0,rate0,distance1,rate1,distance2,rate2,distance3,rate3,distance4,rate4,distance5,rate5,distance6,rate6,distance7,rate7,distance8,rate8,distance9,rate9");
+		TableUtility.AddUIntKeyTable(dataTable, csv_text, cb, "id,startRate,distance0,rate0,distance1,rate1,distance2,rate2,distance3,rate3,distance4,rate4,distance5,rate5,distance6,rate6,distance7,rate7,distance8,rate8,distance9,rate9");
 	}
 
 	public DamageDistanceData GetData(uint id)

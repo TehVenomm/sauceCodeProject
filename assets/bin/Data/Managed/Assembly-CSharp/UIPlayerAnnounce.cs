@@ -41,12 +41,7 @@ public class UIPlayerAnnounce : UIAnnounceBase<UIPlayerAnnounce>
 
 	public void Announce(ANNOUNCE_TYPE type, Player player)
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		if (AnnounceStart(player))
 		{
 			announceName.text = labelSettings[(int)type].text;
@@ -62,12 +57,7 @@ public class UIPlayerAnnounce : UIAnnounceBase<UIPlayerAnnounce>
 
 	public void StartSkill(string skill_name, Player player)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		if (AnnounceStart(player))
 		{
 			announceName.text = skill_name;
@@ -83,11 +73,11 @@ public class UIPlayerAnnounce : UIAnnounceBase<UIPlayerAnnounce>
 
 	protected override void OnStart()
 	{
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 
 	protected override void OnAfterAnimation()
 	{
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 }

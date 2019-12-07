@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -43,8 +42,8 @@ public class LoungeMemberList : GameSection
 	public override void Initialize()
 	{
 		members = new List<PartyModel.SlotInfo>(8);
-		SetLabelText((Enum)UI.STR_LIST_NUM, base.sectionData.GetText("MEMBER_NUMBER"));
-		this.StartCoroutine(DoInitialize());
+		SetLabelText(UI.STR_LIST_NUM, base.sectionData.GetText("MEMBER_NUMBER"));
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -70,9 +69,9 @@ public class LoungeMemberList : GameSection
 	{
 		SetMembers();
 		UpdateListUI();
-		SetActive((Enum)UI.LBL_NON_LIST, members.Count <= 0);
-		SetLabelText((Enum)UI.LBL_MEMBER_NUMBER_NOW, MonoBehaviourSingleton<LoungeMatchingManager>.I.GetMemberCount().ToString());
-		SetLabelText((Enum)UI.LBL_MEMBER_NUMBER_MAX, (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData.num + 1).ToString());
+		SetActive(UI.LBL_NON_LIST, members.Count <= 0);
+		SetLabelText(UI.LBL_MEMBER_NUMBER_NOW, MonoBehaviourSingleton<LoungeMatchingManager>.I.GetMemberCount().ToString());
+		SetLabelText(UI.LBL_MEMBER_NUMBER_MAX, (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData.num + 1).ToString());
 	}
 
 	private void SetMembers()
@@ -90,7 +89,7 @@ public class LoungeMemberList : GameSection
 
 	private void UpdateListUI()
 	{
-		SetDynamicList((Enum)UI.GRD_LIST, "LoungeMemberListItem", members.Count, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList(UI.GRD_LIST, "LoungeMemberListItem", members.Count, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			SetupListItem(members[i], i, t, is_recycle);
 		});
@@ -104,28 +103,24 @@ public class LoungeMemberList : GameSection
 
 	private void SetMemberInfo(PartyModel.SlotInfo data, int i, Transform t)
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 		CharaInfo userInfo = data.userInfo;
 		FollowLoungeMember followLoungeMember = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetFollowLoungeMember(userInfo.userId);
-		EquipSetCalculator otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(i + 4);
-		otherEquipSetCalculator.SetEquipSet(data.userInfo.equipSet);
+		MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(i + 4).SetEquipSet(data.userInfo.equipSet);
 		SetRenderPlayerModel(t, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(userInfo, need_weapon: false, need_helm: true, need_leg: false, is_priority_visual_equip: true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), is_priority_visual_equip: true);
 		SetLabelText(t, UI.LBL_NAME, userInfo.name);
 		SetLabelText(t, UI.LBL_LEVEL, userInfo.level.ToString());
-		string clanId = (userInfo.userClanData == null) ? "0" : userInfo.userClanData.cId;
+		string clanId = (userInfo.userClanData != null) ? userInfo.userClanData.cId : "0";
 		SetFollowStatus(t, userInfo.userId, followLoungeMember.following, followLoungeMember.follower, clanId);
 		SetActive(t, UI.SPR_ICON_HOST, userInfo.userId == MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData.ownerUserId);
 		SetPlayingStatus(t, userInfo.userId);
 		SetActive(t, UI.SPR_ICON_FIRST_MET, MonoBehaviourSingleton<LoungeMatchingManager>.I.CheckFirstMet(userInfo.userId));
-		DegreePlate component = FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(userInfo.selectedDegrees, isButton: false, delegate
+		FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>().Initialize(userInfo.selectedDegrees, isButton: false, delegate
 		{
 			GetCtrl(UI.GRD_LIST).GetComponent<UIGrid>().Reposition();
 		});
 		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsRallyUser(userInfo.userId))
 		{
-			SetBadge(t, -1, 1, 10, 0, is_scale_normalize: true);
+			SetBadge(t, -1, SpriteAlignment.TopLeft, 10, 0, is_scale_normalize: true);
 		}
 	}
 
@@ -145,11 +140,11 @@ public class LoungeMemberList : GameSection
 			is_visible = (clanId == MonoBehaviourSingleton<UserInfoManager>.I.userClan.cId);
 		}
 		SetActive(t, UI.SPR_BLACKLIST_ICON, flag);
-		SetActive(t, UI.OBJ_FOLLOW, following || follower);
+		SetActive(t, UI.OBJ_FOLLOW, following | follower);
 		SetActive(t, UI.SPR_FOLLOW, following);
 		SetActive(t, UI.SPR_FOLLOWER, follower);
 		SetActive(t, UI.SPR_SAME_CLAN_ICON, is_visible);
-		UIGrid component = base.GetComponent<UIGrid>(t, (Enum)UI.GRD_FOLLOW_ARROW);
+		UIGrid component = GetComponent<UIGrid>(t, UI.GRD_FOLLOW_ARROW);
 		if (component != null)
 		{
 			component.Reposition();
@@ -194,7 +189,7 @@ public class LoungeMemberList : GameSection
 			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint)loungeMemberStatus.fieldMapId);
 			if (fieldMapData == null)
 			{
-				SetLabelText(root, UI.LBL_AREA_NAME, string.Empty);
+				SetLabelText(root, UI.LBL_AREA_NAME, "");
 				break;
 			}
 			RegionTable.Data data = Singleton<RegionTable>.I.GetData(fieldMapData.regionId);

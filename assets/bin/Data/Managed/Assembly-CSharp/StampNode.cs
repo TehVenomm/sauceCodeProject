@@ -33,25 +33,13 @@ public class StampNode : MonoBehaviour
 		private set;
 	}
 
-	public StampNode()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		_transform = this.get_transform();
-		scaledeOffset = offset.Mul(_transform.get_lossyScale());
+		_transform = base.transform;
+		scaledeOffset = offset.Mul(_transform.lossyScale);
 		if (autoBaseY != -1f)
 		{
-			float num = autoBaseY;
-			Vector3 lossyScale = _transform.get_lossyScale();
-			autoBaseY = num * lossyScale.y;
+			autoBaseY *= _transform.lossyScale.y;
 		}
 		up = false;
 	}
@@ -62,21 +50,11 @@ public class StampNode : MonoBehaviour
 
 	public bool UpdateStamp(float base_y)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 position = _transform.get_position();
-		float num = position.y - base_y;
-		Matrix4x4 localToWorldMatrix = _transform.get_localToWorldMatrix();
-		Vector3 val = localToWorldMatrix.MultiplyPoint(offset);
-		num = val.y - base_y;
+		float num = _transform.position.y - base_y;
+		num = _transform.localToWorldMatrix.MultiplyPoint(offset).y - base_y;
 		if (autoBaseY == -1f)
 		{
-			autoBaseY = num;
+			autoBaseY = num + 0f;
 		}
 		if (!up)
 		{

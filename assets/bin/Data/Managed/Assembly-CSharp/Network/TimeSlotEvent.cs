@@ -9,8 +9,8 @@ namespace Network
 
 		public string description;
 
-		public string endDate = string.Empty;
+		public string endDate = "";
 
-		public string startData = string.Empty;
+		public string startData = "";
 	}
 }

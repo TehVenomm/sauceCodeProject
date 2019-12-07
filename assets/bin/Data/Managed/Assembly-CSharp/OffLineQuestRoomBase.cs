@@ -80,7 +80,7 @@ public class OffLineQuestRoomBase : GameSection
 
 	protected void UpdateUser()
 	{
-		SetGrid(UI.GRD_PLAYER_INFO, string.Empty, 1, reset: false, delegate(int i, Transform t)
+		SetGrid(UI.GRD_PLAYER_INFO, "", 1, reset: false, delegate(int i, Transform t)
 		{
 			string prefab_name = "QuestRoomUserInfoSelf";
 			return Realizes(prefab_name, t, check_panel: false);
@@ -122,13 +122,12 @@ public class OffLineQuestRoomBase : GameSection
 						SetActive(trans, weaponIcon[weapon_index], is_visible: true);
 						int equipmentTypeIndex = UIBehaviour.GetEquipmentTypeIndex(equipItemData.type);
 						SetSprite(trans, weaponIcon[weapon_index], ITEM_TYPE_ICON_SPRITE_NAME[equipmentTypeIndex]);
-						weapon_index++;
+						int num = ++weapon_index;
 					}
 				}
 			});
 			component.LoadModel(index, userInfo);
-			EquipSetCalculator userEquipCalculator = GetUserEquipCalculator();
-			SimpleStatus finalStatus = userEquipCalculator.GetFinalStatus(0, userInfo.hp, userInfo.atk, userInfo.def);
+			SimpleStatus finalStatus = GetUserEquipCalculator().GetFinalStatus(0, userInfo.hp, userInfo.atk, userInfo.def);
 			SetLabelText(trans, UI.LBL_ATK, finalStatus.GetAttacksSum().ToString());
 			SetLabelText(trans, UI.LBL_DEF, finalStatus.GetDefencesSum().ToString());
 			SetLabelText(trans, UI.LBL_HP, finalStatus.hp.ToString());

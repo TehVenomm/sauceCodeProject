@@ -1,5 +1,3 @@
-using System;
-
 public class ClanRegisteredDialog : GameSection
 {
 	private enum UI
@@ -10,9 +8,9 @@ public class ClanRegisteredDialog : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.LBL_CLAN_NAME, MonoBehaviourSingleton<UserInfoManager>.I.userClan.name);
+		SetLabelText(UI.LBL_CLAN_NAME, MonoBehaviourSingleton<UserInfoManager>.I.userClan.name);
 		bool is_visible = MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsLeader();
-		SetActive((Enum)UI.BTN_SETTING, is_visible);
+		SetActive(UI.BTN_SETTING, is_visible);
 	}
 
 	private void OnQuery_CLAN_DETAIL()

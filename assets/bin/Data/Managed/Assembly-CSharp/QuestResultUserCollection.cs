@@ -21,8 +21,11 @@ public class QuestResultUserCollection
 		{
 			get
 			{
-				bool? flag = is_follow_enable;
-				return flag.HasValue && is_follow_enable == true;
+				if (is_follow_enable.HasValue)
+				{
+					return is_follow_enable == true;
+				}
+				return false;
 			}
 		}
 
@@ -110,7 +113,11 @@ public class QuestResultUserCollection
 
 	public ResultUserInfo GetUserInfo(int user_id)
 	{
-		return (list == null) ? null : list.Find((ResultUserInfo u) => u != null && u.userId == user_id);
+		if (list == null)
+		{
+			return null;
+		}
+		return list.Find((ResultUserInfo u) => u != null && u.userId == user_id);
 	}
 
 	public void SetResultFollowInfo(FriendFollowModel.Param follow)

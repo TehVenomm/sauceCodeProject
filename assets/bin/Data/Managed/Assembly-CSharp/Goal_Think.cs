@@ -18,14 +18,14 @@ public class Goal_Think : GoalComposite
 
 	private List<GoalEvaluator> evaluators = new List<GoalEvaluator>();
 
-	public Goal_Think()
-	{
-		InitEvaluator();
-	}
-
 	protected override GOAL_TYPE GetGoalType()
 	{
 		return GOAL_TYPE.THINK;
+	}
+
+	public Goal_Think()
+	{
+		InitEvaluator();
 	}
 
 	public Goal_Think SetChoiceGoalSpanTimer(float span)
@@ -144,15 +144,14 @@ public class Goal_Think : GoalComposite
 
 	public string ToStringEvaluator(Brain brain)
 	{
-		string text = string.Empty + evalFlag + "\n";
+		string text = evalFlag + "\n";
 		int i = 0;
 		for (int count = evaluators.Count; i < count; i++)
 		{
 			GoalEvaluator goalEvaluator = evaluators[i];
 			float num = goalEvaluator.CalcEvaluateValue(brain);
 			bool flag = FlagIsOn((EVAL_FLAG)(1 << i));
-			string text2 = text;
-			text = text2 + string.Empty + i + ((!flag) ? "(Off)" : string.Empty) + string.Empty + goalEvaluator + ": " + num + "\n";
+			text = text + (i + (flag ? "" : "(Off)")) + goalEvaluator + ": " + num + "\n";
 		}
 		return text.TrimEnd(null);
 	}

@@ -27,9 +27,4 @@ public class AssetBundleInfoCollection : ScriptableObject
 	}
 
 	public List<Info> assetBundles = new List<Info>();
-
-	public AssetBundleInfoCollection()
-		: this()
-	{
-	}
 }

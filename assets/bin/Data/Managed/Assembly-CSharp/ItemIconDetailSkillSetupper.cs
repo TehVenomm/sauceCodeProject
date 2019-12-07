@@ -31,14 +31,13 @@ public class ItemIconDetailSkillSetupper : ItemIconDetailSetuperBase
 
 	public override void Set(object[] data = null)
 	{
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
 		base.Set();
 		if (infoRootAry[0] != null)
 		{
-			infoRootAry[0].SetActive(false);
+			infoRootAry[0].SetActive(value: false);
 			if (selectSP != null)
 			{
-				selectSP.set_enabled(false);
+				selectSP.enabled = false;
 			}
 		}
 		SkillItemSortData skillItemSortData = data[0] as SkillItemSortData;
@@ -51,44 +50,44 @@ public class ItemIconDetailSkillSetupper : ItemIconDetailSetuperBase
 		{
 			text += UIUtility.GetColorText(StringTable.Format(STRING_CATEGORY.SMITH, 9u, skillItemInfo.exceedCnt), ExceedSkillItemTable.color);
 		}
-		infoRootAry[1].SetActive(true);
-		infoRootAry[2].SetActive(false);
+		infoRootAry[1].SetActive(value: true);
+		infoRootAry[2].SetActive(value: false);
 		SetName(skillItemSortData.GetName());
 		SetVisibleBG(is_visible: true);
 		lblDescription.supportEncoding = true;
 		lblDescription.text = skillItemInfo.GetExplanationText();
 		UILabel[] lABELS_LV_HEAD = LABELS_LV_HEAD;
-		foreach (UILabel uILabel in lABELS_LV_HEAD)
+		for (int i = 0; i < lABELS_LV_HEAD.Length; i++)
 		{
-			uILabel.get_gameObject().SetActive(true);
+			lABELS_LV_HEAD[i].gameObject.SetActive(value: true);
 		}
-		UILabel[] lABELS_LV = LABELS_LV;
-		foreach (UILabel uILabel2 in lABELS_LV)
+		lABELS_LV_HEAD = LABELS_LV;
+		foreach (UILabel obj in lABELS_LV_HEAD)
 		{
-			uILabel2.get_gameObject().SetActive(true);
-			uILabel2.supportEncoding = true;
-			uILabel2.text = text;
+			obj.gameObject.SetActive(value: true);
+			obj.supportEncoding = true;
+			obj.text = text;
 		}
-		spEnableExceed.get_gameObject().SetActive(iCON_STATUS == ItemIconDetail.ICON_STATUS.VALID_EXCEED_0);
-		spSameSkillExceedExpUp.get_gameObject().SetActive(isSameSkillExceed);
+		spEnableExceed.gameObject.SetActive(iCON_STATUS == ItemIconDetail.ICON_STATUS.VALID_EXCEED_0);
+		spSameSkillExceedExpUp.gameObject.SetActive(isSameSkillExceed);
 		bool flag = iCON_STATUS == ItemIconDetail.ICON_STATUS.VALID_EXCEED || iCON_STATUS == ItemIconDetail.ICON_STATUS.VALID_EXCEED_0;
-		spriteBg[0].get_gameObject().SetActive(!flag);
-		spriteBg[1].get_gameObject().SetActive(flag);
+		spriteBg[0].gameObject.SetActive(!flag);
+		spriteBg[1].gameObject.SetActive(flag);
 		if (iCON_STATUS == ItemIconDetail.ICON_STATUS.GRAYOUT)
 		{
-			infoRootAry[0].SetActive(true);
+			infoRootAry[0].SetActive(value: true);
 		}
 		GrayOut(iCON_STATUS);
 	}
 
 	private void SetGrayOut(bool is_visible)
 	{
-		spGrayOut.set_enabled(is_visible);
+		spGrayOut.enabled = is_visible;
 	}
 
 	public override void SetupSelectNumberSprite(int select_number)
 	{
 		base.SetupSelectNumberSprite(select_number);
-		spSameSkillExceedExp.get_gameObject().SetActive(isSameSkillExceed && select_number <= 0);
+		spSameSkillExceedExp.gameObject.SetActive(isSameSkillExceed && select_number <= 0);
 	}
 }

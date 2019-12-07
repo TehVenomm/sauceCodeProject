@@ -1,12 +1,11 @@
 using Network;
-using System;
 
 public class ConfigPPOFF : PPInputBase
 {
 	private void OnQuery_OK()
 	{
 		GameSection.StayEvent();
-		MonoBehaviourSingleton<UserInfoManager>.I.SendResetParentalPassword(GetInputValue((Enum)UI.IPT_PW), delegate(Error ret)
+		MonoBehaviourSingleton<UserInfoManager>.I.SendResetParentalPassword(GetInputValue(UI.IPT_PW), delegate(Error ret)
 		{
 			if (ret != 0)
 			{

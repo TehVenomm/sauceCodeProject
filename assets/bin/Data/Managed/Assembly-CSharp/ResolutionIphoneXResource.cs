@@ -10,7 +10,7 @@ public class ResolutionIphoneXResource
 
 	public bool LockRatioPosition;
 
-	public string Path = string.Empty;
+	public string Path = "";
 
 	public bool IsEditMain;
 
@@ -20,7 +20,7 @@ public class ResolutionIphoneXResource
 		{
 			if (PanelFix != null)
 			{
-				return Object.op_Implicit(PanelFix.GetComponent<FixedNGUIThrowIphoneX>());
+				return PanelFix.GetComponent<FixedNGUIThrowIphoneX>();
 			}
 			return false;
 		}

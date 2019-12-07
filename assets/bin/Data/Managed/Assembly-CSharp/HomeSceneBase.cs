@@ -1,11 +1,12 @@
 using System.Collections;
+using UnityEngine;
 
 public class HomeSceneBase : GameSection
 {
 	public override void Initialize()
 	{
 		UILabel.OutlineLimit = false;
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -28,11 +29,52 @@ public class HomeSceneBase : GameSection
 		MonoBehaviourSingleton<WorldMapManager>.I.SetReleasedRegion();
 		MonoBehaviourSingleton<NativeGameService>.I.FixAchievement();
 		base.Initialize();
+		yield return SetEnemyDownloadCallback();
 	}
 
 	public override void Exit()
 	{
 		MonoBehaviourSingleton<StatusManager>.I.InitStatusEquipData();
 		base.Exit();
+	}
+
+	private IEnumerator SetEnemyDownloadCallback()
+	{
+		while (!MonoBehaviourSingleton<EnemyPredownloadManager>.IsValid())
+		{
+			yield return null;
+		}
+		if (!MonoBehaviourSingleton<EnemyPredownloadManager>.I.enabled)
+		{
+			MonoBehaviourSingleton<EnemyPredownloadManager>.I.enabled = true;
+			yield return new WaitForSeconds(0.5f);
+		}
+		if (MonoBehaviourSingleton<EnemyPredownloadManager>.I.IsAvaiDownload())
+		{
+			OnFinishCheckDownloadEnemyData(avaiDownload: true);
+		}
+		else
+		{
+			MonoBehaviourSingleton<EnemyPredownloadManager>.I.AddListenerCheck(OnUpdateCheckDownloadEnemyData, OnFinishCheckDownloadEnemyData);
+		}
+	}
+
+	protected override void OnClose()
+	{
+		MonoBehaviourSingleton<EnemyPredownloadManager>.I.RemoveListenerCheck(OnUpdateCheckDownloadEnemyData, OnFinishCheckDownloadEnemyData);
+		base.OnClose();
+	}
+
+	private void OnFinishCheckDownloadEnemyData(bool avaiDownload)
+	{
+		if (avaiDownload)
+		{
+			Debug.Log("ENABLE DOWNLOAD ENEMY DATA");
+			MonoBehaviourSingleton<GameSceneManager>.I.AddHighForceChangeScene("Home", "DownloadEnemy");
+		}
+	}
+
+	private void OnUpdateCheckDownloadEnemyData()
+	{
 	}
 }

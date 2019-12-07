@@ -45,7 +45,7 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 		}
 		if (MonoBehaviourSingleton<InputManager>.IsValid())
 		{
-			Object.DestroyImmediate(MonoBehaviourSingleton<InputManager>.I.get_gameObject());
+			Object.DestroyImmediate(MonoBehaviourSingleton<InputManager>.I.gameObject);
 		}
 		if (MonoBehaviourSingleton<FieldManager>.IsValid())
 		{
@@ -64,20 +64,20 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 			Object.DestroyImmediate(MonoBehaviourSingleton<OnceManager>.I);
 		}
 		GameSceneGlobalSettings.SetOrientation(ingame: false);
-		if (Camera.get_main() != null)
+		if (Camera.main != null)
 		{
-			Object.DestroyImmediate(Camera.get_main().get_gameObject());
+			Object.DestroyImmediate(Camera.main.gameObject);
 		}
 		ResourceObject[] loadedObjects = lo_common_prefabs.loadedObjects;
-		foreach (ResourceObject resourceObject in loadedObjects)
+		for (int i = 0; i < loadedObjects.Length; i++)
 		{
-			ResourceUtility.Realizes(resourceObject.obj, MonoBehaviourSingleton<AppMain>.I._transform);
+			ResourceUtility.Realizes(loadedObjects[i].obj, MonoBehaviourSingleton<AppMain>.I._transform);
 		}
 		yield return null;
-		ResourceObject[] loadedObjects2 = lo_outgame_prefabs.loadedObjects;
-		foreach (ResourceObject resourceObject2 in loadedObjects2)
+		loadedObjects = lo_outgame_prefabs.loadedObjects;
+		for (int i = 0; i < loadedObjects.Length; i++)
 		{
-			ResourceUtility.Realizes(resourceObject2.obj, MonoBehaviourSingleton<AppMain>.I._transform);
+			ResourceUtility.Realizes(loadedObjects[i].obj, MonoBehaviourSingleton<AppMain>.I._transform);
 		}
 		bool isLinkResourceLoaded = false;
 		if (MonoBehaviourSingleton<GlobalSettingsManager>.IsValid())
@@ -88,10 +88,10 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 			});
 		}
 		yield return null;
-		MonoBehaviourSingleton<AppMain>.I.SetMainCamera(Camera.get_main());
+		MonoBehaviourSingleton<AppMain>.I.SetMainCamera(Camera.main);
 		MonoBehaviourSingleton<AudioListenerManager>.I.SetFlag(AudioListenerManager.STATUS_FLAGS.CAMERA_MAIN_ACTIVE, isEnable: true);
 		yield return null;
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<QuestManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<QuestManager>();
 		bool loadmanifest = true;
 		bool dataTableLoading = true;
 		MonoBehaviourSingleton<DataTableManager>.I.Initialize();
@@ -105,37 +105,37 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 			loadmanifest = false;
 		});
 		yield return null;
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<FilterManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<InGameManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<InventoryManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<PresentManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<FilterManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<InGameManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<InventoryManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<PresentManager>();
 		yield return null;
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<GachaManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<ShopManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<PartyManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<FriendManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<LoungeMatchingManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<ClanMatchingManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<GachaManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<ShopManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<PartyManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<FriendManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<LoungeMatchingManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<ClanMatchingManager>();
 		yield return null;
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<ItemStorageManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<GatherManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<BlackListManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<WorldMapManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<ItemStorageManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<GatherManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<BlackListManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<WorldMapManager>();
 		yield return null;
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<FieldManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<DeliveryManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<AchievementManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<StatusManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<FortuneWheelManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<TradingPostManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<FieldManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<DeliveryManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<AchievementManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<StatusManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<FortuneWheelManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<TradingPostManager>();
 		Utility.CreateGameObjectAndComponent("StageManager", MonoBehaviourSingleton<AppMain>.I._transform);
 		Utility.CreateGameObjectAndComponent("GuildManager", MonoBehaviourSingleton<AppMain>.I._transform);
 		yield return null;
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<SmithManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<ItemExchangeManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<OnceManager>();
-		MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<GuildRequestManager>();
-		while (dataTableLoading || loadmanifest)
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<SmithManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<ItemExchangeManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<OnceManager>();
+		MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<GuildRequestManager>();
+		while (dataTableLoading | loadmanifest)
 		{
 			yield return null;
 		}
@@ -210,7 +210,10 @@ public class LoadingProcess : MonoBehaviourSingleton<LoadingProcess>
 			MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene(text, section_name);
 		}
 		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.INITIALIZE, is_disable: false);
-		MonoBehaviourSingleton<NativeGameService>.I.SignIn();
+		if (MonoBehaviourSingleton<NativeGameService>.IsValid())
+		{
+			MonoBehaviourSingleton<NativeGameService>.I.SignIn();
+		}
 		MonoBehaviourSingleton<AppMain>.I.OnLoadFinished();
 		PredownloadManager.Stop(PredownloadManager.STOP_FLAG.LOADING_PROCESS, is_stop: false);
 		Object.Destroy(this);

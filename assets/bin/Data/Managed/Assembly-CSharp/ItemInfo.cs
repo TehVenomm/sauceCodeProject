@@ -45,12 +45,12 @@ public class ItemInfo : ItemInfoBase<Item>
 
 	public static ItemInfo CreateItemInfo(int itemId)
 	{
-		Item item = new Item();
-		item.uniqId = "0";
-		item.itemId = itemId;
-		item.num = 0;
-		Item item2 = item;
-		return CreateItemInfo(item2);
+		return CreateItemInfo(new Item
+		{
+			uniqId = "0",
+			itemId = itemId,
+			num = 0
+		});
 	}
 
 	public new ITEM_TYPE GetType()

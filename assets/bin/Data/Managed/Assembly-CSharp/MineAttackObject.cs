@@ -35,21 +35,20 @@ public class MineAttackObject : AttackColliderObject
 
 	protected override void OnTriggerEnter(Collider collider)
 	{
-		hitLayer = collider.get_gameObject().get_layer();
+		hitLayer = collider.gameObject.layer;
 		if (((1 << hitLayer) & ignoreLayerMask) > 0)
 		{
 			return;
 		}
 		if (hitLayer == 8)
 		{
-			hitPlayer = collider.get_gameObject().GetComponent<Player>();
-			if (collider.get_gameObject().GetComponent<DangerRader>() != null)
+			hitPlayer = collider.gameObject.GetComponent<Player>();
+			if (collider.gameObject.GetComponent<DangerRader>() != null)
 			{
 				return;
 			}
 		}
-		HealAttackObject component = collider.get_gameObject().GetComponent<HealAttackObject>();
-		if (!(component != null))
+		if (!(collider.gameObject.GetComponent<HealAttackObject>() != null))
 		{
 			isHit = true;
 			DeactivateOwnCollider();

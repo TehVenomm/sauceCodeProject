@@ -65,7 +65,7 @@ public class SkillInfo
 		{
 			get
 			{
-				if (atkRates != null && atkRates.Length > 0)
+				if (atkRates != null && atkRates.Length != 0)
 				{
 					return atkRates[0];
 				}
@@ -86,7 +86,7 @@ public class SkillInfo
 			}
 			bool result = false;
 			SKILL_SLOT_TYPE type = tableData.type;
-			if (type == SKILL_SLOT_TYPE.ATTACK || type == SKILL_SLOT_TYPE.HEAL || type == SKILL_SLOT_TYPE.SUPPORT)
+			if ((uint)(type - 1) <= 2u)
 			{
 				result = true;
 			}
@@ -251,8 +251,7 @@ public class SkillInfo
 		{
 			return 1f;
 		}
-		float num = skillParam.useGaugeCounter / (float)(int)skillParam.useGauge;
-		return Mathf.Clamp01(num);
+		return Mathf.Clamp01(skillParam.useGaugeCounter / (float)(int)skillParam.useGauge);
 	}
 
 	public float GetPercentUseGauge2nd(int skill_index)
@@ -266,15 +265,14 @@ public class SkillInfo
 		{
 			return 0f;
 		}
-		float num = (skillParam.useGaugeCounter - (float)(int)skillParam.useGauge) / (float)(int)skillParam.useGauge2;
-		return Mathf.Clamp01(num);
+		return Mathf.Clamp01((skillParam.useGaugeCounter - (float)(int)skillParam.useGauge) / (float)(int)skillParam.useGauge2);
 	}
 
 	public void OnUpdate()
 	{
 		if (!player.isDead && !player.isProgressStop())
 		{
-			float num = MonoBehaviourSingleton<InGameSettingsManager>.I.player.healSkillGaugePerSecond * Time.get_deltaTime();
+			float num = MonoBehaviourSingleton<InGameSettingsManager>.I.player.healSkillGaugePerSecond * Time.deltaTime;
 			num *= player.buffParam.GetSkillHealSpeedUp();
 			AddUseGauge(num, set_only: true);
 		}
@@ -297,9 +295,8 @@ public class SkillInfo
 			}
 			else
 			{
-				float num = actSkillParam.useGaugeCounter - (float)(int)actSkillParam.useGauge;
-				float num2 = num / (float)(int)actSkillParam.useGauge2;
-				actSkillParam.useGaugeCounter = num2 * (float)(int)actSkillParam.useGauge;
+				float num = (actSkillParam.useGaugeCounter - (float)(int)actSkillParam.useGauge) / (float)(int)actSkillParam.useGauge2;
+				actSkillParam.useGaugeCounter = num * (float)(int)actSkillParam.useGauge;
 			}
 		}
 	}
@@ -308,7 +305,7 @@ public class SkillInfo
 	{
 		if (player.weaponInfo != null)
 		{
-			float num = (!attack_info.toEnemy.isSpecialAttack) ? player.weaponInfo.healSkillGaugeHitRate : player.weaponInfo.healSkillGaugeHitRateSpecialAttack;
+			float num = attack_info.toEnemy.isSpecialAttack ? player.weaponInfo.healSkillGaugeHitRateSpecialAttack : player.weaponInfo.healSkillGaugeHitRate;
 			float add_gauge = player.playerParameter.healSkillGaugeHit * num * attack_info.atkRate;
 			AddUseGauge(add_gauge, set_only: true, isNotBuff: true);
 		}
@@ -380,7 +377,7 @@ public class SkillInfo
 		{
 			if (skillParams[index].tableData.GetAttackElementNum() <= 1)
 			{
-				num *= player.buffParam.GetSkillAbsorbUp((skillParams[index].tableData.type != SKILL_SLOT_TYPE.ATTACK) ? ELEMENT_TYPE.MAX : skillParams[index].tableData.skillAtkType);
+				num *= player.buffParam.GetSkillAbsorbUp((skillParams[index].tableData.type == SKILL_SLOT_TYPE.ATTACK) ? skillParams[index].tableData.skillAtkType : ELEMENT_TYPE.MAX);
 			}
 			else if (skillParams[index].tableData.type == SKILL_SLOT_TYPE.ATTACK)
 			{
@@ -614,17 +611,13 @@ public class SkillInfo
 					{
 						num3 = 0f;
 					}
-					SkillParam skillParam2 = skillParam;
-					skillParam2.useGauge = (int)skillParam2.useGauge + Mathf.FloorToInt((float)(int)skillParam.useGauge * num3);
-					SkillParam skillParam3 = skillParam;
-					skillParam3.useGauge2 = (int)skillParam3.useGauge2 + Mathf.FloorToInt((float)(int)skillParam.useGauge2 * num3);
+					skillParam.useGauge = (int)skillParam.useGauge + Mathf.FloorToInt((float)(int)skillParam.useGauge * num3);
+					skillParam.useGauge2 = (int)skillParam.useGauge2 + Mathf.FloorToInt((float)(int)skillParam.useGauge2 * num3);
 				}
 				if (i.ContainsArenaCondition(ARENA_CONDITION.RECOVER_MAGI_SPEED_UP))
 				{
-					SkillParam skillParam4 = skillParam;
-					skillParam4.useGauge = (int)skillParam4.useGauge - Mathf.FloorToInt((float)(int)skillParam.useGauge * arenaParam.magiSpeedUpBaseRate);
-					SkillParam skillParam5 = skillParam;
-					skillParam5.useGauge2 = (int)skillParam5.useGauge2 - Mathf.FloorToInt((float)(int)skillParam.useGauge2 * arenaParam.magiSpeedUpBaseRate);
+					skillParam.useGauge = (int)skillParam.useGauge - Mathf.FloorToInt((float)(int)skillParam.useGauge * arenaParam.magiSpeedUpBaseRate);
+					skillParam.useGauge2 = (int)skillParam.useGauge2 - Mathf.FloorToInt((float)(int)skillParam.useGauge2 * arenaParam.magiSpeedUpBaseRate);
 				}
 			}
 			if (list != null && list.Count > 0)
@@ -692,11 +685,9 @@ public class SkillInfo
 			{
 				return false;
 			}
-			BuffTable.BuffData buffData = null;
 			for (int i = 0; i < tableData.buffTableIds.Length; i++)
 			{
-				buffData = Singleton<BuffTable>.I.GetData((uint)tableData.buffTableIds[i]);
-				if (buffData.type == BuffParam.BUFFTYPE.SHIELD)
+				if (Singleton<BuffTable>.I.GetData((uint)tableData.buffTableIds[i]).type == BuffParam.BUFFTYPE.SHIELD)
 				{
 					return true;
 				}

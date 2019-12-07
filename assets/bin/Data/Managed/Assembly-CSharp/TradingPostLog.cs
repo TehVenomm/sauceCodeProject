@@ -20,6 +20,7 @@ public class TradingPostLog : GameSection
 
 	private void OnQuery_INVENTORY()
 	{
+		GameSection.ChangeEvent("[BACK]");
 		RequestEvent("TO_STORAGE");
 	}
 }

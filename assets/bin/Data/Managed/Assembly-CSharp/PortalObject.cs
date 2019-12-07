@@ -111,14 +111,8 @@ public class PortalObject : MonoBehaviour
 		set;
 	}
 
-	public PortalObject()
-		: this()
-	{
-	}
-
 	public static PortalObject Create(FieldMapPortalInfo portal_info, Transform parent)
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 		if (portal_info == null)
 		{
 			return null;
@@ -127,9 +121,9 @@ public class PortalObject : MonoBehaviour
 		{
 			return null;
 		}
-		Transform val = Utility.CreateGameObject("PortalObject", parent, 19);
-		val.set_position(new Vector3(portal_info.portalData.srcX, 0f, portal_info.portalData.srcZ));
-		PortalObject portalObject = val.get_gameObject().AddComponent<PortalObject>();
+		Transform transform = Utility.CreateGameObject("PortalObject", parent, 19);
+		transform.position = new Vector3(portal_info.portalData.srcX, 0f, portal_info.portalData.srcZ);
+		PortalObject portalObject = transform.gameObject.AddComponent<PortalObject>();
 		if (portalObject == null)
 		{
 			return null;
@@ -140,13 +134,12 @@ public class PortalObject : MonoBehaviour
 
 	protected virtual void Awake()
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		parameter = MonoBehaviourSingleton<InGameSettingsManager>.I.portal;
-		_transform = this.get_transform();
-		SphereCollider val = this.get_gameObject().AddComponent<SphereCollider>();
-		val.set_center(new Vector3(0f, 0f, 0f));
-		val.set_radius(1f);
-		val.set_isTrigger(true);
+		_transform = base.transform;
+		SphereCollider sphereCollider = base.gameObject.AddComponent<SphereCollider>();
+		sphereCollider.center = new Vector3(0f, 0f, 0f);
+		sphereCollider.radius = 1f;
+		sphereCollider.isTrigger = true;
 		if (MonoBehaviourSingleton<UIStatusGizmoManager>.IsValid())
 		{
 			MonoBehaviourSingleton<UIStatusGizmoManager>.I.Create(this);
@@ -221,7 +214,7 @@ public class PortalObject : MonoBehaviour
 	{
 		if (viewObject != null)
 		{
-			Object.Destroy(viewObject.get_gameObject());
+			Object.Destroy(viewObject.gameObject);
 			viewObject = null;
 		}
 		if (viewType == VIEW_TYPE.NOT_TRAVELED && !isFull)
@@ -235,7 +228,7 @@ public class PortalObject : MonoBehaviour
 				viewAnimator = viewObject.GetComponent<Animator>();
 				if (viewAnimator != null)
 				{
-					viewAnimator.set_speed(0f);
+					viewAnimator.speed = 0f;
 				}
 				viewParticles = viewObject.GetComponentsInChildren<ParticleSystem>();
 			}
@@ -270,10 +263,10 @@ public class PortalObject : MonoBehaviour
 		}
 		if (viewAnimator != null)
 		{
-			viewAnimator.set_speed(1f);
+			viewAnimator.speed = 1f;
 			viewAnimator.Play("ef_btl_warp_unuse_01", 0, num);
 			viewAnimator.Update(0f);
-			viewAnimator.set_speed(0f);
+			viewAnimator.speed = 0f;
 		}
 		if (viewParticles == null)
 		{
@@ -294,12 +287,12 @@ public class PortalObject : MonoBehaviour
 			}
 			if (flag)
 			{
-				if (viewParticles[i].get_isStopped())
+				if (viewParticles[i].isStopped)
 				{
 					viewParticles[i].Play();
 				}
 			}
-			else if (!viewParticles[i].get_isStopped())
+			else if (!viewParticles[i].isStopped)
 			{
 				viewParticles[i].Stop();
 			}
@@ -308,7 +301,7 @@ public class PortalObject : MonoBehaviour
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		if (collider.get_gameObject().GetComponent<Self>() == null || !MonoBehaviourSingleton<InGameProgress>.I.isBattleStart || MonoBehaviourSingleton<InGameProgress>.I.progressEndType != 0 || MonoBehaviourSingleton<InGameProgress>.I.isHappenQuestDirection || MonoBehaviourSingleton<StageObjectManager>.I.self == null || MonoBehaviourSingleton<StageObjectManager>.I.self.isDead)
+		if (collider.gameObject.GetComponent<Self>() == null || !MonoBehaviourSingleton<InGameProgress>.I.isBattleStart || MonoBehaviourSingleton<InGameProgress>.I.progressEndType != 0 || MonoBehaviourSingleton<InGameProgress>.I.isHappenQuestDirection || MonoBehaviourSingleton<StageObjectManager>.I.self == null || MonoBehaviourSingleton<StageObjectManager>.I.self.isDead)
 		{
 			return;
 		}
@@ -325,8 +318,9 @@ public class PortalObject : MonoBehaviour
 				DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData(portalData.appearDeliveryId);
 				text = StringTable.Format(STRING_CATEGORY.IN_GAME, 7001u, deliveryTableData.name);
 			}
-			if (portalData.travelMapId == 0 || !string.IsNullOrEmpty(text) || !MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledMap((int)portalData.travelMapId))
+			if (portalData.travelMapId != 0 && string.IsNullOrEmpty(text))
 			{
+				MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledMap((int)portalData.travelMapId);
 			}
 			if (!isUnlockedTime)
 			{
@@ -334,7 +328,7 @@ public class PortalObject : MonoBehaviour
 			}
 			if (!string.IsNullOrEmpty(text) && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NOT_APPEAR", new object[1]
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_NOT_APPEAR", new object[1]
 				{
 					text
 				});
@@ -343,12 +337,11 @@ public class PortalObject : MonoBehaviour
 		}
 		if (!isFull)
 		{
-			FieldMapPortalInfo portalPointToPortalInfo = MonoBehaviourSingleton<FieldManager>.I.GetPortalPointToPortalInfo();
-			if (portalPointToPortalInfo == portalInfo || portalInfo.IsFull())
+			if (MonoBehaviourSingleton<FieldManager>.I.GetPortalPointToPortalInfo() == portalInfo || portalInfo.IsFull())
 			{
 				if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NOT_FULL", new object[2]
+					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_NOT_FULL", new object[2]
 					{
 						nowPoint.ToString(),
 						maxPoint.ToString()
@@ -357,7 +350,7 @@ public class PortalObject : MonoBehaviour
 			}
 			else if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NOT_ACTIVE");
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_NOT_ACTIVE");
 			}
 			return;
 		}
@@ -368,12 +361,12 @@ public class PortalObject : MonoBehaviour
 			{
 				if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portalData, check_dst_quest: true))
 				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_QUEST_LOCK");
+					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_QUEST_LOCK");
 				}
 			}
 			else if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(portalData.dstQuestID))
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_QUEST");
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_QUEST");
 			}
 		}
 		else if (viewType == VIEW_TYPE.TO_HOME)
@@ -382,31 +375,27 @@ public class PortalObject : MonoBehaviour
 			{
 				if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
 				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_LOUNGE");
+					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_LOUNGE");
 				}
 				else
 				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_HOME");
+					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_HOME");
 				}
 			}
 		}
 		else if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 		{
-			if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 0)
-			{
-			}
+			_ = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep;
 			if (MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portalData, check_dst_quest: false))
 			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NEXT");
+				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", base.gameObject, "PORTAL_NEXT");
 			}
 		}
 	}
 
 	public void OnGetPortalPoint(int add_point)
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		EffectManager.OneShot(parameter.pointGetEffectName, _transform.get_position(), _transform.get_rotation());
+		EffectManager.OneShot(parameter.pointGetEffectName, _transform.position, _transform.rotation);
 		nowPoint += add_point;
 		if (nowPoint >= maxPoint)
 		{
@@ -416,7 +405,7 @@ public class PortalObject : MonoBehaviour
 			}
 			isFull = true;
 			CreateView();
-			string text = string.Empty;
+			string text = "";
 			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(portalData.dstMapID);
 			if (fieldMapData != null)
 			{
@@ -424,13 +413,11 @@ public class PortalObject : MonoBehaviour
 			}
 			if (MonoBehaviourSingleton<FieldManager>.I.isTutorialField)
 			{
-				string text2 = StringTable.Format(STRING_CATEGORY.IN_GAME, 6001u, text);
-				UIInGamePopupDialog.PushOpen(text2, is_important: false, 1.4f);
+				UIInGamePopupDialog.PushOpen(StringTable.Format(STRING_CATEGORY.IN_GAME, 6001u, text), is_important: false, 1.4f);
 			}
 			else if (QuestManager.IsValidInGameExplore())
 			{
-				string text3 = StringTable.Format(STRING_CATEGORY.IN_GAME, 6002u, text);
-				UIInGamePopupDialog.PushOpen(text3, is_important: false, 1.4f);
+				UIInGamePopupDialog.PushOpen(StringTable.Format(STRING_CATEGORY.IN_GAME, 6002u, text), is_important: false, 1.4f);
 			}
 			else
 			{
@@ -439,8 +426,7 @@ public class PortalObject : MonoBehaviour
 				{
 					num = parameter.clearHardCrystalNum;
 				}
-				string text4 = StringTable.Format(STRING_CATEGORY.IN_GAME, 6000u, text, num);
-				UIInGamePopupDialog.PushOpen(text4, is_important: false);
+				UIInGamePopupDialog.PushOpen(StringTable.Format(STRING_CATEGORY.IN_GAME, 6000u, text, num), is_important: false);
 			}
 			SoundManager.PlayOneShotUISE(40000069);
 			SoundManager.PlayOneshotJingle(40000071);

@@ -162,7 +162,7 @@ namespace MsgPack
 
 		public void Write(bool x)
 		{
-			_strm.WriteByte((byte)((!x) ? 194 : 195));
+			_strm.WriteByte((byte)(x ? 195 : 194));
 		}
 
 		public void Write(float x)

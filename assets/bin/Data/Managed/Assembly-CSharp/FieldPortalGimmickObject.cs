@@ -78,7 +78,11 @@ public class FieldPortalGimmickObject : FieldGimmickObject
 			}
 			if (num == 0)
 			{
-				return !MonoBehaviourSingleton<DeliveryManager>.I.IsClearDelivery(result) && !MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)result);
+				if (!MonoBehaviourSingleton<DeliveryManager>.I.IsClearDelivery(result))
+				{
+					return !MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int)result);
+				}
+				return false;
 			}
 		}
 		return true;
@@ -111,11 +115,13 @@ public class FieldPortalGimmickObject : FieldGimmickObject
 				uint.TryParse(array2[1], out deliveryId);
 				break;
 			case "sid":
+			{
 				if (int.TryParse(array2[1], out int result))
 				{
 					subStoryIds.Add(result);
 				}
 				break;
+			}
 			case "edid":
 				uint.TryParse(array2[1], out endDeliveryId);
 				break;
@@ -140,22 +146,6 @@ public class FieldPortalGimmickObject : FieldGimmickObject
 
 	public override void UpdateTargetMarker(bool isNear)
 	{
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 		if (isNear && self != null && self.IsChangeableAction((Character.ACTION_ID)39))
 		{
@@ -167,17 +157,16 @@ public class FieldPortalGimmickObject : FieldGimmickObject
 			if (targetMarker != null)
 			{
 				Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-				Vector3 position = cameraTransform.get_position();
-				Quaternion rotation = cameraTransform.get_rotation();
-				Vector3 val = position - _transform.get_position();
-				Vector3 pos = val.get_normalized() + Vector3.get_up() + _transform.get_position();
+				Vector3 position = cameraTransform.position;
+				Quaternion rotation = cameraTransform.rotation;
+				Vector3 pos = (position - _transform.position).normalized + Vector3.up + _transform.position;
 				pos.y += markerOffsetY;
 				targetMarker.Set(pos, rotation);
 			}
 		}
 		else if (targetMarker != null)
 		{
-			EffectManager.ReleaseEffect(targetMarker.get_gameObject());
+			EffectManager.ReleaseEffect(targetMarker.gameObject);
 		}
 	}
 
@@ -200,7 +189,7 @@ public class FieldPortalGimmickObject : FieldGimmickObject
 		}
 		if (num == 0 && subStoryIds.Count > 0)
 		{
-			num = subStoryIds[Random.Range(0, subStoryIds.Count)];
+			num = subStoryIds[UnityEngine.Random.Range(0, subStoryIds.Count)];
 			isSend = false;
 		}
 		if (num != 0)
@@ -216,8 +205,8 @@ public class FieldPortalGimmickObject : FieldGimmickObject
 
 	protected override void Awake()
 	{
-		_transform = this.get_transform();
-		Utility.SetLayerWithChildren(this.get_transform(), 19);
+		_transform = base.transform;
+		Utility.SetLayerWithChildren(base.transform, 19);
 	}
 
 	private bool IsValidReadStory()

@@ -61,7 +61,7 @@ public class GrabController
 	{
 		if (!IsGrabing())
 		{
-			grabStartTime = Time.get_realtimeSinceStartup();
+			grabStartTime = Time.realtimeSinceStartup;
 			duration = _duration;
 			releaseActionId = releaseActId;
 			releaseByWeakHit = _releaseByWeakHit;
@@ -78,7 +78,11 @@ public class GrabController
 
 	public bool IsReadyForRelease()
 	{
-		return IsGrabing() && Time.get_realtimeSinceStartup() - grabStartTime >= duration;
+		if (IsGrabing())
+		{
+			return Time.realtimeSinceStartup - grabStartTime >= duration;
+		}
+		return false;
 	}
 
 	public bool IsAliveGrabbedPlayerAll()

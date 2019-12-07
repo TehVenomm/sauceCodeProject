@@ -16,7 +16,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 
 	private List<FriendMessageUserListModel.MessageUserInfo> recvUserListAtLeastGetMessageOnce;
 
-	private string mutualFollowValue = string.Empty;
+	private string mutualFollowValue = "";
 
 	private FriendSearchResult recvSearchList;
 
@@ -119,9 +119,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 	{
 		addMessageList.ForEach(delegate(FriendMessageData message)
 		{
-			FriendManager friendManager = this;
-			FriendMessageData friendMessageData = messageDetailList.Find((FriendMessageData m) => m.id == message.id);
-			if (friendMessageData == null)
+			if (messageDetailList.Find((FriendMessageData m) => m.id == message.id) == null)
 			{
 				messageDetailList.Add(message);
 			}
@@ -170,7 +168,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 			{
 				callback(flag);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetChara(int[] userIds, Action<bool, List<FriendCharaInfo>> callback)
@@ -185,7 +183,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		{
 			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
 			callback(arg, ret.result);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetFollowList(int page, Action<bool, FriendFollowListModel.Param> callback)
@@ -201,7 +199,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
 			callback(flag, recvFollowList);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetFollowerList(int _chunkIndex, int _sortTypeIndex, Action<bool, FriendFollowerListModel.Param> callback)
@@ -218,7 +216,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
 			callback(flag, ret.result);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetFollowLink(Action<bool> callback)
@@ -232,7 +230,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				obj = true;
 			}
 			callback(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendFollowUser(List<int> id_list, Action<Error, List<int>> callback)
@@ -252,7 +250,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
 			}
 			callback(ret.Error, arg);
-		}, string.Empty);
+		});
 		MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Friend_request", "Social");
 	}
 
@@ -269,7 +267,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				obj = true;
 			}
 			callback(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendUnfollowUser(int user_id, Action<bool> callback)
@@ -289,7 +287,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
 			}
 			callback(flag);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDeleteFollower(int user_id, Action<bool> callback)
@@ -305,7 +303,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
 			}
 			callback(flag);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetUserListMessagedOnce(bool isCalledByOther, Action<bool, FriendMessagedMutualFollowerListModel.Param> _callback)
@@ -334,7 +332,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				recvUserListAtLeastGetMessageOnce = ret.result.messageFollowList;
 			}
 			callback(flag, ret.result);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetMessageUserList(int page, Action<bool, FriendMessageUserListModel.Param> callback)
@@ -350,7 +348,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
 			callback(flag, recvMessageUserList);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetMessageUserList(int page, bool isCalledByOther, Action<bool, FriendMessageUserListModel.Param> callback)
@@ -407,7 +405,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				}
 			}
 			callback(flag);
-		}, string.Empty);
+		});
 	}
 
 	private FriendMessageUserListModel.MessageUserInfo FindMessageUser(int userId)
@@ -459,7 +457,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				flag = (ret.result.success == 1);
 			}
 			callback(flag);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetNoreadMessage(bool isCalledByOther, Action<bool> callback)
@@ -490,7 +488,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 		{
 			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
 			callback(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendSearchName(string name, int page, Action<bool, FriendSearchResult> callback)
@@ -507,7 +505,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
 			callback(flag, recvSearchList);
-		}, string.Empty);
+		});
 	}
 
 	public void SendSearchLevel(int page, Action<bool, FriendSearchResult> callback)
@@ -523,7 +521,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
 			callback(flag, recvSearchList);
-		}, string.Empty);
+		});
 	}
 
 	public void SendSearchID(string code, Action<bool, FriendSearchResult> callback)
@@ -539,7 +537,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
 			callback(flag, recvSearchList);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetArenaRanking(int group, int isContaionSelf, Action<bool, List<ArenaRankingData>> callback)
@@ -556,7 +554,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				rankingDataList = ret.result;
 			}
 			callback(flag, rankingDataList);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetLastRanking(int group, int isContaionSelf, Action<bool, ArenaLastRankingModel.Param> callback)
@@ -573,7 +571,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				result = ret.result;
 			}
 			callback(flag, result);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetFriendRanking(int group, int isContaionSelf, Action<bool, List<ArenaRankingData>> callback)
@@ -590,7 +588,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				rankingDataList = ret.result;
 			}
 			callback(flag, rankingDataList);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetLegendRanking(Action<bool, List<ArenaLegendRankingModel.Param>> callback)
@@ -604,7 +602,7 @@ public class FriendManager : MonoBehaviourSingleton<FriendManager>
 				result = ret.result;
 			}
 			callback(flag, result);
-		}, string.Empty);
+		});
 	}
 
 	public void Dirty()

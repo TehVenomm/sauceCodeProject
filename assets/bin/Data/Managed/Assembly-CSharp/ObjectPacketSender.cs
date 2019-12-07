@@ -8,7 +8,7 @@ public class ObjectPacketSender : MonoBehaviour
 	{
 		public float startTime = -1f;
 
-		public Vector3 startPos = Vector3.get_zero();
+		public Vector3 startPos = Vector3.zero;
 
 		public float startDir;
 	}
@@ -35,33 +35,32 @@ public class ObjectPacketSender : MonoBehaviour
 		protected set;
 	}
 
+	public static ObjectPacketSender SetupComponent(StageObject set_object)
+	{
+		if (set_object is Enemy)
+		{
+			return set_object.gameObject.AddComponent<EnemyPacketSender>();
+		}
+		if (set_object is Player)
+		{
+			return set_object.gameObject.AddComponent<PlayerPacketSender>();
+		}
+		if (set_object is Character)
+		{
+			return set_object.gameObject.AddComponent<CharacterPacketSender>();
+		}
+		return set_object.gameObject.AddComponent<ObjectPacketSender>();
+	}
+
 	public ObjectPacketSender()
-		: this()
 	{
 		needWaitSyncTime = 0f;
 		enableSend = true;
 	}
 
-	public static ObjectPacketSender SetupComponent(StageObject set_object)
-	{
-		if (set_object is Enemy)
-		{
-			return set_object.get_gameObject().AddComponent<EnemyPacketSender>();
-		}
-		if (set_object is Player)
-		{
-			return set_object.get_gameObject().AddComponent<PlayerPacketSender>();
-		}
-		if (set_object is Character)
-		{
-			return set_object.get_gameObject().AddComponent<CharacterPacketSender>();
-		}
-		return set_object.get_gameObject().AddComponent<ObjectPacketSender>();
-	}
-
 	protected virtual void Awake()
 	{
-		owner = this.GetComponent<StageObject>();
+		owner = GetComponent<StageObject>();
 	}
 
 	protected int SendTo<T>(int to_client_id, T model, bool promise = false, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null) where T : Coop_Model_Base
@@ -122,12 +121,6 @@ public class ObjectPacketSender : MonoBehaviour
 
 	protected virtual void StackActionHistory(Coop_Model_ObjectBase stack_model, bool is_act_model)
 	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
 		if (is_act_model)
 		{
 			ClearActionHistory();
@@ -139,12 +132,9 @@ public class ObjectPacketSender : MonoBehaviour
 		if (actionHistoryList.Count <= 0)
 		{
 			actionHistoryData = new ActionHistoryData();
-			actionHistoryData.startTime = Time.get_time();
+			actionHistoryData.startTime = Time.time;
 			actionHistoryData.startPos = owner._position;
-			ActionHistoryData obj = actionHistoryData;
-			Quaternion rotation = owner._rotation;
-			Vector3 eulerAngles = rotation.get_eulerAngles();
-			obj.startDir = eulerAngles.y;
+			actionHistoryData.startDir = owner._rotation.eulerAngles.y;
 		}
 		actionHistoryList.Add(stack_model);
 	}
@@ -171,7 +161,7 @@ public class ObjectPacketSender : MonoBehaviour
 		float num = 0f;
 		if (actionHistoryData != null && actionHistoryData.startTime >= 0f)
 		{
-			num = Time.get_time() - actionHistoryData.startTime;
+			num = Time.time - actionHistoryData.startTime;
 		}
 		if (num > needWaitSyncTime)
 		{
@@ -345,8 +335,6 @@ public class ObjectPacketSender : MonoBehaviour
 
 	public void OnShotGimmickGenerator(Vector3 pos)
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		if (enableSend && owner.IsOriginal())
 		{
 			Coop_Model_ObjectShotGimmickGenerator coop_Model_ObjectShotGimmickGenerator = new Coop_Model_ObjectShotGimmickGenerator();

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 public class TheaterModeTable : MonoBehaviourSingleton<TheaterModeTable>, IDataTable
@@ -54,9 +53,6 @@ public class TheaterModeTable : MonoBehaviourSingleton<TheaterModeTable>, IDataT
 	}
 
 	private UIntKeyTable<TheaterModeData> dataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<TheaterModeData> _003C_003Ef__mg_0024cache0;
 
 	public bool isLoading
 	{

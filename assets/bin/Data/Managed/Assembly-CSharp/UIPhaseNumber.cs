@@ -8,11 +8,6 @@ public class UIPhaseNumber : MonoBehaviour
 	[SerializeField]
 	protected UITweener[] anims;
 
-	public UIPhaseNumber()
-		: this()
-	{
-	}
-
 	protected void Awake()
 	{
 		label.text = $"Phase {MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex + 1} / {MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestSeriesNum()}";
@@ -23,11 +18,11 @@ public class UIPhaseNumber : MonoBehaviour
 		int i = 0;
 		for (int num = anims.Length; i < num; i++)
 		{
-			if (anims[i].get_enabled())
+			if (anims[i].enabled)
 			{
 				return;
 			}
 		}
-		Object.Destroy(this.get_gameObject());
+		Object.Destroy(base.gameObject);
 	}
 }

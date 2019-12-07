@@ -129,7 +129,11 @@ public class SkillItemSortData : SortCompareData
 
 	public override bool IsEquipping()
 	{
-		return skillData.isAttached || skillData.isUniqueAttached;
+		if (!skillData.isAttached)
+		{
+			return skillData.isUniqueAttached;
+		}
+		return true;
 	}
 
 	public override int GetLevel()
@@ -154,14 +158,13 @@ public class SkillItemSortData : SortCompareData
 
 	public override uint GetMainorSortWeight()
 	{
-		uint num = 0u;
-		uint num2 = (uint)(63 - skillData.tableData.type);
-		num += num2 << 22;
+		uint num = (uint)(63 - skillData.tableData.type);
+		uint num2 = 0 + (num << 22);
 		uint num3 = ElementTypeToMinorSortValue(GetIconElement());
-		num += num3 << 19;
+		uint num4 = num2 + (num3 << 19);
 		uint rarity = (uint)GetRarity();
-		num += rarity << 13;
+		uint num5 = num4 + (rarity << 13);
 		uint level = (uint)skillData.level;
-		return num + (level << 6);
+		return num5 + (level << 6);
 	}
 }

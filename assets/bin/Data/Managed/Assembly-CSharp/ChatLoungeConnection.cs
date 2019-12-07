@@ -52,7 +52,7 @@ public class ChatLoungeConnection : IChatConnection
 		{
 			MonoBehaviourSingleton<LoungeNetworkManager>.I.ChatMessage(message);
 		}
-		OnReceiveMessage(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, message, string.Empty);
+		OnReceiveMessage(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, message);
 	}
 
 	public void SendStamp(int stampId)
@@ -61,7 +61,7 @@ public class ChatLoungeConnection : IChatConnection
 		{
 			MonoBehaviourSingleton<LoungeNetworkManager>.I.ChatStamp(stampId);
 		}
-		OnReceiveStamp(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, stampId, string.Empty);
+		OnReceiveStamp(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, stampId);
 	}
 
 	public void OnReceiveMessage(int userId, string userName, string message, string chatItemId = "")

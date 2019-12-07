@@ -38,7 +38,7 @@ public class ClanSearchSettings : GameSection
 				{
 					return texts[select_index];
 				}
-				return string.Empty;
+				return "";
 			}
 		}
 	}
@@ -56,7 +56,7 @@ public class ClanSearchSettings : GameSection
 		MonoBehaviourSingleton<ClanMatchingManager>.I.LoadSearchRequestFromPrefs();
 		searchRequest = new ClanSearchModel.RequestSendForm();
 		MonoBehaviourSingleton<ClanMatchingManager>.I.searchRequest.Copy(ref searchRequest);
-		SetActive((Enum)UI.LBL_DEFAULT, string.IsNullOrEmpty(searchRequest.name));
+		SetActive(UI.LBL_DEFAULT, string.IsNullOrEmpty(searchRequest.name));
 		SetInput(UI.IPT_NAME, searchRequest.name, 16, OnChangeName);
 		popupJoinType = new PopuplistParam();
 		popupJoinType.texts.Add("Not Specified");
@@ -104,17 +104,17 @@ public class ClanSearchSettings : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.LBL_TARGET_JOIN_TYPE, popupJoinType.SelectedString);
-		SetLabelText((Enum)UI.LBL_TARGET_LABEL, popupLabels.SelectedString);
-		SetLabelText((Enum)UI.LBL_TARGET_JOINABLE, popupJoinable.SelectedString);
+		SetLabelText(UI.LBL_TARGET_JOIN_TYPE, popupJoinType.SelectedString);
+		SetLabelText(UI.LBL_TARGET_LABEL, popupLabels.SelectedString);
+		SetLabelText(UI.LBL_TARGET_JOINABLE, popupJoinable.SelectedString);
 	}
 
 	protected void OnChangeName()
 	{
-		string inputValue = GetInputValue((Enum)UI.IPT_NAME);
-		inputValue = inputValue.Replace(" ", string.Empty);
-		inputValue = inputValue.Replace("\u3000", string.Empty);
-		SetActive((Enum)UI.LBL_DEFAULT, string.IsNullOrEmpty(inputValue));
+		string inputValue = GetInputValue(UI.IPT_NAME);
+		inputValue = inputValue.Replace(" ", "");
+		inputValue = inputValue.Replace("\u3000", "");
+		SetActive(UI.LBL_DEFAULT, string.IsNullOrEmpty(inputValue));
 		searchRequest.name = inputValue;
 	}
 
@@ -164,7 +164,7 @@ public class ClanSearchSettings : GameSection
 			{
 				param.select_index = 0;
 			}
-			param.popup_transform.get_gameObject().SetActive(true);
+			param.popup_transform.gameObject.SetActive(value: true);
 			UIScrollablePopupList.CreatePopup(param.popup_transform, param.parent_ctrl, 5, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, adjust_size: true, param.texts.ToArray(), array, param.select_index, param.callback);
 		}
 	}

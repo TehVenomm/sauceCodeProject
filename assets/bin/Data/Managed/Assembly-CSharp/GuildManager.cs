@@ -69,29 +69,6 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 			private set;
 		}
 
-		public CreateGuildRequestParam()
-		{
-			EmblemLayerIDs = new int[3];
-			EmblemLayerIDs[0] = -1;
-			EmblemLayerIDs[1] = -1;
-			EmblemLayerIDs[2] = -1;
-			GuildType = GUILD_TYPE.PUBLIC;
-			GuildMinLevel = 15;
-		}
-
-		public CreateGuildRequestParam(GuildStatisticInfo guidata)
-		{
-			if (guidata != null)
-			{
-				EmblemLayerIDs = guidata.emblem;
-				GuildName = guidata.clanName;
-				GuildTag = guidata.tag;
-				GuildDescribe = guidata.description;
-				GuildType = (GUILD_TYPE)guidata.privacy;
-				GuildMinLevel = guidata.min_level;
-			}
-		}
-
 		public void SetEmblemID(int layer, int id)
 		{
 			EmblemLayerIDs[layer] = id;
@@ -125,6 +102,29 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		public void SetGuildLocaltion(int location)
 		{
 			GuildLocation = location;
+		}
+
+		public CreateGuildRequestParam()
+		{
+			EmblemLayerIDs = new int[3];
+			EmblemLayerIDs[0] = -1;
+			EmblemLayerIDs[1] = -1;
+			EmblemLayerIDs[2] = -1;
+			GuildType = GUILD_TYPE.PUBLIC;
+			GuildMinLevel = 15;
+		}
+
+		public CreateGuildRequestParam(GuildStatisticInfo guidata)
+		{
+			if (guidata != null)
+			{
+				EmblemLayerIDs = guidata.emblem;
+				GuildName = guidata.clanName;
+				GuildTag = guidata.tag;
+				GuildDescribe = guidata.description;
+				GuildType = (GUILD_TYPE)guidata.privacy;
+				GuildMinLevel = guidata.min_level;
+			}
 		}
 	}
 
@@ -306,7 +306,11 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 
 	public static bool IsValidInGuild()
 	{
-		return MonoBehaviourSingleton<GuildManager>.IsValid() && MonoBehaviourSingleton<GuildManager>.I.IsInGuild();
+		if (MonoBehaviourSingleton<GuildManager>.IsValid())
+		{
+			return MonoBehaviourSingleton<GuildManager>.I.IsInGuild();
+		}
+		return false;
 	}
 
 	public void SendCreate(List<int> inviteList, Action<bool, Error> callBack)
@@ -360,7 +364,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				callBack(is_success, ret.Error);
 				break;
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendCheckClanSetting(int clanId, string clanName, string clanTag, string clanDescription, Action<bool, Error> call_back)
@@ -383,7 +387,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 			{
 				call_back(arg, ret.Error);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendDelete(Action<bool, Error> call_back)
@@ -399,7 +403,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				UpdateGuild(null);
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendSearch(Action<bool, Error> call_back, bool saveSettings)
@@ -416,7 +420,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				guilds = ret.result.clanList;
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendSearchWithID(int clanId, Action<bool, Error> call_back)
@@ -437,7 +441,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				}
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRequestStatistic(int clan_id, Action<bool, GuildStatisticInfo> callback)
@@ -448,7 +452,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		{
 			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
 			callback(arg, ret.result);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRequestJoin(int clanId, int recommentId, Action<bool, Error> call_back)
@@ -481,7 +485,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 			{
 				call_back(is_success, ret.Error);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendKick(int userId, Action<bool, Error> call_back = null)
@@ -498,7 +502,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				arg = true;
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendAdminJoin(int requestId, int decision, Action<bool, Error> call_back)
@@ -515,7 +519,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				arg = true;
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRequestRequest(int clanId, int recommentId, Action<bool, Error> call_back)
@@ -532,7 +536,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				arg = true;
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendChangeSetting(CreateGuildRequestParam requestParam, Action<bool, Error> call_back)
@@ -554,7 +558,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				UpdateGuildData(ret);
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendLeave(Action<bool, Error> call_back)
@@ -570,7 +574,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				UpdateGuild(null);
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void UpdateGuild(GuildModel.Guild guild)
@@ -580,7 +584,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		{
 			MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId = guildData.clanId;
 			GetClanStat();
-			int @int = PlayerPrefs.GetInt("CLAN_ID");
+			PlayerPrefs.GetInt("CLAN_ID");
 			PlayerPrefs.SetInt("CLAN_ID", MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId);
 		}
 		else
@@ -602,7 +606,11 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 
 	public static bool IsValidNotEmptyGuildList()
 	{
-		return MonoBehaviourSingleton<GuildManager>.IsValid() && MonoBehaviourSingleton<GuildManager>.I.guilds != null && MonoBehaviourSingleton<GuildManager>.I.guilds.Count > 0;
+		if (MonoBehaviourSingleton<GuildManager>.IsValid() && MonoBehaviourSingleton<GuildManager>.I.guilds != null)
+		{
+			return MonoBehaviourSingleton<GuildManager>.I.guilds.Count > 0;
+		}
+		return false;
 	}
 
 	private void SaveGuildSettings()
@@ -611,7 +619,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 
 	public static string GenerateToken()
 	{
-		return Guid.NewGuid().ToString().Replace("-", string.Empty);
+		return Guid.NewGuid().ToString().Replace("-", "");
 	}
 
 	public void SendClanInfo(Action<bool> callBack)
@@ -645,7 +653,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 						}
 					}
 				}
-			}, string.Empty);
+			});
 			callBack(obj: true);
 		}
 		else
@@ -692,7 +700,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				{
 					callBack(isSuccess);
 				}
-			}, string.Empty);
+			});
 		}
 	}
 
@@ -728,13 +736,12 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 			members = ret.result.list;
 			guilMemberList = ret;
 			callback(arg, ret);
-		}, string.Empty);
+		});
 	}
 
 	public void SetTalkUser(FriendCharaInfo message_user)
 	{
-		FriendCharaInfo friendCharaInfo = talkUsers.FirstOrDefault((FriendCharaInfo o) => o.userId == message_user.userId);
-		if (friendCharaInfo == null)
+		if (talkUsers.FirstOrDefault((FriendCharaInfo o) => o.userId == message_user.userId) == null)
 		{
 			talkUsers.Insert(0, message_user);
 		}
@@ -785,19 +792,20 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		{
 			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
 			callback(arg, ret);
-		}, string.Empty);
+		});
 	}
 
 	public void SendPrivateClanChatLog(int to, Action<bool, GuildPrivateChatModel> callback)
 	{
-		GuildPrivateChatModel.SendForm sendForm = new GuildPrivateChatModel.SendForm();
-		sendForm.toUserId = to;
-		GuildPrivateChatModel.SendForm postData = sendForm;
+		GuildPrivateChatModel.SendForm postData = new GuildPrivateChatModel.SendForm
+		{
+			toUserId = to
+		};
 		Protocol.Send(GuildPrivateChatModel.URL, postData, delegate(GuildPrivateChatModel ret)
 		{
 			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
 			callback(arg, ret);
-		}, string.Empty);
+		});
 	}
 
 	public void SendClanChatPin(int fromUserId, int chatId, string uuid, int type, string msg, Action<bool, GuildChatPinModel> callback)
@@ -812,7 +820,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		{
 			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
 			callback(arg, ret);
-		}, string.Empty);
+		});
 	}
 
 	public void SendClanChatUnPin(Action<bool, GuildChatUnPinModel> callback)
@@ -822,7 +830,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 			pinDonate = null;
 			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
 			callback(arg, ret);
-		}, string.Empty);
+		});
 	}
 
 	public void SendClanChatOnlineStatus(Action<bool, List<GuildMemberChatStatus>> callback)
@@ -831,7 +839,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		{
 			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
 			callback(arg, ret.result.online);
-		}, string.Empty);
+		});
 	}
 
 	public void GetAllPinData(Action<bool, GuildGetPinModel> callback)
@@ -840,7 +848,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		{
 			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
 			callback(arg, ret);
-		}, string.Empty);
+		});
 	}
 
 	public void SetAskUpdate(long value)
@@ -861,7 +869,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 			DateTime time = DateTime.Parse(ret.currentTime);
 			SystemTime = Utility.DateTimeToTimestampMilliseconds(time);
 			callback(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDonateFobbidenList(Action<bool, List<int>> callback)
@@ -870,7 +878,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		{
 			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
 			callback(arg, ret.result.array);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDonateRequest(int itemId, string itemName, string msg, int quatity, Action<bool> callback)
@@ -889,7 +897,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				MonoBehaviourSingleton<UserInfoManager>.I.userStatus.nextDonationTime = DateTime.Parse(ret.result.expired);
 			}
 			callback(flag);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDonateSend(int donateId, int quatity, Action<bool> callback)
@@ -901,7 +909,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		{
 			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
 			callback(obj);
-		}, string.Empty);
+		});
 	}
 
 	private static void SendDonateReceive(Action<bool> callback)
@@ -913,7 +921,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 			{
 				callback(obj);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendDonateInviteList(int donate_id, Action<bool, GuildDonate.GuildDonateInviteListModel> callback)
@@ -924,7 +932,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		{
 			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
 			callback(arg, ret);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDonateInvite(int id, int user_id, Action<bool> callback)
@@ -936,7 +944,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		{
 			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
 			callback(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDonateInvitationList(Action<bool> callback, bool isResumed = false)
@@ -970,7 +978,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 					MonoBehaviourSingleton<UserInfoManager>.I.SetClanDonateInviteHome();
 				}
 				callback(obj);
-			}, string.Empty);
+			});
 		}
 	}
 
@@ -982,8 +990,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		{
 			if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id != donateInviteList[i].userId)
 			{
-				double num3 = donateInviteList[i].expired / 1000.0 - num;
-				if (num3 < 1.0)
+				if (donateInviteList[i].expired / 1000.0 - num < 1.0)
 				{
 					donateInviteList.RemoveAt(i);
 					num2--;
@@ -1007,7 +1014,11 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 
 	public static bool IsValidNotEmptyDonateInviteList()
 	{
-		return MonoBehaviourSingleton<GuildManager>.IsValid() && MonoBehaviourSingleton<GuildManager>.I.donateInviteList != null && MonoBehaviourSingleton<GuildManager>.I.donateInviteList.Count > 0;
+		if (MonoBehaviourSingleton<GuildManager>.IsValid() && MonoBehaviourSingleton<GuildManager>.I.donateInviteList != null)
+		{
+			return MonoBehaviourSingleton<GuildManager>.I.donateInviteList.Count > 0;
+		}
+		return false;
 	}
 
 	public string GetInviteMessage()
@@ -1025,7 +1036,11 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		{
 			return string.Empty;
 		}
-		return (guildData.inviteFriendInfo == null) ? string.Empty : guildData.inviteFriendInfo.linkUrl;
+		if (guildData.inviteFriendInfo == null)
+		{
+			return string.Empty;
+		}
+		return guildData.inviteFriendInfo.linkUrl;
 	}
 
 	public void SendInviteList(Action<bool, GuildInviteCharaInfo[]> call_back)
@@ -1047,7 +1062,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				arg2 = ret.result.list.ToArray();
 			}
 			call_back(arg, arg2);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInvite(int[] userIds, Action<bool, int[]> call_back)
@@ -1076,7 +1091,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 			{
 				call_back(arg, null);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendRejectInviteClan(int requestId, Action<bool> call_back)
@@ -1091,7 +1106,7 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInvitedGuild(Action<bool> callBack, bool isResumed = false)
@@ -1106,19 +1121,23 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 			guildInviteList = null;
 			Protocol.SendAsync(GuildInvitedModel.RequestInvited.path, delegate(GuildInvitedModel ret)
 			{
-				guildInviteList = ((ret.Error != 0) ? new List<GuildInvitedModel.GuildInvitedInfo>() : ret.result.list);
+				guildInviteList = ((ret.Error == Error.None) ? ret.result.list : new List<GuildInvitedModel.GuildInvitedInfo>());
 				if (isResumed && guildInviteList.Count > 0)
 				{
 					MonoBehaviourSingleton<UserInfoManager>.I.SetClanInviteHome();
 				}
-			}, string.Empty);
+			});
 			callBack?.Invoke(obj: true);
 		}
 	}
 
 	public static bool IsValidNotEmptyInviteList()
 	{
-		return MonoBehaviourSingleton<GuildManager>.IsValid() && MonoBehaviourSingleton<GuildManager>.I.guildInviteList != null && MonoBehaviourSingleton<GuildManager>.I.guildInviteList.Count > 0;
+		if (MonoBehaviourSingleton<GuildManager>.IsValid() && MonoBehaviourSingleton<GuildManager>.I.guildInviteList != null)
+		{
+			return MonoBehaviourSingleton<GuildManager>.I.guildInviteList.Count > 0;
+		}
+		return false;
 	}
 
 	public void SendSearchFollowerRoom(Action<bool, List<GuildSearchFollowerRoomModel.GuildFollowerModel>> call_back)
@@ -1126,6 +1145,6 @@ public class GuildManager : MonoBehaviourSingleton<GuildManager>
 		Protocol.Send(GuildSearchFollowerRoomModel.URL, delegate(GuildSearchFollowerRoomModel ret)
 		{
 			call_back(ret.Error == Error.None, ret.result.list);
-		}, string.Empty);
+		});
 	}
 }

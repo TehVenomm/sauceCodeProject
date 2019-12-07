@@ -17,10 +17,10 @@ public class TermsWebViewDialog : WebViewDialog
 	public override void Initialize()
 	{
 		base.Initialize();
-		string arg = (MonoBehaviourSingleton<AccountManager>.I.termsUpdateDay == null) ? " " : DateTime.Parse(MonoBehaviourSingleton<AccountManager>.I.termsUpdateDay).ToString("yyyymmdd");
+		string arg = (MonoBehaviourSingleton<AccountManager>.I.termsUpdateDay != null) ? DateTime.Parse(MonoBehaviourSingleton<AccountManager>.I.termsUpdateDay).ToString("yyyymmdd") : " ";
 		string text = string.Format(base.sectionData.GetText("STR_CONFIRM"), arg);
-		SetLabelText((Enum)UI.STR_CONFIRM_MESSAGE, text);
-		SetLabelText((Enum)UI.STR_AGE_MESSAGE, base.sectionData.GetText("STR_AGE"));
+		SetLabelText(UI.STR_CONFIRM_MESSAGE, text);
+		SetLabelText(UI.STR_AGE_MESSAGE, base.sectionData.GetText("STR_AGE"));
 	}
 
 	private void OnQuery_DECIDE()
@@ -35,10 +35,10 @@ public class TermsWebViewDialog : WebViewDialog
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.SPR_CHECK, isTermsAgreement);
-		SetActive((Enum)UI.SPR_CHECK_OFF, !isTermsAgreement);
-		SetActive((Enum)UI.BTN_DECIDE, isTermsAgreement);
-		SetActive((Enum)UI.BTN_DECIDE_OFF, !isTermsAgreement);
+		SetActive(UI.SPR_CHECK, isTermsAgreement);
+		SetActive(UI.SPR_CHECK_OFF, !isTermsAgreement);
+		SetActive(UI.BTN_DECIDE, isTermsAgreement);
+		SetActive(UI.BTN_DECIDE_OFF, !isTermsAgreement);
 	}
 
 	private void OnQuery_TERMS()

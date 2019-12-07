@@ -8,7 +8,7 @@ public class QuestEventListSelect : QuestListSelectBase
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -23,13 +23,13 @@ public class QuestEventListSelect : QuestListSelectBase
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.BTN_SORT, is_visible: false);
+		SetActive(UI.BTN_SORT, is_visible: false);
 		if (eventLocation == null || eventLocation.Length == 0)
 		{
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.STR_NON_LIST, is_visible: true);
 			return;
 		}
-		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		SetActive(UI.STR_NON_LIST, is_visible: false);
 		SetGrid(UI.GRD_QUEST, "QuestEventListSelectItem", eventLocation.Length, reset: true, delegate(int i, Transform t, bool is_recycle)
 		{
 			SetEvent(t, "SELECT_EVENT", i);

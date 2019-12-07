@@ -38,14 +38,12 @@ public class InGameShopItemSelect : ShopItemSelect
 		GetCtrl(UI.OBJ_FRAME).GetComponent<UIScreenRotationHandler>().InvokeRotate();
 		GetCtrl(UI.OBJ_FRAME).GetComponent<UIRect>().UpdateAnchors();
 		UpdateAnchors();
-		UIScrollView component = GetCtrl(UI.SCR_LIST).GetComponent<UIScrollView>();
-		component.ResetPosition();
+		GetCtrl(UI.SCR_LIST).GetComponent<UIScrollView>().ResetPosition();
 		AppMain i = MonoBehaviourSingleton<AppMain>.I;
 		i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
 		{
 			RefreshUI();
-			UIPanel component2 = GetCtrl(UI.SCR_LIST).GetComponent<UIPanel>();
-			component2.Refresh();
+			GetCtrl(UI.SCR_LIST).GetComponent<UIPanel>().Refresh();
 		});
 	}
 
@@ -53,11 +51,11 @@ public class InGameShopItemSelect : ShopItemSelect
 	{
 		if (base.transferUI != null)
 		{
-			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
 		}
 		else
 		{
-			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
 		}
 		if (!isInActiveRotate)
 		{

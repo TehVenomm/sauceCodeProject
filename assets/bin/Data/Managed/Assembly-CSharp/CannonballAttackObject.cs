@@ -50,40 +50,30 @@ public class CannonballAttackObject : AttackColliderObject
 
 	private void FixedUpdate()
 	{
-		fixedTime += Time.get_fixedDeltaTime();
+		fixedTime += Time.fixedDeltaTime;
 	}
 
 	protected override void OnTriggerEnter(Collider collider)
 	{
-		hitLayer = collider.get_gameObject().get_layer();
-		if (((1 << hitLayer) & ignoreLayerMask) != 0)
+		hitLayer = collider.gameObject.layer;
+		if (((1 << hitLayer) & ignoreLayerMask) == 0)
 		{
-			return;
-		}
-		if (hitLayer == 11)
-		{
-			hitEnemy = collider.get_gameObject().GetComponent<Enemy>();
-		}
-		else if (hitLayer == 31)
-		{
-			EscapePointObject component = collider.get_gameObject().GetComponent<EscapePointObject>();
-			if (component != null)
+			if (hitLayer == 11)
+			{
+				hitEnemy = collider.gameObject.GetComponent<Enemy>();
+			}
+			else if (hitLayer == 31 && (collider.gameObject.GetComponent<EscapePointObject>() != null || collider.gameObject.GetComponent<BarrierBulletObject>() != null))
 			{
 				return;
 			}
-			BarrierBulletObject component2 = collider.get_gameObject().GetComponent<BarrierBulletObject>();
-			if (component2 != null)
+			isHit = true;
+			base.OnTriggerEnter(collider);
+			DeactivateOwnCollider();
+			Destroy();
+			if (owner != null)
 			{
-				return;
+				owner.OnHit();
 			}
-		}
-		isHit = true;
-		base.OnTriggerEnter(collider);
-		DeactivateOwnCollider();
-		Destroy();
-		if (owner != null)
-		{
-			owner.OnHit();
 		}
 	}
 }

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class QuestAcceptDeliveryDetailForHappen : QuestAcceptDeliveryDetail
@@ -93,7 +92,6 @@ public class QuestAcceptDeliveryDetailForHappen : QuestAcceptDeliveryDetail
 
 	protected override Vector3 GetEquipBtnPos()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 		return new Vector3(170f, -350f, 0f);
 	}
 
@@ -113,22 +111,21 @@ public class QuestAcceptDeliveryDetailForHappen : QuestAcceptDeliveryDetail
 			{
 				text = enemyData.name;
 			}
-			SetLabelText((Enum)UI.LBL_ENEMY_NAME, text);
-			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY));
-			itemIcon.SetDepth(7);
-			SetElementSprite((Enum)UI.SPR_ENM_ELEMENT, (int)enemyData.element);
-			SetElementSprite((Enum)UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
-			SetActive((Enum)UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
+			SetLabelText(UI.LBL_ENEMY_NAME, text);
+			ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY)).SetDepth(7);
+			SetElementSprite(UI.SPR_ENM_ELEMENT, (int)enemyData.element);
+			SetElementSprite(UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
+			SetActive(UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
 		}
 	}
 
 	private void OnQuery_SWITCH_SUBMISSION()
 	{
-		if (Object.op_Implicit(targetFrame) && Object.op_Implicit(submissionFrame))
+		if ((bool)targetFrame && (bool)submissionFrame)
 		{
-			bool activeSelf = targetFrame.get_gameObject().get_activeSelf();
-			targetFrame.get_gameObject().SetActive(!activeSelf);
-			submissionFrame.get_gameObject().SetActive(activeSelf);
+			bool activeSelf = targetFrame.gameObject.activeSelf;
+			targetFrame.gameObject.SetActive(!activeSelf);
+			submissionFrame.gameObject.SetActive(activeSelf);
 			isCompletedEventDelivery = true;
 			RefreshUI();
 		}

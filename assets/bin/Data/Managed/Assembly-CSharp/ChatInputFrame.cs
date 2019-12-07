@@ -44,11 +44,6 @@ public class ChatInputFrame : MonoBehaviour
 
 	private bool IsBusy => m_BusyCount != 0;
 
-	public ChatInputFrame()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		InitTweens(m_OpenTweens);
@@ -63,7 +58,7 @@ public class ChatInputFrame : MonoBehaviour
 			int i = 0;
 			for (int num = tweens.Length; i < num; i++)
 			{
-				tweens[i].set_enabled(false);
+				tweens[i].enabled = false;
 				tweens[i].AddOnFinished(new EventDelegate(OnFinished));
 			}
 		}
@@ -74,7 +69,7 @@ public class ChatInputFrame : MonoBehaviour
 		m_BusyCount--;
 		if (!IsBusy)
 		{
-			m_InputCollider.set_enabled(m_IsOpen);
+			m_InputCollider.enabled = m_IsOpen;
 		}
 	}
 
@@ -115,11 +110,11 @@ public class ChatInputFrame : MonoBehaviour
 			return false;
 		}
 		m_BusyCount = tweens.Length;
-		m_InputCollider.set_enabled(false);
+		m_InputCollider.enabled = false;
 		int i = 0;
 		for (int num = tweens.Length; i < num; i++)
 		{
-			tweens[i].set_enabled(true);
+			tweens[i].enabled = true;
 			tweens[i].ResetToBeginning();
 		}
 		return true;
@@ -136,22 +131,16 @@ public class ChatInputFrame : MonoBehaviour
 
 	public bool IsOpenOrBusy()
 	{
-		return m_IsOpen || IsBusy;
+		if (!m_IsOpen)
+		{
+			return IsBusy;
+		}
+		return true;
 	}
 
 	public void FrameResize()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		BoxCollider inputCollider = m_InputCollider;
-		Vector3 size = m_InputCollider.get_size();
-		float x = size.x;
-		float num = (float)m_BackgroundSprite.height + 10f;
-		Vector3 size2 = m_InputCollider.get_size();
-		inputCollider.set_size(new Vector3(x, num, size2.z));
+		m_InputCollider.size = new Vector3(m_InputCollider.size.x, (float)m_BackgroundSprite.height + 10f, m_InputCollider.size.z);
 	}
 
 	public void ChangeText()
@@ -172,16 +161,12 @@ public class ChatInputFrame : MonoBehaviour
 
 	public void OnTouchOpenCloseBtn()
 	{
-		if (IsBusy)
-		{
-		}
+		_ = IsBusy;
 	}
 
 	public void OnTouchCloseBtn()
 	{
-		if (IsBusy)
-		{
-		}
+		_ = IsBusy;
 	}
 
 	public void UpdateAgeConfirm()
@@ -190,11 +175,11 @@ public class ChatInputFrame : MonoBehaviour
 		bool active2 = UserInfoManager.IsRegisterdAge() && !UserInfoManager.IsEnableCommunication();
 		if (m_AgeConfirmSprite != null)
 		{
-			m_AgeConfirmSprite.get_gameObject().SetActive(active);
+			m_AgeConfirmSprite.gameObject.SetActive(active);
 		}
 		if (m_DenyChatSprite != null)
 		{
-			m_DenyChatSprite.get_gameObject().SetActive(active2);
+			m_DenyChatSprite.gameObject.SetActive(active2);
 		}
 	}
 }

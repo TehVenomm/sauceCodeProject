@@ -26,27 +26,36 @@ public class FieldCarriableDecoyGimmickObject : FieldCarriableGimmickObject
 
 	private Transform decoyEffect;
 
-	public bool isActive => !base.isCarrying && hasDeploied && activeTime > 0f;
+	public bool isActive
+	{
+		get
+		{
+			if (!base.isCarrying && hasDeploied)
+			{
+				return activeTime > 0f;
+			}
+			return false;
+		}
+	}
 
 	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(pointData);
 		activeTime = maxActiveTime;
-		targetObjectForEnemy = this.get_gameObject().AddComponent<DecoyBulletObject>();
+		targetObjectForEnemy = base.gameObject.AddComponent<DecoyBulletObject>();
 		if (targetObjectForEnemy != null)
 		{
-			targetObjectForEnemy.Initialize(-1, -1, null, m_transform.get_position(), null, isHit: false);
+			targetObjectForEnemy.Initialize(-1, -1, null, m_transform.position, null, isHit: false);
 		}
 		targetObjectForEnemy.SetCarriable(this);
-		Transform val = this.get_transform().Find("CMN_decoytrap01");
-		if (val != null)
+		Transform transform = base.transform.Find("CMN_decoytrap01");
+		if (transform != null)
 		{
-			val = val.get_transform().Find("object01");
-			Renderer component = val.GetComponent<Renderer>();
+			transform = transform.transform.Find("object01");
+			Renderer component = transform.GetComponent<Renderer>();
 			if (component != null)
 			{
-				gaugeMat = component.get_materials()[1];
+				gaugeMat = component.materials[1];
 				UpdateGauge();
 			}
 		}
@@ -65,8 +74,8 @@ public class FieldCarriableDecoyGimmickObject : FieldCarriableGimmickObject
 			string[] array2 = array[i].Split(':');
 			if (array2 != null && array2.Length == 2)
 			{
-				string text = array2[0];
-				if (text != null && text == "t")
+				string a = array2[0];
+				if (a == "t")
 				{
 					maxActiveTime = float.Parse(array2[1]);
 				}
@@ -79,7 +88,7 @@ public class FieldCarriableDecoyGimmickObject : FieldCarriableGimmickObject
 		base.OnStartCarry(owner);
 		if (decoyEffect != null)
 		{
-			EffectManager.ReleaseEffect(decoyEffect.get_gameObject());
+			EffectManager.ReleaseEffect(decoyEffect.gameObject);
 			decoyEffect = null;
 		}
 		MonoBehaviourSingleton<StageObjectManager>.I.CheckAllEnemiesMissDecoy(targetObjectForEnemy);
@@ -87,24 +96,21 @@ public class FieldCarriableDecoyGimmickObject : FieldCarriableGimmickObject
 
 	protected override void OnEndCarry()
 	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 		base.OnEndCarry();
 		if (decoyEffect == null)
 		{
 			decoyEffect = EffectManager.GetEffect(kDecoyEffectName, GetTransform());
 		}
 		MonoBehaviourSingleton<StageObjectManager>.I.SetAllEnemiesTargetDecoy();
-		EffectManager.OneShot(kPutEffectName, GetTransform().get_position(), GetTransform().get_rotation());
-		SoundManager.PlayOneShotSE(kPutSEId, GetTransform().get_position());
+		EffectManager.OneShot(kPutEffectName, GetTransform().position, GetTransform().rotation);
+		SoundManager.PlayOneShotSE(kPutSEId, GetTransform().position);
 	}
 
 	private void LateUpdate()
 	{
 		if (isActive)
 		{
-			activeTime = Mathf.Max(0f, activeTime - Time.get_deltaTime());
+			activeTime = Mathf.Max(0f, activeTime - Time.deltaTime);
 			UpdateGauge();
 			if (activeTime <= 0f)
 			{
@@ -115,7 +121,6 @@ public class FieldCarriableDecoyGimmickObject : FieldCarriableGimmickObject
 
 	private void UpdateGauge()
 	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 		float num = 0f - activeTime / maxActiveTime;
 		if (gaugeMat != null)
 		{
@@ -126,15 +131,12 @@ public class FieldCarriableDecoyGimmickObject : FieldCarriableGimmickObject
 
 	protected virtual void OnActiveEnd()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(false);
-		EffectManager.OneShot(kBreakEffectName, GetTransform().get_position(), GetTransform().get_rotation());
-		SoundManager.PlayOneShotSE(kBreakSEId, GetTransform().get_position());
+		base.gameObject.SetActive(value: false);
+		EffectManager.OneShot(kBreakEffectName, GetTransform().position, GetTransform().rotation);
+		SoundManager.PlayOneShotSE(kBreakSEId, GetTransform().position);
 		if (decoyEffect != null)
 		{
-			EffectManager.ReleaseEffect(decoyEffect.get_gameObject());
+			EffectManager.ReleaseEffect(decoyEffect.gameObject);
 			decoyEffect = null;
 		}
 	}

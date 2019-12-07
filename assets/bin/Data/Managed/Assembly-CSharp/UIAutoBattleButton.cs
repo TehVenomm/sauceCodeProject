@@ -60,7 +60,7 @@ public class UIAutoBattleButton : UIBehaviour
 		{
 			canUseAutoMode = false;
 		}
-		this.get_gameObject().SetActive(canUseAutoMode);
+		base.gameObject.SetActive(canUseAutoMode);
 		if (canUseAutoMode)
 		{
 			if (GameSaveData.instance.isAutoMode)
@@ -107,7 +107,7 @@ public class UIAutoBattleButton : UIBehaviour
 		{
 			return;
 		}
-		automodeStatus.SubTime(Time.get_deltaTime());
+		automodeStatus.SubTime(Time.deltaTime);
 		lblAutoTime.text = automodeStatus.GetRemainTime();
 		if (!automodeStatus.IsRemain())
 		{
@@ -115,7 +115,7 @@ public class UIAutoBattleButton : UIBehaviour
 		}
 		if (isAbleCountCycle)
 		{
-			stampCircle -= Time.get_deltaTime();
+			stampCircle -= Time.deltaTime;
 			if (stampCircle < 0.0)
 			{
 				isAbleCountCycle = false;
@@ -135,23 +135,23 @@ public class UIAutoBattleButton : UIBehaviour
 	{
 		if (cachedAutoFlg)
 		{
-			sprAutoOn.SetActive(false);
-			sprAutoOff.SetActive(true);
-			sprAutoPlay.SetActive(false);
-			sprAutoPause.SetActive(true);
+			sprAutoOn.SetActive(value: false);
+			sprAutoOff.SetActive(value: true);
+			sprAutoPlay.SetActive(value: false);
+			sprAutoPause.SetActive(value: true);
 		}
 		else
 		{
-			sprAutoOn.SetActive(true);
-			sprAutoOff.SetActive(false);
-			sprAutoPlay.SetActive(true);
-			sprAutoPause.SetActive(false);
+			sprAutoOn.SetActive(value: true);
+			sprAutoOff.SetActive(value: false);
+			sprAutoPlay.SetActive(value: true);
+			sprAutoPause.SetActive(value: false);
 		}
 		if (!automodeStatus.IsRemain())
 		{
 			canUseAutoMode = false;
 		}
-		this.get_gameObject().SetActive(canUseAutoMode);
+		base.gameObject.SetActive(canUseAutoMode);
 	}
 
 	private bool IsAuto()
@@ -243,7 +243,7 @@ public class UIAutoBattleButton : UIBehaviour
 		{
 			if (btnCollider != null)
 			{
-				btnCollider.set_enabled(false);
+				btnCollider.enabled = false;
 			}
 			btnEnable = false;
 			Protocol.Send(AutoPlaySwitchModel.URL, requestSendForm, delegate(AutoPlaySwitchModel ret)
@@ -255,12 +255,12 @@ public class UIAutoBattleButton : UIBehaviour
 					btnEnable = true;
 					if (btnCollider != null)
 					{
-						btnCollider.set_enabled(true);
+						btnCollider.enabled = true;
 					}
 					Initialize(ret.result.timeLeft, playState == 0);
 				}
 				call_back(obj);
-			}, string.Empty);
+			});
 		}
 	}
 
@@ -323,7 +323,7 @@ public class UIAutoBattleButton : UIBehaviour
 				ForcePauseAutoMode();
 			}
 			call_back(flag);
-		}, string.Empty);
+		});
 	}
 
 	public void GetAutoPlayTime(Action<bool> call_back)
@@ -344,7 +344,7 @@ public class UIAutoBattleButton : UIBehaviour
 					SetupAutoButton(ret.result.timeLeft);
 				}
 				call_back(obj);
-			}, string.Empty);
+			});
 		}
 	}
 
@@ -375,7 +375,7 @@ public class UIAutoBattleButton : UIBehaviour
 		}
 		else
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 		}
 	}
 
@@ -385,9 +385,9 @@ public class UIAutoBattleButton : UIBehaviour
 		{
 			btnEnable = true;
 		}
-		if (!btnCollider.get_enabled())
+		if (!btnCollider.enabled)
 		{
-			btnCollider.set_enabled(true);
+			btnCollider.enabled = true;
 		}
 	}
 
@@ -397,9 +397,9 @@ public class UIAutoBattleButton : UIBehaviour
 		{
 			btnEnable = false;
 		}
-		if (btnCollider.get_enabled())
+		if (btnCollider.enabled)
 		{
-			btnCollider.set_enabled(false);
+			btnCollider.enabled = false;
 		}
 	}
 
@@ -463,6 +463,6 @@ public class UIAutoBattleButton : UIBehaviour
 		requestSendForm.type = 1;
 		Protocol.Send<AutoPlaySwitchModel.RequestSendForm, AutoPlaySwitchModel>(AutoPlaySwitchModel.URL, requestSendForm, delegate
 		{
-		}, string.Empty);
+		});
 	}
 }

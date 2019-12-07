@@ -59,11 +59,11 @@ public class LightweightPlayerLoader : PlayerLoader
 	{
 		if (base.isLoading)
 		{
-			Log.Error(LOG.RESOURCE, this.get_name() + " now loading.");
+			Log.Error(LOG.RESOURCE, base.name + " now loading.");
 		}
 		else
 		{
-			this.StartCoroutine(DoLoad(player_load_info, layer, anim_id, need_anim_event, need_foot_stamp, need_shadow, enable_light_probes, need_action_voice, need_high_reso_tex, need_res_ref_count, need_dev_frame_instantiate, shader_type, callback, enable_eye_blick, use_hair_overlay));
+			StartCoroutine(DoLoad(player_load_info, layer, anim_id, need_anim_event, need_foot_stamp, need_shadow, enable_light_probes, need_action_voice, need_high_reso_tex, need_res_ref_count, need_dev_frame_instantiate, shader_type, callback, enable_eye_blick, use_hair_overlay));
 		}
 	}
 
@@ -74,10 +74,11 @@ public class LightweightPlayerLoader : PlayerLoader
 			Log.Error(LOG.RESOURCE, "PlayerLoader:info=null");
 		}
 		base.animObjectTable = new StringKeyTable<LoadObject>();
-		Player player = this.get_gameObject().GetComponent<Player>();
+		Player player = base.gameObject.GetComponent<Player>();
 		if (player != null)
 		{
-			int id = player.id;
+			_ = player.id;
+			_ = player;
 		}
 		DeleteLoadedObjects();
 		base.loadInfo = info;
@@ -85,17 +86,17 @@ public class LightweightPlayerLoader : PlayerLoader
 		{
 			anim_id = ((anim_id != -1 || info.weaponModelID == -1) ? (-anim_id + info.weaponModelID / 1000) : (info.weaponModelID / 1000));
 		}
-		string body_name = (info.bodyModelID <= -1) ? null : ResourceName.GetPlayerBody(92000);
-		if (body_name == null)
+		string text = (info.bodyModelID > -1) ? ResourceName.GetPlayerBody(92000) : null;
+		if (text == null)
 		{
 			yield break;
 		}
-		Transform _this = this.get_transform();
+		Transform _this = base.transform;
 		if (player != null)
 		{
 			if (player.controller != null)
 			{
-				player.controller.set_enabled(false);
+				player.controller.enabled = false;
 			}
 			if (player.packetReceiver != null)
 			{
@@ -105,7 +106,7 @@ public class LightweightPlayerLoader : PlayerLoader
 		}
 		base.isLoading = true;
 		LoadingQueue load_queue = new LoadingQueue(this, need_res_ref_count);
-		LoadObject lo_body = (!need_dev_frame_instantiate) ? ((body_name == null) ? null : load_queue.Load(RESOURCE_CATEGORY.PLAYER_BDY, body_name)) : ((body_name == null) ? null : load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_BDY, body_name));
+		LoadObject lo_body = (!need_dev_frame_instantiate) ? ((text != null) ? load_queue.Load(RESOURCE_CATEGORY.PLAYER_BDY, text) : null) : ((text != null) ? load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.PLAYER_BDY, text) : null);
 		if (anim_id > -1)
 		{
 			ResourceName.GetPlayerAnim(anim_id);
@@ -120,7 +121,7 @@ public class LightweightPlayerLoader : PlayerLoader
 			yield return load_queue.Wait();
 		}
 		base.body = lo_body.Realizes(_this);
-		base.renderersBody = base.body.get_gameObject().GetComponentsInChildren<Renderer>();
+		base.renderersBody = base.body.gameObject.GetComponentsInChildren<Renderer>();
 		ModelLoaderBase.SetEnabled(base.renderersBody, is_enable: false);
 		if (base.body == null)
 		{
@@ -135,7 +136,7 @@ public class LightweightPlayerLoader : PlayerLoader
 		{
 			if (player.controller != null)
 			{
-				player.controller.set_enabled(true);
+				player.controller.enabled = true;
 			}
 			player.OnLoadComplete();
 			if (player.packetReceiver != null)
@@ -151,19 +152,19 @@ public class LightweightPlayerLoader : PlayerLoader
 	{
 		if (base.wepR != null)
 		{
-			Object.DestroyImmediate(base.wepR.get_gameObject());
+			Object.DestroyImmediate(base.wepR.gameObject);
 		}
 		if (base.wepL != null)
 		{
-			Object.DestroyImmediate(base.wepL.get_gameObject());
+			Object.DestroyImmediate(base.wepL.gameObject);
 		}
 		if (base.body != null)
 		{
-			Object.DestroyImmediate(base.body.get_gameObject());
+			Object.DestroyImmediate(base.body.gameObject);
 		}
 		if (base.shadow != null)
 		{
-			Object.DestroyImmediate(base.shadow.get_gameObject());
+			Object.DestroyImmediate(base.shadow.gameObject);
 		}
 		base.loadInfo = null;
 		base.wepR = null;

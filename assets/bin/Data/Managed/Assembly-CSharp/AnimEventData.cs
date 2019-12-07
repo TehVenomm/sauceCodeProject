@@ -25,32 +25,56 @@ public class AnimEventData : ScriptableObject
 
 		public int GetInt(int index, int defVal = 0)
 		{
-			return (!HasInt(0)) ? defVal : intArgs[index];
+			if (!HasInt(0))
+			{
+				return defVal;
+			}
+			return intArgs[index];
 		}
 
 		public float GetFloat(int index, float defVal = 0f)
 		{
-			return (!HasFloat(0)) ? defVal : floatArgs[index];
+			if (!HasFloat(0))
+			{
+				return defVal;
+			}
+			return floatArgs[index];
 		}
 
 		public string GetString(int index, string defVal = "")
 		{
-			return (!HasString(0)) ? defVal : stringArgs[index];
+			if (!HasString(0))
+			{
+				return defVal;
+			}
+			return stringArgs[index];
 		}
 
 		public bool HasInt(int index)
 		{
-			return intArgs != null && index >= 0 && index < intArgs.Length;
+			if (intArgs != null && index >= 0)
+			{
+				return index < intArgs.Length;
+			}
+			return false;
 		}
 
 		public bool HasFloat(int index)
 		{
-			return floatArgs != null && index >= 0 && index < floatArgs.Length;
+			if (floatArgs != null && index >= 0)
+			{
+				return index < floatArgs.Length;
+			}
+			return false;
 		}
 
 		public bool HasString(int index)
 		{
-			return stringArgs != null && index >= 0 && index < stringArgs.Length;
+			if (stringArgs != null && index >= 0)
+			{
+				return index < stringArgs.Length;
+			}
+			return false;
 		}
 
 		public void Copy(EventData from_data, bool with_time)
@@ -61,9 +85,9 @@ public class AnimEventData : ScriptableObject
 			}
 			id = from_data.id;
 			name = from_data.name;
-			intArgs = ((from_data.intArgs == null) ? null : ((int[])from_data.intArgs.Clone()));
-			floatArgs = ((from_data.floatArgs == null) ? null : ((float[])from_data.floatArgs.Clone()));
-			stringArgs = ((from_data.stringArgs == null) ? null : ((string[])from_data.stringArgs.Clone()));
+			intArgs = ((from_data.intArgs != null) ? ((int[])from_data.intArgs.Clone()) : null);
+			floatArgs = ((from_data.floatArgs != null) ? ((float[])from_data.floatArgs.Clone()) : null);
+			stringArgs = ((from_data.stringArgs != null) ? ((string[])from_data.stringArgs.Clone()) : null);
 		}
 	}
 
@@ -111,10 +135,6 @@ public class AnimEventData : ScriptableObject
 
 		public void Copy(ResidentEffectData srcInfo)
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 			effectName = srcInfo.effectName;
 			linkNodeName = srcInfo.linkNodeName;
 			offsetPos = srcInfo.offsetPos;
@@ -141,24 +161,6 @@ public class AnimEventData : ScriptableObject
 	public static int[] ids;
 
 	public ResidentEffectData[] residentEffectDataList;
-
-	static AnimEventData()
-	{
-		string[] names = Enum.GetNames(typeof(AnimEventFormat.ID));
-		int num = (names != null) ? names.Length : 0;
-		idHashs = new int[num];
-		for (int i = 0; i < num; i++)
-		{
-			idHashs[i] = Animator.StringToHash(names[i]);
-		}
-		ids = (int[])Enum.GetValues(typeof(AnimEventFormat.ID));
-		names = null;
-	}
-
-	public AnimEventData()
-		: this()
-	{
-	}
 
 	public void Initialize()
 	{
@@ -224,6 +226,19 @@ public class AnimEventData : ScriptableObject
 		return null;
 	}
 
+	static AnimEventData()
+	{
+		string[] names = Enum.GetNames(typeof(AnimEventFormat.ID));
+		int num = (names != null) ? names.Length : 0;
+		idHashs = new int[num];
+		for (int i = 0; i < num; i++)
+		{
+			idHashs[i] = Animator.StringToHash(names[i]);
+		}
+		ids = (int[])Enum.GetValues(typeof(AnimEventFormat.ID));
+		names = null;
+	}
+
 	public static AnimEventFormat.ID StringToID(string name)
 	{
 		int num = Animator.StringToHash(name);
@@ -240,20 +255,16 @@ public class AnimEventData : ScriptableObject
 
 	public ResidentEffectData AddResidentEffectData()
 	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 		List<ResidentEffectData> list = new List<ResidentEffectData>();
-		if (residentEffectDataList != null && residentEffectDataList.Length > 0)
+		if (residentEffectDataList != null && residentEffectDataList.Length != 0)
 		{
 			list.AddRange(residentEffectDataList);
 		}
 		ResidentEffectData residentEffectData = new ResidentEffectData();
 		residentEffectData.effectName = string.Empty;
 		residentEffectData.linkNodeName = string.Empty;
-		residentEffectData.offsetPos = Vector3.get_zero();
-		residentEffectData.offsetRot = Vector3.get_zero();
+		residentEffectData.offsetPos = Vector3.zero;
+		residentEffectData.offsetRot = Vector3.zero;
 		residentEffectData.groupID = 0;
 		residentEffectData.handle = 0;
 		residentEffectData.scale = 1f;
@@ -265,7 +276,7 @@ public class AnimEventData : ScriptableObject
 	public void DeleteResidentEffectData(ResidentEffectData targetData)
 	{
 		List<ResidentEffectData> list = new List<ResidentEffectData>();
-		if (residentEffectDataList != null && residentEffectDataList.Length > 0)
+		if (residentEffectDataList != null && residentEffectDataList.Length != 0)
 		{
 			list.AddRange(residentEffectDataList);
 		}

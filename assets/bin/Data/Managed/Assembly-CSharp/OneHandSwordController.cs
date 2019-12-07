@@ -96,12 +96,12 @@ public class OneHandSwordController : IWeaponController
 			case SP_ATTACK_TYPE.BURST:
 				break;
 			case SP_ATTACK_TYPE.NONE:
-				owner.ActAttack(owner.playerParameter.specialActionInfo.spAttackID, send_packet: true, sync_immediately: true, string.Empty, string.Empty);
+				owner.ActAttack(owner.playerParameter.specialActionInfo.spAttackID, send_packet: true, sync_immediately: true);
 				IncrementCounterAttackCount();
 				owner.isActOneHandSwordCounter = true;
 				break;
 			case SP_ATTACK_TYPE.HEAT:
-				owner.ActAttack(ohsInfo.heatOHSInfo.counterAttackId, send_packet: true, sync_immediately: true, string.Empty, string.Empty);
+				owner.ActAttack(ohsInfo.heatOHSInfo.counterAttackId, send_packet: true, sync_immediately: true);
 				IncrementCounterAttackCount();
 				owner.isActOneHandSwordCounter = true;
 				break;
@@ -116,13 +116,13 @@ public class OneHandSwordController : IWeaponController
 			return;
 		}
 		string text = "attack_" + id;
-		int num = Animator.StringToHash(text);
+		int stateID = Animator.StringToHash(text);
 		for (int i = 0; i < oracleDragonEffectAnimators.Count; i++)
 		{
-			Animator val = oracleDragonEffectAnimators[i];
-			if (val.HasState(0, num))
+			Animator animator = oracleDragonEffectAnimators[i];
+			if (animator.HasState(0, stateID))
 			{
-				val.Play(text);
+				animator.Play(text);
 			}
 		}
 	}
@@ -139,31 +139,25 @@ public class OneHandSwordController : IWeaponController
 	{
 		if (type == BuffParam.BUFFTYPE.ORACLE_OHS_PROTECTION && oracleProtection != null)
 		{
-			EffectManager.ReleaseEffect(oracleProtection.get_gameObject());
+			EffectManager.ReleaseEffect(oracleProtection.gameObject);
 			oracleProtection = null;
 		}
 	}
 
 	public void OnReloadEffect(BuffParam.BUFFTYPE type)
 	{
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 		if (type == BuffParam.BUFFTYPE.ORACLE_OHS_PROTECTION)
 		{
 			if (oracleProtection != null)
 			{
-				EffectManager.ReleaseEffect(oracleProtection.get_gameObject());
+				EffectManager.ReleaseEffect(oracleProtection.gameObject);
 			}
-			EffectManager.OneShot("ef_btl_wsk4_sword_dragon_veil_re", owner._transform.get_position(), owner._transform.get_rotation(), Vector3.get_one(), is_priority: false, delegate(Transform effect)
+			EffectManager.OneShot("ef_btl_wsk4_sword_dragon_veil_re", owner._transform.position, owner._transform.rotation, Vector3.one, is_priority: false, delegate(Transform effect)
 			{
-				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-				effect.set_parent(owner._transform);
-				effect.set_localPosition(Vector3.get_zero());
-				effect.set_localRotation(Quaternion.get_identity());
-				effect.set_localScale(Vector3.get_one());
+				effect.parent = owner._transform;
+				effect.localPosition = Vector3.zero;
+				effect.localRotation = Quaternion.identity;
+				effect.localScale = Vector3.one;
 			});
 			oracleProtection = EffectManager.GetEffect("ef_btl_wsk4_sword_dragon_veil", owner._transform);
 		}
@@ -197,21 +191,21 @@ public class OneHandSwordController : IWeaponController
 			{
 				return;
 			}
-			num = ((snatchCtrl.state != SnatchController.STATE.SNATCH) ? (ohsInfo.Soul_BoostGaugeDecreasePerSecond * Time.get_deltaTime()) : (ohsInfo.Soul_BoostSnatchGaugeDecreasePerSecond * Time.get_deltaTime()));
+			num = ((snatchCtrl.state != SnatchController.STATE.SNATCH) ? (ohsInfo.Soul_BoostGaugeDecreasePerSecond * Time.deltaTime) : (ohsInfo.Soul_BoostSnatchGaugeDecreasePerSecond * Time.deltaTime));
 			break;
 		case SP_ATTACK_TYPE.BURST:
 			if (!owner.isBoostMode)
 			{
 				return;
 			}
-			num = 1000f / ohsInfo.burstOHSInfo.GaugeTime * Time.get_deltaTime();
+			num = 1000f / ohsInfo.burstOHSInfo.GaugeTime * Time.deltaTime;
 			break;
 		case SP_ATTACK_TYPE.ORACLE:
 			if (!owner.isBoostMode)
 			{
 				return;
 			}
-			num = 1000f / ohsInfo.oracleOHSInfo.spGaugeDecreasingValue * Time.get_deltaTime();
+			num = 1000f / ohsInfo.oracleOHSInfo.spGaugeDecreasingValue * Time.deltaTime;
 			break;
 		}
 		float num2 = 1f + owner.GetSpGaugeDecreasingRate();
@@ -273,7 +267,11 @@ public class OneHandSwordController : IWeaponController
 
 	public static bool IsOracleAttackId(int id)
 	{
-		return id >= ORACLE_ATTACK_ID_START && id <= ORACLE_ATTACK_ID_END;
+		if (id >= ORACLE_ATTACK_ID_START)
+		{
+			return id <= ORACLE_ATTACK_ID_END;
+		}
+		return false;
 	}
 
 	public void OnStartOracleBoost()
@@ -288,12 +286,12 @@ public class OneHandSwordController : IWeaponController
 		InGameSettingsManager.Player.OracleOneHandSwordActionInfo.DragonEffect[] dragonEffects = ohsInfo.oracleOHSInfo.dragonEffects;
 		for (int i = 0; i < dragonEffects.Length; i++)
 		{
-			Transform val = owner.FindNode(dragonEffects[i].link);
-			if (val == null)
+			Transform transform = owner.FindNode(dragonEffects[i].link);
+			if (transform == null)
 			{
 				continue;
 			}
-			Transform effect = EffectManager.GetEffect(dragonEffects[i].GetEffectName(owner.GetNowWeaponElement()), val);
+			Transform effect = EffectManager.GetEffect(dragonEffects[i].GetEffectName(owner.GetNowWeaponElement()), transform);
 			if (!(effect == null))
 			{
 				oracleDragonEffects.Add(effect);
@@ -310,7 +308,7 @@ public class OneHandSwordController : IWeaponController
 	{
 		for (int i = 0; i < oracleDragonEffects.Count; i++)
 		{
-			EffectManager.ReleaseEffect(oracleDragonEffects[i].get_gameObject());
+			EffectManager.ReleaseEffect(oracleDragonEffects[i].gameObject);
 		}
 		oracleDragonEffects.Clear();
 		oracleDragonEffectAnimators.Clear();

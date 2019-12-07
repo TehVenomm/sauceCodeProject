@@ -35,7 +35,7 @@ public class SelfController : ControllerBase
 	{
 		public COMMAND_TYPE type = COMMAND_TYPE.NONE;
 
-		public Vector2 inputVec = Vector2.get_zero();
+		public Vector2 inputVec = Vector2.zero;
 
 		public float deltaTime;
 
@@ -174,7 +174,7 @@ public class SelfController : ControllerBase
 
 	public void SetCommand(Command command)
 	{
-		if (command != null && command.type != COMMAND_TYPE.NONE && IsCancelAble(command) && (lastActCommandType == COMMAND_TYPE.NONE || command.type != lastActCommandType || !(Time.get_time() - lastActCommandTime < parameter.inputCommandIntervalTime[(int)command.type])))
+		if (command != null && command.type != COMMAND_TYPE.NONE && IsCancelAble(command) && (lastActCommandType == COMMAND_TYPE.NONE || command.type != lastActCommandType || !(Time.time - lastActCommandTime < parameter.inputCommandIntervalTime[(int)command.type])))
 		{
 			lastActCommandType = COMMAND_TYPE.NONE;
 			lastActCommandTime = -1f;
@@ -253,66 +253,6 @@ public class SelfController : ControllerBase
 
 	public void ActCommand(Command command)
 	{
-		//IL_0286: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0294: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0302: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0325: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0333: Unknown result type (might be due to invalid IL or missing references)
-		//IL_034e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0353: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0360: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0365: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0372: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0377: Unknown result type (might be due to invalid IL or missing references)
-		//IL_037c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0381: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0389: Unknown result type (might be due to invalid IL or missing references)
-		//IL_039c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_067e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0683: Unknown result type (might be due to invalid IL or missing references)
-		//IL_068f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0694: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0775: Unknown result type (might be due to invalid IL or missing references)
-		//IL_077a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_077e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0783: Unknown result type (might be due to invalid IL or missing references)
-		//IL_079e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0814: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0819: Unknown result type (might be due to invalid IL or missing references)
-		//IL_081d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0822: Unknown result type (might be due to invalid IL or missing references)
-		//IL_083d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_084a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_084f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_085c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0861: Unknown result type (might be due to invalid IL or missing references)
-		//IL_086c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0871: Unknown result type (might be due to invalid IL or missing references)
 		int num = 0;
 		string text = "Base Layer.";
 		switch (command.type)
@@ -322,12 +262,12 @@ public class SelfController : ControllerBase
 			{
 				self.SetArrowAimKeep();
 			}
-			if (base.character is Player)
+			if (character is Player)
 			{
-				Player player = base.character as Player;
+				Player player = character as Player;
 				if (player != null && player.HitSpearSpecialAction)
 				{
-					base.character.ActAttack(10, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+					character.ActAttack(10);
 					break;
 				}
 			}
@@ -345,59 +285,57 @@ public class SelfController : ControllerBase
 				{
 					if (self.IsActionFromAvoid())
 					{
-						self.ActAttack(98, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+						self.ActAttack(98);
 					}
 					else
 					{
-						self.ActAttack(97, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+						self.ActAttack(97);
 					}
-					break;
 				}
-				if (self.IsAbleArrowRainShot())
+				else if (self.IsAbleArrowRainShot())
 				{
 					if (self.IsActionFromAvoid())
 					{
-						self.ActAttack(MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.arrowRainShotAttackId, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+						self.ActAttack(MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.arrowRainShotAttackId);
 					}
 					else
 					{
-						self.ActAttack(MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.arrowReloadRainShotAttackId, send_packet: true, sync_immediately: false, string.Empty, string.Empty);
+						self.ActAttack(MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.arrowReloadRainShotAttackId);
 					}
-					break;
 				}
-				text = "Base Layer.";
-				num = self.GetNormalAttackId(self.attackMode, self.spAttackType, self.extraAttackType, out text);
-				Character character = base.character;
-				int id = num;
-				string motionLayerName = text;
-				character.ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName, string.Empty);
+				else
+				{
+					text = "Base Layer.";
+					num = self.GetNormalAttackId(self.attackMode, self.spAttackType, self.extraAttackType, out text);
+					character.ActAttack(num, send_packet: true, sync_immediately: false, text);
+				}
 			}
 			break;
 		case COMMAND_TYPE.AVOID:
 		{
 			Transform cameraTransform4 = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-			Vector3 right4 = cameraTransform4.get_right();
-			Vector3 forward4 = cameraTransform4.get_forward();
+			Vector3 right4 = cameraTransform4.right;
+			Vector3 forward4 = cameraTransform4.forward;
 			forward4.y = 0f;
 			forward4.Normalize();
-			Vector3 val3 = this.get_transform().get_position() + (right4 * command.inputVec.x + forward4 * command.inputVec.y);
-			this.get_transform().LookAt(val3);
+			Vector3 worldPosition3 = base.transform.position + (right4 * command.inputVec.x + forward4 * command.inputVec.y);
+			base.transform.LookAt(worldPosition3);
 			self.ActAvoid();
-			slideVerocity = Vector3.get_zero();
+			slideVerocity = Vector3.zero;
 			slideTimer = 0f;
 			break;
 		}
 		case COMMAND_TYPE.WARP:
 		{
 			Transform cameraTransform3 = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-			Vector3 right3 = cameraTransform3.get_right();
-			Vector3 forward3 = cameraTransform3.get_forward();
+			Vector3 right3 = cameraTransform3.right;
+			Vector3 forward3 = cameraTransform3.forward;
 			forward3.y = 0f;
 			forward3.Normalize();
-			Vector3 val2 = this.get_transform().get_position() + (right3 * command.inputVec.x + forward3 * command.inputVec.y);
-			this.get_transform().LookAt(val2);
+			Vector3 worldPosition2 = base.transform.position + (right3 * command.inputVec.x + forward3 * command.inputVec.y);
+			base.transform.LookAt(worldPosition2);
 			self.ActWarp();
-			slideVerocity = Vector3.get_zero();
+			slideVerocity = Vector3.zero;
 			slideTimer = 0f;
 			break;
 		}
@@ -462,14 +400,9 @@ public class SelfController : ControllerBase
 			}
 			break;
 		case COMMAND_TYPE.THS_BURST_RELOAD:
-		{
 			text = self.GetMotionLayerName(self.attackMode, self.spAttackType, command.MotionId);
-			Character character2 = base.character;
-			int id = command.MotionId;
-			string motionLayerName = text;
-			character2.ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName, string.Empty);
+			character.ActAttack(command.MotionId, send_packet: true, sync_immediately: false, text);
 			break;
-		}
 		case COMMAND_TYPE.GATHER_GIMMICK:
 			if (self.nearFieldGimmick == command.fieldGimmickObject)
 			{
@@ -483,8 +416,8 @@ public class SelfController : ControllerBase
 			}
 			break;
 		case COMMAND_TYPE.FLICK_ACTION:
-			self.ActFlickAction(Vector2.op_Implicit(command.inputVec), isOriginal: true);
-			slideVerocity = Vector3.get_zero();
+			self.ActFlickAction(command.inputVec, isOriginal: true);
+			slideVerocity = Vector3.zero;
 			slideTimer = 0f;
 			break;
 		case COMMAND_TYPE.COOP_FISHING:
@@ -513,26 +446,26 @@ public class SelfController : ControllerBase
 		case COMMAND_TYPE.TELEPORT_AVOID:
 		{
 			Transform cameraTransform2 = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-			Vector3 right2 = cameraTransform2.get_right();
-			Vector3 forward2 = cameraTransform2.get_forward();
+			Vector3 right2 = cameraTransform2.right;
+			Vector3 forward2 = cameraTransform2.forward;
 			forward2.y = 0f;
 			forward2.Normalize();
-			Vector3 val = this.get_transform().get_position() + (right2 * command.inputVec.x + forward2 * command.inputVec.y);
-			this.get_transform().LookAt(val);
+			Vector3 worldPosition = base.transform.position + (right2 * command.inputVec.x + forward2 * command.inputVec.y);
+			base.transform.LookAt(worldPosition);
 			self.ActTeleportAvoid();
-			slideVerocity = Vector3.get_zero();
+			slideVerocity = Vector3.zero;
 			slideTimer = 0f;
 			break;
 		}
 		case COMMAND_TYPE.RUSH_AVOID:
 		{
 			Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-			Vector3 right = cameraTransform.get_right();
-			Vector3 forward = cameraTransform.get_forward();
+			Vector3 right = cameraTransform.right;
+			Vector3 forward = cameraTransform.forward;
 			forward.y = 0f;
 			forward.Normalize();
 			self.ActRushAvoid(right * command.inputVec.x + forward * command.inputVec.y);
-			slideVerocity = Vector3.get_zero();
+			slideVerocity = Vector3.zero;
 			slideTimer = 0f;
 			break;
 		}
@@ -553,7 +486,7 @@ public class SelfController : ControllerBase
 			checkTouch = true;
 		}
 		lastActCommandType = command.type;
-		lastActCommandTime = Time.get_time();
+		lastActCommandTime = Time.time;
 	}
 
 	public bool IsCancelAble(Command check_command)
@@ -673,7 +606,7 @@ public class SelfController : ControllerBase
 			{
 				FieldGatherGimmickObject fieldGatherGimmickObject = self.nearFieldGimmick as FieldGatherGimmickObject;
 				GATHER_GIMMICK_TYPE gatherGimmickType = fieldGatherGimmickObject.GetGatherGimmickType();
-				if ((gatherGimmickType == GATHER_GIMMICK_TYPE.FISHING || gatherGimmickType == GATHER_GIMMICK_TYPE.COOP_FISHING) && fieldGatherGimmickObject != null && fieldGatherGimmickObject.CanUse() && self.fishingCtrl != null && !self.fishingCtrl.IsFishing())
+				if ((uint)(gatherGimmickType - 1) <= 1u && fieldGatherGimmickObject != null && fieldGatherGimmickObject.CanUse() && self.fishingCtrl != null && !self.fishingCtrl.IsFishing())
 				{
 					Command command3 = new Command();
 					command3.type = COMMAND_TYPE.GATHER_GIMMICK;
@@ -682,17 +615,13 @@ public class SelfController : ControllerBase
 					return;
 				}
 			}
-			if (self.nearFieldGimmick is FieldQuestGimmickObject)
+			if (self.nearFieldGimmick is FieldQuestGimmickObject && self.nearFieldGimmick as FieldQuestGimmickObject != null)
 			{
-				FieldQuestGimmickObject fieldQuestGimmickObject = self.nearFieldGimmick as FieldQuestGimmickObject;
-				if (fieldQuestGimmickObject != null)
-				{
-					Command command4 = new Command();
-					command4.type = COMMAND_TYPE.QUEST_GIMMICK;
-					command4.fieldGimmickObject = self.nearFieldGimmick;
-					SetCommand(command4);
-					return;
-				}
+				Command command4 = new Command();
+				command4.type = COMMAND_TYPE.QUEST_GIMMICK;
+				command4.fieldGimmickObject = self.nearFieldGimmick;
+				SetCommand(command4);
+				return;
 			}
 			if (self.nearFieldGimmick is FieldBingoObject)
 			{
@@ -766,8 +695,7 @@ public class SelfController : ControllerBase
 
 	private void SetCommandForFieldGimmick<T>(COMMAND_TYPE cmdType) where T : FieldGimmickObject
 	{
-		T val = self.nearFieldGimmick as T;
-		if (!(val == null))
+		if (!((UnityEngine.Object)(self.nearFieldGimmick as T) == (UnityEngine.Object)null))
 		{
 			Command command = new Command();
 			command.type = cmdType;
@@ -805,19 +733,14 @@ public class SelfController : ControllerBase
 
 	private void OnLongTouch(InputManager.TouchInfo touch_info)
 	{
-		if (IsEnableControll() && !(character == null))
+		if (IsEnableControll())
 		{
+			_ = (character == null);
 		}
 	}
 
 	private void OnFlick(Vector2 flick_vec)
 	{
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsEnableControll() || character == null || character.isLoading || self.IsCarrying())
 		{
 			return;
@@ -875,15 +798,13 @@ public class SelfController : ControllerBase
 			command.inputVec = flick_vec;
 			SetCommand(command);
 			slideTimer = 0f;
-			slideVerocity = Vector3.get_zero();
+			slideVerocity = Vector3.zero;
 		}
 	}
 
 	private void SetFlickDirection(Vector2 flick_vec)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		if (flick_vec == Vector2.get_zero())
+		if (flick_vec == Vector2.zero)
 		{
 			return;
 		}
@@ -920,85 +841,11 @@ public class SelfController : ControllerBase
 
 	private void OnTouchOff(InputManager.TouchInfo touch_info)
 	{
-		if (IsEnableControll())
-		{
-		}
+		IsEnableControll();
 	}
 
 	protected override void Update()
 	{
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0350: Unknown result type (might be due to invalid IL or missing references)
-		//IL_035b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0371: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0376: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0606: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0611: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0692: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a2a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a2f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a33: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a38: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a7a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a83: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a93: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a98: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0aa1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ab1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ab6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0abb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ac2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0acb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0adb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ae0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ae9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0af9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0afe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b03: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b21: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b2b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b3a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b44: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b46: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b73: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b7d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b8c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b96: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0b98: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0be0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0bf3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0bf8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0c0a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0c14: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0c2e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0c41: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0c43: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0d23: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0d2e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0d33: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0da1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0da6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0db9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0dbf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0dc4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0dc9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0dde: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0de3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0e15: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0e1a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0e35: Unknown result type (might be due to invalid IL or missing references)
 		InputManager.TouchInfo touchInfo = moveStickInfo;
 		moveStickInfo = null;
 		if ((self.actionID == (Character.ACTION_ID)20 || self.actionID == (Character.ACTION_ID)34 || self.actionID == (Character.ACTION_ID)21) && isInputtedTouch)
@@ -1007,7 +854,7 @@ public class SelfController : ControllerBase
 		}
 		if (nextCommand != null && (self == null || !self.IsHitStop()))
 		{
-			nextCommand.deltaTime += Time.get_deltaTime();
+			nextCommand.deltaTime += Time.deltaTime;
 		}
 		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionType().IsDialog())
 		{
@@ -1022,8 +869,7 @@ public class SelfController : ControllerBase
 			return;
 		}
 		base.Update();
-		InputManager i = MonoBehaviourSingleton<InputManager>.I;
-		InputManager.TouchInfo stickInfo = i.GetStickInfo();
+		InputManager.TouchInfo stickInfo = MonoBehaviourSingleton<InputManager>.I.GetStickInfo();
 		if (stickInfo != null)
 		{
 			self.SetInputAxis(stickInfo.axis);
@@ -1038,7 +884,7 @@ public class SelfController : ControllerBase
 				num = GameSaveData.instance.touchInGameLong;
 			}
 			float num2 = parameter.inputLongTouchTimeLow + (parameter.inputLongTouchTimeHigh - parameter.inputLongTouchTimeLow) * num;
-			if (!initTouch && !this.touchInfo.activeAxis && Time.get_time() - this.touchInfo.beginTime >= num2)
+			if (!initTouch && !this.touchInfo.activeAxis && Time.time - this.touchInfo.beginTime >= num2)
 			{
 				initTouch = true;
 				enableTouch = true;
@@ -1085,7 +931,7 @@ public class SelfController : ControllerBase
 					{
 						self.UpdateCannonAimMode(this.touchInfo.axisNoLimit, this.touchInfo.position);
 						slideTimer = 0f;
-						slideVerocity = Vector3.get_zero();
+						slideVerocity = Vector3.zero;
 					}
 					return;
 				}
@@ -1123,7 +969,7 @@ public class SelfController : ControllerBase
 				{
 					flag = true;
 				}
-				if (flag3 || flag4 || flag5 || flag6)
+				if (flag3 | flag4 | flag5 | flag6)
 				{
 					if (flag2)
 					{
@@ -1144,13 +990,13 @@ public class SelfController : ControllerBase
 							bool flag7 = false;
 							if (touchAimAxisTime >= 0f)
 							{
-								touchAimAxisTime += Time.get_deltaTime();
+								touchAimAxisTime += Time.deltaTime;
 								if (touchAimAxisTime >= MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.aimDelayTime)
 								{
 									flag7 = true;
 								}
 							}
-							if (activeAxis && this.touchInfo != null && this.touchInfo.axisNoLimit.get_magnitude() >= MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.aimDragLength && touchAimAxisTime < 0f)
+							if (activeAxis && this.touchInfo != null && this.touchInfo.axisNoLimit.magnitude >= MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.aimDragLength && touchAimAxisTime < 0f)
 							{
 								touchAimAxisTime = 0f;
 							}
@@ -1181,7 +1027,7 @@ public class SelfController : ControllerBase
 							}
 							else
 							{
-								if (!self.isArrowAimLesserMode && (flag7 || flag6))
+								if (!self.isArrowAimLesserMode && (flag7 | flag6))
 								{
 									self.SetArrowAimLesserMode(enable: true);
 								}
@@ -1193,7 +1039,7 @@ public class SelfController : ControllerBase
 						}
 					}
 					slideTimer = 0f;
-					slideVerocity = Vector3.get_zero();
+					slideVerocity = Vector3.zero;
 					return;
 				}
 				if (self.enabledOraclePairSwordsSP && stickInfo != null)
@@ -1207,7 +1053,7 @@ public class SelfController : ControllerBase
 					}
 					return;
 				}
-				if (!activeAxis || isInputtedTouch || flag)
+				if ((!activeAxis || isInputtedTouch) | flag)
 				{
 					if (self.IsOnCannonMode())
 					{
@@ -1267,7 +1113,7 @@ public class SelfController : ControllerBase
 					{
 						self.UpdateCannonAimMode(this.touchInfo.axisNoLimit, this.touchInfo.position);
 						slideTimer = 0f;
-						slideVerocity = Vector3.get_zero();
+						slideVerocity = Vector3.zero;
 					}
 					return;
 				}
@@ -1296,13 +1142,13 @@ public class SelfController : ControllerBase
 		if (stickInfo != null)
 		{
 			Vector2 axis = stickInfo.axis;
-			float magnitude = axis.get_magnitude();
+			float magnitude = axis.magnitude;
 			float num3 = 0f;
 			if (flag)
 			{
 				num3 = parameter.guardMoveThreshold;
 			}
-			if (Time.get_time() - stickInfo.beginTime >= parameter.inputMoveStartTime)
+			if (Time.time - stickInfo.beginTime >= parameter.inputMoveStartTime)
 			{
 				if (touchInfo != stickInfo && IsCancelAble(null))
 				{
@@ -1311,24 +1157,24 @@ public class SelfController : ControllerBase
 				moveStickInfo = stickInfo;
 				if (magnitude > num3 && self.IsChangeableAction(Character.ACTION_ID.MOVE))
 				{
-					Vector3 right = cameraTransform.get_right();
-					Vector3 forward = cameraTransform.get_forward();
+					Vector3 right = cameraTransform.right;
+					Vector3 forward = cameraTransform.forward;
 					forward.y = 0f;
 					forward.Normalize();
 					if (parameter.alwaysTopSpeed)
 					{
 						axis.Normalize();
 					}
-					Vector3 val = (!(self.actionTarget != null)) ? (right * axis.x * parameter.moveForwardSpeed + forward * axis.y * parameter.moveForwardSpeed) : (right * axis.x * parameter.moveSideSpeed + forward * axis.y * parameter.moveForwardSpeed);
+					Vector3 vector = (!(self.actionTarget != null)) ? (right * axis.x * parameter.moveForwardSpeed + forward * axis.y * parameter.moveForwardSpeed) : (right * axis.x * parameter.moveSideSpeed + forward * axis.y * parameter.moveForwardSpeed);
 					if (flag)
 					{
-						self.ActGuardWalk((!parameter.enableRootMotion) ? val : Vector3.get_zero(), parameter.guardMoveSyncSpeed, val.get_normalized());
-						val = forward;
+						self.ActGuardWalk(parameter.enableRootMotion ? Vector3.zero : vector, parameter.guardMoveSyncSpeed, vector.normalized);
+						vector = forward;
 					}
 					else if (self.IsCarrying())
 					{
-						self.ActCarryWalk((!parameter.enableRootMotion) ? val : Vector3.get_zero(), parameter.moveForwardSpeed, val.get_normalized());
-						val = forward;
+						self.ActCarryWalk(parameter.enableRootMotion ? Vector3.zero : vector, parameter.moveForwardSpeed, vector.normalized);
+						vector = forward;
 					}
 					else
 					{
@@ -1336,20 +1182,20 @@ public class SelfController : ControllerBase
 						if (IsValidSlideProc())
 						{
 							flag11 = false;
-							slideSlowTimer += Time.get_deltaTime();
-							float num4 = Mathf.Clamp01(slideSlowTimer / GetParamNeedTimeToMaxTime());
-							val *= Mathf.Lerp(0f, 1f, num4);
+							slideSlowTimer += Time.deltaTime;
+							float t = Mathf.Clamp01(slideSlowTimer / GetParamNeedTimeToMaxTime());
+							vector *= Mathf.Lerp(0f, 1f, t);
 						}
 						Character.MOTION_ID motion_id = Character.MOTION_ID.WALK;
-						character.ActMoveVelocity((!flag11) ? val : Vector3.get_zero(), parameter.moveForwardSpeed, motion_id);
-						character.SetLerpRotation(val);
+						character.ActMoveVelocity(flag11 ? Vector3.zero : vector, parameter.moveForwardSpeed, motion_id);
+						character.SetLerpRotation(vector);
 						slideTimer = 0f;
-						slideVerocity = val;
+						slideVerocity = vector;
 					}
 					InGameTutorialManager component = MonoBehaviourSingleton<AppMain>.I.GetComponent<InGameTutorialManager>();
-					if (val.get_sqrMagnitude() > 0f && component != null)
+					if (vector.sqrMagnitude > 0f && component != null)
 					{
-						component.TutorialMoveTime += Time.get_deltaTime();
+						component.TutorialMoveTime += Time.deltaTime;
 					}
 					flag10 = true;
 				}
@@ -1375,27 +1221,27 @@ public class SelfController : ControllerBase
 			}
 			if (character.actionID == Character.ACTION_ID.MAX && !((Player)character).enableCancelToAttack)
 			{
-				slideVerocity = this.get_transform().get_forward() * GetParamAvoidSpeed();
+				slideVerocity = base.transform.forward * GetParamAvoidSpeed();
 				slideTimer = 0f;
 			}
 			else
 			{
 				float paramSlideTime = GetParamSlideTime();
-				if (IsValidSlideProc() && slideVerocity.get_sqrMagnitude() > 0.1f && slideTimer < paramSlideTime)
+				if (IsValidSlideProc() && slideVerocity.sqrMagnitude > 0.1f && slideTimer < paramSlideTime)
 				{
-					slideTimer += Time.get_deltaTime();
-					float num5 = slideTimer / paramSlideTime - 1f;
-					Vector3 val2 = -slideVerocity * (num5 * num5 * num5 + 1f) + slideVerocity;
-					character.ActMoveInertia(ref val2);
+					slideTimer += Time.deltaTime;
+					float num4 = slideTimer / paramSlideTime - 1f;
+					Vector3 vector2 = -slideVerocity * (num4 * num4 * num4 + 1f) + slideVerocity;
+					character.ActMoveInertia(ref vector2);
 				}
 				else
 				{
-					slideVerocity = Vector3.get_zero();
+					slideVerocity = Vector3.zero;
 					slideTimer = 0f;
 				}
 			}
 		}
-		if (self.attackMode == Player.ATTACK_MODE.ARROW && moveStickInfo != null && moveStickInfo.axis != Vector2.get_zero())
+		if (self.attackMode == Player.ATTACK_MODE.ARROW && moveStickInfo != null && moveStickInfo.axis != Vector2.zero)
 		{
 			self.SetArrowAimBossModeStartSign(moveStickInfo.axis);
 		}
@@ -1403,29 +1249,8 @@ public class SelfController : ControllerBase
 
 	protected Vector3 GetStickVec(Vector2 stick_vec, Transform camera_transform)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 right = camera_transform.get_right();
-		Vector3 forward = camera_transform.get_forward();
+		Vector3 right = camera_transform.right;
+		Vector3 forward = camera_transform.forward;
 		forward.y = 0f;
 		forward.Normalize();
 		if (parameter.alwaysTopSpeed)
@@ -1480,9 +1305,13 @@ public class SelfController : ControllerBase
 
 	private bool IsValidSlideProc()
 	{
-		bool flag = character.IsHittingIceFloor() || character.IsValidBuff(BuffParam.BUFFTYPE.SLIDE) || character.buffParam.IsValidFieldBuff(BuffParam.BUFFTYPE.SLIDE_ICE);
-		bool flag2 = self.thsCtrl.IsActiveIai() || self.snatchCtrl.IsMove() || self.snatchCtrl.IsMoveLoop();
-		return flag && !flag2 && !character.isDead;
+		bool num = character.IsHittingIceFloor() || character.IsValidBuff(BuffParam.BUFFTYPE.SLIDE) || character.buffParam.IsValidFieldBuff(BuffParam.BUFFTYPE.SLIDE_ICE);
+		bool flag = self.thsCtrl.IsActiveIai() || self.snatchCtrl.IsMove() || self.snatchCtrl.IsMoveLoop();
+		if (num && !flag)
+		{
+			return !character.isDead;
+		}
+		return false;
 	}
 
 	public bool OnSkillButtonPress(int skill_index)

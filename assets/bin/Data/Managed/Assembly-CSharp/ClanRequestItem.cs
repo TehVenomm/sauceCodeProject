@@ -67,18 +67,16 @@ public class ClanRequestItem : UIBehaviour
 
 	protected virtual void SetClearGauge(Transform t, int count, int needCount)
 	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = FindCtrl(t, UI.SPR_GAUGE);
-		if (val != null)
+		Transform transform = FindCtrl(t, UI.SPR_GAUGE);
+		if (transform != null)
 		{
 			if (needCount == 0)
 			{
-				val.set_localScale(new Vector3(0f, 1f, 1f));
+				transform.localScale = new Vector3(0f, 1f, 1f);
 			}
 			else
 			{
-				val.set_localScale(new Vector3(Mathf.Clamp((float)count / (float)needCount, 0f, 1f), 1f, 1f));
+				transform.localScale = new Vector3(Mathf.Clamp((float)count / (float)needCount, 0f, 1f), 1f, 1f);
 			}
 		}
 		SetLabelText(t, UI.LBL_GAUGE, count.ToString() + "/" + needCount.ToString());
@@ -97,27 +95,27 @@ public class ClanRequestItem : UIBehaviour
 
 	public static string GetRemainTimeText(TimeSpan span)
 	{
-		string empty = string.Empty;
+		string text = "";
 		if (span.Seconds > 0)
 		{
 			span = span.Add(TimeSpan.FromMinutes(1.0));
 		}
 		if (span.Days > 0)
 		{
-			return empty + string.Format(StringTable.Get(STRING_CATEGORY.TIME, 0u), span.Days);
+			return text + string.Format(StringTable.Get(STRING_CATEGORY.TIME, 0u), span.Days);
 		}
 		if (span.Hours > 0)
 		{
-			return empty + string.Format(StringTable.Get(STRING_CATEGORY.TIME, 1u), span.Hours);
+			return text + string.Format(StringTable.Get(STRING_CATEGORY.TIME, 1u), span.Hours);
 		}
 		if (span.Minutes > 0)
 		{
-			return empty + string.Format(StringTable.Get(STRING_CATEGORY.TIME, 2u), span.Minutes);
+			return text + string.Format(StringTable.Get(STRING_CATEGORY.TIME, 2u), span.Minutes);
 		}
-		if (empty == string.Empty)
+		if (text == "")
 		{
 			return string.Format(StringTable.Get(STRING_CATEGORY.TIME, 2u), 0);
 		}
-		return empty;
+		return text;
 	}
 }

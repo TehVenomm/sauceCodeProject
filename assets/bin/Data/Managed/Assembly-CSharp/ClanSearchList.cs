@@ -49,17 +49,17 @@ public class ClanSearchList : GameSection
 	{
 		if (!ClanMatchingManager.IsValidNotEmptyList())
 		{
-			SetActive((Enum)UI.GRD_CLAN, is_visible: false);
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: true);
-			SetLabelText((Enum)UI.LBL_MAX, "0");
-			SetLabelText((Enum)UI.LBL_NOW, "0");
+			SetActive(UI.GRD_CLAN, is_visible: false);
+			SetActive(UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.OBJ_ACTIVE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, is_visible: true);
+			SetLabelText(UI.LBL_MAX, "0");
+			SetLabelText(UI.LBL_NOW, "0");
 			return;
 		}
 		clans = MonoBehaviourSingleton<ClanMatchingManager>.I.clans.ToArray();
-		SetActive((Enum)UI.GRD_CLAN, is_visible: true);
-		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		SetActive(UI.GRD_CLAN, is_visible: true);
+		SetActive(UI.STR_NON_LIST, is_visible: false);
 		ClanData[] showList = clans;
 		Array.Sort(showList, delegate(ClanData a, ClanData b)
 		{
@@ -111,17 +111,17 @@ public class ClanSearchList : GameSection
 		});
 		pageMax = 1 + (showList.Length - 1) / 10;
 		bool flag = pageMax > 1;
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
-		SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
+		SetActive(UI.OBJ_ACTIVE_ROOT, flag);
+		SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
+		SetLabelText(UI.LBL_MAX, pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, nowPage.ToString());
 		int num = 10 * (nowPage - 1);
 		if (showList.Length <= num)
 		{
 			num = 0;
 			nowPage = 1;
 		}
-		int num2 = (nowPage != pageMax) ? 10 : (showList.Length - num);
+		int num2 = (nowPage == pageMax) ? (showList.Length - num) : 10;
 		ClanData[] array = new ClanData[num2];
 		Array.Copy(showList, num, array, 0, num2);
 		showList = array;
@@ -130,19 +130,19 @@ public class ClanSearchList : GameSection
 			SetEvent(t, "SELECT", i);
 			SetListItemData(showList[i], t);
 		});
-		SetLabelText((Enum)UI.STR_SORT, GetSortString(sortType));
+		SetLabelText(UI.STR_SORT, GetSortString(sortType));
 		base.UpdateUI();
 	}
 
 	public override void Initialize()
 	{
 		MonoBehaviourSingleton<ClanMatchingManager>.I.ResetSearchRequest();
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		yield return this.StartCoroutine(Reload());
+		yield return StartCoroutine(Reload());
 		base.Initialize();
 	}
 
@@ -186,34 +186,33 @@ public class ClanSearchList : GameSection
 		SetLabelText(t, UI.LBL_CLAN_LABEL, StringTable.Get(STRING_CATEGORY.CLAN_LABEL, (uint)clan.lbl));
 		if (FindCtrl(t, UI.OBJ_SYMBOL_MARK) == null)
 		{
-			this.StartCoroutine(CreateSymbolMark(clan, t));
+			StartCoroutine(CreateSymbolMark(clan, t));
 		}
 		else
 		{
-			base.GetComponent<SymbolMarkCtrl>(t, (Enum)UI.OBJ_SYMBOL_MARK).LoadSymbol(clan.sym);
+			GetComponent<SymbolMarkCtrl>(t, UI.OBJ_SYMBOL_MARK).LoadSymbol(clan.sym);
 		}
 	}
 
 	private IEnumerator CreateSymbolMark(ClanData clan, Transform t)
 	{
-		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject symbolMarkLoadObj = load_queue.Load(RESOURCE_CATEGORY.UI, "ClanSymbolMark");
-		yield return load_queue.Wait();
-		GameObject obj = symbolMarkLoadObj.loadedObject as GameObject;
-		Transform item = ResourceUtility.Realizes(obj, 5);
-		item.set_parent(FindCtrl(t, UI.OBJ_SYMBOL));
-		item.set_localScale(Vector3.get_one());
-		item.set_localPosition(Vector3.get_zero());
-		item.set_name("OBJ_SYMBOL_MARK");
-		SymbolMarkCtrl symbolMark = item.GetComponent<SymbolMarkCtrl>();
-		symbolMark.Initilize();
-		symbolMark.LoadSymbol(clan.sym);
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject symbolMarkLoadObj = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ClanSymbolMark");
+		yield return loadingQueue.Wait();
+		Transform transform = ResourceUtility.Realizes(symbolMarkLoadObj.loadedObject as GameObject, 5);
+		transform.parent = FindCtrl(t, UI.OBJ_SYMBOL);
+		transform.localScale = Vector3.one;
+		transform.localPosition = Vector3.zero;
+		transform.name = "OBJ_SYMBOL_MARK";
+		SymbolMarkCtrl component = transform.GetComponent<SymbolMarkCtrl>();
+		component.Initilize();
+		component.LoadSymbol(clan.sym);
 	}
 
 	private void OnQuery_RELOAD()
 	{
 		GameSection.StayEvent();
-		this.StartCoroutine(Reload(delegate(bool b)
+		StartCoroutine(Reload(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b);
 		}));
@@ -247,7 +246,7 @@ public class ClanSearchList : GameSection
 
 	private void OnQuery_PAGE_PREV()
 	{
-		nowPage = ((nowPage <= 1) ? pageMax : (nowPage - 1));
+		nowPage = ((nowPage > 1) ? (nowPage - 1) : pageMax);
 		RefreshUI();
 	}
 

@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -54,28 +53,28 @@ public class QuestRushSelectList : QuestEventSelectList
 		bool isCarnival = MonoBehaviourSingleton<DeliveryManager>.I.IsCarnivalEvent(eventData.eventId);
 		if (!isCarnival)
 		{
-			yield return this.StartCoroutine(GetCurrentStatus());
+			yield return StartCoroutine(GetCurrentStatus());
 		}
-		SetActive((Enum)UI.OBJ_CURRENT_STATUS, !isCarnival);
-		SetActive((Enum)UI.OBJ_NEXT_REWARD_ROOT, !isCarnival);
-		SetActive((Enum)UI.SPR_NORMAL_INFO, !isCarnival);
-		SetActive((Enum)UI.SPR_CARNIVAL_INFO, isCarnival);
-		yield return this.StartCoroutine(base.DoInitialize());
+		SetActive(UI.OBJ_CURRENT_STATUS, !isCarnival);
+		SetActive(UI.OBJ_NEXT_REWARD_ROOT, !isCarnival);
+		SetActive(UI.SPR_NORMAL_INFO, !isCarnival);
+		SetActive(UI.SPR_CARNIVAL_INFO, isCarnival);
+		yield return StartCoroutine(base.DoInitialize());
 	}
 
 	protected override void UpdateTable()
 	{
 		if (currentData != null)
 		{
-			SetLabelText((Enum)UI.LBL_CURRENT_POINT, StringTable.Format(STRING_CATEGORY.RUSH, 0u, currentData.point));
+			SetLabelText(UI.LBL_CURRENT_POINT, StringTable.Format(STRING_CATEGORY.RUSH, 0u, currentData.point));
 		}
-		SetLabelText((Enum)UI.LBL_POINT_TITLE, StringTable.Get(STRING_CATEGORY.RUSH, 1u));
+		SetLabelText(UI.LBL_POINT_TITLE, StringTable.Get(STRING_CATEGORY.RUSH, 1u));
 		if (currentData != null && currentData.reward != null && currentData.reward.reward.Count > 0)
 		{
-			SetActive((Enum)UI.OBJ_NEXT_REWARD_ROOT, is_visible: true);
-			SetLabelText((Enum)UI.LBL_NEXT_POINT, StringTable.Format(STRING_CATEGORY.RUSH, 0u, currentData.reward.point));
+			SetActive(UI.OBJ_NEXT_REWARD_ROOT, is_visible: true);
+			SetLabelText(UI.LBL_NEXT_POINT, StringTable.Format(STRING_CATEGORY.RUSH, 0u, currentData.reward.point));
 			int num = Mathf.Min(2, currentData.reward.reward.Count);
-			string text = string.Empty;
+			string text = "";
 			for (int j = 0; j < num; j++)
 			{
 				QuestRushPointModel.Param.Reward reward = currentData.reward.reward[j];
@@ -94,18 +93,17 @@ public class QuestRushSelectList : QuestEventSelectList
 			}
 			if (currentData.reward.reward.Count == 1)
 			{
-				SetActive((Enum)UI.OBJ_NEXT_REWARD_ICON_POS2, is_visible: false);
+				SetActive(UI.OBJ_NEXT_REWARD_ICON_POS2, is_visible: false);
 			}
-			SetLabelText((Enum)UI.LBL_NEXT_REWARD_NAME, text);
+			SetLabelText(UI.LBL_NEXT_REWARD_NAME, text);
 			GetCtrl(UI.GRD_NEXT_ICON).GetComponent<UIGrid>().Reposition();
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_NEXT_REWARD_ROOT, is_visible: false);
+			SetActive(UI.OBJ_NEXT_REWARD_ROOT, is_visible: false);
 		}
 		int num2 = 0;
-		int count = stories.Count;
-		if (count > 0)
+		if (stories.Count > 0)
 		{
 			num2++;
 		}
@@ -117,14 +115,14 @@ public class QuestRushSelectList : QuestEventSelectList
 		}
 		if (deliveryInfo == null || num3 == 0)
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
-			SetActive((Enum)UI.TBL_DELIVERY_QUEST, is_visible: false);
+			SetActive(UI.STR_DELIVERY_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_DELIVERY_QUEST, is_visible: false);
+			SetActive(UI.TBL_DELIVERY_QUEST, is_visible: false);
 			return;
 		}
-		SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: false);
-		SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
-		SetActive((Enum)UI.TBL_DELIVERY_QUEST, is_visible: true);
+		SetActive(UI.STR_DELIVERY_NON_LIST, is_visible: false);
+		SetActive(UI.GRD_DELIVERY_QUEST, is_visible: false);
+		SetActive(UI.TBL_DELIVERY_QUEST, is_visible: true);
 		int questStartIndex = 0;
 		questStartIndex++;
 		int completedStartIndex = deliveryInfo.Length + questStartIndex;
@@ -135,18 +133,18 @@ public class QuestRushSelectList : QuestEventSelectList
 			storyStartIndex++;
 		}
 		Transform ctrl2 = GetCtrl(UI.TBL_DELIVERY_QUEST);
-		if (Object.op_Implicit(ctrl2))
+		if ((bool)ctrl2)
 		{
 			int k = 0;
-			for (int childCount = ctrl2.get_childCount(); k < childCount; k++)
+			for (int childCount = ctrl2.childCount; k < childCount; k++)
 			{
 				Transform child = ctrl2.GetChild(0);
-				child.set_parent(null);
-				Object.Destroy(child.get_gameObject());
+				child.parent = null;
+				Object.Destroy(child.gameObject);
 			}
 		}
 		bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num3, reset: false, delegate(int i, Transform parent)
+		SetTable(UI.TBL_DELIVERY_QUEST, "", num3, reset: false, delegate(int i, Transform parent)
 		{
 			Transform result = null;
 			if (i >= storyStartIndex)
@@ -202,8 +200,7 @@ public class QuestRushSelectList : QuestEventSelectList
 				}
 			}
 		});
-		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-		component.set_enabled(true);
+		GetComponent<UIScrollView>(UI.SCR_DELIVERY_QUEST).enabled = true;
 		RepositionTable();
 	}
 
@@ -212,14 +209,14 @@ public class QuestRushSelectList : QuestEventSelectList
 		int num = deliveryInfo.Length + clearedDeliveries.Count;
 		if (deliveryInfo == null || num == 0)
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
+			SetActive(UI.STR_DELIVERY_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_DELIVERY_QUEST, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: false);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: true);
-			SetDynamicList((Enum)UI.GRD_DELIVERY_QUEST, "QuestRequestItemRush", num, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+			SetActive(UI.STR_DELIVERY_NON_LIST, is_visible: false);
+			SetActive(UI.GRD_DELIVERY_QUEST, is_visible: true);
+			SetDynamicList(UI.GRD_DELIVERY_QUEST, "QuestRequestItemRush", num, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 			{
 				SetActive(t, is_visible: true);
 				DeliveryTable.DeliveryData deliveryData = null;
@@ -276,9 +273,9 @@ public class QuestRushSelectList : QuestEventSelectList
 	private void OnQuery_SELECT_RUSH()
 	{
 		int num = (int)GameSection.GetEventData();
-		bool flag = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(deliveryInfo[num].dId);
+		bool num2 = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(deliveryInfo[num].dId);
 		int delivery_id = deliveryInfo[num].dId;
-		if (flag)
+		if (num2)
 		{
 			DeliveryTable.DeliveryData table = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryInfo[num].dId);
 			changeToDeliveryClearEvent = true;
@@ -366,8 +363,7 @@ public class QuestRushSelectList : QuestEventSelectList
 	private void OnQuery_SELECT_COMPLETED_RUSH()
 	{
 		int index = (int)GameSection.GetEventData();
-		DeliveryTable.DeliveryData deliveryData = clearedDeliveries[index];
-		int id = (int)deliveryData.id;
+		int id = (int)clearedDeliveries[index].id;
 		DeliveryRewardList deliveryRewardList = new DeliveryRewardList();
 		GameSection.SetEventData(new object[3]
 		{
@@ -391,8 +387,8 @@ public class QuestRushSelectList : QuestEventSelectList
 		GameSection.SetEventData(new object[4]
 		{
 			story.id,
-			string.Empty,
-			string.Empty,
+			"",
+			"",
 			array
 		});
 	}
@@ -405,14 +401,13 @@ public class QuestRushSelectList : QuestEventSelectList
 	private IEnumerator GetCurrentStatus()
 	{
 		bool isRequest = true;
-		Protocol.Send<QuestRushPointModel.RequestSendForm, QuestRushPointModel>(postData: new QuestRushPointModel.RequestSendForm
-		{
-			eid = eventData.eventId
-		}, url: QuestRushPointModel.URL, callBack: (Action<QuestRushPointModel>)delegate(QuestRushPointModel result)
+		QuestRushPointModel.RequestSendForm requestSendForm = new QuestRushPointModel.RequestSendForm();
+		requestSendForm.eid = eventData.eventId;
+		Protocol.Send(QuestRushPointModel.URL, requestSendForm, delegate(QuestRushPointModel result)
 		{
 			isRequest = false;
 			currentData = result.result;
-		}, getParam: string.Empty);
+		});
 		while (isRequest)
 		{
 			yield return null;
@@ -421,9 +416,8 @@ public class QuestRushSelectList : QuestEventSelectList
 
 	protected override void OnQuery_INFO()
 	{
-		string arg = base.eventData.linkName + "_REWARD";
-		string eventData = string.Format(WebViewManager.NewsWithLinkParamFormat, arg);
-		GameSection.SetEventData(eventData);
+		string arg = eventData.linkName + "_REWARD";
+		GameSection.SetEventData(string.Format(WebViewManager.NewsWithLinkParamFormat, arg));
 	}
 
 	private void OnQuery_HOW_TO()

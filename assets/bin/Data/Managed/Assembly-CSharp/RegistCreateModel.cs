@@ -4,7 +4,7 @@ public class RegistCreateModel : BaseModel
 {
 	public class Param
 	{
-		public string uh = string.Empty;
+		public string uh = "";
 
 		public int userId;
 

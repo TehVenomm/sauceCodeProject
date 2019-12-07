@@ -21,12 +21,11 @@ public class Coop_Model_RegisterACK : Coop_Model_ACK
 
 	public override string ToString()
 	{
-		string text = string.Empty;
+		string text = "";
 		int i = 0;
 		for (int count = ids.Count; i < count; i++)
 		{
-			string text2 = text;
-			text = text2 + "(" + ids[i] + "," + stgids[i] + "," + stgidxs[i] + "," + stghosts[i] + "),";
+			text = text + "(" + ids[i] + "," + stgids[i] + "," + stgidxs[i] + "," + stghosts[i].ToString() + "),";
 		}
 		return base.ToString() + ",clients=" + text;
 	}

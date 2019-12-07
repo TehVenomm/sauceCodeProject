@@ -82,12 +82,11 @@ public static class QuestUtility
 
 	public static string CreateTimeStringByMilliSec(int milliSecond)
 	{
-		float num = 0.001f;
-		int num2 = (int)((float)milliSecond * 0.001f);
-		int num3 = num2 / 60;
-		num2 %= 60;
+		int num = (int)((float)milliSecond * 0.001f);
+		int num2 = num / 60;
+		num %= 60;
 		milliSecond %= 1000;
-		return $"{num3:d2}:{num2:d2}.{milliSecond:d3}";
+		return $"{num2:d2}:{num:d2}.{milliSecond:d3}";
 	}
 
 	public static string CreateTimeStringByMilliSecSeriesArena(int milliSecond)
@@ -173,7 +172,7 @@ public static class QuestUtility
 		{
 			if (!Singleton<EquipItemTable>.I.IsWeapon(allowTypes[i]))
 			{
-				Debug.LogError((object)"武器のチェックに武器以外のタイプが渡されています(無視されます)");
+				Debug.LogError("武器のチェックに武器以外のタイプが渡されています(無視されます)");
 			}
 		}
 		int j = 0;
@@ -223,7 +222,7 @@ public static class QuestUtility
 
 	public static string GetLimitText(ArenaTable.ArenaData arenaData)
 	{
-		string text = string.Empty;
+		string text = "";
 		int i = 0;
 		for (int num = arenaData.limits.Length; i < num; i++)
 		{
@@ -242,7 +241,7 @@ public static class QuestUtility
 
 	public static string GetConditionText(ArenaTable.ArenaData arenaData)
 	{
-		string text = string.Empty;
+		string text = "";
 		int i = 0;
 		for (int num = arenaData.conditions.Length; i < num; i++)
 		{
@@ -267,14 +266,13 @@ public static class QuestUtility
 
 	public static string GetArenaTitle(ARENA_GROUP group, string subTitle)
 	{
-		string str = StringTable.Format(STRING_CATEGORY.ARENA, 0u, group);
-		return str + " " + subTitle;
+		return StringTable.Format(STRING_CATEGORY.ARENA, 0u, group) + " " + subTitle;
 	}
 
 	public static string GetArenaTitle(ARENA_GROUP group, ARENA_RANK rank)
 	{
 		string arg = StringTable.Format(STRING_CATEGORY.ARENA, 0u, group);
-		string text = StringTable.Format(STRING_CATEGORY.ARENA, 1u, rank);
+		StringTable.Format(STRING_CATEGORY.ARENA, 1u, rank);
 		return arg + " " + rank;
 	}
 

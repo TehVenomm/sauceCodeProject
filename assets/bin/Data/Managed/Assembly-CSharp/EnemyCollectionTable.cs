@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 [Obsolete]
 public class EnemyCollectionTable : Singleton<EnemyCollectionTable>, IDataTable
@@ -34,12 +33,6 @@ public class EnemyCollectionTable : Singleton<EnemyCollectionTable>, IDataTable
 	}
 
 	private UIntKeyTable<EnemyCollectionData> enemyCollectionTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<EnemyCollectionData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<EnemyCollectionData> _003C_003Ef__mg_0024cache1;
 
 	public void CreateTable(string csv_text)
 	{

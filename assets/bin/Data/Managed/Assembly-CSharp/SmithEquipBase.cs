@@ -48,15 +48,15 @@ public abstract class SmithEquipBase : SkillInfoBase
 	private void SetupUIFunc()
 	{
 		updateTopAreaUI = null;
-		switch (type)
+		EquipDialogType equipDialogType = type;
+		if ((uint)equipDialogType <= 1u || equipDialogType != EquipDialogType.RESULT)
 		{
-		default:
 			updateTopAreaUI = (Action)Delegate.Combine(updateTopAreaUI, GetEquipInfoFunc());
 			updateTopAreaUI = (Action)Delegate.Combine(updateTopAreaUI, new Action(EquipImg));
-			break;
-		case EquipDialogType.RESULT:
+		}
+		else
+		{
 			updateTopAreaUI = (Action)Delegate.Combine(updateTopAreaUI, new Action(EquipImg));
-			break;
 		}
 		updateMiddleAreaUI = null;
 		switch (type)

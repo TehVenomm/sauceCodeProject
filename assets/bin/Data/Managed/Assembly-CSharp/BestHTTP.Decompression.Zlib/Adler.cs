@@ -16,7 +16,7 @@ namespace BestHTTP.Decompression.Zlib
 			uint num2 = (adler >> 16) & 0xFFFF;
 			while (len > 0)
 			{
-				int num3 = (len >= NMAX) ? NMAX : len;
+				int num3 = (len < NMAX) ? len : NMAX;
 				len -= num3;
 				while (num3 >= 16)
 				{

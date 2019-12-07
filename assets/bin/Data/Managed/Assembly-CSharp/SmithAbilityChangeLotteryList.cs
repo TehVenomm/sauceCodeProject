@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -36,19 +35,19 @@ public class SmithAbilityChangeLotteryList : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	protected virtual IEnumerator DoInitialize()
 	{
-		object[] datas = GameSection.GetEventData() as object[];
-		EquipItemInfo info = datas[0] as EquipItemInfo;
-		SmithEquipBase.SmithType smithType = (SmithEquipBase.SmithType)datas[1];
+		object[] obj = GameSection.GetEventData() as object[];
+		EquipItemInfo equipItemInfo = obj[0] as EquipItemInfo;
+		SmithEquipBase.SmithType smithType = (SmithEquipBase.SmithType)obj[1];
 		bool wait = true;
 		switch (smithType)
 		{
 		case SmithEquipBase.SmithType.ABILITY_CHANGE:
-			MonoBehaviourSingleton<SmithManager>.I.SendGetAbilityList(info.uniqueID, delegate(Error error, List<SmithGetAbilityList.Param> list)
+			MonoBehaviourSingleton<SmithManager>.I.SendGetAbilityList(equipItemInfo.uniqueID, delegate(Error error, List<SmithGetAbilityList.Param> list)
 			{
 				wait = false;
 				SetAbilities(list);
@@ -113,8 +112,8 @@ public class SmithAbilityChangeLotteryList : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
-		SetDynamicList((Enum)UI.GRD_ABILITY, "SmithAbilityChangeLotteryListItem", abilities.Count, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int index, Transform t, bool reset)
+		SetLabelText(UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
+		SetDynamicList(UI.GRD_ABILITY, "SmithAbilityChangeLotteryListItem", abilities.Count, reset: false, null, null, delegate(int index, Transform t, bool reset)
 		{
 			EquipItemAbility equipItemAbility = abilities[index];
 			MinMaxAp minMaxAp = minMaxAps[index];
@@ -136,8 +135,8 @@ public class SmithAbilityChangeLotteryList : GameSection
 
 	private void GetAbilityDetail(EquipItemAbility ability, int minAp, int maxAp, out string ap, out string description)
 	{
-		ap = string.Empty;
-		description = string.Empty;
+		ap = "";
+		description = "";
 		if (minAp == maxAp)
 		{
 			ap = "+" + minAp.ToString();

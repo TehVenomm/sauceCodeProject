@@ -33,7 +33,7 @@ public class HomePointShopEventDetail : GameSection
 	{
 		data = (GameSection.GetEventData() as PointShop);
 		currentPage = 1;
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -55,7 +55,7 @@ public class HomePointShopEventDetail : GameSection
 		UITexture component2 = GetCtrl(UI.TEX_EVENT_POP).GetComponent<UITexture>();
 		ResourceLoad.LoadPointIconImageTexture(component, (uint)data.pointShopId);
 		ResourceLoad.LoadPointShopBGTexture(component2, (uint)data.pointShopId);
-		SetLabelText((Enum)UI.LBL_POINT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), data.userPoint));
+		SetLabelText(UI.LBL_POINT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), data.userPoint));
 		SetList();
 	}
 
@@ -71,8 +71,8 @@ public class HomePointShopEventDetail : GameSection
 		{
 			maxPage++;
 		}
-		SetLabelText((Enum)UI.LBL_ARROW_NOW, (maxPage <= 0) ? "0" : currentPage.ToString());
-		SetLabelText((Enum)UI.LBL_ARROW_MAX, maxPage.ToString());
+		SetLabelText(UI.LBL_ARROW_NOW, (maxPage > 0) ? currentPage.ToString() : "0");
+		SetLabelText(UI.LBL_ARROW_MAX, maxPage.ToString());
 		int item_num = Mathf.Min(GameDefine.POINT_SHOP_LIST_COUNT, currentPointShopItem.Count - (currentPage - 1) * GameDefine.POINT_SHOP_LIST_COUNT);
 		SetGrid(UI.GRD_LIST, "PointShopListItem", item_num, reset: true, delegate(int i, Transform t, bool b)
 		{
@@ -85,8 +85,7 @@ public class HomePointShopEventDetail : GameSection
 				new Action<PointShopItem, int>(OnBuy)
 			};
 			SetEvent(t, "CONFIRM_BUY", event_data);
-			PointShopItemList component = t.GetComponent<PointShopItemList>();
-			component.SetUp(pointShopItem, (uint)data.pointShopId, pointShopItem.needPoint <= data.userPoint);
+			t.GetComponent<PointShopItemList>().SetUp(pointShopItem, (uint)data.pointShopId, pointShopItem.needPoint <= data.userPoint);
 			int num = -1;
 			REWARD_TYPE type = (REWARD_TYPE)pointShopItem.type;
 			if (type == REWARD_TYPE.ITEM)
@@ -100,10 +99,9 @@ public class HomePointShopEventDetail : GameSection
 
 	private void OnQuery_CONFIRM_BUY()
 	{
-		object[] array = GameSection.GetEventData() as object[];
-		PointShopItem pointShopItem = array[0] as PointShopItem;
-		PointShop pointShop = array[1] as PointShop;
-		if (pointShop.userPoint < pointShopItem.needPoint)
+		object[] obj = GameSection.GetEventData() as object[];
+		PointShopItem pointShopItem = obj[0] as PointShopItem;
+		if ((obj[1] as PointShop).userPoint < pointShopItem.needPoint)
 		{
 			GameSection.ChangeEvent("SHORTAGE_POINT");
 		}
@@ -134,7 +132,7 @@ public class HomePointShopEventDetail : GameSection
 				RefreshUI();
 			}
 			GameSection.ResumeEvent(result != null && result.Error == Error.None);
-		}, string.Empty);
+		});
 	}
 
 	private void OnQuery_PAGE_NEXT()
@@ -181,10 +179,10 @@ public class HomePointShopEventDetail : GameSection
 	private List<PointShopItem> GetBuyableItemList()
 	{
 		return (from x in data.items
-		where x.isBuyable
-		where x.type != 8 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedStamp(x.itemId)
-		where x.type != 9 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedDegree(x.itemId)
-		where x.type != 7 || !MonoBehaviourSingleton<GlobalSettingsManager>.I.IsUnlockedAvatar(x.itemId)
-		select x).ToList();
+			where x.isBuyable
+			where x.type != 8 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedStamp(x.itemId)
+			where x.type != 9 || !MonoBehaviourSingleton<UserInfoManager>.I.IsUnlockedDegree(x.itemId)
+			where x.type != 7 || !MonoBehaviourSingleton<GlobalSettingsManager>.I.IsUnlockedAvatar(x.itemId)
+			select x).ToList();
 	}
 }

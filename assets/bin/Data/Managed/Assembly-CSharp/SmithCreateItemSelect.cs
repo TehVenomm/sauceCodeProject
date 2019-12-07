@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class SmithCreateItemSelect : SmithEquipSelectBase
@@ -65,8 +64,8 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 		base.Initialize();
 		pickupWeapon = Singleton<CreatePickupItemTable>.I.GetPickupItemAry(SortBase.TYPE.WEAPON_ALL);
 		pickupArmor = Singleton<CreatePickupItemTable>.I.GetPickupItemAry(SortBase.TYPE.ARMOR_ALL);
-		SetActive((Enum)UI.BTN_WEAPON_PICKUP, pickupWeapon.Length > 0);
-		SetActive((Enum)UI.BTN_ARMOR_PICKUP, pickupArmor.Length > 0);
+		SetActive(UI.BTN_WEAPON_PICKUP, pickupWeapon.Length != 0);
+		SetActive(UI.BTN_ARMOR_PICKUP, pickupArmor.Length != 0);
 		selectTypeIndex = (int)Mathf.Log((float)smithCreateData.selectCreateEquipItemType, 2f);
 		string caption = (!MonoBehaviourSingleton<InventoryManager>.I.IsWeaponInventoryType(base.selectInventoryType)) ? base.sectionData.GetText("CAPTION_DEFENCE") : base.sectionData.GetText("CAPTION_WEAPON");
 		InitializeCaption(caption);
@@ -74,19 +73,24 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 
 	protected override void InitLocalInventory()
 	{
-		SmithManager.SmithCreateData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>();
-		SortBase.TYPE selectCreateEquipItemType = smithData.selectCreateEquipItemType;
+		SortBase.TYPE selectCreateEquipItemType = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>().selectCreateEquipItemType;
 		switch (selectCreateEquipItemType)
 		{
 		case SortBase.TYPE.WEAPON_ALL:
-			localInventoryEquipData = SortCompareData.CreateSortDataAry<SmithCreateItemInfo, SmithCreateSortData>(pickupWeapon, sortSettings);
+		{
+			SortCompareData[] array = localInventoryEquipData = SortCompareData.CreateSortDataAry<SmithCreateItemInfo, SmithCreateSortData>(pickupWeapon, sortSettings);
 			break;
+		}
 		case SortBase.TYPE.ARMOR_ALL:
-			localInventoryEquipData = SortCompareData.CreateSortDataAry<SmithCreateItemInfo, SmithCreateSortData>(pickupArmor, sortSettings);
+		{
+			SortCompareData[] array = localInventoryEquipData = SortCompareData.CreateSortDataAry<SmithCreateItemInfo, SmithCreateSortData>(pickupArmor, sortSettings);
 			break;
+		}
 		default:
-			localInventoryEquipData = sortSettings.CreateSortAry<SmithCreateItemInfo, SmithCreateSortData>(Singleton<CreateEquipItemTable>.I.GetCreateEquipItemDataAry(SortBaseTypeToEquipmentType(selectCreateEquipItemType)));
+		{
+			SortCompareData[] array = localInventoryEquipData = sortSettings.CreateSortAry<SmithCreateItemInfo, SmithCreateSortData>(Singleton<CreateEquipItemTable>.I.GetCreateEquipItemDataAry(SortBaseTypeToEquipmentType(selectCreateEquipItemType)));
 			break;
+		}
 		}
 		SelectingInventoryFirst();
 	}
@@ -94,25 +98,25 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 	public override void UpdateUI()
 	{
 		SmithManager.SmithBadgeData smithBadgeData = MonoBehaviourSingleton<SmithManager>.I.smithBadgeData;
-		SetBadge((Enum)UI.BTN_HELM, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.HELM), 6, 0, 0, is_scale_normalize: true);
-		SetBadge((Enum)UI.BTN_ARMOR, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ARMOR), 6, 0, 0, is_scale_normalize: true);
-		SetBadge((Enum)UI.BTN_ARM, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ARM), 6, 0, 0, is_scale_normalize: true);
-		SetBadge((Enum)UI.BTN_LEG, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.LEG), 6, 0, 0, is_scale_normalize: true);
-		SetBadge((Enum)UI.BTN_WEAPON_1, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ONE_HAND_SWORD), 6, 0, 0, is_scale_normalize: true);
-		SetBadge((Enum)UI.BTN_WEAPON_2, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.TWO_HAND_SWORD), 6, 0, 0, is_scale_normalize: true);
-		SetBadge((Enum)UI.BTN_WEAPON_3, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.SPEAR), 6, 0, 0, is_scale_normalize: true);
-		SetBadge((Enum)UI.BTN_WEAPON_4, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.PAIR_SWORDS), 6, 0, 0, is_scale_normalize: true);
-		SetBadge((Enum)UI.BTN_WEAPON_5, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ARROW), 6, 0, 0, is_scale_normalize: true);
-		SetBadge((Enum)UI.BTN_WEAPON_PICKUP, smithBadgeData.GetPickupBadgeNum(is_weapon: true), 6, 0, 0, is_scale_normalize: true);
-		SetBadge((Enum)UI.BTN_ARMOR_PICKUP, smithBadgeData.GetPickupBadgeNum(is_weapon: false), 6, 0, 0, is_scale_normalize: true);
-		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).get_parent(), pickupWeapon != null && pickupWeapon.Length > 0);
-		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).get_parent(), pickupArmor != null && pickupArmor.Length > 0);
-		base.GetComponent<UIGrid>((Enum)UI.GRD_WEAPON).Reposition();
-		base.GetComponent<UIGrid>((Enum)UI.GRD_ARMOR).Reposition();
+		SetBadge(UI.BTN_HELM, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.HELM), SpriteAlignment.BottomLeft, 0, 0, is_scale_normalize: true);
+		SetBadge(UI.BTN_ARMOR, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ARMOR), SpriteAlignment.BottomLeft, 0, 0, is_scale_normalize: true);
+		SetBadge(UI.BTN_ARM, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ARM), SpriteAlignment.BottomLeft, 0, 0, is_scale_normalize: true);
+		SetBadge(UI.BTN_LEG, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.LEG), SpriteAlignment.BottomLeft, 0, 0, is_scale_normalize: true);
+		SetBadge(UI.BTN_WEAPON_1, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ONE_HAND_SWORD), SpriteAlignment.BottomLeft, 0, 0, is_scale_normalize: true);
+		SetBadge(UI.BTN_WEAPON_2, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.TWO_HAND_SWORD), SpriteAlignment.BottomLeft, 0, 0, is_scale_normalize: true);
+		SetBadge(UI.BTN_WEAPON_3, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.SPEAR), SpriteAlignment.BottomLeft, 0, 0, is_scale_normalize: true);
+		SetBadge(UI.BTN_WEAPON_4, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.PAIR_SWORDS), SpriteAlignment.BottomLeft, 0, 0, is_scale_normalize: true);
+		SetBadge(UI.BTN_WEAPON_5, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.ARROW), SpriteAlignment.BottomLeft, 0, 0, is_scale_normalize: true);
+		SetBadge(UI.BTN_WEAPON_PICKUP, smithBadgeData.GetPickupBadgeNum(is_weapon: true), SpriteAlignment.BottomLeft, 0, 0, is_scale_normalize: true);
+		SetBadge(UI.BTN_ARMOR_PICKUP, smithBadgeData.GetPickupBadgeNum(is_weapon: false), SpriteAlignment.BottomLeft, 0, 0, is_scale_normalize: true);
+		SetActive(GetCtrl(uiTypeTab[weaponPickupIndex]).parent, pickupWeapon != null && pickupWeapon.Length != 0);
+		SetActive(GetCtrl(uiTypeTab[armorPickupIndex]).parent, pickupArmor != null && pickupArmor.Length != 0);
+		GetComponent<UIGrid>(UI.GRD_WEAPON).Reposition();
+		GetComponent<UIGrid>(UI.GRD_ARMOR).Reposition();
 		base.UpdateUI();
 		if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.FORGE_ITEM))
 		{
-			SetBadge((Enum)UI.BTN_WEAPON_3, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.SPEAR) - 1, 6, 0, 0, is_scale_normalize: true);
+			SetBadge(UI.BTN_WEAPON_3, smithBadgeData.GetBadgeNum(EQUIPMENT_TYPE.SPEAR) - 1, SpriteAlignment.BottomLeft, 0, 0, is_scale_normalize: true);
 			if (MonoBehaviourSingleton<UIManager>.I.tutorialMessage != null)
 			{
 				MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName(), "CreateItem");
@@ -122,31 +126,30 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 
 	protected override void SetupInventoryTypeToggole()
 	{
-		SmithManager.SmithCreateData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>();
-		SortBase.TYPE selectCreateEquipItemType = smithData.selectCreateEquipItemType;
+		SortBase.TYPE selectCreateEquipItemType = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>().selectCreateEquipItemType;
 		bool flag = false;
 		if (selectCreateEquipItemType < SortBase.TYPE.ARMOR || selectCreateEquipItemType == SortBase.TYPE.WEAPON_ALL)
 		{
 			flag = true;
 		}
-		SetActive((Enum)UI.OBJ_ATK_ROOT, flag);
-		SetActive((Enum)UI.OBJ_DEF_ROOT, !flag);
-		SetToggleButton((Enum)UI.TGL_BUTTON_ROOT, flag, (Action<bool>)delegate(bool is_active)
+		SetActive(UI.OBJ_ATK_ROOT, flag);
+		SetActive(UI.OBJ_DEF_ROOT, !flag);
+		SetToggleButton(UI.TGL_BUTTON_ROOT, flag, delegate(bool is_active)
 		{
-			SmithManager.SmithCreateData smithData2 = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>();
-			smithData2.selectCreateEquipItemType = (is_active ? SortBase.TYPE.ONE_HAND_SWORD : SortBase.TYPE.HELM);
+			SmithManager.SmithCreateData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>();
+			smithData.selectCreateEquipItemType = (is_active ? SortBase.TYPE.ONE_HAND_SWORD : SortBase.TYPE.HELM);
 			int num = (!is_active) ? 1 : 0;
-			ResetTween((Enum)tabAnimTarget[num], 0);
-			PlayTween((Enum)tabAnimTarget[num], forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
-			SetActive((Enum)UI.OBJ_ATK_ROOT, is_active);
-			SetActive((Enum)UI.OBJ_DEF_ROOT, !is_active);
-			selectTypeIndex = (int)Mathf.Log((float)smithData2.selectCreateEquipItemType, 2f);
+			ResetTween(tabAnimTarget[num]);
+			PlayTween(tabAnimTarget[num], forward: true, null, is_input_block: false);
+			SetActive(UI.OBJ_ATK_ROOT, is_active);
+			SetActive(UI.OBJ_DEF_ROOT, !is_active);
+			selectTypeIndex = (int)Mathf.Log((float)smithData.selectCreateEquipItemType, 2f);
 			SetDirty(InventoryUI);
 			InitSort();
 			InitLocalInventory();
 			LocalInventory();
 			UpdateTabButton();
-			if (!TutorialStep.HasAllTutorialCompleted() && smithData2.selectCreateEquipItemType == SortBase.TYPE.HELM)
+			if (!TutorialStep.HasAllTutorialCompleted() && smithData.selectCreateEquipItemType == SortBase.TYPE.HELM)
 			{
 				MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName(), "SelectArmor");
 			}
@@ -156,7 +159,7 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 	protected override void LocalInventory()
 	{
 		SetupEnableInventoryUI();
-		SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
+		SetLabelText(UI.LBL_SORT, sortSettings.GetSortLabel());
 		if (localInventoryEquipData != null)
 		{
 			SortBase.TYPE tYPE = TranslateInventoryType(selectTypeIndex);
@@ -164,7 +167,7 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 			m_generatedIconList.Clear();
 			UpdateNewIconInfo();
 			bool initItem = false;
-			SetDynamicList((Enum)InventoryUI, string.Empty, localInventoryEquipData.Length, reset: false, (Func<int, bool>)delegate(int check_index)
+			SetDynamicList(InventoryUI, "", localInventoryEquipData.Length, reset: false, delegate(int check_index)
 			{
 				SmithCreateItemInfo smithCreateItemInfo = localInventoryEquipData[check_index].GetItemData() as SmithCreateItemInfo;
 				if (smithCreateItemInfo == null)
@@ -189,12 +192,8 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 					return false;
 				}
 				SortCompareData sortCompareData = localInventoryEquipData[check_index];
-				if (sortCompareData == null || !sortCompareData.IsPriority(sortSettings.orderTypeAsc))
-				{
-					return false;
-				}
-				return true;
-			}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+				return (sortCompareData != null && sortCompareData.IsPriority(sortSettings.orderTypeAsc)) ? true : false;
+			}, null, delegate(int i, Transform t, bool is_recycle)
 			{
 				initItem = true;
 				SmithCreateItemInfo create_info = localInventoryEquipData[i].GetItemData() as SmithCreateItemInfo;
@@ -216,18 +215,7 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 							SkillSlotUIData[] skillSlotData = GetSkillSlotData(equipItemData, 0);
 							bool flag = false;
 							flag = MonoBehaviourSingleton<SmithManager>.I.NeedSmithBadge(create_info, _is_pickup);
-							SmithCreateItemSelect smithCreateItemSelect = this;
-							ITEM_ICON_TYPE icon_type = iconType;
-							int iconID = equipItemData.GetIconID(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex);
-							RARITY_TYPE? rarity = equipItemData.rarity;
-							SmithCreateSortData item_data = smithCreateSortData;
-							SkillSlotUIData[] skill_slot_data = skillSlotData;
-							bool isShowMainStatus = base.IsShowMainStatus;
-							string event_name = "SELECT_ITEM";
-							ItemIconDetail.ICON_STATUS iconStatus = smithCreateSortData.GetIconStatus();
-							bool is_new = flag;
-							GET_TYPE getType = smithCreateSortData.GetGetType();
-							ItemIcon itemIcon = smithCreateItemSelect.CreateSmithCreateItemIconDetail(icon_type, iconID, rarity, item_data, skill_slot_data, isShowMainStatus, t, event_name, i, iconStatus, is_new, -1, is_select: false, getType);
+							ItemIcon itemIcon = CreateSmithCreateItemIconDetail(iconType, equipItemData.GetIconID(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex), equipItemData.rarity, smithCreateSortData, skillSlotData, base.IsShowMainStatus, t, "SELECT_ITEM", i, smithCreateSortData.GetIconStatus(), flag, -1, is_select: false, smithCreateSortData.GetGetType());
 							itemIcon.SetItemID(smithCreateSortData.GetTableID());
 							itemIcon.SetButtonColor(localInventoryEquipData[i].IsPriority(sortSettings.orderTypeAsc), is_instant: true);
 							SetLongTouch(itemIcon.transform, "DETAIL", i);
@@ -394,8 +382,7 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 		int selectTypeIndex = base.selectTypeIndex;
 		base.selectTypeIndex = (int)GameSection.GetEventData();
 		RemoveCreateNewIcon(selectTypeIndex);
-		SmithManager.SmithCreateData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>();
-		SortBase.TYPE tYPE = smithData.selectCreateEquipItemType = TranslateInventoryType(base.selectTypeIndex);
+		SortBase.TYPE tYPE = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>().selectCreateEquipItemType = TranslateInventoryType(base.selectTypeIndex);
 		if ((selectTypeIndex >= 9 && base.selectTypeIndex < 9) || (selectTypeIndex < 9 && base.selectTypeIndex >= 9))
 		{
 			InitSort();
@@ -418,8 +405,7 @@ public class SmithCreateItemSelect : SmithEquipSelectBase
 	private void RemoveCreateNewIcon(int tab_index)
 	{
 		EQUIPMENT_TYPE type = TranslateInventoryTypeForEquipment(tab_index);
-		int badgeNum = MonoBehaviourSingleton<SmithManager>.I.smithBadgeData.GetBadgeNum(type);
-		if (badgeNum > 0)
+		if (MonoBehaviourSingleton<SmithManager>.I.smithBadgeData.GetBadgeNum(type) > 0)
 		{
 			SortBase.TYPE tYPE = TranslateInventoryType(tab_index);
 			bool is_pickup = tYPE == SortBase.TYPE.WEAPON_ALL || tYPE == SortBase.TYPE.ARMOR_ALL;

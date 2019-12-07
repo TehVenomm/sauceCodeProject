@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,12 +33,20 @@ public class ResourceCache
 
 	public static bool CanUseCustomUnloder()
 	{
-		return FieldManager.IsValidInGame() && !MonoBehaviourSingleton<TransitionManager>.I.isChanging && !MonoBehaviourSingleton<TransitionManager>.I.isTransing;
+		if (FieldManager.IsValidInGame())
+		{
+			if (!MonoBehaviourSingleton<TransitionManager>.I.isChanging)
+			{
+				return !MonoBehaviourSingleton<TransitionManager>.I.isTransing;
+			}
+			return false;
+		}
+		return false;
 	}
 
 	public void RequestUnloadUnusedAssets()
 	{
-		requestUnloadUnusedAssetsFrame = Time.get_frameCount();
+		requestUnloadUnusedAssetsFrame = Time.frameCount;
 	}
 
 	public void ClearObjectCaches(bool clearPreloaded)
@@ -138,6 +148,101 @@ public class ResourceCache
 		packageCaches.Clear();
 	}
 
+	public IEnumerator DoClearPackageCaches(Action callback = null)
+	{
+		if (packageCaches != null)
+		{
+			List<StringKeyTableBase.Item>[] lists = packageCaches.GetList();
+			if (lists != null)
+			{
+				int j = 0;
+				int i = lists.Length;
+				while (j < i)
+				{
+					lists[j]?.ForEach(delegate(StringKeyTableBase.Item o)
+					{
+						PackageObject obj = o.value as PackageObject;
+						PackageObject.Release(ref obj);
+					});
+					yield return null;
+					int num = j + 1;
+					j = num;
+				}
+			}
+		}
+		yield return DoDeletePackageObjects();
+		packageCaches.Clear();
+		callback();
+	}
+
+	public IEnumerator DoClearObjectCaches(bool clearPreloaded)
+	{
+		if (MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.selfCacheObject != null)
+		{
+			MonoBehaviourSingleton<InGameManager>.I.DestroySelfCache();
+		}
+		if (IgnoreCategorySpecifiedReleaseList != null)
+		{
+			IgnoreCategorySpecifiedReleaseList.Clear();
+		}
+		if (clearPreloaded && PreloadedInGameResouces != null)
+		{
+			PreloadedInGameResouces.Clear();
+		}
+		if (objectCaches == null)
+		{
+			yield break;
+		}
+		int j;
+		int i;
+		if (clearPreloaded)
+		{
+			i = 0;
+			j = objectCaches.Length;
+			while (i < j)
+			{
+				if (objectCaches[i] != null)
+				{
+					objectCaches[i].ForEach(delegate(ResourceObject o)
+					{
+						ResourceObject.Release(ref o);
+					});
+					objectCaches[i].Clear();
+					yield return null;
+				}
+				int num = i + 1;
+				i = num;
+			}
+			yield break;
+		}
+		List<string> releasedObjNames = new List<string>();
+		j = 0;
+		i = objectCaches.Length;
+		while (j < i)
+		{
+			releasedObjNames.Clear();
+			if (objectCaches[j] != null)
+			{
+				objectCaches[j].ForEach(delegate(ResourceObject o)
+				{
+					if (!PreloadedInGameResouces.Contains(o.name))
+					{
+						releasedObjNames.Add(o.name);
+						ResourceObject.Release(ref o);
+					}
+				});
+				int m = 0;
+				for (int count = releasedObjNames.Count; m < count; m++)
+				{
+					objectCaches[j].Remove(releasedObjNames[m]);
+				}
+			}
+			yield return null;
+			int num = j + 1;
+			j = num;
+		}
+	}
+
 	public void ClearSystemPackageCaches()
 	{
 		systemPackageCaches.ForEach(delegate(PackageObject o)
@@ -174,7 +279,7 @@ public class ResourceCache
 			int i = 0;
 			for (int num = lo.loadedObjects.Length; i < num; i++)
 			{
-				systemCaches.Add(ResourceObject.Get(RESOURCE_CATEGORY.MAX, lo.loadedObjects[i].obj.get_name(), lo.loadedObjects[i].obj));
+				systemCaches.Add(ResourceObject.Get(RESOURCE_CATEGORY.MAX, lo.loadedObjects[i].obj.name, lo.loadedObjects[i].obj));
 			}
 		});
 	}
@@ -183,15 +288,16 @@ public class ResourceCache
 	{
 		los?.ForEach(delegate(LoadObject lo)
 		{
-			ResourceCache resourceCache = this;
 			int i = 0;
-			for (int num = lo.loadedObjects.Length; i < num; i++)
+			int num = lo.loadedObjects.Length;
+			while (i < num)
 			{
-				int num2 = systemCaches.FindIndex((ResourceObject o) => o.obj.get_name() == lo.loadedObjects[i].obj.get_name());
+				int num2 = systemCaches.FindIndex((ResourceObject o) => o.obj.name == lo.loadedObjects[i].obj.name);
 				if (num2 >= 0)
 				{
 					systemCaches.RemoveAt(num2);
 				}
+				int num3 = ++i;
 			}
 		});
 	}
@@ -208,41 +314,37 @@ public class ResourceCache
 
 	public void CacheShadersFromPackage(string cahced_package_name)
 	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Expected O, but got Unknown
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
 		PackageObject cachedPackage = GetCachedPackage(cahced_package_name);
 		if (cachedPackage == null)
 		{
 			return;
 		}
-		AssetBundle val = cachedPackage.obj as AssetBundle;
-		if (!(val != null))
+		AssetBundle assetBundle = cachedPackage.obj as AssetBundle;
+		if (!(assetBundle != null))
 		{
 			return;
 		}
-		Shader[] array = val.LoadAllAssets<Shader>();
-		ShaderVariantCollection val2 = new ShaderVariantCollection();
+		Shader[] array = assetBundle.LoadAllAssets<Shader>();
+		ShaderVariantCollection shaderVariantCollection = new ShaderVariantCollection();
 		int i = 0;
 		for (int num = array.Length; i < num; i++)
 		{
-			if (!array[i].get_isSupported())
+			if (!array[i].isSupported)
 			{
-				Log.Error("no support shader : " + array[i].get_name());
+				Log.Error("no support shader : " + array[i].name);
 			}
-			string name = array[i].get_name();
+			string name = array[i].name;
 			shaderCaches.Add(name, array[i]);
 			if (name.StartsWith("EeL") || name.Contains("effect"))
 			{
-				ShaderVariant val3 = default(ShaderVariant);
-				val3.shader = array[i];
-				val2.Add(val3);
+				ShaderVariantCollection.ShaderVariant variant = default(ShaderVariantCollection.ShaderVariant);
+				variant.shader = array[i];
+				shaderVariantCollection.Add(variant);
 			}
 		}
-		if (!val2.get_isWarmedUp())
+		if (!shaderVariantCollection.isWarmedUp)
 		{
-			val2.WarmUp();
+			shaderVariantCollection.WarmUp();
 		}
 	}
 
@@ -282,8 +384,7 @@ public class ResourceCache
 
 	public bool IsCached(string package_name)
 	{
-		PackageObject cachedPackage = GetCachedPackage(package_name);
-		return cachedPackage != null;
+		return GetCachedPackage(package_name) != null;
 	}
 
 	public ResourceObject GetCachedResourceObject(RESOURCE_CATEGORY category, string resource_name)
@@ -300,7 +401,7 @@ public class ResourceCache
 		ResourceObject resourceObject = stringKeyTable.Get(resource_name);
 		if (resourceObject == null)
 		{
-			resourceObject = systemCaches.Find((ResourceObject o) => o.obj.get_name() == resource_name);
+			resourceObject = systemCaches.Find((ResourceObject o) => o.obj.name == resource_name);
 		}
 		return resourceObject;
 	}
@@ -324,7 +425,7 @@ public class ResourceCache
 			array[i] = stringKeyTable.Get(res_name);
 			if (array[i] == null)
 			{
-				array[i] = systemCaches.Find((ResourceObject o) => o.obj.get_name() == res_name);
+				array[i] = systemCaches.Find((ResourceObject o) => o.obj.name == res_name);
 			}
 		}
 		return array;
@@ -363,17 +464,17 @@ public class ResourceCache
 		}
 		if (resourceObject == null)
 		{
-			resourceObject = systemCaches.Find((ResourceObject o) => o.obj.get_name() == resource_name);
+			resourceObject = systemCaches.Find((ResourceObject o) => o.obj.name == resource_name);
 		}
 		return resourceObject;
 	}
 
-	public Object GetCachedObject(RESOURCE_CATEGORY category, string resource_name)
+	public UnityEngine.Object GetCachedObject(RESOURCE_CATEGORY category, string resource_name)
 	{
 		return GetCachedResourceObject(category, resource_name)?.obj;
 	}
 
-	public Object GetCachedObject(RESOURCE_CATEGORY category, string package_name, string resource_name)
+	public UnityEngine.Object GetCachedObject(RESOURCE_CATEGORY category, string package_name, string resource_name)
 	{
 		return GetCachedResourceObject(category, package_name, resource_name, inc_ref_count: false)?.obj;
 	}
@@ -480,6 +581,30 @@ public class ResourceCache
 		RequestUnloadUnusedAssets();
 	}
 
+	private IEnumerator DoDeletePackageObjects()
+	{
+		if (MonoBehaviourSingleton<ResourceManager>.I.isLoading || InstantiateManager.isBusy)
+		{
+			requestDeletePackageObjects = true;
+			yield break;
+		}
+		int j = 0;
+		int i = deletePackageObjects.size;
+		while (j < i)
+		{
+			PackageObject obj = deletePackageObjects[j];
+			if (obj != null)
+			{
+				PackageObject.Release(ref obj);
+			}
+			yield return null;
+			int num = j + 1;
+			j = num;
+		}
+		deletePackageObjects.Clear();
+		RequestUnloadUnusedAssets();
+	}
+
 	public void AddDelayUnloadAssetBundle(string name, ref AssetBundle asset_bundle)
 	{
 		if (!(asset_bundle == null))
@@ -541,12 +666,12 @@ public class ResourceCache
 		{
 			return;
 		}
-		int frameCount = Time.get_frameCount();
+		int frameCount = Time.frameCount;
 		if (frameCount - requestUnloadUnusedAssetsFrame >= 1 || frameCount < requestUnloadUnusedAssetsFrame)
 		{
 			DeletePackageObjects();
 			requestUnloadUnusedAssetsFrame = 0;
-			if (frameCount - MonoBehaviourSingleton<AppMain>.I.frameExecutedUnloadUnusedAssets > Application.get_targetFrameRate() && !CanUseCustomUnloder())
+			if (frameCount - MonoBehaviourSingleton<AppMain>.I.frameExecutedUnloadUnusedAssets > Application.targetFrameRate && !CanUseCustomUnloder())
 			{
 				MonoBehaviourSingleton<AppMain>.I.UnloadUnusedAssets(need_gc_collect: false);
 			}

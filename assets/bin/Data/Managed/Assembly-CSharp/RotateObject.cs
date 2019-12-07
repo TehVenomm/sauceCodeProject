@@ -3,27 +3,20 @@ using UnityEngine;
 public class RotateObject : MonoBehaviour
 {
 	[SerializeField]
-	private Vector3 rotateSpeed;
+	private Vector3 rotateSpeed = Vector3.zero;
 
 	private Transform _transform;
 
-	public RotateObject()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		_transform = this.get_transform();
+		_transform = base.transform;
 	}
 
 	private void Update()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		if (!(_transform == null))
 		{
-			_transform.Rotate(rotateSpeed * Time.get_deltaTime());
+			_transform.Rotate(rotateSpeed * Time.deltaTime);
 		}
 	}
 }

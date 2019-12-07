@@ -11,6 +11,8 @@ public class RegistAuthRobModel : BaseModel
 
 		public string password;
 
+		public string uid;
+
 		public string d;
 	}
 

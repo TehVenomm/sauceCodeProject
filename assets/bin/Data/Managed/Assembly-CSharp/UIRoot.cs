@@ -79,10 +79,6 @@ public class UIRoot : MonoBehaviour
 	{
 		get
 		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
 			if (activeScaling == Scaling.Flexible)
 			{
 				Vector2 screenSize = NGUITools.screenSize;
@@ -97,8 +93,12 @@ public class UIRoot : MonoBehaviour
 					screenSize.y = maximumHeight;
 					screenSize.x = screenSize.y * num;
 				}
-				int num2 = Mathf.RoundToInt((!shrinkPortraitUI || !(screenSize.y > screenSize.x)) ? screenSize.y : (screenSize.y / num));
-				return (!adjustByDPI) ? num2 : NGUIMath.AdjustByDPI(num2);
+				int num2 = Mathf.RoundToInt((shrinkPortraitUI && screenSize.y > screenSize.x) ? (screenSize.y / num) : screenSize.y);
+				if (!adjustByDPI)
+				{
+					return num2;
+				}
+				return NGUIMath.AdjustByDPI(num2);
 			}
 			Constraint constraint = this.constraint;
 			if (constraint == Constraint.FitHeight)
@@ -113,9 +113,17 @@ public class UIRoot : MonoBehaviour
 			case Constraint.FitWidth:
 				return Mathf.RoundToInt((float)manualWidth / num3);
 			case Constraint.Fit:
-				return (!(num4 > num3)) ? manualHeight : Mathf.RoundToInt((float)manualWidth / num3);
+				if (!(num4 > num3))
+				{
+					return manualHeight;
+				}
+				return Mathf.RoundToInt((float)manualWidth / num3);
 			case Constraint.Fill:
-				return (!(num4 < num3)) ? manualHeight : Mathf.RoundToInt((float)manualWidth / num3);
+				if (!(num4 < num3))
+				{
+					return manualHeight;
+				}
+				return Mathf.RoundToInt((float)manualWidth / num3);
 			default:
 				return manualHeight;
 			}
@@ -126,23 +134,23 @@ public class UIRoot : MonoBehaviour
 	{
 		get
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			Vector2 screenSize = NGUITools.screenSize;
-			int num = Mathf.RoundToInt(screenSize.y);
-			return (num != -1) ? GetPixelSizeAdjustment(num) : 1f;
+			int num = Mathf.RoundToInt(NGUITools.screenSize.y);
+			if (num != -1)
+			{
+				return GetPixelSizeAdjustment(num);
+			}
+			return 1f;
 		}
-	}
-
-	public UIRoot()
-		: this()
-	{
 	}
 
 	public static float GetPixelSizeAdjustment(GameObject go)
 	{
 		UIRoot uIRoot = NGUITools.FindInParents<UIRoot>(go);
-		return (!(uIRoot != null)) ? 1f : uIRoot.pixelSizeAdjustment;
+		if (!(uIRoot != null))
+		{
+			return 1f;
+		}
+		return uIRoot.pixelSizeAdjustment;
 	}
 
 	public float GetPixelSizeAdjustment(int height)
@@ -165,7 +173,7 @@ public class UIRoot : MonoBehaviour
 
 	protected virtual void Awake()
 	{
-		mTrans = this.get_transform();
+		mTrans = base.transform;
 	}
 
 	protected virtual void OnEnable()
@@ -180,15 +188,15 @@ public class UIRoot : MonoBehaviour
 
 	protected virtual void Start()
 	{
-		UIOrthoCamera componentInChildren = this.GetComponentInChildren<UIOrthoCamera>();
+		UIOrthoCamera componentInChildren = GetComponentInChildren<UIOrthoCamera>();
 		if (componentInChildren != null)
 		{
-			Debug.LogWarning((object)"UIRoot should not be active at the same time as UIOrthoCamera. Disabling UIOrthoCamera.", componentInChildren);
-			Camera component = componentInChildren.get_gameObject().GetComponent<Camera>();
-			componentInChildren.set_enabled(false);
+			Debug.LogWarning("UIRoot should not be active at the same time as UIOrthoCamera. Disabling UIOrthoCamera.", componentInChildren);
+			Camera component = componentInChildren.gameObject.GetComponent<Camera>();
+			componentInChildren.enabled = false;
 			if (component != null)
 			{
-				component.set_orthographicSize(1f);
+				component.orthographicSize = 1f;
 			}
 		}
 		else
@@ -204,9 +212,6 @@ public class UIRoot : MonoBehaviour
 
 	public void UpdateScale(bool updateAnchors = true)
 	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
 		if (!(mTrans != null))
 		{
 			return;
@@ -217,13 +222,13 @@ public class UIRoot : MonoBehaviour
 			return;
 		}
 		float num2 = 2f / num;
-		Vector3 localScale = mTrans.get_localScale();
+		Vector3 localScale = mTrans.localScale;
 		if (!(Mathf.Abs(localScale.x - num2) <= float.Epsilon) || !(Mathf.Abs(localScale.y - num2) <= float.Epsilon) || !(Mathf.Abs(localScale.z - num2) <= float.Epsilon))
 		{
-			mTrans.set_localScale(new Vector3(num2, num2, num2));
+			mTrans.localScale = new Vector3(num2, num2, num2);
 			if (updateAnchors)
 			{
-				this.BroadcastMessage("UpdateAnchors");
+				BroadcastMessage("UpdateAnchors");
 			}
 		}
 	}
@@ -236,7 +241,7 @@ public class UIRoot : MonoBehaviour
 			UIRoot uIRoot = list[i];
 			if (uIRoot != null)
 			{
-				uIRoot.BroadcastMessage(funcName, 1);
+				uIRoot.BroadcastMessage(funcName, SendMessageOptions.DontRequireReceiver);
 			}
 		}
 	}
@@ -245,7 +250,7 @@ public class UIRoot : MonoBehaviour
 	{
 		if (param == null)
 		{
-			Debug.LogError((object)"SendMessage is bugged when you try to pass 'null' in the parameter field. It behaves as if no parameter was specified.");
+			Debug.LogError("SendMessage is bugged when you try to pass 'null' in the parameter field. It behaves as if no parameter was specified.");
 			return;
 		}
 		int i = 0;
@@ -254,7 +259,7 @@ public class UIRoot : MonoBehaviour
 			UIRoot uIRoot = list[i];
 			if (uIRoot != null)
 			{
-				uIRoot.BroadcastMessage(funcName, param, 1);
+				uIRoot.BroadcastMessage(funcName, param, SendMessageOptions.DontRequireReceiver);
 			}
 		}
 	}

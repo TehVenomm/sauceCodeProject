@@ -21,7 +21,7 @@ namespace Network
 
 		public EquipItem helm = new EquipItem();
 
-		public string setName = string.Empty;
+		public string setName = "";
 
 		public int showHelm;
 

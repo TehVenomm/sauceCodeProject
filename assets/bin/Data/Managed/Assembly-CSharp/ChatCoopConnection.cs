@@ -53,7 +53,7 @@ public class ChatCoopConnection : IChatConnection
 		else
 		{
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if (self == null || !self.get_gameObject().get_activeInHierarchy() || !self.uiPlayerStatusGizmo.get_isActiveAndEnabled())
+			if (self == null || !self.gameObject.activeInHierarchy || !self.uiPlayerStatusGizmo.isActiveAndEnabled)
 			{
 				MonoBehaviourSingleton<CoopManager>.I.coopStage.SendChatMessage(MonoBehaviourSingleton<CoopManager>.I.GetSelfID(), message);
 			}
@@ -66,7 +66,7 @@ public class ChatCoopConnection : IChatConnection
 				}
 			}
 		}
-		OnReceiveMessage(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, message, string.Empty);
+		OnReceiveMessage(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, message);
 	}
 
 	public void SendStamp(int stampId)
@@ -85,7 +85,7 @@ public class ChatCoopConnection : IChatConnection
 		else
 		{
 			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if (self == null || !self.get_gameObject().get_activeInHierarchy() || !self.uiPlayerStatusGizmo.get_isActiveAndEnabled())
+			if (self == null || !self.gameObject.activeInHierarchy || !self.uiPlayerStatusGizmo.isActiveAndEnabled)
 			{
 				if (QuestManager.IsValidInGameExplore())
 				{
@@ -105,7 +105,7 @@ public class ChatCoopConnection : IChatConnection
 				}
 			}
 		}
-		OnReceiveStamp(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, stampId, string.Empty);
+		OnReceiveStamp(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, stampId);
 	}
 
 	public void SendPrivateText(string target_id, string message)

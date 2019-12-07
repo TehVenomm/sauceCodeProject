@@ -1,7 +1,5 @@
 using Network;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class QuestAcceptWaveDetail : QuestDeliveryDetail
@@ -105,12 +103,11 @@ public class QuestAcceptWaveDetail : QuestDeliveryDetail
 	public override void Initialize()
 	{
 		base.Initialize();
-		List<Network.EventData> eventList = MonoBehaviourSingleton<QuestManager>.I.eventList;
-		foreach (Network.EventData item in eventList)
+		foreach (Network.EventData @event in MonoBehaviourSingleton<QuestManager>.I.eventList)
 		{
-			if (item.eventId == info.eventID)
+			if (@event.eventId == info.eventID)
 			{
-				eventData = item;
+				eventData = @event;
 				break;
 			}
 		}
@@ -118,7 +115,7 @@ public class QuestAcceptWaveDetail : QuestDeliveryDetail
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_CLEAR_REWARD, is_visible: true);
+		SetActive(UI.OBJ_CLEAR_REWARD, is_visible: true);
 		base.UpdateUI();
 		questTableData = info.GetQuestData();
 		if (questTableData != null)
@@ -126,11 +123,10 @@ public class QuestAcceptWaveDetail : QuestDeliveryDetail
 			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questTableData.GetMainEnemyID());
 			if (enemyData != null)
 			{
-				ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY));
-				itemIcon.SetDepth(7);
-				SetElementSprite((Enum)UI.SPR_ENM_ELEMENT, (int)enemyData.element);
+				ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY)).SetDepth(7);
+				SetElementSprite(UI.SPR_ENM_ELEMENT, (int)enemyData.element);
 				int num = (int)questTableData.limitTime;
-				SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num / 60:D2}:{num % 60:D2}");
+				SetLabelText(UI.LBL_LIMIT_TIME, $"{num / 60:D2}:{num % 60:D2}");
 				SetDifficultySprite();
 				SetSprite(baseRoot, UI.SPR_WINDOW, "RequestWindowBase");
 				SetSprite(baseRoot, UI.SPR_MESSAGE_BG, "RequestFukidashi");
@@ -152,7 +148,7 @@ public class QuestAcceptWaveDetail : QuestDeliveryDetail
 	private void SetDifficultySprite()
 	{
 		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryID);
-		SetActive((Enum)UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
+		SetActive(UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
 	}
 
 	private void OnQuery_CREATE()
@@ -190,7 +186,7 @@ public class QuestAcceptWaveDetail : QuestDeliveryDetail
 			else if (maxRetryCount > 0)
 			{
 				retryCount++;
-				this.StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
+				StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
 			}
 			else if (!isJoined)
 			{
@@ -206,7 +202,7 @@ public class QuestAcceptWaveDetail : QuestDeliveryDetail
 
 	private IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
 	{
-		yield return (object)new WaitForSeconds(time);
+		yield return new WaitForSeconds(time);
 		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, isExplore: false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
 		{
 			if (!is_success)
@@ -222,7 +218,7 @@ public class QuestAcceptWaveDetail : QuestDeliveryDetail
 				else
 				{
 					retryCount++;
-					this.StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
+					StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
 				}
 			}
 			else if (!isJoined)

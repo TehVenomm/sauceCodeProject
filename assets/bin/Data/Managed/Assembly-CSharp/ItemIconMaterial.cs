@@ -18,11 +18,11 @@ public class ItemIconMaterial : ItemIcon
 
 	public void SetMaterialNum(int have_num, int need_num)
 	{
-		UIBehaviour.SetMaterialNumText(lblHave.get_transform(), lblNeed.get_transform(), have_num, need_num);
+		UIBehaviour.SetMaterialNumText(lblHave.transform, lblNeed.transform, have_num, need_num);
 	}
 
 	public void SetVisibleBG(bool is_visible)
 	{
-		baseBG.set_enabled(is_visible);
+		baseBG.enabled = is_visible;
 	}
 }

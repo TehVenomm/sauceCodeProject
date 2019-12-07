@@ -42,46 +42,40 @@ public class StageObjectRader : MonoBehaviour
 		protected set;
 	}
 
-	public StageObjectRader()
-		: this()
-	{
-	}
-
 	protected virtual void Awake()
 	{
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 		objects = new List<CatchStageObject>();
-		_transform = this.get_transform();
-		_rigidbody = this.GetComponent<Rigidbody>();
-		_collider = this.GetComponent<Collider>();
+		_transform = base.transform;
+		_rigidbody = GetComponent<Rigidbody>();
+		_collider = GetComponent<Collider>();
 		if (_collider == null)
 		{
-			SphereCollider val = this.get_gameObject().AddComponent<SphereCollider>();
-			val.set_center(new Vector3(0f, 0f, 0f));
-			_collider = val;
+			SphereCollider sphereCollider = base.gameObject.AddComponent<SphereCollider>();
+			sphereCollider.center = new Vector3(0f, 0f, 0f);
+			_collider = sphereCollider;
 		}
 		if (_collider != null)
 		{
-			_collider.set_isTrigger(true);
+			_collider.isTrigger = true;
 			if (_rigidbody == null)
 			{
-				_rigidbody = this.get_gameObject().AddComponent<Rigidbody>();
+				_rigidbody = base.gameObject.AddComponent<Rigidbody>();
 			}
-			_rigidbody.set_isKinematic(true);
+			_rigidbody.isKinematic = true;
 		}
 	}
 
 	protected virtual void Start()
 	{
-		stageObject = this.get_gameObject().GetComponentInParent<StageObject>();
+		stageObject = base.gameObject.GetComponentInParent<StageObject>();
 	}
 
 	public void SetRadius(float radius)
 	{
-		SphereCollider val = _collider as SphereCollider;
-		if (val != null)
+		SphereCollider sphereCollider = _collider as SphereCollider;
+		if (sphereCollider != null)
 		{
-			val.set_radius(radius);
+			sphereCollider.radius = radius;
 		}
 	}
 
@@ -95,7 +89,11 @@ public class StageObjectRader : MonoBehaviour
 	{
 		RemoveFromDestroyedCollider();
 		CatchStageObject catchStageObject = objects.Find((CatchStageObject o) => o.obj is Enemy && o.collider != null && o.bullet == null);
-		return (catchStageObject == null) ? null : (catchStageObject.obj as Enemy);
+		if (catchStageObject == null)
+		{
+			return null;
+		}
+		return catchStageObject.obj as Enemy;
 	}
 
 	public BulletObject FindEnemyBullet()
@@ -114,11 +112,12 @@ public class StageObjectRader : MonoBehaviour
 		CatchStageObject catchStageObject = Find(collider);
 		if (catchStageObject == null)
 		{
-			CatchStageObject catchStageObject2 = new CatchStageObject();
-			catchStageObject2.obj = obj;
-			catchStageObject2.collider = collider;
-			catchStageObject2.bullet = bullet;
-			catchStageObject = catchStageObject2;
+			catchStageObject = new CatchStageObject
+			{
+				obj = obj,
+				collider = collider,
+				bullet = bullet
+			};
 			objects.Add(catchStageObject);
 		}
 	}
@@ -134,23 +133,23 @@ public class StageObjectRader : MonoBehaviour
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		if (_collider == null || !_collider.get_enabled() || this.stageObject == null || collider.get_gameObject() == this.get_gameObject())
+		if (_collider == null || !_collider.enabled || this.stageObject == null || collider.gameObject == base.gameObject)
 		{
 			return;
 		}
 		StageObject stageObject = null;
-		BulletObject component = collider.get_gameObject().GetComponent<BulletObject>();
+		BulletObject component = collider.gameObject.GetComponent<BulletObject>();
 		if (component != null)
 		{
 			stageObject = component.stageObject;
 		}
 		else
 		{
-			if (collider.get_isTrigger())
+			if (collider.isTrigger)
 			{
 				return;
 			}
-			stageObject = collider.get_gameObject().GetComponentInParent<StageObject>();
+			stageObject = collider.gameObject.GetComponentInParent<StageObject>();
 		}
 		if (!(stageObject == null) && !(stageObject == this.stageObject))
 		{
@@ -160,13 +159,9 @@ public class StageObjectRader : MonoBehaviour
 
 	private void OnTriggerExit(Collider collider)
 	{
-		if (!(collider.get_gameObject() == this.get_gameObject()))
+		if (!(collider.gameObject == base.gameObject) && !(collider.gameObject.GetComponentInParent<StageObject>() == null))
 		{
-			StageObject componentInParent = collider.get_gameObject().GetComponentInParent<StageObject>();
-			if (!(componentInParent == null))
-			{
-				Remove(collider);
-			}
+			Remove(collider);
 		}
 	}
 }

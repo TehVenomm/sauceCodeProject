@@ -7,10 +7,10 @@ public class ItemIconDetailEquipAbilitySetupper : ItemIconDetailEquipSetupper
 		base.Set((object[])null);
 		SkillSlotUIData[] slot_data = data[1] as SkillSlotUIData[];
 		bool is_show_main_status = (bool)data[2];
-		infoRootAry[0].SetActive(true);
+		infoRootAry[0].SetActive(value: true);
 		if (gridEquipMark == null)
 		{
-			gridEquipMark = spEquipIndex.get_gameObject().GetComponentInParent<UIGrid>();
+			gridEquipMark = spEquipIndex.gameObject.GetComponentInParent<UIGrid>();
 		}
 		if (data[0] is EquipItemInfo)
 		{
@@ -43,33 +43,33 @@ public class ItemIconDetailEquipAbilitySetupper : ItemIconDetailEquipSetupper
 		}
 		if (is_show_main_status)
 		{
-			infoRootAry[1].SetActive(true);
-			infoRootAry[2].SetActive(false);
+			infoRootAry[1].SetActive(value: true);
+			infoRootAry[2].SetActive(value: false);
 			SetVisibleBG(is_visible: true);
 			SetName(item.tableData.name);
 			SetLevel(item.level, item.tableData.maxLv, item.tableData.IsVisual());
-			SetEquipValue(flag, (!flag) ? item.def : item.atk);
+			SetEquipValue(flag, flag ? item.atk : item.def);
 			return;
 		}
-		infoRootAry[1].SetActive(false);
-		infoRootAry[2].SetActive(true);
+		infoRootAry[1].SetActive(value: false);
+		infoRootAry[2].SetActive(value: true);
 		SetVisibleBG(is_visible: true);
 		SetName(item.tableData.name);
 		bool enabled = true;
 		EquipItemAbility[] ability = item.ability;
-		objAbilityRoot.GetComponentsInChildren<UILabel>(Temporary.uiLabelList);
+		objAbilityRoot.GetComponentsInChildren(Temporary.uiLabelList);
 		int i = 0;
 		for (int count = Temporary.uiLabelList.Count; i < count; i++)
 		{
 			UILabel uILabel = Temporary.uiLabelList[i];
-			uILabel.set_enabled(i < ability.Length && ability[i].id != 0 && ability[i].ap > 0);
-			if (uILabel.get_enabled())
+			uILabel.enabled = (i < ability.Length && ability[i].id != 0 && ability[i].ap > 0);
+			if (uILabel.enabled)
 			{
 				uILabel.text = ability[i].GetNameAndAP();
 				enabled = false;
 			}
 		}
 		Temporary.uiLabelList.Clear();
-		lblNonAbility.set_enabled(enabled);
+		lblNonAbility.enabled = enabled;
 	}
 }

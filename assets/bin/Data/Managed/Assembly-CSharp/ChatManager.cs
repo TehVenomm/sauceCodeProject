@@ -137,9 +137,9 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 							homeChat.Disconnect(delegate
 							{
 								ChatWebSocketConnection chatWebSocketConnection = homeChat.connection as ChatWebSocketConnection;
-								if (Object.op_Implicit(chatWebSocketConnection))
+								if ((bool)chatWebSocketConnection)
 								{
-									Object.Destroy(chatWebSocketConnection);
+									UnityEngine.Object.Destroy(chatWebSocketConnection);
 								}
 								ConnectHomeChat(chatChannel);
 							});
@@ -162,7 +162,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 			homeChat.SetConnection(new ChatOfflineConnection());
 			return;
 		}
-		ChatWebSocketConnection chatWebSocketConnection = this.get_gameObject().AddComponent<ChatWebSocketConnection>();
+		ChatWebSocketConnection chatWebSocketConnection = base.gameObject.AddComponent<ChatWebSocketConnection>();
 		chatWebSocketConnection.Setup(channel.host, channel.port, channel.path);
 		homeChat.SetConnection(chatWebSocketConnection);
 		int roomNo = 1;
@@ -230,7 +230,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 				ChatWebSocketConnection chatWebSocketConnection = conn as ChatWebSocketConnection;
 				if (chatWebSocketConnection != null)
 				{
-					Object.Destroy(chatWebSocketConnection);
+					UnityEngine.Object.Destroy(chatWebSocketConnection);
 				}
 				roomChat.SetConnection(connection);
 				roomChat.JoinRoom(0);
@@ -267,7 +267,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 				ChatWebSocketConnection chatWebSocketConnection = conn as ChatWebSocketConnection;
 				if (chatWebSocketConnection != null)
 				{
-					Object.Destroy(chatWebSocketConnection);
+					UnityEngine.Object.Destroy(chatWebSocketConnection);
 				}
 			});
 			if (this.OnDestroyRoomChat != null)
@@ -301,7 +301,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 	{
 		if (loungeChat != null)
 		{
-			IChatConnection connection = loungeChat.connection;
+			_ = loungeChat.connection;
 			loungeChat.Disconnect();
 			if (this.OnDestroyLoungeChat != null)
 			{
@@ -332,7 +332,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 	{
 		if (clanChat != null)
 		{
-			IChatConnection connection = clanChat.connection;
+			_ = clanChat.connection;
 			clanChat.Disconnect();
 			if (this.OnDestroyClanChat != null)
 			{
@@ -353,7 +353,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 				OnNotifyUpdateChannnelInfo(ret.result.chat);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendChannelEnter(int channel, Action<ChatChannel> call_back)
@@ -368,7 +368,7 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 				obj = ret.result.channel;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendClanChannelEnter(int channel, Action<ChatChannel> call_back)
@@ -383,6 +383,6 @@ public class ChatManager : MonoBehaviourSingleton<ChatManager>
 				obj = ret.result.channel;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 }

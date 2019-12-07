@@ -61,7 +61,7 @@ public class HomeManager : MonoBehaviourSingleton<HomeManager>, IHomeManager
 		{
 			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public OutGameSettingsManager.HomeScene GetSceneSetting()
@@ -75,9 +75,9 @@ public class HomeManager : MonoBehaviourSingleton<HomeManager>, IHomeManager
 		{
 			yield return null;
 		}
-		HomeCamera = this.get_gameObject().AddComponent<HomeCamera>();
-		IHomePeople = this.get_gameObject().AddComponent<HomePeople>();
-		HomeFeatureBanner = this.get_gameObject().AddComponent<HomeFeatureBanner>();
+		HomeCamera = base.gameObject.AddComponent<HomeCamera>();
+		IHomePeople = base.gameObject.AddComponent<HomePeople>();
+		HomeFeatureBanner = base.gameObject.AddComponent<HomeFeatureBanner>();
 		while (!HomeCamera.isInitialized)
 		{
 			yield return null;

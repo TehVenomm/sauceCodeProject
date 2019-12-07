@@ -47,7 +47,11 @@ public class PacketStringStream
 
 	public string Substring(int start, int len = 0)
 	{
-		return (len != 0) ? stream.Substring(start, len) : stream.Substring(start);
+		if (len != 0)
+		{
+			return stream.Substring(start, len);
+		}
+		return stream.Substring(start);
 	}
 
 	public void Close()

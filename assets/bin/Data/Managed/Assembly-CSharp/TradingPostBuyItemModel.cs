@@ -7,5 +7,5 @@ public class TradingPostBuyItemModel : BaseModel
 		public int crystalCL;
 	}
 
-	public static string URL = "/ajax/trading-post/buy-item";
+	public static string URL = "ajax/trading-post/buy-item";
 }

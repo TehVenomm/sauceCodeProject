@@ -18,7 +18,7 @@ public class FilterManager : MonoBehaviourSingleton<FilterManager>
 		{
 			return false;
 		}
-		return blurFilter.get_enabled();
+		return blurFilter.enabled;
 	}
 
 	public void StartBlur(float time = 1f, float strength = 0.25f, float delay = 0f)
@@ -27,13 +27,13 @@ public class FilterManager : MonoBehaviourSingleton<FilterManager>
 		{
 			blurFilter.blurStrength = 0f;
 			blurFilter.StartFilter();
-			this.StartCoroutine(ChangeBlurStrength(time, 0f, strength, delay, null));
+			StartCoroutine(ChangeBlurStrength(time, 0f, strength, delay, null));
 		}
 	}
 
 	public void StopBlur(float time, float delay = 0f)
 	{
-		if (!(blurFilter == null) && blurFilter.get_enabled())
+		if (!(blurFilter == null) && blurFilter.enabled)
 		{
 			if (time <= 0f)
 			{
@@ -41,7 +41,7 @@ public class FilterManager : MonoBehaviourSingleton<FilterManager>
 			}
 			else
 			{
-				this.StartCoroutine(ChangeBlurStrength(time, blurFilter.blurStrength, 0f, delay, delegate
+				StartCoroutine(ChangeBlurStrength(time, blurFilter.blurStrength, 0f, delay, delegate
 				{
 					StopBlur();
 				}));
@@ -51,10 +51,10 @@ public class FilterManager : MonoBehaviourSingleton<FilterManager>
 
 	public void StopBlur()
 	{
-		if (!(blurFilter == null) && blurFilter.get_enabled())
+		if (!(blurFilter == null) && blurFilter.enabled)
 		{
 			blurFilter.StopFilter();
-			blurFilter.set_enabled(false);
+			blurFilter.enabled = false;
 		}
 	}
 
@@ -62,12 +62,12 @@ public class FilterManager : MonoBehaviourSingleton<FilterManager>
 	{
 		if (!(blurFilter == null))
 		{
-			blurFilter.set_enabled(true);
-			yield return (object)new WaitForSeconds(delay);
-			for (float _time = 0f; _time < time; _time += Time.get_deltaTime())
+			blurFilter.enabled = true;
+			yield return new WaitForSeconds(delay);
+			for (float _time = 0f; _time < time; _time += Time.deltaTime)
 			{
-				float t = _time / time;
-				blurFilter.blurStrength = startStrength * (1f - t) + targetStrength * t;
+				float num = _time / time;
+				blurFilter.blurStrength = startStrength * (1f - num) + targetStrength * num;
 				yield return null;
 			}
 			blurFilter.blurStrength = targetStrength;
@@ -78,33 +78,30 @@ public class FilterManager : MonoBehaviourSingleton<FilterManager>
 	private void Start()
 	{
 		blurFilter = MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<BlurFilter>();
-		blurFilter.set_enabled(false);
+		blurFilter.enabled = false;
 	}
 
 	public void StartTubulanceFilter(float power, Vector2 center, Action callback)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(_StartTubulanceFilter(power, center, callback));
+		StartCoroutine(_StartTubulanceFilter(power, center, callback));
 	}
 
 	private IEnumerator _StartTubulanceFilter(float power, Vector2 center, Action callback)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 		if (tubulanceCamera == null)
 		{
 			GameObject obj = Resources.Load<GameObject>("Filter/TurbulanceFilterCamera");
-			tubulanceCamera = ResourceUtility.Instantiate<GameObject>(obj);
+			tubulanceCamera = ResourceUtility.Instantiate(obj);
 		}
 		BlurAndTurbulanceFilter filter = tubulanceCamera.GetComponent<BlurAndTurbulanceFilter>();
 		float time = 0f;
 		while (time < 2f)
 		{
-			time += Time.get_deltaTime();
-			float blurT = Mathf.Clamp01(time / 0.6f);
-			filter.SetBlurPram(Mathf.Lerp(0f, power, blurT), center);
-			float turbulanceT = Mathf.Clamp01((time - 0.2f) / 1f);
-			filter.SetTurbulanceParam(Mathf.Lerp(0f, 0.15f, turbulanceT), Mathf.Lerp(1f, 1.4f, turbulanceT), Mathf.Lerp(0f, 1f, turbulanceT));
+			time += Time.deltaTime;
+			float t = Mathf.Clamp01(time / 0.6f);
+			filter.SetBlurPram(Mathf.Lerp(0f, power, t), center);
+			float t2 = Mathf.Clamp01((time - 0.2f) / 1f);
+			filter.SetTurbulanceParam(Mathf.Lerp(0f, 0.15f, t2), Mathf.Lerp(1f, 1.4f, t2), Mathf.Lerp(0f, 1f, t2));
 			yield return null;
 		}
 		callback?.Invoke();
@@ -114,7 +111,7 @@ public class FilterManager : MonoBehaviourSingleton<FilterManager>
 	{
 		if (tubulanceCamera != null)
 		{
-			Object.Destroy(tubulanceCamera);
+			UnityEngine.Object.Destroy(tubulanceCamera);
 			tubulanceCamera = null;
 		}
 	}

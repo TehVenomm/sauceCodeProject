@@ -1,5 +1,3 @@
-using System;
-
 public class ItemDetailSkillSimpleDialog : ItemDetailSkillDialog
 {
 	public class InitParam
@@ -36,9 +34,9 @@ public class ItemDetailSkillSimpleDialog : ItemDetailSkillDialog
 
 	private void ForceInvisibleUIButtons()
 	{
-		SetActive((Enum)UI.BTN_CHANGE, is_visible: false);
-		SetActive((Enum)UI.BTN_GROW, is_visible: false);
-		SetActive((Enum)UI.BTN_SELL, is_visible: false);
+		SetActive(UI.BTN_CHANGE, is_visible: false);
+		SetActive(UI.BTN_GROW, is_visible: false);
+		SetActive(UI.BTN_SELL, is_visible: false);
 	}
 
 	private void OnQuery_SECTION_BACK()

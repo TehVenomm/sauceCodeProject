@@ -166,9 +166,7 @@ public static class ResultUtility
 			}
 			else
 			{
-				ItemSortData itemSortData2 = sortCompareData as ItemSortData;
-				ItemInfo itemInfo = itemSortData2.GetItemData() as ItemInfo;
-				itemInfo.num += ary[i].num;
+				((sortCompareData as ItemSortData).GetItemData() as ItemInfo).num += ary[i].num;
 			}
 		}
 		return num;
@@ -188,14 +186,15 @@ public static class ResultUtility
 			}
 			if (sortCompareData == null)
 			{
-				EquipItem equipItem = new EquipItem();
-				equipItem.uniqId = "0";
-				equipItem.equipItemId = ary[i].equipItemId;
-				equipItem.level = ary[i].lv;
-				equipItem.exceed = 0;
-				equipItem.is_locked = 0;
-				equipItem.price = 0;
-				EquipItemInfo item = new EquipItemInfo(equipItem);
+				EquipItemInfo item = new EquipItemInfo(new EquipItem
+				{
+					uniqId = "0",
+					equipItemId = ary[i].equipItemId,
+					level = ary[i].lv,
+					exceed = 0,
+					is_locked = 0,
+					price = 0
+				});
 				RewardEquipItemSortData rewardEquipItemSortData = new RewardEquipItemSortData();
 				rewardEquipItemSortData.SetItem(item);
 				rewardEquipItemSortData.SetCategory(category);
@@ -205,8 +204,7 @@ public static class ResultUtility
 			}
 			else
 			{
-				RewardEquipItemSortData rewardEquipItemSortData2 = sortCompareData as RewardEquipItemSortData;
-				rewardEquipItemSortData2.rewardNum += ary[i].num;
+				(sortCompareData as RewardEquipItemSortData).rewardNum += ary[i].num;
 			}
 		}
 		return num;
@@ -238,8 +236,7 @@ public static class ResultUtility
 			}
 			else
 			{
-				RewardSkillItemSortData rewardSkillItemSortData2 = sortCompareData as RewardSkillItemSortData;
-				rewardSkillItemSortData2.rewardNum += ary[i].num;
+				(sortCompareData as RewardSkillItemSortData).rewardNum += ary[i].num;
 			}
 		}
 		return num;
@@ -282,8 +279,7 @@ public static class ResultUtility
 			}
 			else
 			{
-				QuestSortData questSortData2 = sortCompareData as QuestSortData;
-				questSortData2.itemData.infoData.questData.num += ary[i].num;
+				(sortCompareData as QuestSortData).itemData.infoData.questData.num += ary[i].num;
 			}
 		}
 		return num;
@@ -316,8 +312,7 @@ public static class ResultUtility
 			}
 			else
 			{
-				RewardAccessoryItemSortData rewardAccessoryItemSortData2 = sortCompareData as RewardAccessoryItemSortData;
-				rewardAccessoryItemSortData2.rewardNum += ary[i].num;
+				(sortCompareData as RewardAccessoryItemSortData).rewardNum += ary[i].num;
 			}
 		}
 		return num;

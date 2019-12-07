@@ -54,9 +54,9 @@ public class GuildDonateMemberList : GuildMemberList
 				allMember = new List<FriendCharaInfo>(ret.result.list);
 				allMember.Remove(members.FirstOrDefault((FriendCharaInfo o) => o.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id));
 				_invitedList = (from user in ret.result.donate_list
-				where user.isInvited
-				select user into x
-				select x.userId).ToList();
+					where user.isInvited
+					select user into x
+					select x.userId).ToList();
 				callback(success, null);
 			});
 		});
@@ -88,8 +88,7 @@ public class GuildDonateMemberList : GuildMemberList
 		{
 			if (success)
 			{
-				Transform ctrl = GetCtrl(UI.GRD_LIST);
-				Transform child = ctrl.GetChild(index).GetChild(0);
+				Transform child = GetCtrl(UI.GRD_LIST).GetChild(index).GetChild(0);
 				SetActive(child, UI.OBJ_SELECTED, is_visible: true);
 				SetButtonEnabled(child, is_enabled: false);
 				_invitedList.Remove(member.userId);

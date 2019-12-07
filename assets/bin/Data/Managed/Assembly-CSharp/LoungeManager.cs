@@ -82,7 +82,7 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 	{
 		if (userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
-			this.StartCoroutine(CreateCharacterRoomJoined(userId));
+			StartCoroutine(CreateCharacterRoomJoined(userId));
 		}
 	}
 
@@ -97,14 +97,13 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 			}
 			if (id != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 			{
-				this.StartCoroutine(SendLoungeInfoForce());
+				StartCoroutine(SendLoungeInfoForce());
 			}
 		}
 	}
 
 	public void OnRecvRoomMove(int id, Vector3 targetPos)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		if (IHomePeople != null)
 		{
 			IHomePeople.CastToLoungePeople().MoveLoungePlayer(id, targetPos);
@@ -113,7 +112,6 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 
 	public void OnRecvRoomPosition(int id, Vector3 targetPos, LOUNGE_ACTION_TYPE type)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		if (IHomePeople != null)
 		{
 			IHomePeople.CastToLoungePeople().SetInitialPositionLoungePlayer(id, targetPos, type);
@@ -208,10 +206,10 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 		{
 			yield return null;
 		}
-		HomeCamera = this.get_gameObject().AddComponent<HomeCamera>();
-		IHomePeople = this.get_gameObject().AddComponent<LoungePeople>();
-		HomeFeatureBanner = this.get_gameObject().AddComponent<HomeFeatureBanner>();
-		TableSet = this.get_gameObject().AddComponent<LoungeTableSet>();
+		HomeCamera = base.gameObject.AddComponent<HomeCamera>();
+		IHomePeople = base.gameObject.AddComponent<LoungePeople>();
+		HomeFeatureBanner = base.gameObject.AddComponent<HomeFeatureBanner>();
+		TableSet = base.gameObject.AddComponent<LoungeTableSet>();
 		while (!HomeCamera.isInitialized || !IHomePeople.isInitialized || !TableSet.isInitialized)
 		{
 			yield return null;
@@ -223,33 +221,31 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInLounge();
 		}
 		IsInitialized = true;
-		yield return this.StartCoroutine(SendLoungeInfoForce());
-		yield return this.StartCoroutine(CreateLoungePlayerFromSlotInfo());
-		yield return this.StartCoroutine(LoadSE());
+		yield return StartCoroutine(SendLoungeInfoForce());
+		yield return StartCoroutine(CreateLoungePlayerFromSlotInfo());
+		yield return StartCoroutine(LoadSE());
 		PlayWaveSound();
 	}
 
 	private IEnumerator LoadSE()
 	{
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		int[] seList = (int[])Enum.GetValues(typeof(SE));
-		int[] array = seList;
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		int[] array = (int[])Enum.GetValues(typeof(SE));
 		foreach (int se_id in array)
 		{
-			loadQueue.CacheSE(se_id);
+			loadingQueue.CacheSE(se_id);
 		}
-		if (loadQueue.IsLoading())
+		if (loadingQueue.IsLoading())
 		{
-			yield return loadQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
 	}
 
 	private void PlayWaveSound()
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = Utility.CreateGameObject("WaveAudioObjectPos", base._transform);
-		val.set_position(MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.waveSoundPoint);
-		SoundManager.PlayLoopSE(40000363, null, val);
+		Transform transform = Utility.CreateGameObject("WaveAudioObjectPos", base._transform);
+		transform.position = MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.waveSoundPoint;
+		SoundManager.PlayLoopSE(40000363, null, transform);
 	}
 
 	private IEnumerator CreateLoungePlayerFromSlotInfo()
@@ -267,9 +263,8 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 				{
 					break;
 				}
-				LoungeMemberStatus status = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[data[i].userInfo.userId];
-				LoungeMemberStatus.MEMBER_STATUS partyStatus = status.GetStatus();
-				if (partyStatus == LoungeMemberStatus.MEMBER_STATUS.LOUNGE || partyStatus == LoungeMemberStatus.MEMBER_STATUS.QUEST_READY)
+				LoungeMemberStatus.MEMBER_STATUS status = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[data[i].userInfo.userId].GetStatus();
+				if (status == LoungeMemberStatus.MEMBER_STATUS.LOUNGE || status == LoungeMemberStatus.MEMBER_STATUS.QUEST_READY)
 				{
 					IHomePeople.CastToLoungePeople().CreateLoungePlayer(data[i], useMovingEntry: false);
 					yield return null;
@@ -280,14 +275,14 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 
 	private IEnumerator CreateCharacterRoomJoined(int userId)
 	{
-		yield return this.StartCoroutine(SendLoungeInfoForce());
-		PartyModel.SlotInfo slot = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId);
-		if (slot != null && IHomePeople != null && IHomePeople.CastToLoungePeople().CreateLoungePlayer(slot, useMovingEntry: true))
+		yield return StartCoroutine(SendLoungeInfoForce());
+		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId);
+		if (slotInfoByUserId != null && IHomePeople != null && IHomePeople.CastToLoungePeople().CreateLoungePlayer(slotInfoByUserId, useMovingEntry: true))
 		{
-			SetAnnounce(new LoungeAnnounce.AnnounceData(LoungeAnnounce.ANNOUNCE_TYPE.JOIN_LOUNGE, slot.userInfo.name));
+			SetAnnounce(new LoungeAnnounce.AnnounceData(LoungeAnnounce.ANNOUNCE_TYPE.JOIN_LOUNGE, slotInfoByUserId.userInfo.name));
 			if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
 			{
-				MonoBehaviourSingleton<LoungeNetworkManager>.I.JoinNotification(slot.userInfo);
+				MonoBehaviourSingleton<LoungeNetworkManager>.I.JoinNotification(slotInfoByUserId.userInfo);
 			}
 		}
 	}
@@ -311,7 +306,7 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 		case LoungeMemberStatus.MEMBER_STATUS.LOUNGE:
 			SendRoomPosition(userId);
 			NeedLoungeQuestBalloonUpdate = true;
-			this.StartCoroutine(CreatePlayerOnChangedStatus(userId));
+			StartCoroutine(CreatePlayerOnChangedStatus(userId));
 			break;
 		}
 	}
@@ -319,9 +314,9 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 	private IEnumerator CreatePlayerOnChangedStatus(int userId)
 	{
 		yield return SendLoungeInfoForce();
-		PartyModel.SlotInfo slot = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId);
-		IHomePeople.CastToLoungePeople().CreateLoungePlayer(slot, useMovingEntry: true);
-		IHomePeople.CastToLoungePeople().ChangeEquipLoungePlayer(slot, useMovingEntry: true);
+		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId);
+		IHomePeople.CastToLoungePeople().CreateLoungePlayer(slotInfoByUserId, useMovingEntry: true);
+		IHomePeople.CastToLoungePeople().ChangeEquipLoungePlayer(slotInfoByUserId, useMovingEntry: true);
 	}
 
 	private void CreatePartyAnnounce(int userId)
@@ -334,12 +329,12 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 
 	private void SetAnnounce(LoungeAnnounce.AnnounceData data)
 	{
-		if (!object.ReferenceEquals(data, null))
+		if (data != null)
 		{
 			loungeAnnounceQueue.Enqueue(data);
-			if (object.ReferenceEquals(loungeAnnounceCoroutine, null))
+			if (loungeAnnounceCoroutine == null)
 			{
-				loungeAnnounceCoroutine = this.StartCoroutine(ShowAnnounce());
+				loungeAnnounceCoroutine = StartCoroutine(ShowAnnounce());
 			}
 		}
 	}
@@ -354,9 +349,9 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 		}
 		while (loungeAnnounceQueue.Count > 0)
 		{
-			LoungeAnnounce.AnnounceData annouceData = loungeAnnounceQueue.Dequeue();
+			LoungeAnnounce.AnnounceData data = loungeAnnounceQueue.Dequeue();
 			bool wait = true;
-			announce.Play(annouceData, delegate
+			announce.Play(data, delegate
 			{
 				wait = false;
 			});
@@ -364,7 +359,7 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 			{
 				yield return null;
 			}
-			yield return (object)new WaitForSeconds(0.3f);
+			yield return new WaitForSeconds(0.3f);
 		}
 		loungeAnnounceCoroutine = null;
 	}
@@ -373,7 +368,7 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 	{
 		if (sendInfoSpan.IsReady())
 		{
-			this.StartCoroutine(SendLoungeInfoForce());
+			StartCoroutine(SendLoungeInfoForce());
 		}
 	}
 
@@ -388,7 +383,7 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 	{
 		if (!pause)
 		{
-			this.StartCoroutine(ResumeApp());
+			StartCoroutine(ResumeApp());
 		}
 	}
 
@@ -406,7 +401,7 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 		{
 			DestoryMembersOnResume();
 			yield return null;
-			this.StartCoroutine(CreateMembersOnResume());
+			StartCoroutine(CreateMembersOnResume());
 			yield return null;
 			ResetAllMemberAction();
 		}
@@ -441,15 +436,13 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 			{
 				continue;
 			}
-			PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId);
-			if (slotInfoByUserId == null)
+			if (MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId) == null)
 			{
 				IHomePeople.CastToLoungePeople().DestroyLoungePlayer(userId);
 			}
 			else if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus != null)
 			{
-				LoungeMemberStatus loungeMemberStatus = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[userId];
-				LoungeMemberStatus.MEMBER_STATUS status = loungeMemberStatus.GetStatus();
+				LoungeMemberStatus.MEMBER_STATUS status = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[userId].GetStatus();
 				if (status == LoungeMemberStatus.MEMBER_STATUS.QUEST || status == LoungeMemberStatus.MEMBER_STATUS.FIELD)
 				{
 					IHomePeople.CastToLoungePeople().DestroyLoungePlayer(userId);
@@ -476,11 +469,11 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 			{
 				continue;
 			}
-			LoungeMemberStatus status = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[userId];
-			if (status != null)
+			LoungeMemberStatus loungeMemberStatus = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[userId];
+			if (loungeMemberStatus != null)
 			{
-				LoungeMemberStatus.MEMBER_STATUS partyStatus = status.GetStatus();
-				if (partyStatus == LoungeMemberStatus.MEMBER_STATUS.LOUNGE || partyStatus == LoungeMemberStatus.MEMBER_STATUS.QUEST_READY)
+				LoungeMemberStatus.MEMBER_STATUS status = loungeMemberStatus.GetStatus();
+				if (status == LoungeMemberStatus.MEMBER_STATUS.LOUNGE || status == LoungeMemberStatus.MEMBER_STATUS.QUEST_READY)
 				{
 					IHomePeople.CastToLoungePeople().CreateLoungePlayer(slots[i], useMovingEntry: false);
 					IHomePeople.CastToLoungePeople().ChangeEquipLoungePlayer(slots[i], useMovingEntry: false);
@@ -516,12 +509,9 @@ public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 
 	private void SendRoomPosition(int cid)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 		if (IHomePeople != null && !(IHomePeople.selfChara == null))
 		{
-			Vector3 position = IHomePeople.selfChara._transform.get_position();
+			Vector3 position = IHomePeople.selfChara._transform.position;
 			LOUNGE_ACTION_TYPE actionType = IHomePeople.selfChara.GetActionType();
 			MonoBehaviourSingleton<LoungeNetworkManager>.I.RoomPosition(cid, position, actionType);
 		}

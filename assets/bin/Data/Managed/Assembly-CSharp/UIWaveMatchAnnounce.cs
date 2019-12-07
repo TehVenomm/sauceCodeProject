@@ -70,9 +70,9 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 	{
 		wmInfo = info;
 		isEvent = QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true);
-		CutInAnim[0].set_enabled(false);
+		CutInAnim[0].enabled = false;
 		CutInAnim[0].ResetToBeginning();
-		CutInAnim[1].set_enabled(false);
+		CutInAnim[1].enabled = false;
 		CutInAnim[1].ResetToBeginning();
 		if (wmInfo.popGuardSec <= 0)
 		{
@@ -124,7 +124,7 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 
 	private void UpdateAnnounce()
 	{
-		countSec -= Time.get_deltaTime();
+		countSec -= Time.deltaTime;
 		int num = Mathf.FloorToInt(countSec);
 		if (lastInteger != num)
 		{
@@ -140,13 +140,13 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 	private void StartCountDown()
 	{
 		CountDownSpr.spriteName = "WaveEncount_5";
-		CountDownObj.SetActive(true);
+		CountDownObj.SetActive(value: true);
 		state = eState.CountDown;
 	}
 
 	private void UpdateCountDown()
 	{
-		countSec -= Time.get_deltaTime();
+		countSec -= Time.deltaTime;
 		int num = Mathf.FloorToInt(countSec);
 		if (lastInteger != num)
 		{
@@ -155,7 +155,7 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 		}
 		if (countSec <= 1f)
 		{
-			CountDownObj.SetActive(false);
+			CountDownObj.SetActive(value: false);
 			StartCutIn();
 		}
 	}
@@ -169,9 +169,9 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 		}
 		SoundManager.PlayOneshotJingle(wmSetting.waveJingleId);
 		panelChange.UnLock();
-		CutInAnim[0].set_enabled(true);
+		CutInAnim[0].enabled = true;
 		CutInAnim[0].PlayForward();
-		CutInAnim[1].set_enabled(true);
+		CutInAnim[1].enabled = true;
 		CutInAnim[1].PlayForward();
 		if (!flag)
 		{
@@ -180,7 +180,7 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 		}
 		CutInFinalObj.SetActive(flag);
 		CutInNumberObj.SetActive(!flag);
-		CutInObj.SetActive(true);
+		CutInObj.SetActive(value: true);
 		countSec = 2f;
 		if (MonoBehaviourSingleton<UIQuestInfoWaveMatch>.IsValid())
 		{
@@ -196,12 +196,12 @@ public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 
 	private void UpdateCutIn()
 	{
-		countSec -= Time.get_deltaTime();
+		countSec -= Time.deltaTime;
 		if (countSec <= 0f)
 		{
-			CutInFinalObj.SetActive(false);
-			CutInNumberObj.SetActive(false);
-			CutInObj.SetActive(false);
+			CutInFinalObj.SetActive(value: false);
+			CutInNumberObj.SetActive(value: false);
+			CutInObj.SetActive(value: false);
 			panelChange.Lock();
 			state = eState.None;
 		}

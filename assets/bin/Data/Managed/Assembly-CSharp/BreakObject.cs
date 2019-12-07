@@ -3,7 +3,7 @@ using UnityEngine;
 public class BreakObject : GimmickObject
 {
 	[SerializeField]
-	protected string breakEffectName = string.Empty;
+	protected string breakEffectName = "";
 
 	protected override bool IsValidAttackedHit(StageObject from_object)
 	{
@@ -24,13 +24,11 @@ public class BreakObject : GimmickObject
 
 	public override void OnAttackedHitFix(AttackedHitStatusFix status)
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 		base.OnAttackedHitFix(status);
 		if (IsBreakable(status))
 		{
 			EffectManager.OneShot(breakEffectName, _position, _rotation);
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 		}
 	}
 
@@ -53,7 +51,7 @@ public class BreakObject : GimmickObject
 
 	protected bool IsBreakableAttack(AttackHitInfo.ATTACK_TYPE _type)
 	{
-		if (_type == AttackHitInfo.ATTACK_TYPE.BURST_THS_SINGLE_SHOT || _type == AttackHitInfo.ATTACK_TYPE.BURST_THS_FULL_BURST)
+		if ((uint)(_type - 16) <= 1u)
 		{
 			return true;
 		}

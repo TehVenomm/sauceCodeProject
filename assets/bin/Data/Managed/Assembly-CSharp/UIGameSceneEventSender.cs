@@ -27,20 +27,15 @@ public class UIGameSceneEventSender : MonoBehaviour
 		set;
 	}
 
-	public UIGameSceneEventSender()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		buttonTweenCtrl = this.get_gameObject().GetComponent<UIButtonTweenEventCtrl>();
-		playSoundCtrl = this.get_gameObject().GetComponent<UIPlaySoundCustom>();
+		buttonTweenCtrl = base.gameObject.GetComponent<UIButtonTweenEventCtrl>();
+		playSoundCtrl = base.gameObject.GetComponent<UIPlaySoundCustom>();
 	}
 
 	private void OnValidate()
 	{
-		UIButton component = this.get_gameObject().GetComponent<UIButton>();
+		UIButton component = base.gameObject.GetComponent<UIButton>();
 		if (component != null && component.onClick.Find((EventDelegate o) => o.target == this) == null)
 		{
 			component.onClick.Add(new EventDelegate(this, "SendEvent"));
@@ -53,7 +48,7 @@ public class UIGameSceneEventSender : MonoBehaviour
 		{
 			return;
 		}
-		bool flag = this.get_gameObject().GetInstanceID() == UICamera.currentTouch.current.GetInstanceID();
+		bool flag = base.gameObject.GetInstanceID() == UICamera.currentTouch.current.GetInstanceID();
 		if (isDown)
 		{
 			enablePress = flag;
@@ -66,7 +61,7 @@ public class UIGameSceneEventSender : MonoBehaviour
 		else if (enablePress)
 		{
 			enableRelease = flag;
-			if (Object.op_Implicit(buttonTweenCtrl) && enablePress)
+			if ((bool)buttonTweenCtrl && enablePress)
 			{
 				buttonTweenCtrl.PlayPush(isDown);
 			}
@@ -90,7 +85,7 @@ public class UIGameSceneEventSender : MonoBehaviour
 		}
 		enablePress = (enableRelease = false);
 		PlaySound();
-		if (buttonTweenCtrl != null && buttonTweenCtrl.tweens.Length > 0 && buttonTweenCtrl.tweens[0] != null)
+		if (buttonTweenCtrl != null && buttonTweenCtrl.tweens.Length != 0 && buttonTweenCtrl.tweens[0] != null)
 		{
 			if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 			{
@@ -111,7 +106,7 @@ public class UIGameSceneEventSender : MonoBehaviour
 					}
 					else
 					{
-						this.StartCoroutine(DoButtonTweenCtrlReset());
+						StartCoroutine(DoButtonTweenCtrlReset());
 					}
 				});
 			}
@@ -124,7 +119,7 @@ public class UIGameSceneEventSender : MonoBehaviour
 
 	public void _SendEvent()
 	{
-		SendEvent("UIButton", this.get_gameObject(), eventName, eventData, callback);
+		SendEvent("UIButton", base.gameObject, eventName, eventData, callback);
 	}
 
 	private void PlaySound()
@@ -163,7 +158,7 @@ public class UIGameSceneEventSender : MonoBehaviour
 
 	private bool IsActiveButton()
 	{
-		if (!TutorialMessage.IsActiveButton(this.get_gameObject()))
+		if (!TutorialMessage.IsActiveButton(base.gameObject))
 		{
 			if (eventName == "TUTORIAL_NEXT")
 			{

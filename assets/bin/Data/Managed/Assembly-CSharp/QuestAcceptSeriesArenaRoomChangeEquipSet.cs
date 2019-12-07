@@ -97,17 +97,16 @@ public class QuestAcceptSeriesArenaRoomChangeEquipSet : QuestOffLineChangeEquipS
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		if (!(loader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && CanRotateSection())
 		{
-			loader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
+			loader.transform.Rotate(GameDefine.GetCharaRotateVector(touch_info));
 		}
 	}
 
 	private bool CanRotateSection()
 	{
 		string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-		if (currentSectionName != null && currentSectionName == "QuestAcceptSeriesArenaRoomChangeEquipSet")
+		if (currentSectionName == "QuestAcceptSeriesArenaRoomChangeEquipSet")
 		{
 			return true;
 		}
@@ -120,7 +119,7 @@ public class QuestAcceptSeriesArenaRoomChangeEquipSet : QuestOffLineChangeEquipS
 
 	private bool IsReadyCheck()
 	{
-		if (localEquipSet.item[0] == null || localEquipSet.item[3] == null || localEquipSet.item[0].uniqueID == 0 || localEquipSet.item[3].uniqueID == 0)
+		if (localEquipSet.item[0] == null || localEquipSet.item[3] == null || localEquipSet.item[0].uniqueID == 0L || localEquipSet.item[3].uniqueID == 0L)
 		{
 			return false;
 		}
@@ -199,7 +198,7 @@ public class QuestAcceptSeriesArenaRoomChangeEquipSet : QuestOffLineChangeEquipS
 
 	private void OnQuery_QuestAcceptStatusMagiAllRemoveConfirm_YES()
 	{
-		this.StartCoroutine(sendMagiAllRemove());
+		StartCoroutine(sendMagiAllRemove());
 	}
 
 	protected override void OnQuery_DECISION()
@@ -311,8 +310,7 @@ public class QuestAcceptSeriesArenaRoomChangeEquipSet : QuestOffLineChangeEquipS
 
 	protected override void ViewDetailUI()
 	{
-		EquipSetCalculator uniqueEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetUniqueEquipSetCalculator(selfCharaEquipSetNo);
-		SimpleStatus finalStatus = uniqueEquipSetCalculator.GetFinalStatus(0, MonoBehaviourSingleton<UserInfoManager>.I.userStatus);
+		SimpleStatus finalStatus = MonoBehaviourSingleton<StatusManager>.I.GetUniqueEquipSetCalculator(selfCharaEquipSetNo).GetFinalStatus(0, MonoBehaviourSingleton<UserInfoManager>.I.userStatus);
 		int attacksSum = finalStatus.GetAttacksSum();
 		int defencesSum = finalStatus.GetDefencesSum();
 		int hp = finalStatus.hp;
@@ -333,6 +331,6 @@ public class QuestAcceptSeriesArenaRoomChangeEquipSet : QuestOffLineChangeEquipS
 		{
 			DisableClanInfo();
 		}
-		SetButtonEnabled((Enum)UI.BTN_MAGI_REMOVE, MonoBehaviourSingleton<StatusManager>.I.checkEquipMagi(selfCharaEquipSetNo));
+		SetButtonEnabled(UI.BTN_MAGI_REMOVE, MonoBehaviourSingleton<StatusManager>.I.checkEquipMagi(selfCharaEquipSetNo));
 	}
 }

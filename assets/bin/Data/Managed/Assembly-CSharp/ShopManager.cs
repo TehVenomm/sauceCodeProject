@@ -137,7 +137,7 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 				Dirty();
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendBuy(int shopLineupId, Action<Error> call_back)
@@ -181,14 +181,14 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 				}
 			}
 			call_back(ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetGoldPurchaseItemList(Action<bool> call_back)
 	{
 		purchaseItemList = null;
 		GoldPurchaseItemListModel.SendForm sendForm = new GoldPurchaseItemListModel.SendForm();
-		sendForm.checkSum = ((purchaseItemList == null) ? string.Empty : purchaseItemList.checkSum);
+		sendForm.checkSum = ((purchaseItemList != null) ? purchaseItemList.checkSum : string.Empty);
 		Protocol.Send(GoldPurchaseItemListModel.URL, sendForm, delegate(GoldPurchaseItemListModel ret)
 		{
 			bool obj = false;
@@ -197,12 +197,8 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 				if (purchaseItemList == null || !purchaseItemList.checkSum.Equals(ret.result.checkSum))
 				{
 					purchaseItemList = ret.result;
-					string productNameData = string.Join("----", (from x in purchaseItemList.shopList
-					select x.name).ToArray());
-					Native.SetProductNameData(productNameData);
-					productNameData = string.Join("----", (from x in purchaseItemList.shopList
-					select x.productId).ToArray());
-					Native.SetProductIdData(productNameData);
+					Native.SetProductNameData(string.Join("----", purchaseItemList.shopList.Select((ProductData x) => x.name).ToArray()));
+					Native.SetProductIdData(string.Join("----", purchaseItemList.shopList.Select((ProductData x) => x.productId).ToArray()));
 					obj = true;
 					MonoBehaviourSingleton<AppMain>.I.UpdatePurchaseItemListRequestTime();
 					GameSaveData.instance.iAPBundleBought = string.Empty;
@@ -213,7 +209,7 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 			{
 				call_back(obj);
 			}
-		}, string.Empty);
+		});
 	}
 
 	private void AddTestPack()
@@ -255,7 +251,7 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 		Protocol.Send(GoldCanPurchaseModel.URL, requestSendForm, delegate(GoldCanPurchaseModel ret)
 		{
 			call_back(ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDarkMarketCanPurchase(string product_id, int darkMarketId, string safety_lock_password, Action<Error> call_back)
@@ -267,7 +263,7 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 		Protocol.Send(GoldCanPurchaseModel.URL, requestSendForm, delegate(GoldCanPurchaseModel ret)
 		{
 			call_back(ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendCheckPromotion()
@@ -298,19 +294,15 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 					GoGameTimeManager.SetServerTime(ret.currentTime);
 				}
 				darkMarketItemList = ret.result;
-				if (!string.IsNullOrEmpty(ret.result.endDate) && !GameSaveData.instance.resetMarketTime.Equals(ret.result.endDate))
+				if (!string.IsNullOrEmpty(ret.result.endDate) && !GameSaveData.instance.resetMarketTime.Equals(ret.result.endDate) && (int)GoGameTimeManager.GetRemainTime(ret.result.endDate).TotalSeconds > 0)
 				{
-					int num = (int)GoGameTimeManager.GetRemainTime(ret.result.endDate).TotalSeconds;
-					if (num > 0)
-					{
-						GameSaveData.instance.canShowNoteDarkMarket = true;
-						GameSaveData.instance.resetMarketTime = ret.result.endDate;
-					}
+					GameSaveData.instance.canShowNoteDarkMarket = true;
+					GameSaveData.instance.resetMarketTime = ret.result.endDate;
 				}
 				Dirty();
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public DarkMarketItem GetDarkMarketItem(int itemId)
@@ -365,7 +357,7 @@ public class ShopManager : MonoBehaviourSingleton<ShopManager>
 		Protocol.Send(DarkMarketBuyModel.URL, requestSendForm, delegate(DarkMarketBuyModel ret)
 		{
 			call_back(ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void UpdateDarkMarketUsedCount(int darkMarketId, int usedCount)

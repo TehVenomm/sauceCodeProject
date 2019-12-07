@@ -56,7 +56,7 @@ public class SlimeAnimBase<T> where T : new()
 
 	private void updatePlayTime()
 	{
-		nowTime += Time.get_deltaTime();
+		nowTime += Time.deltaTime;
 		if (playTime <= nowTime)
 		{
 			AnimFinish();

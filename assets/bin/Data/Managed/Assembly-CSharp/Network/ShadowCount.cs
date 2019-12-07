@@ -2,15 +2,15 @@ namespace Network
 {
 	public class ShadowCount
 	{
-		public string startDate = string.Empty;
+		public string startDate = "";
 
-		public string endDate = string.Empty;
+		public string endDate = "";
 
 		public int num;
 
 		public bool HasShadowCount()
 		{
-			return startDate != string.Empty;
+			return startDate != "";
 		}
 	}
 }

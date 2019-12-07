@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class UserLevelTable : Singleton<UserLevelTable>, IDataTable
@@ -22,9 +21,6 @@ public class UserLevelTable : Singleton<UserLevelTable>, IDataTable
 	private UIntKeyTable<UserLevelData> userLevelTable;
 
 	private int maxLevel;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<UserLevelData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string csv_text)
 	{
@@ -70,7 +66,7 @@ public class UserLevelTable : Singleton<UserLevelTable>, IDataTable
 		}
 		userLevelTable.ForEach(delegate(UserLevelData data)
 		{
-			maxLevel = Mathf.Max(maxLevel, (int)data.lv);
+			maxLevel = Mathf.Max(maxLevel, data.lv);
 		});
 		return maxLevel;
 	}

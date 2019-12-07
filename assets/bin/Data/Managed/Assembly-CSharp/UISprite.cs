@@ -23,7 +23,17 @@ public class UISprite : UIBasicSprite
 	[NonSerialized]
 	private bool mSpriteSet;
 
-	public override Material material => (!(mAtlas != null)) ? null : mAtlas.spriteMaterial;
+	public override Material material
+	{
+		get
+		{
+			if (!(mAtlas != null))
+			{
+				return null;
+			}
+			return mAtlas.spriteMaterial;
+		}
+	}
 
 	public UIAtlas atlas
 	{
@@ -47,7 +57,7 @@ public class UISprite : UIBasicSprite
 				if (!string.IsNullOrEmpty(mSpriteName))
 				{
 					string spriteName = mSpriteName;
-					mSpriteName = string.Empty;
+					mSpriteName = "";
 					this.spriteName = spriteName;
 					MarkAsChanged();
 				}
@@ -67,7 +77,7 @@ public class UISprite : UIBasicSprite
 			{
 				if (!string.IsNullOrEmpty(mSpriteName))
 				{
-					mSpriteName = string.Empty;
+					mSpriteName = "";
 					mSprite = null;
 					mChanged = true;
 					mSpriteSet = false;
@@ -106,37 +116,42 @@ public class UISprite : UIBasicSprite
 	{
 		get
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			UISpriteData atlasSprite = GetAtlasSprite();
 			if (atlasSprite == null)
 			{
 				return base.border;
 			}
-			return new Vector4((float)atlasSprite.borderLeft, (float)atlasSprite.borderBottom, (float)atlasSprite.borderRight, (float)atlasSprite.borderTop);
+			return new Vector4(atlasSprite.borderLeft, atlasSprite.borderBottom, atlasSprite.borderRight, atlasSprite.borderTop);
 		}
 	}
 
-	public override float pixelSize => (!(mAtlas != null)) ? 1f : mAtlas.pixelSize;
+	public override float pixelSize
+	{
+		get
+		{
+			if (!(mAtlas != null))
+			{
+				return 1f;
+			}
+			return mAtlas.pixelSize;
+		}
+	}
 
 	public override int minWidth
 	{
 		get
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			if (type == Type.Sliced || type == Type.Advanced)
 			{
 				float pixelSize = this.pixelSize;
-				Vector4 val = border * this.pixelSize;
-				int num = Mathf.RoundToInt(val.x + val.z);
+				Vector4 vector = border * this.pixelSize;
+				int num = Mathf.RoundToInt(vector.x + vector.z);
 				UISpriteData atlasSprite = GetAtlasSprite();
 				if (atlasSprite != null)
 				{
 					num += Mathf.RoundToInt(pixelSize * (float)(atlasSprite.paddingLeft + atlasSprite.paddingRight));
 				}
-				return Mathf.Max(base.minWidth, ((num & 1) != 1) ? num : (num + 1));
+				return Mathf.Max(base.minWidth, ((num & 1) == 1) ? (num + 1) : num);
 			}
 			return base.minWidth;
 		}
@@ -146,19 +161,16 @@ public class UISprite : UIBasicSprite
 	{
 		get
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			if (type == Type.Sliced || type == Type.Advanced)
 			{
-				Vector4 val = border * pixelSize;
-				int num = Mathf.RoundToInt(val.y + val.w);
+				Vector4 vector = border * pixelSize;
+				int num = Mathf.RoundToInt(vector.y + vector.w);
 				UISpriteData atlasSprite = GetAtlasSprite();
 				if (atlasSprite != null)
 				{
 					num += atlasSprite.paddingTop + atlasSprite.paddingBottom;
 				}
-				return Mathf.Max(base.minHeight, ((num & 1) != 1) ? num : (num + 1));
+				return Mathf.Max(base.minHeight, ((num & 1) == 1) ? (num + 1) : num);
 			}
 			return base.minHeight;
 		}
@@ -168,13 +180,6 @@ public class UISprite : UIBasicSprite
 	{
 		get
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
 			Vector2 pivotOffset = base.pivotOffset;
 			float num = (0f - pivotOffset.x) * (float)mWidth;
 			float num2 = (0f - pivotOffset.y) * (float)mHeight;
@@ -232,18 +237,28 @@ public class UISprite : UIBasicSprite
 					num4 -= (float)num8 * num12;
 				}
 			}
-			Vector4 val = (!(mAtlas != null)) ? Vector4.get_zero() : (border * this.pixelSize);
-			float num13 = val.x + val.z;
-			float num14 = val.y + val.w;
-			float num15 = Mathf.Lerp(num, num3 - num13, mDrawRegion.x);
-			float num16 = Mathf.Lerp(num2, num4 - num14, mDrawRegion.y);
-			float num17 = Mathf.Lerp(num + num13, num3, mDrawRegion.z);
-			float num18 = Mathf.Lerp(num2 + num14, num4, mDrawRegion.w);
-			return new Vector4(num15, num16, num17, num18);
+			Vector4 vector = (mAtlas != null) ? (border * this.pixelSize) : Vector4.zero;
+			float num13 = vector.x + vector.z;
+			float num14 = vector.y + vector.w;
+			float x = Mathf.Lerp(num, num3 - num13, mDrawRegion.x);
+			float y = Mathf.Lerp(num2, num4 - num14, mDrawRegion.y);
+			float z = Mathf.Lerp(num + num13, num3, mDrawRegion.z);
+			float w = Mathf.Lerp(num2 + num14, num4, mDrawRegion.w);
+			return new Vector4(x, y, z, w);
 		}
 	}
 
-	public override bool premultipliedAlpha => mAtlas != null && mAtlas.premultipliedAlpha;
+	public override bool premultipliedAlpha
+	{
+		get
+		{
+			if (mAtlas != null)
+			{
+				return mAtlas.premultipliedAlpha;
+			}
+			return false;
+		}
+	}
 
 	public UISpriteData GetAtlasSprite()
 	{
@@ -272,7 +287,7 @@ public class UISprite : UIBasicSprite
 				SetAtlasSprite(uISpriteData);
 				if (mSprite == null)
 				{
-					Debug.LogError((object)(mAtlas.get_name() + " seems to have a null sprite!"));
+					Debug.LogError(mAtlas.name + " seems to have a null sprite!");
 					return null;
 				}
 				mSpriteName = mSprite.name;
@@ -292,7 +307,7 @@ public class UISprite : UIBasicSprite
 		}
 		else
 		{
-			mSpriteName = ((mSprite == null) ? string.Empty : mSprite.name);
+			mSpriteName = ((mSprite != null) ? mSprite.name : "");
 			mSprite = sp;
 		}
 	}
@@ -354,14 +369,6 @@ public class UISprite : UIBasicSprite
 
 	public override void OnFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
 		Texture mainTexture = this.mainTexture;
 		if (mainTexture == null)
 		{
@@ -373,14 +380,12 @@ public class UISprite : UIBasicSprite
 		}
 		if (mSprite != null)
 		{
-			Rect val = default(Rect);
-			val._002Ector((float)mSprite.x, (float)mSprite.y, (float)mSprite.width, (float)mSprite.height);
-			Rect val2 = default(Rect);
-			val2._002Ector((float)(mSprite.x + mSprite.borderLeft), (float)(mSprite.y + mSprite.borderTop), (float)(mSprite.width - mSprite.borderLeft - mSprite.borderRight), (float)(mSprite.height - mSprite.borderBottom - mSprite.borderTop));
-			val = NGUIMath.ConvertToTexCoords(val, mainTexture.get_width(), mainTexture.get_height());
-			val2 = NGUIMath.ConvertToTexCoords(val2, mainTexture.get_width(), mainTexture.get_height());
+			Rect rect = new Rect(mSprite.x, mSprite.y, mSprite.width, mSprite.height);
+			Rect rect2 = new Rect(mSprite.x + mSprite.borderLeft, mSprite.y + mSprite.borderTop, mSprite.width - mSprite.borderLeft - mSprite.borderRight, mSprite.height - mSprite.borderBottom - mSprite.borderTop);
+			rect = NGUIMath.ConvertToTexCoords(rect, mainTexture.width, mainTexture.height);
+			rect2 = NGUIMath.ConvertToTexCoords(rect2, mainTexture.width, mainTexture.height);
 			int size = verts.size;
-			Fill(verts, uvs, cols, val, val2);
+			Fill(verts, uvs, cols, rect, rect2);
 			if (onPostFill != null)
 			{
 				onPostFill(this, size, verts, uvs, cols);

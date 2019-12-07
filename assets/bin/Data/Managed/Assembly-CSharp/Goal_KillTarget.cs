@@ -51,9 +51,6 @@ public class Goal_KillTarget : GoalComposite
 
 	public override void HandleEvent(Brain brain, BRAIN_EVENT ev, object param = null)
 	{
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
 		base.HandleEvent(brain, ev, param);
 		switch (ev)
 		{

@@ -1,85 +1,34 @@
 using rhyme;
-using System;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 
 public static class EeLSettings
 {
-	[CompilerGenerated]
-	private static ResourceLoadFunc _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static SoundFunc _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static InitFxFunc _003C_003Ef__mg_0024cache2;
-
-	[CompilerGenerated]
-	private static QueryDestroyFxFunc _003C_003Ef__mg_0024cache3;
-
-	[CompilerGenerated]
-	private static GetShaderFunc _003C_003Ef__mg_0024cache4;
-
-	public unsafe static void Startup()
+	public static void Startup()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Expected O, but got Unknown
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Expected O, but got Unknown
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Expected O, but got Unknown
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Expected O, but got Unknown
-		if (_003C_003Ef__mg_0024cache0 == null)
-		{
-			_003C_003Ef__mg_0024cache0 = new ResourceLoadFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		rymFXManager.ResourceLoadDelegate = _003C_003Ef__mg_0024cache0;
-		if (_003C_003Ef__mg_0024cache1 == null)
-		{
-			_003C_003Ef__mg_0024cache1 = new SoundFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		rymFXManager.PlaySoundDelegate = _003C_003Ef__mg_0024cache1;
-		if (_003C_003Ef__mg_0024cache2 == null)
-		{
-			_003C_003Ef__mg_0024cache2 = new InitFxFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		rymFXManager.InitFxDelegate = _003C_003Ef__mg_0024cache2;
-		if (_003C_003Ef__mg_0024cache3 == null)
-		{
-			_003C_003Ef__mg_0024cache3 = new QueryDestroyFxFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		rymFXManager.QueryDestroyFxDelegate = _003C_003Ef__mg_0024cache3;
-		rymFXManager.MeshBounds = new Bounds(Vector3.get_zero(), new Vector3(100000f, 100000f, 100000f));
+		rymFXManager.ResourceLoadDelegate = OnResourceLoad;
+		rymFXManager.PlaySoundDelegate = PlaySound;
+		rymFXManager.InitFxDelegate = InitFx;
+		rymFXManager.QueryDestroyFxDelegate = OnQueryDestroyFx;
+		rymFXManager.MeshBounds = new Bounds(Vector3.zero, new Vector3(100000f, 100000f, 100000f));
 		rymFXManager.EnableLog = false;
-		if (_003C_003Ef__mg_0024cache4 == null)
-		{
-			_003C_003Ef__mg_0024cache4 = new GetShaderFunc((object)null, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
-		}
-		rymFXManager.GetShaderDelegate = _003C_003Ef__mg_0024cache4;
+		rymFXManager.GetShaderDelegate = GetShader;
 		rymFXTrail.ComplementMode = 0;
 		rymFXManager.ClearPoolObjects();
 		rymTPool<rymXorShift>.Precreate(32);
-		rymTPool<EmitParam>.Precreate(16);
-		rymTPool<PtclWorkBlock>.Precreate(32);
-		rymTPool<rymList<PtclWorkBlock>>.Precreate(32);
-		rymTPool<PtclWork>.Precreate(512);
-		rymTPool<WorkAccess>.Precreate(8);
-		rymTPool<ApplyParam>.Precreate(8);
+		rymTPool<rymFXParticle2.EmitParam>.Precreate(16);
+		rymTPool<rymFXParticle2.PtclWorkBlock>.Precreate(32);
+		rymTPool<rymList<rymFXParticle2.PtclWorkBlock>>.Precreate(32);
+		rymTPool<rymFXParticle2.PtclWork>.Precreate(512);
+		rymTPool<rymFX4KeyAnimValue.WorkAccess>.Precreate(8);
+		rymTPool<rymFXParticleForceBase.ApplyParam>.Precreate(8);
 		rymTPool<rymFXParticle2ChildPlug>.Precreate(32);
-		rymTPool<rymFXTrailPoint>.Precreate(64);
-		rymTPool<rymList<rymFXTrailPoint>>.Precreate(32);
-		rymTPool<rymFXTrailParam>.Precreate(8);
+		rymTPool<rymFXTrail.rymFXTrailPoint>.Precreate(64);
+		rymTPool<rymList<rymFXTrail.rymFXTrailPoint>>.Precreate(32);
+		rymTPool<rymFXTrail.rymFXTrailParam>.Precreate(8);
 		rymTPool<rymFX4KeyAnimValue>.Precreate(32);
-		rymTPool<Param>.Precreate(128);
+		rymTPool<rymFX4KeyAnimValue.Param>.Precreate(128);
 		rymTPool<rymMemReader>.Precreate(1);
 		rymTPool<StringBuilder>.Precreate(1);
 		rymTPool<rymList<string>>.Precreate(16);
@@ -114,38 +63,38 @@ public static class EeLSettings
 		rymTPool<rymFXParticle2ChildWork>.Precreate(16);
 		rymTPool<rymFXParticle2ChildParam>.Precreate(16);
 		rymTPool<rymList<rymFXObjectBase>>.Precreate(32);
-		rymTPool<Param>.Precreate(16);
+		rymTPool<rymFXParticle2.Param>.Precreate(16);
 		object[] array = new object[96];
 		int i = 0;
 		int num = 0;
 		for (; i < 32; i++)
 		{
-			rymList<Vector2> val = rymTPool<rymList<Vector2>>.Get();
-			val.set_Capacity(400);
-			rymList<Vector3> val2 = rymTPool<rymList<Vector3>>.Get();
-			val2.set_Capacity(400);
-			rymList<Color> val3 = rymTPool<rymList<Color>>.Get();
-			val3.set_Capacity(400);
-			array[num++] = val;
-			array[num++] = val2;
-			array[num++] = val3;
+			rymList<Vector2> rymList = rymTPool<rymList<Vector2>>.Get();
+			rymList.Capacity = 400;
+			rymList<Vector3> rymList2 = rymTPool<rymList<Vector3>>.Get();
+			rymList2.Capacity = 400;
+			rymList<Color> rymList3 = rymTPool<rymList<Color>>.Get();
+			rymList3.Capacity = 400;
+			array[num++] = rymList;
+			array[num++] = rymList2;
+			array[num++] = rymList3;
 		}
 		int j = 0;
-		int num5 = 0;
+		int num2 = 0;
 		for (; j < 32; j++)
 		{
-			rymList<Vector2> val4 = array[num5++] as rymList<Vector2>;
-			rymList<Vector3> val5 = array[num5++] as rymList<Vector3>;
-			rymList<Color> val6 = array[num5++] as rymList<Color>;
-			rymTPool<rymList<Vector2>>.Release(ref val4);
-			rymTPool<rymList<Vector3>>.Release(ref val5);
-			rymTPool<rymList<Color>>.Release(ref val6);
+			rymList<Vector2> obj = array[num2++] as rymList<Vector2>;
+			rymList<Vector3> obj2 = array[num2++] as rymList<Vector3>;
+			rymList<Color> obj3 = array[num2++] as rymList<Color>;
+			rymTPool<rymList<Vector2>>.Release(ref obj);
+			rymTPool<rymList<Vector3>>.Release(ref obj2);
+			rymTPool<rymList<Color>>.Release(ref obj3);
 		}
 		rymTPool<rymList<int>>.poolCountLimit = 32;
 		rymFXManager.EnableMaterialCache = false;
 	}
 
-	private static void OnResourceLoad(ResourceLoadWork work)
+	private static void OnResourceLoad(rymFX.ResourceLoadWork work)
 	{
 		if (work.fx == null)
 		{
@@ -160,7 +109,7 @@ public static class EeLSettings
 				int i = 0;
 				for (int size = textureNameList.size; i < size; i++)
 				{
-					string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(textureNameList.get_Item(i));
+					string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(textureNameList[i]);
 					if (!string.IsNullOrEmpty(fileNameWithoutExtension))
 					{
 						work.textures[i] = component.Get<Texture>(fileNameWithoutExtension);
@@ -169,7 +118,7 @@ public static class EeLSettings
 			}
 			else
 			{
-				Debug.LogWarning((object)work.fx.get_name());
+				Debug.LogWarning(work.fx.name);
 			}
 		}
 		work.fx.ResourceLoadComplete();
@@ -177,7 +126,7 @@ public static class EeLSettings
 
 	private static void PlaySound(rymFX fx, rymFXSoundInfo info)
 	{
-		if (!fx.get_enabled() || (info.loop && info.audio_source != null) || string.IsNullOrEmpty(info.clip_name))
+		if (!fx.enabled || (info.loop && info.audio_source != null) || string.IsNullOrEmpty(info.clip_name))
 		{
 			return;
 		}
@@ -187,10 +136,10 @@ public static class EeLSettings
 			return;
 		}
 		string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(info.clip_name);
-		AudioClip val = component.Get<AudioClip>(fileNameWithoutExtension);
-		if (val != null)
+		AudioClip audioClip = component.Get<AudioClip>(fileNameWithoutExtension);
+		if (audioClip != null)
 		{
-			AudioObject audioObject = SoundManager.PlaySE(val, info.loop, fx.get__transform());
+			AudioObject audioObject = SoundManager.PlaySE(audioClip, info.loop, fx._transform);
 			if (audioObject != null && info.loop)
 			{
 				EffectInfoComponent component2 = fx.GetComponent<EffectInfoComponent>();
@@ -202,13 +151,13 @@ public static class EeLSettings
 		}
 		else
 		{
-			Log.Error(LOG.RESOURCE, "{0} is not found. ({1})", fileNameWithoutExtension, fx.get_name());
+			Log.Error(LOG.RESOURCE, "{0} is not found. ({1})", fileNameWithoutExtension, fx.name);
 		}
 	}
 
 	private static void InitFx(rymFX fx, bool binary)
 	{
-		if (fx.get_gameObject().get_layer() != 5)
+		if (fx.gameObject.layer != 5)
 		{
 			SceneSettingsManager.ApplyEffect(fx, force: false);
 		}
@@ -221,7 +170,7 @@ public static class EeLSettings
 
 	private static bool OnQueryDestroyFx(rymFX fx)
 	{
-		if (MonoBehaviourSingleton<EffectManager>.IsValid() && MonoBehaviourSingleton<EffectManager>.I.StockOrDestroy(fx.get_gameObject(), no_stock_to_destroy: false))
+		if (MonoBehaviourSingleton<EffectManager>.IsValid() && MonoBehaviourSingleton<EffectManager>.I.StockOrDestroy(fx.gameObject, no_stock_to_destroy: false))
 		{
 			return false;
 		}

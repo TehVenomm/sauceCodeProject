@@ -32,15 +32,10 @@ public abstract class SkillInfoBase : GameSection
 		}
 		SkillSlotUIData[] ui_slot_data = new SkillSlotUIData[maxSlot];
 		int currentSetNo = GetCurrentEquipSetNo();
-		SkillItemInfo[] skillInventoryClone = MonoBehaviourSingleton<InventoryManager>.I.GetSkillInventoryClone();
-		SkillItemInfo[] array = Array.FindAll(skillInventoryClone, delegate(SkillItemInfo skill_item)
+		SkillItemInfo[] array = Array.FindAll(MonoBehaviourSingleton<InventoryManager>.I.GetSkillInventoryClone(), delegate(SkillItemInfo skill_item)
 		{
 			EquipSetSkillData equipSetSkillData2 = skill_item.equipSetSkill.Find((EquipSetSkillData skill) => skill.equipItemUniqId == equip.uniqueID && skill.equipSetNo == currentSetNo);
-			if (StatusManager.IsUnique())
-			{
-				return skill_item.uniqueEquipSetSkill.equipItemUniqId == equip.uniqueID;
-			}
-			return equipSetSkillData2 != null;
+			return StatusManager.IsUnique() ? (skill_item.uniqueEquipSetSkill.equipItemUniqId == equip.uniqueID) : (equipSetSkillData2 != null);
 		});
 		if (array != null && array.Length > maxSlot)
 		{
@@ -55,7 +50,7 @@ public abstract class SkillInfoBase : GameSection
 				if (StatusManager.IsUnique())
 				{
 					equipSetSkillData = info.uniqueEquipSetSkill;
-					equipSetSkillData = ((equipSetSkillData.equipItemUniqId != equip.uniqueID) ? null : equipSetSkillData);
+					equipSetSkillData = ((equipSetSkillData.equipItemUniqId == equip.uniqueID) ? equipSetSkillData : null);
 				}
 				if (equipSetSkillData != null)
 				{
@@ -183,21 +178,17 @@ public abstract class SkillInfoBase : GameSection
 				int k = 0;
 				for (int count = data.sIds.Count; k < count; k++)
 				{
-					if (list.IndexOf(k) == -1)
+					if (list.IndexOf(k) == -1 && Singleton<SkillItemTable>.I.GetSkillItemData((uint)data.sIds[k]).type == array[j].slotData.slotType)
 					{
-						SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)data.sIds[k]);
-						if (skillItemData.type == array[j].slotData.slotType)
+						int exceed = 0;
+						if (k < data.sExs.Count)
 						{
-							int exceed = 0;
-							if (k < data.sExs.Count)
-							{
-								exceed = data.sExs[k];
-							}
-							array[j].itemData = new SkillItemInfo(j, data.sIds[k], data.sLvs[k], exceed);
-							array[j].slotData.skill_id = (uint)data.sIds[k];
-							list.Add(k);
-							break;
+							exceed = data.sExs[k];
 						}
+						array[j].itemData = new SkillItemInfo(j, data.sIds[k], data.sLvs[k], exceed);
+						array[j].slotData.skill_id = (uint)data.sIds[k];
+						list.Add(k);
+						break;
 					}
 				}
 			}
@@ -218,7 +209,7 @@ public abstract class SkillInfoBase : GameSection
 				num2 = 6;
 				break;
 			default:
-				num2 = ++weapon_cnt;
+				num2 = weapon_cnt++;
 				break;
 			}
 			ary[num2] = equipItemAndSkillData;
@@ -238,13 +229,13 @@ public abstract class SkillInfoBase : GameSection
 		StatusEquipSetCopyModel.RequestSendForm requestSendForm = new StatusEquipSetCopyModel.RequestSendForm();
 		requestSendForm.no = equipSetNo;
 		requestSendForm.name = equipSet.name;
-		requestSendForm.wuid0 = ((equipSet.item[0] == null) ? "0" : equipSet.item[0].uniqueID.ToString());
-		requestSendForm.wuid1 = ((equipSet.item[1] == null) ? "0" : equipSet.item[1].uniqueID.ToString());
-		requestSendForm.wuid2 = ((equipSet.item[2] == null) ? "0" : equipSet.item[2].uniqueID.ToString());
-		requestSendForm.auid = ((equipSet.item[3] == null) ? "0" : equipSet.item[3].uniqueID.ToString());
-		requestSendForm.ruid = ((equipSet.item[5] == null) ? "0" : equipSet.item[5].uniqueID.ToString());
-		requestSendForm.luid = ((equipSet.item[6] == null) ? "0" : equipSet.item[6].uniqueID.ToString());
-		requestSendForm.huid = ((equipSet.item[4] == null) ? "0" : equipSet.item[4].uniqueID.ToString());
+		requestSendForm.wuid0 = ((equipSet.item[0] != null) ? equipSet.item[0].uniqueID.ToString() : "0");
+		requestSendForm.wuid1 = ((equipSet.item[1] != null) ? equipSet.item[1].uniqueID.ToString() : "0");
+		requestSendForm.wuid2 = ((equipSet.item[2] != null) ? equipSet.item[2].uniqueID.ToString() : "0");
+		requestSendForm.auid = ((equipSet.item[3] != null) ? equipSet.item[3].uniqueID.ToString() : "0");
+		requestSendForm.ruid = ((equipSet.item[5] != null) ? equipSet.item[5].uniqueID.ToString() : "0");
+		requestSendForm.luid = ((equipSet.item[6] != null) ? equipSet.item[6].uniqueID.ToString() : "0");
+		requestSendForm.huid = ((equipSet.item[4] != null) ? equipSet.item[4].uniqueID.ToString() : "0");
 		requestSendForm.show = equipSet.showHelm;
 		int i = 0;
 		for (int num = equipSet.item.Length; i < num; i++)
@@ -264,7 +255,7 @@ public abstract class SkillInfoBase : GameSection
 			{
 				SkillItemInfo itemData = skillSlotData[j].itemData;
 				requestSendForm.euids.Add(equipItemInfo.uniqueID.ToString());
-				requestSendForm.suids.Add((itemData == null) ? "0" : itemData.uniqueID.ToString());
+				requestSendForm.suids.Add((itemData != null) ? itemData.uniqueID.ToString() : "0");
 				int num3 = j;
 				if (equipItemInfo.IsExceedSkillSlot(num3))
 				{

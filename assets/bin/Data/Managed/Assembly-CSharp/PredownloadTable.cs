@@ -29,9 +29,4 @@ public class PredownloadTable : ScriptableObject
 	public List<Data> inGameDatas;
 
 	public List<Data> manualDatas;
-
-	public PredownloadTable()
-		: this()
-	{
-	}
 }

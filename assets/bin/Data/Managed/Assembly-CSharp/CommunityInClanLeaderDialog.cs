@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class CommunityInClanLeaderDialog : CommunityDialogBase
@@ -21,11 +20,11 @@ public class CommunityInClanLeaderDialog : CommunityDialogBase
 		base.UpdateUI();
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsLeader())
 		{
-			SetActive((Enum)UI.BTN_CLAN_SETTING, is_visible: true);
+			SetActive(UI.BTN_CLAN_SETTING, is_visible: true);
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_CLAN_SETTING, is_visible: false);
+			SetActive(UI.BTN_CLAN_SETTING, is_visible: false);
 		}
 		UpdateBadge();
 	}
@@ -33,14 +32,14 @@ public class CommunityInClanLeaderDialog : CommunityDialogBase
 	private void UpdateBadge()
 	{
 		Transform ctrl = GetCtrl(UI.BTN_CLAN_APPLIED);
-		if (!(ctrl == null) && ctrl.get_gameObject().get_activeSelf())
+		if (!(ctrl == null) && ctrl.gameObject.activeSelf)
 		{
 			int num = MonoBehaviourSingleton<UserInfoManager>.I.clanRequestNum;
 			if (num < 0)
 			{
 				num = 0;
 			}
-			SetBadge(ctrl, num, 3, -8, -8);
+			SetBadge(ctrl, num, SpriteAlignment.TopRight, -8, -8);
 		}
 	}
 

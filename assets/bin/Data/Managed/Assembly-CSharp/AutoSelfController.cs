@@ -27,17 +27,77 @@ public class AutoSelfController : SelfController
 		private set;
 	}
 
-	private bool isAttack => base.self != null && base.self.actionID == Character.ACTION_ID.ATTACK;
+	private bool isAttack
+	{
+		get
+		{
+			if (!(base.self != null))
+			{
+				return false;
+			}
+			return base.self.actionID == Character.ACTION_ID.ATTACK;
+		}
+	}
 
-	private bool isGuard => base.self != null && base.self.actionID == (Character.ACTION_ID)19;
+	private bool isGuard
+	{
+		get
+		{
+			if (!(base.self != null))
+			{
+				return false;
+			}
+			return base.self.actionID == (Character.ACTION_ID)19;
+		}
+	}
 
-	private bool isMove => base.self != null && base.self.actionID == Character.ACTION_ID.MOVE;
+	private bool isMove
+	{
+		get
+		{
+			if (!(base.self != null))
+			{
+				return false;
+			}
+			return base.self.actionID == Character.ACTION_ID.MOVE;
+		}
+	}
 
-	private bool isChangeableAttack => base.self != null && base.self.IsChangeableAction(Character.ACTION_ID.ATTACK);
+	private bool isChangeableAttack
+	{
+		get
+		{
+			if (!(base.self != null))
+			{
+				return false;
+			}
+			return base.self.IsChangeableAction(Character.ACTION_ID.ATTACK);
+		}
+	}
 
-	private bool isChangeableSpecialAction => base.self != null && base.self.IsChangeableAction((Character.ACTION_ID)33);
+	private bool isChangeableSpecialAction
+	{
+		get
+		{
+			if (!(base.self != null))
+			{
+				return false;
+			}
+			return base.self.IsChangeableAction((Character.ACTION_ID)33);
+		}
+	}
 
-	private StageObject target => (!(base.brain != null)) ? null : base.brain.targetCtrl.GetCurrentTarget();
+	private StageObject target
+	{
+		get
+		{
+			if (!(base.brain != null))
+			{
+				return null;
+			}
+			return base.brain.targetCtrl.GetCurrentTarget();
+		}
+	}
 
 	protected override void Awake()
 	{
@@ -59,7 +119,11 @@ public class AutoSelfController : SelfController
 	private bool IsTouchedInAutoMode()
 	{
 		InputManager.TouchInfo stickInfo = MonoBehaviourSingleton<InputManager>.I.GetStickInfo();
-		return touchInfo != null || stickInfo != null;
+		if (touchInfo == null)
+		{
+			return stickInfo != null;
+		}
+		return true;
 	}
 
 	protected override void Update()
@@ -112,16 +176,16 @@ public class AutoSelfController : SelfController
 		base.OnChangeEnableControll(enable);
 		if (enable)
 		{
-			if (isStart && this.get_enabled() && base.self != null && mainCoroutine == null)
+			if (isStart && base.enabled && base.self != null && mainCoroutine == null)
 			{
 				mainCoroutine = AIMain();
-				this.StartCoroutine(mainCoroutine);
+				StartCoroutine(mainCoroutine);
 			}
 			return;
 		}
 		if (mainCoroutine != null)
 		{
-			this.StopAllCoroutines();
+			StopAllCoroutines();
 			mainCoroutine = null;
 		}
 		if (isGuard)
@@ -142,13 +206,13 @@ public class AutoSelfController : SelfController
 		}
 		if (startWaitTime > 0f)
 		{
-			yield return (object)new WaitForSeconds(startWaitTime);
+			yield return new WaitForSeconds(startWaitTime);
 		}
-		while (this.get_enabled())
+		while (base.enabled)
 		{
 			while (base.self.IsMirror())
 			{
-				yield return (object)new WaitForSeconds(1f);
+				yield return new WaitForSeconds(1f);
 			}
 			while (IsTouchedInAutoMode())
 			{
@@ -156,14 +220,14 @@ public class AutoSelfController : SelfController
 			}
 			OnMove();
 			OnWeapon();
-			float time = 0f;
+			float num = 0f;
 			if (base.self.packetSender != null)
 			{
-				time = base.self.packetSender.GetWaitTime(0f);
+				num = base.self.packetSender.GetWaitTime(0f);
 			}
-			if (time > 0f)
+			if (num > 0f)
 			{
-				yield return (object)new WaitForSeconds(time);
+				yield return new WaitForSeconds(num);
 			}
 			else
 			{
@@ -175,7 +239,7 @@ public class AutoSelfController : SelfController
 
 	private void OnDead()
 	{
-		if (!base.self.isControllable && base.self.actionID == (Character.ACTION_ID)24 && base.self.rescueTime <= 0f && base.self.deadStartTime >= 0f && !base.self.isProgressStop() && base.self == null)
+		if (!base.self.isControllable && base.self.actionID == (Character.ACTION_ID)24 && base.self.rescueTime <= 0f && base.self.deadStartTime >= 0f && !base.self.isProgressStop() && (object)base.self == null)
 		{
 			base.self.DestroyObject();
 		}
@@ -192,8 +256,6 @@ public class AutoSelfController : SelfController
 
 	private void OnMove()
 	{
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
 		bool flag = true;
 		if (base.brain.moveCtrl.IsAvoid())
 		{
@@ -225,101 +287,42 @@ public class AutoSelfController : SelfController
 
 	private void OnMoveStick(Vector2 stick_vec, Vector3 target_pos)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
 		stick_vec.Normalize();
-		Vector3 position = this.get_transform().get_position();
-		Vector3 val = target_pos - position;
-		val.y = 0f;
-		val.Normalize();
-		Vector3 val2 = Quaternion.Euler(0f, 90f, 0f) * val;
-		Vector3 val3 = val;
-		Vector3 val4 = (!(base.self.actionTarget != null)) ? (val2 * stick_vec.x * base.parameter.moveForwardSpeed + val3 * stick_vec.y * base.parameter.moveForwardSpeed) : (val2 * stick_vec.x * base.parameter.moveSideSpeed + val3 * stick_vec.y * base.parameter.moveForwardSpeed);
-		character.ActMoveVelocity((!base.parameter.enableRootMotion) ? val4 : Vector3.get_zero(), base.parameter.moveForwardSpeed);
-		character.SetLerpRotation(val4);
+		Vector3 position = base.transform.position;
+		Vector3 vector = target_pos - position;
+		vector.y = 0f;
+		vector.Normalize();
+		Vector3 a = Quaternion.Euler(0f, 90f, 0f) * vector;
+		Vector3 a2 = vector;
+		Vector3 vector2 = (!(base.self.actionTarget != null)) ? (a * stick_vec.x * base.parameter.moveForwardSpeed + a2 * stick_vec.y * base.parameter.moveForwardSpeed) : (a * stick_vec.x * base.parameter.moveSideSpeed + a2 * stick_vec.y * base.parameter.moveForwardSpeed);
+		character.ActMoveVelocity(base.parameter.enableRootMotion ? Vector3.zero : vector2, base.parameter.moveForwardSpeed);
+		character.SetLerpRotation(vector2);
 	}
 
 	private void OnAvoid(PLACE avoid_place)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 		if (!(target == null))
 		{
-			Vector3 val = target._transform.get_position() - character._transform.get_position();
-			val.y = 0f;
-			Quaternion val2 = Quaternion.LookRotation(val);
-			Vector3 val3 = Vector3.get_zero();
+			Vector3 forward = target._transform.position - character._transform.position;
+			forward.y = 0f;
+			Quaternion rotation = Quaternion.LookRotation(forward);
+			Vector3 b = Vector3.zero;
 			switch (avoid_place)
 			{
 			case PLACE.FRONT:
-				val3 = val2 * Vector3.get_forward();
+				b = rotation * Vector3.forward;
 				break;
 			case PLACE.BACK:
-				val3 = val2 * Vector3.get_back();
+				b = rotation * Vector3.back;
 				break;
 			case PLACE.LEFT:
-				val3 = val2 * Vector3.get_left();
+				b = rotation * Vector3.left;
 				break;
 			case PLACE.RIGHT:
-				val3 = val2 * Vector3.get_right();
+				b = rotation * Vector3.right;
 				break;
 			}
-			character.LookAt(character._transform.get_position() + val3);
+			character.LookAt(character._transform.position + b);
 			base.self.ActAvoid();
 		}
 	}
@@ -371,16 +374,6 @@ public class AutoSelfController : SelfController
 
 	private void OnAttack()
 	{
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0181: Unknown result type (might be due to invalid IL or missing references)
 		if (isActSpecialOneSwordSoul)
 		{
 			return;
@@ -399,9 +392,9 @@ public class AutoSelfController : SelfController
 		{
 			if (flag)
 			{
-				Vector3 val = base.self.targetingPoint.GetTargetPoint() - base.self._position;
-				val.y = 0f;
-				base.self.SetLerpRotation(val.get_normalized());
+				Vector3 vector = base.self.targetingPoint.GetTargetPoint() - base.self._position;
+				vector.y = 0f;
+				base.self.SetLerpRotation(vector.normalized);
 			}
 			if (base.brain.weaponCtrl.beforeAttackId == 0 || base.brain.weaponCtrl.beforeAttackId != base.self.attackID)
 			{
@@ -418,33 +411,32 @@ public class AutoSelfController : SelfController
 			}
 			if (flag)
 			{
-				Vector3 val2 = base.self.targetingPoint.GetTargetPoint() - base.self._position;
-				val2.y = 0f;
-				base.self.SetLerpRotation(val2.get_normalized());
+				Vector3 vector2 = base.self.targetingPoint.GetTargetPoint() - base.self._position;
+				vector2.y = 0f;
+				base.self.SetLerpRotation(vector2.normalized);
 			}
 			if (base.brain.weaponCtrl.IsAvoidAttack())
 			{
 				if (base.self.actionID != Character.ACTION_ID.MAX)
 				{
 					base.self.ActAvoid();
-					this.StartCoroutine(WaitArmorBreakAttach());
+					StartCoroutine(WaitArmorBreakAttach());
 				}
-				return;
 			}
-			string _motionLayerName = "Base Layer.";
-			int normalAttackId = base.self.GetNormalAttackId(base.self.attackMode, base.self.spAttackType, base.self.extraAttackType, out _motionLayerName);
-			Self self = base.self;
-			int id = normalAttackId;
-			string motionLayerName = _motionLayerName;
-			self.ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName, string.Empty);
-			base.brain.weaponCtrl.ComboOff();
-			base.brain.weaponCtrl.SetBeforeAttackId(0);
+			else
+			{
+				string _motionLayerName = "Base Layer.";
+				int normalAttackId = base.self.GetNormalAttackId(base.self.attackMode, base.self.spAttackType, base.self.extraAttackType, out _motionLayerName);
+				base.self.ActAttack(normalAttackId, send_packet: true, sync_immediately: false, _motionLayerName);
+				base.brain.weaponCtrl.ComboOff();
+				base.brain.weaponCtrl.SetBeforeAttackId(0);
+			}
 		}
 	}
 
 	private IEnumerator WaitArmorBreakAttach()
 	{
-		yield return (object)new WaitForSeconds(0.1f);
+		yield return new WaitForSeconds(0.1f);
 		while (!base.self.CheckAvoidAttack())
 		{
 			yield return null;
@@ -454,21 +446,6 @@ public class AutoSelfController : SelfController
 
 	private void OnSpecialAttack()
 	{
-		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0281: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0292: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0311: Unknown result type (might be due to invalid IL or missing references)
 		if (!base.self.isActSpecialAction && isChangeableSpecialAction)
 		{
 			base.self.SetEnableTap(enable: true);
@@ -480,14 +457,14 @@ public class AutoSelfController : SelfController
 			if (base.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.SOUL))
 			{
 				base.self.ActSpecialAction();
-				this.StartCoroutine(ActSpecialPairSoulSword());
+				StartCoroutine(ActSpecialPairSoulSword());
 				return;
 			}
 			if (base.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.ONE_HAND_SWORD, SP_ATTACK_TYPE.SOUL))
 			{
 				if (!isActSpecialOneSwordSoul)
 				{
-					this.StartCoroutine(ActSpecialOneSwordSoul());
+					StartCoroutine(ActSpecialOneSwordSoul());
 				}
 				return;
 			}
@@ -497,11 +474,11 @@ public class AutoSelfController : SelfController
 				{
 					if (base.self.thsCtrl.IsRequiredReloadAction())
 					{
-						this.StartCoroutine(ActSpecialBurstReload());
+						StartCoroutine(ActSpecialBurstReload());
 					}
 					else
 					{
-						this.StartCoroutine(ActSpecialBurstFire());
+						StartCoroutine(ActSpecialBurstFire());
 					}
 				}
 				return;
@@ -509,17 +486,14 @@ public class AutoSelfController : SelfController
 			base.self.ActSpecialAction();
 			if (base.self.CheckAttackMode(Player.ATTACK_MODE.SPEAR))
 			{
-				switch (base.self.spAttackType)
+				if (base.self.spAttackType != 0)
 				{
-				case SP_ATTACK_TYPE.HEAT:
+					_ = 1;
 					base.brain.weaponCtrl.SetChargeRate(1f);
-					break;
-				case SP_ATTACK_TYPE.NONE:
+				}
+				else
+				{
 					base.brain.weaponCtrl.SetChargeRate(0.5f);
-					break;
-				default:
-					base.brain.weaponCtrl.SetChargeRate(1f);
-					break;
 				}
 			}
 			else if (base.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.ONE_HAND_SWORD, SP_ATTACK_TYPE.SOUL))
@@ -558,9 +532,9 @@ public class AutoSelfController : SelfController
 				case SP_ATTACK_TYPE.NONE:
 					if (base.self.targetingPoint != null)
 					{
-						Vector3 val = base.self.targetingPoint.GetTargetPoint() - base.self._position;
-						val.y = 0f;
-						base.self.SetLerpRotation(val.get_normalized());
+						Vector3 vector = base.self.targetingPoint.GetTargetPoint() - base.self._position;
+						vector.y = 0f;
+						base.self.SetLerpRotation(vector.normalized);
 					}
 					break;
 				}
@@ -573,7 +547,7 @@ public class AutoSelfController : SelfController
 	{
 		isWaitingSpecial = true;
 		base.self.ActSpecialAction();
-		yield return (object)new WaitForSeconds(0.5f);
+		yield return new WaitForSeconds(0.5f);
 		isWaitingSpecial = false;
 		base.self.SetEnableTap(enable: false);
 	}
@@ -582,16 +556,16 @@ public class AutoSelfController : SelfController
 	{
 		isWaitingSpecial = true;
 		base.self.ActSpecialAction();
-		yield return (object)new WaitForSeconds(0.5f);
+		yield return new WaitForSeconds(0.5f);
 		if (base.self.targetingPoint == null)
 		{
 			base.self.targetingPointList.Add(actionTargetPoint);
 		}
 		if (base.self.targetingPoint != null)
 		{
-			Vector3 val = base.self.targetingPoint.GetTargetPoint() - base.self._position;
-			val.y = 0f;
-			base.self.SetLerpRotation(val.get_normalized());
+			Vector3 vector = base.self.targetingPoint.GetTargetPoint() - base.self._position;
+			vector.y = 0f;
+			base.self.SetLerpRotation(vector.normalized);
 		}
 		base.self.SetEnableTap(enable: false);
 		isWaitingSpecial = false;
@@ -605,13 +579,13 @@ public class AutoSelfController : SelfController
 		}
 		if (base.self.targetingPoint != null)
 		{
-			Vector3 val = base.self.targetingPoint.GetTargetPoint() - base.self._position;
-			val.y = 0f;
-			base.self.SetLerpRotation(val.get_normalized());
+			Vector3 vector = base.self.targetingPoint.GetTargetPoint() - base.self._position;
+			vector.y = 0f;
+			base.self.SetLerpRotation(vector.normalized);
 		}
 		isActSpecialOneSwordSoul = true;
 		base.self.ActSpecialAction();
-		yield return (object)new WaitForSeconds(2f);
+		yield return new WaitForSeconds(2f);
 		base.self.SetEnableTap(enable: false);
 		if (Utility.Dice100(65))
 		{
@@ -626,28 +600,12 @@ public class AutoSelfController : SelfController
 
 	private IEnumerator ActSpecialPairSoulSword()
 	{
-		yield return (object)new WaitForSeconds(0.5f);
+		yield return new WaitForSeconds(0.5f);
 		base.self.SetEnableTap(enable: false);
 	}
 
 	private void OnArrowAttack()
 	{
-		//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0217: Unknown result type (might be due to invalid IL or missing references)
 		if (base.self.targetingPoint == null)
 		{
 			base.self.targetingPointList.Add(actionTargetPoint);
@@ -657,10 +615,7 @@ public class AutoSelfController : SelfController
 			base.self.SetEnableTap(enable: true);
 			string _motionLayerName = "Base Layer.";
 			int normalAttackId = base.self.GetNormalAttackId(base.self.attackMode, base.self.spAttackType, base.self.extraAttackType, out _motionLayerName);
-			Self self = base.self;
-			int id = normalAttackId;
-			string motionLayerName = _motionLayerName;
-			self.ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName, string.Empty);
+			base.self.ActAttack(normalAttackId, send_packet: true, sync_immediately: false, _motionLayerName);
 			if (base.brain.weaponCtrl.IsSpecial())
 			{
 				base.brain.weaponCtrl.SetChargeRate(1f);
@@ -671,7 +626,7 @@ public class AutoSelfController : SelfController
 			}
 			else
 			{
-				base.brain.weaponCtrl.SetChargeRate(Random.get_value());
+				base.brain.weaponCtrl.SetChargeRate(Random.value);
 			}
 		}
 		else if (base.self.enableInputCharge && base.self.GetChargingRate() >= base.brain.weaponCtrl.chargeRate)
@@ -684,19 +639,18 @@ public class AutoSelfController : SelfController
 			{
 				base.self.SetArrowAimLesserMode(enable: true);
 			}
-			Vector3 zero = Vector3.get_zero();
+			Vector3 zero = Vector3.zero;
 			zero = ((!(base.self.targetingPoint != null)) ? actionTargetPoint.GetTargetPoint() : base.self.targetingPoint.GetTargetPoint());
 			Vector3 arrowAimLesserCursorEffect = base.self.GetArrowAimLesserCursorEffect();
 			if (Vector3.Distance(arrowAimLesserCursorEffect, zero) > 1f)
 			{
-				Vector3 val = arrowAimLesserCursorEffect - zero;
-				Vector2 val2 = default(Vector2);
-				val2._002Ector(val.x, val.z);
-				base.self.UpdateArrowAimLesserMode(val2.get_normalized());
+				Vector3 vector = arrowAimLesserCursorEffect - zero;
+				Vector2 vector2 = new Vector2(vector.x, vector.z);
+				base.self.UpdateArrowAimLesserMode(vector2.normalized);
 			}
 			else
 			{
-				base.self.UpdateArrowAimLesserMode(Vector2.get_zero());
+				base.self.UpdateArrowAimLesserMode(Vector2.zero);
 			}
 		}
 	}
@@ -730,22 +684,6 @@ public class AutoSelfController : SelfController
 
 	private void UpdateRegionTarget()
 	{
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
 		if (base.self == null)
 		{
 			return;
@@ -767,20 +705,15 @@ public class AutoSelfController : SelfController
 		}
 		TargetPoint targetPoint = null;
 		float num = float.MaxValue;
-		Vector3 position = base.self._transform.get_position();
-		Vector2 val = position.ToVector2XZ();
-		Vector2 forwardXZ = base.self.forwardXZ;
-		forwardXZ.Normalize();
+		Vector2 b = base.self._transform.position.ToVector2XZ();
+		base.self.forwardXZ.Normalize();
 		int i = 0;
 		for (int num2 = targetPoints.Length; i < num2; i++)
 		{
 			TargetPoint targetPoint2 = targetPoints[i];
-			if (targetPoint2.get_gameObject().get_activeInHierarchy())
+			if (targetPoint2.gameObject.activeInHierarchy)
 			{
-				Vector3 targetPoint3 = targetPoint2.GetTargetPoint();
-				Vector2 val2 = targetPoint3.ToVector2XZ();
-				Vector2 val3 = val2 - val;
-				float sqrMagnitude = val3.get_sqrMagnitude();
+				float sqrMagnitude = (targetPoint2.GetTargetPoint().ToVector2XZ() - b).sqrMagnitude;
 				if (targetPoint == null || sqrMagnitude < num)
 				{
 					targetPoint = targetPoint2;

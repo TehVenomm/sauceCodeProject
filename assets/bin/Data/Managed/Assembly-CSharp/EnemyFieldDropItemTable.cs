@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
-[Obsolete]
 public class EnemyFieldDropItemTable : Singleton<EnemyFieldDropItemTable>
 {
 	public class EnemyFieldDropItemData

@@ -4,13 +4,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using UnityEngine.Networking;
 
 public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManager>
 {
 	public bool isLoadingVariantManifest;
 
 	public Dictionary<int, string> variantManifest;
+
+	public bool isLoadingServerList;
 
 	private void Start()
 	{
@@ -24,7 +26,7 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 
 	public void LoadVariantManifest()
 	{
-		this.StartCoroutine(IELoadVariantManifest());
+		StartCoroutine(IELoadVariantManifest());
 	}
 
 	private IEnumerator IELoadVariantManifest()
@@ -36,22 +38,24 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 		do
 		{
 			error_code = Error.None;
-			string www_url = url;
-			WWW _www = new WWW(www_url);
-			yield return _www;
-			string www_error = _www.get_error();
-			if (!string.IsNullOrEmpty(www_error))
+			UnityWebRequest _www = new UnityWebRequest(url)
 			{
-				error_code = ((!www_error.Contains("404")) ? Error.AssetLoadFailed : Error.AssetNotFound);
+				downloadHandler = new DownloadHandlerBuffer()
+			};
+			yield return _www.SendWebRequest();
+			string error = _www.error;
+			if (!string.IsNullOrEmpty(error))
+			{
+				error_code = ((!error.Contains("404")) ? Error.AssetLoadFailed : Error.AssetNotFound);
 			}
-			else if (_www.get_bytes() != null)
+			else if (_www.downloadHandler.data != null)
 			{
-				variantManifest = new ObjectPacker().Unpack<Dictionary<int, string>>(_www.get_bytes());
+				variantManifest = new ObjectPacker().Unpack<Dictionary<int, string>>(_www.downloadHandler.data);
 			}
 			else
 			{
 				error_code = Error.AssetLoadFailed;
-				Log.Error(LOG.RESOURCE, _www.get_text());
+				Log.Error(LOG.RESOURCE, _www.downloadHandler.text);
 			}
 			_www.Dispose();
 			if (error_code != 0)
@@ -78,7 +82,7 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 	{
 		if (!category.HasValue)
 		{
-			return string.Empty;
+			return "";
 		}
 		if (category == RESOURCE_CATEGORY.SOUND_VOICE)
 		{
@@ -88,6 +92,10 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 			}
 			return "." + InGameManager.voiceVariants[GameSaveData.instance.voiceOption];
 		}
+		if (variantManifest == null)
+		{
+			return "";
+		}
 		if (variantManifest.ContainsKey((int)category.Value))
 		{
 			if (variantManifest[(int)category.Value].Contains(InGameManager.languageVariants[GameSaveData.instance.languageOption]))
@@ -96,7 +104,7 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 			}
 			return ".en-sd";
 		}
-		return string.Empty;
+		return "";
 	}
 
 	public string GetFullBundleName(string bundleName)
@@ -112,8 +120,7 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 	public RESOURCE_CATEGORY? GetCategory(string fullBundleName)
 	{
 		fullBundleName = fullBundleName.ToUpper();
-		string[] names = Enum.GetNames(typeof(RESOURCE_CATEGORY));
-		string value = names.FirstOrDefault((string s) => fullBundleName.Contains(s + "/"));
+		string value = Enum.GetNames(typeof(RESOURCE_CATEGORY)).FirstOrDefault((string s) => fullBundleName.Contains(s + "/"));
 		if (string.IsNullOrEmpty(value))
 		{
 			return null;
@@ -129,5 +136,60 @@ public class GoGameResourceManager : MonoBehaviourSingleton<GoGameResourceManage
 			return fullBundleName.Remove(fullBundleName.LastIndexOf("."));
 		}
 		return fullBundleName;
+	}
+
+	public void LoadServerList()
+	{
+		StartCoroutine(IELoadServerList());
+	}
+
+	private IEnumerator IELoadServerList()
+	{
+		string www_url2 = NetworkManager.TABLE_HOST;
+		www_url2 += "/serverlisttable.dat";
+		isLoadingServerList = true;
+		Error error_code;
+		do
+		{
+			error_code = Error.None;
+			UnityWebRequest _www = new UnityWebRequest(www_url2)
+			{
+				downloadHandler = new DownloadHandlerBuffer()
+			};
+			yield return _www.SendWebRequest();
+			string error = _www.error;
+			if (!string.IsNullOrEmpty(error))
+			{
+				error_code = ((!error.Contains("404")) ? Error.AssetLoadFailed : Error.AssetNotFound);
+			}
+			else if (_www.downloadHandler.data != null)
+			{
+				Singleton<ServerListTable>.Create();
+				Singleton<ServerListTable>.I.CreateTable(DataTableManager.DecompressToString(_www.downloadHandler.data));
+			}
+			else
+			{
+				error_code = Error.AssetLoadFailed;
+				Log.Error(LOG.RESOURCE, _www.downloadHandler.text);
+			}
+			_www.Dispose();
+			if (error_code != 0)
+			{
+				MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, StringTable.Format(STRING_CATEGORY.COMMON_DIALOG, 1001u, error_code), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u)), delegate
+				{
+					MonoBehaviourSingleton<AppMain>.I.Reset();
+				}, error: true, (int)error_code);
+				break;
+			}
+		}
+		while (error_code != 0);
+		if (error_code == Error.None)
+		{
+			isLoadingServerList = false;
+		}
+		else
+		{
+			isLoadingVariantManifest = true;
+		}
 	}
 }

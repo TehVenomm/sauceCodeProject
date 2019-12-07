@@ -2,16 +2,12 @@ using AOT;
 using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.OurUtils;
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
 {
 	internal class NearbyConnectionsManagerBuilder : BaseReferenceHolder
 	{
-		[CompilerGenerated]
-		private static NearbyConnectionsBuilder.OnInitializationFinishedCallback _003C_003Ef__mg_0024cache0;
-
 		internal NearbyConnectionsManagerBuilder()
 			: base(NearbyConnectionsBuilder.NearbyConnections_Builder_Construct())
 		{

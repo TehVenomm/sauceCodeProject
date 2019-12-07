@@ -128,7 +128,7 @@ public class GachaResultSkill : GachaResultBase
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -150,20 +150,21 @@ public class GachaResultSkill : GachaResultBase
 
 	private IEnumerator LoadNormalUI(LoadingQueue loadQueue)
 	{
-		SetActive((Enum)UI.FOOTER_MULTI_RESULT_ROOT, is_visible: false);
+		SetActive(UI.FOOTER_MULTI_RESULT_ROOT, is_visible: false);
 		if (nextGachaGuarantee.IsValid())
 		{
 			footerRoot = GetCtrl(UI.FOOTER_GUARANTEE_ROOT);
-			SetActive((Enum)UI.FOOTER_ROOT, is_visible: false);
-			SetActive((Enum)UI.FOOTER_GUARANTEE_ROOT, is_visible: true);
+			SetActive(UI.FOOTER_ROOT, is_visible: false);
+			SetActive(UI.FOOTER_GUARANTEE_ROOT, is_visible: true);
 		}
 		else
 		{
 			footerRoot = GetCtrl(UI.FOOTER_ROOT);
-			SetActive((Enum)UI.FOOTER_ROOT, is_visible: true);
-			SetActive((Enum)UI.FOOTER_GUARANTEE_ROOT, is_visible: false);
+			SetActive(UI.FOOTER_ROOT, is_visible: true);
+			SetActive(UI.FOOTER_GUARANTEE_ROOT, is_visible: false);
 		}
-		yield return LoadGachaButton(buttonName: CreateButtonName(), loadQueue: loadQueue, parent: FindCtrl(footerRoot, UI.BTN_GACHA));
+		string buttonName = CreateButtonName();
+		yield return LoadGachaButton(loadQueue, FindCtrl(footerRoot, UI.BTN_GACHA), buttonName);
 		yield return LoadGachaGuaranteeCounter(loadQueue, nextGachaGuarantee, delegate(LoadObject lo_guarantee)
 		{
 			SetTexture(footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN, lo_guarantee.loadedObject as Texture);
@@ -173,8 +174,8 @@ public class GachaResultSkill : GachaResultBase
 	public override void UpdateUI()
 	{
 		bool flag = MonoBehaviourSingleton<GachaManager>.I.selectGacha.num == 1;
-		SetActive((Enum)UI.OBJ_SINGLE_ROOT, flag);
-		SetActive((Enum)UI.OBJ_MULTI_ROOT, !flag);
+		SetActive(UI.OBJ_SINGLE_ROOT, flag);
+		SetActive(UI.OBJ_MULTI_ROOT, !flag);
 		if (flag)
 		{
 			UpdateSingleGachaUI();
@@ -199,30 +200,30 @@ public class GachaResultSkill : GachaResultBase
 		SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)gachaReward.itemId);
 		if (skillItemData == null)
 		{
-			SetActive((Enum)UI.OBJ_SINGLE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_SINGLE_ROOT, is_visible: false);
 		}
-		SetLabelText((Enum)UI.LBL_NAME, skillItemData.name);
-		SetLabelText((Enum)UI.LBL_ATK, skillItemData.baseAtk.ToString());
-		SetLabelText((Enum)UI.LBL_DEF, skillItemData.baseDef.ToString());
-		SetLabelText((Enum)UI.LBL_HP, skillItemData.baseHp.ToString());
-		SetLabelText((Enum)UI.LBL_DESCRIPTION, skillItemData.GetExplanationText());
-		SetRenderSkillItemModel((Enum)UI.TEX_MODEL, skillItemData.id, rotation: true, light_rotation: false);
-		SetRenderSkillItemSymbolModel((Enum)UI.TEX_INNER_MODEL, skillItemData.id, rotation: true);
+		SetLabelText(UI.LBL_NAME, skillItemData.name);
+		SetLabelText(UI.LBL_ATK, skillItemData.baseAtk.ToString());
+		SetLabelText(UI.LBL_DEF, skillItemData.baseDef.ToString());
+		SetLabelText(UI.LBL_HP, skillItemData.baseHp.ToString());
+		SetLabelText(UI.LBL_DESCRIPTION, skillItemData.GetExplanationText());
+		SetRenderSkillItemModel(UI.TEX_MODEL, skillItemData.id);
+		SetRenderSkillItemSymbolModel(UI.TEX_INNER_MODEL, skillItemData.id);
 		RARITY_TYPE[] array = (RARITY_TYPE[])Enum.GetValues(typeof(RARITY_TYPE));
 		int i = 0;
 		for (int num = array.Length; i < num; i++)
 		{
-			SetActive((Enum)rarityAnimRoot[i], skillItemData.rarity == array[i]);
+			SetActive(rarityAnimRoot[i], skillItemData.rarity == array[i]);
 		}
-		ResetTween((Enum)rarityAnimRoot[(int)skillItemData.rarity], 0);
-		ResetTween((Enum)UI.OBJ_RARITY_TEXT_ROOT, 0);
+		ResetTween(rarityAnimRoot[(int)skillItemData.rarity]);
+		ResetTween(UI.OBJ_RARITY_TEXT_ROOT);
 		if (skillItemData.rarity <= RARITY_TYPE.C)
 		{
-			ResetTween((Enum)UI.OBJ_RARITY_LIGHT, 0);
-			PlayTween((Enum)UI.OBJ_RARITY_LIGHT, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+			ResetTween(UI.OBJ_RARITY_LIGHT);
+			PlayTween(UI.OBJ_RARITY_LIGHT, forward: true, null, is_input_block: false);
 		}
-		PlayTween((Enum)rarityAnimRoot[(int)skillItemData.rarity], forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
-		PlayTween((Enum)UI.OBJ_RARITY_TEXT_ROOT, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		PlayTween(rarityAnimRoot[(int)skillItemData.rarity], forward: true, null, is_input_block: false);
+		PlayTween(UI.OBJ_RARITY_TEXT_ROOT, forward: true, null, is_input_block: false);
 		if (AnimationDirector.I is SkillGachaDirector)
 		{
 			(AnimationDirector.I as SkillGachaDirector).PlayUIRarityEffect(skillItemData.rarity, GetCtrl(UI.OBJ_RARITY_ROOT), GetCtrl(rarityAnimRoot[(int)skillItemData.rarity]));
@@ -234,7 +235,7 @@ public class GachaResultSkill : GachaResultBase
 		int index = 0;
 		MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().reward.ForEach(delegate(GachaResult.GachaReward reward)
 		{
-			bool flag = false;
+			bool is_new = false;
 			Transform ctrl = GetCtrl(iconRootAry[index]);
 			SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)reward.itemId);
 			if (skillItemData == null)
@@ -244,16 +245,11 @@ public class GachaResultSkill : GachaResultBase
 			else
 			{
 				SetActive(ctrl, is_visible: true);
-				REWARD_TYPE rewardType = REWARD_TYPE.SKILL_ITEM;
-				uint itemId = (uint)reward.itemId;
-				Transform parent = ctrl;
-				bool is_new = flag;
-				ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(rewardType, itemId, parent, -1, null, 0, is_new);
-				itemIcon.SetEnableCollider(is_enable: false);
+				ItemIcon.CreateRewardItemIcon(REWARD_TYPE.SKILL_ITEM, (uint)reward.itemId, ctrl, -1, null, 0, is_new).SetEnableCollider(is_enable: false);
 				Transform ctrl2 = GetCtrl(magiNameAry[index]);
 				SetLabelText(ctrl2, skillItemData.name);
 				SetEvent(GetCtrl(iconRootAry[index]), "SKILL_DETAIL", index);
-				index++;
+				int num = ++index;
 			}
 		});
 	}
@@ -262,13 +258,13 @@ public class GachaResultSkill : GachaResultBase
 	{
 		if (nextGachaGuarantee.IsValid())
 		{
-			SetActive((Enum)UI.FOOTER_ROOT, is_visible: false);
-			SetActive((Enum)UI.FOOTER_GUARANTEE_ROOT, is_visible: true);
+			SetActive(UI.FOOTER_ROOT, is_visible: false);
+			SetActive(UI.FOOTER_GUARANTEE_ROOT, is_visible: true);
 		}
 		else
 		{
-			SetActive((Enum)UI.FOOTER_ROOT, is_visible: true);
-			SetActive((Enum)UI.FOOTER_GUARANTEE_ROOT, is_visible: false);
+			SetActive(UI.FOOTER_ROOT, is_visible: true);
+			SetActive(UI.FOOTER_GUARANTEE_ROOT, is_visible: false);
 		}
 		int num = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
 		if (MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId > 0)
@@ -280,10 +276,9 @@ public class GachaResultSkill : GachaResultBase
 				FindCtrl(GetCtrl(UI.OBJ_GACHA_ENABLE_ROOT), UI.TEX_TICKET).GetComponent<UITexture>(),
 				GetCtrl(UI.TEX_TICKET_HAVE).GetComponent<UITexture>()
 			};
-			UITexture[] array2 = array;
-			foreach (UITexture ui_tex in array2)
+			for (int i = 0; i < array.Length; i++)
 			{
-				ResourceLoad.LoadItemIconTexture(ui_tex, itemData.iconID);
+				ResourceLoad.LoadItemIconTexture(array[i], itemData.iconID);
 			}
 			num = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == itemData.id, 1);
 		}
@@ -297,8 +292,6 @@ public class GachaResultSkill : GachaResultBase
 
 	protected void UpdateMultiResultFooterUI()
 	{
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<GachaManager>.I.IsExistNextGachaResult())
 		{
 			SetActive(footerRoot, UI.BTN_NEXT, is_visible: true);
@@ -306,7 +299,7 @@ public class GachaResultSkill : GachaResultBase
 			SetActive(footerRoot, UI.BTN_EQUIP, is_visible: false);
 			SetActive(footerRoot, UI.OBJ_GUARANTEE, is_visible: true);
 			SetActive(footerRoot, UI.SPR_LINE_BOTTOM, is_visible: false);
-			GetCtrl(UI.OBJ_ICONS_ROOT).set_localPosition(new Vector3(0f, 0f, 0f));
+			GetCtrl(UI.OBJ_ICONS_ROOT).localPosition = new Vector3(0f, 0f, 0f);
 		}
 		else
 		{
@@ -315,7 +308,7 @@ public class GachaResultSkill : GachaResultBase
 			SetActive(footerRoot, UI.BTN_EQUIP, is_visible: true);
 			SetActive(footerRoot, UI.OBJ_GUARANTEE, is_visible: false);
 			SetActive(footerRoot, UI.SPR_LINE_BOTTOM, is_visible: true);
-			GetCtrl(UI.OBJ_ICONS_ROOT).set_localPosition(new Vector3(0f, -50f, 0f));
+			GetCtrl(UI.OBJ_ICONS_ROOT).localPosition = new Vector3(0f, -50f, 0f);
 		}
 		bool gachaButtonActive = IsEnableEntry();
 		SetGachaButtonActive(gachaButtonActive);
@@ -328,37 +321,37 @@ public class GachaResultSkill : GachaResultBase
 		{
 			return;
 		}
-		Transform val = FindCtrl(footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN);
+		Transform transform = FindCtrl(footerRoot, UI.TEX_GUARANTEE_COUNT_DOWN);
 		if (!nextGachaGuarantee.IsValid() || !nextGachaGuarantee.IsItemConfirmed())
 		{
 			if (!nextGachaGuarantee.link.IsNullOrWhiteSpace())
 			{
-				val.GetComponent<UIButton>().set_enabled(true);
-				SetEvent(val, "GUARANTEE_GACHA_DETAIL_WEB", nextGachaGuarantee.link);
+				transform.GetComponent<UIButton>().enabled = true;
+				SetEvent(transform, "GUARANTEE_GACHA_DETAIL_WEB", nextGachaGuarantee.link);
 			}
 			else
 			{
-				val.GetComponent<UIButton>().set_enabled(false);
+				transform.GetComponent<UIButton>().enabled = false;
 			}
 			return;
 		}
 		switch (nextGachaGuarantee.type)
 		{
 		default:
-			val.GetComponent<UIButton>().set_enabled(false);
+			transform.GetComponent<UIButton>().enabled = false;
 			break;
 		case 5:
-			val.GetComponent<UIButton>().set_enabled(true);
-			SetEvent(val, "GUARANTEE_SKILL_DETAIL", null);
+			transform.GetComponent<UIButton>().enabled = true;
+			SetEvent(transform, "GUARANTEE_SKILL_DETAIL", null);
 			break;
 		case 14:
 		{
-			val.GetComponent<UIButton>().set_enabled(true);
+			transform.GetComponent<UIButton>().enabled = true;
 			AccessorySortData accessorySortData = new AccessorySortData();
 			AccessoryInfo accessoryInfo = new AccessoryInfo();
 			accessoryInfo.SetValue((uint)nextGachaGuarantee.itemId);
 			accessorySortData.SetItem(accessoryInfo);
-			SetEvent(val, "ACCESSORY_SELECT", new object[2]
+			SetEvent(transform, "ACCESSORY_SELECT", new object[2]
 			{
 				ItemDetailEquip.CURRENT_SECTION.SHOP_TOP,
 				accessorySortData
@@ -414,8 +407,7 @@ public class GachaResultSkill : GachaResultBase
 	private void OnQuery_GUARANTEE_SKILL_DETAIL()
 	{
 		uint itemId = (uint)nextGachaGuarantee.itemId;
-		SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData(itemId);
-		if (skillItemData == null)
+		if (Singleton<SkillItemTable>.I.GetSkillItemData(itemId) == null)
 		{
 			GameSection.StopEvent();
 		}
@@ -451,7 +443,7 @@ public class GachaResultSkill : GachaResultBase
 			CheckUpdateCrystalNum();
 			if (!isRetry)
 			{
-				SetLabelText((Enum)UI.LBL_CRYSTAL_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal.ToString());
+				SetLabelText(UI.LBL_CRYSTAL_NUM, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal.ToString());
 			}
 		}
 		base.OnNotify(flags);

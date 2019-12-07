@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,23 +30,24 @@ public class StatusEquipList : GameSection
 	public override void Initialize()
 	{
 		currentPageIndex = 0;
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		LoadingQueue loadQueue = new LoadingQueue(this);
+		LoadingQueue loadingQueue = new LoadingQueue(this);
 		Singleton<EquipItemTable>.I.CreateTableForEquipList();
-		if (loadQueue.IsLoading())
+		if (loadingQueue.IsLoading())
 		{
-			yield return loadQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		obtainedNum = MonoBehaviourSingleton<AchievementManager>.I.GetEquipItemCollectionNum();
-		SetLabelText((Enum)UI.LBL_CURRENT_NUM, obtainedNum.ToString());
-		int totalEquipNum = Singleton<EquipItemTable>.I.GetEquipListCount();
-		SetLabelText((Enum)UI.LBL_MAX_NUM, totalEquipNum.ToString());
-		SetPageNumText(page_num: totalEquipNum, enum_lbl: UI.LBL_PAGE_MAX);
-		SetActive((Enum)UI.BTN_ENEMY_COLLECTION_LIST, is_visible: true);
+		SetLabelText(UI.LBL_CURRENT_NUM, obtainedNum.ToString());
+		int equipListCount = Singleton<EquipItemTable>.I.GetEquipListCount();
+		SetLabelText(UI.LBL_MAX_NUM, equipListCount.ToString());
+		int page_num = equipListCount;
+		SetPageNumText(UI.LBL_PAGE_MAX, page_num);
+		SetActive(UI.BTN_ENEMY_COLLECTION_LIST, is_visible: true);
 		InitializeCaption();
 		base.Initialize();
 	}
@@ -71,9 +71,9 @@ public class StatusEquipList : GameSection
 			return false;
 		}
 		currentPageIndex = pageIndex;
-		SkipTween((Enum)UI.SPR_SELECT_WEAPON, forward: true, 0);
-		SkipTween((Enum)UI.SPR_SELECT_DEF, forward: true, 0);
-		SetPageNumText((Enum)UI.LBL_PAGE_MAX, maxPageNum);
+		SkipTween(UI.SPR_SELECT_WEAPON);
+		SkipTween(UI.SPR_SELECT_DEF);
+		SetPageNumText(UI.LBL_PAGE_MAX, maxPageNum);
 		UpdateInventory();
 		UpdateAnchors();
 		return true;
@@ -108,8 +108,8 @@ public class StatusEquipList : GameSection
 		items = GetEquips(start, last);
 		if (items != null)
 		{
-			SetPageNumText((Enum)UI.LBL_PAGE_NOW, currentPageIndex + 1);
-			SetDynamicList((Enum)UI.GRD_INVENTORY, string.Empty, items.Length, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool isRecycle)
+			SetPageNumText(UI.LBL_PAGE_NOW, currentPageIndex + 1);
+			SetDynamicList(UI.GRD_INVENTORY, "", items.Length, reset: false, null, null, delegate(int i, Transform t, bool isRecycle)
 			{
 				SetActive(t, is_visible: true);
 				EquipItemTable.EquipItemData equipItemData = items[i];
@@ -119,8 +119,8 @@ public class StatusEquipList : GameSection
 				equipItemInfo.SetDefaultData();
 				equipItemSortData.SetItem(equipItemInfo);
 				ITEM_ICON_TYPE iconType = ItemIcon.GetItemIconType(equipItemData.type);
-				bool flag = !MonoBehaviourSingleton<AchievementManager>.I.CheckEquipItemCollection(equipItemData);
-				if (flag)
+				bool num = !MonoBehaviourSingleton<AchievementManager>.I.CheckEquipItemCollection(equipItemData);
+				if (num)
 				{
 					iconType = ITEM_ICON_TYPE.UNKNOWN;
 				}
@@ -131,9 +131,9 @@ public class StatusEquipList : GameSection
 					getType = equipItemData.getType;
 				}
 				ItemIcon itemIcon = ItemIconDetailSmall.CreateSmallListItemIcon(iconType, equipItemSortData, t, isNew, start + i + 1, getType);
-				if (!flag)
+				if (!num)
 				{
-					itemIcon.button.set_enabled(true);
+					itemIcon.button.enabled = true;
 					SetEvent(itemIcon._transform, "DETAIL", new object[2]
 					{
 						ItemDetailEquip.CURRENT_SECTION.EQUIP_LIST,
@@ -142,7 +142,7 @@ public class StatusEquipList : GameSection
 				}
 				else
 				{
-					itemIcon.button.set_enabled(false);
+					itemIcon.button.enabled = false;
 					SetEvent(itemIcon._transform, string.Empty, 0);
 				}
 			});
@@ -174,7 +174,7 @@ public class StatusEquipList : GameSection
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_2);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
-		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
+		UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
 		if (component != null)
 		{
 			component.Reset();

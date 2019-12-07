@@ -45,23 +45,17 @@ public class Goal_Avoid : Goal
 		switch (ev)
 		{
 		case BRAIN_EVENT.PLAY_MOTION:
-		{
-			int num2 = (int)param;
-			if (num2 == 115)
+			if ((int)param == 115)
 			{
 				SetStatus(STATUS.COMPLETED);
 			}
 			break;
-		}
 		case BRAIN_EVENT.END_ACTION:
-		{
-			int num = (int)param;
-			if (num == 13)
+			if ((int)param == 13)
 			{
 				SetStatus(STATUS.COMPLETED);
 			}
 			break;
-		}
 		}
 	}
 

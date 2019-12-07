@@ -53,7 +53,7 @@ public class BlackListManager : MonoBehaviourSingleton<BlackListManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
 			}
 			call_back(arg, ret.result);
-		}, string.Empty);
+		});
 	}
 
 	public void SendAdd(int targetId, Action<bool> call_back)
@@ -77,7 +77,7 @@ public class BlackListManager : MonoBehaviourSingleton<BlackListManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDelete(int targetId, Action<bool> call_back)
@@ -93,7 +93,7 @@ public class BlackListManager : MonoBehaviourSingleton<BlackListManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void Dirty()

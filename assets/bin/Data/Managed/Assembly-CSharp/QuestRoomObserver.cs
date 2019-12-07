@@ -29,17 +29,12 @@ public class QuestRoomObserver : MonoBehaviour
 
 	private SpanTimer sendInfoSpan = new SpanTimer(5f);
 
-	public QuestRoomObserver()
-		: this()
-	{
-	}
-
 	public static void OffObserve()
 	{
 		isObserve = false;
 	}
 
-	public QuestRoomObserver Initialize(bool from_search_section, bool is_entry_pass, Action<string> _dispatch_callback, Action<string> _change_event_callback, Action _stay_event_callback, Action<bool> _resume_event_callback, bool? is_update_observe = default(bool?))
+	public QuestRoomObserver Initialize(bool from_search_section, bool is_entry_pass, Action<string> _dispatch_callback, Action<string> _change_event_callback, Action _stay_event_callback, Action<bool> _resume_event_callback, bool? is_update_observe = null)
 	{
 		fromSearchSection = from_search_section;
 		isEntryPass = is_entry_pass;
@@ -47,8 +42,8 @@ public class QuestRoomObserver : MonoBehaviour
 		changeEventCallBack = _change_event_callback;
 		stayEventCallBack = _stay_event_callback;
 		resumeEventCallBack = _resume_event_callback;
-		isObserve = ((!is_update_observe.HasValue) ? isObserve : is_update_observe.Value);
-		section = this.get_gameObject().GetComponent<GameSection>();
+		isObserve = (is_update_observe ?? isObserve);
+		section = base.gameObject.GetComponent<GameSection>();
 		return this;
 	}
 
@@ -129,7 +124,7 @@ public class QuestRoomObserver : MonoBehaviour
 	{
 		if (changeEventCallBack != null && stayEventCallBack != null && resumeEventCallBack != null && fromSearchSection)
 		{
-			changeEventCallBack((!isEntryPass) ? "BACK_ROOM_SEARCH" : "BACK_INPUT_PASS");
+			changeEventCallBack(isEntryPass ? "BACK_INPUT_PASS" : "BACK_ROOM_SEARCH");
 			if (!isEntryPass)
 			{
 				stayEventCallBack();

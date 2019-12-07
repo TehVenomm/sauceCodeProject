@@ -42,7 +42,7 @@ public class ClanRequestSelect : GameSection
 				component.UpdateAnchors();
 			}
 		}
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	protected virtual IEnumerator DoInitialize()
@@ -63,21 +63,21 @@ public class ClanRequestSelect : GameSection
 		{
 			if (questList == null || questList.Count == 0)
 			{
-				SetActive((Enum)UI.GRD_QUEST, is_visible: false);
-				SetActive((Enum)UI.STR_QUEST_NON_LIST, is_visible: true);
+				SetActive(UI.GRD_QUEST, is_visible: false);
+				SetActive(UI.STR_QUEST_NON_LIST, is_visible: true);
 			}
 			else
 			{
-				SetActive((Enum)UI.STR_QUEST_NON_LIST, is_visible: false);
-				SetActive((Enum)UI.GRD_DELIVERY, is_visible: true);
-				SetDynamicList((Enum)UI.GRD_DELIVERY, "ClanRequestItem", questList.Count, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+				SetActive(UI.STR_QUEST_NON_LIST, is_visible: false);
+				SetActive(UI.GRD_DELIVERY, is_visible: true);
+				SetDynamicList(UI.GRD_DELIVERY, "ClanRequestItem", questList.Count, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 				{
 					SetActive(t, is_visible: true);
-					if (!Object.op_Implicit(t.get_transform().GetComponent<ClanRequestItem>()))
+					if (!t.transform.GetComponent<ClanRequestItem>())
 					{
-						t.get_gameObject().AddComponent<ClanRequestItem>();
+						t.gameObject.AddComponent<ClanRequestItem>();
 					}
-					t.get_transform().GetComponent<ClanRequestItem>().Setup(t, questList[i]);
+					t.transform.GetComponent<ClanRequestItem>().Setup(t, questList[i]);
 				});
 			}
 		}
@@ -89,20 +89,20 @@ public class ClanRequestSelect : GameSection
 		{
 			questList = ret.result.deliveryList;
 			call_back(ret.Error == Error.None);
-		}, string.Empty);
+		});
 	}
 
 	private void SetQuestBoardAccess()
 	{
 		if (MonoBehaviourSingleton<ClanMatchingManager>.I.userClanData.level >= 2)
 		{
-			SetActive((Enum)UI.SPR_QUESTBOARD_BANNER_ON, is_visible: true);
-			SetActive((Enum)UI.SPR_QUESTBOARD_BANNER_OFF, is_visible: false);
+			SetActive(UI.SPR_QUESTBOARD_BANNER_ON, is_visible: true);
+			SetActive(UI.SPR_QUESTBOARD_BANNER_OFF, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.SPR_QUESTBOARD_BANNER_ON, is_visible: false);
-			SetActive((Enum)UI.SPR_QUESTBOARD_BANNER_OFF, is_visible: true);
+			SetActive(UI.SPR_QUESTBOARD_BANNER_ON, is_visible: false);
+			SetActive(UI.SPR_QUESTBOARD_BANNER_OFF, is_visible: true);
 		}
 	}
 

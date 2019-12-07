@@ -36,7 +36,7 @@ public class FriendArenaRankingInfoScore : GameSection
 		object[] array = (object[])GameSection.GetEventData();
 		eventData = (array[0] as Network.EventData);
 		userId = (int)array[1];
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()

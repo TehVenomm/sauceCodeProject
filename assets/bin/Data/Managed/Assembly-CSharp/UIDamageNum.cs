@@ -116,7 +116,7 @@ public class UIDamageNum : MonoBehaviour
 
 	protected float widthOffset;
 
-	protected Color normalColor = Color.get_white();
+	protected Color normalColor = Color.white;
 
 	protected Color normalOutLineColor = new Color(0.03f, 0.08f, 0.14f);
 
@@ -124,45 +124,8 @@ public class UIDamageNum : MonoBehaviour
 
 	public int DamageLength => damageLength;
 
-	public UIDamageNum()
-		: this()
-	{
-	}//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-	//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-	//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-	//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-	//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-	//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-	//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-	//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-	//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-	//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-	//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-	//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-	//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-	//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-	//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-	//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-
-
 	protected void Awake()
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		normalColor = damadeNum.color;
 		normalOutLineColor = damadeNum.effectColor;
 	}
@@ -172,22 +135,17 @@ public class UIDamageNum : MonoBehaviour
 		int i = 0;
 		for (int count = damageNumList.Count; i < count; i++)
 		{
-			UILabel component = damageNumList[i].GetComponent<UILabel>();
-			component.alpha = 0.01f;
+			damageNumList[i].GetComponent<UILabel>().alpha = 0.01f;
 		}
 		enable = false;
 	}
 
 	public bool Initialize(Vector3 pos, int damage, DAMAGE_COLOR color, int groupOffset)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 		worldPos = pos;
-		ref Vector3 reference = ref worldPos;
-		reference.y += offsetY;
-		float num = (float)Screen.get_height() / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
-		float num2 = (float)Screen.get_width() / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth;
+		worldPos.y += offsetY;
+		float num = (float)Screen.height / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
+		float num2 = (float)Screen.width / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth;
 		higthOffset_f = (float)(damadeNum.height * groupOffset) * heightOffsetRatio * num;
 		widthOffset = (float)damadeNum.width * 0.2f * (float)groupOffset * num2;
 		if (!SetPosFromWorld(worldPos))
@@ -205,23 +163,23 @@ public class UIDamageNum : MonoBehaviour
 			if (count > i)
 			{
 				uILabel = damageNumList[i].GetComponent<UILabel>();
-				damageNumList[i].SetActive(true);
+				damageNumList[i].SetActive(value: true);
 			}
 			else
 			{
-				GameObject val = null;
+				GameObject gameObject = null;
 				if (i == 0)
 				{
-					val = damadeNum.get_gameObject();
+					gameObject = damadeNum.gameObject;
 					uILabel = damadeNum;
 				}
 				else
 				{
-					val = ResourceUtility.Instantiate<GameObject>(damadeNum.get_gameObject());
-					Utility.Attach(this.get_gameObject().get_transform(), val.get_transform());
-					uILabel = val.GetComponent<UILabel>();
+					gameObject = ResourceUtility.Instantiate(damadeNum.gameObject);
+					Utility.Attach(base.gameObject.transform, gameObject.transform);
+					uILabel = gameObject.GetComponent<UILabel>();
 				}
-				damageNumList.Add(val);
+				damageNumList.Add(gameObject);
 			}
 			uILabel.text = text[i].ToString();
 			uILabel.alpha = 1f;
@@ -231,11 +189,11 @@ public class UIDamageNum : MonoBehaviour
 		{
 			for (int j = text.Length; j < count; j++)
 			{
-				damageNumList[j].SetActive(false);
+				damageNumList[j].SetActive(value: false);
 			}
 		}
 		grid.Reposition();
-		this.StartCoroutine(DirectionNumber());
+		StartCoroutine(DirectionNumber());
 		return true;
 	}
 
@@ -245,128 +203,84 @@ public class UIDamageNum : MonoBehaviour
 		for (int i = 0; i < num_count; i++)
 		{
 			GameObject obj = damageNumList[i];
-			Vector3 v = obj.get_transform().get_localPosition();
+			Vector3 v = obj.transform.localPosition;
 			while (v.y < upHeight)
 			{
-				v.y += upSpeed * Time.get_deltaTime();
-				obj.get_transform().set_localPosition(v);
+				v.y += upSpeed * Time.deltaTime;
+				obj.transform.localPosition = v;
 				yield return null;
 			}
 			while (v.y >= 0f)
 			{
-				v.y -= upSpeed * Time.get_deltaTime();
-				obj.get_transform().set_localPosition(v);
+				v.y -= upSpeed * Time.deltaTime;
+				obj.transform.localPosition = v;
 				yield return null;
 			}
 			v.y = 0f;
-			obj.get_transform().set_localPosition(v);
+			obj.transform.localPosition = v;
+			v = default(Vector3);
 		}
-		yield return (object)new WaitForSeconds(showTime);
+		yield return new WaitForSeconds(showTime);
 		for (int j = 0; j < num_count; j++)
 		{
-			UILabel component = damageNumList[j].GetComponent<UILabel>();
-			component.alpha = 0.01f;
+			damageNumList[j].GetComponent<UILabel>().alpha = 0.01f;
 		}
 		enable = false;
 	}
 
 	protected void LateUpdate()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 		if (enable && !SetPosFromWorld(worldPos))
 		{
 			enable = false;
 			int i = 0;
 			for (int count = damageNumList.Count; i < count; i++)
 			{
-				UILabel component = damageNumList[i].GetComponent<UILabel>();
-				component.alpha = 0.01f;
+				damageNumList[i].GetComponent<UILabel>().alpha = 0.01f;
 			}
 		}
 	}
 
 	public Vector3 GetUIPosFromWorld(Vector3 world_pos, int groupOffset)
 	{
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
-			return Vector3.get_zero();
+			return Vector3.zero;
 		}
 		world_pos.y += offsetY;
-		Vector3 val = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(world_pos);
-		float num = (float)Screen.get_height() / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
+		Vector3 position = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(world_pos);
+		float num = (float)Screen.height / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
 		higthOffset_f = (float)(damadeNum.height * groupOffset) * heightOffsetRatio * num;
-		val.y += higthOffset_f;
-		if (val.z < 0f)
+		position.y += higthOffset_f;
+		if (position.z < 0f)
 		{
-			return Vector3.get_zero();
+			return Vector3.zero;
 		}
-		val.z = 0f;
-		return MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
+		position.z = 0f;
+		return MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(position);
 	}
 
 	protected bool SetPosFromWorld(Vector3 world_pos)
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
 			return false;
 		}
-		Vector3 val = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(world_pos);
-		val.y += higthOffset_f;
-		val.x += widthOffset;
-		if (val.z < 0f)
+		Vector3 position = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(world_pos);
+		position.y += higthOffset_f;
+		position.x += widthOffset;
+		if (position.z < 0f)
 		{
 			return false;
 		}
-		val.z = 0f;
-		Vector3 position = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
-		this.get_gameObject().get_transform().set_position(position);
+		position.z = 0f;
+		Vector3 position2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(position);
+		base.gameObject.transform.position = position2;
 		return true;
 	}
 
 	protected void ChangeColor(DAMAGE_COLOR color, UILabel label)
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
 		switch (color)
 		{
 		case DAMAGE_COLOR.BUFF:

@@ -1,5 +1,3 @@
-using System;
-
 public class StatusAvatarEquipSelect : StatusEquip
 {
 	private EQUIPMENT_TYPE changeTargetType;
@@ -52,7 +50,7 @@ public class StatusAvatarEquipSelect : StatusEquip
 
 	protected override void InitLocalInventory()
 	{
-		localInventoryEquipData = CreateLocalnventory();
+		SortCompareData[] array = localInventoryEquipData = CreateLocalnventory();
 		sortSettings.Sort(localInventoryEquipData as EquipItemSortData[]);
 	}
 
@@ -68,7 +66,7 @@ public class StatusAvatarEquipSelect : StatusEquip
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_STATUS_ROOT, is_visible: false);
+		SetActive(UI.OBJ_STATUS_ROOT, is_visible: false);
 		base.UpdateUI();
 	}
 
@@ -80,11 +78,11 @@ public class StatusAvatarEquipSelect : StatusEquip
 	{
 		if (EquipItem != null)
 		{
-			SetRenderEquipModel((Enum)UI.TEX_MODEL, EquipItem.tableID, -1, -1, 1f);
+			SetRenderEquipModel(UI.TEX_MODEL, EquipItem.tableID);
 		}
 		else
 		{
-			ClearRenderModel((Enum)UI.TEX_MODEL);
+			ClearRenderModel(UI.TEX_MODEL);
 		}
 	}
 

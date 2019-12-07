@@ -20,8 +20,8 @@ public class SmithPerformanceBase : GameSection
 			MonoBehaviourSingleton<StatusStageManager>.I.SetUITextureActive(active: false);
 		}
 		object obj = resultData = GameSection.GetEventData();
-		SetToggle((Enum)UI.TGL_DIRECTION, value: true);
-		this.StartCoroutine(DoInitialize());
+		SetToggle(UI.TGL_DIRECTION, value: true);
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -30,10 +30,10 @@ public class SmithPerformanceBase : GameSection
 		LoadObject lo_direction = loadingQueue.Load(RESOURCE_CATEGORY.UI, "SmithEquipDirection");
 		int wait = 0;
 		wait++;
-		int npcId = (!StatusManager.IsUnique()) ? 4 : 36;
-		NPCTable.NPCData npcData4 = Singleton<NPCTable>.I.GetNPCData(npcId);
+		int npc_id = StatusManager.IsUnique() ? 36 : 4;
+		NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData(npc_id);
 		GameObject npcRoot4 = new GameObject("NPC");
-		npcData4.LoadModel(npcRoot4, need_shadow: false, enable_light_probe: true, delegate
+		nPCData.LoadModel(npcRoot4, need_shadow: false, enable_light_probe: true, delegate
 		{
 			wait--;
 		}, useSpecialModel: false);
@@ -41,22 +41,20 @@ public class SmithPerformanceBase : GameSection
 		if (this is SmithAbilityChangePerformance || this is SmithAbilityItemPerformance)
 		{
 			wait++;
-			NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData(3);
+			NPCTable.NPCData nPCData2 = Singleton<NPCTable>.I.GetNPCData(3);
 			npcRoot3 = new GameObject("NPC003");
-			nPCData.LoadModel(npcRoot3, need_shadow: false, enable_light_probe: true, delegate
+			nPCData2.LoadModel(npcRoot3, need_shadow: false, enable_light_probe: true, delegate
 			{
 				wait--;
 			}, useSpecialModel: false);
 		}
-		int[] seIds2 = (int[])Enum.GetValues(typeof(SmithEquipDirector.AUDIO));
-		int[] array = seIds2;
+		int[] array = (int[])Enum.GetValues(typeof(SmithEquipDirector.AUDIO));
 		foreach (int se_id in array)
 		{
 			loadingQueue.CacheSE(se_id);
 		}
-		seIds2 = (int[])Enum.GetValues(typeof(EquipResultBase.AUDIO));
-		int[] array2 = seIds2;
-		foreach (int se_id2 in array2)
+		array = (int[])Enum.GetValues(typeof(EquipResultBase.AUDIO));
+		foreach (int se_id2 in array)
 		{
 			loadingQueue.CacheSE(se_id2);
 		}
@@ -65,9 +63,8 @@ public class SmithPerformanceBase : GameSection
 		{
 			yield return null;
 		}
-		Object directionObject = lo_direction.loadedObject;
-		Transform directionTransform = ResourceUtility.Realizes(directionObject, MonoBehaviourSingleton<StageManager>.I.stageObject);
-		director = directionTransform.GetComponent<SmithEquipDirector>();
+		Transform transform = ResourceUtility.Realizes(lo_direction.loadedObject, MonoBehaviourSingleton<StageManager>.I.stageObject);
+		director = transform.GetComponent<SmithEquipDirector>();
 		director.SetNPC004(npcRoot4);
 		director.SetNPC003(npcRoot3);
 		base.Initialize();
@@ -98,12 +95,12 @@ public class SmithPerformanceBase : GameSection
 
 	protected virtual void OnEndDirection()
 	{
-		this.StartCoroutine(DoEnd());
+		StartCoroutine(DoEnd());
 	}
 
 	protected void EndDirectionUI()
 	{
-		SetToggle((Enum)UI.TGL_DIRECTION, value: false);
+		SetToggle(UI.TGL_DIRECTION, value: false);
 	}
 
 	private IEnumerator DoEnd()
@@ -115,19 +112,19 @@ public class SmithPerformanceBase : GameSection
 		}
 		EndDirectionUI();
 		DispatchEvent("SKIP");
-		if (Object.op_Implicit(director))
+		if ((bool)director)
 		{
 			director.Reset();
-			Object.Destroy(director.get_gameObject());
+			UnityEngine.Object.Destroy(director.gameObject);
 		}
 	}
 
 	protected override void OnDestroy()
 	{
-		if (Object.op_Implicit(director))
+		if ((bool)director)
 		{
 			director.Reset();
-			Object.Destroy(director.get_gameObject());
+			UnityEngine.Object.Destroy(director.gameObject);
 		}
 		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
 		{

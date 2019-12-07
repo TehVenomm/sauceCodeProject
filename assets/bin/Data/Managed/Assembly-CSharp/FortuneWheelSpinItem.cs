@@ -24,16 +24,11 @@ public class FortuneWheelSpinItem : MonoBehaviour
 		private set;
 	}
 
-	public FortuneWheelSpinItem()
-		: this()
-	{
-	}
-
 	public void CreateItemIcon(int id, REWARD_TYPE type, uint rewardId, int indexPos)
 	{
 		this.id = id;
 		this.indexPos = indexPos;
-		_trans = this.get_transform();
+		_trans = base.transform;
 		if (type == REWARD_TYPE.JACKPOT)
 		{
 			return;
@@ -56,7 +51,7 @@ public class FortuneWheelSpinItem : MonoBehaviour
 	{
 		id = data.id;
 		this.indexPos = indexPos;
-		_trans = this.get_transform();
+		_trans = base.transform;
 		type = (REWARD_TYPE)data.rewardType;
 		if (string.IsNullOrEmpty(data.imgId))
 		{
@@ -76,7 +71,7 @@ public class FortuneWheelSpinItem : MonoBehaviour
 					itemIcon.SetSpinMachineItem();
 				}
 			}
-			iconTex.get_gameObject().SetActive(false);
+			iconTex.gameObject.SetActive(value: false);
 		}
 		else
 		{
@@ -94,7 +89,7 @@ public class FortuneWheelSpinItem : MonoBehaviour
 	public void CreateItemIcon(int indexPos, string imgId)
 	{
 		this.indexPos = indexPos;
-		_trans = this.get_transform();
+		_trans = base.transform;
 		this.imgId = imgId;
 		ResourceLoad.LoadFortuneWheelIconTexture(iconTex, imgId, delegate(Texture tex)
 		{
@@ -107,7 +102,7 @@ public class FortuneWheelSpinItem : MonoBehaviour
 
 	public void UpdateIcon(int itemId, REWARD_TYPE type, uint rewardId)
 	{
-		Object.Destroy(_trans.Find("ItemIcon").get_gameObject());
+		Object.Destroy(_trans.Find("ItemIcon").gameObject);
 		if (type == REWARD_TYPE.JACKPOT)
 		{
 			return;
@@ -128,25 +123,14 @@ public class FortuneWheelSpinItem : MonoBehaviour
 
 	public void SetRotate(float degree)
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		_trans.set_localEulerAngles(new Vector3(0f, 0f, degree));
+		_trans.localEulerAngles = new Vector3(0f, 0f, degree);
 	}
 
 	public void SetScale(float scale)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 localScale = _trans.get_localScale();
-		if (localScale.x != scale)
+		if (_trans.localScale.x != scale && _trans.localScale.y != scale)
 		{
-			Vector3 localScale2 = _trans.get_localScale();
-			if (localScale2.y != scale)
-			{
-				_trans.set_localScale(new Vector3(scale, scale, 1f));
-			}
+			_trans.localScale = new Vector3(scale, scale, 1f);
 		}
 	}
 }

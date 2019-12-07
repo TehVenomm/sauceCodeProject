@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -46,14 +45,14 @@ public class SmithAbilityChangeResult : GameSection
 	public override void Initialize()
 	{
 		equipItemInfo = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>().selectEquipData;
-		Transform val = SetPrefab((Enum)UI.OBJ_ABILITY_LIST_ROOT, "AbilityChangeAbilityList");
-		abilityList = val.get_gameObject().AddComponent<AbilityChangeAbilityList>();
+		Transform transform = SetPrefab(UI.OBJ_ABILITY_LIST_ROOT, "AbilityChangeAbilityList");
+		abilityList = transform.gameObject.AddComponent<AbilityChangeAbilityList>();
 		abilityList.uiVisible = true;
-		SetRenderEquipModel((Enum)UI.TEX_MODEL, equipItemInfo.tableID, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, -1, 1f);
-		SetLabelText((Enum)UI.STR_NEXT_REFLECT, base.sectionData.GetText("STR_NEXT"));
-		ResetTween((Enum)UI.OBJ_DELAY_2, 0);
+		SetRenderEquipModel(UI.TEX_MODEL, equipItemInfo.tableID, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex);
+		SetLabelText(UI.STR_NEXT_REFLECT, base.sectionData.GetText("STR_NEXT"));
+		ResetTween(UI.OBJ_DELAY_2);
 		MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = false;
-		SetFullScreenButton((Enum)UI.BTN_TAP_FULL_SCREEN);
+		SetFullScreenButton(UI.BTN_TAP_FULL_SCREEN);
 		m_isFirstOpen = true;
 		base.Initialize();
 	}
@@ -63,8 +62,8 @@ public class SmithAbilityChangeResult : GameSection
 		endDirectionCount = 0;
 		abilityList.InitUI();
 		abilityList.Open();
-		PlayTween((Enum)UI.OBJ_DELAY_1, forward: true, (EventDelegate.Callback)PlayDirection, is_input_block: true, 0);
-		SetActive((Enum)UI.OBJ_DELAY_2, is_visible: false);
+		PlayTween(UI.OBJ_DELAY_1, forward: true, PlayDirection);
+		SetActive(UI.OBJ_DELAY_2, is_visible: false);
 		base.OnOpen();
 	}
 
@@ -75,16 +74,16 @@ public class SmithAbilityChangeResult : GameSection
 
 	private void EndAllDirection()
 	{
-		SetActive((Enum)UI.OBJ_DELAY_2, is_visible: true);
-		ResetTween((Enum)UI.OBJ_DELAY_2, 0);
-		PlayTween((Enum)UI.OBJ_DELAY_2, forward: true, (EventDelegate.Callback)null, is_input_block: true, 0);
-		SetActive((Enum)UI.TEX_MODEL, is_visible: false);
+		SetActive(UI.OBJ_DELAY_2, is_visible: true);
+		ResetTween(UI.OBJ_DELAY_2);
+		PlayTween(UI.OBJ_DELAY_2);
+		SetActive(UI.TEX_MODEL, is_visible: false);
 		RefreshUI();
 	}
 
 	private void PlayDirection()
 	{
-		this.StartCoroutine(_PlayDirection());
+		StartCoroutine(_PlayDirection());
 	}
 
 	private IEnumerator _PlayDirection()
@@ -96,14 +95,17 @@ public class SmithAbilityChangeResult : GameSection
 			UI.LBL_ADD_ABILITY_3
 		};
 		EquipItemAbility[] abilities = equipItemInfo.GetLotteryAbility();
-		for (int i = 0; i < abilities.Length; i++)
+		int i = 0;
+		while (i < abilities.Length)
 		{
 			PlayDirection(UiDirection[i], ui_add_ability[i], abilities[i]);
-			yield return (object)new WaitForSeconds(0.46f);
+			yield return new WaitForSeconds(0.46f);
 			if (m_isFirstOpen)
 			{
 				SoundManager.PlayOneShotUISE(40000049);
 			}
+			int num = i + 1;
+			i = num;
 		}
 		isTimerStart = true;
 		m_isFirstOpen = false;
@@ -111,9 +113,9 @@ public class SmithAbilityChangeResult : GameSection
 
 	private void PlayDirection(UI directionObj, UI label, EquipItemAbility ability)
 	{
-		SetFontStyle((Enum)label, 2);
-		SetLabelText((Enum)label, ability.GetNameAndAP());
-		PlayTween((Enum)directionObj, forward: true, (EventDelegate.Callback)EndDirection, is_input_block: false, 0);
+		SetFontStyle(label, FontStyle.Italic);
+		SetLabelText(label, ability.GetNameAndAP());
+		PlayTween(directionObj, forward: true, EndDirection, is_input_block: false);
 	}
 
 	private void EndDirection()
@@ -181,7 +183,7 @@ public class SmithAbilityChangeResult : GameSection
 		{
 			for (int j = 0; j < lotteryAbility.Length; j++)
 			{
-				SkipTween((Enum)UiDirection[j], forward: true, 0);
+				SkipTween(UiDirection[j]);
 			}
 		}
 	}
@@ -200,7 +202,7 @@ public class SmithAbilityChangeResult : GameSection
 	{
 		if (isTimerStart)
 		{
-			timer += Time.get_deltaTime();
+			timer += Time.deltaTime;
 		}
 	}
 }

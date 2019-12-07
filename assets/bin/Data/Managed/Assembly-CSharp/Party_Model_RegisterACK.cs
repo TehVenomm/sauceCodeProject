@@ -55,26 +55,25 @@ public class Party_Model_RegisterACK : Coop_Model_ACK
 
 	public List<string> userinfo;
 
-	public Party_Model_RegisterACK()
-	{
-		base.packetType = PACKET_TYPE.PARTY_REGISTER_ACK;
-	}
-
 	public List<UserInfo> GetConvertUserInfo()
 	{
 		if (userinfo == null)
 		{
 			return null;
 		}
-		return (from x in userinfo
-		select new UserInfo(x)).ToList();
+		return userinfo.Select((string x) => new UserInfo(x)).ToList();
+	}
+
+	public Party_Model_RegisterACK()
+	{
+		base.packetType = PACKET_TYPE.PARTY_REGISTER_ACK;
 	}
 
 	public override string ToString()
 	{
 		string str = base.ToString();
 		str = str + ",ack=" + ack;
-		str = str + ",positive=" + positive;
+		str = str + ",positive=" + positive.ToString();
 		str += ",userInfo=[";
 		if (userinfo != null && userinfo.Any())
 		{

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -42,9 +41,9 @@ public class HomeCountdown : GameSection
 		ready = false;
 		showID = (int)GameSection.GetEventData();
 		PlayerPrefs.SetInt("COUNTDOWN_SHOWED_REMAIN", showID);
-		SetFullScreenButton((Enum)UI.BTN_SKIP_FULL_SCREEN);
-		InitTween((Enum)UI.OBJ_COUNTDOWN_ROOT);
-		this.StartCoroutine(DoInitialize());
+		SetFullScreenButton(UI.BTN_SKIP_FULL_SCREEN);
+		InitTween(UI.OBJ_COUNTDOWN_ROOT);
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -53,8 +52,8 @@ public class HomeCountdown : GameSection
 		{
 			loadQueue = new LoadingQueue(this);
 		}
-		string name = ResourceName.GetCountdownImage(showID);
-		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.COUNTDOWN_IMAGE, name);
+		string countdownImage = ResourceName.GetCountdownImage(showID);
+		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.COUNTDOWN_IMAGE, countdownImage);
 		if (loadQueue.IsLoading())
 		{
 			yield return loadQueue.Wait();
@@ -63,9 +62,7 @@ public class HomeCountdown : GameSection
 		{
 			yield return null;
 		}
-		Transform texture = GetCtrl(UI.TEX_COUNTDOWN);
-		UITexture uiTexture = texture.GetComponent<UITexture>();
-		Texture image = uiTexture.mainTexture = (lo_image.loadedObject as Texture);
+		Texture texture2 = GetCtrl(UI.TEX_COUNTDOWN).GetComponent<UITexture>().mainTexture = (lo_image.loadedObject as Texture);
 		ready = true;
 		base.Initialize();
 	}
@@ -77,16 +74,16 @@ public class HomeCountdown : GameSection
 			switch (currentState)
 			{
 			case State.START:
-				this.StartCoroutine(StartAnimation());
+				StartCoroutine(StartAnimation());
 				stateInitialized = true;
 				break;
 			case State.SHOW:
 				showTimer = 0f;
-				this.StartCoroutine(ShowCountdown());
+				StartCoroutine(ShowCountdown());
 				stateInitialized = true;
 				break;
 			case State.END:
-				this.StartCoroutine(EndAnimation());
+				StartCoroutine(EndAnimation());
 				stateInitialized = true;
 				break;
 			}
@@ -101,13 +98,13 @@ public class HomeCountdown : GameSection
 
 	private IEnumerator StartAnimation()
 	{
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, is_visible: false);
+		SetActive(UI.BTN_SKIP_FULL_SCREEN, is_visible: false);
 		bool wait = true;
 		PlayAudio(AUDIO.START, 1.3f);
-		PlayTween((Enum)UI.OBJ_COUNTDOWN_ROOT, forward: true, (EventDelegate.Callback)delegate
+		PlayTween(UI.OBJ_COUNTDOWN_ROOT, forward: true, delegate
 		{
 			wait = false;
-		}, is_input_block: true, 0);
+		});
 		while (wait)
 		{
 			yield return 0;
@@ -121,10 +118,10 @@ public class HomeCountdown : GameSection
 		Transform skip = GetCtrl(UI.BTN_SKIP_FULL_SCREEN);
 		while (wait)
 		{
-			showTimer += Time.get_deltaTime();
-			if (1.2f < showTimer && !skip.get_gameObject().get_activeSelf())
+			showTimer += Time.deltaTime;
+			if (1.2f < showTimer && !skip.gameObject.activeSelf)
 			{
-				SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, is_visible: true);
+				SetActive(UI.BTN_SKIP_FULL_SCREEN, is_visible: true);
 			}
 			if (skipRequest && 1.2f < showTimer)
 			{
@@ -138,10 +135,10 @@ public class HomeCountdown : GameSection
 	private IEnumerator EndAnimation()
 	{
 		bool wait = true;
-		PlayTween((Enum)UI.OBJ_COUNTDOWN_ROOT, forward: false, (EventDelegate.Callback)delegate
+		PlayTween(UI.OBJ_COUNTDOWN_ROOT, forward: false, delegate
 		{
 			wait = false;
-		}, is_input_block: true, 0);
+		});
 		while (wait)
 		{
 			yield return 0;

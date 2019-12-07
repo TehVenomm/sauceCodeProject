@@ -5,19 +5,14 @@ public class UIDragDropRoot : MonoBehaviour
 {
 	public static Transform root;
 
-	public UIDragDropRoot()
-		: this()
-	{
-	}
-
 	private void OnEnable()
 	{
-		root = this.get_transform();
+		root = base.transform;
 	}
 
 	private void OnDisable()
 	{
-		if (root == this.get_transform())
+		if (root == base.transform)
 		{
 			root = null;
 		}

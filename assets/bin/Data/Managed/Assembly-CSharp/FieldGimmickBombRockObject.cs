@@ -46,55 +46,45 @@ public class FieldGimmickBombRockObject : StageObject, IFieldGimmickObject
 
 	public void RequestDestroy()
 	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Expected O, but got Unknown
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Expected O, but got Unknown
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<EffectManager>.IsValid())
 		{
-			Transform effect = EffectManager.GetEffect("ef_btl_enemy_explosion_01_02", base._transform);
-			effect.set_localScale(new Vector3(0.8f, 0.8f, 0.8f));
+			EffectManager.GetEffect("ef_btl_enemy_explosion_01_02", base._transform).localScale = new Vector3(0.8f, 0.8f, 0.8f);
 		}
 		if (MonoBehaviourSingleton<SoundManager>.IsValid())
 		{
 			SoundManager.PlayOneShotSE(30000102, _position);
 		}
-		m_modelTrans.get_gameObject().SetActive(false);
-		GameObject val = new GameObject("BombRockAttackToEnemy");
-		BombRockAttackObject bombRockAttackObject = val.AddComponent<BombRockAttackObject>();
+		m_modelTrans.gameObject.SetActive(value: false);
+		BombRockAttackObject bombRockAttackObject = new GameObject("BombRockAttackToEnemy").AddComponent<BombRockAttackObject>();
 		AttackInfo attackInfo = MonoBehaviourSingleton<StageObjectManager>.I.self.GetAttackInfos().Find((AttackInfo info) => info.name == "bombrock");
 		if (attackInfo != null)
 		{
 			AttackHitInfo attackHitInfo = attackInfo as AttackHitInfo;
 			attackHitInfo.atk.normal = m_attackRate;
-			bombRockAttackObject.Initialize(MonoBehaviourSingleton<StageObjectManager>.I.self, base._transform, attackHitInfo, Vector3.get_zero(), Vector3.get_zero(), 2f, 1f, 14);
+			bombRockAttackObject.Initialize(MonoBehaviourSingleton<StageObjectManager>.I.self, base._transform, attackHitInfo, Vector3.zero, Vector3.zero, 2f, 1f, 14);
 		}
-		GameObject val2 = new GameObject("BombRockAttackToSelf");
-		BombRockAttackObject bombRockAttackObject2 = val2.AddComponent<BombRockAttackObject>();
-		AttackHitInfo attackHitInfo2 = new AttackHitInfo();
-		attackHitInfo2.attackType = AttackHitInfo.ATTACK_TYPE.BOMBROCK;
-		attackHitInfo2.toPlayer.reactionType = AttackHitInfo.ToPlayer.REACTION_TYPE.BLOW;
-		attackHitInfo2.toPlayer.reactionBlowForce = 100f;
-		attackHitInfo2.toPlayer.reactionBlowAngle = 20f;
-		bombRockAttackObject2.Initialize(this, base._transform, attackHitInfo2, Vector3.get_zero(), Vector3.get_zero(), 2f, 1f, 15);
-		if (!object.ReferenceEquals(m_effectBase, null))
+		new GameObject("BombRockAttackToSelf").AddComponent<BombRockAttackObject>().Initialize(atkInfo: new AttackHitInfo
 		{
-			Object.Destroy(m_effectBase.get_gameObject());
+			attackType = AttackHitInfo.ATTACK_TYPE.BOMBROCK,
+			toPlayer = 
+			{
+				reactionType = AttackHitInfo.ToPlayer.REACTION_TYPE.BLOW,
+				reactionBlowForce = 100f,
+				reactionBlowAngle = 20f
+			}
+		}, attacker: this, parent: base._transform, pos: Vector3.zero, rot: Vector3.zero, radius: 2f, height: 1f, attackLayer: 15);
+		if ((object)m_effectBase != null)
+		{
+			Object.Destroy(m_effectBase.gameObject);
 			m_effectBase = null;
 		}
-		this.StartCoroutine(ProcessDestroy());
+		StartCoroutine(ProcessDestroy());
 	}
 
 	private IEnumerator ProcessDestroy()
 	{
-		yield return (object)new WaitForSeconds(0.7f);
-		Object.Destroy(this.get_gameObject());
+		yield return new WaitForSeconds(0.7f);
+		Object.Destroy(base.gameObject);
 	}
 
 	public int GetId()
@@ -138,14 +128,13 @@ public class FieldGimmickBombRockObject : StageObject, IFieldGimmickObject
 
 	protected override void Awake()
 	{
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 		base.Awake();
-		Utility.SetLayerWithChildren(this.get_transform(), 18);
-		if (object.ReferenceEquals(m_sphereCollider, null))
+		Utility.SetLayerWithChildren(base.transform, 18);
+		if ((object)m_sphereCollider == null)
 		{
-			m_sphereCollider = this.get_gameObject().AddComponent<SphereCollider>();
-			m_sphereCollider.set_center(new Vector3(0f, 0f, 0f));
-			m_sphereCollider.set_radius(1.2f);
+			m_sphereCollider = base.gameObject.AddComponent<SphereCollider>();
+			m_sphereCollider.center = new Vector3(0f, 0f, 0f);
+			m_sphereCollider.radius = 1.2f;
 		}
 	}
 
@@ -169,7 +158,7 @@ public class FieldGimmickBombRockObject : StageObject, IFieldGimmickObject
 	public override void OnAttackedHitFix(AttackedHitStatusFix status)
 	{
 		base.OnAttackedHitFix(status);
-		m_sphereCollider.set_enabled(false);
+		m_sphereCollider.enabled = false;
 		RequestDestroy();
 	}
 }

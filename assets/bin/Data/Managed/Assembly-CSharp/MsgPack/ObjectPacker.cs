@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
 using UnityEngine;
@@ -20,36 +19,6 @@ namespace MsgPack
 		private static Dictionary<Type, PackDelegate> PackerMapping;
 
 		private static Dictionary<Type, UnpackDelegate> UnpackerMapping;
-
-		[CompilerGenerated]
-		private static PackDelegate _003C_003Ef__mg_0024cache0;
-
-		[CompilerGenerated]
-		private static UnpackDelegate _003C_003Ef__mg_0024cache1;
-
-		[CompilerGenerated]
-		private static PackDelegate _003C_003Ef__mg_0024cache2;
-
-		[CompilerGenerated]
-		private static UnpackDelegate _003C_003Ef__mg_0024cache3;
-
-		[CompilerGenerated]
-		private static PackDelegate _003C_003Ef__mg_0024cache4;
-
-		[CompilerGenerated]
-		private static UnpackDelegate _003C_003Ef__mg_0024cache5;
-
-		[CompilerGenerated]
-		private static PackDelegate _003C_003Ef__mg_0024cache6;
-
-		[CompilerGenerated]
-		private static UnpackDelegate _003C_003Ef__mg_0024cache7;
-
-		[CompilerGenerated]
-		private static PackDelegate _003C_003Ef__mg_0024cache8;
-
-		[CompilerGenerated]
-		private static UnpackDelegate _003C_003Ef__mg_0024cache9;
 
 		static ObjectPacker()
 		{

@@ -1,7 +1,6 @@
 using MsgPack;
 using MsgPack.Serialization;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -9,25 +8,25 @@ public class CoopPacketMsgpackUnitySerializer : CoopPacketSerializer
 {
 	public int version = int.Parse("10");
 
-	private SerializationContext context = SerializationContext.get_Default();
+	private SerializationContext context = SerializationContext.Default;
 
 	private ObjectPacker packer = new ObjectPacker();
+
+	public static void RegisterOverrideCommon(SerializationContext context)
+	{
+		context.Serializers.RegisterOverride(new Vector3Serializer(context));
+		context.Serializers.RegisterOverride(new QuaternionSerializer(context));
+		context.Serializers.RegisterOverride(new ListSerializer<int>(context));
+		context.Serializers.RegisterOverride(new ListSerializer<float>(context));
+		context.Serializers.RegisterOverride(new ListSerializer<bool>(context));
+		context.Serializers.RegisterOverride(new ListSerializer<string>(context));
+		context.Serializers.RegisterOverride(new ListSerializer<Vector3>(context));
+		context.Serializers.RegisterOverride(new ListSerializer<SkillInfo.SkillBaseInfo>(context));
+	}
 
 	public CoopPacketMsgpackUnitySerializer()
 	{
 		RegisterOverrideCommon(context);
-	}
-
-	public static void RegisterOverrideCommon(SerializationContext context)
-	{
-		context.get_Serializers().RegisterOverride<Vector3>(new Vector3Serializer(context));
-		context.get_Serializers().RegisterOverride<Quaternion>(new QuaternionSerializer(context));
-		context.get_Serializers().RegisterOverride<List<int>>(new ListSerializer<int>(context));
-		context.get_Serializers().RegisterOverride<List<float>>(new ListSerializer<float>(context));
-		context.get_Serializers().RegisterOverride<List<bool>>(new ListSerializer<bool>(context));
-		context.get_Serializers().RegisterOverride<List<string>>(new ListSerializer<string>(context));
-		context.get_Serializers().RegisterOverride<List<Vector3>>(new ListSerializer<Vector3>(context));
-		context.get_Serializers().RegisterOverride<List<SkillInfo.SkillBaseInfo>>(new ListSerializer<SkillInfo.SkillBaseInfo>(context));
 	}
 
 	public override PacketStream Serialize(CoopPacket packet)
@@ -65,8 +64,7 @@ public class CoopPacketMsgpackUnitySerializer : CoopPacketSerializer
 	protected override CoopPacketHeader OnDeserializeBinaryHeader(PacketMemoryStream stream)
 	{
 		int len = stream.ReadInt32();
-		byte[] buffer = stream.ReadBytes(len);
-		MemoryStream memoryStream = new MemoryStream(buffer);
+		MemoryStream memoryStream = new MemoryStream(stream.ReadBytes(len));
 		CoopPacketHeader result = packer.Unpack<CoopPacketHeader>(memoryStream);
 		memoryStream.Close();
 		memoryStream = null;
@@ -76,7 +74,6 @@ public class CoopPacketMsgpackUnitySerializer : CoopPacketSerializer
 	protected override Coop_Model_Base OnDeserializeBinaryModel(PacketMemoryStream stream, Type type, CoopPacketHeader header)
 	{
 		Type modelType = ((PACKET_TYPE)header.packetType).GetModelType();
-		Coop_Model_Base coop_Model_Base = null;
 		return (Coop_Model_Base)packer.Unpack(modelType, stream);
 	}
 }

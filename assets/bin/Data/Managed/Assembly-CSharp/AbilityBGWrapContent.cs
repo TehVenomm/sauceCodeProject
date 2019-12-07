@@ -6,7 +6,7 @@ public class AbilityBGWrapContent : UIWrapContent
 	{
 		if (scroll == null)
 		{
-			scroll = this.GetComponentInParent<UIScrollView>();
+			scroll = GetComponentInParent<UIScrollView>();
 		}
 		base.OnMove(panel);
 		scroll.restrictWithinPanel = true;

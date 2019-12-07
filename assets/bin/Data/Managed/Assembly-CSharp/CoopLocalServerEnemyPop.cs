@@ -36,12 +36,20 @@ public class CoopLocalServerEnemyPop
 
 	public bool IsTotalComplete()
 	{
-		return data.popNumTotal > 0 && count >= data.popNumTotal;
+		if (data.popNumTotal > 0)
+		{
+			return count >= data.popNumTotal;
+		}
+		return false;
 	}
 
 	public bool IsExtermination()
 	{
-		return IsTotalComplete() && GetPopNum() == 0;
+		if (IsTotalComplete())
+		{
+			return GetPopNum() == 0;
+		}
+		return false;
 	}
 
 	public int GetPopNum()
@@ -125,7 +133,7 @@ public class CoopLocalServerEnemyPop
 			{
 				num = 0f;
 			}
-			coopLocalServerEnemy.Out(Time.get_time() + num);
+			coopLocalServerEnemy.Out(Time.time + num);
 		}
 	}
 }

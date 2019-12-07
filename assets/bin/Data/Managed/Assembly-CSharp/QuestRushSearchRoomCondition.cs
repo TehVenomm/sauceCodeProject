@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -62,13 +61,13 @@ public class QuestRushSearchRoomCondition : QuestSearchRoomConditionBase
 	private void UpdateMinFloor()
 	{
 		int currentSelectMinFloorIndex = getCurrentSelectMinFloorIndex();
-		SetLabelText((Enum)UI.LBL_TARGET_MIN_FLOOR, minFloorList[currentSelectMinFloorIndex]);
+		SetLabelText(UI.LBL_TARGET_MIN_FLOOR, minFloorList[currentSelectMinFloorIndex]);
 	}
 
 	private void UpdateMaxFloor()
 	{
 		int currentSelectMaxFloorIndex = getCurrentSelectMaxFloorIndex();
-		SetLabelText((Enum)UI.LBL_TARGET_MAX_FLOOR, maxFloorList[currentSelectMaxFloorIndex]);
+		SetLabelText(UI.LBL_TARGET_MAX_FLOOR, maxFloorList[currentSelectMaxFloorIndex]);
 	}
 
 	protected override void LoadSearchRequestParam()
@@ -138,9 +137,7 @@ public class QuestRushSearchRoomCondition : QuestSearchRoomConditionBase
 		for (int i = 0; i < count; i++)
 		{
 			minFloorList[i] = (num + 1).ToString();
-			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)questIdList[i]);
-			List<QuestTable.QuestTableData> sameRushQuestData = QuestTable.GetSameRushQuestData(questData.rushId);
-			int num2 = sameRushQuestData.Count - 1;
+			int num2 = QuestTable.GetSameRushQuestData(Singleton<QuestTable>.I.GetQuestData((uint)questIdList[i]).rushId).Count - 1;
 			num += num2;
 			maxFloorList[i] = num.ToString();
 		}

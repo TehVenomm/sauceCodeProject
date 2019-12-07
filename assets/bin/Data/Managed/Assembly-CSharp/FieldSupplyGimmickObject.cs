@@ -54,7 +54,7 @@ public class FieldSupplyGimmickObject : FieldGimmickObject
 	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
 	{
 		base.Initialize(pointData);
-		modelTrans.get_gameObject().SetActive(false);
+		modelTrans.gameObject.SetActive(value: false);
 	}
 
 	protected override void ParseParam(string value2)
@@ -111,7 +111,7 @@ public class FieldSupplyGimmickObject : FieldGimmickObject
 			for (int l = 0; l < array3.Length; l++)
 			{
 				int result3 = 0;
-				if (array4[0].StartsWith(array3[l]) && int.TryParse(array4[0].Replace(array3[l], string.Empty), out result3) && result3 < result)
+				if (array4[0].StartsWith(array3[l]) && int.TryParse(array4[0].Replace(array3[l], ""), out result3) && result3 < result)
 				{
 					switch (array3[l])
 					{
@@ -178,23 +178,6 @@ public class FieldSupplyGimmickObject : FieldGimmickObject
 
 	public override void UpdateTargetMarker(bool isNear)
 	{
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 		if (CanUse() && isNear && self != null && self.IsChangeableAction((Character.ACTION_ID)44))
 		{
@@ -205,16 +188,15 @@ public class FieldSupplyGimmickObject : FieldGimmickObject
 			if (targetMarkerTrans != null)
 			{
 				Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-				Vector3 position = cameraTransform.get_position();
-				Quaternion rotation = cameraTransform.get_rotation();
-				Vector3 val = position - GetTransform().get_position();
-				Vector3 pos = val.get_normalized() * kRadius + Vector3.get_up() + GetTransform().get_position();
+				Vector3 position = cameraTransform.position;
+				Quaternion rotation = cameraTransform.rotation;
+				Vector3 pos = (position - GetTransform().position).normalized * kRadius + Vector3.up + GetTransform().position;
 				targetMarkerTrans.Set(pos, rotation);
 			}
 		}
 		else if (targetMarkerTrans != null)
 		{
-			EffectManager.ReleaseEffect(targetMarkerTrans.get_gameObject());
+			EffectManager.ReleaseEffect(targetMarkerTrans.gameObject);
 		}
 	}
 
@@ -222,27 +204,27 @@ public class FieldSupplyGimmickObject : FieldGimmickObject
 	{
 		if (coolTime > 0f)
 		{
-			coolTime -= Time.get_deltaTime();
+			coolTime -= Time.deltaTime;
 			coolTime = Mathf.Max(0f, coolTime);
 		}
-		if (MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.isStageHost && Time.get_frameCount() % kIntervalFrameForObserve == 0)
+		if (MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.isStageHost && Time.frameCount % kIntervalFrameForObserve == 0)
 		{
 			FieldCarriableGimmickObject fieldCarriableGimmickObject = MonoBehaviourSingleton<InGameProgress>.I.GetFieldGimmickObj(InGameProgress.eFieldGimmick.CarriableGimmick, (int)supplyGimmickIds[suppliedCount]) as FieldCarriableGimmickObject;
-			canUse = (coolTime <= 0f && supplyGimmickIds.Count > suppliedCount && fieldCarriableGimmickObject != null && !fieldCarriableGimmickObject.get_gameObject().get_activeSelf() && MonoBehaviourSingleton<StageObjectManager>.I.GetWaveMatchTargetHpRate() <= activeConditions[suppliedCount].maxDefenseTargetHp && MonoBehaviourSingleton<InGameProgress>.I.partyDefeatCount >= activeConditions[suppliedCount].minDestroiedEnemyCount && MonoBehaviourSingleton<InGameProgress>.I.GetElapsedTime() >= activeConditions[suppliedCount].minElapsedTime && MonoBehaviourSingleton<InGameProgress>.I.GetCarriableGimmickDeploiedCount() >= activeConditions[suppliedCount].minDeploiedGimmickNum);
+			canUse = (coolTime <= 0f && supplyGimmickIds.Count > suppliedCount && fieldCarriableGimmickObject != null && !fieldCarriableGimmickObject.gameObject.activeSelf && MonoBehaviourSingleton<StageObjectManager>.I.GetWaveMatchTargetHpRate() <= activeConditions[suppliedCount].maxDefenseTargetHp && MonoBehaviourSingleton<InGameProgress>.I.partyDefeatCount >= activeConditions[suppliedCount].minDestroiedEnemyCount && MonoBehaviourSingleton<InGameProgress>.I.GetElapsedTime() >= activeConditions[suppliedCount].minElapsedTime && MonoBehaviourSingleton<InGameProgress>.I.GetCarriableGimmickDeploiedCount() >= activeConditions[suppliedCount].minDeploiedGimmickNum);
 		}
-		if (!modelTrans.get_gameObject().get_activeSelf() && CanUse())
+		if (!modelTrans.gameObject.activeSelf && CanUse())
 		{
 			Active();
 		}
-		else if (modelTrans.get_gameObject().get_activeSelf() && !CanUse())
+		else if (modelTrans.gameObject.activeSelf && !CanUse())
 		{
-			modelTrans.get_gameObject().SetActive(false);
+			modelTrans.gameObject.SetActive(value: false);
 		}
 	}
 
 	public virtual void Active()
 	{
-		modelTrans.get_gameObject().SetActive(true);
+		modelTrans.gameObject.SetActive(value: true);
 		canUse = true;
 		OnActive();
 		if (MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.isStageHost)
@@ -273,7 +255,11 @@ public class FieldSupplyGimmickObject : FieldGimmickObject
 
 	public override bool IsSearchableNearest()
 	{
-		return CanUse() && modelTrans.get_gameObject().get_activeSelf();
+		if (CanUse())
+		{
+			return modelTrans.gameObject.activeSelf;
+		}
+		return false;
 	}
 
 	public override void RequestDestroy()
@@ -284,11 +270,6 @@ public class FieldSupplyGimmickObject : FieldGimmickObject
 
 	public FieldCarriableGimmickObject SupplyGimmick()
 	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
 		if (!CanUse())
 		{
 			return null;
@@ -299,9 +280,9 @@ public class FieldSupplyGimmickObject : FieldGimmickObject
 		{
 			return null;
 		}
-		fieldCarriableGimmickObject.GetTransform().set_position(GetTransform().get_position());
-		fieldCarriableGimmickObject.GetTransform().set_rotation(GetTransform().get_rotation());
-		fieldCarriableGimmickObject.get_gameObject().SetActive(true);
+		fieldCarriableGimmickObject.GetTransform().position = GetTransform().position;
+		fieldCarriableGimmickObject.GetTransform().rotation = GetTransform().rotation;
+		fieldCarriableGimmickObject.gameObject.SetActive(value: true);
 		if (MonoBehaviourSingleton<MiniMap>.IsValid())
 		{
 			MonoBehaviourSingleton<MiniMap>.I.Detach(this);
@@ -313,11 +294,11 @@ public class FieldSupplyGimmickObject : FieldGimmickObject
 		}
 		else
 		{
-			modelTrans.get_gameObject().SetActive(false);
+			modelTrans.gameObject.SetActive(value: false);
 			canUse = false;
 		}
-		EffectManager.OneShot(kBreakEffectName, GetTransform().get_position(), GetTransform().get_rotation());
-		SoundManager.PlayOneShotSE(kBreakSEId, GetTransform().get_position());
+		EffectManager.OneShot(kBreakEffectName, GetTransform().position, GetTransform().rotation);
+		SoundManager.PlayOneShotSE(kBreakSEId, GetTransform().position);
 		return fieldCarriableGimmickObject;
 	}
 
@@ -329,16 +310,17 @@ public class FieldSupplyGimmickObject : FieldGimmickObject
 			Active();
 			return;
 		}
-		modelTrans.get_gameObject().SetActive(false);
+		modelTrans.gameObject.SetActive(value: false);
 		canUse = false;
 	}
 
 	public Coop_Model_StageInfo.FieldSupplyGimmickInfo GetSupplyGimmickInfo()
 	{
-		Coop_Model_StageInfo.FieldSupplyGimmickInfo fieldSupplyGimmickInfo = new Coop_Model_StageInfo.FieldSupplyGimmickInfo();
-		fieldSupplyGimmickInfo.pointId = GetId();
-		fieldSupplyGimmickInfo.suppliedCount = suppliedCount;
-		fieldSupplyGimmickInfo.canUse = canUse;
-		return fieldSupplyGimmickInfo;
+		return new Coop_Model_StageInfo.FieldSupplyGimmickInfo
+		{
+			pointId = GetId(),
+			suppliedCount = suppliedCount,
+			canUse = canUse
+		};
 	}
 }

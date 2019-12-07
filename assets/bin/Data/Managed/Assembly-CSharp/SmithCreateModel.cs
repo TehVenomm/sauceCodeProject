@@ -5,7 +5,7 @@ public class SmithCreateModel : BaseModel
 	[Serializable]
 	public class Param
 	{
-		public string equipUniqId = string.Empty;
+		public string equipUniqId = "";
 	}
 
 	public class RequestSendForm

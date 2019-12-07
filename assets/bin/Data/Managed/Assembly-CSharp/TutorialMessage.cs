@@ -76,7 +76,11 @@ public class TutorialMessage : UIBehaviour
 
 		public bool CurrentShowMessageOrImage()
 		{
-			return CurrentShowMessage() || CurrentShowImage();
+			if (!CurrentShowMessage())
+			{
+				return CurrentShowImage();
+			}
+			return true;
 		}
 
 		public bool CurrentShowMessage()
@@ -113,8 +117,7 @@ public class TutorialMessage : UIBehaviour
 			{
 				return false;
 			}
-			TutorialMessageTable.TutorialMessageData.MessageData messageData = Current();
-			if (messageData == null)
+			if (Current() == null)
 			{
 				return false;
 			}
@@ -126,7 +129,7 @@ public class TutorialMessage : UIBehaviour
 			if (load_image != null && load_image.Length > index && is_loading_flag != null && is_loading_flag.Length > index)
 			{
 				load_image[index] = t;
-				load_image[index].get_gameObject().SetActive(false);
+				load_image[index].gameObject.SetActive(value: false);
 				is_loading_flag[index] = false;
 			}
 		}
@@ -135,7 +138,7 @@ public class TutorialMessage : UIBehaviour
 		{
 			if (load_image != null && load_image.Length > m_current_index)
 			{
-				load_image[m_current_index].get_gameObject().SetActive(true);
+				load_image[m_current_index].gameObject.SetActive(value: true);
 			}
 		}
 
@@ -143,7 +146,7 @@ public class TutorialMessage : UIBehaviour
 		{
 			if (load_image[m_current_index] != null)
 			{
-				Object.Destroy(load_image[m_current_index].get_gameObject());
+				UnityEngine.Object.Destroy(load_image[m_current_index].gameObject);
 				load_image[m_current_index] = null;
 			}
 		}
@@ -152,14 +155,14 @@ public class TutorialMessage : UIBehaviour
 		{
 			m_current_index = 0;
 			Messages = data;
-			load_image = (Transform[])new Transform[Messages.messageData.Count];
+			load_image = new Transform[Messages.messageData.Count];
 			is_loading_flag = new bool[Messages.messageData.Count];
 			int index = 0;
 			Messages.messageData.ForEach(delegate(TutorialMessageTable.TutorialMessageData.MessageData msg)
 			{
 				load_image[index] = null;
 				is_loading_flag[index] = !string.IsNullOrEmpty(msg.imageResourceName);
-				index++;
+				int num = ++index;
 			});
 		}
 
@@ -169,7 +172,11 @@ public class TutorialMessage : UIBehaviour
 			{
 				return false;
 			}
-			return (m_current_index + 1 < count) ? true : false;
+			if (m_current_index + 1 >= count)
+			{
+				return false;
+			}
+			return true;
 		}
 
 		public bool ShiftNext()
@@ -243,7 +250,7 @@ public class TutorialMessage : UIBehaviour
 		{
 			if (m_panelRoot == null)
 			{
-				m_panelRoot = this.GetComponent<UIPanel>();
+				m_panelRoot = GetComponent<UIPanel>();
 			}
 			return m_panelRoot;
 		}
@@ -268,12 +275,20 @@ public class TutorialMessage : UIBehaviour
 
 	public bool IsEnableMessage()
 	{
-		return m_tutorial != null || base.isOpen;
+		if (m_tutorial == null)
+		{
+			return base.isOpen;
+		}
+		return true;
 	}
 
 	public bool IsOnlyShowImage()
 	{
-		return m_tutorial != null && m_tutorial.CurrentShowImage() && !m_tutorial.CurrentShowMessage();
+		if (m_tutorial != null && m_tutorial.CurrentShowImage())
+		{
+			return !m_tutorial.CurrentShowMessage();
+		}
+		return false;
 	}
 
 	private void SetErrorResendFlag(FORCE_RESEND_DIALOG_FLAG flag)
@@ -323,11 +338,11 @@ public class TutorialMessage : UIBehaviour
 
 	private void OnTouchOffAlways(InputManager.TouchInfo info)
 	{
-		if (enableSkip && base.GetComponent<UIWidget>((Enum)UI.SPR_MESSAGE).finalAlpha >= 0.99f && !MonoBehaviourSingleton<UIManager>.I.IsTransitioning())
+		if (enableSkip && GetComponent<UIWidget>(UI.SPR_MESSAGE).finalAlpha >= 0.99f && !MonoBehaviourSingleton<UIManager>.I.IsTransitioning())
 		{
 			enableSkip = false;
-			SkipTween((Enum)UI.OBJ_DESC_ROOT, forward: true, GetTweenCtrlID(TWEEN_CTRL_ID.MESSAGE));
-			SkipTween((Enum)UI.OBJ_DESC_ROOT, forward: true, GetTweenCtrlID(TWEEN_CTRL_ID.IMAGE));
+			SkipTween(UI.OBJ_DESC_ROOT, forward: true, GetTweenCtrlID(TWEEN_CTRL_ID.MESSAGE));
+			SkipTween(UI.OBJ_DESC_ROOT, forward: true, GetTweenCtrlID(TWEEN_CTRL_ID.IMAGE));
 			SkipTween(GetCursor(), UI.SPR_TUTORIAL_CURSOR_DOWN);
 			HideFocusFrame();
 		}
@@ -335,14 +350,12 @@ public class TutorialMessage : UIBehaviour
 
 	protected override void OnDestroy()
 	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		if (!AppMain.isApplicationQuit)
 		{
 			if (TextureBG != null)
 			{
-				TextureBG.material.SetVector("_HoleSize", Vector4.get_zero());
-				TextureBG.material.SetVector("_HolePos", Vector4.get_zero());
+				TextureBG.material.SetVector("_HoleSize", Vector4.zero);
+				TextureBG.material.SetVector("_HolePos", Vector4.zero);
 			}
 			base.OnDestroy();
 		}
@@ -384,7 +397,7 @@ public class TutorialMessage : UIBehaviour
 		}
 		m_tutorial = new TutorialData();
 		m_tutorial.Init(enableExecTutorial);
-		this.StartCoroutine(_LoadMessageImage(m_tutorial));
+		StartCoroutine(_LoadMessageImage(m_tutorial));
 		return true;
 	}
 
@@ -415,14 +428,14 @@ public class TutorialMessage : UIBehaviour
 		int index = -1;
 		list.ForEach(delegate(LoadObject data)
 		{
-			index++;
+			int num = ++index;
 			if (data != null)
 			{
-				Transform val = ResourceUtility.Realizes(data.loadedObject, GetCtrl(UI.OBJ_IMAGE_ROOT), 5);
-				if (val != null)
+				Transform transform = ResourceUtility.Realizes(data.loadedObject, GetCtrl(UI.OBJ_IMAGE_ROOT), 5);
+				if (transform != null)
 				{
-					val.set_name(index.ToString());
-					tutorial_data.SetImage(index, val);
+					transform.name = index.ToString();
+					tutorial_data.SetImage(index, transform);
 				}
 			}
 		});
@@ -438,7 +451,7 @@ public class TutorialMessage : UIBehaviour
 		onCloseCallback = callback;
 		if (section_name == "TutorialStep4_1_1")
 		{
-			this.StartCoroutine(Delay(1f));
+			StartCoroutine(Delay(1f));
 		}
 		else
 		{
@@ -448,7 +461,7 @@ public class TutorialMessage : UIBehaviour
 
 	private IEnumerator Delay(float delayTime)
 	{
-		yield return (object)new WaitForSeconds(delayTime);
+		yield return new WaitForSeconds(delayTime);
 		StartTutorial(is_hide_cursol: false);
 	}
 
@@ -569,7 +582,7 @@ public class TutorialMessage : UIBehaviour
 		{
 			if (!show_image)
 			{
-				TextureBG.set_enabled(false);
+				TextureBG.enabled = false;
 			}
 			enableSkip = true;
 		}
@@ -659,18 +672,17 @@ public class TutorialMessage : UIBehaviour
 			WaitingUI(is_wait_start: true);
 			waiting = true;
 			enableSkip = false;
-			this.StartCoroutine(DoWaitToStartMessage(messageData.wait));
+			StartCoroutine(DoWaitToStartMessage(messageData.wait));
 		}
 	}
 
 	private void WaitingUI(bool is_wait_start)
 	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 		if (is_wait_start)
 		{
-			SetActive((Enum)UI.OBJ_MESSAGE_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_IMAGE_ROOT, is_visible: false);
-			SetColor((Enum)UI.OBJ_DESC_ROOT, Color.get_white());
+			SetActive(UI.OBJ_MESSAGE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_IMAGE_ROOT, is_visible: false);
+			SetColor(UI.OBJ_DESC_ROOT, Color.white);
 			HideBGHole();
 		}
 		else
@@ -681,18 +693,18 @@ public class TutorialMessage : UIBehaviour
 
 	private IEnumerator DoWaitToStartMessage(float time)
 	{
-		yield return (object)new WaitForSeconds(time);
+		yield return new WaitForSeconds(time);
 		WaitingUI(is_wait_start: false);
 		StartMessage();
 		waiting = false;
 		enableSkip = true;
-		TextureBG.set_enabled(true);
+		TextureBG.enabled = true;
 		if (m_tutorial != null)
 		{
 			TutorialMessageTable.TutorialMessageData.MessageData messageData = m_tutorial.Current();
 			if (messageData != null && messageData.has_target)
 			{
-				TextureBG.set_enabled(false);
+				TextureBG.enabled = false;
 			}
 		}
 	}
@@ -717,8 +729,8 @@ public class TutorialMessage : UIBehaviour
 				enableSkip = false;
 				HideFocusFrame();
 			};
-			ResetTween((Enum)UI.OBJ_DESC_ROOT, GetTweenCtrlID(TWEEN_CTRL_ID.MESSAGE));
-			ResetTween((Enum)UI.OBJ_DESC_ROOT, GetTweenCtrlID(TWEEN_CTRL_ID.IMAGE));
+			ResetTween(UI.OBJ_DESC_ROOT, GetTweenCtrlID(TWEEN_CTRL_ID.MESSAGE));
+			ResetTween(UI.OBJ_DESC_ROOT, GetTweenCtrlID(TWEEN_CTRL_ID.IMAGE));
 			if (!m_tutorial.CurrentShowMessageOrImage() && !IsWaitTween())
 			{
 				callback();
@@ -747,8 +759,8 @@ public class TutorialMessage : UIBehaviour
 					SubmitCursor("SELF", "TUTORIAL_NEXT");
 				}
 			};
-			ResetTween((Enum)UI.OBJ_DESC_ROOT, GetTweenCtrlID(TWEEN_CTRL_ID.MESSAGE));
-			ResetTween((Enum)UI.OBJ_DESC_ROOT, GetTweenCtrlID(TWEEN_CTRL_ID.IMAGE));
+			ResetTween(UI.OBJ_DESC_ROOT, GetTweenCtrlID(TWEEN_CTRL_ID.MESSAGE));
+			ResetTween(UI.OBJ_DESC_ROOT, GetTweenCtrlID(TWEEN_CTRL_ID.IMAGE));
 			if (!m_tutorial.CurrentShowMessageOrImage() && !IsWaitTween())
 			{
 				callback2();
@@ -763,14 +775,18 @@ public class TutorialMessage : UIBehaviour
 
 	private bool IsWaitTween()
 	{
-		return MonoBehaviourSingleton<UIManager>.I.IsTransitioning() || GameSceneManager.isAutoEventSkip;
+		if (!MonoBehaviourSingleton<UIManager>.I.IsTransitioning())
+		{
+			return GameSceneManager.isAutoEventSkip;
+		}
+		return true;
 	}
 
 	private void TutorialPlayTween(Enum ui, EventDelegate.Callback callback, int tween_ctrl_id)
 	{
 		if (IsWaitTween() || (m_tutorial != null && m_tutorial.CurrentShowImage()))
 		{
-			this.StartCoroutine(_TweenCoroutine(ui, callback, tween_ctrl_id));
+			StartCoroutine(_TweenCoroutine(ui, callback, tween_ctrl_id));
 		}
 		else
 		{
@@ -797,7 +813,6 @@ public class TutorialMessage : UIBehaviour
 
 	private void UpdateFocusFrame()
 	{
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
 		HideFocusFrame();
 		if (m_tutorial == null)
 		{
@@ -811,31 +826,30 @@ public class TutorialMessage : UIBehaviour
 		string[] array = messageData.focusFrame.Split(',');
 		if (array.Length >= 4)
 		{
-			UIWidget component = base.GetComponent<UIWidget>((Enum)UI.SPR_FORCS_FRAME);
+			UIWidget component = GetComponent<UIWidget>(UI.SPR_FORCS_FRAME);
 			if (!(component == null))
 			{
 				float.TryParse(array[0], out float result);
 				float.TryParse(array[1], out float result2);
 				int.TryParse(array[2], out int result3);
 				int.TryParse(array[3], out int result4);
-				component.cachedTransform.set_localPosition(new Vector3(result, result2, 0f));
+				component.cachedTransform.localPosition = new Vector3(result, result2, 0f);
 				component.width = result3;
 				component.height = result4;
-				SetActive((Enum)UI.WGT_FORCS_FRAME, is_visible: true);
-				ResetTween((Enum)UI.WGT_FORCS_FRAME, 0);
-				PlayTween((Enum)UI.WGT_FORCS_FRAME, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+				SetActive(UI.WGT_FORCS_FRAME, is_visible: true);
+				ResetTween(UI.WGT_FORCS_FRAME);
+				PlayTween(UI.WGT_FORCS_FRAME, forward: true, null, is_input_block: false);
 			}
 		}
 	}
 
 	private void HideFocusFrame()
 	{
-		SetActive((Enum)UI.WGT_FORCS_FRAME, is_visible: false);
+		SetActive(UI.WGT_FORCS_FRAME, is_visible: false);
 	}
 
 	private void UpdateMessagePosition(TutorialMessageTable.TutorialMessageData.MessageData.Position pos)
 	{
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 		UI uI = UI.OBJ_ANCHOR_MESSAGE_UP;
 		switch (pos)
 		{
@@ -850,7 +864,7 @@ public class TutorialMessage : UIBehaviour
 		Transform ctrl2 = GetCtrl(UI.OBJ_MESSAGE_ROOT);
 		if (ctrl != null && ctrl2 != null)
 		{
-			ctrl2.set_position(ctrl.get_position());
+			ctrl2.position = ctrl.position;
 		}
 	}
 
@@ -873,21 +887,21 @@ public class TutorialMessage : UIBehaviour
 		}
 		if (m_tutorial != null)
 		{
-			ctrl.get_gameObject().SetActive(true);
-			ctrl3.get_gameObject().SetActive(false);
-			ctrl2.get_gameObject().SetActive(false);
+			ctrl.gameObject.SetActive(value: true);
+			ctrl3.gameObject.SetActive(value: false);
+			ctrl2.gameObject.SetActive(value: false);
 			if (m_tutorial.CurrentShowImage())
 			{
-				ctrl3.get_gameObject().SetActive(true);
+				ctrl3.gameObject.SetActive(value: true);
 			}
 			if (m_tutorial.CurrentShowMessage())
 			{
-				ctrl2.get_gameObject().SetActive(true);
+				ctrl2.gameObject.SetActive(value: true);
 			}
 		}
 		else
 		{
-			ctrl.get_gameObject().SetActive(false);
+			ctrl.gameObject.SetActive(value: false);
 		}
 	}
 
@@ -921,7 +935,6 @@ public class TutorialMessage : UIBehaviour
 
 	private void FocusCursor(TutorialMessageTable.TutorialMessageData.MessageData data)
 	{
-		//IL_0249: Unknown result type (might be due to invalid IL or missing references)
 		GameSection currentSection = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection();
 		if (currentSection == null || currentSection._transform == null)
 		{
@@ -934,8 +947,7 @@ public class TutorialMessage : UIBehaviour
 		{
 			bool is_not_equal = cursorTarget.Contains("[ID!]");
 			int id = 0;
-			string s = cursorTarget.Remove(0, (!is_not_equal) ? 4 : 5);
-			if (int.TryParse(s, out id))
+			if (int.TryParse(cursorTarget.Remove(0, is_not_equal ? 5 : 4), out id))
 			{
 				ItemIcon target_icon = null;
 				ItemIcon[] componentsInChildren = MonoBehaviourSingleton<UIManager>.I.uiRootTransform.GetComponentsInChildren<ItemIcon>();
@@ -964,7 +976,7 @@ public class TutorialMessage : UIBehaviour
 					UIButton componentInParent = target_icon.GetComponentInParent<UIButton>();
 					if (componentInParent != null)
 					{
-						target = componentInParent.get_transform();
+						target = componentInParent.transform;
 					}
 				}
 			}
@@ -998,7 +1010,7 @@ public class TutorialMessage : UIBehaviour
 		FOCUS_PATTERN focusPattern = m_tutorial.Current().focusPattern;
 		if (m_tutorial != null && focusPattern != 0)
 		{
-			ShowBGHole(target.get_transform().get_position(), focusPattern, target);
+			ShowBGHole(target.transform.position, focusPattern, target);
 		}
 		else
 		{
@@ -1008,106 +1020,48 @@ public class TutorialMessage : UIBehaviour
 
 	private void HideBGHole()
 	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		UITexture textureBG = TextureBG;
 		if (!(textureBG == null))
 		{
-			textureBG.set_enabled(true);
-			textureBG.material.SetVector("_HoleSize", new Vector4((float)Screen.get_width(), (float)Screen.get_height(), 1f));
+			textureBG.enabled = true;
+			textureBG.material.SetVector("_HoleSize", new Vector4(Screen.width, Screen.height, 1f));
 			RefreeshDraw();
 		}
 	}
 
 	private void ShowBGHole(Vector3 hole_pos, FOCUS_PATTERN focus, Transform target = null)
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
 		UITexture textureBG = TextureBG;
 		if (textureBG == null)
 		{
 			return;
 		}
-		textureBG.set_enabled(true);
-		Vector3 val = MonoBehaviourSingleton<UIManager>.I.uiCamera.WorldToViewportPoint(hole_pos);
-		Vector4 val2 = default(Vector4);
-		val2._002Ector(val.x * 2f - 1f, val.y * 2f - 1f, 1f);
+		textureBG.enabled = true;
+		Vector3 vector = MonoBehaviourSingleton<UIManager>.I.uiCamera.WorldToViewportPoint(hole_pos);
+		Vector4 value = new Vector4(vector.x * 2f - 1f, vector.y * 2f - 1f, 1f);
 		Vector3 hOLE_SIZE = HOLE_SIZE;
 		BoxCollider component = target.GetComponent<BoxCollider>();
 		if (component != null)
 		{
-			float num;
+			float num = (focus == FOCUS_PATTERN.TARGET_FOCUS) ? (component.size.x * target.localScale.x) : 0f;
+			float num2 = (focus == FOCUS_PATTERN.TARGET_FOCUS) ? (component.size.y * target.localScale.y) : 0f;
+			float x = num / (float)Screen.width;
+			float y = num2 / (float)Screen.height;
+			hOLE_SIZE.x = x;
+			hOLE_SIZE.y = y;
 			if (focus == FOCUS_PATTERN.TARGET_FOCUS)
 			{
-				Vector3 size = component.get_size();
-				float x = size.x;
-				Vector3 localScale = target.get_localScale();
-				num = x * localScale.x;
+				value.x += component.center.x / (float)Screen.width * target.localScale.x;
+				value.y += component.center.y / (float)Screen.height * target.localScale.y;
 			}
 			else
 			{
-				num = 0f;
-			}
-			float num2 = num;
-			float num3;
-			if (focus == FOCUS_PATTERN.TARGET_FOCUS)
-			{
-				Vector3 size2 = component.get_size();
-				float y = size2.y;
-				Vector3 localScale2 = target.get_localScale();
-				num3 = y * localScale2.y;
-			}
-			else
-			{
-				num3 = 0f;
-			}
-			float num4 = num3;
-			float x2 = num2 / (float)Screen.get_width();
-			float y2 = num4 / (float)Screen.get_height();
-			hOLE_SIZE.x = x2;
-			hOLE_SIZE.y = y2;
-			if (focus == FOCUS_PATTERN.TARGET_FOCUS)
-			{
-				float x3 = val2.x;
-				Vector3 center = component.get_center();
-				float num5 = center.x / (float)Screen.get_width();
-				Vector3 localScale3 = target.get_localScale();
-				val2.x = x3 + num5 * localScale3.x;
-				float y3 = val2.y;
-				Vector3 center2 = component.get_center();
-				float num6 = center2.y / (float)Screen.get_height();
-				Vector3 localScale4 = target.get_localScale();
-				val2.y = y3 + num6 * localScale4.y;
-			}
-			else
-			{
-				val2.x = 0f;
-				val2.y = 0f;
+				value.x = 0f;
+				value.y = 0f;
 			}
 		}
-		textureBG.material.SetVector("_HoleSize", Vector4.op_Implicit(hOLE_SIZE));
-		textureBG.material.SetVector("_HolePos", val2);
+		textureBG.material.SetVector("_HoleSize", hOLE_SIZE);
+		textureBG.material.SetVector("_HolePos", value);
 		RefreeshDraw();
 	}
 
@@ -1122,10 +1076,10 @@ public class TutorialMessage : UIBehaviour
 	private void HideCursor(bool force = false, bool is_close = true)
 	{
 		HideBGHole();
-		if ((m_status == State.WAIT && m_last_target != null) || force)
+		if ((m_status == State.WAIT && m_last_target != null) | force)
 		{
 			GameSection currentSection = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection();
-			if (!(currentSection == null) && !(currentSection.get_transform() == null))
+			if (!(currentSection == null) && !(currentSection.transform == null))
 			{
 				DetachCursor(m_last_target, is_close);
 				m_last_target = null;
@@ -1166,75 +1120,42 @@ public class TutorialMessage : UIBehaviour
 
 	private float CalcCenterXOffset(UIWidget widget)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		Vector2 pivotOffset = widget.pivotOffset;
-		float num = (0f - pivotOffset.x) * (float)widget.width;
+		float num = (0f - widget.pivotOffset.x) * (float)widget.width;
 		float num2 = num + (float)widget.width;
 		return (num + num2) * 0.5f;
 	}
 
 	private float CalcCenterYOffset(UIWidget widget)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		Vector2 pivotOffset = widget.pivotOffset;
-		float num = (0f - pivotOffset.y) * (float)widget.height;
+		float num = (0f - widget.pivotOffset.y) * (float)widget.height;
 		float num2 = num + (float)widget.height;
 		return (num + num2) * 0.5f;
 	}
 
 	private void SetupCursor(Transform cursor, Transform target, float center_x, float center_y)
 	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
 		float num = 10f;
-		float num2 = num;
-		Vector3 lossyScale = target.get_lossyScale();
-		float num3 = num2 * lossyScale.x;
+		float num2 = num * target.lossyScale.x;
 		UISprite component = cursor.GetComponent<UISprite>();
-		Vector2 val = new Vector2(center_x, center_y);
-		Vector3 lossyScale2 = target.get_lossyScale();
-		Vector2 val2 = val * lossyScale2.x;
-		Vector3 position = target.get_position();
-		float y = position.y;
-		float y2 = val2.y;
-		float num4 = component.height;
-		Vector3 lossyScale3 = component.cachedTransform.get_lossyScale();
-		float num5 = y + (y2 + num4 * lossyScale3.y);
-		Vector3 val3 = PanelRoot.cachedTransform.InverseTransformPoint(new Vector3(0f, num5, 0f));
-		float y3 = val3.y;
-		float num6 = 427f;
-		Vector2 offset = default(Vector2);
-		if (y3 + num < num6)
+		Vector2 vector = new Vector2(center_x, center_y) * target.lossyScale.x;
+		float y = target.position.y + (vector.y + (float)component.height * component.cachedTransform.lossyScale.y);
+		float y2 = PanelRoot.cachedTransform.InverseTransformPoint(new Vector3(0f, y, 0f)).y;
+		float num3 = 427f;
+		Vector2 offset;
+		if (y2 + num < num3)
 		{
-			offset._002Ector(val2.x, val2.y + num3);
+			offset = new Vector2(vector.x, vector.y + num2);
 			component.pivot = UIWidget.Pivot.Bottom;
 			component.flip = UIBasicSprite.Flip.Nothing;
 		}
 		else
 		{
-			offset._002Ector(val2.x, val2.y - num3);
+			offset = new Vector2(vector.x, vector.y - num2);
 			component.pivot = UIWidget.Pivot.Top;
 			component.flip = UIBasicSprite.Flip.Vertically;
 		}
-		cursor.set_localRotation(Quaternion.get_identity());
-		TutorialUIObjectFollower tutorialUIObjectFollower = cursor.get_gameObject().AddComponent<TutorialUIObjectFollower>();
-		tutorialUIObjectFollower.Setup(target, offset);
+		cursor.localRotation = Quaternion.identity;
+		cursor.gameObject.AddComponent<TutorialUIObjectFollower>().Setup(target, offset);
 	}
 
 	private void SetupCursor(Transform cursor, UIWidget target_widget)
@@ -1244,55 +1165,36 @@ public class TutorialMessage : UIBehaviour
 
 	private void SetupCursor(Transform cursor, BoxCollider collider)
 	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		Transform transform = collider.get_transform();
-		Vector3 center = collider.get_center();
-		float x = center.x;
-		Vector3 center2 = collider.get_center();
-		SetupCursor(cursor, transform, x, center2.y);
+		SetupCursor(cursor, collider.transform, collider.center.x, collider.center.y);
 	}
 
 	private Transform _AttachTutorialCursor(Transform target, TutorialMessageTable.TutorialMessageData.MessageData data)
 	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
 		if (target == null)
 		{
 			return null;
 		}
-		Transform val = null;
-		BoxCollider component2;
-		UIWidget component3;
+		Transform transform = null;
+		BoxCollider component;
+		UIWidget component2;
 		if (data != null && data.cursorType == TutorialMessageTable.TutorialMessageData.MessageData.CursorType.MANUAL)
 		{
-			val = CreateTutorialCursor();
-			UISprite component = val.GetComponent<UISprite>();
-			component.pivot = UIWidget.Pivot.Bottom;
-			TutorialUIObjectFollower tutorialUIObjectFollower = val.get_gameObject().AddComponent<TutorialUIObjectFollower>();
-			TutorialUIObjectFollower tutorialUIObjectFollower2 = tutorialUIObjectFollower;
-			Vector2 cursorOffset = data.cursorOffset;
-			Vector3 lossyScale = target.get_lossyScale();
-			tutorialUIObjectFollower2.Setup(target, cursorOffset * lossyScale.x);
-			val.set_localRotation(Quaternion.AngleAxis((float)data.cursorRotDeg, Vector3.get_forward()));
+			transform = CreateTutorialCursor();
+			transform.GetComponent<UISprite>().pivot = UIWidget.Pivot.Bottom;
+			transform.gameObject.AddComponent<TutorialUIObjectFollower>().Setup(target, data.cursorOffset * target.lossyScale.x);
+			transform.localRotation = Quaternion.AngleAxis(data.cursorRotDeg, Vector3.forward);
 		}
-		else if (Object.op_Implicit(component2 = target.GetComponent<BoxCollider>()))
+		else if ((bool)(component = target.GetComponent<BoxCollider>()))
 		{
-			val = CreateTutorialCursor();
-			SetupCursor(val, component2);
+			transform = CreateTutorialCursor();
+			SetupCursor(transform, component);
 		}
-		else if (Object.op_Implicit(component3 = target.GetComponent<UIWidget>()))
+		else if ((bool)(component2 = target.GetComponent<UIWidget>()))
 		{
-			val = CreateTutorialCursor();
-			SetupCursor(val, component3);
+			transform = CreateTutorialCursor();
+			SetupCursor(transform, component2);
 		}
-		if (val != null)
+		if (transform != null)
 		{
 			bool flag = false;
 			if (m_tutorial != null && !string.IsNullOrEmpty(m_tutorial.Messages.messageData[0].message))
@@ -1301,31 +1203,30 @@ public class TutorialMessage : UIBehaviour
 			}
 			if (data != null && data.cursorDelay >= 0f)
 			{
-				UITweener component4 = base.GetComponent<UITweener>(val, (Enum)UI.SPR_TUTORIAL_CURSOR_DOWN);
-				if (component4 != null)
+				UITweener component3 = GetComponent<UITweener>(transform, UI.SPR_TUTORIAL_CURSOR_DOWN);
+				if (component3 != null)
 				{
-					component4.delay = data.cursorDelay;
+					component3.delay = data.cursorDelay;
 				}
 			}
 			if (flag)
 			{
-				ResetTween(val, UI.SPR_TUTORIAL_CURSOR_DOWN);
-				PlayTween(val, UI.SPR_TUTORIAL_CURSOR_DOWN, forward: true, null, is_input_block: false);
+				ResetTween(transform, UI.SPR_TUTORIAL_CURSOR_DOWN);
+				PlayTween(transform, UI.SPR_TUTORIAL_CURSOR_DOWN, forward: true, null, is_input_block: false);
 			}
 			else
 			{
-				SkipTween(val, UI.SPR_TUTORIAL_CURSOR_DOWN);
+				SkipTween(transform, UI.SPR_TUTORIAL_CURSOR_DOWN);
 			}
 		}
-		return val;
+		return transform;
 	}
 
 	private Transform CreateTutorialCursor()
 	{
-		SetActive((Enum)UI.OBJ_TUTORIAL_CURSOR, is_visible: true);
-		Transform ctrl = GetCtrl(UI.SPR_TUTORIAL_CURSOR_DOWN);
-		Transform result = ResourceUtility.Realizes(ctrl.get_gameObject(), PanelRoot.get_transform());
-		SetActive((Enum)UI.OBJ_TUTORIAL_CURSOR, is_visible: false);
+		SetActive(UI.OBJ_TUTORIAL_CURSOR, is_visible: true);
+		Transform result = ResourceUtility.Realizes(GetCtrl(UI.SPR_TUTORIAL_CURSOR_DOWN).gameObject, PanelRoot.transform);
+		SetActive(UI.OBJ_TUTORIAL_CURSOR, is_visible: false);
 		return result;
 	}
 
@@ -1350,7 +1251,7 @@ public class TutorialMessage : UIBehaviour
 			CursorInfo cursorInfo = cursorAttachList[i];
 			if (cursorInfo.cursor != null)
 			{
-				Object.Destroy(cursorInfo.cursor.get_gameObject());
+				UnityEngine.Object.Destroy(cursorInfo.cursor.gameObject);
 				cursorAttachList.RemoveAt(i);
 				i--;
 				num--;
@@ -1359,7 +1260,7 @@ public class TutorialMessage : UIBehaviour
 		cursorAttachList.Clear();
 		CursorInfo item = default(CursorInfo);
 		item.target = target;
-		item.button = uIButton.get_gameObject();
+		item.button = uIButton.gameObject;
 		item.cursor = _AttachTutorialCursor(target, data);
 		item.isInDynamicList = (target.GetComponentInParent<UIDynamicList>() != null);
 		cursorAttachList.Add(item);
@@ -1374,7 +1275,7 @@ public class TutorialMessage : UIBehaviour
 			CursorInfo cursorInfo = cursorAttachList[i];
 			if (cursorInfo.target == target)
 			{
-				Object.Destroy(cursorInfo.cursor.get_gameObject());
+				UnityEngine.Object.Destroy(cursorInfo.cursor.gameObject);
 				cursorAttachList.RemoveAt(i);
 				i--;
 				num--;
@@ -1390,7 +1291,7 @@ public class TutorialMessage : UIBehaviour
 			CursorInfo cursorInfo = cursorAttachList[i];
 			if (cursorInfo.cursor == cursor)
 			{
-				Object.Destroy(cursorInfo.cursor.get_gameObject());
+				UnityEngine.Object.Destroy(cursorInfo.cursor.gameObject);
 				cursorAttachList.RemoveAt(i);
 				i--;
 				num--;
@@ -1475,14 +1376,14 @@ public class TutorialMessage : UIBehaviour
 			}
 			else if (cursorInfo.isInDynamicList)
 			{
-				Transform val = button.get_transform();
-				while (val != null)
+				Transform transform = button.transform;
+				while (transform != null)
 				{
-					if (cursorInfo.target == val)
+					if (cursorInfo.target == transform)
 					{
 						return true;
 					}
-					val = val.get_parent();
+					transform = transform.parent;
 				}
 			}
 			else if (cursorInfo.button == button)
@@ -1490,7 +1391,7 @@ public class TutorialMessage : UIBehaviour
 				return true;
 			}
 		}
-		if (button.get_name() == "TEX_BG")
+		if (button.name == "TEX_BG")
 		{
 			return true;
 		}
@@ -1508,7 +1409,6 @@ public class TutorialMessage : UIBehaviour
 		{
 			return null;
 		}
-		CursorInfo cursorInfo = tutorialMessage.cursorAttachList[index];
-		return cursorInfo.cursor;
+		return tutorialMessage.cursorAttachList[index].cursor;
 	}
 }

@@ -136,7 +136,7 @@ namespace GooglePlayGames.Native
 				}
 				else
 				{
-					Logger.d("Not all data fetched - original:" + mOriginalDataFetched + " unmerged:" + mUnmergedDataFetched);
+					Logger.d("Not all data fetched - original:" + mOriginalDataFetched.ToString() + " unmerged:" + mUnmergedDataFetched.ToString());
 				}
 			}
 		}
@@ -309,7 +309,7 @@ namespace GooglePlayGames.Native
 			{
 				mSnapshotManager.SnapshotSelectUI(showCreateSaveUI, showDeleteSaveUI, maxDisplayedSavedGames, uiTitle, delegate(GooglePlayGames.Native.PInvoke.SnapshotManager.SnapshotSelectUIResponse response)
 				{
-					callback(AsUIStatus(response.RequestStatus()), (!response.RequestSucceeded()) ? null : response.Data());
+					callback(AsUIStatus(response.RequestStatus()), response.RequestSucceeded() ? response.Data() : null);
 				});
 			}
 		}

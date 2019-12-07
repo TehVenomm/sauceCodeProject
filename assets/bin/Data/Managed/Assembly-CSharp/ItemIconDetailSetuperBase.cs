@@ -30,20 +30,15 @@ public class ItemIconDetailSetuperBase : MonoBehaviour
 
 	protected virtual UISprite selectSP => null;
 
-	public ItemIconDetailSetuperBase()
-		: this()
-	{
-	}
-
 	public virtual void Set(object[] data = null)
 	{
-		if (inActiveRootAry != null && inActiveRootAry.Length > 0)
+		if (inActiveRootAry != null && inActiveRootAry.Length != 0)
 		{
 			Array.ForEach(inActiveRootAry, delegate(GameObject obj)
 			{
 				if (obj != null)
 				{
-					obj.get_gameObject().SetActive(false);
+					obj.gameObject.SetActive(value: false);
 				}
 			});
 		}
@@ -56,7 +51,7 @@ public class ItemIconDetailSetuperBase : MonoBehaviour
 
 	public void SetVisibleBG(bool is_visible)
 	{
-		spBG.set_enabled(is_visible);
+		spBG.enabled = is_visible;
 	}
 
 	public virtual void SetupSelectNumberSprite(int select_number)
@@ -69,7 +64,7 @@ public class ItemIconDetailSetuperBase : MonoBehaviour
 			if (flag)
 			{
 				selectSP.spriteName = SPR_SKILL_MATERIAL_NUMBER[num];
-				selectSP.set_enabled(true);
+				selectSP.enabled = true;
 			}
 		}
 	}

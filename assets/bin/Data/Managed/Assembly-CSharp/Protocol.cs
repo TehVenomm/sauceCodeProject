@@ -27,7 +27,11 @@ public class Protocol
 			{
 				return true;
 			}
-			return MonoBehaviourSingleton<ProtocolManager>.IsValid() && MonoBehaviourSingleton<ProtocolManager>.I.isReserved;
+			if (MonoBehaviourSingleton<ProtocolManager>.IsValid())
+			{
+				return MonoBehaviourSingleton<ProtocolManager>.I.isReserved;
+			}
+			return false;
 		}
 	}
 
@@ -242,7 +246,8 @@ public class Protocol
 			return true;
 		}
 		bool flag2 = false;
-		if (code == 31007)
+		int num = code;
+		if (num == 31007)
 		{
 			flag2 = true;
 		}
@@ -261,24 +266,115 @@ public class Protocol
 			}, error: true, code);
 			return false;
 		}
-		bool flag3;
 		if (code < 100000)
 		{
-			flag3 = false;
-			if (code != 1002 && code != 1003)
+			bool flag3 = false;
+			switch (code)
 			{
-				switch (code)
+			case 1002:
+			case 1003:
+			case 1020:
+			case 1023:
+			case 2001:
+			case 66003:
+				flag3 = true;
+				break;
+			}
+			if ((!flag3 || ret is CheckRegisterModel) && GameSceneGlobalSettings.IsNonPopupError(ret))
+			{
+				if (code == 1002)
 				{
-				case 1020:
-				case 1023:
-					goto IL_018a;
+					OpenMaintenancePopup(ret);
 				}
-				if (code != 2001)
+				return true;
+			}
+			string errorMessage2 = StringTable.GetErrorMessage((uint)code);
+			MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("error_code_" + code, "Error");
+			if (flag3 && code == 66003)
+			{
+				GameSceneEvent.PushStay();
+				MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, errorMessage2), delegate
 				{
-					goto IL_0192;
+					GameSceneEvent.PopStay();
+					MonoBehaviourSingleton<AppMain>.I.Reset();
+				}, error: true, code);
+			}
+			else if (flag3 && code != 1002)
+			{
+				GameSceneEvent.PushStay();
+				MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.YES_NO, errorMessage2), delegate
+				{
+					GameSceneEvent.PopStay();
+					if (code == 1003)
+					{
+						Native.launchMyselfMarket();
+					}
+					MonoBehaviourSingleton<AppMain>.I.Reset();
+				}, error: true, code);
+			}
+			else if (flag3 && code == 1002)
+			{
+				OpenMaintenancePopup(ret);
+			}
+			else if (!MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && !flag)
+			{
+				if (code == 42002)
+				{
+					if (MonoBehaviourSingleton<ClanMatchingManager>.I.userClanData.IsRegistered() && ClanMatchingManager.IsValidInClan())
+					{
+						MonoBehaviourSingleton<ClanMatchingManager>.I.Kick(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
+					}
+					return false;
+				}
+				GameSceneEvent.PushStay();
+				MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, errorMessage2), delegate
+				{
+					GameSceneEvent.PopStay();
+					call_back(ret);
+					if (code == 74001 || code == 74002)
+					{
+						Debug.Log("kciked");
+						MonoBehaviourSingleton<AppMain>.I.ChangeScene("", "HomeTop", delegate
+						{
+							MonoBehaviourSingleton<GuildManager>.I.UpdateGuild(null);
+						});
+					}
+				}, error: true, code);
+			}
+			else
+			{
+				if (flag && GameSceneEvent.IsStay())
+				{
+					GameSceneEvent.PushStay();
+				}
+				if (code == 74001 || code == 74002)
+				{
+					MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, errorMessage2), delegate
+					{
+						GameSceneEvent.PopStay();
+						call_back(ret);
+						if (code == 74001 || code == 74002)
+						{
+							MonoBehaviourSingleton<AppMain>.I.Reset();
+						}
+					}, error: true, code);
+				}
+				else
+				{
+					MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.YES_NO, errorMessage2, StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 110u), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 111u)), delegate(string btn)
+					{
+						if (btn == "YES")
+						{
+							retry_action();
+						}
+						else
+						{
+							MonoBehaviourSingleton<AppMain>.I.Reset();
+						}
+					}, error: true, code);
 				}
 			}
-			goto IL_018a;
+			return false;
 		}
 		uint id = 1001u;
 		if (code == 200000)
@@ -341,96 +437,6 @@ public class Protocol
 			}, error: true, code);
 		}
 		return false;
-		IL_0192:
-		if ((!flag3 || ret is CheckRegisterModel) && GameSceneGlobalSettings.IsNonPopupError(ret))
-		{
-			if (code == 1002)
-			{
-				OpenMaintenancePopup(ret);
-			}
-			return true;
-		}
-		string errorMessage2 = StringTable.GetErrorMessage((uint)code);
-		MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("error_code_" + code, "Error");
-		if (flag3 && code != 1002)
-		{
-			GameSceneEvent.PushStay();
-			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.YES_NO, errorMessage2), delegate
-			{
-				GameSceneEvent.PopStay();
-				if (code == 1003)
-				{
-					Native.launchMyselfMarket();
-				}
-				MonoBehaviourSingleton<AppMain>.I.Reset();
-			}, error: true, code);
-		}
-		else if (flag3 && code == 1002)
-		{
-			OpenMaintenancePopup(ret);
-		}
-		else if (!MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && !flag)
-		{
-			if (code == 42002)
-			{
-				if (MonoBehaviourSingleton<ClanMatchingManager>.I.userClanData.IsRegistered() && ClanMatchingManager.IsValidInClan())
-				{
-					MonoBehaviourSingleton<ClanMatchingManager>.I.Kick(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
-				}
-				return false;
-			}
-			GameSceneEvent.PushStay();
-			MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, errorMessage2), delegate
-			{
-				GameSceneEvent.PopStay();
-				call_back(ret);
-				if (code == 74001 || code == 74002)
-				{
-					Debug.Log((object)"kciked");
-					MonoBehaviourSingleton<AppMain>.I.ChangeScene(string.Empty, "HomeTop", delegate
-					{
-						MonoBehaviourSingleton<GuildManager>.I.UpdateGuild(null);
-					});
-				}
-			}, error: true, code);
-		}
-		else
-		{
-			if (flag && GameSceneEvent.IsStay())
-			{
-				GameSceneEvent.PushStay();
-			}
-			if (code == 74001 || code == 74002)
-			{
-				MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, errorMessage2), delegate
-				{
-					GameSceneEvent.PopStay();
-					call_back(ret);
-					if (code == 74001 || code == 74002)
-					{
-						MonoBehaviourSingleton<AppMain>.I.Reset();
-					}
-				}, error: true, code);
-			}
-			else
-			{
-				MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.YES_NO, errorMessage2, StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 110u), StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 111u)), delegate(string btn)
-				{
-					if (btn == "YES")
-					{
-						retry_action();
-					}
-					else
-					{
-						MonoBehaviourSingleton<AppMain>.I.Reset();
-					}
-				}, error: true, code);
-			}
-		}
-		return false;
-		IL_018a:
-		flag3 = true;
-		goto IL_0192;
 	}
 
 	private static void OpenMaintenancePopup<T>(T ret) where T : BaseModel
@@ -458,9 +464,8 @@ public class Protocol
 			{
 				text += str;
 				byte[] bytes = Encoding.UTF8.GetBytes(text);
-				byte[] source = MD5.Create().ComputeHash(bytes);
-				return string.Concat((from i in source
-				select i.ToString("x2")).ToArray());
+				return string.Concat((from i in MD5.Create().ComputeHash(bytes)
+					select i.ToString("x2")).ToArray());
 			}
 		}
 		return Guid.NewGuid().ToString("N");

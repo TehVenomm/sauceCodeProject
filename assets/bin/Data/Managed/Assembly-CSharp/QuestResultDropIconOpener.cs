@@ -33,11 +33,6 @@ public class QuestResultDropIconOpener : MonoBehaviour
 
 	private const string SPR_BREAK_ICON = "ItemOpenerIcon_Red";
 
-	public QuestResultDropIconOpener()
-		: this()
-	{
-	}
-
 	public void Initialized(ItemIcon _icon, Info info, Action<Transform, Info, bool> load_eff_callback)
 	{
 		if (!(iconParent == null))
@@ -61,7 +56,7 @@ public class QuestResultDropIconOpener : MonoBehaviour
 				iconParent.delay = 0f;
 			}
 			loadEffCallback(icon._transform, m_Info, is_skip);
-			sprite.set_enabled(false);
+			sprite.enabled = false;
 			OpenIcon();
 		}
 	}
@@ -69,7 +64,7 @@ public class QuestResultDropIconOpener : MonoBehaviour
 	private void SetIcon(ItemIcon _icon)
 	{
 		icon = _icon;
-		icon.transform.set_parent(iconParent.get_transform());
+		icon.transform.parent = iconParent.transform;
 		icon.VisibleIcon(is_visible: false);
 	}
 
@@ -98,7 +93,7 @@ public class QuestResultDropIconOpener : MonoBehaviour
 	{
 		if (spriteRewardCategory != null)
 		{
-			spriteRewardCategory.get_gameObject().SetActive(visible);
+			spriteRewardCategory.gameObject.SetActive(visible);
 		}
 	}
 }

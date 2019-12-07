@@ -6,7 +6,7 @@ public class LimitedLoginBonusCheck : GameSection
 	public override void Initialize()
 	{
 		base.Initialize();
-		this.StartCoroutine("DoCheck");
+		StartCoroutine("DoCheck");
 	}
 
 	private IEnumerator DoCheck()
@@ -47,6 +47,6 @@ public class LimitedLoginBonusCheck : GameSection
 
 	public void OnCloseDialog(string section_name)
 	{
-		this.StartCoroutine("DoCheck");
+		StartCoroutine("DoCheck");
 	}
 }

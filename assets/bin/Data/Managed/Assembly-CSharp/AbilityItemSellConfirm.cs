@@ -33,8 +33,7 @@ public class AbilityItemSellConfirm : ItemSellConfirm
 	public override void Initialize()
 	{
 		List<AbilityItemSortData> source = GameSection.GetEventData() as List<AbilityItemSortData>;
-		sellData = (from x in (IEnumerable<AbilityItemSortData>)source
-		select (x)).ToList();
+		sellData = ((IEnumerable<AbilityItemSortData>)source).Select((Func<AbilityItemSortData, SortCompareData>)((AbilityItemSortData x) => x)).ToList();
 		base.isRareConfirm = false;
 		int i = 0;
 		for (int count = sellData.Count; i < count; i++)
@@ -50,7 +49,7 @@ public class AbilityItemSellConfirm : ItemSellConfirm
 	protected override void DrawIcon()
 	{
 		base.DrawIcon();
-		SetActive((Enum)UI.STR_NON_REWARD, is_visible: true);
+		SetActive(UI.STR_NON_REWARD, is_visible: true);
 	}
 
 	private void OnQuery_NO()
@@ -86,7 +85,7 @@ public class AbilityItemSellConfirm : ItemSellConfirm
 			{
 				stringBuilder.AppendLine(base.sectionData.GetText("TEXT_INCLUDE_EXCEED_EQUIP"));
 			}
-			stringBuilder.AppendLine(string.Empty);
+			stringBuilder.AppendLine("");
 			stringBuilder.Append(base.sectionData.GetText("TEXT_GROW"));
 			GameSection.ChangeEvent("INCLUDE_RARE_CONFIRM", stringBuilder.ToString());
 		}

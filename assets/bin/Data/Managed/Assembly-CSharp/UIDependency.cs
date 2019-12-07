@@ -10,7 +10,7 @@ public class UIDependency
 
 	public static string GetPath(string longPath)
 	{
-		string text = longPath.Replace("Assets/App/Resources/", string.Empty);
+		string text = longPath.Replace("Assets/App/Resources/", "");
 		string directoryName = Path.GetDirectoryName(text);
 		string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(text);
 		return Path.Combine(directoryName, fileNameWithoutExtension);

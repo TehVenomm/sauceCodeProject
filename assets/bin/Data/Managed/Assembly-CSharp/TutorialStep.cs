@@ -45,26 +45,46 @@ public class TutorialStep
 
 	public static bool IsPlayingFirstAccept()
 	{
-		return IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02) && !IsTheTutorialOver(TUTORIAL_STEP.ENTER_FIELD_03);
+		if (IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02))
+		{
+			return !IsTheTutorialOver(TUTORIAL_STEP.ENTER_FIELD_03);
+		}
+		return false;
 	}
 
 	public static bool IsPlayingFirstDelivery()
 	{
-		return IsTheTutorialOver(TUTORIAL_STEP.ENTER_FIELD_03) && !IsTheTutorialOver(TUTORIAL_STEP.DELIVERY_COMPLETE_04);
+		if (IsTheTutorialOver(TUTORIAL_STEP.ENTER_FIELD_03))
+		{
+			return !IsTheTutorialOver(TUTORIAL_STEP.DELIVERY_COMPLETE_04);
+		}
+		return false;
 	}
 
 	public static bool IsPlayingFirstBackHome()
 	{
-		return IsTheTutorialOver(TUTORIAL_STEP.DELIVERY_COMPLETE_04) && !IsTheTutorialOver(TUTORIAL_STEP.DELIVERY_REWARD_05);
+		if (IsTheTutorialOver(TUTORIAL_STEP.DELIVERY_COMPLETE_04))
+		{
+			return !IsTheTutorialOver(TUTORIAL_STEP.DELIVERY_REWARD_05);
+		}
+		return false;
 	}
 
 	public static bool IsPlayingFirstReward()
 	{
-		return IsTheTutorialOver(TUTORIAL_STEP.DELIVERY_REWARD_05) && !IsTheTutorialOver(TUTORIAL_STEP.WORK_SHOP_06);
+		if (IsTheTutorialOver(TUTORIAL_STEP.DELIVERY_REWARD_05))
+		{
+			return !IsTheTutorialOver(TUTORIAL_STEP.WORK_SHOP_06);
+		}
+		return false;
 	}
 
 	public static bool IsPlayingStudioTutorial()
 	{
-		return IsTheTutorialOver(TUTORIAL_STEP.DELIVERY_REWARD_05) && !IsTheTutorialOver(TUTORIAL_STEP.CHANGE_EQUIP_08);
+		if (IsTheTutorialOver(TUTORIAL_STEP.DELIVERY_REWARD_05))
+		{
+			return !IsTheTutorialOver(TUTORIAL_STEP.CHANGE_EQUIP_08);
+		}
+		return false;
 	}
 }

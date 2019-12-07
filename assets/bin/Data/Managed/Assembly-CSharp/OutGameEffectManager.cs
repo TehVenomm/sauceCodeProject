@@ -35,41 +35,36 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 		private set;
 	}
 
-	private unsafe IEnumerator Start()
+	private IEnumerator Start()
 	{
-		LoadingQueue load_queue = new LoadingQueue(this);
+		LoadingQueue loadingQueue = new LoadingQueue(this);
 		ResourceManager.enableCache = false;
-		touchEffectPrefab = load_queue.LoadEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_tap_01");
-		moveEffectPrefab = load_queue.LoadEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_downenergy_01");
-		silhouetteEffectPrefab = load_queue.LoadEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_questselect_01");
+		touchEffectPrefab = loadingQueue.LoadEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_tap_01");
+		moveEffectPrefab = loadingQueue.LoadEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_downenergy_01");
+		silhouetteEffectPrefab = loadingQueue.LoadEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_questselect_01");
 		ResourceManager.enableCache = true;
-		if (load_queue.IsLoading())
+		if (loadingQueue.IsLoading())
 		{
-			yield return load_queue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		if (MonoBehaviourSingleton<InputManager>.IsValid())
 		{
 			InputManager.OnTouchOnAlways = (InputManager.OnTouchDelegate)Delegate.Combine(InputManager.OnTouchOnAlways, new InputManager.OnTouchDelegate(OnTouchOn));
 		}
-		rymFXManager.DestroyFxDelegate = Delegate.Combine((Delegate)rymFXManager.DestroyFxDelegate, (Delegate)new DestroyFxFunc((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/));
+		rymFXManager.DestroyFxDelegate = (rymFXManager.DestroyFxFunc)Delegate.Combine(rymFXManager.DestroyFxDelegate, new rymFXManager.DestroyFxFunc(OnDestroyFx));
 	}
 
-	private unsafe void OnDestroy()
+	private void OnDestroy()
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Expected O, but got Unknown
 		if (MonoBehaviourSingleton<InputManager>.IsValid())
 		{
 			InputManager.OnTouchOnAlways = (InputManager.OnTouchDelegate)Delegate.Remove(InputManager.OnTouchOnAlways, new InputManager.OnTouchDelegate(OnTouchOn));
 		}
-		rymFXManager.DestroyFxDelegate = new DestroyFxFunc((object)this, (IntPtr)(void*)/*OpCode not supported: LdFtn*/);
+		rymFXManager.DestroyFxDelegate = OnDestroyFx;
 	}
 
 	private void OnTouchOn(InputManager.TouchInfo touch_info)
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<PuniConManager>.IsValid() || !touch_info.enable)
 		{
 			PopTouchEffect(MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(touch_info.position.ToVector3XY()));
@@ -78,7 +73,7 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 
 	private void OnDestroyFx(rymFX fx)
 	{
-		if (fx.get_name() == "ef_ui_tap_01")
+		if (fx.name == "ef_ui_tap_01")
 		{
 			effectCount--;
 		}
@@ -86,26 +81,22 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 
 	public void PopTouchEffect(Vector3 pos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 		lastTouchEffectPos = pos;
 		if (touchEffectPrefab != null && !(touchEffectPrefab.loadedObject == null) && effectCount < 5)
 		{
-			Transform val = ResourceUtility.Realizes(touchEffectPrefab.loadedObject, MonoBehaviourSingleton<UIManager>.I.uiCamera.get_transform(), 5);
-			val.set_position(pos);
+			ResourceUtility.Realizes(touchEffectPrefab.loadedObject, MonoBehaviourSingleton<UIManager>.I.uiCamera.transform, 5).position = pos;
 			effectCount++;
 		}
 	}
 
 	public void ShowAutoEventEffect()
 	{
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 		if (!(autoEventEffect != null))
 		{
-			autoEventEffect = ResourceUtility.Realizes(moveEffectPrefab.loadedObject, MonoBehaviourSingleton<UIManager>.I.uiCamera.get_transform(), 5);
+			autoEventEffect = ResourceUtility.Realizes(moveEffectPrefab.loadedObject, MonoBehaviourSingleton<UIManager>.I.uiCamera.transform, 5);
 			autoEventEffect.GetComponent<rymFX>().ChangeRenderQueue = 3999;
-			autoEventEffect.set_position(lastTouchEffectPos);
-			autoEventEffect.get_gameObject().AddComponent<TransformInterpolator>();
+			autoEventEffect.position = lastTouchEffectPos;
+			autoEventEffect.gameObject.AddComponent<TransformInterpolator>();
 		}
 	}
 
@@ -113,38 +104,20 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 	{
 		if (!(autoEventEffect == null))
 		{
-			EffectManager.ReleaseEffect(autoEventEffect.get_gameObject());
+			EffectManager.ReleaseEffect(autoEventEffect.gameObject);
 			autoEventEffect = null;
 		}
 	}
 
 	public Coroutine MoveAutoEventEffect(Vector3 to)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 		if (autoEventEffect == null)
 		{
 			return null;
 		}
 		TransformInterpolator component = autoEventEffect.GetComponent<TransformInterpolator>();
-		to = autoEventEffect.get_parent().InverseTransformPoint(to);
-		Vector3 val = to - autoEventEffect.get_localPosition();
-		Vector3 normalized = val.get_normalized();
-		Vector3 add_value = Vector3.Cross(normalized, Vector3.get_forward()) * Random.Range(-64f, 64f);
+		to = autoEventEffect.parent.InverseTransformPoint(to);
+		Vector3 add_value = Vector3.Cross((to - autoEventEffect.localPosition).normalized, Vector3.forward) * UnityEngine.Random.Range(-64f, 64f);
 		add_value.z = 0f;
 		component.Translate(0.25f, to, null, add_value, Curves.arcHalfCurve);
 		return component.Wait();
@@ -152,11 +125,10 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 
 	public void ShowSilhoutteffect(Transform t, int layer)
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 		if (!(silhouetteEffect != null))
 		{
 			silhouetteEffect = ResourceUtility.Realizes(silhouetteEffectPrefab.loadedObject, t, layer);
-			silhouetteEffect.get_transform().set_localPosition(new Vector3(0f, 0f, 500f));
+			silhouetteEffect.transform.localPosition = new Vector3(0f, 0f, 500f);
 		}
 	}
 
@@ -164,7 +136,7 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 	{
 		if (!(silhouetteEffect == null))
 		{
-			EffectManager.ReleaseEffect(silhouetteEffect.get_gameObject());
+			EffectManager.ReleaseEffect(silhouetteEffect.gameObject);
 			silhouetteEffect = null;
 		}
 	}
@@ -181,7 +153,7 @@ public class OutGameEffectManager : MonoBehaviourSingleton<OutGameEffectManager>
 	{
 		if (!(sceneButtonEffect == null))
 		{
-			EffectManager.ReleaseEffect(sceneButtonEffect.get_gameObject());
+			EffectManager.ReleaseEffect(sceneButtonEffect.gameObject);
 			sceneButtonEffect = null;
 			sceneNow = MAIN_SCENE.MAX;
 		}

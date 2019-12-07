@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,7 +27,7 @@ public class GuildDonateInvitationList : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -48,7 +47,7 @@ public class GuildDonateInvitationList : GameSection
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.STR_NON_LIST, _donateList.Count <= 0);
+		SetActive(UI.STR_NON_LIST, _donateList.Count <= 0);
 		SetTable(UI.TBL_QUEST, "GuildDonateInvitationListItem", _donateList.Count, reset: true, (int i, Transform t) => null, delegate(int i, Transform t, bool b)
 		{
 			GuildDonateInvitationList guildDonateInvitationList = this;
@@ -57,13 +56,13 @@ public class GuildDonateInvitationList : GameSection
 			bool flag = info.itemNum >= info.quantity;
 			SetActive(t, UI.OBJ_FULL, flag);
 			SetActive(t, UI.OBJ_NORMAL, !flag);
-			SetLabelText((Enum)UI.LBL_CHAT_MESSAGE, info.msg);
-			SetLabelText((Enum)UI.LBL_USER_NAME, info.nickName);
-			SetLabelText((Enum)UI.LBL_MATERIAL_NAME, info.itemName);
+			SetLabelText(UI.LBL_CHAT_MESSAGE, info.msg);
+			SetLabelText(UI.LBL_USER_NAME, info.nickName);
+			SetLabelText(UI.LBL_MATERIAL_NAME, info.itemName);
 			SetLabelText(UI.LBL_QUATITY, itemNum);
 			SetLabelText(UI.LBL_DONATE_NUM, info.itemNum);
 			SetLabelText(UI.LBL_DONATE_MAX, info.quantity);
-			SetSliderValue((Enum)UI.SLD_PROGRESS, (float)info.itemNum / (float)info.quantity);
+			SetSliderValue(UI.SLD_PROGRESS, (float)info.itemNum / (float)info.quantity);
 			if (!flag && itemNum > 0 && info.itemNum < info.quantity)
 			{
 				SetButtonEvent(t, UI.BTN_GIFT, new EventDelegate(delegate
@@ -106,7 +105,6 @@ public class GuildDonateInvitationList : GameSection
 		ELEMENT_TYPE element = ELEMENT_TYPE.MAX;
 		EQUIPMENT_TYPE? magi_enable_icon_type = null;
 		int icon_id = -1;
-		int num = -1;
 		if (data != null)
 		{
 			iTEM_ICON_TYPE = data.GetIconType();
@@ -114,25 +112,19 @@ public class GuildDonateInvitationList : GameSection
 			rarity = data.GetRarity();
 			element = data.GetIconElement();
 			magi_enable_icon_type = data.GetIconMagiEnableType();
-			num = data.GetNum();
-			if (num == 1)
-			{
-				num = -1;
-			}
+			data.GetNum();
+			_ = 1;
 		}
 		bool is_new = false;
 		switch (iTEM_ICON_TYPE)
 		{
 		case ITEM_ICON_TYPE.ITEM:
 		case ITEM_ICON_TYPE.QUEST_ITEM:
-		{
-			ulong uniqID = data.GetUniqID();
-			if (uniqID != 0)
+			if (data.GetUniqID() != 0L)
 			{
 				is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, data.GetUniqID());
 			}
 			break;
-		}
 		default:
 			is_new = true;
 			break;
@@ -142,28 +134,21 @@ public class GuildDonateInvitationList : GameSection
 		int enemy_icon_id = 0;
 		if (iTEM_ICON_TYPE == ITEM_ICON_TYPE.ITEM)
 		{
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(data.GetTableID());
-			enemy_icon_id = itemData.enemyIconID;
+			enemy_icon_id = Singleton<ItemTable>.I.GetItemData(data.GetTableID()).enemyIconID;
 		}
 		ItemIcon itemIcon = null;
-		if (data.GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
+		itemIcon = ((data.GetIconType() != ITEM_ICON_TYPE.QUEST_ITEM) ? ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, -1, "DROP", 0, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id) : ItemIcon.Create(new ItemIcon.ItemIconCreateParam
 		{
-			ItemIcon.ItemIconCreateParam itemIconCreateParam = new ItemIcon.ItemIconCreateParam();
-			itemIconCreateParam.icon_type = data.GetIconType();
-			itemIconCreateParam.icon_id = data.GetIconID();
-			itemIconCreateParam.rarity = data.GetRarity();
-			itemIconCreateParam.parent = holder;
-			itemIconCreateParam.element = data.GetIconElement();
-			itemIconCreateParam.magi_enable_equip_type = data.GetIconMagiEnableType();
-			itemIconCreateParam.num = data.GetNum();
-			itemIconCreateParam.enemy_icon_id = enemy_icon_id;
-			itemIconCreateParam.questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST;
-			itemIcon = ItemIcon.Create(itemIconCreateParam);
-		}
-		else
-		{
-			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, -1, "DROP", 0, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id);
-		}
+			icon_type = data.GetIconType(),
+			icon_id = data.GetIconID(),
+			rarity = data.GetRarity(),
+			parent = holder,
+			element = data.GetIconElement(),
+			magi_enable_equip_type = data.GetIconMagiEnableType(),
+			num = data.GetNum(),
+			enemy_icon_id = enemy_icon_id,
+			questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST
+		}));
 		SetMaterialInfo(itemIcon.transform, data.GetMaterialType(), data.GetTableID(), parent_scroll);
 	}
 }

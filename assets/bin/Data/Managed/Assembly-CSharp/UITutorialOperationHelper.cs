@@ -45,12 +45,12 @@ public class UITutorialOperationHelper : MonoBehaviour
 
 		public void ShowAutoControlMark()
 		{
-			autoControlMark.SetActive(true);
+			autoControlMark.SetActive(value: true);
 		}
 
 		public void HideAutoControlMark()
 		{
-			autoControlMark.SetActive(false);
+			autoControlMark.SetActive(value: false);
 		}
 
 		public UISprite ShowTapFinger()
@@ -66,20 +66,20 @@ public class UITutorialOperationHelper : MonoBehaviour
 
 		public void ShowTapIcon(int index = 0)
 		{
-			tapIconSprite.get_gameObject().SetActive(true);
-			tapIconSprite.set_enabled(true);
-			tapCharacters[index].get_gameObject().SetActive(true);
-			tapCharacters[index].set_enabled(true);
+			tapIconSprite.gameObject.SetActive(value: true);
+			tapIconSprite.enabled = true;
+			tapCharacters[index].gameObject.SetActive(value: true);
+			tapCharacters[index].enabled = true;
 		}
 
 		public void HideTapIcon()
 		{
-			tapIconSprite.get_gameObject().SetActive(false);
-			tapIconSprite.set_enabled(false);
+			tapIconSprite.gameObject.SetActive(value: false);
+			tapIconSprite.enabled = false;
 			for (int i = 0; i < tapCharacters.Length; i++)
 			{
-				tapCharacters[i].get_gameObject().SetActive(false);
-				tapCharacters[i].set_enabled(false);
+				tapCharacters[i].gameObject.SetActive(value: false);
+				tapCharacters[i].enabled = false;
 			}
 		}
 
@@ -107,7 +107,7 @@ public class UITutorialOperationHelper : MonoBehaviour
 
 		public void ShowComplete()
 		{
-			complete.get_gameObject().SetActive(true);
+			complete.gameObject.SetActive(value: true);
 			complete.Reset();
 			SoundManager.PlayOneShotUISE(SE_ID_COMPLETE);
 			complete.Play();
@@ -115,12 +115,12 @@ public class UITutorialOperationHelper : MonoBehaviour
 
 		public void HideComplete()
 		{
-			complete.get_gameObject().SetActive(false);
+			complete.gameObject.SetActive(value: false);
 		}
 
 		public void ShowGoodJob()
 		{
-			good_job.get_gameObject().SetActive(true);
+			good_job.gameObject.SetActive(value: true);
 			good_job.Reset();
 			SoundManager.PlayOneShotUISE(SE_ID_COMPLETE);
 			good_job.Play();
@@ -128,12 +128,12 @@ public class UITutorialOperationHelper : MonoBehaviour
 
 		public void HideGoodJob()
 		{
-			good_job.get_gameObject().SetActive(false);
+			good_job.gameObject.SetActive(value: false);
 		}
 
 		public void ShowExcellent()
 		{
-			excellent.get_gameObject().SetActive(true);
+			excellent.gameObject.SetActive(value: true);
 			excellent.Reset();
 			SoundManager.PlayOneShotUISE(SE_ID_COMPLETE);
 			excellent.Play();
@@ -141,12 +141,12 @@ public class UITutorialOperationHelper : MonoBehaviour
 
 		public void HideExcellent()
 		{
-			excellent.get_gameObject().SetActive(false);
+			excellent.gameObject.SetActive(value: false);
 		}
 
 		public void ShowSplendid()
 		{
-			splendid.get_gameObject().SetActive(true);
+			splendid.gameObject.SetActive(value: true);
 			splendid.Reset();
 			SoundManager.PlayOneShotUISE(SE_ID_COMPLETE);
 			splendid.Play();
@@ -154,32 +154,32 @@ public class UITutorialOperationHelper : MonoBehaviour
 
 		public void HideSplendid()
 		{
-			splendid.get_gameObject().SetActive(false);
+			splendid.gameObject.SetActive(value: false);
 		}
 
 		public void ShowEnemyCount(int count)
 		{
-			CurrentEnemyShow = ((count <= CurrentEnemyShow) ? CurrentEnemyShow : count);
+			CurrentEnemyShow = ((count > CurrentEnemyShow) ? count : CurrentEnemyShow);
 			if (OnShowEnemyCount)
 			{
 				return;
 			}
 			if (count == 0)
 			{
-				enemy_counts[count].get_gameObject().SetActive(true);
+				enemy_counts[count].gameObject.SetActive(value: true);
 				return;
 			}
-			if (enemy_counts[0].get_gameObject().get_activeInHierarchy())
+			if (enemy_counts[0].gameObject.activeInHierarchy)
 			{
-				enemy_counts[0].get_gameObject().SetActive(true);
+				enemy_counts[0].gameObject.SetActive(value: true);
 			}
 			OnShowEnemyCount = true;
-			enemy_counts[count].get_gameObject().SetActive(true);
+			enemy_counts[count].gameObject.SetActive(value: true);
 			enemy_counts[count].Reset();
 			enemy_counts[count].Play(forward: true, delegate
 			{
 				OnShowEnemyCount = false;
-				enemy_counts[count].get_gameObject().SetActive(false);
+				enemy_counts[count].gameObject.SetActive(value: false);
 				if (CurrentEnemyShow > count)
 				{
 					ShowEnemyCount(count + 1);
@@ -191,7 +191,7 @@ public class UITutorialOperationHelper : MonoBehaviour
 		{
 			for (int i = 0; i < enemy_counts.Length; i++)
 			{
-				enemy_counts[i].get_gameObject().SetActive(false);
+				enemy_counts[i].gameObject.SetActive(value: false);
 			}
 		}
 	}
@@ -355,7 +355,7 @@ public class UITutorialOperationHelper : MonoBehaviour
 		private UISprite helpPicture3;
 
 		[SerializeField]
-		private Object logoAnimationPrefab;
+		private UnityEngine.Object logoAnimationPrefab;
 
 		private GameObject logoAnimationGameObject;
 
@@ -401,12 +401,12 @@ public class UITutorialOperationHelper : MonoBehaviour
 
 		public void PlayLogoAnimation()
 		{
-			logoAnimationGameObject = ResourceUtility.Realizes(logoAnimationPrefab, MonoBehaviourSingleton<AppMain>.I.mainCameraTransform).get_gameObject();
+			logoAnimationGameObject = ResourceUtility.Realizes(logoAnimationPrefab, MonoBehaviourSingleton<AppMain>.I.mainCameraTransform).gameObject;
 		}
 
 		public void StopLogoAnimation()
 		{
-			Object.Destroy(logoAnimationGameObject);
+			UnityEngine.Object.Destroy(logoAnimationGameObject);
 		}
 	}
 
@@ -452,7 +452,7 @@ public class UITutorialOperationHelper : MonoBehaviour
 
 		public bool isActive()
 		{
-			return helpUI.get_activeInHierarchy();
+			return helpUI.activeInHierarchy;
 		}
 
 		public void ShowHelpPicture(Action OnCloseHelp)
@@ -470,20 +470,20 @@ public class UITutorialOperationHelper : MonoBehaviour
 			}
 			if (helpUI != null)
 			{
-				helpUI.SetActive(true);
+				helpUI.SetActive(value: true);
 			}
-			helpImage_1.SetActive(false);
-			helpImage_2.SetActive(false);
-			helpImageIOS_1.SetActive(false);
-			helpImageIOS_2.SetActive(false);
+			helpImage_1.SetActive(value: false);
+			helpImage_2.SetActive(value: false);
+			helpImageIOS_1.SetActive(value: false);
+			helpImageIOS_2.SetActive(value: false);
 			if (moveCtrl != null)
 			{
-				moveCtrl.get_gameObject().SetActive(true);
+				moveCtrl.gameObject.SetActive(value: true);
 				moveCtrl.Play();
 			}
 			if (attackCtrl != null)
 			{
-				attackCtrl.get_gameObject().SetActive(true);
+				attackCtrl.gameObject.SetActive(value: true);
 				attackCtrl.Play();
 			}
 		}
@@ -493,7 +493,7 @@ public class UITutorialOperationHelper : MonoBehaviour
 			SoundManager.PlaySystemSE(SoundID.UISE.CLICK);
 			if (helpUI != null)
 			{
-				helpUI.SetActive(false);
+				helpUI.SetActive(value: false);
 				if (OnCloseHelp != null)
 				{
 					OnCloseHelp();
@@ -592,30 +592,25 @@ public class UITutorialOperationHelper : MonoBehaviour
 
 	public Transform fingerAttack => _fingerAttack;
 
-	public UITutorialOperationHelper()
-		: this()
-	{
-	}
-
 	public static void ShowTutorialWidget(UIWidget widget, float duration = 0.3f)
 	{
-		widget.get_gameObject().SetActive(true);
+		widget.gameObject.SetActive(value: true);
 		widget.alpha = 0f;
-		TweenAlpha.Begin(widget.get_gameObject(), duration, 1f);
+		TweenAlpha.Begin(widget.gameObject, duration, 1f);
 	}
 
 	public static void HideTutorialWidget(UIWidget widget, Action onHided)
 	{
-		TweenAlpha ta = TweenAlpha.Begin(widget.get_gameObject(), 0.2f, 0f);
+		TweenAlpha ta = TweenAlpha.Begin(widget.gameObject, 0.2f, 0f);
 		ta.onFinished.Clear();
 		ta.AddOnFinished(delegate
 		{
-			widget.get_gameObject().SetActive(false);
+			widget.gameObject.SetActive(value: false);
 			if (onHided != null)
 			{
 				onHided();
 			}
-			Object.Destroy(ta);
+			UnityEngine.Object.Destroy(ta);
 		});
 	}
 
@@ -633,7 +628,7 @@ public class UITutorialOperationHelper : MonoBehaviour
 		if (_basicNewHelper.isActive() && countTime >= 0)
 		{
 			_basicNewHelper.SetLabel(countTime);
-			counterTimer += Time.get_deltaTime();
+			counterTimer += Time.deltaTime;
 			if (counterTimer >= 1f)
 			{
 				countTime--;

@@ -28,7 +28,7 @@ public class ShopGachaEquipListTop : GameSection
 		{
 			if (c != null)
 			{
-				this.StopCoroutine(c);
+				StopCoroutine(c);
 			}
 		});
 		coroutineList.Clear();
@@ -47,23 +47,23 @@ public class ShopGachaEquipListTop : GameSection
 		CreateEquipItemTable.CreateEquipItemData[] equipItems = Singleton<CreateEquipItemTable>.I.GetSortedCreateEquipItemsByPart(materialID);
 		SetTable(UI.TBL_LIST, "GachaEquipItem", equipItems.Length, reset: false, delegate(int i, Transform t, bool b)
 		{
-			CreateEquipItemTable.CreateEquipItemData createEquipItemData = equipItems[i];
-			uint equipItemID = createEquipItemData.equipItemID;
+			CreateEquipItemTable.CreateEquipItemData obj = equipItems[i];
+			uint equipItemID = obj.equipItemID;
 			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(equipItemID);
 			SetLabelText(t, UI.LBL_NAME, equipItemData.name);
 			SetEquipmentTypeIcon(t, UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, equipItemData);
-			NeedMaterial[] needMaterial = createEquipItemData.needMaterial;
-			NeedMaterial needMaterial2 = (needMaterial.Length < 1) ? null : needMaterial[0];
+			NeedMaterial[] needMaterial = obj.needMaterial;
+			NeedMaterial needMaterial2 = (needMaterial.Length >= 1) ? needMaterial[0] : null;
 			if (needMaterial2 != null)
 			{
 				SetItemIcon(needMaterial2.itemID, t, UI.ITEM_ICON_1);
 			}
-			NeedMaterial needMaterial3 = (needMaterial.Length < 2) ? null : needMaterial[1];
+			NeedMaterial needMaterial3 = (needMaterial.Length >= 2) ? needMaterial[1] : null;
 			if (needMaterial3 != null)
 			{
 				SetItemIcon(needMaterial3.itemID, t, UI.ITEM_ICON_2);
 			}
-			Coroutine item = this.StartCoroutine(LoadEquipModel(t, UI.TEX_EQUIP_MODEL, equipItemData.id));
+			Coroutine item = StartCoroutine(LoadEquipModel(t, UI.TEX_EQUIP_MODEL, equipItemData.id));
 			coroutineList.Add(item);
 			Transform t2 = FindCtrl(t, UI.BTN_EQUIP_MODEL);
 			SetEvent(t2, "DETAIL_MAX_PARAM", new object[3]
@@ -93,17 +93,16 @@ public class ShopGachaEquipListTop : GameSection
 
 	public void OnQuery_GACHA_DETAIL_MAX_PARAM_FROM_NEWS()
 	{
-		object[] array = GameSection.GetEventData() as object[];
-		uint num = (uint)array[0];
-		int num2 = (int)array[1];
+		object[] obj = GameSection.GetEventData() as object[];
+		uint num = (uint)obj[0];
+		int num2 = (int)obj[1];
 		CreateEquipItemTable.CreateEquipItemData[] sortedCreateEquipItemsByPart = Singleton<CreateEquipItemTable>.I.GetSortedCreateEquipItemsByPart(num);
 		if (num2 >= sortedCreateEquipItemsByPart.Length || num2 <= -1)
 		{
 			GameSection.StopEvent();
 			return;
 		}
-		CreateEquipItemTable.CreateEquipItemData createEquipItemData = sortedCreateEquipItemsByPart[num2];
-		uint equipItemID = createEquipItemData.equipItemID;
+		uint equipItemID = sortedCreateEquipItemsByPart[num2].equipItemID;
 		EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(equipItemID);
 		GameSection.ChangeEvent("DETAIL_MAX_PARAM", new object[3]
 		{

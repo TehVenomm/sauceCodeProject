@@ -1906,22 +1906,22 @@ namespace BestHTTP.Decompression.Zlib
 				int num11 = c[j];
 				while (num11-- != 0)
 				{
-					int num13;
+					int num12;
 					while (j > num8 + num3)
 					{
 						num7++;
 						num8 += num3;
 						num10 = num4 - num8;
-						num10 = ((num10 <= num3) ? num10 : num3);
-						if ((num13 = 1 << (i = j - num8)) > num11 + 1)
+						num10 = ((num10 > num3) ? num3 : num10);
+						if ((num12 = 1 << (i = j - num8)) > num11 + 1)
 						{
-							num13 -= num11 + 1;
+							num12 -= num11 + 1;
 							num6 = j;
 							if (i < num10)
 							{
-								while (++i < num10 && (num13 <<= 1) > c[++num6])
+								while (++i < num10 && (num12 <<= 1) > c[++num6])
 								{
-									num13 -= c[num6];
+									num12 -= c[num6];
 								}
 							}
 						}
@@ -1961,8 +1961,8 @@ namespace BestHTTP.Decompression.Zlib
 						r[0] = (sbyte)(e[v[num] - s] + 16 + 64);
 						r[2] = d[v[num++] - s];
 					}
-					num13 = 1 << j - num8;
-					for (i = SharedUtils.URShift(num2, num8); i < num10; i += num13)
+					num12 = 1 << j - num8;
+					for (i = SharedUtils.URShift(num2, num8); i < num10; i += num12)
 					{
 						Array.Copy(r, 0, hp, (num9 + i) * 3, 3);
 					}
@@ -1973,16 +1973,20 @@ namespace BestHTTP.Decompression.Zlib
 						i = SharedUtils.URShift(i, 1);
 					}
 					num2 ^= i;
-					int num16 = (1 << num8) - 1;
-					while ((num2 & num16) != x[num7])
+					int num13 = (1 << num8) - 1;
+					while ((num2 & num13) != x[num7])
 					{
 						num7--;
 						num8 -= num3;
-						num16 = (1 << num8) - 1;
+						num13 = (1 << num8) - 1;
 					}
 				}
 			}
-			return (num5 != 0 && num4 != 1) ? (-5) : 0;
+			if (num5 == 0 || num4 == 1)
+			{
+				return 0;
+			}
+			return -5;
 		}
 
 		internal int inflate_trees_bits(int[] c, int[] bb, int[] tb, int[] hp, ZlibCodec z)

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -87,21 +86,21 @@ public class SmithGrowSkillResult : ItemDetailSkill
 			ItemDetailEquip.CURRENT_SECTION.UI_PARTS,
 			resultData.itemData
 		});
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		string greatEffectName = "ef_ui_magi_result_02";
-		string normalEffectName = "ef_ui_magi_result_01";
-		string effectName = (!isGreat) ? normalEffectName : greatEffectName;
-		LoadingQueue load_queue = new LoadingQueue(this);
-		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, effectName);
-		yield return load_queue.Wait();
-		Transform effect = EffectManager.GetUIEffect(effectName, GetCtrl(UI.TEX_MODEL), -1f, -2, GetCtrl(UI.TEX_MODEL).GetComponent<UIWidget>());
-		if (effect != null)
+		string text = "ef_ui_magi_result_02";
+		string text2 = "ef_ui_magi_result_01";
+		string effectName = isGreat ? text : text2;
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		loadingQueue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, effectName);
+		yield return loadingQueue.Wait();
+		Transform uIEffect = EffectManager.GetUIEffect(effectName, GetCtrl(UI.TEX_MODEL), -1f, -2, GetCtrl(UI.TEX_MODEL).GetComponent<UIWidget>());
+		if (uIEffect != null)
 		{
-			effect.set_localScale(new Vector3(100f, 100f, 1f));
+			uIEffect.localScale = new Vector3(100f, 100f, 1f);
 		}
 		MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = false;
 		base.Initialize();
@@ -116,32 +115,32 @@ public class SmithGrowSkillResult : ItemDetailSkill
 		{
 			flag = skillItemInfo.IsEnableExceed();
 		}
-		SetActive((Enum)UI.SPR_BG_NORMAL, !isExceed);
-		SetActive((Enum)UI.SPR_BG_EXCEED, isExceed);
-		SetActive((Enum)UI.BTN_NEXT, flag);
-		SetActive((Enum)UI.BTN_NEXT_GRAY, !flag);
-		SetLabelText((Enum)UI.LBL_NEXT_GRAY_BTN, base.sectionData.GetText("STR_NEXT"));
+		SetActive(UI.SPR_BG_NORMAL, !isExceed);
+		SetActive(UI.SPR_BG_EXCEED, isExceed);
+		SetActive(UI.BTN_NEXT, flag);
+		SetActive(UI.BTN_NEXT_GRAY, !flag);
+		SetLabelText(UI.LBL_NEXT_GRAY_BTN, base.sectionData.GetText("STR_NEXT"));
 		if (!isExceed)
 		{
 			return;
 		}
 		if (resultData != null)
 		{
-			SetLabelText((Enum)UI.LBL_EXCEED_PREV, StringTable.Format(STRING_CATEGORY.SMITH, 9u, resultData.beforeExceedCnt));
-			SetLabelText((Enum)UI.LBL_EXCEED_PREV_2, StringTable.Format(STRING_CATEGORY.SMITH, 9u, resultData.beforeExceedCnt));
+			SetLabelText(UI.LBL_EXCEED_PREV, StringTable.Format(STRING_CATEGORY.SMITH, 9u, resultData.beforeExceedCnt));
+			SetLabelText(UI.LBL_EXCEED_PREV_2, StringTable.Format(STRING_CATEGORY.SMITH, 9u, resultData.beforeExceedCnt));
 		}
 		if (skillItemInfo != null)
 		{
 			int exceedCnt = skillItemInfo.exceedCnt;
-			SetLabelText((Enum)UI.LBL_EXCEED_NEXT, StringTable.Format(STRING_CATEGORY.SMITH, 9u, exceedCnt));
-			SetLabelText((Enum)UI.LBL_EXCEED_NEXT_2, StringTable.Format(STRING_CATEGORY.SMITH, 9u, exceedCnt));
+			SetLabelText(UI.LBL_EXCEED_NEXT, StringTable.Format(STRING_CATEGORY.SMITH, 9u, exceedCnt));
+			SetLabelText(UI.LBL_EXCEED_NEXT_2, StringTable.Format(STRING_CATEGORY.SMITH, 9u, exceedCnt));
 			ExceedSkillItemTable.ExceedSkillItemData exceedSkillItemData = Singleton<ExceedSkillItemTable>.I.GetExceedSkillItemData(exceedCnt);
 			if (exceedSkillItemData != null)
 			{
-				SetLabelText((Enum)UI.LBL_ADD_EXCEED, StringTable.Format(STRING_CATEGORY.SMITH, 8u, exceedSkillItemData.GetDecreaseUseGaugePercent()));
-				SetLabelText((Enum)UI.LBL_ADD_EXCEED_2, StringTable.Format(STRING_CATEGORY.SMITH, 8u, exceedSkillItemData.GetDecreaseUseGaugePercent()));
+				SetLabelText(UI.LBL_ADD_EXCEED, StringTable.Format(STRING_CATEGORY.SMITH, 8u, exceedSkillItemData.GetDecreaseUseGaugePercent()));
+				SetLabelText(UI.LBL_ADD_EXCEED_2, StringTable.Format(STRING_CATEGORY.SMITH, 8u, exceedSkillItemData.GetDecreaseUseGaugePercent()));
 			}
-			SetLabelText((Enum)UI.LBL_ADD_EXCEED_EXTRA, skillItemInfo.GetExceedExtraText());
+			SetLabelText(UI.LBL_ADD_EXCEED_EXTRA, skillItemInfo.GetExceedExtraText());
 		}
 	}
 
@@ -149,18 +148,18 @@ public class SmithGrowSkillResult : ItemDetailSkill
 	{
 		if (isPlayExceedAnimation)
 		{
-			this.StartCoroutine(DoPlayExceedAnimation());
+			StartCoroutine(DoPlayExceedAnimation());
 		}
 		base.OnOpen();
 	}
 
 	private IEnumerator DoPlayExceedAnimation()
 	{
-		yield return (object)new WaitForSeconds(0.3f);
-		SkillItemInfo data = resultData.itemData as SkillItemInfo;
-		Transform effTrans = (data == null || data.GetExceedExtraText().IsNullOrWhiteSpace()) ? GetCtrl(UI.OBJ_ADD_EXCEED) : GetCtrl(UI.OBJ_ADD_EXCEED_2);
-		UITweenCtrl.Play(effTrans, forward: true, null, is_input_block: false);
-		UITweenCtrl.Play(effTrans, forward: true, null, is_input_block: false, 1);
+		yield return new WaitForSeconds(0.3f);
+		SkillItemInfo skillItemInfo = resultData.itemData as SkillItemInfo;
+		Transform root = (skillItemInfo == null || skillItemInfo.GetExceedExtraText().IsNullOrWhiteSpace()) ? GetCtrl(UI.OBJ_ADD_EXCEED) : GetCtrl(UI.OBJ_ADD_EXCEED_2);
+		UITweenCtrl.Play(root, forward: true, null, is_input_block: false);
+		UITweenCtrl.Play(root, forward: true, null, is_input_block: false, 1);
 		SoundManager.PlayOneShotUISE(40000157);
 	}
 }

@@ -22,11 +22,6 @@ public class UIVirtualScreen : MonoBehaviour
 
 	public float ScreenHeightFull => screenHeightFull;
 
-	public UIVirtualScreen()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		InitWidget();
@@ -34,8 +29,8 @@ public class UIVirtualScreen : MonoBehaviour
 
 	public static void InitUIRoot(UIRoot root)
 	{
-		float num = Screen.get_width();
-		float num2 = Screen.get_height();
+		float num = Screen.width;
+		float num2 = Screen.height;
 		if (num > num2)
 		{
 			screenWidth = 854f;
@@ -58,9 +53,6 @@ public class UIVirtualScreen : MonoBehaviour
 
 	public void InitWidget()
 	{
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
 		float num = screenWidth;
 		float num2 = screenHeight;
 		RefleshScreenSizeForSpecialDevice();
@@ -69,16 +61,16 @@ public class UIVirtualScreen : MonoBehaviour
 			num = screenWidthFull;
 			num2 = screenHeightFull;
 		}
-		UIWidget uIWidget = this.get_gameObject().GetComponent<UIWidget>();
+		UIWidget uIWidget = base.gameObject.GetComponent<UIWidget>();
 		if (uIWidget == null)
 		{
-			uIWidget = this.get_gameObject().AddComponent<UIWidget>();
+			uIWidget = base.gameObject.AddComponent<UIWidget>();
 		}
 		if ((float)uIWidget.width != num || (float)uIWidget.height != num2)
 		{
-			Vector3 localPosition = uIWidget.get_transform().get_localPosition();
+			Vector3 localPosition = uIWidget.transform.localPosition;
 			uIWidget.SetRect(num * -0.5f, num2 * -0.5f, num, num2);
-			uIWidget.get_transform().set_localPosition(localPosition);
+			uIWidget.transform.localPosition = localPosition;
 			uIWidget.SetDirty();
 		}
 	}
@@ -91,12 +83,12 @@ public class UIVirtualScreen : MonoBehaviour
 		}
 		DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
 		EdgeInsets safeArea = specialDeviceInfo.SafeArea;
-		if (Screen.get_width() > Screen.get_height())
+		if (Screen.width > Screen.height)
 		{
 			screenWidth = 854f;
-			screenWidthFull = 854f / (safeArea.SafeWidth / (float)Screen.get_width());
+			screenWidthFull = 854f / (safeArea.SafeWidth / (float)Screen.width);
 			screenHeight = safeArea.SafeHeight / safeArea.SafeWidth * 854f;
-			screenHeightFull = 854f * ((float)Screen.get_height() / (float)Screen.get_width());
+			screenHeightFull = 854f * ((float)Screen.height / (float)Screen.width);
 			if (specialDeviceInfo.NeedModifyVirtualScreenRatio)
 			{
 				screenWidth *= specialDeviceInfo.RatioVirtualScreenLandscape;
@@ -108,7 +100,7 @@ public class UIVirtualScreen : MonoBehaviour
 		else
 		{
 			screenHeight = 480f * (safeArea.SafeHeightMax / safeArea.SafeWidthMax);
-			screenHeightFull = 480f * ((float)Screen.get_height() / (float)Screen.get_width());
+			screenHeightFull = 480f * ((float)Screen.height / (float)Screen.width);
 			screenWidth = 480f;
 			screenWidthFull = 480f;
 			if (specialDeviceInfo.NeedModifyVirtualScreenRatio)

@@ -12,14 +12,6 @@ public class FieldGimmickCannonHeavy : FieldGimmickCannonBase
 
 	public override void Shot()
 	{
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Expected O, but got Unknown
 		if (IsReadyForShot())
 		{
 			if (base._animator != null)
@@ -33,12 +25,10 @@ public class FieldGimmickCannonHeavy : FieldGimmickCannonBase
 				initParamCannonball.attacker = m_owner;
 				initParamCannonball.atkInfo = attackHitInfo;
 				initParamCannonball.launchTrans = m_cannonTrans;
-				initParamCannonball.offsetPos = Vector3.get_zero();
-				initParamCannonball.offsetRot = Quaternion.get_identity();
-				initParamCannonball.shotRotation = m_cannonTrans.get_rotation();
-				GameObject val = new GameObject("HeavyCannonball");
-				AttackCannonball attackCannonball = val.AddComponent<AttackCannonball>();
-				attackCannonball.Initialize(initParamCannonball);
+				initParamCannonball.offsetPos = Vector3.zero;
+				initParamCannonball.offsetRot = Quaternion.identity;
+				initParamCannonball.shotRotation = m_cannonTrans.rotation;
+				new GameObject("HeavyCannonball").AddComponent<AttackCannonball>().Initialize(initParamCannonball);
 				StartCoolTime();
 				SetState(STATE.COOLTIME);
 			}

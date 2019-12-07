@@ -6,11 +6,6 @@ public class ApplySceneSettings : MonoBehaviour
 
 	public bool applyEffectColor = true;
 
-	public ApplySceneSettings()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
 		Object.DestroyImmediate(this);

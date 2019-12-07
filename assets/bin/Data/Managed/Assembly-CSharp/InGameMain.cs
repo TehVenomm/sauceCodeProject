@@ -76,7 +76,7 @@ public class InGameMain : GameSection
 	{
 		if (QuestManager.IsValidInGame())
 		{
-			if (MonoBehaviourSingleton<UIInGameMenu>.IsValid() && MonoBehaviourSingleton<UIInGameMenu>.I.get_gameObject().get_activeInHierarchy())
+			if (MonoBehaviourSingleton<UIInGameMenu>.IsValid() && MonoBehaviourSingleton<UIInGameMenu>.I.gameObject.activeInHierarchy)
 			{
 				MonoBehaviourSingleton<UIInGameMenu>.I.Close();
 			}
@@ -104,7 +104,11 @@ public class InGameMain : GameSection
 		{
 			MonoBehaviourSingleton<ShopManager>.I.trackPlayerDie = false;
 		}
-		this.StartCoroutine(DoInitialize());
+		if (MonoBehaviourSingleton<InGameManager>.I.selfCacheObject != null)
+		{
+			MonoBehaviourSingleton<InGameManager>.I.DestroySelfCache();
+		}
+		StartCoroutine(DoInitialize_GG_Optimization());
 	}
 
 	private IEnumerator DoInitialize()
@@ -156,16 +160,15 @@ public class InGameMain : GameSection
 			}
 			if (MonoBehaviourSingleton<QuestManager>.IsValid())
 			{
-				int currentQuestBGMID = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestBGMID();
-				SoundManager.RequestBGM(currentQuestBGMID);
+				SoundManager.RequestBGM(MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestBGMID());
 			}
 			MonoBehaviourSingleton<InGameManager>.I.isRetry = false;
 		}
-		SetActive((Enum)UI.BTN_QUEST_MENU, QuestManager.IsValidInGame());
+		SetActive(UI.BTN_QUEST_MENU, QuestManager.IsValidInGame());
 		InitializeChatUI();
 		if (MonoBehaviourSingleton<WorldMapManager>.I.GetOpenRegionIdListInWorldMap(REGION_DIFFICULTY_TYPE.NORMAL).Length >= 2)
 		{
-			SetEvent((Enum)UI.BTN_REQUEST, "QUEST_SELECT_WINDOW", (int)MonoBehaviourSingleton<FieldManager>.I.currentMapData.regionId);
+			SetEvent(UI.BTN_REQUEST, "QUEST_SELECT_WINDOW", (int)MonoBehaviourSingleton<FieldManager>.I.currentMapData.regionId);
 		}
 		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 		{
@@ -181,15 +184,15 @@ public class InGameMain : GameSection
 		}
 		if (QuestManager.IsValidInGame() && MonoBehaviourSingleton<AppMain>.IsValid() && !MonoBehaviourSingleton<InGameRecorder>.IsValid())
 		{
-			MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<InGameRecorder>();
+			MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<InGameRecorder>();
 		}
 		if (MonoBehaviourSingleton<AppMain>.IsValid())
 		{
-			MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<AttackColliderManager>();
+			MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<AttackColliderManager>();
 		}
-		inGameMembers = new GameObject("InGameMembers").get_transform();
+		inGameMembers = new GameObject("InGameMembers").transform;
 		Transform _transform = inGameMembers;
-		_transform.get_transform().set_parent(MonoBehaviourSingleton<AppMain>.I._transform);
+		_transform.transform.parent = MonoBehaviourSingleton<AppMain>.I._transform;
 		inGameUIMembers = Utility.CreateGameObject("InGameUIMembers", MonoBehaviourSingleton<UIManager>.I._transform, 5);
 		LoadingQueue load_queue = new LoadingQueue(this);
 		ResourceManager.enableCache = false;
@@ -240,16 +243,16 @@ public class InGameMain : GameSection
 			QuestManager.VorgonQuetType vorgonQuestType = MonoBehaviourSingleton<QuestManager>.I.GetVorgonQuestType();
 			if (vorgonQuestType != 0)
 			{
-				GameObject questControllerObj = new GameObject("VorgonQuestController");
-				vorgonPreEventController = questControllerObj.AddComponent<VorgonPreEventController>();
-				vorgonPreEventController.set_enabled(false);
-				questControllerObj.get_transform().set_parent(_transform);
+				GameObject gameObject = new GameObject("VorgonQuestController");
+				vorgonPreEventController = gameObject.AddComponent<VorgonPreEventController>();
+				vorgonPreEventController.enabled = false;
+				gameObject.transform.parent = _transform;
 				if (vorgonQuestType == QuestManager.VorgonQuetType.BATTLE_WITH_WYBURN)
 				{
-					string path = "ev001_CutScene";
+					string cutSceneDataPath = "ev001_CutScene";
 					bool wait = true;
-					cutScenePlayer = questControllerObj.AddComponent<CutScenePlayer>();
-					cutScenePlayer.Init(path, delegate
+					cutScenePlayer = gameObject.AddComponent<CutScenePlayer>();
+					cutScenePlayer.Init(cutSceneDataPath, delegate
 					{
 						wait = false;
 					});
@@ -260,7 +263,7 @@ public class InGameMain : GameSection
 				}
 			}
 		}
-		bool isExploreMiniMapActive = MonoBehaviourSingleton<ExploreMiniMap>.IsValid() && MonoBehaviourSingleton<ExploreMiniMap>.I.get_gameObject().get_activeSelf();
+		bool isExploreMiniMapActive = MonoBehaviourSingleton<ExploreMiniMap>.IsValid() && MonoBehaviourSingleton<ExploreMiniMap>.I.gameObject.activeSelf;
 		if (isExploreMiniMapActive)
 		{
 			MonoBehaviourSingleton<ExploreMiniMap>.I.Preload(load_queue);
@@ -281,29 +284,31 @@ public class InGameMain : GameSection
 		{
 			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.SetLoadingPer(20);
 		}
-		Transform _setting_transform = null;
-		InGameSettingsManager.Player player_setting = null;
+		Transform transform = null;
+		InGameSettingsManager.Player player = null;
 		ResourceObject[] loadedObjects = lo_prefabs.loadedObjects;
 		foreach (ResourceObject resourceObject in loadedObjects)
 		{
-			string name = resourceObject.obj.get_name();
+			string name = resourceObject.obj.name;
 			if (name.Contains("PlayerAttackInfo"))
 			{
 				if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
 				{
-					if (_setting_transform == null)
+					if (transform == null)
 					{
-						_setting_transform = MonoBehaviourSingleton<InGameSettingsManager>.I._transform;
+						transform = MonoBehaviourSingleton<InGameSettingsManager>.I._transform;
 					}
-					if (player_setting == null)
+					if (player == null)
 					{
-						player_setting = MonoBehaviourSingleton<InGameSettingsManager>.I.player;
-						player_setting.attackInfosAll = new AttackInfo[0];
+						player = MonoBehaviourSingleton<InGameSettingsManager>.I.player;
+						player.attackInfosAll = new AttackInfo[0];
 					}
-					GameObject gameObject = ResourceUtility.Realizes(resourceObject.obj, _setting_transform).get_gameObject();
-					AttackInfos component = gameObject.GetComponent<AttackInfos>();
-					player_setting.weaponAttackInfoList.Add(component);
-					player_setting.attackInfosAll = Utility.CreateMergedArray(player_setting.attackInfosAll, component.attackHitInfos);
+					AttackInfos component = ResourceUtility.Realizes(resourceObject.obj, transform).gameObject.GetComponent<AttackInfos>();
+					player.weaponAttackInfoList.Add(component);
+					InGameSettingsManager.Player player2 = player;
+					AttackInfo[] attackInfosAll = player.attackInfosAll;
+					AttackInfo[] attackHitInfos = component.attackHitInfos;
+					player2.attackInfosAll = Utility.CreateMergedArray(attackInfosAll, attackHitInfos);
 				}
 			}
 			else if (name.Contains("PuniConManager"))
@@ -316,10 +321,10 @@ public class InGameMain : GameSection
 				ResourceUtility.Realizes(resourceObject.obj, _transform);
 			}
 		}
-		ResourceObject[] loadedObjects2 = lo_link_resources.loadedObjects;
-		foreach (ResourceObject resourceObject2 in loadedObjects2)
+		loadedObjects = lo_link_resources.loadedObjects;
+		for (int j = 0; j < loadedObjects.Length; j++)
 		{
-			ResourceUtility.Realizes(resourceObject2.obj, MonoBehaviourSingleton<InGameSettingsManager>.I._transform);
+			ResourceUtility.Realizes(loadedObjects[j].obj, MonoBehaviourSingleton<InGameSettingsManager>.I._transform);
 		}
 		Utility.CreateGameObjectAndComponent("StageObjectManager", _transform);
 		Utility.CreateGameObjectAndComponent("TargetMarkerManager", _transform);
@@ -327,7 +332,7 @@ public class InGameMain : GameSection
 		Utility.CreateGameObjectAndComponent("AIManager", _transform);
 		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != null)
 		{
-			MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.get_gameObject().SetActive(true);
+			MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.gameObject.SetActive(value: true);
 			if (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite)
 			{
 				MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Open();
@@ -335,10 +340,10 @@ public class InGameMain : GameSection
 		}
 		if (lo_tutorial_prefab != null)
 		{
-			Transform val = ResourceUtility.Realizes(lo_tutorial_prefab.loadedObject, inGameUIMembers);
-			if (val != null)
+			Transform transform2 = ResourceUtility.Realizes(lo_tutorial_prefab.loadedObject, inGameUIMembers);
+			if (transform2 != null)
 			{
-				UITutorialFieldHelper component2 = val.GetComponent<UITutorialFieldHelper>();
+				UITutorialFieldHelper component2 = transform2.GetComponent<UITutorialFieldHelper>();
 				if (component2 != null)
 				{
 					component2.Setup(this);
@@ -347,116 +352,115 @@ public class InGameMain : GameSection
 		}
 		if (MonoBehaviourSingleton<InGameManager>.I.IsRush() || QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true))
 		{
-			GameObject val2 = Object.Instantiate(lo_ingame_rush.loadedObject) as GameObject;
-			val2.get_transform().set_parent(MonoBehaviourSingleton<UIContinueButton>.I._transform.get_parent());
-			val2.get_transform().set_localPosition(Vector3.get_zero());
-			val2.get_transform().set_localRotation(Quaternion.get_identity());
-			val2.get_transform().set_localScale(Vector3.get_one());
-			UIStaticPanelChanger componentInParent = val2.GetComponentInParent<UIStaticPanelChanger>();
+			GameObject obj = UnityEngine.Object.Instantiate(lo_ingame_rush.loadedObject) as GameObject;
+			obj.transform.parent = MonoBehaviourSingleton<UIContinueButton>.I._transform.parent;
+			obj.transform.localPosition = Vector3.zero;
+			obj.transform.localRotation = Quaternion.identity;
+			obj.transform.localScale = Vector3.one;
+			UIStaticPanelChanger componentInParent = obj.GetComponentInParent<UIStaticPanelChanger>();
 			MonoBehaviourSingleton<UISpectatorButton>.I.Initialize(componentInParent);
 		}
 		if (MonoBehaviourSingleton<UIDamageManager>.IsValid())
 		{
 			MonoBehaviourSingleton<UIDamageManager>.I.RegisterDamageNumResources(loDamageNum.loadedObject, loPlayerDamageNum.loadedObject, loAdditionalDamageNum.loadedObject);
 		}
-		string stage_name = (!MonoBehaviourSingleton<InGameManager>.IsValid()) ? "ST011D_01" : MonoBehaviourSingleton<InGameManager>.I.GetCurrentStageName();
+		string text = MonoBehaviourSingleton<InGameManager>.IsValid() ? MonoBehaviourSingleton<InGameManager>.I.GetCurrentStageName() : "ST011D_01";
 		if (MonoBehaviourSingleton<GameSceneManager>.IsValid())
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.SetExternalStageName(stage_name);
+			MonoBehaviourSingleton<GameSceneManager>.I.SetExternalStageName(text);
 		}
-		MonoBehaviourSingleton<StageManager>.I.LoadStage(stage_name);
+		MonoBehaviourSingleton<StageManager>.I.LoadStage(text);
 		while (MonoBehaviourSingleton<StageManager>.I.isLoading)
 		{
 			yield return null;
 		}
-		if (!MonoBehaviourSingleton<StageManager>.I.isValidInside)
-		{
-		}
+		_ = MonoBehaviourSingleton<StageManager>.I.isValidInside;
 		if (MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
 			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.SetLoadingPer(40);
 		}
-		InGameSettingsManager inGameSettings = MonoBehaviourSingleton<InGameSettingsManager>.I;
-		GlobalSettingsManager.LinkResources globalResources = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources;
+		InGameSettingsManager i2 = MonoBehaviourSingleton<InGameSettingsManager>.I;
+		GlobalSettingsManager.LinkResources linkResources = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources;
 		List<string> loadEffectNames = new List<string>();
-		for (int l = 0; l < 3; l++)
+		string[] effects;
+		for (int k = 0; k < 3; k++)
 		{
 			InGameSettingsManager.UseResources useResources = null;
-			switch (l)
+			switch (k)
 			{
 			case 0:
-				useResources = globalResources.inGameCommonResources;
+				useResources = linkResources.inGameCommonResources;
 				break;
 			case 1:
 				if (FieldManager.IsValidInGameNoQuest() || FieldManager.IsValidInGameNoBoss())
 				{
-					useResources = inGameSettings.useResourcesField;
+					useResources = i2.useResourcesField;
 				}
 				break;
 			case 2:
 				if (QuestManager.IsValidInGame() || InGameManager.IsValidInGameTest() || FieldManager.IsValidInTutorial())
 				{
-					useResources = globalResources.inGameQuestResources;
+					useResources = linkResources.inGameQuestResources;
 				}
 				break;
 			}
 			if (useResources != null)
 			{
-				string[] effects = useResources.effects;
-				foreach (string text in effects)
+				effects = useResources.effects;
+				foreach (string text2 in effects)
 				{
-					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text);
-					loadEffectNames.Add(text);
+					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text2);
+					loadEffectNames.Add(text2);
 				}
-				string[] uiEffects = useResources.uiEffects;
-				foreach (string name2 in uiEffects)
+				effects = useResources.uiEffects;
+				foreach (string name2 in effects)
 				{
 					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, name2);
 				}
 			}
 		}
-		InGameSettingsManager.Player player = inGameSettings.player;
-		string[] stunnedEffectList = globalResources.stunnedEffectList;
-		foreach (string text2 in stunnedEffectList)
-		{
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text2);
-			loadEffectNames.Add(text2);
-		}
-		string[] charmEffectList = globalResources.charmEffectList;
-		foreach (string text3 in charmEffectList)
+		_ = i2.player;
+		effects = linkResources.stunnedEffectList;
+		foreach (string text3 in effects)
 		{
 			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text3);
 			loadEffectNames.Add(text3);
 		}
-		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.battleStartEffectName);
-		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.changeWeaponEffectName);
-		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.spActionStartEffectName);
-		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.arrowBleedOtherEffectName);
-		loadEffectNames.Add(globalResources.battleStartEffectName);
-		loadEffectNames.Add(globalResources.changeWeaponEffectName);
-		loadEffectNames.Add(globalResources.spActionStartEffectName);
-		loadEffectNames.Add(globalResources.arrowBleedOtherEffectName);
-		int[] elementHitSEIDs = inGameSettings.enemy.elementHitSEIDs;
+		effects = linkResources.charmEffectList;
+		foreach (string text4 in effects)
+		{
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text4);
+			loadEffectNames.Add(text4);
+		}
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.battleStartEffectName);
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.changeWeaponEffectName);
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.spActionStartEffectName);
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.arrowBleedOtherEffectName);
+		loadEffectNames.Add(linkResources.battleStartEffectName);
+		loadEffectNames.Add(linkResources.changeWeaponEffectName);
+		loadEffectNames.Add(linkResources.spActionStartEffectName);
+		loadEffectNames.Add(linkResources.arrowBleedOtherEffectName);
+		int[] elementHitSEIDs = i2.enemy.elementHitSEIDs;
 		foreach (int se_id in elementHitSEIDs)
 		{
 			load_queue.CacheSE(se_id);
 		}
 		if (FieldManager.IsValidInGameNoBoss())
 		{
-			string[] effectNames = inGameSettings.portal.effectNames;
-			foreach (string text4 in effectNames)
+			effects = i2.portal.effectNames;
+			foreach (string text5 in effects)
 			{
-				load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text4);
-				loadEffectNames.Add(text4);
+				load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text5);
+				loadEffectNames.Add(text5);
 			}
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, inGameSettings.fieldDrop.tresureBoxOpenEffect);
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, inGameSettings.portal.pointGetEffectName);
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, inGameSettings.portal.pointEffect.normalEffectName);
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, inGameSettings.portal.pointEffect.largeEffectName);
-			loadEffectNames.Add(inGameSettings.fieldDrop.tresureBoxOpenEffect);
-			loadEffectNames.Add(inGameSettings.portal.pointGetEffectName);
-			loadEffectNames.Add(inGameSettings.portal.pointEffect.normalEffectName);
-			loadEffectNames.Add(inGameSettings.portal.pointEffect.largeEffectName);
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, i2.fieldDrop.tresureBoxOpenEffect);
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, i2.portal.pointGetEffectName);
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, i2.portal.pointEffect.normalEffectName);
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, i2.portal.pointEffect.largeEffectName);
+			loadEffectNames.Add(i2.fieldDrop.tresureBoxOpenEffect);
+			loadEffectNames.Add(i2.portal.pointGetEffectName);
+			loadEffectNames.Add(i2.portal.pointEffect.normalEffectName);
+			loadEffectNames.Add(i2.portal.pointEffect.largeEffectName);
 			if (MonoBehaviourSingleton<UIInGameFieldQuestWarning>.IsValid())
 			{
 				MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.Load(load_queue);
@@ -465,7 +469,7 @@ public class InGameMain : GameSection
 		}
 		else
 		{
-			InGameSettingsManager.ShadowSealingParam shadowSealingParam = inGameSettings.debuff.shadowSealingParam;
+			InGameSettingsManager.ShadowSealingParam shadowSealingParam = i2.debuff.shadowSealingParam;
 			if (shadowSealingParam.startSeId != 0)
 			{
 				load_queue.CacheSE(shadowSealingParam.startSeId);
@@ -478,39 +482,39 @@ public class InGameMain : GameSection
 			{
 				load_queue.CacheSE(shadowSealingParam.endSeId);
 			}
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.shadowSealingEffectName);
-			loadEffectNames.Add(globalResources.shadowSealingEffectName);
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.shadowSealingEffectName);
+			loadEffectNames.Add(linkResources.shadowSealingEffectName);
 		}
-		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, globalResources.enemyOtherSimpleHitEffectName);
-		loadEffectNames.Add(globalResources.enemyOtherSimpleHitEffectName);
-		string freezeEffect = "ef_btl_pl_frozen_01";
-		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, freezeEffect);
-		loadEffectNames.Add(freezeEffect);
-		string shadowSealingEffect = "ef_btl_wsk_bow_01_04";
-		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, shadowSealingEffect);
-		loadEffectNames.Add(shadowSealingEffect);
-		string concussionEffect = "ef_btl_enm_flinch_01";
-		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, concussionEffect);
-		loadEffectNames.Add(concussionEffect);
-		InGameSettingsManager.Concussion concussionParam = inGameSettings.debuff.concussion;
-		if (concussionParam.startSeId != 0)
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.enemyOtherSimpleHitEffectName);
+		loadEffectNames.Add(linkResources.enemyOtherSimpleHitEffectName);
+		string text6 = "ef_btl_pl_frozen_01";
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text6);
+		loadEffectNames.Add(text6);
+		string text7 = "ef_btl_wsk_bow_01_04";
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text7);
+		loadEffectNames.Add(text7);
+		string text8 = "ef_btl_enm_flinch_01";
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text8);
+		loadEffectNames.Add(text8);
+		InGameSettingsManager.Concussion concussion = i2.debuff.concussion;
+		if (concussion.startSeId != 0)
 		{
-			load_queue.CacheSE(concussionParam.startSeId);
+			load_queue.CacheSE(concussion.startSeId);
 		}
-		if (concussionParam.loopSeId != 0)
+		if (concussion.loopSeId != 0)
 		{
-			load_queue.CacheSE(concussionParam.loopSeId);
+			load_queue.CacheSE(concussion.loopSeId);
 		}
-		if (concussionParam.endSeId != 0)
+		if (concussion.endSeId != 0)
 		{
-			load_queue.CacheSE(concussionParam.endSeId);
+			load_queue.CacheSE(concussion.endSeId);
 		}
 		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.bleedingParam.effectName);
 		MonoBehaviourSingleton<InGameProgress>.I.CacheUseResources(load_queue, ref loadEffectNames);
 		MonoBehaviourSingleton<ResourceManager>.I.cache.AddIgnoreCategorySpecifiedReleaseList(loadEffectNames);
 		if (QuestManager.IsValidInGameWaveMatch())
 		{
-			InGameSettingsManager.WaveMatchParam waveMatchParam = inGameSettings.GetWaveMatchParam();
+			InGameSettingsManager.WaveMatchParam waveMatchParam = i2.GetWaveMatchParam();
 			load_queue.CacheSE(waveMatchParam.waveJingleId);
 			load_queue.CacheSE(waveMatchParam.targetHitSeId);
 			load_queue.CacheSE(waveMatchParam.targetBreakSeId);
@@ -526,25 +530,25 @@ public class InGameMain : GameSection
 		{
 			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.SetLoadingPer(70);
 		}
-		yield return this.StartCoroutine(MonoBehaviourSingleton<InGameManager>.I.InitializeEnemyPop());
-		InGameManager.IntervalTransferInfo interval_transfer_info = null;
+		yield return StartCoroutine(MonoBehaviourSingleton<InGameManager>.I.InitializeEnemyPop());
+		InGameManager.IntervalTransferInfo intervalTransferInfo = null;
 		if (MonoBehaviourSingleton<InGameManager>.IsValid())
 		{
-			interval_transfer_info = MonoBehaviourSingleton<InGameManager>.I.intervalTransferInfo;
+			intervalTransferInfo = MonoBehaviourSingleton<InGameManager>.I.intervalTransferInfo;
 		}
 		if (MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo())
 		{
-			MonoBehaviourSingleton<StageObjectManager>.I.InitForArena(interval_transfer_info);
+			MonoBehaviourSingleton<StageObjectManager>.I.InitForArena(intervalTransferInfo);
 		}
 		else
 		{
-			MonoBehaviourSingleton<StageObjectManager>.I.Init(interval_transfer_info);
+			MonoBehaviourSingleton<StageObjectManager>.I.Init(intervalTransferInfo);
 		}
 		List<Character> load_check_list = new List<Character>();
-		int num5 = 0;
-		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.characterList.Count; num5 < count; num5++)
+		int l = 0;
+		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.characterList.Count; l < count; l++)
 		{
-			Character character2 = MonoBehaviourSingleton<StageObjectManager>.I.characterList[num5] as Character;
+			Character character2 = MonoBehaviourSingleton<StageObjectManager>.I.characterList[l] as Character;
 			if (character2.IsCoopNone() && character2.isLoading && MonoBehaviourSingleton<StageObjectManager>.I.FindNonPlayer(character2.id) == null)
 			{
 				load_check_list.Add(character2);
@@ -611,7 +615,7 @@ public class InGameMain : GameSection
 		MonoBehaviourSingleton<InGameManager>.I.CheckStageInitialState();
 		if (MonoBehaviourSingleton<CoopManager>.IsValid())
 		{
-			yield return this.StartCoroutine(MonoBehaviourSingleton<CoopManager>.I.coopStage.DoActivate());
+			yield return StartCoroutine(MonoBehaviourSingleton<CoopManager>.I.coopStage.DoActivate());
 		}
 		MonoBehaviourSingleton<StageObjectManager>.I.objectList.ForEach(delegate(StageObject o)
 		{
@@ -668,7 +672,7 @@ public class InGameMain : GameSection
 		PredownloadManager.Stop(PredownloadManager.STOP_FLAG.INGAME_MAIN, is_stop: false);
 		if (vorgonPreEventController != null)
 		{
-			vorgonPreEventController.set_enabled(true);
+			vorgonPreEventController.enabled = true;
 		}
 		if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
 		{
@@ -715,14 +719,711 @@ public class InGameMain : GameSection
 		{
 			yield return null;
 		}
-		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 3)
-		{
-		}
+		_ = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep;
+		_ = 3;
 		if (MonoBehaviourSingleton<UIQuestRepeat>.IsValid())
 		{
 			MonoBehaviourSingleton<UIQuestRepeat>.I.InitData();
 		}
+		Debug.Log("STEP FINISH");
 		base.Initialize();
+	}
+
+	private IEnumerator DoInitialize_GG_Optimization()
+	{
+		if (MonoBehaviourSingleton<InGameManager>.I.graphicOptionType <= 0)
+		{
+			UILabel.OutlineLimit = true;
+		}
+		else
+		{
+			UILabel.OutlineLimit = false;
+		}
+		Application.backgroundLoadingPriority = ThreadPriority.High;
+		PredownloadManager.Stop(PredownloadManager.STOP_FLAG.INGAME_MAIN, is_stop: true);
+		while (MonoBehaviourSingleton<DataTableManager>.I.IsLoading())
+		{
+			yield return null;
+		}
+		bool isWaitQuestLoad = true;
+		StartCoroutine(DoInitializeQuest(delegate
+		{
+			isWaitQuestLoad = false;
+		}));
+		bool isWaitChatUILoad = true;
+		StartCoroutine(DoInitializeChatUI(delegate
+		{
+			isWaitChatUILoad = false;
+		}));
+		if (QuestManager.IsValidInGame() && MonoBehaviourSingleton<AppMain>.IsValid() && !MonoBehaviourSingleton<InGameRecorder>.IsValid())
+		{
+			MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<InGameRecorder>();
+		}
+		if (MonoBehaviourSingleton<AppMain>.IsValid())
+		{
+			MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<AttackColliderManager>();
+		}
+		inGameMembers = new GameObject("InGameMembers").transform;
+		Transform _transform = inGameMembers;
+		_transform.transform.parent = MonoBehaviourSingleton<AppMain>.I._transform;
+		inGameUIMembers = Utility.CreateGameObject("InGameUIMembers", MonoBehaviourSingleton<UIManager>.I._transform, 5);
+		LoadingQueue load_queue = new LoadingQueue(this);
+		ResourceManager.enableCache = false;
+		LoadObject lo_prefabs = load_queue.Load(RESOURCE_CATEGORY.SYSTEM, "SystemInGame", new string[8]
+		{
+			"InGameSettingsManager",
+			"InGameCameraManager",
+			"PuniConManager",
+			"PlayerAttackInfo_00",
+			"PlayerAttackInfo_01",
+			"PlayerAttackInfo_02",
+			"PlayerAttackInfo_04",
+			"PlayerAttackInfo_05"
+		});
+		LoadObject lo_tutorial_prefab = null;
+		if (!TutorialStep.HasFirstDeliveryCompleted() && TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02))
+		{
+			lo_tutorial_prefab = load_queue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialFieldHelper");
+		}
+		LoadObject lo_link_resources;
+		if (FieldManager.IsValidInTutorial())
+		{
+			lo_link_resources = load_queue.Load(RESOURCE_CATEGORY.SYSTEM, "SystemInGameLinkResources", new string[3]
+			{
+				"InGameLinkResourcesCommon",
+				"InGameLinkResourcesQuest",
+				"InGameLinkResourcesField"
+			});
+		}
+		else
+		{
+			List<string> list = new List<string>(3);
+			list.Add("InGameLinkResourcesCommon");
+			if (QuestManager.IsValidInGame() || InGameManager.IsValidInGameTest())
+			{
+				list.Add("InGameLinkResourcesQuest");
+			}
+			if (FieldManager.IsValidInGameNoBoss() || InGameManager.IsValidInGameTest())
+			{
+				list.Add("InGameLinkResourcesField");
+			}
+			lo_link_resources = load_queue.Load(RESOURCE_CATEGORY.SYSTEM, "SystemInGameLinkResources", list.ToArray());
+		}
+		ResourceManager.enableCache = true;
+		VorgonPreEventController vorgonPreEventController = null;
+		bool isWaitCutScreen = true;
+		StartCoroutine(DoInitializeCutScreen(delegate(VorgonPreEventController o)
+		{
+			vorgonPreEventController = o;
+			isWaitCutScreen = false;
+		}));
+		bool isExploreMiniMapActive = MonoBehaviourSingleton<ExploreMiniMap>.IsValid() && MonoBehaviourSingleton<ExploreMiniMap>.I.gameObject.activeSelf;
+		if (isExploreMiniMapActive)
+		{
+			MonoBehaviourSingleton<ExploreMiniMap>.I.Preload(load_queue);
+		}
+		LoadObject lo_ingame_rush = null;
+		if (MonoBehaviourSingleton<InGameManager>.I.IsRush() || QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true))
+		{
+			lo_ingame_rush = load_queue.Load(RESOURCE_CATEGORY.UI, "InGameRush");
+		}
+		LoadObject loAdditionalDamageNum = load_queue.Load(RESOURCE_CATEGORY.UI, "InGameAdditionalDamageNum");
+		LoadObject loPlayerDamageNum = load_queue.Load(RESOURCE_CATEGORY.UI, "InGamePlayerDamageNum");
+		LoadObject loDamageNum = load_queue.Load(RESOURCE_CATEGORY.UI, "InGameDamageNum");
+		while ((isWaitQuestLoad | isWaitChatUILoad | isWaitCutScreen) || load_queue.IsLoading())
+		{
+			if (load_queue.IsStop())
+			{
+				yield return null;
+			}
+			else
+			{
+				yield return load_queue.Wait();
+			}
+		}
+		if (MonoBehaviourSingleton<CoopManager>.IsValid())
+		{
+			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.SetLoadingPer(20);
+		}
+		Transform transform = null;
+		InGameSettingsManager.Player player = null;
+		ResourceObject[] loadedObjects = lo_prefabs.loadedObjects;
+		foreach (ResourceObject resourceObject in loadedObjects)
+		{
+			string name = resourceObject.obj.name;
+			if (name.Contains("PlayerAttackInfo"))
+			{
+				if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
+				{
+					if (transform == null)
+					{
+						transform = MonoBehaviourSingleton<InGameSettingsManager>.I._transform;
+					}
+					if (player == null)
+					{
+						player = MonoBehaviourSingleton<InGameSettingsManager>.I.player;
+						player.attackInfosAll = new AttackInfo[0];
+					}
+					AttackInfos component = ResourceUtility.Realizes(resourceObject.obj, transform).gameObject.GetComponent<AttackInfos>();
+					player.weaponAttackInfoList.Add(component);
+					InGameSettingsManager.Player player2 = player;
+					AttackInfo[] attackInfosAll = player.attackInfosAll;
+					AttackInfo[] attackHitInfos = component.attackHitInfos;
+					player2.attackInfosAll = Utility.CreateMergedArray(attackInfosAll, attackHitInfos);
+				}
+			}
+			else if (name.Contains("PuniConManager"))
+			{
+				ResourceUtility.Realizes(resourceObject.obj, inGameUIMembers, 5);
+				MonoBehaviourSingleton<PuniConManager>.I.enableMultiTouch = true;
+			}
+			else
+			{
+				ResourceUtility.Realizes(resourceObject.obj, _transform);
+			}
+		}
+		loadedObjects = lo_link_resources.loadedObjects;
+		for (int i = 0; i < loadedObjects.Length; i++)
+		{
+			ResourceUtility.Realizes(loadedObjects[i].obj, MonoBehaviourSingleton<InGameSettingsManager>.I._transform);
+		}
+		Utility.CreateGameObjectAndComponent("StageObjectManager", _transform);
+		Utility.CreateGameObjectAndComponent("TargetMarkerManager", _transform);
+		Utility.CreateGameObjectAndComponent("InGameProgress", _transform);
+		Utility.CreateGameObjectAndComponent("AIManager", _transform);
+		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != null)
+		{
+			MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.gameObject.SetActive(value: true);
+			if (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.ExistsPartyInvite)
+			{
+				MonoBehaviourSingleton<UIManager>.I.invitationInGameButton.Open();
+			}
+		}
+		if (lo_tutorial_prefab != null)
+		{
+			Transform transform2 = ResourceUtility.Realizes(lo_tutorial_prefab.loadedObject, inGameUIMembers);
+			if (transform2 != null)
+			{
+				UITutorialFieldHelper component2 = transform2.GetComponent<UITutorialFieldHelper>();
+				if (component2 != null)
+				{
+					component2.Setup(this);
+				}
+			}
+		}
+		if (MonoBehaviourSingleton<InGameManager>.I.IsRush() || QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true))
+		{
+			GameObject obj = UnityEngine.Object.Instantiate(lo_ingame_rush.loadedObject) as GameObject;
+			obj.transform.parent = MonoBehaviourSingleton<UIContinueButton>.I._transform.parent;
+			obj.transform.localPosition = Vector3.zero;
+			obj.transform.localRotation = Quaternion.identity;
+			obj.transform.localScale = Vector3.one;
+			UIStaticPanelChanger componentInParent = obj.GetComponentInParent<UIStaticPanelChanger>();
+			MonoBehaviourSingleton<UISpectatorButton>.I.Initialize(componentInParent);
+		}
+		if (MonoBehaviourSingleton<UIDamageManager>.IsValid())
+		{
+			MonoBehaviourSingleton<UIDamageManager>.I.RegisterDamageNumResources(loDamageNum.loadedObject, loPlayerDamageNum.loadedObject, loAdditionalDamageNum.loadedObject);
+		}
+		bool isWaitLoadScene = true;
+		bool isWaitLoadCharacter = true;
+		bool isWaitLoadEnemy = true;
+		StartCoroutine(DoInitializeSceneLoad(delegate
+		{
+			isWaitLoadScene = false;
+			InGameManager.IntervalTransferInfo intervalTransferInfo = null;
+			if (MonoBehaviourSingleton<InGameManager>.IsValid())
+			{
+				intervalTransferInfo = MonoBehaviourSingleton<InGameManager>.I.intervalTransferInfo;
+			}
+			if (MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo())
+			{
+				MonoBehaviourSingleton<StageObjectManager>.I.InitForArena(intervalTransferInfo);
+			}
+			else
+			{
+				MonoBehaviourSingleton<StageObjectManager>.I.Init(intervalTransferInfo);
+			}
+			StartCoroutine(MonoBehaviourSingleton<InGameManager>.I.InitializeEnemyPop_GG_Optimize(delegate
+			{
+				isWaitLoadEnemy = false;
+			}, delegate
+			{
+			}));
+			StartCoroutine(DoInitializeCharacter(delegate
+			{
+				isWaitLoadCharacter = false;
+			}));
+		}));
+		if (MonoBehaviourSingleton<CoopManager>.IsValid())
+		{
+			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.SetLoadingPer(40);
+		}
+		InGameSettingsManager i2 = MonoBehaviourSingleton<InGameSettingsManager>.I;
+		GlobalSettingsManager.LinkResources linkResources = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources;
+		List<string> loadEffectNames = new List<string>();
+		string[] effects;
+		for (int j = 0; j < 3; j++)
+		{
+			InGameSettingsManager.UseResources useResources = null;
+			switch (j)
+			{
+			case 0:
+				useResources = linkResources.inGameCommonResources;
+				break;
+			case 1:
+				if (FieldManager.IsValidInGameNoQuest() || FieldManager.IsValidInGameNoBoss())
+				{
+					useResources = i2.useResourcesField;
+				}
+				break;
+			case 2:
+				if (QuestManager.IsValidInGame() || InGameManager.IsValidInGameTest() || FieldManager.IsValidInTutorial())
+				{
+					useResources = linkResources.inGameQuestResources;
+				}
+				break;
+			}
+			if (useResources != null)
+			{
+				effects = useResources.effects;
+				foreach (string text in effects)
+				{
+					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text);
+					loadEffectNames.Add(text);
+				}
+				effects = useResources.uiEffects;
+				foreach (string name2 in effects)
+				{
+					load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, name2);
+				}
+			}
+		}
+		_ = i2.player;
+		effects = linkResources.stunnedEffectList;
+		foreach (string text2 in effects)
+		{
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text2);
+			loadEffectNames.Add(text2);
+		}
+		effects = linkResources.charmEffectList;
+		foreach (string text3 in effects)
+		{
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text3);
+			loadEffectNames.Add(text3);
+		}
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.battleStartEffectName);
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.changeWeaponEffectName);
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.spActionStartEffectName);
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.arrowBleedOtherEffectName);
+		loadEffectNames.Add(linkResources.battleStartEffectName);
+		loadEffectNames.Add(linkResources.changeWeaponEffectName);
+		loadEffectNames.Add(linkResources.spActionStartEffectName);
+		loadEffectNames.Add(linkResources.arrowBleedOtherEffectName);
+		int[] elementHitSEIDs = i2.enemy.elementHitSEIDs;
+		foreach (int se_id in elementHitSEIDs)
+		{
+			load_queue.CacheSE(se_id);
+		}
+		if (FieldManager.IsValidInGameNoBoss())
+		{
+			effects = i2.portal.effectNames;
+			foreach (string text4 in effects)
+			{
+				load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text4);
+				loadEffectNames.Add(text4);
+			}
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, i2.fieldDrop.tresureBoxOpenEffect);
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, i2.portal.pointGetEffectName);
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, i2.portal.pointEffect.normalEffectName);
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, i2.portal.pointEffect.largeEffectName);
+			loadEffectNames.Add(i2.fieldDrop.tresureBoxOpenEffect);
+			loadEffectNames.Add(i2.portal.pointGetEffectName);
+			loadEffectNames.Add(i2.portal.pointEffect.normalEffectName);
+			loadEffectNames.Add(i2.portal.pointEffect.largeEffectName);
+			if (MonoBehaviourSingleton<UIInGameFieldQuestWarning>.IsValid())
+			{
+				MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.Load(load_queue);
+			}
+			load_queue.CacheAnimDataUseResource(MonoBehaviourSingleton<InGameSettingsManager>.I.fieldDrop.animEventData);
+		}
+		else
+		{
+			InGameSettingsManager.ShadowSealingParam shadowSealingParam = i2.debuff.shadowSealingParam;
+			if (shadowSealingParam.startSeId != 0)
+			{
+				load_queue.CacheSE(shadowSealingParam.startSeId);
+			}
+			if (shadowSealingParam.loopSeId != 0)
+			{
+				load_queue.CacheSE(shadowSealingParam.loopSeId);
+			}
+			if (shadowSealingParam.endSeId != 0)
+			{
+				load_queue.CacheSE(shadowSealingParam.endSeId);
+			}
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.shadowSealingEffectName);
+			loadEffectNames.Add(linkResources.shadowSealingEffectName);
+		}
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, linkResources.enemyOtherSimpleHitEffectName);
+		loadEffectNames.Add(linkResources.enemyOtherSimpleHitEffectName);
+		string text5 = "ef_btl_pl_frozen_01";
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text5);
+		loadEffectNames.Add(text5);
+		string text6 = "ef_btl_wsk_bow_01_04";
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text6);
+		loadEffectNames.Add(text6);
+		string text7 = "ef_btl_enm_flinch_01";
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, text7);
+		loadEffectNames.Add(text7);
+		InGameSettingsManager.Concussion concussion = i2.debuff.concussion;
+		if (concussion.startSeId != 0)
+		{
+			load_queue.CacheSE(concussion.startSeId);
+		}
+		if (concussion.loopSeId != 0)
+		{
+			load_queue.CacheSE(concussion.loopSeId);
+		}
+		if (concussion.endSeId != 0)
+		{
+			load_queue.CacheSE(concussion.endSeId);
+		}
+		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.bleedingParam.effectName);
+		MonoBehaviourSingleton<InGameProgress>.I.CacheUseResources(load_queue, ref loadEffectNames);
+		MonoBehaviourSingleton<ResourceManager>.I.cache.AddIgnoreCategorySpecifiedReleaseList(loadEffectNames);
+		if (QuestManager.IsValidInGameWaveMatch())
+		{
+			InGameSettingsManager.WaveMatchParam waveMatchParam = i2.GetWaveMatchParam();
+			load_queue.CacheSE(waveMatchParam.waveJingleId);
+			load_queue.CacheSE(waveMatchParam.targetHitSeId);
+			load_queue.CacheSE(waveMatchParam.targetBreakSeId);
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, waveMatchParam.targetChangeAnimEffect);
+			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, waveMatchParam.targetHitEffect);
+		}
+		bool isNotInitCharacter = true;
+		while ((isWaitLoadScene | isWaitLoadEnemy | isWaitLoadCharacter) || load_queue.IsLoading())
+		{
+			if (!isWaitLoadScene && isNotInitCharacter)
+			{
+				isNotInitCharacter = false;
+				CacheAudio(load_queue);
+				if (MonoBehaviourSingleton<CoopManager>.IsValid())
+				{
+					MonoBehaviourSingleton<CoopManager>.I.coopMyClient.SetLoadingPer(70);
+				}
+			}
+			if (load_queue.IsStop())
+			{
+				yield return null;
+			}
+			else
+			{
+				yield return load_queue.Wait();
+			}
+		}
+		_ = MonoBehaviourSingleton<StageManager>.I.isValidInside;
+		Application.backgroundLoadingPriority = ThreadPriority.Low;
+		if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+		{
+			MonoBehaviourSingleton<StageObjectManager>.I.self.hitOffFlag |= StageObject.HIT_OFF_FLAG.INITIALIZE;
+		}
+		if (isExploreMiniMapActive)
+		{
+			MonoBehaviourSingleton<ExploreMiniMap>.I.Initialize();
+		}
+		if (MonoBehaviourSingleton<CoopManager>.IsValid())
+		{
+			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.LoadingFinish();
+		}
+		if (!FieldManager.IsValidInTutorial())
+		{
+			yield return MonoBehaviourSingleton<AppMain>.I.ClearMemory(clearObjCaches: false, clearPreloaded: false);
+		}
+		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
+		{
+			float currentLimitTime = MonoBehaviourSingleton<InGameManager>.I.GetCurrentLimitTime();
+			MonoBehaviourSingleton<InGameProgress>.I.SetLimitTime(currentLimitTime);
+			if (MonoBehaviourSingleton<InGameManager>.I.IsRush())
+			{
+				MonoBehaviourSingleton<InGameProgress>.I.SetRushRemainTime((int)currentLimitTime);
+			}
+			if (MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo())
+			{
+				MonoBehaviourSingleton<InGameProgress>.I.SetArenaRemainTime(Mathf.FloorToInt(currentLimitTime));
+			}
+			if (MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsDefenseBattle())
+			{
+				MonoBehaviourSingleton<InGameProgress>.I.SetDefenseBattleEnduranceMax(MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.defenseEndurance);
+				if (MonoBehaviourSingleton<QuestManager>.I.GetRemainEndurance() > 0f)
+				{
+					MonoBehaviourSingleton<InGameProgress>.I.SetDefenseBattleEndurance(MonoBehaviourSingleton<QuestManager>.I.GetRemainEndurance());
+				}
+				else
+				{
+					MonoBehaviourSingleton<InGameProgress>.I.SetDefenseBattleEndurance(MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.defenseEndurance);
+				}
+			}
+			if (QuestManager.IsValidInGameExplore() && MonoBehaviourSingleton<CoopManager>.I.isStageHost && MonoBehaviourSingleton<InGameManager>.I.isAlreadyBattleStarted && MonoBehaviourSingleton<InGameProgress>.I.enableLimitTime)
+			{
+				MonoBehaviourSingleton<InGameProgress>.I.StartTimer();
+			}
+			if (FieldManager.IsValidInGameNoQuest())
+			{
+				MonoBehaviourSingleton<InGameProgress>.I.SetAfkLimitTime();
+			}
+		}
+		MonoBehaviourSingleton<InGameManager>.I.CheckStageInitialState();
+		if (MonoBehaviourSingleton<CoopManager>.IsValid())
+		{
+			yield return StartCoroutine(MonoBehaviourSingleton<CoopManager>.I.coopStage.DoActivate());
+		}
+		MonoBehaviourSingleton<StageObjectManager>.I.objectList.ForEach(delegate(StageObject o)
+		{
+			if (o.controller != null)
+			{
+				o.controller.SetEnableControll(enable: true, ControllerBase.DISABLE_FLAG.BATTLE_START);
+			}
+		});
+		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
+		if (self != null)
+		{
+			self.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.INITIALIZE;
+			if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
+			{
+				self.SetActionTarget(MonoBehaviourSingleton<StageObjectManager>.I.boss);
+			}
+		}
+		if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
+		{
+			prevLevel = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level;
+			if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.levelUp != null)
+			{
+				MonoBehaviourSingleton<UIManager>.I.levelUp.GetNowStatus();
+			}
+		}
+		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+		{
+			if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+			{
+				MonoBehaviourSingleton<InGameCameraManager>.I.target = MonoBehaviourSingleton<StageObjectManager>.I.self._transform;
+			}
+			MonoBehaviourSingleton<InGameCameraManager>.I.AdjustCameraPosition();
+		}
+		if (FieldManager.IsValidInGameNoQuest() && MonoBehaviourSingleton<DeliveryManager>.IsValid())
+		{
+			DropTargetMarkerManeger.Create();
+		}
+		if (MonoBehaviourSingleton<EffectManager>.IsValid())
+		{
+			MonoBehaviourSingleton<EffectManager>.I.enableStock = true;
+		}
+		if (QuestManager.IsValidInGameDefenseBattle())
+		{
+			if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
+			{
+				MonoBehaviourSingleton<UIPlayerStatus>.I.DoDisable();
+			}
+		}
+		else if (MonoBehaviourSingleton<UIEnduranceStatus>.IsValid())
+		{
+			MonoBehaviourSingleton<UIEnduranceStatus>.I.DoDisable();
+		}
+		yield return 0;
+		PredownloadManager.Stop(PredownloadManager.STOP_FLAG.INGAME_MAIN, is_stop: false);
+		if (vorgonPreEventController != null)
+		{
+			vorgonPreEventController.enabled = true;
+		}
+		if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
+		{
+			MonoBehaviourSingleton<UIPlayerStatus>.I.ResetSpActionGaugeState();
+		}
+		if (MonoBehaviourSingleton<UIEnduranceStatus>.IsValid())
+		{
+			MonoBehaviourSingleton<UIEnduranceStatus>.I.ResetSpActionGaugeState();
+		}
+		if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
+		{
+			MonoBehaviourSingleton<StageObjectManager>.I.self.ResetShadowSealingUI();
+			MonoBehaviourSingleton<StageObjectManager>.I.self.ResetConcussionUI();
+		}
+		SyncRotatePosition();
+		if (UIInGameFieldMenu.IsValid() && !UIInGameFieldMenu.I.IsPopMenu())
+		{
+			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
+			if (fieldMapData != null)
+			{
+				if (!FieldManager.HasWorldMap(fieldMapData.mapID))
+				{
+					UIInGameFieldMenu.I.SetDisableMapButton(disable: true);
+				}
+			}
+			else
+			{
+				UIInGameFieldMenu.I.SetDisableMapButton(disable: true);
+			}
+			if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level < MonoBehaviourSingleton<GlobalSettingsManager>.I.unlockEventLevel)
+			{
+				UIInGameFieldMenu.I.SetDisableEventButton(disable: true);
+			}
+		}
+		bool waitGetAutoTime = true;
+		if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
+		{
+			MonoBehaviourSingleton<UIPlayerStatus>.I.autoBattleButton.GetAutoPlayTime(delegate
+			{
+				waitGetAutoTime = false;
+			});
+		}
+		while (waitGetAutoTime)
+		{
+			yield return null;
+		}
+		_ = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep;
+		_ = 3;
+		if (MonoBehaviourSingleton<UIQuestRepeat>.IsValid())
+		{
+			MonoBehaviourSingleton<UIQuestRepeat>.I.InitData();
+		}
+		Application.backgroundLoadingPriority = ThreadPriority.Low;
+		base.Initialize();
+	}
+
+	private IEnumerator DoInitializeQuest(Action callBack)
+	{
+		if (MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.isRetry)
+		{
+			bool isWaitQuestLoad = true;
+			if (MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo())
+			{
+				CoopApp.EnterArenaQuestOffline(delegate(bool isMatching, bool isConnect, bool isRegist, bool isStart)
+				{
+					isWaitQuestLoad = !isStart;
+				});
+			}
+			else if (MonoBehaviourSingleton<StatusManager>.IsValid() && MonoBehaviourSingleton<StatusManager>.I.assignedCharaInfo != null && MonoBehaviourSingleton<StatusManager>.I.assignedEquipmentData != null)
+			{
+				CoopApp.EnterQuestOfflineAssignedEquipment(null, null, delegate(bool isMatching, bool isConnect, bool isRegist, bool isStart)
+				{
+					isWaitQuestLoad = !isStart;
+				});
+			}
+			else
+			{
+				MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID((uint)GameSaveData.instance.lastQusetID);
+				if (MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeriesArena())
+				{
+					CoopApp.EnterSeriesArenaQuestOffline(delegate(bool isMatching, bool isConnect, bool isRegist, bool isStart)
+					{
+						isWaitQuestLoad = !isStart;
+					});
+				}
+			}
+			while (isWaitQuestLoad)
+			{
+				yield return null;
+			}
+			if (MonoBehaviourSingleton<QuestManager>.IsValid())
+			{
+				SoundManager.RequestBGM(MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestBGMID());
+			}
+			MonoBehaviourSingleton<InGameManager>.I.isRetry = false;
+		}
+		callBack();
+	}
+
+	private IEnumerator DoInitializeChatUI(Action callBack)
+	{
+		SetActive(UI.BTN_QUEST_MENU, QuestManager.IsValidInGame());
+		InitializeChatUI();
+		if (MonoBehaviourSingleton<WorldMapManager>.I.GetOpenRegionIdListInWorldMap(REGION_DIFFICULTY_TYPE.NORMAL).Length >= 2)
+		{
+			SetEvent(UI.BTN_REQUEST, "QUEST_SELECT_WINDOW", (int)MonoBehaviourSingleton<FieldManager>.I.currentMapData.regionId);
+		}
+		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+		{
+			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
+		}
+		if (MonoBehaviourSingleton<CoopManager>.IsValid())
+		{
+			MonoBehaviourSingleton<CoopManager>.I.coopMyClient.LoadingStart();
+		}
+		while (MonoBehaviourSingleton<LoadingProcess>.IsValid())
+		{
+			yield return null;
+		}
+		callBack();
+	}
+
+	private IEnumerator DoInitializeCutScreen(Action<VorgonPreEventController> callBack)
+	{
+		VorgonPreEventController vorgonPreEventController = null;
+		if (MonoBehaviourSingleton<QuestManager>.IsValid())
+		{
+			QuestManager.VorgonQuetType vorgonQuestType = MonoBehaviourSingleton<QuestManager>.I.GetVorgonQuestType();
+			if (vorgonQuestType != 0)
+			{
+				GameObject gameObject = new GameObject("VorgonQuestController");
+				vorgonPreEventController = gameObject.AddComponent<VorgonPreEventController>();
+				vorgonPreEventController.enabled = false;
+				gameObject.transform.parent = base._transform;
+				if (vorgonQuestType == QuestManager.VorgonQuetType.BATTLE_WITH_WYBURN)
+				{
+					string cutSceneDataPath = "ev001_CutScene";
+					bool wait = true;
+					cutScenePlayer = gameObject.AddComponent<CutScenePlayer>();
+					cutScenePlayer.Init(cutSceneDataPath, delegate
+					{
+						wait = false;
+					});
+					while (wait)
+					{
+						yield return null;
+					}
+				}
+			}
+		}
+		callBack(vorgonPreEventController);
+	}
+
+	private IEnumerator DoInitializeSceneLoad(Action callBack)
+	{
+		string text = MonoBehaviourSingleton<InGameManager>.IsValid() ? MonoBehaviourSingleton<InGameManager>.I.GetCurrentStageName() : "ST011D_01";
+		if (MonoBehaviourSingleton<GameSceneManager>.IsValid())
+		{
+			MonoBehaviourSingleton<GameSceneManager>.I.SetExternalStageName(text);
+		}
+		MonoBehaviourSingleton<StageManager>.I.LoadStage(text);
+		while (MonoBehaviourSingleton<StageManager>.I.isLoading)
+		{
+			yield return null;
+		}
+		callBack();
+	}
+
+	private IEnumerator DoInitializeCharacter(Action callBack)
+	{
+		List<Character> load_check_list = new List<Character>();
+		int j = 0;
+		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.characterList.Count; j < count; j++)
+		{
+			Character character2 = MonoBehaviourSingleton<StageObjectManager>.I.characterList[j] as Character;
+			if (character2.IsCoopNone() && character2.isLoading && MonoBehaviourSingleton<StageObjectManager>.I.FindNonPlayer(character2.id) == null)
+			{
+				load_check_list.Add(character2);
+			}
+		}
+		int i = 0;
+		for (int len = load_check_list.Count; i < len; i++)
+		{
+			Character character = load_check_list[i];
+			while (character.isLoading)
+			{
+				yield return null;
+			}
+		}
+		callBack();
 	}
 
 	public void SetMapButtonState()
@@ -755,10 +1456,10 @@ public class InGameMain : GameSection
 
 	protected override void OnOpen()
 	{
-		UIExplorePlayerStatusList componentInChildren = this.GetComponentInChildren<UIExplorePlayerStatusList>(true);
-		if (Object.op_Implicit(componentInChildren))
+		UIExplorePlayerStatusList componentInChildren = GetComponentInChildren<UIExplorePlayerStatusList>(includeInactive: true);
+		if ((bool)componentInChildren)
 		{
-			componentInChildren.get_gameObject().SetActive(false);
+			componentInChildren.gameObject.SetActive(value: false);
 		}
 		OnScreenRotate(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
 		base.OnOpen();
@@ -791,7 +1492,7 @@ public class InGameMain : GameSection
 				{
 					if (portalUnlockEvent == null)
 					{
-						portalUnlockEvent = MonoBehaviourSingleton<InGameManager>.I.get_gameObject().AddComponent<PortalUnlockEvent>();
+						portalUnlockEvent = MonoBehaviourSingleton<InGameManager>.I.gameObject.AddComponent<PortalUnlockEvent>();
 						portalUnlockEvent.SetOnEndAllEvent(SetCoopStageReady);
 					}
 					portalUnlockEvent.AddPortal(portalObjectList[i]);
@@ -827,16 +1528,16 @@ public class InGameMain : GameSection
 		int completableDeliveryNum = MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum();
 		int completableEventDeliveryNum = MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableEventDeliveryNum();
 		int num = completableDeliveryNum - completableEventDeliveryNum;
-		SetBadge((Enum)UI.BTN_REQUEST, num, 3, -5, -5, is_scale_normalize: false);
-		SetBadge((Enum)UI.BTN_EVENT, completableEventDeliveryNum, 3, -5, -5, is_scale_normalize: false);
+		SetBadge(UI.BTN_REQUEST, num, SpriteAlignment.TopRight, -5, -5);
+		SetBadge(UI.BTN_EVENT, completableEventDeliveryNum, SpriteAlignment.TopRight, -5, -5);
 		if (LoungeMatchingManager.IsValidInLounge())
 		{
 			int num2 = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetMemberCount() - 1;
-			SetBadge((Enum)UI.BTN_LOUNGE_MEMBER, num2, 3, -5, -5, is_scale_normalize: false);
+			SetBadge(UI.BTN_LOUNGE_MEMBER, num2, SpriteAlignment.TopRight, -5, -5);
 		}
 		if (UIInGameFieldMenu.IsValid() && !UIInGameFieldMenu.I.IsPopMenu())
 		{
-			SetBadge((Enum)UI.BTN_INGAME_MENU, completableDeliveryNum, 3, -5, -5, is_scale_normalize: false);
+			SetBadge(UI.BTN_INGAME_MENU, completableDeliveryNum, SpriteAlignment.TopRight, -5, -5);
 		}
 	}
 
@@ -852,11 +1553,11 @@ public class InGameMain : GameSection
 			TutorialStep4_2();
 			if (!UIInGameFieldMenu.I.IsPopMenu())
 			{
-				SetBadge((Enum)UI.BTN_INGAME_MENU, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum(), 3, -5, -5, is_scale_normalize: false);
+				SetBadge(UI.BTN_INGAME_MENU, MonoBehaviourSingleton<DeliveryManager>.I.GetCompletableDeliveryNum(), SpriteAlignment.TopRight, -5, -5);
 			}
 			else
 			{
-				SetBadge((Enum)UI.BTN_INGAME_MENU, 0, 3, -5, -5, is_scale_normalize: false);
+				SetBadge(UI.BTN_INGAME_MENU, 0, SpriteAlignment.TopRight, -5, -5);
 			}
 		}
 	}
@@ -904,17 +1605,17 @@ public class InGameMain : GameSection
 		if (inGameMembers != null)
 		{
 			MonoBehaviourSingleton<InGameManager>.I.SetIntervalTransferSelf();
-			Object.DestroyImmediate(inGameMembers.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(inGameMembers.gameObject);
 			inGameMembers = null;
 		}
 		if (inGameUIMembers != null)
 		{
-			Object.DestroyImmediate(inGameUIMembers.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(inGameUIMembers.gameObject);
 			inGameUIMembers = null;
 		}
 		if (MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
 		{
-			Object.DestroyImmediate(MonoBehaviourSingleton<DropTargetMarkerManeger>.I);
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<DropTargetMarkerManeger>.I);
 		}
 		if (MonoBehaviourSingleton<EffectManager>.IsValid())
 		{
@@ -930,7 +1631,7 @@ public class InGameMain : GameSection
 		}
 		if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
 		{
-			Object.DestroyImmediate(MonoBehaviourSingleton<AttackColliderManager>.I);
+			UnityEngine.Object.DestroyImmediate(MonoBehaviourSingleton<AttackColliderManager>.I);
 		}
 		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.invitationInGameButton != null)
 		{
@@ -951,9 +1652,7 @@ public class InGameMain : GameSection
 					Network.EventData firstEvent = validBingoDataListInSection[0];
 					List<DeliveryTable.DeliveryData> deliveryTableDataList = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryTableDataList(do_sort: false);
 					List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
-					int num = (from d in deliveryTableDataList
-					where d.IsEvent() && d.eventID == firstEvent.eventId
-					select d).Count();
+					int num = deliveryTableDataList.Where((DeliveryTable.DeliveryData d) => d.IsEvent() && d.eventID == firstEvent.eventId).Count();
 					int num2 = 0;
 					for (int i = 0; i < clearStatusDelivery.Count; i++)
 					{
@@ -1175,9 +1874,11 @@ public class InGameMain : GameSection
 		CloseChatWindow();
 		int num = (int)GameSection.GetEventData();
 		int count = MonoBehaviourSingleton<DeliveryManager>.I.GetNormalDeliveryList(num).Count;
-		List<EventData> list = new List<EventData>();
-		list.Add(new EventData("QUEST_WINDOW", null));
-		list.Add(new EventData("SELECT_NORMAL", null));
+		List<EventData> list = new List<EventData>
+		{
+			new EventData("QUEST_WINDOW", null),
+			new EventData("SELECT_NORMAL", null)
+		};
 		if (count > 0)
 		{
 			list.Add(new EventData("SELECT_AREA", num));
@@ -1205,17 +1906,15 @@ public class InGameMain : GameSection
 		if (!MonoBehaviourSingleton<GameSceneManager>.I.IsExecutionAutoEvent())
 		{
 			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
-			int count = MonoBehaviourSingleton<DeliveryManager>.I.GetEventDeliveryList(fieldMapData.eventId).Count;
-			if (count > 0)
+			if (MonoBehaviourSingleton<DeliveryManager>.I.GetEventDeliveryList(fieldMapData.eventId).Count > 0)
 			{
-				List<Network.EventData> eventList = MonoBehaviourSingleton<QuestManager>.I.eventList;
-				foreach (Network.EventData item in eventList)
+				foreach (Network.EventData @event in MonoBehaviourSingleton<QuestManager>.I.eventList)
 				{
-					if (item.eventId == fieldMapData.eventId)
+					if (@event.eventId == fieldMapData.eventId)
 					{
 						EventData[] autoEvents = new EventData[1]
 						{
-							new EventData("SELECT", item)
+							new EventData("SELECT", @event)
 						};
 						MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
 						break;
@@ -1295,14 +1994,10 @@ public class InGameMain : GameSection
 				}
 			}
 		}
-		else if ((flags & NOTIFY_FLAG.RESET_DARK_MARKET) != (NOTIFY_FLAG)0L)
+		else if ((flags & NOTIFY_FLAG.RESET_DARK_MARKET) != (NOTIFY_FLAG)0L && (int)GoGameTimeManager.GetRemainTime(GameSaveData.instance.resetMarketTime).TotalSeconds > 0)
 		{
-			int num = (int)GoGameTimeManager.GetRemainTime(GameSaveData.instance.resetMarketTime).TotalSeconds;
-			if (num > 0)
-			{
-				GameSaveData.instance.canShowNoteDarkMarket = true;
-				MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 37u), string.Empty);
-			}
+			GameSaveData.instance.canShowNoteDarkMarket = true;
+			MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 37u), "");
 		}
 		if ((flags & NOTIFY_FLAG.LOUNGE_KICKED) != (NOTIFY_FLAG)0L)
 		{
@@ -1338,10 +2033,10 @@ public class InGameMain : GameSection
 
 	private void InitializeExplorePlayerStatuses()
 	{
-		UIExplorePlayerStatusList componentInChildren = this.GetComponentInChildren<UIExplorePlayerStatusList>(true);
-		if (Object.op_Implicit(componentInChildren))
+		UIExplorePlayerStatusList componentInChildren = GetComponentInChildren<UIExplorePlayerStatusList>(includeInactive: true);
+		if ((bool)componentInChildren)
 		{
-			componentInChildren.get_gameObject().SetActive(true);
+			componentInChildren.gameObject.SetActive(value: true);
 			ExploreStatus exploreStatus = MonoBehaviourSingleton<QuestManager>.I.GetExploreStatus();
 			componentInChildren.Initialize(exploreStatus);
 		}
@@ -1356,11 +2051,11 @@ public class InGameMain : GameSection
 		{
 			if (!TutorialStep.HasAllTutorialCompleted())
 			{
-				component.get_gameObject().SetActive(false);
+				component.gameObject.SetActive(value: false);
 			}
 			else if (QuestManager.IsValidInGameSeriesArena())
 			{
-				component.get_gameObject().SetActive(false);
+				component.gameObject.SetActive(value: false);
 			}
 			else if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
 			{
@@ -1371,7 +2066,7 @@ public class InGameMain : GameSection
 			}
 			else
 			{
-				component.get_gameObject().SetActive(false);
+				component.gameObject.SetActive(value: false);
 			}
 		}
 	}
@@ -1390,19 +2085,19 @@ public class InGameMain : GameSection
 		{
 			if ((flag & MainChat.NOTIFY_FLAG.ARRIVED_MESSAGE) != 0)
 			{
-				SetBadge((Enum)UI.BTN_CHAT, MonoBehaviourSingleton<UIManager>.I.mainChat.GetPendingQueueNum(), 1, -5, -5, is_scale_normalize: false);
+				SetBadge(UI.BTN_CHAT, MonoBehaviourSingleton<UIManager>.I.mainChat.GetPendingQueueNum(), SpriteAlignment.TopLeft, -5, -5);
 			}
 			if ((flag & MainChat.NOTIFY_FLAG.CLOSE_WINDOW) != 0)
 			{
-				GetCtrl(UI.BTN_CHAT).get_gameObject().SetActive(true);
+				GetCtrl(UI.BTN_CHAT).gameObject.SetActive(value: true);
 			}
 			if ((flag & MainChat.NOTIFY_FLAG.OPEN_WINDOW) != 0)
 			{
-				GetCtrl(UI.BTN_CHAT).get_gameObject().SetActive(false);
+				GetCtrl(UI.BTN_CHAT).gameObject.SetActive(value: false);
 			}
 			if ((flag & MainChat.NOTIFY_FLAG.OPEN_WINDOW_INPUT_ONLY) != 0)
 			{
-				GetCtrl(UI.BTN_CHAT).get_gameObject().SetActive(false);
+				GetCtrl(UI.BTN_CHAT).gameObject.SetActive(value: false);
 			}
 		}
 	}
@@ -1416,17 +2111,17 @@ public class InGameMain : GameSection
 	{
 		bool isPortrait = SpecialDeviceManager.IsPortrait;
 		Transform ctrl = GetCtrl(UI.WGT_CHAT_PARENT);
-		if (!Object.op_Implicit(ctrl))
+		if (!ctrl)
 		{
 			return;
 		}
-		UIWidget component = ctrl.get_gameObject().GetComponent<UIWidget>();
-		if (!Object.op_Implicit(component))
+		UIWidget component = ctrl.gameObject.GetComponent<UIWidget>();
+		if (!component)
 		{
 			return;
 		}
 		UIStaticPanelChanger staticPanelChanger = ctrl.GetComponentInParent<UIStaticPanelChanger>();
-		if (!Object.op_Implicit(staticPanelChanger))
+		if (!staticPanelChanger)
 		{
 			return;
 		}
@@ -1465,7 +2160,7 @@ public class InGameMain : GameSection
 
 	private void OnQuery_EVOLVE()
 	{
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && !object.ReferenceEquals(MonoBehaviourSingleton<StageObjectManager>.I.self, null) && MonoBehaviourSingleton<UIPlayerStatus>.I.IsEnableWeaponChangeButton() && MonoBehaviourSingleton<StageObjectManager>.I.self.ExecEvolve())
+		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && (object)MonoBehaviourSingleton<StageObjectManager>.I.self != null && MonoBehaviourSingleton<UIPlayerStatus>.I.IsEnableWeaponChangeButton() && MonoBehaviourSingleton<StageObjectManager>.I.self.ExecEvolve())
 		{
 			if (MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
 			{

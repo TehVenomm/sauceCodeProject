@@ -86,7 +86,7 @@ public class LoungeMemberInfo : FriendInfo
 		dataFollower = followLoungeMember.follower;
 		dataFollowing = followLoungeMember.following;
 		nowSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-		isFollowerList = Object.op_Implicit(Object.FindObjectOfType(typeof(FriendFollowerList)));
+		isFollowerList = UnityEngine.Object.FindObjectOfType(typeof(FriendFollowerList));
 		InitializeBase();
 	}
 
@@ -107,24 +107,23 @@ public class LoungeMemberInfo : FriendInfo
 			DispatchEvent("NON_TARGET_PLAYER");
 			return;
 		}
-		int ownerUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetOwnerUserId();
-		bool is_visible = ownerUserId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-		SetActive((Enum)UI.BTN_KICK, is_visible);
+		bool is_visible = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetOwnerUserId() == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
+		SetActive(UI.BTN_KICK, is_visible);
 		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus != null)
 		{
-			SetActive((Enum)UI.BTN_JOIN, is_visible: false);
+			SetActive(UI.BTN_JOIN, is_visible: false);
 			status = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[data.userId];
 			switch (status.GetStatus())
 			{
 			case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
 			case LoungeMemberStatus.MEMBER_STATUS.FIELD:
-				SetActive((Enum)UI.BTN_JOIN, is_visible: true);
+				SetActive(UI.BTN_JOIN, is_visible: true);
 				break;
 			case LoungeMemberStatus.MEMBER_STATUS.QUEST:
-				SetActive((Enum)UI.BTN_JOIN, !CheckRush(status.questId));
+				SetActive(UI.BTN_JOIN, !CheckRush(status.questId));
 				break;
 			case LoungeMemberStatus.MEMBER_STATUS.ARENA:
-				SetActive((Enum)UI.BTN_JOIN, is_visible: false);
+				SetActive(UI.BTN_JOIN, is_visible: false);
 				break;
 			}
 			if (data != null && data.userClanData != null)
@@ -212,8 +211,7 @@ public class LoungeMemberInfo : FriendInfo
 
 	private bool CheckExistTarget()
 	{
-		PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(data.userId);
-		return slotInfoByUserId != null;
+		return MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(data.userId) != null;
 	}
 
 	private void SetFollowLoungeCharaInfo(int userId, bool follow)
@@ -357,8 +355,7 @@ public class LoungeMemberInfo : FriendInfo
 		{
 			if (isSuccess)
 			{
-				IHomeManager currentIHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
-				currentIHomeManager.IHomePeople.CastToLoungePeople()?.DestroyLoungePlayer(data.userId);
+				GameSceneGlobalSettings.GetCurrentIHomeManager().IHomePeople.CastToLoungePeople()?.DestroyLoungePlayer(data.userId);
 			}
 			GameSection.ResumeEvent(isSuccess);
 		}, data.userId);

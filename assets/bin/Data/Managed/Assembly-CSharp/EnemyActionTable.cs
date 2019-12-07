@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class EnemyActionTable : Singleton<EnemyActionTable>, IDataTable
 {
@@ -9,7 +8,7 @@ public class EnemyActionTable : Singleton<EnemyActionTable>, IDataTable
 	{
 		public class RegionFlag
 		{
-			public string name = string.Empty;
+			public string name = "";
 
 			public int flag;
 		}
@@ -78,8 +77,8 @@ public class EnemyActionTable : Singleton<EnemyActionTable>, IDataTable
 				empty = empty + "," + placeWeights[k];
 			}
 			empty = empty + "," + nearMultiPlayerWeight;
-			empty = empty + "," + isUse;
-			empty = empty + "," + isRotate;
+			empty = empty + "," + isUse.ToString();
+			empty = empty + "," + isRotate.ToString();
 			empty = empty + "," + atkRange;
 			empty = empty + "," + afterWaitTime;
 			for (int l = 0; l < 3; l++)
@@ -174,12 +173,6 @@ public class EnemyActionTable : Singleton<EnemyActionTable>, IDataTable
 	};
 
 	private UIntKeyTable<List<EnemyActionData>> dataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<EnemyActionData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<EnemyActionData> _003C_003Ef__mg_0024cache1;
 
 	public static ActionTypeInfo GetActionTypeInfo(string name)
 	{

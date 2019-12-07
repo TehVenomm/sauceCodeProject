@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Grid")]
@@ -56,15 +55,6 @@ public class UIGrid : UIWidgetContainer
 
 	protected bool mInitDone;
 
-	[CompilerGenerated]
-	private static Comparison<Transform> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static Comparison<Transform> _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static Comparison<Transform> _003C_003Ef__mg_0024cache2;
-
 	public bool repositionNow
 	{
 		set
@@ -72,19 +62,19 @@ public class UIGrid : UIWidgetContainer
 			if (value)
 			{
 				mReposition = true;
-				this.set_enabled(true);
+				base.enabled = true;
 			}
 		}
 	}
 
 	public List<Transform> GetChildList()
 	{
-		Transform transform = this.get_transform();
+		Transform transform = base.transform;
 		List<Transform> list = new List<Transform>();
-		for (int i = 0; i < transform.get_childCount(); i++)
+		for (int i = 0; i < transform.childCount; i++)
 		{
 			Transform child = transform.GetChild(i);
-			if (!hideInactive || (Object.op_Implicit(child) && NGUITools.GetActive(child.get_gameObject())))
+			if (!hideInactive || ((bool)child && NGUITools.GetActive(child.gameObject)))
 			{
 				list.Add(child);
 			}
@@ -118,7 +108,11 @@ public class UIGrid : UIWidgetContainer
 	public Transform GetChild(int index)
 	{
 		List<Transform> childList = GetChildList();
-		return (index >= childList.Count) ? null : childList[index];
+		if (index >= childList.Count)
+		{
+			return null;
+		}
+		return childList[index];
 	}
 
 	public int GetIndex(Transform trans)
@@ -135,7 +129,7 @@ public class UIGrid : UIWidgetContainer
 	{
 		if (trans != null)
 		{
-			trans.set_parent(this.get_transform());
+			trans.parent = base.transform;
 			ResetPosition(GetChildList());
 		}
 	}
@@ -154,7 +148,7 @@ public class UIGrid : UIWidgetContainer
 	protected virtual void Init()
 	{
 		mInitDone = true;
-		mPanel = NGUITools.FindInParents<UIPanel>(this.get_gameObject());
+		mPanel = NGUITools.FindInParents<UIPanel>(base.gameObject);
 	}
 
 	protected virtual void Start()
@@ -167,18 +161,18 @@ public class UIGrid : UIWidgetContainer
 		animateSmoothly = false;
 		Reposition();
 		animateSmoothly = flag;
-		this.set_enabled(false);
+		base.enabled = false;
 	}
 
 	protected virtual void Update()
 	{
 		Reposition();
-		this.set_enabled(false);
+		base.enabled = false;
 	}
 
 	private void OnValidate()
 	{
-		if (!Application.get_isPlaying() && NGUITools.GetActive(this))
+		if (!Application.isPlaying && NGUITools.GetActive(this))
 		{
 			Reposition();
 		}
@@ -186,31 +180,17 @@ public class UIGrid : UIWidgetContainer
 
 	public static int SortByName(Transform a, Transform b)
 	{
-		return string.Compare(a.get_name(), b.get_name());
+		return string.Compare(a.name, b.name);
 	}
 
 	public static int SortHorizontal(Transform a, Transform b)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 localPosition = a.get_localPosition();
-		ref float x = ref localPosition.x;
-		Vector3 localPosition2 = b.get_localPosition();
-		return x.CompareTo(localPosition2.x);
+		return a.localPosition.x.CompareTo(b.localPosition.x);
 	}
 
 	public static int SortVertical(Transform a, Transform b)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 localPosition = b.get_localPosition();
-		ref float y = ref localPosition.y;
-		Vector3 localPosition2 = a.get_localPosition();
-		return y.CompareTo(localPosition2.y);
+		return b.localPosition.y.CompareTo(a.localPosition.y);
 	}
 
 	protected virtual void Sort(List<Transform> list)
@@ -220,7 +200,7 @@ public class UIGrid : UIWidgetContainer
 	[ContextMenu("Execute")]
 	public virtual void Reposition()
 	{
-		if (Application.get_isPlaying() && !mInitDone && NGUITools.GetActive(this.get_gameObject()))
+		if (Application.isPlaying && !mInitDone && NGUITools.GetActive(base.gameObject))
 		{
 			Init();
 		}
@@ -249,7 +229,7 @@ public class UIGrid : UIWidgetContainer
 	{
 		if (mPanel != null)
 		{
-			mPanel.ConstrainTargetToBounds(this.get_transform(), immediate: true);
+			mPanel.ConstrainTargetToBounds(base.transform, immediate: true);
 			UIScrollView component = mPanel.GetComponent<UIScrollView>();
 			if (component != null)
 			{
@@ -260,54 +240,42 @@ public class UIGrid : UIWidgetContainer
 
 	protected virtual void ResetPosition(List<Transform> list)
 	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
 		mReposition = false;
 		int num = 0;
 		int num2 = 0;
 		int num3 = 0;
 		int num4 = 0;
-		Transform transform = this.get_transform();
+		Transform transform = base.transform;
 		int i = 0;
 		for (int count = list.Count; i < count; i++)
 		{
-			Transform val = list[i];
-			Vector3 val2 = val.get_localPosition();
-			float z = val2.z;
+			Transform transform2 = list[i];
+			Vector3 vector = transform2.localPosition;
+			float z = vector.z;
 			if (arrangement == Arrangement.CellSnap)
 			{
 				if (cellWidth > 0f)
 				{
-					val2.x = Mathf.Round(val2.x / cellWidth) * cellWidth;
+					vector.x = Mathf.Round(vector.x / cellWidth) * cellWidth;
 				}
 				if (cellHeight > 0f)
 				{
-					val2.y = Mathf.Round(val2.y / cellHeight) * cellHeight;
+					vector.y = Mathf.Round(vector.y / cellHeight) * cellHeight;
 				}
 			}
 			else
 			{
-				val2 = ((arrangement != 0) ? new Vector3(cellWidth * (float)num2, (0f - cellHeight) * (float)num, z) : new Vector3(cellWidth * (float)num, (0f - cellHeight) * (float)num2, z));
+				vector = ((arrangement == Arrangement.Horizontal) ? new Vector3(cellWidth * (float)num, (0f - cellHeight) * (float)num2, z) : new Vector3(cellWidth * (float)num2, (0f - cellHeight) * (float)num, z));
 			}
-			if (animateSmoothly && Application.get_isPlaying())
+			if (animateSmoothly && Application.isPlaying)
 			{
-				SpringPosition springPosition = SpringPosition.Begin(val.get_gameObject(), val2, 15f);
+				SpringPosition springPosition = SpringPosition.Begin(transform2.gameObject, vector, 15f);
 				springPosition.updateScrollView = true;
 				springPosition.ignoreTimeScale = true;
 			}
 			else
 			{
-				val.set_localPosition(val2);
+				transform2.localPosition = vector;
 			}
 			num3 = Mathf.Max(num3, num);
 			num4 = Mathf.Max(num4, num2);
@@ -334,24 +302,20 @@ public class UIGrid : UIWidgetContainer
 			num5 = Mathf.Lerp(0f, (float)num4 * cellWidth, pivotOffset.x);
 			num6 = Mathf.Lerp((float)(-num3) * cellHeight, 0f, pivotOffset.y);
 		}
-		for (int j = 0; j < transform.get_childCount(); j++)
+		for (int j = 0; j < transform.childCount; j++)
 		{
 			Transform child = transform.GetChild(j);
 			SpringPosition component = child.GetComponent<SpringPosition>();
 			if (component != null)
 			{
-				ref Vector3 target = ref component.target;
-				target.x -= num5;
-				ref Vector3 target2 = ref component.target;
-				target2.y -= num6;
+				component.target.x -= num5;
+				component.target.y -= num6;
+				continue;
 			}
-			else
-			{
-				Vector3 localPosition = child.get_localPosition();
-				localPosition.x -= num5;
-				localPosition.y -= num6;
-				child.set_localPosition(localPosition);
-			}
+			Vector3 localPosition = child.localPosition;
+			localPosition.x -= num5;
+			localPosition.y -= num6;
+			child.localPosition = localPosition;
 		}
 	}
 }

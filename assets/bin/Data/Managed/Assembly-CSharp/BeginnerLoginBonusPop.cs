@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -37,9 +36,9 @@ public class BeginnerLoginBonusPop : GameSection
 
 	public override void Initialize()
 	{
-		SetFullScreenButton((Enum)UI.BTN_SKIP_FULL_SCREEN);
-		InitTween((Enum)UI.OBJ_IMG_ROOT);
-		this.StartCoroutine(DoInitialize());
+		SetFullScreenButton(UI.BTN_SKIP_FULL_SCREEN);
+		InitTween(UI.OBJ_IMG_ROOT);
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -57,9 +56,7 @@ public class BeginnerLoginBonusPop : GameSection
 		{
 			yield return null;
 		}
-		Transform texture = GetCtrl(UI.TEX);
-		UITexture uiTexture = texture.GetComponent<UITexture>();
-		Texture image = uiTexture.mainTexture = (lo_image.loadedObject as Texture);
+		Texture texture2 = GetCtrl(UI.TEX).GetComponent<UITexture>().mainTexture = (lo_image.loadedObject as Texture);
 		base.Initialize();
 	}
 
@@ -70,16 +67,16 @@ public class BeginnerLoginBonusPop : GameSection
 			switch (currentState)
 			{
 			case State.START:
-				this.StartCoroutine(StartAnimation());
+				StartCoroutine(StartAnimation());
 				stateInitialized = true;
 				break;
 			case State.SHOW:
 				showTimer = 0f;
-				this.StartCoroutine(ShowCountdown());
+				StartCoroutine(ShowCountdown());
 				stateInitialized = true;
 				break;
 			case State.END:
-				this.StartCoroutine(EndAnimation());
+				StartCoroutine(EndAnimation());
 				stateInitialized = true;
 				break;
 			}
@@ -94,13 +91,13 @@ public class BeginnerLoginBonusPop : GameSection
 
 	private IEnumerator StartAnimation()
 	{
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, is_visible: false);
+		SetActive(UI.BTN_SKIP_FULL_SCREEN, is_visible: false);
 		bool wait = true;
 		PlayAudio(AUDIO.START, 1.3f);
-		PlayTween((Enum)UI.OBJ_IMG_ROOT, forward: true, (EventDelegate.Callback)delegate
+		PlayTween(UI.OBJ_IMG_ROOT, forward: true, delegate
 		{
 			wait = false;
-		}, is_input_block: true, 0);
+		});
 		while (wait)
 		{
 			yield return 0;
@@ -114,10 +111,10 @@ public class BeginnerLoginBonusPop : GameSection
 		Transform skip = GetCtrl(UI.BTN_SKIP_FULL_SCREEN);
 		while (wait)
 		{
-			showTimer += Time.get_deltaTime();
-			if (1.2f < showTimer && !skip.get_gameObject().get_activeSelf())
+			showTimer += Time.deltaTime;
+			if (1.2f < showTimer && !skip.gameObject.activeSelf)
 			{
-				SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, is_visible: true);
+				SetActive(UI.BTN_SKIP_FULL_SCREEN, is_visible: true);
 			}
 			if (skipRequest && 1.2f < showTimer)
 			{
@@ -131,10 +128,10 @@ public class BeginnerLoginBonusPop : GameSection
 	private IEnumerator EndAnimation()
 	{
 		bool wait = true;
-		PlayTween((Enum)UI.OBJ_IMG_ROOT, forward: false, (EventDelegate.Callback)delegate
+		PlayTween(UI.OBJ_IMG_ROOT, forward: false, delegate
 		{
 			wait = false;
-		}, is_input_block: true, 0);
+		});
 		while (wait)
 		{
 			yield return 0;

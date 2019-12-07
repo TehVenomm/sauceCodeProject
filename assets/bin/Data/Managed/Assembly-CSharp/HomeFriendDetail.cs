@@ -144,17 +144,16 @@ public class HomeFriendDetail : QuestRoomUserInfoDetail
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		if (!(loader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && CanRotateSection())
 		{
-			loader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
+			loader.transform.Rotate(GameDefine.GetCharaRotateVector(touch_info));
 		}
 	}
 
 	private bool CanRotateSection()
 	{
 		string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-		if (currentSectionName != null && currentSectionName == "HomeFriendDetail")
+		if (currentSectionName == "HomeFriendDetail")
 		{
 			return true;
 		}

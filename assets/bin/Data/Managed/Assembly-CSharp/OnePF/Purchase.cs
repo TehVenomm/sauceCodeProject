@@ -97,15 +97,16 @@ namespace OnePF
 
 		public static Purchase CreateFromSku(string sku)
 		{
-			return CreateFromSku(sku, string.Empty);
+			return CreateFromSku(sku, "");
 		}
 
 		public static Purchase CreateFromSku(string sku, string developerPayload)
 		{
-			Purchase purchase = new Purchase();
-			purchase.Sku = sku;
-			purchase.DeveloperPayload = developerPayload;
-			return purchase;
+			return new Purchase
+			{
+				Sku = sku,
+				DeveloperPayload = developerPayload
+			};
 		}
 
 		public override string ToString()
@@ -115,20 +116,21 @@ namespace OnePF
 
 		public string Serialize()
 		{
-			JSON jSON = new JSON();
-			jSON["itemType"] = ItemType;
-			jSON["orderId"] = OrderId;
-			jSON["packageName"] = PackageName;
-			jSON["sku"] = Sku;
-			jSON["purchaseTime"] = PurchaseTime;
-			jSON["purchaseState"] = PurchaseState;
-			jSON["developerPayload"] = DeveloperPayload;
-			jSON["token"] = Token;
-			jSON["originalJson"] = OriginalJson;
-			jSON["signature"] = Signature;
-			jSON["appstoreName"] = AppstoreName;
-			jSON["receipt"] = Receipt;
-			return jSON.serialized;
+			return new JSON
+			{
+				["itemType"] = ItemType,
+				["orderId"] = OrderId,
+				["packageName"] = PackageName,
+				["sku"] = Sku,
+				["purchaseTime"] = PurchaseTime,
+				["purchaseState"] = PurchaseState,
+				["developerPayload"] = DeveloperPayload,
+				["token"] = Token,
+				["originalJson"] = OriginalJson,
+				["signature"] = Signature,
+				["appstoreName"] = AppstoreName,
+				["receipt"] = Receipt
+			}.serialized;
 		}
 	}
 }

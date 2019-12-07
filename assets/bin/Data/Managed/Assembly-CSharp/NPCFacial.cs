@@ -89,23 +89,18 @@ public class NPCFacial : MonoBehaviour
 		set;
 	}
 
-	public NPCFacial()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		if (faceRenderer != null)
 		{
-			Material[] materials = faceRenderer.get_materials();
+			Material[] materials = faceRenderer.materials;
 			if (eyeMaterial != null)
 			{
-				eyeMaterial = Array.Find(materials, (Material o) => o.get_name().StartsWith(eyeMaterial.get_name()));
+				eyeMaterial = Array.Find(materials, (Material o) => o.name.StartsWith(eyeMaterial.name));
 			}
 			if (mouthMaterial != null)
 			{
-				mouthMaterial = Array.Find(materials, (Material o) => o.get_name().StartsWith(mouthMaterial.get_name()));
+				mouthMaterial = Array.Find(materials, (Material o) => o.name.StartsWith(mouthMaterial.name));
 			}
 			if (eyeMaterial != null && eyeTextures[1] != null)
 			{
@@ -124,15 +119,11 @@ public class NPCFacial : MonoBehaviour
 
 	private void UpdateAnim()
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
 		if (animNode == null || !enableAnim)
 		{
 			return;
 		}
-		Vector3 localPosition = animNode.get_localPosition();
+		Vector3 localPosition = animNode.localPosition;
 		TYPE tYPE = (TYPE)(localPosition.y * 100f + 0.001f);
 		TYPE tYPE2 = (TYPE)(localPosition.z * 100f + 0.001f);
 		if (lastAnimEyeType != tYPE && Mathf.Abs(lastAnimValue.y - localPosition.y) < 0.0001f)
@@ -168,13 +159,13 @@ public class NPCFacial : MonoBehaviour
 		{
 			return;
 		}
-		eyeBlinkTime -= Time.get_deltaTime();
+		eyeBlinkTime -= Time.deltaTime;
 		if (eyeBlinkTime <= 0f)
 		{
-			if (eyeMaterial.get_mainTexture() != eyeTextures[1])
+			if (eyeMaterial.mainTexture != eyeTextures[1])
 			{
 				SetTexture(eyeMaterial, eyeTextures, TYPE.CLOSE);
-				eyeBlinkTime = Random.Range(0.1f, 0.3f);
+				eyeBlinkTime = UnityEngine.Random.Range(0.1f, 0.3f);
 			}
 			else
 			{
@@ -193,16 +184,16 @@ public class NPCFacial : MonoBehaviour
 			{
 				num = 0;
 			}
-			Texture val = textures[num];
-			if (!(val == null))
+			Texture texture = textures[num];
+			if (!(texture == null))
 			{
-				material.set_mainTexture(val);
+				material.mainTexture = texture;
 			}
 		}
 	}
 
 	private void ResetEyeBlinkTime()
 	{
-		eyeBlinkTime = Random.Range(3f, 6f);
+		eyeBlinkTime = UnityEngine.Random.Range(3f, 6f);
 	}
 }

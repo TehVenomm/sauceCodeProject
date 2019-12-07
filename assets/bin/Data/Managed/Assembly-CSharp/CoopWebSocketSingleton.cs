@@ -154,39 +154,27 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 		private set;
 	}
 
-	public CoopWebSocketSingleton()
-	{
-		serializer = CreatePacketSerializer();
-	}
-
 	public static bool IsValidConnected()
 	{
-		int result;
 		if (MonoBehaviourSingleton<U>.IsValid())
 		{
-			U i = MonoBehaviourSingleton<U>.I;
-			result = (i.IsConnected() ? 1 : 0);
+			return MonoBehaviourSingleton<U>.I.IsConnected();
 		}
-		else
-		{
-			result = 0;
-		}
-		return (byte)result != 0;
+		return false;
 	}
 
 	public static bool IsValidOpen()
 	{
-		int result;
 		if (MonoBehaviourSingleton<U>.IsValid())
 		{
-			U i = MonoBehaviourSingleton<U>.I;
-			result = (i.IsOpen() ? 1 : 0);
+			return MonoBehaviourSingleton<U>.I.IsOpen();
 		}
-		else
-		{
-			result = 0;
-		}
-		return (byte)result != 0;
+		return false;
+	}
+
+	public CoopWebSocketSingleton()
+	{
+		serializer = CreatePacketSerializer();
 	}
 
 	protected override void Awake()
@@ -218,7 +206,11 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 
 	public bool IsOpen()
 	{
-		return sock != null && sock.IsOpen;
+		if (sock == null)
+		{
+			return false;
+		}
+		return sock.IsOpen;
 	}
 
 	public void Connect()
@@ -251,10 +243,10 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 			ClearLastPacketReceivedTime();
 			isConnect = true;
 			CurrentConnectionStatus = CONNECTION_STATUS.CONNECTED;
-			packetSendTime = Time.get_time();
-			this.StartCoroutine("Heartbeat");
+			packetSendTime = Time.time;
+			StartCoroutine("Heartbeat");
 			ReceivePacketAction = (Action<CoopPacket>)Delegate.Combine(ReceivePacketAction, new Action<CoopPacket>(CheckAndSendAck));
-			this.StartCoroutine("ResendMonitor");
+			StartCoroutine("ResendMonitor");
 			ReceivePacketAction = (Action<CoopPacket>)Delegate.Combine(ReceivePacketAction, new Action<CoopPacket>(RemoveResendPacket));
 		});
 		WebSocket webSocket2 = sock;
@@ -381,7 +373,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 		{
 			sock.Send(stream.ToString());
 		}
-		packetSendTime = Time.get_time();
+		packetSendTime = Time.time;
 	}
 
 	private void ReceivePacket(PacketStream stream)
@@ -397,7 +389,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 		}
 		if (coopPacket.model == null || coopPacket.header == null)
 		{
-			Debug.LogWarning((object)"Packet model or header is null");
+			Debug.LogWarning("Packet model or header is null");
 			return;
 		}
 		if (coopPacket.packetType != PACKET_TYPE.HEARTBEAT && coopPacket.packetType != PACKET_TYPE.ACK)
@@ -416,8 +408,8 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 	{
 		while (IsConnected())
 		{
-			double diffSeconds = (DateTime.Now - lastPacketReceivedTime).TotalSeconds;
-			if (10.0 <= diffSeconds)
+			double totalSeconds = (DateTime.Now - lastPacketReceivedTime).TotalSeconds;
+			if (10.0 <= totalSeconds)
 			{
 				OnHeartbeatDisconnected();
 				ClearLastPacketReceivedTime();
@@ -456,7 +448,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 		packet.model.r = true;
 		ResendPacket resendPacket = new ResendPacket();
 		resendPacket.resendCount = 0;
-		resendPacket.lastSendTime = Time.get_time();
+		resendPacket.lastSendTime = Time.time;
 		resendPacket.onReceiveAck = onReceiveAck;
 		resendPacket.onPreResend = onPreResend;
 		resendPacket.packet = packet;
@@ -529,7 +521,7 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 		{
 			while (IsConnected())
 			{
-				float now = Time.get_time();
+				float now = Time.time;
 				List<uint> delete_keys = new List<uint>();
 				resendPackets.ForEach(delegate(ResendPacket resend)
 				{
@@ -565,12 +557,12 @@ public class CoopWebSocketSingleton<U> : MonoBehaviourSingleton<U> where U : Coo
 				{
 					resendPackets.Remove(key);
 				});
-				yield return (object)new WaitForSeconds(resendInterval);
+				yield return new WaitForSeconds(resendInterval);
 			}
 		}
 		finally
 		{
-			base._003C_003E__Finally0();
+			LogDebug("End the coroutine resending packets.");
 		}
 	}
 

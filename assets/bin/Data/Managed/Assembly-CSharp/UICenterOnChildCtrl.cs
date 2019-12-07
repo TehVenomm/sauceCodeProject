@@ -18,15 +18,9 @@ public class UICenterOnChildCtrl : MonoBehaviour
 		private set;
 	}
 
-	public UICenterOnChildCtrl()
-		: this()
-	{
-	}
-
 	public static UICenterOnChildCtrl Get(GameObject go)
 	{
-		UICenterOnChild component = go.GetComponent<UICenterOnChild>();
-		if (component == null)
+		if (go.GetComponent<UICenterOnChild>() == null)
 		{
 			Log.Error("UICenterOnChild is not found.");
 			return null;
@@ -43,7 +37,7 @@ public class UICenterOnChildCtrl : MonoBehaviour
 	{
 		if (centerOnChild == null)
 		{
-			centerOnChild = this.GetComponent<UICenterOnChild>();
+			centerOnChild = GetComponent<UICenterOnChild>();
 			if (centerOnChild == null)
 			{
 				Object.Destroy(this);
@@ -62,9 +56,9 @@ public class UICenterOnChildCtrl : MonoBehaviour
 
 	private void OnCenter(GameObject go)
 	{
-		if (go.get_transform() != lastTarget)
+		if (go.transform != lastTarget)
 		{
-			lastTarget = go.get_transform();
+			lastTarget = go.transform;
 			if (onCenter != null)
 			{
 				onCenter(go);

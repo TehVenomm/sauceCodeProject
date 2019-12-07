@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 public class GachaSearchEnemyTable : Singleton<GachaSearchEnemyTable>, IDataTable
 {
@@ -69,9 +68,6 @@ public class GachaSearchEnemyTable : Singleton<GachaSearchEnemyTable>, IDataTabl
 	}
 
 	private UIntKeyTable<GachaSearchEnemyData> gachaSearchEnemyDataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<GachaSearchEnemyData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string csv_text)
 	{

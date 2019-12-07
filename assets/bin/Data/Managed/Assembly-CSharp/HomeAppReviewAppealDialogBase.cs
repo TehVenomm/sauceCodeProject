@@ -78,8 +78,7 @@ public class HomeAppReviewAppealDialogBase : GameSection
 		int num = StarButtons.Length;
 		for (int i = 0; i < num; i++)
 		{
-			UIButton component = GetCtrl(StarButtons[i]).GetComponent<UIButton>();
-			component.isEnabled = false;
+			GetCtrl(StarButtons[i]).GetComponent<UIButton>().isEnabled = false;
 		}
 	}
 
@@ -112,7 +111,7 @@ public class HomeAppReviewAppealDialogBase : GameSection
 		int num = StarButtons.Length;
 		for (int i = 0; i < num; i++)
 		{
-			SetEvent((Enum)StarButtons[i], "STAR", i);
+			SetEvent(StarButtons[i], "STAR", i);
 		}
 	}
 }

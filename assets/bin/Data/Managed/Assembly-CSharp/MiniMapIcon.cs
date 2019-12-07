@@ -22,10 +22,10 @@ public class MiniMapIcon : MonoBehaviour
 		{
 			if (_isOver != value)
 			{
-				icon.get_gameObject().SetActive(!value);
+				icon.gameObject.SetActive(!value);
 				if (overIcon != null)
 				{
-					overIcon.get_gameObject().SetActive(value);
+					overIcon.gameObject.SetActive(value);
 				}
 			}
 			_isOver = value;
@@ -44,24 +44,19 @@ public class MiniMapIcon : MonoBehaviour
 		set;
 	}
 
-	public MiniMapIcon()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		icon.get_gameObject().SetActive(true);
+		icon.gameObject.SetActive(value: true);
 		if (overIcon != null)
 		{
-			overIcon.get_gameObject().SetActive(false);
+			overIcon.gameObject.SetActive(value: false);
 		}
-		_trasform = this.get_transform();
+		_trasform = base.transform;
 	}
 
 	public virtual void Initialize(MonoBehaviour root_object)
 	{
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 		isInitialized = true;
 	}
 
@@ -79,34 +74,26 @@ public class MiniMapIcon : MonoBehaviour
 
 	public void UpdateIcon(float center_x, float center_y, float scaling, float ui_radius)
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 		if (!(target == null))
 		{
 			if (isInitialized)
 			{
-				this.get_gameObject().SetActive(true);
+				base.gameObject.SetActive(value: true);
 				isInitialized = false;
 			}
 			bool flag = true;
-			Vector3 localPosition = target.get_position();
+			Vector3 localPosition = target.position;
 			localPosition.x = (localPosition.x - center_x) * scaling;
 			localPosition.y = (localPosition.z - center_y) * scaling;
 			localPosition.z = 0f;
-			if (localPosition.get_magnitude() > ui_radius)
+			if (localPosition.magnitude > ui_radius)
 			{
 				flag = false;
-				localPosition = localPosition.get_normalized() * ui_radius;
+				localPosition = localPosition.normalized * ui_radius;
 			}
 			isOver = !flag;
-			_trasform.set_localPosition(localPosition);
-			_trasform.set_localRotation(Quaternion.Inverse(_trasform.get_parent().get_localRotation()));
+			_trasform.localPosition = localPosition;
+			_trasform.localRotation = Quaternion.Inverse(_trasform.parent.localRotation);
 		}
 	}
 }

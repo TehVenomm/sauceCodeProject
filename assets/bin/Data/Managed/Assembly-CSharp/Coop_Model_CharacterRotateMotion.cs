@@ -9,8 +9,7 @@ public class Coop_Model_CharacterRotateMotion : Coop_Model_ObjectSyncPositionBas
 
 	public override bool IsHandleable(StageObject owner)
 	{
-		Character character = owner as Character;
-		if (!character.IsChangeableAction(Character.ACTION_ID.ROTATE))
+		if (!(owner as Character).IsChangeableAction(Character.ACTION_ID.ROTATE))
 		{
 			return false;
 		}

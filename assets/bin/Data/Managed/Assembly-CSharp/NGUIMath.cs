@@ -14,7 +14,15 @@ public static class NGUIMath
 	[DebuggerStepThrough]
 	public static int ClampIndex(int val, int max)
 	{
-		return (val >= 0) ? ((val >= max) ? (max - 1) : val) : 0;
+		if (val >= 0)
+		{
+			if (val >= max)
+			{
+				return max - 1;
+			}
+			return val;
+		}
+		return 0;
 	}
 
 	[DebuggerHidden]
@@ -149,22 +157,15 @@ public static class NGUIMath
 	[DebuggerStepThrough]
 	public static int ColorToInt(Color c)
 	{
-		int num = 0;
-		num |= Mathf.RoundToInt(c.r * 255f) << 24;
-		num |= Mathf.RoundToInt(c.g * 255f) << 16;
-		num |= Mathf.RoundToInt(c.b * 255f) << 8;
-		return num | Mathf.RoundToInt(c.a * 255f);
+		return 0 | (Mathf.RoundToInt(c.r * 255f) << 24) | (Mathf.RoundToInt(c.g * 255f) << 16) | (Mathf.RoundToInt(c.b * 255f) << 8) | Mathf.RoundToInt(c.a * 255f);
 	}
 
 	[DebuggerHidden]
 	[DebuggerStepThrough]
 	public static Color IntToColor(int val)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 		float num = 0.003921569f;
-		Color black = Color.get_black();
+		Color black = Color.black;
 		black.r = num * (float)((val >> 24) & 0xFF);
 		black.g = num * (float)((val >> 16) & 0xFF);
 		black.b = num * (float)((val >> 8) & 0xFF);
@@ -176,7 +177,7 @@ public static class NGUIMath
 	[DebuggerStepThrough]
 	public static string IntToBinary(int val, int bits)
 	{
-		string text = string.Empty;
+		string text = "";
 		int num = bits;
 		while (num > 0)
 		{
@@ -184,7 +185,7 @@ public static class NGUIMath
 			{
 				text += " ";
 			}
-			text += (((val & (1 << --num)) == 0) ? '0' : '1');
+			text += (((val & (1 << --num)) != 0) ? '1' : '0').ToString();
 		}
 		return text;
 	}
@@ -193,80 +194,64 @@ public static class NGUIMath
 	[DebuggerStepThrough]
 	public static Color HexToColor(uint val)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		return IntToColor((int)val);
 	}
 
 	public static Rect ConvertToTexCoords(Rect rect, int width, int height)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 		Rect result = rect;
 		if ((float)width != 0f && (float)height != 0f)
 		{
-			result.set_xMin(rect.get_xMin() / (float)width);
-			result.set_xMax(rect.get_xMax() / (float)width);
-			result.set_yMin(1f - rect.get_yMax() / (float)height);
-			result.set_yMax(1f - rect.get_yMin() / (float)height);
+			result.xMin = rect.xMin / (float)width;
+			result.xMax = rect.xMax / (float)width;
+			result.yMin = 1f - rect.yMax / (float)height;
+			result.yMax = 1f - rect.yMin / (float)height;
 		}
 		return result;
 	}
 
 	public static Rect ConvertToPixels(Rect rect, int width, int height, bool round)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
 		Rect result = rect;
 		if (round)
 		{
-			result.set_xMin((float)Mathf.RoundToInt(rect.get_xMin() * (float)width));
-			result.set_xMax((float)Mathf.RoundToInt(rect.get_xMax() * (float)width));
-			result.set_yMin((float)Mathf.RoundToInt((1f - rect.get_yMax()) * (float)height));
-			result.set_yMax((float)Mathf.RoundToInt((1f - rect.get_yMin()) * (float)height));
+			result.xMin = Mathf.RoundToInt(rect.xMin * (float)width);
+			result.xMax = Mathf.RoundToInt(rect.xMax * (float)width);
+			result.yMin = Mathf.RoundToInt((1f - rect.yMax) * (float)height);
+			result.yMax = Mathf.RoundToInt((1f - rect.yMin) * (float)height);
 		}
 		else
 		{
-			result.set_xMin(rect.get_xMin() * (float)width);
-			result.set_xMax(rect.get_xMax() * (float)width);
-			result.set_yMin((1f - rect.get_yMax()) * (float)height);
-			result.set_yMax((1f - rect.get_yMin()) * (float)height);
+			result.xMin = rect.xMin * (float)width;
+			result.xMax = rect.xMax * (float)width;
+			result.yMin = (1f - rect.yMax) * (float)height;
+			result.yMax = (1f - rect.yMin) * (float)height;
 		}
 		return result;
 	}
 
 	public static Rect MakePixelPerfect(Rect rect)
 	{
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		rect.set_xMin((float)Mathf.RoundToInt(rect.get_xMin()));
-		rect.set_yMin((float)Mathf.RoundToInt(rect.get_yMin()));
-		rect.set_xMax((float)Mathf.RoundToInt(rect.get_xMax()));
-		rect.set_yMax((float)Mathf.RoundToInt(rect.get_yMax()));
+		rect.xMin = Mathf.RoundToInt(rect.xMin);
+		rect.yMin = Mathf.RoundToInt(rect.yMin);
+		rect.xMax = Mathf.RoundToInt(rect.xMax);
+		rect.yMax = Mathf.RoundToInt(rect.yMax);
 		return rect;
 	}
 
 	public static Rect MakePixelPerfect(Rect rect, int width, int height)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 		rect = ConvertToPixels(rect, width, height, round: true);
-		rect.set_xMin((float)Mathf.RoundToInt(rect.get_xMin()));
-		rect.set_yMin((float)Mathf.RoundToInt(rect.get_yMin()));
-		rect.set_xMax((float)Mathf.RoundToInt(rect.get_xMax()));
-		rect.set_yMax((float)Mathf.RoundToInt(rect.get_yMax()));
+		rect.xMin = Mathf.RoundToInt(rect.xMin);
+		rect.yMin = Mathf.RoundToInt(rect.yMin);
+		rect.xMax = Mathf.RoundToInt(rect.xMax);
+		rect.yMax = Mathf.RoundToInt(rect.yMax);
 		return ConvertToTexCoords(rect, width, height);
 	}
 
 	public static Vector2 ConstrainRect(Vector2 minRect, Vector2 maxRect, Vector2 minArea, Vector2 maxArea)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-		Vector2 zero = Vector2.get_zero();
+		Vector2 zero = Vector2.zero;
 		float num = maxRect.x - minRect.x;
 		float num2 = maxRect.y - minRect.y;
 		float num3 = maxArea.x - minArea.x;
@@ -304,140 +289,104 @@ public static class NGUIMath
 
 	public static Bounds CalculateAbsoluteWidgetBounds(Transform trans)
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
 		if (trans != null)
 		{
 			UIWidget[] componentsInChildren = trans.GetComponentsInChildren<UIWidget>();
 			if (componentsInChildren.Length == 0)
 			{
-				return new Bounds(trans.get_position(), Vector3.get_zero());
+				return new Bounds(trans.position, Vector3.zero);
 			}
-			Vector3 val = default(Vector3);
-			val._002Ector(float.MaxValue, float.MaxValue, float.MaxValue);
-			Vector3 val2 = default(Vector3);
-			val2._002Ector(float.MinValue, float.MinValue, float.MinValue);
+			Vector3 center = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+			Vector3 point = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 			int i = 0;
 			for (int num = componentsInChildren.Length; i < num; i++)
 			{
 				UIWidget uIWidget = componentsInChildren[i];
-				if (!uIWidget.get_enabled())
+				if (!uIWidget.enabled)
 				{
 					continue;
 				}
 				Vector3[] worldCorners = uIWidget.worldCorners;
 				for (int j = 0; j < 4; j++)
 				{
-					Vector3 val3 = worldCorners[j];
-					if (val3.x > val2.x)
+					Vector3 vector = worldCorners[j];
+					if (vector.x > point.x)
 					{
-						val2.x = val3.x;
+						point.x = vector.x;
 					}
-					if (val3.y > val2.y)
+					if (vector.y > point.y)
 					{
-						val2.y = val3.y;
+						point.y = vector.y;
 					}
-					if (val3.z > val2.z)
+					if (vector.z > point.z)
 					{
-						val2.z = val3.z;
+						point.z = vector.z;
 					}
-					if (val3.x < val.x)
+					if (vector.x < center.x)
 					{
-						val.x = val3.x;
+						center.x = vector.x;
 					}
-					if (val3.y < val.y)
+					if (vector.y < center.y)
 					{
-						val.y = val3.y;
+						center.y = vector.y;
 					}
-					if (val3.z < val.z)
+					if (vector.z < center.z)
 					{
-						val.z = val3.z;
+						center.z = vector.z;
 					}
 				}
 			}
-			Bounds result = default(Bounds);
-			result._002Ector(val, Vector3.get_zero());
-			result.Encapsulate(val2);
+			Bounds result = new Bounds(center, Vector3.zero);
+			result.Encapsulate(point);
 			return result;
 		}
-		return new Bounds(Vector3.get_zero(), Vector3.get_zero());
+		return new Bounds(Vector3.zero, Vector3.zero);
 	}
 
 	public static Bounds CalculateRelativeWidgetBounds(Transform trans)
 	{
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
 		return CalculateRelativeWidgetBounds(trans, trans, considerInactive: false);
 	}
 
 	public static Bounds CalculateRelativeWidgetBounds(Transform trans, bool considerInactive)
 	{
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
 		return CalculateRelativeWidgetBounds(trans, trans, considerInactive);
 	}
 
 	public static Bounds CalculateRelativeWidgetBounds(Transform relativeTo, Transform content)
 	{
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
 		return CalculateRelativeWidgetBounds(relativeTo, content, considerInactive: false);
 	}
 
 	public static Bounds CalculateRelativeWidgetBounds(Transform relativeTo, Transform content, bool considerInactive, bool considerChildren = true)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 		if (content != null && relativeTo != null)
 		{
 			bool isSet = false;
-			Matrix4x4 toLocal = relativeTo.get_worldToLocalMatrix();
-			Vector3 vMin = default(Vector3);
-			vMin._002Ector(float.MaxValue, float.MaxValue, float.MaxValue);
-			Vector3 vMax = default(Vector3);
-			vMax._002Ector(float.MinValue, float.MinValue, float.MinValue);
+			Matrix4x4 toLocal = relativeTo.worldToLocalMatrix;
+			Vector3 vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+			Vector3 vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 			CalculateRelativeWidgetBounds(content, considerInactive, isRoot: true, ref toLocal, ref vMin, ref vMax, ref isSet, considerChildren);
 			if (isSet)
 			{
-				Bounds result = default(Bounds);
-				result._002Ector(vMin, Vector3.get_zero());
+				Bounds result = new Bounds(vMin, Vector3.zero);
 				result.Encapsulate(vMax);
 				return result;
 			}
 		}
-		return new Bounds(Vector3.get_zero(), Vector3.get_zero());
+		return new Bounds(Vector3.zero, Vector3.zero);
 	}
 
 	[DebuggerHidden]
 	[DebuggerStepThrough]
 	private static void CalculateRelativeWidgetBounds(Transform content, bool considerInactive, bool isRoot, ref Matrix4x4 toLocal, ref Vector3 vMin, ref Vector3 vMax, ref bool isSet, bool considerChildren)
 	{
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-		if (content == null || (!considerInactive && !NGUITools.GetActive(content.get_gameObject())))
+		if (content == null || (!considerInactive && !NGUITools.GetActive(content.gameObject)))
 		{
 			return;
 		}
-		UIPanel uIPanel = (!isRoot) ? content.GetComponent<UIPanel>() : null;
-		if (uIPanel != null && !uIPanel.get_enabled())
+		UIPanel uIPanel = isRoot ? null : content.GetComponent<UIPanel>();
+		if (uIPanel != null && !uIPanel.enabled)
 		{
 			return;
 		}
@@ -446,65 +395,65 @@ public static class NGUIMath
 			Vector3[] worldCorners = uIPanel.worldCorners;
 			for (int i = 0; i < 4; i++)
 			{
-				Vector3 val = toLocal.MultiplyPoint3x4(worldCorners[i]);
-				if (val.x > vMax.x)
+				Vector3 vector = toLocal.MultiplyPoint3x4(worldCorners[i]);
+				if (vector.x > vMax.x)
 				{
-					vMax.x = val.x;
+					vMax.x = vector.x;
 				}
-				if (val.y > vMax.y)
+				if (vector.y > vMax.y)
 				{
-					vMax.y = val.y;
+					vMax.y = vector.y;
 				}
-				if (val.z > vMax.z)
+				if (vector.z > vMax.z)
 				{
-					vMax.z = val.z;
+					vMax.z = vector.z;
 				}
-				if (val.x < vMin.x)
+				if (vector.x < vMin.x)
 				{
-					vMin.x = val.x;
+					vMin.x = vector.x;
 				}
-				if (val.y < vMin.y)
+				if (vector.y < vMin.y)
 				{
-					vMin.y = val.y;
+					vMin.y = vector.y;
 				}
-				if (val.z < vMin.z)
+				if (vector.z < vMin.z)
 				{
-					vMin.z = val.z;
+					vMin.z = vector.z;
 				}
 				isSet = true;
 			}
 			return;
 		}
 		UIWidget component = content.GetComponent<UIWidget>();
-		if (component != null && component.get_enabled())
+		if (component != null && component.enabled)
 		{
 			Vector3[] worldCorners2 = component.worldCorners;
 			for (int j = 0; j < 4; j++)
 			{
-				Vector3 val2 = toLocal.MultiplyPoint3x4(worldCorners2[j]);
-				if (val2.x > vMax.x)
+				Vector3 vector2 = toLocal.MultiplyPoint3x4(worldCorners2[j]);
+				if (vector2.x > vMax.x)
 				{
-					vMax.x = val2.x;
+					vMax.x = vector2.x;
 				}
-				if (val2.y > vMax.y)
+				if (vector2.y > vMax.y)
 				{
-					vMax.y = val2.y;
+					vMax.y = vector2.y;
 				}
-				if (val2.z > vMax.z)
+				if (vector2.z > vMax.z)
 				{
-					vMax.z = val2.z;
+					vMax.z = vector2.z;
 				}
-				if (val2.x < vMin.x)
+				if (vector2.x < vMin.x)
 				{
-					vMin.x = val2.x;
+					vMin.x = vector2.x;
 				}
-				if (val2.y < vMin.y)
+				if (vector2.y < vMin.y)
 				{
-					vMin.y = val2.y;
+					vMin.y = vector2.y;
 				}
-				if (val2.z < vMin.z)
+				if (vector2.z < vMin.z)
 				{
-					vMin.z = val2.z;
+					vMin.z = vector2.z;
 				}
 				isSet = true;
 			}
@@ -514,7 +463,7 @@ public static class NGUIMath
 			}
 		}
 		int k = 0;
-		for (int childCount = content.get_childCount(); k < childCount; k++)
+		for (int childCount = content.childCount; k < childCount; k++)
 		{
 			CalculateRelativeWidgetBounds(content.GetChild(k), considerInactive, isRoot: false, ref toLocal, ref vMin, ref vMax, ref isSet, considerChildren: true);
 		}
@@ -522,46 +471,30 @@ public static class NGUIMath
 
 	public static Vector3 SpringDampen(ref Vector3 velocity, float strength, float deltaTime)
 	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 		if (deltaTime > 1f)
 		{
 			deltaTime = 1f;
 		}
-		float num = 1f - strength * 0.001f;
-		int num2 = Mathf.RoundToInt(deltaTime * 1000f);
-		float num3 = Mathf.Pow(num, (float)num2);
-		Vector3 val = velocity * ((num3 - 1f) / Mathf.Log(num));
-		velocity *= num3;
-		return val * 0.06f;
+		float f = 1f - strength * 0.001f;
+		int num = Mathf.RoundToInt(deltaTime * 1000f);
+		float num2 = Mathf.Pow(f, num);
+		Vector3 a = velocity * ((num2 - 1f) / Mathf.Log(f));
+		velocity *= num2;
+		return a * 0.06f;
 	}
 
 	public static Vector2 SpringDampen(ref Vector2 velocity, float strength, float deltaTime)
 	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 		if (deltaTime > 1f)
 		{
 			deltaTime = 1f;
 		}
-		float num = 1f - strength * 0.001f;
-		int num2 = Mathf.RoundToInt(deltaTime * 1000f);
-		float num3 = Mathf.Pow(num, (float)num2);
-		Vector2 val = velocity * ((num3 - 1f) / Mathf.Log(num));
-		velocity *= num3;
-		return val * 0.06f;
+		float f = 1f - strength * 0.001f;
+		int num = Mathf.RoundToInt(deltaTime * 1000f);
+		float num2 = Mathf.Pow(f, num);
+		Vector2 a = velocity * ((num2 - 1f) / Mathf.Log(f));
+		velocity *= num2;
+		return a * 0.06f;
 	}
 
 	public static float SpringLerp(float strength, float deltaTime)
@@ -597,25 +530,16 @@ public static class NGUIMath
 
 	public static Vector2 SpringLerp(Vector2 from, Vector2 to, float strength, float deltaTime)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		return Vector2.Lerp(from, to, SpringLerp(strength, deltaTime));
 	}
 
 	public static Vector3 SpringLerp(Vector3 from, Vector3 to, float strength, float deltaTime)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		return Vector3.Lerp(from, to, SpringLerp(strength, deltaTime));
 	}
 
 	public static Quaternion SpringLerp(Quaternion from, Quaternion to, float strength, float deltaTime)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 		return Quaternion.Slerp(from, to, SpringLerp(strength, deltaTime));
 	}
 
@@ -631,88 +555,33 @@ public static class NGUIMath
 
 	private static float DistancePointToLineSegment(Vector2 point, Vector2 a, Vector2 b)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		Vector2 val = b - a;
-		float sqrMagnitude = val.get_sqrMagnitude();
+		float sqrMagnitude = (b - a).sqrMagnitude;
 		if (sqrMagnitude == 0f)
 		{
-			Vector2 val2 = point - a;
-			return val2.get_magnitude();
+			return (point - a).magnitude;
 		}
 		float num = Vector2.Dot(point - a, b - a) / sqrMagnitude;
 		if (num < 0f)
 		{
-			Vector2 val3 = point - a;
-			return val3.get_magnitude();
+			return (point - a).magnitude;
 		}
 		if (num > 1f)
 		{
-			Vector2 val4 = point - b;
-			return val4.get_magnitude();
+			return (point - b).magnitude;
 		}
-		Vector2 val5 = a + num * (b - a);
-		Vector2 val6 = point - val5;
-		return val6.get_magnitude();
+		Vector2 b2 = a + num * (b - a);
+		return (point - b2).magnitude;
 	}
 
 	public static float DistanceToRectangle(Vector2[] screenPoints, Vector2 mousePos)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
 		bool flag = false;
 		int val = 4;
 		for (int i = 0; i < 5; i++)
 		{
-			Vector3 val2 = Vector2.op_Implicit(screenPoints[RepeatIndex(i, 4)]);
-			Vector3 val3 = Vector2.op_Implicit(screenPoints[RepeatIndex(val, 4)]);
-			if (val2.y > mousePos.y != val3.y > mousePos.y && mousePos.x < (val3.x - val2.x) * (mousePos.y - val2.y) / (val3.y - val2.y) + val2.x)
+			Vector3 vector = screenPoints[RepeatIndex(i, 4)];
+			Vector3 vector2 = screenPoints[RepeatIndex(val, 4)];
+			if (vector.y > mousePos.y != vector2.y > mousePos.y && mousePos.x < (vector2.x - vector.x) * (mousePos.y - vector.y) / (vector2.y - vector.y) + vector.x)
 			{
 				flag = !flag;
 			}
@@ -723,9 +592,9 @@ public static class NGUIMath
 			float num = -1f;
 			for (int j = 0; j < 4; j++)
 			{
-				Vector3 val4 = Vector2.op_Implicit(screenPoints[j]);
-				Vector3 val5 = Vector2.op_Implicit(screenPoints[RepeatIndex(j + 1, 4)]);
-				float num2 = DistancePointToLineSegment(mousePos, Vector2.op_Implicit(val4), Vector2.op_Implicit(val5));
+				Vector3 v = screenPoints[j];
+				Vector3 v2 = screenPoints[RepeatIndex(j + 1, 4)];
+				float num2 = DistancePointToLineSegment(mousePos, v, v2);
 				if (num2 < num || num < 0f)
 				{
 					num = num2;
@@ -738,25 +607,17 @@ public static class NGUIMath
 
 	public static float DistanceToRectangle(Vector3[] worldPoints, Vector2 mousePos, Camera cam)
 	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		Vector2[] array = (Vector2[])new Vector2[4];
+		Vector2[] array = new Vector2[4];
 		for (int i = 0; i < 4; i++)
 		{
-			array[i] = Vector2.op_Implicit(cam.WorldToScreenPoint(worldPoints[i]));
+			array[i] = cam.WorldToScreenPoint(worldPoints[i]);
 		}
 		return DistanceToRectangle(array, mousePos);
 	}
 
 	public static Vector2 GetPivotOffset(UIWidget.Pivot pv)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		Vector2 zero = Vector2.get_zero();
+		Vector2 zero = Vector2.zero;
 		switch (pv)
 		{
 		case UIWidget.Pivot.Top:
@@ -836,31 +697,26 @@ public static class NGUIMath
 
 	public static void MoveRect(UIRect rect, float x, float y)
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		int num = Mathf.FloorToInt(x + 0.5f);
 		int num2 = Mathf.FloorToInt(y + 0.5f);
-		Transform cachedTransform = rect.cachedTransform;
-		Transform obj = cachedTransform;
-		obj.set_localPosition(obj.get_localPosition() + new Vector3((float)num, (float)num2));
+		rect.cachedTransform.localPosition += new Vector3(num, num2);
 		int num3 = 0;
-		if (Object.op_Implicit(rect.leftAnchor.target))
+		if ((bool)rect.leftAnchor.target)
 		{
 			num3++;
 			rect.leftAnchor.absolute += num;
 		}
-		if (Object.op_Implicit(rect.rightAnchor.target))
+		if ((bool)rect.rightAnchor.target)
 		{
 			num3++;
 			rect.rightAnchor.absolute += num;
 		}
-		if (Object.op_Implicit(rect.bottomAnchor.target))
+		if ((bool)rect.bottomAnchor.target)
 		{
 			num3++;
 			rect.bottomAnchor.absolute += num2;
 		}
-		if (Object.op_Implicit(rect.topAnchor.target))
+		if ((bool)rect.topAnchor.target)
 		{
 			num3++;
 			rect.topAnchor.absolute += num2;
@@ -878,11 +734,6 @@ public static class NGUIMath
 
 	public static void ResizeWidget(UIWidget w, UIWidget.Pivot pivot, float x, float y, int minWidth, int minHeight, int maxWidth, int maxHeight)
 	{
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 		if (pivot == UIWidget.Pivot.Center)
 		{
 			int num = Mathf.RoundToInt(x - (float)w.width);
@@ -897,36 +748,35 @@ public static class NGUIMath
 			}
 			return;
 		}
-		Vector3 val = default(Vector3);
-		val._002Ector(x, y);
-		val = Quaternion.Inverse(w.cachedTransform.get_localRotation()) * val;
+		Vector3 point = new Vector3(x, y);
+		point = Quaternion.Inverse(w.cachedTransform.localRotation) * point;
 		switch (pivot)
 		{
 		case UIWidget.Pivot.Center:
 			break;
 		case UIWidget.Pivot.BottomLeft:
-			AdjustWidget(w, val.x, val.y, 0f, 0f, minWidth, minHeight, maxWidth, maxHeight);
+			AdjustWidget(w, point.x, point.y, 0f, 0f, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 		case UIWidget.Pivot.Left:
-			AdjustWidget(w, val.x, 0f, 0f, 0f, minWidth, minHeight, maxWidth, maxHeight);
+			AdjustWidget(w, point.x, 0f, 0f, 0f, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 		case UIWidget.Pivot.TopLeft:
-			AdjustWidget(w, val.x, 0f, 0f, val.y, minWidth, minHeight, maxWidth, maxHeight);
+			AdjustWidget(w, point.x, 0f, 0f, point.y, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 		case UIWidget.Pivot.Top:
-			AdjustWidget(w, 0f, 0f, 0f, val.y, minWidth, minHeight, maxWidth, maxHeight);
+			AdjustWidget(w, 0f, 0f, 0f, point.y, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 		case UIWidget.Pivot.TopRight:
-			AdjustWidget(w, 0f, 0f, val.x, val.y, minWidth, minHeight, maxWidth, maxHeight);
+			AdjustWidget(w, 0f, 0f, point.x, point.y, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 		case UIWidget.Pivot.Right:
-			AdjustWidget(w, 0f, 0f, val.x, 0f, minWidth, minHeight, maxWidth, maxHeight);
+			AdjustWidget(w, 0f, 0f, point.x, 0f, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 		case UIWidget.Pivot.BottomRight:
-			AdjustWidget(w, 0f, val.y, val.x, 0f, minWidth, minHeight, maxWidth, maxHeight);
+			AdjustWidget(w, 0f, point.y, point.x, 0f, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 		case UIWidget.Pivot.Bottom:
-			AdjustWidget(w, 0f, val.y, 0f, 0f, minWidth, minHeight, maxWidth, maxHeight);
+			AdjustWidget(w, 0f, point.y, 0f, 0f, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 		}
 	}
@@ -943,58 +793,9 @@ public static class NGUIMath
 
 	public static void AdjustWidget(UIWidget w, float left, float bottom, float right, float top, int minWidth, int minHeight, int maxWidth, int maxHeight)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_060c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0611: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0613: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0618: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0619: Unknown result type (might be due to invalid IL or missing references)
-		//IL_061b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0620: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0625: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0628: Unknown result type (might be due to invalid IL or missing references)
 		Vector2 pivotOffset = w.pivotOffset;
 		Transform cachedTransform = w.cachedTransform;
-		Quaternion localRotation = cachedTransform.get_localRotation();
+		Quaternion localRotation = cachedTransform.localRotation;
 		int num = Mathf.FloorToInt(left + 0.5f);
 		int num2 = Mathf.FloorToInt(bottom + 0.5f);
 		int num3 = Mathf.FloorToInt(right + 0.5f);
@@ -1009,65 +810,65 @@ public static class NGUIMath
 			num2 = num2 >> 1 << 1;
 			num4 = num4 >> 1 << 1;
 		}
-		Vector3 val = localRotation * new Vector3((float)num, (float)num4);
-		Vector3 val2 = localRotation * new Vector3((float)num3, (float)num4);
-		Vector3 val3 = localRotation * new Vector3((float)num, (float)num2);
-		Vector3 val4 = localRotation * new Vector3((float)num3, (float)num2);
-		Vector3 val5 = localRotation * new Vector3((float)num, 0f);
-		Vector3 val6 = localRotation * new Vector3((float)num3, 0f);
-		Vector3 val7 = localRotation * new Vector3(0f, (float)num4);
-		Vector3 val8 = localRotation * new Vector3(0f, (float)num2);
-		Vector3 zero = Vector3.get_zero();
+		Vector3 vector = localRotation * new Vector3(num, num4);
+		Vector3 vector2 = localRotation * new Vector3(num3, num4);
+		Vector3 vector3 = localRotation * new Vector3(num, num2);
+		Vector3 vector4 = localRotation * new Vector3(num3, num2);
+		Vector3 vector5 = localRotation * new Vector3(num, 0f);
+		Vector3 vector6 = localRotation * new Vector3(num3, 0f);
+		Vector3 vector7 = localRotation * new Vector3(0f, num4);
+		Vector3 vector8 = localRotation * new Vector3(0f, num2);
+		Vector3 zero = Vector3.zero;
 		if (pivotOffset.x == 0f && pivotOffset.y == 1f)
 		{
-			zero.x = val.x;
-			zero.y = val.y;
+			zero.x = vector.x;
+			zero.y = vector.y;
 		}
 		else if (pivotOffset.x == 1f && pivotOffset.y == 0f)
 		{
-			zero.x = val4.x;
-			zero.y = val4.y;
+			zero.x = vector4.x;
+			zero.y = vector4.y;
 		}
 		else if (pivotOffset.x == 0f && pivotOffset.y == 0f)
 		{
-			zero.x = val3.x;
-			zero.y = val3.y;
+			zero.x = vector3.x;
+			zero.y = vector3.y;
 		}
 		else if (pivotOffset.x == 1f && pivotOffset.y == 1f)
 		{
-			zero.x = val2.x;
-			zero.y = val2.y;
+			zero.x = vector2.x;
+			zero.y = vector2.y;
 		}
 		else if (pivotOffset.x == 0f && pivotOffset.y == 0.5f)
 		{
-			zero.x = val5.x + (val7.x + val8.x) * 0.5f;
-			zero.y = val5.y + (val7.y + val8.y) * 0.5f;
+			zero.x = vector5.x + (vector7.x + vector8.x) * 0.5f;
+			zero.y = vector5.y + (vector7.y + vector8.y) * 0.5f;
 		}
 		else if (pivotOffset.x == 1f && pivotOffset.y == 0.5f)
 		{
-			zero.x = val6.x + (val7.x + val8.x) * 0.5f;
-			zero.y = val6.y + (val7.y + val8.y) * 0.5f;
+			zero.x = vector6.x + (vector7.x + vector8.x) * 0.5f;
+			zero.y = vector6.y + (vector7.y + vector8.y) * 0.5f;
 		}
 		else if (pivotOffset.x == 0.5f && pivotOffset.y == 1f)
 		{
-			zero.x = val7.x + (val5.x + val6.x) * 0.5f;
-			zero.y = val7.y + (val5.y + val6.y) * 0.5f;
+			zero.x = vector7.x + (vector5.x + vector6.x) * 0.5f;
+			zero.y = vector7.y + (vector5.y + vector6.y) * 0.5f;
 		}
 		else if (pivotOffset.x == 0.5f && pivotOffset.y == 0f)
 		{
-			zero.x = val8.x + (val5.x + val6.x) * 0.5f;
-			zero.y = val8.y + (val5.y + val6.y) * 0.5f;
+			zero.x = vector8.x + (vector5.x + vector6.x) * 0.5f;
+			zero.y = vector8.y + (vector5.y + vector6.y) * 0.5f;
 		}
 		else if (pivotOffset.x == 0.5f && pivotOffset.y == 0.5f)
 		{
-			zero.x = (val5.x + val6.x + val7.x + val8.x) * 0.5f;
-			zero.y = (val7.y + val8.y + val5.y + val6.y) * 0.5f;
+			zero.x = (vector5.x + vector6.x + vector7.x + vector8.x) * 0.5f;
+			zero.y = (vector7.y + vector8.y + vector5.y + vector6.y) * 0.5f;
 		}
 		minWidth = Mathf.Max(minWidth, w.minWidth);
 		minHeight = Mathf.Max(minHeight, w.minHeight);
 		int num5 = w.width + num3 - num;
 		int num6 = w.height + num4 - num2;
-		Vector3 zero2 = Vector3.get_zero();
+		Vector3 zero2 = Vector3.zero;
 		int num7 = num5;
 		if (num5 < minWidth)
 		{
@@ -1081,11 +882,11 @@ public static class NGUIMath
 		{
 			if (num != 0)
 			{
-				zero2.x -= Mathf.Lerp((float)(num7 - num5), 0f, pivotOffset.x);
+				zero2.x -= Mathf.Lerp(num7 - num5, 0f, pivotOffset.x);
 			}
 			else
 			{
-				zero2.x += Mathf.Lerp(0f, (float)(num7 - num5), pivotOffset.x);
+				zero2.x += Mathf.Lerp(0f, num7 - num5, pivotOffset.x);
 			}
 			num5 = num7;
 		}
@@ -1102,11 +903,11 @@ public static class NGUIMath
 		{
 			if (num2 != 0)
 			{
-				zero2.y -= Mathf.Lerp((float)(num8 - num6), 0f, pivotOffset.y);
+				zero2.y -= Mathf.Lerp(num8 - num6, 0f, pivotOffset.y);
 			}
 			else
 			{
-				zero2.y += Mathf.Lerp(0f, (float)(num8 - num6), pivotOffset.y);
+				zero2.y += Mathf.Lerp(0f, num8 - num6, pivotOffset.y);
 			}
 			num6 = num8;
 		}
@@ -1118,27 +919,26 @@ public static class NGUIMath
 		{
 			num6 = num6 >> 1 << 1;
 		}
-		Vector3 localPosition = cachedTransform.get_localPosition() + zero + localRotation * zero2;
-		cachedTransform.set_localPosition(localPosition);
+		Vector3 vector10 = cachedTransform.localPosition = cachedTransform.localPosition + zero + localRotation * zero2;
 		w.SetDimensions(num5, num6);
 		if (w.isAnchored)
 		{
-			cachedTransform = cachedTransform.get_parent();
-			float num9 = localPosition.x - pivotOffset.x * (float)num5;
-			float num10 = localPosition.y - pivotOffset.y * (float)num6;
-			if (Object.op_Implicit(w.leftAnchor.target))
+			cachedTransform = cachedTransform.parent;
+			float num9 = vector10.x - pivotOffset.x * (float)num5;
+			float num10 = vector10.y - pivotOffset.y * (float)num6;
+			if ((bool)w.leftAnchor.target)
 			{
 				w.leftAnchor.SetHorizontal(cachedTransform, num9);
 			}
-			if (Object.op_Implicit(w.rightAnchor.target))
+			if ((bool)w.rightAnchor.target)
 			{
 				w.rightAnchor.SetHorizontal(cachedTransform, num9 + (float)num5);
 			}
-			if (Object.op_Implicit(w.bottomAnchor.target))
+			if ((bool)w.bottomAnchor.target)
 			{
 				w.bottomAnchor.SetVertical(cachedTransform, num10);
 			}
-			if (Object.op_Implicit(w.topAnchor.target))
+			if ((bool)w.topAnchor.target)
 			{
 				w.topAnchor.SetVertical(cachedTransform, num10 + (float)num6);
 			}
@@ -1147,17 +947,11 @@ public static class NGUIMath
 
 	public static int AdjustByDPI(float height)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Invalid comparison between Unknown and I4
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Invalid comparison between Unknown and I4
-		float num = Screen.get_dpi();
-		RuntimePlatform platform = Application.get_platform();
+		float num = Screen.dpi;
+		RuntimePlatform platform = Application.platform;
 		if (num == 0f)
 		{
-			num = (((int)platform != 11 && (int)platform != 8) ? 96f : 160f);
+			num = ((platform == RuntimePlatform.Android || platform == RuntimePlatform.IPhonePlayer) ? 160f : 96f);
 		}
 		int num2 = Mathf.RoundToInt(height * (96f / num));
 		if ((num2 & 1) == 1)
@@ -1169,70 +963,43 @@ public static class NGUIMath
 
 	public static Vector2 ScreenToPixels(Vector2 pos, Transform relativeTo)
 	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		int layer = relativeTo.get_gameObject().get_layer();
-		Camera val = NGUITools.FindCameraForLayer(layer);
-		if (val == null)
+		int layer = relativeTo.gameObject.layer;
+		Camera camera = NGUITools.FindCameraForLayer(layer);
+		if (camera == null)
 		{
-			Debug.LogWarning((object)("No camera found for layer " + layer));
+			UnityEngine.Debug.LogWarning("No camera found for layer " + layer);
 			return pos;
 		}
-		Vector3 val2 = val.ScreenToWorldPoint(Vector2.op_Implicit(pos));
-		return Vector2.op_Implicit(relativeTo.InverseTransformPoint(val2));
+		Vector3 position = camera.ScreenToWorldPoint(pos);
+		return relativeTo.InverseTransformPoint(position);
 	}
 
 	public static Vector2 ScreenToParentPixels(Vector2 pos, Transform relativeTo)
 	{
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		int layer = relativeTo.get_gameObject().get_layer();
-		if (relativeTo.get_parent() != null)
+		int layer = relativeTo.gameObject.layer;
+		if (relativeTo.parent != null)
 		{
-			relativeTo = relativeTo.get_parent();
+			relativeTo = relativeTo.parent;
 		}
-		Camera val = NGUITools.FindCameraForLayer(layer);
-		if (val == null)
+		Camera camera = NGUITools.FindCameraForLayer(layer);
+		if (camera == null)
 		{
-			Debug.LogWarning((object)("No camera found for layer " + layer));
+			UnityEngine.Debug.LogWarning("No camera found for layer " + layer);
 			return pos;
 		}
-		Vector3 val2 = val.ScreenToWorldPoint(Vector2.op_Implicit(pos));
-		return Vector2.op_Implicit((!(relativeTo != null)) ? val2 : relativeTo.InverseTransformPoint(val2));
+		Vector3 vector = camera.ScreenToWorldPoint(pos);
+		return (relativeTo != null) ? relativeTo.InverseTransformPoint(vector) : vector;
 	}
 
 	public static Vector3 WorldToLocalPoint(Vector3 worldPos, Camera worldCam, Camera uiCam, Transform relativeTo)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 		worldPos = worldCam.WorldToViewportPoint(worldPos);
 		worldPos = uiCam.ViewportToWorldPoint(worldPos);
 		if (relativeTo == null)
 		{
 			return worldPos;
 		}
-		relativeTo = relativeTo.get_parent();
+		relativeTo = relativeTo.parent;
 		if (relativeTo == null)
 		{
 			return worldPos;
@@ -1242,39 +1009,28 @@ public static class NGUIMath
 
 	public static void OverlayPosition(this Transform trans, Vector3 worldPos, Camera worldCam, Camera myCam)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		worldPos = worldCam.WorldToViewportPoint(worldPos);
 		worldPos = myCam.ViewportToWorldPoint(worldPos);
-		Transform parent = trans.get_parent();
-		trans.set_localPosition((!(parent != null)) ? worldPos : parent.InverseTransformPoint(worldPos));
+		Transform parent = trans.parent;
+		trans.localPosition = ((parent != null) ? parent.InverseTransformPoint(worldPos) : worldPos);
 	}
 
 	public static void OverlayPosition(this Transform trans, Vector3 worldPos, Camera worldCam)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		Camera val = NGUITools.FindCameraForLayer(trans.get_gameObject().get_layer());
-		if (val != null)
+		Camera camera = NGUITools.FindCameraForLayer(trans.gameObject.layer);
+		if (camera != null)
 		{
-			trans.OverlayPosition(worldPos, worldCam, val);
+			trans.OverlayPosition(worldPos, worldCam, camera);
 		}
 	}
 
 	public static void OverlayPosition(this Transform trans, Transform target)
 	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		Camera val = NGUITools.FindCameraForLayer(trans.get_gameObject().get_layer());
-		Camera val2 = NGUITools.FindCameraForLayer(target.get_gameObject().get_layer());
-		if (val != null && val2 != null)
+		Camera camera = NGUITools.FindCameraForLayer(trans.gameObject.layer);
+		Camera camera2 = NGUITools.FindCameraForLayer(target.gameObject.layer);
+		if (camera != null && camera2 != null)
 		{
-			trans.OverlayPosition(target.get_position(), val2, val);
+			trans.OverlayPosition(target.position, camera2, camera);
 		}
 	}
 }

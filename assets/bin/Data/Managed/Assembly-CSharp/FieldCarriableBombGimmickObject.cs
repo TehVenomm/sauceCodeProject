@@ -61,13 +61,10 @@ public class FieldCarriableBombGimmickObject : FieldCarriableGimmickObject
 
 	protected override void OnEndCarry()
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		base.OnEndCarry();
 		timer = 0f;
-		EffectManager.OneShot(kPutEffectName, GetTransform().get_position(), GetTransform().get_rotation());
-		SoundManager.PlayOneShotSE(kPutSEId, GetTransform().get_position());
+		EffectManager.OneShot(kPutEffectName, GetTransform().position, GetTransform().rotation);
+		SoundManager.PlayOneShotSE(kPutSEId, GetTransform().position);
 		if (fuseEffectCtrl != null)
 		{
 			fuseEffectCtrl.Play(kFuseEffectStateEnd);
@@ -78,7 +75,7 @@ public class FieldCarriableBombGimmickObject : FieldCarriableGimmickObject
 	{
 		if (fuseEffectCtrl != null)
 		{
-			EffectManager.ReleaseEffect(fuseEffectCtrl.get_gameObject());
+			EffectManager.ReleaseEffect(fuseEffectCtrl.gameObject);
 			fuseEffectCtrl = null;
 		}
 		base.RequestDestroy();
@@ -88,7 +85,7 @@ public class FieldCarriableBombGimmickObject : FieldCarriableGimmickObject
 	{
 		if (!base.isCarrying && hasDeploied)
 		{
-			timer += Time.get_deltaTime();
+			timer += Time.deltaTime;
 		}
 		if (timer >= kTimerLimit)
 		{
@@ -98,15 +95,13 @@ public class FieldCarriableBombGimmickObject : FieldCarriableGimmickObject
 
 	protected void Explosion()
 	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_gameObject().get_activeSelf() && !(ownerPlayer == null))
+		if (base.gameObject.activeSelf && !(ownerPlayer == null))
 		{
 			AttackInfo attackInfo = ownerPlayer.FindAttackInfo(attackInfoName);
 			if (attackInfo != null)
 			{
 				SoundManager.PlayOneShotSE(kBombSEId);
-				AnimEventShot.Create(ownerPlayer, attackInfo, GetTransform().get_position(), GetTransform().get_rotation());
+				AnimEventShot.Create(ownerPlayer, attackInfo, GetTransform().position, GetTransform().rotation);
 			}
 			RequestDestroy();
 		}

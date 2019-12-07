@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class ItemDetailEquipAttachSkill : SkillInfoBase
@@ -67,14 +66,13 @@ public class ItemDetailEquipAttachSkill : SkillInfoBase
 
 	public override void UpdateUI()
 	{
-		//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
 		if (callSection == ItemDetailEquip.CURRENT_SECTION.SMITH_CREATE || callSection == ItemDetailEquip.CURRENT_SECTION.EQUIP_LIST)
 		{
 			equipData = (eventData as EquipItemTable.EquipItemData);
 			slotData = GetSkillSlotData(eventData as EquipItemTable.EquipItemData, 0);
-			SetActive((Enum)UI.BTN_ATTACH, is_visible: false);
-			SetActive((Enum)UI.BTN_DETACH, is_visible: false);
-			SetActive((Enum)UI.BTN_GROW, is_visible: false);
+			SetActive(UI.BTN_ATTACH, is_visible: false);
+			SetActive(UI.BTN_DETACH, is_visible: false);
+			SetActive(UI.BTN_GROW, is_visible: false);
 		}
 		else if (callSection == ItemDetailEquip.CURRENT_SECTION.SMITH_EVOLVE)
 		{
@@ -82,18 +80,18 @@ public class ItemDetailEquipAttachSkill : SkillInfoBase
 			equipData = equipItemAndSkillData.equipItemInfo.tableData;
 			slotData = equipItemAndSkillData.skillSlotUIData;
 			isSkillUniqItem = true;
-			SetActive((Enum)UI.BTN_ATTACH, is_visible: false);
-			SetActive((Enum)UI.BTN_DETACH, is_visible: false);
-			SetActive((Enum)UI.BTN_GROW, is_visible: false);
+			SetActive(UI.BTN_ATTACH, is_visible: false);
+			SetActive(UI.BTN_DETACH, is_visible: false);
+			SetActive(UI.BTN_GROW, is_visible: false);
 		}
 		else if (callSection == ItemDetailEquip.CURRENT_SECTION.QUEST_ROOM)
 		{
 			equipData = (eventData as EquipItemInfo);
 			slotData = GetSkillSlotData(eventData as EquipItemInfo);
 			isSkillUniqItem = true;
-			SetActive((Enum)UI.BTN_ATTACH, is_visible: false);
-			SetActive((Enum)UI.BTN_DETACH, is_visible: false);
-			SetActive((Enum)UI.BTN_GROW, is_visible: false);
+			SetActive(UI.BTN_ATTACH, is_visible: false);
+			SetActive(UI.BTN_DETACH, is_visible: false);
+			SetActive(UI.BTN_GROW, is_visible: false);
 		}
 		else if (callSection == ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT)
 		{
@@ -101,39 +99,29 @@ public class ItemDetailEquipAttachSkill : SkillInfoBase
 			equipData = equipItemAndSkillData2.equipItemInfo;
 			slotData = equipItemAndSkillData2.skillSlotUIData;
 			isSkillUniqItem = true;
-			SetActive((Enum)UI.BTN_ATTACH, is_visible: false);
-			SetActive((Enum)UI.BTN_DETACH, is_visible: false);
-			SetActive((Enum)UI.BTN_GROW, is_visible: false);
+			SetActive(UI.BTN_ATTACH, is_visible: false);
+			SetActive(UI.BTN_DETACH, is_visible: false);
+			SetActive(UI.BTN_GROW, is_visible: false);
 		}
 		else
 		{
 			equipData = (eventData as EquipItemInfo);
 			slotData = GetSkillSlotData(eventData as EquipItemInfo);
 			isSkillUniqItem = true;
-			SetActive((Enum)UI.BTN_ATTACH, is_visible: true);
-			SetActive((Enum)UI.BTN_DETACH, is_visible: true);
-			SetActive((Enum)UI.BTN_GROW, is_visible: true);
+			SetActive(UI.BTN_ATTACH, is_visible: true);
+			SetActive(UI.BTN_DETACH, is_visible: true);
+			SetActive(UI.BTN_GROW, is_visible: true);
 			lookOnly = false;
 		}
-		SetToggle((Enum)UI.TGL_WINDOW_TITLE, lookOnly);
+		SetToggle(UI.TGL_WINDOW_TITLE, lookOnly);
 		if (slotData != null)
 		{
 			Transform table_item = null;
 			SetTable(UI.TBL_SKILL_LIST, "EquipSetDetailTopItem", 1, reset: false, delegate(int i, Transform t, bool is_recycle)
 			{
-				//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0211: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0216: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0234: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0239: Unknown result type (might be due to invalid IL or missing references)
-				//IL_025f: Unknown result type (might be due to invalid IL or missing references)
 				table_item = t;
 				EquipItemTable.EquipItemData table = null;
 				int num = 1;
-				int num2 = 0;
 				if (callSection == ItemDetailEquip.CURRENT_SECTION.SMITH_CREATE || callSection == ItemDetailEquip.CURRENT_SECTION.SMITH_EVOLVE || callSection == ItemDetailEquip.CURRENT_SECTION.EQUIP_LIST)
 				{
 					table = (equipData as EquipItemTable.EquipItemData);
@@ -143,10 +131,9 @@ public class ItemDetailEquipAttachSkill : SkillInfoBase
 					EquipItemInfo equipItemInfo = equipData as EquipItemInfo;
 					table = equipItemInfo.tableData;
 					num = equipItemInfo.level;
-					num2 = equipItemInfo.exceed;
+					_ = equipItemInfo.exceed;
 				}
-				ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemTable(table, sex, FindCtrl(t, UI.OBJ_ICON_ROOT));
-				itemIcon.SetEnableCollider(is_enable: false);
+				ItemIcon.CreateEquipItemIconByEquipItemTable(table, sex, FindCtrl(t, UI.OBJ_ICON_ROOT)).SetEnableCollider(is_enable: false);
 				SetActive(t, UI.SPR_EQUIP_INDEX_ICON, is_visible: false);
 				string name = table.name;
 				name = Utility.TrimText(name, GetCtrl(UI.LBL_EQUIP_NAME).GetComponent<UILabel>());
@@ -158,7 +145,7 @@ public class ItemDetailEquipAttachSkill : SkillInfoBase
 					SkillItemInfo skillItemInfo = slotData[i2].itemData;
 					bool flag = skillItemInfo != null && skillItemInfo.tableData.type == slotData[i2].slotData.slotType;
 					SetSkillIcon(t2, UI.TEX_SKILL_ICON, slotData[i2].slotData.slotType, flag, is_button_icon: false);
-					SetEvent(t2, (!flag) ? "SLOT" : "SLOT_DETAIL", i2);
+					SetEvent(t2, flag ? "SLOT_DETAIL" : "SLOT", i2);
 					SetLongTouch(t2, "SLOT_DETAIL", i2);
 					if (!flag)
 					{
@@ -192,23 +179,19 @@ public class ItemDetailEquipAttachSkill : SkillInfoBase
 						}
 					}
 				});
-				base.GetComponent<UITable>(t, (Enum)UI.TBL_SPACE).Reposition();
-				Vector3 localPosition = t.get_localPosition();
-				float y = localPosition.y;
-				Vector3 localPosition2 = FindCtrl(t, UI.OBJ_SPACE).get_localPosition();
-				float y2 = localPosition2.y;
-				Vector3 localPosition3 = FindCtrl(t, UI.TBL_SPACE).get_localPosition();
-				float num3 = y2 + localPosition3.y;
-				Vector3 localPosition4 = FindCtrl(t, UI.SPR_EQUIP_INDEX_ICON).get_localPosition();
-				localPosition4.y = (num3 - y) * 0.5f;
-				FindCtrl(t, UI.SPR_EQUIP_INDEX_ICON).set_localPosition(localPosition4);
+				GetComponent<UITable>(t, UI.TBL_SPACE).Reposition();
+				float y = t.localPosition.y;
+				float num2 = FindCtrl(t, UI.OBJ_SPACE).localPosition.y + FindCtrl(t, UI.TBL_SPACE).localPosition.y;
+				Vector3 localPosition = FindCtrl(t, UI.SPR_EQUIP_INDEX_ICON).localPosition;
+				localPosition.y = (num2 - y) * 0.5f;
+				FindCtrl(t, UI.SPR_EQUIP_INDEX_ICON).localPosition = localPosition;
 			});
-			Transform val = FindCtrl(table_item, UI.OBJ_SPACE_COLLISION);
+			Transform transform = FindCtrl(table_item, UI.OBJ_SPACE_COLLISION);
 			Transform ctrl = GetCtrl(UI.OBJ_ANCHOR_BOTTOM);
-			if (val != null && ctrl != null)
+			if (transform != null && ctrl != null)
 			{
 				UpdateAnchors();
-				ctrl.set_position(val.get_position());
+				ctrl.position = transform.position;
 				UpdateAnchors();
 			}
 		}

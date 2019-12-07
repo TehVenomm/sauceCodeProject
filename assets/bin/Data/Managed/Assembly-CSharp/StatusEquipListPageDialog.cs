@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -26,7 +25,7 @@ public class StatusEquipListPageDialog : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -37,9 +36,9 @@ public class StatusEquipListPageDialog : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_1, pageNo[0]);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_2, pageNo[1]);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_3, pageNo[2]);
+		SetLabelText(UI.LBL_INPUT_PASS_1, pageNo[0]);
+		SetLabelText(UI.LBL_INPUT_PASS_2, pageNo[1]);
+		SetLabelText(UI.LBL_INPUT_PASS_3, pageNo[2]);
 		base.UpdateUI();
 	}
 
@@ -114,8 +113,7 @@ public class StatusEquipListPageDialog : GameSection
 		StatusEquipList statusEquipList = MonoBehaviourSingleton<GameSceneManager>.I.FindSection("StatusEquipList") as StatusEquipList;
 		if (statusEquipList != null)
 		{
-			int maxPageNum = statusEquipList.GetMaxPageNum();
-			if (maxPageNum < result)
+			if (statusEquipList.GetMaxPageNum() < result)
 			{
 				GameSection.ChangeEvent("OVER_NUMBER");
 				return;

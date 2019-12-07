@@ -6,7 +6,11 @@ public class DoubleUIntKeyTable<T> : UIntKeyTable<UIntKeyTable<T>>
 	public T Get(uint key1, uint key2)
 	{
 		UIntKeyTable<T> uIntKeyTable = Get(key1);
-		return (uIntKeyTable == null) ? default(T) : uIntKeyTable.Get(key2);
+		if (uIntKeyTable == null)
+		{
+			return default(T);
+		}
+		return uIntKeyTable.Get(key2);
 	}
 
 	public void Add(uint key1, uint key2, T value)

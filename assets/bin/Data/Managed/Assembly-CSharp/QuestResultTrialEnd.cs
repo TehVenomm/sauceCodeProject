@@ -22,15 +22,15 @@ public class QuestResultTrialEnd : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
 		MonoBehaviourSingleton<UIManager>.I.loading.SetActiveDragon(active: true);
-		yield return (object)new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		yield return MonoBehaviourSingleton<AppMain>.I.UnloadUnusedAssets(need_gc_collect: true);
-		yield return (object)new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		if (!MonoBehaviourSingleton<InGameRecorder>.IsValid())
 		{
 			base.Initialize();
@@ -55,7 +55,7 @@ public class QuestResultTrialEnd : GameSection
 		{
 			yield return null;
 		}
-		Transform cameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
+		Transform mainCameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
 		if (MonoBehaviourSingleton<InGameRecorder>.I.isVictory)
 		{
 			int i = 0;
@@ -64,28 +64,28 @@ public class QuestResultTrialEnd : GameSection
 				PlayerLoader playerLoader = playersModels[i];
 				if (playerLoader != null)
 				{
-					playerLoader.animator.set_applyRootMotion(false);
+					playerLoader.animator.applyRootMotion = false;
 					playerLoader.animator.Play(playerLoader.GetWinLoopMotionState());
 				}
 			}
 		}
-		else if (playersModels.Length > 0)
+		else if (playersModels.Length != 0)
 		{
 			OutGameSettingsManager.QuestResult questResult = MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult;
 			SoundManager.RequestBGM(10, isLoop: false);
 			PlayerLoader playerLoader2 = playersModels[0];
 			if (playerLoader2 != null)
 			{
-				Transform transform = playerLoader2.get_transform();
-				cameraTarget = transform.get_position() + new Vector3(0f, questResult.loseCameraHeight, 0f);
-				Vector3 val = cameraTarget + transform.get_forward() * questResult.loseCameraDistance;
-				Quaternion rotation = Quaternion.LookRotation(cameraTarget - val);
-				cameraTransform.set_position(val);
-				cameraTransform.set_rotation(rotation);
-				PLCA default_anim = (Random.Range(0, 2) != 0) ? PLCA.IDLE_02 : PLCA.IDLE_01;
+				Transform transform = playerLoader2.transform;
+				cameraTarget = transform.position + new Vector3(0f, questResult.loseCameraHeight, 0f);
+				Vector3 vector = cameraTarget + transform.forward * questResult.loseCameraDistance;
+				Quaternion rotation = Quaternion.LookRotation(cameraTarget - vector);
+				mainCameraTransform.position = vector;
+				mainCameraTransform.rotation = rotation;
+				PLCA default_anim = (UnityEngine.Random.Range(0, 2) == 0) ? PLCA.IDLE_01 : PLCA.IDLE_02;
 				PlayerAnimCtrl.Get(playerLoader2.animator, default_anim);
 			}
-			MonoBehaviourSingleton<AppMain>.I.mainCamera.set_fieldOfView(questResult.cameraFieldOfView);
+			MonoBehaviourSingleton<AppMain>.I.mainCamera.fieldOfView = questResult.cameraFieldOfView;
 		}
 		GC.Collect();
 		MonoBehaviourSingleton<UIManager>.I.loading.SetActiveDragon(active: false);
@@ -101,22 +101,22 @@ public class QuestResultTrialEnd : GameSection
 	{
 		if (MonoBehaviourSingleton<StatusManager>.IsValid())
 		{
-			string text = string.Empty;
+			string text = "";
 			if (MonoBehaviourSingleton<StatusManager>.I.assignedEquipmentData != null)
 			{
 				text = MonoBehaviourSingleton<StatusManager>.I.assignedEquipmentData.setName;
 			}
-			SetLabelText((Enum)UI.LBL_EQUIP_SET_NAME, text);
-			SetActive((Enum)UI.BTN_NEXT, is_visible: false);
-			SetActive((Enum)UI.BTN_GACHA, is_visible: false);
-			SetActive((Enum)UI.BTN_RETRY, is_visible: false);
+			SetLabelText(UI.LBL_EQUIP_SET_NAME, text);
+			SetActive(UI.BTN_NEXT, is_visible: false);
+			SetActive(UI.BTN_GACHA, is_visible: false);
+			SetActive(UI.BTN_RETRY, is_visible: false);
 			UITweenCtrl component = GetCtrl(UI.OBJ_EQUIP_SET_NAME).GetComponent<UITweenCtrl>();
 			component.Reset();
 			component.Play(forward: true, delegate
 			{
-				SetActive((Enum)UI.BTN_NEXT, is_visible: true);
-				SetActive((Enum)UI.BTN_GACHA, is_visible: true);
-				SetActive((Enum)UI.BTN_RETRY, is_visible: true);
+				SetActive(UI.BTN_NEXT, is_visible: true);
+				SetActive(UI.BTN_GACHA, is_visible: true);
+				SetActive(UI.BTN_RETRY, is_visible: true);
 			});
 		}
 	}
@@ -151,14 +151,12 @@ public class QuestResultTrialEnd : GameSection
 
 	private void Update()
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameRecorder>.IsValid() && !MonoBehaviourSingleton<InGameRecorder>.I.isVictory)
 		{
 			float loseCameraRotateSpeed = MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.loseCameraRotateSpeed;
 			if (loseCameraRotateSpeed != 0f)
 			{
-				MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.RotateAround(cameraTarget, Vector3.get_up(), loseCameraRotateSpeed * Time.get_deltaTime());
+				MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.RotateAround(cameraTarget, Vector3.up, loseCameraRotateSpeed * Time.deltaTime);
 			}
 		}
 	}

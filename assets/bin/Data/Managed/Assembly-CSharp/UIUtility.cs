@@ -31,57 +31,42 @@ public static class UIUtility
 
 	public static Vector2 GetGridItemsBoundSize(UIGrid grid, int item_num)
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		GetGridSize(grid, item_num, out int grid_w, out int grid_h);
 		int num = (int)grid.cellWidth;
-		int num2 = (int)grid.cellHeight;
-		return new Vector2((float)(num * grid_w), (float)(num2 * grid_h));
+		return new Vector2(y: (int)grid.cellHeight * grid_h, x: num * grid_w);
 	}
 
 	public static void SetGridItemsDraggableWidget(UIScrollView scroll_view, UIGrid grid, int item_num)
 	{
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = scroll_view.get_transform().Find("_DRAG_SCROLL_");
+		Transform transform = scroll_view.transform.Find("_DRAG_SCROLL_");
 		UIWidget uIWidget;
-		BoxCollider val2;
-		if (val == null)
+		BoxCollider boxCollider;
+		if (transform == null)
 		{
-			uIWidget = NGUITools.AddChild<UIWidget>(scroll_view.get_gameObject());
-			uIWidget.get_gameObject().set_name("_DRAG_SCROLL_");
-			uIWidget.get_gameObject().AddComponent<UIDragScrollView>();
+			uIWidget = NGUITools.AddChild<UIWidget>(scroll_view.gameObject);
+			uIWidget.gameObject.name = "_DRAG_SCROLL_";
+			uIWidget.gameObject.AddComponent<UIDragScrollView>();
 			uIWidget.depth = -1;
 			uIWidget.pivot = UIWidget.Pivot.TopLeft;
-			val2 = uIWidget.get_gameObject().AddComponent<BoxCollider>();
-			val = uIWidget.get_transform();
+			boxCollider = uIWidget.gameObject.AddComponent<BoxCollider>();
+			transform = uIWidget.transform;
 		}
 		else
 		{
-			val2 = val.GetComponent<BoxCollider>();
-			uIWidget = val.GetComponent<UIWidget>();
+			boxCollider = transform.GetComponent<BoxCollider>();
+			uIWidget = transform.GetComponent<UIWidget>();
 		}
-		Vector3 size = Vector2.op_Implicit(GetGridItemsBoundSize(grid, item_num));
-		val2.set_size(size);
-		val2.set_center(new Vector3(size.x * 0.5f, (0f - size.y) * 0.5f));
-		Vector3 localPosition = grid.get_transform().get_localPosition() + new Vector3((0f - grid.cellWidth) * 0.5f, grid.cellHeight * 0.5f);
+		Vector3 vector2 = boxCollider.size = GetGridItemsBoundSize(grid, item_num);
+		boxCollider.center = new Vector3(vector2.x * 0.5f, (0f - vector2.y) * 0.5f);
+		Vector3 localPosition = grid.transform.localPosition + new Vector3((0f - grid.cellWidth) * 0.5f, grid.cellHeight * 0.5f);
 		if (grid.pivot != 0)
 		{
 			Vector2 pivotOffset = NGUIMath.GetPivotOffset(grid.pivot);
-			localPosition.x -= Mathf.Lerp(0f, size.x - grid.cellWidth, pivotOffset.x);
-			localPosition.y -= Mathf.Lerp(0f - (size.y - grid.cellHeight), 0f, pivotOffset.y);
+			localPosition.x -= Mathf.Lerp(0f, vector2.x - grid.cellWidth, pivotOffset.x);
+			localPosition.y -= Mathf.Lerp(0f - (vector2.y - grid.cellHeight), 0f, pivotOffset.y);
 		}
-		val.set_localPosition(localPosition);
-		uIWidget.SetDimensions((int)size.x, (int)size.y);
+		transform.localPosition = localPosition;
+		uIWidget.SetDimensions((int)vector2.x, (int)vector2.y);
 	}
 
 	public static void AddCenterOnClickChild(Transform t)
@@ -91,17 +76,17 @@ public static class UIUtility
 		{
 			return;
 		}
-		Transform transform = componentInChildren.get_transform();
+		Transform transform = componentInChildren.transform;
 		int i = 0;
-		for (int childCount = transform.get_childCount(); i < childCount; i++)
+		for (int childCount = transform.childCount; i < childCount; i++)
 		{
-			transform.GetChild(i).GetComponentsInChildren<BoxCollider>(true, Temporary.boxColliderList);
+			transform.GetChild(i).GetComponentsInChildren(includeInactive: true, Temporary.boxColliderList);
 			int j = 0;
 			for (int count = Temporary.boxColliderList.Count; j < count; j++)
 			{
 				if (Temporary.boxColliderList[j].GetComponent<UICenterOnClickChild>() == null)
 				{
-					Temporary.boxColliderList[j].get_gameObject().AddComponent<UICenterOnClickChild>();
+					Temporary.boxColliderList[j].gameObject.AddComponent<UICenterOnClickChild>();
 				}
 			}
 			Temporary.boxColliderList.Clear();
@@ -110,12 +95,12 @@ public static class UIUtility
 
 	public static void SetActiveAndAlphaFade(GameObject go, bool is_active)
 	{
-		bool activeSelf = go.get_activeSelf();
-		go.SetActive(true);
+		bool activeSelf = go.activeSelf;
+		go.SetActive(value: true);
 		TweenAlpha component = go.GetComponent<TweenAlpha>();
 		if (component == null)
 		{
-			go.SetActive(false);
+			go.SetActive(value: false);
 		}
 		else if (is_active)
 		{
@@ -130,32 +115,25 @@ public static class UIUtility
 		{
 			component.SetOnFinished(delegate
 			{
-				go.SetActive(false);
+				go.SetActive(value: false);
 			});
 			component.PlayReverse();
 		}
 		else
 		{
 			component.value = 0f;
-			go.SetActive(false);
+			go.SetActive(value: false);
 		}
 	}
 
 	public static float GetWorldTopY(UIWidget w)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		Transform cachedTransform = w.cachedTransform;
-		Vector2 pivotOffset = w.pivotOffset;
-		Vector3 val = cachedTransform.TransformPoint(0f, (0f - pivotOffset.y) * (float)w.height + (float)w.height, 0f);
-		return val.y;
+		return w.cachedTransform.TransformPoint(0f, (0f - w.pivotOffset.y) * (float)w.height + (float)w.height, 0f).y;
 	}
 
 	public static void UpdateAnchors(Transform root)
 	{
-		root.GetComponentsInChildren<UIRect>(true, Temporary.uiRectList);
+		root.GetComponentsInChildren(includeInactive: true, Temporary.uiRectList);
 		int i = 0;
 		for (int count = Temporary.uiRectList.Count; i < count; i++)
 		{
@@ -183,8 +161,7 @@ public static class UIUtility
 
 	public static string TimeFormatWithUnit(int restTime)
 	{
-		TimeSpan restTime2 = TimeSpan.FromSeconds(restTime);
-		return TimeFormatWithUnit(restTime2);
+		return TimeFormatWithUnit(TimeSpan.FromSeconds(restTime));
 	}
 
 	public static string TimeFormatWithUnit(TimeSpan restTime)
@@ -202,8 +179,7 @@ public static class UIUtility
 
 	public static string TimeFormat(int restTime, bool isHours = false)
 	{
-		TimeSpan restTime2 = TimeSpan.FromSeconds(restTime);
-		return TimeFormat(restTime2, isHours);
+		return TimeFormat(TimeSpan.FromSeconds(restTime), isHours);
 	}
 
 	public static string TimeFormat(TimeSpan restTime, bool isHours = false)

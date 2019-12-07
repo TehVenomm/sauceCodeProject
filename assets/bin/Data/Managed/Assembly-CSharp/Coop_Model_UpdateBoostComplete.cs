@@ -9,6 +9,6 @@ public class Coop_Model_UpdateBoostComplete : Coop_Model_Base
 
 	public override string ToString()
 	{
-		return base.ToString() + ",success=" + success;
+		return base.ToString() + ",success=" + success.ToString();
 	}
 }

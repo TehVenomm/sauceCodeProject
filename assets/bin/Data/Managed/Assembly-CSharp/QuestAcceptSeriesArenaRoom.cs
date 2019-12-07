@@ -82,7 +82,7 @@ public class QuestAcceptSeriesArenaRoom : OffLineQuestRoomBase
 	protected new void UpdateUser()
 	{
 		isReady = true;
-		SetGrid(UI.GRD_PLAYER_INFO, string.Empty, 3, reset: false, delegate(int i, Transform t)
+		SetGrid(UI.GRD_PLAYER_INFO, "", 3, reset: false, delegate(int i, Transform t)
 		{
 			string prefab_name = "QuestRoomUserInfoSelf";
 			return Realizes(prefab_name, t, check_panel: false);
@@ -103,8 +103,7 @@ public class QuestAcceptSeriesArenaRoom : OffLineQuestRoomBase
 		SetLabelText(trans, UI.LBL_LV, string.Empty);
 		SetActive(trans, UI.SPR_USER_EQUIPING, is_visible: false);
 		base.UpdateRoomUserInfo(trans, index);
-		QuestRoomUserInfo component = trans.GetComponent<QuestRoomUserInfo>();
-		if (!(component == null))
+		if (!(trans.GetComponent<QuestRoomUserInfo>() == null))
 		{
 			userInfo = GetUserCharaInfo(index);
 			if (userInfo == null)
@@ -150,10 +149,9 @@ public class QuestAcceptSeriesArenaRoom : OffLineQuestRoomBase
 	private void UpdateTopBar()
 	{
 		int num = (int)questData.limitTime;
-		SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num / 60}:{num % 60:D2}");
-		SetLabelText((Enum)UI.LBL_SERIES_ARENA_NAME, deliveryData.name);
-		UITexture component = GetCtrl(UI.TEX_ICON).GetComponent<UITexture>();
-		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.SERIES_ARENA_RANK_ICON, ResourceName.GetSeriesArenaRankIconName(questData.rarity));
+		SetLabelText(UI.LBL_LIMIT_TIME, $"{num / 60}:{num % 60:D2}");
+		SetLabelText(UI.LBL_SERIES_ARENA_NAME, deliveryData.name);
+		ResourceLoad.LoadWithSetUITexture(GetCtrl(UI.TEX_ICON).GetComponent<UITexture>(), RESOURCE_CATEGORY.SERIES_ARENA_RANK_ICON, ResourceName.GetSeriesArenaRankIconName(questData.rarity));
 	}
 
 	private void UpdateEnemyList()
@@ -200,10 +198,10 @@ public class QuestAcceptSeriesArenaRoom : OffLineQuestRoomBase
 		{
 			for (int i = 0; i < array4.Length; i++)
 			{
-				SetLabelText((Enum)array[i], array4[i].tableData.missionText);
+				SetLabelText(array[i], array4[i].tableData.missionText);
 				bool flag = array4[i].state >= CLEAR_STATUS.CLEAR;
-				SetActive((Enum)array2[i], flag);
-				SetActive((Enum)array3[i], !flag);
+				SetActive(array2[i], flag);
+				SetActive(array3[i], !flag);
 			}
 		}
 	}
@@ -232,8 +230,8 @@ public class QuestAcceptSeriesArenaRoom : OffLineQuestRoomBase
 
 	private void UpdateStartButton()
 	{
-		SetActive((Enum)UI.BTN_START, isReady);
-		SetActive((Enum)UI.BTN_NG, !isReady);
+		SetActive(UI.BTN_START, isReady);
+		SetActive(UI.BTN_NG, !isReady);
 	}
 
 	protected void OnQuery_START()
@@ -252,11 +250,11 @@ public class QuestAcceptSeriesArenaRoom : OffLineQuestRoomBase
 
 	public void OnQuery_TO_MISSION()
 	{
-		base.GetComponent<UITweenCtrl>((Enum)UI.OBJ_ENEMYS_ROOT).Play();
+		GetComponent<UITweenCtrl>(UI.OBJ_ENEMYS_ROOT).Play();
 	}
 
 	public void OnQuery_TO_ENEMY()
 	{
-		base.GetComponent<UITweenCtrl>((Enum)UI.OBJ_ENEMYS_ROOT).Play(forward: false);
+		GetComponent<UITweenCtrl>(UI.OBJ_ENEMYS_ROOT).Play(forward: false);
 	}
 }

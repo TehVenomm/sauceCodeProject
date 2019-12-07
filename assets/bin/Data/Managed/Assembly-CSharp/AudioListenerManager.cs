@@ -59,7 +59,7 @@ public class AudioListenerManager : MonoBehaviourSingleton<AudioListenerManager>
 
 	protected override void Awake()
 	{
-		this.get_gameObject().AddComponent<AudioListener>();
+		base.gameObject.AddComponent<AudioListener>();
 		base.Awake();
 	}
 
@@ -89,20 +89,15 @@ public class AudioListenerManager : MonoBehaviourSingleton<AudioListenerManager>
 
 	private void Trace(Transform t, TRACE_FLAGS flag)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 		if (t != null)
 		{
 			if ((flag & TRACE_FLAGS.POSITION) != 0)
 			{
-				base._transform.set_position(t.get_position());
+				base._transform.position = t.position;
 			}
 			if ((flag & TRACE_FLAGS.ROTATION) != 0)
 			{
-				base._transform.set_rotation(Quaternion.LookRotation(Vector3.Cross(Vector3.get_up(), t.get_right())));
+				base._transform.rotation = Quaternion.LookRotation(Vector3.Cross(Vector3.up, t.right));
 			}
 		}
 	}

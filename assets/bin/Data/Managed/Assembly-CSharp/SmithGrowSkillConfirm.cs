@@ -86,13 +86,13 @@ public class SmithGrowSkillConfirm : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.STR_TITLE_R, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText((Enum)UI.LBL_NAME, baseSkill.tableData.name);
-		SetLabelText((Enum)UI.LBL_MATERIAL_2, (!isExceed) ? base.sectionData.GetText("TEXT_GROW") : base.sectionData.GetText("TEXT_EXCEED"));
-		SetActive((Enum)UI.OBJ_MONEY, !isExceed);
+		SetLabelText(UI.STR_TITLE_R, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.LBL_NAME, baseSkill.tableData.name);
+		SetLabelText(UI.LBL_MATERIAL_2, isExceed ? base.sectionData.GetText("TEXT_EXCEED") : base.sectionData.GetText("TEXT_GROW"));
+		SetActive(UI.OBJ_MONEY, !isExceed);
 		if (!isExceed)
 		{
-			SetLabelText((Enum)UI.LBL_MONEY, total.ToString());
+			SetLabelText(UI.LBL_MONEY, total.ToString());
 		}
 		SetGrid(UI.GRD_MATERIAL, null, material.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
@@ -122,7 +122,7 @@ public class SmithGrowSkillConfirm : GameSection
 			{
 				stringBuilder.AppendLine(base.sectionData.GetText("TEXT_INCLUDE_EXCEED"));
 			}
-			stringBuilder.AppendLine(string.Empty);
+			stringBuilder.AppendLine("");
 			stringBuilder.Append(base.sectionData.GetText("TEXT_GROW_CONFIRM"));
 			GameSection.ChangeEvent("INCLUDE_RARE", stringBuilder.ToString());
 		}

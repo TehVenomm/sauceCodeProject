@@ -99,7 +99,7 @@ public class HomeMiniBingo : HomeBingo
 		isFirstUpdate = true;
 		LoadingQueue load_queue = new LoadingQueue(this);
 		CacheAudio(load_queue);
-		this.StartCoroutine(DoInitialize(callback));
+		StartCoroutine(DoInitialize(callback));
 	}
 
 	protected override IEnumerator DoInitialize(Action callback)
@@ -114,15 +114,15 @@ public class HomeMiniBingo : HomeBingo
 		else
 		{
 			InitCardDataList(eventDataList);
-			int defaultIndex = (from ano in eventDataList.Select((Network.EventData e, int j) => new
-			{
-				Content = e,
-				Index = j
-			})
-			where ano.Content.eventId == defaultEventId
-			select ano.Index).FirstOrDefault();
-			SetCurrentIndex(defaultIndex);
-			yield return this.StartCoroutine(LoadBanner(GetEventDataFromList(GetCurrentIndex()), GetCurrentIndex()));
+			int currentIndex = (from ano in eventDataList.Select((Network.EventData e, int j) => new
+				{
+					Content = e,
+					Index = j
+				})
+				where ano.Content.eventId == defaultEventId
+				select ano.Index).FirstOrDefault();
+			SetCurrentIndex(currentIndex);
+			yield return StartCoroutine(LoadBanner(GetEventDataFromList(GetCurrentIndex()), GetCurrentIndex()));
 			callback();
 		}
 	}
@@ -134,8 +134,7 @@ public class HomeMiniBingo : HomeBingo
 
 	protected override void InitCard(int cardIndex)
 	{
-		CardData cardData = cardDataList[cardIndex];
-		Transform val = cardData.cardTransform = GetCtrl(UI.OBJ_CARD);
+		Transform transform = cardDataList[cardIndex].cardTransform = GetCtrl(UI.OBJ_CARD);
 	}
 
 	public override void UpdateUI()
@@ -144,22 +143,21 @@ public class HomeMiniBingo : HomeBingo
 		{
 			return;
 		}
-		int count = cardDataList.Count;
+		_ = cardDataList.Count;
 		if (isFirstUpdate)
 		{
 			isFirstUpdate = false;
-			SetActive((Enum)UI.OBJ_COMPLETE, is_visible: false);
+			SetActive(UI.OBJ_COMPLETE, is_visible: false);
 			bool isCompleted = GetCurrentCard().allBingoData.isCompleted;
-			SetActive((Enum)UI.OBJ_COMPLETE_STAY, isCompleted);
+			SetActive(UI.OBJ_COMPLETE_STAY, isCompleted);
 			if (isCompleted)
 			{
-				Transform ctrl = GetCtrl(UI.OBJ_COMPLETE_STAY);
-				UITweenCtrl component = ctrl.GetComponent<UITweenCtrl>();
+				UITweenCtrl component = GetCtrl(UI.OBJ_COMPLETE_STAY).GetComponent<UITweenCtrl>();
 				component.Reset();
 				component.Play();
 			}
 		}
-		SetActive((Enum)UI.OBJ_BINGO_ANIMATION, is_visible: false);
+		SetActive(UI.OBJ_BINGO_ANIMATION, is_visible: false);
 		UpdateLeftRightButton();
 		UpdateCard(cardDataList[currentCardIndex], currentCardIndex);
 		SetEndDateLabel();
@@ -167,14 +165,14 @@ public class HomeMiniBingo : HomeBingo
 
 	private void HideLeftRightButton()
 	{
-		SetActive((Enum)UI.BTN_RIGHT, is_visible: false);
-		SetActive((Enum)UI.BTN_LEFT, is_visible: false);
+		SetActive(UI.BTN_RIGHT, is_visible: false);
+		SetActive(UI.BTN_LEFT, is_visible: false);
 	}
 
 	private void DispLeftRightButton()
 	{
-		SetActive((Enum)UI.BTN_RIGHT, is_visible: true);
-		SetActive((Enum)UI.BTN_LEFT, is_visible: true);
+		SetActive(UI.BTN_RIGHT, is_visible: true);
+		SetActive(UI.BTN_LEFT, is_visible: true);
 	}
 
 	private void UpdateLeftRightButton()
@@ -206,11 +204,11 @@ public class HomeMiniBingo : HomeBingo
 	{
 		int num = index + 1;
 		GridData gridData = cardDataList[cardIndex].gridDataList[index];
-		gridData.SetEntity(t, string.Empty);
+		gridData.SetEntity(t, "");
 		BoxCollider component = t.GetComponent<BoxCollider>();
 		if (component != null)
 		{
-			component.set_enabled(true);
+			component.enabled = true;
 		}
 		SetActive(t, UI.SPR_GRID_ITEM, !gridData.isCompleted);
 		SetReachVisual(gridData, isActive: false);
@@ -234,7 +232,7 @@ public class HomeMiniBingo : HomeBingo
 			for (int i = 0; i < ColmunNum * ColmunNum; i++)
 			{
 				UI uI2 = uI + i;
-				SetActive((Enum)uI2, num == i);
+				SetActive(uI2, num == i);
 			}
 		}
 		else
@@ -252,7 +250,7 @@ public class HomeMiniBingo : HomeBingo
 		ChangeCard(currentCardIndex, delegate
 		{
 			GameSection.ResumeEvent(is_resume: true);
-			this.StartCoroutine(WaitAndStartAutoComplete());
+			StartCoroutine(WaitAndStartAutoComplete());
 		});
 	}
 
@@ -268,32 +266,30 @@ public class HomeMiniBingo : HomeBingo
 		ChangeCard(currentCardIndex, delegate
 		{
 			GameSection.ResumeEvent(is_resume: true);
-			this.StartCoroutine(WaitAndStartAutoComplete());
+			StartCoroutine(WaitAndStartAutoComplete());
 		});
 	}
 
 	protected override void ChangeCard(int cardIndex, Action callback)
 	{
-		SetActive((Enum)UI.OBJ_COMPLETE, is_visible: false);
+		SetActive(UI.OBJ_COMPLETE, is_visible: false);
 		bool isCompleteAll = GetCurrentCard().allBingoData.isCompleted;
-		SetActive((Enum)UI.OBJ_COMPLETE_STAY, is_visible: false);
+		SetActive(UI.OBJ_COMPLETE_STAY, is_visible: false);
 		if (isCompleteAll)
 		{
-			Transform ctrl = GetCtrl(UI.OBJ_COMPLETE_STAY);
-			UITweenCtrl component = ctrl.GetComponent<UITweenCtrl>();
-			component.Reset();
+			GetCtrl(UI.OBJ_COMPLETE_STAY).GetComponent<UITweenCtrl>().Reset();
 		}
-		this.StartCoroutine(LoadBanner(GetEventDataFromList(cardIndex), cardIndex, delegate
+		StartCoroutine(LoadBanner(GetEventDataFromList(cardIndex), cardIndex, delegate
 		{
 			HideReward(cardDataList[cardIndex]);
 			RefreshUI();
 			if (isCompleteAll)
 			{
-				Transform ctrl2 = GetCtrl(UI.OBJ_COMPLETE_STAY);
-				SetActive((Enum)UI.OBJ_COMPLETE_STAY, is_visible: true);
-				UITweenCtrl component2 = ctrl2.GetComponent<UITweenCtrl>();
-				component2.Reset();
-				component2.Play();
+				Transform ctrl = GetCtrl(UI.OBJ_COMPLETE_STAY);
+				SetActive(UI.OBJ_COMPLETE_STAY, is_visible: true);
+				UITweenCtrl component = ctrl.GetComponent<UITweenCtrl>();
+				component.Reset();
+				component.Play();
 			}
 			callback();
 		}));

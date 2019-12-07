@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -135,8 +134,8 @@ public abstract class EquipResultBase : SmithEquipBase
 
 	protected override void OnOpen()
 	{
-		InitUITweener<UITweener>((Enum)UI.OBJ_DELAY, is_enable: false, (EventDelegate.Callback)null);
-		this.StartCoroutine(DelayedOpenStatus());
+		InitUITweener<UITweener>(UI.OBJ_DELAY, is_enable: false);
+		StartCoroutine(DelayedOpenStatus());
 		MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = false;
 		base.OnOpen();
 	}
@@ -146,35 +145,35 @@ public abstract class EquipResultBase : SmithEquipBase
 		float t = STATUS_WINDOW_DELAY;
 		while (t > 0f)
 		{
-			t -= Time.get_deltaTime();
+			t -= Time.deltaTime;
 			yield return null;
 		}
 		GetCtrl(UI.OBJ_DELAY).GetComponent<UITweener>().PlayForward();
-		bool is_exceed = false;
+		bool flag = false;
 		if (resultData != null)
 		{
 			EquipItemInfo equipItemInfo = resultData.itemData as EquipItemInfo;
 			if (resultData.isExceed && equipItemInfo != null && equipItemInfo.exceed > 0)
 			{
-				is_exceed = true;
+				flag = true;
 			}
 		}
-		SoundManager.PlayOneShotUISE((!is_exceed) ? 40000049 : 40000157);
+		SoundManager.PlayOneShotUISE(flag ? 40000157 : 40000049);
 	}
 
 	public override void UpdateUI()
 	{
 		detailBase = SetPrefab(GetCtrl(UI.OBJ_DETAIL_ROOT), "ItemDetailEquipBase");
-		SetFontStyle(detailBase, UI.STR_TITLE_ITEM_INFO, 2);
-		SetFontStyle(detailBase, UI.STR_TITLE_SKILL_SLOT, 2);
-		SetFontStyle(detailBase, UI.STR_TITLE_STATUS, 2);
-		SetFontStyle(detailBase, UI.STR_TITLE_ABILITY, 2);
-		SetFontStyle(detailBase, UI.STR_TITLE_SELL, 2);
-		SetFontStyle(detailBase, UI.STR_TITLE_ATK, 2);
-		SetFontStyle(detailBase, UI.STR_TITLE_ELEM_ATK, 2);
-		SetFontStyle(detailBase, UI.STR_TITLE_DEF, 2);
-		SetFontStyle(detailBase, UI.STR_TITLE_ELEM_DEF, 2);
-		SetFontStyle(detailBase, UI.STR_TITLE_HP, 2);
+		SetFontStyle(detailBase, UI.STR_TITLE_ITEM_INFO, FontStyle.Italic);
+		SetFontStyle(detailBase, UI.STR_TITLE_SKILL_SLOT, FontStyle.Italic);
+		SetFontStyle(detailBase, UI.STR_TITLE_STATUS, FontStyle.Italic);
+		SetFontStyle(detailBase, UI.STR_TITLE_ABILITY, FontStyle.Italic);
+		SetFontStyle(detailBase, UI.STR_TITLE_SELL, FontStyle.Italic);
+		SetFontStyle(detailBase, UI.STR_TITLE_ATK, FontStyle.Italic);
+		SetFontStyle(detailBase, UI.STR_TITLE_ELEM_ATK, FontStyle.Italic);
+		SetFontStyle(detailBase, UI.STR_TITLE_DEF, FontStyle.Italic);
+		SetFontStyle(detailBase, UI.STR_TITLE_ELEM_DEF, FontStyle.Italic);
+		SetFontStyle(detailBase, UI.STR_TITLE_HP, FontStyle.Italic);
 		base.UpdateUI();
 	}
 
@@ -197,7 +196,7 @@ public abstract class EquipResultBase : SmithEquipBase
 		SetupBottomButton();
 		SetLabelText(detailBase, UI.LBL_NAME, tableData.name);
 		SetLabelText(detailBase, UI.LBL_LV_MAX, tableData.maxLv.ToString());
-		SetSprite(detailBase, UI.SPR_SP_ATTACK_TYPE, (!tableData.IsWeapon()) ? string.Empty : tableData.spAttackType.GetBigFrameSpriteName());
+		SetSprite(detailBase, UI.SPR_SP_ATTACK_TYPE, tableData.IsWeapon() ? tableData.spAttackType.GetBigFrameSpriteName() : "");
 		if (smithType == SmithType.GROW)
 		{
 			string text = base.sectionData.GetText("STATUS_DIFF_FORMAT");
@@ -238,12 +237,12 @@ public abstract class EquipResultBase : SmithEquipBase
 		SetEquipmentTypeIcon(detailBase, UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, item.tableData);
 		AbilityItemInfo abilityItem = item.GetAbilityItem();
 		bool flag2 = abilityItem != null;
-		if ((item.ability != null && item.ability.Length > 0) || flag2)
+		if ((item.ability != null && item.ability.Length != 0) | flag2)
 		{
 			bool empty_ability = true;
-			string allAbilityName = string.Empty;
-			string allAp = string.Empty;
-			string allAbilityDesc = string.Empty;
+			string allAbilityName = "";
+			string allAp = "";
+			string allAbilityDesc = "";
 			SetTable(detailBase, UI.TBL_ABILITY, "ItemDetailEquipAbilityItem", item.ability.Length + (flag2 ? 1 : 0), reset: false, delegate(int i, Transform t, bool is_recycle)
 			{
 				if (i < item.ability.Length)
@@ -287,7 +286,7 @@ public abstract class EquipResultBase : SmithEquipBase
 					SetActive(t, UI.OBJ_ABILITY, is_visible: false);
 					SetActive(t, UI.OBJ_ABILITY_ITEM, is_visible: true);
 					SetLabelText(t, UI.LBL_ABILITY_ITEM, abilityItem.GetName());
-					SetTouchAndRelease(t.GetComponentInChildren<UIButton>().get_transform(), "ABILITY_ITEM_DATA_POPUP", "RELEASE_ABILITY", t);
+					SetTouchAndRelease(t.GetComponentInChildren<UIButton>().transform, "ABILITY_ITEM_DATA_POPUP", "RELEASE_ABILITY", t);
 					allAbilityName += abilityItem.GetName();
 					allAbilityDesc += abilityItem.GetDescription();
 				}
@@ -311,151 +310,113 @@ public abstract class EquipResultBase : SmithEquipBase
 	private void SetDiffElementSprite(Transform t, int elem_type, int before, int after, UI no_diff, UI diff, bool is_weapon)
 	{
 		bool flag = before != after;
-		SetActive((Enum)no_diff, !flag);
-		SetActive((Enum)diff, flag);
+		SetActive(no_diff, !flag);
+		SetActive(diff, flag);
 		if (is_weapon)
 		{
-			SetElementSprite(t, (!flag) ? no_diff : diff, elem_type);
+			SetElementSprite(t, flag ? diff : no_diff, elem_type);
 		}
 		else
 		{
-			SetDefElementSprite(t, (!flag) ? no_diff : diff, elem_type);
+			SetDefElementSprite(t, flag ? diff : no_diff, elem_type);
 		}
 	}
 
 	private void SetupBottomButton()
 	{
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0379: Unknown result type (might be due to invalid IL or missing references)
-		//IL_037e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0388: Unknown result type (might be due to invalid IL or missing references)
-		//IL_038d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0396: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.BTN_NEXT);
 		switch (smithType)
 		{
 		case SmithType.EVOLVE:
 		{
-			SetActive((Enum)UI.BTN_NEXT, is_visible: false);
-			SetActive((Enum)UI.BTN_NEXT_GRAY, is_visible: false);
-			SetActive((Enum)UI.BTN_NEXT_RIGHT, is_visible: false);
-			SetActive((Enum)UI.BTN_TO_SELECT, is_visible: false);
-			SetActive((Enum)UI.BTN_TO_SELECT_CENTER, is_visible: true);
+			SetActive(UI.BTN_NEXT, is_visible: false);
+			SetActive(UI.BTN_NEXT_GRAY, is_visible: false);
+			SetActive(UI.BTN_NEXT_RIGHT, is_visible: false);
+			SetActive(UI.BTN_TO_SELECT, is_visible: false);
+			SetActive(UI.BTN_TO_SELECT_CENTER, is_visible: true);
 			EquipItemInfo equipItemInfo = resultData.itemData as EquipItemInfo;
 			if (equipItemInfo != null && (!equipItemInfo.IsLevelMax() || !equipItemInfo.IsExceedMax() || equipItemInfo.tableData.IsShadow()))
 			{
-				SetActive((Enum)UI.BTN_NEXT, is_visible: true);
-				Transform obj2 = ctrl;
-				Vector3 localPosition3 = ctrl.get_localPosition();
-				float y2 = localPosition3.y;
-				Vector3 localPosition4 = ctrl.get_localPosition();
-				obj2.set_localPosition(new Vector3(0f, y2, localPosition4.z));
-				SetEvent((Enum)UI.BTN_NEXT, "NEXT_GROW_AUTO", 0);
-				SetActive((Enum)UI.BTN_TO_SELECT, is_visible: true);
-				SetActive((Enum)UI.BTN_TO_SELECT_CENTER, is_visible: false);
-				SetLabelText((Enum)UI.LBL_NEXT_BTN, base.sectionData.GetText("CONTINUE"));
+				SetActive(UI.BTN_NEXT, is_visible: true);
+				ctrl.localPosition = new Vector3(0f, ctrl.localPosition.y, ctrl.localPosition.z);
+				SetEvent(UI.BTN_NEXT, "NEXT_GROW_AUTO", 0);
+				SetActive(UI.BTN_TO_SELECT, is_visible: true);
+				SetActive(UI.BTN_TO_SELECT_CENTER, is_visible: false);
+				SetLabelText(UI.LBL_NEXT_BTN, base.sectionData.GetText("CONTINUE"));
 			}
 			break;
 		}
 		case SmithType.GENERATE:
-		{
-			Transform obj3 = ctrl;
-			Vector3 localPosition5 = ctrl.get_localPosition();
-			float y3 = localPosition5.y;
-			Vector3 localPosition6 = ctrl.get_localPosition();
-			obj3.set_localPosition(new Vector3(-34f, y3, localPosition6.z));
-			SetActive((Enum)UI.BTN_NEXT_GRAY, is_visible: false);
-			SetActive((Enum)UI.BTN_NEXT_RIGHT, is_visible: true);
-			SetEventName((Enum)UI.BTN_NEXT_RIGHT, "TO_GROW");
-			SetActive((Enum)UI.BTN_TO_SELECT, is_visible: true);
-			SetActive((Enum)UI.BTN_TO_SELECT_CENTER, is_visible: false);
-			SetLabelText((Enum)UI.LBL_NEXT_BTN, base.sectionData.GetText("CONTINUE"));
+			ctrl.localPosition = new Vector3(-34f, ctrl.localPosition.y, ctrl.localPosition.z);
+			SetActive(UI.BTN_NEXT_GRAY, is_visible: false);
+			SetActive(UI.BTN_NEXT_RIGHT, is_visible: true);
+			SetEventName(UI.BTN_NEXT_RIGHT, "TO_GROW");
+			SetActive(UI.BTN_TO_SELECT, is_visible: true);
+			SetActive(UI.BTN_TO_SELECT_CENTER, is_visible: false);
+			SetLabelText(UI.LBL_NEXT_BTN, base.sectionData.GetText("CONTINUE"));
 			break;
-		}
 		case SmithType.GROW:
 		{
-			Transform obj4 = ctrl;
-			Vector3 localPosition7 = ctrl.get_localPosition();
-			float y4 = localPosition7.y;
-			Vector3 localPosition8 = ctrl.get_localPosition();
-			obj4.set_localPosition(new Vector3(0f, y4, localPosition8.z));
-			SetActive((Enum)UI.BTN_NEXT_GRAY, is_visible: false);
-			SetActive((Enum)UI.BTN_NEXT_RIGHT, is_visible: false);
-			SetActive((Enum)UI.BTN_TO_SELECT, is_visible: true);
-			SetActive((Enum)UI.BTN_TO_SELECT_CENTER, is_visible: false);
+			ctrl.localPosition = new Vector3(0f, ctrl.localPosition.y, ctrl.localPosition.z);
+			SetActive(UI.BTN_NEXT_GRAY, is_visible: false);
+			SetActive(UI.BTN_NEXT_RIGHT, is_visible: false);
+			SetActive(UI.BTN_TO_SELECT, is_visible: true);
+			SetActive(UI.BTN_TO_SELECT_CENTER, is_visible: false);
 			bool flag = false;
 			EquipItemInfo equipItemInfo2 = resultData.itemData as EquipItemInfo;
 			if (equipItemInfo2 != null && equipItemInfo2.IsLevelMax())
 			{
 				if (equipItemInfo2.tableData.IsEvolve())
 				{
-					SetActive((Enum)UI.BTN_NEXT, is_visible: true);
-					SetActive((Enum)UI.BTN_NEXT_GRAY, is_visible: false);
-					SetEvent((Enum)UI.BTN_NEXT, "NEXT_EVOLVE_AUTO", 0);
+					SetActive(UI.BTN_NEXT, is_visible: true);
+					SetActive(UI.BTN_NEXT_GRAY, is_visible: false);
+					SetEvent(UI.BTN_NEXT, "NEXT_EVOLVE_AUTO", 0);
 					flag = true;
 				}
 				else if (!equipItemInfo2.IsExceedMax() || equipItemInfo2.tableData.IsShadow())
 				{
-					SetActive((Enum)UI.BTN_NEXT, is_visible: true);
-					SetActive((Enum)UI.BTN_NEXT_GRAY, is_visible: false);
+					SetActive(UI.BTN_NEXT, is_visible: true);
+					SetActive(UI.BTN_NEXT_GRAY, is_visible: false);
 				}
 				else
 				{
-					SetActive((Enum)UI.BTN_NEXT, is_visible: false);
-					SetActive((Enum)UI.BTN_NEXT_GRAY, is_visible: true);
+					SetActive(UI.BTN_NEXT, is_visible: false);
+					SetActive(UI.BTN_NEXT_GRAY, is_visible: true);
 				}
 			}
 			if (flag)
 			{
-				SetLabelText((Enum)UI.LBL_NEXT_BTN, base.sectionData.GetText("NEXT_EVOLVE"));
-				SetLabelText((Enum)UI.LBL_NEXT_GRAY_BTN, base.sectionData.GetText("NEXT_EVOLVE"));
+				SetLabelText(UI.LBL_NEXT_BTN, base.sectionData.GetText("NEXT_EVOLVE"));
+				SetLabelText(UI.LBL_NEXT_GRAY_BTN, base.sectionData.GetText("NEXT_EVOLVE"));
 			}
 			else
 			{
-				SetLabelText((Enum)UI.LBL_NEXT_BTN, base.sectionData.GetText("CONTINUE"));
-				SetLabelText((Enum)UI.LBL_NEXT_GRAY_BTN, base.sectionData.GetText("CONTINUE"));
+				SetLabelText(UI.LBL_NEXT_BTN, base.sectionData.GetText("CONTINUE"));
+				SetLabelText(UI.LBL_NEXT_GRAY_BTN, base.sectionData.GetText("CONTINUE"));
 			}
 			break;
 		}
 		case SmithType.SKILL_GROW:
 		{
-			Transform obj = ctrl;
-			Vector3 localPosition = ctrl.get_localPosition();
-			float y = localPosition.y;
-			Vector3 localPosition2 = ctrl.get_localPosition();
-			obj.set_localPosition(new Vector3(0f, y, localPosition2.z));
-			SetActive((Enum)UI.BTN_NEXT_GRAY, is_visible: false);
-			SetActive((Enum)UI.BTN_NEXT_RIGHT, is_visible: false);
-			SetActive((Enum)UI.BTN_TO_SELECT, is_visible: true);
-			SetActive((Enum)UI.BTN_TO_SELECT_CENTER, is_visible: false);
+			ctrl.localPosition = new Vector3(0f, ctrl.localPosition.y, ctrl.localPosition.z);
+			SetActive(UI.BTN_NEXT_GRAY, is_visible: false);
+			SetActive(UI.BTN_NEXT_RIGHT, is_visible: false);
+			SetActive(UI.BTN_TO_SELECT, is_visible: true);
+			SetActive(UI.BTN_TO_SELECT_CENTER, is_visible: false);
 			SkillItemInfo skillItemInfo = resultData.itemData as SkillItemInfo;
 			if (skillItemInfo != null && skillItemInfo.IsLevelMax())
 			{
-				SetActive((Enum)UI.BTN_NEXT, is_visible: false);
-				SetActive((Enum)UI.BTN_NEXT_GRAY, is_visible: true);
+				SetActive(UI.BTN_NEXT, is_visible: false);
+				SetActive(UI.BTN_NEXT_GRAY, is_visible: true);
 			}
-			SetLabelText((Enum)UI.LBL_NEXT_BTN, base.sectionData.GetText("CONTINUE"));
-			SetLabelText((Enum)UI.LBL_NEXT_GRAY_BTN, base.sectionData.GetText("CONTINUE"));
+			SetLabelText(UI.LBL_NEXT_BTN, base.sectionData.GetText("CONTINUE"));
+			SetLabelText(UI.LBL_NEXT_GRAY_BTN, base.sectionData.GetText("CONTINUE"));
 			break;
 		}
 		}
-		SetLabelText((Enum)UI.LBL_NEXT_BTN_R, base.GetComponent<UILabel>((Enum)UI.LBL_NEXT_BTN).text);
-		SetLabelText((Enum)UI.LBL_NEXT_GRAY_BTN_R, base.GetComponent<UILabel>((Enum)UI.LBL_NEXT_GRAY_BTN).text);
-		SetLabelText((Enum)UI.LBL_TO_SELECT_CENTER_R, base.GetComponent<UILabel>((Enum)UI.LBL_TO_SELECT_CENTER).text);
+		SetLabelText(UI.LBL_NEXT_BTN_R, GetComponent<UILabel>(UI.LBL_NEXT_BTN).text);
+		SetLabelText(UI.LBL_NEXT_GRAY_BTN_R, GetComponent<UILabel>(UI.LBL_NEXT_GRAY_BTN).text);
+		SetLabelText(UI.LBL_TO_SELECT_CENTER_R, GetComponent<UILabel>(UI.LBL_TO_SELECT_CENTER).text);
 	}
 
 	protected override void EquipImg()
@@ -463,12 +424,12 @@ public abstract class EquipResultBase : SmithEquipBase
 		if (smithType != SmithType.SKILL_GROW)
 		{
 			EquipItemInfo equipItemInfo = resultData.itemData as EquipItemInfo;
-			SetRenderEquipModel((Enum)UI.TEX_MODEL, equipItemInfo.tableID, -1, -1, 1f);
+			SetRenderEquipModel(UI.TEX_MODEL, equipItemInfo.tableID);
 		}
 		else
 		{
 			SkillItemInfo skillItemInfo = resultData.itemData as SkillItemInfo;
-			SetRenderSkillItemModel((Enum)UI.TEX_MODEL, skillItemInfo.tableID, rotation: true, light_rotation: false);
+			SetRenderSkillItemModel(UI.TEX_MODEL, skillItemInfo.tableID);
 		}
 	}
 
@@ -497,13 +458,9 @@ public abstract class EquipResultBase : SmithEquipBase
 		{
 			equipItemAbility = new EquipItemAbility(equipItemInfo.ability[num].id, -1);
 		}
-		else
+		else if (!(resultData.itemData is SkillItemInfo))
 		{
-			SkillItemInfo skillItemInfo = resultData.itemData as SkillItemInfo;
-			if (skillItemInfo == null)
-			{
-				Debug.LogError((object)("err : result data is unknown : atk " + resultData.beforeAtk + " : def " + resultData.beforeDef));
-			}
+			Debug.LogError("err : result data is unknown : atk " + resultData.beforeAtk + " : def " + resultData.beforeDef);
 		}
 		if (equipItemAbility == null)
 		{
@@ -549,8 +506,8 @@ public abstract class EquipResultBase : SmithEquipBase
 		{
 			addAbility = abulity;
 			noticeNum = abulity.Length;
-			SetActive((Enum)UI.SPR_TITLE_ABILITY, is_visible: true);
-			SetActive((Enum)UI.SPR_TITLE_EXCEED, is_visible: false);
+			SetActive(UI.SPR_TITLE_ABILITY, is_visible: true);
+			SetActive(UI.SPR_TITLE_EXCEED, is_visible: false);
 			OnFinishedAddAbilityDirection();
 		}
 	}
@@ -559,16 +516,16 @@ public abstract class EquipResultBase : SmithEquipBase
 	{
 		if (noticeNum > 0)
 		{
-			SetFontStyle((Enum)UI.LBL_ADD_ABILITY, 2);
-			SetLabelText((Enum)UI.LBL_ADD_ABILITY, addAbility[addAbility.Length - noticeNum].GetNameAndAP());
+			SetFontStyle(UI.LBL_ADD_ABILITY, FontStyle.Italic);
+			SetLabelText(UI.LBL_ADD_ABILITY, addAbility[addAbility.Length - noticeNum].GetNameAndAP());
 			noticeNum--;
-			SetActive((Enum)UI.OBJ_ADD_ABILITY, is_visible: true);
-			ResetTween((Enum)UI.OBJ_ADD_ABILITY, 0);
-			PlayTween((Enum)UI.OBJ_ADD_ABILITY, forward: true, (EventDelegate.Callback)OnFinishedAddAbilityDirection, is_input_block: false, 0);
+			SetActive(UI.OBJ_ADD_ABILITY, is_visible: true);
+			ResetTween(UI.OBJ_ADD_ABILITY);
+			PlayTween(UI.OBJ_ADD_ABILITY, forward: true, OnFinishedAddAbilityDirection, is_input_block: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_ADD_ABILITY, is_visible: false);
+			SetActive(UI.OBJ_ADD_ABILITY, is_visible: false);
 		}
 	}
 
@@ -578,8 +535,8 @@ public abstract class EquipResultBase : SmithEquipBase
 		{
 			exceedDescriptions = descriptions;
 			noticeNum = descriptions.Length;
-			SetActive((Enum)UI.SPR_TITLE_ABILITY, is_visible: false);
-			SetActive((Enum)UI.SPR_TITLE_EXCEED, is_visible: true);
+			SetActive(UI.SPR_TITLE_ABILITY, is_visible: false);
+			SetActive(UI.SPR_TITLE_EXCEED, is_visible: true);
 			OnFinishedExceedDirection();
 		}
 	}
@@ -588,32 +545,32 @@ public abstract class EquipResultBase : SmithEquipBase
 	{
 		if (noticeNum > 0)
 		{
-			SetFontStyle((Enum)UI.LBL_ADD_ABILITY, 2);
-			SetLabelText((Enum)UI.LBL_ADD_ABILITY, exceedDescriptions[exceedDescriptions.Length - noticeNum]);
+			SetFontStyle(UI.LBL_ADD_ABILITY, FontStyle.Italic);
+			SetLabelText(UI.LBL_ADD_ABILITY, exceedDescriptions[exceedDescriptions.Length - noticeNum]);
 			noticeNum--;
-			ResetTween((Enum)UI.SPR_TITLE_EXCEED, 0);
-			PlayTween((Enum)UI.SPR_TITLE_EXCEED, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+			ResetTween(UI.SPR_TITLE_EXCEED);
+			PlayTween(UI.SPR_TITLE_EXCEED, forward: true, null, is_input_block: false);
 			EquipItemInfo equipItemInfo = resultData.itemData as EquipItemInfo;
 			int i = 1;
 			for (int num = 4; i <= num; i++)
 			{
-				ResetTween((Enum)UI.SPR_TITLE_EXCEED, i);
+				ResetTween(UI.SPR_TITLE_EXCEED, i);
 				if (i < equipItemInfo.exceed)
 				{
-					SkipTween((Enum)UI.SPR_TITLE_EXCEED, forward: true, i);
+					SkipTween(UI.SPR_TITLE_EXCEED, forward: true, i);
 				}
 				else if (i == equipItemInfo.exceed)
 				{
-					PlayTween((Enum)UI.SPR_TITLE_EXCEED, forward: true, (EventDelegate.Callback)null, is_input_block: false, i);
+					PlayTween(UI.SPR_TITLE_EXCEED, forward: true, null, is_input_block: false, i);
 				}
 			}
-			SetActive((Enum)UI.OBJ_ADD_ABILITY, is_visible: true);
-			ResetTween((Enum)UI.OBJ_ADD_ABILITY, 1);
-			PlayTween((Enum)UI.OBJ_ADD_ABILITY, forward: true, (EventDelegate.Callback)null, is_input_block: false, 1);
+			SetActive(UI.OBJ_ADD_ABILITY, is_visible: true);
+			ResetTween(UI.OBJ_ADD_ABILITY, 1);
+			PlayTween(UI.OBJ_ADD_ABILITY, forward: true, null, is_input_block: false, 1);
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_ADD_ABILITY, is_visible: false);
+			SetActive(UI.OBJ_ADD_ABILITY, is_visible: false);
 		}
 	}
 
@@ -628,14 +585,13 @@ public abstract class EquipResultBase : SmithEquipBase
 
 	protected void OnQuery_ABILITY_DATA_POPUP()
 	{
-		object[] array = GameSection.GetEventData() as object[];
-		int num = (int)array[0];
-		EquipItemInfo equipItemInfo = resultData.itemData as EquipItemInfo;
-		EquipItemAbility abilityDetailText = equipItemInfo.ability[num];
-		Transform targetTrans = array[1] as Transform;
+		object[] obj = GameSection.GetEventData() as object[];
+		int num = (int)obj[0];
+		EquipItemAbility abilityDetailText = (resultData.itemData as EquipItemInfo).ability[num];
+		Transform targetTrans = obj[1] as Transform;
 		if (abilityDetailPopUp == null)
 		{
-			abilityDetailPopUp = CreateAndGetAbilityDetail((Enum)UI.OBJ_DETAIL_ROOT);
+			abilityDetailPopUp = CreateAndGetAbilityDetail(UI.OBJ_DETAIL_ROOT);
 		}
 		abilityDetailPopUp.ShowAbilityDetail(targetTrans);
 		abilityDetailPopUp.SetAbilityDetailText(abilityDetailText);
@@ -656,7 +612,7 @@ public abstract class EquipResultBase : SmithEquipBase
 	{
 		if (abilityDetailPopUp == null)
 		{
-			abilityDetailPopUp = CreateAndGetAbilityDetail((Enum)UI.OBJ_DETAIL_ROOT);
+			abilityDetailPopUp = CreateAndGetAbilityDetail(UI.OBJ_DETAIL_ROOT);
 		}
 		abilityDetailPopUp.PreCacheAbilityDetail(name, ap, desc);
 	}
@@ -668,8 +624,7 @@ public abstract class EquipResultBase : SmithEquipBase
 		{
 			if (equipItemInfo.tableData.IsEvolve())
 			{
-				SmithManager.SmithGrowData smithGrowData = MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();
-				smithGrowData.selectEquipData = equipItemInfo;
+				MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>().selectEquipData = equipItemInfo;
 				GameSection.ChangeEvent("EVOLVE");
 				return;
 			}
@@ -679,7 +634,6 @@ public abstract class EquipResultBase : SmithEquipBase
 				return;
 			}
 		}
-		SmithManager.SmithGrowData smithGrowData2 = MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>();
-		smithGrowData2.selectEquipData = equipItemInfo;
+		MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<SmithManager.SmithGrowData>().selectEquipData = equipItemInfo;
 	}
 }

@@ -102,19 +102,6 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 		set;
 	}
 
-	private InventoryManager()
-	{
-		equipItemInventory = new InventoryList<EquipItemInfo, EquipItem>();
-		skillItemInventory = new InventoryList<SkillItemInfo, SkillItem>();
-		skillMaterialInventory = new InventoryList<SkillItemInfo, SkillItem>();
-		itemInventory = new InventoryList<ItemInfo, Item>();
-		abilityItemInventory = new InventoryList<AbilityItemInfo, AbilityItem>();
-		inGameTempItemInventory = new List<InGameTempItem>();
-		questItemInventory = new InventoryList<QuestItemInfo, QuestItem>();
-		accessoryInventory = new InventoryList<AccessoryInfo, Accessory>();
-		equipItemFilterList = new Dictionary<uint, EquipItemFilter>();
-	}
-
 	public bool IsWeaponInventoryType(INVENTORY_TYPE type)
 	{
 		bool result = false;
@@ -132,6 +119,19 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 			break;
 		}
 		return result;
+	}
+
+	private InventoryManager()
+	{
+		equipItemInventory = new InventoryList<EquipItemInfo, EquipItem>();
+		skillItemInventory = new InventoryList<SkillItemInfo, SkillItem>();
+		skillMaterialInventory = new InventoryList<SkillItemInfo, SkillItem>();
+		itemInventory = new InventoryList<ItemInfo, Item>();
+		abilityItemInventory = new InventoryList<AbilityItemInfo, AbilityItem>();
+		inGameTempItemInventory = new List<InGameTempItem>();
+		questItemInventory = new InventoryList<QuestItemInfo, QuestItem>();
+		accessoryInventory = new InventoryList<AccessoryInfo, Accessory>();
+		equipItemFilterList = new Dictionary<uint, EquipItemFilter>();
 	}
 
 	public List<EquipItemInfo> GetWeaponInventory()
@@ -402,8 +402,7 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 			return false;
 		}
 		List<NeedMaterial> list = new List<NeedMaterial>(needMaterial);
-		LinkedListNode<ItemInfo> node;
-		for (node = itemInventory.GetFirstNode(); node != null; node = node.Next)
+		for (LinkedListNode<ItemInfo> node = itemInventory.GetFirstNode(); node != null; node = node.Next)
 		{
 			bool not_enough = false;
 			NeedMaterial find_material = null;
@@ -511,8 +510,7 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 		{
 			return true;
 		}
-		LinkedListNode<ItemInfo> node;
-		for (node = itemInventory.GetFirstNode(); node != null; node = node.Next)
+		for (LinkedListNode<ItemInfo> node = itemInventory.GetFirstNode(); node != null; node = node.Next)
 		{
 			NeedMaterial find_material = null;
 			list.ForEach(delegate(NeedMaterial material)
@@ -547,13 +545,13 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 
 	public int IsPay(EquipItemInfo equipData)
 	{
-		bool flag = equipData.tableData.getType == GET_TYPE.PAY;
-		int num = 0;
-		if (flag)
+		bool num = equipData.tableData.getType == GET_TYPE.PAY;
+		int num2 = 0;
+		if (num)
 		{
-			return num | 1;
+			return num2 | 1;
 		}
-		return num | 2;
+		return num2 | 2;
 	}
 
 	public int IsHaveingMaterialAndPayAndObtained(SmithCreateItemInfo createData)
@@ -578,11 +576,9 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 			}
 			flag3 = MonoBehaviourSingleton<AchievementManager>.I.CheckEquipItemCollection(createData.equipTableData);
 			List<NeedMaterial> list = new List<NeedMaterial>(needMaterial);
-			int count = list.Count;
-			if (count > 0)
+			if (list.Count > 0)
 			{
-				LinkedListNode<ItemInfo> node;
-				for (node = itemInventory.GetFirstNode(); node != null; node = node.Next)
+				for (LinkedListNode<ItemInfo> node = itemInventory.GetFirstNode(); node != null; node = node.Next)
 				{
 					NeedMaterial find_enough_material = null;
 					list.ForEach(delegate(NeedMaterial material)
@@ -725,11 +721,23 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 		return list;
 	}
 
+	public ItemInfo GetItem(Predicate<ItemInfo> match)
+	{
+		for (LinkedListNode<ItemInfo> linkedListNode = itemInventory.GetFirstNode(); linkedListNode != null; linkedListNode = linkedListNode.Next)
+		{
+			ItemInfo value = linkedListNode.Value;
+			if (match(value))
+			{
+				return value;
+			}
+		}
+		return null;
+	}
+
 	public int GetItemNum(Predicate<ItemInfo> match, int listNum = 0, bool isItemNum = false)
 	{
 		int num = 0;
-		List<ItemInfo> itemList = GetItemList(match, listNum);
-		foreach (ItemInfo item in itemList)
+		foreach (ItemInfo item in GetItemList(match, listNum))
 		{
 			num = ((!isItemNum) ? (num + item.GetNum()) : (num + item.num));
 		}
@@ -761,23 +769,26 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 		case ITEM_ICON_TYPE.NONE:
 			return false;
 		case ITEM_ICON_TYPE.ITEM:
+		{
 			for (LinkedListNode<ItemInfo> linkedListNode2 = itemInventory.GetFirstNode(); linkedListNode2 != null; linkedListNode2 = linkedListNode2.Next)
 			{
 				if (linkedListNode2.Value.uniqueID == uniq_id)
 				{
-					if (linkedListNode2.Value.num > 0)
+					if (linkedListNode2.Value.num <= 0)
 					{
-						return GameSaveData.instance.IsNewItem(type, uniq_id);
+						break;
 					}
-					break;
+					return GameSaveData.instance.IsNewItem(type, uniq_id);
 				}
 			}
 			break;
+		}
 		case ITEM_ICON_TYPE.SKILL_ATTACK:
 		case ITEM_ICON_TYPE.SKILL_SUPPORT:
 		case ITEM_ICON_TYPE.SKILL_HEAL:
 		case ITEM_ICON_TYPE.SKILL_PASSIVE:
 		case ITEM_ICON_TYPE.SKILL_GROW:
+		{
 			for (LinkedListNode<SkillItemInfo> linkedListNode4 = skillItemInventory.GetFirstNode(); linkedListNode4 != null; linkedListNode4 = linkedListNode4.Next)
 			{
 				if (linkedListNode4.Value.uniqueID == uniq_id)
@@ -786,7 +797,9 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 				}
 			}
 			break;
+		}
 		default:
+		{
 			for (LinkedListNode<EquipItemInfo> linkedListNode6 = equipItemInventory.GetFirstNode(); linkedListNode6 != null; linkedListNode6 = linkedListNode6.Next)
 			{
 				if (linkedListNode6.Value.uniqueID == uniq_id)
@@ -795,45 +808,52 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 				}
 			}
 			break;
+		}
 		case ITEM_ICON_TYPE.QUEST_ITEM:
+		{
 			for (LinkedListNode<QuestItemInfo> linkedListNode5 = questItemInventory.GetFirstNode(); linkedListNode5 != null; linkedListNode5 = linkedListNode5.Next)
 			{
 				if (linkedListNode5.Value.uniqueID == uniq_id)
 				{
-					if (linkedListNode5.Value.infoData.questData.num > 0)
+					if (linkedListNode5.Value.infoData.questData.num <= 0)
 					{
-						return GameSaveData.instance.IsNewItem(type, uniq_id);
+						break;
 					}
-					break;
+					return GameSaveData.instance.IsNewItem(type, uniq_id);
 				}
 			}
 			break;
+		}
 		case ITEM_ICON_TYPE.ABILITY_ITEM:
+		{
 			for (LinkedListNode<AbilityItemInfo> linkedListNode3 = abilityItemInventory.GetFirstNode(); linkedListNode3 != null; linkedListNode3 = linkedListNode3.Next)
 			{
 				if (linkedListNode3.Value.uniqueID == uniq_id)
 				{
-					if (linkedListNode3.Value.uniqueID == uniq_id)
+					if (linkedListNode3.Value.uniqueID != uniq_id)
 					{
-						return GameSaveData.instance.IsNewItem(type, uniq_id);
+						break;
 					}
-					break;
+					return GameSaveData.instance.IsNewItem(type, uniq_id);
 				}
 			}
 			break;
+		}
 		case ITEM_ICON_TYPE.ACCESSORY:
+		{
 			for (LinkedListNode<AccessoryInfo> linkedListNode = accessoryInventory.GetFirstNode(); linkedListNode != null; linkedListNode = linkedListNode.Next)
 			{
 				if (linkedListNode.Value.uniqueID == uniq_id)
 				{
-					if (linkedListNode.Value.uniqueID == uniq_id)
+					if (linkedListNode.Value.uniqueID != uniq_id)
 					{
-						return GameSaveData.instance.IsNewItem(type, uniq_id);
+						break;
 					}
-					break;
+					return GameSaveData.instance.IsNewItem(type, uniq_id);
 				}
 			}
 			break;
+		}
 		}
 		return false;
 	}
@@ -848,23 +868,26 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 		switch (type)
 		{
 		case ITEM_ICON_TYPE.ITEM:
+		{
 			for (LinkedListNode<ItemInfo> linkedListNode4 = itemInventory.GetFirstNode(); linkedListNode4 != null; linkedListNode4 = linkedListNode4.Next)
 			{
 				if (linkedListNode4.Value.uniqueID == num)
 				{
-					if (linkedListNode4.Value.num > update_num)
+					if (linkedListNode4.Value.num <= update_num)
 					{
-						return GameSaveData.instance.RemoveNewIcon(type, num);
+						break;
 					}
-					break;
+					return GameSaveData.instance.RemoveNewIcon(type, num);
 				}
 			}
 			break;
+		}
 		case ITEM_ICON_TYPE.SKILL_ATTACK:
 		case ITEM_ICON_TYPE.SKILL_SUPPORT:
 		case ITEM_ICON_TYPE.SKILL_HEAL:
 		case ITEM_ICON_TYPE.SKILL_PASSIVE:
 		case ITEM_ICON_TYPE.SKILL_GROW:
+		{
 			for (LinkedListNode<SkillItemInfo> linkedListNode6 = skillItemInventory.GetFirstNode(); linkedListNode6 != null; linkedListNode6 = linkedListNode6.Next)
 			{
 				if (linkedListNode6.Value.uniqueID == num)
@@ -873,20 +896,24 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 				}
 			}
 			break;
+		}
 		case ITEM_ICON_TYPE.QUEST_ITEM:
+		{
 			for (LinkedListNode<QuestItemInfo> linkedListNode2 = questItemInventory.GetFirstNode(); linkedListNode2 != null; linkedListNode2 = linkedListNode2.Next)
 			{
 				if (linkedListNode2.Value.uniqueID == num)
 				{
-					if (linkedListNode2.Value.infoData.questData.num > update_num)
+					if (linkedListNode2.Value.infoData.questData.num <= update_num)
 					{
-						return GameSaveData.instance.RemoveNewIcon(type, num);
+						break;
 					}
-					break;
+					return GameSaveData.instance.RemoveNewIcon(type, num);
 				}
 			}
 			break;
+		}
 		case ITEM_ICON_TYPE.ABILITY_ITEM:
+		{
 			for (LinkedListNode<AbilityItemInfo> linkedListNode5 = abilityItemInventory.GetFirstNode(); linkedListNode5 != null; linkedListNode5 = linkedListNode5.Next)
 			{
 				if (linkedListNode5.Value.uniqueID == num)
@@ -895,7 +922,9 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 				}
 			}
 			break;
+		}
 		case ITEM_ICON_TYPE.ACCESSORY:
+		{
 			for (LinkedListNode<AccessoryInfo> linkedListNode3 = accessoryInventory.GetFirstNode(); linkedListNode3 != null; linkedListNode3 = linkedListNode3.Next)
 			{
 				if (linkedListNode3.Value.uniqueID == num)
@@ -904,7 +933,9 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 				}
 			}
 			break;
+		}
 		default:
+		{
 			for (LinkedListNode<EquipItemInfo> linkedListNode = equipItemInventory.GetFirstNode(); linkedListNode != null; linkedListNode = linkedListNode.Next)
 			{
 				if (linkedListNode.Value.uniqueID == num)
@@ -913,6 +944,7 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 				}
 			}
 			break;
+		}
 		}
 		return false;
 	}
@@ -945,8 +977,7 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 	{
 		foreach (ExpiredItem expiredItem in list)
 		{
-			List<ItemInfo> itemList = GetItemList((ItemInfo x) => x.tableID == expiredItem.itemId, 1);
-			foreach (ItemInfo item in itemList)
+			foreach (ItemInfo item in GetItemList((ItemInfo x) => x.tableID == expiredItem.itemId, 1))
 			{
 				if (item.expiredAtItem == null)
 				{
@@ -965,7 +996,7 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 		{
 			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInventoryEquipSetExt(string uid, Action<bool> call_back)
@@ -980,7 +1011,7 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInventoryAutoItem(string uid, Action<bool> call_back)
@@ -995,7 +1026,7 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 				MonoBehaviourSingleton<UIPlayerStatus>.I.autoBattleButton.OnUseItem(ret.result.timeLeft);
 			}
 			call_back(flag);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInventoryEquipSetCopy(StatusEquipSetCopyModel.RequestSendForm send_form, Action<bool> call_back)
@@ -1008,7 +1039,7 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInventoryExtend(Action<bool> call_back)
@@ -1024,7 +1055,7 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_INVENTORY_CAPACITY);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void OnDiff(BaseModelDiff.DiffItem diff)
@@ -1106,12 +1137,12 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 			int i = 0;
 			for (int count = diff.add.Count; i < count; i++)
 			{
-				ExpiredItem o = diff.add[i];
+				ExpiredItem o2 = diff.add[i];
 				List<ItemInfo> list2 = list;
-				if (num != o.itemId || list == null)
+				if (num != o2.itemId || list == null)
 				{
-					list2 = GetItemList((ItemInfo x) => x.tableID == o.itemId, 1);
-					num = o.itemId;
+					list2 = GetItemList((ItemInfo x) => x.tableID == o2.itemId, 1);
+					num = o2.itemId;
 					list = list2;
 				}
 				foreach (ItemInfo item in list2)
@@ -1120,7 +1151,7 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 					{
 						item.expiredAtItem = new List<ExpiredItem>();
 					}
-					item.expiredAtItem.Add(o);
+					item.expiredAtItem.Add(o2);
 				}
 			}
 			flag = true;
@@ -1132,19 +1163,19 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 			int j = 0;
 			for (int count2 = diff.update.Count; j < count2; j++)
 			{
-				ExpiredItem o2 = diff.update[j];
+				ExpiredItem o = diff.update[j];
 				List<ItemInfo> list4 = list3;
-				if (num2 != o2.itemId || list3 == null)
+				if (num2 != o.itemId || list3 == null)
 				{
-					list4 = GetItemList((ItemInfo x) => x.tableID == o2.itemId, 1);
-					num2 = o2.itemId;
+					list4 = GetItemList((ItemInfo x) => x.tableID == o.itemId, 1);
+					num2 = o.itemId;
 					list3 = list4;
 				}
 				foreach (ItemInfo item2 in list4)
 				{
-					ExpiredItem expiredItem = item2.expiredAtItem.Find((ExpiredItem y) => y.uniqId.Equals(o2.uniqId));
-					expiredItem.expiredAt = o2.expiredAt;
-					expiredItem.used = o2.used;
+					ExpiredItem expiredItem = item2.expiredAtItem.Find((ExpiredItem y) => y.uniqId.Equals(o.uniqId));
+					expiredItem.expiredAt = o.expiredAt;
+					expiredItem.used = o.used;
 				}
 			}
 			flag = true;
@@ -1422,7 +1453,7 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 				}
 				EquipSetSkillData equipSetSkillData = skillItemInfo.equipSetSkill.Find((EquipSetSkillData x) => x.equipSetNo == o.setNo);
 				ulong num = ulong.Parse(o.euid);
-				if (num == 0)
+				if (num == 0L)
 				{
 					if (equipSetSkillData != null)
 					{
@@ -1486,7 +1517,7 @@ public class InventoryManager : MonoBehaviourSingleton<InventoryManager>
 				}
 				EquipSetSkillData uniqueEquipSetSkill = skillItemInfo.uniqueEquipSetSkill;
 				ulong num = ulong.Parse(diffEquipSetSlot2.euid);
-				if (num == 0)
+				if (num == 0L)
 				{
 					if (uniqueEquipSetSkill != null)
 					{

@@ -41,21 +41,21 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 
 	protected override IEnumerator DoInitialize()
 	{
-		int regionId = (int)GameSection.GetEventData();
-		regionData = Singleton<RegionTable>.I.GetData((uint)regionId);
-		bool needSummary = regionId != 0;
-		SetActive((Enum)UI.BTN_SUMMARY, needSummary);
+		int num = (int)GameSection.GetEventData();
+		regionData = Singleton<RegionTable>.I.GetData((uint)num);
+		bool is_visible = num != 0;
+		SetActive(UI.BTN_SUMMARY, is_visible);
 		LoadingQueue loadQueue = new LoadingQueue(this);
-		string bannerName = ResourceName.GetAreaBG(regionId);
-		LoadObject bannerObj = loadQueue.Load(RESOURCE_CATEGORY.AREA_BACKGROUND, bannerName);
+		string areaBG = ResourceName.GetAreaBG(num);
+		LoadObject bannerObj = loadQueue.Load(RESOURCE_CATEGORY.AREA_BACKGROUND, areaBG);
 		if (loadQueue.IsLoading())
 		{
 			yield return loadQueue.Wait();
 		}
-		Texture2D bannerTex = bannerObj.loadedObject as Texture2D;
-		if (bannerTex != null)
+		Texture2D texture2D = bannerObj.loadedObject as Texture2D;
+		if (texture2D != null)
 		{
-			SetTexture((Enum)UI.TEX_AREA_BG, bannerTex);
+			SetTexture(UI.TEX_AREA_BG, texture2D);
 		}
 		if (ShouldShowEventMapButton())
 		{
@@ -64,11 +64,12 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 			{
 				yield return loadQueue.Wait();
 			}
-			SetTexture(texture: item.loadedObject as Texture2D, texture_enum: UI.TEX_EVENT_BG);
+			Texture2D texture = item.loadedObject as Texture2D;
+			SetTexture(UI.TEX_EVENT_BG, texture);
 			if (item != null && null != item.loadedObject)
 			{
-				GameObject val = item.loadedObject as GameObject;
-				mapItem = val.get_transform();
+				GameObject gameObject = item.loadedObject as GameObject;
+				mapItem = gameObject.transform;
 			}
 		}
 		SetAreaName();
@@ -90,15 +91,14 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 
 	private void SetAreaName()
 	{
-		SetLabelText((Enum)UI.LBL_LOCATION_NAME, regionData.regionName);
-		SetLabelText((Enum)UI.LBL_LOCATION_NAME_EFFECT, regionData.regionName);
+		SetLabelText(UI.LBL_LOCATION_NAME, regionData.regionName);
+		SetLabelText(UI.LBL_LOCATION_NAME_EFFECT, regionData.regionName);
 	}
 
 	protected override void UpdateTable()
 	{
 		int num = 0;
-		int count = stories.Count;
-		if (count > 0)
+		if (stories.Count > 0)
 		{
 			num++;
 		}
@@ -121,17 +121,17 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 		}
 		pageMax = 1 + (list.Count - 1) / 10;
 		bool flag = pageMax > 1;
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
-		SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
+		SetActive(UI.OBJ_ACTIVE_ROOT, flag);
+		SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
+		SetLabelText(UI.LBL_MAX, pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, nowPage.ToString());
 		ShowDeliveryData[] showList = GetPagingList(list.ToArray(), 10, nowPage);
 		int num2 = showList.Length;
 		if (showStory)
 		{
 			num2 += num + stories.Count;
 		}
-		SetActive((Enum)UI.TBL_DELIVERY_QUEST, is_visible: true);
+		SetActive(UI.TBL_DELIVERY_QUEST, is_visible: true);
 		bool flag2 = false;
 		if (ShouldShowEventMapButton())
 		{
@@ -141,7 +141,7 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 		int questStartIndex = 0;
 		if (flag2)
 		{
-			questStartIndex++;
+			int num3 = ++questStartIndex;
 		}
 		int borderIndex = questStartIndex + showList.Length;
 		int storyStartIndex = borderIndex;
@@ -151,16 +151,16 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 		}
 		Transform ctrl = GetCtrl(UI.TBL_DELIVERY_QUEST);
 		int l = 0;
-		for (int childCount = ctrl.get_childCount(); l < childCount; l++)
+		for (int childCount = ctrl.childCount; l < childCount; l++)
 		{
 			Transform child = ctrl.GetChild(0);
-			child.set_parent(null);
-			Object.Destroy(child.get_gameObject());
+			child.parent = null;
+			UnityEngine.Object.Destroy(child.gameObject);
 		}
 		bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, isResetUI, delegate(int i, Transform parent)
+		SetTable(UI.TBL_DELIVERY_QUEST, "", num2, isResetUI, delegate(int i, Transform parent)
 		{
-			Transform val = null;
+			Transform transform = null;
 			if (i >= storyStartIndex)
 			{
 				if (!HasChapterStory() || i == storyStartIndex || !isRenewalFlag)
@@ -177,11 +177,7 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 			{
 				return Realizes("QuestRequestItem", parent);
 			}
-			if (null != mapItem)
-			{
-				return ResourceUtility.Realizes(mapItem.get_gameObject(), parent);
-			}
-			return Realizes("QuestEventBorderItem", parent);
+			return (null != mapItem) ? ResourceUtility.Realizes(mapItem.gameObject, parent) : Realizes("QuestEventBorderItem", parent);
 		}, delegate(int i, Transform t, bool is_recycle)
 		{
 			if (!(t == null))
@@ -196,8 +192,8 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 				{
 					if (i >= questStartIndex)
 					{
-						int num3 = i - questStartIndex;
-						InitDelivery(showList[num3], t);
+						int num4 = i - questStartIndex;
+						InitDelivery(showList[num4], t);
 					}
 					else
 					{
@@ -206,8 +202,7 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 				}
 			}
 		});
-		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-		component.set_enabled(true);
+		GetComponent<UIScrollView>(UI.SCR_DELIVERY_QUEST).enabled = true;
 		RepositionTable();
 	}
 
@@ -234,8 +229,7 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 			}
 			else if (!deliveryTableData.IsEvent())
 			{
-				NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData((int)deliveryTableData.npcID);
-				if (nPCData == null)
+				if (Singleton<NPCTable>.I.GetNPCData((int)deliveryTableData.npcID) == null)
 				{
 					Log.Error("DeliveryTable NPC ID Found  : dId " + delivery.dId + " : npcID " + deliveryTableData.npcID);
 				}
@@ -252,7 +246,7 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 		deliveryInfo = list.ToArray();
 	}
 
-	private new List<DeliveryTable.DeliveryData> CreateClearedDliveryList()
+	protected override List<DeliveryTable.DeliveryData> CreateClearedDliveryList()
 	{
 		List<DeliveryTable.DeliveryData> list = new List<DeliveryTable.DeliveryData>();
 		List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
@@ -313,8 +307,8 @@ public class QuestAreaDeliveryList : QuestEventSelectList
 		GameSection.SetEventData(new object[4]
 		{
 			story.id,
-			string.Empty,
-			string.Empty,
+			"",
+			"",
 			array
 		});
 	}

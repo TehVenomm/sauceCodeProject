@@ -18,7 +18,7 @@ public class SpecialDeviceManager
 
 	public static DeviceIndividualInfo SpecialDeviceInfo => static_device;
 
-	public static bool IsPortrait => Screen.get_width() < Screen.get_height();
+	public static bool IsPortrait => Screen.width < Screen.height;
 
 	public static void StartUp()
 	{

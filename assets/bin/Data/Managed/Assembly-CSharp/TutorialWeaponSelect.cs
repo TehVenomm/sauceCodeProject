@@ -238,11 +238,11 @@ public class TutorialWeaponSelect : GameSection
 	public override void Initialize()
 	{
 		base.Initialize();
-		preloader = this.get_gameObject().AddComponent<PlayerLoader>();
+		preloader = base.gameObject.AddComponent<PlayerLoader>();
 		UpdateStr();
-		SetActive((Enum)UI.OBJ_STATUS_UI_ROOT, is_visible: false);
+		SetActive(UI.OBJ_STATUS_UI_ROOT, is_visible: false);
 		MonoBehaviourSingleton<UIManager>.I.loading.ShowTutorialBg(isShow: true);
-		this.StartCoroutine(Init());
+		StartCoroutine(Init());
 	}
 
 	private IEnumerator Init()
@@ -251,16 +251,16 @@ public class TutorialWeaponSelect : GameSection
 		{
 			yield return null;
 		}
-		this.StartCoroutine(ShowInfo());
-		UIntKeyTable<TutorialGearSetTable.ItemData> result = Singleton<TutorialGearSetTable>.I.ItemTable;
-		equipSet = new EquipSetInfo[result.GetCount()];
-		result.ForEach(delegate(TutorialGearSetTable.ItemData o)
+		StartCoroutine(ShowInfo());
+		UIntKeyTable<TutorialGearSetTable.ItemData> itemTable = Singleton<TutorialGearSetTable>.I.ItemTable;
+		equipSet = new EquipSetInfo[itemTable.GetCount()];
+		itemTable.ForEach(delegate(TutorialGearSetTable.ItemData o)
 		{
 			equipSet[o.id - 1] = new EquipSetInfo(o);
 		});
-		int len = equipSet.Length;
-		equipSetCalc = new EquipSetCalculator[len];
-		for (int i = 0; i < len; i++)
+		int num = equipSet.Length;
+		equipSetCalc = new EquipSetCalculator[num];
+		for (int i = 0; i < num; i++)
 		{
 			equipSetCalc[i] = new EquipSetCalculator();
 			equipSetCalc[i].SetEquipSet(equipSet[i], i);
@@ -270,13 +270,13 @@ public class TutorialWeaponSelect : GameSection
 		RefreshUI();
 		PreLoadModel();
 		MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_2_name_creation, "Tutorial");
-		Debug.LogWarning((object)("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_2_name_creation.ToString()));
+		Debug.LogWarning("trackTutorialStep " + TRACK_TUTORIAL_STEP_BIT.tutorial_2_name_creation.ToString());
 		MonoBehaviourSingleton<GoWrapManager>.I.SendStatusTracking(TRACK_TUTORIAL_STEP_BIT.tutorial_2_name_creation, "Tutorial");
 	}
 
 	private void PreLoadModel()
 	{
-		this.StartCoroutine(IEPreLoadModel());
+		StartCoroutine(IEPreLoadModel());
 	}
 
 	private IEnumerator IEPreLoadModel()
@@ -287,49 +287,49 @@ public class TutorialWeaponSelect : GameSection
 		}
 		for (int i = 0; i < equipSet.Length; i++)
 		{
-			EquipSetInfo equip_set = equipSet[i];
-			PlayerLoadInfo playerLoadInfoMale = PlayerLoadInfo.GenerateForTutorial(0, equip_set.item[0].tableID, equip_set.item[3].tableID, equip_set.item[4].tableID, equip_set.item[5].tableID, equip_set.item[6].tableID);
-			PlayerLoadInfo playerLoadInfoFemale = PlayerLoadInfo.GenerateForTutorial(1, equip_set.item[0].tableID, equip_set.item[3].tableID, equip_set.item[4].tableID, equip_set.item[5].tableID, equip_set.item[6].tableID);
+			EquipSetInfo equipSetInfo = equipSet[i];
+			PlayerLoadInfo playerLoadInfoMale = PlayerLoadInfo.GenerateForTutorial(0, equipSetInfo.item[0].tableID, equipSetInfo.item[3].tableID, equipSetInfo.item[4].tableID, equipSetInfo.item[5].tableID, equipSetInfo.item[6].tableID);
+			PlayerLoadInfo playerLoadInfoFemale = PlayerLoadInfo.GenerateForTutorial(1, equipSetInfo.item[0].tableID, equipSetInfo.item[3].tableID, equipSetInfo.item[4].tableID, equipSetInfo.item[5].tableID, equipSetInfo.item[6].tableID);
 			while (preloader.isLoading)
 			{
 				yield return null;
 			}
-			preloader.StartLoad(playerLoadInfoMale, this.get_gameObject().get_layer(), 99, need_anim_event: false, need_foot_stamp: false, need_shadow: true, enable_light_probes: true, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: true, need_dev_frame_instantiate: true, SHADER_TYPE.NORMAL, null);
+			preloader.StartLoad(playerLoadInfoMale, base.gameObject.layer, 99, need_anim_event: false, need_foot_stamp: false, need_shadow: true, enable_light_probes: true, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: true, need_dev_frame_instantiate: true, SHADER_TYPE.NORMAL, null);
 			while (preloader.isLoading)
 			{
 				yield return null;
 			}
-			preloader.StartLoad(playerLoadInfoFemale, this.get_gameObject().get_layer(), 99, need_anim_event: false, need_foot_stamp: false, need_shadow: true, enable_light_probes: true, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: true, need_dev_frame_instantiate: true, SHADER_TYPE.NORMAL, null);
+			preloader.StartLoad(playerLoadInfoFemale, base.gameObject.layer, 99, need_anim_event: false, need_foot_stamp: false, need_shadow: true, enable_light_probes: true, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: true, need_dev_frame_instantiate: true, SHADER_TYPE.NORMAL, null);
 		}
-		Object.Destroy(preloader);
-		this.StartCoroutine(IEPreloadVoice());
+		UnityEngine.Object.Destroy(preloader);
+		StartCoroutine(IEPreloadVoice());
 		HideLoading();
 		RefreshUI();
 	}
 
 	private IEnumerator IEPreloadVoice()
 	{
-		LoadingQueue loadQueue = new LoadingQueue(this);
+		LoadingQueue loadingQueue = new LoadingQueue(this);
 		int[] array = mvoices;
 		foreach (int voice_id in array)
 		{
-			loadQueue.CacheActionVoice(voice_id);
+			loadingQueue.CacheActionVoice(voice_id);
 		}
-		int[] array2 = fvoices;
-		foreach (int num in array2)
+		array = fvoices;
+		foreach (int num in array)
 		{
 			if (num == 300001 || num == 300002)
 			{
-				loadQueue.CacheVoice(num);
+				loadingQueue.CacheVoice(num);
 			}
 			else
 			{
-				loadQueue.CacheActionVoice(num);
+				loadingQueue.CacheActionVoice(num);
 			}
 		}
-		if (loadQueue.IsLoading())
+		if (loadingQueue.IsLoading())
 		{
-			yield return loadQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
 	}
 
@@ -342,7 +342,7 @@ public class TutorialWeaponSelect : GameSection
 
 	private IEnumerator ShowInfo()
 	{
-		yield return (object)new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		DispatchEvent("INFO", base.sectionData.GetText("STR_INFO"));
 	}
 
@@ -362,7 +362,7 @@ public class TutorialWeaponSelect : GameSection
 		{
 			return;
 		}
-		SetActive((Enum)UI.OBJ_STATUS_UI_ROOT, is_visible: true);
+		SetActive(UI.OBJ_STATUS_UI_ROOT, is_visible: true);
 		EquipSetInfo equipSetInfo = localEquipSet[localEquipSetNo];
 		int j = 0;
 		for (int num = 1; j < num; j++)
@@ -373,42 +373,34 @@ public class TutorialWeaponSelect : GameSection
 			string text = string.Empty;
 			if (equipItemInfo != null && equipItemInfo.tableID != 0)
 			{
-				EquipItemTable.EquipItemData tableData = equipItemInfo.tableData;
-				num2 = tableData.GetIconID(sexId);
+				num2 = equipItemInfo.tableData.GetIconID(sexId);
 				text = string.Format(StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 1u), equipItemInfo.level);
 			}
-			itemIcon.get_gameObject().SetActive(num2 != -1);
-			SetEvent((Enum)iconsBtn[j], (num2 == -1) ? "EQUIP" : "DETAIL", j);
-			SetLabelText((Enum)lblEquipLevel[j], text);
-			SetLabelText((Enum)lblShadowEquipLevel[j], text);
+			itemIcon.gameObject.SetActive(num2 != -1);
+			SetEvent(iconsBtn[j], (num2 != -1) ? "DETAIL" : "EQUIP", j);
+			SetLabelText(lblEquipLevel[j], text);
+			SetLabelText(lblShadowEquipLevel[j], text);
 			if (num2 != -1)
 			{
-				itemIcon.SetEquipExt(equipItemInfo, base.GetComponent<UILabel>((Enum)lblEquipLevel[j]));
+				itemIcon.SetEquipExt(equipItemInfo, GetComponent<UILabel>(lblEquipLevel[j]));
 			}
 			Transform ctrl = GetCtrl(iconsBtn[j]);
 			bool flag = equipItemInfo != null && equipItemInfo.tableID != 0;
 			if (flag)
 			{
-				Transform root = ctrl;
-				Enum ui_widget_enum = UI.OBJ_SKILL_BUTTON_ROOT;
-				string skill_button_prefab_name = "SkillIconButtonTOP";
-				EquipItemTable.EquipItemData tableData2 = equipItemInfo.tableData;
-				SkillSlotUIData[] skillSlotData = GetSkillSlotData(equipSetInfo, equipItemInfo);
-				int button_event_data = j;
-				SetSkillIconButton(root, ui_widget_enum, skill_button_prefab_name, tableData2, skillSlotData, "SKILL_ICON_BUTTON", button_event_data);
+				SetSkillIconButton(ctrl, UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButtonTOP", equipItemInfo.tableData, GetSkillSlotData(equipSetInfo, equipItemInfo), "SKILL_ICON_BUTTON", j);
 			}
-			FindCtrl(ctrl, UI.OBJ_SKILL_BUTTON_ROOT).get_gameObject().SetActive(flag);
+			FindCtrl(ctrl, UI.OBJ_SKILL_BUTTON_ROOT).gameObject.SetActive(flag);
 		}
-		UI? uI = tweenTarget;
-		if (uI.HasValue)
+		if (tweenTarget.HasValue)
 		{
-			ResetTween((Enum)(object)tweenTarget);
-			PlayTween((Enum)(object)tweenTarget, forward: true, null, is_input_block: false);
+			ResetTween(tweenTarget);
+			PlayTween(tweenTarget, forward: true, null, is_input_block: false);
 		}
-		SetActive((Enum)UI.OBJ_STUDIO_BUTTON_ROOT, showEquipMode);
-		SetActive((Enum)UI.TGL_VISIBLE_UI_BUTTON, !showEquipMode);
-		SetToggle((Enum)UI.TGL_SHOW_EQUIP_TYPE, showEquipMode);
-		SetDynamicList((Enum)UI.GRD_DRUM, "equipno", SET_NO_MAX, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool isRecycle)
+		SetActive(UI.OBJ_STUDIO_BUTTON_ROOT, showEquipMode);
+		SetActive(UI.TGL_VISIBLE_UI_BUTTON, !showEquipMode);
+		SetToggle(UI.TGL_SHOW_EQUIP_TYPE, showEquipMode);
+		SetDynamicList(UI.GRD_DRUM, "equipno", SET_NO_MAX, reset: false, null, null, delegate(int i, Transform t, bool isRecycle)
 		{
 			SetLabelText(t, UI.LBL_EQUIP_NO, (i + 1).ToString());
 		});
@@ -422,12 +414,12 @@ public class TutorialWeaponSelect : GameSection
 		playerLoadInfo = PlayerLoadInfo.GenerateForTutorial(sex, equipItemInfo.tableID, equip_set.item[3].tableID, equip_set.item[4].tableID, equip_set.item[5].tableID, equip_set.item[6].tableID);
 		SetRenderPlayerModel(playerLoadInfo);
 		UpdateStat();
-		SetSprite((Enum)UI.SPR_SP_ATTACK_TYPE, equipItemInfo.tableData.spAttackType.GetBigFrameSpriteName());
+		SetSprite(UI.SPR_SP_ATTACK_TYPE, equipItemInfo.tableData.spAttackType.GetBigFrameSpriteName());
 		Transform ctrl = GetCtrl(UI.SPR_TYPE_ICON_BG);
 		Transform t_icon = FindCtrl(ctrl, UI.SPR_TYPE_ICON);
-		Transform val = FindCtrl(ctrl, UI.SPR_TYPE_ICON_RARITY);
-		SetEquipmentTypeIcon(t_icon, ctrl, val, equipItemInfo.tableData);
-		SetActive(val, is_visible: false);
+		Transform transform = FindCtrl(ctrl, UI.SPR_TYPE_ICON_RARITY);
+		SetEquipmentTypeIcon(t_icon, ctrl, transform, equipItemInfo.tableData);
+		SetActive(transform, is_visible: false);
 		SetLabelText(GetCtrl(UI.OBJ_STATUS_UI_ROOT), UI.LBL_SET_TIER, string.Format(StringTable.Get(STRING_CATEGORY.COMMON, 19792u), equip_set.tier));
 		SetLabelText(GetCtrl(UI.OBJ_EQUIP_SET_NAME), UI.LBL_SET_NAME, equip_set.name);
 	}
@@ -453,7 +445,7 @@ public class TutorialWeaponSelect : GameSection
 			return null;
 		}
 		SkillSlotUIData[] array = new SkillSlotUIData[maxSlot];
-		int currentEquipSetNo = GetCurrentEquipSetNo();
+		GetCurrentEquipSetNo();
 		SkillItemInfo[] array2 = new SkillItemInfo[1]
 		{
 			new SkillItemInfo(0, (int)setInfo.skillId, 1, 4)
@@ -518,8 +510,8 @@ public class TutorialWeaponSelect : GameSection
 
 	protected void SetRenderPlayerModel(PlayerLoadInfo load_player_info)
 	{
-		this.StopCoroutine(IERender(load_player_info));
-		this.StartCoroutine(IERender(load_player_info));
+		StopCoroutine(IERender(load_player_info));
+		StartCoroutine(IERender(load_player_info));
 	}
 
 	private IEnumerator IERender(PlayerLoadInfo load_player_info)
@@ -543,7 +535,7 @@ public class TutorialWeaponSelect : GameSection
 	private void PlayVoice()
 	{
 		int[] array = (sexId != 0) ? fvoices : mvoices;
-		int num = (localEquipSetNo >= array.Length) ? array[0] : array[localEquipSetNo];
+		int num = (localEquipSetNo < array.Length) ? array[localEquipSetNo] : array[0];
 		if (IsActive(UI.OBJ_STATUS_UI_ROOT))
 		{
 			if (num == 300001 || num == 300002)
@@ -601,17 +593,16 @@ public class TutorialWeaponSelect : GameSection
 		PlayerPrefs.SetInt("Tut_Leg", (int)localEquipSet[localEquipSetNo].item[4].tableID);
 		PlayerPrefs.SetInt("Tut_Weapon", (int)localEquipSet[localEquipSetNo].item[0].tableID);
 		PlayerPrefs.SetInt("Tut_Sex", sexId);
-		int num = playerLoadInfo.weaponModelID / 1000;
-		PlayerPrefs.SetInt("Tut_Weapon_Type", num);
+		int value = playerLoadInfo.weaponModelID / 1000;
+		PlayerPrefs.SetInt("Tut_Weapon_Type", value);
 	}
 
 	public void UpdateStat()
 	{
-		EquipSetCalculator equipSetCalculator = equipSetCalc[localEquipSetNo];
-		SimpleStatus finalStatus = equipSetCalculator.GetFinalStatus(0, MonoBehaviourSingleton<UserInfoManager>.I.userStatus);
-		SetLabelText((Enum)UI.LBL_ATK, finalStatus.GetAttacksSum().ToString());
-		SetLabelText((Enum)UI.LBL_DEF, finalStatus.GetDefencesSum().ToString());
-		SetLabelText((Enum)UI.LBL_HP, finalStatus.hp.ToString());
+		SimpleStatus finalStatus = equipSetCalc[localEquipSetNo].GetFinalStatus(0, MonoBehaviourSingleton<UserInfoManager>.I.userStatus);
+		SetLabelText(UI.LBL_ATK, finalStatus.GetAttacksSum().ToString());
+		SetLabelText(UI.LBL_DEF, finalStatus.GetDefencesSum().ToString());
+		SetLabelText(UI.LBL_HP, finalStatus.hp.ToString());
 	}
 
 	public void OnQuery_WEAPON_SELECT_MALE()
@@ -637,7 +628,7 @@ public class TutorialWeaponSelect : GameSection
 		base.Exit();
 		if (!MonoBehaviourSingleton<LoadingProcess>.IsValid())
 		{
-			MonoBehaviourSingleton<AppMain>.I.get_gameObject().AddComponent<InGameTutorialManager>();
+			MonoBehaviourSingleton<AppMain>.I.gameObject.AddComponent<InGameTutorialManager>();
 		}
 	}
 
@@ -653,10 +644,9 @@ public class TutorialWeaponSelect : GameSection
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 		if (!(loader == null))
 		{
-			loader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
+			loader.transform.Rotate(GameDefine.GetCharaRotateVector(touch_info));
 		}
 	}
 }

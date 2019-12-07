@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [ExecuteInEditMode]
@@ -60,7 +59,17 @@ public class UICamera : MonoBehaviour
 
 		public float deltaTime => RealTime.time - pressTime;
 
-		public bool isOverUI => current != null && current != fallThrough && NGUITools.FindInParents<UIRoot>(current) != null;
+		public bool isOverUI
+		{
+			get
+			{
+				if (current != null && current != fallThrough)
+				{
+					return NGUITools.FindInParents<UIRoot>(current) != null;
+				}
+				return false;
+			}
+		}
 	}
 
 	public enum EventType
@@ -141,7 +150,7 @@ public class UICamera : MonoBehaviour
 
 	public bool eventsGoToColliders;
 
-	public LayerMask eventReceiverMask = LayerMask.op_Implicit(-1);
+	public LayerMask eventReceiverMask = -1;
 
 	public bool debug;
 
@@ -183,13 +192,13 @@ public class UICamera : MonoBehaviour
 
 	public bool commandClick = true;
 
-	public KeyCode submitKey0 = 13;
+	public KeyCode submitKey0 = KeyCode.Return;
 
-	public KeyCode submitKey1 = 330;
+	public KeyCode submitKey1 = KeyCode.JoystickButton0;
 
-	public KeyCode cancelKey0 = 27;
+	public KeyCode cancelKey0 = KeyCode.Escape;
 
-	public KeyCode cancelKey1 = 331;
+	public KeyCode cancelKey1 = KeyCode.JoystickButton1;
 
 	public static OnCustomInput onCustomInput;
 
@@ -197,9 +206,9 @@ public class UICamera : MonoBehaviour
 
 	private static bool mDisableController = false;
 
-	private static Vector2 mLastPos = Vector2.get_zero();
+	private static Vector2 mLastPos = Vector2.zero;
 
-	public static Vector3 lastWorldPosition = Vector3.get_zero();
+	public static Vector3 lastWorldPosition = Vector3.zero;
 
 	public static RaycastHit lastHit;
 
@@ -211,7 +220,7 @@ public class UICamera : MonoBehaviour
 
 	public static int currentTouchID = -100;
 
-	private static KeyCode mCurrentKey = 48;
+	private static KeyCode mCurrentKey = KeyCode.Alpha0;
 
 	public static MouseOrTouch currentTouch = null;
 
@@ -292,7 +301,7 @@ public class UICamera : MonoBehaviour
 
 	private static BetterList<DepthEntry> mHits = new BetterList<DepthEntry>();
 
-	private static Plane m2DPlane = new Plane(Vector3.get_back(), 0f);
+	private static Plane m2DPlane = new Plane(Vector3.back, 0f);
 
 	private static float mNextEvent = 0f;
 
@@ -304,35 +313,18 @@ public class UICamera : MonoBehaviour
 
 	public static GetTouchCallback GetInputTouch;
 
-	[CompilerGenerated]
-	private static BetterList<UICamera>.CompareFunc _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static GetKeyStateFunc _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static GetKeyStateFunc _003C_003Ef__mg_0024cache2;
-
-	[CompilerGenerated]
-	private static GetKeyStateFunc _003C_003Ef__mg_0024cache3;
-
-	[CompilerGenerated]
-	private static GetAxisFunc _003C_003Ef__mg_0024cache4;
-
 	[Obsolete("Use new OnDragStart / OnDragOver / OnDragOut / OnDragEnd events instead")]
-	public bool stickyPress
-	{
-		get
-		{
-			return true;
-		}
-	}
+	public bool stickyPress => true;
 
 	public static bool disableController
 	{
 		get
 		{
-			return mDisableController && UIPopupList.current == null;
+			if (mDisableController)
+			{
+				return UIPopupList.current == null;
+			}
+			return false;
 		}
 		set
 		{
@@ -345,13 +337,10 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			return mLastPos;
 		}
 		set
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			mLastPos = value;
 		}
 	}
@@ -360,29 +349,19 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			ControlScheme currentScheme = UICamera.currentScheme;
 			if (currentScheme == ControlScheme.Controller)
 			{
 				GameObject hoveredObject = UICamera.hoveredObject;
 				if (hoveredObject != null)
 				{
-					Bounds val = NGUIMath.CalculateAbsoluteWidgetBounds(hoveredObject.get_transform());
-					Camera val2 = NGUITools.FindCameraForLayer(hoveredObject.get_layer());
-					return Vector2.op_Implicit(val2.WorldToScreenPoint(val.get_center()));
+					Bounds bounds = NGUIMath.CalculateAbsoluteWidgetBounds(hoveredObject.transform);
+					return NGUITools.FindCameraForLayer(hoveredObject.layer).WorldToScreenPoint(bounds.center);
 				}
 			}
 			return mLastPos;
 		}
 		set
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			mLastPos = value;
 		}
 	}
@@ -391,14 +370,11 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Invalid comparison between Unknown and I4
-			if ((int)mCurrentKey == 0)
+			if (mCurrentKey == KeyCode.None)
 			{
 				return ControlScheme.Touch;
 			}
-			if ((int)mCurrentKey >= 330)
+			if (mCurrentKey >= KeyCode.JoystickButton0)
 			{
 				return ControlScheme.Controller;
 			}
@@ -409,16 +385,16 @@ public class UICamera : MonoBehaviour
 			switch (value)
 			{
 			case ControlScheme.Mouse:
-				currentKey = 323;
+				currentKey = KeyCode.Mouse0;
 				break;
 			case ControlScheme.Controller:
-				currentKey = 330;
+				currentKey = KeyCode.JoystickButton0;
 				break;
 			case ControlScheme.Touch:
-				currentKey = 0;
+				currentKey = KeyCode.None;
 				break;
 			default:
-				currentKey = 48;
+				currentKey = KeyCode.Alpha0;
 				break;
 			}
 		}
@@ -428,15 +404,10 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			return mCurrentKey;
 		}
 		set
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			if (mCurrentKey == value)
 			{
 				return;
@@ -449,13 +420,13 @@ public class UICamera : MonoBehaviour
 				HideTooltip();
 				if (currentScheme2 == ControlScheme.Mouse)
 				{
-					Cursor.set_lockState(1);
-					Cursor.set_visible(true);
+					Cursor.lockState = CursorLockMode.Locked;
+					Cursor.visible = true;
 				}
 				else
 				{
-					Cursor.set_visible(false);
-					Cursor.set_lockState(0);
+					Cursor.visible = false;
+					Cursor.lockState = CursorLockMode.None;
 					mMouse[0].ignoreDelta = 2;
 				}
 				if (onSchemeChange != null)
@@ -466,7 +437,17 @@ public class UICamera : MonoBehaviour
 		}
 	}
 
-	public static Ray currentRay => (!(currentCamera != null) || currentTouch == null) ? default(Ray) : currentCamera.ScreenPointToRay(Vector2.op_Implicit(currentTouch.pos));
+	public static Ray currentRay
+	{
+		get
+		{
+			if (!(currentCamera != null) || currentTouch == null)
+			{
+				return default(Ray);
+			}
+			return currentCamera.ScreenPointToRay(currentTouch.pos);
+		}
+	}
 
 	public static bool inputHasFocus
 	{
@@ -474,7 +455,7 @@ public class UICamera : MonoBehaviour
 		{
 			if (mInputFocus)
 			{
-				if (Object.op_Implicit(mSelected) && mSelected.get_activeInHierarchy())
+				if ((bool)mSelected && mSelected.activeInHierarchy)
 				{
 					return true;
 				}
@@ -505,7 +486,7 @@ public class UICamera : MonoBehaviour
 		{
 			if (mCam == null)
 			{
-				mCam = this.GetComponent<Camera>();
+				mCam = GetComponent<Camera>();
 			}
 			return mCam;
 		}
@@ -541,7 +522,7 @@ public class UICamera : MonoBehaviour
 			{
 				return currentTouch.current;
 			}
-			if (Object.op_Implicit(mHover) && mHover.get_activeInHierarchy())
+			if ((bool)mHover && mHover.activeInHierarchy)
 			{
 				return mHover;
 			}
@@ -563,7 +544,7 @@ public class UICamera : MonoBehaviour
 				currentTouch = controller;
 			}
 			ShowTooltip(null);
-			if (Object.op_Implicit(mSelected) && currentScheme == ControlScheme.Controller)
+			if ((bool)mSelected && currentScheme == ControlScheme.Controller)
 			{
 				Notify(mSelected, "OnSelect", false);
 				if (onSelect != null)
@@ -572,7 +553,7 @@ public class UICamera : MonoBehaviour
 				}
 				mSelected = null;
 			}
-			if (Object.op_Implicit(mHover))
+			if ((bool)mHover)
 			{
 				Notify(mHover, "OnHover", false);
 				if (onHover != null)
@@ -582,7 +563,7 @@ public class UICamera : MonoBehaviour
 			}
 			mHover = value;
 			currentTouch.clickNotification = ClickNotification.None;
-			if (Object.op_Implicit(mHover))
+			if ((bool)mHover)
 			{
 				if (mHover != controller.current && mHover.GetComponent<UIKeyNavigation>() != null)
 				{
@@ -590,7 +571,7 @@ public class UICamera : MonoBehaviour
 				}
 				if (flag)
 				{
-					UICamera uICamera2 = (!(mHover != null)) ? list[0] : FindCameraForLayer(mHover.get_layer());
+					UICamera uICamera2 = (mHover != null) ? FindCameraForLayer(mHover.layer) : list[0];
 					if (uICamera2 != null)
 					{
 						current = uICamera2;
@@ -606,7 +587,7 @@ public class UICamera : MonoBehaviour
 			if (flag)
 			{
 				current = uICamera;
-				currentCamera = ((!(uICamera != null)) ? null : uICamera.cachedCamera);
+				currentCamera = ((uICamera != null) ? uICamera.cachedCamera : null);
 				currentTouch = null;
 				currentTouchID = -100;
 			}
@@ -617,7 +598,7 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			if (Object.op_Implicit(controller.current) && controller.current.get_activeInHierarchy())
+			if ((bool)controller.current && controller.current.activeInHierarchy)
 			{
 				return controller.current;
 			}
@@ -626,9 +607,9 @@ public class UICamera : MonoBehaviour
 				for (int i = 0; i < UIKeyNavigation.list.size; i++)
 				{
 					UIKeyNavigation uIKeyNavigation = UIKeyNavigation.list[i];
-					if (Object.op_Implicit(uIKeyNavigation) && uIKeyNavigation.constraint != UIKeyNavigation.Constraint.Explicit && uIKeyNavigation.startsSelected)
+					if ((bool)uIKeyNavigation && uIKeyNavigation.constraint != UIKeyNavigation.Constraint.Explicit && uIKeyNavigation.startsSelected)
 					{
-						hoveredObject = uIKeyNavigation.get_gameObject();
+						hoveredObject = uIKeyNavigation.gameObject;
 						controller.current = mHover;
 						return mHover;
 					}
@@ -638,9 +619,9 @@ public class UICamera : MonoBehaviour
 					for (int j = 0; j < UIKeyNavigation.list.size; j++)
 					{
 						UIKeyNavigation uIKeyNavigation2 = UIKeyNavigation.list[j];
-						if (Object.op_Implicit(uIKeyNavigation2) && uIKeyNavigation2.constraint != UIKeyNavigation.Constraint.Explicit)
+						if ((bool)uIKeyNavigation2 && uIKeyNavigation2.constraint != UIKeyNavigation.Constraint.Explicit)
 						{
-							hoveredObject = uIKeyNavigation2.get_gameObject();
+							hoveredObject = uIKeyNavigation2.gameObject;
 							controller.current = mHover;
 							return mHover;
 						}
@@ -652,7 +633,7 @@ public class UICamera : MonoBehaviour
 		}
 		set
 		{
-			if (controller.current != value && Object.op_Implicit(controller.current))
+			if (controller.current != value && (bool)controller.current)
 			{
 				Notify(controller.current, "OnHover", false);
 				if (onHover != null)
@@ -669,7 +650,7 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			if (Object.op_Implicit(mSelected) && mSelected.get_activeInHierarchy())
+			if ((bool)mSelected && mSelected.activeInHierarchy)
 			{
 				return mSelected;
 			}
@@ -694,7 +675,7 @@ public class UICamera : MonoBehaviour
 				currentTouch = controller;
 			}
 			mInputFocus = false;
-			if (Object.op_Implicit(mSelected))
+			if ((bool)mSelected)
 			{
 				Notify(mSelected, "OnSelect", false);
 				if (onSelect != null)
@@ -704,26 +685,22 @@ public class UICamera : MonoBehaviour
 			}
 			mSelected = value;
 			currentTouch.clickNotification = ClickNotification.None;
-			if (value != null)
+			if (value != null && value.GetComponent<UIKeyNavigation>() != null)
 			{
-				UIKeyNavigation component = value.GetComponent<UIKeyNavigation>();
-				if (component != null)
-				{
-					controller.current = value;
-				}
+				controller.current = value;
 			}
-			if (Object.op_Implicit(mSelected) && flag)
+			if ((bool)mSelected && flag)
 			{
-				UICamera uICamera2 = (!(mSelected != null)) ? list[0] : FindCameraForLayer(mSelected.get_layer());
+				UICamera uICamera2 = (mSelected != null) ? FindCameraForLayer(mSelected.layer) : list[0];
 				if (uICamera2 != null)
 				{
 					current = uICamera2;
 					currentCamera = uICamera2.cachedCamera;
 				}
 			}
-			if (Object.op_Implicit(mSelected))
+			if ((bool)mSelected)
 			{
-				mInputFocus = (mSelected.get_activeInHierarchy() && mSelected.GetComponent<UIInput>() != null);
+				mInputFocus = (mSelected.activeInHierarchy && mSelected.GetComponent<UIInput>() != null);
 				if (onSelect != null)
 				{
 					onSelect(mSelected, state: true);
@@ -733,7 +710,7 @@ public class UICamera : MonoBehaviour
 			if (flag)
 			{
 				current = uICamera;
-				currentCamera = ((!(uICamera != null)) ? null : uICamera.cachedCamera);
+				currentCamera = ((uICamera != null) ? uICamera.cachedCamera : null);
 				currentTouch = null;
 				currentTouchID = -100;
 			}
@@ -741,13 +718,7 @@ public class UICamera : MonoBehaviour
 	}
 
 	[Obsolete("Use either 'CountInputSources()' or 'activeTouches.Count'")]
-	public static int touchCount
-	{
-		get
-		{
-			return CountInputSources();
-		}
-	}
+	public static int touchCount => CountInputSources();
 
 	public static int dragCount
 	{
@@ -757,8 +728,7 @@ public class UICamera : MonoBehaviour
 			int i = 0;
 			for (int count = activeTouches.Count; i < count; i++)
 			{
-				MouseOrTouch mouseOrTouch = activeTouches[i];
-				if (mouseOrTouch.dragged != null)
+				if (activeTouches[i].dragged != null)
 				{
 					num++;
 				}
@@ -783,7 +753,11 @@ public class UICamera : MonoBehaviour
 		get
 		{
 			UICamera eventHandler = UICamera.eventHandler;
-			return (!(eventHandler != null)) ? null : eventHandler.cachedCamera;
+			if (!(eventHandler != null))
+			{
+				return null;
+			}
+			return eventHandler.cachedCamera;
 		}
 	}
 
@@ -794,7 +768,7 @@ public class UICamera : MonoBehaviour
 			for (int i = 0; i < list.size; i++)
 			{
 				UICamera uICamera = list.buffer[i];
-				if (!(uICamera == null) && uICamera.get_enabled() && NGUITools.GetActive(uICamera.get_gameObject()))
+				if (!(uICamera == null) && uICamera.enabled && NGUITools.GetActive(uICamera.gameObject))
 				{
 					return uICamera;
 				}
@@ -802,17 +776,6 @@ public class UICamera : MonoBehaviour
 			return null;
 		}
 	}
-
-	public UICamera()
-		: this()
-	{
-	}//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-	//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-	//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-	//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-	//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-	//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-
 
 	public static bool IsPressed(GameObject go)
 	{
@@ -826,8 +789,7 @@ public class UICamera : MonoBehaviour
 		int j = 0;
 		for (int count = activeTouches.Count; j < count; j++)
 		{
-			MouseOrTouch mouseOrTouch = activeTouches[j];
-			if (mouseOrTouch.pressed == go)
+			if (activeTouches[j].pressed == go)
 			{
 				return true;
 			}
@@ -845,8 +807,7 @@ public class UICamera : MonoBehaviour
 		int i = 0;
 		for (int count = activeTouches.Count; i < count; i++)
 		{
-			MouseOrTouch mouseOrTouch = activeTouches[i];
-			if (mouseOrTouch.pressed != null)
+			if (activeTouches[i].pressed != null)
 			{
 				num++;
 			}
@@ -867,11 +828,11 @@ public class UICamera : MonoBehaviour
 
 	private static int CompareFunc(UICamera a, UICamera b)
 	{
-		if (a.cachedCamera.get_depth() < b.cachedCamera.get_depth())
+		if (a.cachedCamera.depth < b.cachedCamera.depth)
 		{
 			return 1;
 		}
-		if (a.cachedCamera.get_depth() > b.cachedCamera.get_depth())
+		if (a.cachedCamera.depth > b.cachedCamera.depth)
 		{
 			return -1;
 		}
@@ -891,7 +852,7 @@ public class UICamera : MonoBehaviour
 			{
 				return component;
 			}
-			trans = trans.get_parent();
+			trans = trans.parent;
 		}
 		return null;
 	}
@@ -909,18 +870,14 @@ public class UICamera : MonoBehaviour
 			{
 				return component;
 			}
-			trans = trans.get_parent();
+			trans = trans.parent;
 		}
 		return null;
 	}
 
 	public static void Raycast(MouseOrTouch touch)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		if (!Raycast(Vector2.op_Implicit(touch.pos)))
+		if (!Raycast(touch.pos))
 		{
 			mRayHitObject = fallThrough;
 		}
@@ -935,95 +892,52 @@ public class UICamera : MonoBehaviour
 
 	public static bool Raycast(Vector3 inPos)
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0293: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0298: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_034c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0351: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0380: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0385: Unknown result type (might be due to invalid IL or missing references)
-		//IL_041c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0469: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0492: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0497: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_050e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0510: Unknown result type (might be due to invalid IL or missing references)
-		//IL_056e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_057f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0584: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0589: Unknown result type (might be due to invalid IL or missing references)
-		//IL_058e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_066f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0674: Unknown result type (might be due to invalid IL or missing references)
-		//IL_077e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07c3: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < list.size; i++)
 		{
 			UICamera uICamera = list.buffer[i];
-			if (!uICamera.get_enabled() || !NGUITools.GetActive(uICamera.get_gameObject()))
+			if (!uICamera.enabled || !NGUITools.GetActive(uICamera.gameObject))
 			{
 				continue;
 			}
 			currentCamera = uICamera.cachedCamera;
-			Vector3 val = currentCamera.ScreenToViewportPoint(inPos);
-			if (float.IsNaN(val.x) || float.IsNaN(val.y) || val.x < 0f || val.x > 1f || val.y < 0f || val.y > 1f)
+			Vector3 vector = currentCamera.ScreenToViewportPoint(inPos);
+			if (float.IsNaN(vector.x) || float.IsNaN(vector.y) || vector.x < 0f || vector.x > 1f || vector.y < 0f || vector.y > 1f)
 			{
 				continue;
 			}
-			Ray val2 = currentCamera.ScreenPointToRay(inPos);
-			int num = currentCamera.get_cullingMask() & LayerMask.op_Implicit(uICamera.eventReceiverMask);
-			float num2 = (!(uICamera.rangeDistance > 0f)) ? (currentCamera.get_farClipPlane() - currentCamera.get_nearClipPlane()) : uICamera.rangeDistance;
+			Ray ray = currentCamera.ScreenPointToRay(inPos);
+			int layerMask = currentCamera.cullingMask & (int)uICamera.eventReceiverMask;
+			float enter = (uICamera.rangeDistance > 0f) ? uICamera.rangeDistance : (currentCamera.farClipPlane - currentCamera.nearClipPlane);
 			if (uICamera.eventType == EventType.World_3D)
 			{
-				if (!Physics.Raycast(val2, ref lastHit, num2, num))
+				if (!Physics.Raycast(ray, out lastHit, enter, layerMask))
 				{
 					continue;
 				}
-				lastWorldPosition = lastHit.get_point();
-				mRayHitObject = lastHit.get_collider().get_gameObject();
+				lastWorldPosition = lastHit.point;
+				mRayHitObject = lastHit.collider.gameObject;
 				if (!list[0].eventsGoToColliders)
 				{
-					Rigidbody val3 = FindRootRigidbody(mRayHitObject.get_transform());
-					if (val3 != null)
+					Rigidbody rigidbody = FindRootRigidbody(mRayHitObject.transform);
+					if (rigidbody != null)
 					{
-						mRayHitObject = val3.get_gameObject();
+						mRayHitObject = rigidbody.gameObject;
 					}
 				}
 				return true;
 			}
 			if (uICamera.eventType == EventType.UI_3D)
 			{
-				RaycastHit[] array = Physics.RaycastAll(val2, num2, num);
+				RaycastHit[] array = Physics.RaycastAll(ray, enter, layerMask);
 				if (array.Length > 1)
 				{
 					for (int j = 0; j < array.Length; j++)
 					{
-						GameObject gameObject = array[j].get_collider().get_gameObject();
+						GameObject gameObject = array[j].collider.gameObject;
 						UIWidget component = gameObject.GetComponent<UIWidget>();
 						if (component != null)
 						{
-							if (!component.isVisible || (component.hitCheck != null && !component.hitCheck(array[j].get_point())))
+							if (!component.isVisible || (component.hitCheck != null && !component.hitCheck(array[j].point)))
 							{
 								continue;
 							}
@@ -1040,8 +954,8 @@ public class UICamera : MonoBehaviour
 						if (mHit.depth != int.MaxValue)
 						{
 							mHit.hit = array[j];
-							mHit.point = array[j].get_point();
-							mHit.go = array[j].get_collider().get_gameObject();
+							mHit.point = array[j].point;
+							mHit.go = array[j].collider.gameObject;
 							mHits.Add(mHit);
 						}
 					}
@@ -1050,12 +964,9 @@ public class UICamera : MonoBehaviour
 					{
 						if (IsVisible(ref mHits.buffer[k]))
 						{
-							DepthEntry depthEntry = mHits[k];
-							lastHit = depthEntry.hit;
-							DepthEntry depthEntry2 = mHits[k];
-							mRayHitObject = depthEntry2.go;
-							DepthEntry depthEntry3 = mHits[k];
-							lastWorldPosition = depthEntry3.point;
+							lastHit = mHits[k].hit;
+							mRayHitObject = mHits[k].go;
+							lastWorldPosition = mHits[k].point;
 							mHits.Clear();
 							return true;
 						}
@@ -1068,11 +979,11 @@ public class UICamera : MonoBehaviour
 					{
 						continue;
 					}
-					GameObject gameObject2 = array[0].get_collider().get_gameObject();
+					GameObject gameObject2 = array[0].collider.gameObject;
 					UIWidget component2 = gameObject2.GetComponent<UIWidget>();
 					if (component2 != null)
 					{
-						if (!component2.isVisible || (component2.hitCheck != null && !component2.hitCheck(array[0].get_point())))
+						if (!component2.isVisible || (component2.hitCheck != null && !component2.hitCheck(array[0].point)))
 						{
 							continue;
 						}
@@ -1085,11 +996,11 @@ public class UICamera : MonoBehaviour
 							continue;
 						}
 					}
-					if (IsVisible(array[0].get_point(), array[0].get_collider().get_gameObject()))
+					if (IsVisible(array[0].point, array[0].collider.gameObject))
 					{
 						lastHit = array[0];
-						lastWorldPosition = array[0].get_point();
-						mRayHitObject = lastHit.get_collider().get_gameObject();
+						lastWorldPosition = array[0].point;
+						mRayHitObject = lastHit.collider.gameObject;
 						return true;
 					}
 				}
@@ -1098,39 +1009,39 @@ public class UICamera : MonoBehaviour
 			{
 				if (uICamera.eventType == EventType.World_2D)
 				{
-					if (!m2DPlane.Raycast(val2, ref num2))
+					if (!m2DPlane.Raycast(ray, out enter))
 					{
 						continue;
 					}
-					Vector3 point = val2.GetPoint(num2);
-					Collider2D val4 = Physics2D.OverlapPoint(Vector2.op_Implicit(point), num);
-					if (!Object.op_Implicit(val4))
+					Vector3 point = ray.GetPoint(enter);
+					Collider2D collider2D = Physics2D.OverlapPoint(point, layerMask);
+					if (!collider2D)
 					{
 						continue;
 					}
 					lastWorldPosition = point;
-					mRayHitObject = val4.get_gameObject();
+					mRayHitObject = collider2D.gameObject;
 					if (!uICamera.eventsGoToColliders)
 					{
-						Rigidbody2D val5 = FindRootRigidbody2D(mRayHitObject.get_transform());
-						if (val5 != null)
+						Rigidbody2D rigidbody2D = FindRootRigidbody2D(mRayHitObject.transform);
+						if (rigidbody2D != null)
 						{
-							mRayHitObject = val5.get_gameObject();
+							mRayHitObject = rigidbody2D.gameObject;
 						}
 					}
 					return true;
 				}
-				if (uICamera.eventType != EventType.UI_2D || !m2DPlane.Raycast(val2, ref num2))
+				if (uICamera.eventType != EventType.UI_2D || !m2DPlane.Raycast(ray, out enter))
 				{
 					continue;
 				}
-				lastWorldPosition = val2.GetPoint(num2);
-				Collider2D[] array2 = Physics2D.OverlapPointAll(Vector2.op_Implicit(lastWorldPosition), num);
+				lastWorldPosition = ray.GetPoint(enter);
+				Collider2D[] array2 = Physics2D.OverlapPointAll(lastWorldPosition, layerMask);
 				if (array2.Length > 1)
 				{
 					for (int l = 0; l < array2.Length; l++)
 					{
-						GameObject gameObject3 = array2[l].get_gameObject();
+						GameObject gameObject3 = array2[l].gameObject;
 						UIWidget component3 = gameObject3.GetComponent<UIWidget>();
 						if (component3 != null)
 						{
@@ -1160,8 +1071,7 @@ public class UICamera : MonoBehaviour
 					{
 						if (IsVisible(ref mHits.buffer[m]))
 						{
-							DepthEntry depthEntry4 = mHits[m];
-							mRayHitObject = depthEntry4.go;
+							mRayHitObject = mHits[m].go;
 							mHits.Clear();
 							return true;
 						}
@@ -1174,7 +1084,7 @@ public class UICamera : MonoBehaviour
 					{
 						continue;
 					}
-					GameObject gameObject4 = array2[0].get_gameObject();
+					GameObject gameObject4 = array2[0].gameObject;
 					UIWidget component4 = gameObject4.GetComponent<UIWidget>();
 					if (component4 != null)
 					{
@@ -1204,7 +1114,6 @@ public class UICamera : MonoBehaviour
 
 	private static bool IsVisible(Vector3 worldPoint, GameObject go)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 		UIPanel uIPanel = NGUITools.FindInParents<UIPanel>(go);
 		while (uIPanel != null)
 		{
@@ -1219,7 +1128,6 @@ public class UICamera : MonoBehaviour
 
 	private static bool IsVisible(ref DepthEntry de)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 		UIPanel uIPanel = NGUITools.FindInParents<UIPanel>(de.go);
 		while (uIPanel != null)
 		{
@@ -1244,7 +1152,7 @@ public class UICamera : MonoBehaviour
 		{
 			UICamera uICamera = list.buffer[i];
 			Camera cachedCamera = uICamera.cachedCamera;
-			if (cachedCamera != null && (cachedCamera.get_cullingMask() & num) != 0)
+			if (cachedCamera != null && (cachedCamera.cullingMask & num) != 0)
 			{
 				return uICamera;
 			}
@@ -1254,10 +1162,6 @@ public class UICamera : MonoBehaviour
 
 	private static int GetDirection(KeyCode up, KeyCode down)
 	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		if (GetKeyDown(up))
 		{
 			currentKey = up;
@@ -1273,14 +1177,6 @@ public class UICamera : MonoBehaviour
 
 	private static int GetDirection(KeyCode up0, KeyCode up1, KeyCode down0, KeyCode down1)
 	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 		if (GetKeyDown(up0))
 		{
 			currentKey = up0;
@@ -1312,13 +1208,13 @@ public class UICamera : MonoBehaviour
 			float num = GetAxis(axis);
 			if (num > 0.75f)
 			{
-				currentKey = 330;
+				currentKey = KeyCode.JoystickButton0;
 				mNextEvent = time + 0.25f;
 				return 1;
 			}
 			if (num < -0.75f)
 			{
-				currentKey = 330;
+				currentKey = KeyCode.JoystickButton0;
 				mNextEvent = time + 0.25f;
 				return -1;
 			}
@@ -1334,15 +1230,15 @@ public class UICamera : MonoBehaviour
 		}
 		if (currentScheme == ControlScheme.Controller && UIPopupList.isOpen && UIPopupList.current.source == go && UIPopupList.isOpen)
 		{
-			go = UIPopupList.current.get_gameObject();
+			go = UIPopupList.current.gameObject;
 		}
-		if (Object.op_Implicit(go) && go.get_activeInHierarchy())
+		if ((bool)go && go.activeInHierarchy)
 		{
 			mNotifying++;
-			go.SendMessage(funcName, obj, 1);
+			go.SendMessage(funcName, obj, SendMessageOptions.DontRequireReceiver);
 			if (mGenericHandler != null && mGenericHandler != go)
 			{
-				mGenericHandler.SendMessage(funcName, obj, 1);
+				mGenericHandler.SendMessage(funcName, obj, SendMessageOptions.DontRequireReceiver);
 			}
 			mNotifying--;
 		}
@@ -1402,18 +1298,9 @@ public class UICamera : MonoBehaviour
 
 	private void Awake()
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		mWidth = Screen.get_width();
-		mHeight = Screen.get_height();
-		mMouse[0].pos = Vector2.op_Implicit(Input.get_mousePosition());
+		mWidth = Screen.width;
+		mHeight = Screen.height;
+		mMouse[0].pos = Input.mousePosition;
 		for (int i = 1; i < 3; i++)
 		{
 			mMouse[i].pos = mMouse[0].pos;
@@ -1435,30 +1322,28 @@ public class UICamera : MonoBehaviour
 
 	private void Start()
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Invalid comparison between Unknown and I4
-		if (eventType != 0 && (int)cachedCamera.get_transparencySortMode() != 2)
+		if (eventType != 0 && cachedCamera.transparencySortMode != TransparencySortMode.Orthographic)
 		{
-			cachedCamera.set_transparencySortMode(2);
+			cachedCamera.transparencySortMode = TransparencySortMode.Orthographic;
 		}
-		if (!Application.get_isPlaying())
+		if (!Application.isPlaying)
 		{
 			return;
 		}
 		if (fallThrough == null)
 		{
-			UIRoot uIRoot = NGUITools.FindInParents<UIRoot>(this.get_gameObject());
+			UIRoot uIRoot = NGUITools.FindInParents<UIRoot>(base.gameObject);
 			if (uIRoot != null)
 			{
-				fallThrough = uIRoot.get_gameObject();
+				fallThrough = uIRoot.gameObject;
 			}
 			else
 			{
-				Transform transform = this.get_transform();
-				fallThrough = ((!(transform.get_parent() != null)) ? this.get_gameObject() : transform.get_parent().get_gameObject());
+				Transform transform = base.transform;
+				fallThrough = ((transform.parent != null) ? transform.parent.gameObject : base.gameObject);
 			}
 		}
-		cachedCamera.set_eventMask(0);
+		cachedCamera.eventMask = 0;
 	}
 
 	private void Update()
@@ -1487,7 +1372,7 @@ public class UICamera : MonoBehaviour
 		}
 		if (useMouse && mHover != null)
 		{
-			float num = string.IsNullOrEmpty(scrollAxisName) ? 0f : GetAxis(scrollAxisName);
+			float num = (!string.IsNullOrEmpty(scrollAxisName)) ? GetAxis(scrollAxisName) : 0f;
 			if (num != 0f)
 			{
 				if (onScroll != null)
@@ -1496,7 +1381,7 @@ public class UICamera : MonoBehaviour
 				}
 				Notify(mHover, "OnScroll", num);
 			}
-			if (showTooltips && mTooltipTime != 0f && !UIPopupList.isOpen && (mTooltipTime < RealTime.time || GetKey(304) || GetKey(303)))
+			if (showTooltips && mTooltipTime != 0f && !UIPopupList.isOpen && (mTooltipTime < RealTime.time || GetKey(KeyCode.LeftShift) || GetKey(KeyCode.RightShift)))
 			{
 				currentTouch = mMouse[0];
 				currentTouchID = -1;
@@ -1517,8 +1402,8 @@ public class UICamera : MonoBehaviour
 		{
 			return;
 		}
-		int width = Screen.get_width();
-		int height = Screen.get_height();
+		int width = Screen.width;
+		int height = Screen.height;
 		if (width != mWidth || height != mHeight)
 		{
 			mWidth = width;
@@ -1533,35 +1418,19 @@ public class UICamera : MonoBehaviour
 
 	public void ProcessMouse()
 	{
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b0: Unknown result type (might be due to invalid IL or missing references)
 		bool flag = false;
 		bool flag2 = false;
 		for (int i = 0; i < 3; i++)
 		{
 			if (Input.GetMouseButtonDown(i))
 			{
-				currentKey = 323 + i;
+				currentKey = (KeyCode)(323 + i);
 				flag2 = true;
 				flag = true;
 			}
 			else if (Input.GetMouseButton(i))
 			{
-				currentKey = 323 + i;
+				currentKey = (KeyCode)(323 + i);
 				flag = true;
 			}
 		}
@@ -1570,10 +1439,10 @@ public class UICamera : MonoBehaviour
 			return;
 		}
 		currentTouch = mMouse[0];
-		Vector2 val = Vector2.op_Implicit(Input.get_mousePosition());
+		Vector2 vector = Input.mousePosition;
 		if (currentTouch.ignoreDelta == 0)
 		{
-			currentTouch.delta = val - currentTouch.pos;
+			currentTouch.delta = vector - currentTouch.pos;
 		}
 		else
 		{
@@ -1581,9 +1450,9 @@ public class UICamera : MonoBehaviour
 			currentTouch.delta.x = 0f;
 			currentTouch.delta.y = 0f;
 		}
-		float sqrMagnitude = currentTouch.delta.get_sqrMagnitude();
-		currentTouch.pos = val;
-		mLastPos = val;
+		float sqrMagnitude = currentTouch.delta.sqrMagnitude;
+		currentTouch.pos = vector;
+		mLastPos = vector;
 		bool flag3 = false;
 		if (currentScheme != 0)
 		{
@@ -1591,7 +1460,7 @@ public class UICamera : MonoBehaviour
 			{
 				return;
 			}
-			currentKey = 323;
+			currentKey = KeyCode.Mouse0;
 			flag3 = true;
 		}
 		else if (sqrMagnitude > 0.001f)
@@ -1603,7 +1472,7 @@ public class UICamera : MonoBehaviour
 			mMouse[j].pos = currentTouch.pos;
 			mMouse[j].delta = currentTouch.delta;
 		}
-		if (flag || flag3 || mNextRaycast < RealTime.time)
+		if ((flag | flag3) || mNextRaycast < RealTime.time)
 		{
 			mNextRaycast = RealTime.time + 0.02f;
 			Raycast(currentTouch);
@@ -1621,13 +1490,13 @@ public class UICamera : MonoBehaviour
 		currentTouchID = -1;
 		if (flag4)
 		{
-			currentKey = 323;
+			currentKey = KeyCode.Mouse0;
 		}
-		if (!flag && flag3 && (!stickyTooltip || flag4))
+		if (!flag && flag3 && (!stickyTooltip | flag4))
 		{
 			if (mTooltipTime != 0f)
 			{
-				mTooltipTime = Time.get_unscaledTime() + tooltipDelay;
+				mTooltipTime = Time.unscaledTime + tooltipDelay;
 			}
 			else if (mTooltip != null)
 			{
@@ -1647,13 +1516,13 @@ public class UICamera : MonoBehaviour
 		{
 			bool mouseButtonDown = Input.GetMouseButtonDown(l);
 			bool mouseButtonUp = Input.GetMouseButtonUp(l);
-			if (mouseButtonDown || mouseButtonUp)
+			if (mouseButtonDown | mouseButtonUp)
 			{
-				currentKey = 323 + l;
+				currentKey = (KeyCode)(323 + l);
 			}
 			currentTouch = mMouse[l];
 			currentTouchID = -1 - l;
-			currentKey = 323 + l;
+			currentKey = (KeyCode)(323 + l);
 			if (mouseButtonDown)
 			{
 				currentTouch.pressedCam = currentCamera;
@@ -1670,7 +1539,7 @@ public class UICamera : MonoBehaviour
 			currentTouch = mMouse[0];
 			mTooltipTime = RealTime.time + tooltipDelay;
 			currentTouchID = -1;
-			currentKey = 323;
+			currentKey = KeyCode.Mouse0;
 			hoveredObject = currentTouch.current;
 		}
 		currentTouch = null;
@@ -1683,28 +1552,7 @@ public class UICamera : MonoBehaviour
 
 	public void ProcessTouches()
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Invalid comparison between Unknown and I4
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Invalid comparison between Unknown and I4
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-		int num = (GetInputTouchCount != null) ? GetInputTouchCount() : Input.get_touchCount();
+		int num = (GetInputTouchCount == null) ? Input.touchCount : GetInputTouchCount();
 		for (int i = 0; i < num; i++)
 		{
 			TouchPhase phase;
@@ -1713,11 +1561,11 @@ public class UICamera : MonoBehaviour
 			int tapCount;
 			if (GetInputTouch == null)
 			{
-				Touch touch = Input.GetTouch(i);
-				phase = touch.get_phase();
-				fingerId = touch.get_fingerId();
-				position = touch.get_position();
-				tapCount = touch.get_tapCount();
+				UnityEngine.Touch touch = Input.GetTouch(i);
+				phase = touch.phase;
+				fingerId = touch.fingerId;
+				position = touch.position;
+				tapCount = touch.tapCount;
 			}
 			else
 			{
@@ -1729,12 +1577,12 @@ public class UICamera : MonoBehaviour
 			}
 			currentTouchID = ((!allowMultiTouch) ? 1 : fingerId);
 			currentTouch = GetTouch(currentTouchID, createIfMissing: true);
-			bool flag = (int)phase == 0 || currentTouch.touchBegan;
-			bool flag2 = (int)phase == 4 || (int)phase == 3;
+			bool flag = phase == TouchPhase.Began || currentTouch.touchBegan;
+			bool flag2 = phase == TouchPhase.Canceled || phase == TouchPhase.Ended;
 			currentTouch.touchBegan = false;
 			currentTouch.delta = position - currentTouch.pos;
 			currentTouch.pos = position;
-			currentKey = 0;
+			currentKey = KeyCode.None;
 			Raycast(currentTouch);
 			if (flag)
 			{
@@ -1779,19 +1627,10 @@ public class UICamera : MonoBehaviour
 
 	private void ProcessFakeTouches()
 	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 		bool mouseButtonDown = Input.GetMouseButtonDown(0);
 		bool mouseButtonUp = Input.GetMouseButtonUp(0);
 		bool mouseButton = Input.GetMouseButton(0);
-		if (mouseButtonDown || mouseButtonUp || mouseButton)
+		if (mouseButtonDown | mouseButtonUp | mouseButton)
 		{
 			currentTouchID = 1;
 			currentTouch = mMouse[0];
@@ -1801,9 +1640,9 @@ public class UICamera : MonoBehaviour
 				currentTouch.pressTime = RealTime.time;
 				activeTouches.Add(currentTouch);
 			}
-			Vector2 val = Vector2.op_Implicit(Input.get_mousePosition());
-			currentTouch.delta = val - currentTouch.pos;
-			currentTouch.pos = val;
+			Vector2 vector = Input.mousePosition;
+			currentTouch.delta = vector - currentTouch.pos;
+			currentTouch.pos = vector;
 			Raycast(currentTouch);
 			if (mouseButtonDown)
 			{
@@ -1813,7 +1652,7 @@ public class UICamera : MonoBehaviour
 			{
 				currentCamera = currentTouch.pressedCam;
 			}
-			currentKey = 0;
+			currentKey = KeyCode.None;
 			ProcessTouch(mouseButtonDown, mouseButtonUp);
 			if (mouseButtonUp)
 			{
@@ -1826,85 +1665,36 @@ public class UICamera : MonoBehaviour
 
 	public void ProcessOthers()
 	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Invalid comparison between Unknown and I4
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Invalid comparison between Unknown and I4
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Invalid comparison between Unknown and I4
-		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012d: Invalid comparison between Unknown and I4
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0287: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0313: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0342: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0400: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0405: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0420: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0436: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0465: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0467: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0468: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0479: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0495: Unknown result type (might be due to invalid IL or missing references)
-		//IL_049c: Invalid comparison between Unknown and I4
-		//IL_04b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04b8: Invalid comparison between Unknown and I4
-		//IL_04cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04d4: Invalid comparison between Unknown and I4
-		//IL_04d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04e0: Invalid comparison between Unknown and I4
-		//IL_04ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_050a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0520: Unknown result type (might be due to invalid IL or missing references)
 		currentTouchID = -100;
 		currentTouch = controller;
 		bool flag = false;
 		bool flag2 = false;
-		if ((int)submitKey0 != 0 && GetKeyDown(submitKey0))
+		if (submitKey0 != 0 && GetKeyDown(submitKey0))
 		{
 			currentKey = submitKey0;
 			flag = true;
 		}
-		else if ((int)submitKey1 != 0 && GetKeyDown(submitKey1))
+		else if (submitKey1 != 0 && GetKeyDown(submitKey1))
 		{
 			currentKey = submitKey1;
 			flag = true;
 		}
-		else if (((int)submitKey0 == 13 || (int)submitKey1 == 13) && GetKeyDown(271))
+		else if ((submitKey0 == KeyCode.Return || submitKey1 == KeyCode.Return) && GetKeyDown(KeyCode.KeypadEnter))
 		{
 			currentKey = submitKey0;
 			flag = true;
 		}
-		if ((int)submitKey0 != 0 && GetKeyUp(submitKey0))
+		if (submitKey0 != 0 && GetKeyUp(submitKey0))
 		{
 			currentKey = submitKey0;
 			flag2 = true;
 		}
-		else if ((int)submitKey1 != 0 && GetKeyUp(submitKey1))
+		else if (submitKey1 != 0 && GetKeyUp(submitKey1))
 		{
 			currentKey = submitKey1;
 			flag2 = true;
 		}
-		else if (((int)submitKey0 == 13 || (int)submitKey1 == 13) && GetKeyUp(271))
+		else if ((submitKey0 == KeyCode.Return || submitKey1 == KeyCode.Return) && GetKeyUp(KeyCode.KeypadEnter))
 		{
 			currentKey = submitKey0;
 			flag2 = true;
@@ -1913,16 +1703,16 @@ public class UICamera : MonoBehaviour
 		{
 			currentTouch.pressTime = RealTime.time;
 		}
-		if ((flag || flag2) && currentScheme == ControlScheme.Controller)
+		if ((flag | flag2) && currentScheme == ControlScheme.Controller)
 		{
 			currentTouch.current = controllerNavigationObject;
 			ProcessTouch(flag, flag2);
 			currentTouch.last = currentTouch.current;
 		}
-		KeyCode val = 0;
+		KeyCode keyCode = KeyCode.None;
 		if (useController)
 		{
-			if (!disableController && currentScheme == ControlScheme.Controller && (currentTouch.current == null || !currentTouch.current.get_activeInHierarchy()))
+			if (!disableController && currentScheme == ControlScheme.Controller && (currentTouch.current == null || !currentTouch.current.activeInHierarchy))
 			{
 				currentTouch.current = controllerNavigationObject;
 			}
@@ -1936,12 +1726,12 @@ public class UICamera : MonoBehaviour
 					currentTouch.current = controllerNavigationObject;
 					if (currentTouch.current != null)
 					{
-						val = ((direction <= 0) ? 274 : 273);
+						keyCode = ((direction > 0) ? KeyCode.UpArrow : KeyCode.DownArrow);
 						if (onNavigate != null)
 						{
-							onNavigate(currentTouch.current, val);
+							onNavigate(currentTouch.current, keyCode);
 						}
-						Notify(currentTouch.current, "OnNavigate", val);
+						Notify(currentTouch.current, "OnNavigate", keyCode);
 					}
 				}
 			}
@@ -1955,17 +1745,17 @@ public class UICamera : MonoBehaviour
 					currentTouch.current = controllerNavigationObject;
 					if (currentTouch.current != null)
 					{
-						val = ((direction2 <= 0) ? 276 : 275);
+						keyCode = ((direction2 > 0) ? KeyCode.RightArrow : KeyCode.LeftArrow);
 						if (onNavigate != null)
 						{
-							onNavigate(currentTouch.current, val);
+							onNavigate(currentTouch.current, keyCode);
 						}
-						Notify(currentTouch.current, "OnNavigate", val);
+						Notify(currentTouch.current, "OnNavigate", keyCode);
 					}
 				}
 			}
-			float num = string.IsNullOrEmpty(horizontalPanAxisName) ? 0f : GetAxis(horizontalPanAxisName);
-			float num2 = string.IsNullOrEmpty(verticalPanAxisName) ? 0f : GetAxis(verticalPanAxisName);
+			float num = (!string.IsNullOrEmpty(horizontalPanAxisName)) ? GetAxis(horizontalPanAxisName) : 0f;
+			float num2 = (!string.IsNullOrEmpty(verticalPanAxisName)) ? GetAxis(verticalPanAxisName) : 0f;
 			if (num != 0f || num2 != 0f)
 			{
 				ShowTooltip(null);
@@ -1973,31 +1763,30 @@ public class UICamera : MonoBehaviour
 				currentTouch.current = controllerNavigationObject;
 				if (currentTouch.current != null)
 				{
-					Vector2 val2 = default(Vector2);
-					val2._002Ector(num, num2);
-					val2 *= Time.get_unscaledDeltaTime();
+					Vector2 vector = new Vector2(num, num2);
+					vector *= Time.unscaledDeltaTime;
 					if (onPan != null)
 					{
-						onPan(currentTouch.current, val2);
+						onPan(currentTouch.current, vector);
 					}
-					Notify(currentTouch.current, "OnPan", val2);
+					Notify(currentTouch.current, "OnPan", vector);
 				}
 			}
 		}
-		if (Input.get_anyKeyDown())
+		if (Input.anyKeyDown)
 		{
 			int i = 0;
 			for (int num3 = NGUITools.keys.Length; i < num3; i++)
 			{
-				KeyCode val3 = NGUITools.keys[i];
-				if (val != val3 && GetKeyDown(val3) && (useKeyboard || (int)val3 >= 323) && (useController || (int)val3 < 330) && (useMouse || ((int)val3 < 323 && (int)val3 > 329)))
+				KeyCode keyCode2 = NGUITools.keys[i];
+				if (keyCode != keyCode2 && GetKeyDown(keyCode2) && (useKeyboard || keyCode2 >= KeyCode.Mouse0) && (useController || keyCode2 < KeyCode.JoystickButton0) && (useMouse || (keyCode2 < KeyCode.Mouse0 && keyCode2 > KeyCode.Mouse6)))
 				{
-					currentKey = val3;
+					currentKey = keyCode2;
 					if (onKey != null)
 					{
-						onKey(currentTouch.current, val3);
+						onKey(currentTouch.current, keyCode2);
 					}
-					Notify(currentTouch.current, "OnKey", val3);
+					Notify(currentTouch.current, "OnKey", keyCode2);
 				}
 			}
 		}
@@ -2006,18 +1795,6 @@ public class UICamera : MonoBehaviour
 
 	private void ProcessPress(bool pressed, float click, float drag)
 	{
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0293: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0300: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0305: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0551: Unknown result type (might be due to invalid IL or missing references)
-		//IL_056f: Unknown result type (might be due to invalid IL or missing references)
 		if (pressed)
 		{
 			if (mTooltip != null)
@@ -2025,7 +1802,7 @@ public class UICamera : MonoBehaviour
 				ShowTooltip(null);
 			}
 			currentTouch.pressStarted = true;
-			if (onPress != null && Object.op_Implicit(currentTouch.pressed))
+			if (onPress != null && (bool)currentTouch.pressed)
 			{
 				onPress(currentTouch.pressed, state: false);
 			}
@@ -2033,9 +1810,9 @@ public class UICamera : MonoBehaviour
 			currentTouch.pressed = currentTouch.current;
 			currentTouch.dragged = currentTouch.current;
 			currentTouch.clickNotification = ClickNotification.BasedOnDelta;
-			currentTouch.totalDelta = Vector2.get_zero();
+			currentTouch.totalDelta = Vector2.zero;
 			currentTouch.dragStarted = false;
-			if (onPress != null && Object.op_Implicit(currentTouch.pressed))
+			if (onPress != null && (bool)currentTouch.pressed)
 			{
 				onPress(currentTouch.pressed, state: true);
 			}
@@ -2049,7 +1826,7 @@ public class UICamera : MonoBehaviour
 				return;
 			}
 			mInputFocus = false;
-			if (Object.op_Implicit(mSelected))
+			if ((bool)mSelected)
 			{
 				Notify(mSelected, "OnSelect", false);
 				if (onSelect != null)
@@ -2058,17 +1835,13 @@ public class UICamera : MonoBehaviour
 				}
 			}
 			mSelected = currentTouch.pressed;
-			if (currentTouch.pressed != null)
+			if (currentTouch.pressed != null && currentTouch.pressed.GetComponent<UIKeyNavigation>() != null)
 			{
-				UIKeyNavigation component = currentTouch.pressed.GetComponent<UIKeyNavigation>();
-				if (component != null)
-				{
-					controller.current = currentTouch.pressed;
-				}
+				controller.current = currentTouch.pressed;
 			}
-			if (Object.op_Implicit(mSelected))
+			if ((bool)mSelected)
 			{
-				mInputFocus = (mSelected.get_activeInHierarchy() && mSelected.GetComponent<UIInput>() != null);
+				mInputFocus = (mSelected.activeInHierarchy && mSelected.GetComponent<UIInput>() != null);
 				if (onSelect != null)
 				{
 					onSelect(mSelected, state: true);
@@ -2078,13 +1851,12 @@ public class UICamera : MonoBehaviour
 		}
 		else
 		{
-			if (!(currentTouch.pressed != null) || (currentTouch.delta.get_sqrMagnitude() == 0f && !(currentTouch.current != currentTouch.last)))
+			if (!(currentTouch.pressed != null) || (currentTouch.delta.sqrMagnitude == 0f && !(currentTouch.current != currentTouch.last)))
 			{
 				return;
 			}
-			MouseOrTouch mouseOrTouch = currentTouch;
-			mouseOrTouch.totalDelta += currentTouch.delta;
-			float sqrMagnitude = currentTouch.totalDelta.get_sqrMagnitude();
+			currentTouch.totalDelta += currentTouch.delta;
+			float sqrMagnitude = currentTouch.totalDelta.sqrMagnitude;
 			bool flag = false;
 			if (!currentTouch.dragStarted && currentTouch.last != currentTouch.current)
 			{
@@ -2118,7 +1890,7 @@ public class UICamera : MonoBehaviour
 				ShowTooltip(null);
 			}
 			isDragging = true;
-			bool flag2 = currentTouch.clickNotification == ClickNotification.None;
+			bool num = currentTouch.clickNotification == ClickNotification.None;
 			if (flag)
 			{
 				if (onDragStart != null)
@@ -2152,7 +1924,7 @@ public class UICamera : MonoBehaviour
 			Notify(currentTouch.dragged, "OnDrag", currentTouch.delta);
 			currentTouch.last = currentTouch.current;
 			isDragging = false;
-			if (flag2)
+			if (num)
 			{
 				currentTouch.clickNotification = ClickNotification.None;
 			}
@@ -2205,7 +1977,7 @@ public class UICamera : MonoBehaviour
 					hoveredObject = currentTouch.current;
 				}
 			}
-			if (currentTouch.dragged == currentTouch.current || (currentScheme != ControlScheme.Controller && currentTouch.clickNotification != 0 && currentTouch.totalDelta.get_sqrMagnitude() < drag))
+			if (currentTouch.dragged == currentTouch.current || (currentScheme != ControlScheme.Controller && currentTouch.clickNotification != 0 && currentTouch.totalDelta.sqrMagnitude < drag))
 			{
 				if (currentTouch.clickNotification != 0 && currentTouch.pressed == currentTouch.current)
 				{
@@ -2253,21 +2025,25 @@ public class UICamera : MonoBehaviour
 		Collider component = go.GetComponent<Collider>();
 		if (component != null)
 		{
-			return component.get_enabled();
+			return component.enabled;
 		}
 		Collider2D component2 = go.GetComponent<Collider2D>();
-		return component2 != null && component2.get_enabled();
+		if (component2 != null)
+		{
+			return component2.enabled;
+		}
+		return false;
 	}
 
 	public void ProcessTouch(bool pressed, bool released)
 	{
 		if (pressed)
 		{
-			mTooltipTime = Time.get_unscaledTime() + tooltipDelay;
+			mTooltipTime = Time.unscaledTime + tooltipDelay;
 		}
 		bool flag = currentScheme == ControlScheme.Mouse;
-		float num = (!flag) ? touchDragThreshold : mouseDragThreshold;
-		float num2 = (!flag) ? touchClickThreshold : mouseClickThreshold;
+		float num = flag ? mouseDragThreshold : touchDragThreshold;
+		float num2 = flag ? mouseClickThreshold : touchClickThreshold;
 		num *= num;
 		num2 *= num2;
 		if (currentTouch.pressed != null)
@@ -2288,7 +2064,7 @@ public class UICamera : MonoBehaviour
 				Notify(currentTouch.current, "OnLongPress", null);
 			}
 		}
-		else if (flag || pressed || released)
+		else if (flag | pressed | released)
 		{
 			ProcessPress(pressed, num2, num);
 			if (released)

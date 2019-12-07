@@ -6,7 +6,7 @@ public class UIAnimationGauge : UIHGauge
 
 	private void Awake()
 	{
-		_mat = this.GetComponent<MeshRenderer>().get_material();
+		_mat = GetComponent<MeshRenderer>().material;
 	}
 
 	protected override void UpdateGauge()

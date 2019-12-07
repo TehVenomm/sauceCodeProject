@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{59BC8477-80F5-492A-B4D2-C7A2AC286A9F}</ProjectGuid>
+    <ProjectGuid>{F8FB4933-3211-4BDC-91EE-19892068B013}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Library</OutputType>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>8.0</LangVersion>
     <AssemblyName>Assembly-CSharp</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
@@ -27,22 +27,93 @@
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="UnityEngine" />
-    <Reference Include="System.Core">
-      <HintPath>C:\WINDOWS\assembly\GAC_MSIL\System.Core\3.5.0.0__b77a5c561934e089\System.Core.dll</HintPath>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
     <Reference Include="System">
-      <HintPath>C:\WINDOWS\assembly\GAC_MSIL\System\2.0.0.0__b77a5c561934e089\System.dll</HintPath>
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\System.dll</HintPath>
     </Reference>
-    <Reference Include="rym_fx_unity5" />
-    <Reference Include="MsgPack" />
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>C:\Users\User\Desktop\sauceCodeProject\assets\bin\Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="TcpClientImplementation" />
-    <Reference Include="Firebase.Messaging" />
-    <Reference Include="Ionic.Zlib.CF" />
-    <Reference Include="Facebook.Unity" />
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="rym_fx_unity5">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\rym_fx_unity5.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\System.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Physics2DModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.Messaging">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\Firebase.Messaging.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestWWWModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+    </Reference>
+    <Reference Include="MsgPack">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\MsgPack.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.GameCenterModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.GameCenterModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zlib.CF">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\Ionic.Zlib.CF.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TerrainModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.TerrainModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Facebook.Unity">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\Facebook.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="TcpClientImplementation">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\TcpClientImplementation.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ClothModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.ClothModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ScreenCaptureModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.ScreenCaptureModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestTextureModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAssetBundleModule">
+      <HintPath>E:\One Drive - FESPPR u260569\OneDrive - Fundação de Estudos Sociais do Paraná\.Private\Dpro Assets\GL 1.8.1\Unzip\assets\bin\Data\Managed\UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbilityAtkArrowSp.cs" />
@@ -91,8 +162,11 @@
     <Compile Include="AccessoryTable.cs" />
     <Compile Include="ACCESSORY_PART.cs" />
     <Compile Include="AccountChangePasswordMail.cs" />
+    <Compile Include="AccountChangeServerConflict.cs" />
     <Compile Include="AccountConflict.cs" />
     <Compile Include="AccountContact.cs" />
+    <Compile Include="AccountLink.cs" />
+    <Compile Include="AccountLinkRobConflict.cs" />
     <Compile Include="AccountLoginBase.cs" />
     <Compile Include="AccountLoginGoogle.cs" />
     <Compile Include="AccountLoginMail.cs" />
@@ -528,6 +602,7 @@
     <Compile Include="ConfigName.cs" />
     <Compile Include="ConfigPPOFF.cs" />
     <Compile Include="ConfigPPON.cs" />
+    <Compile Include="ConfigServer.cs" />
     <Compile Include="ConfigSound.cs" />
     <Compile Include="ConfigTop.cs" />
     <Compile Include="ConfigTouch.cs" />
@@ -888,6 +963,8 @@
     <Compile Include="DISPLAY_TYPE.cs" />
     <Compile Include="DISTANCE.cs" />
     <Compile Include="DoubleUIntKeyTable.cs" />
+    <Compile Include="DownloadEnemyDialog.cs" />
+    <Compile Include="DownloadEnemyProcess.cs" />
     <Compile Include="DraggableCamera.cs" />
     <Compile Include="DrainAttackInfo.cs" />
     <Compile Include="DrawColliderGizmos.cs" />
@@ -907,6 +984,7 @@
     <Compile Include="EffectPlayProcessor.cs" />
     <Compile Include="EffectSizeCtrl.cs" />
     <Compile Include="EffectStock.cs" />
+    <Compile Include="EffectSubLoader.cs" />
     <Compile Include="EffectViewShift.cs" />
     <Compile Include="ElectricShockInfo.cs" />
     <Compile Include="ELEMENT_TYPE.cs" />
@@ -924,6 +1002,8 @@
     <Compile Include="EnemyColliderSettings.cs" />
     <Compile Include="EnemyController.cs" />
     <Compile Include="EnemyDataCache.cs" />
+    <Compile Include="EnemyDownloadScene.cs" />
+    <Compile Include="EnemyDownloadTop.cs" />
     <Compile Include="EnemyEffectObject.cs" />
     <Compile Include="EnemyFieldDropItemTable.cs" />
     <Compile Include="EnemyHitMaterialTable.cs" />
@@ -933,6 +1013,8 @@
     <Compile Include="EnemyPacketSender.cs" />
     <Compile Include="EnemyParam.cs" />
     <Compile Include="EnemyPersonalityTable.cs" />
+    <Compile Include="EnemyPredownloadManager.cs" />
+    <Compile Include="EnemyPredownloadTable.cs" />
     <Compile Include="EnemyRegionWork.cs" />
     <Compile Include="EnemyTable.cs" />
     <Compile Include="EnemyWaveStrategyController.cs" />
@@ -1180,6 +1262,7 @@
     <Compile Include="GATHER_OBJECT_TYPE.cs" />
     <Compile Include="GATHER_POINT_STATUS.cs" />
     <Compile Include="GeneratedAttackObject.cs" />
+    <Compile Include="GetAllAccountsModel.cs" />
     <Compile Include="GetMoreTicketDialog.cs" />
     <Compile Include="GET_TYPE.cs" />
     <Compile Include="GGNativeShare.cs" />
@@ -1217,6 +1300,22 @@
     <Compile Include="GoGameResourceManager.cs" />
     <Compile Include="GoGameSettingsManager.cs" />
     <Compile Include="GoGameTimeManager.cs" />
+    <Compile Include="gogame\BannerAdSize.cs" />
+    <Compile Include="gogame\CustomWindow.cs" />
+    <Compile Include="gogame\FlowLayoutGroup.cs" />
+    <Compile Include="gogame\GoWrap.cs" />
+    <Compile Include="gogame\GoWrapComponent.cs" />
+    <Compile Include="gogame\GoWrapDebugMenu.cs" />
+    <Compile Include="gogame\GoWrapTest.cs" />
+    <Compile Include="gogame\GoWrap_Android.cs" />
+    <Compile Include="gogame\GoWrap_UnityEditor.cs" />
+    <Compile Include="gogame\IGoWrap.cs" />
+    <Compile Include="gogame\IGoWrapDelegate.cs" />
+    <Compile Include="gogame\JSONObject.cs" />
+    <Compile Include="gogame\JSONObjectEnumer.cs" />
+    <Compile Include="gogame\UIHelper.cs" />
+    <Compile Include="gogame\UnityEditorGoWrapMenu.cs" />
+    <Compile Include="gogame\VipStatus.cs" />
     <Compile Include="GoldCanPurchaseModel.cs" />
     <Compile Include="GoldPurchaseItemListModel.cs" />
     <Compile Include="Google.Developers\JavaInterfaceProxy.cs" />
@@ -1606,6 +1705,7 @@
     <Compile Include="IJSONFieldValue.cs" />
     <Compile Include="ILoungePeople.cs" />
     <Compile Include="InformationDialog.cs" />
+    <Compile Include="InGameCameraCuller.cs" />
     <Compile Include="InGameCameraManager.cs" />
     <Compile Include="InGameConfigGraphics.cs" />
     <Compile Include="InGameConfigSound.cs" />
@@ -1771,6 +1871,7 @@
     <Compile Include="LimitedLoginBonus.cs" />
     <Compile Include="LimitedLoginBonusCheck.cs" />
     <Compile Include="LimitedLoginBonusGet.cs" />
+    <Compile Include="LinkRobModel.cs" />
     <Compile Include="LINK_TYPE.cs" />
     <Compile Include="LoadAndInstantiateObject.cs" />
     <Compile Include="LoadingProcess.cs" />
@@ -2213,6 +2314,7 @@
     <Compile Include="PresentManager.cs" />
     <Compile Include="PresentReceiveModel.cs" />
     <Compile Include="PresentTop.cs" />
+    <Compile Include="PriorityQueue.cs" />
     <Compile Include="ProductDataTable.cs" />
     <Compile Include="ProfileChangeDegreeFrame.cs" />
     <Compile Include="ProfileEditComment.cs" />
@@ -2444,6 +2546,8 @@
     <Compile Include="RegistCreateRobAccountModel.cs" />
     <Compile Include="RegistCreateSendParam.cs" />
     <Compile Include="RegistLinkFacebookModel.cs" />
+    <Compile Include="RegistLinkRobIgnoreCloudModel.cs" />
+    <Compile Include="RegistLinkRobUseCloudDataModel.cs" />
     <Compile Include="RegistLogoutModel.cs" />
     <Compile Include="RegistUnlinkFacebookModel.cs" />
     <Compile Include="RenderTargetCacher.cs" />
@@ -2488,7 +2592,9 @@
     <Compile Include="SerialInputModel.cs" />
     <Compile Include="SerialListModel.cs" />
     <Compile Include="SeriesArenaResultTop.cs" />
+    <Compile Include="ServerAccountSaveData.cs" />
     <Compile Include="ServerConstDefine.cs" />
+    <Compile Include="ServerListTable.cs" />
     <Compile Include="SETable.cs" />
     <Compile Include="ShaderGlobal.cs" />
     <Compile Include="SHADER_TYPE.cs" />
@@ -2761,6 +2867,7 @@
     <Compile Include="TradingPostRemoveTransactionModel.cs" />
     <Compile Include="TradingPostSellItemDialog.cs" />
     <Compile Include="TradingPostSellItemModel.cs" />
+    <Compile Include="TradingPostSoldModel.cs" />
     <Compile Include="TradingPostTable.cs" />
     <Compile Include="TradingPostTop.cs" />
     <Compile Include="TradingPostUserAgreement.cs" />

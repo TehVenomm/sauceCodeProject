@@ -76,11 +76,6 @@ public static class ResourceName
 				text += "_bundle";
 			}
 			text = text + ResourceDefine.suffix[(int)category] + GoGameResourceManager.GetDefaultAssetBundleExtension();
-			if (text.Contains("areamap_ui"))
-			{
-				int num = 1;
-				num++;
-			}
 		}
 		else
 		{
@@ -165,14 +160,12 @@ public static class ResourceName
 
 	public static string GetNPCVoiceName(int npc_id, int type, int no)
 	{
-		int npc_voice_id = npc_id * 100000 + type * 100 + no;
-		return GetNPCVoiceName(npc_voice_id);
+		return GetNPCVoiceName(npc_id * 100000 + type * 100 + no);
 	}
 
 	public static string GetNPCVoiceName(int npc_id, int no)
 	{
-		int npc_voice_id = npc_id * 100000 + no;
-		return GetNPCVoiceName(npc_voice_id);
+		return GetNPCVoiceName(npc_id * 100000 + no);
 	}
 
 	public static string GetNPCVoiceName(int npc_voice_id)
@@ -356,14 +349,17 @@ public static class ResourceName
 		if (int.TryParse(s, out result))
 		{
 			result *= 10;
-			switch (stage_name.Substring(stage_name.Length - 1))
+			string a = stage_name.Substring(stage_name.Length - 1);
+			if (!(a == "S"))
 			{
-			case "S":
+				if (a == "N")
+				{
+					result += 2;
+				}
+			}
+			else
+			{
 				result++;
-				break;
-			case "N":
-				result += 2;
-				break;
 			}
 		}
 		return $"QIC_{result:D8}";

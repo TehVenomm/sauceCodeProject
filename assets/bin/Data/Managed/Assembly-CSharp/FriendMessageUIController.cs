@@ -138,9 +138,9 @@ public class FriendMessageUIController : UIBehaviour
 
 	private float interval;
 
-	private Transform ScrollViewTrans => m_scrollViewTrans ?? (m_scrollViewTrans = m_ScrollView.get_transform());
+	private Transform ScrollViewTrans => m_scrollViewTrans ?? (m_scrollViewTrans = m_ScrollView.transform);
 
-	private Transform DragScrollTrans => m_dragScrollTrans ?? (m_dragScrollTrans = m_DragScrollCollider.get_transform());
+	private Transform DragScrollTrans => m_dragScrollTrans ?? (m_dragScrollTrans = m_DragScrollCollider.transform);
 
 	public FriendMessageUserListModel.MessageUserInfo talkUser
 	{
@@ -148,9 +148,29 @@ public class FriendMessageUIController : UIBehaviour
 		private set;
 	}
 
-	private float CurrentTotalHeight => (itemListData == null) ? 0f : itemListData.currentTotalHeight;
+	private float CurrentTotalHeight
+	{
+		get
+		{
+			if (itemListData == null)
+			{
+				return 0f;
+			}
+			return itemListData.currentTotalHeight;
+		}
+	}
 
-	private float BasePosY => (itemListData == null) ? 0f : itemListData.basePosY;
+	private float BasePosY
+	{
+		get
+		{
+			if (itemListData == null)
+			{
+				return 0f;
+			}
+			return itemListData.basePosY;
+		}
+	}
 
 	private UIWidget WidgetBackGroundImg => m_widgetBackGroundImg ?? (m_widgetBackGroundImg = GetCtrl(UI.SPR_BG).GetComponent<UIWidget>());
 
@@ -163,7 +183,7 @@ public class FriendMessageUIController : UIBehaviour
 	public void Initialize(MainChat _manager)
 	{
 		m_manager = _manager;
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -175,24 +195,24 @@ public class FriendMessageUIController : UIBehaviour
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
 			OnScreenRotateAsInit(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
 		}
-		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_quest_chatitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatItem");
-		LoadObject lo_chat_stamp_listitem = load_queue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem");
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject lo_quest_chatitem = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ChatItem");
+		LoadObject lo_chat_stamp_listitem = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem");
 		talkUser = MonoBehaviourSingleton<FriendManager>.I.talkUser;
 		if (talkUser == null)
 		{
 			OnClickCloseButton();
 			yield break;
 		}
-		string talkerName = talkUser.name;
-		SetLebelText(m_titleUpper, talkerName);
-		SetLebelText(m_titleLower, talkerName);
+		string name = talkUser.name;
+		SetLebelText(m_titleUpper, name);
+		SetLebelText(m_titleLower, name);
 		m_nowPage = 0;
 		m_loadedPage = -1;
 		itemListData = new FriendMessage.MessageItemListData(m_talkRootObject);
-		if (load_queue.IsLoading())
+		if (loadingQueue.IsLoading())
 		{
-			yield return load_queue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		chatItemPrefab = (lo_quest_chatitem.loadedObject as GameObject);
 		chatStampListPrefab = (lo_chat_stamp_listitem.loadedObject as GameObject);
@@ -215,8 +235,8 @@ public class FriendMessageUIController : UIBehaviour
 		});
 		if (talkUser.userId == 0)
 		{
-			m_stampListRoot.SetActive(false);
-			m_postFrameObject.SetActive(false);
+			m_stampListRoot.SetActive(value: false);
+			m_postFrameObject.SetActive(value: false);
 		}
 		else
 		{
@@ -267,8 +287,7 @@ public class FriendMessageUIController : UIBehaviour
 		{
 			return false;
 		}
-		StampTable.Data data = Singleton<StampTable>.I.GetData((uint)stampId);
-		if (data == null)
+		if (Singleton<StampTable>.I.GetData((uint)stampId) == null)
 		{
 			return false;
 		}
@@ -294,15 +313,14 @@ public class FriendMessageUIController : UIBehaviour
 
 	private Transform CreateStampItem(int index, Transform parent)
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		if (chatStampListPrefab == null)
 		{
 			return null;
 		}
-		Transform val = ResourceUtility.Realizes(chatStampListPrefab, 5);
-		val.set_parent(parent);
-		val.set_localScale(Vector3.get_one());
-		return val;
+		Transform transform = ResourceUtility.Realizes(chatStampListPrefab, 5);
+		transform.parent = parent;
+		transform.localScale = Vector3.one;
+		return transform;
 	}
 
 	private void InitStampItem(int index, Transform iTransform, bool isRecycle)
@@ -322,31 +340,19 @@ public class FriendMessageUIController : UIBehaviour
 
 	private void AddNextChatItem(Action<ChatItem> initializer, bool topPosition, bool forceScroll)
 	{
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018b: Unknown result type (might be due to invalid IL or missing references)
 		if (chatItemPrefab == null)
 		{
 			return;
 		}
 		FriendMessage.MessageItemListData messageItemListData = itemListData;
 		ChatItem chatItem = null;
-		chatItem = ResourceUtility.Realizes(chatItemPrefab, messageItemListData.rootObject.get_transform(), 5).GetComponent<ChatItem>();
+		chatItem = ResourceUtility.Realizes(chatItemPrefab, messageItemListData.rootObject.transform, 5).GetComponent<ChatItem>();
 		if (topPosition)
 		{
 			initializer(chatItem);
 			float num = chatItem.height + 22f;
 			messageItemListData.basePosY += num;
-			chatItem.get_transform().set_localPosition(new Vector3(-15f, messageItemListData.basePosY, 0f));
+			chatItem.transform.localPosition = new Vector3(-15f, messageItemListData.basePosY, 0f);
 			messageItemListData.currentTotalHeight += num;
 		}
 		else
@@ -356,25 +362,15 @@ public class FriendMessageUIController : UIBehaviour
 				messageItemListData.currentTotalHeight += 22f;
 			}
 			float num2 = messageItemListData.currentTotalHeight - messageItemListData.basePosY;
-			chatItem.get_transform().set_localPosition(new Vector3(-15f, 0f - num2, 0f));
+			chatItem.transform.localPosition = new Vector3(-15f, 0f - num2, 0f);
 			initializer(chatItem);
 			messageItemListData.currentTotalHeight += chatItem.height;
 		}
 		UpdateDummyDragScroll();
 		if (!topPosition && forceScroll)
 		{
-			float currentTotalHeight = messageItemListData.currentTotalHeight;
-			Vector4 baseClipRegion = m_ScrollView.panel.baseClipRegion;
-			float num3 = currentTotalHeight + baseClipRegion.y;
-			Vector4 baseClipRegion2 = m_ScrollView.panel.baseClipRegion;
-			float num4 = num3 - baseClipRegion2.w * 0.5f;
-			Vector3 localPosition = ScrollViewTrans.get_localPosition();
-			float y = localPosition.y;
-			Vector2 clipOffset = m_ScrollView.panel.clipOffset;
-			float num5 = num4 + (y + clipOffset.y);
-			Vector2 clipSoftness = m_ScrollView.panel.clipSoftness;
-			float num6 = num5 + clipSoftness.y;
-			ForceScroll(num6 - messageItemListData.basePosY, useSpring: true);
+			float num3 = messageItemListData.currentTotalHeight + m_ScrollView.panel.baseClipRegion.y - m_ScrollView.panel.baseClipRegion.w * 0.5f + (ScrollViewTrans.localPosition.y + m_ScrollView.panel.clipOffset.y) + m_ScrollView.panel.clipSoftness.y;
+			ForceScroll(num3 - messageItemListData.basePosY, useSpring: true);
 		}
 		if (topPosition)
 		{
@@ -388,18 +384,10 @@ public class FriendMessageUIController : UIBehaviour
 
 	private void SetSliderLimit()
 	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		if (!(m_slideLimit == null))
 		{
-			UIRect.AnchorPoint topAnchor = m_slideLimit.topAnchor;
-			Vector3 hOME_SLIDER_OPEN_POS = HOME_SLIDER_OPEN_POS;
-			topAnchor.absolute = (int)hOME_SLIDER_OPEN_POS.y + 9;
-			UIRect.AnchorPoint bottomAnchor = m_slideLimit.bottomAnchor;
-			Vector3 hOME_SLIDER_CLOSE_POS = HOME_SLIDER_CLOSE_POS;
-			bottomAnchor.absolute = (int)hOME_SLIDER_CLOSE_POS.y - 49;
+			m_slideLimit.topAnchor.absolute = (int)HOME_SLIDER_OPEN_POS.y + 9;
+			m_slideLimit.bottomAnchor.absolute = (int)HOME_SLIDER_CLOSE_POS.y - 49;
 		}
 	}
 
@@ -413,38 +401,13 @@ public class FriendMessageUIController : UIBehaviour
 
 	private void Update()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
 		if (!isInitialized)
 		{
 			return;
 		}
-		Vector4 baseClipRegion = m_ScrollView.panel.baseClipRegion;
-		float w = baseClipRegion.w;
-		Vector4 baseClipRegion2 = m_ScrollView.panel.baseClipRegion;
-		float num = w - baseClipRegion2.y;
-		Vector3 localPosition = DragScrollTrans.get_localPosition();
-		float num2 = num + localPosition.y;
-		Vector4 finalClipRegion = m_ScrollView.panel.finalClipRegion;
-		float w2 = finalClipRegion.w;
-		Vector2 clipOffset = m_ScrollView.panel.clipOffset;
-		float num3 = num2 - (w2 + clipOffset.y);
-		BoxCollider dragScrollCollider = m_DragScrollCollider;
-		Vector4 baseClipRegion3 = m_ScrollView.panel.baseClipRegion;
-		dragScrollCollider.set_center(Vector2.op_Implicit(new Vector2(baseClipRegion3.x, 0f - num3)));
-		interval += Time.get_deltaTime();
+		float num = m_ScrollView.panel.baseClipRegion.w - m_ScrollView.panel.baseClipRegion.y + DragScrollTrans.localPosition.y - (m_ScrollView.panel.finalClipRegion.w + m_ScrollView.panel.clipOffset.y);
+		m_DragScrollCollider.center = new Vector2(m_ScrollView.panel.baseClipRegion.x, 0f - num);
+		interval += Time.deltaTime;
 		if (IntervalSendGetNoRead <= interval)
 		{
 			interval = 0f;
@@ -457,21 +420,21 @@ public class FriendMessageUIController : UIBehaviour
 			hashSet.ExceptWith(postMessageList);
 			FriendMessageData[] array = new FriendMessageData[hashSet.Count];
 			hashSet.CopyTo(array);
-			long num4 = 0L;
+			long num2 = 0L;
 			if (0 < postMessageList.Count)
 			{
-				num4 = postMessageList[0].lid;
+				num2 = postMessageList[0].lid;
 			}
-			for (int num5 = array.Length - 1; num5 >= 0; num5--)
+			for (int num3 = array.Length - 1; num3 >= 0; num3--)
 			{
-				if (num4 > array[0].lid)
+				if (num2 > array[0].lid)
 				{
-					messageQueue.Enqueue(new FriendMessage.PostMessageData(array[num5], _topPosition: true, _forceScroll: false));
+					messageQueue.Enqueue(new FriendMessage.PostMessageData(array[num3], _topPosition: true, _forceScroll: false));
 				}
 			}
 			for (int i = 0; i < array.Length; i++)
 			{
-				if (num4 <= array[0].lid)
+				if (num2 <= array[0].lid)
 				{
 					bool forceScroll = i == array.Length - 1;
 					messageQueue.Enqueue(new FriendMessage.PostMessageData(array[i], _topPosition: false, forceScroll));
@@ -493,7 +456,7 @@ public class FriendMessageUIController : UIBehaviour
 
 	private void Reset()
 	{
-		m_Input.value = string.Empty;
+		m_Input.value = "";
 		m_InputFrame.Reset();
 		UpdateAnchors();
 		UpdateWindowSize();
@@ -501,42 +464,12 @@ public class FriendMessageUIController : UIBehaviour
 
 	public void UpdateWindowSize()
 	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		float currentTotalHeight = CurrentTotalHeight;
-		Vector4 baseClipRegion = m_ScrollView.panel.baseClipRegion;
-		float num = currentTotalHeight + baseClipRegion.y;
-		Vector4 baseClipRegion2 = m_ScrollView.panel.baseClipRegion;
-		float num2 = num - baseClipRegion2.w * 0.5f;
-		Vector3 localPosition = ScrollViewTrans.get_localPosition();
-		float y = localPosition.y;
-		Vector2 clipOffset = m_ScrollView.panel.clipOffset;
-		float num3 = num2 + (y + clipOffset.y);
-		Vector2 clipSoftness = m_ScrollView.panel.clipSoftness;
-		ForceScroll(num3 + clipSoftness.y, useSpring: false);
+		ForceScroll(CurrentTotalHeight + m_ScrollView.panel.baseClipRegion.y - m_ScrollView.panel.baseClipRegion.w * 0.5f + (ScrollViewTrans.localPosition.y + m_ScrollView.panel.clipOffset.y) + m_ScrollView.panel.clipSoftness.y, useSpring: false);
 		UpdateDummyDragScroll();
 	}
 
 	private void UpdateDummyDragScroll()
 	{
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
 		if (m_ScrollView.panel.height > CurrentTotalHeight)
 		{
 			m_DummyDragScroll.height = (int)(m_ScrollView.panel.height - 20f);
@@ -545,58 +478,32 @@ public class FriendMessageUIController : UIBehaviour
 		{
 			m_DummyDragScroll.height = (int)(CurrentTotalHeight - 20f);
 		}
-		Transform dragScrollTrans = DragScrollTrans;
-		Vector2 clipOffset = m_ScrollView.panel.clipOffset;
-		dragScrollTrans.set_localPosition(new Vector3(clipOffset.x, BasePosY - CurrentTotalHeight, 0f));
-		BoxCollider dragScrollCollider = m_DragScrollCollider;
-		Vector4 finalClipRegion = m_ScrollView.panel.finalClipRegion;
-		float z = finalClipRegion.z;
-		Vector4 finalClipRegion2 = m_ScrollView.panel.finalClipRegion;
-		float w = finalClipRegion2.w;
-		Vector2 clipSoftness = m_ScrollView.panel.clipSoftness;
-		dragScrollCollider.set_size(new Vector3(z, w - clipSoftness.y * 2f, 0f));
+		DragScrollTrans.localPosition = new Vector3(m_ScrollView.panel.clipOffset.x, BasePosY - CurrentTotalHeight, 0f);
+		m_DragScrollCollider.size = new Vector3(m_ScrollView.panel.finalClipRegion.z, m_ScrollView.panel.finalClipRegion.w - m_ScrollView.panel.clipSoftness.y * 2f, 0f);
 	}
 
 	private void ForceScroll(float newHeight, bool useSpring)
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 		m_ScrollView.DisableSpring();
 		if (useSpring)
 		{
-			SpringPanel.Begin(m_ScrollView.get_gameObject(), Vector3.get_up() * newHeight, 20f);
+			SpringPanel.Begin(m_ScrollView.gameObject, Vector3.up * newHeight, 20f);
 			return;
 		}
 		Vector2 clipOffset = m_ScrollView.panel.clipOffset;
-		Vector3 localPosition = ScrollViewTrans.get_localPosition();
-		float num = localPosition.y + clipOffset.y;
-		ScrollViewTrans.set_localPosition(Vector3.get_up() * newHeight);
+		float num = ScrollViewTrans.localPosition.y + clipOffset.y;
+		ScrollViewTrans.localPosition = Vector3.up * newHeight;
 		clipOffset.y = 0f - newHeight + num;
 		m_ScrollView.panel.clipOffset = clipOffset;
 	}
 
 	private void OnDragFinished()
 	{
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<FriendManager>.I.messagePageMax - 1 > m_nowPage && m_nowPage == m_loadedPage && CurrentTotalHeight >= m_ScrollView.panel.height)
 		{
 			Bounds bounds = m_ScrollView.bounds;
-			Vector3 val = m_ScrollView.panel.CalculateConstrainOffset(Vector2.op_Implicit(bounds.get_min()), Vector2.op_Implicit(bounds.get_max()));
-			if (30f <= val.y)
+			Vector3 vector = m_ScrollView.panel.CalculateConstrainOffset(bounds.min, bounds.max);
+			if (30f <= vector.y)
 			{
 				m_nowPage++;
 				SendGetMessageDetail();
@@ -610,7 +517,7 @@ public class FriendMessageUIController : UIBehaviour
 		if (value.Length != 0)
 		{
 			SendText(value);
-			m_Input.value = string.Empty;
+			m_Input.value = "";
 			m_InputFrame.FrameResize();
 		}
 	}
@@ -618,9 +525,8 @@ public class FriendMessageUIController : UIBehaviour
 	public void OnInput()
 	{
 		m_InputFrame.FrameResize();
-		string value = m_Input.value;
-		bool flag = string.IsNullOrEmpty(value);
-		if (m_defaultLabelObject.get_activeSelf() != flag)
+		bool flag = string.IsNullOrEmpty(m_Input.value);
+		if (m_defaultLabelObject.activeSelf != flag)
 		{
 			m_defaultLabelObject.SetActive(flag);
 		}
@@ -642,42 +548,31 @@ public class FriendMessageUIController : UIBehaviour
 
 	private void SetCommonScreenSettings(bool _isPortrait)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-		Vector4 val = (!_isPortrait) ? WIDGET_ANCHOR_BG_IMG_SPLIT_LANDSCAPE_SETTINGS : WIDGET_ANCHOR_BG_IMG_DEFAULT_SETTINGS;
-		WidgetBackGroundImg.leftAnchor.Set(0f, val.x);
-		WidgetBackGroundImg.rightAnchor.Set(1f, val.y);
-		WidgetBackGroundImg.bottomAnchor.Set((!_isPortrait) ? 0f : 0f, val.z);
-		WidgetBackGroundImg.topAnchor.Set(1f, val.w);
-		val = ((!_isPortrait) ? WIDGET_ANCHOR_TOP_SPLIT_LANDSCAPE_SETTINGS : WIDGET_ANCHOR_TOP_DEFAULT_SETTINGS);
-		WidgetTop.leftAnchor.Set(0f, val.x);
-		WidgetTop.rightAnchor.Set(1f, val.y);
-		WidgetTop.bottomAnchor.Set((!_isPortrait) ? 0f : 1f, val.z);
-		WidgetTop.topAnchor.Set(1f, val.w);
-		val = ((!_isPortrait) ? WIDGET_ANCHOR_BOT_SPLIT_LANDSCAPE_SETTINGS : WIDGET_ANCHOR_BOT_DEFAULT_SETTINGS);
+		Vector4 vector = _isPortrait ? WIDGET_ANCHOR_BG_IMG_DEFAULT_SETTINGS : WIDGET_ANCHOR_BG_IMG_SPLIT_LANDSCAPE_SETTINGS;
+		WidgetBackGroundImg.leftAnchor.Set(0f, vector.x);
+		WidgetBackGroundImg.rightAnchor.Set(1f, vector.y);
+		WidgetBackGroundImg.bottomAnchor.Set(_isPortrait ? 0f : 0f, vector.z);
+		WidgetBackGroundImg.topAnchor.Set(1f, vector.w);
+		vector = (_isPortrait ? WIDGET_ANCHOR_TOP_DEFAULT_SETTINGS : WIDGET_ANCHOR_TOP_SPLIT_LANDSCAPE_SETTINGS);
+		WidgetTop.leftAnchor.Set(0f, vector.x);
+		WidgetTop.rightAnchor.Set(1f, vector.y);
+		WidgetTop.bottomAnchor.Set(_isPortrait ? 1f : 0f, vector.z);
+		WidgetTop.topAnchor.Set(1f, vector.w);
+		vector = (_isPortrait ? WIDGET_ANCHOR_BOT_DEFAULT_SETTINGS : WIDGET_ANCHOR_BOT_SPLIT_LANDSCAPE_SETTINGS);
 		if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.NeedModifyChatAnchor)
 		{
 			DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
 			if (!SpecialDeviceManager.IsPortrait)
 			{
-				val = specialDeviceInfo.FriendMessage_WIDGET_ANCHOR_BOT_SPLIT_LANDSCAPE_SETTINGS;
+				vector = specialDeviceInfo.FriendMessage_WIDGET_ANCHOR_BOT_SPLIT_LANDSCAPE_SETTINGS;
 			}
 		}
-		WidgetBot.leftAnchor.Set(0f, val.x);
-		WidgetBot.rightAnchor.Set(1f, val.y);
-		WidgetBot.bottomAnchor.Set(0f, val.z);
-		WidgetBot.topAnchor.Set(1f, val.w);
-		GridStamp.maxPerLine = ((!_isPortrait) ? 4 : 5);
-		GridStamp.set_enabled(true);
+		WidgetBot.leftAnchor.Set(0f, vector.x);
+		WidgetBot.rightAnchor.Set(1f, vector.y);
+		WidgetBot.bottomAnchor.Set(0f, vector.z);
+		WidgetBot.topAnchor.Set(1f, vector.w);
+		GridStamp.maxPerLine = (_isPortrait ? 5 : 4);
+		GridStamp.enabled = true;
 	}
 
 	private void SendGetMessageDetail()
@@ -714,7 +609,7 @@ public class FriendMessageUIController : UIBehaviour
 		string text = _text;
 		if (!string.IsNullOrEmpty(text))
 		{
-			text = text.Replace("\n", string.Empty);
+			text = text.Replace("\n", "");
 		}
 		MonoBehaviourSingleton<FriendManager>.I.SendFriendMessage(talkUser.userId, text, isCalledByOther: true, delegate
 		{
@@ -726,7 +621,7 @@ public class FriendMessageUIController : UIBehaviour
 		if (data.message.StartsWith("[STAMP]"))
 		{
 			string message = data.message;
-			message = message.Replace("[STAMP]", string.Empty);
+			message = message.Replace("[STAMP]", "");
 			PostUIStamp(data.fromUserId, int.Parse(message), topPosition, forceScroll);
 		}
 		else
@@ -739,26 +634,22 @@ public class FriendMessageUIController : UIBehaviour
 	{
 		if (!string.IsNullOrEmpty(message))
 		{
-			message = message.Replace("\n", string.Empty);
+			message = message.Replace("\n", "");
 		}
 		AddNextChatItem(delegate(ChatItem chatItem)
 		{
-			chatItem.Init(userId, talkUser.name, message, string.Empty);
+			chatItem.Init(userId, talkUser.name, message);
 		}, topPosition, forceScroll);
 	}
 
 	private void PostUIStamp(int userId, int stampId, bool topPosition, bool forceScroll)
 	{
-		if (IsValidStampId(stampId))
+		if (IsValidStampId(stampId) && Singleton<StampTable>.I.GetData((uint)stampId) != null)
 		{
-			StampTable.Data data = Singleton<StampTable>.I.GetData((uint)stampId);
-			if (data != null)
+			AddNextChatItem(delegate(ChatItem chatItem)
 			{
-				AddNextChatItem(delegate(ChatItem chatItem)
-				{
-					chatItem.Init(userId, talkUser.name, stampId, string.Empty);
-				}, topPosition, forceScroll);
-			}
+				chatItem.Init(userId, talkUser.name, stampId);
+			}, topPosition, forceScroll);
 		}
 	}
 

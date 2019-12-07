@@ -46,7 +46,17 @@ public class PropertyReference
 		}
 	}
 
-	public bool isValid => mTarget != null && !string.IsNullOrEmpty(mName);
+	public bool isValid
+	{
+		get
+		{
+			if (mTarget != null)
+			{
+				return !string.IsNullOrEmpty(mName);
+			}
+			return false;
+		}
+	}
 
 	public bool isEnabled
 	{
@@ -56,8 +66,12 @@ public class PropertyReference
 			{
 				return false;
 			}
-			MonoBehaviour val = mTarget as MonoBehaviour;
-			return val == null || val.get_enabled();
+			MonoBehaviour monoBehaviour = mTarget as MonoBehaviour;
+			if (!(monoBehaviour == null))
+			{
+				return monoBehaviour.enabled;
+			}
+			return true;
 		}
 	}
 
@@ -97,7 +111,11 @@ public class PropertyReference
 		if (obj is PropertyReference)
 		{
 			PropertyReference propertyReference = obj as PropertyReference;
-			return mTarget == propertyReference.mTarget && string.Equals(mName, propertyReference.mName);
+			if (mTarget == propertyReference.mTarget)
+			{
+				return string.Equals(mName, propertyReference.mName);
+			}
+			return false;
 		}
 		return false;
 	}
@@ -134,7 +152,7 @@ public class PropertyReference
 	{
 		if (comp != null)
 		{
-			string text = ((object)comp).GetType().ToString();
+			string text = comp.GetType().ToString();
 			int num = text.LastIndexOf('.');
 			if (num > 0)
 			{
@@ -187,7 +205,7 @@ public class PropertyReference
 		{
 			try
 			{
-				if (mProperty == null)
+				if (!(mProperty != null))
 				{
 					mField.SetValue(mTarget, null);
 					return true;
@@ -205,9 +223,9 @@ public class PropertyReference
 		}
 		if (!Convert(ref value))
 		{
-			if (Application.get_isPlaying())
+			if (Application.isPlaying)
 			{
-				Debug.LogError((object)("Unable to convert " + value.GetType() + " to " + GetPropertyType()));
+				UnityEngine.Debug.LogError("Unable to convert " + value.GetType() + " to " + GetPropertyType());
 			}
 		}
 		else
@@ -232,7 +250,7 @@ public class PropertyReference
 	{
 		if (mTarget != null && !string.IsNullOrEmpty(mName))
 		{
-			Type type = ((object)mTarget).GetType();
+			Type type = mTarget.GetType();
 			mField = type.GetField(mName);
 			mProperty = type.GetProperty(mName);
 		}
@@ -241,7 +259,11 @@ public class PropertyReference
 			mField = null;
 			mProperty = null;
 		}
-		return mField != null || mProperty != null;
+		if (!(mField != null))
+		{
+			return mProperty != null;
+		}
+		return true;
 	}
 
 	private bool Convert(ref object value)
@@ -291,7 +313,7 @@ public class PropertyReference
 		}
 		if (to == typeof(string))
 		{
-			value = ((value == null) ? "null" : value.ToString());
+			value = ((value != null) ? value.ToString() : "null");
 			return true;
 		}
 		if (value == null)

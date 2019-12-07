@@ -97,14 +97,14 @@ public class GuildDonateMaterialSelectDialog : GameSection
 			itemInfo.num = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == id, 1);
 			itemList.Add(itemInfo);
 		});
-		SetLabelText((Enum)UI.LBL_NUMBER_REQUEST, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 34u), MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap, MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
+		SetLabelText(UI.LBL_NUMBER_REQUEST, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 34u), MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap, MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
 		SetSupportEncoding(UI.LBL_NUMBER_REQUEST, isEnable: true);
 		base.Initialize();
 	}
 
 	public override void UpdateUI()
 	{
-		SetDynamicList((Enum)UI.GRD_INVENTORY, "GuildDonateMaterialItem", itemList.Count, reset: false, (Func<int, bool>)((int i) => true), (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycre)
+		SetDynamicList(UI.GRD_INVENTORY, "GuildDonateMaterialItem", itemList.Count, reset: false, (int i) => true, null, delegate(int i, Transform t, bool is_recycre)
 		{
 			GuildDonateMaterialSelectDialog guildDonateMaterialSelectDialog = this;
 			SetSprite(t, UI.SPR_RARITY_TEXT_ICON, ItemIcon.ITEM_ICON_ITEM_RARITY_ICON_SPRITE[(int)itemList[i].tableData.rarity]);
@@ -147,7 +147,7 @@ public class GuildDonateMaterialSelectDialog : GameSection
 			int num = int.Parse(s);
 			if (num > 0 && chooseIndex >= 0)
 			{
-				this.StartCoroutine(CRSendDonateRequest((int)itemList[chooseIndex].tableData.id, itemList[chooseIndex].tableData.name, string.Empty, num));
+				StartCoroutine(CRSendDonateRequest((int)itemList[chooseIndex].tableData.id, itemList[chooseIndex].tableData.name, "", num));
 				chooseIndex = -1;
 			}
 		}
@@ -159,7 +159,7 @@ public class GuildDonateMaterialSelectDialog : GameSection
 
 	private IEnumerator CRSendDonateRequest(int itemID, string itemName, string request, int numRequest)
 	{
-		yield return (object)new WaitUntil((Func<bool>)(() => !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible()));
+		yield return new WaitUntil(() => !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible());
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<GuildManager>.I.SendDonateRequest(itemID, itemName, request, numRequest, delegate(bool success)
 		{

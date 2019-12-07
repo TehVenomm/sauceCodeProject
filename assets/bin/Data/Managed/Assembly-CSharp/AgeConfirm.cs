@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 public class AgeConfirm : GameSection
@@ -16,17 +15,15 @@ public class AgeConfirm : GameSection
 
 	public override void UpdateUI()
 	{
-		SetInput(UI.IPT_AD, string.Empty, 4);
-		SetInput(UI.IPT_MONTH, string.Empty, 2);
+		SetInput(UI.IPT_AD, "", 4);
+		SetInput(UI.IPT_MONTH, "", 2);
 	}
 
 	private void OnQuery_OK()
 	{
-		string inputValue = GetInputValue((Enum)UI.IPT_AD);
-		string inputValue2 = GetInputValue((Enum)UI.IPT_MONTH);
-		int result2;
-		int result;
-		if (inputValue.Length == 4 && inputValue2.Length >= 1 && int.TryParse(inputValue, out result) && int.TryParse(inputValue2, out result2) && result > 1800 && result2 >= 1 && result2 <= 12)
+		string inputValue = GetInputValue(UI.IPT_AD);
+		string inputValue2 = GetInputValue(UI.IPT_MONTH);
+		if (inputValue.Length == 4 && inputValue2.Length >= 1 && int.TryParse(inputValue, out int result) && int.TryParse(inputValue2, out int result2) && result > 1800 && result2 >= 1 && result2 <= 12)
 		{
 			GameSection.StayEvent();
 			MonoBehaviourSingleton<UserInfoManager>.I.SendBirthday(result, result2, 1, delegate(bool is_success)

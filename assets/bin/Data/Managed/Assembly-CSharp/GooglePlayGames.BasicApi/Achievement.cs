@@ -176,7 +176,7 @@ namespace GooglePlayGames.BasicApi
 
 		public override string ToString()
 		{
-			return string.Format("[Achievement] id={0}, name={1}, desc={2}, type={3}, revealed={4}, unlocked={5}, steps={6}/{7}", mId, mName, mDescription, (!mIsIncremental) ? "STANDARD" : "INCREMENTAL", mIsRevealed, mIsUnlocked, mCurrentSteps, mTotalSteps);
+			return string.Format("[Achievement] id={0}, name={1}, desc={2}, type={3}, revealed={4}, unlocked={5}, steps={6}/{7}", mId, mName, mDescription, mIsIncremental ? "INCREMENTAL" : "STANDARD", mIsRevealed, mIsUnlocked, mCurrentSteps, mTotalSteps);
 		}
 	}
 }

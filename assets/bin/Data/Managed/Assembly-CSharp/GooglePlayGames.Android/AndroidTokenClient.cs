@@ -38,16 +38,9 @@ namespace GooglePlayGames.Android
 
 		public static AndroidJavaObject GetActivity()
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Expected O, but got Unknown
-			AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-			try
+			using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
 			{
-				return val.GetStatic<AndroidJavaObject>("currentActivity");
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
+				return androidJavaClass.GetStatic<AndroidJavaObject>("currentActivity");
 			}
 		}
 
@@ -101,17 +94,22 @@ namespace GooglePlayGames.Android
 			idToken = null;
 			PlayGamesHelperObject.RunOnGameThread(delegate
 			{
-				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0015: Expected O, but got Unknown
-				Debug.Log((object)"Calling Signout in token client");
-				AndroidJavaClass val = new AndroidJavaClass("com.google.games.bridge.TokenFragment");
-				val.CallStatic("signOut", new object[0]);
+				Debug.Log("Calling Signout in token client");
+				new AndroidJavaClass("com.google.games.bridge.TokenFragment").CallStatic("signOut");
 			});
 		}
 
 		public bool NeedsToRun()
 		{
-			return (requestAuthCode && string.IsNullOrEmpty(authCode)) || (requestEmail && string.IsNullOrEmpty(email)) || (requestIdToken && string.IsNullOrEmpty(idToken));
+			if ((!requestAuthCode || !string.IsNullOrEmpty(authCode)) && (!requestEmail || !string.IsNullOrEmpty(email)))
+			{
+				if (requestIdToken)
+				{
+					return string.IsNullOrEmpty(idToken);
+				}
+				return false;
+			}
+			return true;
 		}
 
 		public void FetchTokens(Action callback)
@@ -124,31 +122,25 @@ namespace GooglePlayGames.Android
 
 		internal void DoFetchToken(Action callback)
 		{
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Expected O, but got Unknown
-			object[] array = new object[9];
-			jvalue[] array2 = AndroidJNIHelper.CreateJNIArgArray(array);
+			object[] args = new object[9];
+			jvalue[] array = AndroidJNIHelper.CreateJNIArgArray(args);
 			try
 			{
-				AndroidJavaClass val = new AndroidJavaClass("com.google.games.bridge.TokenFragment");
-				try
+				using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("com.google.games.bridge.TokenFragment"))
 				{
-					AndroidJavaObject activity = GetActivity();
-					try
+					using (AndroidJavaObject androidJavaObject = GetActivity())
 					{
-						IntPtr staticMethodID = AndroidJNI.GetStaticMethodID(val.GetRawClass(), "fetchToken", "(Landroid/app/Activity;ZZZLjava/lang/String;Z[Ljava/lang/String;ZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;");
-						array2[0].l = activity.GetRawObject();
-						array2[1].z = requestAuthCode;
-						array2[2].z = requestEmail;
-						array2[3].z = requestIdToken;
-						array2[4].l = AndroidJNI.NewStringUTF(webClientId);
-						array2[5].z = forceRefresh;
-						array2[6].l = AndroidJNIHelper.ConvertToJNIArray((Array)oauthScopes.ToArray());
-						array2[7].z = hidePopups;
-						array2[8].l = AndroidJNI.NewStringUTF(accountName);
-						IntPtr ptr = AndroidJNI.CallStaticObjectMethod(val.GetRawClass(), staticMethodID, array2);
-						PendingResult<TokenResult> pendingResult = new PendingResult<TokenResult>(ptr);
-						pendingResult.setResultCallback(new TokenResultCallback(delegate(int rc, string authCode, string email, string idToken)
+						IntPtr staticMethodID = AndroidJNI.GetStaticMethodID(androidJavaClass.GetRawClass(), "fetchToken", "(Landroid/app/Activity;ZZZLjava/lang/String;Z[Ljava/lang/String;ZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;");
+						array[0].l = androidJavaObject.GetRawObject();
+						array[1].z = requestAuthCode;
+						array[2].z = requestEmail;
+						array[3].z = requestIdToken;
+						array[4].l = AndroidJNI.NewStringUTF(webClientId);
+						array[5].z = forceRefresh;
+						array[6].l = AndroidJNIHelper.ConvertToJNIArray(oauthScopes.ToArray());
+						array[7].z = hidePopups;
+						array[8].l = AndroidJNI.NewStringUTF(accountName);
+						new PendingResult<TokenResult>(AndroidJNI.CallStaticObjectMethod(androidJavaClass.GetRawClass(), staticMethodID, array)).setResultCallback(new TokenResultCallback(delegate(int rc, string authCode, string email, string idToken)
 						{
 							this.authCode = authCode;
 							this.email = email;
@@ -156,70 +148,48 @@ namespace GooglePlayGames.Android
 							callback();
 						}));
 					}
-					finally
-					{
-						((IDisposable)activity)?.Dispose();
-					}
-				}
-				finally
-				{
-					((IDisposable)val)?.Dispose();
 				}
 			}
 			catch (Exception ex)
 			{
-				Logger.e("Exception launching token request: " + ex.Message);
-				Logger.e(ex.ToString());
+				GooglePlayGames.OurUtils.Logger.e("Exception launching token request: " + ex.Message);
+				GooglePlayGames.OurUtils.Logger.e(ex.ToString());
 			}
 			finally
 			{
-				AndroidJNIHelper.DeleteJNIArgArray(array, array2);
+				AndroidJNIHelper.DeleteJNIArgArray(args, array);
 			}
 		}
 
 		internal static void FetchToken(bool fetchAuthCode, bool fetchEmail, bool fetchIdToken, string webClientId, bool forceRefresh, Action<int, string, string, string> callback)
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Expected O, but got Unknown
-			object[] array = new object[7];
-			jvalue[] array2 = AndroidJNIHelper.CreateJNIArgArray(array);
+			object[] args = new object[7];
+			jvalue[] array = AndroidJNIHelper.CreateJNIArgArray(args);
 			try
 			{
-				AndroidJavaClass val = new AndroidJavaClass("com.google.games.bridge.TokenFragment");
-				try
+				using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("com.google.games.bridge.TokenFragment"))
 				{
-					AndroidJavaObject activity = GetActivity();
-					try
+					using (AndroidJavaObject androidJavaObject = GetActivity())
 					{
-						IntPtr staticMethodID = AndroidJNI.GetStaticMethodID(val.GetRawClass(), "fetchToken", "(Landroid/app/Activity;ZZZLjava/lang/String;Z[Ljava/lang/String;ZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;");
-						array2[0].l = activity.GetRawObject();
-						array2[1].z = fetchAuthCode;
-						array2[2].z = fetchEmail;
-						array2[3].z = fetchIdToken;
-						array2[4].l = AndroidJNI.NewStringUTF(webClientId);
-						array2[5].z = forceRefresh;
-						IntPtr ptr = AndroidJNI.CallStaticObjectMethod(val.GetRawClass(), staticMethodID, array2);
-						PendingResult<TokenResult> pendingResult = new PendingResult<TokenResult>(ptr);
-						pendingResult.setResultCallback(new TokenResultCallback(callback));
+						IntPtr staticMethodID = AndroidJNI.GetStaticMethodID(androidJavaClass.GetRawClass(), "fetchToken", "(Landroid/app/Activity;ZZZLjava/lang/String;Z[Ljava/lang/String;ZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;");
+						array[0].l = androidJavaObject.GetRawObject();
+						array[1].z = fetchAuthCode;
+						array[2].z = fetchEmail;
+						array[3].z = fetchIdToken;
+						array[4].l = AndroidJNI.NewStringUTF(webClientId);
+						array[5].z = forceRefresh;
+						new PendingResult<TokenResult>(AndroidJNI.CallStaticObjectMethod(androidJavaClass.GetRawClass(), staticMethodID, array)).setResultCallback(new TokenResultCallback(callback));
 					}
-					finally
-					{
-						((IDisposable)activity)?.Dispose();
-					}
-				}
-				finally
-				{
-					((IDisposable)val)?.Dispose();
 				}
 			}
 			catch (Exception ex)
 			{
-				Logger.e("Exception launching token request: " + ex.Message);
-				Logger.e(ex.ToString());
+				GooglePlayGames.OurUtils.Logger.e("Exception launching token request: " + ex.Message);
+				GooglePlayGames.OurUtils.Logger.e(ex.ToString());
 			}
 			finally
 			{
-				AndroidJNIHelper.DeleteJNIArgArray(array, array2);
+				AndroidJNIHelper.DeleteJNIArgArray(args, array);
 			}
 		}
 

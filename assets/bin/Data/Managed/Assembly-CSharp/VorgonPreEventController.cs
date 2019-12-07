@@ -32,11 +32,6 @@ public class VorgonPreEventController : MonoBehaviour
 
 	private bool npcAnnouncedHint;
 
-	public VorgonPreEventController()
-		: this()
-	{
-	}
-
 	private IEnumerator Start()
 	{
 		while (enemy == null)
@@ -57,8 +52,7 @@ public class VorgonPreEventController : MonoBehaviour
 		}
 		if (questType == QuestManager.VorgonQuetType.BATTLE_WITH_VORGON)
 		{
-			EnemyBrain componentInChildren = enemy.GetComponentInChildren<EnemyBrain>();
-			componentInChildren.actionCtrl.actions[14].isForceDisable = true;
+			enemy.GetComponentInChildren<EnemyBrain>().actionCtrl.actions[14].isForceDisable = true;
 		}
 	}
 
@@ -76,18 +70,18 @@ public class VorgonPreEventController : MonoBehaviour
 		if (!npcStartedTalking)
 		{
 			npcStartedTalking = true;
-			this.StartCoroutine("UpdateNPCTalking");
+			StartCoroutine("UpdateNPCTalking");
 		}
 		if (vorgonBarrierBrokenProc && !npcAnnouncedHint && !enemy.IsValidBarrier)
 		{
-			this.StopCoroutine("UpdateNPCTalking");
-			this.StartCoroutine("UpdateNPCTalkingAfterBreakedBariier");
+			StopCoroutine("UpdateNPCTalking");
+			StartCoroutine("UpdateNPCTalkingAfterBreakedBariier");
 			npcAnnouncedHint = true;
 		}
 		if ((float)enemy.hp / (float)enemy.hpMax <= 0.5f || MonoBehaviourSingleton<InGameProgress>.I.remaindTime < 84f)
 		{
-			this.StopCoroutine("UpdateNPCTalking");
-			this.StopCoroutine("UpdateNPCTalkingAfterBreakedBariier");
+			StopCoroutine("UpdateNPCTalking");
+			StopCoroutine("UpdateNPCTalkingAfterBreakedBariier");
 			EnemyBrain componentInChildren = enemy.GetComponentInChildren<EnemyBrain>();
 			for (int i = 0; i < componentInChildren.actionCtrl.actions.Count; i++)
 			{
@@ -100,7 +94,7 @@ public class VorgonPreEventController : MonoBehaviour
 	private IEnumerator UpdateNPCTalking()
 	{
 		GameSceneTables.SectionData sectionData = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection().sectionData;
-		yield return (object)new WaitForSeconds(5f);
+		yield return new WaitForSeconds(5f);
 		Player hound_A = MonoBehaviourSingleton<StageObjectManager>.I.nonplayerList[0] as Player;
 		Player hound_B = MonoBehaviourSingleton<StageObjectManager>.I.nonplayerList[1] as Player;
 		Player beginner = MonoBehaviourSingleton<StageObjectManager>.I.nonplayerList[2] as Player;
@@ -108,23 +102,23 @@ public class VorgonPreEventController : MonoBehaviour
 		hound_B.uiPlayerStatusGizmo.SetChatDuration(4f);
 		beginner.uiPlayerStatusGizmo.SetChatDuration(4f);
 		beginner.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_0"));
-		yield return (object)new WaitForSeconds(5f);
+		yield return new WaitForSeconds(5f);
 		hound_A.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_1"));
-		yield return (object)new WaitForSeconds(10f);
+		yield return new WaitForSeconds(10f);
 		hound_B.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_2"));
-		yield return (object)new WaitForSeconds(4f);
+		yield return new WaitForSeconds(4f);
 		hound_B.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_3"));
-		yield return (object)new WaitForSeconds(6f);
+		yield return new WaitForSeconds(6f);
 		beginner.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_4"));
-		yield return (object)new WaitForSeconds(4f);
+		yield return new WaitForSeconds(4f);
 		hound_A.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_5"));
-		yield return (object)new WaitForSeconds(10f);
+		yield return new WaitForSeconds(10f);
 		hound_B.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_6"));
-		yield return (object)new WaitForSeconds(5f);
+		yield return new WaitForSeconds(5f);
 		hound_A.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_7"));
-		yield return (object)new WaitForSeconds(4f);
+		yield return new WaitForSeconds(4f);
 		hound_A.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_8"));
-		yield return (object)new WaitForSeconds(4f);
+		yield return new WaitForSeconds(4f);
 		if ((int)enemy.BarrierHp > 1)
 		{
 			enemy.BarrierHp = 1;
@@ -139,19 +133,19 @@ public class VorgonPreEventController : MonoBehaviour
 		Player hound_B = MonoBehaviourSingleton<StageObjectManager>.I.nonplayerList[1] as Player;
 		Player beginner = MonoBehaviourSingleton<StageObjectManager>.I.nonplayerList[2] as Player;
 		hound_B.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_9"));
-		yield return (object)new WaitForSeconds(4f);
+		yield return new WaitForSeconds(4f);
 		hound_A.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_10"));
-		yield return (object)new WaitForSeconds(4f);
+		yield return new WaitForSeconds(4f);
 		beginner.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_11"));
-		yield return (object)new WaitForSeconds(20f);
+		yield return new WaitForSeconds(20f);
 		hound_B.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_12"));
-		EnemyBrain brain = enemy.GetComponentInChildren<EnemyBrain>();
-		for (int i = 0; i < brain.actionCtrl.actions.Count; i++)
+		EnemyBrain componentInChildren = enemy.GetComponentInChildren<EnemyBrain>();
+		for (int i = 0; i < componentInChildren.actionCtrl.actions.Count; i++)
 		{
-			brain.actionCtrl.actions[i].isForceDisable = (i != 14);
+			componentInChildren.actionCtrl.actions[i].isForceDisable = (i != 14);
 			finish = true;
 		}
-		yield return (object)new WaitForSeconds(5f);
+		yield return new WaitForSeconds(5f);
 		hound_A.uiPlayerStatusGizmo.SayChat(sectionData.GetText("STR_VORGON_HINT_13"));
 		yield return null;
 	}

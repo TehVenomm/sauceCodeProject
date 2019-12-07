@@ -93,19 +93,23 @@ public class FieldCarriableBuffPointGimmickObject : FieldCarriableGimmickObject
 			for (int k = 0; k < array.Length; k++)
 			{
 				int result = 0;
-				if (array3[0].StartsWith(array[k]) && int.TryParse(array3[0].Replace(array[k], string.Empty), out result) && result <= maxLv)
+				if (!array3[0].StartsWith(array[k]) || !int.TryParse(array3[0].Replace(array[k], ""), out result) || result > maxLv)
 				{
-					switch (array[k])
-					{
-					case "bf":
-						buffList[result].buffIdList.Add(uint.Parse(array3[1]));
-						break;
-					case "r":
-						buffList[result].buffRadius = float.Parse(array3[1]);
-						break;
-					}
-					break;
+					continue;
 				}
+				string a = array[k];
+				if (!(a == "bf"))
+				{
+					if (a == "r")
+					{
+						buffList[result].buffRadius = float.Parse(array3[1]);
+					}
+				}
+				else
+				{
+					buffList[result].buffIdList.Add(uint.Parse(array3[1]));
+				}
+				break;
 			}
 		}
 	}
@@ -115,64 +119,52 @@ public class FieldCarriableBuffPointGimmickObject : FieldCarriableGimmickObject
 		base.OnStartCarry(owner);
 		if (buffEffect != null)
 		{
-			EffectManager.ReleaseEffect(buffEffect.get_gameObject());
+			EffectManager.ReleaseEffect(buffEffect.gameObject);
 			buffEffect = null;
 		}
 		if (headEffect != null)
 		{
-			EffectManager.ReleaseEffect(headEffect.get_gameObject());
+			EffectManager.ReleaseEffect(headEffect.gameObject);
 			headEffect = null;
 		}
 	}
 
 	protected override void OnEndCarry()
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
 		base.OnEndCarry();
 		if (buffEffect == null)
 		{
 			buffEffect = EffectManager.GetEffect(GetBuffEffectNameByModelIndex(modelIndex), GetTransform());
-			Transform obj = buffEffect;
-			obj.set_localScale(obj.get_localScale() * (buffList[currentLv].buffRadius / kDefaultBuffRadius));
+			buffEffect.localScale *= buffList[currentLv].buffRadius / kDefaultBuffRadius;
 		}
 		if (headEffect == null)
 		{
 			headEffect = EffectManager.GetEffect(GetHeadEffectNameByModelIndex(modelIndex), GetTransform());
 		}
-		EffectManager.OneShot(kPutEffectName, GetTransform().get_position(), GetTransform().get_rotation());
-		SoundManager.PlayOneShotSE(kPutSEId, GetTransform().get_position());
+		EffectManager.OneShot(kPutEffectName, GetTransform().position, GetTransform().rotation);
+		SoundManager.PlayOneShotSE(kPutSEId, GetTransform().position);
 	}
 
 	protected override void OnEvolved()
 	{
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 		base.OnEvolved();
 		if (buffEffect != null)
 		{
-			EffectManager.ReleaseEffect(buffEffect.get_gameObject());
+			EffectManager.ReleaseEffect(buffEffect.gameObject);
 			buffEffect = null;
 		}
 		if (headEffect != null)
 		{
-			EffectManager.ReleaseEffect(headEffect.get_gameObject());
+			EffectManager.ReleaseEffect(headEffect.gameObject);
 			headEffect = null;
 		}
 		buffEffect = EffectManager.GetEffect(GetBuffEffectNameByModelIndex(modelIndex), GetTransform());
-		Transform obj = buffEffect;
-		obj.set_localScale(obj.get_localScale() * (buffList[currentLv].buffRadius / kDefaultBuffRadius));
+		buffEffect.localScale *= buffList[currentLv].buffRadius / kDefaultBuffRadius;
 		headEffect = EffectManager.GetEffect(GetHeadEffectNameByModelIndex(modelIndex), GetTransform());
 	}
 
 	private void LateUpdate()
 	{
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 		if (buffList.IsNullOrEmpty() || buffList[currentLv].buffParamList.IsNullOrEmpty() || buffEffect == null)
 		{
 			return;
@@ -183,12 +175,7 @@ public class FieldCarriableBuffPointGimmickObject : FieldCarriableGimmickObject
 		for (int i = 0; i < list.Count; i++)
 		{
 			Character character = list[i] as Character;
-			if (character == null || character.isDead)
-			{
-				continue;
-			}
-			float num = Vector3.Magnitude(GetTransform().get_position() - character._transform.get_position());
-			if (num > buffData.buffRadius)
+			if (character == null || character.isDead || Vector3.Magnitude(GetTransform().position - character._transform.position) > buffData.buffRadius)
 			{
 				continue;
 			}

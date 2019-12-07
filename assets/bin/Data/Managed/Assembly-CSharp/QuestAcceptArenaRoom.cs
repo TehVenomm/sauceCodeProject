@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -62,7 +61,7 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 		base.Initialize();
 		arenaData = Singleton<ArenaTable>.I.GetArenaData(MonoBehaviourSingleton<QuestManager>.I.currentArenaId);
 		deliveryData = (GameSection.GetEventData() as DeliveryTable.DeliveryData);
-		this.StartCoroutine(StartPredownload());
+		StartCoroutine(StartPredownload());
 	}
 
 	public override void UpdateUI()
@@ -79,21 +78,20 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 	private void UpdateTopBar()
 	{
 		int num = QuestUtility.ToSecByMilliSec(arenaData.timeLimit);
-		SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num / 60}:{num % 60:D2}");
-		string empty = string.Empty;
+		SetLabelText(UI.LBL_LIMIT_TIME, $"{num / 60}:{num % 60:D2}");
+		string text = "";
 		if (deliveryData != null)
 		{
-			empty = QuestUtility.GetArenaTitle(arenaData.group, deliveryData.name);
+			text = QuestUtility.GetArenaTitle(arenaData.group, deliveryData.name);
 		}
 		else
 		{
 			string str = StringTable.Format(STRING_CATEGORY.ARENA, 0u, arenaData.group);
 			string str2 = StringTable.Format(STRING_CATEGORY.ARENA, 1u, arenaData.rank);
-			empty = str + "\u3000" + str2;
+			text = str + "\u3000" + str2;
 		}
-		SetLabelText((Enum)UI.LBL_ARENA_NAME, empty);
-		UITexture component = GetCtrl(UI.TEX_ICON).GetComponent<UITexture>();
-		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.ARENA_RANK_ICON, ResourceName.GetArenaRankIconName(arenaData.rank));
+		SetLabelText(UI.LBL_ARENA_NAME, text);
+		ResourceLoad.LoadWithSetUITexture(GetCtrl(UI.TEX_ICON).GetComponent<UITexture>(), RESOURCE_CATEGORY.ARENA_RANK_ICON, ResourceName.GetArenaRankIconName(arenaData.rank));
 	}
 
 	private void UpdateEnemyList()
@@ -115,8 +113,7 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 		{
 			SetLabelText(t, UI.LBL_ENEMY_LEVEL, StringTable.Format(STRING_CATEGORY.MAIN_STATUS, 1u, arenaData.level));
 			SetLabelText(t, UI.LBL_ENEMY_NAME, enemyData.name);
-			ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(questData.questType), enemyData.iconId, questData.rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element);
-			itemIcon.SetEnableCollider(is_enable: false);
+			ItemIcon.Create(ItemIcon.GetItemIconType(questData.questType), enemyData.iconId, questData.rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element).SetEnableCollider(is_enable: false);
 			SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
 			SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData.element);
 			SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
@@ -126,19 +123,19 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 
 	private void UpdateLimitText()
 	{
-		SetLabelText((Enum)UI.LBL_LIMIT, QuestUtility.GetLimitText(arenaData));
+		SetLabelText(UI.LBL_LIMIT, QuestUtility.GetLimitText(arenaData));
 	}
 
 	private void UpdateConditionText()
 	{
-		SetLabelText((Enum)UI.LBL_CONDITION, QuestUtility.GetConditionText(arenaData));
+		SetLabelText(UI.LBL_CONDITION, QuestUtility.GetConditionText(arenaData));
 	}
 
 	private void UpdateStartButton()
 	{
 		bool flag = QuestUtility.JudgeLimit(arenaData, userInfo.equipSet);
-		SetActive((Enum)UI.BTN_START, flag);
-		SetActive((Enum)UI.BTN_NG, !flag);
+		SetActive(UI.BTN_START, flag);
+		SetActive(UI.BTN_NG, !flag);
 	}
 
 	protected void OnQuery_START()
@@ -157,7 +154,7 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 
 	private void SetDifficultySprite()
 	{
-		SetActive((Enum)UI.SPR_TYPE_DIFFICULTY, (deliveryData != null && deliveryData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
+		SetActive(UI.SPR_TYPE_DIFFICULTY, (deliveryData != null && deliveryData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
 	}
 
 	private IEnumerator StartPredownload()
@@ -235,15 +232,15 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 			yield break;
 		}
 		List<string> assetNames = new List<string>();
-		foreach (ResourceInfo item2 in list)
+		foreach (ResourceInfo item in list)
 		{
-			if (!string.IsNullOrEmpty(item2.packageName) && !MonoBehaviourSingleton<ResourceManager>.I.IsCached(item2.category, item2.packageName))
+			if (!string.IsNullOrEmpty(item.packageName) && !MonoBehaviourSingleton<ResourceManager>.I.IsCached(item.category, item.packageName))
 			{
-				assetNames.Add(item2.category.ToAssetBundleName(item2.packageName));
+				assetNames.Add(item.category.ToAssetBundleName(item.packageName));
 			}
 		}
-		SetActive((Enum)UI.BTN_START_DISABLE, is_visible: true);
-		SetActive((Enum)UI.BTN_START, is_visible: false);
+		SetActive(UI.BTN_START_DISABLE, is_visible: true);
+		SetActive(UI.BTN_START, is_visible: false);
 		yield return ResourceSizeInfo.Init();
 		string act = null;
 		yield return ResourceSizeInfo.OpenConfirmDialog(ResourceSizeInfo.GetAssetsSizeMB(assetNames.ToArray()), 3002u, CommonDialog.TYPE.YES_NO, delegate(string str)
@@ -261,18 +258,18 @@ public class QuestAcceptArenaRoom : OffLineQuestRoomBase
 		else
 		{
 			LoadingQueue loadQueue = new LoadingQueue(this);
-			foreach (ResourceInfo item in list)
+			foreach (ResourceInfo item2 in list)
 			{
-				if (!string.IsNullOrEmpty(item.packageName) && !MonoBehaviourSingleton<ResourceManager>.I.IsCached(item.category, item.packageName))
+				if (!string.IsNullOrEmpty(item2.packageName) && !MonoBehaviourSingleton<ResourceManager>.I.IsCached(item2.category, item2.packageName))
 				{
 					ResourceManager.downloadOnly = true;
-					loadQueue.Load(item.category, item.packageName, null);
+					loadQueue.Load(item2.category, item2.packageName, null);
 					ResourceManager.downloadOnly = false;
 					yield return loadQueue.Wait();
 				}
 			}
-			SetActive((Enum)UI.BTN_START_DISABLE, is_visible: false);
-			SetActive((Enum)UI.BTN_START, is_visible: true);
+			SetActive(UI.BTN_START_DISABLE, is_visible: false);
+			SetActive(UI.BTN_START, is_visible: true);
 		}
 	}
 }

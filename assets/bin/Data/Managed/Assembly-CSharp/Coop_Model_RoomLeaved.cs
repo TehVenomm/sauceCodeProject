@@ -2,7 +2,7 @@ public class Coop_Model_RoomLeaved : Coop_Model_Base
 {
 	public int cid;
 
-	public string token = string.Empty;
+	public string token = "";
 
 	public int stgid;
 
@@ -15,11 +15,11 @@ public class Coop_Model_RoomLeaved : Coop_Model_Base
 
 	public override string ToString()
 	{
-		string empty = string.Empty;
-		empty = empty + ",cid=" + cid;
-		empty = empty + ",token=" + token;
-		empty = empty + ",stgid=" + stgid;
-		empty = empty + ",stghostid=" + stghostid;
-		return base.ToString() + empty;
+		string arg = "";
+		arg = arg + ",cid=" + cid;
+		arg = arg + ",token=" + token;
+		arg = arg + ",stgid=" + stgid;
+		arg = arg + ",stghostid=" + stghostid;
+		return base.ToString() + arg;
 	}
 }

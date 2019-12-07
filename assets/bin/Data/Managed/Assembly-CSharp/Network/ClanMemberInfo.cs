@@ -6,7 +6,7 @@ namespace Network
 		{
 			public int ClanId = -1;
 
-			public string ClanName = string.Empty;
+			public string ClanName = "";
 
 			public int ClanMemberId = -1;
 		}
@@ -31,7 +31,11 @@ namespace Network
 
 		public bool IsJoinClan(int _alianceId)
 		{
-			return IsJoinClan() && _alianceId == myClanInfo.ClanId;
+			if (IsJoinClan())
+			{
+				return _alianceId == myClanInfo.ClanId;
+			}
+			return false;
 		}
 	}
 }

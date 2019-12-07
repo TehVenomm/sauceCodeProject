@@ -19,11 +19,6 @@ public class RenderTargetCacher : MonoBehaviour
 		set;
 	}
 
-	public RenderTargetCacher()
-		: this()
-	{
-	}
-
 	public RenderTexture GetTexture()
 	{
 		if (renderTexture == null)
@@ -35,7 +30,7 @@ public class RenderTargetCacher : MonoBehaviour
 
 	private void Start()
 	{
-		cam = this.GetComponent<Camera>();
+		cam = GetComponent<Camera>();
 		CreateTexture();
 	}
 
@@ -43,7 +38,7 @@ public class RenderTargetCacher : MonoBehaviour
 	{
 		if (!(renderTexture != null))
 		{
-			renderTexture = RenderTexture.GetTemporary(Screen.get_width(), Screen.get_height());
+			renderTexture = RenderTexture.GetTemporary(Screen.width, Screen.height);
 			if (onUpdateTexture != null)
 			{
 				onUpdateTexture(renderTexture);
@@ -62,20 +57,17 @@ public class RenderTargetCacher : MonoBehaviour
 
 	private void OnPreRender()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Invalid comparison between Unknown and I4
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		if (cam == null)
 		{
 			return;
 		}
-		if ((int)cam.get_clearFlags() == 2)
+		if (cam.clearFlags == CameraClearFlags.Color)
 		{
-			GL.Clear(true, true, Color.get_black());
+			GL.Clear(clearDepth: true, clearColor: true, Color.black);
 		}
 		if (!(renderTexture == null))
 		{
-			if (renderTexture.get_width() != Screen.get_width() || renderTexture.get_height() != Screen.get_height())
+			if (renderTexture.width != Screen.width || renderTexture.height != Screen.height)
 			{
 				renderTexture.Release();
 				renderTexture = null;

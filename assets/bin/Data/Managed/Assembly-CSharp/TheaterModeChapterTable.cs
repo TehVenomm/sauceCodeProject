@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class TheaterModeChapterTable : MonoBehaviourSingleton<TheaterModeChapterTable>, IDataTable
 {
@@ -32,15 +31,11 @@ public class TheaterModeChapterTable : MonoBehaviourSingleton<TheaterModeChapter
 		public override string ToString()
 		{
 			string empty = string.Empty;
-			string text = empty;
-			return text + chapter_id + "," + chapter_name + "," + order + "," + is_main + "," + banner_id;
+			return empty + chapter_id + "," + chapter_name + "," + order + "," + is_main + "," + banner_id;
 		}
 	}
 
 	private UIntKeyTable<TheaterModeChapterData> dataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<TheaterModeChapterData> _003C_003Ef__mg_0024cache0;
 
 	public bool isLoading
 	{

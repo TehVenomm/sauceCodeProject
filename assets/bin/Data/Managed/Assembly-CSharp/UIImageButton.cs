@@ -19,30 +19,29 @@ public class UIImageButton : MonoBehaviour
 	{
 		get
 		{
-			Collider component = this.get_gameObject().GetComponent<Collider>();
-			return Object.op_Implicit(component) && component.get_enabled();
+			Collider component = base.gameObject.GetComponent<Collider>();
+			if ((bool)component)
+			{
+				return component.enabled;
+			}
+			return false;
 		}
 		set
 		{
-			Collider component = this.get_gameObject().GetComponent<Collider>();
-			if (Object.op_Implicit(component) && component.get_enabled() != value)
+			Collider component = base.gameObject.GetComponent<Collider>();
+			if ((bool)component && component.enabled != value)
 			{
-				component.set_enabled(value);
+				component.enabled = value;
 				UpdateImage();
 			}
 		}
-	}
-
-	public UIImageButton()
-		: this()
-	{
 	}
 
 	private void OnEnable()
 	{
 		if (target == null)
 		{
-			target = this.GetComponentInChildren<UISprite>();
+			target = GetComponentInChildren<UISprite>();
 		}
 		UpdateImage();
 	}
@@ -76,7 +75,7 @@ public class UIImageButton : MonoBehaviour
 		{
 			if (isEnabled)
 			{
-				SetSprite((!UICamera.IsHighlighted(this.get_gameObject())) ? normalSprite : hoverSprite);
+				SetSprite(UICamera.IsHighlighted(base.gameObject) ? hoverSprite : normalSprite);
 			}
 			else
 			{
@@ -89,7 +88,7 @@ public class UIImageButton : MonoBehaviour
 	{
 		if (isEnabled && target != null)
 		{
-			SetSprite((!isOver) ? normalSprite : hoverSprite);
+			SetSprite(isOver ? hoverSprite : normalSprite);
 		}
 	}
 

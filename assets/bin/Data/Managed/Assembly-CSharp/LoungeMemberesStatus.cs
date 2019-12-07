@@ -5,18 +5,11 @@ public class LoungeMemberesStatus
 {
 	private List<LoungeMemberStatus> memberes = new List<LoungeMemberStatus>();
 
-	public LoungeMemberStatus this[int userId]
-	{
-		get
-		{
-			return GetMemberData(userId);
-		}
-	}
+	public LoungeMemberStatus this[int userId] => GetMemberData(userId);
 
 	public LoungeMemberesStatus(LoungeModel.Lounge lounge)
 	{
-		memberes = (from x in lounge.slotInfos
-		select new LoungeMemberStatus(x)).ToList();
+		memberes = lounge.slotInfos.Select((PartyModel.SlotInfo x) => new LoungeMemberStatus(x)).ToList();
 	}
 
 	public LoungeMemberesStatus(List<Party_Model_RegisterACK.UserInfo> data)
@@ -27,7 +20,7 @@ public class LoungeMemberesStatus
 	public LoungeMemberStatus GetMemberData(int userId)
 	{
 		LoungeMemberStatus loungeMemberStatus = memberes.FirstOrDefault((LoungeMemberStatus x) => x.userId == userId);
-		if (object.ReferenceEquals(null, loungeMemberStatus))
+		if (loungeMemberStatus == null)
 		{
 			loungeMemberStatus = new LoungeMemberStatus(userId);
 			memberes.Add(loungeMemberStatus);
@@ -38,7 +31,7 @@ public class LoungeMemberesStatus
 	public void Add(LoungeMemberStatus member)
 	{
 		LoungeMemberStatus memberData = GetMemberData(member.userId);
-		if (object.ReferenceEquals(null, memberData))
+		if (memberData == null)
 		{
 			memberes.Add(memberData);
 		}
@@ -51,7 +44,7 @@ public class LoungeMemberesStatus
 	public void Remove(int userId)
 	{
 		LoungeMemberStatus memberData = GetMemberData(userId);
-		if (!object.ReferenceEquals(null, memberData))
+		if (memberData != null)
 		{
 			memberes.Remove(memberData);
 		}
@@ -59,10 +52,9 @@ public class LoungeMemberesStatus
 
 	public void Set(List<Party_Model_RegisterACK.UserInfo> data)
 	{
-		if (!object.ReferenceEquals(null, data))
+		if (data != null)
 		{
-			memberes = (from x in data
-			select new LoungeMemberStatus(x)).ToList();
+			memberes = data.Select((Party_Model_RegisterACK.UserInfo x) => new LoungeMemberStatus(x)).ToList();
 		}
 	}
 
@@ -76,12 +68,12 @@ public class LoungeMemberesStatus
 		List<int> list = new List<int>();
 		List<int> list2 = new List<int>();
 		list = (from x in lounge.slotInfos
-		where x.userInfo != null && !memberes.Any((LoungeMemberStatus m) => m.userId == x.userInfo.userId)
-		select x.userInfo.userId).ToList();
+			where x.userInfo != null && !memberes.Any((LoungeMemberStatus m) => m.userId == x.userInfo.userId)
+			select x.userInfo.userId).ToList();
 		list2 = (from m in memberes
-		where !lounge.slotInfos.Any((PartyModel.SlotInfo x) => x.userInfo != null && x.userInfo.userId == m.userId)
-		select m into x
-		select x.userId).ToList();
+			where !lounge.slotInfos.Any((PartyModel.SlotInfo x) => x.userInfo != null && x.userInfo.userId == m.userId)
+			select m into x
+			select x.userId).ToList();
 		for (int i = 0; i < list.Count; i++)
 		{
 			memberes.Add(new LoungeMemberStatus(list[i]));
@@ -97,12 +89,12 @@ public class LoungeMemberesStatus
 		List<int> list = new List<int>();
 		List<int> list2 = new List<int>();
 		list = (from x in party.slotInfos
-		where x.userInfo != null && !memberes.Any((LoungeMemberStatus m) => m.userId == x.userInfo.userId)
-		select x.userInfo.userId).ToList();
+			where x.userInfo != null && !memberes.Any((LoungeMemberStatus m) => m.userId == x.userInfo.userId)
+			select x.userInfo.userId).ToList();
 		list2 = (from m in memberes
-		where !party.slotInfos.Any((PartyModel.SlotInfo x) => x.userInfo != null && x.userInfo.userId == m.userId)
-		select m into x
-		select x.userId).ToList();
+			where !party.slotInfos.Any((PartyModel.SlotInfo x) => x.userInfo != null && x.userInfo.userId == m.userId)
+			select m into x
+			select x.userId).ToList();
 		if (!list.IsNullOrEmpty())
 		{
 			for (int i = 0; i < list.Count; i++)

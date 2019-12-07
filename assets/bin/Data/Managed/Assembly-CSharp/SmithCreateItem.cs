@@ -53,8 +53,7 @@ public class SmithCreateItem : EquipGenerateBase
 
 	protected override uint GetCreateEquiptableID()
 	{
-		SmithManager.SmithCreateData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>();
-		return smithData.createEquipItemTable.id;
+		return MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>().createEquipItemTable.id;
 	}
 
 	private void OnQuery_SECTION_BACK()

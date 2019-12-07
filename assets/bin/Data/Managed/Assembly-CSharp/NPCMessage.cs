@@ -106,14 +106,14 @@ public class NPCMessage : UIBehaviour
 		model = Utility.CreateGameObject("NPC", GetRenderTextureModelTransform(targetTex), GetRenderTextureLayer(targetTex));
 		npcData = Singleton<NPCTable>.I.GetNPCData(message.npc);
 		isLoading = true;
-		npcData.LoadModel(model.get_gameObject(), need_shadow: false, enable_light_probe: false, OnModelLoadComplete, useSpecialModel: false);
+		npcData.LoadModel(model.gameObject, need_shadow: false, enable_light_probe: false, OnModelLoadComplete, useSpecialModel: false);
 	}
 
 	private void OnModelLoadComplete(Animator animator)
 	{
 		if (message.has_voice)
 		{
-			this.StartCoroutine(DoCacheVoice(delegate
+			StartCoroutine(DoCacheVoice(delegate
 			{
 				OpenMessage(animator);
 			}));
@@ -128,12 +128,12 @@ public class NPCMessage : UIBehaviour
 	{
 		if (message != null && message.has_voice && model != null)
 		{
-			NPCLoader loader = model.GetComponent<NPCLoader>();
-			if (loader != null)
+			NPCLoader component = model.GetComponent<NPCLoader>();
+			if (component != null)
 			{
-				LoadingQueue load_queue = new LoadingQueue(loader);
-				load_queue.CacheVoice(message.voice_id);
-				yield return load_queue.Wait();
+				LoadingQueue loadingQueue = new LoadingQueue(component);
+				loadingQueue.CacheVoice(message.voice_id);
+				yield return loadingQueue.Wait();
 			}
 		}
 		on_complete();
@@ -141,10 +141,6 @@ public class NPCMessage : UIBehaviour
 
 	private void OpenMessage(Animator animator)
 	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
 		isLoading = false;
 		Open();
 		if (needUpdateAnchors)
@@ -152,36 +148,36 @@ public class NPCMessage : UIBehaviour
 			needUpdateAnchors = false;
 			UpdateAnchors();
 		}
-		model.set_localPosition(message.pos);
-		model.set_localEulerAngles(message.rot);
+		model.localPosition = message.pos;
+		model.localEulerAngles = message.rot;
 		if (animator != null)
 		{
 			PlayerAnimCtrl.Get(animator, PlayerAnimCtrl.StringToEnum(npcData.anim));
 		}
 		EnableRenderTexture(targetTex);
 		string replaceText = message.GetReplaceText();
-		SetColor((Enum)UI.SPR_MESSAGE, (!isShowMessage || string.IsNullOrEmpty(replaceText)) ? Color.get_clear() : Color.get_white());
+		SetColor(UI.SPR_MESSAGE, (isShowMessage && !string.IsNullOrEmpty(replaceText)) ? Color.white : Color.clear);
 		isShowMessage = true;
-		SetLabelText((Enum)UI.LBL_MESSAGE, replaceText);
+		SetLabelText(UI.LBL_MESSAGE, replaceText);
 		string displayName = npcData.displayName;
-		SetLabelText((Enum)UI.LBL_NAME, displayName);
+		SetLabelText(UI.LBL_NAME, displayName);
 		if (message.has_voice)
 		{
 			SoundManager.PlayVoice(message.voice_id);
 		}
 		if (targetTex == UI.TEX_QUEST_NPC)
 		{
-			InitUITweener<TweenColor>((Enum)UI.TEX_QUEST_NPC, is_enable: true, (EventDelegate.Callback)DeleteModel);
-			InitUITweener<TweenColor>((Enum)UI.SPR_MESSAGE, is_enable: true, (EventDelegate.Callback)null);
+			InitUITweener<TweenColor>(UI.TEX_QUEST_NPC, is_enable: true, DeleteModel);
+			InitUITweener<TweenColor>(UI.SPR_MESSAGE, is_enable: true);
 		}
 	}
 
 	private void DeleteModel()
 	{
-		DeleteRenderTexture((Enum)targetTex);
+		DeleteRenderTexture(targetTex);
 		if (model != null)
 		{
-			Object.DestroyImmediate(model.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(model.gameObject);
 			model = null;
 		}
 		isLoading = false;

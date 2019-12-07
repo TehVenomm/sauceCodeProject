@@ -52,7 +52,11 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal bool IsConnectedToRoom()
 		{
-			return GooglePlayGames.Native.Cwrapper.MultiplayerParticipant.MultiplayerParticipant_IsConnectedToRoom(SelfPtr()) || Status() == Types.ParticipantStatus.JOINED;
+			if (!GooglePlayGames.Native.Cwrapper.MultiplayerParticipant.MultiplayerParticipant_IsConnectedToRoom(SelfPtr()))
+			{
+				return Status() == Types.ParticipantStatus.JOINED;
+			}
+			return true;
 		}
 
 		internal string DisplayName()

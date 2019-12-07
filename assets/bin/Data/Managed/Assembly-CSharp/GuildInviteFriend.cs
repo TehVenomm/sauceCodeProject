@@ -54,8 +54,8 @@ public class GuildInviteFriend : QuestAcceptRoomInviteFriend
 			if (is_success)
 			{
 				nowPage = page;
-				pageNumMax = ((recv_data != null && recv_data.Length > 0) ? Mathf.CeilToInt((float)recv_data.Length / 10f) : 0);
-				inviteUsers = recv_data;
+				pageNumMax = ((recv_data != null && recv_data.Length != 0) ? Mathf.CeilToInt((float)recv_data.Length / 10f) : 0);
+				PartyInviteCharaInfo[] array = inviteUsers = recv_data;
 				Sort(GetCurrentUserList());
 			}
 			if (callback != null)

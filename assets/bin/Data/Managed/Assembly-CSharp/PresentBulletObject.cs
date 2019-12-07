@@ -53,28 +53,14 @@ public class PresentBulletObject : MonoBehaviour, IPresentBulletObject
 
 	private Character.HealData m_healData;
 
-	public PresentBulletObject()
-		: this()
-	{
-	}
-
 	public void Initialize(int id, BulletData bulletData, Transform transform)
 	{
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			Log.Error(LOG.INGAME, "StageObjectManager is invalid. Can't initialize PresentBulletObject.");
 			return;
 		}
-		this.get_gameObject().set_name("PresentBulletObject:" + id.ToString());
+		base.gameObject.name = "PresentBulletObject:" + id.ToString();
 		m_presentBulletId = id;
 		m_bulletData = bulletData;
 		m_stageObjMgr = MonoBehaviourSingleton<StageObjectManager>.I;
@@ -84,43 +70,39 @@ public class PresentBulletObject : MonoBehaviour, IPresentBulletObject
 			m_lifeSpanType = m_bulletData.dataPresent.lifeSpanType;
 			m_buffIds = m_bulletData.dataPresent.buffIds;
 		}
-		m_cachedTransform = this.get_transform();
-		m_cachedTransform.set_parent(m_stageObjMgr._transform);
-		m_cachedTransform.set_position(transform.get_position());
-		m_cachedTransform.set_localScale(Vector3.get_one());
+		m_cachedTransform = base.transform;
+		m_cachedTransform.parent = m_stageObjMgr._transform;
+		m_cachedTransform.position = transform.position;
+		m_cachedTransform.localScale = Vector3.one;
 		if (MonoBehaviourSingleton<EffectManager>.IsValid())
 		{
 			m_cachedEffectTransform = EffectManager.GetEffect(m_bulletData.data.effectName, MonoBehaviourSingleton<EffectManager>.I._transform);
 		}
 		if (m_cachedEffectTransform != null)
 		{
-			m_cachedEffectTransform.set_position(transform.get_position() + bulletData.data.dispOffset);
-			m_cachedEffectTransform.set_localRotation(Quaternion.Euler(bulletData.data.dispRotation));
-			m_effectAnimator = m_cachedEffectTransform.get_gameObject().GetComponent<Animator>();
-			m_effectCtrl = m_cachedEffectTransform.get_gameObject().GetComponent<EffectCtrl>();
+			m_cachedEffectTransform.position = transform.position + bulletData.data.dispOffset;
+			m_cachedEffectTransform.localRotation = Quaternion.Euler(bulletData.data.dispRotation);
+			m_effectAnimator = m_cachedEffectTransform.gameObject.GetComponent<Animator>();
+			m_effectCtrl = m_cachedEffectTransform.gameObject.GetComponent<EffectCtrl>();
 		}
-		this.get_gameObject().set_layer(31);
+		base.gameObject.layer = 31;
 		m_ignoreLayerMask |= 41984;
 		m_ignoreLayerMask |= 20480;
 		m_ignoreLayerMask |= 2490880;
-		m_cachedCollider = this.get_gameObject().AddComponent<BoxCollider>();
-		m_cachedCollider.set_size(COLLIDER_SIZE);
-		m_cachedCollider.set_center(COLLIDER_CENTER);
-		m_cachedCollider.set_isTrigger(true);
-		m_cachedCollider.set_enabled(false);
+		m_cachedCollider = base.gameObject.AddComponent<BoxCollider>();
+		m_cachedCollider.size = COLLIDER_SIZE;
+		m_cachedCollider.center = COLLIDER_CENTER;
+		m_cachedCollider.isTrigger = true;
+		m_cachedCollider.enabled = false;
 		m_state = STATE.ACTIVE;
 	}
 
 	public void SetPosition(Vector3 position)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		m_cachedTransform.set_position(position);
+		m_cachedTransform.position = position;
 		if (m_cachedEffectTransform != null)
 		{
-			m_cachedEffectTransform.set_position(position + m_bulletData.data.dispOffset);
+			m_cachedEffectTransform.position = position + m_bulletData.data.dispOffset;
 		}
 	}
 
@@ -140,15 +122,9 @@ public class PresentBulletObject : MonoBehaviour, IPresentBulletObject
 
 	private void Update()
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		if (m_effectAnimator != null)
+		if (m_effectAnimator != null && m_effectAnimator.GetCurrentAnimatorStateInfo(0).fullPathHash == ANIM_STATE_LOOP_INCLUDE_LAYER)
 		{
-			AnimatorStateInfo currentAnimatorStateInfo = m_effectAnimator.GetCurrentAnimatorStateInfo(0);
-			if (currentAnimatorStateInfo.get_fullPathHash() == ANIM_STATE_LOOP_INCLUDE_LAYER)
-			{
-				m_cachedCollider.set_enabled(true);
-			}
+			m_cachedCollider.enabled = true;
 		}
 		if (m_state == STATE.ACTIVE && m_lifeSpanType == BulletData.BulletPresent.LIFE_SPAN_TYPE.TIME)
 		{
@@ -156,7 +132,7 @@ public class PresentBulletObject : MonoBehaviour, IPresentBulletObject
 			{
 				OnDisappear();
 			}
-			m_lifeSpan -= Time.get_deltaTime();
+			m_lifeSpan -= Time.deltaTime;
 		}
 	}
 
@@ -164,16 +140,16 @@ public class PresentBulletObject : MonoBehaviour, IPresentBulletObject
 	{
 		if (m_cachedCollider != null)
 		{
-			m_cachedCollider.set_enabled(false);
+			m_cachedCollider.enabled = false;
 		}
 		m_stageObjMgr.RemovePresentBulletObject(m_presentBulletId);
-		if (m_cachedEffectTransform != null && m_cachedEffectTransform.get_gameObject() != null)
+		if (m_cachedEffectTransform != null && m_cachedEffectTransform.gameObject != null)
 		{
-			EffectManager.ReleaseEffect(m_cachedEffectTransform.get_gameObject());
+			EffectManager.ReleaseEffect(m_cachedEffectTransform.gameObject);
 		}
-		if (this.get_gameObject() != null)
+		if (base.gameObject != null)
 		{
-			Object.Destroy(this.get_gameObject());
+			Object.Destroy(base.gameObject);
 		}
 	}
 
@@ -182,9 +158,9 @@ public class PresentBulletObject : MonoBehaviour, IPresentBulletObject
 		m_state = STATE.PICKED;
 		if (m_cachedCollider != null)
 		{
-			m_cachedCollider.set_enabled(false);
+			m_cachedCollider.enabled = false;
 		}
-		this.StartCoroutine(OnPickedEffect());
+		StartCoroutine(OnPickedEffect());
 	}
 
 	private IEnumerator OnPickedEffect()
@@ -195,68 +171,56 @@ public class PresentBulletObject : MonoBehaviour, IPresentBulletObject
 		}
 		m_effectAnimator.Play(ANIM_STATE_PICKED, 0, 0f);
 		yield return null;
-		while (true)
+		while (m_effectAnimator.GetCurrentAnimatorStateInfo(0).fullPathHash != ANIM_STATE_PICKED_INCLUDE_LAYER)
 		{
-			AnimatorStateInfo currentAnimatorStateInfo = m_effectAnimator.GetCurrentAnimatorStateInfo(0);
-			if (currentAnimatorStateInfo.get_fullPathHash() != ANIM_STATE_PICKED_INCLUDE_LAYER)
-			{
-				yield return null;
-				continue;
-			}
-			break;
+			yield return null;
 		}
-		while (true)
+		while (m_effectAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
 		{
-			AnimatorStateInfo currentAnimatorStateInfo2 = m_effectAnimator.GetCurrentAnimatorStateInfo(0);
-			if (!(currentAnimatorStateInfo2.get_normalizedTime() < 1f))
-			{
-				break;
-			}
 			yield return null;
 		}
 		if (m_effectCtrl.waitParticlePlaying)
 		{
 			for (int i = 0; i < m_effectCtrl.particles.Length; i++)
 			{
-				ParticleSystem ps = m_effectCtrl.particles[i];
-				if (ps != null && ps.get_isPlaying())
+				ParticleSystem particleSystem = m_effectCtrl.particles[i];
+				if (particleSystem != null && particleSystem.isPlaying)
 				{
-					ps.Stop(true);
+					particleSystem.Stop(withChildren: true);
 					yield return null;
 				}
 			}
 		}
-		if (m_cachedEffectTransform != null && m_cachedEffectTransform.get_gameObject() != null)
+		if (m_cachedEffectTransform != null && m_cachedEffectTransform.gameObject != null)
 		{
 			bool flag = false;
 			if (MonoBehaviourSingleton<EffectManager>.IsValid())
 			{
-				flag = MonoBehaviourSingleton<EffectManager>.I.StockOrDestroy(m_cachedEffectTransform.get_gameObject(), no_stock_to_destroy: false);
+				flag = MonoBehaviourSingleton<EffectManager>.I.StockOrDestroy(m_cachedEffectTransform.gameObject, no_stock_to_destroy: false);
 			}
 			if (!flag)
 			{
-				Object.Destroy(m_cachedEffectTransform.get_gameObject());
+				Object.Destroy(m_cachedEffectTransform.gameObject);
 			}
 		}
-		if (this.get_gameObject() != null)
+		if (base.gameObject != null)
 		{
-			Object.Destroy(this.get_gameObject());
+			Object.Destroy(base.gameObject);
 		}
 	}
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		int layer = collider.get_gameObject().get_layer();
-		if (((1 << layer) & m_ignoreLayerMask) > 0 || (layer == 8 && collider.get_gameObject().GetComponent<DangerRader>() != null) || m_state == STATE.PICKED)
+		int layer = collider.gameObject.layer;
+		if (((1 << layer) & m_ignoreLayerMask) > 0 || (layer == 8 && collider.gameObject.GetComponent<DangerRader>() != null) || m_state == STATE.PICKED)
 		{
 			return;
 		}
-		int num = 0;
 		if (m_skillParam != null)
 		{
-			num = m_skillParam.healHp;
+			_ = m_skillParam.healHp;
 		}
-		Self component = collider.get_gameObject().GetComponent<Self>();
+		Self component = collider.gameObject.GetComponent<Self>();
 		if (!(component != null))
 		{
 			return;

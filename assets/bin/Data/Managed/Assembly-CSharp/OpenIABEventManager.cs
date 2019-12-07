@@ -26,20 +26,15 @@ public class OpenIABEventManager : MonoBehaviour
 
 	public static event Action restoreSucceededEvent;
 
-	public OpenIABEventManager()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		this.get_gameObject().set_name(base.GetType().ToString());
-		Object.DontDestroyOnLoad(this);
+		base.gameObject.name = GetType().ToString();
+		UnityEngine.Object.DontDestroyOnLoad(this);
 	}
 
 	private void OnMapSkuFailed(string exception)
 	{
-		Debug.LogError((object)("SKU mapping failed: " + exception));
+		Debug.LogError("SKU mapping failed: " + exception);
 	}
 
 	private void OnBillingSupported(string empty)

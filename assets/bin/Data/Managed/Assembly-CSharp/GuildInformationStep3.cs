@@ -45,13 +45,13 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 		}
 		if (array == null || array.Length == 0)
 		{
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.GRD_LIST, is_visible: false);
+			SetActive(UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_LIST, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
-			SetActive((Enum)UI.GRD_LIST, is_visible: true);
+			SetActive(UI.STR_NON_LIST, is_visible: false);
+			SetActive(UI.GRD_LIST, is_visible: true);
 			UpdateDynamicList();
 		}
 	}
@@ -68,7 +68,7 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 				item_num = info.Length;
 			}
 		}
-		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList(UI.GRD_LIST, GetListItemName, item_num, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			SetListItem(i, t, is_recycle, info[i]);
 		});
@@ -77,15 +77,11 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 	protected virtual void SetListItem(int i, Transform t, bool is_recycle, FriendCharaInfo data)
 	{
 		SetFollowStatus(t, data.userId, data.following, data.follower);
-		SetCharaInfo(data, i, t, is_recycle, 0 == data.userId);
+		SetCharaInfo(data, i, t, is_recycle, data.userId == 0);
 	}
 
 	protected void SetCharaInfo(FriendCharaInfo data, int i, Transform t, bool is_recycle, bool isGM)
 	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
 		object[] event_data = new object[2]
 		{
 			data.userId,
@@ -259,7 +255,7 @@ public class GuildInformationStep3 : UserListBase<FriendCharaInfo>
 				GameSection.ResumeEvent(is_resume: true);
 				if (is_success)
 				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("GuildInformationStep3", guildInformationStep.get_gameObject(), "STORY", new object[3]
+					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("GuildInformationStep3", guildInformationStep.gameObject, "STORY", new object[3]
 					{
 						80000001,
 						0,

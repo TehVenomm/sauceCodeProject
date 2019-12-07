@@ -7,9 +7,4 @@ public class SplitPlayerAttackInfo : MonoBehaviour
 
 	[Tooltip("攻撃継続効果情報")]
 	public AttackContinuationInfo attackContinuationInfo;
-
-	public SplitPlayerAttackInfo()
-		: this()
-	{
-	}
 }

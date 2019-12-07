@@ -6,6 +6,47 @@ using UnityEngine;
 
 public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 {
+	private class GameSceneTask : IComparable<GameSceneTask>
+	{
+		public int Priority;
+
+		public string SceneName;
+
+		public string SectionName;
+
+		public bool Error;
+
+		public bool InternalRes;
+
+		public UITransition.TYPE CloseType;
+
+		public UITransition.TYPE OpenType;
+
+		public bool ReloadSceneFlag;
+
+		public GameSceneTask(int priority)
+		{
+			Priority = priority;
+		}
+
+		public int CompareTo(GameSceneTask other)
+		{
+			if (this == null && other == null)
+			{
+				return 0;
+			}
+			if (this == null)
+			{
+				return -1;
+			}
+			if (other == null)
+			{
+				return 1;
+			}
+			return Priority.CompareTo(other.Priority);
+		}
+	}
+
 	public const string STR_EVENT_BACK = "[BACK]";
 
 	private const string STR_EVENT_VERSION_RESTRICTION = "APP_VERSION_RESTRICTION";
@@ -31,6 +72,10 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 	private int downloadErrorResult;
 
 	private static readonly List<GameSceneTables.TextData> emptyTextList = new List<GameSceneTables.TextData>();
+
+	private static bool Use_Force = true;
+
+	private PriorityQueue<GameSceneTask> q_ForceTask = new PriorityQueue<GameSceneTask>();
 
 	private int doWaitEventCount;
 
@@ -110,27 +155,27 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		global = new GameSceneGlobalSettings();
 		history = new GameSectionHistory();
 		hierarchy = new GameSectionHierarchy();
-		Object.DontDestroyOnLoad(this);
+		UnityEngine.Object.DontDestroyOnLoad(this);
 		GameSceneEvent.Initialize();
 		MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += global.OnScreenRotate;
 	}
 
 	public void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
 		isInitialized = false;
 		tables = new GameSceneTables();
-		LoadingQueue load_queue = new LoadingQueue(this);
+		LoadingQueue loadingQueue = new LoadingQueue(this);
 		ResourceManager.enableCache = false;
-		LoadObject lo_common_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, "CommonDialogTable");
+		LoadObject lo_common_table = loadingQueue.Load(RESOURCE_CATEGORY.TABLE, "CommonDialogTable");
 		ResourceManager.enableCache = true;
-		if (load_queue.IsLoading())
+		if (loadingQueue.IsLoading())
 		{
-			yield return load_queue.Wait();
+			yield return loadingQueue.Wait();
 		}
 		tables.CreateCommonResourceTable(lo_common_table.loadedObject as TextAsset);
 		isInitialized = true;
@@ -180,16 +225,16 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		notifyFlags |= (long)flag;
 		if (notifyCoroutine == null)
 		{
-			this.StartCoroutine(notifyCoroutine = DoNotifyUpdate());
+			StartCoroutine(notifyCoroutine = DoNotifyUpdate());
 		}
 	}
 
 	private IEnumerator DoNotifyUpdate()
 	{
-		while (notifyFlags != 0)
+		while (notifyFlags != 0L)
 		{
 			yield return null;
-			if (notifyFlags != 0 && !GameSceneEvent.IsStay() && !Protocol.isBusy && !isWaiting)
+			if (notifyFlags != 0L && !GameSceneEvent.IsStay() && !Protocol.isBusy && !isWaiting)
 			{
 				bool save_isWaiting = isWaiting;
 				isWaiting = true;
@@ -231,11 +276,11 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			}
 			if (param == null)
 			{
-				target.SendMessage(func, 1);
+				target.SendMessage(func, SendMessageOptions.DontRequireReceiver);
 			}
 			else
 			{
-				target.SendMessage(func, param, 1);
+				target.SendMessage(func, param, SendMessageOptions.DontRequireReceiver);
 			}
 			this.isWaiting = isWaiting;
 		}
@@ -350,24 +395,62 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		return hierarchy.GetHierarchyList();
 	}
 
+	public static void StopForce()
+	{
+		Use_Force = !Use_Force;
+	}
+
+	public void AddHighForceChangeScene(string scene_name, string section_name = null, bool internal_res = false, UITransition.TYPE close_type = UITransition.TYPE.CLOSE, UITransition.TYPE open_type = UITransition.TYPE.OPEN, bool error = false, bool reloadSceneFlag = false)
+	{
+		AddForceScene(0, scene_name, section_name, internal_res, close_type, open_type, error, reloadSceneFlag);
+	}
+
+	public void AddNormalForceChangeScene(string scene_name, string section_name = null, bool internal_res = false, UITransition.TYPE close_type = UITransition.TYPE.CLOSE, UITransition.TYPE open_type = UITransition.TYPE.OPEN, bool error = false, bool reloadSceneFlag = false)
+	{
+		AddForceScene(10000, scene_name, section_name, internal_res, close_type, open_type, error, reloadSceneFlag);
+	}
+
+	public void AddLowForceChangeScene(string scene_name, string section_name = null, bool internal_res = false, UITransition.TYPE close_type = UITransition.TYPE.CLOSE, UITransition.TYPE open_type = UITransition.TYPE.OPEN, bool error = false, bool reloadSceneFlag = false)
+	{
+		AddForceScene(100000, scene_name, section_name, internal_res, close_type, open_type, error, reloadSceneFlag);
+	}
+
+	private void AddForceScene(int piority, string scene_name, string section_name = null, bool internal_res = false, UITransition.TYPE close_type = UITransition.TYPE.CLOSE, UITransition.TYPE open_type = UITransition.TYPE.OPEN, bool error = false, bool reloadSceneFlag = false)
+	{
+		if (Use_Force)
+		{
+			GameSceneTask item = new GameSceneTask(piority)
+			{
+				SceneName = scene_name,
+				SectionName = section_name,
+				Error = error,
+				InternalRes = internal_res,
+				CloseType = close_type,
+				OpenType = open_type,
+				ReloadSceneFlag = reloadSceneFlag
+			};
+			q_ForceTask.Enqueue(item);
+		}
+	}
+
 	public void ChangeScene(string scene_name, string section_name = null, UITransition.TYPE close_type = UITransition.TYPE.CLOSE, UITransition.TYPE open_type = UITransition.TYPE.OPEN, bool error = false)
 	{
 		if (!AppMain.isApplicationQuit)
 		{
-			this.StartCoroutine(DoChangeScene(scene_name, section_name, error, ResourceManager.internalMode, close_type, open_type, reloadSceneFlag: false));
+			StartCoroutine(DoChangeScene(scene_name, section_name, error, ResourceManager.internalMode, close_type, open_type, reloadSceneFlag: false));
 		}
 	}
 
 	private void ChangeCommonDialog(string scene_name, string section_name, bool error, bool internal_res)
 	{
-		this.StartCoroutine(DoChangeScene(scene_name, section_name, error, internal_res, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, reloadSceneFlag: false));
+		StartCoroutine(DoChangeScene(scene_name, section_name, error, internal_res, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, reloadSceneFlag: false));
 	}
 
 	public void ReloadScene(UITransition.TYPE close_type = UITransition.TYPE.CLOSE, UITransition.TYPE open_type = UITransition.TYPE.OPEN, bool error = false)
 	{
-		string scene_name = GetCurrentSceneName().Replace("Scene", string.Empty);
+		string scene_name = GetCurrentSceneName().Replace("Scene", "");
 		string section_name = null;
-		this.StartCoroutine(DoChangeScene(scene_name, section_name, error, ResourceManager.internalMode, close_type, open_type, reloadSceneFlag: true));
+		StartCoroutine(DoChangeScene(scene_name, section_name, error, ResourceManager.internalMode, close_type, open_type, reloadSceneFlag: true));
 	}
 
 	public void ChangeSectionBack()
@@ -377,10 +460,16 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 
 	private IEnumerator DoChangeScene(string scene_name, string section_name, bool error, bool internal_res, UITransition.TYPE close_type, UITransition.TYPE open_type, bool reloadSceneFlag)
 	{
-		if (isChangeing && !error && (!isWaiting || commonDialogCallback == null))
+		if (isChangeing && !error && (!this.isWaiting || commonDialogCallback == null))
 		{
 			Log.Error("Error DoChangeScene : scene={0} ,section={1}", scene_name, section_name);
 			GameSceneEvent.request = null;
+			yield break;
+		}
+		if (q_ForceTask.Count() > 0 && GetCurrentScreenName() != "InGameScene" && Use_Force)
+		{
+			GameSceneTask gameSceneTask = q_ForceTask.Dequeue();
+			yield return DoChangeScene(gameSceneTask.SceneName, gameSceneTask.SectionName, gameSceneTask.Error, gameSceneTask.InternalRes, gameSceneTask.CloseType, gameSceneTask.OpenType, gameSceneTask.ReloadSceneFlag);
 			yield break;
 		}
 		bool save_isChangeing = isChangeing;
@@ -390,22 +479,22 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.SCENE_CHANGE, is_disable: true);
 		if (commonDialogResult != null)
 		{
-			GameSectionHierarchy.HierarchyData dialog_hierarchy_data = hierarchy.GetLast();
-			dialog_hierarchy_data.section.Close(close_type);
-			while (dialog_hierarchy_data.section.state != 0)
+			GameSectionHierarchy.HierarchyData dialog_hierarchy_data2 = hierarchy.GetLast();
+			dialog_hierarchy_data2.section.Close(close_type);
+			while (dialog_hierarchy_data2.section.state != 0)
 			{
 				yield return null;
 			}
-			hierarchy.DestroyHierarchy(dialog_hierarchy_data);
-			Action<string> dialog_callback = commonDialogCallback;
-			string dialog_result = commonDialogResult;
+			hierarchy.DestroyHierarchy(dialog_hierarchy_data2);
+			Action<string> action = commonDialogCallback;
+			string obj = commonDialogResult;
 			commonDialogResult = null;
 			commonDialogCallback = null;
 			isOpenImportantDialog = false;
-			bool save_isWaiting7 = isWaiting;
-			isWaiting = true;
-			dialog_callback?.Invoke(dialog_result);
-			isWaiting = save_isWaiting7;
+			bool isWaiting = this.isWaiting;
+			this.isWaiting = true;
+			action?.Invoke(obj);
+			this.isWaiting = isWaiting;
 			GameSceneEvent.current = commonDialogSaveCurrentEvent;
 			commonDialogSaveCurrentEvent = null;
 			MonoBehaviourSingleton<UIManager>.I.UpdateDialogBlocker(hierarchy, null);
@@ -443,7 +532,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			else
 			{
 				GameSectionHistory.HistoryData last = history.GetLast();
-				scene_name = ((last == null) ? scene_section_name.Replace("Scene", string.Empty) : last.sceneName);
+				scene_name = ((last == null) ? scene_section_name.Replace("Scene", "") : last.sceneName);
 			}
 		}
 		else
@@ -493,13 +582,13 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		GameSceneTables.SceneData new_scene_data = tables.GetSceneData(scene_name, section_name);
 		if (new_scene_data == null)
 		{
-			string load_scene_table_name = scene_section_name + "Table";
-			bool save_enable_cache = ResourceManager.enableCache;
-			bool save_internal_mode2 = ResourceManager.internalMode;
-			bool internal_mode = internal_res;
-			if (!internal_mode && MonoBehaviourSingleton<ResourceManager>.I.manifest != null)
+			string text = scene_section_name + "Table";
+			bool enableCache = ResourceManager.enableCache;
+			bool internalMode = ResourceManager.internalMode;
+			bool flag = internal_res;
+			if (!flag && MonoBehaviourSingleton<ResourceManager>.I.manifest != null)
 			{
-				internal_mode = true;
+				flag = true;
 				if (MonoBehaviourSingleton<GlobalSettingsManager>.IsValid() && !AppMain.CheckApplicationVersion(MonoBehaviourSingleton<GlobalSettingsManager>.I.ignoreExternalSceneTableNamesAppVer))
 				{
 					List<string> useExternalSceneTableNames = MonoBehaviourSingleton<GlobalSettingsManager>.I.useExternalSceneTableNames;
@@ -508,9 +597,9 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 						int i = 0;
 						for (int count = useExternalSceneTableNames.Count; i < count; i++)
 						{
-							if (useExternalSceneTableNames[i] == load_scene_table_name)
+							if (useExternalSceneTableNames[i] == text)
 							{
-								internal_mode = false;
+								flag = false;
 								break;
 							}
 						}
@@ -518,20 +607,27 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 				}
 			}
 			ResourceManager.enableCache = false;
-			ResourceManager.internalMode = internal_mode;
-			LoadObject lo_scene_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, load_scene_table_name);
-			ResourceManager.enableCache = save_enable_cache;
-			ResourceManager.internalMode = save_internal_mode2;
-			yield return load_queue.Wait();
+			ResourceManager.internalMode = flag;
+			LoadObject lo_scene_table = load_queue.Load(RESOURCE_CATEGORY.TABLE, text);
+			ResourceManager.enableCache = enableCache;
+			ResourceManager.internalMode = internalMode;
+			while (load_queue.IsLoading())
+			{
+				yield return load_queue.Wait();
+			}
+			if (lo_scene_table.loadedObject == null)
+			{
+				yield break;
+			}
 			new_scene_data = tables.CreateSceneData(scene_name, lo_scene_table.loadedObject as TextAsset);
 		}
 		GameSceneTables.SectionData new_scene_section_data = new_scene_data.GetSectionData(scene_section_name);
-		GameSectionHierarchy.HierarchyData now_scene_hierarchy_data = hierarchy.GetTyped(GAME_SECTION_TYPE.SCENE);
-		if (new_scene_section_data != null && (now_scene_hierarchy_data == null || now_scene_hierarchy_data.data != new_scene_section_data || reloadSceneFlag))
+		GameSectionHierarchy.HierarchyData typed = hierarchy.GetTyped(GAME_SECTION_TYPE.SCENE);
+		if (new_scene_section_data != null && ((typed == null || typed.data != new_scene_section_data) | reloadSceneFlag))
 		{
 			global.ChangeSection(new_scene_data, null);
-			List<GameSectionHierarchy.HierarchyData> exclusive_list2 = isOpenImportantDialog ? new List<GameSectionHierarchy.HierarchyData>() : hierarchy.GetExclusiveList(GAME_SECTION_TYPE.SCENE);
-			exclusive_list2.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
+			List<GameSectionHierarchy.HierarchyData> exclusive_list3 = isOpenImportantDialog ? new List<GameSectionHierarchy.HierarchyData>() : hierarchy.GetExclusiveList(GAME_SECTION_TYPE.SCENE);
+			exclusive_list3.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
 			{
 				o.section.Close(close_type);
 			});
@@ -543,10 +639,10 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			{
 				if (!MonoBehaviourSingleton<TransitionManager>.I.isTransing && !isOpenCommonDialog)
 				{
-					TransitionManager.TYPE transition_type3 = global.GetTransitionType(prev_scene_name, prev_section_name, scene_section_name, section_name);
-					if (transition_type3 != 0)
+					TransitionManager.TYPE transitionType = global.GetTransitionType(prev_scene_name, prev_section_name, scene_section_name, section_name);
+					if (transitionType != 0)
 					{
-						yield return MonoBehaviourSingleton<TransitionManager>.I.Out(transition_type3);
+						yield return MonoBehaviourSingleton<TransitionManager>.I.Out(transitionType);
 					}
 				}
 				else
@@ -557,39 +653,39 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 					}
 				}
 			}
-			bool save_isWaiting10 = isWaiting;
-			isWaiting = true;
-			exclusive_list2.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
+			bool save_isWaiting9 = this.isWaiting;
+			this.isWaiting = true;
+			exclusive_list3.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
 			{
 				o.section.Exit();
 			});
-			while (exclusive_list2.Find((GameSectionHierarchy.HierarchyData o) => !o.section.isExited) != null)
+			while (exclusive_list3.Find((GameSectionHierarchy.HierarchyData o) => !o.section.isExited) != null)
 			{
 				yield return null;
 			}
-			isWaiting = save_isWaiting10;
-			hierarchy.DestroyHierarchy(exclusive_list2);
+			this.isWaiting = save_isWaiting9;
+			hierarchy.DestroyHierarchy(exclusive_list3);
 			if (global.SceneClear(prev_scene_name, prev_section_name, scene_section_name))
 			{
 				if (MonoBehaviourSingleton<InstantiateManager>.IsValid())
 				{
 					MonoBehaviourSingleton<InstantiateManager>.I.ClearStocks();
 				}
-				bool flag = new_scene_section_data.sectionName == "InGameScene";
+				_ = (new_scene_section_data.sectionName == "InGameScene");
 				yield return MonoBehaviourSingleton<AppMain>.I.ClearMemory(clearObjCaches: true, clearPreloaded: true);
 			}
-			bool save_isWaiting9 = isWaiting;
-			isWaiting = true;
+			save_isWaiting9 = this.isWaiting;
+			this.isWaiting = true;
 			global.SceneInitialize(prev_scene_name, scene_section_name, scene_name.Contains("TutorialWeaponSelect"));
 			while (!global.isInitialized || IsBusy(error))
 			{
 				yield return null;
 			}
-			isWaiting = save_isWaiting9;
-			bool save_internal_mode = ResourceManager.internalMode;
+			this.isWaiting = save_isWaiting9;
+			bool internalMode2 = ResourceManager.internalMode;
 			ResourceManager.internalMode = internal_res;
 			LoadObject[] load_objs2 = new_scene_section_data.LoadUseResources(load_queue);
-			ResourceManager.internalMode = save_internal_mode;
+			ResourceManager.internalMode = internalMode2;
 			if (load_queue.IsLoading())
 			{
 				yield return load_queue.Wait();
@@ -597,7 +693,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			new_scene_section = hierarchy.CreateSection(new_scene_section_data, load_objs2);
 			if (string.IsNullOrEmpty(section_name))
 			{
-				GameSceneTables.EventData eventData = new_scene_section_data.GetEventData(string.Empty);
+				GameSceneTables.EventData eventData = new_scene_section_data.GetEventData("");
 				if (eventData != null)
 				{
 					section_name = eventData.toSectionName;
@@ -613,7 +709,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 				{
 					section_name = scene_name + "Top";
 				}
-				if (now_scene_hierarchy_data.data == new_scene_section_data)
+				if (typed.data == new_scene_section_data)
 				{
 					GameSectionHierarchy.HierarchyData last2 = hierarchy.GetLast();
 					if (last2 != null && last2.data.type == GAME_SECTION_TYPE.COMMON_DIALOG)
@@ -637,13 +733,13 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			}
 			global.ChangeSection(null, new_section_data);
 			global.StageSetup(prev_scene_name, scene_section_name, section_name, new_section_data);
-			GameSectionHierarchy.HierarchyData last_hierarchy_data = hierarchy.GetLast();
+			GameSectionHierarchy.HierarchyData dialog_hierarchy_data2 = hierarchy.GetLast();
 			GameSectionHierarchy.HierarchyData now_hierarchy_data = hierarchy.FindIgnoreSingle(new_section_data);
 			if (now_hierarchy_data == null)
 			{
 				MonoBehaviourSingleton<UIManager>.I.UpdateMainUI(scene_section_name, section_name);
-				List<GameSectionHierarchy.HierarchyData> exclusive_list = isOpenImportantDialog ? new List<GameSectionHierarchy.HierarchyData>() : hierarchy.GetExclusiveList(new_section_data.type);
-				exclusive_list.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
+				List<GameSectionHierarchy.HierarchyData> exclusive_list3 = isOpenImportantDialog ? new List<GameSectionHierarchy.HierarchyData>() : hierarchy.GetExclusiveList(new_section_data.type);
+				exclusive_list3.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
 				{
 					o.section.Close(close_type);
 				});
@@ -656,10 +752,10 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 				{
 					if (!MonoBehaviourSingleton<TransitionManager>.I.isTransing && !new_section_data.type.IsDialog())
 					{
-						TransitionManager.TYPE transition_type2 = global.GetTransitionType(prev_scene_name, prev_section_name, scene_section_name, section_name);
-						if (transition_type2 != 0)
+						TransitionManager.TYPE transitionType2 = global.GetTransitionType(prev_scene_name, prev_section_name, scene_section_name, section_name);
+						if (transitionType2 != 0)
 						{
-							yield return MonoBehaviourSingleton<TransitionManager>.I.Out(transition_type2);
+							yield return MonoBehaviourSingleton<TransitionManager>.I.Out(transitionType2);
 						}
 					}
 					else
@@ -670,63 +766,63 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 						}
 					}
 				}
-				if (last_hierarchy_data != null)
+				if (dialog_hierarchy_data2 != null)
 				{
-					Send(set_wait_flag: true, last_hierarchy_data.section, "OnChangePretreat", section_name + "@" + scene_name);
+					Send(set_wait_flag: true, dialog_hierarchy_data2.section, "OnChangePretreat", section_name + "@" + scene_name);
 				}
 				if (new_section_data.type == GAME_SECTION_TYPE.PAGE && !new_section_data.isTop)
 				{
-					List<GameSectionHierarchy.HierarchyData> list = new List<GameSectionHierarchy.HierarchyData>();
-					exclusive_list.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
+					List<GameSectionHierarchy.HierarchyData> list2 = new List<GameSectionHierarchy.HierarchyData>();
+					exclusive_list3.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
 					{
 						if (o.data.type != GAME_SECTION_TYPE.PAGE)
-						{
-							list.Add(o);
-						}
-					});
-					exclusive_list = list;
-				}
-				else if (new_section_data.type == GAME_SECTION_TYPE.PAGE_DIALOG)
-				{
-					List<GameSectionHierarchy.HierarchyData> list2 = new List<GameSectionHierarchy.HierarchyData>();
-					exclusive_list.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
-					{
-						if (o.data.type != GAME_SECTION_TYPE.PAGE_DIALOG)
 						{
 							list2.Add(o);
 						}
 					});
-					exclusive_list = list2;
+					exclusive_list3 = list2;
 				}
-				bool save_isWaiting8 = isWaiting;
-				isWaiting = true;
-				exclusive_list.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
+				else if (new_section_data.type == GAME_SECTION_TYPE.PAGE_DIALOG)
+				{
+					List<GameSectionHierarchy.HierarchyData> list = new List<GameSectionHierarchy.HierarchyData>();
+					exclusive_list3.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
+					{
+						if (o.data.type != GAME_SECTION_TYPE.PAGE_DIALOG)
+						{
+							list.Add(o);
+						}
+					});
+					exclusive_list3 = list;
+				}
+				bool save_isWaiting9 = this.isWaiting;
+				this.isWaiting = true;
+				exclusive_list3.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
 				{
 					o.section.Exit();
 				});
-				while (exclusive_list.Find((GameSectionHierarchy.HierarchyData o) => !o.section.isExited) != null)
+				while (exclusive_list3.Find((GameSectionHierarchy.HierarchyData o) => !o.section.isExited) != null)
 				{
 					yield return null;
 				}
-				isWaiting = save_isWaiting8;
-				hierarchy.DestroyHierarchy(exclusive_list);
+				this.isWaiting = save_isWaiting9;
+				hierarchy.DestroyHierarchy(exclusive_list3);
 				MonoBehaviourSingleton<UIManager>.I.UpdateDialogBlocker(hierarchy, new_section_data);
-				bool internalMode = ResourceManager.internalMode;
+				bool internalMode3 = ResourceManager.internalMode;
 				ResourceManager.internalMode = internal_res;
-				LoadObject[] load_objs;
+				LoadObject[] load_objs2;
 				if (new_section_data.type != GAME_SECTION_TYPE.COMMON_DIALOG)
 				{
-					load_objs = new_section_data.LoadUseResources(load_queue);
+					load_objs2 = new_section_data.LoadUseResources(load_queue);
 				}
 				else
 				{
 					string commonResourceName = tables.GetCommonResourceName(new_section_data.typeParams[0]);
-					load_objs = new LoadObject[1]
+					load_objs2 = new LoadObject[1]
 					{
 						load_queue.Load(RESOURCE_CATEGORY.UI, commonResourceName)
 					};
 				}
-				ResourceManager.internalMode = internalMode;
+				ResourceManager.internalMode = internalMode3;
 				if (load_queue.IsLoading())
 				{
 					yield return load_queue.Wait();
@@ -742,12 +838,12 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 						yield return null;
 					}
 				}
-				new_section = hierarchy.CreateSection(new_section_data, load_objs);
+				new_section = hierarchy.CreateSection(new_section_data, load_objs2);
 			}
-			else if (last_hierarchy_data != now_hierarchy_data)
+			else if (dialog_hierarchy_data2 != now_hierarchy_data)
 			{
-				List<GameSectionHierarchy.HierarchyData> cut_list = isOpenImportantDialog ? new List<GameSectionHierarchy.HierarchyData>() : hierarchy.GetCutList(now_hierarchy_data);
-				cut_list.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
+				List<GameSectionHierarchy.HierarchyData> exclusive_list3 = isOpenImportantDialog ? new List<GameSectionHierarchy.HierarchyData>() : hierarchy.GetCutList(now_hierarchy_data);
+				exclusive_list3.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
 				{
 					o.section.Close(close_type);
 				});
@@ -760,13 +856,13 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 				{
 					if (!MonoBehaviourSingleton<TransitionManager>.I.isTransing && !new_section_data.type.IsDialog())
 					{
-						GameSectionHierarchy.HierarchyData last_exculude_dialog_data = hierarchy.GetLastExcludeDialog();
-						if ((last_hierarchy_data.data.type == GAME_SECTION_TYPE.PAGE || (last_hierarchy_data.data.type.IsDialog() && last_exculude_dialog_data != null && last_exculude_dialog_data.data.type == GAME_SECTION_TYPE.PAGE && last_exculude_dialog_data != now_hierarchy_data)) && (!last_hierarchy_data.data.type.IsDialog() || !new_section_data.type.IsDialog()))
+						GameSectionHierarchy.HierarchyData lastExcludeDialog = hierarchy.GetLastExcludeDialog();
+						if ((dialog_hierarchy_data2.data.type == GAME_SECTION_TYPE.PAGE || (dialog_hierarchy_data2.data.type.IsDialog() && lastExcludeDialog != null && lastExcludeDialog.data.type == GAME_SECTION_TYPE.PAGE && lastExcludeDialog != now_hierarchy_data)) && (!dialog_hierarchy_data2.data.type.IsDialog() || !new_section_data.type.IsDialog()))
 						{
-							TransitionManager.TYPE transition_type = global.GetTransitionType(prev_scene_name, prev_section_name, scene_section_name, section_name);
-							if (transition_type != 0)
+							TransitionManager.TYPE transitionType3 = global.GetTransitionType(prev_scene_name, prev_section_name, scene_section_name, section_name);
+							if (transitionType3 != 0)
 							{
-								yield return MonoBehaviourSingleton<TransitionManager>.I.Out(transition_type);
+								yield return MonoBehaviourSingleton<TransitionManager>.I.Out(transitionType3);
 							}
 						}
 					}
@@ -778,53 +874,54 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 						}
 					}
 				}
+				bool save_isWaiting9;
 				if (!global_init_section)
 				{
-					bool save_isWaiting6 = isWaiting;
-					isWaiting = true;
+					save_isWaiting9 = this.isWaiting;
+					this.isWaiting = true;
 					global_init_section = true;
 					global.SectionInitialize(scene_section_name, section_name, new_section_data);
 					while (!global.isInitialized || IsBusy(error))
 					{
 						yield return null;
 					}
-					isWaiting = save_isWaiting6;
+					this.isWaiting = save_isWaiting9;
 				}
 				MonoBehaviourSingleton<UIManager>.I.UpdateMainUI(scene_section_name, section_name);
 				if (now_hierarchy_data.section.state != UIBehaviour.STATE.OPEN)
 				{
-					bool save_isWaiting5 = isWaiting;
-					isWaiting = true;
+					save_isWaiting9 = this.isWaiting;
+					this.isWaiting = true;
 					now_hierarchy_data.section.isReOpenInitialized = false;
 					now_hierarchy_data.section.InitializeReopen();
 					while (!now_hierarchy_data.section.isReOpenInitialized || IsBusy(error))
 					{
 						yield return null;
 					}
-					isWaiting = save_isWaiting5;
+					this.isWaiting = save_isWaiting9;
 					now_hierarchy_data.section.Open(open_type);
 				}
 				while (MonoBehaviourSingleton<UIManager>.I.IsTransitioning())
 				{
 					yield return null;
 				}
-				bool save_isWaiting4 = isWaiting;
-				isWaiting = true;
-				cut_list.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
+				save_isWaiting9 = this.isWaiting;
+				this.isWaiting = true;
+				exclusive_list3.ForEach(delegate(GameSectionHierarchy.HierarchyData o)
 				{
 					o.section.Exit();
 				});
-				while (cut_list.Find((GameSectionHierarchy.HierarchyData o) => !o.section.isExited) != null)
+				while (exclusive_list3.Find((GameSectionHierarchy.HierarchyData o) => !o.section.isExited) != null)
 				{
 					yield return null;
 				}
-				isWaiting = save_isWaiting4;
-				hierarchy.DestroyHierarchy(cut_list);
+				this.isWaiting = save_isWaiting9;
+				hierarchy.DestroyHierarchy(exclusive_list3);
 				MonoBehaviourSingleton<UIManager>.I.UpdateDialogBlocker(hierarchy, new_section_data);
-				if (last_hierarchy_data != null && last_hierarchy_data.data.type.IsDialog())
+				if (dialog_hierarchy_data2 != null && dialog_hierarchy_data2.data.type.IsDialog())
 				{
-					Send(set_wait_flag: true, now_hierarchy_data.section, "OnCloseDialog", last_hierarchy_data.data.sectionName);
-					Send(set_wait_flag: true, now_hierarchy_data.section, "OnCloseDialog_" + last_hierarchy_data.data.sectionName);
+					Send(set_wait_flag: true, now_hierarchy_data.section, "OnCloseDialog", dialog_hierarchy_data2.data.sectionName);
+					Send(set_wait_flag: true, now_hierarchy_data.section, "OnCloseDialog_" + dialog_hierarchy_data2.data.sectionName);
 					while (IsBusy(error))
 					{
 						yield return null;
@@ -838,19 +935,19 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		}
 		if (!global_init_section)
 		{
-			bool save_isWaiting3 = isWaiting;
-			isWaiting = true;
+			bool save_isWaiting9 = this.isWaiting;
+			this.isWaiting = true;
 			global.SectionInitialize(scene_section_name, section_name, new_section_data);
 			while (!global.isInitialized || IsBusy(error))
 			{
 				yield return null;
 			}
-			isWaiting = save_isWaiting3;
+			this.isWaiting = save_isWaiting9;
 		}
 		if (new_scene_section != null)
 		{
-			bool save_isWaiting2 = isWaiting;
-			isWaiting = true;
+			bool save_isWaiting9 = this.isWaiting;
+			this.isWaiting = true;
 			new_section.LoadRequireDataTable();
 			while (!new_section.isLoadedRequireDataTable)
 			{
@@ -861,14 +958,14 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			{
 				yield return null;
 			}
-			isWaiting = save_isWaiting2;
+			this.isWaiting = save_isWaiting9;
 			new_scene_section.Open(open_type);
 			if (new_scene_section_data != null)
 			{
-				bool internalMode2 = ResourceManager.internalMode;
+				bool internalMode4 = ResourceManager.internalMode;
 				ResourceManager.internalMode = internal_res;
 				new_scene_section_data.LoadPreloadResources(load_queue);
-				ResourceManager.internalMode = internalMode2;
+				ResourceManager.internalMode = internalMode4;
 			}
 		}
 		bool shouldPreOpenCamera = false;
@@ -883,8 +980,8 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		}
 		if (new_section != null)
 		{
-			bool save_isWaiting = isWaiting;
-			isWaiting = true;
+			bool save_isWaiting9 = this.isWaiting;
+			this.isWaiting = true;
 			new_section.LoadRequireDataTable();
 			while (!new_section.isLoadedRequireDataTable)
 			{
@@ -899,15 +996,15 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			{
 				yield return null;
 			}
-			isWaiting = save_isWaiting;
+			this.isWaiting = save_isWaiting9;
 			MonoBehaviourSingleton<UIManager>.I.UpdateDialogBlocker(hierarchy, new_section_data);
 			new_section.Open(open_type);
 			if (new_section_data != null)
 			{
-				bool internalMode3 = ResourceManager.internalMode;
+				bool internalMode5 = ResourceManager.internalMode;
 				ResourceManager.internalMode = internal_res;
 				new_section_data.LoadPreloadResources(load_queue);
-				ResourceManager.internalMode = internalMode3;
+				ResourceManager.internalMode = internalMode5;
 			}
 		}
 		if (!save_isChangeing)
@@ -953,7 +1050,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		}
 		if (GameSceneEvent.request != null)
 		{
-			ExecuteSceneEvent("REQUEST", this.get_gameObject(), GameSceneEvent.request.eventName, GameSceneEvent.request.userData);
+			ExecuteSceneEvent("REQUEST", base.gameObject, GameSceneEvent.request.eventName, GameSceneEvent.request.userData);
 			GameSceneEvent.request = null;
 		}
 	}
@@ -965,7 +1062,11 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 
 	private bool IsBusy(bool important)
 	{
-		return !important && IsBusy();
+		if (!important)
+		{
+			return IsBusy();
+		}
+		return false;
 	}
 
 	public void ExecuteSceneEvent(string caller, GameObject sender, string event_name, object user_data = null, string check_app_ver = null, bool is_send_query = true)
@@ -978,7 +1079,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		UIBehaviour uIBehaviour = null;
 		string text;
 		bool flag;
-		if (sender == this.get_gameObject())
+		if (sender == base.gameObject)
 		{
 			uIBehaviour = null;
 			text = string.Empty;
@@ -998,7 +1099,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 					uIBehaviour = null;
 				}
 			}
-			text = ((!(uIBehaviour != null)) ? string.Empty : uIBehaviour.get_name());
+			text = ((uIBehaviour != null) ? uIBehaviour.name : string.Empty);
 			flag = false;
 		}
 		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.tutorialMessage != null)
@@ -1033,7 +1134,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		{
 			if (!Protocol.strict && doWaitEventCount == 0)
 			{
-				this.StartCoroutine(DoWaitEvent(caller, sender, event_name, user_data, check_app_ver, is_send_query));
+				StartCoroutine(DoWaitEvent(caller, sender, event_name, user_data, check_app_ver, is_send_query));
 			}
 			else
 			{
@@ -1281,13 +1382,12 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			{
 				break;
 			}
-			if (!IsEventExecutionPossible())
+			if (IsEventExecutionPossible())
 			{
-				continue;
+				doWaitEventCount--;
+				ExecuteSceneEvent(caller, sender, event_name, user_data, check_app_ver, is_send_query);
+				yield break;
 			}
-			doWaitEventCount--;
-			ExecuteSceneEvent(caller, sender, event_name, user_data, check_app_ver, is_send_query);
-			yield break;
 		}
 		doWaitEventCount--;
 	}
@@ -1316,7 +1416,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		{
 			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.SetSkipSectionRunCount(autoEvents.Length - 1);
 		}
-		this.StartCoroutine(DoAutoEvent());
+		StartCoroutine(DoAutoEvent());
 	}
 
 	public void StopAutoEvent(Action on_finished = null)
@@ -1342,7 +1442,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		while (autoEvents != null)
 		{
 			yield return null;
-			if (notifyFlags != 0 || isChangeing || isOpenCommonDialog || GameSceneEvent.IsStay() || (MonoBehaviourSingleton<UIManager>.I.disableFlags & UIManager.DISABLE_FACTOR.AUTO_EVENT) != UIManager.DISABLE_FACTOR.AUTO_EVENT)
+			if (notifyFlags != 0L || isChangeing || isOpenCommonDialog || GameSceneEvent.IsStay() || (MonoBehaviourSingleton<UIManager>.I.disableFlags & UIManager.DISABLE_FACTOR.AUTO_EVENT) != UIManager.DISABLE_FACTOR.AUTO_EVENT)
 			{
 				continue;
 			}
@@ -1354,7 +1454,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			{
 				yield return MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.AUTO_EVENT);
 			}
-			EventData event_data = (autoEvents == null) ? null : autoEvents[index];
+			EventData event_data = (autoEvents != null) ? autoEvents[index] : null;
 			if (event_data != null)
 			{
 				EventData eventData = GetCurrentSection().CheckAutoEvent(event_data.name, event_data.data);
@@ -1369,20 +1469,20 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 				UIGameSceneEventSender sender = null;
 				Utility.ForEach(MonoBehaviourSingleton<UIManager>.I._transform, delegate(Transform t)
 				{
-					UIGameSceneEventSender component = t.GetComponent<UIGameSceneEventSender>();
-					if (component == null)
+					UIGameSceneEventSender component2 = t.GetComponent<UIGameSceneEventSender>();
+					if (component2 == null)
 					{
 						return false;
 					}
-					if (component.eventName != event_data.name)
+					if (component2.eventName != event_data.name)
 					{
 						return false;
 					}
-					if (component.eventData != null && event_data.data != null && !component.eventData.Equals(event_data.data))
+					if (component2.eventData != null && event_data.data != null && !component2.eventData.Equals(event_data.data))
 					{
 						return false;
 					}
-					sender = component;
+					sender = component2;
 					return true;
 				});
 				if (sender != null)
@@ -1390,44 +1490,40 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 					UIButton button = sender.GetComponent<UIButton>();
 					if (button != null)
 					{
-						UIScrollView scroll_view = button.GetComponentInParent<UIScrollView>();
-						if (scroll_view != null && scroll_view.get_enabled())
+						UIScrollView componentInParent = button.GetComponentInParent<UIScrollView>();
+						if (componentInParent != null && componentInParent.enabled)
 						{
-							UIPanel panel = scroll_view.GetComponent<UIPanel>();
-							if (!panel.IsVisible(button.GetComponent<UIWidget>()))
+							UIPanel component = componentInParent.GetComponent<UIPanel>();
+							if (!component.IsVisible(button.GetComponent<UIWidget>()))
 							{
-								Vector3 offset = -panel.cachedTransform.InverseTransformPoint(button.get_transform().get_position());
-								if (!scroll_view.canMoveHorizontally)
+								Vector3 pos2 = -component.cachedTransform.InverseTransformPoint(button.transform.position);
+								if (!componentInParent.canMoveHorizontally)
 								{
-									Vector3 localPosition = panel.cachedTransform.get_localPosition();
-									offset.x = localPosition.x;
+									pos2.x = component.cachedTransform.localPosition.x;
 								}
-								if (!scroll_view.canMoveVertically)
+								if (!componentInParent.canMoveVertically)
 								{
-									Vector3 localPosition2 = panel.cachedTransform.get_localPosition();
-									offset.y = localPosition2.y;
+									pos2.y = component.cachedTransform.localPosition.y;
 								}
-								SpringPanel sp = SpringPanel.Begin(panel.cachedGameObject, offset, 16f);
+								SpringPanel sp = SpringPanel.Begin(component.cachedGameObject, pos2, 16f);
 								bool wait = true;
 								SpringPanel.OnFinished func = delegate
 								{
 									wait = false;
 								};
-								SpringPanel springPanel = sp;
-								springPanel.onFinished = (SpringPanel.OnFinished)Delegate.Combine(springPanel.onFinished, func);
+								sp.onFinished = (SpringPanel.OnFinished)Delegate.Combine(sp.onFinished, func);
 								while (wait)
 								{
 									yield return null;
 								}
-								SpringPanel springPanel2 = sp;
-								springPanel2.onFinished = (SpringPanel.OnFinished)Delegate.Remove(springPanel2.onFinished, func);
+								sp.onFinished = (SpringPanel.OnFinished)Delegate.Remove(sp.onFinished, func);
 							}
 						}
-						Vector3 pos = button.get_transform().get_position();
+						Vector3 pos = button.transform.position;
 						yield return MonoBehaviourSingleton<OutGameEffectManager>.I.MoveAutoEventEffect(pos);
 						button.SetState(UIButtonColor.State.Pressed, immediate: false);
 						MonoBehaviourSingleton<OutGameEffectManager>.I.PopTouchEffect(pos);
-						yield return (object)new WaitForSeconds(0.2f);
+						yield return new WaitForSeconds(0.2f);
 						button.SetState(UIButtonColor.State.Normal, immediate: false);
 					}
 				}
@@ -1436,24 +1532,23 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 			{
 				if (event_data.data != null && event_data.data.GetType() == typeof(EventListData))
 				{
-					Network.EventData eventData2 = (Network.EventData)event_data.data;
-					if (eventData2.eventType == 15)
+					if (((Network.EventData)event_data.data).eventType == 15)
 					{
 						if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level < 50)
 						{
 							MonoBehaviourSingleton<GameSceneManager>.I.StopAutoEvent();
 							break;
 						}
-						ExecuteSceneEvent("AUTO", this.get_gameObject(), event_data.name + "_ARENA", event_data.data);
+						ExecuteSceneEvent("AUTO", base.gameObject, event_data.name + "_ARENA", event_data.data);
 					}
 					else
 					{
-						ExecuteSceneEvent("AUTO", this.get_gameObject(), event_data.name, event_data.data);
+						ExecuteSceneEvent("AUTO", base.gameObject, event_data.name, event_data.data);
 					}
 				}
 				else
 				{
-					ExecuteSceneEvent("AUTO", this.get_gameObject(), event_data.name, event_data.data);
+					ExecuteSceneEvent("AUTO", base.gameObject, event_data.name, event_data.data);
 				}
 				if (GameSceneEvent.current.eventName == "RecommendedVersionCheck")
 				{
@@ -1500,7 +1595,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		}
 		if (isOpenCommonDialog)
 		{
-			this.StartCoroutine(DoWaitOpenCommonDialog(desc, callback, error, internal_res, errorCode));
+			StartCoroutine(DoWaitOpenCommonDialog(desc, callback, error, internal_res, errorCode));
 			return;
 		}
 		if (isChangeing && !error)
@@ -1527,15 +1622,15 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 		}
 		else if (errorCode > 500000 && errorCode < 600000)
 		{
-			ChangeCommonDialog("CommonDialog", (!error) ? "CommonDialogTop" : "CustomDialogError", error, internal_res);
+			ChangeCommonDialog("CommonDialog", error ? "CustomDialogError" : "CommonDialogTop", error, internal_res);
 		}
 		else if (errorCode > 600000 && errorCode < 700000)
 		{
-			ChangeCommonDialog("CommonDialog", (!error) ? "CommonDialogTop" : "CustomDialogError", error, internal_res);
+			ChangeCommonDialog("CommonDialog", error ? "CustomDialogError" : "CommonDialogTop", error, internal_res);
 		}
 		else
 		{
-			ChangeCommonDialog("CommonDialog", (!error) ? "CommonDialogTop" : "CommonDialogError", error, internal_res);
+			ChangeCommonDialog("CommonDialog", error ? "CommonDialogError" : "CommonDialogTop", error, internal_res);
 		}
 	}
 
@@ -1647,7 +1742,7 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 					EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)quest_data.enemyID[i]);
 					if (enemyData != null && !enemyData.IsEnableNowApplicationVersion())
 					{
-						OpenUpdateAppDialog((!is_happen_quest) ? 2003u : 2002u, is_yes_no, delegate
+						OpenUpdateAppDialog(is_happen_quest ? 2002u : 2003u, is_yes_no, delegate
 						{
 							GameSceneEvent.Cancel();
 						});
@@ -1713,12 +1808,12 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 
 	public void OpinionBox()
 	{
-		this.StartCoroutine(DoOpenOpinionBox());
+		StartCoroutine(DoOpenOpinionBox());
 	}
 
 	private IEnumerator DoOpenOpinionBox()
 	{
-		while (notifyFlags != 0 || isChangeing || isOpenCommonDialog || GameSceneEvent.IsStay())
+		while (notifyFlags != 0L || isChangeing || isOpenCommonDialog || GameSceneEvent.IsStay())
 		{
 			yield return null;
 		}
@@ -1727,12 +1822,20 @@ public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 
 	public bool IsCurrentSceneHomeOrLounge()
 	{
-		return GetCurrentSceneName() == "HomeScene" || GetCurrentSceneName() == "LoungeScene" || GetCurrentSceneName() == "ClanScene" || GetCurrentSceneName() == "GuildScene";
+		if (!(GetCurrentSceneName() == "HomeScene") && !(GetCurrentSceneName() == "LoungeScene") && !(GetCurrentSceneName() == "ClanScene"))
+		{
+			return GetCurrentSceneName() == "GuildScene";
+		}
+		return true;
 	}
 
 	public bool IsCurrentSceneMejorOutGameScene()
 	{
-		return GetCurrentSceneName() == "HomeScene" || GetCurrentSceneName() == "LoungeScene" || GetCurrentSceneName() == "ClanScene" || GetCurrentSceneName() == "StatusScene" || GetCurrentSceneName() == "ShopScene";
+		if (!(GetCurrentSceneName() == "HomeScene") && !(GetCurrentSceneName() == "LoungeScene") && !(GetCurrentSceneName() == "ClanScene") && !(GetCurrentSceneName() == "StatusScene"))
+		{
+			return GetCurrentSceneName() == "ShopScene";
+		}
+		return true;
 	}
 
 	public void SetExternalStageName(string stage_name)

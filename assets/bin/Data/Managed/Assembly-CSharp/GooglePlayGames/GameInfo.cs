@@ -20,22 +20,38 @@ namespace GooglePlayGames
 
 		public static bool ApplicationIdInitialized()
 		{
-			return !string.IsNullOrEmpty("683498632423") && !"683498632423".Equals(ToEscapedToken("APP_ID"));
+			if (!string.IsNullOrEmpty("683498632423"))
+			{
+				return !"683498632423".Equals(ToEscapedToken("APP_ID"));
+			}
+			return false;
 		}
 
 		public static bool IosClientIdInitialized()
 		{
-			return !string.IsNullOrEmpty(string.Empty) && !string.Empty.Equals(ToEscapedToken("IOS_CLIENTID"));
+			if (!string.IsNullOrEmpty(""))
+			{
+				return !"".Equals(ToEscapedToken("IOS_CLIENTID"));
+			}
+			return false;
 		}
 
 		public static bool WebClientIdInitialized()
 		{
-			return !string.IsNullOrEmpty("683498632423-6p90updcgm6b67r4ucmhs82nkq1dc1mi.apps.googleusercontent.com") && !"683498632423-6p90updcgm6b67r4ucmhs82nkq1dc1mi.apps.googleusercontent.com".Equals(ToEscapedToken("WEB_CLIENTID"));
+			if (!string.IsNullOrEmpty("683498632423-6p90updcgm6b67r4ucmhs82nkq1dc1mi.apps.googleusercontent.com"))
+			{
+				return !"683498632423-6p90updcgm6b67r4ucmhs82nkq1dc1mi.apps.googleusercontent.com".Equals(ToEscapedToken("WEB_CLIENTID"));
+			}
+			return false;
 		}
 
 		public static bool NearbyConnectionsInitialized()
 		{
-			return !string.IsNullOrEmpty(string.Empty) && !string.Empty.Equals(ToEscapedToken("NEARBY_SERVICE_ID"));
+			if (!string.IsNullOrEmpty(""))
+			{
+				return !"".Equals(ToEscapedToken("NEARBY_SERVICE_ID"));
+			}
+			return false;
 		}
 
 		private static string ToEscapedToken(string token)

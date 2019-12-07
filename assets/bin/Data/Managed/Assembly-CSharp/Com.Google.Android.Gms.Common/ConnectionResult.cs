@@ -85,27 +85,27 @@ namespace Com.Google.Android.Gms.Common
 
 		public string toString()
 		{
-			return InvokeCall<string>("toString", "()Ljava/lang/String;", new object[0]);
+			return InvokeCall<string>("toString", "()Ljava/lang/String;", Array.Empty<object>());
 		}
 
 		public int hashCode()
 		{
-			return InvokeCall<int>("hashCode", "()I", new object[0]);
+			return InvokeCall<int>("hashCode", "()I", Array.Empty<object>());
 		}
 
 		public int describeContents()
 		{
-			return InvokeCall<int>("describeContents", "()I", new object[0]);
+			return InvokeCall<int>("describeContents", "()I", Array.Empty<object>());
 		}
 
 		public object getResolution()
 		{
-			return InvokeCall<object>("getResolution", "()Landroid/app/PendingIntent;", new object[0]);
+			return InvokeCall<object>("getResolution", "()Landroid/app/PendingIntent;", Array.Empty<object>());
 		}
 
 		public bool hasResolution()
 		{
-			return InvokeCall<bool>("hasResolution", "()Z", new object[0]);
+			return InvokeCall<bool>("hasResolution", "()Z", Array.Empty<object>());
 		}
 
 		public void startResolutionForResult(object arg_object_1, int arg_int_2)
@@ -120,17 +120,17 @@ namespace Com.Google.Android.Gms.Common
 
 		public int getErrorCode()
 		{
-			return InvokeCall<int>("getErrorCode", "()I", new object[0]);
+			return InvokeCall<int>("getErrorCode", "()I", Array.Empty<object>());
 		}
 
 		public string getErrorMessage()
 		{
-			return InvokeCall<string>("getErrorMessage", "()Ljava/lang/String;", new object[0]);
+			return InvokeCall<string>("getErrorMessage", "()Ljava/lang/String;", Array.Empty<object>());
 		}
 
 		public bool isSuccess()
 		{
-			return InvokeCall<bool>("isSuccess", "()Z", new object[0]);
+			return InvokeCall<bool>("isSuccess", "()Z", Array.Empty<object>());
 		}
 	}
 }

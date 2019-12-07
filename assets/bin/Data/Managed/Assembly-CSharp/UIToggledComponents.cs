@@ -18,11 +18,6 @@ public class UIToggledComponents : MonoBehaviour
 	[SerializeField]
 	private bool inverse;
 
-	public UIToggledComponents()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		if (target != null)
@@ -43,23 +38,20 @@ public class UIToggledComponents : MonoBehaviour
 				target = null;
 			}
 		}
-		UIToggle component = this.GetComponent<UIToggle>();
-		EventDelegate.Add(component.onChange, Toggle);
+		EventDelegate.Add(GetComponent<UIToggle>().onChange, Toggle);
 	}
 
 	public void Toggle()
 	{
-		if (this.get_enabled())
+		if (base.enabled)
 		{
 			for (int i = 0; i < activate.Count; i++)
 			{
-				MonoBehaviour val = activate[i];
-				val.set_enabled(UIToggle.current.value);
+				activate[i].enabled = UIToggle.current.value;
 			}
 			for (int j = 0; j < deactivate.Count; j++)
 			{
-				MonoBehaviour val2 = deactivate[j];
-				val2.set_enabled(!UIToggle.current.value);
+				deactivate[j].enabled = !UIToggle.current.value;
 			}
 		}
 	}

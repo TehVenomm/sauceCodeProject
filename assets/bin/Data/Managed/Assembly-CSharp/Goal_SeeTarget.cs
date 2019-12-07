@@ -9,9 +9,6 @@ public class Goal_SeeTarget : GoalComposite
 
 	protected override void Activate(Brain brain)
 	{
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
 		SetStatus(STATUS.ACTIVE);
 		if (!brain.targetCtrl.IsAliveTarget())
 		{

@@ -69,8 +69,7 @@ public class FieldQuestGimmickObject : FieldGatherGimmickObject
 		{
 			return false;
 		}
-		QuestTable.QuestTableData questTableData = Singleton<QuestTable>.I.GetQuestData(result3);
-		if (questTableData == null)
+		if (Singleton<QuestTable>.I.GetQuestData(result3) == null)
 		{
 			return false;
 		}
@@ -91,20 +90,17 @@ public class FieldQuestGimmickObject : FieldGatherGimmickObject
 			{
 				continue;
 			}
-			switch (array2[0])
+			string a = array2[0];
+			if (!(a == "gvid"))
 			{
-			case "gvid":
-				if (uint.TryParse(array2[1], out gvid))
-				{
-					viewData = Singleton<FieldMapTable>.I.GetGatherPointViewData(gvid);
-				}
-				break;
-			case "qid":
-				if (uint.TryParse(array2[1], out uint result))
+				if (a == "qid" && uint.TryParse(array2[1], out uint result))
 				{
 					questData = Singleton<QuestTable>.I.GetQuestData(result);
 				}
-				break;
+			}
+			else if (uint.TryParse(array2[1], out gvid))
+			{
+				viewData = Singleton<FieldMapTable>.I.GetGatherPointViewData(gvid);
 			}
 		}
 	}
@@ -177,8 +173,8 @@ public class FieldQuestGimmickObject : FieldGatherGimmickObject
 			string[] array2 = array[i].Split(':');
 			if (array2 != null && array2.Length == 2)
 			{
-				string text = array2[0];
-				if (text != null && text == "gvid" && uint.TryParse(array2[1], out uint result))
+				string a = array2[0];
+				if (a == "gvid" && uint.TryParse(array2[1], out uint result))
 				{
 					return Singleton<FieldMapTable>.I.GetGatherPointViewData(result);
 				}
@@ -189,25 +185,6 @@ public class FieldQuestGimmickObject : FieldGatherGimmickObject
 
 	protected override void CreateModel()
 	{
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<InGameProgress>.IsValid() || MonoBehaviourSingleton<InGameProgress>.I.fieldGimmickModelTable == null)
 		{
 			return;
@@ -226,21 +203,20 @@ public class FieldQuestGimmickObject : FieldGatherGimmickObject
 			Transform effect = EffectManager.GetEffect(viewData.gatherEffectName, _transform);
 			if (effect != null)
 			{
-				effect.get_gameObject().SetActive(true);
+				effect.gameObject.SetActive(value: true);
 				Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-				Vector3 position = cameraTransform.get_position();
-				Quaternion rotation = cameraTransform.get_rotation();
-				Vector3 val = position - _transform.get_position();
-				Vector3 pos = val.get_normalized() * viewData.targetEffectShift + Vector3.get_up() * viewData.targetEffectHeight + _transform.get_position();
+				Vector3 position = cameraTransform.position;
+				Quaternion rotation = cameraTransform.rotation;
+				Vector3 pos = (position - _transform.position).normalized * viewData.targetEffectShift + Vector3.up * viewData.targetEffectHeight + _transform.position;
 				effect.Set(pos, rotation);
 			}
 		}
 		sqlRadius = viewData.targetRadius * viewData.targetRadius;
 		if (viewData.colRadius > 0f)
 		{
-			SphereCollider val2 = this.get_gameObject().AddComponent<SphereCollider>();
-			val2.set_center(new Vector3(0f, 0f, 0f));
-			val2.set_radius(viewData.colRadius);
+			SphereCollider sphereCollider = base.gameObject.AddComponent<SphereCollider>();
+			sphereCollider.center = new Vector3(0f, 0f, 0f);
+			sphereCollider.radius = viewData.colRadius;
 		}
 	}
 }

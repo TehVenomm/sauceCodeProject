@@ -19,7 +19,7 @@ namespace Network
 
 		public class OncePurchaseItemToShop
 		{
-			public string productId = string.Empty;
+			public string productId = "";
 		}
 
 		public List<GachaReward> reward;
@@ -34,8 +34,8 @@ namespace Network
 
 		public OncePurchaseItemToShop oncePurchaseItemToShop;
 
-		public string buttonImg = string.Empty;
+		public string buttonImg = "";
 
-		public string detailButtonImg = string.Empty;
+		public string detailButtonImg = "";
 	}
 }

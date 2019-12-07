@@ -79,13 +79,13 @@ public class QuestRushSearchListSelect : QuestSearchListSelectBase
 	{
 		if (!PartyManager.IsValidNotEmptyList())
 		{
-			SetActive((Enum)UI.GRD_QUEST, is_visible: false);
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_QUEST, is_visible: false);
+			SetActive(UI.STR_NON_LIST, is_visible: true);
 			return;
 		}
 		PartyModel.Party[] partys = MonoBehaviourSingleton<PartyManager>.I.partys.ToArray();
-		SetActive((Enum)UI.GRD_QUEST, is_visible: true);
-		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		SetActive(UI.GRD_QUEST, is_visible: true);
+		SetActive(UI.STR_NON_LIST, is_visible: false);
 		SetGrid(UI.GRD_QUEST, "QuestRushSearchListSelectItem", partys.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
 			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)partys[i].quest.questId);
@@ -121,8 +121,7 @@ public class QuestRushSearchListSelect : QuestSearchListSelectBase
 		{
 			SetActive(t, UI.TGL_MEMBER_1, is_visible: false);
 		}
-		UITexture component = FindCtrl(t, UI.TEX_RUSH_IMAGE).GetComponent<UITexture>();
-		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.RUSH_QUEST_ICON, ResourceName.GetRushQuestIconName((int)questData.rushIconId));
+		ResourceLoad.LoadWithSetUITexture(FindCtrl(t, UI.TEX_RUSH_IMAGE).GetComponent<UITexture>(), RESOURCE_CATEGORY.RUSH_QUEST_ICON, ResourceName.GetRushQuestIconName((int)questData.rushIconId));
 	}
 
 	private void SetDeliveryData(uint questId, Transform t)

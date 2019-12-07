@@ -113,7 +113,7 @@ public class GameSceneTables
 
 		public static bool operator ==(SectionData a, SectionData b)
 		{
-			if (object.ReferenceEquals(a, b))
+			if ((object)a == b)
 			{
 				return true;
 			}
@@ -143,7 +143,7 @@ public class GameSceneTables
 
 		public static bool operator ==(SceneData a, SceneData b)
 		{
-			if (object.ReferenceEquals(a, b))
+			if ((object)a == b)
 			{
 				return true;
 			}
@@ -188,18 +188,18 @@ public class GameSceneTables
 				if (find_data == null && o.GetSectionData(section_name) != null)
 				{
 					find_data = o;
-					bool flag = LoungeMatchingManager.IsValidInLounge();
-					bool flag2 = ClanMatchingManager.IsValidInClan() || MonoBehaviourSingleton<ClanManager>.IsValid();
-					bool flag3 = !flag && !flag2;
-					if (flag && (o.sceneName == "Home" || o.sceneName == "Clan"))
+					bool num = LoungeMatchingManager.IsValidInLounge();
+					bool flag = ClanMatchingManager.IsValidInClan() || MonoBehaviourSingleton<ClanManager>.IsValid();
+					bool flag2 = !num && !flag;
+					if (num && (o.sceneName == "Home" || o.sceneName == "Clan"))
 					{
 						find_data = null;
 					}
-					if (flag3 && (o.sceneName == "Lounge" || o.sceneName == "Clan"))
+					if (flag2 && (o.sceneName == "Lounge" || o.sceneName == "Clan"))
 					{
 						find_data = null;
 					}
-					if (flag2 && (o.sceneName == "Lounge" || o.sceneName == "Home"))
+					if (flag && (o.sceneName == "Lounge" || o.sceneName == "Home"))
 					{
 						find_data = null;
 					}
@@ -211,10 +211,9 @@ public class GameSceneTables
 
 	public SceneData CreateSceneData(string scene_name, TextAsset text_asset)
 	{
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
 		try
 		{
-			CSVReader cSVReader = new CSVReader(text_asset.get_text(), "name,type,useRes,loadRes,appVer,evName,evTo,retBtn,strKey,strJP", decrypt: true);
+			CSVReader cSVReader = new CSVReader(text_asset.text, "name,type,useRes,loadRes,appVer,evName,evTo,retBtn,strKey,strJP", decrypt: true);
 			SceneData sceneData = new SceneData();
 			sceneData.sceneName = scene_name;
 			SectionData sectionData = null;
@@ -349,7 +348,7 @@ public class GameSceneTables
 
 	public void CreateCommonResourceTable(TextAsset text_asset)
 	{
-		CSVReader cSVReader = new CSVReader(text_asset.get_text(), "name,useRes", decrypt: true);
+		CSVReader cSVReader = new CSVReader(text_asset.text, "name,useRes", decrypt: true);
 		while (cSVReader.NextLine())
 		{
 			string value = string.Empty;

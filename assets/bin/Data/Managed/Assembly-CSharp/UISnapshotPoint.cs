@@ -17,16 +17,11 @@ public class UISnapshotPoint : MonoBehaviour
 
 	public Texture2D thumbnail;
 
-	public UISnapshotPoint()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
-		if (this.get_tag() != "EditorOnly")
+		if (base.tag != "EditorOnly")
 		{
-			this.set_tag("EditorOnly");
+			base.tag = "EditorOnly";
 		}
 	}
 }

@@ -28,14 +28,10 @@ public static class ShaderGlobal
 	{
 		get
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			return _FogColor_f;
 		}
 		set
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			Shader.SetGlobalColor("_FogColor_f", _FogColor_f = value);
 		}
 	}
@@ -92,14 +88,10 @@ public static class ShaderGlobal
 	{
 		get
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			return _GlobalRimColor;
 		}
 		set
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			Shader.SetGlobalColor("_GlobalRimColor", _GlobalRimColor = value);
 		}
 	}
@@ -112,7 +104,7 @@ public static class ShaderGlobal
 		}
 		set
 		{
-			Shader.SetGlobalFloat("_light_probe", (!(_light_probe = value)) ? 0f : 1f);
+			Shader.SetGlobalFloat("_light_probe", (_light_probe = value) ? 1f : 0f);
 		}
 	}
 
@@ -120,14 +112,10 @@ public static class ShaderGlobal
 	{
 		get
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			return _LightProbeMul;
 		}
 		set
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			Shader.SetGlobalColor("_LightProbeMul", _LightProbeMul = value);
 		}
 	}
@@ -136,14 +124,10 @@ public static class ShaderGlobal
 	{
 		get
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			return _LightProbeAdd;
 		}
 		set
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			Shader.SetGlobalColor("_LightProbeAdd", _LightProbeAdd = value);
 		}
 	}
@@ -164,25 +148,16 @@ public static class ShaderGlobal
 	{
 		get
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			return _npc_ambient_color;
 		}
 		set
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			Shader.SetGlobalColor("_npc_ambient_color", _npc_ambient_color = value);
 		}
 	}
 
 	public static void Initialize()
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 		fogColor = new Color(0.75f, 0.8f, 1f, 1f);
 		fogNear = 0f;
 		fogFar = 40f;
@@ -220,10 +195,10 @@ public static class ShaderGlobal
 		{
 			Utility.MaterialForEach(renderers, delegate(Material material)
 			{
-				Shader val = ResourceUtility.FindShader(material.get_shader().get_name() + "__l");
-				if (val != null)
+				Shader shader = ResourceUtility.FindShader(material.shader.name + "__l");
+				if (shader != null)
 				{
-					material.set_shader(val);
+					material.shader = shader;
 				}
 			});
 		}
@@ -235,10 +210,10 @@ public static class ShaderGlobal
 		{
 			Utility.MaterialForEach(renderers, delegate(Material material)
 			{
-				Shader val = ResourceUtility.FindShader(material.get_shader().get_name() + "__u");
-				if (val != null)
+				Shader shader = ResourceUtility.FindShader(material.shader.name + "__u");
+				if (shader != null)
 				{
-					material.set_shader(val);
+					material.shader = shader;
 				}
 			});
 		}

@@ -98,8 +98,8 @@ public class QuestEventSelectList : QuestSpecialSelect
 	public override void Initialize()
 	{
 		eventData = (GameSection.GetEventData() as Network.EventData);
-		SkipTween((Enum)UI.SPR_DELIVERY_BTN_SELECTED, forward: true, 0);
-		SetActive((Enum)UI.OBJ_DELIVERY_ROOT, is_visible: true);
+		SkipTween(UI.SPR_DELIVERY_BTN_SELECTED);
+		SetActive(UI.OBJ_DELIVERY_ROOT, is_visible: true);
 		int width = GetWidth(UI.WGT_LOCATION_NAME_LIMIT);
 		title = new LabelWidthLimitter(GetCtrl(UI.LBL_LOCATION_NAME).GetComponent<UILabel>(), width, fixAnchorForEffect: false);
 		titleEffect = new LabelWidthLimitter(GetCtrl(UI.LBL_LOCATION_NAME_EFFECT).GetComponent<UILabel>(), width, fixAnchorForEffect: true);
@@ -108,30 +108,31 @@ public class QuestEventSelectList : QuestSpecialSelect
 
 	protected override IEnumerator DoInitialize()
 	{
-		string resourceName = ResourceName.GetEventBG(eventData.bannerId);
+		string eventBG = ResourceName.GetEventBG(eventData.bannerId);
 		Hash128 hash = default(Hash128);
 		if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest != null)
 		{
-			hash = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(resourceName));
+			hash = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(eventBG));
 		}
-		if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest == null || hash.get_isValid())
+		if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest == null || hash.isValid)
 		{
-			LoadingQueue load_queue = new LoadingQueue(this);
-			LoadObject lo_bg = load_queue.Load(isEventAsset: true, RESOURCE_CATEGORY.EVENT_BG, resourceName);
+			LoadingQueue loadingQueue = new LoadingQueue(this);
+			LoadObject lo_bg = loadingQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.EVENT_BG, eventBG);
 			LoadObject lo_item = null;
 			if (ShouldShowEventMapButton())
 			{
-				lo_item = load_queue.Load(RESOURCE_CATEGORY.QUEST_ITEM, "QEM_10000000");
+				lo_item = loadingQueue.Load(RESOURCE_CATEGORY.QUEST_ITEM, "QEM_10000000");
 			}
-			if (load_queue.IsLoading())
+			if (loadingQueue.IsLoading())
 			{
-				yield return load_queue.Wait();
+				yield return loadingQueue.Wait();
 			}
-			SetTexture(texture: lo_bg.loadedObject as Texture2D, texture_enum: UI.TEX_EVENT_BG);
+			Texture2D texture = lo_bg.loadedObject as Texture2D;
+			SetTexture(UI.TEX_EVENT_BG, texture);
 			if (lo_item != null && null != lo_item.loadedObject)
 			{
-				GameObject val = lo_item.loadedObject as GameObject;
-				mapItem = val.get_transform();
+				GameObject gameObject = lo_item.loadedObject as GameObject;
+				mapItem = gameObject.transform;
 			}
 		}
 		GetDeliveryList();
@@ -145,7 +146,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 
 	protected override void OnOpen()
 	{
-		this.StartCoroutine(InitScroll());
+		StartCoroutine(InitScroll());
 		base.OnOpen();
 	}
 
@@ -155,12 +156,12 @@ public class QuestEventSelectList : QuestSpecialSelect
 
 	private IEnumerator InitScroll()
 	{
-		UIScrollView scroll = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
+		UIScrollView scroll = GetComponent<UIScrollView>(UI.SCR_DELIVERY_QUEST);
 		while (base.state != STATE.OPEN)
 		{
 			yield return null;
 		}
-		scroll.set_enabled(scroll.shouldMoveVertically);
+		scroll.enabled = scroll.shouldMoveVertically;
 		RepositionTable();
 	}
 
@@ -170,9 +171,8 @@ public class QuestEventSelectList : QuestSpecialSelect
 		{
 			return false;
 		}
-		RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
-		RegionTable.Data data2 = Array.Find(data, (RegionTable.Data o) => o.eventId == eventData.eventId);
-		return null != data2;
+		RegionTable.Data data = Array.Find(Singleton<RegionTable>.I.GetData(), (RegionTable.Data o) => o.eventId == eventData.eventId);
+		return data != null;
 	}
 
 	protected override bool IsVisibleDelivery(Delivery delivery, DeliveryTable.DeliveryData tableData)
@@ -190,20 +190,17 @@ public class QuestEventSelectList : QuestSpecialSelect
 
 	protected void RepositionTable()
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		UITable component = base.GetComponent<UITable>((Enum)UI.TBL_DELIVERY_QUEST);
-		if (Object.op_Implicit(component))
+		UITable component = GetComponent<UITable>(UI.TBL_DELIVERY_QUEST);
+		if ((bool)component)
 		{
 			component.Reposition();
 			List<Transform> childList = component.GetChildList();
 			int i = 0;
 			for (int count = childList.Count; i < count; i++)
 			{
-				Vector3 localPosition = childList[i].get_localPosition();
+				Vector3 localPosition = childList[i].localPosition;
 				localPosition.x = 0f;
-				childList[i].set_localPosition(localPosition);
+				childList[i].localPosition = localPosition;
 			}
 		}
 	}
@@ -240,9 +237,9 @@ public class QuestEventSelectList : QuestSpecialSelect
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.LBL_LOCATION_NAME, eventData.name);
-		SetLabelText((Enum)UI.LBL_LOCATION_NAME_EFFECT, eventData.name);
-		SetActive((Enum)UI.BTN_INFO, !string.IsNullOrEmpty(eventData.linkName));
+		SetLabelText(UI.LBL_LOCATION_NAME, eventData.name);
+		SetLabelText(UI.LBL_LOCATION_NAME_EFFECT, eventData.name);
+		SetActive(UI.BTN_INFO, !string.IsNullOrEmpty(eventData.linkName));
 		title.Update();
 		titleEffect.Update();
 		stories.Clear();
@@ -252,7 +249,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 		}
 		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() != "InGameScene")
 		{
-			SetActive((Enum)UI.BTN_FISHING_RECORD, eventData.subButtonType == 1);
+			SetActive(UI.BTN_FISHING_RECORD, eventData.subButtonType == 1);
 		}
 		clearedDeliveries = CreateClearedDliveryList();
 		UpdateList();
@@ -293,7 +290,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 
 	protected void UpdateList()
 	{
-		if (Object.op_Implicit(GetCtrl(UI.TBL_DELIVERY_QUEST)))
+		if ((bool)GetCtrl(UI.TBL_DELIVERY_QUEST))
 		{
 			UpdateTable();
 		}
@@ -306,8 +303,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 	protected virtual void UpdateTable()
 	{
 		int num = 0;
-		int count = stories.Count;
-		if (count > 0)
+		if (stories.Count > 0)
 		{
 			num++;
 		}
@@ -330,10 +326,10 @@ public class QuestEventSelectList : QuestSpecialSelect
 		}
 		pageMax = 1 + (list.Count - 1) / 10;
 		bool flag = pageMax > 1;
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
-		SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
+		SetActive(UI.OBJ_ACTIVE_ROOT, flag);
+		SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
+		SetLabelText(UI.LBL_MAX, pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, nowPage.ToString());
 		ShowDeliveryData[] showList = GetPagingList(list.ToArray(), 10, nowPage);
 		int num2 = showList.Length;
 		if (showStory)
@@ -342,14 +338,14 @@ public class QuestEventSelectList : QuestSpecialSelect
 		}
 		if (num2 == 0)
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
-			SetActive((Enum)UI.TBL_DELIVERY_QUEST, is_visible: false);
+			SetActive(UI.STR_DELIVERY_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_DELIVERY_QUEST, is_visible: false);
+			SetActive(UI.TBL_DELIVERY_QUEST, is_visible: false);
 			return;
 		}
-		SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: false);
-		SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
-		SetActive((Enum)UI.TBL_DELIVERY_QUEST, is_visible: true);
+		SetActive(UI.STR_DELIVERY_NON_LIST, is_visible: false);
+		SetActive(UI.GRD_DELIVERY_QUEST, is_visible: false);
+		SetActive(UI.TBL_DELIVERY_QUEST, is_visible: true);
 		bool flag2 = false;
 		if (ShouldShowEventMapButton())
 		{
@@ -359,7 +355,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 		int questStartIndex = 0;
 		if (flag2)
 		{
-			questStartIndex++;
+			int num3 = ++questStartIndex;
 		}
 		int borderIndex = questStartIndex + showList.Length;
 		int storyStartIndex = borderIndex;
@@ -368,20 +364,20 @@ public class QuestEventSelectList : QuestSpecialSelect
 			storyStartIndex++;
 		}
 		Transform ctrl = GetCtrl(UI.TBL_DELIVERY_QUEST);
-		if (Object.op_Implicit(ctrl))
+		if ((bool)ctrl)
 		{
 			int l = 0;
-			for (int childCount = ctrl.get_childCount(); l < childCount; l++)
+			for (int childCount = ctrl.childCount; l < childCount; l++)
 			{
 				Transform child = ctrl.GetChild(0);
-				child.set_parent(null);
-				Object.Destroy(child.get_gameObject());
+				child.parent = null;
+				UnityEngine.Object.Destroy(child.gameObject);
 			}
 		}
 		bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, isResetUI, delegate(int i, Transform parent)
+		SetTable(UI.TBL_DELIVERY_QUEST, "", num2, isResetUI, delegate(int i, Transform parent)
 		{
-			Transform val = null;
+			Transform transform = null;
 			if (i >= storyStartIndex)
 			{
 				if (!HasChapterStory() || i == storyStartIndex || !isRenewalFlag)
@@ -398,11 +394,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 			{
 				return Realizes("QuestRequestItem", parent);
 			}
-			if (null != mapItem)
-			{
-				return ResourceUtility.Realizes(mapItem.get_gameObject(), parent);
-			}
-			return Realizes("QuestEventBorderItem", parent);
+			return (null != mapItem) ? ResourceUtility.Realizes(mapItem.gameObject, parent) : Realizes("QuestEventBorderItem", parent);
 		}, delegate(int i, Transform t, bool is_recycle)
 		{
 			if (!(t == null))
@@ -417,8 +409,8 @@ public class QuestEventSelectList : QuestSpecialSelect
 				{
 					if (i >= questStartIndex && i < borderIndex)
 					{
-						int num3 = i - questStartIndex;
-						InitDelivery(showList[num3], t);
+						int num4 = i - questStartIndex;
+						InitDelivery(showList[num4], t);
 						ChangeDeliveryFrameSprite(t);
 					}
 					else if (i < questStartIndex)
@@ -428,8 +420,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 				}
 			}
 		});
-		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-		component.set_enabled(true);
+		GetComponent<UIScrollView>(UI.SCR_DELIVERY_QUEST).enabled = true;
 		RepositionTable();
 	}
 
@@ -458,21 +449,21 @@ public class QuestEventSelectList : QuestSpecialSelect
 		}
 		pageMax = 1 + (list.Count - 1) / 10;
 		bool flag = pageMax > 1;
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
-		SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
+		SetActive(UI.OBJ_ACTIVE_ROOT, flag);
+		SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
+		SetLabelText(UI.LBL_MAX, pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, nowPage.ToString());
 		ShowDeliveryData[] showList = GetPagingList(list.ToArray(), 10, nowPage);
 		if (list.Count == 0)
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
+			SetActive(UI.STR_DELIVERY_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_DELIVERY_QUEST, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: false);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: true);
-			SetDynamicList((Enum)UI.GRD_DELIVERY_QUEST, "QuestRequestItem", showList.Length, isResetUI, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+			SetActive(UI.STR_DELIVERY_NON_LIST, is_visible: false);
+			SetActive(UI.GRD_DELIVERY_QUEST, is_visible: true);
+			SetDynamicList(UI.GRD_DELIVERY_QUEST, "QuestRequestItem", showList.Length, isResetUI, null, null, delegate(int i, Transform t, bool is_recycle)
 			{
 				SetActive(t, is_visible: true);
 				if (showList[i].data.subType == DELIVERY_SUB_TYPE.ASSIGNED_EQUIPMENT)
@@ -568,8 +559,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 	private void OnQuery_COMPLETED_ASSIGNED_EQUIPMENT()
 	{
 		int index = (int)GameSection.GetEventData();
-		DeliveryTable.DeliveryData deliveryData = clearedDeliveries[index];
-		GameSection.SetEventData(deliveryData);
+		GameSection.SetEventData(clearedDeliveries[index]);
 	}
 
 	protected virtual void InitNormalDelivery(int index, Transform t)
@@ -628,8 +618,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 
 	protected virtual void OnQuery_INFO()
 	{
-		string text = string.Format(WebViewManager.NewsWithLinkParamFormat, eventData.linkName);
-		GameSection.SetEventData(text);
+		GameSection.SetEventData(string.Format(WebViewManager.NewsWithLinkParamFormat, eventData.linkName));
 	}
 
 	private void OnQuery_SELECT_COMPLETED_DELIVERY()
@@ -645,8 +634,7 @@ public class QuestEventSelectList : QuestSpecialSelect
 	private void SetCompletedDeliveryEventData()
 	{
 		int index = (int)GameSection.GetEventData();
-		DeliveryTable.DeliveryData deliveryData = clearedDeliveries[index];
-		int id = (int)deliveryData.id;
+		int id = (int)clearedDeliveries[index].id;
 		DeliveryRewardList deliveryRewardList = new DeliveryRewardList();
 		GameSection.SetEventData(new object[3]
 		{
@@ -692,15 +680,15 @@ public class QuestEventSelectList : QuestSpecialSelect
 			{
 				new EventData(goingHomeEvent, null),
 				new EventData("TO_EVENT", null),
-				(eventListData.placeEnum != EVENT_DISPLAY_PLACE.PRESENT) ? new EventData("TAB_EVENT", null) : new EventData("TAB_PRESENT", null),
+				(eventListData.placeEnum == EVENT_DISPLAY_PLACE.PRESENT) ? new EventData("TAB_PRESENT", null) : new EventData("TAB_EVENT", null),
 				new EventData("SELECT", eventData)
 			};
 		}
 		GameSection.SetEventData(new object[4]
 		{
 			story.id,
-			string.Empty,
-			string.Empty,
+			"",
+			"",
 			array
 		});
 	}
@@ -708,19 +696,18 @@ public class QuestEventSelectList : QuestSpecialSelect
 	protected virtual void OnQuery_WORLDMAP()
 	{
 		int eventId = (int)GameSection.GetEventData();
-		RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
-		RegionTable.Data data2 = Array.Find(data, (RegionTable.Data o) => o.eventId == eventId);
-		if (data2 != null)
+		RegionTable.Data data = Array.Find(Singleton<RegionTable>.I.GetData(), (RegionTable.Data o) => o.eventId == eventId);
+		if (data != null)
 		{
 			MonoBehaviourSingleton<WorldMapManager>.I.ignoreTutorial = true;
-			RequestEvent("DIRECT_EVENT", (int)data2.regionId);
+			RequestEvent("DIRECT_EVENT", (int)data.regionId);
 		}
 	}
 
 	private void OnQuery_PAGE_PREV()
 	{
 		isResetUI = true;
-		nowPage = ((nowPage <= 1) ? pageMax : (nowPage - 1));
+		nowPage = ((nowPage > 1) ? (nowPage - 1) : pageMax);
 		RefreshUI();
 	}
 

@@ -5,7 +5,6 @@ using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.Native.PInvoke;
 using GooglePlayGames.OurUtils;
 using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace GooglePlayGames.Native
@@ -15,9 +14,6 @@ namespace GooglePlayGames.Native
 		private static volatile NearbyConnectionsManager sManager;
 
 		private static Action<INearbyConnectionClient> sCreationCallback;
-
-		[CompilerGenerated]
-		private static Action<NearbyConnectionsStatus.InitializationStatus> _003C_003Ef__mg_0024cache0;
 
 		internal static NearbyConnectionsManager GetManager()
 		{
@@ -44,13 +40,13 @@ namespace GooglePlayGames.Native
 			NearbyConnectionsManagerBuilder nearbyConnectionsManagerBuilder = new NearbyConnectionsManagerBuilder();
 			nearbyConnectionsManagerBuilder.SetOnInitializationFinished(OnManagerInitialized);
 			PlatformConfiguration configuration = new AndroidClient().CreatePlatformConfiguration(PlayGamesClientConfiguration.DefaultConfiguration);
-			Debug.Log((object)"Building manager Now");
+			Debug.Log("Building manager Now");
 			sManager = nearbyConnectionsManagerBuilder.Build(configuration);
 		}
 
 		internal static void OnManagerInitialized(NearbyConnectionsStatus.InitializationStatus status)
 		{
-			Debug.Log((object)("Nearby Init Complete: " + status + " sManager = " + sManager));
+			Debug.Log("Nearby Init Complete: " + status + " sManager = " + sManager);
 			if (status == NearbyConnectionsStatus.InitializationStatus.VALID)
 			{
 				if (sCreationCallback != null)
@@ -61,7 +57,7 @@ namespace GooglePlayGames.Native
 			}
 			else
 			{
-				Debug.LogError((object)("ERROR: NearbyConnectionManager not initialized: " + status));
+				Debug.LogError("ERROR: NearbyConnectionManager not initialized: " + status);
 			}
 		}
 	}

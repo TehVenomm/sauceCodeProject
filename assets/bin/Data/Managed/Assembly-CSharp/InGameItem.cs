@@ -48,7 +48,7 @@ public class InGameItem : GameSection
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
 			isInActiveRotate = true;
 		}
-		PlayTween((Enum)UI.OBJ_CAPTION_3, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		PlayTween(UI.OBJ_CAPTION_3, forward: true, null, is_input_block: false);
 	}
 
 	public override void Exit()
@@ -64,17 +64,13 @@ public class InGameItem : GameSection
 	{
 		UpdateAnchors();
 		base.UpdateUI();
-		SetToggle((Enum)UI.TGL_CHANGE_INVENTORY, value: true);
+		SetToggle(UI.TGL_CHANGE_INVENTORY, value: true);
 		inventory = new InGameUseItemInventory();
-		SetDynamicList((Enum)SelectListTarget(showInventoryMode), (string)null, inventory.datas.Length, reset: false, (Func<int, bool>)delegate(int i)
+		SetDynamicList(SelectListTarget(showInventoryMode), null, inventory.datas.Length, reset: false, delegate(int i)
 		{
 			SortCompareData sortCompareData2 = inventory.datas[i];
-			if (sortCompareData2 == null || !sortCompareData2.IsPriority(inventory.sortSettings.orderTypeAsc))
-			{
-				return false;
-			}
-			return true;
-		}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycre)
+			return (sortCompareData2 != null && sortCompareData2.IsPriority(inventory.sortSettings.orderTypeAsc)) ? true : false;
+		}, null, delegate(int i, Transform t, bool is_recycre)
 		{
 			SortCompareData sortCompareData = inventory.datas[i];
 			ItemIcon itemIcon = inventory.CreateIcon(new object[4]
@@ -92,8 +88,7 @@ public class InGameItem : GameSection
 				SetLongTouch(itemIcon.transform, "DETAIL", i);
 			}
 		});
-		UIPanel component = GetCtrl(UI.SCR_INVENTORY).GetComponent<UIPanel>();
-		component.Refresh();
+		GetCtrl(UI.SCR_INVENTORY).GetComponent<UIPanel>().Refresh();
 		if (isInActiveRotate && MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 		{
 			Reposition(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
@@ -112,8 +107,7 @@ public class InGameItem : GameSection
 		GetCtrl(UI.BTN_ITEM_SHOP).GetComponent<UIScreenRotationHandler>().InvokeRotate();
 		GetCtrl(UI.BG).GetComponent<UIRect>().UpdateAnchors();
 		UpdateAnchors();
-		UIScrollView component = GetCtrl(UI.SCR_INVENTORY).GetComponent<UIScrollView>();
-		component.ResetPosition();
+		GetCtrl(UI.SCR_INVENTORY).GetComponent<UIScrollView>().ResetPosition();
 		AppMain i2 = MonoBehaviourSingleton<AppMain>.I;
 		i2.onDelayCall = (Action)Delegate.Combine(i2.onDelayCall, (Action)delegate
 		{
@@ -125,11 +119,11 @@ public class InGameItem : GameSection
 	{
 		if (base.transferUI != null)
 		{
-			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
 		}
 		else
 		{
-			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
 		}
 		if (!isInActiveRotate)
 		{
@@ -139,8 +133,8 @@ public class InGameItem : GameSection
 
 	private UI SelectListTarget(ItemStorageTop.SHOW_INVENTORY_MODE show_detail_icon)
 	{
-		SetActive((Enum)UI.GRD_INVENTORY, is_visible: true);
-		SetActive((Enum)UI.GRD_INVENTORY_SMALL, is_visible: false);
+		SetActive(UI.GRD_INVENTORY, is_visible: true);
+		SetActive(UI.GRD_INVENTORY_SMALL, is_visible: false);
 		return UI.GRD_INVENTORY;
 	}
 

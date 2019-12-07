@@ -38,9 +38,8 @@ public class ItemDetailEquipSkillSelectDialog : ItemDetailEquipSkillSelect
 
 	private void OnQuery_DETAIL()
 	{
-		Debug.LogWarning((object)"OnQuery_DETAIL");
+		Debug.LogWarning("OnQuery_DETAIL");
 		selectIndex = (int)GameSection.GetEventData();
-		ItemDetailSkillSimpleDialog.InitParam eventData = new ItemDetailSkillSimpleDialog.InitParam(CreateDetailEventData(selectIndex), initData);
-		GameSection.SetEventData(eventData);
+		GameSection.SetEventData(new ItemDetailSkillSimpleDialog.InitParam(CreateDetailEventData(selectIndex), initData));
 	}
 }

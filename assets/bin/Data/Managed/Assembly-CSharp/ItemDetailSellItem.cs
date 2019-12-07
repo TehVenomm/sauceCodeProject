@@ -33,6 +33,13 @@ public class ItemDetailSellItem : ItemDetailSellBase
 
 	private void OnQuery_SALE_TP()
 	{
-		MonoBehaviourSingleton<TradingPostManager>.I.SetTradingPostSellItemData(data.GetTableID(), data.GetUniqID(), data.GetNum());
+		if (!TradingPostManager.IsTradingEnable())
+		{
+			TradingPostManager.ShowUnavailableDialog();
+		}
+		else
+		{
+			MonoBehaviourSingleton<TradingPostManager>.I.SetTradingPostSellItemData(data.GetTableID(), data.GetUniqID(), data.GetNum());
+		}
 	}
 }

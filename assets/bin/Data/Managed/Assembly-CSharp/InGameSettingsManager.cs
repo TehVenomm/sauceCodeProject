@@ -673,9 +673,9 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 				{
 					return MinAttenuationDmgRate;
 				}
-				float num = (_distance - MinAttenuationDistance) / (MaxAttenuationDistance - MinAttenuationDistance);
-				float num2 = Mathf.Round(AnimCurve.Evaluate(num) * 100f) / 100f;
-				return (MaxAttenuationDmgRate - MinAttenuationDmgRate) * num2 + MinAttenuationDmgRate;
+				float time = (_distance - MinAttenuationDistance) / (MaxAttenuationDistance - MinAttenuationDistance);
+				float num = Mathf.Round(AnimCurve.Evaluate(time) * 100f) / 100f;
+				return (MaxAttenuationDmgRate - MinAttenuationDmgRate) * num + MinAttenuationDmgRate;
 			}
 		}
 
@@ -917,13 +917,13 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 		public class ArrowActionInfo
 		{
 			[Tooltip("弓のライン色：通常")]
-			public Color bulletLineColor = Color.get_yellow();
+			public Color bulletLineColor = Color.yellow;
 
 			[Tooltip("弓のライン色：ソウル")]
-			public Color bulletLineColorSoul = Color.get_magenta();
+			public Color bulletLineColorSoul = Color.magenta;
 
 			[Tooltip("弓のライン色：ソウル(Max)")]
-			public Color bulletLineColorSoulFull = Color.get_red();
+			public Color bulletLineColorSoulFull = Color.red;
 
 			[Tooltip("弓のライン参照のattackInfoの名前")]
 			public string[] attackInfoNames;
@@ -1787,7 +1787,7 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 		public SpecialActionInfo specialActionInfo;
 
 		[Tooltip("ベスト距離のヒットエフェクト名")]
-		public string bestDistanceEffect = string.Empty;
+		public string bestDistanceEffect = "";
 
 		[Tooltip("両手剣固有アクション情報")]
 		public TwoHandSwordActionInfo twoHandSwordActionInfo;
@@ -2133,7 +2133,7 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 		public float confirmUITime = 30f;
 
 		[Tooltip("モンスタ\u30fc初期位置")]
-		public Vector3 enemyInitPos = Vector3.get_zero();
+		public Vector3 enemyInitPos = Vector3.zero;
 
 		[Tooltip("モンスタ\u30fc初期向き（角度")]
 		public float enemyInitDir;
@@ -2471,10 +2471,10 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 		public string effectNodeName = "Root";
 
 		[Tooltip("出血エフェクト座標")]
-		public Vector3 effectPosition = Vector3.get_zero();
+		public Vector3 effectPosition = Vector3.zero;
 
 		[Tooltip("出血エフェクト回転")]
-		public Vector3 effectRotation = Vector3.get_zero();
+		public Vector3 effectRotation = Vector3.zero;
 
 		[Tooltip("出血エフェクトサイズ")]
 		public float effectScale = 1.2f;
@@ -2883,6 +2883,10 @@ public class InGameSettingsManager : MonoBehaviourSingleton<InGameSettingsManage
 
 	public WaveMatchParam GetWaveMatchParam()
 	{
-		return (!QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true)) ? waveMatchParam : waveMatchEventParam;
+		if (!QuestManager.IsValidInGameWaveMatch(isOnlyEvent: true))
+		{
+			return waveMatchParam;
+		}
+		return waveMatchEventParam;
 	}
 }

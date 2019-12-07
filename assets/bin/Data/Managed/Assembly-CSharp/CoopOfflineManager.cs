@@ -28,7 +28,11 @@ public class CoopOfflineManager : MonoBehaviourSingleton<CoopOfflineManager>
 
 	public static bool IsValidActivate()
 	{
-		return MonoBehaviourSingleton<CoopOfflineManager>.IsValid() && MonoBehaviourSingleton<CoopOfflineManager>.I.isActivate;
+		if (MonoBehaviourSingleton<CoopOfflineManager>.IsValid())
+		{
+			return MonoBehaviourSingleton<CoopOfflineManager>.I.isActivate;
+		}
+		return false;
 	}
 
 	protected override void Awake()
@@ -36,7 +40,7 @@ public class CoopOfflineManager : MonoBehaviourSingleton<CoopOfflineManager>
 		base.Awake();
 		isActivate = false;
 		svSocket = new CoopLocalServerSocket();
-		packetReceiver = this.get_gameObject().AddComponent<CoopNetworkPacketReceiver>();
+		packetReceiver = base.gameObject.AddComponent<CoopNetworkPacketReceiver>();
 	}
 
 	private void Update()
@@ -50,9 +54,7 @@ public class CoopOfflineManager : MonoBehaviourSingleton<CoopOfflineManager>
 
 	private void Logd(string str, params object[] objs)
 	{
-		if (!Log.enabled)
-		{
-		}
+		_ = Log.enabled;
 	}
 
 	public void Clear()

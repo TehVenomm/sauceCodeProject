@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class DegreeTable : Singleton<DegreeTable>, IDataTable
 {
@@ -80,12 +79,6 @@ public class DegreeTable : Singleton<DegreeTable>, IDataTable
 	public const int INFO_MAX = 3;
 
 	private UIntKeyTable<DegreeData> dataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<DegreeData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<DegreeData> _003C_003Ef__mg_0024cache1;
 
 	public void CreateTable(string csv_text)
 	{

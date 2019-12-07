@@ -13,7 +13,7 @@ public class InGameConfigGraphics : ConfigGraphics
 		{
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
 			isInActiveRotate = true;
-			GetCtrl(UI.DSV_ROOT).GetComponent<Collider>().set_enabled(!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
+			GetCtrl(UI.DSV_ROOT).GetComponent<Collider>().enabled = !MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait;
 		}
 	}
 
@@ -41,27 +41,25 @@ public class InGameConfigGraphics : ConfigGraphics
 		GetCtrl(UI.SPR_BG_FRAME).GetComponent<UIScreenRotationHandler>().InvokeRotate();
 		GetCtrl(UI.SCR_ROOT).GetComponent<UIScreenRotationHandler>().InvokeRotate();
 		UpdateAnchors();
-		UIScrollView component = GetCtrl(UI.SCR_ROOT).GetComponent<UIScrollView>();
-		component.ResetPosition();
+		GetCtrl(UI.SCR_ROOT).GetComponent<UIScrollView>().ResetPosition();
 		AppMain i = MonoBehaviourSingleton<AppMain>.I;
 		i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
 		{
 			RefreshUI();
-			UIPanel component2 = GetCtrl(UI.SCR_ROOT).GetComponent<UIPanel>();
-			component2.Refresh();
+			GetCtrl(UI.SCR_ROOT).GetComponent<UIPanel>().Refresh();
 		});
-		GetCtrl(UI.DSV_ROOT).GetComponent<Collider>().set_enabled(!isPortrait);
+		GetCtrl(UI.DSV_ROOT).GetComponent<Collider>().enabled = !isPortrait;
 	}
 
 	private void OnScreenRotate(bool isPortrait)
 	{
 		if (base.transferUI != null)
 		{
-			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
 		}
 		else
 		{
-			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
 		}
 		if (!isInActiveRotate)
 		{
@@ -76,8 +74,7 @@ public class InGameConfigGraphics : ConfigGraphics
 		int i = 0;
 		for (int count = enemyList.Count; i < count; i++)
 		{
-			Enemy enemy = enemyList[i] as Enemy;
-			enemy.DeleteStatusGizmo();
+			(enemyList[i] as Enemy).DeleteStatusGizmo();
 		}
 	}
 

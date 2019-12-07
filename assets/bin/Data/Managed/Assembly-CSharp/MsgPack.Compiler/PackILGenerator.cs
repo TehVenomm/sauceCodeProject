@@ -98,7 +98,7 @@ namespace MsgPack.Compiler
 			il.Emit(meth: type.IsPrimitive ? typeof(MsgPackWriter).GetMethod("Write", new Type[1]
 			{
 				type
-			}) : ((currentType != type) ? lookupPackMethod(type) : currentMethod), opcode: OpCodes.Call);
+			}) : ((!(currentType == type)) ? lookupPackMethod(type) : currentMethod), opcode: OpCodes.Call);
 		}
 
 		public static void EmitUnpackCode(Type type, MethodInfo mi, ILGenerator il, Func<Type, MemberInfo[]> targetMemberSelector, Func<MemberInfo, string> memberNameFormatter, Func<Type, MethodInfo> lookupUnpackMethod, Func<Type, IDictionary<string, int>> lookupMemberMapping, MethodInfo lookupMemberMappingMethod)
@@ -244,7 +244,7 @@ namespace MsgPack.Compiler
 		private static void EmitUnpackReadAndTypeCheckCode(ILGenerator il, Variable msgpackReader, MethodInfo typeCheckMethod, MethodInfo failedMethod, bool nullCheckAndReturn)
 		{
 			Label label = il.DefineLabel();
-			Label label2 = (!nullCheckAndReturn) ? default(Label) : il.DefineLabel();
+			Label label2 = nullCheckAndReturn ? il.DefineLabel() : default(Label);
 			Label label3 = il.DefineLabel();
 			il.EmitLd(msgpackReader);
 			il.Emit(OpCodes.Call, typeof(MsgPackReader).GetMethod("Read"));

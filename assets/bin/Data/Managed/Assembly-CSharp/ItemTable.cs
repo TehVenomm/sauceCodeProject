@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class ItemTable : Singleton<ItemTable>, IDataTable
 {
@@ -87,12 +86,6 @@ public class ItemTable : Singleton<ItemTable>, IDataTable
 
 	private UIntKeyTable<ItemData> itemTable;
 
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<ItemData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<ItemData> _003C_003Ef__mg_0024cache1;
-
 	public void CreateTable(string csv_text)
 	{
 		itemTable = TableUtility.CreateUIntKeyTable<ItemData>(csv_text, ItemData.cb, "itemId,itemType,getType,eventId,name,text,enemyIconID,enemyIconID2,rarity,iconID,price,cantSell,element,effectType_0,effectType_1,effectType_2,effectTime,startDate,endDate");
@@ -126,8 +119,7 @@ public class ItemTable : Singleton<ItemTable>, IDataTable
 		{
 			return false;
 		}
-		ItemData itemData = itemTable.Get(id);
-		if (itemData == null)
+		if (itemTable.Get(id) == null)
 		{
 			return false;
 		}

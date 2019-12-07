@@ -6,14 +6,9 @@ public class LanguageSelection : MonoBehaviour
 {
 	private UIPopupList mList;
 
-	public LanguageSelection()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		mList = this.GetComponent<UIPopupList>();
+		mList = GetComponent<UIPopupList>();
 		Refresh();
 	}
 

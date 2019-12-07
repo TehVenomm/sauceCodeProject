@@ -40,7 +40,7 @@ public abstract class QuestSearchListSelectBase : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -55,7 +55,7 @@ public abstract class QuestSearchListSelectBase : GameSection
 		{
 			yield return null;
 		}
-		yield return this.StartCoroutine(Reload());
+		yield return StartCoroutine(Reload());
 		base.Initialize();
 	}
 
@@ -76,11 +76,9 @@ public abstract class QuestSearchListSelectBase : GameSection
 
 	protected void SetNpcMessage()
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 		string nPCMessageBySectionData = Singleton<NPCMessageTable>.I.GetNPCMessageBySectionData(base.sectionData);
-		SetRenderNPCModel((Enum)UI.TEX_NPCMODEL, 2, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCRot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCFOV, (Action<NPCLoader>)null);
-		SetLabelText((Enum)UI.LBL_NPC_MESSAGE, nPCMessageBySectionData);
+		SetRenderNPCModel(UI.TEX_NPCMODEL, 2, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCRot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCFOV);
+		SetLabelText(UI.LBL_NPC_MESSAGE, nPCMessageBySectionData);
 	}
 
 	protected void SetPartyData(PartyModel.Party party, Transform t)
@@ -97,7 +95,7 @@ public abstract class QuestSearchListSelectBase : GameSection
 				}
 				else
 				{
-					member_num++;
+					int num = ++member_num;
 				}
 			}
 		});
@@ -145,7 +143,7 @@ public abstract class QuestSearchListSelectBase : GameSection
 	public virtual void OnQuery_RELOAD()
 	{
 		GameSection.StayEvent();
-		this.StartCoroutine(Reload(delegate(bool b)
+		StartCoroutine(Reload(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b);
 		}));
@@ -162,7 +160,7 @@ public abstract class QuestSearchListSelectBase : GameSection
 
 	public void OnCloseDialog_QuestAcceptRoomInvalid()
 	{
-		this.StartCoroutine(Reload(delegate(bool b)
+		StartCoroutine(Reload(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b);
 		}));

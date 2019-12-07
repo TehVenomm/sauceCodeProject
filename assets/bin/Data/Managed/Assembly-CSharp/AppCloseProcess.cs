@@ -3,11 +3,6 @@ using UnityEngine;
 
 public class AppCloseProcess : MonoBehaviour
 {
-	public AppCloseProcess()
-		: this()
-	{
-	}
-
 	private IEnumerator Start()
 	{
 		PredownloadManager.Stop(PredownloadManager.STOP_FLAG.LOADING_PROCESS, is_stop: true);
@@ -29,16 +24,16 @@ public class AppCloseProcess : MonoBehaviour
 		}
 		GameSceneGlobalSettings.SetOrientation(ingame: false);
 		MonoBehaviourSingleton<GameSceneManager>.I.Initialize();
-		if (Camera.get_main() != null)
+		if (Camera.main != null)
 		{
-			Object.DestroyImmediate(Camera.get_main().get_gameObject());
+			Object.DestroyImmediate(Camera.main.gameObject);
 		}
 		ResourceObject[] loadedObjects = lo_common_prefabs.loadedObjects;
-		foreach (ResourceObject resourceObject in loadedObjects)
+		for (int i = 0; i < loadedObjects.Length; i++)
 		{
-			ResourceUtility.Realizes(resourceObject.obj, MonoBehaviourSingleton<AppMain>.I._transform);
+			ResourceUtility.Realizes(loadedObjects[i].obj, MonoBehaviourSingleton<AppMain>.I._transform);
 		}
-		MonoBehaviourSingleton<AppMain>.I.SetMainCamera(Camera.get_main());
+		MonoBehaviourSingleton<AppMain>.I.SetMainCamera(Camera.main);
 		MonoBehaviourSingleton<AudioListenerManager>.I.SetFlag(AudioListenerManager.STATUS_FLAGS.CAMERA_MAIN_ACTIVE, isEnable: true);
 		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.INITIALIZE, is_disable: false);
 		MonoBehaviourSingleton<AppMain>.I.startScene = string.Empty;

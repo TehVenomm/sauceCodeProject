@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public abstract class SkillSelectBaseSecond : SkillSelectBase
@@ -75,7 +74,7 @@ public abstract class SkillSelectBaseSecond : SkillSelectBase
 	protected void SetVisibleEmptySkillType(bool is_visible, int index = 0)
 	{
 		isVisibleEmptySkill = is_visible;
-		SetActive((Enum)UI.OBJ_EMPTY_SKILL_ROOT, is_visible);
+		SetActive(UI.OBJ_EMPTY_SKILL_ROOT, is_visible);
 		if (!is_visible)
 		{
 			return;
@@ -86,13 +85,13 @@ public abstract class SkillSelectBaseSecond : SkillSelectBase
 			SkillItemTable.SkillSlotData[] skillSlot = equipItem.tableData.GetSkillSlot(equipItem.exceed);
 			if (skillSlot == null || skillSlot.Length <= index)
 			{
-				SetActive((Enum)UI.OBJ_EMPTY_SKILL_ROOT, is_visible: false);
+				SetActive(UI.OBJ_EMPTY_SKILL_ROOT, is_visible: false);
 				return;
 			}
 			sKILL_SLOT_TYPE = skillSlot[index].slotType;
 		}
-		SetLabelText((Enum)UI.LBL_EMPTY_SKILL_TYPE, MonoBehaviourSingleton<StatusManager>.I.GetSkillItemGroupString(sKILL_SLOT_TYPE));
-		SetSprite((Enum)UI.SPR_EMPTY_SKILL, UIBehaviour.GetSkillIconSpriteName(sKILL_SLOT_TYPE, is_attached: true, is_button_icon: true));
+		SetLabelText(UI.LBL_EMPTY_SKILL_TYPE, MonoBehaviourSingleton<StatusManager>.I.GetSkillItemGroupString(sKILL_SLOT_TYPE));
+		SetSprite(UI.SPR_EMPTY_SKILL, UIBehaviour.GetSkillIconSpriteName(sKILL_SLOT_TYPE, is_attached: true, is_button_icon: true));
 	}
 
 	protected override void UpdateParam()
@@ -137,7 +136,7 @@ public abstract class SkillSelectBaseSecond : SkillSelectBase
 		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
 		string text = base.sectionData.GetText("CAPTION");
 		SetLabelText(ctrl, UI.LBL_CAPTION, text);
-		UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
+		UITweenCtrl component = ctrl.gameObject.GetComponent<UITweenCtrl>();
 		if (component != null)
 		{
 			component.Reset();

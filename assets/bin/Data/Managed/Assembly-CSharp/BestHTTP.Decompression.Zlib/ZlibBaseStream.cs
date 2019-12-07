@@ -160,7 +160,7 @@ namespace BestHTTP.Decompression.Zlib
 				_z.OutputBuffer = workingBuffer;
 				_z.NextOut = 0;
 				_z.AvailableBytesOut = _workingBuffer.Length;
-				int num = (!_wantCompress) ? _z.Inflate(_flushMode) : _z.Deflate(_flushMode);
+				int num = _wantCompress ? _z.Deflate(_flushMode) : _z.Inflate(_flushMode);
 				if (num != 0 && num != 1)
 				{
 					break;
@@ -176,7 +176,7 @@ namespace BestHTTP.Decompression.Zlib
 					return;
 				}
 			}
-			throw new ZlibException(((!_wantCompress) ? "in" : "de") + "flating: " + _z.Message);
+			throw new ZlibException((_wantCompress ? "de" : "in") + "flating: " + _z.Message);
 		}
 
 		private void finish()
@@ -193,10 +193,10 @@ namespace BestHTTP.Decompression.Zlib
 					_z.OutputBuffer = workingBuffer;
 					_z.NextOut = 0;
 					_z.AvailableBytesOut = _workingBuffer.Length;
-					int num = (!_wantCompress) ? _z.Inflate(FlushType.Finish) : _z.Deflate(FlushType.Finish);
+					int num = _wantCompress ? _z.Deflate(FlushType.Finish) : _z.Inflate(FlushType.Finish);
 					if (num != 1 && num != 0)
 					{
-						string text = ((!_wantCompress) ? "in" : "de") + "flating";
+						string text = (_wantCompress ? "de" : "in") + "flating";
 						if (_z.Message == null)
 						{
 							throw new ZlibException($"{text}: (rc = {num})");
@@ -237,7 +237,7 @@ namespace BestHTTP.Decompression.Zlib
 				{
 					throw new ZlibException("Reading with compression is not supported.");
 				}
-				if (_z.TotalBytesOut == 0)
+				if (_z.TotalBytesOut == 0L)
 				{
 					return;
 				}
@@ -328,8 +328,7 @@ namespace BestHTTP.Decompression.Zlib
 			bool flag = false;
 			do
 			{
-				int num = _stream.Read(_buf1, 0, 1);
-				if (num != 1)
+				if (_stream.Read(_buf1, 0, 1) != 1)
 				{
 					throw new ZlibException("Unexpected EOF reading GZIP header.");
 				}
@@ -460,21 +459,22 @@ namespace BestHTTP.Decompression.Zlib
 						nomoreinput = true;
 					}
 				}
-				num = ((!_wantCompress) ? _z.Inflate(_flushMode) : _z.Deflate(_flushMode));
+				num = (_wantCompress ? _z.Deflate(_flushMode) : _z.Inflate(_flushMode));
 				if (nomoreinput && num == -5)
 				{
 					return 0;
 				}
 				if (num != 0 && num != 1)
 				{
-					throw new ZlibException(string.Format("{0}flating:  rc={1}  msg={2}", (!_wantCompress) ? "in" : "de", num, _z.Message));
+					throw new ZlibException(string.Format("{0}flating:  rc={1}  msg={2}", _wantCompress ? "de" : "in", num, _z.Message));
 				}
 			}
 			while (((!nomoreinput && num != 1) || _z.AvailableBytesOut != count) && _z.AvailableBytesOut > 0 && !nomoreinput && num == 0);
 			if (_z.AvailableBytesOut > 0)
 			{
-				if (num != 0 || _z.AvailableBytesIn == 0)
+				if (num == 0)
 				{
+					_ = _z.AvailableBytesIn;
 				}
 				if (nomoreinput && _wantCompress)
 				{
@@ -525,8 +525,7 @@ namespace BestHTTP.Decompression.Zlib
 					}
 				}
 				memoryStream.Seek(0L, SeekOrigin.Begin);
-				StreamReader streamReader = new StreamReader(memoryStream, uTF);
-				return streamReader.ReadToEnd();
+				return new StreamReader(memoryStream, uTF).ReadToEnd();
 			}
 		}
 

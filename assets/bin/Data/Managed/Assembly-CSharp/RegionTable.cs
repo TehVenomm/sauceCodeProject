@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class RegionTable : Singleton<RegionTable>, IDataTable
@@ -13,11 +12,11 @@ public class RegionTable : Singleton<RegionTable>, IDataTable
 
 		public int iconID;
 
-		public Vector3 iconPos = Vector3.get_zero();
+		public Vector3 iconPos = Vector3.zero;
 
-		public Vector2 iconSize = Vector2.get_zero();
+		public Vector2 iconSize = Vector2.zero;
 
-		public Vector3 markerPos = Vector2.op_Implicit(Vector2.get_zero());
+		public Vector3 markerPos = Vector2.zero;
 
 		public uint parentRegionId = uint.MaxValue;
 
@@ -48,15 +47,12 @@ public class RegionTable : Singleton<RegionTable>, IDataTable
 
 		public static bool cb(CSVReader csvReader, Data data, ref uint key)
 		{
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 			data.regionId = key;
 			csvReader.Pop(ref data.regionName);
 			csvReader.Pop(ref data.iconID);
 			csvReader.Pop(ref data.iconPos);
 			csvReader.Pop(ref data.iconSize);
-			Vector2 value = default(Vector2);
-			value._002Ector(0f, 0f);
+			Vector2 value = new Vector2(0f, 0f);
 			csvReader.Pop(ref value);
 			data.markerPos = new Vector3(value.x, value.y, 0f);
 			csvReader.Pop(ref data.parentRegionId);
@@ -91,9 +87,6 @@ public class RegionTable : Singleton<RegionTable>, IDataTable
 
 	private UIntKeyTable<Data> table;
 
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache0;
-
 	public void CreateTable(string csv_text)
 	{
 		table = TableUtility.CreateUIntKeyTable<Data>(csv_text, Data.cb, "regionId,name,iconId,x,y,z,w,h,mx,my,parentRegionId,eventId,difficulty,worldId,nextRegionId,startAt,groupId");
@@ -119,7 +112,7 @@ public class RegionTable : Singleton<RegionTable>, IDataTable
 		int index = 0;
 		table.ForEach(delegate(Data data)
 		{
-			ret[++index] = data;
+			ret[index++] = data;
 		});
 		return ret;
 	}
@@ -131,7 +124,7 @@ public class RegionTable : Singleton<RegionTable>, IDataTable
 			return null;
 		}
 		Data[] data = GetData();
-		List<Data> list = new List<Data>();
+		new List<Data>();
 		Data[] array = data;
 		foreach (Data data2 in array)
 		{
@@ -189,8 +182,7 @@ public class RegionTable : Singleton<RegionTable>, IDataTable
 		}
 		List<int> list = new List<int>();
 		Data[] data3 = GetData();
-		Data[] array = data3;
-		foreach (Data data4 in array)
+		foreach (Data data4 in data3)
 		{
 			if (data4.regionId < 100 && data4.difficulty == REGION_DIFFICULTY_TYPE.NORMAL)
 			{

@@ -17,9 +17,9 @@ public class FriendFollowList : FollowListBase
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_FOLLOW_NUMBER_ROOT, is_visible: true);
-		SetLabelText((Enum)UI.LBL_FOLLOW_NUMBER_NOW, MonoBehaviourSingleton<FriendManager>.I.followNum.ToString());
-		SetLabelText((Enum)UI.LBL_FOLLOW_NUMBER_MAX, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxFollow.ToString());
+		SetActive(UI.OBJ_FOLLOW_NUMBER_ROOT, is_visible: true);
+		SetLabelText(UI.LBL_FOLLOW_NUMBER_NOW, MonoBehaviourSingleton<FriendManager>.I.followNum.ToString());
+		SetLabelText(UI.LBL_FOLLOW_NUMBER_MAX, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxFollow.ToString());
 		ListUI();
 	}
 
@@ -40,7 +40,7 @@ public class FriendFollowList : FollowListBase
 				base.ScrollGrid.cellHeight = GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 			}
 			CleanItemList();
-			SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, pageItemLength, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+			SetDynamicList(UI.GRD_LIST, GetListItemName, pageItemLength, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 			{
 				SetListItem(i, t, is_recycle, info[i]);
 			});
@@ -49,7 +49,11 @@ public class FriendFollowList : FollowListBase
 
 	private int GetPageItemLength(int currentPage)
 	{
-		return (currentPage + 1 < pageNumMax || recvList.Count % 10 <= 0) ? 10 : (recvList.Count % 10);
+		if (currentPage + 1 < pageNumMax || recvList.Count % 10 <= 0)
+		{
+			return 10;
+		}
+		return recvList.Count % 10;
 	}
 
 	protected override void SendGetList(int page, Action<bool> callback)

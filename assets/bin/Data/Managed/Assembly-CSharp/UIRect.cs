@@ -66,46 +66,36 @@ public abstract class UIRect : MonoBehaviour
 
 		public void SetHorizontal(Transform parent, float localPos)
 		{
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			if (Object.op_Implicit(rect))
+			if ((bool)rect)
 			{
 				Vector3[] sides = rect.GetSides(parent);
 				float num = Mathf.Lerp(sides[0].x, sides[2].x, relative);
 				absolute = Mathf.FloorToInt(localPos - num + 0.5f);
 				return;
 			}
-			Vector3 val = target.get_position();
+			Vector3 position = target.position;
 			if (parent != null)
 			{
-				val = parent.InverseTransformPoint(val);
+				position = parent.InverseTransformPoint(position);
 			}
-			absolute = Mathf.FloorToInt(localPos - val.x + 0.5f);
+			absolute = Mathf.FloorToInt(localPos - position.x + 0.5f);
 		}
 
 		public void SetVertical(Transform parent, float localPos)
 		{
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			if (Object.op_Implicit(rect))
+			if ((bool)rect)
 			{
 				Vector3[] sides = rect.GetSides(parent);
 				float num = Mathf.Lerp(sides[3].y, sides[1].y, relative);
 				absolute = Mathf.FloorToInt(localPos - num + 0.5f);
 				return;
 			}
-			Vector3 val = target.get_position();
+			Vector3 position = target.position;
 			if (parent != null)
 			{
-				val = parent.InverseTransformPoint(val);
+				position = parent.InverseTransformPoint(position);
 			}
-			absolute = Mathf.FloorToInt(localPos - val.y + 0.5f);
+			absolute = Mathf.FloorToInt(localPos - position.y + 0.5f);
 		}
 
 		public Vector3[] GetSides(Transform relativeTo)
@@ -179,7 +169,7 @@ public abstract class UIRect : MonoBehaviour
 	[NonSerialized]
 	public float finalAlpha = 1f;
 
-	protected static Vector3[] mSides = (Vector3[])new Vector3[4];
+	protected static Vector3[] mSides = new Vector3[4];
 
 	public GameObject cachedGameObject
 	{
@@ -187,7 +177,7 @@ public abstract class UIRect : MonoBehaviour
 		{
 			if (mGo == null)
 			{
-				mGo = this.get_gameObject();
+				mGo = base.gameObject;
 			}
 			return mGo;
 		}
@@ -199,7 +189,7 @@ public abstract class UIRect : MonoBehaviour
 		{
 			if (mTrans == null)
 			{
-				mTrans = this.get_transform();
+				mTrans = base.transform;
 			}
 			return mTrans;
 		}
@@ -217,11 +207,41 @@ public abstract class UIRect : MonoBehaviour
 		}
 	}
 
-	public bool isFullyAnchored => Object.op_Implicit(leftAnchor.target) && Object.op_Implicit(rightAnchor.target) && Object.op_Implicit(topAnchor.target) && Object.op_Implicit(bottomAnchor.target);
+	public bool isFullyAnchored
+	{
+		get
+		{
+			if ((bool)leftAnchor.target && (bool)rightAnchor.target && (bool)topAnchor.target)
+			{
+				return bottomAnchor.target;
+			}
+			return false;
+		}
+	}
 
-	public virtual bool isAnchoredHorizontally => Object.op_Implicit(leftAnchor.target) || Object.op_Implicit(rightAnchor.target);
+	public virtual bool isAnchoredHorizontally
+	{
+		get
+		{
+			if (!leftAnchor.target)
+			{
+				return rightAnchor.target;
+			}
+			return true;
+		}
+	}
 
-	public virtual bool isAnchoredVertically => Object.op_Implicit(bottomAnchor.target) || Object.op_Implicit(topAnchor.target);
+	public virtual bool isAnchoredVertically
+	{
+		get
+		{
+			if (!bottomAnchor.target)
+			{
+				return topAnchor.target;
+			}
+			return true;
+		}
+	}
 
 	public virtual bool canBeAnchored => true;
 
@@ -232,7 +252,7 @@ public abstract class UIRect : MonoBehaviour
 			if (!mParentFound)
 			{
 				mParentFound = true;
-				mParent = NGUITools.FindInParents<UIRect>(cachedTransform.get_parent());
+				mParent = NGUITools.FindInParents<UIRect>(cachedTransform.parent);
 			}
 			return mParent;
 		}
@@ -255,7 +275,17 @@ public abstract class UIRect : MonoBehaviour
 		}
 	}
 
-	public bool isAnchored => (Object.op_Implicit(leftAnchor.target) || Object.op_Implicit(rightAnchor.target) || Object.op_Implicit(topAnchor.target) || Object.op_Implicit(bottomAnchor.target)) && canBeAnchored;
+	public bool isAnchored
+	{
+		get
+		{
+			if ((bool)leftAnchor.target || (bool)rightAnchor.target || (bool)topAnchor.target || (bool)bottomAnchor.target)
+			{
+				return canBeAnchored;
+			}
+			return false;
+		}
+	}
 
 	public abstract float alpha
 	{
@@ -277,40 +307,23 @@ public abstract class UIRect : MonoBehaviour
 	{
 		get
 		{
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 			if (anchorCamera == null)
 			{
 				return 0f;
 			}
-			if (!mCam.get_orthographic())
+			if (!mCam.orthographic)
 			{
 				Transform cachedTransform = this.cachedTransform;
-				Transform transform = mCam.get_transform();
-				Plane val = default(Plane);
-				val._002Ector(cachedTransform.get_rotation() * Vector3.get_back(), cachedTransform.get_position());
-				Ray val2 = default(Ray);
-				val2._002Ector(transform.get_position(), transform.get_rotation() * Vector3.get_forward());
-				float result = default(float);
-				if (val.Raycast(val2, ref result))
+				Transform transform = mCam.transform;
+				Plane plane = new Plane(cachedTransform.rotation * Vector3.back, cachedTransform.position);
+				Ray ray = new Ray(transform.position, transform.rotation * Vector3.forward);
+				if (plane.Raycast(ray, out float enter))
 				{
-					return result;
+					return enter;
 				}
 			}
-			return Mathf.Lerp(mCam.get_nearClipPlane(), mCam.get_farClipPlane(), 0.5f);
+			return Mathf.Lerp(mCam.nearClipPlane, mCam.farClipPlane, 0.5f);
 		}
-	}
-
-	protected UIRect()
-		: this()
-	{
 	}
 
 	public abstract float CalculateFinalAlpha(int frameID);
@@ -329,18 +342,11 @@ public abstract class UIRect : MonoBehaviour
 
 	public virtual Vector3[] GetSides(Transform relativeTo)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 		if (anchorCamera != null)
 		{
 			return mCam.GetSides(cameraRayDistance, relativeTo);
 		}
-		Vector3 position = cachedTransform.get_position();
+		Vector3 position = cachedTransform.position;
 		for (int i = 0; i < 4; i++)
 		{
 			mSides[i] = position;
@@ -357,35 +363,21 @@ public abstract class UIRect : MonoBehaviour
 
 	protected Vector3 GetLocalPos(AnchorPoint ac, Transform trans)
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
 		if (anchorCamera == null || ac.targetCam == null)
 		{
-			return cachedTransform.get_localPosition();
+			return cachedTransform.localPosition;
 		}
-		Rect rect = ac.targetCam.get_rect();
-		Vector3 val = ac.targetCam.WorldToViewportPoint(ac.target.get_position());
-		Vector3 val2 = default(Vector3);
-		val2._002Ector(val.x * rect.get_width() + rect.get_x(), val.y * rect.get_height() + rect.get_y(), val.z);
-		val2 = mCam.ViewportToWorldPoint(val2);
+		Rect rect = ac.targetCam.rect;
+		Vector3 vector = ac.targetCam.WorldToViewportPoint(ac.target.position);
+		Vector3 vector2 = new Vector3(vector.x * rect.width + rect.x, vector.y * rect.height + rect.y, vector.z);
+		vector2 = mCam.ViewportToWorldPoint(vector2);
 		if (trans != null)
 		{
-			val2 = trans.InverseTransformPoint(val2);
+			vector2 = trans.InverseTransformPoint(vector2);
 		}
-		val2.x = Mathf.Floor(val2.x + 0.5f);
-		val2.y = Mathf.Floor(val2.y + 0.5f);
-		return val2;
+		vector2.x = Mathf.Floor(vector2.x + 0.5f);
+		vector2.y = Mathf.Floor(vector2.y + 0.5f);
+		return vector2;
 	}
 
 	protected virtual void OnEnable()
@@ -417,7 +409,7 @@ public abstract class UIRect : MonoBehaviour
 
 	protected virtual void OnDisable()
 	{
-		if (Object.op_Implicit(mParent))
+		if ((bool)mParent)
 		{
 			mParent.mChildren.Remove(this);
 		}
@@ -441,7 +433,7 @@ public abstract class UIRect : MonoBehaviour
 		{
 			ResetAnchors();
 		}
-		int frameCount = Time.get_frameCount();
+		int frameCount = Time.frameCount;
 		if (mUpdateFrame != frameCount)
 		{
 			if (updateAnchors == AnchorUpdate.OnUpdate || mUpdateAnchors)
@@ -457,7 +449,7 @@ public abstract class UIRect : MonoBehaviour
 		mUpdateFrame = frame;
 		mUpdateAnchors = false;
 		bool flag = false;
-		if (Object.op_Implicit(leftAnchor.target))
+		if ((bool)leftAnchor.target)
 		{
 			flag = true;
 			if (leftAnchor.rect != null && leftAnchor.rect.mUpdateFrame != frame)
@@ -465,7 +457,7 @@ public abstract class UIRect : MonoBehaviour
 				leftAnchor.rect._Update();
 			}
 		}
-		if (Object.op_Implicit(bottomAnchor.target))
+		if ((bool)bottomAnchor.target)
 		{
 			flag = true;
 			if (bottomAnchor.rect != null && bottomAnchor.rect.mUpdateFrame != frame)
@@ -473,7 +465,7 @@ public abstract class UIRect : MonoBehaviour
 				bottomAnchor.rect._Update();
 			}
 		}
-		if (Object.op_Implicit(rightAnchor.target))
+		if ((bool)rightAnchor.target)
 		{
 			flag = true;
 			if (rightAnchor.rect != null && rightAnchor.rect.mUpdateFrame != frame)
@@ -481,7 +473,7 @@ public abstract class UIRect : MonoBehaviour
 				rightAnchor.rect._Update();
 			}
 		}
-		if (Object.op_Implicit(topAnchor.target))
+		if ((bool)topAnchor.target)
 		{
 			flag = true;
 			if (topAnchor.rect != null && topAnchor.rect.mUpdateFrame != frame)
@@ -501,9 +493,9 @@ public abstract class UIRect : MonoBehaviour
 		{
 			mUpdateFrame = -1;
 			mUpdateAnchors = true;
-			if (!(mGo != null) || mGo.get_activeInHierarchy())
+			if (!(mGo != null) || mGo.activeInHierarchy)
 			{
-				UpdateAnchorsInternal(Time.get_frameCount());
+				UpdateAnchorsInternal(Time.frameCount);
 			}
 		}
 	}
@@ -522,7 +514,7 @@ public abstract class UIRect : MonoBehaviour
 
 	public void SetAnchor(GameObject go)
 	{
-		Transform target = (!(go != null)) ? null : go.get_transform();
+		Transform target = (go != null) ? go.transform : null;
 		leftAnchor.target = target;
 		rightAnchor.target = target;
 		topAnchor.target = target;
@@ -533,7 +525,7 @@ public abstract class UIRect : MonoBehaviour
 
 	public void SetAnchor(GameObject go, int left, int bottom, int right, int top)
 	{
-		Transform target = (!(go != null)) ? null : go.get_transform();
+		Transform target = (go != null) ? go.transform : null;
 		leftAnchor.target = target;
 		rightAnchor.target = target;
 		topAnchor.target = target;
@@ -553,11 +545,11 @@ public abstract class UIRect : MonoBehaviour
 	public void ResetAnchors()
 	{
 		mAnchorsCached = true;
-		leftAnchor.rect = ((!Object.op_Implicit(leftAnchor.target)) ? null : leftAnchor.target.GetComponent<UIRect>());
-		bottomAnchor.rect = ((!Object.op_Implicit(bottomAnchor.target)) ? null : bottomAnchor.target.GetComponent<UIRect>());
-		rightAnchor.rect = ((!Object.op_Implicit(rightAnchor.target)) ? null : rightAnchor.target.GetComponent<UIRect>());
-		topAnchor.rect = ((!Object.op_Implicit(topAnchor.target)) ? null : topAnchor.target.GetComponent<UIRect>());
-		mCam = NGUITools.FindCameraForLayer(cachedGameObject.get_layer());
+		leftAnchor.rect = (leftAnchor.target ? leftAnchor.target.GetComponent<UIRect>() : null);
+		bottomAnchor.rect = (bottomAnchor.target ? bottomAnchor.target.GetComponent<UIRect>() : null);
+		rightAnchor.rect = (rightAnchor.target ? rightAnchor.target.GetComponent<UIRect>() : null);
+		topAnchor.rect = (topAnchor.target ? topAnchor.target.GetComponent<UIRect>() : null);
+		mCam = NGUITools.FindCameraForLayer(cachedGameObject.layer);
 		FindCameraFor(leftAnchor);
 		FindCameraFor(bottomAnchor);
 		FindCameraFor(rightAnchor);
@@ -581,22 +573,22 @@ public abstract class UIRect : MonoBehaviour
 		}
 		else
 		{
-			ap.targetCam = NGUITools.FindCameraForLayer(ap.target.get_gameObject().get_layer());
+			ap.targetCam = NGUITools.FindCameraForLayer(ap.target.gameObject.layer);
 		}
 	}
 
 	public virtual void ParentHasChanged()
 	{
 		mParentFound = false;
-		UIRect uIRect = NGUITools.FindInParents<UIRect>(cachedTransform.get_parent());
-		if (mParent != uIRect)
+		UIRect y = NGUITools.FindInParents<UIRect>(cachedTransform.parent);
+		if (mParent != y)
 		{
-			if (Object.op_Implicit(mParent))
+			if ((bool)mParent)
 			{
 				mParent.mChildren.Remove(this);
 			}
-			mParent = uIRect;
-			if (Object.op_Implicit(mParent))
+			mParent = y;
+			if ((bool)mParent)
 			{
 				mParent.mChildren.Add(this);
 			}

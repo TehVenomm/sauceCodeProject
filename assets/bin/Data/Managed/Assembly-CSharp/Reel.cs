@@ -44,14 +44,14 @@ public class Reel : GameSection
 	public override void Initialize()
 	{
 		initData = (GameSection.GetEventData() as InitData);
-		this.recvData = new RecvData[initData.digit.Length];
-		for (int i = 0; i < this.recvData.Length; i++)
+		recvData = new RecvData[initData.digit.Length];
+		for (int i = 0; i < recvData.Length; i++)
 		{
-			this.recvData[i] = new RecvData();
-			RecvData recvData = this.recvData[i];
-			recvData.digit = initData.digit[i];
-			recvData.selectValue = 0;
-			recvData.ancer = 0;
+			recvData[i] = new RecvData();
+			RecvData obj = recvData[i];
+			obj.digit = initData.digit[i];
+			obj.selectValue = 0;
+			obj.ancer = 0;
 		}
 		base.Initialize();
 	}
@@ -67,9 +67,6 @@ public class Reel : GameSection
 		int reel_list_width_base = width / digits;
 		SetTable(UI.TBL_REEL, "ReelList", initData.digit.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 			if (initData.digit[i] <= 0)
 			{
 				SetActive(t, is_visible: false);
@@ -79,14 +76,14 @@ public class Reel : GameSection
 				SetActive(t, is_visible: true);
 				float width2 = reel_list_width_base * initData.digit[i];
 				SetWidth(t, (int)width2);
-				UIScrollView component = base.GetComponent<UIScrollView>(t, (Enum)UI.SCR_LIST);
+				UIScrollView component = GetComponent<UIScrollView>(t, UI.SCR_LIST);
 				Vector4 baseClipRegion = component.panel.baseClipRegion;
 				baseClipRegion.z = width2;
 				component.panel.baseClipRegion = baseClipRegion;
-				base.GetComponent<UIGrid>(t, (Enum)UI.GRD_REEL_LIST).cellWidth = reel_list_width_base;
+				GetComponent<UIGrid>(t, UI.GRD_REEL_LIST).cellWidth = reel_list_width_base;
 				SetGrid(t, UI.GRD_REEL_LIST, "ReelListItem", 10, reset: false, delegate(int i2, Transform t2, bool is_recycle2)
 				{
-					base.GetComponent<UIGrid>(t2, (Enum)UI.GRD_REEL_LIST_ITEM).cellWidth = reel_list_width_base;
+					GetComponent<UIGrid>(t2, UI.GRD_REEL_LIST_ITEM).cellWidth = reel_list_width_base;
 					SetWidth(t2, (int)width2);
 					SetGrid(t2, UI.GRD_REEL_LIST_ITEM, "ReelListText", initData.digit[i], reset: false, delegate(int i3, Transform t3, bool is_recycle3)
 					{
@@ -101,7 +98,7 @@ public class Reel : GameSection
 				{
 					num -= initData.digit[j];
 				}
-				int index = initData.initValue / (int)Mathf.Pow(10f, (float)(num - 1)) % 10;
+				int index = initData.initValue / (int)Mathf.Pow(10f, num - 1) % 10;
 				SetCenter(t, UI.GRD_REEL_LIST, index, is_instant: true);
 				SetCenterOnChildFunc(t, UI.GRD_REEL_LIST, OnCenter);
 			}
@@ -111,14 +108,12 @@ public class Reel : GameSection
 	public void OnCenter(GameObject go)
 	{
 		int result = 0;
-		if (!int.TryParse(go.get_name(), out result))
+		if (!int.TryParse(go.name, out result))
 		{
 			return;
 		}
 		int result2 = 0;
-		if (int.TryParse(go.get_transform().get_parent().get_parent()
-			.get_parent()
-			.get_name(), out result2) && result2 < recvData.Length)
+		if (int.TryParse(go.transform.parent.parent.parent.name, out result2) && result2 < recvData.Length)
 		{
 			int digits = 0;
 			Array.ForEach(initData.digit, delegate(int data)
@@ -132,7 +127,7 @@ public class Reel : GameSection
 				num -= initData.digit[i];
 			}
 			recvData[result2].selectValue = result;
-			recvData[result2].ancer = result * (int)Mathf.Pow(10f, (float)(num - 1));
+			recvData[result2].ancer = result * (int)Mathf.Pow(10f, num - 1);
 		}
 	}
 

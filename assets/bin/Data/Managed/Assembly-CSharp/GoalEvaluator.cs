@@ -50,8 +50,7 @@ public abstract class GoalEvaluator
 		float val = 1f;
 		if (target is Character)
 		{
-			Character character = target as Character;
-			Character.ACTION_ID actionID = character.actionID;
+			Character.ACTION_ID actionID = (target as Character).actionID;
 			val = ((actionID != Character.ACTION_ID.ATTACK) ? 50f : 80f);
 		}
 		return EvaluateValue(val, 1f, 100f);

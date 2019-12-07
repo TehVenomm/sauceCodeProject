@@ -24,13 +24,9 @@ public class Goal_Guard : Goal
 	public override void HandleEvent(Brain brain, BRAIN_EVENT ev, object param)
 	{
 		base.HandleEvent(brain, ev, param);
-		if (ev == BRAIN_EVENT.END_ACTION)
+		if (ev == BRAIN_EVENT.END_ACTION && (int)param == 19)
 		{
-			int num = (int)param;
-			if (num == 19)
-			{
-				SetStatus(STATUS.COMPLETED);
-			}
+			SetStatus(STATUS.COMPLETED);
 		}
 	}
 }

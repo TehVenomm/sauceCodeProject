@@ -1,6 +1,5 @@
 using Network;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class AssignedEquipmentTable : Singleton<AssignedEquipmentTable>, IDataTable
 {
@@ -25,7 +24,7 @@ public class AssignedEquipmentTable : Singleton<AssignedEquipmentTable>, IDataTa
 			data.id = (int)key;
 			csv_reader.Pop(ref data.setName);
 			csv_reader.Pop(ref data.deliveryId);
-			string value = string.Empty;
+			string value = "";
 			csv_reader.Pop(ref value);
 			data.questids = TableUtility.ParseStringToIntArray(value);
 			csv_reader.Pop(ref data.helpUrl);
@@ -94,9 +93,6 @@ public class AssignedEquipmentTable : Singleton<AssignedEquipmentTable>, IDataTa
 
 	private UIntKeyTable<AssignedEquipmentData> dataTable;
 
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<AssignedEquipmentData> _003C_003Ef__mg_0024cache0;
-
 	public void CreateTable(string csv_text)
 	{
 		dataTable = TableUtility.CreateUIntKeyTable<AssignedEquipmentData>(csv_text, AssignedEquipmentData.cb, "id,setName,deliveryId,questids,helpUrl,weapon1Id,w1A1Id,w1A1Pt,w1A2Id,w1A2Pt,w1A3Id,w1A3Pt,w1M1Id,w1M2Id,w1M3Id,armorId,arA1Id,arA1Pt,arA2Id,arA2Pt,arA3Id,arA3Pt,arM1Id,arM2Id,arM3Id,helmId,heA1Id,heA1Pt,heA2Id,heA2Pt,heA3Id,heA3Pt,heM1Id,heM2Id,heM3Id,armId,armA1Id,armA1Pt,armA2Id,armA2Pt,armA3Id,armA3Pt,armM1Id,armM2Id,armM3Id,legId,legA1Id,legA1Pt,legA2Id,legA2Pt,legA3Id,legA3Pt,legM1Id,legM2Id,legM3Id");
@@ -152,7 +148,7 @@ public class AssignedEquipmentTable : Singleton<AssignedEquipmentTable>, IDataTa
 		AssignedEquipmentData data = null;
 		dataTable.ForEach(delegate(AssignedEquipmentData o)
 		{
-			if (data == null && o.questids != null && o.questids.Length > 0)
+			if (data == null && o.questids != null && o.questids.Length != 0)
 			{
 				int num = 0;
 				while (true)

@@ -30,7 +30,6 @@ public abstract class ControllerBase : MonoBehaviour
 	}
 
 	public ControllerBase()
-		: this()
 	{
 		disableFlag = DISABLE_FLAG.NONE;
 	}
@@ -42,13 +41,13 @@ public abstract class ControllerBase : MonoBehaviour
 
 	protected virtual void Awake()
 	{
-		character = this.GetComponentInParent<Character>();
+		character = GetComponentInParent<Character>();
 		if (character != null)
 		{
 			character.controller = this;
 			if (character.isLoading)
 			{
-				this.set_enabled(false);
+				base.enabled = false;
 			}
 		}
 	}
@@ -63,10 +62,10 @@ public abstract class ControllerBase : MonoBehaviour
 
 	protected virtual T AttachBrain<T>() where T : Brain
 	{
-		brain = this.get_gameObject().GetComponent<T>();
+		brain = base.gameObject.GetComponent<T>();
 		if (brain == null)
 		{
-			brain = this.get_gameObject().AddComponent<T>();
+			brain = base.gameObject.AddComponent<T>();
 		}
 		return brain as T;
 	}
@@ -78,7 +77,7 @@ public abstract class ControllerBase : MonoBehaviour
 
 	public virtual void SetEnableControll(bool enable, DISABLE_FLAG flag = DISABLE_FLAG.DEFAULT)
 	{
-		bool flag2 = IsEnableControll();
+		bool num = IsEnableControll();
 		if (enable)
 		{
 			disableFlag &= ~flag;
@@ -87,7 +86,7 @@ public abstract class ControllerBase : MonoBehaviour
 		{
 			disableFlag |= flag;
 		}
-		if (flag2 != IsEnableControll())
+		if (num != IsEnableControll())
 		{
 			OnChangeEnableControll(IsEnableControll());
 		}
@@ -105,7 +104,7 @@ public abstract class ControllerBase : MonoBehaviour
 	{
 		if (brain != null)
 		{
-			brain.set_enabled(true);
+			brain.enabled = true;
 		}
 		if (IsEnableControll())
 		{
@@ -117,7 +116,7 @@ public abstract class ControllerBase : MonoBehaviour
 	{
 		if (brain != null)
 		{
-			brain.set_enabled(false);
+			brain.enabled = false;
 		}
 		if (IsEnableControll())
 		{

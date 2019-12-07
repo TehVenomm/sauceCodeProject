@@ -9,8 +9,8 @@ public class Lounge_Model_MemberLounge : Coop_Model_Base
 
 	public override string ToString()
 	{
-		string empty = string.Empty;
-		empty = empty + ",cid=" + cid;
-		return base.ToString() + empty;
+		string arg = "";
+		arg = arg + ",cid=" + cid;
+		return base.ToString() + arg;
 	}
 }

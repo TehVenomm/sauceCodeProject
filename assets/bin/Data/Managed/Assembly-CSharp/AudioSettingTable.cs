@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 
 public class AudioSettingTable : Singleton<AudioSettingTable>, IDataTable
 {
@@ -27,9 +26,6 @@ public class AudioSettingTable : Singleton<AudioSettingTable>, IDataTable
 	}
 
 	public UIntKeyTable<Data> audioSettingTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTableFromInternal(string encrypted_csv_text)
 	{

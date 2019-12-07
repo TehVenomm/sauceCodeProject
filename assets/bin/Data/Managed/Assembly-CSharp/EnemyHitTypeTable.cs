@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class EnemyHitTypeTable : Singleton<EnemyHitTypeTable>, IDataTable
@@ -22,9 +21,6 @@ public class EnemyHitTypeTable : Singleton<EnemyHitTypeTable>, IDataTable
 		}
 	}
 
-	[CompilerGenerated]
-	private static TableUtility.CallBackStringKeyReadCSV<TypeData> _003C_003Ef__mg_0024cache0;
-
 	public StringKeyTable<TypeData> dataTable
 	{
 		get;
@@ -33,7 +29,7 @@ public class EnemyHitTypeTable : Singleton<EnemyHitTypeTable>, IDataTable
 
 	public void CreateTable(TextAsset stage_table_text_asset)
 	{
-		CreateTable(stage_table_text_asset.get_text());
+		CreateTable(stage_table_text_asset.text);
 	}
 
 	public void CreateTable(string csv)

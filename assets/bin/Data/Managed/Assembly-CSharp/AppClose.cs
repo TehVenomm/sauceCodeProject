@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -22,7 +21,7 @@ public class AppClose : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -34,21 +33,21 @@ public class AppClose : GameSection
 		{
 			yield return null;
 		}
-		Transform director_t = ResourceUtility.Realizes(lo_director.loadedObject);
-		if (director_t != null)
+		Transform transform = ResourceUtility.Realizes(lo_director.loadedObject);
+		if (transform != null)
 		{
-			director = director_t.GetComponent<TutorialBossDirector>();
+			director = transform.GetComponent<TutorialBossDirector>();
 			if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.NeedModifyTitleTop)
 			{
 				DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
-				director.logo.camera.set_orthographicSize(specialDeviceInfo.TitleTopCameraSize);
-				director.logo.bg.get_transform().set_localScale(specialDeviceInfo.TitleTopBGScale);
+				director.logo.camera.orthographicSize = specialDeviceInfo.TitleTopCameraSize;
+				director.logo.bg.transform.localScale = specialDeviceInfo.TitleTopBGScale;
 			}
 			director.StartLogoAnimation(tutorial_flag: false, null, delegate
 			{
 				SetActiveUI(enable: true);
 			});
-			MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>().set_enabled(false);
+			MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>().enabled = false;
 		}
 		else
 		{
@@ -61,14 +60,14 @@ public class AppClose : GameSection
 	{
 		SetApplicationVersionText(UI.LBL_APP_VERSION);
 		string text = MonoBehaviourSingleton<AccountManager>.I.closedNotice.Replace("<BR>", "\n").Replace("<br>", "\n");
-		SetLabelText((Enum)UI.LBL_SERVICE_MESSAGE, text);
-		SetActive((Enum)UI.BTN_REPAYMENT, MonoBehaviourSingleton<AccountManager>.I.openRefundForm);
+		SetLabelText(UI.LBL_SERVICE_MESSAGE, text);
+		SetActive(UI.BTN_REPAYMENT, MonoBehaviourSingleton<AccountManager>.I.openRefundForm);
 		base.UpdateUI();
 	}
 
 	private void SetActiveUI(bool enable)
 	{
-		GetCtrl(UI.Container).get_gameObject().SetActive(enable);
+		GetCtrl(UI.Container).gameObject.SetActive(enable);
 	}
 
 	private void OnQuery_SERVICE()

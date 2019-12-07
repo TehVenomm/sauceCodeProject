@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class TwoHandSwordBurstController : IWeaponController
 {
 	public class InitParam
@@ -39,7 +37,17 @@ public class TwoHandSwordBurstController : IWeaponController
 
 	private bool m_isEnableTransitionFromAvoidAtk;
 
-	public int FirstReloadActionAtkID => (m_burstActionInfo != null) ? m_burstActionInfo.FirstReloadActionAttackID : 0;
+	public int FirstReloadActionAtkID
+	{
+		get
+		{
+			if (m_burstActionInfo != null)
+			{
+				return m_burstActionInfo.FirstReloadActionAttackID;
+			}
+			return 0;
+		}
+	}
 
 	public int[] GetAllCurrentRestBulletCount => m_currentRestBulletCount;
 
@@ -80,19 +88,6 @@ public class TwoHandSwordBurstController : IWeaponController
 	public bool IsEnableChangeReloadMotionSpeed => m_isEnableChangeReloadMotionSpeed;
 
 	public bool IsEnableTransitionFromAvoidAtk => m_isEnableTransitionFromAvoidAtk;
-
-	public TwoHandSwordBurstController()
-	{
-		m_owner = null;
-		m_burstActionInfo = null;
-		m_currentRestBulletCount = new int[3];
-		m_currentMaxBulletCount = new int[3];
-		for (int i = 0; i < 3; i++)
-		{
-			m_currentRestBulletCount[i] = 0;
-			m_currentMaxBulletCount[i] = 0;
-		}
-	}
 
 	public void SetCurrentRestBulletCount(int value)
 	{
@@ -135,6 +130,19 @@ public class TwoHandSwordBurstController : IWeaponController
 	public void SetEnableTransitionFromAvoidAtkFlag(bool _isEnable)
 	{
 		m_isEnableTransitionFromAvoidAtk = _isEnable;
+	}
+
+	public TwoHandSwordBurstController()
+	{
+		m_owner = null;
+		m_burstActionInfo = null;
+		m_currentRestBulletCount = new int[3];
+		m_currentMaxBulletCount = new int[3];
+		for (int i = 0; i < 3; i++)
+		{
+			m_currentRestBulletCount[i] = 0;
+			m_currentMaxBulletCount[i] = 0;
+		}
 	}
 
 	public void Init(Player _player)
@@ -213,7 +221,7 @@ public class TwoHandSwordBurstController : IWeaponController
 	public void OnRelease()
 	{
 		int num = -1;
-		string motionLayerName = string.Empty;
+		string motionLayerName = "";
 		if (IsReadyForShoot)
 		{
 			SetReadyForShoot(_isReady: false);
@@ -236,7 +244,7 @@ public class TwoHandSwordBurstController : IWeaponController
 		}
 		if (num != -1)
 		{
-			m_owner.ActAttack(num, send_packet: true, sync_immediately: true, motionLayerName, string.Empty);
+			m_owner.ActAttack(num, send_packet: true, sync_immediately: true, motionLayerName);
 		}
 	}
 
@@ -327,20 +335,14 @@ public class TwoHandSwordBurstController : IWeaponController
 		{
 			int firstShotAttackID = m_burstActionInfo.FirstShotAttackID;
 			string motionLayerName = m_owner.GetMotionLayerName(m_owner.attackMode, m_owner.spAttackType, firstShotAttackID);
-			Player owner = m_owner;
-			int id = firstShotAttackID;
-			string motionLayerName2 = motionLayerName;
-			owner.ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName2, string.Empty);
+			m_owner.ActAttack(firstShotAttackID, send_packet: true, sync_immediately: false, motionLayerName);
 			return true;
 		}
 		if (IsEnableShootFullBurst())
 		{
 			int fullBurstAttackID = m_burstActionInfo.FullBurstAttackID;
-			string motionLayerName3 = m_owner.GetMotionLayerName(m_owner.attackMode, m_owner.spAttackType, fullBurstAttackID);
-			Player owner2 = m_owner;
-			int id = fullBurstAttackID;
-			string motionLayerName2 = motionLayerName3;
-			owner2.ActAttack(id, send_packet: true, sync_immediately: false, motionLayerName2, string.Empty);
+			string motionLayerName2 = m_owner.GetMotionLayerName(m_owner.attackMode, m_owner.spAttackType, fullBurstAttackID);
+			m_owner.ActAttack(fullBurstAttackID, send_packet: true, sync_immediately: false, motionLayerName2);
 			return true;
 		}
 		return false;
@@ -473,7 +475,7 @@ public class TwoHandSwordBurstController : IWeaponController
 		{
 			int nextReloadActionAttackID = m_burstActionInfo.NextReloadActionAttackID;
 			string motionLayerName = m_owner.GetMotionLayerName(m_owner.attackMode, m_owner.spAttackType, nextReloadActionAttackID);
-			m_owner.ActAttack(nextReloadActionAttackID, send_packet: true, sync_immediately: true, motionLayerName, string.Empty);
+			m_owner.ActAttack(nextReloadActionAttackID, send_packet: true, sync_immediately: true, motionLayerName);
 			return true;
 		}
 		SetStartReloading(_isReadyForReload: false);
@@ -502,12 +504,7 @@ public class TwoHandSwordBurstController : IWeaponController
 
 	public float GetAtkRate(Enemy _enemy, Player _player)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = _enemy.get_transform().get_position() - _player.get_transform().get_position();
-		float magnitude = val.get_magnitude();
+		float magnitude = (_enemy.transform.position - _player.transform.position).magnitude;
 		return m_burstActionInfo.GetDistanceAttenuationRatio(magnitude);
 	}
 }

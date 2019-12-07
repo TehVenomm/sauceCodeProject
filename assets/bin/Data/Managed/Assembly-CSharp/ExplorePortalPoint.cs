@@ -2,7 +2,7 @@ using Network;
 
 public class ExplorePortalPoint
 {
-	public static readonly int USEDFLAG_CLOSED;
+	public static readonly int USEDFLAG_CLOSED = 0;
 
 	public static readonly int USEDFLAG_OPENED = 1;
 
@@ -59,7 +59,7 @@ public class ExplorePortalPoint
 
 	public void UpdatePoint(int point, bool force = false)
 	{
-		if (fieldPortal.point < point || force)
+		if ((fieldPortal.point < point) | force)
 		{
 			fieldPortal.point = point;
 		}

@@ -50,15 +50,8 @@ public class UIBurstBulletUIController : MonoBehaviour
 
 	private BoxCollider m_boxCol;
 
-	public UIBurstBulletUIController()
-		: this()
-	{
-	}
-
 	public bool Initialize(InitParam _param)
 	{
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0164: Unknown result type (might be due to invalid IL or missing references)
 		m_currentMaxBulletIconCount = _param.MaxBulletCount;
 		m_currentRestBulletIconCount = _param.CurrentRestBulletCount;
 		for (int i = 0; i < m_currentMaxBulletIconCount || i < m_bulletIcons.Count; i++)
@@ -89,8 +82,8 @@ public class UIBurstBulletUIController : MonoBehaviour
 		{
 			m_boxCol = m_baseSprite.GetComponent<BoxCollider>();
 		}
-		m_boxCol.set_size(new Vector3((float)m_baseSprite.width, (float)m_baseSprite.height, 1f));
-		m_boxCol.set_center(new Vector3((float)m_baseSprite.width / 2f, 0f, 0f));
+		m_boxCol.size = new Vector3(m_baseSprite.width, m_baseSprite.height, 1f);
+		m_boxCol.center = new Vector3((float)m_baseSprite.width / 2f, 0f, 0f);
 		return true;
 	}
 
@@ -100,20 +93,21 @@ public class UIBurstBulletUIController : MonoBehaviour
 		{
 			return false;
 		}
-		Transform val = ResourceUtility.Realizes(Resources.Load(BULLET_ICON_PATH), m_bulletIconRoot);
-		if (val == null)
+		Transform transform = ResourceUtility.Realizes(Resources.Load(BULLET_ICON_PATH), m_bulletIconRoot);
+		if (transform == null)
 		{
 			return false;
 		}
-		UIBurstBulletIconController component = val.GetComponent<UIBurstBulletIconController>();
+		UIBurstBulletIconController component = transform.GetComponent<UIBurstBulletIconController>();
 		if (component == null)
 		{
 			return false;
 		}
-		UIBurstBulletIconController.InitParam initParam = new UIBurstBulletIconController.InitParam();
-		initParam.IconIndex = index;
-		initParam.DepthOffset = ((!(m_baseSprite == null)) ? (m_baseSprite.depth + 1) : 0);
-		UIBurstBulletIconController.InitParam param = initParam;
+		UIBurstBulletIconController.InitParam param = new UIBurstBulletIconController.InitParam
+		{
+			IconIndex = index,
+			DepthOffset = ((!(m_baseSprite == null)) ? (m_baseSprite.depth + 1) : 0)
+		};
 		component.Initialize(param);
 		m_bulletIcons.Add(component);
 		return true;
@@ -121,8 +115,6 @@ public class UIBurstBulletUIController : MonoBehaviour
 
 	private void InitUISpriteParameter()
 	{
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
 		if (!(m_baseSprite == null))
 		{
 			int num = m_baseSprite.depth + 2 * (m_currentMaxBulletIconCount + 1) + 1;
@@ -136,7 +128,7 @@ public class UIBurstBulletUIController : MonoBehaviour
 			}
 			m_baseSprite.width = num2;
 			m_emptyEffect.width = num2 + -30;
-			m_diamondIcon_R.get_transform().set_localPosition(Vector3.get_right() * (16.2f + 39.5f * (float)m_currentMaxBulletIconCount));
+			m_diamondIcon_R.transform.localPosition = Vector3.right * (16.2f + 39.5f * (float)m_currentMaxBulletIconCount);
 		}
 	}
 
@@ -208,7 +200,7 @@ public class UIBurstBulletUIController : MonoBehaviour
 
 	private bool SwitchActivateIconRoot(bool _isActivate)
 	{
-		if (m_iconRoot == null || m_iconRoot.get_activeSelf() == _isActivate)
+		if (m_iconRoot == null || m_iconRoot.activeSelf == _isActivate)
 		{
 			return false;
 		}
@@ -241,11 +233,11 @@ public class UIBurstBulletUIController : MonoBehaviour
 
 	private bool SetEmptyAppeal(bool _isValid)
 	{
-		if (m_emptyEffect == null || m_emptyEffect.get_enabled() == _isValid)
+		if (m_emptyEffect == null || m_emptyEffect.enabled == _isValid)
 		{
 			return false;
 		}
-		m_emptyEffect.set_enabled(_isValid);
+		m_emptyEffect.enabled = _isValid;
 		return true;
 	}
 
@@ -276,11 +268,19 @@ public class UIBurstBulletUIController : MonoBehaviour
 
 	public bool IsEmpty()
 	{
-		return m_currentMaxBulletIconCount > 0 && m_currentRestBulletIconCount <= 0;
+		if (m_currentMaxBulletIconCount > 0)
+		{
+			return m_currentRestBulletIconCount <= 0;
+		}
+		return false;
 	}
 
 	public bool IsEnableReload()
 	{
-		return m_currentMaxBulletIconCount > 0 && m_currentRestBulletIconCount < m_currentMaxBulletIconCount;
+		if (m_currentMaxBulletIconCount > 0)
+		{
+			return m_currentRestBulletIconCount < m_currentMaxBulletIconCount;
+		}
+		return false;
 	}
 }

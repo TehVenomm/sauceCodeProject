@@ -12,11 +12,6 @@ public class GuildChatAdvisoryItem : MonoBehaviour
 
 	private string content;
 
-	public GuildChatAdvisoryItem()
-		: this()
-	{
-	}
-
 	public void Init(string t, string c)
 	{
 		title = t;
@@ -27,7 +22,11 @@ public class GuildChatAdvisoryItem : MonoBehaviour
 	public static bool HasReadNew()
 	{
 		int @int = PlayerPrefs.GetInt("Guild_Chat_Advisory_New", 0);
-		return @int != 0 && @int == DateTime.Now.Day;
+		if (@int != 0)
+		{
+			return @int == DateTime.Now.Day;
+		}
+		return false;
 	}
 
 	public static void SetReadNew()
@@ -38,7 +37,11 @@ public class GuildChatAdvisoryItem : MonoBehaviour
 	public static bool HasReadHomeNew()
 	{
 		int @int = PlayerPrefs.GetInt("Home_Chat_Advisory_New", 0);
-		return @int != 0 && @int == DateTime.Now.Day;
+		if (@int != 0)
+		{
+			return @int == DateTime.Now.Day;
+		}
+		return false;
 	}
 
 	public static void SetReadHomeNew()

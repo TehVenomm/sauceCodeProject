@@ -1,7 +1,6 @@
 using Network;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class ItemToFieldTable : Singleton<ItemToFieldTable>, IDataTable
@@ -122,18 +121,6 @@ public class ItemToFieldTable : Singleton<ItemToFieldTable>, IDataTable
 	public const int GATHER_POINT_NUM_MAX = 5;
 
 	private DoubleUIntKeyTable<ItemToFieldData> itemToFieldTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<ItemToFieldData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<ItemToFieldData> _003C_003Ef__mg_0024cache2;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache3;
 
 	public void CreateTable(string csv_text)
 	{
@@ -315,7 +302,7 @@ public class ItemToFieldTable : Singleton<ItemToFieldTable>, IDataTable
 			{
 				array2 = Singleton<ItemToQuestTable>.I.GetHappenQuestTableFromItemID(item_id);
 			}
-			if (array2 != null && array2.Length > 0)
+			if (array2 != null && array2.Length != 0)
 			{
 				recommendFieldData.isNeedUnknownField = true;
 			}

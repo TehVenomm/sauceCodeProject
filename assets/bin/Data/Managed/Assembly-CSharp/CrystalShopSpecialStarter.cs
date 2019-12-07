@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -19,18 +18,18 @@ public class CrystalShopSpecialStarter : GameSection
 
 	public override void UpdateUI()
 	{
-		SetModel((Enum)UI.OBJ_MODEL, "RoyalChest_Open");
+		SetModel(UI.OBJ_MODEL, "RoyalChest_Open");
 	}
 
 	public override void StartSection()
 	{
 		ProductDataTable.PackInfo pack = Singleton<ProductDataTable>.I.GetPack(purchaseData.productId);
-		this.StartCoroutine(Wait(pack.openAnimEndTime));
+		StartCoroutine(Wait(pack.openAnimEndTime));
 	}
 
 	private IEnumerator Wait(float time)
 	{
-		yield return (object)new WaitForSeconds(time);
+		yield return new WaitForSeconds(time);
 		RequestEvent("BUNDLE_NOTICE", purchaseData);
 		GameSection.BackSection();
 	}

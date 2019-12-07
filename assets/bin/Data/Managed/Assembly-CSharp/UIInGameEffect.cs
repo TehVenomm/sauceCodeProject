@@ -5,11 +5,6 @@ public class UIInGameEffect : MonoBehaviour
 	[SerializeField]
 	protected UITweenCtrl tweenCtrl;
 
-	public UIInGameEffect()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
 		tweenCtrl.Reset();
@@ -21,11 +16,11 @@ public class UIInGameEffect : MonoBehaviour
 		int i = 0;
 		for (int num = tweenCtrl.tweens.Length; i < num; i++)
 		{
-			if (tweenCtrl.tweens[i].style != UITweener.Style.Loop && tweenCtrl.tweens[i].get_isActiveAndEnabled())
+			if (tweenCtrl.tweens[i].style != UITweener.Style.Loop && tweenCtrl.tweens[i].isActiveAndEnabled)
 			{
 				return;
 			}
 		}
-		Object.Destroy(this.get_gameObject());
+		Object.Destroy(base.gameObject);
 	}
 }

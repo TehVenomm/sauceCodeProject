@@ -27,19 +27,23 @@ public class CSVReader
 
 		public static readonly PopResult PARSE_ERROR = new PopResult(Result.PARSE_ERROR);
 
+		public static bool IsParseSucceeded(PopResult _result)
+		{
+			if ((Result)_result != Result.DONT_DEFINE_ERROR)
+			{
+				return (Result)_result != Result.UNKNOWN;
+			}
+			return false;
+		}
+
 		public PopResult(Result result)
 		{
 			_result = result;
 		}
 
-		public static bool IsParseSucceeded(PopResult _result)
-		{
-			return (Result)_result != Result.DONT_DEFINE_ERROR && (Result)_result != Result.UNKNOWN;
-		}
-
 		public static bool operator ==(PopResult a, PopResult b)
 		{
-			if (object.ReferenceEquals(a, b))
+			if ((object)a == b)
 			{
 				return true;
 			}
@@ -175,23 +179,21 @@ public class CSVReader
 					break;
 				}
 			}
-			if (!flag)
+			if (flag)
 			{
-				num3 = -1;
-				pos = start_pos;
-				while ((bool)Pop(ref value))
-				{
-					num3++;
-					if (value == array[j])
-					{
-						flag = true;
-						array2[num3] = j;
-						break;
-					}
-				}
+				continue;
 			}
-			if (!flag)
+			num3 = -1;
+			pos = start_pos;
+			while ((bool)Pop(ref value))
 			{
+				num3++;
+				if (value == array[j])
+				{
+					flag = true;
+					array2[num3] = j;
+					break;
+				}
 			}
 		}
 		namedIndex = array2;
@@ -713,7 +715,7 @@ public class CSVReader
 
 	public PopResult PopColor24(ref Color32 value)
 	{
-		value._002Ector(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
+		value = new Color32(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
 		PopResult a = Pop(ref value.r);
 		PopResult a2 = Pop(ref value.g);
 		PopResult a3 = Pop(ref value.b);
@@ -734,15 +736,15 @@ public class CSVReader
 		int value2 = 255;
 		int value3 = 255;
 		int value4 = 255;
-		if (!(bool)Pop(ref value2))
+		if (!Pop(ref value2))
 		{
 			result = PopResult.UNKNOWN;
 		}
-		if (!(bool)Pop(ref value3))
+		if (!Pop(ref value3))
 		{
 			result = PopResult.UNKNOWN;
 		}
-		if (!(bool)Pop(ref value4))
+		if (!Pop(ref value4))
 		{
 			result = PopResult.UNKNOWN;
 		}

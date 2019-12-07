@@ -21,7 +21,7 @@ public class TweenHeight : UITweener
 		{
 			if (mWidget == null)
 			{
-				mWidget = this.GetComponent<UIWidget>();
+				mWidget = GetComponent<UIWidget>();
 			}
 			return mWidget;
 		}
@@ -61,7 +61,7 @@ public class TweenHeight : UITweener
 		}
 		if (mTable == null)
 		{
-			mTable = NGUITools.FindInParents<UITable>(this.get_gameObject());
+			mTable = NGUITools.FindInParents<UITable>(base.gameObject);
 			if (mTable == null)
 			{
 				updateTable = false;
@@ -73,13 +73,13 @@ public class TweenHeight : UITweener
 
 	public static TweenHeight Begin(UIWidget widget, float duration, int height)
 	{
-		TweenHeight tweenHeight = UITweener.Begin<TweenHeight>(widget.get_gameObject(), duration);
+		TweenHeight tweenHeight = UITweener.Begin<TweenHeight>(widget.gameObject, duration);
 		tweenHeight.from = widget.height;
 		tweenHeight.to = height;
 		if (duration <= 0f)
 		{
 			tweenHeight.Sample(1f, isFinished: true);
-			tweenHeight.set_enabled(false);
+			tweenHeight.enabled = false;
 		}
 		return tweenHeight;
 	}

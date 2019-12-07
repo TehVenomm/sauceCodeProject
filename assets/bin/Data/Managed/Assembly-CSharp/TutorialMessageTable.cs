@@ -37,7 +37,7 @@ public class TutorialMessageTable : Singleton<TutorialMessageTable>, IDataTable
 
 			public CursorType cursorType;
 
-			public Vector2 cursorOffset = Vector2.get_zero();
+			public Vector2 cursorOffset = Vector2.zero;
 
 			public int cursorRotDeg;
 
@@ -278,8 +278,8 @@ public class TutorialMessageTable : Singleton<TutorialMessageTable>, IDataTable
 							if (!is_equip_first_slot)
 							{
 								int index = o.messageData.Count - 1;
-								o.messageData[index].waitEventName = o.messageData[index].waitEventName.Replace("_DETAIL", string.Empty);
-								Debug.LogWarning((object)("replace : " + o.messageData[index].waitEventName));
+								o.messageData[index].waitEventName = o.messageData[index].waitEventName.Replace("_DETAIL", "");
+								Debug.LogWarning("replace : " + o.messageData[index].waitEventName);
 							}
 						}
 						list.Add(o);

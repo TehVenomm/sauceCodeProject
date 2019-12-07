@@ -24,31 +24,31 @@ public class UIButtonKeys : UIKeyNavigation
 	{
 		if (onClick == null && selectOnClick != null)
 		{
-			onClick = selectOnClick.get_gameObject();
+			onClick = selectOnClick.gameObject;
 			selectOnClick = null;
 			NGUITools.SetDirty(this);
 		}
 		if (onLeft == null && selectOnLeft != null)
 		{
-			onLeft = selectOnLeft.get_gameObject();
+			onLeft = selectOnLeft.gameObject;
 			selectOnLeft = null;
 			NGUITools.SetDirty(this);
 		}
 		if (onRight == null && selectOnRight != null)
 		{
-			onRight = selectOnRight.get_gameObject();
+			onRight = selectOnRight.gameObject;
 			selectOnRight = null;
 			NGUITools.SetDirty(this);
 		}
 		if (onUp == null && selectOnUp != null)
 		{
-			onUp = selectOnUp.get_gameObject();
+			onUp = selectOnUp.gameObject;
 			selectOnUp = null;
 			NGUITools.SetDirty(this);
 		}
 		if (onDown == null && selectOnDown != null)
 		{
-			onDown = selectOnDown.get_gameObject();
+			onDown = selectOnDown.gameObject;
 			selectOnDown = null;
 			NGUITools.SetDirty(this);
 		}

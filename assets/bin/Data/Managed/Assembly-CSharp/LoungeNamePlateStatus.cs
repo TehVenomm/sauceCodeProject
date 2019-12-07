@@ -21,24 +21,24 @@ public class LoungeNamePlateStatus : UIBehaviour
 
 	public override void UpdateUI()
 	{
-		SetActive(this.get_transform(), UI.SPR_STATUS_AFK, is_visible: false);
-		SetActive(this.get_transform(), UI.SPR_STATUS_SMITH, is_visible: false);
-		SetActive(this.get_transform(), UI.SPR_STATUS_SHOP, is_visible: false);
-		SetActive(this.get_transform(), UI.SPR_STATUS_AFK_CENTER, is_visible: false);
-		SetActive(this.get_transform(), UI.SPR_STATUS_SMITH_CENTER, is_visible: false);
-		SetActive(this.get_transform(), UI.SPR_STATUS_SHOP_CENTER, is_visible: false);
+		SetActive(base.transform, UI.SPR_STATUS_AFK, is_visible: false);
+		SetActive(base.transform, UI.SPR_STATUS_SMITH, is_visible: false);
+		SetActive(base.transform, UI.SPR_STATUS_SHOP, is_visible: false);
+		SetActive(base.transform, UI.SPR_STATUS_AFK_CENTER, is_visible: false);
+		SetActive(base.transform, UI.SPR_STATUS_SMITH_CENTER, is_visible: false);
+		SetActive(base.transform, UI.SPR_STATUS_SHOP_CENTER, is_visible: false);
 		if (isValidNamePlate)
 		{
 			switch (actionType)
 			{
 			case LOUNGE_ACTION_TYPE.TO_EQUIP:
-				SetActive(this.get_transform(), UI.SPR_STATUS_SMITH, is_visible: true);
+				SetActive(base.transform, UI.SPR_STATUS_SMITH, is_visible: true);
 				break;
 			case LOUNGE_ACTION_TYPE.TO_GACHA:
-				SetActive(this.get_transform(), UI.SPR_STATUS_SHOP, is_visible: true);
+				SetActive(base.transform, UI.SPR_STATUS_SHOP, is_visible: true);
 				break;
 			case LOUNGE_ACTION_TYPE.AFK:
-				SetActive(this.get_transform(), UI.SPR_STATUS_AFK, is_visible: true);
+				SetActive(base.transform, UI.SPR_STATUS_AFK, is_visible: true);
 				break;
 			}
 		}
@@ -47,13 +47,13 @@ public class LoungeNamePlateStatus : UIBehaviour
 			switch (actionType)
 			{
 			case LOUNGE_ACTION_TYPE.TO_EQUIP:
-				SetActive(this.get_transform(), UI.SPR_STATUS_SMITH_CENTER, is_visible: true);
+				SetActive(base.transform, UI.SPR_STATUS_SMITH_CENTER, is_visible: true);
 				break;
 			case LOUNGE_ACTION_TYPE.TO_GACHA:
-				SetActive(this.get_transform(), UI.SPR_STATUS_SHOP_CENTER, is_visible: true);
+				SetActive(base.transform, UI.SPR_STATUS_SHOP_CENTER, is_visible: true);
 				break;
 			case LOUNGE_ACTION_TYPE.AFK:
-				SetActive(this.get_transform(), UI.SPR_STATUS_AFK_CENTER, is_visible: true);
+				SetActive(base.transform, UI.SPR_STATUS_AFK_CENTER, is_visible: true);
 				break;
 			}
 		}
@@ -71,16 +71,16 @@ public class LoungeNamePlateStatus : UIBehaviour
 		isValidNamePlate = isActive;
 		if (isActive)
 		{
-			SetActive(this.get_transform(), UI.OBJ_LOUNGE_NAMEPLATE, is_visible: true);
+			SetActive(base.transform, UI.OBJ_LOUNGE_NAMEPLATE, is_visible: true);
 		}
-		SetActive(this.get_transform(), UI.LBL_NAMEPLATE, isActive);
-		SetActive(this.get_transform(), UI.SPR_LOUNGE_NAMEPLATE, isActive);
+		SetActive(base.transform, UI.LBL_NAMEPLATE, isActive);
+		SetActive(base.transform, UI.SPR_LOUNGE_NAMEPLATE, isActive);
 		RefreshUI();
 	}
 
 	public void ChangePlayerName(string name)
 	{
-		SetLabelText(this.get_transform(), UI.LBL_NAMEPLATE, name);
+		SetLabelText(base.transform, UI.LBL_NAMEPLATE, name);
 	}
 
 	private void LateUpdate()

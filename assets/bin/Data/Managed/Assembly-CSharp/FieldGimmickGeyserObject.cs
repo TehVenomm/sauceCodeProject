@@ -66,7 +66,7 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 	{
 		base.Initialize(pointData);
 		actionData = Singleton<FieldMapTable>.I.GetFieldGimmickActionData((uint)base.m_pointData.value1);
-		Transform effect = EffectManager.GetEffect("ef_btl_bg_geyser_01", this.get_transform());
+		Transform effect = EffectManager.GetEffect("ef_btl_bg_geyser_01", base.transform);
 		if (effect != null)
 		{
 			effectCtrl = effect.GetComponent<EffectCtrl>();
@@ -77,22 +77,21 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 		}
 		if (self != null)
 		{
-			selfInstanceId = self.get_gameObject().GetInstanceID();
+			selfInstanceId = self.gameObject.GetInstanceID();
 		}
 		reactionType = actionData.reactionType;
-		actCollider = this.get_gameObject().AddComponent<CapsuleCollider>();
+		actCollider = base.gameObject.AddComponent<CapsuleCollider>();
 		Reset();
 	}
 
 	public void Reset()
 	{
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 		state = STATE.IDLE;
 		if (actionData != null)
 		{
 			if (actionData.start < 0f)
 			{
-				timer = Random.get_value() * INTERVAL;
+				timer = UnityEngine.Random.value * INTERVAL;
 			}
 			else
 			{
@@ -103,15 +102,15 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 		}
 		if (actCollider != null)
 		{
-			float num = (actionData == null) ? 1f : actionData.radius;
+			float num = (actionData != null) ? actionData.radius : 1f;
 			float num2 = num * 2f + 3f;
-			actCollider.set_radius(num);
-			actCollider.set_height(num2);
-			actCollider.set_center(new Vector3(0f, num2 / 2f - num, 0f));
-			actCollider.set_isTrigger(true);
-			actCollider.set_enabled(false);
+			actCollider.radius = num;
+			actCollider.height = num2;
+			actCollider.center = new Vector3(0f, num2 / 2f - num, 0f);
+			actCollider.isTrigger = true;
+			actCollider.enabled = false;
 		}
-		this.set_enabled(true);
+		base.enabled = true;
 	}
 
 	public override void RequestDestroy()
@@ -119,7 +118,7 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 		SetEnableAction(value: false);
 		if (effectCtrl != null)
 		{
-			EffectManager.ReleaseEffect(effectCtrl.get_gameObject());
+			EffectManager.ReleaseEffect(effectCtrl.gameObject);
 		}
 		base.RequestDestroy();
 	}
@@ -133,14 +132,14 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 
 	private void SetEnableAction(bool value)
 	{
-		if (this.get_enabled() != value)
+		if (base.enabled != value)
 		{
 			Reset();
 		}
-		this.set_enabled(value);
+		base.enabled = value;
 		if (effectCtrl != null)
 		{
-			effectCtrl.get_gameObject().SetActive(value);
+			effectCtrl.gameObject.SetActive(value);
 		}
 	}
 
@@ -150,7 +149,7 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 		{
 			return;
 		}
-		timer += Time.get_deltaTime();
+		timer += Time.deltaTime;
 		switch (state)
 		{
 		case STATE.IDLE:
@@ -163,14 +162,14 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 		case STATE.READY:
 			if (effectCtrl.IsCurrentState(ACTION_ANIM_HASH))
 			{
-				actCollider.set_enabled(true);
+				actCollider.enabled = true;
 				NextState();
 			}
 			break;
 		case STATE.ACTION:
 			if (timer > DURATION)
 			{
-				actCollider.set_enabled(false);
+				actCollider.enabled = false;
 				effectCtrl.CrossFade(IDLE_ANIM_HASH, 0.3f);
 				NextState();
 			}
@@ -196,41 +195,18 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 	{
 		if (actCollider != null)
 		{
-			actCollider.set_enabled(value);
+			actCollider.enabled = value;
 		}
 	}
 
 	public void ReactPlayer(Player self)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 		self.isGatherInterruption = true;
-		Vector3 val = self._transform.get_position() - m_transform.get_position();
-		Vector3 normalized = val.get_normalized();
-		switch (reactionType)
+		Vector3 normalized = (self._transform.position - m_transform.position).normalized;
+		Character.REACTION_TYPE rEACTION_TYPE = reactionType;
+		if ((uint)(rEACTION_TYPE - 2) <= 1u || rEACTION_TYPE == Character.REACTION_TYPE.FALL_BLOW || rEACTION_TYPE == Character.REACTION_TYPE.CHARM_BLOW)
 		{
-		case Character.REACTION_TYPE.BLOW:
-		case Character.REACTION_TYPE.STUNNED_BLOW:
-		case Character.REACTION_TYPE.FALL_BLOW:
-		case Character.REACTION_TYPE.CHARM_BLOW:
 			self._forward = -normalized;
-			break;
 		}
 		normalized = Quaternion.AngleAxis(actionData.angle, self._right) * normalized;
 		normalized *= actionData.force;
@@ -244,22 +220,26 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (selfInstanceId == other.get_gameObject().GetInstanceID() && self != null)
+		if (selfInstanceId == other.gameObject.GetInstanceID() && self != null)
 		{
 			bool flag = self.hitOffFlag == StageObject.HIT_OFF_FLAG.NONE;
-			Character.ACTION_ID actionID = self.actionID;
-			if (actionID == Character.ACTION_ID.DAMAGE || actionID == Character.ACTION_ID.MAX || actionID == (Character.ACTION_ID)20 || actionID == (Character.ACTION_ID)33)
+			switch (self.actionID)
 			{
+			case Character.ACTION_ID.DAMAGE:
+			case Character.ACTION_ID.MAX:
+			case (Character.ACTION_ID)20:
+			case (Character.ACTION_ID)33:
 				flag = true;
+				break;
 			}
 			if (self.isActSpecialAction)
 			{
 				flag = true;
 			}
-			if (flag && this.get_enabled())
+			if (flag && base.enabled)
 			{
 				SetEnableCollider(value: false);
-				this.StartCoroutine(SetEnableCollider(value: true, 1f));
+				StartCoroutine(SetEnableCollider(value: true, 1f));
 				ReactPlayer(self);
 			}
 		}
@@ -267,7 +247,7 @@ public class FieldGimmickGeyserObject : FieldGimmickObject
 
 	private IEnumerator SetEnableCollider(bool value, float delay)
 	{
-		yield return (object)new WaitForSeconds(delay);
+		yield return new WaitForSeconds(delay);
 		if (state == STATE.ACTION)
 		{
 			SetEnableCollider(value);

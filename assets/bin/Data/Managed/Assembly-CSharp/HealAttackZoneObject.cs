@@ -33,10 +33,10 @@ public class HealAttackZoneObject : HealAttackObject
 			{
 				collInfo.Add(name, value: true);
 			}
-			if (lastTime != Time.get_time())
+			if (lastTime != Time.time)
 			{
-				sec += Time.get_deltaTime();
-				lastTime = Time.get_time();
+				sec += Time.deltaTime;
+				lastTime = Time.time;
 			}
 		}
 
@@ -91,21 +91,21 @@ public class HealAttackZoneObject : HealAttackObject
 
 	protected override void Update()
 	{
-		m_timeCount += Time.get_deltaTime();
+		m_timeCount += Time.deltaTime;
 	}
 
 	protected override void OnTriggerEnter(Collider collider)
 	{
 		Enemy enemy = _GetValidEnemy(collider);
-		if (!object.ReferenceEquals(enemy, null))
+		if ((object)enemy != null)
 		{
 			if (targetCollection.ContainsKey(enemy.id))
 			{
-				targetCollection[enemy.id].Enter(collider.get_name());
+				targetCollection[enemy.id].Enter(collider.name);
 				return;
 			}
 			TargetInfo targetInfo = new TargetInfo();
-			targetInfo.Enter(collider.get_name());
+			targetInfo.Enter(collider.name);
 			targetCollection.Add(enemy.id, targetInfo);
 		}
 	}
@@ -113,13 +113,13 @@ public class HealAttackZoneObject : HealAttackObject
 	protected override void OnTriggerStay(Collider collider)
 	{
 		Enemy enemy = _GetValidEnemy(collider);
-		if (!object.ReferenceEquals(enemy, null))
+		if ((object)enemy != null)
 		{
 			if (!targetCollection.ContainsKey(enemy.id))
 			{
 				targetCollection.Add(enemy.id, new TargetInfo());
 			}
-			targetCollection[enemy.id].Stay(collider.get_name());
+			targetCollection[enemy.id].Stay(collider.name);
 			if (targetCollection[enemy.id].sec >= intervalTime)
 			{
 				targetCollection[enemy.id].sec -= intervalTime;
@@ -132,16 +132,16 @@ public class HealAttackZoneObject : HealAttackObject
 	protected override void OnTriggerExit(Collider collider)
 	{
 		Enemy enemy = _GetValidEnemy(collider);
-		if (!object.ReferenceEquals(enemy, null) && targetCollection.ContainsKey(enemy.id))
+		if ((object)enemy != null && targetCollection.ContainsKey(enemy.id))
 		{
-			targetCollection[enemy.id].Exit(collider.get_name());
+			targetCollection[enemy.id].Exit(collider.name);
 		}
 	}
 
 	private Enemy _GetValidEnemy(Collider collider)
 	{
-		Enemy componentInParent = collider.get_gameObject().GetComponentInParent<Enemy>();
-		if (object.ReferenceEquals(componentInParent, null))
+		Enemy componentInParent = collider.gameObject.GetComponentInParent<Enemy>();
+		if ((object)componentInParent == null)
 		{
 			return null;
 		}

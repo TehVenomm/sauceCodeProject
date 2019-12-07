@@ -65,7 +65,7 @@ public class EquipValue
 		type = data.type;
 		spAttackType = data.spAttackType;
 		GrowEquipItemTable.GrowEquipItemData growEquipItemData = Singleton<GrowEquipItemTable>.I.GetGrowEquipItemData(data.growID, (uint)item.lv);
-		if (object.ReferenceEquals(growEquipItemData, null))
+		if (growEquipItemData == null)
 		{
 			baseStatus.hp = data.baseHp;
 			baseStatus.attacks[0] = data.baseAtk;
@@ -90,7 +90,7 @@ public class EquipValue
 			}
 		}
 		EquipItemExceedParamTable.EquipItemExceedParamAll exceedParam = data.GetExceedParam((uint)item.exceed);
-		if (!object.ReferenceEquals(exceedParam, null))
+		if (exceedParam != null)
 		{
 			baseStatus.hp += exceedParam.hp;
 			baseStatus.attacks[0] += exceedParam.atk;
@@ -132,47 +132,41 @@ public class EquipValue
 		int num2 = 0;
 		for (int count2 = item.aIds.Count; num2 < count2; num2++)
 		{
-			int num3 = item.aIds[num2];
-			int num4 = item.aPts[num2];
-			if (this.ability.ContainsKey(num3))
+			int key = item.aIds[num2];
+			int num3 = item.aPts[num2];
+			if (this.ability.ContainsKey(key))
 			{
-				Dictionary<int, int> dictionary;
-				int key;
-				(dictionary = this.ability)[key = num3] = dictionary[key] + num4;
+				this.ability[key] += num3;
 			}
 			else
 			{
-				this.ability.Add(num3, num4);
+				this.ability.Add(key, num3);
 			}
 		}
-		int num5 = 0;
-		for (int num6 = data.fixedAbility.Length; num5 < num6; num5++)
+		int num4 = 0;
+		for (int num5 = data.fixedAbility.Length; num4 < num5; num4++)
 		{
-			EquipItem.Ability ability = data.fixedAbility[num5];
+			EquipItem.Ability ability = data.fixedAbility[num4];
 			if (this.ability.ContainsKey(ability.id))
 			{
-				Dictionary<int, int> dictionary;
-				int id;
-				(dictionary = this.ability)[id = ability.id] = dictionary[id] + ability.pt;
+				this.ability[ability.id] += ability.pt;
 			}
 			else
 			{
 				this.ability.Add(ability.id, ability.pt);
 			}
 		}
-		if (object.ReferenceEquals(exceedParam, null))
+		if (exceedParam == null)
 		{
 			return;
 		}
-		int num7 = 0;
-		for (int num8 = exceedParam.ability.Length; num7 < num8; num7++)
+		int num6 = 0;
+		for (int num7 = exceedParam.ability.Length; num6 < num7; num6++)
 		{
-			EquipItem.Ability ability2 = exceedParam.ability[num7];
+			EquipItem.Ability ability2 = exceedParam.ability[num6];
 			if (this.ability.ContainsKey(ability2.id))
 			{
-				Dictionary<int, int> dictionary;
-				int id2;
-				(dictionary = this.ability)[id2 = ability2.id] = dictionary[id2] + ability2.pt;
+				this.ability[ability2.id] += ability2.pt;
 			}
 			else
 			{

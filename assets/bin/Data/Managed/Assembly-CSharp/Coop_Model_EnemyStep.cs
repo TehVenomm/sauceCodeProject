@@ -9,8 +9,7 @@ public class Coop_Model_EnemyStep : Coop_Model_ObjectSyncPositionBase
 
 	public override bool IsHandleable(StageObject owner)
 	{
-		Character character = owner as Character;
-		if (!character.IsChangeableAction(Character.ACTION_ID.MAX))
+		if (!(owner as Character).IsChangeableAction(Character.ACTION_ID.MAX))
 		{
 			return false;
 		}

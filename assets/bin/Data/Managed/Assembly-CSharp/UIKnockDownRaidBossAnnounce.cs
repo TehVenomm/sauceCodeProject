@@ -30,7 +30,7 @@ public class UIKnockDownRaidBossAnnounce : UIInGameSelfAnnounce
 		string sE = ResourceName.GetSE(40000067);
 		if (!string.IsNullOrEmpty(sE))
 		{
-			ResourceLink component = this.get_gameObject().GetComponent<ResourceLink>();
+			ResourceLink component = base.gameObject.GetComponent<ResourceLink>();
 			if (!(component == null))
 			{
 				m_audioClip = component.Get<AudioClip>(sE);
@@ -177,13 +177,13 @@ public class UIKnockDownRaidBossAnnounce : UIInGameSelfAnnounce
 		{
 			if (m_coroutine == null)
 			{
-				m_coroutine = this.StartCoroutine(DelayPlay());
+				m_coroutine = StartCoroutine(DelayPlay());
 			}
 			return;
 		}
 		if (isForcePlay && m_coroutine != null)
 		{
-			this.StopCoroutine(m_coroutine);
+			StopCoroutine(m_coroutine);
 			m_coroutine = null;
 		}
 		Play(callback);
@@ -211,7 +211,7 @@ public class UIKnockDownRaidBossAnnounce : UIInGameSelfAnnounce
 	{
 		if (m_coroutine != null)
 		{
-			this.StopCoroutine(m_coroutine);
+			StopCoroutine(m_coroutine);
 			m_coroutine = null;
 		}
 	}

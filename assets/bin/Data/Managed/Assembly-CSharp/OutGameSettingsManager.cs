@@ -178,7 +178,7 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 
 		public Vector3 defaultTargetPos = new Vector3(0f, 0f, 7f);
 
-		public Vector3 defaultCameraPos = Vector3.get_zero();
+		public Vector3 defaultCameraPos = Vector3.zero;
 
 		public float GetSelfCameraHeight()
 		{
@@ -197,7 +197,7 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 			{
 				NPC nPC = npcs[i];
 				nPC.selectSituationID = -1;
-				int num2 = Random.Range(0, 100);
+				int num2 = UnityEngine.Random.Range(0, 100);
 				int num3 = 0;
 				if (!nPC.enabled)
 				{
@@ -275,7 +275,7 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 	[Serializable]
 	public class QuestMap
 	{
-		public Color monsterAmbientColor = Color.get_white();
+		public Color monsterAmbientColor = Color.white;
 
 		public float cameraFieldOfViwe = 40f;
 
@@ -381,7 +381,7 @@ public class OutGameSettingsManager : MonoBehaviourSingleton<OutGameSettingsMana
 
 		public EquipViewInfo GetEquipViewInfo(string find_name)
 		{
-			find_name = find_name.Replace("VISUAL_", string.Empty);
+			find_name = find_name.Replace("VISUAL_", "");
 			int num = equipViewInfos.Length;
 			for (int i = 0; i < num; i++)
 			{

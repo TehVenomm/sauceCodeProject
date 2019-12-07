@@ -5,7 +5,7 @@ namespace GooglePlayGames.OurUtils
 {
 	public class Logger
 	{
-		private static bool debugLogEnabled;
+		private static bool debugLogEnabled = false;
 
 		private static bool warningLogEnabled = true;
 
@@ -39,7 +39,7 @@ namespace GooglePlayGames.OurUtils
 			{
 				PlayGamesHelperObject.RunOnGameThread(delegate
 				{
-					Debug.Log((object)ToLogMessage(string.Empty, "DEBUG", msg));
+					Debug.Log(ToLogMessage(string.Empty, "DEBUG", msg));
 				});
 			}
 		}
@@ -50,7 +50,7 @@ namespace GooglePlayGames.OurUtils
 			{
 				PlayGamesHelperObject.RunOnGameThread(delegate
 				{
-					Debug.LogWarning((object)ToLogMessage("!!!", "WARNING", msg));
+					Debug.LogWarning(ToLogMessage("!!!", "WARNING", msg));
 				});
 			}
 		}
@@ -61,14 +61,18 @@ namespace GooglePlayGames.OurUtils
 			{
 				PlayGamesHelperObject.RunOnGameThread(delegate
 				{
-					Debug.LogWarning((object)ToLogMessage("***", "ERROR", msg));
+					Debug.LogWarning(ToLogMessage("***", "ERROR", msg));
 				});
 			}
 		}
 
 		public static string describe(byte[] b)
 		{
-			return (b != null) ? ("byte[" + b.Length + "]") : "(null)";
+			if (b != null)
+			{
+				return "byte[" + b.Length + "]";
+			}
+			return "(null)";
 		}
 
 		private static string ToLogMessage(string prefix, string logType, string msg)

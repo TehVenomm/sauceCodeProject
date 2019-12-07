@@ -36,7 +36,7 @@ public class HomeNPCCharacter : HomeCharacterBase
 		{
 			useSpecialModel = true;
 		}
-		return npcData.LoadModel(this.get_gameObject(), need_shadow: true, enable_light_probe: true, null, useSpecialModel);
+		return npcData.LoadModel(base.gameObject, need_shadow: true, enable_light_probe: true, null, useSpecialModel);
 	}
 
 	protected override void InitCollider()
@@ -53,14 +53,11 @@ public class HomeNPCCharacter : HomeCharacterBase
 
 	protected override void ChangeScale()
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<LoungeManager>.IsValid() && npcInfo.npcID == 4)
 		{
-			Vector3 localScale = this.get_transform().get_localScale();
+			Vector3 localScale = base.transform.localScale;
 			float num = 1.3f;
-			this.get_transform().set_localScale(new Vector3(localScale.x * num, localScale.y * num, localScale.z * num));
+			base.transform.localScale = new Vector3(localScale.x * num, localScale.y * num, localScale.z * num);
 		}
 	}
 
@@ -105,7 +102,7 @@ public class HomeNPCCharacter : HomeCharacterBase
 		}
 		if (state == STATE.FREE && npcInfo != null && !string.IsNullOrEmpty(npcInfo.eventName))
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomeNPCCharacter", this.get_gameObject(), npcInfo.eventName);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomeNPCCharacter", base.gameObject, npcInfo.eventName);
 			return true;
 		}
 		return false;
@@ -113,7 +110,7 @@ public class HomeNPCCharacter : HomeCharacterBase
 
 	public void SetQuestBalloon(Transform t)
 	{
-		t.set_name(HomeBase.QuestBalloonName);
+		t.name = HomeBase.QuestBalloonName;
 		namePlate = t;
 	}
 
@@ -134,18 +131,18 @@ public class HomeNPCCharacter : HomeCharacterBase
 	public void HideShadow()
 	{
 		NPCLoader nPCLoader = base.loader as NPCLoader;
-		if (Object.op_Implicit(nPCLoader))
+		if ((bool)nPCLoader)
 		{
-			if (Object.op_Implicit(nPCLoader.shadow))
+			if ((bool)nPCLoader.shadow)
 			{
-				nPCLoader.shadow.get_gameObject().SetActive(false);
+				nPCLoader.shadow.gameObject.SetActive(value: false);
 			}
 			return;
 		}
-		Transform val = base._transform.Find("CircleShadow");
-		if (null != val)
+		Transform transform = base._transform.Find("CircleShadow");
+		if (null != transform)
 		{
-			val.get_gameObject().SetActive(false);
+			transform.gameObject.SetActive(value: false);
 		}
 	}
 }

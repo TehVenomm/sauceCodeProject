@@ -26,7 +26,7 @@ public class SerialCodeTop : GameSection
 				serialList = ret.result;
 			}
 			callback(obj);
-		}, string.Empty);
+		});
 	}
 
 	private void SendInputSerialCode(int id, string code, Action<bool, string> callback)
@@ -44,12 +44,12 @@ public class SerialCodeTop : GameSection
 				arg2 = ret.result.message;
 			}
 			callback(arg, arg2);
-		}, string.Empty);
+		});
 	}
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()

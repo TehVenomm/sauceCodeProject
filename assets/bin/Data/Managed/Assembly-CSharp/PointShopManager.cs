@@ -21,7 +21,7 @@ public class PointShopManager
 				arg = true;
 			}
 			call_back(arg, pointShopList);
-		}, string.Empty);
+		});
 	}
 
 	public void SendPointShopBuy(PointShopItem pointShopItem, PointShop pointShop, int num, Action<bool> call_back)
@@ -39,12 +39,12 @@ public class PointShopManager
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public static string GetBoughtMessage(PointShopItem item, int num)
 	{
-		string empty = string.Empty;
+		string text = "";
 		if (item.itemId == 1200000)
 		{
 			return string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 8u), item.name, num);

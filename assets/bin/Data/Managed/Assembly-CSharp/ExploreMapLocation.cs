@@ -30,9 +30,4 @@ public class ExploreMapLocation : MonoBehaviour
 			_icon = value;
 		}
 	}
-
-	public ExploreMapLocation()
-		: this()
-	{
-	}
 }

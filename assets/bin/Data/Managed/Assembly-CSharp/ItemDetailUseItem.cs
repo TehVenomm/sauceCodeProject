@@ -1,6 +1,3 @@
-using System;
-using UnityEngine;
-
 public class ItemDetailUseItem : GameSection
 {
 	protected enum UI
@@ -30,34 +27,17 @@ public class ItemDetailUseItem : GameSection
 	public override void UpdateUI()
 	{
 		ItemInfo itemInfo = data.GetItemData() as ItemInfo;
-		SetActive((Enum)UI.STR_SELL, data.CanSale());
-		SetActive((Enum)UI.BTN_DETAIL_SELL, data.CanSale() && MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
-		SetLabelText((Enum)UI.LBL_NAME, data.GetName());
-		SetLabelText((Enum)UI.LBL_HAVE_NUM, "Qty:" + data.GetNum().ToString());
-		SetLabelText((Enum)UI.LBL_DESCRIPTION, itemInfo.tableData.text);
-		SetLabelText((Enum)UI.LBL_SELL, data.GetSalePrice().ToString());
+		SetActive(UI.STR_SELL, data.CanSale());
+		SetActive(UI.BTN_DETAIL_SELL, data.CanSale() && MonoBehaviourSingleton<ItemExchangeManager>.I.IsExchangeScene());
+		SetLabelText(UI.LBL_NAME, data.GetName());
+		SetLabelText(UI.LBL_HAVE_NUM, "Qty:" + data.GetNum().ToString());
+		SetLabelText(UI.LBL_DESCRIPTION, itemInfo.tableData.text);
+		SetLabelText(UI.LBL_SELL, data.GetSalePrice().ToString());
 		int num = 0;
 		int num2 = 0;
 		num = itemInfo.tableData.enemyIconID;
 		num2 = itemInfo.tableData.enemyIconID2;
-		ITEM_ICON_TYPE iconType = data.GetIconType();
-		int iconID = data.GetIconID();
-		RARITY_TYPE? rarity = data.GetRarity();
-		Transform ctrl = GetCtrl(UI.OBJ_ICON_ROOT);
-		ELEMENT_TYPE iconElement = data.GetIconElement();
-		EQUIPMENT_TYPE? iconMagiEnableType = data.GetIconMagiEnableType();
-		int num3 = -1;
-		string event_name = null;
-		int event_data = 0;
-		bool is_new = false;
-		int toggle_group = -1;
-		bool is_select = false;
-		string icon_under_text = null;
-		bool is_equipping = false;
-		int enemy_icon_id = num;
-		int enemy_icon_id2 = num2;
-		GET_TYPE getType = data.GetGetType();
-		ItemIcon.Create(iconType, iconID, rarity, ctrl, iconElement, iconMagiEnableType, num3, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text: false, getType);
+		ItemIcon.Create(data.GetIconType(), data.GetIconID(), data.GetRarity(), GetCtrl(UI.OBJ_ICON_ROOT), data.GetIconElement(), data.GetIconMagiEnableType(), -1, null, 0, is_new: false, -1, is_select: false, null, is_equipping: false, num, num2, disable_rarity_text: false, data.GetGetType());
 	}
 
 	public void OnQuery_USE()

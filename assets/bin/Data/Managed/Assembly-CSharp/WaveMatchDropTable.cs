@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class WaveMatchDropTable : Singleton<WaveMatchDropTable>, IDataTable
 {
@@ -17,7 +16,7 @@ public class WaveMatchDropTable : Singleton<WaveMatchDropTable>, IDataTable
 
 		public List<uint> buffTableIds = new List<uint>();
 
-		public string getEffect = string.Empty;
+		public string getEffect = "";
 
 		public int getSE;
 
@@ -30,9 +29,9 @@ public class WaveMatchDropTable : Singleton<WaveMatchDropTable>, IDataTable
 			csv_reader.Pop(ref data.type);
 			csv_reader.Pop(ref data.calcType);
 			csv_reader.Pop(ref data.value);
-			string empty = string.Empty;
-			csv_reader.Pop(ref empty);
-			string[] array = empty.Split(':');
+			string text = "";
+			csv_reader.Pop(ref text);
+			string[] array = text.Split(':');
 			data.buffTableIds.Clear();
 			int i = 0;
 			for (int num = array.Length; i < num; i++)
@@ -50,9 +49,6 @@ public class WaveMatchDropTable : Singleton<WaveMatchDropTable>, IDataTable
 	}
 
 	private UIntKeyTable<WaveMatchDropData> dataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<WaveMatchDropData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string text)
 	{

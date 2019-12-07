@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +27,7 @@ public class GuildInfoDetailDialog : GameSection
 		object[] array = GameSection.GetEventData() as object[];
 		_info = (array[0] as GuildStatisticInfo);
 		_clanId = (int)array[1];
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -50,11 +49,11 @@ public class GuildInfoDetailDialog : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.LBL_HUNTER, string.Format(base.sectionData.GetText("TEXT_HUNTER"), _info.currentMem, _info.memCap));
+		SetLabelText(UI.LBL_HUNTER, string.Format(base.sectionData.GetText("TEXT_HUNTER"), _info.currentMem, _info.memCap));
 		SetGrid(UI.GRD_LIST, "GuildInfoDetailListItem", members.Count, reset: true, delegate(int i, Transform t, bool b)
 		{
 			FriendCharaInfo friendCharaInfo = members[i];
-			string str = (friendCharaInfo.userId != _clanMasterUserId) ? string.Empty : string.Format("({0})", base.sectionData.GetText("TEXT_MASTER"));
+			string str = (friendCharaInfo.userId == _clanMasterUserId) ? string.Format("({0})", base.sectionData.GetText("TEXT_MASTER")) : "";
 			SetLabelText(t, UI.LBL_NAME, friendCharaInfo.name + str);
 			SetEvent(t, "DETAIL", friendCharaInfo);
 		});

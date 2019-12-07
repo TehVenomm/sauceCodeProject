@@ -1,5 +1,3 @@
-using System;
-
 public class QuestAcceptRoomSettingsLevel : QuestAcceptEntryPassRoom
 {
 	protected new enum UI
@@ -50,20 +48,20 @@ public class QuestAcceptRoomSettingsLevel : QuestAcceptEntryPassRoom
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.STR_NON_SETTINGS, is_visible: false);
+		SetActive(UI.STR_NON_SETTINGS, is_visible: false);
 		int i = 0;
 		for (int num = passCode.Length; i < num; i++)
 		{
-			SetLabelText((Enum)lblAry[i], string.Empty);
+			SetLabelText(lblAry[i], string.Empty);
 		}
-		string text = string.Join(string.Empty, passCode);
+		string text = string.Join("", passCode);
 		if (text.Length == 0)
 		{
-			SetActive((Enum)UI.STR_NON_SETTINGS, is_visible: true);
+			SetActive(UI.STR_NON_SETTINGS, is_visible: true);
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_INPUT_PASS_3, text);
+			SetLabelText(UI.LBL_INPUT_PASS_3, text);
 		}
 	}
 
@@ -91,9 +89,7 @@ public class QuestAcceptRoomSettingsLevel : QuestAcceptEntryPassRoom
 	protected override void OnQuery_ROOM()
 	{
 		int result = 0;
-		string text = string.Join(string.Empty, passCode);
-		text = text.Replace("-", string.Empty);
-		int.TryParse(text, out result);
+		int.TryParse(string.Join("", passCode).Replace("-", ""), out result);
 		MonoBehaviourSingleton<PartyManager>.I.partySetting.level = result;
 		GameSection.ChangeEvent("[BACK]");
 	}

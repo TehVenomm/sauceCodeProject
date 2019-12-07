@@ -8,29 +8,16 @@ public class AndroidPermissionsManager
 
 	private static AndroidJavaObject GetActivity()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Expected O, but got Unknown
 		if (m_Activity == null)
 		{
-			AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-			m_Activity = val.GetStatic<AndroidJavaObject>("currentActivity");
+			m_Activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity");
 		}
 		return m_Activity;
 	}
 
 	private static AndroidJavaObject GetPermissionsService()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
-		object obj = m_PermissionService;
-		if (obj == null)
-		{
-			AndroidJavaObject val = new AndroidJavaObject("com.unity3d.plugin.UnityAndroidPermissions", new object[0]);
-			obj = (object)val;
-			m_PermissionService = val;
-		}
-		return obj;
+		return m_PermissionService ?? (m_PermissionService = new AndroidJavaObject("com.unity3d.plugin.UnityAndroidPermissions"));
 	}
 
 	public static bool ShouldShowRequestPermission(string permissionName)
@@ -44,10 +31,7 @@ public class AndroidPermissionsManager
 
 	public static void OpenAppSetting()
 	{
-		GetPermissionsService().Call("OpenAppSetting", new object[1]
-		{
-			GetActivity()
-		});
+		GetPermissionsService().Call("OpenAppSetting", GetActivity());
 	}
 
 	public static bool IsPermissionGranted(string permissionName)
@@ -69,11 +53,6 @@ public class AndroidPermissionsManager
 
 	public static void RequestPermission(string[] permissionNames, AndroidPermissionCallback callback)
 	{
-		GetPermissionsService().Call("RequestPermissionAsync", new object[3]
-		{
-			GetActivity(),
-			permissionNames,
-			callback
-		});
+		GetPermissionsService().Call("RequestPermissionAsync", GetActivity(), permissionNames, callback);
 	}
 }

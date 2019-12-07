@@ -28,7 +28,7 @@ public class SoulEnergyController
 				break;
 			}
 		}
-		if (object.ReferenceEquals(soulEnergy, null))
+		if (soulEnergy == null)
 		{
 			soulEnergy = new SoulEnergy();
 			soulEnergy.Init();

@@ -9,14 +9,9 @@ public class CoopRoomPacketSender : MonoBehaviour
 		set;
 	}
 
-	public CoopRoomPacketSender()
-		: this()
-	{
-	}
-
 	protected virtual void Awake()
 	{
-		coopRoom = this.get_gameObject().GetComponent<CoopRoom>();
+		coopRoom = base.gameObject.GetComponent<CoopRoom>();
 	}
 
 	protected virtual void Start()
@@ -155,8 +150,7 @@ public class CoopRoomPacketSender : MonoBehaviour
 
 	public void SendSyncPlayerStatus(Self self, int toClientId = -1)
 	{
-		CoopClient coopClient = coopRoom.clients.Find((CoopClient x) => x.stageId != MonoBehaviourSingleton<CoopManager>.I.coopMyClient.stageId);
-		if (coopClient == null)
+		if (coopRoom.clients.Find((CoopClient x) => x.stageId != MonoBehaviourSingleton<CoopManager>.I.coopMyClient.stageId) == null)
 		{
 			return;
 		}

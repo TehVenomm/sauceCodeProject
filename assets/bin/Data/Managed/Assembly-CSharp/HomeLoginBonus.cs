@@ -1,5 +1,4 @@
 using Network;
-using System;
 using UnityEngine;
 
 public class HomeLoginBonus : GameSection
@@ -44,13 +43,13 @@ public class HomeLoginBonus : GameSection
 			return;
 		}
 		MonoBehaviourSingleton<AccountManager>.I.logInBonus.Remove(loginBonus);
-		SetLabelText((Enum)UI.LBL_LOGIN_DAYS, loginBonus.total.ToString());
+		SetLabelText(UI.LBL_LOGIN_DAYS, loginBonus.total.ToString());
 		if (loginBonus.reward.Count > 0)
 		{
 			LoginBonus.LoginBonusReward loginBonusReward = loginBonus.reward[0];
-			SetLabelText((Enum)UI.LBL_GET_ITEM, loginBonusReward.name);
+			SetLabelText(UI.LBL_GET_ITEM, loginBonusReward.name);
 			float rotateSpeed = 35f;
-			if (loginBonusReward.type == 5)
+			if (5 == loginBonusReward.type)
 			{
 				uint itemId = (uint)loginBonusReward.itemId;
 				texModelRenderTexture_.InitSkillItem(texModelTexture_, itemId, rotation: true, light_rotation: false, 45f);
@@ -99,7 +98,7 @@ public class HomeLoginBonus : GameSection
 	{
 		if (null != glowModel_)
 		{
-			glowModel_.get_gameObject().SetActive(false);
+			glowModel_.gameObject.SetActive(value: false);
 		}
 		if (MonoBehaviourSingleton<AccountManager>.I.logInBonus.Count > 0)
 		{

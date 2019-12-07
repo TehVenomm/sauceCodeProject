@@ -1,8 +1,5 @@
-using System.Runtime.InteropServices;
-
 namespace MsgPack
 {
-	[StructLayout(LayoutKind.Sequential, Size = 1)]
 	public struct Ext
 	{
 		public sbyte Type

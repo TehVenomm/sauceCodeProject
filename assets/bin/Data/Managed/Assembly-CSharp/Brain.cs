@@ -101,10 +101,7 @@ public class Brain : MonoBehaviour
 	{
 		get
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 position = _frontTransform.get_position();
+			Vector3 position = _frontTransform.position;
 			return new Vector2(position.x, position.z);
 		}
 	}
@@ -113,10 +110,7 @@ public class Brain : MonoBehaviour
 	{
 		get
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 forward = _frontTransform.get_forward();
+			Vector3 forward = _frontTransform.forward;
 			return new Vector2(forward.x, forward.z);
 		}
 	}
@@ -125,10 +119,7 @@ public class Brain : MonoBehaviour
 	{
 		get
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 position = _backTransform.get_position();
+			Vector3 position = _backTransform.position;
 			return new Vector2(position.x, position.z);
 		}
 	}
@@ -137,24 +128,26 @@ public class Brain : MonoBehaviour
 	{
 		get
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 forward = _backTransform.get_forward();
+			Vector3 forward = _backTransform.forward;
 			return new Vector2(forward.x, forward.z);
 		}
 	}
 
-	public bool isNonActive => fsm != null && fsm.currentType == STATE_TYPE.NONACTIVE;
-
-	public Brain()
-		: this()
+	public bool isNonActive
 	{
+		get
+		{
+			if (fsm != null)
+			{
+				return fsm.currentType == STATE_TYPE.NONACTIVE;
+			}
+			return false;
+		}
 	}
 
 	protected virtual void Awake()
 	{
-		owner = this.GetComponentInParent<Character>();
+		owner = GetComponentInParent<Character>();
 		isInitialized = false;
 	}
 
@@ -209,14 +202,6 @@ public class Brain : MonoBehaviour
 
 	protected virtual void OnInitialize()
 	{
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
 		opponentMem = new OpponentMemory(this);
 		targetCtrl = new TargetController(this);
 		moveCtrl = new MoveController(this);
@@ -226,10 +211,8 @@ public class Brain : MonoBehaviour
 		_frontTransform = GetFront();
 		_backTransform = GetBack();
 		rootInternalRedius = param.sensorParam.internalRadius * GetScale();
-		Vector2 val = frontPositionXZ - owner.positionXZ;
-		rootFrontDistance = val.get_magnitude() - rootInternalRedius;
-		Vector2 val2 = backPositionXZ - owner.positionXZ;
-		rootBackDistance = val2.get_magnitude() - rootInternalRedius;
+		rootFrontDistance = (frontPositionXZ - owner.positionXZ).magnitude - rootInternalRedius;
+		rootBackDistance = (backPositionXZ - owner.positionXZ).magnitude - rootInternalRedius;
 	}
 
 	public void ResetInitialized()
@@ -254,12 +237,20 @@ public class Brain : MonoBehaviour
 
 	public virtual List<StageObject> GetTargetObjectList()
 	{
-		return (!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? new List<StageObject>() : MonoBehaviourSingleton<StageObjectManager>.I.objectList;
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		{
+			return new List<StageObject>();
+		}
+		return MonoBehaviourSingleton<StageObjectManager>.I.objectList;
 	}
 
 	public virtual List<StageObject> GetAllyObjectList()
 	{
-		return (!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? new List<StageObject>() : MonoBehaviourSingleton<StageObjectManager>.I.objectList;
+		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+		{
+			return new List<StageObject>();
+		}
+		return MonoBehaviourSingleton<StageObjectManager>.I.objectList;
 	}
 
 	public virtual void HandleEvent(BRAIN_EVENT ev, object param = null)

@@ -118,18 +118,11 @@ public class QuestAcceptDeliveryDetail : QuestDeliveryDetail
 
 	protected override bool IsChangableEquip()
 	{
-		switch (info.type)
+		DELIVERY_TYPE type = info.type;
+		if (type != 0 && (uint)(type - 8) > 4u && type != DELIVERY_TYPE.ETC)
 		{
-		default:
 			return false;
-		case DELIVERY_TYPE.DAILY:
-		case DELIVERY_TYPE.STORY:
-		case DELIVERY_TYPE.ONCE:
-		case DELIVERY_TYPE.WEEKLY:
-		case DELIVERY_TYPE.EVENT:
-		case DELIVERY_TYPE.SUB_EVENT:
-		case DELIVERY_TYPE.ETC:
-			return true;
 		}
+		return true;
 	}
 }

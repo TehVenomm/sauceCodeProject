@@ -33,15 +33,10 @@ public class UISpriteMask : MonoBehaviour
 
 	private static Dictionary<Material, MaterialEntry> maskMaterials = new Dictionary<Material, MaterialEntry>();
 
-	public UISpriteMask()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		sprite = this.GetComponent<UISprite>();
-		if (Object.op_Implicit(sprite))
+		sprite = GetComponent<UISprite>();
+		if ((bool)sprite)
 		{
 			SetupMaskSprite();
 		}
@@ -49,60 +44,41 @@ public class UISpriteMask : MonoBehaviour
 
 	private void SetupMaskSprite()
 	{
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0238: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
 		Shader shader = ResourceUtility.FindShader("mobile/Custom/UI/ui_alpha_mask");
 		Material material = GetMaterial(sprite.material, shader);
 		UISpriteData atlasSprite = sprite.GetAtlasSprite();
-		Rect rect = default(Rect);
-		rect._002Ector((float)atlasSprite.x, (float)atlasSprite.y, (float)atlasSprite.width, (float)atlasSprite.height);
-		Rect uvRect = NGUIMath.ConvertToTexCoords(rect, material.get_mainTexture().get_width(), material.get_mainTexture().get_height());
-		maskSprite = new GameObject(sprite.get_name()).AddComponent<UITexture>();
-		maskSprite.get_gameObject().set_layer(sprite.get_gameObject().get_layer());
-		maskSprite.get_transform().set_parent(sprite.get_transform());
-		maskSprite.get_transform().set_localPosition(Vector3.get_zero());
-		maskSprite.get_transform().set_localScale(Vector3.get_one());
+		Rect uvRect = NGUIMath.ConvertToTexCoords(new Rect(atlasSprite.x, atlasSprite.y, atlasSprite.width, atlasSprite.height), material.mainTexture.width, material.mainTexture.height);
+		maskSprite = new GameObject(sprite.name).AddComponent<UITexture>();
+		maskSprite.gameObject.layer = sprite.gameObject.layer;
+		maskSprite.transform.parent = sprite.transform;
+		maskSprite.transform.localPosition = Vector3.zero;
+		maskSprite.transform.localScale = Vector3.one;
 		maskSprite.depth = sprite.depth + MASK_DEPTH;
 		maskSprite.width = sprite.width;
 		maskSprite.height = sprite.height;
 		maskSprite.uvRect = uvRect;
 		maskSprite.material = material;
-		if (Object.op_Implicit(maskingObject))
+		if ((bool)maskingObject)
 		{
 			UISprite uISprite = maskingObject as UISprite;
-			if (Object.op_Implicit(uISprite))
+			if ((bool)uISprite)
 			{
 				Shader shader2 = ResourceUtility.FindShader("mobile/Custom/UI/ui_add_depth_greater");
 				Material material2 = GetMaterial(uISprite.material, shader2);
 				UISpriteData atlasSprite2 = uISprite.GetAtlasSprite();
-				Rect rect2 = default(Rect);
-				rect2._002Ector((float)atlasSprite2.x, (float)atlasSprite2.y, (float)atlasSprite2.width, (float)atlasSprite2.height);
-				Rect uvRect2 = NGUIMath.ConvertToTexCoords(rect2, material2.get_mainTexture().get_width(), material2.get_mainTexture().get_height());
-				maskedSprite = new GameObject(uISprite.get_name()).AddComponent<UITexture>();
-				maskedSprite.get_gameObject().set_layer(uISprite.get_gameObject().get_layer());
-				maskedSprite.get_transform().set_parent(uISprite.get_transform());
-				maskedSprite.get_transform().set_localPosition(Vector3.get_zero());
-				maskedSprite.get_transform().set_localScale(Vector3.get_one());
+				Rect uvRect2 = NGUIMath.ConvertToTexCoords(new Rect(atlasSprite2.x, atlasSprite2.y, atlasSprite2.width, atlasSprite2.height), material2.mainTexture.width, material2.mainTexture.height);
+				maskedSprite = new GameObject(uISprite.name).AddComponent<UITexture>();
+				maskedSprite.gameObject.layer = uISprite.gameObject.layer;
+				maskedSprite.transform.parent = uISprite.transform;
+				maskedSprite.transform.localPosition = Vector3.zero;
+				maskedSprite.transform.localScale = Vector3.one;
 				maskedSprite.depth = sprite.depth + MASK_DEPTH + 1;
 				maskedSprite.width = uISprite.width;
 				maskedSprite.height = uISprite.height;
 				maskedSprite.uvRect = uvRect2;
 				maskedSprite.color = uISprite.color;
 				maskedSprite.material = material2;
-				uISprite.set_enabled(false);
+				uISprite.enabled = false;
 			}
 			else
 			{
@@ -120,35 +96,35 @@ public class UISpriteMask : MonoBehaviour
 		}
 		if (!AppMain.isApplicationQuit)
 		{
-			if (Object.op_Implicit(maskSprite))
+			if ((bool)maskSprite)
 			{
-				if (Object.op_Implicit(sprite))
+				if ((bool)sprite)
 				{
 					ReleaseMaterial(sprite.material);
 				}
 				else
 				{
-					Material val = FindOriginalMaterial(maskSprite.material);
-					if (Object.op_Implicit(val))
+					Material material = FindOriginalMaterial(maskSprite.material);
+					if ((bool)material)
 					{
-						ReleaseMaterial(val);
+						ReleaseMaterial(material);
 					}
 				}
 			}
-			if (!Object.op_Implicit(maskedSprite))
+			if (!maskedSprite)
 			{
 				return;
 			}
 			UISprite uISprite = maskingObject as UISprite;
-			if (Object.op_Implicit(uISprite))
+			if ((bool)uISprite)
 			{
 				ReleaseMaterial(uISprite.material);
 				return;
 			}
-			Material val2 = FindOriginalMaterial(maskedSprite.material);
-			if (Object.op_Implicit(val2))
+			Material material2 = FindOriginalMaterial(maskedSprite.material);
+			if ((bool)material2)
 			{
-				ReleaseMaterial(val2);
+				ReleaseMaterial(material2);
 			}
 		}
 		else
@@ -171,22 +147,19 @@ public class UISpriteMask : MonoBehaviour
 
 	private Material GetMaterial(Material orig, Shader shader)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
-		//IL_002b: Expected O, but got Unknown
 		if (!maskMaterials.TryGetValue(orig, out MaterialEntry value))
 		{
-			Material val = new Material(shader);
+			Material material = new Material(shader);
 			try
 			{
-				val.set_mainTexture(orig.get_mainTexture());
+				material.mainTexture = orig.mainTexture;
 			}
-			catch (UnassignedReferenceException val2)
+			catch (UnassignedReferenceException arg)
 			{
-				UnassignedReferenceException val3 = val2;
+				Debug.Log("UISPriteMask Error:" + arg);
 			}
-			val.SetFloat("_Cutoff", cutoff);
-			value = new MaterialEntry(val);
+			material.SetFloat("_Cutoff", cutoff);
+			value = new MaterialEntry(material);
 			maskMaterials.Add(orig, value);
 		}
 		value.refCount++;

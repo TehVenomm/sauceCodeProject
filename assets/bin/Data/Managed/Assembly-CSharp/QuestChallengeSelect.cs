@@ -88,7 +88,7 @@ public class QuestChallengeSelect : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -98,9 +98,9 @@ public class QuestChallengeSelect : GameSection
 		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_questselect_new");
 		load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_questselect_complete");
 		InitSearchParam();
-		QuestAcceptChallengeRoomCondition.ChallengeSearchRequestParam sendParam = new QuestAcceptChallengeRoomCondition.ChallengeSearchRequestParam();
-		int userLevel = sendParam.enemyLevel = GetEnemyLevelFromUserLevel();
-		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeList(sendParam, delegate
+		QuestAcceptChallengeRoomCondition.ChallengeSearchRequestParam challengeSearchRequestParam = new QuestAcceptChallengeRoomCondition.ChallengeSearchRequestParam();
+		int num = challengeSearchRequestParam.enemyLevel = GetEnemyLevelFromUserLevel();
+		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeList(challengeSearchRequestParam, delegate
 		{
 			is_recv_quest = true;
 		}, isSave: false);
@@ -108,7 +108,7 @@ public class QuestChallengeSelect : GameSection
 		{
 			yield return null;
 		}
-		this.StartCoroutine(CheckLimitQuestItem());
+		StartCoroutine(CheckLimitQuestItem());
 		if (load_queue.IsLoading())
 		{
 			yield return load_queue.Wait();
@@ -131,54 +131,52 @@ public class QuestChallengeSelect : GameSection
 
 	protected void ShowChallenge()
 	{
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 		List<QuestData> challengeList = MonoBehaviourSingleton<QuestManager>.I.challengeList;
 		if (MonoBehaviourSingleton<PartyManager>.I.challengeInfo.oldShadowCount != null)
 		{
-			SetActive((Enum)UI.STR_CHALLENGE_BONUS_MESSAGE, is_visible: true);
-			SetActive((Enum)UI.BTN_DETAIL, is_visible: true);
-			UIPanel component = GetCtrl(UI.SCR_ORDER_QUEST).GetComponent<UIPanel>();
-			component.baseClipRegion = new Vector4(0f, -110f, 440f, 549f);
-			SetLabelText((Enum)UI.STR_CHALLENGE_BONUS_MESSAGE, StringTable.Format(STRING_CATEGORY.SHADOW_COUNT, 3u, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.oldShadowCount.num));
-			base.GetComponent<UILabel>((Enum)UI.STR_CHALLENGE_BONUS_MESSAGE).supportEncoding = true;
+			SetActive(UI.STR_CHALLENGE_BONUS_MESSAGE, is_visible: true);
+			SetActive(UI.BTN_DETAIL, is_visible: true);
+			GetCtrl(UI.SCR_ORDER_QUEST).GetComponent<UIPanel>().baseClipRegion = new Vector4(0f, -110f, 440f, 549f);
+			SetLabelText(UI.STR_CHALLENGE_BONUS_MESSAGE, StringTable.Format(STRING_CATEGORY.SHADOW_COUNT, 3u, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.oldShadowCount.num));
+			GetComponent<UILabel>(UI.STR_CHALLENGE_BONUS_MESSAGE).supportEncoding = true;
 		}
 		else
 		{
-			SetActive((Enum)UI.STR_CHALLENGE_BONUS_MESSAGE, is_visible: false);
-			SetActive((Enum)UI.BTN_DETAIL, is_visible: false);
+			SetActive(UI.STR_CHALLENGE_BONUS_MESSAGE, is_visible: false);
+			SetActive(UI.BTN_DETAIL, is_visible: false);
 		}
-		SetLabelText((Enum)UI.STR_CHALLENGE_MESSAGE, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.message);
+		SetLabelText(UI.STR_CHALLENGE_MESSAGE, MonoBehaviourSingleton<PartyManager>.I.challengeInfo.message);
 		SetSupportEncoding(UI.STR_CHALLENGE_MESSAGE, isEnable: true);
 		if (challengeList == null || challengeList.Count == 0)
 		{
-			SetActive((Enum)UI.GRD_ORDER_QUEST, is_visible: false);
-			SetActive((Enum)UI.STR_ORDER_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: true);
-			SetLabelText((Enum)UI.LBL_MAX, "0");
-			SetLabelText((Enum)UI.LBL_NOW, "0");
-			UIScrollView component2 = GetCtrl(UI.SCR_ORDER_QUEST).GetComponent<UIScrollView>();
-			if (component2 != null)
+			SetActive(UI.GRD_ORDER_QUEST, is_visible: false);
+			SetActive(UI.STR_ORDER_NON_LIST, is_visible: true);
+			SetActive(UI.OBJ_ACTIVE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, is_visible: true);
+			SetLabelText(UI.LBL_MAX, "0");
+			SetLabelText(UI.LBL_NOW, "0");
+			UIScrollView component = GetCtrl(UI.SCR_ORDER_QUEST).GetComponent<UIScrollView>();
+			if (component != null)
 			{
-				component2.set_enabled(false);
-				component2.verticalScrollBar.alpha = 0f;
+				component.enabled = false;
+				component.verticalScrollBar.alpha = 0f;
 			}
 			return;
 		}
-		SetActive((Enum)UI.GRD_ORDER_QUEST, is_visible: true);
-		SetActive((Enum)UI.STR_ORDER_NON_LIST, is_visible: false);
+		SetActive(UI.GRD_ORDER_QUEST, is_visible: true);
+		SetActive(UI.STR_ORDER_NON_LIST, is_visible: false);
 		pageMax = 1 + (challengeList.Count - 1) / 10;
 		bool flag = pageMax > 1;
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
-		SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
+		SetActive(UI.OBJ_ACTIVE_ROOT, flag);
+		SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
+		SetLabelText(UI.LBL_MAX, pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, nowPage.ToString());
 		UITweener[] transitions = GetCtrl(UI.OBJ_FRAME).GetComponents<UITweener>();
 		int finishCount = 0;
 		UITweener[] array = transitions;
-		foreach (UITweener uITweener in array)
+		for (int j = 0; j < array.Length; j++)
 		{
-			uITweener.AddOnFinished(delegate
+			array[j].AddOnFinished(delegate
 			{
 				finishCount++;
 				if (finishCount >= transitions.Length)
@@ -188,7 +186,7 @@ public class QuestChallengeSelect : GameSection
 			});
 		}
 		int num = 10 * (nowPage - 1);
-		int num2 = (nowPage != pageMax) ? 10 : (challengeList.Count - num);
+		int num2 = (nowPage == pageMax) ? (challengeList.Count - num) : 10;
 		challengeData = new QuestData[num2];
 		Array.Copy(challengeList.ToArray(), num, challengeData, 0, num2);
 		bool isGuildRequest = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName().Contains("GuildRequest");
@@ -209,7 +207,7 @@ public class QuestChallengeSelect : GameSection
 			{
 				SetActive(t, UI.TWN_DIFFICULT_STAR, is_visible: false);
 				SetActive(t, UI.TXT_NEED_POINT, is_visible: false);
-				Debug.Log((object)"2");
+				Debug.Log("2");
 			}
 			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
 			ITEM_ICON_TYPE itemIconType = ItemIcon.GetItemIconType(questData.questType);
@@ -240,13 +238,13 @@ public class QuestChallengeSelect : GameSection
 				SetToggle(t, UI.OBJ_ICON_NEW, value: true);
 				SetVisibleWidgetEffect(UI.SCR_ORDER_QUEST, t, UI.SPR_ICON_NEW, "ef_ui_questselect_new");
 			}
-			Transform val = FindCtrl(t, UI.OBJ_FRAME);
-			if (val != null)
+			Transform transform = FindCtrl(t, UI.OBJ_FRAME);
+			if (transform != null)
 			{
-				UIPanel uiPanel = val.get_gameObject().GetComponent<UIPanel>();
+				UIPanel uiPanel = transform.gameObject.GetComponent<UIPanel>();
 				if (uiPanel == null)
 				{
-					uiPanel = val.get_gameObject().AddComponent<UIPanel>();
+					uiPanel = transform.gameObject.AddComponent<UIPanel>();
 					uiPanel.depth = scrollView.panel.depth + 1;
 				}
 				uiPanel.widgetsAreStatic = false;
@@ -256,8 +254,7 @@ public class QuestChallengeSelect : GameSection
 				}
 				else
 				{
-					QuestChallengeSelect questChallengeSelect = this;
-					questChallengeSelect.onScrollViewReady = (Action)Delegate.Combine(questChallengeSelect.onScrollViewReady, (Action)delegate
+					onScrollViewReady = (Action)Delegate.Combine(onScrollViewReady, (Action)delegate
 					{
 						PanelToStatic(icon, uiPanel);
 					});
@@ -315,19 +312,17 @@ public class QuestChallengeSelect : GameSection
 			return;
 		}
 		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID((uint)challengeData[num].questId);
-		QuestInfoData questChallengeInfoData = MonoBehaviourSingleton<QuestManager>.I.GetQuestChallengeInfoData((uint)challengeData[num].questId);
-		GameSection.SetEventData(questChallengeInfoData);
+		GameSection.SetEventData(MonoBehaviourSingleton<QuestManager>.I.GetQuestChallengeInfoData((uint)challengeData[num].questId));
 		isScrollViewReady = false;
 	}
 
 	public override void OnNotify(NOTIFY_FLAG flags)
 	{
-		bool flag = false;
 		if ((flags & NOTIFY_FLAG.UPDATE_QUEST_ITEM_INVENTORY) != (NOTIFY_FLAG)0L)
 		{
 			SetDirty(UI.GRD_ORDER_QUEST);
 		}
-		if (!flag)
+		if (0 == 0)
 		{
 			base.OnNotify(flags);
 		}
@@ -351,7 +346,7 @@ public class QuestChallengeSelect : GameSection
 			{
 				MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeList(param, delegate
 				{
-					this.StartCoroutine(CheckLimitQuestItem());
+					StartCoroutine(CheckLimitQuestItem());
 				}, isSave: true);
 			});
 			isQuestItemDirty = false;
@@ -382,7 +377,7 @@ public class QuestChallengeSelect : GameSection
 					}
 				}
 			});
-			yield return (object)new WaitForSeconds(minRemainingSec);
+			yield return new WaitForSeconds(minRemainingSec);
 			if (questData != null)
 			{
 				isQuestItemDirty = true;
@@ -393,7 +388,7 @@ public class QuestChallengeSelect : GameSection
 	private void OnQuery_PAGE_PREV()
 	{
 		isResetUI = true;
-		nowPage = ((nowPage <= 1) ? pageMax : (nowPage - 1));
+		nowPage = ((nowPage > 1) ? (nowPage - 1) : pageMax);
 		ShowChallenge();
 	}
 
@@ -435,7 +430,6 @@ public class QuestChallengeSelect : GameSection
 	private int GetEnemyLevelFromUserLevel(int userLevel)
 	{
 		int qUEST_ITEM_LEVEL_MAX = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.QUEST_ITEM_LEVEL_MAX;
-		int num = Mathf.Clamp(userLevel, 10, qUEST_ITEM_LEVEL_MAX);
-		return (num + 9) / 10 * 10;
+		return (Mathf.Clamp(userLevel, 10, qUEST_ITEM_LEVEL_MAX) + 9) / 10 * 10;
 	}
 }

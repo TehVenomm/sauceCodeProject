@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -37,12 +36,12 @@ public class ItemDetailOrderSellConfirm : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.LBL_TITLE_U, base.sectionData.GetText("TITLE"));
-		SetLabelText((Enum)UI.LBL_TITLE_D, base.sectionData.GetText("TITLE"));
+		SetLabelText(UI.LBL_TITLE_U, base.sectionData.GetText("TITLE"));
+		SetLabelText(UI.LBL_TITLE_D, base.sectionData.GetText("TITLE"));
 		int num = 0;
 		int num2 = 0;
 		QuestItemInfo item_info = itemData.GetItemData() as QuestItemInfo;
-		SetGrid(UI.GRD_ICON, string.Empty, 1, reset: false, delegate(int i, Transform t, bool is_recycle)
+		SetGrid(UI.GRD_ICON, "", 1, reset: false, delegate(int i, Transform t, bool is_recycle)
 		{
 			uint num3 = 0u;
 			EquipItemExceedTable.EquipItemExceedData equipItemExceedData = Singleton<EquipItemExceedTable>.I.GetEquipItemExceedData(item_info.infoData.questData.tableData.rarity, item_info.infoData.questData.tableData.getType, item_info.infoData.questData.tableData.eventId);
@@ -55,9 +54,9 @@ public class ItemDetailOrderSellConfirm : GameSection
 			SetMaterialInfo(itemIcon.transform, rEWARD_TYPE, num3);
 			itemIcon.SetRewardBG(is_visible: true);
 		});
-		SetLabelText((Enum)UI.LBL_GOLD, num.ToString());
-		SetLabelText((Enum)UI.LBL_EXP, num2.ToString());
-		SetLabelText((Enum)UI.LBL_SELL, string.Format(base.sectionData.GetText("STR_SELL"), itemData.GetName(), sellNum));
+		SetLabelText(UI.LBL_GOLD, num.ToString());
+		SetLabelText(UI.LBL_EXP, num2.ToString());
+		SetLabelText(UI.LBL_SELL, string.Format(base.sectionData.GetText("STR_SELL"), itemData.GetName(), sellNum));
 	}
 
 	private void OnQuery_OK()

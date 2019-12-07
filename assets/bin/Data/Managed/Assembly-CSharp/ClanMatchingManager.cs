@@ -27,7 +27,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 
 	public bool UsingChatConnection;
 
-	public string CachedMessageClanId = string.Empty;
+	public string CachedMessageClanId = "";
 
 	public int chatUpdateInterval = 5;
 
@@ -137,6 +137,11 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 
 	public event Action<ClanChatMessageModel> OnReceiveCharacterMessage;
 
+	public void OnCreateAnnounce()
+	{
+		isClanCreatedNow = false;
+	}
+
 	public ClanMatchingManager()
 	{
 		isClanCreatedNow = false;
@@ -144,16 +149,11 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 		clanServerData = null;
 	}
 
-	public void OnCreateAnnounce()
-	{
-		isClanCreatedNow = false;
-	}
-
 	protected override void Awake()
 	{
 		base.Awake();
-		this.get_gameObject().AddComponent<LoungeWebSocket>();
-		this.get_gameObject().AddComponent<ClanNetworkManager>();
+		base.gameObject.AddComponent<LoungeWebSocket>();
+		base.gameObject.AddComponent<ClanNetworkManager>();
 	}
 
 	private void OnApplicationPause(bool pause)
@@ -248,8 +248,8 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 		if (MonoBehaviourSingleton<ClanNetworkManager>.IsValid())
 		{
 			List<Party_Model_RegisterACK.UserInfo> data = (from x in MonoBehaviourSingleton<ClanNetworkManager>.I.registerAck.GetConvertUserInfo()
-			where GetSlotInfoByUserId(x.userId) != null
-			select x).ToList();
+				where GetSlotInfoByUserId(x.userId) != null
+				select x).ToList();
 			loungeMemberStatus = new LoungeMemberesStatus(data);
 		}
 	}
@@ -266,7 +266,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				{
 					Kick(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
 				}
-			}, string.Empty);
+			});
 		}
 	}
 
@@ -283,13 +283,21 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 
 	public static bool IsValidInClan()
 	{
-		return MonoBehaviourSingleton<ClanMatchingManager>.IsValid() && MonoBehaviourSingleton<ClanMatchingManager>.I.IsInClan();
+		if (MonoBehaviourSingleton<ClanMatchingManager>.IsValid())
+		{
+			return MonoBehaviourSingleton<ClanMatchingManager>.I.IsInClan();
+		}
+		return false;
 	}
 
 	public bool IsUserInClanBase(int user_id)
 	{
 		PartyModel.SlotInfo slotInfoByUserId = GetSlotInfoByUserId(user_id);
-		return IsValidInClan() && slotInfoByUserId != null && slotInfoByUserId.userInfo != null;
+		if (IsValidInClan() && slotInfoByUserId != null)
+		{
+			return slotInfoByUserId.userInfo != null;
+		}
+		return false;
 	}
 
 	public bool IsInClan()
@@ -299,17 +307,29 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 
 	public string GetPartyId()
 	{
-		return (partyData == null) ? string.Empty : partyData.id;
+		if (partyData == null)
+		{
+			return "";
+		}
+		return partyData.id;
 	}
 
 	public int GetSlotIndex(int user_id)
 	{
-		return (partyData == null) ? (-1) : partyData.slotInfos.FindIndex((PartyModel.SlotInfo s) => s.userInfo != null && s.userInfo.userId == user_id);
+		if (partyData == null)
+		{
+			return -1;
+		}
+		return partyData.slotInfos.FindIndex((PartyModel.SlotInfo s) => s.userInfo != null && s.userInfo.userId == user_id);
 	}
 
 	public PARTY_STATUS GetStatus()
 	{
-		return (PARTY_STATUS)((partyData != null) ? partyData.status : 0);
+		if (partyData == null)
+		{
+			return PARTY_STATUS.NONE;
+		}
+		return (PARTY_STATUS)partyData.status;
 	}
 
 	public PartyModel.SlotInfo GetSlotInfoByIndex(int idx)
@@ -324,7 +344,11 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 	public PartyModel.SlotInfo GetSlotInfoByUserId(int user_id)
 	{
 		int slotIndex = GetSlotIndex(user_id);
-		return (slotIndex < 0) ? null : GetSlotInfoByIndex(slotIndex);
+		if (slotIndex < 0)
+		{
+			return null;
+		}
+		return GetSlotInfoByIndex(slotIndex);
 	}
 
 	public int GetMemberCount()
@@ -346,7 +370,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 
 	public static string GenerateToken()
 	{
-		return Guid.NewGuid().ToString().Replace("-", string.Empty);
+		return Guid.NewGuid().ToString().Replace("-", "");
 	}
 
 	public void SendInfo(Action<bool> call_back, bool force = false)
@@ -389,7 +413,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				ClearClan();
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendEnterToClanBase(Action<bool> call_back)
@@ -408,7 +432,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				}
 				call_back(obj: true);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendLeaveFromClanBase(Action<bool> call_back)
@@ -436,7 +460,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				{
 					call_back(obj);
 				}
-			}, string.Empty);
+			});
 		}
 	}
 
@@ -544,12 +568,16 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				break;
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public int GetOwnerUserId()
 	{
-		return (partyData != null) ? partyData.ownerUserId : 0;
+		if (partyData == null)
+		{
+			return 0;
+		}
+		return partyData.ownerUserId;
 	}
 
 	public void RequestApply(ClanApplyModel.RequestSendForm send_param, Action<bool> call_back)
@@ -566,7 +594,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				}
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void RequestApplyCancel(string clanId, Action<bool> call_back)
@@ -581,7 +609,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void RequestEdit(ClanEditClanModel.RequestSendForm clanSetting, Action<bool> call_back)
@@ -595,7 +623,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				UpdateClan(ret.result);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	private void SendLeavePacket()
@@ -626,7 +654,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				SendLeavePacket();
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void RequestKick(ClanKickModel.RequestSendForm send_param, Action<bool> call_back)
@@ -646,7 +674,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				MonoBehaviourSingleton<ClanNetworkManager>.I.SendBroadcast(model);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void RequestEditMember(ClanEditMemberModel.RequestSendForm send_param, Action<bool> call_back)
@@ -659,7 +687,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void RequestEditNoticeBoard(string msg, Action<bool> call_back)
@@ -671,7 +699,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
 			MonoBehaviourSingleton<ClanManager>.I.SetNoticeBoardData(ret.result.clanNoticeBoard, isSaveBoardVersion: true);
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void RequestNoticeBoard(Action<bool> call_back)
@@ -681,19 +709,19 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
 			MonoBehaviourSingleton<ClanManager>.I.SetNoticeBoardData(ret.result.clanNoticeBoard, isSaveBoardVersion: true);
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	private void PopupNoticeBoard()
 	{
 		if (popupNoticeBoardCoroutine != null)
 		{
-			this.StopCoroutine(popupNoticeBoardCoroutine);
+			StopCoroutine(popupNoticeBoardCoroutine);
 			popupNoticeBoardCoroutine = null;
 		}
 		if (!IsAbleToPopupNoticeBoard())
 		{
-			popupNoticeBoardCoroutine = this.StartCoroutine(DelayPlay());
+			popupNoticeBoardCoroutine = StartCoroutine(DelayPlay());
 			return;
 		}
 		EventData[] autoEvents = new EventData[1]
@@ -711,11 +739,11 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 			waitCount = (IsAbleToPopupNoticeBoard() ? (waitCount + 1) : 0);
 			yield return null;
 		}
-		EventData[] autoEventData = new EventData[1]
+		EventData[] autoEvents = new EventData[1]
 		{
 			new EventData("NOTICE_BOARD", null)
 		};
-		MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEventData);
+		MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
 	}
 
 	private bool IsAbleToPopupNoticeBoard()
@@ -773,12 +801,20 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 
 	public static bool IsValidNotEmptyList()
 	{
-		return MonoBehaviourSingleton<ClanMatchingManager>.IsValid() && MonoBehaviourSingleton<ClanMatchingManager>.I.clans != null && MonoBehaviourSingleton<ClanMatchingManager>.I.clans.Count > 0;
+		if (MonoBehaviourSingleton<ClanMatchingManager>.IsValid() && MonoBehaviourSingleton<ClanMatchingManager>.I.clans != null)
+		{
+			return MonoBehaviourSingleton<ClanMatchingManager>.I.clans.Count > 0;
+		}
+		return false;
 	}
 
 	public static bool IsScoutValidNotEmptyList()
 	{
-		return MonoBehaviourSingleton<ClanMatchingManager>.IsValid() && MonoBehaviourSingleton<ClanMatchingManager>.I.scoutClans != null && MonoBehaviourSingleton<ClanMatchingManager>.I.scoutClans.Count > 0;
+		if (MonoBehaviourSingleton<ClanMatchingManager>.IsValid() && MonoBehaviourSingleton<ClanMatchingManager>.I.scoutClans != null)
+		{
+			return MonoBehaviourSingleton<ClanMatchingManager>.I.scoutClans.Count > 0;
+		}
+		return false;
 	}
 
 	public void RequestSearch(Action<bool, Error> call_back, bool saveSettings)
@@ -801,7 +837,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				UpdateSearchList(ret.result);
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SetSearchRequest(ClanSearchModel.RequestSendForm request)
@@ -854,17 +890,15 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 		requestSendForm.cId = clanId;
 		Protocol.Send(ClanDetailModel.URL, requestSendForm, delegate(ClanDetailModel ret)
 		{
-			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				flag = true;
 				if (clanId == "0")
 				{
 					UpdateClan(ret.result.clan);
 				}
 				call_back(ret.result);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void RequestUserDetail(int uId, Action<UserClanData> call_back)
@@ -873,14 +907,12 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 		requestSendForm.uId = uId;
 		Protocol.Send(ClanUserDetailModel.URL, requestSendForm, delegate(ClanUserDetailModel ret)
 		{
-			bool flag = false;
 			if (ret.Error == Error.None)
 			{
-				flag = true;
 				userClanData = ret.result;
 				call_back(ret.result);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void Kick(int userId)
@@ -928,17 +960,18 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 		{
 			return null;
 		}
-		ClanNetworkManager.ConnectData connectData = new ClanNetworkManager.ConnectData();
-		connectData.path = clanServerData.wsHost;
-		connectData.ports = clanServerData.wsPorts;
-		connectData.fromId = id;
-		connectData.ackPrefix = slotIndex;
-		connectData.roomId = partyData.id;
-		connectData.owner = partyData.ownerUserId;
-		connectData.ownerToken = clanServerData.token;
-		connectData.uid = id;
-		connectData.signature = clanServerData.signature;
-		return connectData;
+		return new ClanNetworkManager.ConnectData
+		{
+			path = clanServerData.wsHost,
+			ports = clanServerData.wsPorts,
+			fromId = id,
+			ackPrefix = slotIndex,
+			roomId = partyData.id,
+			owner = partyData.ownerUserId,
+			ownerToken = clanServerData.token,
+			uid = id,
+			signature = clanServerData.signature
+		};
 	}
 
 	public void ConnectServer()
@@ -1045,8 +1078,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 	{
 		SendRoomPartyAFKKick(userId, delegate
 		{
-			IHomeManager currentIHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
-			currentIHomeManager.IHomePeople.CastToLoungePeople()?.DestroyLoungePlayer(userId);
+			GameSceneGlobalSettings.GetCurrentIHomeManager().IHomePeople.CastToLoungePeople()?.DestroyLoungePlayer(userId);
 		});
 	}
 
@@ -1061,8 +1093,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 			{
 				if (ret.Error == Error.None)
 				{
-					PartyModel.SlotInfo slotInfo = ret.result.clanParty.slotInfos.Find((PartyModel.SlotInfo s) => s.userInfo != null && s.userInfo.userId == kickedUserId);
-					if (slotInfo != null)
+					if (ret.result.clanParty.slotInfos.Find((PartyModel.SlotInfo s) => s.userInfo != null && s.userInfo.userId == kickedUserId) != null)
 					{
 						loungeMemberStatus[kickedUserId].UpdateLastExecTime(TimeManager.GetNow().ToUniversalTime());
 					}
@@ -1084,16 +1115,16 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				}
 			}
 			call_back(flag);
-		}, string.Empty);
+		});
 	}
 
 	private void AFKCheck()
 	{
 		if (afkCoroutine != null)
 		{
-			this.StopCoroutine(afkCoroutine);
+			StopCoroutine(afkCoroutine);
 		}
-		afkCoroutine = this.StartCoroutine(DoAFKCheck());
+		afkCoroutine = StartCoroutine(DoAFKCheck());
 	}
 
 	private IEnumerator DoAFKCheck()
@@ -1102,32 +1133,29 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 		{
 			yield break;
 		}
-		List<LoungeMemberStatus> allMember = loungeMemberStatus.GetAll();
-		if (allMember.IsNullOrEmpty() || !(from x in allMember
-		where x.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
-		select x).Any())
+		List<LoungeMemberStatus> all = loungeMemberStatus.GetAll();
+		if (all.IsNullOrEmpty() || !all.Where((LoungeMemberStatus x) => x.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id).Any())
 		{
 			yield break;
 		}
-		LoungeMemberStatus fastest = (from x in allMember
-		where x.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
-		where x.GetStatus() == LoungeMemberStatus.MEMBER_STATUS.LOUNGE
-		orderby x.lastExecTime
-		select x).FirstOrDefault();
+		LoungeMemberStatus fastest = (from x in all
+			where x.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
+			where x.GetStatus() == LoungeMemberStatus.MEMBER_STATUS.LOUNGE
+			orderby x.lastExecTime
+			select x).FirstOrDefault();
 		if (fastest != null)
 		{
-			double waitTime = (AFK_KICK_TIME - (TimeManager.GetNow().ToUniversalTime() - fastest.lastExecTime)).TotalSeconds;
-			if (waitTime > 0.0)
+			double totalSeconds = (AFK_KICK_TIME - (TimeManager.GetNow().ToUniversalTime() - fastest.lastExecTime)).TotalSeconds;
+			if (totalSeconds > 0.0)
 			{
-				yield return (object)new WaitForSeconds((float)waitTime);
+				yield return new WaitForSeconds((float)totalSeconds);
 			}
 			bool wait = true;
 			Protocol.Force(delegate
 			{
 				SendRoomPartyAFKKick(fastest.userId, delegate
 				{
-					IHomeManager currentIHomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
-					currentIHomeManager.IHomePeople.CastToLoungePeople()?.DestroyLoungePlayer(fastest.userId);
+					GameSceneGlobalSettings.GetCurrentIHomeManager().IHomePeople.CastToLoungePeople()?.DestroyLoungePlayer(fastest.userId);
 					wait = false;
 				});
 			});
@@ -1143,7 +1171,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 	{
 		if (afkCoroutine != null)
 		{
-			this.StopCoroutine(afkCoroutine);
+			StopCoroutine(afkCoroutine);
 		}
 	}
 
@@ -1168,7 +1196,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 		{
 			return chatMessagesDESC[0].id;
 		}
-		return string.Empty;
+		return "";
 	}
 
 	public void OnReadMessage(string messageId)
@@ -1186,10 +1214,9 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 
 	public void UpdateUnreadMessage()
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		if ((int)Application.get_internetReachability() != 0 && EnableClanChat && !UsingChatConnection && (!(UnreadCountSyncFixedTime > 0f) || !(UnreadCountSyncFixedTime + (float)chatUpdateInterval > Time.get_fixedTime())))
+		if (Application.internetReachability != 0 && EnableClanChat && !UsingChatConnection && (!(UnreadCountSyncFixedTime > 0f) || !(UnreadCountSyncFixedTime + (float)chatUpdateInterval > Time.fixedTime)))
 		{
-			UnreadCountSyncFixedTime = Time.get_fixedTime();
+			UnreadCountSyncFixedTime = Time.fixedTime;
 			UpdateUnreadMessageCount(delegate
 			{
 				UpdateUnreadCharacterMessage(delegate
@@ -1226,7 +1253,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				{
 					callback();
 				}
-			}, string.Empty);
+			});
 		});
 	}
 
@@ -1256,7 +1283,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				{
 					callback();
 				}
-			}, string.Empty);
+			});
 		});
 	}
 
@@ -1283,16 +1310,14 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				Protocol.Send(ClanChatPostMessageModel.URL, send_form, delegate(ClanChatPostMessageModel ret)
 				{
 					UsingChatConnection = false;
-					bool flag = false;
 					if (ret.Error == Error.None)
 					{
-						flag = true;
 						List<ClanChatMessageModel> collection = chatMessagesDESC;
 						chatMessagesDESC = ret.result.messages;
 						chatMessagesDESC.AddRange(collection);
 						chatConnection.OnAfterSendUserMessage();
 					}
-				}, string.Empty);
+				});
 			});
 		}
 	}
@@ -1362,10 +1387,8 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				Protocol.Send(ClanChatMessageUpdateModel.URL, send_form, delegate(ClanChatMessageUpdateModel ret)
 				{
 					UsingChatConnection = false;
-					bool flag = false;
 					if (ret.Error == Error.None)
 					{
-						flag = true;
 						int count = chatMessagesDESC.Count;
 						List<ClanChatMessageModel> collection = chatMessagesDESC;
 						chatMessagesDESC = ret.result.messages;
@@ -1376,7 +1399,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 							callback();
 						}
 					}
-				}, string.Empty);
+				});
 			});
 		}
 	}
@@ -1460,7 +1483,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 
 	public void StartRequestClanData(Action cb = null)
 	{
-		this.StartCoroutine(RequestClanData(cb));
+		StartCoroutine(RequestClanData(cb));
 	}
 
 	private IEnumerator RequestClanData(Action cb)
@@ -1484,7 +1507,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 
 	public void StartRankUp()
 	{
-		this.StartCoroutine(_RankUp());
+		StartCoroutine(_RankUp());
 	}
 
 	private IEnumerator _RankUp()
@@ -1497,7 +1520,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 		{
 			yield return null;
 		}
-		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("ClanTop", this.get_gameObject(), "ROOM_RANKUP");
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("ClanTop", base.gameObject, "ROOM_RANKUP");
 	}
 
 	public void ChatGetOldMessage(int maxDispatchNum, string oldestId = "")
@@ -1557,10 +1580,8 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 			{
 				Protocol.Send(ClanChatMessageHistoryModel.URL, send_form, delegate(ClanChatMessageUpdateModel ret)
 				{
-					bool flag = false;
 					if (ret.Error == Error.None)
 					{
-						flag = true;
 						chatUpdateInterval = ret.result.updateInterval;
 						if (ret.result.messages.Count > 0)
 						{
@@ -1571,7 +1592,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 							}
 						}
 					}
-				}, string.Empty);
+				});
 			});
 		}
 	}
@@ -1655,7 +1676,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 			{
 				call_back(arg, ret.result);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendAcceptRequest(int userId, Action<bool> call_back)
@@ -1673,7 +1694,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 			{
 				call_back(obj);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendRejectRequest(int userId, Action<bool> call_back)
@@ -1691,7 +1712,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 			{
 				call_back(obj);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendSymbolEditRequest(ClanSymbolData symbol, Action<bool> call_back)
@@ -1714,7 +1735,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 			{
 				call_back(obj);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SendClanInvite(int userId, Action<bool> call_back)
@@ -1738,7 +1759,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				call_back(obj);
 			}
 			MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
-		}, string.Empty);
+		});
 	}
 
 	public void SendClanInviteList(Action<bool> call_back)
@@ -1756,7 +1777,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 			{
 				call_back(obj);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void RemoveClanScoutList(string cId)
@@ -1781,7 +1802,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				}
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendClanCancelInvite(int userId, Action<bool> call_back)
@@ -1800,7 +1821,7 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				call_back(obj);
 			}
 			MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
-		}, string.Empty);
+		});
 	}
 
 	public void SendClanRejectInvite(int clanId, Action<bool> call_back)
@@ -1815,6 +1836,6 @@ public class ClanMatchingManager : MonoBehaviourSingleton<ClanMatchingManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 }

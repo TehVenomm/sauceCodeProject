@@ -21,7 +21,7 @@ public class TweenWidth : UITweener
 		{
 			if (mWidget == null)
 			{
-				mWidget = this.GetComponent<UIWidget>();
+				mWidget = GetComponent<UIWidget>();
 			}
 			return mWidget;
 		}
@@ -61,7 +61,7 @@ public class TweenWidth : UITweener
 		}
 		if (mTable == null)
 		{
-			mTable = NGUITools.FindInParents<UITable>(this.get_gameObject());
+			mTable = NGUITools.FindInParents<UITable>(base.gameObject);
 			if (mTable == null)
 			{
 				updateTable = false;
@@ -73,13 +73,13 @@ public class TweenWidth : UITweener
 
 	public static TweenWidth Begin(UIWidget widget, float duration, int width)
 	{
-		TweenWidth tweenWidth = UITweener.Begin<TweenWidth>(widget.get_gameObject(), duration);
+		TweenWidth tweenWidth = UITweener.Begin<TweenWidth>(widget.gameObject, duration);
 		tweenWidth.from = widget.width;
 		tweenWidth.to = width;
 		if (duration <= 0f)
 		{
 			tweenWidth.Sample(1f, isFinished: true);
-			tweenWidth.set_enabled(false);
+			tweenWidth.enabled = false;
 		}
 		return tweenWidth;
 	}

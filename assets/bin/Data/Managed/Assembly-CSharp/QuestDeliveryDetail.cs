@@ -253,12 +253,12 @@ public class QuestDeliveryDetail : GameSection
 
 	protected virtual void SetBaseFrame()
 	{
-		baseRoot = SetPrefab((Enum)UI.OBJ_BASE_ROOT, "QuestRequestCheckBase");
+		baseRoot = SetPrefab(UI.OBJ_BASE_ROOT, "QuestRequestCheckBase");
 	}
 
 	protected virtual void SetTargetFrame()
 	{
-		targetFrame = SetPrefab((Enum)UI.OBJ_NEED_ITEM_ROOT, "QuestRequestCheckItem");
+		targetFrame = SetPrefab(UI.OBJ_NEED_ITEM_ROOT, "QuestRequestCheckItem");
 	}
 
 	protected virtual void SetSubmissionFrame()
@@ -277,18 +277,16 @@ public class QuestDeliveryDetail : GameSection
 
 	protected void AdjustBtnPosToChangableEquipUI1Btn()
 	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = FindCtrl(baseRoot, GetBtnChangeEquipValue());
-		if (!(val == null))
+		Transform transform = FindCtrl(baseRoot, GetBtnChangeEquipValue());
+		if (!(transform == null))
 		{
-			val.set_localPosition(GetEquipBtnPos());
+			transform.localPosition = GetEquipBtnPos();
 			SetActive(baseRoot, GetBtnChangeEquipValue(), is_visible: true);
 		}
 	}
 
 	protected virtual Vector3 GetEquipBtnPos()
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 		return new Vector3(170f, -340f, 0f);
 	}
 
@@ -326,11 +324,11 @@ public class QuestDeliveryDetail : GameSection
 		uint questId = info.needs[0].questId;
 		if (questId == 0)
 		{
-			SetActive((Enum)UI.BTN_SUBMISSION, is_visible: false);
+			SetActive(UI.BTN_SUBMISSION, is_visible: false);
 			return;
 		}
 		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(questId);
-		SetActive((Enum)UI.BTN_SUBMISSION, questData.IsMissionExist());
+		SetActive(UI.BTN_SUBMISSION, questData.IsMissionExist());
 	}
 
 	protected void UpdateSubMission()
@@ -377,13 +375,13 @@ public class QuestDeliveryDetail : GameSection
 		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(questId);
 		if (!questData.IsMissionExist())
 		{
-			SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, is_visible: false);
+			SetActive(UI.OBJ_SUBMISSION_ROOT, is_visible: false);
 			return;
 		}
 		ClearStatusQuest clearStatusQuestData = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(questId);
 		if (clearStatusQuestData == null)
 		{
-			SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, is_visible: true);
+			SetActive(UI.OBJ_SUBMISSION_ROOT, is_visible: true);
 			int i = 0;
 			for (int num = questData.missionID.Length; i < num; i++)
 			{
@@ -402,7 +400,7 @@ public class QuestDeliveryDetail : GameSection
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, is_visible: true);
+			SetActive(UI.OBJ_SUBMISSION_ROOT, is_visible: true);
 			int j = 0;
 			for (int count = clearStatusQuestData.missionStatus.Count; j < count; j++)
 			{
@@ -432,29 +430,25 @@ public class QuestDeliveryDetail : GameSection
 
 	public override void UpdateUI()
 	{
-		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_065e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_067b: Unknown result type (might be due to invalid IL or missing references)
 		OpenTutorial();
 		UpdateTitle();
 		SetSprite(baseRoot, UI.SPR_WINDOW, SPR_WINDOW_TYPE[info.DeliveryTypeIndex()]);
 		SetSprite(baseRoot, UI.SPR_MESSAGE_BG, SPR_MESSAGE_BG_TYPE[info.DeliveryTypeIndex()]);
 		bool flag = false;
-		if (Object.op_Implicit(submissionFrame))
+		if ((bool)submissionFrame)
 		{
 			UpdateSubMissionButton();
 			UpdateSubMission();
-			flag = submissionFrame.get_gameObject().get_activeSelf();
-			SetActive((Enum)UI.STR_BTN_SUBMISSION, !flag);
-			SetActive((Enum)UI.STR_BTN_SUBMISSION_BACK, flag);
+			flag = submissionFrame.gameObject.activeSelf;
+			SetActive(UI.STR_BTN_SUBMISSION, !flag);
+			SetActive(UI.STR_BTN_SUBMISSION_BACK, flag);
 		}
 		Transform root = targetFrame;
 		MonoBehaviourSingleton<DeliveryManager>.I.GetTargetEnemyData(deliveryID, out targetQuestID, out targetMapID, out string map_name, out string enemy_name, out DIFFICULTY_TYPE? difficulty, out targetPortalID);
 		SetLabelText(root, UI.LBL_PLACE_NAME, map_name);
 		MonoBehaviourSingleton<DeliveryManager>.I.GetAllProgressDelivery(deliveryID, out int have, out int need);
-		SetLabelText(root, UI.LBL_HAVE, (!isComplete) ? have.ToString() : need.ToString());
-		SetColor(root, UI.LBL_HAVE, (!isComplete) ? Color.get_red() : Color.get_white());
+		SetLabelText(root, UI.LBL_HAVE, isComplete ? need.ToString() : have.ToString());
+		SetColor(root, UI.LBL_HAVE, isComplete ? Color.white : Color.red);
 		SetLabelText(root, UI.LBL_NEED, need.ToString());
 		SetLabelText(root, UI.LBL_NEED_ITEM_NAME, MonoBehaviourSingleton<DeliveryManager>.I.GetTargetItemName(deliveryID));
 		if (info.IsDefeatCondition())
@@ -462,12 +456,12 @@ public class QuestDeliveryDetail : GameSection
 			if (targetQuestID != 0)
 			{
 				isQuestEnemy = true;
-				Transform val = FindCtrl(root, UI.OBJ_DIFFICULTY_ROOT);
+				Transform transform = FindCtrl(root, UI.OBJ_DIFFICULTY_ROOT);
 				int value = (int)difficulty.Value;
 				int j = 0;
-				for (int childCount = val.get_childCount(); j < childCount; j++)
+				for (int childCount = transform.childCount; j < childCount; j++)
 				{
-					Transform child = val.GetChild(j);
+					Transform child = transform.GetChild(j);
 					SetActive(child, j <= value);
 				}
 				SetLabelText(root, UI.LBL_GET_PLACE, base.sectionData.GetText("GET_QUEST"));
@@ -490,10 +484,10 @@ public class QuestDeliveryDetail : GameSection
 		UpdateNPC(map_name, enemy_name);
 		if ((isComplete || isNotice) && !isCompletedEventDelivery)
 		{
-			SetActive((Enum)UI.OBJ_BACK, is_visible: false);
-			SetActive((Enum)UI.BTN_CREATE, is_visible: false);
-			SetActive((Enum)UI.BTN_JOIN, is_visible: false);
-			SetActive((Enum)UI.BTN_MATCHING, is_visible: false);
+			SetActive(UI.OBJ_BACK, is_visible: false);
+			SetActive(UI.BTN_CREATE, is_visible: false);
+			SetActive(UI.BTN_JOIN, is_visible: false);
+			SetActive(UI.BTN_MATCHING, is_visible: false);
 			SetActive(GetBtnChangeEquipValue(), is_visible: false);
 			if (isNotice)
 			{
@@ -502,7 +496,7 @@ public class QuestDeliveryDetail : GameSection
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_BACK, is_visible: true);
+			SetActive(UI.OBJ_BACK, is_visible: true);
 			bool flag2 = true;
 			bool flag3 = false;
 			if (info == null || info.IsDefeatCondition() || targetMapID != 0)
@@ -582,7 +576,7 @@ public class QuestDeliveryDetail : GameSection
 					}
 					if (jumpButtonType != JumpButtonType.WaveRoom && jumpButtonType != JumpButtonType.seriesRoom && jumpButtonType != JumpButtonType.orderRoom && jumpButtonType != JumpButtonType.eventRoom)
 					{
-						jumpButtonType = ((!flag3) ? JumpButtonType.Quest : JumpButtonType.Map);
+						jumpButtonType = (flag3 ? JumpButtonType.Map : JumpButtonType.Quest);
 					}
 				}
 				UpdateUIJumpButton(jumpButtonType);
@@ -601,11 +595,11 @@ public class QuestDeliveryDetail : GameSection
 			}
 			if (flag3 && MonoBehaviourSingleton<FieldManager>.I.currentMapID != targetMapID)
 			{
-				SetColor(baseRoot, UI.LBL_PLACE_NAME, Color.get_red());
+				SetColor(baseRoot, UI.LBL_PLACE_NAME, Color.red);
 			}
 			else
 			{
-				SetColor(baseRoot, UI.LBL_PLACE_NAME, Color.get_white());
+				SetColor(baseRoot, UI.LBL_PLACE_NAME, Color.white);
 			}
 		}
 		int money = 0;
@@ -613,7 +607,7 @@ public class QuestDeliveryDetail : GameSection
 		int carnivalPoint = 0;
 		if (rewardData != null)
 		{
-			SetGrid(baseRoot, UI.GRD_REWARD, string.Empty, rewardData.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
+			SetGrid(baseRoot, UI.GRD_REWARD, "", rewardData.Length, reset: false, delegate(int i, Transform t, bool is_recycle)
 			{
 				DeliveryRewardTable.DeliveryRewardData.Reward reward = rewardData[i].reward;
 				bool is_visible = false;
@@ -641,7 +635,7 @@ public class QuestDeliveryDetail : GameSection
 		}
 		SetLabelText(baseRoot, UI.LBL_MONEY, money.ToString());
 		SetLabelText(baseRoot, UI.LBL_EXP, exp.ToString());
-		SetActive((Enum)UI.OBJ_CARNIVAL_ROOT, carnivalPoint > 0);
+		SetActive(UI.OBJ_CARNIVAL_ROOT, carnivalPoint > 0);
 		if (carnivalPoint > 0)
 		{
 			SetLabelText(baseRoot, UI.LBL_POINT_CARNIVAL, carnivalPoint.ToString());
@@ -682,10 +676,10 @@ public class QuestDeliveryDetail : GameSection
 			}
 			else
 			{
-				this.StartCoroutine(StartTweenCoroutine(flag5));
+				StartCoroutine(StartTweenCoroutine(flag5));
 			}
 		}
-		this.StartCoroutine(SetPointShopGetPointUI());
+		StartCoroutine(SetPointShopGetPointUI());
 	}
 
 	private IEnumerator StartTweenCoroutine(bool is_unlock_portal)
@@ -697,9 +691,9 @@ public class QuestDeliveryDetail : GameSection
 		string effectName = "ef_ui_portal_unlock_01";
 		if (is_unlock_portal)
 		{
-			LoadingQueue load_queue = new LoadingQueue(this);
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, effectName);
-			yield return load_queue.Wait();
+			LoadingQueue loadingQueue = new LoadingQueue(this);
+			loadingQueue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, effectName);
+			yield return loadingQueue.Wait();
 			ResetTween(baseRoot, UI.OBJ_UNLOCK_PORTAL_ROOT);
 		}
 		PlayCompleteTween(delegate
@@ -764,12 +758,10 @@ public class QuestDeliveryDetail : GameSection
 			hasDispedMessage = true;
 			int releasedEventId = MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds[0];
 			MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds.RemoveAt(0);
-			Network.EventData eventData = (from e in MonoBehaviourSingleton<QuestManager>.I.eventList
-			where e.eventId == releasedEventId
-			select e).First();
+			Network.EventData eventData = MonoBehaviourSingleton<QuestManager>.I.eventList.Where((Network.EventData e) => e.eventId == releasedEventId).First();
 			if (eventData == null)
 			{
-				Debug.LogError((object)"イベント開放に関して、指定されたIDのイベントが存在しません");
+				Debug.LogError("イベント開放に関して、指定されたIDのイベントが存在しません");
 				DispMessageEventOpen();
 			}
 			else
@@ -792,7 +784,7 @@ public class QuestDeliveryDetail : GameSection
 		NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData((int)info.npcID);
 		SetNPCIcon(baseRoot, UI.TEX_NPC, nPCData.npcModelID, isComplete);
 		SetLabelText(baseRoot, UI.LBL_PERSON_NAME, nPCData.displayName);
-		string text = (!isComplete) ? info.npcComment : info.npcClearComment;
+		string text = isComplete ? info.npcClearComment : info.npcComment;
 		text = text.Replace("{MAP_NAME}", map_name);
 		text = text.Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name);
 		text = text.Replace("{ENEMY_NAME}", enemy_name);
@@ -976,8 +968,7 @@ public class QuestDeliveryDetail : GameSection
 		bool flag = true;
 		if (Singleton<TutorialMessageTable>.IsValid())
 		{
-			TutorialReadData readData = Singleton<TutorialMessageTable>.I.ReadData;
-			flag = readData.HasRead(10003);
+			flag = Singleton<TutorialMessageTable>.I.ReadData.HasRead(10003);
 		}
 		bool flag2 = false;
 		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryID);
@@ -986,9 +977,9 @@ public class QuestDeliveryDetail : GameSection
 			flag2 = true;
 			if (Singleton<TutorialMessageTable>.IsValid())
 			{
-				TutorialReadData readData2 = Singleton<TutorialMessageTable>.I.ReadData;
-				readData2.SetReadId(10003, hasRead: true);
-				readData2.Save();
+				TutorialReadData readData = Singleton<TutorialMessageTable>.I.ReadData;
+				readData.SetReadId(10003, hasRead: true);
+				readData.Save();
 			}
 		}
 		if (flag2)
@@ -1013,10 +1004,9 @@ public class QuestDeliveryDetail : GameSection
 		{
 			yield return queue.Wait();
 		}
-		SetActive((Enum)UI.OBJ_NORMAL_ROOT, is_visible: true);
-		SetLabelText((Enum)UI.LBL_POINT_NORMAL, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopGetPointData[0].basePoint));
-		UITexture normalTex = GetCtrl(UI.TEX_NORMAL_ICON).GetComponent<UITexture>();
-		ResourceLoad.LoadPointIconImageTexture(normalTex, pointShopGetPointData[0].pointShopId);
+		SetActive(UI.OBJ_NORMAL_ROOT, is_visible: true);
+		SetLabelText(UI.LBL_POINT_NORMAL, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopGetPointData[0].basePoint));
+		ResourceLoad.LoadPointIconImageTexture(GetCtrl(UI.TEX_NORMAL_ICON).GetComponent<UITexture>(), pointShopGetPointData[0].pointShopId);
 		if (pointShopGetPointData.Count >= 2)
 		{
 			queue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName((int)pointShopGetPointData[1].pointShopId));
@@ -1024,10 +1014,9 @@ public class QuestDeliveryDetail : GameSection
 			{
 				yield return queue.Wait();
 			}
-			SetActive((Enum)UI.OBJ_EVENT_ROOT, is_visible: true);
-			SetLabelText((Enum)UI.LBL_POINT_EVENT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopGetPointData[1].basePoint));
-			UITexture eventTex = GetCtrl(UI.TEX_EVENT_ICON).GetComponent<UITexture>();
-			ResourceLoad.LoadPointIconImageTexture(eventTex, pointShopGetPointData[1].pointShopId);
+			SetActive(UI.OBJ_EVENT_ROOT, is_visible: true);
+			SetLabelText(UI.LBL_POINT_EVENT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopGetPointData[1].basePoint));
+			ResourceLoad.LoadPointIconImageTexture(GetCtrl(UI.TEX_EVENT_ICON).GetComponent<UITexture>(), pointShopGetPointData[1].pointShopId);
 		}
 	}
 
@@ -1085,7 +1074,7 @@ public class QuestDeliveryDetail : GameSection
 			else if (maxRetryCount > 0)
 			{
 				retryCount++;
-				this.StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
+				StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
 			}
 			else if (!isJoined)
 			{
@@ -1101,7 +1090,7 @@ public class QuestDeliveryDetail : GameSection
 
 	private IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
 	{
-		yield return (object)new WaitForSeconds(time);
+		yield return new WaitForSeconds(time);
 		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, isExplore: false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
 		{
 			if (!is_success)
@@ -1117,7 +1106,7 @@ public class QuestDeliveryDetail : GameSection
 				else
 				{
 					retryCount++;
-					this.StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
+					StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
 				}
 			}
 			else if (!isJoined)
@@ -1264,29 +1253,22 @@ public class QuestDeliveryDetail : GameSection
 			ToSmith();
 			return;
 		}
-		switch (section)
-		{
-		case SMITH_SECTION.EQUIP_GROW:
-		case SMITH_SECTION.EQUIP_EXCEED:
-		case SMITH_SECTION.EQUIP_EVOLVE:
+		if ((uint)(section - 1) <= 2u)
 		{
 			EquipItemInfo growEquipItem = GetGrowEquipItem(section, targetId);
-			if (growEquipItem == null)
+			if (growEquipItem != null)
 			{
-				break;
+				GetOrCreateSmithData<SmithManager.SmithGrowData>().selectEquipData = growEquipItem;
+				if (growEquipItem.IsLevelMax() && growEquipItem.tableData.IsEvolve())
+				{
+					ChangeSmithScene("SmithEvolve");
+				}
+				else
+				{
+					ChangeSmithScene("SmithGrow");
+				}
+				return;
 			}
-			SmithManager.SmithGrowData orCreateSmithData = GetOrCreateSmithData<SmithManager.SmithGrowData>();
-			orCreateSmithData.selectEquipData = growEquipItem;
-			if (growEquipItem.IsLevelMax() && growEquipItem.tableData.IsEvolve())
-			{
-				ChangeSmithScene("SmithEvolve");
-			}
-			else
-			{
-				ChangeSmithScene("SmithGrow");
-			}
-			return;
-		}
 		}
 		ToSmith();
 	}
@@ -1294,8 +1276,7 @@ public class QuestDeliveryDetail : GameSection
 	private EquipItemInfo GetGrowEquipItem(SMITH_SECTION section, XorUInt targetId)
 	{
 		MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType = InventoryManager.INVENTORY_TYPE.ALL_EQUIP;
-		EquipItemInfo[] equipInventoryClone = MonoBehaviourSingleton<InventoryManager>.I.GetEquipInventoryClone();
-		EquipItemInfo[] array = Array.FindAll(equipInventoryClone, (EquipItemInfo e) => e.tableID == (uint)targetId || e.tableData.shadowEvolveEquipItemId == (uint)targetId);
+		EquipItemInfo[] array = Array.FindAll(MonoBehaviourSingleton<InventoryManager>.I.GetEquipInventoryClone(), (EquipItemInfo e) => e.tableID == (uint)targetId || e.tableData.shadowEvolveEquipItemId == (uint)targetId);
 		Array.Sort(array, (EquipItemInfo a, EquipItemInfo b) => (b.uniqueID - a.uniqueID < 0) ? 1 : ((b.uniqueID - a.uniqueID != 0) ? (-1) : 0));
 		EquipItemInfo equipItemInfo = null;
 		switch (section)

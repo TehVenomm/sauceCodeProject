@@ -23,10 +23,10 @@ public class UIQuestInfoSeries : MonoBehaviourSingleton<UIQuestInfoSeries>
 		m_questMgr = MonoBehaviourSingleton<QuestManager>.I;
 		if (!m_questMgr.IsCurrentQuestTypeSeries() && !m_questMgr.IsCurrentQuestTypeSeriesArena())
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 			return;
 		}
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		seriesMax.text = $"/{m_questMgr.GetCurrentQuestSeriesNum()}";
 		m_series = (int)(m_questMgr.currentQuestSeriesIndex + 1);
 		SetSeriesNow(m_series);

@@ -8,7 +8,7 @@ public class CoopClientPacketReceiver : PacketReceiver
 
 	protected virtual void Awake()
 	{
-		coopClient = this.get_gameObject().GetComponent<CoopClient>();
+		coopClient = base.gameObject.GetComponent<CoopClient>();
 	}
 
 	protected override bool HandleCoopEvent(CoopPacket packet)

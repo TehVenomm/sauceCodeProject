@@ -49,7 +49,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
 
 		public override string ToString()
 		{
-			return string.Format("[Participant: '{0}' (id {1}), status={2}, player={3}, connected={4}]", mDisplayName, mParticipantId, mStatus.ToString(), (mPlayer != null) ? mPlayer.ToString() : "NULL", mIsConnectedToRoom);
+			return string.Format("[Participant: '{0}' (id {1}), status={2}, player={3}, connected={4}]", mDisplayName, mParticipantId, mStatus.ToString(), (mPlayer == null) ? "NULL" : mPlayer.ToString(), mIsConnectedToRoom);
 		}
 
 		public int CompareTo(Participant other)
@@ -63,7 +63,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
 			{
 				return false;
 			}
-			if (object.ReferenceEquals(this, obj))
+			if (this == obj)
 			{
 				return true;
 			}
@@ -77,7 +77,11 @@ namespace GooglePlayGames.BasicApi.Multiplayer
 
 		public override int GetHashCode()
 		{
-			return (mParticipantId != null) ? mParticipantId.GetHashCode() : 0;
+			if (mParticipantId == null)
+			{
+				return 0;
+			}
+			return mParticipantId.GetHashCode();
 		}
 	}
 }

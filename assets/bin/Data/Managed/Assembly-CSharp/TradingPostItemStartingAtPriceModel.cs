@@ -7,7 +7,7 @@ public class TradingPostItemStartingAtPriceModel : BaseModel
 		public int itemId;
 	}
 
-	public static string URL = "/ajax/trading-post/daily-item-summary";
+	public static string URL = "ajax/trading-post/daily-item-summary";
 
 	public TradingPostItemStartingAtPrice result = new TradingPostItemStartingAtPrice();
 }

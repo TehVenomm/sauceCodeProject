@@ -18,25 +18,20 @@ public class MultiLockMarker : MonoBehaviour
 
 	public List<int> lockOrder => _lockOrder;
 
-	public MultiLockMarker()
-		: this()
-	{
-	}
-
 	private void Update()
 	{
 		if (_lockInterval >= 0f)
 		{
-			_lockInterval -= Time.get_deltaTime();
+			_lockInterval -= Time.deltaTime;
 		}
 	}
 
 	public void Init()
 	{
-		_transform = this.get_transform();
+		_transform = base.transform;
 		_lockOrder.Clear();
 		_lockInterval = 0f;
-		info = ((!MonoBehaviourSingleton<InGameSettingsManager>.IsValid()) ? null : MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo);
+		info = (MonoBehaviourSingleton<InGameSettingsManager>.IsValid() ? MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo : null);
 	}
 
 	private bool CanLock()
@@ -63,7 +58,7 @@ public class MultiLockMarker : MonoBehaviour
 			return false;
 		}
 		_lockOrder.Add(sumLockNum + 1);
-		_lockInterval = ((!isBoost) ? info.soulLockRegionInterval : info.soulBoostLockRegionInterval);
+		_lockInterval = (isBoost ? info.soulBoostLockRegionInterval : info.soulLockRegionInterval);
 		animator.SetInteger("state", _lockOrder.Count);
 		EffectManager.GetEffect("ef_btl_wsk2_bow_lock_02", _transform);
 		return true;

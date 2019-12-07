@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,7 +28,7 @@ public class ClanAcceptDialog : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	protected IEnumerator DoInitialize()
@@ -62,8 +61,8 @@ public class ClanAcceptDialog : GameSection
 		SetupSrollBarCollider();
 		SetupPaging();
 		int num = CreatePageList();
-		SetActive((Enum)UI.STR_NON_LIST, num == 0);
-		SetDynamicList((Enum)UI.GRD_LIST, "ClanAcceptListItem", num, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetActive(UI.STR_NON_LIST, num == 0);
+		SetDynamicList(UI.GRD_LIST, "ClanAcceptListItem", num, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			SetupItem(t, i);
 			SetActive(t, is_visible: true);
@@ -72,12 +71,6 @@ public class ClanAcceptDialog : GameSection
 
 	private void SetupSrollBarCollider()
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_SCROLL_BAR);
 		if (ctrl == null)
 		{
@@ -89,21 +82,17 @@ public class ClanAcceptDialog : GameSection
 			BoxCollider component2 = ctrl.GetComponent<BoxCollider>();
 			if (!(component2 == null))
 			{
-				BoxCollider obj = component2;
-				Vector3 size = component2.get_size();
-				float x = size.x;
-				Vector2 localSize = component.localSize;
-				obj.set_size(Vector2.op_Implicit(new Vector2(x, localSize.y)));
+				component2.size = new Vector2(component2.size.x, component.localSize.y);
 			}
 		}
 	}
 
 	private void SetupPaging()
 	{
-		SetPageNumText((Enum)UI.LBL_NOW, nowPage + 1);
-		SetPageNumText((Enum)UI.LBL_MAX, pageNumMax);
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
+		SetPageNumText(UI.LBL_NOW, nowPage + 1);
+		SetPageNumText(UI.LBL_MAX, pageNumMax);
+		SetActive(UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
+		SetActive(UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
 	}
 
 	private int CreatePageList()
@@ -131,7 +120,7 @@ public class ClanAcceptDialog : GameSection
 		ClanAcceptListItem clanAcceptListItem = t.GetComponent<ClanAcceptListItem>();
 		if (clanAcceptListItem == null)
 		{
-			clanAcceptListItem = t.get_gameObject().AddComponent<ClanAcceptListItem>();
+			clanAcceptListItem = t.gameObject.AddComponent<ClanAcceptListItem>();
 		}
 		clanAcceptListItem.InitUI();
 		clanAcceptListItem.Setup(t, index, pageList[index]);

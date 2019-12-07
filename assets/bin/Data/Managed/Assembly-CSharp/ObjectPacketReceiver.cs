@@ -27,22 +27,22 @@ public class ObjectPacketReceiver : PacketReceiver
 	{
 		if (set_object is Enemy)
 		{
-			return set_object.get_gameObject().AddComponent<EnemyPacketReceiver>();
+			return set_object.gameObject.AddComponent<EnemyPacketReceiver>();
 		}
 		if (set_object is Player)
 		{
-			return set_object.get_gameObject().AddComponent<PlayerPacketReceiver>();
+			return set_object.gameObject.AddComponent<PlayerPacketReceiver>();
 		}
 		if (set_object is Character)
 		{
-			return set_object.get_gameObject().AddComponent<CharacterPacketReceiver>();
+			return set_object.gameObject.AddComponent<CharacterPacketReceiver>();
 		}
-		return set_object.get_gameObject().AddComponent<ObjectPacketReceiver>();
+		return set_object.gameObject.AddComponent<ObjectPacketReceiver>();
 	}
 
 	protected virtual void Awake()
 	{
-		owner = this.GetComponent<StageObject>();
+		owner = GetComponent<StageObject>();
 	}
 
 	public override void SetStopPacketUpdate(bool is_stop)
@@ -53,7 +53,7 @@ public class ObjectPacketReceiver : PacketReceiver
 	public override void Set(CoopPacket packet)
 	{
 		base.Set(packet);
-		packet.GetModel<Coop_Model_ObjectBase>()?.SetReceiveTime(Time.get_time());
+		packet.GetModel<Coop_Model_ObjectBase>()?.SetReceiveTime(Time.time);
 	}
 
 	protected override void PacketUpdate()
@@ -115,7 +115,7 @@ public class ObjectPacketReceiver : PacketReceiver
 					{
 						num = MonoBehaviourSingleton<InGameSettingsManager>.I.stageObject.packetHandleMarginTime;
 					}
-					if (Time.get_time() > model2.GetReceiveTime() + num)
+					if (Time.time > model2.GetReceiveTime() + num)
 					{
 						flag = true;
 						if (!model2.IsHandleable(owner))
@@ -144,7 +144,7 @@ public class ObjectPacketReceiver : PacketReceiver
 				}
 				continue;
 			}
-			if (Time.get_time() > model2.GetReceiveTime() + 20f)
+			if (Time.time > model2.GetReceiveTime() + 20f)
 			{
 				Log.Warning(LOG.COOP, "ObjectPacketReceiver::PacketUpdate() Err. ( Over 20 Second. ) type : " + coopPacket2.packetType);
 			}
@@ -187,15 +187,10 @@ public class ObjectPacketReceiver : PacketReceiver
 
 	public virtual bool GetPredictivePosition(out Vector3 pos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		pos = Vector3.get_zero();
+		pos = Vector3.zero;
 		for (int num = base.packets.Count - 1; num >= 0; num--)
 		{
-			CoopPacket coopPacket = base.packets[num];
-			Coop_Model_ObjectBase model = coopPacket.GetModel<Coop_Model_ObjectBase>();
+			Coop_Model_ObjectBase model = base.packets[num].GetModel<Coop_Model_ObjectBase>();
 			if (model != null && model.IsHaveObjectPosition())
 			{
 				pos = model.GetObjectPosition();
@@ -207,7 +202,6 @@ public class ObjectPacketReceiver : PacketReceiver
 
 	protected override bool HandleCoopEvent(CoopPacket packet)
 	{
-		//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
 		switch (packet.packetType)
 		{
 		case PACKET_TYPE.OBJECT_DESTROY:
@@ -218,8 +212,7 @@ public class ObjectPacketReceiver : PacketReceiver
 			return owner.DestroyObject();
 		case PACKET_TYPE.OBJECT_ATTACKED_HIT_OWNER:
 		{
-			Coop_Model_ObjectAttackedHitOwner model9 = packet.GetModel<Coop_Model_ObjectAttackedHitOwner>();
-			model9.CopyAttackedHitStatus(out AttackedHitStatusOwner status2);
+			packet.GetModel<Coop_Model_ObjectAttackedHitOwner>().CopyAttackedHitStatus(out AttackedHitStatusOwner status2);
 			if (owner.IsEnableAttackedHitOwner())
 			{
 				owner.OnAttackedHitOwner(status2);
@@ -234,8 +227,7 @@ public class ObjectPacketReceiver : PacketReceiver
 		}
 		case PACKET_TYPE.OBJECT_ATTACKED_HIT_FIX:
 		{
-			Coop_Model_ObjectAttackedHitFix model8 = packet.GetModel<Coop_Model_ObjectAttackedHitFix>();
-			model8.CopyAttackedHitStatus(out AttackedHitStatusFix status);
+			packet.GetModel<Coop_Model_ObjectAttackedHitFix>().CopyAttackedHitStatus(out AttackedHitStatusFix status);
 			owner.OnAttackedHitFix(status);
 			break;
 		}

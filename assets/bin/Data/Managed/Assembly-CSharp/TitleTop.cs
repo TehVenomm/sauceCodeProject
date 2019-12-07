@@ -1,6 +1,5 @@
 using Network;
 using rhyme;
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -37,7 +36,7 @@ public class TitleTop : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -84,21 +83,21 @@ public class TitleTop : GameSection
 		{
 			yield return null;
 		}
-		Transform director_t = ResourceUtility.Realizes(lo_director.loadedObject);
-		if (director_t != null)
+		Transform transform = ResourceUtility.Realizes(lo_director.loadedObject);
+		if (transform != null)
 		{
-			director = director_t.GetComponent<TutorialBossDirector>();
+			director = transform.GetComponent<TutorialBossDirector>();
 			if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.NeedModifyTitleTop)
 			{
 				DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
-				director.logo.camera.set_orthographicSize(specialDeviceInfo.TitleTopCameraSize);
-				director.logo.bg.get_transform().set_localScale(specialDeviceInfo.TitleTopBGScale);
+				director.logo.camera.orthographicSize = specialDeviceInfo.TitleTopCameraSize;
+				director.logo.bg.transform.localScale = specialDeviceInfo.TitleTopBGScale;
 			}
 			director.StartLogoAnimation(tutorial_flag: false, null, delegate
 			{
 				SetActiveUI(enable: true);
 			});
-			MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>().set_enabled(false);
+			MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>().enabled = false;
 		}
 		else
 		{
@@ -110,7 +109,7 @@ public class TitleTop : GameSection
 
 	private void SetActiveUI(bool enable)
 	{
-		GetCtrl(UI.Container).get_gameObject().SetActive(enable);
+		GetCtrl(UI.Container).gameObject.SetActive(enable);
 	}
 
 	public override void UpdateUI()
@@ -119,11 +118,11 @@ public class TitleTop : GameSection
 		SetVisibleWidgetEffect(UI.TEX_BG, "ef_ui_title_01");
 		if (MonoBehaviourSingleton<GlobalSettingsManager>.I.submissionVersion)
 		{
-			SetActive((Enum)UI.BTN_ADVANCED_LOGIN, is_visible: false);
+			SetActive(UI.BTN_ADVANCED_LOGIN, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_ADVANCED_LOGIN, !MonoBehaviourSingleton<AccountManager>.I.account.IsRegist());
+			SetActive(UI.BTN_ADVANCED_LOGIN, !MonoBehaviourSingleton<AccountManager>.I.account.IsRegist());
 		}
 	}
 
@@ -132,8 +131,8 @@ public class TitleTop : GameSection
 		base.Exit();
 		if (director != null)
 		{
-			Object.Destroy(director.get_gameObject());
-			MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>().set_enabled(true);
+			Object.Destroy(director.gameObject);
+			MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>().enabled = true;
 		}
 	}
 
@@ -152,8 +151,6 @@ public class TitleTop : GameSection
 
 	private void OnQuery_PUSH_START()
 	{
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
 		if (null != tapEffect)
 		{
 			return;
@@ -177,24 +174,24 @@ public class TitleTop : GameSection
 			rymFX component = tapEffect.GetComponent<rymFX>();
 			if (null != component && null != director)
 			{
-				component.Cameras = (Camera[])new Camera[1]
+				component.Cameras = new Camera[1]
 				{
 					director.logoCamera
 				};
 			}
-			tapEffect.set_localPosition(new Vector3(0f, 1000f, 0.1f));
-			tapEffect.set_localScale(new Vector3(11f, 11f, 1f));
-			tapEffect.get_gameObject().SetActive(true);
+			tapEffect.localPosition = new Vector3(0f, 1000f, 0.1f);
+			tapEffect.localScale = new Vector3(11f, 11f, 1f);
+			tapEffect.gameObject.SetActive(value: true);
 		}
-		SetActive((Enum)UI.BTN_CLEARCACHE, is_visible: false);
-		this.StartCoroutine(DelayStart());
+		SetActive(UI.BTN_CLEARCACHE, is_visible: false);
+		StartCoroutine(DelayStart());
 	}
 
 	private IEnumerator DelayStart()
 	{
-		yield return (object)new WaitForSeconds(0.5f);
-		SetActive((Enum)UI.BTN_START, is_visible: false);
-		yield return (object)new WaitForSeconds(1.5f);
+		yield return new WaitForSeconds(0.5f);
+		SetActive(UI.BTN_START, is_visible: false);
+		yield return new WaitForSeconds(1.5f);
 		DispatchEvent("START");
 	}
 
@@ -214,8 +211,10 @@ public class TitleTop : GameSection
 		}
 		else if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep > 0 && MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep <= 2)
 		{
-			if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 1 || MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 2)
+			if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep != 1)
 			{
+				_ = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep;
+				_ = 2;
 			}
 			DispatchEvent("MAIN_MENU_HOME");
 		}

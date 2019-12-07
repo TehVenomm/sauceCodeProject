@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,32 +20,32 @@ public class GuildSettings : GameSection
 		base.Initialize();
 		if (MonoBehaviourSingleton<GuildManager>.I.guildData.clanMasterId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 		{
-			SetActive((Enum)UI.BTN_SETTING, is_visible: true);
-			SetActive((Enum)UI.BTN_DELETE, is_visible: true);
-			SetActive((Enum)UI.BTN_LEAVE, is_visible: false);
+			SetActive(UI.BTN_SETTING, is_visible: true);
+			SetActive(UI.BTN_DELETE, is_visible: true);
+			SetActive(UI.BTN_LEAVE, is_visible: false);
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_SETTING, is_visible: false);
-			SetActive((Enum)UI.BTN_DELETE, is_visible: false);
-			SetActive((Enum)UI.BTN_LEAVE, is_visible: true);
+			SetActive(UI.BTN_SETTING, is_visible: false);
+			SetActive(UI.BTN_DELETE, is_visible: false);
+			SetActive(UI.BTN_LEAVE, is_visible: true);
 		}
 		if (MonoBehaviourSingleton<GuildManager>.I.guildData.privacy == 2)
 		{
 			if (MonoBehaviourSingleton<GuildManager>.I.guildData.clanMasterId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
 			{
-				SetActive((Enum)UI.BTN_INVITE, is_visible: true);
+				SetActive(UI.BTN_INVITE, is_visible: true);
 			}
 			else
 			{
-				SetActive((Enum)UI.BTN_INVITE, is_visible: false);
+				SetActive(UI.BTN_INVITE, is_visible: false);
 			}
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_INVITE, is_visible: true);
+			SetActive(UI.BTN_INVITE, is_visible: true);
 		}
-		SetActive((Enum)UI.SPR_BADGE, is_visible: false);
+		SetActive(UI.SPR_BADGE, is_visible: false);
 		UpdateBadge();
 	}
 
@@ -65,7 +64,7 @@ public class GuildSettings : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.LBL_GUILD_ID, $"{MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId:D5}");
+		SetLabelText(UI.LBL_GUILD_ID, $"{MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId:D5}");
 	}
 
 	private void OnQuery_MESSAGE()

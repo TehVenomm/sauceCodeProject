@@ -57,11 +57,6 @@ public class BMSymbol
 
 	public bool Validate(UIAtlas atlas)
 	{
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
 		if (atlas == null)
 		{
 			return false;
@@ -72,7 +67,7 @@ public class BMSymbol
 			{
 				return false;
 			}
-			mSprite = ((!(atlas != null)) ? null : atlas.GetSprite(spriteName));
+			mSprite = ((atlas != null) ? atlas.GetSprite(spriteName) : null);
 			if (mSprite != null)
 			{
 				Texture texture = atlas.texture;
@@ -82,8 +77,8 @@ public class BMSymbol
 				}
 				else
 				{
-					mUV = new Rect((float)mSprite.x, (float)mSprite.y, (float)mSprite.width, (float)mSprite.height);
-					mUV = NGUIMath.ConvertToTexCoords(mUV, texture.get_width(), texture.get_height());
+					mUV = new Rect(mSprite.x, mSprite.y, mSprite.width, mSprite.height);
+					mUV = NGUIMath.ConvertToTexCoords(mUV, texture.width, texture.height);
 					mOffsetX = mSprite.paddingLeft;
 					mOffsetY = mSprite.paddingTop;
 					mWidth = mSprite.width;

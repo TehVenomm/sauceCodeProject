@@ -11,7 +11,7 @@ public class MessageDialog : CommonDialog
 		if (text == null)
 		{
 			string[] texts = GetTexts(data_object as object[], message_category);
-			base.InitDialog(new Desc(TYPE.OK, (texts.Length <= 0) ? string.Empty : texts[0], (texts.Length <= 1) ? string.Empty : texts[1]));
+			base.InitDialog(new Desc(TYPE.OK, (texts.Length != 0) ? texts[0] : string.Empty, (texts.Length > 1) ? texts[1] : string.Empty));
 		}
 		else
 		{

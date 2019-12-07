@@ -42,12 +42,24 @@ public class TargetController
 		if (stageObject is Player)
 		{
 			Player player = stageObject as Player;
-			return (player.isDead && player.rescueTime > 0f) || (player.IsStone() && player.stoneRescueTime > 0f);
+			if (!player.isDead || !(player.rescueTime > 0f))
+			{
+				if (player.IsStone())
+				{
+					return player.stoneRescueTime > 0f;
+				}
+				return false;
+			}
+			return true;
 		}
 		if (stageObject is Character)
 		{
 			Character character = stageObject as Character;
-			return character.isDead || character.IsStone();
+			if (!character.isDead)
+			{
+				return character.IsStone();
+			}
+			return true;
 		}
 		return false;
 	}
@@ -59,13 +71,9 @@ public class TargetController
 		{
 			for (int i = 0; i < player.prayerIds.Count; i++)
 			{
-				if (player.prayerIds[i] != brain.owner.id)
+				if (player.prayerIds[i] != brain.owner.id && !(MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(player.prayerIds[i]) as Player).isNpc)
 				{
-					Player player2 = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(player.prayerIds[i]) as Player;
-					if (!player2.isNpc)
-					{
-						return true;
-					}
+					return true;
 				}
 			}
 		}
@@ -123,8 +131,7 @@ public class TargetController
 	{
 		StageObject obj = null;
 		double len = double.MaxValue;
-		List<OpponentMemory.OpponentRecord> listOfSensedOpponent = brain.opponentMem.GetListOfSensedOpponent();
-		listOfSensedOpponent.ForEach(delegate(OpponentMemory.OpponentRecord t)
+		brain.opponentMem.GetListOfSensedOpponent().ForEach(delegate(OpponentMemory.OpponentRecord t)
 		{
 			if ((double)t.record.distance < len)
 			{
@@ -174,8 +181,7 @@ public class TargetController
 			return null;
 		}
 		int index = Utility.Random(listOfSensedOpponent.Count);
-		OpponentMemory.OpponentRecord opponentRecord = listOfSensedOpponent[index];
-		return opponentRecord.obj;
+		return listOfSensedOpponent[index].obj;
 	}
 
 	public OpponentMemory.OpponentRecord GetOpponent()
@@ -308,19 +314,16 @@ public class TargetController
 
 	public Vector3 GetTargetPosition()
 	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 		return GetOpponent().record.pos;
 	}
 
 	public Vector3 GetAttackPosition()
 	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 		return GetOpponent().record.attackPos;
 	}
 
 	public float GetLengthWithAttackPos(Vector3 check_pos)
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 		StageObject currentTarget = GetCurrentTarget();
 		if (currentTarget == null)
 		{

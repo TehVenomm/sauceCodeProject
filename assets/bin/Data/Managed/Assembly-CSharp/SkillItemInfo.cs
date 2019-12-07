@@ -119,9 +119,29 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 		"[supportTime3]"
 	};
 
-	public bool isAttached => equipSetSkill != null && equipSetSkill.Count > 0;
+	public bool isAttached
+	{
+		get
+		{
+			if (equipSetSkill != null)
+			{
+				return equipSetSkill.Count > 0;
+			}
+			return false;
+		}
+	}
 
-	public bool isUniqueAttached => uniqueEquipSetSkill != null && uniqueEquipSetSkill.equipItemUniqId != 0;
+	public bool isUniqueAttached
+	{
+		get
+		{
+			if (uniqueEquipSetSkill != null)
+			{
+				return uniqueEquipSetSkill.equipItemUniqId != 0;
+			}
+			return false;
+		}
+	}
 
 	public int atk => atkList[0];
 
@@ -235,7 +255,7 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 		{
 			if (ulong.TryParse(equipSlot.euid, out ulong result))
 			{
-				if (result != 0)
+				if (result != 0L)
 				{
 					equipSetSkill.Add(new EquipSetSkillData(equipSlot));
 				}
@@ -326,74 +346,62 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 
 	private int GetGrowParamAtk(bool is_next_level = false)
 	{
-		GrowSkillItemTable.GrowSkillItemData growSkillItemData = (!is_next_level) ? growData : nextGrowData;
-		return growSkillItemData.GetGrowParamAtk(tableData.baseAtk);
+		return (is_next_level ? nextGrowData : growData).GetGrowParamAtk(tableData.baseAtk);
 	}
 
 	private int GetGrowParamDef(bool is_next_level = false)
 	{
-		GrowSkillItemTable.GrowSkillItemData growSkillItemData = (!is_next_level) ? growData : nextGrowData;
-		return growSkillItemData.GetGrowParamDef(tableData.baseDef);
+		return (is_next_level ? nextGrowData : growData).GetGrowParamDef(tableData.baseDef);
 	}
 
 	private int GetGrowParamHp(bool is_next_level = false)
 	{
-		GrowSkillItemTable.GrowSkillItemData growSkillItemData = (!is_next_level) ? growData : nextGrowData;
-		return growSkillItemData.GetGrowParamHp(tableData.baseHp);
+		return (is_next_level ? nextGrowData : growData).GetGrowParamHp(tableData.baseHp);
 	}
 
 	private int GetGrowParamSkillAtk(bool is_next_level = false)
 	{
-		GrowSkillItemTable.GrowSkillItemData growSkillItemData = (!is_next_level) ? growData : nextGrowData;
-		return growSkillItemData.GetGrowParamSkillAtk(tableData.skillAtk);
+		return (is_next_level ? nextGrowData : growData).GetGrowParamSkillAtk(tableData.skillAtk);
 	}
 
 	private int GetGrowParamSkillAtkRate(bool is_next_level = false)
 	{
-		GrowSkillItemTable.GrowSkillItemData growSkillItemData = (!is_next_level) ? growData : nextGrowData;
-		return growSkillItemData.GetGrowParamSkillAtkRate(tableData.skillAtkRate);
+		return (is_next_level ? nextGrowData : growData).GetGrowParamSkillAtkRate(tableData.skillAtkRate);
 	}
 
 	private int GetGrowParamHealHp(bool is_next_level = false)
 	{
-		GrowSkillItemTable.GrowSkillItemData growSkillItemData = (!is_next_level) ? growData : nextGrowData;
-		return growSkillItemData.GetGrowParamHealHp(tableData.healHp);
+		return (is_next_level ? nextGrowData : growData).GetGrowParamHealHp(tableData.healHp);
 	}
 
 	private int GetGrowParamSupprtValue(int index, bool is_next_level = false)
 	{
-		GrowSkillItemTable.GrowSkillItemData growSkillItemData = (!is_next_level) ? growData : nextGrowData;
-		return growSkillItemData.GetGrowParamSupprtValue(tableData.supportValue, index);
+		return (is_next_level ? nextGrowData : growData).GetGrowParamSupprtValue(tableData.supportValue, index);
 	}
 
 	private float GetGrowParamSupprtTime(int index, bool is_next_level = false)
 	{
-		GrowSkillItemTable.GrowSkillItemData growSkillItemData = (!is_next_level) ? growData : nextGrowData;
-		return growSkillItemData.GetGrowParamSupprtTime(tableData.supportTime, index);
+		return (is_next_level ? nextGrowData : growData).GetGrowParamSupprtTime(tableData.supportTime, index);
 	}
 
 	private int[] GetGrowParamElemAtk(bool is_next_level = false)
 	{
-		GrowSkillItemTable.GrowSkillItemData growSkillItemData = (!is_next_level) ? growData : nextGrowData;
-		return growSkillItemData.GetGrowParamElemAtk(tableData.atkElement);
+		return (is_next_level ? nextGrowData : growData).GetGrowParamElemAtk(tableData.atkElement);
 	}
 
 	private int[] GetGrowParamElemDef(bool is_next_level = false)
 	{
-		GrowSkillItemTable.GrowSkillItemData growSkillItemData = (!is_next_level) ? growData : nextGrowData;
-		return growSkillItemData.GetGrowParamElemDef(tableData.defElement);
+		return (is_next_level ? nextGrowData : growData).GetGrowParamElemDef(tableData.defElement);
 	}
 
 	private int GetGrowParamNeedExp(bool is_next_level = false)
 	{
-		GrowSkillItemTable.GrowSkillItemData growSkillItemData = (!is_next_level) ? growData : nextGrowData;
-		return growSkillItemData.GetGrowParamNeedExp(tableData.baseNeedExp);
+		return (is_next_level ? nextGrowData : growData).GetGrowParamNeedExp(tableData.baseNeedExp);
 	}
 
 	private int GetGrowParamGiveExp(bool is_next_level = false)
 	{
-		GrowSkillItemTable.GrowSkillItemData growSkillItemData = (!is_next_level) ? growData : nextGrowData;
-		return growSkillItemData.GetGrowParamGiveExp(tableData.baseGiveExp);
+		return (is_next_level ? nextGrowData : growData).GetGrowParamGiveExp(tableData.baseGiveExp);
 	}
 
 	public static InventoryList<SkillItemInfo, SkillItem> CreateList(List<SkillItem> recv_list)
@@ -415,8 +423,7 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 		}
 		recv_list.ForEach(delegate(Item o)
 		{
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)o.itemId);
-			if (itemData.type == ITEM_TYPE.MATERIAL_MAGI && o.num > 0)
+			if (Singleton<ItemTable>.I.GetItemData((uint)o.itemId).type == ITEM_TYPE.MATERIAL_MAGI && o.num > 0)
 			{
 				SkillItem item = new SkillItem
 				{
@@ -511,7 +518,7 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 		if (IsExistNextExceed())
 		{
 			SKILL_SLOT_TYPE type = tableData.type;
-			if (type == SKILL_SLOT_TYPE.ATTACK || type == SKILL_SLOT_TYPE.HEAL || type == SKILL_SLOT_TYPE.SUPPORT)
+			if ((uint)(type - 1) <= 2u)
 			{
 				return true;
 			}
@@ -570,26 +577,24 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 
 	public static string GetExceedExplanationText(SkillItemTable.SkillItemData data, int level, int exceedCnt)
 	{
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 		string text = StringTable.Format(STRING_CATEGORY.SMITH, 8u, GetDecreaseUseGaugePercent(exceedCnt));
 		string text2 = GetExceedExtraText(data, level, exceedCnt);
 		if (!string.IsNullOrEmpty(text2))
 		{
 			text = text + "/" + text2;
 		}
-		string text3 = StringTable.Format(STRING_CATEGORY.SMITH, 11u, StringTable.Format(STRING_CATEGORY.SMITH, 9u, exceedCnt), text);
-		return UIUtility.GetColorText(text3, ExceedSkillItemTable.color);
+		return UIUtility.GetColorText(StringTable.Format(STRING_CATEGORY.SMITH, 11u, StringTable.Format(STRING_CATEGORY.SMITH, 9u, exceedCnt), text), ExceedSkillItemTable.color);
 	}
 
 	public string GetExplanationStatusUpText(string format, bool isExceed, bool isHideExplanation)
 	{
-		string empty = string.Empty;
+		string text = "";
 		if (!isExceed)
 		{
 			return GetExplanationStatusUpText(tableData.text, format, (EXPLANATION_COMMAND cmd) => GetStatusText(cmd));
 		}
-		empty = ((!isHideExplanation) ? (GetExplanationText(tableData.text, (EXPLANATION_COMMAND cmd) => GetStatusText(cmd)) + "\n") : string.Empty);
-		return empty + GetExceedExplanationText(tableData, level, exceedCnt);
+		text = ((!isHideExplanation) ? (GetExplanationText(tableData.text, (EXPLANATION_COMMAND cmd) => GetStatusText(cmd)) + "\n") : "");
+		return text + GetExceedExplanationText(tableData, level, exceedCnt);
 	}
 
 	private static int GetDecreaseUseGaugePercent(int exceedCnt)
@@ -689,59 +694,144 @@ public class SkillItemInfo : ItemInfoBase<SkillItem>
 		switch (cmd)
 		{
 		case EXPLANATION_COMMAND.ATK:
-			return (level <= 1) ? table_data.baseAtk.ToString() : grow_data.GetGrowParamAtk(table_data.baseAtk).ToString();
+			if (level <= 1)
+			{
+				return table_data.baseAtk.ToString();
+			}
+			return grow_data.GetGrowParamAtk(table_data.baseAtk).ToString();
 		case EXPLANATION_COMMAND.DEF:
-			return (level <= 1) ? table_data.baseDef.ToString() : grow_data.GetGrowParamDef(table_data.baseDef).ToString();
+			if (level <= 1)
+			{
+				return table_data.baseDef.ToString();
+			}
+			return grow_data.GetGrowParamDef(table_data.baseDef).ToString();
 		case EXPLANATION_COMMAND.HP:
-			return (level <= 1) ? table_data.baseHp.ToString() : grow_data.GetGrowParamHp(table_data.baseHp).ToString();
+			if (level <= 1)
+			{
+				return table_data.baseHp.ToString();
+			}
+			return grow_data.GetGrowParamHp(table_data.baseHp).ToString();
 		case EXPLANATION_COMMAND.FIRE_ATK:
-			return (level <= 1) ? table_data.atkElement[0].ToString() : grow_data.GetGrowParamElemAtk(table_data.atkElement)[0].ToString();
+			if (level <= 1)
+			{
+				return table_data.atkElement[0].ToString();
+			}
+			return grow_data.GetGrowParamElemAtk(table_data.atkElement)[0].ToString();
 		case EXPLANATION_COMMAND.WATER_ATK:
-			return (level <= 1) ? table_data.atkElement[1].ToString() : grow_data.GetGrowParamElemAtk(table_data.atkElement)[1].ToString();
+			if (level <= 1)
+			{
+				return table_data.atkElement[1].ToString();
+			}
+			return grow_data.GetGrowParamElemAtk(table_data.atkElement)[1].ToString();
 		case EXPLANATION_COMMAND.THUNDER_ATK:
-			return (level <= 1) ? table_data.atkElement[2].ToString() : grow_data.GetGrowParamElemAtk(table_data.atkElement)[2].ToString();
+			if (level <= 1)
+			{
+				return table_data.atkElement[2].ToString();
+			}
+			return grow_data.GetGrowParamElemAtk(table_data.atkElement)[2].ToString();
 		case EXPLANATION_COMMAND.SOIL_ATK:
-			return (level <= 1) ? table_data.atkElement[3].ToString() : grow_data.GetGrowParamElemAtk(table_data.atkElement)[3].ToString();
+			if (level <= 1)
+			{
+				return table_data.atkElement[3].ToString();
+			}
+			return grow_data.GetGrowParamElemAtk(table_data.atkElement)[3].ToString();
 		case EXPLANATION_COMMAND.LIGHR_ATK:
-			return (level <= 1) ? table_data.atkElement[4].ToString() : grow_data.GetGrowParamElemAtk(table_data.atkElement)[4].ToString();
+			if (level <= 1)
+			{
+				return table_data.atkElement[4].ToString();
+			}
+			return grow_data.GetGrowParamElemAtk(table_data.atkElement)[4].ToString();
 		case EXPLANATION_COMMAND.DARK_ATK:
-			return (level <= 1) ? table_data.atkElement[5].ToString() : grow_data.GetGrowParamElemAtk(table_data.atkElement)[5].ToString();
+			if (level <= 1)
+			{
+				return table_data.atkElement[5].ToString();
+			}
+			return grow_data.GetGrowParamElemAtk(table_data.atkElement)[5].ToString();
 		case EXPLANATION_COMMAND.FIRE_DEF:
-			return (level <= 1) ? table_data.defElement[0].ToString() : grow_data.GetGrowParamElemDef(table_data.defElement)[0].ToString();
+			if (level <= 1)
+			{
+				return table_data.defElement[0].ToString();
+			}
+			return grow_data.GetGrowParamElemDef(table_data.defElement)[0].ToString();
 		case EXPLANATION_COMMAND.WATER_DEF:
-			return (level <= 1) ? table_data.defElement[1].ToString() : grow_data.GetGrowParamElemDef(table_data.defElement)[1].ToString();
+			if (level <= 1)
+			{
+				return table_data.defElement[1].ToString();
+			}
+			return grow_data.GetGrowParamElemDef(table_data.defElement)[1].ToString();
 		case EXPLANATION_COMMAND.THUNDER_DEF:
-			return (level <= 1) ? table_data.defElement[2].ToString() : grow_data.GetGrowParamElemDef(table_data.defElement)[2].ToString();
+			if (level <= 1)
+			{
+				return table_data.defElement[2].ToString();
+			}
+			return grow_data.GetGrowParamElemDef(table_data.defElement)[2].ToString();
 		case EXPLANATION_COMMAND.SOIL_DEF:
-			return (level <= 1) ? table_data.defElement[3].ToString() : grow_data.GetGrowParamElemDef(table_data.defElement)[3].ToString();
+			if (level <= 1)
+			{
+				return table_data.defElement[3].ToString();
+			}
+			return grow_data.GetGrowParamElemDef(table_data.defElement)[3].ToString();
 		case EXPLANATION_COMMAND.LIGHR_DEF:
-			return (level <= 1) ? table_data.defElement[4].ToString() : grow_data.GetGrowParamElemDef(table_data.defElement)[4].ToString();
+			if (level <= 1)
+			{
+				return table_data.defElement[4].ToString();
+			}
+			return grow_data.GetGrowParamElemDef(table_data.defElement)[4].ToString();
 		case EXPLANATION_COMMAND.DARK_DEF:
-			return (level <= 1) ? table_data.defElement[5].ToString() : grow_data.GetGrowParamElemDef(table_data.defElement)[5].ToString();
+			if (level <= 1)
+			{
+				return table_data.defElement[5].ToString();
+			}
+			return grow_data.GetGrowParamElemDef(table_data.defElement)[5].ToString();
 		case EXPLANATION_COMMAND.SKILL_ATK:
 		{
-			int num2 = (level <= 1) ? ((int)table_data.skillAtk) : grow_data.GetGrowParamSkillAtk(table_data.skillAtk);
-			return Mathf.FloorToInt((float)num2 * MonoBehaviourSingleton<GlobalSettingsManager>.I.skillItem.explanationAtkDispRate).ToString();
+			int num = (level > 1) ? grow_data.GetGrowParamSkillAtk(table_data.skillAtk) : ((int)table_data.skillAtk);
+			return Mathf.FloorToInt((float)num * MonoBehaviourSingleton<GlobalSettingsManager>.I.skillItem.explanationAtkDispRate).ToString();
 		}
 		case EXPLANATION_COMMAND.SKILL_ATKRATE:
-		{
-			int num = (level <= 1) ? ((int)table_data.skillAtkRate) : grow_data.GetGrowParamSkillAtkRate(table_data.skillAtkRate);
-			return Mathf.FloorToInt((float)num * MonoBehaviourSingleton<GlobalSettingsManager>.I.skillItem.explanationAtkRateDispRate).ToString();
-		}
+			return Mathf.FloorToInt((float)((level > 1) ? grow_data.GetGrowParamSkillAtkRate(table_data.skillAtkRate) : ((int)table_data.skillAtkRate)) * MonoBehaviourSingleton<GlobalSettingsManager>.I.skillItem.explanationAtkRateDispRate).ToString();
 		case EXPLANATION_COMMAND.HEAL_HP:
-			return (level <= 1) ? table_data.healHp.ToString() : grow_data.GetGrowParamHealHp(table_data.healHp).ToString();
+			if (level <= 1)
+			{
+				return table_data.healHp.ToString();
+			}
+			return grow_data.GetGrowParamHealHp(table_data.healHp).ToString();
 		case EXPLANATION_COMMAND.SUPPORT_VALUE_1:
-			return (level <= 1) ? table_data.supportValue[0].ToString() : grow_data.GetGrowParamSupprtValue(table_data.supportValue, 0).ToString();
+			if (level <= 1)
+			{
+				return table_data.supportValue[0].ToString();
+			}
+			return grow_data.GetGrowParamSupprtValue(table_data.supportValue, 0).ToString();
 		case EXPLANATION_COMMAND.SUPPORT_VALUE_2:
-			return (level <= 1) ? table_data.supportValue[1].ToString() : grow_data.GetGrowParamSupprtValue(table_data.supportValue, 1).ToString();
+			if (level <= 1)
+			{
+				return table_data.supportValue[1].ToString();
+			}
+			return grow_data.GetGrowParamSupprtValue(table_data.supportValue, 1).ToString();
 		case EXPLANATION_COMMAND.SUPPORT_VALUE_3:
-			return (level <= 1) ? table_data.supportValue[2].ToString() : grow_data.GetGrowParamSupprtValue(table_data.supportValue, 2).ToString();
+			if (level <= 1)
+			{
+				return table_data.supportValue[2].ToString();
+			}
+			return grow_data.GetGrowParamSupprtValue(table_data.supportValue, 2).ToString();
 		case EXPLANATION_COMMAND.SUPPORT_TIME_1:
-			return (level <= 1) ? table_data.supportTime[0].ToString() : grow_data.GetGrowParamSupprtTime(table_data.supportTime, 0).ToString();
+			if (level <= 1)
+			{
+				return table_data.supportTime[0].ToString();
+			}
+			return grow_data.GetGrowParamSupprtTime(table_data.supportTime, 0).ToString();
 		case EXPLANATION_COMMAND.SUPPORT_TIME_2:
-			return (level <= 1) ? table_data.supportTime[1].ToString() : grow_data.GetGrowParamSupprtTime(table_data.supportTime, 1).ToString();
+			if (level <= 1)
+			{
+				return table_data.supportTime[1].ToString();
+			}
+			return grow_data.GetGrowParamSupprtTime(table_data.supportTime, 1).ToString();
 		case EXPLANATION_COMMAND.SUPPORT_TIME_3:
-			return (level <= 1) ? table_data.supportTime[2].ToString() : grow_data.GetGrowParamSupprtTime(table_data.supportTime, 2).ToString();
+			if (level <= 1)
+			{
+				return table_data.supportTime[2].ToString();
+			}
+			return grow_data.GetGrowParamSupprtTime(table_data.supportTime, 2).ToString();
 		default:
 			Log.Error("explanation command unsupported {0}", EXPLANATION_COMMAND_LIST[(int)cmd]);
 			return EXPLANATION_COMMAND_LIST[(int)cmd];

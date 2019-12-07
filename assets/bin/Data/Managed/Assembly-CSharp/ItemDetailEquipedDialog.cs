@@ -20,7 +20,7 @@ public class ItemDetailEquipedDialog : ItemDetailEquip
 		{
 			return;
 		}
-		Transform child = this.get_transform().GetChild(0);
+		Transform child = base.transform.GetChild(0);
 		if (!(child == null))
 		{
 			ResourceLink component = child.GetComponent<ResourceLink>();

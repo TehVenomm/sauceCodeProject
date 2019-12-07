@@ -28,11 +28,6 @@ public class NodeObject : MonoBehaviour
 		protected set;
 	}
 
-	public NodeObject()
-		: this()
-	{
-	}
-
 	protected virtual bool triggerColliderIsRequired()
 	{
 		return true;
@@ -40,38 +35,37 @@ public class NodeObject : MonoBehaviour
 
 	protected virtual void Awake()
 	{
-		_transform = this.get_transform();
-		_rigidbody = this.GetComponent<Rigidbody>();
+		_transform = base.transform;
+		_rigidbody = GetComponent<Rigidbody>();
 		_collider = GetCollider();
 		if (_collider != null && triggerColliderIsRequired())
 		{
 			if (_rigidbody == null)
 			{
-				_rigidbody = this.get_gameObject().AddComponent<Rigidbody>();
+				_rigidbody = base.gameObject.AddComponent<Rigidbody>();
 			}
-			_rigidbody.set_isKinematic(true);
+			_rigidbody.isKinematic = true;
 		}
 	}
 
 	protected Collider GetCollider()
 	{
-		Collider component = this.GetComponent<Collider>();
+		Collider component = GetComponent<Collider>();
 		if (component == null)
 		{
 			return null;
 		}
 		bool flag = triggerColliderIsRequired();
-		if (component.get_isTrigger() == flag)
+		if (component.isTrigger == flag)
 		{
 			return component;
 		}
-		Collider[] components = this.get_gameObject().GetComponents<Collider>();
-		Collider[] array = components;
-		foreach (Collider val in array)
+		Collider[] components = base.gameObject.GetComponents<Collider>();
+		foreach (Collider collider in components)
 		{
-			if (val.get_isTrigger() == flag)
+			if (collider.isTrigger == flag)
 			{
-				return val;
+				return collider;
 			}
 		}
 		return null;
@@ -81,23 +75,23 @@ public class NodeObject : MonoBehaviour
 	{
 		if (triggerColliderIsRequired())
 		{
-			stageObject = this.get_gameObject().GetComponentInParent<StageObject>();
+			stageObject = base.gameObject.GetComponentInParent<StageObject>();
 		}
 	}
 
 	protected virtual void Update()
 	{
-		if (_collider != null && _collider.get_enabled())
+		if (_collider != null && _collider.enabled)
 		{
-			timeCount += Time.get_deltaTime();
+			timeCount += Time.deltaTime;
 		}
 	}
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		if (!(_collider == null) && _collider.get_enabled() && !collider.get_isTrigger() && !(stageObject == null) && !(collider.get_gameObject() == this.get_gameObject()))
+		if (!(_collider == null) && _collider.enabled && !collider.isTrigger && !(stageObject == null) && !(collider.gameObject == base.gameObject))
 		{
-			StageObject componentInParent = collider.get_gameObject().GetComponentInParent<StageObject>();
+			StageObject componentInParent = collider.gameObject.GetComponentInParent<StageObject>();
 			if (!(componentInParent == null) && !(componentInParent == stageObject))
 			{
 				OnHitTrigger(collider, componentInParent);
@@ -111,9 +105,9 @@ public class NodeObject : MonoBehaviour
 
 	public void SetEnableTrigger(bool enable, bool init = true)
 	{
-		if (_collider != null && _collider.get_isTrigger())
+		if (_collider != null && _collider.isTrigger)
 		{
-			_collider.set_enabled(enable);
+			_collider.enabled = enable;
 		}
 		if (enable && init)
 		{

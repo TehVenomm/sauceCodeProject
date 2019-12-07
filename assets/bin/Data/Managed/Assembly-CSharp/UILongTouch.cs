@@ -10,11 +10,6 @@ public class UILongTouch : MonoBehaviour
 
 	protected float time;
 
-	public UILongTouch()
-		: this()
-	{
-	}
-
 	public static void Set(GameObject button, string event_name, object event_data = null)
 	{
 		if (!(button.GetComponent<UIButton>() == null))
@@ -39,7 +34,7 @@ public class UILongTouch : MonoBehaviour
 
 	protected virtual void OnPress(bool isPressed)
 	{
-		if (TutorialMessage.IsActiveButton(this.get_gameObject()))
+		if (TutorialMessage.IsActiveButton(base.gameObject))
 		{
 			if (isPressed)
 			{
@@ -63,10 +58,10 @@ public class UILongTouch : MonoBehaviour
 		{
 			return;
 		}
-		time -= Time.get_deltaTime();
+		time -= Time.deltaTime;
 		if (time <= 0f)
 		{
-			UIScrollView componentInParent = this.GetComponentInParent<UIScrollView>();
+			UIScrollView componentInParent = GetComponentInParent<UIScrollView>();
 			if ((componentInParent == null || (componentInParent != null && !componentInParent.isDragging)) && TutorialStep.HasAllTutorialCompleted() && !MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && !MonoBehaviourSingleton<GameSceneManager>.I.isCallingOnQuery)
 			{
 				_SendEvent();
@@ -81,6 +76,6 @@ public class UILongTouch : MonoBehaviour
 
 	protected virtual void _SendEvent()
 	{
-		UIGameSceneEventSender.SendEvent("UILongTouch", this.get_gameObject(), eventName, eventData);
+		UIGameSceneEventSender.SendEvent("UILongTouch", base.gameObject, eventName, eventData);
 	}
 }

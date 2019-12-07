@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -48,29 +47,29 @@ public class CrystalShopMaterialDetail : GameSection
 				datas.Add(itemSortData);
 			}
 		}
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		string buttonName = "BTN_SHOP_NORMAL1";
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject lo_button = loadQueue.Load(RESOURCE_CATEGORY.GACHA_BUTTON, buttonName);
-		if (loadQueue.IsLoading())
+		string resource_name = "BTN_SHOP_NORMAL1";
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject lo_button = loadingQueue.Load(RESOURCE_CATEGORY.GACHA_BUTTON, resource_name);
+		if (loadingQueue.IsLoading())
 		{
-			yield return loadQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
-		GameObject buttonObj = Object.Instantiate(lo_button.loadedObject) as GameObject;
-		buttonObj.get_transform().set_parent(FindCtrl(base._transform, UI.OBJ_BUY));
-		buttonObj.get_transform().set_localScale(new Vector3(1f, 1f, 1f));
-		buttonObj.get_transform().set_localPosition(new Vector3(0f, 0f, 0f));
+		GameObject obj = Object.Instantiate(lo_button.loadedObject) as GameObject;
+		obj.transform.parent = FindCtrl(base._transform, UI.OBJ_BUY);
+		obj.transform.localScale = new Vector3(1f, 1f, 1f);
+		obj.transform.localPosition = new Vector3(0f, 0f, 0f);
 		base.Initialize();
 	}
 
 	public override void UpdateUI()
 	{
 		SetLabelText(base._transform, UI.LBL_PRICE, priceStr);
-		SetActive((Enum)UI.SPR_SALE, materialData.offerType == 3);
+		SetActive(UI.SPR_SALE, materialData.offerType == 3);
 		SetGrid(UI.GRD_DETAIL, null, datas.Count, reset: true, delegate(int i, Transform t, bool is_recycle)
 		{
 			ItemSortData data = datas[i];
@@ -122,14 +121,11 @@ public class CrystalShopMaterialDetail : GameSection
 		{
 		case ITEM_ICON_TYPE.ITEM:
 		case ITEM_ICON_TYPE.QUEST_ITEM:
-		{
-			ulong uniqID = data.GetUniqID();
-			if (uniqID != 0)
+			if (data.GetUniqID() != 0L)
 			{
 				is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, data.GetUniqID());
 			}
 			break;
-		}
 		default:
 			is_new = true;
 			break;
@@ -139,28 +135,21 @@ public class CrystalShopMaterialDetail : GameSection
 		int enemy_icon_id = 0;
 		if (iTEM_ICON_TYPE == ITEM_ICON_TYPE.ITEM)
 		{
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(data.GetTableID());
-			enemy_icon_id = itemData.enemyIconID;
+			enemy_icon_id = Singleton<ItemTable>.I.GetItemData(data.GetTableID()).enemyIconID;
 		}
 		ItemIcon itemIcon = null;
-		if (data.GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
+		itemIcon = ((data.GetIconType() != ITEM_ICON_TYPE.QUEST_ITEM) ? ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, num, "DROP", event_data, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id) : ItemIcon.Create(new ItemIcon.ItemIconCreateParam
 		{
-			ItemIcon.ItemIconCreateParam itemIconCreateParam = new ItemIcon.ItemIconCreateParam();
-			itemIconCreateParam.icon_type = data.GetIconType();
-			itemIconCreateParam.icon_id = data.GetIconID();
-			itemIconCreateParam.rarity = data.GetRarity();
-			itemIconCreateParam.parent = holder;
-			itemIconCreateParam.element = data.GetIconElement();
-			itemIconCreateParam.magi_enable_equip_type = data.GetIconMagiEnableType();
-			itemIconCreateParam.num = data.GetNum();
-			itemIconCreateParam.enemy_icon_id = enemy_icon_id;
-			itemIconCreateParam.questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST;
-			itemIcon = ItemIcon.Create(itemIconCreateParam);
-		}
-		else
-		{
-			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, num, "DROP", event_data, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id);
-		}
+			icon_type = data.GetIconType(),
+			icon_id = data.GetIconID(),
+			rarity = data.GetRarity(),
+			parent = holder,
+			element = data.GetIconElement(),
+			magi_enable_equip_type = data.GetIconMagiEnableType(),
+			num = data.GetNum(),
+			enemy_icon_id = enemy_icon_id,
+			questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST
+		}));
 		itemIcon.SetRewardBG(is_visible: true);
 		SetMaterialInfo(itemIcon.transform, data.GetMaterialType(), data.GetTableID(), GetCtrl(UI.PNL_MATERIAL_INFO));
 	}

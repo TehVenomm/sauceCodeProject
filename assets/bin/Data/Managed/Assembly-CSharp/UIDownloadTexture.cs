@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 
 [RequireComponent(typeof(UITexture))]
 public class UIDownloadTexture : MonoBehaviour
@@ -10,19 +11,14 @@ public class UIDownloadTexture : MonoBehaviour
 
 	private Texture2D mTex;
 
-	public UIDownloadTexture()
-		: this()
-	{
-	}
-
 	private IEnumerator Start()
 	{
-		WWW www = new WWW(url);
-		yield return www;
-		mTex = www.get_texture();
+		UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
+		yield return www.SendWebRequest();
+		mTex = DownloadHandlerTexture.GetContent(www);
 		if (mTex != null)
 		{
-			UITexture component = this.GetComponent<UITexture>();
+			UITexture component = GetComponent<UITexture>();
 			component.mainTexture = mTex;
 			if (pixelPerfect)
 			{

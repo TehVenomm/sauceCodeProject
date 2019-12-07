@@ -90,21 +90,21 @@ namespace Network
 
 			public int remainCount = -1;
 
-			public string seriesStartDate = string.Empty;
+			public string seriesStartDate = "";
 
-			public string endDate = string.Empty;
+			public string endDate = "";
 
 			public int seriesId = -1;
 
-			public string description = string.Empty;
+			public string description = "";
 
-			public string detailButtonImg = string.Empty;
+			public string detailButtonImg = "";
 
-			public string link = string.Empty;
+			public string link = "";
 
 			public string campaignDetailImg;
 
-			public string caption = string.Empty;
+			public string caption = "";
 
 			public bool IsEnd
 			{
@@ -124,7 +124,7 @@ namespace Network
 
 			public bool IsDirectPurchase()
 			{
-				return productId != string.Empty;
+				return productId != "";
 			}
 
 			public bool IsOncePurchase()
@@ -144,7 +144,7 @@ namespace Network
 
 			public DateTime GetStartDateTime()
 			{
-				if (seriesStartDate == string.Empty)
+				if (seriesStartDate == "")
 				{
 					return new DateTime(0L);
 				}
@@ -181,22 +181,18 @@ namespace Network
 
 				public Color toColor()
 				{
-					//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-					Color result = default(Color);
-					ColorUtility.TryParseHtmlString(color, ref result);
+					ColorUtility.TryParseHtmlString(color, out Color result);
 					return result;
 				}
 
 				public Color toOutColor()
 				{
-					//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-					Color result = default(Color);
-					ColorUtility.TryParseHtmlString(outColor, ref result);
+					ColorUtility.TryParseHtmlString(outColor, out Color result);
 					return result;
 				}
 			}
 
-			public string pattern = string.Empty;
+			public string pattern = "";
 
 			public TextStyle name = new TextStyle();
 

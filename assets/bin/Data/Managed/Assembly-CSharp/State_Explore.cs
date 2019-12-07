@@ -4,7 +4,6 @@ public class State_Explore : State
 {
 	public override void Enter(StateMachine fsm, Brain brain)
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 		brain.moveCtrl.SetRootPosition(brain.owner.appearPos);
 		Explore(fsm, brain);
 	}
@@ -36,12 +35,6 @@ public class State_Explore : State
 
 	private void Explore(StateMachine fsm, Brain brain)
 	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 		float value = brain.param.moveParam.moveMaxLength * 0.5f;
 		int num = Utility.Random(100);
 		if (num < 15)

@@ -27,11 +27,6 @@ public class HealAttackObject : MonoBehaviour, IAttackCollider
 		set;
 	}
 
-	public HealAttackObject()
-		: this()
-	{
-	}
-
 	protected virtual string GetAttackInfoName()
 	{
 		return "sk_heal_atk";
@@ -39,46 +34,33 @@ public class HealAttackObject : MonoBehaviour, IAttackCollider
 
 	public void Initialize(StageObject attacker, Transform parent, SkillInfo.SkillParam skillParam, Vector3 pos, Vector3 rot, float height, int attackLayer)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 		_Initialize(attacker, parent, pos, rot, height, attackLayer, skillParam.healHp, skillParam.tableData.skillRange);
 	}
 
 	public void Initialize(StageObject attacker, Transform parent, float healAtk, float radius)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		_Initialize(attacker, parent, Vector3.get_zero(), Vector3.get_zero(), 0f, 12, healAtk, radius);
+		_Initialize(attacker, parent, Vector3.zero, Vector3.zero, 0f, 12, healAtk, radius);
 	}
 
 	private void _Initialize(StageObject attacker, Transform parent, Vector3 pos, Vector3 rot, float height, int attackLayer, float healAtk, float radius)
 	{
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
 		m_player = (attacker as Player);
-		this.get_gameObject().set_layer(attackLayer);
-		Player player = m_player;
-		string attackInfoName = GetAttackInfoName();
-		bool isDuplicateAttackInfo = this.isDuplicateAttackInfo;
-		AttackHitInfo attackHitInfo = player.FindAttackInfo(attackInfoName, fix_rate: true, isDuplicateAttackInfo) as AttackHitInfo;
+		base.gameObject.layer = attackLayer;
+		AttackHitInfo attackHitInfo = m_player.FindAttackInfo(GetAttackInfoName(), fix_rate: true, isDuplicateAttackInfo) as AttackHitInfo;
 		attackHitInfo.atk.normal = healAtk;
 		m_attacker = attacker;
 		m_attackInfo = attackHitInfo;
-		Transform transform = this.get_transform();
-		transform.set_parent(parent);
-		transform.set_localEulerAngles(rot);
-		transform.set_localPosition(transform.get_localRotation() * pos);
-		transform.set_localScale(Vector3.get_one());
-		m_capsule.set_direction(2);
-		m_capsule.set_radius(radius);
-		m_capsule.set_height(height);
-		m_capsule.set_enabled(true);
-		m_capsule.set_center(new Vector3(0f, 0f, height * 0.5f));
-		m_capsule.set_isTrigger(true);
+		Transform transform = base.transform;
+		transform.parent = parent;
+		transform.localEulerAngles = rot;
+		transform.localPosition = transform.localRotation * pos;
+		transform.localScale = Vector3.one;
+		m_capsule.direction = 2;
+		m_capsule.radius = radius;
+		m_capsule.height = height;
+		m_capsule.enabled = true;
+		m_capsule.center = new Vector3(0f, 0f, height * 0.5f);
+		m_capsule.isTrigger = true;
 		m_timeCount = 0f;
 		if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
 		{
@@ -93,19 +75,19 @@ public class HealAttackObject : MonoBehaviour, IAttackCollider
 		{
 			m_rigidBody.Sleep();
 		}
-		Object.Destroy(this.get_gameObject());
+		Object.Destroy(base.gameObject);
 	}
 
 	protected void Awake()
 	{
-		m_capsule = this.get_gameObject().AddComponent<CapsuleCollider>();
-		m_rigidBody = this.get_gameObject().AddComponent<Rigidbody>();
-		m_rigidBody.set_useGravity(false);
+		m_capsule = base.gameObject.AddComponent<CapsuleCollider>();
+		m_rigidBody = base.gameObject.AddComponent<Rigidbody>();
+		m_rigidBody.useGravity = false;
 	}
 
 	protected virtual void Update()
 	{
-		m_timeCount += Time.get_deltaTime();
+		m_timeCount += Time.deltaTime;
 		if (!m_player.isActSkillAction)
 		{
 			Destroy();
@@ -140,7 +122,7 @@ public class HealAttackObject : MonoBehaviour, IAttackCollider
 	{
 		if (m_capsule != null)
 		{
-			m_capsule.set_enabled(true);
+			m_capsule.enabled = true;
 		}
 	}
 
@@ -148,7 +130,7 @@ public class HealAttackObject : MonoBehaviour, IAttackCollider
 	{
 		if (m_capsule != null)
 		{
-			m_capsule.set_enabled(false);
+			m_capsule.enabled = false;
 		}
 	}
 
@@ -180,19 +162,11 @@ public class HealAttackObject : MonoBehaviour, IAttackCollider
 
 	public virtual Vector3 GetCrossCheckPoint(Collider from_collider)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		Bounds bounds = from_collider.get_bounds();
-		Vector3 result = bounds.get_center();
+		Vector3 result = from_collider.bounds.center;
 		Character character = m_attacker as Character;
 		if (character != null && character.rootNode != null)
 		{
-			result = character.rootNode.get_position();
+			result = character.rootNode.position;
 		}
 		return result;
 	}
@@ -203,13 +177,9 @@ public class HealAttackObject : MonoBehaviour, IAttackCollider
 		{
 			return false;
 		}
-		if (info.attackType == AttackHitInfo.ATTACK_TYPE.HEAL_ATTACK && to_object is Enemy)
+		if (info.attackType == AttackHitInfo.ATTACK_TYPE.HEAL_ATTACK && to_object is Enemy && (to_object as Enemy).healDamageRate <= 0f)
 		{
-			Enemy enemy = to_object as Enemy;
-			if (enemy.healDamageRate <= 0f)
-			{
-				return false;
-			}
+			return false;
 		}
 		return true;
 	}

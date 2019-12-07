@@ -52,9 +52,7 @@ namespace GooglePlayGames.BasicApi.Video
 
 		public override string ToString()
 		{
-			return string.Format("[VideoCapabilities: mIsCameraSupported={0}, mIsMicSupported={1}, mIsWriteStorageSupported={2}, mCaptureModesSupported={3}, mQualityLevelsSupported={4}]", mIsCameraSupported, mIsMicSupported, mIsWriteStorageSupported, string.Join(",", (from p in mCaptureModesSupported
-			select p.ToString()).ToArray()), string.Join(",", (from p in mQualityLevelsSupported
-			select p.ToString()).ToArray()));
+			return string.Format("[VideoCapabilities: mIsCameraSupported={0}, mIsMicSupported={1}, mIsWriteStorageSupported={2}, mCaptureModesSupported={3}, mQualityLevelsSupported={4}]", mIsCameraSupported, mIsMicSupported, mIsWriteStorageSupported, string.Join(",", mCaptureModesSupported.Select((bool p) => p.ToString()).ToArray()), string.Join(",", mQualityLevelsSupported.Select((bool p) => p.ToString()).ToArray()));
 		}
 	}
 }

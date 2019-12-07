@@ -4,7 +4,6 @@ using GooglePlayGames.OurUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace GooglePlayGames.Native
 {
@@ -63,9 +62,6 @@ namespace GooglePlayGames.Native
 		}
 
 		private readonly NearbyConnectionsManager mManager;
-
-		[CompilerGenerated]
-		private static Func<string, NativeAppIdentifier> _003C_003Ef__mg_0024cache0;
 
 		internal NativeNearbyConnectionsClient(NearbyConnectionsManager manager)
 		{
@@ -157,7 +153,11 @@ namespace GooglePlayGames.Native
 
 		private static long ToTimeoutMillis(TimeSpan? span)
 		{
-			return (!span.HasValue) ? 0 : PInvokeUtilities.ToMilliseconds(span.Value);
+			if (!span.HasValue)
+			{
+				return 0L;
+			}
+			return PInvokeUtilities.ToMilliseconds(span.Value);
 		}
 
 		public void StopAdvertising()

@@ -49,15 +49,8 @@ public class UIOracleStockUIController : MonoBehaviour
 
 	public int StockMax => icons.Count;
 
-	public UIOracleStockUIController()
-		: this()
-	{
-	}
-
 	public void Initialize(int max)
 	{
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
 		for (int i = 0; i < max && icons.Count <= i; i++)
 		{
 			UIOracleStockIconController uIOracleStockIconController = CreateIcon(i);
@@ -71,23 +64,22 @@ public class UIOracleStockUIController : MonoBehaviour
 		BoxCollider component = baseSprite.GetComponent<BoxCollider>();
 		if (component != null)
 		{
-			component.set_size(new Vector3((float)baseSprite.width, (float)baseSprite.height + btnColliderExpansion, 1f));
-			component.set_center(new Vector3((float)baseSprite.width / 2f, 0f, 0f));
+			component.size = new Vector3(baseSprite.width, (float)baseSprite.height + btnColliderExpansion, 1f);
+			component.center = new Vector3((float)baseSprite.width / 2f, 0f, 0f);
 		}
 		fulledEffect.width = baseEffectWidth + iconWidth * icons.Count;
 	}
 
 	private UIOracleStockIconController CreateIcon(int index)
 	{
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = ResourceUtility.Realizes(Resources.Load(stockIconPath), iconsRoot.get_transform());
-		if (val == null)
+		Transform transform = ResourceUtility.Realizes(Resources.Load(stockIconPath), iconsRoot.transform);
+		if (transform == null)
 		{
-			Debug.LogError((object)("failed to create icon(" + index + "). " + stockIconPath));
+			Debug.LogError("failed to create icon(" + index + "). " + stockIconPath);
 			return null;
 		}
-		val.get_transform().set_localPosition(new Vector3((float)(index * iconWidth), 0f, 0f));
-		UIOracleStockIconController component = val.GetComponent<UIOracleStockIconController>();
+		transform.transform.localPosition = new Vector3(index * iconWidth, 0f, 0f);
+		UIOracleStockIconController component = transform.GetComponent<UIOracleStockIconController>();
 		component.Initialize(index, (!(baseSprite == null)) ? (baseSprite.depth + 1) : 0);
 		return component;
 	}
@@ -98,20 +90,20 @@ public class UIOracleStockUIController : MonoBehaviour
 		{
 			icons[i].Stock(stockedCount > i);
 		}
-		fulledEffect.set_enabled(stockedCount >= StockMax);
+		fulledEffect.enabled = (stockedCount >= StockMax);
 	}
 
 	public void SetActive(bool enabled)
 	{
 		if (enabled && icons.Count > 0)
 		{
-			iconsRoot.SetActive(true);
-			baseSprite.get_gameObject().SetActive(true);
+			iconsRoot.SetActive(value: true);
+			baseSprite.gameObject.SetActive(value: true);
 		}
 		else
 		{
-			iconsRoot.SetActive(false);
-			baseSprite.get_gameObject().SetActive(false);
+			iconsRoot.SetActive(value: false);
+			baseSprite.gameObject.SetActive(value: false);
 		}
 	}
 

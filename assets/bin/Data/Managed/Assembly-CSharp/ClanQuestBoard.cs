@@ -58,32 +58,32 @@ public class ClanQuestBoard : GameSection
 
 	public override void Initialize()
 	{
-		SetLabelText((Enum)UI.LBL_TITLE, base.sectionData.GetText("TITLE"));
-		SetLabelText((Enum)UI.LBL_TITLE_SHADOW, base.sectionData.GetText("TITLE"));
-		SetLabelText((Enum)UI.STR_NON_LIST, base.sectionData.GetText("NON_QUEST"));
-		SetActive((Enum)UI.SCR_QUEST, is_visible: true);
-		this.StartCoroutine(DoInitialize());
+		SetLabelText(UI.LBL_TITLE, base.sectionData.GetText("TITLE"));
+		SetLabelText(UI.LBL_TITLE_SHADOW, base.sectionData.GetText("TITLE"));
+		SetLabelText(UI.STR_NON_LIST, base.sectionData.GetText("NON_QUEST"));
+		SetActive(UI.SCR_QUEST, is_visible: true);
+		StartCoroutine(DoInitialize());
 	}
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.SPR_CONDITION_DIFFICULTY, is_visible: false);
-		SetActive((Enum)UI.STR_NO_CONDITION, is_visible: true);
+		SetActive(UI.SPR_CONDITION_DIFFICULTY, is_visible: false);
+		SetActive(UI.STR_NO_CONDITION, is_visible: true);
 		SetNpcInfo();
 		if (parties == null)
 		{
-			SetActive((Enum)UI.GRD_QUEST, is_visible: false);
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_QUEST, is_visible: false);
+			SetActive(UI.STR_NON_LIST, is_visible: true);
 		}
 		else if (parties.Count <= 0)
 		{
-			SetActive((Enum)UI.GRD_QUEST, is_visible: false);
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_QUEST, is_visible: false);
+			SetActive(UI.STR_NON_LIST, is_visible: true);
 		}
 		else
 		{
-			SetActive((Enum)UI.GRD_QUEST, is_visible: true);
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+			SetActive(UI.GRD_QUEST, is_visible: true);
+			SetActive(UI.STR_NON_LIST, is_visible: false);
 			SetGrid(UI.GRD_QUEST, "QuestSearchListSelectItem", parties.Count, reset: false, delegate(int i, Transform t, bool is_recycle)
 			{
 				QuestTable.QuestTableData questTableData = null;
@@ -121,7 +121,7 @@ public class ClanQuestBoard : GameSection
 
 	private IEnumerator DoInitialize()
 	{
-		yield return this.StartCoroutine(Reload());
+		yield return StartCoroutine(Reload());
 	}
 
 	private IEnumerator Reload(Action<bool> cb = null)
@@ -163,7 +163,7 @@ public class ClanQuestBoard : GameSection
 				}
 				else
 				{
-					member_num++;
+					int num = ++member_num;
 				}
 			}
 		});
@@ -180,10 +180,10 @@ public class ClanQuestBoard : GameSection
 			}
 			else
 			{
-				SetLabelText(t, UI.LBL_HOST_NAME, string.Empty);
+				SetLabelText(t, UI.LBL_HOST_NAME, "");
 			}
-			SetLabelText(t, UI.LBL_HOST_LV, string.Empty);
-			SetLabelText(t, UI.LBL_LV, string.Empty);
+			SetLabelText(t, UI.LBL_HOST_LV, "");
+			SetLabelText(t, UI.LBL_LV, "");
 		}
 	}
 
@@ -215,9 +215,8 @@ public class ClanQuestBoard : GameSection
 		{
 			SetActive(t, UI.OBJ_ENEMY, is_visible: true);
 			int iconId = enemyData.iconId;
-			RARITY_TYPE? rarity = (questData.questType != QUEST_TYPE.ORDER) ? null : new RARITY_TYPE?(questData.rarity);
-			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element);
-			itemIcon.SetEnableCollider(is_enable: false);
+			RARITY_TYPE? rarity = (questData.questType == QUEST_TYPE.ORDER) ? new RARITY_TYPE?(questData.rarity) : null;
+			ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, iconId, rarity, FindCtrl(t, UI.OBJ_ENEMY), enemyData.element).SetEnableCollider(is_enable: false);
 			SetActive(t, UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
 			SetElementSprite(t, UI.SPR_ELEMENT, (int)enemyData.element);
 			SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
@@ -229,38 +228,37 @@ public class ClanQuestBoard : GameSection
 			SetElementSprite(t, UI.SPR_WEAK_ELEMENT, 6);
 			SetActive(t, UI.STR_NON_WEAK_ELEMENT, is_visible: true);
 		}
-		Transform val = FindCtrl(t, UI.SPR_ICON_DOUBLE);
-		Transform val2 = FindCtrl(t, UI.SPR_ICON_DEFENSE_BATTLE);
-		Transform val3 = FindCtrl(t, UI.LBL_RECRUTING_MEMBERS);
-		Transform val4 = FindCtrl(t, UI.SPR_WINDOW_BASE);
-		if (val4 != null)
+		Transform transform = FindCtrl(t, UI.SPR_ICON_DOUBLE);
+		Transform transform2 = FindCtrl(t, UI.SPR_ICON_DEFENSE_BATTLE);
+		Transform transform3 = FindCtrl(t, UI.LBL_RECRUTING_MEMBERS);
+		Transform transform4 = FindCtrl(t, UI.SPR_WINDOW_BASE);
+		if (transform4 != null)
 		{
-			UISprite component = val4.GetComponent<UISprite>();
-			Transform val5 = FindCtrl(t, UI.OBJ_SEARCH_INFO_ROOT);
-			UISprite component2 = val5.GetComponent<UISprite>();
+			UISprite component = transform4.GetComponent<UISprite>();
+			UISprite component2 = FindCtrl(t, UI.OBJ_SEARCH_INFO_ROOT).GetComponent<UISprite>();
 			if (questData.questType == QUEST_TYPE.GATE || questData.questType == QUEST_TYPE.DEFENSE)
 			{
 				component.spriteName = "QuestListPlateO";
 				component2.spriteName = "SearchAdWindowO";
-				val.get_gameObject().SetActive(true);
-				val2.get_gameObject().SetActive(questData.questType == QUEST_TYPE.DEFENSE);
-				val3.get_gameObject().SetActive(questData.questType == QUEST_TYPE.DEFENSE);
+				transform.gameObject.SetActive(value: true);
+				transform2.gameObject.SetActive(questData.questType == QUEST_TYPE.DEFENSE);
+				transform3.gameObject.SetActive(questData.questType == QUEST_TYPE.DEFENSE);
 				string format = StringTable.Get(STRING_CATEGORY.GATE_QUEST_NAME, 0u);
-				string text = string.Empty;
+				string text = "";
 				if (enemyData != null)
 				{
 					text = string.Format(format, questData.GetMainEnemyLv(), enemyData.name);
 				}
 				SetLabelText(t, UI.LBL_QUEST_NAME, text);
-				SetLabelText(t, UI.LBL_QUEST_NUM, string.Empty);
+				SetLabelText(t, UI.LBL_QUEST_NUM, "");
 			}
 			else
 			{
 				component.spriteName = "QuestListPlateN";
 				component2.spriteName = "SearchAdWindow";
-				val.get_gameObject().SetActive(false);
-				val2.get_gameObject().SetActive(false);
-				val3.get_gameObject().SetActive(false);
+				transform.gameObject.SetActive(value: false);
+				transform2.gameObject.SetActive(value: false);
+				transform3.gameObject.SetActive(value: false);
 				SetLabelText(t, UI.LBL_QUEST_NAME, questData.questText);
 				SetLabelText(t, UI.LBL_QUEST_NUM, string.Format(base.sectionData.GetText("QUEST_NUMBER"), questData.locationNumber, questData.questNumber));
 			}
@@ -274,11 +272,9 @@ public class ClanQuestBoard : GameSection
 
 	private void SetNpcInfo()
 	{
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		string text = (parties.Count <= 0) ? base.sectionData.GetText("NON_LIST_MSG") : base.sectionData.GetText("EXIST_LIST_MSG");
-		SetRenderNPCModel((Enum)UI.TEX_NPCMODEL, 7, MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.boardCenterNPCPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.boardCenterNPCRot, MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.boardCenterNPCFOV, (Action<NPCLoader>)null);
-		SetLabelText((Enum)UI.LBL_MESSAGE, text);
+		string text = (parties.Count > 0) ? base.sectionData.GetText("EXIST_LIST_MSG") : base.sectionData.GetText("NON_LIST_MSG");
+		SetRenderNPCModel(UI.TEX_NPCMODEL, 7, MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.boardCenterNPCPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.boardCenterNPCRot, MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.boardCenterNPCFOV);
+		SetLabelText(UI.LBL_MESSAGE, text);
 	}
 
 	private void OnQuery_SELECT_ROOM()
@@ -303,7 +299,7 @@ public class ClanQuestBoard : GameSection
 	private void OnQuery_RELOAD()
 	{
 		GameSection.StayEvent();
-		this.StartCoroutine(Reload(delegate(bool b)
+		StartCoroutine(Reload(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b);
 		}));

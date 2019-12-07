@@ -167,9 +167,6 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 		int j = 0;
 		for (int num2 = setInfo.item.Length; j < num2; j++)
 		{
-			ITEM_ICON_TYPE iTEM_ICON_TYPE = ITEM_ICON_TYPE.NONE;
-			RARITY_TYPE? rARITY_TYPE = null;
-			ELEMENT_TYPE eLEMENT_TYPE = ELEMENT_TYPE.MAX;
 			int num3 = -1;
 			EquipItemInfo equipItemInfo = setInfo.item[j];
 			if (equipItemInfo == null)
@@ -190,11 +187,11 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 				SetLabelText(GetCtrl(iconsLevel[j]), text);
 			}
 			Transform ctrl = GetCtrl(icons[j]);
-			ctrl.GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
+			ctrl.GetComponentsInChildren(includeInactive: true, Temporary.itemIconList);
 			int k = 0;
 			for (int count = Temporary.itemIconList.Count; k < count; k++)
 			{
-				Temporary.itemIconList[k].get_gameObject().SetActive(true);
+				Temporary.itemIconList[k].gameObject.SetActive(value: true);
 			}
 			Temporary.itemIconList.Clear();
 			ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, ctrl, null, -1, "EQUIP", j);
@@ -202,16 +199,16 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 			{
 				SetLongTouch(itemIcon.transform, "DETAIL", j);
 				SetEvent(GetCtrl(iconsBtn[j]), "DETAIL", j);
-				itemIcon.get_gameObject().SetActive(num3 != -1);
+				itemIcon.gameObject.SetActive(num3 != -1);
 				if (num3 != -1)
 				{
-					itemIcon.SetEquipExtInvertedColor(equipItemInfo, base.GetComponent<UILabel>((Enum)iconsLevel[j]));
+					itemIcon.SetEquipExtInvertedColor(equipItemInfo, GetComponent<UILabel>(iconsLevel[j]));
 				}
 			}
 			UpdateEquipSkillButton(equipItemInfo, j);
 		}
-		ResetTween((Enum)UI.OBJ_EQUIP_ROOT, 0);
-		PlayTween((Enum)UI.OBJ_EQUIP_ROOT, forward: true, (EventDelegate.Callback)null, is_input_block: false, 0);
+		ResetTween(UI.OBJ_EQUIP_ROOT);
+		PlayTween(UI.OBJ_EQUIP_ROOT, forward: true, null, is_input_block: false);
 	}
 
 	private void UpdateEnemyInfo()
@@ -222,28 +219,27 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
 			if (enemyData != null)
 			{
-				SetLabelText((Enum)UI.LBL_ENEMY_LEVEL, StringTable.Format(STRING_CATEGORY.MAIN_STATUS, 1u, enemyData.level));
-				SetLabelText((Enum)UI.LBL_ENEMY_NAME, enemyData.name);
-				Transform ctrl = GetCtrl(UI.OBJ_ENEMY);
-				ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(questData.questType), enemyData.iconId, questData.rarity, GetCtrl(UI.OBJ_ENEMY), enemyData.element);
-				itemIcon.SetEnableCollider(is_enable: false);
-				SetActive((Enum)UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
-				SetElementSprite((Enum)UI.SPR_ELEMENT, (int)enemyData.element);
-				SetElementSprite((Enum)UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
-				SetActive((Enum)UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
+				SetLabelText(UI.LBL_ENEMY_LEVEL, StringTable.Format(STRING_CATEGORY.MAIN_STATUS, 1u, enemyData.level));
+				SetLabelText(UI.LBL_ENEMY_NAME, enemyData.name);
+				GetCtrl(UI.OBJ_ENEMY);
+				ItemIcon.Create(ItemIcon.GetItemIconType(questData.questType), enemyData.iconId, questData.rarity, GetCtrl(UI.OBJ_ENEMY), enemyData.element).SetEnableCollider(is_enable: false);
+				SetActive(UI.SPR_ELEMENT_ROOT, enemyData.element != ELEMENT_TYPE.MAX);
+				SetElementSprite(UI.SPR_ELEMENT, (int)enemyData.element);
+				SetElementSprite(UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
+				SetActive(UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
 			}
 		}
 	}
 
 	private void UpdateEquipSetInfo()
 	{
-		SetLabelText((Enum)UI.LBL_ASSIGNED_SET_NAME, targetData.setName);
+		SetLabelText(UI.LBL_ASSIGNED_SET_NAME, targetData.setName);
 		EquipItemTable.EquipItemData tableData = allEquipItemInfo[0].tableData;
 		if (tableData != null)
 		{
-			SetEquipmentTypeIcon((Enum)UI.SPR_TYPE_ICON_WEP, (Enum)UI.SPR_TYPE_ICON_BG, (Enum)UI.SPR_TYPE_ICON_RARITY, tableData);
-			SetActive((Enum)UI.SPR_TYPE_ICON_RARITY, is_visible: false);
-			SetSprite((Enum)UI.SPR_SP_ATTACK_TYPE, tableData.spAttackType.GetBigFrameSpriteName());
+			SetEquipmentTypeIcon(UI.SPR_TYPE_ICON_WEP, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, tableData);
+			SetActive(UI.SPR_TYPE_ICON_RARITY, is_visible: false);
+			SetSprite(UI.SPR_SP_ATTACK_TYPE, tableData.spAttackType.GetBigFrameSpriteName());
 		}
 	}
 
@@ -298,8 +294,6 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 
 	private void SetRenderPlayerModel(PlayerLoadInfo load_player_info)
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		SetRenderPlayerModel(base._transform, UI.TEX_MODEL, load_player_info, record.animID, new Vector3(0f, -0.75f, 14f), new Vector3(0f, 180f, 0f), is_priority_visual_equip: false, delegate(PlayerLoader player_loader)
 		{
 			if (player_loader != null)
@@ -337,10 +331,10 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 		int defencesSum = finalStatus.GetDefencesSum();
 		int hp = finalStatus.hp;
 		int num = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level;
-		SetLabelText((Enum)UI.LBL_ATK, attacksSum.ToString());
-		SetLabelText((Enum)UI.LBL_DEF, defencesSum.ToString());
-		SetLabelText((Enum)UI.LBL_HP, hp.ToString());
-		SetLabelText((Enum)UI.LBL_LEVEL, num.ToString());
+		SetLabelText(UI.LBL_ATK, attacksSum.ToString());
+		SetLabelText(UI.LBL_DEF, defencesSum.ToString());
+		SetLabelText(UI.LBL_HP, hp.ToString());
+		SetLabelText(UI.LBL_LEVEL, num.ToString());
 	}
 
 	private void UpdateEquipSkillButton(EquipItemInfo item, int i)
@@ -350,14 +344,9 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 		if (flag)
 		{
 			SkillSlotUIData[] assignedSkillSlotData = GetAssignedSkillSlotData(item);
-			Transform root = ctrl;
-			Enum ui_widget_enum = UI.OBJ_SKILL_BUTTON_ROOT;
-			string skill_button_prefab_name = "SkillIconButtonTOP";
-			EquipItemTable.EquipItemData tableData = item.tableData;
-			SkillSlotUIData[] skill_tables = assignedSkillSlotData;
-			SetSkillIconButton(root, ui_widget_enum, skill_button_prefab_name, tableData, skill_tables, "SKILL_ICON_BUTTON", i);
+			SetSkillIconButton(ctrl, UI.OBJ_SKILL_BUTTON_ROOT, "SkillIconButtonTOP", item.tableData, assignedSkillSlotData, "SKILL_ICON_BUTTON", i);
 		}
-		FindCtrl(ctrl, UI.OBJ_SKILL_BUTTON_ROOT).get_gameObject().SetActive(flag);
+		FindCtrl(ctrl, UI.OBJ_SKILL_BUTTON_ROOT).gameObject.SetActive(flag);
 	}
 
 	private EquipItemAndSkillData CreateEquipItemAndSkillData(int index)
@@ -474,31 +463,33 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 	{
 		UserInfo userInfo = MonoBehaviourSingleton<UserInfoManager>.I.userInfo;
 		UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
-		InGameRecorder.PlayerRecord playerRecord = new InGameRecorder.PlayerRecord();
-		playerRecord.id = 0;
-		playerRecord.isNPC = false;
-		playerRecord.isSelf = true;
+		InGameRecorder.PlayerRecord obj = new InGameRecorder.PlayerRecord
+		{
+			id = 0,
+			isNPC = false,
+			isSelf = true
+		};
 		MonoBehaviourSingleton<StatusManager>.I.CreateLocalEquipSetData();
-		playerRecord.playerLoadInfo = CreatePlayerLoadInfo();
-		playerRecord.animID = PLAYER_ANIM_TYPE.GetStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex);
-		playerRecord.charaInfo = new CharaInfo();
-		playerRecord.charaInfo.userId = userInfo.id;
-		playerRecord.charaInfo.name = userInfo.name;
-		playerRecord.charaInfo.comment = userInfo.comment;
-		playerRecord.charaInfo.code = userInfo.code;
-		playerRecord.charaInfo.level = userStatus.level;
-		playerRecord.charaInfo.atk = userStatus.atk;
-		playerRecord.charaInfo.def = userStatus.def;
-		playerRecord.charaInfo.hp = userStatus.hp;
-		playerRecord.charaInfo.faceId = userStatus.faceId;
-		playerRecord.charaInfo.hairId = userStatus.hairId;
-		playerRecord.charaInfo.hairColorId = userStatus.hairColorId;
-		playerRecord.charaInfo.skinId = userStatus.skinId;
-		playerRecord.charaInfo.voiceId = userStatus.voiceId;
-		playerRecord.charaInfo.sex = userStatus.sex;
-		playerRecord.charaInfo.equipSet = null;
-		playerRecord.charaInfo.showHelm = 1;
-		return playerRecord;
+		obj.playerLoadInfo = CreatePlayerLoadInfo();
+		obj.animID = PLAYER_ANIM_TYPE.GetStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex);
+		obj.charaInfo = new CharaInfo();
+		obj.charaInfo.userId = userInfo.id;
+		obj.charaInfo.name = userInfo.name;
+		obj.charaInfo.comment = userInfo.comment;
+		obj.charaInfo.code = userInfo.code;
+		obj.charaInfo.level = userStatus.level;
+		obj.charaInfo.atk = userStatus.atk;
+		obj.charaInfo.def = userStatus.def;
+		obj.charaInfo.hp = userStatus.hp;
+		obj.charaInfo.faceId = userStatus.faceId;
+		obj.charaInfo.hairId = userStatus.hairId;
+		obj.charaInfo.hairColorId = userStatus.hairColorId;
+		obj.charaInfo.skinId = userStatus.skinId;
+		obj.charaInfo.voiceId = userStatus.voiceId;
+		obj.charaInfo.sex = userStatus.sex;
+		obj.charaInfo.equipSet = null;
+		obj.charaInfo.showHelm = 1;
+		return obj;
 	}
 
 	private List<EquipItem.Ability> GetAssignedAbilityList(AssignedEquipmentTable.EquipmentData assignedData)
@@ -531,7 +522,7 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 		{
 			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(targetData.equipmentData[i].id);
 			EquipItem equipItem = new EquipItem();
-			equipItem.uniqId = string.Empty;
+			equipItem.uniqId = "";
 			equipItem.equipItemId = (int)equipItemData.id;
 			equipItem.level = equipItemData.maxLv;
 			equipItem.exceed = ((equipItemData.exceedID != 0) ? 4 : 0);
@@ -557,7 +548,7 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 		}
 		equipSet.weapon_1 = null;
 		equipSet.weapon_2 = null;
-		equipSet.setName = string.Empty;
+		equipSet.setName = "";
 		equipSet.showHelm = 1;
 		allEquipItemInfo = new EquipItemInfo[7]
 		{
@@ -577,7 +568,7 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 		{
 			CreateEquipItemInfo();
 		}
-		return new EquipSetInfo(allEquipItemInfo, string.Empty, 1, new AccessoryPlaceInfo());
+		return new EquipSetInfo(allEquipItemInfo, "", 1, new AccessoryPlaceInfo());
 	}
 
 	private List<CharaInfo.EquipItem> CreateEquipItemListForRecord(List<CharaInfo.EquipItem> equips)
@@ -590,12 +581,11 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 		{
 			equips[i].aIds.Clear();
 			equips[i].aPts.Clear();
-			List<EquipItem.Ability> list = null;
 			AssignedEquipmentTable.EquipmentData[] equipmentData = targetData.equipmentData;
 			foreach (AssignedEquipmentTable.EquipmentData equipmentData2 in equipmentData)
 			{
+				List<int> list = new List<int>(2);
 				List<int> list2 = new List<int>(2);
-				List<int> list3 = new List<int>(2);
 				if (equipmentData2.id == equips[i].eId)
 				{
 					List<EquipItem.Ability> assignedAbilityList = GetAssignedAbilityList(equipmentData2);
@@ -603,11 +593,11 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 					{
 						foreach (EquipItem.Ability item in assignedAbilityList)
 						{
-							list2.Add(item.id);
-							list3.Add(item.pt);
+							list.Add(item.id);
+							list2.Add(item.pt);
 						}
-						equips[i].aIds = list2;
-						equips[i].aPts = list3;
+						equips[i].aIds = list;
+						equips[i].aPts = list2;
 					}
 				}
 			}
@@ -628,10 +618,9 @@ public class QuestAcceptAssignedEquipment : SkillInfoBase
 
 	private void OnDrag(InputManager.TouchInfo touch_info)
 	{
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		if (!(loader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == nowSectionName)
 		{
-			loader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
+			loader.transform.Rotate(GameDefine.GetCharaRotateVector(touch_info));
 		}
 	}
 

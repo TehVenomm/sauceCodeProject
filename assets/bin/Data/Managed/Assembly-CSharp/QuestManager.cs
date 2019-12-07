@@ -183,67 +183,107 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		set;
 	}
 
-	private QuestManager()
-	{
-		clearStatusQuest = new List<ClearStatusQuest>();
-		clearStatusQuestEnemySpecies = new List<ClearStatusQuestEnemySpecies>();
-		resultUserCollection = new QuestResultUserCollection();
-		isBackGachaQuest = false;
-	}
-
 	public static bool IsValidInGame()
 	{
-		return MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.startData != null;
+		if (MonoBehaviourSingleton<QuestManager>.IsValid())
+		{
+			return MonoBehaviourSingleton<QuestManager>.I.startData != null;
+		}
+		return false;
 	}
 
 	public static bool IsValidInGameExplore()
 	{
-		return IsValidInGame() && MonoBehaviourSingleton<QuestManager>.I.IsExplore();
+		if (IsValidInGame())
+		{
+			return MonoBehaviourSingleton<QuestManager>.I.IsExplore();
+		}
+		return false;
 	}
 
 	public static bool IsValidExplore()
 	{
-		return MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsExplore();
+		if (MonoBehaviourSingleton<QuestManager>.IsValid())
+		{
+			return MonoBehaviourSingleton<QuestManager>.I.IsExplore();
+		}
+		return false;
 	}
 
 	public static bool IsValidInGameArena()
 	{
-		return MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.startData != null && MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestType() == QUEST_TYPE.ARENA;
+		if (MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.startData != null)
+		{
+			return MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestType() == QUEST_TYPE.ARENA;
+		}
+		return false;
 	}
 
 	public static bool IsValidInGameDefenseBattle()
 	{
-		return IsValidInGame() && MonoBehaviourSingleton<QuestManager>.I.IsDefenseBattle();
+		if (IsValidInGame())
+		{
+			return MonoBehaviourSingleton<QuestManager>.I.IsDefenseBattle();
+		}
+		return false;
 	}
 
 	public static bool IsValidInGameWaveMatch(bool isOnlyEvent = false)
 	{
-		return IsValidInGame() && MonoBehaviourSingleton<QuestManager>.I.IsWaveMatch(isOnlyEvent);
+		if (IsValidInGame())
+		{
+			return MonoBehaviourSingleton<QuestManager>.I.IsWaveMatch(isOnlyEvent);
+		}
+		return false;
 	}
 
 	public static bool IsValidInGameSeries()
 	{
-		return IsValidInGame() && MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeries();
+		if (IsValidInGame())
+		{
+			return MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeries();
+		}
+		return false;
 	}
 
 	public static bool IsValidInGameSeriesArena()
 	{
-		return IsValidInGame() && MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeriesArena();
+		if (IsValidInGame())
+		{
+			return MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeriesArena();
+		}
+		return false;
 	}
 
 	public static bool IsValidInGameTrial()
 	{
-		return IsValidInGame() && MonoBehaviourSingleton<QuestManager>.I.isTrial;
+		if (IsValidInGame())
+		{
+			return MonoBehaviourSingleton<QuestManager>.I.isTrial;
+		}
+		return false;
 	}
 
 	public static bool IsValidTrial()
 	{
-		return MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.isTrial;
+		if (MonoBehaviourSingleton<QuestManager>.IsValid())
+		{
+			return MonoBehaviourSingleton<QuestManager>.I.isTrial;
+		}
+		return false;
 	}
 
 	public static bool IsValidInGameWaveStrategy()
 	{
-		return IsValidInGame() && (MonoBehaviourSingleton<QuestManager>.I.IsMatchQuestType(QUEST_TYPE.WAVE_STRATEGY) || MonoBehaviourSingleton<QuestManager>.I.IsMatchQuestType(QUEST_TYPE.EVENT_WAVE_STRATEGY));
+		if (IsValidInGame())
+		{
+			if (!MonoBehaviourSingleton<QuestManager>.I.IsMatchQuestType(QUEST_TYPE.WAVE_STRATEGY))
+			{
+				return MonoBehaviourSingleton<QuestManager>.I.IsMatchQuestType(QUEST_TYPE.EVENT_WAVE_STRATEGY);
+			}
+			return true;
+		}
+		return false;
 	}
 
 	public void SetEventList(List<Network.EventData> _eventList)
@@ -383,7 +423,11 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		{
 			return false;
 		}
-		return current.questData.questType == QUEST_TYPE.DEFENSE || current.questData.questStyle == QUEST_STYLE.DEFENSE;
+		if (current.questData.questType != QUEST_TYPE.DEFENSE)
+		{
+			return current.questData.questStyle == QUEST_STYLE.DEFENSE;
+		}
+		return true;
 	}
 
 	public bool IsWaveMatch(bool isOnlyEvent = false)
@@ -394,9 +438,17 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		}
 		if (isOnlyEvent)
 		{
-			return current.questData.questType == QUEST_TYPE.EVENT_WAVE || current.questData.questType == QUEST_TYPE.EVENT_WAVE_STRATEGY;
+			if (current.questData.questType != QUEST_TYPE.EVENT_WAVE)
+			{
+				return current.questData.questType == QUEST_TYPE.EVENT_WAVE_STRATEGY;
+			}
+			return true;
 		}
-		return current.questData.questType == QUEST_TYPE.WAVE || current.questData.questType == QUEST_TYPE.EVENT_WAVE || current.questData.questType == QUEST_TYPE.WAVE_STRATEGY || current.questData.questType == QUEST_TYPE.EVENT_WAVE_STRATEGY;
+		if (current.questData.questType != QUEST_TYPE.WAVE && current.questData.questType != QUEST_TYPE.EVENT_WAVE && current.questData.questType != QUEST_TYPE.WAVE_STRATEGY)
+		{
+			return current.questData.questType == QUEST_TYPE.EVENT_WAVE_STRATEGY;
+		}
+		return true;
 	}
 
 	public bool IsWaveStrategyMatch(bool isOnlyEvent = false)
@@ -409,7 +461,11 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		{
 			return current.questData.questType == QUEST_TYPE.EVENT_WAVE_STRATEGY;
 		}
-		return current.questData.questType == QUEST_TYPE.WAVE_STRATEGY || current.questData.questType == QUEST_TYPE.EVENT_WAVE_STRATEGY;
+		if (current.questData.questType != QUEST_TYPE.WAVE_STRATEGY)
+		{
+			return current.questData.questType == QUEST_TYPE.EVENT_WAVE_STRATEGY;
+		}
+		return true;
 	}
 
 	public bool IsExplore()
@@ -685,14 +741,13 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 					{
 						if (!PlayPortalPointEffect(portalInfo, point - prevPoint, x, z) && ShouldShowPortalOpenNotification())
 						{
-							string text3 = string.Empty;
+							string text2 = "";
 							FieldMapTable.FieldMapTableData fieldMapData2 = Singleton<FieldMapTable>.I.GetFieldMapData(portal.portalData.dstMapID);
 							if (fieldMapData2 != null)
 							{
-								text3 = fieldMapData2.mapName;
+								text2 = fieldMapData2.mapName;
 							}
-							string text4 = StringTable.Format(STRING_CATEGORY.IN_GAME, 6002u, text3);
-							UIInGamePopupDialog.PushOpen(text4, is_important: false);
+							UIInGamePopupDialog.PushOpen(StringTable.Format(STRING_CATEGORY.IN_GAME, 6002u, text2), is_important: false);
 						}
 					}
 					else
@@ -705,14 +760,13 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			SetExplorePortalPoint(portalId, point);
 			if (!PlayPortalPointEffect(portalInfo, point - prevPoint, x, z) && ShouldShowPortalOpenNotification())
 			{
-				string text = string.Empty;
+				string text = "";
 				FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(portal.portalData.dstMapID);
 				if (fieldMapData != null)
 				{
 					text = fieldMapData.mapName;
 				}
-				string text2 = StringTable.Format(STRING_CATEGORY.IN_GAME, 6002u, text);
-				UIInGamePopupDialog.PushOpen(text2, is_important: false, 1.4f);
+				UIInGamePopupDialog.PushOpen(StringTable.Format(STRING_CATEGORY.IN_GAME, 6002u, text), is_important: false, 1.4f);
 			}
 		}
 		else
@@ -724,7 +778,15 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 
 	private bool ShouldShowPortalOpenNotification()
 	{
-		return !MonoBehaviourSingleton<QuestManager>.I.IsExploreBossMap() && MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<InGameProgress>.I.progressEndType == InGameProgress.PROGRESS_END_TYPE.NONE;
+		if (!MonoBehaviourSingleton<QuestManager>.I.IsExploreBossMap())
+		{
+			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
+			{
+				return MonoBehaviourSingleton<InGameProgress>.I.progressEndType == InGameProgress.PROGRESS_END_TYPE.NONE;
+			}
+			return false;
+		}
+		return false;
 	}
 
 	private bool PlayPortalPointEffect(FieldMapPortalInfo portalInfo, int getPoint, int portalX, int portalZ)
@@ -1102,6 +1164,14 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		}
 	}
 
+	private QuestManager()
+	{
+		clearStatusQuest = new List<ClearStatusQuest>();
+		clearStatusQuestEnemySpecies = new List<ClearStatusQuestEnemySpecies>();
+		resultUserCollection = new QuestResultUserCollection();
+		isBackGachaQuest = false;
+	}
+
 	public void ClearPlayData()
 	{
 		startData = null;
@@ -1167,7 +1237,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		{
 			current.questData = null;
 		}
-		current.limitTime = ((current.questData == null) ? 0f : current.questData.limitTime);
+		current.limitTime = ((current.questData != null) ? current.questData.limitTime : 0f);
 		current.seriesIndex = 0u;
 	}
 
@@ -1383,7 +1453,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	public bool IsClearQuest(uint questId)
 	{
 		CLEAR_STATUS clearStatusQuest = GetClearStatusQuest(questId);
-		if (clearStatusQuest == CLEAR_STATUS.CLEAR || clearStatusQuest == CLEAR_STATUS.ALL_CLEAR)
+		if ((uint)(clearStatusQuest - 3) <= 1u)
 		{
 			return true;
 		}
@@ -1565,7 +1635,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		int questId = (int)tableData.questID;
 		if (questId != questData.questId)
 		{
-			Debug.LogWarning((object)("Network.QuestDataとQuestTableDataのクエストIDが一致していません questData = " + questData.questId + " tableData = " + questId));
+			Debug.LogWarning("Network.QuestDataとQuestTableDataのクエストIDが一致していません questData = " + questData.questId + " tableData = " + questId);
 		}
 		ClearStatusQuest clearStatusQuest = this.clearStatusQuest.Find((ClearStatusQuest data) => data.questId == questId);
 		if (clearStatusQuest != null && clearStatusQuest.questStatus > 0)
@@ -1583,23 +1653,23 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			Log.Error("QuestTableDataがありません");
 			return null;
 		}
-		QuestData questData2 = new QuestData();
-		questData2.questId = (int)quest_id;
-		questData2.crystalNum = 0;
-		questData2.order = null;
-		QuestData questData3 = questData2;
-		if (questData3 == null)
+		QuestData questData2 = new QuestData
+		{
+			questId = (int)quest_id,
+			crystalNum = 0,
+			order = null
+		};
+		if (questData2 == null)
 		{
 			Log.Error("対象のEventQuestDataがありません");
 			return null;
 		}
-		return new QuestInfoData(questData, questData3, null);
+		return new QuestInfoData(questData, questData2, null);
 	}
 
 	public ClearStatusQuest GetClearStatusQuestData(uint quest_id)
 	{
-		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(quest_id);
-		if (questData == null)
+		if (Singleton<QuestTable>.I.GetQuestData(quest_id) == null)
 		{
 			return null;
 		}
@@ -1652,9 +1722,8 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				{
 					orderQuestList = ret.result.order;
 				}
-				if (send.req_eq > 0)
-				{
-				}
+				_ = send.req_eq;
+				_ = 0;
 				if (send.req_e > 0)
 				{
 					SetEventList(ret.result.events);
@@ -1671,7 +1740,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				}
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetQuestList(Action<bool> call_back)
@@ -1738,9 +1807,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		{
 			excludeLocationType = EVENT_DISPLAY_LOCATION_TYPE.FIELD;
 		}
-		return (from e in bingoEventList
-		where e.displayLocationType != (int)excludeLocationType
-		select e).ToList();
+		return bingoEventList.Where((Network.EventData e) => e.displayLocationType != (int)excludeLocationType).ToList();
 	}
 
 	public bool IsBingoPlayableEventExist()
@@ -1782,9 +1849,8 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	public static string GenerateQuestToken(int key)
 	{
 		byte[] bytes = Encoding.UTF8.GetBytes(key.ToString());
-		byte[] source = MD5.Create().ComputeHash(bytes);
-		return string.Concat((from i in source
-		select i.ToString("x2")).ToArray());
+		return string.Concat((from i in MD5.Create().ComputeHash(bytes)
+			select i.ToString("x2")).ToArray());
 	}
 
 	public void SendQuestStart(int questId, int equip_set_no, bool free_join, Action<bool> call_back)
@@ -1824,12 +1890,12 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			case Error.None:
 				obj = true;
 				startData = ret.result;
-				startTime = Time.get_time();
+				startTime = Time.time;
 				MonoBehaviourSingleton<GoWrapManager>.I.trackQuestStart(currentQuestID);
 				break;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public bool IsUnLockedTimeForCompleteSend()
@@ -1839,8 +1905,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 		{
 			num = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.QUEST_LOCK_SEC;
 		}
-		float num2 = Time.get_time() - startTime;
-		if (num2 < num)
+		if (Time.time - startTime < num)
 		{
 			return false;
 		}
@@ -1918,7 +1983,11 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 	public bool CheckMissionAllClear(uint questID)
 	{
 		ClearStatusQuest clearStatusQuestData = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(questID);
-		return clearStatusQuestData != null && !clearStatusQuestData.missionStatus.Any((int missionStatus) => missionStatus < 3);
+		if (clearStatusQuestData != null)
+		{
+			return !clearStatusQuestData.missionStatus.Any((int missionStatus) => missionStatus < 3);
+		}
+		return false;
 	}
 
 	public bool CheckEventMissionAllClear(int eventID)
@@ -1956,7 +2025,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				arg = true;
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendQuestComplete(List<List<int>> breakIds, List<int> mClear, List<int> memIds, float hpRate, List<QuestCompleteModel.BattleUserLog> logs, Action<bool, Error> call_back)
@@ -2087,7 +2156,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				break;
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendQuestRetire(bool is_timeout, List<int> memIDs, string roomId, List<QuestCompleteModel.BattleUserLog> logs, Action<bool> call_back)
@@ -2144,7 +2213,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				MonoBehaviourSingleton<GoWrapManager>.I.trackQuestEnd(currentQuestID, isSuccess: false);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendQuestContinue(Action<bool, Error> call_back)
@@ -2159,7 +2228,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				arg = true;
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendQuestReadEventStory(int eventId, Action<bool, Error> call_back)
@@ -2174,7 +2243,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				arg = true;
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendQuestRushProgress(int wave, int remainSec, List<int> breakIds, List<int> mClear, List<int> memIds, float hpRate, List<QuestCompleteModel.BattleUserLog> logs, Action<bool, Error> call_back)
@@ -2236,7 +2305,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				break;
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendArenaQuestStart(ArenaStartModel.RequestSendForm requestData, Action<bool> callBack)
@@ -2250,10 +2319,10 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			{
 				obj = true;
 				startData = ret.result;
-				startTime = Time.get_time();
+				startTime = Time.time;
 			}
 			callBack(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendQuestArenaProgress(ArenaProgressModel.RequestSendForm requestData, Action<bool, Error> callback)
@@ -2275,7 +2344,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				MonoBehaviourSingleton<InGameProgress>.I.SetArenaTimeBonus(ret.result.plusSec);
 			}
 			callback(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendArenaComplete(Action<bool, Error> callBack)
@@ -2290,7 +2359,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			callBack(arg1: false, Error.Unknown);
 			return;
 		}
-		CoopManager i = MonoBehaviourSingleton<CoopManager>.I;
+		_ = MonoBehaviourSingleton<CoopManager>.I;
 		ArenaCompleteModel.RequestSendForm requestSendForm = new ArenaCompleteModel.RequestSendForm();
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 		{
@@ -2306,7 +2375,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				arenaCompData = ret.result;
 			}
 			callBack(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendArenaRetire(ArenaRetireModel.RequestSendForm requestData, Action<bool> callBack)
@@ -2325,7 +2394,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				obj = true;
 			}
 			callBack(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetArenaUserRecord(int userId, int eventId, Action<bool, ArenaUserRecordModel.Param> callBack)
@@ -2341,7 +2410,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				arg = true;
 			}
 			callBack(arg, ret.result);
-		}, string.Empty);
+		});
 	}
 
 	public void SetClearStatus()
@@ -2444,7 +2513,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				UpdateChallengeList(ret.result.shadow);
 			}
 			call_back(arg, ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetChallengeList(int enemyLevel, Action<bool, Error> call_back, bool isSave)
@@ -2489,7 +2558,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 				arg = true;
 			}
 			call_back(arg, ret.result);
-		}, string.Empty);
+		});
 	}
 
 	public void SetChallengeSearchRequestFromPrefs(int userLevel, QuestAcceptChallengeRoomCondition.ChallengeSearchRequestParam sendForm)
@@ -2506,7 +2575,7 @@ public class QuestManager : MonoBehaviourSingleton<QuestManager>
 			sendForm.rarityBit = PlayerPrefs.GetInt("CHALLENGE_SEARCH_RAIRTY_KEY", 8388607);
 			sendForm.elementBit = PlayerPrefs.GetInt("CHALLENGE_SEARCH_ELEMENT_KEY", 8388607);
 			sendForm.enemyLevel = PlayerPrefs.GetInt("CHALLENGE_SEARCH_ENEMY_LEVEL_KEY", userLevel);
-			sendForm.targetEnemySpeciesName = PlayerPrefs.GetString("CHALLENGE_SEARCH_SPECIES_KEY", (string)null);
+			sendForm.targetEnemySpeciesName = PlayerPrefs.GetString("CHALLENGE_SEARCH_SPECIES_KEY", null);
 		}
 	}
 

@@ -15,8 +15,7 @@ public class GoalEvaluator_RaiseAlly : GoalEvaluator
 		{
 			return 0f;
 		}
-		float num = 1f;
-		return num * base.bias;
+		return 1f * base.bias;
 	}
 
 	public override void SetGoal(Brain brain, Goal_Think think)

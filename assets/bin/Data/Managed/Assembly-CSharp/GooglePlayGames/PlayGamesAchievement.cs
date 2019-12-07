@@ -1,6 +1,7 @@
 using GooglePlayGames.BasicApi;
 using System;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SocialPlatforms;
 
 namespace GooglePlayGames
@@ -31,7 +32,7 @@ namespace GooglePlayGames
 
 		private string mUnlockedImageUrl = string.Empty;
 
-		private WWW mImageFetcher;
+		private UnityWebRequest mImageFetcher;
 
 		private Texture2D mImage;
 
@@ -115,7 +116,7 @@ namespace GooglePlayGames
 			}
 			else
 			{
-				mPercentComplete = ((!ach.IsUnlocked) ? 0.0 : 100.0);
+				mPercentComplete = (ach.IsUnlocked ? 100.0 : 0.0);
 			}
 			mCompleted = ach.IsUnlocked;
 			mHidden = !ach.IsRevealed;
@@ -134,27 +135,26 @@ namespace GooglePlayGames
 
 		private Texture2D LoadImage()
 		{
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Expected O, but got Unknown
 			if (hidden)
 			{
 				return null;
 			}
-			string text = (!completed) ? mRevealedImageUrl : mUnlockedImageUrl;
+			string text = completed ? mUnlockedImageUrl : mRevealedImageUrl;
 			if (!string.IsNullOrEmpty(text))
 			{
-				if (mImageFetcher == null || mImageFetcher.get_url() != text)
+				if (mImageFetcher == null || mImageFetcher.url != text)
 				{
-					mImageFetcher = new WWW(text);
+					mImageFetcher = UnityWebRequestTexture.GetTexture(text);
+					mImageFetcher.SendWebRequest();
 					mImage = null;
 				}
 				if (mImage != null)
 				{
 					return mImage;
 				}
-				if (mImageFetcher.get_isDone())
+				if (mImageFetcher.isDone)
 				{
-					mImage = mImageFetcher.get_texture();
+					mImage = DownloadHandlerTexture.GetContent(mImageFetcher);
 					return mImage;
 				}
 			}

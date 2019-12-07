@@ -23,10 +23,10 @@ public class UIQuestInfoArena : MonoBehaviourSingleton<UIQuestInfoArena>
 	{
 		if (!IsArena())
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 			return;
 		}
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		m_inGameMgr = MonoBehaviourSingleton<InGameManager>.I;
 		m_inGameProgress = MonoBehaviourSingleton<InGameProgress>.I;
 		waveMax.text = $"/{m_inGameMgr.GetArenaWaveMax()}";
@@ -37,7 +37,7 @@ public class UIQuestInfoArena : MonoBehaviourSingleton<UIQuestInfoArena>
 
 	private void LateUpdate()
 	{
-		string text = (!m_isTimeAttack) ? m_inGameProgress.GetArenaRemainTimeToString() : m_inGameProgress.GetArenaElapseTimeToString();
+		string text = m_isTimeAttack ? m_inGameProgress.GetArenaElapseTimeToString() : m_inGameProgress.GetArenaRemainTimeToString();
 		timeArenaText.text = text;
 		if (m_wave != m_inGameMgr.GetCurrentArenaWaveNum())
 		{
@@ -48,7 +48,11 @@ public class UIQuestInfoArena : MonoBehaviourSingleton<UIQuestInfoArena>
 
 	private bool IsArena()
 	{
-		return QuestManager.IsValidInGame() && MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo();
+		if (QuestManager.IsValidInGame())
+		{
+			return MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo();
+		}
+		return false;
 	}
 
 	public void SetWaveNow(int num)

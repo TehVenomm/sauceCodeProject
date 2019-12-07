@@ -15,27 +15,16 @@ public class UIButtonScale : MonoBehaviour
 
 	private bool mStarted;
 
-	public UIButtonScale()
-		: this()
-	{
-	}//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-	//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-	//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-
-
 	private void Start()
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 		if (!mStarted)
 		{
 			mStarted = true;
 			if (tweenTarget == null)
 			{
-				tweenTarget = this.get_transform();
+				tweenTarget = base.transform;
 			}
-			mScale = tweenTarget.get_localScale();
+			mScale = tweenTarget.localScale;
 		}
 	}
 
@@ -43,62 +32,50 @@ public class UIButtonScale : MonoBehaviour
 	{
 		if (mStarted)
 		{
-			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
+			OnHover(UICamera.IsHighlighted(base.gameObject));
 		}
 	}
 
 	private void OnDisable()
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		if (mStarted && tweenTarget != null)
 		{
 			TweenScale component = tweenTarget.GetComponent<TweenScale>();
 			if (component != null)
 			{
 				component.value = mScale;
-				component.set_enabled(false);
+				component.enabled = false;
 			}
 		}
 	}
 
 	private void OnPress(bool isPressed)
 	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_enabled())
+		if (base.enabled)
 		{
 			if (!mStarted)
 			{
 				Start();
 			}
-			TweenScale.Begin(tweenTarget.get_gameObject(), duration, isPressed ? Vector3.Scale(mScale, pressed) : ((!UICamera.IsHighlighted(this.get_gameObject())) ? mScale : Vector3.Scale(mScale, hover))).method = UITweener.Method.EaseInOut;
+			TweenScale.Begin(tweenTarget.gameObject, duration, isPressed ? Vector3.Scale(mScale, pressed) : (UICamera.IsHighlighted(base.gameObject) ? Vector3.Scale(mScale, hover) : mScale)).method = UITweener.Method.EaseInOut;
 		}
 	}
 
 	private void OnHover(bool isOver)
 	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_enabled())
+		if (base.enabled)
 		{
 			if (!mStarted)
 			{
 				Start();
 			}
-			TweenScale.Begin(tweenTarget.get_gameObject(), duration, (!isOver) ? mScale : Vector3.Scale(mScale, hover)).method = UITweener.Method.EaseInOut;
+			TweenScale.Begin(tweenTarget.gameObject, duration, isOver ? Vector3.Scale(mScale, hover) : mScale).method = UITweener.Method.EaseInOut;
 		}
 	}
 
 	private void OnSelect(bool isSelected)
 	{
-		if (this.get_enabled() && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
+		if (base.enabled && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
 		{
 			OnHover(isSelected);
 		}

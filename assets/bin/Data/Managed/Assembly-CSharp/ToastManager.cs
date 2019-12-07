@@ -69,9 +69,9 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 		base.Awake();
 		if (!(window == null))
 		{
-			windowTransform = window.get_transform();
+			windowTransform = window.transform;
 			transitions = window.GetComponentsInChildren<UITransition>();
-			window.SetActive(false);
+			window.SetActive(value: false);
 			isOpenDialog = false;
 		}
 	}
@@ -80,23 +80,27 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 	{
 		if (!(window == null) && (!MonoBehaviourSingleton<TransitionManager>.IsValid() || !MonoBehaviourSingleton<TransitionManager>.I.isTransing) && !isOpenDialog && openInfoList.Count > 0)
 		{
-			this.StartCoroutine(DoShowDialog(openInfoList[0]));
+			StartCoroutine(DoShowDialog(openInfoList[0]));
 			openInfoList.RemoveAt(0);
 		}
 	}
 
 	public bool IsShowingDialog()
 	{
-		return isOpenDialog || openInfoList.Count > 0;
+		if (!isOpenDialog)
+		{
+			return openInfoList.Count > 0;
+		}
+		return true;
 	}
 
 	private IEnumerator DoShowDialog(Desc desc)
 	{
 		isOpenDialog = true;
-		window.SetActive(true);
+		window.SetActive(value: true);
 		tweenCtrl.Reset();
-		windowTransform.set_parent(dialogInfo.link);
-		windowTransform.set_localPosition(Vector3.get_zero());
+		windowTransform.parent = dialogInfo.link;
+		windowTransform.localPosition = Vector3.zero;
 		int i = 0;
 		for (int num = sprites.Length; i < num; i++)
 		{
@@ -118,12 +122,12 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 		{
 			play_tween = false;
 		});
-		yield return (object)new WaitForSeconds(desc.showTime);
+		yield return new WaitForSeconds(desc.showTime);
 		while (play_tween)
 		{
 			yield return null;
 		}
-		yield return (object)new WaitForSeconds(desc.showTime);
+		yield return new WaitForSeconds(desc.showTime);
 		if (transitions != null)
 		{
 			int k = 0;
@@ -132,33 +136,34 @@ public class ToastManager : MonoBehaviourSingleton<ToastManager>
 				transitions[k].Close(null);
 			}
 		}
-		yield return this.StartCoroutine(DoWaitTransitions());
+		yield return StartCoroutine(DoWaitTransitions());
 		isOpenDialog = false;
 	}
 
 	private IEnumerator DoWaitTransitions()
 	{
-		if (transitions.Length <= 0)
+		if (transitions.Length == 0)
 		{
 			yield break;
 		}
 		while (true)
 		{
-			bool busy = false;
+			bool flag = false;
 			int i = 0;
 			for (int num = transitions.Length; i < num; i++)
 			{
 				if (transitions[i].isBusy)
 				{
-					busy = true;
+					flag = true;
 					break;
 				}
 			}
-			if (!busy)
+			if (flag)
 			{
-				break;
+				yield return null;
+				continue;
 			}
-			yield return null;
+			break;
 		}
 	}
 }

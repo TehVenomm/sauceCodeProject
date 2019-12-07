@@ -6,8 +6,6 @@ public class BulletControllerResurrectionHoming : BulletControllerHealingHoming
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam _skillInfoParam, Vector3 pos, Quaternion rot)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(bullet, _skillInfoParam, pos, rot);
 		BulletData.BulletResurrectionHoming dataResurrectionHomingBullet = bullet.dataResurrectionHomingBullet;
 		if (dataResurrectionHomingBullet != null)
@@ -17,8 +15,8 @@ public class BulletControllerResurrectionHoming : BulletControllerHealingHoming
 			m_isAlreadyDoneHitProcess = false;
 			m_buffIdList = dataResurrectionHomingBullet.buffIds;
 			m_isAddBuffActionOnResurrected = dataResurrectionHomingBullet.isAddBuffActionOnResurrected;
-			Utility.SetLayerWithChildren(this.get_transform(), dataResurrectionHomingBullet.defaultGenerateLayer);
-			m_effectAnimator = this.GetComponentInChildren<Animator>();
+			Utility.SetLayerWithChildren(base.transform, dataResurrectionHomingBullet.defaultGenerateLayer);
+			m_effectAnimator = GetComponentInChildren<Animator>();
 		}
 	}
 
@@ -28,7 +26,7 @@ public class BulletControllerResurrectionHoming : BulletControllerHealingHoming
 		{
 			m_isAlreadyDoneHitProcess = true;
 			PlayOnHitAnimation();
-			Player component = collider.get_gameObject().GetComponent<Player>();
+			Player component = collider.gameObject.GetComponent<Player>();
 			if (component != null && component.isDead)
 			{
 				component.OnResurrectionReceive();

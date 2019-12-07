@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,7 +21,7 @@ public class TheaterStory : GameSection
 
 	private List<TheaterModeTable.TheaterModeData> m_canViewStoryList;
 
-	private string m_chapterName = string.Empty;
+	private string m_chapterName = "";
 
 	private int m_nowPage = 1;
 
@@ -45,14 +44,10 @@ public class TheaterStory : GameSection
 			{
 				return 1;
 			}
-			if (a.order != 0)
-			{
-				return -1;
-			}
-			return (int)(a.story_id - b.story_id);
+			return (a.order != 0) ? (-1) : ((int)(a.story_id - b.story_id));
 		});
 		SetPaging();
-		this.StartCoroutine("DoInitialize");
+		StartCoroutine("DoInitialize");
 	}
 
 	private IEnumerator DoInitialize()
@@ -77,16 +72,16 @@ public class TheaterStory : GameSection
 		};
 		if (m_canViewStoryList.Count > 0)
 		{
-			SetActive(this.get_gameObject().get_transform(), UI.STR_STORY_NON_LIST, is_visible: false);
+			SetActive(base.gameObject.transform, UI.STR_STORY_NON_LIST, is_visible: false);
 		}
 		else
 		{
-			SetActive(this.get_gameObject().get_transform(), UI.STR_STORY_NON_LIST, is_visible: true);
+			SetActive(base.gameObject.transform, UI.STR_STORY_NON_LIST, is_visible: true);
 		}
-		SetActive(this.get_gameObject().get_transform(), UI.LBL_CHAPTER_NAME, is_visible: true);
-		SetLabelText(this.get_gameObject().get_transform(), UI.LBL_CHAPTER_NAME, m_chapterName);
-		SetLabelText((Enum)UI.LBL_MAX, m_pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, m_nowPage.ToString());
+		SetActive(base.gameObject.transform, UI.LBL_CHAPTER_NAME, is_visible: true);
+		SetLabelText(base.gameObject.transform, UI.LBL_CHAPTER_NAME, m_chapterName);
+		SetLabelText(UI.LBL_MAX, m_pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, m_nowPage.ToString());
 		List<TheaterModeTable.TheaterModeData> dispList = m_canViewStoryList;
 		if (m_pageMax > 1)
 		{
@@ -101,7 +96,7 @@ public class TheaterStory : GameSection
 			}
 			dispList = list;
 		}
-		SetDynamicList((Enum)UI.GRD_LIST, "TheaterStoryListItem", dispList.Count, reset: true, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList(UI.GRD_LIST, "TheaterStoryListItem", dispList.Count, reset: true, null, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			SetActive(t, UI.LBL_STORY_TITLE, is_visible: true);
 			SetLabelText(t, UI.LBL_STORY_TITLE, dispList[i].title);
@@ -129,7 +124,7 @@ public class TheaterStory : GameSection
 
 	private void OnQuery_PAGE_PREV()
 	{
-		m_nowPage = ((m_nowPage <= 1) ? m_pageMax : (m_nowPage - 1));
+		m_nowPage = ((m_nowPage > 1) ? (m_nowPage - 1) : m_pageMax);
 		RefreshUI();
 	}
 
@@ -145,17 +140,17 @@ public class TheaterStory : GameSection
 		List<TheaterModeTable.TheaterModeData> canViewStoryList = m_canViewStoryList;
 		if (canViewStoryList.Count <= 10)
 		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: true);
+			SetActive(UI.OBJ_ACTIVE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, is_visible: true);
 			m_pageMax = 1;
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: true);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_ACTIVE_ROOT, is_visible: true);
+			SetActive(UI.OBJ_INACTIVE_ROOT, is_visible: false);
 			m_pageMax = canViewStoryList.Count / 10 + 1;
 		}
-		SetLabelText((Enum)UI.LBL_MAX, m_pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, m_nowPage.ToString());
+		SetLabelText(UI.LBL_MAX, m_pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, m_nowPage.ToString());
 	}
 }

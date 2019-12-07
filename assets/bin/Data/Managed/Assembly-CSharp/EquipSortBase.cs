@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class EquipSortBase : SortBase
@@ -178,28 +177,23 @@ public class EquipSortBase : SortBase
 
 	public override void UpdateUI()
 	{
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-		//IL_076d: Unknown result type (might be due to invalid IL or missing references)
-		SetActive((Enum)UI.OBJ_TYPE, is_visible: false);
+		SetActive(UI.OBJ_TYPE, is_visible: false);
 		if (sortOrder.dialogType == DIALOG_TYPE.STORAGE_SKILL || sortOrder.dialogType == DIALOG_TYPE.SKILL)
 		{
-			SetActive((Enum)UI.OBJ_TYPE_SKILL, is_visible: true);
-			SetActive((Enum)UI.OBJ_TYPE_EQUIP, is_visible: false);
-			UIWidget component = base.GetComponent<UIWidget>((Enum)UI.OBJ_FRAME);
+			SetActive(UI.OBJ_TYPE_SKILL, is_visible: true);
+			SetActive(UI.OBJ_TYPE_EQUIP, is_visible: false);
+			UIWidget component = GetComponent<UIWidget>(UI.OBJ_FRAME);
 			if (component != null)
 			{
 				component.height = 820;
-				component.get_transform().set_localPosition(new Vector3(0f, 410f, 0f));
+				component.transform.localPosition = new Vector3(0f, 410f, 0f);
 				component.UpdateAnchors();
 			}
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_TYPE_SKILL, is_visible: false);
-			SetActive((Enum)UI.OBJ_TYPE_EQUIP, is_visible: true);
+			SetActive(UI.OBJ_TYPE_SKILL, is_visible: false);
+			SetActive(UI.OBJ_TYPE_EQUIP, is_visible: true);
 			if (sortOrder.dialogType == DIALOG_TYPE.WEAPON || sortOrder.dialogType == DIALOG_TYPE.ARMOR || sortOrder.dialogType == DIALOG_TYPE.TYPE_FILTERABLE_WEAPON || sortOrder.dialogType == DIALOG_TYPE.TYPE_FILTERABLE_ARMOR)
 			{
 				int num = 0;
@@ -209,31 +203,28 @@ public class EquipSortBase : SortBase
 					for (int num2 = equipChangeSortBaseFilterButton.Length; i < num2; i++)
 					{
 						bool value = (sortOrder.equipFilter & (1 << i)) != 0;
-						SetEvent((Enum)equipChangeSortBaseFilterButton[i], "EQUIP_FILTER", i);
-						SetToggle(GetCtrl(equipChangeSortBaseFilterButton[i]).get_parent(), value);
+						SetEvent(equipChangeSortBaseFilterButton[i], "EQUIP_FILTER", i);
+						SetToggle(GetCtrl(equipChangeSortBaseFilterButton[i]).parent, value);
 					}
 					num = 95;
-					SetActive((Enum)UI.OBJ_TYPE, is_visible: true);
+					SetActive(UI.OBJ_TYPE, is_visible: true);
 				}
-				int num3 = num;
-				UIWidget component2 = base.GetComponent<UIWidget>((Enum)UI.Frame);
+				int num3 = num / 2;
+				UIWidget component2 = GetComponent<UIWidget>(UI.Frame);
 				if (component2 != null)
 				{
 					component2.height = 703 + num3;
-					component2.get_transform().set_localPosition(new Vector3(0f, 349f + (float)num3, 0f));
+					component2.transform.localPosition = new Vector3(0f, 349f + (float)num3, 0f);
 					component2.UpdateAnchors();
 				}
-				Transform ctrl = GetCtrl(UI.OBJ_SORT_ROOT);
-				Transform ctrl2 = GetCtrl(UI.SPR_SORT_UNDER_LINE);
-				ctrl2.set_localPosition(new Vector3(0f, (float)(-(130 + num3)), 0f));
 			}
 			else
 			{
-				UIWidget component3 = base.GetComponent<UIWidget>((Enum)UI.OBJ_FRAME);
+				UIWidget component3 = GetComponent<UIWidget>(UI.OBJ_FRAME);
 				if (component3 != null)
 				{
 					component3.height = 770;
-					component3.get_transform().set_localPosition(new Vector3(0f, 385f, 0f));
+					component3.transform.localPosition = new Vector3(0f, 385f, 0f);
 					component3.UpdateAnchors();
 				}
 			}
@@ -242,8 +233,8 @@ public class EquipSortBase : SortBase
 		for (int num4 = rarityButton.Length; j < num4; j++)
 		{
 			bool value2 = (sortOrder.rarity & (1 << j)) != 0;
-			SetEvent((Enum)rarityButton[j], "RARITY", j);
-			SetToggle(GetCtrl(rarityButton[j]).get_parent(), value2);
+			SetEvent(rarityButton[j], "RARITY", j);
+			SetToggle(GetCtrl(rarityButton[j]).parent, value2);
 		}
 		UI?[] array = typeButton;
 		UI?[] array2 = null;
@@ -290,33 +281,28 @@ public class EquipSortBase : SortBase
 			int k = 0;
 			for (int num7 = array.Length; k < num7; k++)
 			{
-				UI? uI = array[k];
-				if (!uI.HasValue)
+				if (!array[k].HasValue)
 				{
 					continue;
 				}
 				if ((num5 & (1 << k)) != 0)
 				{
 					bool value3 = (sortOrder.type & (1 << k)) != 0;
-					SetEvent((Enum)(object)array[k], event_name, k);
-					SetToggle(GetCtrl((Enum)(object)array[k]).get_parent(), value3);
+					SetEvent(array[k], event_name, k);
+					SetToggle(GetCtrl(array[k]).parent, value3);
 				}
 				else if (MonoBehaviourSingleton<GameSceneManager>.I.GetPrevSectionNameFromHistory() == "SmithGrowSkillSelectMaterial")
 				{
-					if (array2 != null && k < array2.Length)
+					if (array2 != null && k < array2.Length && array2[k].HasValue)
 					{
-						UI? uI2 = array2[k];
-						if (uI2.HasValue)
-						{
-							SetActive((Enum)(object)array[k], is_visible: false);
-							SetActive((Enum)(object)array2[k], is_visible: true);
-						}
+						SetActive(array[k], is_visible: false);
+						SetActive(array2[k], is_visible: true);
 					}
 				}
 				else
 				{
-					SetActive((Enum)(object)array[k], is_visible: false);
-					SetActive((Enum)(object)array2[k], is_visible: false);
+					SetActive(array[k], is_visible: false);
+					SetActive(array2[k], is_visible: false);
 				}
 			}
 		}
@@ -326,35 +312,34 @@ public class EquipSortBase : SortBase
 			for (int num8 = array3.Length; l < num8; l++)
 			{
 				bool value4 = (sortOrder.element & (1 << l)) != 0;
-				SetEvent((Enum)(object)array3[l], "ELEMENT", l);
-				SetToggle(GetCtrl((Enum)(object)array3[l]).get_parent(), value4);
+				SetEvent(array3[l], "ELEMENT", l);
+				SetToggle(GetCtrl(array3[l]).parent, value4);
 			}
 		}
-		UI? uI3 = null;
+		UI? uI = null;
 		int m = 0;
 		for (int num9 = requirementButton.Length; m < num9; m++)
 		{
-			UI? uI4 = requirementButton[m];
-			if (uI4.HasValue)
+			if (requirementButton[m].HasValue)
 			{
 				int num10 = 1 << m;
 				if ((num10 & num6) != 0)
 				{
 					bool value5 = sortOrder.requirement == (SORT_REQUIREMENT)num10;
-					SetEvent((Enum)(object)requirementButton[m], "REQUIREMENT", num10);
-					SetToggle((Enum)(object)requirementButton[m], value5);
-					uI3 = requirementButton[m];
+					SetEvent(requirementButton[m], "REQUIREMENT", num10);
+					SetToggle(requirementButton[m], value5);
+					uI = requirementButton[m];
 				}
 				else
 				{
-					SetActive((Enum)(object)requirementButton[m], is_visible: false);
+					SetActive(requirementButton[m], is_visible: false);
 				}
 			}
 		}
-		if (uI3.HasValue)
+		if (uI.HasValue)
 		{
-			base.GetComponent<UIGrid>((Enum)UI.GRD_REQUIREMENT).Reposition();
-			GetCtrl(UI.OBJ_HEIGHT_ANCHOR).set_position(GetCtrl((Enum)(object)uI3).get_position());
+			GetComponent<UIGrid>(UI.GRD_REQUIREMENT).Reposition();
+			GetCtrl(UI.OBJ_HEIGHT_ANCHOR).position = GetCtrl(uI).position;
 		}
 		int n = 0;
 		for (int num11 = ascButton.Length; n < num11; n++)
@@ -364,38 +349,38 @@ public class EquipSortBase : SortBase
 			{
 				value6 = true;
 			}
-			SetEvent((Enum)ascButton[n], "ORDER_TYPE", n);
-			SetToggle((Enum)ascButton[n], value6);
+			SetEvent(ascButton[n], "ORDER_TYPE", n);
+			SetToggle(ascButton[n], value6);
 		}
 	}
 
 	protected void OnQuery_RARITY()
 	{
 		OnQueryEvent_Rarity(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl(rarityButton[_index]).get_parent(), _is_enable);
+		SetToggle(GetCtrl(rarityButton[_index]).parent, _is_enable);
 	}
 
 	protected void OnQuery_TYPE()
 	{
 		OnQueryEvent_Type(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl((Enum)(object)typeButton[_index]).get_parent(), _is_enable);
+		SetToggle(GetCtrl(typeButton[_index]).parent, _is_enable);
 	}
 
 	protected void OnQuery_SKILL_TYPE()
 	{
 		OnQueryEvent_Type(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl((Enum)(object)typeSkillButton[_index]).get_parent(), _is_enable);
+		SetToggle(GetCtrl(typeSkillButton[_index]).parent, _is_enable);
 	}
 
 	protected void OnQuery_ELEMENT()
 	{
 		OnQueryEvent_Element(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl((Enum)(object)elementButton[_index]).get_parent(), _is_enable);
+		SetToggle(GetCtrl(elementButton[_index]).parent, _is_enable);
 	}
 
 	protected void OnQuery_EQUIP_FILTER()
 	{
 		OnQueryEvent_EquipFilter(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl(equipChangeSortBaseFilterButton[_index]).get_parent(), _is_enable);
+		SetToggle(GetCtrl(equipChangeSortBaseFilterButton[_index]).parent, _is_enable);
 	}
 }

@@ -9,5 +9,5 @@ public class TradingPostSellItemModel : BaseModel
 		public int price;
 	}
 
-	public static string URL = "/ajax/trading-post/sell";
+	public static string URL = "ajax/trading-post/sell";
 }

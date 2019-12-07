@@ -43,11 +43,11 @@ public class GachaDecoManager : MonoBehaviourSingleton<GachaDecoManager>
 				index = 0;
 			}
 			info = list[index];
-			double remain_time = (double)info.remainTime - new TimeSpan(TimeManager.GetNow().Ticks - MonoBehaviourSingleton<UserInfoManager>.I.gachaDecoDateBase).TotalSeconds;
+			double num = (double)info.remainTime - new TimeSpan(TimeManager.GetNow().Ticks - MonoBehaviourSingleton<UserInfoManager>.I.gachaDecoDateBase).TotalSeconds;
 			double wait_time = interval_time;
-			if (wait_time > remain_time)
+			if (wait_time > num)
 			{
-				wait_time = remain_time;
+				wait_time = num;
 			}
 			if (wait_time > 1.0)
 			{
@@ -55,7 +55,7 @@ public class GachaDecoManager : MonoBehaviourSingleton<GachaDecoManager>
 				float timer = (float)wait_time;
 				while (timer > 0f && IsVisible())
 				{
-					timer -= Time.get_deltaTime();
+					timer -= Time.deltaTime;
 					yield return null;
 				}
 			}

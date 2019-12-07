@@ -4,7 +4,6 @@ using GooglePlayGames.OurUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
@@ -163,45 +162,6 @@ namespace GooglePlayGames.Native.PInvoke
 
 		private readonly GameServices mGameServices;
 
-		[CompilerGenerated]
-		private static RealTimeMultiplayerManager.RealTimeRoomCallback _003C_003Ef__mg_0024cache0;
-
-		[CompilerGenerated]
-		private static Func<IntPtr, PlayerSelectUIResponse> _003C_003Ef__mg_0024cache1;
-
-		[CompilerGenerated]
-		private static RealTimeMultiplayerManager.PlayerSelectUICallback _003C_003Ef__mg_0024cache2;
-
-		[CompilerGenerated]
-		private static Func<IntPtr, RoomInboxUIResponse> _003C_003Ef__mg_0024cache3;
-
-		[CompilerGenerated]
-		private static RealTimeMultiplayerManager.RoomInboxUICallback _003C_003Ef__mg_0024cache4;
-
-		[CompilerGenerated]
-		private static Func<IntPtr, WaitingRoomUIResponse> _003C_003Ef__mg_0024cache5;
-
-		[CompilerGenerated]
-		private static RealTimeMultiplayerManager.WaitingRoomUICallback _003C_003Ef__mg_0024cache6;
-
-		[CompilerGenerated]
-		private static Func<IntPtr, FetchInvitationsResponse> _003C_003Ef__mg_0024cache7;
-
-		[CompilerGenerated]
-		private static RealTimeMultiplayerManager.FetchInvitationsCallback _003C_003Ef__mg_0024cache8;
-
-		[CompilerGenerated]
-		private static RealTimeMultiplayerManager.LeaveRoomCallback _003C_003Ef__mg_0024cache9;
-
-		[CompilerGenerated]
-		private static RealTimeMultiplayerManager.RealTimeRoomCallback _003C_003Ef__mg_0024cacheA;
-
-		[CompilerGenerated]
-		private static RealTimeMultiplayerManager.SendReliableMessageCallback _003C_003Ef__mg_0024cacheB;
-
-		[CompilerGenerated]
-		private static Func<IntPtr, RealTimeRoomResponse> _003C_003Ef__mg_0024cacheC;
-
 		internal RealtimeManager(GameServices gameServices)
 		{
 			mGameServices = Misc.CheckNotNull(gameServices);
@@ -326,8 +286,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal void SendUnreliableMessageToSpecificParticipants(NativeRealTimeRoom room, List<MultiplayerParticipant> recipients, byte[] data)
 		{
-			RealTimeMultiplayerManager.RealTimeMultiplayerManager_SendUnreliableMessage(mGameServices.AsHandle(), room.AsPointer(), (from r in recipients
-			select r.AsPointer()).ToArray(), new UIntPtr((ulong)recipients.LongCount()), data, PInvokeUtilities.ArrayToSizeT(data));
+			RealTimeMultiplayerManager.RealTimeMultiplayerManager_SendUnreliableMessage(mGameServices.AsHandle(), room.AsPointer(), recipients.Select((MultiplayerParticipant r) => r.AsPointer()).ToArray(), new UIntPtr((ulong)recipients.LongCount()), data, PInvokeUtilities.ArrayToSizeT(data));
 		}
 
 		private static IntPtr ToCallbackPointer(Action<RealTimeRoomResponse> callback)

@@ -67,7 +67,7 @@ public class GatherManager : MonoBehaviourSingleton<GatherManager>
 				gatherPointList = ret.result.gather;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGatherEnter(Action<bool, GatherEnterData> call_back)
@@ -80,7 +80,7 @@ public class GatherManager : MonoBehaviourSingleton<GatherManager>
 				arg = true;
 			}
 			call_back(arg, ret.result);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGatherUpdate(Action<bool, GatherEnterData> call_back)
@@ -93,7 +93,7 @@ public class GatherManager : MonoBehaviourSingleton<GatherManager>
 				arg = true;
 			}
 			call_back(arg, ret.result);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGatherStart(int pointId, Action<bool, bool, int> call_back)
@@ -115,7 +115,7 @@ public class GatherManager : MonoBehaviourSingleton<GatherManager>
 				}
 			}
 			call_back(arg, arg2, arg3);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGatherComplete(int pointId, Action<bool, bool, int, GatherRewardList> call_back)
@@ -136,7 +136,7 @@ public class GatherManager : MonoBehaviourSingleton<GatherManager>
 				arg4 = ret.result.reward;
 			}
 			call_back(arg, arg2, arg3, arg4);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGatherShortcut(int pointId, Action<bool> call_back)
@@ -152,7 +152,7 @@ public class GatherManager : MonoBehaviourSingleton<GatherManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void Dirty()

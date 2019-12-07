@@ -20,7 +20,7 @@ public class BulletControllerArrowSoul : BulletControllerBase
 
 	protected TargetPoint target;
 
-	protected Vector3 direction = Vector3.get_forward();
+	protected Vector3 direction = Vector3.forward;
 
 	protected float speed0;
 
@@ -42,28 +42,12 @@ public class BulletControllerArrowSoul : BulletControllerBase
 
 	public void SetPuppetTargetPos(Vector3 pos)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		puppetTargetPos = pos;
 		isPuppet = true;
 	}
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam skillParam, Vector3 pos, Quaternion rot)
 	{
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
 		base.timeCount = 0f;
 		isEndAccel = false;
 		isLookTarget = false;
@@ -76,62 +60,44 @@ public class BulletControllerArrowSoul : BulletControllerBase
 		angularVelocity = bullet.dataArrowSoul.angularVelocity;
 		angularStartTime = bullet.dataArrowSoul.angularStartTime;
 		ignoreAngle = bullet.dataArrowSoul.ignoreAngle;
-		base._transform.set_position(pos);
+		base._transform.position = pos;
 		int num = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.soulShotDirs.Length;
 		int num2 = Random.Range(0, num - 1);
-		Vector3 val = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.soulShotDirs[num2];
-		direction = rot * val;
-		Transform transform = base._transform;
-		transform.set_position(transform.get_position() - direction * MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.soulShotDirVec);
-		base._transform.set_rotation(rot);
-		base._rigidbody.set_velocity(direction * speed0);
+		Vector3 point = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.soulShotDirs[num2];
+		direction = rot * point;
+		base._transform.position -= direction * MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.soulShotDirVec;
+		base._transform.rotation = rot;
+		base._rigidbody.velocity = direction * speed0;
 	}
 
 	public override void Update()
 	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
 		if (target == null && !isPuppet)
 		{
 			return;
 		}
-		base.timeCount += Time.get_deltaTime();
+		base.timeCount += Time.deltaTime;
 		bool flag = _CalcSpeed();
 		_CalcAngle();
 		if (isLookTarget)
 		{
-			Vector3 val = ((!isPuppet) ? target.GetTargetPoint() : puppetTargetPos) - base._transform.get_position();
-			float num = Mathf.Abs(Vector3.Angle(base._transform.get_forward(), val));
+			Vector3 vector = (isPuppet ? puppetTargetPos : target.GetTargetPoint()) - base._transform.position;
+			float num = Mathf.Abs(Vector3.Angle(base._transform.forward, vector));
 			if (num > ignoreAngle)
 			{
-				float num2 = angularVelocity * Time.get_deltaTime() / num;
+				float num2 = angularVelocity * Time.deltaTime / num;
 				if (num2 > 1f)
 				{
 					num2 = 1f;
 				}
-				base._transform.set_rotation(Quaternion.Lerp(base._transform.get_rotation(), Quaternion.LookRotation(val), num2));
-				direction = base._transform.get_rotation() * Vector3.get_forward();
+				base._transform.rotation = Quaternion.Lerp(base._transform.rotation, Quaternion.LookRotation(vector), num2);
+				direction = base._transform.rotation * Vector3.forward;
 				flag = true;
 			}
 		}
 		if (flag)
 		{
-			base._rigidbody.set_velocity(direction * speed1);
+			base._rigidbody.velocity = direction * speed1;
 		}
 	}
 

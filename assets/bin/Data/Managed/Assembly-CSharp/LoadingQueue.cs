@@ -31,8 +31,6 @@ public class LoadingQueue
 
 	public LoadObject Load(bool isEventAsset, RESOURCE_CATEGORY category, string resource_name, bool cache_package = false)
 	{
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 		switch (category)
 		{
 		case RESOURCE_CATEGORY.DEGREE_FRAME:
@@ -45,16 +43,11 @@ public class LoadingQueue
 		case RESOURCE_CATEGORY.LOGINBONUS_IMAGE:
 		case RESOURCE_CATEGORY.SHOP_IMG:
 		case RESOURCE_CATEGORY.TIPS_IMAGE:
-			if (!(MonoBehaviourSingleton<ResourceManager>.I.event_manifest == null))
+			if (MonoBehaviourSingleton<ResourceManager>.I.event_manifest == null || !MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(category.ToAssetBundleName(resource_name)).isValid)
 			{
-				Hash128 assetBundleHash = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(category.ToAssetBundleName(resource_name));
-				if (assetBundleHash.get_isValid())
-				{
-					break;
-				}
+				Log.Error("Missing event asset: " + resource_name);
+				resource_name = category.ToString();
 			}
-			Log.Error("Missing event asset: " + resource_name);
-			resource_name = category.ToString();
 			break;
 		}
 		LoadObject loadObject = new LoadObject(isEventAsset, monoBehaviour, category, resource_name, cache_package);
@@ -68,6 +61,16 @@ public class LoadingQueue
 	public LoadObject Load(RESOURCE_CATEGORY category, string resource_name, bool cache_package = false)
 	{
 		LoadObject loadObject = new LoadObject(monoBehaviour, category, resource_name, cache_package);
+		if (loadObject.isLoading)
+		{
+			loadQueue.Enqueue(loadObject);
+		}
+		return loadObject;
+	}
+
+	public LoadObject LoadAssetBundleToCache(RESOURCE_CATEGORY category, string resource_name, bool cache_package = false)
+	{
+		LoadObject loadObject = new LoadObject(monoBehaviour, category, resource_name, cache_package, unload_bundle: true);
 		if (loadObject.isLoading)
 		{
 			loadQueue.Enqueue(loadObject);
@@ -119,6 +122,28 @@ public class LoadingQueue
 		}, cache_package: true);
 	}
 
+	public LoadObject QuickLoad(RESOURCE_CATEGORY category, string resource_name, bool cache_package = false)
+	{
+		LoadObject loadObject = new LoadObject();
+		loadObject.QuickLoad(monoBehaviour, category, resource_name, cache_package);
+		if (loadObject.isLoading)
+		{
+			loadQueue.Enqueue(loadObject);
+		}
+		return loadObject;
+	}
+
+	public LoadObject QuickLoad(RESOURCE_CATEGORY category, string package_name, string[] resource_names, bool cache_package = false)
+	{
+		LoadObject loadObject = new LoadObject();
+		loadObject.QuickLoad(monoBehaviour, category, package_name, resource_names, cache_package);
+		if (loadObject.isLoading)
+		{
+			loadQueue.Enqueue(loadObject);
+		}
+		return loadObject;
+	}
+
 	public void CacheSE(int se_id, List<LoadObject> los = null)
 	{
 		string sEPackage = ResourceName.GetSEPackage(se_id);
@@ -168,8 +193,7 @@ public class LoadingQueue
 			ResourceObject cachedResourceObject = MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedResourceObject(category, name);
 			if (cachedResourceObject != null)
 			{
-				ResourceLoad resourceLoad = ResourceLoad.GetResourceLoad(monoBehaviour);
-				resourceLoad.SetReference(cachedResourceObject);
+				ResourceLoad.GetResourceLoad(monoBehaviour).SetReference(cachedResourceObject);
 				return null;
 			}
 		}
@@ -196,8 +220,7 @@ public class LoadingQueue
 			ResourceObject cachedResourceObject = MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedResourceObject(category, name);
 			if (cachedResourceObject != null)
 			{
-				ResourceLoad resourceLoad = ResourceLoad.GetResourceLoad(monoBehaviour);
-				resourceLoad.SetReference(cachedResourceObject);
+				ResourceLoad.GetResourceLoad(monoBehaviour).SetReference(cachedResourceObject);
 				return null;
 			}
 		}
@@ -280,7 +303,7 @@ public class LoadingQueue
 				case AnimEventFormat.ID.WEAKPOINT_ON:
 				{
 					eventData.attackMode = Player.ATTACK_MODE.NONE;
-					string text6 = (eventData.stringArgs.Length <= 0) ? string.Empty : eventData.stringArgs[0];
+					string text6 = (eventData.stringArgs.Length != 0) ? eventData.stringArgs[0] : "";
 					if (!string.IsNullOrEmpty(text6))
 					{
 						if (Enum.IsDefined(typeof(EQUIPMENT_TYPE), text6))
@@ -309,7 +332,7 @@ public class LoadingQueue
 					case Enemy.WEAK_STATE.WEAK_ELEMENT_ATTACK:
 					case Enemy.WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK:
 					{
-						int num5 = (eventData.intArgs.Length <= 2) ? (-1) : eventData.intArgs[2];
+						int num5 = (eventData.intArgs.Length > 2) ? eventData.intArgs[2] : (-1);
 						if (num5 >= 0)
 						{
 							text7 += num5.ToString();
@@ -318,7 +341,7 @@ public class LoadingQueue
 					}
 					case Enemy.WEAK_STATE.WEAK_ELEMENT_SP_ATTACK:
 					{
-						int num4 = (eventData.intArgs.Length <= 2) ? (-1) : eventData.intArgs[2];
+						int num4 = (eventData.intArgs.Length > 2) ? eventData.intArgs[2] : (-1);
 						if (eventData.attackMode != 0 && num4 >= 0)
 						{
 							text7 = string.Format(text7, (int)(eventData.attackMode - 1), num4);
@@ -332,7 +355,7 @@ public class LoadingQueue
 				case AnimEventFormat.ID.WEAKPOINT_ALL_ON:
 				{
 					eventData.attackMode = Player.ATTACK_MODE.NONE;
-					string text = (eventData.stringArgs.Length <= 0) ? string.Empty : eventData.stringArgs[0];
+					string text = (eventData.stringArgs.Length != 0) ? eventData.stringArgs[0] : "";
 					if (!string.IsNullOrEmpty(text))
 					{
 						if (!Enum.IsDefined(typeof(EQUIPMENT_TYPE), text))
@@ -413,9 +436,9 @@ public class LoadingQueue
 				case AnimEventFormat.ID.EFFECT_SWITCH_OBJECT_BY_CONDITION:
 				case AnimEventFormat.ID.EFFECT_TILING:
 				{
-					bool flag = eventData.intArgs != null && eventData.intArgs.Length > 3 && eventData.intArgs[3] == 1;
+					bool num = eventData.intArgs != null && eventData.intArgs.Length > 3 && eventData.intArgs[3] == 1;
 					string text = eventData.stringArgs[0];
-					if (flag)
+					if (num)
 					{
 						int currentWeaponElement3 = player.GetCurrentWeaponElement();
 						if (currentWeaponElement3 >= 6)
@@ -504,8 +527,7 @@ public class LoadingQueue
 		{
 			CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, dataBarrier.effectNameInBarrier);
 		}
-		BulletData.BulletResurrectionHoming dataResurrectionHomingBullet = bulletData.dataResurrectionHomingBullet;
-		if (dataResurrectionHomingBullet != null)
+		if (bulletData.dataResurrectionHomingBullet != null)
 		{
 			CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_sk_heal_04_03");
 		}
@@ -565,6 +587,15 @@ public class LoadingQueue
 				return true;
 			}
 			loadQueue.Dequeue();
+		}
+		return false;
+	}
+
+	public bool IsStop()
+	{
+		if (loadQueue.Count <= 0)
+		{
+			return true;
 		}
 		return false;
 	}

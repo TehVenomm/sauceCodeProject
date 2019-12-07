@@ -33,7 +33,7 @@ public class TypewriterEffect : MonoBehaviour
 
 	private UILabel mLabel;
 
-	private string mFullText = string.Empty;
+	private string mFullText = "";
 
 	private int mCurrentOffset;
 
@@ -46,11 +46,6 @@ public class TypewriterEffect : MonoBehaviour
 	private BetterList<FadeEntry> mFade = new BetterList<FadeEntry>();
 
 	public bool isActive => mActive;
-
-	public TypewriterEffect()
-		: this()
-	{
-	}
 
 	public void ResetToBeginning()
 	{
@@ -104,7 +99,7 @@ public class TypewriterEffect : MonoBehaviour
 		{
 			mCurrentOffset = 0;
 			mReset = false;
-			mLabel = this.GetComponent<UILabel>();
+			mLabel = GetComponent<UILabel>();
 			mFullText = mLabel.processedText;
 			mFade.Clear();
 			if (keepFullDimensions && scrollView != null)
@@ -132,7 +127,7 @@ public class TypewriterEffect : MonoBehaviour
 				break;
 			}
 			float num2 = 1f / (float)charsPerSecond;
-			char c = (num >= mFullText.Length) ? '\n' : mFullText[num];
+			char c = (num < mFullText.Length) ? mFullText[num] : '\n';
 			if (c == '\n')
 			{
 				num2 += delayOnNewLine;
@@ -176,7 +171,7 @@ public class TypewriterEffect : MonoBehaviour
 			}
 			else
 			{
-				mLabel.text = ((!keepFullDimensions) ? mFullText.Substring(0, mCurrentOffset) : (mFullText.Substring(0, mCurrentOffset) + "[00]" + mFullText.Substring(mCurrentOffset)));
+				mLabel.text = (keepFullDimensions ? (mFullText.Substring(0, mCurrentOffset) + "[00]" + mFullText.Substring(mCurrentOffset)) : mFullText.Substring(0, mCurrentOffset));
 				if (!keepFullDimensions && scrollView != null)
 				{
 					scrollView.UpdatePosition();

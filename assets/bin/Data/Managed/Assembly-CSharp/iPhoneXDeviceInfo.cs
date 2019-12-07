@@ -10,7 +10,7 @@ public class iPhoneXDeviceInfo : DeviceIndividualInfo
 
 	private static EDGE_SIZE edgeSize = EDGE_SIZE.X;
 
-	private static readonly float DEVICE_SCALE = (float)((Screen.get_width() <= Screen.get_height()) ? Screen.get_height() : Screen.get_width()) / 2436f;
+	private static readonly float DEVICE_SCALE = (float)((Screen.width > Screen.height) ? Screen.width : Screen.height) / 2436f;
 
 	private EdgeInsets edgePortrait;
 
@@ -68,16 +68,16 @@ public class iPhoneXDeviceInfo : DeviceIndividualInfo
 
 	public iPhoneXDeviceInfo()
 	{
-		switch (edgeSize)
+		EDGE_SIZE eDGE_SIZE = edgeSize;
+		if (eDGE_SIZE != 0 && eDGE_SIZE == EDGE_SIZE.XR)
 		{
-		case EDGE_SIZE.XR:
 			edgePortrait = new EdgeInsets(88f, 0f, 68f, 0f, DeviceIndividualInfo.shorterSide, DeviceIndividualInfo.longerSide);
 			edgeLandscape = new EdgeInsets(0f, 88f, 42f, 88f, DeviceIndividualInfo.longerSide, DeviceIndividualInfo.shorterSide);
-			break;
-		default:
+		}
+		else
+		{
 			edgePortrait = new EdgeInsets(132f, 0f, 102f, 0f, DeviceIndividualInfo.shorterSide, DeviceIndividualInfo.longerSide);
 			edgeLandscape = new EdgeInsets(0f, 132f, 63f, 132f, DeviceIndividualInfo.longerSide, DeviceIndividualInfo.shorterSide);
-			break;
 		}
 		WebViewInfoPortrait.Set(62, 62, 353, 183);
 		WebViewHelpPortrait.Set(62, 62, 244, 317);

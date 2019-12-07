@@ -12,25 +12,23 @@ public class ItemDetailSeriesArena : UIBehaviour
 
 	public void SetUpItem(Transform t)
 	{
-		this.StartCoroutine(loadBanner(t));
+		StartCoroutine(loadBanner(t));
 	}
 
 	private IEnumerator loadBanner(Transform t)
 	{
-		Network.EventData eventData = (from e in MonoBehaviourSingleton<QuestManager>.I.eventList
-		where e.eventTypeEnum == EVENT_TYPE.SERIES_ARENA_POINT_CLEAR
-		select e).FirstOrDefault();
+		Network.EventData eventData = MonoBehaviourSingleton<QuestManager>.I.eventList.Where((Network.EventData e) => e.eventTypeEnum == EVENT_TYPE.SERIES_ARENA_POINT_CLEAR).FirstOrDefault();
 		LoadingQueue loadingQueue = new LoadingQueue(this);
 		LoadObject obj = loadingQueue.Load(RESOURCE_CATEGORY.EVENT_ICON, ResourceName.GetEventBanner(eventData.bannerId));
 		if (loadingQueue.IsLoading())
 		{
 			yield return loadingQueue.Wait();
 		}
-		Texture2D bannerTex = obj.loadedObject as Texture2D;
-		if (bannerTex != null)
+		Texture2D texture2D = obj.loadedObject as Texture2D;
+		if (texture2D != null)
 		{
 			Transform t2 = FindCtrl(t, UI.TEX_EVENT_BANNER);
-			SetTexture(t2, bannerTex);
+			SetTexture(t2, texture2D);
 			SetActive(t2, is_visible: true);
 		}
 	}

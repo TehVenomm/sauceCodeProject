@@ -46,9 +46,9 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 
 	private float m_rotateFinishTime;
 
-	private Quaternion m_rotStart = Quaternion.get_identity();
+	private Quaternion m_rotStart = Quaternion.identity;
 
-	private Quaternion m_rotEnd = Quaternion.get_identity();
+	private Quaternion m_rotEnd = Quaternion.identity;
 
 	private BallisticLineRenderer ballisticLineRenderer;
 
@@ -70,20 +70,19 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 
 	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
 	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(pointData);
 		m_coolFinishTime = pointData.value1;
 		m_baseTrans = modelTrans.Find("CMN_cannon01_Origin/Move/Root/base/rot");
 		m_cannonTrans = modelTrans.Find("CMN_cannon01_Origin/Move/Root/base/rot/cannon_rot");
-		m_baseTrans.LookAt(Vector3.get_zero());
-		_animator = this.get_gameObject().GetComponentInChildren<Animator>();
+		m_baseTrans.LookAt(Vector3.zero);
+		_animator = base.gameObject.GetComponentInChildren<Animator>();
 		if (MonoBehaviourSingleton<UIStatusGizmoManager>.IsValid())
 		{
 			MonoBehaviourSingleton<UIStatusGizmoManager>.I.Create(this);
 		}
 		if (ballisticLineRenderer == null)
 		{
-			ballisticLineRenderer = this.get_gameObject().AddComponent<BallisticLineRenderer>();
+			ballisticLineRenderer = base.gameObject.AddComponent<BallisticLineRenderer>();
 		}
 	}
 
@@ -94,12 +93,20 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 
 	public bool IsAbleToUse()
 	{
-		return m_owner == null && m_state == STATE.NONE;
+		if (m_owner == null)
+		{
+			return m_state == STATE.NONE;
+		}
+		return false;
 	}
 
 	public bool IsAbleToShot()
 	{
-		return IsUsing() && m_state == STATE.READY;
+		if (IsUsing())
+		{
+			return m_state == STATE.READY;
+		}
+		return false;
 	}
 
 	public bool IsCooling()
@@ -181,32 +188,12 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 
 	protected override void Awake()
 	{
-		_transform = this.get_transform();
-		Utility.SetLayerWithChildren(this.get_transform(), 19);
+		_transform = base.transform;
+		Utility.SetLayerWithChildren(base.transform, 19);
 	}
 
 	private void Update()
 	{
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
 		switch (m_state)
 		{
 		case STATE.NONE:
@@ -224,12 +211,11 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 			{
 				Vector3 position = MonoBehaviourSingleton<StageObjectManager>.I.boss._position;
 				position.y = 0f;
-				Vector3 val = position - _transform.get_position();
-				Vector3 normalized = val.get_normalized();
-				float num = Vector3.Dot(m_baseTrans.get_forward(), normalized);
+				Vector3 normalized = (position - _transform.position).normalized;
+				float num = Vector3.Dot(m_baseTrans.forward, normalized);
 				m_rotateTime = 0f;
-				m_rotateFinishTime = Mathf.Acos(num) / 0.17453292f * (1f / (float)Application.get_targetFrameRate());
-				m_rotStart = Quaternion.LookRotation(m_baseTrans.get_forward());
+				m_rotateFinishTime = Mathf.Acos(num) / 0.17453292f * (1f / (float)Application.targetFrameRate);
+				m_rotStart = Quaternion.LookRotation(m_baseTrans.forward);
 				m_rotEnd = Quaternion.LookRotation(normalized);
 				if (num >= 1f)
 				{
@@ -237,12 +223,12 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 					break;
 				}
 				SetStateRotate();
-				SoundManager.PlayOneShotSE(10000079, _transform.get_position());
+				SoundManager.PlayOneShotSE(10000079, _transform.position);
 			}
 			break;
 		case STATE.ROTATE:
 		{
-			m_rotateTime += Time.get_deltaTime();
+			m_rotateTime += Time.deltaTime;
 			if (m_rotateFinishTime <= 0f)
 			{
 				SetStateReady();
@@ -255,7 +241,7 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 			}
 			else
 			{
-				m_baseTrans.set_localRotation(Quaternion.Lerp(m_rotStart, m_rotEnd, num2));
+				m_baseTrans.localRotation = Quaternion.Lerp(m_rotStart, m_rotEnd, num2);
 			}
 			break;
 		}
@@ -284,41 +270,25 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 		}
 		if (m_coolTime >= 0f)
 		{
-			m_coolTime -= Time.get_deltaTime();
+			m_coolTime -= Time.deltaTime;
 		}
 	}
 
 	private void LateUpdate()
 	{
 		STATE state = m_state;
-		if (state == STATE.READY || state == STATE.COOLTIME)
+		if ((uint)(state - 3) <= 1u)
 		{
 			UpdateCannonRotation();
 			UpdateCannonAngle();
 		}
 	}
 
-	public new void UpdateTargetMarker(bool isNear)
+	public override void UpdateTargetMarker(bool isNear)
 	{
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 		Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-		if (boss != null && boss.IsValidShield() && !IsUsing() && isNear && self != null && self.IsChangeableAction((Character.ACTION_ID)31))
+		if (((boss != null && boss.IsValidShield() && !IsUsing()) & isNear) && self != null && self.IsChangeableAction((Character.ACTION_ID)31))
 		{
 			if (m_targetEffect == null && !string.IsNullOrEmpty(ResourceName.GetFieldGimmickCannonTargetEffect()))
 			{
@@ -327,44 +297,36 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 			if (m_targetEffect != null)
 			{
 				Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-				Vector3 position = cameraTransform.get_position();
-				Quaternion rotation = cameraTransform.get_rotation();
-				Vector3 val = position - _transform.get_position();
-				Vector3 pos = val.get_normalized() + Vector3.get_up() + _transform.get_position();
+				Vector3 position = cameraTransform.position;
+				Quaternion rotation = cameraTransform.rotation;
+				Vector3 pos = (position - _transform.position).normalized + Vector3.up + _transform.position;
 				m_targetEffect.Set(pos, rotation);
 			}
 		}
 		else if (m_targetEffect != null)
 		{
-			EffectManager.ReleaseEffect(m_targetEffect.get_gameObject());
+			EffectManager.ReleaseEffect(m_targetEffect.gameObject);
 		}
 	}
 
 	private void UpdateCannonAngle()
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 		if (!(m_cannonTrans == null) && !(m_owner == null))
 		{
 			Self self = m_owner as Self;
 			if (!(self == null))
 			{
-				m_cannonTrans.set_localRotation(Quaternion.Euler(self.GetCannonShotEuler()));
-				ballisticLineRenderer.UpdateLine(m_cannonTrans.get_position(), m_cannonTrans.get_rotation() * Vector3.get_forward());
+				m_cannonTrans.localRotation = Quaternion.Euler(self.GetCannonShotEuler());
+				ballisticLineRenderer.UpdateLine(m_cannonTrans.position, m_cannonTrans.rotation * Vector3.forward);
 			}
 		}
 	}
 
 	private void UpdateCannonRotation()
 	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 		if (!(m_baseTrans == null) && !(m_owner == null))
 		{
-			m_baseTrans.set_localRotation(m_owner._rigidbody.get_rotation());
+			m_baseTrans.localRotation = m_owner._rigidbody.rotation;
 		}
 	}
 
@@ -406,14 +368,6 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 
 	public void Shot()
 	{
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Expected O, but got Unknown
 		if (IsReadyForShot())
 		{
 			if (_animator != null)
@@ -427,12 +381,10 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 				initParamCannonball.attacker = m_owner;
 				initParamCannonball.atkInfo = attackHitInfo;
 				initParamCannonball.launchTrans = m_cannonTrans;
-				initParamCannonball.offsetPos = Vector3.get_zero();
-				initParamCannonball.offsetRot = Quaternion.get_identity();
-				initParamCannonball.shotRotation = m_cannonTrans.get_rotation();
-				GameObject val = new GameObject("AttackCannonball");
-				AttackCannonball attackCannonball = val.AddComponent<AttackCannonball>();
-				attackCannonball.Initialize(initParamCannonball);
+				initParamCannonball.offsetPos = Vector3.zero;
+				initParamCannonball.offsetRot = Quaternion.identity;
+				initParamCannonball.shotRotation = m_cannonTrans.rotation;
+				new GameObject("AttackCannonball").AddComponent<AttackCannonball>().Initialize(initParamCannonball);
 				EffectManager.GetEffect("ef_btl_magibullet_shot_01", m_cannonTrans);
 				SetStateCooltime();
 			}
@@ -451,33 +403,24 @@ public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon,
 
 	public Vector3 GetBaseTransformForward()
 	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		if (m_baseTrans == null)
 		{
-			return Vector3.get_forward();
+			return Vector3.forward;
 		}
-		return m_baseTrans.get_forward();
+		return m_baseTrans.forward;
 	}
 
 	public Vector3 GetPosition()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		return _transform.get_position();
+		return _transform.position;
 	}
 
 	public void ApplyCannonVector(Vector3 cannonVec)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = cannonVec;
-		val.y = 0f;
-		m_baseTrans.set_rotation(Quaternion.LookRotation(val));
-		m_cannonTrans.set_rotation(Quaternion.LookRotation(cannonVec));
+		Vector3 forward = cannonVec;
+		forward.y = 0f;
+		m_baseTrans.rotation = Quaternion.LookRotation(forward);
+		m_cannonTrans.rotation = Quaternion.LookRotation(cannonVec);
 	}
 
 	public override string GetObjectName()

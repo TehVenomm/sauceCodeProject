@@ -4,20 +4,15 @@ public class SnatchLineRenderer : MonoBehaviour
 {
 	private LineRenderer lineRenderer;
 
-	public SnatchLineRenderer()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
-		Transform val = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.snatchLine, MonoBehaviourSingleton<StageObjectManager>.I._transform);
-		if (!(val == null))
+		Transform transform = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.snatchLine, MonoBehaviourSingleton<StageObjectManager>.I._transform);
+		if (!(transform == null))
 		{
-			lineRenderer = val.GetComponent<LineRenderer>();
+			lineRenderer = transform.GetComponent<LineRenderer>();
 			if (lineRenderer != null)
 			{
-				lineRenderer.set_enabled(false);
+				lineRenderer.enabled = false;
 			}
 		}
 	}
@@ -26,7 +21,7 @@ public class SnatchLineRenderer : MonoBehaviour
 	{
 		if (lineRenderer != null)
 		{
-			Object.Destroy(lineRenderer.get_gameObject());
+			Object.Destroy(lineRenderer.gameObject);
 			lineRenderer = null;
 		}
 	}
@@ -35,7 +30,7 @@ public class SnatchLineRenderer : MonoBehaviour
 	{
 		if (lineRenderer != null)
 		{
-			lineRenderer.set_enabled(true);
+			lineRenderer.enabled = true;
 		}
 	}
 
@@ -43,13 +38,12 @@ public class SnatchLineRenderer : MonoBehaviour
 	{
 		if (lineRenderer != null)
 		{
-			lineRenderer.set_enabled(false);
+			lineRenderer.enabled = false;
 		}
 	}
 
 	public void SetPositonStart(Vector3 pos)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		if (lineRenderer != null)
 		{
 			lineRenderer.SetPosition(0, pos);
@@ -58,7 +52,6 @@ public class SnatchLineRenderer : MonoBehaviour
 
 	public void SetPositionEnd(Vector3 pos)
 	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 		if (lineRenderer != null)
 		{
 			lineRenderer.SetPosition(1, pos);

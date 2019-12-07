@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class StampTable : Singleton<StampTable>, IDataTable
 {
@@ -31,9 +30,6 @@ public class StampTable : Singleton<StampTable>, IDataTable
 	}
 
 	public UIntKeyTable<Data> table;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string csv_text)
 	{

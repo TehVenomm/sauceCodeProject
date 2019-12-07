@@ -334,7 +334,7 @@ public class AnimEventFormat
 
 	public class GenerateEffectParam
 	{
-		public string EffectName = string.Empty;
+		public string EffectName = "";
 
 		public Transform EffectParent;
 
@@ -349,13 +349,6 @@ public class AnimEventFormat
 
 	private static Transform CreateCameraEffect(string effect_name, float effect_scale, AnimEventData.EventData data)
 	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid())
 		{
 			return null;
@@ -370,87 +363,33 @@ public class AnimEventFormat
 		{
 			return null;
 		}
-		Vector3 localScale = effect.get_localScale();
-		effect.set_localScale(localScale * effect_scale);
+		Vector3 localScale = effect.localScale;
+		effect.localScale = localScale * effect_scale;
 		if (data.floatArgs.Length >= 7)
 		{
-			effect.set_localPosition(new Vector3(data.floatArgs[1], data.floatArgs[2], data.floatArgs[3]));
-			effect.set_localRotation(Quaternion.Euler(new Vector3(data.floatArgs[4], data.floatArgs[5], data.floatArgs[6])));
+			effect.localPosition = new Vector3(data.floatArgs[1], data.floatArgs[2], data.floatArgs[3]);
+			effect.localRotation = Quaternion.Euler(new Vector3(data.floatArgs[4], data.floatArgs[5], data.floatArgs[6]));
 		}
 		return effect;
 	}
 
 	public static Transform EffectEventExec(ID id, AnimEventData.EventData data, Transform transform, bool is_oneshot_priority, EffectNameAnalyzer name_analyzer = null, NodeFinder node_finder = null, Character chara = null)
 	{
-		//IL_0229: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0235: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0260: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0283: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0288: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0302: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0305: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0309: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0334: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0357: Unknown result type (might be due to invalid IL or missing references)
-		//IL_035c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0375: Unknown result type (might be due to invalid IL or missing references)
-		//IL_037a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0396: Unknown result type (might be due to invalid IL or missing references)
-		//IL_039b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0408: Unknown result type (might be due to invalid IL or missing references)
-		//IL_040a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_040e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0415: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_050e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0513: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0518: Unknown result type (might be due to invalid IL or missing references)
-		//IL_051d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0520: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0522: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0524: Unknown result type (might be due to invalid IL or missing references)
-		//IL_052b: Unknown result type (might be due to invalid IL or missing references)
 		if (id != ID.EFFECT && id != ID.EFFECT_ONESHOT && id != ID.EFFECT_STATIC && id != ID.EFFECT_LOOP_CUSTOM && id != ID.EFFECT_DEPEND_SP_ATTACK_TYPE && id != ID.EFFECT_DEPEND_WEAPON_ELEMENT && id != ID.EFFECT_SCALE_DEPEND_VALUE && id != ID.CAMERA_EFFECT && id != ID.EFFECT_SWITCH_OBJECT_BY_CONDITION && id != ID.EFFECT_ONESHOT_ON_RAIN_SHOT_POS)
 		{
 			return null;
 		}
-		Transform val = null;
+		Transform transform2 = null;
 		string empty = string.Empty;
 		string empty2 = string.Empty;
 		if (id == ID.EFFECT_DEPEND_SP_ATTACK_TYPE)
 		{
-			if (object.ReferenceEquals(chara, null))
+			if ((object)chara == null)
 			{
 				return null;
 			}
 			Player player = chara as Player;
-			if (object.ReferenceEquals(player, null))
+			if ((object)player == null)
 			{
 				return null;
 			}
@@ -465,7 +404,7 @@ public class AnimEventFormat
 		else
 		{
 			empty = data.stringArgs[0];
-			empty2 = ((data.stringArgs.Length <= 1) ? string.Empty : data.stringArgs[1]);
+			empty2 = ((data.stringArgs.Length > 1) ? data.stringArgs[1] : string.Empty);
 		}
 		if (name_analyzer != null)
 		{
@@ -476,12 +415,12 @@ public class AnimEventFormat
 			}
 		}
 		int num2 = data.floatArgs.Length;
-		float num3 = (num2 <= 0) ? 1f : data.floatArgs[0];
+		float num3 = (num2 > 0) ? data.floatArgs[0] : 1f;
 		if (id == ID.CAMERA_EFFECT)
 		{
 			return CreateCameraEffect(empty, num3, data);
 		}
-		Transform val2 = (node_finder != null) ? node_finder(empty2) : ((!string.IsNullOrEmpty(empty2)) ? Utility.Find(transform, empty2) : transform);
+		Transform transform3 = (node_finder != null) ? node_finder(empty2) : ((!string.IsNullOrEmpty(empty2)) ? Utility.Find(transform, empty2) : transform);
 		switch (id)
 		{
 		case ID.EFFECT:
@@ -490,22 +429,22 @@ public class AnimEventFormat
 		case ID.EFFECT_DEPEND_SP_ATTACK_TYPE:
 		case ID.EFFECT_SCALE_DEPEND_VALUE:
 		{
-			val = EffectManager.GetEffect(empty, val2);
-			if (val == null)
+			transform2 = EffectManager.GetEffect(empty, transform3);
+			if (transform2 == null)
 			{
 				Log.Warning("Failed to create effect!! " + empty);
 				break;
 			}
-			if (id == ID.EFFECT_SCALE_DEPEND_VALUE && !object.ReferenceEquals(chara, null))
+			if (id == ID.EFFECT_SCALE_DEPEND_VALUE && (object)chara != null)
 			{
 				num3 = chara.GetEffectScaleDependValue();
 			}
-			Vector3 localScale2 = val.get_localScale();
-			val.set_localScale(localScale2 * num3);
+			Vector3 localScale2 = transform2.localScale;
+			transform2.localScale = localScale2 * num3;
 			if (num2 >= 7)
 			{
-				val.set_localPosition(new Vector3(data.floatArgs[1], data.floatArgs[2], data.floatArgs[3]));
-				val.set_localRotation(Quaternion.Euler(new Vector3(data.floatArgs[4], data.floatArgs[5], data.floatArgs[6])));
+				transform2.localPosition = new Vector3(data.floatArgs[1], data.floatArgs[2], data.floatArgs[3]);
+				transform2.localRotation = Quaternion.Euler(new Vector3(data.floatArgs[4], data.floatArgs[5], data.floatArgs[6]));
 			}
 			break;
 		}
@@ -521,15 +460,15 @@ public class AnimEventFormat
 			{
 				break;
 			}
-			val = EffectManager.GetEffect(empty + currentWeaponElement.ToString(), val2);
-			if (!(val == null))
+			transform2 = EffectManager.GetEffect(empty + currentWeaponElement.ToString(), transform3);
+			if (!(transform2 == null))
 			{
-				Vector3 localScale = val.get_localScale();
-				val.set_localScale(localScale * num3);
+				Vector3 localScale = transform2.localScale;
+				transform2.localScale = localScale * num3;
 				if (num2 >= 7)
 				{
-					val.set_localPosition(new Vector3(data.floatArgs[1], data.floatArgs[2], data.floatArgs[3]));
-					val.set_localRotation(Quaternion.Euler(new Vector3(data.floatArgs[4], data.floatArgs[5], data.floatArgs[6])));
+					transform2.localPosition = new Vector3(data.floatArgs[1], data.floatArgs[2], data.floatArgs[3]);
+					transform2.localRotation = Quaternion.Euler(new Vector3(data.floatArgs[4], data.floatArgs[5], data.floatArgs[6]));
 				}
 			}
 			break;
@@ -537,25 +476,24 @@ public class AnimEventFormat
 		case ID.EFFECT_ONESHOT:
 		{
 			Vector3 pos;
-			Quaternion rot;
+			Quaternion rot2;
 			if (num2 >= 7)
 			{
-				Matrix4x4 localToWorldMatrix = val2.get_localToWorldMatrix();
-				Vector3 val5 = localToWorldMatrix.MultiplyPoint3x4(new Vector3(data.floatArgs[1], data.floatArgs[2], data.floatArgs[3]));
-				Quaternion val6 = val2.get_rotation() * Quaternion.Euler(new Vector3(data.floatArgs[4], data.floatArgs[5], data.floatArgs[6]));
-				pos = val5;
-				rot = val6;
+				Vector3 vector = transform3.localToWorldMatrix.MultiplyPoint3x4(new Vector3(data.floatArgs[1], data.floatArgs[2], data.floatArgs[3]));
+				Quaternion quaternion = transform3.rotation * Quaternion.Euler(new Vector3(data.floatArgs[4], data.floatArgs[5], data.floatArgs[6]));
+				pos = vector;
+				rot2 = quaternion;
 			}
 			else
 			{
-				pos = val2.get_position();
-				rot = val2.get_rotation();
+				pos = transform3.position;
+				rot2 = transform3.rotation;
 			}
-			if (val2.get_gameObject().get_activeInHierarchy())
+			if (transform3.gameObject.activeInHierarchy)
 			{
-				EffectManager.OneShot(empty, pos, rot, val2.get_lossyScale() * num3, is_oneshot_priority, delegate(Transform effect)
+				EffectManager.OneShot(empty, pos, rot2, transform3.lossyScale * num3, is_oneshot_priority, delegate(Transform effect)
 				{
-					rymFX component = effect.get_gameObject().GetComponent<rymFX>();
+					rymFX component = effect.gameObject.GetComponent<rymFX>();
 					if (component != null)
 					{
 						component.LoopEnd = true;
@@ -566,32 +504,30 @@ public class AnimEventFormat
 			break;
 		}
 		case ID.EFFECT_SWITCH_OBJECT_BY_CONDITION:
-		{
-			GenerateEffectParam generateEffectParam = new GenerateEffectParam();
-			generateEffectParam.EffectName = empty;
-			generateEffectParam.EffectParent = val2;
-			generateEffectParam.Chara = chara;
-			generateEffectParam.EffectScale = num3;
-			generateEffectParam.Data = data;
-			GenerateEffectParam param = generateEffectParam;
-			val = GetSwichedEffect(param);
+			transform2 = GetSwichedEffect(new GenerateEffectParam
+			{
+				EffectName = empty,
+				EffectParent = transform3,
+				Chara = chara,
+				EffectScale = num3,
+				Data = data
+			});
 			break;
-		}
 		case ID.EFFECT_ONESHOT_ON_RAIN_SHOT_POS:
 		{
 			Player player2 = chara as Player;
 			if (!(player2 == null))
 			{
-				Vector3 val3 = player2.rainShotFallPosition;
-				Quaternion val4 = Quaternion.Euler(new Vector3(0f, player2.rainShotFallRotateY, 0f));
+				Vector3 rainShotFallPosition = player2.rainShotFallPosition;
+				Quaternion rot = Quaternion.Euler(new Vector3(0f, player2.rainShotFallRotateY, 0f));
 				if (num2 >= 7)
 				{
-					val3 += new Vector3(data.floatArgs[1], data.floatArgs[2], data.floatArgs[3]);
-					val4 *= Quaternion.Euler(new Vector3(data.floatArgs[4], data.floatArgs[5], data.floatArgs[6]));
+					rainShotFallPosition += new Vector3(data.floatArgs[1], data.floatArgs[2], data.floatArgs[3]);
+					rot *= Quaternion.Euler(new Vector3(data.floatArgs[4], data.floatArgs[5], data.floatArgs[6]));
 				}
-				EffectManager.OneShot(empty, val3, val4, Vector3.get_one() * num3, is_oneshot_priority, delegate(Transform effect)
+				EffectManager.OneShot(empty, rainShotFallPosition, rot, Vector3.one * num3, is_oneshot_priority, delegate(Transform effect)
 				{
-					rymFX component2 = effect.get_gameObject().GetComponent<rymFX>();
+					rymFX component2 = effect.gameObject.GetComponent<rymFX>();
 					if (component2 != null)
 					{
 						component2.LoopEnd = true;
@@ -602,7 +538,7 @@ public class AnimEventFormat
 			break;
 		}
 		}
-		return val;
+		return transform2;
 	}
 
 	public static Transform[] EffectsEventExec(ID id, AnimEventData.EventData data, Transform transform, bool is_oneshot_priority, EffectNameAnalyzer name_analyzer = null, NodeFinder node_finder = null, Character chara = null)
@@ -616,8 +552,8 @@ public class AnimEventFormat
 			return null;
 		}
 		List<Transform> list = new List<Transform>();
-		string text = (data.stringArgs.Length <= 0) ? string.Empty : data.stringArgs[0];
-		string text2 = (data.stringArgs.Length <= 1) ? string.Empty : data.stringArgs[1];
+		string text = (data.stringArgs.Length != 0) ? data.stringArgs[0] : string.Empty;
+		string text2 = (data.stringArgs.Length > 1) ? data.stringArgs[1] : string.Empty;
 		if (name_analyzer != null)
 		{
 			text = name_analyzer(text);
@@ -626,19 +562,18 @@ public class AnimEventFormat
 				return null;
 			}
 		}
-		int num = data.floatArgs.Length;
-		float effectScale = (num <= 0) ? 1f : data.floatArgs[0];
+		float effectScale = (data.floatArgs.Length > 0) ? data.floatArgs[0] : 1f;
 		Transform effectParent = (node_finder != null) ? node_finder(text2) : ((!string.IsNullOrEmpty(text2)) ? Utility.Find(transform, text2) : transform);
 		if (id == ID.EFFECT_TILING)
 		{
-			GenerateEffectParam generateEffectParam = new GenerateEffectParam();
-			generateEffectParam.EffectName = text;
-			generateEffectParam.EffectParent = effectParent;
-			generateEffectParam.Chara = chara;
-			generateEffectParam.EffectScale = effectScale;
-			generateEffectParam.Data = data;
-			GenerateEffectParam param = generateEffectParam;
-			list = GetMultiEffect(param);
+			list = GetMultiEffect(new GenerateEffectParam
+			{
+				EffectName = text,
+				EffectParent = effectParent,
+				Chara = chara,
+				EffectScale = effectScale,
+				Data = data
+			});
 		}
 		return list?.ToArray();
 	}
@@ -669,8 +604,6 @@ public class AnimEventFormat
 
 	private static List<Transform> GetMultiEffect(GenerateEffectParam _param)
 	{
-		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
 		if (_param == null || _param.Chara == null || _param.Data.intArgs == null || _param.Data.intArgs.Length < 7 || _param.Data.floatArgs == null || _param.Data.floatArgs.Length < 13)
 		{
 			return null;
@@ -683,11 +616,8 @@ public class AnimEventFormat
 		int num = _param.Data.intArgs[4];
 		int num2 = _param.Data.intArgs[5];
 		int num3 = _param.Data.intArgs[6];
-		Vector3 intervalPos = default(Vector3);
-		intervalPos._002Ector(_param.Data.floatArgs[7], _param.Data.floatArgs[8], _param.Data.floatArgs[9]);
-		Vector3 intervalRot = default(Vector3);
-		intervalRot._002Ector(_param.Data.floatArgs[10], _param.Data.floatArgs[11], _param.Data.floatArgs[12]);
-		int num4 = num;
+		Vector3 intervalPos = new Vector3(_param.Data.floatArgs[7], _param.Data.floatArgs[8], _param.Data.floatArgs[9]);
+		Vector3 intervalRot = new Vector3(_param.Data.floatArgs[10], _param.Data.floatArgs[11], _param.Data.floatArgs[12]);
 		EFFECT_TILING_PATTERN eFFECT_TILING_PATTERN = (EFFECT_TILING_PATTERN)_param.Data.intArgs[2];
 		switch (eFFECT_TILING_PATTERN)
 		{
@@ -752,38 +682,24 @@ public class AnimEventFormat
 
 	private static void SetTransformInfo(Transform _tr, int i, int j, int k, int totalCount, EFFECT_TILING_PATTERN _pattern, Vector3 _intervalPos, Vector3 _intervalRot, Player _player)
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
 		switch (_pattern)
 		{
 		case EFFECT_TILING_PATTERN.AS_BURST_BULLET_UI:
 		{
-			_tr.set_localPosition(_tr.get_localPosition() + new Vector3(_intervalPos.x * (float)i, _intervalPos.y * (float)j, _intervalPos.z * (float)k));
-			float num4 = (totalCount % 2 != 1) ? ((float)totalCount / 2f + 0.5f) : ((float)totalCount / 2f);
-			num4 -= 1f;
-			_tr.Rotate(_intervalRot.x * ((float)i - num4), _intervalRot.y * ((float)j - num4), _intervalRot.z * ((float)k - num4));
+			_tr.localPosition += new Vector3(_intervalPos.x * (float)i, _intervalPos.y * (float)j, _intervalPos.z * (float)k);
+			float num3 = (totalCount % 2 == 1) ? ((float)totalCount / 2f) : ((float)totalCount / 2f + 0.5f);
+			num3 -= 1f;
+			_tr.Rotate(_intervalRot.x * ((float)i - num3), _intervalRot.y * ((float)j - num3), _intervalRot.z * ((float)k - num3));
 			break;
 		}
 		case EFFECT_TILING_PATTERN.AS_BURST_SHOTGUN:
 		{
-			float num = Random.Range(_intervalPos.x, _intervalPos.x);
-			float num2 = Random.Range(_intervalPos.y, _intervalPos.y);
-			float num3 = Random.Range(0f, 360f) * ((float)Math.PI / 180f);
-			Vector3 right = _player.get_transform().get_right();
-			Vector3 forward = _player.get_transform().get_forward();
-			_tr.set_localPosition(_tr.get_localPosition() + (num * Mathf.Cos(num3) * right + num2 * Mathf.Sin(num3) * forward));
+			float num = UnityEngine.Random.Range(_intervalPos.x, _intervalPos.x);
+			float num2 = UnityEngine.Random.Range(_intervalPos.y, _intervalPos.y);
+			float f = UnityEngine.Random.Range(0f, 360f) * ((float)Math.PI / 180f);
+			Vector3 right = _player.transform.right;
+			Vector3 forward = _player.transform.forward;
+			_tr.localPosition += num * Mathf.Cos(f) * right + num2 * Mathf.Sin(f) * forward;
 			break;
 		}
 		}
@@ -791,33 +707,26 @@ public class AnimEventFormat
 
 	private static Transform GetParamGeneratedEffect(GenerateEffectParam _param)
 	{
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = null;
+		Transform transform = null;
 		Player player = _param.Chara as Player;
 		if (player == null)
 		{
 			return null;
 		}
-		bool flag = _param.Data.intArgs != null && _param.Data.intArgs.Length > 3 && _param.Data.intArgs[3] == 1;
+		bool num = _param.Data.intArgs != null && _param.Data.intArgs.Length > 3 && _param.Data.intArgs[3] == 1;
 		int currentWeaponElement = player.GetCurrentWeaponElement();
-		val = ((!flag || 0 > currentWeaponElement || currentWeaponElement >= 6) ? EffectManager.GetEffect(_param.EffectName, _param.EffectParent) : EffectManager.GetEffect($"{_param.EffectName}{currentWeaponElement:D2}", _param.EffectParent));
-		if (val == null)
+		transform = ((!num || 0 > currentWeaponElement || currentWeaponElement >= 6) ? EffectManager.GetEffect(_param.EffectName, _param.EffectParent) : EffectManager.GetEffect($"{_param.EffectName}{currentWeaponElement:D2}", _param.EffectParent));
+		if (transform == null)
 		{
-			return val;
+			return transform;
 		}
-		Vector3 localScale = val.get_localScale();
-		val.set_localScale(localScale * _param.EffectScale);
+		Vector3 localScale = transform.localScale;
+		transform.localScale = localScale * _param.EffectScale;
 		if (_param.Data.floatArgs.Length >= 7)
 		{
-			val.set_localPosition(new Vector3(_param.Data.floatArgs[1], _param.Data.floatArgs[2], _param.Data.floatArgs[3]));
-			val.set_localRotation(Quaternion.Euler(new Vector3(_param.Data.floatArgs[4], _param.Data.floatArgs[5], _param.Data.floatArgs[6])));
+			transform.localPosition = new Vector3(_param.Data.floatArgs[1], _param.Data.floatArgs[2], _param.Data.floatArgs[3]);
+			transform.localRotation = Quaternion.Euler(new Vector3(_param.Data.floatArgs[4], _param.Data.floatArgs[5], _param.Data.floatArgs[6]));
 		}
-		return val;
+		return transform;
 	}
 }

@@ -13,10 +13,10 @@ public class Lounge_Model_MemberArena : Coop_Model_Base
 
 	public override string ToString()
 	{
-		string empty = string.Empty;
-		empty = empty + ",cid=" + cid;
-		empty = empty + ",pid=" + pid;
-		empty = empty + ",aid=" + aid;
-		return base.ToString() + empty;
+		string arg = "";
+		arg = arg + ",cid=" + cid;
+		arg = arg + ",pid=" + pid;
+		arg = arg + ",aid=" + aid;
+		return base.ToString() + arg;
 	}
 }

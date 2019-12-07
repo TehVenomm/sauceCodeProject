@@ -64,14 +64,9 @@ public class UIProgressWork : MonoBehaviour
 		private set;
 	}
 
-	public UIProgressWork()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
-		progress = this.GetComponent<UIProgressBar>();
+		progress = GetComponent<UIProgressBar>();
 		UpdateValue();
 		EventDelegate.Add(progress.onChange, OnValueChange);
 	}
@@ -90,12 +85,12 @@ public class UIProgressWork : MonoBehaviour
 				min = max;
 			}
 			int num = max - min;
-			progress.set_enabled(true);
+			progress.enabled = true;
 			if (num == 0)
 			{
 				SetValue(1f);
 				progress.numberOfSteps = 0;
-				progress.set_enabled(false);
+				progress.enabled = false;
 			}
 			else
 			{
@@ -107,9 +102,9 @@ public class UIProgressWork : MonoBehaviour
 
 	private void SetValue(float value)
 	{
-		bool enabled = progress.get_enabled();
+		bool enabled = progress.enabled;
 		bool flag = enableUpdateValue;
-		progress.set_enabled(true);
+		progress.enabled = true;
 		enableUpdateValue = false;
 		if (progress.value == value)
 		{
@@ -117,6 +112,6 @@ public class UIProgressWork : MonoBehaviour
 		}
 		progress.value = value;
 		enableUpdateValue = flag;
-		progress.set_enabled(enabled);
+		progress.enabled = enabled;
 	}
 }

@@ -55,11 +55,9 @@ public class StatusScreenShot : GameSection
 
 	private void OnDrag(GameObject obj, Vector2 move)
 	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 		if (!(playerLoader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && !(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "StatusScreenShot"))
 		{
-			playerLoader.get_transform().Rotate(GameDefine.GetCharaRotateVector(move));
+			playerLoader.transform.Rotate(GameDefine.GetCharaRotateVector(move));
 		}
 	}
 
@@ -75,23 +73,23 @@ public class StatusScreenShot : GameSection
 	public override void UpdateUI()
 	{
 		CreateDegree();
-		SetLabelText((Enum)UI.LBL_LV_NOW, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level.ToString());
-		SetLabelText((Enum)UI.LBL_NAME, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name);
-		SetLabelText((Enum)UI.LBL_HOUND_ID, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.code);
-		SetLabelText((Enum)UI.LBL_COMMENT, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.comment);
+		SetLabelText(UI.LBL_LV_NOW, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level.ToString());
+		SetLabelText(UI.LBL_NAME, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name);
+		SetLabelText(UI.LBL_HOUND_ID, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.code);
+		SetLabelText(UI.LBL_COMMENT, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.comment);
 		SetEnableAll();
 	}
 
 	private void SetEnableAll()
 	{
-		SetActive((Enum)UI.LBL_NAME, (filter & 1) == 1);
-		SetActive((Enum)UI.OBJ_LEVEL, (filter & 2) == 2);
-		SetActive((Enum)UI.OBJ_FRAME_1, (filter & 1) == 1 || (filter & 2) == 2);
-		SetActive((Enum)UI.OBJ_FRAME_2, (filter & 4) == 4);
-		SetActive((Enum)UI.SPR_COMMENT, (filter & 8) == 8);
+		SetActive(UI.LBL_NAME, (filter & 1) == 1);
+		SetActive(UI.OBJ_LEVEL, (filter & 2) == 2);
+		SetActive(UI.OBJ_FRAME_1, (filter & 1) == 1 || (filter & 2) == 2);
+		SetActive(UI.OBJ_FRAME_2, (filter & 4) == 4);
+		SetActive(UI.SPR_COMMENT, (filter & 8) == 8);
 		if (isInitializeDegree)
 		{
-			SetActive((Enum)UI.OBJ_DEGREE_ROOT, (filter & 0x10) == 16);
+			SetActive(UI.OBJ_DEGREE_ROOT, (filter & 0x10) == 16);
 		}
 	}
 
@@ -112,10 +110,9 @@ public class StatusScreenShot : GameSection
 
 	private void CreateDegree()
 	{
-		DegreePlate component = GetCtrl(UI.OBJ_DEGREE_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds, isButton: false, delegate
+		GetCtrl(UI.OBJ_DEGREE_ROOT).GetComponent<DegreePlate>().Initialize(MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds, isButton: false, delegate
 		{
-			SetActive((Enum)UI.OBJ_DEGREE_ROOT, (filter & 0x10) == 16);
+			SetActive(UI.OBJ_DEGREE_ROOT, (filter & 0x10) == 16);
 			isInitializeDegree = true;
 		});
 	}

@@ -8,7 +8,7 @@ public class ItemIconDetailAccessorySetupper : ItemIconDetailSetuperBase
 		AccessoryTable.AccessoryData accessoryData = data[0] as AccessoryTable.AccessoryData;
 		SetName(accessoryData.name);
 		SetVisibleBG(is_visible: true);
-		infoRootAry[0].SetActive(true);
+		infoRootAry[0].SetActive(value: true);
 		lblDescription.text = accessoryData.descript;
 	}
 }

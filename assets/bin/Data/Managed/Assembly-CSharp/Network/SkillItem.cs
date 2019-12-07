@@ -88,6 +88,16 @@ namespace Network
 
 		public int RelativeExpNext => expNext - expPrev;
 
-		public float ExpProgress01 => (RelativeExpNext > 0) ? ((float)RelativeExp / (float)RelativeExpNext) : 1f;
+		public float ExpProgress01
+		{
+			get
+			{
+				if (RelativeExpNext > 0)
+				{
+					return (float)RelativeExp / (float)RelativeExpNext;
+				}
+				return 1f;
+			}
+		}
 	}
 }

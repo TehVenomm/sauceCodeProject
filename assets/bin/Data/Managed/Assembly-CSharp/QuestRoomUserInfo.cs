@@ -21,22 +21,8 @@ public class QuestRoomUserInfo : MonoBehaviour
 
 	private Action animEndCallback;
 
-	public QuestRoomUserInfo()
-		: this()
-	{
-	}
-
 	public void LoadModel(int index, CharaInfo user_info)
 	{
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
 		if (user_info == null)
 		{
 			if (index <= 3 && index >= 0)
@@ -52,7 +38,7 @@ public class QuestRoomUserInfo : MonoBehaviour
 		userInfo = user_info;
 		if (index <= 3)
 		{
-			UITexture componentInChildren = this.GetComponentInChildren<UITexture>();
+			UITexture componentInChildren = GetComponentInChildren<UITexture>();
 			if (MonoBehaviourSingleton<OutGameSettingsManager>.I.questSelect.isRightDepthForward)
 			{
 				componentInChildren.depth = index;
@@ -65,18 +51,12 @@ public class QuestRoomUserInfo : MonoBehaviour
 			renderTexture.nearClipPlane = 4f;
 			if (userInfo.sex == 1 && renderTexture.modelTransform != null && MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerFemaleCameraOffsetY != 0f)
 			{
-				Transform modelTransform = renderTexture.modelTransform;
-				Vector3 localPosition = renderTexture.modelTransform.get_localPosition();
-				float x = localPosition.x;
-				Vector3 localPosition2 = renderTexture.modelTransform.get_localPosition();
-				float num = localPosition2.y + MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerFemaleCameraOffsetY;
-				Vector3 localPosition3 = renderTexture.modelTransform.get_localPosition();
-				modelTransform.set_localPosition(new Vector3(x, num, localPosition3.z));
+				renderTexture.modelTransform.localPosition = new Vector3(renderTexture.modelTransform.localPosition.x, renderTexture.modelTransform.localPosition.y + MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerFemaleCameraOffsetY, renderTexture.modelTransform.localPosition.z);
 			}
 			model = Utility.CreateGameObject("PlayerModel", renderTexture.modelTransform);
-			model.set_localPosition(new Vector3(0f, -1.1f, 8f));
-			model.set_eulerAngles(new Vector3(0f, 180f, 0f));
-			this.StartCoroutine(Loading());
+			model.localPosition = new Vector3(0f, -1.1f, 8f);
+			model.eulerAngles = new Vector3(0f, 180f, 0f);
+			StartCoroutine(Loading());
 		}
 	}
 
@@ -87,40 +67,23 @@ public class QuestRoomUserInfo : MonoBehaviour
 		{
 			yield break;
 		}
-		bool is_owner = userInfo.userId == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId();
-		IEnumerator enumerator = model.GetEnumerator();
-		try
+		bool flag = userInfo.userId == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId();
+		foreach (Transform item in model)
 		{
-			while (enumerator.MoveNext())
-			{
-				Transform val = enumerator.Current;
-				Object.Destroy(val.get_gameObject());
-			}
-		}
-		finally
-		{
-			IDisposable disposable;
-			IDisposable disposable2 = disposable = (enumerator as IDisposable);
-			if (disposable != null)
-			{
-				disposable2.Dispose();
-			}
+			UnityEngine.Object.Destroy(item.gameObject);
 		}
 		PlayerLoadInfo load_info = new PlayerLoadInfo();
 		load_info.Apply(userInfo, need_weapon: true, need_helm: true, need_leg: true, is_priority_visual_equip: true);
 		bool wait = true;
-		loader = model.get_gameObject().AddComponent<PlayerLoader>();
+		loader = model.gameObject.AddComponent<PlayerLoader>();
 		loader.StartLoad(load_info, renderTexture.renderLayer, 90, need_anim_event: false, need_foot_stamp: false, need_shadow: false, enable_light_probes: false, need_action_voice: false, need_high_reso_tex: false, need_res_ref_count: true, need_dev_frame_instantiate: true, SHADER_TYPE.UI, delegate
 		{
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 			wait = false;
-			float num = (userInfo.sex != 0) ? MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleFemale : MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleMale;
-			loader.get_transform().set_localScale(loader.get_transform().get_localScale().Mul(new Vector3(num, num, num)));
+			float num = (userInfo.sex == 0) ? MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleMale : MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.playerScaleFemale;
+			loader.transform.localScale = loader.transform.localScale.Mul(new Vector3(num, num, num));
 		});
 		int voice_id = -1;
-		if (!is_owner)
+		if (!flag)
 		{
 			voice_id = loader.GetVoiceId(ACTION_VOICE_EX_ID.ALLIVE_01);
 			LoadingQueue lo_queue = new LoadingQueue(this);
@@ -157,11 +120,11 @@ public class QuestRoomUserInfo : MonoBehaviour
 			bool active = anim_ctrl.IsPlaying(PlayerAnimCtrl.battleAnims);
 			if (loader.wepL != null)
 			{
-				loader.wepL.get_gameObject().SetActive(active);
+				loader.wepL.gameObject.SetActive(active);
 			}
 			if (loader.wepR != null)
 			{
-				loader.wepR.get_gameObject().SetActive(active);
+				loader.wepR.gameObject.SetActive(active);
 			}
 		}
 	}
@@ -232,12 +195,12 @@ public class QuestRoomUserInfo : MonoBehaviour
 		{
 			if (renderTexture != null)
 			{
-				Object.DestroyImmediate(renderTexture);
+				UnityEngine.Object.DestroyImmediate(renderTexture);
 				renderTexture = null;
 			}
 			if (model != null)
 			{
-				Object.Destroy(model.get_gameObject());
+				UnityEngine.Object.Destroy(model.gameObject);
 				model = null;
 				loader = null;
 				animCtrl = null;
@@ -247,10 +210,10 @@ public class QuestRoomUserInfo : MonoBehaviour
 
 	public void SetOnEmotion(RoomEmotion.OnEmotion on_emotion, Action anim_end_callback, UIChatItem[] target)
 	{
-		RoomEmotion roomEmotion = this.GetComponent<RoomEmotion>();
+		RoomEmotion roomEmotion = GetComponent<RoomEmotion>();
 		if (roomEmotion == null)
 		{
-			roomEmotion = this.get_gameObject().AddComponent<RoomEmotion>();
+			roomEmotion = base.gameObject.AddComponent<RoomEmotion>();
 		}
 		roomEmotion.SetChatItem(target);
 		roomEmotion.SetOnEmotion(on_emotion);

@@ -62,7 +62,17 @@ public class ExploreStatus
 		private set;
 	}
 
-	public bool isBossDead => bossStatus != null && bossStatus.isDead;
+	public bool isBossDead
+	{
+		get
+		{
+			if (bossStatus != null)
+			{
+				return bossStatus.isDead;
+			}
+			return false;
+		}
+	}
 
 	public bool isEncountered
 	{
@@ -97,8 +107,7 @@ public class ExploreStatus
 		int count = GetEnabledPlayerStatusList().Count;
 		for (int i = 0; i < count; i++)
 		{
-			int exploreMapId = MonoBehaviourSingleton<QuestManager>.I.GetExploreMapId(i);
-			if (exploreMapId == exploreInfo.mapIds[exploreInfo.mapIds.Count - 1])
+			if (MonoBehaviourSingleton<QuestManager>.I.GetExploreMapId(i) == exploreInfo.mapIds[exploreInfo.mapIds.Count - 1])
 			{
 				return;
 			}
@@ -106,7 +115,7 @@ public class ExploreStatus
 		int currentBossMapId = GetCurrentBossMapId();
 		if (currentBossMapId < 0)
 		{
-			int num = Random.Range(0, exploreInfo.mapIds.Count - 1);
+			int num = UnityEngine.Random.Range(0, exploreInfo.mapIds.Count - 1);
 			int item = exploreInfo.mapIds[num];
 			if (num == 0 && exploreInfo.mapIds.Count > 1)
 			{
@@ -137,10 +146,9 @@ public class ExploreStatus
 		}
 		if (list.Count > 0)
 		{
-			int index = Random.Range(0, list.Count);
+			int index = UnityEngine.Random.Range(0, list.Count);
 			int num2 = list[index];
-			int beforeBossMapId = GetBeforeBossMapId();
-			if (beforeBossMapId == num2 && list.Count > 1)
+			if (GetBeforeBossMapId() == num2 && list.Count > 1)
 			{
 				UpdateBossMap();
 			}
@@ -343,26 +351,12 @@ public class ExploreStatus
 
 	public List<ExplorePortalPoint> GetPortalDataFromMapId(int mapId)
 	{
-		return portals.FindAll(delegate(ExplorePortalPoint o)
-		{
-			if (o.portalData.dstMapID == (uint)mapId)
-			{
-				return true;
-			}
-			return false;
-		});
+		return portals.FindAll((ExplorePortalPoint o) => (o.portalData.dstMapID == (uint)mapId) ? true : false);
 	}
 
 	public List<ExplorePortalPoint> GetPortalDataFromSrcMapId(int mapId)
 	{
-		return portals.FindAll(delegate(ExplorePortalPoint o)
-		{
-			if (o.portalData.srcMapID == (uint)mapId)
-			{
-				return true;
-			}
-			return false;
-		});
+		return portals.FindAll((ExplorePortalPoint o) => (o.portalData.srcMapID == (uint)mapId) ? true : false);
 	}
 
 	public uint GetLastPortalId()
@@ -387,7 +381,7 @@ public class ExploreStatus
 
 	private ExplorePlayerStatus GetPlayerStatus(CoopClient coopClient)
 	{
-		if (Object.op_Implicit(coopClient))
+		if ((bool)coopClient)
 		{
 			return GetPlayerStatus(coopClient.userId);
 		}
@@ -460,7 +454,7 @@ public class ExploreStatus
 	{
 		ExplorePlayerStatus playerStatus = GetPlayerStatus(coopClient);
 		Player player = coopClient.GetPlayer();
-		if (playerStatus != null && Object.op_Implicit(player))
+		if (playerStatus != null && (bool)player)
 		{
 			playerStatus.SyncFromPlayer(player);
 		}

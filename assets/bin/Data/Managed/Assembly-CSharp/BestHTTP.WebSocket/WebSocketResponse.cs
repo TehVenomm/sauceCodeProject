@@ -61,15 +61,15 @@ namespace BestHTTP.WebSocket
 
 		internal override bool Receive(int forceReadRawContentLength = -1)
 		{
-			bool flag = base.Receive(forceReadRawContentLength);
-			if (flag && base.IsUpgraded)
+			bool num = base.Receive(forceReadRawContentLength);
+			if (num && base.IsUpgraded)
 			{
 				ReceiverThread = new Thread(ReceiveThreadFunc);
 				ReceiverThread.Name = "WebSocket Receiver Thread";
 				ReceiverThread.IsBackground = true;
 				ReceiverThread.Start();
 			}
-			return flag;
+			return num;
 		}
 
 		public void Send(string message)
@@ -184,6 +184,12 @@ namespace BestHTTP.WebSocket
 					{
 						switch (webSocketFrameReader.Type)
 						{
+						case (WebSocketFrameTypes)3:
+						case (WebSocketFrameTypes)4:
+						case (WebSocketFrameTypes)5:
+						case (WebSocketFrameTypes)6:
+						case (WebSocketFrameTypes)7:
+							break;
 						case WebSocketFrameTypes.Continuation:
 							if (OnIncompleteFrame != null)
 							{
@@ -343,7 +349,7 @@ namespace BestHTTP.WebSocket
 					{
 						if (BitConverter.IsLittleEndian)
 						{
-							Array.Reverse(CloseFrame.Data, 0, 2);
+							Array.Reverse((Array)CloseFrame.Data, 0, 2);
 						}
 						arg = BitConverter.ToUInt16(CloseFrame.Data, 0);
 						if (CloseFrame.Data.Length > 2)

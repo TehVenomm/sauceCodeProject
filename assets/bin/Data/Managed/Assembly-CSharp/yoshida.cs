@@ -4,11 +4,6 @@ public class yoshida : MonoBehaviour
 {
 	public InputManager inputMgr;
 
-	public yoshida()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
 	}

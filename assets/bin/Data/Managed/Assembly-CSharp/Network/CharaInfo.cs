@@ -29,34 +29,33 @@ namespace Network
 
 			public override string ToString()
 			{
-				string empty = string.Empty;
-				empty = empty + eId + ",";
-				empty = empty + lv + ",";
+				string arg = "";
+				arg = arg + eId + ",";
+				arg = arg + lv + ",";
 				int i = 0;
 				for (int count = sIds.Count; i < count; i++)
 				{
-					empty += "s(";
-					empty = empty + sIds[i] + ",";
-					empty = empty + sLvs[i] + ",";
+					arg += "s(";
+					arg = arg + sIds[i] + ",";
+					arg = arg + sLvs[i] + ",";
 					int num = 0;
 					if (i < sExs.Count)
 					{
 						num = sExs[i];
 					}
-					empty = empty + num.ToString() + ",";
-					empty += "),";
+					arg = arg + num.ToString() + ",";
+					arg += "),";
 				}
 				int j = 0;
 				for (int count2 = aIds.Count; j < count2; j++)
 				{
-					empty += "a(";
-					empty = empty + aIds[j] + ",";
-					empty = empty + aPts[j] + ",";
-					empty += "),";
+					arg += "a(";
+					arg = arg + aIds[j] + ",";
+					arg = arg + aPts[j] + ",";
+					arg += "),";
 				}
-				string text = empty;
-				empty = text + "ai(" + ai + ")";
-				return base.ToString() + empty;
+				arg = arg + "ai(" + ai + ")";
+				return base.ToString() + arg;
 			}
 
 			public int GetSkillExceed(int idx)
@@ -176,7 +175,7 @@ namespace Network
 
 		public override string ToString()
 		{
-			string str = string.Empty;
+			string str = "";
 			str = str + userId + ",";
 			str = str + name + ",";
 			str = str + comment + ",";
@@ -202,16 +201,14 @@ namespace Network
 			{
 				equipSet.ForEach(delegate(EquipItem e)
 				{
-					string text2 = str;
-					str = text2 + "[" + e + "],";
+					str = str + "[" + e + "],";
 				});
 			}
 			if (!accessory.IsNullOrEmpty())
 			{
 				accessory.ForEach(delegate(UserAccessory a)
 				{
-					string text = str;
-					str = text + "[" + a + "],";
+					str = str + "[" + a + "],";
 				});
 			}
 			return base.ToString() + str;

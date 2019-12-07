@@ -1,5 +1,4 @@
 using Network;
-using System;
 
 public class GuildDonateSendDialog : GameSection
 {
@@ -39,7 +38,7 @@ public class GuildDonateSendDialog : GameSection
 			canUpdateUI = true;
 			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == _info.itemId, 1);
 			int num = _info.quantity - _info.itemNum;
-			m_maxNum = ((itemNum < num) ? itemNum : num);
+			m_maxNum = ((itemNum >= num) ? num : itemNum);
 			m_nowSelect = m_maxNum;
 		}
 		else if (MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap < MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap)
@@ -51,14 +50,14 @@ public class GuildDonateSendDialog : GameSection
 			SetActive(base._transform, UI.SPR_REACH_LIMIT, is_visible: false);
 			SetActive(base._transform, UI.LBL_NUMBER_REQUEST, is_visible: true);
 			SetSupportEncoding(UI.LBL_NUMBER_REQUEST, isEnable: true);
-			SetLabelText((Enum)UI.LBL_NUMBER_REQUEST, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 32u), MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap, MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
+			SetLabelText(UI.LBL_NUMBER_REQUEST, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 32u), MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap, MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
 		}
 		else
 		{
 			SetActive(base._transform, UI.SPR_SELECT_FRAME, is_visible: false);
 			SetActive(base._transform, UI.SPR_REACH_LIMIT, is_visible: true);
 			SetSupportEncoding(UI.LBL_REQUEST_LIMIT, isEnable: true);
-			SetLabelText((Enum)UI.LBL_REQUEST_LIMIT, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 33u), MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap, MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
+			SetLabelText(UI.LBL_REQUEST_LIMIT, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 33u), MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap, MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
 			canUpdateUI = false;
 		}
 		base.Initialize();
@@ -69,34 +68,34 @@ public class GuildDonateSendDialog : GameSection
 		if (canUpdateUI)
 		{
 			string key = "TEXT_SELECT";
-			SetLabelText((Enum)UI.LBL_CAPTION, base.sectionData.GetText(key));
-			SetLabelText((Enum)UI.STR_TITLE_U, base.sectionData.GetText(key));
-			SetLabelText((Enum)UI.STR_TITLE_D, base.sectionData.GetText(key));
+			SetLabelText(UI.LBL_CAPTION, base.sectionData.GetText(key));
+			SetLabelText(UI.STR_TITLE_U, base.sectionData.GetText(key));
+			SetLabelText(UI.STR_TITLE_D, base.sectionData.GetText(key));
 			string key2 = "TEXT_SELECT_NUM";
-			SetLabelText((Enum)UI.STR_SELECT_NUM, base.sectionData.GetText(key2));
-			SetProgressInt((Enum)UI.SLD_SELECT_NUM, m_nowSelect, 0, m_maxNum, (EventDelegate.Callback)OnChagenSlider);
+			SetLabelText(UI.STR_SELECT_NUM, base.sectionData.GetText(key2));
+			SetProgressInt(UI.SLD_SELECT_NUM, m_nowSelect, 0, m_maxNum, OnChagenSlider);
 		}
 	}
 
 	private void OnChagenSlider()
 	{
-		int progressInt = GetProgressInt((Enum)UI.SLD_SELECT_NUM);
-		SetLabelText((Enum)UI.LBL_SELECT_NUM, string.Format("{0,8:#,0}", progressInt));
+		int progressInt = GetProgressInt(UI.SLD_SELECT_NUM);
+		SetLabelText(UI.LBL_SELECT_NUM, string.Format("{0,8:#,0}", progressInt));
 	}
 
 	private void OnQuery_SELECT_NUM_MINUS()
 	{
-		SetProgressInt((Enum)UI.SLD_SELECT_NUM, GetProgressInt((Enum)UI.SLD_SELECT_NUM) - 1, -1, -1, (EventDelegate.Callback)null);
+		SetProgressInt(UI.SLD_SELECT_NUM, GetProgressInt(UI.SLD_SELECT_NUM) - 1);
 	}
 
 	private void OnQuery_SELECT_NUM_PLUS()
 	{
-		SetProgressInt((Enum)UI.SLD_SELECT_NUM, GetProgressInt((Enum)UI.SLD_SELECT_NUM) + 1, -1, -1, (EventDelegate.Callback)null);
+		SetProgressInt(UI.SLD_SELECT_NUM, GetProgressInt(UI.SLD_SELECT_NUM) + 1);
 	}
 
 	protected int GetSliderNum()
 	{
-		return GetProgressInt((Enum)UI.SLD_SELECT_NUM);
+		return GetProgressInt(UI.SLD_SELECT_NUM);
 	}
 
 	private void OnQuery_SELECT()

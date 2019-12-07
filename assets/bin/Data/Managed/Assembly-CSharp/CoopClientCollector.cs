@@ -8,7 +8,11 @@ public class CoopClientCollector
 
 	public CoopClient GetAt(int idx)
 	{
-		return (idx < 0 || idx >= 8) ? null : clientList[idx];
+		if (idx < 0 || idx >= 8)
+		{
+			return null;
+		}
+		return clientList[idx];
 	}
 
 	public void Add(CoopClient client)
@@ -79,8 +83,7 @@ public class CoopClientCollector
 		int i = 0;
 		for (int num = clientList.Length; i < num; i++)
 		{
-			CoopClient coopClient = clientList[i];
-			if (coopClient.userId == client.userId)
+			if (clientList[i].userId == client.userId)
 			{
 				return i;
 			}
@@ -176,11 +179,7 @@ public class CoopClientCollector
 			{
 				return false;
 			}
-			if (!c.IsStageRequest())
-			{
-				return false;
-			}
-			return !c.isSeriesProgressEnd;
+			return c.IsStageRequest() && !c.isSeriesProgressEnd;
 		}) != null;
 	}
 

@@ -42,7 +42,7 @@ public class UIButtonRepeater : UILongTouch
 	{
 		if (CheckSendTime())
 		{
-			UIGameSceneEventSender.SendEvent("UIButtonRepeater", this.get_gameObject(), eventName, eventData);
+			UIGameSceneEventSender.SendEvent("UIButtonRepeater", base.gameObject, eventName, eventData);
 		}
 	}
 
@@ -63,7 +63,7 @@ public class UIButtonRepeater : UILongTouch
 			return false;
 		}
 		time = 0.001f;
-		repeatTime -= Time.get_deltaTime();
+		repeatTime -= Time.deltaTime;
 		if (repeatTime > 0f)
 		{
 			return false;
@@ -74,7 +74,7 @@ public class UIButtonRepeater : UILongTouch
 
 	private float GetIntervalTime()
 	{
-		pushTime -= Time.get_deltaTime();
+		pushTime -= Time.deltaTime;
 		float result;
 		if (isFirstWait)
 		{
@@ -83,7 +83,7 @@ public class UIButtonRepeater : UILongTouch
 		}
 		else
 		{
-			result = ((!(pushTime < -1f)) ? interval : shortInterval);
+			result = ((pushTime < -1f) ? shortInterval : interval);
 		}
 		return result;
 	}

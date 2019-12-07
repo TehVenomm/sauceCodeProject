@@ -6,11 +6,6 @@ public class AnimCtrlNormalizer : MonoBehaviour
 
 	public float transitionDurationFromAnyState = 0.05f;
 
-	public AnimCtrlNormalizer()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
 	}

@@ -10,11 +10,6 @@ public class SkyDomeWeatherController : MonoBehaviour
 
 	private int MATERIALCOLOR_PROPERTY_KEY;
 
-	public SkyDomeWeatherController()
-		: this()
-	{
-	}
-
 	private void Awake()
 	{
 		MATERIALCOLOR_PROPERTY_KEY = Shader.PropertyToID("_MainColor");
@@ -23,12 +18,6 @@ public class SkyDomeWeatherController : MonoBehaviour
 
 	public void UpdateRenderers(float rate)
 	{
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
 		if (originalRenderer != null)
 		{
 			for (int i = 0; i < originalRenderer.Length; i++)
@@ -37,14 +26,14 @@ public class SkyDomeWeatherController : MonoBehaviour
 				{
 					continue;
 				}
-				Material[] sharedMaterials = originalRenderer[i].get_sharedMaterials();
-				foreach (Material val in sharedMaterials)
+				Material[] sharedMaterials = originalRenderer[i].sharedMaterials;
+				foreach (Material material in sharedMaterials)
 				{
-					if (!(val == null) && val.HasProperty(MATERIALCOLOR_PROPERTY_KEY))
+					if (!(material == null) && material.HasProperty(MATERIALCOLOR_PROPERTY_KEY))
 					{
-						Color color = val.GetColor(MATERIALCOLOR_PROPERTY_KEY);
+						Color color = material.GetColor(MATERIALCOLOR_PROPERTY_KEY);
 						color.a = 1f - rate;
-						val.SetColor(MATERIALCOLOR_PROPERTY_KEY, color);
+						material.SetColor(MATERIALCOLOR_PROPERTY_KEY, color);
 					}
 				}
 			}
@@ -59,15 +48,15 @@ public class SkyDomeWeatherController : MonoBehaviour
 			{
 				continue;
 			}
-			Material[] materials = afterRenderer[k].get_materials();
-			for (int l = 0; l < afterRenderer[k].get_materials().Length; l++)
+			_ = afterRenderer[k].materials;
+			for (int l = 0; l < afterRenderer[k].materials.Length; l++)
 			{
-				Material val2 = afterRenderer[k].get_sharedMaterials()[l];
-				if (!(val2 == null) && val2.HasProperty(MATERIALCOLOR_PROPERTY_KEY))
+				Material material2 = afterRenderer[k].sharedMaterials[l];
+				if (!(material2 == null) && material2.HasProperty(MATERIALCOLOR_PROPERTY_KEY))
 				{
-					Color color2 = val2.GetColor(MATERIALCOLOR_PROPERTY_KEY);
+					Color color2 = material2.GetColor(MATERIALCOLOR_PROPERTY_KEY);
 					color2.a = rate;
-					val2.SetColor(MATERIALCOLOR_PROPERTY_KEY, color2);
+					material2.SetColor(MATERIALCOLOR_PROPERTY_KEY, color2);
 				}
 			}
 		}

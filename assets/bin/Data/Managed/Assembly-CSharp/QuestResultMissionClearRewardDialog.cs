@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -47,8 +46,8 @@ public class QuestResultMissionClearRewardDialog : ItemSellConfirm
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetActive((Enum)UI.OBJ_NORMAL_ROOT, !isComplete);
-		SetActive((Enum)UI.OBJ_COMPLETE_ROOT, isComplete);
+		SetActive(UI.OBJ_NORMAL_ROOT, !isComplete);
+		SetActive(UI.OBJ_COMPLETE_ROOT, isComplete);
 	}
 
 	private void OnQuery_OK()
@@ -62,15 +61,15 @@ public class QuestResultMissionClearRewardDialog : ItemSellConfirm
 		int reward_num = sell_data_ary.Length;
 		if (crystalNum > 0)
 		{
-			reward_num++;
+			int num = ++reward_num;
 		}
 		if (totalGold > 0)
 		{
-			reward_num++;
+			int num = ++reward_num;
 		}
 		if (missionPointData != null && missionPointData.missionPoint > 0)
 		{
-			reward_num++;
+			int num = ++reward_num;
 		}
 		bool shouldAddGold = totalGold > 0;
 		bool shouldAddMissionPoint = missionPointData != null && missionPointData.missionPoint > 0;
@@ -81,32 +80,16 @@ public class QuestResultMissionClearRewardDialog : ItemSellConfirm
 			{
 				if (i < sell_data_ary.Length)
 				{
-					int num = 0;
-					int num2 = 0;
+					int enemy_icon_id = 0;
+					int enemy_icon_id2 = 0;
 					object itemData = sell_data_ary[i].GetItemData();
 					if (itemData is ItemSortData)
 					{
-						ItemSortData itemSortData = itemData as ItemSortData;
-						num = itemSortData.itemData.tableData.enemyIconID;
-						num2 = itemSortData.itemData.tableData.enemyIconID2;
+						ItemSortData obj = itemData as ItemSortData;
+						enemy_icon_id = obj.itemData.tableData.enemyIconID;
+						enemy_icon_id2 = obj.itemData.tableData.enemyIconID2;
 					}
-					ITEM_ICON_TYPE iconType = sell_data_ary[i].GetIconType();
-					int iconID = sell_data_ary[i].GetIconID();
-					RARITY_TYPE? rarity = sell_data_ary[i].GetRarity();
-					ELEMENT_TYPE iconElement = sell_data_ary[i].GetIconElement();
-					EQUIPMENT_TYPE? iconMagiEnableType = sell_data_ary[i].GetIconMagiEnableType();
-					int num3 = sell_data_ary[i].GetNum();
-					string event_name = null;
-					int event_data = 0;
-					bool is_new = false;
-					int toggle_group = -1;
-					bool is_select = false;
-					string icon_under_text = null;
-					bool is_equipping = false;
-					int enemy_icon_id = num;
-					int enemy_icon_id2 = num2;
-					GET_TYPE getType = sell_data_ary[i].GetGetType();
-					ItemIcon itemIcon = ItemIcon.Create(iconType, iconID, rarity, t, iconElement, iconMagiEnableType, num3, event_name, event_data, is_new, toggle_group, is_select, icon_under_text, is_equipping, enemy_icon_id, enemy_icon_id2, disable_rarity_text: false, getType);
+					ItemIcon itemIcon = ItemIcon.Create(sell_data_ary[i].GetIconType(), sell_data_ary[i].GetIconID(), sell_data_ary[i].GetRarity(), t, sell_data_ary[i].GetIconElement(), sell_data_ary[i].GetIconMagiEnableType(), sell_data_ary[i].GetNum(), null, 0, is_new: false, -1, is_select: false, null, is_equipping: false, enemy_icon_id, enemy_icon_id2, disable_rarity_text: false, sell_data_ary[i].GetGetType());
 					itemIcon.SetRewardBG(is_visible: true);
 					SetMaterialInfo(itemIcon.transform, sell_data_ary[i].GetMaterialType(), sell_data_ary[i].GetTableID());
 				}
@@ -119,8 +102,8 @@ public class QuestResultMissionClearRewardDialog : ItemSellConfirm
 				}
 				else if (shouldAddMissionPoint)
 				{
-					ItemIcon.GetIconShowData(REWARD_TYPE.POINT_SHOP_POINT, (uint)missionPointData.pointShopId, out int icon_id, out ITEM_ICON_TYPE icon_type, out RARITY_TYPE? rarity2, out ELEMENT_TYPE element, out ELEMENT_TYPE _, out EQUIPMENT_TYPE? _, out int _, out int _, out GET_TYPE _);
-					ItemIcon itemIcon3 = ItemIcon.Create(icon_type, icon_id, rarity2, t, element, null, missionPointData.missionPoint);
+					ItemIcon.GetIconShowData(REWARD_TYPE.POINT_SHOP_POINT, (uint)missionPointData.pointShopId, out int icon_id, out ITEM_ICON_TYPE icon_type, out RARITY_TYPE? rarity, out ELEMENT_TYPE element, out ELEMENT_TYPE _, out EQUIPMENT_TYPE? _, out int _, out int _, out GET_TYPE _);
+					ItemIcon itemIcon3 = ItemIcon.Create(icon_type, icon_id, rarity, t, element, null, missionPointData.missionPoint);
 					itemIcon3.SetRewardBG(is_visible: true);
 					int id = (!missionPointData.isEvent) ? 1 : 0;
 					SetMaterialInfo(itemIcon3.transform, REWARD_TYPE.POINT_SHOP_POINT, (uint)id);

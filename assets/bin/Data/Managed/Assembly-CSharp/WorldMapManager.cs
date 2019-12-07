@@ -110,8 +110,7 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 		{
 			return MonoBehaviourSingleton<QuestManager>.I.MapIsTraveldInExplore(mapId);
 		}
-		int num = traveledMapList.IndexOf(mapId);
-		return num >= 0;
+		return traveledMapList.IndexOf(mapId) >= 0;
 	}
 
 	public uint[] GetOpenRegionIdList()
@@ -299,7 +298,7 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDebugUsedPortal(int portalId, int used, Action<bool> call_back)
@@ -311,7 +310,7 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 		{
 			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDebugSetPortalPoint(int portalId, int point, Action<bool> call_back)
@@ -323,7 +322,7 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 		{
 			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void Dirty()
@@ -419,14 +418,14 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 		Protocol.Send(RegionCrystalNumModel.URL, requestSendForm, delegate(RegionCrystalNumModel ret)
 		{
 			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			string arg = string.Empty;
+			string arg = "";
 			if (flag)
 			{
 				releaseCrystalNum = ret.result.crystalNum;
 				arg = ret.result.text;
 			}
 			call_back(flag, arg);
-		}, string.Empty);
+		});
 	}
 
 	public void SendRegionOpen(int regionId, Action<bool> call_back)
@@ -443,7 +442,7 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 				releasedRegionIds.Add(regionId);
 			}
 			call_back(flag);
-		}, string.Empty);
+		});
 	}
 
 	public bool IsShowedOpenRegion(int regionId)
@@ -457,8 +456,7 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 		{
 			return true;
 		}
-		List<int> showedOpenRegionIds = GameSaveData.instance.showedOpenRegionIds;
-		if (showedOpenRegionIds.Contains(regionId))
+		if (GameSaveData.instance.showedOpenRegionIds.Contains(regionId))
 		{
 			return true;
 		}
@@ -480,8 +478,7 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 	public bool ExistRegionDirection()
 	{
 		uint[] openRegionIdListInWorldMap = GetOpenRegionIdListInWorldMap();
-		uint[] array = openRegionIdListInWorldMap;
-		foreach (uint num in array)
+		foreach (uint num in openRegionIdListInWorldMap)
 		{
 			if (num != 0 && !IsShowedOpenRegion((int)num))
 			{
@@ -494,8 +491,7 @@ public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 	public bool IsExistedWorld2()
 	{
 		uint[] validRegionIdListInWorldMap = GetValidRegionIdListInWorldMap();
-		uint[] array = validRegionIdListInWorldMap;
-		foreach (uint id in array)
+		foreach (uint id in validRegionIdListInWorldMap)
 		{
 			RegionTable.Data data = Singleton<RegionTable>.I.GetData(id);
 			if (data.regionId < 100 && data.worldId == 2)

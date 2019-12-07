@@ -7,21 +7,21 @@ namespace Network
 	{
 		public int setNo;
 
-		public string weapon_0 = string.Empty;
+		public string weapon_0 = "";
 
-		public string weapon_1 = string.Empty;
+		public string weapon_1 = "";
 
-		public string weapon_2 = string.Empty;
+		public string weapon_2 = "";
 
-		public string armor = string.Empty;
+		public string armor = "";
 
-		public string arm = string.Empty;
+		public string arm = "";
 
-		public string leg = string.Empty;
+		public string leg = "";
 
-		public string helm = string.Empty;
+		public string helm = "";
 
-		public string setName = string.Empty;
+		public string setName = "";
 
 		public int showHelm;
 

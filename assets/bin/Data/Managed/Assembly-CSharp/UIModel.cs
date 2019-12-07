@@ -26,17 +26,12 @@ public class UIModel : MonoBehaviour
 		}
 	}
 
-	public UIModel()
-		: this()
-	{
-	}
-
 	public static UIModel Get(Transform t)
 	{
 		UIModel uIModel = t.GetComponent<UIModel>();
 		if (uIModel == null)
 		{
-			uIModel = t.get_gameObject().AddComponent<UIModel>();
+			uIModel = t.gameObject.AddComponent<UIModel>();
 		}
 		return uIModel;
 	}
@@ -45,7 +40,7 @@ public class UIModel : MonoBehaviour
 	{
 		if (model != null)
 		{
-			model.get_gameObject().SetActive(false);
+			model.gameObject.SetActive(value: false);
 		}
 	}
 
@@ -53,7 +48,7 @@ public class UIModel : MonoBehaviour
 	{
 		if (model != null)
 		{
-			model.get_gameObject().SetActive(true);
+			model.gameObject.SetActive(value: true);
 		}
 	}
 
@@ -61,25 +56,24 @@ public class UIModel : MonoBehaviour
 	{
 		models.DoAction(delegate(Transform t, int i)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			t.set_position(new Vector3((float)(i + 1) * 5000f, 0f, 0f));
+			t.position = new Vector3((float)(i + 1) * 5000f, 0f, 0f);
 		});
 	}
 
 	private void Awake()
 	{
-		_transform = this.get_transform();
+		_transform = base.transform;
 	}
 
 	public void Init(string resource_name)
 	{
 		if (model != null)
 		{
-			model.get_gameObject().SetActive(true);
+			model.gameObject.SetActive(value: true);
 		}
 		else if (!isLoading)
 		{
-			this.StartCoroutine(DoInit(resource_name));
+			StartCoroutine(DoInit(resource_name));
 		}
 	}
 
@@ -88,7 +82,7 @@ public class UIModel : MonoBehaviour
 		if (model != null)
 		{
 			models.Remove(model);
-			Object.Destroy(model.get_gameObject());
+			Object.Destroy(model.gameObject);
 			model = null;
 		}
 	}
@@ -97,16 +91,16 @@ public class UIModel : MonoBehaviour
 	{
 		if (model != null)
 		{
-			model.get_gameObject().SetActive(active);
+			model.gameObject.SetActive(active);
 		}
 	}
 
 	private IEnumerator DoInit(string resource_name)
 	{
 		isLoading = true;
-		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject load_object = load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.COMMON, resource_name);
-		yield return load_queue.Wait();
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject load_object = loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.COMMON, resource_name);
+		yield return loadingQueue.Wait();
 		model = load_object.Realizes(MonoBehaviourSingleton<AppMain>.I._transform);
 		if (model != null)
 		{
@@ -121,7 +115,7 @@ public class UIModel : MonoBehaviour
 		if (model != null)
 		{
 			models.Remove(model);
-			Object.DestroyImmediate(model.get_gameObject());
+			Object.DestroyImmediate(model.gameObject);
 		}
 		UpdateModelOffset();
 	}

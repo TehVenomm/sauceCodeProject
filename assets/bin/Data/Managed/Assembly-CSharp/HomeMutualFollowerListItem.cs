@@ -15,7 +15,7 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 
 		public bool IsFollower;
 
-		public string clanId = string.Empty;
+		public string clanId = "";
 
 		public int NoReadMsgNum;
 
@@ -143,11 +143,6 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 
 	protected uint LoadingBit => m_loadingBit;
 
-	public HomeMutualFollowerListItem()
-		: this()
-	{
-	}
-
 	private void StartInitialize()
 	{
 		m_isInitialized = false;
@@ -171,14 +166,14 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 			{
 				ResetParams();
 			}
-			m_initCoroutine = this.StartCoroutine(InitCoroutine(_param));
+			m_initCoroutine = StartCoroutine(InitCoroutine(_param));
 		}
 	}
 
 	private void ResetParams()
 	{
 		m_loadingBit = 0u;
-		this.StopCoroutine(m_initCoroutine);
+		StopCoroutine(m_initCoroutine);
 		m_initCoroutine = null;
 		EndInitialize();
 	}
@@ -188,44 +183,30 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 		StartInitialize();
 		if (m_allUiArray == null)
 		{
-			m_allUiArray = this.GetComponentsInChildren<UIWidget>(true);
+			m_allUiArray = GetComponentsInChildren<UIWidget>(includeInactive: true);
 		}
 		SetInitParameter(_param);
 		SetUserBaseInfo(_param.CharacterInfo, _param.Index, _param.IsPermittedMessage, _param.IsUseRenderTextureCharaModel);
 		SetFollowState(_param);
 		if (m_userJoinInfoRootObject != null)
 		{
-			m_userJoinInfoRootObject.get_gameObject().SetActive(false);
+			m_userJoinInfoRootObject.gameObject.SetActive(value: false);
 		}
 		if (m_userCharacterInfoRootObject != null)
 		{
-			m_userCharacterInfoRootObject.get_gameObject().SetActive(true);
+			m_userCharacterInfoRootObject.gameObject.SetActive(value: true);
 		}
 		InitButtonSettings();
-		bool isLoadingComplete = false;
-		while (!isLoadingComplete)
+		bool flag = false;
+		while (!flag)
 		{
 			yield return null;
-			isLoadingComplete = true;
-			IEnumerator enumerator = Enum.GetValues(typeof(LOADING_COMP_BIT)).GetEnumerator();
-			try
+			flag = true;
+			foreach (LOADING_COMP_BIT value in Enum.GetValues(typeof(LOADING_COMP_BIT)))
 			{
-				while (enumerator.MoveNext())
+				if (value != 0)
 				{
-					LOADING_COMP_BIT lOADING_COMP_BIT = (LOADING_COMP_BIT)enumerator.Current;
-					if (lOADING_COMP_BIT != 0)
-					{
-						isLoadingComplete &= (((int)lOADING_COMP_BIT & (int)LoadingBit) != 0);
-					}
-				}
-			}
-			finally
-			{
-				IDisposable disposable;
-				IDisposable disposable2 = disposable = (enumerator as IDisposable);
-				if (disposable != null)
-				{
-					disposable2.Dispose();
+					flag &= (((int)value & (int)LoadingBit) != 0);
 				}
 			}
 		}
@@ -245,10 +226,6 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 
 	private void SetUserBaseInfo(FriendCharaInfo _info, int _index, bool _isPerMittedUser, bool _isUseRernderTexture)
 	{
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
 		if (_info != null)
 		{
 			bool flag = _info.userId == 0;
@@ -260,7 +237,7 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 			{
 				m_disableMask.SetActive(!_isPerMittedUser);
 			}
-			int width = (!_isUseRernderTexture) ? 137 : 274;
+			int width = _isUseRernderTexture ? 274 : 137;
 			if (m_userHPBgImg != null)
 			{
 				m_userHPBgImg.width = width;
@@ -273,10 +250,10 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 			{
 				m_userDefBgImg.width = width;
 			}
-			m_userCharaIconTex.set_enabled(false);
-			if (m_userCharaIconTex.get_gameObject().get_activeSelf() != _isUseRernderTexture)
+			m_userCharaIconTex.enabled = false;
+			if (m_userCharaIconTex.gameObject.activeSelf != _isUseRernderTexture)
 			{
-				m_userCharaIconTex.get_gameObject().SetActive(_isUseRernderTexture);
+				m_userCharaIconTex.gameObject.SetActive(_isUseRernderTexture);
 			}
 			if (!_isUseRernderTexture)
 			{
@@ -284,17 +261,17 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 			}
 			else if (flag)
 			{
-				SetRenderNPCModel(m_userCharaIconTex.get_transform(), m_userCharaIconTex, 0, NPC_CHARA_ICON_POS, NPC_CHARA_ICON_ROT, 10f, delegate
+				SetRenderNPCModel(m_userCharaIconTex.transform, m_userCharaIconTex, 0, NPC_CHARA_ICON_POS, NPC_CHARA_ICON_ROT, 10f, delegate
 				{
-					m_userCharaIconTex.set_enabled(true);
+					m_userCharaIconTex.enabled = true;
 					SetLoadComplete(LOADING_COMP_BIT.CHARA_RENDER_TEX);
 				});
 			}
 			else
 			{
-				ForceSetRenderPlayerModel(m_userCharaIconTex.get_transform(), m_userCharaIconTex, PlayerLoadInfo.FromCharaInfo(_info, need_weapon: false, need_helm: true, need_leg: false, is_priority_visual_equip: true), 99, PC_CHARA_ICON_POS, PC_CHARA_ICON_ROT, is_priority_visual_equip: true, delegate
+				ForceSetRenderPlayerModel(m_userCharaIconTex.transform, m_userCharaIconTex, PlayerLoadInfo.FromCharaInfo(_info, need_weapon: false, need_helm: true, need_leg: false, is_priority_visual_equip: true), 99, PC_CHARA_ICON_POS, PC_CHARA_ICON_ROT, is_priority_visual_equip: true, delegate
 				{
-					m_userCharaIconTex.set_enabled(true);
+					m_userCharaIconTex.enabled = true;
 					SetLoadComplete(LOADING_COMP_BIT.CHARA_RENDER_TEX);
 				});
 			}
@@ -316,7 +293,7 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 
 	private void InitButtonSettings()
 	{
-		UIButton component = this.GetComponent<UIButton>();
+		UIButton component = GetComponent<UIButton>();
 		if (component != null)
 		{
 			component.onClick.Clear();
@@ -325,7 +302,7 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 				OnClickMe();
 			}));
 		}
-		UIGameSceneEventSender component2 = this.GetComponent<UIGameSceneEventSender>();
+		UIGameSceneEventSender component2 = GetComponent<UIGameSceneEventSender>();
 		if (component2 != null)
 		{
 			component2.eventName = string.Empty;
@@ -339,12 +316,22 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 		{
 			flag = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(_param.CharacterInfo.userId);
 		}
-		bool flag2 = !flag && (_param.IsFollowing || _param.IsFollower);
+		if (!flag)
+		{
+			if (_param.IsFollowing)
+			{
+				_ = 1;
+			}
+			else
+				_ = _param.IsFollower;
+		}
+		else
+			_ = 0;
 		bool active = false;
-		Debug.Log((object)("_param.clanId : " + _param.clanId));
+		Debug.Log("_param.clanId : " + _param.clanId);
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsRegistered())
 		{
-			Debug.Log((object)("UserInfoManager.I.userClan.cId : " + MonoBehaviourSingleton<UserInfoManager>.I.userClan.cId));
+			Debug.Log("UserInfoManager.I.userClan.cId : " + MonoBehaviourSingleton<UserInfoManager>.I.userClan.cId);
 			active = (_param.clanId == MonoBehaviourSingleton<UserInfoManager>.I.userClan.cId);
 		}
 		if (m_blackListIcon != null)
@@ -381,15 +368,13 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 		{
 			for (int i = 0; i < m_allUiArray.Length; i++)
 			{
-				m_allUiArray[i].set_enabled(_isVisible);
+				m_allUiArray[i].enabled = _isVisible;
 			}
 		}
 	}
 
 	protected void SetRenderNPCModel(Transform targetTrans, UITexture _uiTex, int npc_id, Vector3 pos, Vector3 rot, float fov = -1f, Action<NPCLoader> onload_callback = null)
 	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 		if (!(targetTrans == null))
 		{
 			UIModelRenderTexture.Get(targetTrans).InitNPC(_uiTex, npc_id, pos, rot, fov, onload_callback);
@@ -398,8 +383,6 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 
 	protected void ForceSetRenderPlayerModel(Transform targetTrans, UITexture _uiTex, PlayerLoadInfo info, int anim_id, Vector3 pos, Vector3 rot, bool is_priority_visual_equip, Action<PlayerLoader> onload_callback = null)
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 		if (targetTrans == null)
 		{
 			onload_callback?.Invoke(null);
@@ -441,7 +424,7 @@ public class HomeMutualFollowerListItem : MonoBehaviour
 
 	public void CleanRenderTexture()
 	{
-		UIModelRenderTexture.Get(m_userCharaIconTex.get_transform()).Clear();
+		UIModelRenderTexture.Get(m_userCharaIconTex.transform).Clear();
 	}
 
 	public void OnClickJoinButton()

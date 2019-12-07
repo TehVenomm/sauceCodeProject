@@ -30,18 +30,13 @@ public class EffectColorCtrl : MonoBehaviour
 
 	private Material[] materials;
 
-	public EffectColorCtrl()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
 		ID_RIM_COLOR = Shader.PropertyToID("_RimColor");
 		ID_INNER_COLOR = Shader.PropertyToID("_InnerColor");
-		transforms = this.get_transform().GetComponentsInChildren<Transform>();
+		transforms = base.transform.GetComponentsInChildren<Transform>();
 		List<Material> list = new List<Material>();
-		List<Renderer> list2 = new List<Renderer>();
+		new List<Renderer>();
 		if (!transforms.IsNullOrEmpty())
 		{
 			int i = 0;
@@ -50,10 +45,10 @@ public class EffectColorCtrl : MonoBehaviour
 				Renderer component = transforms[i].GetComponent<Renderer>();
 				if (component != null)
 				{
-					component.set_enabled(true);
-					if (component.get_material() != null)
+					component.enabled = true;
+					if (component.material != null)
 					{
-						list.Add(component.get_material());
+						list.Add(component.material);
 					}
 				}
 			}
@@ -63,16 +58,6 @@ public class EffectColorCtrl : MonoBehaviour
 
 	public void UpdateColor(float rate)
 	{
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
 		if (colorVariation.IsNullOrEmpty() || colorVariation.Length <= 1)
 		{
 			return;
@@ -94,19 +79,19 @@ public class EffectColorCtrl : MonoBehaviour
 			}
 			return;
 		}
-		float num5 = (num * (float)num3 - num2) / num;
+		float t = (num * (float)num3 - num2) / num;
 		int i = 0;
-		for (int num6 = materials.Length; i < num6; i++)
+		for (int num5 = materials.Length; i < num5; i++)
 		{
 			if (materials[i].HasProperty(ID_RIM_COLOR))
 			{
-				Color val = Color.Lerp(colorVariation[num3].rimColor, colorVariation[num3 - 1].rimColor, num5);
-				materials[i].SetColor(ID_RIM_COLOR, val);
+				Color value = Color.Lerp(colorVariation[num3].rimColor, colorVariation[num3 - 1].rimColor, t);
+				materials[i].SetColor(ID_RIM_COLOR, value);
 			}
 			if (materials[i].HasProperty(ID_INNER_COLOR))
 			{
-				Color val2 = Color.Lerp(colorVariation[num3].innerColor, colorVariation[num3 - 1].innerColor, num5);
-				materials[i].SetColor(ID_INNER_COLOR, val2);
+				Color value2 = Color.Lerp(colorVariation[num3].innerColor, colorVariation[num3 - 1].innerColor, t);
+				materials[i].SetColor(ID_INNER_COLOR, value2);
 			}
 		}
 	}
@@ -115,7 +100,7 @@ public class EffectColorCtrl : MonoBehaviour
 	{
 		if (!(hitEffectTrans == null))
 		{
-			this.StartCoroutine(PlayHitEffect(hitEffectTrans.get_gameObject()));
+			StartCoroutine(PlayHitEffect(hitEffectTrans.gameObject));
 		}
 	}
 
@@ -123,9 +108,9 @@ public class EffectColorCtrl : MonoBehaviour
 	{
 		if (!(obj == null))
 		{
-			obj.SetActive(true);
-			yield return (object)new WaitForSeconds(effectCoolTime);
-			obj.SetActive(false);
+			obj.SetActive(value: true);
+			yield return new WaitForSeconds(effectCoolTime);
+			obj.SetActive(value: false);
 		}
 	}
 }

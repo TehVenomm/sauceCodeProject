@@ -15,11 +15,6 @@ public class SymbolMarkCtrl : MonoBehaviour
 	[SerializeField]
 	private SymbolTexture frameOutLineTexture;
 
-	public SymbolMarkCtrl()
-		: this()
-	{
-	}
-
 	public void Initilize()
 	{
 		markTexture.Initilize(SymbolTable.SymbolType.MARK);

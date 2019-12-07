@@ -36,25 +36,19 @@ public static class CoopStageObjectUtility
 
 	public static void SetOfflineForAll()
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
 		{
 			return;
 		}
 		MonoBehaviourSingleton<StageObjectManager>.I.cacheList.ForEach(delegate(StageObject obj)
 		{
-			obj.get_gameObject().SetActive(true);
+			obj.gameObject.SetActive(value: true);
 		});
 		MonoBehaviourSingleton<StageObjectManager>.I.ClearCacheObject();
-		Vector3 val = Vector3.get_zero();
+		Vector3 vector = Vector3.zero;
 		if (MonoBehaviourSingleton<StageObjectManager>.I.boss != null)
 		{
-			val = MonoBehaviourSingleton<StageObjectManager>.I.boss._transform.get_position();
+			vector = MonoBehaviourSingleton<StageObjectManager>.I.boss._transform.position;
 		}
 		int i = 0;
 		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.objectList.Count; i < count; i++)
@@ -73,11 +67,11 @@ public static class CoopStageObjectUtility
 				{
 					if (player is Self)
 					{
-						player.SetAppearPosOwner(val);
+						player.SetAppearPosOwner(vector);
 					}
 					else
 					{
-						player.SetAppearPosGuest(val);
+						player.SetAppearPosGuest(vector);
 					}
 				}
 				if (player.isWaitBattleStart)
@@ -99,7 +93,6 @@ public static class CoopStageObjectUtility
 
 	public static void TransfarOwner(StageObject obj, int owner_client_id)
 	{
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId == owner_client_id)
 		{
 			if (!CanControll(obj))
@@ -154,7 +147,7 @@ public static class CoopStageObjectUtility
 				Player player = MonoBehaviourSingleton<StageObjectManager>.I.cacheList[num] as Player;
 				if (player != null)
 				{
-					player.get_gameObject().SetActive(true);
+					player.gameObject.SetActive(value: true);
 					MonoBehaviourSingleton<StageObjectManager>.I.cacheList.RemoveAt(num);
 				}
 				else
@@ -293,8 +286,7 @@ public static class CoopStageObjectUtility
 			int num3 = Math.Min(num2, destroyList.Count);
 			for (int i = 0; i < num3; i++)
 			{
-				StageObject stageObject = destroyList[i];
-				stageObject.DestroyObject();
+				destroyList[i].DestroyObject();
 			}
 		}
 	}
@@ -324,8 +316,7 @@ public static class CoopStageObjectUtility
 			MonoBehaviourSingleton<StageObjectManager>.I.playerList.ForEach(action2);
 			for (int i = 0; i < destroyList.Count; i++)
 			{
-				StageObject stageObject = destroyList[i];
-				stageObject.DestroyObject();
+				destroyList[i].DestroyObject();
 			}
 		}
 	}

@@ -1,7 +1,5 @@
 using Network;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class QuestAcceptExploreDetail : QuestDeliveryDetail
@@ -105,12 +103,11 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 	public override void Initialize()
 	{
 		base.Initialize();
-		List<Network.EventData> eventList = MonoBehaviourSingleton<QuestManager>.I.eventList;
-		foreach (Network.EventData item in eventList)
+		foreach (Network.EventData @event in MonoBehaviourSingleton<QuestManager>.I.eventList)
 		{
-			if (item.eventId == info.eventID)
+			if (@event.eventId == info.eventID)
 			{
-				eventData = item;
+				eventData = @event;
 				break;
 			}
 		}
@@ -118,7 +115,7 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.OBJ_CLEAR_REWARD, is_visible: true);
+		SetActive(UI.OBJ_CLEAR_REWARD, is_visible: true);
 		base.UpdateUI();
 		questTableData = info.GetQuestData();
 		if (questTableData == null)
@@ -128,21 +125,20 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questTableData.GetMainEnemyID());
 		if (enemyData != null)
 		{
-			ItemIcon itemIcon = ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY));
-			itemIcon.SetDepth(7);
-			SetElementSprite((Enum)UI.SPR_ENM_ELEMENT, (int)enemyData.element);
-			SetElementSprite((Enum)UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
-			SetActive((Enum)UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
+			ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, GetCtrl(UI.OBJ_ENEMY)).SetDepth(7);
+			SetElementSprite(UI.SPR_ENM_ELEMENT, (int)enemyData.element);
+			SetElementSprite(UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
+			SetActive(UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
 			int num = (int)questTableData.limitTime;
-			SetLabelText((Enum)UI.LBL_LIMIT_TIME, $"{num / 60:D2}:{num % 60:D2}");
+			SetLabelText(UI.LBL_LIMIT_TIME, $"{num / 60:D2}:{num % 60:D2}");
 			if ((base.isComplete || isNotice) && !isCompletedEventDelivery)
 			{
-				SetActive((Enum)UI.BTN_CREATE_OFF, is_visible: false);
+				SetActive(UI.BTN_CREATE_OFF, is_visible: false);
 			}
 			else
 			{
-				SetActive((Enum)UI.BTN_CREATE, IsCreatableRoom());
-				SetActive((Enum)UI.BTN_CREATE_OFF, !IsCreatableRoom());
+				SetActive(UI.BTN_CREATE, IsCreatableRoom());
+				SetActive(UI.BTN_CREATE_OFF, !IsCreatableRoom());
 			}
 			SetDifficultySprite();
 			SetSprite(baseRoot, UI.SPR_WINDOW, "RequestWindowBase_Explorer");
@@ -168,11 +164,11 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 
 	private void OnQuery_SWITCH_SUBMISSION()
 	{
-		if (Object.op_Implicit(targetFrame) && Object.op_Implicit(submissionFrame))
+		if ((bool)targetFrame && (bool)submissionFrame)
 		{
-			bool activeSelf = targetFrame.get_gameObject().get_activeSelf();
-			targetFrame.get_gameObject().SetActive(!activeSelf);
-			submissionFrame.get_gameObject().SetActive(activeSelf);
+			bool activeSelf = targetFrame.gameObject.activeSelf;
+			targetFrame.gameObject.SetActive(!activeSelf);
+			submissionFrame.gameObject.SetActive(activeSelf);
 			isCompletedEventDelivery = true;
 			RefreshUI();
 		}
@@ -183,10 +179,7 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 		if (!IsCreatableRoom())
 		{
 			string text = StringTable.Get(STRING_CATEGORY.MATCHING, 0u);
-			object[] array = new object[1]
-			{
-				text
-			};
+			(new object[1])[0] = text;
 			GameSection.ChangeEvent("HOST_LIMIT", text);
 			return;
 		}
@@ -223,7 +216,7 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 			else if (maxRetryCount > 0)
 			{
 				retryCount++;
-				this.StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
+				StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
 			}
 			else if (!isJoined)
 			{
@@ -239,7 +232,7 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 
 	private IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
 	{
-		yield return (object)new WaitForSeconds(time);
+		yield return new WaitForSeconds(time);
 		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, isExplore: true, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
 		{
 			if (!is_success)
@@ -255,7 +248,7 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 				else
 				{
 					retryCount++;
-					this.StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
+					StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
 				}
 			}
 			else if (!isJoined)
@@ -274,10 +267,7 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 	{
 		GameSection.ResumeEvent(is_resume: false);
 		string text = StringTable.Get(STRING_CATEGORY.MATCHING, 1u);
-		object[] array = new object[1]
-		{
-			text
-		};
+		(new object[1])[0] = text;
 		DispatchEvent("HOST_LIMIT", text);
 	}
 
@@ -289,6 +279,6 @@ public class QuestAcceptExploreDetail : QuestDeliveryDetail
 	private void SetDifficultySprite()
 	{
 		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryID);
-		SetActive((Enum)UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
+		SetActive(UI.SPR_TYPE_DIFFICULTY, (deliveryTableData != null && deliveryTableData.difficulty >= DIFFICULTY_MODE.HARD) ? true : false);
 	}
 }

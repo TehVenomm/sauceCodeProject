@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -50,39 +49,39 @@ public class LimitedLoginBonusGet : GameSection
 		{
 			return;
 		}
-		SetLabelText((Enum)UI.LBL_LOGIN_DAYS, loginBonus.name);
+		SetLabelText(UI.LBL_LOGIN_DAYS, loginBonus.name);
 		if (loginBonus.reward.Count > 0)
 		{
 			reward = loginBonus.reward[0];
-			SetLabelText((Enum)UI.LBL_GET_ITEM, reward.name);
-			if (reward.type == 14)
+			SetLabelText(UI.LBL_GET_ITEM, reward.name);
+			if (14 == reward.type)
 			{
-				SetRenderAccessoryModel((Enum)UI.TEX_MODEL, (uint)reward.itemId, reward.GetScale(), rotation: true, light_rotation: false);
+				SetRenderAccessoryModel(UI.TEX_MODEL, (uint)reward.itemId, reward.GetScale());
 				texModelTexture_.width = 300;
 				texModelTexture_.height = 300;
 				isModel = true;
 			}
-			else if (reward.type == 5)
+			else if (5 == reward.type)
 			{
 				uint itemId = (uint)reward.itemId;
 				texModelRenderTexture_.InitSkillItem(texModelTexture_, itemId, rotation: true, light_rotation: false, 45f);
 				texInnerModelRenderTexture_.InitSkillItemSymbol(texInnerModelTexture_, itemId, rotation: true, 17f);
 				isModel = true;
 			}
-			else if (reward.type == 4)
+			else if (4 == reward.type)
 			{
-				SetRenderEquipModel((Enum)UI.TEX_MODEL, (uint)reward.itemId, -1, -1, reward.GetScale());
+				SetRenderEquipModel(UI.TEX_MODEL, (uint)reward.itemId, -1, -1, reward.GetScale());
 				texModelTexture_.width = 300;
 				texModelTexture_.height = 300;
 				isModel = true;
 			}
-			else if (reward.type == 1 || reward.type == 2)
+			else if (1 == reward.type || 2 == reward.type)
 			{
 				uint itemModelID = GetItemModelID((REWARD_TYPE)reward.type, reward.itemId);
 				texModelRenderTexture_.InitItem(texModelTexture_, itemModelID);
 				isModel = true;
 			}
-			else if (reward.type == 3 && IsDispItem3D(reward.itemId))
+			else if (3 == reward.type && IsDispItem3D(reward.itemId))
 			{
 				uint itemModelID2 = GetItemModelID((REWARD_TYPE)reward.type, reward.itemId);
 				texModelRenderTexture_.InitItem(texModelTexture_, itemModelID2);
@@ -90,7 +89,7 @@ public class LimitedLoginBonusGet : GameSection
 			}
 			if (!isModel)
 			{
-				this.StartCoroutine("LoadIcon");
+				StartCoroutine("LoadIcon");
 			}
 			float rotateSpeed = 35f;
 			texModelRenderTexture_.SetRotateSpeed(rotateSpeed);
@@ -101,19 +100,26 @@ public class LimitedLoginBonusGet : GameSection
 	private IEnumerator LoadIcon()
 	{
 		yield return null;
-		LoginBonus.LoginBonusReward r = reward;
-		ItemIcon icon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)r.type, (uint)r.itemId, GetCtrl(UI.OBJ_DETAIL_ROOT));
-		icon.transform.set_localScale(new Vector3(1.5f, 1.5f, 1.5f));
-		GetCtrl(UI.OBJ_DETAIL_ROOT).set_localPosition(new Vector3(0f, 50f, 0f));
+		LoginBonus.LoginBonusReward loginBonusReward = reward;
+		ItemIcon.CreateRewardItemIcon((REWARD_TYPE)loginBonusReward.type, (uint)loginBonusReward.itemId, GetCtrl(UI.OBJ_DETAIL_ROOT)).transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+		GetCtrl(UI.OBJ_DETAIL_ROOT).localPosition = new Vector3(0f, 50f, 0f);
 	}
 
 	private bool IsDispItem3D(int itemID)
 	{
-		if (itemID == 7000100 || itemID == 7000101 || itemID == 7000200 || itemID == 7000201 || itemID == 7000300 || itemID == 7000301 || itemID == 1200000)
+		switch (itemID)
 		{
+		case 1200000:
+		case 7000100:
+		case 7000101:
+		case 7000200:
+		case 7000201:
+		case 7000300:
+		case 7000301:
 			return true;
+		default:
+			return false;
 		}
-		return false;
 	}
 
 	private uint GetItemModelID(REWARD_TYPE type, int itemID)
@@ -138,7 +144,7 @@ public class LimitedLoginBonusGet : GameSection
 	{
 		if (null != glowModel_)
 		{
-			glowModel_.get_gameObject().SetActive(false);
+			glowModel_.gameObject.SetActive(value: false);
 		}
 		GameSection.BackSection();
 	}

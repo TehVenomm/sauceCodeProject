@@ -7,7 +7,7 @@ public class WeatherController
 	[Serializable]
 	private class ShaderSettings
 	{
-		public Color fogColor = Color.get_white();
+		public Color fogColor = Color.white;
 
 		public float linearFogStart;
 
@@ -62,16 +62,6 @@ public class WeatherController
 
 	public void Init()
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
 		LIGHTMAPBLEND_PARAMTER_KEY = Shader.PropertyToID("_LightMapBlend");
 		if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
 		{
@@ -86,7 +76,7 @@ public class WeatherController
 			originalSettings.lightProbePeak = MonoBehaviourSingleton<SceneSettingsManager>.I.lightProbePeak;
 			originalSettings.npcAmbientColor = MonoBehaviourSingleton<SceneSettingsManager>.I.npcAmbientColor;
 		}
-		if (!Application.get_isPlaying())
+		if (!Application.isPlaying)
 		{
 			return;
 		}
@@ -95,28 +85,13 @@ public class WeatherController
 		{
 			for (int i = 0; i < enableObjects.Length; i++)
 			{
-				enableObjects[i].SetActive(false);
+				enableObjects[i].SetActive(value: false);
 			}
 		}
 	}
 
 	public void Update(float rate)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
 		rate = Mathf.Clamp01(rate);
 		ShaderGlobal.fogColor = Color.Lerp(originalSettings.fogColor, afterShaderSettings.fogColor, rate);
 		ShaderGlobal.fogNear = Mathf.Lerp(originalSettings.linearFogStart, afterShaderSettings.linearFogStart, rate);
@@ -136,12 +111,12 @@ public class WeatherController
 				{
 					continue;
 				}
-				Material[] sharedMaterials = blendLightMapRenderer[i].get_sharedMaterials();
-				foreach (Material val in sharedMaterials)
+				Material[] sharedMaterials = blendLightMapRenderer[i].sharedMaterials;
+				foreach (Material material in sharedMaterials)
 				{
-					if (!(val == null) && val.HasProperty(LIGHTMAPBLEND_PARAMTER_KEY))
+					if (!(material == null) && material.HasProperty(LIGHTMAPBLEND_PARAMTER_KEY))
 					{
-						val.SetFloat(LIGHTMAPBLEND_PARAMTER_KEY, rate);
+						material.SetFloat(LIGHTMAPBLEND_PARAMTER_KEY, rate);
 					}
 				}
 			}
@@ -158,18 +133,18 @@ public class WeatherController
 		{
 			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect != null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect.get_gameObject().SetActive(!cameraLinkEffectEnable);
+				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect.gameObject.SetActive(!cameraLinkEffectEnable);
 			}
 			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0 != null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0.get_gameObject().SetActive(!cameraLinkEffectY0Enable);
+				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0.gameObject.SetActive(!cameraLinkEffectY0Enable);
 			}
 		}
 		if (disableObjects != null)
 		{
 			for (int i = 0; i < disableObjects.Length; i++)
 			{
-				disableObjects[i].SetActive(false);
+				disableObjects[i].SetActive(value: false);
 			}
 		}
 	}
@@ -180,18 +155,18 @@ public class WeatherController
 		{
 			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect != null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect.get_gameObject().SetActive(cameraLinkEffectEnable);
+				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect.gameObject.SetActive(cameraLinkEffectEnable);
 			}
 			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0 != null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0.get_gameObject().SetActive(cameraLinkEffectY0Enable);
+				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0.gameObject.SetActive(cameraLinkEffectY0Enable);
 			}
 		}
 		if (enableObjects != null)
 		{
 			for (int i = 0; i < enableObjects.Length; i++)
 			{
-				enableObjects[i].SetActive(true);
+				enableObjects[i].SetActive(value: true);
 			}
 		}
 	}
@@ -202,18 +177,18 @@ public class WeatherController
 		{
 			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect != null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect.get_gameObject().SetActive(!cameraLinkEffectEnable);
+				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffect.gameObject.SetActive(!cameraLinkEffectEnable);
 			}
 			if (MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0 != null)
 			{
-				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0.get_gameObject().SetActive(!cameraLinkEffectY0Enable);
+				MonoBehaviourSingleton<StageManager>.I.cameraLinkEffectY0.gameObject.SetActive(!cameraLinkEffectY0Enable);
 			}
 		}
 		if (enableObjects != null)
 		{
 			for (int i = 0; i < enableObjects.Length; i++)
 			{
-				enableObjects[i].SetActive(false);
+				enableObjects[i].SetActive(value: false);
 			}
 		}
 	}
@@ -224,7 +199,7 @@ public class WeatherController
 		{
 			for (int i = 0; i < disableObjects.Length; i++)
 			{
-				disableObjects[i].SetActive(true);
+				disableObjects[i].SetActive(value: true);
 			}
 		}
 	}

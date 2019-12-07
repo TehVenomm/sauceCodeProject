@@ -112,9 +112,4 @@ public class CutSceneData : ScriptableObject
 	public const int NOT_REQUEST_STORY = 0;
 
 	public int storyId;
-
-	public CutSceneData()
-		: this()
-	{
-	}
 }

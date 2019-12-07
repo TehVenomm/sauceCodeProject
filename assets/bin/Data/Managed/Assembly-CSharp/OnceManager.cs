@@ -35,6 +35,6 @@ public class OnceManager : MonoBehaviourSingleton<OnceManager>
 				firstSendOnce = false;
 			}
 			callBack(obj);
-		}, string.Empty);
+		});
 	}
 }

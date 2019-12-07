@@ -102,7 +102,7 @@ public class LoadingUI : UIBehaviour
 		}
 		if (currentProgress != null && polling)
 		{
-			this.StartCoroutine(DoUpdate());
+			StartCoroutine(DoUpdate());
 		}
 	}
 
@@ -118,18 +118,18 @@ public class LoadingUI : UIBehaviour
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.SPR_TIPS, is_visible: false);
-		SetActive((Enum)UI.OBJ_ICON, is_visible: false);
-		SetActive((Enum)UI.OBJ_TEXT, is_visible: false);
-		SetActive((Enum)UI.SPR_DL, is_visible: false);
-		SetActive((Enum)UI.LBL_SYSTEM_MESSAGE, is_visible: false);
-		SetActive((Enum)UI.OBJ_TITLE, is_visible: false);
-		SetActive((Enum)UI.OBJ_ANNOUNCE_TIME_BONUS, is_visible: false);
-		SetActive((Enum)UI.OBJ_ANNOUNCE_ELAPSED_TIME, is_visible: false);
-		SetActive((Enum)UI.SPR_DRAGON_UI, is_visible: false);
-		downloadGauge = base.GetComponent<UISlider>((Enum)UI.SPR_DL_GAUGE);
-		percentLabel = base.GetComponent<UILabel>((Enum)UI.LBL_PERCENT);
-		percentRefLabel = base.GetComponent<UILabel>((Enum)UI.LBL_PERCENT_REFLECT);
+		SetActive(UI.SPR_TIPS, is_visible: false);
+		SetActive(UI.OBJ_ICON, is_visible: false);
+		SetActive(UI.OBJ_TEXT, is_visible: false);
+		SetActive(UI.SPR_DL, is_visible: false);
+		SetActive(UI.LBL_SYSTEM_MESSAGE, is_visible: false);
+		SetActive(UI.OBJ_TITLE, is_visible: false);
+		SetActive(UI.OBJ_ANNOUNCE_TIME_BONUS, is_visible: false);
+		SetActive(UI.OBJ_ANNOUNCE_ELAPSED_TIME, is_visible: false);
+		SetActive(UI.SPR_DRAGON_UI, is_visible: false);
+		downloadGauge = GetComponent<UISlider>(UI.SPR_DL_GAUGE);
+		percentLabel = GetComponent<UILabel>(UI.LBL_PERCENT);
+		percentRefLabel = GetComponent<UILabel>(UI.LBL_PERCENT_REFLECT);
 		if (!SpecialDeviceManager.HasSpecialDeviceInfo || !SpecialDeviceManager.SpecialDeviceInfo.NeedLoadingUIIndicatorsAnchor)
 		{
 			return;
@@ -139,7 +139,7 @@ public class LoadingUI : UIBehaviour
 		if (!(ctrl == null))
 		{
 			UIWidget component = ctrl.GetComponent<UIWidget>();
-			UIVirtualScreen componentInChildren = this.GetComponentInChildren<UIVirtualScreen>();
+			UIVirtualScreen componentInChildren = GetComponentInChildren<UIVirtualScreen>();
 			if (componentInChildren.ScreenWidthFull > componentInChildren.ScreenHeightFull)
 			{
 				component.leftAnchor.absolute = specialDeviceInfo.LoadingUIIndicatorsAnchor.left;
@@ -160,7 +160,7 @@ public class LoadingUI : UIBehaviour
 			UpdateConnecting();
 		}
 		TouchScreen();
-		if (Input.GetKeyUp(27) && SupportEscape())
+		if (Input.GetKeyUp(KeyCode.Escape) && SupportEscape())
 		{
 			Native.applicationQuit();
 		}
@@ -168,27 +168,26 @@ public class LoadingUI : UIBehaviour
 
 	private bool SupportEscape()
 	{
-		return GetCtrl(UI.OBJ_CHANGE_PERMISSION_MASSAGE).get_gameObject().get_activeSelf() || GetCtrl(UI.OBJ_DELLY_MASSAGE).get_gameObject().get_activeSelf() || GetCtrl(UI.OBJ_FIRSTLOAD).get_gameObject().get_activeSelf() || GetCtrl(UI.OBJ_WELLCOME_MASSAGE).get_gameObject().get_activeSelf();
+		if (!GetCtrl(UI.OBJ_CHANGE_PERMISSION_MASSAGE).gameObject.activeSelf && !GetCtrl(UI.OBJ_DELLY_MASSAGE).gameObject.activeSelf && !GetCtrl(UI.OBJ_FIRSTLOAD).gameObject.activeSelf)
+		{
+			return GetCtrl(UI.OBJ_WELLCOME_MASSAGE).gameObject.activeSelf;
+		}
+		return true;
 	}
 
 	private void TouchScreen()
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		int touchCount = Input.get_touchCount();
+		int touchCount = Input.touchCount;
 		for (int i = 0; i < touchCount; i++)
 		{
 			Touch touch = Input.GetTouch(i);
-			Touch(touch.get_fingerId(), touch.get_phase(), touch.get_position());
+			Touch(touch.fingerId, touch.phase, touch.position);
 		}
 	}
 
 	private void Touch(int id, TouchPhase phase, Vector2 pos)
 	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		if ((int)phase == 0)
+		if (phase == TouchPhase.Began)
 		{
 			ResetTips();
 		}
@@ -200,25 +199,25 @@ public class LoadingUI : UIBehaviour
 		{
 			flags &= ~UIManager.DISABLE_FACTOR.PROTOCOL;
 		}
-		bool flag = (flags & (UIManager.DISABLE_FACTOR.PROTOCOL | UIManager.DISABLE_FACTOR.MANUAL_NETWORK)) != (UIManager.DISABLE_FACTOR)0;
-		bool is_active = (flags & (UIManager.DISABLE_FACTOR.SCENE_CHANGE | UIManager.DISABLE_FACTOR.TRANSITION)) == (UIManager.DISABLE_FACTOR.SCENE_CHANGE | UIManager.DISABLE_FACTOR.TRANSITION) || (flags & (UIManager.DISABLE_FACTOR.INITIALIZE | UIManager.DISABLE_FACTOR.LOADING)) != (UIManager.DISABLE_FACTOR)0;
+		bool flag = (flags & (UIManager.DISABLE_FACTOR.PROTOCOL | UIManager.DISABLE_FACTOR.MANUAL_NETWORK)) != 0;
+		bool is_active = (flags & (UIManager.DISABLE_FACTOR.SCENE_CHANGE | UIManager.DISABLE_FACTOR.TRANSITION)) == (UIManager.DISABLE_FACTOR.SCENE_CHANGE | UIManager.DISABLE_FACTOR.TRANSITION) || (flags & (UIManager.DISABLE_FACTOR.INITIALIZE | UIManager.DISABLE_FACTOR.LOADING)) != 0;
 		if (GameSceneManager.isAutoEventSkip && (flags & UIManager.DISABLE_FACTOR.AUTO_EVENT) != 0)
 		{
 			is_active = true;
 		}
-		UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.OBJ_ICON).get_gameObject(), is_active);
+		UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.OBJ_ICON).gameObject, is_active);
 		visibleConnectingByUIDisable = flag;
 		UpdateConnecting();
 	}
 
 	public void ShowRushUI(bool is_show)
 	{
-		if (!MonoBehaviourSingleton<InGameManager>.IsValid() || !MonoBehaviourSingleton<InGameManager>.I.isResultedRush || !is_show)
+		if (!((MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.isResultedRush) & is_show))
 		{
 			SetSpriteAnimation(IsRush());
-			UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.OBJ_TITLE).get_gameObject(), IsRush() && is_show);
+			UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.OBJ_TITLE).gameObject, IsRush() && is_show);
 			UpdateWave();
-			SetActive((Enum)UI.OBJ_ANNOUNCE_TIME_BONUS, HasRushTimeBonus());
+			SetActive(UI.OBJ_ANNOUNCE_TIME_BONUS, HasRushTimeBonus());
 			ShowRushTimeBonus(is_show);
 		}
 	}
@@ -244,32 +243,30 @@ public class LoadingUI : UIBehaviour
 	{
 		if (HasRushTimeBonus())
 		{
-			ResetTween((Enum)UI.OBJ_REMAIN_TIME, 0);
-			ResetTween((Enum)UI.OBJ_TIME_BONUS, 0);
+			ResetTween(UI.OBJ_REMAIN_TIME);
+			ResetTween(UI.OBJ_TIME_BONUS);
 			Transform itemRoot = GetCtrl(UI.OBJ_TIME_BONUS_ITEM);
 			QuestRushProgressData.RushTimeBonus[] bonus = MonoBehaviourSingleton<InGameProgress>.I.rushTimeBonus.ToArray();
 			int plusSec = 0;
 			List<Transform> t_timeBonusItem = new List<Transform>();
 			SetGrid(UI.GRD_TIME_BONUS_ROOT, null, bonus.Length, reset: true, delegate(int i, Transform t, bool is_recycle)
 			{
-				//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-				Transform val = t.Find("bonus");
-				if (val == null)
+				Transform transform = t.Find("bonus");
+				if (transform == null)
 				{
-					val = ResourceUtility.Realizes(itemRoot.get_gameObject());
-					val.set_parent(t);
-					val.set_localPosition(Vector3.get_one());
-					val.set_localScale(itemRoot.get_localScale());
-					val.set_name("bonus");
+					transform = ResourceUtility.Realizes(itemRoot.gameObject);
+					transform.parent = t;
+					transform.localPosition = Vector3.one;
+					transform.localScale = itemRoot.localScale;
+					transform.name = "bonus";
 				}
-				SetActive(val, is_visible: true);
-				UILabel component = FindCtrl(val, UI.LBL_TIME_BONUS).GetComponent<UILabel>();
+				SetActive(transform, is_visible: true);
+				UILabel component = FindCtrl(transform, UI.LBL_TIME_BONUS).GetComponent<UILabel>();
 				component.alpha = 1f;
 				component.text = string.Format(StringTable.Get(STRING_CATEGORY.RUSH_TIME_BONUS, 1u), bonus[i].bonusName, bonus[i].plusSec);
-				component.fontStyle = 2;
-				t_timeBonusItem.Add(val);
-				ResetTween(val);
+				component.fontStyle = FontStyle.Italic;
+				t_timeBonusItem.Add(transform);
+				ResetTween(transform);
 				plusSec += bonus[i].plusSec;
 			});
 			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
@@ -277,11 +274,11 @@ public class LoadingUI : UIBehaviour
 				MonoBehaviourSingleton<InGameProgress>.I.PlayTimeBonusSE();
 			}
 			int num = Mathf.CeilToInt(MonoBehaviourSingleton<InGameProgress>.I.remaindTime);
-			SetLabelText((Enum)UI.LBL_REMAIN_TIME, InGameProgress.GetTimeToString(num));
+			SetLabelText(UI.LBL_REMAIN_TIME, InGameProgress.GetTimeToString(num));
 			cnt_timeBonus = t_timeBonusItem.Count;
-			PlayTween((Enum)UI.OBJ_REMAIN_TIME, forward, (EventDelegate.Callback)delegate
+			PlayTween(UI.OBJ_REMAIN_TIME, forward, delegate
 			{
-				PlayTween((Enum)UI.OBJ_TIME_BONUS, forward: true, (EventDelegate.Callback)delegate
+				PlayTween(UI.OBJ_TIME_BONUS, forward: true, delegate
 				{
 					foreach (Transform item in t_timeBonusItem)
 					{
@@ -290,10 +287,10 @@ public class LoadingUI : UIBehaviour
 							cnt_timeBonus--;
 						});
 					}
-				}, is_input_block: false, 0);
-			}, is_input_block: false, 0);
+				}, is_input_block: false);
+			}, is_input_block: false);
 			int targetPoint = num + plusSec;
-			this.StartCoroutine(CountUpAnimation(num, targetPoint, UI.LBL_REMAIN_TIME));
+			StartCoroutine(CountUpAnimation(num, targetPoint, UI.LBL_REMAIN_TIME));
 		}
 	}
 
@@ -304,12 +301,12 @@ public class LoadingUI : UIBehaviour
 			SetSpriteAnimation(is_rush: false);
 			if (MonoBehaviourSingleton<InGameManager>.I.IsArenaTimeAttack())
 			{
-				SetActive((Enum)UI.OBJ_ANNOUNCE_ELAPSED_TIME, isShow);
+				SetActive(UI.OBJ_ANNOUNCE_ELAPSED_TIME, isShow);
 				ShowArenaElapsedTime(isShow);
 			}
 			else
 			{
-				SetActive((Enum)UI.OBJ_ANNOUNCE_TIME_BONUS, HasArenaTimeBonus());
+				SetActive(UI.OBJ_ANNOUNCE_TIME_BONUS, HasArenaTimeBonus());
 				ShowArenaTimeBonus(isShow);
 			}
 		}
@@ -340,32 +337,30 @@ public class LoadingUI : UIBehaviour
 	{
 		if (HasArenaTimeBonus())
 		{
-			ResetTween((Enum)UI.OBJ_REMAIN_TIME, 0);
-			ResetTween((Enum)UI.OBJ_TIME_BONUS, 0);
+			ResetTween(UI.OBJ_REMAIN_TIME);
+			ResetTween(UI.OBJ_TIME_BONUS);
 			Transform itemRoot = GetCtrl(UI.OBJ_TIME_BONUS_ITEM);
 			QuestArenaProgressData.ArenaTimeBonus[] bonus = MonoBehaviourSingleton<InGameProgress>.I.arenaTimeBonus.ToArray();
 			int plusSec = 0;
 			List<Transform> timeBonusItemTransList = new List<Transform>();
 			SetGrid(UI.GRD_TIME_BONUS_ROOT, null, bonus.Length, reset: true, delegate(int i, Transform t, bool isRecycle)
 			{
-				//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-				Transform val = t.Find("bonus");
-				if (val == null)
+				Transform transform = t.Find("bonus");
+				if (transform == null)
 				{
-					val = ResourceUtility.Realizes(itemRoot.get_gameObject());
-					val.set_parent(t);
-					val.set_localPosition(Vector3.get_one());
-					val.set_localScale(itemRoot.get_localScale());
-					val.set_name("bonus");
+					transform = ResourceUtility.Realizes(itemRoot.gameObject);
+					transform.parent = t;
+					transform.localPosition = Vector3.one;
+					transform.localScale = itemRoot.localScale;
+					transform.name = "bonus";
 				}
-				SetActive(val, is_visible: true);
-				UILabel component = FindCtrl(val, UI.LBL_TIME_BONUS).GetComponent<UILabel>();
+				SetActive(transform, is_visible: true);
+				UILabel component = FindCtrl(transform, UI.LBL_TIME_BONUS).GetComponent<UILabel>();
 				component.alpha = 1f;
 				component.text = string.Format(StringTable.Get(STRING_CATEGORY.RUSH_TIME_BONUS, 1u), bonus[i].bonusName, bonus[i].plusSec);
-				component.fontStyle = 2;
-				timeBonusItemTransList.Add(val);
-				ResetTween(val);
+				component.fontStyle = FontStyle.Italic;
+				timeBonusItemTransList.Add(transform);
+				ResetTween(transform);
 				plusSec += bonus[i].plusSec;
 			});
 			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
@@ -373,11 +368,11 @@ public class LoadingUI : UIBehaviour
 				MonoBehaviourSingleton<InGameProgress>.I.PlayTimeBonusSE();
 			}
 			int num = Mathf.CeilToInt(MonoBehaviourSingleton<InGameProgress>.I.remaindTime);
-			SetLabelText((Enum)UI.LBL_REMAIN_TIME, InGameProgress.GetTimeToString(num));
+			SetLabelText(UI.LBL_REMAIN_TIME, InGameProgress.GetTimeToString(num));
 			cnt_timeBonus = timeBonusItemTransList.Count;
-			PlayTween((Enum)UI.OBJ_REMAIN_TIME, forward, (EventDelegate.Callback)delegate
+			PlayTween(UI.OBJ_REMAIN_TIME, forward, delegate
 			{
-				PlayTween((Enum)UI.OBJ_TIME_BONUS, forward: true, (EventDelegate.Callback)delegate
+				PlayTween(UI.OBJ_TIME_BONUS, forward: true, delegate
 				{
 					for (int j = 0; j < timeBonusItemTransList.Count; j++)
 					{
@@ -386,10 +381,10 @@ public class LoadingUI : UIBehaviour
 							cnt_timeBonus--;
 						});
 					}
-				}, is_input_block: false, 0);
-			}, is_input_block: false, 0);
+				}, is_input_block: false);
+			}, is_input_block: false);
 			int targetPoint = num + plusSec;
-			this.StartCoroutine(CountUpAnimation(num, targetPoint, UI.LBL_REMAIN_TIME));
+			StartCoroutine(CountUpAnimation(num, targetPoint, UI.LBL_REMAIN_TIME));
 		}
 	}
 
@@ -397,13 +392,13 @@ public class LoadingUI : UIBehaviour
 	{
 		if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<InGameManager>.IsValid() && !(MonoBehaviourSingleton<InGameProgress>.I.GetArenaElapsedTime() <= 0f))
 		{
-			ResetTween((Enum)UI.OBJ_ELAPSED_TIME, 0);
+			ResetTween(UI.OBJ_ELAPSED_TIME);
 			if (MonoBehaviourSingleton<InGameProgress>.IsValid())
 			{
 				MonoBehaviourSingleton<InGameProgress>.I.PlayTimeBonusSE();
 			}
-			SetLabelText((Enum)UI.LBL_ELAPSED_TIME, InGameProgress.GetTimeWithMilliSecToString(MonoBehaviourSingleton<InGameProgress>.I.GetArenaElapsedTime()));
-			PlayTween((Enum)UI.OBJ_ELAPSED_TIME, forward, (EventDelegate.Callback)null, is_input_block: false, 0);
+			SetLabelText(UI.LBL_ELAPSED_TIME, InGameProgress.GetTimeWithMilliSecToString(MonoBehaviourSingleton<InGameProgress>.I.GetArenaElapsedTime()));
+			PlayTween(UI.OBJ_ELAPSED_TIME, forward, null, is_input_block: false);
 		}
 	}
 
@@ -412,17 +407,17 @@ public class LoadingUI : UIBehaviour
 		float timer = 0f;
 		while (cnt_timeBonus > 0 && timer < 2f)
 		{
-			timer += Time.get_deltaTime();
+			timer += Time.deltaTime;
 			yield return null;
 		}
-		yield return (object)new WaitForSeconds(0.2f);
+		yield return new WaitForSeconds(0.2f);
 		while (currentPoint < (float)targetPoint)
 		{
 			yield return 0;
-			float addingPoint = Mathf.Max(((float)targetPoint - currentPoint) * CountDownCube(Time.get_deltaTime() * 0.5f), 1f);
-			currentPoint += addingPoint;
-			currentPoint = Mathf.Min(currentPoint, (float)targetPoint);
-			SetLabelText((Enum)targetUI, InGameProgress.GetTimeToString(Mathf.FloorToInt(currentPoint)));
+			float num = Mathf.Max(((float)targetPoint - currentPoint) * CountDownCube(Time.deltaTime * 0.5f), 1f);
+			currentPoint += num;
+			currentPoint = Mathf.Min(currentPoint, targetPoint);
+			SetLabelText(targetUI, InGameProgress.GetTimeToString(Mathf.FloorToInt(currentPoint)));
 		}
 	}
 
@@ -433,8 +428,8 @@ public class LoadingUI : UIBehaviour
 
 	private void SetSpriteAnimation(bool is_rush)
 	{
-		SetActive((Enum)UI.SPR_PAMERA, is_rush);
-		SetActive((Enum)UI.SPR_DRAGON, !is_rush);
+		SetActive(UI.SPR_PAMERA, is_rush);
+		SetActive(UI.SPR_DRAGON, !is_rush);
 	}
 
 	private bool IsRush()
@@ -467,15 +462,15 @@ public class LoadingUI : UIBehaviour
 			string str4 = text[0].ToString();
 			GetCtrl(UI.SPR_WAVE_001).GetComponent<UISprite>().spriteName = "Load_txt_" + str;
 			GetCtrl(UI.SPR_WAVE_010).GetComponent<UISprite>().spriteName = "Load_txt_" + str2;
-			GetCtrl(UI.SPR_WAVE_100).GetComponent<UISprite>().spriteName = ((currentWaveNum < 100) ? string.Empty : ("Load_txt_" + str3));
-			GetCtrl(UI.SPR_WAVE_1000).GetComponent<UISprite>().spriteName = ((currentWaveNum < 1000) ? string.Empty : ("Load_txt_" + str4));
+			GetCtrl(UI.SPR_WAVE_100).GetComponent<UISprite>().spriteName = ((currentWaveNum >= 100) ? ("Load_txt_" + str3) : "");
+			GetCtrl(UI.SPR_WAVE_1000).GetComponent<UISprite>().spriteName = ((currentWaveNum >= 1000) ? ("Load_txt_" + str4) : "");
 		}
 	}
 
 	private void UpdateConnecting()
 	{
 		bool is_active = visibleConnectingByUIDisable || visibleConnectingByKtbWebSocket;
-		UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.OBJ_TEXT).get_gameObject(), is_active);
+		UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.OBJ_TEXT).gameObject, is_active);
 	}
 
 	public void ShowTips(bool is_show)
@@ -486,16 +481,16 @@ public class LoadingUI : UIBehaviour
 		}
 		if (coroutineTips != null)
 		{
-			this.StopCoroutine(coroutineTips);
+			StopCoroutine(coroutineTips);
 			coroutineTips = null;
 		}
 		if (is_show)
 		{
-			this.StartCoroutine(coroutineTips = DoShowTips());
+			StartCoroutine(coroutineTips = DoShowTips());
 		}
 		else
 		{
-			this.StartCoroutine(coroutineTips = DoHideTips());
+			StartCoroutine(coroutineTips = DoHideTips());
 		}
 	}
 
@@ -503,16 +498,16 @@ public class LoadingUI : UIBehaviour
 	{
 		prevTipsIdx = 0;
 		yield return LoadAndSetTips();
-		UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.SPR_TIPS).get_gameObject(), is_active: true);
+		UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.SPR_TIPS).gameObject, is_active: true);
 		GetCtrl(UI.SPR_TIPS).GetComponent<TweenAlpha>().value = 0f;
 		coroutineTips = null;
 	}
 
 	public void ResetTips()
 	{
-		if (coroutineTips == null && GetCtrl(UI.SPR_TIPS).get_gameObject().get_activeSelf())
+		if (coroutineTips == null && GetCtrl(UI.SPR_TIPS).gameObject.activeSelf)
 		{
-			this.StartCoroutine(coroutineTips = DoResetTips());
+			StartCoroutine(coroutineTips = DoResetTips());
 		}
 	}
 
@@ -534,61 +529,61 @@ public class LoadingUI : UIBehaviour
 
 	private IEnumerator LoadAndSetTips()
 	{
-		STRING_CATEGORY category = (!IsRush()) ? STRING_CATEGORY.TIPS : STRING_CATEGORY.RUSH_TIPS;
+		STRING_CATEGORY category = IsRush() ? STRING_CATEGORY.RUSH_TIPS : STRING_CATEGORY.TIPS;
 		int num = StringTable.GetAllInCategory(category).Length;
 		new List<int>(tipsIdxList);
-		int tips_index;
+		int num2;
 		string tips;
 		do
 		{
 			int tipTypeFromTutorial = Utility.GetTipTypeFromTutorial();
-			tips_index = ((tipTypeFromTutorial == -1) ? Random.Range(1, num + 1) : tipTypeFromTutorial);
+			num2 = ((tipTypeFromTutorial == -1) ? UnityEngine.Random.Range(1, num + 1) : tipTypeFromTutorial);
 			if (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name == "/colopl_rob")
 			{
-				tips_index = 1;
+				num2 = 1;
 			}
 			if (tipTypeFromTutorial != -1)
 			{
-				tips_index = tipTypeFromTutorial;
+				num2 = tipTypeFromTutorial;
 			}
-			tips = StringTable.Get(category, (uint)tips_index);
+			tips = StringTable.Get(category, (uint)num2);
 		}
-		while ((string.IsNullOrEmpty(tips) || tips.Length <= 1) && tips_index != 1);
-		prevTipsIdx = tips_index;
+		while ((string.IsNullOrEmpty(tips) || tips.Length <= 1) && num2 != 1);
+		prevTipsIdx = num2;
 		LoadObject lo_image = null;
 		if (!ResourceManager.internalMode)
 		{
-			LoadingQueue load_queue = new LoadingQueue(this);
+			LoadingQueue loadingQueue = new LoadingQueue(this);
 			ResourceManager.enableCache = false;
-			lo_image = ((!IsRush()) ? load_queue.Load(isEventAsset: true, RESOURCE_CATEGORY.TIPS_IMAGE, ResourceName.GetTipsImage(tips_index)) : load_queue.Load(RESOURCE_CATEGORY.RUSH_TIPS_IMAGE, ResourceName.GetRushTipsImage(tips_index)));
+			lo_image = ((!IsRush()) ? loadingQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.TIPS_IMAGE, ResourceName.GetTipsImage(num2)) : loadingQueue.Load(RESOURCE_CATEGORY.RUSH_TIPS_IMAGE, ResourceName.GetRushTipsImage(num2)));
 			ResourceManager.enableCache = true;
-			if (load_queue.IsLoading())
+			if (loadingQueue.IsLoading())
 			{
-				yield return load_queue.Wait();
+				yield return loadingQueue.Wait();
 			}
 		}
 		if (lo_image != null && lo_image.loadedObject != null)
 		{
 			RemoveTexImage();
-			SetTexture((Enum)UI.TEX_IMAGE, lo_image.loadedObject as Texture);
+			SetTexture(UI.TEX_IMAGE, lo_image.loadedObject as Texture);
 		}
 		string text = string.Empty;
 		string text2 = string.Empty;
-		int num2 = tips.IndexOf('\n');
-		if (num2 >= 0)
+		int num3 = tips.IndexOf('\n');
+		if (num3 >= 0)
 		{
-			text = tips.Substring(0, num2);
-			text2 = tips.Substring(num2 + 1);
+			text = tips.Substring(0, num3);
+			text2 = tips.Substring(num3 + 1);
 		}
-		SetLabelText((Enum)UI.LBL_TIPS_TITLE, text);
-		SetLabelText((Enum)UI.LBL_TIPS_TITLE_REFLECT, text);
-		SetLabelText((Enum)UI.LBL_TIPS, text2);
+		SetLabelText(UI.LBL_TIPS_TITLE, text);
+		SetLabelText(UI.LBL_TIPS_TITLE_REFLECT, text);
+		SetLabelText(UI.LBL_TIPS, text2);
 	}
 
 	private IEnumerator DoHideTips()
 	{
-		UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.SPR_TIPS).get_gameObject(), is_active: false);
-		while (GetCtrl(UI.SPR_TIPS).get_gameObject().get_activeSelf())
+		UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.SPR_TIPS).gameObject, is_active: false);
+		while (GetCtrl(UI.SPR_TIPS).gameObject.activeSelf)
 		{
 			yield return null;
 		}
@@ -613,12 +608,12 @@ public class LoadingUI : UIBehaviour
 	{
 		if (!string.IsNullOrEmpty(msg))
 		{
-			SetActive((Enum)UI.LBL_SYSTEM_MESSAGE, is_visible: true);
-			SetLabelText((Enum)UI.LBL_SYSTEM_MESSAGE, msg);
+			SetActive(UI.LBL_SYSTEM_MESSAGE, is_visible: true);
+			SetLabelText(UI.LBL_SYSTEM_MESSAGE, msg);
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_SYSTEM_MESSAGE, is_visible: false);
+			SetActive(UI.LBL_SYSTEM_MESSAGE, is_visible: false);
 		}
 	}
 
@@ -634,12 +629,12 @@ public class LoadingUI : UIBehaviour
 	{
 		currentProgress = progress;
 		polling = true;
-		this.StartCoroutine(DoUpdate());
+		StartCoroutine(DoUpdate());
 	}
 
 	public void SetActiveDragon(bool active)
 	{
-		SetActive((Enum)UI.SPR_DRAGON_UI, active);
+		SetActive(UI.SPR_DRAGON_UI, active);
 	}
 
 	private IEnumerator DoUpdate()
@@ -649,39 +644,39 @@ public class LoadingUI : UIBehaviour
 		while (polling && currentProgress != null)
 		{
 			yield return null;
-			bool gauge_visible = _downloadGaugeVisible && currentProgress != null && currentProgress.IsVisible();
+			bool flag = _downloadGaugeVisible && currentProgress != null && currentProgress.IsVisible();
 			if (currentProgress == null || currentProgress.IsCompleted())
 			{
 				UpdateGauge();
-				gauge_visible = false;
+				flag = false;
 				gauge_fadein = true;
 				reverbe_time = 0f;
 				polling = false;
 				currentProgress = null;
 			}
-			if (gauge_visible)
+			if (flag)
 			{
 				if (!gauge_fadein)
 				{
 					gauge_fadein = true;
-					UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.SPR_DL).get_gameObject(), is_active: true);
+					UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.SPR_DL).gameObject, is_active: true);
 				}
 				UpdateGauge();
 			}
 			else if (reverbe_time > 0f)
 			{
 				UpdateGauge();
-				reverbe_time -= Time.get_deltaTime();
+				reverbe_time -= Time.deltaTime;
 			}
 			else if (gauge_fadein)
 			{
 				gauge_fadein = false;
-				UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.SPR_DL).get_gameObject(), is_active: false);
+				UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.SPR_DL).gameObject, is_active: false);
 			}
 		}
 		currentProgress = null;
 		polling = false;
-		UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.SPR_DL).get_gameObject(), is_active: false);
+		UIUtility.SetActiveAndAlphaFade(GetCtrl(UI.SPR_DL).gameObject, is_active: false);
 	}
 
 	private void UpdateGauge()
@@ -702,76 +697,76 @@ public class LoadingUI : UIBehaviour
 
 	public void HideAllPermissionMsg()
 	{
-		SetActive((Enum)UI.OBJ_EMPTY_MASSAGE, is_visible: false);
-		SetActive((Enum)UI.OBJ_WELLCOME_MASSAGE, is_visible: false);
-		SetActive((Enum)UI.OBJ_DELLY_MASSAGE, is_visible: false);
-		SetActive((Enum)UI.OBJ_CHANGE_PERMISSION_MASSAGE, is_visible: false);
-		SetActive((Enum)UI.OBJ_FIRSTLOAD, is_visible: false);
+		SetActive(UI.OBJ_EMPTY_MASSAGE, is_visible: false);
+		SetActive(UI.OBJ_WELLCOME_MASSAGE, is_visible: false);
+		SetActive(UI.OBJ_DELLY_MASSAGE, is_visible: false);
+		SetActive(UI.OBJ_CHANGE_PERMISSION_MASSAGE, is_visible: false);
+		SetActive(UI.OBJ_FIRSTLOAD, is_visible: false);
 	}
 
 	public void ShowWellcomeMsg(bool isShow)
 	{
-		SetActive((Enum)UI.OBJ_WELLCOME_MASSAGE, isShow);
+		SetActive(UI.OBJ_WELLCOME_MASSAGE, isShow);
 	}
 
 	public void ShowDellyMsg(bool isShow)
 	{
-		SetActive((Enum)UI.OBJ_DELLY_MASSAGE, isShow);
+		SetActive(UI.OBJ_DELLY_MASSAGE, isShow);
 		Transform ctrl = GetCtrl(UI.OBJ_DELLY_MASSAGE);
 		SetSupportEncoding(ctrl, UI.LBL_FIRST_MASSAGE, isEnable: true);
 	}
 
 	public void ShowChangePermissionMsg(bool isShow)
 	{
-		SetActive((Enum)UI.OBJ_CHANGE_PERMISSION_MASSAGE, isShow);
+		SetActive(UI.OBJ_CHANGE_PERMISSION_MASSAGE, isShow);
 		Transform ctrl = GetCtrl(UI.OBJ_CHANGE_PERMISSION_MASSAGE);
 		SetSupportEncoding(ctrl, UI.LBL_FIRST_MASSAGE, isEnable: true);
 	}
 
 	public void ShowFirstLoad(bool isShow)
 	{
-		SetActive((Enum)UI.OBJ_FIRSTLOAD, isShow);
+		SetActive(UI.OBJ_FIRSTLOAD, isShow);
 	}
 
 	public void HideAllTextMsg()
 	{
-		SetActive((Enum)UI.OBJ_WELLCOME_MASSAGE, is_visible: false);
-		SetActive((Enum)UI.OBJ_DELLY_MASSAGE, is_visible: false);
-		SetActive((Enum)UI.OBJ_CHANGE_PERMISSION_MASSAGE, is_visible: false);
-		SetActive((Enum)UI.OBJ_FIRSTLOAD, is_visible: false);
+		SetActive(UI.OBJ_WELLCOME_MASSAGE, is_visible: false);
+		SetActive(UI.OBJ_DELLY_MASSAGE, is_visible: false);
+		SetActive(UI.OBJ_CHANGE_PERMISSION_MASSAGE, is_visible: false);
+		SetActive(UI.OBJ_FIRSTLOAD, is_visible: false);
 	}
 
 	public void ShowEmptyFirstLoad(bool isShow)
 	{
-		SetActive((Enum)UI.OBJ_EMPTY_MASSAGE, isShow);
+		SetActive(UI.OBJ_EMPTY_MASSAGE, isShow);
 	}
 
 	public void ShowTutorialMsg(string msg, string endTxt)
 	{
 		if (tutorialTweenCtrl == null)
 		{
-			tutorialTweenCtrl = base.GetComponent<UITweenCtrl>((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE);
+			tutorialTweenCtrl = GetComponent<UITweenCtrl>(UI.LBL_FIRST_TUTORIAL_MESSAGE);
 		}
-		SetActive((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE, is_visible: true);
+		SetActive(UI.LBL_FIRST_TUTORIAL_MESSAGE, is_visible: true);
 		SetSupportEncoding(UI.LBL_FIRST_TUTORIAL_MESSAGE, isEnable: true);
-		SetFontStyle((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE, 2);
-		SetLabelText((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE, msg);
-		SetActive((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE_END, is_visible: true);
+		SetFontStyle(UI.LBL_FIRST_TUTORIAL_MESSAGE, FontStyle.Italic);
+		SetLabelText(UI.LBL_FIRST_TUTORIAL_MESSAGE, msg);
+		SetActive(UI.LBL_FIRST_TUTORIAL_MESSAGE_END, is_visible: true);
 		SetSupportEncoding(UI.LBL_FIRST_TUTORIAL_MESSAGE_END, isEnable: true);
-		SetFontStyle((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE_END, 2);
-		SetLabelText((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE_END, endTxt);
+		SetFontStyle(UI.LBL_FIRST_TUTORIAL_MESSAGE_END, FontStyle.Italic);
+		SetLabelText(UI.LBL_FIRST_TUTORIAL_MESSAGE_END, endTxt);
 		tutorialTweenCtrl.Reset();
 		tutorialTweenCtrl.Play();
 	}
 
 	public void HideTutorialMsg()
 	{
-		SetActive((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE_END, is_visible: false);
-		SetActive((Enum)UI.LBL_FIRST_TUTORIAL_MESSAGE, is_visible: false);
+		SetActive(UI.LBL_FIRST_TUTORIAL_MESSAGE_END, is_visible: false);
+		SetActive(UI.LBL_FIRST_TUTORIAL_MESSAGE, is_visible: false);
 	}
 
 	public void ShowTutorialBg(bool isShow)
 	{
-		SetActive((Enum)UI.SPR_BG_TUTORIAL, isShow);
+		SetActive(UI.SPR_BG_TUTORIAL, isShow);
 	}
 }

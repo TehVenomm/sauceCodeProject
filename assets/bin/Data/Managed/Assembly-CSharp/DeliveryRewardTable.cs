@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class DeliveryRewardTable : Singleton<DeliveryRewardTable>, IDataTable
 {
@@ -44,18 +43,6 @@ public class DeliveryRewardTable : Singleton<DeliveryRewardTable>, IDataTable
 	}
 
 	private DoubleUIntKeyTable<DeliveryRewardData> tableData;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<DeliveryRewardData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntKeyReadCSV<DeliveryRewardData> _003C_003Ef__mg_0024cache2;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackDoubleUIntSecondKey _003C_003Ef__mg_0024cache3;
 
 	public void CreateTable(string csv_text)
 	{

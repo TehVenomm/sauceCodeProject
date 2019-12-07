@@ -36,9 +36,9 @@ public class QuestResultFriend : GameSection
 
 	private List<InGameRecorder.PlayerRecord> playerRecords;
 
-	private Transform[] itemsL = (Transform[])new Transform[4];
+	private Transform[] itemsL = new Transform[4];
 
-	private Transform[] itemsR = (Transform[])new Transform[4];
+	private Transform[] itemsR = new Transform[4];
 
 	private Vector3 cameraTarget;
 
@@ -48,15 +48,15 @@ public class QuestResultFriend : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
 		MonoBehaviourSingleton<UIManager>.I.loading.SetActiveDragon(active: true);
-		yield return (object)new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		yield return MonoBehaviourSingleton<AppMain>.I.UnloadUnusedAssets(need_gc_collect: true);
-		yield return (object)new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
 		{
 			playerRecords = MonoBehaviourSingleton<InGameRecorder>.I.players;
@@ -83,7 +83,7 @@ public class QuestResultFriend : GameSection
 			{
 				yield return null;
 			}
-			Transform camera_t = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
+			Transform mainCameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
 			if (MonoBehaviourSingleton<InGameRecorder>.I.isVictory)
 			{
 				int i = 0;
@@ -92,29 +92,29 @@ public class QuestResultFriend : GameSection
 					PlayerLoader playerLoader = playersModels[i];
 					if (playerLoader != null)
 					{
-						playerLoader.animator.set_applyRootMotion(false);
+						playerLoader.animator.applyRootMotion = false;
 						playerLoader.animator.Play(playerLoader.GetWinLoopMotionState());
 					}
 				}
-				camera_t.set_position(camera_t.get_position() + camera_t.get_forward() * 1.5f);
+				mainCameraTransform.position += mainCameraTransform.forward * 1.5f;
 			}
-			else if (playersModels.Length > 0)
+			else if (playersModels.Length != 0)
 			{
 				OutGameSettingsManager.QuestResult questResult = MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult;
 				SoundManager.RequestBGM(10, isLoop: false);
 				PlayerLoader playerLoader2 = playersModels[0];
 				if (playerLoader2 != null)
 				{
-					Transform transform = playerLoader2.get_transform();
-					cameraTarget = transform.get_position() + new Vector3(0f, questResult.loseCameraHeight, 0f);
-					Vector3 val = cameraTarget + transform.get_forward() * questResult.loseCameraDistance;
-					Quaternion rotation = Quaternion.LookRotation(cameraTarget - val);
-					camera_t.set_position(val);
-					camera_t.set_rotation(rotation);
-					PLCA default_anim = (Random.Range(0, 2) != 0) ? PLCA.IDLE_02 : PLCA.IDLE_01;
+					Transform transform = playerLoader2.transform;
+					cameraTarget = transform.position + new Vector3(0f, questResult.loseCameraHeight, 0f);
+					Vector3 vector = cameraTarget + transform.forward * questResult.loseCameraDistance;
+					Quaternion rotation = Quaternion.LookRotation(cameraTarget - vector);
+					mainCameraTransform.position = vector;
+					mainCameraTransform.rotation = rotation;
+					PLCA default_anim = (UnityEngine.Random.Range(0, 2) == 0) ? PLCA.IDLE_01 : PLCA.IDLE_02;
 					PlayerAnimCtrl.Get(playerLoader2.animator, default_anim);
 				}
-				MonoBehaviourSingleton<AppMain>.I.mainCamera.set_fieldOfView(questResult.cameraFieldOfView);
+				MonoBehaviourSingleton<AppMain>.I.mainCamera.fieldOfView = questResult.cameraFieldOfView;
 			}
 		}
 		itemsL[0] = GetCtrl(UI.OBJ_ITEM_POS_L_0);
@@ -127,8 +127,8 @@ public class QuestResultFriend : GameSection
 		itemsR[3] = GetCtrl(UI.OBJ_ITEM_POS_R_3);
 		if (MonoBehaviourSingleton<InGameManager>.IsValid())
 		{
-			SetActive((Enum)UI.SPR_TITLE, !MonoBehaviourSingleton<InGameManager>.I.IsRush());
-			SetActive((Enum)UI.SPR_RUSH_TITLE, MonoBehaviourSingleton<InGameManager>.I.IsRush());
+			SetActive(UI.SPR_TITLE, !MonoBehaviourSingleton<InGameManager>.I.IsRush());
+			SetActive(UI.SPR_RUSH_TITLE, MonoBehaviourSingleton<InGameManager>.I.IsRush());
 		}
 		if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
 		{
@@ -141,8 +141,6 @@ public class QuestResultFriend : GameSection
 
 	public override void UpdateUI()
 	{
-		//IL_0511: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0525: Unknown result type (might be due to invalid IL or missing references)
 		if (!MonoBehaviourSingleton<InGameRecorder>.IsValid())
 		{
 			return;
@@ -158,8 +156,7 @@ public class QuestResultFriend : GameSection
 			float num5 = 0f;
 			if (playerRecords != null && i < playerRecords.Count && playerRecords[i] != null)
 			{
-				InGameRecorder.PlayerRecord playerRecord = playerRecords[i];
-				float num6 = (float)playerRecord.givenTotalDamage / num * 100f;
+				float num6 = (float)playerRecords[i].givenTotalDamage / num * 100f;
 				num4 = (int)num6;
 				num5 = num6 - (float)num4;
 				if (num2 + num4 > 100)
@@ -178,9 +175,7 @@ public class QuestResultFriend : GameSection
 			for (int j = 0; j < 4; j++)
 			{
 				int num8 = Mathf.CeilToInt(score_truncation_list[j]);
-				List<int> list;
-				int index;
-				(list = score_list)[index = j] = list[index] + num8;
+				score_list[j] += num8;
 				num7 -= num8;
 				num2 += num8;
 				if (num7 <= 0 || num2 >= 100)
@@ -194,30 +189,30 @@ public class QuestResultFriend : GameSection
 		{
 			if (playerRecords != null && k < playerRecords.Count && playerRecords[k] != null)
 			{
-				InGameRecorder.PlayerRecord playerRecord2 = playerRecords[k];
-				if (playerRecord2 == null || playerRecord2.charaInfo == null)
+				InGameRecorder.PlayerRecord playerRecord = playerRecords[k];
+				if (playerRecord == null || playerRecord.charaInfo == null)
 				{
 					continue;
 				}
 				bool flag = false;
-				if (playerRecord2.id != 0 && playerRecord2.charaInfo.userId != 0)
+				if (playerRecord.id != 0 && playerRecord.charaInfo.userId != 0)
 				{
-					QuestResultUserCollection.ResultUserInfo userInfo = MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.GetUserInfo(playerRecord2.charaInfo.userId);
+					QuestResultUserCollection.ResultUserInfo userInfo = MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.GetUserInfo(playerRecord.charaInfo.userId);
 					if (userInfo != null && !userInfo.CanSendFollow)
 					{
 						flag = true;
 					}
 					if (userInfo != null)
 					{
-						playerRecord2.charaInfo.selectedDegrees = userInfo.selectDegrees;
+						playerRecord.charaInfo.selectedDegrees = userInfo.selectDegrees;
 					}
 				}
 				Transform root = SetPrefab(itemsL[k], "QuestResultFriendItemL");
-				if (playerRecord2.isSelf)
+				if (playerRecord.isSelf)
 				{
-					playerRecord2.charaInfo.selectedDegrees = MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds;
+					playerRecord.charaInfo.selectedDegrees = MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds;
 				}
-				CharaInfo.ClanInfo clanInfo = playerRecord2.charaInfo.clanInfo;
+				CharaInfo.ClanInfo clanInfo = playerRecord.charaInfo.clanInfo;
 				if (clanInfo == null)
 				{
 					clanInfo = new CharaInfo.ClanInfo();
@@ -225,22 +220,22 @@ public class QuestResultFriend : GameSection
 					clanInfo.tag = string.Empty;
 				}
 				bool isSameTeam = clanInfo.clanId > -1 && MonoBehaviourSingleton<GuildManager>.I.guildData != null && clanInfo.clanId == MonoBehaviourSingleton<GuildManager>.I.guildData.clanId;
-				if (playerRecord2.isSelf)
+				if (playerRecord.isSelf)
 				{
 					SetSupportEncoding(root, UI.LBL_NAME_OWN, isEnable: true);
-					SetLabelText(root, UI.LBL_NAME_OWN, Utility.GetNameWithColoredClanTag(clanInfo.tag, playerRecord2.charaInfo.name, playerRecord2.id == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, isSameTeam));
+					SetLabelText(root, UI.LBL_NAME_OWN, Utility.GetNameWithColoredClanTag(clanInfo.tag, playerRecord.charaInfo.name, playerRecord.id == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, isSameTeam));
 					SetActive(root, UI.LBL_NAME, is_visible: false);
 				}
 				else
 				{
 					SetSupportEncoding(root, UI.LBL_NAME, isEnable: true);
-					SetLabelText(root, UI.LBL_NAME, Utility.GetNameWithColoredClanTag(clanInfo.tag, playerRecord2.charaInfo.name, playerRecord2.id == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, isSameTeam));
+					SetLabelText(root, UI.LBL_NAME, Utility.GetNameWithColoredClanTag(clanInfo.tag, playerRecord.charaInfo.name, playerRecord.id == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, isSameTeam));
 					SetActive(root, UI.LBL_NAME_OWN, is_visible: false);
 				}
-				if (!playerRecord2.isNPC)
+				if (!playerRecord.isNPC)
 				{
-					int num9 = playerRecord2.charaInfo.level;
-					if (playerRecord2.isSelf)
+					int num9 = playerRecord.charaInfo.level;
+					if (playerRecord.isSelf)
 					{
 						num9 = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level;
 					}
@@ -249,25 +244,24 @@ public class QuestResultFriend : GameSection
 				else
 				{
 					SetActive(root, UI.LBL_LEVEL, is_visible: false);
-					if (FindCtrl(root, UI.BTN_DETAIL) != null && base.GetComponent<UINoAuto>(root, (Enum)UI.BTN_DETAIL) == null)
+					if (FindCtrl(root, UI.BTN_DETAIL) != null && GetComponent<UINoAuto>(root, UI.BTN_DETAIL) == null)
 					{
-						FindCtrl(root, UI.BTN_DETAIL).get_gameObject().AddComponent<UINoAuto>();
+						FindCtrl(root, UI.BTN_DETAIL).gameObject.AddComponent<UINoAuto>();
 					}
 				}
 				SetEvent(root, UI.BTN_DETAIL, "DETAIL", k);
-				if (playerRecord2.isSelf)
+				if (playerRecord.isSelf)
 				{
 					SetButtonSprite(root, UI.BTN_DETAIL, "ResultPlatemine", with_press: true);
 				}
-				PlayerLoadInfo playerLoadInfo = playerRecord2.playerLoadInfo.Clone();
+				PlayerLoadInfo playerLoadInfo = playerRecord.playerLoadInfo.Clone();
 				playerLoadInfo.armModelID = -1;
 				playerLoadInfo.weaponModelID = -1;
 				playerLoadInfo.legModelID = -1;
 				SetRenderPlayerModel(root, UI.TEX_MODEL, playerLoadInfo, 98, new Vector3(0f, -1.613f, 2.342f), new Vector3(0f, 154f, 0f), is_priority_visual_equip: true);
-				if (playerRecord2.charaInfo.selectedDegrees != null && playerRecord2.charaInfo.selectedDegrees.Count == GameDefine.DEGREE_PART_COUNT)
+				if (playerRecord.charaInfo.selectedDegrees != null && playerRecord.charaInfo.selectedDegrees.Count == GameDefine.DEGREE_PART_COUNT)
 				{
-					DegreePlate component = FindCtrl(root, UI.OBJ_DEGREE_PLATE).GetComponent<DegreePlate>();
-					component.Initialize(playerRecord2.charaInfo.selectedDegrees, isButton: false, delegate
+					FindCtrl(root, UI.OBJ_DEGREE_PLATE).GetComponent<DegreePlate>().Initialize(playerRecord.charaInfo.selectedDegrees, isButton: false, delegate
 					{
 					});
 				}
@@ -292,7 +286,7 @@ public class QuestResultFriend : GameSection
 				{
 					SetActive(root, UI.SPR_NUM_2, is_visible: false);
 				}
-				if (!playerRecord2.isSelf && !playerRecord2.isNPC)
+				if (!playerRecord.isSelf && !playerRecord.isNPC)
 				{
 					SetEvent(root, UI.BTN_FOLLOW, "FOLLOW", k);
 					if (!flag)
@@ -329,7 +323,7 @@ public class QuestResultFriend : GameSection
 				SetActive(root2, UI.BTN_FOLLOW, is_visible: false);
 			}
 		}
-		PlayTween((Enum)UI.OBJ_ITEMS, forward: true, (EventDelegate.Callback)null, is_input_block: true, 0);
+		PlayTween(UI.OBJ_ITEMS);
 	}
 
 	protected override void OnClose()
@@ -457,14 +451,12 @@ public class QuestResultFriend : GameSection
 
 	private void Update()
 	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameRecorder>.IsValid() && !MonoBehaviourSingleton<InGameRecorder>.I.isVictory)
 		{
 			float loseCameraRotateSpeed = MonoBehaviourSingleton<OutGameSettingsManager>.I.questResult.loseCameraRotateSpeed;
 			if (loseCameraRotateSpeed != 0f)
 			{
-				MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.RotateAround(cameraTarget, Vector3.get_up(), loseCameraRotateSpeed * Time.get_deltaTime());
+				MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.RotateAround(cameraTarget, Vector3.up, loseCameraRotateSpeed * Time.deltaTime);
 			}
 		}
 	}

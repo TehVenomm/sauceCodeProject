@@ -26,11 +26,6 @@ public class UIExplorePlayerStatus : MonoBehaviour
 
 	private IEnumerator rotateUpdate;
 
-	public UIExplorePlayerStatus()
-		: this()
-	{
-	}
-
 	public void Initialize(ExplorePlayerStatus playerStatus)
 	{
 		if (this.playerStatus != playerStatus)
@@ -47,7 +42,7 @@ public class UIExplorePlayerStatus : MonoBehaviour
 			return;
 		}
 		playerStatus.onInitialize += OnInitializeStatus;
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 
 	private void Clear()
@@ -61,7 +56,7 @@ public class UIExplorePlayerStatus : MonoBehaviour
 			playerStatus = null;
 			if (rotateUpdate != null)
 			{
-				this.StopCoroutine(rotateUpdate);
+				StopCoroutine(rotateUpdate);
 				rotateUpdate = null;
 			}
 		}
@@ -69,7 +64,7 @@ public class UIExplorePlayerStatus : MonoBehaviour
 
 	private void OnInitializeStatus()
 	{
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 		SetName();
 		UpdateHp();
 		UpdateWeapon();
@@ -104,13 +99,13 @@ public class UIExplorePlayerStatus : MonoBehaviour
 			if (rotateUpdate == null)
 			{
 				rotateUpdate = RotateUpdateStatusIcon();
-				this.StartCoroutine(rotateUpdate);
+				StartCoroutine(rotateUpdate);
 			}
 			return;
 		}
 		if (rotateUpdate != null)
 		{
-			this.StopCoroutine(rotateUpdate);
+			StopCoroutine(rotateUpdate);
 			rotateUpdate = null;
 		}
 		checkStatusType = 0;
@@ -121,7 +116,7 @@ public class UIExplorePlayerStatus : MonoBehaviour
 	{
 		while (true)
 		{
-			nextStatusIconRotate -= Time.get_deltaTime();
+			nextStatusIconRotate -= Time.deltaTime;
 			if (nextStatusIconRotate <= 0f)
 			{
 				checkStatusType = statusIcon.RotatedUpdateStatusIcon(checkStatusType, playerStatus.buff, playerStatus.extraStatus);

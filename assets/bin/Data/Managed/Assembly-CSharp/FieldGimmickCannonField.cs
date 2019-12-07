@@ -12,7 +12,7 @@ public class FieldGimmickCannonField : FieldGimmickCannonBase
 
 	private readonly Vector3 OFFSET_RIGHT = new Vector3(0.4f, 0f, 0f);
 
-	private readonly Vector3 OFFSET_ZERO = Vector3.get_zero();
+	private readonly Vector3 OFFSET_ZERO = Vector3.zero;
 
 	private Vector3[] offsetArray;
 
@@ -36,8 +36,8 @@ public class FieldGimmickCannonField : FieldGimmickCannonBase
 			string[] array2 = array[i].Split(':');
 			if (array2 != null && array2.Length == 2)
 			{
-				string text = array2[0];
-				if (text != null && text == "ai")
+				string a = array2[0];
+				if (a == "ai")
 				{
 					return array2[1];
 				}
@@ -60,8 +60,8 @@ public class FieldGimmickCannonField : FieldGimmickCannonBase
 			{
 				continue;
 			}
-			string text = array2[0];
-			if (text != null && text == "mi")
+			string a = array2[0];
+			if (a == "mi")
 			{
 				int result = 0;
 				if (int.TryParse(array2[1], out result))
@@ -90,17 +90,11 @@ public class FieldGimmickCannonField : FieldGimmickCannonBase
 
 	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
 	{
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(pointData);
 		m_coolTime = MonoBehaviourSingleton<InGameSettingsManager>.I.cannonParam.coolTimeForField;
 		m_baseTrans = modelTrans.Find("CMN_cannon01_Origin/Move/Root/base/rot");
 		m_cannonTrans = modelTrans.Find("CMN_cannon01_Origin/Move/Root/base/rot/cannon_rot");
-		offsetArray = (Vector3[])new Vector3[3]
+		offsetArray = new Vector3[3]
 		{
 			OFFSET_ZERO,
 			OFFSET_RIGHT,
@@ -123,26 +117,15 @@ public class FieldGimmickCannonField : FieldGimmickCannonBase
 
 	protected override void UpdateStateStandBy()
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 		if (!(m_owner == null) && !(m_baseTrans == null))
 		{
-			m_owner._rotation = Quaternion.LookRotation(m_baseTrans.get_forward());
+			m_owner._rotation = Quaternion.LookRotation(m_baseTrans.forward);
 			SetState(STATE.READY);
 		}
 	}
 
 	public override void Shot()
 	{
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Expected O, but got Unknown
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
 		if (!IsReadyForShot())
 		{
 			return;
@@ -160,14 +143,12 @@ public class FieldGimmickCannonField : FieldGimmickCannonBase
 			initParamCannonball.atkInfo = attackHitInfo;
 			initParamCannonball.launchTrans = m_cannonTrans;
 			initParamCannonball.offsetPos = offsetArray[num];
-			initParamCannonball.offsetRot = Quaternion.get_identity();
-			initParamCannonball.shotRotation = m_cannonTrans.get_rotation();
-			GameObject val = new GameObject("AttackCannonball");
-			AttackCannonball attackCannonball = val.AddComponent<AttackCannonball>();
-			attackCannonball.Initialize(initParamCannonball);
+			initParamCannonball.offsetRot = Quaternion.identity;
+			initParamCannonball.shotRotation = m_cannonTrans.rotation;
+			new GameObject("AttackCannonball").AddComponent<AttackCannonball>().Initialize(initParamCannonball);
 			if (shotSeId > 0)
 			{
-				SoundManager.PlayOneShotSE(shotSeId, m_cannonTrans.get_position());
+				SoundManager.PlayOneShotSE(shotSeId, m_cannonTrans.position);
 			}
 			StartCoolTime();
 			SetState(STATE.COOLTIME);

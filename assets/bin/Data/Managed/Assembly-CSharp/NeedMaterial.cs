@@ -31,7 +31,11 @@ public class NeedMaterial
 		{
 			return false;
 		}
-		return isKey == needMaterial.isKey && itemID == needMaterial.itemID && num == needMaterial.num;
+		if (isKey == needMaterial.isKey && itemID == needMaterial.itemID)
+		{
+			return num == needMaterial.num;
+		}
+		return false;
 	}
 
 	public override int GetHashCode()
@@ -41,6 +45,6 @@ public class NeedMaterial
 
 	public override string ToString()
 	{
-		return "isKey:" + isKey + ", itemID:" + itemID + ", num:" + num;
+		return "isKey:" + isKey.ToString() + ", itemID:" + itemID + ", num:" + num;
 	}
 }

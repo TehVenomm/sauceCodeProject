@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using UnityEngine;
-
 public class NetworkStateView : MonoBehaviourSingleton<NetworkStateView>
 {
 	protected override void Awake()
@@ -13,15 +10,6 @@ public class NetworkStateView : MonoBehaviourSingleton<NetworkStateView>
 	}
 
 	public void SearchSession()
-	{
-	}
-
-	public List<HostData> GetSessionList()
-	{
-		return null;
-	}
-
-	public void JoinSession(HostData hostData)
 	{
 	}
 

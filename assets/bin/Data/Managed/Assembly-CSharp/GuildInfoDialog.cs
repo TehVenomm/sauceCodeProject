@@ -31,7 +31,7 @@ public class GuildInfoDialog : GameSection
 	public override void Initialize()
 	{
 		_clanId = (int)GameSection.GetEventData();
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -51,32 +51,31 @@ public class GuildInfoDialog : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.LBL_GUILD_NAME, _info.clanName);
+		SetLabelText(UI.LBL_GUILD_NAME, _info.clanName);
 		if (_info.emblem != null && _info.emblem.Length >= 3)
 		{
-			SetSprite((Enum)UI.SPR_EMBLEM_LAYER_1, GuildItemManager.I.GetItemSprite(_info.emblem[0]));
-			SetSprite((Enum)UI.SPR_EMBLEM_LAYER_2, GuildItemManager.I.GetItemSprite(_info.emblem[1]));
-			SetSprite((Enum)UI.SPR_EMBLEM_LAYER_3, GuildItemManager.I.GetItemSprite(_info.emblem[2]));
+			SetSprite(UI.SPR_EMBLEM_LAYER_1, GuildItemManager.I.GetItemSprite(_info.emblem[0]));
+			SetSprite(UI.SPR_EMBLEM_LAYER_2, GuildItemManager.I.GetItemSprite(_info.emblem[1]));
+			SetSprite(UI.SPR_EMBLEM_LAYER_3, GuildItemManager.I.GetItemSprite(_info.emblem[2]));
 		}
 		else
 		{
-			SetSprite((Enum)UI.SPR_EMBLEM_LAYER_1, string.Empty);
-			SetSprite((Enum)UI.SPR_EMBLEM_LAYER_2, string.Empty);
-			SetSprite((Enum)UI.SPR_EMBLEM_LAYER_3, string.Empty);
+			SetSprite(UI.SPR_EMBLEM_LAYER_1, "");
+			SetSprite(UI.SPR_EMBLEM_LAYER_2, "");
+			SetSprite(UI.SPR_EMBLEM_LAYER_3, "");
 		}
-		SetLabelText((Enum)UI.LBL_TAG, _info.tag);
-		SetLabelText((Enum)UI.LBL_LEVEL, string.Format(base.sectionData.GetText("TEXT_LEVEL"), _info.level));
-		SetLabelText((Enum)UI.LBL_MEM, $"{_info.currentMem}/{_info.memCap}");
-		SetLabelText((Enum)UI.LBL_DESC, _info.description);
-		TimeSpan timeSpan = DateTime.UtcNow - DateTime.Parse(_info.createAt);
-		SetLabelText(UI.LBL_DAYS, timeSpan.Days);
+		SetLabelText(UI.LBL_TAG, _info.tag);
+		SetLabelText(UI.LBL_LEVEL, string.Format(base.sectionData.GetText("TEXT_LEVEL"), _info.level));
+		SetLabelText(UI.LBL_MEM, $"{_info.currentMem}/{_info.memCap}");
+		SetLabelText(UI.LBL_DESC, _info.description);
+		SetLabelText(obj: (DateTime.UtcNow - DateTime.Parse(_info.createAt)).Days, label_enum: UI.LBL_DAYS);
 		SetLabelText(UI.LBL_DONATE, _info.donate);
-		SetLabelText((Enum)UI.LBL_GUILD_ID, $"{_clanId:D5}");
-		SetLabelText((Enum)UI.LBL_HUNTER_NUM, $"{_info.currentMem}/{_info.memCap}");
-		SetActive((Enum)UI.BTN_JOIN, _info.privacy == 0);
-		SetActive((Enum)UI.BTN_REQUEST, _info.privacy == 1);
-		SetButtonEnabled((Enum)UI.BTN_JOIN, _info.canJoin, is_update_child_label: true);
-		SetButtonEnabled((Enum)UI.BTN_REQUEST, _info.canJoin, is_update_child_label: true);
+		SetLabelText(UI.LBL_GUILD_ID, $"{_clanId:D5}");
+		SetLabelText(UI.LBL_HUNTER_NUM, $"{_info.currentMem}/{_info.memCap}");
+		SetActive(UI.BTN_JOIN, _info.privacy == 0);
+		SetActive(UI.BTN_REQUEST, _info.privacy == 1);
+		SetButtonEnabled(UI.BTN_JOIN, _info.canJoin, is_update_child_label: true);
+		SetButtonEnabled(UI.BTN_REQUEST, _info.canJoin, is_update_child_label: true);
 	}
 
 	private void OnQuery_JOIN()
@@ -119,7 +118,7 @@ public class GuildInfoDialog : GameSection
 			{
 				if (isSuccess)
 				{
-					guildInfoDialog.SetButtonEnabled((Enum)UI.BTN_REQUEST, is_enabled: false, is_update_child_label: true);
+					guildInfoDialog.SetButtonEnabled(UI.BTN_REQUEST, is_enabled: false, is_update_child_label: true);
 				}
 				if (GuildManager.IsValidInGuild())
 				{

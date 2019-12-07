@@ -7,9 +7,4 @@ public class EnemyColliderSettings : MonoBehaviour
 
 	[Tooltip("攻撃ヒット無視フラグ")]
 	public bool ignoreHitAttack = true;
-
-	public EnemyColliderSettings()
-		: this()
-	{
-	}
 }

@@ -1520,26 +1520,18 @@ public class BuffParam
 
 		public bool isSkillChargeType()
 		{
-			switch (type)
+			BUFFTYPE bUFFTYPE = type;
+			if ((uint)(bUFFTYPE - 62) <= 1u || (uint)(bUFFTYPE - 130) <= 5u)
 			{
-			case BUFFTYPE.SKILL_CHARGE:
-			case BUFFTYPE.SKILL_CHARGE_RATE:
-			case BUFFTYPE.SKILL_CHARGE_FIRE:
-			case BUFFTYPE.SKILL_CHARGE_WATER:
-			case BUFFTYPE.SKILL_CHARGE_THUNDER:
-			case BUFFTYPE.SKILL_CHARGE_SOIL:
-			case BUFFTYPE.SKILL_CHARGE_LIGHT:
-			case BUFFTYPE.SKILL_CHARGE_DARK:
 				return true;
-			default:
-				return false;
 			}
+			return false;
 		}
 
 		public bool isSkillChargeMoveType()
 		{
 			BUFFTYPE bUFFTYPE = type;
-			if (bUFFTYPE == BUFFTYPE.SKILL_CHARGE_ABOVE || bUFFTYPE == BUFFTYPE.SKILL_CHARGE_UNDER)
+			if ((uint)(bUFFTYPE - 193) <= 1u)
 			{
 				return true;
 			}
@@ -1548,39 +1540,22 @@ public class BuffParam
 
 		public bool IsAbsorbType()
 		{
-			switch (type)
+			BUFFTYPE bUFFTYPE = type;
+			if ((uint)(bUFFTYPE - 144) <= 7u)
 			{
-			case BUFFTYPE.ABSORB_NORMAL:
-			case BUFFTYPE.ABSORB_FIRE:
-			case BUFFTYPE.ABSORB_WATER:
-			case BUFFTYPE.ABSORB_THUNDER:
-			case BUFFTYPE.ABSORB_SOIL:
-			case BUFFTYPE.ABSORB_LIGHT:
-			case BUFFTYPE.ABSORB_DARK:
-			case BUFFTYPE.ABSORB_ALL_ELEMENT:
 				return true;
-			default:
-				return false;
 			}
+			return false;
 		}
 
 		public bool IsInvinsibleType()
 		{
-			switch (type)
+			BUFFTYPE bUFFTYPE = type;
+			if ((uint)(bUFFTYPE - 164) <= 5u || (uint)(bUFFTYPE - 177) <= 1u || bUFFTYPE == BUFFTYPE.INVINCIBLE_ALL_ELEMENT)
 			{
-			case BUFFTYPE.INVINCIBLE_NORMAL:
-			case BUFFTYPE.INVINCIBLE_FIRE:
-			case BUFFTYPE.INVINCIBLE_WATER:
-			case BUFFTYPE.INVINCIBLE_THUNDER:
-			case BUFFTYPE.INVINCIBLE_SOIL:
-			case BUFFTYPE.INVINCIBLE_ALL:
-			case BUFFTYPE.INVINCIBLE_LIGHT:
-			case BUFFTYPE.INVINCIBLE_DARK:
-			case BUFFTYPE.INVINCIBLE_ALL_ELEMENT:
 				return true;
-			default:
-				return false;
 			}
+			return false;
 		}
 	}
 
@@ -1620,18 +1595,18 @@ public class BuffParam
 
 		public override string ToString()
 		{
-			string empty = string.Empty;
-			empty += type;
-			empty = empty + "," + time;
-			empty = empty + "," + value;
-			empty = empty + "," + valueType;
-			empty = empty + "," + conditionIndex;
-			empty = empty + "," + fromObjectID;
-			empty = empty + "," + fromEquipIndex;
-			empty = empty + "," + fromSkillIndex;
-			empty = empty + "," + endless;
-			empty = empty + "," + skillId;
-			return base.ToString() + empty;
+			string arg = "";
+			arg += type;
+			arg = arg + "," + time;
+			arg = arg + "," + value;
+			arg = arg + "," + valueType;
+			arg = arg + "," + conditionIndex;
+			arg = arg + "," + fromObjectID;
+			arg = arg + "," + fromEquipIndex;
+			arg = arg + "," + fromSkillIndex;
+			arg = arg + "," + endless;
+			arg = arg + "," + skillId;
+			return base.ToString() + arg;
 		}
 	}
 
@@ -1644,19 +1619,17 @@ public class BuffParam
 
 		public override string ToString()
 		{
-			string str = string.Empty;
+			string str = "";
 			if (buffDatas != null)
 			{
 				str += "b[";
 				buffDatas.ForEach(delegate(BuffSyncData b)
 				{
-					string text2 = str;
-					str = text2 + "(" + b + "),";
+					str = str + "(" + b + "),";
 				});
 				str += "],";
 			}
-			string text = str;
-			str = text + "shield=" + shieldHp + ",";
+			str = str + "shield=" + shieldHp + ",";
 			return base.ToString() + str;
 		}
 	}
@@ -1797,7 +1770,7 @@ public class BuffParam
 			}
 			if (data[i].endless.HasValue && !data[i].endless.Value)
 			{
-				data[i].time -= Time.get_deltaTime();
+				data[i].time -= Time.deltaTime;
 			}
 			if (!flag || flag2)
 			{
@@ -1805,7 +1778,7 @@ public class BuffParam
 			}
 			if (data[i].interval > 0f)
 			{
-				data[i].progress += Time.get_deltaTime();
+				data[i].progress += Time.deltaTime;
 				if (data[i].interval < data[i].progress)
 				{
 					chara.OnBuffRoutine(data[i]);
@@ -2012,7 +1985,7 @@ public class BuffParam
 		{
 			num += GetFieldBuffValue(type);
 		}
-		if (!object.ReferenceEquals(ownerEvolveCtrl, null))
+		if (ownerEvolveCtrl != null)
 		{
 			num += ownerEvolveCtrl.GetExecBuffValue(type);
 		}
@@ -2021,7 +1994,11 @@ public class BuffParam
 
 	public bool IsValidBuffOrFieldBuff(BUFFTYPE type, bool isFieldBuff)
 	{
-		return (!isFieldBuff) ? IsValidBuff(type) : IsValidFieldBuff(type);
+		if (!isFieldBuff)
+		{
+			return IsValidBuff(type);
+		}
+		return IsValidFieldBuff(type);
 	}
 
 	public bool IsValidBuff(BUFFTYPE type)
@@ -2056,7 +2033,7 @@ public class BuffParam
 	{
 		int num = GetValue(BUFFTYPE.MOVE_SPEED_UP) - GetValue(BUFFTYPE.MOVE_SPEED_DOWN);
 		float num2 = 1f + passive.moveSpeedUp + (float)num * 0.01f;
-		if (!object.ReferenceEquals(player, null) && player.isBoostMode)
+		if ((object)player != null && player.isBoostMode)
 		{
 			num2 += passive.boostMoveSpeedUp + (float)GetValue(BUFFTYPE.BOOST_MOVE_SPEED_UP) * 0.01f;
 		}
@@ -2071,7 +2048,7 @@ public class BuffParam
 	{
 		int num = GetValue(BUFFTYPE.ATTACK_SPEED_UP) - GetValue(BUFFTYPE.ATTACK_SPEED_DOWN);
 		float num2 = 1f + passive.attackSpeedUp + (float)num * 0.01f;
-		if (!object.ReferenceEquals(player, null) && player.isBoostMode)
+		if ((object)player != null && player.isBoostMode)
 		{
 			num2 += passive.boostAttackSpeedUp + (float)GetValue(BUFFTYPE.BOOST_ATTACK_SPEED_UP) * 0.01f;
 		}
@@ -2128,7 +2105,7 @@ public class BuffParam
 	public float GetSkillAbsorbUpByElementList(ELEMENT_TYPE[] eTypes)
 	{
 		float num = 1f + passive.skillAbsorbUp + (float)GetValue(BUFFTYPE.SKILL_ABSORBUP) * 0.01f;
-		if (eTypes != null && eTypes.Length > 0)
+		if (eTypes != null && eTypes.Length != 0)
 		{
 			for (int i = 0; i < eTypes.Length; i++)
 			{
@@ -2180,7 +2157,7 @@ public class BuffParam
 		{
 			num -= (float)GetValue(BUFFTYPE.MOVE_SPEED_DOWN) * 0.01f;
 		}
-		if (!object.ReferenceEquals(player, null) && player.isBoostMode)
+		if ((object)player != null && player.isBoostMode)
 		{
 			num += passive.boostAvoidUp + (float)GetValue(BUFFTYPE.BOOST_AVOID_UP) * 0.01f;
 		}
@@ -2447,7 +2424,11 @@ public class BuffParam
 
 	public bool IsHalfReaction(TOLERANCETYPE type)
 	{
-		return passive.tolerance[(int)type] < 100 && !IsInvalidReaction(type);
+		if (passive.tolerance[(int)type] < 100)
+		{
+			return !IsInvalidReaction(type);
+		}
+		return false;
 	}
 
 	public bool IsInvalidReaction(TOLERANCETYPE type)
@@ -2458,11 +2439,11 @@ public class BuffParam
 	public float GetDamageDownRate()
 	{
 		float num = 1f - (passive.damageDown + (float)GetValue(BUFFTYPE.DAMAGE_DOWN) * 0.01f);
-		if (!object.ReferenceEquals(player, null) && player.isBoostMode)
+		if ((object)player != null && player.isBoostMode)
 		{
 			num -= passive.boostDamageDown + (float)GetValue(BUFFTYPE.BOOST_DAMAGE_DOWN) * 0.01f;
 		}
-		float num2 = 1f - ((!MonoBehaviourSingleton<InGameSettingsManager>.IsValid()) ? 0.6f : MonoBehaviourSingleton<InGameSettingsManager>.I.player.maxDamageDownRate);
+		float num2 = 1f - (MonoBehaviourSingleton<InGameSettingsManager>.IsValid() ? MonoBehaviourSingleton<InGameSettingsManager>.I.player.maxDamageDownRate : 0.6f);
 		if (num < num2)
 		{
 			num = num2;
@@ -2783,13 +2764,9 @@ public class BuffParam
 			num = GetSilenceGuardWeight();
 			break;
 		}
-		if (num > 0)
+		if (num > 0 && UnityEngine.Random.Range(0, 100) <= num)
 		{
-			int num2 = Random.Range(0, 100);
-			if (num2 <= num)
-			{
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}
@@ -2914,7 +2891,7 @@ public class BuffParam
 		}
 		if (type == BUFFTYPE.AUTO_REVIVE || type == BUFFTYPE.AUTO_REVIVE_SKILL_CHARGE)
 		{
-			if (object.ReferenceEquals(player, null))
+			if ((object)player == null)
 			{
 				return false;
 			}
@@ -2925,7 +2902,7 @@ public class BuffParam
 		}
 		if (type == BUFFTYPE.INVINCIBLECOUNT)
 		{
-			if (object.ReferenceEquals(player, null))
+			if ((object)player == null)
 			{
 				return false;
 			}
@@ -2937,7 +2914,7 @@ public class BuffParam
 		}
 		if (type == BUFFTYPE.INVINCIBLE_BADSTATUS)
 		{
-			if (object.ReferenceEquals(player, null))
+			if ((object)player == null)
 			{
 				return false;
 			}
@@ -3000,10 +2977,10 @@ public class BuffParam
 		case BUFFTYPE.SHIELD:
 			if (player != null)
 			{
-				int num = (int)((float)player.hpMax * ((float)buffData.value / 100f));
-				num = Mathf.Max(0, num);
-				player.ShieldHp = num;
-				player.ShieldHpMax = num;
+				int b = (int)((float)player.hpMax * ((float)buffData.value / 100f));
+				b = Mathf.Max(0, b);
+				player.ShieldHp = b;
+				player.ShieldHpMax = b;
 				buffData2.fromEquipIndex = buffData.fromEquipIndex;
 				buffData2.fromSkillIndex = buffData.fromSkillIndex;
 			}
@@ -3038,8 +3015,8 @@ public class BuffParam
 				passive.conditionsAbilityList[conditionIndex].cleaveComboNum = 0;
 			}
 		}
-		bool flag = buffData.EndBuff();
-		if (flag)
+		bool num = buffData.EndBuff();
+		if (num)
 		{
 			EndBuffEffect(buffData, isPlayEndEffect);
 		}
@@ -3047,7 +3024,7 @@ public class BuffParam
 		{
 			substituteCtrl.End();
 		}
-		return flag;
+		return num;
 	}
 
 	public void AllBuffEnd(bool sync)
@@ -3081,7 +3058,7 @@ public class BuffParam
 		{
 			if (num < count)
 			{
-				if (loopEffect[num].effect == servant.get_gameObject())
+				if (loopEffect[num].effect == servant.gameObject)
 				{
 					break;
 				}
@@ -3154,7 +3131,7 @@ public class BuffParam
 			case BUFFTYPE.INVINCIBLE_BUFF_CANCELLATION_EXPAND:
 			case BUFFTYPE.ORACLE_OHS_PROTECTION:
 			case BUFFTYPE.DAMAGE_MOTION_STOP:
-				text2 = string.Empty;
+				text2 = "";
 				break;
 			}
 			text = "BUFF_" + type_key + "_" + text2 + "_DEFAULT";
@@ -3213,32 +3190,30 @@ public class BuffParam
 					continue;
 				}
 			}
-			Transform val = chara.effectPlayProcessor.PlayEffect(effectSetting);
-			if (val != null && loop)
+			Transform transform = chara.effectPlayProcessor.PlayEffect(effectSetting);
+			if (transform != null && loop)
 			{
-				DisableNotifyMonoBehaviour disableNotifyMonoBehaviour = val.get_gameObject().AddComponent<DisableNotifyMonoBehaviour>();
-				disableNotifyMonoBehaviour.SetNotifyMaster(chara);
+				transform.gameObject.AddComponent<DisableNotifyMonoBehaviour>().SetNotifyMaster(chara);
 				EffectInfo effectInfo = new EffectInfo();
-				effectInfo.effect = val.get_gameObject();
+				effectInfo.effect = transform.gameObject;
 				effectInfo.setting = effectSetting;
 				effectInfo.linkData.Add(data);
 				loopEffect.Add(effectInfo);
 				if (data.type == BUFFTYPE.SLIDE)
 				{
-					BuffSlideEffectController buffSlideEffectController = val.get_gameObject().AddComponent<BuffSlideEffectController>();
-					buffSlideEffectController.Initialize(player);
+					transform.gameObject.AddComponent<BuffSlideEffectController>().Initialize(player);
 				}
 				else if (data.type == BUFFTYPE.INVINCIBLECOUNT)
 				{
-					invincibleCountAnimator = val.GetComponent<Animator>();
+					invincibleCountAnimator = transform.GetComponent<Animator>();
 				}
 				else if (data.type == BUFFTYPE.INVINCIBLE_BADSTATUS)
 				{
-					invincibleBadStatusAnimator = val.GetComponent<Animator>();
+					invincibleBadStatusAnimator = transform.GetComponent<Animator>();
 				}
 				else if (data.type == BUFFTYPE.INVINCIBLE_BUFF_CANCELLATION)
 				{
-					invincibleBuffCancellationAnimator = val.GetComponent<Animator>();
+					invincibleBuffCancellationAnimator = transform.GetComponent<Animator>();
 				}
 			}
 		}
@@ -3261,8 +3236,7 @@ public class BuffParam
 				{
 					if (data.type == BUFFTYPE.SLIDE)
 					{
-						BuffSlideEffectController component = effect.GetComponent<BuffSlideEffectController>();
-						component.set_enabled(false);
+						effect.GetComponent<BuffSlideEffectController>().enabled = false;
 					}
 					else if (data.type == BUFFTYPE.INVINCIBLECOUNT)
 					{
@@ -3450,24 +3424,26 @@ public class BuffParam
 	private bool RazerActiveFullArmorSet(uint abilityId)
 	{
 		CharaInfo charaInfo = player.createInfo.charaInfo;
-		List<int> list = new List<int>();
-		list.Add(80000020);
-		list.Add(80000030);
-		list.Add(80000040);
-		list.Add(80000050);
-		List<int> list2 = list;
-		list = new List<int>();
-		list.Add(80000021);
-		list.Add(80000031);
-		list.Add(80000041);
-		list.Add(80000051);
-		List<int> list3 = list;
+		List<int> list = new List<int>
+		{
+			80000020,
+			80000030,
+			80000040,
+			80000050
+		};
+		List<int> list2 = new List<int>
+		{
+			80000021,
+			80000031,
+			80000041,
+			80000051
+		};
 		int num = 0;
 		if (charaInfo.sex == 0)
 		{
 			foreach (CharaInfo.EquipItem item in charaInfo.equipSet)
 			{
-				if (list2.IndexOf(item.eId) > -1)
+				if (list.IndexOf(item.eId) > -1)
 				{
 					num++;
 				}
@@ -3477,7 +3453,7 @@ public class BuffParam
 		{
 			foreach (CharaInfo.EquipItem item2 in charaInfo.equipSet)
 			{
-				if (list3.IndexOf(item2.eId) > -1)
+				if (list2.IndexOf(item2.eId) > -1)
 				{
 					num++;
 				}
@@ -3492,16 +3468,17 @@ public class BuffParam
 
 	private bool RazerActiveWeapon(uint abilityId)
 	{
-		List<int> list = new List<int>();
-		list.Add(60020200);
-		list.Add(60020201);
-		list.Add(60020202);
-		list.Add(60030200);
-		list.Add(60030201);
-		list.Add(60030202);
-		List<int> list2 = list;
+		List<int> obj = new List<int>
+		{
+			60020200,
+			60020201,
+			60020202,
+			60030200,
+			60030201,
+			60030202
+		};
 		CharaInfo.EquipItem weaponData = player.weaponData;
-		if (list2.IndexOf(weaponData.eId) > -1)
+		if (obj.IndexOf(weaponData.eId) > -1)
 		{
 			return true;
 		}
@@ -3510,13 +3487,13 @@ public class BuffParam
 
 	private bool RazerS2ActiveWeapon(uint abilityId)
 	{
-		List<int> list = new List<int>();
-		list.Add(99200101);
-		list.Add(99200102);
-		list.Add(99200103);
-		list.Add(99200104);
-		List<int> list2 = list;
-		if (list2.IndexOf(player.weaponData.eId) > -1)
+		if (new List<int>
+		{
+			99200101,
+			99200102,
+			99200103,
+			99200104
+		}.IndexOf(player.weaponData.eId) > -1)
 		{
 			return true;
 		}
@@ -3808,29 +3785,29 @@ public class BuffParam
 		case ABILITY_TYPE.BAD_STATUS_UP:
 			if (Enum.IsDefined(typeof(BAD_STATUS_UP), info.target))
 			{
-				int num4 = (int)Enum.Parse(typeof(BAD_STATUS_UP), info.target);
-				passive.badStatusUp[num4] += (float)(int)info.value * (float)num;
+				int num3 = (int)Enum.Parse(typeof(BAD_STATUS_UP), info.target);
+				passive.badStatusUp[num3] += (float)(int)info.value * (float)num;
 			}
 			break;
 		case ABILITY_TYPE.BAD_STATUS_RATE_UP:
 			if (Enum.IsDefined(typeof(BAD_STATUS_UP), info.target))
 			{
-				int num3 = (int)Enum.Parse(typeof(BAD_STATUS_UP), info.target);
-				passive.badStatusRateUp[num3] += (float)(int)info.value * 0.01f * (float)num;
+				int num2 = (int)Enum.Parse(typeof(BAD_STATUS_UP), info.target);
+				passive.badStatusRateUp[num2] += (float)(int)info.value * 0.01f * (float)num;
 			}
 			break;
 		case ABILITY_TYPE.TOLERANCE_UP:
 			if (Enum.IsDefined(typeof(TOLERANCETYPE), info.target))
 			{
-				int num2 = (int)Enum.Parse(typeof(TOLERANCETYPE), info.target);
-				passive.tolerance[num2] -= (int)info.value * num;
+				int num5 = (int)Enum.Parse(typeof(TOLERANCETYPE), info.target);
+				passive.tolerance[num5] -= (int)info.value * num;
 			}
 			break;
 		case ABILITY_TYPE.BADSTATUS_TOLERANCE_DOWN:
 			if (Enum.IsDefined(typeof(TOLERANCETYPE), info.target))
 			{
-				int num5 = (int)Enum.Parse(typeof(TOLERANCETYPE), info.target);
-				passive.tolerance[num5] += (int)info.value * num;
+				int num4 = (int)Enum.Parse(typeof(TOLERANCETYPE), info.target);
+				passive.tolerance[num4] += (int)info.value * num;
 			}
 			break;
 		case ABILITY_TYPE.HEAL_UP:
@@ -4245,7 +4222,7 @@ public class BuffParam
 			ConditionsAbility conditionsAbility = passive.conditionsAbilityList[i];
 			for (int j = 0; j < 3; j++)
 			{
-				if (conditionsAbility.conditionInfos != null && conditionsAbility.conditionInfos.Length > 0 && conditionsAbility.conditionInfos[j] != null)
+				if (conditionsAbility.conditionInfos != null && conditionsAbility.conditionInfos.Length != 0 && conditionsAbility.conditionInfos[j] != null)
 				{
 					conditionsAbility.conditionInfos[j].isStacked = false;
 				}
@@ -4267,14 +4244,12 @@ public class BuffParam
 				}
 				break;
 			case ABILITY_ENABLE_TYPE.FINISH_A_CLEAVE_COMBO:
-			{
-				int num2 = info.enables[i].values[0];
+				_ = info.enables[i].values[0];
 				if (nowCleaveCombo <= 0)
 				{
 					return false;
 				}
 				break;
-			}
 			case ABILITY_ENABLE_TYPE.IF_HP_HIGH:
 				if (!(hpRate >= (float)info.enables[i].values[0] * 0.01f))
 				{
@@ -4305,7 +4280,11 @@ public class BuffParam
 			case ABILITY_ENABLE_TYPE.IN_ORACLE_SPEAR_SP_LOOP:
 				return player.spearCtrl.InOracleSpLoop;
 			case ABILITY_ENABLE_TYPE.GUARDING:
-				return player._IsGuard() || player.spearCtrl.IsGuard();
+				if (!player._IsGuard())
+				{
+					return player.spearCtrl.IsGuard();
+				}
+				return true;
 			case ABILITY_ENABLE_TYPE.ATTACKING:
 				return player.actionID == Character.ACTION_ID.ATTACK;
 			case ABILITY_ENABLE_TYPE.BOOST:
@@ -4313,7 +4292,11 @@ public class BuffParam
 			case ABILITY_ENABLE_TYPE.IN_ORACLE_PAIR_SWORDS_SP_LOOP:
 				return player.enabledOraclePairSwordsSP;
 			case ABILITY_ENABLE_TYPE.IN_ORACLE_PAIR_SWORDS_RUSH_LOOP:
-				return player.attackID == 43 || player.attackID == 42;
+				if (player.attackID != 43)
+				{
+					return player.attackID == 42;
+				}
+				return true;
 			}
 		}
 		return true;
@@ -4497,20 +4480,11 @@ public class BuffParam
 
 	public static bool IsHitAbsorbType(BUFFTYPE buffType)
 	{
-		switch (buffType)
+		if ((uint)(buffType - 152) <= 7u)
 		{
-		case BUFFTYPE.HIT_ABSORB_NORMAL:
-		case BUFFTYPE.HIT_ABSORB_FIRE:
-		case BUFFTYPE.HIT_ABSORB_WATER:
-		case BUFFTYPE.HIT_ABSORB_THUNDER:
-		case BUFFTYPE.HIT_ABSORB_SOIL:
-		case BUFFTYPE.HIT_ABSORB_LIGHT:
-		case BUFFTYPE.HIT_ABSORB_DARK:
-		case BUFFTYPE.HIT_ABSORB_ALL:
 			return true;
-		default:
-			return false;
 		}
+		return false;
 	}
 
 	public bool IsValidShieldBuff(int skillIndex)
@@ -4520,7 +4494,11 @@ public class BuffParam
 		{
 			return false;
 		}
-		return buffData.enable && buffData.fromObjectID == player.createInfo.charaInfo.userId && buffData.fromEquipIndex == player.weaponIndex && buffData.fromSkillIndex == skillIndex;
+		if (buffData.enable && buffData.fromObjectID == player.createInfo.charaInfo.userId && buffData.fromEquipIndex == player.weaponIndex)
+		{
+			return buffData.fromSkillIndex == skillIndex;
+		}
+		return false;
 	}
 
 	public bool IsValidInvincibleBuff()
@@ -4606,9 +4584,7 @@ public class BuffParam
 		{
 			if (passive.fieldBuffResist.ContainsKey(result))
 			{
-				Dictionary<uint, float> fieldBuffResist;
-				uint key;
-				(fieldBuffResist = passive.fieldBuffResist)[key = result] = fieldBuffResist[key] + value;
+				passive.fieldBuffResist[result] += value;
 			}
 			else
 			{
@@ -4637,9 +4613,7 @@ public class BuffParam
 			{
 				if (passive.fieldBuffResistByType.ContainsKey(buffData.type))
 				{
-					Dictionary<BUFFTYPE, float> fieldBuffResistByType;
-					BUFFTYPE type;
-					(fieldBuffResistByType = passive.fieldBuffResistByType)[type = buffData.type] = fieldBuffResistByType[type] + value;
+					passive.fieldBuffResistByType[buffData.type] += value;
 				}
 				else
 				{

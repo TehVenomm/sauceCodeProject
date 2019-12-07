@@ -12,7 +12,7 @@ public class ChatSlider : MonoBehaviour
 		{
 			if (m_Collider == null)
 			{
-				m_Collider = this.GetComponent<BoxCollider>();
+				m_Collider = GetComponent<BoxCollider>();
 			}
 			return m_Collider;
 		}
@@ -24,15 +24,10 @@ public class ChatSlider : MonoBehaviour
 		{
 			if (m_Trans == null)
 			{
-				m_Trans = this.get_transform();
+				m_Trans = base.transform;
 			}
 			return m_Trans;
 		}
-	}
-
-	public ChatSlider()
-		: this()
-	{
 	}
 
 	private void OnDrag(Vector2 delta)

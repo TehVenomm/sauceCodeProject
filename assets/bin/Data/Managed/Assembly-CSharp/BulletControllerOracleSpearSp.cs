@@ -6,9 +6,9 @@ public class BulletControllerOracleSpearSp : BulletControllerBase
 
 	private string chargedEffect;
 
-	private Vector3 basePos = Vector3.get_zero();
+	private Vector3 basePos = Vector3.zero;
 
-	private Quaternion baseRot = Quaternion.get_identity();
+	private Quaternion baseRot = Quaternion.identity;
 
 	public bool Charged
 	{
@@ -29,48 +29,38 @@ public class BulletControllerOracleSpearSp : BulletControllerBase
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam skillInfoParam, Vector3 pos, Quaternion rot)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(bullet, skillInfoParam, pos, rot);
 		data = bullet.dataOracleSpearSp;
 	}
 
 	public override void RegisterFromObject(StageObject obj)
 	{
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 		base.RegisterFromObject(obj);
 		chargedEffect = data.GetEffectName(obj as Player);
-		bulletObject.get_transform().SetParent(obj.get_transform());
-		basePos = bulletObject._transform.get_localPosition();
-		baseRot = bulletObject._transform.get_localRotation();
+		bulletObject.transform.SetParent(obj.transform);
+		basePos = bulletObject._transform.localPosition;
+		baseRot = bulletObject._transform.localRotation;
 	}
 
 	private void UpdateBulletTransform()
 	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		bulletObject._transform.set_localPosition(basePos);
-		bulletObject._transform.set_localRotation(baseRot);
+		bulletObject._transform.localPosition = basePos;
+		bulletObject._transform.localRotation = baseRot;
 	}
 
 	public void UpdateChargedEffect()
 	{
 		Charged = true;
-		EffectManager.ReleaseEffect(bulletObject.bulletEffect.get_gameObject(), isPlayEndAnimation: false, immediate: true);
-		bulletObject.bulletEffect = EffectManager.GetEffect(chargedEffect, bulletObject.get_transform());
+		EffectManager.ReleaseEffect(bulletObject.bulletEffect.gameObject, isPlayEndAnimation: false, immediate: true);
+		bulletObject.bulletEffect = EffectManager.GetEffect(chargedEffect, bulletObject.transform);
 		SoundManager.PlayUISE(data.chargedSEId);
 	}
 
 	private void UpdateEffectScale(float rate)
 	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 		if (!Charged)
 		{
-			bulletObject.bulletEffect.set_localScale(Vector3.get_one() * Mathf.Lerp(1f, 1.2f, rate));
+			bulletObject.bulletEffect.localScale = Vector3.one * Mathf.Lerp(1f, 1.2f, rate);
 		}
 	}
 }

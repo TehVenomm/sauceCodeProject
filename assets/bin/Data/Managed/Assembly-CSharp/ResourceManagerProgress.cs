@@ -14,8 +14,7 @@ internal class ResourceManagerProgress : IProgress
 		int i = 0;
 		for (int count = loadRequests.Count; i < count; i++)
 		{
-			ResourceManager.LoadRequest loadRequest = loadRequests[i];
-			if (loadRequest.IsValid() && loadRequests[i].progressObject != null)
+			if (loadRequests[i].IsValid() && loadRequests[i].progressObject != null)
 			{
 				hasProgress = true;
 				return loadRequests[i].GetProgress();

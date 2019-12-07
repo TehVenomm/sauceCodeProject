@@ -2,7 +2,6 @@ using AOT;
 using GooglePlayGames.Native.Cwrapper;
 using GooglePlayGames.OurUtils;
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke
@@ -10,9 +9,6 @@ namespace GooglePlayGames.Native.PInvoke
 	internal sealed class AndroidPlatformConfiguration : PlatformConfiguration
 	{
 		private delegate void IntentHandlerInternal(IntPtr intent, IntPtr userData);
-
-		[CompilerGenerated]
-		private static GooglePlayGames.Native.Cwrapper.AndroidPlatformConfiguration.IntentHandler _003C_003Ef__mg_0024cache0;
 
 		private AndroidPlatformConfiguration(IntPtr selfPointer)
 			: base(selfPointer)
@@ -48,8 +44,7 @@ namespace GooglePlayGames.Native.PInvoke
 
 		internal static AndroidPlatformConfiguration Create()
 		{
-			IntPtr selfPointer = GooglePlayGames.Native.Cwrapper.AndroidPlatformConfiguration.AndroidPlatformConfiguration_Construct();
-			return new AndroidPlatformConfiguration(selfPointer);
+			return new AndroidPlatformConfiguration(GooglePlayGames.Native.Cwrapper.AndroidPlatformConfiguration.AndroidPlatformConfiguration_Construct());
 		}
 	}
 }

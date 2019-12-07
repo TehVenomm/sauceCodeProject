@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -39,7 +38,7 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 
 	public override void Initialize()
 	{
-		SetActive((Enum)UI.OBJ_GUILD_NUMBER_ROOT, is_visible: false);
+		SetActive(UI.OBJ_GUILD_NUMBER_ROOT, is_visible: false);
 		base.Initialize();
 	}
 
@@ -52,21 +51,21 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 		}
 		if (array == null || array.Length == 0)
 		{
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.GRD_LIST, is_visible: false);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: true);
-			SetLabelText((Enum)UI.LBL_NOW, "0");
-			SetLabelText((Enum)UI.LBL_MAX, "0");
+			SetActive(UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_LIST, is_visible: false);
+			SetActive(UI.OBJ_ACTIVE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, is_visible: true);
+			SetLabelText(UI.LBL_NOW, "0");
+			SetLabelText(UI.LBL_MAX, "0");
 		}
 		else
 		{
-			SetPageNumText((Enum)UI.LBL_NOW, nowPage + 1);
-			SetPageNumText((Enum)UI.LBL_MAX, pageNumMax);
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
-			SetActive((Enum)UI.GRD_LIST, is_visible: true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
+			SetPageNumText(UI.LBL_NOW, nowPage + 1);
+			SetPageNumText(UI.LBL_MAX, pageNumMax);
+			SetActive(UI.STR_NON_LIST, is_visible: false);
+			SetActive(UI.GRD_LIST, is_visible: true);
+			SetActive(UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
+			SetActive(UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
 			UpdateDynamicList();
 		}
 	}
@@ -85,10 +84,9 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 		}
 		if (GameDefine.ACTIVE_DEGREE)
 		{
-			UIGrid component = GetCtrl(UI.GRD_LIST).GetComponent<UIGrid>();
-			component.cellHeight = GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
+			GetCtrl(UI.GRD_LIST).GetComponent<UIGrid>().cellHeight = GameDefine.DEGREE_FRIEND_LIST_HEIGHT;
 		}
-		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList(UI.GRD_LIST, GetListItemName, item_num, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			SetListItem(i, t, is_recycle, info[i]);
 		});
@@ -97,7 +95,7 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 	protected virtual void SetListItem(int i, Transform t, bool is_recycle, FriendCharaInfo data)
 	{
 		SetFollowStatus(t, data.userId, data.following, data.follower);
-		SetCharaInfo(data, i, t, is_recycle, 0 == data.userId);
+		SetCharaInfo(data, i, t, is_recycle, data.userId == 0);
 		if (LoungeMatchingManager.IsValidInLounge())
 		{
 			SetActive(t, UI.SPR_ICON_FIRST_MET, MonoBehaviourSingleton<LoungeMatchingManager>.I.CheckFirstMet(data.userId));
@@ -106,10 +104,6 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 
 	protected void SetCharaInfo(FriendCharaInfo data, int i, Transform t, bool is_recycle, bool isGM)
 	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
 		SetEvent(t, "GUILD_INFO", i);
 		if (isGM)
 		{
@@ -130,8 +124,7 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 		SetLabelText(t, UI.LBL_ATK, finalStatus.GetAttacksSum().ToString());
 		SetLabelText(t, UI.LBL_DEF, finalStatus.defences[0].ToString());
 		SetLabelText(t, UI.LBL_HP, finalStatus.hp.ToString());
-		DegreePlate component = FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(data.selectedDegrees, isButton: false, delegate
+		FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>().Initialize(data.selectedDegrees, isButton: false, delegate
 		{
 			GetCtrl(UI.GRD_LIST).GetComponent<UIGrid>().Reposition();
 		});
@@ -188,8 +181,7 @@ public class GuildListBase : UserListBase<FriendCharaInfo>
 	public virtual void OnQuery_GUILD_INFO()
 	{
 		int index = (int)GameSection.GetEventData();
-		FriendCharaInfo eventData = recvList[index];
-		GameSection.SetEventData(eventData);
+		GameSection.SetEventData(recvList[index]);
 	}
 
 	protected void SetDirtyTable()

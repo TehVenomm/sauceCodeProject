@@ -19,8 +19,7 @@ public class GuildRequestChallengeCounter : QuestChallengeSelect
 			return;
 		}
 		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID((uint)challengeData[num].questId);
-		QuestInfoData questChallengeInfoData = MonoBehaviourSingleton<QuestManager>.I.GetQuestChallengeInfoData((uint)challengeData[num].questId);
-		GameSection.SetEventData(questChallengeInfoData);
+		GameSection.SetEventData(MonoBehaviourSingleton<QuestManager>.I.GetQuestChallengeInfoData((uint)challengeData[num].questId));
 		isScrollViewReady = false;
 	}
 

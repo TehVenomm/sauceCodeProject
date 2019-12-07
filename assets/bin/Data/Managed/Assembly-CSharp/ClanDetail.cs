@@ -98,7 +98,7 @@ public class ClanDetail : GameSection
 	public override void Initialize()
 	{
 		sendClanId = (string)GameSection.GetEventData();
-		this.StartCoroutine(Reload(delegate
+		StartCoroutine(Reload(delegate
 		{
 			base.Initialize();
 		}));
@@ -139,61 +139,60 @@ public class ClanDetail : GameSection
 		UpdateHeaderUI();
 		UpdateListUI();
 		UpdateFooterUI();
-		SetActive((Enum)UI.LBL_NON_LIST, members.Count <= 0);
+		SetActive(UI.LBL_NON_LIST, members.Count <= 0);
 	}
 
 	public void UpdateHeaderUI()
 	{
-		SetLabelText((Enum)UI.LBL_CLAN_NAME, clanData.name);
-		SetLabelText((Enum)UI.LBL_CLAN_LEVEL, clanData.lv.ToString());
-		SetLabelText((Enum)UI.LBL_APLLY_TYPE, StringTable.Get(STRING_CATEGORY.JOIN_TYPE, (uint)clanData.jt));
-		SetLabelText((Enum)UI.LBL_MODE, StringTable.Get(STRING_CATEGORY.CLAN_LABEL, (uint)clanData.lbl));
-		SetLabelText((Enum)UI.LBL_COMMENT, clanData.cmt);
-		SetLabelText((Enum)UI.LBL_MEMBER_NUMBER_NOW, members.Count.ToString());
-		SetLabelText((Enum)UI.LBL_MEMBER_NUMBER_MAX, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.CLAN_MAX_MEMBER_NUM.ToString());
-		this.StartCoroutine(CreateSymbolMark());
+		SetLabelText(UI.LBL_CLAN_NAME, clanData.name);
+		SetLabelText(UI.LBL_CLAN_LEVEL, clanData.lv.ToString());
+		SetLabelText(UI.LBL_APLLY_TYPE, StringTable.Get(STRING_CATEGORY.JOIN_TYPE, (uint)clanData.jt));
+		SetLabelText(UI.LBL_MODE, StringTable.Get(STRING_CATEGORY.CLAN_LABEL, (uint)clanData.lbl));
+		SetLabelText(UI.LBL_COMMENT, clanData.cmt);
+		SetLabelText(UI.LBL_MEMBER_NUMBER_NOW, members.Count.ToString());
+		SetLabelText(UI.LBL_MEMBER_NUMBER_MAX, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.CLAN_MAX_MEMBER_NUM.ToString());
+		StartCoroutine(CreateSymbolMark());
 	}
 
 	private IEnumerator CreateSymbolMark()
 	{
-		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject symbolMarkLoadObj = load_queue.Load(RESOURCE_CATEGORY.UI, "ClanSymbolMark");
-		yield return load_queue.Wait();
-		GameObject obj = symbolMarkLoadObj.loadedObject as GameObject;
-		Transform item = ResourceUtility.Realizes(obj, 5);
-		item.set_parent(GetCtrl(UI.OBJ_SYMBOL));
-		item.set_localScale(Vector3.get_one());
-		item.set_localPosition(Vector3.get_zero());
-		symbolMark = item.GetComponent<SymbolMarkCtrl>();
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject symbolMarkLoadObj = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ClanSymbolMark");
+		yield return loadingQueue.Wait();
+		Transform transform = ResourceUtility.Realizes(symbolMarkLoadObj.loadedObject as GameObject, 5);
+		transform.parent = GetCtrl(UI.OBJ_SYMBOL);
+		transform.localScale = Vector3.one;
+		transform.localPosition = Vector3.zero;
+		symbolMark = transform.GetComponent<SymbolMarkCtrl>();
 		symbolMark.Initilize();
 		symbolMark.LoadSymbol(clanData.sym);
 	}
 
 	private void UpdateListUI()
 	{
-		SetPageNumText((Enum)UI.LBL_NOW, nowPage + 1);
-		SetPageNumText((Enum)UI.LBL_MAX, pageNumMax);
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
+		SetPageNumText(UI.LBL_NOW, nowPage + 1);
+		SetPageNumText(UI.LBL_MAX, pageNumMax);
+		SetActive(UI.OBJ_ACTIVE_ROOT, pageNumMax != 1);
+		SetActive(UI.OBJ_INACTIVE_ROOT, pageNumMax == 1);
 		UpdateDynamicList();
 	}
 
 	private void UpdateFooterUI()
 	{
 		bool is_visible = clanData.cId == MonoBehaviourSingleton<UserInfoManager>.I.userClan.cId;
-		bool flag = MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsNotRegistered();
-		SetActive((Enum)UI.BTN_LEAVE, is_visible);
-		SetActive((Enum)UI.BTN_INVITE, is_visible: false);
+		MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsNotRegistered();
+		SetActive(UI.BTN_LEAVE, is_visible);
+		SetActive(UI.BTN_INVITE, is_visible: false);
 		if (MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsRegistered() || MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "ClanScene")
 		{
-			SetActive((Enum)UI.BTN_APPLY, is_visible: false);
-			SetActive((Enum)UI.BTN_APPLY_CANCEL, is_visible: false);
+			SetActive(UI.BTN_APPLY, is_visible: false);
+			SetActive(UI.BTN_APPLY_CANCEL, is_visible: false);
 			return;
 		}
 		if (isRequested)
 		{
-			SetActive((Enum)UI.BTN_APPLY, is_visible: false);
-			SetActive((Enum)UI.BTN_APPLY_CANCEL, is_visible: true);
+			SetActive(UI.BTN_APPLY, is_visible: false);
+			SetActive(UI.BTN_APPLY_CANCEL, is_visible: true);
 			return;
 		}
 		Enum ctrl_enum = UI.BTN_APPLY;
@@ -210,9 +209,9 @@ public class ClanDetail : GameSection
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_APPLY, is_visible: false);
+			SetActive(UI.BTN_APPLY, is_visible: false);
 		}
-		SetActive((Enum)UI.BTN_APPLY_CANCEL, is_visible: false);
+		SetActive(UI.BTN_APPLY_CANCEL, is_visible: false);
 	}
 
 	protected virtual void UpdateDynamicList()
@@ -225,7 +224,7 @@ public class ClanDetail : GameSection
 		{
 			info[j] = currentUserArray[num + j];
 		}
-		SetDynamicList((Enum)UI.GRD_LIST, "ClanMemberListItem", pageItemLength, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList(UI.GRD_LIST, "ClanMemberListItem", pageItemLength, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			SetupListItem(info[i], i, t, is_recycle);
 		});
@@ -242,7 +241,11 @@ public class ClanDetail : GameSection
 
 	private int GetPageItemLength(int currentPage)
 	{
-		return (currentPage + 1 < pageNumMax || members.Count % 10 <= 0) ? 10 : (members.Count % 10);
+		if (currentPage + 1 < pageNumMax || members.Count % 10 <= 0)
+		{
+			return 10;
+		}
+		return members.Count % 10;
 	}
 
 	private void SetupListItem(FriendCharaInfo data, int i, Transform t, bool is_recycle)
@@ -257,19 +260,15 @@ public class ClanDetail : GameSection
 
 	private void SetMemberInfo(FriendCharaInfo data, int i, Transform t)
 	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		EquipSetCalculator otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(i + 4);
-		otherEquipSetCalculator.SetEquipSet(data.equipSet);
+		MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(i + 4).SetEquipSet(data.equipSet);
 		SetRenderPlayerModel(t, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data, need_weapon: false, need_helm: true, need_leg: false, is_priority_visual_equip: true), 99, new Vector3(0f, -1.536f, 1.87f), new Vector3(0f, 154f, 0f), is_priority_visual_equip: true);
 		SetLabelText(t, UI.LBL_NAME, data.name);
 		SetLabelText(t, UI.LBL_LEVEL, data.level.ToString());
 		SetFollowStatus(t, data.userId, data.following, data.follower);
-		SetJoinInfo(t, i, data.userId, data.joinStatus, string.Empty);
+		SetJoinInfo(t, i, data.userId, data.joinStatus, "");
 		SetStatusSprite(t, data.userClanData);
 		SetBtnMemberSetting(t, i, data);
-		DegreePlate component = FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(data.selectedDegrees, isButton: false, delegate
+		FindCtrl(t, UI.OBJ_DEGREE_FRAME_ROOT).GetComponent<DegreePlate>().Initialize(data.selectedDegrees, isButton: false, delegate
 		{
 			GetCtrl(UI.GRD_LIST).GetComponent<UIGrid>().Reposition();
 		});
@@ -312,16 +311,16 @@ public class ClanDetail : GameSection
 		{
 			is_visible = (clanData.cId == MonoBehaviourSingleton<UserInfoManager>.I.userClan.cId);
 		}
-		bool flag2 = !flag && (following || follower);
+		bool flag2 = !flag && (following | follower);
 		SetActive(t, UI.SPR_BLACKLIST_ICON, flag);
 		SetActive(t, UI.OBJ_FOLLOW, flag2);
 		SetActive(t, UI.SPR_FOLLOW, flag2 && following);
 		SetActive(t, UI.SPR_FOLLOWER, flag2 && follower);
 		SetActive(t, UI.SPR_SAME_CLAN_ICON, is_visible);
-		SetActive(t, UI.OBJ_FOLLOW, following || follower);
+		SetActive(t, UI.OBJ_FOLLOW, following | follower);
 		SetActive(t, UI.SPR_FOLLOW, following);
 		SetActive(t, UI.SPR_FOLLOWER, follower);
-		UIGrid component = base.GetComponent<UIGrid>(t, (Enum)UI.GRD_FOLLOW_ARROW);
+		UIGrid component = GetComponent<UIGrid>(t, UI.GRD_FOLLOW_ARROW);
 		if (component != null)
 		{
 			component.Reposition();
@@ -351,16 +350,6 @@ public class ClanDetail : GameSection
 
 	private void SetJoinTextInfo(Transform _target, FriendCharaInfo.JoinInfo _joinStatus)
 	{
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
 		UILabel component = FindCtrl(_target, UI.ONLINE_TEXT).GetComponent<UILabel>();
 		UILabel component2 = FindCtrl(_target, UI.DETAIL_TEXT).GetComponent<UILabel>();
 		if (component != null)
@@ -369,7 +358,7 @@ public class ClanDetail : GameSection
 		}
 		if (component2 != null)
 		{
-			component2.text = string.Empty;
+			component2.text = "";
 		}
 		switch (_joinStatus.joinType)
 		{
@@ -441,7 +430,11 @@ public class ClanDetail : GameSection
 			return string.Empty;
 		}
 		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)_questId);
-		return (questData != null) ? questData.questText : string.Empty;
+		if (questData != null)
+		{
+			return questData.questText;
+		}
+		return string.Empty;
 	}
 
 	public override void OnNotify(NOTIFY_FLAG flags)
@@ -466,21 +459,18 @@ public class ClanDetail : GameSection
 		}
 		if (!MonoBehaviourSingleton<GameSceneManager>.I.IsCurrentSceneMejorOutGameScene())
 		{
-			component.get_gameObject().SetActive(false);
+			component.gameObject.SetActive(value: false);
 			return;
 		}
-		switch (_status)
+		if ((uint)(_status - 2) <= 2u)
 		{
-		case ONLINE_STATUS.ONLINE_LOUNGE:
-		case ONLINE_STATUS.ONLINE_QUEST:
-		case ONLINE_STATUS.ONLINE_FIELD:
-			component.get_gameObject().SetActive(true);
-			break;
-		default:
-			component.get_gameObject().SetActive(false);
-			break;
+			component.gameObject.SetActive(value: true);
 		}
-		UIGameSceneEventSender componentInChildren = component.GetComponentInChildren<UIGameSceneEventSender>(true);
+		else
+		{
+			component.gameObject.SetActive(value: false);
+		}
+		UIGameSceneEventSender componentInChildren = component.GetComponentInChildren<UIGameSceneEventSender>(includeInactive: true);
 		if (componentInChildren != null)
 		{
 			componentInChildren.eventName = "JOIN_FRIEND";
@@ -659,18 +649,18 @@ public class ClanDetail : GameSection
 
 	private void OnQuery_LEAVE()
 	{
-		string empty = string.Empty;
+		string text = "";
 		if (members.Count > 1)
 		{
-			empty = StringTable.Get(STRING_CATEGORY.CLAN_LEAVE, 0u);
-			empty = string.Format(empty, clanData.name);
+			text = StringTable.Get(STRING_CATEGORY.CLAN_LEAVE, 0u);
+			text = string.Format(text, clanData.name);
 		}
 		else
 		{
-			empty = StringTable.Get(STRING_CATEGORY.CLAN_LEAVE, 1u);
-			empty = string.Format(empty, clanData.name);
+			text = StringTable.Get(STRING_CATEGORY.CLAN_LEAVE, 1u);
+			text = string.Format(text, clanData.name);
 		}
-		GameSection.SetEventData(empty);
+		GameSection.SetEventData(text);
 	}
 
 	private void OnQuery_ClanLeaveConfirmDialog_YES()
@@ -719,16 +709,14 @@ public class ClanDetail : GameSection
 	{
 		int num = (int)GameSection.GetEventData();
 		int index = 10 * nowPage + num;
-		FriendCharaInfo eventData = members[index];
-		GameSection.SetEventData(eventData);
+		GameSection.SetEventData(members[index]);
 	}
 
 	protected virtual void OnQuery_JOIN_FRIEND()
 	{
 		int num = (int)GameSection.GetEventData();
 		int index = 10 * nowPage + num;
-		FriendCharaInfo friendCharaInfo = members[index];
-		FriendCharaInfo.JoinInfo joinStatus = friendCharaInfo.joinStatus;
+		FriendCharaInfo.JoinInfo joinStatus = members[index].joinStatus;
 		if (joinStatus == null)
 		{
 			return;
@@ -827,14 +815,14 @@ public class ClanDetail : GameSection
 
 	private void OnCloseDialog_ClanMemberStatusChangeConfirmDialog()
 	{
-		this.StartCoroutine(Reload(delegate
+		StartCoroutine(Reload(delegate
 		{
 		}));
 	}
 
 	private void OnCloseDialog_ClanKickConfirmDialog()
 	{
-		this.StartCoroutine(Reload(delegate
+		StartCoroutine(Reload(delegate
 		{
 		}));
 	}

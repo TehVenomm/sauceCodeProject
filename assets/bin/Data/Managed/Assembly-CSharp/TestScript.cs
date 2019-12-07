@@ -15,9 +15,4 @@ public class TestScript : MonoBehaviour
 	public Bounds bounds;
 
 	public Quaternion quat;
-
-	public TestScript()
-		: this()
-	{
-	}
 }

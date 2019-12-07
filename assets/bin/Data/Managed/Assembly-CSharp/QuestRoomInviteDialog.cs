@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using UnityEngine;
 
@@ -13,9 +12,9 @@ public class QuestRoomInviteDialog : GameSection
 		LBL_INVITE
 	}
 
-	protected string inviteMessage = string.Empty;
+	protected string inviteMessage = "";
 
-	protected string helpLinkURL = string.Empty;
+	protected string helpLinkURL = "";
 
 	public override void Initialize()
 	{
@@ -27,21 +26,21 @@ public class QuestRoomInviteDialog : GameSection
 
 	protected void InitializeBase()
 	{
-		Debug.Log((object)("<color=blue>InitializeBase  </color>" + MonoBehaviourSingleton<AccountManager>.I.usageLimitMode + " ; " + string.Format(base.sectionData.GetText("STR_SERVICE"))));
+		Debug.Log("<color=blue>InitializeBase  </color>" + MonoBehaviourSingleton<AccountManager>.I.usageLimitMode.ToString() + " ; " + string.Format(base.sectionData.GetText("STR_SERVICE")));
 		if (MonoBehaviourSingleton<AccountManager>.I.usageLimitMode)
 		{
-			SetActive((Enum)UI.LBL_INVITE, is_visible: false);
-			SetActive((Enum)UI.LBL_SNS, is_visible: false);
-			SetActive((Enum)UI.OBJ_LINE_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_TWITTER_ROOT, is_visible: false);
-			SetActive((Enum)UI.LBL_SERVICE, is_visible: true);
-			SetLabelText((Enum)UI.LBL_SERVICE, string.Format(base.sectionData.GetText("STR_SERVICE")));
+			SetActive(UI.LBL_INVITE, is_visible: false);
+			SetActive(UI.LBL_SNS, is_visible: false);
+			SetActive(UI.OBJ_LINE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_TWITTER_ROOT, is_visible: false);
+			SetActive(UI.LBL_SERVICE, is_visible: true);
+			SetLabelText(UI.LBL_SERVICE, string.Format(base.sectionData.GetText("STR_SERVICE")));
 		}
 		else
 		{
-			SetActive((Enum)UI.LBL_SNS, is_visible: false);
-			SetActive((Enum)UI.LBL_SERVICE, is_visible: false);
-			SetActive((Enum)UI.LBL_INVITE, is_visible: true);
+			SetActive(UI.LBL_SNS, is_visible: false);
+			SetActive(UI.LBL_SERVICE, is_visible: false);
+			SetActive(UI.LBL_INVITE, is_visible: true);
 		}
 		base.Initialize();
 	}

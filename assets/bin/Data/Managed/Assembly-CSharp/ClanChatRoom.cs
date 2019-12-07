@@ -43,9 +43,29 @@ public class ClanChatRoom
 		private set;
 	}
 
-	public bool HasConnect => connection != null && connection.isEstablished;
+	public bool HasConnect
+	{
+		get
+		{
+			if (connection != null)
+			{
+				return connection.isEstablished;
+			}
+			return false;
+		}
+	}
 
-	public bool IsConnecting => connection != null && connection.isConnecting;
+	public bool IsConnecting
+	{
+		get
+		{
+			if (connection != null)
+			{
+				return connection.isConnecting;
+			}
+			return false;
+		}
+	}
 
 	public IClanChatConnection connection
 	{

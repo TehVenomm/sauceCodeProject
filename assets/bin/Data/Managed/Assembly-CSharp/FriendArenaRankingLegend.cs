@@ -81,8 +81,8 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 	public override void UpdateUI()
 	{
 		base.UpdateUI();
-		SetActive((Enum)UI.BTN_OWN, is_visible: false);
-		SetActive((Enum)UI.OBJ_OWN_ON, is_visible: false);
+		SetActive(UI.BTN_OWN, is_visible: false);
+		SetActive(UI.OBJ_OWN_ON, is_visible: false);
 	}
 
 	protected override void SetRankiItem(int i, Transform t)
@@ -114,7 +114,7 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 				item_num = info.Length;
 			}
 		}
-		SetDynamicList((Enum)UI.GRD_LIST, GetListItemName, item_num, reset: false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetDynamicList(UI.GRD_LIST, GetListItemName, item_num, reset: false, null, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			SetListItem(i, t, is_recycle, info[i]);
 		});
@@ -155,7 +155,7 @@ public class FriendArenaRankingLegend : FriendArenaRankingBase
 	{
 		rankingDataList = new List<ArenaRankingData>();
 		eventDataList = new List<Network.EventData>();
-		List<FriendInfo> list = new List<FriendInfo>();
+		new List<FriendInfo>();
 		int i = 0;
 		for (int count = result.Count; i < count; i++)
 		{

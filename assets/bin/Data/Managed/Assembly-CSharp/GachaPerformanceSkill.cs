@@ -1,5 +1,3 @@
-using System;
-
 public class GachaPerformanceSkill : GachaPerformanceBase, SkillGachaDirector.ISectionCommand
 {
 	public new enum UI
@@ -21,7 +19,7 @@ public class GachaPerformanceSkill : GachaPerformanceBase, SkillGachaDirector.IS
 
 	protected override void OnOpen()
 	{
-		SetActive((Enum)UI.BTN_SKIP, is_visible: true);
+		SetActive(UI.BTN_SKIP, is_visible: true);
 		if (AnimationDirector.I != null)
 		{
 			(AnimationDirector.I as SkillGachaDirector).StartDirection(this);
@@ -30,14 +28,14 @@ public class GachaPerformanceSkill : GachaPerformanceBase, SkillGachaDirector.IS
 
 	void SkillGachaDirector.ISectionCommand.OnShowSkillModel(uint skill_item_id)
 	{
-		SetRenderSkillItemModel((Enum)UI.TEX_MODEL, skill_item_id, rotation: false, light_rotation: false);
-		SetRenderSkillItemSymbolModel((Enum)UI.TEX_INNER_MODEL, skill_item_id, rotation: false);
+		SetRenderSkillItemModel(UI.TEX_MODEL, skill_item_id, rotation: false);
+		SetRenderSkillItemSymbolModel(UI.TEX_INNER_MODEL, skill_item_id, rotation: false);
 	}
 
 	void SkillGachaDirector.ISectionCommand.OnHideSkillModel()
 	{
-		ClearRenderModel((Enum)UI.TEX_MODEL);
-		ClearRenderModel((Enum)UI.TEX_INNER_MODEL);
+		ClearRenderModel(UI.TEX_MODEL);
+		ClearRenderModel(UI.TEX_INNER_MODEL);
 	}
 
 	void SkillGachaDirector.ISectionCommand.OnShowRarity(RARITY_TYPE rarity)

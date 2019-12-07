@@ -94,9 +94,9 @@ public class TutorialBossDirector : MonoBehaviour
 
 	private readonly string LEGEND_DRAGON_ANIM_STATE = "ENM011_1003_TutorialEnd";
 
-	private Vector3 cutChangePosition = Vector3.get_zero();
+	private Vector3 cutChangePosition = Vector3.zero;
 
-	private Quaternion cutChangeRotation = Quaternion.get_identity();
+	private Quaternion cutChangeRotation = Quaternion.identity;
 
 	[SerializeField]
 	public Logo logo;
@@ -127,42 +127,32 @@ public class TutorialBossDirector : MonoBehaviour
 		set;
 	}
 
-	public TutorialBossDirector()
-		: this()
-	{
-	}//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-	//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-
-
 	public void StartBattleStartDirection(Enemy enemy, Character character, Action onComplete)
 	{
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 		boss = enemy;
 		bossShadow = boss.GetComponentInChildren<CircleShadow>();
-		bossShadowMaterial = bossShadow.GetComponent<MeshRenderer>().get_material();
+		bossShadowMaterial = bossShadow.GetComponent<MeshRenderer>().material;
 		bossShadow.setAnimTransform(boss.hip);
 		player = character;
 		radialBlurFilter = MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RadialBlurFilter>();
 		MonoBehaviourSingleton<SoundManager>.I.requestBGMID = 114;
 		MonoBehaviourSingleton<SoundManager>.I.TransitionTo("EventBattle1");
-		originalPlayerAnimatorController = player.animator.get_runtimeAnimatorController();
-		player.animator.set_runtimeAnimatorController(playerAnimatorController);
-		player.animator.set_cullingMode(0);
+		originalPlayerAnimatorController = player.animator.runtimeAnimatorController;
+		player.animator.runtimeAnimatorController = playerAnimatorController;
+		player.animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 		player.animator.Rebind();
 		player._position = new Vector3(0f, 0f, 26f);
 		player.PlayMotion(PLAYER_ANIM_ENTER_CUT_SCENE_START_NAME);
-		enemy.animator.set_cullingMode(0);
+		enemy.animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 		enemy.animator.Rebind();
 		enemy.PlayMotion(BOSS_ANIM_ENTER_CUT_SCENE_STATE_NAME);
 		enemyController = enemy.GetComponent<EnemyController>();
-		enemyController.set_enabled(false);
-		originalFov = MonoBehaviourSingleton<AppMain>.I.mainCamera.get_fieldOfView();
-		cameraAnim.set_cullingType(0);
+		enemyController.enabled = false;
+		originalFov = MonoBehaviourSingleton<AppMain>.I.mainCamera.fieldOfView;
+		cameraAnim.cullingType = AnimationCullingType.AlwaysAnimate;
 		cameraAnim.Play(BATTLE_ENTER_CAMERA_CLIP_NAME);
-		MonoBehaviourSingleton<InGameCameraManager>.I.set_enabled(false);
-		this.StartCoroutine(DoBattleStartDirection(onComplete));
+		MonoBehaviourSingleton<InGameCameraManager>.I.enabled = false;
+		StartCoroutine(DoBattleStartDirection(onComplete));
 	}
 
 	private IEnumerator WaitAndPlaySounds(List<PlaySoundParam> playSoundParams)
@@ -170,86 +160,80 @@ public class TutorialBossDirector : MonoBehaviour
 		float timer = 0f;
 		while (0 < playSoundParams.Count)
 		{
-			PlaySoundParam param = playSoundParams[0];
-			if (timer >= param.time)
+			PlaySoundParam playSoundParam = playSoundParams[0];
+			if (timer >= playSoundParam.time)
 			{
-				if (param.func != null)
+				if (playSoundParam.func != null)
 				{
-					Vector3 pos = param.func();
-					SoundManager.PlayOneShotSE(param.id, pos);
+					Vector3 pos = playSoundParam.func();
+					SoundManager.PlayOneShotSE(playSoundParam.id, pos);
 				}
 				else
 				{
-					SoundManager.PlayOneShotUISE(param.id);
+					SoundManager.PlayOneShotUISE(playSoundParam.id);
 				}
-				playSoundParams.Remove(param);
+				playSoundParams.Remove(playSoundParam);
 			}
-			timer += Time.get_deltaTime();
+			timer += Time.deltaTime;
 			yield return null;
 		}
 	}
 
 	private IEnumerator DoBattleStartDirection(Action onComplete)
 	{
-		Transform t = cameraAnim.get_transform();
+		Transform t = cameraAnim.transform;
 		Camera mainCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
 		Transform cameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
-		this.StartCoroutine(WaitAndPlaySounds(new List<PlaySoundParam>
+		List<PlaySoundParam> list = new List<PlaySoundParam>();
+		list.Add(new PlaySoundParam(0f, UITutorialOperationHelper.SE_ID_THUNDERSTORM_01));
+		list.Add(new PlaySoundParam(5.53f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01));
+		list.Add(new PlaySoundParam(6.53f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01));
+		list.Add(new PlaySoundParam(7.56f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01));
+		list.Add(new PlaySoundParam(8.56f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01));
+		list.Add(new PlaySoundParam(9.56f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01));
+		list.Add(new PlaySoundParam(11.3f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01));
+		list.Add(new PlaySoundParam(11.93f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01));
+		list.Add(new PlaySoundParam(13f, UITutorialOperationHelper.SE_ID_DRAGON_LANDING));
+		list.Add(new PlaySoundParam(14.7f, UITutorialOperationHelper.SE_ID_DRAGON_CALL_01, () => boss.head.position));
+		StartCoroutine(WaitAndPlaySounds(list));
+		StartCoroutine(WaitForTime(14.7f, delegate
 		{
-			new PlaySoundParam(0f, UITutorialOperationHelper.SE_ID_THUNDERSTORM_01),
-			new PlaySoundParam(5.53f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01),
-			new PlaySoundParam(6.53f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01),
-			new PlaySoundParam(7.56f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01),
-			new PlaySoundParam(8.56f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01),
-			new PlaySoundParam(9.56f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01),
-			new PlaySoundParam(11.3f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01),
-			new PlaySoundParam(11.93f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01),
-			new PlaySoundParam(13f, UITutorialOperationHelper.SE_ID_DRAGON_LANDING),
-			new PlaySoundParam(14.7f, UITutorialOperationHelper.SE_ID_DRAGON_CALL_01, () => boss.head.get_position())
+			StartCoroutine(DoRadialBlur(0.6f, 0.3f, 1f));
 		}));
-		this.StartCoroutine(WaitForTime(14.7f, delegate
-		{
-			this.StartCoroutine(DoRadialBlur(0.6f, 0.3f, 1f));
-		}));
-		while (cameraAnim.get_isPlaying())
+		while (cameraAnim.isPlaying)
 		{
 			boss._rigidbody.Sleep();
-			Vector3 position = boss.head.get_position();
-			if (5f < position.y)
+			if (5f < boss.head.position.y)
 			{
-				Material obj = bossShadowMaterial;
-				Vector3 position2 = boss.head.get_position();
-				obj.SetFloat("_AlphaPower", 2.5f / position2.y);
+				bossShadowMaterial.SetFloat("_AlphaPower", 2.5f / boss.head.position.y);
 			}
-			cameraTransform.set_position(t.get_position());
-			cameraTransform.set_rotation(t.get_rotation());
-			Camera obj2 = mainCamera;
-			Vector3 localScale = t.get_localScale();
-			obj2.set_fieldOfView(localScale.x);
+			cameraTransform.position = t.position;
+			cameraTransform.rotation = t.rotation;
+			mainCamera.fieldOfView = t.localScale.x;
 			yield return null;
 		}
 		bossShadowMaterial.SetFloat("_AlphaPower", 0.5f);
-		boss.get_transform().set_position(Vector3.get_zero());
+		boss.transform.position = Vector3.zero;
 		player.PlayMotion("idle");
-		player.animator.set_runtimeAnimatorController(originalPlayerAnimatorController);
-		Vector3 startCameraPos = cameraTransform.get_position();
-		Quaternion startCameraRotation = cameraTransform.get_rotation();
-		float startFieldOfView = mainCamera.get_fieldOfView();
+		player.animator.runtimeAnimatorController = originalPlayerAnimatorController;
+		Vector3 startCameraPos = cameraTransform.position;
+		Quaternion startCameraRotation = cameraTransform.rotation;
+		float startFieldOfView = mainCamera.fieldOfView;
 		float timer = 0f;
 		while (timer < DURATION_TO_BATTLE_START)
 		{
-			timer += Time.get_deltaTime();
-			float ratio = timer / DURATION_TO_BATTLE_START;
-			cameraTransform.set_position(Vector3.Lerp(startCameraPos, CAMERA_END_POSITION, ratio));
-			cameraTransform.set_rotation(Quaternion.Slerp(startCameraRotation, CAMERA_END_ROTAION, ratio));
-			mainCamera.set_fieldOfView(Mathf.Lerp(startFieldOfView, originalFov, ratio));
+			timer += Time.deltaTime;
+			float t2 = timer / DURATION_TO_BATTLE_START;
+			cameraTransform.position = Vector3.Lerp(startCameraPos, CAMERA_END_POSITION, t2);
+			cameraTransform.rotation = Quaternion.Slerp(startCameraRotation, CAMERA_END_ROTAION, t2);
+			mainCamera.fieldOfView = Mathf.Lerp(startFieldOfView, originalFov, t2);
 			yield return null;
 		}
 		boss.PlayMotion("idle");
 		MonoBehaviourSingleton<InGameCameraManager>.I.ResetMovePositionAndRotaion();
-		MonoBehaviourSingleton<InGameCameraManager>.I.set_enabled(true);
+		MonoBehaviourSingleton<InGameCameraManager>.I.enabled = true;
 		bossShadow.setAnimTransform(null);
-		bossShadow.get_transform().set_position(boss.get_transform().get_position());
+		bossShadow.transform.position = boss.transform.position;
 		onComplete?.Invoke();
 	}
 
@@ -262,48 +246,39 @@ public class TutorialBossDirector : MonoBehaviour
 
 	public void StartBattleEndDirection(GameObject legend, GameObject title_ui, Action onComplete)
 	{
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0323: Unknown result type (might be due to invalid IL or missing references)
 		titleUIPrefab = title_ui;
-		originalPlayerAnimatorController = player.animator.get_runtimeAnimatorController();
-		player._collider.set_enabled(false);
-		player.animator.set_runtimeAnimatorController(playerAnimatorController);
-		player.animator.set_cullingMode(0);
+		originalPlayerAnimatorController = player.animator.runtimeAnimatorController;
+		player._collider.enabled = false;
+		player.animator.runtimeAnimatorController = playerAnimatorController;
+		player.animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 		player.animator.Rebind();
-		player._transform.set_position(new Vector3(0f, 0f, 26f));
-		player._transform.set_eulerAngles(new Vector3(0f, 180f, 0f));
-		player._rigidbody.set_constraints(126);
+		player._transform.position = new Vector3(0f, 0f, 26f);
+		player._transform.eulerAngles = new Vector3(0f, 180f, 0f);
+		player._rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 		player.ActIdle();
 		player.PlayMotion(PLAYER_ANIM_EXIT_CUT_SCENE_START_NAME);
-		legend.SetActive(true);
+		legend.SetActive(value: true);
 		legendDragon = legend;
 		Animator component = legend.GetComponent<Animator>();
-		component.set_runtimeAnimatorController(legendDragonAnimController);
+		component.runtimeAnimatorController = legendDragonAnimController;
 		component.Play(LEGEND_DRAGON_ANIM_STATE);
 		if (boss != null)
 		{
-			if (boss.colliders != null && boss.colliders.Length > 0)
+			if (boss.colliders != null && boss.colliders.Length != 0)
 			{
 				int i = 0;
 				for (int num = boss.colliders.Length; i < num; i++)
 				{
 					if (boss.colliders[i] != null)
 					{
-						boss.colliders[i].set_enabled(false);
+						boss.colliders[i].enabled = false;
 					}
 				}
-				boss._transform.set_position(Vector3.get_zero());
-				boss._transform.set_eulerAngles(Vector3.get_zero());
-				boss._rigidbody.set_constraints(126);
+				boss._transform.position = Vector3.zero;
+				boss._transform.eulerAngles = Vector3.zero;
+				boss._rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 				boss.ActIdle();
-				boss.animator.set_cullingMode(0);
+				boss.animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 				boss.animator.Rebind();
 				boss.PlayMotion(BOSS_ANIM_EXIT_CUT_SCENE_STATE_NAME);
 			}
@@ -318,41 +293,40 @@ public class TutorialBossDirector : MonoBehaviour
 		}
 		if (enemyController != null)
 		{
-			enemyController.set_enabled(false);
+			enemyController.enabled = false;
 		}
-		originalFov = MonoBehaviourSingleton<AppMain>.I.mainCamera.get_fieldOfView();
-		cameraAnim.get_transform().set_position(Vector3.get_zero());
-		cameraAnim.get_transform().set_rotation(Quaternion.get_identity());
-		cameraAnim.get_transform().set_localScale(Vector3.get_zero());
-		cameraAnim.set_cullingType(0);
+		originalFov = MonoBehaviourSingleton<AppMain>.I.mainCamera.fieldOfView;
+		cameraAnim.transform.position = Vector3.zero;
+		cameraAnim.transform.rotation = Quaternion.identity;
+		cameraAnim.transform.localScale = Vector3.zero;
+		cameraAnim.cullingType = AnimationCullingType.AlwaysAnimate;
 		cameraAnim.Play(BATTLE_EXIT_CAMERA_CLIP_NAME);
 		cameraAnim.Sample();
-		MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_position(CAMERA_END_POSITION);
-		MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_rotation(CAMERA_END_ROTAION);
-		MonoBehaviourSingleton<InGameCameraManager>.I.set_enabled(false);
-		this.StartCoroutine(DoBattleEndDirection(onComplete));
+		MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.position = CAMERA_END_POSITION;
+		MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.rotation = CAMERA_END_ROTAION;
+		MonoBehaviourSingleton<InGameCameraManager>.I.enabled = false;
+		StartCoroutine(DoBattleEndDirection(onComplete));
 	}
 
 	private IEnumerator DoBattleEndDirection(Action onComplete)
 	{
-		Transform t = cameraAnim.get_transform();
+		Transform t = cameraAnim.transform;
 		Camera mainCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
 		Transform cameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
-		this.StartCoroutine(WaitAndPlaySounds(new List<PlaySoundParam>
-		{
-			new PlaySoundParam(0f, UITutorialOperationHelper.SE_ID_THUNDERSTORM_02),
-			new PlaySoundParam(0f, UITutorialOperationHelper.SE_ID_DRAGON_CALL_02),
-			new PlaySoundParam(2.26f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01),
-			new PlaySoundParam(3.2f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01),
-			new PlaySoundParam(4.16f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01),
-			new PlaySoundParam(5.16f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01),
-			new PlaySoundParam(6.13f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01),
-			new PlaySoundParam(8.65f, UITutorialOperationHelper.SE_ID_DRAGON_CALL_03),
-			new PlaySoundParam(11.2f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_02),
-			new PlaySoundParam(13.2f, UITutorialOperationHelper.SE_ID_DRAGON_CALL_04)
-		}));
+		List<PlaySoundParam> list = new List<PlaySoundParam>();
+		list.Add(new PlaySoundParam(0f, UITutorialOperationHelper.SE_ID_THUNDERSTORM_02));
+		list.Add(new PlaySoundParam(0f, UITutorialOperationHelper.SE_ID_DRAGON_CALL_02));
+		list.Add(new PlaySoundParam(2.26f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01));
+		list.Add(new PlaySoundParam(3.2f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01));
+		list.Add(new PlaySoundParam(4.16f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01));
+		list.Add(new PlaySoundParam(5.16f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01));
+		list.Add(new PlaySoundParam(6.13f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_01));
+		list.Add(new PlaySoundParam(8.65f, UITutorialOperationHelper.SE_ID_DRAGON_CALL_03));
+		list.Add(new PlaySoundParam(11.2f, UITutorialOperationHelper.SE_ID_DRAGON_FLUTTER_02));
+		list.Add(new PlaySoundParam(13.2f, UITutorialOperationHelper.SE_ID_DRAGON_CALL_04));
+		StartCoroutine(WaitAndPlaySounds(list));
 		bool isRequestedLogoAnimation = false;
-		while (cameraAnim.get_isPlaying())
+		while (cameraAnim.isPlaying)
 		{
 			if (boss != null)
 			{
@@ -360,27 +334,19 @@ public class TutorialBossDirector : MonoBehaviour
 				{
 					boss._rigidbody.Sleep();
 				}
-				if (boss.head != null)
+				if (boss.head != null && 2.5f < boss.head.position.y)
 				{
-					Vector3 position = boss.head.get_position();
-					if (2.5f < position.y)
-					{
-						Material obj = bossShadowMaterial;
-						Vector3 position2 = boss.head.get_position();
-						obj.SetFloat("_AlphaPower", 1.25f / position2.y);
-					}
+					bossShadowMaterial.SetFloat("_AlphaPower", 1.25f / boss.head.position.y);
 				}
 			}
-			cameraTransform.set_position(t.get_position());
-			cameraTransform.set_rotation(t.get_rotation());
-			Vector3 localScale = t.get_localScale();
-			float fov = localScale.x;
-			if (1f < fov)
+			cameraTransform.position = t.position;
+			cameraTransform.rotation = t.rotation;
+			float x = t.localScale.x;
+			if (1f < x)
 			{
-				mainCamera.set_fieldOfView(fov);
+				mainCamera.fieldOfView = x;
 			}
-			Vector3 localScale2 = t.get_localScale();
-			if (localScale2.z > 0.5f && !isRequestedLogoAnimation)
+			if (t.localScale.z > 0.5f && !isRequestedLogoAnimation)
 			{
 				isRequestedLogoAnimation = true;
 				StartLogoAnimation(tutorial_flag: true, onComplete);
@@ -390,7 +356,7 @@ public class TutorialBossDirector : MonoBehaviour
 		if (bossShadow != null)
 		{
 			bossShadow.setAnimTransform(null);
-			bossShadow.get_transform().set_position(boss.get_transform().get_position());
+			bossShadow.transform.position = boss.transform.position;
 		}
 		if (!isRequestedLogoAnimation)
 		{
@@ -400,22 +366,20 @@ public class TutorialBossDirector : MonoBehaviour
 
 	public void StartLogoAnimation(bool tutorial_flag, Action onComplete, Action onLoop = null)
 	{
-		this.StartCoroutine(DoStartLogoAnimation(tutorial_flag, onComplete, onLoop));
+		StartCoroutine(DoStartLogoAnimation(tutorial_flag, onComplete, onLoop));
 	}
 
 	public void InitLogo()
 	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		logo.camera.get_gameObject().SetActive(false);
-		logo.eye.get_transform().set_localScale(Vector3.get_zero());
-		Material material = logo.fader.get_material();
-		Material material2 = logo.logo.get_material();
+		logo.camera.gameObject.SetActive(value: false);
+		logo.eye.transform.localScale = Vector3.zero;
+		Material material = logo.fader.material;
+		Material material2 = logo.logo.material;
 		material.SetColor("_Color", new Color(0f, 0f, 0f, 0f));
 		material2.SetFloat("_AlphaRate", -1f);
 		material2.SetFloat("_BlendRate", 0f);
-		logo.effect1.SetActive(false);
-		logo.bg.SetActive(false);
+		logo.effect1.SetActive(value: false);
+		logo.bg.SetActive(value: false);
 		if (effects == null)
 		{
 			return;
@@ -424,7 +388,7 @@ public class TutorialBossDirector : MonoBehaviour
 		{
 			if (effects[i] != null)
 			{
-				Object.Destroy(effects[i]);
+				UnityEngine.Object.Destroy(effects[i]);
 				effects[i] = null;
 			}
 		}
@@ -432,107 +396,107 @@ public class TutorialBossDirector : MonoBehaviour
 
 	private IEnumerator DoFadeOut()
 	{
-		Material faderMat = logo.fader.get_material();
+		Material faderMat = logo.fader.material;
 		float timer = 0f;
 		while (timer < 0.3f)
 		{
-			timer += Time.get_deltaTime();
+			timer += Time.deltaTime;
 			faderMat.SetColor("_Color", new Color(0f, 0f, 0f, Mathf.Clamp01(timer / 0.3f)));
 			yield return null;
 		}
 		if (legendDragon != null)
 		{
-			legendDragon.SetActive(false);
+			legendDragon.SetActive(value: false);
 		}
 	}
 
 	private IEnumerator DoStartLogoAnimation(bool tutorial_flag, Action onComplete, Action onLoop)
 	{
-		logo.root.set_position(Vector3.get_up() * 1000f);
-		logo.root.set_rotation(Quaternion.get_identity());
-		logo.root.set_localScale(Vector3.get_one());
+		logo.root.position = Vector3.up * 1000f;
+		logo.root.rotation = Quaternion.identity;
+		logo.root.localScale = Vector3.one;
 		if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.NeedModifyTitleTop)
 		{
 			DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
-			logo.camera.set_orthographicSize(specialDeviceInfo.TitleTopCameraSize);
-			logo.bg.get_transform().set_localScale(specialDeviceInfo.TitleTopBGScale);
+			logo.camera.orthographicSize = specialDeviceInfo.TitleTopCameraSize;
+			logo.bg.transform.localScale = specialDeviceInfo.TitleTopBGScale;
 		}
-		logo.camera.get_gameObject().SetActive(true);
-		Material faderMat = logo.fader.get_material();
-		Material logoMat = logo.logo.get_material();
-		logo.camera.set_depth(-1f);
-		logo.dragonRoot.SetActive(false);
+		logo.camera.gameObject.SetActive(value: true);
+		Material faderMat = logo.fader.material;
+		Material logoMat = logo.logo.material;
+		logo.camera.depth = -1f;
+		logo.dragonRoot.SetActive(value: false);
 		Color dragonPlaneColor = new Color(1f, 1f, 1f, 0f);
-		logo.dragonPlane.get_sharedMaterial().SetColor("Color", dragonPlaneColor);
+		logo.dragonPlane.sharedMaterial.SetColor("Color", dragonPlaneColor);
 		if (tutorial_flag)
 		{
-			this.StartCoroutine(DoFadeOut());
+			StartCoroutine(DoFadeOut());
 			SoundManager.RequestBGM(11, isLoop: false);
 			while (MonoBehaviourSingleton<SoundManager>.I.playingBGMID != 11 || MonoBehaviourSingleton<SoundManager>.I.changingBGM)
 			{
 				yield return null;
 			}
-			yield return (object)new WaitForSeconds(2.3f);
+			yield return new WaitForSeconds(2.3f);
 		}
 		else
 		{
 			faderMat.SetColor("_Color", new Color(0f, 0f, 0f, 0f));
 		}
-		effects = (GameObject[])new GameObject[titleEffectPrefab.Length];
+		effects = new GameObject[titleEffectPrefab.Length];
 		for (int i = 0; i < titleEffectPrefab.Length; i++)
 		{
 			rymFX component = ResourceUtility.Realizes(titleEffectPrefab[i]).GetComponent<rymFX>();
-			component.Cameras = (Camera[])new Camera[1]
+			component.Cameras = new Camera[1]
 			{
 				logo.camera
 			};
-			component.get__transform().set_localScale(component.get__transform().get_localScale() * 10f);
+			component._transform.localScale = component._transform.localScale * 10f;
 			if (i == 1)
 			{
-				component.get__transform().set_position(new Vector3(0.568f, 999.946f, 0.1f));
+				component._transform.position = new Vector3(0.568f, 999.946f, 0.1f);
 			}
 			else
 			{
-				component.get__transform().set_position(logo.eye.get_transform().get_position());
+				component._transform.position = logo.eye.transform.position;
 			}
-			effects[i] = component.get_gameObject();
+			effects[i] = component.gameObject;
 		}
-		yield return (object)new WaitForSeconds(1f);
+		yield return new WaitForSeconds(1f);
 		float timer4 = 0f;
 		while (timer4 < 0.17f)
 		{
-			timer4 += Time.get_deltaTime();
-			float s = Mathf.Clamp01(timer4 / 0.17f);
-			logo.eye.get_transform().set_localScale(Vector3.get_one() * s * 10f);
+			timer4 += Time.deltaTime;
+			float d = Mathf.Clamp01(timer4 / 0.17f);
+			logo.eye.transform.localScale = Vector3.one * d * 10f;
 			logoMat.SetFloat("_AlphaRate", -1f + timer4 * 2f);
 			yield return null;
 		}
-		logo.dragonRoot.SetActive(true);
+		logo.dragonRoot.SetActive(value: true);
 		while (timer4 < 1f)
 		{
-			timer4 += Time.get_deltaTime();
+			timer4 += Time.deltaTime;
 			logoMat.SetFloat("_AlphaRate", -1f + timer4 * 2f);
 			dragonPlaneColor.a = timer4;
-			logo.dragonPlane.get_sharedMaterial().SetColor("Color", dragonPlaneColor);
+			logo.dragonPlane.sharedMaterial.SetColor("Color", dragonPlaneColor);
 			yield return null;
 		}
 		dragonPlaneColor.a = 1f;
-		logo.dragonPlane.get_sharedMaterial().SetColor("Color", dragonPlaneColor);
+		logo.dragonPlane.sharedMaterial.SetColor("Color", dragonPlaneColor);
 		timer4 = 0f;
 		while (timer4 < 0.5f)
 		{
-			timer4 += Time.get_deltaTime();
+			timer4 += Time.deltaTime;
 			logoMat.SetFloat("_BlendRate", timer4 * 2f);
 			yield return null;
 		}
-		logo.bg.SetActive(true);
-		logo.effect1.SetActive(true);
+		logo.bg.SetActive(value: true);
+		logo.effect1.SetActive(value: true);
 		timer4 = 0f;
-		Material bgMaterial = logo.bgFader.get_material();
+		Material bgMaterial = logo.bgFader.material;
 		while (timer4 < 0.7f)
 		{
-			timer4 += Time.get_deltaTime();
-			bgMaterial.set_color(new Color(1f, 1f, 1f, 1f - timer4 / 0.7f));
+			timer4 += Time.deltaTime;
+			bgMaterial.color = new Color(1f, 1f, 1f, 1f - timer4 / 0.7f);
 			yield return null;
 		}
 		if (!tutorial_flag)
@@ -543,34 +507,34 @@ public class TutorialBossDirector : MonoBehaviour
 				yield return null;
 			}
 		}
-		yield return (object)new WaitForSeconds(0.3f);
+		yield return new WaitForSeconds(0.3f);
 		if (titleUIPrefab != null)
 		{
-			Transform val = ResourceUtility.Realizes(titleUIPrefab, MonoBehaviourSingleton<UIManager>.I.uiRootTransform, 5);
-			if (val != null)
+			Transform transform = ResourceUtility.Realizes(titleUIPrefab, MonoBehaviourSingleton<UIManager>.I.uiRootTransform, 5);
+			if (transform != null)
 			{
-				Transform val2 = Utility.Find(val, "BTN_START");
-				if (val2 != null)
+				Transform transform2 = Utility.Find(transform, "BTN_START");
+				if (transform2 != null)
 				{
-					val2.GetComponent<Collider>().set_enabled(false);
+					transform2.GetComponent<Collider>().enabled = false;
 				}
-				val2 = Utility.Find(val, "BTN_ADVANCED_LOGIN");
-				if (val2 != null)
+				transform2 = Utility.Find(transform, "BTN_ADVANCED_LOGIN");
+				if (transform2 != null)
 				{
-					val2.get_gameObject().SetActive(false);
+					transform2.gameObject.SetActive(value: false);
 				}
-				val2 = Utility.Find(val, "BTN_CLEARCACHE");
-				if (val2 != null)
+				transform2 = Utility.Find(transform, "BTN_CLEARCACHE");
+				if (transform2 != null)
 				{
-					val2.get_gameObject().SetActive(false);
+					transform2.gameObject.SetActive(value: false);
 				}
 			}
 		}
-		yield return (object)new WaitForSeconds(6f);
+		yield return new WaitForSeconds(6f);
 		timer4 = 0f;
 		while (timer4 < 0.3f)
 		{
-			timer4 += Time.get_deltaTime();
+			timer4 += Time.deltaTime;
 			faderMat.SetColor("_Color", new Color(0f, 0f, 0f, timer4 / 0.3f));
 			yield return null;
 		}
@@ -584,29 +548,18 @@ public class TutorialBossDirector : MonoBehaviour
 
 	private void LateUpdate()
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		Transform transform = cameraAnim.get_transform();
+		Transform transform = cameraAnim.transform;
 		if (!MonoBehaviourSingleton<AppMain>.IsValid())
 		{
 			return;
 		}
 		if (!replaceCameraRoationWithCutSceneRotation)
 		{
-			Vector3 localScale = transform.get_localScale();
-			if (localScale.y > 0.1f)
+			if (transform.localScale.y > 0.1f)
 			{
 				replaceCameraRoationWithCutSceneRotation = true;
-				cutChangePosition = transform.get_position();
-				cutChangeRotation = transform.get_rotation();
+				cutChangePosition = transform.position;
+				cutChangeRotation = transform.rotation;
 			}
 		}
 		else
@@ -615,13 +568,12 @@ public class TutorialBossDirector : MonoBehaviour
 			{
 				return;
 			}
-			Vector3 localScale2 = transform.get_localScale();
-			if (localScale2.y > 0.1f)
+			if (transform.localScale.y > 0.1f)
 			{
 				if (MonoBehaviourSingleton<AppMain>.IsValid() && MonoBehaviourSingleton<AppMain>.I.mainCameraTransform != null)
 				{
-					MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_position(cutChangePosition);
-					MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_rotation(cutChangeRotation);
+					MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.position = cutChangePosition;
+					MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.rotation = cutChangeRotation;
 				}
 			}
 			else
@@ -638,17 +590,17 @@ public class TutorialBossDirector : MonoBehaviour
 		Camera camera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
 		while (timer2 < startDuration)
 		{
-			timer2 += Time.get_deltaTime();
+			timer2 += Time.deltaTime;
 			radialBlurFilter.strength = Mathf.Lerp(0f, maxStrength, timer2 / 0.6f);
-			radialBlurFilter.SetCenter(Vector2.op_Implicit(camera.WorldToViewportPoint(boss.head.get_position())));
+			radialBlurFilter.SetCenter(camera.WorldToViewportPoint(boss.head.position));
 			yield return null;
 		}
 		timer2 = 0f;
 		while (timer2 < endDuration)
 		{
-			timer2 += Time.get_deltaTime();
+			timer2 += Time.deltaTime;
 			radialBlurFilter.strength = Mathf.Lerp(maxStrength, 0f, timer2 / 0.3f);
-			radialBlurFilter.SetCenter(Vector2.op_Implicit(camera.WorldToViewportPoint(boss.head.get_position())));
+			radialBlurFilter.SetCenter(camera.WorldToViewportPoint(boss.head.position));
 			yield return null;
 		}
 		radialBlurFilter.StopFilter();
@@ -656,7 +608,7 @@ public class TutorialBossDirector : MonoBehaviour
 
 	private IEnumerator WaitForTime(float waitTime, Action action)
 	{
-		yield return (object)new WaitForSeconds(waitTime);
+		yield return new WaitForSeconds(waitTime);
 		action();
 	}
 }

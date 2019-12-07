@@ -112,7 +112,7 @@ public class JackpotWinDialog : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -121,9 +121,9 @@ public class JackpotWinDialog : GameSection
 		if (data != null)
 		{
 			isOurs = IsOurWin(int.Parse(data.userId));
-			SoundManager.RequestBGM((!isOurs) ? 10 : 191, isLoop: false);
-			pamelaActiveList = ((!isOurs) ? pamelaTheirsAnimList : pamelaOursAnimList);
-			dragonActiveList = ((!isOurs) ? dragonTheirsAnimList : dragonOursAnimList);
+			SoundManager.RequestBGM(isOurs ? 191 : 10, isLoop: false);
+			pamelaActiveList = (isOurs ? pamelaOursAnimList : pamelaTheirsAnimList);
+			dragonActiveList = (isOurs ? dragonOursAnimList : dragonTheirsAnimList);
 			jackportNumber = GetCtrl(UI.JACKPOT_NUMBER).GetComponent<JackportNumber>();
 			UpdateNPC();
 			yield return null;
@@ -138,8 +138,8 @@ public class JackpotWinDialog : GameSection
 
 	public override void UpdateUI()
 	{
-		SetActive((Enum)UI.BTN_CLAIM, isOurs);
-		SetActive((Enum)UI.BTN_CLOSE_NEXT, !isOurs);
+		SetActive(UI.BTN_CLAIM, isOurs);
+		SetActive(UI.BTN_CLOSE_NEXT, !isOurs);
 		SetView(data.jackpot, isOurs, data.userName);
 	}
 
@@ -147,12 +147,12 @@ public class JackpotWinDialog : GameSection
 	{
 		jackportNumber.ShowNumber(jackpot);
 		Transform ctrl = GetCtrl(UI.OBJ_JACKPOT_GROUP);
-		SetActive(ctrl.get_transform(), UI.OBJ_OURS, isOurs);
-		SetActive(ctrl.get_transform(), UI.OBJ_THEIRS, !isOurs);
-		SetActive((Enum)UI.BTN_SHARESCREENSHOT, isOurs);
+		SetActive(ctrl.transform, UI.OBJ_OURS, isOurs);
+		SetActive(ctrl.transform, UI.OBJ_THEIRS, !isOurs);
+		SetActive(UI.BTN_SHARESCREENSHOT, isOurs);
 		if (!isOurs)
 		{
-			SetLabelText(GetCtrl(UI.OBJ_THEIRS).get_transform(), UI.LBL_HUNTER_WIN, string.Format(StringTable.Get(STRING_CATEGORY.DRAGON_VAULT, 3u), hunterWinName));
+			SetLabelText(GetCtrl(UI.OBJ_THEIRS).transform, UI.LBL_HUNTER_WIN, string.Format(StringTable.Get(STRING_CATEGORY.DRAGON_VAULT, 3u), hunterWinName));
 			return;
 		}
 		SetActive(GetCtrl(UI.OBJ_OURS), UI.SPR_INFO_GRAND, data.percentage == 100);
@@ -166,52 +166,35 @@ public class JackpotWinDialog : GameSection
 
 	private void UpdateNPC()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		SetRenderNPCModel((Enum)UI.TEX_NPCMODEL_PAMELA, 0, new Vector3(0.4f, -1.3f, 6.87f), new Vector3(0f, -157.64f, 0f), MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.questCenterNPCFOV, (Action<NPCLoader>)delegate(NPCLoader loader)
+		SetRenderNPCModel(UI.TEX_NPCMODEL_PAMELA, 0, new Vector3(0.4f, -1.3f, 6.87f), new Vector3(0f, -157.64f, 0f), MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.questCenterNPCFOV, delegate(NPCLoader loader)
 		{
 			pamelaLoader = loader;
 			pamelaLoader.GetAnimator().Play(pamelaActiveList[pamelaAnimIndex]);
 			SoundManager.PlayVoice((int)Enum.Parse(typeof(PamelaVoice), pamelaActiveList[pamelaAnimIndex]));
 		});
-		SetRenderNPCModel((Enum)UI.TEX_NPCMODEL_DRAGON, 6, new Vector3(-0.1f, -2.18f, 12f), new Vector3(0f, 169f, 0f), MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.questCenterNPCFOV, (Action<NPCLoader>)delegate(NPCLoader loader)
+		SetRenderNPCModel(UI.TEX_NPCMODEL_DRAGON, 6, new Vector3(-0.1f, -2.18f, 12f), new Vector3(0f, 169f, 0f), MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.questCenterNPCFOV, delegate(NPCLoader loader)
 		{
 			dragonLoader = loader;
 			dragonLoader.GetAnimator().Play(dragonActiveList[dragonAnimIndex]);
-			SoundManager.PlayVoice((!isOurs) ? 600024 : 600026);
+			SoundManager.PlayVoice(isOurs ? 600026 : 600024);
 		});
 	}
 
 	private void Update()
 	{
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		if (pamelaActiveList != null && pamelaLoader != null && pamelaAnimIndex < pamelaActiveList.Count)
+		if (pamelaActiveList != null && pamelaLoader != null && pamelaAnimIndex < pamelaActiveList.Count && pamelaLoader.GetAnimator().GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
 		{
-			AnimatorStateInfo currentAnimatorStateInfo = pamelaLoader.GetAnimator().GetCurrentAnimatorStateInfo(0);
-			if (currentAnimatorStateInfo.get_normalizedTime() >= 1f)
+			pamelaAnimIndex++;
+			if (pamelaAnimIndex < pamelaActiveList.Count)
 			{
-				pamelaAnimIndex++;
-				if (pamelaAnimIndex < pamelaActiveList.Count)
+				if (!pamelaActiveList[pamelaAnimIndex].Contains("IDLE"))
 				{
-					if (!pamelaActiveList[pamelaAnimIndex].Contains("IDLE"))
-					{
-						SoundManager.PlayOneShotUISE((int)Enum.Parse(typeof(PamelaVoice), pamelaActiveList[pamelaAnimIndex]));
-					}
-					pamelaLoader.GetAnimator().Play(pamelaActiveList[pamelaAnimIndex]);
+					SoundManager.PlayOneShotUISE((int)Enum.Parse(typeof(PamelaVoice), pamelaActiveList[pamelaAnimIndex]));
 				}
+				pamelaLoader.GetAnimator().Play(pamelaActiveList[pamelaAnimIndex]);
 			}
 		}
-		if (dragonActiveList == null || !(dragonLoader != null) || dragonAnimIndex >= dragonActiveList.Count)
-		{
-			return;
-		}
-		AnimatorStateInfo currentAnimatorStateInfo2 = dragonLoader.GetAnimator().GetCurrentAnimatorStateInfo(0);
-		if (!currentAnimatorStateInfo2.IsName(dragonActiveList[dragonAnimIndex]))
+		if (dragonActiveList != null && dragonLoader != null && dragonAnimIndex < dragonActiveList.Count && !dragonLoader.GetAnimator().GetCurrentAnimatorStateInfo(0).IsName(dragonActiveList[dragonAnimIndex]))
 		{
 			dragonAnimIndex++;
 			if (dragonAnimIndex < dragonActiveList.Count)

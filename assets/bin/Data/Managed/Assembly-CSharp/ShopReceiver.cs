@@ -82,8 +82,7 @@ public class ShopReceiver : MonoBehaviourSingleton<ShopReceiver>
 		{
 			try
 			{
-				OriginalPurchaseData originalPurchaseData = JsonUtility.FromJson<OriginalPurchaseData>(json);
-				PaymentPurchaseData result2 = originalPurchaseData.result;
+				PaymentPurchaseData result2 = JsonUtility.FromJson<OriginalPurchaseData>(json).result;
 				if (result2.productType == 1)
 				{
 					onBuyItem(result2.productId);

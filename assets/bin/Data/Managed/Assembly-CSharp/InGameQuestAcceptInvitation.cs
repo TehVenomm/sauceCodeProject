@@ -168,28 +168,26 @@ public class InGameQuestAcceptInvitation : QuestAcceptInvitation
 
 	private void Reposition(bool isPortrait)
 	{
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
 		if (base._transform == null)
 		{
 			return;
 		}
-		Transform val = Utility.Find(base._transform, "SCR_QUEST");
-		if (val != null)
+		Transform transform = Utility.Find(base._transform, "SCR_QUEST");
+		if (transform != null)
 		{
-			UIPanel panel = val.GetComponent<UIPanel>();
+			UIPanel panel = transform.GetComponent<UIPanel>();
 			if (panel != null)
 			{
 				if (isPortrait)
 				{
-					panel.clipRange = new Vector4(0f, 0f, 460f, 500f);
+					panel.baseClipRegion = new Vector4(0f, 0f, 460f, 500f);
 				}
 				else
 				{
-					panel.clipRange = new Vector4(0f, 0f, 460f, 260f);
+					panel.baseClipRegion = new Vector4(0f, 0f, 460f, 260f);
 				}
 			}
-			UIScrollView component = val.GetComponent<UIScrollView>();
+			UIScrollView component = transform.GetComponent<UIScrollView>();
 			if (component != null)
 			{
 				component.ResetPosition();
@@ -201,7 +199,7 @@ public class InGameQuestAcceptInvitation : QuestAcceptInvitation
 				});
 			}
 		}
-		UIScreenRotationHandler[] componentsInChildren = this.get_gameObject().GetComponentsInChildren<UIScreenRotationHandler>();
+		UIScreenRotationHandler[] componentsInChildren = base.gameObject.GetComponentsInChildren<UIScreenRotationHandler>();
 		for (int j = 0; j < componentsInChildren.Length; j++)
 		{
 			componentsInChildren[j].InvokeRotate();
@@ -213,11 +211,11 @@ public class InGameQuestAcceptInvitation : QuestAcceptInvitation
 	{
 		if (base.transferUI != null)
 		{
-			isInActiveRotate = !base.transferUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.transferUI.gameObject.activeInHierarchy;
 		}
 		else if (base.collectUI != null)
 		{
-			isInActiveRotate = !base.collectUI.get_gameObject().get_activeInHierarchy();
+			isInActiveRotate = !base.collectUI.gameObject.activeInHierarchy;
 		}
 		if (!isInActiveRotate)
 		{

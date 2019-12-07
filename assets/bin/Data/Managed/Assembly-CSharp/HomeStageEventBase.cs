@@ -6,14 +6,9 @@ public class HomeStageEventBase : MonoBehaviour
 
 	public object eventData;
 
-	public HomeStageEventBase()
-		: this()
-	{
-	}
-
 	protected virtual void Awake()
 	{
-		this.get_gameObject().set_layer(GetLayer());
+		base.gameObject.layer = GetLayer();
 	}
 
 	protected virtual int GetLayer()
@@ -40,11 +35,11 @@ public class HomeStageEventBase : MonoBehaviour
 		}
 		if (eventName.Contains("EVENT_COUNTER") && (int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level < 20)
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomeStageEventBase", this.get_gameObject(), "QUEST_LOCK");
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomeStageEventBase", base.gameObject, "QUEST_LOCK");
 		}
 		else if (!eventName.Contains("POINT_SHOP") && (!eventName.Contains("ARENA_LIST") || (MonoBehaviourSingleton<UserInfoManager>.I.isArenaOpen && (int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level >= 50)) && (!eventName.Contains("BINGO") || MonoBehaviourSingleton<QuestManager>.I.IsBingoPlayableEventExist()) && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
 		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomeStageEventBase", this.get_gameObject(), eventName, eventData);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomeStageEventBase", base.gameObject, eventName, eventData);
 		}
 	}
 }

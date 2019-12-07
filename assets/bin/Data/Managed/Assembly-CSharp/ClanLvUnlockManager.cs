@@ -21,11 +21,6 @@ public class ClanLvUnlockManager : MonoBehaviour
 
 	private UserClanData m_clanData;
 
-	public ClanLvUnlockManager()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
 		m_clanData = MonoBehaviourSingleton<ClanMatchingManager>.I.userClanData;
@@ -42,7 +37,7 @@ public class ClanLvUnlockManager : MonoBehaviour
 	{
 		if (m_clanData == null)
 		{
-			Debug.LogError((object)"m_clanData is null");
+			Debug.LogError("m_clanData is null");
 		}
 		else
 		{
@@ -50,11 +45,11 @@ public class ClanLvUnlockManager : MonoBehaviour
 			{
 				return;
 			}
-			foreach (GameObject val in objs)
+			foreach (GameObject gameObject in objs)
 			{
-				if (!(val == null))
+				if (!(gameObject == null))
 				{
-					val.SetActive(false);
+					gameObject.SetActive(value: false);
 				}
 			}
 		}

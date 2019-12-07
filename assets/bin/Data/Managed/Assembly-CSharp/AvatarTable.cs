@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class AvatarTable : Singleton<AvatarTable>, IDataTable
@@ -81,12 +80,6 @@ public class AvatarTable : Singleton<AvatarTable>, IDataTable
 	}
 
 	private UIntKeyTable<AvatarData> avatarTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<AvatarData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<AvatarData> _003C_003Ef__mg_0024cache1;
 
 	public int[] manHeadIDs
 	{
@@ -174,10 +167,6 @@ public class AvatarTable : Singleton<AvatarTable>, IDataTable
 
 	public void ConvertTable()
 	{
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
 		List<int> list = new List<int>();
 		List<int> list2 = new List<int>();
 		List<int> list3 = new List<int>();
@@ -211,11 +200,11 @@ public class AvatarTable : Singleton<AvatarTable>, IDataTable
 			}
 			if (data.hasSkinColor)
 			{
-				list5.Add(Color32.op_Implicit(data.skinColor));
+				list5.Add(data.skinColor);
 			}
 			if (data.hasHairColor)
 			{
-				list6.Add(Color32.op_Implicit(data.hairColor));
+				list6.Add(data.hairColor);
 			}
 			if (data.defaultHasManHeadIndex >= 0)
 			{
@@ -282,13 +271,13 @@ public class AvatarTable : Singleton<AvatarTable>, IDataTable
 
 	public string GetFaceName(bool isWoman, int index)
 	{
-		Type type = (!isWoman) ? Type.ManFace : Type.WomanFace;
+		Type type = isWoman ? Type.WomanFace : Type.ManFace;
 		return GetName(type, index);
 	}
 
 	public string GetVoiceName(bool isWoman, int index)
 	{
-		Type type = (!isWoman) ? Type.ManVoice : Type.WomanVoice;
+		Type type = isWoman ? Type.WomanVoice : Type.ManVoice;
 		return GetName(type, index);
 	}
 
@@ -315,7 +304,7 @@ public class AvatarTable : Singleton<AvatarTable>, IDataTable
 				return data.name;
 			}
 		}
-		return string.Empty;
+		return "";
 	}
 
 	public int GetCount()

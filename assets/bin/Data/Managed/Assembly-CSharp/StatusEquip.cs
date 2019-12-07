@@ -195,7 +195,11 @@ public class StatusEquip : EquipSelectBase
 
 	protected virtual SortBase.DIALOG_TYPE GetDialogType(bool isWeapon)
 	{
-		return (!isWeapon) ? SortBase.DIALOG_TYPE.ARMOR : SortBase.DIALOG_TYPE.WEAPON;
+		if (!isWeapon)
+		{
+			return SortBase.DIALOG_TYPE.ARMOR;
+		}
+		return SortBase.DIALOG_TYPE.WEAPON;
 	}
 
 	protected override void InitLocalInventory()
@@ -270,9 +274,9 @@ public class StatusEquip : EquipSelectBase
 			equipSetInfo.item[selectEquipSetData.index] = select_item;
 		}
 		MonoBehaviourSingleton<StatusManager>.I.CalcSelfStatusParam(equipSetInfo, out int _atk, out int _def, out int _hp, out int _, out int _);
-		SetLabelText((Enum)UI.LBL_STATUS_ATK, _atk.ToString());
-		SetLabelText((Enum)UI.LBL_STATUS_DEF, _def.ToString());
-		SetLabelText((Enum)UI.LBL_STATUS_HP, _hp.ToString());
+		SetLabelText(UI.LBL_STATUS_ATK, _atk.ToString());
+		SetLabelText(UI.LBL_STATUS_DEF, _def.ToString());
+		SetLabelText(UI.LBL_STATUS_HP, _hp.ToString());
 		int atk = 0;
 		int def = 0;
 		int hp = 0;
@@ -298,44 +302,44 @@ public class StatusEquip : EquipSelectBase
 			int num2 = (compareItemData != null) ? (compareItemData.atk + compareItemData.elemAtk + atk) : 0;
 			int num3 = (select_item != null) ? (select_item.atk + select_item.elemAtk + atk2) : 0;
 			int num4 = num3 - num2;
-			string format = (num4 <= 0) ? "{0}" : base.sectionData.GetText("DISP_PLUS");
-			SetLabelCompareParam((Enum)UI.LBL_STATUS_ADD_ATK, num3, num2, string.Format(format, num4));
-			SetActive((Enum)UI.LBL_STATUS_ADD_ATK, num4 != 0);
+			string format = (num4 > 0) ? base.sectionData.GetText("DISP_PLUS") : "{0}";
+			SetLabelCompareParam(UI.LBL_STATUS_ADD_ATK, num3, num2, string.Format(format, num4));
+			SetActive(UI.LBL_STATUS_ADD_ATK, num4 != 0);
 			int num5 = (compareItemData != null) ? (compareItemData.def + def) : 0;
 			int num6 = (select_item != null) ? (select_item.def + def2) : 0;
 			int num7 = num6 - num5;
-			string format2 = (num7 <= 0) ? "{0}" : base.sectionData.GetText("DISP_PLUS");
-			SetLabelCompareParam((Enum)UI.LBL_STATUS_ADD_DEF, num6, num5, string.Format(format2, num7));
-			SetActive((Enum)UI.LBL_STATUS_ADD_DEF, num7 != 0);
+			string format2 = (num7 > 0) ? base.sectionData.GetText("DISP_PLUS") : "{0}";
+			SetLabelCompareParam(UI.LBL_STATUS_ADD_DEF, num6, num5, string.Format(format2, num7));
+			SetActive(UI.LBL_STATUS_ADD_DEF, num7 != 0);
 			int num8 = (compareItemData != null) ? (compareItemData.hp + hp) : 0;
 			int num9 = (select_item != null) ? (select_item.hp + hp2) : 0;
 			int num10 = num9 - num8;
-			string format3 = (num10 <= 0) ? "{0}" : base.sectionData.GetText("DISP_PLUS");
-			SetLabelCompareParam((Enum)UI.LBL_STATUS_ADD_HP, num9, num8, string.Format(format3, num10));
-			SetActive((Enum)UI.LBL_STATUS_ADD_HP, num10 != 0);
+			string format3 = (num10 > 0) ? base.sectionData.GetText("DISP_PLUS") : "{0}";
+			SetLabelCompareParam(UI.LBL_STATUS_ADD_HP, num9, num8, string.Format(format3, num10));
+			SetActive(UI.LBL_STATUS_ADD_HP, num10 != 0);
 		}
 		else
 		{
 			int num11 = atk;
 			int num12 = atk2;
 			int num13 = num12 - num11;
-			string format4 = (num13 <= 0) ? "{0}" : base.sectionData.GetText("DISP_PLUS");
-			SetLabelCompareParam((Enum)UI.LBL_STATUS_ADD_ATK, num12, num11, string.Format(format4, num13));
-			SetActive((Enum)UI.LBL_STATUS_ADD_ATK, num13 != 0);
+			string format4 = (num13 > 0) ? base.sectionData.GetText("DISP_PLUS") : "{0}";
+			SetLabelCompareParam(UI.LBL_STATUS_ADD_ATK, num12, num11, string.Format(format4, num13));
+			SetActive(UI.LBL_STATUS_ADD_ATK, num13 != 0);
 			int num14 = def;
 			int num15 = def2;
 			int num16 = num15 - num14;
-			string format5 = (num16 <= 0) ? "{0}" : base.sectionData.GetText("DISP_PLUS");
-			SetLabelCompareParam((Enum)UI.LBL_STATUS_ADD_DEF, num15, num14, string.Format(format5, num16));
-			SetActive((Enum)UI.LBL_STATUS_ADD_DEF, num16 != 0);
+			string format5 = (num16 > 0) ? base.sectionData.GetText("DISP_PLUS") : "{0}";
+			SetLabelCompareParam(UI.LBL_STATUS_ADD_DEF, num15, num14, string.Format(format5, num16));
+			SetActive(UI.LBL_STATUS_ADD_DEF, num16 != 0);
 			int num17 = hp;
 			int num18 = hp2;
 			int num19 = num18 - num17;
-			string format6 = (num19 <= 0) ? "{0}" : base.sectionData.GetText("DISP_PLUS");
-			SetLabelCompareParam((Enum)UI.LBL_STATUS_ADD_HP, num18, num17, string.Format(format6, num19));
-			SetActive((Enum)UI.LBL_STATUS_ADD_HP, num19 != 0);
+			string format6 = (num19 > 0) ? base.sectionData.GetText("DISP_PLUS") : "{0}";
+			SetLabelCompareParam(UI.LBL_STATUS_ADD_HP, num18, num17, string.Format(format6, num19));
+			SetActive(UI.LBL_STATUS_ADD_HP, num19 != 0);
 		}
-		SetActive((Enum)UI.OBJ_SELL_ROOT, is_visible: false);
+		SetActive(UI.OBJ_SELL_ROOT, is_visible: false);
 		if (select_item == null)
 		{
 			string text = base.sectionData.GetText("NON_DATA");
@@ -343,40 +347,40 @@ public class StatusEquip : EquipSelectBase
 			{
 				if (compareItemData.tableData.IsWeapon())
 				{
-					SetActive((Enum)UI.OBJ_ELEM_ROOT, compareItemData.elemAtk > 0);
-					SetElementSprite((Enum)UI.SPR_ELEM, compareItemData.GetElemAtkType());
-					SetLabelCompareParam((Enum)UI.LBL_ATK, -compareItemData.atk, 0, 0);
-					SetLabelCompareParam((Enum)UI.LBL_ELEM, -compareItemData.elemAtk, 0, 0);
+					SetActive(UI.OBJ_ELEM_ROOT, compareItemData.elemAtk > 0);
+					SetElementSprite(UI.SPR_ELEM, compareItemData.GetElemAtkType());
+					SetLabelCompareParam(UI.LBL_ATK, -compareItemData.atk, 0, 0);
+					SetLabelCompareParam(UI.LBL_ELEM, -compareItemData.elemAtk, 0, 0);
 				}
 				else
 				{
-					SetActive((Enum)UI.OBJ_ELEM_ROOT, compareItemData.elemDef > 0);
-					SetDefElementSprite((Enum)UI.SPR_ELEM, compareItemData.GetElemDefType());
-					SetLabelCompareParam((Enum)UI.LBL_DEF, -compareItemData.def, 0, 0);
-					SetLabelCompareParam((Enum)UI.LBL_ELEM, -compareItemData.elemDef, 0, 0);
+					SetActive(UI.OBJ_ELEM_ROOT, compareItemData.elemDef > 0);
+					SetDefElementSprite(UI.SPR_ELEM, compareItemData.GetElemDefType());
+					SetLabelCompareParam(UI.LBL_DEF, -compareItemData.def, 0, 0);
+					SetLabelCompareParam(UI.LBL_ELEM, -compareItemData.elemDef, 0, 0);
 				}
 			}
 			else
 			{
 				bool flag2 = selectEquipSetData.index < 3;
-				SetLabelCompareParam((Enum)UI.LBL_ATK, 0, 0, -1);
-				SetLabelCompareParam((Enum)UI.LBL_DEF, 0, 0, -1);
-				SetActive((Enum)UI.OBJ_ATK_ROOT, flag2);
-				SetActive((Enum)UI.OBJ_DEF_ROOT, !flag2);
-				SetActive((Enum)UI.OBJ_ELEM_ROOT, is_visible: false);
+				SetLabelCompareParam(UI.LBL_ATK, 0, 0);
+				SetLabelCompareParam(UI.LBL_DEF, 0, 0);
+				SetActive(UI.OBJ_ATK_ROOT, flag2);
+				SetActive(UI.OBJ_DEF_ROOT, !flag2);
+				SetActive(UI.OBJ_ELEM_ROOT, is_visible: false);
 			}
-			SetLabelText((Enum)UI.LBL_NAME, base.sectionData.GetText("EMPTY"));
-			SetLabelCompareParam((Enum)UI.LBL_LV_NOW, 0, 0, text);
-			SetLabelCompareParam((Enum)UI.LBL_LV_MAX, 0, 0, text);
-			SetActive((Enum)UI.OBJ_SKILL_BUTTON_ROOT, is_visible: false);
-			SetActive((Enum)UI.TBL_ABILITY, is_visible: false);
-			SetActive((Enum)UI.STR_NON_ABILITY, is_visible: false);
-			SetActive((Enum)UI.SPR_IS_EVOLVE, is_visible: false);
-			SetEquipmentTypeIcon((Enum)UI.SPR_TYPE_ICON, (Enum)UI.SPR_TYPE_ICON_BG, (Enum)UI.SPR_TYPE_ICON_RARITY, (EquipItemTable.EquipItemData)null);
+			SetLabelText(UI.LBL_NAME, base.sectionData.GetText("EMPTY"));
+			SetLabelCompareParam(UI.LBL_LV_NOW, 0, 0, text);
+			SetLabelCompareParam(UI.LBL_LV_MAX, 0, 0, text);
+			SetActive(UI.OBJ_SKILL_BUTTON_ROOT, is_visible: false);
+			SetActive(UI.TBL_ABILITY, is_visible: false);
+			SetActive(UI.STR_NON_ABILITY, is_visible: false);
+			SetActive(UI.SPR_IS_EVOLVE, is_visible: false);
+			SetEquipmentTypeIcon(UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, null);
 		}
 		else
 		{
-			SetActive((Enum)UI.TBL_ABILITY, is_visible: true);
+			SetActive(UI.TBL_ABILITY, is_visible: true);
 			base.EquipParam();
 		}
 	}
@@ -391,7 +395,7 @@ public class StatusEquip : EquipSelectBase
 			SkillSlotUIData[] skillSlotData = GetSkillSlotData(item);
 			if (skillSlotData != null)
 			{
-				int index;
+				int index = default(int);
 				Array.ForEach(skillSlotData, delegate(SkillSlotUIData data)
 				{
 					if (data != null && data.slotData.skill_id != 0)
@@ -413,7 +417,7 @@ public class StatusEquip : EquipSelectBase
 									{
 										elem_atk += _elem_atk;
 									}
-									index++;
+									int num = ++index;
 								});
 								break;
 							case ELEMENT_TYPE.MAX:
@@ -434,7 +438,11 @@ public class StatusEquip : EquipSelectBase
 
 	protected virtual bool IsCreateRemoveButton()
 	{
-		return selectEquipSetData.index != 0 && selectEquipSetData.index != 3;
+		if (selectEquipSetData.index != 0)
+		{
+			return selectEquipSetData.index != 3;
+		}
+		return false;
 	}
 
 	protected override void LocalInventory()
@@ -444,7 +452,7 @@ public class StatusEquip : EquipSelectBase
 		{
 			return;
 		}
-		SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
+		SetLabelText(UI.LBL_SORT, sortSettings.GetSortLabel());
 		bool created_remove_btn = false;
 		EquipItemInfo equipping_item = GetCompareItemData();
 		int find_index = -1;
@@ -459,7 +467,7 @@ public class StatusEquip : EquipSelectBase
 		created_remove_btn = IsCreateRemoveButton();
 		m_generatedIconList.Clear();
 		UpdateNewIconInfo();
-		SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length + 2, reset: false, (Func<int, bool>)delegate(int i)
+		SetDynamicList(InventoryUI, null, localInventoryEquipData.Length + 2, reset: false, delegate(int i)
 		{
 			if (created_remove_btn && i == 0)
 			{
@@ -496,9 +504,9 @@ public class StatusEquip : EquipSelectBase
 				}
 			}
 			return flag3;
-		}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		}, null, delegate(int i, Transform t, bool is_recycle)
 		{
-			if (i == 0 && created_remove_btn)
+			if ((i == 0) & created_remove_btn)
 			{
 				CreateRemoveIcon(t, "TRY_ON", -1, 100, selectInventoryIndex == -1, base.sectionData.GetText("STR_DETACH"));
 			}
@@ -529,7 +537,7 @@ public class StatusEquip : EquipSelectBase
 				if (num2 < 0)
 				{
 					int equipIndex = GetEquipIndex(equipItemSortData.equipData);
-					num2 = ((equipIndex < 0) ? equipIndex : 3);
+					num2 = ((equipIndex >= 0) ? 3 : equipIndex);
 				}
 				bool is_select = num == selectInventoryIndex;
 				ITEM_ICON_TYPE iconType = equipItemSortData.GetIconType();
@@ -543,7 +551,7 @@ public class StatusEquip : EquipSelectBase
 				else
 				{
 					int equip_index = -1;
-					if (num2 > -1 || flag)
+					if ((num2 > -1) | flag)
 					{
 						equip_index = (equipItemData.IsWeapon() ? (num2 + 1) : 0);
 					}
@@ -645,8 +653,8 @@ public class StatusEquip : EquipSelectBase
 	protected bool OnSelectItemAndChekIsGoStatus()
 	{
 		EquipItemInfo equipItem = EquipItem;
-		ulong num = (equipItem == null) ? 0 : equipItem.uniqueID;
-		if (num == 0 && !IsCreateRemoveButton())
+		ulong num = equipItem?.uniqueID ?? 0;
+		if (num == 0L && !IsCreateRemoveButton())
 		{
 			GameSection.ChangeEvent("NO_SELECTED");
 			return false;
@@ -661,8 +669,7 @@ public class StatusEquip : EquipSelectBase
 			return false;
 		}
 		EquipItemInfo compareItemData = GetCompareItemData();
-		ulong num2 = (compareItemData == null) ? 0 : compareItemData.uniqueID;
-		if (num2 != num)
+		if ((compareItemData?.uniqueID ?? 0) != num)
 		{
 			if (equipItem != null && !MonoBehaviourSingleton<GameSceneManager>.I.CheckEquipItemAndOpenUpdateAppDialog(equipItem.tableData, OnCancelSelect))
 			{
@@ -827,7 +834,7 @@ public class StatusEquip : EquipSelectBase
 						selectInventoryIndex = 0;
 					}
 				}
-				EquipItem = ((selectInventoryIndex == -1) ? null : (localInventoryEquipData[selectInventoryIndex].GetItemData() as EquipItemInfo));
+				EquipItem = ((selectInventoryIndex != -1) ? (localInventoryEquipData[selectInventoryIndex].GetItemData() as EquipItemInfo) : null);
 				if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
 				{
 					MonoBehaviourSingleton<StatusStageManager>.I.SetEquipInfo(EquipItem);
@@ -892,7 +899,7 @@ public class StatusEquip : EquipSelectBase
 		migrationSendCount = list2.Count + list.Count;
 		GameSection.SetEventData(new ChangeEquipData(selectEquipSetData.setNo, selectEquipSetData.index, migrationSelectItem));
 		GameSection.StayEvent();
-		this.StartCoroutine(SendReplacementSkill(list2, list));
+		StartCoroutine(SendReplacementSkill(list2, list));
 	}
 
 	protected virtual void ChangeSwapEquipConfirm(int slotNo, string equipName)
@@ -907,11 +914,11 @@ public class StatusEquip : EquipSelectBase
 	private IEnumerator SendReplacementSkill(List<MigrationSkillData> migrationSkill, List<SkillItemInfo> detachSkill)
 	{
 		bool isSendFinish = false;
-		foreach (MigrationSkillData migration in migrationSkill)
+		foreach (MigrationSkillData item in migrationSkill)
 		{
 			isSendFinish = false;
-			MigrationSkillData i = migration;
-			MonoBehaviourSingleton<StatusManager>.I.SendSetSkill(i.toUniqueId, i.skill.uniqueID, i.toSlotNo, MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo(), delegate(bool isSucces)
+			MigrationSkillData migrationSkillData = item;
+			MonoBehaviourSingleton<StatusManager>.I.SendSetSkill(migrationSkillData.toUniqueId, migrationSkillData.skill.uniqueID, migrationSkillData.toSlotNo, MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo(), delegate(bool isSucces)
 			{
 				MigrationSkillCallback(isSucces);
 				isSendFinish = true;
@@ -921,16 +928,16 @@ public class StatusEquip : EquipSelectBase
 				yield return null;
 			}
 		}
-		foreach (SkillItemInfo detach in detachSkill)
+		foreach (SkillItemInfo item2 in detachSkill)
 		{
 			isSendFinish = false;
-			SkillItemInfo d = detach;
-			EquipSetSkillData setInfo = d.equipSetSkill.Find((EquipSetSkillData x) => x.equipSetNo == MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo());
+			SkillItemInfo skillItemInfo = item2;
+			EquipSetSkillData equipSetSkillData = skillItemInfo.equipSetSkill.Find((EquipSetSkillData x) => x.equipSetNo == MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo());
 			if (StatusManager.IsUnique())
 			{
-				setInfo = d.uniqueEquipSetSkill;
+				equipSetSkillData = skillItemInfo.uniqueEquipSetSkill;
 			}
-			MonoBehaviourSingleton<StatusManager>.I.SendDetachSkill(setInfo.equipItemUniqId, setInfo.equipSlotNo, setInfo.equipSetNo, delegate(bool isSucces)
+			MonoBehaviourSingleton<StatusManager>.I.SendDetachSkill(equipSetSkillData.equipItemUniqId, equipSetSkillData.equipSlotNo, equipSetSkillData.equipSetNo, delegate(bool isSucces)
 			{
 				MigrationSkillCallback(isSucces);
 				isSendFinish = true;
@@ -970,7 +977,7 @@ public class StatusEquip : EquipSelectBase
 		{
 			int currentEquipSetNo = MonoBehaviourSingleton<StatusManager>.I.GetCurrentEquipSetNo();
 			GameSection.StayEvent();
-			this.StartCoroutine(SendRemoveAllSkill(migrationOldItem.uniqueID, currentEquipSetNo));
+			StartCoroutine(SendRemoveAllSkill(migrationOldItem.uniqueID, currentEquipSetNo));
 		}
 	}
 

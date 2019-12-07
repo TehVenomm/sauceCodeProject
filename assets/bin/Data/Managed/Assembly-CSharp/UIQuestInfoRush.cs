@@ -15,7 +15,7 @@ public class UIQuestInfoRush : MonoBehaviourSingleton<UIQuestInfoRush>
 
 	private void Start()
 	{
-		this.get_gameObject().SetActive(IsEnable());
+		base.gameObject.SetActive(IsEnable());
 		if (IsEnable())
 		{
 			int num = QuestTable.GetSameRushQuestData((uint)MonoBehaviourSingleton<InGameManager>.I.rushId).Count - 1;
@@ -39,7 +39,11 @@ public class UIQuestInfoRush : MonoBehaviourSingleton<UIQuestInfoRush>
 
 	private bool IsEnable()
 	{
-		return QuestManager.IsValidInGame() && MonoBehaviourSingleton<InGameManager>.I.IsRush();
+		if (QuestManager.IsValidInGame())
+		{
+			return MonoBehaviourSingleton<InGameManager>.I.IsRush();
+		}
+		return false;
 	}
 
 	public void SetWaveNow(int num)

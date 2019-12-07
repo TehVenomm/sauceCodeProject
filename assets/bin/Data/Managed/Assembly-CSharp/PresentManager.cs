@@ -58,7 +58,7 @@ public class PresentManager : MonoBehaviourSingleton<PresentManager>
 				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_PRESENT_LIST);
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendReceivePresent(List<string> uniqIds, Action<bool, Error, int> call_back)
@@ -88,7 +88,7 @@ public class PresentManager : MonoBehaviourSingleton<PresentManager>
 				}
 			}
 			call_back(arg, ret.Error, arg2);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGetPresentTotalCount(Action<bool> call_back)
@@ -105,7 +105,7 @@ public class PresentManager : MonoBehaviourSingleton<PresentManager>
 				}
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDebugAddPresent(int rewardType, int actionType, string comment, int num, int id, int p0, int p1, Action<bool> call_back)
@@ -128,7 +128,7 @@ public class PresentManager : MonoBehaviourSingleton<PresentManager>
 				DirtyPresentNum();
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendDebugAddCrystal(int num, Action<bool> call_back)
@@ -156,7 +156,7 @@ public class PresentManager : MonoBehaviourSingleton<PresentManager>
 			{
 				call_back(obj: false);
 			}
-		}, string.Empty);
+		});
 	}
 
 	public void SetPresentNum(int presentNum)

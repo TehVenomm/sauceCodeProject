@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 public class TradingPostTable : Singleton<TradingPostTable>, IDataTable
 {
 	public class ItemData
@@ -34,12 +32,6 @@ public class TradingPostTable : Singleton<TradingPostTable>, IDataTable
 	}
 
 	private UIntKeyTable<ItemData> itemTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<ItemData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<ItemData> _003C_003Ef__mg_0024cache1;
 
 	public UIntKeyTable<ItemData> ItemTable => itemTable;
 
@@ -81,8 +73,7 @@ public class TradingPostTable : Singleton<TradingPostTable>, IDataTable
 		{
 			return false;
 		}
-		ItemData itemData = itemTable.Get(id);
-		if (itemData == null)
+		if (itemTable.Get(id) == null)
 		{
 			return false;
 		}

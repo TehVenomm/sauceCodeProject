@@ -27,17 +27,17 @@ public class Chat_Model_JackpotWin : Chat_Model_Base
 		chat_Model_JackpotWin.m_packetType = CHAT_PACKET_TYPE.JACKPOT_WIN_UPDATE;
 		chat_Model_JackpotWin.payload = str.Substring(Chat_Model_Base.PAYLOAD_ORIGIN_INDEX);
 		chat_Model_JackpotWin.jacpotData = str.Substring(40);
-		Chat_Model_JackpotWin chat_Model_JackpotWin2 = chat_Model_JackpotWin;
-		chat_Model_JackpotWin2.SetErrorType("0");
-		return chat_Model_JackpotWin2;
+		chat_Model_JackpotWin.SetErrorType("0");
+		return chat_Model_JackpotWin;
 	}
 
 	public static Chat_Model_JackpotWin Create(string flag)
 	{
-		Chat_Model_JackpotWin chat_Model_JackpotWin = new Chat_Model_JackpotWin();
-		chat_Model_JackpotWin.jacpotData = flag;
-		Chat_Model_JackpotWin chat_Model_JackpotWin2 = chat_Model_JackpotWin;
-		chat_Model_JackpotWin2.payload = chat_Model_JackpotWin2.Serialize();
-		return chat_Model_JackpotWin2;
+		Chat_Model_JackpotWin obj = new Chat_Model_JackpotWin
+		{
+			jacpotData = flag
+		};
+		obj.payload = obj.Serialize();
+		return obj;
 	}
 }

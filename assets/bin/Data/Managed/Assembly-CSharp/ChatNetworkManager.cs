@@ -38,7 +38,7 @@ public class ChatNetworkManager : MonoBehaviourSingleton<ChatNetworkManager>
 	protected override void Awake()
 	{
 		base.Awake();
-		packetReceiver = this.get_gameObject().AddComponent<ChatPacketReceiver>();
+		packetReceiver = base.gameObject.AddComponent<ChatPacketReceiver>();
 	}
 
 	private void Clear()
@@ -47,9 +47,7 @@ public class ChatNetworkManager : MonoBehaviourSingleton<ChatNetworkManager>
 
 	private void Logd(string str, params object[] objs)
 	{
-		if (!Log.enabled)
-		{
-		}
+		_ = Log.enabled;
 	}
 
 	private void Update()
@@ -59,34 +57,34 @@ public class ChatNetworkManager : MonoBehaviourSingleton<ChatNetworkManager>
 
 	public void PacketUpdate()
 	{
-		List<ChatPacket> list = rymTPool<List<ChatPacket>>.Get();
-		if (list.Capacity < packetReceiver.packets.Count)
+		List<ChatPacket> obj = rymTPool<List<ChatPacket>>.Get();
+		if (obj.Capacity < packetReceiver.packets.Count)
 		{
-			list.Capacity = packetReceiver.packets.Count;
+			obj.Capacity = packetReceiver.packets.Count;
 		}
 		int i = 0;
-		for (int count = list.Count; i < count; i++)
+		for (int count = obj.Count; i < count; i++)
 		{
-			list[i] = packetReceiver.packets[i];
+			obj[i] = packetReceiver.packets[i];
 		}
 		int j = 0;
-		for (int count2 = list.Count; j < count2; j++)
+		for (int count2 = obj.Count; j < count2; j++)
 		{
-			ChatPacket packet = list[j];
+			ChatPacket packet = obj[j];
 			if (HandleChatPacket(packet))
 			{
 				packetReceiver.AddDeleteQueue(packet);
 			}
 		}
-		list.Clear();
-		rymTPool<List<ChatPacket>>.Release(ref list);
+		obj.Clear();
+		rymTPool<List<ChatPacket>>.Release(ref obj);
 		packetReceiver.EraseUsedPacket();
 	}
 
 	private bool HandleChatPacket(ChatPacket packet)
 	{
 		bool flag = false;
-		CHAT_PACKET_TYPE packetType = packet.packetType;
+		_ = packet.packetType;
 		Logd(packet.ToString());
 		return true;
 	}

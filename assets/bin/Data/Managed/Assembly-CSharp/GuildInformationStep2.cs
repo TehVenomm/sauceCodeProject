@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -82,11 +81,11 @@ public class GuildInformationStep2 : GameSection
 		mapIndex = mCreateRequest.GuildMapID;
 		UpdateMap();
 		bool flag = MonoBehaviourSingleton<GuildManager>.I.guildData != null && MonoBehaviourSingleton<GuildManager>.I.guildData.clanId != -1;
-		SetActive((Enum)UI.BTN_NEXT, !flag);
-		SetActive((Enum)UI.BTN_NEXT_UPDATE, flag);
-		SetActive((Enum)UI.SPR_TYPE_INFO, is_visible: false);
-		SetTouchAndRelease((Enum)UI.BTN_INFO, "TYPE_INFO_SHOW", "TYPE_INFO_HIDE", (object)null);
-		SetActive((Enum)UI.SPR_TYPE_INFO, is_visible: false);
+		SetActive(UI.BTN_NEXT, !flag);
+		SetActive(UI.BTN_NEXT_UPDATE, flag);
+		SetActive(UI.SPR_TYPE_INFO, is_visible: false);
+		SetTouchAndRelease(UI.BTN_INFO, "TYPE_INFO_SHOW", "TYPE_INFO_HIDE");
+		SetActive(UI.SPR_TYPE_INFO, is_visible: false);
 		SetSupportEncoding(UI.STR_TYPE_INFOR, isEnable: true);
 		mCreateRequest.SetGuildType(mCreateRequest.GuildType);
 		mCreateRequest.SetGuildMinLevel(int.Parse(levelNames[levelIndex]));
@@ -101,19 +100,19 @@ public class GuildInformationStep2 : GameSection
 	private void UpdateMinLevel()
 	{
 		int index = levelIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_MIN_LEVEL, levelNames[index]);
+		SetLabelText(UI.LBL_TARGET_MIN_LEVEL, levelNames[index]);
 	}
 
 	private void UpdateLock()
 	{
 		int index = lockIndex;
-		SetLabelText((Enum)UI.LBL_TARGET_LOCK, lockNames[index]);
+		SetLabelText(UI.LBL_TARGET_LOCK, lockNames[index]);
 	}
 
 	private void UpdateMap()
 	{
-		SetSprite((Enum)UI.SPR_MAP, spriteMapNames[mapIndex]);
-		SetLabelText((Enum)UI.STR_MAP_ADDITION, additioonMapInfos[mapIndex]);
+		SetSprite(UI.SPR_MAP, spriteMapNames[mapIndex]);
+		SetLabelText(UI.STR_MAP_ADDITION, additioonMapInfos[mapIndex]);
 	}
 
 	private void OnQuery_MAP_NEXT()
@@ -204,11 +203,11 @@ public class GuildInformationStep2 : GameSection
 
 	private void OnQuery_TYPE_INFO_SHOW()
 	{
-		SetActive((Enum)UI.SPR_TYPE_INFO, is_visible: true);
+		SetActive(UI.SPR_TYPE_INFO, is_visible: true);
 	}
 
 	private void OnQuery_TYPE_INFO_HIDE()
 	{
-		SetActive((Enum)UI.SPR_TYPE_INFO, is_visible: false);
+		SetActive(UI.SPR_TYPE_INFO, is_visible: false);
 	}
 }

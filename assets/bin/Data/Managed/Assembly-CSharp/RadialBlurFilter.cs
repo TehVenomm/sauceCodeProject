@@ -30,24 +30,20 @@ public class RadialBlurFilter : FilterBase
 
 	public void SetCenter(Vector2 screenPos)
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 		if (_blurMaterial != null)
 		{
-			_blurMaterial.SetVector("_Origin", Vector4.op_Implicit(screenPos));
+			_blurMaterial.SetVector("_Origin", screenPos);
 		}
 	}
 
 	private void Awake()
 	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Expected O, but got Unknown
 		_blurMaterial = new Material(ResourceUtility.FindShader("mobile/Custom/ImageEffect/RadialBlurFilter"));
 	}
 
 	public override void StartFilter()
 	{
-		postEffector = this.get_gameObject().AddComponent<PostEffector>();
+		postEffector = base.gameObject.AddComponent<PostEffector>();
 		postEffector.SetFilter(this);
 	}
 

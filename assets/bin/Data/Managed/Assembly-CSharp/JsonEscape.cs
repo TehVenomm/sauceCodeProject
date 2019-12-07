@@ -6,7 +6,7 @@ public static class JsonEscape
 	{
 		if (s == null || s.Length == 0)
 		{
-			return string.Empty;
+			return "";
 		}
 		char c = '\0';
 		int length = s.Length;
@@ -16,6 +16,15 @@ public static class JsonEscape
 			c = s[i];
 			switch (c)
 			{
+			case '"':
+			case '\\':
+				stringBuilder.Append('\\');
+				stringBuilder.Append(c);
+				continue;
+			case '/':
+				stringBuilder.Append('\\');
+				stringBuilder.Append(c);
+				continue;
 			case '\b':
 				stringBuilder.Append("\\b");
 				continue;
@@ -32,31 +41,16 @@ public static class JsonEscape
 				stringBuilder.Append("\\r");
 				continue;
 			}
-			if (c != '"')
+			if (c > '\u007f')
 			{
-				if (c == '/')
-				{
-					stringBuilder.Append('\\');
-					stringBuilder.Append(c);
-					continue;
-				}
-				if (c != '\\')
-				{
-					if (c > '\u007f')
-					{
-						int num = c;
-						string value = "\\u" + num.ToString("x4");
-						stringBuilder.Append(value);
-					}
-					else
-					{
-						stringBuilder.Append(c);
-					}
-					continue;
-				}
+				int num = c;
+				string value = "\\u" + num.ToString("x4");
+				stringBuilder.Append(value);
 			}
-			stringBuilder.Append('\\');
-			stringBuilder.Append(c);
+			else
+			{
+				stringBuilder.Append(c);
+			}
 		}
 		return stringBuilder.ToString();
 	}
@@ -65,7 +59,7 @@ public static class JsonEscape
 	{
 		if (s == null || s.Length == 0)
 		{
-			return string.Empty;
+			return "";
 		}
 		char c = '\0';
 		int length = s.Length;

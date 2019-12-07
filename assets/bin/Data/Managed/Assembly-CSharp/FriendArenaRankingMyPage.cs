@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -89,7 +88,7 @@ public class FriendArenaRankingMyPage : GameSection
 		}
 		else if (IsRankingJoin())
 		{
-			this.StartCoroutine(SendGetMyRcord());
+			StartCoroutine(SendGetMyRcord());
 		}
 		else
 		{
@@ -128,34 +127,34 @@ public class FriendArenaRankingMyPage : GameSection
 	{
 		if (!isExistArena)
 		{
-			SetLabelText((Enum)UI.LBL_ARENA_NAME, string.Empty);
-			SetLabelText((Enum)UI.LBL_END_DATE, string.Empty);
+			SetLabelText(UI.LBL_ARENA_NAME, "");
+			SetLabelText(UI.LBL_END_DATE, "");
 		}
 		else
 		{
-			SetLabelText((Enum)UI.LBL_ARENA_NAME, eventData.name);
+			SetLabelText(UI.LBL_ARENA_NAME, eventData.name);
 			string endDateString = QuestUtility.GetEndDateString(eventData);
-			SetLabelText((Enum)UI.LBL_END_DATE, endDateString);
+			SetLabelText(UI.LBL_END_DATE, endDateString);
 		}
 	}
 
 	private void UpdateRecord()
 	{
-		SetActive((Enum)UI.OBJ_NO_SCORE, !IsRankingJoin());
-		SetActive((Enum)UI.OBJ_SCORE, IsRankingJoin());
-		SetActive((Enum)UI.OBJ_MY_RANK, IsRankingJoin());
-		SetActive((Enum)UI.OBJ_NOT_EXIST, is_visible: false);
+		SetActive(UI.OBJ_NO_SCORE, !IsRankingJoin());
+		SetActive(UI.OBJ_SCORE, IsRankingJoin());
+		SetActive(UI.OBJ_MY_RANK, IsRankingJoin());
+		SetActive(UI.OBJ_NOT_EXIST, is_visible: false);
 		if (!isExistArena)
 		{
-			SetActive((Enum)UI.OBJ_NO_SCORE, is_visible: false);
-			SetActive((Enum)UI.OBJ_SCORE, is_visible: false);
-			SetActive((Enum)UI.OBJ_MY_RANK, is_visible: false);
-			SetActive((Enum)UI.OBJ_NOT_EXIST, is_visible: true);
+			SetActive(UI.OBJ_NO_SCORE, is_visible: false);
+			SetActive(UI.OBJ_SCORE, is_visible: false);
+			SetActive(UI.OBJ_MY_RANK, is_visible: false);
+			SetActive(UI.OBJ_NOT_EXIST, is_visible: true);
 			return;
 		}
 		if (!IsRankingJoin())
 		{
-			SetLabelText((Enum)UI.LBL_NO_TOTAL, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 29u), ARENA_RANK.S.ToString()));
+			SetLabelText(UI.LBL_NO_TOTAL, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 29u), ARENA_RANK.S.ToString()));
 			return;
 		}
 		UpdateRank();
@@ -187,27 +186,28 @@ public class FriendArenaRankingMyPage : GameSection
 		string text = num.ToString();
 		for (int i = 0; i < RankingNumUIs.Length; i++)
 		{
-			SetActive((Enum)RankingNumUIs[i], is_visible: false);
+			SetActive(RankingNumUIs[i], is_visible: false);
 		}
 		if (num <= 0)
 		{
-			SetActive((Enum)UI.SPR_RANK, is_visible: false);
-			SetActive((Enum)UI.SPR_OUT_OF_RANK, is_visible: true);
+			SetActive(UI.SPR_RANK, is_visible: false);
+			SetActive(UI.SPR_OUT_OF_RANK, is_visible: true);
 			return;
 		}
-		SetActive((Enum)UI.SPR_RANK, is_visible: true);
-		SetActive((Enum)UI.SPR_OUT_OF_RANK, is_visible: false);
+		SetActive(UI.SPR_RANK, is_visible: true);
+		SetActive(UI.SPR_OUT_OF_RANK, is_visible: false);
 		int num2 = (RankingNumUIs.Length - text.Length) / 2;
 		for (int j = 0; j < text.Length; j++)
 		{
 			int num3 = int.Parse(text[j].ToString());
-			if (j >= RankingNumUIs.Length)
+			if (j < RankingNumUIs.Length)
 			{
-				break;
+				int num4 = j + num2;
+				SetSprite(GetCtrl(RankingNumUIs[num4]), RankingNumbers[num3]);
+				SetActive(RankingNumUIs[num4], is_visible: true);
+				continue;
 			}
-			int num4 = j + num2;
-			SetSprite(GetCtrl(RankingNumUIs[num4]), RankingNumbers[num3]);
-			SetActive((Enum)RankingNumUIs[num4], is_visible: true);
+			break;
 		}
 	}
 

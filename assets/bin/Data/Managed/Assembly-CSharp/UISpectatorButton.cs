@@ -20,7 +20,7 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 	{
 		if (currentTarget == null)
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 		}
 	}
 
@@ -33,7 +33,7 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 	{
 		Player value = GetPlayers().First.Value;
 		SetTarget(value);
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 	}
 
 	public void OnPrev()
@@ -71,11 +71,11 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 
 	public void EndSpect()
 	{
-		if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient != null && Object.op_Implicit(MonoBehaviourSingleton<CoopManager>.I.coopMyClient.GetPlayer()))
+		if (MonoBehaviourSingleton<CoopManager>.I.coopMyClient != null && (bool)MonoBehaviourSingleton<CoopManager>.I.coopMyClient.GetPlayer())
 		{
 			MonoBehaviourSingleton<InGameCameraManager>.I.target = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.GetPlayer()._transform;
 		}
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 
 	public void LateUpdate()
@@ -126,6 +126,6 @@ public class UISpectatorButton : MonoBehaviourSingleton<UISpectatorButton>
 
 	public bool IsEnable()
 	{
-		return this.get_gameObject().get_activeSelf();
+		return base.gameObject.activeSelf;
 	}
 }

@@ -33,14 +33,14 @@ public class PacketStream
 	public PacketStream(object stream)
 	{
 		this.stream = stream;
-		Type type = stream.GetType();
-		if (type == typeof(byte[]))
+		Type left = stream.GetType();
+		if (left == typeof(byte[]))
 		{
-			this.type = TYPE.BUFFER;
+			type = TYPE.BUFFER;
 		}
-		else if (type == typeof(string))
+		else if (left == typeof(string))
 		{
-			this.type = TYPE.STRING;
+			type = TYPE.STRING;
 		}
 	}
 

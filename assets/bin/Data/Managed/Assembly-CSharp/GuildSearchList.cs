@@ -26,12 +26,12 @@ public class GuildSearchList : GameSection
 	public override void Initialize()
 	{
 		MonoBehaviourSingleton<GuildManager>.I.ResetGuildSearchRequest();
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		yield return this.StartCoroutine(Reload());
+		yield return StartCoroutine(Reload());
 		base.Initialize();
 	}
 
@@ -39,13 +39,13 @@ public class GuildSearchList : GameSection
 	{
 		if (!GuildManager.IsValidNotEmptyGuildList())
 		{
-			SetActive((Enum)UI.GRD_GUILD, is_visible: false);
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_GUILD, is_visible: false);
+			SetActive(UI.STR_NON_LIST, is_visible: true);
 			return;
 		}
 		guilds = MonoBehaviourSingleton<GuildManager>.I.guilds.ToArray();
-		SetActive((Enum)UI.GRD_GUILD, is_visible: true);
-		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		SetActive(UI.GRD_GUILD, is_visible: true);
+		SetActive(UI.STR_NON_LIST, is_visible: false);
 		SetGrid(UI.GRD_GUILD, "GuildSearchListItem", guilds.Length, reset: true, delegate(int i, Transform t, bool is_recycle)
 		{
 			GuildSearchModel.GuildSearchInfo guildSearchInfo = guilds[i];
@@ -71,18 +71,18 @@ public class GuildSearchList : GameSection
 		}
 		else
 		{
-			SetSprite(t, UI.SPR_EMBLEM_LAYER_1, string.Empty);
-			SetSprite(t, UI.SPR_EMBLEM_LAYER_2, string.Empty);
-			SetSprite(t, UI.SPR_EMBLEM_LAYER_3, string.Empty);
+			SetSprite(t, UI.SPR_EMBLEM_LAYER_1, "");
+			SetSprite(t, UI.SPR_EMBLEM_LAYER_2, "");
+			SetSprite(t, UI.SPR_EMBLEM_LAYER_3, "");
 		}
 		SetLabelText(t, UI.LBL_HOST_NAME, guild.admin);
 	}
 
 	private void OnQuery_RELOAD()
 	{
-		MonoBehaviourSingleton<GuildManager>.I.mSearchKeywork = string.Empty;
+		MonoBehaviourSingleton<GuildManager>.I.mSearchKeywork = "";
 		GameSection.StayEvent();
-		this.StartCoroutine(Reload(delegate(bool b)
+		StartCoroutine(Reload(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b);
 		}));

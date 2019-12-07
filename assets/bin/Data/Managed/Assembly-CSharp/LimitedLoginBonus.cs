@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -144,9 +143,9 @@ public class LimitedLoginBonus : GameSection
 		texInnerModelTexture_ = texInnerModel_.GetComponent<UITexture>();
 		info = SetPrefab(GetCtrl(UI.SPR_FRAME), "LimitedLoginBonusInfo");
 		infoDetail = SetPrefab(GetCtrl(UI.SPR_FRAME), "LimitedLoginBonusInfoDetail");
-		info.get_gameObject().SetActive(false);
-		infoDetail.get_gameObject().SetActive(false);
-		this.StartCoroutine(DoInitialize());
+		info.gameObject.SetActive(value: false);
+		infoDetail.gameObject.SetActive(value: false);
+		StartCoroutine(DoInitialize());
 	}
 
 	protected void OnQuery_RELEASE_ABILITY()
@@ -155,32 +154,29 @@ public class LimitedLoginBonus : GameSection
 		{
 			if (isDetail)
 			{
-				SetLabelText(infoDetail, UI.LBL_INFODETAIL_NAME, string.Empty);
-				SetLabelText(infoDetail, UI.LBL_INFODETAIL_DESC, string.Empty);
-				SetLabelText(infoDetail, UI.LBL_INFODETAIL_NUM, string.Empty);
-				infoDetail.get_gameObject().SetActive(false);
+				SetLabelText(infoDetail, UI.LBL_INFODETAIL_NAME, "");
+				SetLabelText(infoDetail, UI.LBL_INFODETAIL_DESC, "");
+				SetLabelText(infoDetail, UI.LBL_INFODETAIL_NUM, "");
+				infoDetail.gameObject.SetActive(value: false);
 			}
 			else
 			{
-				SetLabelText(infoDetail, UI.LBL_INFODETAIL_NAME, string.Empty);
-				SetLabelText(infoDetail, UI.LBL_INFODETAIL_DESC, string.Empty);
-				SetLabelText(infoDetail, UI.LBL_INFODETAIL_NUM, string.Empty);
+				SetLabelText(infoDetail, UI.LBL_INFODETAIL_NAME, "");
+				SetLabelText(infoDetail, UI.LBL_INFODETAIL_DESC, "");
+				SetLabelText(infoDetail, UI.LBL_INFODETAIL_NUM, "");
 			}
-			infoDetail.get_gameObject().SetActive(false);
-			info.get_gameObject().SetActive(false);
+			infoDetail.gameObject.SetActive(value: false);
+			info.gameObject.SetActive(value: false);
 			GameSection.StopEvent();
 		}
 	}
 
 	protected void OnQuery_ABILITY_DATA_POPUP()
 	{
-		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-		object[] array = GameSection.GetEventData() as object[];
-		int index = (int)array[0];
-		string text = string.Empty;
+		int index = (int)(GameSection.GetEventData() as object[])[0];
+		string text = "";
 		string text2 = null;
-		string empty = string.Empty;
+		string text3 = "";
 		LoginBonus.LoginBonusReward loginBonusReward = lb.next[index].reward[0];
 		if (Singleton<ItemTable>.I.IsExistItemData((uint)loginBonusReward.itemId))
 		{
@@ -195,24 +191,23 @@ public class LimitedLoginBonus : GameSection
 		{
 			text = loginBonusReward.name;
 		}
-		empty = "x" + loginBonusReward.itemNum.ToString();
-		Vector3 localPosition = default(Vector3);
-		localPosition._002Ector(0f, 60f, 0f);
+		text3 = "x" + loginBonusReward.itemNum.ToString();
+		Vector3 localPosition = new Vector3(0f, 60f, 0f);
 		if (text2 != null)
 		{
 			SetLabelText(infoDetail, UI.LBL_INFODETAIL_NAME, text);
 			SetLabelText(infoDetail, UI.LBL_INFODETAIL_DESC, text2);
-			SetLabelText(infoDetail, UI.LBL_INFODETAIL_NUM, empty);
-			infoDetail.set_localPosition(localPosition);
-			infoDetail.get_gameObject().SetActive(true);
+			SetLabelText(infoDetail, UI.LBL_INFODETAIL_NUM, text3);
+			infoDetail.localPosition = localPosition;
+			infoDetail.gameObject.SetActive(value: true);
 			isDetail = true;
 		}
 		else
 		{
 			SetLabelText(info, UI.LBL_INFO_NAME, text);
-			SetLabelText(info, UI.LBL_INFO_NUM, empty);
-			info.set_localPosition(localPosition);
-			info.get_gameObject().SetActive(true);
+			SetLabelText(info, UI.LBL_INFO_NUM, text3);
+			info.localPosition = localPosition;
+			info.gameObject.SetActive(value: true);
 			isDetail = false;
 		}
 		GameSection.StopEvent();
@@ -234,10 +229,9 @@ public class LimitedLoginBonus : GameSection
 		lb = null;
 		if (GameSection.GetEventData() != null)
 		{
-			Protocol.Send<LoginBonusConfirmModel.RequestSendForm, LoginBonusConfirmModel>(postData: new LoginBonusConfirmModel.RequestSendForm
-			{
-				loginBonusId = (int)GameSection.GetEventData()
-			}, url: LoginBonusConfirmModel.URL, callBack: (Action<LoginBonusConfirmModel>)delegate(LoginBonusConfirmModel ret)
+			LoginBonusConfirmModel.RequestSendForm requestSendForm = new LoginBonusConfirmModel.RequestSendForm();
+			requestSendForm.loginBonusId = (int)GameSection.GetEventData();
+			Protocol.Send(LoginBonusConfirmModel.URL, requestSendForm, delegate(LoginBonusConfirmModel ret)
 			{
 				if (ret.Error == Error.None)
 				{
@@ -247,7 +241,7 @@ public class LimitedLoginBonus : GameSection
 					}
 					connect = true;
 				}
-			}, getParam: string.Empty);
+			});
 			while (!connect)
 			{
 				yield return null;
@@ -283,15 +277,15 @@ public class LimitedLoginBonus : GameSection
 				break;
 			}
 		}
-		int logbo_column_num = 1 + (lb.next.Count - 1) / 5;
-		int logbo_now_column = 1 + arrayNow / 5;
-		if (logbo_column_num > 3)
+		int num = 1 + (lb.next.Count - 1) / 5;
+		int num2 = 1 + arrayNow / 5;
+		if (num > 3)
 		{
-			if (logbo_now_column > logbo_column_num - 2)
+			if (num2 > num - 2)
 			{
-				logbo_now_column = logbo_column_num - 2;
+				num2 = num - 2;
 			}
-			startScrPos = scrollStartHeight + iconHeight * (float)(logbo_now_column - 1);
+			startScrPos = scrollStartHeight + iconHeight * (float)(num2 - 1);
 			isFirst = true;
 		}
 		else
@@ -300,30 +294,30 @@ public class LimitedLoginBonus : GameSection
 		}
 		SetPickUp();
 		float rotateSpeed = 35f;
-		if (pickUpReward.type == 14)
+		if (14 == pickUpReward.type)
 		{
-			SetRenderAccessoryModel((Enum)UI.TEX_MODEL, (uint)pickUpReward.itemId, pickUpReward.GetScale(), rotation: true, light_rotation: false);
+			SetRenderAccessoryModel(UI.TEX_MODEL, (uint)pickUpReward.itemId, pickUpReward.GetScale());
 			isModel = true;
 		}
-		else if (pickUpReward.type == 5)
+		else if (5 == pickUpReward.type)
 		{
 			uint itemId = (uint)pickUpReward.itemId;
 			texModelRenderTexture_.InitSkillItem(texModelTexture_, itemId, rotation: true, light_rotation: false, 45f);
 			texInnerModelRenderTexture_.InitSkillItemSymbol(texInnerModelTexture_, itemId, rotation: true, 17f);
 			isModel = true;
 		}
-		else if (pickUpReward.type == 4)
+		else if (4 == pickUpReward.type)
 		{
-			SetRenderEquipModel((Enum)UI.TEX_MODEL, (uint)pickUpReward.itemId, -1, -1, pickUpReward.GetScale());
+			SetRenderEquipModel(UI.TEX_MODEL, (uint)pickUpReward.itemId, -1, -1, pickUpReward.GetScale());
 			isModel = true;
 		}
-		else if (pickUpReward.type == 1 || pickUpReward.type == 2)
+		else if (1 == pickUpReward.type || 2 == pickUpReward.type)
 		{
 			uint itemModelID = GetItemModelID((REWARD_TYPE)pickUpReward.type, pickUpReward.itemId);
 			texModelRenderTexture_.InitItem(texModelTexture_, itemModelID);
 			isModel = true;
 		}
-		else if (pickUpReward.type == 3 && IsDispItem3D(pickUpReward.itemId))
+		else if (3 == pickUpReward.type && IsDispItem3D(pickUpReward.itemId))
 		{
 			uint itemModelID2 = GetItemModelID((REWARD_TYPE)pickUpReward.type, pickUpReward.itemId);
 			texModelRenderTexture_.InitItem(texModelTexture_, itemModelID2);
@@ -332,8 +326,8 @@ public class LimitedLoginBonus : GameSection
 		texModelRenderTexture_.SetRotateSpeed(rotateSpeed);
 		texInnerModelRenderTexture_.SetRotateSpeed(rotateSpeed);
 		LoadingQueue loadingQueue = new LoadingQueue(this);
-		string topImgName = ResourceName.GetLoginBonusTopImage(lb.loginBonusId);
-		topImageLoadObj = loadingQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.LOGINBONUS_IMAGE, topImgName);
+		string loginBonusTopImage = ResourceName.GetLoginBonusTopImage(lb.loginBonusId);
+		topImageLoadObj = loadingQueue.Load(isEventAsset: true, RESOURCE_CATEGORY.LOGINBONUS_IMAGE, loginBonusTopImage);
 		if (loadingQueue.IsLoading())
 		{
 			yield return loadingQueue.Wait();
@@ -343,115 +337,108 @@ public class LimitedLoginBonus : GameSection
 
 	public override void UpdateUI()
 	{
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0233: Unknown result type (might be due to invalid IL or missing references)
 		if (lb == null)
 		{
-			SetLabelText((Enum)UI.LBL_PICKUP, string.Empty);
-			SetLabelText((Enum)UI.LBL_PERIOD, string.Empty);
+			SetLabelText(UI.LBL_PICKUP, "");
+			SetLabelText(UI.LBL_PERIOD, "");
 			return;
 		}
 		if (topImageLoadObj != null)
 		{
-			Texture2D val = null;
-			val = (topImageLoadObj.loadedObject as Texture2D);
-			if (val != null)
+			Texture2D texture2D = null;
+			texture2D = (topImageLoadObj.loadedObject as Texture2D);
+			if (texture2D != null)
 			{
 				Transform t2 = FindCtrl(base._transform, UI.TEX_LOGIN_BANNER);
 				SetActive(t2, is_visible: true);
-				SetTexture(t2, val);
+				SetTexture(t2, texture2D);
 			}
 		}
 		if (!isModel)
 		{
-			FindCtrl(base._transform, UI.OBJ_DETAIL_ROOT).set_localPosition(new Vector3(pickUpPosX, pickUpItemPosY, 0f));
+			FindCtrl(base._transform, UI.OBJ_DETAIL_ROOT).localPosition = new Vector3(pickUpPosX, pickUpItemPosY, 0f);
 			LoginBonus.LoginBonusReward loginBonusReward = pickUpReward;
-			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)loginBonusReward.type, (uint)loginBonusReward.itemId, Utility.Find(base._transform, "OBJ_DETAIL_ROOT"));
-			itemIcon.transform.set_localScale(new Vector3(1.5f, 1.5f, 1.5f));
+			ItemIcon.CreateRewardItemIcon((REWARD_TYPE)loginBonusReward.type, (uint)loginBonusReward.itemId, Utility.Find(base._transform, "OBJ_DETAIL_ROOT")).transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
 		}
-		SetLabelText((Enum)UI.LBL_PERIOD, lb.period_announce);
-		SetLabelText((Enum)UI.LBL_LOGIN_DAYS, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 7u), lb.nowCount.ToString()));
+		SetLabelText(UI.LBL_PERIOD, lb.period_announce);
+		SetLabelText(UI.LBL_LOGIN_DAYS, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 7u), lb.nowCount.ToString()));
 		FindCtrl(base._transform, UI.LBL_PICKUP).GetComponent<UILabel>().supportEncoding = true;
-		SetLabelText((Enum)UI.LBL_PICKUP, pickUpReward.pickUpText);
+		SetLabelText(UI.LBL_PICKUP, pickUpReward.pickUpText);
 		int count = lb.next.Count;
 		SetFrame(1 + (lb.next.Count - 1) / 5, lb.boardType);
 		touchAndReleaseList.Clear();
 		SetGrid(UI.GRD_BONUSLIST, "LimitedLoginBonusItem", count, reset: false, delegate(int i, Transform t, bool b)
 		{
-			//IL_03bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
 			bool flag = false;
 			LoginBonus.LoginBonusReward loginBonusReward2 = null;
 			loginBonusReward2 = lb.next[i].reward[0];
 			flag = loginBonusReward2.isGet;
 			if (arrayNow == i && lb.reward.Count > 0)
 			{
-				GameObject gameObject = FindCtrl(t, UI.SPR_STAMP_ANIM).get_gameObject();
-				gameObject.SetActive(true);
+				GameObject gameObject = FindCtrl(t, UI.SPR_STAMP_ANIM).gameObject;
+				gameObject.SetActive(value: true);
 				EventDelegate.Set(gameObject.GetComponentInChildren<TweenScale>().onFinished, SetGetDialog);
-				FindCtrl(t, UI.SPR_STAMP).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.SPR_STAMP).gameObject.SetActive(value: false);
 			}
 			else if (flag)
 			{
-				FindCtrl(t, UI.SPR_STAMP_ANIM).get_gameObject().SetActive(false);
-				FindCtrl(t, UI.SPR_STAMP).get_gameObject().SetActive(true);
+				FindCtrl(t, UI.SPR_STAMP_ANIM).gameObject.SetActive(value: false);
+				FindCtrl(t, UI.SPR_STAMP).gameObject.SetActive(value: true);
 			}
 			else
 			{
-				FindCtrl(t, UI.SPR_STAMP).get_gameObject().SetActive(false);
-				FindCtrl(t, UI.SPR_STAMP_ANIM).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.SPR_STAMP).gameObject.SetActive(value: false);
+				FindCtrl(t, UI.SPR_STAMP_ANIM).gameObject.SetActive(value: false);
 			}
 			if (loginBonusReward2.isPickUp)
 			{
-				FindCtrl(t, UI.SPR_DAY_BASE).get_gameObject().SetActive(false);
-				FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).get_gameObject().SetActive(true);
-				FindCtrl(t, UI.SPR_DAY_BASE_FINE).get_gameObject().SetActive(false);
-				FindCtrl(t, UI.LBL_DAY_PICKUP).get_gameObject().SetActive(true);
-				FindCtrl(t, UI.LBL_DAY_FINE).get_gameObject().SetActive(false);
-				FindCtrl(t, UI.LBL_DAY).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.SPR_DAY_BASE).gameObject.SetActive(value: false);
+				FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).gameObject.SetActive(value: true);
+				FindCtrl(t, UI.SPR_DAY_BASE_FINE).gameObject.SetActive(value: false);
+				FindCtrl(t, UI.LBL_DAY_PICKUP).gameObject.SetActive(value: true);
+				FindCtrl(t, UI.LBL_DAY_FINE).gameObject.SetActive(value: false);
+				FindCtrl(t, UI.LBL_DAY).gameObject.SetActive(value: false);
 				SetLabelText(t, UI.LBL_DAY_PICKUP, loginBonusReward2.day);
 			}
 			else if (loginBonusReward2.frameType != 0)
 			{
-				FindCtrl(t, UI.SPR_DAY_BASE).get_gameObject().SetActive(false);
-				FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).get_gameObject().SetActive(false);
-				FindCtrl(t, UI.SPR_DAY_BASE_FINE).get_gameObject().SetActive(true);
-				FindCtrl(t, UI.LBL_DAY_PICKUP).get_gameObject().SetActive(false);
-				FindCtrl(t, UI.LBL_DAY_FINE).get_gameObject().SetActive(true);
-				FindCtrl(t, UI.LBL_DAY).get_gameObject().SetActive(false);
+				FindCtrl(t, UI.SPR_DAY_BASE).gameObject.SetActive(value: false);
+				FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).gameObject.SetActive(value: false);
+				FindCtrl(t, UI.SPR_DAY_BASE_FINE).gameObject.SetActive(value: true);
+				FindCtrl(t, UI.LBL_DAY_PICKUP).gameObject.SetActive(value: false);
+				FindCtrl(t, UI.LBL_DAY_FINE).gameObject.SetActive(value: true);
+				FindCtrl(t, UI.LBL_DAY).gameObject.SetActive(value: false);
 				SetLabelText(t, UI.LBL_DAY_FINE, loginBonusReward2.day);
 			}
 			else
 			{
-				FindCtrl(t, UI.SPR_DAY_BASE).get_gameObject().SetActive(true);
-				FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).get_gameObject().SetActive(false);
-				FindCtrl(t, UI.SPR_DAY_BASE_FINE).get_gameObject().SetActive(false);
-				FindCtrl(t, UI.LBL_DAY_PICKUP).get_gameObject().SetActive(false);
-				FindCtrl(t, UI.LBL_DAY_FINE).get_gameObject().SetActive(false);
-				FindCtrl(t, UI.LBL_DAY).get_gameObject().SetActive(true);
+				FindCtrl(t, UI.SPR_DAY_BASE).gameObject.SetActive(value: true);
+				FindCtrl(t, UI.SPR_DAY_BASE_PICKUP).gameObject.SetActive(value: false);
+				FindCtrl(t, UI.SPR_DAY_BASE_FINE).gameObject.SetActive(value: false);
+				FindCtrl(t, UI.LBL_DAY_PICKUP).gameObject.SetActive(value: false);
+				FindCtrl(t, UI.LBL_DAY_FINE).gameObject.SetActive(value: false);
+				FindCtrl(t, UI.LBL_DAY).gameObject.SetActive(value: true);
 				SetLabelText(t, UI.LBL_DAY, loginBonusReward2.day);
 			}
 			SetLabelText(t, UI.LBL_ITEMNUM, "x" + loginBonusReward2.itemNum.ToString());
-			ItemIcon itemIcon2 = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)loginBonusReward2.type, (uint)loginBonusReward2.itemId, FindCtrl(t, UI.OBJ_ICON_ROOT));
-			if (itemIcon2 != null)
+			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)loginBonusReward2.type, (uint)loginBonusReward2.itemId, FindCtrl(t, UI.OBJ_ICON_ROOT));
+			if (itemIcon != null)
 			{
-				itemIcon2.SetEnableCollider(is_enable: false);
+				itemIcon.SetEnableCollider(is_enable: false);
 			}
 			if (flag)
 			{
-				UITexture[] componentsInChildren = itemIcon2.GetComponentsInChildren<UITexture>();
+				UITexture[] componentsInChildren = itemIcon.GetComponentsInChildren<UITexture>();
 				int j = 0;
 				for (int num = componentsInChildren.Length; j < num; j++)
 				{
-					componentsInChildren[j].color = Color.get_gray();
+					componentsInChildren[j].color = Color.gray;
 				}
-				UISprite[] componentsInChildren2 = itemIcon2.GetComponentsInChildren<UISprite>();
+				UISprite[] componentsInChildren2 = itemIcon.GetComponentsInChildren<UISprite>();
 				int k = 0;
 				for (int num2 = componentsInChildren2.Length; k < num2; k++)
 				{
-					componentsInChildren2[k].color = Color.get_gray();
+					componentsInChildren2[k].color = Color.gray;
 				}
 			}
 			SetAbilityItemEvent(t, i, touchAndReleaseList);
@@ -460,33 +447,13 @@ public class LimitedLoginBonus : GameSection
 		{
 			Transform ctrl = GetCtrl(UI.SCR_BONUSLIST);
 			UIPanel component = ctrl.GetComponent<UIPanel>();
-			ctrl.get_transform().set_localPosition(new Vector3(0f, startScrPos, 0f));
+			ctrl.transform.localPosition = new Vector3(0f, startScrPos, 0f);
 			component.clipOffset = new Vector2(0f, 0f - startScrPos);
 		}
 	}
 
 	private void SetFrame(int column_num, int board_type)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0297: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0315: Unknown result type (might be due to invalid IL or missing references)
 		Color color;
 		switch (board_type)
 		{
@@ -517,12 +484,12 @@ public class LimitedLoginBonus : GameSection
 			FindCtrl(base._transform, UI.SPR_FRAME_ICONS).GetComponent<UIWidget>().height = (int)num;
 			FindCtrl(base._transform, UI.SPR_FRAME_BG_3_L).GetComponent<UIWidget>().height = (int)(bg3SizeBase.y - num2);
 			FindCtrl(base._transform, UI.SPR_FRAME_BG_3_R).GetComponent<UIWidget>().height = (int)(bg3SizeBase.y - num2);
-			FindCtrl(base._transform, UI.SPR_FRAME_BG_4_L).set_localPosition(new Vector3(0f, bg4Height + num2, 0f));
-			FindCtrl(base._transform, UI.SPR_FRAME_BG_4_R).set_localPosition(new Vector3(0f, bg4Height + num2, 0f));
-			FindCtrl(base._transform, UI.SPR_FRAME_FOOTER_L).set_localPosition(new Vector3(0f, footerHeight + num2, 0f));
-			FindCtrl(base._transform, UI.SPR_FRAME_FOOTER_R).set_localPosition(new Vector3(0f, footerHeight + num2, 0f));
-			FindCtrl(base._transform, UI.BTN_CLOSE).set_localPosition(new Vector3(0f, btnHeight + num2, 0f));
-			base._transform.set_localPosition(new Vector3(0f, (0f - num2) / 2f, 0f));
+			FindCtrl(base._transform, UI.SPR_FRAME_BG_4_L).localPosition = new Vector3(0f, bg4Height + num2, 0f);
+			FindCtrl(base._transform, UI.SPR_FRAME_BG_4_R).localPosition = new Vector3(0f, bg4Height + num2, 0f);
+			FindCtrl(base._transform, UI.SPR_FRAME_FOOTER_L).localPosition = new Vector3(0f, footerHeight + num2, 0f);
+			FindCtrl(base._transform, UI.SPR_FRAME_FOOTER_R).localPosition = new Vector3(0f, footerHeight + num2, 0f);
+			FindCtrl(base._transform, UI.BTN_CLOSE).localPosition = new Vector3(0f, btnHeight + num2, 0f);
+			base._transform.localPosition = new Vector3(0f, (0f - num2) / 2f, 0f);
 		}
 	}
 
@@ -561,12 +528,12 @@ public class LimitedLoginBonus : GameSection
 	private void SetGetDialog()
 	{
 		PlayAudio(AUDIO.REQUEST_COMPLETE);
-		this.StartCoroutine("WaitGetDialog");
+		StartCoroutine("WaitGetDialog");
 	}
 
 	private IEnumerator WaitGetDialog()
 	{
-		yield return (object)new WaitForSeconds(0.8f);
+		yield return new WaitForSeconds(0.8f);
 		DispatchEvent("LIMITED_LOGIN_GET", lb);
 	}
 
@@ -578,7 +545,7 @@ public class LimitedLoginBonus : GameSection
 	{
 		if (null != glowModel_)
 		{
-			glowModel_.get_gameObject().SetActive(false);
+			glowModel_.gameObject.SetActive(value: false);
 		}
 		if (lb.type == 6 && lb.isBeginner2Pop && !showedBLBP)
 		{
@@ -612,11 +579,19 @@ public class LimitedLoginBonus : GameSection
 
 	private bool IsDispItem3D(int itemID)
 	{
-		if (itemID == 7000100 || itemID == 7000101 || itemID == 7000200 || itemID == 7000201 || itemID == 7000300 || itemID == 7000301 || itemID == 1200000)
+		switch (itemID)
 		{
+		case 1200000:
+		case 7000100:
+		case 7000101:
+		case 7000200:
+		case 7000201:
+		case 7000300:
+		case 7000301:
 			return true;
+		default:
+			return false;
 		}
-		return false;
 	}
 
 	private void SetDummyLogbo()
@@ -637,7 +612,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 10,
 						isGet = true,
 						isPickUp = false,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u))
 					}
 				}
@@ -655,7 +630,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 1,
 						isGet = true,
 						isPickUp = false,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 2)
 					}
 				}
@@ -673,7 +648,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 5,
 						isGet = false,
 						isPickUp = false,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 5)
 					}
 				}
@@ -691,7 +666,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 5,
 						isGet = false,
 						isPickUp = false,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 5)
 					}
 				}
@@ -709,7 +684,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 5,
 						isGet = false,
 						isPickUp = true,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 5)
 					}
 				}
@@ -727,7 +702,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 1,
 						isGet = true,
 						isPickUp = false,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 3)
 					}
 				}
@@ -745,7 +720,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 1000000,
 						isGet = false,
 						isPickUp = false,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 5)
 					}
 				}
@@ -763,7 +738,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 1,
 						isGet = false,
 						isPickUp = false,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 2)
 					}
 				}
@@ -781,7 +756,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 10,
 						isGet = false,
 						isPickUp = false,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 6)
 					}
 				}
@@ -799,7 +774,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 1,
 						isGet = false,
 						isPickUp = true,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 7)
 					}
 				}
@@ -817,7 +792,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 100000,
 						isGet = false,
 						isPickUp = true,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 5)
 					}
 				}
@@ -835,7 +810,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 10,
 						isGet = false,
 						isPickUp = false,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 6)
 					}
 				}
@@ -853,7 +828,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 1,
 						isGet = false,
 						isPickUp = true,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 7)
 					}
 				}
@@ -871,7 +846,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 5,
 						isGet = false,
 						isPickUp = false,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 5)
 					}
 				}
@@ -889,7 +864,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 10,
 						isGet = false,
 						isPickUp = false,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 6)
 					}
 				}
@@ -907,7 +882,7 @@ public class LimitedLoginBonus : GameSection
 						itemNum = 1,
 						isGet = false,
 						isPickUp = true,
-						pickUpText = string.Empty,
+						pickUpText = "",
 						day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 7)
 					}
 				}
@@ -923,7 +898,7 @@ public class LimitedLoginBonus : GameSection
 				itemNum = 1,
 				isGet = true,
 				isPickUp = false,
-				pickUpText = string.Empty,
+				pickUpText = "",
 				day = string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 8u), 4)
 			}
 		};

@@ -54,8 +54,7 @@ public class QuestRequestItemSeriesArena : QuestRequestItem
 
 	protected override void SetIcon(Transform t, DeliveryTable.DeliveryData info)
 	{
-		UITexture component = FindCtrl(t, UI.TEX_NPC).GetComponent<UITexture>();
-		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.SERIES_ARENA_RANK_ICON, ResourceName.GetSeriesArenaRankIconName(info.GetQuestData().rarity));
+		ResourceLoad.LoadWithSetUITexture(FindCtrl(t, UI.TEX_NPC).GetComponent<UITexture>(), RESOURCE_CATEGORY.SERIES_ARENA_RANK_ICON, ResourceName.GetSeriesArenaRankIconName(info.GetQuestData().rarity));
 	}
 
 	private void SetBestTimeOrStamp(Transform t, uint questId)
@@ -63,7 +62,7 @@ public class QuestRequestItemSeriesArena : QuestRequestItem
 		ClearStatusQuest clearStatusQuestData = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(questId);
 		if (clearStatusQuestData != null && clearStatusQuestData.clearTime > 0)
 		{
-			int clearTime = clearStatusQuestData.clearTime;
+			_ = clearStatusQuestData.clearTime;
 			bool flag = MonoBehaviourSingleton<QuestManager>.I.CheckMissionAllClear(questId);
 			SetActive(t, UI.SPR_MISSION_CROWN_OFF, !flag);
 			SetActive(t, UI.SPR_MISSION_CROWN_ON, flag);

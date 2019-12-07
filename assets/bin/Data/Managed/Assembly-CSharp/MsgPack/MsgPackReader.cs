@@ -83,12 +83,20 @@ namespace MsgPack
 
 		public bool IsSigned()
 		{
-			return Type == TypePrefixes.NegativeFixNum || Type == TypePrefixes.PositiveFixNum || Type == TypePrefixes.Int8 || Type == TypePrefixes.Int16 || Type == TypePrefixes.Int32;
+			if (Type != TypePrefixes.NegativeFixNum && Type != 0 && Type != TypePrefixes.Int8 && Type != TypePrefixes.Int16)
+			{
+				return Type == TypePrefixes.Int32;
+			}
+			return true;
 		}
 
 		public bool IsBoolean()
 		{
-			return Type == TypePrefixes.True || Type == TypePrefixes.False;
+			if (Type != TypePrefixes.True)
+			{
+				return Type == TypePrefixes.False;
+			}
+			return true;
 		}
 
 		public bool IsSigned64()
@@ -98,7 +106,11 @@ namespace MsgPack
 
 		public bool IsUnsigned()
 		{
-			return Type == TypePrefixes.PositiveFixNum || Type == TypePrefixes.UInt8 || Type == TypePrefixes.UInt16 || Type == TypePrefixes.UInt32;
+			if (Type != 0 && Type != TypePrefixes.UInt8 && Type != TypePrefixes.UInt16)
+			{
+				return Type == TypePrefixes.UInt32;
+			}
+			return true;
 		}
 
 		public bool IsUnsigned64()
@@ -108,23 +120,39 @@ namespace MsgPack
 
 		public bool IsRaw()
 		{
-			return Type == TypePrefixes.FixRaw || Type == TypePrefixes.Raw8 || Type == TypePrefixes.Raw16 || Type == TypePrefixes.Raw32;
+			if (Type != TypePrefixes.FixRaw && Type != TypePrefixes.Raw8 && Type != TypePrefixes.Raw16)
+			{
+				return Type == TypePrefixes.Raw32;
+			}
+			return true;
 		}
 
 		public bool IsBinary()
 		{
 			TypePrefixes type = Type;
-			return type == TypePrefixes.Bin8 || type == TypePrefixes.Bin16 || type == TypePrefixes.Bin32;
+			if (type != TypePrefixes.Bin8 && type != TypePrefixes.Bin16)
+			{
+				return type == TypePrefixes.Bin32;
+			}
+			return true;
 		}
 
 		public bool IsArray()
 		{
-			return Type == TypePrefixes.FixArray || Type == TypePrefixes.Array16 || Type == TypePrefixes.Array32;
+			if (Type != TypePrefixes.FixArray && Type != TypePrefixes.Array16)
+			{
+				return Type == TypePrefixes.Array32;
+			}
+			return true;
 		}
 
 		public bool IsMap()
 		{
-			return Type == TypePrefixes.FixMap || Type == TypePrefixes.Map16 || Type == TypePrefixes.Map32;
+			if (Type != TypePrefixes.FixMap && Type != TypePrefixes.Map16)
+			{
+				return Type == TypePrefixes.Map32;
+			}
+			return true;
 		}
 
 		public bool Read()
@@ -240,7 +268,7 @@ namespace MsgPack
 				{
 					throw new FormatException();
 				}
-				ValueSigned64 = (((long)(int)tmp[0] << 56) | ((long)(int)tmp[1] << 48) | ((long)(int)tmp[2] << 40) | ((long)(int)tmp[3] << 32) | ((long)(int)tmp[4] << 24) | ((long)(int)tmp[5] << 16) | ((long)(int)tmp[6] << 8) | (int)tmp[7]);
+				ValueSigned64 = (long)(((ulong)tmp[0] << 56) | ((ulong)tmp[1] << 48) | ((ulong)tmp[2] << 40) | ((ulong)tmp[3] << 32) | ((ulong)tmp[4] << 24) | ((ulong)tmp[5] << 16) | ((ulong)tmp[6] << 8) | tmp[7]);
 				break;
 			case TypePrefixes.FixRaw:
 				Length = (uint)(num & 0x1F);

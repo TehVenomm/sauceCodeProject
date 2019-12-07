@@ -1,7 +1,6 @@
 using Network;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class NPCTable : Singleton<NPCTable>, IDataTable
@@ -74,7 +73,7 @@ public class NPCTable : Singleton<NPCTable>, IDataTable
 			{
 				data.displayName = data.name;
 			}
-			string value = string.Empty;
+			string value = "";
 			csv_reader.Pop(ref value);
 			data.questids = TableUtility.ParseStringToIntArray(value);
 			return true;
@@ -116,30 +115,30 @@ public class NPCTable : Singleton<NPCTable>, IDataTable
 		{
 			if (IsUsePlayerModel())
 			{
-				PlayerLoader loader = go.AddComponent<PlayerLoader>();
+				PlayerLoader loader2 = go.AddComponent<PlayerLoader>();
 				PlayerLoadInfo player_load_info = CreatePlayerLoadInfo();
-				loader.StartLoad(player_load_info, go.get_layer(), 99, need_anim_event: false, need_foot_stamp: false, need_shadow, enable_light_probe, need_action_voice: false, need_high_reso_tex: false, FieldManager.IsValidInField(), need_dev_frame_instantiate: true, (!enable_light_probe) ? SHADER_TYPE.UI : ShaderGlobal.GetCharacterShaderType(), delegate
+				loader2.StartLoad(player_load_info, go.layer, 99, need_anim_event: false, need_foot_stamp: false, need_shadow, enable_light_probe, need_action_voice: false, need_high_reso_tex: false, FieldManager.IsValidInField(), need_dev_frame_instantiate: true, enable_light_probe ? ShaderGlobal.GetCharacterShaderType() : SHADER_TYPE.UI, delegate
 				{
 					if (on_complete != null)
 					{
-						on_complete(loader.animator);
+						on_complete(loader2.animator);
 					}
 				});
-				return loader;
+				return loader2;
 			}
-			NPCLoader loader2 = go.AddComponent<NPCLoader>();
+			NPCLoader loader = go.AddComponent<NPCLoader>();
 			HomeThemeTable.HomeThemeData homeThemeData = Singleton<HomeThemeTable>.I.GetHomeThemeData(TimeManager.GetNow());
 			int num = Singleton<HomeThemeTable>.I.GetNpcModelID(homeThemeData, id);
-			int num2 = (num <= 0) ? specialModelID : num;
-			int npc_model_id = (!useSpecialModel || num2 <= 0) ? npcModelID : num2;
-			loader2.Load(npc_model_id, go.get_layer(), need_shadow, enable_light_probe, (!enable_light_probe) ? SHADER_TYPE.UI : ShaderGlobal.GetCharacterShaderType(), delegate
+			int num2 = (num > 0) ? num : specialModelID;
+			int npc_model_id = (useSpecialModel && num2 > 0) ? num2 : npcModelID;
+			loader.Load(npc_model_id, go.layer, need_shadow, enable_light_probe, enable_light_probe ? ShaderGlobal.GetCharacterShaderType() : SHADER_TYPE.UI, delegate
 			{
 				if (on_complete != null)
 				{
-					on_complete(loader2.animator);
+					on_complete(loader.animator);
 				}
 			});
-			return loader2;
+			return loader;
 		}
 
 		public override string ToString()
@@ -151,9 +150,6 @@ public class NPCTable : Singleton<NPCTable>, IDataTable
 	private UIntKeyTable<NPCData> npcDataTable;
 
 	public List<int>[] npcTypeOnNpcIdList = new List<int>[Enum.GetNames(typeof(NPC_TYPE)).Length];
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<NPCData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string csv_text)
 	{
@@ -207,7 +203,7 @@ public class NPCTable : Singleton<NPCTable>, IDataTable
 		{
 			range = npcTypeOnNpcIdList[(int)npc_type].GetRange(0, npcTypeOnNpcIdList[(int)npc_type].Count);
 		}
-		int index = (int)(Random.get_value() * (float)range.Count);
+		int index = (int)(UnityEngine.Random.value * (float)range.Count);
 		int key = range[index];
 		return npcDataTable.Get((uint)key);
 	}
@@ -231,7 +227,7 @@ public class NPCTable : Singleton<NPCTable>, IDataTable
 		for (int j = 0; j < range.Count; j++)
 		{
 			NPCData nPCData = npcDataTable.Get((uint)range[j]);
-			if (nPCData == null || nPCData.questids == null || nPCData.questids.Length <= 0)
+			if (nPCData == null || nPCData.questids == null || nPCData.questids.Length == 0)
 			{
 				continue;
 			}
@@ -246,7 +242,7 @@ public class NPCTable : Singleton<NPCTable>, IDataTable
 		}
 		if (list.Count > 0)
 		{
-			int index = (int)(Random.get_value() * (float)list.Count);
+			int index = (int)(UnityEngine.Random.value * (float)list.Count);
 			int key = list[index];
 			return npcDataTable.Get((uint)key);
 		}

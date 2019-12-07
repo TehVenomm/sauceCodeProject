@@ -222,30 +222,30 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 	protected override void Awake()
 	{
 		base.Awake();
-		boostRate.fontStyle = 2;
-		boostTime.fontStyle = 2;
-		this.get_gameObject().SetActive(false);
+		boostRate.fontStyle = FontStyle.Italic;
+		boostTime.fontStyle = FontStyle.Italic;
+		base.gameObject.SetActive(value: false);
 		CreateBurstBulletUI();
 	}
 
 	private void CreateBurstBulletUI()
 	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		if (m_burstBulletCtrl != null)
 		{
 			return;
 		}
-		Transform val = ResourceUtility.Realizes(Resources.Load(UIPlayerStatus.UI_BURST_BULLET), this.get_transform());
-		if (!(val == null))
+		Transform transform = ResourceUtility.Realizes(Resources.Load(UIPlayerStatus.UI_BURST_BULLET), base.transform);
+		if (!(transform == null))
 		{
-			val.set_localPosition(UIPlayerStatus.UI_BURST_BULLET_POS);
-			m_burstBulletCtrl = val.GetComponent<UIBurstBulletUIController>();
+			transform.localPosition = UIPlayerStatus.UI_BURST_BULLET_POS;
+			m_burstBulletCtrl = transform.GetComponent<UIBurstBulletUIController>();
 			if (m_burstBulletCtrl != null)
 			{
-				UIBurstBulletUIController.InitParam initParam = new UIBurstBulletUIController.InitParam();
-				initParam.MaxBulletCount = 6;
-				initParam.CurrentRestBulletCount = 6;
-				UIBurstBulletUIController.InitParam param = initParam;
+				UIBurstBulletUIController.InitParam param = new UIBurstBulletUIController.InitParam
+				{
+					MaxBulletCount = 6,
+					CurrentRestBulletCount = 6
+				};
 				m_burstBulletCtrl.Initialize(param);
 			}
 		}
@@ -253,7 +253,7 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	private void Start()
 	{
-		EffectCtrl[] componentsInChildren = boostAnimator.GetComponentsInChildren<EffectCtrl>(true);
+		EffectCtrl[] componentsInChildren = boostAnimator.GetComponentsInChildren<EffectCtrl>(includeInactive: true);
 		for (int i = 0; i < componentsInChildren.Length; i++)
 		{
 			componentsInChildren[i].SetRenderQueue(2000);
@@ -265,7 +265,7 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 		targetPlayer = player;
 		if (targetPlayer == null)
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 			return;
 		}
 		if (weaponChange != null)
@@ -274,7 +274,7 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 		}
 		UpdateUI();
 		SetUpBoostAnimator();
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 	}
 
 	public void SetUpBoostAnimator()
@@ -313,19 +313,6 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	private void UpdateUI()
 	{
-		//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0261: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0263: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0275: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0294: Unknown result type (might be due to invalid IL or missing references)
 		if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid() && !string.IsNullOrEmpty(MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.enduranceObjectName))
 		{
 			enduranceName.text = MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.enduranceObjectName;
@@ -336,17 +323,17 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 		}
 		if (hpGaugeUI != null)
 		{
-			float percent = (!(MonoBehaviourSingleton<InGameProgress>.I.defenseBattleEnduranceMax > 0f)) ? 0f : (MonoBehaviourSingleton<InGameProgress>.I.defenseBattleEndurance / MonoBehaviourSingleton<InGameProgress>.I.defenseBattleEnduranceMax);
+			float percent = (MonoBehaviourSingleton<InGameProgress>.I.defenseBattleEnduranceMax > 0f) ? (MonoBehaviourSingleton<InGameProgress>.I.defenseBattleEndurance / MonoBehaviourSingleton<InGameProgress>.I.defenseBattleEnduranceMax) : 0f;
 			hpGaugeUI.SetPercent(percent);
 		}
 		OnUpdateWeaponIndex();
 		bool flag = targetPlayer.IsValidSpActionMemori();
-		if (spActionGaugeInfo.gaugeMemoriObj.get_activeSelf() != flag)
+		if (spActionGaugeInfo.gaugeMemoriObj.activeSelf != flag)
 		{
 			spActionGaugeInfo.gaugeMemoriObj.SetActive(flag);
 		}
 		bool flag2 = targetPlayer.IsValidSpActionGauge();
-		if (spActionGaugeInfo.root != null && spActionGaugeInfo.root.get_activeSelf() != flag2)
+		if (spActionGaugeInfo.root != null && spActionGaugeInfo.root.activeSelf != flag2)
 		{
 			spActionGaugeInfo.root.SetActive(flag2);
 		}
@@ -355,13 +342,13 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 			if (spActionGaugeInfo.renderer != null)
 			{
 				int num = targetPlayer.CheckGaugeLevel();
-				Color val = (num != -1) ? ((!targetPlayer.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.SOUL)) ? spActionGaugeInfo.gaugeColorJump[num] : spActionGaugeInfo.gaugeColorSoulPairSwords[num]) : ((targetPlayer.spAttackType != SP_ATTACK_TYPE.SOUL) ? ((!targetPlayer.IsSpActionGaugeHalfCharged() && !targetPlayer.isBoostMode) ? spActionGaugeInfo.gaugeColorNormal : spActionGaugeInfo.gaugeColorCharged) : ((!targetPlayer.IsSpActionGaugeHalfCharged() && !targetPlayer.isBoostMode) ? spActionGaugeInfo.gaugeColorSoul[0] : spActionGaugeInfo.gaugeColorSoul[1]));
-				if (val != spActionGaugeInfo.renderer.get_material().get_color())
+				Color color = (num != -1) ? ((!targetPlayer.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.SOUL)) ? spActionGaugeInfo.gaugeColorJump[num] : spActionGaugeInfo.gaugeColorSoulPairSwords[num]) : ((targetPlayer.spAttackType != SP_ATTACK_TYPE.SOUL) ? ((targetPlayer.IsSpActionGaugeHalfCharged() || targetPlayer.isBoostMode) ? spActionGaugeInfo.gaugeColorCharged : spActionGaugeInfo.gaugeColorNormal) : ((targetPlayer.IsSpActionGaugeHalfCharged() || targetPlayer.isBoostMode) ? spActionGaugeInfo.gaugeColorSoul[1] : spActionGaugeInfo.gaugeColorSoul[0]));
+				if (color != spActionGaugeInfo.renderer.material.color)
 				{
-					spActionGaugeInfo.renderer.get_material().set_color(val);
+					spActionGaugeInfo.renderer.material.color = color;
 				}
 			}
-			float num2 = (!(targetPlayer.CurrentWeaponSpActionGaugeMax > 0f)) ? 0f : (targetPlayer.CurrentWeaponSpActionGauge / targetPlayer.CurrentWeaponSpActionGaugeMax);
+			float num2 = (targetPlayer.CurrentWeaponSpActionGaugeMax > 0f) ? (targetPlayer.CurrentWeaponSpActionGauge / targetPlayer.CurrentWeaponSpActionGaugeMax) : 0f;
 			bool flag3 = false;
 			if (spActionGaugeInfo.gaugeUI != null)
 			{
@@ -376,32 +363,32 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 			{
 				sprite.width = (int)(num2 * (float)spActionGaugeADD_BOOST.sizeMax + (1f - num2) * (float)spActionGaugeADD_BOOST.sizeMin);
 			}
-			if (spActionGaugeInfo.root != null && spActionGaugeInfo.root.get_activeInHierarchy())
+			if (spActionGaugeInfo.root != null && spActionGaugeInfo.root.activeInHierarchy)
 			{
 				if (targetPlayer.IsSpActionGaugeHalfCharged() && !spActionGaugeInfo.IsPlayAnim(SpActionGaugeInfo.ANIM_STATE.HALF))
 				{
-					sprite.get_gameObject().SetActive(false);
-					spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(true);
-					UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 1);
-					UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), forward: true, null, is_input_block: false, 1);
+					sprite.gameObject.SetActive(value: false);
+					spActionGaugeADD_HALF.sprite.gameObject.SetActive(value: true);
+					UITweenCtrl.Reset(spActionGaugeInfo.root.transform, 1);
+					UITweenCtrl.Play(spActionGaugeInfo.root.transform, forward: true, null, is_input_block: false, 1);
 					spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.HALF);
 					SoundManager.PlayOneShotUISE(40000358);
 				}
 				if (targetPlayer.IsSpActionGaugeFullCharged() && !spActionGaugeInfo.IsPlayAnim(SpActionGaugeInfo.ANIM_STATE.FULL))
 				{
-					sprite.get_gameObject().SetActive(false);
-					spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(true);
-					UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 2);
-					UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), forward: true, null, is_input_block: false, 2);
+					sprite.gameObject.SetActive(value: false);
+					spActionGaugeADD_HALF.sprite.gameObject.SetActive(value: true);
+					UITweenCtrl.Reset(spActionGaugeInfo.root.transform, 2);
+					UITweenCtrl.Play(spActionGaugeInfo.root.transform, forward: true, null, is_input_block: false, 2);
 					spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.FULL);
 					SoundManager.PlayOneShotUISE(40000359);
 				}
 				if (targetPlayer.isBoostMode && !spActionGaugeInfo.IsPlayAnim(SpActionGaugeInfo.ANIM_STATE.BOOST))
 				{
-					sprite.get_gameObject().SetActive(true);
-					spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(false);
-					UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform());
-					UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), forward: true, null, is_input_block: false);
+					sprite.gameObject.SetActive(value: true);
+					spActionGaugeADD_HALF.sprite.gameObject.SetActive(value: false);
+					UITweenCtrl.Reset(spActionGaugeInfo.root.transform);
+					UITweenCtrl.Play(spActionGaugeInfo.root.transform, forward: true, null, is_input_block: false);
 					spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.BOOST);
 				}
 			}
@@ -438,14 +425,10 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 		{
 			return;
 		}
-		float num3 = (!(targetPlayer.GetCannonChargeMax() > 0f)) ? 0f : targetPlayer.GetCannonChargeRate();
-		if (validCannonSpecialGaugeInfo.root != null && validCannonSpecialGaugeInfo.root.get_activeInHierarchy())
+		float num3 = (targetPlayer.GetCannonChargeMax() > 0f) ? targetPlayer.GetCannonChargeRate() : 0f;
+		if (validCannonSpecialGaugeInfo.root != null && validCannonSpecialGaugeInfo.root.activeInHierarchy && validCannonSpecialGaugeInfo.gaugeUI != null && validCannonSpecialGaugeInfo.gaugeUI.nowPercent != num3)
 		{
-			bool flag7 = false;
-			if (validCannonSpecialGaugeInfo.gaugeUI != null && validCannonSpecialGaugeInfo.gaugeUI.nowPercent != num3)
-			{
-				validCannonSpecialGaugeInfo.gaugeUI.SetPercent(num3, anim: false);
-			}
+			validCannonSpecialGaugeInfo.gaugeUI.SetPercent(num3, anim: false);
 		}
 		validCannonSpecialGaugeInfo.gaugeNormalObj.SetActive(!targetPlayer.IsCannonFullCharged());
 		validCannonSpecialGaugeInfo.gaugeChargedObj.SetActive(targetPlayer.IsCannonFullCharged());
@@ -455,14 +438,14 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 		{
 			if (!validCannonSpecialGaugeInfo.IsPlayAnim(CannonSpecialGaugeInfo.ANIM_STATE.FULL))
 			{
-				UITweenCtrl.Reset(validCannonSpecialGaugeInfo.gaugeAddObj.get_transform(), 3);
-				UITweenCtrl.Play(validCannonSpecialGaugeInfo.gaugeAddObj.get_transform(), forward: true, null, is_input_block: false, 3);
+				UITweenCtrl.Reset(validCannonSpecialGaugeInfo.gaugeAddObj.transform, 3);
+				UITweenCtrl.Play(validCannonSpecialGaugeInfo.gaugeAddObj.transform, forward: true, null, is_input_block: false, 3);
 				validCannonSpecialGaugeInfo.SetState(CannonSpecialGaugeInfo.ANIM_STATE.FULL);
 			}
 		}
 		else
 		{
-			UITweenCtrl.Reset(validCannonSpecialGaugeInfo.gaugeAddObj.get_transform(), 3);
+			UITweenCtrl.Reset(validCannonSpecialGaugeInfo.gaugeAddObj.transform, 3);
 			validCannonSpecialGaugeInfo.state = 0;
 		}
 	}
@@ -480,17 +463,16 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	public void SetGaugeEffectColor(SP_ATTACK_TYPE type)
 	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		spActionGaugeADD_BOOST.sprite.color = spActionGaugeADD_BOOST.effectColor[(int)type];
 	}
 
 	public void ResetSpActionGaugeState()
 	{
-		spActionGaugeADD_BOOST.sprite.get_gameObject().SetActive(false);
-		spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(false);
-		UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform());
-		UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 1);
-		UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 2);
+		spActionGaugeADD_BOOST.sprite.gameObject.SetActive(value: false);
+		spActionGaugeADD_HALF.sprite.gameObject.SetActive(value: false);
+		UITweenCtrl.Reset(spActionGaugeInfo.root.transform);
+		UITweenCtrl.Reset(spActionGaugeInfo.root.transform, 1);
+		UITweenCtrl.Reset(spActionGaugeInfo.root.transform, 2);
 		spActionGaugeInfo.state = 0;
 		if (targetPlayer == null)
 		{
@@ -498,10 +480,10 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 		}
 		if (targetPlayer.IsSpActionGaugeHalfCharged())
 		{
-			spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(true);
-			if (spActionGaugeADD_HALF.sprite.get_gameObject().get_activeInHierarchy())
+			spActionGaugeADD_HALF.sprite.gameObject.SetActive(value: true);
+			if (spActionGaugeADD_HALF.sprite.gameObject.activeInHierarchy)
 			{
-				UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), forward: true, null, is_input_block: false, 1);
+				UITweenCtrl.Play(spActionGaugeInfo.root.transform, forward: true, null, is_input_block: false, 1);
 				spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.HALF);
 			}
 		}
@@ -518,8 +500,8 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	private void ChangeShowBoost(USE_ITEM_EFFECT_TYPE type)
 	{
-		boostRate.get_gameObject().SetActive(type != USE_ITEM_EFFECT_TYPE.NONE);
-		boostTime.get_gameObject().SetActive(type != USE_ITEM_EFFECT_TYPE.NONE);
+		boostRate.gameObject.SetActive(type != USE_ITEM_EFFECT_TYPE.NONE);
+		boostTime.gameObject.SetActive(type != USE_ITEM_EFFECT_TYPE.NONE);
 		int i = 0;
 		for (int num = boostItems.Length; i < num; i++)
 		{
@@ -539,7 +521,6 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	private void UpdateShowBoost(BoostStatus boost)
 	{
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 		switch (boost.type)
 		{
 		case 1:
@@ -550,7 +531,7 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 		case 212:
 			boostRate.text = boost.GetBoostRateText();
 			boostRate.color = boostAnimator.GetRateColor(boost.value);
-			boostTime.text = ((boost.type != 210) ? boost.GetRemainTime() : string.Empty);
+			boostTime.text = ((boost.type == 210) ? "" : boost.GetRemainTime());
 			break;
 		}
 	}
@@ -565,12 +546,12 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	public void DoEnable()
 	{
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 	}
 
 	public void DoDisable()
 	{
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 
 	public void SetHGPBoostUpdatePermitFlag(bool permit)
@@ -580,42 +561,39 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	public void DirectionSoulGauge(SoulEnergy soulEnergy, Vector3 worldHitPos)
 	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_gameObject().get_activeInHierarchy())
+		if (base.gameObject.activeInHierarchy)
 		{
-			this.StartCoroutine(_DirectionSoulGauge(soulEnergy, worldHitPos));
+			StartCoroutine(_DirectionSoulGauge(soulEnergy, worldHitPos));
 		}
 	}
 
 	private IEnumerator _DirectionSoulGauge(SoulEnergy soulEnergy, Vector3 worldHitPos)
 	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		Transform trans = soulEnergy.GetEffectTrans(soulEffectDirection);
-		if (!object.ReferenceEquals(trans, null))
+		Transform effectTrans = soulEnergy.GetEffectTrans(soulEffectDirection);
+		if ((object)effectTrans != null)
 		{
-			Vector3 screenPos = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(worldHitPos);
-			Vector3 uiPos = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenPos);
-			uiPos.z = 1f;
-			trans.set_position(uiPos);
-			TransformInterpolator interp = trans.get_gameObject().GetComponent<TransformInterpolator>();
-			if (object.ReferenceEquals(interp, null))
+			Vector3 position = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(worldHitPos);
+			Vector3 position2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(position);
+			position2.z = 1f;
+			effectTrans.position = position2;
+			TransformInterpolator transformInterpolator = effectTrans.gameObject.GetComponent<TransformInterpolator>();
+			if ((object)transformInterpolator == null)
 			{
-				interp = trans.get_gameObject().AddComponent<TransformInterpolator>();
+				transformInterpolator = effectTrans.gameObject.AddComponent<TransformInterpolator>();
 			}
-			interp.Translate(add_value: new Vector3(Random.Range(0f - soulEffectAddRandomMax, soulEffectAddRandomMax), Random.Range(0f - soulEffectAddRandomMax, soulEffectAddRandomMax), 0f), _time: soulEffectTime, target: Vector3.get_zero(), ease_curve: soulEffectEaseCurve, add_curve: soulEffectAddCurve);
-			yield return (object)new WaitForSeconds(soulEffectTime);
+			transformInterpolator.Translate(add_value: new Vector3(UnityEngine.Random.Range(0f - soulEffectAddRandomMax, soulEffectAddRandomMax), UnityEngine.Random.Range(0f - soulEffectAddRandomMax, soulEffectAddRandomMax), 0f), _time: soulEffectTime, target: Vector3.zero, ease_curve: soulEffectEaseCurve, add_curve: soulEffectAddCurve);
+			yield return new WaitForSeconds(soulEffectTime);
 			soulEnergy.Absorbed();
 		}
 	}
 
 	public void PlayChangeEvolveIcon(bool start)
 	{
-		if (object.ReferenceEquals(evolveGauge, null) || object.ReferenceEquals(evolveGauge.evolveIcon, null) || evolveGauge.evolveIcon.get_gameObject().get_activeSelf() == start)
+		if ((object)evolveGauge == null || (object)evolveGauge.evolveIcon == null || evolveGauge.evolveIcon.gameObject.activeSelf == start)
 		{
 			return;
 		}
-		if (!object.ReferenceEquals(weaponChange, null))
+		if ((object)weaponChange != null)
 		{
 			if (start)
 			{
@@ -640,7 +618,7 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	public void SetEvolveIcon(uint evolveId)
 	{
-		if (!object.ReferenceEquals(evolveGauge, null))
+		if ((object)evolveGauge != null)
 		{
 			evolveGauge.SetEvolveIcon(evolveId);
 		}
@@ -648,7 +626,7 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	public void EnableEvolveIcon(bool isEnable)
 	{
-		if (!object.ReferenceEquals(evolveGauge, null))
+		if ((object)evolveGauge != null)
 		{
 			evolveGauge.EnableEvolveIcon(isEnable);
 		}
@@ -656,7 +634,7 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	public void SetEvolveRate(float rate)
 	{
-		if (!object.ReferenceEquals(evolveGauge, null))
+		if ((object)evolveGauge != null)
 		{
 			evolveGauge.SetRate(rate);
 			if (rate >= 1f)
@@ -668,7 +646,7 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 
 	public void RestrictPopMenu(bool isRestrict)
 	{
-		if (!object.ReferenceEquals(weaponChange, null))
+		if ((object)weaponChange != null)
 		{
 			weaponChange.SetRestrictPopMenu(isRestrict);
 		}
@@ -720,10 +698,11 @@ public class UIEnduranceStatus : MonoBehaviourSingleton<UIEnduranceStatus>
 	{
 		if (!(m_burstBulletCtrl == null) && !(targetPlayer == null) && targetPlayer.thsCtrl != null)
 		{
-			UIBurstBulletUIController.InitParam initParam = new UIBurstBulletUIController.InitParam();
-			initParam.MaxBulletCount = targetPlayer.thsCtrl.CurrentMaxBulletCount;
-			initParam.CurrentRestBulletCount = targetPlayer.thsCtrl.CurrentRestBulletCount;
-			UIBurstBulletUIController.InitParam param = initParam;
+			UIBurstBulletUIController.InitParam param = new UIBurstBulletUIController.InitParam
+			{
+				MaxBulletCount = targetPlayer.thsCtrl.CurrentMaxBulletCount,
+				CurrentRestBulletCount = targetPlayer.thsCtrl.CurrentRestBulletCount
+			};
 			m_burstBulletCtrl.Initialize(param);
 		}
 	}

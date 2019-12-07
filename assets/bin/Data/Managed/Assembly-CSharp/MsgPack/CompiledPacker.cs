@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace MsgPack
@@ -67,21 +66,6 @@ namespace MsgPack
 
 			private static int _dynamicMethodIdx;
 
-			[CompilerGenerated]
-			private static Func<Type, MemberInfo[]> _003C_003Ef__mg_0024cache0;
-
-			[CompilerGenerated]
-			private static Func<MemberInfo, string> _003C_003Ef__mg_0024cache1;
-
-			[CompilerGenerated]
-			private static Func<Type, MemberInfo[]> _003C_003Ef__mg_0024cache2;
-
-			[CompilerGenerated]
-			private static Func<MemberInfo, string> _003C_003Ef__mg_0024cache3;
-
-			[CompilerGenerated]
-			private static Func<Type, IDictionary<string, int>> _003C_003Ef__mg_0024cache4;
-
 			static DynamicMethodPacker()
 			{
 				UnpackMemberMappings = new Dictionary<Type, IDictionary<string, int>>();
@@ -90,14 +74,12 @@ namespace MsgPack
 
 			protected override Action<MsgPackWriter, T> CreatePacker_Internal<T>()
 			{
-				DynamicMethod dynamicMethod = CreatePacker(typeof(T), CreatePackDynamicMethod(typeof(T)));
-				return (Action<MsgPackWriter, T>)dynamicMethod.CreateDelegate(typeof(Action<MsgPackWriter, T>));
+				return (Action<MsgPackWriter, T>)CreatePacker(typeof(T), CreatePackDynamicMethod(typeof(T))).CreateDelegate(typeof(Action<MsgPackWriter, T>));
 			}
 
 			protected override Func<MsgPackReader, T> CreateUnpacker_Internal<T>()
 			{
-				DynamicMethod dynamicMethod = CreateUnpacker(typeof(T), CreateUnpackDynamicMethod(typeof(T)));
-				return (Func<MsgPackReader, T>)dynamicMethod.CreateDelegate(typeof(Func<MsgPackReader, T>));
+				return (Func<MsgPackReader, T>)CreateUnpacker(typeof(T), CreateUnpackDynamicMethod(typeof(T))).CreateDelegate(typeof(Func<MsgPackReader, T>));
 			}
 
 			private DynamicMethod CreatePacker(Type t, DynamicMethod dm)
@@ -178,8 +160,7 @@ namespace MsgPack
 
 			private static DynamicMethod CreateDynamicMethod(Type returnType, Type[] parameterTypes)
 			{
-				string name = "_" + Interlocked.Increment(ref _dynamicMethodIdx).ToString();
-				return new DynamicMethod(name, returnType, parameterTypes, restrictedSkipVisibility: true);
+				return new DynamicMethod("_" + Interlocked.Increment(ref _dynamicMethodIdx).ToString(), returnType, parameterTypes, restrictedSkipVisibility: true);
 			}
 
 			internal static IDictionary<string, int> LookupMemberMapping(Type t)
@@ -210,21 +191,6 @@ namespace MsgPack
 			private static MethodInfo LookupMemberMappingMethod;
 
 			private static Dictionary<Type, IDictionary<string, int>> UnpackMemberMappings;
-
-			[CompilerGenerated]
-			private static Func<Type, MemberInfo[]> _003C_003Ef__mg_0024cache0;
-
-			[CompilerGenerated]
-			private static Func<MemberInfo, string> _003C_003Ef__mg_0024cache1;
-
-			[CompilerGenerated]
-			private static Func<Type, MemberInfo[]> _003C_003Ef__mg_0024cache2;
-
-			[CompilerGenerated]
-			private static Func<MemberInfo, string> _003C_003Ef__mg_0024cache3;
-
-			[CompilerGenerated]
-			private static Func<Type, IDictionary<string, int>> _003C_003Ef__mg_0024cache4;
 
 			static MethodBuilderPacker()
 			{
@@ -267,8 +233,7 @@ namespace MsgPack
 
 			private MethodInfo ToCallableMethodInfo(Type t, TypeBuilder tb, bool isPacker)
 			{
-				Type type = tb.CreateType();
-				MethodInfo method = type.GetMethod((!isPacker) ? "Unpack" : "Pack", BindingFlags.Static | BindingFlags.Public);
+				MethodInfo method = tb.CreateType().GetMethod(isPacker ? "Pack" : "Unpack", BindingFlags.Static | BindingFlags.Public);
 				if (isPacker)
 				{
 					_packMethods[t] = method;
@@ -361,15 +326,14 @@ namespace MsgPack
 
 			private static void RegisterPackMethods(Dictionary<Type, MethodInfo> packMethods)
 			{
-				Type typeFromHandle = typeof(DefaultPackMethods);
-				MethodInfo[] methods = typeFromHandle.GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
+				MethodInfo[] methods = typeof(DefaultPackMethods).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
 				string text = "Pack";
 				for (int i = 0; i < methods.Length; i++)
 				{
 					if (text.Equals(methods[i].Name))
 					{
 						ParameterInfo[] parameters = methods[i].GetParameters();
-						if (parameters.Length == 2 && parameters[0].ParameterType == typeof(MsgPackWriter))
+						if (parameters.Length == 2 && !(parameters[0].ParameterType != typeof(MsgPackWriter)))
 						{
 							packMethods.Add(parameters[1].ParameterType, methods[i]);
 						}
@@ -397,21 +361,16 @@ namespace MsgPack
 				unpackMethods.Add(typeof(sbyte), method);
 				unpackMethods.Add(typeof(short), method);
 				unpackMethods.Add(typeof(int), method);
-				method = typeFromHandle.GetMethod("Unpack_Signed64", bindingAttr);
-				unpackMethods.Add(typeof(long), method);
+				unpackMethods.Add(value: typeFromHandle.GetMethod("Unpack_Signed64", bindingAttr), key: typeof(long));
 				method = typeFromHandle.GetMethod("Unpack_Unsigned", bindingAttr);
 				unpackMethods.Add(typeof(byte), method);
 				unpackMethods.Add(typeof(ushort), method);
 				unpackMethods.Add(typeof(char), method);
 				unpackMethods.Add(typeof(uint), method);
-				method = typeFromHandle.GetMethod("Unpack_Unsigned64", bindingAttr);
-				unpackMethods.Add(typeof(ulong), method);
-				method = typeFromHandle.GetMethod("Unpack_Boolean", bindingAttr);
-				unpackMethods.Add(typeof(bool), method);
-				method = typeFromHandle.GetMethod("Unpack_Float", bindingAttr);
-				unpackMethods.Add(typeof(float), method);
-				method = typeFromHandle.GetMethod("Unpack_Double", bindingAttr);
-				unpackMethods.Add(typeof(double), method);
+				unpackMethods.Add(value: typeFromHandle.GetMethod("Unpack_Unsigned64", bindingAttr), key: typeof(ulong));
+				unpackMethods.Add(value: typeFromHandle.GetMethod("Unpack_Boolean", bindingAttr), key: typeof(bool));
+				unpackMethods.Add(value: typeFromHandle.GetMethod("Unpack_Float", bindingAttr), key: typeof(float));
+				unpackMethods.Add(value: typeFromHandle.GetMethod("Unpack_Double", bindingAttr), key: typeof(double));
 				method = typeFromHandle.GetMethod("Unpack_String", bindingAttr);
 				unpackMethods.Add(typeof(string), method);
 			}
@@ -531,7 +490,7 @@ namespace MsgPack
 
 		public CompiledPacker(bool packPrivateField)
 		{
-			_packer = ((!packPrivateField) ? _publicFieldPacker : _allFieldPacker);
+			_packer = (packPrivateField ? _allFieldPacker : _publicFieldPacker);
 		}
 
 		public void Prepare<T>()

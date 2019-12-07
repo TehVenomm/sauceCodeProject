@@ -39,17 +39,21 @@ public class FieldChatGimmickObject : FieldGimmickObject
 		for (int i = 0; i < array.Length; i++)
 		{
 			string[] array2 = array[i].Split(':');
-			if (array2 != null && array2.Length == 2)
+			if (array2 == null || array2.Length != 2)
 			{
-				switch (array2[0])
+				continue;
+			}
+			string a = array2[0];
+			if (!(a == "sdid"))
+			{
+				if (a == "edid")
 				{
-				case "sdid":
-					uint.TryParse(array2[1], out result);
-					break;
-				case "edid":
 					uint.TryParse(array2[1], out result2);
-					break;
 				}
+			}
+			else
+			{
+				uint.TryParse(array2[1], out result);
 			}
 		}
 		if (result2 != 0 && MonoBehaviourSingleton<DeliveryManager>.I.IsAppearDelivery(result2))
@@ -72,12 +76,9 @@ public class FieldChatGimmickObject : FieldGimmickObject
 		}
 		if (Singleton<NPCTable>.IsValid())
 		{
-			Singleton<NPCTable>.I.GetNPCData(npcId)?.LoadModel(this.get_gameObject(), need_shadow: true, enable_light_probe: true, delegate(Animator animator)
+			Singleton<NPCTable>.I.GetNPCData(npcId)?.LoadModel(base.gameObject, need_shadow: true, enable_light_probe: true, delegate(Animator animator)
 			{
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-				Transform transform = animator.get_gameObject().get_transform();
-				transform.set_localScale(transform.get_localScale() * npcScale);
+				animator.gameObject.transform.localScale *= npcScale;
 			}, useSpecialModel: false);
 		}
 	}
@@ -99,6 +100,7 @@ public class FieldChatGimmickObject : FieldGimmickObject
 			switch (array2[0])
 			{
 			case "mid":
+			{
 				if (uint.TryParse(array2[1], out uint result))
 				{
 					string text = StringTable.Get(STRING_CATEGORY.GIMMICK, result);
@@ -108,6 +110,7 @@ public class FieldChatGimmickObject : FieldGimmickObject
 					}
 				}
 				break;
+			}
 			case "m":
 				if (!array2[1].IsNullOrWhiteSpace())
 				{
@@ -135,22 +138,6 @@ public class FieldChatGimmickObject : FieldGimmickObject
 
 	public override void UpdateTargetMarker(bool isNear)
 	{
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 		if (isNear && IsValid())
 		{
 			if (targetMarker == null && !string.IsNullOrEmpty("ef_btl_target_readstory_01"))
@@ -160,17 +147,16 @@ public class FieldChatGimmickObject : FieldGimmickObject
 			if (targetMarker != null)
 			{
 				Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-				Vector3 position = cameraTransform.get_position();
-				Quaternion rotation = cameraTransform.get_rotation();
-				Vector3 val = position - _transform.get_position();
-				Vector3 pos = val.get_normalized() + Vector3.get_up() + _transform.get_position();
+				Vector3 position = cameraTransform.position;
+				Quaternion rotation = cameraTransform.rotation;
+				Vector3 pos = (position - _transform.position).normalized + Vector3.up + _transform.position;
 				pos.y += markerOffsetY;
 				targetMarker.Set(pos, rotation);
 			}
 		}
 		else if (targetMarker != null)
 		{
-			EffectManager.ReleaseEffect(targetMarker.get_gameObject());
+			EffectManager.ReleaseEffect(targetMarker.gameObject);
 		}
 	}
 
@@ -191,8 +177,8 @@ public class FieldChatGimmickObject : FieldGimmickObject
 
 	protected override void Awake()
 	{
-		_transform = this.get_transform();
-		Utility.SetLayerWithChildren(this.get_transform(), 19);
+		_transform = base.transform;
+		Utility.SetLayerWithChildren(base.transform, 19);
 	}
 
 	private bool IsValid()
@@ -240,10 +226,7 @@ public class FieldChatGimmickObject : FieldGimmickObject
 
 	public Vector3 GetPosition()
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 position = _transform.get_position();
+		Vector3 position = _transform.position;
 		position.y += chatOffsetY;
 		return position;
 	}

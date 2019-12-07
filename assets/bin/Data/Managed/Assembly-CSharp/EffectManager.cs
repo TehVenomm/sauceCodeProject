@@ -62,15 +62,15 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 		int i = 0;
 		for (int count = infoList.Count; i < count; i++)
 		{
-			OneShotInfo oneShotInfo = infoList[i];
-			rymTPool<OneShotInfo>.Release(ref oneShotInfo);
+			OneShotInfo obj = infoList[i];
+			rymTPool<OneShotInfo>.Release(ref obj);
 		}
 		infoList.Clear();
 		int j = 0;
 		for (int count2 = infoSecondList.Count; j < count2; j++)
 		{
-			OneShotInfo oneShotInfo2 = infoSecondList[j];
-			rymTPool<OneShotInfo>.Release(ref oneShotInfo2);
+			OneShotInfo obj2 = infoSecondList[j];
+			rymTPool<OneShotInfo>.Release(ref obj2);
 		}
 		infoSecondList.Clear();
 		base.OnDisable();
@@ -79,7 +79,7 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 
 	private bool OnTrailQueryDestroy(Trail trail)
 	{
-		if (StockOrDestroy(trail.get_gameObject(), no_stock_to_destroy: false))
+		if (StockOrDestroy(trail.gameObject, no_stock_to_destroy: false))
 		{
 			return false;
 		}
@@ -88,17 +88,11 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 
 	private void LateUpdate()
 	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
 		if (infoList.Count > 0)
 		{
-			OneShotInfo oneShotInfo = infoList[0];
-			_OneShot(oneShotInfo.name, oneShotInfo.pos, oneShotInfo.rot, oneShotInfo.scale, oneShotInfo.onCreateCallBack);
-			rymTPool<OneShotInfo>.Release(ref oneShotInfo);
+			OneShotInfo obj = infoList[0];
+			_OneShot(obj.name, obj.pos, obj.rot, obj.scale, obj.onCreateCallBack);
+			rymTPool<OneShotInfo>.Release(ref obj);
 			infoList.RemoveAt(0);
 			return;
 		}
@@ -107,24 +101,24 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 		{
 			return;
 		}
-		float time = Time.get_time();
+		float time = Time.time;
 		int num = 0;
 		for (int i = 0; i < count; i++)
 		{
-			OneShotInfo oneShotInfo2 = infoSecondList[i];
-			if (time - oneShotInfo2.time > 0.1f)
+			OneShotInfo oneShotInfo = infoSecondList[i];
+			if (time - oneShotInfo.time > 0.1f)
 			{
 				num++;
 				continue;
 			}
-			_OneShot(oneShotInfo2.name, oneShotInfo2.pos, oneShotInfo2.rot, oneShotInfo2.scale, oneShotInfo2.onCreateCallBack);
+			_OneShot(oneShotInfo.name, oneShotInfo.pos, oneShotInfo.rot, oneShotInfo.scale, oneShotInfo.onCreateCallBack);
 			num++;
 			break;
 		}
 		for (int j = 0; j < num; j++)
 		{
-			OneShotInfo oneShotInfo3 = infoSecondList[j];
-			rymTPool<OneShotInfo>.Release(ref oneShotInfo3);
+			OneShotInfo obj2 = infoSecondList[j];
+			rymTPool<OneShotInfo>.Release(ref obj2);
 		}
 		infoSecondList.RemoveRange(0, num);
 	}
@@ -141,17 +135,17 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 			if (component != null && !component.IsLoop())
 			{
 				component.Stock();
-				go.get_transform().SetParent(stockParent, false);
-				if (stockParent.get_childCount() >= maxStockCount)
+				go.transform.SetParent(stockParent, worldPositionStays: false);
+				if (stockParent.childCount >= maxStockCount)
 				{
-					Object.DestroyImmediate(stockParent.GetChild(0).get_gameObject());
+					UnityEngine.Object.DestroyImmediate(stockParent.GetChild(0).gameObject);
 				}
 				return true;
 			}
 		}
 		if (no_stock_to_destroy)
 		{
-			Object.Destroy(go);
+			UnityEngine.Object.Destroy(go);
 		}
 		return false;
 	}
@@ -160,15 +154,29 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 	{
 		if (stockParent != null)
 		{
-			Object.DestroyImmediate(stockParent.get_gameObject());
+			UnityEngine.Object.DestroyImmediate(stockParent.gameObject);
 		}
 		stockParent = Utility.CreateGameObject("Stocks", base._transform);
-		stockParent.get_gameObject().SetActive(false);
+		stockParent.gameObject.SetActive(value: false);
 	}
 
 	public static Transform GetEffect(string effect_name, Transform parent = null)
 	{
 		return GetEffect(RESOURCE_CATEGORY.EFFECT_ACTION, effect_name, parent);
+	}
+
+	public static bool ExistEffect(string effect_name)
+	{
+		if (string.IsNullOrEmpty(effect_name))
+		{
+			return false;
+		}
+		if (!MonoBehaviourSingleton<EffectManager>.IsValid() || !MonoBehaviourSingleton<ResourceManager>.IsValid())
+		{
+			return false;
+		}
+		effect_name = ResourceName.AddAttributID(effect_name);
+		return MonoBehaviourSingleton<ResourceManager>.I.IsCached(RESOURCE_CATEGORY.EFFECT_ACTION, effect_name);
 	}
 
 	public static Transform GetCameraLinkEffect(string effect_name, bool y0, Transform parent = null)
@@ -178,11 +186,11 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 		{
 			return null;
 		}
-		CameraPosLink cameraPosLink = effect.get_gameObject().AddComponent<CameraPosLink>();
+		CameraPosLink cameraPosLink = effect.gameObject.AddComponent<CameraPosLink>();
 		if (cameraPosLink != null)
 		{
 			cameraPosLink.y0 = y0;
-			EffectInfoComponent component = effect.get_gameObject().GetComponent<EffectInfoComponent>();
+			EffectInfoComponent component = effect.gameObject.GetComponent<EffectInfoComponent>();
 			if (component != null)
 			{
 				cameraPosLink.cameraOffsetZ = component.CameraPosLinkOffsetZ;
@@ -198,7 +206,7 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 
 	public static Transform GetUIEffect(string effect_name, UIWidget widget, float z = -0.001f, int add_render_queue = 0)
 	{
-		return GetUIEffect(effect_name, widget.get_transform(), z, add_render_queue);
+		return GetUIEffect(effect_name, widget.transform, z, add_render_queue);
 	}
 
 	public static Transform GetUIEffect(string effect_name, Transform parent, float z = -0.001f, int add_render_queue = 0, UIWidget ref_render_queue = null)
@@ -217,10 +225,7 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 
 	public static void SetUIEffectDepth(Transform effect, Transform parent, float z = -0.001f, int add_render_queue = 0, UIWidget ref_render_queue = null)
 	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		effect.set_localPosition(effect.get_localPosition() + new Vector3(0f, 0f, z));
+		effect.localPosition += new Vector3(0f, 0f, z);
 		if (ref_render_queue == null)
 		{
 			ref_render_queue = parent.GetComponentInChildren<UIWidget>();
@@ -236,7 +241,7 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 				{
 					if (fx != null)
 					{
-						fx.SetRenderQueue(mate.get_renderQueue() + add_render_queue);
+						fx.SetRenderQueue(mate.renderQueue + add_render_queue);
 					}
 				});
 			}
@@ -248,26 +253,26 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 		else if (effect.GetComponent<EffectCtrl>() != null)
 		{
 			Renderer[] renderers = effect.GetComponentsInChildren<Renderer>();
-			if (renderers.Length > 0)
+			if (renderers.Length != 0)
 			{
 				UIWidget uIWidget2 = ref_render_queue;
 				uIWidget2.onRender = (UIDrawCall.OnRenderCallback)Delegate.Combine(uIWidget2.onRender, (UIDrawCall.OnRenderCallback)delegate(Material mate)
 				{
-					int renderQueue = mate.get_renderQueue() + add_render_queue;
+					int renderQueue = mate.renderQueue + add_render_queue;
 					int i = 0;
 					for (int num = renderers.Length; i < num; i++)
 					{
-						Renderer val = renderers[i];
-						if (val != null)
+						Renderer renderer = renderers[i];
+						if (renderer != null)
 						{
-							Material[] materials = val.get_materials();
+							Material[] materials = renderer.materials;
 							int j = 0;
 							for (int num2 = materials.Length; j < num2; j++)
 							{
-								Material val2 = materials[j];
-								if (val2 != null)
+								Material material = materials[j];
+								if (material != null)
 								{
-									val2.set_renderQueue(renderQueue);
+									material.renderQueue = renderQueue;
 								}
 							}
 						}
@@ -279,12 +284,6 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 
 	private static Transform GetEffect(RESOURCE_CATEGORY category, string effect_name, Transform parent = null, int layer = -1, bool enable_stock = false)
 	{
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Expected O, but got Unknown
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Expected O, but got Unknown
-		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Expected O, but got Unknown
 		if (string.IsNullOrEmpty(effect_name))
 		{
 			return null;
@@ -299,41 +298,41 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 				{
 					parent = i._transform;
 				}
-				GameObject val = null;
-				GameObject val2 = null;
-				Transform val3 = null;
+				GameObject gameObject = null;
+				GameObject gameObject2 = null;
+				Transform transform = null;
 				bool flag = i.enableStock && enable_stock;
 				if (flag)
 				{
-					Transform val4 = i.stockParent.Find(effect_name);
-					if (val4 != null)
+					Transform transform2 = i.stockParent.Find(effect_name);
+					if (transform2 != null)
 					{
-						val4.GetComponent<EffectStock>().Recycle(parent, layer);
-						return val4;
+						transform2.GetComponent<EffectStock>().Recycle(parent, layer);
+						return transform2;
 					}
 				}
-				val2 = InstantiateManager.FindStock(category, effect_name);
-				if (val2 != null)
+				gameObject2 = (GameObject)InstantiateManager.FindStock(category, effect_name);
+				if (gameObject2 != null)
 				{
-					val3 = InstantiateManager.Realizes(ref val2, parent, layer);
-					val2 = val3.get_gameObject();
+					transform = InstantiateManager.Realizes(ref gameObject2, parent, layer);
+					gameObject2 = transform.gameObject;
 				}
 				else
 				{
-					val = ((!ResourceManager.enableLoadDirect) ? MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedObject(category, effect_name) : MonoBehaviourSingleton<ResourceManager>.I.LoadDirect(category, effect_name));
-					if (val != null)
+					gameObject = ((!ResourceManager.enableLoadDirect) ? ((GameObject)MonoBehaviourSingleton<ResourceManager>.I.cache.GetCachedObject(category, effect_name)) : ((GameObject)MonoBehaviourSingleton<ResourceManager>.I.LoadDirect(category, effect_name)));
+					if (gameObject != null)
 					{
-						val3 = ResourceUtility.Realizes(val, parent, layer);
-						val2 = val3.get_gameObject();
+						transform = ResourceUtility.Realizes(gameObject, parent, layer);
+						gameObject2 = transform.gameObject;
 					}
 				}
-				if (val2 != null)
+				if (gameObject2 != null)
 				{
 					if (flag)
 					{
-						val2.AddComponent<EffectStock>();
+						gameObject2.AddComponent<EffectStock>();
 					}
-					return val3;
+					return transform;
 				}
 			}
 		}
@@ -354,29 +353,11 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 
 	public static void OneShot(string effect_name, Vector3 pos, Quaternion rot, bool is_priority = false)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		OneShot(effect_name, pos, rot, Vector3.get_one(), is_priority);
+		OneShot(effect_name, pos, rot, Vector3.one, is_priority);
 	}
 
 	public static void OneShot(string effect_name, Vector3 pos, Quaternion rot, Vector3 scale, bool is_priority = false, Action<Transform> callback = null)
 	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
 		bool flag = false;
 		if (MonoBehaviourSingleton<InGameManager>.I.graphicOptionType >= 2)
 		{
@@ -387,8 +368,8 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 			_OneShot(effect_name, pos, rot, scale, callback);
 			return;
 		}
-		Vector3 val = MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToViewportPoint(pos);
-		if (!(val.x < -0.5f) && !(val.x > 1.5f) && !(val.y < -0.5f) && !(val.y > 1.5f) && !(val.z < 0f))
+		Vector3 vector = MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToViewportPoint(pos);
+		if (!(vector.x < -0.5f) && !(vector.x > 1.5f) && !(vector.y < -0.5f) && !(vector.y > 1.5f) && !(vector.z < 0f))
 		{
 			if (MonoBehaviourSingleton<EffectManager>.IsValid())
 			{
@@ -397,7 +378,7 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 				oneShotInfo.pos = pos;
 				oneShotInfo.rot = rot;
 				oneShotInfo.scale = scale;
-				oneShotInfo.time = Time.get_time();
+				oneShotInfo.time = Time.time;
 				oneShotInfo.onCreateCallBack = callback;
 				MonoBehaviourSingleton<EffectManager>.I.AddOneShotInfo(oneShotInfo, is_priority);
 			}
@@ -410,17 +391,12 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 
 	public static void _OneShot(string effect_name, Vector3 pos, Quaternion rot, Vector3 scale, Action<Transform> callback = null)
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 		Transform effect = GetEffect(RESOURCE_CATEGORY.EFFECT_ACTION, effect_name, null, -1, enable_stock: true);
 		if (!(effect == null))
 		{
-			effect.set_position(pos);
-			effect.set_rotation(rot);
-			effect.set_localScale(Vector3.Scale(effect.get_localScale(), scale));
+			effect.position = pos;
+			effect.rotation = rot;
+			effect.localScale = Vector3.Scale(effect.localScale, scale);
 			callback?.Invoke(effect);
 		}
 	}
@@ -428,18 +404,18 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 	public void DeleteManagerChildrenEffects()
 	{
 		infoList.Clear();
-		this.get_gameObject().GetComponentsInChildren<rymFX>(Temporary.fxList);
+		base.gameObject.GetComponentsInChildren(Temporary.fxList);
 		int i = 0;
 		for (int count = Temporary.fxList.Count; i < count; i++)
 		{
-			Object.Destroy(Temporary.fxList[i].get_gameObject());
+			UnityEngine.Object.Destroy(Temporary.fxList[i].gameObject);
 		}
 		Temporary.fxList.Clear();
-		this.get_gameObject().GetComponentsInChildren<EffectCtrl>(Temporary.effectCtrlList);
+		base.gameObject.GetComponentsInChildren(Temporary.effectCtrlList);
 		int j = 0;
 		for (int count2 = Temporary.effectCtrlList.Count; j < count2; j++)
 		{
-			Object.Destroy(Temporary.effectCtrlList[j].get_gameObject());
+			UnityEngine.Object.Destroy(Temporary.effectCtrlList[j].gameObject);
 		}
 		Temporary.effectCtrlList.Clear();
 	}
@@ -452,7 +428,7 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 		}
 		if (!MonoBehaviourSingleton<EffectManager>.IsValid())
 		{
-			Object.Destroy(effect_object);
+			UnityEngine.Object.Destroy(effect_object);
 			return;
 		}
 		EffectManager i = MonoBehaviourSingleton<EffectManager>.I;
@@ -466,25 +442,25 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 			{
 				effectCtrl = effect_object.GetComponent<EffectCtrl>();
 			}
-			if (effectCtrl == null && effect_object.get_transform().get_childCount() > 0)
+			if (effectCtrl == null && effect_object.transform.childCount > 0)
 			{
-				effect_object.GetComponentsInChildren<Renderer>(Temporary.rendererList);
+				effect_object.GetComponentsInChildren(Temporary.rendererList);
 				int j = 0;
 				for (int count = Temporary.rendererList.Count; j < count; j++)
 				{
-					Temporary.rendererList[j].set_enabled(false);
+					Temporary.rendererList[j].enabled = false;
 				}
 				Temporary.rendererList.Clear();
 			}
-			effect_object.GetComponents<Trail>(Temporary.trailList);
+			effect_object.GetComponents(Temporary.trailList);
 			bool flag = false;
-			if (component2 != null && component2.get_enabled())
+			if (component2 != null && component2.enabled)
 			{
 				component2.AutoDelete = true;
 				component2.LoopEnd = true;
 				flag = true;
 			}
-			else if (effectCtrl != null && effectCtrl.get_enabled())
+			else if (effectCtrl != null && effectCtrl.enabled)
 			{
 				effectCtrl.EndLoop(isPlayEndAnimation);
 				flag = true;
@@ -517,7 +493,7 @@ public class EffectManager : MonoBehaviourSingleton<EffectManager>
 	{
 		if (t != null)
 		{
-			ReleaseEffect(t.get_gameObject());
+			ReleaseEffect(t.gameObject);
 			t = null;
 		}
 	}

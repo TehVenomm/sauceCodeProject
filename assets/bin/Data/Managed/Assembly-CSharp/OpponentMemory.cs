@@ -68,18 +68,7 @@ public class OpponentMemory
 
 		public override string ToString()
 		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			string empty = string.Empty;
-			empty = empty + "pos=" + pos;
-			empty = empty + ", len=" + distance;
-			empty = empty + ", front=" + distanceFront;
-			empty = empty + ", D=" + distanceType;
-			empty = empty + ", P=" + place;
-			empty = empty + ", angle=" + rootAngle;
-			empty = empty + ", frontAngle=" + frontAngle;
-			empty = empty + ", View=" + isView;
-			empty = empty + ", Near=" + isNearPlace;
-			return empty + ", moveLength=" + moveLength;
+			return "" + "pos=" + pos + ", len=" + distance + ", front=" + distanceFront + ", D=" + distanceType + ", P=" + place + ", angle=" + rootAngle + ", frontAngle=" + frontAngle + ", View=" + isView.ToString() + ", Near=" + isNearPlace.ToString() + ", moveLength=" + moveLength;
 		}
 	}
 
@@ -98,7 +87,11 @@ public class OpponentMemory
 
 		public bool IsAlive()
 		{
-			return !(obj != null) || !(obj is Character) || !(obj as Character).isDead;
+			if (!(obj != null) || !(obj is Character))
+			{
+				return true;
+			}
+			return !(obj as Character).isDead;
 		}
 	}
 
@@ -141,7 +134,11 @@ public class OpponentMemory
 	public OpponentRecord FindOrEmpty(StageObject obj)
 	{
 		OpponentRecord opponentRecord = Find(obj);
-		return (opponentRecord == null) ? emptyOpponent : opponentRecord;
+		if (opponentRecord == null)
+		{
+			return emptyOpponent;
+		}
+		return opponentRecord;
 	}
 
 	public OpponentRecord FindOrRegist(StageObject obj)
@@ -179,10 +176,6 @@ public class OpponentMemory
 
 	public void Update()
 	{
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 		BrainParam.SensorParam sensorParam = brain.param.sensorParam;
 		Character owner = brain.owner;
 		Vector2 owner_pos2 = owner.positionXZ;
@@ -200,54 +193,8 @@ public class OpponentMemory
 				actionTargetPoint = autoSelfController.actionTargetPoint;
 			}
 		}
-		List<StageObject> targetObjectList = brain.GetTargetObjectList();
-		targetObjectList.ForEach(delegate(StageObject opponent_obj)
+		brain.GetTargetObjectList().ForEach(delegate(StageObject opponent_obj)
 		{
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0349: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0380: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0384: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0394: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0400: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0424: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0427: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0437: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0443: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0446: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044b: Unknown result type (might be due to invalid IL or missing references)
 			Character character = opponent_obj as Character;
 			if (!(character != null) || !character.isDead)
 			{
@@ -260,27 +207,23 @@ public class OpponentMemory
 				}
 				else
 				{
-					client_pos = Vector3.get_zero();
+					client_pos = Vector3.zero;
 					opponentRecord.record = new RecordData();
 				}
 				RecordData record = opponentRecord.record;
 				record.pos = owner.GetTargetPosition(opponent_obj);
-				Vector2 val = record.pos.ToVector2XZ();
-				Vector2 p = val - owner_pos2;
-				Vector2 p2 = val - brain.frontPositionXZ;
-				record.distance = p.get_magnitude();
-				record.distanceFront = p2.get_magnitude();
+				Vector2 vector = record.pos.ToVector2XZ();
+				Vector2 p = vector - owner_pos2;
+				Vector2 p2 = vector - brain.frontPositionXZ;
+				record.distance = p.magnitude;
+				record.distanceFront = p2.magnitude;
 				record.rootAngle = Utility.Angle360(owner_forward2, p);
 				record.frontAngle = Utility.Angle360(owner_forward2, p2);
 				record.isView = false;
-				if (record.distanceFront <= sensorParam.viewDistance)
+				if (record.distanceFront <= sensorParam.viewDistance && (record.frontAngle + sensorParam.viewAngle / 2f) % 360f < sensorParam.viewAngle)
 				{
-					float num = (record.frontAngle + sensorParam.viewAngle / 2f) % 360f;
-					if (num < sensorParam.viewAngle)
-					{
-						record.isView = true;
-						counter.viewNum++;
-					}
+					record.isView = true;
+					counter.viewNum++;
 				}
 				record.place = AIUtility.GetPlaceOfAngle360(record.rootAngle);
 				switch (record.place)
@@ -304,25 +247,25 @@ public class OpponentMemory
 					record.isNearPlace = true;
 					counter.nearNum++;
 				}
-				float num2 = record.distance - brain.rootInternalRedius;
+				float num = record.distance - brain.rootInternalRedius;
 				switch (record.place)
 				{
 				case PLACE.FRONT:
-					num2 -= brain.rootFrontDistance;
+					num -= brain.rootFrontDistance;
 					break;
 				case PLACE.BACK:
-					num2 -= brain.rootBackDistance;
+					num -= brain.rootBackDistance;
 					break;
 				}
-				if (num2 < sensorParam.shortDistance)
+				if (num < sensorParam.shortDistance)
 				{
 					record.distanceType = DISTANCE.SHORT_SHORT;
 				}
-				else if (num2 >= sensorParam.shortDistance && num2 < sensorParam.middleDistance)
+				else if (num >= sensorParam.shortDistance && num < sensorParam.middleDistance)
 				{
 					record.distanceType = DISTANCE.SHORT;
 				}
-				else if (num2 >= sensorParam.middleDistance && num2 < sensorParam.longDistance)
+				else if (num >= sensorParam.middleDistance && num < sensorParam.longDistance)
 				{
 					record.distanceType = DISTANCE.MIDDLE;
 				}
@@ -330,15 +273,14 @@ public class OpponentMemory
 				{
 					record.distanceType = DISTANCE.LONG;
 				}
-				Vector3 val2 = record.pos;
+				Vector3 vector2 = record.pos;
 				float attackPosDistance = record.distance;
 				if (isAutoMode)
 				{
 					if (actionTargetPoint != null)
 					{
-						val2 = actionTargetPoint.GetTargetPoint();
-						Vector2 val3 = val2.ToVector2XZ() - owner_pos2;
-						attackPosDistance = val3.get_magnitude();
+						vector2 = actionTargetPoint.GetTargetPoint();
+						attackPosDistance = (vector2.ToVector2XZ() - owner_pos2).magnitude;
 					}
 				}
 				else if (owner is Player)
@@ -346,19 +288,18 @@ public class OpponentMemory
 					Player player = owner as Player;
 					if (player.targetingPoint != null)
 					{
-						val2 = player.targetingPoint.GetTargetPoint();
-						Vector2 val4 = val2.ToVector2XZ() - owner_pos2;
-						attackPosDistance = val4.get_magnitude();
+						vector2 = player.targetingPoint.GetTargetPoint();
+						attackPosDistance = (vector2.ToVector2XZ() - owner_pos2).magnitude;
 					}
 				}
-				record.attackPos = val2;
+				record.attackPos = vector2;
 				record.attackPosDistance = attackPosDistance;
 				record.moveLength = 0f;
 				if (flag)
 				{
 					record.moveLength = AIUtility.GetLengthWithBetweenPosition(client_pos, record.pos);
 				}
-				Vector2 p3 = owner_pos2 - val;
+				Vector2 p3 = owner_pos2 - vector;
 				float angle = Utility.Angle360(opponent_obj.forwardXZ, p3);
 				record.placeOfOpponent = AIUtility.GetPlaceOfAngle360(angle);
 			}
@@ -443,7 +384,6 @@ public class OpponentMemory
 
 	public bool IsArrivalPosition(StageObject obj)
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 		OpponentRecord opponentRecord = Find(obj);
 		if (opponentRecord == null)
 		{
@@ -454,7 +394,6 @@ public class OpponentMemory
 
 	public bool IsArrivalAttackPosition(StageObject obj)
 	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 		OpponentRecord opponentRecord = Find(obj);
 		if (opponentRecord == null)
 		{
@@ -465,8 +404,6 @@ public class OpponentMemory
 
 	public float GetLengthWithAttackPos(StageObject obj, Vector3 check_pos)
 	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 		OpponentRecord opponentRecord = Find(obj);
 		if (opponentRecord == null)
 		{
@@ -510,8 +447,7 @@ public class OpponentMemory
 
 	public Hate GetHate(StageObject obj)
 	{
-		OpponentRecord opponentRecord = FindOrRegist(obj);
-		return opponentRecord.hate;
+		return FindOrRegist(obj).hate;
 	}
 
 	public void AddHate(StageObject obj, int hate_val, Hate.TYPE type)

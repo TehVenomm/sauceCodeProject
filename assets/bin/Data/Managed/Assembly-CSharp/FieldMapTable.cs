@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class FieldMapTable : Singleton<FieldMapTable>
@@ -43,13 +42,13 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		public uint fieldBuffId;
 
-		public Vector3 camOffsetPortraitPos = Vector3.get_zero();
+		public Vector3 camOffsetPortraitPos = Vector3.zero;
 
-		public Vector3 camOffsetPortraitRot = Vector3.get_zero();
+		public Vector3 camOffsetPortraitRot = Vector3.zero;
 
-		public Vector3 camOffsetLandscapePos = Vector3.get_zero();
+		public Vector3 camOffsetLandscapePos = Vector3.zero;
 
-		public Vector3 camOffsetLandscapeRot = Vector3.get_zero();
+		public Vector3 camOffsetLandscapeRot = Vector3.zero;
 
 		public const string NT = "mapId,regionId,mapName,stageName,happenStageName,fieldGrade,fieldMode,eventId,jumpPortalId,bgmId,happenBgmId,linkQuestID,childRegionId,iconId,questIconId,fieldBuffId,camOffsetPortraitPos,camOffsetPortraitRot,camOffsetLandscapePos,camOffsetLandscapeRot";
 
@@ -89,9 +88,7 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		private static bool TryParseNonSplitStrToVector3(string str, out Vector3 vec)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			vec = Vector3.get_zero();
+			vec = Vector3.zero;
 			if (string.IsNullOrEmpty(str))
 			{
 				return false;
@@ -101,7 +98,7 @@ public class FieldMapTable : Singleton<FieldMapTable>
 			{
 				return false;
 			}
-			vec._002Ector(array[0].ToFloatOrDefault(), array[1].ToFloatOrDefault(), array[2].ToFloatOrDefault());
+			vec = new Vector3(array[0].ToFloatOrDefault(), array[1].ToFloatOrDefault(), array[2].ToFloatOrDefault());
 			return true;
 		}
 
@@ -262,7 +259,7 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		public bool enableWalkSpeed;
 
-		private Vector3 cachedPopBasePosition = Vector3.get_zero();
+		private Vector3 cachedPopBasePosition = Vector3.zero;
 
 		private bool isPopBasePositionCached;
 
@@ -314,7 +311,7 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		public float GeneratePopTime()
 		{
-			return Random.Range(popTimeMin, popTimeMax);
+			return UnityEngine.Random.Range(popTimeMin, popTimeMax);
 		}
 
 		public float GenerateWalkSpeed()
@@ -325,20 +322,17 @@ public class FieldMapTable : Singleton<FieldMapTable>
 			}
 			if (walkSpeedMin < walkSpeedMax)
 			{
-				return Random.Range(walkSpeedMin, walkSpeedMax);
+				return UnityEngine.Random.Range(walkSpeedMin, walkSpeedMax);
 			}
 			if (walkSpeedMin > walkSpeedMax)
 			{
-				return Random.Range(walkSpeedMax, walkSpeedMin);
+				return UnityEngine.Random.Range(walkSpeedMax, walkSpeedMin);
 			}
 			return walkSpeedMin;
 		}
 
 		public Vector3 GeneratePopPosVec3()
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			if (!isPopBasePositionCached)
 			{
 				cachedPopBasePosition = new Vector3(popX, popY, popZ);
@@ -406,15 +400,16 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		public FieldGimmickPointTableData CloneAsGimmickData()
 		{
-			FieldGimmickPointTableData fieldGimmickPointTableData = new FieldGimmickPointTableData();
-			fieldGimmickPointTableData.pointID = pointID;
-			fieldGimmickPointTableData.pointMapID = pointMapID;
-			fieldGimmickPointTableData.pointX = pointX;
-			fieldGimmickPointTableData.pointZ = pointZ;
-			fieldGimmickPointTableData.pointDir = pointDir;
-			fieldGimmickPointTableData.gimmickType = gimmickType;
-			fieldGimmickPointTableData.value1 = value1;
-			return fieldGimmickPointTableData;
+			return new FieldGimmickPointTableData
+			{
+				pointID = pointID,
+				pointMapID = pointMapID,
+				pointX = pointX,
+				pointZ = pointZ,
+				pointDir = pointDir,
+				gimmickType = gimmickType,
+				value1 = value1
+			};
 		}
 	}
 
@@ -518,7 +513,7 @@ public class FieldMapTable : Singleton<FieldMapTable>
 
 		public float value1;
 
-		public string value2 = string.Empty;
+		public string value2 = "";
 
 		public const string NT = "pointId,gimmickType,pointMapId,pointX,pointZ,pointDir,value1,value2";
 
@@ -606,36 +601,6 @@ public class FieldMapTable : Singleton<FieldMapTable>
 	private UIntKeyTable<List<FieldGimmickPointTableData>> fieldGimmickPointMapIDTable;
 
 	private UIntKeyTable<FieldGimmickActionTableData> fieldGimmickActionTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<FieldMapTableData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<FieldMapTableData> _003C_003Ef__mg_0024cache1;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<PortalTableData> _003C_003Ef__mg_0024cache2;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<PortalTableData> _003C_003Ef__mg_0024cache3;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<EnemyPopTableData> _003C_003Ef__mg_0024cache4;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<EnemyPopTableData> _003C_003Ef__mg_0024cache5;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<GatherPointTableData> _003C_003Ef__mg_0024cache6;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<GatherPointViewTableData> _003C_003Ef__mg_0024cache7;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<FieldGimmickPointTableData> _003C_003Ef__mg_0024cache8;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<FieldGimmickActionTableData> _003C_003Ef__mg_0024cache9;
 
 	public void CreateFieldMapTable(string csv_text)
 	{
@@ -862,8 +827,7 @@ public class FieldMapTable : Singleton<FieldMapTable>
 		int i = 0;
 		for (int count = list.Count; i < count; i++)
 		{
-			EnemyPopTableData enemyPopTableData = list[i];
-			if (enemyPopTableData.enemyPopType != 0)
+			if (list[i].enemyPopType != 0)
 			{
 				list2.Add(list[i]);
 			}

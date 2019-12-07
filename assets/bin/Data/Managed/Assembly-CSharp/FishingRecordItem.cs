@@ -35,14 +35,12 @@ public class FishingRecordItem : UIBehaviour
 
 	public void Setup(Transform t, GatherItemRecord rec)
 	{
-		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
 		record = rec;
 		prefsKey = "gik_" + record.listId.ToString();
 		valueState = eValueState.None;
 		if (PlayerPrefs.HasKey(prefsKey))
 		{
-			int @int = PlayerPrefs.GetInt(prefsKey);
-			if (@int < record.maxValue)
+			if (PlayerPrefs.GetInt(prefsKey) < record.maxValue)
 			{
 				valueState = eValueState.Update;
 			}

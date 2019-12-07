@@ -1,4 +1,3 @@
-using Network;
 using System.Collections;
 using UnityEngine;
 
@@ -16,47 +15,46 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 		Init();
 		int display_rarity = 0;
 		SetLinkCamera(is_link: true);
-		int enemy_id = 0;
+		int num = 0;
 		EnemyTable.EnemyData enemy_data = null;
 		if (MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult() != null)
 		{
-			GachaResult.GachaReward reward = MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().reward[0];
-			uint itemId = (uint)reward.itemId;
-			QuestTable.QuestTableData quest_data = Singleton<QuestTable>.I.GetQuestData(itemId);
-			if (quest_data != null)
+			uint itemId = (uint)MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().reward[0].itemId;
+			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(itemId);
+			if (questData != null)
 			{
-				enemy_data = Singleton<EnemyTable>.I.GetEnemyData((uint)quest_data.GetMainEnemyID());
+				enemy_data = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
 			}
 		}
 		if (enemy_data == null)
 		{
-			if (enemy_id == 0)
+			if (num == 0)
 			{
-				enemy_id = 1101001;
+				num = 1101001;
 			}
-			enemy_data = Singleton<EnemyTable>.I.GetEnemyData((uint)enemy_id);
+			enemy_data = Singleton<EnemyTable>.I.GetEnemyData((uint)num);
 		}
 		NPCLoader npc_loader = LoadNPC();
 		EnemyLoader enemy_loader = null;
 		if (enemy_data != null)
 		{
-			int displayAnimID = enemy_data.animId;
-			OutGameSettingsManager.EnemyDisplayInfo displayInfo = MonoBehaviourSingleton<OutGameSettingsManager>.I.SearchEnemyDisplayInfoForGacha(enemy_data);
-			int modelID = enemy_data.modelId;
+			int anim_id = enemy_data.animId;
+			OutGameSettingsManager.EnemyDisplayInfo enemyDisplayInfo = MonoBehaviourSingleton<OutGameSettingsManager>.I.SearchEnemyDisplayInfoForGacha(enemy_data);
+			int modelId = enemy_data.modelId;
 			float displayScale = enemy_data.modelScale;
-			if (displayInfo != null)
+			if (enemyDisplayInfo != null)
 			{
-				displayAnimID = displayInfo.animID;
-				displayScale = displayInfo.gachaScale;
+				anim_id = enemyDisplayInfo.animID;
+				displayScale = enemyDisplayInfo.gachaScale;
 			}
-			enemy_loader = LoadEnemy(enemyPosition, modelID, displayAnimID, displayScale, enemy_data.baseEffectName, enemy_data.baseEffectNode);
+			enemy_loader = LoadEnemy(enemyPosition, modelId, anim_id, displayScale, enemy_data.baseEffectName, enemy_data.baseEffectNode);
 			while (enemy_loader.isLoading)
 			{
 				yield return null;
 			}
 			enemy_loader.ApplyGachaDisplayScaleToParentNode();
 			CheckAndReplaceShader(enemy_loader);
-			enemy_loader.get_gameObject().SetActive(false);
+			enemy_loader.gameObject.SetActive(value: false);
 		}
 		while (npc_loader.isLoading)
 		{
@@ -75,7 +73,7 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 		PlayerAnimCtrl npc_anim = PlayerAnimCtrl.Get(npc_loader.animator, PLCA.IDLE_01);
 		CreateNPCEffect(npc_loader.model);
 		yield return null;
-		stageAnimator.set_cullingMode(0);
+		stageAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 		stageAnimator.Rebind();
 		targetRarity = MonoBehaviourSingleton<GachaManager>.I.GetMaxRarity().ToRarityExpressionID() + 1;
 		if (targetRarity > 4)
@@ -118,7 +116,7 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 		{
 			yield return null;
 		}
-		npc_loader.get_gameObject().SetActive(false);
+		npc_loader.gameObject.SetActive(value: false);
 		PlayMeteorEffect(display_rarity);
 		PlayAudio(AUDIO.METEOR_01);
 		while (Step(7.5f))
@@ -150,7 +148,7 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 		}
 		if (enemy_loader != null)
 		{
-			enemy_loader.get_gameObject().SetActive(true);
+			enemy_loader.gameObject.SetActive(value: true);
 		}
 		if (!skip)
 		{
@@ -159,8 +157,8 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 		Play("MainAnim_End");
 		UpdateDisplayRarity(ref display_rarity);
 		PlayEndEffect(display_rarity);
-		RARITY_TYPE rarity = MonoBehaviourSingleton<GachaManager>.I.GetMaxRarity();
-		PlayAppearAudio(rarity, is_short: false);
+		RARITY_TYPE maxRarity = MonoBehaviourSingleton<GachaManager>.I.GetMaxRarity();
+		PlayAppearAudio(maxRarity, is_short: false);
 		if (enemy_data != null)
 		{
 			PlayEnemyAudio(enemy_data);
@@ -180,7 +178,7 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 				yield return null;
 			}
 			PlayEnemyAnimation(enemy_loader, "Base Layer.IDLE");
-			Time.set_timeScale(1f);
+			Time.timeScale = 1f;
 			if (MonoBehaviourSingleton<TransitionManager>.I.isTransing)
 			{
 				yield return MonoBehaviourSingleton<TransitionManager>.I.In();
@@ -190,7 +188,7 @@ public class QuestSingleGachaDirector : QuestGachaDirectorBase
 		{
 			skip = true;
 		}
-		Time.set_timeScale(1f);
+		Time.timeScale = 1f;
 		sectionCommandReceiver.OnEnd();
 	}
 }

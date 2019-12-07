@@ -12,9 +12,9 @@ public class AttackedHitStatus
 
 	public StageObject.OBJECT_TYPE fromType;
 
-	public Vector3 fromPos = Vector3.get_zero();
+	public Vector3 fromPos = Vector3.zero;
 
-	public Vector3 hitPos = Vector3.get_zero();
+	public Vector3 hitPos = Vector3.zero;
 
 	public float distanceXZ;
 
@@ -60,7 +60,7 @@ public class AttackedHitStatus
 
 	public bool isArrowBomb;
 
-	public Vector3 hostPos = Vector3.get_zero();
+	public Vector3 hostPos = Vector3.zero;
 
 	public float hostDir;
 
@@ -74,7 +74,7 @@ public class AttackedHitStatus
 
 	public int reactionType;
 
-	public Vector3 blowForce = Vector3.get_zero();
+	public Vector3 blowForce = Vector3.zero;
 
 	public float downTotal;
 
@@ -102,5 +102,5 @@ public class AttackedHitStatus
 
 	public Player.ATTACK_MODE attackMode;
 
-	public Vector3 exHitPos = Vector3.get_zero();
+	public Vector3 exHitPos = Vector3.zero;
 }

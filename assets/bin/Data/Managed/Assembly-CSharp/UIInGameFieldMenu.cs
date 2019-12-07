@@ -39,7 +39,7 @@ public class UIInGameFieldMenu : UIInGamePopBase
 	protected override void Awake()
 	{
 		instance = this;
-		_transform = this.get_transform();
+		_transform = base.transform;
 		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
 		{
 			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
@@ -48,11 +48,11 @@ public class UIInGameFieldMenu : UIInGamePopBase
 		base.Awake();
 		if (!FieldManager.IsValidInGameNoQuest())
 		{
-			this.get_gameObject().SetActive(false);
+			base.gameObject.SetActive(value: false);
 		}
 		bool flag = LoungeMatchingManager.IsValidInLounge();
 		bool flag2 = ClanMatchingManager.IsValidInClan();
-		bool flag3 = !flag && !flag2;
+		bool flag3 = !(flag | flag2);
 		SetVisibleButton("BTN_HOME", !flag3);
 		SetVisibleButton("BTN_LOUNGE", !flag);
 		SetVisibleButton("BTN_CLAN", !flag2);
@@ -81,7 +81,7 @@ public class UIInGameFieldMenu : UIInGamePopBase
 			{
 				event_name = "RETURN_LOUNGE";
 			}
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameFieldMenu.OnClickReturn", this.get_gameObject(), event_name);
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameFieldMenu.OnClickReturn", base.gameObject, event_name);
 		}
 	}
 
@@ -117,7 +117,7 @@ public class UIInGameFieldMenu : UIInGamePopBase
 		int i = 0;
 		for (int num = menuBtns.Length; i < num; i++)
 		{
-			if (menuBtns[i] != null && menuBtns[i].get_name() == "BTN_EVENT")
+			if (menuBtns[i] != null && menuBtns[i].name == "BTN_EVENT")
 			{
 				menuBtns[i].isEnabled = !disable;
 			}
@@ -133,7 +133,7 @@ public class UIInGameFieldMenu : UIInGamePopBase
 		int i = 0;
 		for (int num = menuBtns.Length; i < num; i++)
 		{
-			if (menuBtns[i] != null && menuBtns[i].get_name() == "BTN_MAP")
+			if (menuBtns[i] != null && menuBtns[i].name == "BTN_MAP")
 			{
 				menuBtns[i].isEnabled = !disable;
 			}
@@ -165,7 +165,7 @@ public class UIInGameFieldMenu : UIInGamePopBase
 		int i = 0;
 		for (int num = menuBtns.Length; i < num; i++)
 		{
-			if (menuBtns[i] != null && menuBtns[i].get_name() == btn_name)
+			if (menuBtns[i] != null && menuBtns[i].name == btn_name)
 			{
 				menuBtns[i].isEnabled = is_enable;
 			}
@@ -180,9 +180,9 @@ public class UIInGameFieldMenu : UIInGamePopBase
 		}
 		for (int i = 0; i < menuBtns.Length; i++)
 		{
-			if (menuBtns[i] != null && menuBtns[i].get_name() == btn_name)
+			if (menuBtns[i] != null && menuBtns[i].name == btn_name)
 			{
-				menuBtns[i].get_gameObject().SetActive(!isVisible);
+				menuBtns[i].gameObject.SetActive(!isVisible);
 			}
 		}
 	}
@@ -190,9 +190,9 @@ public class UIInGameFieldMenu : UIInGamePopBase
 	public void SetButtonOnTutorial()
 	{
 		UIButton[] array = menuBtns;
-		foreach (UIButton uIButton in array)
+		for (int i = 0; i < array.Length; i++)
 		{
-			uIButton.set_enabled(false);
+			array[i].enabled = false;
 		}
 	}
 

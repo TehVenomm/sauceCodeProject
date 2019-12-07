@@ -29,8 +29,7 @@ public class Goal_Prayer : Goal
 			SetStatus(STATUS.COMPLETED);
 			return status;
 		}
-		double num = AIUtility.GetLengthWithBetweenObject(brain.owner, target);
-		if (num > (double)revival_range)
+		if ((double)AIUtility.GetLengthWithBetweenObject(brain.owner, target) > (double)revival_range)
 		{
 			SetStatus(STATUS.COMPLETED);
 		}
@@ -55,8 +54,8 @@ public class Goal_Prayer : Goal
 		base.HandleEvent(brain, ev, param);
 		if (ev == BRAIN_EVENT.DESTROY_OBJECT)
 		{
-			StageObject stageObject = (StageObject)param;
-			if (target == stageObject)
+			StageObject y = (StageObject)param;
+			if (target == y)
 			{
 				target = null;
 			}

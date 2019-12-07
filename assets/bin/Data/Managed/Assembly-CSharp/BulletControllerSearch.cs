@@ -18,13 +18,10 @@ public class BulletControllerSearch : BulletControllerBase
 
 	public override void Initialize(BulletData bullet, SkillInfo.SkillParam skillParam, Vector3 pos, Quaternion rot)
 	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 		base.Initialize(bullet, skillParam, pos, rot);
 		searchStartTime = bullet.dataSearch.searchStartTime;
 		angularVelocity = bullet.dataSearch.angularVelocity;
-		base._rigidbody.set_velocity(Vector3.get_zero());
+		base._rigidbody.velocity = Vector3.zero;
 		isStart = false;
 	}
 
@@ -46,22 +43,6 @@ public class BulletControllerSearch : BulletControllerBase
 
 	public override void Update()
 	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
 		base.Update();
 		if (searchStartTime > base.timeCount)
 		{
@@ -70,29 +51,25 @@ public class BulletControllerSearch : BulletControllerBase
 		if (!isStart)
 		{
 			isStart = true;
-			base._rigidbody.set_velocity(base._transform.get_forward() * base.speed * Time.get_deltaTime());
+			base._rigidbody.velocity = base._transform.forward * base.speed * Time.deltaTime;
 		}
-		Vector3 val = GetDestination() - base._transform.get_position();
-		val.y = 0f;
-		float num = Mathf.Abs(Vector3.Angle(base._transform.get_forward(), val));
+		Vector3 vector = GetDestination() - base._transform.position;
+		vector.y = 0f;
+		float num = Mathf.Abs(Vector3.Angle(base._transform.forward, vector));
 		if (!(num <= 0f))
 		{
-			float num2 = angularVelocity * Time.get_deltaTime() / num;
+			float num2 = angularVelocity * Time.deltaTime / num;
 			if (num2 > 1f)
 			{
 				num2 = 1f;
 			}
-			base._transform.set_rotation(Quaternion.Lerp(base._transform.get_rotation(), Quaternion.LookRotation(val), num2));
-			base._rigidbody.set_velocity(base._transform.get_forward() * base.speed * Time.get_deltaTime());
+			base._transform.rotation = Quaternion.Lerp(base._transform.rotation, Quaternion.LookRotation(vector), num2);
+			base._rigidbody.velocity = base._transform.forward * base.speed * Time.deltaTime;
 		}
 	}
 
 	private Vector3 GetDestination()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 		if (isOwnerSelf)
 		{
 			CheckTarget();
@@ -111,10 +88,6 @@ public class BulletControllerSearch : BulletControllerBase
 
 	private void CheckTarget()
 	{
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 		if (targetEnemy != null && !targetEnemy.isDead)
 		{
 			return;
@@ -131,8 +104,7 @@ public class BulletControllerSearch : BulletControllerBase
 			Enemy enemy = MonoBehaviourSingleton<StageObjectManager>.I.enemyList[i] as Enemy;
 			if (!(enemy == null) && !enemy.isDead && !enemy.enableAssimilation)
 			{
-				Vector3 val = enemy._position - base._transform.get_position();
-				float sqrMagnitude = val.get_sqrMagnitude();
+				float sqrMagnitude = (enemy._position - base._transform.position).sqrMagnitude;
 				if (num > sqrMagnitude && sqrMagnitude <= bulletObject.bulletData.dataSearch.searchRangeSqr)
 				{
 					targetEnemy = enemy;

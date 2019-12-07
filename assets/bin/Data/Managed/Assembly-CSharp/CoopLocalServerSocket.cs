@@ -56,16 +56,29 @@ public class CoopLocalServerSocket
 		{
 			return null;
 		}
-		Coop_Model_RegisterACK coop_Model_RegisterACK = new Coop_Model_RegisterACK();
-		coop_Model_RegisterACK.ack = model.u;
-		coop_Model_RegisterACK.positive = true;
-		coop_Model_RegisterACK.sid = MonoBehaviourSingleton<CoopManager>.I.GetSelfID();
-		coop_Model_RegisterACK.of = false;
-		coop_Model_RegisterACK.ids.Add(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
-		coop_Model_RegisterACK.stgids.Add(1);
-		coop_Model_RegisterACK.stgidxs.Add(0);
-		coop_Model_RegisterACK.stghosts.Add(item: true);
-		return coop_Model_RegisterACK;
+		return new Coop_Model_RegisterACK
+		{
+			ack = model.u,
+			positive = true,
+			sid = MonoBehaviourSingleton<CoopManager>.I.GetSelfID(),
+			of = false,
+			ids = 
+			{
+				MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id
+			},
+			stgids = 
+			{
+				1
+			},
+			stgidxs = 
+			{
+				0
+			},
+			stghosts = 
+			{
+				true
+			}
+		};
 	}
 
 	private Coop_Model_ACK RecvRoomStageRequest(Coop_Model_RoomStageRequest model)

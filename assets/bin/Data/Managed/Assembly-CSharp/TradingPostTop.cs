@@ -98,10 +98,10 @@ public class TradingPostTop : GameSection
 			tutorialArr[1] = tutorialStep2;
 			tutorialArr[2] = tutorialStep3;
 		}
-		scrollview = base.GetComponent<UIScrollView>((Enum)UI.SCR_POST);
+		scrollview = GetComponent<UIScrollView>(UI.SCR_POST);
 		UIScrollView uIScrollView = scrollview;
 		uIScrollView.onReachBottom = (UIScrollView.OnDragNotification)Delegate.Combine(uIScrollView.onReachBottom, new UIScrollView.OnDragNotification(OnScrollViewReachBottom));
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	protected override void OnDestroy()
@@ -135,6 +135,10 @@ public class TradingPostTop : GameSection
 			yield return null;
 		}
 		base.Initialize();
+		if (MonoBehaviourSingleton<TradingPostManager>.I.tradingPostSoldNum > 0)
+		{
+			RequestEvent("HISTORY");
+		}
 	}
 
 	private void Refresh()
@@ -179,25 +183,28 @@ public class TradingPostTop : GameSection
 		case NOTIFY_FLAG.UPDATE_TRADING_POST_ITEM_DETAIL:
 			Refresh();
 			break;
+		case NOTIFY_FLAG.UPDATE_TRADING_POST_SOLD:
+			UpdateUI();
+			break;
 		}
 	}
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.LBL_SELL_ITEM, base.sectionData.GetText("STR_SELL_ITEM"));
-		SetLabelText((Enum)UI.LBL_QTY_NORMAL, base.sectionData.GetText("TEXT_BTN_QTY"));
-		SetLabelText((Enum)UI.LBL_QTY_SELECT, base.sectionData.GetText("TEXT_BTN_QTY"));
-		SetLabelText((Enum)UI.LBL_PRICE_NORMAL, base.sectionData.GetText("TEXT_BTN_PRICE"));
-		SetLabelText((Enum)UI.LBL_PRICE_SELECT, base.sectionData.GetText("TEXT_BTN_PRICE"));
-		SetLabelText((Enum)UI.LBL_REFRESH, base.sectionData.GetText("TEXT_BTN_REFRESH"));
+		SetLabelText(UI.LBL_SELL_ITEM, base.sectionData.GetText("STR_SELL_ITEM"));
+		SetLabelText(UI.LBL_QTY_NORMAL, base.sectionData.GetText("TEXT_BTN_QTY"));
+		SetLabelText(UI.LBL_QTY_SELECT, base.sectionData.GetText("TEXT_BTN_QTY"));
+		SetLabelText(UI.LBL_PRICE_NORMAL, base.sectionData.GetText("TEXT_BTN_PRICE"));
+		SetLabelText(UI.LBL_PRICE_SELECT, base.sectionData.GetText("TEXT_BTN_PRICE"));
+		SetLabelText(UI.LBL_REFRESH, base.sectionData.GetText("TEXT_BTN_REFRESH"));
 		bool flag = TradingPostManager.IsPurchasedLicense() || TradingPostManager.IsLoginRequireFinish();
-		SetActive((Enum)UI.OBJ_NOT_LICENSED, !flag);
+		SetActive(UI.OBJ_NOT_LICENSED, !flag);
 		if (!flag)
 		{
-			SetLabelText((Enum)UI.LBL_LOGIN, string.Format(base.sectionData.GetText("STR_LOGIN"), MonoBehaviourSingleton<TradingPostManager>.I.tradingDay, MonoBehaviourSingleton<TradingPostManager>.I.tradingConditionDay));
-			SetLabelText((Enum)UI.LBL_NOTICE, string.Format(base.sectionData.GetText("STR_NOTICE"), MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
-			SetLabelText((Enum)UI.LBL_REQ_LOGIN, base.sectionData.GetText("STR_REQ_LOGIN"));
-			SetLabelText((Enum)UI.LBL_REQ_LICENSE, base.sectionData.GetText("STR_REQ_LICENSE"));
+			SetLabelText(UI.LBL_LOGIN, string.Format(base.sectionData.GetText("STR_LOGIN"), MonoBehaviourSingleton<TradingPostManager>.I.tradingDay, MonoBehaviourSingleton<TradingPostManager>.I.tradingConditionDay));
+			SetLabelText(UI.LBL_NOTICE, string.Format(base.sectionData.GetText("STR_NOTICE"), MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
+			SetLabelText(UI.LBL_REQ_LOGIN, base.sectionData.GetText("STR_REQ_LOGIN"));
+			SetLabelText(UI.LBL_REQ_LICENSE, base.sectionData.GetText("STR_REQ_LICENSE"));
 		}
 		List<ITEM_TYPE> itemTypes;
 		switch (_viewType)
@@ -220,8 +227,7 @@ public class TradingPostTop : GameSection
 		}
 		currentInfos = allInfos.Where(delegate(TradingPostInfo info)
 		{
-			ItemInfo itemInfo = ItemInfo.CreateItemInfo(info.itemId);
-			ITEM_TYPE type = itemInfo.GetType();
+			ITEM_TYPE type = ItemInfo.CreateItemInfo(info.itemId).GetType();
 			return itemTypes.Contains(type);
 		}).ToList();
 		if (_sortType != 0)
@@ -240,10 +246,11 @@ public class TradingPostTop : GameSection
 			}
 			SetSortButtonUIStatus();
 		}
-		SetGrid(UI.GRD_POST, "TradingPostListBaseItem", currentInfos.Count, reset: false, delegate(int i, Transform t, bool b)
+		SetGrid(UI.GRD_POST, "TradingPostListBaseItem", currentInfos.Count, reset: true, delegate(int i, Transform t, bool b)
 		{
 			InitItemList(currentInfos[i], t, i);
 		});
+		SetBadge(UI.BTN_STORAGE, MonoBehaviourSingleton<TradingPostManager>.I.tradingPostSoldNum, SpriteAlignment.TopLeft, 8, -8);
 	}
 
 	public override void StartSection()
@@ -295,46 +302,46 @@ public class TradingPostTop : GameSection
 
 	private void SetBtnActive(UI ui, bool active)
 	{
-		string sprite_name = (!active) ? "ItemBoxExtentBtn_half" : "ItemBoxExtentBtn2_half";
-		SetSprite((Enum)ui, sprite_name);
-		SetButtonSprite((Enum)ui, sprite_name, with_press: true);
+		string sprite_name = active ? "ItemBoxExtentBtn2_half" : "ItemBoxExtentBtn_half";
+		SetSprite(ui, sprite_name);
+		SetButtonSprite(ui, sprite_name, with_press: true);
 	}
 
 	private void SetSortButtonUIStatus()
 	{
-		BoxCollider component = GetCtrl(UI.BTN_QUATITY).get_gameObject().GetComponent<BoxCollider>();
+		BoxCollider component = GetCtrl(UI.BTN_QUATITY).gameObject.GetComponent<BoxCollider>();
 		switch (_sortType)
 		{
 		case SORT_TYPE.QUANTITY:
-			SetActive((Enum)UI.LBL_PRICE_NORMAL, is_visible: true);
-			SetActive((Enum)UI.LBL_PRICE_SELECT, is_visible: false);
+			SetActive(UI.LBL_PRICE_NORMAL, is_visible: true);
+			SetActive(UI.LBL_PRICE_SELECT, is_visible: false);
 			SetBtnActive(UI.BTN_QUATITY, active: true);
 			SetBtnActive(UI.BTN_PRICE, active: false);
-			component.set_enabled(false);
+			component.enabled = false;
 			SetPriceArrowStatus(isVisible: false, isUp: false);
 			break;
 		case SORT_TYPE.PRICE_DOWN:
-			SetActive((Enum)UI.LBL_PRICE_NORMAL, is_visible: false);
-			SetActive((Enum)UI.LBL_PRICE_SELECT, is_visible: true);
+			SetActive(UI.LBL_PRICE_NORMAL, is_visible: false);
+			SetActive(UI.LBL_PRICE_SELECT, is_visible: true);
 			SetBtnActive(UI.BTN_QUATITY, active: false);
 			SetBtnActive(UI.BTN_PRICE, active: true);
-			component.set_enabled(true);
+			component.enabled = true;
 			SetPriceArrowStatus(isVisible: true, isUp: false);
 			break;
 		case SORT_TYPE.PRICE_UP:
-			SetActive((Enum)UI.LBL_PRICE_NORMAL, is_visible: false);
-			SetActive((Enum)UI.LBL_PRICE_SELECT, is_visible: true);
+			SetActive(UI.LBL_PRICE_NORMAL, is_visible: false);
+			SetActive(UI.LBL_PRICE_SELECT, is_visible: true);
 			SetBtnActive(UI.BTN_QUATITY, active: false);
 			SetBtnActive(UI.BTN_PRICE, active: true);
-			component.set_enabled(true);
+			component.enabled = true;
 			SetPriceArrowStatus(isVisible: true, isUp: true);
 			break;
 		default:
-			SetActive((Enum)UI.LBL_PRICE_NORMAL, is_visible: true);
-			SetActive((Enum)UI.LBL_PRICE_SELECT, is_visible: false);
+			SetActive(UI.LBL_PRICE_NORMAL, is_visible: true);
+			SetActive(UI.LBL_PRICE_SELECT, is_visible: false);
 			SetBtnActive(UI.BTN_QUATITY, active: false);
 			SetBtnActive(UI.BTN_PRICE, active: false);
-			component.set_enabled(true);
+			component.enabled = true;
 			SetPriceArrowStatus(isVisible: false, isUp: false);
 			break;
 		}
@@ -342,11 +349,8 @@ public class TradingPostTop : GameSection
 
 	private void SetPriceArrowStatus(bool isVisible, bool isUp)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		SetActive((Enum)UI.SPR_PRICE_ARROW, isVisible);
-		Vector3 one = Vector3.get_one();
+		SetActive(UI.SPR_PRICE_ARROW, isVisible);
+		Vector3 one = Vector3.one;
 		if (isUp)
 		{
 			one.y = -1f;
@@ -355,7 +359,7 @@ public class TradingPostTop : GameSection
 		{
 			one.y = 1f;
 		}
-		GetCtrl(UI.SPR_PRICE_ARROW).get_transform().set_localScale(one);
+		GetCtrl(UI.SPR_PRICE_ARROW).transform.localScale = one;
 	}
 
 	private void OnQuery_TAB_1()
@@ -406,14 +410,13 @@ public class TradingPostTop : GameSection
 			if (list.Count == 0)
 			{
 				endPage = true;
-				GameSection.ResumeEvent(is_resume: false);
 			}
 			else
 			{
 				allInfos.AddRange(list);
-				RefreshUI();
-				GameSection.ResumeEvent(is_resume: false);
 			}
+			RefreshUI();
+			GameSection.ResumeEvent(is_resume: false);
 		});
 	}
 
@@ -426,14 +429,13 @@ public class TradingPostTop : GameSection
 			if (list.Count == 0)
 			{
 				endPage = true;
-				GameSection.ResumeEvent(is_resume: false);
 			}
 			else
 			{
 				allInfos.AddRange(list);
-				RefreshUI();
-				GameSection.ResumeEvent(is_resume: false);
 			}
+			RefreshUI();
+			GameSection.ResumeEvent(is_resume: false);
 		});
 	}
 
@@ -514,6 +516,12 @@ public class TradingPostTop : GameSection
 		StartSection();
 	}
 
+	private void OnCloseDialog_TradingPostActiveHistory()
+	{
+		Refresh();
+		UpdateUI();
+	}
+
 	private void OnCloseDialog_TradingPostInventoryDialog()
 	{
 		if (MonoBehaviourSingleton<TradingPostManager>.I.isRefreshTradingPost)
@@ -526,21 +534,21 @@ public class TradingPostTop : GameSection
 	private void startTutorial()
 	{
 		currentTutorialIndex = 0;
-		this.StartCoroutine(DoTutorial());
+		StartCoroutine(DoTutorial());
 	}
 
 	private IEnumerator DoTutorial()
 	{
 		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.MOMENT, is_disable: true);
-		yield return (object)new WaitForSeconds(1f);
+		yield return new WaitForSeconds(1f);
 		nextStep();
-		yield return (object)new WaitForSeconds(2f);
+		yield return new WaitForSeconds(2f);
 		while (HasStepTutorial())
 		{
 			if (Input.GetMouseButtonDown(0))
 			{
 				nextStep();
-				yield return (object)new WaitForSeconds(2f);
+				yield return new WaitForSeconds(2f);
 			}
 			else
 			{
@@ -556,7 +564,11 @@ public class TradingPostTop : GameSection
 
 	private bool HasStepTutorial()
 	{
-		return tutorialArr != null && currentTutorialIndex < tutorialArr.Length;
+		if (tutorialArr != null)
+		{
+			return currentTutorialIndex < tutorialArr.Length;
+		}
+		return false;
 	}
 
 	private void nextStep()
@@ -569,33 +581,33 @@ public class TradingPostTop : GameSection
 	{
 		Transform ctrl = GetCtrl(UI.OBJ_TUTORIAL_1);
 		SetLabelText(ctrl, UI.LBL_MESSAGE, string.Format(base.sectionData.GetText("STR_TUTORIAL_1"), MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
-		SetActive((Enum)UI.OBJ_TUTORIAL_1, is_visible: true);
-		SetActive((Enum)UI.OBJ_TUTORIAL_2, is_visible: false);
-		SetActive((Enum)UI.OBJ_TUTORIAL_3, is_visible: false);
+		SetActive(UI.OBJ_TUTORIAL_1, is_visible: true);
+		SetActive(UI.OBJ_TUTORIAL_2, is_visible: false);
+		SetActive(UI.OBJ_TUTORIAL_3, is_visible: false);
 	}
 
 	private void tutorialStep2()
 	{
 		Transform ctrl = GetCtrl(UI.OBJ_TUTORIAL_2);
 		SetLabelText(ctrl, UI.LBL_MESSAGE, base.sectionData.GetText("STR_TUTORIAL_2"));
-		SetActive((Enum)UI.OBJ_TUTORIAL_1, is_visible: false);
-		SetActive((Enum)UI.OBJ_TUTORIAL_2, is_visible: true);
-		SetActive((Enum)UI.OBJ_TUTORIAL_3, is_visible: false);
+		SetActive(UI.OBJ_TUTORIAL_1, is_visible: false);
+		SetActive(UI.OBJ_TUTORIAL_2, is_visible: true);
+		SetActive(UI.OBJ_TUTORIAL_3, is_visible: false);
 	}
 
 	private void tutorialStep3()
 	{
 		Transform ctrl = GetCtrl(UI.OBJ_TUTORIAL_3);
 		SetLabelText(ctrl, UI.LBL_MESSAGE, base.sectionData.GetText("STR_TUTORIAL_3"));
-		SetActive((Enum)UI.OBJ_TUTORIAL_1, is_visible: false);
-		SetActive((Enum)UI.OBJ_TUTORIAL_2, is_visible: false);
-		SetActive((Enum)UI.OBJ_TUTORIAL_3, is_visible: true);
+		SetActive(UI.OBJ_TUTORIAL_1, is_visible: false);
+		SetActive(UI.OBJ_TUTORIAL_2, is_visible: false);
+		SetActive(UI.OBJ_TUTORIAL_3, is_visible: true);
 	}
 
 	private void endTutorial()
 	{
 		GameSaveData.instance.isFinishTradingPostTutorial = true;
-		SetActive((Enum)UI.OBJ_TUTORIAL, is_visible: false);
+		SetActive(UI.OBJ_TUTORIAL, is_visible: false);
 		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.MOMENT, is_disable: false);
 	}
 
@@ -620,14 +632,11 @@ public class TradingPostTop : GameSection
 		{
 		case ITEM_ICON_TYPE.ITEM:
 		case ITEM_ICON_TYPE.QUEST_ITEM:
-		{
-			ulong uniqID = data.GetUniqID();
-			if (uniqID != 0)
+			if (data.GetUniqID() != 0L)
 			{
 				is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, data.GetUniqID());
 			}
 			break;
-		}
 		default:
 			is_new = true;
 			break;
@@ -637,28 +646,21 @@ public class TradingPostTop : GameSection
 		int enemy_icon_id = 0;
 		if (iTEM_ICON_TYPE == ITEM_ICON_TYPE.ITEM)
 		{
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(data.GetTableID());
-			enemy_icon_id = itemData.enemyIconID;
+			enemy_icon_id = Singleton<ItemTable>.I.GetItemData(data.GetTableID()).enemyIconID;
 		}
 		ItemIcon itemIcon = null;
-		if (data.GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
+		itemIcon = ((data.GetIconType() != ITEM_ICON_TYPE.QUEST_ITEM) ? ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, num, "DROP", event_data, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id) : ItemIcon.Create(new ItemIcon.ItemIconCreateParam
 		{
-			ItemIcon.ItemIconCreateParam itemIconCreateParam = new ItemIcon.ItemIconCreateParam();
-			itemIconCreateParam.icon_type = data.GetIconType();
-			itemIconCreateParam.icon_id = data.GetIconID();
-			itemIconCreateParam.rarity = data.GetRarity();
-			itemIconCreateParam.parent = holder;
-			itemIconCreateParam.element = data.GetIconElement();
-			itemIconCreateParam.magi_enable_equip_type = data.GetIconMagiEnableType();
-			itemIconCreateParam.num = data.GetNum();
-			itemIconCreateParam.enemy_icon_id = enemy_icon_id;
-			itemIconCreateParam.questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST;
-			itemIcon = ItemIcon.Create(itemIconCreateParam);
-		}
-		else
-		{
-			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, num, "DROP", event_data, is_new, -1, is_select: false, null, is_equipping: false, enemy_icon_id);
-		}
+			icon_type = data.GetIconType(),
+			icon_id = data.GetIconID(),
+			rarity = data.GetRarity(),
+			parent = holder,
+			element = data.GetIconElement(),
+			magi_enable_equip_type = data.GetIconMagiEnableType(),
+			num = data.GetNum(),
+			enemy_icon_id = enemy_icon_id,
+			questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST
+		}));
 		itemIcon.SetRewardBG(is_visible: false);
 		SetMaterialInfo(itemIcon.transform, data.GetMaterialType(), data.GetTableID(), GetCtrl(UI.PNL_MATERIAL_INFO));
 	}

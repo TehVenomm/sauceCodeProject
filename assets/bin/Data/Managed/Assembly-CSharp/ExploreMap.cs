@@ -32,7 +32,7 @@ public class ExploreMap : GameSection
 
 	private OPEN_MAP_TYPE openType;
 
-	private Transform[] playerMarkers_ = (Transform[])new Transform[4];
+	private Transform[] playerMarkers_ = new Transform[4];
 
 	private ExploreMapRoot mapRoot_;
 
@@ -61,52 +61,51 @@ public class ExploreMap : GameSection
 		{
 			openType = (OPEN_MAP_TYPE)eventData;
 		}
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 		if (openType == OPEN_MAP_TYPE.SONAR)
 		{
-			this.StartCoroutine(StartSonar());
+			StartCoroutine(StartSonar());
 		}
 	}
 
 	private IEnumerator DoInitialize()
 	{
 		uint regionId = MonoBehaviourSingleton<FieldManager>.I.currentMapData.regionId;
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject loadedExploreMapFrame = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExploreMapFrame");
-		LoadObject loadedExploreMap = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExploreMap_" + regionId.ToString("D3"));
-		LoadObject loadedPlayerMarker = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExplorePlayerMarker");
-		LoadObject loadedCircle = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExploreCircle");
-		LoadObject loadedBattleIcon = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExploreBattleMarker");
-		LoadObject loadedFootprint = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExploreTraceMarker");
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject loadedExploreMapFrame = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExploreMapFrame");
+		LoadObject loadedExploreMap = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExploreMap_" + regionId.ToString("D3"));
+		LoadObject loadedPlayerMarker = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExplorePlayerMarker");
+		LoadObject loadedCircle = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExploreCircle");
+		LoadObject loadedBattleIcon = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExploreBattleMarker");
+		LoadObject loadedFootprint = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExploreTraceMarker");
 		LoadObject loadedFindIcon = null;
 		LoadObject loadedDirSonar = null;
 		LoadObject loadedSonarTexture = null;
 		if (openType == OPEN_MAP_TYPE.SONAR)
 		{
-			loadedFindIcon = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExploreExclametionMarker");
-			loadedDirSonar = loadQueue.Load(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_sonar_02");
-			loadedSonarTexture = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExploreSonarTexture");
-			CacheAudio(loadQueue);
+			loadedFindIcon = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExploreExclametionMarker");
+			loadedDirSonar = loadingQueue.Load(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_sonar_02");
+			loadedSonarTexture = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ExploreSonarTexture");
+			CacheAudio(loadingQueue);
 		}
-		if (loadQueue.IsLoading())
+		if (loadingQueue.IsLoading())
 		{
-			yield return loadQueue.Wait();
+			yield return loadingQueue.Wait();
 		}
-		Transform exploreMapFrame = ResourceUtility.Realizes(loadedExploreMapFrame.loadedObject, base._transform);
-		Transform exploreMap = ResourceUtility.Realizes(loadedExploreMap.loadedObject, exploreMapFrame);
-		Transform map = exploreMap.Find("Map");
-		map.get_gameObject().SetActive(true);
-		mapRoot_ = exploreMap.GetComponent<ExploreMapRoot>();
+		Transform transform = ResourceUtility.Realizes(loadedExploreMapFrame.loadedObject, base._transform);
+		Transform transform2 = ResourceUtility.Realizes(loadedExploreMap.loadedObject, transform);
+		transform2.Find("Map").gameObject.SetActive(value: true);
+		mapRoot_ = transform2.GetComponent<ExploreMapRoot>();
 		ExploreMapLocation[] locations = mapRoot_.locations;
 		for (int i = 0; i < locations.Length; i++)
 		{
-			Transform val = locations[i].get_transform().Find("ExploreSpotActive");
-			Transform val2 = locations[i].get_transform().Find("ExploreSpotInactive");
-			Transform val3 = locations[i].get_transform().Find("ExploreSpotSonar");
-			val.get_gameObject().SetActive(true);
-			val2.get_gameObject().SetActive(false);
+			Transform transform3 = locations[i].transform.Find("ExploreSpotActive");
+			Transform transform4 = locations[i].transform.Find("ExploreSpotInactive");
+			Transform transform5 = locations[i].transform.Find("ExploreSpotSonar");
+			transform3.gameObject.SetActive(value: true);
+			transform4.gameObject.SetActive(value: false);
 			List<FieldMapTable.FieldGimmickPointTableData> fieldGimmickPointListByMapID = Singleton<FieldMapTable>.I.GetFieldGimmickPointListByMapID((uint)locations[i].mapId);
-			if (fieldGimmickPointListByMapID == null || !(val3 != null))
+			if (fieldGimmickPointListByMapID == null || !(transform5 != null))
 			{
 				continue;
 			}
@@ -114,93 +113,92 @@ public class ExploreMap : GameSection
 			{
 				if (fieldGimmickPointListByMapID[j].gimmickType == FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.SONAR)
 				{
-					val.get_gameObject().SetActive(false);
-					val2.get_gameObject().SetActive(false);
-					val3.get_gameObject().SetActive(true);
+					transform3.gameObject.SetActive(value: false);
+					transform4.gameObject.SetActive(value: false);
+					transform5.gameObject.SetActive(value: true);
 				}
 			}
 		}
 		mapRoot_.UpdatePortals(isMiniMap: false);
-		ExploreMapFrame frame = exploreMapFrame.GetComponent<ExploreMapFrame>();
-		frame.SetMap(mapRoot_);
-		RegionTable.Data regionData = Singleton<RegionTable>.I.GetData(regionId);
-		if (regionData != null)
+		ExploreMapFrame component = transform.GetComponent<ExploreMapFrame>();
+		component.SetMap(mapRoot_);
+		RegionTable.Data data = Singleton<RegionTable>.I.GetData(regionId);
+		if (data != null)
 		{
-			frame.SetCaption(regionData.regionName);
+			component.SetCaption(data.regionName);
 		}
 		for (int k = 0; k < playerMarkers_.Length; k++)
 		{
-			playerMarkers_[k] = ResourceUtility.Realizes(loadedPlayerMarker.loadedObject, exploreMapFrame);
-			ExplorePlayerMarker component = playerMarkers_[k].GetComponent<ExplorePlayerMarker>();
-			if (null != component)
+			playerMarkers_[k] = ResourceUtility.Realizes(loadedPlayerMarker.loadedObject, transform);
+			ExplorePlayerMarker component2 = playerMarkers_[k].GetComponent<ExplorePlayerMarker>();
+			if (null != component2)
 			{
-				component.SetIndex(k);
+				component2.SetIndex(k);
 			}
-			component.get_gameObject().SetActive(false);
+			component2.gameObject.SetActive(value: false);
 		}
 		mapRoot_.SetMarkers(playerMarkers_, isMiniMap: false);
-		ExploreStatus.TraceInfo[] traceHistory = MonoBehaviourSingleton<QuestManager>.I.GetBossTraceHistory();
-		if (traceHistory != null && traceHistory.Length > 0)
+		ExploreStatus.TraceInfo[] bossTraceHistory = MonoBehaviourSingleton<QuestManager>.I.GetBossTraceHistory();
+		if (bossTraceHistory != null && bossTraceHistory.Length != 0)
 		{
-			Transform val4 = ResourceUtility.Realizes(loadedFootprint.loadedObject, exploreMap);
-			ExploreStatus.TraceInfo traceInfo = traceHistory[traceHistory.Length - 1];
+			Transform transform6 = ResourceUtility.Realizes(loadedFootprint.loadedObject, transform2);
+			ExploreStatus.TraceInfo traceInfo = bossTraceHistory[bossTraceHistory.Length - 1];
 			Vector3 positionOnMap = mapRoot_.GetPositionOnMap(traceInfo.mapId);
-			val4.set_localPosition(new Vector3(positionOnMap.x + 22f, positionOnMap.y + 33f, positionOnMap.z));
-			val4.get_gameObject().SetActive(true);
-			if (traceHistory.Length > 1)
+			transform6.localPosition = new Vector3(positionOnMap.x + 22f, positionOnMap.y + 33f, positionOnMap.z);
+			transform6.gameObject.SetActive(value: true);
+			if (bossTraceHistory.Length > 1)
 			{
-				Transform val5 = ResourceUtility.Realizes(loadedFootprint.loadedObject, exploreMap);
-				ExploreStatus.TraceInfo traceInfo2 = traceHistory[traceHistory.Length - 2];
+				Transform transform7 = ResourceUtility.Realizes(loadedFootprint.loadedObject, transform2);
+				ExploreStatus.TraceInfo traceInfo2 = bossTraceHistory[bossTraceHistory.Length - 2];
 				Vector3 positionOnMap2 = mapRoot_.GetPositionOnMap(traceInfo2.mapId);
-				val5.set_localPosition(new Vector3(positionOnMap2.x + 22f, positionOnMap2.y + 33f, positionOnMap2.z));
-				val5.get_gameObject().SetActive(true);
+				transform7.localPosition = new Vector3(positionOnMap2.x + 22f, positionOnMap2.y + 33f, positionOnMap2.z);
+				transform7.gameObject.SetActive(value: true);
 			}
 		}
-		redCircle = ResourceUtility.Realizes(loadedCircle.loadedObject, exploreMap);
-		redCircle.set_localScale(new Vector3(0.6f, 0.6f, 0.6f));
-		battleIcon = ResourceUtility.Realizes(loadedBattleIcon.loadedObject, exploreMap);
+		redCircle = ResourceUtility.Realizes(loadedCircle.loadedObject, transform2);
+		redCircle.localScale = new Vector3(0.6f, 0.6f, 0.6f);
+		battleIcon = ResourceUtility.Realizes(loadedBattleIcon.loadedObject, transform2);
 		if (mapRoot_.showBattleMarker && openType != OPEN_MAP_TYPE.SONAR)
 		{
 			int exploreBossAppearMapId = MonoBehaviourSingleton<QuestManager>.I.GetExploreBossAppearMapId();
 			Vector3 positionOnMap3 = mapRoot_.GetPositionOnMap(exploreBossAppearMapId);
-			redCircle.set_localPosition(positionOnMap3);
-			battleIcon.set_localPosition(new Vector3(positionOnMap3.x + 22f, positionOnMap3.y + 33f, positionOnMap3.z));
-			TweenAlpha component2 = redCircle.GetComponent<TweenAlpha>();
-			if (null != component2)
+			redCircle.localPosition = positionOnMap3;
+			battleIcon.localPosition = new Vector3(positionOnMap3.x + 22f, positionOnMap3.y + 33f, positionOnMap3.z);
+			TweenAlpha component3 = redCircle.GetComponent<TweenAlpha>();
+			if (null != component3)
 			{
-				component2.from = component2.to;
+				component3.from = component3.to;
 			}
-			redCircle.get_gameObject().SetActive(true);
-			battleIcon.get_gameObject().SetActive(true);
+			redCircle.gameObject.SetActive(value: true);
+			battleIcon.gameObject.SetActive(value: true);
 		}
 		else
 		{
-			redCircle.get_gameObject().SetActive(false);
-			battleIcon.get_gameObject().SetActive(false);
+			redCircle.gameObject.SetActive(value: false);
+			battleIcon.gameObject.SetActive(value: false);
 		}
 		if (openType == OPEN_MAP_TYPE.SONAR)
 		{
-			tapToSkip = Utility.FindChild(exploreMapFrame, "TaptoSkip");
-			Transform val6 = Utility.FindChild(exploreMapFrame, "BG");
-			val6.get_gameObject().SetActive(true);
-			bgEventListener = UIEventListener.Get(val6.get_gameObject());
-			Transform val7 = Utility.FindChild(exploreMapFrame, "CaptionRoot/Close");
-			if (val7 != null)
+			tapToSkip = Utility.FindChild(transform, "TaptoSkip");
+			Transform transform8 = Utility.FindChild(transform, "BG");
+			transform8.gameObject.SetActive(value: true);
+			bgEventListener = UIEventListener.Get(transform8.gameObject);
+			Transform transform9 = Utility.FindChild(transform, "CaptionRoot/Close");
+			if (transform9 != null)
 			{
-				val7.get_gameObject().SetActive(false);
+				transform9.gameObject.SetActive(value: false);
 			}
-			findIcon = ResourceUtility.Realizes(loadedFindIcon.loadedObject, exploreMap);
-			findIcon.get_gameObject().SetActive(false);
-			sonarTexture = ResourceUtility.Realizes(loadedSonarTexture.loadedObject, exploreMap);
-			UITexture componentInChildren = sonarTexture.get_gameObject().GetComponentInChildren<UITexture>();
-			UIRenderTexture uIRenderTexture = UIRenderTexture.Get(componentInChildren, mapRoot_.GetSonarFov());
-			uIRenderTexture.modelTransform.set_localPosition(new Vector3(0f, 0f, 150f));
+			findIcon = ResourceUtility.Realizes(loadedFindIcon.loadedObject, transform2);
+			findIcon.gameObject.SetActive(value: false);
+			sonarTexture = ResourceUtility.Realizes(loadedSonarTexture.loadedObject, transform2);
+			UIRenderTexture uIRenderTexture = UIRenderTexture.Get(sonarTexture.gameObject.GetComponentInChildren<UITexture>(), mapRoot_.GetSonarFov());
+			uIRenderTexture.modelTransform.localPosition = new Vector3(0f, 0f, 150f);
 			sonarDirEffect = ResourceUtility.Realizes(loadedDirSonar.loadedObject, uIRenderTexture.modelTransform, uIRenderTexture.renderLayer);
-			sonarDirEffect.set_localScale(Vector2.op_Implicit(mapRoot_.GetSonarScale()));
-			sonarDirEffect.get_gameObject().SetActive(false);
+			sonarDirEffect.localScale = mapRoot_.GetSonarScale();
+			sonarDirEffect.gameObject.SetActive(value: false);
 			uIRenderTexture.Enable();
-			uIRenderTexture.renderCamera.set_backgroundColor(mapRoot_.sonarBackGroundColor);
-			mapRoot_.SetDirectionSonar(sonarDirEffect.get_gameObject());
+			uIRenderTexture.renderCamera.backgroundColor = mapRoot_.sonarBackGroundColor;
+			mapRoot_.SetDirectionSonar(sonarDirEffect.gameObject);
 		}
 		base.Initialize();
 	}
@@ -213,57 +211,57 @@ public class ExploreMap : GameSection
 		}
 		int bossMapId = MonoBehaviourSingleton<QuestManager>.I.GetExploreBossAppearMapId();
 		Vector3 bossPos = mapRoot_.GetPositionOnMap(bossMapId);
-		int currentMapId = (int)MonoBehaviourSingleton<FieldManager>.I.currentMapID;
-		Vector3 selfPos = mapRoot_.GetPositionOnMap(currentMapId);
-		float distance = Vector3.Distance(bossPos, selfPos);
-		float sonarSize = GetSonarSize(currentMapId);
-		bool find = distance <= sonarSize;
+		int currentMapID = (int)MonoBehaviourSingleton<FieldManager>.I.currentMapID;
+		Vector3 selfPos = mapRoot_.GetPositionOnMap(currentMapID);
+		float num = Vector3.Distance(bossPos, selfPos);
+		float sonarSize = GetSonarSize(currentMapID);
+		bool find = num <= sonarSize;
 		SONAR_DIR dir = CalculateSonarDir(bossPos, selfPos);
-		yield return (object)new WaitForSeconds(0.7f);
+		yield return new WaitForSeconds(0.7f);
 		PlaySonarEffect(dir, selfPos, sonarSize);
 		PlayAudio(AUDIO.SONAR);
-		yield return (object)new WaitForSeconds(2f);
+		yield return new WaitForSeconds(2f);
 		if (mapRoot_.showBattleMarker)
 		{
-			sonarDirEffect.get_gameObject().SetActive(false);
+			sonarDirEffect.gameObject.SetActive(value: false);
 			MonoBehaviourSingleton<QuestManager>.I.GetExploreBossAppearMapId();
 			Vector3 pos = mapRoot_.GetPositionOnMap(bossMapId);
-			redCircle.set_localPosition(pos);
-			redCircle.get_gameObject().SetActive(true);
+			redCircle.localPosition = pos;
+			redCircle.gameObject.SetActive(value: true);
 			TweenAlpha tweenAlpha2 = redCircle.GetComponent<TweenAlpha>();
 			if (null != tweenAlpha2)
 			{
-				while (tweenAlpha2.get_isActiveAndEnabled())
+				while (tweenAlpha2.isActiveAndEnabled)
 				{
 					yield return null;
 				}
 			}
-			yield return (object)new WaitForSeconds(0.4f);
-			battleIcon.set_localPosition(new Vector3(pos.x + 22f, pos.y + 33f, pos.z));
-			battleIcon.get_gameObject().SetActive(true);
+			yield return new WaitForSeconds(0.4f);
+			battleIcon.localPosition = new Vector3(pos.x + 22f, pos.y + 33f, pos.z);
+			battleIcon.gameObject.SetActive(value: true);
 			PlayAudio(AUDIO.MARKER);
 		}
-		else if (find && !redCircle.get_gameObject().get_activeSelf())
+		else if (find && !redCircle.gameObject.activeSelf)
 		{
-			sonarDirEffect.get_gameObject().SetActive(false);
-			redCircle.set_localPosition(bossPos);
-			redCircle.get_gameObject().SetActive(true);
-			TweenAlpha tweenAlpha = redCircle.GetComponent<TweenAlpha>();
-			if (null != tweenAlpha)
+			sonarDirEffect.gameObject.SetActive(value: false);
+			redCircle.localPosition = bossPos;
+			redCircle.gameObject.SetActive(value: true);
+			TweenAlpha tweenAlpha2 = redCircle.GetComponent<TweenAlpha>();
+			if (null != tweenAlpha2)
 			{
-				while (tweenAlpha.get_isActiveAndEnabled())
+				while (tweenAlpha2.isActiveAndEnabled)
 				{
 					yield return null;
 				}
 			}
-			yield return (object)new WaitForSeconds(0.4f);
-			findIcon.set_localPosition(new Vector3(bossPos.x + 22f, bossPos.y + 33f, bossPos.z));
-			findIcon.get_gameObject().SetActive(true);
+			yield return new WaitForSeconds(0.4f);
+			findIcon.localPosition = new Vector3(bossPos.x + 22f, bossPos.y + 33f, bossPos.z);
+			findIcon.gameObject.SetActive(value: true);
 			PlayAudio(AUDIO.MARKER);
 		}
 		if (tapToSkip != null)
 		{
-			tapToSkip.get_gameObject().SetActive(true);
+			tapToSkip.gameObject.SetActive(value: true);
 			UIEventListener uIEventListener = bgEventListener;
 			uIEventListener.onClick = (UIEventListener.VoidDelegate)Delegate.Combine(uIEventListener.onClick, new UIEventListener.VoidDelegate(onClick));
 		}
@@ -289,24 +287,16 @@ public class ExploreMap : GameSection
 
 	private void PlaySonarEffect(SONAR_DIR dir, Vector3 pos, float size)
 	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		sonarTexture.set_localPosition(pos);
+		sonarTexture.localPosition = pos;
 		float num = size / 100f * mapRoot_.GetMapScale() * mapRoot_.GetSonarOffset();
-		Vector3 localScale = sonarTexture.get_localScale();
-		sonarTexture.set_localScale(new Vector3(localScale.x * num, localScale.y * num, localScale.z));
-		sonarDirEffect.get_gameObject().SetActive(true);
+		Vector3 localScale = sonarTexture.localScale;
+		sonarTexture.localScale = new Vector3(localScale.x * num, localScale.y * num, localScale.z);
+		sonarDirEffect.gameObject.SetActive(value: true);
 		RotateSonarEffect(dir);
 	}
 
 	private void RotateSonarEffect(SONAR_DIR dir)
 	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 		switch (dir)
 		{
 		case SONAR_DIR.UP:
@@ -326,10 +316,8 @@ public class ExploreMap : GameSection
 
 	private SONAR_DIR CalculateSonarDir(Vector3 targetPos, Vector3 currentPos)
 	{
-		float num = targetPos.x - currentPos.x;
-		float num2 = targetPos.y - currentPos.y;
-		float num3 = Mathf.Atan2(num2, num);
-		float deg = num3 * 57.29578f;
+		float x = targetPos.x - currentPos.x;
+		float deg = Mathf.Atan2(targetPos.y - currentPos.y, x) * 57.29578f;
 		return GetSonarDir(deg);
 	}
 
@@ -377,7 +365,7 @@ public class ExploreMap : GameSection
 				UIEventListener uIEventListener = bgEventListener;
 				uIEventListener.onClick = (UIEventListener.VoidDelegate)Delegate.Remove(uIEventListener.onClick, new UIEventListener.VoidDelegate(onClick));
 			}
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("ExploreMap", this.get_gameObject(), "[BACK]");
+			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("ExploreMap", base.gameObject, "[BACK]");
 			calledExit = true;
 		}
 	}

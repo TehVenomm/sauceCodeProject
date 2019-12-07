@@ -19,8 +19,7 @@ namespace BestHTTP.Extensions
 				list.Add(new KeyValuePair(key));
 				while (pos < str.Length)
 				{
-					string key2 = str.Read(ref pos, '=').TrimAndLower();
-					KeyValuePair keyValuePair = new KeyValuePair(key2);
+					KeyValuePair keyValuePair = new KeyValuePair(str.Read(ref pos, '=').TrimAndLower());
 					str.SkipWhiteSpace(ref pos);
 					keyValuePair.Value = str.ReadQuotedText(ref pos);
 					list.Add(keyValuePair);

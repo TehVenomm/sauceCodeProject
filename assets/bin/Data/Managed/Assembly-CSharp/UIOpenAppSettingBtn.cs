@@ -4,11 +4,6 @@ public class UIOpenAppSettingBtn : MonoBehaviour
 {
 	private BootProcess currentBootProcess;
 
-	public UIOpenAppSettingBtn()
-		: this()
-	{
-	}
-
 	public void SetBootProcess(BootProcess pro)
 	{
 		currentBootProcess = pro;
@@ -33,7 +28,7 @@ public class UIOpenAppSettingBtn : MonoBehaviour
 
 	private void OnEnable()
 	{
-		currentBootProcess = MonoBehaviourSingleton<AppMain>.I.get_gameObject().GetComponent<BootProcess>();
+		currentBootProcess = MonoBehaviourSingleton<AppMain>.I.gameObject.GetComponent<BootProcess>();
 	}
 
 	private void OnDisable()

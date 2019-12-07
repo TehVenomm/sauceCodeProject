@@ -155,7 +155,7 @@ public class QuestOrderSelect : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
@@ -176,7 +176,7 @@ public class QuestOrderSelect : GameSection
 				yield return null;
 			}
 		}
-		this.StartCoroutine(CheckLimitQuestItem());
+		StartCoroutine(CheckLimitQuestItem());
 		sortSettings = SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.QUEST, SortSettings.SETTINGS_TYPE.ORDER_QUEST);
 		SHOW_QUEST_REMAIN_LIMIT_SECOND = (float)TimeSpan.FromDays(5.0).TotalSeconds;
 		sortSettings.indivComparison = Compare;
@@ -196,18 +196,16 @@ public class QuestOrderSelect : GameSection
 
 	public override void UpdateUI()
 	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 		npcText = Singleton<NPCMessageTable>.I.GetNPCMessageBySectionData(base.sectionData);
-		SetRenderNPCModel((Enum)UI.TEX_NPCMODEL, 2, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCRot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCFOV, (Action<NPCLoader>)null);
-		SetLabelText((Enum)UI.LBL_NPC_MESSAGE, npcText);
+		SetRenderNPCModel(UI.TEX_NPCMODEL, 2, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCRot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCFOV);
+		SetLabelText(UI.LBL_NPC_MESSAGE, npcText);
 		if (MonoBehaviourSingleton<PartyManager>.IsValid() && MonoBehaviourSingleton<PartyManager>.I.challengeInfo != null && MonoBehaviourSingleton<PartyManager>.I.challengeInfo.currentShadowCount != null)
 		{
-			SetActive((Enum)UI.BTN_SHADOW_COUNT, is_visible: true);
+			SetActive(UI.BTN_SHADOW_COUNT, is_visible: true);
 		}
 		else
 		{
-			SetActive((Enum)UI.BTN_SHADOW_COUNT, is_visible: false);
+			SetActive(UI.BTN_SHADOW_COUNT, is_visible: false);
 		}
 		ShowOrder();
 		isResetUI = false;
@@ -262,12 +260,9 @@ public class QuestOrderSelect : GameSection
 					int num3 = 0;
 					if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 					{
-						num3 = (from g in MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList
-						where g.questId == (int)info.questData.tableData.questID
-						select g).Count();
+						num3 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where((GuildRequestItem g) => g.questId == (int)info.questData.tableData.questID).Count();
 					}
-					int num4 = num2 - num3;
-					if (num4 > 0)
+					if (num2 - num3 > 0)
 					{
 						list2.Add(new QuestGridData(QuestGridData.ORDER_QUEST_TYPE.Quest, array[i]));
 					}
@@ -277,43 +272,43 @@ public class QuestOrderSelect : GameSection
 		questGridDatas = list2.ToArray();
 		if (questGridDatas == null || questGridDatas.Length == 0)
 		{
-			SetActive((Enum)UI.GRD_ORDER_QUEST, is_visible: false);
-			SetActive((Enum)UI.STR_ORDER_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: true);
-			SetLabelText((Enum)UI.LBL_MAX, "0");
-			SetLabelText((Enum)UI.LBL_NOW, "0");
+			SetActive(UI.GRD_ORDER_QUEST, is_visible: false);
+			SetActive(UI.STR_ORDER_NON_LIST, is_visible: true);
+			SetActive(UI.OBJ_ACTIVE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, is_visible: true);
+			SetLabelText(UI.LBL_MAX, "0");
+			SetLabelText(UI.LBL_NOW, "0");
 			UIScrollView component = GetCtrl(UI.SCR_ORDER_QUEST).GetComponent<UIScrollView>();
 			if (component != null)
 			{
-				component.set_enabled(false);
+				component.enabled = false;
 				component.verticalScrollBar.alpha = 0f;
 			}
 			return;
 		}
 		if (questGridDatas.Length == 1 && questGridDatas[0].orderQuestType == QuestGridData.ORDER_QUEST_TYPE.Challenge)
 		{
-			SetActive((Enum)UI.STR_ORDER_NON_LIST, is_visible: true);
+			SetActive(UI.STR_ORDER_NON_LIST, is_visible: true);
 		}
 		else
 		{
-			SetActive((Enum)UI.STR_ORDER_NON_LIST, is_visible: false);
+			SetActive(UI.STR_ORDER_NON_LIST, is_visible: false);
 		}
-		SetActive((Enum)UI.GRD_ORDER_QUEST, is_visible: true);
-		SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
-		SetToggle((Enum)UI.TGL_ICON_ASC, sortSettings.orderTypeAsc);
+		SetActive(UI.GRD_ORDER_QUEST, is_visible: true);
+		SetLabelText(UI.LBL_SORT, sortSettings.GetSortLabel());
+		SetToggle(UI.TGL_ICON_ASC, sortSettings.orderTypeAsc);
 		pageMax = 1 + (questGridDatas.Length - 1) / 10;
 		bool flag = pageMax > 1;
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
-		SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
+		SetActive(UI.OBJ_ACTIVE_ROOT, flag);
+		SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
+		SetLabelText(UI.LBL_MAX, pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, nowPage.ToString());
 		UITweener[] transitions = GetCtrl(UI.OBJ_FRAME).GetComponents<UITweener>();
 		int finishCount = 0;
 		UITweener[] array2 = transitions;
-		foreach (UITweener uITweener in array2)
+		for (int j = 0; j < array2.Length; j++)
 		{
-			uITweener.AddOnFinished(delegate
+			array2[j].AddOnFinished(delegate
 			{
 				finishCount++;
 				if (finishCount >= transitions.Length)
@@ -322,12 +317,12 @@ public class QuestOrderSelect : GameSection
 				}
 			});
 		}
-		int num5 = 10 * (nowPage - 1);
-		int num6 = (nowPage != pageMax) ? 10 : (questGridDatas.Length - num5);
-		QuestGridData[] destinationArray = new QuestGridData[num6];
-		Array.Copy(questGridDatas, num5, destinationArray, 0, num6);
+		int num4 = 10 * (nowPage - 1);
+		int num5 = (nowPage == pageMax) ? (questGridDatas.Length - num4) : 10;
+		QuestGridData[] destinationArray = new QuestGridData[num5];
+		Array.Copy(questGridDatas, num4, destinationArray, 0, num5);
 		questGridDatas = destinationArray;
-		SetGrid(UI.GRD_ORDER_QUEST, string.Empty, 0, reset: true, null, null);
+		SetGrid(UI.GRD_ORDER_QUEST, "", 0, reset: true, null, null);
 		SetGrid(UI.GRD_ORDER_QUEST, "QuestListOrderItem", questGridDatas.Length, reset: true, CreateGridListItem, UpdateGridListItem);
 	}
 
@@ -363,14 +358,13 @@ public class QuestOrderSelect : GameSection
 
 	private void UpdateGirdListItemQuest(int i, Transform t, bool is_recycle)
 	{
-		List<GameSectionHistory.HistoryData> historyList = MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList();
-		bool flag = historyList.Any((GameSectionHistory.HistoryData h) => h.sectionName.StartsWith("GuildRequest"));
+		bool num = MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList().Any((GameSectionHistory.HistoryData h) => h.sectionName.StartsWith("GuildRequest"));
 		SetActive(t, is_visible: true);
 		SetEvent(t, "SELECT_ORDER", i);
 		QuestSortData questSortData = questGridDatas[i].questSortData;
 		UIScrollView component = GetCtrl(UI.SCR_ORDER_QUEST).GetComponent<UIScrollView>();
 		QuestInfoData info = questSortData.itemData.infoData;
-		if (flag)
+		if (num)
 		{
 			SetActive(t, UI.TWN_DIFFICULT_STAR, is_visible: false);
 			SetActive(t, UI.TXT_NEED_POINT, is_visible: true);
@@ -391,17 +385,17 @@ public class QuestOrderSelect : GameSection
 		SetElementSprite(t, UI.SPR_WEAK_ELEMENT, (int)enemyData.weakElement);
 		SetActive(t, UI.STR_NON_WEAK_ELEMENT, enemyData.weakElement == ELEMENT_TYPE.MAX);
 		SetLabelText(t, UI.LBL_QUEST_NAME, info.questData.tableData.questText);
-		int num = 1;
+		int num2 = 1;
 		ClearStatusQuestEnemySpecies clearStatusQuestEnemySpecies = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestEnemySpecies(info.questData.tableData.questID);
 		if (clearStatusQuestEnemySpecies != null)
 		{
-			num = clearStatusQuestEnemySpecies.questStatus;
+			num2 = clearStatusQuestEnemySpecies.questStatus;
 		}
 		int value = i + 100;
 		SetToggleGroup(t, UI.OBJ_ICON_NEW, value);
 		SetToggleGroup(t, UI.OBJ_ICON_CLEARED, value);
 		SetToggleGroup(t, UI.OBJ_ICON_COMPLETE, value);
-		CLEAR_STATUS cLEAR_STATUS = (CLEAR_STATUS)num;
+		CLEAR_STATUS cLEAR_STATUS = (CLEAR_STATUS)num2;
 		if (cLEAR_STATUS != CLEAR_STATUS.NEW)
 		{
 			SetToggle(t, UI.OBJ_ICON_NEW, value: false);
@@ -418,27 +412,25 @@ public class QuestOrderSelect : GameSection
 			SetVisibleWidgetEffect(UI.SCR_ORDER_QUEST, t, UI.SPR_ICON_COMPLETE, null);
 			SetVisibleWidgetEffect(UI.SCR_ORDER_QUEST, t, UI.SPR_ICON_NEW, "ef_ui_questselect_new");
 		}
-		int num2 = info.questData.num;
-		int num3 = 0;
+		int num3 = info.questData.num;
+		int num4 = 0;
 		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
 		{
-			num3 = (from g in MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList
-			where g.questId == (int)info.questData.tableData.questID
-			select g).Count();
+			num4 = MonoBehaviourSingleton<GuildRequestManager>.I.guildRequestData.guildRequestItemList.Where((GuildRequestItem g) => g.questId == (int)info.questData.tableData.questID).Count();
 		}
-		int num4 = num2 - num3;
-		SetLabelText(t, UI.LBL_ORDER_NUM, num4.ToString());
-		if (num4 <= 0)
+		int num5 = num3 - num4;
+		SetLabelText(t, UI.LBL_ORDER_NUM, num5.ToString());
+		if (num5 <= 0)
 		{
 			t.GetComponent<UIButton>().isEnabled = false;
 		}
-		Transform val = FindCtrl(t, UI.OBJ_FRAME);
-		if (val != null)
+		Transform transform = FindCtrl(t, UI.OBJ_FRAME);
+		if (transform != null)
 		{
-			UIPanel uiPanel = val.get_gameObject().GetComponent<UIPanel>();
+			UIPanel uiPanel = transform.gameObject.GetComponent<UIPanel>();
 			if (uiPanel == null)
 			{
-				uiPanel = val.get_gameObject().AddComponent<UIPanel>();
+				uiPanel = transform.gameObject.AddComponent<UIPanel>();
 				uiPanel.depth = component.panel.depth + 1;
 			}
 			uiPanel.widgetsAreStatic = false;
@@ -458,8 +450,7 @@ public class QuestOrderSelect : GameSection
 		bool is_visible = false;
 		foreach (float remainTime in itemData.remainTimes)
 		{
-			float num5 = remainTime;
-			if (num5 < SHOW_QUEST_REMAIN_LIMIT_SECOND)
+			if (remainTime < SHOW_QUEST_REMAIN_LIMIT_SECOND)
 			{
 				is_visible = true;
 				break;
@@ -601,13 +592,12 @@ public class QuestOrderSelect : GameSection
 
 	public override void OnNotify(NOTIFY_FLAG flags)
 	{
-		bool flag = false;
 		if ((flags & NOTIFY_FLAG.UPDATE_QUEST_ITEM_INVENTORY) != (NOTIFY_FLAG)0L)
 		{
 			SetDirty(UI.GRD_ORDER_QUEST);
 			questItemAry = null;
 		}
-		if (!flag)
+		if (0 == 0)
 		{
 			base.OnNotify(flags);
 		}
@@ -647,7 +637,7 @@ public class QuestOrderSelect : GameSection
 			{
 				MonoBehaviourSingleton<QuestManager>.I.SendGetQuestList(delegate
 				{
-					this.StartCoroutine(CheckLimitQuestItem());
+					StartCoroutine(CheckLimitQuestItem());
 				});
 			});
 			isQuestItemDirty = false;
@@ -717,7 +707,7 @@ public class QuestOrderSelect : GameSection
 				}
 			});
 			remainingTime = minRemainingSec;
-			yield return (object)new WaitForSeconds(minRemainingSec);
+			yield return new WaitForSeconds(minRemainingSec);
 			if (questData != null)
 			{
 				isQuestItemDirty = true;
@@ -728,7 +718,7 @@ public class QuestOrderSelect : GameSection
 	private void OnQuery_PAGE_PREV()
 	{
 		isResetUI = true;
-		nowPage = ((nowPage <= 1) ? pageMax : (nowPage - 1));
+		nowPage = ((nowPage > 1) ? (nowPage - 1) : pageMax);
 		ShowOrder();
 	}
 
@@ -749,11 +739,11 @@ public class QuestOrderSelect : GameSection
 		if (param != null && param.order != 0)
 		{
 			list = (from item in list
-			where param.IsMatchRarity(item)
-			where param.IsMatchLevel(item)
-			where param.IsMatchElement(item)
-			where param.IsMatchEnemySpecies(item)
-			select item).ToList();
+				where param.IsMatchRarity(item)
+				where param.IsMatchLevel(item)
+				where param.IsMatchElement(item)
+				where param.IsMatchEnemySpecies(item)
+				select item).ToList();
 		}
 	}
 
@@ -771,11 +761,19 @@ public class QuestOrderSelect : GameSection
 		bool flag2 = num2 < SHOW_QUEST_REMAIN_LIMIT_SECOND;
 		if (lp.IsAbsFirst() != rp.IsAbsFirst())
 		{
-			return (!lp.IsAbsFirst()) ? 1 : (-1);
+			if (!lp.IsAbsFirst())
+			{
+				return 1;
+			}
+			return -1;
 		}
 		if (flag != flag2)
 		{
-			return (!flag) ? 1 : (-1);
+			if (!flag)
+			{
+				return 1;
+			}
+			return -1;
 		}
 		int num3 = questSortData2.GetRarity() - questSortData.GetRarity();
 		if (num3 == 0)

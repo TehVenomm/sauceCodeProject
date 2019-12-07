@@ -10,11 +10,6 @@ namespace GooglePlayGames.Native.PInvoke
 
 		private HandleRef mSelfPointer;
 
-		public BaseReferenceHolder(IntPtr pointer)
-		{
-			mSelfPointer = PInvokeUtilities.CheckNonNull(new HandleRef(this, pointer));
-		}
-
 		protected bool IsDisposed()
 		{
 			return PInvokeUtilities.IsNull(mSelfPointer);
@@ -27,6 +22,11 @@ namespace GooglePlayGames.Native.PInvoke
 				throw new InvalidOperationException("Attempted to use object after it was cleaned up");
 			}
 			return mSelfPointer;
+		}
+
+		public BaseReferenceHolder(IntPtr pointer)
+		{
+			mSelfPointer = PInvokeUtilities.CheckNonNull(new HandleRef(this, pointer));
 		}
 
 		protected abstract void CallDispose(HandleRef selfPointer);

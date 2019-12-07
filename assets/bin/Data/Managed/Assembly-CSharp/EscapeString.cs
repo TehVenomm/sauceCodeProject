@@ -278,7 +278,7 @@ public class EscapeString
 
 	public static string Escape(string input)
 	{
-		StringBuilder stringBuilder = new StringBuilder(string.Empty);
+		StringBuilder stringBuilder = new StringBuilder("");
 		for (int i = 0; i < input.Length; i++)
 		{
 			bool flag = false;
@@ -301,14 +301,14 @@ public class EscapeString
 
 	public static string Unescape(string input)
 	{
-		StringBuilder stringBuilder = new StringBuilder(string.Empty);
+		StringBuilder stringBuilder = new StringBuilder("");
 		char[] array = input.ToCharArray();
 		int num = 0;
 		while (num < array.Length)
 		{
 			if (array[num] == '%')
 			{
-				StringBuilder stringBuilder2 = new StringBuilder(string.Empty);
+				StringBuilder stringBuilder2 = new StringBuilder("");
 				stringBuilder2.Append(array[num++]);
 				stringBuilder2.Append(array[num++]);
 				stringBuilder2.Append(array[num++]);

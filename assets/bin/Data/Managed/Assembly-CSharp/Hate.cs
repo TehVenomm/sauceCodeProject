@@ -34,6 +34,6 @@ public class Hate
 
 	public override string ToString()
 	{
-		return string.Empty + val + "/" + turnVal + "[" + cycleLockCount + "/" + totalLockCount + "]";
+		return val + "/" + turnVal + "[" + cycleLockCount + "/" + totalLockCount + "]";
 	}
 }

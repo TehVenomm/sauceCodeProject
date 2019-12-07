@@ -71,11 +71,10 @@ public class AchievementIdTable : Singleton<AchievementIdTable>, IDataTable
 
 	public void CreateTable(TextAsset csv = null)
 	{
-		bool flag = false;
 		if (csv == null)
 		{
 			csv = Resources.Load<TextAsset>("Internal/internal__TABLE__AchievementIdTable");
 		}
-		CreateTable(csv.get_text());
+		CreateTable(csv.text);
 	}
 }

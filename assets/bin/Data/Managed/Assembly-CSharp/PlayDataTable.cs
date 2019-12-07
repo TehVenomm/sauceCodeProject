@@ -1,7 +1,6 @@
 using Network;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class PlayDataTable : Singleton<PlayDataTable>, IDataTable
 {
@@ -45,9 +44,6 @@ public class PlayDataTable : Singleton<PlayDataTable>, IDataTable
 
 	private UIntKeyTable<PlayData> playDataTable;
 
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<PlayData> _003C_003Ef__mg_0024cache0;
-
 	public void CreateTable(string csv_text)
 	{
 		playDataTable = TableUtility.CreateUIntKeyTable<PlayData>(csv_text, PlayData.cb, "id,type,subType,name,format,orderNo,startAt");
@@ -63,7 +59,7 @@ public class PlayDataTable : Singleton<PlayDataTable>, IDataTable
 			if (o.startAt <= now)
 			{
 				AchievementCounter achievementCounter = dataList.Find((AchievementCounter x) => x.type == o.type && x.subType == o.subType);
-				string s = (achievementCounter == null) ? "0" : achievementCounter.count;
+				string s = (achievementCounter != null) ? achievementCounter.count : "0";
 				o.count = int.Parse(s);
 				sortData.Add(o);
 			}

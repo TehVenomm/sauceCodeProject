@@ -55,41 +55,30 @@ public class InGamePlayerList : GameSection
 
 	private void OnScreenRotate(bool is_portrait)
 	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
 		UIPanel panel = GetCtrl(UI.SCR_LIST).GetComponent<UIPanel>();
 		Vector4 baseClipRegion = panel.baseClipRegion;
 		if (is_portrait)
 		{
-			Vector3 localPosition = GetCtrl(UI.PORTRAIT_FRAME).get_localPosition();
+			Vector3 localPosition = GetCtrl(UI.PORTRAIT_FRAME).localPosition;
 			int height = GetHeight(UI.PORTRAIT_FRAME);
-			GetCtrl(UI.FRAME).set_localPosition(localPosition);
-			SetHeight((Enum)UI.FRAME, height);
-			GetCtrl(UI.SCR_LIST).set_parent(GetCtrl(UI.PORTRAIT_LIST));
+			GetCtrl(UI.FRAME).localPosition = localPosition;
+			SetHeight(UI.FRAME, height);
+			GetCtrl(UI.SCR_LIST).parent = GetCtrl(UI.PORTRAIT_LIST);
 			baseClipRegion.w = GetHeight(UI.PORTRAIT_LIST);
 		}
 		else
 		{
-			Vector3 localPosition2 = GetCtrl(UI.LANDSCAPE_FRAME).get_localPosition();
+			Vector3 localPosition2 = GetCtrl(UI.LANDSCAPE_FRAME).localPosition;
 			int height2 = GetHeight(UI.LANDSCAPE_FRAME);
-			GetCtrl(UI.FRAME).set_localPosition(localPosition2);
-			SetHeight((Enum)UI.FRAME, height2);
-			GetCtrl(UI.SCR_LIST).set_parent(GetCtrl(UI.LANDSCAPE_LIST));
+			GetCtrl(UI.FRAME).localPosition = localPosition2;
+			SetHeight(UI.FRAME, height2);
+			GetCtrl(UI.SCR_LIST).parent = GetCtrl(UI.LANDSCAPE_LIST);
 			baseClipRegion.w = GetHeight(UI.LANDSCAPE_LIST);
 		}
 		panel.baseClipRegion = baseClipRegion;
-		panel.clipOffset = Vector2.get_zero();
-		GetCtrl(UI.SCR_LIST).set_localPosition(Vector3.get_zero());
-		ScrollViewResetPosition((Enum)UI.SCR_LIST);
+		panel.clipOffset = Vector2.zero;
+		GetCtrl(UI.SCR_LIST).localPosition = Vector3.zero;
+		ScrollViewResetPosition(UI.SCR_LIST);
 		UpdateAnchors();
 		AppMain i = MonoBehaviourSingleton<AppMain>.I;
 		i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
@@ -104,8 +93,8 @@ public class InGamePlayerList : GameSection
 		int count = infoList.Count;
 		if (count <= 0)
 		{
-			SetActive((Enum)UI.GRD_LIST, is_visible: false);
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_LIST, is_visible: false);
+			SetActive(UI.STR_NON_LIST, is_visible: true);
 		}
 		else
 		{
@@ -137,10 +126,10 @@ public class InGamePlayerList : GameSection
 					SetEvent(t, UI.BTN_BLACK_LIST, "BLACK_LIST_IN", i);
 				}
 				SetButtonEnabled(t, UI.BTN_BLACK_LIST, !flag);
-				string clanId = (infoList[i].userClanData == null) ? "0" : infoList[i].userClanData.cId;
+				string clanId = (infoList[i].userClanData != null) ? infoList[i].userClanData.cId : "0";
 				SetFollowStatus(t, infoList[i].userId, infoList[i].following, infoList[i].follower, clanId);
 			});
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+			SetActive(UI.STR_NON_LIST, is_visible: false);
 		}
 	}
 
@@ -152,13 +141,13 @@ public class InGamePlayerList : GameSection
 		{
 			is_visible = (clanId == MonoBehaviourSingleton<UserInfoManager>.I.userClan.cId);
 		}
-		bool flag2 = !flag && (following || follower);
+		bool flag2 = !flag && (following | follower);
 		SetActive(t, UI.SPR_BLACKLIST_ICON, flag);
 		SetActive(t, UI.OBJ_FOLLOW, flag2);
 		SetActive(t, UI.SPR_FOLLOW, flag2 && following);
 		SetActive(t, UI.SPR_FOLLOWER, flag2 && follower);
 		SetActive(t, UI.SPR_SAME_CLAN_ICON, is_visible);
-		UIGrid component = base.GetComponent<UIGrid>(t, (Enum)UI.GRD_FOLLOW_ARROW);
+		UIGrid component = GetComponent<UIGrid>(t, UI.GRD_FOLLOW_ARROW);
 		if (component != null)
 		{
 			component.Reposition();
@@ -199,8 +188,8 @@ public class InGamePlayerList : GameSection
 		GameSection.StayEvent();
 		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(list, delegate(Error err, List<int> follow_list)
 		{
-			bool flag = err == Error.None && follow_list.Count > 0;
-			if (flag)
+			bool num = err == Error.None && follow_list.Count > 0;
+			if (num)
 			{
 				infoList[index].following = !infoList[index].following;
 			}
@@ -208,7 +197,7 @@ public class InGamePlayerList : GameSection
 			{
 				CoopApp.UpdateField();
 			}
-			GameSection.ResumeEvent(flag);
+			GameSection.ResumeEvent(num);
 			RefreshUI();
 		});
 	}

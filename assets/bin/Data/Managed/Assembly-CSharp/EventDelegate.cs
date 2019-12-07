@@ -9,7 +9,7 @@ public class EventDelegate
 	[Serializable]
 	public class Parameter
 	{
-		public Object obj;
+		public UnityEngine.Object obj;
 
 		public string field;
 
@@ -43,7 +43,7 @@ public class EventDelegate
 					propInfo = null;
 					if (obj != null && !string.IsNullOrEmpty(field))
 					{
-						Type type = ((object)obj).GetType();
+						Type type = obj.GetType();
 						propInfo = type.GetProperty(field);
 						if (propInfo == null)
 						{
@@ -87,7 +87,7 @@ public class EventDelegate
 				{
 					return typeof(void);
 				}
-				return ((object)obj).GetType();
+				return obj.GetType();
 			}
 		}
 
@@ -95,7 +95,7 @@ public class EventDelegate
 		{
 		}
 
-		public Parameter(Object obj, string field)
+		public Parameter(UnityEngine.Object obj, string field)
 		{
 			this.obj = obj;
 			this.field = field;
@@ -196,7 +196,15 @@ public class EventDelegate
 			{
 				Cache();
 			}
-			return (mRawDelegate && mCachedCallback != null) || (mTarget != null && !string.IsNullOrEmpty(mMethodName));
+			if (!mRawDelegate || mCachedCallback == null)
+			{
+				if (mTarget != null)
+				{
+					return !string.IsNullOrEmpty(mMethodName);
+				}
+				return false;
+			}
+			return true;
 		}
 	}
 
@@ -216,8 +224,12 @@ public class EventDelegate
 			{
 				return false;
 			}
-			MonoBehaviour val = mTarget;
-			return val == null || val.get_enabled();
+			MonoBehaviour monoBehaviour = mTarget;
+			if (!(monoBehaviour == null))
+			{
+				return monoBehaviour.enabled;
+			}
+			return true;
 		}
 	}
 
@@ -242,7 +254,11 @@ public class EventDelegate
 
 	private static bool IsValid(Callback callback)
 	{
-		return callback != null && callback.Method != null;
+		if (callback != null)
+		{
+			return callback.Method != null;
+		}
+		return false;
 	}
 
 	public override bool Equals(object obj)
@@ -258,13 +274,21 @@ public class EventDelegate
 			{
 				return true;
 			}
-			MonoBehaviour val = callback.Target as MonoBehaviour;
-			return mTarget == val && string.Equals(mMethodName, GetMethodName(callback));
+			MonoBehaviour y = callback.Target as MonoBehaviour;
+			if (mTarget == y)
+			{
+				return string.Equals(mMethodName, GetMethodName(callback));
+			}
+			return false;
 		}
 		if (obj is EventDelegate)
 		{
 			EventDelegate eventDelegate = obj as EventDelegate;
-			return mTarget == eventDelegate.mTarget && string.Equals(mMethodName, eventDelegate.mMethodName);
+			if (mTarget == eventDelegate.mTarget)
+			{
+				return string.Equals(mMethodName, eventDelegate.mMethodName);
+			}
+			return false;
 		}
 		return false;
 	}
@@ -308,7 +332,7 @@ public class EventDelegate
 		{
 			return;
 		}
-		Type type = ((object)mTarget).GetType();
+		Type type = mTarget.GetType();
 		mMethod = null;
 		while (type != null)
 		{
@@ -327,12 +351,12 @@ public class EventDelegate
 		}
 		if (mMethod == null)
 		{
-			Debug.LogError((object)("Could not find method '" + mMethodName + "' on " + ((object)mTarget).GetType()), mTarget);
+			Debug.LogError("Could not find method '" + mMethodName + "' on " + mTarget.GetType(), mTarget);
 			return;
 		}
 		if (mMethod.ReturnType != typeof(void))
 		{
-			Debug.LogError((object)(((object)mTarget).GetType() + "." + mMethodName + " must have a 'void' return type."), mTarget);
+			Debug.LogError(mTarget.GetType() + "." + mMethodName + " must have a 'void' return type.", mTarget);
 			return;
 		}
 		mParameterInfos = mMethod.GetParameters();
@@ -395,15 +419,7 @@ public class EventDelegate
 				catch (ArgumentException ex)
 				{
 					string text = "Error calling ";
-					if (mTarget == null)
-					{
-						text += mMethod.Name;
-					}
-					else
-					{
-						string text2 = text;
-						text = text2 + ((object)mTarget).GetType() + "." + mMethod.Name;
-					}
+					text = ((!(mTarget == null)) ? (text + mTarget.GetType() + "." + mMethod.Name) : (text + mMethod.Name));
 					text = text + ": " + ex.Message;
 					text += "\n  Expected: ";
 					if (mParameterInfos.Length == 0)
@@ -432,7 +448,7 @@ public class EventDelegate
 						}
 					}
 					text += "\n";
-					Debug.LogError((object)text);
+					Debug.LogError(text);
 				}
 				int l = 0;
 				for (int num2 = mArgs.Length; l < num2; l++)
@@ -466,7 +482,7 @@ public class EventDelegate
 	{
 		if (mTarget != null)
 		{
-			string text = ((object)mTarget).GetType().ToString();
+			string text = mTarget.GetType().ToString();
 			int num = text.LastIndexOf('.');
 			if (num > 0)
 			{
@@ -478,7 +494,11 @@ public class EventDelegate
 			}
 			return text + "/[delegate]";
 		}
-		return (!mRawDelegate) ? null : "[delegate]";
+		if (!mRawDelegate)
+		{
+			return null;
+		}
+		return "[delegate]";
 	}
 
 	public static void Execute(List<EventDelegate> list)
@@ -501,11 +521,11 @@ public class EventDelegate
 				{
 					if (ex.InnerException != null)
 					{
-						Debug.LogError((object)ex.InnerException.Message);
+						Debug.LogError(ex.InnerException.Message);
 					}
 					else
 					{
-						Debug.LogError((object)ex.Message);
+						Debug.LogError(ex.Message);
 					}
 				}
 				if (num >= list.Count)
@@ -587,7 +607,7 @@ public class EventDelegate
 			list.Add(eventDelegate2);
 			return eventDelegate2;
 		}
-		Debug.LogWarning((object)"Attempting to add a callback to a list that's null");
+		Debug.LogWarning("Attempting to add a callback to a list that's null");
 		return null;
 	}
 
@@ -615,7 +635,7 @@ public class EventDelegate
 			}
 			EventDelegate eventDelegate2 = new EventDelegate(ev.target, ev.methodName);
 			eventDelegate2.oneShot = oneShot;
-			if (ev.mParameters != null && ev.mParameters.Length > 0)
+			if (ev.mParameters != null && ev.mParameters.Length != 0)
 			{
 				eventDelegate2.mParameters = new Parameter[ev.mParameters.Length];
 				for (int j = 0; j < ev.mParameters.Length; j++)
@@ -627,7 +647,7 @@ public class EventDelegate
 		}
 		else
 		{
-			Debug.LogWarning((object)"Attempting to add a callback to a list that's null");
+			Debug.LogWarning("Attempting to add a callback to a list that's null");
 		}
 	}
 

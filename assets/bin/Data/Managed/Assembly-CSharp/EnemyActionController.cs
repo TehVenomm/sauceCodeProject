@@ -216,7 +216,7 @@ public class EnemyActionController
 					}
 				}
 				EnemyActionTable.ActionTypeInfo[] combiActionTypeInfos = actionInfo.data.combiActionTypeInfos;
-				if (combiActionTypeInfos != null && combiActionTypeInfos.Length > 0)
+				if (combiActionTypeInfos != null && combiActionTypeInfos.Length != 0)
 				{
 					int num2 = combiActionTypeInfos.Length;
 					for (int j = 0; j < num2; j++)
@@ -240,7 +240,7 @@ public class EnemyActionController
 				}
 				if (data.startWaitInterval > 0f)
 				{
-					data.startWaitTime = Time.get_time();
+					data.startWaitTime = Time.time;
 				}
 				if ((int)m_enemyData.level >= data.useLvLimit)
 				{
@@ -253,18 +253,15 @@ public class EnemyActionController
 	private bool canActionWithAliveRegion(ActionInfo action)
 	{
 		EnemyRegionWork[] works = enemy.regionWorks;
-		int num = action.useAliveRegionIDs.Find((int id) => id < works.Length && (int)works[id].hp <= 0);
-		if (num > 0)
+		if (action.useAliveRegionIDs.Find((int id) => id < works.Length && (int)works[id].hp <= 0) > 0)
 		{
 			return false;
 		}
-		int num2 = action.useDeadRegionIDs.Find((int id) => (id < works.Length && (int)works[id].hp > 0) || enemy.IsEnableReviveRegion(id));
-		if (num2 > 0)
+		if (action.useDeadRegionIDs.Find((int id) => (id < works.Length && (int)works[id].hp > 0) || enemy.IsEnableReviveRegion(id)) > 0)
 		{
 			return false;
 		}
-		int num3 = action.useReviveRegionIDs.Find((int id) => !enemy.IsEnableReviveRegion(id));
-		if (num3 > 0)
+		if (action.useReviveRegionIDs.Find((int id) => !enemy.IsEnableReviveRegion(id)) > 0)
 		{
 			return false;
 		}
@@ -342,7 +339,7 @@ public class EnemyActionController
 				continue;
 			}
 			canUseCount++;
-			if (!canActionWithAliveRegion(actionInfo) || !CheckActionByAngryCondition(actionInfo) || (actionInfo.data.startWaitInterval > 0f && Time.get_time() - actionInfo.data.startWaitTime < actionInfo.data.startWaitInterval) || (actionInfo.data.lotteryWaitInterval > 0f && Time.get_time() - actionInfo.data.lotteryWaitTime < actionInfo.data.lotteryWaitInterval))
+			if (!canActionWithAliveRegion(actionInfo) || !CheckActionByAngryCondition(actionInfo) || (actionInfo.data.startWaitInterval > 0f && Time.time - actionInfo.data.startWaitTime < actionInfo.data.startWaitInterval) || (actionInfo.data.lotteryWaitInterval > 0f && Time.time - actionInfo.data.lotteryWaitTime < actionInfo.data.lotteryWaitInterval))
 			{
 				continue;
 			}
@@ -373,7 +370,7 @@ public class EnemyActionController
 			return;
 		}
 		int num2 = 0;
-		int num3 = Random.Range(0, totalWeight) + 1;
+		int num3 = UnityEngine.Random.Range(0, totalWeight) + 1;
 		int j = 0;
 		for (int count2 = actions.Count; j < count2; j++)
 		{
@@ -501,12 +498,7 @@ public class EnemyActionController
 
 	public void OnReviveRegion(int regionId)
 	{
-		if (enemy == null)
-		{
-			return;
-		}
-		EnemyRegionWork enemyRegionWork = enemy.SearchRegionWork(regionId);
-		if (enemyRegionWork == null || m_angryDataList == null)
+		if (enemy == null || enemy.SearchRegionWork(regionId) == null || m_angryDataList == null)
 		{
 			return;
 		}

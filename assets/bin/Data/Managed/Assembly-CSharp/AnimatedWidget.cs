@@ -9,14 +9,9 @@ public class AnimatedWidget : MonoBehaviour
 
 	private UIWidget mWidget;
 
-	public AnimatedWidget()
-		: this()
-	{
-	}
-
 	private void OnEnable()
 	{
-		mWidget = this.GetComponent<UIWidget>();
+		mWidget = GetComponent<UIWidget>();
 		LateUpdate();
 	}
 

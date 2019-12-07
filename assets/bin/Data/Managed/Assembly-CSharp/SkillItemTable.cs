@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
@@ -131,7 +130,7 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 		{
 			get
 			{
-				if (skillAtkTypes != null && skillAtkTypes.Length > 0)
+				if (skillAtkTypes != null && skillAtkTypes.Length != 0)
 				{
 					return skillAtkTypes[0];
 				}
@@ -143,7 +142,7 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 		{
 			get
 			{
-				if (skillAtkRates != null && skillAtkRates.Length > 0)
+				if (skillAtkRates != null && skillAtkRates.Length != 0)
 				{
 					return skillAtkRates[0];
 				}
@@ -225,7 +224,11 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 
 		public bool IsPassive()
 		{
-			return type != SKILL_SLOT_TYPE.ATTACK && type != SKILL_SLOT_TYPE.SUPPORT && type != SKILL_SLOT_TYPE.HEAL;
+			if (type != SKILL_SLOT_TYPE.ATTACK && type != SKILL_SLOT_TYPE.SUPPORT)
+			{
+				return type != SKILL_SLOT_TYPE.HEAL;
+			}
+			return false;
 		}
 
 		public bool IsEnableEquipType(EQUIPMENT_TYPE type)
@@ -312,7 +315,7 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 			{
 				return false;
 			}
-			if (supportPassiveEqType.Length <= 0)
+			if (supportPassiveEqType.Length == 0)
 			{
 				return false;
 			}
@@ -390,7 +393,7 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 
 		public bool HasElement(ELEMENT_TYPE element)
 		{
-			if (skillAtkTypes != null && skillAtkTypes.Length > 0)
+			if (skillAtkTypes != null && skillAtkTypes.Length != 0)
 			{
 				for (int i = 0; i < skillAtkTypes.Length; i++)
 				{
@@ -564,12 +567,6 @@ public class SkillItemTable : Singleton<SkillItemTable>, IDataTable
 	public const int SKILL_SLOT_TABLE_DATA_MAX = 9;
 
 	private UIntKeyTable<SkillItemData> skillTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<SkillItemData> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<SkillItemData> _003C_003Ef__mg_0024cache1;
 
 	public void CreateTable(string csv_text)
 	{

@@ -243,14 +243,12 @@ public class PlayerLoadInfo
 
 	public void SetFace(int sex, int face_type_id, int skin_color_id)
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		faceModelID = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetFaceModelID(sex, face_type_id);
 		skinColor = NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetSkinColor(skin_color_id));
 	}
 
 	public void SetHair(int sex, int hair_style_id, int hair_color_id)
 	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 		hairModelID = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetHairModelID(sex, hair_style_id);
 		hairColor = NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetHairColor(hair_color_id));
 	}
@@ -332,7 +330,7 @@ public class PlayerLoadInfo
 
 	public void SetEquipBody(int sex, uint equip_body_item_id)
 	{
-		SetEquipBody(sex, (equip_body_item_id == 0) ? null : Singleton<EquipItemTable>.I.GetEquipItemData(equip_body_item_id));
+		SetEquipBody(sex, (equip_body_item_id != 0) ? Singleton<EquipItemTable>.I.GetEquipItemData(equip_body_item_id) : null);
 	}
 
 	public void SetEquipBody(int sex, EquipItemTable.EquipItemData body_item_data)
@@ -351,7 +349,7 @@ public class PlayerLoadInfo
 
 	public void SetEquipArm(int sex, uint equip_arm_item_id)
 	{
-		SetEquipArm(sex, (equip_arm_item_id == 0) ? null : Singleton<EquipItemTable>.I.GetEquipItemData(equip_arm_item_id));
+		SetEquipArm(sex, (equip_arm_item_id != 0) ? Singleton<EquipItemTable>.I.GetEquipItemData(equip_arm_item_id) : null);
 	}
 
 	public void SetEquipArm(int sex, EquipItemTable.EquipItemData arm_item_data)
@@ -370,7 +368,7 @@ public class PlayerLoadInfo
 
 	public void SetEquipLeg(int sex, uint equip_leg_item_id)
 	{
-		SetEquipLeg(sex, (equip_leg_item_id == 0) ? null : Singleton<EquipItemTable>.I.GetEquipItemData(equip_leg_item_id));
+		SetEquipLeg(sex, (equip_leg_item_id != 0) ? Singleton<EquipItemTable>.I.GetEquipItemData(equip_leg_item_id) : null);
 	}
 
 	public void SetEquipLeg(int sex, EquipItemTable.EquipItemData leg_item_data)
@@ -389,7 +387,7 @@ public class PlayerLoadInfo
 
 	public void SetEquipHead(int sex, uint equip_head_item_id)
 	{
-		SetEquipHead(sex, (equip_head_item_id == 0) ? null : Singleton<EquipItemTable>.I.GetEquipItemData(equip_head_item_id));
+		SetEquipHead(sex, (equip_head_item_id != 0) ? Singleton<EquipItemTable>.I.GetEquipItemData(equip_head_item_id) : null);
 	}
 
 	public void SetEquipHead(int sex, EquipItemTable.EquipItemData head_item_data)
@@ -408,7 +406,7 @@ public class PlayerLoadInfo
 
 	public void SetEquipWeapon(int sex, uint equip_weapon_item_id)
 	{
-		SetEquipWeapon(sex, (equip_weapon_item_id == 0) ? null : Singleton<EquipItemTable>.I.GetEquipItemData(equip_weapon_item_id));
+		SetEquipWeapon(sex, (equip_weapon_item_id != 0) ? Singleton<EquipItemTable>.I.GetEquipItemData(equip_weapon_item_id) : null);
 	}
 
 	public void SetEquipWeapon(int sex, EquipItemTable.EquipItemData weapon_item_data)
@@ -536,21 +534,21 @@ public class PlayerLoadInfo
 
 	public void SetupLoadInfo(EquipSetInfo equip_set, ulong weapon_uniq_id, ulong armor_uniq_id, ulong helm_uniq_id, ulong arm_uniq_id, ulong leg_uniq_id, bool show_helm)
 	{
-		EquipItemInfo equipItemInfo = (weapon_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(weapon_uniq_id) : equip_set.item[0];
-		EquipItemInfo equipItemInfo2 = (armor_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(armor_uniq_id) : equip_set.item[3];
-		EquipItemInfo equipItemInfo3 = (!show_helm) ? null : ((helm_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(helm_uniq_id) : equip_set.item[4]);
-		EquipItemInfo equipItemInfo4 = (arm_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(arm_uniq_id) : equip_set.item[5];
-		EquipItemInfo equipItemInfo5 = (leg_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(leg_uniq_id) : equip_set.item[6];
+		EquipItemInfo equipItemInfo = (weapon_uniq_id == 0L) ? equip_set.item[0] : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(weapon_uniq_id);
+		EquipItemInfo equipItemInfo2 = (armor_uniq_id == 0L) ? equip_set.item[3] : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(armor_uniq_id);
+		EquipItemInfo equipItemInfo3 = (!show_helm) ? null : ((helm_uniq_id == 0L) ? equip_set.item[4] : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(helm_uniq_id));
+		EquipItemInfo equipItemInfo4 = (arm_uniq_id == 0L) ? equip_set.item[5] : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(arm_uniq_id);
+		EquipItemInfo equipItemInfo5 = (leg_uniq_id == 0L) ? equip_set.item[6] : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(leg_uniq_id);
 		ApplyAccessory(equip_set.acc);
-		SetupLoadInfo((equipItemInfo != null) ? equipItemInfo.tableID : 0u, (equipItemInfo2 != null) ? equipItemInfo2.tableID : 0u, (equipItemInfo3 != null) ? equipItemInfo3.tableID : 0u, (equipItemInfo4 != null) ? equipItemInfo4.tableID : 0u, (equipItemInfo5 != null) ? equipItemInfo5.tableID : 0u);
+		SetupLoadInfo(equipItemInfo?.tableID ?? 0, equipItemInfo2?.tableID ?? 0, equipItemInfo3?.tableID ?? 0, equipItemInfo4?.tableID ?? 0, equipItemInfo5?.tableID ?? 0);
 	}
 
 	public void SetUpCharaMakeLoadInfo(EquipSetInfo equip_set, ulong armor_uniq_id, ulong helm_uniq_id, ulong arm_uniq_id, ulong leg_uniq_id, int sex, bool isShowhelm)
 	{
-		EquipItemInfo equipItemInfo = (armor_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(armor_uniq_id) : equip_set.item[3];
-		EquipItemInfo equipItemInfo2 = (arm_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(arm_uniq_id) : equip_set.item[5];
-		EquipItemInfo equipItemInfo3 = (helm_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(helm_uniq_id) : equip_set.item[4];
-		EquipItemInfo equipItemInfo4 = (leg_uniq_id != 0) ? MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(leg_uniq_id) : equip_set.item[6];
+		EquipItemInfo equipItemInfo = (armor_uniq_id == 0L) ? equip_set.item[3] : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(armor_uniq_id);
+		EquipItemInfo equipItemInfo2 = (arm_uniq_id == 0L) ? equip_set.item[5] : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(arm_uniq_id);
+		EquipItemInfo equipItemInfo3 = (helm_uniq_id == 0L) ? equip_set.item[4] : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(helm_uniq_id);
+		EquipItemInfo equipItemInfo4 = (leg_uniq_id == 0L) ? equip_set.item[6] : MonoBehaviourSingleton<InventoryManager>.I.equipItemInventory.Find(leg_uniq_id);
 		if (equipItemInfo != null)
 		{
 			SetEquipBody(sex, equipItemInfo.tableID);

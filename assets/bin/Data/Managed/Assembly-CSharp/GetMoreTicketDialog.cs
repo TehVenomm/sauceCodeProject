@@ -8,8 +8,8 @@ public class GetMoreTicketDialog : GameSection
 
 	public override void Initialize()
 	{
-		GetCtrl(UI.SPR_BTN_FB).GetComponent<UIButton>().set_enabled(true);
-		GetCtrl(UI.SPR_BTN_Tweter).GetComponent<UIButton>().set_enabled(true);
+		GetCtrl(UI.SPR_BTN_FB).GetComponent<UIButton>().enabled = true;
+		GetCtrl(UI.SPR_BTN_Tweter).GetComponent<UIButton>().enabled = true;
 		base.Initialize();
 	}
 

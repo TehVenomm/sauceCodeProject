@@ -29,38 +29,28 @@ public class GachaSkillBannerAnimPattern : UIBehaviour
 
 	public void Init(int index, SkillItemTable.SkillItemData table, Texture tex, GachaList.GachaPickupAnim anim)
 	{
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018e: Unknown result type (might be due to invalid IL or missing references)
 		GachaList.GachaPickupAnim.TextStyle name = anim.name;
-		SetFontStyle(lblName.get_transform(), (name.italic == 1) ? 2 : 0);
+		SetFontStyle(lblName.transform, (name.italic == 1) ? FontStyle.Italic : FontStyle.Normal);
 		SetPatternText(lblName, table.name, name.size, name.toColor(), name.toOutColor());
 		GachaList.GachaPickupAnim.TextStyle description = anim.description;
-		SetFontStyle(lblDescription.get_transform(), (description.italic == 1) ? 2 : 0);
+		SetFontStyle(lblDescription.transform, (description.italic == 1) ? FontStyle.Italic : FontStyle.Normal);
 		SetPatternText(lblDescription, SkillItemInfo.GetExplanationText(table, 1, 0), description.size, description.toColor(), description.toOutColor());
 		GachaList.GachaPickupAnim.TextStyle sub = anim.sub;
-		SetFontStyle(lblSubDescription.get_transform(), (sub.italic == 1) ? 2 : 0);
+		SetFontStyle(lblSubDescription.transform, (sub.italic == 1) ? FontStyle.Italic : FontStyle.Normal);
 		SetPatternText(lblSubDescription, sub.text, sub.size, sub.toColor(), sub.toOutColor());
 		GachaList.GachaPickupAnim.TextStyle adda = anim.adda;
-		SetFontStyle(lblAddText_A.get_transform(), (adda.italic == 1) ? 2 : 0);
+		SetFontStyle(lblAddText_A.transform, (adda.italic == 1) ? FontStyle.Italic : FontStyle.Normal);
 		SetPatternText(lblAddText_A, adda.text, adda.size, adda.toColor(), adda.toOutColor());
 		GachaList.GachaPickupAnim.TextStyle addb = anim.addb;
-		SetFontStyle(lblAddText_B.get_transform(), (addb.italic == 1) ? 2 : 0);
+		SetFontStyle(lblAddText_B.transform, (addb.italic == 1) ? FontStyle.Italic : FontStyle.Normal);
 		SetPatternText(lblAddText_B, addb.text, addb.size, addb.toColor(), addb.toOutColor());
 		uiTex.mainTexture = tex;
-		this.get_gameObject().SetActive(true);
+		base.gameObject.SetActive(value: true);
 	}
 
 	public void Finish()
 	{
-		this.get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
 		if (uiTex.mainTexture != null)
 		{
 			uiTex.mainTexture = null;
@@ -70,7 +60,7 @@ public class GachaSkillBannerAnimPattern : UIBehaviour
 	public void AnimStart(bool is_entry, bool is_skip, EventDelegate.Callback end_callback)
 	{
 		nowEntryAnim = is_entry;
-		Transform t = (!nowEntryAnim) ? this.get_transform() : entryAnimCtrl.get_transform();
+		Transform t = nowEntryAnim ? entryAnimCtrl.transform : base.transform;
 		ResetTween(t);
 		if (is_skip)
 		{
@@ -86,8 +76,6 @@ public class GachaSkillBannerAnimPattern : UIBehaviour
 
 	private void SetPatternText(UILabel lbl, string text, int size, Color text_color, Color out_line_color)
 	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 		if (lbl != null)
 		{
 			lbl.text = text;
@@ -101,23 +89,23 @@ public class GachaSkillBannerAnimPattern : UIBehaviour
 	{
 		Array.ForEach(GetDirectionTweenCtrl().tweens, delegate(UITweener tw)
 		{
-			tw.set_enabled(false);
+			tw.enabled = false;
 		});
 		Array.ForEach(GetEntryTweenCtrl().tweens, delegate(UITweener tw)
 		{
-			tw.set_enabled(false);
+			tw.enabled = false;
 		});
-		ResetTween(this.get_transform());
-		ResetTween(entryAnimCtrl.get_transform());
+		ResetTween(base.transform);
+		ResetTween(entryAnimCtrl.transform);
 	}
 
 	public UITweenCtrl GetDirectionTweenCtrl()
 	{
-		return base.GetComponent<UITweenCtrl>(this.get_transform());
+		return GetComponent<UITweenCtrl>(base.transform);
 	}
 
 	public UITweenCtrl GetEntryTweenCtrl()
 	{
-		return base.GetComponent<UITweenCtrl>(entryAnimCtrl.get_transform());
+		return GetComponent<UITweenCtrl>(entryAnimCtrl.transform);
 	}
 }

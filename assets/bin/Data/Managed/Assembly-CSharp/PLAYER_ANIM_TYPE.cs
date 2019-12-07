@@ -48,6 +48,10 @@ public static class PLAYER_ANIM_TYPE
 
 	public static int GetStatus(int sex)
 	{
-		return (sex != 0) ? (-80) : (-70);
+		if (sex != 0)
+		{
+			return -80;
+		}
+		return -70;
 	}
 }

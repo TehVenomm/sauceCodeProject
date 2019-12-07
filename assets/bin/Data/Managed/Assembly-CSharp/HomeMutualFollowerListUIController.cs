@@ -36,7 +36,7 @@ public class HomeMutualFollowerListUIController : ScrollItemListControllerBase
 			{
 				m_userDataList = recv_data.messageUser;
 				m_maxPageNum = recv_data.pageNumMax;
-				m_currentPageNum = ((MaxPageNum >= 1) ? (_nextPageNum % MaxPageNum) : 0);
+				m_currentPageNum = ((base.MaxPageNum >= 1) ? (_nextPageNum % base.MaxPageNum) : 0);
 			}
 			if (_callback != null)
 			{
@@ -87,7 +87,7 @@ public class HomeMutualFollowerListUIController : ScrollItemListControllerBase
 		initParam.Index = i;
 		initParam.IsFollower = messageUserInfo.follower;
 		initParam.IsFollowing = messageUserInfo.following;
-		initParam.clanId = ((messageUserInfo.userClanData == null) ? string.Empty : messageUserInfo.userClanData.cId);
+		initParam.clanId = ((messageUserInfo.userClanData != null) ? messageUserInfo.userClanData.cId : "");
 		initParam.NoReadMsgNum = messageUserInfo.noReadNum;
 		initParam.IsPermittedMessage = messageUserInfo.isPermitted;
 		initParam.OnClickItem = OnClickItem;
@@ -105,7 +105,11 @@ public class HomeMutualFollowerListUIController : ScrollItemListControllerBase
 
 	public override int GetItemListDataCount()
 	{
-		return (m_userDataList != null) ? m_userDataList.Count : 0;
+		if (m_userDataList != null)
+		{
+			return m_userDataList.Count;
+		}
+		return 0;
 	}
 
 	public override string GetChatTitle()

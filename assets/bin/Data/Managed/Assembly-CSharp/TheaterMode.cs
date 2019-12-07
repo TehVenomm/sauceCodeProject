@@ -84,18 +84,18 @@ public class TheaterMode : GameSection
 		isRenewalFlag = (MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal);
 		if (isRenewalFlag)
 		{
-			this.StartCoroutine(DoInitialize2());
+			StartCoroutine(DoInitialize2());
 		}
 		else
 		{
-			this.StartCoroutine("DoInitialize");
+			StartCoroutine("DoInitialize");
 		}
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		Utility.CreateGameObjectAndComponent("TheaterModeTable", this.get_gameObject().get_transform());
-		Utility.CreateGameObjectAndComponent("TheaterModeChapterTable", this.get_gameObject().get_transform());
+		Utility.CreateGameObjectAndComponent("TheaterModeTable", base.gameObject.transform);
+		Utility.CreateGameObjectAndComponent("TheaterModeChapterTable", base.gameObject.transform);
 		while (MonoBehaviourSingleton<TheaterModeChapterTable>.I.isLoading || MonoBehaviourSingleton<TheaterModeTable>.I.isLoading)
 		{
 			yield return null;
@@ -180,7 +180,7 @@ public class TheaterMode : GameSection
 		});
 		if (s_connectCache == null)
 		{
-			TheaterModeModel.RequestSendForm send_form = new TheaterModeModel.RequestSendForm();
+			TheaterModeModel.RequestSendForm requestSendForm = new TheaterModeModel.RequestSendForm();
 			foreach (KeyValuePair<uint, List<int>> item in deliveryList)
 			{
 				List<int> value = item.Value;
@@ -192,7 +192,7 @@ public class TheaterMode : GameSection
 						int key = value[i];
 						if (checkList[key] < 1)
 						{
-							send_form.theaterList.Add(new TheaterModePostData((int)idList[key], (int)item.Key, 0));
+							requestSendForm.theaterList.Add(new TheaterModePostData((int)idList[key], (int)item.Key, 0));
 						}
 					}
 				}
@@ -202,11 +202,11 @@ public class TheaterMode : GameSection
 				int key2 = item2.Key;
 				if (checkList[key2] == 0)
 				{
-					send_form.theaterList.Add(new TheaterModePostData((int)idList[key2], 0, key2));
+					requestSendForm.theaterList.Add(new TheaterModePostData((int)idList[key2], 0, key2));
 				}
 			}
 			bool isEndConnection = false;
-			Protocol.Send(TheaterModeModel.URL, send_form, delegate(TheaterModeModel ret)
+			Protocol.Send(TheaterModeModel.URL, requestSendForm, delegate(TheaterModeModel ret)
 			{
 				if (ret.Error == Error.None)
 				{
@@ -217,7 +217,7 @@ public class TheaterMode : GameSection
 					s_connectCache = ret.result;
 				}
 				isEndConnection = true;
-			}, string.Empty);
+			});
 			while (!isEndConnection)
 			{
 				yield return null;
@@ -235,17 +235,17 @@ public class TheaterMode : GameSection
 			}
 		}
 		m_canViewStoryList = MonoBehaviourSingleton<TheaterModeTable>.I.GetTableFromOKDic(checkList);
-		List<uint> chapterList = new List<uint>();
+		List<uint> list = new List<uint>();
 		int k = 0;
 		for (int count2 = m_canViewStoryList.Count; k < count2; k++)
 		{
 			uint chapter_id = (uint)m_canViewStoryList[k].chapter_id;
-			if (!chapterList.Contains(chapter_id))
+			if (!list.Contains(chapter_id))
 			{
-				chapterList.Add(chapter_id);
+				list.Add(chapter_id);
 			}
 		}
-		m_canViewChapterList = MonoBehaviourSingleton<TheaterModeChapterTable>.I.GetPickedData(chapterList);
+		m_canViewChapterList = MonoBehaviourSingleton<TheaterModeChapterTable>.I.GetPickedData(list);
 		m_canViewChapterList.Sort(delegate(TheaterModeChapterTable.TheaterModeChapterData a, TheaterModeChapterTable.TheaterModeChapterData b)
 		{
 			if (a.order != 0 && b.order != 0)
@@ -256,11 +256,7 @@ public class TheaterMode : GameSection
 			{
 				return -1;
 			}
-			if (a.order != 0)
-			{
-				return 1;
-			}
-			return (int)(b.chapter_id - a.chapter_id);
+			return (int)((a.order != 0) ? 1 : (b.chapter_id - a.chapter_id));
 		});
 		LoadingQueue loadingQueue = new LoadingQueue(this);
 		bannerTable = new Dictionary<int, LoadObject>(m_canViewChapterList.Count);
@@ -328,15 +324,15 @@ public class TheaterMode : GameSection
 		}
 		if (dispList == null || dispList.Count == 0)
 		{
-			SetActive((Enum)UI.STR_EVENT_NON_LIST, is_visible: true);
+			SetActive(UI.STR_EVENT_NON_LIST, is_visible: true);
 		}
 		else
 		{
-			SetActive((Enum)UI.STR_EVENT_NON_LIST, is_visible: false);
+			SetActive(UI.STR_EVENT_NON_LIST, is_visible: false);
 		}
-		SetLabelText((Enum)UI.LBL_MAX, m_pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, m_nowPage.ToString());
-		SetDynamicList((Enum)UI.GRD_EVENT_QUEST, "TheaterModeListItem", dispList.Count, reset: true, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+		SetLabelText(UI.LBL_MAX, m_pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, m_nowPage.ToString());
+		SetDynamicList(UI.GRD_EVENT_QUEST, "TheaterModeListItem", dispList.Count, reset: true, null, null, delegate(int i, Transform t, bool is_recycle)
 		{
 			if (m_isSelectMain)
 			{
@@ -348,16 +344,15 @@ public class TheaterMode : GameSection
 			else
 			{
 				bool flag = false;
-				Texture2D val = null;
-				Dictionary<int, LoadObject> dictionary = IsDownloadingBanner ? prevBannerTable : bannerTable;
-				if (dictionary.TryGetValue(dispList[i].banner_id, out LoadObject value))
+				Texture2D texture2D = null;
+				if (((!IsDownloadingBanner) ? bannerTable : prevBannerTable).TryGetValue(dispList[i].banner_id, out LoadObject value))
 				{
-					val = (value.loadedObject as Texture2D);
-					if (val != null)
+					texture2D = (value.loadedObject as Texture2D);
+					if (texture2D != null)
 					{
 						Transform t2 = FindCtrl(t, UI.TEX_EVENT_BANNER);
 						SetActive(t2, is_visible: true);
-						SetTexture(t2, val);
+						SetTexture(t2, texture2D);
 						SetActive(t, UI.LBL_CHAPTER_NAME, is_visible: false);
 						SetActive(t, UI.MAIN_BG, is_visible: false);
 						flag = true;
@@ -406,12 +401,12 @@ public class TheaterMode : GameSection
 		if (!m_isSelectMain)
 		{
 			m_isSelectMain = true;
-			SetActive((Enum)UI.BTN_TAB_MAIN_OFF, is_visible: false);
-			SetActive((Enum)UI.BTN_TAB_MAIN_ON, is_visible: true);
-			SetActive((Enum)UI.BTN_TAB_EVENT_OFF, is_visible: true);
-			SetActive((Enum)UI.BTN_TAB_EVENT_ON, is_visible: false);
-			SetActive((Enum)UI.SPR_TAB_EVENT, is_visible: false);
-			SetActive((Enum)UI.SPR_TAB_MAIN, is_visible: true);
+			SetActive(UI.BTN_TAB_MAIN_OFF, is_visible: false);
+			SetActive(UI.BTN_TAB_MAIN_ON, is_visible: true);
+			SetActive(UI.BTN_TAB_EVENT_OFF, is_visible: true);
+			SetActive(UI.BTN_TAB_EVENT_ON, is_visible: false);
+			SetActive(UI.SPR_TAB_EVENT, is_visible: false);
+			SetActive(UI.SPR_TAB_MAIN, is_visible: true);
 			SetPaging();
 			RefreshUI();
 		}
@@ -424,18 +419,18 @@ public class TheaterMode : GameSection
 			return;
 		}
 		m_isSelectMain = false;
-		SetActive((Enum)UI.BTN_TAB_MAIN_OFF, is_visible: true);
-		SetActive((Enum)UI.BTN_TAB_MAIN_ON, is_visible: false);
-		SetActive((Enum)UI.BTN_TAB_EVENT_OFF, is_visible: false);
-		SetActive((Enum)UI.BTN_TAB_EVENT_ON, is_visible: true);
-		SetActive((Enum)UI.SPR_TAB_EVENT, is_visible: true);
-		SetActive((Enum)UI.SPR_TAB_MAIN, is_visible: false);
+		SetActive(UI.BTN_TAB_MAIN_OFF, is_visible: true);
+		SetActive(UI.BTN_TAB_MAIN_ON, is_visible: false);
+		SetActive(UI.BTN_TAB_EVENT_OFF, is_visible: false);
+		SetActive(UI.BTN_TAB_EVENT_ON, is_visible: true);
+		SetActive(UI.SPR_TAB_EVENT, is_visible: true);
+		SetActive(UI.SPR_TAB_MAIN, is_visible: false);
 		SetPaging();
 		if (isRenewalFlag)
 		{
 			if (!IsDownloadingBanner)
 			{
-				this.StartCoroutine(LoadBannerImage(m_nowPage, delegate
+				StartCoroutine(LoadBannerImage(m_nowPage, delegate
 				{
 					RefreshUI();
 					ReleasePrevBannerImage();
@@ -454,8 +449,8 @@ public class TheaterMode : GameSection
 		{
 			if (!IsDownloadingBanner)
 			{
-				m_nowPage = ((m_nowPage <= 1) ? m_pageMax : (m_nowPage - 1));
-				this.StartCoroutine(LoadBannerImage(m_nowPage, delegate
+				m_nowPage = ((m_nowPage > 1) ? (m_nowPage - 1) : m_pageMax);
+				StartCoroutine(LoadBannerImage(m_nowPage, delegate
 				{
 					RefreshUI();
 					ReleasePrevBannerImage();
@@ -464,7 +459,7 @@ public class TheaterMode : GameSection
 		}
 		else
 		{
-			m_nowPage = ((m_nowPage <= 1) ? m_pageMax : (m_nowPage - 1));
+			m_nowPage = ((m_nowPage > 1) ? (m_nowPage - 1) : m_pageMax);
 			RefreshUI();
 		}
 	}
@@ -476,7 +471,7 @@ public class TheaterMode : GameSection
 			if (!IsDownloadingBanner)
 			{
 				m_nowPage = ((m_nowPage >= m_pageMax) ? 1 : (m_nowPage + 1));
-				this.StartCoroutine(LoadBannerImage(m_nowPage, delegate
+				StartCoroutine(LoadBannerImage(m_nowPage, delegate
 				{
 					RefreshUI();
 					ReleasePrevBannerImage();
@@ -496,18 +491,18 @@ public class TheaterMode : GameSection
 		List<TheaterModeChapterTable.TheaterModeChapterData> list = (!m_isSelectMain) ? m_eventChapterList : m_mainChapterList;
 		if (list.Count <= 10)
 		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: true);
+			SetActive(UI.OBJ_ACTIVE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, is_visible: true);
 			m_pageMax = 1;
 		}
 		else
 		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: true);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_ACTIVE_ROOT, is_visible: true);
+			SetActive(UI.OBJ_INACTIVE_ROOT, is_visible: false);
 			m_pageMax = Mathf.CeilToInt((float)list.Count / 10f);
 		}
-		SetLabelText((Enum)UI.LBL_MAX, m_pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, m_nowPage.ToString());
+		SetLabelText(UI.LBL_MAX, m_pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, m_nowPage.ToString());
 	}
 
 	private void OnQuery_STORY()
@@ -524,7 +519,7 @@ public class TheaterMode : GameSection
 	{
 		yield return InitTables();
 		InitChapterTables();
-		yield return this.StartCoroutine(LoadBannerImage(1, null));
+		yield return StartCoroutine(LoadBannerImage(1, null));
 		SetPaging();
 		m_isSelectMain = false;
 		OnQuery_SELECT_MAIN();
@@ -537,8 +532,8 @@ public class TheaterMode : GameSection
 
 	private IEnumerator InitTables()
 	{
-		Utility.CreateGameObjectAndComponent("TheaterModeTable", this.get_gameObject().get_transform());
-		Utility.CreateGameObjectAndComponent("TheaterModeChapterTable", this.get_gameObject().get_transform());
+		Utility.CreateGameObjectAndComponent("TheaterModeTable", base.gameObject.transform);
+		Utility.CreateGameObjectAndComponent("TheaterModeChapterTable", base.gameObject.transform);
 		while (MonoBehaviourSingleton<TheaterModeChapterTable>.I.isLoading || MonoBehaviourSingleton<TheaterModeTable>.I.isLoading)
 		{
 			yield return null;
@@ -562,7 +557,7 @@ public class TheaterMode : GameSection
 		SetTutorialStoryForceEnableView(checkList);
 		SetQuestStorySetting(checkList, stateList, questList);
 		SetDeliveryStorySetting(checkList, stateList, deliveryList);
-		yield return this.StartCoroutine(RequestPrologueStoryStatusAPI(checkList, deliveryList, idList));
+		yield return StartCoroutine(RequestPrologueStoryStatusAPI(checkList, deliveryList, idList));
 		CheckPrologueStorySettings(checkList, revIdList);
 		m_canViewStoryList = MonoBehaviourSingleton<TheaterModeTable>.I.GetTableFromOKDic(checkList);
 	}
@@ -643,7 +638,7 @@ public class TheaterMode : GameSection
 						{
 							_checkList[storyId] = -1;
 						}
-						else if (questMgr.IsEventOpen(data.eventId) || isMainStory)
+						else if (questMgr.IsEventOpen(data.eventId) | isMainStory)
 						{
 							_questList.Add(data.questID, storyId);
 							if (questMgr.IsClearQuest(data.questID))
@@ -714,7 +709,7 @@ public class TheaterMode : GameSection
 		{
 			return true;
 		}
-		if (i.IsEventOpen(_eventId) || flag)
+		if (i.IsEventOpen(_eventId) | flag)
 		{
 			if (storyId != 0 && _checkList.ContainsKey(storyId))
 			{
@@ -745,7 +740,7 @@ public class TheaterMode : GameSection
 	{
 		if (s_connectCache == null)
 		{
-			TheaterModeModel.RequestSendForm send_form = new TheaterModeModel.RequestSendForm();
+			TheaterModeModel.RequestSendForm requestSendForm = new TheaterModeModel.RequestSendForm();
 			foreach (KeyValuePair<uint, List<int>> _delivery in _deliveryList)
 			{
 				List<int> value = _delivery.Value;
@@ -757,7 +752,7 @@ public class TheaterMode : GameSection
 						int key = value[i];
 						if (_checkList[key] == 0)
 						{
-							send_form.theaterList.Add(new TheaterModePostData((int)_idList[key], (int)_delivery.Key, 0));
+							requestSendForm.theaterList.Add(new TheaterModePostData((int)_idList[key], (int)_delivery.Key, 0));
 						}
 					}
 				}
@@ -767,11 +762,11 @@ public class TheaterMode : GameSection
 				int key2 = _check.Key;
 				if (_checkList[key2] == 0)
 				{
-					send_form.theaterList.Add(new TheaterModePostData((int)_idList[key2], 0, key2));
+					requestSendForm.theaterList.Add(new TheaterModePostData((int)_idList[key2], 0, key2));
 				}
 			}
 			bool isEndConnection = false;
-			Protocol.Send(TheaterModeModel.URL, send_form, delegate(TheaterModeModel ret)
+			Protocol.Send(TheaterModeModel.URL, requestSendForm, delegate(TheaterModeModel ret)
 			{
 				if (ret.Error == Error.None)
 				{
@@ -782,7 +777,7 @@ public class TheaterMode : GameSection
 					s_connectCache = ret.result;
 				}
 				isEndConnection = true;
-			}, string.Empty);
+			});
 			while (!isEndConnection)
 			{
 				yield return null;
@@ -829,11 +824,7 @@ public class TheaterMode : GameSection
 			{
 				return -1;
 			}
-			if (a.order != 0)
-			{
-				return 1;
-			}
-			return (int)(b.chapter_id - a.chapter_id);
+			return (int)((a.order != 0) ? 1 : (b.chapter_id - a.chapter_id));
 		});
 		return result;
 	}
@@ -847,12 +838,12 @@ public class TheaterMode : GameSection
 			_onCompleteCallback?.Invoke();
 			yield break;
 		}
-		int startIndex = (_nextVisiblePageNum - 1) * 10;
-		int bannerCount = (startIndex + 10 <= m_canViewChapterList.Count) ? (startIndex + 10) : m_canViewChapterList.Count;
+		int num = (_nextVisiblePageNum - 1) * 10;
+		int num2 = (num + 10 > m_canViewChapterList.Count) ? m_canViewChapterList.Count : (num + 10);
 		LoadingQueue loadingQueue = new LoadingQueue(this);
 		prevBannerTable = new Dictionary<int, LoadObject>(bannerTable);
 		bannerTable.Clear();
-		for (int i = startIndex; i < bannerCount; i++)
+		for (int i = num; i < num2; i++)
 		{
 			TheaterModeChapterTable.TheaterModeChapterData theaterModeChapterData = m_canViewChapterList[i];
 			if (!bannerTable.ContainsKey(theaterModeChapterData.banner_id))

@@ -73,18 +73,12 @@ public class BrainParam
 
 		public bool IsScouted(Transform self, Transform target)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 val = target.get_position() - self.get_position();
-			if (val.get_sqrMagnitude() >= scountigRangeSqr)
+			Vector3 vector = target.position - self.position;
+			if (vector.sqrMagnitude >= scountigRangeSqr)
 			{
 				return false;
 			}
-			if (Vector3.Dot(self.get_forward(), val.get_normalized()) < scoutingSightCos)
+			if (Vector3.Dot(self.forward, vector.normalized) < scoutingSightCos)
 			{
 				return false;
 			}

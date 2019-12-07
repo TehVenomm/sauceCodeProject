@@ -19,14 +19,12 @@ public class Coop_Model_WaveMatchDropCreate : Coop_Model_Base
 
 	public override string ToString()
 	{
-		string empty = string.Empty;
-		empty = empty + ",mid=" + managedId.ToString();
-		empty = empty + ",did=" + dataId.ToString();
-		string text = empty;
-		empty = text + ",pos(" + basePos.x + ", " + basePos.z + ")";
-		text = empty;
-		empty = text + ",offset(" + offset.x + ", " + offset.z + ")";
-		empty = empty + ",sec=" + sec;
-		return base.ToString() + empty;
+		string str = "";
+		str = str + ",mid=" + managedId.ToString();
+		str = str + ",did=" + dataId.ToString();
+		str = str + ",pos(" + basePos.x + ", " + basePos.z + ")";
+		str = str + ",offset(" + offset.x + ", " + offset.z + ")";
+		str = str + ",sec=" + sec;
+		return base.ToString() + str;
 	}
 }

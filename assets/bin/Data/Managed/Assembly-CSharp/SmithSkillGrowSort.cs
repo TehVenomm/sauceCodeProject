@@ -4,13 +4,13 @@ public class SmithSkillGrowSort : SkillGrowSortBase
 
 	public override void Initialize()
 	{
-		object[] array = GameSection.GetEventData() as object[];
-		SkillItemInfo skillItemInfo = array[0] as SkillItemInfo;
+		object[] obj = GameSection.GetEventData() as object[];
+		SkillItemInfo skillItemInfo = obj[0] as SkillItemInfo;
 		if (skillItemInfo != null)
 		{
 			baseItemID = skillItemInfo.tableID;
 		}
-		SortSettings sortSettings = array[1] as SortSettings;
+		SortSettings sortSettings = obj[1] as SortSettings;
 		GameSection.SetEventData(sortSettings);
 		isExceed = (sortSettings.settingsType == SortSettings.SETTINGS_TYPE.EXCEED_SKILL_ITEM);
 		if (isExceed)

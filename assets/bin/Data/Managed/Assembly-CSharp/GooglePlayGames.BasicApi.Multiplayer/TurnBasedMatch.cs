@@ -62,7 +62,17 @@ namespace GooglePlayGames.BasicApi.Multiplayer
 
 		public string PendingParticipantId => mPendingParticipantId;
 
-		public Participant PendingParticipant => (mPendingParticipantId != null) ? GetParticipant(mPendingParticipantId) : null;
+		public Participant PendingParticipant
+		{
+			get
+			{
+				if (mPendingParticipantId != null)
+				{
+					return GetParticipant(mPendingParticipantId);
+				}
+				return null;
+			}
+		}
 
 		public MatchTurnStatus TurnStatus => mTurnStatus;
 
@@ -105,8 +115,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
 
 		public override string ToString()
 		{
-			return string.Format("[TurnBasedMatch: mMatchId={0}, mData={1}, mCanRematch={2}, mSelfParticipantId={3}, mParticipants={4}, mPendingParticipantId={5}, mTurnStatus={6}, mMatchStatus={7}, mVariant={8}, mVersion={9}]", mMatchId, mData, mCanRematch, mSelfParticipantId, string.Join(",", (from p in mParticipants
-			select p.ToString()).ToArray()), mPendingParticipantId, mTurnStatus, mMatchStatus, mVariant, mVersion);
+			return string.Format("[TurnBasedMatch: mMatchId={0}, mData={1}, mCanRematch={2}, mSelfParticipantId={3}, mParticipants={4}, mPendingParticipantId={5}, mTurnStatus={6}, mMatchStatus={7}, mVariant={8}, mVersion={9}]", mMatchId, mData, mCanRematch, mSelfParticipantId, string.Join(",", mParticipants.Select((Participant p) => p.ToString()).ToArray()), mPendingParticipantId, mTurnStatus, mMatchStatus, mVariant, mVersion);
 		}
 	}
 }

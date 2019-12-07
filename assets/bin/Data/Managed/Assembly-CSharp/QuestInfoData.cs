@@ -85,18 +85,6 @@ public class QuestInfoData
 
 	public bool isExistMission;
 
-	public QuestInfoData(QuestTable.QuestTableData quest_table_data, QuestData quest_list, int[] mission_clear_status)
-	{
-		questData = new Quest(quest_table_data, quest_list);
-		MissionInit(mission_clear_status);
-	}
-
-	public QuestInfoData(QuestTable.QuestTableData quest_table_data, QuestData.QuestRewardList reward_list, int have_num, int crystal_num, int[] mission_clear_status)
-	{
-		questData = new Quest(quest_table_data, have_num, crystal_num, reward_list);
-		MissionInit(mission_clear_status);
-	}
-
 	public static Mission[] CreateMissionData(QuestTable.QuestTableData quest_table)
 	{
 		if (quest_table.missionID == null || (quest_table.missionID[0] == 0 && quest_table.missionID[1] == 0 && quest_table.missionID[2] == 0))
@@ -116,7 +104,7 @@ public class QuestInfoData
 					if (quest_table.missionID[index] != 0)
 					{
 						mission_info[index] = new Mission(Singleton<QuestTable>.I.GetMissionData(quest_table.missionID[index]), (CLEAR_STATUS)data.missionStatus[index]);
-						index++;
+						int num = ++index;
 					}
 				});
 			}
@@ -132,6 +120,18 @@ public class QuestInfoData
 			}
 		}
 		return mission_info;
+	}
+
+	public QuestInfoData(QuestTable.QuestTableData quest_table_data, QuestData quest_list, int[] mission_clear_status)
+	{
+		questData = new Quest(quest_table_data, quest_list);
+		MissionInit(mission_clear_status);
+	}
+
+	public QuestInfoData(QuestTable.QuestTableData quest_table_data, QuestData.QuestRewardList reward_list, int have_num, int crystal_num, int[] mission_clear_status)
+	{
+		questData = new Quest(quest_table_data, have_num, crystal_num, reward_list);
+		MissionInit(mission_clear_status);
 	}
 
 	private void MissionInit(int[] mission_clear_status)

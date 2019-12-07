@@ -109,11 +109,11 @@ public class TargetMarker
 		effectType = EFFECT_TYPE.NONE;
 		if (effectTransform != null)
 		{
-			EffectManager.ReleaseEffect(effectTransform.get_gameObject());
+			EffectManager.ReleaseEffect(effectTransform.gameObject);
 		}
 		if (multiLockTransform != null)
 		{
-			EffectManager.ReleaseEffect(multiLockTransform.get_gameObject());
+			EffectManager.ReleaseEffect(multiLockTransform.gameObject);
 		}
 		effectTransform = null;
 		multiLockTransform = null;
@@ -122,16 +122,6 @@ public class TargetMarker
 
 	public bool UpdateMarker(UpdateParam param)
 	{
-		//IL_03ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_050f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_051a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0546: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0556: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0566: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0571: Unknown result type (might be due to invalid IL or missing references)
 		if (param == null)
 		{
 			return false;
@@ -203,7 +193,7 @@ public class TargetMarker
 		{
 			if (effectTransform != null)
 			{
-				EffectManager.ReleaseEffect(effectTransform.get_gameObject());
+				EffectManager.ReleaseEffect(effectTransform.gameObject);
 			}
 			effectTransform = null;
 		}
@@ -277,7 +267,7 @@ public class TargetMarker
 		{
 			if (multiLockTransform != null)
 			{
-				EffectManager.ReleaseEffect(multiLockTransform.get_gameObject());
+				EffectManager.ReleaseEffect(multiLockTransform.gameObject);
 			}
 			multiLockTransform = null;
 			multiLock = null;
@@ -287,42 +277,26 @@ public class TargetMarker
 		if (effectTransform != null)
 		{
 			effectTransform.Set(point.param.markerPos, point.param.markerRot);
-			effectTransform.set_localScale(Vector3.get_one() * param.markerScale);
+			effectTransform.localScale = Vector3.one * param.markerScale;
 		}
 		if (multiLockTransform != null)
 		{
 			multiLockTransform.Set(point.param.markerPos, point.param.markerRot);
-			multiLockTransform.set_localScale(Vector3.get_one() * param.markerScale);
+			multiLockTransform.localScale = Vector3.one * param.markerScale;
 		}
 		return result;
 	}
 
 	public void UpdateByTargetPoint(TargetPoint targetPoint, string effectName)
 	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 		if (effectTransform == null)
 		{
 			effectTransform = EffectManager.GetEffect(effectName, transform);
 		}
 		Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
 		Vector3 targetPoint2 = targetPoint.GetTargetPoint();
-		Vector3 val = cameraTransform.get_position() - targetPoint2;
-		Vector3 pos = val.get_normalized() * targetPoint.scaledMarkerZShift + targetPoint2;
-		Quaternion rotation = cameraTransform.get_rotation();
+		Vector3 pos = (cameraTransform.position - targetPoint2).normalized * targetPoint.scaledMarkerZShift + targetPoint2;
+		Quaternion rotation = cameraTransform.rotation;
 		effectTransform.Set(pos, rotation);
 	}
 

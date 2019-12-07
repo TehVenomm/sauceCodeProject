@@ -98,8 +98,6 @@ public class XorFloat
 
 	public static XorFloat operator ++(XorFloat value)
 	{
-		float num = value;
-		num += 1f;
-		return num;
+		return (float)value + 1f;
 	}
 }

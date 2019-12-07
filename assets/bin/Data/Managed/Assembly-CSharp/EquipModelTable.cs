@@ -43,7 +43,11 @@ public class EquipModelTable : Singleton<EquipModelTable>, IDataTable
 
 		public float GetZBias()
 		{
-			return ((flags & 0x10) != 0) ? 0.0001f : 0f;
+			if ((flags & 0x10) != 0)
+			{
+				return 0.0001f;
+			}
+			return 0f;
 		}
 
 		public int GetHairModelID(int base_hair_model_id)

@@ -10,14 +10,14 @@ public class BaseModelDiff
 	{
 		public class Name
 		{
-			public string name = string.Empty;
+			public string name = "";
 
 			public EndDate editNameAt;
 		}
 
 		public class Birthday
 		{
-			public string birthday = string.Empty;
+			public string birthday = "";
 
 			public bool communityFlag;
 		}
@@ -88,13 +88,13 @@ public class BaseModelDiff
 
 		public class ShowEquip
 		{
-			public string armorUniqId = string.Empty;
+			public string armorUniqId = "";
 
-			public string armUniqId = string.Empty;
+			public string armUniqId = "";
 
-			public string legUniqId = string.Empty;
+			public string legUniqId = "";
 
-			public string helmUniqId = string.Empty;
+			public string helmUniqId = "";
 
 			public int showHelm;
 		}

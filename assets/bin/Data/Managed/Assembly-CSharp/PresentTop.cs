@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -38,21 +37,21 @@ public class PresentTop : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText((Enum)UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.STR_TITLE, base.sectionData.GetText("STR_TITLE"));
+		SetLabelText(UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
 		int count = MonoBehaviourSingleton<PresentManager>.I.presentData.presents.Count;
 		bool flag = count > 0;
-		SetActive((Enum)UI.BTN_ALL, flag);
-		SetActive((Enum)UI.BTN_ALL_DISABLE, !flag);
-		SetLabelText((Enum)UI.STR_ALL_DISABLE, base.sectionData.GetText("STR_ALL"));
-		SetActive((Enum)UI.STR_NON_LIST, !flag);
+		SetActive(UI.BTN_ALL, flag);
+		SetActive(UI.BTN_ALL_DISABLE, !flag);
+		SetLabelText(UI.STR_ALL_DISABLE, base.sectionData.GetText("STR_ALL"));
+		SetActive(UI.STR_NON_LIST, !flag);
 		SetGrid(UI.GRD_LIST, "PresentListItem", count, reset: false, delegate(int i, Transform t, bool b)
 		{
 			Present present = MonoBehaviourSingleton<PresentManager>.I.presentData.presents[i];
 			SetLabelText(t, UI.LBL_NAME, present.name);
 			SetLabelText(t, UI.LBL_COMMENT, present.comment);
 			SetLabelText(t, UI.LBL_DESC, present.desc);
-			string text = (!string.IsNullOrEmpty(present.expire)) ? present.expire : base.sectionData.GetText("NON_EXPIRE");
+			string text = string.IsNullOrEmpty(present.expire) ? base.sectionData.GetText("NON_EXPIRE") : present.expire;
 			SetLabelText(t, UI.LBL_EXPIRE, text);
 			SetLabelText(t, UI.LBL_TIME, present.timeInfo);
 			SetEvent(t, UI.BTN_SELECT, "SELECT", i);
@@ -65,10 +64,10 @@ public class PresentTop : GameSection
 		int num = 1;
 		int page_num = MonoBehaviourSingleton<PresentManager>.I.page + num;
 		int num2 = Mathf.Max(MonoBehaviourSingleton<PresentManager>.I.pageMax, num);
-		SetPageNumText((Enum)UI.LBL_NOW, page_num);
-		SetPageNumText((Enum)UI.LBL_MAX, num2);
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, num != num2);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, num == num2);
+		SetPageNumText(UI.LBL_NOW, page_num);
+		SetPageNumText(UI.LBL_MAX, num2);
+		SetActive(UI.OBJ_ACTIVE_ROOT, num != num2);
+		SetActive(UI.OBJ_INACTIVE_ROOT, num == num2);
 	}
 
 	public override void StartSection()
@@ -258,8 +257,7 @@ public class PresentTop : GameSection
 	{
 		if ((notify_flags & NOTIFY_FLAG.UPDATE_PRESENT_NUM) != (NOTIFY_FLAG)0L && (notify_flags & NOTIFY_FLAG.UPDATE_PRESENT_LIST) == (NOTIFY_FLAG)0L)
 		{
-			int num = (MonoBehaviourSingleton<PresentManager>.I.presentNum > 0) ? ((MonoBehaviourSingleton<PresentManager>.I.presentNum - 1) / MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.LIST_NUM_PER_PAGE) : 0;
-			int page = Mathf.Min(num, MonoBehaviourSingleton<PresentManager>.I.page);
+			int page = Mathf.Min((MonoBehaviourSingleton<PresentManager>.I.presentNum > 0) ? ((MonoBehaviourSingleton<PresentManager>.I.presentNum - 1) / MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.LIST_NUM_PER_PAGE) : 0, MonoBehaviourSingleton<PresentManager>.I.page);
 			SetDirty(UI.GRD_LIST);
 			MovePage(page, is_on_query_event: false);
 		}

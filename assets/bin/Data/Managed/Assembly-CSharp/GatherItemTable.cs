@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 public class GatherItemTable : Singleton<GatherItemTable>, IDataTable
 {
@@ -35,9 +34,6 @@ public class GatherItemTable : Singleton<GatherItemTable>, IDataTable
 	}
 
 	private UIntKeyTable<GatherItemData> dataTable;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<GatherItemData> _003C_003Ef__mg_0024cache0;
 
 	public void CreateTable(string text)
 	{

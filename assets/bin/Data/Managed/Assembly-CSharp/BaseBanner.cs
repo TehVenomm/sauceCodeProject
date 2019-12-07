@@ -9,7 +9,6 @@ public class BaseBanner : GameSection
 
 	public override void UpdateUI()
 	{
-		UITexture component = FindCtrl(base._transform, UI.BANNER).GetComponent<UITexture>();
-		ResourceLoad.LoadCommonTexture(component, MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName());
+		ResourceLoad.LoadCommonTexture(FindCtrl(base._transform, UI.BANNER).GetComponent<UITexture>(), MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName());
 	}
 }

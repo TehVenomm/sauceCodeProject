@@ -59,9 +59,9 @@ public class FishingController
 
 	private bool isSend;
 
-	private string hitStr = string.Empty;
+	private string hitStr = "";
 
-	private string enemyHitStr = string.Empty;
+	private string enemyHitStr = "";
 
 	private bool isFightCompleteSend;
 
@@ -108,7 +108,7 @@ public class FishingController
 		coopFishingGaugeNegativeTimer = param.coopFishingGaugeMarginToStartChangeRed;
 	}
 
-	public void Finalize()
+	public void TryFinalize()
 	{
 		_DestroyCoopFieldGimmick();
 		if (coopOwnerPlayerId == 0)
@@ -151,10 +151,7 @@ public class FishingController
 		{
 			return 20f;
 		}
-		float num = param.waitSec[1];
-		num += (float)(param.maxOmenNum - 1) * param.omenInterval;
-		num += param.hookSec;
-		return num + (param.sendMinSec + param.sendCrownTypeSec[2] + param.sendSec[3] + param.sendRareSec);
+		return param.waitSec[1] + (float)(param.maxOmenNum - 1) * param.omenInterval + param.hookSec + (param.sendMinSec + param.sendCrownTypeSec[2] + param.sendSec[3] + param.sendRareSec);
 	}
 
 	public float GetCoopFishingGaugeRate()
@@ -174,7 +171,7 @@ public class FishingController
 
 	public void AddCoopFishingGauge(bool isPacket = false)
 	{
-		coopFishingGaugeCurrent += ((!isPacket) ? param.coopFishingGaugeIncreasePerTapBySelf : param.coopFishingGaugeIncreasePerTapByOther);
+		coopFishingGaugeCurrent += (isPacket ? param.coopFishingGaugeIncreasePerTapByOther : param.coopFishingGaugeIncreasePerTapBySelf);
 		coopFishingGaugeDecreaseTimer = param.coopFishingGaugeMarginSecToStartDecrease;
 		coopFishingGaugeNegativeTimer = param.coopFishingGaugeMarginToStartChangeRed;
 		isGaugePositive = true;
@@ -200,7 +197,7 @@ public class FishingController
 		gatherGimickTrans = ggTrans;
 		gatherGimickModelIndex = modelIndex;
 		lotId = id;
-		hitStr = string.Empty;
+		hitStr = "";
 		hitType = eHitType.None;
 		waitTime = 0f;
 		omenNum = 0;
@@ -210,7 +207,7 @@ public class FishingController
 		timing = -1;
 		isSend = false;
 		coopFishingGaugeCurrent = param.coopFishingGaugeInitial;
-		owner._rigidbody.set_isKinematic(true);
+		owner._rigidbody.isKinematic = true;
 		_ShowWeapon(isShow: false);
 		_SetExclamation();
 		ChangeState(eState.Wait);
@@ -220,7 +217,7 @@ public class FishingController
 	{
 		if (state != 0)
 		{
-			owner._rigidbody.set_isKinematic(false);
+			owner._rigidbody.isKinematic = false;
 			_ShowWeapon(isShow: true);
 			if (effectHookTrans != null)
 			{
@@ -237,17 +234,15 @@ public class FishingController
 
 	public void Get()
 	{
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 		if (state == eState.Hit && hitType != eHitType.Enemy)
 		{
 			if (hitType == eHitType.Item || hitType == eHitType.GatherItem)
 			{
-				EffectManager.OneShot("ef_btl_fishing_03", owner.FindNode("L_Hand").get_position(), Quaternion.get_identity());
+				EffectManager.OneShot("ef_btl_fishing_03", owner.FindNode("L_Hand").position, Quaternion.identity);
 			}
 			if (isSelf)
 			{
-				SoundManager.PlayOneShotSE(param.hitSeIds[(int)hitType], owner, owner.FindNode(string.Empty));
+				SoundManager.PlayOneShotSE(param.hitSeIds[(int)hitType], owner, owner.FindNode(""));
 				UIInGamePopupDialog.PushOpen(hitStr, is_important: false);
 			}
 		}
@@ -255,7 +250,7 @@ public class FishingController
 
 	public void CoopStart()
 	{
-		hitStr = string.Empty;
+		hitStr = "";
 		hitType = eHitType.None;
 		waitTime = 0f;
 		omenNum = 0;
@@ -266,7 +261,7 @@ public class FishingController
 		isSend = false;
 		isFightCompleteSend = false;
 		coopFishingGaugeCurrent = param.coopFishingGaugeInitial;
-		owner._rigidbody.set_isKinematic(true);
+		owner._rigidbody.isKinematic = true;
 		_ShowWeapon(isShow: false);
 		ChangeState(eState.Coop);
 	}
@@ -275,7 +270,7 @@ public class FishingController
 	{
 		if (IsFishing())
 		{
-			owner._rigidbody.set_isKinematic(false);
+			owner._rigidbody.isKinematic = false;
 			_ShowWeapon(isShow: true);
 			if (effectHookTrans != null)
 			{
@@ -411,12 +406,6 @@ public class FishingController
 	{
 		switch (state)
 		{
-		case eState.Send:
-		case eState.Hit:
-		case eState.Quit:
-		case eState.FightSuccess:
-		case eState.FightFailed:
-			break;
 		case eState.Wait:
 		case eState.Omen:
 			_TapWait();
@@ -440,7 +429,7 @@ public class FishingController
 
 	private void _UpdateWait()
 	{
-		waitTime -= Time.get_deltaTime();
+		waitTime -= Time.deltaTime;
 		if (waitTime <= 0f)
 		{
 			ChangeState(eState.Omen);
@@ -460,13 +449,11 @@ public class FishingController
 
 	private void _UpdateOmen()
 	{
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		omenInterval -= Time.get_deltaTime();
+		omenInterval -= Time.deltaTime;
 		if (omenInterval <= 0f)
 		{
-			SoundManager.PlayOneShotSE(GetSeId(1), owner, owner.FindNode(string.Empty));
-			EffectManager.OneShot(param.omenEffect[gatherGimickModelIndex], gatherGimickTrans.get_position(), Quaternion.get_identity());
+			SoundManager.PlayOneShotSE(GetSeId(1), owner, owner.FindNode(""));
+			EffectManager.OneShot(param.omenEffect[gatherGimickModelIndex], gatherGimickTrans.position, Quaternion.identity);
 			if (--omenNum < 0)
 			{
 				ChangeState(eState.Hook);
@@ -486,7 +473,7 @@ public class FishingController
 
 	private void _UpdateHook()
 	{
-		hookTime -= Time.get_deltaTime();
+		hookTime -= Time.deltaTime;
 		if (hookTime <= 0f)
 		{
 			ChangeState(eState.Send);
@@ -603,7 +590,7 @@ public class FishingController
 
 	private void _UpdateSend()
 	{
-		sendTime -= Time.get_deltaTime();
+		sendTime -= Time.deltaTime;
 		if (sendTime <= 0f && isSend)
 		{
 			ChangeState(eState.Hit);
@@ -612,7 +599,6 @@ public class FishingController
 
 	private void _ChangeHit()
 	{
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 		if (effectHookTrans != null)
 		{
 			EffectManager.ReleaseEffect(ref effectHookTrans);
@@ -622,7 +608,7 @@ public class FishingController
 		{
 			if (popInfo != null && gatherGimickTrans != null)
 			{
-				MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyForcePop(popInfo, gatherGimickTrans.get_position());
+				MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyForcePop(popInfo, gatherGimickTrans.position);
 			}
 			AppMain.Delay(param.delayEnemyFishing, delegate
 			{
@@ -662,17 +648,17 @@ public class FishingController
 	{
 		if (coopFishingGaugeDecreaseTimer < 0f)
 		{
-			coopFishingGaugeCurrent -= param.coopFishingGaugeDecreasePerSec * Time.get_deltaTime();
+			coopFishingGaugeCurrent -= param.coopFishingGaugeDecreasePerSec * Time.deltaTime;
 		}
 		if (coopFishingGaugeNegativeTimer < 0f)
 		{
 			isGaugePositive = false;
 		}
-		coopFishingGaugeDecreaseTimer -= Time.get_deltaTime();
-		coopFishingGaugeNegativeTimer -= Time.get_deltaTime();
+		coopFishingGaugeDecreaseTimer -= Time.deltaTime;
+		coopFishingGaugeNegativeTimer -= Time.deltaTime;
 		if (isRoutineStamp)
 		{
-			stampRoutineSec += Time.get_deltaTime();
+			stampRoutineSec += Time.deltaTime;
 			if (stampRoutineSec >= param.coopFishingStampRoutineSec)
 			{
 				stampRoutineSec -= param.coopFishingStampRoutineSec;
@@ -707,7 +693,7 @@ public class FishingController
 
 	private void _UpdateFightSuccess()
 	{
-		sendTime -= Time.get_deltaTime();
+		sendTime -= Time.deltaTime;
 		if (sendTime <= 0f && isFightCompleteSend)
 		{
 			ChangeState(eState.Hit);
@@ -733,7 +719,7 @@ public class FishingController
 
 	private void _UpdateFightFailed()
 	{
-		sendTime -= Time.get_deltaTime();
+		sendTime -= Time.deltaTime;
 		if (sendTime <= 0f && isFightCompleteSend)
 		{
 			ChangeState(eState.Hit);
@@ -762,17 +748,17 @@ public class FishingController
 	{
 		if (coopFishingGaugeDecreaseTimer < 0f)
 		{
-			coopFishingGaugeCurrent -= param.coopFishingGaugeDecreasePerSec * Time.get_deltaTime();
+			coopFishingGaugeCurrent -= param.coopFishingGaugeDecreasePerSec * Time.deltaTime;
 		}
 		if (coopFishingGaugeNegativeTimer < 0f)
 		{
 			isGaugePositive = false;
 		}
-		coopFishingGaugeDecreaseTimer -= Time.get_deltaTime();
-		coopFishingGaugeNegativeTimer -= Time.get_deltaTime();
+		coopFishingGaugeDecreaseTimer -= Time.deltaTime;
+		coopFishingGaugeNegativeTimer -= Time.deltaTime;
 		if (isRoutineStamp)
 		{
-			stampRoutineSec += Time.get_deltaTime();
+			stampRoutineSec += Time.deltaTime;
 			if (stampRoutineSec >= param.coopFishingGuestStampRoutineSec)
 			{
 				stampRoutineSec -= param.coopFishingGuestStampRoutineSec;
@@ -800,7 +786,7 @@ public class FishingController
 
 	private void _UpdateCoopSuccess()
 	{
-		sendTime -= Time.get_deltaTime();
+		sendTime -= Time.deltaTime;
 		if (sendTime <= 0f && isFightCompleteSend)
 		{
 			ChangeState(eState.Hit);
@@ -814,7 +800,7 @@ public class FishingController
 
 	private void _UpdateCoopFailed()
 	{
-		sendTime -= Time.get_deltaTime();
+		sendTime -= Time.deltaTime;
 		if (sendTime <= 0f && isFightCompleteSend)
 		{
 			ChangeState(eState.Quit);
@@ -824,7 +810,7 @@ public class FishingController
 
 	private void _SetExclamation()
 	{
-		if (isSelf && !(owner == null) && !(owner.uiPlayerStatusGizmo == null) && owner.uiPlayerStatusGizmo.get_gameObject().get_activeInHierarchy())
+		if (isSelf && !(owner == null) && !(owner.uiPlayerStatusGizmo == null) && owner.uiPlayerStatusGizmo.gameObject.activeInHierarchy)
 		{
 			owner.uiPlayerStatusGizmo.SetEmotionDuration(param.hookSec);
 		}
@@ -832,12 +818,12 @@ public class FishingController
 
 	private void _DispExclamation(bool isDisp)
 	{
-		if (isSelf && !(owner == null) && !(owner.uiPlayerStatusGizmo == null) && owner.uiPlayerStatusGizmo.get_gameObject().get_activeInHierarchy())
+		if (isSelf && !(owner == null) && !(owner.uiPlayerStatusGizmo == null) && owner.uiPlayerStatusGizmo.gameObject.activeInHierarchy)
 		{
 			owner.uiPlayerStatusGizmo.OnDispEmotion(isDisp);
 			if (isDisp)
 			{
-				SoundManager.PlayOneShotSE(param.hookSeId, owner, owner.FindNode(string.Empty));
+				SoundManager.PlayOneShotSE(param.hookSeId, owner, owner.FindNode(""));
 			}
 		}
 	}
@@ -890,27 +876,18 @@ public class FishingController
 
 	private void _CreateCoopFishingGimmick()
 	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
 		if (!(fieldGimmickCoopFishingObject != null))
 		{
 			FieldMapTable.FieldGimmickPointTableData fieldGimmickPointTableData = new FieldMapTable.FieldGimmickPointTableData();
 			fieldGimmickPointTableData.gimmickType = FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.COOP_FISHING;
 			fieldGimmickPointTableData.pointID = (uint)owner.id;
-			FieldMapTable.FieldGimmickPointTableData fieldGimmickPointTableData2 = fieldGimmickPointTableData;
-			Vector3 position = owner._position;
-			fieldGimmickPointTableData2.pointX = position.x;
-			FieldMapTable.FieldGimmickPointTableData fieldGimmickPointTableData3 = fieldGimmickPointTableData;
-			Vector3 position2 = owner._position;
-			fieldGimmickPointTableData3.pointZ = position2.z;
+			fieldGimmickPointTableData.pointX = owner._position.x;
+			fieldGimmickPointTableData.pointZ = owner._position.z;
 			fieldGimmickPointTableData.value2 = owner.createInfo.charaInfo.userId.ToString();
 			FieldGimmickCoopFishing fieldGimmickCoopFishing = Utility.CreateGameObjectAndComponent<FieldGimmickCoopFishing>(MonoBehaviourSingleton<StageObjectManager>.I._transform, 19);
 			fieldGimmickCoopFishing.Initialize(fieldGimmickPointTableData);
 			fieldGimmickCoopFishing.SetOwner(owner);
-			fieldGimmickCoopFishing.get_transform().set_position(owner._position);
+			fieldGimmickCoopFishing.transform.position = owner._position;
 			fieldGimmickCoopFishingObject = fieldGimmickCoopFishing;
 			MonoBehaviourSingleton<InGameProgress>.I.AddFieldGimmickObj(InGameProgress.eFieldGimmick.CoopFishing, fieldGimmickCoopFishing);
 		}

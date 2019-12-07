@@ -66,24 +66,42 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 
 	public bool isCoop => coopRoom.IsActivate();
 
-	public bool isStageHost => !MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected() || coopMyClient.isStageHost;
+	public bool isStageHost
+	{
+		get
+		{
+			if (MonoBehaviourSingleton<KtbWebSocket>.I.IsConnected())
+			{
+				return coopMyClient.isStageHost;
+			}
+			return true;
+		}
+	}
 
 	public static bool IsValidInOnline()
 	{
-		return MonoBehaviourSingleton<CoopManager>.IsValid() && CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected();
+		if (MonoBehaviourSingleton<CoopManager>.IsValid())
+		{
+			return CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected();
+		}
+		return false;
 	}
 
 	public static bool IsValidInCoop()
 	{
-		return MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.isCoop;
+		if (MonoBehaviourSingleton<CoopManager>.IsValid())
+		{
+			return MonoBehaviourSingleton<CoopManager>.I.isCoop;
+		}
+		return false;
 	}
 
 	protected override void Awake()
 	{
 		base.Awake();
-		coopRoom = this.get_gameObject().AddComponent<CoopRoom>();
-		coopStage = this.get_gameObject().AddComponent<CoopStage>();
-		coopMyClient = (CoopMyClient)Utility.CreateGameObjectAndComponent("CoopMyClient", this.get_transform());
+		coopRoom = base.gameObject.AddComponent<CoopRoom>();
+		coopStage = base.gameObject.AddComponent<CoopStage>();
+		coopMyClient = (CoopMyClient)Utility.CreateGameObjectAndComponent("CoopMyClient", base.transform);
 	}
 
 	private void Start()
@@ -96,9 +114,7 @@ public class CoopManager : MonoBehaviourSingleton<CoopManager>
 
 	private void Logd(string str, params object[] objs)
 	{
-		if (!Log.enabled)
-		{
-		}
+		_ = Log.enabled;
 	}
 
 	public void Clear()

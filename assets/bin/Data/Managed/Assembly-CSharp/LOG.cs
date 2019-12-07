@@ -74,7 +74,7 @@ public static class Log
 
 	public static void Exception(Exception exc)
 	{
-		Debug.LogException(exc);
+		UnityEngine.Debug.LogException(exc);
 	}
 
 	[Conditional("ENABLE_LOG")]

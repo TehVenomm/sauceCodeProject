@@ -8,7 +8,7 @@ public class AndroidPermissionCallback : AndroidJavaProxy
 	private event Action<string> OnPermissionDeniedAction;
 
 	public AndroidPermissionCallback(Action<string> onGrantedCallback, Action<string> onDeniedCallback)
-		: this("com.unity3d.plugin.UnityAndroidPermissions$IPermissionRequestResult")
+		: base("com.unity3d.plugin.UnityAndroidPermissions$IPermissionRequestResult")
 	{
 		if (onGrantedCallback != null)
 		{

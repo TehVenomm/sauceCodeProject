@@ -62,11 +62,6 @@ public class AttackShotNodeLink : MonoBehaviour
 
 	public string AttackInfoName => atkInfoName;
 
-	public AttackShotNodeLink()
-		: this()
-	{
-	}
-
 	public void RequestDestroy()
 	{
 		isRequestDelete = true;
@@ -74,64 +69,40 @@ public class AttackShotNodeLink : MonoBehaviour
 
 	public void Initialize(StageObject attacker, Transform parentTrans, AnimEventData.EventData data, AttackInfo atkInfo, AnimEventShot childEventShot)
 	{
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0302: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0308: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0312: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0322: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0328: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032d: Unknown result type (might be due to invalid IL or missing references)
 		bulletData = atkInfo.bulletData;
-		if (bulletData == null)
-		{
-			return;
-		}
-		BulletData.BulletBase data2 = bulletData.data;
-		if (data2 != null)
+		if (!(bulletData == null) && bulletData.data != null)
 		{
 			this.attacker = attacker;
 			this.parentTrans = parentTrans;
-			int num = (!(attacker is Player)) ? 15 : 14;
+			_ = (attacker is Player);
 			AttackHitInfo attackHitInfo = atkInfo as AttackHitInfo;
 			if (attackHitInfo != null)
 			{
 				attackHitInfo.enableIdentityCheck = false;
 			}
 			atkInfoName = atkInfo.name;
-			_transform = this.get_transform();
-			_transform.set_parent((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
-			_transform.set_position(parentTrans.get_position());
+			_transform = base.transform;
+			_transform.parent = (MonoBehaviourSingleton<StageObjectManager>.IsValid() ? MonoBehaviourSingleton<StageObjectManager>.I._transform : MonoBehaviourSingleton<EffectManager>.I._transform);
+			_transform.position = parentTrans.position;
 			switch (data.intArgs[0])
 			{
 			case 0:
-				_transform.set_rotation(attacker._transform.get_rotation());
+				_transform.rotation = attacker._transform.rotation;
 				break;
 			case 1:
-				_transform.set_rotation(parentTrans.get_rotation());
+				_transform.rotation = parentTrans.rotation;
 				break;
 			case 2:
-				_transform.set_rotation(Quaternion.get_identity());
+				_transform.rotation = Quaternion.identity;
 				break;
 			}
-			defaultPos = _transform.get_position();
-			childEventShot.get_transform().set_parent(_transform);
-			bulletObj = childEventShot.get_gameObject();
-			bulletTrans = bulletObj.get_transform();
-			Vector3 localPosition = default(Vector3);
-			localPosition._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-			bulletTrans.set_localEulerAngles(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
-			bulletTrans.set_localPosition(localPosition);
+			defaultPos = _transform.position;
+			childEventShot.transform.parent = _transform;
+			bulletObj = childEventShot.gameObject;
+			bulletTrans = bulletObj.transform;
+			Vector3 localPosition = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+			bulletTrans.localEulerAngles = new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
+			bulletTrans.localPosition = localPosition;
 			rotSpd = data.floatArgs[6];
 			moveSpd = data.floatArgs[7];
 			moveDis = data.floatArgs[8];
@@ -147,13 +118,13 @@ public class AttackShotNodeLink : MonoBehaviour
 			isMinusMove = ((data.intArgs[11] != 0) ? true : false);
 			if (parentTrans != null)
 			{
-				defaultOffsetPos = Vector3.get_zero();
-				defaultOffsetRot = _transform.get_eulerAngles() - parentTrans.get_eulerAngles();
+				defaultOffsetPos = Vector3.zero;
+				defaultOffsetRot = _transform.eulerAngles - parentTrans.eulerAngles;
 			}
 			else
 			{
-				defaultOffsetPos = Vector3.get_zero();
-				defaultOffsetRot = Vector3.get_zero();
+				defaultOffsetPos = Vector3.zero;
+				defaultOffsetRot = Vector3.zero;
 			}
 			if (isChaseXPos || isChaseYPos || isChaseZPos)
 			{
@@ -170,31 +141,13 @@ public class AttackShotNodeLink : MonoBehaviour
 
 	private void LateUpdate()
 	{
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0395: Unknown result type (might be due to invalid IL or missing references)
 		if (!isInit)
 		{
 			return;
 		}
 		if (bulletObj == null)
 		{
-			Object.Destroy(this.get_gameObject());
+			Object.Destroy(base.gameObject);
 			return;
 		}
 		if (isRequestDelete)
@@ -207,10 +160,10 @@ public class AttackShotNodeLink : MonoBehaviour
 			Object.Destroy(bulletObj);
 			return;
 		}
-		Vector3 position = _transform.get_position();
-		Vector3 position2 = parentTrans.get_position();
-		Vector3 eulerAngles = _transform.get_eulerAngles();
-		Vector3 eulerAngles2 = parentTrans.get_eulerAngles();
+		Vector3 position = _transform.position;
+		Vector3 position2 = parentTrans.position;
+		Vector3 eulerAngles = _transform.eulerAngles;
+		Vector3 eulerAngles2 = parentTrans.eulerAngles;
 		if (isUseChaseRot)
 		{
 			if (isChaseXRot)
@@ -230,11 +183,11 @@ public class AttackShotNodeLink : MonoBehaviour
 		{
 			if (isChaseYRot)
 			{
-				currentRotAngle += rotSpd * Time.get_deltaTime();
+				currentRotAngle += rotSpd * Time.deltaTime;
 			}
 			else
 			{
-				currentRotAngle = rotSpd * Time.get_deltaTime();
+				currentRotAngle = rotSpd * Time.deltaTime;
 			}
 			if (currentRotAngle > 360f)
 			{
@@ -246,7 +199,7 @@ public class AttackShotNodeLink : MonoBehaviour
 			}
 			eulerAngles.y += currentRotAngle;
 		}
-		_transform.set_eulerAngles(eulerAngles);
+		_transform.eulerAngles = eulerAngles;
 		if (isUseChasePos)
 		{
 			if (isChaseXPos)
@@ -264,7 +217,7 @@ public class AttackShotNodeLink : MonoBehaviour
 		}
 		if (isMove)
 		{
-			currentMoveDis += moveSpd * Time.get_deltaTime();
+			currentMoveDis += moveSpd * Time.deltaTime;
 			if (currentMoveDis >= moveDis)
 			{
 				currentMoveDis = moveDis;
@@ -283,8 +236,8 @@ public class AttackShotNodeLink : MonoBehaviour
 					moveSpd *= -1f;
 				}
 			}
-			Vector3 zero = Vector3.get_zero();
-			zero = ((moveDir != 0) ? (bulletTrans.get_right() * currentMoveDis) : (bulletTrans.get_forward() * currentMoveDis));
+			Vector3 zero = Vector3.zero;
+			zero = ((moveDir != 0) ? (bulletTrans.right * currentMoveDis) : (bulletTrans.forward * currentMoveDis));
 			if (isChaseXPos)
 			{
 				position.x += zero.x;
@@ -302,7 +255,7 @@ public class AttackShotNodeLink : MonoBehaviour
 				position.z = defaultPos.z + zero.z;
 			}
 		}
-		_transform.set_position(position);
+		_transform.position = position;
 	}
 
 	public void Destroy()

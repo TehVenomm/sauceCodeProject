@@ -153,7 +153,7 @@ public class PlayingAudioList
 		}
 		int index = m_AudioLists.Count - 1;
 		AudioObject audioObject = m_AudioLists[index];
-		float time = Time.get_time();
+		float time = Time.time;
 		if (audioObject != null && time - audioObject.timeAtPlay < IntervalTime)
 		{
 			return false;
@@ -164,7 +164,11 @@ public class PlayingAudioList
 		}
 		if (CullingType == AudioControlGroup.CullingTypes.REJECT)
 		{
-			return (PlayingCount < LimitNum) ? true : false;
+			if (PlayingCount >= LimitNum)
+			{
+				return false;
+			}
+			return true;
 		}
 		return true;
 	}
@@ -174,7 +178,7 @@ public class PlayingAudioList
 		if (m_AudioLists != null)
 		{
 			m_AudioLists.Add(ao);
-			PlayingCount++;
+			int num = ++PlayingCount;
 			if (LimitNum < PlayingCount)
 			{
 				DoCullingAudio(LimitNum - PlayingCount);
@@ -187,7 +191,7 @@ public class PlayingAudioList
 		if (m_AudioLists != null)
 		{
 			m_AudioLists.Remove(ao);
-			PlayingCount--;
+			int num = --PlayingCount;
 			if (PlayingCount < 0)
 			{
 				PlayingCount = 0;

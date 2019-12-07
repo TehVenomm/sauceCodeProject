@@ -8,7 +8,7 @@ public class ClanMemberListUIController : ScrollItemListControllerBase
 	{
 	}
 
-	private static readonly string LIST_ITEM_PREFAB_NAME = string.Empty;
+	private static readonly string LIST_ITEM_PREFAB_NAME = "";
 
 	public ClanMemberListUIController()
 	{

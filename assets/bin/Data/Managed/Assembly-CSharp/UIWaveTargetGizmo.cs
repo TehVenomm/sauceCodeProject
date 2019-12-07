@@ -62,9 +62,9 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 
 	protected Animator targetAnimator;
 
-	protected string lastIconName = string.Empty;
+	protected string lastIconName = "";
 
-	protected string dispNameStr = string.Empty;
+	protected string dispNameStr = "";
 
 	protected float lastHp;
 
@@ -85,13 +85,13 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 			_waveTarget = value;
 			if (_waveTarget != null)
 			{
-				this.get_gameObject().SetActive(true);
-				portalTransform = value.get_transform();
+				base.gameObject.SetActive(value: true);
+				portalTransform = value.transform;
 				UpdateParam();
 			}
 			else
 			{
-				this.get_gameObject().SetActive(false);
+				base.gameObject.SetActive(value: false);
 			}
 		}
 	}
@@ -102,21 +102,21 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 		{
 			return;
 		}
-		GameObject val = null;
+		GameObject gameObject = null;
 		if (!_waveTarget.info.name.IsNullOrWhiteSpace())
 		{
-			val = MonoBehaviourSingleton<SceneSettingsManager>.I.GetWaveTarget(_waveTarget.info.name);
+			gameObject = MonoBehaviourSingleton<SceneSettingsManager>.I.GetWaveTarget(_waveTarget.info.name);
 		}
 		else if (_waveTarget.gimmickType == FieldMapTable.FieldGimmickPointTableData.GIMMICK_TYPE.WAVE_TARGET3)
 		{
-			val = _waveTarget.get_gameObject();
+			gameObject = _waveTarget.gameObject;
 		}
-		if (val != null)
+		if (gameObject != null)
 		{
-			targetAnimator = val.GetComponentInChildren<Animator>();
+			targetAnimator = gameObject.GetComponentInChildren<Animator>();
 			if (targetAnimator != null)
 			{
-				targetAnimator.set_enabled(true);
+				targetAnimator.enabled = true;
 			}
 		}
 		lastIconName = _waveTarget.GetIconName();
@@ -130,18 +130,18 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 			dispName.text = _waveTarget.info.dispName;
 			dispNameStr = _waveTarget.info.dispName;
 		}
-		dispName.get_gameObject().SetActive(flag);
+		dispName.gameObject.SetActive(flag);
 	}
 
 	protected override void OnEnable()
 	{
 		isEnable = true;
 		base.OnEnable();
-		nearUI.SetActive(false);
-		farUI.SetActive(false);
-		vitalUI.SetActive(true);
-		arrowTransform = arrowUI.get_transform();
-		arrowUI.SetActive(false);
+		nearUI.SetActive(value: false);
+		farUI.SetActive(value: false);
+		vitalUI.SetActive(value: true);
+		arrowTransform = arrowUI.transform;
+		arrowUI.SetActive(value: false);
 	}
 
 	protected override void OnDisable()
@@ -171,41 +171,19 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 
 	protected override void UpdateParam()
 	{
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
-		if (waveTarget == null || waveTarget.isDead || !waveTarget.get_gameObject().get_activeSelf())
+		if (waveTarget == null || waveTarget.isDead || !waveTarget.gameObject.activeSelf)
 		{
 			OnDisable();
 			return;
 		}
-		Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, portalTransform.get_position());
+		Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, portalTransform.position);
 		screenZ = screenUIPosition.z;
 		screenUIPosition.z = 0f;
 		float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
-		Vector3 val = screenUIPosition;
+		Vector3 a = screenUIPosition;
 		bool flag = false;
-		float num2 = Screen.get_width();
-		float num3 = Screen.get_height();
+		float num2 = Screen.width;
+		_ = Screen.height;
 		if (screenUIPosition.x < screenSideOffset * num)
 		{
 			screenUIPosition.x = screenSideOffset * num;
@@ -221,12 +199,11 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 			screenUIPosition.y = screenBottomOffset * num;
 			flag = true;
 		}
-		Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
-		val2.y += offsetY;
-		Vector3 val3 = transform.get_position() - val2;
-		if (val3.get_sqrMagnitude() >= 2E-05f)
+		Vector3 vector = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
+		vector.y += offsetY;
+		if ((transform.position - vector).sqrMagnitude >= 2E-05f)
 		{
-			transform.set_position(val2);
+			transform.position = vector;
 		}
 		if (flag)
 		{
@@ -236,14 +213,14 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 			{
 				return;
 			}
-			Vector3 val4 = val - screenUIPosition;
-			if (val4 == Vector3.get_zero())
+			Vector3 vector2 = a - screenUIPosition;
+			if (vector2 == Vector3.zero)
 			{
 				SetActiveSafe(arrowUI, active: false);
 				return;
 			}
-			float num4 = 90f - Vector3.Angle(Vector3.get_right(), val4);
-			arrowTransform.set_eulerAngles(new Vector3(0f, 0f, num4));
+			float z = 90f - Vector3.Angle(Vector3.right, vector2);
+			arrowTransform.eulerAngles = new Vector3(0f, 0f, z);
 			SetActiveSafe(arrowUI, active: true);
 		}
 		else
@@ -257,9 +234,6 @@ public class UIWaveTargetGizmo : UIStatusGizmoBase
 
 	private void CheckHp()
 	{
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 		if (lastHp == (float)waveTarget.nowHp)
 		{
 			return;

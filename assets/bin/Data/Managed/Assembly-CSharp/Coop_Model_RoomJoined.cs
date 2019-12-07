@@ -15,11 +15,11 @@ public class Coop_Model_RoomJoined : Coop_Model_Base
 
 	public override string ToString()
 	{
-		string empty = string.Empty;
-		empty = empty + ",cid=" + cid;
-		empty = empty + ",stgid=" + stgid;
-		empty = empty + ",stgidx=" + stgidx;
-		empty = empty + ",stghostid=" + stghostid;
-		return base.ToString() + empty;
+		string arg = "";
+		arg = arg + ",cid=" + cid;
+		arg = arg + ",stgid=" + stgid;
+		arg = arg + ",stgidx=" + stgidx;
+		arg = arg + ",stghostid=" + stghostid;
+		return base.ToString() + arg;
 	}
 }

@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -101,7 +100,17 @@ public class QuestFriendDetailBase : FriendInfo
 		private set;
 	}
 
-	protected override bool showMagiButton => !IsFriendInfo && isSelfData;
+	protected override bool showMagiButton
+	{
+		get
+		{
+			if (!IsFriendInfo)
+			{
+				return isSelfData;
+			}
+			return false;
+		}
+	}
 
 	protected override List<int> SelectedDegrees => mSelectedDegrees;
 
@@ -127,9 +136,9 @@ public class QuestFriendDetailBase : FriendInfo
 			record = (GameSection.GetEventData() as InGameRecorder.PlayerRecord);
 			if (record != null)
 			{
-				detailUserID = ((record.id == 0) ? MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id : record.charaInfo.userId);
+				detailUserID = ((record.id != 0) ? record.charaInfo.userId : MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
 				isSelfData = (detailUserID == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
-				mSelectedDegrees = ((!isSelfData) ? record.charaInfo.selectedDegrees : MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds);
+				mSelectedDegrees = (isSelfData ? MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds : record.charaInfo.selectedDegrees);
 				if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName().Contains("InGame"))
 				{
 					isQuestResult = true;
@@ -140,9 +149,9 @@ public class QuestFriendDetailBase : FriendInfo
 				}
 			}
 		}
-		selfCharaEquipSetNo = ((!isSelfData) ? (-1) : MonoBehaviourSingleton<UserInfoManager>.I.userStatus.eSetNo);
-		transRoot = SetPrefab((Enum)UI.OBJ_EQUIP_SET_ROOT, "FriendInfoBase");
-		this.StartCoroutine(DoInitialize());
+		selfCharaEquipSetNo = (isSelfData ? MonoBehaviourSingleton<UserInfoManager>.I.userStatus.eSetNo : (-1));
+		transRoot = SetPrefab(UI.OBJ_EQUIP_SET_ROOT, "FriendInfoBase");
+		StartCoroutine(DoInitialize());
 	}
 
 	protected new IEnumerator DoInitialize()
@@ -242,8 +251,6 @@ public class QuestFriendDetailBase : FriendInfo
 
 	protected void SetRenderPlayerModel(PlayerLoadInfo load_player_info)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 		SetRenderPlayerModel(transRoot, UI.TEX_MODEL, load_player_info, record.animID, new Vector3(0f, -0.75f, 14f), new Vector3(0f, 180f, 0f), isVisualMode, delegate(PlayerLoader player_loader)
 		{
 			if (player_loader != null)
@@ -303,7 +310,7 @@ public class QuestFriendDetailBase : FriendInfo
 	{
 		bool isNPC = record.isNPC;
 		QuestResultUserCollection.ResultUserInfo userInfo = MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.GetUserInfo(detailUserID);
-		if (record.isSelf || isNPC || userInfo == null)
+		if ((record.isSelf | isNPC) || userInfo == null)
 		{
 			SetActive(transRoot, UI.BTN_FOLLOW, is_visible: false);
 			SetActive(transRoot, UI.BTN_UNFOLLOW, is_visible: false);
@@ -397,8 +404,7 @@ public class QuestFriendDetailBase : FriendInfo
 		}
 		else
 		{
-			EquipSetCalculator equipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetEquipSetCalculator(selfCharaEquipSetNo);
-			SimpleStatus finalStatus2 = equipSetCalculator.GetFinalStatus(0, MonoBehaviourSingleton<UserInfoManager>.I.userStatus);
+			SimpleStatus finalStatus2 = MonoBehaviourSingleton<StatusManager>.I.GetEquipSetCalculator(selfCharaEquipSetNo).GetFinalStatus(0, MonoBehaviourSingleton<UserInfoManager>.I.userStatus);
 			num = finalStatus2.GetAttacksSum();
 			num2 = finalStatus2.GetDefencesSum();
 			num3 = finalStatus2.hp;
@@ -463,9 +469,6 @@ public class QuestFriendDetailBase : FriendInfo
 		int j = 0;
 		for (int num2 = localEquipSet.item.Length; j < num2; j++)
 		{
-			ITEM_ICON_TYPE iTEM_ICON_TYPE = ITEM_ICON_TYPE.NONE;
-			RARITY_TYPE? rARITY_TYPE = null;
-			ELEMENT_TYPE eLEMENT_TYPE = ELEMENT_TYPE.MAX;
 			int num3 = -1;
 			EquipItemInfo equipItemInfo = localEquipSet.item[j];
 			EquipItemTable.EquipItemData equipItemData = null;
@@ -508,10 +511,10 @@ public class QuestFriendDetailBase : FriendInfo
 			SetLongTouch(itemIcon.transform, "DETAIL", j);
 			SetEvent(FindCtrl(transRoot, icons_btn[j]), "DETAIL", j);
 			SetEvent(itemIcon.transform, "DETAIL", j);
-			itemIcon.get_gameObject().SetActive(num3 != -1);
+			itemIcon.gameObject.SetActive(num3 != -1);
 			if (num3 != -1)
 			{
-				itemIcon.SetEquipExtInvertedColor(equipItemInfo, base.GetComponent<UILabel>(transRoot, (Enum)icons_level[j]));
+				itemIcon.SetEquipExtInvertedColor(equipItemInfo, GetComponent<UILabel>(transRoot, icons_level[j]));
 			}
 		}
 		if (flag && record.charaInfo.hId != 0)
@@ -614,7 +617,7 @@ public class QuestFriendDetailBase : FriendInfo
 
 	protected override void OnQuery_ABILITY()
 	{
-		List<CharaInfo.EquipItem> chara_list_equip_data = (!isSelfData || isSelfEventEquipSet) ? record.charaInfo.equipSet : null;
+		List<CharaInfo.EquipItem> chara_list_equip_data = (isSelfData && !isSelfEventEquipSet) ? null : record.charaInfo.equipSet;
 		GameSection.SetEventData(new object[3]
 		{
 			localEquipSet,
@@ -625,7 +628,7 @@ public class QuestFriendDetailBase : FriendInfo
 
 	protected override void OnQuery_STATUS()
 	{
-		List<CharaInfo.EquipItem> chara_list_equip_data = (!isSelfData || isSelfEventEquipSet) ? record.charaInfo.equipSet : null;
+		List<CharaInfo.EquipItem> chara_list_equip_data = (isSelfData && !isSelfEventEquipSet) ? null : record.charaInfo.equipSet;
 		GameSection.SetEventData(new object[3]
 		{
 			localEquipSet,

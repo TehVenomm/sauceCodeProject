@@ -59,7 +59,9 @@ public class GameSection : UIBehaviour
 		RESET_DARK_MARKET = 0x1000000000000,
 		UPDATE_TRADING_POST = 0x2000000000000,
 		UPDATE_TRADING_POST_ITEM_DETAIL = 0x4000000000000,
-		UPDATE_CLAN_SCOUT_REQUEST = 0x1000
+		UPDATE_CLAN_SCOUT_REQUEST = 0x80000,
+		UPDATE_LINK_ROB = 0x100000,
+		UPDATE_TRADING_POST_SOLD = 0x20000000000000
 	}
 
 	private static object[] expandStorageEventData;
@@ -140,7 +142,7 @@ public class GameSection : UIBehaviour
 
 	protected void DispatchEvent(string event_name, object event_data = null)
 	{
-		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("GameSection", this.get_gameObject(), event_name, event_data);
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("GameSection", base.gameObject, event_name, event_data);
 	}
 
 	protected void RequestEvent(string event_name, object event_data = null)
@@ -252,7 +254,7 @@ public class GameSection : UIBehaviour
 	public void LoadRequireDataTable()
 	{
 		isLoadedRequireDataTable = false;
-		this.StartCoroutine(WaitDataTable());
+		StartCoroutine(WaitDataTable());
 	}
 
 	protected IEnumerator WaitDataTable()
@@ -274,7 +276,7 @@ public class GameSection : UIBehaviour
 
 	protected void DoWaitProtocolBusyFinish(Action callback)
 	{
-		this.StartCoroutine(WaitProtocolBusyFinish(callback));
+		StartCoroutine(WaitProtocolBusyFinish(callback));
 	}
 
 	protected IEnumerator WaitProtocolBusyFinish(Action callback)
@@ -493,8 +495,7 @@ public class GameSection : UIBehaviour
 			StopEvent();
 			return;
 		}
-		WorldMapOpenNewField.SectionEventData eventData = new WorldMapOpenNewField.SectionEventData(eventType, ENEMY_TYPE.BAT);
-		SetEventData(eventData);
+		SetEventData(new WorldMapOpenNewField.SectionEventData(eventType, ENEMY_TYPE.BAT));
 		StayEvent();
 		CoopApp.EnterField(portal_id, 0u, delegate(bool is_matching, bool is_connect, bool is_regist)
 		{
@@ -552,8 +553,7 @@ public class GameSection : UIBehaviour
 
 	protected virtual void OnQuery_GachaConfirm_YES()
 	{
-		int price_num = (MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId <= 0) ? MonoBehaviourSingleton<GachaManager>.I.selectGacha.crystalNum : MonoBehaviourSingleton<GachaManager>.I.selectGacha.needItemNum;
-		if (CheckCrystal(price_num, MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId))
+		if (CheckCrystal((MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId > 0) ? MonoBehaviourSingleton<GachaManager>.I.selectGacha.needItemNum : MonoBehaviourSingleton<GachaManager>.I.selectGacha.crystalNum, MonoBehaviourSingleton<GachaManager>.I.selectGacha.requiredItemId))
 		{
 			StayEvent();
 			DoGacha(delegate(Error ret)
@@ -722,8 +722,7 @@ public class GameSection : UIBehaviour
 		{
 			ChangeScene("ItemStorage", "ItemStorageTop");
 			GameSectionHistory.HistoryData[] array = MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList().ToArray();
-			GameSectionHistory.HistoryData[] array2 = array;
-			foreach (GameSectionHistory.HistoryData historyData in array2)
+			foreach (GameSectionHistory.HistoryData historyData in array)
 			{
 				if (historyData.sectionName != "HomeTop" && historyData.sectionName != "LoungeTop")
 				{
@@ -828,13 +827,13 @@ public class GameSection : UIBehaviour
 			{
 				ResumeEvent(is_resume: true);
 				PlayerPrefs.SetInt("share_screenshot", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
-			}, string.Empty);
+			});
 		}
 	}
 
 	public void OnQuery_FORCE_MOVETO_HOME()
 	{
-		MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Home", string.Empty);
+		MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Home", "");
 	}
 
 	public void OnQuery_FORCE_MOVETO_LOUNGE()
@@ -849,7 +848,7 @@ public class GameSection : UIBehaviour
 				{
 					if (isSucceed)
 					{
-						MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Lounge", string.Empty);
+						MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Lounge", "");
 					}
 					ResumeEvent(is_resume: true);
 				});
@@ -861,7 +860,7 @@ public class GameSection : UIBehaviour
 			{
 				if (isSucceed)
 				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Lounge", string.Empty);
+					MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Lounge", "");
 				}
 				ResumeEvent(is_resume: true);
 			});
@@ -871,8 +870,7 @@ public class GameSection : UIBehaviour
 	public bool ContainsHistory(string sceneName, string sectionName)
 	{
 		GameSectionHistory.HistoryData[] array = MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList().ToArray();
-		GameSectionHistory.HistoryData[] array2 = array;
-		foreach (GameSectionHistory.HistoryData historyData in array2)
+		foreach (GameSectionHistory.HistoryData historyData in array)
 		{
 			if (historyData.sceneName == sceneName && historyData.sectionName == sectionName)
 			{

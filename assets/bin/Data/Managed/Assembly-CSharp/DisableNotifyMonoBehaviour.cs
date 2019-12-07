@@ -21,14 +21,9 @@ public class DisableNotifyMonoBehaviour : MonoBehaviour
 		private set;
 	}
 
-	public DisableNotifyMonoBehaviour()
-		: this()
-	{
-	}
-
 	protected virtual void Awake()
 	{
-		_transform = this.get_transform();
+		_transform = base.transform;
 	}
 
 	protected virtual void OnDisable()

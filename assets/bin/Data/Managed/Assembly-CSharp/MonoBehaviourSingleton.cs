@@ -8,10 +8,10 @@ public class MonoBehaviourSingleton<T> : DisableNotifyMonoBehaviour where T : Di
 	{
 		get
 		{
-			if (instance == null)
+			if ((Object)instance == (Object)null)
 			{
-				instance = (T)(DisableNotifyMonoBehaviour)Object.FindObjectOfType(typeof(T));
-				if (instance == null)
+				instance = (T)Object.FindObjectOfType(typeof(T));
+				if ((Object)instance == (Object)null)
 				{
 					Log.Error(LOG.SYSTEM, typeof(T) + " is nothing");
 				}
@@ -29,7 +29,7 @@ public class MonoBehaviourSingleton<T> : DisableNotifyMonoBehaviour where T : Di
 		if (instance == this)
 		{
 			OnDestroySingleton();
-			instance = (T)null;
+			instance = null;
 		}
 	}
 
@@ -64,14 +64,14 @@ public class MonoBehaviourSingleton<T> : DisableNotifyMonoBehaviour where T : Di
 
 	protected void RemoveInstance()
 	{
-		if (instance == this as T)
+		if ((Object)instance == (Object)(this as T))
 		{
-			instance = (T)null;
+			instance = null;
 		}
 	}
 
 	public static bool IsValid()
 	{
-		return instance != null;
+		return (Object)instance != (Object)null;
 	}
 }

@@ -194,11 +194,9 @@ namespace BestHTTP.Caching
 			}
 			if (MaxAge != -1)
 			{
-				long val = Math.Max(0L, (long)(Received - Date).TotalSeconds);
-				long num = Math.Max(val, Age);
+				long num = Math.Max(Math.Max(0L, (long)(Received - Date).TotalSeconds), Age);
 				long num2 = (long)(DateTime.UtcNow - Date).TotalSeconds;
-				long num3 = num + num2;
-				return num3 < MaxAge;
+				return num + num2 < MaxAge;
 			}
 			return Expires > DateTime.UtcNow;
 		}

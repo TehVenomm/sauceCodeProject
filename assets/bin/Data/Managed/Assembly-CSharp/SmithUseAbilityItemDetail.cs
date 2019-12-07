@@ -1,5 +1,4 @@
 using Network;
-using System;
 using UnityEngine;
 
 public class SmithUseAbilityItemDetail : GameSection
@@ -55,16 +54,16 @@ public class SmithUseAbilityItemDetail : GameSection
 
 	public override void UpdateUI()
 	{
-		SetLabelText((Enum)UI.LBL_NAME, equipItemInfo.tableData.name);
-		SetLabelText((Enum)UI.LBL_LV_NOW, equipItemInfo.level.ToString());
-		SetLabelText((Enum)UI.LBL_LV_MAX, equipItemInfo.tableData.maxLv.ToString());
-		SetEquipmentTypeIcon((Enum)UI.SPR_TYPE_ICON, (Enum)UI.SPR_TYPE_ICON_BG, (Enum)UI.SPR_TYPE_ICON_RARITY, equipItemInfo.tableData);
+		SetLabelText(UI.LBL_NAME, equipItemInfo.tableData.name);
+		SetLabelText(UI.LBL_LV_NOW, equipItemInfo.level.ToString());
+		SetLabelText(UI.LBL_LV_MAX, equipItemInfo.tableData.maxLv.ToString());
+		SetEquipmentTypeIcon(UI.SPR_TYPE_ICON, UI.SPR_TYPE_ICON_BG, UI.SPR_TYPE_ICON_RARITY, equipItemInfo.tableData);
 		Transform ctrl = GetCtrl(UI.OBJ_BEFORE_ITEM_ROOT);
 		Transform ctrl2 = GetCtrl(UI.OBJ_AFTER_ITEM_ROOT);
 		AbilityItemInfo abilityItem = equipItemInfo.GetAbilityItem();
 		if (abilityItem == null)
 		{
-			SetLabelText(ctrl, UI.LBL_ABILITY_ITEM_NAME, string.Empty);
+			SetLabelText(ctrl, UI.LBL_ABILITY_ITEM_NAME, "");
 			SetLabelText(ctrl, UI.LBL_ABILITY_ITEM_DESC, StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 28u));
 		}
 		else

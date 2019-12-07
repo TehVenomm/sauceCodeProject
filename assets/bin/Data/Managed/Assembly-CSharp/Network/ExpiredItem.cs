@@ -15,7 +15,11 @@ namespace Network
 
 		public bool CanUse()
 		{
-			return (string.IsNullOrEmpty(expiredAt) || TimeManager.GetRemainTime(expiredAt).CompareTo(TimeSpan.Zero) > 0) && used == 0;
+			if (string.IsNullOrEmpty(expiredAt) || TimeManager.GetRemainTime(expiredAt).CompareTo(TimeSpan.Zero) > 0)
+			{
+				return used == 0;
+			}
+			return false;
 		}
 	}
 }

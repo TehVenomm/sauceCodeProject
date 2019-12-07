@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -39,8 +38,7 @@ public class QuestTrialSelectList : QuestEventSelectList
 	protected override void UpdateTable()
 	{
 		int num = 0;
-		int count = stories.Count;
-		if (count > 0)
+		if (stories.Count > 0)
 		{
 			num++;
 		}
@@ -63,10 +61,10 @@ public class QuestTrialSelectList : QuestEventSelectList
 		}
 		pageMax = 1 + (list.Count - 1) / 10;
 		bool flag = pageMax > 1;
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
-		SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
+		SetActive(UI.OBJ_ACTIVE_ROOT, flag);
+		SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
+		SetLabelText(UI.LBL_MAX, pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, nowPage.ToString());
 		ShowDeliveryData[] showList = GetPagingList(list.ToArray(), 10, nowPage);
 		int num2 = showList.Length;
 		if (showStory)
@@ -75,14 +73,14 @@ public class QuestTrialSelectList : QuestEventSelectList
 		}
 		if (num2 == 0)
 		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
-			SetActive((Enum)UI.TBL_DELIVERY_QUEST, is_visible: false);
+			SetActive(UI.STR_DELIVERY_NON_LIST, is_visible: true);
+			SetActive(UI.GRD_DELIVERY_QUEST, is_visible: false);
+			SetActive(UI.TBL_DELIVERY_QUEST, is_visible: false);
 			return;
 		}
-		SetActive((Enum)UI.STR_DELIVERY_NON_LIST, is_visible: false);
-		SetActive((Enum)UI.GRD_DELIVERY_QUEST, is_visible: false);
-		SetActive((Enum)UI.TBL_DELIVERY_QUEST, is_visible: true);
+		SetActive(UI.STR_DELIVERY_NON_LIST, is_visible: false);
+		SetActive(UI.GRD_DELIVERY_QUEST, is_visible: false);
+		SetActive(UI.TBL_DELIVERY_QUEST, is_visible: true);
 		bool flag2 = false;
 		if (ShouldShowEventMapButton())
 		{
@@ -92,7 +90,7 @@ public class QuestTrialSelectList : QuestEventSelectList
 		int questStartIndex = 0;
 		if (flag2)
 		{
-			questStartIndex++;
+			int num3 = ++questStartIndex;
 		}
 		int borderIndex = questStartIndex + showList.Length;
 		int storyStartIndex = borderIndex;
@@ -101,20 +99,20 @@ public class QuestTrialSelectList : QuestEventSelectList
 			storyStartIndex++;
 		}
 		Transform ctrl = GetCtrl(UI.TBL_DELIVERY_QUEST);
-		if (Object.op_Implicit(ctrl))
+		if ((bool)ctrl)
 		{
 			int l = 0;
-			for (int childCount = ctrl.get_childCount(); l < childCount; l++)
+			for (int childCount = ctrl.childCount; l < childCount; l++)
 			{
 				Transform child = ctrl.GetChild(0);
-				child.set_parent(null);
-				Object.Destroy(child.get_gameObject());
+				child.parent = null;
+				Object.Destroy(child.gameObject);
 			}
 		}
 		bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
-		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, isResetUI, delegate(int i, Transform parent)
+		SetTable(UI.TBL_DELIVERY_QUEST, "", num2, isResetUI, delegate(int i, Transform parent)
 		{
-			Transform val = null;
+			Transform transform = null;
 			if (i >= storyStartIndex)
 			{
 				if (!HasChapterStory() || i == storyStartIndex || !isRenewalFlag)
@@ -131,11 +129,7 @@ public class QuestTrialSelectList : QuestEventSelectList
 			{
 				return Realizes("QuestRequestItemTrial", parent);
 			}
-			if (null != mapItem)
-			{
-				return ResourceUtility.Realizes(mapItem.get_gameObject(), parent);
-			}
-			return Realizes("QuestEventBorderItem", parent);
+			return (null != mapItem) ? ResourceUtility.Realizes(mapItem.gameObject, parent) : Realizes("QuestEventBorderItem", parent);
 		}, delegate(int i, Transform t, bool is_recycle)
 		{
 			if (!(t == null))
@@ -150,8 +144,8 @@ public class QuestTrialSelectList : QuestEventSelectList
 				{
 					if (i >= questStartIndex && i < borderIndex)
 					{
-						int num3 = i - questStartIndex;
-						InitDelivery(showList[num3], t);
+						int num4 = i - questStartIndex;
+						InitDelivery(showList[num4], t);
 						ChangeDeliveryFrameSprite(t);
 					}
 					else if (i < questStartIndex)
@@ -161,8 +155,7 @@ public class QuestTrialSelectList : QuestEventSelectList
 				}
 			}
 		});
-		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-		component.set_enabled(true);
+		GetComponent<UIScrollView>(UI.SCR_DELIVERY_QUEST).enabled = true;
 		RepositionTable();
 	}
 
@@ -209,8 +202,8 @@ public class QuestTrialSelectList : QuestEventSelectList
 		GameSection.SetEventData(new object[4]
 		{
 			story.id,
-			string.Empty,
-			string.Empty,
+			"",
+			"",
 			array
 		});
 	}

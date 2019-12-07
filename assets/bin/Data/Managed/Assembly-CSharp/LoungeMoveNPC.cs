@@ -21,7 +21,7 @@ public class LoungeMoveNPC : HomeCharacterBase
 		{
 			useSpecialModel = true;
 		}
-		return npcData.LoadModel(this.get_gameObject(), need_shadow: true, enable_light_probe: true, null, useSpecialModel);
+		return npcData.LoadModel(base.gameObject, need_shadow: true, enable_light_probe: true, null, useSpecialModel);
 	}
 
 	protected override void InitAnim()

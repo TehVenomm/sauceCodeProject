@@ -15,8 +15,7 @@ public class Coop_Model_EnemyAngry : Coop_Model_ObjectSyncPositionBase
 
 	public override bool IsHandleable(StageObject owner)
 	{
-		Character character = owner as Character;
-		if (!character.IsChangeableAction((Character.ACTION_ID)15))
+		if (!(owner as Character).IsChangeableAction((Character.ACTION_ID)15))
 		{
 			return false;
 		}

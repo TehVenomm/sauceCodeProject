@@ -19,13 +19,14 @@ public class Coop_Model_CharacterBuffRoutine : Coop_Model_ObjectBase
 
 	public BuffParam.BuffData Deserialize()
 	{
-		BuffParam.BuffData buffData = new BuffParam.BuffData();
-		buffData.type = (BuffParam.BUFFTYPE)type;
-		buffData.value = value;
-		buffData.valueType = (BuffParam.VALUE_TYPE)valueType;
-		buffData.fromObjectID = fromObjectID;
-		buffData.fromEquipIndex = fromEquipIndex;
-		buffData.fromSkillIndex = fromSkillIndex;
-		return buffData;
+		return new BuffParam.BuffData
+		{
+			type = (BuffParam.BUFFTYPE)type,
+			value = value,
+			valueType = (BuffParam.VALUE_TYPE)valueType,
+			fromObjectID = fromObjectID,
+			fromEquipIndex = fromEquipIndex,
+			fromSkillIndex = fromSkillIndex
+		};
 	}
 }

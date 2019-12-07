@@ -6,7 +6,7 @@ public class WebViewDialog : GameSection
 	{
 		get
 		{
-			if (this.get_gameObject().get_name() == "WebViewDialog")
+			if (base.gameObject.name == "WebViewDialog")
 			{
 				return "[BACK]";
 			}

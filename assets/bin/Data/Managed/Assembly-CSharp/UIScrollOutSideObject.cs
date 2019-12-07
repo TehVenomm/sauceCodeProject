@@ -12,15 +12,10 @@ public class UIScrollOutSideObject : MonoBehaviour
 		private set;
 	}
 
-	public UIScrollOutSideObject()
-		: this()
-	{
-	}
-
 	public void SetActive(bool is_active)
 	{
 		enaleUpdate = is_active;
-		this.get_gameObject().SetActive(is_active);
+		base.gameObject.SetActive(is_active);
 	}
 
 	public void SetTargetTransform(Transform _t)
@@ -37,15 +32,14 @@ public class UIScrollOutSideObject : MonoBehaviour
 
 	private void Start()
 	{
-		_transform = this.get_transform();
+		_transform = base.transform;
 	}
 
 	private void LateUpdate()
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 		if (enaleUpdate && _transform != null && target != null)
 		{
-			this.get_transform().set_position(target.get_position());
+			base.transform.position = target.position;
 		}
 	}
 }

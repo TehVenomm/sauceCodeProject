@@ -34,7 +34,11 @@ public class LoungePlayer : HomePlayerCharacterBase
 
 	public override int GetUserId()
 	{
-		return (LoungeCharaInfo != null) ? LoungeCharaInfo.userId : 0;
+		if (LoungeCharaInfo == null)
+		{
+			return 0;
+		}
+		return LoungeCharaInfo.userId;
 	}
 
 	public void SetLoungeCharaInfo(CharaInfo info)
@@ -44,11 +48,8 @@ public class LoungePlayer : HomePlayerCharacterBase
 
 	public void SetInitialPosition(Vector3 pos, LOUNGE_ACTION_TYPE type)
 	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		InitialPos = pos;
-		base._transform.set_position(InitialPos.Value);
+		base._transform.position = InitialPos.Value;
 		isInitPos = true;
 		base.moveTargetPos = InitialPos.Value;
 		if (type == LOUNGE_ACTION_TYPE.SIT && !isSitting)
@@ -59,7 +60,6 @@ public class LoungePlayer : HomePlayerCharacterBase
 
 	public void SetMoveTargetPosition(Vector3 pos)
 	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 		if (!isPlayingSitAnimation)
 		{
 			base.moveTargetPos = pos;
@@ -78,9 +78,7 @@ public class LoungePlayer : HomePlayerCharacterBase
 
 	private void Update()
 	{
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		afkTimer += Time.get_deltaTime();
+		afkTimer += Time.deltaTime;
 		if (afkTimer > 150f)
 		{
 			if (base.CurrentActionType == LOUNGE_ACTION_TYPE.NONE || base.CurrentActionType == LOUNGE_ACTION_TYPE.SIT)
@@ -98,13 +96,12 @@ public class LoungePlayer : HomePlayerCharacterBase
 			{
 				animCtrl.PlayDefault();
 			}
-			float num = Vector3.Distance(base._transform.get_position(), base.moveTargetPos);
-			if (num > 0.5f)
+			if (Vector3.Distance(base._transform.position, base.moveTargetPos) > 0.5f)
 			{
 				base.CurrentActionType = LOUNGE_ACTION_TYPE.NONE;
 				isMoving = true;
 				isSitting = false;
-				this.StartCoroutine(Move());
+				StartCoroutine(Move());
 			}
 		}
 	}
@@ -114,42 +111,27 @@ public class LoungePlayer : HomePlayerCharacterBase
 		if (LoungeCharaInfo != null)
 		{
 			namePlate = MonoBehaviourSingleton<UIManager>.I.common.CreateLoungeNamePlate(LoungeCharaInfo.name);
-			namePlateStatus = namePlate.get_gameObject().AddComponent<LoungeNamePlateStatus>();
+			namePlateStatus = namePlate.gameObject.AddComponent<LoungeNamePlateStatus>();
 			namePlateStatus.SetPlayer(this);
 		}
 	}
 
 	protected override void UpdateNamePlatePos()
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
 		if (!(namePlate == null))
 		{
-			Vector3 val = (!(base.Head != null)) ? (base._transform.get_position() + new Vector3(0f, 1.9f, 0f)) : (base.Head.get_position() + new Vector3(0f, 0.4f, 0f));
-			val = MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToScreenPoint(val);
-			val = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
-			if (val.z >= 0f)
+			Vector3 position = (!(base.Head != null)) ? (base._transform.position + new Vector3(0f, 1.9f, 0f)) : (base.Head.position + new Vector3(0f, 0.4f, 0f));
+			position = MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToScreenPoint(position);
+			position = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(position);
+			if (position.z >= 0f)
 			{
-				val.z = 0f;
+				position.z = 0f;
 				namePlateStatus.SetActiveNamePlate(GameSaveData.instance.headName);
-				namePlate.set_position(val);
+				namePlate.position = position;
 			}
 			else
 			{
-				namePlate.get_gameObject().SetActive(false);
+				namePlate.gameObject.SetActive(value: false);
 			}
 		}
 	}
@@ -158,7 +140,7 @@ public class LoungePlayer : HomePlayerCharacterBase
 	{
 		while (isMoving)
 		{
-			sitTimer += Time.get_deltaTime();
+			sitTimer += Time.deltaTime;
 			if (10f < sitTimer)
 			{
 				yield break;
@@ -171,13 +153,13 @@ public class LoungePlayer : HomePlayerCharacterBase
 		}
 		if (MonoBehaviourSingleton<LoungeManager>.IsValid())
 		{
-			chairPoint = MonoBehaviourSingleton<LoungeManager>.I.TableSet.GetNearSitPoint(base._transform.get_position());
+			chairPoint = MonoBehaviourSingleton<LoungeManager>.I.TableSet.GetNearSitPoint(base._transform.position);
 		}
 		if (MonoBehaviourSingleton<ClanManager>.IsValid())
 		{
-			chairPoint = MonoBehaviourSingleton<ClanManager>.I.TableSet.GetNearSitPoint(base._transform.get_position());
+			chairPoint = MonoBehaviourSingleton<ClanManager>.I.TableSet.GetNearSitPoint(base._transform.position);
 		}
-		yield return this.StartCoroutine(base.DoSit());
+		yield return StartCoroutine(base.DoSit());
 	}
 
 	protected override IEnumerator StandUp()
@@ -186,15 +168,15 @@ public class LoungePlayer : HomePlayerCharacterBase
 		{
 			yield return null;
 		}
-		yield return this.StartCoroutine(base.StandUp());
+		yield return StartCoroutine(base.StandUp());
 	}
 
 	protected override void InitAnim()
 	{
 		base.InitAnim();
-		animCtrl.moveAnim = ((sexType != 0) ? PLCA.RUN_F : PLCA.RUN);
+		animCtrl.moveAnim = ((sexType == 0) ? PLCA.RUN : PLCA.RUN_F);
 		animCtrl.transitionDuration = 0.15f;
-		animCtrl.animator.set_speed(1f);
+		animCtrl.animator.speed = 1f;
 	}
 
 	protected virtual IEnumerator Move()
@@ -203,18 +185,13 @@ public class LoungePlayer : HomePlayerCharacterBase
 		isMoving = true;
 		while (true)
 		{
-			Vector3 pos = base._transform.get_position();
-			Vector3 diff = base.moveTargetPos - pos;
-			Vector2 val = diff.ToVector2XZ();
-			Vector2 dir = val.get_normalized();
-			Quaternion val2 = Quaternion.LookRotation(dir.ToVector3XZ());
-			Vector3 eulerAngles = val2.get_eulerAngles();
-			float rot2 = eulerAngles.y;
-			float vel = 0f;
-			Vector3 eulerAngles2 = base._transform.get_eulerAngles();
-			rot2 = Mathf.SmoothDampAngle(eulerAngles2.y, rot2, ref vel, 0.1f);
-			base._transform.set_eulerAngles(new Vector3(0f, rot2, 0f));
-			if (diff.get_magnitude() < 1f)
+			Vector3 position = base._transform.position;
+			Vector3 vector = base.moveTargetPos - position;
+			float y = Quaternion.LookRotation(vector.ToVector2XZ().normalized.ToVector3XZ()).eulerAngles.y;
+			float currentVelocity = 0f;
+			y = Mathf.SmoothDampAngle(base._transform.eulerAngles.y, y, ref currentVelocity, 0.1f);
+			base._transform.eulerAngles = new Vector3(0f, y, 0f);
+			if (vector.magnitude < 1f)
 			{
 				animCtrl.Play(PLCA.WALK);
 			}
@@ -222,7 +199,7 @@ public class LoungePlayer : HomePlayerCharacterBase
 			{
 				animCtrl.PlayMove();
 			}
-			if (diff.get_magnitude() < 0.5f)
+			if (vector.magnitude < 0.5f)
 			{
 				break;
 			}
@@ -233,7 +210,7 @@ public class LoungePlayer : HomePlayerCharacterBase
 
 	protected override ModelLoaderBase LoadModel()
 	{
-		return Load(this, this.get_gameObject(), LoungeCharaInfo, null);
+		return Load(this, base.gameObject, LoungeCharaInfo, null);
 	}
 
 	protected virtual PlayerLoader Load(LoungePlayer chara, GameObject go, CharaInfo chara_info, PlayerLoader.OnCompleteLoad callback)
@@ -252,14 +229,14 @@ public class LoungePlayer : HomePlayerCharacterBase
 	public virtual void OnRecvSit()
 	{
 		isSitting = true;
-		this.StartCoroutine(DoSit());
+		StartCoroutine(DoSit());
 		base.CurrentActionType = LOUNGE_ACTION_TYPE.SIT;
 	}
 
 	public virtual void OnRecvStandUp()
 	{
 		isSitting = false;
-		this.StartCoroutine(StandUp());
+		StartCoroutine(StandUp());
 		if (chairPoint != null)
 		{
 			chairPoint.ResetSittingCharacter();
@@ -297,7 +274,7 @@ public class LoungePlayer : HomePlayerCharacterBase
 		{
 			return false;
 		}
-		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("LoungePlayerCharacter", this.get_gameObject(), "LOUNGE_FRIEND", LoungeCharaInfo);
+		MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("LoungePlayerCharacter", base.gameObject, "LOUNGE_FRIEND", LoungeCharaInfo);
 		return true;
 	}
 

@@ -17,7 +17,7 @@ public class PacketMemoryStream : MemoryStream
 		byte[] bytes = BitConverter.GetBytes(val);
 		if (BitConverter.IsLittleEndian)
 		{
-			Array.Reverse(bytes);
+			Array.Reverse((Array)bytes);
 		}
 		return bytes;
 	}
@@ -26,7 +26,7 @@ public class PacketMemoryStream : MemoryStream
 	{
 		if (BitConverter.IsLittleEndian)
 		{
-			Array.Reverse(bytes);
+			Array.Reverse((Array)bytes);
 		}
 		return BitConverter.ToInt32(bytes, 0);
 	}

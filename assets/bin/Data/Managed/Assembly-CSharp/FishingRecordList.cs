@@ -1,5 +1,4 @@
 using Network;
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -22,7 +21,7 @@ public class FishingRecordList : GameSection
 	public override void Initialize()
 	{
 		eventId = (int)GameSection.GetEventData();
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	protected IEnumerator DoInitialize()
@@ -48,11 +47,11 @@ public class FishingRecordList : GameSection
 		if (records != null)
 		{
 			SetupSrollBarCollider();
-			SetActive((Enum)UI.STR_NON_LIST, records.gatherItems.IsNullOrEmpty());
-			SetLabelText((Enum)UI.LBL_SUM_VALUE, $"{records.totalNum.ToString():#,0}");
+			SetActive(UI.STR_NON_LIST, records.gatherItems.IsNullOrEmpty());
+			SetLabelText(UI.LBL_SUM_VALUE, $"{records.totalNum.ToString():#,0}");
 			if (!records.gatherItems.IsNullOrEmpty())
 			{
-				SetDynamicList((Enum)UI.GRD_LIST, "FishingRecordItem", records.gatherItems.Count, isResetUI, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
+				SetDynamicList(UI.GRD_LIST, "FishingRecordItem", records.gatherItems.Count, isResetUI, null, null, delegate(int i, Transform t, bool is_recycle)
 				{
 					SetupItem(t, records.gatherItems[i]);
 					SetActive(t, is_visible: true);
@@ -64,12 +63,6 @@ public class FishingRecordList : GameSection
 
 	private void SetupSrollBarCollider()
 	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 		Transform ctrl = GetCtrl(UI.OBJ_SCROLL_BAR);
 		if (ctrl == null)
 		{
@@ -81,11 +74,7 @@ public class FishingRecordList : GameSection
 			BoxCollider component2 = ctrl.GetComponent<BoxCollider>();
 			if (!(component2 == null))
 			{
-				BoxCollider obj = component2;
-				Vector3 size = component2.get_size();
-				float x = size.x;
-				Vector2 localSize = component.localSize;
-				obj.set_size(Vector2.op_Implicit(new Vector2(x, localSize.y)));
+				component2.size = new Vector2(component2.size.x, component.localSize.y);
 			}
 		}
 	}
@@ -95,7 +84,7 @@ public class FishingRecordList : GameSection
 		FishingRecordItem fishingRecordItem = t.GetComponent<FishingRecordItem>();
 		if (fishingRecordItem == null)
 		{
-			fishingRecordItem = t.get_gameObject().AddComponent<FishingRecordItem>();
+			fishingRecordItem = t.gameObject.AddComponent<FishingRecordItem>();
 		}
 		fishingRecordItem.InitUI();
 		fishingRecordItem.Setup(t, info);
@@ -113,7 +102,7 @@ public class FishingRecordList : GameSection
 		{
 			return;
 		}
-		FishingRecordItem[] componentsInChildren = ctrl.GetComponentsInChildren<FishingRecordItem>(true);
+		FishingRecordItem[] componentsInChildren = ctrl.GetComponentsInChildren<FishingRecordItem>(includeInactive: true);
 		if (componentsInChildren.IsNullOrEmpty())
 		{
 			return;

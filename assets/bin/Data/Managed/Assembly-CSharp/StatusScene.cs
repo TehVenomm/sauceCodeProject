@@ -5,7 +5,7 @@ public class StatusScene : GameSection
 		RenderTargetCacher component = MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>();
 		if (component != null)
 		{
-			component.set_enabled(true);
+			component.enabled = true;
 		}
 		MonoBehaviourSingleton<StatusManager>.I.CreateLocalEquipSetData();
 		MonoBehaviourSingleton<StatusManager>.I.CreateLocalVisualEquipData();

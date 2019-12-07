@@ -26,7 +26,7 @@ namespace BestHTTP.WebSocket.Frames
 				byte[] bytes = BitConverter.GetBytes(code);
 				if (BitConverter.IsLittleEndian)
 				{
-					Array.Reverse(bytes, 0, bytes.Length);
+					Array.Reverse((Array)bytes, 0, bytes.Length);
 				}
 				memoryStream.Write(bytes, 0, bytes.Length);
 				bytes = Encoding.UTF8.GetBytes(message);

@@ -24,7 +24,7 @@ public class Pool<ABS_T> where ABS_T : Poolable
 			queue = new Queue<ABS_T>();
 			poolablesOfType.Add(GetKey<T>(), queue);
 		}
-		T val = (T)null;
+		T val = null;
 		if (queue.Count > 0)
 		{
 			val = (T)queue.Dequeue();
@@ -43,7 +43,7 @@ public class Pool<ABS_T> where ABS_T : Poolable
 		Queue<ABS_T> queue = poolablesOfType.Get(GetKey(poolable.GetType()));
 		if (queue == null)
 		{
-			Debug.LogError((object)("Pool: not alloc poolable. poolable=" + poolable));
+			Debug.LogError("Pool: not alloc poolable. poolable=" + poolable);
 			return;
 		}
 		poolable.OnFinal();

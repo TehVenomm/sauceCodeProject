@@ -12,7 +12,7 @@ public class UISpriteAnimation : MonoBehaviour
 
 	[HideInInspector]
 	[SerializeField]
-	protected string mPrefix = string.Empty;
+	protected string mPrefix = "";
 
 	[HideInInspector]
 	[SerializeField]
@@ -76,11 +76,6 @@ public class UISpriteAnimation : MonoBehaviour
 
 	public bool isPlaying => mActive;
 
-	public UISpriteAnimation()
-		: this()
-	{
-	}
-
 	protected virtual void Start()
 	{
 		RebuildSpriteList();
@@ -88,7 +83,7 @@ public class UISpriteAnimation : MonoBehaviour
 
 	protected virtual void Update()
 	{
-		if (!mActive || mSpriteNames.Count <= 1 || !Application.get_isPlaying() || mFPS <= 0)
+		if (!mActive || mSpriteNames.Count <= 1 || !Application.isPlaying || mFPS <= 0)
 		{
 			return;
 		}
@@ -98,7 +93,7 @@ public class UISpriteAnimation : MonoBehaviour
 		{
 			return;
 		}
-		mDelta = ((!(num > 0f)) ? 0f : (mDelta - num));
+		mDelta = ((num > 0f) ? (mDelta - num) : 0f);
 		if (++mIndex >= mSpriteNames.Count)
 		{
 			mIndex = 0;
@@ -118,7 +113,7 @@ public class UISpriteAnimation : MonoBehaviour
 	{
 		if (mSprite == null)
 		{
-			mSprite = this.GetComponent<UISprite>();
+			mSprite = GetComponent<UISprite>();
 		}
 		mSpriteNames.Clear();
 		if (!(mSprite != null) || !(mSprite.atlas != null))

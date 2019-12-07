@@ -11,8 +11,7 @@ public class Coop_Model_PlayerFlickAction : Coop_Model_ObjectSyncPositionBase
 
 	public override bool IsHandleable(StageObject owner)
 	{
-		Character character = owner as Character;
-		if (!character.IsChangeableAction((Character.ACTION_ID)42))
+		if (!(owner as Character).IsChangeableAction((Character.ACTION_ID)42))
 		{
 			return false;
 		}

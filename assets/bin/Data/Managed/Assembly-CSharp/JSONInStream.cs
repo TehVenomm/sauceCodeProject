@@ -35,13 +35,13 @@ public class JSONInStream
 		{
 			try
 			{
-				JSONNullFieldValue jSONNullFieldValue = (JSONNullFieldValue)node.GetField(tag);
+				_ = (JSONNullFieldValue)node.GetField(tag);
 				value = null;
 				return this;
 			}
 			catch (Exception ex2)
 			{
-				Debug.LogError((object)("Error JSONInStream " + tag + " " + ex.ToString() + " " + ex2.ToString()));
+				Debug.LogError("Error JSONInStream " + tag + " " + ex.ToString() + " " + ex2.ToString());
 				value = null;
 				return null;
 			}
@@ -64,13 +64,13 @@ public class JSONInStream
 		{
 			try
 			{
-				JSONNullFieldValue jSONNullFieldValue = (JSONNullFieldValue)node.GetField(tag);
+				_ = (JSONNullFieldValue)node.GetField(tag);
 				value = null;
 				return this;
 			}
 			catch (Exception ex2)
 			{
-				Debug.LogError((object)("Error JSONInStream " + tag + " " + ex.ToString() + " " + ex2.ToString()));
+				Debug.LogError("Error JSONInStream " + tag + " " + ex.ToString() + " " + ex2.ToString());
 				return null;
 			}
 		}
@@ -93,13 +93,13 @@ public class JSONInStream
 		{
 			try
 			{
-				JSONNullFieldValue jSONNullFieldValue = (JSONNullFieldValue)node.GetField(idx);
+				_ = (JSONNullFieldValue)node.GetField(idx);
 				value = null;
 				return this;
 			}
 			catch (Exception ex2)
 			{
-				Debug.LogError((object)("Error JSONInStream " + idx + " " + ex.ToString() + " " + ex2.ToString()));
+				Debug.LogError("Error JSONInStream " + idx + " " + ex.ToString() + " " + ex2.ToString());
 				value = null;
 				return null;
 			}
@@ -113,10 +113,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(tag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 		}
 		value = (float)jSONNumberFieldValue.value;
 		return this;
@@ -134,10 +134,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(idx);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)idx);
+			Debug.LogError(message);
+			Debug.LogError(idx);
 		}
 		value = (float)jSONNumberFieldValue.value;
 		return this;
@@ -150,10 +150,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(tag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 		}
 		value = jSONNumberFieldValue.value;
 		return this;
@@ -171,10 +171,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(idx);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)idx);
+			Debug.LogError(message);
+			Debug.LogError(idx);
 		}
 		value = jSONNumberFieldValue.value;
 		return this;
@@ -187,10 +187,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(tag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 		}
 		if (jSONNumberFieldValue != null)
 		{
@@ -206,10 +206,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(tag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 		}
 		value = (int)jSONNumberFieldValue.value;
 		return this;
@@ -227,10 +227,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(idx);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)idx);
+			Debug.LogError(message);
+			Debug.LogError(idx);
 		}
 		value = (int)jSONNumberFieldValue.value;
 		return this;
@@ -243,10 +243,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(tag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 		}
 		if (jSONNumberFieldValue != null)
 		{
@@ -262,10 +262,10 @@ public class JSONInStream
 		{
 			jSONBooleanFieldValue = (JSONBooleanFieldValue)node.GetField(tag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 		}
 		value = jSONBooleanFieldValue.value;
 		return this;
@@ -283,10 +283,10 @@ public class JSONInStream
 		{
 			jSONBooleanFieldValue = (JSONBooleanFieldValue)node.GetField(idx);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)idx);
+			Debug.LogError(message);
+			Debug.LogError(idx);
 		}
 		value = jSONBooleanFieldValue.value;
 		return this;
@@ -299,10 +299,10 @@ public class JSONInStream
 		{
 			jSONBooleanFieldValue = (JSONBooleanFieldValue)node.GetField(tag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 		}
 		if (jSONBooleanFieldValue != null)
 		{
@@ -313,12 +313,9 @@ public class JSONInStream
 
 	public JSONInStream Content(string tag, out Vector2 value)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		IJSONFieldValue field = node.GetField(tag);
-		if (field.GetType() == typeof(JSONNullFieldValue))
+		if (node.GetField(tag).GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Vector2.get_zero();
+			value = Vector2.zero;
 			return this;
 		}
 		float[] fs = new float[2];
@@ -327,14 +324,12 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1]);
+		value = new Vector2(fs[0], fs[1]);
 		return this;
 	}
 
 	public JSONInStream ContentOptional(string tag, ref Vector2 value)
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		IJSONFieldValue field = node.GetField(tag);
 		if (field == null)
 		{
@@ -342,7 +337,7 @@ public class JSONInStream
 		}
 		if (field.GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Vector2.get_zero();
+			value = Vector2.zero;
 			return this;
 		}
 		float[] fs = new float[2];
@@ -351,7 +346,7 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1]);
+		value = new Vector2(fs[0], fs[1]);
 		return this;
 	}
 
@@ -362,12 +357,9 @@ public class JSONInStream
 
 	public JSONInStream Content(int idx, out Vector2 value)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		IJSONFieldValue field = node.GetField(idx);
-		if (field.GetType() == typeof(JSONNullFieldValue))
+		if (node.GetField(idx).GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Vector2.get_zero();
+			value = Vector2.zero;
 			return this;
 		}
 		float[] fs = new float[2];
@@ -376,18 +368,15 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1]);
+		value = new Vector2(fs[0], fs[1]);
 		return this;
 	}
 
 	public JSONInStream Content(string tag, out Vector3 value)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		IJSONFieldValue field = node.GetField(tag);
-		if (field.GetType() == typeof(JSONNullFieldValue))
+		if (node.GetField(tag).GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Vector3.get_zero();
+			value = Vector3.zero;
 			return this;
 		}
 		float[] fs = new float[3];
@@ -396,14 +385,12 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2]);
+		value = new Vector3(fs[0], fs[1], fs[2]);
 		return this;
 	}
 
 	public JSONInStream ContentOptional(string tag, ref Vector3 value)
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		IJSONFieldValue field = node.GetField(tag);
 		if (field == null)
 		{
@@ -411,7 +398,7 @@ public class JSONInStream
 		}
 		if (field.GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Vector3.get_zero();
+			value = Vector3.zero;
 			return this;
 		}
 		float[] fs = new float[3];
@@ -420,7 +407,7 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2]);
+		value = new Vector3(fs[0], fs[1], fs[2]);
 		return this;
 	}
 
@@ -431,12 +418,9 @@ public class JSONInStream
 
 	public JSONInStream Content(int idx, out Vector3 value)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		IJSONFieldValue field = node.GetField(idx);
-		if (field.GetType() == typeof(JSONNullFieldValue))
+		if (node.GetField(idx).GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Vector3.get_zero();
+			value = Vector3.zero;
 			return this;
 		}
 		float[] fs = new float[3];
@@ -445,18 +429,15 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2]);
+		value = new Vector3(fs[0], fs[1], fs[2]);
 		return this;
 	}
 
 	public JSONInStream Content(string tag, out Vector4 value)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		IJSONFieldValue field = node.GetField(tag);
-		if (field.GetType() == typeof(JSONNullFieldValue))
+		if (node.GetField(tag).GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Vector4.get_zero();
+			value = Vector4.zero;
 			return this;
 		}
 		float[] fs = new float[4];
@@ -465,14 +446,12 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
+		value = new Vector4(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
 
 	public JSONInStream ContentOptional(string tag, ref Vector4 value)
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		IJSONFieldValue field = node.GetField(tag);
 		if (field == null)
 		{
@@ -480,7 +459,7 @@ public class JSONInStream
 		}
 		if (field.GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Vector4.get_zero();
+			value = Vector4.zero;
 			return this;
 		}
 		float[] fs = new float[4];
@@ -489,7 +468,7 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
+		value = new Vector4(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
 
@@ -500,12 +479,9 @@ public class JSONInStream
 
 	public JSONInStream Content(int idx, out Vector4 value)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		IJSONFieldValue field = node.GetField(idx);
-		if (field.GetType() == typeof(JSONNullFieldValue))
+		if (node.GetField(idx).GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Vector4.get_zero();
+			value = Vector4.zero;
 			return this;
 		}
 		float[] fs = new float[4];
@@ -514,18 +490,15 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
+		value = new Vector4(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
 
 	public JSONInStream Content(string tag, out Quaternion value)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		IJSONFieldValue field = node.GetField(tag);
-		if (field.GetType() == typeof(JSONNullFieldValue))
+		if (node.GetField(tag).GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Quaternion.get_identity();
+			value = Quaternion.identity;
 			return this;
 		}
 		float[] fs = new float[4];
@@ -534,14 +507,12 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
+		value = new Quaternion(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
 
 	public JSONInStream ContentOptional(string tag, ref Quaternion value)
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		IJSONFieldValue field = node.GetField(tag);
 		if (field == null)
 		{
@@ -549,7 +520,7 @@ public class JSONInStream
 		}
 		if (field.GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Quaternion.get_identity();
+			value = Quaternion.identity;
 			return this;
 		}
 		float[] fs = new float[4];
@@ -558,7 +529,7 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
+		value = new Quaternion(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
 
@@ -569,12 +540,9 @@ public class JSONInStream
 
 	public JSONInStream Content(int idx, out Quaternion value)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		IJSONFieldValue field = node.GetField(idx);
-		if (field.GetType() == typeof(JSONNullFieldValue))
+		if (node.GetField(idx).GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Quaternion.get_identity();
+			value = Quaternion.identity;
 			return this;
 		}
 		float[] fs = new float[4];
@@ -583,18 +551,15 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
+		value = new Quaternion(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
 
 	public JSONInStream Content(string tag, out Color value)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		IJSONFieldValue field = node.GetField(tag);
-		if (field.GetType() == typeof(JSONNullFieldValue))
+		if (node.GetField(tag).GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Color.get_white();
+			value = Color.white;
 			return this;
 		}
 		float[] fs = new float[4];
@@ -603,14 +568,12 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
+		value = new Color(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
 
 	public JSONInStream ContentOptional(string tag, ref Color value)
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 		IJSONFieldValue field = node.GetField(tag);
 		if (field == null)
 		{
@@ -618,7 +581,7 @@ public class JSONInStream
 		}
 		if (field.GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Color.get_white();
+			value = Color.white;
 			return this;
 		}
 		float[] fs = new float[4];
@@ -627,7 +590,7 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
+		value = new Color(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
 
@@ -638,12 +601,9 @@ public class JSONInStream
 
 	public JSONInStream Content(int idx, out Color value)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		IJSONFieldValue field = node.GetField(idx);
-		if (field.GetType() == typeof(JSONNullFieldValue))
+		if (node.GetField(idx).GetType() == typeof(JSONNullFieldValue))
 		{
-			value = Color.get_white();
+			value = Color.white;
 			return this;
 		}
 		float[] fs = new float[4];
@@ -652,15 +612,13 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
+		value = new Color(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
 
 	public JSONInStream Content(string tag, out Rect value)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		IJSONFieldValue field = node.GetField(tag);
-		if (field.GetType() == typeof(JSONNullFieldValue))
+		if (node.GetField(tag).GetType() == typeof(JSONNullFieldValue))
 		{
 			value = default(Rect);
 			return this;
@@ -671,13 +629,12 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
+		value = new Rect(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
 
 	public JSONInStream ContentOptional(string tag, ref Rect value)
 	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 		IJSONFieldValue field = node.GetField(tag);
 		if (field == null)
 		{
@@ -694,7 +651,7 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
+		value = new Rect(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
 
@@ -705,9 +662,7 @@ public class JSONInStream
 
 	public JSONInStream Content(int idx, out Rect value)
 	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		IJSONFieldValue field = node.GetField(idx);
-		if (field.GetType() == typeof(JSONNullFieldValue))
+		if (node.GetField(idx).GetType() == typeof(JSONNullFieldValue))
 		{
 			value = default(Rect);
 			return this;
@@ -718,7 +673,7 @@ public class JSONInStream
 			stream.Content(out float value2);
 			fs[i] = value2;
 		});
-		value._002Ector(fs[0], fs[1], fs[2], fs[3]);
+		value = new Rect(fs[0], fs[1], fs[2], fs[3]);
 		return this;
 	}
 
@@ -729,10 +684,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(tag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 		}
 		value = (int)jSONNumberFieldValue.value;
 		return this;
@@ -750,10 +705,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(idx);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)idx);
+			Debug.LogError(message);
+			Debug.LogError(idx);
 		}
 		value = (int)jSONNumberFieldValue.value;
 		return this;
@@ -766,10 +721,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(tag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 		}
 		if (jSONNumberFieldValue != null)
 		{
@@ -785,10 +740,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(tag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 		}
 		value = (uint)jSONNumberFieldValue.value;
 		return this;
@@ -806,10 +761,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(idx);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)idx);
+			Debug.LogError(message);
+			Debug.LogError(idx);
 		}
 		value = (uint)jSONNumberFieldValue.value;
 		return this;
@@ -822,10 +777,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(tag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 		}
 		if (jSONNumberFieldValue != null)
 		{
@@ -841,10 +796,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(tag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 		}
 		value = (float)jSONNumberFieldValue.value;
 		return this;
@@ -862,10 +817,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(idx);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)idx);
+			Debug.LogError(message);
+			Debug.LogError(idx);
 		}
 		value = (float)jSONNumberFieldValue.value;
 		return this;
@@ -878,10 +833,10 @@ public class JSONInStream
 		{
 			jSONNumberFieldValue = (JSONNumberFieldValue)node.GetField(tag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 		}
 		if (jSONNumberFieldValue != null)
 		{
@@ -897,20 +852,18 @@ public class JSONInStream
 		{
 			jSONListFieldValue = (JSONListFieldValue)node.GetField(tag);
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 		}
 		int num = 0;
 		foreach (IJSONFieldValue item in jSONListFieldValue.value)
 		{
-			JSONNode jSONNode = new JSONNode(item);
-			JSONInStream jSONInStream = new JSONInStream(jSONNode);
+			JSONInStream jSONInStream = new JSONInStream(new JSONNode(item));
 			try
 			{
-				JSONObjectFieldValue jSONObjectFieldValue = (JSONObjectFieldValue)item;
-				if (jSONObjectFieldValue != null)
+				if ((JSONObjectFieldValue)item != null)
 				{
 					jSONInStream = jSONInStream.Start(0);
 				}
@@ -925,16 +878,14 @@ public class JSONInStream
 
 	public JSONInStream List(int idx, Action<int, JSONInStream> callback)
 	{
-		JSONListFieldValue jSONListFieldValue = (JSONListFieldValue)node.GetField(idx);
+		JSONListFieldValue obj = (JSONListFieldValue)node.GetField(idx);
 		int num = 0;
-		foreach (IJSONFieldValue item in jSONListFieldValue.value)
+		foreach (IJSONFieldValue item in obj.value)
 		{
-			JSONNode jSONNode = new JSONNode(item);
-			JSONInStream jSONInStream = new JSONInStream(jSONNode);
+			JSONInStream jSONInStream = new JSONInStream(new JSONNode(item));
 			try
 			{
-				JSONObjectFieldValue jSONObjectFieldValue = (JSONObjectFieldValue)item;
-				if (jSONObjectFieldValue != null)
+				if ((JSONObjectFieldValue)item != null)
 				{
 					jSONInStream = jSONInStream.Start(0);
 				}
@@ -956,10 +907,10 @@ public class JSONInStream
 			node = jSONObjectFieldValue.value;
 			return this;
 		}
-		catch (Exception ex)
+		catch (Exception message)
 		{
-			Debug.LogError((object)ex);
-			Debug.LogError((object)tag);
+			Debug.LogError(message);
+			Debug.LogError(tag);
 			return this;
 		}
 	}

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class AndroidRuntimePermissionChecker
@@ -7,31 +6,17 @@ public class AndroidRuntimePermissionChecker
 
 	private static AndroidJavaObject GetActivity()
 	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Expected O, but got Unknown
-		AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-		try
+		using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
 		{
-			return val.GetStatic<AndroidJavaObject>("currentActivity");
-		}
-		finally
-		{
-			((IDisposable)val)?.Dispose();
+			return androidJavaClass.GetStatic<AndroidJavaObject>("currentActivity");
 		}
 	}
 
 	private static bool IsAndroidMOrGreater()
 	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Expected O, but got Unknown
-		AndroidJavaClass val = new AndroidJavaClass("android.os.Build$VERSION");
-		try
+		using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("android.os.Build$VERSION"))
 		{
-			return val.GetStatic<int>("SDK_INT") >= 23;
-		}
-		finally
-		{
-			((IDisposable)val)?.Dispose();
+			return androidJavaClass.GetStatic<int>("SDK_INT") >= 23;
 		}
 	}
 
@@ -50,17 +35,12 @@ public class AndroidRuntimePermissionChecker
 
 	private static bool CheckPermission(string permission)
 	{
-		AndroidJavaObject activity = GetActivity();
-		try
+		using (AndroidJavaObject androidJavaObject = GetActivity())
 		{
-			return activity.Call<int>("checkSelfPermission", new object[1]
+			return androidJavaObject.Call<int>("checkSelfPermission", new object[1]
 			{
 				permission
 			}) == 0;
-		}
-		finally
-		{
-			((IDisposable)activity)?.Dispose();
 		}
 	}
 
@@ -68,18 +48,9 @@ public class AndroidRuntimePermissionChecker
 	{
 		if (IsAndroidMOrGreater())
 		{
-			AndroidJavaObject activity = GetActivity();
-			try
+			using (AndroidJavaObject androidJavaObject = GetActivity())
 			{
-				activity.Call("requestPermissions", new object[2]
-				{
-					permissiions,
-					0
-				});
-			}
-			finally
-			{
-				((IDisposable)activity)?.Dispose();
+				androidJavaObject.Call("requestPermissions", permissiions, 0);
 			}
 		}
 	}

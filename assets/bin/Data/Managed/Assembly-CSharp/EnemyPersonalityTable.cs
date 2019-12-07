@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class EnemyPersonalityTable : Singleton<EnemyPersonalityTable>, IDataTable
@@ -55,15 +54,9 @@ public class EnemyPersonalityTable : Singleton<EnemyPersonalityTable>, IDataTabl
 
 	private UIntKeyTable<Data> dataTable;
 
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache1;
-
 	public void CreateTable(TextAsset textasset)
 	{
-		CreateTable(textasset.get_text());
+		CreateTable(textasset.text);
 	}
 
 	public void CreateTable(string csv)
@@ -74,7 +67,7 @@ public class EnemyPersonalityTable : Singleton<EnemyPersonalityTable>, IDataTabl
 
 	public void AddTable(TextAsset textasset)
 	{
-		TableUtility.AddUIntKeyTable(dataTable, textasset.get_text(), Data.cb, "id,distanceHateRate,shortShortDistance,shortDistance,middleDistance,longDistance,lifeLowerImportance,lifeLownerVolatize,lifeLowerAttackedVolatize,shortShortDistanceDamage,shortDistanceDamage,middleDistanceDamage,longDistanceDamage,damageImportance,damageVolatize,damageAttackedVolatize,healImportance,healVolatize,healAttackedVolatize,skillImportance,skillVolatize,skillDamagedVolatize,skillHateParam,specialDamageImportance,specialDamageVolatize,specialDamageAttackedVolatize,weakPointHate");
+		TableUtility.AddUIntKeyTable(dataTable, textasset.text, Data.cb, "id,distanceHateRate,shortShortDistance,shortDistance,middleDistance,longDistance,lifeLowerImportance,lifeLownerVolatize,lifeLowerAttackedVolatize,shortShortDistanceDamage,shortDistanceDamage,middleDistanceDamage,longDistanceDamage,damageImportance,damageVolatize,damageAttackedVolatize,healImportance,healVolatize,healAttackedVolatize,skillImportance,skillVolatize,skillDamagedVolatize,skillHateParam,specialDamageImportance,specialDamageVolatize,specialDamageAttackedVolatize,weakPointHate");
 	}
 
 	public Data GetData(uint id)

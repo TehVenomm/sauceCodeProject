@@ -2,6 +2,7 @@ using GooglePlayGames.OurUtils;
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SocialPlatforms;
 
 namespace GooglePlayGames
@@ -24,7 +25,7 @@ namespace GooglePlayGames
 
 		public bool isFriend => true;
 
-		public UserState state => 0;
+		public UserState state => UserState.Online;
 
 		public Texture2D image
 		{
@@ -32,7 +33,7 @@ namespace GooglePlayGames
 			{
 				if (!mImageLoading && mImage == null && !string.IsNullOrEmpty(AvatarURL))
 				{
-					Debug.Log((object)("Starting to load image: " + AvatarURL));
+					Debug.Log("Starting to load image: " + AvatarURL);
 					mImageLoading = true;
 					PlayGamesHelperObject.RunCoroutine(LoadImage());
 				}
@@ -66,26 +67,27 @@ namespace GooglePlayGames
 		{
 			if (!string.IsNullOrEmpty(AvatarURL))
 			{
-				WWW www = new WWW(AvatarURL);
-				while (!www.get_isDone())
+				UnityWebRequest www = UnityWebRequestTexture.GetTexture(AvatarURL);
+				www.SendWebRequest();
+				while (!www.isDone)
 				{
 					yield return null;
 				}
-				if (www.get_error() == null)
+				if (www.error == null)
 				{
-					mImage = www.get_texture();
+					mImage = DownloadHandlerTexture.GetContent(www);
 				}
 				else
 				{
-					mImage = Texture2D.get_blackTexture();
-					Debug.Log((object)("Error downloading image: " + www.get_error()));
+					mImage = Texture2D.blackTexture;
+					Debug.Log("Error downloading image: " + www.error);
 				}
 				mImageLoading = false;
 			}
 			else
 			{
-				Debug.Log((object)"No URL found.");
-				mImage = Texture2D.get_blackTexture();
+				Debug.Log("No URL found.");
+				mImage = Texture2D.blackTexture;
 				mImageLoading = false;
 			}
 		}
@@ -96,7 +98,7 @@ namespace GooglePlayGames
 			{
 				return false;
 			}
-			if (object.ReferenceEquals(this, obj))
+			if (this == obj)
 			{
 				return true;
 			}

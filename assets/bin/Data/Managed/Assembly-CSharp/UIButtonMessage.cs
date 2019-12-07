@@ -23,11 +23,6 @@ public class UIButtonMessage : MonoBehaviour
 
 	private bool mStarted;
 
-	public UIButtonMessage()
-		: this()
-	{
-	}
-
 	private void Start()
 	{
 		mStarted = true;
@@ -37,13 +32,13 @@ public class UIButtonMessage : MonoBehaviour
 	{
 		if (mStarted)
 		{
-			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
+			OnHover(UICamera.IsHighlighted(base.gameObject));
 		}
 	}
 
 	private void OnHover(bool isOver)
 	{
-		if (this.get_enabled() && ((isOver && trigger == Trigger.OnMouseOver) || (!isOver && trigger == Trigger.OnMouseOut)))
+		if (base.enabled && ((isOver && trigger == Trigger.OnMouseOver) || (!isOver && trigger == Trigger.OnMouseOut)))
 		{
 			Send();
 		}
@@ -51,7 +46,7 @@ public class UIButtonMessage : MonoBehaviour
 
 	private void OnPress(bool isPressed)
 	{
-		if (this.get_enabled() && ((isPressed && trigger == Trigger.OnPress) || (!isPressed && trigger == Trigger.OnRelease)))
+		if (base.enabled && ((isPressed && trigger == Trigger.OnPress) || (!isPressed && trigger == Trigger.OnRelease)))
 		{
 			Send();
 		}
@@ -59,7 +54,7 @@ public class UIButtonMessage : MonoBehaviour
 
 	private void OnSelect(bool isSelected)
 	{
-		if (this.get_enabled() && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
+		if (base.enabled && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
 		{
 			OnHover(isSelected);
 		}
@@ -67,7 +62,7 @@ public class UIButtonMessage : MonoBehaviour
 
 	private void OnClick()
 	{
-		if (this.get_enabled() && trigger == Trigger.OnClick)
+		if (base.enabled && trigger == Trigger.OnClick)
 		{
 			Send();
 		}
@@ -75,7 +70,7 @@ public class UIButtonMessage : MonoBehaviour
 
 	private void OnDoubleClick()
 	{
-		if (this.get_enabled() && trigger == Trigger.OnDoubleClick)
+		if (base.enabled && trigger == Trigger.OnDoubleClick)
 		{
 			Send();
 		}
@@ -89,7 +84,7 @@ public class UIButtonMessage : MonoBehaviour
 		}
 		if (target == null)
 		{
-			target = this.get_gameObject();
+			target = base.gameObject;
 		}
 		if (includeChildren)
 		{
@@ -97,13 +92,12 @@ public class UIButtonMessage : MonoBehaviour
 			int i = 0;
 			for (int num = componentsInChildren.Length; i < num; i++)
 			{
-				Transform val = componentsInChildren[i];
-				val.get_gameObject().SendMessage(functionName, (object)this.get_gameObject(), 1);
+				componentsInChildren[i].gameObject.SendMessage(functionName, base.gameObject, SendMessageOptions.DontRequireReceiver);
 			}
 		}
 		else
 		{
-			target.SendMessage(functionName, (object)this.get_gameObject(), 1);
+			target.SendMessage(functionName, base.gameObject, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 }

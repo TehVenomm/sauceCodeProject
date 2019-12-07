@@ -43,12 +43,12 @@ public class ClanScoutList : GameSection
 	{
 		if (!ClanMatchingManager.IsScoutValidNotEmptyList())
 		{
-			SetActive((Enum)UI.GRD_CLAN, is_visible: false);
-			SetActive((Enum)UI.STR_NON_LIST, is_visible: true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, is_visible: false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, is_visible: true);
-			SetLabelText((Enum)UI.LBL_MAX, "0");
-			SetLabelText((Enum)UI.LBL_NOW, "0");
+			SetActive(UI.GRD_CLAN, is_visible: false);
+			SetActive(UI.STR_NON_LIST, is_visible: true);
+			SetActive(UI.OBJ_ACTIVE_ROOT, is_visible: false);
+			SetActive(UI.OBJ_INACTIVE_ROOT, is_visible: true);
+			SetLabelText(UI.LBL_MAX, "0");
+			SetLabelText(UI.LBL_NOW, "0");
 			return;
 		}
 		clans = MonoBehaviourSingleton<ClanMatchingManager>.I.scoutClans.ToArray();
@@ -58,27 +58,23 @@ public class ClanScoutList : GameSection
 			{
 				return -1;
 			}
-			if (a.expiredAt < b.expiredAt)
-			{
-				return 1;
-			}
-			return 0;
+			return (a.expiredAt < b.expiredAt) ? 1 : 0;
 		});
-		SetActive((Enum)UI.GRD_CLAN, is_visible: true);
-		SetActive((Enum)UI.STR_NON_LIST, is_visible: false);
+		SetActive(UI.GRD_CLAN, is_visible: true);
+		SetActive(UI.STR_NON_LIST, is_visible: false);
 		pageMax = 1 + (clans.Length - 1) / 10;
 		bool flag = pageMax > 1;
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
-		SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
+		SetActive(UI.OBJ_ACTIVE_ROOT, flag);
+		SetActive(UI.OBJ_INACTIVE_ROOT, !flag);
+		SetLabelText(UI.LBL_MAX, pageMax.ToString());
+		SetLabelText(UI.LBL_NOW, nowPage.ToString());
 		int num = 10 * (nowPage - 1);
 		if (clans.Length <= num)
 		{
 			num = 0;
 			nowPage = 1;
 		}
-		int num2 = (nowPage != pageMax) ? 10 : (clans.Length - num);
+		int num2 = (nowPage == pageMax) ? (clans.Length - num) : 10;
 		ClanData[] showList = new ClanData[num2];
 		Array.Copy(clans, num, showList, 0, num2);
 		SetGrid(UI.GRD_CLAN, "ClanScoutListItem", showList.Length, reset: true, delegate(int i, Transform t, bool is_recycle)
@@ -92,12 +88,12 @@ public class ClanScoutList : GameSection
 
 	public override void Initialize()
 	{
-		this.StartCoroutine(DoInitialize());
+		StartCoroutine(DoInitialize());
 	}
 
 	private IEnumerator DoInitialize()
 	{
-		yield return this.StartCoroutine(Reload());
+		yield return StartCoroutine(Reload());
 		base.Initialize();
 	}
 
@@ -154,22 +150,22 @@ public class ClanScoutList : GameSection
 		SetLabelText(t, UI.LBL_CLAN_LABEL, StringTable.Get(STRING_CATEGORY.CLAN_LABEL, (uint)clan.lbl));
 		SetLabelText(t, UI.LBL_CLAN_MEMBER_NUM, clan.num.ToString());
 		SetLabelText(t, UI.LBL_CLAN_MAX_MEMBER_NUM, constDefine.CLAN_MAX_MEMBER_NUM.ToString());
-		SetLabelText(t, UI.LBL_LIMIT_TIME, MonoBehaviourSingleton<ClanMatchingManager>.I.ConvertDateIntToString(string.Empty, clan.expiredAt));
+		SetLabelText(t, UI.LBL_LIMIT_TIME, MonoBehaviourSingleton<ClanMatchingManager>.I.ConvertDateIntToString("", clan.expiredAt));
 		bool is_visible = GameSaveData.instance.isNewClanScout(clan.cId, clan.expiredAt);
 		SetActive(t, UI.OBJ_NEW, is_visible);
 		if (FindCtrl(t, UI.OBJ_SYMBOL_MARK) == null)
 		{
-			this.StartCoroutine(CreateSymbolMark(clan, t));
+			StartCoroutine(CreateSymbolMark(clan, t));
 		}
 		else
 		{
-			base.GetComponent<SymbolMarkCtrl>(t, (Enum)UI.OBJ_SYMBOL_MARK).LoadSymbol(clan.sym);
+			GetComponent<SymbolMarkCtrl>(t, UI.OBJ_SYMBOL_MARK).LoadSymbol(clan.sym);
 		}
 	}
 
 	private void OnQuery_PAGE_PREV()
 	{
-		nowPage = ((nowPage <= 1) ? pageMax : (nowPage - 1));
+		nowPage = ((nowPage > 1) ? (nowPage - 1) : pageMax);
 		RefreshUI();
 	}
 
@@ -182,7 +178,7 @@ public class ClanScoutList : GameSection
 	private void OnQuery_RELOAD()
 	{
 		GameSection.StayEvent();
-		this.StartCoroutine(Reload(delegate(bool b)
+		StartCoroutine(Reload(delegate(bool b)
 		{
 			GameSection.ResumeEvent(b);
 		}));
@@ -211,7 +207,7 @@ public class ClanScoutList : GameSection
 		GameSection.StayEvent();
 		SendInviteReject(delegate
 		{
-			this.StartCoroutine(Reload(delegate(bool b)
+			StartCoroutine(Reload(delegate(bool b)
 			{
 				GameSection.ResumeEvent(b);
 			}));
@@ -225,18 +221,17 @@ public class ClanScoutList : GameSection
 
 	private IEnumerator CreateSymbolMark(ClanData clan, Transform t)
 	{
-		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject symbolMarkLoadObj = load_queue.Load(RESOURCE_CATEGORY.UI, "ClanSymbolMark");
-		yield return load_queue.Wait();
-		GameObject obj = symbolMarkLoadObj.loadedObject as GameObject;
-		Transform item = ResourceUtility.Realizes(obj, 5);
-		item.set_parent(FindCtrl(t, UI.OBJ_SYMBOL));
-		item.set_localScale(Vector3.get_one());
-		item.set_localPosition(Vector3.get_zero());
-		item.set_name("OBJ_SYMBOL_MARK");
-		SymbolMarkCtrl symbolMark = item.GetComponent<SymbolMarkCtrl>();
-		symbolMark.Initilize();
-		symbolMark.LoadSymbol(clan.sym);
-		symbolMark.SetSize(90);
+		LoadingQueue loadingQueue = new LoadingQueue(this);
+		LoadObject symbolMarkLoadObj = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ClanSymbolMark");
+		yield return loadingQueue.Wait();
+		Transform transform = ResourceUtility.Realizes(symbolMarkLoadObj.loadedObject as GameObject, 5);
+		transform.parent = FindCtrl(t, UI.OBJ_SYMBOL);
+		transform.localScale = Vector3.one;
+		transform.localPosition = Vector3.zero;
+		transform.name = "OBJ_SYMBOL_MARK";
+		SymbolMarkCtrl component = transform.GetComponent<SymbolMarkCtrl>();
+		component.Initilize();
+		component.LoadSymbol(clan.sym);
+		component.SetSize(90);
 	}
 }

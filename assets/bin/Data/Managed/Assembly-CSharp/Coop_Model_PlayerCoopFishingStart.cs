@@ -15,8 +15,7 @@ public class Coop_Model_PlayerCoopFishingStart : Coop_Model_ObjectSyncPositionBa
 
 	public override bool IsHandleable(StageObject owner)
 	{
-		Character character = owner as Character;
-		if (!character.IsChangeableAction((Character.ACTION_ID)41))
+		if (!(owner as Character).IsChangeableAction((Character.ACTION_ID)41))
 		{
 			return false;
 		}

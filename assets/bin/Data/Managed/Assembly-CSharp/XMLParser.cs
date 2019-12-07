@@ -43,12 +43,12 @@ public class XMLParser
 				text2 = text.Substring(2, text.Length - 3);
 				if (currentElement == null)
 				{
-					Debug.LogError((object)("Got close tag '" + text2 + "' without open tag."));
+					Debug.LogError("Got close tag '" + text2 + "' without open tag.");
 					return null;
 				}
 				if (text2 != currentElement.tag)
 				{
-					Debug.LogError((object)("Expected close tag for '" + currentElement.tag + "' but got '" + text2 + "'."));
+					Debug.LogError("Expected close tag for '" + currentElement.tag + "' but got '" + text2 + "'.");
 					return null;
 				}
 				if (elements.Count == 0)
@@ -73,7 +73,7 @@ public class XMLParser
 				else
 				{
 					text2 = text.Substring(1, text.Length - 2).Trim();
-					text = string.Empty;
+					text = "";
 				}
 			}
 			else
@@ -99,7 +99,7 @@ public class XMLParser
 				num = text.IndexOf("=");
 				if (num < 0)
 				{
-					Debug.LogError((object)("Invalid attribute for tag '" + text2 + "'."));
+					Debug.LogError("Invalid attribute for tag '" + text2 + "'.");
 					return null;
 				}
 				string key = text.Substring(0, num);
@@ -128,7 +128,7 @@ public class XMLParser
 				}
 				if (num < 0)
 				{
-					Debug.LogError((object)("Invalid attribute for tag '" + text2 + "'."));
+					Debug.LogError("Invalid attribute for tag '" + text2 + "'.");
 					return null;
 				}
 				string value = (!flag2) ? text.Substring(0, num - 1) : text.Substring(1, num - 1);
@@ -215,34 +215,34 @@ public class XMLParser
 			}
 			return;
 		}
-		Debug.LogError((object)("Expected '<' but got '" + num + "'."));
+		Debug.LogError("Expected '<' but got '" + num + "'.");
 	}
 
 	private string ReadTag(bool startingBracket)
 	{
 		SkipWhitespace();
-		string str = string.Empty;
+		string str = "";
 		char c = (char)reader.Peek();
 		if (startingBracket && c != '<')
 		{
-			Debug.LogError((object)("Expected < but got " + c));
+			Debug.LogError("Expected < but got " + c.ToString());
 			return null;
 		}
 		if (!startingBracket)
 		{
 			str += "<";
 		}
-		str += ((char)(ushort)reader.Read()).ToString();
+		str += ((char)reader.Read()).ToString();
 		while (reader.Peek() != 62)
 		{
-			str += ((char)(ushort)reader.Read()).ToString();
+			str += ((char)reader.Read()).ToString();
 		}
-		return str + ((char)(ushort)reader.Read()).ToString();
+		return str + ((char)reader.Read()).ToString();
 	}
 
 	private string ReadText()
 	{
-		string text = string.Empty;
+		string text = "";
 		while (true)
 		{
 			int num = reader.Peek();
@@ -254,7 +254,7 @@ public class XMLParser
 			{
 				break;
 			}
-			text += ((char)(ushort)reader.Read()).ToString();
+			text += ((char)reader.Read()).ToString();
 		}
 		return text.Trim();
 	}

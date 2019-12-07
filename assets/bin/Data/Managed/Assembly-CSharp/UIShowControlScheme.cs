@@ -11,11 +11,6 @@ public class UIShowControlScheme : MonoBehaviour
 
 	public bool controller = true;
 
-	public UIShowControlScheme()
-		: this()
-	{
-	}
-
 	private void OnEnable()
 	{
 		UICamera.onSchemeChange = (UICamera.OnSchemeChange)Delegate.Combine(UICamera.onSchemeChange, new UICamera.OnSchemeChange(OnScheme));

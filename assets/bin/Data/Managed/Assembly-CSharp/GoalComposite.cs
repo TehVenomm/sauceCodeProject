@@ -86,7 +86,7 @@ public abstract class GoalComposite : Goal
 
 	public string ToStringSubgoals(int layer, bool first)
 	{
-		string text = string.Empty + ToStringGoal();
+		string text = ToStringGoal() ?? "";
 		foreach (Goal subGoal in subGoals)
 		{
 			text += "\n";
@@ -94,7 +94,7 @@ public abstract class GoalComposite : Goal
 			{
 				text += "  ";
 			}
-			text += ((!first) ? "-" : "+");
+			text += (first ? "+" : "-");
 			text = ((!(subGoal is GoalComposite)) ? (text + subGoal.ToStringGoal()) : (text + (subGoal as GoalComposite).ToStringSubgoals(layer + 1, first)));
 			first = false;
 		}

@@ -56,7 +56,7 @@ public class FortuneWheelManager : MonoBehaviourSingleton<FortuneWheelManager>
 			try
 			{
 				num = long.Parse(data.jackpot);
-				MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(string.Format(StringTable.Get(STRING_CATEGORY.DRAGON_VAULT, 1u), data.userName, num.ToString()), string.Empty);
+				MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(string.Format(StringTable.Get(STRING_CATEGORY.DRAGON_VAULT, 1u), data.userName, num.ToString()), "");
 			}
 			catch
 			{
@@ -86,7 +86,7 @@ public class FortuneWheelManager : MonoBehaviourSingleton<FortuneWheelManager>
 				lastUpdateTime = ret.result.lastUpdateTime;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendSpin(SPIN_TYPE spinType, Action<bool> call_back)
@@ -105,7 +105,7 @@ public class FortuneWheelManager : MonoBehaviourSingleton<FortuneWheelManager>
 				lastUpdateTime = ret.result.lastUpdateTime;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendInfo(Action<bool> call_back)
@@ -120,7 +120,7 @@ public class FortuneWheelManager : MonoBehaviourSingleton<FortuneWheelManager>
 				lastUpdateTime = WheelData.lastUpdateTime;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void BuyTicket(int numTicket, Action<bool> call_back)
@@ -137,6 +137,6 @@ public class FortuneWheelManager : MonoBehaviourSingleton<FortuneWheelManager>
 				obj = true;
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 }

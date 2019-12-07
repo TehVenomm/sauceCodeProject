@@ -13,7 +13,7 @@ public class AccountPopupAdjuster : GameSection
 		}
 		popAdjustBeforeList.Add(pop_text);
 		char[] array = pop_text.ToCharArray();
-		Array.Reverse(array);
+		Array.Reverse((Array)array);
 		string text = new string(array);
 		int num = lbl.CalculateOffsetToFit(text);
 		string empty = string.Empty;
@@ -22,7 +22,7 @@ public class AccountPopupAdjuster : GameSection
 			empty = text.Substring(num - 1);
 			empty = "…" + empty;
 			char[] array2 = empty.ToCharArray();
-			Array.Reverse(array2);
+			Array.Reverse((Array)array2);
 			return new string(array2);
 		}
 		return pop_text;

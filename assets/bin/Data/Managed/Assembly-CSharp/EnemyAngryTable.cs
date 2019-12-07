@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class EnemyAngryTable : Singleton<EnemyAngryTable>, IDataTable
@@ -37,15 +36,9 @@ public class EnemyAngryTable : Singleton<EnemyAngryTable>, IDataTable
 
 	private UIntKeyTable<Data> dataTable;
 
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache0;
-
-	[CompilerGenerated]
-	private static TableUtility.CallBackUIntKeyReadCSV<Data> _003C_003Ef__mg_0024cache1;
-
 	public void CreateTable(TextAsset textasset)
 	{
-		CreateTable(textasset.get_text());
+		CreateTable(textasset.text);
 	}
 
 	public void CreateTable(string text)
@@ -56,7 +49,7 @@ public class EnemyAngryTable : Singleton<EnemyAngryTable>, IDataTable
 
 	public void AddTable(TextAsset textasset)
 	{
-		TableUtility.AddUIntKeyTable(dataTable, textasset.get_text(), Data.cb, "id,condition,value1,value2,value3,value4");
+		TableUtility.AddUIntKeyTable(dataTable, textasset.text, Data.cb, "id,condition,value1,value2,value3,value4");
 	}
 
 	public Data GetData(uint id)

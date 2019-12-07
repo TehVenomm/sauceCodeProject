@@ -56,7 +56,7 @@ namespace BestHTTP.WebSocket.Frames
 				stream.Read(array, 0, 2);
 				if (BitConverter.IsLittleEndian)
 				{
-					Array.Reverse(array, 0, array.Length);
+					Array.Reverse((Array)array, 0, array.Length);
 				}
 				Length = BitConverter.ToUInt16(array, 0);
 			}
@@ -66,7 +66,7 @@ namespace BestHTTP.WebSocket.Frames
 				stream.Read(array2, 0, 8);
 				if (BitConverter.IsLittleEndian)
 				{
-					Array.Reverse(array2, 0, array2.Length);
+					Array.Reverse((Array)array2, 0, array2.Length);
 				}
 				Length = BitConverter.ToUInt64(array2, 0);
 			}

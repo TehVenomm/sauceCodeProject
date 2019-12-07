@@ -52,14 +52,14 @@ public class FieldCarriableGimmickObject : FieldGimmickObject
 	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
 	{
 		base.Initialize(pointData);
-		parentTrans = GetTransform().get_parent();
+		parentTrans = GetTransform().parent;
 		isCarrying = false;
-		if (modelIndexes.Length > 0)
+		if (modelIndexes.Length != 0)
 		{
 			modelIndex = modelIndexes[0];
 		}
-		this.get_gameObject().SetActive(false);
-		GetTransform().get_gameObject().SetActive(false);
+		base.gameObject.SetActive(value: false);
+		GetTransform().gameObject.SetActive(value: false);
 	}
 
 	protected override void ParseParam(string value2)
@@ -89,8 +89,8 @@ public class FieldCarriableGimmickObject : FieldGimmickObject
 					list.Add(int.Parse(array2[1]));
 				}
 			}
-			string text = array2[0];
-			if (text != null && text == "ml")
+			string a = array2[0];
+			if (a == "ml")
 			{
 				maxLv = Mathf.Max(0, int.Parse(array2[1]) - 1);
 			}
@@ -108,32 +108,13 @@ public class FieldCarriableGimmickObject : FieldGimmickObject
 
 	public override void UpdateTargetMarker(bool isNear)
 	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
 		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
 		if (isNear && self != null && self.IsChangeableAction(GetTargetActionId()))
 		{
 			Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-			Vector3 position = cameraTransform.get_position();
-			Quaternion rotation = cameraTransform.get_rotation();
-			Vector3 val = position - GetTransform().get_position();
-			Vector3 pos = val.get_normalized() + Vector3.get_up() + GetTransform().get_position();
+			Vector3 position = cameraTransform.position;
+			Quaternion rotation = cameraTransform.rotation;
+			Vector3 pos = (position - GetTransform().position).normalized + Vector3.up + GetTransform().position;
 			if (self.carryingGimmickObject is FieldCarriableEvolveItemGimmickObject && CanEvolve())
 			{
 				if (evolveMarkerTrans == null)
@@ -146,7 +127,7 @@ public class FieldCarriableGimmickObject : FieldGimmickObject
 				}
 				if (carryMarkerTrans != null)
 				{
-					EffectManager.ReleaseEffect(carryMarkerTrans.get_gameObject());
+					EffectManager.ReleaseEffect(carryMarkerTrans.gameObject);
 					carryMarkerTrans = null;
 				}
 				return;
@@ -163,7 +144,7 @@ public class FieldCarriableGimmickObject : FieldGimmickObject
 				}
 				if (evolveMarkerTrans != null)
 				{
-					EffectManager.ReleaseEffect(evolveMarkerTrans.get_gameObject());
+					EffectManager.ReleaseEffect(evolveMarkerTrans.gameObject);
 					evolveMarkerTrans = null;
 				}
 				return;
@@ -171,12 +152,12 @@ public class FieldCarriableGimmickObject : FieldGimmickObject
 		}
 		if (carryMarkerTrans != null)
 		{
-			EffectManager.ReleaseEffect(carryMarkerTrans.get_gameObject());
+			EffectManager.ReleaseEffect(carryMarkerTrans.gameObject);
 			carryMarkerTrans = null;
 		}
 		if (evolveMarkerTrans != null)
 		{
-			EffectManager.ReleaseEffect(evolveMarkerTrans.get_gameObject());
+			EffectManager.ReleaseEffect(evolveMarkerTrans.gameObject);
 			evolveMarkerTrans = null;
 		}
 	}
@@ -231,12 +212,20 @@ public class FieldCarriableGimmickObject : FieldGimmickObject
 
 	public virtual bool CanCarry()
 	{
-		return this.get_gameObject().get_activeSelf() && !isCarrying;
+		if (base.gameObject.activeSelf)
+		{
+			return !isCarrying;
+		}
+		return false;
 	}
 
 	public virtual bool CanEvolve()
 	{
-		return currentLv < maxLv && currentLv < modelIndexes.Length - 1;
+		if (currentLv < maxLv)
+		{
+			return currentLv < modelIndexes.Length - 1;
+		}
+		return false;
 	}
 
 	public virtual bool HasDeploied()
@@ -249,27 +238,21 @@ public class FieldCarriableGimmickObject : FieldGimmickObject
 		isCarrying = true;
 		if (shadowTrans != null)
 		{
-			shadowTrans.get_gameObject().SetActive(false);
+			shadowTrans.gameObject.SetActive(value: false);
 		}
 		OnStartCarry(player);
 	}
 
 	public void EndCarry()
 	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 		GetTransform().SetParent(parentTrans);
-		Vector3 localPosition = GetTransform().get_localPosition();
+		Vector3 localPosition = GetTransform().localPosition;
 		localPosition.y = 0f;
-		GetTransform().set_localPosition(localPosition);
-		Quaternion localRotation = GetTransform().get_localRotation();
+		GetTransform().localPosition = localPosition;
+		Quaternion localRotation = GetTransform().localRotation;
 		localRotation.x = 0f;
 		localRotation.z = 0f;
-		GetTransform().set_localRotation(localRotation);
+		GetTransform().localRotation = localRotation;
 		if (!hasDeploied)
 		{
 			if (IsDefenseTool() && MonoBehaviourSingleton<InGameProgress>.IsValid())
@@ -280,7 +263,7 @@ public class FieldCarriableGimmickObject : FieldGimmickObject
 		}
 		if (shadowTrans != null)
 		{
-			shadowTrans.get_gameObject().SetActive(true);
+			shadowTrans.gameObject.SetActive(value: true);
 		}
 		isCarrying = false;
 		OnEndCarry();
@@ -303,7 +286,7 @@ public class FieldCarriableGimmickObject : FieldGimmickObject
 	{
 		if (CanEvolve())
 		{
-			Object.Destroy(modelTrans.get_gameObject());
+			Object.Destroy(modelTrans.gameObject);
 			currentLv++;
 			modelIndex = modelIndexes[currentLv];
 			CreateModel();
@@ -313,11 +296,8 @@ public class FieldCarriableGimmickObject : FieldGimmickObject
 
 	protected virtual void OnEvolved()
 	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		EffectManager.OneShot(kEvolveEffectName, GetTransform().get_position(), GetTransform().get_rotation());
-		SoundManager.PlayOneShotSE(kEvolveSEId, GetTransform().get_position());
+		EffectManager.OneShot(kEvolveEffectName, GetTransform().position, GetTransform().rotation);
+		SoundManager.PlayOneShotSE(kEvolveSEId, GetTransform().position);
 	}
 
 	public static List<int> GetModelIndexes(string value2)
@@ -348,12 +328,11 @@ public class FieldCarriableGimmickObject : FieldGimmickObject
 
 	public void SetCarriableGimmickInfo(Coop_Model_StageInfo.FieldCarriableGimmickInfo info)
 	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		GetTransform().set_position(info.position);
-		this.get_gameObject().SetActive(info.enable);
+		GetTransform().position = info.position;
+		base.gameObject.SetActive(info.enable);
 		if (currentLv != info.currentLv)
 		{
-			Object.Destroy(modelTrans.get_gameObject());
+			Object.Destroy(modelTrans.gameObject);
 			modelIndex = modelIndexes[info.currentLv];
 			CreateModel();
 		}
@@ -362,13 +341,12 @@ public class FieldCarriableGimmickObject : FieldGimmickObject
 
 	public Coop_Model_StageInfo.FieldCarriableGimmickInfo GetCarriableGimmickInfo()
 	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		Coop_Model_StageInfo.FieldCarriableGimmickInfo fieldCarriableGimmickInfo = new Coop_Model_StageInfo.FieldCarriableGimmickInfo();
-		fieldCarriableGimmickInfo.pointId = GetId();
-		fieldCarriableGimmickInfo.position = GetTransform().get_position();
-		fieldCarriableGimmickInfo.enable = this.get_gameObject().get_activeSelf();
-		fieldCarriableGimmickInfo.currentLv = currentLv;
-		return fieldCarriableGimmickInfo;
+		return new Coop_Model_StageInfo.FieldCarriableGimmickInfo
+		{
+			pointId = GetId(),
+			position = GetTransform().position,
+			enable = base.gameObject.activeSelf,
+			currentLv = currentLv
+		};
 	}
 }

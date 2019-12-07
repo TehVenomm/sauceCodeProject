@@ -35,7 +35,7 @@ public class GameSectionHierarchy
 		{
 			typedDatas[type] = null;
 		}
-		Object.DestroyImmediate(hierarchy_data.section.get_gameObject());
+		UnityEngine.Object.DestroyImmediate(hierarchy_data.section.gameObject);
 		hierarchyList.Remove(hierarchy_data);
 	}
 
@@ -104,12 +104,12 @@ public class GameSectionHierarchy
 	{
 		GameSection gameSection = null;
 		HierarchyData last = GetLast();
-		Transform parent = (last != null) ? last.section._transform : MonoBehaviourSingleton<UIManager>.I.uiCamera.get_transform();
+		Transform parent = (last == null) ? MonoBehaviourSingleton<UIManager>.I.uiCamera.transform : last.section._transform;
 		if (section_data.type == GAME_SECTION_TYPE.COMMON_DIALOG)
 		{
 			gameSection = (Utility.CreateGameObjectAndComponent(section_data.typeParams[0], parent, 5) as GameSection);
 			gameSection.baseDepth = GetPrefabUIDepth(section_data.type);
-			gameSection.set_name(section_data.sectionName);
+			gameSection.name = section_data.sectionName;
 			parent = gameSection._transform;
 		}
 		int i = 0;
@@ -120,22 +120,22 @@ public class GameSectionHierarchy
 			{
 				continue;
 			}
-			GameObject val = loadObject.loadedObject as GameObject;
-			if (!(val != null))
+			GameObject gameObject = loadObject.loadedObject as GameObject;
+			if (!(gameObject != null))
 			{
 				continue;
 			}
-			if (val.GetComponent<UIVirtualScreen>() != null)
+			if (gameObject.GetComponent<UIVirtualScreen>() != null)
 			{
 				Type type = null;
 				if (gameSection == null)
 				{
 					type = Type.GetType(section_data.sectionName);
 				}
-				UIBehaviour uIBehaviour = UIManager.CreatePrefabUI(val, loadObject.PopInstantiatedGameObject(), type, initVisible: false, parent, GetPrefabUIDepth(section_data.type), section_data);
+				UIBehaviour uIBehaviour = UIManager.CreatePrefabUI(gameObject, loadObject.PopInstantiatedGameObject(), type, initVisible: false, parent, GetPrefabUIDepth(section_data.type), section_data);
 				if (gameSection == null && section_data.type == GAME_SECTION_TYPE.COMMON_DIALOG)
 				{
-					gameSection = (uIBehaviour.get_gameObject().AddComponent(Type.GetType(section_data.typeParams[0])) as GameSection);
+					gameSection = (uIBehaviour.gameObject.AddComponent(Type.GetType(section_data.typeParams[0])) as GameSection);
 					parent = gameSection._transform;
 					continue;
 				}
@@ -162,11 +162,11 @@ public class GameSectionHierarchy
 			}
 			else if (gameSection != null)
 			{
-				gameSection.AddPrefab(val, loadObject.PopInstantiatedGameObject());
+				gameSection.AddPrefab(gameObject, loadObject.PopInstantiatedGameObject());
 			}
 			else
 			{
-				Log.Warning(LOG.GAMESCENE, "[{0}] is not used.", val.get_name());
+				Log.Warning(LOG.GAMESCENE, "[{0}] is not used.", gameObject.name);
 			}
 		}
 		if (gameSection == null)

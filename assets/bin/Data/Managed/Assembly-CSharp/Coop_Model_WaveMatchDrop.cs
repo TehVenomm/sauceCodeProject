@@ -17,7 +17,7 @@ public class Coop_Model_WaveMatchDrop : Coop_Model_Base
 
 	public override string ToString()
 	{
-		string str_fiIds = string.Empty;
+		string str_fiIds = "";
 		if (fiIds != null)
 		{
 			fiIds.ForEach(delegate(int id)
@@ -25,11 +25,10 @@ public class Coop_Model_WaveMatchDrop : Coop_Model_Base
 				str_fiIds = str_fiIds + id + ",";
 			});
 		}
-		string empty = string.Empty;
-		empty = empty + ",id=" + str_fiIds.Trim(',');
-		string text = empty;
-		empty = text + ",pos(" + x + ", " + z + ")";
-		empty = empty + ",sec=" + sec;
-		return base.ToString() + empty;
+		string str = "";
+		str = str + ",id=" + str_fiIds.Trim(',');
+		str = str + ",pos(" + x + ", " + z + ")";
+		str = str + ",sec=" + sec;
+		return base.ToString() + str;
 	}
 }

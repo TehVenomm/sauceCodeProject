@@ -56,11 +56,6 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 		private set;
 	}
 
-	public GachaManager()
-	{
-		gachaData = new GachaList();
-	}
-
 	public bool IsMultiResult()
 	{
 		return gachaResultList.Count > 1;
@@ -122,7 +117,16 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 
 	public bool IsSelectTutorialGacha()
 	{
-		return selectGachaRealType == GACHA_TYPE.TUTORIAL1 || selectGachaRealType == GACHA_TYPE.TUTORIAL2;
+		if (selectGachaRealType != GACHA_TYPE.TUTORIAL1)
+		{
+			return selectGachaRealType == GACHA_TYPE.TUTORIAL2;
+		}
+		return true;
+	}
+
+	public GachaManager()
+	{
+		gachaData = new GachaList();
 	}
 
 	public void Dirty()
@@ -281,10 +285,9 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 		}
 		if (selectGachaType == GACHA_TYPE.QUEST)
 		{
-			int count = result.reward.Count;
-			int[] array = new int[count];
+			int[] array = new int[result.reward.Count];
 			int i = 0;
-			for (int count2 = result.reward.Count; i < count2; i++)
+			for (int count = result.reward.Count; i < count; i++)
 			{
 				array[i] = result.reward[i].itemId;
 			}
@@ -307,7 +310,7 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 		{
 			int[] array2 = new int[result.reward.Count];
 			int j = 0;
-			for (int count3 = result.reward.Count; j < count3; j++)
+			for (int count2 = result.reward.Count; j < count2; j++)
 			{
 				array2[j] = result.reward[j].itemId;
 			}
@@ -388,31 +391,30 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 				{
 					type.groups.ForEach(delegate(GachaList.GachaGroup gr)
 					{
-						List<GachaList.Gacha> oncePurchaseGachaList = (from g in gr.gachas
-						where g.IsOncePurchase()
-						select g).ToList();
+						List<GachaList.Gacha> oncePurchaseGachaList = gr.gachas.Where((GachaList.Gacha g) => g.IsOncePurchase()).ToList();
 						int num = oncePurchaseGachaList.Count();
+						int gachaId = default(int);
+						int targetSubGroup = default(int);
 						for (int i = 0; i < num; i++)
 						{
 							GachaList.Gacha gacha = oncePurchaseGachaList.ElementAt(i);
-							int gachaId = gacha.gachaId;
-							List<GachaList.Gacha> list = (from g in gr.gachas
-							where g.gachaId == gachaId
-							where oncePurchaseGachaList.IndexOf(g) == -1
-							select g).ToList();
-							if (list.Count > 0)
+							gachaId = gacha.gachaId;
+							if ((from g in gr.gachas
+								where g.gachaId == gachaId
+								where oncePurchaseGachaList.IndexOf(g) == -1
+								select g).ToList().Count > 0)
 							{
 								gr.gachas.Remove(gacha);
-								int targetSubGroup = (from g in gr.gachas
-								where g.gachaId == gachaId
-								select g.subGroup).First();
+								targetSubGroup = (from g in gr.gachas
+									where g.gachaId == gachaId
+									select g.subGroup).First();
 								int index = (from ano in gr.gachas.Select((GachaList.Gacha g, int j) => new
-								{
-									Content = g,
-									Index = j
-								})
-								where ano.Content.subGroup == targetSubGroup
-								select ano.Index).First();
+									{
+										Content = g,
+										Index = j
+									})
+									where ano.Content.subGroup == targetSubGroup
+									select ano.Index).First();
 								gr.gachas.Insert(index, gacha);
 							}
 						}
@@ -421,7 +423,7 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 				Dirty();
 			}
 			call_back(obj);
-		}, string.Empty);
+		});
 	}
 
 	public void SendGachaGacha(int gachaId, int requiredItemId, string productId, int campaignId, int campaignType, int remainCount, int userCount, bool isStepUpTicket, int seriesId, Action<Error> call_back)
@@ -439,7 +441,7 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 		requestSendForm.seriesId = seriesId;
 		gachaResultList = new List<GachaResult>();
 		gachaResultBonus = null;
-		int presentNum = MonoBehaviourSingleton<PresentManager>.I.presentNum;
+		_ = MonoBehaviourSingleton<PresentManager>.I.presentNum;
 		Protocol.Send(GachaGachaModel.URL, requestSendForm, delegate(GachaGachaModel ret)
 		{
 			if (ret.Error == Error.None)
@@ -476,12 +478,16 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 				}
 			}
 			call_back(ret.Error);
-		}, string.Empty);
+		});
 	}
 
 	public bool IsTutorial()
 	{
-		return IsTutorialQuestGacha() || IsTutorialSkillGacha();
+		if (!IsTutorialQuestGacha())
+		{
+			return IsTutorialSkillGacha();
+		}
+		return true;
 	}
 
 	public bool IsTutorialQuestGacha()
@@ -526,8 +532,7 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 
 	public DateTime GetTimeShowShopAdvertisement()
 	{
-		string @string = PlayerPrefs.GetString("SHOP_TOP_ADVERTISEMENT");
-		return DateTime.FromBinary(Convert.ToInt64(@string));
+		return DateTime.FromBinary(Convert.ToInt64(PlayerPrefs.GetString("SHOP_TOP_ADVERTISEMENT")));
 	}
 
 	public string CreateButtonBaseName(GachaList.Gacha gacha, GachaGuaranteeCampaignInfo guarantee, bool resultScene = false)
@@ -540,7 +545,7 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 		if (guarantee != null && guarantee.IsValid())
 		{
 			string buttonImageName = guarantee.GetButtonImageName();
-			if (buttonImageName != string.Empty)
+			if (buttonImageName != "")
 			{
 				text = buttonImageName;
 			}
@@ -559,7 +564,7 @@ public class GachaManager : MonoBehaviourSingleton<GachaManager>
 		}
 		if (string.IsNullOrEmpty(text))
 		{
-			text = "BTN_GACHA_NORMAL1" + ((gacha.num != 1) ? "0" : string.Empty);
+			text = "BTN_GACHA_NORMAL1" + ((gacha.num == 1) ? "" : "0");
 		}
 		return text;
 	}
