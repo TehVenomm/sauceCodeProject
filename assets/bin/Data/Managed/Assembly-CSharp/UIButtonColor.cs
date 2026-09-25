@@ -1,343 +1,259 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIButtonColor
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Button Color")]
 public class UIButtonColor : UIWidgetContainer
 {
-	public enum State
-	{
-		Normal,
-		Hover,
-		Pressed,
-		Disabled
-	}
+  public GameObject tweenTarget;
+  public Color hover = new Color(0.882352948f, 0.784313738f, 0.5882353f, 1f);
+  public Color pressed = new Color(0.7176471f, 0.6392157f, 0.482352942f, 1f);
+  public Color disabledColor = Color.grey;
+  public float duration = 0.2f;
+  [NonSerialized]
+  protected Color mStartingColor;
+  [NonSerialized]
+  protected Color mDefaultColor;
+  [NonSerialized]
+  protected bool mInitDone;
+  [NonSerialized]
+  protected UIWidget mWidget;
+  [NonSerialized]
+  protected UIButtonColor.State mState;
 
-	public GameObject tweenTarget;
+  public UIButtonColor.State state
+  {
+    get => this.mState;
+    set => this.SetState(value, false);
+  }
 
-	public Color hover = new Color(0.882352948f, 0.784313738f, 0.5882353f, 1f);
+  public Color defaultColor
+  {
+    get
+    {
+      if (!this.mInitDone)
+        this.OnInit();
+      return this.mDefaultColor;
+    }
+    set
+    {
+      if (!this.mInitDone)
+        this.OnInit();
+      this.mDefaultColor = value;
+      UIButtonColor.State mState = this.mState;
+      this.mState = UIButtonColor.State.Disabled;
+      this.SetState(mState, false);
+    }
+  }
 
-	public Color pressed = new Color(0.7176471f, 0.6392157f, 0.482352942f, 1f);
+  public virtual bool isEnabled
+  {
+    get => ((Behaviour) this).enabled;
+    set => ((Behaviour) this).enabled = value;
+  }
 
-	public Color disabledColor = Color.get_grey();
+  public void ResetDefaultColor() => this.defaultColor = this.mStartingColor;
 
-	public float duration = 0.2f;
+  public void CacheDefaultColor()
+  {
+    if (this.mInitDone)
+      return;
+    this.OnInit();
+  }
 
-	[NonSerialized]
-	protected Color mStartingColor;
+  private void Start()
+  {
+    if (!this.mInitDone)
+      this.OnInit();
+    if (this.isEnabled)
+      return;
+    this.SetState(UIButtonColor.State.Disabled, true);
+  }
 
-	[NonSerialized]
-	protected Color mDefaultColor;
+  protected virtual void OnInit()
+  {
+    this.mInitDone = true;
+    if (Object.op_Equality((Object) this.tweenTarget, (Object) null))
+      this.tweenTarget = ((Component) this).gameObject;
+    if (Object.op_Inequality((Object) this.tweenTarget, (Object) null))
+      this.mWidget = this.tweenTarget.GetComponent<UIWidget>();
+    if (Object.op_Inequality((Object) this.mWidget, (Object) null))
+    {
+      this.mDefaultColor = this.mWidget.color;
+      this.mStartingColor = this.mDefaultColor;
+    }
+    else
+    {
+      if (!Object.op_Inequality((Object) this.tweenTarget, (Object) null))
+        return;
+      Renderer component1 = this.tweenTarget.GetComponent<Renderer>();
+      if (Object.op_Inequality((Object) component1, (Object) null))
+      {
+        this.mDefaultColor = Application.isPlaying ? component1.material.color : component1.sharedMaterial.color;
+        this.mStartingColor = this.mDefaultColor;
+      }
+      else
+      {
+        Light component2 = this.tweenTarget.GetComponent<Light>();
+        if (Object.op_Inequality((Object) component2, (Object) null))
+        {
+          this.mDefaultColor = component2.color;
+          this.mStartingColor = this.mDefaultColor;
+        }
+        else
+        {
+          this.tweenTarget = (GameObject) null;
+          this.mInitDone = false;
+        }
+      }
+    }
+  }
 
-	[NonSerialized]
-	protected bool mInitDone;
+  protected virtual void OnEnable()
+  {
+    if (this.mInitDone)
+      this.OnHover(UICamera.IsHighlighted(((Component) this).gameObject));
+    if (UICamera.currentTouch == null)
+      return;
+    if (Object.op_Equality((Object) UICamera.currentTouch.pressed, (Object) ((Component) this).gameObject))
+    {
+      this.OnPress(true);
+    }
+    else
+    {
+      if (!Object.op_Equality((Object) UICamera.currentTouch.current, (Object) ((Component) this).gameObject))
+        return;
+      this.OnHover(true);
+    }
+  }
 
-	[NonSerialized]
-	protected UIWidget mWidget;
+  protected virtual void OnDisable()
+  {
+    if (!this.mInitDone || !Object.op_Inequality((Object) this.tweenTarget, (Object) null))
+      return;
+    this.SetState(UIButtonColor.State.Normal, true);
+    TweenColor component = this.tweenTarget.GetComponent<TweenColor>();
+    if (!Object.op_Inequality((Object) component, (Object) null))
+      return;
+    component.value = this.mDefaultColor;
+    ((Behaviour) component).enabled = false;
+  }
 
-	[NonSerialized]
-	protected State mState;
+  protected virtual void OnHover(bool isOver)
+  {
+    if (!this.isEnabled)
+      return;
+    if (!this.mInitDone)
+      this.OnInit();
+    if (!Object.op_Inequality((Object) this.tweenTarget, (Object) null))
+      return;
+    this.SetState(isOver ? UIButtonColor.State.Hover : UIButtonColor.State.Normal, false);
+  }
 
-	public State state
-	{
-		get
-		{
-			return mState;
-		}
-		set
-		{
-			SetState(value, false);
-		}
-	}
+  protected virtual void OnPress(bool isPressed)
+  {
+    if (!this.isEnabled || UICamera.currentTouch == null)
+      return;
+    if (!this.mInitDone)
+      this.OnInit();
+    if (!Object.op_Inequality((Object) this.tweenTarget, (Object) null))
+      return;
+    if (isPressed)
+      this.SetState(UIButtonColor.State.Pressed, false);
+    else if (Object.op_Equality((Object) UICamera.currentTouch.current, (Object) ((Component) this).gameObject))
+    {
+      switch (UICamera.currentScheme)
+      {
+        case UICamera.ControlScheme.Mouse:
+          if (Object.op_Equality((Object) UICamera.hoveredObject, (Object) ((Component) this).gameObject))
+          {
+            this.SetState(UIButtonColor.State.Hover, false);
+            return;
+          }
+          break;
+        case UICamera.ControlScheme.Controller:
+          this.SetState(UIButtonColor.State.Hover, false);
+          return;
+      }
+      this.SetState(UIButtonColor.State.Normal, false);
+    }
+    else
+      this.SetState(UIButtonColor.State.Normal, false);
+  }
 
-	public Color defaultColor
-	{
-		get
-		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			if (!mInitDone)
-			{
-				OnInit();
-			}
-			return mDefaultColor;
-		}
-		set
-		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			if (!mInitDone)
-			{
-				OnInit();
-			}
-			mDefaultColor = value;
-			State state = mState;
-			mState = State.Disabled;
-			SetState(state, false);
-		}
-	}
+  protected virtual void OnDragOver()
+  {
+    if (!this.isEnabled)
+      return;
+    if (!this.mInitDone)
+      this.OnInit();
+    if (!Object.op_Inequality((Object) this.tweenTarget, (Object) null))
+      return;
+    this.SetState(UIButtonColor.State.Pressed, false);
+  }
 
-	public virtual bool isEnabled
-	{
-		get
-		{
-			return this.get_enabled();
-		}
-		set
-		{
-			this.set_enabled(value);
-		}
-	}
+  protected virtual void OnDragOut()
+  {
+    if (!this.isEnabled)
+      return;
+    if (!this.mInitDone)
+      this.OnInit();
+    if (!Object.op_Inequality((Object) this.tweenTarget, (Object) null))
+      return;
+    this.SetState(UIButtonColor.State.Normal, false);
+  }
 
-	public void ResetDefaultColor()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		defaultColor = mStartingColor;
-	}
+  public virtual void SetState(UIButtonColor.State state, bool instant)
+  {
+    if (!this.mInitDone)
+    {
+      this.mInitDone = true;
+      this.OnInit();
+    }
+    if (this.mState == state)
+      return;
+    this.mState = state;
+    this.UpdateColor(instant);
+  }
 
-	public void CacheDefaultColor()
-	{
-		if (!mInitDone)
-		{
-			OnInit();
-		}
-	}
+  public void UpdateColor(bool instant)
+  {
+    if (!Object.op_Inequality((Object) this.tweenTarget, (Object) null))
+      return;
+    TweenColor tweenColor;
+    switch (this.mState)
+    {
+      case UIButtonColor.State.Hover:
+        tweenColor = TweenColor.Begin(this.tweenTarget, this.duration, this.hover);
+        break;
+      case UIButtonColor.State.Pressed:
+        tweenColor = TweenColor.Begin(this.tweenTarget, this.duration, this.pressed);
+        break;
+      case UIButtonColor.State.Disabled:
+        tweenColor = TweenColor.Begin(this.tweenTarget, this.duration, this.disabledColor);
+        break;
+      default:
+        tweenColor = TweenColor.Begin(this.tweenTarget, this.duration, this.mDefaultColor);
+        break;
+    }
+    if (!instant || !Object.op_Inequality((Object) tweenColor, (Object) null))
+      return;
+    tweenColor.value = tweenColor.to;
+    ((Behaviour) tweenColor).enabled = false;
+  }
 
-	private void Start()
-	{
-		if (!mInitDone)
-		{
-			OnInit();
-		}
-		if (!isEnabled)
-		{
-			SetState(State.Disabled, true);
-		}
-	}
-
-	protected virtual void OnInit()
-	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Expected O, but got Unknown
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-		mInitDone = true;
-		if (tweenTarget == null)
-		{
-			tweenTarget = this.get_gameObject();
-		}
-		if (tweenTarget != null)
-		{
-			mWidget = tweenTarget.GetComponent<UIWidget>();
-		}
-		if (mWidget != null)
-		{
-			mDefaultColor = mWidget.color;
-			mStartingColor = mDefaultColor;
-		}
-		else if (tweenTarget != null)
-		{
-			Renderer component = tweenTarget.GetComponent<Renderer>();
-			if (component != null)
-			{
-				mDefaultColor = ((!Application.get_isPlaying()) ? component.get_sharedMaterial().get_color() : component.get_material().get_color());
-				mStartingColor = mDefaultColor;
-			}
-			else
-			{
-				Light component2 = tweenTarget.GetComponent<Light>();
-				if (component2 != null)
-				{
-					mDefaultColor = component2.get_color();
-					mStartingColor = mDefaultColor;
-				}
-				else
-				{
-					tweenTarget = null;
-					mInitDone = false;
-				}
-			}
-		}
-	}
-
-	protected virtual void OnEnable()
-	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		if (mInitDone)
-		{
-			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
-		}
-		if (UICamera.currentTouch != null)
-		{
-			if (UICamera.currentTouch.pressed == this.get_gameObject())
-			{
-				OnPress(true);
-			}
-			else if (UICamera.currentTouch.current == this.get_gameObject())
-			{
-				OnHover(true);
-			}
-		}
-	}
-
-	protected virtual void OnDisable()
-	{
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		if (mInitDone && tweenTarget != null)
-		{
-			SetState(State.Normal, true);
-			TweenColor component = tweenTarget.GetComponent<TweenColor>();
-			if (component != null)
-			{
-				component.value = mDefaultColor;
-				component.set_enabled(false);
-			}
-		}
-	}
-
-	protected virtual void OnHover(bool isOver)
-	{
-		if (isEnabled)
-		{
-			if (!mInitDone)
-			{
-				OnInit();
-			}
-			if (tweenTarget != null)
-			{
-				SetState(isOver ? State.Hover : State.Normal, false);
-			}
-		}
-	}
-
-	protected virtual void OnPress(bool isPressed)
-	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		if (isEnabled && UICamera.currentTouch != null)
-		{
-			if (!mInitDone)
-			{
-				OnInit();
-			}
-			if (tweenTarget != null)
-			{
-				if (isPressed)
-				{
-					SetState(State.Pressed, false);
-				}
-				else if (UICamera.currentTouch.current == this.get_gameObject())
-				{
-					if (UICamera.currentScheme == UICamera.ControlScheme.Controller)
-					{
-						SetState(State.Hover, false);
-					}
-					else if (UICamera.currentScheme == UICamera.ControlScheme.Mouse && UICamera.hoveredObject == this.get_gameObject())
-					{
-						SetState(State.Hover, false);
-					}
-					else
-					{
-						SetState(State.Normal, false);
-					}
-				}
-				else
-				{
-					SetState(State.Normal, false);
-				}
-			}
-		}
-	}
-
-	protected virtual void OnDragOver()
-	{
-		if (isEnabled)
-		{
-			if (!mInitDone)
-			{
-				OnInit();
-			}
-			if (tweenTarget != null)
-			{
-				SetState(State.Pressed, false);
-			}
-		}
-	}
-
-	protected virtual void OnDragOut()
-	{
-		if (isEnabled)
-		{
-			if (!mInitDone)
-			{
-				OnInit();
-			}
-			if (tweenTarget != null)
-			{
-				SetState(State.Normal, false);
-			}
-		}
-	}
-
-	public virtual void SetState(State state, bool instant)
-	{
-		if (!mInitDone)
-		{
-			mInitDone = true;
-			OnInit();
-		}
-		if (mState != state)
-		{
-			mState = state;
-			UpdateColor(instant);
-		}
-	}
-
-	public void UpdateColor(bool instant)
-	{
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		if (tweenTarget != null)
-		{
-			TweenColor tweenColor;
-			switch (mState)
-			{
-			case State.Hover:
-				tweenColor = TweenColor.Begin(tweenTarget, duration, hover);
-				break;
-			case State.Pressed:
-				tweenColor = TweenColor.Begin(tweenTarget, duration, pressed);
-				break;
-			case State.Disabled:
-				tweenColor = TweenColor.Begin(tweenTarget, duration, disabledColor);
-				break;
-			default:
-				tweenColor = TweenColor.Begin(tweenTarget, duration, mDefaultColor);
-				break;
-			}
-			if (instant && tweenColor != null)
-			{
-				tweenColor.value = tweenColor.to;
-				tweenColor.set_enabled(false);
-			}
-		}
-	}
+  public enum State
+  {
+    Normal,
+    Hover,
+    Pressed,
+    Disabled,
+  }
 }

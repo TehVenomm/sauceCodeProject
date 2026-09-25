@@ -1,3 +1,9 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: OnePF.JSON
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,750 +11,657 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-namespace OnePF
+#nullable disable
+namespace OnePF;
+
+public class JSON
 {
-	public class JSON
-	{
-		private sealed class _JSON
-		{
-			private sealed class Parser : IDisposable
-			{
-				private enum TOKEN
-				{
-					NONE,
-					CURLY_OPEN,
-					CURLY_CLOSE,
-					SQUARED_OPEN,
-					SQUARED_CLOSE,
-					COLON,
-					COMMA,
-					STRING,
-					NUMBER,
-					TRUE,
-					FALSE,
-					NULL
-				}
+  public Dictionary<string, object> fields = new Dictionary<string, object>();
 
-				private const string WHITE_SPACE = " \t\n\r";
+  public JSON()
+  {
+  }
 
-				private const string WORD_BREAK = " \t\n\r{}[],:\"";
+  public JSON(string jsonString) => this.serialized = jsonString;
 
-				private StringReader json;
+  public object this[string fieldName]
+  {
+    get => this.fields.ContainsKey(fieldName) ? this.fields[fieldName] : (object) null;
+    set
+    {
+      if (this.fields.ContainsKey(fieldName))
+        this.fields[fieldName] = value;
+      else
+        this.fields.Add(fieldName, value);
+    }
+  }
 
-				private char PeekChar => Convert.ToChar(json.Peek());
+  public string ToString(string fieldName)
+  {
+    return this.fields.ContainsKey(fieldName) ? Convert.ToString(this.fields[fieldName]) : "";
+  }
 
-				private char NextChar => Convert.ToChar(json.Read());
+  public int ToInt(string fieldName)
+  {
+    return this.fields.ContainsKey(fieldName) ? Convert.ToInt32(this.fields[fieldName]) : 0;
+  }
 
-				private string NextWord
-				{
-					get
-					{
-						StringBuilder stringBuilder = new StringBuilder();
-						while (" \t\n\r{}[],:\"".IndexOf(PeekChar) == -1)
-						{
-							stringBuilder.Append(NextChar);
-							if (json.Peek() == -1)
-							{
-								break;
-							}
-						}
-						return stringBuilder.ToString();
-					}
-				}
+  public long ToLong(string fieldName)
+  {
+    return this.fields.ContainsKey(fieldName) ? Convert.ToInt64(this.fields[fieldName]) : 0L;
+  }
 
-				private TOKEN NextToken
-				{
-					get
-					{
-						EatWhitespace();
-						if (json.Peek() != -1)
-						{
-							switch (PeekChar)
-							{
-							case '{':
-								return TOKEN.CURLY_OPEN;
-							case '}':
-								json.Read();
-								return TOKEN.CURLY_CLOSE;
-							case '[':
-								return TOKEN.SQUARED_OPEN;
-							case ']':
-								json.Read();
-								return TOKEN.SQUARED_CLOSE;
-							case ',':
-								json.Read();
-								return TOKEN.COMMA;
-							case '"':
-								return TOKEN.STRING;
-							case ':':
-								return TOKEN.COLON;
-							case '-':
-							case '0':
-							case '1':
-							case '2':
-							case '3':
-							case '4':
-							case '5':
-							case '6':
-							case '7':
-							case '8':
-							case '9':
-								return TOKEN.NUMBER;
-							default:
-							{
-								string nextWord = NextWord;
-								switch (nextWord)
-								{
-								case "false":
-									return TOKEN.FALSE;
-								case "true":
-									return TOKEN.TRUE;
-								case "null":
-									return TOKEN.NULL;
-								default:
-									return TOKEN.NONE;
-								}
-							}
-							}
-						}
-						return TOKEN.NONE;
-					}
-				}
+  public float ToFloat(string fieldName)
+  {
+    return this.fields.ContainsKey(fieldName) ? Convert.ToSingle(this.fields[fieldName]) : 0.0f;
+  }
 
-				private Parser(string jsonString)
-				{
-					json = new StringReader(jsonString);
-				}
+  public bool ToBoolean(string fieldName)
+  {
+    return this.fields.ContainsKey(fieldName) && Convert.ToBoolean(this.fields[fieldName]);
+  }
 
-				public static JSON Parse(string jsonString)
-				{
-					using (Parser parser = new Parser(jsonString))
-					{
-						return parser.ParseValue() as JSON;
-						IL_0018:
-						JSON result;
-						return result;
-					}
-				}
+  public string serialized
+  {
+    get => JSON._JSON.Serialize(this);
+    set
+    {
+      JSON json = JSON._JSON.Deserialize(value);
+      if (json == null)
+        return;
+      this.fields = json.fields;
+    }
+  }
 
-				public void Dispose()
-				{
-					json.Dispose();
-					json = null;
-				}
+  public JSON ToJSON(string fieldName)
+  {
+    if (!this.fields.ContainsKey(fieldName))
+      this.fields.Add(fieldName, (object) new JSON());
+    return (JSON) this[fieldName];
+  }
 
-				private JSON ParseObject()
-				{
-					Dictionary<string, object> dictionary = new Dictionary<string, object>();
-					JSON jSON = new JSON();
-					jSON.fields = dictionary;
-					json.Read();
-					while (true)
-					{
-						switch (NextToken)
-						{
-						case TOKEN.COMMA:
-							break;
-						case TOKEN.NONE:
-							return null;
-						case TOKEN.CURLY_CLOSE:
-							return jSON;
-						default:
-						{
-							string text = ParseString();
-							if (text == null)
-							{
-								return null;
-							}
-							if (NextToken != TOKEN.COLON)
-							{
-								return null;
-							}
-							json.Read();
-							dictionary[text] = ParseValue();
-							break;
-						}
-						}
-					}
-				}
+  public static implicit operator Vector2(JSON value)
+  {
+    return Vector2.op_Implicit(new Vector3(Convert.ToSingle(value["x"]), Convert.ToSingle(value["y"])));
+  }
 
-				private List<object> ParseArray()
-				{
-					List<object> list = new List<object>();
-					json.Read();
-					bool flag = true;
-					while (flag)
-					{
-						TOKEN nextToken = NextToken;
-						switch (nextToken)
-						{
-						case TOKEN.NONE:
-							return null;
-						case TOKEN.SQUARED_CLOSE:
-							flag = false;
-							break;
-						default:
-						{
-							object item = ParseByToken(nextToken);
-							list.Add(item);
-							break;
-						}
-						case TOKEN.COMMA:
-							break;
-						}
-					}
-					return list;
-				}
+  public static explicit operator JSON(Vector2 value)
+  {
+    return new JSON()
+    {
+      ["x"] = (object) value.x,
+      ["y"] = (object) value.y
+    };
+  }
 
-				private object ParseValue()
-				{
-					TOKEN nextToken = NextToken;
-					return ParseByToken(nextToken);
-				}
+  public static implicit operator Vector3(JSON value)
+  {
+    return new Vector3(Convert.ToSingle(value["x"]), Convert.ToSingle(value["y"]), Convert.ToSingle(value["z"]));
+  }
 
-				private object ParseByToken(TOKEN token)
-				{
-					switch (token)
-					{
-					case TOKEN.STRING:
-						return ParseString();
-					case TOKEN.NUMBER:
-						return ParseNumber();
-					case TOKEN.CURLY_OPEN:
-						return ParseObject();
-					case TOKEN.SQUARED_OPEN:
-						return ParseArray();
-					case TOKEN.TRUE:
-						return true;
-					case TOKEN.FALSE:
-						return false;
-					case TOKEN.NULL:
-						return null;
-					default:
-						return null;
-					}
-				}
+  public static explicit operator JSON(Vector3 value)
+  {
+    return new JSON()
+    {
+      ["x"] = (object) value.x,
+      ["y"] = (object) value.y,
+      ["z"] = (object) value.z
+    };
+  }
 
-				private string ParseString()
-				{
-					StringBuilder stringBuilder = new StringBuilder();
-					json.Read();
-					bool flag = true;
-					while (flag)
-					{
-						if (json.Peek() == -1)
-						{
-							flag = false;
-							break;
-						}
-						char nextChar = NextChar;
-						switch (nextChar)
-						{
-						case '"':
-							flag = false;
-							break;
-						case '\\':
-							if (json.Peek() == -1)
-							{
-								flag = false;
-							}
-							else
-							{
-								nextChar = NextChar;
-								switch (nextChar)
-								{
-								case '"':
-								case '/':
-								case '\\':
-									stringBuilder.Append(nextChar);
-									break;
-								case 'b':
-									stringBuilder.Append('\b');
-									break;
-								case 'f':
-									stringBuilder.Append('\f');
-									break;
-								case 'n':
-									stringBuilder.Append('\n');
-									break;
-								case 'r':
-									stringBuilder.Append('\r');
-									break;
-								case 't':
-									stringBuilder.Append('\t');
-									break;
-								case 'u':
-								{
-									StringBuilder stringBuilder2 = new StringBuilder();
-									for (int i = 0; i < 4; i++)
-									{
-										stringBuilder2.Append(NextChar);
-									}
-									stringBuilder.Append((char)Convert.ToInt32(stringBuilder2.ToString(), 16));
-									break;
-								}
-								}
-							}
-							break;
-						default:
-							stringBuilder.Append(nextChar);
-							break;
-						}
-					}
-					return stringBuilder.ToString();
-				}
+  public static implicit operator Quaternion(JSON value)
+  {
+    return new Quaternion(Convert.ToSingle(value["x"]), Convert.ToSingle(value["y"]), Convert.ToSingle(value["z"]), Convert.ToSingle(value["w"]));
+  }
 
-				private object ParseNumber()
-				{
-					string nextWord = NextWord;
-					if (nextWord.IndexOf('.') == -1)
-					{
-						long.TryParse(nextWord, out long result);
-						return result;
-					}
-					double.TryParse(nextWord, out double result2);
-					return result2;
-				}
+  public static explicit operator JSON(Quaternion value)
+  {
+    return new JSON()
+    {
+      ["x"] = (object) value.x,
+      ["y"] = (object) value.y,
+      ["z"] = (object) value.z,
+      ["w"] = (object) value.w
+    };
+  }
 
-				private void EatWhitespace()
-				{
-					while (" \t\n\r".IndexOf(PeekChar) != -1)
-					{
-						json.Read();
-						if (json.Peek() == -1)
-						{
-							break;
-						}
-					}
-				}
-			}
+  public static implicit operator Color(JSON value)
+  {
+    return new Color(Convert.ToSingle(value["r"]), Convert.ToSingle(value["g"]), Convert.ToSingle(value["b"]), Convert.ToSingle(value["a"]));
+  }
 
-			private sealed class Serializer
-			{
-				private StringBuilder builder;
+  public static explicit operator JSON(Color value)
+  {
+    return new JSON()
+    {
+      ["r"] = (object) value.r,
+      ["g"] = (object) value.g,
+      ["b"] = (object) value.b,
+      ["a"] = (object) value.a
+    };
+  }
 
-				private Serializer()
-				{
-					builder = new StringBuilder();
-				}
+  public static implicit operator Color32(JSON value)
+  {
+    return new Color32(Convert.ToByte(value["r"]), Convert.ToByte(value["g"]), Convert.ToByte(value["b"]), Convert.ToByte(value["a"]));
+  }
 
-				public static string Serialize(JSON obj)
-				{
-					Serializer serializer = new Serializer();
-					serializer.SerializeValue(obj);
-					return serializer.builder.ToString();
-				}
+  public static explicit operator JSON(Color32 value)
+  {
+    return new JSON()
+    {
+      ["r"] = (object) value.r,
+      ["g"] = (object) value.g,
+      ["b"] = (object) value.b,
+      ["a"] = (object) value.a
+    };
+  }
 
-				private void SerializeValue(object value)
-				{
-					if (value == null)
-					{
-						builder.Append("null");
-					}
-					else if (value is string)
-					{
-						SerializeString(value as string);
-					}
-					else if (value is bool)
-					{
-						builder.Append(value.ToString().ToLower());
-					}
-					else if (value is JSON)
-					{
-						SerializeObject(value as JSON);
-					}
-					else if (value is IDictionary)
-					{
-						SerializeDictionary(value as IDictionary);
-					}
-					else if (value is IList)
-					{
-						SerializeArray(value as IList);
-					}
-					else if (value is char)
-					{
-						SerializeString(value.ToString());
-					}
-					else
-					{
-						SerializeOther(value);
-					}
-				}
+  public static implicit operator Rect(JSON value)
+  {
+    return new Rect((float) Convert.ToByte(value["left"]), (float) Convert.ToByte(value["top"]), (float) Convert.ToByte(value["width"]), (float) Convert.ToByte(value["height"]));
+  }
 
-				private void SerializeObject(JSON obj)
-				{
-					SerializeDictionary(obj.fields);
-				}
+  public static explicit operator JSON(Rect value)
+  {
+    return new JSON()
+    {
+      ["left"] = (object) ((Rect) ref value).xMin,
+      ["top"] = (object) ((Rect) ref value).yMax,
+      ["width"] = (object) ((Rect) ref value).width,
+      ["height"] = (object) ((Rect) ref value).height
+    };
+  }
 
-				private void SerializeDictionary(IDictionary obj)
-				{
-					bool flag = true;
-					builder.Append('{');
-					foreach (object key in obj.Keys)
-					{
-						if (!flag)
-						{
-							builder.Append(',');
-						}
-						SerializeString(key.ToString());
-						builder.Append(':');
-						SerializeValue(obj[key]);
-						flag = false;
-					}
-					builder.Append('}');
-				}
+  public T[] ToArray<T>(string fieldName)
+  {
+    if (!this.fields.ContainsKey(fieldName) || !(this.fields[fieldName] is IEnumerable))
+      return new T[0];
+    List<T> objList = new List<T>();
+    foreach (object obj in this.fields[fieldName] as IEnumerable)
+    {
+      switch (objList)
+      {
+        case List<string> _:
+          (objList as List<string>).Add(Convert.ToString(obj));
+          continue;
+        case List<int> _:
+          (objList as List<int>).Add(Convert.ToInt32(obj));
+          continue;
+        case List<float> _:
+          (objList as List<float>).Add(Convert.ToSingle(obj));
+          continue;
+        case List<bool> _:
+          (objList as List<bool>).Add(Convert.ToBoolean(obj));
+          continue;
+        case List<Vector2> _:
+          (objList as List<Vector2>).Add((Vector2) (JSON) obj);
+          continue;
+        case List<Vector3> _:
+          (objList as List<Vector3>).Add((Vector3) (JSON) obj);
+          continue;
+        case List<Rect> _:
+          (objList as List<Rect>).Add((Rect) (JSON) obj);
+          continue;
+        case List<Color> _:
+          (objList as List<Color>).Add((Color) (JSON) obj);
+          continue;
+        case List<Color32> _:
+          (objList as List<Color32>).Add((Color32) (JSON) obj);
+          continue;
+        case List<Quaternion> _:
+          (objList as List<Quaternion>).Add((Quaternion) (JSON) obj);
+          continue;
+        case List<JSON> _:
+          (objList as List<JSON>).Add((JSON) obj);
+          continue;
+        default:
+          continue;
+      }
+    }
+    return objList.ToArray();
+  }
 
-				private void SerializeArray(IList anArray)
-				{
-					builder.Append('[');
-					bool flag = true;
-					foreach (object item in anArray)
-					{
-						if (!flag)
-						{
-							builder.Append(',');
-						}
-						SerializeValue(item);
-						flag = false;
-					}
-					builder.Append(']');
-				}
+  private sealed class _JSON
+  {
+    public static JSON Deserialize(string json)
+    {
+      return json == null ? (JSON) null : JSON._JSON.Parser.Parse(json);
+    }
 
-				private void SerializeString(string str)
-				{
-					builder.Append('"');
-					char[] array = str.ToCharArray();
-					char[] array2 = array;
-					foreach (char c in array2)
-					{
-						switch (c)
-						{
-						case '"':
-							builder.Append("\\\"");
-							break;
-						case '\\':
-							builder.Append("\\\\");
-							break;
-						case '\b':
-							builder.Append("\\b");
-							break;
-						case '\f':
-							builder.Append("\\f");
-							break;
-						case '\n':
-							builder.Append("\\n");
-							break;
-						case '\r':
-							builder.Append("\\r");
-							break;
-						case '\t':
-							builder.Append("\\t");
-							break;
-						default:
-						{
-							int num = Convert.ToInt32(c);
-							if (num >= 32 && num <= 126)
-							{
-								builder.Append(c);
-							}
-							else
-							{
-								builder.Append("\\u" + Convert.ToString(num, 16).PadLeft(4, '0'));
-							}
-							break;
-						}
-						}
-					}
-					builder.Append('"');
-				}
+    public static string Serialize(JSON obj) => JSON._JSON.Serializer.Serialize(obj);
 
-				private void SerializeOther(object value)
-				{
-					if (value is float || value is int || value is uint || value is long || value is double || value is sbyte || value is byte || value is short || value is ushort || value is ulong || value is decimal)
-					{
-						builder.Append(value.ToString());
-					}
-					else
-					{
-						SerializeString(value.ToString());
-					}
-				}
-			}
+    private sealed class Parser : IDisposable
+    {
+      private const string WHITE_SPACE = " \t\n\r";
+      private const string WORD_BREAK = " \t\n\r{}[],:\"";
+      private StringReader json;
 
-			public static JSON Deserialize(string json)
-			{
-				if (json == null)
-				{
-					return null;
-				}
-				return Parser.Parse(json);
-			}
+      private Parser(string jsonString) => this.json = new StringReader(jsonString);
 
-			public static string Serialize(JSON obj)
-			{
-				return Serializer.Serialize(obj);
-			}
-		}
+      public static JSON Parse(string jsonString)
+      {
+        using (JSON._JSON.Parser parser = new JSON._JSON.Parser(jsonString))
+          return parser.ParseValue() as JSON;
+      }
 
-		public Dictionary<string, object> fields = new Dictionary<string, object>();
+      public void Dispose()
+      {
+        this.json.Dispose();
+        this.json = (StringReader) null;
+      }
 
-		public object this[string fieldName]
-		{
-			get
-			{
-				if (fields.ContainsKey(fieldName))
-				{
-					return fields[fieldName];
-				}
-				return null;
-			}
-			set
-			{
-				if (fields.ContainsKey(fieldName))
-				{
-					fields[fieldName] = value;
-				}
-				else
-				{
-					fields.Add(fieldName, value);
-				}
-			}
-		}
+      private JSON ParseObject()
+      {
+        Dictionary<string, object> dictionary = new Dictionary<string, object>();
+        JSON json = new JSON();
+        json.fields = dictionary;
+        this.json.Read();
+        while (true)
+        {
+          JSON._JSON.Parser.TOKEN nextToken;
+          do
+          {
+            nextToken = this.NextToken;
+            if (nextToken != JSON._JSON.Parser.TOKEN.NONE)
+            {
+              if (nextToken == JSON._JSON.Parser.TOKEN.CURLY_CLOSE)
+                goto label_5;
+            }
+            else
+              goto label_4;
+          }
+          while (nextToken == JSON._JSON.Parser.TOKEN.COMMA);
+          string key = this.ParseString();
+          if (key != null)
+          {
+            if (this.NextToken == JSON._JSON.Parser.TOKEN.COLON)
+            {
+              this.json.Read();
+              dictionary[key] = this.ParseValue();
+            }
+            else
+              goto label_9;
+          }
+          else
+            goto label_7;
+        }
+label_4:
+        return (JSON) null;
+label_5:
+        return json;
+label_7:
+        return (JSON) null;
+label_9:
+        return (JSON) null;
+      }
 
-		public string serialized
-		{
-			get
-			{
-				return _JSON.Serialize(this);
-			}
-			set
-			{
-				JSON jSON = _JSON.Deserialize(value);
-				if (jSON != null)
-				{
-					fields = jSON.fields;
-				}
-			}
-		}
+      private List<object> ParseArray()
+      {
+        List<object> array = new List<object>();
+        this.json.Read();
+        bool flag = true;
+        while (flag)
+        {
+          JSON._JSON.Parser.TOKEN nextToken = this.NextToken;
+          switch (nextToken)
+          {
+            case JSON._JSON.Parser.TOKEN.NONE:
+              return (List<object>) null;
+            case JSON._JSON.Parser.TOKEN.SQUARED_CLOSE:
+              flag = false;
+              continue;
+            case JSON._JSON.Parser.TOKEN.COMMA:
+              continue;
+            default:
+              object byToken = this.ParseByToken(nextToken);
+              array.Add(byToken);
+              continue;
+          }
+        }
+        return array;
+      }
 
-		public JSON()
-		{
-		}
+      private object ParseValue() => this.ParseByToken(this.NextToken);
 
-		public JSON(string jsonString)
-		{
-			serialized = jsonString;
-		}
+      private object ParseByToken(JSON._JSON.Parser.TOKEN token)
+      {
+        switch (token)
+        {
+          case JSON._JSON.Parser.TOKEN.CURLY_OPEN:
+            return (object) this.ParseObject();
+          case JSON._JSON.Parser.TOKEN.SQUARED_OPEN:
+            return (object) this.ParseArray();
+          case JSON._JSON.Parser.TOKEN.STRING:
+            return (object) this.ParseString();
+          case JSON._JSON.Parser.TOKEN.NUMBER:
+            return this.ParseNumber();
+          case JSON._JSON.Parser.TOKEN.TRUE:
+            return (object) true;
+          case JSON._JSON.Parser.TOKEN.FALSE:
+            return (object) false;
+          case JSON._JSON.Parser.TOKEN.NULL:
+            return (object) null;
+          default:
+            return (object) null;
+        }
+      }
 
-		public string ToString(string fieldName)
-		{
-			if (fields.ContainsKey(fieldName))
-			{
-				return Convert.ToString(fields[fieldName]);
-			}
-			return string.Empty;
-		}
+      private string ParseString()
+      {
+        StringBuilder stringBuilder1 = new StringBuilder();
+        this.json.Read();
+        bool flag = true;
+        while (flag)
+        {
+          if (this.json.Peek() == -1)
+            break;
+          char nextChar1 = this.NextChar;
+          switch (nextChar1)
+          {
+            case '"':
+              flag = false;
+              continue;
+            case '\\':
+              if (this.json.Peek() == -1)
+              {
+                flag = false;
+                continue;
+              }
+              char nextChar2 = this.NextChar;
+              switch (nextChar2)
+              {
+                case '"':
+                case '/':
+                case '\\':
+                  stringBuilder1.Append(nextChar2);
+                  continue;
+                case 'b':
+                  stringBuilder1.Append('\b');
+                  continue;
+                case 'f':
+                  stringBuilder1.Append('\f');
+                  continue;
+                case 'n':
+                  stringBuilder1.Append('\n');
+                  continue;
+                case 'r':
+                  stringBuilder1.Append('\r');
+                  continue;
+                case 't':
+                  stringBuilder1.Append('\t');
+                  continue;
+                case 'u':
+                  StringBuilder stringBuilder2 = new StringBuilder();
+                  for (int index = 0; index < 4; ++index)
+                    stringBuilder2.Append(this.NextChar);
+                  stringBuilder1.Append((char) Convert.ToInt32(stringBuilder2.ToString(), 16 /*0x10*/));
+                  continue;
+                default:
+                  continue;
+              }
+            default:
+              stringBuilder1.Append(nextChar1);
+              continue;
+          }
+        }
+        return stringBuilder1.ToString();
+      }
 
-		public int ToInt(string fieldName)
-		{
-			if (fields.ContainsKey(fieldName))
-			{
-				return Convert.ToInt32(fields[fieldName]);
-			}
-			return 0;
-		}
+      private object ParseNumber()
+      {
+        string nextWord = this.NextWord;
+        if (nextWord.IndexOf('.') == -1)
+        {
+          long result;
+          long.TryParse(nextWord, out result);
+          return (object) result;
+        }
+        double result1;
+        double.TryParse(nextWord, out result1);
+        return (object) result1;
+      }
 
-		public long ToLong(string fieldName)
-		{
-			if (fields.ContainsKey(fieldName))
-			{
-				return Convert.ToInt64(fields[fieldName]);
-			}
-			return 0L;
-		}
+      private void EatWhitespace()
+      {
+        while (" \t\n\r".IndexOf(this.PeekChar) != -1)
+        {
+          this.json.Read();
+          if (this.json.Peek() == -1)
+            break;
+        }
+      }
 
-		public float ToFloat(string fieldName)
-		{
-			if (fields.ContainsKey(fieldName))
-			{
-				return Convert.ToSingle(fields[fieldName]);
-			}
-			return 0f;
-		}
+      private char PeekChar => Convert.ToChar(this.json.Peek());
 
-		public bool ToBoolean(string fieldName)
-		{
-			if (fields.ContainsKey(fieldName))
-			{
-				return Convert.ToBoolean(fields[fieldName]);
-			}
-			return false;
-		}
+      private char NextChar => Convert.ToChar(this.json.Read());
 
-		public JSON ToJSON(string fieldName)
-		{
-			if (!fields.ContainsKey(fieldName))
-			{
-				fields.Add(fieldName, new JSON());
-			}
-			return (JSON)this[fieldName];
-		}
+      private string NextWord
+      {
+        get
+        {
+          StringBuilder stringBuilder = new StringBuilder();
+          while (" \t\n\r{}[],:\"".IndexOf(this.PeekChar) == -1)
+          {
+            stringBuilder.Append(this.NextChar);
+            if (this.json.Peek() == -1)
+              break;
+          }
+          return stringBuilder.ToString();
+        }
+      }
 
-		public T[] ToArray<T>(string fieldName)
-		{
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-			if (fields.ContainsKey(fieldName) && fields[fieldName] is IEnumerable)
-			{
-				List<T> list = new List<T>();
-				foreach (object item in fields[fieldName] as IEnumerable)
-				{
-					if (list is List<string>)
-					{
-						(list as List<string>).Add(Convert.ToString(item));
-					}
-					else if (list is List<int>)
-					{
-						(list as List<int>).Add(Convert.ToInt32(item));
-					}
-					else if (list is List<float>)
-					{
-						(list as List<float>).Add(Convert.ToSingle(item));
-					}
-					else if (list is List<bool>)
-					{
-						(list as List<bool>).Add(Convert.ToBoolean(item));
-					}
-					else if (list is List<Vector2>)
-					{
-						(list as List<Vector2>).Add((JSON)item);
-					}
-					else if (list is List<Vector3>)
-					{
-						(list as List<Vector3>).Add((JSON)item);
-					}
-					else if (list is List<Rect>)
-					{
-						(list as List<Rect>).Add((JSON)item);
-					}
-					else if (list is List<Color>)
-					{
-						(list as List<Color>).Add((JSON)item);
-					}
-					else if (list is List<Color32>)
-					{
-						(list as List<Color32>).Add((JSON)item);
-					}
-					else if (list is List<Quaternion>)
-					{
-						(list as List<Quaternion>).Add((JSON)item);
-					}
-					else if (list is List<JSON>)
-					{
-						(list as List<JSON>).Add((JSON)item);
-					}
-				}
-				return list.ToArray();
-			}
-			return new T[0];
-		}
+      private JSON._JSON.Parser.TOKEN NextToken
+      {
+        get
+        {
+          this.EatWhitespace();
+          if (this.json.Peek() == -1)
+            return JSON._JSON.Parser.TOKEN.NONE;
+          switch (this.PeekChar)
+          {
+            case '"':
+              return JSON._JSON.Parser.TOKEN.STRING;
+            case ',':
+              this.json.Read();
+              return JSON._JSON.Parser.TOKEN.COMMA;
+            case '-':
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+              return JSON._JSON.Parser.TOKEN.NUMBER;
+            case ':':
+              return JSON._JSON.Parser.TOKEN.COLON;
+            case '[':
+              return JSON._JSON.Parser.TOKEN.SQUARED_OPEN;
+            case ']':
+              this.json.Read();
+              return JSON._JSON.Parser.TOKEN.SQUARED_CLOSE;
+            case '{':
+              return JSON._JSON.Parser.TOKEN.CURLY_OPEN;
+            case '}':
+              this.json.Read();
+              return JSON._JSON.Parser.TOKEN.CURLY_CLOSE;
+            default:
+              switch (this.NextWord)
+              {
+                case "false":
+                  return JSON._JSON.Parser.TOKEN.FALSE;
+                case "true":
+                  return JSON._JSON.Parser.TOKEN.TRUE;
+                case "null":
+                  return JSON._JSON.Parser.TOKEN.NULL;
+                default:
+                  return JSON._JSON.Parser.TOKEN.NONE;
+              }
+          }
+        }
+      }
 
-		public static implicit operator Vector2(JSON value)
-		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			return Vector2.op_Implicit(new Vector3(Convert.ToSingle(value["x"]), Convert.ToSingle(value["y"])));
-		}
+      private enum TOKEN
+      {
+        NONE,
+        CURLY_OPEN,
+        CURLY_CLOSE,
+        SQUARED_OPEN,
+        SQUARED_CLOSE,
+        COLON,
+        COMMA,
+        STRING,
+        NUMBER,
+        TRUE,
+        FALSE,
+        NULL,
+      }
+    }
 
-		public static explicit operator JSON(Vector2 value)
-		{
-			JSON jSON = new JSON();
-			jSON["x"] = value.x;
-			jSON["y"] = value.y;
-			return jSON;
-		}
+    private sealed class Serializer
+    {
+      private StringBuilder builder;
 
-		public static implicit operator Vector3(JSON value)
-		{
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			return new Vector3(Convert.ToSingle(value["x"]), Convert.ToSingle(value["y"]), Convert.ToSingle(value["z"]));
-		}
+      private Serializer() => this.builder = new StringBuilder();
 
-		public static explicit operator JSON(Vector3 value)
-		{
-			JSON jSON = new JSON();
-			jSON["x"] = value.x;
-			jSON["y"] = value.y;
-			jSON["z"] = value.z;
-			return jSON;
-		}
+      public static string Serialize(JSON obj)
+      {
+        JSON._JSON.Serializer serializer = new JSON._JSON.Serializer();
+        serializer.SerializeValue((object) obj);
+        return serializer.builder.ToString();
+      }
 
-		public static implicit operator Quaternion(JSON value)
-		{
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			return new Quaternion(Convert.ToSingle(value["x"]), Convert.ToSingle(value["y"]), Convert.ToSingle(value["z"]), Convert.ToSingle(value["w"]));
-		}
+      private void SerializeValue(object value)
+      {
+        switch (value)
+        {
+          case null:
+            this.builder.Append("null");
+            break;
+          case string _:
+            this.SerializeString(value as string);
+            break;
+          case bool _:
+            this.builder.Append(value.ToString().ToLower());
+            break;
+          case JSON _:
+            this.SerializeObject(value as JSON);
+            break;
+          case IDictionary _:
+            this.SerializeDictionary(value as IDictionary);
+            break;
+          case IList _:
+            this.SerializeArray(value as IList);
+            break;
+          case char _:
+            this.SerializeString(value.ToString());
+            break;
+          default:
+            this.SerializeOther(value);
+            break;
+        }
+      }
 
-		public static explicit operator JSON(Quaternion value)
-		{
-			JSON jSON = new JSON();
-			jSON["x"] = value.x;
-			jSON["y"] = value.y;
-			jSON["z"] = value.z;
-			jSON["w"] = value.w;
-			return jSON;
-		}
+      private void SerializeObject(JSON obj) => this.SerializeDictionary((IDictionary) obj.fields);
 
-		public static implicit operator Color(JSON value)
-		{
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			return new Color(Convert.ToSingle(value["r"]), Convert.ToSingle(value["g"]), Convert.ToSingle(value["b"]), Convert.ToSingle(value["a"]));
-		}
+      private void SerializeDictionary(IDictionary obj)
+      {
+        bool flag = true;
+        this.builder.Append('{');
+        foreach (object key in (IEnumerable) obj.Keys)
+        {
+          if (!flag)
+            this.builder.Append(',');
+          this.SerializeString(key.ToString());
+          this.builder.Append(':');
+          this.SerializeValue(obj[key]);
+          flag = false;
+        }
+        this.builder.Append('}');
+      }
 
-		public static explicit operator JSON(Color value)
-		{
-			JSON jSON = new JSON();
-			jSON["r"] = value.r;
-			jSON["g"] = value.g;
-			jSON["b"] = value.b;
-			jSON["a"] = value.a;
-			return jSON;
-		}
+      private void SerializeArray(IList anArray)
+      {
+        this.builder.Append('[');
+        bool flag = true;
+        foreach (object an in (IEnumerable) anArray)
+        {
+          if (!flag)
+            this.builder.Append(',');
+          this.SerializeValue(an);
+          flag = false;
+        }
+        this.builder.Append(']');
+      }
 
-		public static implicit operator Color32(JSON value)
-		{
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			return new Color32(Convert.ToByte(value["r"]), Convert.ToByte(value["g"]), Convert.ToByte(value["b"]), Convert.ToByte(value["a"]));
-		}
+      private void SerializeString(string str)
+      {
+        this.builder.Append('"');
+        foreach (char ch in str.ToCharArray())
+        {
+          switch (ch)
+          {
+            case '\b':
+              this.builder.Append("\\b");
+              break;
+            case '\t':
+              this.builder.Append("\\t");
+              break;
+            case '\n':
+              this.builder.Append("\\n");
+              break;
+            case '\f':
+              this.builder.Append("\\f");
+              break;
+            case '\r':
+              this.builder.Append("\\r");
+              break;
+            case '"':
+              this.builder.Append("\\\"");
+              break;
+            case '\\':
+              this.builder.Append("\\\\");
+              break;
+            default:
+              int int32 = Convert.ToInt32(ch);
+              if (int32 >= 32 /*0x20*/ && int32 <= 126)
+              {
+                this.builder.Append(ch);
+                break;
+              }
+              this.builder.Append("\\u" + Convert.ToString(int32, 16 /*0x10*/).PadLeft(4, '0'));
+              break;
+          }
+        }
+        this.builder.Append('"');
+      }
 
-		public static explicit operator JSON(Color32 value)
-		{
-			JSON jSON = new JSON();
-			jSON["r"] = value.r;
-			jSON["g"] = value.g;
-			jSON["b"] = value.b;
-			jSON["a"] = value.a;
-			return jSON;
-		}
-
-		public static implicit operator Rect(JSON value)
-		{
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			return new Rect((float)(int)Convert.ToByte(value["left"]), (float)(int)Convert.ToByte(value["top"]), (float)(int)Convert.ToByte(value["width"]), (float)(int)Convert.ToByte(value["height"]));
-		}
-
-		public static explicit operator JSON(Rect value)
-		{
-			JSON jSON = new JSON();
-			jSON["left"] = value.get_xMin();
-			jSON["top"] = value.get_yMax();
-			jSON["width"] = value.get_width();
-			jSON["height"] = value.get_height();
-			return jSON;
-		}
-	}
+      private void SerializeOther(object value)
+      {
+        switch (value)
+        {
+          case float _:
+          case int _:
+          case uint _:
+          case long _:
+          case double _:
+          case sbyte _:
+          case byte _:
+          case short _:
+          case ushort _:
+          case ulong _:
+          case Decimal _:
+            this.builder.Append(value.ToString());
+            break;
+          default:
+            this.SerializeString(value.ToString());
+            break;
+        }
+      }
+    }
+  }
 }

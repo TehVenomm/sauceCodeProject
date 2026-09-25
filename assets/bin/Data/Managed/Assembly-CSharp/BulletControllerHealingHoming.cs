@@ -1,121 +1,86 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: BulletControllerHealingHoming
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class BulletControllerHealingHoming : BulletControllerHoming
 {
-	protected const float PERCENT = 0.01f;
+  protected const float PERCENT = 0.01f;
+  private static readonly int ANIM_STATE_PICKED = Animator.StringToHash("PICKED");
+  protected bool m_isIgnoreColliderExceptTarget = true;
+  protected bool m_isAlreadyDoneHitProcess;
+  protected Animator m_effectAnimator;
+  protected List<int> m_buffIdList;
 
-	private static readonly int ANIM_STATE_PICKED = Animator.StringToHash("PICKED");
+  public override void Initialize(
+    BulletData bullet,
+    SkillInfo.SkillParam _skillInfoParam,
+    Vector3 pos,
+    Quaternion rot)
+  {
+    base.Initialize(bullet, _skillInfoParam, pos, rot);
+    BulletData.BulletHealingHoming healingHomingBullet = bullet.dataHealingHomingBullet;
+    if (healingHomingBullet == null)
+      return;
+    this.InitParam((BulletData.BulletHoming) healingHomingBullet);
+    this.m_isIgnoreColliderExceptTarget = healingHomingBullet.isIgnoreColliderExceptTarget;
+    this.m_isAlreadyDoneHitProcess = false;
+    this.m_buffIdList = healingHomingBullet.buffIds;
+    Utility.SetLayerWithChildren(((Component) this).transform, healingHomingBullet.defaultGenerateLayer);
+    this.m_effectAnimator = ((Component) this).GetComponentInChildren<Animator>();
+  }
 
-	protected bool m_isIgnoreColliderExceptTarget = true;
+  public override bool IsHit(Collider collider)
+  {
+    StageObject targetObject = this.targetObject;
+    return !this.m_isIgnoreColliderExceptTarget || !Object.op_Inequality((Object) targetObject, (Object) null) || !(((Object) targetObject).name != ((Object) collider).name);
+  }
 
-	protected bool m_isAlreadyDoneHitProcess;
+  public override void OnHit(Collider collider)
+  {
+    if (this.m_isAlreadyDoneHitProcess)
+      return;
+    this.m_isAlreadyDoneHitProcess = true;
+    this.PlayOnHitAnimation();
+    this.HealAction();
+    this.AddBuffAction(((Component) collider).gameObject.GetComponent<Player>());
+    base.OnHit(collider);
+  }
 
-	protected Animator m_effectAnimator;
+  protected void PlayOnHitAnimation()
+  {
+    if (Object.op_Inequality((Object) this.bulletObject, (Object) null))
+      this.bulletObject.SetDisablePlayEndAnim();
+    if (Object.op_Equality((Object) this.m_effectAnimator, (Object) null))
+      return;
+    this.m_effectAnimator.Play(BulletControllerHealingHoming.ANIM_STATE_PICKED, 0, 0.0f);
+  }
 
-	private List<int> m_buffIdList;
+  protected void HealAction()
+  {
+    if (this.bulletSkillInfoParam == null)
+      return;
+    StageObject targetObject = this.targetObject;
+    if (Object.op_Equality((Object) targetObject, (Object) null) || !targetObject.IsCoopNone() && !targetObject.IsOriginal() || !(targetObject is Player))
+      return;
+    Character.HealData healData = new Character.HealData(this.bulletSkillInfoParam.healHp, this.bulletSkillInfoParam.tableData.healType, HEAL_EFFECT_TYPE.BASIS, new List<int>()
+    {
+      10
+    });
+    (targetObject as Player).OnHealReceive(healData);
+  }
 
-	public override void Initialize(BulletData bullet, SkillInfo.SkillParam _skillInfoParam, Vector3 pos, Quaternion rot)
-	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Expected O, but got Unknown
-		base.Initialize(bullet, _skillInfoParam, pos, rot);
-		BulletData.BulletHealingHoming dataHealingHomingBullet = bullet.dataHealingHomingBullet;
-		if (dataHealingHomingBullet != null)
-		{
-			InitParam(dataHealingHomingBullet);
-			m_isIgnoreColliderExceptTarget = dataHealingHomingBullet.isIgnoreColliderExceptTarget;
-			m_isAlreadyDoneHitProcess = false;
-			m_buffIdList = dataHealingHomingBullet.buffIds;
-			Utility.SetLayerWithChildren(this.get_transform(), dataHealingHomingBullet.defaultGenerateLayer);
-			m_effectAnimator = this.GetComponentInChildren<Animator>();
-		}
-	}
-
-	public override bool IsHit(Collider collider)
-	{
-		StageObject target = GetTarget();
-		if (m_isIgnoreColliderExceptTarget && target != null && target.get_name() != collider.get_name())
-		{
-			return false;
-		}
-		return true;
-	}
-
-	public override void OnHit(Collider collider)
-	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		if (!m_isAlreadyDoneHitProcess)
-		{
-			m_isAlreadyDoneHitProcess = true;
-			PlayOnHitAnimation();
-			HealAction();
-			Player component = collider.get_gameObject().GetComponent<Player>();
-			AddBuffAction(component);
-			base.OnHit(collider);
-		}
-	}
-
-	protected void PlayOnHitAnimation()
-	{
-		if (bulletObject != null)
-		{
-			bulletObject.SetDisablePlayEndAnim();
-		}
-		if (!(m_effectAnimator == null))
-		{
-			m_effectAnimator.Play(ANIM_STATE_PICKED, 0, 0f);
-		}
-	}
-
-	protected void HealAction()
-	{
-		if (base.bulletSkillInfoParam != null)
-		{
-			StageObject target = GetTarget();
-			if (!(target == null) && (target.IsCoopNone() || target.IsOriginal()) && target is Player)
-			{
-				(target as Player).OnHealReceive(base.bulletSkillInfoParam.healHp, base.bulletSkillInfoParam.tableData.healType, HEAL_EFFECT_TYPE.BASIS, true);
-			}
-		}
-	}
-
-	protected void AddBuffAction(Player _player)
-	{
-		if (m_buffIdList != null && m_buffIdList.Count >= 1 && base.bulletSkillInfoParam != null && !(_player == null) && !_player.isDead)
-		{
-			int i = 0;
-			for (int count = m_buffIdList.Count; i < count; i++)
-			{
-				int num = m_buffIdList[i];
-				if (Singleton<BuffTable>.IsValid() && num > 0)
-				{
-					BuffTable.BuffData data = Singleton<BuffTable>.I.GetData((uint)num);
-					if (data != null)
-					{
-						BuffParam.BuffData buffData = new BuffParam.BuffData();
-						buffData.type = data.type;
-						buffData.interval = data.interval;
-						buffData.valueType = data.valueType;
-						buffData.time = data.duration;
-						float num2 = (float)data.value;
-						GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(data.growID, base.bulletSkillInfoParam.baseInfo.level);
-						if (growSkillItemData != null)
-						{
-							buffData.time = data.duration * (float)(int)growSkillItemData.supprtTime[0].rate * 0.01f + (float)growSkillItemData.supprtTime[0].add;
-							num2 = (float)(data.value * (int)growSkillItemData.supprtValue[0].rate) * 0.01f + (float)(int)growSkillItemData.supprtValue[0].add;
-						}
-						if (buffData.valueType == BuffParam.VALUE_TYPE.RATE && BuffParam.IsTypeValueBasedOnHP(buffData.type))
-						{
-							num2 = (float)_player.hpMax * num2 * 0.01f;
-						}
-						buffData.value = Mathf.FloorToInt(num2);
-						_player.OnBuffStart(buffData);
-					}
-				}
-			}
-		}
-	}
+  protected void AddBuffAction(Player _player)
+  {
+    if (this.m_buffIdList == null || this.m_buffIdList.Count < 1 || this.bulletSkillInfoParam == null || Object.op_Equality((Object) _player, (Object) null) || _player.isDead)
+      return;
+    int index = 0;
+    for (int count = this.m_buffIdList.Count; index < count; ++index)
+      _player.StartBuffByBuffTableId(this.m_buffIdList[index], this.bulletSkillInfoParam);
+  }
 }

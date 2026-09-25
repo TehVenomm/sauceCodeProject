@@ -1,976 +1,1189 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestDeliveryDetail
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using rhyme;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
+#nullable disable
 public class QuestDeliveryDetail : GameSection
 {
-	protected enum UI
-	{
-		OBJ_BASE_ROOT,
-		OBJ_BACK,
-		OBJ_COMPLETE_ROOT,
-		BTN_COMPLETE,
-		CHARA_ALL,
-		OBJ_UNLOCK_PORTAL_ROOT,
-		LBL_UNLOCK_PORTAL,
-		LBL_QUEST_TITLE,
-		LBL_CHARA_MESSAGE,
-		LBL_PERSON_NAME,
-		TEX_NPC,
-		BTN_JUMP_QUEST,
-		BTN_JUMP_INVALID,
-		BTN_JUMP_MAP,
-		BTN_JUMP_GACHATOP,
-		GRD_REWARD,
-		LBL_MONEY,
-		LBL_EXP,
-		SPR_WINDOW,
-		SPR_MESSAGE_BG,
-		OBJ_NEED_ITEM_ROOT,
-		LBL_NEED_ITEM_NAME,
-		LBL_NEED,
-		LBL_HAVE,
-		LBL_PLACE_NAME,
-		LBL_ENEMY_NAME,
-		OBJ_DIFFICULTY_ROOT,
-		OBJ_ENEMY_NAME_ROOT,
-		LBL_GET_PLACE,
-		OBJ_ENEMY,
-		SPR_ELEMENT_ROOT,
-		SPR_ELEMENT,
-		SPR_WEAK_ELEMENT,
-		STR_NON_WEAK_ELEMENT,
-		BTN_SUBMISSION,
-		STR_BTN_SUBMISSION,
-		STR_BTN_SUBMISSION_BACK,
-		OBJ_TOP_CROWN_ROOT,
-		OBJ_TOP_CROWN_1,
-		OBJ_TOP_CROWN_2,
-		OBJ_TOP_CROWN_3,
-		STR_MISSION_EMPTY,
-		SPR_CROWN_1,
-		SPR_CROWN_2,
-		SPR_CROWN_3,
-		OBJ_SUBMISSION_ROOT,
-		OBJ_MISSION_INFO,
-		OBJ_MISSION_INFO_1,
-		OBJ_MISSION_INFO_2,
-		OBJ_MISSION_INFO_3,
-		LBL_MISSION_INFO_1,
-		LBL_MISSION_INFO_2,
-		LBL_MISSION_INFO_3,
-		SPR_MISSION_INFO_CROWN_1,
-		SPR_MISSION_INFO_CROWN_2,
-		SPR_MISSION_INFO_CROWN_3,
-		STR_MISSION,
-		OBJ_BASE_FRAME,
-		OBJ_TARGET_FRAME,
-		OBJ_SUBMISSION_FRAME,
-		OBJ_NORMAL_ROOT,
-		OBJ_EVENT_ROOT,
-		LBL_POINT_NORMAL,
-		TEX_NORMAL_ICON,
-		LBL_POINT_EVENT,
-		TEX_EVENT_ICON,
-		BTN_CREATE,
-		BTN_JOIN,
-		BTN_MATCHING,
-		BTN_JUMP_SMITH,
-		BTN_JUMP_STATUS,
-		BTN_JUMP_STORAGE,
-		BTN_JUMP_POINT_SHOP,
-		BTN_JUMP_WORLDMAP,
-		BTN_WAVEMATCH_NEW,
-		BTN_WAVEMATCH_PASS,
-		BTN_WAVEMATCH_AUTO
-	}
+  private readonly string[] SPR_WINDOW_TYPE = new string[5]
+  {
+    "RequestWindowBase",
+    "RequestWindowBase_Event",
+    "RequestWindowBase_Story",
+    "RequestWindowBase_Hard",
+    "RequestWindowBase_Event"
+  };
+  private readonly string[] SPR_MESSAGE_BG_TYPE = new string[5]
+  {
+    "CheckHukidashi",
+    "Checkhukidashi_Event",
+    "Checkhukidashi_Story",
+    "Checkhukidashi_Hard",
+    "Checkhukidashi_Event"
+  };
+  protected Transform baseRoot;
+  protected Transform targetFrame;
+  protected Transform submissionFrame;
+  protected int deliveryID;
+  protected DeliveryTable.DeliveryData info;
+  private DeliveryRewardTable.DeliveryRewardData[] rewardData;
+  private DeliveryRewardList competeReward;
+  public List<PointShopGetPointTable.Data> pointShopGetPointData;
+  private bool isInGameScene;
+  protected bool isCompletedEventDelivery;
+  protected bool isNotice;
+  protected bool completeJumpButton;
+  private bool isQuestEnemy;
+  private uint targetQuestID;
+  private uint targetMapID;
+  private int[] targetPortalID;
+  private bool hasDispedMessage;
 
-	private enum AUDIO
-	{
-		REQUEST_COMPLETE = 40000029,
-		GO_TO_FIELD = 40000124,
-		UNLOCKE_PORTAL = 40000161
-	}
+  public override IEnumerable<string> requireDataTable
+  {
+    get
+    {
+      yield return "PointShopGetPointTable";
+      yield return "DeliveryRewardTable";
+      yield return "FieldMapTable";
+    }
+  }
 
-	public enum JumpButtonType
-	{
-		Invalid,
-		Complete,
-		Map,
-		Quest,
-		Gacha,
-		Smith,
-		Status,
-		Storage,
-		PointShop,
-		WorldMap,
-		WaveRoom
-	}
+  private QuestDeliveryDetail.JumpButtonType GetJumpButtonTypeByQuestType(QUEST_TYPE questType)
+  {
+    switch (questType)
+    {
+      case QUEST_TYPE.EVENT:
+        return QuestDeliveryDetail.JumpButtonType.eventRoom;
+      case QUEST_TYPE.ORDER:
+        return QuestDeliveryDetail.JumpButtonType.orderRoom;
+      case QUEST_TYPE.WAVE:
+      case QUEST_TYPE.WAVE_STRATEGY:
+        return QuestDeliveryDetail.JumpButtonType.WaveRoom;
+      case QUEST_TYPE.SERIES:
+        return QuestDeliveryDetail.JumpButtonType.seriesRoom;
+      default:
+        return QuestDeliveryDetail.JumpButtonType.Invalid;
+    }
+  }
 
-	private readonly string[] SPR_WINDOW_TYPE = new string[5]
-	{
-		"RequestWindowBase",
-		"RequestWindowBase_Event",
-		"RequestWindowBase_Story",
-		"RequestWindowBase_Hard",
-		"RequestWindowBase_Event"
-	};
+  protected bool isComplete => this.competeReward != null;
 
-	private readonly string[] SPR_MESSAGE_BG_TYPE = new string[5]
-	{
-		"CheckHukidashi",
-		"Checkhukidashi_Event",
-		"Checkhukidashi_Story",
-		"Checkhukidashi_Hard",
-		"Checkhukidashi_Event"
-	};
+  public override void Initialize()
+  {
+    this.isInGameScene = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene";
+    object[] eventData = GameSection.GetEventData() as object[];
+    this.deliveryID = (int) eventData[0];
+    this.competeReward = eventData[1] as DeliveryRewardList;
+    if (eventData.Length >= 3)
+      this.isCompletedEventDelivery = (bool) eventData[2];
+    this.info = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint) this.deliveryID);
+    this.rewardData = Singleton<DeliveryRewardTable>.I.GetDeliveryRewardTableData((uint) this.deliveryID);
+    this.pointShopGetPointData = Singleton<PointShopGetPointTable>.I.GetFromDeiliveryId((uint) this.deliveryID);
+    this.SetBaseFrame();
+    this.SetTargetFrame();
+    this.SetSubmissionFrame();
+    this.completeJumpButton = false;
+    base.Initialize();
+  }
 
-	protected Transform baseRoot;
+  private void OpenTutorial()
+  {
+    if (!HomeTutorialManager.DoesTutorial() || this.isInGameScene)
+      return;
+    MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("HomeScene", "TutorialStep2_2");
+  }
 
-	protected Transform targetFrame;
+  private void CompleteTutorial()
+  {
+    if (TutorialStep.HasAllTutorialCompleted() || this.isInGameScene)
+      return;
+    MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("HomeScene", "TutorialStep5_1");
+  }
 
-	protected Transform submissionFrame;
+  protected virtual void SetBaseFrame()
+  {
+    this.baseRoot = this.SetPrefab((Enum) QuestDeliveryDetail.UI.OBJ_BASE_ROOT, "QuestRequestCheckBase");
+  }
 
-	protected int deliveryID;
+  protected virtual void SetTargetFrame()
+  {
+    this.targetFrame = this.SetPrefab((Enum) QuestDeliveryDetail.UI.OBJ_NEED_ITEM_ROOT, "QuestRequestCheckItem");
+  }
 
-	protected DeliveryTable.DeliveryData info;
+  protected virtual void SetSubmissionFrame()
+  {
+  }
 
-	private DeliveryRewardTable.DeliveryRewardData[] rewardData;
+  protected virtual Enum GetBtnChangeEquipValue() => (Enum) QuestDeliveryDetail.UI.BTN_CHANGE_EQUIP;
 
-	private DeliveryRewardList competeReward;
+  protected virtual bool IsChangableEquip() => false;
 
-	public List<PointShopGetPointTable.Data> pointShopGetPointData;
+  protected void AdjustBtnPosToChangableEquipUI1Btn()
+  {
+    Transform ctrl = this.FindCtrl(this.baseRoot, this.GetBtnChangeEquipValue());
+    if (Object.op_Equality((Object) ctrl, (Object) null))
+      return;
+    ctrl.localPosition = this.GetEquipBtnPos();
+    this.SetActive(this.baseRoot, this.GetBtnChangeEquipValue(), true);
+  }
 
-	private bool isInGameScene;
+  protected virtual Vector3 GetEquipBtnPos() => new Vector3(170f, -340f, 0.0f);
 
-	protected bool isCompletedEventDelivery;
+  private void AdjustBtnPositionToChangableEquipUI(QuestDeliveryDetail.JumpButtonType type)
+  {
+    if (this.isInGameScene || !this.IsChangableEquip())
+    {
+      this.SetActive(this.baseRoot, this.GetBtnChangeEquipValue(), false);
+    }
+    else
+    {
+      switch (type)
+      {
+        case QuestDeliveryDetail.JumpButtonType.Map:
+        case QuestDeliveryDetail.JumpButtonType.Quest:
+        case QuestDeliveryDetail.JumpButtonType.WorldMap:
+          this.AdjustBtnPosToChangableEquipUI1Btn();
+          break;
+      }
+    }
+  }
 
-	protected bool isNotice;
+  protected void UpdateSubMissionButton()
+  {
+    uint questId = this.info.needs[0].questId;
+    if (questId <= 0U)
+      this.SetActive((Enum) QuestDeliveryDetail.UI.BTN_SUBMISSION, false);
+    else
+      this.SetActive((Enum) QuestDeliveryDetail.UI.BTN_SUBMISSION, Singleton<QuestTable>.I.GetQuestData(questId).IsMissionExist());
+  }
 
-	private bool isQuestEnemy;
+  protected void UpdateSubMission()
+  {
+    QuestDeliveryDetail.UI[] uiArray1 = new QuestDeliveryDetail.UI[3]
+    {
+      QuestDeliveryDetail.UI.OBJ_MISSION_INFO_1,
+      QuestDeliveryDetail.UI.OBJ_MISSION_INFO_2,
+      QuestDeliveryDetail.UI.OBJ_MISSION_INFO_3
+    };
+    QuestDeliveryDetail.UI[] uiArray2 = new QuestDeliveryDetail.UI[3]
+    {
+      QuestDeliveryDetail.UI.OBJ_TOP_CROWN_1,
+      QuestDeliveryDetail.UI.OBJ_TOP_CROWN_2,
+      QuestDeliveryDetail.UI.OBJ_TOP_CROWN_3
+    };
+    QuestDeliveryDetail.UI[] uiArray3 = new QuestDeliveryDetail.UI[3]
+    {
+      QuestDeliveryDetail.UI.LBL_MISSION_INFO_1,
+      QuestDeliveryDetail.UI.LBL_MISSION_INFO_2,
+      QuestDeliveryDetail.UI.LBL_MISSION_INFO_3
+    };
+    QuestDeliveryDetail.UI[] uiArray4 = new QuestDeliveryDetail.UI[3]
+    {
+      QuestDeliveryDetail.UI.SPR_MISSION_INFO_CROWN_1,
+      QuestDeliveryDetail.UI.SPR_MISSION_INFO_CROWN_2,
+      QuestDeliveryDetail.UI.SPR_MISSION_INFO_CROWN_3
+    };
+    QuestDeliveryDetail.UI[] uiArray5 = new QuestDeliveryDetail.UI[3]
+    {
+      QuestDeliveryDetail.UI.SPR_CROWN_1,
+      QuestDeliveryDetail.UI.SPR_CROWN_2,
+      QuestDeliveryDetail.UI.SPR_CROWN_3
+    };
+    if (this.info.needs.Length == 0)
+      return;
+    uint questId = this.info.needs[0].questId;
+    if (questId <= 0U)
+      return;
+    QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(questId);
+    if (!questData.IsMissionExist())
+    {
+      this.SetActive((Enum) QuestDeliveryDetail.UI.OBJ_SUBMISSION_ROOT, false);
+    }
+    else
+    {
+      ClearStatusQuest clearStatusQuestData = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(questId);
+      if (clearStatusQuestData == null)
+      {
+        this.SetActive((Enum) QuestDeliveryDetail.UI.OBJ_SUBMISSION_ROOT, true);
+        int index = 0;
+        for (int length = questData.missionID.Length; index < length; ++index)
+        {
+          uint id = questData.missionID[index];
+          this.SetActive(this.submissionFrame, (Enum) uiArray1[index], id > 0U);
+          this.SetActive(this.submissionFrame, (Enum) uiArray2[index], id > 0U);
+          this.SetActive(this.submissionFrame, (Enum) uiArray3[index], id > 0U);
+          if (id > 0U)
+          {
+            this.SetActive(this.submissionFrame, (Enum) uiArray4[index], false);
+            this.SetActive(this.submissionFrame, (Enum) uiArray5[index], false);
+            QuestTable.MissionTableData missionData = Singleton<QuestTable>.I.GetMissionData(id);
+            this.SetLabelText(this.submissionFrame, (Enum) uiArray3[index], missionData.missionText);
+          }
+        }
+      }
+      else
+      {
+        this.SetActive((Enum) QuestDeliveryDetail.UI.OBJ_SUBMISSION_ROOT, true);
+        int index = 0;
+        for (int count = clearStatusQuestData.missionStatus.Count; index < count; ++index)
+        {
+          CLEAR_STATUS missionStatu = (CLEAR_STATUS) clearStatusQuestData.missionStatus[index];
+          this.SetActive(this.submissionFrame, (Enum) uiArray1[index], questData.missionID[index] > 0U);
+          this.SetActive(this.submissionFrame, (Enum) uiArray2[index], questData.missionID[index] > 0U);
+          this.SetActive(this.submissionFrame, (Enum) uiArray4[index], missionStatu >= CLEAR_STATUS.CLEAR);
+          this.SetActive(this.submissionFrame, (Enum) uiArray5[index], missionStatu >= CLEAR_STATUS.CLEAR);
+          QuestTable.MissionTableData missionData = Singleton<QuestTable>.I.GetMissionData(questData.missionID[index]);
+          this.SetLabelText(this.submissionFrame, (Enum) uiArray3[index], missionData.missionText);
+        }
+      }
+    }
+  }
 
-	private uint targetQuestID;
+  protected void UpdateHappenTarget()
+  {
+    QuestTable.QuestTableData questData = this.info.GetQuestData();
+    if (questData == null)
+      return;
+    EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint) questData.GetMainEnemyID());
+    if (enemyData == null)
+      return;
+    ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, new RARITY_TYPE?(), this.FindCtrl(this.targetFrame, (Enum) QuestDeliveryDetail.UI.OBJ_ENEMY), enemyData.element);
+  }
 
-	private uint targetMapID;
+  public override void UpdateUI()
+  {
+    this.OpenTutorial();
+    this.UpdateTitle();
+    this.SetSprite(this.baseRoot, (Enum) QuestDeliveryDetail.UI.SPR_WINDOW, this.SPR_WINDOW_TYPE[this.info.DeliveryTypeIndex()]);
+    this.SetSprite(this.baseRoot, (Enum) QuestDeliveryDetail.UI.SPR_MESSAGE_BG, this.SPR_MESSAGE_BG_TYPE[this.info.DeliveryTypeIndex()]);
+    bool is_visible1 = false;
+    if (Object.op_Implicit((Object) this.submissionFrame))
+    {
+      this.UpdateSubMissionButton();
+      this.UpdateSubMission();
+      is_visible1 = ((Component) this.submissionFrame).gameObject.activeSelf;
+      this.SetActive((Enum) QuestDeliveryDetail.UI.STR_BTN_SUBMISSION, !is_visible1);
+      this.SetActive((Enum) QuestDeliveryDetail.UI.STR_BTN_SUBMISSION_BACK, is_visible1);
+    }
+    Transform targetFrame = this.targetFrame;
+    string map_name;
+    string enemy_name;
+    DIFFICULTY_TYPE? difficulty;
+    MonoBehaviourSingleton<DeliveryManager>.I.GetTargetEnemyData(this.deliveryID, out this.targetQuestID, out this.targetMapID, out map_name, out enemy_name, out difficulty, out this.targetPortalID);
+    this.SetLabelText(targetFrame, (Enum) QuestDeliveryDetail.UI.LBL_PLACE_NAME, map_name);
+    int have;
+    int need;
+    MonoBehaviourSingleton<DeliveryManager>.I.GetAllProgressDelivery(this.deliveryID, out have, out need);
+    this.SetLabelText(targetFrame, (Enum) QuestDeliveryDetail.UI.LBL_HAVE, this.isComplete ? need.ToString() : have.ToString());
+    this.SetColor(targetFrame, (Enum) QuestDeliveryDetail.UI.LBL_HAVE, this.isComplete ? Color.white : Color.red);
+    this.SetLabelText(targetFrame, (Enum) QuestDeliveryDetail.UI.LBL_NEED, need.ToString());
+    this.SetLabelText(targetFrame, (Enum) QuestDeliveryDetail.UI.LBL_NEED_ITEM_NAME, MonoBehaviourSingleton<DeliveryManager>.I.GetTargetItemName(this.deliveryID));
+    if (this.info.IsDefeatCondition())
+    {
+      if (this.targetQuestID > 0U)
+      {
+        this.isQuestEnemy = true;
+        Transform ctrl = this.FindCtrl(targetFrame, (Enum) QuestDeliveryDetail.UI.OBJ_DIFFICULTY_ROOT);
+        int num1 = (int) difficulty.Value;
+        int num2 = 0;
+        for (int childCount = ctrl.childCount; num2 < childCount; ++num2)
+          this.SetActive(ctrl.GetChild(num2), num2 <= num1);
+        this.SetLabelText(targetFrame, (Enum) QuestDeliveryDetail.UI.LBL_GET_PLACE, this.sectionData.GetText("GET_QUEST"));
+      }
+      else
+      {
+        this.isQuestEnemy = false;
+        this.SetLabelText(targetFrame, (Enum) QuestDeliveryDetail.UI.LBL_GET_PLACE, this.sectionData.GetText("GET_AREA"));
+      }
+      this.SetLabelText(targetFrame, (Enum) QuestDeliveryDetail.UI.LBL_ENEMY_NAME, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 3U), (object) enemy_name));
+    }
+    else
+    {
+      this.isQuestEnemy = false;
+      this.SetLabelText(targetFrame, (Enum) QuestDeliveryDetail.UI.LBL_GET_PLACE, StringTable.Get(STRING_CATEGORY.DELIVERY_CONDITION_PLACE, (uint) this.info.GetConditionType()));
+      this.SetLabelText(targetFrame, (Enum) QuestDeliveryDetail.UI.LBL_ENEMY_NAME, enemy_name);
+    }
+    this.SetActive(targetFrame, (Enum) QuestDeliveryDetail.UI.OBJ_DIFFICULTY_ROOT, this.isQuestEnemy);
+    this.SetActive(targetFrame, (Enum) QuestDeliveryDetail.UI.OBJ_ENEMY_NAME_ROOT, !this.isQuestEnemy);
+    this.UpdateNPC(map_name, enemy_name);
+    if ((this.isComplete || this.isNotice) && !this.isCompletedEventDelivery)
+    {
+      this.SetActive((Enum) QuestDeliveryDetail.UI.OBJ_BACK, false);
+      this.SetActive((Enum) QuestDeliveryDetail.UI.BTN_CREATE, false);
+      this.SetActive((Enum) QuestDeliveryDetail.UI.BTN_JOIN, false);
+      this.SetActive((Enum) QuestDeliveryDetail.UI.BTN_MATCHING, false);
+      this.SetActive(this.GetBtnChangeEquipValue(), false);
+      if (this.isNotice)
+        this.UpdateUIJumpButton(QuestDeliveryDetail.JumpButtonType.Complete);
+    }
+    else
+    {
+      this.SetActive((Enum) QuestDeliveryDetail.UI.OBJ_BACK, true);
+      bool flag1 = true;
+      bool flag2 = false;
+      if (this.info == null || this.info.IsDefeatCondition() || this.targetMapID != 0U)
+      {
+        if (this.isQuestEnemy)
+        {
+          if (this.isInGameScene)
+            flag1 = false;
+        }
+        else
+        {
+          bool flag3 = FieldManager.HasWorldMap(this.targetMapID);
+          if (this.isInGameScene)
+          {
+            if ((int) MonoBehaviourSingleton<FieldManager>.I.currentMapID == (int) this.targetMapID)
+            {
+              if (flag3)
+                flag2 = true;
+              else
+                flag1 = false;
+            }
+            else if (flag3)
+            {
+              if (!MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(this.targetMapID) || WorldMapManager.IsValidPortalIDs(this.targetPortalID))
+                flag2 = true;
+            }
+            else if (!MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(this.targetMapID))
+              flag1 = false;
+          }
+          else if (flag3)
+          {
+            if (!MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(this.targetMapID) || WorldMapManager.IsValidPortalIDs(this.targetPortalID))
+              flag2 = true;
+          }
+          else if (!MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(this.targetMapID))
+            flag1 = false;
+        }
+      }
+      else
+        flag1 = this.info.GetDeliveryJumpType() != 0;
+      if (this.info != null && this.info.subType == DELIVERY_SUB_TYPE.READ_STORY)
+        flag1 = false;
+      QuestDeliveryDetail.JumpButtonType type = QuestDeliveryDetail.JumpButtonType.Invalid;
+      if (flag1)
+      {
+        if (this.info != null && this.info.GetDeliveryJumpType() != DeliveryTable.DELIVERY_JUMPTYPE.UNDEFINED)
+        {
+          type = this.ConvertDeliveryJumpType();
+        }
+        else
+        {
+          if (this.info != null)
+          {
+            QuestTable.QuestTableData questData = this.info.GetQuestData();
+            if (questData != null)
+              type = this.GetJumpButtonTypeByQuestType(questData.questType);
+          }
+          if (type != QuestDeliveryDetail.JumpButtonType.WaveRoom && type != QuestDeliveryDetail.JumpButtonType.seriesRoom && type != QuestDeliveryDetail.JumpButtonType.orderRoom && type != QuestDeliveryDetail.JumpButtonType.eventRoom)
+            type = flag2 ? QuestDeliveryDetail.JumpButtonType.Map : QuestDeliveryDetail.JumpButtonType.Quest;
+        }
+        this.UpdateUIJumpButton(type);
+      }
+      else
+      {
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_QUEST, false);
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_MAP, false);
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_GACHATOP, false);
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_INVALID, false);
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_WAVEMATCH_NEW, false);
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_WAVEMATCH_PASS, false);
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_WAVEMATCH_AUTO, false);
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_COMPLETE, false);
+        this.SetActive(this.GetBtnChangeEquipValue(), false);
+      }
+      if (flag2 && (int) MonoBehaviourSingleton<FieldManager>.I.currentMapID != (int) this.targetMapID)
+        this.SetColor(this.baseRoot, (Enum) QuestDeliveryDetail.UI.LBL_PLACE_NAME, Color.red);
+      else
+        this.SetColor(this.baseRoot, (Enum) QuestDeliveryDetail.UI.LBL_PLACE_NAME, Color.white);
+    }
+    int money = 0;
+    int exp = 0;
+    int carnivalPoint = 0;
+    if (this.rewardData != null)
+      this.SetGrid(this.baseRoot, (Enum) QuestDeliveryDetail.UI.GRD_REWARD, "", this.rewardData.Length, false, (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+      {
+        DeliveryRewardTable.DeliveryRewardData.Reward reward = this.rewardData[i].reward;
+        bool is_visible2 = false;
+        if (reward.type == REWARD_TYPE.MONEY)
+          money += reward.num;
+        else if (reward.type == REWARD_TYPE.EXP)
+          exp += reward.num;
+        else if (reward.type == REWARD_TYPE.RANKING_POINT)
+        {
+          carnivalPoint += reward.num;
+        }
+        else
+        {
+          is_visible2 = true;
+          ItemIcon rewardItemIcon = ItemIcon.CreateRewardItemIcon(reward.type, reward.item_id, t, reward.num, string.Empty, questIconSizeType: ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_DETAIL);
+          this.SetMaterialInfo(rewardItemIcon.transform, reward.type, reward.item_id);
+          rewardItemIcon.SetRewardBG(true);
+        }
+        this.SetActive(t, is_visible2);
+      }));
+    this.SetLabelText(this.baseRoot, (Enum) QuestDeliveryDetail.UI.LBL_MONEY, money.ToString());
+    this.SetLabelText(this.baseRoot, (Enum) QuestDeliveryDetail.UI.LBL_EXP, exp.ToString());
+    this.SetActive((Enum) QuestDeliveryDetail.UI.OBJ_CARNIVAL_ROOT, carnivalPoint > 0);
+    if (carnivalPoint > 0)
+      this.SetLabelText(this.baseRoot, (Enum) QuestDeliveryDetail.UI.LBL_POINT_CARNIVAL, carnivalPoint.ToString());
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.OBJ_COMPLETE_ROOT, this.isComplete && !is_visible1);
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.OBJ_UNLOCK_PORTAL_ROOT, this.isComplete);
+    if (this.isComplete)
+    {
+      string text = string.Empty;
+      List<FieldMapTable.PortalTableData> relationPortalData = Singleton<FieldMapTable>.I.GetDeliveryRelationPortalData(this.info.id);
+      switch (relationPortalData.Count)
+      {
+        case 0:
+          bool is_unlock_portal = !string.IsNullOrEmpty(text);
+          if (!TutorialStep.HasFirstDeliveryCompleted())
+            is_unlock_portal = false;
+          this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.OBJ_UNLOCK_PORTAL_ROOT, is_unlock_portal && !this.isCompletedEventDelivery);
+          this.SetLabelText(this.baseRoot, (Enum) QuestDeliveryDetail.UI.LBL_UNLOCK_PORTAL, text);
+          if (this.isCompletedEventDelivery)
+          {
+            this.SkipTween(this.baseRoot, (Enum) QuestDeliveryDetail.UI.OBJ_COMPLETE_ROOT);
+            break;
+          }
+          this.StartCoroutine(this.StartTweenCoroutine(is_unlock_portal));
+          break;
+        case 1:
+          FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(relationPortalData[0].srcMapID);
+          if (fieldMapData != null)
+          {
+            text = fieldMapData.mapName;
+            goto case 0;
+          }
+          goto case 0;
+        default:
+          text = this.sectionData.GetText("MULTI_UNLOCK");
+          goto case 0;
+      }
+    }
+    this.StartCoroutine(this.SetPointShopGetPointUI());
+  }
 
-	private int[] targetPortalID;
+  private IEnumerator StartTweenCoroutine(bool is_unlock_portal)
+  {
+    while (GameSceneManager.isAutoEventSkip)
+      yield return (object) null;
+    string effectName = "ef_ui_portal_unlock_01";
+    if (is_unlock_portal)
+    {
+      LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+      loadingQueue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, effectName);
+      yield return (object) loadingQueue.Wait();
+      this.ResetTween(this.baseRoot, (Enum) QuestDeliveryDetail.UI.OBJ_UNLOCK_PORTAL_ROOT);
+    }
+    this.PlayCompleteTween((EventDelegate.Callback) (() => this.OnEndCompletetween(is_unlock_portal, effectName)));
+    this.CompleteTutorial();
+  }
 
-	public override IEnumerable<string> requireDataTable
-	{
-		get
-		{
-			yield return "PointShopGetPointTable";
-			yield return "DeliveryRewardTable";
-			yield return "FieldMapTable";
-		}
-	}
+  private void PlayCompleteTween(EventDelegate.Callback callback)
+  {
+    this.ResetTween(this.baseRoot, (Enum) QuestDeliveryDetail.UI.OBJ_COMPLETE_ROOT);
+    this.PlayTween(this.baseRoot, (Enum) QuestDeliveryDetail.UI.OBJ_COMPLETE_ROOT, callback: (EventDelegate.Callback) (() =>
+    {
+      this.PlayAudio((Enum) QuestDeliveryDetail.AUDIO.REQUEST_COMPLETE);
+      callback();
+    }), is_input_block: false);
+  }
 
-	protected bool isComplete => competeReward != null;
+  protected virtual void OnEndCompletetween(bool is_unlock_portal, string effectName)
+  {
+    this.completeJumpButton = true;
+    if (is_unlock_portal)
+    {
+      this.PlayUnlockPortalTween(effectName, (System.Action) (() =>
+      {
+        this.UpdateUIJumpButton(QuestDeliveryDetail.JumpButtonType.Complete);
+        this.DispMessageEventOpen();
+      }));
+    }
+    else
+    {
+      this.UpdateUIJumpButton(QuestDeliveryDetail.JumpButtonType.Complete);
+      this.DispMessageEventOpen();
+    }
+  }
 
-	public override void Initialize()
-	{
-		isInGameScene = (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene");
-		object[] array = GameSection.GetEventData() as object[];
-		deliveryID = (int)array[0];
-		competeReward = (array[1] as DeliveryRewardList);
-		if (array.Length >= 3)
-		{
-			isCompletedEventDelivery = (bool)array[2];
-		}
-		info = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryID);
-		rewardData = Singleton<DeliveryRewardTable>.I.GetDeliveryRewardTableData((uint)deliveryID);
-		pointShopGetPointData = Singleton<PointShopGetPointTable>.I.GetFromDeiliveryId((uint)deliveryID);
-		SetBaseFrame();
-		SetTargetFrame();
-		SetSubmissionFrame();
-		base.Initialize();
-	}
+  protected void PlayUnlockPortalTween(string effectName, System.Action callback)
+  {
+    Transform ctrl = this.GetCtrl((Enum) QuestDeliveryDetail.UI.OBJ_UNLOCK_PORTAL_ROOT);
+    if (Object.op_Inequality((Object) ctrl, (Object) null))
+    {
+      Transform uiEffect = EffectManager.GetUIEffect(effectName, ctrl, -0.2f);
+      if (Object.op_Inequality((Object) uiEffect, (Object) null))
+      {
+        rymFX component = ((Component) uiEffect).GetComponent<rymFX>();
+        if (Object.op_Inequality((Object) component, (Object) null))
+          component.ChangeRenderQueue = 3999;
+      }
+    }
+    this.PlayTween(this.baseRoot, (Enum) QuestDeliveryDetail.UI.OBJ_UNLOCK_PORTAL_ROOT, callback: (EventDelegate.Callback) (() =>
+    {
+      this.PlayAudio((Enum) QuestDeliveryDetail.AUDIO.UNLOCKE_PORTAL, as_jingle: true);
+      callback();
+    }), is_input_block: false);
+  }
 
-	private void OpenTutorial()
-	{
-		if (HomeTutorialManager.DoesTutorial() && !isInGameScene)
-		{
-			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("HomeScene", "TutorialStep2_2", null);
-		}
-	}
+  protected void DispMessageEventOpen()
+  {
+    if (MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds == null || MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds.Count == 0)
+      return;
+    this.hasDispedMessage = true;
+    int releasedEventId = MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds[0];
+    MonoBehaviourSingleton<DeliveryManager>.I.releasedEventIds.RemoveAt(0);
+    Network.EventData eventData = MonoBehaviourSingleton<QuestManager>.I.eventList.Where<Network.EventData>((Func<Network.EventData, bool>) (e => e.eventId == releasedEventId)).First<Network.EventData>();
+    if (eventData == null)
+    {
+      Debug.LogError((object) "イベント開放に関して、指定されたIDのイベントが存在しません");
+      this.DispMessageEventOpen();
+    }
+    else
+      MonoBehaviourSingleton<GameSceneManager>.I.OpenCommonDialog(new CommonDialog.Desc(CommonDialog.TYPE.OK, string.Format(StringTable.Get(STRING_CATEGORY.QUEST_DELIVERY, 4U), (object) eventData.name)), (Action<string>) (ret => this.DispMessageEventOpen()));
+  }
 
-	private void CompleteTutorial()
-	{
-		if (!TutorialStep.HasAllTutorialCompleted() && !isInGameScene)
-		{
-			MonoBehaviourSingleton<UIManager>.I.tutorialMessage.ForceRun("HomeScene", "TutorialStep5_1", null);
-		}
-	}
+  protected virtual void UpdateTitle()
+  {
+    this.SetLabelText(this.baseRoot, (Enum) QuestDeliveryDetail.UI.LBL_QUEST_TITLE, this.info.name);
+  }
 
-	protected virtual void SetBaseFrame()
-	{
-		baseRoot = SetPrefab((Enum)UI.OBJ_BASE_ROOT, "QuestRequestCheckBase");
-	}
+  protected virtual void UpdateNPC(string map_name, string enemy_name)
+  {
+    NPCTable.NPCData npcData = Singleton<NPCTable>.I.GetNPCData((int) this.info.npcID);
+    this.SetNPCIcon(this.baseRoot, (Enum) QuestDeliveryDetail.UI.TEX_NPC, npcData.npcModelID, this.isComplete);
+    this.SetLabelText(this.baseRoot, (Enum) QuestDeliveryDetail.UI.LBL_PERSON_NAME, npcData.displayName);
+    this.SetLabelText(this.baseRoot, (Enum) QuestDeliveryDetail.UI.LBL_CHARA_MESSAGE, (this.isComplete ? this.info.npcClearComment : this.info.npcComment).Replace("{MAP_NAME}", map_name).Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name).Replace("{ENEMY_NAME}", enemy_name));
+  }
 
-	protected virtual void SetTargetFrame()
-	{
-		targetFrame = SetPrefab((Enum)UI.OBJ_NEED_ITEM_ROOT, "QuestRequestCheckItem");
-	}
+  protected void JumpQuest()
+  {
+    if (!TutorialStep.HasFirstDeliveryCompleted())
+    {
+      GameSection.StopEvent();
+      this.DispatchEvent("TUTORIAL_TO_FIELD");
+    }
+    else
+    {
+      this.PlayAudio((Enum) QuestDeliveryDetail.AUDIO.GO_TO_FIELD);
+      if (this.isQuestEnemy)
+      {
+        if (this.isInGameScene)
+          return;
+        MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(new EventData[3]
+        {
+          new EventData("[BACK]", (object) null),
+          new EventData("TAB_QUEST", (object) (uint) this.deliveryID),
+          new EventData("SELECT_QUEST", (object) this.targetQuestID)
+        });
+      }
+      else
+      {
+        FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(this.targetMapID);
+        if (fieldMapData == null || fieldMapData.jumpPortalID == 0U)
+          Log.Error("QuestDeliveryDetail.JumpQuest() jumpPortalID is not found.");
+        else if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() != "InGameScene")
+        {
+          MonoBehaviourSingleton<WorldMapManager>.I.SetJumpPortalID(fieldMapData.jumpPortalID);
+          GameSection.StopEvent();
+          this.DispatchEvent("QUEST_TO_FIELD");
+        }
+        else
+        {
+          if (!MonoBehaviourSingleton<InGameProgress>.IsValid() || (int) MonoBehaviourSingleton<FieldManager>.I.currentMapID == (int) this.targetMapID)
+            return;
+          MonoBehaviourSingleton<InGameProgress>.I.PortalNext(fieldMapData.jumpPortalID);
+        }
+      }
+    }
+  }
 
-	protected virtual void SetSubmissionFrame()
-	{
-	}
+  protected void OnQuery_TO_SMITH()
+  {
+    XorUInt targetId;
+    QuestDeliveryDetail.SMITH_SECTION smithSection = this.GetSmithSection(this.info, out targetId);
+    MonoBehaviourSingleton<StatusManager>.I.InitUniqueEquip();
+    if (smithSection == QuestDeliveryDetail.SMITH_SECTION.INVALID)
+      this.ToSmith();
+    else
+      this.ToSmith(smithSection, targetId);
+  }
 
-	protected void UpdateSubMissionButton()
-	{
-		uint questId = info.needs[0].questId;
-		if (questId == 0)
-		{
-			SetActive((Enum)UI.BTN_SUBMISSION, false);
-		}
-		else
-		{
-			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(questId);
-			SetActive((Enum)UI.BTN_SUBMISSION, questData.IsMissionExist());
-		}
-	}
+  protected void OnQuery_TO_STATUS() => this.OnQuery_MAIN_MENU_STATUS();
 
-	protected void UpdateSubMission()
-	{
-		UI[] array = new UI[3]
-		{
-			UI.OBJ_MISSION_INFO_1,
-			UI.OBJ_MISSION_INFO_2,
-			UI.OBJ_MISSION_INFO_3
-		};
-		UI[] array2 = new UI[3]
-		{
-			UI.OBJ_TOP_CROWN_1,
-			UI.OBJ_TOP_CROWN_2,
-			UI.OBJ_TOP_CROWN_3
-		};
-		UI[] array3 = new UI[3]
-		{
-			UI.LBL_MISSION_INFO_1,
-			UI.LBL_MISSION_INFO_2,
-			UI.LBL_MISSION_INFO_3
-		};
-		UI[] array4 = new UI[3]
-		{
-			UI.SPR_MISSION_INFO_CROWN_1,
-			UI.SPR_MISSION_INFO_CROWN_2,
-			UI.SPR_MISSION_INFO_CROWN_3
-		};
-		UI[] array5 = new UI[3]
-		{
-			UI.SPR_CROWN_1,
-			UI.SPR_CROWN_2,
-			UI.SPR_CROWN_3
-		};
-		if (info.needs.Length != 0)
-		{
-			uint questId = info.needs[0].questId;
-			if (questId != 0)
-			{
-				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(questId);
-				if (!questData.IsMissionExist())
-				{
-					SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, false);
-				}
-				else
-				{
-					ClearStatusQuest clearStatusQuestData = MonoBehaviourSingleton<QuestManager>.I.GetClearStatusQuestData(questId);
-					if (clearStatusQuestData == null)
-					{
-						SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, true);
-						int i = 0;
-						for (int num = questData.missionID.Length; i < num; i++)
-						{
-							uint num2 = questData.missionID[i];
-							SetActive(submissionFrame, array[i], num2 != 0);
-							SetActive(submissionFrame, array2[i], num2 != 0);
-							SetActive(submissionFrame, array3[i], num2 != 0);
-							if (num2 != 0)
-							{
-								SetActive(submissionFrame, array4[i], false);
-								SetActive(submissionFrame, array5[i], false);
-								QuestTable.MissionTableData missionData = Singleton<QuestTable>.I.GetMissionData(num2);
-								SetLabelText(submissionFrame, array3[i], missionData.missionText);
-							}
-						}
-					}
-					else
-					{
-						SetActive((Enum)UI.OBJ_SUBMISSION_ROOT, true);
-						int j = 0;
-						for (int count = clearStatusQuestData.missionStatus.Count; j < count; j++)
-						{
-							CLEAR_STATUS cLEAR_STATUS = (CLEAR_STATUS)clearStatusQuestData.missionStatus[j];
-							SetActive(submissionFrame, array[j], questData.missionID[j] != 0);
-							SetActive(submissionFrame, array2[j], questData.missionID[j] != 0);
-							SetActive(submissionFrame, array4[j], cLEAR_STATUS >= CLEAR_STATUS.CLEAR);
-							SetActive(submissionFrame, array5[j], cLEAR_STATUS >= CLEAR_STATUS.CLEAR);
-							QuestTable.MissionTableData missionData2 = Singleton<QuestTable>.I.GetMissionData(questData.missionID[j]);
-							SetLabelText(submissionFrame, array3[j], missionData2.missionText);
-						}
-					}
-				}
-			}
-		}
-	}
+  protected void OnQuery_TO_STORAGE() => this.OpenStorage();
 
-	protected void UpdateHappenTarget()
-	{
-		QuestTable.QuestTableData questData = info.GetQuestData();
-		if (questData != null)
-		{
-			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)questData.GetMainEnemyID());
-			if (enemyData != null)
-			{
-				ItemIcon.Create(ITEM_ICON_TYPE.QUEST_ITEM, enemyData.iconId, null, FindCtrl(targetFrame, UI.OBJ_ENEMY), enemyData.element, null, -1, null, 0, false, -1, false, null, false, 0, 0, false, GET_TYPE.PAY);
-			}
-		}
-	}
+  protected void OnQuery_TO_POINT_SHOP() => this.ToPointShop();
 
-	public override void UpdateUI()
-	{
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e4: Expected O, but got Unknown
-		//IL_05e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07ed: Unknown result type (might be due to invalid IL or missing references)
-		OpenTutorial();
-		UpdateTitle();
-		SetSprite(baseRoot, UI.SPR_WINDOW, SPR_WINDOW_TYPE[info.DeliveryTypeIndex()]);
-		SetSprite(baseRoot, UI.SPR_MESSAGE_BG, SPR_MESSAGE_BG_TYPE[info.DeliveryTypeIndex()]);
-		bool flag = false;
-		if (Object.op_Implicit(submissionFrame))
-		{
-			UpdateSubMissionButton();
-			UpdateSubMission();
-			flag = submissionFrame.get_gameObject().get_activeSelf();
-			SetActive((Enum)UI.STR_BTN_SUBMISSION, !flag);
-			SetActive((Enum)UI.STR_BTN_SUBMISSION_BACK, flag);
-		}
-		Transform root = targetFrame;
-		MonoBehaviourSingleton<DeliveryManager>.I.GetTargetEnemyData(deliveryID, out targetQuestID, out targetMapID, out string map_name, out string enemy_name, out DIFFICULTY_TYPE? difficulty, out targetPortalID);
-		SetLabelText(root, UI.LBL_PLACE_NAME, map_name);
-		MonoBehaviourSingleton<DeliveryManager>.I.GetAllProgressDelivery(deliveryID, out int have, out int need);
-		SetLabelText(root, UI.LBL_HAVE, (!isComplete) ? have.ToString() : need.ToString());
-		SetColor(root, UI.LBL_HAVE, (!isComplete) ? Color.get_red() : Color.get_white());
-		SetLabelText(root, UI.LBL_NEED, need.ToString());
-		SetLabelText(root, UI.LBL_NEED_ITEM_NAME, MonoBehaviourSingleton<DeliveryManager>.I.GetTargetItemName(deliveryID, 0u));
-		if (info.IsDefeatCondition(0u))
-		{
-			if (targetQuestID != 0)
-			{
-				isQuestEnemy = true;
-				Transform val = FindCtrl(root, UI.OBJ_DIFFICULTY_ROOT);
-				int value = (int)difficulty.Value;
-				int j = 0;
-				for (int childCount = val.get_childCount(); j < childCount; j++)
-				{
-					Transform t2 = val.GetChild(j);
-					SetActive(t2, j <= value);
-				}
-				SetLabelText(root, UI.LBL_GET_PLACE, base.sectionData.GetText("GET_QUEST"));
-			}
-			else
-			{
-				isQuestEnemy = false;
-				SetLabelText(root, UI.LBL_GET_PLACE, base.sectionData.GetText("GET_AREA"));
-			}
-			SetLabelText(root, UI.LBL_ENEMY_NAME, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 3u), enemy_name));
-		}
-		else
-		{
-			isQuestEnemy = false;
-			SetLabelText(root, UI.LBL_GET_PLACE, StringTable.Get(STRING_CATEGORY.DELIVERY_CONDITION_PLACE, (uint)info.GetConditionType(0u)));
-			SetLabelText(root, UI.LBL_ENEMY_NAME, enemy_name);
-		}
-		SetActive(root, UI.OBJ_DIFFICULTY_ROOT, isQuestEnemy);
-		SetActive(root, UI.OBJ_ENEMY_NAME_ROOT, !isQuestEnemy);
-		UpdateNPC(map_name, enemy_name);
-		if ((isComplete || isNotice) && !isCompletedEventDelivery)
-		{
-			SetActive((Enum)UI.OBJ_BACK, false);
-			SetActive((Enum)UI.BTN_CREATE, false);
-			SetActive((Enum)UI.BTN_JOIN, false);
-			SetActive((Enum)UI.BTN_MATCHING, false);
-			UpdateUIJumpButton(JumpButtonType.Complete);
-		}
-		else
-		{
-			SetActive((Enum)UI.OBJ_BACK, true);
-			bool flag2 = true;
-			bool flag3 = false;
-			if (info == null || info.IsDefeatCondition(0u) || targetMapID != 0)
-			{
-				if (isQuestEnemy)
-				{
-					if (isInGameScene)
-					{
-						flag2 = false;
-					}
-				}
-				else
-				{
-					bool flag4 = FieldManager.HasWorldMap(targetMapID);
-					if (isInGameScene)
-					{
-						if (MonoBehaviourSingleton<FieldManager>.I.currentMapID == targetMapID)
-						{
-							if (flag4)
-							{
-								flag3 = true;
-							}
-							else
-							{
-								flag2 = false;
-							}
-						}
-						else if (flag4)
-						{
-							if (!MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(targetMapID) || WorldMapManager.IsValidPortalIDs(targetPortalID))
-							{
-								flag3 = true;
-							}
-						}
-						else if (!MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(targetMapID))
-						{
-							flag2 = false;
-						}
-					}
-					else if (flag4)
-					{
-						if (!MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(targetMapID) || WorldMapManager.IsValidPortalIDs(targetPortalID))
-						{
-							flag3 = true;
-						}
-					}
-					else if (!MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(targetMapID))
-					{
-						flag2 = false;
-					}
-				}
-			}
-			else
-			{
-				flag2 = (info.GetDeliveryJumpType() != DeliveryTable.DELIVERY_JUMPTYPE.UNDEFINED);
-			}
-			JumpButtonType jumpButtonType = JumpButtonType.Invalid;
-			if (flag2)
-			{
-				if (info != null && info.GetDeliveryJumpType() != 0)
-				{
-					jumpButtonType = ConvertDeliveryJumpType();
-				}
-				else
-				{
-					if (info != null)
-					{
-						QuestTable.QuestTableData questData = info.GetQuestData();
-						if (questData != null && questData.questType == QUEST_TYPE.WAVE)
-						{
-							jumpButtonType = JumpButtonType.WaveRoom;
-						}
-					}
-					if (jumpButtonType != JumpButtonType.WaveRoom)
-					{
-						jumpButtonType = ((!flag3) ? JumpButtonType.Quest : JumpButtonType.Map);
-					}
-				}
-				UpdateUIJumpButton(jumpButtonType);
-			}
-			else
-			{
-				SetActive(baseRoot, UI.BTN_JUMP_QUEST, false);
-				SetActive(baseRoot, UI.BTN_JUMP_MAP, false);
-				SetActive(baseRoot, UI.BTN_JUMP_GACHATOP, false);
-				SetActive(baseRoot, UI.BTN_JUMP_INVALID, false);
-				SetActive(baseRoot, UI.BTN_WAVEMATCH_NEW, false);
-				SetActive(baseRoot, UI.BTN_WAVEMATCH_PASS, false);
-				SetActive(baseRoot, UI.BTN_WAVEMATCH_AUTO, false);
-				SetActive(baseRoot, UI.BTN_COMPLETE, false);
-			}
-			if (flag3 && MonoBehaviourSingleton<FieldManager>.I.currentMapID != targetMapID)
-			{
-				SetColor(baseRoot, UI.LBL_PLACE_NAME, Color.get_red());
-			}
-			else
-			{
-				SetColor(baseRoot, UI.LBL_PLACE_NAME, Color.get_white());
-			}
-		}
-		int money = 0;
-		int exp = 0;
-		if (rewardData != null)
-		{
-			SetGrid(baseRoot, UI.GRD_REWARD, string.Empty, rewardData.Length, false, delegate(int i, Transform t, bool is_recycle)
-			{
-				DeliveryRewardTable.DeliveryRewardData.Reward reward = rewardData[i].reward;
-				bool is_visible = false;
-				if (reward.type == REWARD_TYPE.MONEY)
-				{
-					money += reward.num;
-				}
-				else if (reward.type == REWARD_TYPE.EXP)
-				{
-					exp += reward.num;
-				}
-				else
-				{
-					is_visible = true;
-					ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(reward.type, reward.item_id, t, reward.num, string.Empty, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_DETAIL);
-					SetMaterialInfo(itemIcon.transform, reward.type, reward.item_id, null);
-					itemIcon.SetRewardBG(true);
-				}
-				SetActive(t, is_visible);
-			});
-		}
-		SetLabelText(baseRoot, UI.LBL_MONEY, money.ToString());
-		SetLabelText(baseRoot, UI.LBL_EXP, exp.ToString());
-		SetActive(baseRoot, UI.OBJ_COMPLETE_ROOT, isComplete && !flag);
-		SetActive(baseRoot, UI.OBJ_UNLOCK_PORTAL_ROOT, isComplete);
-		if (isComplete)
-		{
-			string text = string.Empty;
-			List<FieldMapTable.PortalTableData> deliveryRelationPortalData = Singleton<FieldMapTable>.I.GetDeliveryRelationPortalData(info.id);
-			switch (deliveryRelationPortalData.Count)
-			{
-			case 1:
-			{
-				FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(deliveryRelationPortalData[0].srcMapID);
-				if (fieldMapData != null)
-				{
-					text = fieldMapData.mapName;
-				}
-				break;
-			}
-			default:
-				text = base.sectionData.GetText("MULTI_UNLOCK");
-				break;
-			case 0:
-				break;
-			}
-			bool flag5 = !string.IsNullOrEmpty(text);
-			if (!TutorialStep.HasFirstDeliveryCompleted())
-			{
-				flag5 = false;
-			}
-			SetActive(baseRoot, UI.OBJ_UNLOCK_PORTAL_ROOT, flag5 && !isCompletedEventDelivery);
-			SetLabelText(baseRoot, UI.LBL_UNLOCK_PORTAL, text);
-			if (isCompletedEventDelivery)
-			{
-				SkipTween(baseRoot, UI.OBJ_COMPLETE_ROOT, true, 0);
-			}
-			else
-			{
-				this.StartCoroutine(StartTweenCoroutine(flag5));
-			}
-		}
-		this.StartCoroutine(SetPointShopGetPointUI());
-	}
+  protected void OnQuery_TO_WORLDMAP() => this.OnQuery_MAIN_MENU_QUEST();
 
-	private IEnumerator StartTweenCoroutine(bool is_unlock_portal)
-	{
-		while (GameSceneManager.isAutoEventSkip)
-		{
-			yield return (object)null;
-		}
-		string effectName = "ef_ui_portal_unlock_01";
-		if (is_unlock_portal)
-		{
-			LoadingQueue load_queue = new LoadingQueue(this);
-			load_queue.CacheEffect(RESOURCE_CATEGORY.EFFECT_UI, effectName);
-			yield return (object)load_queue.Wait();
-			ResetTween(baseRoot, UI.OBJ_UNLOCK_PORTAL_ROOT, 0);
-		}
-		PlayCompleteTween(delegate
-		{
-			((_003CStartTweenCoroutine_003Ec__Iterator85)/*Error near IL_00c1: stateMachine*/)._003C_003Ef__this.OnEndCompletetween(((_003CStartTweenCoroutine_003Ec__Iterator85)/*Error near IL_00c1: stateMachine*/).is_unlock_portal, ((_003CStartTweenCoroutine_003Ec__Iterator85)/*Error near IL_00c1: stateMachine*/)._003CeffectName_003E__0);
-		});
-		CompleteTutorial();
-	}
+  public void OnQuery_PORTAL_RELEASE()
+  {
+    object eventData = GameSection.GetEventData();
+    if (eventData is List<uint>)
+      GameSaveData.instance.newReleasePortals = eventData as List<uint>;
+    if (MonoBehaviourSingleton<DeliveryManager>.I.isNoticeNewDeliveryAtHomeScene)
+    {
+      MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtInGame = new List<int>((IEnumerable<int>) MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene);
+      MonoBehaviourSingleton<DeliveryManager>.I.noticeNewDeliveryAtHomeScene.Clear();
+      MonoBehaviourSingleton<InGameProgress>.I.DeliveryAddCheck();
+    }
+    else
+      MonoBehaviourSingleton<DeliveryManager>.I.CheckAnnouncePortalOpen();
+  }
 
-	private void PlayCompleteTween(EventDelegate.Callback callback)
-	{
-		ResetTween(baseRoot, UI.OBJ_COMPLETE_ROOT, 0);
-		PlayTween(baseRoot, UI.OBJ_COMPLETE_ROOT, true, delegate
-		{
-			PlayAudio(AUDIO.REQUEST_COMPLETE, 1f, false);
-			callback();
-		}, false, 0);
-	}
+  protected virtual void UpdateUIJumpButton(QuestDeliveryDetail.JumpButtonType type)
+  {
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_QUEST, false);
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_MAP, false);
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_GACHATOP, false);
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_INVALID, false);
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_COMPLETE, false);
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_POINT_SHOP, false);
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_WORLDMAP, false);
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_SMITH, false);
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_STATUS, false);
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_STORAGE, false);
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_WAVEMATCH_NEW, false);
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_WAVEMATCH_PASS, false);
+    this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_WAVEMATCH_AUTO, false);
+    this.SetActive(this.baseRoot, this.GetBtnChangeEquipValue(), false);
+    this.AdjustBtnPositionToChangableEquipUI(type);
+    switch (type)
+    {
+      case QuestDeliveryDetail.JumpButtonType.Complete:
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_COMPLETE, true);
+        break;
+      case QuestDeliveryDetail.JumpButtonType.Map:
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_MAP, true);
+        break;
+      case QuestDeliveryDetail.JumpButtonType.Quest:
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_QUEST, true);
+        break;
+      case QuestDeliveryDetail.JumpButtonType.Gacha:
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_GACHATOP, true);
+        break;
+      case QuestDeliveryDetail.JumpButtonType.Smith:
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_SMITH, true);
+        break;
+      case QuestDeliveryDetail.JumpButtonType.Status:
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_STATUS, true);
+        break;
+      case QuestDeliveryDetail.JumpButtonType.Storage:
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_STORAGE, true);
+        break;
+      case QuestDeliveryDetail.JumpButtonType.PointShop:
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_POINT_SHOP, true);
+        break;
+      case QuestDeliveryDetail.JumpButtonType.WorldMap:
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_WORLDMAP, true);
+        break;
+      case QuestDeliveryDetail.JumpButtonType.WaveRoom:
+      case QuestDeliveryDetail.JumpButtonType.seriesRoom:
+      case QuestDeliveryDetail.JumpButtonType.orderRoom:
+      case QuestDeliveryDetail.JumpButtonType.eventRoom:
+        if (this.isInGameScene)
+          break;
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_WAVEMATCH_NEW, true);
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_WAVEMATCH_PASS, true);
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_WAVEMATCH_AUTO, true);
+        break;
+      default:
+        this.SetActive(this.baseRoot, (Enum) QuestDeliveryDetail.UI.BTN_JUMP_INVALID, true);
+        break;
+    }
+  }
 
-	protected virtual void OnEndCompletetween(bool is_unlock_portal, string effectName)
-	{
-		if (is_unlock_portal)
-		{
-			PlayUnlockPortalTween(effectName);
-		}
-	}
+  protected void JumpMap()
+  {
+    if (FieldManager.HasWorldMap(this.targetMapID))
+    {
+      FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(this.targetMapID);
+      if (Array.IndexOf<uint>(MonoBehaviourSingleton<WorldMapManager>.I.GetOpenRegionIdList(), fieldMapData.regionId) < 0)
+      {
+        GameSection.ChangeEvent("NOT_OPEN", (object) new object[1]
+        {
+          (object) Singleton<RegionTable>.I.GetData(fieldMapData.regionId).regionName
+        });
+        return;
+      }
+    }
+    MonoBehaviourSingleton<WorldMapManager>.I.PushDisplayQuestTarget((int) this.targetMapID, this.targetPortalID);
+    MonoBehaviourSingleton<WorldMapManager>.I.ignoreTutorial = true;
+    bool flag1 = true;
+    if (Singleton<TutorialMessageTable>.IsValid())
+      flag1 = Singleton<TutorialMessageTable>.I.ReadData.HasRead(10003);
+    bool flag2 = false;
+    DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint) this.deliveryID);
+    if (deliveryTableData != null && deliveryTableData.type == DELIVERY_TYPE.STORY && 10100011 >= this.deliveryID && !flag1)
+    {
+      flag2 = true;
+      if (Singleton<TutorialMessageTable>.IsValid())
+      {
+        TutorialReadData readData = Singleton<TutorialMessageTable>.I.ReadData;
+        readData.SetReadId(10003, true);
+        readData.Save();
+      }
+    }
+    if (flag2)
+      this.RequestEvent("DIRECT_REGION_TUTORIAL");
+    else
+      this.RequestEvent("DIRECT_REGION_QUEST");
+  }
 
-	protected void PlayUnlockPortalTween(string effectName)
-	{
-		Transform ctrl = GetCtrl(UI.OBJ_UNLOCK_PORTAL_ROOT);
-		if (ctrl != null)
-		{
-			Transform uIEffect = EffectManager.GetUIEffect(effectName, ctrl, -0.2f, 0, null);
-			if (uIEffect != null)
-			{
-				rymFX component = uIEffect.GetComponent<rymFX>();
-				if (component != null)
-				{
-					component.ChangeRenderQueue = 3999;
-				}
-			}
-		}
-		PlayTween(baseRoot, UI.OBJ_UNLOCK_PORTAL_ROOT, true, delegate
-		{
-			PlayAudio(AUDIO.UNLOCKE_PORTAL, 1f, true);
-		}, false, 0);
-	}
+  private IEnumerator SetPointShopGetPointUI()
+  {
+    if (this.pointShopGetPointData != null && this.pointShopGetPointData.Count > 0)
+    {
+      LoadingQueue queue = new LoadingQueue((MonoBehaviour) this);
+      queue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName((int) this.pointShopGetPointData[0].pointShopId));
+      if (queue.IsLoading())
+        yield return (object) queue.Wait();
+      this.SetActive((Enum) QuestDeliveryDetail.UI.OBJ_NORMAL_ROOT, true);
+      this.SetLabelText((Enum) QuestDeliveryDetail.UI.LBL_POINT_NORMAL, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2U), (object) this.pointShopGetPointData[0].basePoint));
+      ResourceLoad.LoadPointIconImageTexture(((Component) this.GetCtrl((Enum) QuestDeliveryDetail.UI.TEX_NORMAL_ICON)).GetComponent<UITexture>(), this.pointShopGetPointData[0].pointShopId);
+      if (this.pointShopGetPointData.Count >= 2)
+      {
+        queue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName((int) this.pointShopGetPointData[1].pointShopId));
+        if (queue.IsLoading())
+          yield return (object) queue.Wait();
+        this.SetActive((Enum) QuestDeliveryDetail.UI.OBJ_EVENT_ROOT, true);
+        this.SetLabelText((Enum) QuestDeliveryDetail.UI.LBL_POINT_EVENT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2U), (object) this.pointShopGetPointData[1].basePoint));
+        ResourceLoad.LoadPointIconImageTexture(((Component) this.GetCtrl((Enum) QuestDeliveryDetail.UI.TEX_EVENT_ICON)).GetComponent<UITexture>(), this.pointShopGetPointData[1].pointShopId);
+      }
+      queue = (LoadingQueue) null;
+    }
+  }
 
-	protected virtual void UpdateTitle()
-	{
-		SetLabelText(baseRoot, UI.LBL_QUEST_TITLE, info.name);
-	}
+  private QuestDeliveryDetail.JumpButtonType ConvertDeliveryJumpType()
+  {
+    switch (this.info.GetDeliveryJumpType())
+    {
+      case DeliveryTable.DELIVERY_JUMPTYPE.TO_GACHA:
+        return QuestDeliveryDetail.JumpButtonType.Gacha;
+      case DeliveryTable.DELIVERY_JUMPTYPE.TO_SMITH:
+        return QuestDeliveryDetail.JumpButtonType.Smith;
+      case DeliveryTable.DELIVERY_JUMPTYPE.TO_STATUS:
+        return QuestDeliveryDetail.JumpButtonType.Status;
+      case DeliveryTable.DELIVERY_JUMPTYPE.TO_STORAGE:
+        return QuestDeliveryDetail.JumpButtonType.Storage;
+      case DeliveryTable.DELIVERY_JUMPTYPE.TO_POINT_SHOP:
+        return QuestDeliveryDetail.JumpButtonType.PointShop;
+      case DeliveryTable.DELIVERY_JUMPTYPE.TO_WORLD_MAP:
+        return QuestDeliveryDetail.JumpButtonType.WorldMap;
+      default:
+        return QuestDeliveryDetail.JumpButtonType.Invalid;
+    }
+  }
 
-	protected virtual void UpdateNPC(string map_name, string enemy_name)
-	{
-		NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData((int)info.npcID);
-		SetNPCIcon(baseRoot, UI.TEX_NPC, nPCData.npcModelID, isComplete);
-		SetLabelText(baseRoot, UI.LBL_PERSON_NAME, nPCData.displayName);
-		string text = (!isComplete) ? info.npcComment : info.npcClearComment;
-		text = text.Replace("{MAP_NAME}", map_name);
-		text = text.Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name);
-		text = text.Replace("{ENEMY_NAME}", enemy_name);
-		SetLabelText(baseRoot, UI.LBL_CHARA_MESSAGE, text);
-	}
+  protected void WaveMatchNew()
+  {
+    QuestTable.QuestTableData questData = this.info.GetQuestData();
+    MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questData.questID);
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) questData.questType
+    });
+  }
 
-	protected void JumpQuest()
-	{
-		if (!TutorialStep.HasFirstDeliveryCompleted())
-		{
-			GameSection.StopEvent();
-			DispatchEvent("TUTORIAL_TO_FIELD", null);
-		}
-		else
-		{
-			PlayAudio(AUDIO.GO_TO_FIELD, 1f, false);
-			if (isQuestEnemy)
-			{
-				if (!isInGameScene)
-				{
-					EventData[] autoEvents = new EventData[3]
-					{
-						new EventData("[BACK]", null),
-						new EventData("TAB_QUEST", (uint)deliveryID),
-						new EventData("SELECT_QUEST", targetQuestID)
-					};
-					MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
-				}
-			}
-			else
-			{
-				FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(targetMapID);
-				if (fieldMapData == null || fieldMapData.jumpPortalID == 0)
-				{
-					Log.Error("QuestDeliveryDetail.JumpQuest() jumpPortalID is not found.");
-				}
-				else if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() != "InGameScene")
-				{
-					MonoBehaviourSingleton<WorldMapManager>.I.SetJumpPortalID(fieldMapData.jumpPortalID);
-					GameSection.StopEvent();
-					DispatchEvent("QUEST_TO_FIELD", null);
-				}
-				else if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<FieldManager>.I.currentMapID != targetMapID)
-				{
-					MonoBehaviourSingleton<InGameProgress>.I.PortalNext(fieldMapData.jumpPortalID);
-				}
-			}
-		}
-	}
+  protected void WaveMatchPass()
+  {
+    MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(this.info.needs[0].questId);
+  }
 
-	protected void OnQuery_TO_SMITH()
-	{
-		ToSmith();
-	}
+  protected void WaveMatchAuto()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) false
+    });
+    GameSection.StayEvent();
+    int retryCount = 0;
+    PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0);
+    MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int) this.info.GetQuestData().questID, retryCount, false, (Action<bool, int, bool, float>) ((is_success, maxRetryCount, isJoined, waitTime) =>
+    {
+      if (!is_success)
+        GameSection.ResumeEvent(false);
+      else if (maxRetryCount > 0)
+      {
+        ++retryCount;
+        this.StartCoroutine(this.MatchAtRandom(setting, retryCount, waitTime));
+      }
+      else if (!isJoined)
+      {
+        this.WaveMatchCreate();
+      }
+      else
+      {
+        MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
+        GameSection.ResumeEvent(true);
+      }
+    }));
+  }
 
-	protected void OnQuery_TO_STATUS()
-	{
-		OnQuery_MAIN_MENU_STATUS();
-	}
+  private IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
+  {
+    yield return (object) new WaitForSeconds(time);
+    MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int) this.info.needs[0].questId, retryCount, false, (Action<bool, int, bool, float>) ((is_success, maxRetryCount, isJoined, waitTime) =>
+    {
+      if (!is_success)
+        GameSection.ResumeEvent(false);
+      else if (maxRetryCount > 0)
+      {
+        if (retryCount >= maxRetryCount)
+        {
+          this.WaveMatchCreate();
+        }
+        else
+        {
+          ++retryCount;
+          this.StartCoroutine(this.MatchAtRandom(setting, retryCount, waitTime));
+        }
+      }
+      else if (!isJoined)
+      {
+        this.WaveMatchCreate();
+      }
+      else
+      {
+        MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
+        GameSection.ResumeEvent(true);
+      }
+    }));
+  }
 
-	protected void OnQuery_TO_STORAGE()
-	{
-		OpenStorage();
-	}
+  protected void WaveMatchCreate()
+  {
+    QuestTable.QuestTableData questData = this.info.GetQuestData();
+    MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questData.questID);
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) questData.questType
+    });
+    PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0);
+    MonoBehaviourSingleton<PartyManager>.I.SendCreate((int) questData.questID, setting, (Action<bool>) (is_success =>
+    {
+      if (is_success)
+        MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
+      GameSection.ResumeEvent(is_success);
+    }));
+  }
 
-	protected void OnQuery_TO_POINT_SHOP()
-	{
-		ToPointShop();
-	}
+  private void OnQuery_SECTION_BACK()
+  {
+    if (this.info == null || !this.completeJumpButton)
+      return;
+    if (this.info.GetUIType() == DeliveryTable.UIType.EVENT || this.info.GetUIType() == DeliveryTable.UIType.SUB_EVENT)
+    {
+      GameSection.StayEvent();
+      MonoBehaviourSingleton<DeliveryManager>.I.SendEventList((Action<bool>) (is_success => GameSection.ResumeEvent(true)));
+    }
+    else
+    {
+      if (this.info.DeliveryTypeIndex() == 1)
+        return;
+      GameSection.StayEvent();
+      MonoBehaviourSingleton<DeliveryManager>.I.SendEventNormalList((Action<bool>) (is_success => GameSection.ResumeEvent(true)));
+    }
+  }
 
-	protected void OnQuery_TO_WORLDMAP()
-	{
-		OnQuery_MAIN_MENU_QUEST();
-	}
+  private QuestDeliveryDetail.SMITH_SECTION GetSmithSection(
+    DeliveryTable.DeliveryData _info,
+    out XorUInt targetId)
+  {
+    targetId = (XorUInt) 0U;
+    if (_info == null)
+      return QuestDeliveryDetail.SMITH_SECTION.INVALID;
+    QuestDeliveryDetail.SMITH_SECTION smithSection = QuestDeliveryDetail.SMITH_SECTION.INVALID;
+    DeliveryTable.DeliveryData.NeedData[] needs = _info.needs;
+    int index = 0;
+    for (int length = needs.Length; index < length; ++index)
+    {
+      DeliveryTable.DeliveryData.NeedData needData = needs[index];
+      switch (needData.conditionType)
+      {
+        case DELIVERY_CONDITION_TYPE.WEAPON_PROTECTOR_GROW:
+        case DELIVERY_CONDITION_TYPE.WEAPON_GROW:
+        case DELIVERY_CONDITION_TYPE.PROTECTOR_GROW:
+        case DELIVERY_CONDITION_TYPE.EQUIP_GROW_MAX_EQUIP_ID_OR:
+          targetId = needData.needId;
+          if (!MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int) _info.id) && MonoBehaviourSingleton<InventoryManager>.I.GetEquipItemNumWithShadow((uint) targetId) > 0)
+            return QuestDeliveryDetail.SMITH_SECTION.EQUIP_GROW;
+          break;
+        case DELIVERY_CONDITION_TYPE.MAGI_GROW:
+          targetId = needData.needId;
+          if (!MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int) _info.id))
+            return QuestDeliveryDetail.SMITH_SECTION.MAGI_GROW;
+          break;
+        case DELIVERY_CONDITION_TYPE.WEAPON_PROTECTOR_CREATE:
+        case DELIVERY_CONDITION_TYPE.WEAPON_CREATE:
+        case DELIVERY_CONDITION_TYPE.PROTECTOR_CREATE:
+          targetId = needData.needId;
+          if (!MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int) _info.id))
+            return QuestDeliveryDetail.SMITH_SECTION.EQUIP_CREATE;
+          break;
+        case DELIVERY_CONDITION_TYPE.WEAPON_PROTECTOR_EVOLVE:
+        case DELIVERY_CONDITION_TYPE.WEAPON_EVOLVE:
+        case DELIVERY_CONDITION_TYPE.PROTECTOR_EVOLVE:
+          targetId = needData.needId;
+          if (!MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int) _info.id) && MonoBehaviourSingleton<InventoryManager>.I.GetEquipItemNumWithShadow((uint) targetId) > 0)
+            return QuestDeliveryDetail.SMITH_SECTION.EQUIP_EVOLVE;
+          break;
+        case DELIVERY_CONDITION_TYPE.CHANGE_ABILITY:
+          targetId = needData.needId;
+          if (!MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int) _info.id))
+            return QuestDeliveryDetail.SMITH_SECTION.CHANGE_ABILITY;
+          break;
+        case DELIVERY_CONDITION_TYPE.EQUIP_EXCEED:
+          targetId = needData.needId;
+          if (!MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int) _info.id) && MonoBehaviourSingleton<InventoryManager>.I.GetEquipItemNumWithShadow((uint) targetId) > 0)
+            return QuestDeliveryDetail.SMITH_SECTION.EQUIP_EXCEED;
+          break;
+        case DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID:
+          if (!MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int) needData.needId.value))
+          {
+            smithSection = this.GetSmithSection(Singleton<DeliveryTable>.I.GetDeliveryTableData(needData.needId.value), out targetId);
+            if (smithSection != QuestDeliveryDetail.SMITH_SECTION.INVALID)
+              return smithSection;
+            break;
+          }
+          break;
+        default:
+          smithSection = QuestDeliveryDetail.SMITH_SECTION.INVALID;
+          break;
+      }
+    }
+    return smithSection;
+  }
 
-	protected virtual void UpdateUIJumpButton(JumpButtonType type)
-	{
-		SetActive(baseRoot, UI.BTN_JUMP_QUEST, false);
-		SetActive(baseRoot, UI.BTN_JUMP_MAP, false);
-		SetActive(baseRoot, UI.BTN_JUMP_GACHATOP, false);
-		SetActive(baseRoot, UI.BTN_JUMP_INVALID, false);
-		SetActive(baseRoot, UI.BTN_COMPLETE, false);
-		SetActive(baseRoot, UI.BTN_JUMP_POINT_SHOP, false);
-		SetActive(baseRoot, UI.BTN_JUMP_WORLDMAP, false);
-		SetActive(baseRoot, UI.BTN_JUMP_SMITH, false);
-		SetActive(baseRoot, UI.BTN_JUMP_STATUS, false);
-		SetActive(baseRoot, UI.BTN_JUMP_STORAGE, false);
-		SetActive(baseRoot, UI.BTN_WAVEMATCH_NEW, false);
-		SetActive(baseRoot, UI.BTN_WAVEMATCH_PASS, false);
-		SetActive(baseRoot, UI.BTN_WAVEMATCH_AUTO, false);
-		switch (type)
-		{
-		default:
-			SetActive(baseRoot, UI.BTN_JUMP_INVALID, true);
-			break;
-		case JumpButtonType.Complete:
-			SetActive(baseRoot, UI.BTN_COMPLETE, true);
-			break;
-		case JumpButtonType.Map:
-			SetActive(baseRoot, UI.BTN_JUMP_MAP, true);
-			break;
-		case JumpButtonType.Quest:
-			SetActive(baseRoot, UI.BTN_JUMP_QUEST, true);
-			break;
-		case JumpButtonType.Gacha:
-			SetActive(baseRoot, UI.BTN_JUMP_GACHATOP, true);
-			break;
-		case JumpButtonType.Smith:
-			SetActive(baseRoot, UI.BTN_JUMP_SMITH, true);
-			break;
-		case JumpButtonType.Status:
-			SetActive(baseRoot, UI.BTN_JUMP_STATUS, true);
-			break;
-		case JumpButtonType.Storage:
-			SetActive(baseRoot, UI.BTN_JUMP_STORAGE, true);
-			break;
-		case JumpButtonType.PointShop:
-			SetActive(baseRoot, UI.BTN_JUMP_POINT_SHOP, true);
-			break;
-		case JumpButtonType.WorldMap:
-			SetActive(baseRoot, UI.BTN_JUMP_WORLDMAP, true);
-			break;
-		case JumpButtonType.WaveRoom:
-			if (!isInGameScene)
-			{
-				SetActive(baseRoot, UI.BTN_WAVEMATCH_NEW, true);
-				SetActive(baseRoot, UI.BTN_WAVEMATCH_PASS, true);
-				SetActive(baseRoot, UI.BTN_WAVEMATCH_AUTO, true);
-			}
-			break;
-		}
-	}
+  private void ToSmith(QuestDeliveryDetail.SMITH_SECTION section, XorUInt targetId)
+  {
+    if ((uint) targetId == 0U)
+    {
+      this.ToSmith();
+    }
+    else
+    {
+      switch (section)
+      {
+        case QuestDeliveryDetail.SMITH_SECTION.EQUIP_GROW:
+        case QuestDeliveryDetail.SMITH_SECTION.EQUIP_EXCEED:
+        case QuestDeliveryDetail.SMITH_SECTION.EQUIP_EVOLVE:
+          EquipItemInfo growEquipItem = this.GetGrowEquipItem(section, targetId);
+          if (growEquipItem != null)
+          {
+            this.GetOrCreateSmithData<SmithManager.SmithGrowData>().selectEquipData = growEquipItem;
+            if (growEquipItem.IsLevelMax() && growEquipItem.tableData.IsEvolve())
+            {
+              this.ChangeSmithScene("SmithEvolve");
+              return;
+            }
+            this.ChangeSmithScene("SmithGrow");
+            return;
+          }
+          break;
+      }
+      this.ToSmith();
+    }
+  }
 
-	protected void JumpMap()
-	{
-		if (FieldManager.HasWorldMap(targetMapID))
-		{
-			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(targetMapID);
-			if (Array.IndexOf(MonoBehaviourSingleton<WorldMapManager>.I.GetOpenRegionIdList(), fieldMapData.regionId) < 0)
-			{
-				RegionTable.Data data = Singleton<RegionTable>.I.GetData(fieldMapData.regionId);
-				GameSection.ChangeEvent("NOT_OPEN", new object[1]
-				{
-					data.regionName
-				});
-				return;
-			}
-		}
-		MonoBehaviourSingleton<WorldMapManager>.I.PushDisplayQuestTarget((int)targetMapID, targetPortalID);
-		MonoBehaviourSingleton<WorldMapManager>.I.ignoreTutorial = true;
-		bool flag = true;
-		if (Singleton<TutorialMessageTable>.IsValid())
-		{
-			TutorialReadData readData = Singleton<TutorialMessageTable>.I.ReadData;
-			flag = readData.HasRead(10003);
-		}
-		bool flag2 = false;
-		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryID);
-		if (deliveryTableData != null && deliveryTableData.type == DELIVERY_TYPE.STORY && 10100011 >= deliveryID && !flag)
-		{
-			flag2 = true;
-			if (Singleton<TutorialMessageTable>.IsValid())
-			{
-				TutorialReadData readData2 = Singleton<TutorialMessageTable>.I.ReadData;
-				readData2.SetReadId(10003, true);
-				readData2.Save();
-			}
-		}
-		if (flag2)
-		{
-			RequestEvent("DIRECT_REGION_TUTORIAL", null);
-		}
-		else
-		{
-			RequestEvent("DIRECT_REGION_QUEST", null);
-		}
-	}
+  private EquipItemInfo GetGrowEquipItem(
+    QuestDeliveryDetail.SMITH_SECTION section,
+    XorUInt targetId)
+  {
+    MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType = InventoryManager.INVENTORY_TYPE.ALL_EQUIP;
+    EquipItemInfo[] all = Array.FindAll<EquipItemInfo>(MonoBehaviourSingleton<InventoryManager>.I.GetEquipInventoryClone(), (Predicate<EquipItemInfo>) (e => (int) e.tableID == (int) (uint) targetId || (int) e.tableData.shadowEvolveEquipItemId == (int) (uint) targetId));
+    Array.Sort<EquipItemInfo>(all, (Comparison<EquipItemInfo>) ((a, b) =>
+    {
+      if (b.uniqueID - a.uniqueID < 0UL)
+        return 1;
+      return b.uniqueID - a.uniqueID <= 0UL ? 0 : -1;
+    }));
+    EquipItemInfo growEquipItem = (EquipItemInfo) null;
+    switch (section)
+    {
+      case QuestDeliveryDetail.SMITH_SECTION.EQUIP_GROW:
+        for (int index = 0; index < all.Length; ++index)
+        {
+          EquipItemInfo equipItemInfo = all[index];
+          if (growEquipItem == null || growEquipItem.IsLevelMax() && !equipItemInfo.IsLevelMax())
+            growEquipItem = equipItemInfo;
+        }
+        break;
+      case QuestDeliveryDetail.SMITH_SECTION.EQUIP_EXCEED:
+        for (int index = 0; index < all.Length; ++index)
+        {
+          EquipItemInfo equipItemInfo = all[index];
+          if (growEquipItem == null || growEquipItem.IsExceedMax() && !equipItemInfo.IsExceedMax())
+            growEquipItem = equipItemInfo;
+        }
+        break;
+      case QuestDeliveryDetail.SMITH_SECTION.EQUIP_EVOLVE:
+        for (int index = 0; index < all.Length; ++index)
+        {
+          EquipItemInfo equipItemInfo = all[index];
+          if (growEquipItem == null || growEquipItem.IsLevelAndEvolveMax() && !equipItemInfo.IsLevelAndEvolveMax())
+            growEquipItem = equipItemInfo;
+        }
+        break;
+    }
+    if (growEquipItem != null && growEquipItem.IsLevelAndEvolveMax() && growEquipItem.IsExceedMax())
+      growEquipItem = (EquipItemInfo) null;
+    return growEquipItem;
+  }
 
-	private IEnumerator SetPointShopGetPointUI()
-	{
-		if (pointShopGetPointData != null && pointShopGetPointData.Count > 0)
-		{
-			LoadingQueue queue = new LoadingQueue(this);
-			queue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName((int)pointShopGetPointData[0].pointShopId), false);
-			if (queue.IsLoading())
-			{
-				yield return (object)queue.Wait();
-			}
-			SetActive((Enum)UI.OBJ_NORMAL_ROOT, true);
-			SetLabelText((Enum)UI.LBL_POINT_NORMAL, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopGetPointData[0].basePoint));
-			UITexture normalTex = GetCtrl(UI.TEX_NORMAL_ICON).GetComponent<UITexture>();
-			ResourceLoad.LoadPointIconImageTexture(normalTex, pointShopGetPointData[0].pointShopId);
-			if (pointShopGetPointData.Count >= 2)
-			{
-				queue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetPointIconImageName((int)pointShopGetPointData[1].pointShopId), false);
-				if (queue.IsLoading())
-				{
-					yield return (object)queue.Wait();
-				}
-				SetActive((Enum)UI.OBJ_EVENT_ROOT, true);
-				SetLabelText((Enum)UI.LBL_POINT_EVENT, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopGetPointData[1].basePoint));
-				UITexture eventTex = GetCtrl(UI.TEX_EVENT_ICON).GetComponent<UITexture>();
-				ResourceLoad.LoadPointIconImageTexture(eventTex, pointShopGetPointData[1].pointShopId);
-			}
-		}
-	}
+  private SortSettings CreateSortSettings()
+  {
+    SmithManager.SmithCreateData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>();
+    return smithData.selectCreateEquipItemType < SortBase.TYPE.ARMOR || smithData.selectCreateEquipItemType == SortBase.TYPE.WEAPON_ALL ? (smithData.selectCreateEquipItemType == SortBase.TYPE.WEAPON_ALL ? SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.SMITH_CREATE_PICKUP_WEAPON, SortSettings.SETTINGS_TYPE.CREATE_EQUIP_ITEM) : SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.SMITH_CREATE_WEAPON, SortSettings.SETTINGS_TYPE.CREATE_EQUIP_ITEM)) : (smithData.selectCreateEquipItemType == SortBase.TYPE.ARMOR_ALL ? SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.SMITH_CREATE_PICKUP_ARMOR, SortSettings.SETTINGS_TYPE.CREATE_EQUIP_ITEM) : SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.SMITH_CREATE_ARMOR, SortSettings.SETTINGS_TYPE.CREATE_EQUIP_ITEM));
+  }
 
-	private JumpButtonType ConvertDeliveryJumpType()
-	{
-		switch (info.GetDeliveryJumpType())
-		{
-		case DeliveryTable.DELIVERY_JUMPTYPE.TO_GACHA:
-			return JumpButtonType.Gacha;
-		case DeliveryTable.DELIVERY_JUMPTYPE.TO_SMITH:
-			return JumpButtonType.Smith;
-		case DeliveryTable.DELIVERY_JUMPTYPE.TO_STATUS:
-			return JumpButtonType.Status;
-		case DeliveryTable.DELIVERY_JUMPTYPE.TO_STORAGE:
-			return JumpButtonType.Storage;
-		case DeliveryTable.DELIVERY_JUMPTYPE.TO_POINT_SHOP:
-			return JumpButtonType.PointShop;
-		case DeliveryTable.DELIVERY_JUMPTYPE.TO_WORLD_MAP:
-			return JumpButtonType.WorldMap;
-		default:
-			return JumpButtonType.Invalid;
-		}
-	}
+  private T GetOrCreateSmithData<T>() where T : SmithManager.SmithDataBase, new()
+  {
+    return MonoBehaviourSingleton<SmithManager>.I.GetSmithData<T>() ?? MonoBehaviourSingleton<SmithManager>.I.CreateSmithData<T>();
+  }
 
-	protected void WaveMatchNew()
-	{
-		QuestTable.QuestTableData questData = info.GetQuestData();
-		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questData.questID, true);
-		GameSection.SetEventData(new object[1]
-		{
-			questData.questType
-		});
-	}
+  private void ChangeSmithScene(string to_section)
+  {
+    MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Smith", to_section);
+  }
 
-	protected void WaveMatchPass()
-	{
-		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(info.needs[0].questId, true);
-	}
+  protected enum UI
+  {
+    OBJ_BASE_ROOT,
+    OBJ_BACK,
+    OBJ_COMPLETE_ROOT,
+    BTN_COMPLETE,
+    CHARA_ALL,
+    OBJ_UNLOCK_PORTAL_ROOT,
+    LBL_UNLOCK_PORTAL,
+    LBL_QUEST_TITLE,
+    LBL_CHARA_MESSAGE,
+    LBL_PERSON_NAME,
+    TEX_NPC,
+    BTN_JUMP_QUEST,
+    BTN_JUMP_INVALID,
+    BTN_JUMP_MAP,
+    BTN_JUMP_GACHATOP,
+    GRD_REWARD,
+    LBL_MONEY,
+    LBL_EXP,
+    SPR_WINDOW,
+    SPR_MESSAGE_BG,
+    OBJ_NEED_ITEM_ROOT,
+    LBL_NEED_ITEM_NAME,
+    LBL_NEED,
+    LBL_HAVE,
+    LBL_PLACE_NAME,
+    LBL_ENEMY_NAME,
+    OBJ_DIFFICULTY_ROOT,
+    OBJ_ENEMY_NAME_ROOT,
+    LBL_GET_PLACE,
+    OBJ_ENEMY,
+    SPR_ELEMENT_ROOT,
+    SPR_ELEMENT,
+    SPR_WEAK_ELEMENT,
+    STR_NON_WEAK_ELEMENT,
+    BTN_SUBMISSION,
+    STR_BTN_SUBMISSION,
+    STR_BTN_SUBMISSION_BACK,
+    OBJ_TOP_CROWN_ROOT,
+    OBJ_TOP_CROWN_1,
+    OBJ_TOP_CROWN_2,
+    OBJ_TOP_CROWN_3,
+    STR_MISSION_EMPTY,
+    SPR_CROWN_1,
+    SPR_CROWN_2,
+    SPR_CROWN_3,
+    OBJ_SUBMISSION_ROOT,
+    OBJ_MISSION_INFO,
+    OBJ_MISSION_INFO_1,
+    OBJ_MISSION_INFO_2,
+    OBJ_MISSION_INFO_3,
+    LBL_MISSION_INFO_1,
+    LBL_MISSION_INFO_2,
+    LBL_MISSION_INFO_3,
+    SPR_MISSION_INFO_CROWN_1,
+    SPR_MISSION_INFO_CROWN_2,
+    SPR_MISSION_INFO_CROWN_3,
+    STR_MISSION,
+    OBJ_BASE_FRAME,
+    OBJ_TARGET_FRAME,
+    OBJ_SUBMISSION_FRAME,
+    OBJ_NORMAL_ROOT,
+    OBJ_EVENT_ROOT,
+    LBL_POINT_NORMAL,
+    TEX_NORMAL_ICON,
+    LBL_POINT_EVENT,
+    TEX_EVENT_ICON,
+    BTN_CREATE,
+    BTN_JOIN,
+    BTN_MATCHING,
+    BTN_JUMP_SMITH,
+    BTN_JUMP_STATUS,
+    BTN_JUMP_STORAGE,
+    BTN_JUMP_POINT_SHOP,
+    BTN_JUMP_WORLDMAP,
+    BTN_WAVEMATCH_NEW,
+    BTN_WAVEMATCH_PASS,
+    BTN_WAVEMATCH_AUTO,
+    OBJ_CARNIVAL_ROOT,
+    LBL_POINT_CARNIVAL,
+    LBL_LIMIT_TIME,
+    OBJ_CLEAR_ICON_ROOT,
+    OBJ_CLEAR_REWARD,
+    BTN_CREATE_OFF,
+    SPR_TYPE_DIFFICULTY,
+    BTN_CHANGE_EQUIP,
+  }
 
-	protected void WaveMatchAuto()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			false
-		});
-		GameSection.StayEvent();
-		int retryCount = 0;
-		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 0);
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.GetQuestData().questID, retryCount, false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
-		{
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			if (!is_success)
-			{
-				GameSection.ResumeEvent(false, null);
-			}
-			else if (maxRetryCount > 0)
-			{
-				retryCount++;
-				this.StartCoroutine(MatchAtRandom(setting, retryCount, waitTime));
-			}
-			else if (!isJoined)
-			{
-				WaveMatchCreate();
-			}
-			else
-			{
-				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
-				GameSection.ResumeEvent(true, null);
-			}
-		});
-	}
+  private enum AUDIO
+  {
+    REQUEST_COMPLETE = 40000029, // 0x02625A1D
+    GO_TO_FIELD = 40000124, // 0x02625A7C
+    UNLOCKE_PORTAL = 40000161, // 0x02625AA1
+  }
 
-	private IEnumerator MatchAtRandom(PartyManager.PartySetting setting, int retryCount, float time)
-	{
-		yield return (object)new WaitForSeconds(time);
-		MonoBehaviourSingleton<PartyManager>.I.SendRandomMatching((int)info.needs[0].questId, retryCount, false, delegate(bool is_success, int maxRetryCount, bool isJoined, float waitTime)
-		{
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			if (!is_success)
-			{
-				GameSection.ResumeEvent(false, null);
-			}
-			else if (maxRetryCount > 0)
-			{
-				if (((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/).retryCount >= maxRetryCount)
-				{
-					((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.WaveMatchCreate();
-				}
-				else
-				{
-					((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/).retryCount++;
-					((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.StartCoroutine(((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.MatchAtRandom(((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/).setting, ((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/).retryCount, waitTime));
-				}
-			}
-			else if (!isJoined)
-			{
-				((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/)._003C_003Ef__this.WaveMatchCreate();
-			}
-			else
-			{
-				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(((_003CMatchAtRandom_003Ec__Iterator87)/*Error near IL_0061: stateMachine*/).setting);
-				GameSection.ResumeEvent(true, null);
-			}
-		});
-	}
+  public enum JumpButtonType
+  {
+    Invalid,
+    Complete,
+    Map,
+    Quest,
+    Gacha,
+    Smith,
+    Status,
+    Storage,
+    PointShop,
+    WorldMap,
+    WaveRoom,
+    seriesRoom,
+    orderRoom,
+    eventRoom,
+  }
 
-	protected void WaveMatchCreate()
-	{
-		QuestTable.QuestTableData questData = info.GetQuestData();
-		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questData.questID, true);
-		GameSection.SetEventData(new object[1]
-		{
-			questData.questType
-		});
-		PartyManager.PartySetting setting = new PartyManager.PartySetting(false, 0, 0, 0, 0);
-		MonoBehaviourSingleton<PartyManager>.I.SendCreate((int)questData.questID, setting, delegate(bool is_success)
-		{
-			if (is_success)
-			{
-				MonoBehaviourSingleton<PartyManager>.I.SetPartySetting(setting);
-			}
-			GameSection.ResumeEvent(is_success, null);
-		});
-	}
+  private enum SMITH_SECTION
+  {
+    INVALID,
+    EQUIP_GROW,
+    EQUIP_EXCEED,
+    EQUIP_EVOLVE,
+    EQUIP_CREATE,
+    MAGI_GROW,
+    CHANGE_ABILITY,
+  }
 }

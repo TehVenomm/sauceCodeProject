@@ -1,83 +1,71 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIStaticPanelRotateCheck
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class UIStaticPanelRotateCheck
+#nullable disable
+public class UIStaticPanelRotateCheck : MonoBehaviour
 {
-	[SerializeField]
-	protected UIPanel panel;
+  [SerializeField]
+  protected UIPanel panel;
+  private int updateCount;
+  private bool updateAnchors = true;
+  protected UIAnchor[] anchors;
 
-	private int updateCount;
+  private void Awake()
+  {
+    if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+      MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += new ScreenOrientationManager.OnScreenRotateDelegate(this.OnScreenRotate);
+    this.anchors = ((Component) this).GetComponentsInChildren<UIAnchor>();
+    this.updateCount = 0;
+    this.updateAnchors = true;
+    this.panel.widgetsAreStatic = false;
+  }
 
-	private bool updateAnchors = true;
+  private void OnEnable()
+  {
+    this.updateCount = 0;
+    this.updateAnchors = true;
+    this.panel.widgetsAreStatic = false;
+  }
 
-	protected UIAnchor[] anchors;
+  private void OnDestroy()
+  {
+    if (!MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= new ScreenOrientationManager.OnScreenRotateDelegate(this.OnScreenRotate);
+  }
 
-	public UIStaticPanelRotateCheck()
-		: this()
-	{
-	}
+  protected virtual void Update()
+  {
+    if (this.panel.widgetsAreStatic)
+      return;
+    ++this.updateCount;
+    if (this.updateCount < 3)
+      return;
+    if (this.updateAnchors)
+    {
+      int index1 = 0;
+      for (int length = this.anchors.Length; index1 < length; ++index1)
+        ((Behaviour) this.anchors[index1]).enabled = true;
+      ((Component) this).GetComponentsInChildren<UIRect>(true, Temporary.uiRectList);
+      int index2 = 0;
+      for (int count = Temporary.uiRectList.Count; index2 < count; ++index2)
+        Temporary.uiRectList[index2].UpdateAnchors();
+      Temporary.uiRectList.Clear();
+      this.updateAnchors = false;
+    }
+    else
+      this.panel.widgetsAreStatic = true;
+  }
 
-	private void Awake()
-	{
-		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
-		{
-			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
-		}
-		anchors = this.GetComponentsInChildren<UIAnchor>();
-		updateCount = 0;
-		updateAnchors = true;
-		panel.widgetsAreStatic = false;
-	}
-
-	private void OnEnable()
-	{
-		updateCount = 0;
-		updateAnchors = true;
-		panel.widgetsAreStatic = false;
-	}
-
-	private void OnDestroy()
-	{
-		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
-		{
-			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= OnScreenRotate;
-		}
-	}
-
-	protected virtual void Update()
-	{
-		if (!panel.widgetsAreStatic)
-		{
-			updateCount++;
-			if (updateCount >= 3)
-			{
-				if (updateAnchors)
-				{
-					int i = 0;
-					for (int num = anchors.Length; i < num; i++)
-					{
-						anchors[i].set_enabled(true);
-					}
-					this.GetComponentsInChildren<UIRect>(true, Temporary.uiRectList);
-					int j = 0;
-					for (int count = Temporary.uiRectList.Count; j < count; j++)
-					{
-						Temporary.uiRectList[j].UpdateAnchors();
-					}
-					Temporary.uiRectList.Clear();
-					updateAnchors = false;
-				}
-				else
-				{
-					panel.widgetsAreStatic = true;
-				}
-			}
-		}
-	}
-
-	private void OnScreenRotate(bool is_portrait)
-	{
-		updateCount = 0;
-		panel.widgetsAreStatic = false;
-		panel.ForceUpDate();
-	}
+  private void OnScreenRotate(bool is_portrait)
+  {
+    this.updateCount = 0;
+    this.panel.widgetsAreStatic = false;
+    this.panel.ForceUpDate();
+  }
 }

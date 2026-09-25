@@ -1,20 +1,29 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: AndroidClipBoard
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class AndroidClipBoard : iClipBoard
 {
-	public unsafe void SetClipBoard(string s)
-	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Expected O, but got Unknown
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Expected O, but got Unknown
-		AndroidJavaClass val = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-		AndroidJavaObject activity = val.GetStatic<AndroidJavaObject>("currentActivity");
-		_003CSetClipBoard_003Ec__AnonStorey66C _003CSetClipBoard_003Ec__AnonStorey66C;
-		activity.Call("runOnUiThread", new object[1]
-		{
-			(object)new AndroidJavaRunnable((object)_003CSetClipBoard_003Ec__AnonStorey66C, (IntPtr)(void*)/*OpCode not supported: LdFtn*/)
-		});
-	}
+  public void SetClipBoard(string s)
+  {
+    // ISSUE: object of a compiler-generated type is created
+    // ISSUE: variable of a compiler-generated type
+    AndroidClipBoard.\u003C\u003Ec__DisplayClass0_0 cDisplayClass00 = new AndroidClipBoard.\u003C\u003Ec__DisplayClass0_0();
+    // ISSUE: reference to a compiler-generated field
+    cDisplayClass00.s = s;
+    AndroidJavaClass androidJavaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+    // ISSUE: reference to a compiler-generated field
+    cDisplayClass00.activity = ((AndroidJavaObject) androidJavaClass).GetStatic<AndroidJavaObject>("currentActivity");
+    // ISSUE: reference to a compiler-generated field
+    // ISSUE: method pointer
+    cDisplayClass00.activity.Call("runOnUiThread", new object[1]
+    {
+      (object) new AndroidJavaRunnable((object) cDisplayClass00, __methodptr(\u003CSetClipBoard\u003Eb__0))
+    });
+  }
 }

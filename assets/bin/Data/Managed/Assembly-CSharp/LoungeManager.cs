@@ -1,527 +1,425 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: LoungeManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LoungeManager : MonoBehaviourSingleton<LoungeManager>
+#nullable disable
+public class LoungeManager : MonoBehaviourSingleton<LoungeManager>, IHomeManager
 {
-	private enum SE
-	{
-		WAVE = 40000363
-	}
+  private const float SendInfoSpan = 3600f;
+  private SpanTimer sendInfoSpan;
+  private Queue<LoungeAnnounce.AnnounceData> loungeAnnounceQueue = new Queue<LoungeAnnounce.AnnounceData>();
+  private Coroutine loungeAnnounceCoroutine;
 
-	private const float SendInfoSpan = 3600f;
+  public bool IsJumpToGacha { get; set; }
 
-	private SpanTimer sendInfoSpan;
+  public bool IsInitialized { get; private set; }
 
-	private Queue<LoungeAnnounce.AnnounceData> loungeAnnounceQueue = new Queue<LoungeAnnounce.AnnounceData>();
+  public HomeCamera HomeCamera { get; private set; }
 
-	private Coroutine loungeAnnounceCoroutine;
+  public IHomePeople IHomePeople { get; private set; }
 
-	public bool IsJumpToGacha
-	{
-		get;
-		set;
-	}
+  public LoungeTableSet TableSet { get; private set; }
 
-	public bool IsInitialized
-	{
-		get;
-		private set;
-	}
+  public HomeFeatureBanner HomeFeatureBanner { get; private set; }
 
-	public HomeCamera HomeCamera
-	{
-		get;
-		private set;
-	}
+  public bool IsPointShopOpen { get; private set; }
 
-	public HomePeople HomePeople
-	{
-		get;
-		private set;
-	}
+  public int PointShopBannerId { get; private set; }
 
-	public LoungeTableSet TableSet
-	{
-		get;
-		private set;
-	}
+  public bool NeedLoungeQuestBalloonUpdate { get; private set; }
 
-	public HomeFeatureBanner HomeFeatureBanner
-	{
-		get;
-		private set;
-	}
+  public void SetPointShop(bool isOpen, int bannerId)
+  {
+    this.IsPointShopOpen = isOpen;
+    this.PointShopBannerId = bannerId;
+  }
 
-	public bool IsPointShopOpen
-	{
-		get;
-		private set;
-	}
+  public void OnRecvRoomJoined(int userId)
+  {
+    if (userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
+      return;
+    this.StartCoroutine(this.CreateCharacterRoomJoined(userId));
+  }
 
-	public int PointShopBannerId
-	{
-		get;
-		private set;
-	}
+  public void OnRecvRoomLeaved(int id)
+  {
+    if (this.IHomePeople == null)
+      return;
+    if (this.IHomePeople.CastToLoungePeople().DestroyLoungePlayer(id))
+      this.SetAnnounce(new LoungeAnnounce.AnnounceData(LoungeAnnounce.ANNOUNCE_TYPE.LEAVED_LOUNGE, MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(id).userInfo.name));
+    if (id == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
+      return;
+    this.StartCoroutine(this.SendLoungeInfoForce());
+  }
 
-	public bool NeedLoungeQuestBalloonUpdate
-	{
-		get;
-		private set;
-	}
+  public void OnRecvRoomMove(int id, Vector3 targetPos)
+  {
+    if (this.IHomePeople == null)
+      return;
+    this.IHomePeople.CastToLoungePeople().MoveLoungePlayer(id, targetPos);
+  }
 
-	public void SetPointShop(bool isOpen, int bannerId)
-	{
-		IsPointShopOpen = isOpen;
-		PointShopBannerId = bannerId;
-	}
+  public void OnRecvRoomPosition(int id, Vector3 targetPos, LOUNGE_ACTION_TYPE type)
+  {
+    if (this.IHomePeople == null)
+      return;
+    this.IHomePeople.CastToLoungePeople().SetInitialPositionLoungePlayer(id, targetPos, type);
+  }
 
-	public void OnRecvRoomJoined(int userId)
-	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		if (userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
-		{
-			this.StartCoroutine(CreateCharacterRoomJoined(userId));
-		}
-	}
+  public void OnRecvRoomAction(int cid, int aid)
+  {
+    if (this.IHomePeople == null)
+      return;
+    LoungePlayer loungePlayer = this.IHomePeople.CastToLoungePeople().GetLoungePlayer(cid);
+    if (Object.op_Equality((Object) loungePlayer, (Object) null))
+      return;
+    loungePlayer.ResetAFKTimer();
+    switch (aid)
+    {
+      case 1:
+        loungePlayer.OnRecvSit();
+        break;
+      case 2:
+        loungePlayer.OnRecvStandUp();
+        break;
+      case 4:
+        loungePlayer.OnRecvToGacha();
+        break;
+      case 5:
+        loungePlayer.OnRecvToEquip();
+        break;
+      case 6:
+        loungePlayer.OnRecvAFK();
+        break;
+      default:
+        loungePlayer.OnRecvNone();
+        break;
+    }
+  }
 
-	public void OnRecvRoomLeaved(int id)
-	{
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		if (!(HomePeople == null))
-		{
-			if (HomePeople.DestroyLoungePlayer(id))
-			{
-				LoungeModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(id);
-				SetAnnounce(new LoungeAnnounce.AnnounceData(LoungeAnnounce.ANNOUNCE_TYPE.LEAVED_LOUNGE, slotInfoByUserId.userInfo.name));
-			}
-			if (id != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
-			{
-				this.StartCoroutine(SendLoungeInfoForce());
-			}
-		}
-	}
+  public void OnRecvChatMessage(int userId)
+  {
+    if (this.IHomePeople == null)
+      return;
+    LoungePlayer loungePlayer = this.IHomePeople.CastToLoungePeople().GetLoungePlayer(userId);
+    if (Object.op_Equality((Object) loungePlayer, (Object) null))
+      return;
+    loungePlayer.ResetAFKTimer();
+  }
 
-	public void OnRecvRoomMove(int id, Vector3 targetPos)
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		if (!(HomePeople == null))
-		{
-			HomePeople.MoveLoungePlayer(id, targetPos);
-		}
-	}
+  public void OnRecvRoomKick(int id)
+  {
+    if (this.IHomePeople == null)
+      return;
+    if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id == id)
+      MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(new EventData[2]
+      {
+        new EventData("MAIN_MENU_LOUNGE", (object) null),
+        new EventData("LOUNGE_KICKED", (object) null)
+      });
+    else
+      this.IHomePeople.CastToLoungePeople().DestroyLoungePlayer(id);
+  }
 
-	public void OnRecvRoomPosition(int id, Vector3 targetPos, LOUNGE_ACTION_TYPE type)
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		if (!(HomePeople == null))
-		{
-			HomePeople.SetInitialPositionLoungePlayer(id, targetPos, type);
-		}
-	}
+  public void SetLoungeQuestBalloon(bool request) => this.NeedLoungeQuestBalloonUpdate = request;
 
-	public void OnRecvRoomAction(int cid, int aid)
-	{
-		if (!(HomePeople == null))
-		{
-			LoungePlayer loungePlayer = HomePeople.GetLoungePlayer(cid);
-			if (!(loungePlayer == null))
-			{
-				loungePlayer.ResetAFKTimer();
-				switch (aid)
-				{
-				case 1:
-					loungePlayer.OnRecvSit();
-					break;
-				case 2:
-					loungePlayer.OnRecvStandUp();
-					break;
-				case 5:
-					loungePlayer.OnRecvToEquip();
-					break;
-				case 4:
-					loungePlayer.OnRecvToGacha();
-					break;
-				case 6:
-					loungePlayer.OnRecvAFK();
-					break;
-				default:
-					loungePlayer.OnRecvNone();
-					break;
-				}
-			}
-		}
-	}
+  public OutGameSettingsManager.HomeScene GetSceneSetting()
+  {
+    return (OutGameSettingsManager.HomeScene) MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene;
+  }
 
-	public void OnRecvChatMessage(int userId)
-	{
-		if (!(HomePeople == null))
-		{
-			LoungePlayer loungePlayer = HomePeople.GetLoungePlayer(userId);
-			if (!(loungePlayer == null))
-			{
-				loungePlayer.ResetAFKTimer();
-			}
-		}
-	}
+  protected override void Awake()
+  {
+    base.Awake();
+    this.sendInfoSpan = new SpanTimer(3600f);
+  }
 
-	public void OnRecvRoomKick(int id)
-	{
-		if (!(HomePeople == null))
-		{
-			if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id == id)
-			{
-				EventData[] autoEvents = new EventData[2]
-				{
-					new EventData("MAIN_MENU_LOUNGE", null),
-					new EventData("LOUNGE_KICKED", null)
-				};
-				MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
-			}
-			else
-			{
-				HomePeople.DestroyLoungePlayer(id);
-			}
-		}
-	}
+  private IEnumerator Start()
+  {
+    while (!MonoBehaviourSingleton<StageManager>.IsValid() || MonoBehaviourSingleton<StageManager>.I.isLoading)
+      yield return (object) null;
+    this.HomeCamera = ((Component) this).gameObject.AddComponent<HomeCamera>();
+    this.IHomePeople = (IHomePeople) ((Component) this).gameObject.AddComponent<LoungePeople>();
+    this.HomeFeatureBanner = ((Component) this).gameObject.AddComponent<HomeFeatureBanner>();
+    this.TableSet = ((Component) this).gameObject.AddComponent<LoungeTableSet>();
+    while (!this.HomeCamera.isInitialized || !this.IHomePeople.isInitialized || !this.TableSet.isInitialized)
+      yield return (object) null;
+    MonoBehaviourSingleton<LoungeMatchingManager>.I.OnChangeMemberStatus += new Action<LoungeMemberStatus>(this.OnChangeMemberStatus);
+    if (LoungeMatchingManager.IsValidInLounge())
+      MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInLounge();
+    this.IsInitialized = true;
+    yield return (object) this.StartCoroutine(this.SendLoungeInfoForce());
+    yield return (object) this.StartCoroutine(this.CreateLoungePlayerFromSlotInfo());
+    yield return (object) this.StartCoroutine(this.LoadSE());
+    this.PlayWaveSound();
+  }
 
-	public void SetLoungeQuestBalloon(bool request)
-	{
-		NeedLoungeQuestBalloonUpdate = request;
-	}
+  private IEnumerator LoadSE()
+  {
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    foreach (int se_id in (int[]) Enum.GetValues(typeof (LoungeManager.SE)))
+      loadingQueue.CacheSE(se_id);
+    if (loadingQueue.IsLoading())
+      yield return (object) loadingQueue.Wait();
+  }
 
-	protected override void Awake()
-	{
-		base.Awake();
-		sendInfoSpan = new SpanTimer(3600f);
-	}
+  private void PlayWaveSound()
+  {
+    Transform gameObject = Utility.CreateGameObject("WaveAudioObjectPos", this._transform);
+    gameObject.position = MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.waveSoundPoint;
+    SoundManager.PlayLoopSE(40000363, (DisableNotifyMonoBehaviour) null, gameObject);
+  }
 
-	private IEnumerator Start()
-	{
-		while (!MonoBehaviourSingleton<StageManager>.IsValid() || MonoBehaviourSingleton<StageManager>.I.isLoading)
-		{
-			yield return (object)null;
-		}
-		HomeCamera = this.get_gameObject().AddComponent<HomeCamera>();
-		HomePeople = this.get_gameObject().AddComponent<HomePeople>();
-		HomeFeatureBanner = this.get_gameObject().AddComponent<HomeFeatureBanner>();
-		TableSet = this.get_gameObject().AddComponent<LoungeTableSet>();
-		while (!HomeCamera.isInitialized || !HomePeople.isInitialized || !TableSet.isInitialized)
-		{
-			yield return (object)null;
-		}
-		LoungeMatchingManager i = MonoBehaviourSingleton<LoungeMatchingManager>.I;
-		i.OnChangeMemberStatus = (Action<LoungeMemberStatus>)Delegate.Combine(i.OnChangeMemberStatus, new Action<LoungeMemberStatus>(OnChangeMemberStatus));
-		if (LoungeMatchingManager.IsValidInLounge())
-		{
-			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInLounge();
-		}
-		IsInitialized = true;
-		yield return (object)this.StartCoroutine(SendLoungeInfoForce());
-		yield return (object)this.StartCoroutine(CreateLoungePlayerFromSlotInfo());
-		yield return (object)this.StartCoroutine(LoadSE());
-		PlayWaveSound();
-	}
+  private IEnumerator CreateLoungePlayerFromSlotInfo()
+  {
+    if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData != null)
+    {
+      List<PartyModel.SlotInfo> data = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData.slotInfos;
+      for (int i = 0; i < data.Count; ++i)
+      {
+        if (data[i].userInfo != null && data[i].userInfo.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
+        {
+          if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus == null)
+            break;
+          switch (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[data[i].userInfo.userId].GetStatus())
+          {
+            case LoungeMemberStatus.MEMBER_STATUS.LOUNGE:
+            case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
+              this.IHomePeople.CastToLoungePeople().CreateLoungePlayer(data[i], false);
+              yield return (object) null;
+              continue;
+            default:
+              continue;
+          }
+        }
+      }
+    }
+  }
 
-	private IEnumerator LoadSE()
-	{
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		int[] seList = (int[])Enum.GetValues(typeof(SE));
-		int[] array = seList;
-		foreach (int seId in array)
-		{
-			loadQueue.CacheSE(seId, null);
-		}
-		if (loadQueue.IsLoading())
-		{
-			yield return (object)loadQueue.Wait();
-		}
-	}
+  private IEnumerator CreateCharacterRoomJoined(int userId)
+  {
+    yield return (object) this.StartCoroutine(this.SendLoungeInfoForce());
+    PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId);
+    if (slotInfoByUserId != null && this.IHomePeople != null && this.IHomePeople.CastToLoungePeople().CreateLoungePlayer(slotInfoByUserId, true))
+    {
+      this.SetAnnounce(new LoungeAnnounce.AnnounceData(LoungeAnnounce.ANNOUNCE_TYPE.JOIN_LOUNGE, slotInfoByUserId.userInfo.name));
+      if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
+        MonoBehaviourSingleton<LoungeNetworkManager>.I.JoinNotification(slotInfoByUserId.userInfo);
+    }
+  }
 
-	private void PlayWaveSound()
-	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = Utility.CreateGameObject("WaveAudioObjectPos", base._transform, -1);
-		val.set_position(MonoBehaviourSingleton<OutGameSettingsManager>.I.loungeScene.waveSoundPoint);
-		SoundManager.PlayLoopSE(40000363, null, val);
-	}
+  private void OnChangeMemberStatus(LoungeMemberStatus status)
+  {
+    int userId = status.userId;
+    switch (status.GetStatus())
+    {
+      case LoungeMemberStatus.MEMBER_STATUS.LOUNGE:
+        this.SendRoomPosition(userId);
+        this.NeedLoungeQuestBalloonUpdate = true;
+        this.StartCoroutine(this.CreatePlayerOnChangedStatus(userId));
+        break;
+      case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
+        if (!status.isHost)
+          break;
+        this.CreatePartyAnnounce(userId);
+        break;
+      case LoungeMemberStatus.MEMBER_STATUS.QUEST:
+      case LoungeMemberStatus.MEMBER_STATUS.FIELD:
+      case LoungeMemberStatus.MEMBER_STATUS.ARENA:
+        this.IHomePeople.CastToLoungePeople().DestroyLoungePlayer(userId);
+        break;
+    }
+  }
 
-	private IEnumerator CreateLoungePlayerFromSlotInfo()
-	{
-		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData != null)
-		{
-			List<LoungeModel.SlotInfo> data = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData.slotInfos;
-			for (int i = 0; i < data.Count; i++)
-			{
-				if (data[i].userInfo != null && data[i].userInfo.userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
-				{
-					if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus == null)
-					{
-						break;
-					}
-					LoungeMemberStatus status = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[data[i].userInfo.userId];
-					LoungeMemberStatus.MEMBER_STATUS partyStatus = status.GetStatus();
-					if (partyStatus == LoungeMemberStatus.MEMBER_STATUS.LOUNGE || partyStatus == LoungeMemberStatus.MEMBER_STATUS.QUEST_READY)
-					{
-						HomePeople.CreateLoungePlayer(data[i], false, false);
-						yield return (object)null;
-					}
-				}
-			}
-		}
-	}
+  private IEnumerator CreatePlayerOnChangedStatus(int userId)
+  {
+    yield return (object) this.SendLoungeInfoForce();
+    PartyModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId);
+    this.IHomePeople.CastToLoungePeople().CreateLoungePlayer(slotInfoByUserId, true);
+    this.IHomePeople.CastToLoungePeople().ChangeEquipLoungePlayer(slotInfoByUserId, true);
+  }
 
-	private IEnumerator CreateCharacterRoomJoined(int userId)
-	{
-		yield return (object)this.StartCoroutine(SendLoungeInfoForce());
-		LoungeModel.SlotInfo slot = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId);
-		if (slot != null && HomePeople != null && HomePeople.CreateLoungePlayer(slot, true, false))
-		{
-			SetAnnounce(new LoungeAnnounce.AnnounceData(LoungeAnnounce.ANNOUNCE_TYPE.JOIN_LOUNGE, slot.userInfo.name));
-			if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
-			{
-				MonoBehaviourSingleton<LoungeNetworkManager>.I.JoinNotification(slot.userInfo);
-			}
-		}
-	}
+  private void CreatePartyAnnounce(int userId)
+  {
+    this.NeedLoungeQuestBalloonUpdate = true;
+    this.SetAnnounce(new LoungeAnnounce.AnnounceData(LoungeAnnounce.ANNOUNCE_TYPE.CREATED_PARTY, MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId).userInfo.name));
+  }
 
-	private void OnChangeMemberStatus(LoungeMemberStatus status)
-	{
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		int userId = status.userId;
-		switch (status.GetStatus())
-		{
-		case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
-			if (status.isHost)
-			{
-				CreatePartyAnnounce(userId);
-			}
-			break;
-		case LoungeMemberStatus.MEMBER_STATUS.QUEST:
-		case LoungeMemberStatus.MEMBER_STATUS.FIELD:
-		case LoungeMemberStatus.MEMBER_STATUS.ARENA:
-			HomePeople.DestroyLoungePlayer(userId);
-			break;
-		case LoungeMemberStatus.MEMBER_STATUS.LOUNGE:
-			SendRoomPosition(userId);
-			NeedLoungeQuestBalloonUpdate = true;
-			this.StartCoroutine(CreatePlayerOnChangedStatus(userId));
-			break;
-		}
-	}
+  private void SetAnnounce(LoungeAnnounce.AnnounceData data)
+  {
+    if (data == null)
+      return;
+    this.loungeAnnounceQueue.Enqueue(data);
+    if (this.loungeAnnounceCoroutine != null)
+      return;
+    this.loungeAnnounceCoroutine = this.StartCoroutine(this.ShowAnnounce());
+  }
 
-	private IEnumerator CreatePlayerOnChangedStatus(int userId)
-	{
-		yield return (object)SendLoungeInfoForce();
-		LoungeModel.SlotInfo slot = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId);
-		HomePeople.CreateLoungePlayer(slot, true, true);
-	}
+  private IEnumerator ShowAnnounce()
+  {
+    LoungeAnnounce announce = MonoBehaviourSingleton<UIManager>.I.loungeAnnounce;
+    if (Object.op_Equality((Object) announce, (Object) null))
+    {
+      this.loungeAnnounceCoroutine = (Coroutine) null;
+    }
+    else
+    {
+      while (this.loungeAnnounceQueue.Count > 0)
+      {
+        LoungeAnnounce.AnnounceData data = this.loungeAnnounceQueue.Dequeue();
+        bool wait = true;
+        announce.Play(data, (System.Action) (() => wait = false));
+        while (wait)
+          yield return (object) null;
+        yield return (object) new WaitForSeconds(0.3f);
+      }
+      this.loungeAnnounceCoroutine = (Coroutine) null;
+    }
+  }
 
-	private void CreatePartyAnnounce(int userId)
-	{
-		NeedLoungeQuestBalloonUpdate = true;
-		LoungeModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId);
-		LoungeAnnounce.AnnounceData announce = new LoungeAnnounce.AnnounceData(LoungeAnnounce.ANNOUNCE_TYPE.CREATED_PARTY, slotInfoByUserId.userInfo.name);
-		SetAnnounce(announce);
-	}
+  private void Update()
+  {
+    if (!this.sendInfoSpan.IsReady())
+      return;
+    this.StartCoroutine(this.SendLoungeInfoForce());
+  }
 
-	private void SetAnnounce(LoungeAnnounce.AnnounceData data)
-	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Expected O, but got Unknown
-		if (!object.ReferenceEquals(data, null))
-		{
-			loungeAnnounceQueue.Enqueue(data);
-			if (object.ReferenceEquals(loungeAnnounceCoroutine, null))
-			{
-				loungeAnnounceCoroutine = this.StartCoroutine(ShowAnnounce());
-			}
-		}
-	}
+  protected override void _OnDestroy()
+  {
+    MonoBehaviourSingleton<LoungeMatchingManager>.I.OnChangeMemberStatus -= new Action<LoungeMemberStatus>(this.OnChangeMemberStatus);
+    base._OnDestroy();
+  }
 
-	private IEnumerator ShowAnnounce()
-	{
-		LoungeAnnounce announce = MonoBehaviourSingleton<UIManager>.I.loungeAnnounce;
-		if (announce == null)
-		{
-			loungeAnnounceCoroutine = null;
-		}
-		else
-		{
-			while (loungeAnnounceQueue.Count > 0)
-			{
-				LoungeAnnounce.AnnounceData annouceData = loungeAnnounceQueue.Dequeue();
-				bool wait = true;
-				announce.Play(annouceData, delegate
-				{
-					((_003CShowAnnounce_003Ec__IteratorDE)/*Error near IL_0085: stateMachine*/)._003Cwait_003E__2 = false;
-				});
-				while (wait)
-				{
-					yield return (object)null;
-				}
-				yield return (object)new WaitForSeconds(0.3f);
-			}
-			loungeAnnounceCoroutine = null;
-		}
-	}
+  private void OnApplicationPause(bool pause)
+  {
+    if (pause)
+      return;
+    this.StartCoroutine(this.ResumeApp());
+  }
 
-	private void Update()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (sendInfoSpan.IsReady())
-		{
-			this.StartCoroutine(SendLoungeInfoForce());
-		}
-	}
+  private IEnumerator ResumeApp()
+  {
+    while (MonoBehaviourSingleton<LoungeMatchingManager>.I.isResume)
+      yield return (object) null;
+    while (!MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected())
+      yield return (object) null;
+    if (!this.CheckLeavedOnResume())
+    {
+      this.DestoryMembersOnResume();
+      yield return (object) null;
+      this.StartCoroutine(this.CreateMembersOnResume());
+      yield return (object) null;
+      this.ResetAllMemberAction();
+    }
+  }
 
-	protected override void _OnDestroy()
-	{
-		LoungeMatchingManager i = MonoBehaviourSingleton<LoungeMatchingManager>.I;
-		i.OnChangeMemberStatus = (Action<LoungeMemberStatus>)Delegate.Remove(i.OnChangeMemberStatus, new Action<LoungeMemberStatus>(OnChangeMemberStatus));
-		base._OnDestroy();
-	}
+  private bool CheckLeavedOnResume()
+  {
+    if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData != null)
+      return false;
+    MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(new EventData[2]
+    {
+      new EventData("MAIN_MENU_LOUNGE", (object) null),
+      new EventData("LOUNGE_KICKED", (object) null)
+    });
+    MonoBehaviourSingleton<LoungeMatchingManager>.I.StopAFKCheck();
+    return true;
+  }
 
-	private void OnApplicationPause(bool pause)
-	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		if (!pause)
-		{
-			this.StartCoroutine(ResumeApp());
-		}
-	}
+  private void DestoryMembersOnResume()
+  {
+    if (this.IHomePeople == null || this.IHomePeople.CastToLoungePeople().loungePlayers == null)
+      return;
+    for (int index = 0; index < this.IHomePeople.CastToLoungePeople().loungePlayers.Count; ++index)
+    {
+      int userId = this.IHomePeople.CastToLoungePeople().loungePlayers[index].GetUserId();
+      if (userId != 0)
+      {
+        if (MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId) == null)
+          this.IHomePeople.CastToLoungePeople().DestroyLoungePlayer(userId);
+        else if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus != null)
+        {
+          switch (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[userId].GetStatus())
+          {
+            case LoungeMemberStatus.MEMBER_STATUS.QUEST:
+            case LoungeMemberStatus.MEMBER_STATUS.FIELD:
+              this.IHomePeople.CastToLoungePeople().DestroyLoungePlayer(userId);
+              continue;
+            default:
+              continue;
+          }
+        }
+      }
+    }
+  }
 
-	private IEnumerator ResumeApp()
-	{
-		while (MonoBehaviourSingleton<LoungeMatchingManager>.I.isResume)
-		{
-			yield return (object)null;
-		}
-		while (!MonoBehaviourSingleton<LoungeWebSocket>.I.IsConnected())
-		{
-			yield return (object)null;
-		}
-		if (!CheckLeavedOnResume())
-		{
-			DestoryMembersOnResume();
-			yield return (object)null;
-			this.StartCoroutine(CreateMembersOnResume());
-			yield return (object)null;
-			ResetAllMemberAction();
-		}
-	}
+  private IEnumerator CreateMembersOnResume()
+  {
+    if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData != null)
+    {
+      List<PartyModel.SlotInfo> slots = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData.slotInfos;
+      for (int i = 0; i < slots.Count; ++i)
+      {
+        if (slots[i].userInfo != null)
+        {
+          int userId = slots[i].userInfo.userId;
+          if (userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id && MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus != null)
+          {
+            LoungeMemberStatus loungeMemberStatu = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[userId];
+            if (loungeMemberStatu != null)
+            {
+              switch (loungeMemberStatu.GetStatus())
+              {
+                case LoungeMemberStatus.MEMBER_STATUS.LOUNGE:
+                case LoungeMemberStatus.MEMBER_STATUS.QUEST_READY:
+                  this.IHomePeople.CastToLoungePeople().CreateLoungePlayer(slots[i], false);
+                  this.IHomePeople.CastToLoungePeople().ChangeEquipLoungePlayer(slots[i], false);
+                  yield return (object) null;
+                  continue;
+                default:
+                  continue;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
-	private bool CheckLeavedOnResume()
-	{
-		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData == null)
-		{
-			EventData[] autoEvents = new EventData[2]
-			{
-				new EventData("MAIN_MENU_LOUNGE", null),
-				new EventData("LOUNGE_KICKED", null)
-			};
-			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
-			MonoBehaviourSingleton<LoungeMatchingManager>.I.StopAFKCheck();
-			return true;
-		}
-		return false;
-	}
+  private void ResetAllMemberAction()
+  {
+    if (this.IHomePeople == null)
+      return;
+    for (int index = 0; index < this.IHomePeople.CastToLoungePeople().loungePlayers.Count; ++index)
+      this.IHomePeople.CastToLoungePeople().loungePlayers[index].ResetAction();
+  }
 
-	private void DestoryMembersOnResume()
-	{
-		if (!(HomePeople == null) && HomePeople.loungePlayers != null)
-		{
-			for (int i = 0; i < HomePeople.loungePlayers.Count; i++)
-			{
-				int userId = HomePeople.loungePlayers[i].GetUserId();
-				if (userId != 0)
-				{
-					LoungeModel.SlotInfo slotInfoByUserId = MonoBehaviourSingleton<LoungeMatchingManager>.I.GetSlotInfoByUserId(userId);
-					if (slotInfoByUserId == null)
-					{
-						HomePeople.DestroyLoungePlayer(userId);
-					}
-					else if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus != null)
-					{
-						LoungeMemberStatus loungeMemberStatus = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[userId];
-						LoungeMemberStatus.MEMBER_STATUS status = loungeMemberStatus.GetStatus();
-						if (status == LoungeMemberStatus.MEMBER_STATUS.QUEST || status == LoungeMemberStatus.MEMBER_STATUS.FIELD)
-						{
-							HomePeople.DestroyLoungePlayer(userId);
-						}
-					}
-				}
-			}
-		}
-	}
+  private IEnumerator SendLoungeInfoForce()
+  {
+    bool wait = true;
+    MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo((Action<bool>) (is_success => wait = false), true);
+    while (wait)
+      yield return (object) null;
+  }
 
-	private IEnumerator CreateMembersOnResume()
-	{
-		if (MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData != null)
-		{
-			List<LoungeModel.SlotInfo> slots = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeData.slotInfos;
-			for (int i = 0; i < slots.Count; i++)
-			{
-				if (slots[i].userInfo != null)
-				{
-					int userId = slots[i].userInfo.userId;
-					if (userId != MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id && MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus != null)
-					{
-						LoungeMemberStatus status = MonoBehaviourSingleton<LoungeMatchingManager>.I.loungeMemberStatus[userId];
-						if (status != null)
-						{
-							LoungeMemberStatus.MEMBER_STATUS partyStatus = status.GetStatus();
-							if (partyStatus == LoungeMemberStatus.MEMBER_STATUS.LOUNGE || partyStatus == LoungeMemberStatus.MEMBER_STATUS.QUEST_READY)
-							{
-								HomePeople.CreateLoungePlayer(slots[i], false, true);
-								yield return (object)null;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+  private void SendRoomPosition(int cid)
+  {
+    if (this.IHomePeople == null || Object.op_Equality((Object) this.IHomePeople.selfChara, (Object) null))
+      return;
+    Vector3 position = this.IHomePeople.selfChara._transform.position;
+    LOUNGE_ACTION_TYPE actionType = this.IHomePeople.selfChara.GetActionType();
+    MonoBehaviourSingleton<LoungeNetworkManager>.I.RoomPosition(cid, position, actionType);
+  }
 
-	private void ResetAllMemberAction()
-	{
-		if (!(HomePeople == null))
-		{
-			for (int i = 0; i < HomePeople.loungePlayers.Count; i++)
-			{
-				HomePeople.loungePlayers[i].ResetAction();
-			}
-		}
-	}
-
-	private IEnumerator SendLoungeInfoForce()
-	{
-		bool wait = true;
-		Protocol.Force(delegate
-		{
-			MonoBehaviourSingleton<LoungeMatchingManager>.I.SendInfo(delegate
-			{
-				((_003CSendLoungeInfoForce_003Ec__IteratorE1)/*Error near IL_0028: stateMachine*/)._003Cwait_003E__0 = false;
-			}, false);
-		});
-		while (wait)
-		{
-			yield return (object)null;
-		}
-	}
-
-	private void SendRoomPosition(int cid)
-	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		if (!(HomePeople == null) && !(HomePeople.selfChara == null))
-		{
-			Vector3 position = HomePeople.selfChara._transform.get_position();
-			LOUNGE_ACTION_TYPE actionType = HomePeople.selfChara.GetActionType();
-			MonoBehaviourSingleton<LoungeNetworkManager>.I.RoomPosition(cid, position, actionType);
-		}
-	}
+  private enum SE
+  {
+    WAVE = 40000363, // 0x02625B6B
+  }
 }

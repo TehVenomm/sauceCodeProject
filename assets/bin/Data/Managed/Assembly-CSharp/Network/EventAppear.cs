@@ -1,9 +1,14 @@
-namespace Network
-{
-	public class EventAppear
-	{
-		public EndDate end = new EndDate();
+﻿// Decompiled with JetBrains decompiler
+// Type: Network.EventAppear
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
 
-		public string remain;
-	}
+#nullable disable
+namespace Network;
+
+public class EventAppear
+{
+  public EndDate end = new EndDate();
+  public string remain;
 }

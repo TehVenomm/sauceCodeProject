@@ -1,121 +1,84 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: MiniMapIcon
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class MiniMapIcon
+#nullable disable
+public class MiniMapIcon : MonoBehaviour
 {
-	[SerializeField]
-	protected UISprite icon;
+  [SerializeField]
+  protected UISprite icon;
+  [SerializeField]
+  protected UISprite overIcon;
+  private bool _isOver;
+  private bool isInitialized;
 
-	[SerializeField]
-	protected UISprite overIcon;
+  public bool isOver
+  {
+    set
+    {
+      if (this._isOver != value)
+      {
+        ((Component) this.icon).gameObject.SetActive(!value);
+        if (Object.op_Inequality((Object) this.overIcon, (Object) null))
+          ((Component) this.overIcon).gameObject.SetActive(value);
+      }
+      this._isOver = value;
+    }
+    get => this._isOver;
+  }
 
-	private bool _isOver;
+  public Transform target { get; set; }
 
-	private bool isInitialized;
+  public Transform _trasform { get; set; }
 
-	public bool isOver
-	{
-		get
-		{
-			return _isOver;
-		}
-		set
-		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			if (_isOver != value)
-			{
-				icon.get_gameObject().SetActive(!value);
-				if (overIcon != null)
-				{
-					overIcon.get_gameObject().SetActive(value);
-				}
-			}
-			_isOver = value;
-		}
-	}
+  private void Awake()
+  {
+    ((Component) this.icon).gameObject.SetActive(true);
+    if (Object.op_Inequality((Object) this.overIcon, (Object) null))
+      ((Component) this.overIcon).gameObject.SetActive(false);
+    this._trasform = ((Component) this).transform;
+  }
 
-	public Transform target
-	{
-		get;
-		set;
-	}
+  public virtual void Initialize(MonoBehaviour root_object)
+  {
+    ((Component) this).gameObject.SetActive(false);
+    this.isInitialized = true;
+  }
 
-	public Transform _trasform
-	{
-		get;
-		set;
-	}
+  public void SetIconSprite(string spriteName)
+  {
+    if (Object.op_Inequality((Object) this.icon, (Object) null))
+      this.icon.spriteName = spriteName;
+    if (!Object.op_Inequality((Object) this.overIcon, (Object) null))
+      return;
+    this.overIcon.spriteName = spriteName;
+  }
 
-	public MiniMapIcon()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Expected O, but got Unknown
-		icon.get_gameObject().SetActive(true);
-		if (overIcon != null)
-		{
-			overIcon.get_gameObject().SetActive(false);
-		}
-		_trasform = this.get_transform();
-	}
-
-	public virtual void Initialize(MonoBehaviour root_object)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(false);
-		isInitialized = true;
-	}
-
-	public void SetIconSprite(string spriteName)
-	{
-		if (icon != null)
-		{
-			icon.spriteName = spriteName;
-		}
-		if (overIcon != null)
-		{
-			overIcon.spriteName = spriteName;
-		}
-	}
-
-	public void UpdateIcon(float center_x, float center_y, float scaling, float ui_radius)
-	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		if (!(target == null))
-		{
-			if (isInitialized)
-			{
-				this.get_gameObject().SetActive(true);
-				isInitialized = false;
-			}
-			bool flag = true;
-			Vector3 localPosition = target.get_position();
-			localPosition.x = (localPosition.x - center_x) * scaling;
-			localPosition.y = (localPosition.z - center_y) * scaling;
-			localPosition.z = 0f;
-			if (localPosition.get_magnitude() > ui_radius)
-			{
-				flag = false;
-				localPosition = localPosition.get_normalized() * ui_radius;
-			}
-			isOver = !flag;
-			_trasform.set_localPosition(localPosition);
-			_trasform.set_localRotation(Quaternion.Inverse(_trasform.get_parent().get_localRotation()));
-		}
-	}
+  public void UpdateIcon(float center_x, float center_y, float scaling, float ui_radius)
+  {
+    if (Object.op_Equality((Object) this.target, (Object) null))
+      return;
+    if (this.isInitialized)
+    {
+      ((Component) this).gameObject.SetActive(true);
+      this.isInitialized = false;
+    }
+    bool flag = true;
+    Vector3 vector3 = this.target.position;
+    vector3.x = (vector3.x - center_x) * scaling;
+    vector3.y = (vector3.z - center_y) * scaling;
+    vector3.z = 0.0f;
+    if ((double) ((Vector3) ref vector3).magnitude > (double) ui_radius)
+    {
+      flag = false;
+      vector3 = Vector3.op_Multiply(((Vector3) ref vector3).normalized, ui_radius);
+    }
+    this.isOver = !flag;
+    this._trasform.localPosition = vector3;
+    this._trasform.localRotation = Quaternion.Inverse(this._trasform.parent.localRotation);
+  }
 }

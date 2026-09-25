@@ -1,116 +1,99 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIPlaySound
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Interaction/Play Sound")]
-public class UIPlaySound
+public class UIPlaySound : MonoBehaviour
 {
-	public enum Trigger
-	{
-		OnClick,
-		OnMouseOver,
-		OnMouseOut,
-		OnPress,
-		OnRelease,
-		Custom,
-		OnEnable,
-		OnDisable
-	}
+  public AudioClip audioClip;
+  public UIPlaySound.Trigger trigger;
+  [Range(0.0f, 1f)]
+  public float volume = 1f;
+  [Range(0.0f, 2f)]
+  public float pitch = 1f;
+  private bool mIsOver;
 
-	public AudioClip audioClip;
+  private bool canPlay
+  {
+    get
+    {
+      if (!((Behaviour) this).enabled)
+        return false;
+      UIButton component = ((Component) this).GetComponent<UIButton>();
+      return Object.op_Equality((Object) component, (Object) null) || component.isEnabled;
+    }
+  }
 
-	public Trigger trigger;
+  private void OnEnable()
+  {
+    if (this.trigger != UIPlaySound.Trigger.OnEnable)
+      return;
+    NGUITools.PlaySound(this.audioClip, this.volume, this.pitch);
+  }
 
-	[Range(0f, 1f)]
-	public float volume = 1f;
+  private void OnDisable()
+  {
+    if (this.trigger != UIPlaySound.Trigger.OnDisable)
+      return;
+    NGUITools.PlaySound(this.audioClip, this.volume, this.pitch);
+  }
 
-	[Range(0f, 2f)]
-	public float pitch = 1f;
+  private void OnHover(bool isOver)
+  {
+    if (this.trigger == UIPlaySound.Trigger.OnMouseOver)
+    {
+      if (this.mIsOver == isOver)
+        return;
+      this.mIsOver = isOver;
+    }
+    if (!this.canPlay || (!isOver || this.trigger != UIPlaySound.Trigger.OnMouseOver) && (isOver || this.trigger != UIPlaySound.Trigger.OnMouseOut))
+      return;
+    NGUITools.PlaySound(this.audioClip, this.volume, this.pitch);
+  }
 
-	private bool mIsOver;
+  private void OnPress(bool isPressed)
+  {
+    if (this.trigger == UIPlaySound.Trigger.OnPress)
+    {
+      if (this.mIsOver == isPressed)
+        return;
+      this.mIsOver = isPressed;
+    }
+    if (!this.canPlay || (!isPressed || this.trigger != UIPlaySound.Trigger.OnPress) && (isPressed || this.trigger != UIPlaySound.Trigger.OnRelease))
+      return;
+    NGUITools.PlaySound(this.audioClip, this.volume, this.pitch);
+  }
 
-	private bool canPlay
-	{
-		get
-		{
-			if (!this.get_enabled())
-			{
-				return false;
-			}
-			UIButton component = this.GetComponent<UIButton>();
-			return component == null || component.isEnabled;
-		}
-	}
+  private void OnClick()
+  {
+    if (!this.canPlay || this.trigger != UIPlaySound.Trigger.OnClick)
+      return;
+    NGUITools.PlaySound(this.audioClip, this.volume, this.pitch);
+  }
 
-	public UIPlaySound()
-		: this()
-	{
-	}
+  private void OnSelect(bool isSelected)
+  {
+    if (!this.canPlay || isSelected && UICamera.currentScheme != UICamera.ControlScheme.Controller)
+      return;
+    this.OnHover(isSelected);
+  }
 
-	private void OnEnable()
-	{
-		if (trigger == Trigger.OnEnable)
-		{
-			NGUITools.PlaySound(audioClip, volume, pitch);
-		}
-	}
+  public void Play() => NGUITools.PlaySound(this.audioClip, this.volume, this.pitch);
 
-	private void OnDisable()
-	{
-		if (trigger == Trigger.OnDisable)
-		{
-			NGUITools.PlaySound(audioClip, volume, pitch);
-		}
-	}
-
-	private void OnHover(bool isOver)
-	{
-		if (trigger == Trigger.OnMouseOver)
-		{
-			if (mIsOver == isOver)
-			{
-				return;
-			}
-			mIsOver = isOver;
-		}
-		if (canPlay && ((isOver && trigger == Trigger.OnMouseOver) || (!isOver && trigger == Trigger.OnMouseOut)))
-		{
-			NGUITools.PlaySound(audioClip, volume, pitch);
-		}
-	}
-
-	private void OnPress(bool isPressed)
-	{
-		if (trigger == Trigger.OnPress)
-		{
-			if (mIsOver == isPressed)
-			{
-				return;
-			}
-			mIsOver = isPressed;
-		}
-		if (canPlay && ((isPressed && trigger == Trigger.OnPress) || (!isPressed && trigger == Trigger.OnRelease)))
-		{
-			NGUITools.PlaySound(audioClip, volume, pitch);
-		}
-	}
-
-	private void OnClick()
-	{
-		if (canPlay && trigger == Trigger.OnClick)
-		{
-			NGUITools.PlaySound(audioClip, volume, pitch);
-		}
-	}
-
-	private void OnSelect(bool isSelected)
-	{
-		if (canPlay && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
-		{
-			OnHover(isSelected);
-		}
-	}
-
-	public void Play()
-	{
-		NGUITools.PlaySound(audioClip, volume, pitch);
-	}
+  public enum Trigger
+  {
+    OnClick,
+    OnMouseOver,
+    OnMouseOut,
+    OnPress,
+    OnRelease,
+    Custom,
+    OnEnable,
+    OnDisable,
+  }
 }

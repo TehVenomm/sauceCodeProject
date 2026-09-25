@@ -1,11 +1,17 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AutoPlayTimeModel
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class AutoPlayTimeModel : BaseModel
 {
-	public class Param
-	{
-		public double timeLeft;
-	}
+  public static string URL = "ajax/inventory/getautopotion";
+  public AutoPlayTimeModel.Param result = new AutoPlayTimeModel.Param();
 
-	public static string URL = "ajax/inventory/getautopotion";
-
-	public Param result = new Param();
+  public class Param
+  {
+    public double timeLeft;
+  }
 }

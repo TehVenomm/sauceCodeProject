@@ -1,36 +1,24 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: LoungePlayerCreateInfo
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class LoungePlayerCreateInfo
+#nullable disable
+public class LoungePlayerCreateInfo : MonoBehaviour
 {
-	public Vector3 lookPoint;
+  public Vector3 lookPoint;
+  public SphereCollider createArea;
 
-	public SphereCollider createArea;
-
-	public LoungePlayerCreateInfo()
-		: this()
-	{
-	}
-
-	public Vector3 GetCreatePosition()
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		if (createArea == null)
-		{
-			return Vector3.get_zero();
-		}
-		Transform val = createArea.get_transform();
-		Quaternion val2 = Quaternion.Euler(0f, (float)Random.Range(0, 360), 0f);
-		float num = Random.Range(0f, createArea.get_radius());
-		return val.get_position() + val2 * Vector3.get_forward() * num;
-	}
+  public Vector3 GetCreatePosition()
+  {
+    if (Object.op_Equality((Object) this.createArea, (Object) null))
+      return Vector3.zero;
+    Transform transform = ((Component) this.createArea).transform;
+    Quaternion quaternion = Quaternion.Euler(0.0f, (float) Random.Range(0, 360), 0.0f);
+    float num = Random.Range(0.0f, this.createArea.radius);
+    return Vector3.op_Addition(transform.position, Vector3.op_Multiply(Quaternion.op_Multiply(quaternion, Vector3.forward), num));
+  }
 }

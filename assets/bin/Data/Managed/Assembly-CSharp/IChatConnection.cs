@@ -1,29 +1,33 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: IChatConnection
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
 
+#nullable disable
 public interface IChatConnection
 {
-	bool isEstablished
-	{
-		get;
-	}
+  bool isEstablished { get; }
 
-	event ChatRoom.OnJoin onJoin;
+  event ChatRoom.OnJoin onJoin;
 
-	event ChatRoom.OnReceiveText onReceiveText;
+  event ChatRoom.OnReceiveText onReceiveText;
 
-	event ChatRoom.OnReceiveStamp onReceiveStamp;
+  event ChatRoom.OnReceiveStamp onReceiveStamp;
 
-	event ChatRoom.OnReceiveNotification onReceiveNotification;
+  event ChatRoom.OnReceiveNotification onReceiveNotification;
 
-	event ChatRoom.OnDisconnect onDisconnect;
+  event ChatRoom.OnAfterSendUserMessage onAfterSendUserMessage;
 
-	void Connect();
+  event ChatRoom.OnDisconnect onDisconnect;
 
-	void Disconnect(Action onFinished = null);
+  void Connect();
 
-	void Join(int roomNo, string userName);
+  void Disconnect(System.Action onFinished = null);
 
-	void SendText(string message);
+  void Join(int roomNo, string userName);
 
-	void SendStamp(int stampId);
+  void SendText(string message);
+
+  void SendStamp(int stampId);
 }

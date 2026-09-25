@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="no"?><manifest xmlns:android="http://schemas.android.com/apk/res/android" android:installLocation="preferExternal" package="net.gogame.dragon" platformBuildVersionCode="23" platformBuildVersionName="6.0-2438415">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="29" android:compileSdkVersionCodename="10" android:installLocation="preferExternal" package="net.gogame.dragon" platformBuildVersionCode="2020070202" platformBuildVersionName="1.8.9">
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="com.android.vending.BILLING"/>
     <uses-permission android:name="com.android.vending.CHECK_LICENSE"/>
     <uses-permission android:name="org.onepf.openiab.permission.BILLING"/>
@@ -13,10 +14,18 @@
     <permission android:name="net.gogame.dragon.permission.C2D_MESSAGE" android:protectionLevel="signature"/>
     <uses-permission android:name="net.gogame.dragon.permission.C2D_MESSAGE"/>
     <supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true" android:smallScreens="true" android:xlargeScreens="true"/>
-    <application android:debuggable="false" android:icon="@drawable/app_icon" android:isGame="true" android:label="@string/app_name" android:launchMode="singleTask" android:name="jp.colopl.drapro.ColoplApplication">
+    <uses-feature android:glEsVersion="0x20000"/>
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
+    <uses-feature android:name="android.hardware.touchscreen.multitouch" android:required="false"/>
+    <uses-feature android:name="android.hardware.touchscreen.multitouch.distinct" android:required="false"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE"/>
+    <application android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:icon="@mipmap/app_icon" android:isGame="true" android:label="@string/app_name" android:launchMode="singleTask" android:name="jp.colopl.drapro.ColoplApplication" android:supportsRtl="true" android:usesCleartextTraffic="true">
+        <provider android:authorities="net.gogame.dragon" android:exported="false" android:grantUriPermissions="true" android:name="com.yasirkula.unity.UnitySSContentProvider"/>
         <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/push_icon"/>
-        <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@drawable/app_icon"/>
-        <activity android:configChanges="fontScale|keyboard|keyboardHidden|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode" android:label="@string/app_name" android:launchMode="singleTask" android:name="jp.colopl.drapro.StartActivity" android:screenOrientation="portrait" android:theme="@style/AppTheme">
+        <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@mipmap/app_icon"/>
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+        <activity android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale" android:label="@string/app_name" android:launchMode="singleTask" android:name="jp.colopl.drapro.StartActivity" android:screenOrientation="portrait" android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -34,9 +43,6 @@
                 <data android:host="*.db.gogame.net" android:scheme="gogamedrapro"/>
             </intent-filter>
         </activity>
-        <intent-filter>
-            <action android:name="com.android.vending.INSTALL_REFERRER"/>
-        </intent-filter>
         <receiver android:exported="true" android:name="com.appsflyer.MultipleInstallBroadcastReceiver">
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER"/>
@@ -54,8 +60,8 @@
         <meta-data android:name="io.fabric.ApiKey" android:value="fd8ec9cb24e8352db761b66890b5b3af975f2b4a"/>
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="fb403641043327462"/>
         <meta-data android:name="unityplayer.SkipPermissionsDialog" android:value="true"/>
-        <activity android:configChanges="fontScale|keyboard|keyboardHidden|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode" android:name="com.facebook.unity.FBUnityLoginActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
-        <activity android:configChanges="fontScale|keyboard|keyboardHidden|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode" android:name="com.facebook.unity.FBUnityDialogsActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
+        <activity android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale" android:name="com.facebook.unity.FBUnityLoginActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
+        <activity android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale" android:name="com.facebook.unity.FBUnityDialogsActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
         <activity android:exported="true" android:name="com.facebook.unity.FBUnityAppLinkActivity"/>
         <activity android:exported="true" android:name="com.facebook.unity.FBUnityDeepLinkingActivity"/>
         <activity android:name="com.facebook.unity.FBUnityGameRequestActivity"/>
@@ -63,68 +69,63 @@
         <activity android:name="com.facebook.unity.FBUnityJoinGameGroupActivity"/>
         <activity android:name="com.facebook.unity.AppInviteDialogActivity"/>
         <provider android:authorities="com.facebook.app.FacebookContentProvider403641043327462" android:exported="true" android:name="com.facebook.FacebookContentProvider"/>
-        <activity android:configChanges="fontScale|keyboard|keyboardHidden|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode" android:label="@string/app_name" android:launchMode="singleTask" android:name="org.onepf.openiab.UnityProxyActivity"/>
+        <activity android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale" android:label="@string/app_name" android:launchMode="singleTask" android:name="org.onepf.openiab.UnityProxyActivity"/>
         <receiver android:name="com.amazon.device.iap.ResponseReceiver">
             <intent-filter>
                 <action android:name="com.amazon.inapp.purchasing.NOTIFY" android:permission="com.amazon.inapp.purchasing.Permission.NOTIFY"/>
             </intent-filter>
         </receiver>
         <activity android:name="net.gogame.gopay.sdk.iab.PurchaseActivity" android:theme="@android:style/Theme.Translucent"/>
-        <activity android:name="com.google.games.bridge.NativeBridgeActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
-        <meta-data android:name="com.google.android.gms.nearby.connection.SERVICE_ID" android:value=""/>
-        <meta-data android:name="com.google.android.gms.games.APP_ID" android:value="\ 683498632423"/>
-        <meta-data android:name="com.google.android.gms.games.unityVersion" android:value="0.9.38a"/>
-        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize" android:name="com.facebook.FacebookActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
-        <activity android:exported="true" android:name="com.facebook.CustomTabActivity"/>
-        <service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementService"/>
-        <service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
-        <receiver android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementReceiver"/>
-        <receiver android:enabled="true" android:exported="true" android:name="com.google.android.gms.measurement.AppMeasurementInstallReferrerReceiver" android:permission="android.permission.INSTALL_PACKAGES">
+        <receiver android:name="mp.MpSMSReceiver">
             <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER"/>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
             </intent-filter>
         </receiver>
-        <provider android:authorities="net.gogame.dragon.firebaseinitprovider" android:exported="false" android:initOrder="100" android:name="com.google.firebase.provider.FirebaseInitProvider"/>
-        <service android:exported="true" android:name="com.google.firebase.iid.FirebaseInstanceIdService">
-            <intent-filter android:priority="-500">
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
-            </intent-filter>
-        </service>
-        <receiver android:exported="true" android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver" android:permission="com.google.android.c2dm.permission.SEND">
+        <service android:name="mp.MpService"/>
+        <service android:name="mp.StatusUpdateService"/>
+        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="mp.MpActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+        <meta-data android:name="unity.build-id" android:value="5cb5ebda-e4d4-4bbd-b3e9-ee8076278a1a"/>
+        <meta-data android:name="unity.splash-mode" android:value="2"/>
+        <meta-data android:name="unity.splash-enable" android:value="true"/>
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize" android:name="com.facebook.FacebookActivity" android:theme="@style/com_facebook_activity_theme"/>
+        <activity android:name="com.facebook.CustomTabMainActivity"/>
+        <activity android:exported="true" android:name="com.facebook.CustomTabActivity">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-                <category android:name="net.gogame.dragon"/>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:host="cct.net.gogame.dragon" android:scheme="fbconnect"/>
+            </intent-filter>
+        </activity>
+        <provider android:authorities="net.gogame.dragon.FacebookInitProvider" android:exported="false" android:name="com.facebook.internal.FacebookInitProvider"/>
+        <receiver android:exported="false" android:name="com.facebook.CurrentAccessTokenExpirationBroadcastReceiver">
+            <intent-filter>
+                <action android:name="com.facebook.sdk.ACTION_CURRENT_ACCESS_TOKEN_CHANGED"/>
             </intent-filter>
         </receiver>
-        <receiver android:exported="false" android:name="com.google.firebase.iid.FirebaseInstanceIdInternalReceiver"/>
-        <service android:exported="true" android:name="com.google.firebase.messaging.FirebaseMessagingService">
+        <activity android:excludeFromRecents="true" android:exported="false" android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+        <service android:exported="true" android:name="com.google.android.gms.auth.api.signin.RevocationBoundService" android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"/>
+        <service android:exported="false" android:name="com.google.firebase.messaging.FirebaseMessagingService">
             <intent-filter android:priority="-500">
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
+        <service android:exported="false" android:name="com.google.firebase.components.ComponentDiscoveryService">
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.analytics.connector.internal.AnalyticsConnectorRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.iid.Registrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+        </service>
+        <receiver android:exported="true" android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver" android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+            </intent-filter>
+        </receiver>
+        <provider android:authorities="net.gogame.dragon.firebaseinitprovider" android:exported="false" android:initOrder="100" android:name="com.google.firebase.provider.FirebaseInitProvider"/>
         <service android:exported="false" android:name="com.google.firebase.messaging.cpp.ListenerService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
-        <service android:exported="false" android:name="com.google.firebase.messaging.cpp.FcmInstanceIDListenerService">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
-            </intent-filter>
-        </service>
         <service android:exported="false" android:name="com.google.firebase.messaging.cpp.RegistrationIntentService"/>
-        <activity android:excludeFromRecents="true" android:exported="false" android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
-        <service android:exported="true" android:name="com.google.android.gms.auth.api.signin.RevocationBoundService" android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"/>
-        <activity android:exported="false" android:name="com.google.android.gms.common.api.GoogleApiActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
-        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="net.gogame.gowrap.ui.MainActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
-        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="net.gogame.gowrap.ui.dpro.ui.MainActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
-        <service android:exported="false" android:name="com.zopim.android.sdk.api.ChatService"/>
-        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="net.gogame.zopim.client.base.ZopimMainActivity" android:theme="@style/net.gogame.zopim.ZopimChatTheme" android:windowSoftInputMode="adjustResize"/>
-        <receiver android:name="com.zopim.android.sdk.api.ZopimChat$ChatTimeoutReceiver">
-            <intent-filter android:priority="1000">
-                <action android:name="chat.action.TIMEOUT"/>
-            </intent-filter>
-        </receiver>
         <receiver android:exported="true" android:name="net.gogame.gowrap.integrations.InstallReferrerReceiver">
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER"/>
@@ -138,19 +139,36 @@
         </receiver>
         <meta-data android:name="net.gogame.gowrap.installReferrerReceiver.appsflyer" android:value="com.appsflyer.SingleInstallBroadcastReceiver"/>
         <meta-data android:name="net.gogame.gowrap.packageRemovedReceiver.appsflyer" android:value="com.appsflyer.SingleInstallBroadcastReceiver"/>
-        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="net.gogame.gopay.sdk.StoreActivity" android:theme="@android:style/Theme.Dialog"/>
-        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="net.gogame.gopay.sdk.iab.PurchaseActivity" android:theme="@android:style/Theme.Translucent"/>
+        <receiver android:name="net.gogame.gowrap.ui.utils.ShareBroadcastReceiver"/>
+        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:hardwareAccelerated="true" android:name="net.gogame.gowrap.ui.dpro.ui.MainActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:hardwareAccelerated="true" android:name="net.gogame.gowrap.ui.MainActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+        <activity android:hardwareAccelerated="true" android:launchMode="singleTop" android:name="com.helpshift.support.activities.ParentActivity" android:theme="@style/Helpshift.Theme.Unity.Activity"/>
+        <activity android:configChanges="orientation|screenSize" android:hardwareAccelerated="true" android:name="com.helpshift.support.HSReview" android:theme="@style/Helpshift.Theme.Unity.Dialog"/>
+        <activity android:hardwareAccelerated="true" android:launchMode="singleInstance" android:name="com.helpshift.activities.UnityDelegateActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+        <activity android:hardwareAccelerated="true" android:name="com.helpshift.campaigns.activities.ParentActivity" android:theme="@style/Helpshift.Theme.Unity.Activity"/>
+        <activity android:configChanges="locale|orientation|screenSize|layoutDirection" android:excludeFromRecents="true" android:hardwareAccelerated="true" android:launchMode="singleTask" android:name="com.helpshift.campaigns.activities.NotificationActivity" android:noHistory="true" android:taskAffinity="" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="net.gogame.zopim.client.base.ZopimMainActivity" android:theme="@style/net.gogame.zopim.ZopimChatTheme" android:windowSoftInputMode="adjustResize"/>
+        <service android:exported="false" android:name="com.zopim.android.sdk.api.ChatService"/>
+        <receiver android:name="com.zopim.android.sdk.api.ZopimChat$ChatTimeoutReceiver">
+            <intent-filter android:priority="1000">
+                <action android:name="chat.action.TIMEOUT"/>
+            </intent-filter>
+        </receiver>
+        <meta-data android:name="com.google.android.gms.nearby.connection.SERVICE_ID" android:value=""/>
+        <meta-data android:name="com.google.android.gms.games.APP_ID" android:value="\683498632423"/>
+        <meta-data android:name="com.google.android.gms.games.unityVersion" android:value=" 0.9.38a"/>
+        <activity android:name="com.google.games.bridge.NativeBridgeActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
+        <provider android:authorities="net.gogame.dragon.helpshift.fileprovider" android:exported="false" android:grantUriPermissions="true" android:name="com.helpshift.support.providers.HelpshiftFileProvider">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/hs__provider_paths"/>
+        </provider>
+        <receiver android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementReceiver"/>
+        <receiver android:enabled="true" android:exported="true" android:name="com.google.android.gms.measurement.AppMeasurementInstallReferrerReceiver" android:permission="android.permission.INSTALL_PACKAGES">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER"/>
+            </intent-filter>
+        </receiver>
+        <service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementService"/>
+        <service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <activity android:exported="false" android:name="com.google.android.gms.common.api.GoogleApiActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
     </application>
-    <receiver android:name="mp.MpSMSReceiver">
-        <intent-filter>
-            <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
-        </intent-filter>
-    </receiver>
-    <service android:name="mp.MpService"/>
-    <service android:name="mp.StatusUpdateService"/>
-    <activity android:configChanges="keyboardHidden|orientation|screenSize" android:name="mp.MpActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
-    <uses-feature android:glEsVersion="0x00020000"/>
-    <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
-    <uses-feature android:name="android.hardware.touchscreen.multitouch" android:required="false"/>
-    <uses-feature android:name="android.hardware.touchscreen.multitouch.distinct" android:required="false"/>
 </manifest>

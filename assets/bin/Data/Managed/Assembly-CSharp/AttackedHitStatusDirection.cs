@@ -1,116 +1,86 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AttackedHitStatusDirection
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class AttackedHitStatusDirection
 {
-	public AttackedHitStatus origin
-	{
-		get;
-		protected set;
-	}
+  public AttackedHitStatus origin { get; protected set; }
 
-	public AttackHitColliderProcessor.HitParam hitParam => origin.hitParam;
+  public AttackedHitStatusDirection() => this.origin = new AttackedHitStatus();
 
-	public AttackHitInfo attackInfo => origin.attackInfo;
+  public AttackedHitStatusDirection(AttackedHitStatus status) => this.origin = status;
 
-	public int fromObjectID => origin.fromObjectID;
+  public AttackHitColliderProcessor.HitParam hitParam => this.origin.hitParam;
 
-	public StageObject fromObject => origin.fromObject;
+  public AttackHitInfo attackInfo => this.origin.attackInfo;
 
-	public StageObject.OBJECT_TYPE fromType => origin.fromType;
+  public int fromObjectID => this.origin.fromObjectID;
 
-	public Vector3 fromPos => origin.fromPos;
+  public StageObject fromObject => this.origin.fromObject;
 
-	public Vector3 hitPos => origin.hitPos;
+  public StageObject.OBJECT_TYPE fromType => this.origin.fromType;
 
-	public float distanceXZ => origin.distanceXZ;
+  public Vector3 fromPos => this.origin.fromPos;
 
-	public float hitTime => origin.hitTime;
+  public Vector3 hitPos => this.origin.hitPos;
 
-	public int fromClientID => origin.fromClientID;
+  public float distanceXZ => this.origin.distanceXZ;
 
-	public DamageDistanceTable.DamageDistanceData damageDistanceData => origin.damageDistanceData;
+  public float hitTime => this.origin.hitTime;
 
-	public Vector3 exHitPos => origin.exHitPos;
+  public int fromClientID => this.origin.fromClientID;
 
-	public AtkAttribute atk
-	{
-		get
-		{
-			return origin.atk;
-		}
-		set
-		{
-			origin.atk = value;
-		}
-	}
+  public DamageDistanceTable.DamageDistanceData damageDistanceData
+  {
+    get => this.origin.damageDistanceData;
+  }
 
-	public SkillInfo.SkillParam skillParam
-	{
-		get
-		{
-			return origin.skillParam;
-		}
-		set
-		{
-			origin.skillParam = value;
-		}
-	}
+  public Vector3 exHitPos => this.origin.exHitPos;
 
-	public bool validDamage
-	{
-		get
-		{
-			return origin.validDamage;
-		}
-		set
-		{
-			origin.validDamage = value;
-		}
-	}
+  public AtkAttribute atk
+  {
+    get => this.origin.atk;
+    set => this.origin.atk = value;
+  }
 
-	public BadStatus badStatusAdd
-	{
-		get
-		{
-			return origin.badStatusAdd;
-		}
-		set
-		{
-			origin.badStatusAdd = value;
-		}
-	}
+  public SkillInfo.SkillParam skillParam
+  {
+    get => this.origin.skillParam;
+    set => this.origin.skillParam = value;
+  }
 
-	public int regionID
-	{
-		get
-		{
-			return origin.regionID;
-		}
-		set
-		{
-			origin.regionID = value;
-		}
-	}
+  public bool validDamage
+  {
+    get => this.origin.validDamage;
+    set => this.origin.validDamage = value;
+  }
 
-	public Enemy.WEAK_STATE weakState
-	{
-		get
-		{
-			return origin.weakState;
-		}
-		set
-		{
-			origin.weakState = value;
-		}
-	}
+  public BadStatus badStatusAdd
+  {
+    get => this.origin.badStatusAdd;
+    set => this.origin.badStatusAdd = value;
+  }
 
-	public AttackedHitStatusDirection()
-	{
-		origin = new AttackedHitStatus();
-	}
+  public int regionID
+  {
+    get => this.origin.regionID;
+    set => this.origin.regionID = value;
+  }
 
-	public AttackedHitStatusDirection(AttackedHitStatus status)
-	{
-		origin = status;
-	}
+  public bool isDamageRegionOnly
+  {
+    get => this.origin.isDamageRegionOnly;
+    set => this.origin.isDamageRegionOnly = value;
+  }
+
+  public Enemy.WEAK_STATE weakState
+  {
+    get => this.origin.weakState;
+    set => this.origin.weakState = value;
+  }
 }

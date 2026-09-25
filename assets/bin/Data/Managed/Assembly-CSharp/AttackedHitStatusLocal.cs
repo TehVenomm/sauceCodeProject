@@ -1,162 +1,128 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AttackedHitStatusLocal
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class AttackedHitStatusLocal
 {
-	public AttackedHitStatus origin
-	{
-		get;
-		protected set;
-	}
+  public AttackedHitStatus origin { get; protected set; }
 
-	public AttackHitColliderProcessor.HitParam hitParam => origin.hitParam;
+  public AttackedHitStatusLocal() => this.origin = new AttackedHitStatus();
 
-	public AttackHitInfo attackInfo => origin.attackInfo;
+  public AttackedHitStatusLocal(AttackedHitStatus status) => this.origin = status;
 
-	public int fromObjectID => origin.fromObjectID;
+  public AttackHitColliderProcessor.HitParam hitParam => this.origin.hitParam;
 
-	public StageObject fromObject => origin.fromObject;
+  public AttackHitInfo attackInfo => this.origin.attackInfo;
 
-	public StageObject.OBJECT_TYPE fromType => origin.fromType;
+  public int fromObjectID => this.origin.fromObjectID;
 
-	public Vector3 fromPos => origin.fromPos;
+  public StageObject fromObject => this.origin.fromObject;
 
-	public Vector3 hitPos => origin.hitPos;
+  public StageObject.OBJECT_TYPE fromType => this.origin.fromType;
 
-	public float distanceXZ => origin.distanceXZ;
+  public Vector3 fromPos => this.origin.fromPos;
 
-	public float hitTime => origin.hitTime;
+  public Vector3 hitPos => this.origin.hitPos;
 
-	public int fromClientID => origin.fromClientID;
+  public float distanceXZ => this.origin.distanceXZ;
 
-	public DamageDistanceTable.DamageDistanceData damageDistanceData => origin.damageDistanceData;
+  public float hitTime => this.origin.hitTime;
 
-	public AtkAttribute atk => origin.atk;
+  public int fromClientID => this.origin.fromClientID;
 
-	public SkillInfo.SkillParam skillParam => origin.skillParam;
+  public DamageDistanceTable.DamageDistanceData damageDistanceData
+  {
+    get => this.origin.damageDistanceData;
+  }
 
-	public bool validDamage => origin.validDamage;
+  public AtkAttribute atk => this.origin.atk;
 
-	public BadStatus badStatusAdd => origin.badStatusAdd;
+  public SkillInfo.SkillParam skillParam => this.origin.skillParam;
 
-	public int regionID => origin.regionID;
+  public bool validDamage => this.origin.validDamage;
 
-	public Enemy.WEAK_STATE weakState => origin.weakState;
+  public BadStatus badStatusAdd => this.origin.badStatusAdd;
 
-	public int damage
-	{
-		get
-		{
-			return origin.damage;
-		}
-		set
-		{
-			origin.damage = value;
-		}
-	}
+  public int regionID => this.origin.regionID;
 
-	public AtkAttribute damageDetails
-	{
-		get
-		{
-			return origin.damageDetails;
-		}
-		set
-		{
-			origin.damageDetails = value;
-		}
-	}
+  public bool isDamageRegionOnly => this.origin.isDamageRegionOnly;
 
-	public float downAddBase
-	{
-		get
-		{
-			return origin.downAddBase;
-		}
-		set
-		{
-			origin.downAddBase = value;
-		}
-	}
+  public Enemy.WEAK_STATE weakState => this.origin.weakState;
 
-	public float downAddWeak
-	{
-		get
-		{
-			return origin.downAddWeak;
-		}
-		set
-		{
-			origin.downAddWeak = value;
-		}
-	}
+  public int damage
+  {
+    get => this.origin.damage;
+    set => this.origin.damage = value;
+  }
 
-	public bool isArrowBleed
-	{
-		get
-		{
-			return origin.isArrowBleed;
-		}
-		set
-		{
-			origin.isArrowBleed = value;
-		}
-	}
+  public AtkAttribute damageDetails
+  {
+    get => this.origin.damageDetails;
+    set => this.origin.damageDetails = value;
+  }
 
-	public int arrowBleedDamage
-	{
-		get
-		{
-			return origin.arrowBleedDamage;
-		}
-		set
-		{
-			origin.arrowBleedDamage = value;
-		}
-	}
+  public float downAddBase
+  {
+    get => this.origin.downAddBase;
+    set => this.origin.downAddBase = value;
+  }
 
-	public int arrowBurstDamage
-	{
-		get
-		{
-			return origin.arrowBurstDamage;
-		}
-		set
-		{
-			origin.arrowBurstDamage = value;
-		}
-	}
+  public float downAddWeak
+  {
+    get => this.origin.downAddWeak;
+    set => this.origin.downAddWeak = value;
+  }
 
-	public bool isShadowSealing
-	{
-		get
-		{
-			return origin.isShadowSealing;
-		}
-		set
-		{
-			origin.isShadowSealing = value;
-		}
-	}
+  public bool isForceDown
+  {
+    get => this.origin.isForceDown;
+    set => this.origin.isForceDown = value;
+  }
 
-	public Player.ATTACK_MODE attackMode
-	{
-		get
-		{
-			return origin.attackMode;
-		}
-		set
-		{
-			origin.attackMode = value;
-		}
-	}
+  public float concussionAdd
+  {
+    get => this.origin.concussionAdd;
+    set => this.origin.concussionAdd = value;
+  }
 
-	public AttackedHitStatusLocal()
-	{
-		origin = new AttackedHitStatus();
-	}
+  public bool isArrowBleed
+  {
+    get => this.origin.isArrowBleed;
+    set => this.origin.isArrowBleed = value;
+  }
 
-	public AttackedHitStatusLocal(AttackedHitStatus status)
-	{
-		origin = status;
-	}
+  public int arrowBleedDamage
+  {
+    get => this.origin.arrowBleedDamage;
+    set => this.origin.arrowBleedDamage = value;
+  }
+
+  public int arrowBurstDamage
+  {
+    get => this.origin.arrowBurstDamage;
+    set => this.origin.arrowBurstDamage = value;
+  }
+
+  public bool isShadowSealing
+  {
+    get => this.origin.isShadowSealing;
+    set => this.origin.isShadowSealing = value;
+  }
+
+  public bool isArrowBomb
+  {
+    get => this.origin.isArrowBomb;
+    set => this.origin.isArrowBomb = value;
+  }
+
+  public Player.ATTACK_MODE attackMode
+  {
+    get => this.origin.attackMode;
+    set => this.origin.attackMode = value;
+  }
 }

@@ -1,40 +1,36 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: GuildGetPinModel
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 
+#nullable disable
 public class GuildGetPinModel : BaseModel
 {
-	[Serializable]
-	public class Param
-	{
-		public int fromUserId;
+  public static string URL = "clan/ClanPin.go";
+  public GuildGetPinModel.Param result = new GuildGetPinModel.Param();
 
-		public int id;
+  [Serializable]
+  public class Param
+  {
+    public int fromUserId;
+    public int id;
+    public int type;
+    public string message;
+    public string uuid;
+    public CharaInfo charInfo;
+  }
 
-		public int type;
-
-		public string message;
-
-		public string uuid;
-
-		public CharaInfo charInfo;
-	}
-
-	public class PinData
-	{
-		public int fromUserId;
-
-		public int id;
-
-		public int type;
-
-		public string message;
-
-		public string uuid;
-
-		public CharaInfo charInfo;
-	}
-
-	public static string URL = "clan/ClanPin.go";
-
-	public Param result = new Param();
+  public class PinData
+  {
+    public int fromUserId;
+    public int id;
+    public int type;
+    public string message;
+    public string uuid;
+    public CharaInfo charInfo;
+  }
 }

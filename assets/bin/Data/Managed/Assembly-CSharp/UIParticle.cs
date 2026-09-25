@@ -1,91 +1,81 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIParticle
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class UIParticle : UIWidget
 {
-	private Renderer[] _renderers;
+  private Renderer[] _renderers;
+  private int _lastQueue;
+  private ParticleSystemRenderer _particleRenderer;
+  private bool _createMaterial;
 
-	private int _lastQueue;
+  public override Material material
+  {
+    get
+    {
+      if (Object.op_Equality((Object) this._particleRenderer, (Object) null))
+        this._particleRenderer = ((Component) this).GetComponentInChildren<ParticleSystemRenderer>(true);
+      return ((Renderer) this._particleRenderer).sharedMaterial;
+    }
+    set
+    {
+      throw new NotImplementedException(((object) this).GetType().ToString() + " has no material setter");
+    }
+  }
 
-	private ParticleSystemRenderer _particleRenderer;
+  protected override void OnStart()
+  {
+    base.OnStart();
+    this._renderers = ((Component) this).GetComponentsInChildren<Renderer>(true);
+    if (Application.isPlaying && !this._createMaterial)
+    {
+      this._createMaterial = true;
+      foreach (Renderer renderer in this._renderers)
+      {
+        int length = renderer.materials.Length;
+        Material[] materialArray = new Material[length];
+        for (int index = 0; index < length; ++index)
+        {
+          Material material = new Material(renderer.materials[index]);
+          materialArray[index] = material;
+        }
+        renderer.materials = materialArray;
+      }
+    }
+    this._lastQueue = -1;
+  }
 
-	private bool _createMaterial;
+  protected override void OnUpdate()
+  {
+    base.OnUpdate();
+    if (Object.op_Equality((Object) this.drawCall, (Object) null))
+      return;
+    int renderQueue = this.drawCall.renderQueue;
+    if (this._lastQueue == renderQueue)
+      return;
+    this._lastQueue = renderQueue;
+    foreach (Renderer renderer in this._renderers)
+    {
+      foreach (Material sharedMaterial in renderer.sharedMaterials)
+        sharedMaterial.renderQueue = this._lastQueue;
+      renderer.sortingOrder = this.drawCall.sortingOrder;
+    }
+  }
 
-	public override Material material
-	{
-		get
-		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Expected O, but got Unknown
-			if (_particleRenderer == null)
-			{
-				_particleRenderer = this.GetComponentInChildren<ParticleSystemRenderer>(true);
-			}
-			return _particleRenderer.get_sharedMaterial();
-		}
-		set
-		{
-			throw new NotImplementedException(GetType() + " has no material setter");
-		}
-	}
-
-	protected override void OnStart()
-	{
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Expected O, but got Unknown
-		base.OnStart();
-		_renderers = this.GetComponentsInChildren<Renderer>(true);
-		if (Application.get_isPlaying() && !_createMaterial)
-		{
-			_createMaterial = true;
-			Renderer[] renderers = _renderers;
-			foreach (Renderer val in renderers)
-			{
-				int num = val.get_materials().Length;
-				Material[] array = (Material[])new Material[num];
-				for (int j = 0; j < num; j++)
-				{
-					Material val2 = array[j] = new Material(val.get_materials()[j]);
-				}
-				val.set_materials(array);
-			}
-		}
-		_lastQueue = -1;
-	}
-
-	protected override void OnUpdate()
-	{
-		base.OnUpdate();
-		if (!(drawCall == null))
-		{
-			int renderQueue = drawCall.renderQueue;
-			if (_lastQueue != renderQueue)
-			{
-				_lastQueue = renderQueue;
-				Renderer[] renderers = _renderers;
-				foreach (Renderer val in renderers)
-				{
-					Material[] sharedMaterials = val.get_sharedMaterials();
-					foreach (Material val2 in sharedMaterials)
-					{
-						val2.set_renderQueue(_lastQueue);
-					}
-					val.set_sortingOrder(drawCall.sortingOrder);
-				}
-			}
-		}
-	}
-
-	public override void OnFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		for (int i = 0; i < 4; i++)
-		{
-			verts.Add(Vector3.get_zero());
-		}
-		uvs.Add(Vector2.get_zero());
-		cols.Add(new Color32((byte)1, (byte)1, (byte)1, (byte)1));
-	}
+  public override void OnFill(
+    BetterList<Vector3> verts,
+    BetterList<Vector2> uvs,
+    BetterList<Color32> cols)
+  {
+    for (int index = 0; index < 4; ++index)
+      verts.Add(Vector3.zero);
+    uvs.Add(Vector2.zero);
+    cols.Add(new Color32((byte) 1, (byte) 1, (byte) 1, (byte) 1));
+  }
 }

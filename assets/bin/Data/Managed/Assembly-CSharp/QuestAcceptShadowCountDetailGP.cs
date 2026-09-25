@@ -1,46 +1,41 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestAcceptShadowCountDetailGP
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class QuestAcceptShadowCountDetailGP : GameSection
 {
-	private enum UI
-	{
-		SPR_FRAME,
-		TBL_CONTENTS,
-		LBL_DATE,
-		LBL_DESCRIPTION
-	}
+  private const int ADD_MSG_HEIGHT = 123;
 
-	private const int ADD_MSG_HEIGHT = 123;
+  public override void UpdateUI()
+  {
+    this.SetLabelText((Enum) QuestAcceptShadowCountDetailGP.UI.LBL_DATE, $"{MonoBehaviourSingleton<PartyManager>.I.challengeInfo.oldShadowCount.startDate} 〜\n{MonoBehaviourSingleton<PartyManager>.I.challengeInfo.oldShadowCount.endDate}");
+    this.SetLabelText((Enum) QuestAcceptShadowCountDetailGP.UI.LBL_DESCRIPTION, StringTable.Get(STRING_CATEGORY.SHADOW_COUNT, 4U));
+    this.GetComponent<UITable>((Enum) QuestAcceptShadowCountDetailGP.UI.TBL_CONTENTS).Reposition();
+    Transform ctrl = this.GetCtrl((Enum) QuestAcceptShadowCountDetailGP.UI.SPR_FRAME);
+    int num = 0;
+    int childCount = this.GetCtrl((Enum) QuestAcceptShadowCountDetailGP.UI.TBL_CONTENTS).childCount;
+    for (int index = 0; index < childCount; ++index)
+    {
+      Transform child = this.GetCtrl((Enum) QuestAcceptShadowCountDetailGP.UI.TBL_CONTENTS).GetChild(index);
+      if (((Component) child).gameObject.activeSelf)
+        num += ((Component) child).GetComponent<UIWidget>().height;
+    }
+    this.SetHeight((Enum) QuestAcceptShadowCountDetailGP.UI.SPR_FRAME, (int) ((double) (123 + Mathf.Max(num, 0)) / (double) ctrl.localScale.y));
+    this.UpdateAnchors();
+    base.UpdateUI();
+  }
 
-	public override void UpdateUI()
-	{
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Expected O, but got Unknown
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		string text = MonoBehaviourSingleton<PartyManager>.I.challengeInfo.oldShadowCount.startDate + " 〜\n" + MonoBehaviourSingleton<PartyManager>.I.challengeInfo.oldShadowCount.endDate;
-		SetLabelText((Enum)UI.LBL_DATE, text);
-		SetLabelText((Enum)UI.LBL_DESCRIPTION, StringTable.Get(STRING_CATEGORY.SHADOW_COUNT, 4u));
-		base.GetComponent<UITable>((Enum)UI.TBL_CONTENTS).Reposition();
-		Transform ctrl = GetCtrl(UI.SPR_FRAME);
-		int num = 0;
-		int childCount = GetCtrl(UI.TBL_CONTENTS).get_childCount();
-		for (int i = 0; i < childCount; i++)
-		{
-			Transform val = GetCtrl(UI.TBL_CONTENTS).GetChild(i);
-			if (val.get_gameObject().get_activeSelf())
-			{
-				num += val.GetComponent<UIWidget>().height;
-			}
-		}
-		num = Mathf.Max(num, 0);
-		float num2 = (float)(123 + num);
-		Vector3 localScale = ctrl.get_localScale();
-		int height = (int)(num2 / localScale.y);
-		SetHeight((Enum)UI.SPR_FRAME, height);
-		UpdateAnchors();
-		base.UpdateUI();
-	}
+  private enum UI
+  {
+    SPR_FRAME,
+    TBL_CONTENTS,
+    LBL_DATE,
+    LBL_DESCRIPTION,
+  }
 }

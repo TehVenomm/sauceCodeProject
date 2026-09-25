@@ -1,293 +1,243 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: CommonDialog
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class CommonDialog : GameSection
 {
-	public enum TYPE
-	{
-		OK,
-		YES_NO,
-		YES_NO_CANCEL,
-		YES_NO_CLOSE,
-		DECLINE_COMFIRM,
-		DEFAULT
-	}
+  private const int MIN_MSG_HEIGHT = 96 /*0x60*/;
+  private const int ADD_MSG_HEIGHT = 20;
+  private const float THREE_BUTTON_WIDTH = 90f;
+  protected static readonly string[] BTN_SPRITE_NAME = new string[4]
+  {
+    "CmnBtn",
+    "CmnBtnG",
+    "CmnBtnR",
+    "CmnBtnO_n"
+  };
+  protected const int CMNBTNO_TEXTCOLOR_BOTTOM = -2644481;
+  protected const int CMNBTNO_TEXTCOLOR_EFFECT = 957678335;
+  private string backKeyEvent;
 
-	protected enum UI
-	{
-		MESSAGE,
-		SPR_BTN_0,
-		LBL_BTN_0,
-		LBL_BTN_0_R,
-		SPR_BTN_1,
-		LBL_BTN_1,
-		LBL_BTN_1_R,
-		SPR_BTN_2,
-		LBL_BTN_2,
-		LBL_BTN_2_R,
-		OBJ_SPACE,
-		OBJ_FRAME,
-		TBL_BTN,
-		BG,
-		HEADER,
-		CLOSE_BTN,
-		LBL_TITLE,
-		LBL_TITLE_U,
-		LBL_TITLE_D,
-		FOOTER
-	}
+  protected virtual SoundID.UISE openingSound => SoundID.UISE.DIALOG_COMMON;
 
-	public class Desc
-	{
-		public TYPE type;
+  public override string overrideBackKeyEvent => this.backKeyEvent;
 
-		public string text;
+  protected virtual string GetTransferUIName() => "UI_CommonDialog";
 
-		public string[] btnText = new string[3];
+  public override void Initialize()
+  {
+    this.SetTransferUI(this.GetTransferUIName(), typeof (CommonDialog.UI));
+    this.InitDialog(GameSceneEvent.current.userData);
+    base.Initialize();
+    this.PlayTween((Enum) CommonDialog.UI.OBJ_FRAME, is_input_block: false);
+  }
 
-		public object data;
+  protected string[] GetTexts(object[] args, STRING_CATEGORY message_categoly = STRING_CATEGORY.COMMON_DIALOG)
+  {
+    string[] sectionTypeParams = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionTypeParams();
+    if (sectionTypeParams == null || sectionTypeParams.Length < 2)
+    {
+      List<GameSceneTables.TextData> currentSectionTextList = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionTextList();
+      string[] texts = new string[currentSectionTextList.Count];
+      if (args != null)
+      {
+        int index = 0;
+        for (int length = texts.Length; index < length; ++index)
+          texts[index] = string.Format(currentSectionTextList[index].text, args);
+      }
+      else
+      {
+        int index = 0;
+        for (int length = texts.Length; index < length; ++index)
+          texts[index] = currentSectionTextList[index].text;
+      }
+      return texts;
+    }
+    int length1 = sectionTypeParams.Length;
+    string[] texts1 = new string[length1 - 1];
+    texts1[0] = args == null || args.Length == 0 ? StringTable.Get(message_categoly, uint.Parse(sectionTypeParams[1])) : StringTable.Format(message_categoly, uint.Parse(sectionTypeParams[1]), args);
+    if (length1 > 2)
+      texts1[1] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, uint.Parse(sectionTypeParams[2]));
+    if (length1 > 3)
+      texts1[2] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, uint.Parse(sectionTypeParams[3]));
+    if (length1 > 4)
+      texts1[3] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, uint.Parse(sectionTypeParams[4]));
+    return texts1;
+  }
 
-		public Desc(TYPE _type, string _text, string btn_text0 = null, string btn_text1 = null, string btn_text2 = null, object data = null)
-		{
-			type = _type;
-			text = _text;
-			btnText[0] = btn_text0;
-			btnText[1] = btn_text1;
-			btnText[2] = btn_text2;
-			this.data = data;
-		}
-	}
+  protected virtual void InitDialog(object data_object)
+  {
+    this.InitUI();
+    if (!(data_object is CommonDialog.Desc data))
+    {
+      string[] texts = this.GetTexts(data_object as object[]);
+      data = new CommonDialog.Desc(CommonDialog.TYPE.YES_NO_CANCEL, texts.Length != 0 ? texts[0] : "message", texts.Length > 1 ? texts[1] : "YES", texts.Length > 2 ? texts[2] : "NO", texts.Length > 3 ? texts[3] : "CANCEL");
+    }
+    string text = data.text;
+    if (text.StartsWith("[BB]"))
+    {
+      text = text.Substring(4);
+      UILabel component = this.GetComponent<UILabel>((Enum) CommonDialog.UI.MESSAGE);
+      if (Object.op_Inequality((Object) component, (Object) null))
+        component.supportEncoding = true;
+    }
+    this.SetLabelText((Enum) CommonDialog.UI.MESSAGE, text);
+    Transform ctrl = this.GetCtrl((Enum) CommonDialog.UI.BG);
+    int num1 = this.GetHeight((Enum) CommonDialog.UI.MESSAGE) + 20;
+    if (num1 < 96 /*0x60*/)
+      num1 = 96 /*0x60*/;
+    int num2 = 20 + num1 - 96 /*0x60*/;
+    this.SetHeight((Enum) CommonDialog.UI.BG, this.GetHeight((Enum) CommonDialog.UI.BG) + (int) ((double) num2 / (double) ctrl.localScale.y));
+    Vector3 localPosition = ctrl.localPosition;
+    localPosition.y += (float) num2 * 0.5f;
+    ctrl.localPosition = localPosition;
+    this.UpdateAnchors();
+    Debug.Log((object) ("dialog type: " + (object) data.type));
+    switch (data.type)
+    {
+      case CommonDialog.TYPE.OK:
+        if (string.IsNullOrEmpty(data.btnText[0]))
+          data.btnText[0] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100U);
+        this.SetActive((Enum) CommonDialog.UI.SPR_BTN_0, false);
+        this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_1, data.btnText[0]);
+        this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_1_R, data.btnText[0]);
+        this.SetEventName((Enum) CommonDialog.UI.SPR_BTN_1, "OK");
+        this.SetFullScreenButton((Enum) CommonDialog.UI.SPR_BTN_1);
+        this.SetButtonSprite((Enum) CommonDialog.UI.SPR_BTN_1, CommonDialog.BTN_SPRITE_NAME[1], true);
+        this.SetActive((Enum) CommonDialog.UI.OBJ_SPACE, false);
+        this.SetActive((Enum) CommonDialog.UI.SPR_BTN_2, false);
+        this.backKeyEvent = "OK";
+        break;
+      case CommonDialog.TYPE.YES_NO:
+        if (string.IsNullOrEmpty(data.btnText[0]))
+          data.btnText[0] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 101U);
+        if (string.IsNullOrEmpty(data.btnText[1]))
+          data.btnText[1] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 102U);
+        this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_0, data.btnText[1]);
+        this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_0_R, data.btnText[1]);
+        this.SetEventName((Enum) CommonDialog.UI.SPR_BTN_0, "NO");
+        this.SetButtonSprite((Enum) CommonDialog.UI.SPR_BTN_0, CommonDialog.BTN_SPRITE_NAME[2], true);
+        this.SetActive((Enum) CommonDialog.UI.SPR_BTN_1, false);
+        this.SetActive((Enum) CommonDialog.UI.OBJ_SPACE, true);
+        this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_2, data.btnText[0]);
+        this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_2_R, data.btnText[0]);
+        this.SetEventName((Enum) CommonDialog.UI.SPR_BTN_2, "YES");
+        this.SetButtonSprite((Enum) CommonDialog.UI.SPR_BTN_2, CommonDialog.BTN_SPRITE_NAME[1], true);
+        this.backKeyEvent = "NO";
+        break;
+      case CommonDialog.TYPE.YES_NO_CANCEL:
+        this.SetupThreeButton(data);
+        break;
+      case CommonDialog.TYPE.DECLINE_COMFIRM:
+        if (string.IsNullOrEmpty(data.btnText[0]))
+          data.btnText[0] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 101U);
+        if (string.IsNullOrEmpty(data.btnText[1]))
+          data.btnText[1] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 102U);
+        this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_0, data.btnText[1]);
+        this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_0_R, data.btnText[1]);
+        this.SetEventName((Enum) CommonDialog.UI.SPR_BTN_0, "NO");
+        this.SetActive((Enum) CommonDialog.UI.SPR_BTN_1, false);
+        this.SetActive((Enum) CommonDialog.UI.OBJ_SPACE, true);
+        this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_2, data.btnText[0]);
+        this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_2_R, data.btnText[0]);
+        this.SetEventName((Enum) CommonDialog.UI.SPR_BTN_2, "YES");
+        this.backKeyEvent = "NO";
+        break;
+    }
+    this.GetComponent<UITable>((Enum) CommonDialog.UI.TBL_BTN).Reposition();
+    SoundManager.PlaySystemSE(this.openingSound);
+  }
 
-	private const int MIN_MSG_HEIGHT = 96;
+  protected virtual void SetupThreeButton(CommonDialog.Desc data)
+  {
+    if (string.IsNullOrEmpty(data.btnText[0]))
+      data.btnText[0] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 101U);
+    if (string.IsNullOrEmpty(data.btnText[1]))
+      data.btnText[1] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 102U);
+    if (string.IsNullOrEmpty(data.btnText[2]))
+      data.btnText[2] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 103U);
+    this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_0, data.btnText[0]);
+    this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_0_R, data.btnText[0]);
+    this.SetEventName((Enum) CommonDialog.UI.SPR_BTN_0, "YES");
+    this.SetButtonSprite((Enum) CommonDialog.UI.SPR_BTN_0, CommonDialog.BTN_SPRITE_NAME[3], true);
+    this.GetComponent<UILabel>((Enum) CommonDialog.UI.LBL_BTN_0).gradientBottom = NGUIMath.IntToColor(-2644481);
+    this.GetComponent<UILabel>((Enum) CommonDialog.UI.LBL_BTN_0).effectColor = NGUIMath.IntToColor(957678335);
+    this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_1, data.btnText[1]);
+    this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_1_R, data.btnText[1]);
+    this.SetEventName((Enum) CommonDialog.UI.SPR_BTN_1, "NO");
+    this.SetButtonSprite((Enum) CommonDialog.UI.SPR_BTN_1, CommonDialog.BTN_SPRITE_NAME[3], true);
+    this.GetComponent<UILabel>((Enum) CommonDialog.UI.LBL_BTN_1).gradientBottom = NGUIMath.IntToColor(-2644481);
+    this.GetComponent<UILabel>((Enum) CommonDialog.UI.LBL_BTN_1).effectColor = NGUIMath.IntToColor(957678335);
+    this.SetActive((Enum) CommonDialog.UI.OBJ_SPACE, false);
+    this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_2, data.btnText[2]);
+    this.SetLabelText((Enum) CommonDialog.UI.LBL_BTN_2_R, data.btnText[2]);
+    this.SetEventName((Enum) CommonDialog.UI.SPR_BTN_2, "CANCEL");
+    this.SetButtonSprite((Enum) CommonDialog.UI.SPR_BTN_2, CommonDialog.BTN_SPRITE_NAME[1], true);
+    this.backKeyEvent = "CANCEL";
+  }
 
-	private const int ADD_MSG_HEIGHT = 20;
+  public enum TYPE
+  {
+    OK,
+    YES_NO,
+    YES_NO_CANCEL,
+    YES_NO_CLOSE,
+    DECLINE_COMFIRM,
+    DEFAULT,
+  }
 
-	private const float THREE_BUTTON_WIDTH = 90f;
+  protected enum UI
+  {
+    MESSAGE,
+    SPR_BTN_0,
+    LBL_BTN_0,
+    LBL_BTN_0_R,
+    SPR_BTN_1,
+    LBL_BTN_1,
+    LBL_BTN_1_R,
+    SPR_BTN_2,
+    LBL_BTN_2,
+    LBL_BTN_2_R,
+    OBJ_SPACE,
+    OBJ_FRAME,
+    TBL_BTN,
+    BG,
+    HEADER,
+    CLOSE_BTN,
+    LBL_TITLE,
+    LBL_TITLE_U,
+    LBL_TITLE_D,
+    FOOTER,
+  }
 
-	protected const int CMNBTNO_TEXTCOLOR_BOTTOM = -2644481;
+  public class Desc
+  {
+    public CommonDialog.TYPE type;
+    public string text;
+    public string[] btnText = new string[3];
+    public object data;
 
-	protected const int CMNBTNO_TEXTCOLOR_EFFECT = 957678335;
-
-	protected static readonly string[] BTN_SPRITE_NAME = new string[4]
-	{
-		"CmnBtn",
-		"CmnBtnG",
-		"CmnBtnR",
-		"CmnBtnO_n"
-	};
-
-	private string backKeyEvent;
-
-	protected virtual SoundID.UISE openingSound => SoundID.UISE.DIALOG_COMMON;
-
-	public override string overrideBackKeyEvent => backKeyEvent;
-
-	protected virtual string GetTransferUIName()
-	{
-		return "UI_CommonDialog";
-	}
-
-	public override void Initialize()
-	{
-		SetTransferUI(GetTransferUIName(), typeof(UI));
-		InitDialog(GameSceneEvent.current.userData);
-		base.Initialize();
-		PlayTween((Enum)UI.OBJ_FRAME, true, (EventDelegate.Callback)null, false, 0);
-	}
-
-	protected string[] GetTexts(object[] args, STRING_CATEGORY message_categoly = STRING_CATEGORY.COMMON_DIALOG)
-	{
-		string[] currentSectionTypeParams = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionTypeParams();
-		if (currentSectionTypeParams == null || currentSectionTypeParams.Length < 2)
-		{
-			List<GameSceneTables.TextData> currentSectionTextList = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionTextList();
-			string[] array = new string[currentSectionTextList.Count];
-			if (args != null)
-			{
-				int i = 0;
-				for (int num = array.Length; i < num; i++)
-				{
-					array[i] = string.Format(currentSectionTextList[i].text, args);
-				}
-			}
-			else
-			{
-				int j = 0;
-				for (int num2 = array.Length; j < num2; j++)
-				{
-					array[j] = currentSectionTextList[j].text;
-				}
-			}
-			return array;
-		}
-		int num3 = currentSectionTypeParams.Length;
-		string[] array2 = new string[num3 - 1];
-		if (args != null && args.Length > 0)
-		{
-			array2[0] = StringTable.Format(message_categoly, uint.Parse(currentSectionTypeParams[1]), args);
-		}
-		else
-		{
-			array2[0] = StringTable.Get(message_categoly, uint.Parse(currentSectionTypeParams[1]));
-		}
-		if (num3 > 2)
-		{
-			array2[1] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, uint.Parse(currentSectionTypeParams[2]));
-		}
-		if (num3 > 3)
-		{
-			array2[2] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, uint.Parse(currentSectionTypeParams[3]));
-		}
-		if (num3 > 4)
-		{
-			array2[3] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, uint.Parse(currentSectionTypeParams[4]));
-		}
-		return array2;
-	}
-
-	protected virtual void InitDialog(object data_object)
-	{
-		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		InitUI();
-		Desc desc = data_object as Desc;
-		if (desc == null)
-		{
-			string[] texts = GetTexts(data_object as object[], STRING_CATEGORY.COMMON_DIALOG);
-			desc = new Desc(TYPE.YES_NO_CANCEL, (texts.Length <= 0) ? "message" : texts[0], (texts.Length <= 1) ? "YES" : texts[1], (texts.Length <= 2) ? "NO" : texts[2], (texts.Length <= 3) ? "CANCEL" : texts[3], null);
-		}
-		string text = desc.text;
-		if (text.StartsWith("[BB]"))
-		{
-			text = text.Substring(4);
-			UILabel component = base.GetComponent<UILabel>((Enum)UI.MESSAGE);
-			if (component != null)
-			{
-				component.supportEncoding = true;
-			}
-		}
-		SetLabelText((Enum)UI.MESSAGE, text);
-		Transform ctrl = GetCtrl(UI.BG);
-		int num = GetHeight(UI.MESSAGE) + 20;
-		if (num < 96)
-		{
-			num = 96;
-		}
-		int num2 = 20 + num - 96;
-		int height = GetHeight(UI.BG);
-		float num3 = (float)num2;
-		Vector3 localScale = ctrl.get_localScale();
-		int height2 = height + (int)(num3 / localScale.y);
-		SetHeight((Enum)UI.BG, height2);
-		Vector3 localPosition = ctrl.get_localPosition();
-		localPosition.y += (float)num2 * 0.5f;
-		ctrl.set_localPosition(localPosition);
-		UpdateAnchors();
-		Debug.Log((object)("dialog type: " + desc.type));
-		switch (desc.type)
-		{
-		case TYPE.OK:
-			if (string.IsNullOrEmpty(desc.btnText[0]))
-			{
-				desc.btnText[0] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 100u);
-			}
-			SetActive((Enum)UI.SPR_BTN_0, false);
-			SetLabelText((Enum)UI.LBL_BTN_1, desc.btnText[0]);
-			SetLabelText((Enum)UI.LBL_BTN_1_R, desc.btnText[0]);
-			SetEventName((Enum)UI.SPR_BTN_1, "OK");
-			SetFullScreenButton((Enum)UI.SPR_BTN_1);
-			SetButtonSprite((Enum)UI.SPR_BTN_1, BTN_SPRITE_NAME[1], true);
-			SetActive((Enum)UI.OBJ_SPACE, false);
-			SetActive((Enum)UI.SPR_BTN_2, false);
-			backKeyEvent = "OK";
-			break;
-		case TYPE.YES_NO:
-			if (string.IsNullOrEmpty(desc.btnText[0]))
-			{
-				desc.btnText[0] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 101u);
-			}
-			if (string.IsNullOrEmpty(desc.btnText[1]))
-			{
-				desc.btnText[1] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 102u);
-			}
-			SetLabelText((Enum)UI.LBL_BTN_0, desc.btnText[1]);
-			SetLabelText((Enum)UI.LBL_BTN_0_R, desc.btnText[1]);
-			SetEventName((Enum)UI.SPR_BTN_0, "NO");
-			SetButtonSprite((Enum)UI.SPR_BTN_0, BTN_SPRITE_NAME[2], true);
-			SetActive((Enum)UI.SPR_BTN_1, false);
-			SetActive((Enum)UI.OBJ_SPACE, true);
-			SetLabelText((Enum)UI.LBL_BTN_2, desc.btnText[0]);
-			SetLabelText((Enum)UI.LBL_BTN_2_R, desc.btnText[0]);
-			SetEventName((Enum)UI.SPR_BTN_2, "YES");
-			SetButtonSprite((Enum)UI.SPR_BTN_2, BTN_SPRITE_NAME[1], true);
-			backKeyEvent = "NO";
-			break;
-		case TYPE.YES_NO_CANCEL:
-			SetupThreeButton(desc);
-			break;
-		case TYPE.DECLINE_COMFIRM:
-			if (string.IsNullOrEmpty(desc.btnText[0]))
-			{
-				desc.btnText[0] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 101u);
-			}
-			if (string.IsNullOrEmpty(desc.btnText[1]))
-			{
-				desc.btnText[1] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 102u);
-			}
-			SetLabelText((Enum)UI.LBL_BTN_0, desc.btnText[1]);
-			SetLabelText((Enum)UI.LBL_BTN_0_R, desc.btnText[1]);
-			SetEventName((Enum)UI.SPR_BTN_0, "NO");
-			SetActive((Enum)UI.SPR_BTN_1, false);
-			SetActive((Enum)UI.OBJ_SPACE, true);
-			SetLabelText((Enum)UI.LBL_BTN_2, desc.btnText[0]);
-			SetLabelText((Enum)UI.LBL_BTN_2_R, desc.btnText[0]);
-			SetEventName((Enum)UI.SPR_BTN_2, "YES");
-			backKeyEvent = "NO";
-			break;
-		}
-		base.GetComponent<UITable>((Enum)UI.TBL_BTN).Reposition();
-		SoundManager.PlaySystemSE(openingSound, 1f);
-	}
-
-	protected virtual void SetupThreeButton(Desc data)
-	{
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-		if (string.IsNullOrEmpty(data.btnText[0]))
-		{
-			data.btnText[0] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 101u);
-		}
-		if (string.IsNullOrEmpty(data.btnText[1]))
-		{
-			data.btnText[1] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 102u);
-		}
-		if (string.IsNullOrEmpty(data.btnText[2]))
-		{
-			data.btnText[2] = StringTable.Get(STRING_CATEGORY.COMMON_DIALOG, 103u);
-		}
-		SetLabelText((Enum)UI.LBL_BTN_0, data.btnText[0]);
-		SetLabelText((Enum)UI.LBL_BTN_0_R, data.btnText[0]);
-		SetEventName((Enum)UI.SPR_BTN_0, "YES");
-		SetButtonSprite((Enum)UI.SPR_BTN_0, BTN_SPRITE_NAME[3], true);
-		base.GetComponent<UILabel>((Enum)UI.LBL_BTN_0).gradientBottom = NGUIMath.IntToColor(-2644481);
-		base.GetComponent<UILabel>((Enum)UI.LBL_BTN_0).effectColor = NGUIMath.IntToColor(957678335);
-		SetLabelText((Enum)UI.LBL_BTN_1, data.btnText[1]);
-		SetLabelText((Enum)UI.LBL_BTN_1_R, data.btnText[1]);
-		SetEventName((Enum)UI.SPR_BTN_1, "NO");
-		SetButtonSprite((Enum)UI.SPR_BTN_1, BTN_SPRITE_NAME[3], true);
-		base.GetComponent<UILabel>((Enum)UI.LBL_BTN_1).gradientBottom = NGUIMath.IntToColor(-2644481);
-		base.GetComponent<UILabel>((Enum)UI.LBL_BTN_1).effectColor = NGUIMath.IntToColor(957678335);
-		SetActive((Enum)UI.OBJ_SPACE, false);
-		SetLabelText((Enum)UI.LBL_BTN_2, data.btnText[2]);
-		SetLabelText((Enum)UI.LBL_BTN_2_R, data.btnText[2]);
-		SetEventName((Enum)UI.SPR_BTN_2, "CANCEL");
-		SetButtonSprite((Enum)UI.SPR_BTN_2, BTN_SPRITE_NAME[1], true);
-		backKeyEvent = "CANCEL";
-	}
+    public Desc(
+      CommonDialog.TYPE _type,
+      string _text,
+      string btn_text0 = null,
+      string btn_text1 = null,
+      string btn_text2 = null,
+      object data = null)
+    {
+      this.type = _type;
+      this.text = _text;
+      this.btnText[0] = btn_text0;
+      this.btnText[1] = btn_text1;
+      this.btnText[2] = btn_text2;
+      this.data = data;
+    }
+  }
 }

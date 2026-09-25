@@ -1,146 +1,145 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: FieldMapEnemyPopTimeZoneTable
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 
+#nullable disable
 public class FieldMapEnemyPopTimeZoneTable : Singleton<FieldMapEnemyPopTimeZoneTable>, IDataTable
 {
-	public class FieldMapEnemyPopTimeZoneData
-	{
-		public const string NT = "id,startTime,endTime,enemyId,mapId";
+  private UIntKeyTable<FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData> timeZoneDataTable;
 
-		public uint id;
+  public void CreateTable(string csv_text)
+  {
+    this.timeZoneDataTable = TableUtility.CreateUIntKeyTable<FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData>(csv_text, new TableUtility.CallBackUIntKeyReadCSV<FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData>(FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData.cb), "id,startTime,endTime,enemyId,mapId,existStrId,goneStrId");
+  }
 
-		public string startTime;
+  public void CreateTable(string csv_text, TableUtility.Progress progress)
+  {
+    this.timeZoneDataTable = TableUtility.CreateUIntKeyTable<FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData>(csv_text, new TableUtility.CallBackUIntKeyReadCSV<FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData>(FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData.cb), "id,startTime,endTime,enemyId,mapId,existStrId,goneStrId", progress);
+    this.timeZoneDataTable.TrimExcess();
+  }
 
-		public string endTime;
+  public void AddTable(string csv_text)
+  {
+    TableUtility.AddUIntKeyTable<FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData>(this.timeZoneDataTable, csv_text, new TableUtility.CallBackUIntKeyReadCSV<FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData>(FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData.cb), "id,startTime,endTime,enemyId,mapId,existStrId,goneStrId");
+  }
 
-		public int enemyId;
+  public List<FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData> GetEnemyTimeZoneDataList(
+    int mapId)
+  {
+    if (this.timeZoneDataTable == null)
+      return (List<FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData>) null;
+    List<FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData> list = new List<FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData>();
+    this.timeZoneDataTable.ForEach((Action<FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData>) (data =>
+    {
+      if (data.mapId != mapId)
+        return;
+      list.Add(data);
+    }));
+    return list;
+  }
 
-		public int mapId;
+  public bool TryGetEnableLastEndTime(
+    int mapId,
+    out FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData resultTimeZone,
+    out ENEMY_POP_TYPE resultType)
+  {
+    resultTimeZone = (FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData) null;
+    resultType = ENEMY_POP_TYPE.RARE_SPECIES;
+    if (!MonoBehaviourSingleton<FieldManager>.IsValid())
+      return false;
+    List<FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData> timeZoneDataList = this.GetEnemyTimeZoneDataList(mapId);
+    if (timeZoneDataList == null || timeZoneDataList.Count <= 0)
+      return false;
+    List<FieldMapTable.EnemyPopTableData> rareOrBossEnemyList = Singleton<FieldMapTable>.I.GetRareOrBossEnemyList(mapId);
+    if (rareOrBossEnemyList == null || rareOrBossEnemyList.Count <= 0)
+      return false;
+    bool enableLastEndTime = false;
+    DateTime minValue = DateTime.MinValue;
+    DateTime createdAt;
+    if (!MonoBehaviourSingleton<FieldManager>.I.fieldData.field.TryGetCreatedAt(out createdAt))
+      return false;
+    DateTime now = TimeManager.GetNow();
+    int index = 0;
+    for (int count = timeZoneDataList.Count; index < count; ++index)
+    {
+      FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData enemyPopTimeZoneData = timeZoneDataList[index];
+      DateTime result1;
+      DateTime result2;
+      if (enemyPopTimeZoneData.TryGetStartTime(out result1) && enemyPopTimeZoneData.TryGetEndTime(out result2))
+      {
+        result1 = TimeManager.CombineDateAndTime(createdAt, result1);
+        result2 = TimeManager.CombineDateAndTime(createdAt, result2);
+        if (createdAt >= result1 && now <= result2)
+        {
+          FieldMapTable.EnemyPopTableData enemyPopData = this.FindEnemyPopData(rareOrBossEnemyList, mapId, enemyPopTimeZoneData.enemyId);
+          if (enemyPopData != null && (result2 > minValue || this.IsPreferredType(resultType, enemyPopData)))
+          {
+            enableLastEndTime = true;
+            resultType = enemyPopData.enemyPopType;
+            resultTimeZone = enemyPopTimeZoneData;
+          }
+        }
+      }
+    }
+    return enableLastEndTime;
+  }
 
-		public static bool cb(CSVReader csv_reader, FieldMapEnemyPopTimeZoneData data, ref uint key)
-		{
-			data.id = key;
-			csv_reader.Pop(ref data.startTime);
-			csv_reader.Pop(ref data.endTime);
-			csv_reader.Pop(ref data.enemyId);
-			csv_reader.Pop(ref data.mapId);
-			return true;
-		}
+  private bool IsPreferredType(ENEMY_POP_TYPE now, FieldMapTable.EnemyPopTableData popData)
+  {
+    return now == ENEMY_POP_TYPE.RARE_SPECIES && popData.enemyPopType == ENEMY_POP_TYPE.FIELD_BOSS;
+  }
 
-		public bool TryGetStartTime(out DateTime result)
-		{
-			return DateTime.TryParse(startTime, out result);
-		}
+  private FieldMapTable.EnemyPopTableData FindEnemyPopData(
+    List<FieldMapTable.EnemyPopTableData> specialEnemyList,
+    int mapId,
+    int enemyId)
+  {
+    int index = 0;
+    for (int count = specialEnemyList.Count; index < count; ++index)
+    {
+      FieldMapTable.EnemyPopTableData specialEnemy = specialEnemyList[index];
+      if ((long) specialEnemy.mapID == (long) mapId && (long) specialEnemy.enemyID == (long) enemyId)
+        return specialEnemy;
+    }
+    return (FieldMapTable.EnemyPopTableData) null;
+  }
 
-		public bool TryGetEndTime(out DateTime result)
-		{
-			return DateTime.TryParse(endTime, out result);
-		}
-	}
+  public class FieldMapEnemyPopTimeZoneData
+  {
+    public uint id;
+    public string startTime;
+    public string endTime;
+    public int enemyId;
+    public int mapId;
+    public uint existStrId;
+    public uint goneStrId;
+    public const string NT = "id,startTime,endTime,enemyId,mapId,existStrId,goneStrId";
 
-	private UIntKeyTable<FieldMapEnemyPopTimeZoneData> timeZoneDataTable;
+    public static bool cb(
+      CSVReader csv_reader,
+      FieldMapEnemyPopTimeZoneTable.FieldMapEnemyPopTimeZoneData data,
+      ref uint key)
+    {
+      data.id = key;
+      csv_reader.Pop(ref data.startTime);
+      csv_reader.Pop(ref data.endTime);
+      csv_reader.Pop(ref data.enemyId);
+      csv_reader.Pop(ref data.mapId);
+      csv_reader.Pop(ref data.existStrId);
+      csv_reader.Pop(ref data.goneStrId);
+      return true;
+    }
 
-	public void CreateTable(string csv_text)
-	{
-		timeZoneDataTable = TableUtility.CreateUIntKeyTable<FieldMapEnemyPopTimeZoneData>(csv_text, FieldMapEnemyPopTimeZoneData.cb, "id,startTime,endTime,enemyId,mapId", null);
-	}
+    public bool TryGetStartTime(out DateTime result)
+    {
+      return DateTime.TryParse(this.startTime, out result);
+    }
 
-	public void CreateTable(string csv_text, TableUtility.Progress progress)
-	{
-		timeZoneDataTable = TableUtility.CreateUIntKeyTable<FieldMapEnemyPopTimeZoneData>(csv_text, FieldMapEnemyPopTimeZoneData.cb, "id,startTime,endTime,enemyId,mapId", progress);
-		timeZoneDataTable.TrimExcess();
-	}
-
-	public void AddTable(string csv_text)
-	{
-		TableUtility.AddUIntKeyTable(timeZoneDataTable, csv_text, FieldMapEnemyPopTimeZoneData.cb, "id,startTime,endTime,enemyId,mapId", null);
-	}
-
-	public List<FieldMapEnemyPopTimeZoneData> GetEnemyTimeZoneDataList(int mapId)
-	{
-		if (timeZoneDataTable == null)
-		{
-			return null;
-		}
-		List<FieldMapEnemyPopTimeZoneData> list = new List<FieldMapEnemyPopTimeZoneData>();
-		timeZoneDataTable.ForEach(delegate(FieldMapEnemyPopTimeZoneData data)
-		{
-			if (data.mapId == mapId)
-			{
-				list.Add(data);
-			}
-		});
-		return list;
-	}
-
-	public bool TryGetEnableLastEndTime(int mapId, out FieldMapEnemyPopTimeZoneData resultTimeZone, out ENEMY_POP_TYPE resultType)
-	{
-		resultTimeZone = null;
-		resultType = ENEMY_POP_TYPE.RARE_SPECIES;
-		if (!MonoBehaviourSingleton<FieldManager>.IsValid())
-		{
-			return false;
-		}
-		List<FieldMapEnemyPopTimeZoneData> enemyTimeZoneDataList = GetEnemyTimeZoneDataList(mapId);
-		if (enemyTimeZoneDataList == null || enemyTimeZoneDataList.Count <= 0)
-		{
-			return false;
-		}
-		List<FieldMapTable.EnemyPopTableData> rareOrBossEnemyList = Singleton<FieldMapTable>.I.GetRareOrBossEnemyList(mapId);
-		if (rareOrBossEnemyList == null || rareOrBossEnemyList.Count <= 0)
-		{
-			return false;
-		}
-		bool result = false;
-		DateTime minValue = DateTime.MinValue;
-		if (!MonoBehaviourSingleton<FieldManager>.I.fieldData.field.TryGetCreatedAt(out DateTime createdAt))
-		{
-			return false;
-		}
-		DateTime now = TimeManager.GetNow();
-		int i = 0;
-		for (int count = enemyTimeZoneDataList.Count; i < count; i++)
-		{
-			FieldMapEnemyPopTimeZoneData fieldMapEnemyPopTimeZoneData = enemyTimeZoneDataList[i];
-			if (fieldMapEnemyPopTimeZoneData.TryGetStartTime(out DateTime result2) && fieldMapEnemyPopTimeZoneData.TryGetEndTime(out DateTime result3))
-			{
-				result2 = TimeManager.CombineDateAndTime(createdAt, result2);
-				result3 = TimeManager.CombineDateAndTime(createdAt, result3);
-				if (createdAt >= result2 && now <= result3)
-				{
-					FieldMapTable.EnemyPopTableData enemyPopTableData = FindEnemyPopData(rareOrBossEnemyList, mapId, fieldMapEnemyPopTimeZoneData.enemyId);
-					if (enemyPopTableData != null && (result3 > minValue || IsPreferredType(resultType, enemyPopTableData)))
-					{
-						result = true;
-						resultType = enemyPopTableData.enemyPopType;
-						resultTimeZone = fieldMapEnemyPopTimeZoneData;
-					}
-				}
-			}
-		}
-		return result;
-	}
-
-	private bool IsPreferredType(ENEMY_POP_TYPE now, FieldMapTable.EnemyPopTableData popData)
-	{
-		if (now == ENEMY_POP_TYPE.RARE_SPECIES && popData.enemyPopType == ENEMY_POP_TYPE.FIELD_BOSS)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	private FieldMapTable.EnemyPopTableData FindEnemyPopData(List<FieldMapTable.EnemyPopTableData> specialEnemyList, int mapId, int enemyId)
-	{
-		int i = 0;
-		for (int count = specialEnemyList.Count; i < count; i++)
-		{
-			FieldMapTable.EnemyPopTableData enemyPopTableData = specialEnemyList[i];
-			if (enemyPopTableData.mapID == mapId && enemyPopTableData.enemyID == enemyId)
-			{
-				return enemyPopTableData;
-			}
-		}
-		return null;
-	}
+    public bool TryGetEndTime(out DateTime result) => DateTime.TryParse(this.endTime, out result);
+  }
 }

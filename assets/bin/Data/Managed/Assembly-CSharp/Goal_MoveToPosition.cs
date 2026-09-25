@@ -1,82 +1,63 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Goal_MoveToPosition
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class Goal_MoveToPosition : GoalComposite
 {
-	private float moveLen;
+  private float moveLen;
+  private float margin;
 
-	private float margin;
+  protected override GOAL_TYPE GetGoalType() => GOAL_TYPE.MOVE_TO_POSITION;
 
-	private Vector3 targetPos
-	{
-		get;
-		set;
-	}
+  private Vector3 targetPos { get; set; }
 
-	protected override GOAL_TYPE GetGoalType()
-	{
-		return GOAL_TYPE.MOVE_TO_POSITION;
-	}
+  public Goal_MoveToPosition SetParam(Vector3 pos, float move_len)
+  {
+    this.targetPos = pos;
+    this.moveLen = move_len;
+    return this;
+  }
 
-	public Goal_MoveToPosition SetParam(Vector3 pos, float move_len)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		targetPos = pos;
-		moveLen = move_len;
-		return this;
-	}
+  protected override void Activate(Brain brain)
+  {
+    this.SetStatus(Goal.STATUS.ACTIVE);
+    Vector3 vector3 = Vector3.op_Subtraction(this.targetPos, brain.owner._transform.position);
+    vector3.y = 0.0f;
+    this.margin = 0.0f;
+    if ((double) this.moveLen > 0.0)
+    {
+      float num = brain.owner.moveStopRange + this.moveLen;
+      float magnitude = ((Vector3) ref vector3).magnitude;
+      if ((double) magnitude > (double) num)
+      {
+        vector3 = Vector3.op_Multiply(vector3, num / magnitude);
+        this.margin = this.moveLen / 3f;
+      }
+    }
+    this.targetPos = Vector3.op_Addition(brain.owner._transform.position, vector3);
+    this.AddSubGoal<Goal_Move>().SetStick(Vector2.up, this.targetPos).SetGiveupTime(this.moveLen + 0.5f);
+  }
 
-	protected override void Activate(Brain brain)
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		SetStatus(STATUS.ACTIVE);
-		Vector3 val = targetPos - brain.owner._transform.get_position();
-		val.y = 0f;
-		margin = 0f;
-		if (moveLen > 0f)
-		{
-			float num = brain.owner.moveStopRange + moveLen;
-			float magnitude = val.get_magnitude();
-			if (magnitude > num)
-			{
-				val *= num / magnitude;
-				margin = moveLen / 3f;
-			}
-		}
-		targetPos = brain.owner._transform.get_position() + val;
-		AddSubGoal<Goal_Move>().SetStick(Vector2.get_up(), targetPos).SetGiveupTime(moveLen + 0.5f);
-	}
+  protected override Goal.STATUS Process(Brain brain)
+  {
+    this.SetStatus(this.UpdateSubGoals(brain));
+    if (brain.owner.IsArrivalPosition(this.targetPos, this.margin))
+      this.SetStatus(Goal.STATUS.COMPLETED);
+    return this.status;
+  }
 
-	protected override STATUS Process(Brain brain)
-	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		STATUS status = UpdateSubGoals(brain);
-		SetStatus(status);
-		if (brain.owner.IsArrivalPosition(targetPos, margin))
-		{
-			SetStatus(STATUS.COMPLETED);
-		}
-		return base.status;
-	}
+  protected override void Terminate(Brain brain)
+  {
+  }
 
-	protected override void Terminate(Brain brain)
-	{
-	}
-
-	public override string ToStringGoal()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		string str = $"targetPos={(object)targetPos}, moveLen={(object)moveLen}";
-		return base.ToStringGoal() + str;
-	}
+  public override string ToStringGoal()
+  {
+    string str = $"targetPos={this.targetPos}, moveLen={this.moveLen}";
+    return base.ToStringGoal() + str;
+  }
 }

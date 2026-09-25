@@ -1,182 +1,127 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: UITutorialDialog
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class UITutorialDialog
+#nullable disable
+public class UITutorialDialog : MonoBehaviour
 {
-	private const int oneLine = 0;
+  private const int oneLine = 0;
+  private const int twoLine = 1;
+  private const int threeLine = 2;
+  private const int threeLineLabel = 3;
+  private const int threeLineLabel2 = 4;
+  [SerializeField]
+  private UIPanel[] root;
+  [SerializeField]
+  private UISprite[] messageLine0;
+  [SerializeField]
+  private UISprite[] messageLine1;
+  [SerializeField]
+  private UISprite[] messageLine2;
+  [SerializeField]
+  private UIAtlas[] atlases;
+  public UILabel lbGreeting;
+  public UILabel lbChargeWaypoint;
 
-	private const int twoLine = 1;
+  public void Open(int atlasIndex0, string spriteName0)
+  {
+    ((Component) this.root[1]).gameObject.SetActive(false);
+    ((Component) this.root[2]).gameObject.SetActive(false);
+    if (!((Component) this.root[0]).gameObject.activeInHierarchy)
+      ((Component) this.root[0]).gameObject.SetActive(true);
+    this.messageLine0[0].atlas = this.atlases[atlasIndex0];
+    this.messageLine0[0].spriteName = spriteName0;
+    this.root[0].alpha = 0.0f;
+    TweenAlpha.Begin(((Component) this.root[0]).gameObject, 0.3f, 1f);
+  }
 
-	private const int threeLine = 2;
+  public void Open(int atlasIndex0, string spriteName0, int atlasIndex1, string spriteName1)
+  {
+    ((Component) this.root[0]).gameObject.SetActive(false);
+    ((Component) this.root[2]).gameObject.SetActive(false);
+    if (!((Component) this.root[1]).gameObject.activeInHierarchy)
+      ((Component) this.root[1]).gameObject.SetActive(true);
+    this.messageLine0[1].atlas = this.atlases[atlasIndex0];
+    this.messageLine0[1].spriteName = spriteName0;
+    this.messageLine1[1].atlas = this.atlases[atlasIndex1];
+    this.messageLine1[1].spriteName = spriteName1;
+    this.root[1].alpha = 0.0f;
+    TweenAlpha.Begin(((Component) this.root[1]).gameObject, 0.3f, 1f);
+  }
 
-	private const int threeLineLabel = 3;
+  public void Open(
+    int atlasIndex0,
+    string spriteName0,
+    int atlasIndex1,
+    string spriteName1,
+    int atlasIndex2,
+    string spriteName2)
+  {
+    ((Component) this.root[0]).gameObject.SetActive(false);
+    ((Component) this.root[1]).gameObject.SetActive(false);
+    if (!((Component) this.root[2]).gameObject.activeInHierarchy)
+      ((Component) this.root[2]).gameObject.SetActive(true);
+    this.messageLine0[2].atlas = this.atlases[atlasIndex0];
+    this.messageLine0[2].spriteName = spriteName0;
+    this.messageLine1[2].atlas = this.atlases[atlasIndex1];
+    this.messageLine1[2].spriteName = spriteName1;
+    this.messageLine2[2].atlas = this.atlases[atlasIndex2];
+    this.messageLine2[2].spriteName = spriteName2;
+    this.root[2].alpha = 0.0f;
+    TweenAlpha.Begin(((Component) this.root[2]).gameObject, 0.3f, 1f);
+  }
 
-	private const int threeLineLabel2 = 4;
+  public void OpenThreeLineLabel()
+  {
+    if (((Component) this.root[1]).gameObject.activeInHierarchy)
+      TweenAlpha.Begin(((Component) this.root[1]).gameObject, 0.0f, 0.0f);
+    if (!((Component) this.root[3]).gameObject.activeInHierarchy)
+      ((Component) this.root[3]).gameObject.SetActive(true);
+    this.lbGreeting.supportEncoding = true;
+    this.root[3].alpha = 0.0f;
+    TweenAlpha.Begin(((Component) this.root[3]).gameObject, 0.3f, 1f);
+  }
 
-	[SerializeField]
-	private UIPanel[] root;
+  public void HideThreeLineLabel()
+  {
+    TweenAlpha.Begin(((Component) this.root[3]).gameObject, 0.3f, 0.0f);
+  }
 
-	[SerializeField]
-	private UISprite[] messageLine0;
+  public void OpenThreeLineLabel2()
+  {
+    if (!((Component) this.root[4]).gameObject.activeInHierarchy)
+      ((Component) this.root[4]).gameObject.SetActive(true);
+    this.lbChargeWaypoint.supportEncoding = true;
+    this.root[4].alpha = 1f;
+    TweenAlpha.Begin(((Component) this.root[4]).gameObject, 3f, 1f).AddOnFinished((EventDelegate.Callback) (() => ((Component) this.root[4]).gameObject.SetActive(false)));
+  }
 
-	[SerializeField]
-	private UISprite[] messageLine1;
+  public bool isThreeLineLabel2Active() => ((Behaviour) this.root[4]).isActiveAndEnabled;
 
-	[SerializeField]
-	private UISprite[] messageLine2;
+  public bool isTwoLineGameObjectActive() => ((Component) this.root[1]).gameObject.activeSelf;
 
-	[SerializeField]
-	private UIAtlas[] atlases;
+  public void HideThreeLineLabel2() => ((Component) this.root[4]).gameObject.SetActive(false);
 
-	public UILabel lbGreeting;
+  public void Close(int lineIndex = 0, System.Action onClose = null)
+  {
+    TweenAlpha ta = TweenAlpha.Begin(((Component) this.root[lineIndex]).gameObject, 0.3f, 0.0f);
+    if (onClose == null)
+      return;
+    ta.AddOnFinished((EventDelegate.Callback) (() =>
+    {
+      Object.DestroyImmediate((Object) ta);
+      if (onClose == null)
+        return;
+      onClose();
+    }));
+  }
 
-	public UILabel lbChargeWaypoint;
-
-	public UITutorialDialog()
-		: this()
-	{
-	}
-
-	public void Open(int atlasIndex0, string spriteName0)
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Expected O, but got Unknown
-		root[1].get_gameObject().SetActive(false);
-		root[2].get_gameObject().SetActive(false);
-		if (!root[0].get_gameObject().get_activeInHierarchy())
-		{
-			root[0].get_gameObject().SetActive(true);
-		}
-		messageLine0[0].atlas = atlases[atlasIndex0];
-		messageLine0[0].spriteName = spriteName0;
-		root[0].alpha = 0f;
-		TweenAlpha.Begin(root[0].get_gameObject(), 0.3f, 1f);
-	}
-
-	public void Open(int atlasIndex0, string spriteName0, int atlasIndex1, string spriteName1)
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Expected O, but got Unknown
-		root[0].get_gameObject().SetActive(false);
-		root[2].get_gameObject().SetActive(false);
-		if (!root[1].get_gameObject().get_activeInHierarchy())
-		{
-			root[1].get_gameObject().SetActive(true);
-		}
-		messageLine0[1].atlas = atlases[atlasIndex0];
-		messageLine0[1].spriteName = spriteName0;
-		messageLine1[1].atlas = atlases[atlasIndex1];
-		messageLine1[1].spriteName = spriteName1;
-		root[1].alpha = 0f;
-		TweenAlpha.Begin(root[1].get_gameObject(), 0.3f, 1f);
-	}
-
-	public void Open(int atlasIndex0, string spriteName0, int atlasIndex1, string spriteName1, int atlasIndex2, string spriteName2)
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Expected O, but got Unknown
-		root[0].get_gameObject().SetActive(false);
-		root[1].get_gameObject().SetActive(false);
-		if (!root[2].get_gameObject().get_activeInHierarchy())
-		{
-			root[2].get_gameObject().SetActive(true);
-		}
-		messageLine0[2].atlas = atlases[atlasIndex0];
-		messageLine0[2].spriteName = spriteName0;
-		messageLine1[2].atlas = atlases[atlasIndex1];
-		messageLine1[2].spriteName = spriteName1;
-		messageLine2[2].atlas = atlases[atlasIndex2];
-		messageLine2[2].spriteName = spriteName2;
-		root[2].alpha = 0f;
-		TweenAlpha.Begin(root[2].get_gameObject(), 0.3f, 1f);
-	}
-
-	public void OpenThreeLineLabel()
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Expected O, but got Unknown
-		if (root[1].get_gameObject().get_activeInHierarchy())
-		{
-			TweenAlpha.Begin(root[1].get_gameObject(), 0f, 0f);
-		}
-		if (!root[3].get_gameObject().get_activeInHierarchy())
-		{
-			root[3].get_gameObject().SetActive(true);
-		}
-		lbGreeting.supportEncoding = true;
-		root[3].alpha = 0f;
-		TweenAlpha.Begin(root[3].get_gameObject(), 0.3f, 1f);
-	}
-
-	public void HideThreeLineLabel()
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Expected O, but got Unknown
-		TweenAlpha.Begin(root[3].get_gameObject(), 0.3f, 0f);
-	}
-
-	public void OpenThreeLineLabel2()
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Expected O, but got Unknown
-		if (!root[4].get_gameObject().get_activeInHierarchy())
-		{
-			root[4].get_gameObject().SetActive(true);
-		}
-		lbChargeWaypoint.supportEncoding = true;
-		root[4].alpha = 1f;
-		TweenAlpha.Begin(root[4].get_gameObject(), 3f, 1f).AddOnFinished(delegate
-		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			root[4].get_gameObject().SetActive(false);
-		});
-	}
-
-	public bool isThreeLineLabel2Active()
-	{
-		return root[4].get_isActiveAndEnabled();
-	}
-
-	public void HideThreeLineLabel2()
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		root[4].get_gameObject().SetActive(false);
-	}
-
-	public void Close(int lineIndex = 0, Action onClose = null)
-	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Expected O, but got Unknown
-		TweenAlpha ta = TweenAlpha.Begin(root[lineIndex].get_gameObject(), 0.3f, 0f);
-		if (onClose != null)
-		{
-			ta.AddOnFinished(delegate
-			{
-				Object.DestroyImmediate(ta);
-				if (onClose != null)
-				{
-					onClose();
-				}
-			});
-		}
-	}
+  public void CloseaLLImmediately(int lineIndex = 0)
+  {
+    ((Component) this.root[lineIndex]).gameObject.SetActive(false);
+  }
 }

@@ -1,713 +1,783 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UISkillButton
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using UnityEngine;
 
-public class UISkillButton
+#nullable disable
+public class UISkillButton : MonoBehaviour
 {
-	[Serializable]
-	public class GaugeEffect
-	{
-		public GameObject obj;
-
-		public TweenAlpha alpha;
-
-		public TweenScale scale;
-
-		private IEnumerator work;
-
-		private bool isActive = true;
-
-		public void Init(UISkillButton parent)
-		{
-			if (work != null)
-			{
-				parent.StopCoroutine(work);
-				work = null;
-			}
-			if (isActive)
-			{
-				isActive = false;
-				if (obj != null)
-				{
-					obj.SetActive(false);
-				}
-			}
-		}
-
-		public void Play(UISkillButton parent)
-		{
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			isActive = true;
-			if (obj != null)
-			{
-				obj.SetActive(true);
-			}
-			if (alpha != null)
-			{
-				alpha.ResetToBeginning();
-				alpha.PlayForward();
-			}
-			if (scale != null)
-			{
-				scale.ResetToBeginning();
-				scale.PlayForward();
-			}
-			if (work != null)
-			{
-				parent.StopCoroutine(work);
-			}
-			work = EndCheck();
-			parent.StartCoroutine(work);
-		}
-
-		private IEnumerator EndCheck()
-		{
-			if (alpha != null)
-			{
-				while (alpha.get_enabled())
-				{
-					yield return (object)null;
-				}
-			}
-			if (scale != null)
-			{
-				while (scale.get_enabled())
-				{
-					yield return (object)null;
-				}
-			}
-			work = null;
-			if (obj != null)
-			{
-				obj.SetActive(false);
-			}
-			isActive = false;
-		}
-	}
-
-	private const string SKILL_ON_ATK_GAUGE_NAME = "skill_plate_r_on";
-
-	private const string SKILL_ON_HEAL_GAUGE_NAME = "skill_plate_g_on";
-
-	private const string SKILL_ON_SUPPORT_GAUGE_NAME = "skill_plate_b_on";
-
-	private const string SKILL_OFF_ATK_GAUGE_NAME = "skill_plate_attack_off";
-
-	private const string SKILL_OFF_HEAL_GAUGE_NAME = "skill_plate_heal_off";
-
-	private const string SKILL_OFF_SUPPORT_GAUGE_NAME = "skill_plate_off";
-
-	private const string SILENCE_ATK_ICON_NAME = "skill_plate_r_lock";
-
-	private const string SILENCE_HEAL_ICON_NAME = "skill_plate_g_lock";
-
-	private const string SILENCE_SUPPORT_ICON_NAME = "skill_plate_b_lock";
-
-	public static readonly string[] effect_red = new string[5]
-	{
-		"ef_ui_skillgauge_red_01",
-		"ef_ui_skillgauge_red_02",
-		"ef_ui_skillgauge_red_03",
-		"ef_ui_skillgauge_red_04",
-		"ef_ui_skillgauge_red_05"
-	};
-
-	public static readonly string[] effect_green = new string[5]
-	{
-		"ef_ui_skillgauge_green_01",
-		"ef_ui_skillgauge_green_02",
-		"ef_ui_skillgauge_green_03",
-		"ef_ui_skillgauge_green_04",
-		"ef_ui_skillgauge_green_05"
-	};
-
-	public static readonly string[] effect_blue = new string[5]
-	{
-		"ef_ui_skillgauge_blue_01",
-		"ef_ui_skillgauge_blue_02",
-		"ef_ui_skillgauge_blue_03",
-		"ef_ui_skillgauge_blue_04",
-		"ef_ui_skillgauge_blue_05"
-	};
-
-	[SerializeField]
-	protected Transform frame;
-
-	[SerializeField]
-	protected UITexture skillIconOff;
-
-	[SerializeField]
-	protected UITexture skillIconOn;
-
-	[SerializeField]
-	protected UISprite skillTypeON;
-
-	[SerializeField]
-	protected UISprite skillTypeOFF;
-
-	[SerializeField]
-	protected UITexture skillTypeMask;
-
-	[SerializeField]
-	protected UIButton skillButton;
-
-	[SerializeField]
-	protected UIHGauge coolTimeGuage;
-
-	[SerializeField]
-	protected GaugeEffect maxEffect = new GaugeEffect();
-
-	[SerializeField]
-	protected UIStaticPanelChanger panelChange;
-
-	[SerializeField]
-	protected GameObject silenceBase;
-
-	[SerializeField]
-	protected UISprite silenceBg;
-
-	[SerializeField]
-	protected UISprite silenceIcon;
-
-	protected Transform gaugeEffect_1;
-
-	protected Transform gaugeEffect_2;
-
-	protected Transform gaugeEffect_3;
-
-	protected Transform gaugeEffect_Max;
-
-	protected Transform effectTransform;
-
-	protected Vector3 skillIconOnPos;
-
-	protected bool btnEnable;
-
-	protected float btnSize;
-
-	protected string[] useEffectNames;
-
-	protected bool isPrevGaugeMax;
-
-	protected bool playSkill;
-
-	protected Player target;
-
-	public bool upDateStop;
-
-	protected bool requestCheck;
-
-	protected int gaugeMaxSEId;
-
-	private IEnumerator routineWork;
-
-	private UITweener alphaTween;
-
-	private UITweener scaleTween;
-
-	public int buttonIndex
-	{
-		get;
-		protected set;
-	}
-
-	public UISkillButton()
-		: this()
-	{
-		buttonIndex = -1;
-	}
-
-	public UIHGauge GetCoolTimeGauge()
-	{
-		return coolTimeGuage;
-	}
-
-	private void Awake()
-	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Expected O, but got Unknown
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Expected O, but got Unknown
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		maxEffect.Init(this);
-		silenceBase.SetActive(false);
-		if (skillIconOn != null)
-		{
-			effectTransform = skillIconOn.get_gameObject().get_transform();
-			skillIconOnPos = effectTransform.get_localPosition();
-		}
-		else
-		{
-			effectTransform = this.get_gameObject().get_transform();
-		}
-		if (coolTimeGuage != null)
-		{
-			UIWidget component = coolTimeGuage.get_gameObject().GetComponent<UIWidget>();
-			btnSize = (float)component.height;
-		}
-		if (skillButton != null)
-		{
-			btnEnable = skillButton.isEnabled;
-		}
-		UIButtonEffect uIButtonEffect = this.get_gameObject().AddComponent<UIButtonEffect>();
-		uIButtonEffect.isSimple = true;
-	}
-
-	private void OnDisable()
-	{
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		maxEffect.Init(this);
-		silenceBase.SetActive(false);
-		if (playSkill)
-		{
-			if (alphaTween != null)
-			{
-				alphaTween.set_enabled(false);
-				alphaTween = null;
-			}
-			if (scaleTween != null)
-			{
-				scaleTween.set_enabled(false);
-				scaleTween = null;
-			}
-			this.StopCoroutine(routineWork);
-			skillIconOn.get_transform().set_localPosition(skillIconOnPos);
-			skillIconOn.get_transform().set_localScale(Vector3.get_one());
-			skillIconOn.alpha = 1f;
-			panelChange.Lock();
-			playSkill = false;
-			routineWork = null;
-		}
-	}
-
-	public void SetTareget(Player player)
-	{
-		target = player;
-	}
-
-	public void SetButtonIndex(int button_index)
-	{
-		this.buttonIndex = button_index + target.skillInfo.weaponOffset;
-		if (!(target == null))
-		{
-			int buttonIndex = this.buttonIndex;
-			SkillInfo.SkillParam skillParam = target.skillInfo.GetSkillParam(buttonIndex);
-			if (skillParam != null && skillParam.IsActiveType())
-			{
-				float percent = 1f - target.skillInfo.GetPercentUseGauge(buttonIndex);
-				ChengeSkillType(buttonIndex, skillParam.tableData, percent);
-			}
-		}
-	}
-
-	private void Update()
-	{
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0203: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020a: Expected O, but got Unknown
-		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0286: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028d: Expected O, but got Unknown
-		//IL_02b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b7: Expected O, but got Unknown
-		//IL_0384: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0395: Unknown result type (might be due to invalid IL or missing references)
-		if (this.buttonIndex != -1)
-		{
-			RequestCheck();
-			if (!upDateStop)
-			{
-				UpdateSilence();
-				if (skillButton != null)
-				{
-					bool flag = IsEnable();
-					if (btnEnable != flag)
-					{
-						skillButton.isEnabled = flag;
-						btnEnable = flag;
-					}
-				}
-				if (!playSkill)
-				{
-					bool flag2 = false;
-					int buttonIndex = this.buttonIndex;
-					float num = 1f - target.skillInfo.GetPercentUseGauge(buttonIndex);
-					bool flag3 = MonoBehaviourSingleton<InGameManager>.I.graphicOptionType > 0;
-					if (coolTimeGuage != null)
-					{
-						if (num > 0f)
-						{
-							if (num < 0.3f)
-							{
-								num = 0.3f;
-							}
-							coolTimeGuage.SetPercent(num, false);
-							if (flag3)
-							{
-								if (num < 1f)
-								{
-									if (gaugeEffect_1 == null)
-									{
-										gaugeEffect_1 = EffectManager.GetUIEffect(useEffectNames[0], effectTransform, -1f, 0, null);
-										if (gaugeEffect_1 != null)
-										{
-											Vector3 localPosition = gaugeEffect_1.get_localPosition();
-											localPosition.x = btnSize * 2f;
-											gaugeEffect_1.set_localPosition(localPosition);
-											flag2 = true;
-										}
-									}
-									else
-									{
-										Vector3 localPosition2 = gaugeEffect_1.get_localPosition();
-										localPosition2.x = 0f;
-										localPosition2.y = (0f - btnSize) * num + btnSize * 0.5f;
-										gaugeEffect_1.set_localPosition(localPosition2);
-									}
-									if (gaugeEffect_2 == null)
-									{
-										gaugeEffect_2 = EffectManager.GetUIEffect(useEffectNames[1], effectTransform, -0.001f, 0, null);
-										if (gaugeEffect_2 != null)
-										{
-											flag2 = true;
-										}
-									}
-								}
-								else
-								{
-									ReleaseEffects();
-								}
-								if (gaugeEffect_3 != null)
-								{
-									EffectManager.ReleaseEffect(gaugeEffect_3.get_gameObject(), true, false);
-									gaugeEffect_3 = null;
-								}
-							}
-							isPrevGaugeMax = false;
-							maxEffect.Init(this);
-						}
-						else
-						{
-							coolTimeGuage.SetPercent(num, false);
-							if (flag3)
-							{
-								if (gaugeEffect_1 != null)
-								{
-									Vector3 localPosition3 = gaugeEffect_1.get_localPosition();
-									localPosition3.y = btnSize * 0.5f;
-									gaugeEffect_1.set_localPosition(localPosition3);
-									EffectManager.ReleaseEffect(gaugeEffect_1.get_gameObject(), true, false);
-									gaugeEffect_1 = null;
-								}
-								if (gaugeEffect_2 != null)
-								{
-									EffectManager.ReleaseEffect(gaugeEffect_2.get_gameObject(), true, false);
-									gaugeEffect_2 = null;
-								}
-								if (gaugeEffect_3 == null)
-								{
-									gaugeEffect_3 = EffectManager.GetUIEffect(useEffectNames[3], effectTransform, -0.001f, 0, null);
-									if (gaugeEffect_3 != null)
-									{
-										flag2 = true;
-									}
-								}
-							}
-							if (!isPrevGaugeMax && !target.IsValidBuffSilence())
-							{
-								if (flag3)
-								{
-									if (frame != null)
-									{
-										gaugeEffect_Max = EffectManager.GetUIEffect(useEffectNames[2], frame, -0.001f, 0, null);
-									}
-									maxEffect.Play(this);
-								}
-								SoundManager.PlayOneShotUISE(gaugeMaxSEId);
-							}
-							isPrevGaugeMax = true;
-						}
-					}
-					if (flag2)
-					{
-						effectTransform.get_gameObject().SetActive(false);
-						effectTransform.get_gameObject().SetActive(true);
-					}
-				}
-			}
-		}
-	}
-
-	private void UpdateSilence()
-	{
-		bool flag = false;
-		if (silenceBase != null)
-		{
-			if (target != null && target.IsValidBuffSilence())
-			{
-				flag = true;
-			}
-			if (silenceBase.get_activeInHierarchy() != flag)
-			{
-				silenceBase.SetActive(flag);
-			}
-		}
-	}
-
-	public void ReleaseEffects()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		if (gaugeEffect_1 != null)
-		{
-			Object.Destroy(gaugeEffect_1.get_gameObject());
-			gaugeEffect_1 = null;
-		}
-		if (gaugeEffect_2 != null)
-		{
-			Object.Destroy(gaugeEffect_2.get_gameObject());
-			gaugeEffect_2 = null;
-		}
-		if (gaugeEffect_3 != null)
-		{
-			Object.Destroy(gaugeEffect_3.get_gameObject());
-			gaugeEffect_3 = null;
-		}
-		if (gaugeEffect_Max != null)
-		{
-			Object.Destroy(gaugeEffect_Max.get_gameObject());
-			gaugeEffect_Max = null;
-		}
-	}
-
-	protected void ChengeSkillType(int index, SkillItemTable.SkillItemData data, float percent)
-	{
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		ReleaseEffects();
-		if (coolTimeGuage != null)
-		{
-			if (percent > 0f)
-			{
-				if (percent < 0.2f)
-				{
-					percent = 0.2f;
-				}
-				coolTimeGuage.SetPercent(percent, false);
-			}
-			else
-			{
-				coolTimeGuage.SetPercent(percent, false);
-			}
-		}
-		if (skillIconOff != null)
-		{
-			skillIconOff.get_gameObject().SetActive(true);
-			ResourceLoad.LoadItemIconTexture(skillIconOff, data.iconID);
-		}
-		if (skillIconOn != null)
-		{
-			skillIconOn.get_gameObject().SetActive(true);
-			ResourceLoad.LoadItemIconTexture(skillIconOn, data.iconID);
-		}
-		SetSlotType(data.type);
-		skillTypeOFF.alpha = 1f;
-		isPrevGaugeMax = (percent <= 0f);
-		maxEffect.Init(this);
-		UpdateSilence();
-	}
-
-	public void SetInActiveSlot(SKILL_SLOT_TYPE type)
-	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		buttonIndex = -1;
-		ReleaseEffects();
-		if (coolTimeGuage != null)
-		{
-			coolTimeGuage.SetPercent(1f, false);
-		}
-		if (skillIconOff != null)
-		{
-			skillIconOff.get_gameObject().SetActive(false);
-		}
-		if (skillIconOn != null)
-		{
-			skillIconOn.get_gameObject().SetActive(false);
-		}
-		SetSlotType(type);
-		skillTypeOFF.alpha = 0.5f;
-		isPrevGaugeMax = false;
-		maxEffect.Init(this);
-		silenceBase.SetActive(false);
-		skillButton.isEnabled = false;
-		btnEnable = false;
-	}
-
-	protected void SetSlotType(SKILL_SLOT_TYPE type)
-	{
-		switch (type)
-		{
-		case SKILL_SLOT_TYPE.ATTACK:
-			skillTypeON.spriteName = "skill_plate_r_on";
-			skillTypeOFF.spriteName = "skill_plate_attack_off";
-			silenceBg.spriteName = "skill_plate_r_on";
-			silenceIcon.spriteName = "skill_plate_r_lock";
-			useEffectNames = effect_red;
-			gaugeMaxSEId = 40000120;
-			break;
-		case SKILL_SLOT_TYPE.HEAL:
-			skillTypeON.spriteName = "skill_plate_g_on";
-			skillTypeOFF.spriteName = "skill_plate_heal_off";
-			silenceBg.spriteName = "skill_plate_g_on";
-			silenceIcon.spriteName = "skill_plate_g_lock";
-			useEffectNames = effect_green;
-			gaugeMaxSEId = 40000120;
-			break;
-		case SKILL_SLOT_TYPE.SUPPORT:
-			skillTypeON.spriteName = "skill_plate_b_on";
-			skillTypeOFF.spriteName = "skill_plate_off";
-			silenceBg.spriteName = "skill_plate_b_on";
-			silenceIcon.spriteName = "skill_plate_b_lock";
-			useEffectNames = effect_blue;
-			gaugeMaxSEId = 40000120;
-			break;
-		}
-		skillTypeMask.mainTexture = MonoBehaviourSingleton<UISkillButtonGroup>.I.GetMaskTexture(type);
-	}
-
-	public bool IsEnable()
-	{
-		if (this.buttonIndex < 0)
-		{
-			return false;
-		}
-		if (target == null)
-		{
-			return false;
-		}
-		int buttonIndex = this.buttonIndex;
-		SkillInfo.SkillParam skillParam = target.skillInfo.GetSkillParam(buttonIndex);
-		if (skillParam == null || !skillParam.IsActiveType())
-		{
-			return false;
-		}
-		SelfController selfController = target.controller as SelfController;
-		if (selfController == null)
-		{
-			return false;
-		}
-		if (selfController.IsCancelNextNotCancel())
-		{
-			return false;
-		}
-		return target.IsActSkillAction(buttonIndex);
-	}
-
-	private bool IsSelfCommandCheck()
-	{
-		int buttonIndex = this.buttonIndex;
-		SelfController selfController = target.controller as SelfController;
-		if (selfController == null)
-		{
-			return false;
-		}
-		if (selfController.nextCommand != null && selfController.nextCommand.type == SelfController.COMMAND_TYPE.SKILL && selfController.nextCommand.skillIndex == buttonIndex)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	public void OnClick()
-	{
-		if (this.buttonIndex >= 0 && !(target == null))
-		{
-			SelfController selfController = target.controller as SelfController;
-			if (!(selfController == null) && !selfController.IsCancelNextNotCancel())
-			{
-				int buttonIndex = this.buttonIndex;
-				if (selfController.OnSkillButtonPress(buttonIndex))
-				{
-					requestCheck = true;
-					skillButton.isEnabled = false;
-					btnEnable = false;
-				}
-			}
-		}
-	}
-
-	private void RequestCheck()
-	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		if (requestCheck && !IsSelfCommandCheck())
-		{
-			if (gaugeEffect_3 != null)
-			{
-				Object.Destroy(gaugeEffect_3.get_gameObject());
-				gaugeEffect_3 = null;
-			}
-			requestCheck = false;
-			if (target.actionID == (Character.ACTION_ID)20)
-			{
-				if (frame != null)
-				{
-					EffectManager.GetUIEffect(useEffectNames[4], frame, -1f, 0, null);
-				}
-				ReleaseEffects();
-				if (coolTimeGuage != null)
-				{
-					coolTimeGuage.SetPercent(1f, false);
-				}
-				if (skillIconOn != null && !playSkill)
-				{
-					if (routineWork != null)
-					{
-						this.StopCoroutine(routineWork);
-					}
-					routineWork = SkillStart();
-					this.StartCoroutine(routineWork);
-				}
-			}
-		}
-	}
-
-	private IEnumerator SkillStart()
-	{
-		playSkill = true;
-		yield return (object)new WaitForEndOfFrame();
-		panelChange.UnLock();
-		Vector3 v = skillIconOn.get_transform().get_localPosition();
-		v.z = 0f;
-		skillIconOn.get_transform().set_localPosition(v);
-		alphaTween = TweenAlpha.Begin(skillIconOn.get_gameObject(), 0.5f, 0.01f);
-		scaleTween = TweenScale.Begin(skillIconOn.get_gameObject(), 0.5f, new Vector3(2f, 2f, 2f));
-		yield return (object)new WaitForSeconds(1.5f);
-		skillIconOn.get_transform().set_localPosition(skillIconOnPos);
-		skillIconOn.get_transform().set_localScale(Vector3.get_one());
-		skillIconOn.alpha = 1f;
-		panelChange.Lock();
-		playSkill = false;
-		alphaTween = null;
-		scaleTween = null;
-		routineWork = null;
-	}
+  private const string SKILL_ON_ATK_GAUGE_NAME = "skill_plate_r_on";
+  private const string SKILL_ON_HEAL_GAUGE_NAME = "skill_plate_g_on";
+  private const string SKILL_ON_SUPPORT_GAUGE_NAME = "skill_plate_b_on";
+  private const string SKILL_ON_ATK_GAUGE_NAME_2ND = "skill_plate_y_on";
+  private const string SKILL_ON_HEAL_GAUGE_NAME_2ND = "skill_plate_g_on";
+  private const string SKILL_ON_SUPPORT_GAUGE_NAME_2ND = "skill_plate_b_on";
+  private const string SKILL_OFF_ATK_GAUGE_NAME = "skill_plate_attack_off";
+  private const string SKILL_OFF_HEAL_GAUGE_NAME = "skill_plate_heal_off";
+  private const string SKILL_OFF_SUPPORT_GAUGE_NAME = "skill_plate_off";
+  private const string SILENCE_ATK_ICON_NAME = "skill_plate_r_lock";
+  private const string SILENCE_HEAL_ICON_NAME = "skill_plate_g_lock";
+  private const string SILENCE_SUPPORT_ICON_NAME = "skill_plate_b_lock";
+  public static readonly string[] effect_red = new string[5]
+  {
+    "ef_ui_skillgauge_red_01",
+    "ef_ui_skillgauge_red_02",
+    "ef_ui_skillgauge_red_03",
+    "ef_ui_skillgauge_red_04",
+    "ef_ui_skillgauge_red_05"
+  };
+  public static readonly string[] effect_yellow = new string[5]
+  {
+    "ef_ui_skillgauge_yellow_01",
+    "ef_ui_skillgauge_yellow_02",
+    "ef_ui_skillgauge_yellow_03",
+    "ef_ui_skillgauge_yellow_04",
+    "ef_ui_skillgauge_yellow_05"
+  };
+  public static readonly string[] effect_green = new string[5]
+  {
+    "ef_ui_skillgauge_green_01",
+    "ef_ui_skillgauge_green_02",
+    "ef_ui_skillgauge_green_03",
+    "ef_ui_skillgauge_green_04",
+    "ef_ui_skillgauge_green_05"
+  };
+  public static readonly string[] effect_blue = new string[5]
+  {
+    "ef_ui_skillgauge_blue_01",
+    "ef_ui_skillgauge_blue_02",
+    "ef_ui_skillgauge_blue_03",
+    "ef_ui_skillgauge_blue_04",
+    "ef_ui_skillgauge_blue_05"
+  };
+  [SerializeField]
+  protected Transform frame;
+  [SerializeField]
+  protected UITexture skillIconOff;
+  [SerializeField]
+  protected UISprite skillTypeOFF;
+  [SerializeField]
+  protected UISkillButton.SkillGauge skillGauge1;
+  [SerializeField]
+  protected UISkillButton.SkillGauge skillGauge2;
+  [SerializeField]
+  protected UIButton skillButton;
+  [SerializeField]
+  protected UITexture skillTypeMask;
+  [SerializeField]
+  protected UIHGauge skillGaugeMask;
+  [SerializeField]
+  protected UIStaticPanelChanger panelChange;
+  [SerializeField]
+  protected GameObject silenceBase;
+  [SerializeField]
+  protected UISprite silenceBg;
+  [SerializeField]
+  protected UISprite silenceIcon;
+  protected bool btnEnable;
+  protected bool isPrevGaugeMax;
+  protected bool playSkill;
+  protected Player target;
+  public bool upDateStop;
+  protected bool requestCheck;
+  protected int gaugeMaxSEId;
+  private IEnumerator routineWork;
+
+  public int buttonIndex { get; protected set; }
+
+  public UIHGauge GetCoolTimeGauge() => this.skillGaugeMask;
+
+  public UISkillButton() => this.buttonIndex = -1;
+
+  private void Awake()
+  {
+    this.skillGauge1.maxEffect.Init(this);
+    this.skillGauge2.maxEffect.Init(this);
+    this.silenceBase.SetActive(false);
+    if (Object.op_Inequality((Object) this.skillGaugeMask, (Object) null))
+    {
+      UIWidget component = ((Component) this.skillGaugeMask).gameObject.GetComponent<UIWidget>();
+      this.skillGauge1.Init((float) component.height);
+      this.skillGauge2.Init((float) component.height);
+    }
+    if (Object.op_Inequality((Object) this.skillButton, (Object) null))
+      this.btnEnable = this.skillButton.isEnabled;
+    ((Component) this).gameObject.AddComponent<UIButtonEffect>().isSimple = true;
+  }
+
+  private void OnDisable()
+  {
+    this.skillGauge1.maxEffect.Init(this);
+    this.skillGauge2.maxEffect.Init(this);
+    this.silenceBase.SetActive(false);
+    if (!this.playSkill)
+      return;
+    this.StopCoroutine(this.routineWork);
+    int depth = ((Component) this.skillGaugeMask).GetComponent<UIWidget>().depth;
+    this.skillGauge1.MoveToFront(depth);
+    this.skillGauge2.MoveToFront(depth);
+    this.skillGauge1.OnDisable();
+    this.skillGauge2.OnDisable();
+    this.panelChange.Lock();
+    this.playSkill = false;
+    this.routineWork = (IEnumerator) null;
+  }
+
+  public void SetTareget(Player player) => this.target = player;
+
+  public void SetButtonIndex(int button_index)
+  {
+    this.buttonIndex = button_index + this.target.skillInfo.weaponOffset;
+    if (Object.op_Equality((Object) this.target, (Object) null))
+      return;
+    int buttonIndex = this.buttonIndex;
+    SkillInfo.SkillParam skillParam = this.target.skillInfo.GetSkillParam(buttonIndex);
+    if (skillParam == null || !skillParam.IsActiveType())
+      return;
+    float percent = 1f - this.target.skillInfo.GetPercentUseGauge(buttonIndex);
+    this.ChengeSkillType(buttonIndex, skillParam.tableData, percent);
+  }
+
+  private UISkillButton.GAUGE_GRADE GetGaugeGrade()
+  {
+    SkillInfo.SkillParam skillParam = this.target.skillInfo.GetSkillParam(this.buttonIndex);
+    if (skillParam == null)
+      return UISkillButton.GAUGE_GRADE.NONE;
+    return (double) (int) skillParam.useGauge2 <= 0.0 || (double) this.skillGauge1.percent != 0.0 ? UISkillButton.GAUGE_GRADE.FIRST : UISkillButton.GAUGE_GRADE.SECOND;
+  }
+
+  private void GetGauges(
+    out UISkillButton.SkillGauge activeGauge,
+    out UISkillButton.SkillGauge inactiveGauge)
+  {
+    switch (this.GetGaugeGrade())
+    {
+      case UISkillButton.GAUGE_GRADE.NONE:
+        activeGauge = (UISkillButton.SkillGauge) null;
+        inactiveGauge = (UISkillButton.SkillGauge) null;
+        break;
+      case UISkillButton.GAUGE_GRADE.SECOND:
+        activeGauge = this.skillGauge2;
+        inactiveGauge = this.skillGauge1;
+        break;
+      default:
+        activeGauge = this.skillGauge1;
+        inactiveGauge = this.skillGauge2;
+        break;
+    }
+  }
+
+  private void Update()
+  {
+    if (this.buttonIndex == -1)
+      return;
+    this.skillGauge1.percent = 1f - this.target.skillInfo.GetPercentUseGauge(this.buttonIndex);
+    this.skillGauge2.percent = 1f - this.target.skillInfo.GetPercentUseGauge2nd(this.buttonIndex);
+    if (this.target.isUsingSecondGradeSkill && this.target.skillInfo.GetSkillParam(this.buttonIndex).isUsingSecondGrade)
+    {
+      this.skillGauge1.percent = 1f;
+      this.skillGauge2.percent = 1f;
+    }
+    UISkillButton.SkillGauge activeGauge;
+    UISkillButton.SkillGauge inactiveGauge;
+    this.GetGauges(out activeGauge, out inactiveGauge);
+    if (activeGauge == null || inactiveGauge == null)
+    {
+      this.skillGauge1.SetActive(false);
+      this.skillGauge2.SetActive(false);
+      this.skillGaugeMask.SetPercent(1f, false);
+    }
+    else
+    {
+      this.RequestCheck(activeGauge, inactiveGauge);
+      if (this.upDateStop)
+      {
+        this.skillGauge1.SetActive(false);
+        this.skillGauge2.SetActive(false);
+        this.skillGaugeMask.SetPercent(1f, false);
+      }
+      else
+      {
+        this.skillGauge1.SetActive(true);
+        if (activeGauge == this.skillGauge2)
+          this.skillGauge2.SetActive(true);
+        else
+          this.skillGauge2.SetActive(false);
+        this.UpdateSilence();
+        if (Object.op_Inequality((Object) this.skillButton, (Object) null))
+        {
+          bool flag = this.IsEnable();
+          if (this.btnEnable != flag)
+          {
+            this.skillButton.isEnabled = flag;
+            this.btnEnable = flag;
+          }
+        }
+        this.UpdateSkillButton(activeGauge, inactiveGauge);
+      }
+    }
+  }
+
+  private void SetDepthOfGauges(
+    UISkillButton.SkillGauge activeGauge,
+    UISkillButton.SkillGauge inactiveGauge)
+  {
+    int depth = ((Component) this.skillGaugeMask).GetComponent<UIWidget>().depth;
+    activeGauge.MoveToFront(depth);
+    inactiveGauge.MoveToBack(depth);
+  }
+
+  private void UpdateSkillButton(
+    UISkillButton.SkillGauge activeGauge,
+    UISkillButton.SkillGauge inactiveGauge)
+  {
+    if (Object.op_Equality((Object) this.skillGaugeMask, (Object) null))
+      return;
+    this.SetDepthOfGauges(activeGauge, inactiveGauge);
+    bool isGraphicOptOverLow = MonoBehaviourSingleton<InGameManager>.I.graphicOptionType > 0;
+    if (!this.UpdateSkillGauge(activeGauge, inactiveGauge, isGraphicOptOverLow))
+      return;
+    ((Component) activeGauge.effectTransform).gameObject.SetActive(false);
+    ((Component) activeGauge.effectTransform).gameObject.SetActive(true);
+  }
+
+  private bool UpdateSkillGauge(
+    UISkillButton.SkillGauge activeGauge,
+    UISkillButton.SkillGauge inactiveGauge,
+    bool isGraphicOptOverLow)
+  {
+    bool flag = false;
+    float percent = activeGauge.percent;
+    if ((double) percent > 0.0 && (double) percent < 0.30000001192092896)
+      percent = 0.3f;
+    if ((double) percent <= 0.0)
+    {
+      this.skillGaugeMask.SetPercent(percent, false);
+      flag = this.UpdateFullChargedGaugeEffect(activeGauge, isGraphicOptOverLow);
+      if (!activeGauge.isPrevGaugeMax)
+        this.PlayFullChargeEffect(activeGauge, isGraphicOptOverLow);
+      activeGauge.isPrevGaugeMax = true;
+    }
+    else
+    {
+      this.skillGaugeMask.SetPercent(percent, false);
+      activeGauge.isPrevGaugeMax = false;
+      activeGauge.maxEffect.Init(this);
+      if ((double) percent >= 1.0)
+        activeGauge.ReleaseEffects();
+      else
+        flag = this.UpdateChargingGaugeEffect(activeGauge, percent, isGraphicOptOverLow);
+    }
+    if ((double) inactiveGauge.percent <= 0.0)
+    {
+      if (!inactiveGauge.isPrevGaugeMax)
+        this.PlayFullChargeEffect(inactiveGauge, isGraphicOptOverLow);
+      inactiveGauge.isPrevGaugeMax = true;
+    }
+    else
+    {
+      inactiveGauge.ReleaseEffects();
+      inactiveGauge.maxEffect.Init(this);
+      inactiveGauge.isPrevGaugeMax = false;
+    }
+    return flag;
+  }
+
+  private bool UpdateChargingGaugeEffect(
+    UISkillButton.SkillGauge skillGauge,
+    float percent,
+    bool isGraphicOptOverLow)
+  {
+    if (!isGraphicOptOverLow)
+    {
+      skillGauge.ReleaseEffects();
+      return false;
+    }
+    int num = 0 | (skillGauge.PlayEffect1(percent) ? 1 : 0) | (skillGauge.PlayEffect2() ? 1 : 0);
+    skillGauge.HideEffect3();
+    return num != 0;
+  }
+
+  private bool UpdateFullChargedGaugeEffect(
+    UISkillButton.SkillGauge skillGauge,
+    bool isGraphicOptOverLow)
+  {
+    if (!isGraphicOptOverLow)
+    {
+      skillGauge.ReleaseEffects();
+      return false;
+    }
+    skillGauge.ReleaseEffect1();
+    skillGauge.ReleaseEffect2();
+    return (0 | (skillGauge.PlayEffect3() ? 1 : 0)) != 0;
+  }
+
+  private void PlayFullChargeEffect(UISkillButton.SkillGauge skillGauge, bool isGraphicOptOverLow)
+  {
+    if (this.target.IsValidBuffSilence())
+      return;
+    SoundManager.PlayOneShotUISE(this.gaugeMaxSEId);
+    if (!isGraphicOptOverLow)
+      return;
+    skillGauge.maxEffect.Play(this);
+  }
+
+  private void UpdateSilence()
+  {
+    bool flag = false;
+    if (!Object.op_Inequality((Object) this.silenceBase, (Object) null))
+      return;
+    if (Object.op_Inequality((Object) this.target, (Object) null) && this.target.IsValidBuffSilence())
+      flag = true;
+    if (this.silenceBase.activeInHierarchy == flag)
+      return;
+    this.silenceBase.SetActive(flag);
+  }
+
+  public void ReleaseEffects()
+  {
+    this.skillGauge1.ReleaseEffects();
+    this.skillGauge2.ReleaseEffects();
+  }
+
+  protected void ChengeSkillType(int index, SkillItemTable.SkillItemData data, float percent)
+  {
+    this.ReleaseEffects();
+    if (Object.op_Inequality((Object) this.skillGaugeMask, (Object) null))
+    {
+      if ((double) percent > 0.0)
+      {
+        if ((double) percent < 0.20000000298023224)
+          percent = 0.2f;
+        this.skillGaugeMask.SetPercent(percent, false);
+      }
+      else
+        this.skillGaugeMask.SetPercent(percent, false);
+    }
+    if (Object.op_Inequality((Object) this.skillIconOff, (Object) null))
+    {
+      ((Component) this.skillIconOff).gameObject.SetActive(true);
+      ResourceLoad.LoadItemIconTexture(this.skillIconOff, data.iconID);
+    }
+    if (this.skillGauge1 != null && Object.op_Inequality((Object) this.skillGauge1.iconTexture, (Object) null))
+      ResourceLoad.LoadItemIconTexture(this.skillGauge1.iconTexture, data.iconID);
+    if (this.skillGauge2 != null && Object.op_Inequality((Object) this.skillGauge2.iconTexture, (Object) null))
+      ResourceLoad.LoadItemIconTexture(this.skillGauge2.iconTexture, data.iconID);
+    this.SetSlotType(data.type);
+    this.skillTypeOFF.alpha = 1f;
+    this.isPrevGaugeMax = (double) percent <= 0.0;
+    this.skillGauge1.maxEffect.Init(this);
+    this.skillGauge2.maxEffect.Init(this);
+    this.UpdateSilence();
+  }
+
+  public void SetInActiveSlot(SKILL_SLOT_TYPE type)
+  {
+    this.buttonIndex = -1;
+    this.ReleaseEffects();
+    if (Object.op_Inequality((Object) this.skillGaugeMask, (Object) null))
+      this.skillGaugeMask.SetPercent(1f, false);
+    if (Object.op_Inequality((Object) this.skillIconOff, (Object) null))
+      ((Component) this.skillIconOff).gameObject.SetActive(false);
+    if (this.skillGauge1 != null)
+      ((Component) this.skillGauge1.iconTexture).gameObject.SetActive(false);
+    if (this.skillGauge2 != null)
+      ((Component) this.skillGauge2.iconTexture).gameObject.SetActive(false);
+    this.SetSlotType(type);
+    this.skillTypeOFF.alpha = 0.5f;
+    this.isPrevGaugeMax = false;
+    int depth = ((Component) this.skillGaugeMask).GetComponent<UIWidget>().depth;
+    this.skillGauge1.SetActive(false);
+    this.skillGauge2.SetActive(false);
+    this.skillGauge1.MoveToFront(depth);
+    this.skillGauge2.MoveToFront(depth);
+    this.skillGauge1.maxEffect.Init(this);
+    this.skillGauge2.maxEffect.Init(this);
+    this.silenceBase.SetActive(false);
+    this.skillButton.isEnabled = false;
+    this.btnEnable = false;
+  }
+
+  protected void SetSlotType(SKILL_SLOT_TYPE type)
+  {
+    switch (type)
+    {
+      case SKILL_SLOT_TYPE.ATTACK:
+        this.skillGauge1.typeSprite.spriteName = "skill_plate_r_on";
+        this.skillGauge2.typeSprite.spriteName = "skill_plate_y_on";
+        this.skillTypeOFF.spriteName = "skill_plate_attack_off";
+        this.silenceBg.spriteName = "skill_plate_r_on";
+        this.silenceIcon.spriteName = "skill_plate_r_lock";
+        this.skillGauge1.useEffectNames = UISkillButton.effect_red;
+        this.skillGauge2.useEffectNames = UISkillButton.effect_yellow;
+        this.gaugeMaxSEId = 40000120;
+        break;
+      case SKILL_SLOT_TYPE.SUPPORT:
+        this.skillGauge1.typeSprite.spriteName = "skill_plate_b_on";
+        this.skillGauge2.typeSprite.spriteName = "skill_plate_b_on";
+        this.skillTypeOFF.spriteName = "skill_plate_off";
+        this.silenceBg.spriteName = "skill_plate_b_on";
+        this.silenceIcon.spriteName = "skill_plate_b_lock";
+        this.skillGauge1.useEffectNames = UISkillButton.effect_blue;
+        this.skillGauge2.useEffectNames = UISkillButton.effect_yellow;
+        this.gaugeMaxSEId = 40000120;
+        break;
+      case SKILL_SLOT_TYPE.HEAL:
+        this.skillGauge1.typeSprite.spriteName = "skill_plate_g_on";
+        this.skillGauge2.typeSprite.spriteName = "skill_plate_g_on";
+        this.skillTypeOFF.spriteName = "skill_plate_heal_off";
+        this.silenceBg.spriteName = "skill_plate_g_on";
+        this.silenceIcon.spriteName = "skill_plate_g_lock";
+        this.skillGauge1.useEffectNames = UISkillButton.effect_green;
+        this.skillGauge2.useEffectNames = UISkillButton.effect_yellow;
+        this.gaugeMaxSEId = 40000120;
+        break;
+    }
+    this.skillTypeMask.mainTexture = MonoBehaviourSingleton<UISkillButtonGroup>.I.GetMaskTexture(type);
+  }
+
+  public bool IsEnable()
+  {
+    if (this.buttonIndex < 0 || Object.op_Equality((Object) this.target, (Object) null))
+      return false;
+    int buttonIndex = this.buttonIndex;
+    SkillInfo.SkillParam skillParam = this.target.skillInfo.GetSkillParam(buttonIndex);
+    if (skillParam == null || !skillParam.IsActiveType())
+      return false;
+    SelfController controller = this.target.controller as SelfController;
+    return !Object.op_Equality((Object) controller, (Object) null) && !controller.IsCancelNextNotCancel() && this.target.IsActSkillAction(buttonIndex);
+  }
+
+  private bool IsSelfCommandCheck()
+  {
+    int buttonIndex = this.buttonIndex;
+    SelfController controller = this.target.controller as SelfController;
+    return !Object.op_Equality((Object) controller, (Object) null) && controller.nextCommand != null && controller.nextCommand.type == SelfController.COMMAND_TYPE.SKILL && controller.nextCommand.skillIndex == buttonIndex;
+  }
+
+  public void OnClick()
+  {
+    if (this.buttonIndex < 0 || Object.op_Equality((Object) this.target, (Object) null))
+      return;
+    SelfController controller = this.target.controller as SelfController;
+    if (Object.op_Equality((Object) controller, (Object) null) || controller.IsCancelNextNotCancel())
+      return;
+    int buttonIndex = this.buttonIndex;
+    if (!controller.OnSkillButtonPress(buttonIndex))
+      return;
+    this.requestCheck = true;
+    this.skillButton.isEnabled = false;
+    this.btnEnable = false;
+  }
+
+  private void RequestCheck(
+    UISkillButton.SkillGauge activeGauge,
+    UISkillButton.SkillGauge inactiveGauge)
+  {
+    if (!this.requestCheck || this.IsSelfCommandCheck())
+      return;
+    activeGauge.HideEffect3();
+    inactiveGauge.HideEffect3();
+    this.requestCheck = false;
+    if (this.target.actionID != (Character.ACTION_ID) 22)
+      return;
+    if (Object.op_Inequality((Object) this.frame, (Object) null))
+      activeGauge.PlayEffectPlaySkill(this.frame);
+    this.ReleaseEffects();
+    if (Object.op_Inequality((Object) this.skillGaugeMask, (Object) null) && activeGauge == this.skillGauge2)
+    {
+      if ((double) this.skillGauge2.percent > 0.0)
+      {
+        inactiveGauge.percent = activeGauge.percent;
+      }
+      else
+      {
+        inactiveGauge.percent = 1f;
+        activeGauge.percent = 1f;
+      }
+    }
+    if (activeGauge == null || this.playSkill)
+      return;
+    if (this.routineWork != null)
+      this.StopCoroutine(this.routineWork);
+    this.routineWork = this.SkillStart(activeGauge, inactiveGauge);
+    this.StartCoroutine(this.routineWork);
+  }
+
+  private IEnumerator SkillStart(
+    UISkillButton.SkillGauge activeGauge,
+    UISkillButton.SkillGauge inactiveGauge)
+  {
+    this.playSkill = true;
+    yield return (object) new WaitForEndOfFrame();
+    this.panelChange.UnLock();
+    yield return (object) new WaitForSeconds(1.5f);
+    this.panelChange.Lock();
+    this.playSkill = false;
+    this.routineWork = (IEnumerator) null;
+  }
+
+  [Serializable]
+  public class GaugeEffect
+  {
+    public GameObject obj;
+    public TweenAlpha alpha;
+    public TweenScale scale;
+    private IEnumerator work;
+    private bool isActive = true;
+
+    public void Init(UISkillButton parent)
+    {
+      if (this.work != null)
+      {
+        parent.StopCoroutine(this.work);
+        this.work = (IEnumerator) null;
+      }
+      if (!this.isActive)
+        return;
+      this.isActive = false;
+      if (!Object.op_Inequality((Object) this.obj, (Object) null))
+        return;
+      this.obj.SetActive(false);
+    }
+
+    public void Play(UISkillButton parent)
+    {
+      this.isActive = true;
+      if (Object.op_Inequality((Object) this.obj, (Object) null))
+        this.obj.SetActive(true);
+      if (Object.op_Inequality((Object) this.alpha, (Object) null))
+      {
+        this.alpha.ResetToBeginning();
+        this.alpha.PlayForward();
+      }
+      if (Object.op_Inequality((Object) this.scale, (Object) null))
+      {
+        this.scale.ResetToBeginning();
+        this.scale.PlayForward();
+      }
+      if (this.work != null)
+        parent.StopCoroutine(this.work);
+      this.work = this.EndCheck();
+      parent.StartCoroutine(this.work);
+    }
+
+    private IEnumerator EndCheck()
+    {
+      if (Object.op_Inequality((Object) this.alpha, (Object) null))
+      {
+        while (((Behaviour) this.alpha).enabled)
+          yield return (object) null;
+      }
+      if (Object.op_Inequality((Object) this.scale, (Object) null))
+      {
+        while (((Behaviour) this.scale).enabled)
+          yield return (object) null;
+      }
+      this.work = (IEnumerator) null;
+      if (Object.op_Inequality((Object) this.obj, (Object) null))
+        this.obj.SetActive(false);
+      this.isActive = false;
+    }
+  }
+
+  [Serializable]
+  protected class SkillGauge
+  {
+    public UISprite typeSprite;
+    public UITexture iconTexture;
+    public UISkillButton.GaugeEffect maxEffect;
+    [HideInInspector]
+    public Transform effectTransform;
+    [HideInInspector]
+    public float btnSize;
+    [HideInInspector]
+    public Vector3 skillIconOnPos;
+    [HideInInspector]
+    public string[] useEffectNames;
+    [HideInInspector]
+    public float percent;
+    [HideInInspector]
+    public bool isPrevGaugeMax;
+    [HideInInspector]
+    public float depth = -1f;
+    private Transform gaugeEffect_1;
+    private Transform gaugeEffect_2;
+    private Transform gaugeEffect_3;
+    private Transform gaugeEffect_Max;
+    private UITweener alphaTween;
+    private UITweener scaleTween;
+
+    public void Init(float btnSize)
+    {
+      this.btnSize = btnSize;
+      this.effectTransform = ((Component) this.iconTexture).transform;
+      this.skillIconOnPos = this.effectTransform.localPosition;
+    }
+
+    public void SetActive(bool isActive)
+    {
+      ((Component) this.typeSprite).gameObject.SetActive(isActive);
+      ((Component) this.iconTexture).gameObject.SetActive(isActive);
+    }
+
+    private void SetDepth(int depth)
+    {
+      if ((double) this.depth == (double) depth)
+        return;
+      this.iconTexture.depth = depth + 1;
+      this.typeSprite.depth = depth;
+      this.depth = (float) depth;
+    }
+
+    public void MoveToFront(int depth) => this.SetDepth(depth + 1);
+
+    public void MoveToBack(int depth) => this.SetDepth(depth - 2);
+
+    public bool PlayEffect1(float dispPercent)
+    {
+      bool flag = false;
+      if (Object.op_Equality((Object) this.gaugeEffect_1, (Object) null))
+      {
+        this.gaugeEffect_1 = EffectManager.GetUIEffect(this.useEffectNames[0], this.effectTransform, -1f);
+        if (Object.op_Inequality((Object) this.gaugeEffect_1, (Object) null))
+        {
+          Vector3 localPosition = this.gaugeEffect_1.localPosition;
+          localPosition.x = this.btnSize * 2f;
+          this.gaugeEffect_1.localPosition = localPosition;
+          flag = true;
+        }
+      }
+      else
+      {
+        Vector3 localPosition = this.gaugeEffect_1.localPosition;
+        localPosition.x = 0.0f;
+        localPosition.y = (float) (-(double) this.btnSize * (double) dispPercent + (double) this.btnSize * 0.5);
+        this.gaugeEffect_1.localPosition = localPosition;
+      }
+      return flag;
+    }
+
+    public bool PlayEffect2()
+    {
+      bool flag = false;
+      if (Object.op_Equality((Object) this.gaugeEffect_2, (Object) null))
+      {
+        this.gaugeEffect_2 = EffectManager.GetUIEffect(this.useEffectNames[1], this.effectTransform);
+        if (Object.op_Inequality((Object) this.gaugeEffect_2, (Object) null))
+          flag = true;
+      }
+      return flag;
+    }
+
+    public bool PlayEffect3()
+    {
+      bool flag = false;
+      if (Object.op_Equality((Object) this.gaugeEffect_3, (Object) null))
+      {
+        this.gaugeEffect_3 = EffectManager.GetUIEffect(this.useEffectNames[3], this.effectTransform);
+        if (Object.op_Inequality((Object) this.gaugeEffect_3, (Object) null))
+          flag = true;
+      }
+      ((Component) this.gaugeEffect_3).gameObject.SetActive(true);
+      return flag;
+    }
+
+    public void PlayEffectMax(Transform frame)
+    {
+      this.gaugeEffect_Max = EffectManager.GetUIEffect(this.useEffectNames[2], frame);
+    }
+
+    public void PlayEffectPlaySkill(Transform frame)
+    {
+      EffectManager.GetUIEffect(this.useEffectNames[4], frame);
+    }
+
+    public void ReleaseEffect1()
+    {
+      if (Object.op_Equality((Object) this.gaugeEffect_1, (Object) null))
+        return;
+      Vector3 localPosition = this.gaugeEffect_1.localPosition;
+      localPosition.y = this.btnSize * 0.5f;
+      this.gaugeEffect_1.localPosition = localPosition;
+      EffectManager.ReleaseEffect(((Component) this.gaugeEffect_1).gameObject);
+      this.gaugeEffect_1 = (Transform) null;
+    }
+
+    public void ReleaseEffect2()
+    {
+      if (Object.op_Equality((Object) this.gaugeEffect_2, (Object) null))
+        return;
+      EffectManager.ReleaseEffect(((Component) this.gaugeEffect_2).gameObject);
+      this.gaugeEffect_2 = (Transform) null;
+    }
+
+    public void HideEffect3()
+    {
+      if (Object.op_Equality((Object) this.gaugeEffect_3, (Object) null))
+        return;
+      ((Component) this.gaugeEffect_3).gameObject.SetActive(false);
+    }
+
+    public void ReleaseEffects()
+    {
+      if (Object.op_Inequality((Object) this.gaugeEffect_1, (Object) null))
+      {
+        Object.Destroy((Object) ((Component) this.gaugeEffect_1).gameObject);
+        this.gaugeEffect_1 = (Transform) null;
+      }
+      if (Object.op_Inequality((Object) this.gaugeEffect_2, (Object) null))
+      {
+        Object.Destroy((Object) ((Component) this.gaugeEffect_2).gameObject);
+        this.gaugeEffect_2 = (Transform) null;
+      }
+      if (Object.op_Inequality((Object) this.gaugeEffect_3, (Object) null))
+      {
+        Object.Destroy((Object) ((Component) this.gaugeEffect_3).gameObject);
+        this.gaugeEffect_3 = (Transform) null;
+      }
+      if (!Object.op_Inequality((Object) this.gaugeEffect_Max, (Object) null))
+        return;
+      Object.Destroy((Object) ((Component) this.gaugeEffect_Max).gameObject);
+      this.gaugeEffect_Max = (Transform) null;
+    }
+
+    public void OnDisable()
+    {
+      ((Component) this.iconTexture).transform.localPosition = this.skillIconOnPos;
+      ((Component) this.iconTexture).transform.localScale = Vector3.one;
+      this.iconTexture.alpha = 1f;
+      if (Object.op_Inequality((Object) this.alphaTween, (Object) null))
+      {
+        ((Behaviour) this.alphaTween).enabled = false;
+        this.alphaTween = (UITweener) null;
+      }
+      if (!Object.op_Inequality((Object) this.scaleTween, (Object) null))
+        return;
+      ((Behaviour) this.scaleTween).enabled = false;
+      this.scaleTween = (UITweener) null;
+    }
+
+    public void PlayTween()
+    {
+      Transform transform = ((Component) this.iconTexture).transform;
+      Vector3 localPosition = ((Component) this.iconTexture).transform.localPosition;
+      localPosition.z = 0.0f;
+      transform.localPosition = localPosition;
+      this.alphaTween = (UITweener) TweenAlpha.Begin(((Component) transform).gameObject, 0.5f, 0.01f);
+      this.scaleTween = (UITweener) TweenScale.Begin(((Component) transform).gameObject, 0.5f, new Vector3(2f, 2f, 2f));
+    }
+  }
+
+  private enum GAUGE_GRADE
+  {
+    NONE,
+    FIRST,
+    SECOND,
+  }
 }

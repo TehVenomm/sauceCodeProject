@@ -1,98 +1,64 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: HomeDragonRandomMove
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class HomeDragonRandomMove
+#nullable disable
+public class HomeDragonRandomMove : MonoBehaviour
 {
-	private readonly float MAX_DISTANCE = 0.4f;
+  private readonly float MAX_DISTANCE = 0.4f;
+  private Transform _transform;
+  private Vector3 originalPosition;
+  private float maxDistance;
+  private Vector2 coordX;
+  private Vector2 coordY;
+  private Vector2 coordZ;
+  private Vector2 dirX;
+  private Vector2 dirY;
+  private Vector2 dirZ;
 
-	private Transform _transform;
+  private void Awake()
+  {
+    this._transform = ((Component) this).transform;
+    ((Behaviour) this).enabled = false;
+  }
 
-	private Vector3 originalPosition;
+  public void Reset()
+  {
+    this.originalPosition = this._transform.localPosition;
+    this.coordX = Vector2.zero;
+    this.coordY = Vector2.zero;
+    this.coordZ = Vector2.zero;
+    Vector2 vector2_1 = new Vector2(Random.value, Random.value);
+    this.dirX = ((Vector2) ref vector2_1).normalized;
+    Vector2 vector2_2 = new Vector2(Random.value, Random.value);
+    this.dirY = ((Vector2) ref vector2_2).normalized;
+    Vector2 vector2_3 = new Vector2(Random.value, Random.value);
+    this.dirZ = ((Vector2) ref vector2_3).normalized;
+    this.maxDistance = 0.0f;
+    ((Behaviour) this).enabled = true;
+  }
 
-	private float maxDistance;
-
-	private Vector2 coordX;
-
-	private Vector2 coordY;
-
-	private Vector2 coordZ;
-
-	private Vector2 dirX;
-
-	private Vector2 dirY;
-
-	private Vector2 dirZ;
-
-	public HomeDragonRandomMove()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		_transform = this.get_transform();
-		this.set_enabled(false);
-	}
-
-	public void Reset()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		originalPosition = _transform.get_localPosition();
-		coordX = Vector2.get_zero();
-		coordY = Vector2.get_zero();
-		coordZ = Vector2.get_zero();
-		Vector2 val = default(Vector2);
-		val._002Ector(Random.get_value(), Random.get_value());
-		dirX = val.get_normalized();
-		Vector2 val2 = default(Vector2);
-		val2._002Ector(Random.get_value(), Random.get_value());
-		dirY = val2.get_normalized();
-		Vector2 val3 = default(Vector2);
-		val3._002Ector(Random.get_value(), Random.get_value());
-		dirZ = val3.get_normalized();
-		maxDistance = 0f;
-		this.set_enabled(true);
-	}
-
-	private void Update()
-	{
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		float num = (Mathf.PerlinNoise(coordX.x, coordX.y) - 0.5f) * maxDistance;
-		float num2 = (Mathf.PerlinNoise(coordY.x, coordY.y) - 0.5f) * maxDistance;
-		float num3 = (Mathf.PerlinNoise(coordZ.x, coordZ.y) - 0.5f) * maxDistance;
-		_transform.set_localPosition(originalPosition + new Vector3(num, num2, num3));
-		float num4 = Time.get_deltaTime() * 0.5f;
-		coordX.x += dirX.x * num4;
-		coordX.y += dirX.y * num4;
-		num4 *= 0.9f;
-		coordY.x += dirY.x * num4;
-		coordY.y += dirY.y * num4;
-		num4 *= 0.9f;
-		coordZ.x += dirZ.x * num4;
-		coordZ.y += dirZ.y * num4;
-		if (maxDistance < MAX_DISTANCE)
-		{
-			maxDistance += Time.get_deltaTime() * 0.5f;
-			if (maxDistance > MAX_DISTANCE)
-			{
-				maxDistance = MAX_DISTANCE;
-			}
-		}
-	}
+  private void Update()
+  {
+    this._transform.localPosition = Vector3.op_Addition(this.originalPosition, new Vector3((Mathf.PerlinNoise(this.coordX.x, this.coordX.y) - 0.5f) * this.maxDistance, (Mathf.PerlinNoise(this.coordY.x, this.coordY.y) - 0.5f) * this.maxDistance, (Mathf.PerlinNoise(this.coordZ.x, this.coordZ.y) - 0.5f) * this.maxDistance));
+    float num1 = Time.deltaTime * 0.5f;
+    this.coordX.x += this.dirX.x * num1;
+    this.coordX.y += this.dirX.y * num1;
+    float num2 = num1 * 0.9f;
+    this.coordY.x += this.dirY.x * num2;
+    this.coordY.y += this.dirY.y * num2;
+    float num3 = num2 * 0.9f;
+    this.coordZ.x += this.dirZ.x * num3;
+    this.coordZ.y += this.dirZ.y * num3;
+    if ((double) this.maxDistance >= (double) this.MAX_DISTANCE)
+      return;
+    this.maxDistance += Time.deltaTime * 0.5f;
+    if ((double) this.maxDistance <= (double) this.MAX_DISTANCE)
+      return;
+    this.maxDistance = this.MAX_DISTANCE;
+  }
 }

@@ -1,101 +1,92 @@
-using Network;
+﻿// Decompiled with JetBrains decompiler
+// Type: HomeBingoGetReward
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class HomeBingoGetReward : GameSection
 {
-	private enum UI
-	{
-		LBL_TITLE,
-		GRD_GET_ITEM,
-		LBL_GET_ITEM,
-		GRD_REWARD
-	}
+  private Transform texModel_;
+  private UIModelRenderTexture texModelRenderTexture_;
+  private UITexture texModelTexture_;
+  private Transform texInnerModel_;
+  private UIModelRenderTexture texInnerModelRenderTexture_;
+  private UITexture texInnerModelTexture_;
+  private Transform glowModel_;
+  private DeliveryTable.DeliveryData deliveryData;
+  private Network.EventData eventData;
 
-	private struct Reward
-	{
-		public int itemId;
+  public override string overrideBackKeyEvent => "CLOSE";
 
-		public int type;
+  public override void Initialize()
+  {
+    object[] eventData = GameSection.GetEventData() as object[];
+    this.deliveryData = eventData[0] as DeliveryTable.DeliveryData;
+    this.eventData = eventData[1] as Network.EventData;
+    base.Initialize();
+    this.texModel_ = Utility.Find(this._transform, "TEX_MODEL");
+    this.texModelRenderTexture_ = UIModelRenderTexture.Get(this.texModel_);
+    this.texModelTexture_ = ((Component) this.texModel_).GetComponent<UITexture>();
+    this.texInnerModel_ = Utility.Find(this._transform, "TEX_INNER_MODEL");
+    this.texInnerModelRenderTexture_ = UIModelRenderTexture.Get(this.texInnerModel_);
+    this.texInnerModelTexture_ = ((Component) this.texInnerModel_).GetComponent<UITexture>();
+    this.glowModel_ = Utility.Find(this._transform, "LIB_00000003");
+    this.SetLabelText((Enum) HomeBingoGetReward.UI.LBL_TITLE, this.eventData.name);
+  }
 
-		public string name;
-	}
+  public override void UpdateUI()
+  {
+    this.UpdateRewardIcon(Singleton<DeliveryRewardTable>.I.GetDeliveryRewardTableData(this.deliveryData.id));
+    base.UpdateUI();
+  }
 
-	private Transform texModel_;
+  private void UpdateRewardIcon(DeliveryRewardTable.DeliveryRewardData[] rewards)
+  {
+    if (rewards == null || rewards.Length == 0)
+      return;
+    int exp = 0;
+    this.SetGrid((Enum) HomeBingoGetReward.UI.GRD_REWARD, "", rewards.Length, false, (Action<int, Transform, bool>) ((index, t, is_recycle) =>
+    {
+      DeliveryRewardTable.DeliveryRewardData.Reward reward = rewards[index].reward;
+      bool is_visible = false;
+      if (reward.type == REWARD_TYPE.EXP)
+      {
+        exp += reward.num;
+      }
+      else
+      {
+        is_visible = true;
+        ItemIcon rewardItemIcon = ItemIcon.CreateRewardItemIcon(reward.type, reward.item_id, t, reward.num, questIconSizeType: ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_DETAIL);
+        this.SetMaterialInfo(rewardItemIcon.transform, reward.type, reward.item_id);
+        rewardItemIcon.SetRewardBG(true);
+      }
+      this.SetActive(t, is_visible);
+    }));
+  }
 
-	private UIModelRenderTexture texModelRenderTexture_;
+  private void OnQuery_CLOSE()
+  {
+    if (Object.op_Inequality((Object) null, (Object) this.glowModel_))
+      ((Component) this.glowModel_).gameObject.SetActive(false);
+    GameSection.BackSection();
+  }
 
-	private UITexture texModelTexture_;
+  private enum UI
+  {
+    LBL_TITLE,
+    GRD_GET_ITEM,
+    LBL_GET_ITEM,
+    GRD_REWARD,
+  }
 
-	private Transform texInnerModel_;
-
-	private UIModelRenderTexture texInnerModelRenderTexture_;
-
-	private UITexture texInnerModelTexture_;
-
-	private Transform glowModel_;
-
-	private DeliveryTable.DeliveryData deliveryData;
-
-	private Network.EventData eventData;
-
-	public override string overrideBackKeyEvent => "CLOSE";
-
-	public override void Initialize()
-	{
-		object[] array = GameSection.GetEventData() as object[];
-		deliveryData = (array[0] as DeliveryTable.DeliveryData);
-		eventData = (array[1] as Network.EventData);
-		base.Initialize();
-		texModel_ = Utility.Find(base._transform, "TEX_MODEL");
-		texModelRenderTexture_ = UIModelRenderTexture.Get(texModel_);
-		texModelTexture_ = texModel_.GetComponent<UITexture>();
-		texInnerModel_ = Utility.Find(base._transform, "TEX_INNER_MODEL");
-		texInnerModelRenderTexture_ = UIModelRenderTexture.Get(texInnerModel_);
-		texInnerModelTexture_ = texInnerModel_.GetComponent<UITexture>();
-		glowModel_ = Utility.Find(base._transform, "LIB_00000003");
-		SetLabelText((Enum)UI.LBL_TITLE, eventData.name);
-	}
-
-	public override void UpdateUI()
-	{
-		DeliveryRewardTable.DeliveryRewardData[] deliveryRewardTableData = Singleton<DeliveryRewardTable>.I.GetDeliveryRewardTableData(deliveryData.id);
-		UpdateRewardIcon(deliveryRewardTableData);
-		base.UpdateUI();
-	}
-
-	private void UpdateRewardIcon(DeliveryRewardTable.DeliveryRewardData[] rewards)
-	{
-		if (rewards != null && rewards.Length > 0)
-		{
-			int exp = 0;
-			SetGrid(UI.GRD_REWARD, string.Empty, rewards.Length, false, delegate(int index, Transform t, bool is_recycle)
-			{
-				DeliveryRewardTable.DeliveryRewardData.Reward reward = rewards[index].reward;
-				bool is_visible = false;
-				if (reward.type == REWARD_TYPE.EXP)
-				{
-					exp += reward.num;
-				}
-				else
-				{
-					is_visible = true;
-					ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(reward.type, reward.item_id, t, reward.num, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_DETAIL);
-					SetMaterialInfo(itemIcon.transform, reward.type, reward.item_id, null);
-					itemIcon.SetRewardBG(true);
-				}
-				SetActive(t, is_visible);
-			});
-		}
-	}
-
-	private void OnQuery_CLOSE()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (null != glowModel_)
-		{
-			glowModel_.get_gameObject().SetActive(false);
-		}
-		GameSection.BackSection();
-	}
+  private struct Reward
+  {
+    public int itemId;
+    public int type;
+    public string name;
+  }
 }

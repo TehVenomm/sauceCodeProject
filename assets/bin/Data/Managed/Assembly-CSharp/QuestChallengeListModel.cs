@@ -1,35 +1,37 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestChallengeListModel
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System.Collections.Generic;
 
+#nullable disable
 public class QuestChallengeListModel : BaseModel
 {
-	public class Param
-	{
-		public List<QuestData> shadow = new List<QuestData>();
-	}
+  public static string URL = "ajax/quest/challenge-list";
+  public QuestChallengeListModel.Param result = new QuestChallengeListModel.Param();
 
-	public class RequestSendForm
-	{
-		public int rarityBit;
+  public class Param
+  {
+    public List<QuestData> shadow = new List<QuestData>();
+  }
 
-		public int elementBit;
+  public class RequestSendForm
+  {
+    public int rarityBit;
+    public int elementBit;
+    public int enemyLevel;
+    public int enemySpeciesId;
+    public string enemySpeciesName;
 
-		public int enemyLevel;
-
-		public int enemySpeciesId;
-
-		public string enemySpeciesName;
-
-		public RequestSendForm()
-		{
-			rarityBit = 8388607;
-			elementBit = 8388607;
-			enemyLevel = 10;
-			enemySpeciesId = 0;
-		}
-	}
-
-	public static string URL = "ajax/quest/challenge-list";
-
-	public Param result = new Param();
+    public RequestSendForm()
+    {
+      this.rarityBit = 8388607 /*0x7FFFFF*/;
+      this.elementBit = 8388607 /*0x7FFFFF*/;
+      this.enemyLevel = 10;
+      this.enemySpeciesId = 0;
+    }
+  }
 }

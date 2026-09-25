@@ -1,284 +1,269 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UISkillButtonGroup
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class UISkillButtonGroup : MonoBehaviourSingleton<UISkillButtonGroup>
 {
-	[SerializeField]
-	protected List<UISkillButton> skillButtons = new List<UISkillButton>();
+  [SerializeField]
+  protected List<UISkillButton> skillButtons = new List<UISkillButton>();
+  [SerializeField]
+  protected UITweener[] changeStartAnimTweens;
+  [SerializeField]
+  protected UITweener[] changeEndAnimTweens;
+  [SerializeField]
+  protected Texture[] maskTextures;
+  protected Player target;
+  protected bool _isChangeAnimStartWait;
 
-	[SerializeField]
-	protected UITweener[] changeStartAnimTweens;
+  public bool isChangeAnimStartWait
+  {
+    get => this._isChangeAnimStartWait;
+    private set => this._isChangeAnimStartWait = value;
+  }
 
-	[SerializeField]
-	protected UITweener[] changeEndAnimTweens;
+  protected override void Awake()
+  {
+    base.Awake();
+    if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+      MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += new ScreenOrientationManager.OnScreenRotateDelegate(this.OnScreenRotate);
+    this.SyncRotatePosition();
+  }
 
-	[SerializeField]
-	protected Texture[] maskTextures;
+  protected override void OnDestroySingleton()
+  {
+    base.OnDestroySingleton();
+    if (!MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= new ScreenOrientationManager.OnScreenRotateDelegate(this.OnScreenRotate);
+  }
 
-	protected Player target;
+  private void OnScreenRotate(bool is_portrait) => this.SyncRotatePosition();
 
-	protected bool _isChangeAnimStartWait;
+  private void SyncRotatePosition()
+  {
+    if (!SpecialDeviceManager.HasSpecialDeviceInfo || !SpecialDeviceManager.SpecialDeviceInfo.NeedModifyInGameSkillButtonPosition)
+      return;
+    DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
+    Transform parent = ((Component) this).gameObject.transform.parent;
+    if (!Object.op_Inequality((Object) parent, (Object) null))
+      return;
+    UIWidget component = ((Component) parent).gameObject.GetComponent<UIWidget>();
+    if (!Object.op_Inequality((Object) component, (Object) null))
+      return;
+    if (SpecialDeviceManager.IsPortrait)
+    {
+      component.leftAnchor.absolute = specialDeviceInfo.SkillButtonAnchorPortrait.left;
+      component.rightAnchor.absolute = specialDeviceInfo.SkillButtonAnchorPortrait.right;
+      component.bottomAnchor.absolute = specialDeviceInfo.SkillButtonAnchorPortrait.bottom;
+      component.topAnchor.absolute = specialDeviceInfo.SkillButtonAnchorPortrait.top;
+    }
+    else
+    {
+      component.leftAnchor.absolute = specialDeviceInfo.SkillButtonAnchorLandscape.left;
+      component.rightAnchor.absolute = specialDeviceInfo.SkillButtonAnchorLandscape.right;
+      component.bottomAnchor.absolute = specialDeviceInfo.SkillButtonAnchorLandscape.bottom;
+      component.topAnchor.absolute = specialDeviceInfo.SkillButtonAnchorLandscape.top;
+    }
+    component.UpdateAnchors();
+  }
 
-	public bool isChangeAnimStartWait
-	{
-		get
-		{
-			return _isChangeAnimStartWait;
-		}
-		private set
-		{
-			_isChangeAnimStartWait = value;
-		}
-	}
+  public UISkillButton GetUISkillButton(int index)
+  {
+    return this.skillButtons.Count < index ? (UISkillButton) null : this.skillButtons[index];
+  }
 
-	protected override void Awake()
-	{
-		base.Awake();
-	}
+  public UISkillButton GetSameButtonIndex(int buttonIndex, ref int arrayIndex)
+  {
+    arrayIndex = -1;
+    int index = 0;
+    for (int count = this.skillButtons.Count; index < count; ++index)
+    {
+      UISkillButton skillButton = this.skillButtons[index];
+      if (skillButton.buttonIndex == buttonIndex)
+      {
+        arrayIndex = index;
+        return skillButton;
+      }
+    }
+    return (UISkillButton) null;
+  }
 
-	public UISkillButton GetUISkillButton(int index)
-	{
-		if (skillButtons.Count < index)
-		{
-			return null;
-		}
-		return skillButtons[index];
-	}
+  protected override void OnDisable()
+  {
+    base.OnDisable();
+    int length = this.changeEndAnimTweens.Length;
+    for (int index = 0; index < length; ++index)
+    {
+      ((Behaviour) this.changeEndAnimTweens[index]).enabled = false;
+      this.changeEndAnimTweens[index].Sample(1f, true);
+    }
+    int count = this.skillButtons.Count;
+    for (int index = 0; index < count; ++index)
+      this.skillButtons[index].upDateStop = false;
+    this.UpdateIndex();
+  }
 
-	protected override void OnDisable()
-	{
-		base.OnDisable();
-		int num = changeEndAnimTweens.Length;
-		for (int i = 0; i < num; i++)
-		{
-			changeEndAnimTweens[i].set_enabled(false);
-			changeEndAnimTweens[i].Sample(1f, true);
-		}
-		num = skillButtons.Count;
-		for (int j = 0; j < num; j++)
-		{
-			skillButtons[j].upDateStop = false;
-		}
-		UpdateIndex();
-	}
+  public void SetTarget(Player player)
+  {
+    int index = 0;
+    for (int count = this.skillButtons.Count; index < count; ++index)
+      this.skillButtons[index].SetTareget(player);
+    this.target = player;
+    this.UpdateIndex();
+  }
 
-	public void SetTarget(Player player)
-	{
-		int i = 0;
-		for (int count = skillButtons.Count; i < count; i++)
-		{
-			skillButtons[i].SetTareget(player);
-		}
-		target = player;
-		UpdateIndex();
-	}
+  public void UpdateIndex()
+  {
+    if (Object.op_Equality((Object) this.target, (Object) null) || this.target.weaponData == null)
+      return;
+    EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint) this.target.weaponData.eId);
+    if (equipItemData == null)
+      return;
+    SkillItemTable.SkillSlotData[] skillSlotDataArray = equipItemData.GetSkillSlot(this.target.weaponData.exceed);
+    if (!TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02))
+    {
+      skillSlotDataArray = new SkillItemTable.SkillSlotData[1]
+      {
+        new SkillItemTable.SkillSlotData()
+      };
+      skillSlotDataArray[0].slotType = SKILL_SLOT_TYPE.ATTACK;
+      skillSlotDataArray[0].skill_id = 0U;
+    }
+    int num1 = 0;
+    int index1 = 0;
+    for (int length = skillSlotDataArray.Length; index1 < length; ++index1)
+    {
+      if (skillSlotDataArray[index1].slotType != SKILL_SLOT_TYPE.ATTACK && skillSlotDataArray[index1].slotType != SKILL_SLOT_TYPE.SUPPORT && skillSlotDataArray[index1].slotType != SKILL_SLOT_TYPE.HEAL)
+        ++num1;
+    }
+    int index2 = 0;
+    int num2 = skillSlotDataArray.Length - num1;
+    for (int count = this.skillButtons.Count; num2 < count; ++num2)
+    {
+      ((Component) this.skillButtons[index2]).gameObject.SetActive(false);
+      this.skillButtons[index2].SetButtonIndex(-1);
+      ++index2;
+    }
+    int button_index = 0;
+    int index3 = 0;
+    for (int length = skillSlotDataArray.Length; index3 < length && index2 < this.skillButtons.Count; ++index3)
+    {
+      if (skillSlotDataArray[index3].slotType == SKILL_SLOT_TYPE.ATTACK || skillSlotDataArray[index3].slotType == SKILL_SLOT_TYPE.SUPPORT || skillSlotDataArray[index3].slotType == SKILL_SLOT_TYPE.HEAL)
+      {
+        ((Component) this.skillButtons[index2]).gameObject.SetActive(true);
+        SkillInfo.SkillParam skillParam = this.target.skillInfo.GetSkillParam(this.target.skillInfo.weaponOffset + button_index);
+        if (skillParam != null && skillParam.tableData.type == skillSlotDataArray[index3].slotType)
+        {
+          this.skillButtons[index2].SetButtonIndex(button_index);
+          ++button_index;
+        }
+        else
+          this.skillButtons[index2].SetInActiveSlot(skillSlotDataArray[index3].slotType);
+        ++index2;
+      }
+    }
+  }
 
-	public void UpdateIndex()
-	{
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-		if (!(target == null) && target.weaponData != null)
-		{
-			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)target.weaponData.eId);
-			if (equipItemData != null)
-			{
-				SkillItemTable.SkillSlotData[] array = equipItemData.GetSkillSlot(target.weaponData.exceed);
-				if (!TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02))
-				{
-					array = new SkillItemTable.SkillSlotData[1]
-					{
-						new SkillItemTable.SkillSlotData()
-					};
-					array[0].slotType = SKILL_SLOT_TYPE.ATTACK;
-					array[0].skill_id = 0u;
-				}
-				int num = 0;
-				int i = 0;
-				for (int num2 = array.Length; i < num2; i++)
-				{
-					if (array[i].slotType != SKILL_SLOT_TYPE.ATTACK && array[i].slotType != SKILL_SLOT_TYPE.SUPPORT && array[i].slotType != SKILL_SLOT_TYPE.HEAL)
-					{
-						num++;
-					}
-				}
-				int num3 = 0;
-				int j = array.Length - num;
-				for (int count = skillButtons.Count; j < count; j++)
-				{
-					skillButtons[num3].get_gameObject().SetActive(false);
-					skillButtons[num3].SetButtonIndex(-1);
-					num3++;
-				}
-				int num4 = 0;
-				int k = 0;
-				for (int num5 = array.Length; k < num5; k++)
-				{
-					if (num3 >= skillButtons.Count)
-					{
-						break;
-					}
-					if (array[k].slotType == SKILL_SLOT_TYPE.ATTACK || array[k].slotType == SKILL_SLOT_TYPE.SUPPORT || array[k].slotType == SKILL_SLOT_TYPE.HEAL)
-					{
-						skillButtons[num3].get_gameObject().SetActive(true);
-						SkillInfo.SkillParam skillParam = target.skillInfo.GetSkillParam(target.skillInfo.weaponOffset + num4);
-						if (skillParam != null && skillParam.tableData.type == array[k].slotType)
-						{
-							skillButtons[num3].SetButtonIndex(num4);
-							num4++;
-						}
-						else
-						{
-							skillButtons[num3].SetInActiveSlot(array[k].slotType);
-						}
-						num3++;
-					}
-				}
-			}
-		}
-	}
+  private void Update()
+  {
+    if (this.IsEnable())
+      return;
+    ((Component) this).gameObject.SetActive(false);
+  }
 
-	private void Update()
-	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		if (!IsEnable())
-		{
-			this.get_gameObject().SetActive(false);
-		}
-	}
+  public bool IsEnable()
+  {
+    return MonoBehaviourSingleton<StageObjectManager>.IsValid() && !Object.op_Equality((Object) this.target, (Object) null) && !Object.op_Equality((Object) (this.target.controller as SelfController), (Object) null) && MonoBehaviourSingleton<InGameSettingsManager>.IsValid();
+  }
 
-	public bool IsEnable()
-	{
-		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
-		{
-			return false;
-		}
-		if (target == null)
-		{
-			return false;
-		}
-		SelfController selfController = target.controller as SelfController;
-		if (selfController == null)
-		{
-			return false;
-		}
-		if (!MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
-		{
-			return false;
-		}
-		return true;
-	}
+  public void ChangeAnimStart()
+  {
+    if (!((Component) this).gameObject.activeInHierarchy)
+      return;
+    this.isChangeAnimStartWait = true;
+    this.StartCoroutine(this._ChangeAnimStart());
+  }
 
-	public void ChangeAnimStart()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_gameObject().get_activeInHierarchy())
-		{
-			isChangeAnimStartWait = true;
-			this.StartCoroutine(_ChangeAnimStart());
-		}
-	}
+  private IEnumerator _ChangeAnimStart()
+  {
+    int index1 = 0;
+    for (int count = this.skillButtons.Count; index1 < count; ++index1)
+    {
+      this.skillButtons[index1].ReleaseEffects();
+      this.skillButtons[index1].upDateStop = true;
+    }
+    yield return (object) null;
+    int n = this.changeStartAnimTweens.Length;
+    for (int index2 = 0; index2 < n; ++index2)
+    {
+      this.changeStartAnimTweens[index2].ResetToBeginning();
+      this.changeStartAnimTweens[index2].PlayForward();
+    }
+    for (int i = 0; i < n; ++i)
+    {
+      while (((Behaviour) this.changeStartAnimTweens[i]).isActiveAndEnabled)
+        yield return (object) null;
+    }
+    this.UpdateIndex();
+    n = this.changeEndAnimTweens.Length;
+    for (int index3 = 0; index3 < n; ++index3)
+      this.changeEndAnimTweens[index3].ResetToBeginning();
+    this.isChangeAnimStartWait = false;
+  }
 
-	private IEnumerator _ChangeAnimStart()
-	{
-		int n = 0;
-		for (int len = skillButtons.Count; n < len; n++)
-		{
-			skillButtons[n].ReleaseEffects();
-			skillButtons[n].upDateStop = true;
-		}
-		yield return (object)null;
-		int m = changeStartAnimTweens.Length;
-		for (int l = 0; l < m; l++)
-		{
-			changeStartAnimTweens[l].ResetToBeginning();
-			changeStartAnimTweens[l].PlayForward();
-		}
-		for (int k = 0; k < m; k++)
-		{
-			while (changeStartAnimTweens[k].get_isActiveAndEnabled())
-			{
-				yield return (object)null;
-			}
-		}
-		UpdateIndex();
-		m = changeEndAnimTweens.Length;
-		for (int i = 0; i < m; i++)
-		{
-			changeEndAnimTweens[i].ResetToBeginning();
-		}
-		isChangeAnimStartWait = false;
-	}
+  public void ChangeAnimEnd()
+  {
+    if (!((Component) this).gameObject.activeInHierarchy)
+    {
+      int length = this.changeEndAnimTweens.Length;
+      for (int index = 0; index < length; ++index)
+        this.changeEndAnimTweens[index].PlayForward();
+      int count = this.skillButtons.Count;
+      for (int index = 0; index < count; ++index)
+        this.skillButtons[index].upDateStop = false;
+    }
+    else
+      this.StartCoroutine(this._ChangeAnimEnd());
+  }
 
-	public void ChangeAnimEnd()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		if (!this.get_gameObject().get_activeInHierarchy())
-		{
-			int num = changeEndAnimTweens.Length;
-			for (int i = 0; i < num; i++)
-			{
-				changeEndAnimTweens[i].PlayForward();
-			}
-			num = skillButtons.Count;
-			for (int j = 0; j < num; j++)
-			{
-				skillButtons[j].upDateStop = false;
-			}
-		}
-		else
-		{
-			this.StartCoroutine(_ChangeAnimEnd());
-		}
-	}
+  private IEnumerator _ChangeAnimEnd()
+  {
+    int n = this.changeEndAnimTweens.Length;
+    for (int index = 0; index < n; ++index)
+      this.changeEndAnimTweens[index].PlayForward();
+    for (int i = 0; i < n; ++i)
+    {
+      while (((Behaviour) this.changeEndAnimTweens[i]).isActiveAndEnabled)
+        yield return (object) null;
+    }
+    n = this.skillButtons.Count;
+    for (int index = 0; index < n; ++index)
+      this.skillButtons[index].upDateStop = false;
+  }
 
-	private IEnumerator _ChangeAnimEnd()
-	{
-		int m = changeEndAnimTweens.Length;
-		for (int l = 0; l < m; l++)
-		{
-			changeEndAnimTweens[l].PlayForward();
-		}
-		for (int k = 0; k < m; k++)
-		{
-			while (changeEndAnimTweens[k].get_isActiveAndEnabled())
-			{
-				yield return (object)null;
-			}
-		}
-		m = skillButtons.Count;
-		for (int i = 0; i < m; i++)
-		{
-			skillButtons[i].upDateStop = false;
-		}
-	}
+  public Texture GetMaskTexture(SKILL_SLOT_TYPE type)
+  {
+    switch (type)
+    {
+      case SKILL_SLOT_TYPE.ATTACK:
+        return this.maskTextures[0];
+      case SKILL_SLOT_TYPE.SUPPORT:
+        return this.maskTextures[2];
+      case SKILL_SLOT_TYPE.HEAL:
+        return this.maskTextures[1];
+      default:
+        return (Texture) null;
+    }
+  }
 
-	public Texture GetMaskTexture(SKILL_SLOT_TYPE type)
-	{
-		switch (type)
-		{
-		case SKILL_SLOT_TYPE.ATTACK:
-			return maskTextures[0];
-		case SKILL_SLOT_TYPE.HEAL:
-			return maskTextures[1];
-		case SKILL_SLOT_TYPE.SUPPORT:
-			return maskTextures[2];
-		default:
-			return null;
-		}
-	}
+  public void DoEnable() => ((Component) this).gameObject.SetActive(true);
 
-	public void DoEnable()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(true);
-	}
-
-	public void DoDisable()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(false);
-	}
+  public void DoDisable() => ((Component) this).gameObject.SetActive(false);
 }

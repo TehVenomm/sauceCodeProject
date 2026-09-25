@@ -1,104 +1,122 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: TheaterModeTable
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
+using System.Text;
 
+#nullable disable
 public class TheaterModeTable : MonoBehaviourSingleton<TheaterModeTable>, IDataTable
 {
-	[Serializable]
-	public class TheaterModeData
-	{
-		public const string NT = "story_id,title,chapter_id,order,script_id";
+  private UIntKeyTable<TheaterModeTable.TheaterModeData> dataTable;
 
-		public uint story_id;
+  public bool isLoading { get; private set; }
 
-		public string title;
+  protected override void Awake()
+  {
+    base.Awake();
+    this.LoadTable();
+  }
 
-		public int chapter_id;
+  private void LoadTable()
+  {
+    this.isLoading = true;
+    MonoBehaviourSingleton<DataTableManager>.I.RequestLoadTable(nameof (TheaterModeTable), (IDataTable) this, (System.Action) (() => this.isLoading = false));
+  }
 
-		public int order;
+  public void CreateTable(string csv)
+  {
+    this.dataTable = TableUtility.CreateUIntKeyTable<TheaterModeTable.TheaterModeData>(csv, new TableUtility.CallBackUIntKeyReadCSV<TheaterModeTable.TheaterModeData>(TheaterModeTable.TheaterModeData.CB), "story_id,title,chapter_id,order,script_id,state_id");
+    this.dataTable.TrimExcess();
+  }
 
-		public int script_id;
+  public void AllTheaterData(Action<TheaterModeTable.TheaterModeData> call_back)
+  {
+    if (this.dataTable == null || call_back == null)
+      return;
+    this.dataTable.ForEach((Action<TheaterModeTable.TheaterModeData>) (data => call_back(data)));
+  }
 
-		public static bool CB(CSVReader csv, TheaterModeData data, ref uint key1)
-		{
-			data.story_id = key1;
-			csv.Pop(ref data.title);
-			csv.Pop(ref data.chapter_id);
-			csv.Pop(ref data.order);
-			csv.Pop(ref data.script_id);
-			return true;
-		}
+  public void AllTheaterDataAsc(Action<TheaterModeTable.TheaterModeData> call_back)
+  {
+    if (this.dataTable == null || call_back == null)
+      return;
+    this.dataTable.ForEach((Action<TheaterModeTable.TheaterModeData>) (data => call_back(data)));
+  }
 
-		public override string ToString()
-		{
-			string empty = string.Empty;
-			string text = empty;
-			return text + story_id + "," + title + "," + chapter_id + "," + order + "," + script_id;
-		}
-	}
+  public void AllTheaterDataDesc(Action<TheaterModeTable.TheaterModeData> call_back)
+  {
+    if (this.dataTable == null || call_back == null)
+      return;
+    this.dataTable.ForEachDesc((Action<TheaterModeTable.TheaterModeData>) (data => call_back(data)));
+  }
 
-	private UIntKeyTable<TheaterModeData> dataTable;
+  public List<TheaterModeTable.TheaterModeData> GetTableFromOKDic(Dictionary<int, int> ok_dic)
+  {
+    List<TheaterModeTable.TheaterModeData> list = new List<TheaterModeTable.TheaterModeData>();
+    this.dataTable.ForEach((Action<TheaterModeTable.TheaterModeData>) (data =>
+    {
+      if (ok_dic[data.script_id] < 1)
+        return;
+      list.Add(data);
+    }));
+    return list;
+  }
 
-	public bool isLoading
-	{
-		get;
-		private set;
-	}
+  public List<TheaterModeTable.TheaterModeData> GetTableFromChapter(int chapter_id)
+  {
+    List<TheaterModeTable.TheaterModeData> list = new List<TheaterModeTable.TheaterModeData>();
+    this.dataTable.ForEach((Action<TheaterModeTable.TheaterModeData>) (data =>
+    {
+      if (data.chapter_id != chapter_id)
+        return;
+      list.Add(data);
+    }));
+    return list;
+  }
 
-	protected override void Awake()
-	{
-		base.Awake();
-		LoadTable();
-	}
+  [Serializable]
+  public class TheaterModeData
+  {
+    public uint story_id;
+    public string title;
+    public int chapter_id;
+    public int order;
+    public int script_id;
+    public int state_id;
+    public const string NT = "story_id,title,chapter_id,order,script_id,state_id";
 
-	private void LoadTable()
-	{
-		isLoading = true;
-		MonoBehaviourSingleton<DataTableManager>.I.RequestLoadTable("TheaterModeTable", this, delegate
-		{
-			isLoading = false;
-		}, false);
-	}
+    public static bool CB(CSVReader csv, TheaterModeTable.TheaterModeData data, ref uint key1)
+    {
+      data.story_id = key1;
+      csv.Pop(ref data.title);
+      csv.Pop(ref data.chapter_id);
+      csv.Pop(ref data.order);
+      csv.Pop(ref data.script_id);
+      csv.Pop(ref data.state_id);
+      return true;
+    }
 
-	public void CreateTable(string csv)
-	{
-		dataTable = TableUtility.CreateUIntKeyTable<TheaterModeData>(csv, TheaterModeData.CB, "story_id,title,chapter_id,order,script_id", null);
-		dataTable.TrimExcess();
-	}
+    public override string ToString()
+    {
+      StringBuilder stringBuilder = new StringBuilder();
+      stringBuilder.AppendFormat("{0}", (object) this.story_id);
+      stringBuilder.AppendFormat(",{0}", (object) this.title);
+      stringBuilder.AppendFormat(",{0}", (object) this.chapter_id);
+      stringBuilder.AppendFormat(",{0}", (object) this.order);
+      stringBuilder.AppendFormat(",{0}", (object) this.script_id);
+      stringBuilder.AppendFormat(",{0}", (object) this.state_id);
+      return stringBuilder.ToString();
+    }
 
-	public void AllTheaterData(Action<TheaterModeData> call_back)
-	{
-		if (dataTable != null && call_back != null)
-		{
-			dataTable.ForEach(delegate(TheaterModeData data)
-			{
-				call_back(data);
-			});
-		}
-	}
-
-	public List<TheaterModeData> GetTableFromOKDic(Dictionary<int, int> ok_dic)
-	{
-		List<TheaterModeData> list = new List<TheaterModeData>();
-		dataTable.ForEach(delegate(TheaterModeData data)
-		{
-			if (ok_dic[data.script_id] >= 1)
-			{
-				list.Add(data);
-			}
-		});
-		return list;
-	}
-
-	public List<TheaterModeData> GetTableFromChapter(int chapter_id)
-	{
-		List<TheaterModeData> list = new List<TheaterModeData>();
-		dataTable.ForEach(delegate(TheaterModeData data)
-		{
-			if (data.chapter_id == chapter_id)
-			{
-				list.Add(data);
-			}
-		});
-		return list;
-	}
+    public enum STATE_ID
+    {
+      BLACK_LIST,
+      MAIN_STORY,
+      EVENT_STORY,
+    }
+  }
 }

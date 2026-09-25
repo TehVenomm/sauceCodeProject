@@ -1,128 +1,107 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Coop_Model_ObjectAttackedHitOwner
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class Coop_Model_ObjectAttackedHitOwner : Coop_Model_ObjectBase
 {
-	public string attackInfoName;
+  public string attackInfoName;
+  public float attackInfoRate;
+  public int fromObjectID;
+  public int fromType;
+  public Vector3 fromPos = Vector3.zero;
+  public Vector3 hitPos = Vector3.zero;
+  public int fromClientID;
+  public int skillIndex = -1;
+  public int regionID = -1;
+  public bool isDamageRegionOnly;
+  public int weakState;
+  public int damage;
+  public bool validDamage;
+  public float downAddBase;
+  public float downAddWeak;
+  public bool isForceDown;
+  public float concussionAdd;
+  public bool isArrowBleed;
+  public int arrowBleedDamage;
+  public int arrowBurstDamage;
+  public BadStatus badStatusAdd = new BadStatus();
+  public bool isSpAttackHit;
+  public AtkAttribute damageDetails = new AtkAttribute();
+  public bool isShadowSealing;
+  public bool isArrowBomb;
 
-	public float attackInfoRate;
+  public Coop_Model_ObjectAttackedHitOwner()
+  {
+    this.packetType = PACKET_TYPE.OBJECT_ATTACKED_HIT_OWNER;
+  }
 
-	public int fromObjectID;
+  public void SetAttackedHitStatus(AttackedHitStatusOwner status)
+  {
+    this.attackInfoName = status.attackInfo.name;
+    this.attackInfoRate = status.attackInfo.rateInfoRate;
+    this.fromObjectID = status.fromObjectID;
+    this.fromType = (int) status.fromType;
+    this.fromPos = status.fromPos;
+    this.hitPos = status.hitPos;
+    this.fromClientID = status.fromClientID;
+    if (status.skillParam != null)
+      this.skillIndex = status.skillParam.skillIndex;
+    this.regionID = status.regionID;
+    this.isDamageRegionOnly = status.isDamageRegionOnly;
+    this.weakState = (int) status.weakState;
+    this.damage = status.damage;
+    this.validDamage = status.validDamage;
+    this.downAddBase = status.downAddBase;
+    this.downAddWeak = status.downAddWeak;
+    this.isForceDown = status.isForceDown;
+    this.concussionAdd = status.concussionAdd;
+    this.isArrowBleed = status.isArrowBleed;
+    this.arrowBleedDamage = status.arrowBleedDamage;
+    this.arrowBurstDamage = status.arrowBurstDamage;
+    this.badStatusAdd.Copy(status.badStatusAdd);
+    this.isSpAttackHit = status.IsSpAttackHit;
+    this.damageDetails = status.damageDetails;
+    this.isShadowSealing = status.isShadowSealing;
+    this.isArrowBomb = status.isArrowBomb;
+  }
 
-	public int fromType;
-
-	public Vector3 fromPos = Vector3.get_zero();
-
-	public Vector3 hitPos = Vector3.get_zero();
-
-	public int fromClientID;
-
-	public int skillIndex = -1;
-
-	public int regionID = -1;
-
-	public int weakState;
-
-	public int damage;
-
-	public bool validDamage;
-
-	public float downAddBase;
-
-	public float downAddWeak;
-
-	public bool isArrowBleed;
-
-	public int arrowBleedDamage;
-
-	public int arrowBurstDamage;
-
-	public BadStatus badStatusAdd = new BadStatus();
-
-	public bool isSpAttackHit;
-
-	public AtkAttribute damageDetails = new AtkAttribute();
-
-	public bool isShadowSealing;
-
-	public Coop_Model_ObjectAttackedHitOwner()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		base.packetType = PACKET_TYPE.OBJECT_ATTACKED_HIT_OWNER;
-	}
-
-	public void SetAttackedHitStatus(AttackedHitStatusOwner status)
-	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		attackInfoName = status.attackInfo.name;
-		attackInfoRate = status.attackInfo.rateInfoRate;
-		fromObjectID = status.fromObjectID;
-		fromType = (int)status.fromType;
-		fromPos = status.fromPos;
-		hitPos = status.hitPos;
-		fromClientID = status.fromClientID;
-		if (status.skillParam != null)
-		{
-			skillIndex = status.skillParam.skillIndex;
-		}
-		regionID = status.regionID;
-		weakState = (int)status.weakState;
-		damage = status.damage;
-		validDamage = status.validDamage;
-		downAddBase = status.downAddBase;
-		downAddWeak = status.downAddWeak;
-		isArrowBleed = status.isArrowBleed;
-		arrowBleedDamage = status.arrowBleedDamage;
-		arrowBurstDamage = status.arrowBurstDamage;
-		badStatusAdd.Copy(status.badStatusAdd);
-		isSpAttackHit = status.IsSpAttackHit;
-		damageDetails = status.damageDetails;
-		isShadowSealing = status.isShadowSealing;
-	}
-
-	public void CopyAttackedHitStatus(out AttackedHitStatusOwner status)
-	{
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		AttackedHitStatus attackedHitStatus = new AttackedHitStatus();
-		attackedHitStatus.fromObjectID = fromObjectID;
-		attackedHitStatus.fromObject = MonoBehaviourSingleton<StageObjectManager>.I.FindCharacter(fromObjectID);
-		if (attackedHitStatus.fromObject != null)
-		{
-			attackedHitStatus.attackInfo = (attackedHitStatus.fromObject.FindAttackInfoExternal(attackInfoName, true, attackInfoRate) as AttackHitInfo);
-		}
-		if (attackedHitStatus.attackInfo == null)
-		{
-			attackedHitStatus.attackInfo = new AttackHitInfo();
-		}
-		attackedHitStatus.fromType = (StageObject.OBJECT_TYPE)fromType;
-		attackedHitStatus.fromPos = fromPos;
-		attackedHitStatus.hitPos = hitPos;
-		attackedHitStatus.fromClientID = fromClientID;
-		if (attackedHitStatus.fromObject != null)
-		{
-			attackedHitStatus.skillParam = attackedHitStatus.fromObject.GetSkillParam(skillIndex);
-		}
-		attackedHitStatus.regionID = regionID;
-		attackedHitStatus.weakState = (Enemy.WEAK_STATE)weakState;
-		attackedHitStatus.damage = damage;
-		attackedHitStatus.validDamage = validDamage;
-		attackedHitStatus.downAddBase = downAddBase;
-		attackedHitStatus.downAddWeak = downAddWeak;
-		attackedHitStatus.isArrowBleed = isArrowBleed;
-		attackedHitStatus.arrowBleedDamage = arrowBleedDamage;
-		attackedHitStatus.arrowBurstDamage = arrowBurstDamage;
-		attackedHitStatus.badStatusAdd.Copy(badStatusAdd);
-		attackedHitStatus.isSpAttackHit = isSpAttackHit;
-		attackedHitStatus.damageDetails = damageDetails;
-		attackedHitStatus.isShadowSealing = isShadowSealing;
-		status = new AttackedHitStatusOwner(attackedHitStatus);
-	}
+  public void CopyAttackedHitStatus(out AttackedHitStatusOwner status)
+  {
+    AttackedHitStatus status1 = new AttackedHitStatus();
+    status1.fromObjectID = this.fromObjectID;
+    status1.fromObject = MonoBehaviourSingleton<StageObjectManager>.I.FindCharacter(this.fromObjectID);
+    if (Object.op_Inequality((Object) status1.fromObject, (Object) null))
+      status1.attackInfo = status1.fromObject.FindAttackInfoExternal(this.attackInfoName, true, this.attackInfoRate) as AttackHitInfo;
+    if (status1.attackInfo == null)
+      status1.attackInfo = new AttackHitInfo();
+    status1.fromType = (StageObject.OBJECT_TYPE) this.fromType;
+    status1.fromPos = this.fromPos;
+    status1.hitPos = this.hitPos;
+    status1.fromClientID = this.fromClientID;
+    if (Object.op_Inequality((Object) status1.fromObject, (Object) null))
+      status1.skillParam = status1.fromObject.GetSkillParam(this.skillIndex);
+    status1.regionID = this.regionID;
+    status1.isDamageRegionOnly = this.isDamageRegionOnly;
+    status1.weakState = (Enemy.WEAK_STATE) this.weakState;
+    status1.damage = this.damage;
+    status1.validDamage = this.validDamage;
+    status1.downAddBase = this.downAddBase;
+    status1.downAddWeak = this.downAddWeak;
+    status1.isForceDown = this.isForceDown;
+    status1.concussionAdd = this.concussionAdd;
+    status1.isArrowBleed = this.isArrowBleed;
+    status1.arrowBleedDamage = this.arrowBleedDamage;
+    status1.arrowBurstDamage = this.arrowBurstDamage;
+    status1.badStatusAdd.Copy(this.badStatusAdd);
+    status1.isSpAttackHit = this.isSpAttackHit;
+    status1.damageDetails = this.damageDetails;
+    status1.isShadowSealing = this.isShadowSealing;
+    status1.isArrowBomb = this.isArrowBomb;
+    status = new AttackedHitStatusOwner(status1);
+  }
 }

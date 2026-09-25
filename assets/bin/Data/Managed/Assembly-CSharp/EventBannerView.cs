@@ -1,349 +1,271 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: EventBannerView
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class EventBannerView : UIBehaviour
 {
-	private enum UI
-	{
-		SCR_LIST1,
-		SCR_LIST2,
-		WRP_EVENT_BANNER1,
-		WRP_EVENT_BANNER2,
-		NORMAL_CLOTH
-	}
+  private Dictionary<Transform, IEnumerator> loadingRoutines = new Dictionary<Transform, IEnumerator>();
+  private UIScrollView sctList1;
+  private UIScrollView sctList2;
+  private GameObject mEventBannerPrefab;
+  private UICenterOnChild mCenterOnChild1;
+  private UICenterOnChild mCenterOnChild2;
+  private GameObject[] indexList;
+  private const int SHOW_BANNER1_NUM = 1;
+  private const int SHOW_BANNER2_NUM = 5;
+  private int bannerNum1;
+  private int bannerNum2;
+  private bool updateEventBanner = true;
+  private int mCenterIndex1;
+  private int mCenterIndex2;
+  private const float BANNER_AUTO_SCROLL_INTERVAL = 5f;
+  private float timer1;
+  private float timer2;
 
-	private const int SHOW_BANNER1_NUM = 1;
+  protected override GameSection.NOTIFY_FLAG GetUpdateUINotifyFlags()
+  {
+    return GameSection.NOTIFY_FLAG.UPDATE_EVENT_BANNER;
+  }
 
-	private const int SHOW_BANNER2_NUM = 5;
+  private IEnumerator Start()
+  {
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject lo_event_banner = (LoadObject) loadingQueue.LoadAndInstantiate(RESOURCE_CATEGORY.UI, "EventBanner");
+    if (loadingQueue.IsLoading())
+      yield return (object) loadingQueue.Wait();
+    this.mEventBannerPrefab = lo_event_banner.loadedObject as GameObject;
+    this.AddPrefab(this.mEventBannerPrefab, lo_event_banner.PopInstantiatedGameObject());
+    this.mCenterOnChild1 = ((Component) this.GetCtrl((Enum) EventBannerView.UI.WRP_EVENT_BANNER1)).GetComponent<UICenterOnChild>();
+    this.mCenterOnChild1.onCenter = new UICenterOnChild.OnCenterCallback(this.OnCenter1);
+    this.mCenterOnChild2 = ((Component) this.GetCtrl((Enum) EventBannerView.UI.WRP_EVENT_BANNER2)).GetComponent<UICenterOnChild>();
+    this.mCenterOnChild2.onCenter = new UICenterOnChild.OnCenterCallback(this.OnCenter2);
+  }
 
-	private const float BANNER_AUTO_SCROLL_INTERVAL = 5f;
+  public override void UpdateUI()
+  {
+    if (Object.op_Equality((Object) this.mEventBannerPrefab, (Object) null))
+      return;
+    this.UpdateEventBannerAll();
+    this.sctList1 = this.GetComponent<UIScrollView>((Enum) EventBannerView.UI.SCR_LIST1);
+    this.sctList2 = this.GetComponent<UIScrollView>((Enum) EventBannerView.UI.SCR_LIST2);
+    base.UpdateUI();
+  }
 
-	private Dictionary<Transform, IEnumerator> loadingRoutines = new Dictionary<Transform, IEnumerator>();
+  public override void OnNotify(GameSection.NOTIFY_FLAG flags)
+  {
+    if ((flags & GameSection.NOTIFY_FLAG.UPDATE_EVENT_BANNER) != (GameSection.NOTIFY_FLAG) 0)
+      this.updateEventBanner = true;
+    base.OnNotify(flags);
+  }
 
-	private UIScrollView sctList1;
+  private void UpdateEventBannerAll()
+  {
+    if (!this.updateEventBanner)
+      return;
+    this.updateEventBanner = false;
+    if (MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList == null || MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count <= 0)
+    {
+      this.Close();
+    }
+    else
+    {
+      this.GetCtrl((Enum) EventBannerView.UI.WRP_EVENT_BANNER1).DestroyChildren();
+      this.GetCtrl((Enum) EventBannerView.UI.WRP_EVENT_BANNER2).DestroyChildren();
+      foreach (IEnumerator enumerator in this.loadingRoutines.Values)
+        this.StopCoroutine(enumerator);
+      this.loadingRoutines.Clear();
+      UIWidget refWidget = ((Component) this._transform).GetComponentInChildren<UIWidget>();
+      this.bannerNum1 = MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count > 1 ? 1 : MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count;
+      this.SetWrapContent((Enum) EventBannerView.UI.WRP_EVENT_BANNER1, "EventBanner", this.bannerNum1, true, (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+      {
+        EventBanner eventBanner = MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList[i];
+        this.SetBannerEvent(t.GetChild(0), eventBanner);
+        Renderer r = ((Component) t).GetComponentInChildren<Renderer>();
+        refWidget.onRender += (UIDrawCall.OnRenderCallback) (mat => r.material.renderQueue = mat.renderQueue);
+        r.material.color = Color.clear;
+        this.SetBanner(t, EventBannerView.UI.NORMAL_CLOTH, false);
+        ((Component) t).gameObject.SetActive(false);
+        IEnumerator enumerator = this.LoadImg(t, eventBanner, i, this.mCenterIndex1);
+        this.loadingRoutines.Add(t, enumerator);
+        this.StartCoroutine(enumerator);
+      }));
+      this.bannerNum2 = MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count - this.bannerNum1;
+      if (this.bannerNum2 > 5)
+        this.bannerNum2 = 5;
+      this.SetWrapContent((Enum) EventBannerView.UI.WRP_EVENT_BANNER2, "EventBanner", this.bannerNum2, true, (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+      {
+        EventBanner eventBanner = MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList[i + this.bannerNum1];
+        this.SetBannerEvent(t.GetChild(0), eventBanner);
+        Renderer r = ((Component) t).GetComponentInChildren<Renderer>();
+        refWidget.onRender += (UIDrawCall.OnRenderCallback) (mat => r.material.renderQueue = mat.renderQueue);
+        r.material.color = Color.clear;
+        this.SetBanner(t, EventBannerView.UI.NORMAL_CLOTH, false);
+        ((Component) t).gameObject.SetActive(false);
+        IEnumerator enumerator = this.LoadImg(t, eventBanner, i, this.mCenterIndex2);
+        this.loadingRoutines.Add(t, enumerator);
+        this.StartCoroutine(enumerator);
+      }));
+      this.mCenterIndex1 = 0;
+      this.mCenterIndex2 = 0;
+      this.timer1 = 0.0f;
+      this.timer2 = 0.0f;
+    }
+  }
 
-	private UIScrollView sctList2;
+  private IEnumerator LoadImg(Transform t, EventBanner banner, int index, int centerIndex)
+  {
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject lo = banner.LinkType != LINK_TYPE.NEWS ? loadingQueue.Load(true, RESOURCE_CATEGORY.HOME_BANNER_IMAGE, ResourceName.GetHomeBannerImage(banner.bannerId)) : loadingQueue.Load(true, RESOURCE_CATEGORY.HOME_BANNER_IMAGE, ResourceName.GetHomeBannerImage(banner.bannerId) + "_result");
+    yield return (object) loadingQueue.Wait();
+    Transform ctrl = this.FindCtrl(t, (Enum) EventBannerView.UI.NORMAL_CLOTH);
+    Texture2D loadedObject = lo.loadedObject as Texture2D;
+    ((Component) ctrl).gameObject.SetActive(true);
+    ((Component) ctrl).GetComponent<Cloth>().enabled = true;
+    Renderer component = ((Component) ctrl).GetComponent<Renderer>();
+    Material mat = component.material;
+    mat.mainTexture = (Texture) loadedObject;
+    component.material = mat;
+    yield return (object) null;
+    if (index == centerIndex)
+    {
+      mat.color = Color.white;
+      ((Component) t).gameObject.SetActive(true);
+    }
+    this.loadingRoutines.Remove(t);
+  }
 
-	private GameObject mEventBannerPrefab;
+  private void SetBannerEvent(Transform t, EventBanner banner)
+  {
+    switch (banner.LinkType)
+    {
+      case LINK_TYPE.PAYMENT:
+        this.SetEvent(t, "BANNER_CRYSTAL_SHOP", 0);
+        break;
+      case LINK_TYPE.GACHA:
+        this.SetEvent(t, "BANNER_GACHA", banner.param);
+        break;
+      case LINK_TYPE.NEWS:
+        this.SetEvent(t, "BANNER_NEWS", banner.param);
+        break;
+      case LINK_TYPE.EVENT_DELIVERY:
+        this.SetEvent(t, "BANNER_EVENT_DELIVERY", banner.param);
+        break;
+      case LINK_TYPE.EXPLORE_DELIVERY:
+        this.SetEvent(t, "BANNER_EXPLORE_DELIVERY", banner.param);
+        break;
+      case LINK_TYPE.LOGIN_BONUS:
+        this.SetEvent(t, "BANNER_LOGIN_BONUS", banner.param);
+        break;
+      default:
+        this.SetEvent(t, "BANNER_NEWS", 0);
+        break;
+    }
+  }
 
-	private UICenterOnChild mCenterOnChild1;
+  public void NextBanner(int targetBanner, bool forward = true)
+  {
+    if (targetBanner == 1)
+    {
+      this.timer1 = 0.0f;
+      if (this.bannerNum1 > 1)
+      {
+        int num = forward ? (this.mCenterIndex1 + 1) % this.bannerNum1 : (this.bannerNum1 + this.mCenterIndex1 - 1) % this.bannerNum1;
+        this.StartCoroutine(this.ChangeBanner(((Component) this.mCenterOnChild1).transform.GetChild(this.mCenterIndex1), ((Component) this.mCenterOnChild1).transform.GetChild(num)));
+        this.mCenterIndex1 = num;
+      }
+    }
+    if (targetBanner != 2)
+      return;
+    this.timer2 = 0.0f;
+    if (this.bannerNum2 <= 1)
+      return;
+    int num1 = forward ? (this.mCenterIndex2 + 1) % this.bannerNum2 : (this.bannerNum2 + this.mCenterIndex2 - 1) % this.bannerNum2;
+    this.StartCoroutine(this.ChangeBanner(((Component) this.mCenterOnChild2).transform.GetChild(this.mCenterIndex2), ((Component) this.mCenterOnChild2).transform.GetChild(num1)));
+    this.mCenterIndex2 = num1;
+  }
 
-	private UICenterOnChild mCenterOnChild2;
+  private void Update()
+  {
+    if (this.state != UIBehaviour.STATE.OPEN)
+      return;
+    if (Object.op_Inequality((Object) this.sctList2, (Object) null) && this.sctList2.isDragging)
+    {
+      this.timer2 = 0.0f;
+    }
+    else
+    {
+      this.timer2 += Time.deltaTime;
+      if ((double) this.timer2 < 5.0)
+        return;
+      this.NextBanner(2);
+    }
+  }
 
-	private GameObject[] indexList;
+  private IEnumerator ChangeBanner(Transform fromBanner, Transform toBanner)
+  {
+    Color c = Color.white;
+    Renderer componentInChildren1 = ((Component) fromBanner).GetComponentInChildren<Renderer>();
+    Renderer componentInChildren2 = ((Component) toBanner).GetComponentInChildren<Renderer>();
+    if (!Object.op_Equality((Object) componentInChildren1, (Object) null) && !Object.op_Equality((Object) componentInChildren2, (Object) null))
+    {
+      Material fmat = componentInChildren1.material;
+      Material tmat = componentInChildren2.material;
+      tmat.color = c;
+      ((Component) toBanner).GetComponentInChildren<Cloth>().enabled = true;
+      ((Component) toBanner).gameObject.SetActive(true);
+      fromBanner.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+      toBanner.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+      float time = 0.34f;
+      while ((double) time > 0.0)
+      {
+        time -= Time.deltaTime;
+        float num = time / 0.34f;
+        c.a = num;
+        fmat.color = c;
+        c.a = 1f - num;
+        tmat.color = c;
+        yield return (object) null;
+      }
+      c.a = 0.0f;
+      fmat.color = c;
+      ((Component) fromBanner).GetComponentInChildren<Cloth>().enabled = false;
+      ((Component) fromBanner).gameObject.SetActive(false);
+    }
+  }
 
-	private int bannerNum1;
+  private void OnCenter1(GameObject obj) => this.mCenterIndex1 = int.Parse(((Object) obj).name);
 
-	private int bannerNum2;
+  private void OnCenter2(GameObject obj) => this.mCenterIndex2 = int.Parse(((Object) obj).name);
 
-	private bool updateEventBanner = true;
+  protected override void OnOpen()
+  {
+    this.timer1 = 0.0f;
+    this.timer2 = 0.0f;
+    this.updateEventBanner = true;
+  }
 
-	private int mCenterIndex1;
+  private void SetBanner(Transform t, EventBannerView.UI enumValue, bool enabled)
+  {
+    Transform ctrl = this.FindCtrl(t, (Enum) enumValue);
+    ((Component) ctrl).gameObject.SetActive(enabled);
+    ((Component) ctrl).GetComponent<Cloth>().enabled = enabled;
+  }
 
-	private int mCenterIndex2;
-
-	private float timer1;
-
-	private float timer2;
-
-	protected override GameSection.NOTIFY_FLAG GetUpdateUINotifyFlags()
-	{
-		return GameSection.NOTIFY_FLAG.UPDATE_EVENT_BANNER;
-	}
-
-	private IEnumerator Start()
-	{
-		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_event_banner = load_queue.LoadAndInstantiate(RESOURCE_CATEGORY.UI, "EventBanner");
-		if (load_queue.IsLoading())
-		{
-			yield return (object)load_queue.Wait();
-		}
-		mEventBannerPrefab = (lo_event_banner.loadedObject as GameObject);
-		AddPrefab(mEventBannerPrefab, lo_event_banner.PopInstantiatedGameObject());
-		mCenterOnChild1 = GetCtrl(UI.WRP_EVENT_BANNER1).GetComponent<UICenterOnChild>();
-		mCenterOnChild1.onCenter = OnCenter1;
-		mCenterOnChild2 = GetCtrl(UI.WRP_EVENT_BANNER2).GetComponent<UICenterOnChild>();
-		mCenterOnChild2.onCenter = OnCenter2;
-	}
-
-	public override void UpdateUI()
-	{
-		if (!(mEventBannerPrefab == null))
-		{
-			UpdateEventBannerAll();
-			sctList1 = base.GetComponent<UIScrollView>((Enum)UI.SCR_LIST1);
-			sctList2 = base.GetComponent<UIScrollView>((Enum)UI.SCR_LIST2);
-			base.UpdateUI();
-		}
-	}
-
-	public override void OnNotify(GameSection.NOTIFY_FLAG flags)
-	{
-		if ((flags & GameSection.NOTIFY_FLAG.UPDATE_EVENT_BANNER) != (GameSection.NOTIFY_FLAG)0L)
-		{
-			updateEventBanner = true;
-		}
-		base.OnNotify(flags);
-	}
-
-	private void UpdateEventBannerAll()
-	{
-		if (updateEventBanner)
-		{
-			updateEventBanner = false;
-			if (MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList == null || MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count <= 0)
-			{
-				Close(UITransition.TYPE.CLOSE);
-			}
-			else
-			{
-				GetCtrl(UI.WRP_EVENT_BANNER1).DestroyChildren();
-				GetCtrl(UI.WRP_EVENT_BANNER2).DestroyChildren();
-				foreach (IEnumerator value in loadingRoutines.Values)
-				{
-					this.StopCoroutine(value);
-				}
-				loadingRoutines.Clear();
-				UIWidget refWidget = base._transform.GetComponentInChildren<UIWidget>();
-				bannerNum1 = ((MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count > 1) ? 1 : MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count);
-				SetWrapContent(UI.WRP_EVENT_BANNER1, "EventBanner", bannerNum1, true, delegate(int i, Transform t, bool is_recycle)
-				{
-					//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-					//IL_002c: Expected O, but got Unknown
-					//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-					//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-					EventBanner banner2 = MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList[i];
-					SetBannerEvent(t.GetChild(0), banner2);
-					Renderer r2 = t.GetComponentInChildren<Renderer>();
-					UIWidget uIWidget2 = refWidget;
-					uIWidget2.onRender = (UIDrawCall.OnRenderCallback)Delegate.Combine(uIWidget2.onRender, (UIDrawCall.OnRenderCallback)delegate(Material mat)
-					{
-						//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-						r2.get_material().set_renderQueue(mat.get_renderQueue());
-					});
-					r2.get_material().set_color(Color.get_clear());
-					SetBanner(t, UI.NORMAL_CLOTH, false);
-					t.get_gameObject().SetActive(false);
-					IEnumerator enumerator3 = LoadImg(t, banner2, i, mCenterIndex1);
-					loadingRoutines.Add(t, enumerator3);
-					this.StartCoroutine(enumerator3);
-				});
-				bannerNum2 = MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList.Count - bannerNum1;
-				if (bannerNum2 > 5)
-				{
-					bannerNum2 = 5;
-				}
-				SetWrapContent(UI.WRP_EVENT_BANNER2, "EventBanner", bannerNum2, true, delegate(int i, Transform t, bool is_recycle)
-				{
-					//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0038: Expected O, but got Unknown
-					//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-					//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-					EventBanner banner = MonoBehaviourSingleton<UserInfoManager>.I.eventBannerList[i + bannerNum1];
-					SetBannerEvent(t.GetChild(0), banner);
-					Renderer r = t.GetComponentInChildren<Renderer>();
-					UIWidget uIWidget = refWidget;
-					uIWidget.onRender = (UIDrawCall.OnRenderCallback)Delegate.Combine(uIWidget.onRender, (UIDrawCall.OnRenderCallback)delegate(Material mat)
-					{
-						//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-						r.get_material().set_renderQueue(mat.get_renderQueue());
-					});
-					r.get_material().set_color(Color.get_clear());
-					SetBanner(t, UI.NORMAL_CLOTH, false);
-					t.get_gameObject().SetActive(false);
-					IEnumerator enumerator2 = LoadImg(t, banner, i, mCenterIndex2);
-					loadingRoutines.Add(t, enumerator2);
-					this.StartCoroutine(enumerator2);
-				});
-				mCenterIndex1 = 0;
-				mCenterIndex2 = 0;
-				timer1 = 0f;
-				timer2 = 0f;
-			}
-		}
-	}
-
-	private IEnumerator LoadImg(Transform t, EventBanner banner, int index, int centerIndex)
-	{
-		LoadingQueue load = new LoadingQueue(this);
-		LoadObject lo;
-		if (MonoBehaviourSingleton<ResourceManager>.I.manifest != null)
-		{
-			Hash128 assetBundleHash = MonoBehaviourSingleton<ResourceManager>.I.manifest.GetAssetBundleHash(RESOURCE_CATEGORY.HOME_BANNER_IMAGE.ToAssetBundleName(ResourceName.GetHomeBannerImage(banner.bannerId)));
-			if (assetBundleHash.get_isValid())
-			{
-				lo = load.Load(RESOURCE_CATEGORY.HOME_BANNER_IMAGE, ResourceName.GetHomeBannerImage(banner.bannerId), false);
-				goto IL_00e5;
-			}
-		}
-		lo = load.Load(RESOURCE_CATEGORY.HOME_BANNER_IMAGE, "HBI_Default", false);
-		Log.Error("Missing HBI image: " + ResourceName.GetHomeBannerImage(banner.bannerId));
-		goto IL_00e5;
-		IL_00e5:
-		yield return (object)load.Wait();
-		Transform bannerTrans = FindCtrl(t, UI.NORMAL_CLOTH);
-		Texture2D tex = lo.loadedObject as Texture2D;
-		bannerTrans.get_gameObject().SetActive(true);
-		bannerTrans.GetComponent<Cloth>().set_enabled(true);
-		Renderer r = bannerTrans.GetComponent<Renderer>();
-		Material mat = r.get_material();
-		mat.set_mainTexture(tex);
-		r.set_material(mat);
-		yield return (object)null;
-		if (index == centerIndex)
-		{
-			mat.set_color(Color.get_white());
-			t.get_gameObject().SetActive(true);
-		}
-		loadingRoutines.Remove(t);
-	}
-
-	private void SetBannerEvent(Transform t, EventBanner banner)
-	{
-		switch (banner.LinkType)
-		{
-		case LINK_TYPE.GACHA:
-			SetEvent(t, "BANNER_GACHA", banner.param);
-			break;
-		case LINK_TYPE.EVENT_DELIVERY:
-			SetEvent(t, "BANNER_EVENT_DELIVERY", banner.param);
-			break;
-		case LINK_TYPE.NEWS:
-			SetEvent(t, "BANNER_NEWS", banner.param);
-			break;
-		case LINK_TYPE.PAYMENT:
-			SetEvent(t, "BANNER_CRYSTAL_SHOP", 0);
-			break;
-		case LINK_TYPE.EXPLORE_DELIVERY:
-			SetEvent(t, "BANNER_EXPLORE_DELIVERY", banner.param);
-			break;
-		case LINK_TYPE.LOGIN_BONUS:
-			SetEvent(t, "BANNER_LOGIN_BONUS", banner.param);
-			break;
-		default:
-			SetEvent(t, "BANNER_NEWS", 0);
-			break;
-		}
-	}
-
-	public void NextBanner(int targetBanner, bool forward = true)
-	{
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Expected O, but got Unknown
-		//IL_0078: Expected O, but got Unknown
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0102: Expected O, but got Unknown
-		//IL_0102: Expected O, but got Unknown
-		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-		if (targetBanner == 1)
-		{
-			timer1 = 0f;
-			if (bannerNum1 > 1)
-			{
-				int num = (!forward) ? ((bannerNum1 + mCenterIndex1 - 1) % bannerNum1) : ((mCenterIndex1 + 1) % bannerNum1);
-				this.StartCoroutine(ChangeBanner(mCenterOnChild1.get_transform().GetChild(mCenterIndex1), mCenterOnChild1.get_transform().GetChild(num)));
-				mCenterIndex1 = num;
-			}
-		}
-		if (targetBanner == 2)
-		{
-			timer2 = 0f;
-			if (bannerNum2 > 1)
-			{
-				int num2 = (!forward) ? ((bannerNum2 + mCenterIndex2 - 1) % bannerNum2) : ((mCenterIndex2 + 1) % bannerNum2);
-				this.StartCoroutine(ChangeBanner(mCenterOnChild2.get_transform().GetChild(mCenterIndex2), mCenterOnChild2.get_transform().GetChild(num2)));
-				mCenterIndex2 = num2;
-			}
-		}
-	}
-
-	private void Update()
-	{
-		if (base.state == STATE.OPEN)
-		{
-			if (sctList2 != null && sctList2.isDragging)
-			{
-				timer2 = 0f;
-			}
-			else
-			{
-				timer2 += Time.get_deltaTime();
-				if (timer2 >= 5f)
-				{
-					NextBanner(2, true);
-				}
-			}
-		}
-	}
-
-	private IEnumerator ChangeBanner(Transform fromBanner, Transform toBanner)
-	{
-		Color c = Color.get_white();
-		Renderer fr = fromBanner.GetComponentInChildren<Renderer>();
-		Renderer tr = toBanner.GetComponentInChildren<Renderer>();
-		if (!(fr == null) && !(tr == null))
-		{
-			Material fmat = fr.get_material();
-			Material tmat = tr.get_material();
-			tmat.set_color(c);
-			toBanner.GetComponentInChildren<Cloth>().set_enabled(true);
-			toBanner.get_gameObject().SetActive(true);
-			fromBanner.set_localPosition(new Vector3(0f, 0f, 0f));
-			toBanner.set_localPosition(new Vector3(0f, 0f, 0f));
-			float time = 0.34f;
-			while (time > 0f)
-			{
-				time -= Time.get_deltaTime();
-				float alpha = c.a = time / 0.34f;
-				fmat.set_color(c);
-				c.a = 1f - alpha;
-				tmat.set_color(c);
-				yield return (object)null;
-			}
-			c.a = 0f;
-			fmat.set_color(c);
-			fromBanner.GetComponentInChildren<Cloth>().set_enabled(false);
-			fromBanner.get_gameObject().SetActive(false);
-		}
-	}
-
-	private void OnCenter1(GameObject obj)
-	{
-		mCenterIndex1 = int.Parse(obj.get_name());
-	}
-
-	private void OnCenter2(GameObject obj)
-	{
-		mCenterIndex2 = int.Parse(obj.get_name());
-	}
-
-	protected override void OnOpen()
-	{
-		timer1 = 0f;
-		timer2 = 0f;
-		updateEventBanner = true;
-	}
-
-	private void SetBanner(Transform t, UI enumValue, bool enabled)
-	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = FindCtrl(t, enumValue);
-		val.get_gameObject().SetActive(enabled);
-		val.GetComponent<Cloth>().set_enabled(enabled);
-	}
+  private enum UI
+  {
+    SCR_LIST1,
+    SCR_LIST2,
+    WRP_EVENT_BANNER1,
+    WRP_EVENT_BANNER2,
+    NORMAL_CLOTH,
+  }
 }

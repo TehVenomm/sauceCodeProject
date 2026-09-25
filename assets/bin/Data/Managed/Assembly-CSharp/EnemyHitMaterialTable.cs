@@ -1,107 +1,86 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: EnemyHitMaterialTable
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class EnemyHitMaterialTable : Singleton<EnemyHitMaterialTable>, IDataTable
 {
-	public class MaterialData
-	{
-		public const string NT = "name,se_id_,add_effect_name";
+  protected List<string> typeKeyTable = new List<string>();
 
-		public int[] typeSEIDs;
+  public StringKeyTable<EnemyHitMaterialTable.MaterialData> dataTable { get; private set; }
 
-		public string addEffectName;
+  public void CreateTable(TextAsset stage_table_text_asset)
+  {
+    this.CreateTable(stage_table_text_asset.text);
+  }
 
-		public static bool cb(CSVReader csv, MaterialData data, ref string key)
-		{
-			int num = 0;
-			if (Singleton<EnemyHitMaterialTable>.IsValid() && Singleton<EnemyHitMaterialTable>.I.typeKeyTable != null)
-			{
-				num = Singleton<EnemyHitMaterialTable>.I.typeKeyTable.Count;
-			}
-			data.typeSEIDs = new int[num];
-			for (int i = 0; i < num; i++)
-			{
-				data.typeSEIDs[i] = 0;
-				csv.Pop(ref data.typeSEIDs[i]);
-			}
-			csv.Pop(ref data.addEffectName);
-			return true;
-		}
+  public void CreateTable(string csv)
+  {
+    if (!Singleton<EnemyHitTypeTable>.IsValid() || Singleton<EnemyHitTypeTable>.I.dataTable == null)
+    {
+      Log.Error(LOG.INGAME, "EnemyHitMaterialTable::CreateTable() Err ( EnemyHitTypeTable is invalid. )");
+    }
+    else
+    {
+      this.typeKeyTable = new List<string>();
+      Singleton<EnemyHitTypeTable>.I.dataTable.ForEachKeys((Action<string>) (key =>
+      {
+        if (key.IndexOf("@") >= 0)
+          return;
+        this.typeKeyTable.Add(key);
+      }));
+      string newValue = "";
+      int index = 0;
+      for (int count = this.typeKeyTable.Count; index < count; ++index)
+      {
+        newValue = $"{newValue}se_id_{this.typeKeyTable[index]}";
+        if (index != count - 1)
+          newValue += ",";
+      }
+      string name_table = "name,se_id_,add_effect_name".Replace("se_id_", newValue);
+      this.dataTable = TableUtility.CreateStringKeyTable<EnemyHitMaterialTable.MaterialData>(csv, new TableUtility.CallBackStringKeyReadCSV<EnemyHitMaterialTable.MaterialData>(EnemyHitMaterialTable.MaterialData.cb), name_table);
+      this.dataTable.TrimExcess();
+    }
+  }
 
-		public int GetTypeSEID(string hit_type)
-		{
-			if (!Singleton<EnemyHitMaterialTable>.IsValid())
-			{
-				return 0;
-			}
-			if (Singleton<EnemyHitMaterialTable>.I.typeKeyTable == null)
-			{
-				return 0;
-			}
-			if (typeSEIDs == null)
-			{
-				return 0;
-			}
-			int num = Singleton<EnemyHitMaterialTable>.I.typeKeyTable.IndexOf(hit_type);
-			if (num < 0 || num >= typeSEIDs.Length)
-			{
-				return 0;
-			}
-			return typeSEIDs[num];
-		}
-	}
+  public EnemyHitMaterialTable.MaterialData GetData(string name)
+  {
+    return this.dataTable == null ? (EnemyHitMaterialTable.MaterialData) null : this.dataTable.Get(name);
+  }
 
-	protected List<string> typeKeyTable = new List<string>();
+  public class MaterialData
+  {
+    public int[] typeSEIDs;
+    public string addEffectName;
+    public const string NT = "name,se_id_,add_effect_name";
 
-	public StringKeyTable<MaterialData> dataTable
-	{
-		get;
-		private set;
-	}
+    public static bool cb(CSVReader csv, EnemyHitMaterialTable.MaterialData data, ref string key)
+    {
+      int length = 0;
+      if (Singleton<EnemyHitMaterialTable>.IsValid() && Singleton<EnemyHitMaterialTable>.I.typeKeyTable != null)
+        length = Singleton<EnemyHitMaterialTable>.I.typeKeyTable.Count;
+      data.typeSEIDs = new int[length];
+      for (int index = 0; index < length; ++index)
+      {
+        data.typeSEIDs[index] = 0;
+        csv.Pop(ref data.typeSEIDs[index]);
+      }
+      csv.Pop(ref data.addEffectName);
+      return true;
+    }
 
-	public void CreateTable(TextAsset stage_table_text_asset)
-	{
-		CreateTable(stage_table_text_asset.get_text());
-	}
-
-	public void CreateTable(string csv)
-	{
-		if (!Singleton<EnemyHitTypeTable>.IsValid() || Singleton<EnemyHitTypeTable>.I.dataTable == null)
-		{
-			Log.Error(LOG.INGAME, "EnemyHitMaterialTable::CreateTable() Err ( EnemyHitTypeTable is invalid. )");
-		}
-		else
-		{
-			typeKeyTable = new List<string>();
-			Singleton<EnemyHitTypeTable>.I.dataTable.ForEachKeys(delegate(string key)
-			{
-				if (key.IndexOf("@") < 0)
-				{
-					typeKeyTable.Add(key);
-				}
-			});
-			string text = string.Empty;
-			int i = 0;
-			for (int count = typeKeyTable.Count; i < count; i++)
-			{
-				text = text + "se_id_" + typeKeyTable[i];
-				if (i != count - 1)
-				{
-					text += ",";
-				}
-			}
-			string name_table = "name,se_id_,add_effect_name".Replace("se_id_", text);
-			dataTable = TableUtility.CreateStringKeyTable<MaterialData>(csv, MaterialData.cb, name_table);
-			dataTable.TrimExcess();
-		}
-	}
-
-	public MaterialData GetData(string name)
-	{
-		if (dataTable == null)
-		{
-			return null;
-		}
-		return dataTable.Get(name);
-	}
+    public int GetTypeSEID(string hit_type)
+    {
+      if (!Singleton<EnemyHitMaterialTable>.IsValid() || Singleton<EnemyHitMaterialTable>.I.typeKeyTable == null || this.typeSEIDs == null)
+        return 0;
+      int index = Singleton<EnemyHitMaterialTable>.I.typeKeyTable.IndexOf(hit_type);
+      return index < 0 || index >= this.typeSEIDs.Length ? 0 : this.typeSEIDs[index];
+    }
+  }
 }

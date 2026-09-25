@@ -1,113 +1,85 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: TweenWidth
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
+[RequireComponent(typeof (UIWidget))]
 [AddComponentMenu("NGUI/Tween/Tween Width")]
-[RequireComponent(typeof(UIWidget))]
 public class TweenWidth : UITweener
 {
-	public int from = 100;
+  public int from = 100;
+  public int to = 100;
+  public bool updateTable;
+  private UIWidget mWidget;
+  private UITable mTable;
 
-	public int to = 100;
+  public UIWidget cachedWidget
+  {
+    get
+    {
+      if (Object.op_Equality((Object) this.mWidget, (Object) null))
+        this.mWidget = ((Component) this).GetComponent<UIWidget>();
+      return this.mWidget;
+    }
+  }
 
-	public bool updateTable;
+  [Obsolete("Use 'value' instead")]
+  public int width
+  {
+    get => this.value;
+    set => this.value = value;
+  }
 
-	private UIWidget mWidget;
+  public int value
+  {
+    get => this.cachedWidget.width;
+    set => this.cachedWidget.width = value;
+  }
 
-	private UITable mTable;
+  protected override void OnUpdate(float factor, bool isFinished)
+  {
+    this.value = Mathf.RoundToInt((float) ((double) this.from * (1.0 - (double) factor) + (double) this.to * (double) factor));
+    if (!this.updateTable)
+      return;
+    if (Object.op_Equality((Object) this.mTable, (Object) null))
+    {
+      this.mTable = NGUITools.FindInParents<UITable>(((Component) this).gameObject);
+      if (Object.op_Equality((Object) this.mTable, (Object) null))
+      {
+        this.updateTable = false;
+        return;
+      }
+    }
+    this.mTable.repositionNow = true;
+  }
 
-	public UIWidget cachedWidget
-	{
-		get
-		{
-			if (mWidget == null)
-			{
-				mWidget = this.GetComponent<UIWidget>();
-			}
-			return mWidget;
-		}
-	}
+  public static TweenWidth Begin(UIWidget widget, float duration, int width)
+  {
+    TweenWidth tweenWidth = UITweener.Begin<TweenWidth>(((Component) widget).gameObject, duration);
+    tweenWidth.from = widget.width;
+    tweenWidth.to = width;
+    if ((double) duration <= 0.0)
+    {
+      tweenWidth.Sample(1f, true);
+      ((Behaviour) tweenWidth).enabled = false;
+    }
+    return tweenWidth;
+  }
 
-	[Obsolete("Use 'value' instead")]
-	public int width
-	{
-		get
-		{
-			return value;
-		}
-		set
-		{
-			this.value = value;
-		}
-	}
+  [ContextMenu("Set 'From' to current value")]
+  public override void SetStartToCurrentValue() => this.from = this.value;
 
-	public int value
-	{
-		get
-		{
-			return cachedWidget.width;
-		}
-		set
-		{
-			cachedWidget.width = value;
-		}
-	}
+  [ContextMenu("Set 'To' to current value")]
+  public override void SetEndToCurrentValue() => this.to = this.value;
 
-	protected override void OnUpdate(float factor, bool isFinished)
-	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Expected O, but got Unknown
-		value = Mathf.RoundToInt((float)from * (1f - factor) + (float)to * factor);
-		if (updateTable)
-		{
-			if (mTable == null)
-			{
-				mTable = NGUITools.FindInParents<UITable>(this.get_gameObject());
-				if (mTable == null)
-				{
-					updateTable = false;
-					return;
-				}
-			}
-			mTable.repositionNow = true;
-		}
-	}
+  [ContextMenu("Assume value of 'From'")]
+  private void SetCurrentValueToStart() => this.value = this.from;
 
-	public static TweenWidth Begin(UIWidget widget, float duration, int width)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Expected O, but got Unknown
-		TweenWidth tweenWidth = UITweener.Begin<TweenWidth>(widget.get_gameObject(), duration, true);
-		tweenWidth.from = widget.width;
-		tweenWidth.to = width;
-		if (duration <= 0f)
-		{
-			tweenWidth.Sample(1f, true);
-			tweenWidth.set_enabled(false);
-		}
-		return tweenWidth;
-	}
-
-	[ContextMenu("Set 'From' to current value")]
-	public override void SetStartToCurrentValue()
-	{
-		from = value;
-	}
-
-	[ContextMenu("Set 'To' to current value")]
-	public override void SetEndToCurrentValue()
-	{
-		to = value;
-	}
-
-	[ContextMenu("Assume value of 'From'")]
-	private void SetCurrentValueToStart()
-	{
-		value = from;
-	}
-
-	[ContextMenu("Assume value of 'To'")]
-	private void SetCurrentValueToEnd()
-	{
-		value = to;
-	}
+  [ContextMenu("Assume value of 'To'")]
+  private void SetCurrentValueToEnd() => this.value = this.to;
 }

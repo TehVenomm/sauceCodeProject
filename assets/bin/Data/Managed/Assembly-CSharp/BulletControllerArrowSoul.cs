@@ -1,159 +1,109 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: BulletControllerArrowSoul
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class BulletControllerArrowSoul : BulletControllerBase
 {
-	protected float accel;
+  protected float accel;
+  protected float accelStartTime;
+  protected float maxSpeed;
+  protected float angularVelocity;
+  protected float angularStartTime;
+  protected float ignoreAngle;
+  protected bool isEndAccel;
+  protected bool isLookTarget;
+  protected TargetPoint target;
+  protected Vector3 direction = Vector3.forward;
+  protected float speed0;
+  protected float speed1;
+  protected bool isPuppet;
+  protected Vector3 puppetTargetPos;
 
-	protected float accelStartTime;
+  public void SetTarget(TargetPoint point) => this.target = point;
 
-	protected float maxSpeed;
+  public TargetPoint GetTarget() => this.target;
 
-	protected float angularVelocity;
+  public void SetPuppetTargetPos(Vector3 pos)
+  {
+    this.puppetTargetPos = pos;
+    this.isPuppet = true;
+  }
 
-	protected float angularStartTime;
+  public override void Initialize(
+    BulletData bullet,
+    SkillInfo.SkillParam skillParam,
+    Vector3 pos,
+    Quaternion rot)
+  {
+    this.timeCount = 0.0f;
+    this.isEndAccel = false;
+    this.isLookTarget = false;
+    this.bulletSkillInfoParam = skillParam;
+    this.speed0 = bullet.data.speed;
+    this.speed1 = bullet.data.speed;
+    this.accel = bullet.dataArrowSoul.accel;
+    this.accelStartTime = bullet.dataArrowSoul.accelStartTime;
+    this.maxSpeed = bullet.dataArrowSoul.maxSpeed;
+    this.angularVelocity = bullet.dataArrowSoul.angularVelocity;
+    this.angularStartTime = bullet.dataArrowSoul.angularStartTime;
+    this.ignoreAngle = bullet.dataArrowSoul.ignoreAngle;
+    this._transform.position = pos;
+    Vector3 soulShotDir = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.soulShotDirs[Random.Range(0, MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.soulShotDirs.Length - 1)];
+    this.direction = Quaternion.op_Multiply(rot, soulShotDir);
+    Transform transform = this._transform;
+    transform.position = Vector3.op_Subtraction(transform.position, Vector3.op_Multiply(this.direction, MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.soulShotDirVec));
+    this._transform.rotation = rot;
+    this._rigidbody.velocity = Vector3.op_Multiply(this.direction, this.speed0);
+  }
 
-	protected float ignoreAngle;
+  public override void Update()
+  {
+    if (Object.op_Equality((Object) this.target, (Object) null) && !this.isPuppet)
+      return;
+    this.timeCount += Time.deltaTime;
+    bool flag = this._CalcSpeed();
+    this._CalcAngle();
+    if (this.isLookTarget)
+    {
+      Vector3 vector3 = Vector3.op_Subtraction(this.isPuppet ? this.puppetTargetPos : this.target.GetTargetPoint(), this._transform.position);
+      float num1 = Mathf.Abs(Vector3.Angle(this._transform.forward, vector3));
+      if ((double) num1 > (double) this.ignoreAngle)
+      {
+        float num2 = this.angularVelocity * Time.deltaTime / num1;
+        if ((double) num2 > 1.0)
+          num2 = 1f;
+        this._transform.rotation = Quaternion.Lerp(this._transform.rotation, Quaternion.LookRotation(vector3), num2);
+        this.direction = Quaternion.op_Multiply(this._transform.rotation, Vector3.forward);
+        flag = true;
+      }
+    }
+    if (!flag)
+      return;
+    this._rigidbody.velocity = Vector3.op_Multiply(this.direction, this.speed1);
+  }
 
-	protected bool isEndAccel;
+  private bool _CalcSpeed()
+  {
+    if (this.isEndAccel || (double) this.timeCount < (double) this.accelStartTime)
+      return false;
+    this.speed1 = this.speed0 + this.accel * (this.timeCount - this.accelStartTime);
+    if ((double) this.speed1 > (double) this.maxSpeed)
+    {
+      this.speed1 = this.maxSpeed;
+      this.isEndAccel = true;
+    }
+    return true;
+  }
 
-	protected bool isLookTarget;
-
-	protected Transform target;
-
-	protected Vector3 direction = Vector3.get_forward();
-
-	protected float speed0;
-
-	protected float speed1;
-
-	protected bool isPuppet;
-
-	protected Vector3 puppetTargetPos;
-
-	public void SetTarget(Transform trans)
-	{
-		target = trans;
-	}
-
-	public Transform GetTarget()
-	{
-		return target;
-	}
-
-	public void SetPuppetTargetPos(Vector3 pos)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		puppetTargetPos = pos;
-		isPuppet = true;
-	}
-
-	public override void Initialize(BulletData bullet, SkillInfo.SkillParam skillParam, Vector3 pos, Quaternion rot)
-	{
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-		base.timeCount = 0f;
-		isEndAccel = false;
-		isLookTarget = false;
-		base.bulletSkillInfoParam = skillParam;
-		speed0 = bullet.data.speed;
-		speed1 = bullet.data.speed;
-		accel = bullet.dataArrowSoul.accel;
-		accelStartTime = bullet.dataArrowSoul.accelStartTime;
-		maxSpeed = bullet.dataArrowSoul.maxSpeed;
-		angularVelocity = bullet.dataArrowSoul.angularVelocity;
-		angularStartTime = bullet.dataArrowSoul.angularStartTime;
-		ignoreAngle = bullet.dataArrowSoul.ignoreAngle;
-		base._transform.set_position(pos);
-		int num = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.soulShotDirs.Length;
-		int num2 = Random.Range(0, num - 1);
-		Vector3 val = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.soulShotDirs[num2];
-		direction = rot * val;
-		object transform = (object)base._transform;
-		transform.set_position(transform.get_position() - direction * MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.soulShotDirVec);
-		base._transform.set_rotation(rot);
-		base._rigidbody.set_velocity(direction * speed0);
-	}
-
-	public override void Update()
-	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-		if (!(target == null) || isPuppet)
-		{
-			base.timeCount += Time.get_deltaTime();
-			bool flag = _CalcSpeed();
-			_CalcAngle();
-			if (isLookTarget)
-			{
-				Vector3 val = ((!isPuppet) ? target.get_position() : puppetTargetPos) - base._transform.get_position();
-				float num = Mathf.Abs(Vector3.Angle(base._transform.get_forward(), val));
-				if (num > ignoreAngle)
-				{
-					float num2 = angularVelocity * Time.get_deltaTime() / num;
-					if (num2 > 1f)
-					{
-						num2 = 1f;
-					}
-					base._transform.set_rotation(Quaternion.Lerp(base._transform.get_rotation(), Quaternion.LookRotation(val), num2));
-					direction = base._transform.get_rotation() * Vector3.get_forward();
-					flag = true;
-				}
-			}
-			if (flag)
-			{
-				base._rigidbody.set_velocity(direction * speed1);
-			}
-		}
-	}
-
-	private bool _CalcSpeed()
-	{
-		if (isEndAccel || base.timeCount < accelStartTime)
-		{
-			return false;
-		}
-		speed1 = speed0 + accel * (base.timeCount - accelStartTime);
-		if (speed1 > maxSpeed)
-		{
-			speed1 = maxSpeed;
-			isEndAccel = true;
-		}
-		return true;
-	}
-
-	private void _CalcAngle()
-	{
-		if (!isLookTarget && !(base.timeCount < angularStartTime))
-		{
-			isLookTarget = true;
-		}
-	}
+  private void _CalcAngle()
+  {
+    if (this.isLookTarget || (double) this.timeCount < (double) this.angularStartTime)
+      return;
+    this.isLookTarget = true;
+  }
 }

@@ -1,17 +1,21 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: GuildSmithMaterialDetail
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class GuildSmithMaterialDetail : ItemDetailTop
 {
-	private int needNum;
+  private int needNum;
 
-	protected override int? GetNeedNum()
-	{
-		return needNum;
-	}
+  protected override int? GetNeedNum() => new int?(this.needNum);
 
-	public override void Initialize()
-	{
-		object[] array = GameSection.GetEventData() as object[];
-		needNum = (int)array[1];
-		GameSection.SetEventData(array[0]);
-		base.Initialize();
-	}
+  public override void Initialize()
+  {
+    object[] eventData = GameSection.GetEventData() as object[];
+    this.needNum = (int) eventData[1];
+    GameSection.SetEventData(eventData[0]);
+    base.Initialize();
+  }
 }

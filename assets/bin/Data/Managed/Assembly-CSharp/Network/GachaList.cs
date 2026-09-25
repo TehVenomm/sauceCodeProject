@@ -1,183 +1,148 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Network.GachaList
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Network
+#nullable disable
+namespace Network;
+
+[Serializable]
+public class GachaList
 {
-	[Serializable]
-	public class GachaList
-	{
-		public class GachaType
-		{
-			public int type;
+  public List<GachaList.GachaType> types = new List<GachaList.GachaType>();
+  public string note = string.Empty;
 
-			public List<GachaGroup> groups = new List<GachaGroup>();
+  public class GachaType
+  {
+    public int type;
+    public List<GachaList.GachaGroup> groups = new List<GachaList.GachaGroup>();
+    public string url;
 
-			public string url;
+    public GACHA_TYPE Type => (GACHA_TYPE) this.type;
 
-			public GACHA_TYPE Type => (GACHA_TYPE)type;
+    public GACHA_TYPE ViewType
+    {
+      get
+      {
+        GACHA_TYPE viewType = (GACHA_TYPE) this.type;
+        if (viewType == GACHA_TYPE.TUTORIAL1)
+          viewType = GACHA_TYPE.QUEST;
+        if (viewType == GACHA_TYPE.TUTORIAL2)
+          viewType = GACHA_TYPE.SKILL;
+        return viewType;
+      }
+    }
+  }
 
-			public GACHA_TYPE ViewType
-			{
-				get
-				{
-					GACHA_TYPE gACHA_TYPE = (GACHA_TYPE)type;
-					if (gACHA_TYPE == GACHA_TYPE.TUTORIAL1)
-					{
-						gACHA_TYPE = GACHA_TYPE.QUEST;
-					}
-					if (gACHA_TYPE == GACHA_TYPE.TUTORIAL2)
-					{
-						gACHA_TYPE = GACHA_TYPE.SKILL;
-					}
-					return gACHA_TYPE;
-				}
-			}
-		}
+  public class GachaGroup
+  {
+    public int group;
+    public int priority;
+    public string note;
+    public string bannerImg;
+    public string url;
+    public List<GachaList.Gacha> gachas = new List<GachaList.Gacha>();
+    public List<GachaGuaranteeCampaignInfo> gachaGuaranteeCampaignInfo = new List<GachaGuaranteeCampaignInfo>();
+    public List<GachaFriendPromotionInfo> friendPromotionInfo = new List<GachaFriendPromotionInfo>();
+    public List<GachaList.GachaLineup> pickupLineups = new List<GachaList.GachaLineup>();
+    public int counter = -1;
+    public string expireAt;
+  }
 
-		public class GachaGroup
-		{
-			public int group;
+  public class Gacha
+  {
+    public int gachaId;
+    public int subGroup;
+    public string productId;
+    public int priority;
+    public string name;
+    public int requiredItemId;
+    public int needItemNum;
+    public int crystalNum;
+    public int num;
+    public float yen;
+    public float yenIncludeTax;
+    public string buttonImg;
+    public string eventTitleImg;
+    public int remainCount = -1;
+    public string seriesStartDate = "";
+    public string endDate = "";
+    public int seriesId = -1;
+    public string description = "";
+    public string detailButtonImg = "";
+    public string link = "";
+    public string campaignDetailImg;
+    public string caption = "";
 
-			public int priority;
+    public bool IsEnd
+    {
+      get
+      {
+        if (string.IsNullOrEmpty(this.endDate))
+          return false;
+        DateTime result;
+        return !DateTime.TryParse(this.endDate, out result) || result < TimeManager.GetNow();
+      }
+    }
 
-			public string note;
+    public bool IsDirectPurchase() => this.productId != "";
 
-			public string bannerImg;
+    public bool IsOncePurchase() => this.subGroup == 0;
 
-			public string url;
+    public void SetCrystalNum(int num) => this.crystalNum = num;
 
-			public List<Gacha> gachas = new List<Gacha>();
+    public string GetTitleImageName() => this.detailButtonImg;
 
-			public List<GachaGuaranteeCampaignInfo> gachaGuaranteeCampaignInfo = new List<GachaGuaranteeCampaignInfo>();
+    public DateTime GetStartDateTime()
+    {
+      return this.seriesStartDate == "" ? new DateTime(0L) : DateTime.Parse(this.seriesStartDate);
+    }
+  }
 
-			public List<GachaFriendPromotionInfo> friendPromotionInfo = new List<GachaFriendPromotionInfo>();
+  public class GachaLineup
+  {
+    public int rewardType;
+    public int itemId;
+    public int orderNo;
+    public GachaList.GachaPickupAnim anim;
+    public List<QuestItem.SellItem> sellItems;
+  }
 
-			public List<GachaLineup> pickupLineups = new List<GachaLineup>();
+  public class GachaPickupAnim
+  {
+    public string pattern = "";
+    public GachaList.GachaPickupAnim.TextStyle name = new GachaList.GachaPickupAnim.TextStyle();
+    public GachaList.GachaPickupAnim.TextStyle description = new GachaList.GachaPickupAnim.TextStyle();
+    public GachaList.GachaPickupAnim.TextStyle sub = new GachaList.GachaPickupAnim.TextStyle();
+    public GachaList.GachaPickupAnim.TextStyle adda = new GachaList.GachaPickupAnim.TextStyle();
+    public GachaList.GachaPickupAnim.TextStyle addb = new GachaList.GachaPickupAnim.TextStyle();
 
-			public int counter = -1;
+    public class TextStyle
+    {
+      public string text;
+      public int size;
+      public int italic;
+      public string color;
+      public string outColor;
 
-			public string expireAt;
-		}
+      public Color toColor()
+      {
+        Color color;
+        ColorUtility.TryParseHtmlString(this.color, ref color);
+        return color;
+      }
 
-		public class Gacha
-		{
-			public int gachaId;
-
-			public int subGroup;
-
-			public string productId;
-
-			public int priority;
-
-			public string name;
-
-			public int requiredItemId;
-
-			public int needItemNum;
-
-			public int crystalNum;
-
-			public int num;
-
-			public int yen;
-
-			public int yenIncludeTax;
-
-			public string buttonImg;
-
-			public string eventTitleImg;
-
-			public int remainCount = -1;
-
-			public string endDate;
-
-			public bool IsEnd
-			{
-				get
-				{
-					if (string.IsNullOrEmpty(endDate))
-					{
-						return false;
-					}
-					if (!DateTime.TryParse(endDate, out DateTime result))
-					{
-						return true;
-					}
-					return result < TimeManager.GetNow();
-				}
-			}
-
-			public bool IsOncePurchase()
-			{
-				return subGroup == 0;
-			}
-
-			public void SetCrystalNum(int num)
-			{
-				crystalNum = num;
-			}
-		}
-
-		public class GachaLineup
-		{
-			public int rewardType;
-
-			public int itemId;
-
-			public int orderNo;
-
-			public GachaPickupAnim anim;
-
-			public List<QuestItem.SellItem> sellItems;
-		}
-
-		public class GachaPickupAnim
-		{
-			public class TextStyle
-			{
-				public string text;
-
-				public int size;
-
-				public int italic;
-
-				public string color;
-
-				public string outColor;
-
-				public Color toColor()
-				{
-					//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-					Color result = default(Color);
-					ColorUtility.TryParseHtmlString(color, ref result);
-					return result;
-				}
-
-				public Color toOutColor()
-				{
-					//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-					Color result = default(Color);
-					ColorUtility.TryParseHtmlString(outColor, ref result);
-					return result;
-				}
-			}
-
-			public string pattern = string.Empty;
-
-			public TextStyle name = new TextStyle();
-
-			public TextStyle description = new TextStyle();
-
-			public TextStyle sub = new TextStyle();
-
-			public TextStyle adda = new TextStyle();
-
-			public TextStyle addb = new TextStyle();
-		}
-
-		public List<GachaType> types = new List<GachaType>();
-
-		public string note = string.Empty;
-	}
+      public Color toOutColor()
+      {
+        Color outColor;
+        ColorUtility.TryParseHtmlString(this.outColor, ref outColor);
+        return outColor;
+      }
+    }
+  }
 }

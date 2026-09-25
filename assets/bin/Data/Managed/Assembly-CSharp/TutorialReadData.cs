@@ -1,167 +1,127 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: TutorialReadData
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class TutorialReadData
 {
-	public class SaveData
-	{
-		public bool read_all;
+  private TutorialReadData.SaveData m_SaveData;
+  private const string SAVE_KEY = "TutorialProgress";
 
-		public List<int> read_ids = new List<int>();
-	}
+  public bool IsCompleteTutorial { get; private set; }
 
-	private const string SAVE_KEY = "TutorialProgress";
+  public TutorialReadData.SaveData Data => this.m_SaveData;
 
-	private SaveData m_SaveData;
+  public void SetReadId(int id, bool hasRead)
+  {
+    if (this.m_SaveData == null || this.m_SaveData.read_ids == null)
+      return;
+    if (hasRead)
+    {
+      if (!this.m_SaveData.read_ids.Contains(id))
+        this.m_SaveData.read_ids.Add(id);
+    }
+    else if (this.m_SaveData.read_ids.Contains(id))
+      this.m_SaveData.read_ids.Remove(id);
+    this.UpdateReadAllFlag();
+  }
 
-	public bool IsCompleteTutorial
-	{
-		get;
-		private set;
-	}
+  public bool HasRead(int id)
+  {
+    return this.m_SaveData != null && this.m_SaveData.read_ids != null && this.m_SaveData.read_ids.Contains(id);
+  }
 
-	public SaveData Data => m_SaveData;
+  public int LastRead()
+  {
+    return this.m_SaveData == null || this.m_SaveData.read_ids == null || this.m_SaveData.read_ids.Count == 0 ? -1 : this.m_SaveData.read_ids[this.m_SaveData.read_ids.Count - 1];
+  }
 
-	public void SetReadId(int id, bool hasRead)
-	{
-		if (m_SaveData != null && m_SaveData.read_ids != null)
-		{
-			if (hasRead)
-			{
-				if (!m_SaveData.read_ids.Contains(id))
-				{
-					m_SaveData.read_ids.Add(id);
-				}
-			}
-			else if (m_SaveData.read_ids.Contains(id))
-			{
-				m_SaveData.read_ids.Remove(id);
-			}
-			UpdateReadAllFlag();
-		}
-	}
+  public bool HasReadAll() => this.m_SaveData != null && this.m_SaveData.read_all;
 
-	public bool HasRead(int id)
-	{
-		if (m_SaveData == null || m_SaveData.read_ids == null)
-		{
-			return false;
-		}
-		return m_SaveData.read_ids.Contains(id);
-	}
+  public void UpdateReadAllFlag()
+  {
+    if (!Singleton<TutorialMessageTable>.IsValid() || this.m_SaveData == null || this.m_SaveData.read_ids == null)
+      return;
+    bool flag = true;
+    int[] tutorialIds = Singleton<TutorialMessageTable>.I.GetTutorialIds();
+    foreach (int num in tutorialIds)
+    {
+      if (!this.m_SaveData.read_ids.Contains(num))
+      {
+        flag = false;
+        break;
+      }
+    }
+    this.m_SaveData.read_all = this.IsCompleteTutorial = flag;
+    if (!flag)
+      return;
+    int num1 = 0;
+    int length = tutorialIds.Length;
+    while (num1 < length)
+      ++num1;
+  }
 
-	public int LastRead()
-	{
-		if (m_SaveData == null || m_SaveData.read_ids == null)
-		{
-			return -1;
-		}
-		if (m_SaveData.read_ids.Count == 0)
-		{
-			return -1;
-		}
-		return m_SaveData.read_ids[m_SaveData.read_ids.Count - 1];
-	}
+  public static void SaveAsEmptyData()
+  {
+    PlayerPrefs.SetString("TutorialProgress", JSONSerializer.Serialize<TutorialReadData.SaveData>(new TutorialReadData.SaveData()));
+  }
 
-	public bool HasReadAll()
-	{
-		if (m_SaveData == null)
-		{
-			return false;
-		}
-		return m_SaveData.read_all;
-	}
+  public void Save()
+  {
+    PlayerPrefs.SetString("TutorialProgress", JSONSerializer.Serialize<TutorialReadData.SaveData>(this.m_SaveData));
+  }
 
-	public void UpdateReadAllFlag()
-	{
-		if (Singleton<TutorialMessageTable>.IsValid() && m_SaveData != null && m_SaveData.read_ids != null)
-		{
-			bool flag = true;
-			int[] tutorialIds = Singleton<TutorialMessageTable>.I.GetTutorialIds();
-			int[] array = tutorialIds;
-			foreach (int item in array)
-			{
-				if (!m_SaveData.read_ids.Contains(item))
-				{
-					flag = false;
-					break;
-				}
-			}
-			SaveData saveData = m_SaveData;
-			bool read_all = IsCompleteTutorial = flag;
-			saveData.read_all = read_all;
-			if (flag)
-			{
-				int j = 0;
-				for (int num = tutorialIds.Length; j < num; j++)
-				{
-				}
-			}
-		}
-	}
+  public static bool HasSave() => PlayerPrefs.HasKey("TutorialProgress");
 
-	public static void SaveAsEmptyData()
-	{
-		string text = JSONSerializer.Serialize(new SaveData());
-		PlayerPrefs.SetString("TutorialProgress", text);
-	}
+  public static void DeleteSave() => PlayerPrefs.DeleteKey("TutorialProgress");
 
-	public void Save()
-	{
-		string text = JSONSerializer.Serialize(m_SaveData);
-		PlayerPrefs.SetString("TutorialProgress", text);
-	}
+  public void LoadSaveData()
+  {
+    TutorialReadData.SaveData saveData;
+    if (TutorialReadData.HasSave())
+    {
+      string message = PlayerPrefs.GetString("TutorialProgress");
+      saveData = JSONSerializer.Deserialize<TutorialReadData.SaveData>(message);
+      if (saveData == null)
+      {
+        Log.Error("JSONSerializer.Deserialize<TutorialReadData.SaveData> {0}", (object) message);
+        return;
+      }
+    }
+    else
+      saveData = new TutorialReadData.SaveData();
+    this.m_SaveData = saveData;
+  }
 
-	public static bool HasSave()
-	{
-		return PlayerPrefs.HasKey("TutorialProgress");
-	}
+  public static TutorialReadData CreateAndLoad()
+  {
+    if (TutorialReadData.HasSave())
+    {
+      string message = PlayerPrefs.GetString("TutorialProgress");
+      if (JSONSerializer.Deserialize<TutorialReadData.SaveData>(message) == null)
+      {
+        Log.Error("JSONSerializer.Deserialize<TutorialReadData.SaveData> {0}", (object) message);
+        return (TutorialReadData) null;
+      }
+    }
+    else
+    {
+      TutorialReadData.SaveData saveData = new TutorialReadData.SaveData();
+    }
+    TutorialReadData andLoad = new TutorialReadData();
+    andLoad.LoadSaveData();
+    andLoad.UpdateReadAllFlag();
+    return andLoad;
+  }
 
-	public static void DeleteSave()
-	{
-		PlayerPrefs.DeleteKey("TutorialProgress");
-	}
-
-	public void LoadSaveData()
-	{
-		SaveData saveData = null;
-		if (HasSave())
-		{
-			string @string = PlayerPrefs.GetString("TutorialProgress");
-			saveData = JSONSerializer.Deserialize<SaveData>(@string);
-			if (saveData == null)
-			{
-				Log.Error("JSONSerializer.Deserialize<TutorialReadData.SaveData> {0}", @string);
-				return;
-			}
-		}
-		else
-		{
-			saveData = new SaveData();
-		}
-		m_SaveData = saveData;
-	}
-
-	public static TutorialReadData CreateAndLoad()
-	{
-		SaveData saveData = null;
-		if (HasSave())
-		{
-			string @string = PlayerPrefs.GetString("TutorialProgress");
-			saveData = JSONSerializer.Deserialize<SaveData>(@string);
-			if (saveData == null)
-			{
-				Log.Error("JSONSerializer.Deserialize<TutorialReadData.SaveData> {0}", @string);
-				return null;
-			}
-		}
-		else
-		{
-			saveData = new SaveData();
-		}
-		TutorialReadData tutorialReadData = new TutorialReadData();
-		tutorialReadData.LoadSaveData();
-		tutorialReadData.UpdateReadAllFlag();
-		return tutorialReadData;
-	}
+  public class SaveData
+  {
+    public bool read_all;
+    public List<int> read_ids = new List<int>();
+  }
 }

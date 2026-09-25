@@ -1,18 +1,17 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: eel.EeL_btl_bg_questboard_02
+// Assembly: Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: BB1BE8DD-31E2-441F-A619-55A0A9A5488F
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp-firstpass.dll
+
+using rhyme;
 using UnityEngine;
 
-namespace eel
-{
-	[AddComponentMenu("EeL/EeL_btl_bg_questboard_02")]
-	public class EeL_btl_bg_questboard_02
-	{
-		public EeL_btl_bg_questboard_02()
-			: this()
-		{
-		}
+#nullable disable
+namespace eel;
 
-		public override string GetName()
-		{
-			return "EeL_btl_bg_questboard_02";
-		}
-	}
+[AddComponentMenu("EeL/EeL_btl_bg_questboard_02")]
+public class EeL_btl_bg_questboard_02 : rymFXBinary
+{
+  public override string GetName() => nameof (EeL_btl_bg_questboard_02);
 }

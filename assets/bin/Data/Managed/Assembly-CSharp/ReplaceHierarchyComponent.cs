@@ -1,37 +1,25 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ReplaceHierarchyComponent
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class ReplaceHierarchyComponent
+#nullable disable
+public class ReplaceHierarchyComponent : MonoBehaviour
 {
-	[Tooltip("階層を入れ替えるオブジェクト")]
-	public GameObject targetObject;
+  [Tooltip("階層を入れ替えるオブジェクト")]
+  public GameObject targetObject;
 
-	public ReplaceHierarchyComponent()
-		: this()
-	{
-	}
-
-	public void Awake()
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		if (!(targetObject == null))
-		{
-			targetObject.get_transform().set_parent(this.get_transform().get_parent());
-			targetObject.get_transform().set_localPosition(this.get_transform().get_localPosition());
-			targetObject.get_transform().set_localScale(this.get_transform().get_localScale());
-			targetObject.get_transform().set_localRotation(this.get_transform().get_localRotation());
-			Object.Destroy(this.get_gameObject());
-		}
-	}
+  public void Awake()
+  {
+    if (Object.op_Equality((Object) this.targetObject, (Object) null))
+      return;
+    this.targetObject.transform.parent = ((Component) this).transform.parent;
+    this.targetObject.transform.localPosition = ((Component) this).transform.localPosition;
+    this.targetObject.transform.localScale = ((Component) this).transform.localScale;
+    this.targetObject.transform.localRotation = ((Component) this).transform.localRotation;
+    Object.Destroy((Object) ((Component) this).gameObject);
+  }
 }

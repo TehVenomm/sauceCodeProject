@@ -1,88 +1,66 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: GrabCommand
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class GrabCommand
+#nullable disable
+public class GrabCommand : MonoBehaviour
 {
-	public const float TEXTURE_REDUCE_RATE_FOR_IPHONE5 = 0.5f;
+  public const float TEXTURE_REDUCE_RATE_FOR_IPHONE5 = 0.5f;
+  public const int DEPTH_BUFFER = 0;
+  private Camera _camera;
+  private CommandBuffer _commandBuffer;
+  private RenderTexture renderTexture;
+  private CameraEvent cameraEvent = (CameraEvent) 11;
+  private List<GameObject> referenceObjects = new List<GameObject>(10);
 
-	public const int DEPTH_BUFFER = 0;
+  public RenderTexture useRenderTexture(GameObject parent)
+  {
+    if (!this.referenceObjects.Contains(parent))
+      this.referenceObjects.Add(parent);
+    return this.renderTexture;
+  }
 
-	private Camera _camera;
+  public void releaseRenderTexture(GameObject parent)
+  {
+    this.referenceObjects.Remove(parent);
+    if (this.referenceObjects.Count != 0)
+      return;
+    Object.Destroy((Object) this);
+  }
 
-	private CommandBuffer _commandBuffer;
+  private void OnDestroy()
+  {
+    if (Object.op_Inequality((Object) this.renderTexture, (Object) null))
+    {
+      RenderTexture.ReleaseTemporary(this.renderTexture);
+      this.renderTexture = (RenderTexture) null;
+    }
+    if (!Object.op_Inequality((Object) this._camera, (Object) null) || this._commandBuffer == null)
+      return;
+    this._camera.RemoveCommandBuffer(this.cameraEvent, this._commandBuffer);
+  }
 
-	private RenderTexture renderTexture;
+  private void CreateTexture()
+  {
+    if (Object.op_Inequality((Object) this.renderTexture, (Object) null))
+      return;
+    this.renderTexture = RenderTexture.GetTemporary(Screen.width, Screen.height);
+  }
 
-	private CameraEvent cameraEvent = 11;
-
-	private List<GameObject> referenceObjects = new List<GameObject>(10);
-
-	public GrabCommand()
-		: this()
-	{
-	}//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-
-
-	public RenderTexture useRenderTexture(GameObject parent)
-	{
-		if (!referenceObjects.Contains(parent))
-		{
-			referenceObjects.Add(parent);
-		}
-		return renderTexture;
-	}
-
-	public void releaseRenderTexture(GameObject parent)
-	{
-		referenceObjects.Remove(parent);
-		if (referenceObjects.Count == 0)
-		{
-			Object.Destroy(this);
-		}
-	}
-
-	private void OnDestroy()
-	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		if (renderTexture != null)
-		{
-			RenderTexture.ReleaseTemporary(renderTexture);
-			renderTexture = null;
-		}
-		if (_camera != null && _commandBuffer != null)
-		{
-			_camera.RemoveCommandBuffer(cameraEvent, _commandBuffer);
-		}
-	}
-
-	private void CreateTexture()
-	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Expected O, but got Unknown
-		if (!(renderTexture != null))
-		{
-			int width = Screen.get_width();
-			int height = Screen.get_height();
-			renderTexture = RenderTexture.GetTemporary(width, height);
-		}
-	}
-
-	public void ApplyCommandBuffer(CameraEvent _cameraEvent)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		cameraEvent = _cameraEvent;
-		_camera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
-		CreateTexture();
-		_commandBuffer = new CommandBuffer();
-		_commandBuffer.set_name("Grab texture");
-		_commandBuffer.Blit(RenderTargetIdentifier.op_Implicit(1), RenderTargetIdentifier.op_Implicit(renderTexture));
-		_camera.AddCommandBuffer(cameraEvent, _commandBuffer);
-	}
+  public void ApplyCommandBuffer(CameraEvent _cameraEvent)
+  {
+    this.cameraEvent = _cameraEvent;
+    this._camera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
+    this.CreateTexture();
+    this._commandBuffer = new CommandBuffer();
+    this._commandBuffer.name = "Grab texture";
+    this._commandBuffer.Blit(RenderTargetIdentifier.op_Implicit((BuiltinRenderTextureType) 1), RenderTargetIdentifier.op_Implicit((Texture) this.renderTexture));
+    this._camera.AddCommandBuffer(this.cameraEvent, this._commandBuffer);
+  }
 }

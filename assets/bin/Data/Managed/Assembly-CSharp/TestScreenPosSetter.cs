@@ -1,54 +1,36 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: TestScreenPosSetter
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class TestScreenPosSetter
+#nullable disable
+public class TestScreenPosSetter : MonoBehaviour
 {
-	public PuniController punicon;
+  public PuniController punicon;
 
-	public TestScreenPosSetter()
-		: this()
-	{
-	}
+  private void Start()
+  {
+  }
 
-	private void Start()
-	{
-	}
+  private void Update()
+  {
+    if (this.IsTouchOn())
+      this.punicon.SetStartPosition(this.GetTouchScreenPos());
+    if (this.IsTouchOff())
+      this.punicon.Reset();
+    if (!this.IsTouch())
+      return;
+    this.punicon.SetEndPosition(this.GetTouchScreenPos());
+  }
 
-	private void Update()
-	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		if (IsTouchOn())
-		{
-			punicon.SetStartPosition(GetTouchScreenPos());
-		}
-		if (IsTouchOff())
-		{
-			punicon.Reset();
-		}
-		if (IsTouch())
-		{
-			punicon.SetEndPosition(GetTouchScreenPos());
-		}
-	}
+  private bool IsTouchOn() => false;
 
-	private bool IsTouchOn()
-	{
-		return false;
-	}
+  private bool IsTouchOff() => false;
 
-	private bool IsTouchOff()
-	{
-		return false;
-	}
+  private bool IsTouch() => false;
 
-	private bool IsTouch()
-	{
-		return false;
-	}
-
-	private Vector3 GetTouchScreenPos()
-	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		return Vector3.get_zero();
-	}
+  private Vector3 GetTouchScreenPos() => Vector3.zero;
 }

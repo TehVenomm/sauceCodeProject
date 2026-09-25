@@ -1,146 +1,101 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: TweenAlpha
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Tween/Tween Alpha")]
 public class TweenAlpha : UITweener
 {
-	[Range(0f, 1f)]
-	public float from = 1f;
+  [Range(0.0f, 1f)]
+  public float from = 1f;
+  [Range(0.0f, 1f)]
+  public float to = 1f;
+  private bool mCached;
+  private UIRect mRect;
+  private Material mMat;
+  private SpriteRenderer mSr;
 
-	[Range(0f, 1f)]
-	public float to = 1f;
+  [Obsolete("Use 'value' instead")]
+  public float alpha
+  {
+    get => this.value;
+    set => this.value = value;
+  }
 
-	private bool mCached;
+  private void Cache()
+  {
+    this.mCached = true;
+    this.mRect = ((Component) this).GetComponent<UIRect>();
+    this.mSr = ((Component) this).GetComponent<SpriteRenderer>();
+    if (!Object.op_Equality((Object) this.mRect, (Object) null) || !Object.op_Equality((Object) this.mSr, (Object) null))
+      return;
+    Renderer component = ((Component) this).GetComponent<Renderer>();
+    if (Object.op_Inequality((Object) component, (Object) null))
+      this.mMat = component.material;
+    if (!Object.op_Equality((Object) this.mMat, (Object) null))
+      return;
+    this.mRect = ((Component) this).GetComponentInChildren<UIRect>();
+  }
 
-	private UIRect mRect;
+  public float value
+  {
+    get
+    {
+      if (!this.mCached)
+        this.Cache();
+      if (Object.op_Inequality((Object) this.mRect, (Object) null))
+        return this.mRect.alpha;
+      if (Object.op_Inequality((Object) this.mSr, (Object) null))
+        return this.mSr.color.a;
+      return !Object.op_Inequality((Object) this.mMat, (Object) null) ? 1f : this.mMat.color.a;
+    }
+    set
+    {
+      if (!this.mCached)
+        this.Cache();
+      if (Object.op_Inequality((Object) this.mRect, (Object) null))
+        this.mRect.alpha = value;
+      else if (Object.op_Inequality((Object) this.mSr, (Object) null))
+      {
+        Color color = this.mSr.color;
+        color.a = value;
+        this.mSr.color = color;
+      }
+      else
+      {
+        if (!Object.op_Inequality((Object) this.mMat, (Object) null))
+          return;
+        Color color = this.mMat.color;
+        color.a = value;
+        this.mMat.color = color;
+      }
+    }
+  }
 
-	private Material mMat;
+  protected override void OnUpdate(float factor, bool isFinished)
+  {
+    this.value = Mathf.Lerp(this.from, this.to, factor);
+  }
 
-	private SpriteRenderer mSr;
+  public static TweenAlpha Begin(GameObject go, float duration, float alpha)
+  {
+    TweenAlpha tweenAlpha = UITweener.Begin<TweenAlpha>(go, duration);
+    tweenAlpha.from = tweenAlpha.value;
+    tweenAlpha.to = alpha;
+    if ((double) duration <= 0.0)
+    {
+      tweenAlpha.Sample(1f, true);
+      ((Behaviour) tweenAlpha).enabled = false;
+    }
+    return tweenAlpha;
+  }
 
-	[Obsolete("Use 'value' instead")]
-	public float alpha
-	{
-		get
-		{
-			return value;
-		}
-		set
-		{
-			this.value = value;
-		}
-	}
+  public override void SetStartToCurrentValue() => this.from = this.value;
 
-	public float value
-	{
-		get
-		{
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			if (!mCached)
-			{
-				Cache();
-			}
-			if (mRect != null)
-			{
-				return mRect.alpha;
-			}
-			if (mSr != null)
-			{
-				Color color = mSr.get_color();
-				return color.a;
-			}
-			float result;
-			if (mMat != null)
-			{
-				Color color2 = mMat.get_color();
-				result = color2.a;
-			}
-			else
-			{
-				result = 1f;
-			}
-			return result;
-		}
-		set
-		{
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			if (!mCached)
-			{
-				Cache();
-			}
-			if (mRect != null)
-			{
-				mRect.alpha = value;
-			}
-			else if (mSr != null)
-			{
-				Color color = mSr.get_color();
-				color.a = value;
-				mSr.set_color(color);
-			}
-			else if (mMat != null)
-			{
-				Color color2 = mMat.get_color();
-				color2.a = value;
-				mMat.set_color(color2);
-			}
-		}
-	}
-
-	private void Cache()
-	{
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Expected O, but got Unknown
-		mCached = true;
-		mRect = this.GetComponent<UIRect>();
-		mSr = this.GetComponent<SpriteRenderer>();
-		if (mRect == null && mSr == null)
-		{
-			Renderer component = this.GetComponent<Renderer>();
-			if (component != null)
-			{
-				mMat = component.get_material();
-			}
-			if (mMat == null)
-			{
-				mRect = this.GetComponentInChildren<UIRect>();
-			}
-		}
-	}
-
-	protected override void OnUpdate(float factor, bool isFinished)
-	{
-		value = Mathf.Lerp(from, to, factor);
-	}
-
-	public static TweenAlpha Begin(GameObject go, float duration, float alpha)
-	{
-		TweenAlpha tweenAlpha = UITweener.Begin<TweenAlpha>(go, duration, true);
-		tweenAlpha.from = tweenAlpha.value;
-		tweenAlpha.to = alpha;
-		if (duration <= 0f)
-		{
-			tweenAlpha.Sample(1f, true);
-			tweenAlpha.set_enabled(false);
-		}
-		return tweenAlpha;
-	}
-
-	public override void SetStartToCurrentValue()
-	{
-		from = value;
-	}
-
-	public override void SetEndToCurrentValue()
-	{
-		to = value;
-	}
+  public override void SetEndToCurrentValue() => this.to = this.value;
 }

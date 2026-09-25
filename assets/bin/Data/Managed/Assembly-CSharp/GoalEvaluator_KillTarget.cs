@@ -1,27 +1,19 @@
-public class GoalEvaluator_KillTarget : GoalEvaluator
+﻿// Decompiled with JetBrains decompiler
+// Type: GoalEvaluator_KillTarget
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
+public class GoalEvaluator_KillTarget(float bias) : GoalEvaluator(bias)
 {
-	public GoalEvaluator_KillTarget(float bias)
-		: base(bias)
-	{
-	}
+  public override float CalcEvaluateValue(Brain brain)
+  {
+    if (!brain.targetCtrl.IsAliveTarget())
+      return 0.0f;
+    StageObject currentTarget = brain.targetCtrl.GetCurrentTarget();
+    return (float) (0.0 + (1.0 - (double) this.EvaluateDistanceWithObject(brain, currentTarget)) * (1.0 - (double) this.EvaluateDangerWithTargetCondition(brain, currentTarget) * (double) this.EvaluateDangerWithTargetPlace(brain, currentTarget))) * this.bias;
+  }
 
-	public override float CalcEvaluateValue(Brain brain)
-	{
-		if (!brain.targetCtrl.IsAliveTarget())
-		{
-			return 0f;
-		}
-		float num = 0f;
-		StageObject currentTarget = brain.targetCtrl.GetCurrentTarget();
-		float num2 = EvaluateDistanceWithObject(brain, currentTarget);
-		float num3 = EvaluateDangerWithTargetCondition(brain, currentTarget);
-		float num4 = EvaluateDangerWithTargetPlace(brain, currentTarget);
-		num += (1f - num2) * (1f - num3 * num4);
-		return num * base.bias;
-	}
-
-	public override void SetGoal(Brain brain, Goal_Think think)
-	{
-		think.AddGoal_KillTarget(brain);
-	}
+  public override void SetGoal(Brain brain, Goal_Think think) => think.AddGoal_KillTarget(brain);
 }

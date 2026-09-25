@@ -1,103 +1,86 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestResultDirector
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections;
 using UnityEngine;
 
-public class QuestResultDirector : AnimationEventProxy.IEvent
+#nullable disable
+public class QuestResultDirector : MonoBehaviour, AnimationEventProxy.IEvent
 {
-	public float[] playerAnimTimings;
+  public float[] playerAnimTimings;
+  public Animation cameraAnim;
+  public Animation cameraAnimTrial;
+  private bool skip;
 
-	public Animation cameraAnim;
+  public PlayerLoader[] players { get; set; }
 
-	private bool skip;
+  public Animation targetAnim { get; private set; }
 
-	public PlayerLoader[] players
-	{
-		get;
-		set;
-	}
+  private void Start()
+  {
+    this.targetAnim = !QuestManager.IsValidTrial() ? this.cameraAnim : this.cameraAnimTrial;
+    ((Component) this.targetAnim).GetComponent<AnimationEventProxy>().listener = (AnimationEventProxy.IEvent) this;
+    int index = 0;
+    for (int length = this.playerAnimTimings.Length; index < length; ++index)
+      this.targetAnim.clip.AddEvent(new AnimationEvent()
+      {
+        functionName = "OnEventInt",
+        intParameter = index,
+        time = this.playerAnimTimings[index]
+      });
+  }
 
-	public QuestResultDirector()
-		: this()
-	{
-	}
+  private void Update()
+  {
+    if (Object.op_Equality((Object) this.targetAnim, (Object) null))
+      return;
+    Transform transform = ((Component) this.targetAnim).transform;
+    MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.position = transform.position;
+    MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.rotation = transform.rotation;
+    float x = transform.localScale.x;
+    if ((double) x <= 0.0)
+      return;
+    MonoBehaviourSingleton<AppMain>.I.mainCamera.fieldOfView = Utility.HorizontalToVerticalFOV(x);
+  }
 
-	void AnimationEventProxy.IEvent.OnEvent()
-	{
-	}
+  void AnimationEventProxy.IEvent.OnEvent()
+  {
+  }
 
-	void AnimationEventProxy.IEvent.OnEventStr(string str)
-	{
-	}
+  void AnimationEventProxy.IEvent.OnEventStr(string str)
+  {
+  }
 
-	void AnimationEventProxy.IEvent.OnEventInt(int i)
-	{
-		if (i < players.Length && players[i] != null)
-		{
-			players[i].animator.Play("win", 0, 0f);
-		}
-	}
+  void AnimationEventProxy.IEvent.OnEventInt(int i)
+  {
+    if (i >= this.players.Length || !Object.op_Inequality((Object) this.players[i], (Object) null))
+      return;
+    this.players[i].animator.Play(this.players[i].GetWinMotionState(), 0, 0.0f);
+  }
 
-	private void Start()
-	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Expected O, but got Unknown
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		cameraAnim.GetComponent<AnimationEventProxy>().listener = this;
-		int i = 0;
-		for (int num = playerAnimTimings.Length; i < num; i++)
-		{
-			AnimationEvent val = new AnimationEvent();
-			val.set_functionName("OnEventInt");
-			val.set_intParameter(i);
-			val.set_time(playerAnimTimings[i]);
-			cameraAnim.get_clip().AddEvent(val);
-		}
-	}
+  public void Skip()
+  {
+    if (this.skip)
+      return;
+    this.skip = true;
+    this.StartCoroutine(this.DoSkip());
+  }
 
-	private void Update()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Expected O, but got Unknown
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = cameraAnim.get_transform();
-		MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_position(val.get_position());
-		MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_rotation(val.get_rotation());
-		Vector3 localScale = val.get_localScale();
-		float x = localScale.x;
-		if (x > 0f)
-		{
-			MonoBehaviourSingleton<AppMain>.I.mainCamera.set_fieldOfView(Utility.HorizontalToVerticalFOV(x));
-		}
-	}
+  private IEnumerator DoSkip()
+  {
+    yield return (object) MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.WHITE);
+    Time.timeScale = 100f;
+  }
 
-	public void Skip()
-	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		if (!skip)
-		{
-			skip = true;
-			this.StartCoroutine(DoSkip());
-		}
-	}
-
-	private IEnumerator DoSkip()
-	{
-		yield return (object)MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.WHITE);
-		Time.set_timeScale(100f);
-	}
-
-	private void OnDestroy()
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		if (skip)
-		{
-			cameraAnim.get_clip().SampleAnimation(cameraAnim.get_gameObject(), cameraAnim.get_clip().get_length());
-			Update();
-			Time.set_timeScale(1f);
-		}
-	}
+  private void OnDestroy()
+  {
+    if (!Object.op_Inequality((Object) this.targetAnim, (Object) null) || !this.skip)
+      return;
+    this.targetAnim.clip.SampleAnimation(((Component) this.targetAnim).gameObject, this.targetAnim.clip.length);
+    this.Update();
+    Time.timeScale = 1f;
+  }
 }

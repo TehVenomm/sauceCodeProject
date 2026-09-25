@@ -1,94 +1,68 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: XorInt
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Threading;
 
+#nullable disable
 public class XorInt
 {
-	private const int gens = 5;
+  private int key;
+  private const int gens = 5;
+  private static Random[] s_rnds = new Random[5]
+  {
+    new Random(),
+    new Random(),
+    new Random(),
+    new Random(),
+    new Random()
+  };
+  private static int cnt = 0;
 
-	private int key;
+  public XorInt()
+    : this(0)
+  {
+  }
 
-	private static Random[] s_rnds = new Random[5]
-	{
-		new Random(),
-		new Random(),
-		new Random(),
-		new Random(),
-		new Random()
-	};
+  public XorInt(int value)
+  {
+    this.GenerateKey();
+    this.rawValue = this.Xor(value);
+  }
 
-	private static int cnt = 0;
+  private void GenerateKey()
+  {
+    Interlocked.Increment(ref XorInt.cnt);
+    Random rnd = XorInt.s_rnds[XorInt.cnt % 5];
+    lock (rnd)
+      this.key = rnd.Next();
+  }
 
-	public int rawValue
-	{
-		get;
-		private set;
-	}
+  public int rawValue { get; private set; }
 
-	public int value
-	{
-		get
-		{
-			return Xor(rawValue);
-		}
-		set
-		{
-			rawValue = Xor(value);
-		}
-	}
+  public int value
+  {
+    get => this.Xor(this.rawValue);
+    set => this.rawValue = this.Xor(value);
+  }
 
-	public XorInt()
-		: this(0)
-	{
-	}
+  private int Xor(int x) => x ^ this.key;
 
-	public XorInt(int value)
-	{
-		GenerateKey();
-		rawValue = Xor(value);
-	}
+  public static implicit operator int(XorInt xor) => xor == null ? 0 : xor.value;
 
-	private void GenerateKey()
-	{
-		Interlocked.Increment(ref cnt);
-		Random random = s_rnds[cnt % 5];
-		lock (random)
-		{
-			key = random.Next();
-		}
-	}
+  public static implicit operator XorInt(int val) => new XorInt(val);
 
-	private int Xor(int x)
-	{
-		return x ^ key;
-	}
+  public override string ToString() => this.value.ToString();
 
-	public override string ToString()
-	{
-		return value.ToString();
-	}
+  public string ToString(string format) => this.value.ToString(format);
 
-	public string ToString(string format)
-	{
-		return value.ToString(format);
-	}
+  public string ToString(IFormatProvider provider) => this.value.ToString(provider);
 
-	public string ToString(IFormatProvider provider)
-	{
-		return value.ToString(provider);
-	}
-
-	public string ToString(string format, IFormatProvider provider)
-	{
-		return value.ToString(format, provider);
-	}
-
-	public static implicit operator int(XorInt xor)
-	{
-		return xor?.value ?? 0;
-	}
-
-	public static implicit operator XorInt(int val)
-	{
-		return new XorInt(val);
-	}
+  public string ToString(string format, IFormatProvider provider)
+  {
+    return this.value.ToString(format, provider);
+  }
 }

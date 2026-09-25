@@ -1,20 +1,18 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Coop_Model_EnemyOut
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class Coop_Model_EnemyOut : Coop_Model_Base
 {
-	public int sid;
+  public int sid;
+  public int x;
+  public int z;
+  public bool isEscape;
 
-	public int x;
+  public Coop_Model_EnemyOut() => this.packetType = PACKET_TYPE.ENEMY_OUT;
 
-	public int z;
-
-	public bool isEscape;
-
-	public Coop_Model_EnemyOut()
-	{
-		base.packetType = PACKET_TYPE.ENEMY_OUT;
-	}
-
-	public override string ToString()
-	{
-		return base.ToString() + ",sid=" + sid;
-	}
+  public override string ToString() => $"{base.ToString()},sid={(object) this.sid}";
 }

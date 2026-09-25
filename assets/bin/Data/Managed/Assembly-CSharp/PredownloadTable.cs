@@ -1,34 +1,33 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: PredownloadTable
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class PredownloadTable
+#nullable disable
+public class PredownloadTable : ScriptableObject
 {
-	[Serializable]
-	public class Data
-	{
-		public string categoryName;
+  public List<PredownloadTable.Data> tutorialDatas;
+  public List<PredownloadTable.Data> preloadDatas;
+  public List<PredownloadTable.Data> autoDatas;
+  public List<PredownloadTable.Data> inGameDatas;
+  public List<PredownloadTable.Data> manualDatas;
 
-		public List<Package> packages;
-	}
+  [Serializable]
+  public class Data
+  {
+    public string categoryName;
+    public List<PredownloadTable.Package> packages;
+  }
 
-	[Serializable]
-	public class Package
-	{
-		public string packageName;
-
-		public List<string> resourceNames;
-	}
-
-	public List<Data> tutorialDatas;
-
-	public List<Data> preloadDatas;
-
-	public List<Data> autoDatas;
-
-	public List<Data> manualDatas;
-
-	public PredownloadTable()
-		: this()
-	{
-	}
+  [Serializable]
+  public class Package
+  {
+    public string packageName;
+    public List<string> resourceNames;
+  }
 }

@@ -1,3 +1,9 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: NativeGameService
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using Network;
@@ -6,218 +12,168 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
 
+#nullable disable
 public class NativeGameService : MonoBehaviourSingleton<NativeGameService>
 {
-	private const string FLAG_AUTO_LOGIN_KEY = "signin_game_service_auto";
+  private const string FLAG_AUTO_LOGIN_KEY = "signin_game_service_auto";
+  private const string FLAG_OLD_USER_LOGIN_KEY = "old_user_login_gg";
+  private bool isRunLogin;
+  private bool isFirstRun;
+  private bool isFixed;
 
-	private const string FLAG_OLD_USER_LOGIN_KEY = "old_user_login_gg";
+  protected override void Awake()
+  {
+    switch (CryptoPrefs.GetInt("signin_game_service_auto"))
+    {
+      case -1:
+        return;
+      case 0:
+        this.isFirstRun = true;
+        break;
+      default:
+        this.isFirstRun = false;
+        break;
+    }
+    this.InitData();
+  }
 
-	private bool isRunLogin;
+  private void InitData()
+  {
+    Singleton<AchievementIdTable>.Create();
+    Singleton<AchievementIdTable>.I.CreateTable();
+  }
 
-	private bool isFirstRun;
+  public void SetOldUserLogin()
+  {
+    PlayerPrefs.SetInt("old_user_login_gg", 1);
+    PlayerPrefs.Save();
+  }
 
-	private bool isFixed;
+  private bool isOldPlayerLogin() => PlayerPrefs.GetInt("old_user_login_gg", 0) == 1;
 
-	private new void Awake()
-	{
-		switch (CryptoPrefs.GetInt("signin_game_service_auto", 0))
-		{
-		case -1:
-			return;
-		case 0:
-			isFirstRun = true;
-			break;
-		default:
-			isFirstRun = false;
-			break;
-		}
-		InitData();
-	}
+  public void FixAchievement()
+  {
+    if (!this.isConnected() || this.isFixed)
+      return;
+    this.isFixed = true;
+    List<TaskInfo> taskInos = MonoBehaviourSingleton<AchievementManager>.I.GetTaskInfos();
+    int listCount = taskInos.Count;
+    Singleton<AchievementIdTable>.I.ForEach((Action<AchievementIdTable.AchievementIdData>) (data =>
+    {
+      for (int index = 0; index < listCount; ++index)
+      {
+        if (taskInos[index].taskId == data.taskId)
+        {
+          if (taskInos[index].progress <= 0)
+            break;
+          double num = (double) taskInos[index].progress * 100.0 / (double) data.goalNum;
+          Social.ReportProgress(data.key, num, (Action<bool>) (success => { }));
+          break;
+        }
+      }
+    }));
+  }
 
-	private void InitData()
-	{
-		Singleton<AchievementIdTable>.Create();
-		Singleton<AchievementIdTable>.I.CreateTable(null);
-	}
+  public void SignIn()
+  {
+    if (this.isConnected())
+      return;
+    if (this.isOldPlayerLogin())
+    {
+      this.Login();
+    }
+    else
+    {
+      if (this.isFirstRun)
+        return;
+      this.Login();
+    }
+  }
 
-	public void SetOldUserLogin()
-	{
-		PlayerPrefs.SetInt("old_user_login_gg", 1);
-		PlayerPrefs.Save();
-	}
+  public void SignInFirstTime()
+  {
+    if (this.isConnected() || !this.isFirstRun)
+      return;
+    CryptoPrefs.SetInt("signin_game_service_auto", 2);
+    this.Login();
+  }
 
-	private bool isOldPlayerLogin()
-	{
-		return PlayerPrefs.GetInt("old_user_login_gg", 0) == 1;
-	}
+  private void Login()
+  {
+    if (CryptoPrefs.GetInt("signin_game_service_auto") == -1 || this.isRunLogin)
+      return;
+    this.isRunLogin = true;
+    PlayGamesPlatform.Activate();
+    Social.localUser.Authenticate((Action<bool>) (success =>
+    {
+      if (success)
+        CryptoPrefs.SetInt("signin_game_service_auto", 1);
+      else
+        ((PlayGamesLocalUser) Social.localUser).GetStats((Action<CommonStatusCodes, PlayerStats>) ((rc, stats) =>
+        {
+          if (rc == CommonStatusCodes.SignInRequired || rc == CommonStatusCodes.ServiceDisabled)
+          {
+            if (CryptoPrefs.GetInt("signin_game_service_auto") == 1)
+              return;
+            CryptoPrefs.SetInt("signin_game_service_auto", -1);
+          }
+          else
+            CryptoPrefs.SetInt("signin_game_service_auto", 2);
+        }));
+    }));
+  }
 
-	public void FixAchievement()
-	{
-		if (isConnected() && !isFixed)
-		{
-			isFixed = true;
-			List<TaskInfo> taskInos = MonoBehaviourSingleton<AchievementManager>.I.GetTaskInfos();
-			int listCount = taskInos.Count;
-			Singleton<AchievementIdTable>.I.ForEach(delegate(AchievementIdTable.AchievementIdData data)
-			{
-				int num = 0;
-				while (true)
-				{
-					if (num >= listCount)
-					{
-						return;
-					}
-					if (taskInos[num].taskId == data.taskId)
-					{
-						break;
-					}
-					num++;
-				}
-				if (taskInos[num].progress > 0)
-				{
-					double num2 = (double)taskInos[num].progress * 100.0 / (double)data.goalNum;
-					Social.ReportProgress(data.key, num2, (Action<bool>)delegate
-					{
-					});
-				}
-			});
-		}
-	}
+  private bool isConnected() => Social.localUser.authenticated;
 
-	public void SignIn()
-	{
-		if (!isConnected())
-		{
-			if (isOldPlayerLogin())
-			{
-				Login();
-			}
-			else if (!isFirstRun)
-			{
-				Login();
-			}
-		}
-	}
+  public void SetAchievementStep(int taskID, int currentStep, int oldStep)
+  {
+    if (!this.isConnected())
+      return;
+    AchievementIdTable.AchievementIdData byTask = Singleton<AchievementIdTable>.I.GetByTask(taskID);
+    if (byTask == null)
+      return;
+    int goalNum = byTask.goalNum;
+    if (currentStep < goalNum)
+    {
+      double num = (double) currentStep * 100.0 / (double) goalNum;
+      Social.ReportProgress(byTask.key, num, (Action<bool>) (success => { }));
+    }
+    else
+      Social.ReportProgress(byTask.key, 100.0, (Action<bool>) (success => { }));
+  }
 
-	public void SignInFirstTime()
-	{
-		if (!isConnected() && isFirstRun)
-		{
-			CryptoPrefs.SetInt("signin_game_service_auto", 2);
-			Login();
-		}
-	}
+  public void SHowAchievementUI()
+  {
+    if (!this.isConnected())
+      return;
+    Social.ShowAchievementsUI();
+  }
 
-	private void Login()
-	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		if (CryptoPrefs.GetInt("signin_game_service_auto", 0) != -1 && !isRunLogin)
-		{
-			isRunLogin = true;
-			PlayGamesPlatform.Activate();
-			Social.get_localUser().Authenticate((Action<bool>)delegate(bool success)
-			{
-				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001b: Expected O, but got Unknown
-				if (success)
-				{
-					CryptoPrefs.SetInt("signin_game_service_auto", 1);
-				}
-				else
-				{
-					((PlayGamesLocalUser)Social.get_localUser()).GetStats(delegate(CommonStatusCodes rc, PlayerStats stats)
-					{
-						if (rc == CommonStatusCodes.SignInRequired || rc == CommonStatusCodes.ServiceDisabled)
-						{
-							if (CryptoPrefs.GetInt("signin_game_service_auto", 0) != 1)
-							{
-								CryptoPrefs.SetInt("signin_game_service_auto", -1);
-							}
-						}
-						else
-						{
-							CryptoPrefs.SetInt("signin_game_service_auto", 2);
-						}
-					});
-				}
-			});
-		}
-	}
+  public void GetAllAchievementID()
+  {
+    if (!this.isConnected())
+      return;
+    Social.LoadAchievementDescriptions((Action<IAchievementDescription[]>) (descriptions =>
+    {
+      if (descriptions.Length == 0)
+        return;
+      foreach (IAchievementDescription description in descriptions)
+        ;
+    }));
+  }
 
-	private bool isConnected()
-	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		return Social.get_localUser().get_authenticated();
-	}
+  public void ResetAchievement()
+  {
+  }
 
-	public void SetAchievementStep(int taskID, int currentStep, int oldStep)
-	{
-		if (isConnected())
-		{
-			AchievementIdTable.AchievementIdData byTask = Singleton<AchievementIdTable>.I.GetByTask(taskID);
-			if (byTask != null)
-			{
-				int goalNum = byTask.goalNum;
-				if (currentStep < goalNum)
-				{
-					double num = (double)currentStep * 100.0 / (double)goalNum;
-					Social.ReportProgress(byTask.key, num, (Action<bool>)delegate
-					{
-					});
-				}
-				else
-				{
-					Social.ReportProgress(byTask.key, 100.0, (Action<bool>)delegate
-					{
-					});
-				}
-			}
-		}
-	}
-
-	public void SHowAchievementUI()
-	{
-		if (isConnected())
-		{
-			Social.ShowAchievementsUI();
-		}
-	}
-
-	public void GetAllAchievementID()
-	{
-		if (isConnected())
-		{
-			Social.LoadAchievementDescriptions((Action<IAchievementDescription[]>)delegate(IAchievementDescription[] descriptions)
-			{
-				if (descriptions.Length > 0)
-				{
-					foreach (IAchievementDescription val in descriptions)
-					{
-					}
-				}
-			});
-		}
-	}
-
-	public void ResetAchievement()
-	{
-	}
-
-	public void UnlockAchievement(int taskID)
-	{
-		if (isConnected())
-		{
-			AchievementIdTable.AchievementIdData byTask = Singleton<AchievementIdTable>.I.GetByTask(taskID);
-			if (byTask != null)
-			{
-				Social.ReportProgress(byTask.key, 100.0, (Action<bool>)delegate(bool success)
-				{
-					if (!success)
-					{
-						return;
-					}
-				});
-			}
-		}
-	}
+  public void UnlockAchievement(int taskID)
+  {
+    if (!this.isConnected())
+      return;
+    AchievementIdTable.AchievementIdData byTask = Singleton<AchievementIdTable>.I.GetByTask(taskID);
+    if (byTask == null)
+      return;
+    int num;
+    Social.ReportProgress(byTask.key, 100.0, (Action<bool>) (success => num = success ? 1 : 0));
+  }
 }

@@ -1,55 +1,36 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UICenterOnClick
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Interaction/Center Scroll View on Click")]
-public class UICenterOnClick
+public class UICenterOnClick : MonoBehaviour
 {
-	public UICenterOnClick()
-		: this()
-	{
-	}
-
-	private void OnClick()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Expected O, but got Unknown
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		UICenterOnChild uICenterOnChild = NGUITools.FindInParents<UICenterOnChild>(this.get_gameObject());
-		UIPanel uIPanel = NGUITools.FindInParents<UIPanel>(this.get_gameObject());
-		if (uICenterOnChild != null)
-		{
-			if (uICenterOnChild.get_enabled())
-			{
-				uICenterOnChild.CenterOn(this.get_transform());
-			}
-		}
-		else if (uIPanel != null && uIPanel.clipping != 0)
-		{
-			UIScrollView component = uIPanel.GetComponent<UIScrollView>();
-			Vector3 pos = -uIPanel.cachedTransform.InverseTransformPoint(this.get_transform().get_position());
-			if (!component.canMoveHorizontally)
-			{
-				Vector3 localPosition = uIPanel.cachedTransform.get_localPosition();
-				pos.x = localPosition.x;
-			}
-			if (!component.canMoveVertically)
-			{
-				Vector3 localPosition2 = uIPanel.cachedTransform.get_localPosition();
-				pos.y = localPosition2.y;
-			}
-			SpringPanel.Begin(uIPanel.cachedGameObject, pos, 6f);
-		}
-	}
+  private void OnClick()
+  {
+    UICenterOnChild inParents1 = NGUITools.FindInParents<UICenterOnChild>(((Component) this).gameObject);
+    UIPanel inParents2 = NGUITools.FindInParents<UIPanel>(((Component) this).gameObject);
+    if (Object.op_Inequality((Object) inParents1, (Object) null))
+    {
+      if (!((Behaviour) inParents1).enabled)
+        return;
+      inParents1.CenterOn(((Component) this).transform);
+    }
+    else
+    {
+      if (!Object.op_Inequality((Object) inParents2, (Object) null) || inParents2.clipping == UIDrawCall.Clipping.None)
+        return;
+      UIScrollView component = ((Component) inParents2).GetComponent<UIScrollView>();
+      Vector3 pos = Vector3.op_UnaryNegation(inParents2.cachedTransform.InverseTransformPoint(((Component) this).transform.position));
+      if (!component.canMoveHorizontally)
+        pos.x = inParents2.cachedTransform.localPosition.x;
+      if (!component.canMoveVertically)
+        pos.y = inParents2.cachedTransform.localPosition.y;
+      SpringPanel.Begin(inParents2.cachedGameObject, pos, 6f);
+    }
+  }
 }

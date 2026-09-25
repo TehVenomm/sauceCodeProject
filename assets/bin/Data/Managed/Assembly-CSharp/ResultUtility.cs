@@ -1,279 +1,315 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ResultUtility
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public static class ResultUtility
 {
-	private class RewardEquipItemSortData : EquipItemSortData
-	{
-		public int rewardNum = -1;
+  public static void DevideRewardDropAndEvent(
+    QuestCompleteReward reward,
+    ref QuestCompleteReward dropReward,
+    ref QuestCompleteReward eventReward,
+    ref List<string> eventRewardTitles)
+  {
+    List<string> stringList = new List<string>();
+    dropReward.exp += reward.exp;
+    int num1 = 0;
+    int num2 = 0;
+    for (int index = 0; index < reward.eventPrice.Count; ++index)
+    {
+      num1 += reward.eventPrice[index].gold;
+      num2 += reward.eventPrice[index].crystal;
+      eventReward.eventPrice.Add(reward.eventPrice[index]);
+      stringList.Add(reward.eventPrice[index].rewardTitle);
+    }
+    dropReward.money += Mathf.Max(0, reward.money - num1);
+    dropReward.crystal += Mathf.Max(0, reward.crystal - num2);
+    for (int index = 0; index < reward.item.Count; ++index)
+    {
+      if (string.IsNullOrEmpty(reward.item[index].rewardTitle))
+      {
+        dropReward.item.Add(reward.item[index]);
+      }
+      else
+      {
+        eventReward.item.Add(reward.item[index]);
+        stringList.Add(reward.item[index].rewardTitle);
+      }
+    }
+    for (int index = 0; index < reward.skillItem.Count; ++index)
+    {
+      if (string.IsNullOrEmpty(reward.skillItem[index].rewardTitle))
+      {
+        dropReward.skillItem.Add(reward.skillItem[index]);
+      }
+      else
+      {
+        eventReward.skillItem.Add(reward.skillItem[index]);
+        stringList.Add(reward.skillItem[index].rewardTitle);
+      }
+    }
+    for (int index = 0; index < reward.equipItem.Count; ++index)
+    {
+      if (string.IsNullOrEmpty(reward.equipItem[index].rewardTitle))
+      {
+        dropReward.equipItem.Add(reward.equipItem[index]);
+      }
+      else
+      {
+        eventReward.equipItem.Add(reward.equipItem[index]);
+        stringList.Add(reward.equipItem[index].rewardTitle);
+      }
+    }
+    for (int index = 0; index < reward.questItem.Count; ++index)
+    {
+      if (string.IsNullOrEmpty(reward.questItem[index].rewardTitle))
+      {
+        dropReward.questItem.Add(reward.questItem[index]);
+      }
+      else
+      {
+        eventReward.questItem.Add(reward.questItem[index]);
+        stringList.Add(reward.questItem[index].rewardTitle);
+      }
+    }
+    for (int index = 0; index < reward.accessoryItem.Count; ++index)
+    {
+      if (string.IsNullOrEmpty(reward.accessoryItem[index].rewardTitle))
+      {
+        dropReward.accessoryItem.Add(reward.accessoryItem[index]);
+      }
+      else
+      {
+        eventReward.accessoryItem.Add(reward.accessoryItem[index]);
+        stringList.Add(reward.accessoryItem[index].rewardTitle);
+      }
+    }
+    if (eventRewardTitles == null)
+      eventRewardTitles = new List<string>();
+    for (int index = 0; index < stringList.Count; ++index)
+    {
+      if (!eventRewardTitles.Contains(stringList[index]))
+        eventRewardTitles.Add(stringList[index]);
+    }
+  }
 
-		public override int GetNum()
-		{
-			return rewardNum;
-		}
-	}
+  public static bool IsRare(SortCompareData icon_base)
+  {
+    return icon_base != null && GameDefine.IsRare(icon_base.GetRarity());
+  }
 
-	private class RewardSkillItemSortData : SkillItemSortData
-	{
-		public int rewardNum = -1;
+  public static bool IsBreakReward(SortCompareData icon_base)
+  {
+    return icon_base != null && icon_base.GetCategory() == REWARD_CATEGORY.BREAK;
+  }
 
-		public override int GetNum()
-		{
-			return rewardNum;
-		}
-	}
+  public static int SetDropData(
+    List<SortCompareData> drop_ary,
+    int start_ary_index,
+    List<QuestCompleteReward.Item> drop_data,
+    REWARD_CATEGORY category = REWARD_CATEGORY.DROP)
+  {
+    int num = start_ary_index;
+    QuestCompleteReward.Item[] ary = drop_data.ToArray();
+    int i = 0;
+    for (int length = ary.Length; i < length; i++)
+    {
+      SortCompareData sortCompareData = (SortCompareData) null;
+      if (num > 0 && category != REWARD_CATEGORY.BREAK)
+        sortCompareData = drop_ary.Find((Predicate<SortCompareData>) (_data => _data != null && (int) _data.GetTableID() == ary[i].itemId && _data is ItemSortData));
+      if (sortCompareData == null)
+      {
+        ItemInfo item = new ItemInfo();
+        item.tableID = (uint) ary[i].itemId;
+        item.tableData = Singleton<ItemTable>.I.GetItemData(item.tableID);
+        item.num = ary[i].num;
+        if (MonoBehaviourSingleton<InventoryManager>.I.IsHaveingItem(item.tableID))
+          MonoBehaviourSingleton<InventoryManager>.I.ForAllItemInventory((Action<ItemInfo>) (inventory_item =>
+          {
+            if ((int) inventory_item.tableID != (int) item.tableID || inventory_item.num != item.num)
+              return;
+            item.uniqueID = inventory_item.uniqueID;
+          }));
+        ItemSortData itemSortData = new ItemSortData();
+        itemSortData.SetItem((object) item);
+        itemSortData.SetCategory(category);
+        drop_ary.Add((SortCompareData) itemSortData);
+        ++num;
+      }
+      else
+        ((sortCompareData as ItemSortData).GetItemData() as ItemInfo).num += ary[i].num;
+    }
+    return num;
+  }
 
-	public static void DevideRewardDropAndEvent(QuestCompleteReward reward, ref QuestCompleteReward dropReward, ref QuestCompleteReward eventReward, ref List<string> eventRewardTitles)
-	{
-		List<string> list = new List<string>();
-		dropReward.exp += reward.exp;
-		int num = 0;
-		int num2 = 0;
-		for (int i = 0; i < reward.eventPrice.Count; i++)
-		{
-			num += reward.eventPrice[i].gold;
-			num2 += reward.eventPrice[i].crystal;
-			eventReward.eventPrice.Add(reward.eventPrice[i]);
-			list.Add(reward.eventPrice[i].rewardTitle);
-		}
-		dropReward.money += Mathf.Max(0, reward.money - num);
-		dropReward.crystal += Mathf.Max(0, reward.crystal - num2);
-		for (int j = 0; j < reward.item.Count; j++)
-		{
-			if (string.IsNullOrEmpty(reward.item[j].rewardTitle))
-			{
-				dropReward.item.Add(reward.item[j]);
-			}
-			else
-			{
-				eventReward.item.Add(reward.item[j]);
-				list.Add(reward.item[j].rewardTitle);
-			}
-		}
-		for (int k = 0; k < reward.skillItem.Count; k++)
-		{
-			if (string.IsNullOrEmpty(reward.skillItem[k].rewardTitle))
-			{
-				dropReward.skillItem.Add(reward.skillItem[k]);
-			}
-			else
-			{
-				eventReward.skillItem.Add(reward.skillItem[k]);
-				list.Add(reward.skillItem[k].rewardTitle);
-			}
-		}
-		for (int l = 0; l < reward.equipItem.Count; l++)
-		{
-			if (string.IsNullOrEmpty(reward.equipItem[l].rewardTitle))
-			{
-				dropReward.equipItem.Add(reward.equipItem[l]);
-			}
-			else
-			{
-				eventReward.equipItem.Add(reward.equipItem[l]);
-				list.Add(reward.equipItem[l].rewardTitle);
-			}
-		}
-		for (int m = 0; m < reward.questItem.Count; m++)
-		{
-			if (string.IsNullOrEmpty(reward.questItem[m].rewardTitle))
-			{
-				dropReward.questItem.Add(reward.questItem[m]);
-			}
-			else
-			{
-				eventReward.questItem.Add(reward.questItem[m]);
-				list.Add(reward.questItem[m].rewardTitle);
-			}
-		}
-		if (eventRewardTitles == null)
-		{
-			eventRewardTitles = new List<string>();
-		}
-		for (int n = 0; n < list.Count; n++)
-		{
-			if (!eventRewardTitles.Contains(list[n]))
-			{
-				eventRewardTitles.Add(list[n]);
-			}
-		}
-	}
+  public static int SetDropData(
+    List<SortCompareData> drop_ary,
+    int start_ary_index,
+    List<QuestCompleteReward.EquipItem> drop_data,
+    REWARD_CATEGORY category = REWARD_CATEGORY.DROP)
+  {
+    int num = start_ary_index;
+    QuestCompleteReward.EquipItem[] ary = drop_data.ToArray();
+    int i = 0;
+    for (int length = ary.Length; i < length; i++)
+    {
+      SortCompareData sortCompareData = (SortCompareData) null;
+      if (num > 0 && category != REWARD_CATEGORY.BREAK)
+        sortCompareData = drop_ary.Find((Predicate<SortCompareData>) (_data => _data != null && (int) _data.GetTableID() == ary[i].equipItemId && _data is ResultUtility.RewardEquipItemSortData));
+      if (sortCompareData == null)
+      {
+        EquipItemInfo equipItemInfo = new EquipItemInfo(new EquipItem()
+        {
+          uniqId = "0",
+          equipItemId = ary[i].equipItemId,
+          level = (XorInt) ary[i].lv,
+          exceed = 0,
+          is_locked = 0,
+          price = 0
+        });
+        ResultUtility.RewardEquipItemSortData equipItemSortData = new ResultUtility.RewardEquipItemSortData();
+        equipItemSortData.SetItem((object) equipItemInfo);
+        equipItemSortData.SetCategory(category);
+        equipItemSortData.rewardNum = ary[i].num;
+        drop_ary.Add((SortCompareData) equipItemSortData);
+        ++num;
+      }
+      else
+        (sortCompareData as ResultUtility.RewardEquipItemSortData).rewardNum += ary[i].num;
+    }
+    return num;
+  }
 
-	public static bool IsRare(SortCompareData icon_base)
-	{
-		if (icon_base != null)
-		{
-			return GameDefine.IsRare(icon_base.GetRarity());
-		}
-		return false;
-	}
+  public static int SetDropData(
+    List<SortCompareData> drop_ary,
+    int start_ary_index,
+    List<QuestCompleteReward.SkillItem> drop_data,
+    REWARD_CATEGORY category = REWARD_CATEGORY.DROP)
+  {
+    int num = start_ary_index;
+    QuestCompleteReward.SkillItem[] ary = drop_data.ToArray();
+    int i = 0;
+    for (int length = ary.Length; i < length; i++)
+    {
+      SortCompareData sortCompareData = (SortCompareData) null;
+      if (num > 0 && category != REWARD_CATEGORY.BREAK)
+        sortCompareData = drop_ary.Find((Predicate<SortCompareData>) (_data => _data != null && (int) _data.GetTableID() == ary[i].skillItemId && _data is ResultUtility.RewardSkillItemSortData));
+      if (sortCompareData == null)
+      {
+        SkillItemInfo skillItemInfo = new SkillItemInfo();
+        skillItemInfo.tableID = (uint) ary[i].skillItemId;
+        skillItemInfo.tableData = Singleton<SkillItemTable>.I.GetSkillItemData((uint) ary[i].skillItemId);
+        ResultUtility.RewardSkillItemSortData skillItemSortData = new ResultUtility.RewardSkillItemSortData();
+        skillItemSortData.SetItem((object) skillItemInfo);
+        skillItemSortData.SetCategory(category);
+        skillItemSortData.rewardNum = ary[i].num;
+        drop_ary.Add((SortCompareData) skillItemSortData);
+        ++num;
+      }
+      else
+        (sortCompareData as ResultUtility.RewardSkillItemSortData).rewardNum += ary[i].num;
+    }
+    return num;
+  }
 
-	public static bool IsBreakReward(SortCompareData icon_base)
-	{
-		if (icon_base != null)
-		{
-			return icon_base.GetCategory() == REWARD_CATEGORY.BREAK;
-		}
-		return false;
-	}
+  public static int SetDropData(
+    List<SortCompareData> drop_ary,
+    int start_ary_index,
+    List<QuestCompleteReward.QuestItem> drop_data,
+    REWARD_CATEGORY category = REWARD_CATEGORY.DROP)
+  {
+    int num = start_ary_index;
+    QuestCompleteReward.QuestItem[] ary = drop_data.ToArray();
+    int i = 0;
+    for (int length = ary.Length; i < length; i++)
+    {
+      SortCompareData sortCompareData = (SortCompareData) null;
+      if (num > 0 && category != REWARD_CATEGORY.BREAK)
+        sortCompareData = drop_ary.Find((Predicate<SortCompareData>) (_data => _data != null && (int) _data.GetTableID() == ary[i].questId && _data is QuestSortData));
+      if (sortCompareData == null)
+      {
+        QuestItemInfo item = new QuestItemInfo();
+        item.tableID = (uint) ary[i].questId;
+        QuestData quest_list = new QuestData();
+        item.infoData = new QuestInfoData(Singleton<QuestTable>.I.GetQuestData(item.tableID), quest_list, (int[]) null);
+        item.infoData.questData.num = ary[i].num;
+        if (MonoBehaviourSingleton<InventoryManager>.I.IsHaveingItem(item.tableID))
+          MonoBehaviourSingleton<InventoryManager>.I.ForAllItemInventory((Action<ItemInfo>) (inventory_item =>
+          {
+            if ((int) inventory_item.tableID != (int) item.tableID || inventory_item.num != item.infoData.questData.num)
+              return;
+            item.uniqueID = inventory_item.uniqueID;
+          }));
+        QuestSortData questSortData = new QuestSortData();
+        questSortData.SetItem((object) item);
+        questSortData.SetCategory(category);
+        drop_ary.Add((SortCompareData) questSortData);
+        ++num;
+      }
+      else
+        (sortCompareData as QuestSortData).itemData.infoData.questData.num += ary[i].num;
+    }
+    return num;
+  }
 
-	public static int SetDropData(List<SortCompareData> drop_ary, int start_ary_index, List<QuestCompleteReward.Item> drop_data, REWARD_CATEGORY category = REWARD_CATEGORY.DROP)
-	{
-		int num = start_ary_index;
-		QuestCompleteReward.Item[] ary = drop_data.ToArray();
-		int i = 0;
-		for (int num2 = ary.Length; i < num2; i++)
-		{
-			SortCompareData sortCompareData = null;
-			if (num > 0 && category != REWARD_CATEGORY.BREAK)
-			{
-				sortCompareData = drop_ary.Find((SortCompareData _data) => _data != null && _data.GetTableID() == (uint)ary[i].itemId && _data is ItemSortData);
-			}
-			if (sortCompareData == null)
-			{
-				ItemInfo item = new ItemInfo();
-				item.tableID = (uint)ary[i].itemId;
-				item.tableData = Singleton<ItemTable>.I.GetItemData(item.tableID);
-				item.num = ary[i].num;
-				if (MonoBehaviourSingleton<InventoryManager>.I.IsHaveingItem(item.tableID))
-				{
-					MonoBehaviourSingleton<InventoryManager>.I.ForAllItemInventory(delegate(ItemInfo inventory_item)
-					{
-						if (inventory_item.tableID == item.tableID && inventory_item.num == item.num)
-						{
-							item.uniqueID = inventory_item.uniqueID;
-						}
-					});
-				}
-				ItemSortData itemSortData = new ItemSortData();
-				itemSortData.SetItem(item);
-				itemSortData.SetCategory(category);
-				drop_ary.Add(itemSortData);
-				num++;
-			}
-			else
-			{
-				ItemSortData itemSortData2 = sortCompareData as ItemSortData;
-				ItemInfo itemInfo = itemSortData2.GetItemData() as ItemInfo;
-				itemInfo.num += ary[i].num;
-			}
-		}
-		return num;
-	}
+  public static int SetDropData(
+    List<SortCompareData> drop_ary,
+    int start_ary_index,
+    List<QuestCompleteReward.AccessoryItem> drop_data,
+    REWARD_CATEGORY category = REWARD_CATEGORY.DROP)
+  {
+    int num = start_ary_index;
+    QuestCompleteReward.AccessoryItem[] ary = drop_data.ToArray();
+    int i = 0;
+    for (int length = ary.Length; i < length; i++)
+    {
+      SortCompareData sortCompareData = (SortCompareData) null;
+      if (num > 0 && category != REWARD_CATEGORY.BREAK)
+        sortCompareData = drop_ary.Find((Predicate<SortCompareData>) (_data => _data != null && (int) _data.GetTableID() == ary[i].accessoryId && _data is ResultUtility.RewardAccessoryItemSortData));
+      if (sortCompareData == null)
+      {
+        AccessoryInfo accessoryInfo = new AccessoryInfo();
+        accessoryInfo.tableID = (uint) ary[i].accessoryId;
+        accessoryInfo.tableData = Singleton<AccessoryTable>.I.GetData(accessoryInfo.tableID);
+        accessoryInfo.tableInfos = Singleton<AccessoryTable>.I.GetInfoList(accessoryInfo.tableID);
+        ResultUtility.RewardAccessoryItemSortData accessoryItemSortData = new ResultUtility.RewardAccessoryItemSortData();
+        accessoryItemSortData.SetItem((object) accessoryInfo);
+        accessoryItemSortData.SetCategory(category);
+        accessoryItemSortData.rewardNum = ary[i].num;
+        drop_ary.Add((SortCompareData) accessoryItemSortData);
+        ++num;
+      }
+      else
+        (sortCompareData as ResultUtility.RewardAccessoryItemSortData).rewardNum += ary[i].num;
+    }
+    return num;
+  }
 
-	public static int SetDropData(List<SortCompareData> drop_ary, int start_ary_index, List<QuestCompleteReward.EquipItem> drop_data, REWARD_CATEGORY category = REWARD_CATEGORY.DROP)
-	{
-		int num = start_ary_index;
-		QuestCompleteReward.EquipItem[] ary = drop_data.ToArray();
-		int i = 0;
-		for (int num2 = ary.Length; i < num2; i++)
-		{
-			SortCompareData sortCompareData = null;
-			if (num > 0 && category != REWARD_CATEGORY.BREAK)
-			{
-				sortCompareData = drop_ary.Find((SortCompareData _data) => _data != null && _data.GetTableID() == (uint)ary[i].equipItemId && _data is RewardEquipItemSortData);
-			}
-			if (sortCompareData == null)
-			{
-				EquipItem equipItem = new EquipItem();
-				equipItem.uniqId = "0";
-				equipItem.equipItemId = ary[i].equipItemId;
-				equipItem.level = ary[i].lv;
-				equipItem.exceed = 0;
-				equipItem.is_locked = 0;
-				equipItem.price = 0;
-				EquipItemInfo item = new EquipItemInfo(equipItem);
-				RewardEquipItemSortData rewardEquipItemSortData = new RewardEquipItemSortData();
-				rewardEquipItemSortData.SetItem(item);
-				rewardEquipItemSortData.SetCategory(category);
-				rewardEquipItemSortData.rewardNum = ary[i].num;
-				drop_ary.Add(rewardEquipItemSortData);
-				num++;
-			}
-			else
-			{
-				RewardEquipItemSortData rewardEquipItemSortData2 = sortCompareData as RewardEquipItemSortData;
-				rewardEquipItemSortData2.rewardNum += ary[i].num;
-			}
-		}
-		return num;
-	}
+  private class RewardEquipItemSortData : EquipItemSortData
+  {
+    public int rewardNum = -1;
 
-	public static int SetDropData(List<SortCompareData> drop_ary, int start_ary_index, List<QuestCompleteReward.SkillItem> drop_data, REWARD_CATEGORY category = REWARD_CATEGORY.DROP)
-	{
-		int num = start_ary_index;
-		QuestCompleteReward.SkillItem[] ary = drop_data.ToArray();
-		int i = 0;
-		for (int num2 = ary.Length; i < num2; i++)
-		{
-			SortCompareData sortCompareData = null;
-			if (num > 0 && category != REWARD_CATEGORY.BREAK)
-			{
-				sortCompareData = drop_ary.Find((SortCompareData _data) => _data != null && _data.GetTableID() == (uint)ary[i].skillItemId && _data is RewardSkillItemSortData);
-			}
-			if (sortCompareData == null)
-			{
-				SkillItemInfo skillItemInfo = new SkillItemInfo();
-				skillItemInfo.tableID = (uint)ary[i].skillItemId;
-				skillItemInfo.tableData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)ary[i].skillItemId);
-				RewardSkillItemSortData rewardSkillItemSortData = new RewardSkillItemSortData();
-				rewardSkillItemSortData.SetItem(skillItemInfo);
-				rewardSkillItemSortData.SetCategory(category);
-				rewardSkillItemSortData.rewardNum = ary[i].num;
-				drop_ary.Add(rewardSkillItemSortData);
-				num++;
-			}
-			else
-			{
-				RewardSkillItemSortData rewardSkillItemSortData2 = sortCompareData as RewardSkillItemSortData;
-				rewardSkillItemSortData2.rewardNum += ary[i].num;
-			}
-		}
-		return num;
-	}
+    public override int GetNum() => this.rewardNum;
+  }
 
-	public static int SetDropData(List<SortCompareData> drop_ary, int start_ary_index, List<QuestCompleteReward.QuestItem> drop_data, REWARD_CATEGORY category = REWARD_CATEGORY.DROP)
-	{
-		int num = start_ary_index;
-		QuestCompleteReward.QuestItem[] ary = drop_data.ToArray();
-		int i = 0;
-		for (int num2 = ary.Length; i < num2; i++)
-		{
-			SortCompareData sortCompareData = null;
-			if (num > 0 && category != REWARD_CATEGORY.BREAK)
-			{
-				sortCompareData = drop_ary.Find((SortCompareData _data) => _data != null && _data.GetTableID() == (uint)ary[i].questId && _data is QuestSortData);
-			}
-			if (sortCompareData == null)
-			{
-				QuestItemInfo item = new QuestItemInfo();
-				item.tableID = (uint)ary[i].questId;
-				QuestData quest_list = new QuestData();
-				item.infoData = new QuestInfoData(Singleton<QuestTable>.I.GetQuestData(item.tableID), quest_list, null);
-				item.infoData.questData.num = ary[i].num;
-				if (MonoBehaviourSingleton<InventoryManager>.I.IsHaveingItem(item.tableID))
-				{
-					MonoBehaviourSingleton<InventoryManager>.I.ForAllItemInventory(delegate(ItemInfo inventory_item)
-					{
-						if (inventory_item.tableID == item.tableID && inventory_item.num == item.infoData.questData.num)
-						{
-							item.uniqueID = inventory_item.uniqueID;
-						}
-					});
-				}
-				QuestSortData questSortData = new QuestSortData();
-				questSortData.SetItem(item);
-				questSortData.SetCategory(category);
-				drop_ary.Add(questSortData);
-				num++;
-			}
-			else
-			{
-				QuestSortData questSortData2 = sortCompareData as QuestSortData;
-				questSortData2.itemData.infoData.questData.num += ary[i].num;
-			}
-		}
-		return num;
-	}
+  private class RewardSkillItemSortData : SkillItemSortData
+  {
+    public int rewardNum = -1;
+
+    public override int GetNum() => this.rewardNum;
+  }
+
+  private class RewardAccessoryItemSortData : AccessorySortData
+  {
+    public int rewardNum = -1;
+
+    public override int GetNum() => this.rewardNum;
+  }
 }

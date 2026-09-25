@@ -1,49 +1,35 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: BestHTTP.HTTPUpdateDelegator
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using BestHTTP.Caching;
 using UnityEngine;
 
-namespace BestHTTP
+#nullable disable
+namespace BestHTTP;
+
+internal sealed class HTTPUpdateDelegator : MonoBehaviour
 {
-	internal sealed class HTTPUpdateDelegator
-	{
-		private static HTTPUpdateDelegator instance;
+  private static HTTPUpdateDelegator instance;
 
-		public HTTPUpdateDelegator()
-			: this()
-		{
-		}
+  public static void CheckInstance()
+  {
+    if (Object.op_Implicit((Object) HTTPUpdateDelegator.instance))
+      return;
+    HTTPUpdateDelegator.instance = Object.FindObjectOfType(typeof (HTTPUpdateDelegator)) as HTTPUpdateDelegator;
+    if (Object.op_Implicit((Object) HTTPUpdateDelegator.instance))
+      return;
+    GameObject gameObject = new GameObject("HTTP Update Delegator");
+    ((Object) gameObject).hideFlags = (HideFlags) 3;
+    Object.DontDestroyOnLoad((Object) gameObject);
+    HTTPUpdateDelegator.instance = gameObject.AddComponent<HTTPUpdateDelegator>();
+  }
 
-		public static void CheckInstance()
-		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Expected O, but got Unknown
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Expected O, but got Unknown
-			if (!Object.op_Implicit(instance))
-			{
-				instance = (Object.FindObjectOfType(typeof(HTTPUpdateDelegator)) as HTTPUpdateDelegator);
-				if (!Object.op_Implicit(instance))
-				{
-					GameObject val = new GameObject("HTTP Update Delegator");
-					val.set_hideFlags(3);
-					Object.DontDestroyOnLoad(val);
-					instance = val.AddComponent<HTTPUpdateDelegator>();
-				}
-			}
-		}
+  private void Awake() => HTTPCacheService.SetupCacheFolder();
 
-		private void Awake()
-		{
-			HTTPCacheService.SetupCacheFolder();
-		}
+  private void LateUpdate() => HTTPManager.OnUpdate();
 
-		private void LateUpdate()
-		{
-			HTTPManager.OnUpdate();
-		}
-
-		private void OnApplicationQuit()
-		{
-			HTTPManager.OnQuit();
-		}
-	}
+  private void OnApplicationQuit() => HTTPManager.OnQuit();
 }

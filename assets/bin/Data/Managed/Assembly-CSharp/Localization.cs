@@ -1,545 +1,434 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Localization
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public static class Localization
 {
-	public delegate byte[] LoadFunction(string path);
+  public static Localization.LoadFunction loadFunction;
+  public static Localization.OnLocalizeNotification onLocalize;
+  public static bool localizationHasBeenSet = false;
+  private static string[] mLanguages = (string[]) null;
+  private static Dictionary<string, string> mOldDictionary = new Dictionary<string, string>();
+  private static Dictionary<string, string[]> mDictionary = new Dictionary<string, string[]>();
+  private static Dictionary<string, string> mReplacement = new Dictionary<string, string>();
+  private static int mLanguageIndex = -1;
+  private static string mLanguage;
+  private static bool mMerging = false;
 
-	public delegate void OnLocalizeNotification();
+  public static Dictionary<string, string[]> dictionary
+  {
+    get
+    {
+      if (!Localization.localizationHasBeenSet)
+        Localization.LoadDictionary(PlayerPrefs.GetString("Language", "English"));
+      return Localization.mDictionary;
+    }
+    set
+    {
+      Localization.localizationHasBeenSet = value != null;
+      Localization.mDictionary = value;
+    }
+  }
 
-	public static LoadFunction loadFunction;
+  public static string[] knownLanguages
+  {
+    get
+    {
+      if (!Localization.localizationHasBeenSet)
+        Localization.LoadDictionary(PlayerPrefs.GetString("Language", "English"));
+      return Localization.mLanguages;
+    }
+  }
 
-	public static OnLocalizeNotification onLocalize;
+  public static string language
+  {
+    get
+    {
+      if (string.IsNullOrEmpty(Localization.mLanguage))
+      {
+        Localization.mLanguage = PlayerPrefs.GetString("Language", "English");
+        Localization.LoadAndSelect(Localization.mLanguage);
+      }
+      return Localization.mLanguage;
+    }
+    set
+    {
+      if (!(Localization.mLanguage != value))
+        return;
+      Localization.mLanguage = value;
+      Localization.LoadAndSelect(value);
+    }
+  }
 
-	public static bool localizationHasBeenSet = false;
+  private static bool LoadDictionary(string value)
+  {
+    byte[] bytes = (byte[]) null;
+    if (!Localization.localizationHasBeenSet)
+    {
+      if (Localization.loadFunction == null)
+      {
+        TextAsset textAsset = Resources.Load<TextAsset>(nameof (Localization));
+        if (Object.op_Inequality((Object) textAsset, (Object) null))
+          bytes = textAsset.bytes;
+      }
+      else
+        bytes = Localization.loadFunction(nameof (Localization));
+      Localization.localizationHasBeenSet = true;
+    }
+    if (Localization.LoadCSV(bytes))
+      return true;
+    if (string.IsNullOrEmpty(value))
+      value = Localization.mLanguage;
+    if (string.IsNullOrEmpty(value))
+      return false;
+    if (Localization.loadFunction == null)
+    {
+      TextAsset textAsset = Resources.Load<TextAsset>(value);
+      if (Object.op_Inequality((Object) textAsset, (Object) null))
+        bytes = textAsset.bytes;
+    }
+    else
+      bytes = Localization.loadFunction(value);
+    if (bytes == null)
+      return false;
+    Localization.Set(value, bytes);
+    return true;
+  }
 
-	private static string[] mLanguages = null;
+  private static bool LoadAndSelect(string value)
+  {
+    if (!string.IsNullOrEmpty(value))
+    {
+      if (Localization.mDictionary.Count == 0 && !Localization.LoadDictionary(value))
+        return false;
+      if (Localization.SelectLanguage(value))
+        return true;
+    }
+    if (Localization.mOldDictionary.Count > 0)
+      return true;
+    Localization.mOldDictionary.Clear();
+    Localization.mDictionary.Clear();
+    if (string.IsNullOrEmpty(value))
+      PlayerPrefs.DeleteKey("Language");
+    return false;
+  }
 
-	private static Dictionary<string, string> mOldDictionary = new Dictionary<string, string>();
+  public static void Load(TextAsset asset)
+  {
+    ByteReader byteReader = new ByteReader(asset);
+    Localization.Set(((Object) asset).name, byteReader.ReadDictionary());
+  }
 
-	private static Dictionary<string, string[]> mDictionary = new Dictionary<string, string[]>();
+  public static void Set(string languageName, byte[] bytes)
+  {
+    ByteReader byteReader = new ByteReader(bytes);
+    Localization.Set(languageName, byteReader.ReadDictionary());
+  }
 
-	private static Dictionary<string, string> mReplacement = new Dictionary<string, string>();
+  public static void ReplaceKey(string key, string val)
+  {
+    if (!string.IsNullOrEmpty(val))
+      Localization.mReplacement[key] = val;
+    else
+      Localization.mReplacement.Remove(key);
+  }
 
-	private static int mLanguageIndex = -1;
+  public static void ClearReplacements() => Localization.mReplacement.Clear();
 
-	private static string mLanguage;
+  public static bool LoadCSV(TextAsset asset, bool merge = false)
+  {
+    return Localization.LoadCSV(asset.bytes, asset, merge);
+  }
 
-	private static bool mMerging = false;
+  public static bool LoadCSV(byte[] bytes, bool merge = false)
+  {
+    return Localization.LoadCSV(bytes, (TextAsset) null, merge);
+  }
 
-	public static Dictionary<string, string[]> dictionary
-	{
-		get
-		{
-			if (!localizationHasBeenSet)
-			{
-				LoadDictionary(PlayerPrefs.GetString("Language", "English"));
-			}
-			return mDictionary;
-		}
-		set
-		{
-			localizationHasBeenSet = (value != null);
-			mDictionary = value;
-		}
-	}
+  private static bool HasLanguage(string languageName)
+  {
+    int index = 0;
+    for (int length = Localization.mLanguages.Length; index < length; ++index)
+    {
+      if (Localization.mLanguages[index] == languageName)
+        return true;
+    }
+    return false;
+  }
 
-	public static string[] knownLanguages
-	{
-		get
-		{
-			if (!localizationHasBeenSet)
-			{
-				LoadDictionary(PlayerPrefs.GetString("Language", "English"));
-			}
-			return mLanguages;
-		}
-	}
+  private static bool LoadCSV(byte[] bytes, TextAsset asset, bool merge = false)
+  {
+    if (bytes == null)
+      return false;
+    ByteReader byteReader = new ByteReader(bytes);
+    BetterList<string> betterList = byteReader.ReadCSV();
+    if (betterList.size < 2)
+      return false;
+    betterList.RemoveAt(0);
+    string[] newLanguages = (string[]) null;
+    if (string.IsNullOrEmpty(Localization.mLanguage))
+      Localization.localizationHasBeenSet = false;
+    if (!Localization.localizationHasBeenSet || !merge && !Localization.mMerging || Localization.mLanguages == null || Localization.mLanguages.Length == 0)
+    {
+      Localization.mDictionary.Clear();
+      Localization.mLanguages = new string[betterList.size];
+      if (!Localization.localizationHasBeenSet)
+      {
+        Localization.mLanguage = PlayerPrefs.GetString("Language", betterList[0]);
+        Localization.localizationHasBeenSet = true;
+      }
+      for (int i = 0; i < betterList.size; ++i)
+      {
+        Localization.mLanguages[i] = betterList[i];
+        if (Localization.mLanguages[i] == Localization.mLanguage)
+          Localization.mLanguageIndex = i;
+      }
+    }
+    else
+    {
+      newLanguages = new string[betterList.size];
+      for (int i = 0; i < betterList.size; ++i)
+        newLanguages[i] = betterList[i];
+      for (int i = 0; i < betterList.size; ++i)
+      {
+        if (!Localization.HasLanguage(betterList[i]))
+        {
+          int newSize = Localization.mLanguages.Length + 1;
+          Array.Resize<string>(ref Localization.mLanguages, newSize);
+          Localization.mLanguages[newSize - 1] = betterList[i];
+          Dictionary<string, string[]> dictionary = new Dictionary<string, string[]>();
+          foreach (KeyValuePair<string, string[]> m in Localization.mDictionary)
+          {
+            string[] array = m.Value;
+            Array.Resize<string>(ref array, newSize);
+            array[newSize - 1] = array[0];
+            dictionary.Add(m.Key, array);
+          }
+          Localization.mDictionary = dictionary;
+        }
+      }
+    }
+    Dictionary<string, int> languageIndices = new Dictionary<string, int>();
+    for (int index = 0; index < Localization.mLanguages.Length; ++index)
+      languageIndices.Add(Localization.mLanguages[index], index);
+    while (true)
+    {
+      BetterList<string> newValues;
+      do
+      {
+        newValues = byteReader.ReadCSV();
+        if (newValues == null || newValues.size == 0)
+          goto label_33;
+      }
+      while (string.IsNullOrEmpty(newValues[0]));
+      Localization.AddCSV(newValues, newLanguages, languageIndices);
+    }
+label_33:
+    if (!Localization.mMerging && Localization.onLocalize != null)
+    {
+      Localization.mMerging = true;
+      Localization.OnLocalizeNotification onLocalize = Localization.onLocalize;
+      Localization.onLocalize = (Localization.OnLocalizeNotification) null;
+      onLocalize();
+      Localization.onLocalize = onLocalize;
+      Localization.mMerging = false;
+    }
+    return true;
+  }
 
-	public static string language
-	{
-		get
-		{
-			if (string.IsNullOrEmpty(mLanguage))
-			{
-				mLanguage = PlayerPrefs.GetString("Language", "English");
-				LoadAndSelect(mLanguage);
-			}
-			return mLanguage;
-		}
-		set
-		{
-			if (mLanguage != value)
-			{
-				mLanguage = value;
-				LoadAndSelect(value);
-			}
-		}
-	}
+  private static void AddCSV(
+    BetterList<string> newValues,
+    string[] newLanguages,
+    Dictionary<string, int> languageIndices)
+  {
+    if (newValues.size < 2)
+      return;
+    string newValue = newValues[0];
+    if (string.IsNullOrEmpty(newValue))
+      return;
+    string[] strings = Localization.ExtractStrings(newValues, newLanguages, languageIndices);
+    if (Localization.mDictionary.ContainsKey(newValue))
+    {
+      Localization.mDictionary[newValue] = strings;
+      if (newLanguages != null)
+        return;
+      Debug.LogWarning((object) $"Localization key '{newValue}' is already present");
+    }
+    else
+    {
+      try
+      {
+        Localization.mDictionary.Add(newValue, strings);
+      }
+      catch (Exception ex)
+      {
+        Debug.LogError((object) $"Unable to add '{newValue}' to the Localization dictionary.\n{ex.Message}");
+      }
+    }
+  }
 
-	[Obsolete("Localization is now always active. You no longer need to check this property.")]
-	public static bool isActive
-	{
-		get
-		{
-			return true;
-		}
-	}
+  private static string[] ExtractStrings(
+    BetterList<string> added,
+    string[] newLanguages,
+    Dictionary<string, int> languageIndices)
+  {
+    if (newLanguages == null)
+    {
+      string[] strings = new string[Localization.mLanguages.Length];
+      int i = 1;
+      for (int index = Mathf.Min(added.size, strings.Length + 1); i < index; ++i)
+        strings[i - 1] = added[i];
+      return strings;
+    }
+    string key = added[0];
+    string[] strings1;
+    if (!Localization.mDictionary.TryGetValue(key, out strings1))
+      strings1 = new string[Localization.mLanguages.Length];
+    int index1 = 0;
+    for (int length = newLanguages.Length; index1 < length; ++index1)
+    {
+      string newLanguage = newLanguages[index1];
+      int languageIndex = languageIndices[newLanguage];
+      strings1[languageIndex] = added[index1 + 1];
+    }
+    return strings1;
+  }
 
-	private static bool LoadDictionary(string value)
-	{
-		byte[] array = null;
-		if (!localizationHasBeenSet)
-		{
-			if (loadFunction == null)
-			{
-				TextAsset val = Resources.Load<TextAsset>("Localization");
-				if (val != null)
-				{
-					array = val.get_bytes();
-				}
-			}
-			else
-			{
-				array = loadFunction("Localization");
-			}
-			localizationHasBeenSet = true;
-		}
-		if (LoadCSV(array, false))
-		{
-			return true;
-		}
-		if (string.IsNullOrEmpty(value))
-		{
-			value = mLanguage;
-		}
-		if (string.IsNullOrEmpty(value))
-		{
-			return false;
-		}
-		if (loadFunction == null)
-		{
-			TextAsset val2 = Resources.Load<TextAsset>(value);
-			if (val2 != null)
-			{
-				array = val2.get_bytes();
-			}
-		}
-		else
-		{
-			array = loadFunction(value);
-		}
-		if (array != null)
-		{
-			Set(value, array);
-			return true;
-		}
-		return false;
-	}
+  private static bool SelectLanguage(string language)
+  {
+    Localization.mLanguageIndex = -1;
+    if (Localization.mDictionary.Count == 0)
+      return false;
+    int index = 0;
+    for (int length = Localization.mLanguages.Length; index < length; ++index)
+    {
+      if (Localization.mLanguages[index] == language)
+      {
+        Localization.mOldDictionary.Clear();
+        Localization.mLanguageIndex = index;
+        Localization.mLanguage = language;
+        PlayerPrefs.SetString("Language", Localization.mLanguage);
+        if (Localization.onLocalize != null)
+          Localization.onLocalize();
+        UIRoot.Broadcast("OnLocalize");
+        return true;
+      }
+    }
+    return false;
+  }
 
-	private static bool LoadAndSelect(string value)
-	{
-		if (!string.IsNullOrEmpty(value))
-		{
-			if (mDictionary.Count == 0 && !LoadDictionary(value))
-			{
-				return false;
-			}
-			if (SelectLanguage(value))
-			{
-				return true;
-			}
-		}
-		if (mOldDictionary.Count > 0)
-		{
-			return true;
-		}
-		mOldDictionary.Clear();
-		mDictionary.Clear();
-		if (string.IsNullOrEmpty(value))
-		{
-			PlayerPrefs.DeleteKey("Language");
-		}
-		return false;
-	}
+  public static void Set(string languageName, Dictionary<string, string> dictionary)
+  {
+    Localization.mLanguage = languageName;
+    PlayerPrefs.SetString("Language", Localization.mLanguage);
+    Localization.mOldDictionary = dictionary;
+    Localization.localizationHasBeenSet = true;
+    Localization.mLanguageIndex = -1;
+    Localization.mLanguages = new string[1]{ languageName };
+    if (Localization.onLocalize != null)
+      Localization.onLocalize();
+    UIRoot.Broadcast("OnLocalize");
+  }
 
-	public static void Load(TextAsset asset)
-	{
-		ByteReader byteReader = new ByteReader(asset);
-		Set(asset.get_name(), byteReader.ReadDictionary());
-	}
+  public static void Set(string key, string value)
+  {
+    if (Localization.mOldDictionary.ContainsKey(key))
+      Localization.mOldDictionary[key] = value;
+    else
+      Localization.mOldDictionary.Add(key, value);
+  }
 
-	public static void Set(string languageName, byte[] bytes)
-	{
-		ByteReader byteReader = new ByteReader(bytes);
-		Set(languageName, byteReader.ReadDictionary());
-	}
+  public static string Get(string key)
+  {
+    if (!Localization.localizationHasBeenSet)
+      Localization.LoadDictionary(PlayerPrefs.GetString("Language", "English"));
+    if (Localization.mLanguages == null)
+    {
+      Debug.LogError((object) "No localization data present");
+      return (string) null;
+    }
+    string language = Localization.language;
+    if (Localization.mLanguageIndex == -1)
+    {
+      for (int index = 0; index < Localization.mLanguages.Length; ++index)
+      {
+        if (Localization.mLanguages[index] == language)
+        {
+          Localization.mLanguageIndex = index;
+          break;
+        }
+      }
+    }
+    if (Localization.mLanguageIndex == -1)
+    {
+      Localization.mLanguageIndex = 0;
+      Localization.mLanguage = Localization.mLanguages[0];
+      Debug.LogWarning((object) ("Language not found: " + language));
+    }
+    string str1;
+    string[] strArray;
+    switch (UICamera.currentScheme)
+    {
+      case UICamera.ControlScheme.Touch:
+        string key1 = key + " Mobile";
+        if (Localization.mReplacement.TryGetValue(key1, out str1))
+          return str1;
+        if (Localization.mLanguageIndex != -1 && Localization.mDictionary.TryGetValue(key1, out strArray) && Localization.mLanguageIndex < strArray.Length)
+          return strArray[Localization.mLanguageIndex];
+        if (Localization.mOldDictionary.TryGetValue(key1, out str1))
+          return str1;
+        break;
+      case UICamera.ControlScheme.Controller:
+        string key2 = key + " Controller";
+        if (Localization.mReplacement.TryGetValue(key2, out str1))
+          return str1;
+        if (Localization.mLanguageIndex != -1 && Localization.mDictionary.TryGetValue(key2, out strArray) && Localization.mLanguageIndex < strArray.Length)
+          return strArray[Localization.mLanguageIndex];
+        if (Localization.mOldDictionary.TryGetValue(key2, out str1))
+          return str1;
+        break;
+    }
+    if (Localization.mReplacement.TryGetValue(key, out str1))
+      return str1;
+    if (Localization.mLanguageIndex != -1 && Localization.mDictionary.TryGetValue(key, out strArray))
+    {
+      if (Localization.mLanguageIndex >= strArray.Length)
+        return strArray[0];
+      string str2 = strArray[Localization.mLanguageIndex];
+      if (string.IsNullOrEmpty(str2))
+        str2 = strArray[0];
+      return str2;
+    }
+    return Localization.mOldDictionary.TryGetValue(key, out str1) ? str1 : key;
+  }
 
-	public static void ReplaceKey(string key, string val)
-	{
-		if (!string.IsNullOrEmpty(val))
-		{
-			mReplacement[key] = val;
-		}
-		else
-		{
-			mReplacement.Remove(key);
-		}
-	}
+  public static string Format(string key, params object[] parameters)
+  {
+    return string.Format(Localization.Get(key), parameters);
+  }
 
-	public static void ClearReplacements()
-	{
-		mReplacement.Clear();
-	}
+  [Obsolete("Localization is now always active. You no longer need to check this property.")]
+  public static bool isActive => true;
 
-	public static bool LoadCSV(TextAsset asset, bool merge = false)
-	{
-		return LoadCSV(asset.get_bytes(), asset, merge);
-	}
+  [Obsolete("Use Localization.Get instead")]
+  public static string Localize(string key) => Localization.Get(key);
 
-	public static bool LoadCSV(byte[] bytes, bool merge = false)
-	{
-		return LoadCSV(bytes, null, merge);
-	}
+  public static bool Exists(string key)
+  {
+    if (!Localization.localizationHasBeenSet)
+      Localization.language = PlayerPrefs.GetString("Language", "English");
+    string key1 = key + " Mobile";
+    return Localization.mDictionary.ContainsKey(key1) || Localization.mOldDictionary.ContainsKey(key1) || Localization.mDictionary.ContainsKey(key) || Localization.mOldDictionary.ContainsKey(key);
+  }
 
-	private static bool HasLanguage(string languageName)
-	{
-		int i = 0;
-		for (int num = mLanguages.Length; i < num; i++)
-		{
-			if (mLanguages[i] == languageName)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+  public delegate byte[] LoadFunction(string path);
 
-	private static bool LoadCSV(byte[] bytes, TextAsset asset, bool merge = false)
-	{
-		if (bytes == null)
-		{
-			return false;
-		}
-		ByteReader byteReader = new ByteReader(bytes);
-		BetterList<string> betterList = byteReader.ReadCSV();
-		if (betterList.size < 2)
-		{
-			return false;
-		}
-		betterList.RemoveAt(0);
-		string[] array = null;
-		if (string.IsNullOrEmpty(mLanguage))
-		{
-			localizationHasBeenSet = false;
-		}
-		if (!localizationHasBeenSet || (!merge && !mMerging) || mLanguages == null || mLanguages.Length == 0)
-		{
-			mDictionary.Clear();
-			mLanguages = new string[betterList.size];
-			if (!localizationHasBeenSet)
-			{
-				mLanguage = PlayerPrefs.GetString("Language", betterList[0]);
-				localizationHasBeenSet = true;
-			}
-			for (int i = 0; i < betterList.size; i++)
-			{
-				mLanguages[i] = betterList[i];
-				if (mLanguages[i] == mLanguage)
-				{
-					mLanguageIndex = i;
-				}
-			}
-		}
-		else
-		{
-			array = new string[betterList.size];
-			for (int j = 0; j < betterList.size; j++)
-			{
-				array[j] = betterList[j];
-			}
-			for (int k = 0; k < betterList.size; k++)
-			{
-				if (!HasLanguage(betterList[k]))
-				{
-					int num = mLanguages.Length + 1;
-					Array.Resize(ref mLanguages, num);
-					mLanguages[num - 1] = betterList[k];
-					Dictionary<string, string[]> dictionary = new Dictionary<string, string[]>();
-					foreach (KeyValuePair<string, string[]> item in mDictionary)
-					{
-						string[] array2 = item.Value;
-						Array.Resize(ref array2, num);
-						array2[num - 1] = array2[0];
-						dictionary.Add(item.Key, array2);
-					}
-					mDictionary = dictionary;
-				}
-			}
-		}
-		Dictionary<string, int> dictionary2 = new Dictionary<string, int>();
-		for (int l = 0; l < mLanguages.Length; l++)
-		{
-			dictionary2.Add(mLanguages[l], l);
-		}
-		while (true)
-		{
-			BetterList<string> betterList2 = byteReader.ReadCSV();
-			if (betterList2 == null || betterList2.size == 0)
-			{
-				break;
-			}
-			if (!string.IsNullOrEmpty(betterList2[0]))
-			{
-				AddCSV(betterList2, array, dictionary2);
-			}
-		}
-		if (!mMerging && onLocalize != null)
-		{
-			mMerging = true;
-			OnLocalizeNotification onLocalizeNotification = onLocalize;
-			onLocalize = null;
-			onLocalizeNotification();
-			onLocalize = onLocalizeNotification;
-			mMerging = false;
-		}
-		return true;
-	}
-
-	private static void AddCSV(BetterList<string> newValues, string[] newLanguages, Dictionary<string, int> languageIndices)
-	{
-		if (newValues.size >= 2)
-		{
-			string text = newValues[0];
-			if (!string.IsNullOrEmpty(text))
-			{
-				string[] value = ExtractStrings(newValues, newLanguages, languageIndices);
-				if (mDictionary.ContainsKey(text))
-				{
-					mDictionary[text] = value;
-					if (newLanguages == null)
-					{
-						Debug.LogWarning((object)("Localization key '" + text + "' is already present"));
-					}
-				}
-				else
-				{
-					try
-					{
-						mDictionary.Add(text, value);
-					}
-					catch (Exception ex)
-					{
-						Debug.LogError((object)("Unable to add '" + text + "' to the Localization dictionary.\n" + ex.Message));
-					}
-				}
-			}
-		}
-	}
-
-	private static string[] ExtractStrings(BetterList<string> added, string[] newLanguages, Dictionary<string, int> languageIndices)
-	{
-		if (newLanguages == null)
-		{
-			string[] array = new string[mLanguages.Length];
-			int i = 1;
-			for (int num = Mathf.Min(added.size, array.Length + 1); i < num; i++)
-			{
-				array[i - 1] = added[i];
-			}
-			return array;
-		}
-		string key = added[0];
-		if (!mDictionary.TryGetValue(key, out string[] value))
-		{
-			value = new string[mLanguages.Length];
-		}
-		int j = 0;
-		for (int num2 = newLanguages.Length; j < num2; j++)
-		{
-			string key2 = newLanguages[j];
-			int num3 = languageIndices[key2];
-			value[num3] = added[j + 1];
-		}
-		return value;
-	}
-
-	private static bool SelectLanguage(string language)
-	{
-		mLanguageIndex = -1;
-		if (mDictionary.Count == 0)
-		{
-			return false;
-		}
-		int i = 0;
-		for (int num = mLanguages.Length; i < num; i++)
-		{
-			if (mLanguages[i] == language)
-			{
-				mOldDictionary.Clear();
-				mLanguageIndex = i;
-				mLanguage = language;
-				PlayerPrefs.SetString("Language", mLanguage);
-				if (onLocalize != null)
-				{
-					onLocalize();
-				}
-				UIRoot.Broadcast("OnLocalize");
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static void Set(string languageName, Dictionary<string, string> dictionary)
-	{
-		mLanguage = languageName;
-		PlayerPrefs.SetString("Language", mLanguage);
-		mOldDictionary = dictionary;
-		localizationHasBeenSet = true;
-		mLanguageIndex = -1;
-		mLanguages = new string[1]
-		{
-			languageName
-		};
-		if (onLocalize != null)
-		{
-			onLocalize();
-		}
-		UIRoot.Broadcast("OnLocalize");
-	}
-
-	public static void Set(string key, string value)
-	{
-		if (mOldDictionary.ContainsKey(key))
-		{
-			mOldDictionary[key] = value;
-		}
-		else
-		{
-			mOldDictionary.Add(key, value);
-		}
-	}
-
-	public static string Get(string key)
-	{
-		if (!localizationHasBeenSet)
-		{
-			LoadDictionary(PlayerPrefs.GetString("Language", "English"));
-		}
-		if (mLanguages == null)
-		{
-			Debug.LogError((object)"No localization data present");
-			return null;
-		}
-		string language = Localization.language;
-		if (mLanguageIndex == -1)
-		{
-			for (int i = 0; i < mLanguages.Length; i++)
-			{
-				if (mLanguages[i] == language)
-				{
-					mLanguageIndex = i;
-					break;
-				}
-			}
-		}
-		if (mLanguageIndex == -1)
-		{
-			mLanguageIndex = 0;
-			mLanguage = mLanguages[0];
-			Debug.LogWarning((object)("Language not found: " + language));
-		}
-		string value;
-		string[] value2;
-		switch (UICamera.currentScheme)
-		{
-		case UICamera.ControlScheme.Touch:
-		{
-			string key3 = key + " Mobile";
-			if (mReplacement.TryGetValue(key3, out value))
-			{
-				return value;
-			}
-			if (mLanguageIndex != -1 && mDictionary.TryGetValue(key3, out value2) && mLanguageIndex < value2.Length)
-			{
-				return value2[mLanguageIndex];
-			}
-			if (mOldDictionary.TryGetValue(key3, out value))
-			{
-				return value;
-			}
-			break;
-		}
-		case UICamera.ControlScheme.Controller:
-		{
-			string key2 = key + " Controller";
-			if (mReplacement.TryGetValue(key2, out value))
-			{
-				return value;
-			}
-			if (mLanguageIndex != -1 && mDictionary.TryGetValue(key2, out value2) && mLanguageIndex < value2.Length)
-			{
-				return value2[mLanguageIndex];
-			}
-			if (mOldDictionary.TryGetValue(key2, out value))
-			{
-				return value;
-			}
-			break;
-		}
-		}
-		if (mReplacement.TryGetValue(key, out value))
-		{
-			return value;
-		}
-		if (mLanguageIndex != -1 && mDictionary.TryGetValue(key, out value2))
-		{
-			if (mLanguageIndex < value2.Length)
-			{
-				string text = value2[mLanguageIndex];
-				if (string.IsNullOrEmpty(text))
-				{
-					text = value2[0];
-				}
-				return text;
-			}
-			return value2[0];
-		}
-		if (mOldDictionary.TryGetValue(key, out value))
-		{
-			return value;
-		}
-		return key;
-	}
-
-	public static string Format(string key, params object[] parameters)
-	{
-		return string.Format(Get(key), parameters);
-	}
-
-	[Obsolete("Use Localization.Get instead")]
-	public static string Localize(string key)
-	{
-		return Get(key);
-	}
-
-	public static bool Exists(string key)
-	{
-		if (!localizationHasBeenSet)
-		{
-			language = PlayerPrefs.GetString("Language", "English");
-		}
-		string key2 = key + " Mobile";
-		if (mDictionary.ContainsKey(key2))
-		{
-			return true;
-		}
-		if (mOldDictionary.ContainsKey(key2))
-		{
-			return true;
-		}
-		return mDictionary.ContainsKey(key) || mOldDictionary.ContainsKey(key);
-	}
+  public delegate void OnLocalizeNotification();
 }

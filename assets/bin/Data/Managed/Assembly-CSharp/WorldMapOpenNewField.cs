@@ -1,1063 +1,807 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: WorldMapOpenNewField
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using rhyme;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class WorldMapOpenNewField : GameSection
 {
-	public enum EVENT_TYPE
-	{
-		NONE,
-		ONLY_CAMERA_MOVE,
-		ENCOUNTER_BOSS,
-		QUEST_TO_FIELD,
-		OPEN_NEW_DUNGEON,
-		EXIST_IN_DUNGEON
-	}
+  private WorldMapOpenNewField.SectionEventData eventData;
+  private FieldMapTable.PortalTableData portalData;
+  private FieldMapTable.FieldMapTableData newMapData;
+  private RegionMapRoot regionMapRoot;
+  private Transform playerMarker;
+  private rymFX windEffect;
+  private Object topEffectPrefab;
+  private Object remainEffectPrefab;
+  private Transform dungeonOpenEffect;
+  private GameObject fieldQuestWarningRoot;
+  private Camera _camera;
+  private UITexture uiFrontMapSprite;
+  private UITexture uiMapSprite;
+  private uint regionId;
+  private ZoomBlurFilter blurFilter;
+  private SpotManager spots;
+  private bool calledExit;
+  private bool isUpdateRenderTexture;
+  private bool toRegionRelease;
+  private UIEventListener bgEventListener;
+  private Transform tutorialTrigger;
+  private Vector3 tutorialTriggerPos = new Vector3(3.7f, 0.5f, 0.0f);
 
-	public enum AUDIO
-	{
-		DRAW_LINE = 40000032,
-		APEAR_LOCATION
-	}
+  public override IEnumerable<string> requireDataTable
+  {
+    get
+    {
+      yield return "FieldMapTable";
+      yield return "RegionTable";
+    }
+  }
 
-	public class SectionEventData
-	{
-		private EVENT_TYPE eventType;
+  public override void Initialize() => this.StartCoroutine("DoInitialize");
 
-		public ENEMY_TYPE enemyType
-		{
-			get;
-			private set;
-		}
+  private IEnumerator DoInitialize()
+  {
+    this.eventData = (WorldMapOpenNewField.SectionEventData) GameSection.GetEventData();
+    if (MonoBehaviourSingleton<InGameManager>.IsValid())
+      this.portalData = Singleton<FieldMapTable>.I.GetPortalData(MonoBehaviourSingleton<InGameManager>.I.beforePortalID);
+    if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid() && this.portalData == null)
+      this.portalData = Singleton<FieldMapTable>.I.GetPortalData((uint) MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.linkFieldPortalID);
+    if (this.eventData.IsQuestToField())
+      this.portalData = Singleton<FieldMapTable>.I.GetPortalData(MonoBehaviourSingleton<FieldManager>.I.currentPortalID);
+    if (this.portalData == null)
+    {
+      base.Initialize();
+    }
+    else
+    {
+      FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(this.portalData.srcMapID);
+      this.newMapData = Singleton<FieldMapTable>.I.GetFieldMapData(this.portalData.dstMapID);
+      this.regionId = this.newMapData.regionId;
+      if (this.NeedDirectionOpenRegion())
+      {
+        this.toRegionRelease = true;
+        base.Initialize();
+      }
+      else
+      {
+        if (fieldMapData != null && this.newMapData != null && (int) this.newMapData.regionId != (int) fieldMapData.regionId)
+          this.regionId = fieldMapData.regionId;
+        if (this.newMapData == null || !WorldMapOpenNewField.IsValidRegion(this.newMapData))
+        {
+          this.newMapData = (FieldMapTable.FieldMapTableData) null;
+          base.Initialize();
+        }
+        else
+        {
+          LoadingQueue loadQueue = new LoadingQueue((MonoBehaviour) this);
+          LoadObject loadedEventUIRoot = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "NewFieldOpenEventUIRoot");
+          LoadObject loadedLocationSpot = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "LocationSpot");
+          LoadObject loadedEventCamera = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "NewFieldEventCamera");
+          LoadObject loadedFilterCamera = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ZoomBlurFilterCamera");
+          LoadObject loadedPlayerMarker = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "PlayerMarker");
+          LoadObject loadedRegion = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "RegionMap_" + this.regionId.ToString("D3"));
+          LoadObject loadedEffect = loadQueue.LoadEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_map_fire_01");
+          LoadObject loadedWindEffect = loadQueue.LoadEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_bg_questmap_01");
+          LoadObject loadedDungeonEff = (LoadObject) null;
+          if (this.eventData.IsFindNewDungeon() && this.newMapData != null)
+            loadedDungeonEff = loadQueue.LoadEffect(RESOURCE_CATEGORY.EFFECT_DUNGEON, "DEF_" + this.newMapData.mapID.ToString("D8"));
+          LoadObject loadedEncounterBossCutIn = (LoadObject) null;
+          if (this.eventData.IsEncounterBossEvent())
+            loadedEncounterBossCutIn = loadQueue.Load(RESOURCE_CATEGORY.UI, "InGameFieldQuestWarning");
+          this.CacheAudio(loadQueue);
+          if (loadQueue.IsLoading())
+            yield return (object) loadQueue.Wait();
+          if (loadedEncounterBossCutIn != null)
+          {
+            this.fieldQuestWarningRoot = ((Component) ResourceUtility.Realizes(loadedEncounterBossCutIn.loadedObject)).gameObject;
+            UIPanel componentInChildren = this.fieldQuestWarningRoot.GetComponentInChildren<UIPanel>();
+            if (Object.op_Inequality((Object) componentInChildren, (Object) null))
+              componentInChildren.depth = 8000;
+            if (MonoBehaviourSingleton<UIInGameFieldQuestWarning>.IsValid())
+              MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.Load(loadQueue);
+          }
+          if (loadQueue.IsLoading())
+            yield return (object) loadQueue.Wait();
+          this.topEffectPrefab = loadedEffect.loadedObject;
+          Transform t = ResourceUtility.Realizes(loadedEventUIRoot.loadedObject, this._transform);
+          this.regionMapRoot = ((Component) ResourceUtility.Realizes(loadedRegion.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform)).gameObject.GetComponent<RegionMapRoot>();
+          if (Object.op_Inequality((Object) this.regionMapRoot, (Object) null))
+          {
+            bool wait = true;
+            this.regionMapRoot.InitPortalStatus((System.Action) (() => wait = false));
+            while (wait)
+              yield return (object) null;
+          }
+          this.blurFilter = (ResourceUtility.Instantiate<Object>(loadedFilterCamera.loadedObject) as GameObject).GetComponent<ZoomBlurFilter>();
+          ((Component) this.blurFilter).transform.parent = this._transform;
+          this._camera = ((Component) ResourceUtility.Realizes(loadedEventCamera.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform)).GetComponent<Camera>();
+          this.uiFrontMapSprite = ((Component) t.Find("FrontMap")).gameObject.GetComponent<UITexture>();
+          if (Object.op_Inequality((Object) this.uiFrontMapSprite, (Object) null))
+            this.uiFrontMapSprite.alpha = 0.0f;
+          this.uiMapSprite = ((Component) t.Find("Map")).gameObject.GetComponent<UITexture>();
+          this.InitMapSprite(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
+          if (this.eventData.IsEncounterBossEvent())
+            ((Component) t.Find("TaptoSkip")).gameObject.SetActive(false);
+          this.bgEventListener = UIEventListener.Get(((Component) t.Find("BG")).gameObject);
+          this.tutorialTrigger = t.Find("TUTORIAL_TRIGGER");
+          if (Object.op_Inequality((Object) this.tutorialTrigger, (Object) null))
+          {
+            if (!TutorialStep.HasAllTutorialCompleted())
+            {
+              ((Component) this.tutorialTrigger).gameObject.SetActive(true);
+              UITweenCtrl.Play(this.tutorialTrigger, is_input_block: false);
+            }
+            else
+              ((Component) this.tutorialTrigger).gameObject.SetActive(false);
+          }
+          this.spots = new SpotManager((GameObject) null, loadedLocationSpot.loadedObject as GameObject, this._camera);
+          this.spots.spotRootTransform = t;
+          this.playerMarker = ResourceUtility.Realizes(loadedPlayerMarker.loadedObject);
+          PlayerMarker component = ((Component) this.playerMarker).GetComponent<PlayerMarker>();
+          if (Object.op_Inequality((Object) null, (Object) component))
+            component.SetCamera(((Component) this._camera).transform);
+          this.windEffect = ((Component) ResourceUtility.Realizes(loadedWindEffect.loadedObject, ((Component) this._camera).transform)).gameObject.GetComponent<rymFX>();
+          this.windEffect.Cameras = new Camera[1]
+          {
+            this._camera
+          };
+          ((Component) this.windEffect).gameObject.layer = LayerMask.NameToLayer("WorldMap");
+          if (loadedDungeonEff != null)
+          {
+            this.dungeonOpenEffect = ResourceUtility.Realizes(loadedDungeonEff.loadedObject, this._transform);
+            ((Component) this.dungeonOpenEffect).gameObject.SetActive(false);
+          }
+          this.CreateVisitedLocationSpot();
+          if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
+            MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += new ScreenOrientationManager.OnScreenRotateDelegate(this.InitMapSprite);
+          base.Initialize();
+        }
+      }
+    }
+  }
 
-		public SectionEventData(EVENT_TYPE _eventType, ENEMY_TYPE _enemyType)
-		{
-			eventType = _eventType;
-			enemyType = _enemyType;
-		}
+  public override void StartSection()
+  {
+    if (!this.toRegionRelease)
+      return;
+    MonoBehaviourSingleton<WorldMapManager>.I.transferInfo = new WorldMapManager.TransferInfo((int) this.regionId, true);
+    this.DispatchEvent("WORLD_MAP");
+    this.Exit();
+  }
 
-		public bool IsOnlyCameraMoveEvent()
-		{
-			return eventType == EVENT_TYPE.ONLY_CAMERA_MOVE;
-		}
+  private bool NeedDirectionOpenRegion()
+  {
+    MonoBehaviourSingleton<WorldMapManager>.I.openNewFieldId = (int) this.newMapData.mapID;
+    return MonoBehaviourSingleton<WorldMapManager>.I.NeedDirectionOpenRegion((int) this.regionId);
+  }
 
-		public bool IsEnterDungeon()
-		{
-			return eventType == EVENT_TYPE.EXIST_IN_DUNGEON;
-		}
+  private void CreateVisitedLocationSpot()
+  {
+    MonoBehaviourSingleton<FilterManager>.I.StopBlur(MonoBehaviourSingleton<OutGameSettingsManager>.I.questMap.cameraMoveTime);
+    for (int index1 = 0; index1 < this.regionMapRoot.locations.Length; ++index1)
+    {
+      RegionMapLocation location = this.regionMapRoot.locations[index1];
+      FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint) location.mapId);
+      if ((fieldMapData != null || location.mapId == 0) && (fieldMapData == null || FieldManager.IsShowPortal(fieldMapData.jumpPortalID)))
+      {
+        if (fieldMapData != null && !MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapData))
+          this.CreateLocationSpot(location, SpotManager.ICON_TYPE.NOT_OPENED);
+        else if ((long) location.mapId == (long) this.newMapData.mapID && !this.eventData.IsOnlyCameraMoveEvent() && !this.eventData.IsEnterDungeon() && !this.eventData.IsQuestToField())
+        {
+          this.CreateLocationSpot(location, SpotManager.ICON_TYPE.NOT_OPENED);
+        }
+        else
+        {
+          SpotManager.ICON_TYPE icon = SpotManager.ICON_TYPE.CLEARED;
+          if (location.portal.Length != 0)
+          {
+            for (int index2 = 0; index2 < location.portal.Length; ++index2)
+            {
+              RegionMapPortal regionMapPortal = location.portal[index2];
+              if (!regionMapPortal.IsVisited() && regionMapPortal.IsShow())
+              {
+                icon = SpotManager.ICON_TYPE.NEW;
+                break;
+              }
+            }
+          }
+          if (fieldMapData != null)
+          {
+            if (FieldManager.IsToHardPortal(fieldMapData.jumpPortalID))
+            {
+              icon = SpotManager.ICON_TYPE.HARD;
+              if (icon == SpotManager.ICON_TYPE.NEW)
+                icon = SpotManager.ICON_TYPE.HARD_NEW;
+            }
+            if (fieldMapData.hasChildRegion && (int) fieldMapData.childRegionId != (int) this.regionId)
+              icon = SpotManager.ICON_TYPE.CHILD_REGION;
+          }
+          this.CreateLocationSpot(location, icon);
+        }
+      }
+    }
+  }
 
-		public bool IsFindNewDungeon()
-		{
-			return eventType == EVENT_TYPE.OPEN_NEW_DUNGEON;
-		}
+  private GameObject CreateLocationSpot(
+    RegionMapLocation location,
+    SpotManager.ICON_TYPE icon = SpotManager.ICON_TYPE.CLEARED,
+    bool isNew = false)
+  {
+    if (location.mapId == 0)
+      return ((Component) this.spots.AddSpot(0, MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionTextList().Find((Predicate<GameSceneTables.TextData>) (textData => textData.key == "STR_HOME")).text, ((Component) location).transform.position, SpotManager.ICON_TYPE.HOME, (string) null)._transform).gameObject;
+    FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint) location.mapId);
+    if (fieldMapData == null)
+      return (GameObject) null;
+    bool canUnlockNewPortal = false;
+    if (location.portal.Length != 0 && icon != SpotManager.ICON_TYPE.NOT_OPENED)
+    {
+      for (int index = 0; index < location.portal.Length; ++index)
+      {
+        int result;
+        int.TryParse(((Object) location).name.Replace(nameof (location), ""), out result);
+        int[] locationNumbers = this.GetLocationNumbers(((Object) location.portal[index]).name);
+        if (result == locationNumbers[0] && GameSaveData.instance.isNewReleasePortal((uint) location.portal[index].entranceId))
+        {
+          if (location.portal[index].IsVisited())
+          {
+            GameSaveData.instance.newReleasePortals.Remove((uint) location.portal[index].entranceId);
+          }
+          else
+          {
+            canUnlockNewPortal = true;
+            break;
+          }
+        }
+        if (result == locationNumbers[1] && GameSaveData.instance.isNewReleasePortal((uint) location.portal[index].exitId))
+        {
+          if (location.portal[index].IsVisited())
+          {
+            GameSaveData.instance.newReleasePortals.Remove((uint) location.portal[index].exitId);
+          }
+          else
+          {
+            canUnlockNewPortal = true;
+            break;
+          }
+        }
+      }
+    }
+    return ((Component) this.spots.AddSpot((int) fieldMapData.mapID, fieldMapData.mapName, ((Component) location).transform.position, icon, (string) null, isNew, canUnlockNewPortal, _event: (object) fieldMapData.mapID, dungeon_icon: location.icon)._transform).gameObject;
+  }
 
-		public bool IsEncounterBossEvent()
-		{
-			return eventType == EVENT_TYPE.ENCOUNTER_BOSS;
-		}
+  private void InitMapSprite(bool isPortrait)
+  {
+    if (Object.op_Inequality((Object) this.uiMapSprite, (Object) null))
+    {
+      if (Object.op_Inequality((Object) this._camera.targetTexture, (Object) null))
+      {
+        RenderTexture.ReleaseTemporary(this._camera.targetTexture);
+        this._camera.targetTexture = (RenderTexture) null;
+      }
+      this._camera.targetTexture = RenderTexture.GetTemporary(Screen.width, Screen.height);
+      this.uiMapSprite.mainTexture = (Texture) this._camera.targetTexture;
+      this.uiMapSprite.width = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth;
+      this.uiMapSprite.height = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
+    }
+    if (!Object.op_Inequality((Object) this.uiFrontMapSprite, (Object) null) || !Object.op_Inequality((Object) this.blurFilter, (Object) null))
+      return;
+    this.uiFrontMapSprite.mainTexture = (Texture) this.blurFilter.filteredTexture;
+    this.uiFrontMapSprite.width = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth;
+    this.uiFrontMapSprite.height = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
+  }
 
-		public bool IsQuestToField()
-		{
-			return eventType == EVENT_TYPE.QUEST_TO_FIELD;
-		}
-	}
+  protected override void OnOpen()
+  {
+    if (this.toRegionRelease)
+    {
+      base.OnOpen();
+    }
+    else
+    {
+      if (Object.op_Inequality((Object) null, (Object) this.bgEventListener))
+        this.bgEventListener.onClick += new UIEventListener.VoidDelegate(this.onClick);
+      if (this.portalData == null || this.newMapData == null)
+        this.RequestEvent("EXIT");
+      else if (this.eventData.IsFindNewDungeon())
+        this.OpenNewDungeon();
+      else if (this.eventData.IsOnlyCameraMoveEvent() || this.eventData.IsEnterDungeon())
+        this.CameraMoveEvent();
+      else if (this.eventData.IsQuestToField())
+        this.QuestToField();
+      else
+        this.OpenNewLocation();
+      Transform child = Utility.FindChild(((Component) this).gameObject.transform, "BG");
+      if (Object.op_Inequality((Object) child, (Object) null))
+      {
+        UITexture component = ((Component) child).GetComponent<UITexture>();
+        if (Object.op_Inequality((Object) component, (Object) null))
+        {
+          component.width = 4000;
+          component.height = 4000;
+          ((Component) component).gameObject.SetActive(true);
+        }
+      }
+      base.OnOpen();
+    }
+  }
 
-	private SectionEventData eventData;
+  private void OnQuery_EXIT()
+  {
+    if (Object.op_Inequality((Object) this.playerMarker, (Object) null))
+    {
+      Object.Destroy((Object) ((Component) this.playerMarker).gameObject);
+      this.playerMarker = (Transform) null;
+    }
+    if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
+      MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= new ScreenOrientationManager.OnScreenRotateDelegate(this.InitMapSprite);
+    this.StopAllCoroutines();
+    if (this.calledExit)
+      return;
+    if (Object.op_Inequality((Object) null, (Object) this.bgEventListener))
+      this.bgEventListener.onClick -= new UIEventListener.VoidDelegate(this.onClick);
+    MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent(nameof (WorldMapOpenNewField), ((Component) this).gameObject, "INGAME_MAIN");
+    this.calledExit = true;
+  }
 
-	private FieldMapTable.PortalTableData portalData;
+  public void CameraMoveEvent()
+  {
+    RegionMapPortal portalData1;
+    bool portalData2 = this.IsPortalReverseAndGetPortalData((int) this.portalData.portalID, out portalData1);
+    if (Object.op_Equality((Object) portalData1, (Object) null))
+    {
+      this.RequestEvent("EXIT");
+    }
+    else
+    {
+      Vector3 position = ((Component) portalData1.fromLocation).transform.position;
+      this.playerMarker.SetParent(((Component) portalData1.fromLocation).transform);
+      if (portalData2)
+      {
+        position = ((Component) portalData1.toLocation).transform.position;
+        this.playerMarker.SetParent(((Component) portalData1.toLocation).transform);
+      }
+      this.playerMarker.localPosition = MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerOffset;
+      ((Component) this._camera).transform.position = Vector3.op_Subtraction(position, Vector3.op_Multiply(((Component) this._camera).transform.forward, MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventCameraDistance));
+      this.StartCoroutine(this.DoExitEvent(portalData1, (rymFX) null, MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.onlyCameraMoveDelay, portalData2));
+    }
+  }
 
-	private FieldMapTable.FieldMapTableData newMapData;
+  private void QuestToField()
+  {
+    FieldMapTable.PortalTableData portalData = Singleton<FieldMapTable>.I.GetPortalData(MonoBehaviourSingleton<FieldManager>.I.currentPortalID);
+    if (portalData == null)
+    {
+      this.RequestEvent("EXIT");
+    }
+    else
+    {
+      RegionMapLocation location = this.regionMapRoot.FindLocation((int) portalData.dstMapID);
+      if (Object.op_Equality((Object) null, (Object) location))
+      {
+        this.RequestEvent("EXIT");
+      }
+      else
+      {
+        ((Component) this._camera).transform.position = Vector3.op_Subtraction(((Component) location).transform.position, Vector3.op_Multiply(((Component) this._camera).transform.forward, MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventCameraDistance));
+        this.playerMarker.SetParent(((Component) location).transform);
+        this.playerMarker.localPosition = MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerOffset;
+        this.playerMarker.localScale = new Vector3(0.0f, 0.0f, 0.0f);
+        this.StartCoroutine(this.DoQuestToField());
+      }
+    }
+  }
 
-	private RegionMapRoot regionMapRoot;
+  private IEnumerator DoQuestToField()
+  {
+    yield return (object) new WaitForSeconds(0.8f);
+    TweenScale.Begin(((Component) this.playerMarker).gameObject, MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerScaleTime, Vector3.one);
+    yield return (object) new WaitForSeconds(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerScaleTime + 1.5f);
+    this.OnQuery_EXIT();
+  }
 
-	private Transform playerMarker;
+  private bool IsPortalReverseAndGetPortalData(int portalId, out RegionMapPortal portalData)
+  {
+    portalData = this.regionMapRoot.FindEntrancePortal(portalId);
+    if (Object.op_Inequality((Object) portalData, (Object) null))
+      return false;
+    portalData = this.regionMapRoot.FindExitPortal(portalId);
+    return true;
+  }
 
-	private rymFX windEffect;
+  private void SetCameraToMiddlePoint(RegionMapPortal portal)
+  {
+    ((Component) this._camera).transform.position = Vector3.op_Subtraction(Vector3.op_Division(Vector3.op_Addition(((Component) portal.fromLocation).transform.position, ((Component) portal.toLocation).transform.position), 2f), Vector3.op_Multiply(((Component) this._camera).transform.forward, MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventCameraDistance));
+  }
 
-	private Object topEffectPrefab;
+  private void SetCameraToLocation(RegionMapLocation location)
+  {
+    ((Component) this._camera).transform.position = Vector3.op_Subtraction(((Component) location).transform.position, Vector3.op_Multiply(((Component) this._camera).transform.forward, MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventCameraDistance));
+  }
 
-	private Object remainEffectPrefab;
+  private void SetPlayerMakerToStartPosition(RegionMapPortal portal, bool reverse)
+  {
+    this.playerMarker.SetParent(((Component) portal.fromLocation).transform);
+    if (reverse)
+      this.playerMarker.SetParent(((Component) portal.toLocation).transform);
+    this.playerMarker.localPosition = MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerOffset;
+  }
 
-	private Transform dungeonOpenEffect;
+  public void OpenNewDungeon() => this.StartCoroutine(this.DoOpenNewDungeon());
 
-	private GameObject fieldQuestWarningRoot;
+  private IEnumerator DoOpenNewDungeon()
+  {
+    yield return (object) null;
+    RegionMapPortal portal;
+    bool reverse = this.IsPortalReverseAndGetPortalData((int) this.portalData.portalID, out portal);
+    if (Object.op_Equality((Object) portal, (Object) null))
+    {
+      this.RequestEvent("EXIT");
+    }
+    else
+    {
+      this.regionMapRoot.animator.Play(((Object) ((Component) portal).gameObject).name);
+      this.SetCameraToMiddlePoint(portal);
+      this.SetPlayerMakerToStartPosition(portal, reverse);
+      SoundManager.PlayOneShotUISE(40000032);
+      GameObject gameObject = ResourceUtility.Instantiate<Object>(this.topEffectPrefab) as GameObject;
+      rymFX rym = gameObject.GetComponent<rymFX>();
+      rym.Cameras = new Camera[1]{ this._camera };
+      rym.ViewShift = 0.0f;
+      portal.Open(gameObject.transform, this.regionMapRoot.animator, false, 1f, (System.Action) (() =>
+      {
+        if (this.calledExit)
+          return;
+        GameObject locationSpot = this.CreateLocationSpot(portal.toLocation, SpotManager.ICON_TYPE.CHILD_REGION, true);
+        if (Object.op_Inequality((Object) locationSpot, (Object) null))
+        {
+          locationSpot.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+          TweenScale.Begin(locationSpot, 0.3f, Vector3.one);
+        }
+        this.StartCoroutine(this.DoExitEvent(portal, rym, reverse: reverse, findDungeon: true));
+      }));
+    }
+  }
 
-	private Camera _camera;
+  public void OpenNewLocation()
+  {
+    RegionMapPortal portal;
+    bool reverse = this.IsPortalReverseAndGetPortalData((int) this.portalData.portalID, out portal);
+    if (Object.op_Equality((Object) portal, (Object) null))
+    {
+      this.RequestEvent("EXIT");
+    }
+    else
+    {
+      string name = ((Object) ((Component) portal).gameObject).name;
+      if (reverse)
+        name += "_R";
+      this.regionMapRoot.animator.Play(name);
+      this.SetCameraToMiddlePoint(portal);
+      this.SetPlayerMakerToStartPosition(portal, reverse);
+      GameObject effect = ResourceUtility.Instantiate<Object>(this.topEffectPrefab) as GameObject;
+      rymFX rym = effect.GetComponent<rymFX>();
+      rym.Cameras = new Camera[1]{ this._camera };
+      rym.ViewShift = 0.0f;
+      float endTime = 1f;
+      if (this.eventData.IsEncounterBossEvent())
+        endTime = 0.4f;
+      SoundManager.PlayOneShotUISE(40000032);
+      portal.Open(effect.transform, this.regionMapRoot.animator, reverse, endTime, (System.Action) (() =>
+      {
+        if (this.calledExit)
+          return;
+        RegionMapLocation location = portal.toLocation;
+        if (this.eventData.IsEncounterBossEvent())
+        {
+          if (MonoBehaviourSingleton<UIInGameFieldQuestWarning>.IsValid())
+          {
+            MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.Play(this.eventData.enemyType);
+            MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.FadeOut(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.encounterBossCutInTime + 2f, 0.3f, (System.Action) (() =>
+            {
+              if (!Object.op_Inequality((Object) this.fieldQuestWarningRoot, (Object) null))
+                return;
+              Object.Destroy((Object) this.fieldQuestWarningRoot);
+            }));
+          }
+          if (Object.op_Inequality((Object) effect, (Object) null))
+            EffectManager.ReleaseEffect(effect);
+          this.StartCoroutine(this.DoExitEncounterBossEvent());
+        }
+        else
+        {
+          if (reverse)
+            location = portal.fromLocation;
+          GameObject locationSpot = this.CreateLocationSpot(location, SpotManager.ICON_TYPE.NEW, true);
+          if (Object.op_Inequality((Object) locationSpot, (Object) null))
+          {
+            locationSpot.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            TweenScale.Begin(locationSpot, 0.3f, Vector3.one);
+            SoundManager.PlayOneShotUISE(40000033);
+          }
+          this.StartCoroutine(this.DoExitEvent(portal, rym, reverse: reverse));
+        }
+      }));
+    }
+  }
 
-	private UITexture uiFrontMapSprite;
+  private IEnumerator DoExitEncounterBossEvent()
+  {
+    yield return (object) new WaitForSeconds(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.encounterBossCutInTime);
+    this.OnQuery_EXIT();
+  }
 
-	private UITexture uiMapSprite;
+  private IEnumerator DoExitEvent(
+    RegionMapPortal portal,
+    rymFX effect,
+    float delay = 0.0f,
+    bool reverse = false,
+    bool findDungeon = false)
+  {
+    if (Object.op_Inequality((Object) effect, (Object) null))
+    {
+      EffectManager.ReleaseEffect(((Component) effect).gameObject);
+      effect = (rymFX) null;
+    }
+    yield return (object) new WaitForSeconds(delay);
+    LoadObject loadObj = (LoadObject) null;
+    if (findDungeon)
+    {
+      LoadingQueue loadQueue = new LoadingQueue((MonoBehaviour) this);
+      loadObj = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "RegionMap_" + Singleton<FieldMapTable>.I.GetFieldMapData((uint) portal.toLocation.mapId).childRegionId.ToString("D3"));
+      if (Object.op_Inequality((Object) null, (Object) this.dungeonOpenEffect))
+      {
+        EffectCtrl component1 = ((Component) this.dungeonOpenEffect).GetComponent<EffectCtrl>();
+        component1.Reset();
+        for (int index = 0; index < component1.particles.Length; ++index)
+        {
+          ParticleSystem particle = component1.particles[index];
+          if (!Object.op_Equality((Object) null, (Object) particle))
+          {
+            Renderer component2 = ((Component) particle).GetComponent<Renderer>();
+            if (!Object.op_Equality((Object) null, (Object) component2))
+              component2.sortingOrder = 2;
+          }
+        }
+        ((Component) this.dungeonOpenEffect).gameObject.SetActive(true);
+        AudioClip attachedAudioClip = component1.attachedAudioClip;
+        if (Object.op_Inequality((Object) attachedAudioClip, (Object) null))
+        {
+          int attachedAudioSettingId = component1.attachedAudioSettingID;
+          SoundManager.PlayOneShotUISE(attachedAudioClip, attachedAudioSettingId);
+        }
+        yield return (object) new WaitForSeconds(component1.waitTime);
+      }
+      if (loadQueue.IsLoading())
+        yield return (object) loadQueue.Wait();
+      loadQueue = (LoadingQueue) null;
+    }
+    TweenScale.Begin(((Component) this.playerMarker).gameObject, MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerScaleTime, Vector3.zero);
+    yield return (object) new WaitForSeconds(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerScaleTime);
+    float timer = 0.0f;
+    Vector3 target = ((Component) portal.toLocation).transform.position;
+    this.playerMarker.SetParent(((Component) portal.toLocation).transform);
+    if (reverse)
+    {
+      target = ((Component) portal.fromLocation).transform.position;
+      this.playerMarker.SetParent(((Component) portal.fromLocation).transform);
+    }
+    this.playerMarker.localPosition = MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerOffset;
+    target = Vector3.op_Subtraction(target, Vector3.op_Multiply(((Component) this._camera).transform.forward, MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventCameraDistance));
+    Vector3 startPos = ((Component) this._camera).transform.position;
+    TweenScale.Begin(((Component) this.playerMarker).gameObject, MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerScaleTime, Vector3.one);
+    while ((double) timer <= (double) MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventCameraMoveTime)
+    {
+      timer += Time.deltaTime;
+      ((Component) this._camera).transform.position = Vector3.Lerp(startPos, target, timer / MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventCameraMoveTime);
+      yield return (object) null;
+    }
+    ((Component) this._camera).transform.position = target;
+    yield return (object) new WaitForSeconds(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventRemainTime);
+    if (findDungeon)
+      yield return (object) this.StartCoroutine(this.DoFindNewDungeonEvent(portal, loadObj));
+    this.OnQuery_EXIT();
+  }
 
-	private uint regionId;
+  private IEnumerator DoFindNewDungeonEvent(RegionMapPortal portal, LoadObject newRegion)
+  {
+    if (Object.op_Inequality((Object) this.blurFilter, (Object) null))
+    {
+      bool wait = true;
+      this.blurFilter.CacheRenderTarget((System.Action) (() =>
+      {
+        ((Component) this.playerMarker).gameObject.SetActive(false);
+        this.playerMarker.SetParent(this._transform);
+        wait = false;
+      }), true);
+      while (wait)
+        yield return (object) null;
+      this.uiFrontMapSprite.alpha = 1f;
+      this.spots.ClearAllSpot();
+      Object.Destroy((Object) ((Component) this.regionMapRoot).gameObject);
+      RegionMapLocation newLocation = (RegionMapLocation) null;
+      if (newRegion != null)
+      {
+        this.regionMapRoot = ((Component) ResourceUtility.Realizes(newRegion.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform)).gameObject.GetComponent<RegionMapRoot>();
+        if (Object.op_Inequality((Object) this.regionMapRoot, (Object) null))
+        {
+          wait = true;
+          this.regionMapRoot.InitPortalStatus((System.Action) (() => wait = false));
+          while (wait)
+            yield return (object) null;
+          this.CreateVisitedLocationSpot();
+          newLocation = this.regionMapRoot.FindLocation(portal.toLocation.mapId);
+          if (Object.op_Inequality((Object) newLocation, (Object) null))
+          {
+            this.SetCameraToLocation(newLocation);
+            this.playerMarker.SetParent(((Component) newLocation).transform);
+            this.playerMarker.localPosition = MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerOffset;
+          }
+        }
+      }
+      wait = true;
+      float duration = 0.25f;
+      Vector2 blurCenter;
+      // ISSUE: explicit constructor call
+      ((Vector2) ref blurCenter).\u002Ector(0.5f, 0.5f);
+      this.blurFilter.StartBlurFilter(0.01f, 0.25f, duration, blurCenter, (System.Action) (() => wait = false));
+      this.uiMapSprite.alpha = 0.0f;
+      TweenAlpha.Begin(((Component) this.uiMapSprite).gameObject, duration, 1f);
+      TweenAlpha.Begin(((Component) this.uiFrontMapSprite).gameObject, duration, 0.0f);
+      while (wait)
+        yield return (object) null;
+      yield return (object) new WaitForSeconds(1f);
+      if (Object.op_Inequality((Object) this.regionMapRoot, (Object) null) && Object.op_Inequality((Object) newLocation, (Object) null))
+      {
+        GameObject locationSpot = this.CreateLocationSpot(newLocation, SpotManager.ICON_TYPE.NEW, true);
+        if (Object.op_Inequality((Object) locationSpot, (Object) null))
+        {
+          locationSpot.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+          TweenScale.Begin(locationSpot, 0.3f, Vector3.one);
+          SoundManager.PlayOneShotUISE(40000033);
+        }
+        yield return (object) new WaitForSeconds(0.5f);
+        ((Component) this.playerMarker).gameObject.SetActive(true);
+        this.playerMarker.localScale = new Vector3(0.0f, 0.0f, 0.0f);
+        TweenScale.Begin(((Component) this.playerMarker).gameObject, MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerScaleTime, Vector3.one);
+      }
+      yield return (object) new WaitForSeconds(1.5f);
+      newLocation = (RegionMapLocation) null;
+    }
+  }
 
-	private ZoomBlurFilter blurFilter;
+  private IEnumerator DoAfterWaitForSecond(float time, System.Action func)
+  {
+    yield return (object) new WaitForSeconds(time);
+    if (func != null)
+      func();
+  }
 
-	private SpotManager spots;
+  public override void Exit()
+  {
+    if (Object.op_Inequality((Object) this.windEffect, (Object) null))
+      EffectManager.ReleaseEffect(((Component) this.windEffect).gameObject);
+    if (this.spots != null)
+      this.spots.ClearAllSpot();
+    if (Object.op_Inequality((Object) this.regionMapRoot, (Object) null))
+      Object.Destroy((Object) ((Component) this.regionMapRoot).gameObject);
+    if (Object.op_Inequality((Object) this._camera, (Object) null))
+      Object.Destroy((Object) ((Component) this._camera).gameObject);
+    if (Object.op_Inequality((Object) null, (Object) this.dungeonOpenEffect))
+      Object.Destroy((Object) this.dungeonOpenEffect);
+    base.Exit();
+  }
 
-	private bool calledExit;
+  private void LateUpdate()
+  {
+    this.UpdateTutorialTrigger();
+    if (this.spots != null)
+      this.spots.Update();
+    if (!this.isUpdateRenderTexture)
+      return;
+    this.InitMapSprite(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
+    this.isUpdateRenderTexture = false;
+  }
 
-	private bool isUpdateRenderTexture;
+  private void UpdateTutorialTrigger()
+  {
+    if (Object.op_Equality((Object) this.tutorialTrigger, (Object) null))
+      return;
+    Vector3 worldPoint = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(this._camera.WorldToScreenPoint(this.tutorialTriggerPos));
+    worldPoint.z = 0.0f;
+    this.tutorialTrigger.position = worldPoint;
+  }
 
-	private bool toRegionRelease;
+  private void OnApplicationPause(bool paused) => this.isUpdateRenderTexture = !paused;
 
-	private UIEventListener bgEventListener;
+  private void onClick(GameObject g)
+  {
+    if (this.eventData.IsEncounterBossEvent())
+      return;
+    this.OnQuery_EXIT();
+  }
 
-	private Transform tutorialTrigger;
+  public static bool IsValidRegionFromMapId(uint mapId)
+  {
+    return Singleton<FieldMapTable>.IsValid() && WorldMapOpenNewField.IsValidRegion(Singleton<FieldMapTable>.I.GetFieldMapData(mapId));
+  }
 
-	private Vector3 tutorialTriggerPos = new Vector3(3.7f, 0.5f, 0f);
+  public static bool IsValidRegion(FieldMapTable.FieldMapTableData mapData)
+  {
+    if (mapData == null || !Singleton<RegionTable>.IsValid())
+      return false;
+    RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
+    return data != null && data.Length != 0 && Array.Find<RegionTable.Data>(data, (Predicate<RegionTable.Data>) (o => (int) o.regionId == (int) mapData.regionId)) != null;
+  }
 
-	public override IEnumerable<string> requireDataTable
-	{
-		get
-		{
-			yield return "FieldMapTable";
-			yield return "RegionTable";
-		}
-	}
+  private int[] GetLocationNumbers(string portalName)
+  {
+    string[] strArray = portalName.Replace("portal", "").Split('_');
+    return new int[2]
+    {
+      int.Parse(strArray[0]),
+      int.Parse(strArray[1])
+    };
+  }
 
-	public override void Initialize()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine("DoInitialize");
-	}
+  public enum EVENT_TYPE
+  {
+    NONE,
+    ONLY_CAMERA_MOVE,
+    ENCOUNTER_BOSS,
+    QUEST_TO_FIELD,
+    OPEN_NEW_DUNGEON,
+    EXIST_IN_DUNGEON,
+  }
 
-	private IEnumerator DoInitialize()
-	{
-		eventData = (SectionEventData)GameSection.GetEventData();
-		if (MonoBehaviourSingleton<InGameManager>.IsValid())
-		{
-			portalData = Singleton<FieldMapTable>.I.GetPortalData(MonoBehaviourSingleton<InGameManager>.I.beforePortalID);
-		}
-		if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid() && portalData == null)
-		{
-			portalData = Singleton<FieldMapTable>.I.GetPortalData((uint)MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.linkFieldPortalID);
-		}
-		if (eventData.IsQuestToField())
-		{
-			portalData = Singleton<FieldMapTable>.I.GetPortalData(MonoBehaviourSingleton<FieldManager>.I.currentPortalID);
-		}
-		if (portalData == null)
-		{
-			base.Initialize();
-		}
-		else
-		{
-			FieldMapTable.FieldMapTableData currentMapData = Singleton<FieldMapTable>.I.GetFieldMapData(portalData.srcMapID);
-			newMapData = Singleton<FieldMapTable>.I.GetFieldMapData(portalData.dstMapID);
-			regionId = newMapData.regionId;
-			if (NeedDirectionOpenRegion())
-			{
-				toRegionRelease = true;
-				base.Initialize();
-			}
-			else
-			{
-				if (currentMapData != null && newMapData != null && newMapData.regionId != currentMapData.regionId)
-				{
-					regionId = currentMapData.regionId;
-				}
-				if (newMapData == null || !IsValidRegion(newMapData))
-				{
-					newMapData = null;
-					base.Initialize();
-				}
-				else
-				{
-					LoadingQueue loadQueue = new LoadingQueue(this);
-					LoadObject loadedEventUIRoot = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "NewFieldOpenEventUIRoot", false);
-					LoadObject loadedLocationSpot = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "LocationSpot", false);
-					LoadObject loadedEventCamera = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "NewFieldEventCamera", false);
-					LoadObject loadedFilterCamera = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "ZoomBlurFilterCamera", false);
-					LoadObject loadedPlayerMarker = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "PlayerMarker", false);
-					LoadObject loadedRegion = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "RegionMap_" + regionId.ToString("D3"), false);
-					LoadObject loadedEffect = loadQueue.LoadEffect(RESOURCE_CATEGORY.EFFECT_UI, "ef_ui_map_fire_01", false);
-					LoadObject loadedWindEffect = loadQueue.LoadEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_bg_questmap_01", false);
-					LoadObject loadedDungeonEff = null;
-					if (eventData.IsFindNewDungeon() && newMapData != null)
-					{
-						uint mapID = newMapData.mapID;
-						loadedDungeonEff = loadQueue.LoadEffect(RESOURCE_CATEGORY.EFFECT_DUNGEON, "DEF_" + mapID.ToString("D8"), false);
-					}
-					LoadObject loadedEncounterBossCutIn = null;
-					if (eventData.IsEncounterBossEvent())
-					{
-						loadedEncounterBossCutIn = loadQueue.Load(RESOURCE_CATEGORY.UI, "InGameFieldQuestWarning", false);
-					}
-					CacheAudio(loadQueue);
-					if (loadQueue.IsLoading())
-					{
-						yield return (object)loadQueue.Wait();
-					}
-					if (loadedEncounterBossCutIn != null)
-					{
-						fieldQuestWarningRoot = ResourceUtility.Realizes(loadedEncounterBossCutIn.loadedObject, -1).get_gameObject();
-						UIPanel panel = fieldQuestWarningRoot.GetComponentInChildren<UIPanel>();
-						if (panel != null)
-						{
-							panel.depth = 8000;
-						}
-						if (MonoBehaviourSingleton<UIInGameFieldQuestWarning>.IsValid())
-						{
-							MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.Load(loadQueue);
-						}
-					}
-					if (loadQueue.IsLoading())
-					{
-						yield return (object)loadQueue.Wait();
-					}
-					topEffectPrefab = loadedEffect.loadedObject;
-					Transform t = ResourceUtility.Realizes(loadedEventUIRoot.loadedObject, base._transform, -1);
-					regionMapRoot = ResourceUtility.Realizes(loadedRegion.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform, -1).get_gameObject().GetComponent<RegionMapRoot>();
-					if (regionMapRoot != null)
-					{
-						bool wait = true;
-						regionMapRoot.InitPortalStatus(delegate
-						{
-							((_003CDoInitialize_003Ec__Iterator164)/*Error near IL_0526: stateMachine*/)._003Cwait_003E__15 = false;
-						});
-						while (wait)
-						{
-							yield return (object)null;
-						}
-					}
-					blurFilter = (ResourceUtility.Instantiate<Object>(loadedFilterCamera.loadedObject) as GameObject).GetComponent<ZoomBlurFilter>();
-					blurFilter.get_transform().set_parent(base._transform);
-					_camera = ResourceUtility.Realizes(loadedEventCamera.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform, -1).GetComponent<Camera>();
-					uiFrontMapSprite = t.FindChild("FrontMap").get_gameObject().GetComponent<UITexture>();
-					if (uiFrontMapSprite != null)
-					{
-						uiFrontMapSprite.alpha = 0f;
-					}
-					uiMapSprite = t.FindChild("Map").get_gameObject().GetComponent<UITexture>();
-					InitMapSprite(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
-					if (eventData.IsEncounterBossEvent())
-					{
-						t.FindChild("TaptoSkip").get_gameObject().SetActive(false);
-					}
-					bgEventListener = UIEventListener.Get(t.Find("BG").get_gameObject());
-					tutorialTrigger = t.FindChild("TUTORIAL_TRIGGER");
-					if (tutorialTrigger != null)
-					{
-						if (!TutorialStep.HasAllTutorialCompleted())
-						{
-							tutorialTrigger.get_gameObject().SetActive(true);
-							UITweenCtrl.Play(tutorialTrigger, true, null, false, 0);
-						}
-						else
-						{
-							tutorialTrigger.get_gameObject().SetActive(false);
-						}
-					}
-					spots = new SpotManager(null, loadedLocationSpot.loadedObject as GameObject, _camera);
-					spots.spotRootTransform = t;
-					playerMarker = ResourceUtility.Realizes(loadedPlayerMarker.loadedObject, -1);
-					PlayerMarker playerMarkerCom = playerMarker.GetComponent<PlayerMarker>();
-					if (null != playerMarkerCom)
-					{
-						playerMarkerCom.SetCamera(_camera.get_transform());
-					}
-					windEffect = ResourceUtility.Realizes(loadedWindEffect.loadedObject, _camera.get_transform(), -1).get_gameObject().GetComponent<rymFX>();
-					windEffect.Cameras = (Camera[])new Camera[1]
-					{
-						_camera
-					};
-					windEffect.get_gameObject().set_layer(LayerMask.NameToLayer("WorldMap"));
-					if (loadedDungeonEff != null)
-					{
-						dungeonOpenEffect = ResourceUtility.Realizes(loadedDungeonEff.loadedObject, base._transform, -1);
-						dungeonOpenEffect.get_gameObject().SetActive(false);
-					}
-					CreateVisitedLocationSpot();
-					if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
-					{
-						MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += InitMapSprite;
-					}
-					base.Initialize();
-				}
-			}
-		}
-	}
+  public enum AUDIO
+  {
+    DRAW_LINE = 40000032, // 0x02625A20
+    APEAR_LOCATION = 40000033, // 0x02625A21
+  }
 
-	public override void StartSection()
-	{
-		if (toRegionRelease)
-		{
-			MonoBehaviourSingleton<WorldMapManager>.I.transferInfo = new WorldMapManager.TransferInfo((int)regionId, true);
-			DispatchEvent("WORLD_MAP", null);
-			Exit();
-		}
-	}
+  public class SectionEventData
+  {
+    private WorldMapOpenNewField.EVENT_TYPE eventType;
 
-	private bool NeedDirectionOpenRegion()
-	{
-		MonoBehaviourSingleton<WorldMapManager>.I.openNewFieldId = (int)newMapData.mapID;
-		if (regionId >= 100)
-		{
-			return false;
-		}
-		if (MonoBehaviourSingleton<GameSceneManager>.I.IsExecutionAutoEvent())
-		{
-			return false;
-		}
-		if (MonoBehaviourSingleton<WorldMapManager>.I.IsShowedOpenRegion((int)regionId))
-		{
-			return false;
-		}
-		return true;
-	}
+    public SectionEventData(WorldMapOpenNewField.EVENT_TYPE _eventType, ENEMY_TYPE _enemyType)
+    {
+      this.eventType = _eventType;
+      this.enemyType = _enemyType;
+    }
 
-	private void CreateVisitedLocationSpot()
-	{
-		OutGameSettingsManager.QuestMap questMap = MonoBehaviourSingleton<OutGameSettingsManager>.I.questMap;
-		MonoBehaviourSingleton<FilterManager>.I.StopBlur(questMap.cameraMoveTime, 0f);
-		for (int i = 0; i < regionMapRoot.locations.Length; i++)
-		{
-			RegionMapLocation regionMapLocation = regionMapRoot.locations[i];
-			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint)regionMapLocation.mapId);
-			if ((fieldMapData != null || regionMapLocation.mapId == 0) && (fieldMapData == null || FieldManager.IsShowPortal(fieldMapData.jumpPortalID)))
-			{
-				if (fieldMapData != null && !MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapData))
-				{
-					CreateLocationSpot(regionMapLocation, SpotManager.ICON_TYPE.NOT_OPENED, false);
-				}
-				else if (regionMapLocation.mapId == newMapData.mapID && !eventData.IsOnlyCameraMoveEvent() && !eventData.IsEnterDungeon() && !eventData.IsQuestToField())
-				{
-					CreateLocationSpot(regionMapLocation, SpotManager.ICON_TYPE.NOT_OPENED, false);
-				}
-				else
-				{
-					SpotManager.ICON_TYPE iCON_TYPE = SpotManager.ICON_TYPE.CLEARED;
-					if (regionMapLocation.portal.Length > 0)
-					{
-						for (int j = 0; j < regionMapLocation.portal.Length; j++)
-						{
-							RegionMapPortal regionMapPortal = regionMapLocation.portal[j];
-							if (!regionMapPortal.IsVisited() && regionMapPortal.IsShow())
-							{
-								iCON_TYPE = SpotManager.ICON_TYPE.NEW;
-								break;
-							}
-						}
-					}
-					if (fieldMapData != null)
-					{
-						if (FieldManager.IsToHardPortal(fieldMapData.jumpPortalID))
-						{
-							iCON_TYPE = SpotManager.ICON_TYPE.HARD;
-							if (iCON_TYPE == SpotManager.ICON_TYPE.NEW)
-							{
-								iCON_TYPE = SpotManager.ICON_TYPE.HARD_NEW;
-							}
-						}
-						if (fieldMapData.hasChildRegion && fieldMapData.childRegionId != regionId)
-						{
-							iCON_TYPE = SpotManager.ICON_TYPE.CHILD_REGION;
-						}
-					}
-					CreateLocationSpot(regionMapLocation, iCON_TYPE, false);
-				}
-			}
-		}
-	}
+    public ENEMY_TYPE enemyType { get; private set; }
 
-	private GameObject CreateLocationSpot(RegionMapLocation location, SpotManager.ICON_TYPE icon = SpotManager.ICON_TYPE.CLEARED, bool isNew = false)
-	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Expected O, but got Unknown
-		//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ee: Expected O, but got Unknown
-		if (location.mapId == 0)
-		{
-			return spots.AddSpot(0, MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionTextList().Find((GameSceneTables.TextData textData) => textData.key == "STR_HOME").text, location.get_transform().get_position(), SpotManager.ICON_TYPE.HOME, null, false, false, false, null, null, false, SpotManager.HAPPEN_CONDITION.NONE, 0)._transform.get_gameObject();
-		}
-		FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint)location.mapId);
-		if (fieldMapData == null)
-		{
-			return null;
-		}
-		bool canUnlockNewPortal = false;
-		if (location.portal.Length > 0 && icon != SpotManager.ICON_TYPE.NOT_OPENED)
-		{
-			for (int i = 0; i < location.portal.Length; i++)
-			{
-				string s = location.get_name().Replace("location", string.Empty);
-				int.TryParse(s, out int result);
-				int[] locationNumbers = GetLocationNumbers(location.portal[i].get_name());
-				if (result == locationNumbers[0] && GameSaveData.instance.isNewReleasePortal((uint)location.portal[i].entranceId))
-				{
-					if (!location.portal[i].IsVisited())
-					{
-						canUnlockNewPortal = true;
-						break;
-					}
-					GameSaveData.instance.newReleasePortals.Remove((uint)location.portal[i].entranceId);
-				}
-				if (result == locationNumbers[1] && GameSaveData.instance.isNewReleasePortal((uint)location.portal[i].exitId))
-				{
-					if (!location.portal[i].IsVisited())
-					{
-						canUnlockNewPortal = true;
-						break;
-					}
-					GameSaveData.instance.newReleasePortals.Remove((uint)location.portal[i].exitId);
-				}
-			}
-		}
-		return spots.AddSpot((int)fieldMapData.mapID, fieldMapData.mapName, location.get_transform().get_position(), icon, null, isNew, canUnlockNewPortal, false, fieldMapData.mapID, location.icon, false, SpotManager.HAPPEN_CONDITION.NONE, 0)._transform.get_gameObject();
-	}
+    public bool IsOnlyCameraMoveEvent()
+    {
+      return this.eventType == WorldMapOpenNewField.EVENT_TYPE.ONLY_CAMERA_MOVE;
+    }
 
-	private void InitMapSprite(bool isPortrait)
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Expected O, but got Unknown
-		if (uiMapSprite != null)
-		{
-			if (_camera.get_targetTexture() != null)
-			{
-				RenderTexture.ReleaseTemporary(_camera.get_targetTexture());
-				_camera.set_targetTexture(null);
-			}
-			_camera.set_targetTexture(RenderTexture.GetTemporary(Screen.get_width(), Screen.get_height()));
-			uiMapSprite.mainTexture = _camera.get_targetTexture();
-			uiMapSprite.width = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth;
-			uiMapSprite.height = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
-		}
-		if (uiFrontMapSprite != null && blurFilter != null)
-		{
-			uiFrontMapSprite.mainTexture = blurFilter.filteredTexture;
-			uiFrontMapSprite.width = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth;
-			uiFrontMapSprite.height = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
-		}
-	}
+    public bool IsEnterDungeon()
+    {
+      return this.eventType == WorldMapOpenNewField.EVENT_TYPE.EXIST_IN_DUNGEON;
+    }
 
-	protected override void OnOpen()
-	{
-		if (toRegionRelease)
-		{
-			base.OnOpen();
-		}
-		else
-		{
-			if (null != bgEventListener)
-			{
-				UIEventListener uIEventListener = bgEventListener;
-				uIEventListener.onClick = (UIEventListener.VoidDelegate)Delegate.Combine(uIEventListener.onClick, new UIEventListener.VoidDelegate(onClick));
-			}
-			if (portalData == null || newMapData == null)
-			{
-				RequestEvent("EXIT", null);
-			}
-			else if (eventData.IsFindNewDungeon())
-			{
-				OpenNewDungeon();
-			}
-			else if (eventData.IsOnlyCameraMoveEvent() || eventData.IsEnterDungeon())
-			{
-				CameraMoveEvent();
-			}
-			else if (eventData.IsQuestToField())
-			{
-				QuestToField();
-			}
-			else
-			{
-				OpenNewLocation();
-			}
-			base.OnOpen();
-		}
-	}
+    public bool IsFindNewDungeon()
+    {
+      return this.eventType == WorldMapOpenNewField.EVENT_TYPE.OPEN_NEW_DUNGEON;
+    }
 
-	private void OnQuery_EXIT()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Expected O, but got Unknown
-		if (playerMarker != null)
-		{
-			Object.Destroy(playerMarker.get_gameObject());
-			playerMarker = null;
-		}
-		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
-		{
-			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= InitMapSprite;
-		}
-		this.StopAllCoroutines();
-		if (!calledExit)
-		{
-			if (null != bgEventListener)
-			{
-				UIEventListener uIEventListener = bgEventListener;
-				uIEventListener.onClick = (UIEventListener.VoidDelegate)Delegate.Remove(uIEventListener.onClick, new UIEventListener.VoidDelegate(onClick));
-			}
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("WorldMapOpenNewField", this.get_gameObject(), "INGAME_MAIN", null, null, true);
-			calledExit = true;
-		}
-	}
+    public bool IsEncounterBossEvent()
+    {
+      return this.eventType == WorldMapOpenNewField.EVENT_TYPE.ENCOUNTER_BOSS;
+    }
 
-	public void CameraMoveEvent()
-	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		RegionMapPortal regionMapPortal;
-		bool flag = IsPortalReverseAndGetPortalData((int)portalData.portalID, out regionMapPortal);
-		if (regionMapPortal == null)
-		{
-			RequestEvent("EXIT", null);
-		}
-		else
-		{
-			Vector3 position = regionMapPortal.fromLocation.get_transform().get_position();
-			playerMarker.SetParent(regionMapPortal.fromLocation.get_transform());
-			if (flag)
-			{
-				position = regionMapPortal.toLocation.get_transform().get_position();
-				playerMarker.SetParent(regionMapPortal.toLocation.get_transform());
-			}
-			playerMarker.set_localPosition(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerOffset);
-			position -= _camera.get_transform().get_forward() * MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventCameraDistance;
-			_camera.get_transform().set_position(position);
-			this.StartCoroutine(DoExitEvent(regionMapPortal, null, MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.onlyCameraMoveDelay, flag, false));
-		}
-	}
-
-	private void QuestToField()
-	{
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		FieldMapTable.PortalTableData portalTableData = Singleton<FieldMapTable>.I.GetPortalData(MonoBehaviourSingleton<FieldManager>.I.currentPortalID);
-		if (portalTableData == null)
-		{
-			RequestEvent("EXIT", null);
-		}
-		else
-		{
-			RegionMapLocation regionMapLocation = regionMapRoot.FindLocation((int)portalTableData.dstMapID);
-			if (null == regionMapLocation)
-			{
-				RequestEvent("EXIT", null);
-			}
-			else
-			{
-				Vector3 position = regionMapLocation.get_transform().get_position();
-				_camera.get_transform().set_position(position - _camera.get_transform().get_forward() * MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventCameraDistance);
-				playerMarker.SetParent(regionMapLocation.get_transform());
-				playerMarker.set_localPosition(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerOffset);
-				playerMarker.set_localScale(new Vector3(0f, 0f, 0f));
-				this.StartCoroutine(DoQuestToField());
-			}
-		}
-	}
-
-	private IEnumerator DoQuestToField()
-	{
-		yield return (object)new WaitForSeconds(0.8f);
-		TweenScale.Begin(playerMarker.get_gameObject(), MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerScaleTime, Vector3.get_one());
-		yield return (object)new WaitForSeconds(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerScaleTime + 1.5f);
-		OnQuery_EXIT();
-	}
-
-	private bool IsPortalReverseAndGetPortalData(int portalId, out RegionMapPortal portalData)
-	{
-		portalData = regionMapRoot.FindEntrancePortal(portalId);
-		if (portalData != null)
-		{
-			return false;
-		}
-		portalData = regionMapRoot.FindExitPortal(portalId);
-		return true;
-	}
-
-	private void SetCameraToMiddlePoint(RegionMapPortal portal)
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = (portal.fromLocation.get_transform().get_position() + portal.toLocation.get_transform().get_position()) / 2f;
-		val -= _camera.get_transform().get_forward() * MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventCameraDistance;
-		_camera.get_transform().set_position(val);
-	}
-
-	private void SetCameraToLocation(RegionMapLocation location)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 position = location.get_transform().get_position();
-		position -= _camera.get_transform().get_forward() * MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventCameraDistance;
-		_camera.get_transform().set_position(position);
-	}
-
-	private void SetPlayerMakerToStartPosition(RegionMapPortal portal, bool reverse)
-	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		playerMarker.SetParent(portal.fromLocation.get_transform());
-		if (reverse)
-		{
-			playerMarker.SetParent(portal.toLocation.get_transform());
-		}
-		playerMarker.set_localPosition(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerOffset);
-	}
-
-	public void OpenNewDungeon()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoOpenNewDungeon());
-	}
-
-	private IEnumerator DoOpenNewDungeon()
-	{
-		yield return (object)null;
-		RegionMapPortal portal;
-		bool reverse = IsPortalReverseAndGetPortalData((int)portalData.portalID, out portal);
-		if (portal == null)
-		{
-			RequestEvent("EXIT", null);
-		}
-		else
-		{
-			regionMapRoot.animator.Play(portal.get_gameObject().get_name());
-			SetCameraToMiddlePoint(portal);
-			SetPlayerMakerToStartPosition(portal, reverse);
-			SoundManager.PlayOneShotUISE(40000032);
-			GameObject effect = ResourceUtility.Instantiate<Object>(topEffectPrefab) as GameObject;
-			rymFX rym = effect.GetComponent<rymFX>();
-			rym.Cameras = (Camera[])new Camera[1]
-			{
-				_camera
-			};
-			rym.ViewShift = 0f;
-			portal.Open(effect.get_transform(), regionMapRoot.animator, false, 1f, delegate
-			{
-				//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-				if (!((_003CDoOpenNewDungeon_003Ec__Iterator166)/*Error near IL_015b: stateMachine*/)._003C_003Ef__this.calledExit)
-				{
-					GameObject val = ((_003CDoOpenNewDungeon_003Ec__Iterator166)/*Error near IL_015b: stateMachine*/)._003C_003Ef__this.CreateLocationSpot(((_003CDoOpenNewDungeon_003Ec__Iterator166)/*Error near IL_015b: stateMachine*/)._003Cportal_003E__0.toLocation, SpotManager.ICON_TYPE.CHILD_REGION, true);
-					if (val != null)
-					{
-						val.get_transform().set_localScale(new Vector3(0.1f, 0.1f, 0.1f));
-						TweenScale.Begin(val, 0.3f, Vector3.get_one());
-					}
-					((_003CDoOpenNewDungeon_003Ec__Iterator166)/*Error near IL_015b: stateMachine*/)._003C_003Ef__this.StartCoroutine(((_003CDoOpenNewDungeon_003Ec__Iterator166)/*Error near IL_015b: stateMachine*/)._003C_003Ef__this.DoExitEvent(((_003CDoOpenNewDungeon_003Ec__Iterator166)/*Error near IL_015b: stateMachine*/)._003Cportal_003E__0, ((_003CDoOpenNewDungeon_003Ec__Iterator166)/*Error near IL_015b: stateMachine*/)._003Crym_003E__3, 0f, ((_003CDoOpenNewDungeon_003Ec__Iterator166)/*Error near IL_015b: stateMachine*/)._003Creverse_003E__1, true));
-				}
-			});
-		}
-	}
-
-	public void OpenNewLocation()
-	{
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Expected O, but got Unknown
-		RegionMapPortal portal;
-		bool reverse = IsPortalReverseAndGetPortalData((int)portalData.portalID, out portal);
-		if (portal == null)
-		{
-			RequestEvent("EXIT", null);
-		}
-		else
-		{
-			string text = portal.get_gameObject().get_name();
-			if (reverse)
-			{
-				text += "_R";
-			}
-			regionMapRoot.animator.Play(text);
-			SetCameraToMiddlePoint(portal);
-			SetPlayerMakerToStartPosition(portal, reverse);
-			GameObject effect = ResourceUtility.Instantiate<Object>(topEffectPrefab) as GameObject;
-			rymFX rym = effect.GetComponent<rymFX>();
-			rym.Cameras = (Camera[])new Camera[1]
-			{
-				_camera
-			};
-			rym.ViewShift = 0f;
-			float endTime = 1f;
-			if (eventData.IsEncounterBossEvent())
-			{
-				endTime = 0.4f;
-			}
-			SoundManager.PlayOneShotUISE(40000032);
-			portal.Open(effect.get_transform(), regionMapRoot.animator, reverse, endTime, delegate
-			{
-				//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-				if (!calledExit)
-				{
-					RegionMapLocation location = portal.toLocation;
-					if (eventData.IsEncounterBossEvent())
-					{
-						if (MonoBehaviourSingleton<UIInGameFieldQuestWarning>.IsValid())
-						{
-							MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.Play(eventData.enemyType, 0, false);
-							MonoBehaviourSingleton<UIInGameFieldQuestWarning>.I.FadeOut(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.encounterBossCutInTime + 2f, 0.3f, delegate
-							{
-								if (fieldQuestWarningRoot != null)
-								{
-									Object.Destroy(fieldQuestWarningRoot);
-								}
-							});
-						}
-						if (effect != null)
-						{
-							EffectManager.ReleaseEffect(effect, true, false);
-						}
-						this.StartCoroutine(DoExitEncounterBossEvent());
-					}
-					else
-					{
-						if (reverse)
-						{
-							location = portal.fromLocation;
-						}
-						GameObject val = CreateLocationSpot(location, SpotManager.ICON_TYPE.NEW, true);
-						if (val != null)
-						{
-							val.get_transform().set_localScale(new Vector3(0.1f, 0.1f, 0.1f));
-							TweenScale.Begin(val, 0.3f, Vector3.get_one());
-							SoundManager.PlayOneShotUISE(40000033);
-						}
-						this.StartCoroutine(DoExitEvent(portal, rym, 0f, reverse, false));
-					}
-				}
-			});
-		}
-	}
-
-	private IEnumerator DoExitEncounterBossEvent()
-	{
-		yield return (object)new WaitForSeconds(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.encounterBossCutInTime);
-		OnQuery_EXIT();
-	}
-
-	private IEnumerator DoExitEvent(RegionMapPortal portal, rymFX effect, float delay = 0f, bool reverse = false, bool findDungeon = false)
-	{
-		if (effect != null)
-		{
-			EffectManager.ReleaseEffect(effect.get_gameObject(), true, false);
-			effect = null;
-		}
-		yield return (object)new WaitForSeconds(delay);
-		LoadObject loadObj = null;
-		if (findDungeon)
-		{
-			LoadingQueue loadQueue = new LoadingQueue(this);
-			FieldMapTable.FieldMapTableData mapData = Singleton<FieldMapTable>.I.GetFieldMapData((uint)portal.toLocation.mapId);
-			loadObj = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "RegionMap_" + mapData.childRegionId.ToString("D3"), false);
-			if (null != dungeonOpenEffect)
-			{
-				EffectCtrl eff = dungeonOpenEffect.GetComponent<EffectCtrl>();
-				eff.Reset();
-				for (int i = 0; i < eff.particles.Length; i++)
-				{
-					ParticleSystem particle = eff.particles[i];
-					if (!(null == particle))
-					{
-						Renderer renderer = particle.GetComponent<Renderer>();
-						if (!(null == renderer))
-						{
-							renderer.set_sortingOrder(2);
-						}
-					}
-				}
-				dungeonOpenEffect.get_gameObject().SetActive(true);
-				AudioClip clip_effect = eff.attachedAudioClip;
-				if (clip_effect != null)
-				{
-					int SE_CONFIG_AREA_LOCATION = eff.attachedAudioSettingID;
-					SoundManager.PlayOneShotUISE(clip_effect, SE_CONFIG_AREA_LOCATION);
-				}
-				yield return (object)new WaitForSeconds(eff.waitTime);
-			}
-			if (loadQueue.IsLoading())
-			{
-				yield return (object)loadQueue.Wait();
-			}
-		}
-		TweenScale.Begin(playerMarker.get_gameObject(), MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerScaleTime, Vector3.get_zero());
-		yield return (object)new WaitForSeconds(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerScaleTime);
-		float timer = 0f;
-		Vector3 target2 = portal.toLocation.get_transform().get_position();
-		playerMarker.SetParent(portal.toLocation.get_transform());
-		if (reverse)
-		{
-			target2 = portal.fromLocation.get_transform().get_position();
-			playerMarker.SetParent(portal.fromLocation.get_transform());
-		}
-		playerMarker.set_localPosition(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerOffset);
-		target2 -= _camera.get_transform().get_forward() * MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventCameraDistance;
-		Vector3 startPos = _camera.get_transform().get_position();
-		TweenScale.Begin(playerMarker.get_gameObject(), MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerScaleTime, Vector3.get_one());
-		while (timer <= MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventCameraMoveTime)
-		{
-			timer += Time.get_deltaTime();
-			_camera.get_transform().set_position(Vector3.Lerp(startPos, target2, timer / MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventCameraMoveTime));
-			yield return (object)null;
-		}
-		_camera.get_transform().set_position(target2);
-		yield return (object)new WaitForSeconds(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.eventRemainTime);
-		if (findDungeon)
-		{
-			yield return (object)this.StartCoroutine(DoFindNewDungeonEvent(portal, loadObj));
-		}
-		OnQuery_EXIT();
-	}
-
-	private IEnumerator DoFindNewDungeonEvent(RegionMapPortal portal, LoadObject newRegion)
-	{
-		if (blurFilter != null)
-		{
-			bool wait3 = true;
-			blurFilter.CacheRenderTarget(delegate
-			{
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				((_003CDoFindNewDungeonEvent_003Ec__Iterator169)/*Error near IL_005d: stateMachine*/)._003C_003Ef__this.playerMarker.get_gameObject().SetActive(false);
-				((_003CDoFindNewDungeonEvent_003Ec__Iterator169)/*Error near IL_005d: stateMachine*/)._003C_003Ef__this.playerMarker.SetParent(((_003CDoFindNewDungeonEvent_003Ec__Iterator169)/*Error near IL_005d: stateMachine*/)._003C_003Ef__this._transform);
-				((_003CDoFindNewDungeonEvent_003Ec__Iterator169)/*Error near IL_005d: stateMachine*/)._003Cwait_003E__0 = false;
-			}, true);
-			while (wait3)
-			{
-				yield return (object)null;
-			}
-			uiFrontMapSprite.alpha = 1f;
-			spots.ClearAllSpot();
-			Object.Destroy(regionMapRoot.get_gameObject());
-			RegionMapLocation newLocation = null;
-			if (newRegion != null)
-			{
-				regionMapRoot = ResourceUtility.Realizes(newRegion.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform, -1).get_gameObject().GetComponent<RegionMapRoot>();
-				if (regionMapRoot != null)
-				{
-					wait3 = true;
-					regionMapRoot.InitPortalStatus(delegate
-					{
-						((_003CDoFindNewDungeonEvent_003Ec__Iterator169)/*Error near IL_0136: stateMachine*/)._003Cwait_003E__0 = false;
-					});
-					while (wait3)
-					{
-						yield return (object)null;
-					}
-					CreateVisitedLocationSpot();
-					newLocation = regionMapRoot.FindLocation(portal.toLocation.mapId);
-					if (newLocation != null)
-					{
-						SetCameraToLocation(newLocation);
-						playerMarker.SetParent(newLocation.get_transform());
-						playerMarker.set_localPosition(MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerOffset);
-					}
-				}
-			}
-			wait3 = true;
-			float blurTime = 0.25f;
-			Vector2 blurCenter = new Vector2(0.5f, 0.5f);
-			blurFilter.StartBlurFilter(0.01f, 0.25f, blurTime, blurCenter, delegate
-			{
-				((_003CDoFindNewDungeonEvent_003Ec__Iterator169)/*Error near IL_023f: stateMachine*/)._003Cwait_003E__0 = false;
-			});
-			uiMapSprite.alpha = 0f;
-			TweenAlpha.Begin(uiMapSprite.get_gameObject(), blurTime, 1f);
-			TweenAlpha.Begin(uiFrontMapSprite.get_gameObject(), blurTime, 0f);
-			while (wait3)
-			{
-				yield return (object)null;
-			}
-			yield return (object)new WaitForSeconds(1f);
-			if (regionMapRoot != null && newLocation != null)
-			{
-				GameObject obj = CreateLocationSpot(newLocation, SpotManager.ICON_TYPE.NEW, true);
-				if (obj != null)
-				{
-					obj.get_transform().set_localScale(new Vector3(0.1f, 0.1f, 0.1f));
-					TweenScale.Begin(obj, 0.3f, Vector3.get_one());
-					SoundManager.PlayOneShotUISE(40000033);
-				}
-				yield return (object)new WaitForSeconds(0.5f);
-				playerMarker.get_gameObject().SetActive(true);
-				playerMarker.set_localScale(new Vector3(0f, 0f, 0f));
-				TweenScale.Begin(playerMarker.get_gameObject(), MonoBehaviourSingleton<GlobalSettingsManager>.I.worldMapParam.playerMarkerScaleTime, Vector3.get_one());
-			}
-			yield return (object)new WaitForSeconds(1.5f);
-		}
-	}
-
-	private IEnumerator DoAfterWaitForSecond(float time, Action func)
-	{
-		yield return (object)new WaitForSeconds(time);
-		func?.Invoke();
-	}
-
-	public override void Exit()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		if (windEffect != null)
-		{
-			EffectManager.ReleaseEffect(windEffect.get_gameObject(), true, false);
-		}
-		if (spots != null)
-		{
-			spots.ClearAllSpot();
-		}
-		if (regionMapRoot != null)
-		{
-			Object.Destroy(regionMapRoot.get_gameObject());
-		}
-		if (_camera != null)
-		{
-			Object.Destroy(_camera.get_gameObject());
-		}
-		if (null != dungeonOpenEffect)
-		{
-			Object.Destroy(dungeonOpenEffect);
-		}
-		base.Exit();
-	}
-
-	private void LateUpdate()
-	{
-		UpdateTutorialTrigger();
-		if (spots != null)
-		{
-			spots.Update();
-		}
-		if (isUpdateRenderTexture)
-		{
-			InitMapSprite(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
-			isUpdateRenderTexture = false;
-		}
-	}
-
-	private void UpdateTutorialTrigger()
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		if (!(tutorialTrigger == null))
-		{
-			Vector3 val = _camera.WorldToScreenPoint(tutorialTriggerPos);
-			val = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
-			val.z = 0f;
-			tutorialTrigger.set_position(val);
-		}
-	}
-
-	private void OnApplicationPause(bool paused)
-	{
-		isUpdateRenderTexture = !paused;
-	}
-
-	private void onClick(GameObject g)
-	{
-		if (!eventData.IsEncounterBossEvent())
-		{
-			OnQuery_EXIT();
-		}
-	}
-
-	public static bool IsValidRegionFromMapId(uint mapId)
-	{
-		if (!Singleton<FieldMapTable>.IsValid())
-		{
-			return false;
-		}
-		return IsValidRegion(Singleton<FieldMapTable>.I.GetFieldMapData(mapId));
-	}
-
-	public static bool IsValidRegion(FieldMapTable.FieldMapTableData mapData)
-	{
-		if (mapData == null)
-		{
-			return false;
-		}
-		if (!Singleton<RegionTable>.IsValid())
-		{
-			return false;
-		}
-		RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
-		if (data == null || data.Length == 0)
-		{
-			return false;
-		}
-		RegionTable.Data data2 = Array.Find(data, (RegionTable.Data o) => o.regionId == mapData.regionId);
-		return null != data2;
-	}
-
-	private int[] GetLocationNumbers(string portalName)
-	{
-		string[] array = portalName.Replace("portal", string.Empty).Split('_');
-		return new int[2]
-		{
-			int.Parse(array[0]),
-			int.Parse(array[1])
-		};
-	}
+    public bool IsQuestToField()
+    {
+      return this.eventType == WorldMapOpenNewField.EVENT_TYPE.QUEST_TO_FIELD;
+    }
+  }
 }

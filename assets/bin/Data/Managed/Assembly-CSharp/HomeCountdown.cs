@@ -1,160 +1,130 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: HomeCountdown
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class HomeCountdown : GameSection
 {
-	private enum UI
-	{
-		OBJ_COUNTDOWN_ROOT,
-		TEX_COUNTDOWN,
-		BTN_SKIP_FULL_SCREEN
-	}
+  private bool ready;
+  private LoadingQueue loadQueue;
+  private int showID;
+  private HomeCountdown.State currentState;
+  private bool stateInitialized;
+  private float showTimer;
+  private bool skipRequest;
 
-	private enum AUDIO
-	{
-		START = 40000388
-	}
+  public override void Initialize()
+  {
+    this.ready = false;
+    this.showID = (int) GameSection.GetEventData();
+    PlayerPrefs.SetInt("COUNTDOWN_SHOWED_REMAIN", this.showID);
+    this.SetFullScreenButton((Enum) HomeCountdown.UI.BTN_SKIP_FULL_SCREEN);
+    this.InitTween((Enum) HomeCountdown.UI.OBJ_COUNTDOWN_ROOT);
+    this.StartCoroutine(this.DoInitialize());
+  }
 
-	private enum State
-	{
-		START,
-		SHOW,
-		END
-	}
+  private IEnumerator DoInitialize()
+  {
+    if (this.loadQueue == null)
+      this.loadQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject lo_image = this.loadQueue.Load(RESOURCE_CATEGORY.COUNTDOWN_IMAGE, ResourceName.GetCountdownImage(this.showID));
+    if (this.loadQueue.IsLoading())
+      yield return (object) this.loadQueue.Wait();
+    if (Object.op_Equality(lo_image.loadedObject, (Object) null))
+      yield return (object) null;
+    ((Component) this.GetCtrl((Enum) HomeCountdown.UI.TEX_COUNTDOWN)).GetComponent<UITexture>().mainTexture = lo_image.loadedObject as Texture;
+    this.ready = true;
+    base.Initialize();
+  }
 
-	private bool ready;
+  private void Update()
+  {
+    if (this.stateInitialized)
+      return;
+    switch (this.currentState)
+    {
+      case HomeCountdown.State.START:
+        this.StartCoroutine(this.StartAnimation());
+        this.stateInitialized = true;
+        break;
+      case HomeCountdown.State.SHOW:
+        this.showTimer = 0.0f;
+        this.StartCoroutine(this.ShowCountdown());
+        this.stateInitialized = true;
+        break;
+      case HomeCountdown.State.END:
+        this.StartCoroutine(this.EndAnimation());
+        this.stateInitialized = true;
+        break;
+    }
+  }
 
-	private LoadingQueue loadQueue;
+  private void ChangeState(HomeCountdown.State nextState)
+  {
+    this.stateInitialized = false;
+    this.currentState = nextState;
+  }
 
-	private int showID;
+  private IEnumerator StartAnimation()
+  {
+    this.SetActive((Enum) HomeCountdown.UI.BTN_SKIP_FULL_SCREEN, false);
+    bool wait = true;
+    this.PlayAudio((Enum) HomeCountdown.AUDIO.START, 1.3f);
+    this.PlayTween((Enum) HomeCountdown.UI.OBJ_COUNTDOWN_ROOT, callback: (EventDelegate.Callback) (() => wait = false));
+    while (wait)
+      yield return (object) 0;
+    this.ChangeState(HomeCountdown.State.SHOW);
+  }
 
-	private State currentState;
+  private IEnumerator ShowCountdown()
+  {
+    bool wait = true;
+    Transform skip = this.GetCtrl((Enum) HomeCountdown.UI.BTN_SKIP_FULL_SCREEN);
+    while (wait)
+    {
+      this.showTimer += Time.deltaTime;
+      if (1.2000000476837158 < (double) this.showTimer && !((Component) skip).gameObject.activeSelf)
+        this.SetActive((Enum) HomeCountdown.UI.BTN_SKIP_FULL_SCREEN, true);
+      if (this.skipRequest && 1.2000000476837158 < (double) this.showTimer)
+        wait = false;
+      yield return (object) 0;
+    }
+    this.ChangeState(HomeCountdown.State.END);
+  }
 
-	private bool stateInitialized;
+  private IEnumerator EndAnimation()
+  {
+    bool wait = true;
+    this.PlayTween((Enum) HomeCountdown.UI.OBJ_COUNTDOWN_ROOT, false, (EventDelegate.Callback) (() => wait = false));
+    while (wait)
+      yield return (object) 0;
+    this.DispatchEvent("BACK");
+  }
 
-	private float showTimer;
+  private void OnQuery_SKIP() => this.skipRequest = true;
 
-	private bool skipRequest;
+  private enum UI
+  {
+    OBJ_COUNTDOWN_ROOT,
+    TEX_COUNTDOWN,
+    BTN_SKIP_FULL_SCREEN,
+  }
 
-	public override void Initialize()
-	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		ready = false;
-		showID = (int)GameSection.GetEventData();
-		PlayerPrefs.SetInt("COUNTDOWN_SHOWED_REMAIN", showID);
-		SetFullScreenButton((Enum)UI.BTN_SKIP_FULL_SCREEN);
-		InitTween((Enum)UI.OBJ_COUNTDOWN_ROOT);
-		this.StartCoroutine(DoInitialize());
-	}
+  private enum AUDIO
+  {
+    START = 40000388, // 0x02625B84
+  }
 
-	private IEnumerator DoInitialize()
-	{
-		if (loadQueue == null)
-		{
-			loadQueue = new LoadingQueue(this);
-		}
-		string name = ResourceName.GetCountdownImage(showID);
-		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.COUNTDOWN_IMAGE, name, false);
-		if (loadQueue.IsLoading())
-		{
-			yield return (object)loadQueue.Wait();
-		}
-		if (lo_image.loadedObject == null)
-		{
-			yield return (object)null;
-		}
-		Transform texture = GetCtrl(UI.TEX_COUNTDOWN);
-		UITexture uiTexture = texture.GetComponent<UITexture>();
-		Texture image = uiTexture.mainTexture = (lo_image.loadedObject as Texture);
-		ready = true;
-		base.Initialize();
-	}
-
-	private void Update()
-	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		if (!stateInitialized)
-		{
-			switch (currentState)
-			{
-			case State.START:
-				this.StartCoroutine(StartAnimation());
-				stateInitialized = true;
-				break;
-			case State.SHOW:
-				showTimer = 0f;
-				this.StartCoroutine(ShowCountdown());
-				stateInitialized = true;
-				break;
-			case State.END:
-				this.StartCoroutine(EndAnimation());
-				stateInitialized = true;
-				break;
-			}
-		}
-	}
-
-	private void ChangeState(State nextState)
-	{
-		stateInitialized = false;
-		currentState = nextState;
-	}
-
-	private IEnumerator StartAnimation()
-	{
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, false);
-		bool wait = true;
-		PlayAudio(AUDIO.START, 1.3f, false);
-		PlayTween((Enum)UI.OBJ_COUNTDOWN_ROOT, true, (EventDelegate.Callback)delegate
-		{
-			((_003CStartAnimation_003Ec__Iterator7E)/*Error near IL_0062: stateMachine*/)._003Cwait_003E__0 = false;
-		}, true, 0);
-		while (wait)
-		{
-			yield return (object)0;
-		}
-		ChangeState(State.SHOW);
-	}
-
-	private IEnumerator ShowCountdown()
-	{
-		bool wait = true;
-		Transform skip = GetCtrl(UI.BTN_SKIP_FULL_SCREEN);
-		while (wait)
-		{
-			showTimer += Time.get_deltaTime();
-			if (1.2f < showTimer && !skip.get_gameObject().get_activeSelf())
-			{
-				SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, true);
-			}
-			if (skipRequest && 1.2f < showTimer)
-			{
-				wait = false;
-			}
-			yield return (object)0;
-		}
-		ChangeState(State.END);
-	}
-
-	private IEnumerator EndAnimation()
-	{
-		bool wait = true;
-		PlayTween((Enum)UI.OBJ_COUNTDOWN_ROOT, false, (EventDelegate.Callback)delegate
-		{
-			((_003CEndAnimation_003Ec__Iterator80)/*Error near IL_0035: stateMachine*/)._003Cwait_003E__0 = false;
-		}, true, 0);
-		while (wait)
-		{
-			yield return (object)0;
-		}
-		DispatchEvent("BACK", null);
-	}
-
-	private void OnQuery_SKIP()
-	{
-		skipRequest = true;
-	}
+  private enum State
+  {
+    START,
+    SHOW,
+    END,
+  }
 }

@@ -1,55 +1,46 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SceneParameter
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class SceneParameter
+#nullable disable
+public class SceneParameter : MonoBehaviour
 {
-	public Texture2D[] lightmapsFar;
+  public Texture2D[] lightmapsFar;
+  public Texture2D[] lightmapsNear;
+  public LightmapsMode lightmapMode;
+  public LightProbes lightProbes;
 
-	public Texture2D[] lightmapsNear;
+  private void OnDisable()
+  {
+    LightmapSettings.lightmaps = (LightmapData[]) null;
+    LightmapSettings.lightProbes = (LightProbes) null;
+  }
 
-	public LightmapsMode lightmapMode;
-
-	public LightProbes lightProbes;
-
-	public SceneParameter()
-		: this()
-	{
-	}
-
-	private void OnDisable()
-	{
-		LightmapSettings.set_lightmaps((LightmapData[])null);
-		LightmapSettings.set_lightProbes(null);
-	}
-
-	public void Apply()
-	{
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Expected O, but got Unknown
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		if (lightProbes != null)
-		{
-			LightmapSettings.set_lightProbes(lightProbes);
-			ShaderGlobal.lightProbe = true;
-		}
-		else
-		{
-			ShaderGlobal.lightProbe = false;
-		}
-		if (lightmapsFar != null && lightmapsFar.Length > 0)
-		{
-			LightmapData[] array = (LightmapData[])new LightmapData[lightmapsFar.Length];
-			int i = 0;
-			for (int num = lightmapsFar.Length; i < num; i++)
-			{
-				array[i] = new LightmapData();
-				array[i].set_lightmapFar(lightmapsFar[i]);
-				if (i < lightmapsNear.Length)
-				{
-					array[i].set_lightmapNear(lightmapsNear[i]);
-				}
-			}
-			LightmapSettings.set_lightmapsMode(lightmapMode);
-			LightmapSettings.set_lightmaps(array);
-		}
-	}
+  public void Apply()
+  {
+    if (Object.op_Inequality((Object) this.lightProbes, (Object) null))
+    {
+      LightmapSettings.lightProbes = this.lightProbes;
+      ShaderGlobal.lightProbe = true;
+    }
+    else
+      ShaderGlobal.lightProbe = false;
+    if (this.lightmapsFar == null || this.lightmapsFar.Length == 0)
+      return;
+    LightmapData[] lightmapDataArray = new LightmapData[this.lightmapsFar.Length];
+    int index = 0;
+    for (int length = this.lightmapsFar.Length; index < length; ++index)
+    {
+      lightmapDataArray[index] = new LightmapData();
+      lightmapDataArray[index].lightmapColor = this.lightmapsFar[index];
+      if (index < this.lightmapsNear.Length)
+        lightmapDataArray[index].lightmapDir = this.lightmapsNear[index];
+    }
+    LightmapSettings.lightmapsMode = this.lightmapMode;
+    LightmapSettings.lightmaps = lightmapDataArray;
+  }
 }

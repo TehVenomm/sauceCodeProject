@@ -1,407 +1,350 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: CharacterPacketSender
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public abstract class CharacterPacketSender : ObjectPacketSender
 {
-	protected float updatePositionTimer;
+  protected float updatePositionTimer;
+  protected bool actUpdateSendFlag;
+  protected float actUpdateTimer;
+  protected int moveMotion;
+  protected int prevSendHp;
 
-	protected bool actUpdateSendFlag;
+  protected Character character => (Character) this.owner;
 
-	protected float actUpdateTimer;
+  public abstract void OnLoadComplete(bool promise = true);
 
-	protected int moveMotion;
+  public abstract void OnRecvLoadComplete(int to_client_id);
 
-	protected int prevSendHp;
+  public abstract void SendInitialize(int to_client_id = 0);
 
-	protected Character character => (Character)base.owner;
+  public override void OnUpdate()
+  {
+    base.OnUpdate();
+    if (this.actUpdateSendFlag)
+    {
+      float num = MonoBehaviourSingleton<InGameSettingsManager>.I.character.moveSendInterval;
+      int index = 0;
+      for (int count = this.character.periodicSyncOwnerList.Count; index < count; ++index)
+      {
+        StageObject periodicSyncOwner = (StageObject) this.character.periodicSyncOwnerList[index];
+        if (periodicSyncOwner.IsMirror() || periodicSyncOwner.IsPuppet())
+        {
+          num = MonoBehaviourSingleton<InGameSettingsManager>.I.character.periodicSyncActionPositionCheckTime + MonoBehaviourSingleton<InGameSettingsManager>.I.character.periodicSyncActionPositionApplyTime;
+          break;
+        }
+      }
+      this.actUpdateTimer += Time.deltaTime;
+      if (this.character.actionID == Character.ACTION_ID.MOVE && (double) this.actUpdateTimer >= (double) num)
+      {
+        Coop_Model_CharacterMoveVelocity characterMoveVelocity = new Coop_Model_CharacterMoveVelocity();
+        characterMoveVelocity.id = this.owner.id;
+        characterMoveVelocity.time = this.actUpdateTimer;
+        characterMoveVelocity.pos = this.owner._position;
+        characterMoveVelocity.motion_id = this.moveMotion;
+        characterMoveVelocity.target_id = Object.op_Inequality((Object) this.character.actionTarget, (Object) null) ? this.character.actionTarget.id : -1;
+        if (this.enableSend && this.owner.IsOriginal())
+          this.SendBroadcast<Coop_Model_CharacterMoveVelocity>(characterMoveVelocity);
+        this.StackActionHistory((Coop_Model_ObjectBase) characterMoveVelocity, true);
+        this.actUpdateTimer = 0.0f;
+      }
+    }
+    if (!this.character.isControllable && !this.character.enableMotionCancel)
+      return;
+    this.PassNeedWaitSyncTime(Time.deltaTime);
+  }
 
-	public abstract void OnLoadComplete(bool promise = true);
+  public virtual void OnSetActionTarget(StageObject target)
+  {
+    if (!this.enableSend || !this.owner.IsOriginal())
+      return;
+    Coop_Model_CharacterActionTarget model = new Coop_Model_CharacterActionTarget();
+    model.id = this.owner.id;
+    model.target_id = Object.op_Inequality((Object) target, (Object) null) ? target.id : -1;
+    this.SendBroadcast<Coop_Model_CharacterActionTarget>(model);
+  }
 
-	public abstract void OnRecvLoadComplete(int to_client_id);
+  public virtual void OnUpdateActionPosition(string trigger)
+  {
+    Coop_Model_CharacterUpdateActionPosition updateActionPosition = new Coop_Model_CharacterUpdateActionPosition();
+    updateActionPosition.id = this.owner.id;
+    updateActionPosition.trigger = trigger;
+    updateActionPosition.act_pos = this.character.actionPosition;
+    updateActionPosition.act_pos_f = this.character.actionPositionFlag;
+    if (this.enableSend && this.owner.IsOriginal())
+      this.SendBroadcast<Coop_Model_CharacterUpdateActionPosition>(updateActionPosition);
+    this.StackActionHistory((Coop_Model_ObjectBase) updateActionPosition, false);
+  }
 
-	public abstract void SendInitialize(int to_client_id = 0);
+  public virtual void OnUpdateDirection(string trigger)
+  {
+    Coop_Model_CharacterUpdateDirection characterUpdateDirection1 = new Coop_Model_CharacterUpdateDirection();
+    characterUpdateDirection1.id = this.owner.id;
+    characterUpdateDirection1.trigger = trigger;
+    Coop_Model_CharacterUpdateDirection characterUpdateDirection2 = characterUpdateDirection1;
+    Quaternion rotation = this.owner._rotation;
+    double y1 = (double) ((Quaternion) ref rotation).eulerAngles.y;
+    characterUpdateDirection2.dir = (float) y1;
+    if (Vector3.op_Equality(this.character.lerpRotateVec, Vector3.zero))
+    {
+      characterUpdateDirection1.lerp_dir = characterUpdateDirection1.dir;
+    }
+    else
+    {
+      Coop_Model_CharacterUpdateDirection characterUpdateDirection3 = characterUpdateDirection1;
+      Quaternion quaternion = Quaternion.LookRotation(this.character.lerpRotateVec);
+      double y2 = (double) ((Quaternion) ref quaternion).eulerAngles.y;
+      characterUpdateDirection3.lerp_dir = (float) y2;
+    }
+    if (this.enableSend && this.owner.IsOriginal())
+      this.SendBroadcast<Coop_Model_CharacterUpdateDirection>(characterUpdateDirection1);
+    this.StackActionHistory((Coop_Model_ObjectBase) characterUpdateDirection1, false);
+  }
 
-	public override void OnUpdate()
-	{
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		base.OnUpdate();
-		if (actUpdateSendFlag)
-		{
-			float num = MonoBehaviourSingleton<InGameSettingsManager>.I.character.moveSendInterval;
-			int i = 0;
-			for (int count = character.periodicSyncOwnerList.Count; i < count; i++)
-			{
-				StageObject stageObject = character.periodicSyncOwnerList[i];
-				if (stageObject.IsMirror() || stageObject.IsPuppet())
-				{
-					num = MonoBehaviourSingleton<InGameSettingsManager>.I.character.periodicSyncActionPositionCheckTime + MonoBehaviourSingleton<InGameSettingsManager>.I.character.periodicSyncActionPositionApplyTime;
-					break;
-				}
-			}
-			actUpdateTimer += Time.get_deltaTime();
-			if (character.actionID == Character.ACTION_ID.MOVE && actUpdateTimer >= num)
-			{
-				Coop_Model_CharacterMoveVelocity coop_Model_CharacterMoveVelocity = new Coop_Model_CharacterMoveVelocity();
-				coop_Model_CharacterMoveVelocity.id = base.owner.id;
-				coop_Model_CharacterMoveVelocity.time = actUpdateTimer;
-				coop_Model_CharacterMoveVelocity.pos = base.owner._position;
-				coop_Model_CharacterMoveVelocity.motion_id = moveMotion;
-				coop_Model_CharacterMoveVelocity.target_id = ((!(character.actionTarget != null)) ? (-1) : character.actionTarget.id);
-				if (base.enableSend && base.owner.IsOriginal())
-				{
-					SendBroadcast(coop_Model_CharacterMoveVelocity, false, null, null);
-				}
-				StackActionHistory(coop_Model_CharacterMoveVelocity, true);
-				actUpdateTimer = 0f;
-			}
-		}
-		if (character.isControllable || character.enableMotionCancel)
-		{
-			PassNeedWaitSyncTime(Time.get_deltaTime());
-		}
-	}
+  public virtual void OnPeriodicSyncActionPosition(Character.PeriodicSyncActionPositionInfo info)
+  {
+    Coop_Model_CharacterPeriodicSyncActionPosition syncActionPosition = new Coop_Model_CharacterPeriodicSyncActionPosition();
+    syncActionPosition.id = this.owner.id;
+    syncActionPosition.info = info;
+    if (this.enableSend && this.owner.IsOriginal())
+      this.SendBroadcast<Coop_Model_CharacterPeriodicSyncActionPosition>(syncActionPosition);
+    this.StackActionHistory((Coop_Model_ObjectBase) syncActionPosition, false);
+  }
 
-	public virtual void OnSetActionTarget(StageObject target)
-	{
-		if (base.enableSend && base.owner.IsOriginal())
-		{
-			Coop_Model_CharacterActionTarget coop_Model_CharacterActionTarget = new Coop_Model_CharacterActionTarget();
-			coop_Model_CharacterActionTarget.id = base.owner.id;
-			coop_Model_CharacterActionTarget.target_id = ((!(target != null)) ? (-1) : target.id);
-			SendBroadcast(coop_Model_CharacterActionTarget, false, null, null);
-		}
-	}
+  public virtual void OnActIdle(bool is_sync)
+  {
+    if (this.enableSend && this.owner.IsOriginal() && is_sync)
+    {
+      Coop_Model_CharacterIdle model = new Coop_Model_CharacterIdle();
+      model.id = this.owner.id;
+      model.SetSyncPosition(this.owner);
+      this.SendBroadcast<Coop_Model_CharacterIdle>(model);
+    }
+    this.ClearActionHistory();
+  }
 
-	public virtual void OnUpdateActionPosition(string trigger)
-	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		Coop_Model_CharacterUpdateActionPosition coop_Model_CharacterUpdateActionPosition = new Coop_Model_CharacterUpdateActionPosition();
-		coop_Model_CharacterUpdateActionPosition.id = base.owner.id;
-		coop_Model_CharacterUpdateActionPosition.trigger = trigger;
-		coop_Model_CharacterUpdateActionPosition.act_pos = character.actionPosition;
-		coop_Model_CharacterUpdateActionPosition.act_pos_f = character.actionPositionFlag;
-		if (base.enableSend && base.owner.IsOriginal())
-		{
-			SendBroadcast(coop_Model_CharacterUpdateActionPosition, false, null, null);
-		}
-		StackActionHistory(coop_Model_CharacterUpdateActionPosition, false);
-	}
+  public virtual void OnActAttack(
+    int id,
+    bool sync_immediately,
+    int syncRandomSeed = 0,
+    string _motionLayerName = "",
+    string _motionStateName = "")
+  {
+    Coop_Model_CharacterAttack modelCharacterAttack = new Coop_Model_CharacterAttack();
+    modelCharacterAttack.id = this.owner.id;
+    modelCharacterAttack.SetSyncPosition(this.owner);
+    modelCharacterAttack.attack_id = id;
+    modelCharacterAttack.motionLayerName = _motionLayerName;
+    modelCharacterAttack.motionStateName = _motionStateName;
+    modelCharacterAttack.act_pos = this.character.actionPosition;
+    modelCharacterAttack.act_pos_f = this.character.actionPositionFlag;
+    modelCharacterAttack.sync_immediately = sync_immediately;
+    modelCharacterAttack.syncRandomSeed = syncRandomSeed;
+    if (this.enableSend && this.owner.IsOriginal())
+      this.SendBroadcast<Coop_Model_CharacterAttack>(modelCharacterAttack);
+    this.StackActionHistory((Coop_Model_ObjectBase) modelCharacterAttack, true);
+  }
 
-	public virtual void OnUpdateDirection(string trigger)
-	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		Coop_Model_CharacterUpdateDirection coop_Model_CharacterUpdateDirection = new Coop_Model_CharacterUpdateDirection();
-		coop_Model_CharacterUpdateDirection.id = base.owner.id;
-		coop_Model_CharacterUpdateDirection.trigger = trigger;
-		Coop_Model_CharacterUpdateDirection coop_Model_CharacterUpdateDirection2 = coop_Model_CharacterUpdateDirection;
-		Quaternion rotation = base.owner._rotation;
-		Vector3 eulerAngles = rotation.get_eulerAngles();
-		coop_Model_CharacterUpdateDirection2.dir = eulerAngles.y;
-		if (character.lerpRotateVec == Vector3.get_zero())
-		{
-			coop_Model_CharacterUpdateDirection.lerp_dir = coop_Model_CharacterUpdateDirection.dir;
-		}
-		else
-		{
-			Coop_Model_CharacterUpdateDirection coop_Model_CharacterUpdateDirection3 = coop_Model_CharacterUpdateDirection;
-			Quaternion val = Quaternion.LookRotation(character.lerpRotateVec);
-			Vector3 eulerAngles2 = val.get_eulerAngles();
-			coop_Model_CharacterUpdateDirection3.lerp_dir = eulerAngles2.y;
-		}
-		if (base.enableSend && base.owner.IsOriginal())
-		{
-			SendBroadcast(coop_Model_CharacterUpdateDirection, false, null, null);
-		}
-		StackActionHistory(coop_Model_CharacterUpdateDirection, false);
-	}
+  public virtual void OnActMoveVelocity(int motion_id)
+  {
+    this.actUpdateTimer = 0.0f;
+    this.actUpdateSendFlag = true;
+    this.moveMotion = motion_id;
+  }
 
-	public virtual void OnPeriodicSyncActionPosition(Character.PeriodicSyncActionPositionInfo info)
-	{
-		Coop_Model_CharacterPeriodicSyncActionPosition coop_Model_CharacterPeriodicSyncActionPosition = new Coop_Model_CharacterPeriodicSyncActionPosition();
-		coop_Model_CharacterPeriodicSyncActionPosition.id = base.owner.id;
-		coop_Model_CharacterPeriodicSyncActionPosition.info = info;
-		if (base.enableSend && base.owner.IsOriginal())
-		{
-			SendBroadcast(coop_Model_CharacterPeriodicSyncActionPosition, false, null, null);
-		}
-		StackActionHistory(coop_Model_CharacterPeriodicSyncActionPosition, false);
-	}
+  public virtual void OnActMoveToPosition(Vector3 target_pos)
+  {
+    Coop_Model_CharacterMoveToPosition characterMoveToPosition = new Coop_Model_CharacterMoveToPosition();
+    characterMoveToPosition.id = this.owner.id;
+    characterMoveToPosition.SetSyncPosition(this.owner);
+    characterMoveToPosition.target_pos = target_pos;
+    if (this.enableSend && this.owner.IsOriginal())
+      this.SendBroadcast<Coop_Model_CharacterMoveToPosition>(characterMoveToPosition);
+    this.StackActionHistory((Coop_Model_ObjectBase) characterMoveToPosition, true);
+  }
 
-	public virtual void OnActIdle(bool is_sync)
-	{
-		if (base.enableSend && base.owner.IsOriginal() && is_sync)
-		{
-			Coop_Model_CharacterIdle coop_Model_CharacterIdle = new Coop_Model_CharacterIdle();
-			coop_Model_CharacterIdle.id = base.owner.id;
-			coop_Model_CharacterIdle.SetSyncPosition(base.owner);
-			SendBroadcast(coop_Model_CharacterIdle, false, null, null);
-		}
-		ClearActionHistory();
-	}
+  public virtual void OnActMoveHoming(float max_length)
+  {
+    Coop_Model_CharacterMoveHoming characterMoveHoming = new Coop_Model_CharacterMoveHoming();
+    characterMoveHoming.id = this.owner.id;
+    characterMoveHoming.SetSyncPosition(this.owner);
+    characterMoveHoming.act_pos = this.character.actionPosition;
+    characterMoveHoming.act_pos_f = this.character.actionPositionFlag;
+    characterMoveHoming.max_length = max_length;
+    if (this.enableSend && this.owner.IsOriginal())
+      this.SendBroadcast<Coop_Model_CharacterMoveHoming>(characterMoveHoming);
+    this.StackActionHistory((Coop_Model_ObjectBase) characterMoveHoming, true);
+  }
 
-	public virtual void OnActAttack(int id, bool sync_immediately, int syncRandomSeed = 0)
-	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		Coop_Model_CharacterAttack coop_Model_CharacterAttack = new Coop_Model_CharacterAttack();
-		coop_Model_CharacterAttack.id = base.owner.id;
-		coop_Model_CharacterAttack.SetSyncPosition(base.owner);
-		coop_Model_CharacterAttack.attack_id = id;
-		coop_Model_CharacterAttack.act_pos = character.actionPosition;
-		coop_Model_CharacterAttack.act_pos_f = character.actionPositionFlag;
-		coop_Model_CharacterAttack.sync_immediately = sync_immediately;
-		coop_Model_CharacterAttack.syncRandomSeed = syncRandomSeed;
-		if (base.enableSend && base.owner.IsOriginal())
-		{
-			SendBroadcast(coop_Model_CharacterAttack, false, null, null);
-		}
-		StackActionHistory(coop_Model_CharacterAttack, true);
-	}
+  public virtual void OnActMoveSideways(int moveAngleSign)
+  {
+    Coop_Model_CharacterMoveSideways characterMoveSideways = new Coop_Model_CharacterMoveSideways();
+    characterMoveSideways.id = this.owner.id;
+    characterMoveSideways.SetSyncPosition(this.owner);
+    characterMoveSideways.actionPos = this.character.actionPosition;
+    characterMoveSideways.actionPosFlag = this.character.actionPositionFlag;
+    characterMoveSideways.moveAngleSign = moveAngleSign;
+    if (this.enableSend && this.owner.IsOriginal())
+      this.SendBroadcast<Coop_Model_CharacterMoveSideways>(characterMoveSideways);
+    this.StackActionHistory((Coop_Model_ObjectBase) characterMoveSideways, true);
+  }
 
-	public virtual void OnActMoveVelocity(int motion_id)
-	{
-		actUpdateTimer = 0f;
-		actUpdateSendFlag = true;
-		moveMotion = motion_id;
-	}
+  public virtual void OnActMovePoint(Vector3 targetPos)
+  {
+    Coop_Model_CharacterMovePoint characterMovePoint = new Coop_Model_CharacterMovePoint();
+    characterMovePoint.id = this.owner.id;
+    characterMovePoint.SetSyncPosition(this.owner);
+    characterMovePoint.targetPos = targetPos;
+    if (((Behaviour) this).enabled && this.owner.IsOriginal())
+      this.SendBroadcast<Coop_Model_CharacterMovePoint>(characterMovePoint);
+    this.StackActionHistory((Coop_Model_ObjectBase) characterMovePoint, true);
+  }
 
-	public virtual void OnActMoveToPosition(Vector3 target_pos)
-	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		Coop_Model_CharacterMoveToPosition coop_Model_CharacterMoveToPosition = new Coop_Model_CharacterMoveToPosition();
-		coop_Model_CharacterMoveToPosition.id = base.owner.id;
-		coop_Model_CharacterMoveToPosition.SetSyncPosition(base.owner);
-		coop_Model_CharacterMoveToPosition.target_pos = target_pos;
-		if (base.enableSend && base.owner.IsOriginal())
-		{
-			SendBroadcast(coop_Model_CharacterMoveToPosition, false, null, null);
-		}
-		StackActionHistory(coop_Model_CharacterMoveToPosition, true);
-	}
+  public void OnActMoveLookAt(Vector3 moveLookAtPos)
+  {
+    Coop_Model_CharacterMoveLookAt characterMoveLookAt = new Coop_Model_CharacterMoveLookAt();
+    characterMoveLookAt.id = this.owner.id;
+    characterMoveLookAt.SetSyncPosition(this.owner);
+    characterMoveLookAt.moveLookAtPos = moveLookAtPos;
+    if (((Behaviour) this).enabled && this.owner.IsOriginal())
+      this.SendBroadcast<Coop_Model_CharacterMoveLookAt>(characterMoveLookAt);
+    this.StackActionHistory((Coop_Model_ObjectBase) characterMoveLookAt, true);
+  }
 
-	public virtual void OnActMoveHoming(float max_length)
-	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		Coop_Model_CharacterMoveHoming coop_Model_CharacterMoveHoming = new Coop_Model_CharacterMoveHoming();
-		coop_Model_CharacterMoveHoming.id = base.owner.id;
-		coop_Model_CharacterMoveHoming.SetSyncPosition(base.owner);
-		coop_Model_CharacterMoveHoming.act_pos = character.actionPosition;
-		coop_Model_CharacterMoveHoming.act_pos_f = character.actionPositionFlag;
-		coop_Model_CharacterMoveHoming.max_length = max_length;
-		if (base.enableSend && base.owner.IsOriginal())
-		{
-			SendBroadcast(coop_Model_CharacterMoveHoming, false, null, null);
-		}
-		StackActionHistory(coop_Model_CharacterMoveHoming, true);
-	}
+  public virtual void OnActRotate(float direction)
+  {
+    Coop_Model_CharacterRotate modelCharacterRotate = new Coop_Model_CharacterRotate();
+    modelCharacterRotate.id = this.owner.id;
+    modelCharacterRotate.SetSyncPosition(this.owner);
+    modelCharacterRotate.target_dir = direction;
+    if (this.enableSend && this.owner.IsOriginal())
+      this.SendBroadcast<Coop_Model_CharacterRotate>(modelCharacterRotate);
+    this.StackActionHistory((Coop_Model_ObjectBase) modelCharacterRotate, true);
+  }
 
-	public virtual void OnActMoveSideways(int moveAngleSign)
-	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		Coop_Model_CharacterMoveSideways coop_Model_CharacterMoveSideways = new Coop_Model_CharacterMoveSideways();
-		coop_Model_CharacterMoveSideways.id = base.owner.id;
-		coop_Model_CharacterMoveSideways.SetSyncPosition(base.owner);
-		coop_Model_CharacterMoveSideways.actionPos = character.actionPosition;
-		coop_Model_CharacterMoveSideways.actionPosFlag = character.actionPositionFlag;
-		coop_Model_CharacterMoveSideways.moveAngleSign = moveAngleSign;
-		if (base.enableSend && base.owner.IsOriginal())
-		{
-			SendBroadcast(coop_Model_CharacterMoveSideways, false, null, null);
-		}
-		StackActionHistory(coop_Model_CharacterMoveSideways, true);
-	}
+  public virtual void OnActRotateMotion(float direction)
+  {
+    Coop_Model_CharacterRotateMotion characterRotateMotion = new Coop_Model_CharacterRotateMotion();
+    characterRotateMotion.id = this.owner.id;
+    characterRotateMotion.SetSyncPosition(this.owner);
+    characterRotateMotion.target_dir = direction;
+    if (this.enableSend && this.owner.IsOriginal())
+      this.SendBroadcast<Coop_Model_CharacterRotateMotion>(characterRotateMotion);
+    this.StackActionHistory((Coop_Model_ObjectBase) characterRotateMotion, true);
+  }
 
-	public virtual void OnActMovePoint(Vector3 targetPos)
-	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		Coop_Model_CharacterMovePoint coop_Model_CharacterMovePoint = new Coop_Model_CharacterMovePoint();
-		coop_Model_CharacterMovePoint.id = base.owner.id;
-		coop_Model_CharacterMovePoint.SetSyncPosition(base.owner);
-		coop_Model_CharacterMovePoint.targetPos = targetPos;
-		if (this.get_enabled() && base.owner.IsOriginal())
-		{
-			SendBroadcast(coop_Model_CharacterMovePoint, false, null, null);
-		}
-		StackActionHistory(coop_Model_CharacterMovePoint, true);
-	}
+  public void OnReactionDelay(List<Character.DelayReactionInfo> reactionList)
+  {
+    Coop_Model_CharacterReactionDelay characterReactionDelay = new Coop_Model_CharacterReactionDelay();
+    characterReactionDelay.id = this.owner.id;
+    characterReactionDelay.SetSyncPosition(this.owner);
+    characterReactionDelay.reactionInfoList = reactionList;
+    if (this.enableSend && this.owner.IsOriginal())
+      this.SendBroadcast<Coop_Model_CharacterReactionDelay>(characterReactionDelay);
+    this.StackActionHistory((Coop_Model_ObjectBase) characterReactionDelay, true);
+  }
 
-	public void OnActMoveLookAt(Vector3 moveLookAtPos)
-	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		Coop_Model_CharacterMoveLookAt coop_Model_CharacterMoveLookAt = new Coop_Model_CharacterMoveLookAt();
-		coop_Model_CharacterMoveLookAt.id = base.owner.id;
-		coop_Model_CharacterMoveLookAt.SetSyncPosition(base.owner);
-		coop_Model_CharacterMoveLookAt.moveLookAtPos = moveLookAtPos;
-		if (this.get_enabled() && base.owner.IsOriginal())
-		{
-			SendBroadcast(coop_Model_CharacterMoveLookAt, false, null, null);
-		}
-		StackActionHistory(coop_Model_CharacterMoveLookAt, true);
-	}
+  public void OnSendContinusAttackSync(ContinusAttackParam.SyncParam syncParam)
+  {
+    if (!this.enableSend || !this.owner.IsOriginal())
+      return;
+    Coop_Model_CharacterContinusAttackSync model = new Coop_Model_CharacterContinusAttackSync();
+    model.id = this.owner.id;
+    model.sync_param = syncParam;
+    this.SendBroadcast<Coop_Model_CharacterContinusAttackSync>(model);
+  }
 
-	public virtual void OnActRotate(float direction)
-	{
-		Coop_Model_CharacterRotate coop_Model_CharacterRotate = new Coop_Model_CharacterRotate();
-		coop_Model_CharacterRotate.id = base.owner.id;
-		coop_Model_CharacterRotate.SetSyncPosition(base.owner);
-		coop_Model_CharacterRotate.target_dir = direction;
-		if (base.enableSend && base.owner.IsOriginal())
-		{
-			SendBroadcast(coop_Model_CharacterRotate, false, null, null);
-		}
-		StackActionHistory(coop_Model_CharacterRotate, true);
-	}
+  public void OnSendBuffSync(BuffParam.BuffSyncParam sync_param)
+  {
+    if (!this.enableSend || !this.owner.IsOriginal())
+      return;
+    Coop_Model_CharacterBuffSync model = new Coop_Model_CharacterBuffSync();
+    model.id = this.owner.id;
+    model.sync_param = sync_param;
+    this.SendBroadcast<Coop_Model_CharacterBuffSync>(model);
+  }
 
-	public virtual void OnActRotateMotion(float direction)
-	{
-		Coop_Model_CharacterRotateMotion coop_Model_CharacterRotateMotion = new Coop_Model_CharacterRotateMotion();
-		coop_Model_CharacterRotateMotion.id = base.owner.id;
-		coop_Model_CharacterRotateMotion.SetSyncPosition(base.owner);
-		coop_Model_CharacterRotateMotion.target_dir = direction;
-		if (base.enableSend && base.owner.IsOriginal())
-		{
-			SendBroadcast(coop_Model_CharacterRotateMotion, false, null, null);
-		}
-		StackActionHistory(coop_Model_CharacterRotateMotion, true);
-	}
+  public void OnBuffReceive(BuffParam.BUFFTYPE type, int value, float time)
+  {
+    if (!this.enableSend || !this.owner.IsPuppet() && !this.owner.IsMirror())
+      return;
+    Coop_Model_CharacterBuffReceive model = new Coop_Model_CharacterBuffReceive();
+    model.id = this.owner.id;
+    model.type = (int) type;
+    model.value = value;
+    model.time = time;
+    this.SendTo<Coop_Model_CharacterBuffReceive>(this.owner.coopClientId, model);
+  }
 
-	public void OnReactionDelay(List<Character.DelayReactionInfo> reactionList)
-	{
-		Coop_Model_CharacterReactionDelay coop_Model_CharacterReactionDelay = new Coop_Model_CharacterReactionDelay();
-		coop_Model_CharacterReactionDelay.id = base.owner.id;
-		coop_Model_CharacterReactionDelay.SetSyncPosition(base.owner);
-		coop_Model_CharacterReactionDelay.reactionInfoList = reactionList;
-		if (base.enableSend && base.owner.IsOriginal())
-		{
-			SendBroadcast(coop_Model_CharacterReactionDelay, false, null, null);
-		}
-		StackActionHistory(coop_Model_CharacterReactionDelay, true);
-	}
+  public void OnBuffRoutine(
+    BuffParam.BUFFTYPE type,
+    int value,
+    int fromObjectID,
+    int fromEquipIndex,
+    int fromSkillIndex)
+  {
+    if (!this.enableSend || !this.owner.IsOriginal())
+      return;
+    Coop_Model_CharacterBuffRoutine model = new Coop_Model_CharacterBuffRoutine();
+    model.id = this.owner.id;
+    model.type = (int) type;
+    model.value = value;
+    model.fromObjectID = fromObjectID;
+    model.fromEquipIndex = fromEquipIndex;
+    model.fromSkillIndex = fromSkillIndex;
+    this.SendBroadcast<Coop_Model_CharacterBuffRoutine>(model);
+  }
 
-	public void OnSendContinusAttackSync(ContinusAttackParam.SyncParam syncParam)
-	{
-		if (base.enableSend && base.owner.IsOriginal())
-		{
-			Coop_Model_CharacterContinusAttackSync coop_Model_CharacterContinusAttackSync = new Coop_Model_CharacterContinusAttackSync();
-			coop_Model_CharacterContinusAttackSync.id = base.owner.id;
-			coop_Model_CharacterContinusAttackSync.sync_param = syncParam;
-			SendBroadcast(coop_Model_CharacterContinusAttackSync, false, null, null);
-		}
-	}
+  public virtual void OnEndAction()
+  {
+    if (this.character.actionID != Character.ACTION_ID.MOVE || !this.actUpdateSendFlag)
+      return;
+    if (this.enableSend && this.owner.IsOriginal())
+    {
+      Coop_Model_CharacterMoveVelocityEnd model = new Coop_Model_CharacterMoveVelocityEnd();
+      model.id = this.owner.id;
+      model.time = this.actUpdateTimer;
+      model.pos = this.owner._position;
+      Coop_Model_CharacterMoveVelocityEnd characterMoveVelocityEnd = model;
+      Quaternion rotation = this.owner._rotation;
+      double y = (double) ((Quaternion) ref rotation).eulerAngles.y;
+      characterMoveVelocityEnd.direction = (float) y;
+      model.sync_speed = this.character.moveSyncSpeed;
+      model.motion_id = this.moveMotion;
+      this.SendBroadcast<Coop_Model_CharacterMoveVelocityEnd>(model);
+    }
+    this.actUpdateTimer = 0.0f;
+    this.actUpdateSendFlag = false;
+  }
 
-	public void OnSendBuffSync(BuffParam.BuffSyncParam sync_param)
-	{
-		if (base.enableSend && base.owner.IsOriginal())
-		{
-			Coop_Model_CharacterBuffSync coop_Model_CharacterBuffSync = new Coop_Model_CharacterBuffSync();
-			coop_Model_CharacterBuffSync.id = base.owner.id;
-			coop_Model_CharacterBuffSync.sync_param = sync_param;
-			SendBroadcast(coop_Model_CharacterBuffSync, false, null, null);
-		}
-	}
+  public void OnActReaction(Character.ReactionInfo info, bool isSync)
+  {
+    Coop_Model_CharacterReaction characterReaction = new Coop_Model_CharacterReaction();
+    characterReaction.id = this.owner.id;
+    characterReaction.SetSyncPosition(this.owner);
+    characterReaction.reactionType = (int) info.reactionType;
+    characterReaction.blowForce = info.blowForce;
+    characterReaction.loopTime = info.loopTime;
+    characterReaction.targetId = info.targetId;
+    characterReaction.deadReviveCount = info.deadReviveCount;
+    if (isSync)
+      this.SendBroadcast<Coop_Model_CharacterReaction>(characterReaction);
+    this.StackActionHistory((Coop_Model_ObjectBase) characterReaction, true);
+  }
 
-	public void OnBuffReceive(BuffParam.BUFFTYPE type, int value, float time)
-	{
-		if (base.enableSend && (base.owner.IsPuppet() || base.owner.IsMirror()))
-		{
-			Coop_Model_CharacterBuffReceive coop_Model_CharacterBuffReceive = new Coop_Model_CharacterBuffReceive();
-			coop_Model_CharacterBuffReceive.id = base.owner.id;
-			coop_Model_CharacterBuffReceive.type = (int)type;
-			coop_Model_CharacterBuffReceive.value = value;
-			coop_Model_CharacterBuffReceive.time = time;
-			SendTo(base.owner.coopClientId, coop_Model_CharacterBuffReceive, false, null, null);
-		}
-	}
-
-	public void OnBuffRoutine(BuffParam.BUFFTYPE type, int value, int fromObjectID, int fromEquipIndex, int fromSkillIndex)
-	{
-		if (base.enableSend && base.owner.IsOriginal())
-		{
-			Coop_Model_CharacterBuffRoutine coop_Model_CharacterBuffRoutine = new Coop_Model_CharacterBuffRoutine();
-			coop_Model_CharacterBuffRoutine.id = base.owner.id;
-			coop_Model_CharacterBuffRoutine.type = (int)type;
-			coop_Model_CharacterBuffRoutine.value = value;
-			coop_Model_CharacterBuffRoutine.fromObjectID = fromObjectID;
-			coop_Model_CharacterBuffRoutine.fromEquipIndex = fromEquipIndex;
-			coop_Model_CharacterBuffRoutine.fromSkillIndex = fromSkillIndex;
-			SendBroadcast(coop_Model_CharacterBuffRoutine, false, null, null);
-		}
-	}
-
-	public virtual void OnEndAction()
-	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		Character.ACTION_ID actionID = character.actionID;
-		if (actionID == Character.ACTION_ID.MOVE && actUpdateSendFlag)
-		{
-			if (base.enableSend && base.owner.IsOriginal())
-			{
-				Coop_Model_CharacterMoveVelocityEnd coop_Model_CharacterMoveVelocityEnd = new Coop_Model_CharacterMoveVelocityEnd();
-				coop_Model_CharacterMoveVelocityEnd.id = base.owner.id;
-				coop_Model_CharacterMoveVelocityEnd.time = actUpdateTimer;
-				coop_Model_CharacterMoveVelocityEnd.pos = base.owner._position;
-				Coop_Model_CharacterMoveVelocityEnd coop_Model_CharacterMoveVelocityEnd2 = coop_Model_CharacterMoveVelocityEnd;
-				Quaternion rotation = base.owner._rotation;
-				Vector3 eulerAngles = rotation.get_eulerAngles();
-				coop_Model_CharacterMoveVelocityEnd2.direction = eulerAngles.y;
-				coop_Model_CharacterMoveVelocityEnd.sync_speed = character.moveSyncSpeed;
-				coop_Model_CharacterMoveVelocityEnd.motion_id = moveMotion;
-				SendBroadcast(coop_Model_CharacterMoveVelocityEnd, false, null, null);
-			}
-			actUpdateTimer = 0f;
-			actUpdateSendFlag = false;
-		}
-	}
-
-	public void OnActReaction(Character.ReactionInfo info, bool isSync)
-	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		Coop_Model_CharacterReaction coop_Model_CharacterReaction = new Coop_Model_CharacterReaction();
-		coop_Model_CharacterReaction.id = base.owner.id;
-		coop_Model_CharacterReaction.SetSyncPosition(base.owner);
-		coop_Model_CharacterReaction.reactionType = (int)info.reactionType;
-		coop_Model_CharacterReaction.blowForce = info.blowForce;
-		coop_Model_CharacterReaction.loopTime = info.loopTime;
-		coop_Model_CharacterReaction.targetId = info.targetId;
-		if (isSync)
-		{
-			SendBroadcast(coop_Model_CharacterReaction, false, null, null);
-		}
-		StackActionHistory(coop_Model_CharacterReaction, true);
-	}
-
-	public void OnActDead()
-	{
-		Coop_Model_CharacterDead coop_Model_CharacterDead = new Coop_Model_CharacterDead();
-		coop_Model_CharacterDead.id = base.owner.id;
-		coop_Model_CharacterDead.SetSyncPosition(base.owner);
-		if (base.enableSend)
-		{
-			SendBroadcast(coop_Model_CharacterDead, true, null, null);
-		}
-		StackActionHistory(coop_Model_CharacterDead, true);
-	}
+  public void OnActDead()
+  {
+    Coop_Model_CharacterDead modelCharacterDead = new Coop_Model_CharacterDead();
+    modelCharacterDead.id = this.owner.id;
+    modelCharacterDead.SetSyncPosition(this.owner);
+    if (this.enableSend)
+      this.SendBroadcast<Coop_Model_CharacterDead>(modelCharacterDead, true);
+    this.StackActionHistory((Coop_Model_ObjectBase) modelCharacterDead, true);
+  }
 }

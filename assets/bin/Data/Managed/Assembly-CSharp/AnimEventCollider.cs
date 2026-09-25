@@ -1,359 +1,320 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AnimEventCollider
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class AnimEventCollider
 {
-	public class AtkColliderHiter : IAttackCollider
-	{
-		protected enum COLLIDER_INFO
-		{
-			NONE = 0,
-			FIXED_UPDATE = 1,
-			RESERVE_RELEASE = 2,
-			RELEASED = 4
-		}
+  protected GameObject gameObject;
+  protected AnimEventCollider.AtkColliderHiter colliderHiter;
 
-		protected StageObject stageObject;
+  public void SetFixedUpdateFlag(bool flag)
+  {
+    if (!Object.op_Inequality((Object) this.colliderHiter, (Object) null))
+      return;
+    this.colliderHiter.checkFixedUpdate = flag;
+  }
 
-		protected CapsuleCollider capsule;
+  public void SetFixTransformUpdateFlag(bool flag)
+  {
+    if (!Object.op_Inequality((Object) this.colliderHiter, (Object) null))
+      return;
+    this.colliderHiter.isUpdateFixTrans = flag;
+  }
 
-		protected Vector3 fixPos = Vector3.get_zero();
+  public void ValidTriggerStay()
+  {
+    if (!Object.op_Inequality((Object) this.colliderHiter, (Object) null))
+      return;
+    this.colliderHiter.ValidTriggerStay();
+  }
 
-		protected Quaternion fixRot = Quaternion.get_identity();
+  public AttackInfo attackInfo
+  {
+    get
+    {
+      return !Object.op_Inequality((Object) this.colliderHiter, (Object) null) ? (AttackInfo) null : this.colliderHiter.attackInfo;
+    }
+  }
 
-		protected AttackColliderProcessor colliderProcessor;
+  public bool isReleased
+  {
+    get
+    {
+      return Object.op_Inequality((Object) this.colliderHiter, (Object) null) && this.colliderHiter.isReleased;
+    }
+  }
 
-		protected AttackHitChecker attackHitChecker;
+  public bool Initialize(StageObject stgObj, AnimEventData.EventData data, AttackInfo atkInfo)
+  {
+    if (data.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE && data.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_START && data.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_DEPEND_VALUE && data.id != AnimEventFormat.ID.CONTINUS_ATTACK && data.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_DEPEND_VALUE_MULTI || stgObj == null)
+      return false;
+    Player player = stgObj as Player;
+    int num1 = 13;
+    float num2 = 1f;
+    if (player != null)
+    {
+      num1 = 12;
+      num2 = player.GetRadiusCustomRate();
+    }
+    if (Object.op_Equality((Object) this.gameObject, (Object) null))
+    {
+      this.gameObject = new GameObject();
+      ((Object) this.gameObject).name = nameof (AnimEventCollider);
+      this.gameObject.layer = num1;
+      this.colliderHiter = this.gameObject.AddComponent<AnimEventCollider.AtkColliderHiter>();
+    }
+    Transform parent = ((Component) stgObj).gameObject.transform;
+    if (!string.IsNullOrEmpty(data.stringArgs[1]))
+    {
+      Transform node = stgObj.FindNode(data.stringArgs[1]);
+      if (Object.op_Inequality((Object) node, (Object) null))
+        parent = node;
+    }
+    Vector3 pos;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref pos).\u002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+    Vector3 rot;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref rot).\u002Ector(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
+    float radius = data.floatArgs[6] * num2;
+    float floatArg = data.floatArgs[7];
+    this.colliderHiter.SetColliderInfo(stgObj, parent, atkInfo, pos, rot, radius, floatArg);
+    return true;
+  }
 
-		public bool checkFixedUpdate = true;
+  public void ReserveRelease() => this.colliderHiter.ReserveRelease();
 
-		public bool isUpdateFixTrans = true;
+  public void Destroy()
+  {
+    this.colliderHiter = (AnimEventCollider.AtkColliderHiter) null;
+    Object.Destroy((Object) this.gameObject);
+    this.gameObject = (GameObject) null;
+  }
 
-		protected COLLIDER_INFO colliderInfo
-		{
-			get;
-			set;
-		}
+  public void InitTransformSettings(StageObject stgObj, AnimEventData.EventData _eventData)
+  {
+    if (Object.op_Equality((Object) stgObj, (Object) null) || Object.op_Equality((Object) this.colliderHiter, (Object) null) || _eventData == null || _eventData.intArgs == null || _eventData.floatArgs == null || _eventData.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_DEPEND_VALUE_MULTI || _eventData.intArgs.Length < 2)
+      return;
+    Vector3 vector3;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref vector3).\u002Ector(_eventData.floatArgs[8], _eventData.floatArgs[9], _eventData.floatArgs[10]);
+    if (_eventData.intArgs[0] != 1)
+      return;
+    float num1 = Random.Range(-vector3.x, vector3.x);
+    float num2 = Random.Range(-vector3.y, vector3.y);
+    float num3 = Random.Range(0.0f, 360f) * ((float) Math.PI / 180f);
+    Vector3 right = ((Component) stgObj).transform.right;
+    Vector3 up = ((Component) stgObj).transform.up;
+    Transform transform = ((Component) this.colliderHiter).transform;
+    transform.position = Vector3.op_Addition(transform.position, Vector3.op_Addition(Vector3.op_Multiply(num1 * Mathf.Cos(num3), right), Vector3.op_Multiply(num2 * Mathf.Sin(num3), up)));
+    ((Component) this.colliderHiter).transform.LookAt(((Component) stgObj).transform.position);
+    this.colliderHiter.ForceUpdateCurrentTransformInfo();
+  }
 
-		public StageObject fromObject => stageObject;
+  public void OverwriteObjectLayer(int _layer)
+  {
+    if (Object.op_Equality((Object) this.colliderHiter, (Object) null))
+      return;
+    ((Component) this.colliderHiter).gameObject.layer = _layer;
+  }
 
-		public AttackInfo attackInfo
-		{
-			get;
-			protected set;
-		}
+  public class AtkColliderHiter : MonoBehaviour, IAttackCollider
+  {
+    protected StageObject stageObject;
+    protected CapsuleCollider capsule;
+    protected Vector3 fixPos = Vector3.zero;
+    protected Quaternion fixRot = Quaternion.identity;
+    protected AttackColliderProcessor colliderProcessor;
+    protected AttackHitChecker attackHitChecker;
+    public bool checkFixedUpdate = true;
+    public bool isUpdateFixTrans = true;
 
-		public float timeCount
-		{
-			get;
-			protected set;
-		}
+    protected AnimEventCollider.AtkColliderHiter.COLLIDER_INFO colliderInfo { get; set; }
 
-		public bool enabledCollider
-		{
-			get
-			{
-				return capsule != null && capsule.get_enabled();
-			}
-			protected set
-			{
-				if (capsule != null)
-				{
-					capsule.set_enabled(value);
-				}
-			}
-		}
+    public StageObject fromObject => this.stageObject;
 
-		public bool isReleased => (colliderInfo & COLLIDER_INFO.RELEASED) != COLLIDER_INFO.NONE;
+    public AttackInfo attackInfo { get; protected set; }
 
-		public AtkColliderHiter()
-			: this()
-		{
-		}//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+    public float timeCount { get; protected set; }
 
+    public bool enabledCollider
+    {
+      protected set
+      {
+        if (!Object.op_Inequality((Object) this.capsule, (Object) null))
+          return;
+        ((Collider) this.capsule).enabled = value;
+      }
+      get
+      {
+        return Object.op_Inequality((Object) this.capsule, (Object) null) && ((Collider) this.capsule).enabled;
+      }
+    }
 
-		public void ValidTriggerStay()
-		{
-			if (colliderProcessor != null)
-			{
-				colliderProcessor.ValidTriggerStay();
-			}
-		}
+    public void ValidTriggerStay()
+    {
+      if (this.colliderProcessor == null)
+        return;
+      this.colliderProcessor.ValidTriggerStay();
+    }
 
-		protected void Awake()
-		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			capsule = this.get_gameObject().AddComponent<CapsuleCollider>();
-		}
+    public bool isReleased
+    {
+      get => (this.colliderInfo & AnimEventCollider.AtkColliderHiter.COLLIDER_INFO.RELEASED) != 0;
+    }
 
-		private void Update()
-		{
-			timeCount += Time.get_deltaTime();
-		}
+    protected void Awake()
+    {
+      this.capsule = ((Component) this).gameObject.AddComponent<CapsuleCollider>();
+    }
 
-		private void FixedUpdate()
-		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			if (!isReleased)
-			{
-				if (isUpdateFixTrans)
-				{
-					this.get_transform().set_position(fixPos);
-					this.get_transform().set_rotation(fixRot);
-				}
-				if ((colliderInfo & COLLIDER_INFO.RESERVE_RELEASE) != 0 && (colliderInfo & COLLIDER_INFO.FIXED_UPDATE) != 0)
-				{
-					enabledCollider = false;
-				}
-				if (!enabledCollider)
-				{
-					if (colliderProcessor != null && !colliderProcessor.IsBusy())
-					{
-						colliderProcessor.OnDestroy();
-						colliderProcessor = null;
-					}
-					if (colliderProcessor == null)
-					{
-						colliderInfo |= COLLIDER_INFO.RELEASED;
-					}
-				}
-				if (checkFixedUpdate)
-				{
-					colliderInfo |= COLLIDER_INFO.FIXED_UPDATE;
-				}
-			}
-		}
+    private void Update() => this.timeCount += Time.deltaTime;
 
-		public void SetColliderInfo(StageObject _stageObject, Transform parent, AttackInfo info, Vector3 pos, Vector3 rot, float radius, float height)
-		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			stageObject = _stageObject;
-			attackInfo = info;
-			this.get_transform().set_parent(parent);
-			this.get_transform().set_localPosition(pos);
-			this.get_transform().set_localEulerAngles(rot);
-			this.get_transform().set_localScale(Vector3.get_one());
-			fixPos = this.get_transform().get_position();
-			fixRot = this.get_transform().get_rotation();
-			capsule.set_direction(2);
-			capsule.set_radius(radius);
-			capsule.set_height(height);
-			capsule.set_enabled(true);
-			capsule.set_isTrigger(true);
-			stageObject._rigidbody.WakeUp();
-			timeCount = 0f;
-			colliderInfo = COLLIDER_INFO.NONE;
-			if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
-			{
-				colliderProcessor = MonoBehaviourSingleton<AttackColliderManager>.I.CreateProcessor(attackInfo, stageObject, capsule, this, Player.ATTACK_MODE.NONE, null);
-				attackHitChecker = stageObject.ReferenceAttackHitChecker();
-			}
-		}
+    private void FixedUpdate()
+    {
+      if (this.isReleased)
+        return;
+      if (this.isUpdateFixTrans)
+      {
+        ((Component) this).transform.position = this.fixPos;
+        ((Component) this).transform.rotation = this.fixRot;
+      }
+      if ((this.colliderInfo & AnimEventCollider.AtkColliderHiter.COLLIDER_INFO.RESERVE_RELEASE) != AnimEventCollider.AtkColliderHiter.COLLIDER_INFO.NONE && (this.colliderInfo & AnimEventCollider.AtkColliderHiter.COLLIDER_INFO.FIXED_UPDATE) != AnimEventCollider.AtkColliderHiter.COLLIDER_INFO.NONE)
+        this.enabledCollider = false;
+      if (!this.enabledCollider)
+      {
+        if (this.colliderProcessor != null && !this.colliderProcessor.IsBusy())
+        {
+          this.colliderProcessor.OnDestroy();
+          this.colliderProcessor = (AttackColliderProcessor) null;
+        }
+        if (this.colliderProcessor == null)
+          this.colliderInfo |= AnimEventCollider.AtkColliderHiter.COLLIDER_INFO.RELEASED;
+      }
+      if (!this.checkFixedUpdate)
+        return;
+      this.colliderInfo |= AnimEventCollider.AtkColliderHiter.COLLIDER_INFO.FIXED_UPDATE;
+    }
 
-		public void ReserveRelease()
-		{
-			colliderInfo |= COLLIDER_INFO.RESERVE_RELEASE;
-		}
+    public void SetColliderInfo(
+      StageObject _stageObject,
+      Transform parent,
+      AttackInfo info,
+      Vector3 pos,
+      Vector3 rot,
+      float radius,
+      float height)
+    {
+      this.stageObject = _stageObject;
+      this.attackInfo = info;
+      ((Component) this).transform.parent = parent;
+      ((Component) this).transform.localPosition = pos;
+      ((Component) this).transform.localEulerAngles = rot;
+      ((Component) this).transform.localScale = Vector3.one;
+      this.fixPos = ((Component) this).transform.position;
+      this.fixRot = ((Component) this).transform.rotation;
+      this.capsule.direction = 2;
+      this.capsule.radius = radius;
+      this.capsule.height = height;
+      ((Collider) this.capsule).enabled = true;
+      ((Collider) this.capsule).isTrigger = true;
+      this.stageObject._rigidbody.WakeUp();
+      this.timeCount = 0.0f;
+      this.colliderInfo = AnimEventCollider.AtkColliderHiter.COLLIDER_INFO.NONE;
+      if (MonoBehaviourSingleton<AttackColliderManager>.IsValid())
+      {
+        this.colliderProcessor = MonoBehaviourSingleton<AttackColliderManager>.I.CreateProcessor(this.attackInfo, this.stageObject, (Collider) this.capsule, (IAttackCollider) this);
+        this.attackHitChecker = this.stageObject.ReferenceAttackHitChecker();
+      }
+      if (!(this.attackInfo is AttackContinuationInfo attackInfo) || !attackInfo.disableUpdateFixTrans)
+        return;
+      this.isUpdateFixTrans = false;
+    }
 
-		private void OnTriggerEnter(Collider collider)
-		{
-			if (colliderProcessor != null)
-			{
-				colliderProcessor.OnTriggerEnter(collider);
-			}
-		}
+    public void ForceUpdateCurrentTransformInfo()
+    {
+      this.fixPos = ((Component) this).transform.position;
+      this.fixRot = ((Component) this).transform.rotation;
+    }
 
-		private void OnTriggerStay(Collider collider)
-		{
-			if (colliderProcessor != null)
-			{
-				colliderProcessor.OnTriggerStay(collider);
-			}
-		}
+    public void ReserveRelease()
+    {
+      this.colliderInfo |= AnimEventCollider.AtkColliderHiter.COLLIDER_INFO.RESERVE_RELEASE;
+    }
 
-		private void OnTriggerExit(Collider collider)
-		{
-			if (colliderProcessor != null)
-			{
-				colliderProcessor.OnTriggerExit(collider);
-			}
-		}
+    private void OnTriggerEnter(Collider collider)
+    {
+      if (this.colliderProcessor == null)
+        return;
+      this.colliderProcessor.OnTriggerEnter(collider);
+    }
 
-		public virtual void OnHitTrigger(Collider to_collider, StageObject to_object)
-		{
-		}
+    private void OnTriggerStay(Collider collider)
+    {
+      if (this.colliderProcessor == null)
+        return;
+      this.colliderProcessor.OnTriggerStay(collider);
+    }
 
-		public virtual float GetTime()
-		{
-			return timeCount;
-		}
+    private void OnTriggerExit(Collider collider)
+    {
+      if (this.colliderProcessor == null)
+        return;
+      this.colliderProcessor.OnTriggerExit(collider);
+    }
 
-		public virtual bool IsEnable()
-		{
-			return true;
-		}
+    public virtual void OnHitTrigger(Collider to_collider, StageObject to_object)
+    {
+    }
 
-		public virtual void SortHitStackList(List<AttackHitColliderProcessor.HitResult> stack_list)
-		{
-		}
+    public virtual float GetTime() => this.timeCount;
 
-		public virtual Vector3 GetCrossCheckPoint(Collider from_collider)
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			Bounds bounds = from_collider.get_bounds();
-			Vector3 result = bounds.get_center();
-			Character character = stageObject as Character;
-			if (character != null && character.rootNode != null)
-			{
-				result = character.rootNode.get_position();
-			}
-			return result;
-		}
+    public virtual bool IsEnable() => true;
 
-		public bool CheckHitAttack(AttackHitInfo info, Collider to_collider, StageObject to_object)
-		{
-			if (attackHitChecker != null && !attackHitChecker.CheckHitAttack(info, to_collider, to_object))
-			{
-				return false;
-			}
-			return true;
-		}
+    public virtual void SortHitStackList(
+      List<AttackHitColliderProcessor.HitResult> stack_list)
+    {
+    }
 
-		public void OnHitAttack(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
-		{
-			if (attackHitChecker != null)
-			{
-				attackHitChecker.OnHitAttack(info, hit_param);
-			}
-		}
+    public virtual Vector3 GetCrossCheckPoint(Collider from_collider)
+    {
+      Bounds bounds = from_collider.bounds;
+      Vector3 crossCheckPoint = ((Bounds) ref bounds).center;
+      Character stageObject = this.stageObject as Character;
+      if (Object.op_Inequality((Object) stageObject, (Object) null) && Object.op_Inequality((Object) stageObject.rootNode, (Object) null))
+        crossCheckPoint = stageObject.rootNode.position;
+      return crossCheckPoint;
+    }
 
-		public AttackInfo GetAttackInfo()
-		{
-			return colliderProcessor.attackInfo;
-		}
+    public bool CheckHitAttack(AttackHitInfo info, Collider to_collider, StageObject to_object)
+    {
+      return this.attackHitChecker == null || this.attackHitChecker.CheckHitAttack(info, to_collider, to_object);
+    }
 
-		public StageObject GetFromObject()
-		{
-			return colliderProcessor.fromObject;
-		}
-	}
+    public void OnHitAttack(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
+    {
+      if (this.attackHitChecker == null)
+        return;
+      this.attackHitChecker.OnHitAttack(info, hit_param);
+    }
 
-	protected GameObject gameObject;
+    public AttackInfo GetAttackInfo() => this.colliderProcessor.attackInfo;
 
-	protected AtkColliderHiter colliderHiter;
+    public StageObject GetFromObject() => this.colliderProcessor.fromObject;
 
-	public AttackInfo attackInfo => (!(colliderHiter != null)) ? null : colliderHiter.attackInfo;
-
-	public bool isReleased => colliderHiter != null && colliderHiter.isReleased;
-
-	public void SetFixedUpdateFlag(bool flag)
-	{
-		if (colliderHiter != null)
-		{
-			colliderHiter.checkFixedUpdate = flag;
-		}
-	}
-
-	public void SetFixTransformUpdateFlag(bool flag)
-	{
-		if (colliderHiter != null)
-		{
-			colliderHiter.isUpdateFixTrans = flag;
-		}
-	}
-
-	public void ValidTriggerStay()
-	{
-		if (colliderHiter != null)
-		{
-			colliderHiter.ValidTriggerStay();
-		}
-	}
-
-	public bool Initialize(StageObject stgObj, AnimEventData.EventData data, AttackInfo atkInfo)
-	{
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Expected O, but got Unknown
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Expected O, but got Unknown
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-		if (data.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE && data.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_START && data.id != AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_DEPEND_VALUE && data.id != AnimEventFormat.ID.CONTINUS_ATTACK)
-		{
-			return false;
-		}
-		if (object.ReferenceEquals(stgObj, null))
-		{
-			return false;
-		}
-		Player player = stgObj as Player;
-		int layer = 13;
-		float num = 1f;
-		if (!object.ReferenceEquals(player, null))
-		{
-			layer = 12;
-			num = player.GetRadiusCustomRate();
-		}
-		if (gameObject == null)
-		{
-			gameObject = new GameObject();
-			gameObject.set_name("AnimEventCollider");
-			gameObject.set_layer(layer);
-			colliderHiter = gameObject.AddComponent<AtkColliderHiter>();
-		}
-		Transform parent = stgObj.get_gameObject().get_transform();
-		if (!string.IsNullOrEmpty(data.stringArgs[1]))
-		{
-			Transform val = stgObj.FindNode(data.stringArgs[1]);
-			if (val != null)
-			{
-				parent = val;
-			}
-		}
-		Vector3 pos = default(Vector3);
-		pos._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-		Vector3 rot = default(Vector3);
-		rot._002Ector(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
-		float radius = data.floatArgs[6] * num;
-		float height = data.floatArgs[7];
-		colliderHiter.SetColliderInfo(stgObj, parent, atkInfo, pos, rot, radius, height);
-		return true;
-	}
-
-	public void ReserveRelease()
-	{
-		colliderHiter.ReserveRelease();
-	}
-
-	public void Destroy()
-	{
-		colliderHiter = null;
-		Object.Destroy(gameObject);
-		gameObject = null;
-	}
+    protected enum COLLIDER_INFO
+    {
+      NONE = 0,
+      FIXED_UPDATE = 1,
+      RESERVE_RELEASE = 2,
+      RELEASED = 4,
+    }
+  }
 }

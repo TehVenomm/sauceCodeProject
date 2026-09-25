@@ -1,163 +1,153 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: MD5Hash
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
+#nullable disable
 public class MD5Hash : IDataTableRequestHash
 {
-	public static readonly MD5Hash invalidHash = new MD5Hash();
+  public static readonly MD5Hash invalidHash = new MD5Hash();
+  private static MD5 md5Calc = MD5.Create();
+  private uint u32_0;
+  private uint u32_1;
+  private uint u32_2;
+  private uint u32_3;
 
-	private static MD5 md5Calc = MD5.Create();
+  public bool isValid
+  {
+    get => this.u32_0 != 0U || this.u32_1 != 0U || this.u32_2 != 0U || this.u32_3 > 0U;
+  }
 
-	private uint u32_0;
+  public MD5Hash(uint u32_0, uint u32_1, uint u32_2, uint u32_3)
+  {
+    this.u32_0 = u32_0;
+    this.u32_1 = u32_1;
+    this.u32_2 = u32_2;
+    this.u32_3 = u32_3;
+  }
 
-	private uint u32_1;
+  public MD5Hash()
+  {
+  }
 
-	private uint u32_2;
+  private MD5Hash(byte[] hash)
+  {
+    this.u32_0 |= (uint) hash[0] << 24;
+    this.u32_0 |= (uint) hash[1] << 16 /*0x10*/;
+    this.u32_0 |= (uint) hash[2] << 8;
+    this.u32_0 |= (uint) hash[3];
+    this.u32_1 |= (uint) hash[4] << 24;
+    this.u32_1 |= (uint) hash[5] << 16 /*0x10*/;
+    this.u32_1 |= (uint) hash[6] << 8;
+    this.u32_1 |= (uint) hash[7];
+    this.u32_2 |= (uint) hash[8] << 24;
+    this.u32_2 |= (uint) hash[9] << 16 /*0x10*/;
+    this.u32_2 |= (uint) hash[10] << 8;
+    this.u32_2 |= (uint) hash[11];
+    this.u32_3 |= (uint) hash[12] << 24;
+    this.u32_3 |= (uint) hash[13] << 16 /*0x10*/;
+    this.u32_3 |= (uint) hash[14] << 8;
+    this.u32_3 |= (uint) hash[15];
+  }
 
-	private uint u32_3;
+  public uint this[int key]
+  {
+    get
+    {
+      switch (key)
+      {
+        case 0:
+          return this.u32_0;
+        case 1:
+          return this.u32_1;
+        case 2:
+          return this.u32_2;
+        case 3:
+          return this.u32_3;
+        default:
+          throw new KeyNotFoundException();
+      }
+    }
+    private set
+    {
+      switch (key)
+      {
+        case 0:
+          this.u32_0 = value;
+          break;
+        case 1:
+          this.u32_1 = value;
+          break;
+        case 2:
+          this.u32_2 = value;
+          break;
+        case 3:
+          this.u32_3 = value;
+          break;
+        default:
+          throw new KeyNotFoundException();
+      }
+    }
+  }
 
-	public bool isValid => u32_0 != 0 || u32_1 != 0 || u32_2 != 0 || u32_3 != 0;
+  public static MD5Hash Parse(string hashString)
+  {
+    MD5Hash md5Hash = new MD5Hash();
+    for (int key = 0; key < 4; ++key)
+    {
+      for (int index = 0; index < 4; ++index)
+      {
+        byte num = Convert.ToByte(hashString.Substring(index * 2 + key * 8, 2), 16 /*0x10*/);
+        md5Hash[key] |= (uint) num << 24 - index * 8;
+      }
+    }
+    return md5Hash;
+  }
 
-	public uint this[int key]
-	{
-		get
-		{
-			switch (key)
-			{
-			case 0:
-				return u32_0;
-			case 1:
-				return u32_1;
-			case 2:
-				return u32_2;
-			case 3:
-				return u32_3;
-			default:
-				throw new KeyNotFoundException();
-			}
-		}
-		private set
-		{
-			switch (key)
-			{
-			case 0:
-				u32_0 = value;
-				break;
-			case 1:
-				u32_1 = value;
-				break;
-			case 2:
-				u32_2 = value;
-				break;
-			case 3:
-				u32_3 = value;
-				break;
-			default:
-				throw new KeyNotFoundException();
-			}
-		}
-	}
+  public static MD5Hash Calc(byte[] data)
+  {
+    MD5Hash.md5Calc.Initialize();
+    return new MD5Hash(MD5Hash.md5Calc.ComputeHash(data));
+  }
 
-	public MD5Hash(uint u32_0, uint u32_1, uint u32_2, uint u32_3)
-	{
-		this.u32_0 = u32_0;
-		this.u32_1 = u32_1;
-		this.u32_2 = u32_2;
-		this.u32_3 = u32_3;
-	}
+  public static MD5Hash Calc(string s)
+  {
+    MD5Hash.md5Calc.Initialize();
+    byte[] bytes = Encoding.UTF8.GetBytes(s);
+    return new MD5Hash(MD5Hash.md5Calc.ComputeHash(bytes));
+  }
 
-	public MD5Hash()
-	{
-	}
+  public override string ToString()
+  {
+    return this.u32_0.ToString("x8") + this.u32_1.ToString("x8") + this.u32_2.ToString("x8") + this.u32_3.ToString("x8");
+  }
 
-	private MD5Hash(byte[] hash)
-	{
-		u32_0 |= (uint)(hash[0] << 24);
-		u32_0 |= (uint)(hash[1] << 16);
-		u32_0 |= (uint)(hash[2] << 8);
-		u32_0 |= hash[3];
-		u32_1 |= (uint)(hash[4] << 24);
-		u32_1 |= (uint)(hash[5] << 16);
-		u32_1 |= (uint)(hash[6] << 8);
-		u32_1 |= hash[7];
-		u32_2 |= (uint)(hash[8] << 24);
-		u32_2 |= (uint)(hash[9] << 16);
-		u32_2 |= (uint)(hash[10] << 8);
-		u32_2 |= hash[11];
-		u32_3 |= (uint)(hash[12] << 24);
-		u32_3 |= (uint)(hash[13] << 16);
-		u32_3 |= (uint)(hash[14] << 8);
-		u32_3 |= hash[15];
-	}
+  public override bool Equals(object obj)
+  {
+    MD5Hash md5Hash = obj as MD5Hash;
+    return !(md5Hash == (MD5Hash) null) && this == md5Hash;
+  }
 
-	public static MD5Hash Parse(string hashString)
-	{
-		MD5Hash mD5Hash = new MD5Hash();
-		for (int i = 0; i < 4; i++)
-		{
-			for (int j = 0; j < 4; j++)
-			{
-				string value = hashString.Substring(j * 2 + i * 8, 2);
-				byte b = Convert.ToByte(value, 16);
-				MD5Hash mD5Hash2;
-				MD5Hash mD5Hash3 = mD5Hash2 = mD5Hash;
-				int key;
-				int key2 = key = i;
-				uint num = mD5Hash2[key];
-				mD5Hash3[key2] = (uint)((int)num | (b << 24 - j * 8));
-			}
-		}
-		return mD5Hash;
-	}
+  public override int GetHashCode()
+  {
+    return (int) this.u32_0 ^ (int) this.u32_1 ^ (int) this.u32_2 ^ (int) this.u32_3;
+  }
 
-	public static MD5Hash Calc(byte[] data)
-	{
-		md5Calc.Initialize();
-		byte[] hash = md5Calc.ComputeHash(data);
-		return new MD5Hash(hash);
-	}
+  public uint GetUIntHashCode() => this.u32_0 ^ this.u32_1 ^ this.u32_2 ^ this.u32_3;
 
-	public static MD5Hash Calc(string s)
-	{
-		md5Calc.Initialize();
-		byte[] bytes = Encoding.UTF8.GetBytes(s);
-		byte[] hash = md5Calc.ComputeHash(bytes);
-		return new MD5Hash(hash);
-	}
+  public static bool operator ==(MD5Hash a, MD5Hash b)
+  {
+    return (int) a.u32_0 == (int) b.u32_0 && (int) a.u32_1 == (int) b.u32_1 && (int) a.u32_2 == (int) b.u32_2 && (int) a.u32_3 == (int) b.u32_3;
+  }
 
-	public override string ToString()
-	{
-		return u32_0.ToString("x8") + u32_1.ToString("x8") + u32_2.ToString("x8") + u32_3.ToString("x8");
-	}
-
-	public override bool Equals(object obj)
-	{
-		MD5Hash mD5Hash = obj as MD5Hash;
-		if (mD5Hash == (MD5Hash)null)
-		{
-			return false;
-		}
-		return this == mD5Hash;
-	}
-
-	public override int GetHashCode()
-	{
-		return (int)(u32_0 ^ u32_1 ^ u32_2 ^ u32_3);
-	}
-
-	public uint GetUIntHashCode()
-	{
-		return u32_0 ^ u32_1 ^ u32_2 ^ u32_3;
-	}
-
-	public static bool operator ==(MD5Hash a, MD5Hash b)
-	{
-		return a.u32_0 == b.u32_0 && a.u32_1 == b.u32_1 && a.u32_2 == b.u32_2 && a.u32_3 == b.u32_3;
-	}
-
-	public static bool operator !=(MD5Hash a, MD5Hash b)
-	{
-		return a.u32_0 != b.u32_0 || a.u32_1 != b.u32_1 || a.u32_2 != b.u32_2 || a.u32_3 == b.u32_3;
-	}
+  public static bool operator !=(MD5Hash a, MD5Hash b)
+  {
+    return (int) a.u32_0 != (int) b.u32_0 || (int) a.u32_1 != (int) b.u32_1 || (int) a.u32_2 != (int) b.u32_2 || (int) a.u32_3 == (int) b.u32_3;
+  }
 }

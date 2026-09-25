@@ -1,199 +1,147 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UICannonGizmo
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using UnityEngine;
 
+#nullable disable
 public class UICannonGizmo : UIStatusGizmoBase
 {
-	[SerializeField]
-	protected UISprite arrowSprite;
+  [SerializeField]
+  protected UISprite arrowSprite;
+  [SerializeField]
+  protected UISprite statusSprite;
+  [SerializeField]
+  protected Vector3 offset;
+  [SerializeField]
+  [Tooltip("スクリーン横オフセット")]
+  protected float screenSideOffset = 22f;
+  [SerializeField]
+  [Tooltip("スクリーン下オフセット")]
+  protected float screenBottomOffset = 112f;
+  private FieldGimmickCannonObject _owner;
+  protected Transform targetTransform;
+  protected Transform arrowTransform;
+  private Self myPlayer;
+  private UIPanel panel;
+  private bool isPlayAnimation;
 
-	[SerializeField]
-	protected UISprite statusSprite;
+  public FieldGimmickCannonObject owner
+  {
+    get => this._owner;
+    set
+    {
+      this._owner = value;
+      if (Object.op_Inequality((Object) this._owner, (Object) null))
+      {
+        ((Component) this).gameObject.SetActive(true);
+        this.targetTransform = ((Component) value).transform;
+        this.UpdateParam();
+      }
+      else
+        ((Component) this).gameObject.SetActive(false);
+    }
+  }
 
-	[SerializeField]
-	protected Vector3 offset;
+  protected override void OnEnable()
+  {
+    base.OnEnable();
+    if (Object.op_Inequality((Object) this.arrowSprite, (Object) null))
+      this.arrowTransform = ((Component) this.arrowSprite).transform.parent;
+    if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.playerList != null)
+      this.myPlayer = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Find((Predicate<StageObject>) (x => x is Self)) as Self;
+    this.panel = ((Component) this).GetComponent<UIPanel>();
+    this.isPlayAnimation = false;
+  }
 
-	[Tooltip("スクリ\u30fcン横オフセット")]
-	[SerializeField]
-	protected float screenSideOffset = 22f;
+  protected override void UpdateParam()
+  {
+    if (Object.op_Equality((Object) this.owner, (Object) null) || !((Component) this.owner).gameObject.activeSelf)
+    {
+      this.SetSpriteEnable(false);
+      this.isPlayAnimation = false;
+    }
+    else
+    {
+      Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+      if (Object.op_Inequality((Object) boss, (Object) null))
+      {
+        if (boss.IsValidShield())
+        {
+          if (Object.op_Inequality((Object) this.myPlayer, (Object) null))
+          {
+            if (this.myPlayer.IsOnCannonMode())
+            {
+              this.SetSpriteEnable(false);
+              this.isPlayAnimation = false;
+              return;
+            }
+            this.SetSpriteEnable(true);
+          }
+          if (!this.isPlayAnimation)
+          {
+            this.isPlayAnimation = true;
+            UITweenCtrl component = ((Component) this).GetComponent<UITweenCtrl>();
+            component.Reset();
+            component.Play();
+          }
+        }
+        else
+        {
+          this.SetSpriteEnable(false);
+          this.isPlayAnimation = false;
+          return;
+        }
+      }
+      Vector3 screenUiPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, Vector3.op_Addition(this.targetTransform.position, this.offset));
+      this.screenZ = screenUiPosition.z;
+      screenUiPosition.z = 0.0f;
+      float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
+      Vector3 vector3_1 = screenUiPosition;
+      bool flag = false;
+      float width = (float) Screen.width;
+      if ((double) screenUiPosition.x < (double) this.screenSideOffset * (double) num)
+      {
+        screenUiPosition.x = this.screenSideOffset * num;
+        flag = true;
+      }
+      else if ((double) screenUiPosition.x > (double) width - (double) this.screenSideOffset * (double) num)
+      {
+        screenUiPosition.x = width - this.screenSideOffset * num;
+        flag = true;
+      }
+      if ((double) screenUiPosition.y < (double) this.screenBottomOffset * (double) num)
+      {
+        screenUiPosition.y = this.screenBottomOffset * num;
+        flag = true;
+      }
+      if (flag)
+      {
+        this.SetSpriteEnable(true);
+        Vector3 worldPoint = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUiPosition);
+        Vector3 vector3_2 = Vector3.op_Subtraction(this.transform.position, worldPoint);
+        if ((double) ((Vector3) ref vector3_2).sqrMagnitude >= 1.9999999494757503E-05)
+          this.transform.position = worldPoint;
+        if (!Object.op_Inequality((Object) this.arrowTransform, (Object) null))
+          return;
+        Vector3 vector3_3 = Vector3.op_Subtraction(vector3_1, screenUiPosition);
+        if (Vector3.op_Inequality(vector3_3, Vector3.zero))
+          this.arrowTransform.eulerAngles = new Vector3(0.0f, 0.0f, 90f - Vector3.Angle(Vector3.right, vector3_3));
+        else
+          this.arrowTransform.eulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
+      }
+      else
+        this.SetSpriteEnable(false);
+    }
+  }
 
-	[Tooltip("スクリ\u30fcン下オフセット")]
-	[SerializeField]
-	protected float screenBottomOffset = 112f;
-
-	private FieldGimmickCannonObject _owner;
-
-	protected Transform targetTransform;
-
-	protected Transform arrowTransform;
-
-	private Self myPlayer;
-
-	private UIPanel panel;
-
-	private bool isPlayAnimation;
-
-	public FieldGimmickCannonObject owner
-	{
-		get
-		{
-			return _owner;
-		}
-		set
-		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Expected O, but got Unknown
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			_owner = value;
-			if (_owner != null)
-			{
-				this.get_gameObject().SetActive(true);
-				targetTransform = value.get_transform();
-				UpdateParam();
-			}
-			else
-			{
-				this.get_gameObject().SetActive(false);
-			}
-		}
-	}
-
-	protected override void OnEnable()
-	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Expected O, but got Unknown
-		base.OnEnable();
-		if (arrowSprite != null)
-		{
-			arrowTransform = arrowSprite.get_transform().get_parent();
-		}
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.playerList != null)
-		{
-			myPlayer = (MonoBehaviourSingleton<StageObjectManager>.I.playerList.Find((StageObject x) => x is Self) as Self);
-		}
-		panel = this.GetComponent<UIPanel>();
-		isPlayAnimation = false;
-	}
-
-	protected override void UpdateParam()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0223: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0226: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0243: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0288: Unknown result type (might be due to invalid IL or missing references)
-		if (owner == null || !owner.get_gameObject().get_activeSelf())
-		{
-			SetSpriteEnable(false);
-			isPlayAnimation = false;
-		}
-		else
-		{
-			Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-			if (boss != null)
-			{
-				if (!boss.IsValidShield())
-				{
-					SetSpriteEnable(false);
-					isPlayAnimation = false;
-					return;
-				}
-				if (myPlayer != null)
-				{
-					if (myPlayer.IsOnCannonMode())
-					{
-						SetSpriteEnable(false);
-						isPlayAnimation = false;
-						return;
-					}
-					SetSpriteEnable(true);
-				}
-				if (!isPlayAnimation)
-				{
-					isPlayAnimation = true;
-					UITweenCtrl component = this.GetComponent<UITweenCtrl>();
-					component.Reset();
-					component.Play(true, null);
-				}
-			}
-			Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, targetTransform.get_position() + offset);
-			screenZ = screenUIPosition.z;
-			screenUIPosition.z = 0f;
-			float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
-			Vector3 val = screenUIPosition;
-			bool flag = false;
-			float num2 = (float)Screen.get_width();
-			if (screenUIPosition.x < screenSideOffset * num)
-			{
-				screenUIPosition.x = screenSideOffset * num;
-				flag = true;
-			}
-			else if (screenUIPosition.x > num2 - screenSideOffset * num)
-			{
-				screenUIPosition.x = num2 - screenSideOffset * num;
-				flag = true;
-			}
-			if (screenUIPosition.y < screenBottomOffset * num)
-			{
-				screenUIPosition.y = screenBottomOffset * num;
-				flag = true;
-			}
-			if (flag)
-			{
-				SetSpriteEnable(true);
-				Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
-				Vector3 val3 = transform.get_position() - val2;
-				if (val3.get_sqrMagnitude() >= 2E-05f)
-				{
-					transform.set_position(val2);
-				}
-				if (arrowTransform != null)
-				{
-					Vector3 val4 = val - screenUIPosition;
-					if (val4 != Vector3.get_zero())
-					{
-						float num3 = 90f - Vector3.Angle(Vector3.get_right(), val4);
-						arrowTransform.set_eulerAngles(new Vector3(0f, 0f, num3));
-					}
-					else
-					{
-						arrowTransform.set_eulerAngles(new Vector3(0f, 0f, 0f));
-					}
-				}
-			}
-			else
-			{
-				SetSpriteEnable(false);
-			}
-		}
-	}
-
-	private void SetSpriteEnable(bool enable)
-	{
-		if (panel != null)
-		{
-			panel.set_enabled(enable);
-		}
-	}
+  private void SetSpriteEnable(bool enable)
+  {
+    if (!Object.op_Inequality((Object) this.panel, (Object) null))
+      return;
+    ((Behaviour) this.panel).enabled = enable;
+  }
 }

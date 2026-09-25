@@ -1,122 +1,96 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIProgressWork
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class UIProgressWork
+#nullable disable
+public class UIProgressWork : MonoBehaviour
 {
-	private int min;
+  private int min;
+  private int max = 100;
+  private int now;
+  private bool enableUpdateValue = true;
 
-	private int max = 100;
+  public int minValue
+  {
+    get => this.min;
+    set
+    {
+      this.min = value;
+      this.UpdateValue();
+    }
+  }
 
-	private int now;
+  public int maxValue
+  {
+    get => this.max;
+    set
+    {
+      this.max = value;
+      this.UpdateValue();
+    }
+  }
 
-	private bool enableUpdateValue = true;
+  public int value
+  {
+    get => this.now;
+    set
+    {
+      this.now = Mathf.Clamp(value, this.min, this.max);
+      this.enableUpdateValue = false;
+      if (this.min == this.max)
+        this.SetValue(1f);
+      else
+        this.SetValue((float) (this.now - this.min) / (float) (this.max - this.min));
+      this.enableUpdateValue = true;
+    }
+  }
 
-	public int minValue
-	{
-		get
-		{
-			return min;
-		}
-		set
-		{
-			min = value;
-			UpdateValue();
-		}
-	}
+  public UIProgressBar progress { get; private set; }
 
-	public int maxValue
-	{
-		get
-		{
-			return max;
-		}
-		set
-		{
-			max = value;
-			UpdateValue();
-		}
-	}
+  private void Awake()
+  {
+    this.progress = ((Component) this).GetComponent<UIProgressBar>();
+    this.UpdateValue();
+    EventDelegate.Add(this.progress.onChange, new EventDelegate.Callback(this.OnValueChange));
+  }
 
-	public int value
-	{
-		get
-		{
-			return now;
-		}
-		set
-		{
-			now = Mathf.Clamp(value, min, max);
-			enableUpdateValue = false;
-			if (min == max)
-			{
-				SetValue(1f);
-			}
-			else
-			{
-				SetValue((float)(now - min) / (float)(max - min));
-			}
-			enableUpdateValue = true;
-		}
-	}
+  private void OnValueChange() => this.UpdateValue();
 
-	public UIProgressBar progress
-	{
-		get;
-		private set;
-	}
+  private void UpdateValue()
+  {
+    if (!this.enableUpdateValue)
+      return;
+    if (this.min > this.max)
+      this.min = this.max;
+    int num = this.max - this.min;
+    ((Behaviour) this.progress).enabled = true;
+    if (num == 0)
+    {
+      this.SetValue(1f);
+      this.progress.numberOfSteps = 0;
+      ((Behaviour) this.progress).enabled = false;
+    }
+    else
+    {
+      this.now = Mathf.RoundToInt((float) num * this.progress.value) + this.min;
+      this.progress.numberOfSteps = num + 1;
+    }
+  }
 
-	public UIProgressWork()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		progress = this.GetComponent<UIProgressBar>();
-		UpdateValue();
-		EventDelegate.Add(progress.onChange, OnValueChange);
-	}
-
-	private void OnValueChange()
-	{
-		UpdateValue();
-	}
-
-	private void UpdateValue()
-	{
-		if (enableUpdateValue)
-		{
-			if (min > max)
-			{
-				min = max;
-			}
-			int num = max - min;
-			progress.set_enabled(true);
-			if (num == 0)
-			{
-				SetValue(1f);
-				progress.numberOfSteps = 0;
-				progress.set_enabled(false);
-			}
-			else
-			{
-				now = Mathf.RoundToInt((float)num * progress.value) + min;
-				progress.numberOfSteps = num + 1;
-			}
-		}
-	}
-
-	private void SetValue(float value)
-	{
-		bool enabled = progress.get_enabled();
-		bool flag = enableUpdateValue;
-		progress.set_enabled(true);
-		enableUpdateValue = false;
-		if (progress.value == value)
-		{
-			progress.value = 1f - value;
-		}
-		progress.value = value;
-		enableUpdateValue = flag;
-		progress.set_enabled(enabled);
-	}
+  private void SetValue(float value)
+  {
+    bool enabled = ((Behaviour) this.progress).enabled;
+    bool enableUpdateValue = this.enableUpdateValue;
+    ((Behaviour) this.progress).enabled = true;
+    this.enableUpdateValue = false;
+    if ((double) this.progress.value == (double) value)
+      this.progress.value = 1f - value;
+    this.progress.value = value;
+    this.enableUpdateValue = enableUpdateValue;
+    ((Behaviour) this.progress).enabled = enabled;
+  }
 }

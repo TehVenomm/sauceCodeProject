@@ -1,122 +1,97 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: DegreeTable
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using System.Collections.Generic;
 
+#nullable disable
 public class DegreeTable : Singleton<DegreeTable>, IDataTable
 {
-	public class DegreeData
-	{
-		public const string NT = "id,name,type,requirementType,requirementText,lockNameId,lockTextId";
+  public const int INFO_MAX = 3;
+  private UIntKeyTable<DegreeTable.DegreeData> dataTable;
 
-		public uint id;
+  public void CreateTable(string csv_text)
+  {
+    this.dataTable = TableUtility.CreateUIntKeyTable<DegreeTable.DegreeData>(csv_text, new TableUtility.CallBackUIntKeyReadCSV<DegreeTable.DegreeData>(DegreeTable.DegreeData.cb), "id,name,type,requirementType,requirementText,lockNameId,lockTextId");
+    this.dataTable.TrimExcess();
+  }
 
-		public string name;
+  public void AddTable(string csv_text)
+  {
+    TableUtility.AddUIntKeyTable<DegreeTable.DegreeData>(this.dataTable, csv_text, new TableUtility.CallBackUIntKeyReadCSV<DegreeTable.DegreeData>(DegreeTable.DegreeData.cb), "id,name,type,requirementType,requirementText,lockNameId,lockTextId");
+  }
 
-		public DEGREE_TYPE type;
+  public DegreeTable.DegreeData GetData(uint id)
+  {
+    if (this.dataTable == null)
+      return (DegreeTable.DegreeData) null;
+    DegreeTable.DegreeData data = this.dataTable.Get(id);
+    if (data == null)
+    {
+      Log.TableError((object) this, id);
+      data = new DegreeTable.DegreeData();
+      data.name = Log.NON_DATA_NAME;
+    }
+    return data;
+  }
 
-		public DEGREE_REQUIREMENT_TYPE requirementType;
+  public List<DegreeTable.DegreeData> GetAll()
+  {
+    List<DegreeTable.DegreeData> allData = new List<DegreeTable.DegreeData>();
+    this.dataTable.ForEach((Action<DegreeTable.DegreeData>) (x =>
+    {
+      if (x == null)
+        return;
+      allData.Add(x);
+    }));
+    return allData;
+  }
 
-		public string requirementText;
+  public class DegreeData
+  {
+    public uint id;
+    public string name;
+    public DEGREE_TYPE type;
+    public DEGREE_REQUIREMENT_TYPE requirementType;
+    public string requirementText;
+    public uint lockNameId;
+    public uint lockTextId;
+    public const string NT = "id,name,type,requirementType,requirementText,lockNameId,lockTextId";
 
-		public uint lockNameId;
+    public static bool cb(CSVReader csv_reader, DegreeTable.DegreeData data, ref uint key)
+    {
+      data.id = key;
+      csv_reader.Pop(ref data.name);
+      csv_reader.PopEnum<DEGREE_TYPE>(ref data.type, DEGREE_TYPE.NONE);
+      csv_reader.PopEnum<DEGREE_REQUIREMENT_TYPE>(ref data.requirementType, DEGREE_REQUIREMENT_TYPE.COMMON);
+      csv_reader.Pop(ref data.requirementText);
+      csv_reader.Pop(ref data.lockNameId);
+      csv_reader.Pop(ref data.lockTextId);
+      return true;
+    }
 
-		public uint lockTextId;
+    public bool IsUnlcok(List<int> userUnlockList)
+    {
+      if (this.requirementType == DEGREE_REQUIREMENT_TYPE.COMMON)
+        return true;
+      return userUnlockList != null && userUnlockList.Contains((int) this.id);
+    }
 
-		public static bool cb(CSVReader csv_reader, DegreeData data, ref uint key)
-		{
-			data.id = key;
-			csv_reader.Pop(ref data.name);
-			csv_reader.PopEnum(ref data.type, DEGREE_TYPE.NONE);
-			csv_reader.PopEnum(ref data.requirementType, DEGREE_REQUIREMENT_TYPE.COMMON);
-			csv_reader.Pop(ref data.requirementText);
-			csv_reader.Pop(ref data.lockNameId);
-			csv_reader.Pop(ref data.lockTextId);
-			return true;
-		}
+    public bool IsSecretText(List<int> userUnlockList)
+    {
+      if (this.lockTextId == 0U || this.IsUnlcok(userUnlockList))
+        return false;
+      return userUnlockList == null || !userUnlockList.Contains((int) this.lockTextId);
+    }
 
-		public bool IsUnlcok(List<int> userUnlockList)
-		{
-			if (requirementType == DEGREE_REQUIREMENT_TYPE.COMMON)
-			{
-				return true;
-			}
-			return userUnlockList?.Contains((int)id) ?? false;
-		}
-
-		public bool IsSecretText(List<int> userUnlockList)
-		{
-			if (lockTextId == 0)
-			{
-				return false;
-			}
-			if (IsUnlcok(userUnlockList))
-			{
-				return false;
-			}
-			if (userUnlockList == null)
-			{
-				return true;
-			}
-			return !userUnlockList.Contains((int)lockTextId);
-		}
-
-		public bool IsSecretName(List<int> userUnlockList)
-		{
-			if (lockNameId == 0)
-			{
-				return false;
-			}
-			if (IsUnlcok(userUnlockList))
-			{
-				return false;
-			}
-			if (userUnlockList == null)
-			{
-				return true;
-			}
-			return !userUnlockList.Contains((int)lockNameId);
-		}
-	}
-
-	public const int INFO_MAX = 3;
-
-	private UIntKeyTable<DegreeData> dataTable;
-
-	public void CreateTable(string csv_text)
-	{
-		dataTable = TableUtility.CreateUIntKeyTable<DegreeData>(csv_text, DegreeData.cb, "id,name,type,requirementType,requirementText,lockNameId,lockTextId", null);
-		dataTable.TrimExcess();
-	}
-
-	public void AddTable(string csv_text)
-	{
-		TableUtility.AddUIntKeyTable(dataTable, csv_text, DegreeData.cb, "id,name,type,requirementType,requirementText,lockNameId,lockTextId", null);
-	}
-
-	public DegreeData GetData(uint id)
-	{
-		if (dataTable == null)
-		{
-			return null;
-		}
-		DegreeData degreeData = dataTable.Get(id);
-		if (degreeData == null)
-		{
-			Log.TableError(this, id);
-			degreeData = new DegreeData();
-			degreeData.name = Log.NON_DATA_NAME;
-		}
-		return degreeData;
-	}
-
-	public List<DegreeData> GetAll()
-	{
-		List<DegreeData> allData = new List<DegreeData>();
-		dataTable.ForEach(delegate(DegreeData x)
-		{
-			if (x != null)
-			{
-				allData.Add(x);
-			}
-		});
-		return allData;
-	}
+    public bool IsSecretName(List<int> userUnlockList)
+    {
+      if (this.lockNameId == 0U || this.IsUnlcok(userUnlockList))
+        return false;
+      return userUnlockList == null || !userUnlockList.Contains((int) this.lockNameId);
+    }
+  }
 }

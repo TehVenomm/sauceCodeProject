@@ -1,63 +1,49 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: CharaMakeColorListItem
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class CharaMakeColorListItem
+#nullable disable
+public class CharaMakeColorListItem : MonoBehaviour
 {
-	[SerializeField]
-	private UISprite m_Sprite;
+  [SerializeField]
+  private UISprite m_Sprite;
+  [SerializeField]
+  private UIButton m_Button;
+  [SerializeField]
+  private GameObject m_OnRoot;
+  [SerializeField]
+  private GameObject m_OffRoot;
+  public int id;
 
-	[SerializeField]
-	private UIButton m_Button;
+  public Transform uiEventSender => ((Component) this.m_Button).transform;
 
-	[SerializeField]
-	private GameObject m_OnRoot;
+  private void Awake() => this.m_Button.tweenTarget = (GameObject) null;
 
-	[SerializeField]
-	private GameObject m_OffRoot;
+  public void Init(Color color, int id, UIScrollView scroll)
+  {
+    this.m_Sprite.color = color;
+    this.m_Button.defaultColor = color;
+    this.m_Button.hover = color;
+    this.m_Button.pressed = color;
+    this.m_Button.disabledColor = color;
+    this.m_Button.CacheDefaultColor();
+    this.id = id;
+    ((Component) this.m_Button).gameObject.AddComponent<UIDragScrollView>().scrollView = scroll;
+  }
 
-	public int id;
+  public void On()
+  {
+    this.m_OnRoot.SetActive(true);
+    this.m_OffRoot.SetActive(false);
+  }
 
-	public Transform uiEventSender => m_Button.get_transform();
-
-	public CharaMakeColorListItem()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		m_Button.tweenTarget = null;
-	}
-
-	public void Init(Color color, int id, UIScrollView scroll)
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		m_Sprite.color = color;
-		m_Button.defaultColor = color;
-		m_Button.hover = color;
-		m_Button.pressed = color;
-		m_Button.disabledColor = color;
-		m_Button.CacheDefaultColor();
-		this.id = id;
-		m_Button.get_gameObject().AddComponent<UIDragScrollView>().scrollView = scroll;
-	}
-
-	public void On()
-	{
-		m_OnRoot.SetActive(true);
-		m_OffRoot.SetActive(false);
-	}
-
-	public void Off()
-	{
-		m_OnRoot.SetActive(false);
-		m_OffRoot.SetActive(true);
-	}
+  public void Off()
+  {
+    this.m_OnRoot.SetActive(false);
+    this.m_OffRoot.SetActive(true);
+  }
 }

@@ -1,39 +1,30 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AlphaClear
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
-public class AlphaClear
+#nullable disable
+[RequireComponent(typeof (Camera))]
+public class AlphaClear : MonoBehaviour
 {
-	[SerializeField]
-	private Mesh quad;
+  [SerializeField]
+  private Mesh quad;
+  private Matrix4x4 matrix;
+  private Material alphaClearMaterial;
 
-	private Matrix4x4 matrix;
+  private void Awake()
+  {
+    this.matrix = Matrix4x4.identity;
+    ((Matrix4x4) ref this.matrix).SetTRS(Vector3.zero, Quaternion.AngleAxis(90f, Vector3.right), new Vector3(100f, 100f, 1f));
+    this.alphaClearMaterial = new Material(ResourceUtility.FindShader("Custom/AlphaClear"));
+  }
 
-	private Material alphaClearMaterial;
-
-	public AlphaClear()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Expected O, but got Unknown
-		matrix = Matrix4x4.get_identity();
-		matrix.SetTRS(Vector3.get_zero(), Quaternion.AngleAxis(90f, Vector3.get_right()), new Vector3(100f, 100f, 1f));
-		alphaClearMaterial = new Material(ResourceUtility.FindShader("Custom/AlphaClear"));
-	}
-
-	private void OnPostRender()
-	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		alphaClearMaterial.SetPass(0);
-		Graphics.DrawMeshNow(quad, matrix, 0);
-	}
+  private void OnPostRender()
+  {
+    this.alphaClearMaterial.SetPass(0);
+    Graphics.DrawMeshNow(this.quad, this.matrix, 0);
+  }
 }

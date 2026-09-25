@@ -1,269 +1,198 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AnimationDirector
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using rhyme;
-using System;
 using UnityEngine;
 
-public class AnimationDirector
+#nullable disable
+public class AnimationDirector : MonoBehaviour
 {
-	public const string TAG = "Direction";
+  public const string TAG = "Direction";
+  public Camera useCamera;
+  public GameObject fader;
+  public Component commandReceiver;
+  protected bool skip;
+  private bool linkCamera;
+  private Transform saveCameraParamsObject;
+  private Camera saveCameraParams;
+  private Vector3 saveCameraPos;
+  private Quaternion saveCameraRot;
+  private bool isDestroy;
+  private Animator _animator;
+  private int playingStateHash;
+  private System.Action endCallback;
 
-	public Camera useCamera;
+  public static AnimationDirector I { get; private set; }
 
-	public GameObject fader;
+  public void __FUNCTION__InstantiatePrefab(string game_object_name)
+  {
+    GameObject gameObject = GameObject.Find(game_object_name);
+    if (Object.op_Equality((Object) gameObject, (Object) null))
+      return;
+    DirectionPrefabObject component = gameObject.GetComponent<DirectionPrefabObject>();
+    if (Object.op_Equality((Object) component, (Object) null))
+      return;
+    this.CreateEffect(component.prefab, ((Component) component).transform);
+  }
 
-	public Component commandReceiver;
+  public void __FUNCTION__PlayAudio(string game_object_name)
+  {
+    GameObject gameObject = GameObject.Find(game_object_name);
+    if (Object.op_Equality((Object) gameObject, (Object) null))
+      return;
+    AudioSource component = gameObject.GetComponent<AudioSource>();
+    if (Object.op_Equality((Object) component, (Object) null))
+      return;
+    gameObject.tag = "Direction";
+    component.Play();
+  }
 
-	protected bool skip;
+  public virtual void __FUNCTION__PlayCachedAudio(int se_id) => SoundManager.PlayOneShotUISE(se_id);
 
-	private bool linkCamera;
+  public void __FUNCTION_Command(string command)
+  {
+    if (!Object.op_Inequality((Object) this.commandReceiver, (Object) null))
+      return;
+    this.commandReceiver.SendMessage("OnDirectionCommand", (object) command);
+  }
 
-	private Transform saveCameraParamsObject;
+  protected Transform CreateEffect(GameObject effect_prefab, Transform parent)
+  {
+    Transform effect = ResourceUtility.Realizes((Object) effect_prefab, parent);
+    if (Object.op_Equality((Object) effect, (Object) null))
+      return (Transform) null;
+    ((Component) effect).gameObject.tag = "Direction";
+    rymFX component = ((Component) effect).GetComponent<rymFX>();
+    if (Object.op_Inequality((Object) component, (Object) null) && Object.op_Inequality((Object) this.useCamera, (Object) null))
+      component.Cameras = new Camera[1]
+      {
+        MonoBehaviourSingleton<AppMain>.I.mainCamera
+      };
+    return effect;
+  }
 
-	private Camera saveCameraParams;
+  protected virtual void OnEnable() => AnimationDirector.I = this;
 
-	private Vector3 saveCameraPos;
+  protected virtual void OnDisable()
+  {
+    if (!Object.op_Equality((Object) AnimationDirector.I, (Object) this))
+      return;
+    AnimationDirector.I = (AnimationDirector) null;
+  }
 
-	private Quaternion saveCameraRot;
+  protected virtual void Awake()
+  {
+    AnimationDirector.I = this;
+    this._animator = ((Component) this).GetComponent<Animator>();
+    if (MonoBehaviourSingleton<AppMain>.IsValid() && Object.op_Inequality((Object) this.useCamera, (Object) null))
+      ((Behaviour) this.useCamera).enabled = false;
+    if (!Object.op_Inequality((Object) this.fader, (Object) null))
+      return;
+    this.fader.SetActive(false);
+  }
 
-	private bool isDestroy;
+  protected virtual void OnDestroy()
+  {
+    if (AppMain.isApplicationQuit)
+      return;
+    this.isDestroy = true;
+    this.SetLinkCamera(false);
+    if (!Object.op_Equality((Object) AnimationDirector.I, (Object) this))
+      return;
+    AnimationDirector.I = (AnimationDirector) null;
+  }
 
-	private Animator _animator;
+  public void Play(string state_name, System.Action end_callback = null, float normalizedTime = 0.0f)
+  {
+    this.playingStateHash = Animator.StringToHash("Base Layer." + state_name);
+    this.endCallback = end_callback;
+    ((Behaviour) this._animator).enabled = true;
+    this._animator.Play(this.playingStateHash, 0, normalizedTime);
+    this._animator.Update(0.0f);
+  }
 
-	private int playingStateHash;
+  public void SetAnimatorInteger(string name, int value) => this._animator.SetInteger(name, value);
 
-	private Action endCallback;
+  public bool isPlaying => this.playingStateHash != 0;
 
-	public static AnimationDirector I
-	{
-		get;
-		private set;
-	}
+  protected virtual void Update()
+  {
+    if (Object.op_Equality((Object) this._animator, (Object) null))
+      return;
+    this._animator.speed = this.skip ? 10000f : 1f;
+    if (this.playingStateHash == 0)
+      return;
+    AnimatorStateInfo animatorStateInfo = this._animator.GetCurrentAnimatorStateInfo(0);
+    if (((AnimatorStateInfo) ref animatorStateInfo).fullPathHash != this.playingStateHash || (double) ((AnimatorStateInfo) ref animatorStateInfo).normalizedTime < 1.0)
+      return;
+    this.playingStateHash = 0;
+    if (this.endCallback == null)
+      return;
+    System.Action endCallback = this.endCallback;
+    this.endCallback = (System.Action) null;
+    endCallback();
+  }
 
-	public bool isPlaying => playingStateHash != 0;
+  protected virtual void LateUpdate()
+  {
+    if (!this.linkCamera)
+      return;
+    MonoBehaviourSingleton<AppMain>.I.mainCamera.CopyFrom(this.useCamera);
+  }
 
-	public AnimationDirector()
-		: this()
-	{
-	}
+  public void SetLinkCamera(bool is_link)
+  {
+    if (Object.op_Equality((Object) this.useCamera, (Object) null) || this.linkCamera == is_link)
+      return;
+    this.linkCamera = is_link;
+    if (is_link)
+    {
+      if (Object.op_Equality((Object) this.saveCameraParams, (Object) null))
+      {
+        this.saveCameraParamsObject = Utility.CreateGameObject("saveCameraParams", ((Component) this).transform);
+        this.saveCameraParams = ((Component) this.saveCameraParamsObject).gameObject.AddComponent<Camera>();
+      }
+      Transform transform = ((Component) this).transform;
+      Vector3 position = transform.position;
+      Quaternion rotation = transform.rotation;
+      this.saveCameraParams.CopyFrom(MonoBehaviourSingleton<AppMain>.I.mainCamera);
+      this.saveCameraPos = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.position;
+      this.saveCameraRot = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.rotation;
+      transform.position = position;
+      transform.rotation = rotation;
+      ((Behaviour) this.saveCameraParams).enabled = false;
+      if (!Object.op_Inequality((Object) this.fader, (Object) null))
+        return;
+      this.fader.SetActive(true);
+    }
+    else
+    {
+      if (Object.op_Inequality((Object) this.saveCameraParams, (Object) null))
+      {
+        MonoBehaviourSingleton<AppMain>.I.mainCamera.CopyFrom(this.saveCameraParams);
+        MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.position = this.saveCameraPos;
+        MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.rotation = this.saveCameraRot;
+        if (!this.isDestroy)
+          Object.DestroyImmediate((Object) ((Component) this.saveCameraParamsObject).gameObject);
+        this.saveCameraParamsObject = (Transform) null;
+        this.saveCameraParams = (Camera) null;
+      }
+      if (!Object.op_Inequality((Object) this.fader, (Object) null))
+        return;
+      this.fader.SetActive(false);
+    }
+  }
 
-	public void __FUNCTION__InstantiatePrefab(string game_object_name)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Expected O, but got Unknown
-		GameObject val = GameObject.Find(game_object_name);
-		if (!(val == null))
-		{
-			DirectionPrefabObject component = val.GetComponent<DirectionPrefabObject>();
-			if (!(component == null))
-			{
-				CreateEffect(component.prefab, component.get_transform());
-			}
-		}
-	}
+  public virtual void Skip() => this.skip = true;
 
-	public void __FUNCTION__PlayAudio(string game_object_name)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		GameObject val = GameObject.Find(game_object_name);
-		if (!(val == null))
-		{
-			AudioSource component = val.GetComponent<AudioSource>();
-			if (!(component == null))
-			{
-				val.set_tag("Direction");
-				component.Play();
-			}
-		}
-	}
+  public bool IsSkip() => this.skip;
 
-	public virtual void __FUNCTION__PlayCachedAudio(int se_id)
-	{
-		SoundManager.PlayOneShotUISE(se_id);
-	}
+  public virtual void SkipAll()
+  {
+  }
 
-	public void __FUNCTION_Command(string command)
-	{
-		if (commandReceiver != null)
-		{
-			commandReceiver.SendMessage("OnDirectionCommand", (object)command);
-		}
-	}
-
-	protected Transform CreateEffect(GameObject effect_prefab, Transform parent)
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = ResourceUtility.Realizes(effect_prefab, parent, -1);
-		if (val == null)
-		{
-			return null;
-		}
-		val.get_gameObject().set_tag("Direction");
-		rymFX component = val.GetComponent<rymFX>();
-		if (component != null && useCamera != null)
-		{
-			component.Cameras = (Camera[])new Camera[1]
-			{
-				MonoBehaviourSingleton<AppMain>.I.mainCamera
-			};
-		}
-		return val;
-	}
-
-	protected virtual void Awake()
-	{
-		if (I == null)
-		{
-			I = this;
-		}
-		_animator = this.GetComponent<Animator>();
-		if (MonoBehaviourSingleton<AppMain>.IsValid() && useCamera != null)
-		{
-			useCamera.set_enabled(false);
-		}
-		if (fader != null)
-		{
-			fader.SetActive(false);
-		}
-	}
-
-	protected virtual void OnDestroy()
-	{
-		if (!AppMain.isApplicationQuit)
-		{
-			isDestroy = true;
-			SetLinkCamera(false);
-			if (I == this)
-			{
-				I = null;
-			}
-		}
-	}
-
-	public void Play(string state_name, Action end_callback = null, float normalizedTime = 0f)
-	{
-		playingStateHash = Animator.StringToHash("Base Layer." + state_name);
-		endCallback = end_callback;
-		_animator.set_enabled(true);
-		_animator.Play(playingStateHash, 0, normalizedTime);
-		_animator.Update(0f);
-	}
-
-	protected virtual void Update()
-	{
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		if (!(_animator == null))
-		{
-			_animator.set_speed((!skip) ? 1f : 10000f);
-			if (playingStateHash != 0)
-			{
-				AnimatorStateInfo currentAnimatorStateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_fullPathHash() == playingStateHash && currentAnimatorStateInfo.get_normalizedTime() >= 1f)
-				{
-					playingStateHash = 0;
-					if (endCallback != null)
-					{
-						Action action = endCallback;
-						endCallback = null;
-						action();
-					}
-				}
-			}
-		}
-	}
-
-	protected virtual void LateUpdate()
-	{
-		if (linkCamera)
-		{
-			MonoBehaviourSingleton<AppMain>.I.mainCamera.CopyFrom(useCamera);
-		}
-	}
-
-	public void SetLinkCamera(bool is_link)
-	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Expected O, but got Unknown
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Expected O, but got Unknown
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		if (!(useCamera == null) && linkCamera != is_link)
-		{
-			linkCamera = is_link;
-			if (is_link)
-			{
-				if (saveCameraParams == null)
-				{
-					saveCameraParamsObject = Utility.CreateGameObject("saveCameraParams", this.get_transform(), -1);
-					saveCameraParams = saveCameraParamsObject.get_gameObject().AddComponent<Camera>();
-				}
-				Transform val = this.get_transform();
-				Vector3 position = val.get_position();
-				Quaternion rotation = val.get_rotation();
-				saveCameraParams.CopyFrom(MonoBehaviourSingleton<AppMain>.I.mainCamera);
-				saveCameraPos = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_position();
-				saveCameraRot = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_rotation();
-				val.set_position(position);
-				val.set_rotation(rotation);
-				saveCameraParams.set_enabled(false);
-				if (fader != null)
-				{
-					fader.SetActive(true);
-				}
-			}
-			else
-			{
-				if (saveCameraParams != null)
-				{
-					MonoBehaviourSingleton<AppMain>.I.mainCamera.CopyFrom(saveCameraParams);
-					MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_position(saveCameraPos);
-					MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.set_rotation(saveCameraRot);
-					if (!isDestroy)
-					{
-						Object.DestroyImmediate(saveCameraParamsObject.get_gameObject());
-					}
-					saveCameraParamsObject = null;
-					saveCameraParams = null;
-				}
-				if (fader != null)
-				{
-					fader.SetActive(false);
-				}
-			}
-		}
-	}
-
-	public virtual void Skip()
-	{
-		skip = true;
-	}
-
-	public bool IsSkip()
-	{
-		return skip;
-	}
-
-	public virtual void SkipAll()
-	{
-	}
-
-	public virtual void Reset()
-	{
-		SetLinkCamera(false);
-	}
+  public virtual void Reset() => this.SetLinkCamera(false);
 }

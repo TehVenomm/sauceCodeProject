@@ -1,438 +1,310 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SlimeController
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class SlimeController
+#nullable disable
+public class SlimeController : MonoBehaviour
 {
-	private const float MOVE_V = 0.15f;
+  [Tooltip("FadeInアニメーション再生時間(秒)")]
+  public float fadeInAnimTime = 0.3f;
+  [Tooltip("FadeInの色アニメーション再生時間(秒)")]
+  public float fadeInColorAnimTime = 0.3f;
+  public AnimationCurve animFadeIn;
+  [Tooltip("FadeOutアニメーション再生時間(秒)")]
+  public float fadeOutAnimTime = 0.6f;
+  [Tooltip("FadeOutの色アニメーション再生時間(秒)")]
+  public float fadeOutColorAnimTime = 0.6f;
+  public AnimationCurve animFadeOut;
+  [Tooltip("Crushアニメーション再生時間(秒)")]
+  public float crushAnimTime = 0.1f;
+  [Tooltip("Crushの色アニメーション再生時間(秒)")]
+  public float crushColorAnimTime = 0.4f;
+  public AnimationCurve animCrush;
+  public AnimationCurve animCrush_temp;
+  [Tooltip("ScaleUpDownアニメーション再生時間(秒)")]
+  public float scaleUpDownAnimTime = 1f;
+  public AnimationCurve animScaleUpDown;
+  [Tooltip("ScaleUpアニメーション最大倍率")]
+  public float scaleupAnimMaxScale = 2.4f;
+  [Tooltip("ScaleUpアニメーション再生時間(秒)")]
+  public float scaleupAnimTime = 0.8f;
+  public SlimeAnimation slimeAnim;
+  private Vector3 targetVector = Vector3.zero;
+  private int subdivionsWidth;
+  private int subdivionsHeight;
+  private ParametricPlane parametricPlane;
+  private MeshFilter meshFilter;
+  private MeshRenderer meshRenderer;
+  private Vector3[] firstVectors;
+  private Vector3[] nowVectors;
+  private Vector3[] vertWork;
+  private float[] inv_lenghts;
+  private Vector3 dragPos;
+  private Vector3 startPosition = Vector3.zero;
+  private float animTime;
+  private bool isMeshUpdate;
+  private bool isDrag;
+  private bool isSlimeStart;
+  private const float MOVE_V = 0.15f;
+  private const float RAND_VR = 0.1f;
+  private const float RAND_V = 5f;
+  private const float RAND_W = 100f;
 
-	private const float RAND_VR = 0.1f;
+  public float updateAnimTime { set; get; }
 
-	private const float RAND_V = 5f;
+  private void Awake()
+  {
+    this.meshFilter = ((Component) this).GetComponent<MeshFilter>();
+    this.meshRenderer = ((Component) this).GetComponent<MeshRenderer>();
+  }
 
-	private const float RAND_W = 100f;
+  private void Start()
+  {
+    Color color = ((Renderer) this.meshRenderer).material.color;
+    color.a = 0.0f;
+    ((Renderer) this.meshRenderer).material.color = color;
+    this.SetInvisible();
+    this.parametricPlane = ((Component) this).GetComponent<ParametricPlane>();
+    this.parametricPlane.CreateMesh();
+    this.Initialize();
+    this.slimeAnim = new SlimeAnimation(this);
+    this.isMeshUpdate = false;
+  }
 
-	[Tooltip("FadeInアニメ\u30fcション再生時間(秒)")]
-	public float fadeInAnimTime = 0.3f;
+  private void Update()
+  {
+    if (this.subdivionsHeight <= 0 || this.subdivionsWidth <= 0)
+      return;
+    if (this.isMeshUpdate)
+    {
+      if ((double) this.targetVector.y < 0.5 * (double) this.parametricPlane._height)
+      {
+        this.isDrag = false;
+        this.targetVector = Vector3.zero;
+      }
+      else
+        this.isDrag = true;
+      this.SmoothingFilter();
+      int index = 0;
+      for (int length = this.nowVectors.Length; index < length; ++index)
+        this.vertWork[index] = this.nowVectors[index];
+      this.meshFilter.mesh.vertices = this.vertWork;
+    }
+    this.TouchSlimeUpdateAnim();
+  }
 
-	[Tooltip("FadeInの色アニメ\u30fcション再生時間(秒)")]
-	public float fadeInColorAnimTime = 0.3f;
+  private void Initialize()
+  {
+    this.subdivionsWidth = this.parametricPlane._subdivisionsWidth + 1;
+    this.subdivionsHeight = this.parametricPlane._subdivisionsHeight + 1;
+    this.firstVectors = this.meshFilter.mesh.vertices;
+    this.vertWork = new Vector3[this.firstVectors.Length];
+    this.inv_lenghts = new float[this.firstVectors.Length];
+    this.nowVectors = new Vector3[this.firstVectors.Length];
+    int num1 = this.subdivionsWidth / 2;
+    int num2 = 0;
+    this.dragPos = this.firstVectors[num2 * this.subdivionsWidth + num1];
+    int index1 = 0;
+    int subdivionsWidth = this.subdivionsWidth;
+    int subdivionsHeight = this.subdivionsHeight;
+    for (int index2 = 0; index2 < subdivionsHeight; ++index2)
+    {
+      for (int index3 = 0; index3 < subdivionsWidth; ++index3)
+      {
+        this.nowVectors[index1] = this.firstVectors[index1];
+        int num3 = (num1 - index3) * (num1 - index3) + (num2 - index2) * (num2 - index2);
+        this.inv_lenghts[index1] = num3 == 0 ? 1f : 1f / Mathf.Sqrt((float) num3);
+        ++index1;
+      }
+    }
+  }
 
-	public AnimationCurve animFadeIn;
+  private void SmoothingFilter()
+  {
+    if (Vector3.op_Inequality(this.targetVector, Vector3.zero))
+      this.SmoothingTargetNotZero();
+    else
+      this.SmoothingTargetZero();
+    this.CountAnimTime();
+  }
 
-	[Tooltip("FadeOutアニメ\u30fcション再生時間(秒)")]
-	public float fadeOutAnimTime = 0.6f;
+  private void SmoothingTargetNotZero()
+  {
+    float num1 = this.targetVector.x - this.dragPos.x;
+    float num2 = this.targetVector.y - this.dragPos.y;
+    int index = 0;
+    for (int length = this.nowVectors.Length; index < length; ++index)
+    {
+      Vector3 firstVector = this.firstVectors[index];
+      float invLenght = this.inv_lenghts[index];
+      firstVector.x += num1 * invLenght;
+      firstVector.y += num2 * invLenght;
+      this.nowVectors[index] = firstVector;
+    }
+    this.ResetAnimTime();
+    if (!Vector3.op_Equality(this.startPosition, Vector3.zero))
+      return;
+    this.startPosition = ((Component) this).transform.localPosition;
+  }
 
-	[Tooltip("FadeOutの色アニメ\u30fcション再生時間(秒)")]
-	public float fadeOutColorAnimTime = 0.6f;
+  private void SmoothingTargetZero()
+  {
+    int index = 0;
+    for (int length = this.nowVectors.Length; index < length; ++index)
+    {
+      Vector3 firstVector = this.firstVectors[index];
+      Vector3 nowVector = this.nowVectors[index];
+      float num = 1f - this.animTime;
+      firstVector.x = (float) ((double) firstVector.x * (double) this.animTime + (double) nowVector.x * (double) num);
+      firstVector.y = (float) ((double) firstVector.y * (double) this.animTime + (double) nowVector.y * (double) num);
+      this.nowVectors[index] = firstVector;
+    }
+    if (!Vector3.op_Inequality(this.startPosition, Vector3.zero))
+      return;
+    this.startPosition = Vector3.zero;
+  }
 
-	public AnimationCurve animFadeOut;
+  public void TouchStartSlime()
+  {
+    this.isSlimeStart = true;
+    this.MeshPosInit();
+    this.SetVisible();
+    this.TouchStartSlimeAnim();
+  }
 
-	[Tooltip("Crushアニメ\u30fcション再生時間(秒)")]
-	public float crushAnimTime = 0.1f;
+  public void TouchEndSlime()
+  {
+    this.isSlimeStart = false;
+    this.ResetTarget();
+    this.TouchEndSlimeAnim();
+  }
 
-	[Tooltip("Crushの色アニメ\u30fcション再生時間(秒)")]
-	public float crushColorAnimTime = 0.4f;
+  public void SetTargetPos(Vector3 target)
+  {
+    this.targetVector = target;
+    this.isMeshUpdate = true;
+  }
 
-	public AnimationCurve animCrush;
+  private void TouchStartSlimeAnim() => this.slimeAnim.TouchOn();
 
-	public AnimationCurve animCrush_temp;
+  private void TouchEndSlimeAnim()
+  {
+    if (this.isDrag)
+    {
+      this.slimeAnim.TouchOff();
+    }
+    else
+    {
+      this.CrushPolygon();
+      this.slimeAnim.Crush();
+    }
+  }
 
-	[Tooltip("ScaleUpDownアニメ\u30fcション再生時間(秒)")]
-	public float scaleUpDownAnimTime = 1f;
+  private void TouchSlimeUpdateAnim() => this.slimeAnim.Update();
 
-	public AnimationCurve animScaleUpDown;
+  private void ResetTarget()
+  {
+    this.targetVector = Vector3.zero;
+    this.isMeshUpdate = true;
+  }
 
-	[Tooltip("ScaleUpアニメ\u30fcション最大倍率")]
-	public float scaleupAnimMaxScale = 2.4f;
+  public void SetVisible()
+  {
+    if (((Renderer) this.meshRenderer).enabled)
+      return;
+    ((Renderer) this.meshRenderer).enabled = true;
+  }
 
-	[Tooltip("ScaleUpアニメ\u30fcション再生時間(秒)")]
-	public float scaleupAnimTime = 0.8f;
+  private void MeshPosInit()
+  {
+    if ((double) this.animTime < 1.0)
+    {
+      this.animTime = 0.99f;
+      this.SmoothingFilter();
+    }
+    ((Renderer) this.meshRenderer).enabled = true;
+  }
 
-	public SlimeAnimation slimeAnim;
+  public void SetInvisible()
+  {
+    if (!((Renderer) this.meshRenderer).enabled)
+      return;
+    ((Renderer) this.meshRenderer).enabled = false;
+  }
 
-	private Vector3 targetVector = Vector3.get_zero();
+  public bool IsVisible() => ((Renderer) this.meshRenderer).enabled;
 
-	private int subdivionsWidth;
+  private void ResetAnimTime()
+  {
+    this.animTime = 0.0f;
+    this.isMeshUpdate = true;
+  }
 
-	private int subdivionsHeight;
+  private void CountAnimTime()
+  {
+    if ((double) this.animTime < 1.0)
+    {
+      this.animTime += this.updateAnimTime;
+      if ((double) this.animTime <= 1.0)
+        return;
+      this.animTime = 1f;
+    }
+    else
+    {
+      this.isMeshUpdate = false;
+      if (this.isSlimeStart || this.slimeAnim.IsPlaying())
+        return;
+      this.SetInvisible();
+    }
+  }
 
-	private ParametricPlane parametricPlane;
+  public bool isDragSlime() => this.isDrag;
 
-	private MeshFilter meshFilter;
+  public void CrushPolygon()
+  {
+    this.ResetAnimTime();
+    float num1 = Random.Range(5f, 5.1f);
+    float num2 = Random.Range(0.0f, 100f);
+    float num3 = (float) (0.15000000596046448 * (double) this.parametricPlane._height * 0.5);
+    int index = 0;
+    for (int length = this.nowVectors.Length; index < length; ++index)
+    {
+      Vector3 nowVector = this.nowVectors[index];
+      Vector3 firstVector = this.firstVectors[index];
+      float num4 = Mathf.Atan2(nowVector.y, nowVector.x);
+      float num5 = num3 * (Mathf.Sin(num4 * num1 + num2) + 1f);
+      nowVector.x = firstVector.x + Mathf.Cos(num4) * num5;
+      nowVector.y = firstVector.y + Mathf.Sin(num4) * num5;
+      this.nowVectors[index] = nowVector;
+    }
+  }
 
-	private MeshRenderer meshRenderer;
-
-	private Vector3[] firstVectors;
-
-	private Vector3[] nowVectors;
-
-	private Vector3[] vertWork;
-
-	private float[] inv_lenghts;
-
-	private Vector3 dragPos;
-
-	private Vector3 startPosition = Vector3.get_zero();
-
-	private float animTime;
-
-	private bool isMeshUpdate;
-
-	private bool isDrag;
-
-	private bool isSlimeStart;
-
-	public float updateAnimTime
-	{
-		get;
-		set;
-	}
-
-	public SlimeController()
-		: this()
-	{
-	}//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-	//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-
-
-	private void Awake()
-	{
-		meshFilter = this.GetComponent<MeshFilter>();
-		meshRenderer = this.GetComponent<MeshRenderer>();
-	}
-
-	private void Start()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		Color color = meshRenderer.get_material().get_color();
-		color.a = 0f;
-		meshRenderer.get_material().set_color(color);
-		SetInvisible();
-		parametricPlane = this.GetComponent<ParametricPlane>();
-		parametricPlane.CreateMesh();
-		Initialize();
-		slimeAnim = new SlimeAnimation(this);
-		isMeshUpdate = false;
-	}
-
-	private void Update()
-	{
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		if (subdivionsHeight > 0 && subdivionsWidth > 0)
-		{
-			if (isMeshUpdate)
-			{
-				if (targetVector.y < 0.5f * parametricPlane._height)
-				{
-					isDrag = false;
-					targetVector = Vector3.get_zero();
-				}
-				else
-				{
-					isDrag = true;
-				}
-				SmoothingFilter();
-				int i = 0;
-				for (int num = nowVectors.Length; i < num; i++)
-				{
-					vertWork[i] = nowVectors[i];
-				}
-				meshFilter.get_mesh().set_vertices(vertWork);
-			}
-			TouchSlimeUpdateAnim();
-		}
-	}
-
-	private void Initialize()
-	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		subdivionsWidth = parametricPlane._subdivisionsWidth + 1;
-		subdivionsHeight = parametricPlane._subdivisionsHeight + 1;
-		firstVectors = meshFilter.get_mesh().get_vertices();
-		vertWork = (Vector3[])new Vector3[firstVectors.Length];
-		inv_lenghts = new float[firstVectors.Length];
-		nowVectors = (Vector3[])new Vector3[firstVectors.Length];
-		int num = subdivionsWidth / 2;
-		int num2 = 0;
-		dragPos = firstVectors[num2 * subdivionsWidth + num];
-		int num3 = 0;
-		int num4 = subdivionsWidth;
-		int num5 = subdivionsHeight;
-		for (int i = 0; i < num5; i++)
-		{
-			for (int j = 0; j < num4; j++)
-			{
-				nowVectors[num3] = firstVectors[num3];
-				int num6 = (num - j) * (num - j) + (num2 - i) * (num2 - i);
-				if (num6 != 0)
-				{
-					inv_lenghts[num3] = 1f / Mathf.Sqrt((float)num6);
-				}
-				else
-				{
-					inv_lenghts[num3] = 1f;
-				}
-				num3++;
-			}
-		}
-	}
-
-	private void SmoothingFilter()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		if (targetVector != Vector3.get_zero())
-		{
-			SmoothingTargetNotZero();
-		}
-		else
-		{
-			SmoothingTargetZero();
-		}
-		CountAnimTime();
-	}
-
-	private void SmoothingTargetNotZero()
-	{
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		float num = targetVector.x - dragPos.x;
-		float num2 = targetVector.y - dragPos.y;
-		int i = 0;
-		for (int num3 = nowVectors.Length; i < num3; i++)
-		{
-			Vector3 val = firstVectors[i];
-			float num4 = inv_lenghts[i];
-			val.x += num * num4;
-			val.y += num2 * num4;
-			nowVectors[i] = val;
-		}
-		ResetAnimTime();
-		if (startPosition == Vector3.get_zero())
-		{
-			startPosition = this.get_transform().get_localPosition();
-		}
-	}
-
-	private void SmoothingTargetZero()
-	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		int i = 0;
-		for (int num = nowVectors.Length; i < num; i++)
-		{
-			Vector3 val = firstVectors[i];
-			Vector3 val2 = nowVectors[i];
-			float num2 = 1f - animTime;
-			val.x = val.x * animTime + val2.x * num2;
-			val.y = val.y * animTime + val2.y * num2;
-			nowVectors[i] = val;
-		}
-		if (startPosition != Vector3.get_zero())
-		{
-			startPosition = Vector3.get_zero();
-		}
-	}
-
-	public void TouchStartSlime()
-	{
-		isSlimeStart = true;
-		MeshPosInit();
-		SetVisible();
-		TouchStartSlimeAnim();
-	}
-
-	public void TouchEndSlime()
-	{
-		isSlimeStart = false;
-		ResetTarget();
-		TouchEndSlimeAnim();
-	}
-
-	public void SetTargetPos(Vector3 target)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		targetVector = target;
-		isMeshUpdate = true;
-	}
-
-	private void TouchStartSlimeAnim()
-	{
-		slimeAnim.TouchOn(null, null, null);
-	}
-
-	private void TouchEndSlimeAnim()
-	{
-		if (isDrag)
-		{
-			slimeAnim.TouchOff(null, null, null);
-		}
-		else
-		{
-			CrushPolygon();
-			slimeAnim.Crush(null, null, null);
-		}
-	}
-
-	private void TouchSlimeUpdateAnim()
-	{
-		slimeAnim.Update();
-	}
-
-	private void ResetTarget()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		targetVector = Vector3.get_zero();
-		isMeshUpdate = true;
-	}
-
-	public void SetVisible()
-	{
-		if (!meshRenderer.get_enabled())
-		{
-			meshRenderer.set_enabled(true);
-		}
-	}
-
-	private void MeshPosInit()
-	{
-		if (animTime < 1f)
-		{
-			animTime = 0.99f;
-			SmoothingFilter();
-		}
-		meshRenderer.set_enabled(true);
-	}
-
-	public void SetInvisible()
-	{
-		if (meshRenderer.get_enabled())
-		{
-			meshRenderer.set_enabled(false);
-		}
-	}
-
-	public bool IsVisible()
-	{
-		return meshRenderer.get_enabled();
-	}
-
-	private void ResetAnimTime()
-	{
-		animTime = 0f;
-		isMeshUpdate = true;
-	}
-
-	private void CountAnimTime()
-	{
-		if (animTime < 1f)
-		{
-			animTime += updateAnimTime;
-			if (animTime > 1f)
-			{
-				animTime = 1f;
-			}
-		}
-		else
-		{
-			isMeshUpdate = false;
-			if (!isSlimeStart && !slimeAnim.IsPlaying())
-			{
-				SetInvisible();
-			}
-		}
-	}
-
-	public bool isDragSlime()
-	{
-		return isDrag;
-	}
-
-	public void CrushPolygon()
-	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		ResetAnimTime();
-		float num = Random.Range(5f, 5.1f);
-		float num2 = Random.Range(0f, 100f);
-		float num3 = 0.15f * parametricPlane._height * 0.5f;
-		int i = 0;
-		for (int num4 = nowVectors.Length; i < num4; i++)
-		{
-			Vector3 val = nowVectors[i];
-			Vector3 val2 = firstVectors[i];
-			float num5 = Mathf.Atan2(val.y, val.x);
-			float num6 = num3 * (Mathf.Sin(num5 * num + num2) + 1f);
-			val.x = val2.x + Mathf.Cos(num5) * num6;
-			val.y = val2.y + Mathf.Sin(num5) * num6;
-			nowVectors[i] = val;
-		}
-	}
-
-	private void ButtonPolygon(float rate)
-	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-		ResetAnimTime();
-		float num = 4f;
-		float num2 = 45f;
-		float num3 = 0.5f * rate;
-		this.get_transform().set_localRotation(Quaternion.Euler(0f, 0f, 0f));
-		int i = 0;
-		for (int num4 = nowVectors.Length; i < num4; i++)
-		{
-			Vector3 val = nowVectors[i];
-			float num5 = Mathf.Atan2(val.y, val.x);
-			float num6 = num5 * 57.29578f;
-			if (num6 >= -45f && 135f >= num6)
-			{
-				Vector3 val2 = firstVectors[i];
-				float num7 = num3 * (Mathf.Sin(num5 * num + num2) + 1f) / 2f;
-				val.x = val2.x + Mathf.Cos(num5) * num7;
-				val.y = val2.y + Mathf.Sin(num5) * num7;
-				nowVectors[i] = val;
-			}
-		}
-		SmoothingFilter();
-	}
+  private void ButtonPolygon(float rate)
+  {
+    this.ResetAnimTime();
+    float num1 = 4f;
+    float num2 = 45f;
+    float num3 = 0.5f * rate;
+    ((Component) this).transform.localRotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
+    int index = 0;
+    for (int length = this.nowVectors.Length; index < length; ++index)
+    {
+      Vector3 nowVector = this.nowVectors[index];
+      float num4 = Mathf.Atan2(nowVector.y, nowVector.x);
+      float num5 = num4 * 57.29578f;
+      if ((double) num5 >= -45.0 && 135.0 >= (double) num5)
+      {
+        Vector3 firstVector = this.firstVectors[index];
+        float num6 = (float) ((double) num3 * ((double) Mathf.Sin(num4 * num1 + num2) + 1.0) / 2.0);
+        nowVector.x = firstVector.x + Mathf.Cos(num4) * num6;
+        nowVector.y = firstVector.y + Mathf.Sin(num4) * num6;
+        this.nowVectors[index] = nowVector;
+      }
+    }
+    this.SmoothingFilter();
+  }
 }

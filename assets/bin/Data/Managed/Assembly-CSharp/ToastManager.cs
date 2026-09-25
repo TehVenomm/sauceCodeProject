@@ -1,166 +1,136 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ToastManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class ToastManager : MonoBehaviourSingleton<ToastManager>
 {
-	[Serializable]
-	public class DialogInfo
-	{
-		public Transform link;
+  [SerializeField]
+  protected GameObject window;
+  [SerializeField]
+  protected UILabel messageLabel;
+  [SerializeField]
+  protected UITweenCtrl tweenCtrl;
+  [SerializeField]
+  protected UISprite[] sprites;
+  [SerializeField]
+  protected ToastManager.DialogInfo dialogInfo;
+  protected List<ToastManager.Desc> openInfoList = new List<ToastManager.Desc>();
+  protected Transform windowTransform;
 
-		public Color lineColor;
+  public bool isOpenDialog { get; protected set; }
 
-		public string[] spritesNames;
-	}
+  public UITransition[] transitions { get; private set; }
 
-	public class Desc
-	{
-		public string text;
+  public static void PushOpen(string text, float _show_time = 1.8f)
+  {
+    if (!MonoBehaviourSingleton<ToastManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<ToastManager>.I.openInfoList.Add(new ToastManager.Desc()
+    {
+      text = text,
+      showTime = _show_time
+    });
+  }
 
-		public float showTime;
-	}
+  protected override void Awake()
+  {
+    base.Awake();
+    if (Object.op_Equality((Object) this.window, (Object) null))
+      return;
+    this.windowTransform = this.window.transform;
+    this.transitions = this.window.GetComponentsInChildren<UITransition>();
+    this.window.SetActive(false);
+    this.isOpenDialog = false;
+  }
 
-	[SerializeField]
-	protected GameObject window;
+  private void Update()
+  {
+    if (Object.op_Equality((Object) this.window, (Object) null) || MonoBehaviourSingleton<TransitionManager>.IsValid() && MonoBehaviourSingleton<TransitionManager>.I.isTransing || this.isOpenDialog || this.openInfoList.Count <= 0)
+      return;
+    this.StartCoroutine(this.DoShowDialog(this.openInfoList[0]));
+    this.openInfoList.RemoveAt(0);
+  }
 
-	[SerializeField]
-	protected UILabel messageLabel;
+  public bool IsShowingDialog() => this.isOpenDialog || this.openInfoList.Count > 0;
 
-	[SerializeField]
-	protected UITweenCtrl tweenCtrl;
+  private IEnumerator DoShowDialog(ToastManager.Desc desc)
+  {
+    this.isOpenDialog = true;
+    this.window.SetActive(true);
+    this.tweenCtrl.Reset();
+    this.windowTransform.parent = this.dialogInfo.link;
+    this.windowTransform.localPosition = Vector3.zero;
+    int index1 = 0;
+    for (int length = this.sprites.Length; index1 < length; ++index1)
+      this.sprites[index1].spriteName = this.dialogInfo.spritesNames[index1];
+    this.messageLabel.effectColor = this.dialogInfo.lineColor;
+    this.messageLabel.supportEncoding = true;
+    this.messageLabel.text = desc.text;
+    if (this.transitions != null)
+    {
+      int index2 = 0;
+      for (int length = this.transitions.Length; index2 < length; ++index2)
+        this.transitions[index2].Open((System.Action) null);
+    }
+    bool play_tween = true;
+    this.tweenCtrl.Play(onFinished: (EventDelegate.Callback) (() => play_tween = false));
+    yield return (object) new WaitForSeconds(desc.showTime);
+    while (play_tween)
+      yield return (object) null;
+    yield return (object) new WaitForSeconds(desc.showTime);
+    if (this.transitions != null)
+    {
+      int index3 = 0;
+      for (int length = this.transitions.Length; index3 < length; ++index3)
+        this.transitions[index3].Close((System.Action) null);
+    }
+    yield return (object) this.StartCoroutine(this.DoWaitTransitions());
+    this.isOpenDialog = false;
+  }
 
-	[SerializeField]
-	protected UISprite[] sprites;
+  private IEnumerator DoWaitTransitions()
+  {
+    if (this.transitions.Length != 0)
+    {
+      while (true)
+      {
+        bool flag = false;
+        int index = 0;
+        for (int length = this.transitions.Length; index < length; ++index)
+        {
+          if (this.transitions[index].isBusy)
+          {
+            flag = true;
+            break;
+          }
+        }
+        if (flag)
+          yield return (object) null;
+        else
+          break;
+      }
+    }
+  }
 
-	[SerializeField]
-	protected DialogInfo dialogInfo;
+  [Serializable]
+  public class DialogInfo
+  {
+    public Transform link;
+    public Color lineColor;
+    public string[] spritesNames;
+  }
 
-	protected List<Desc> openInfoList = new List<Desc>();
-
-	protected Transform windowTransform;
-
-	public bool isOpenDialog
-	{
-		get;
-		protected set;
-	}
-
-	public UITransition[] transitions
-	{
-		get;
-		private set;
-	}
-
-	public static void PushOpen(string text, float _show_time = 1.8f)
-	{
-		if (MonoBehaviourSingleton<ToastManager>.IsValid())
-		{
-			Desc desc = new Desc();
-			desc.text = text;
-			desc.showTime = _show_time;
-			MonoBehaviourSingleton<ToastManager>.I.openInfoList.Add(desc);
-		}
-	}
-
-	protected override void Awake()
-	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
-		base.Awake();
-		if (!(window == null))
-		{
-			windowTransform = window.get_transform();
-			transitions = window.GetComponentsInChildren<UITransition>();
-			window.SetActive(false);
-			isOpenDialog = false;
-		}
-	}
-
-	private void Update()
-	{
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		if (!(window == null) && !MonoBehaviourSingleton<TransitionManager>.I.isTransing && !isOpenDialog && openInfoList.Count > 0)
-		{
-			this.StartCoroutine(DoShowDialog(openInfoList[0]));
-			openInfoList.RemoveAt(0);
-		}
-	}
-
-	public bool IsShowingDialog()
-	{
-		return isOpenDialog || openInfoList.Count > 0;
-	}
-
-	private IEnumerator DoShowDialog(Desc desc)
-	{
-		isOpenDialog = true;
-		window.SetActive(true);
-		tweenCtrl.Reset();
-		windowTransform.set_parent(dialogInfo.link);
-		windowTransform.set_localPosition(Vector3.get_zero());
-		int n = 0;
-		for (int m = sprites.Length; n < m; n++)
-		{
-			sprites[n].spriteName = dialogInfo.spritesNames[n];
-		}
-		messageLabel.effectColor = dialogInfo.lineColor;
-		messageLabel.supportEncoding = true;
-		messageLabel.text = desc.text;
-		if (transitions != null)
-		{
-			int l = 0;
-			for (int k = transitions.Length; l < k; l++)
-			{
-				transitions[l].Open(null);
-			}
-		}
-		bool play_tween = true;
-		tweenCtrl.Play(true, delegate
-		{
-			((_003CDoShowDialog_003Ec__Iterator251)/*Error near IL_01c0: stateMachine*/)._003Cplay_tween_003E__4 = false;
-		});
-		yield return (object)new WaitForSeconds(desc.showTime);
-		while (play_tween)
-		{
-			yield return (object)null;
-		}
-		yield return (object)new WaitForSeconds(desc.showTime);
-		if (transitions != null)
-		{
-			int j = 0;
-			for (int i = transitions.Length; j < i; j++)
-			{
-				transitions[j].Close(null);
-			}
-		}
-		yield return (object)this.StartCoroutine(DoWaitTransitions());
-		isOpenDialog = false;
-	}
-
-	private IEnumerator DoWaitTransitions()
-	{
-		if (transitions.Length > 0)
-		{
-			while (true)
-			{
-				bool busy = false;
-				int j = 0;
-				for (int i = transitions.Length; j < i; j++)
-				{
-					if (transitions[j].isBusy)
-					{
-						busy = true;
-						break;
-					}
-				}
-				if (!busy)
-				{
-					break;
-				}
-				yield return (object)null;
-			}
-		}
-	}
+  public class Desc
+  {
+    public string text;
+    public float showTime;
+  }
 }

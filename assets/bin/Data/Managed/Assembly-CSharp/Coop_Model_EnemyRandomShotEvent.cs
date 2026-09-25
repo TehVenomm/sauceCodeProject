@@ -1,12 +1,16 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Coop_Model_EnemyRandomShotEvent
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class Coop_Model_EnemyRandomShotEvent : Coop_Model_ObjectBase
 {
-	public List<Vector3> points = new List<Vector3>();
+  public List<Vector3> points = new List<Vector3>();
 
-	public Coop_Model_EnemyRandomShotEvent()
-	{
-		base.packetType = PACKET_TYPE.ENEMY_RANDOMSHOT_EVENT;
-	}
+  public Coop_Model_EnemyRandomShotEvent() => this.packetType = PACKET_TYPE.ENEMY_RANDOMSHOT_EVENT;
 }

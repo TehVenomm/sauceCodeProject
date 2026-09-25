@@ -1,126 +1,108 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: FilterManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class FilterManager : MonoBehaviourSingleton<FilterManager>
 {
-	private BlurFilter blurFilter;
+  private BlurFilter blurFilter;
 
-	public GameObject tubulanceCamera
-	{
-		get;
-		set;
-	}
+  public bool IsEnabledBlur()
+  {
+    return !Object.op_Equality((Object) this.blurFilter, (Object) null) && ((Behaviour) this.blurFilter).enabled;
+  }
 
-	public bool IsEnabledBlur()
-	{
-		if (blurFilter == null)
-		{
-			return false;
-		}
-		return blurFilter.get_enabled();
-	}
+  public void StartBlur(float time = 1f, float strength = 0.25f, float delay = 0.0f)
+  {
+    if (Object.op_Equality((Object) this.blurFilter, (Object) null))
+      return;
+    this.blurFilter.blurStrength = 0.0f;
+    this.blurFilter.StartFilter();
+    this.StartCoroutine(this.ChangeBlurStrength(time, 0.0f, strength, delay, (System.Action) null));
+  }
 
-	public void StartBlur(float time = 1f, float strength = 0.25f, float delay = 0f)
-	{
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		if (!(blurFilter == null))
-		{
-			blurFilter.blurStrength = 0f;
-			blurFilter.StartFilter();
-			this.StartCoroutine(ChangeBlurStrength(time, 0f, strength, delay, null));
-		}
-	}
+  public void StopBlur(float time, float delay = 0.0f)
+  {
+    if (Object.op_Equality((Object) this.blurFilter, (Object) null) || !((Behaviour) this.blurFilter).enabled)
+      return;
+    if ((double) time <= 0.0)
+      this.StopBlur();
+    else
+      this.StartCoroutine(this.ChangeBlurStrength(time, this.blurFilter.blurStrength, 0.0f, delay, (System.Action) (() => this.StopBlur())));
+  }
 
-	public void StopBlur(float time, float delay = 0f)
-	{
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		if (!(blurFilter == null) && blurFilter.get_enabled())
-		{
-			if (time <= 0f)
-			{
-				StopBlur();
-			}
-			else
-			{
-				this.StartCoroutine(ChangeBlurStrength(time, blurFilter.blurStrength, 0f, delay, delegate
-				{
-					StopBlur();
-				}));
-			}
-		}
-	}
+  public void StopBlur()
+  {
+    if (Object.op_Equality((Object) this.blurFilter, (Object) null) || !((Behaviour) this.blurFilter).enabled)
+      return;
+    this.blurFilter.StopFilter();
+    ((Behaviour) this.blurFilter).enabled = false;
+  }
 
-	public void StopBlur()
-	{
-		if (!(blurFilter == null) && blurFilter.get_enabled())
-		{
-			blurFilter.StopFilter();
-			blurFilter.set_enabled(false);
-		}
-	}
+  private IEnumerator ChangeBlurStrength(
+    float time,
+    float startStrength,
+    float targetStrength,
+    float delay,
+    System.Action onComplete)
+  {
+    if (!Object.op_Equality((Object) this.blurFilter, (Object) null))
+    {
+      ((Behaviour) this.blurFilter).enabled = true;
+      yield return (object) new WaitForSeconds(delay);
+      for (float _time = 0.0f; (double) _time < (double) time; _time += Time.deltaTime)
+      {
+        float num = _time / time;
+        this.blurFilter.blurStrength = (float) ((double) startStrength * (1.0 - (double) num) + (double) targetStrength * (double) num);
+        yield return (object) null;
+      }
+      this.blurFilter.blurStrength = targetStrength;
+      if (onComplete != null)
+        onComplete();
+    }
+  }
 
-	private IEnumerator ChangeBlurStrength(float time, float startStrength, float targetStrength, float delay, Action onComplete)
-	{
-		if (!(blurFilter == null))
-		{
-			blurFilter.set_enabled(true);
-			yield return (object)new WaitForSeconds(delay);
-			for (float _time = 0f; _time < time; _time += Time.get_deltaTime())
-			{
-				float t = _time / time;
-				blurFilter.blurStrength = startStrength * (1f - t) + targetStrength * t;
-				yield return (object)null;
-			}
-			blurFilter.blurStrength = targetStrength;
-			onComplete?.Invoke();
-		}
-	}
+  private void Start()
+  {
+    this.blurFilter = ((Component) MonoBehaviourSingleton<AppMain>.I.mainCamera).GetComponent<BlurFilter>();
+    ((Behaviour) this.blurFilter).enabled = false;
+  }
 
-	private void Start()
-	{
-		blurFilter = MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<BlurFilter>();
-		blurFilter.set_enabled(false);
-	}
+  public GameObject tubulanceCamera { set; get; }
 
-	public void StartTubulanceFilter(float power, Vector2 center, Action callback)
-	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(_StartTubulanceFilter(power, center, callback));
-	}
+  public void StartTubulanceFilter(float power, Vector2 center, System.Action callback)
+  {
+    this.StartCoroutine(this._StartTubulanceFilter(power, center, callback));
+  }
 
-	private IEnumerator _StartTubulanceFilter(float power, Vector2 center, Action callback)
-	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		if (tubulanceCamera == null)
-		{
-			GameObject prefab = Resources.Load<GameObject>("Filter/TurbulanceFilterCamera");
-			tubulanceCamera = ResourceUtility.Instantiate<GameObject>(prefab);
-		}
-		BlurAndTurbulanceFilter filter = tubulanceCamera.GetComponent<BlurAndTurbulanceFilter>();
-		float time = 0f;
-		while (time < 2f)
-		{
-			time += Time.get_deltaTime();
-			float blurT = Mathf.Clamp01(time / 0.6f);
-			filter.SetBlurPram(Mathf.Lerp(0f, power, blurT), center);
-			float turbulanceT = Mathf.Clamp01((time - 0.2f) / 1f);
-			filter.SetTurbulanceParam(Mathf.Lerp(0f, 0.15f, turbulanceT), Mathf.Lerp(1f, 1.4f, turbulanceT), Mathf.Lerp(0f, 1f, turbulanceT));
-			yield return (object)null;
-		}
-		callback?.Invoke();
-	}
+  private IEnumerator _StartTubulanceFilter(float power, Vector2 center, System.Action callback)
+  {
+    if (Object.op_Equality((Object) this.tubulanceCamera, (Object) null))
+      this.tubulanceCamera = ResourceUtility.Instantiate<GameObject>(Resources.Load<GameObject>("Filter/TurbulanceFilterCamera"));
+    BlurAndTurbulanceFilter filter = this.tubulanceCamera.GetComponent<BlurAndTurbulanceFilter>();
+    float time = 0.0f;
+    while ((double) time < 2.0)
+    {
+      time += Time.deltaTime;
+      filter.SetBlurPram(Mathf.Lerp(0.0f, power, Mathf.Clamp01(time / 0.6f)), center);
+      float num = Mathf.Clamp01((float) (((double) time - 0.20000000298023224) / 1.0));
+      filter.SetTurbulanceParam(Mathf.Lerp(0.0f, 0.15f, num), Mathf.Lerp(1f, 1.4f, num), Mathf.Lerp(0.0f, 1f, num));
+      yield return (object) null;
+    }
+    if (callback != null)
+      callback();
+  }
 
-	public void StopTubulanceFilter()
-	{
-		if (tubulanceCamera != null)
-		{
-			Object.Destroy(tubulanceCamera);
-			tubulanceCamera = null;
-		}
-	}
+  public void StopTubulanceFilter()
+  {
+    if (!Object.op_Inequality((Object) this.tubulanceCamera, (Object) null))
+      return;
+    Object.Destroy((Object) this.tubulanceCamera);
+    this.tubulanceCamera = (GameObject) null;
+  }
 }

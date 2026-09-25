@@ -1,517 +1,415 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: EnemyActionController
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class EnemyActionController
 {
-	public enum REGION_FLAG
-	{
-		DEAD,
-		ALIVE,
-		REVIVABLE
-	}
+  public GrabController grabController;
+  private EnemyWaveStrategyController waveStrategyCtrl;
+  private Brain brain;
+  private Enemy enemy;
+  public List<EnemyActionController.ActionInfo> actions = new List<EnemyActionController.ActionInfo>();
+  public EnemyActionController.ActionInfo EMPTY_ACTION = new EnemyActionController.ActionInfo()
+  {
+    data = new EnemyActionTable.EnemyActionData()
+  };
+  public EnemyActionController.ActionInfo alteredAction;
+  private List<EnemyAngryTable.Data> m_angryDataList = new List<EnemyAngryTable.Data>();
+  private List<uint> m_execAngryIdList = new List<uint>();
+  public int m_angryStartIndex = -1;
+  private List<EnemyActionTable.EnemyActionData> m_basisActionDataList = new List<EnemyActionTable.EnemyActionData>();
+  private List<EnemyActionTable.EnemyActionData> m_exActionDataList = new List<EnemyActionTable.EnemyActionData>();
+  private EnemyTable.EnemyData m_enemyData;
+  private int m_nowActionID;
+  public int modeId = 1;
 
-	public enum EXACTION_CONDITION
-	{
-		NONE,
-		SHIELD_ON,
-		MAX
-	}
+  public EnemyActionController(Brain brain)
+  {
+    this.brain = brain;
+    this.enemy = brain.owner as Enemy;
+    this.oldIndex = -1;
+    this.grabController = new GrabController();
+    this.waveStrategyCtrl = new EnemyWaveStrategyController(this.enemy);
+  }
 
-	[Serializable]
-	public class ActionInfo
-	{
-		public EnemyActionTable.EnemyActionData data;
+  public int nowIndex { get; protected set; }
 
-		public List<int> useAliveRegionIDs = new List<int>();
+  public int oldIndex { get; protected set; }
 
-		public List<int> useDeadRegionIDs = new List<int>();
+  public EnemyActionController.ActionInfo nowAction
+  {
+    get
+    {
+      if (this.nowIndex >= 0 && this.nowIndex < this.actions.Count)
+        return this.actions[this.nowIndex];
+      return this.alteredAction != null ? this.alteredAction : this.EMPTY_ACTION;
+    }
+  }
 
-		public List<int> useReviveRegionIDs = new List<int>();
+  public int canUseCount { get; private set; }
 
-		public bool isForceDisable;
-	}
+  public int totalWeight { get; private set; }
 
-	public GrabController grabController;
+  public uint actionID { get; private set; }
 
-	private Brain brain;
+  public int GetCounterAttackId()
+  {
+    for (int index1 = 0; index1 < this.actions.Count; ++index1)
+    {
+      if (this.actions[index1].data.isCounterAttack && (this.actions[index1].data.modeId <= 0 || this.actions[index1].data.modeId == this.modeId))
+      {
+        for (int index2 = 0; index2 < this.actions[index1].data.combiActionTypeInfos.Length; ++index2)
+        {
+          if (this.actions[index1].data.combiActionTypeInfos[index2].type == EnemyActionTable.ACTION_TYPE.ATTACK)
+            return this.actions[index1].data.combiActionTypeInfos[index2].id;
+        }
+      }
+    }
+    return int.MaxValue;
+  }
 
-	private Enemy enemy;
+  public int GetNowModeCounterModeId()
+  {
+    for (int index = 0; index < this.actions.Count; ++index)
+    {
+      if (this.actions[index].data.isCounterAttack && (this.actions[index].data.modeId <= 0 || this.actions[index].data.modeId == this.modeId))
+        return this.actions[index].data.modeId;
+    }
+    return -1;
+  }
 
-	public List<ActionInfo> actions = new List<ActionInfo>();
+  public void LoadTable()
+  {
+    this.actionID = 0U;
+    this.modeId = 1;
+    if (!Singleton<EnemyActionTable>.IsValid())
+      return;
+    EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint) this.enemy.enemyID);
+    if (enemyData == null)
+      return;
+    this.actionID = (uint) enemyData.actionId;
+    List<EnemyActionTable.EnemyActionData> enemyActionList = Singleton<EnemyActionTable>.I.GetEnemyActionList(this.actionID);
+    if (enemyActionList == null)
+      return;
+    this.m_basisActionDataList = enemyActionList;
+    if (this.enemy.ExActionID > 0)
+      this.m_exActionDataList = Singleton<EnemyActionTable>.I.GetEnemyActionList((uint) this.enemy.ExActionID);
+    this.m_enemyData = enemyData;
+    this.PrepareActionInfoList(enemyActionList, enemyData.actionId);
+  }
 
-	public ActionInfo EMPTY_ACTION = new ActionInfo
-	{
-		data = new EnemyActionTable.EnemyActionData()
-	};
+  private void PrepareActionInfoList(
+    List<EnemyActionTable.EnemyActionData> actionDataList,
+    int nextActionID)
+  {
+    if (this.m_nowActionID == nextActionID)
+      return;
+    this.actions = new List<EnemyActionController.ActionInfo>();
+    this.m_angryDataList = new List<EnemyAngryTable.Data>();
+    this.m_nowActionID = nextActionID;
+    actionDataList.ForEach((Action<EnemyActionTable.EnemyActionData>) (data =>
+    {
+      EnemyActionController.ActionInfo actionInfo = new EnemyActionController.ActionInfo()
+      {
+        data = data
+      };
+      int length1 = data.regionFlags.Length;
+      for (int index = 0; index < length1; ++index)
+      {
+        EnemyActionTable.EnemyActionData.RegionFlag regionFlag = data.regionFlags[index];
+        if (regionFlag.name.Length > 0)
+        {
+          int regionId = this.enemy.GetRegionID(regionFlag.name);
+          if (regionId > 0)
+          {
+            switch (regionFlag.flag)
+            {
+              case 0:
+                actionInfo.useDeadRegionIDs.Add(regionId);
+                continue;
+              case 1:
+                actionInfo.useAliveRegionIDs.Add(regionId);
+                continue;
+              case 2:
+                actionInfo.useReviveRegionIDs.Add(regionId);
+                continue;
+              default:
+                continue;
+            }
+          }
+        }
+      }
+      EnemyActionTable.ActionTypeInfo[] combiActionTypeInfos = actionInfo.data.combiActionTypeInfos;
+      if (combiActionTypeInfos != null && combiActionTypeInfos.Length != 0)
+      {
+        int length2 = combiActionTypeInfos.Length;
+        for (int index = 0; index < length2; ++index)
+        {
+          if (combiActionTypeInfos[index].type == EnemyActionTable.ACTION_TYPE.ANGRY)
+          {
+            uint angryId = actionInfo.data.angryId;
+            if (Singleton<EnemyAngryTable>.IsValid() && angryId > 0U)
+            {
+              EnemyAngryTable.Data data1 = Singleton<EnemyAngryTable>.I.GetData(angryId);
+              if (data1 != null)
+              {
+                data1.actionID = actionInfo.data.actionID;
+                this.m_angryDataList.Add(data1);
+              }
+            }
+            actionInfo.data.isUse = false;
+          }
+        }
+      }
+      if ((double) data.startWaitInterval > 0.0)
+        data.startWaitTime = Time.time;
+      if ((int) this.m_enemyData.level < data.useLvLimit)
+        return;
+      this.actions.Add(actionInfo);
+    }));
+  }
 
-	private List<EnemyAngryTable.Data> m_angryDataList = new List<EnemyAngryTable.Data>();
+  private bool canActionWithAliveRegion(EnemyActionController.ActionInfo action)
+  {
+    EnemyRegionWork[] works = this.enemy.regionWorks;
+    return action.useAliveRegionIDs.Find((Predicate<int>) (id => id < works.Length && (int) works[id].hp <= 0)) <= 0 && action.useDeadRegionIDs.Find((Predicate<int>) (id => id < works.Length && (int) works[id].hp > 0 || this.enemy.IsEnableReviveRegion(id))) <= 0 && action.useReviveRegionIDs.Find((Predicate<int>) (id => !this.enemy.IsEnableReviveRegion(id))) <= 0;
+  }
 
-	private List<uint> m_execAngryIdList = new List<uint>();
+  private bool CheckActionByAngryCondition(EnemyActionController.ActionInfo action)
+  {
+    uint validAngryId = action.data.validAngryId;
+    return validAngryId <= 0U || (int) this.enemy.NowAngryID == (int) validAngryId;
+  }
 
-	public int m_angryStartIndex = -1;
+  protected virtual int GetWeight(EnemyActionController.ActionInfo action, DISTANCE d, PLACE p)
+  {
+    int weight = action.data.distanceWeights[(int) d] * action.data.placeWeights[(int) p];
+    if (this.brain.opponentMem.counter.nearNum >= 2)
+      weight += action.data.nearMultiPlayerWeight;
+    return weight;
+  }
 
-	private List<EnemyActionTable.EnemyActionData> m_basisActionDataList = new List<EnemyActionTable.EnemyActionData>();
+  private void UpdateActionInfoList()
+  {
+    EnemyTable.EnemyData enemyData = this.m_enemyData;
+    EnemyActionController.EXACTION_CONDITION exActionCondition = (EnemyActionController.EXACTION_CONDITION) this.enemy.ExActionCondition;
+    if (exActionCondition <= EnemyActionController.EXACTION_CONDITION.NONE || exActionCondition >= EnemyActionController.EXACTION_CONDITION.MAX || this.enemy.ExActionID <= 0 || this.m_exActionDataList == null || this.m_exActionDataList.Count <= 0)
+      return;
+    bool flag = false;
+    if (exActionCondition == EnemyActionController.EXACTION_CONDITION.SHIELD_ON)
+      flag = this.enemy.IsValidShield();
+    if (flag)
+      this.PrepareActionInfoList(this.m_exActionDataList, this.enemy.ExActionID);
+    else
+      this.PrepareActionInfoList(this.m_basisActionDataList, enemyData.actionId);
+  }
 
-	private List<EnemyActionTable.EnemyActionData> m_exActionDataList = new List<EnemyActionTable.EnemyActionData>();
+  public void SelectAction()
+  {
+    this.UpdateActionInfoList();
+    this.canUseCount = 0;
+    this.totalWeight = 0;
+    this.alteredAction = (EnemyActionController.ActionInfo) null;
+    int[] numArray = new int[this.actions.Count];
+    int continuout_index = -1;
+    int index1 = 0;
+    for (int count = this.actions.Count; index1 < count; ++index1)
+    {
+      EnemyActionController.ActionInfo action = this.actions[index1];
+      bool flag = action.data.isUse;
+      if (action.isForceDisable)
+        flag = false;
+      if (action.data.modeId > 0 && action.data.modeId != this.modeId)
+        flag = false;
+      if (flag)
+      {
+        ++this.canUseCount;
+        if (this.canActionWithAliveRegion(action) && this.CheckActionByAngryCondition(action) && ((double) action.data.startWaitInterval <= 0.0 || (double) Time.time - (double) action.data.startWaitTime >= (double) action.data.startWaitInterval) && ((double) action.data.lotteryWaitInterval <= 0.0 || (double) Time.time - (double) action.data.lotteryWaitTime >= (double) action.data.lotteryWaitInterval))
+        {
+          int num = 0;
+          OpponentMemory.OpponentRecord opponent = this.brain.targetCtrl.GetOpponent();
+          if (opponent != null)
+            num = this.GetWeight(action, opponent.record.distanceType, opponent.record.place);
+          numArray[index1] = num;
+          if (this.oldIndex == index1 && this.enemy.isBoss)
+          {
+            numArray[index1] /= 2;
+            if (num > 0)
+              continuout_index = index1;
+          }
+          this.totalWeight += numArray[index1];
+        }
+      }
+    }
+    if (this.canUseCount <= 0 || this.SetupAngryStartAction())
+      return;
+    if (this.totalWeight <= 0)
+    {
+      this.SetupActionIndexWhenNoWeight(continuout_index);
+    }
+    else
+    {
+      int num1 = 0;
+      int num2 = Random.Range(0, this.totalWeight) + 1;
+      int index2 = 0;
+      for (int count = this.actions.Count; index2 < count; ++index2)
+      {
+        if (numArray[index2] > 0)
+        {
+          num1 += numArray[index2];
+          if (num1 >= num2)
+          {
+            this.oldIndex = this.nowIndex;
+            this.nowIndex = index2;
+            break;
+          }
+        }
+      }
+      if (this.grabController.IsReadyForRelease())
+        this.nowIndex = this.actions.FindIndex((Predicate<EnemyActionController.ActionInfo>) (action => (long) action.data.actionID == (long) this.grabController.releaseActionId));
+      else if (this.waveStrategyCtrl.IsActive() && !this.waveStrategyCtrl.IsArrivedTarget())
+      {
+        this.nowIndex = -1;
+        this.alteredAction = this.waveStrategyCtrl.GetAlteredAction();
+      }
+      else
+      {
+        if (!this.enemy.counterFlag)
+          return;
+        this.enemy.counterFlag = false;
+        int count = this.actions.Count;
+        for (int index3 = 0; index3 < count; ++index3)
+        {
+          if (this.actions[index3].data.isCounterAttack && (this.actions[index3].data.modeId <= 0 || this.actions[index3].data.modeId == this.modeId))
+          {
+            this.nowIndex = index3;
+            break;
+          }
+        }
+      }
+    }
+  }
 
-	private EnemyTable.EnemyData m_enemyData;
+  private bool SetupAngryStartAction()
+  {
+    if (this.m_angryDataList == null || this.m_angryDataList.Count <= 0)
+      return false;
+    int count = this.m_angryDataList.Count;
+    if (count <= 0)
+      return false;
+    this.m_execAngryIdList.Clear();
+    int num = -1;
+    for (int index = 0; index < count; ++index)
+    {
+      EnemyAngryTable.Data angryData = this.m_angryDataList[index];
+      if (angryData == null)
+        Log.Error("angryData is null!! idx:{0}", (object) index);
+      else if (!this.enemy.CheckAngryID(angryData.id))
+      {
+        bool flag = false;
+        switch (angryData.condition)
+        {
+          case ANGRY_CONDITION.LESS_HP:
+            if ((double) this.enemy.hp / (double) this.enemy.hpMax <= (double) ((float) angryData.value1 / 100f))
+            {
+              flag = true;
+              break;
+            }
+            break;
+          case ANGRY_CONDITION.NUM_DOWN:
+            if (this.enemy.downCount >= angryData.value1)
+            {
+              flag = true;
+              break;
+            }
+            break;
+          case ANGRY_CONDITION.BREAK_PARTS:
+            EnemyRegionWork enemyRegionWork = this.enemy.SearchRegionWork(angryData.value1);
+            if (enemyRegionWork != null && (int) enemyRegionWork.hp <= 0)
+            {
+              flag = true;
+              break;
+            }
+            break;
+        }
+        if (flag)
+        {
+          num = this.actions.FindIndex((Predicate<EnemyActionController.ActionInfo>) (action => (int) action.data.actionID == (int) angryData.actionID));
+          this.m_execAngryIdList.Add(angryData.id);
+        }
+      }
+    }
+    if (num < 0)
+      return false;
+    foreach (uint execAngryId in this.m_execAngryIdList)
+      this.enemy.RegisterAngryID(execAngryId);
+    this.oldIndex = this.nowIndex;
+    this.nowIndex = num;
+    this.totalWeight = 1;
+    return true;
+  }
 
-	private int m_nowActionID;
+  public void OnReviveRegion(int regionId)
+  {
+    if (Object.op_Equality((Object) this.enemy, (Object) null) || this.enemy.SearchRegionWork(regionId) == null || this.m_angryDataList == null)
+      return;
+    int count = this.m_angryDataList.Count;
+    for (int index = 0; index < count; ++index)
+    {
+      EnemyAngryTable.Data angryData = this.m_angryDataList[index];
+      if (angryData.condition == ANGRY_CONDITION.BREAK_PARTS && regionId == angryData.value1)
+      {
+        this.enemy.UnRegisterAngryID(angryData.id);
+        break;
+      }
+    }
+  }
 
-	public int modeId = 1;
+  private void SetupActionIndexWhenNoWeight(int continuout_index)
+  {
+    if (continuout_index < 0)
+      return;
+    this.oldIndex = this.nowIndex;
+    this.nowIndex = continuout_index;
+    this.totalWeight = 1;
+  }
 
-	public int nowIndex
-	{
-		get;
-		protected set;
-	}
+  public bool GetMoveMaxLength(ref float length)
+  {
+    if (!this.waveStrategyCtrl.IsActive())
+      return false;
+    length = 0.0f;
+    return true;
+  }
 
-	public int oldIndex
-	{
-		get;
-		protected set;
-	}
+  public enum REGION_FLAG
+  {
+    DEAD,
+    ALIVE,
+    REVIVABLE,
+  }
 
-	public ActionInfo nowAction
-	{
-		get
-		{
-			if (nowIndex >= 0 && nowIndex < actions.Count)
-			{
-				return actions[nowIndex];
-			}
-			return EMPTY_ACTION;
-		}
-	}
+  public enum EXACTION_CONDITION
+  {
+    NONE,
+    SHIELD_ON,
+    MAX,
+  }
 
-	public int canUseCount
-	{
-		get;
-		private set;
-	}
-
-	public int totalWeight
-	{
-		get;
-		private set;
-	}
-
-	public uint actionID
-	{
-		get;
-		private set;
-	}
-
-	public EnemyActionController(Brain brain)
-	{
-		this.brain = brain;
-		enemy = (brain.owner as Enemy);
-		oldIndex = -1;
-		grabController = new GrabController();
-	}
-
-	public int GetCounterAttackId()
-	{
-		for (int i = 0; i < actions.Count; i++)
-		{
-			if (actions[i].data.isCounterAttack && (actions[i].data.modeId <= 0 || actions[i].data.modeId == modeId))
-			{
-				for (int j = 0; j < actions[i].data.combiActionTypeInfos.Length; j++)
-				{
-					if (actions[i].data.combiActionTypeInfos[j].type == EnemyActionTable.ACTION_TYPE.ATTACK)
-					{
-						return actions[i].data.combiActionTypeInfos[j].id;
-					}
-				}
-			}
-		}
-		return 2147483647;
-	}
-
-	public int GetNowModeCounterModeId()
-	{
-		for (int i = 0; i < actions.Count; i++)
-		{
-			if (actions[i].data.isCounterAttack && (actions[i].data.modeId <= 0 || actions[i].data.modeId == modeId))
-			{
-				return actions[i].data.modeId;
-			}
-		}
-		return -1;
-	}
-
-	public void LoadTable()
-	{
-		actionID = 0u;
-		modeId = 1;
-		if (Singleton<EnemyActionTable>.IsValid())
-		{
-			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)enemy.enemyID);
-			if (enemyData != null)
-			{
-				actionID = (uint)enemyData.actionId;
-				List<EnemyActionTable.EnemyActionData> enemyActionList = Singleton<EnemyActionTable>.I.GetEnemyActionList(actionID);
-				if (enemyActionList != null)
-				{
-					m_basisActionDataList = enemyActionList;
-					if (enemy.ExActionID > 0)
-					{
-						m_exActionDataList = Singleton<EnemyActionTable>.I.GetEnemyActionList((uint)enemy.ExActionID);
-					}
-					m_enemyData = enemyData;
-					PrepareActionInfoList(enemyActionList, enemyData.actionId);
-				}
-			}
-		}
-	}
-
-	private void PrepareActionInfoList(List<EnemyActionTable.EnemyActionData> actionDataList, int nextActionID)
-	{
-		if (m_nowActionID != nextActionID)
-		{
-			actions = new List<ActionInfo>();
-			m_angryDataList = new List<EnemyAngryTable.Data>();
-			m_nowActionID = nextActionID;
-			actionDataList.ForEach(delegate(EnemyActionTable.EnemyActionData data)
-			{
-				ActionInfo actionInfo = new ActionInfo
-				{
-					data = data
-				};
-				int num = data.regionFlags.Length;
-				for (int i = 0; i < num; i++)
-				{
-					EnemyActionTable.EnemyActionData.RegionFlag regionFlag = data.regionFlags[i];
-					if (regionFlag.name.Length > 0)
-					{
-						int regionID = enemy.GetRegionID(regionFlag.name);
-						if (regionID > 0)
-						{
-							switch (regionFlag.flag)
-							{
-							case 0:
-								actionInfo.useDeadRegionIDs.Add(regionID);
-								break;
-							case 1:
-								actionInfo.useAliveRegionIDs.Add(regionID);
-								break;
-							case 2:
-								actionInfo.useReviveRegionIDs.Add(regionID);
-								break;
-							}
-						}
-					}
-				}
-				EnemyActionTable.ActionTypeInfo[] combiActionTypeInfos = actionInfo.data.combiActionTypeInfos;
-				if (combiActionTypeInfos != null && combiActionTypeInfos.Length > 0)
-				{
-					int num2 = combiActionTypeInfos.Length;
-					for (int j = 0; j < num2; j++)
-					{
-						EnemyActionTable.ACTION_TYPE type = combiActionTypeInfos[j].type;
-						if (type == EnemyActionTable.ACTION_TYPE.ANGRY)
-						{
-							uint angryId = actionInfo.data.angryId;
-							if (Singleton<EnemyAngryTable>.IsValid() && angryId != 0)
-							{
-								EnemyAngryTable.Data data2 = Singleton<EnemyAngryTable>.I.GetData(angryId);
-								if (data2 != null)
-								{
-									data2.actionID = actionInfo.data.actionID;
-									m_angryDataList.Add(data2);
-								}
-							}
-							actionInfo.data.isUse = false;
-						}
-					}
-				}
-				if (data.startWaitInterval > 0f)
-				{
-					data.startWaitTime = Time.get_time();
-				}
-				if ((int)m_enemyData.level >= data.useLvLimit)
-				{
-					actions.Add(actionInfo);
-				}
-			});
-		}
-	}
-
-	private bool canActionWithAliveRegion(ActionInfo action)
-	{
-		EnemyRegionWork[] works = enemy.regionWorks;
-		int num = action.useAliveRegionIDs.Find((int id) => id < works.Length && (int)works[id].hp <= 0);
-		if (num > 0)
-		{
-			return false;
-		}
-		int num2 = action.useDeadRegionIDs.Find((int id) => (id < works.Length && (int)works[id].hp > 0) || enemy.IsEnableReviveRegion(id));
-		if (num2 > 0)
-		{
-			return false;
-		}
-		int num3 = action.useReviveRegionIDs.Find((int id) => !enemy.IsEnableReviveRegion(id));
-		if (num3 > 0)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	private bool CheckActionByAngryCondition(ActionInfo action)
-	{
-		uint validAngryId = action.data.validAngryId;
-		if (validAngryId == 0)
-		{
-			return true;
-		}
-		return enemy.NowAngryID == validAngryId;
-	}
-
-	protected virtual int GetWeight(ActionInfo action, DISTANCE d, PLACE p)
-	{
-		int num = 0;
-		int num2 = action.data.distanceWeights[(int)d];
-		int num3 = action.data.placeWeights[(int)p];
-		num = num2 * num3;
-		if (brain.opponentMem.counter.nearNum >= 2)
-		{
-			num += action.data.nearMultiPlayerWeight;
-		}
-		return num;
-	}
-
-	private void UpdateActionInfoList()
-	{
-		EnemyTable.EnemyData enemyData = m_enemyData;
-		EXACTION_CONDITION exActionCondition = (EXACTION_CONDITION)enemy.ExActionCondition;
-		switch (exActionCondition)
-		{
-		case EXACTION_CONDITION.SHIELD_ON:
-			if (enemy.ExActionID > 0 && m_exActionDataList != null && m_exActionDataList.Count > 0)
-			{
-				bool flag = false;
-				EXACTION_CONDITION eXACTION_CONDITION = exActionCondition;
-				if (eXACTION_CONDITION == EXACTION_CONDITION.SHIELD_ON)
-				{
-					flag = enemy.IsValidShield();
-				}
-				if (flag)
-				{
-					PrepareActionInfoList(m_exActionDataList, enemy.ExActionID);
-				}
-				else
-				{
-					PrepareActionInfoList(m_basisActionDataList, enemyData.actionId);
-				}
-			}
-			break;
-		}
-	}
-
-	public void SelectAction()
-	{
-		UpdateActionInfoList();
-		canUseCount = 0;
-		totalWeight = 0;
-		int[] array = new int[actions.Count];
-		int continuout_index = -1;
-		int i = 0;
-		for (int count = actions.Count; i < count; i++)
-		{
-			ActionInfo actionInfo = actions[i];
-			bool flag = actionInfo.data.isUse;
-			if (actionInfo.isForceDisable)
-			{
-				flag = false;
-			}
-			if (actionInfo.data.modeId > 0 && actionInfo.data.modeId != modeId)
-			{
-				flag = false;
-			}
-			if (flag)
-			{
-				canUseCount++;
-				if (canActionWithAliveRegion(actionInfo) && CheckActionByAngryCondition(actionInfo) && (!(actionInfo.data.startWaitInterval > 0f) || !(Time.get_time() - actionInfo.data.startWaitTime < actionInfo.data.startWaitInterval)) && (!(actionInfo.data.lotteryWaitInterval > 0f) || !(Time.get_time() - actionInfo.data.lotteryWaitTime < actionInfo.data.lotteryWaitInterval)))
-				{
-					int num = 0;
-					OpponentMemory.OpponentRecord opponent = brain.targetCtrl.GetOpponent();
-					if (opponent != null)
-					{
-						num = GetWeight(actionInfo, opponent.record.distanceType, opponent.record.place);
-					}
-					array[i] = num;
-					if (oldIndex == i && enemy.isBoss)
-					{
-						array[i] /= 2;
-						if (num > 0)
-						{
-							continuout_index = i;
-						}
-					}
-					totalWeight += array[i];
-				}
-			}
-		}
-		if (canUseCount > 0 && !SetupAngryStartAction())
-		{
-			if (totalWeight <= 0)
-			{
-				SetupActionIndexWhenNoWeight(continuout_index);
-			}
-			else
-			{
-				int num2 = 0;
-				int num3 = Random.Range(0, totalWeight) + 1;
-				int j = 0;
-				for (int count2 = actions.Count; j < count2; j++)
-				{
-					if (array[j] > 0)
-					{
-						num2 += array[j];
-						if (num2 >= num3)
-						{
-							oldIndex = nowIndex;
-							nowIndex = j;
-							break;
-						}
-					}
-				}
-				if (grabController.IsReadyForRelease())
-				{
-					nowIndex = actions.FindIndex((ActionInfo action) => action.data.actionID == grabController.releaseActionId);
-				}
-				else if (enemy.counterFlag)
-				{
-					enemy.counterFlag = false;
-					int count3 = actions.Count;
-					int num4 = 0;
-					while (true)
-					{
-						if (num4 >= count3)
-						{
-							return;
-						}
-						if (actions[num4].data.isCounterAttack && (actions[num4].data.modeId <= 0 || actions[num4].data.modeId == modeId))
-						{
-							break;
-						}
-						num4++;
-					}
-					nowIndex = num4;
-				}
-			}
-		}
-	}
-
-	private bool SetupAngryStartAction()
-	{
-		if (m_angryDataList == null || m_angryDataList.Count <= 0)
-		{
-			return false;
-		}
-		int count = m_angryDataList.Count;
-		if (count <= 0)
-		{
-			return false;
-		}
-		m_execAngryIdList.Clear();
-		int num = -1;
-		for (int i = 0; i < count; i++)
-		{
-			EnemyAngryTable.Data angryData = m_angryDataList[i];
-			if (angryData == null)
-			{
-				Log.Error("angryData is null!! idx:{0}", i);
-			}
-			else if (!enemy.CheckAngryID(angryData.id))
-			{
-				bool flag = false;
-				switch (angryData.condition)
-				{
-				case ANGRY_CONDITION.LESS_HP:
-				{
-					float num2 = (float)enemy.hp / (float)enemy.hpMax;
-					float num3 = (float)angryData.value1 / 100f;
-					if (num2 <= num3)
-					{
-						flag = true;
-					}
-					break;
-				}
-				case ANGRY_CONDITION.NUM_DOWN:
-					if (enemy.downCount >= angryData.value1)
-					{
-						flag = true;
-					}
-					break;
-				case ANGRY_CONDITION.BREAK_PARTS:
-				{
-					EnemyRegionWork enemyRegionWork = enemy.SearchRegionWork(angryData.value1);
-					if (enemyRegionWork != null && (int)enemyRegionWork.hp <= 0)
-					{
-						flag = true;
-					}
-					break;
-				}
-				}
-				if (flag)
-				{
-					num = actions.FindIndex((ActionInfo action) => action.data.actionID == angryData.actionID);
-					m_execAngryIdList.Add(angryData.id);
-				}
-			}
-		}
-		if (num < 0)
-		{
-			return false;
-		}
-		foreach (uint execAngryId in m_execAngryIdList)
-		{
-			enemy.RegisterAngryID(execAngryId);
-		}
-		oldIndex = nowIndex;
-		nowIndex = num;
-		totalWeight = 1;
-		return true;
-	}
-
-	public void OnReviveRegion(int regionId)
-	{
-		if (!(enemy == null))
-		{
-			EnemyRegionWork enemyRegionWork = enemy.SearchRegionWork(regionId);
-			if (enemyRegionWork != null && m_angryDataList != null)
-			{
-				int count = m_angryDataList.Count;
-				int num = 0;
-				EnemyAngryTable.Data data;
-				while (true)
-				{
-					if (num >= count)
-					{
-						return;
-					}
-					data = m_angryDataList[num];
-					if (data.condition == ANGRY_CONDITION.BREAK_PARTS && regionId == data.value1)
-					{
-						break;
-					}
-					num++;
-				}
-				enemy.UnRegisterAngryID(data.id);
-			}
-		}
-	}
-
-	private void SetupActionIndexWhenNoWeight(int continuout_index)
-	{
-		if (continuout_index >= 0)
-		{
-			oldIndex = nowIndex;
-			nowIndex = continuout_index;
-			totalWeight = 1;
-		}
-	}
+  [Serializable]
+  public class ActionInfo
+  {
+    public EnemyActionTable.EnemyActionData data;
+    public List<int> useAliveRegionIDs = new List<int>();
+    public List<int> useDeadRegionIDs = new List<int>();
+    public List<int> useReviveRegionIDs = new List<int>();
+    public bool isForceDisable;
+  }
 }

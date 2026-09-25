@@ -1,131 +1,85 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: LoungePacketReceiver
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using rhyme;
 using System.Collections.Generic;
 
+#nullable disable
 public class LoungePacketReceiver : PacketReceiver
 {
-	protected override void PacketUpdate()
-	{
-		if (!base.stopPacketUpdate)
-		{
-			List<CoopPacket> list = rymTPool<List<CoopPacket>>.Get();
-			if (list.Capacity < base.packets.Count)
-			{
-				list.Capacity = base.packets.Count;
-			}
-			int i = 0;
-			for (int count = base.packets.Count; i < count; i++)
-			{
-				list.Add(base.packets[i]);
-			}
-			int j = 0;
-			for (int count2 = list.Count; j < count2; j++)
-			{
-				if (base.stopPacketUpdate)
-				{
-					break;
-				}
-				CoopPacket packet = list[j];
-				if (HandleCoopEvent(packet))
-				{
-					AddDeleteQueue(packet);
-				}
-			}
-			list.Clear();
-			rymTPool<List<CoopPacket>>.Release(ref list);
-			EraseUsedPacket();
-		}
-	}
+  protected override void PacketUpdate()
+  {
+    if (this.stopPacketUpdate)
+      return;
+    List<CoopPacket> coopPacketList = rymTPool<List<CoopPacket>>.Get();
+    if (coopPacketList.Capacity < this.packets.Count)
+      coopPacketList.Capacity = this.packets.Count;
+    int index1 = 0;
+    for (int count = this.packets.Count; index1 < count; ++index1)
+      coopPacketList.Add(this.packets[index1]);
+    int index2 = 0;
+    for (int count = coopPacketList.Count; index2 < count && !this.stopPacketUpdate; ++index2)
+    {
+      CoopPacket packet = coopPacketList[index2];
+      if (this.HandleCoopEvent(packet))
+        this.AddDeleteQueue(packet);
+    }
+    coopPacketList.Clear();
+    rymTPool<List<CoopPacket>>.Release(ref coopPacketList);
+    this.EraseUsedPacket();
+  }
 
-	protected override bool HandleCoopEvent(CoopPacket packet)
-	{
-		bool result = false;
-		switch (packet.packetType)
-		{
-		case PACKET_TYPE.LOUNGE_ROOM_JOINED:
-		{
-			Lounge_Model_RoomJoined model14 = packet.GetModel<Lounge_Model_RoomJoined>();
-			result = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomJoined(model14);
-			break;
-		}
-		case PACKET_TYPE.LOUNGE_ROOM_LEAVED:
-		{
-			Lounge_Model_RoomLeaved model13 = packet.GetModel<Lounge_Model_RoomLeaved>();
-			result = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomLeaved(model13);
-			break;
-		}
-		case PACKET_TYPE.LOUNGE_ROOM_ACTION:
-		{
-			Lounge_Model_RoomAction model12 = packet.GetModel<Lounge_Model_RoomAction>();
-			result = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomAction(model12);
-			break;
-		}
-		case PACKET_TYPE.LOUNGE_ROOM_MOVE:
-		{
-			Lounge_Model_RoomMove model11 = packet.GetModel<Lounge_Model_RoomMove>();
-			result = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomMove(model11);
-			break;
-		}
-		case PACKET_TYPE.LOUNGE_ROOM_POSITION:
-		{
-			Lounge_Model_RoomPosition model10 = packet.GetModel<Lounge_Model_RoomPosition>();
-			result = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomPoisition(model10);
-			break;
-		}
-		case PACKET_TYPE.LOUNGE_ROOM_KICK:
-		{
-			Lounge_Model_RoomKick model9 = packet.GetModel<Lounge_Model_RoomKick>();
-			result = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomKick(model9);
-			break;
-		}
-		case PACKET_TYPE.LOUNGE_ROOM_AFK_KICK:
-		{
-			Lounge_Model_AFK_Kick model8 = packet.GetModel<Lounge_Model_AFK_Kick>();
-			result = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomAFKKick(model8);
-			break;
-		}
-		case PACKET_TYPE.LOUNGE_ROOM_HOST_CHANGED:
-		{
-			Lounge_Model_RoomHostChanged model7 = packet.GetModel<Lounge_Model_RoomHostChanged>();
-			result = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomHostChanged(model7);
-			break;
-		}
-		case PACKET_TYPE.LOUNGE_MEMBER_LOUNGE:
-		{
-			Lounge_Model_MemberLounge model6 = packet.GetModel<Lounge_Model_MemberLounge>();
-			result = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvMemberLounge(model6);
-			break;
-		}
-		case PACKET_TYPE.LOUNGE_MEMBER_FIELD:
-		{
-			Lounge_Model_MemberField model5 = packet.GetModel<Lounge_Model_MemberField>();
-			result = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvMemberField(model5);
-			break;
-		}
-		case PACKET_TYPE.LOUNGE_MEMBER_QUEST:
-		{
-			Lounge_Model_MemberQuest model4 = packet.GetModel<Lounge_Model_MemberQuest>();
-			result = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvMemberQuest(model4);
-			break;
-		}
-		case PACKET_TYPE.LOUNGE_MEMBER_ARENA:
-		{
-			Lounge_Model_MemberArena model3 = packet.GetModel<Lounge_Model_MemberArena>();
-			result = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvMemberArena(model3);
-			break;
-		}
-		case PACKET_TYPE.CHAT_MESSAGE:
-		{
-			Coop_Model_StageChatMessage model2 = packet.GetModel<Coop_Model_StageChatMessage>();
-			result = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvChatMessage(model2);
-			break;
-		}
-		case PACKET_TYPE.STAGE_CHAT_STAMP:
-		{
-			Coop_Model_StageChatStamp model = packet.GetModel<Coop_Model_StageChatStamp>();
-			result = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvChatStamp(model);
-			break;
-		}
-		}
-		return result;
-	}
+  protected override bool HandleCoopEvent(CoopPacket packet)
+  {
+    bool flag = false;
+    switch (packet.packetType)
+    {
+      case PACKET_TYPE.CHAT_MESSAGE:
+        flag = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvChatMessage(packet.GetModel<Coop_Model_StageChatMessage>());
+        break;
+      case PACKET_TYPE.LOUNGE_ROOM_JOINED:
+        flag = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomJoined(packet.GetModel<Lounge_Model_RoomJoined>());
+        break;
+      case PACKET_TYPE.LOUNGE_ROOM_LEAVED:
+        flag = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomLeaved(packet.GetModel<Lounge_Model_RoomLeaved>());
+        break;
+      case PACKET_TYPE.LOUNGE_ROOM_HOST_CHANGED:
+        flag = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomHostChanged(packet.GetModel<Lounge_Model_RoomHostChanged>());
+        break;
+      case PACKET_TYPE.LOUNGE_ROOM_KICK:
+        flag = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomKick(packet.GetModel<Lounge_Model_RoomKick>());
+        break;
+      case PACKET_TYPE.LOUNGE_ROOM_MOVE:
+        flag = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomMove(packet.GetModel<Lounge_Model_RoomMove>());
+        break;
+      case PACKET_TYPE.LOUNGE_ROOM_POSITION:
+        flag = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomPoisition(packet.GetModel<Lounge_Model_RoomPosition>());
+        break;
+      case PACKET_TYPE.LOUNGE_ROOM_ACTION:
+        flag = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomAction(packet.GetModel<Lounge_Model_RoomAction>());
+        break;
+      case PACKET_TYPE.LOUNGE_ROOM_AFK_KICK:
+        flag = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvRoomAFKKick(packet.GetModel<Lounge_Model_AFK_Kick>());
+        break;
+      case PACKET_TYPE.LOUNGE_MEMBER_LOUNGE:
+        flag = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvMemberLounge(packet.GetModel<Lounge_Model_MemberLounge>());
+        break;
+      case PACKET_TYPE.LOUNGE_MEMBER_FIELD:
+        flag = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvMemberField(packet.GetModel<Lounge_Model_MemberField>());
+        break;
+      case PACKET_TYPE.LOUNGE_MEMBER_QUEST:
+        flag = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvMemberQuest(packet.GetModel<Lounge_Model_MemberQuest>());
+        break;
+      case PACKET_TYPE.LOUNGE_MEMBER_ARENA:
+        flag = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvMemberArena(packet.GetModel<Lounge_Model_MemberArena>());
+        break;
+      case PACKET_TYPE.STAGE_CHAT_STAMP:
+        flag = MonoBehaviourSingleton<LoungeNetworkManager>.I.OnRecvChatStamp(packet.GetModel<Coop_Model_StageChatStamp>());
+        break;
+    }
+    return flag;
+  }
 }

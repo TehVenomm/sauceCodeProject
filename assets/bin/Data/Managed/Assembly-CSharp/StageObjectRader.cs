@@ -1,183 +1,135 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: StageObjectRader
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StageObjectRader
+#nullable disable
+public class StageObjectRader : MonoBehaviour
 {
-	public class CatchStageObject
-	{
-		public StageObject obj;
+  public List<StageObjectRader.CatchStageObject> objects { get; protected set; }
 
-		public Collider collider;
+  public Transform _transform { get; protected set; }
 
-		public BulletObject bullet;
-	}
+  public Rigidbody _rigidbody { get; protected set; }
 
-	public List<CatchStageObject> objects
-	{
-		get;
-		protected set;
-	}
+  public Collider _collider { get; protected set; }
 
-	public Transform _transform
-	{
-		get;
-		protected set;
-	}
+  public StageObject stageObject { get; protected set; }
 
-	public Rigidbody _rigidbody
-	{
-		get;
-		protected set;
-	}
+  protected virtual void Awake()
+  {
+    this.objects = new List<StageObjectRader.CatchStageObject>();
+    this._transform = ((Component) this).transform;
+    this._rigidbody = ((Component) this).GetComponent<Rigidbody>();
+    this._collider = ((Component) this).GetComponent<Collider>();
+    if (Object.op_Equality((Object) this._collider, (Object) null))
+    {
+      SphereCollider sphereCollider = ((Component) this).gameObject.AddComponent<SphereCollider>();
+      sphereCollider.center = new Vector3(0.0f, 0.0f, 0.0f);
+      this._collider = (Collider) sphereCollider;
+    }
+    if (!Object.op_Inequality((Object) this._collider, (Object) null))
+      return;
+    this._collider.isTrigger = true;
+    if (Object.op_Equality((Object) this._rigidbody, (Object) null))
+      this._rigidbody = ((Component) this).gameObject.AddComponent<Rigidbody>();
+    this._rigidbody.isKinematic = true;
+  }
 
-	public Collider _collider
-	{
-		get;
-		protected set;
-	}
+  protected virtual void Start()
+  {
+    this.stageObject = ((Component) this).gameObject.GetComponentInParent<StageObject>();
+  }
 
-	public StageObject stageObject
-	{
-		get;
-		protected set;
-	}
+  public void SetRadius(float radius)
+  {
+    SphereCollider collider = this._collider as SphereCollider;
+    if (!Object.op_Inequality((Object) collider, (Object) null))
+      return;
+    collider.radius = radius;
+  }
 
-	public StageObjectRader()
-		: this()
-	{
-	}
+  public StageObjectRader.CatchStageObject Find(Collider collider)
+  {
+    this.RemoveFromDestroyedCollider();
+    return this.objects.Find((Predicate<StageObjectRader.CatchStageObject>) (o => Object.op_Equality((Object) o.collider, (Object) collider)));
+  }
 
-	protected virtual void Awake()
-	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		objects = new List<CatchStageObject>();
-		_transform = this.get_transform();
-		_rigidbody = this.GetComponent<Rigidbody>();
-		_collider = this.GetComponent<Collider>();
-		if (_collider == null)
-		{
-			SphereCollider val = this.get_gameObject().AddComponent<SphereCollider>();
-			val.set_center(new Vector3(0f, 0f, 0f));
-			_collider = val;
-		}
-		if (_collider != null)
-		{
-			_collider.set_isTrigger(true);
-			if (_rigidbody == null)
-			{
-				_rigidbody = this.get_gameObject().AddComponent<Rigidbody>();
-			}
-			_rigidbody.set_isKinematic(true);
-		}
-	}
+  public Enemy FindEnemy()
+  {
+    this.RemoveFromDestroyedCollider();
+    StageObjectRader.CatchStageObject catchStageObject = this.objects.Find((Predicate<StageObjectRader.CatchStageObject>) (o => o.obj is Enemy && Object.op_Inequality((Object) o.collider, (Object) null) && Object.op_Equality((Object) o.bullet, (Object) null)));
+    return catchStageObject == null ? (Enemy) null : catchStageObject.obj as Enemy;
+  }
 
-	protected virtual void Start()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		stageObject = this.get_gameObject().GetComponentInParent<StageObject>();
-	}
+  public BulletObject FindEnemyBullet()
+  {
+    this.RemoveFromDestroyedCollider();
+    return this.objects.Find((Predicate<StageObjectRader.CatchStageObject>) (o => o.obj is Enemy && Object.op_Inequality((Object) o.collider, (Object) null) && Object.op_Inequality((Object) o.bullet, (Object) null)))?.bullet;
+  }
 
-	public void SetRadius(float radius)
-	{
-		SphereCollider val = _collider as SphereCollider;
-		if (val != null)
-		{
-			val.set_radius(radius);
-		}
-	}
+  protected virtual void RemoveFromDestroyedCollider()
+  {
+    this.objects.RemoveAll((Predicate<StageObjectRader.CatchStageObject>) (o => Object.op_Equality((Object) o.collider, (Object) null)));
+  }
 
-	public CatchStageObject Find(Collider collider)
-	{
-		RemoveFromDestroyedCollider();
-		return objects.Find((CatchStageObject o) => o.collider == collider);
-	}
+  protected virtual void Add(StageObject obj, Collider collider, BulletObject bullet)
+  {
+    if (this.Find(collider) != null)
+      return;
+    this.objects.Add(new StageObjectRader.CatchStageObject()
+    {
+      obj = obj,
+      collider = collider,
+      bullet = bullet
+    });
+  }
 
-	public Enemy FindEnemy()
-	{
-		RemoveFromDestroyedCollider();
-		CatchStageObject catchStageObject = objects.Find((CatchStageObject o) => o.obj is Enemy && o.collider != null && o.bullet == null);
-		return (catchStageObject == null) ? null : (catchStageObject.obj as Enemy);
-	}
+  protected virtual void Remove(Collider collider)
+  {
+    StageObjectRader.CatchStageObject catchStageObject = this.Find(collider);
+    if (catchStageObject == null)
+      return;
+    this.objects.Remove(catchStageObject);
+  }
 
-	public BulletObject FindEnemyBullet()
-	{
-		RemoveFromDestroyedCollider();
-		return objects.Find((CatchStageObject o) => o.obj is Enemy && o.collider != null && o.bullet != null)?.bullet;
-	}
+  private void OnTriggerEnter(Collider collider)
+  {
+    if (Object.op_Equality((Object) this._collider, (Object) null) || !this._collider.enabled || Object.op_Equality((Object) this.stageObject, (Object) null) || Object.op_Equality((Object) ((Component) collider).gameObject, (Object) ((Component) this).gameObject))
+      return;
+    BulletObject component = ((Component) collider).gameObject.GetComponent<BulletObject>();
+    StageObject stageObject;
+    if (Object.op_Inequality((Object) component, (Object) null))
+    {
+      stageObject = component.stageObject;
+    }
+    else
+    {
+      if (collider.isTrigger)
+        return;
+      stageObject = ((Component) collider).gameObject.GetComponentInParent<StageObject>();
+    }
+    if (Object.op_Equality((Object) stageObject, (Object) null) || Object.op_Equality((Object) stageObject, (Object) this.stageObject))
+      return;
+    this.Add(stageObject, collider, component);
+  }
 
-	protected virtual void RemoveFromDestroyedCollider()
-	{
-		objects.RemoveAll((CatchStageObject o) => o.collider == null);
-	}
+  private void OnTriggerExit(Collider collider)
+  {
+    if (Object.op_Equality((Object) ((Component) collider).gameObject, (Object) ((Component) this).gameObject) || Object.op_Equality((Object) ((Component) collider).gameObject.GetComponentInParent<StageObject>(), (Object) null))
+      return;
+    this.Remove(collider);
+  }
 
-	protected virtual void Add(StageObject obj, Collider collider, BulletObject bullet)
-	{
-		CatchStageObject catchStageObject = Find(collider);
-		if (catchStageObject == null)
-		{
-			CatchStageObject catchStageObject2 = new CatchStageObject();
-			catchStageObject2.obj = obj;
-			catchStageObject2.collider = collider;
-			catchStageObject2.bullet = bullet;
-			catchStageObject = catchStageObject2;
-			objects.Add(catchStageObject);
-		}
-	}
-
-	protected virtual void Remove(Collider collider)
-	{
-		CatchStageObject catchStageObject = Find(collider);
-		if (catchStageObject != null)
-		{
-			objects.Remove(catchStageObject);
-		}
-	}
-
-	private void OnTriggerEnter(Collider collider)
-	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		if (!(_collider == null) && _collider.get_enabled() && !(this.stageObject == null) && !(collider.get_gameObject() == this.get_gameObject()))
-		{
-			StageObject stageObject = null;
-			BulletObject component = collider.get_gameObject().GetComponent<BulletObject>();
-			if (component != null)
-			{
-				stageObject = component.stageObject;
-			}
-			else
-			{
-				if (collider.get_isTrigger())
-				{
-					return;
-				}
-				stageObject = collider.get_gameObject().GetComponentInParent<StageObject>();
-			}
-			if (!(stageObject == null) && !(stageObject == this.stageObject))
-			{
-				Add(stageObject, collider, component);
-			}
-		}
-	}
-
-	private void OnTriggerExit(Collider collider)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		if (!(collider.get_gameObject() == this.get_gameObject()))
-		{
-			StageObject componentInParent = collider.get_gameObject().GetComponentInParent<StageObject>();
-			if (!(componentInParent == null))
-			{
-				Remove(collider);
-			}
-		}
-	}
+  public class CatchStageObject
+  {
+    public StageObject obj;
+    public Collider collider;
+    public BulletObject bullet;
+  }
 }

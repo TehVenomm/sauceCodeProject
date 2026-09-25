@@ -1,159 +1,118 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: EffectPlayProcessor
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EffectPlayProcessor
+#nullable disable
+public class EffectPlayProcessor : MonoBehaviour
 {
-	[Serializable]
-	public class EffectSetting
-	{
-		[Tooltip("名前")]
-		public string name;
+  public EffectPlayProcessor.EffectSetting[] effectSettings;
 
-		[Tooltip("エフェクト名")]
-		public string effectName;
+  public bool IsContainSetting(string setting_name)
+  {
+    if (string.IsNullOrEmpty(setting_name))
+      return false;
+    int index = 0;
+    for (int length = this.effectSettings.Length; index < length; ++index)
+    {
+      if (this.effectSettings[index].name == setting_name)
+        return true;
+    }
+    return false;
+  }
 
-		[Tooltip("ノ\u30fcド名")]
-		public string nodeName;
+  public List<EffectPlayProcessor.EffectSetting> GetSettings(string setting_name)
+  {
+    if (string.IsNullOrEmpty(setting_name))
+      return (List<EffectPlayProcessor.EffectSetting>) null;
+    List<EffectPlayProcessor.EffectSetting> effectSettingList = new List<EffectPlayProcessor.EffectSetting>();
+    int index = 0;
+    for (int length = this.effectSettings.Length; index < length; ++index)
+    {
+      if (this.effectSettings[index].name == setting_name)
+        effectSettingList.Add(this.effectSettings[index]);
+    }
+    return effectSettingList.Count <= 0 ? (List<EffectPlayProcessor.EffectSetting>) null : effectSettingList;
+  }
 
-		[Tooltip("オフセット座標")]
-		public Vector3 position = Vector3.get_zero();
+  public List<Transform> PlayEffect(string setting_name, Transform owner_node = null)
+  {
+    return this.PlayEffect(this.GetSettings(setting_name), owner_node);
+  }
 
-		[Tooltip("回転")]
-		public Vector3 rotation = Vector3.get_zero();
+  public List<Transform> PlayEffect(
+    List<EffectPlayProcessor.EffectSetting> settings,
+    Transform owner_node = null)
+  {
+    if (settings == null)
+      return (List<Transform>) null;
+    List<Transform> transformList = new List<Transform>();
+    int index = 0;
+    for (int count = settings.Count; index < count; ++index)
+    {
+      Transform transform = this.PlayEffect(settings[index], owner_node);
+      if (Object.op_Inequality((Object) transform, (Object) null))
+        transformList.Add(transform);
+    }
+    return transformList.Count <= 0 ? (List<Transform>) null : transformList;
+  }
 
-		[Tooltip("スケ\u30fcル")]
-		public float scale = 1f;
+  public Transform PlayEffect(EffectPlayProcessor.EffectSetting setting, Transform owner_node = null)
+  {
+    if (setting == null)
+      return (Transform) null;
+    if (string.IsNullOrEmpty(setting.effectName))
+      return (Transform) null;
+    if (Object.op_Equality((Object) owner_node, (Object) null))
+      owner_node = ((Component) this).transform;
+    Transform parent = !string.IsNullOrEmpty(setting.nodeName) ? Utility.Find(owner_node, setting.nodeName) : owner_node;
+    if (Object.op_Equality((Object) parent, (Object) null))
+      parent = owner_node;
+    Transform effect = EffectManager.GetEffect(setting.effectName, parent);
+    if (Object.op_Inequality((Object) effect, (Object) null))
+    {
+      effect.localPosition = setting.position;
+      effect.localRotation = Quaternion.Euler(setting.rotation);
+      float num = setting.scale;
+      if ((double) num == 0.0)
+        num = 1f;
+      effect.localScale = Vector3.op_Multiply(Vector3.one, num);
+    }
+    return effect;
+  }
 
-		public EffectSetting Clone()
-		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			EffectSetting effectSetting = new EffectSetting();
-			effectSetting.name = name;
-			effectSetting.effectName = effectName;
-			effectSetting.nodeName = nodeName;
-			effectSetting.position = position;
-			effectSetting.rotation = rotation;
-			effectSetting.scale = scale;
-			return effectSetting;
-		}
-	}
+  [Serializable]
+  public class EffectSetting
+  {
+    [Tooltip("名前")]
+    public string name;
+    [Tooltip("エフェクト名")]
+    public string effectName;
+    [Tooltip("ノード名")]
+    public string nodeName;
+    [Tooltip("オフセット座標")]
+    public Vector3 position = Vector3.zero;
+    [Tooltip("回転")]
+    public Vector3 rotation = Vector3.zero;
+    [Tooltip("スケール")]
+    public float scale = 1f;
 
-	public EffectSetting[] effectSettings;
-
-	public EffectPlayProcessor()
-		: this()
-	{
-	}
-
-	public bool IsContainSetting(string setting_name)
-	{
-		if (string.IsNullOrEmpty(setting_name))
-		{
-			return false;
-		}
-		int i = 0;
-		for (int num = effectSettings.Length; i < num; i++)
-		{
-			if (effectSettings[i].name == setting_name)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public List<EffectSetting> GetSettings(string setting_name)
-	{
-		if (string.IsNullOrEmpty(setting_name))
-		{
-			return null;
-		}
-		List<EffectSetting> list = new List<EffectSetting>();
-		int i = 0;
-		for (int num = effectSettings.Length; i < num; i++)
-		{
-			if (effectSettings[i].name == setting_name)
-			{
-				list.Add(effectSettings[i]);
-			}
-		}
-		if (list.Count <= 0)
-		{
-			return null;
-		}
-		return list;
-	}
-
-	public List<Transform> PlayEffect(string setting_name, Transform owner_node = null)
-	{
-		return PlayEffect(GetSettings(setting_name), owner_node);
-	}
-
-	public List<Transform> PlayEffect(List<EffectSetting> settings, Transform owner_node = null)
-	{
-		if (settings == null)
-		{
-			return null;
-		}
-		List<Transform> list = new List<Transform>();
-		int i = 0;
-		for (int count = settings.Count; i < count; i++)
-		{
-			Transform val = PlayEffect(settings[i], owner_node);
-			if (val != null)
-			{
-				list.Add(val);
-			}
-		}
-		if (list.Count <= 0)
-		{
-			return null;
-		}
-		return list;
-	}
-
-	public Transform PlayEffect(EffectSetting setting, Transform owner_node = null)
-	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Expected O, but got Unknown
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		if (setting == null)
-		{
-			return null;
-		}
-		if (string.IsNullOrEmpty(setting.effectName))
-		{
-			return null;
-		}
-		if (owner_node == null)
-		{
-			owner_node = this.get_transform();
-		}
-		Transform val = (!string.IsNullOrEmpty(setting.nodeName)) ? Utility.Find(owner_node, setting.nodeName) : owner_node;
-		if (val == null)
-		{
-			val = owner_node;
-		}
-		Transform effect = EffectManager.GetEffect(setting.effectName, val);
-		if (effect != null)
-		{
-			effect.set_localPosition(setting.position);
-			effect.set_localRotation(Quaternion.Euler(setting.rotation));
-			float num = setting.scale;
-			if (num == 0f)
-			{
-				num = 1f;
-			}
-			effect.set_localScale(Vector3.get_one() * num);
-		}
-		return effect;
-	}
+    public EffectPlayProcessor.EffectSetting Clone()
+    {
+      return new EffectPlayProcessor.EffectSetting()
+      {
+        name = this.name,
+        effectName = this.effectName,
+        nodeName = this.nodeName,
+        position = this.position,
+        rotation = this.rotation,
+        scale = this.scale
+      };
+    }
+  }
 }

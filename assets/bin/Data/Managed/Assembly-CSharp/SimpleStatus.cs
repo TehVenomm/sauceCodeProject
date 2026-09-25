@@ -1,50 +1,44 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SimpleStatus
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class SimpleStatus
 {
-	public int hp;
+  public int hp;
+  public int[] attacks = new int[7];
+  public int[] defences = new int[7];
+  public int[] tolerances = new int[6];
 
-	public int[] attacks = new int[7];
+  public SimpleStatus() => this.Reset();
 
-	public int[] defences = new int[7];
+  public void Reset()
+  {
+    this.hp = 0;
+    for (int index = 0; index < 7; ++index)
+    {
+      this.attacks[index] = 0;
+      this.defences[index] = 0;
+    }
+    for (int index = 0; index < 6; ++index)
+      this.tolerances[index] = 0;
+  }
 
-	public int[] tolerances = new int[6];
+  public int GetAttacksSum()
+  {
+    int attacksSum = 0;
+    for (int index = 0; index < 7; ++index)
+      attacksSum += this.attacks[index];
+    return attacksSum;
+  }
 
-	public SimpleStatus()
-	{
-		Reset();
-	}
-
-	public void Reset()
-	{
-		hp = 0;
-		for (int i = 0; i < 7; i++)
-		{
-			attacks[i] = 0;
-			defences[i] = 0;
-		}
-		for (int j = 0; j < 6; j++)
-		{
-			tolerances[j] = 0;
-		}
-	}
-
-	public int GetAttacksSum()
-	{
-		int num = 0;
-		for (int i = 0; i < 7; i++)
-		{
-			num += attacks[i];
-		}
-		return num;
-	}
-
-	public int GetDefencesSum()
-	{
-		int num = 0;
-		num += defences[0];
-		for (int i = 0; i < 6; i++)
-		{
-			num += tolerances[i];
-		}
-		return num;
-	}
+  public int GetDefencesSum()
+  {
+    int defencesSum = 0 + this.defences[0];
+    for (int index = 0; index < 6; ++index)
+      defencesSum += this.tolerances[index];
+    return defencesSum;
+  }
 }

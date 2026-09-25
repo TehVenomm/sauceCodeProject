@@ -1,3 +1,9 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: JSONSerializer
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,472 +12,473 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+#nullable disable
 public static class JSONSerializer
 {
-	public static T Deserialize<T>(string message) where T : new()
-	{
-		JSONInStream stream = new JSONInStream(message);
-		return (T)DeserializeObject(stream, typeof(T));
-	}
+  public static T Deserialize<T>(string message) where T : new()
+  {
+    return (T) JSONSerializer.DeserializeObject(new JSONInStream(message), typeof (T));
+  }
 
-	public static T Deserialize<T>(string message, Type type) where T : new()
-	{
-		JSONInStream stream = new JSONInStream(message);
-		return (T)DeserializeObject(stream, type);
-	}
+  public static T Deserialize<T>(string message, System.Type type) where T : new()
+  {
+    return (T) JSONSerializer.DeserializeObject(new JSONInStream(message), type);
+  }
 
-	public static string Serialize<T>(T message)
-	{
-		JSONOutStream jSONOutStream = new JSONOutStream();
-		SerializeObject(jSONOutStream, typeof(T), message);
-		return jSONOutStream.Serialize();
-	}
+  public static string Serialize<T>(T message)
+  {
+    JSONOutStream stream = new JSONOutStream();
+    JSONSerializer.SerializeObject(stream, typeof (T), (object) message);
+    return stream.Serialize();
+  }
 
-	public static string Serialize(object message, Type type)
-	{
-		JSONOutStream jSONOutStream = new JSONOutStream();
-		SerializeObject(jSONOutStream, type, message);
-		return jSONOutStream.Serialize();
-	}
+  public static string Serialize(object message, System.Type type)
+  {
+    JSONOutStream stream = new JSONOutStream();
+    JSONSerializer.SerializeObject(stream, type, message);
+    return stream.Serialize();
+  }
 
-	private static string GetName(FieldInfo fi)
-	{
-		FormerlySerializedAsAttribute val = fi.GetCustomAttributes(typeof(FormerlySerializedAsAttribute), false).FirstOrDefault() as FormerlySerializedAsAttribute;
-		if (val == null)
-		{
-			return fi.Name;
-		}
-		return val.get_oldName();
-	}
+  private static string GetName(FieldInfo fi)
+  {
+    return !(((IEnumerable<object>) fi.GetCustomAttributes(typeof (FormerlySerializedAsAttribute), false)).FirstOrDefault<object>() is FormerlySerializedAsAttribute serializedAsAttribute) ? fi.Name : serializedAsAttribute.oldName;
+  }
 
-	private static IEnumerable<FieldInfo> GetTargetFields(Type type)
-	{
-		FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-		foreach (FieldInfo f in fields)
-		{
-			if (!f.IsPublic)
-			{
-				string typeName = f.FieldType.ToString();
-				if (typeName != "XorInt" && typeName != "XorUInt" && typeName != "XorFloat")
-				{
-					continue;
-				}
-			}
-			yield return f;
-		}
-	}
+  private static IEnumerable<FieldInfo> GetTargetFields(System.Type type)
+  {
+    FieldInfo[] fieldInfoArray = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+    for (int index = 0; index < fieldInfoArray.Length; ++index)
+    {
+      FieldInfo targetField = fieldInfoArray[index];
+      if (!targetField.IsPublic)
+      {
+        string str = targetField.FieldType.ToString();
+        if (str != "XorInt" && str != "XorUInt" && str != "XorFloat")
+          continue;
+      }
+      yield return targetField;
+    }
+    fieldInfoArray = (FieldInfo[]) null;
+  }
 
-	private static void SerializeObject(JSONOutStream stream, Type type, object message)
-	{
-		//IL_0216: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0234: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0270: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028e: Unknown result type (might be due to invalid IL or missing references)
-		MethodInfo method = type.GetMethod("ToJSON");
-		if (method != null)
-		{
-			method.Invoke(message, new object[1]
-			{
-				stream
-			});
-		}
-		else
-		{
-			IEnumerable<FieldInfo> targetFields = GetTargetFields(type);
-			foreach (FieldInfo item in targetFields)
-			{
-				switch (item.FieldType.ToString())
-				{
-				case "System.String":
-					stream.Content(GetName(item), (string)item.GetValue(message));
-					break;
-				case "System.Single":
-					stream.Content(GetName(item), (XorFloat)(float)item.GetValue(message));
-					break;
-				case "System.Double":
-					stream.Content(GetName(item), (double)item.GetValue(message));
-					break;
-				case "System.Int32":
-					stream.Content(GetName(item), (int)item.GetValue(message));
-					break;
-				case "System.Boolean":
-					stream.Content(GetName(item), (bool)item.GetValue(message));
-					break;
-				case "UnityEngine.Vector3":
-					stream.Content(GetName(item), (Vector3)item.GetValue(message));
-					break;
-				case "UnityEngine.Quaternion":
-					stream.Content(GetName(item), (Quaternion)item.GetValue(message));
-					break;
-				case "UnityEngine.Color":
-					stream.Content(GetName(item), (Color)item.GetValue(message));
-					break;
-				case "UnityEngine.Rect":
-					stream.Content(GetName(item), (Rect)item.GetValue(message));
-					break;
-				case "UnityEngine.Vector2":
-					stream.Content(GetName(item), (Vector2)item.GetValue(message));
-					break;
-				case "XorInt":
-					stream.Content(GetName(item), item.GetValue(message) as XorInt);
-					break;
-				case "XorUInt":
-					stream.Content(GetName(item), item.GetValue(message) as XorUInt);
-					break;
-				case "XorFloat":
-					stream.Content(GetName(item), item.GetValue(message) as XorFloat);
-					break;
-				default:
-					if (item.FieldType.IsEnum)
-					{
-						stream.Content(GetName(item), item.GetValue(message).ToString());
-					}
-					else if (item.FieldType.IsGenericType)
-					{
-						Type type2 = item.FieldType.GetGenericArguments()[0];
-						Type typeFromHandle = typeof(List<>);
-						Type type3 = typeFromHandle.MakeGenericType(type2);
-						PropertyInfo property = type3.GetProperty("Count");
-						PropertyInfo property2 = type3.GetProperty("Item");
-						int num = (int)property.GetValue(item.GetValue(message), new object[0]);
-						stream.List(GetName(item));
-						for (int i = 0; i < num; i++)
-						{
-							object value = property2.GetValue(item.GetValue(message), new object[1]
-							{
-								i
-							});
-							SerializeListElement(stream, type2, value, i);
-						}
-						stream.End();
-					}
-					else if (item.FieldType.IsArray)
-					{
-						object[] array = ToObjectArray((IEnumerable)item.GetValue(message));
-						Type type4 = Type.GetTypeArray(array)[0];
-						stream.List(GetName(item));
-						for (int j = 0; j < array.Length; j++)
-						{
-							object message2 = array[j];
-							SerializeListElement(stream, type4, message2, j);
-						}
-						stream.End();
-					}
-					else
-					{
-						stream.Start(GetName(item));
-						SerializeObject(stream, item.FieldType, item.GetValue(message));
-						stream.End();
-					}
-					break;
-				}
-			}
-		}
-	}
+  private static void SerializeObject(JSONOutStream stream, System.Type type, object message)
+  {
+    MethodInfo method = type.GetMethod("ToJSON");
+    if (method != (MethodInfo) null)
+    {
+      method.Invoke(message, new object[1]
+      {
+        (object) stream
+      });
+    }
+    else
+    {
+      foreach (FieldInfo targetField in JSONSerializer.GetTargetFields(type))
+      {
+        switch (targetField.FieldType.ToString())
+        {
+          case "System.Boolean":
+            stream.Content(JSONSerializer.GetName(targetField), (bool) targetField.GetValue(message));
+            continue;
+          case "System.Double":
+            stream.Content(JSONSerializer.GetName(targetField), (double) targetField.GetValue(message));
+            continue;
+          case "System.Int32":
+            stream.Content(JSONSerializer.GetName(targetField), (int) targetField.GetValue(message));
+            continue;
+          case "System.Single":
+            stream.Content(JSONSerializer.GetName(targetField), (XorFloat) (float) targetField.GetValue(message));
+            continue;
+          case "System.String":
+            stream.Content(JSONSerializer.GetName(targetField), (string) targetField.GetValue(message));
+            continue;
+          case "UnityEngine.Color":
+            stream.Content(JSONSerializer.GetName(targetField), (Color) targetField.GetValue(message));
+            continue;
+          case "UnityEngine.Quaternion":
+            stream.Content(JSONSerializer.GetName(targetField), (Quaternion) targetField.GetValue(message));
+            continue;
+          case "UnityEngine.Rect":
+            stream.Content(JSONSerializer.GetName(targetField), (Rect) targetField.GetValue(message));
+            continue;
+          case "UnityEngine.Vector2":
+            stream.Content(JSONSerializer.GetName(targetField), (Vector2) targetField.GetValue(message));
+            continue;
+          case "UnityEngine.Vector3":
+            stream.Content(JSONSerializer.GetName(targetField), (Vector3) targetField.GetValue(message));
+            continue;
+          case "XorFloat":
+            stream.Content(JSONSerializer.GetName(targetField), targetField.GetValue(message) as XorFloat);
+            continue;
+          case "XorInt":
+            stream.Content(JSONSerializer.GetName(targetField), targetField.GetValue(message) as XorInt);
+            continue;
+          case "XorUInt":
+            stream.Content(JSONSerializer.GetName(targetField), targetField.GetValue(message) as XorUInt);
+            continue;
+          default:
+            if (targetField.FieldType.IsEnum)
+            {
+              stream.Content(JSONSerializer.GetName(targetField), targetField.GetValue(message).ToString());
+              continue;
+            }
+            if (targetField.FieldType.IsGenericType)
+            {
+              System.Type genericArgument = targetField.FieldType.GetGenericArguments()[0];
+              System.Type type1 = typeof (List<>).MakeGenericType(genericArgument);
+              PropertyInfo property1 = type1.GetProperty("Count");
+              PropertyInfo property2 = type1.GetProperty("Item");
+              int num = (int) property1.GetValue(targetField.GetValue(message), new object[0]);
+              stream.List(JSONSerializer.GetName(targetField));
+              for (int i = 0; i < num; ++i)
+              {
+                object message1 = property2.GetValue(targetField.GetValue(message), new object[1]
+                {
+                  (object) i
+                });
+                JSONSerializer.SerializeListElement(stream, genericArgument, message1, i);
+              }
+              stream.End();
+              continue;
+            }
+            if (targetField.FieldType.IsArray)
+            {
+              object[] objectArray = JSONSerializer.ToObjectArray((IEnumerable) targetField.GetValue(message));
+              System.Type type2 = System.Type.GetTypeArray(objectArray)[0];
+              stream.List(JSONSerializer.GetName(targetField));
+              for (int i = 0; i < objectArray.Length; ++i)
+              {
+                object message2 = objectArray[i];
+                JSONSerializer.SerializeListElement(stream, type2, message2, i);
+              }
+              stream.End();
+              continue;
+            }
+            stream.Start(JSONSerializer.GetName(targetField));
+            JSONSerializer.SerializeObject(stream, targetField.FieldType, targetField.GetValue(message));
+            stream.End();
+            continue;
+        }
+      }
+    }
+  }
 
-	private static void SerializeListElement(JSONOutStream stream, Type type, object message, int i)
-	{
-		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-		if (!type.IsEnum)
-		{
-			switch (type.ToString())
-			{
-			case "System.String":
-				stream.Content(i, (string)message);
-				break;
-			case "System.Single":
-				stream.Content(i, (XorFloat)(float)message);
-				break;
-			case "System.Double":
-				stream.Content(i, (double)message);
-				break;
-			case "System.Int32":
-				stream.Content(i, (int)message);
-				break;
-			case "System.Boolean":
-				stream.Content(i, (bool)message);
-				break;
-			case "UnityEngine.Vector3":
-				stream.Content(i, (Vector3)message);
-				break;
-			case "UnityEngine.Quaternion":
-				stream.Content(i, (Quaternion)message);
-				break;
-			case "UnityEngine.Color":
-				stream.Content(i, (Color)message);
-				break;
-			case "UnityEngine.Rect":
-				stream.Content(i, (Rect)message);
-				break;
-			case "UnityEngine.Vector2":
-				stream.Content(i, (Vector2)message);
-				break;
-			case "XorInt":
-				stream.Content(i, new XorInt((int)message));
-				break;
-			case "XorUInt":
-				stream.Content(i, new XorUInt((uint)message));
-				break;
-			case "XorFloat":
-				stream.Content(i, new XorFloat((float)message));
-				break;
-			default:
-				stream.Start(i);
-				SerializeObject(stream, type, message);
-				stream.End();
-				break;
-			}
-		}
-		else
-		{
-			stream.Content(i, (int)message);
-		}
-	}
+  private static void SerializeListElement(JSONOutStream stream, System.Type type, object message, int i)
+  {
+    if (type.IsEnum)
+    {
+      stream.Content(i, (int) message);
+    }
+    else
+    {
+      switch (type.ToString())
+      {
+        case "System.Boolean":
+          stream.Content(i, (bool) message);
+          break;
+        case "System.Double":
+          stream.Content(i, (double) message);
+          break;
+        case "System.Int32":
+          stream.Content(i, (int) message);
+          break;
+        case "System.Single":
+          stream.Content(i, (XorFloat) (float) message);
+          break;
+        case "System.String":
+          stream.Content(i, (string) message);
+          break;
+        case "UnityEngine.Color":
+          stream.Content(i, (Color) message);
+          break;
+        case "UnityEngine.Quaternion":
+          stream.Content(i, (Quaternion) message);
+          break;
+        case "UnityEngine.Rect":
+          stream.Content(i, (Rect) message);
+          break;
+        case "UnityEngine.Vector2":
+          stream.Content(i, (Vector2) message);
+          break;
+        case "UnityEngine.Vector3":
+          stream.Content(i, (Vector3) message);
+          break;
+        case "XorFloat":
+          stream.Content(i, new XorFloat((float) message));
+          break;
+        case "XorInt":
+          stream.Content(i, new XorInt((int) message));
+          break;
+        case "XorUInt":
+          stream.Content(i, new XorUInt((uint) message));
+          break;
+        default:
+          stream.Start(i);
+          JSONSerializer.SerializeObject(stream, type, message);
+          stream.End();
+          break;
+      }
+    }
+  }
 
-	private static object DeserializeObject(JSONInStream stream, Type type)
-	{
-		//IL_0291: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_035d: Unknown result type (might be due to invalid IL or missing references)
-		MethodInfo method = type.GetMethod("FromJSON");
-		if (method != null)
-		{
-			return method.Invoke(null, new object[1]
-			{
-				stream
-			});
-		}
-		object obj = Activator.CreateInstance(type);
-		IEnumerable<FieldInfo> targetFields = GetTargetFields(type);
-		foreach (FieldInfo item in targetFields)
-		{
-			switch (item.FieldType.ToString())
-			{
-			case "System.String":
-				if (stream.Has(GetName(item)))
-				{
-					stream.Content(GetName(item), out string value7);
-					item.SetValue(obj, value7);
-				}
-				break;
-			case "System.Single":
-				if (stream.Has(GetName(item)))
-				{
-					stream.Content(GetName(item), out float value12);
-					item.SetValue(obj, value12);
-				}
-				break;
-			case "System.Double":
-				if (stream.Has(GetName(item)))
-				{
-					stream.Content(GetName(item), out double value16);
-					item.SetValue(obj, value16);
-				}
-				break;
-			case "System.Int32":
-				if (stream.Has(GetName(item)))
-				{
-					stream.Content(GetName(item), out int value9);
-					item.SetValue(obj, value9);
-				}
-				break;
-			case "System.Boolean":
-				if (stream.Has(GetName(item)))
-				{
-					stream.Content(GetName(item), out bool value5);
-					item.SetValue(obj, value5);
-				}
-				break;
-			case "UnityEngine.Vector3":
-				if (stream.Has(GetName(item)))
-				{
-					stream.Content(GetName(item), out Vector3 value14);
-					item.SetValue(obj, value14);
-				}
-				break;
-			case "UnityEngine.Quaternion":
-				if (stream.Has(GetName(item)))
-				{
-					stream.Content(GetName(item), out Quaternion value10);
-					item.SetValue(obj, value10);
-				}
-				break;
-			case "UnityEngine.Color":
-				if (stream.Has(GetName(item)))
-				{
-					stream.Content(GetName(item), out Color value8);
-					item.SetValue(obj, value8);
-				}
-				break;
-			case "UnityEngine.Rect":
-				if (stream.Has(GetName(item)))
-				{
-					stream.Content(GetName(item), out Rect value6);
-					item.SetValue(obj, value6);
-				}
-				break;
-			case "UnityEngine.Vector2":
-				if (stream.Has(GetName(item)))
-				{
-					stream.Content(GetName(item), out Vector2 value4);
-					item.SetValue(obj, value4);
-				}
-				break;
-			case "XorInt":
-				if (stream.Has(GetName(item)))
-				{
-					stream.Content(GetName(item), out XorInt value15);
-					item.SetValue(obj, value15);
-				}
-				break;
-			case "XorUInt":
-				if (stream.Has(GetName(item)))
-				{
-					stream.Content(GetName(item), out XorUInt value13);
-					item.SetValue(obj, value13);
-				}
-				break;
-			case "XorFloat":
-				if (stream.Has(GetName(item)))
-				{
-					stream.Content(GetName(item), out XorFloat value11);
-					item.SetValue(obj, value11);
-				}
-				break;
-			default:
-				if (stream.Has(GetName(item)))
-				{
-					if (item.FieldType.IsEnum)
-					{
-						stream.Content(GetName(item), out string value);
-						item.SetValue(obj, Enum.Parse(item.FieldType, value));
-					}
-					else if (item.FieldType.IsGenericType)
-					{
-						Type containedType = item.FieldType.GetGenericArguments()[0];
-						Type typeFromHandle = typeof(List<>);
-						Type type2 = typeFromHandle.MakeGenericType(containedType);
-						MethodInfo addMethod = type2.GetMethod("Add");
-						object list = Activator.CreateInstance(type2);
-						stream.List(GetName(item), delegate(int i, JSONInStream stream2)
-						{
-							object obj3 = DeserializeListElement(stream2, containedType);
-							addMethod.Invoke(list, new object[1]
-							{
-								obj3
-							});
-						});
-						item.SetValue(obj, list);
-					}
-					else if (item.FieldType.IsArray)
-					{
-						Type containedType2 = item.FieldType.GetElementType();
-						Type typeFromHandle2 = typeof(List<>);
-						Type type3 = typeFromHandle2.MakeGenericType(containedType2);
-						MethodInfo addMethod2 = type3.GetMethod("Add");
-						MethodInfo method2 = type3.GetMethod("ToArray");
-						object list2 = Activator.CreateInstance(type3);
-						stream.List(GetName(item), delegate(int i, JSONInStream stream2)
-						{
-							object obj2 = DeserializeListElement(stream2, containedType2);
-							addMethod2.Invoke(list2, new object[1]
-							{
-								obj2
-							});
-						});
-						object value2 = method2.Invoke(list2, new object[0]);
-						item.SetValue(obj, value2);
-					}
-					else
-					{
-						stream.Start(GetName(item));
-						object value3 = DeserializeObject(stream, item.FieldType);
-						stream.End();
-						item.SetValue(obj, value3);
-					}
-				}
-				break;
-			}
-		}
-		return obj;
-	}
+  private static object DeserializeObject(JSONInStream stream, System.Type type)
+  {
+    MethodInfo method1 = type.GetMethod("FromJSON");
+    if (method1 != (MethodInfo) null)
+      return method1.Invoke((object) null, new object[1]
+      {
+        (object) stream
+      });
+    object instance = Activator.CreateInstance(type);
+    foreach (FieldInfo targetField in JSONSerializer.GetTargetFields(type))
+    {
+      switch (targetField.FieldType.ToString())
+      {
+        case "System.Boolean":
+          if (stream.Has(JSONSerializer.GetName(targetField)))
+          {
+            bool flag;
+            stream.Content(JSONSerializer.GetName(targetField), out flag);
+            targetField.SetValue(instance, (object) flag);
+            continue;
+          }
+          continue;
+        case "System.Double":
+          if (stream.Has(JSONSerializer.GetName(targetField)))
+          {
+            double num;
+            stream.Content(JSONSerializer.GetName(targetField), out num);
+            targetField.SetValue(instance, (object) num);
+            continue;
+          }
+          continue;
+        case "System.Int32":
+          if (stream.Has(JSONSerializer.GetName(targetField)))
+          {
+            int num;
+            stream.Content(JSONSerializer.GetName(targetField), out num);
+            targetField.SetValue(instance, (object) num);
+            continue;
+          }
+          continue;
+        case "System.Single":
+          if (stream.Has(JSONSerializer.GetName(targetField)))
+          {
+            float num;
+            stream.Content(JSONSerializer.GetName(targetField), out num);
+            targetField.SetValue(instance, (object) num);
+            continue;
+          }
+          continue;
+        case "System.String":
+          if (stream.Has(JSONSerializer.GetName(targetField)))
+          {
+            string str;
+            stream.Content(JSONSerializer.GetName(targetField), out str);
+            targetField.SetValue(instance, (object) str);
+            continue;
+          }
+          continue;
+        case "UnityEngine.Color":
+          if (stream.Has(JSONSerializer.GetName(targetField)))
+          {
+            Color color;
+            stream.Content(JSONSerializer.GetName(targetField), out color);
+            targetField.SetValue(instance, (object) color);
+            continue;
+          }
+          continue;
+        case "UnityEngine.Quaternion":
+          if (stream.Has(JSONSerializer.GetName(targetField)))
+          {
+            Quaternion quaternion;
+            stream.Content(JSONSerializer.GetName(targetField), out quaternion);
+            targetField.SetValue(instance, (object) quaternion);
+            continue;
+          }
+          continue;
+        case "UnityEngine.Rect":
+          if (stream.Has(JSONSerializer.GetName(targetField)))
+          {
+            Rect rect;
+            stream.Content(JSONSerializer.GetName(targetField), out rect);
+            targetField.SetValue(instance, (object) rect);
+            continue;
+          }
+          continue;
+        case "UnityEngine.Vector2":
+          if (stream.Has(JSONSerializer.GetName(targetField)))
+          {
+            Vector2 vector2;
+            stream.Content(JSONSerializer.GetName(targetField), out vector2);
+            targetField.SetValue(instance, (object) vector2);
+            continue;
+          }
+          continue;
+        case "UnityEngine.Vector3":
+          if (stream.Has(JSONSerializer.GetName(targetField)))
+          {
+            Vector3 vector3;
+            stream.Content(JSONSerializer.GetName(targetField), out vector3);
+            targetField.SetValue(instance, (object) vector3);
+            continue;
+          }
+          continue;
+        case "XorFloat":
+          if (stream.Has(JSONSerializer.GetName(targetField)))
+          {
+            XorFloat xorFloat;
+            stream.Content(JSONSerializer.GetName(targetField), out xorFloat);
+            targetField.SetValue(instance, (object) xorFloat);
+            continue;
+          }
+          continue;
+        case "XorInt":
+          if (stream.Has(JSONSerializer.GetName(targetField)))
+          {
+            XorInt xorInt;
+            stream.Content(JSONSerializer.GetName(targetField), out xorInt);
+            targetField.SetValue(instance, (object) xorInt);
+            continue;
+          }
+          continue;
+        case "XorUInt":
+          if (stream.Has(JSONSerializer.GetName(targetField)))
+          {
+            XorUInt xorUint;
+            stream.Content(JSONSerializer.GetName(targetField), out xorUint);
+            targetField.SetValue(instance, (object) xorUint);
+            continue;
+          }
+          continue;
+        default:
+          if (stream.Has(JSONSerializer.GetName(targetField)))
+          {
+            if (targetField.FieldType.IsEnum)
+            {
+              string str;
+              stream.Content(JSONSerializer.GetName(targetField), out str);
+              targetField.SetValue(instance, Enum.Parse(targetField.FieldType, str));
+              continue;
+            }
+            if (targetField.FieldType.IsGenericType)
+            {
+              System.Type containedType = targetField.FieldType.GetGenericArguments()[0];
+              System.Type type1 = typeof (List<>).MakeGenericType(containedType);
+              MethodInfo addMethod = type1.GetMethod("Add");
+              object list = Activator.CreateInstance(type1);
+              stream.List(JSONSerializer.GetName(targetField), (Action<int, JSONInStream>) ((i, stream2) =>
+              {
+                object obj = JSONSerializer.DeserializeListElement(stream2, containedType);
+                addMethod.Invoke(list, new object[1]{ obj });
+              }));
+              targetField.SetValue(instance, list);
+              continue;
+            }
+            if (targetField.FieldType.IsArray)
+            {
+              System.Type containedType = targetField.FieldType.GetElementType();
+              System.Type type2 = typeof (List<>).MakeGenericType(containedType);
+              MethodInfo addMethod = type2.GetMethod("Add");
+              MethodInfo method2 = type2.GetMethod("ToArray");
+              object list = Activator.CreateInstance(type2);
+              stream.List(JSONSerializer.GetName(targetField), (Action<int, JSONInStream>) ((i, stream2) =>
+              {
+                object obj = JSONSerializer.DeserializeListElement(stream2, containedType);
+                addMethod.Invoke(list, new object[1]{ obj });
+              }));
+              object obj1 = list;
+              object[] parameters = new object[0];
+              object obj2 = method2.Invoke(obj1, parameters);
+              targetField.SetValue(instance, obj2);
+              continue;
+            }
+            stream.Start(JSONSerializer.GetName(targetField));
+            object obj3 = JSONSerializer.DeserializeObject(stream, targetField.FieldType);
+            stream.End();
+            targetField.SetValue(instance, obj3);
+            continue;
+          }
+          continue;
+      }
+    }
+    return instance;
+  }
 
-	private static object[] ToObjectArray(IEnumerable enumerableObject)
-	{
-		List<object> list = new List<object>();
-		foreach (object item in enumerableObject)
-		{
-			list.Add(item);
-		}
-		return list.ToArray();
-	}
+  private static object[] ToObjectArray(IEnumerable enumerableObject)
+  {
+    List<object> objectList = new List<object>();
+    foreach (object obj in enumerableObject)
+      objectList.Add(obj);
+    return objectList.ToArray();
+  }
 
-	private static object DeserializeListElement(JSONInStream stream, Type type)
-	{
-		//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-		if (!type.IsEnum)
-		{
-			switch (type.ToString())
-			{
-			case "System.String":
-				stream.Content(0, out string value13);
-				return value13;
-			case "System.Single":
-				stream.Content(0, out float value12);
-				return value12;
-			case "System.Double":
-				stream.Content(0, out double value11);
-				return value11;
-			case "System.Int32":
-				stream.Content(0, out int value10);
-				return value10;
-			case "System.Boolean":
-				stream.Content(0, out bool value9);
-				return value9;
-			case "UnityEngine.Vector3":
-				stream.Content(0, out Vector3 value8);
-				return value8;
-			case "UnityEngine.Quaternion":
-				stream.Content(0, out Quaternion value7);
-				return value7;
-			case "UnityEngine.Color":
-				stream.Content(0, out Color value6);
-				return value6;
-			case "UnityEngine.Rect":
-				stream.Content(0, out Rect value5);
-				return value5;
-			case "UnityEngine.Vector2":
-				stream.Content(0, out Vector2 value4);
-				return value4;
-			case "XorInt":
-				stream.Content(0, out XorInt value3);
-				return value3;
-			case "XorUInt":
-				stream.Content(0, out XorUInt value2);
-				return value2;
-			case "XorFloat":
-				stream.Content(0, out XorFloat value);
-				return value;
-			default:
-			{
-				object result = DeserializeObject(stream, type);
-				stream.End();
-				return result;
-			}
-			}
-		}
-		stream.Content(0, out int value14);
-		return Enum.Parse(type, value14.ToString());
-	}
+  private static object DeserializeListElement(JSONInStream stream, System.Type type)
+  {
+    if (type.IsEnum)
+    {
+      int num;
+      stream.Content(0, out num);
+      return Enum.Parse(type, num.ToString());
+    }
+    switch (type.ToString())
+    {
+      case "System.Boolean":
+        bool flag;
+        stream.Content(0, out flag);
+        return (object) flag;
+      case "System.Double":
+        double num1;
+        stream.Content(0, out num1);
+        return (object) num1;
+      case "System.Int32":
+        int num2;
+        stream.Content(0, out num2);
+        return (object) num2;
+      case "System.Single":
+        float num3;
+        stream.Content(0, out num3);
+        return (object) num3;
+      case "System.String":
+        string str;
+        stream.Content(0, out str);
+        return (object) str;
+      case "UnityEngine.Color":
+        Color color;
+        stream.Content(0, out color);
+        return (object) color;
+      case "UnityEngine.Quaternion":
+        Quaternion quaternion;
+        stream.Content(0, out quaternion);
+        return (object) quaternion;
+      case "UnityEngine.Rect":
+        Rect rect;
+        stream.Content(0, out rect);
+        return (object) rect;
+      case "UnityEngine.Vector2":
+        Vector2 vector2;
+        stream.Content(0, out vector2);
+        return (object) vector2;
+      case "UnityEngine.Vector3":
+        Vector3 vector3;
+        stream.Content(0, out vector3);
+        return (object) vector3;
+      case "XorFloat":
+        XorFloat xorFloat;
+        stream.Content(0, out xorFloat);
+        return (object) xorFloat;
+      case "XorInt":
+        XorInt xorInt;
+        stream.Content(0, out xorInt);
+        return (object) xorInt;
+      case "XorUInt":
+        XorUInt xorUint;
+        stream.Content(0, out xorUint);
+        return (object) xorUint;
+      default:
+        object obj = JSONSerializer.DeserializeObject(stream, type);
+        stream.End();
+        return obj;
+    }
+  }
 }

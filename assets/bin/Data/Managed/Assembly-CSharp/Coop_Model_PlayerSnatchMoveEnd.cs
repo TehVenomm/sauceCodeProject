@@ -1,17 +1,17 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Coop_Model_PlayerSnatchMoveEnd
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class Coop_Model_PlayerSnatchMoveEnd : Coop_Model_ObjectSyncPositionBase
 {
-	public Vector3 act_pos = Vector3.get_zero();
+  public Vector3 act_pos = Vector3.zero;
+  public bool act_pos_f;
+  public int triggerIndex;
 
-	public bool act_pos_f;
-
-	public int triggerIndex;
-
-	public Coop_Model_PlayerSnatchMoveEnd()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		base.packetType = PACKET_TYPE.PLAYER_SNATCH_MOVE_END;
-	}
+  public Coop_Model_PlayerSnatchMoveEnd() => this.packetType = PACKET_TYPE.PLAYER_SNATCH_MOVE_END;
 }

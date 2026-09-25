@@ -1,258 +1,234 @@
-using Network;
+﻿// Decompiled with JetBrains decompiler
+// Type: FriendArenaRankingMyPage
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class FriendArenaRankingMyPage : GameSection
 {
-	private enum UI
-	{
-		LBL_ARENA_NAME,
-		LBL_END_DATE,
-		OBJ_GROUP_A,
-		OBJ_GROUP_B,
-		OBJ_GROUP_C,
-		OBJ_GROUP_D,
-		OBJ_GROUP_E,
-		OBJ_TOTAL,
-		OBJ_SCORE,
-		OBJ_NO_SCORE,
-		OBJ_MY_RANK,
-		LBL_GROUP_TIME,
-		LBL_TIME_DEFAULT,
-		LBL_MY_RANK,
-		OBJ_NOT_EXIST,
-		SPR_RANK_NUM_0,
-		SPR_RANK_NUM_1,
-		SPR_RANK_NUM_2,
-		SPR_RANK_NUM_3,
-		SPR_RANK_NUM_4,
-		SPR_RANK_NUM_5,
-		SPR_RANK_NUM_6,
-		SPR_RANK,
-		SPR_OUT_OF_RANK,
-		LBL_NO_TOTAL
-	}
+  private Network.EventData eventData;
+  private bool isExistArena = true;
+  private static readonly FriendArenaRankingMyPage.UI[] Groups = new FriendArenaRankingMyPage.UI[5]
+  {
+    FriendArenaRankingMyPage.UI.OBJ_GROUP_A,
+    FriendArenaRankingMyPage.UI.OBJ_GROUP_B,
+    FriendArenaRankingMyPage.UI.OBJ_GROUP_C,
+    FriendArenaRankingMyPage.UI.OBJ_GROUP_D,
+    FriendArenaRankingMyPage.UI.OBJ_GROUP_E
+  };
+  private bool IsFinishRecieveDelivery;
+  private ArenaUserRecordModel.Param record;
+  private int userRank = -1;
+  private readonly string[] RankingNumbers = new string[10]
+  {
+    "RankingNumber_0",
+    "RankingNumber_1",
+    "RankingNumber_2",
+    "RankingNumber_3",
+    "RankingNumber_4",
+    "RankingNumber_5",
+    "RankingNumber_6",
+    "RankingNumber_7",
+    "RankingNumber_8",
+    "RankingNumber_9"
+  };
+  private readonly FriendArenaRankingMyPage.UI[] RankingNumUIs = new FriendArenaRankingMyPage.UI[7]
+  {
+    FriendArenaRankingMyPage.UI.SPR_RANK_NUM_0,
+    FriendArenaRankingMyPage.UI.SPR_RANK_NUM_1,
+    FriendArenaRankingMyPage.UI.SPR_RANK_NUM_2,
+    FriendArenaRankingMyPage.UI.SPR_RANK_NUM_3,
+    FriendArenaRankingMyPage.UI.SPR_RANK_NUM_4,
+    FriendArenaRankingMyPage.UI.SPR_RANK_NUM_5,
+    FriendArenaRankingMyPage.UI.SPR_RANK_NUM_6
+  };
 
-	private Network.EventData eventData;
+  public override void Initialize()
+  {
+    this.eventData = GameSection.GetEventData() as Network.EventData;
+    this.IsFinishRecieveDelivery = true;
+    if (this.eventData == null)
+    {
+      this.isExistArena = false;
+      base.Initialize();
+    }
+    else if (this.IsRankingJoin())
+      this.StartCoroutine(this.SendGetMyRcord());
+    else
+      base.Initialize();
+  }
 
-	private bool isExistArena = true;
+  private IEnumerator SendGetMyRcord()
+  {
+    while (!this.IsFinishRecieveDelivery)
+      yield return (object) null;
+    bool isFinishGetRecord = false;
+    MonoBehaviourSingleton<QuestManager>.I.SendGetArenaUserRecord(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, this.eventData.eventId, (Action<bool, ArenaUserRecordModel.Param>) ((b, result) =>
+    {
+      isFinishGetRecord = true;
+      this.record = result;
+      this.userRank = this.record.userRank;
+    }));
+    while (!isFinishGetRecord)
+      yield return (object) null;
+    base.Initialize();
+  }
 
-	private static readonly UI[] Groups = new UI[5]
-	{
-		UI.OBJ_GROUP_A,
-		UI.OBJ_GROUP_B,
-		UI.OBJ_GROUP_C,
-		UI.OBJ_GROUP_D,
-		UI.OBJ_GROUP_E
-	};
+  public override void UpdateUI()
+  {
+    this.UpdateTitle();
+    this.UpdateRecord();
+    base.UpdateUI();
+  }
 
-	private bool IsFinishRecieveDelivery;
+  private void UpdateTitle()
+  {
+    if (!this.isExistArena)
+    {
+      this.SetLabelText((Enum) FriendArenaRankingMyPage.UI.LBL_ARENA_NAME, "");
+      this.SetLabelText((Enum) FriendArenaRankingMyPage.UI.LBL_END_DATE, "");
+    }
+    else
+    {
+      this.SetLabelText((Enum) FriendArenaRankingMyPage.UI.LBL_ARENA_NAME, this.eventData.name);
+      this.SetLabelText((Enum) FriendArenaRankingMyPage.UI.LBL_END_DATE, QuestUtility.GetEndDateString(this.eventData));
+    }
+  }
 
-	private ArenaUserRecordModel.Param record;
+  private void UpdateRecord()
+  {
+    this.SetActive((Enum) FriendArenaRankingMyPage.UI.OBJ_NO_SCORE, !this.IsRankingJoin());
+    this.SetActive((Enum) FriendArenaRankingMyPage.UI.OBJ_SCORE, this.IsRankingJoin());
+    this.SetActive((Enum) FriendArenaRankingMyPage.UI.OBJ_MY_RANK, this.IsRankingJoin());
+    this.SetActive((Enum) FriendArenaRankingMyPage.UI.OBJ_NOT_EXIST, false);
+    if (!this.isExistArena)
+    {
+      this.SetActive((Enum) FriendArenaRankingMyPage.UI.OBJ_NO_SCORE, false);
+      this.SetActive((Enum) FriendArenaRankingMyPage.UI.OBJ_SCORE, false);
+      this.SetActive((Enum) FriendArenaRankingMyPage.UI.OBJ_MY_RANK, false);
+      this.SetActive((Enum) FriendArenaRankingMyPage.UI.OBJ_NOT_EXIST, true);
+    }
+    else if (!this.IsRankingJoin())
+    {
+      this.SetLabelText((Enum) FriendArenaRankingMyPage.UI.LBL_NO_TOTAL, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 29U), (object) ARENA_RANK.S.ToString()));
+    }
+    else
+    {
+      this.UpdateRank();
+      int index = 0;
+      for (int count = this.record.clearMilliSecList.Count; index < count; ++index)
+      {
+        Transform ctrl = this.GetCtrl((Enum) FriendArenaRankingMyPage.Groups[index]);
+        bool is_visible = QuestUtility.IsDefaultArenaTime(this.record.clearMilliSecList[index]);
+        string stringByMilliSec = QuestUtility.CreateTimeStringByMilliSec(this.record.clearMilliSecList[index]);
+        this.SetActive(ctrl, (Enum) FriendArenaRankingMyPage.UI.LBL_GROUP_TIME, !is_visible);
+        this.SetActive(ctrl, (Enum) FriendArenaRankingMyPage.UI.LBL_TIME_DEFAULT, is_visible);
+        if (is_visible)
+          this.SetLabelText(ctrl, (Enum) FriendArenaRankingMyPage.UI.LBL_TIME_DEFAULT, stringByMilliSec);
+        else
+          this.SetLabelText(ctrl, (Enum) FriendArenaRankingMyPage.UI.LBL_GROUP_TIME, stringByMilliSec);
+      }
+      this.SetLabelText(this.GetCtrl((Enum) FriendArenaRankingMyPage.UI.OBJ_TOTAL), (Enum) FriendArenaRankingMyPage.UI.LBL_GROUP_TIME, QuestUtility.CreateTimeStringByMilliSec(this.record.totalMilliSec));
+    }
+  }
 
-	private int userRank = -1;
+  private void UpdateRank()
+  {
+    int userRank = this.record.userRank;
+    string str = userRank.ToString();
+    for (int index = 0; index < this.RankingNumUIs.Length; ++index)
+      this.SetActive((Enum) this.RankingNumUIs[index], false);
+    if (userRank <= 0)
+    {
+      this.SetActive((Enum) FriendArenaRankingMyPage.UI.SPR_RANK, false);
+      this.SetActive((Enum) FriendArenaRankingMyPage.UI.SPR_OUT_OF_RANK, true);
+    }
+    else
+    {
+      this.SetActive((Enum) FriendArenaRankingMyPage.UI.SPR_RANK, true);
+      this.SetActive((Enum) FriendArenaRankingMyPage.UI.SPR_OUT_OF_RANK, false);
+      int num = (this.RankingNumUIs.Length - str.Length) / 2;
+      for (int index1 = 0; index1 < str.Length; ++index1)
+      {
+        int index2 = int.Parse(str[index1].ToString());
+        if (index1 >= this.RankingNumUIs.Length)
+          break;
+        int index3 = index1 + num;
+        this.SetSprite(this.GetCtrl((Enum) this.RankingNumUIs[index3]), this.RankingNumbers[index2]);
+        this.SetActive((Enum) this.RankingNumUIs[index3], true);
+      }
+    }
+  }
 
-	private readonly string[] RankingNumbers = new string[10]
-	{
-		"RankingNumber_0",
-		"RankingNumber_1",
-		"RankingNumber_2",
-		"RankingNumber_3",
-		"RankingNumber_4",
-		"RankingNumber_5",
-		"RankingNumber_6",
-		"RankingNumber_7",
-		"RankingNumber_8",
-		"RankingNumber_9"
-	};
+  private void OnQuery_FOLLOWER()
+  {
+    GameSection.SetEventData((object) new object[2]
+    {
+      (object) this.eventData,
+      (object) this.userRank
+    });
+  }
 
-	private readonly UI[] RankingNumUIs = new UI[7]
-	{
-		UI.SPR_RANK_NUM_0,
-		UI.SPR_RANK_NUM_1,
-		UI.SPR_RANK_NUM_2,
-		UI.SPR_RANK_NUM_3,
-		UI.SPR_RANK_NUM_4,
-		UI.SPR_RANK_NUM_5,
-		UI.SPR_RANK_NUM_6
-	};
+  private void OnQuery_WORLD()
+  {
+    GameSection.SetEventData((object) new object[2]
+    {
+      (object) this.eventData,
+      (object) this.userRank
+    });
+  }
 
-	public override void Initialize()
-	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		eventData = (GameSection.GetEventData() as Network.EventData);
-		IsFinishRecieveDelivery = true;
-		if (eventData == null)
-		{
-			isExistArena = false;
-			base.Initialize();
-		}
-		else if (IsRankingJoin())
-		{
-			this.StartCoroutine(SendGetMyRcord());
-		}
-		else
-		{
-			base.Initialize();
-		}
-	}
+  private void OnQuery_LAST()
+  {
+    GameSection.SetEventData((object) new object[2]
+    {
+      (object) this.eventData,
+      (object) this.userRank
+    });
+  }
 
-	private IEnumerator SendGetMyRcord()
-	{
-		while (!IsFinishRecieveDelivery)
-		{
-			yield return (object)null;
-		}
-		bool isFinishGetRecord = false;
-		MonoBehaviourSingleton<QuestManager>.I.SendGetArenaUserRecord(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, eventData.eventId, delegate(bool b, ArenaUserRecordModel.Param result)
-		{
-			((_003CSendGetMyRcord_003Ec__Iterator3C)/*Error near IL_0078: stateMachine*/)._003CisFinishGetRecord_003E__0 = true;
-			((_003CSendGetMyRcord_003Ec__Iterator3C)/*Error near IL_0078: stateMachine*/)._003C_003Ef__this.record = result;
-			((_003CSendGetMyRcord_003Ec__Iterator3C)/*Error near IL_0078: stateMachine*/)._003C_003Ef__this.userRank = ((_003CSendGetMyRcord_003Ec__Iterator3C)/*Error near IL_0078: stateMachine*/)._003C_003Ef__this.record.userRank;
-		});
-		while (!isFinishGetRecord)
-		{
-			yield return (object)null;
-		}
-		base.Initialize();
-	}
+  private void OnQuery_LEGEND()
+  {
+    GameSection.SetEventData((object) new object[2]
+    {
+      (object) this.eventData,
+      (object) this.userRank
+    });
+  }
 
-	public override void UpdateUI()
-	{
-		UpdateTitle();
-		UpdateRecord();
-		base.UpdateUI();
-	}
+  private bool IsRankingJoin() => MonoBehaviourSingleton<UserInfoManager>.I.isJoinedArenaRanking;
 
-	private void UpdateTitle()
-	{
-		if (!isExistArena)
-		{
-			SetLabelText((Enum)UI.LBL_ARENA_NAME, string.Empty);
-			SetLabelText((Enum)UI.LBL_END_DATE, string.Empty);
-		}
-		else
-		{
-			SetLabelText((Enum)UI.LBL_ARENA_NAME, eventData.name);
-			string endDateString = QuestUtility.GetEndDateString(eventData);
-			SetLabelText((Enum)UI.LBL_END_DATE, endDateString);
-		}
-	}
-
-	private void UpdateRecord()
-	{
-		SetActive((Enum)UI.OBJ_NO_SCORE, !IsRankingJoin());
-		SetActive((Enum)UI.OBJ_SCORE, IsRankingJoin());
-		SetActive((Enum)UI.OBJ_MY_RANK, IsRankingJoin());
-		SetActive((Enum)UI.OBJ_NOT_EXIST, false);
-		if (!isExistArena)
-		{
-			SetActive((Enum)UI.OBJ_NO_SCORE, false);
-			SetActive((Enum)UI.OBJ_SCORE, false);
-			SetActive((Enum)UI.OBJ_MY_RANK, false);
-			SetActive((Enum)UI.OBJ_NOT_EXIST, true);
-		}
-		else if (!IsRankingJoin())
-		{
-			SetLabelText((Enum)UI.LBL_NO_TOTAL, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 29u), ARENA_RANK.S.ToString()));
-		}
-		else
-		{
-			UpdateRank();
-			int i = 0;
-			for (int count = record.clearMilliSecList.Count; i < count; i++)
-			{
-				Transform ctrl = GetCtrl(Groups[i]);
-				bool flag = QuestUtility.IsDefaultArenaTime(record.clearMilliSecList[i]);
-				string text = QuestUtility.CreateTimeStringByMilliSec(record.clearMilliSecList[i]);
-				SetActive(ctrl, UI.LBL_GROUP_TIME, !flag);
-				SetActive(ctrl, UI.LBL_TIME_DEFAULT, flag);
-				if (flag)
-				{
-					SetLabelText(ctrl, UI.LBL_TIME_DEFAULT, text);
-				}
-				else
-				{
-					SetLabelText(ctrl, UI.LBL_GROUP_TIME, text);
-				}
-			}
-			Transform ctrl2 = GetCtrl(UI.OBJ_TOTAL);
-			string text2 = QuestUtility.CreateTimeStringByMilliSec(record.totalMilliSec);
-			SetLabelText(ctrl2, UI.LBL_GROUP_TIME, text2);
-		}
-	}
-
-	private void UpdateRank()
-	{
-		int num = record.userRank;
-		string text = num.ToString();
-		for (int i = 0; i < RankingNumUIs.Length; i++)
-		{
-			SetActive((Enum)RankingNumUIs[i], false);
-		}
-		if (num <= 0)
-		{
-			SetActive((Enum)UI.SPR_RANK, false);
-			SetActive((Enum)UI.SPR_OUT_OF_RANK, true);
-		}
-		else
-		{
-			SetActive((Enum)UI.SPR_RANK, true);
-			SetActive((Enum)UI.SPR_OUT_OF_RANK, false);
-			int num2 = (RankingNumUIs.Length - text.Length) / 2;
-			for (int j = 0; j < text.Length; j++)
-			{
-				int num3 = int.Parse(text[j].ToString());
-				if (j >= RankingNumUIs.Length)
-				{
-					break;
-				}
-				int num4 = j + num2;
-				SetSprite(GetCtrl(RankingNumUIs[num4]), RankingNumbers[num3]);
-				SetActive((Enum)RankingNumUIs[num4], true);
-			}
-		}
-	}
-
-	private void OnQuery_FOLLOWER()
-	{
-		GameSection.SetEventData(new object[2]
-		{
-			eventData,
-			userRank
-		});
-	}
-
-	private void OnQuery_WORLD()
-	{
-		GameSection.SetEventData(new object[2]
-		{
-			eventData,
-			userRank
-		});
-	}
-
-	private void OnQuery_LAST()
-	{
-		GameSection.SetEventData(new object[2]
-		{
-			eventData,
-			userRank
-		});
-	}
-
-	private void OnQuery_LEGEND()
-	{
-		GameSection.SetEventData(new object[2]
-		{
-			eventData,
-			userRank
-		});
-	}
-
-	private bool IsRankingJoin()
-	{
-		return MonoBehaviourSingleton<UserInfoManager>.I.isJoinedArenaRanking;
-	}
+  private enum UI
+  {
+    LBL_ARENA_NAME,
+    LBL_END_DATE,
+    OBJ_GROUP_A,
+    OBJ_GROUP_B,
+    OBJ_GROUP_C,
+    OBJ_GROUP_D,
+    OBJ_GROUP_E,
+    OBJ_TOTAL,
+    OBJ_SCORE,
+    OBJ_NO_SCORE,
+    OBJ_MY_RANK,
+    LBL_GROUP_TIME,
+    LBL_TIME_DEFAULT,
+    LBL_MY_RANK,
+    OBJ_NOT_EXIST,
+    SPR_RANK_NUM_0,
+    SPR_RANK_NUM_1,
+    SPR_RANK_NUM_2,
+    SPR_RANK_NUM_3,
+    SPR_RANK_NUM_4,
+    SPR_RANK_NUM_5,
+    SPR_RANK_NUM_6,
+    SPR_RANK,
+    SPR_OUT_OF_RANK,
+    LBL_NO_TOTAL,
+  }
 }

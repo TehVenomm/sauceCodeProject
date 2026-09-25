@@ -1,21 +1,18 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Coop_Model_PlayerShotSoulArrow
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class Coop_Model_PlayerShotSoulArrow : Coop_Model_ObjectSyncPositionBase
 {
-	public Vector3 shotPos = Vector3.get_zero();
+  public Vector3 shotPos = Vector3.zero;
+  public Quaternion bowRot;
+  public List<Vector3> targetPosList = new List<Vector3>();
 
-	public Quaternion bowRot = default(Quaternion);
-
-	public List<Vector3> targetPosList = new List<Vector3>();
-
-	public Coop_Model_PlayerShotSoulArrow()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		base.packetType = PACKET_TYPE.PLAYER_SHOT_SOUL_ARROW;
-	}
+  public Coop_Model_PlayerShotSoulArrow() => this.packetType = PACKET_TYPE.PLAYER_SHOT_SOUL_ARROW;
 }

@@ -1,152 +1,102 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: RailCamera
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class RailCamera
+#nullable disable
+public class RailCamera : MonoBehaviour
 {
-	public float moveCoef = -0.3f;
+  public float moveCoef = -0.3f;
+  public float easeCoef = 0.9f;
+  private float moveRate;
 
-	public float easeCoef = 0.9f;
+  public bool enableInput { get; set; }
 
-	private float moveRate;
+  public Camera targetCamera { get; private set; }
 
-	public bool enableInput
-	{
-		get;
-		set;
-	}
+  public Transform targetCameraTransform { get; private set; }
 
-	public Camera targetCamera
-	{
-		get;
-		private set;
-	}
+  public RailAnimation railAnim { get; private set; }
 
-	public Transform targetCameraTransform
-	{
-		get;
-		private set;
-	}
+  private void Awake()
+  {
+    this.targetCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
+    this.targetCameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
+    this.railAnim = ((Component) this.targetCameraTransform).gameObject.AddComponent<RailAnimation>();
+    this.enableInput = true;
+  }
 
-	public RailAnimation railAnim
-	{
-		get;
-		private set;
-	}
+  private void FixedUpdate()
+  {
+    if ((double) this.moveRate == 0.0)
+      return;
+    this.moveRate *= this.easeCoef;
+    this.railAnim.rate += this.moveRate;
+  }
 
-	public RailCamera()
-		: this()
-	{
-	}
+  private void OnEnable()
+  {
+    InputManager.OnTouchOn += new InputManager.OnTouchDelegate(this.OnTouchOn);
+    InputManager.OnTouchOff += new InputManager.OnTouchDelegate(this.OnTouchOff);
+    InputManager.OnDrag += new InputManager.OnTouchDelegate(this.OnDrag);
+    this.railAnim.enabledRail = true;
+  }
 
-	private void Awake()
-	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		targetCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
-		targetCameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
-		railAnim = targetCameraTransform.get_gameObject().AddComponent<RailAnimation>();
-		enableInput = true;
-	}
+  private void OnDisable()
+  {
+    InputManager.OnTouchOn -= new InputManager.OnTouchDelegate(this.OnTouchOn);
+    InputManager.OnTouchOff -= new InputManager.OnTouchDelegate(this.OnTouchOff);
+    InputManager.OnDrag -= new InputManager.OnTouchDelegate(this.OnDrag);
+    this.railAnim.enabledRail = false;
+    this.Stop();
+  }
 
-	private void FixedUpdate()
-	{
-		if (moveRate != 0f)
-		{
-			moveRate *= easeCoef;
-			railAnim.rate += moveRate;
-		}
-	}
+  private void OnDestroy()
+  {
+    if (AppMain.isApplicationQuit)
+      return;
+    Object.DestroyImmediate((Object) this.railAnim);
+  }
 
-	private void OnEnable()
-	{
-		InputManager.OnTouchOn = (InputManager.OnTouchDelegate)Delegate.Combine(InputManager.OnTouchOn, new InputManager.OnTouchDelegate(OnTouchOn));
-		InputManager.OnTouchOff = (InputManager.OnTouchDelegate)Delegate.Combine(InputManager.OnTouchOff, new InputManager.OnTouchDelegate(OnTouchOff));
-		InputManager.OnDrag = (InputManager.OnTouchDelegate)Delegate.Combine(InputManager.OnDrag, new InputManager.OnTouchDelegate(OnDrag));
-		railAnim.enabledRail = true;
-	}
+  private void OnTouchOn(InputManager.TouchInfo info)
+  {
+    if (!this.enableInput)
+      return;
+    this.Stop();
+  }
 
-	private void OnDisable()
-	{
-		InputManager.OnTouchOn = (InputManager.OnTouchDelegate)Delegate.Remove(InputManager.OnTouchOn, new InputManager.OnTouchDelegate(OnTouchOn));
-		InputManager.OnTouchOff = (InputManager.OnTouchDelegate)Delegate.Remove(InputManager.OnTouchOff, new InputManager.OnTouchDelegate(OnTouchOff));
-		InputManager.OnDrag = (InputManager.OnTouchDelegate)Delegate.Remove(InputManager.OnDrag, new InputManager.OnTouchDelegate(OnDrag));
-		railAnim.enabledRail = false;
-		Stop();
-	}
+  private void OnTouchOff(InputManager.TouchInfo info)
+  {
+    if (!this.enableInput)
+      return;
+    this.moveRate = this.GetMove(info);
+  }
 
-	private void OnDestroy()
-	{
-		if (!AppMain.isApplicationQuit)
-		{
-			Object.DestroyImmediate(railAnim);
-		}
-	}
+  private void OnDrag(InputManager.TouchInfo info)
+  {
+    if (!this.enableInput)
+      return;
+    this.railAnim.rate += this.GetMove(info);
+  }
 
-	private void OnTouchOn(InputManager.TouchInfo info)
-	{
-		if (enableInput)
-		{
-			Stop();
-		}
-	}
+  protected virtual float GetMove(InputManager.TouchInfo info)
+  {
+    Vector2 vector2 = Vector2.op_Subtraction(info.position, info.move);
+    Vector2 position = info.position;
+    vector2.y = 0.0f;
+    position.y = 0.0f;
+    float y = this.targetCameraTransform.position.y;
+    Vector3 worldPoint = this.targetCamera.ScreenToWorldPoint(vector2.ToVector3XY(y));
+    Vector3 vector3 = Vector3.op_Subtraction(this.targetCamera.ScreenToWorldPoint(position.ToVector3XY(y)), worldPoint);
+    vector3.y = 0.0f;
+    float num = ((Vector3) ref vector3).magnitude;
+    if ((double) info.move.x < 0.0)
+      num = -num;
+    return num * this.moveCoef;
+  }
 
-	private void OnTouchOff(InputManager.TouchInfo info)
-	{
-		if (enableInput)
-		{
-			moveRate = GetMove(info);
-		}
-	}
-
-	private void OnDrag(InputManager.TouchInfo info)
-	{
-		if (enableInput)
-		{
-			railAnim.rate += GetMove(info);
-		}
-	}
-
-	protected virtual float GetMove(InputManager.TouchInfo info)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		Vector2 vector = info.position - info.move;
-		Vector2 position = info.position;
-		vector.y = 0f;
-		position.y = 0f;
-		Vector3 position2 = targetCameraTransform.get_position();
-		float y = position2.y;
-		Vector3 val = targetCamera.ScreenToWorldPoint(vector.ToVector3XY(y));
-		Vector3 val2 = targetCamera.ScreenToWorldPoint(position.ToVector3XY(y));
-		Vector3 val3 = val2 - val;
-		val3.y = 0f;
-		float num = val3.get_magnitude();
-		if (info.move.x < 0f)
-		{
-			num = 0f - num;
-		}
-		return num * moveCoef;
-	}
-
-	public void Stop()
-	{
-		moveRate = 0f;
-	}
+  public void Stop() => this.moveRate = 0.0f;
 }

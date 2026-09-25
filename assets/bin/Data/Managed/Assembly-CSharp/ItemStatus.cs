@@ -1,101 +1,76 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ItemStatus
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class ItemStatus
 {
-	public int atk;
+  public int atk;
+  public int def;
+  public int hp;
+  public int[] elemAtk;
+  public int[] elemDef;
 
-	public int def;
+  public ItemStatus() => this.Init();
 
-	public int hp;
+  protected virtual void Init()
+  {
+    this.atk = 0;
+    this.def = 0;
+    this.hp = 0;
+    this.elemAtk = new int[6];
+    this.elemDef = new int[6];
+  }
 
-	public int[] elemAtk;
+  public void Add(ItemStatus param)
+  {
+    if (param == null)
+      return;
+    this.atk += param.atk;
+    this.def += param.def;
+    this.hp += param.hp;
+    int index1 = 0;
+    for (int index2 = 6; index1 < index2; ++index1)
+    {
+      this.elemAtk[index1] += param.elemAtk[index1];
+      this.elemDef[index1] += param.elemDef[index1];
+    }
+  }
 
-	public int[] elemDef;
+  public int GetElemAtk(EquipItemInfo item)
+  {
+    if (item == null)
+      return 0;
+    int elemAtkType = item.GetElemAtkType();
+    return elemAtkType == -1 ? 0 : this._GetElem(elemAtkType, this.elemAtk);
+  }
 
-	public ItemStatus()
-	{
-		Init();
-	}
+  public int GetElemAtk(int elem) => this._GetElem(elem, this.elemAtk);
 
-	protected virtual void Init()
-	{
-		atk = 0;
-		def = 0;
-		hp = 0;
-		elemAtk = new int[6];
-		elemDef = new int[6];
-	}
+  public int GetElemDef(EquipItemInfo item)
+  {
+    if (item == null)
+      return 0;
+    int elemDefType = item.GetElemDefType();
+    return elemDefType == -1 ? 0 : this._GetElem(elemDefType, this.elemDef);
+  }
 
-	public void Add(ItemStatus param)
-	{
-		if (param != null)
-		{
-			atk += param.atk;
-			def += param.def;
-			hp += param.hp;
-			int i = 0;
-			for (int num = 6; i < num; i++)
-			{
-				elemAtk[i] += param.elemAtk[i];
-				elemDef[i] += param.elemDef[i];
-			}
-		}
-	}
+  public int GetElemDef(int elem) => this._GetElem(elem, this.elemDef);
 
-	public int GetElemAtk(EquipItemInfo item)
-	{
-		if (item == null)
-		{
-			return 0;
-		}
-		int elemAtkType = item.GetElemAtkType();
-		if (elemAtkType == -1)
-		{
-			return 0;
-		}
-		return _GetElem(elemAtkType, elemAtk);
-	}
-
-	public int GetElemAtk(int elem)
-	{
-		return _GetElem(elem, elemAtk);
-	}
-
-	public int GetElemDef(EquipItemInfo item)
-	{
-		if (item == null)
-		{
-			return 0;
-		}
-		int elemDefType = item.GetElemDefType();
-		if (elemDefType == -1)
-		{
-			return 0;
-		}
-		return _GetElem(elemDefType, elemDef);
-	}
-
-	public int GetElemDef(int elem)
-	{
-		return _GetElem(elem, elemDef);
-	}
-
-	private int _GetElem(int elem, int[] target_elem)
-	{
-		if (elem == 6)
-		{
-			return 0;
-		}
-		int num = 0;
-		if (elem == -1)
-		{
-			for (int i = 0; i < 6; i++)
-			{
-				num += target_elem[i];
-			}
-		}
-		else
-		{
-			num = target_elem[elem];
-		}
-		return num;
-	}
+  private int _GetElem(int elem, int[] target_elem)
+  {
+    if (elem == 6)
+      return 0;
+    int elem1 = 0;
+    if (elem == -1)
+    {
+      for (int index = 0; index < 6; ++index)
+        elem1 += target_elem[index];
+    }
+    else
+      elem1 = target_elem[elem];
+    return elem1;
+  }
 }

@@ -1,363 +1,267 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIGrid
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Interaction/Grid")]
 public class UIGrid : UIWidgetContainer
 {
-	public enum Arrangement
-	{
-		Horizontal,
-		Vertical,
-		CellSnap
-	}
+  public UIGrid.Arrangement arrangement;
+  public UIGrid.Sorting sorting;
+  public UIWidget.Pivot pivot;
+  public int maxPerLine;
+  public float cellWidth = 200f;
+  public float cellHeight = 200f;
+  public bool animateSmoothly;
+  public bool hideInactive;
+  public bool keepWithinPanel;
+  public UIGrid.OnReposition onReposition;
+  public Comparison<Transform> onCustomSort;
+  [HideInInspector]
+  [SerializeField]
+  private bool sorted;
+  protected bool mReposition;
+  protected UIPanel mPanel;
+  protected bool mInitDone;
 
-	public enum Sorting
-	{
-		None,
-		Alphabetic,
-		Horizontal,
-		Vertical,
-		Custom
-	}
+  public bool repositionNow
+  {
+    set
+    {
+      if (!value)
+        return;
+      this.mReposition = true;
+      ((Behaviour) this).enabled = true;
+    }
+  }
 
-	public delegate void OnReposition();
+  public List<Transform> GetChildList()
+  {
+    Transform transform = ((Component) this).transform;
+    List<Transform> list = new List<Transform>();
+    for (int index = 0; index < transform.childCount; ++index)
+    {
+      Transform child = transform.GetChild(index);
+      if (!this.hideInactive || Object.op_Implicit((Object) child) && NGUITools.GetActive(((Component) child).gameObject))
+        list.Add(child);
+    }
+    if (this.sorting != UIGrid.Sorting.None && this.arrangement != UIGrid.Arrangement.CellSnap)
+    {
+      if (this.sorting == UIGrid.Sorting.Alphabetic)
+        list.Sort(new Comparison<Transform>(UIGrid.SortByName));
+      else if (this.sorting == UIGrid.Sorting.Horizontal)
+        list.Sort(new Comparison<Transform>(UIGrid.SortHorizontal));
+      else if (this.sorting == UIGrid.Sorting.Vertical)
+        list.Sort(new Comparison<Transform>(UIGrid.SortVertical));
+      else if (this.onCustomSort != null)
+        list.Sort(this.onCustomSort);
+      else
+        this.Sort(list);
+    }
+    return list;
+  }
 
-	public Arrangement arrangement;
+  public Transform GetChild(int index)
+  {
+    List<Transform> childList = this.GetChildList();
+    return index >= childList.Count ? (Transform) null : childList[index];
+  }
 
-	public Sorting sorting;
+  public int GetIndex(Transform trans) => this.GetChildList().IndexOf(trans);
 
-	public UIWidget.Pivot pivot;
+  public void AddChild(Transform trans) => this.AddChild(trans, true);
 
-	public int maxPerLine;
+  public void AddChild(Transform trans, bool sort)
+  {
+    if (!Object.op_Inequality((Object) trans, (Object) null))
+      return;
+    trans.parent = ((Component) this).transform;
+    this.ResetPosition(this.GetChildList());
+  }
 
-	public float cellWidth = 200f;
+  public bool RemoveChild(Transform t)
+  {
+    List<Transform> childList = this.GetChildList();
+    if (!childList.Remove(t))
+      return false;
+    this.ResetPosition(childList);
+    return true;
+  }
 
-	public float cellHeight = 200f;
+  protected virtual void Init()
+  {
+    this.mInitDone = true;
+    this.mPanel = NGUITools.FindInParents<UIPanel>(((Component) this).gameObject);
+  }
 
-	public bool animateSmoothly;
+  protected virtual void Start()
+  {
+    if (!this.mInitDone)
+      this.Init();
+    bool animateSmoothly = this.animateSmoothly;
+    this.animateSmoothly = false;
+    this.Reposition();
+    this.animateSmoothly = animateSmoothly;
+    ((Behaviour) this).enabled = false;
+  }
 
-	public bool hideInactive;
+  protected virtual void Update()
+  {
+    this.Reposition();
+    ((Behaviour) this).enabled = false;
+  }
 
-	public bool keepWithinPanel;
+  private void OnValidate()
+  {
+    if (Application.isPlaying || !NGUITools.GetActive((Behaviour) this))
+      return;
+    this.Reposition();
+  }
 
-	public OnReposition onReposition;
+  public static int SortByName(Transform a, Transform b)
+  {
+    return string.Compare(((Object) a).name, ((Object) b).name);
+  }
 
-	public Comparison<Transform> onCustomSort;
+  public static int SortHorizontal(Transform a, Transform b)
+  {
+    return a.localPosition.x.CompareTo(b.localPosition.x);
+  }
 
-	[SerializeField]
-	[HideInInspector]
-	private bool sorted;
+  public static int SortVertical(Transform a, Transform b)
+  {
+    return b.localPosition.y.CompareTo(a.localPosition.y);
+  }
 
-	protected bool mReposition;
+  protected virtual void Sort(List<Transform> list)
+  {
+  }
 
-	protected UIPanel mPanel;
+  [ContextMenu("Execute")]
+  public virtual void Reposition()
+  {
+    if (Application.isPlaying && !this.mInitDone && NGUITools.GetActive(((Component) this).gameObject))
+      this.Init();
+    if (this.sorted)
+    {
+      this.sorted = false;
+      if (this.sorting == UIGrid.Sorting.None)
+        this.sorting = UIGrid.Sorting.Alphabetic;
+      NGUITools.SetDirty((Object) this);
+    }
+    this.ResetPosition(this.GetChildList());
+    if (this.keepWithinPanel)
+      this.ConstrainWithinPanel();
+    if (this.onReposition == null)
+      return;
+    this.onReposition();
+  }
 
-	protected bool mInitDone;
+  public void ConstrainWithinPanel()
+  {
+    if (!Object.op_Inequality((Object) this.mPanel, (Object) null))
+      return;
+    this.mPanel.ConstrainTargetToBounds(((Component) this).transform, true);
+    UIScrollView component = ((Component) this.mPanel).GetComponent<UIScrollView>();
+    if (!Object.op_Inequality((Object) component, (Object) null))
+      return;
+    component.UpdateScrollbars(true);
+  }
 
-	public bool repositionNow
-	{
-		set
-		{
-			if (value)
-			{
-				mReposition = true;
-				this.set_enabled(true);
-			}
-		}
-	}
+  protected virtual void ResetPosition(List<Transform> list)
+  {
+    this.mReposition = false;
+    int num1 = 0;
+    int num2 = 0;
+    int num3 = 0;
+    int num4 = 0;
+    Transform transform1 = ((Component) this).transform;
+    int index1 = 0;
+    for (int count = list.Count; index1 < count; ++index1)
+    {
+      Transform transform2 = list[index1];
+      Vector3 pos = transform2.localPosition;
+      float z = pos.z;
+      if (this.arrangement == UIGrid.Arrangement.CellSnap)
+      {
+        if ((double) this.cellWidth > 0.0)
+          pos.x = Mathf.Round(pos.x / this.cellWidth) * this.cellWidth;
+        if ((double) this.cellHeight > 0.0)
+          pos.y = Mathf.Round(pos.y / this.cellHeight) * this.cellHeight;
+      }
+      else
+        pos = this.arrangement == UIGrid.Arrangement.Horizontal ? new Vector3(this.cellWidth * (float) num1, -this.cellHeight * (float) num2, z) : new Vector3(this.cellWidth * (float) num2, -this.cellHeight * (float) num1, z);
+      if (this.animateSmoothly && Application.isPlaying)
+      {
+        SpringPosition springPosition = SpringPosition.Begin(((Component) transform2).gameObject, pos, 15f);
+        springPosition.updateScrollView = true;
+        springPosition.ignoreTimeScale = true;
+      }
+      else
+        transform2.localPosition = pos;
+      num3 = Mathf.Max(num3, num1);
+      num4 = Mathf.Max(num4, num2);
+      if (++num1 >= this.maxPerLine && this.maxPerLine > 0)
+      {
+        num1 = 0;
+        ++num2;
+      }
+    }
+    if (this.pivot == UIWidget.Pivot.TopLeft)
+      return;
+    Vector2 pivotOffset = NGUIMath.GetPivotOffset(this.pivot);
+    float num5;
+    float num6;
+    if (this.arrangement == UIGrid.Arrangement.Horizontal)
+    {
+      num5 = Mathf.Lerp(0.0f, (float) num3 * this.cellWidth, pivotOffset.x);
+      num6 = Mathf.Lerp((float) -num4 * this.cellHeight, 0.0f, pivotOffset.y);
+    }
+    else
+    {
+      num5 = Mathf.Lerp(0.0f, (float) num4 * this.cellWidth, pivotOffset.x);
+      num6 = Mathf.Lerp((float) -num3 * this.cellHeight, 0.0f, pivotOffset.y);
+    }
+    for (int index2 = 0; index2 < transform1.childCount; ++index2)
+    {
+      Transform child = transform1.GetChild(index2);
+      SpringPosition component = ((Component) child).GetComponent<SpringPosition>();
+      if (Object.op_Inequality((Object) component, (Object) null))
+      {
+        component.target.x -= num5;
+        component.target.y -= num6;
+      }
+      else
+      {
+        Vector3 localPosition = child.localPosition;
+        localPosition.x -= num5;
+        localPosition.y -= num6;
+        child.localPosition = localPosition;
+      }
+    }
+  }
 
-	public List<Transform> GetChildList()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Expected O, but got Unknown
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Expected O, but got Unknown
-		Transform val = this.get_transform();
-		List<Transform> list = new List<Transform>();
-		for (int i = 0; i < val.get_childCount(); i++)
-		{
-			Transform val2 = val.GetChild(i);
-			if (!hideInactive || (Object.op_Implicit(val2) && NGUITools.GetActive(val2.get_gameObject())))
-			{
-				list.Add(val2);
-			}
-		}
-		if (sorting != 0 && arrangement != Arrangement.CellSnap)
-		{
-			if (sorting == Sorting.Alphabetic)
-			{
-				list.Sort(SortByName);
-			}
-			else if (sorting == Sorting.Horizontal)
-			{
-				list.Sort(SortHorizontal);
-			}
-			else if (sorting == Sorting.Vertical)
-			{
-				list.Sort(SortVertical);
-			}
-			else if (onCustomSort != null)
-			{
-				list.Sort(onCustomSort);
-			}
-			else
-			{
-				Sort(list);
-			}
-		}
-		return list;
-	}
+  public delegate void OnReposition();
 
-	public Transform GetChild(int index)
-	{
-		List<Transform> childList = GetChildList();
-		return (index >= childList.Count) ? null : childList[index];
-	}
+  public enum Arrangement
+  {
+    Horizontal,
+    Vertical,
+    CellSnap,
+  }
 
-	public int GetIndex(Transform trans)
-	{
-		return GetChildList().IndexOf(trans);
-	}
-
-	public void AddChild(Transform trans)
-	{
-		AddChild(trans, true);
-	}
-
-	public void AddChild(Transform trans, bool sort)
-	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		if (trans != null)
-		{
-			trans.set_parent(this.get_transform());
-			ResetPosition(GetChildList());
-		}
-	}
-
-	public bool RemoveChild(Transform t)
-	{
-		List<Transform> childList = GetChildList();
-		if (childList.Remove(t))
-		{
-			ResetPosition(childList);
-			return true;
-		}
-		return false;
-	}
-
-	protected virtual void Init()
-	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Expected O, but got Unknown
-		mInitDone = true;
-		mPanel = NGUITools.FindInParents<UIPanel>(this.get_gameObject());
-	}
-
-	protected virtual void Start()
-	{
-		if (!mInitDone)
-		{
-			Init();
-		}
-		bool flag = animateSmoothly;
-		animateSmoothly = false;
-		Reposition();
-		animateSmoothly = flag;
-		this.set_enabled(false);
-	}
-
-	protected virtual void Update()
-	{
-		Reposition();
-		this.set_enabled(false);
-	}
-
-	private void OnValidate()
-	{
-		if (!Application.get_isPlaying() && NGUITools.GetActive(this))
-		{
-			Reposition();
-		}
-	}
-
-	public static int SortByName(Transform a, Transform b)
-	{
-		return string.Compare(a.get_name(), b.get_name());
-	}
-
-	public static int SortHorizontal(Transform a, Transform b)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 localPosition = a.get_localPosition();
-		ref float x = ref localPosition.x;
-		Vector3 localPosition2 = b.get_localPosition();
-		return x.CompareTo(localPosition2.x);
-	}
-
-	public static int SortVertical(Transform a, Transform b)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 localPosition = b.get_localPosition();
-		ref float y = ref localPosition.y;
-		Vector3 localPosition2 = a.get_localPosition();
-		return y.CompareTo(localPosition2.y);
-	}
-
-	protected virtual void Sort(List<Transform> list)
-	{
-	}
-
-	[ContextMenu("Execute")]
-	public virtual void Reposition()
-	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Expected O, but got Unknown
-		if (Application.get_isPlaying() && !mInitDone && NGUITools.GetActive(this.get_gameObject()))
-		{
-			Init();
-		}
-		if (sorted)
-		{
-			sorted = false;
-			if (sorting == Sorting.None)
-			{
-				sorting = Sorting.Alphabetic;
-			}
-			NGUITools.SetDirty(this);
-		}
-		List<Transform> childList = GetChildList();
-		ResetPosition(childList);
-		if (keepWithinPanel)
-		{
-			ConstrainWithinPanel();
-		}
-		if (onReposition != null)
-		{
-			onReposition();
-		}
-	}
-
-	public void ConstrainWithinPanel()
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
-		if (mPanel != null)
-		{
-			mPanel.ConstrainTargetToBounds(this.get_transform(), true);
-			UIScrollView component = mPanel.GetComponent<UIScrollView>();
-			if (component != null)
-			{
-				component.UpdateScrollbars(true);
-			}
-		}
-	}
-
-	protected virtual void ResetPosition(List<Transform> list)
-	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Expected O, but got Unknown
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011f: Expected O, but got Unknown
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0230: Expected O, but got Unknown
-		//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
-		mReposition = false;
-		int num = 0;
-		int num2 = 0;
-		int num3 = 0;
-		int num4 = 0;
-		Transform val = this.get_transform();
-		int i = 0;
-		for (int count = list.Count; i < count; i++)
-		{
-			Transform val2 = list[i];
-			Vector3 val3 = val2.get_localPosition();
-			float z = val3.z;
-			if (arrangement == Arrangement.CellSnap)
-			{
-				if (cellWidth > 0f)
-				{
-					val3.x = Mathf.Round(val3.x / cellWidth) * cellWidth;
-				}
-				if (cellHeight > 0f)
-				{
-					val3.y = Mathf.Round(val3.y / cellHeight) * cellHeight;
-				}
-			}
-			else
-			{
-				val3 = ((arrangement != 0) ? new Vector3(cellWidth * (float)num2, (0f - cellHeight) * (float)num, z) : new Vector3(cellWidth * (float)num, (0f - cellHeight) * (float)num2, z));
-			}
-			if (animateSmoothly && Application.get_isPlaying())
-			{
-				SpringPosition springPosition = SpringPosition.Begin(val2.get_gameObject(), val3, 15f);
-				springPosition.updateScrollView = true;
-				springPosition.ignoreTimeScale = true;
-			}
-			else
-			{
-				val2.set_localPosition(val3);
-			}
-			num3 = Mathf.Max(num3, num);
-			num4 = Mathf.Max(num4, num2);
-			if (++num >= maxPerLine && maxPerLine > 0)
-			{
-				num = 0;
-				num2++;
-			}
-		}
-		if (pivot != 0)
-		{
-			Vector2 pivotOffset = NGUIMath.GetPivotOffset(pivot);
-			float num5;
-			float num6;
-			if (arrangement == Arrangement.Horizontal)
-			{
-				num5 = Mathf.Lerp(0f, (float)num3 * cellWidth, pivotOffset.x);
-				num6 = Mathf.Lerp((float)(-num4) * cellHeight, 0f, pivotOffset.y);
-			}
-			else
-			{
-				num5 = Mathf.Lerp(0f, (float)num4 * cellWidth, pivotOffset.x);
-				num6 = Mathf.Lerp((float)(-num3) * cellHeight, 0f, pivotOffset.y);
-			}
-			for (int j = 0; j < val.get_childCount(); j++)
-			{
-				Transform val4 = val.GetChild(j);
-				SpringPosition component = val4.GetComponent<SpringPosition>();
-				if (component != null)
-				{
-					component.target.x -= num5;
-					component.target.y -= num6;
-				}
-				else
-				{
-					Vector3 localPosition = val4.get_localPosition();
-					localPosition.x -= num5;
-					localPosition.y -= num6;
-					val4.set_localPosition(localPosition);
-				}
-			}
-		}
-	}
+  public enum Sorting
+  {
+    None,
+    Alphabetic,
+    Horizontal,
+    Vertical,
+    Custom,
+  }
 }

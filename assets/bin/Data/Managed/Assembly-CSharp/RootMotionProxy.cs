@@ -1,70 +1,48 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: RootMotionProxy
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class RootMotionProxy
+#nullable disable
+public class RootMotionProxy : MonoBehaviour
 {
-	private Animator animator;
+  private Animator animator;
+  private Transform parentTransfom;
+  private Rigidbody parentRigidbody;
 
-	private Transform parentTransfom;
+  private void Start()
+  {
+    this.animator = ((Component) this).gameObject.GetComponent<Animator>();
+    this.parentTransfom = ((Component) this).transform.parent;
+    if (!Object.op_Inequality((Object) this.parentTransfom, (Object) null))
+      return;
+    this.parentRigidbody = ((Component) this.parentTransfom).gameObject.GetComponent<Rigidbody>();
+  }
 
-	private Rigidbody parentRigidbody;
-
-	public RootMotionProxy()
-		: this()
-	{
-	}
-
-	private void Start()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		animator = this.get_gameObject().GetComponent<Animator>();
-		parentTransfom = this.get_transform().get_parent();
-		if (parentTransfom != null)
-		{
-			parentRigidbody = parentTransfom.get_gameObject().GetComponent<Rigidbody>();
-		}
-	}
-
-	private void OnAnimatorMove()
-	{
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-		if (!(parentTransfom == null) && !(animator == null))
-		{
-			if (!animator.get_applyRootMotion())
-			{
-				if (parentRigidbody != null)
-				{
-					parentRigidbody.set_velocity(Vector3.get_zero());
-				}
-			}
-			else if (parentRigidbody != null && !parentRigidbody.get_isKinematic())
-			{
-				if (Time.get_deltaTime() > 0f)
-				{
-					parentRigidbody.set_velocity(animator.get_deltaPosition() / Time.get_deltaTime());
-				}
-				else
-				{
-					parentRigidbody.set_velocity(Vector3.get_zero());
-				}
-			}
-			else
-			{
-				parentTransfom.set_localPosition(parentTransfom.get_localPosition() + animator.get_deltaPosition());
-				parentTransfom.set_localRotation(parentTransfom.get_localRotation() * animator.get_deltaRotation());
-			}
-		}
-	}
+  private void OnAnimatorMove()
+  {
+    if (Object.op_Equality((Object) this.parentTransfom, (Object) null) || Object.op_Equality((Object) this.animator, (Object) null))
+      return;
+    if (!this.animator.applyRootMotion)
+    {
+      if (!Object.op_Inequality((Object) this.parentRigidbody, (Object) null))
+        return;
+      this.parentRigidbody.velocity = Vector3.zero;
+    }
+    else if (Object.op_Inequality((Object) this.parentRigidbody, (Object) null) && !this.parentRigidbody.isKinematic)
+    {
+      if ((double) Time.deltaTime > 0.0)
+        this.parentRigidbody.velocity = Vector3.op_Division(this.animator.deltaPosition, Time.deltaTime);
+      else
+        this.parentRigidbody.velocity = Vector3.zero;
+    }
+    else
+    {
+      this.parentTransfom.localPosition = Vector3.op_Addition(this.parentTransfom.localPosition, this.animator.deltaPosition);
+      this.parentTransfom.localRotation = Quaternion.op_Multiply(this.parentTransfom.localRotation, this.animator.deltaRotation);
+    }
+  }
 }

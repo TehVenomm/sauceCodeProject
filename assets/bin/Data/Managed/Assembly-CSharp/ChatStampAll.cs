@@ -1,133 +1,111 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: ChatStampAll
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChatStampAll
+#nullable disable
+public class ChatStampAll : MonoBehaviour
 {
-	public UIGrid grid;
+  public UIGrid grid;
+  public UIScrollView scroll;
+  public UIButton closeButton;
+  public UITweenCtrl tweenCtrl;
+  private GameObject mChatStampPrefab;
+  private List<StampTable.Data> currentUnlockStamps;
+  private List<Transform> createIcons;
+  private bool initailized;
 
-	public UIScrollView scroll;
+  public void Open()
+  {
+    ((Component) this).gameObject.SetActive(true);
+    this.tweenCtrl.Play();
+    this.StartCoroutine(this.DoOpen());
+  }
 
-	public UIButton closeButton;
+  private IEnumerator DoOpen()
+  {
+    if (!this.initailized)
+    {
+      LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+      LoadObject lo_chat_stamp_listitem = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem");
+      if (loadingQueue.IsLoading())
+        yield return (object) loadingQueue.Wait();
+      this.mChatStampPrefab = lo_chat_stamp_listitem.loadedObject as GameObject;
+      this.closeButton.onClick.Add(new EventDelegate(new EventDelegate.Callback(this.OnClose)));
+      this.createIcons = new List<Transform>();
+      this.initailized = true;
+      lo_chat_stamp_listitem = (LoadObject) null;
+    }
+    this.currentUnlockStamps = Singleton<StampTable>.I.GetUnlockStamps(MonoBehaviourSingleton<UserInfoManager>.I);
+    this.CreateStampList();
+    this.InitStampList();
+    UIUtility.SetGridItemsDraggableWidget(this.scroll, this.grid, this.createIcons.Count);
+  }
 
-	public UITweenCtrl tweenCtrl;
+  public void Close()
+  {
+    this.tweenCtrl.Play(false, (EventDelegate.Callback) (() => ((Component) this).gameObject.SetActive(false)));
+  }
 
-	private GameObject mChatStampPrefab;
+  private void CreateStampList()
+  {
+    for (int count = this.createIcons.Count; count < MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count + this.currentUnlockStamps.Count; ++count)
+    {
+      Transform stampItem = this.CreateStampItem(((Component) this.grid).transform);
+      ((Object) stampItem).name = count.ToString();
+      this.createIcons.Add(stampItem);
+    }
+    this.grid.Reposition();
+    this.scroll.ResetPosition();
+  }
 
-	private List<StampTable.Data> currentUnlockStamps;
+  private void InitStampList()
+  {
+    for (int index1 = 0; index1 < MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count + this.currentUnlockStamps.Count; ++index1)
+    {
+      Transform createIcon = this.createIcons[index1];
+      if (MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count > index1)
+      {
+        int index = index1;
+        this.InitStampItem(MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[index], createIcon, (System.Action) (() => this.OnClickIcon(MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[index])));
+      }
+      else
+      {
+        int index = index1 - MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count;
+        this.InitStampItem((int) this.currentUnlockStamps[index].id, createIcon, (System.Action) (() => this.OnClickIcon((int) this.currentUnlockStamps[index].id)));
+      }
+    }
+  }
 
-	private List<Transform> createIcons;
+  private Transform CreateStampItem(Transform parent)
+  {
+    Transform stampItem = ResourceUtility.Realizes((Object) this.mChatStampPrefab, 5);
+    stampItem.parent = parent;
+    stampItem.localScale = Vector3.one;
+    return stampItem;
+  }
 
-	private bool initailized;
+  private void InitStampItem(int stampId, Transform iTransform, System.Action onClick)
+  {
+    ChatStampListItem component = ((Component) iTransform).GetComponent<ChatStampListItem>();
+    component.Init(stampId);
+    component.onButton = onClick;
+  }
 
-	public ChatStampAll()
-		: this()
-	{
-	}
+  private void OnClickIcon(int stampId)
+  {
+    MonoBehaviourSingleton<UIManager>.I.mainChat.SendStampAsMine(stampId);
+    this.Close();
+  }
 
-	public void Open()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(true);
-		tweenCtrl.Play(true, null);
-		this.StartCoroutine(DoOpen());
-	}
-
-	private IEnumerator DoOpen()
-	{
-		if (!initailized)
-		{
-			LoadingQueue loadingQueue = new LoadingQueue(this);
-			LoadObject lo_chat_stamp_listitem = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ChatStampListItem", false);
-			if (loadingQueue.IsLoading())
-			{
-				yield return (object)loadingQueue.Wait();
-			}
-			mChatStampPrefab = (lo_chat_stamp_listitem.loadedObject as GameObject);
-			closeButton.onClick.Add(new EventDelegate(OnClose));
-			createIcons = new List<Transform>();
-			initailized = true;
-		}
-		currentUnlockStamps = Singleton<StampTable>.I.GetUnlockStamps(MonoBehaviourSingleton<UserInfoManager>.I);
-		CreateStampList();
-		InitStampList();
-		UIUtility.SetGridItemsDraggableWidget(scroll, grid, createIcons.Count);
-	}
-
-	public void Close()
-	{
-		tweenCtrl.Play(false, delegate
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			this.get_gameObject().SetActive(false);
-		});
-	}
-
-	private void CreateStampList()
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
-		for (int i = createIcons.Count; i < MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count + currentUnlockStamps.Count; i++)
-		{
-			Transform val = CreateStampItem(grid.get_transform());
-			val.set_name(i.ToString());
-			createIcons.Add(val);
-		}
-		grid.Reposition();
-		scroll.ResetPosition();
-	}
-
-	private void InitStampList()
-	{
-		for (int i = 0; i < MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count + currentUnlockStamps.Count; i++)
-		{
-			Transform iTransform = createIcons[i];
-			if (MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count > i)
-			{
-				int index = i;
-				InitStampItem(MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[index], iTransform, delegate
-				{
-					OnClickIcon(MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds[index]);
-				});
-			}
-			else
-			{
-				int index2 = i - MonoBehaviourSingleton<UserInfoManager>.I.favoriteStampIds.Count;
-				InitStampItem((int)currentUnlockStamps[index2].id, iTransform, delegate
-				{
-					OnClickIcon((int)currentUnlockStamps[index2].id);
-				});
-			}
-		}
-	}
-
-	private Transform CreateStampItem(Transform parent)
-	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = ResourceUtility.Realizes(mChatStampPrefab, 5);
-		val.set_parent(parent);
-		val.set_localScale(Vector3.get_one());
-		return val;
-	}
-
-	private void InitStampItem(int stampId, Transform iTransform, Action onClick)
-	{
-		ChatStampListItem component = iTransform.GetComponent<ChatStampListItem>();
-		component.Init(stampId);
-		component.onButton = onClick;
-	}
-
-	private void OnClickIcon(int stampId)
-	{
-		MonoBehaviourSingleton<UIManager>.I.mainChat.SendStampAsMine(stampId);
-		Close();
-	}
-
-	private void OnClose()
-	{
-		SoundManager.PlaySystemSE(SoundID.UISE.CANCEL, 1f);
-		Close();
-	}
+  private void OnClose()
+  {
+    SoundManager.PlaySystemSE(SoundID.UISE.CANCEL);
+    this.Close();
+  }
 }

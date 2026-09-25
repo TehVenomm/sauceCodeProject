@@ -1,117 +1,95 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIVisibleWidgetEffect
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class UIVisibleWidgetEffect
+#nullable disable
+public class UIVisibleWidgetEffect : MonoBehaviour
 {
-	private UIPanel panel;
+  private UIPanel panel;
+  private UIWidget widget;
+  private string sectionName;
+  private string effectName;
+  private Transform effect;
+  private int setRendererQueue = -1;
 
-	private UIWidget widget;
+  public static void Set(
+    UIPanel panel,
+    UIWidget widget,
+    string effect_name,
+    string current_section_name)
+  {
+    if (Object.op_Equality((Object) widget, (Object) null))
+      return;
+    UIVisibleWidgetEffect visibleWidgetEffect = ((Component) widget).GetComponent<UIVisibleWidgetEffect>();
+    if (effect_name == null)
+    {
+      if (!Object.op_Inequality((Object) visibleWidgetEffect, (Object) null))
+        return;
+      Object.Destroy((Object) visibleWidgetEffect);
+    }
+    else
+    {
+      if (Object.op_Equality((Object) visibleWidgetEffect, (Object) null))
+        visibleWidgetEffect = ((Component) widget).gameObject.AddComponent<UIVisibleWidgetEffect>();
+      visibleWidgetEffect.panel = panel;
+      visibleWidgetEffect.widget = widget;
+      if (string.IsNullOrEmpty(visibleWidgetEffect.sectionName))
+        visibleWidgetEffect.sectionName = current_section_name ?? MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
+      if (visibleWidgetEffect.effectName != effect_name)
+        visibleWidgetEffect.DeleteEffect();
+      visibleWidgetEffect.effectName = effect_name;
+    }
+  }
 
-	private string sectionName;
+  public static void OneShot(
+    UIPanel panel,
+    UIWidget widget,
+    string effect_name,
+    string current_section_name)
+  {
+    EffectManager.GetUIEffect(effect_name, widget.cachedTransform, 0.0f, 1, widget);
+  }
 
-	private string effectName;
+  private void LateUpdate()
+  {
+    if (this.sectionName == MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() && Object.op_Inequality((Object) MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection(), (Object) null) && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection().state == UIBehaviour.STATE.OPEN && (Object.op_Equality((Object) this.panel, (Object) null) || this.panel.IsVisible(this.widget.cachedTransform.position)))
+    {
+      if (!Object.op_Equality((Object) this.effect, (Object) null))
+        return;
+      this.effect = EffectManager.GetUIEffect(this.effectName, this.widget.cachedTransform, 0.0f, 1, this.widget);
+      if (Object.op_Equality((Object) this.effect, (Object) null))
+        ((Behaviour) this).enabled = false;
+      else
+        this._SetRendererQueue();
+    }
+    else
+      this.DeleteEffect();
+  }
 
-	private Transform effect;
+  private void DeleteEffect()
+  {
+    if (!Object.op_Inequality((Object) this.effect, (Object) null))
+      return;
+    EffectManager.ReleaseEffect(ref this.effect);
+  }
 
-	private int setRendererQueue = -1;
+  private void OnDisable() => this.DeleteEffect();
 
-	public UIVisibleWidgetEffect()
-		: this()
-	{
-	}
+  private void _SetRendererQueue()
+  {
+    if (!Object.op_Inequality((Object) this.effect, (Object) null) || this.setRendererQueue == -1)
+      return;
+    foreach (Renderer componentsInChild in ((Component) this.effect).GetComponentsInChildren<Renderer>(true))
+      componentsInChild.material.renderQueue = this.setRendererQueue;
+  }
 
-	public static void Set(UIPanel panel, UIWidget widget, string effect_name, string current_section_name)
-	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		if (!(widget == null))
-		{
-			UIVisibleWidgetEffect uIVisibleWidgetEffect = widget.GetComponent<UIVisibleWidgetEffect>();
-			if (effect_name == null)
-			{
-				if (uIVisibleWidgetEffect != null)
-				{
-					Object.Destroy(uIVisibleWidgetEffect);
-				}
-			}
-			else
-			{
-				if (uIVisibleWidgetEffect == null)
-				{
-					uIVisibleWidgetEffect = widget.get_gameObject().AddComponent<UIVisibleWidgetEffect>();
-				}
-				uIVisibleWidgetEffect.panel = panel;
-				uIVisibleWidgetEffect.widget = widget;
-				if (string.IsNullOrEmpty(uIVisibleWidgetEffect.sectionName))
-				{
-					uIVisibleWidgetEffect.sectionName = (current_section_name ?? MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName());
-				}
-				if (uIVisibleWidgetEffect.effectName != effect_name)
-				{
-					uIVisibleWidgetEffect.DeleteEffect();
-				}
-				uIVisibleWidgetEffect.effectName = effect_name;
-			}
-		}
-	}
-
-	public static void OneShot(UIPanel panel, UIWidget widget, string effect_name, string current_section_name)
-	{
-		EffectManager.GetUIEffect(effect_name, widget.cachedTransform, 0f, 1, widget);
-	}
-
-	private void LateUpdate()
-	{
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		if (sectionName == MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection() != null && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection().state == UIBehaviour.STATE.OPEN && (panel == null || panel.IsVisible(widget.cachedTransform.get_position())))
-		{
-			if (effect == null)
-			{
-				effect = EffectManager.GetUIEffect(effectName, widget.cachedTransform, 0f, 1, widget);
-				if (effect == null)
-				{
-					this.set_enabled(false);
-				}
-				else
-				{
-					_SetRendererQueue();
-				}
-			}
-		}
-		else
-		{
-			DeleteEffect();
-		}
-	}
-
-	private void DeleteEffect()
-	{
-		if (effect != null)
-		{
-			EffectManager.ReleaseEffect(ref effect);
-		}
-	}
-
-	private void OnDisable()
-	{
-		DeleteEffect();
-	}
-
-	private void _SetRendererQueue()
-	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		if (effect != null && setRendererQueue != -1)
-		{
-			Renderer[] componentsInChildren = effect.GetComponentsInChildren<Renderer>(true);
-			Renderer[] array = componentsInChildren;
-			foreach (Renderer val in array)
-			{
-				val.get_material().set_renderQueue(setRendererQueue);
-			}
-		}
-	}
-
-	public void SetRendererQueue(int setQueue)
-	{
-		setRendererQueue = setQueue;
-		_SetRendererQueue();
-	}
+  public void SetRendererQueue(int setQueue)
+  {
+    this.setRendererQueue = setQueue;
+    this._SetRendererQueue();
+  }
 }

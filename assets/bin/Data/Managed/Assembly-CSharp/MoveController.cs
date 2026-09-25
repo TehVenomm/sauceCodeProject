@@ -1,236 +1,130 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: MoveController
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class MoveController
 {
-	[Flags]
-	public enum MOVE_TYPE
-	{
-		NONE = 0x0,
-		STOP = 0x1,
-		AVOID = 0x2,
-		SEEK = 0x4,
-		ROTATE = 0x8
-	}
+  private Brain brain;
+  public MoveController.MOVE_TYPE moveType;
+  private float saveStopRange;
+  private float stopTime;
+  private RaycastHit _seekHit;
+  private const float AVOID_RANGE = 2f;
 
-	private const float AVOID_RANGE = 2f;
+  public MoveController(Brain brain) => this.brain = brain;
 
-	private Brain brain;
+  private void TypeOn(MoveController.MOVE_TYPE type) => this.moveType |= type;
 
-	public MOVE_TYPE moveType;
+  private void TypeOff(MoveController.MOVE_TYPE type) => this.moveType &= ~type;
 
-	private float saveStopRange;
+  private bool TypeIsOn(MoveController.MOVE_TYPE type) => (this.moveType & type) == type;
 
-	private float stopTime;
+  public void StopOn() => this.TypeOn(MoveController.MOVE_TYPE.STOP);
 
-	private RaycastHit _seekHit = default(RaycastHit);
+  public void AvoidOn() => this.TypeOn(MoveController.MOVE_TYPE.AVOID);
 
-	public bool isStopTimeOver => stopTime < Time.get_time();
+  public void SeekOn() => this.TypeOn(MoveController.MOVE_TYPE.SEEK);
 
-	public RaycastHit seekHit => _seekHit;
+  public void RotateOn() => this.TypeOn(MoveController.MOVE_TYPE.ROTATE);
 
-	public Vector2 stickVec
-	{
-		get;
-		private set;
-	}
+  public void StopOff() => this.TypeOff(MoveController.MOVE_TYPE.STOP);
 
-	public Vector3 targetPos
-	{
-		get;
-		private set;
-	}
+  public void AvoidOff() => this.TypeOff(MoveController.MOVE_TYPE.AVOID);
 
-	public PLACE avoidPlace
-	{
-		get;
-		private set;
-	}
+  public void SeekOff() => this.TypeOff(MoveController.MOVE_TYPE.SEEK);
 
-	public Vector3 rootPosition
-	{
-		get;
-		private set;
-	}
+  public void RotateOff() => this.TypeOff(MoveController.MOVE_TYPE.ROTATE);
 
-	public MoveController(Brain brain)
-	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		this.brain = brain;
-	}
+  public bool IsStop() => this.TypeIsOn(MoveController.MOVE_TYPE.STOP);
 
-	private void TypeOn(MOVE_TYPE type)
-	{
-		moveType |= type;
-	}
+  public bool IsAvoid() => this.TypeIsOn(MoveController.MOVE_TYPE.AVOID);
 
-	private void TypeOff(MOVE_TYPE type)
-	{
-		moveType &= ~type;
-	}
+  public bool IsSeek() => this.TypeIsOn(MoveController.MOVE_TYPE.SEEK);
 
-	private bool TypeIsOn(MOVE_TYPE type)
-	{
-		return (moveType & type) == type;
-	}
+  public bool IsRotate() => this.TypeIsOn(MoveController.MOVE_TYPE.ROTATE);
 
-	public void StopOn()
-	{
-		TypeOn(MOVE_TYPE.STOP);
-	}
+  public void ChangeStopRange(float range)
+  {
+    this.saveStopRange = this.brain.owner.moveStopRange;
+    this.brain.owner.moveStopRange = range;
+  }
 
-	public void AvoidOn()
-	{
-		TypeOn(MOVE_TYPE.AVOID);
-	}
+  public void ResetStopRange()
+  {
+    if ((double) this.saveStopRange > 0.0)
+      this.brain.owner.moveStopRange = this.saveStopRange;
+    this.saveStopRange = 0.0f;
+  }
 
-	public void SeekOn()
-	{
-		TypeOn(MOVE_TYPE.SEEK);
-	}
+  public void SetStopTime(float time) => this.stopTime = time + Time.time;
 
-	public void RotateOn()
-	{
-		TypeOn(MOVE_TYPE.ROTATE);
-	}
+  public bool isStopTimeOver => (double) this.stopTime < (double) Time.time;
 
-	public void StopOff()
-	{
-		TypeOff(MOVE_TYPE.STOP);
-	}
+  public RaycastHit seekHit => this._seekHit;
 
-	public void AvoidOff()
-	{
-		TypeOff(MOVE_TYPE.AVOID);
-	}
+  public Vector2 stickVec { get; private set; }
 
-	public void SeekOff()
-	{
-		TypeOff(MOVE_TYPE.SEEK);
-	}
+  public Vector3 targetPos { get; private set; }
 
-	public void RotateOff()
-	{
-		TypeOff(MOVE_TYPE.ROTATE);
-	}
+  public void SetSeek(Vector2 stick, Vector3 pos)
+  {
+    this.stickVec = stick;
+    this.targetPos = pos;
+  }
 
-	public bool IsStop()
-	{
-		return TypeIsOn(MOVE_TYPE.STOP);
-	}
+  public void SetTargetPos(Vector3 pos) => this.targetPos = pos;
 
-	public bool IsAvoid()
-	{
-		return TypeIsOn(MOVE_TYPE.AVOID);
-	}
+  public bool CanSeekToOpponent(Vector3 target_pos, float move_len)
+  {
+    int obstacleMask = AIUtility.GetObstacleMask();
+    return this.CanSeekToPosition(target_pos, move_len, obstacleMask);
+  }
 
-	public bool IsSeek()
-	{
-		return TypeIsOn(MOVE_TYPE.SEEK);
-	}
+  public bool CanSeekToAlly(Vector3 target_pos, float move_len)
+  {
+    int mask = AIUtility.GetObstacleMask() | AIUtility.GetOpponentMask((StageObject) this.brain.owner);
+    return this.CanSeekToPosition(target_pos, move_len, mask);
+  }
 
-	public bool IsRotate()
-	{
-		return TypeIsOn(MOVE_TYPE.ROTATE);
-	}
+  public bool CanSeekToPosition(Vector3 target_pos, float move_len, int mask)
+  {
+    return !AIUtility.RaycastForTargetPos(this.brain.owner._transform.position, target_pos, mask, out this._seekHit) || (double) ((RaycastHit) ref this._seekHit).distance > (double) move_len;
+  }
 
-	public void ChangeStopRange(float range)
-	{
-		saveStopRange = brain.owner.moveStopRange;
-		brain.owner.moveStopRange = range;
-	}
+  public PLACE avoidPlace { get; private set; }
 
-	public void ResetStopRange()
-	{
-		if (saveStopRange > 0f)
-		{
-			brain.owner.moveStopRange = saveStopRange;
-		}
-		saveStopRange = 0f;
-	}
+  public void SetAvoid(PLACE place) => this.avoidPlace = place;
 
-	public void SetStopTime(float time)
-	{
-		stopTime = time + Time.get_time();
-	}
+  public bool CanRightAvoid() => this.CanPlaceAvoid(PLACE.RIGHT);
 
-	public void SetSeek(Vector2 stick, Vector3 pos)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		stickVec = stick;
-		targetPos = pos;
-	}
+  public bool CanLeftAvoid() => this.CanPlaceAvoid(PLACE.LEFT);
 
-	public void SetTargetPos(Vector3 pos)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		targetPos = pos;
-	}
+  public bool CanBackAvoid() => this.CanPlaceAvoid(PLACE.BACK);
 
-	public bool CanSeekToOpponent(Vector3 target_pos, float move_len)
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		int obstacleMask = AIUtility.GetObstacleMask();
-		return CanSeekToPosition(target_pos, move_len, obstacleMask);
-	}
+  public bool CanFrontAvoid() => this.CanPlaceAvoid(PLACE.FRONT);
 
-	public bool CanSeekToAlly(Vector3 target_pos, float move_len)
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		int mask = AIUtility.GetObstacleMask() | AIUtility.GetOpponentMask(brain.owner);
-		return CanSeekToPosition(target_pos, move_len, mask);
-	}
+  public bool CanPlaceAvoid(PLACE place)
+  {
+    return !AIUtility.IsHitObstacleOrOpponentWithPlace((StageObject) this.brain.owner, place, 2f);
+  }
 
-	public bool CanSeekToPosition(Vector3 target_pos, float move_len, int mask)
-	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 position = brain.owner._transform.get_position();
-		if (AIUtility.RaycastForTargetPos(position, target_pos, mask, out _seekHit) && _seekHit.get_distance() <= move_len)
-		{
-			return false;
-		}
-		return true;
-	}
+  public Vector3 rootPosition { get; private set; }
 
-	public void SetAvoid(PLACE place)
-	{
-		avoidPlace = place;
-	}
+  public void SetRootPosition(Vector3 pos) => this.rootPosition = pos;
 
-	public bool CanRightAvoid()
-	{
-		return CanPlaceAvoid(PLACE.RIGHT);
-	}
-
-	public bool CanLeftAvoid()
-	{
-		return CanPlaceAvoid(PLACE.LEFT);
-	}
-
-	public bool CanBackAvoid()
-	{
-		return CanPlaceAvoid(PLACE.BACK);
-	}
-
-	public bool CanFrontAvoid()
-	{
-		return CanPlaceAvoid(PLACE.FRONT);
-	}
-
-	public bool CanPlaceAvoid(PLACE place)
-	{
-		return !AIUtility.IsHitObstacleOrOpponentWithPlace(brain.owner, place, 2f);
-	}
-
-	public void SetRootPosition(Vector3 pos)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		rootPosition = pos;
-	}
+  [Flags]
+  public enum MOVE_TYPE
+  {
+    NONE = 0,
+    STOP = 1,
+    AVOID = 2,
+    SEEK = 4,
+    ROTATE = 8,
+  }
 }

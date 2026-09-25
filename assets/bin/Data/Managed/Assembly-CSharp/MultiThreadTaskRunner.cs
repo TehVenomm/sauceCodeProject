@@ -1,143 +1,124 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: MultiThreadTaskRunner
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
+#nullable disable
 public class MultiThreadTaskRunner
 {
-	private class TaskParam
-	{
-		public string name = string.Empty;
+  private Thread[] threads;
+  private volatile List<MultiThreadTaskRunner.TaskParam> tasks = new List<MultiThreadTaskRunner.TaskParam>();
+  private volatile object lockObject = new object();
+  private volatile int workingCount;
+  private volatile bool stopAllThreads;
+  private const int THREAD_COUNT = 3;
 
-		public Action act;
-	}
+  public bool isWorking
+  {
+    get
+    {
+      if (this.threads == null)
+        return false;
+      lock (this.lockObject)
+        return this.tasks.Count > 0 || this.workingCount != 0;
+    }
+  }
 
-	private const int THREAD_COUNT = 3;
+  public void CreateThread()
+  {
+    if (this.threads != null)
+      return;
+    this.workingCount = 0;
+    this.stopAllThreads = false;
+    int length = 3;
+    this.threads = new Thread[length];
+    for (int index = 0; index < length; ++index)
+    {
+      this.threads[index] = new Thread(new ThreadStart(this.Worker));
+      this.threads[index].IsBackground = true;
+      this.threads[index].Start();
+    }
+  }
 
-	private Thread[] threads;
+  public void DestroyThread()
+  {
+    if (this.threads == null)
+      return;
+    this.stopAllThreads = true;
+    int index = 0;
+    for (int length = this.threads.Length; index < length; ++index)
+      this.threads[index].Join();
+    this.threads = (Thread[]) null;
+  }
 
-	private volatile List<TaskParam> tasks = new List<TaskParam>();
+  private void Worker()
+  {
+    try
+    {
+      MultiThreadTaskRunner.TaskParam taskParam = (MultiThreadTaskRunner.TaskParam) null;
+      while (!this.stopAllThreads)
+      {
+        if (this.tasks.Count > 0 || taskParam != null)
+        {
+          lock (this.lockObject)
+          {
+            if (taskParam != null)
+            {
+              --this.workingCount;
+              taskParam = (MultiThreadTaskRunner.TaskParam) null;
+            }
+            if (this.tasks.Count > 0)
+            {
+              taskParam = this.tasks[0];
+              this.tasks.RemoveAt(0);
+              ++this.workingCount;
+            }
+          }
+          if (taskParam != null && taskParam.act != null)
+            taskParam.act();
+        }
+      }
+    }
+    catch (Exception ex)
+    {
+      if (ex is ThreadAbortException)
+        return;
+      Debug.LogError((object) ("MultiThreadTaskRunner : " + ex.ToString()));
+    }
+  }
 
-	private volatile object lockObject = new object();
+  public void Add(string name, System.Action act)
+  {
+    if (this.threads == null)
+      return;
+    MultiThreadTaskRunner.TaskParam taskParam = new MultiThreadTaskRunner.TaskParam();
+    taskParam.name = name;
+    taskParam.act = act;
+    lock (this.lockObject)
+      this.tasks.Add(taskParam);
+  }
 
-	private volatile int workingCount;
+  public void ChangePriorityTop(string name)
+  {
+    lock (this.lockObject)
+    {
+      MultiThreadTaskRunner.TaskParam taskParam = this.tasks.Find((Predicate<MultiThreadTaskRunner.TaskParam>) (o => o.name == name));
+      if (taskParam == null)
+        return;
+      this.tasks.Remove(taskParam);
+      this.tasks.Insert(0, taskParam);
+    }
+  }
 
-	private volatile bool stopAllThreads;
-
-	public bool isWorking
-	{
-		get
-		{
-			if (threads == null)
-			{
-				return false;
-			}
-			bool flag = false;
-			lock (lockObject)
-			{
-				if (tasks.Count <= 0)
-				{
-					return workingCount != 0;
-				}
-				return true;
-			}
-		}
-	}
-
-	public void CreateThread()
-	{
-		if (threads == null)
-		{
-			workingCount = 0;
-			stopAllThreads = false;
-			int num = 3;
-			threads = new Thread[num];
-			for (int i = 0; i < num; i++)
-			{
-				threads[i] = new Thread(Worker);
-				threads[i].IsBackground = true;
-				threads[i].Start();
-			}
-		}
-	}
-
-	public void DestroyThread()
-	{
-		if (threads != null)
-		{
-			stopAllThreads = true;
-			int i = 0;
-			for (int num = threads.Length; i < num; i++)
-			{
-				threads[i].Join();
-			}
-			threads = null;
-		}
-	}
-
-	private void Worker()
-	{
-		try
-		{
-			TaskParam taskParam = null;
-			while (!stopAllThreads)
-			{
-				if (tasks.Count > 0 || taskParam != null)
-				{
-					lock (lockObject)
-					{
-						if (taskParam != null)
-						{
-							workingCount--;
-							taskParam = null;
-						}
-						if (tasks.Count > 0)
-						{
-							taskParam = tasks[0];
-							tasks.RemoveAt(0);
-							workingCount++;
-						}
-					}
-					if (taskParam != null && taskParam.act != null)
-					{
-						taskParam.act();
-					}
-				}
-			}
-		}
-		catch (Exception ex)
-		{
-			if (!(ex is ThreadAbortException))
-			{
-				Debug.LogError((object)("MultiThreadTaskRunner : " + ex.ToString()));
-			}
-		}
-	}
-
-	public void Add(string name, Action act)
-	{
-		if (threads != null)
-		{
-			TaskParam taskParam = new TaskParam();
-			taskParam.name = name;
-			taskParam.act = act;
-			lock (lockObject)
-			{
-				tasks.Add(taskParam);
-			}
-		}
-	}
-
-	public void ChangePriorityTop(string name)
-	{
-		lock (lockObject)
-		{
-			TaskParam taskParam = tasks.Find((TaskParam o) => o.name == name);
-			if (taskParam != null)
-			{
-				tasks.Remove(taskParam);
-				tasks.Insert(0, taskParam);
-			}
-		}
-	}
+  private class TaskParam
+  {
+    public string name = "";
+    public System.Action act;
+  }
 }

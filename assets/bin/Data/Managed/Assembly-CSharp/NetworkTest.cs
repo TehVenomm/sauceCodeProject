@@ -1,56 +1,47 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: NetworkTest
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using UnityEngine;
 
-public class NetworkTest
+#nullable disable
+public class NetworkTest : MonoBehaviour
 {
-	private NetworkRegistTest netRegister;
+  private NetworkRegistTest netRegister;
+  public bool isAutoMode = true;
+  public bool isLocalhost = true;
 
-	public bool isAutoMode = true;
+  private void Awake()
+  {
+    ((Component) this).gameObject.AddComponent<NetworkManager>();
+    ((Component) this).gameObject.AddComponent<AccountManager>();
+    this.netRegister = ((Component) this).gameObject.AddComponent<NetworkRegistTest>();
+  }
 
-	public bool isLocalhost = true;
+  private void Start()
+  {
+  }
 
-	public NetworkTest()
-		: this()
-	{
-	}
+  private void Update()
+  {
+    if (!this.isAutoMode)
+      return;
+    this.netRegister.SendRequest();
+  }
 
-	private void Awake()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().AddComponent<NetworkManager>();
-		this.get_gameObject().AddComponent<AccountManager>();
-		netRegister = this.get_gameObject().AddComponent<NetworkRegistTest>();
-	}
-
-	private void Start()
-	{
-	}
-
-	private void Update()
-	{
-		if (isAutoMode)
-		{
-			netRegister.SendRequest();
-		}
-	}
-
-	private void OnGUI()
-	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		GUILayout.BeginArea(new Rect(10f, 30f, 250f, 100f));
-		if (netRegister.progress < NetworkRegistTest.PROGRESS.REGIST_FAILED)
-		{
-			string text = "Network Request\n[" + netRegister.progress + "] " + ((!netRegister.isSending) ? string.Empty : "Sending...");
-			if (GUILayout.Button(text, (GUILayoutOption[])new GUILayoutOption[0]))
-			{
-				netRegister.SendRequest();
-			}
-		}
-		if (GUILayout.Button("ClearSaveData", (GUILayoutOption[])new GUILayoutOption[0]))
-		{
-			MonoBehaviourSingleton<AccountManager>.I.ClearAccount();
-		}
-		GUILayout.EndArea();
-	}
+  private void OnGUI()
+  {
+    GUILayout.BeginArea(new Rect(10f, 30f, 250f, 100f));
+    if (this.netRegister.progress < NetworkRegistTest.PROGRESS.REGIST_FAILED)
+    {
+      if (GUILayout.Button($"Network Request\n[{(object) this.netRegister.progress}] {(this.netRegister.isSending ? (object) "Sending..." : (object) "")}", Array.Empty<GUILayoutOption>()))
+        this.netRegister.SendRequest();
+    }
+    if (GUILayout.Button("ClearSaveData", Array.Empty<GUILayoutOption>()))
+      MonoBehaviourSingleton<AccountManager>.I.ClearAccount();
+    GUILayout.EndArea();
+  }
 }

@@ -1,53 +1,37 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SpanTimer
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class SpanTimer
 {
-	private float span;
+  private float span;
+  private float nextTime;
+  private bool pause;
 
-	private float nextTime;
+  public SpanTimer(float span) => this.span = span;
 
-	private bool pause;
+  public bool IsReady()
+  {
+    if ((double) this.span < 0.0 || this.pause)
+      return false;
+    if ((double) this.span == 0.0)
+      return true;
+    if ((double) this.nextTime > (double) Time.time)
+      return false;
+    this.ResetNextTime();
+    return true;
+  }
 
-	public SpanTimer(float span)
-	{
-		this.span = span;
-	}
+  public void ResetNextTime() => this.nextTime = Time.time + this.span;
 
-	public bool IsReady()
-	{
-		if (span < 0f || pause)
-		{
-			return false;
-		}
-		if (span == 0f)
-		{
-			return true;
-		}
-		if (nextTime > Time.get_time())
-		{
-			return false;
-		}
-		ResetNextTime();
-		return true;
-	}
+  public void SetTempSpan(float temp_span) => this.nextTime = Time.time + temp_span;
 
-	public void ResetNextTime()
-	{
-		nextTime = Time.get_time() + span;
-	}
+  public void PauseOn() => this.pause = true;
 
-	public void SetTempSpan(float temp_span)
-	{
-		nextTime = Time.get_time() + temp_span;
-	}
-
-	public void PauseOn()
-	{
-		pause = true;
-	}
-
-	public void PauseOff()
-	{
-		pause = false;
-	}
+  public void PauseOff() => this.pause = false;
 }

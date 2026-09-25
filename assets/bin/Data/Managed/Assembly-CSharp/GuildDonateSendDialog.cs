@@ -1,152 +1,152 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: GuildDonateSendDialog
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 
+#nullable disable
 public class GuildDonateSendDialog : GameSection
 {
-	protected enum UI
-	{
-		LBL_SELECT_NUM,
-		LBL_SELECT_PRICE,
-		BTN_SELECT_NUM_MINUS,
-		BTN_SELECT_NUM_PLUS,
-		SLD_SELECT_NUM,
-		SPR_SELECT_FRAME,
-		LBL_NUMBER_REQUEST,
-		SPR_REACH_LIMIT,
-		LBL_REQUEST_LIMIT,
-		STR_TITLE_U,
-		STR_TITLE_D,
-		STR_SELECT_NUM,
-		LBL_CAPTION
-	}
+  private DonateInfo _info;
+  private int m_maxNum;
+  private int m_nowSelect;
+  private bool canUpdateUI = true;
 
-	private DonateInfo _info;
+  public override void Initialize()
+  {
+    this._info = GameSection.GetEventData() as DonateInfo;
+    if (this._info != null)
+    {
+      this.SetActive(this._transform, (Enum) GuildDonateSendDialog.UI.SPR_SELECT_FRAME, true);
+      this.SetActive(this._transform, (Enum) GuildDonateSendDialog.UI.SPR_REACH_LIMIT, false);
+      this.SetActive(this._transform, (Enum) GuildDonateSendDialog.UI.LBL_NUMBER_REQUEST, false);
+      this.canUpdateUI = true;
+      int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((Predicate<ItemInfo>) (x => (long) x.tableData.id == (long) this._info.itemId), 1);
+      int num = this._info.quantity - this._info.itemNum;
+      this.m_maxNum = itemNum >= num ? num : itemNum;
+      this.m_nowSelect = this.m_maxNum;
+    }
+    else if (MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap < MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap)
+    {
+      this.m_maxNum = MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap - MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap;
+      this.m_nowSelect = 1;
+      this.canUpdateUI = true;
+      this.SetActive(this._transform, (Enum) GuildDonateSendDialog.UI.SPR_SELECT_FRAME, true);
+      this.SetActive(this._transform, (Enum) GuildDonateSendDialog.UI.SPR_REACH_LIMIT, false);
+      this.SetActive(this._transform, (Enum) GuildDonateSendDialog.UI.LBL_NUMBER_REQUEST, true);
+      this.SetSupportEncoding((Enum) GuildDonateSendDialog.UI.LBL_NUMBER_REQUEST, true);
+      this.SetLabelText((Enum) GuildDonateSendDialog.UI.LBL_NUMBER_REQUEST, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 32U /*0x20*/), (object) MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap, (object) MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
+    }
+    else
+    {
+      this.SetActive(this._transform, (Enum) GuildDonateSendDialog.UI.SPR_SELECT_FRAME, false);
+      this.SetActive(this._transform, (Enum) GuildDonateSendDialog.UI.SPR_REACH_LIMIT, true);
+      this.SetSupportEncoding((Enum) GuildDonateSendDialog.UI.LBL_REQUEST_LIMIT, true);
+      this.SetLabelText((Enum) GuildDonateSendDialog.UI.LBL_REQUEST_LIMIT, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 33U), (object) MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap, (object) MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
+      this.canUpdateUI = false;
+    }
+    base.Initialize();
+  }
 
-	private int m_maxNum;
+  public override void UpdateUI()
+  {
+    if (!this.canUpdateUI)
+      return;
+    string key = "TEXT_SELECT";
+    this.SetLabelText((Enum) GuildDonateSendDialog.UI.LBL_CAPTION, this.sectionData.GetText(key));
+    this.SetLabelText((Enum) GuildDonateSendDialog.UI.STR_TITLE_U, this.sectionData.GetText(key));
+    this.SetLabelText((Enum) GuildDonateSendDialog.UI.STR_TITLE_D, this.sectionData.GetText(key));
+    this.SetLabelText((Enum) GuildDonateSendDialog.UI.STR_SELECT_NUM, this.sectionData.GetText("TEXT_SELECT_NUM"));
+    this.SetProgressInt((Enum) GuildDonateSendDialog.UI.SLD_SELECT_NUM, this.m_nowSelect, 0, this.m_maxNum, new EventDelegate.Callback(this.OnChagenSlider));
+  }
 
-	private int m_nowSelect;
+  private void OnChagenSlider()
+  {
+    this.SetLabelText((Enum) GuildDonateSendDialog.UI.LBL_SELECT_NUM, string.Format("{0,8:#,0}", (object) this.GetProgressInt((Enum) GuildDonateSendDialog.UI.SLD_SELECT_NUM)));
+  }
 
-	private bool canUpdateUI = true;
+  private void OnQuery_SELECT_NUM_MINUS()
+  {
+    this.SetProgressInt((Enum) GuildDonateSendDialog.UI.SLD_SELECT_NUM, this.GetProgressInt((Enum) GuildDonateSendDialog.UI.SLD_SELECT_NUM) - 1);
+  }
 
-	public override void Initialize()
-	{
-		_info = (GameSection.GetEventData() as DonateInfo);
-		if (_info != null)
-		{
-			SetActive(base._transform, UI.SPR_SELECT_FRAME, true);
-			SetActive(base._transform, UI.SPR_REACH_LIMIT, false);
-			SetActive(base._transform, UI.LBL_NUMBER_REQUEST, false);
-			canUpdateUI = true;
-			int itemNum = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == _info.itemId, 1, false);
-			int num = _info.quantity - _info.itemNum;
-			m_maxNum = ((itemNum < num) ? itemNum : num);
-			m_nowSelect = m_maxNum;
-		}
-		else if (MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap < MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap)
-		{
-			m_maxNum = MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap - MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap;
-			m_nowSelect = 1;
-			canUpdateUI = true;
-			SetActive(base._transform, UI.SPR_SELECT_FRAME, true);
-			SetActive(base._transform, UI.SPR_REACH_LIMIT, false);
-			SetActive(base._transform, UI.LBL_NUMBER_REQUEST, true);
-			SetSupportEncoding(UI.LBL_NUMBER_REQUEST, true);
-			SetLabelText((Enum)UI.LBL_NUMBER_REQUEST, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 32u), MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateCap, MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
-		}
-		else
-		{
-			SetActive(base._transform, UI.SPR_SELECT_FRAME, false);
-			SetActive(base._transform, UI.SPR_REACH_LIMIT, true);
-			SetSupportEncoding(UI.LBL_REQUEST_LIMIT, true);
-			SetLabelText((Enum)UI.LBL_REQUEST_LIMIT, string.Format(StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 33u), MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap, MonoBehaviourSingleton<GuildManager>.I.guildInfos.donateMaxCap));
-			canUpdateUI = false;
-		}
-		base.Initialize();
-	}
+  private void OnQuery_SELECT_NUM_PLUS()
+  {
+    this.SetProgressInt((Enum) GuildDonateSendDialog.UI.SLD_SELECT_NUM, this.GetProgressInt((Enum) GuildDonateSendDialog.UI.SLD_SELECT_NUM) + 1);
+  }
 
-	public override void UpdateUI()
-	{
-		if (canUpdateUI)
-		{
-			string key = "TEXT_SELECT";
-			SetLabelText((Enum)UI.LBL_CAPTION, base.sectionData.GetText(key));
-			SetLabelText((Enum)UI.STR_TITLE_U, base.sectionData.GetText(key));
-			SetLabelText((Enum)UI.STR_TITLE_D, base.sectionData.GetText(key));
-			string key2 = "TEXT_SELECT_NUM";
-			SetLabelText((Enum)UI.STR_SELECT_NUM, base.sectionData.GetText(key2));
-			SetProgressInt((Enum)UI.SLD_SELECT_NUM, m_nowSelect, 0, m_maxNum, (EventDelegate.Callback)OnChagenSlider);
-		}
-	}
+  protected int GetSliderNum()
+  {
+    return this.GetProgressInt((Enum) GuildDonateSendDialog.UI.SLD_SELECT_NUM);
+  }
 
-	private void OnChagenSlider()
-	{
-		int progressInt = GetProgressInt((Enum)UI.SLD_SELECT_NUM);
-		SetLabelText((Enum)UI.LBL_SELECT_NUM, string.Format("{0,8:#,0}", progressInt));
-	}
+  private void OnQuery_SELECT()
+  {
+    if (this._info != null)
+    {
+      int num = this.GetSliderNum();
+      if (num > 0)
+      {
+        GameSection.StayEvent();
+        MonoBehaviourSingleton<GuildManager>.I.SendDonateSend(this._info.id, num, (Action<bool>) (success =>
+        {
+          if (MonoBehaviourSingleton<GuildManager>.I.donateInviteList != null)
+          {
+            int count = MonoBehaviourSingleton<GuildManager>.I.donateInviteList.Count;
+            for (int index = 0; index < count; ++index)
+            {
+              if (MonoBehaviourSingleton<GuildManager>.I.donateInviteList[index].id == this._info.id)
+              {
+                MonoBehaviourSingleton<GuildManager>.I.donateInviteList[index].itemNum += num;
+                if (MonoBehaviourSingleton<GuildManager>.I.donateInviteList[index].itemNum >= MonoBehaviourSingleton<GuildManager>.I.donateInviteList[index].quantity)
+                {
+                  MonoBehaviourSingleton<GuildManager>.I.donateInviteList.RemoveAt(index);
+                  break;
+                }
+                break;
+              }
+            }
+          }
+          MonoBehaviourSingleton<GuildManager>.I.SendDonateList((Action<bool>) (donate_success =>
+          {
+            GameSection.ResumeEvent(donate_success);
+            GameSection.BackSection();
+          }));
+        }));
+      }
+      else
+        GameSection.BackSection();
+    }
+    else
+    {
+      GameSection.SetEventData((object) this.GetSliderNum().ToString());
+      GameSection.BackSection();
+    }
+  }
 
-	private void OnQuery_SELECT_NUM_MINUS()
-	{
-		SetProgressInt((Enum)UI.SLD_SELECT_NUM, GetProgressInt((Enum)UI.SLD_SELECT_NUM) - 1, -1, -1, (EventDelegate.Callback)null);
-	}
+  private void OnQuery_CLOSE()
+  {
+    GameSection.SetEventData((object) "0");
+    GameSection.BackSection();
+  }
 
-	private void OnQuery_SELECT_NUM_PLUS()
-	{
-		SetProgressInt((Enum)UI.SLD_SELECT_NUM, GetProgressInt((Enum)UI.SLD_SELECT_NUM) + 1, -1, -1, (EventDelegate.Callback)null);
-	}
-
-	protected int GetSliderNum()
-	{
-		return GetProgressInt((Enum)UI.SLD_SELECT_NUM);
-	}
-
-	private void OnQuery_SELECT()
-	{
-		if (_info != null)
-		{
-			int num = GetSliderNum();
-			if (num > 0)
-			{
-				GameSection.StayEvent();
-				MonoBehaviourSingleton<GuildManager>.I.SendDonateSend(_info.id, num, delegate
-				{
-					if (MonoBehaviourSingleton<GuildManager>.I.donateInviteList != null)
-					{
-						int count = MonoBehaviourSingleton<GuildManager>.I.donateInviteList.Count;
-						for (int i = 0; i < count; i++)
-						{
-							if (MonoBehaviourSingleton<GuildManager>.I.donateInviteList[i].id == _info.id)
-							{
-								MonoBehaviourSingleton<GuildManager>.I.donateInviteList[i].itemNum += num;
-								if (MonoBehaviourSingleton<GuildManager>.I.donateInviteList[i].itemNum >= MonoBehaviourSingleton<GuildManager>.I.donateInviteList[i].quantity)
-								{
-									MonoBehaviourSingleton<GuildManager>.I.donateInviteList.RemoveAt(i);
-								}
-								break;
-							}
-						}
-					}
-					MonoBehaviourSingleton<GuildManager>.I.SendDonateList(delegate(bool donate_success)
-					{
-						GameSection.ResumeEvent(donate_success, null);
-						GameSection.BackSection();
-					});
-				});
-			}
-			else
-			{
-				GameSection.BackSection();
-			}
-		}
-		else
-		{
-			GameSection.SetEventData(GetSliderNum().ToString());
-			GameSection.BackSection();
-		}
-	}
-
-	private void OnQuery_CLOSE()
-	{
-		GameSection.SetEventData("0");
-		GameSection.BackSection();
-	}
+  protected enum UI
+  {
+    LBL_SELECT_NUM,
+    LBL_SELECT_PRICE,
+    BTN_SELECT_NUM_MINUS,
+    BTN_SELECT_NUM_PLUS,
+    SLD_SELECT_NUM,
+    SPR_SELECT_FRAME,
+    LBL_NUMBER_REQUEST,
+    SPR_REACH_LIMIT,
+    LBL_REQUEST_LIMIT,
+    STR_TITLE_U,
+    STR_TITLE_D,
+    STR_SELECT_NUM,
+    LBL_CAPTION,
+  }
 }

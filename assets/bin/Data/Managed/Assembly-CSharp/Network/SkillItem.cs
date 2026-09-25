@@ -1,74 +1,87 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Network.SkillItem
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 
-namespace Network
+#nullable disable
+namespace Network;
+
+[Serializable]
+public class SkillItem
 {
-	[Serializable]
-	public class SkillItem
-	{
-		public class EquipSetSlot
-		{
-			public int setNo;
+  public string uniqId;
+  public int skillItemId;
+  public XorInt level = (XorInt) 0;
+  public int exceed;
+  public int exceedExp;
+  public int is_locked;
+  public int exp;
+  public int expPrev;
+  public int expNext;
+  public float growCost;
+  public int price;
+  public List<SkillItem.EquipSetSlot> equipSlots = new List<SkillItem.EquipSetSlot>();
+  public SkillItem.UniqueEquipSetSlot uniqueEquipSlots = new SkillItem.UniqueEquipSetSlot();
 
-			public string euid;
+  public int RelativeExp => this.exp - this.expPrev;
 
-			public int slotNo;
+  public int RelativeExpNext => this.expNext - this.expPrev;
 
-			public EquipSetSlot()
-			{
-			}
+  public float ExpProgress01
+  {
+    get => this.RelativeExpNext > 0 ? (float) this.RelativeExp / (float) this.RelativeExpNext : 1f;
+  }
 
-			public EquipSetSlot(int sNo, string eId, int slNo)
-			{
-				setNo = sNo;
-				euid = eId;
-				slotNo = slNo;
-			}
-		}
+  public class EquipSetSlot
+  {
+    public int setNo;
+    public string euid;
+    public int slotNo;
 
-		public class DiffEquipSetSlot : EquipSetSlot
-		{
-			public string uniqId;
+    public EquipSetSlot()
+    {
+    }
 
-			public DiffEquipSetSlot()
-			{
-			}
+    public EquipSetSlot(int sNo, string eId, int slNo)
+    {
+      this.setNo = sNo;
+      this.euid = eId;
+      this.slotNo = slNo;
+    }
+  }
 
-			public DiffEquipSetSlot(int sNo, string eId, int slNo, string uId)
-				: base(sNo, eId, slNo)
-			{
-				uniqId = uId;
-			}
-		}
+  public class UniqueEquipSetSlot
+  {
+    public string euid;
+    public int slotNo;
 
-		public string uniqId;
+    public UniqueEquipSetSlot()
+    {
+    }
 
-		public int skillItemId;
+    public UniqueEquipSetSlot(string eId, int slNo)
+    {
+      this.euid = eId;
+      this.slotNo = slNo;
+    }
+  }
 
-		public XorInt level = 0;
+  public class DiffEquipSetSlot : SkillItem.EquipSetSlot
+  {
+    public string uniqId;
 
-		public int exceed;
+    public DiffEquipSetSlot()
+    {
+    }
 
-		public int exceedExp;
-
-		public int is_locked;
-
-		public int exp;
-
-		public int expPrev;
-
-		public int expNext;
-
-		public float growCost;
-
-		public int price;
-
-		public List<EquipSetSlot> equipSlots = new List<EquipSetSlot>();
-
-		public int RelativeExp => exp - expPrev;
-
-		public int RelativeExpNext => expNext - expPrev;
-
-		public float ExpProgress01 => (RelativeExpNext > 0) ? ((float)RelativeExp / (float)RelativeExpNext) : 1f;
-	}
+    public DiffEquipSetSlot(int sNo, string eId, int slNo, string uId)
+      : base(sNo, eId, slNo)
+    {
+      this.uniqId = uId;
+    }
+  }
 }

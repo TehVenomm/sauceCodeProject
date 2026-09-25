@@ -1,41 +1,37 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: LanguageSelection
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
+[RequireComponent(typeof (UIPopupList))]
 [AddComponentMenu("NGUI/Interaction/Language Selection")]
-[RequireComponent(typeof(UIPopupList))]
-public class LanguageSelection
+public class LanguageSelection : MonoBehaviour
 {
-	private UIPopupList mList;
+  private UIPopupList mList;
 
-	public LanguageSelection()
-		: this()
-	{
-	}
+  private void Awake()
+  {
+    this.mList = ((Component) this).GetComponent<UIPopupList>();
+    this.Refresh();
+  }
 
-	private void Awake()
-	{
-		mList = this.GetComponent<UIPopupList>();
-		Refresh();
-	}
+  private void Start()
+  {
+    EventDelegate.Add(this.mList.onChange, (EventDelegate.Callback) (() => Localization.language = UIPopupList.current.value));
+  }
 
-	private void Start()
-	{
-		EventDelegate.Add(mList.onChange, delegate
-		{
-			Localization.language = UIPopupList.current.value;
-		});
-	}
-
-	public void Refresh()
-	{
-		if (mList != null && Localization.knownLanguages != null)
-		{
-			mList.Clear();
-			int i = 0;
-			for (int num = Localization.knownLanguages.Length; i < num; i++)
-			{
-				mList.items.Add(Localization.knownLanguages[i]);
-			}
-			mList.value = Localization.language;
-		}
-	}
+  public void Refresh()
+  {
+    if (!Object.op_Inequality((Object) this.mList, (Object) null) || Localization.knownLanguages == null)
+      return;
+    this.mList.Clear();
+    int index = 0;
+    for (int length = Localization.knownLanguages.Length; index < length; ++index)
+      this.mList.items.Add(Localization.knownLanguages[index]);
+    this.mList.value = Localization.language;
+  }
 }

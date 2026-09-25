@@ -1,173 +1,149 @@
-using Network;
+﻿// Decompiled with JetBrains decompiler
+// Type: CrystalShopMaterialDetail
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class CrystalShopMaterialDetail : GameSection
 {
-	private enum UI
-	{
-		SPR_SALE,
-		OBJ_BUY,
-		SPR_BUY_NOW,
-		LBL_PRICE,
-		SCR_DETAIL,
-		GRD_DETAIL,
-		PNL_MATERIAL_INFO
-	}
+  private const string NORMAL_DROP_EFF_NAME = "ef_ui_dropitem_silver_01";
+  private const string RARE_DROP_EFF_NAME = "ef_ui_dropitem_gold_01";
+  private const string BREAK_DROP_EFF_NAME = "ef_ui_dropitem_red_01";
+  private Network.ProductData materialData;
+  private string priceStr = string.Empty;
+  private List<ItemSortData> datas;
+  private int index;
 
-	private const string NORMAL_DROP_EFF_NAME = "ef_ui_dropitem_silver_01";
+  public override void Initialize()
+  {
+    object[] eventData = GameSection.GetEventData() as object[];
+    this.materialData = eventData[0] as Network.ProductData;
+    this.priceStr = eventData[1] as string;
+    this.index = (int) eventData[2];
+    InventoryList<ItemInfo, Network.Item> list = ItemInfo.CreateList(this.materialData.items);
+    this.datas = new List<ItemSortData>();
+    for (LinkedListNode<ItemInfo> linkedListNode = list.GetFirstNode(); linkedListNode != null; linkedListNode = linkedListNode.Next)
+    {
+      if (linkedListNode != null && linkedListNode.Value != null && linkedListNode.Value.tableData != null)
+      {
+        ItemSortData itemSortData = new ItemSortData();
+        itemSortData.SetItem((object) linkedListNode.Value);
+        this.datas.Add(itemSortData);
+      }
+    }
+    this.StartCoroutine(this.DoInitialize());
+  }
 
-	private const string RARE_DROP_EFF_NAME = "ef_ui_dropitem_gold_01";
+  private IEnumerator DoInitialize()
+  {
+    string resource_name = "BTN_SHOP_NORMAL1";
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject lo_button = loadingQueue.Load(RESOURCE_CATEGORY.GACHA_BUTTON, resource_name);
+    if (loadingQueue.IsLoading())
+      yield return (object) loadingQueue.Wait();
+    GameObject gameObject = Object.Instantiate(lo_button.loadedObject) as GameObject;
+    gameObject.transform.parent = this.FindCtrl(this._transform, (Enum) CrystalShopMaterialDetail.UI.OBJ_BUY);
+    gameObject.transform.localScale = new Vector3(1f, 1f, 1f);
+    gameObject.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+    base.Initialize();
+  }
 
-	private const string BREAK_DROP_EFF_NAME = "ef_ui_dropitem_red_01";
+  public override void UpdateUI()
+  {
+    this.SetLabelText(this._transform, (Enum) CrystalShopMaterialDetail.UI.LBL_PRICE, this.priceStr);
+    this.SetActive((Enum) CrystalShopMaterialDetail.UI.SPR_SALE, this.materialData.offerType == 3);
+    this.SetGrid((Enum) CrystalShopMaterialDetail.UI.GRD_DETAIL, (string) null, this.datas.Count, true, (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+    {
+      ItemSortData data = this.datas[i];
+      this.SetItemIcon(t, data, i);
+    }));
+  }
 
-	private ProductData materialData;
+  private bool IsRare(SortCompareData icon_base)
+  {
+    return icon_base != null && GameDefine.IsRare(icon_base.GetRarity());
+  }
 
-	private string priceStr = string.Empty;
+  private bool IsBreakReward(SortCompareData icon_base)
+  {
+    return icon_base != null && icon_base.GetCategory() == REWARD_CATEGORY.BREAK;
+  }
 
-	private List<ItemSortData> datas;
+  private void SetItemIcon(Transform holder, ItemSortData data, int event_data = 0)
+  {
+    ITEM_ICON_TYPE itemIconType = ITEM_ICON_TYPE.NONE;
+    RARITY_TYPE? rarity = new RARITY_TYPE?();
+    ELEMENT_TYPE element = ELEMENT_TYPE.MAX;
+    EQUIPMENT_TYPE? magi_enable_icon_type = new EQUIPMENT_TYPE?();
+    int icon_id = -1;
+    int num = -1;
+    if (data != null)
+    {
+      itemIconType = data.GetIconType();
+      icon_id = data.GetIconID();
+      rarity = new RARITY_TYPE?(data.GetRarity());
+      element = data.GetIconElement();
+      magi_enable_icon_type = data.GetIconMagiEnableType();
+      num = data.GetNum();
+      if (num == 1)
+        num = -1;
+    }
+    bool is_new = false;
+    switch (itemIconType)
+    {
+      case ITEM_ICON_TYPE.NONE:
+        int enemy_icon_id = 0;
+        if (itemIconType == ITEM_ICON_TYPE.ITEM)
+          enemy_icon_id = Singleton<ItemTable>.I.GetItemData(data.GetTableID()).enemyIconID;
+        ItemIcon itemIcon;
+        if (data.GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
+          itemIcon = ItemIcon.Create(new ItemIcon.ItemIconCreateParam()
+          {
+            icon_type = data.GetIconType(),
+            icon_id = data.GetIconID(),
+            rarity = new RARITY_TYPE?(data.GetRarity()),
+            parent = holder,
+            element = data.GetIconElement(),
+            magi_enable_equip_type = data.GetIconMagiEnableType(),
+            num = data.GetNum(),
+            enemy_icon_id = enemy_icon_id,
+            questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST
+          });
+        else
+          itemIcon = ItemIcon.Create(itemIconType, icon_id, rarity, holder, element, magi_enable_icon_type, num, "DROP", event_data, is_new, enemy_icon_id: enemy_icon_id);
+        itemIcon.SetRewardBG(true);
+        this.SetMaterialInfo(itemIcon.transform, data.GetMaterialType(), data.GetTableID(), this.GetCtrl((Enum) CrystalShopMaterialDetail.UI.PNL_MATERIAL_INFO));
+        break;
+      case ITEM_ICON_TYPE.ITEM:
+      case ITEM_ICON_TYPE.QUEST_ITEM:
+        if (data.GetUniqID() != 0UL)
+        {
+          is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(itemIconType, data.GetUniqID());
+          goto case ITEM_ICON_TYPE.NONE;
+        }
+        goto case ITEM_ICON_TYPE.NONE;
+      default:
+        is_new = true;
+        goto case ITEM_ICON_TYPE.NONE;
+    }
+  }
 
-	private int index;
+  private void OnQuery_BUY() => this.RequestEvent("BUY", (object) this.index);
 
-	public override void Initialize()
-	{
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		object[] array = GameSection.GetEventData() as object[];
-		materialData = (array[0] as ProductData);
-		priceStr = (array[1] as string);
-		index = (int)array[2];
-		InventoryList<ItemInfo, Item> inventoryList = ItemInfo.CreateList(materialData.items);
-		datas = new List<ItemSortData>();
-		for (LinkedListNode<ItemInfo> linkedListNode = inventoryList.GetFirstNode(); linkedListNode != null; linkedListNode = linkedListNode.Next)
-		{
-			if (linkedListNode != null && linkedListNode.Value != null && linkedListNode.Value.tableData != null)
-			{
-				ItemSortData itemSortData = new ItemSortData();
-				itemSortData.SetItem(linkedListNode.Value);
-				datas.Add(itemSortData);
-			}
-		}
-		this.StartCoroutine(DoInitialize());
-	}
-
-	private IEnumerator DoInitialize()
-	{
-		string buttonName = "BTN_SHOP_NORMAL1";
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject lo_button = loadQueue.Load(RESOURCE_CATEGORY.GACHA_BUTTON, buttonName, false);
-		if (loadQueue.IsLoading())
-		{
-			yield return (object)loadQueue.Wait();
-		}
-		GameObject buttonObj = Object.Instantiate(lo_button.loadedObject) as GameObject;
-		buttonObj.get_transform().set_parent(FindCtrl(base._transform, UI.OBJ_BUY));
-		buttonObj.get_transform().set_localScale(new Vector3(1f, 1f, 1f));
-		buttonObj.get_transform().set_localPosition(new Vector3(0f, 0f, 0f));
-		base.Initialize();
-	}
-
-	public override void UpdateUI()
-	{
-		SetLabelText(base._transform, UI.LBL_PRICE, priceStr);
-		SetActive((Enum)UI.SPR_SALE, materialData.offerType == 3);
-		SetGrid(UI.GRD_DETAIL, null, datas.Count, true, delegate(int i, Transform t, bool is_recycle)
-		{
-			ItemSortData data = datas[i];
-			SetItemIcon(t, data, i);
-		});
-	}
-
-	private bool IsRare(SortCompareData icon_base)
-	{
-		if (icon_base != null)
-		{
-			return GameDefine.IsRare(icon_base.GetRarity());
-		}
-		return false;
-	}
-
-	private bool IsBreakReward(SortCompareData icon_base)
-	{
-		if (icon_base != null)
-		{
-			return icon_base.GetCategory() == REWARD_CATEGORY.BREAK;
-		}
-		return false;
-	}
-
-	private void SetItemIcon(Transform holder, ItemSortData data, int event_data = 0)
-	{
-		ITEM_ICON_TYPE iTEM_ICON_TYPE = ITEM_ICON_TYPE.NONE;
-		RARITY_TYPE? rarity = null;
-		ELEMENT_TYPE element = ELEMENT_TYPE.MAX;
-		EQUIPMENT_TYPE? magi_enable_icon_type = null;
-		int icon_id = -1;
-		int num = -1;
-		if (data != null)
-		{
-			iTEM_ICON_TYPE = data.GetIconType();
-			icon_id = data.GetIconID();
-			rarity = data.GetRarity();
-			element = data.GetIconElement();
-			magi_enable_icon_type = data.GetIconMagiEnableType();
-			num = data.GetNum();
-			if (num == 1)
-			{
-				num = -1;
-			}
-		}
-		bool is_new = false;
-		switch (iTEM_ICON_TYPE)
-		{
-		case ITEM_ICON_TYPE.ITEM:
-		case ITEM_ICON_TYPE.QUEST_ITEM:
-		{
-			ulong uniqID = data.GetUniqID();
-			if (uniqID != 0L)
-			{
-				is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iTEM_ICON_TYPE, data.GetUniqID());
-			}
-			break;
-		}
-		default:
-			is_new = true;
-			break;
-		case ITEM_ICON_TYPE.NONE:
-			break;
-		}
-		int enemy_icon_id = 0;
-		if (iTEM_ICON_TYPE == ITEM_ICON_TYPE.ITEM)
-		{
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(data.GetTableID());
-			enemy_icon_id = itemData.enemyIconID;
-		}
-		ItemIcon itemIcon = null;
-		if (data.GetIconType() == ITEM_ICON_TYPE.QUEST_ITEM)
-		{
-			ItemIcon.ItemIconCreateParam itemIconCreateParam = new ItemIcon.ItemIconCreateParam();
-			itemIconCreateParam.icon_type = data.GetIconType();
-			itemIconCreateParam.icon_id = data.GetIconID();
-			itemIconCreateParam.rarity = data.GetRarity();
-			itemIconCreateParam.parent = holder;
-			itemIconCreateParam.element = data.GetIconElement();
-			itemIconCreateParam.magi_enable_equip_type = data.GetIconMagiEnableType();
-			itemIconCreateParam.num = data.GetNum();
-			itemIconCreateParam.enemy_icon_id = enemy_icon_id;
-			itemIconCreateParam.questIconSizeType = ItemIcon.QUEST_ICON_SIZE_TYPE.REWARD_DELIVERY_LIST;
-			itemIcon = ItemIcon.Create(itemIconCreateParam);
-		}
-		else
-		{
-			itemIcon = ItemIcon.Create(iTEM_ICON_TYPE, icon_id, rarity, holder, element, magi_enable_icon_type, num, "DROP", event_data, is_new, -1, false, null, false, enemy_icon_id, 0, false, GET_TYPE.PAY);
-		}
-		itemIcon.SetRewardBG(true);
-		SetMaterialInfo(itemIcon.transform, data.GetMaterialType(), data.GetTableID(), GetCtrl(UI.PNL_MATERIAL_INFO));
-	}
-
-	private void OnQuery_BUY()
-	{
-		RequestEvent("BUY", index);
-	}
+  private enum UI
+  {
+    SPR_SALE,
+    OBJ_BUY,
+    SPR_BUY_NOW,
+    LBL_PRICE,
+    SCR_DETAIL,
+    GRD_DETAIL,
+    PNL_MATERIAL_INFO,
+  }
 }

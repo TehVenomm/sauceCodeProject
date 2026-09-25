@@ -1,379 +1,332 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UI_Common
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class UI_Common : UIBehaviour
 {
-	private enum UI
-	{
-		OBJ_CAPTION,
-		OBJ_CAPTION_1,
-		OBJ_CAPTION_2,
-		OBJ_CAPTION_3,
-		SPR_BADGE,
-		LBL_BADGE,
-		SPR_NAMEPLATE,
-		LBL_NAMEPLATE,
-		OBJ_QUEST_BALLOON,
-		SPR_QUEST_BALLOON_N,
-		SPR_QUEST_BALLOON_R,
-		OBJ_EVENT_BALLOON,
-		SPR_EVENT_BALLOON,
-		OBJ_BACK,
-		LBL_CAPTION,
-		OBJ_BACK_1,
-		OBJ_BACK_2,
-		OBJ_BACK_3,
-		SPR_QUEST_BALLOON_E,
-		SPR_QUEST_BALLOON_CN,
-		SPR_QUEST_BALLOON_CE,
-		SPR_QUEST_BALLOON_SC,
-		SPR_EVENT_BALLOON_C,
-		OBJ_POINT_SHOP_BALLOON,
-		SPR_POINT_SHOP_BALLOON,
-		OBJ_BINGO_BALLOON,
-		SPR_BINGO_BALLOON,
-		OBJ_EXPLORE_BALLOON,
-		SPR_EXPLORE_BALLOON,
-		OBJ_LOUNGE_QUEST_BALLOON,
-		SPR_LOUNGE_QUEST_BALLOON,
-		OBJ_LOUNGE_NAMEPLATE,
-		SPR_LOUNGE_NAMEPLATE,
-		OBJ_CHAT_APPEAL,
-		OBJ_STAMP_APPEAL
-	}
+  public override void UpdateUI()
+  {
+    this.SetActive((Enum) UI_Common.UI.OBJ_CAPTION_1, false);
+    this.SetActive((Enum) UI_Common.UI.OBJ_CAPTION_2, false);
+    this.SetActive((Enum) UI_Common.UI.OBJ_CAPTION_3, false);
+    this.SetActive((Enum) UI_Common.UI.SPR_BADGE, false);
+    this.SetActive((Enum) UI_Common.UI.SPR_NAMEPLATE, false);
+    this.SetActive((Enum) UI_Common.UI.OBJ_QUEST_BALLOON, false);
+    this.SetActive((Enum) UI_Common.UI.OBJ_EVENT_BALLOON, false);
+    this.SetActive((Enum) UI_Common.UI.OBJ_LOUNGE_QUEST_BALLOON, false);
+    this.SetActive((Enum) UI_Common.UI.OBJ_BACK_1, false);
+    this.SetActive((Enum) UI_Common.UI.OBJ_BACK_2, false);
+    this.SetActive((Enum) UI_Common.UI.OBJ_BACK_3, false);
+    this.SetActive((Enum) UI_Common.UI.OBJ_LOUNGE_NAMEPLATE, false);
+    this.SetActive((Enum) UI_Common.UI.OBJ_CHAT_APPEAL, false);
+    this.SetActive((Enum) UI_Common.UI.OBJ_STAMP_APPEAL, false);
+  }
 
-	public enum BALLOON_TYPE
-	{
-		NEW_NORMAL_L,
-		NEW_NORMAL_R,
-		NEW_DAILY,
-		COMPLETABLE_NORMAL_L,
-		COMPLETABLE_DAILY,
-		POINT_SHOP,
-		NEW_SHADOW_CHALLENGE
-	}
+  public void AttachBackButton(UIBehaviour target_ui, int button_index)
+  {
+    UI_Common.UI label_enum = (UI_Common.UI) (15 + button_index);
+    ((Object) ((Component) this.Attach(target_ui, this.GetCtrl((Enum) label_enum))).gameObject).name = UI_Common.UI.OBJ_BACK.ToString();
+  }
 
-	public enum EVENT_BALLOON_TYPE
-	{
-		NONE,
-		NEW,
-		COMPLETABLE
-	}
+  public void AttachCaption(UIBehaviour target_ui, int button_index, string caption)
+  {
+    if (string.IsNullOrEmpty(caption) || button_index == 0)
+      return;
+    UI_Common.UI label_enum = (UI_Common.UI) button_index;
+    Transform root = this.Attach(target_ui, this.GetCtrl((Enum) label_enum));
+    ((Object) ((Component) root).gameObject).name = UI_Common.UI.OBJ_CAPTION.ToString();
+    this.SetLabelText(root, (Enum) UI_Common.UI.LBL_CAPTION, caption);
+    UITweenCtrl componentInChildren = ((Component) root).gameObject.GetComponentInChildren<UITweenCtrl>();
+    if (!Object.op_Inequality((Object) componentInChildren, (Object) null))
+      return;
+    componentInChildren.Reset();
+    int index = 0;
+    for (int length = componentInChildren.tweens.Length; index < length; ++index)
+      componentInChildren.tweens[index].ResetToBeginning();
+    componentInChildren.Play();
+  }
 
-	public override void UpdateUI()
-	{
-		SetActive((Enum)UI.OBJ_CAPTION_1, false);
-		SetActive((Enum)UI.OBJ_CAPTION_2, false);
-		SetActive((Enum)UI.OBJ_CAPTION_3, false);
-		SetActive((Enum)UI.SPR_BADGE, false);
-		SetActive((Enum)UI.SPR_NAMEPLATE, false);
-		SetActive((Enum)UI.OBJ_QUEST_BALLOON, false);
-		SetActive((Enum)UI.OBJ_EVENT_BALLOON, false);
-		SetActive((Enum)UI.OBJ_LOUNGE_QUEST_BALLOON, false);
-		SetActive((Enum)UI.OBJ_BACK_1, false);
-		SetActive((Enum)UI.OBJ_BACK_2, false);
-		SetActive((Enum)UI.OBJ_BACK_3, false);
-		SetActive((Enum)UI.OBJ_LOUNGE_NAMEPLATE, false);
-		SetActive((Enum)UI.OBJ_CHAT_APPEAL, false);
-		SetActive((Enum)UI.OBJ_STAMP_APPEAL, false);
-	}
+  public void AttachBadge(
+    UIWidget target_widget,
+    int num,
+    SpriteAlignment align,
+    int offset_x = 5,
+    int offset_y = 5,
+    bool is_scale_normalize = false)
+  {
+    if (Object.op_Equality((Object) target_widget, (Object) null))
+      return;
+    Transform transform = ((Component) target_widget).transform;
+    string text = (string) null;
+    if (num < 0)
+      text = "!";
+    else if (num > 99)
+      text = "99+";
+    else if (num != 0)
+      text = num.ToString();
+    Transform ctrl = this.FindCtrl(transform, (Enum) UI_Common.UI.LBL_BADGE);
+    if (Object.op_Inequality((Object) ctrl, (Object) null))
+    {
+      if (text == null)
+        Object.DestroyImmediate((Object) ((Component) this.FindCtrl(transform, (Enum) UI_Common.UI.SPR_BADGE)).gameObject);
+      else
+        ((Component) ctrl).GetComponent<UILabel>().text = text;
+    }
+    else
+    {
+      if (text == null)
+        return;
+      Transform root = this.Attach(target_widget, this.GetCtrl((Enum) UI_Common.UI.SPR_BADGE), align, offset_x, offset_y);
+      this.SetLabelText(root, (Enum) UI_Common.UI.LBL_BADGE, text);
+      if (!is_scale_normalize)
+        return;
+      Vector3 localScale = MonoBehaviourSingleton<UIManager>.I.uiRootTransform.localScale;
+      Vector3 vector3;
+      // ISSUE: explicit constructor call
+      ((Vector3) ref vector3).\u002Ector(localScale.x / root.lossyScale.x, localScale.y / root.lossyScale.y);
+      root.localScale = vector3;
+    }
+  }
 
-	public void AttachBackButton(UIBehaviour target_ui, int button_index)
-	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		UI uI = (UI)(15 + button_index);
-		Transform val = Attach(target_ui, GetCtrl(uI));
-		val.get_gameObject().set_name(UI.OBJ_BACK.ToString());
-	}
+  public Transform CreateQuestBalloon(UI_Common.BALLOON_TYPE type, Transform parent)
+  {
+    Transform root = this.Clone(this.GetCtrl((Enum) UI_Common.UI.OBJ_QUEST_BALLOON), parent);
+    this.SetActive(root, (Enum) UI_Common.UI.OBJ_QUEST_BALLOON, true);
+    this.SetActive(root, (Enum) UI_Common.UI.SPR_QUEST_BALLOON_N, type == UI_Common.BALLOON_TYPE.NEW_NORMAL_L);
+    this.SetActive(root, (Enum) UI_Common.UI.SPR_QUEST_BALLOON_R, type == UI_Common.BALLOON_TYPE.NEW_NORMAL_R);
+    this.SetActive(root, (Enum) UI_Common.UI.SPR_QUEST_BALLOON_E, type == UI_Common.BALLOON_TYPE.NEW_DAILY);
+    this.SetActive(root, (Enum) UI_Common.UI.SPR_QUEST_BALLOON_CN, type == UI_Common.BALLOON_TYPE.COMPLETABLE_NORMAL_L);
+    this.SetActive(root, (Enum) UI_Common.UI.SPR_QUEST_BALLOON_CE, type == UI_Common.BALLOON_TYPE.COMPLETABLE_DAILY);
+    this.SetActive(root, (Enum) UI_Common.UI.SPR_QUEST_BALLOON_SC, type == UI_Common.BALLOON_TYPE.NEW_SHADOW_CHALLENGE);
+    Transform ctrl;
+    switch (type)
+    {
+      case UI_Common.BALLOON_TYPE.NEW_NORMAL_R:
+        ctrl = this.FindCtrl(root, (Enum) UI_Common.UI.SPR_QUEST_BALLOON_R);
+        break;
+      case UI_Common.BALLOON_TYPE.NEW_DAILY:
+        ctrl = this.FindCtrl(root, (Enum) UI_Common.UI.SPR_QUEST_BALLOON_E);
+        break;
+      case UI_Common.BALLOON_TYPE.COMPLETABLE_NORMAL_L:
+        ctrl = this.FindCtrl(root, (Enum) UI_Common.UI.SPR_QUEST_BALLOON_CN);
+        break;
+      case UI_Common.BALLOON_TYPE.COMPLETABLE_DAILY:
+        ctrl = this.FindCtrl(root, (Enum) UI_Common.UI.SPR_QUEST_BALLOON_CE);
+        break;
+      case UI_Common.BALLOON_TYPE.NEW_SHADOW_CHALLENGE:
+        ctrl = this.FindCtrl(root, (Enum) UI_Common.UI.SPR_QUEST_BALLOON_SC);
+        break;
+      default:
+        ctrl = this.FindCtrl(root, (Enum) UI_Common.UI.SPR_QUEST_BALLOON_N);
+        break;
+    }
+    return ctrl;
+  }
 
-	public void AttachCaption(UIBehaviour target_ui, int button_index, string caption)
-	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		if (!string.IsNullOrEmpty(caption) && button_index != 0)
-		{
-			UI uI = (UI)(0 + button_index);
-			Transform val = Attach(target_ui, GetCtrl(uI));
-			val.get_gameObject().set_name(UI.OBJ_CAPTION.ToString());
-			SetLabelText(val, UI.LBL_CAPTION, caption);
-			UITweenCtrl component = val.get_gameObject().GetComponent<UITweenCtrl>();
-			if (component != null)
-			{
-				component.Reset();
-				int i = 0;
-				for (int num = component.tweens.Length; i < num; i++)
-				{
-					component.tweens[i].ResetToBeginning();
-				}
-				component.Play(true, null);
-			}
-		}
-	}
+  public Transform CreateEventBalloon(Transform parent, UI_Common.EVENT_BALLOON_TYPE type)
+  {
+    Transform root = this.Clone(this.GetCtrl((Enum) UI_Common.UI.OBJ_EVENT_BALLOON), parent);
+    this.SetActive(root, (Enum) UI_Common.UI.OBJ_EVENT_BALLOON, true);
+    this.SetActive(root, (Enum) UI_Common.UI.SPR_EVENT_BALLOON, type == UI_Common.EVENT_BALLOON_TYPE.NEW);
+    this.SetActive(root, (Enum) UI_Common.UI.SPR_EVENT_BALLOON_C, type == UI_Common.EVENT_BALLOON_TYPE.COMPLETABLE);
+    return type == UI_Common.EVENT_BALLOON_TYPE.NEW || type != UI_Common.EVENT_BALLOON_TYPE.COMPLETABLE ? this.FindCtrl(root, (Enum) UI_Common.UI.SPR_EVENT_BALLOON) : this.FindCtrl(root, (Enum) UI_Common.UI.SPR_EVENT_BALLOON_C);
+  }
 
-	public void AttachBadge(UIWidget target_widget, int num, SpriteAlignment align, int offset_x = 5, int offset_y = 5, bool is_scale_normalize = false)
-	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-		if (!(target_widget == null))
-		{
-			Transform root = target_widget.get_transform();
-			string text = null;
-			if (num < 0)
-			{
-				text = "!";
-			}
-			else if (num > 99)
-			{
-				text = "99+";
-			}
-			else if (num != 0)
-			{
-				text = num.ToString();
-			}
-			Transform val = FindCtrl(root, UI.LBL_BADGE);
-			if (val != null)
-			{
-				if (text == null)
-				{
-					Object.DestroyImmediate(FindCtrl(root, UI.SPR_BADGE).get_gameObject());
-				}
-				else
-				{
-					val.GetComponent<UILabel>().text = text;
-				}
-			}
-			else if (text != null)
-			{
-				Transform val2 = Attach(target_widget, GetCtrl(UI.SPR_BADGE), align, offset_x, offset_y);
-				SetLabelText(val2, UI.LBL_BADGE, text);
-				if (is_scale_normalize)
-				{
-					Vector3 localScale = MonoBehaviourSingleton<UIManager>.I.uiRootTransform.get_localScale();
-					float x = localScale.x;
-					Vector3 lossyScale = val2.get_lossyScale();
-					float num2 = x / lossyScale.x;
-					float y = localScale.y;
-					Vector3 lossyScale2 = val2.get_lossyScale();
-					Vector3 localScale2 = default(Vector3);
-					localScale2._002Ector(num2, y / lossyScale2.y);
-					val2.set_localScale(localScale2);
-				}
-			}
-		}
-	}
+  public Transform CreatePointShopBalloon(Transform parent)
+  {
+    Transform root = this.Clone(this.GetCtrl((Enum) UI_Common.UI.OBJ_POINT_SHOP_BALLOON), parent);
+    this.SetActive(root, (Enum) UI_Common.UI.OBJ_POINT_SHOP_BALLOON, true);
+    return this.FindCtrl(root, (Enum) UI_Common.UI.SPR_POINT_SHOP_BALLOON);
+  }
 
-	public Transform CreateQuestBalloon(BALLOON_TYPE type, Transform parent)
-	{
-		Transform root = Clone(GetCtrl(UI.OBJ_QUEST_BALLOON), parent);
-		SetActive(root, UI.OBJ_QUEST_BALLOON, true);
-		SetActive(root, UI.SPR_QUEST_BALLOON_N, type == BALLOON_TYPE.NEW_NORMAL_L);
-		SetActive(root, UI.SPR_QUEST_BALLOON_R, type == BALLOON_TYPE.NEW_NORMAL_R);
-		SetActive(root, UI.SPR_QUEST_BALLOON_E, type == BALLOON_TYPE.NEW_DAILY);
-		SetActive(root, UI.SPR_QUEST_BALLOON_CN, type == BALLOON_TYPE.COMPLETABLE_NORMAL_L);
-		SetActive(root, UI.SPR_QUEST_BALLOON_CE, type == BALLOON_TYPE.COMPLETABLE_DAILY);
-		SetActive(root, UI.SPR_QUEST_BALLOON_SC, type == BALLOON_TYPE.NEW_SHADOW_CHALLENGE);
-		switch (type)
-		{
-		default:
-			return FindCtrl(root, UI.SPR_QUEST_BALLOON_N);
-		case BALLOON_TYPE.NEW_NORMAL_R:
-			return FindCtrl(root, UI.SPR_QUEST_BALLOON_R);
-		case BALLOON_TYPE.NEW_DAILY:
-			return FindCtrl(root, UI.SPR_QUEST_BALLOON_E);
-		case BALLOON_TYPE.COMPLETABLE_NORMAL_L:
-			return FindCtrl(root, UI.SPR_QUEST_BALLOON_CN);
-		case BALLOON_TYPE.COMPLETABLE_DAILY:
-			return FindCtrl(root, UI.SPR_QUEST_BALLOON_CE);
-		case BALLOON_TYPE.NEW_SHADOW_CHALLENGE:
-			return FindCtrl(root, UI.SPR_QUEST_BALLOON_SC);
-		}
-	}
+  public Transform CreateBingoBalloon(Transform parent)
+  {
+    Transform root = this.Clone(this.GetCtrl((Enum) UI_Common.UI.OBJ_BINGO_BALLOON), parent);
+    this.SetActive(root, (Enum) UI_Common.UI.OBJ_BINGO_BALLOON, true);
+    return this.FindCtrl(root, (Enum) UI_Common.UI.SPR_BINGO_BALLOON);
+  }
 
-	public Transform CreateEventBalloon(Transform parent, EVENT_BALLOON_TYPE type)
-	{
-		Transform root = Clone(GetCtrl(UI.OBJ_EVENT_BALLOON), parent);
-		SetActive(root, UI.OBJ_EVENT_BALLOON, true);
-		SetActive(root, UI.SPR_EVENT_BALLOON, type == EVENT_BALLOON_TYPE.NEW);
-		SetActive(root, UI.SPR_EVENT_BALLOON_C, type == EVENT_BALLOON_TYPE.COMPLETABLE);
-		Transform val = null;
-		switch (type)
-		{
-		default:
-			return FindCtrl(root, UI.SPR_EVENT_BALLOON);
-		case EVENT_BALLOON_TYPE.COMPLETABLE:
-			return FindCtrl(root, UI.SPR_EVENT_BALLOON_C);
-		}
-	}
+  public Transform CreateExploreBalloon(Transform parent)
+  {
+    Transform root = this.Clone(this.GetCtrl((Enum) UI_Common.UI.OBJ_EXPLORE_BALLOON), parent);
+    this.SetActive(root, (Enum) UI_Common.UI.OBJ_EXPLORE_BALLOON, true);
+    return this.FindCtrl(root, (Enum) UI_Common.UI.SPR_EXPLORE_BALLOON);
+  }
 
-	public Transform CreatePointShopBalloon(Transform parent)
-	{
-		Transform root = Clone(GetCtrl(UI.OBJ_POINT_SHOP_BALLOON), parent);
-		SetActive(root, UI.OBJ_POINT_SHOP_BALLOON, true);
-		return FindCtrl(root, UI.SPR_POINT_SHOP_BALLOON);
-	}
+  public Transform CreateLoungeQuestBalloon(Transform parent)
+  {
+    Transform root = this.Clone(this.GetCtrl((Enum) UI_Common.UI.OBJ_LOUNGE_QUEST_BALLOON), parent);
+    this.SetActive(root, (Enum) UI_Common.UI.OBJ_LOUNGE_QUEST_BALLOON, true);
+    return this.FindCtrl(root, (Enum) UI_Common.UI.SPR_LOUNGE_QUEST_BALLOON);
+  }
 
-	public Transform CreateBingoBalloon(Transform parent)
-	{
-		Transform root = Clone(GetCtrl(UI.OBJ_BINGO_BALLOON), parent);
-		SetActive(root, UI.OBJ_BINGO_BALLOON, true);
-		return FindCtrl(root, UI.SPR_BINGO_BALLOON);
-	}
+  public Transform CreateNamePlate(string text)
+  {
+    Transform root = this.Clone(this.GetCtrl((Enum) UI_Common.UI.SPR_NAMEPLATE), MonoBehaviourSingleton<UIManager>.I._transform);
+    this.SetLabelText(root, (Enum) UI_Common.UI.LBL_NAMEPLATE, text);
+    return root;
+  }
 
-	public Transform CreateExploreBalloon(Transform parent)
-	{
-		Transform root = Clone(GetCtrl(UI.OBJ_EXPLORE_BALLOON), parent);
-		SetActive(root, UI.OBJ_EXPLORE_BALLOON, true);
-		return FindCtrl(root, UI.SPR_EXPLORE_BALLOON);
-	}
+  public Transform CreateLoungeNamePlate(string text)
+  {
+    Transform root = this.Clone(this.GetCtrl((Enum) UI_Common.UI.OBJ_LOUNGE_NAMEPLATE), MonoBehaviourSingleton<UIManager>.I._transform);
+    this.SetLabelText(root, (Enum) UI_Common.UI.LBL_NAMEPLATE, text);
+    return root;
+  }
 
-	public Transform CreateLoungeQuestBalloon(Transform parent)
-	{
-		Transform root = Clone(GetCtrl(UI.OBJ_LOUNGE_QUEST_BALLOON), parent);
-		SetActive(root, UI.OBJ_LOUNGE_QUEST_BALLOON, true);
-		return FindCtrl(root, UI.SPR_LOUNGE_QUEST_BALLOON);
-	}
+  public Transform CreateChatAppeal()
+  {
+    return this.Clone(this.GetCtrl((Enum) UI_Common.UI.OBJ_CHAT_APPEAL), MonoBehaviourSingleton<UIManager>.I._transform);
+  }
 
-	public Transform CreateNamePlate(string text)
-	{
-		Transform val = Clone(GetCtrl(UI.SPR_NAMEPLATE), MonoBehaviourSingleton<UIManager>.I._transform);
-		SetLabelText(val, UI.LBL_NAMEPLATE, text);
-		return val;
-	}
+  public Transform CreateStampAppeal()
+  {
+    return this.Clone(this.GetCtrl((Enum) UI_Common.UI.OBJ_STAMP_APPEAL), MonoBehaviourSingleton<UIManager>.I._transform);
+  }
 
-	public Transform CreateLoungeNamePlate(string text)
-	{
-		Transform val = Clone(GetCtrl(UI.OBJ_LOUNGE_NAMEPLATE), MonoBehaviourSingleton<UIManager>.I._transform);
-		SetLabelText(val, UI.LBL_NAMEPLATE, text);
-		return val;
-	}
+  private Transform Clone(Transform base_ui, Transform parent)
+  {
+    ((Component) base_ui).gameObject.SetActive(true);
+    Transform transform = ResourceUtility.Realizes((Object) ((Component) base_ui).gameObject, parent);
+    ((Component) base_ui).gameObject.SetActive(false);
+    return transform;
+  }
 
-	public Transform CreateChatAppeal()
-	{
-		return Clone(GetCtrl(UI.OBJ_CHAT_APPEAL), MonoBehaviourSingleton<UIManager>.I._transform);
-	}
+  private Transform Attach(UIBehaviour target_ui, Transform base_ui)
+  {
+    UIVirtualScreen component1 = ((Component) target_ui.collectUI).GetComponent<UIVirtualScreen>();
+    if (Object.op_Equality((Object) component1, (Object) null))
+      return (Transform) null;
+    Transform transform = this.Clone(base_ui, ((Component) component1).transform);
+    UIWidget component2 = ((Component) transform).GetComponent<UIWidget>();
+    if (!Object.op_Inequality((Object) component2, (Object) null))
+      return transform;
+    if (component2.leftAnchor != null)
+    {
+      if (FixedPanelNGUI.CheckResolutionCanFix())
+      {
+        if (((Object) component2.leftAnchor.target).name == "UI_Root")
+        {
+          component2.SetAnchor(FixedPanelNGUI.Root);
+          return transform;
+        }
+        component2.SetAnchor(((Component) component1).gameObject);
+        return transform;
+      }
+      component2.SetAnchor(((Component) component1).gameObject);
+      return transform;
+    }
+    component2.SetAnchor((GameObject) null);
+    return transform;
+  }
 
-	public Transform CreateStampAppeal()
-	{
-		return Clone(GetCtrl(UI.OBJ_STAMP_APPEAL), MonoBehaviourSingleton<UIManager>.I._transform);
-	}
+  private Transform Attach(
+    UIWidget target_widget,
+    Transform base_ui,
+    SpriteAlignment align,
+    int offset_x,
+    int offset_y)
+  {
+    if (Object.op_Equality((Object) target_widget, (Object) null))
+      return (Transform) null;
+    Transform transform = this.Clone(base_ui, ((Component) target_widget).transform);
+    UISprite component = ((Component) transform).GetComponent<UISprite>();
+    int num1 = target_widget.width >> 1;
+    int num2 = target_widget.height >> 1;
+    int num3 = component.width >> 1;
+    int num4 = component.height >> 1;
+    int num5 = num1 - num3;
+    int num6 = -num1 + num3;
+    int num7 = num2 - num4;
+    int num8 = -num2 + num4;
+    if (align == 4 || align == 6 || align == 1)
+    {
+      num5 -= num1;
+      num6 -= num1;
+    }
+    else if (align == 5 || align == 8 || align == 3)
+    {
+      num5 += num1;
+      num6 += num1;
+    }
+    if (align == 2 || align == 1 || align == 3)
+    {
+      num8 += num2;
+      num7 += num2;
+    }
+    else if (align == 7 || align == 6 || align == 8)
+    {
+      num8 -= num2;
+      num7 -= num2;
+    }
+    int left = num5 + offset_x;
+    int right = num6 + offset_x;
+    int top = num8 + offset_y;
+    int bottom = num7 + offset_y;
+    component.SetAnchor(((Component) target_widget).gameObject, left, bottom, right, top);
+    return transform;
+  }
 
-	private Transform Clone(Transform base_ui, Transform parent)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		base_ui.get_gameObject().SetActive(true);
-		Transform result = ResourceUtility.Realizes(base_ui.get_gameObject(), parent, -1);
-		base_ui.get_gameObject().SetActive(false);
-		return result;
-	}
+  private enum UI
+  {
+    OBJ_CAPTION,
+    OBJ_CAPTION_1,
+    OBJ_CAPTION_2,
+    OBJ_CAPTION_3,
+    SPR_BADGE,
+    LBL_BADGE,
+    SPR_NAMEPLATE,
+    LBL_NAMEPLATE,
+    OBJ_QUEST_BALLOON,
+    SPR_QUEST_BALLOON_N,
+    SPR_QUEST_BALLOON_R,
+    OBJ_EVENT_BALLOON,
+    SPR_EVENT_BALLOON,
+    OBJ_BACK,
+    LBL_CAPTION,
+    OBJ_BACK_1,
+    OBJ_BACK_2,
+    OBJ_BACK_3,
+    SPR_QUEST_BALLOON_E,
+    SPR_QUEST_BALLOON_CN,
+    SPR_QUEST_BALLOON_CE,
+    SPR_QUEST_BALLOON_SC,
+    SPR_EVENT_BALLOON_C,
+    OBJ_POINT_SHOP_BALLOON,
+    SPR_POINT_SHOP_BALLOON,
+    OBJ_BINGO_BALLOON,
+    SPR_BINGO_BALLOON,
+    OBJ_EXPLORE_BALLOON,
+    SPR_EXPLORE_BALLOON,
+    OBJ_LOUNGE_QUEST_BALLOON,
+    SPR_LOUNGE_QUEST_BALLOON,
+    OBJ_LOUNGE_NAMEPLATE,
+    SPR_LOUNGE_NAMEPLATE,
+    OBJ_CHAT_APPEAL,
+    OBJ_STAMP_APPEAL,
+  }
 
-	private Transform Attach(UIBehaviour target_ui, Transform base_ui)
-	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Expected O, but got Unknown
-		UIVirtualScreen component = target_ui.collectUI.GetComponent<UIVirtualScreen>();
-		if (component == null)
-		{
-			return null;
-		}
-		Transform val = Clone(base_ui, component.get_transform());
-		UIWidget component2 = val.GetComponent<UIWidget>();
-		if (component2 != null)
-		{
-			if (component2.leftAnchor != null)
-			{
-				((UIRect)component2).SetAnchor(component.get_gameObject());
-			}
-			else
-			{
-				((UIRect)component2).SetAnchor(null);
-			}
-		}
-		return val;
-	}
+  public enum BALLOON_TYPE
+  {
+    NEW_NORMAL_L,
+    NEW_NORMAL_R,
+    NEW_DAILY,
+    COMPLETABLE_NORMAL_L,
+    COMPLETABLE_DAILY,
+    POINT_SHOP,
+    NEW_SHADOW_CHALLENGE,
+  }
 
-	private Transform Attach(UIWidget target_widget, Transform base_ui, SpriteAlignment align, int offset_x, int offset_y)
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Invalid comparison between Unknown and I4
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Invalid comparison between Unknown and I4
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Invalid comparison between Unknown and I4
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Invalid comparison between Unknown and I4
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Invalid comparison between Unknown and I4
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Invalid comparison between Unknown and I4
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Invalid comparison between Unknown and I4
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Invalid comparison between Unknown and I4
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Invalid comparison between Unknown and I4
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Invalid comparison between Unknown and I4
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Invalid comparison between Unknown and I4
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Invalid comparison between Unknown and I4
-		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Expected O, but got Unknown
-		if (target_widget == null)
-		{
-			return null;
-		}
-		Transform val = Clone(base_ui, target_widget.get_transform());
-		UISprite component = val.GetComponent<UISprite>();
-		int num = target_widget.width >> 1;
-		int num2 = target_widget.height >> 1;
-		int num3 = component.width >> 1;
-		int num4 = component.height >> 1;
-		int num5 = num - num3;
-		int num6 = -num + num3;
-		int num7 = num2 - num4;
-		int num8 = -num2 + num4;
-		if ((int)align == 4 || (int)align == 6 || (int)align == 1)
-		{
-			num5 -= num;
-			num6 -= num;
-		}
-		else if ((int)align == 5 || (int)align == 8 || (int)align == 3)
-		{
-			num5 += num;
-			num6 += num;
-		}
-		if ((int)align == 2 || (int)align == 1 || (int)align == 3)
-		{
-			num8 += num2;
-			num7 += num2;
-		}
-		else if ((int)align == 7 || (int)align == 6 || (int)align == 8)
-		{
-			num8 -= num2;
-			num7 -= num2;
-		}
-		num5 += offset_x;
-		num6 += offset_x;
-		num8 += offset_y;
-		num7 += offset_y;
-		component.SetAnchor(target_widget.get_gameObject(), num5, num7, num6, num8);
-		return val;
-	}
+  public enum EVENT_BALLOON_TYPE
+  {
+    NONE,
+    NEW,
+    COMPLETABLE,
+  }
 }

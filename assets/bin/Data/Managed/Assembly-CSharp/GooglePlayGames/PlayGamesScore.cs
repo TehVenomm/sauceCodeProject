@@ -1,68 +1,64 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: GooglePlayGames.PlayGamesScore
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
+using UnityEngine.SocialPlatforms;
 
-namespace GooglePlayGames
+#nullable disable
+namespace GooglePlayGames;
+
+public class PlayGamesScore : IScore
 {
-	public class PlayGamesScore
-	{
-		private string mLbId;
+  private string mLbId;
+  private long mValue;
+  private ulong mRank;
+  private string mPlayerId = string.Empty;
+  private string mMetadata = string.Empty;
+  private DateTime mDate = new DateTime(1970, 1, 1, 0, 0, 0);
 
-		private long mValue;
+  internal PlayGamesScore(
+    DateTime date,
+    string leaderboardId,
+    ulong rank,
+    string playerId,
+    ulong value,
+    string metadata)
+  {
+    this.mDate = date;
+    this.mLbId = this.leaderboardID;
+    this.mRank = rank;
+    this.mPlayerId = playerId;
+    this.mValue = (long) value;
+    this.mMetadata = metadata;
+  }
 
-		private ulong mRank;
+  public void ReportScore(Action<bool> callback)
+  {
+    PlayGamesPlatform.Instance.ReportScore(this.mValue, this.mLbId, this.mMetadata, callback);
+  }
 
-		private string mPlayerId = string.Empty;
+  public string leaderboardID
+  {
+    get => this.mLbId;
+    set => this.mLbId = value;
+  }
 
-		private string mMetadata = string.Empty;
+  public long value
+  {
+    get => this.mValue;
+    set => this.mValue = value;
+  }
 
-		private DateTime mDate = new DateTime(1970, 1, 1, 0, 0, 0);
+  public DateTime date => this.mDate;
 
-		public string leaderboardID
-		{
-			get
-			{
-				return mLbId;
-			}
-			set
-			{
-				mLbId = value;
-			}
-		}
+  public string formattedValue => this.mValue.ToString();
 
-		public long value
-		{
-			get
-			{
-				return mValue;
-			}
-			set
-			{
-				mValue = value;
-			}
-		}
+  public string userID => this.mPlayerId;
 
-		public DateTime date => mDate;
+  public int rank => (int) this.mRank;
 
-		public string formattedValue => mValue.ToString();
-
-		public string userID => mPlayerId;
-
-		public int rank => (int)mRank;
-
-		public string metaData => mMetadata;
-
-		internal PlayGamesScore(DateTime date, string leaderboardId, ulong rank, string playerId, ulong value, string metadata)
-		{
-			mDate = date;
-			mLbId = leaderboardID;
-			mRank = rank;
-			mPlayerId = playerId;
-			mValue = (long)value;
-			mMetadata = metadata;
-		}
-
-		public void ReportScore(Action<bool> callback)
-		{
-			PlayGamesPlatform.Instance.ReportScore(mValue, mLbId, mMetadata, callback);
-		}
-	}
+  public string metaData => this.mMetadata;
 }

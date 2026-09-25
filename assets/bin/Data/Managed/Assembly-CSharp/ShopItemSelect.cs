@@ -1,90 +1,94 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ShopItemSelect
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
+using System;
 using UnityEngine;
 
+#nullable disable
 public class ShopItemSelect : GameSection
 {
-	protected enum UI
-	{
-		OBJ_FRAME,
-		SCR_LIST,
-		TBL_LIST,
-		LBL_NAME,
-		LBL_DESCRIPTION,
-		LBL_CRYSTAL_NUM,
-		OBJ_ICON_ROOT
-	}
+  protected object[] selectEventData;
 
-	protected object[] selectEventData;
+  public override void Initialize() => base.Initialize();
 
-	public override void Initialize()
-	{
-		base.Initialize();
-	}
+  public override void UpdateUI()
+  {
+    base.UpdateUI();
+    this.SetTable((Enum) ShopItemSelect.UI.TBL_LIST, "ShopItemListItem", MonoBehaviourSingleton<ShopManager>.I.shopData.lineups.Count, false, (Action<int, Transform, bool>) ((i, t, b) =>
+    {
+      ShopList.ShopLineup lineup = MonoBehaviourSingleton<ShopManager>.I.shopData.lineups[i];
+      this.SetLabelText(t, (Enum) ShopItemSelect.UI.LBL_NAME, lineup.name);
+      this.SetLabelText(t, (Enum) ShopItemSelect.UI.LBL_DESCRIPTION, lineup.description);
+      this.SetLabelText(t, (Enum) ShopItemSelect.UI.LBL_CRYSTAL_NUM, lineup.crystalNum.ToString());
+      this.SetEvent(t, "SELECT", lineup.shopLineupId);
+      ItemIcon rewardItemIcon = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.ITEM, (uint) lineup.itemIds[0], this.FindCtrl(t, (Enum) ShopItemSelect.UI.OBJ_ICON_ROOT));
+      if (!Object.op_Inequality((Object) rewardItemIcon, (Object) null))
+        return;
+      rewardItemIcon.SetEnableCollider(false);
+    }));
+  }
 
-	public override void UpdateUI()
-	{
-		base.UpdateUI();
-		SetTable(UI.TBL_LIST, "ShopItemListItem", MonoBehaviourSingleton<ShopManager>.I.shopData.lineups.Count, false, delegate(int i, Transform t, bool b)
-		{
-			ShopList.ShopLineup shopLineup = MonoBehaviourSingleton<ShopManager>.I.shopData.lineups[i];
-			SetLabelText(t, UI.LBL_NAME, shopLineup.name);
-			SetLabelText(t, UI.LBL_DESCRIPTION, shopLineup.description);
-			SetLabelText(t, UI.LBL_CRYSTAL_NUM, shopLineup.crystalNum.ToString());
-			SetEvent(t, "SELECT", shopLineup.shopLineupId);
-			uint itemId = (uint)shopLineup.itemIds[0];
-			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon(REWARD_TYPE.ITEM, itemId, FindCtrl(t, UI.OBJ_ICON_ROOT), -1, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-			if (itemIcon != null)
-			{
-				itemIcon.SetEnableCollider(false);
-			}
-		});
-	}
+  private void OnQuery_SELECT()
+  {
+    int eventData = (int) GameSection.GetEventData();
+    ShopList.ShopLineup lineup = MonoBehaviourSingleton<ShopManager>.I.GetLineup(eventData);
+    if (lineup == null)
+    {
+      Log.Error(LOG.OUTGAME, $"lineup_id={(object) eventData} is not found.");
+      GameSection.StopEvent();
+    }
+    else
+    {
+      this.selectEventData = new object[7]
+      {
+        (object) eventData,
+        (object) lineup,
+        (object) lineup.name,
+        (object) lineup.description,
+        (object) lineup.crystalNum,
+        (object) MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal,
+        (object) (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal - lineup.crystalNum)
+      };
+      GameSection.SetEventData((object) this.selectEventData);
+    }
+  }
 
-	private void OnQuery_SELECT()
-	{
-		int num = (int)GameSection.GetEventData();
-		ShopList.ShopLineup lineup = MonoBehaviourSingleton<ShopManager>.I.GetLineup(num);
-		if (lineup == null)
-		{
-			Log.Error(LOG.OUTGAME, "lineup_id=" + num + " is not found.");
-			GameSection.StopEvent();
-		}
-		else
-		{
-			selectEventData = new object[7]
-			{
-				num,
-				lineup,
-				lineup.name,
-				lineup.description,
-				lineup.crystalNum,
-				MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal,
-				MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal - lineup.crystalNum
-			};
-			GameSection.SetEventData(selectEventData);
-		}
-	}
+  protected void OnQuery_ShopItemConfirm_YES()
+  {
+    GameSection.SetEventData((object) this.selectEventData);
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<ShopManager>.I.SendBuy((int) this.selectEventData[0], (Action<Error>) (error =>
+    {
+      if (error != Error.None)
+      {
+        if (error == Error.ERR_CRYSTAL_NOT_ENOUGH)
+        {
+          GameSection.ChangeStayEvent("NOT_ENOUGTH");
+          GameSection.ResumeEvent(true);
+        }
+        else
+          GameSection.ResumeEvent(false);
+      }
+      else
+      {
+        this.selectEventData[6] = (object) MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
+        GameSection.ResumeEvent(true);
+      }
+    }));
+  }
 
-	protected void OnQuery_ShopItemConfirm_YES()
-	{
-		GameSection.SetEventData(selectEventData);
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<ShopManager>.I.SendBuy((int)selectEventData[0], delegate(Error error)
-		{
-			switch (error)
-			{
-			case Error.None:
-				selectEventData[6] = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
-				GameSection.ResumeEvent(true, null);
-				break;
-			case Error.ERR_CRYSTAL_NOT_ENOUGH:
-				GameSection.ChangeStayEvent("NOT_ENOUGTH", null);
-				GameSection.ResumeEvent(true, null);
-				break;
-			default:
-				GameSection.ResumeEvent(false, null);
-				break;
-			}
-		});
-	}
+  protected enum UI
+  {
+    OBJ_FRAME,
+    SCR_LIST,
+    TBL_LIST,
+    LBL_NAME,
+    LBL_DESCRIPTION,
+    LBL_CRYSTAL_NUM,
+    OBJ_ICON_ROOT,
+  }
 }

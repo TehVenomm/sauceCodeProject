@@ -1,98 +1,66 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: PlayerMarker
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class PlayerMarker
+#nullable disable
+public class PlayerMarker : MonoBehaviour
 {
-	[SerializeField]
-	private float speed;
+  [SerializeField]
+  private float speed;
+  [SerializeField]
+  private float alphaSpeed;
+  private float angle;
+  private Transform _transform;
+  private float baseAngle = -45f;
+  private float alpha;
+  private Material _mat;
+  private Transform camTransform;
 
-	[SerializeField]
-	private float alphaSpeed;
+  private void Awake()
+  {
+    this._transform = ((Component) this).transform;
+    MeshRenderer component = ((Component) this).GetComponent<MeshRenderer>();
+    if (!Object.op_Inequality((Object) component, (Object) null))
+      return;
+    this._mat = ((Renderer) component).material;
+  }
 
-	private float angle;
+  private void Update()
+  {
+    this.alpha += Time.deltaTime * this.alphaSpeed;
+    this.alpha = Mathf.Clamp01(this.alpha);
+    this._mat.SetFloat("_Alpha", this.alpha);
+    this.angle += Time.deltaTime * this.speed;
+    this.angle = Mathf.Repeat(this.angle, 360f);
+    if (Object.op_Inequality((Object) null, (Object) this.camTransform))
+    {
+      Vector3 position = this.camTransform.position;
+      position.x = this._transform.position.x;
+      this._transform.LookAt(position);
+      this._transform.localRotation = Quaternion.op_Multiply(this._transform.localRotation, Quaternion.AngleAxis(this.angle, Vector3.up));
+    }
+    else
+      this._transform.localRotation = Quaternion.op_Multiply(Quaternion.AngleAxis(this.baseAngle, Vector3.right), Quaternion.AngleAxis(this.angle, Vector3.up));
+  }
 
-	private Transform _transform;
+  public void SetWorldMode(bool enable)
+  {
+    if (enable)
+    {
+      this.baseAngle = 45f;
+      float num = 10f;
+      this._transform.localScale = new Vector3(num, num, num);
+    }
+    else
+    {
+      this.baseAngle = -45f;
+      this._transform.localScale = Vector3.one;
+    }
+  }
 
-	private float baseAngle = -45f;
-
-	private float alpha;
-
-	private Material _mat;
-
-	private Transform camTransform;
-
-	public PlayerMarker()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Expected O, but got Unknown
-		_transform = this.get_transform();
-		MeshRenderer component = this.GetComponent<MeshRenderer>();
-		if (component != null)
-		{
-			_mat = component.get_material();
-		}
-	}
-
-	private void Update()
-	{
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		alpha += Time.get_deltaTime() * alphaSpeed;
-		alpha = Mathf.Clamp01(alpha);
-		_mat.SetFloat("_Alpha", alpha);
-		angle += Time.get_deltaTime() * speed;
-		angle = Mathf.Repeat(angle, 360f);
-		if (null != camTransform)
-		{
-			Vector3 position = camTransform.get_position();
-			Vector3 position2 = _transform.get_position();
-			position.x = position2.x;
-			_transform.LookAt(position);
-			_transform.set_localRotation(_transform.get_localRotation() * Quaternion.AngleAxis(angle, Vector3.get_up()));
-		}
-		else
-		{
-			_transform.set_localRotation(Quaternion.AngleAxis(baseAngle, Vector3.get_right()) * Quaternion.AngleAxis(angle, Vector3.get_up()));
-		}
-	}
-
-	public void SetWorldMode(bool enable)
-	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		if (enable)
-		{
-			baseAngle = 45f;
-			float num = 10f;
-			_transform.set_localScale(new Vector3(num, num, num));
-		}
-		else
-		{
-			baseAngle = -45f;
-			_transform.set_localScale(Vector3.get_one());
-		}
-	}
-
-	public void SetCamera(Transform c)
-	{
-		camTransform = c;
-	}
+  public void SetCamera(Transform c) => this.camTransform = c;
 }

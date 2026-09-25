@@ -1,42 +1,41 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ShopPopUpAdDialog
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class ShopPopUpAdDialog : GameSection
 {
-	protected enum UI
-	{
-		OBJ_FRAME,
-		TEX_MAIN
-	}
+  private string textureName = "";
 
-	private string textureName = string.Empty;
+  public override void Initialize()
+  {
+    this.textureName = GameSection.GetEventData() as string;
+    this.StartCoroutine(this.DoInitialize());
+  }
 
-	public override void Initialize()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		textureName = (GameSection.GetEventData() as string);
-		this.StartCoroutine(DoInitialize());
-	}
+  private IEnumerator DoInitialize()
+  {
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject loTex = loadingQueue.Load(RESOURCE_CATEGORY.GACHA_POP_UP_ADVERTISEMENT, this.textureName);
+    if (loadingQueue.IsLoading())
+      yield return (object) loadingQueue.Wait();
+    if (Object.op_Inequality(loTex.loadedObject, (Object) null))
+      this.SetTexture((Enum) ShopPopUpAdDialog.UI.TEX_MAIN, loTex.loadedObject as Texture);
+    this.PlayTween((Enum) ShopPopUpAdDialog.UI.OBJ_FRAME, is_input_block: false);
+    base.Initialize();
+  }
 
-	private IEnumerator DoInitialize()
-	{
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject loTex = loadQueue.Load(RESOURCE_CATEGORY.GACHA_POP_UP_ADVERTISEMENT, textureName, false);
-		if (loadQueue.IsLoading())
-		{
-			yield return (object)loadQueue.Wait();
-		}
-		if (loTex.loadedObject != null)
-		{
-			SetTexture((Enum)UI.TEX_MAIN, loTex.loadedObject as Texture);
-		}
-		PlayTween((Enum)UI.OBJ_FRAME, true, (EventDelegate.Callback)null, false, 0);
-		base.Initialize();
-	}
+  public override void UpdateUI() => base.UpdateUI();
 
-	public override void UpdateUI()
-	{
-		base.UpdateUI();
-	}
+  protected enum UI
+  {
+    OBJ_FRAME,
+    TEX_MAIN,
+  }
 }

@@ -1,694 +1,525 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: WorldMapOpenNewRegion
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class WorldMapOpenNewRegion : GameSection
 {
-	public enum EVENT_TYPE
-	{
-		NONE,
-		ONLY_CAMERA_MOVE
-	}
+  private WorldMapOpenNewRegion.SectionEventData eventData;
+  private WorldMapOpenNewRegion.OpendRegionInfo[] openedRegionInfo;
+  private GameObject worldMapUIRoot;
+  private Transform worldMapObject;
+  private Transform playerMarker;
+  private UITexture uiMapSprite;
+  private SpotManager spots;
+  private Transform[] regionAreas;
+  private Transform glowRegionTop;
+  private Transform mapGlowEffectA;
+  private Transform mapGlowEffectB;
+  private ParticleSystem mapGlowEffectParticleA;
+  private ParticleSystem mapGlowEffectParticleB;
+  private uint fromRegionID;
+  private uint toRegionID;
+  private Transform telop;
+  private Transform targetRegionIcon;
+  private Material glowMaterial;
+  private static readonly int SE_ID_SMOKE = 40000034;
+  private static readonly int SE_ID_LOGO = 40000160;
+  private bool calledExit;
+  private bool isUpdateRenderTexture;
+  private UIEventListener bgEventListener;
 
-	public class SectionEventData
-	{
-		private EVENT_TYPE eventType;
+  public override IEnumerable<string> requireDataTable
+  {
+    get
+    {
+      yield return "FieldMapTable";
+      yield return "RegionTable";
+    }
+  }
 
-		public SectionEventData(EVENT_TYPE _eventType)
-		{
-			eventType = _eventType;
-		}
+  public WorldMapCameraController worldMapCamera { get; private set; }
 
-		public bool IsOnlyCameraMoveEvent()
-		{
-			return eventType == EVENT_TYPE.ONLY_CAMERA_MOVE;
-		}
-	}
+  public override void Initialize() => this.StartCoroutine("DoInitialize");
 
-	private struct OpendRegionInfo
-	{
-		public RegionTable.Data data;
+  private IEnumerator DoInitialize()
+  {
+    this.eventData = (WorldMapOpenNewRegion.SectionEventData) GameSection.GetEventData();
+    FieldMapTable.PortalTableData portalData = Singleton<FieldMapTable>.I.GetPortalData(MonoBehaviourSingleton<FieldManager>.I.currentPortalID);
+    FieldMapTable.FieldMapTableData fieldMapData1 = Singleton<FieldMapTable>.I.GetFieldMapData(portalData.srcMapID);
+    FieldMapTable.FieldMapTableData fieldMapData2 = Singleton<FieldMapTable>.I.GetFieldMapData(portalData.dstMapID);
+    this.fromRegionID = fieldMapData1.regionId;
+    this.toRegionID = fieldMapData2.regionId;
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject loadedWorldMap = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "WorldMap");
+    LoadObject loadedRegionSpotRoot = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "RegionSpotRoot");
+    LoadObject loadedRegionSpot = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "RegionSpot");
+    LoadObject loadedPlayerMarker = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "PlayerMarker");
+    LoadObject loadedMapGlowEffectA = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "MapGlowEffectA");
+    LoadObject loadedMapGlowEffectB = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "MapGlowEffectB");
+    LoadObject loadedTelop = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "TelopOpenRegion");
+    loadingQueue.CacheSE(WorldMapOpenNewRegion.SE_ID_LOGO);
+    loadingQueue.CacheSE(WorldMapOpenNewRegion.SE_ID_SMOKE);
+    uint[] numArray = MonoBehaviourSingleton<WorldMapManager>.I.GetOpenRegionIdListInWorldMap();
+    if (numArray.Length == 0)
+      numArray = new uint[1];
+    LoadObject[] regionAreaLOs = new LoadObject[numArray.Length];
+    string regionIcon1 = ResourceName.GetRegionIcon(0);
+    string regionIcon2 = ResourceName.GetRegionIcon(1);
+    int num = numArray.Length - 1;
+    this.openedRegionInfo = new WorldMapOpenNewRegion.OpendRegionInfo[numArray.Length];
+    for (int index = 0; index < numArray.Length; ++index)
+    {
+      RegionTable.Data data = Singleton<RegionTable>.I.GetData(numArray[index]);
+      if (!data.hasParentRegion())
+      {
+        string resource_name = regionIcon2;
+        if (num == index)
+          resource_name = regionIcon1;
+        LoadObject _icon = loadingQueue.Load(RESOURCE_CATEGORY.REGION_ICON, resource_name);
+        this.openedRegionInfo[index] = new WorldMapOpenNewRegion.OpendRegionInfo(data, _icon);
+        if (index != 0)
+          regionAreaLOs[index] = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "WorldMapPart" + numArray[index].ToString("D3"));
+      }
+    }
+    LoadObject loadedMaterial = (LoadObject) null;
+    if (!this.eventData.IsOnlyCameraMoveEvent())
+      loadedMaterial = loadingQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "WorldMapPartGlow" + this.toRegionID.ToString("D3"));
+    if (loadingQueue.IsLoading())
+      yield return (object) loadingQueue.Wait();
+    this.worldMapUIRoot = ((Component) ResourceUtility.Realizes(loadedWorldMap.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform)).gameObject;
+    this.worldMapCamera = ((Component) this.worldMapUIRoot.transform.Find("Camera")).GetComponent<WorldMapCameraController>();
+    this.worldMapCamera.isInteractive = false;
+    this.worldMapObject = this.worldMapUIRoot.transform.Find("Map");
+    this.spots = new SpotManager(loadedRegionSpotRoot.loadedObject as GameObject, loadedRegionSpot.loadedObject as GameObject, this.worldMapCamera._camera);
+    this.spots.CreateSpotRoot();
+    GameObject gameObject = ((Component) this.spots.spotRootTransform.Find("BG")).gameObject;
+    gameObject.gameObject.SetActive(true);
+    this.bgEventListener = UIEventListener.Get(gameObject);
+    ((Component) this.spots.spotRootTransform.Find("TaptoSkip")).gameObject.SetActive(true);
+    this.mapGlowEffectA = ResourceUtility.Realizes(loadedMapGlowEffectA.loadedObject, this.worldMapObject);
+    ((Component) this.mapGlowEffectA).gameObject.SetActive(false);
+    this.mapGlowEffectParticleA = ((Component) this.mapGlowEffectA).GetComponent<ParticleSystem>();
+    this.mapGlowEffectB = ResourceUtility.Realizes(loadedMapGlowEffectB.loadedObject, this.worldMapObject);
+    ((Component) this.mapGlowEffectB).gameObject.SetActive(false);
+    this.mapGlowEffectParticleB = ((Component) this.mapGlowEffectB).GetComponent<ParticleSystem>();
+    this.playerMarker = ResourceUtility.Realizes(loadedPlayerMarker.loadedObject, this._transform);
+    ((Component) this.playerMarker).gameObject.SetActive(false);
+    if (loadedMaterial != null)
+      this.glowMaterial = loadedMaterial.loadedObject as Material;
+    this.regionAreas = new Transform[regionAreaLOs.Length];
+    for (int index = 0; index < regionAreaLOs.Length; ++index)
+    {
+      LoadObject loadObject = regionAreaLOs[index];
+      if (loadObject != null && Object.op_Inequality((Object) null, loadObject.loadedObject))
+      {
+        Transform transform = ResourceUtility.Realizes(loadObject.loadedObject, this.worldMapObject);
+        if ((long) index == (long) this.toRegionID)
+        {
+          if (this.eventData.IsOnlyCameraMoveEvent())
+            ((Component) transform).gameObject.SetActive(true);
+          else
+            ((Component) transform).gameObject.SetActive(false);
+          this.mapGlowEffectA.SetParent(transform);
+          this.mapGlowEffectA.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+          this.mapGlowEffectB.SetParent(transform);
+          this.mapGlowEffectB.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+          ParticleSystem.ShapeModule shape = this.mapGlowEffectParticleB.shape;
+          MeshFilter component = ((Component) transform).GetComponent<MeshFilter>();
+          ((ParticleSystem.ShapeModule) ref shape).mesh = component.sharedMesh;
+          this.glowRegionTop = ResourceUtility.Realizes(loadObject.loadedObject, this.worldMapObject);
+          ((Component) this.glowRegionTop).gameObject.SetActive(false);
+          this.glowRegionTop.localPosition = Vector3.op_Addition(this.glowRegionTop.localPosition, new Vector3(0.0f, 0.0f, 1f / 1000f));
+          this.glowRegionTop.localScale = new Vector3(1.1f, 1.1f, 1.1f);
+          ((Component) this.glowRegionTop).GetComponent<Renderer>().material = this.glowMaterial;
+        }
+        else
+          ((Component) transform).gameObject.SetActive(true);
+        this.regionAreas[index] = transform;
+      }
+    }
+    this.telop = ResourceUtility.Realizes(loadedTelop.loadedObject, this.spots.spotRootTransform);
+    Transform transform1 = Utility.Find(this.spots.spotRootTransform, "CLOSE_BTN");
+    if (Object.op_Inequality((Object) null, (Object) transform1))
+      ((Component) transform1).gameObject.SetActive(false);
+    if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
+      MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += new ScreenOrientationManager.OnScreenRotateDelegate(this.InitMapSprite);
+    base.Initialize();
+  }
 
-		public LoadObject icon;
+  public void InitRegionInfo()
+  {
+    if (this.spots == null)
+      return;
+    Transform transform = this.spots.SetRoot(this._transform);
+    if (Object.op_Equality((Object) this.uiMapSprite, (Object) null))
+      this.uiMapSprite = ((Component) transform.Find("Map")).gameObject.GetComponent<UITexture>();
+    this.InitMapSprite(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
+    ((Component) this.worldMapObject).gameObject.SetActive(true);
+    for (int index = 0; index < this.openedRegionInfo.Length; ++index)
+    {
+      RegionTable.Data data = this.openedRegionInfo[index].data;
+      if (data != null)
+      {
+        SpotManager.Spot spot = this.spots.AddSpot((int) data.regionId, data.regionName, data.iconPos, SpotManager.ICON_TYPE.CLEARED, "OPEN_REGION");
+        spot.SetIconSprite("SPR_ICON", this.openedRegionInfo[index].icon.loadedObject as Texture2D, (int) data.iconSize.x, (int) data.iconSize.y);
+        if ((int) this.fromRegionID == (int) data.regionId)
+        {
+          ((Component) this.playerMarker).gameObject.SetActive(true);
+          this.playerMarker.SetParent(((Component) this.worldMapObject).transform);
+          PlayerMarker component = ((Component) this.playerMarker).GetComponent<PlayerMarker>();
+          component.SetWorldMode(true);
+          component.SetCamera(((Component) this.worldMapCamera._camera).transform);
+          this.playerMarker.localPosition = data.markerPos;
+        }
+        if ((int) this.toRegionID == (int) data.regionId)
+        {
+          this.targetRegionIcon = spot._transform;
+          if (!this.eventData.IsOnlyCameraMoveEvent())
+            ((Component) spot._transform).gameObject.SetActive(false);
+          else
+            ((Component) spot._transform).gameObject.SetActive(true);
+        }
+      }
+    }
+  }
 
-		public OpendRegionInfo(RegionTable.Data _data, LoadObject _icon)
-		{
-			data = _data;
-			icon = _icon;
-		}
-	}
+  private void InitMapSprite(bool isPortrait)
+  {
+    if (Object.op_Inequality((Object) this.uiMapSprite, (Object) null))
+    {
+      if (Object.op_Equality((Object) null, (Object) this.worldMapCamera._camera.targetTexture))
+        this.worldMapCamera.Restore();
+      this.uiMapSprite.mainTexture = (Texture) this.worldMapCamera._camera.targetTexture;
+      this.uiMapSprite.width = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth;
+      this.uiMapSprite.height = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
+    }
+    if (isPortrait)
+    {
+      if (Object.op_Inequality((Object) null, (Object) this.telop))
+        this.telop.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+      if (Object.op_Inequality((Object) null, (Object) this.mapGlowEffectA))
+      {
+        ParticleSystemRenderer component = ((Component) this.mapGlowEffectA).GetComponent<ParticleSystemRenderer>();
+        component.minParticleSize = 1f;
+        component.maxParticleSize = 1f;
+      }
+      if (!Object.op_Inequality((Object) null, (Object) this.mapGlowEffectB))
+        return;
+      ParticleSystemRenderer component1 = ((Component) this.mapGlowEffectB).GetComponent<ParticleSystemRenderer>();
+      component1.minParticleSize = 1f;
+      component1.maxParticleSize = 1f;
+    }
+    else
+    {
+      if (Object.op_Inequality((Object) null, (Object) this.telop))
+        this.telop.localPosition = new Vector3(0.0f, -90f, 0.0f);
+      if (Object.op_Inequality((Object) null, (Object) this.mapGlowEffectA))
+      {
+        ParticleSystemRenderer component = ((Component) this.mapGlowEffectA).GetComponent<ParticleSystemRenderer>();
+        component.minParticleSize = 0.5f;
+        component.maxParticleSize = 0.5f;
+      }
+      if (!Object.op_Inequality((Object) null, (Object) this.mapGlowEffectB))
+        return;
+      ParticleSystemRenderer component2 = ((Component) this.mapGlowEffectB).GetComponent<ParticleSystemRenderer>();
+      component2.minParticleSize = 0.5f;
+      component2.maxParticleSize = 0.5f;
+    }
+  }
 
-	private SectionEventData eventData;
+  protected override void OnOpen()
+  {
+    this.bgEventListener.onClick += new UIEventListener.VoidDelegate(this.onClick);
+    ((Component) this.worldMapObject).gameObject.SetActive(true);
+    Vector3 from = new Vector3(0.0f, 0.0f, 0.0f);
+    Vector3 to = new Vector3(0.0f, 0.0f, 0.0f);
+    RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
+    if (0U <= this.fromRegionID && (long) data.Length > (long) this.fromRegionID)
+    {
+      from = data[(int) this.fromRegionID].iconPos;
+      this.worldMapCamera.targetPos = from;
+    }
+    if (0U <= this.toRegionID && (long) data.Length > (long) this.toRegionID)
+      to = data[(int) this.toRegionID].iconPos;
+    this.FadeInMap((System.Action) (() =>
+    {
+      this.InitRegionInfo();
+      if (this.eventData.IsOnlyCameraMoveEvent())
+        this.MoveCamera(from, to);
+      else
+        this.GlowRegion(from, to);
+    }));
+    this.collectUI = this._transform;
+    base.OnOpen();
+  }
 
-	private OpendRegionInfo[] openedRegionInfo;
+  private void OnQuery_EXIT()
+  {
+    if (!this.calledExit)
+    {
+      this.bgEventListener.onClick -= new UIEventListener.VoidDelegate(this.onClick);
+      MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent(nameof (WorldMapOpenNewRegion), ((Component) this).gameObject, "INGAME_MAIN");
+      this.calledExit = true;
+    }
+    this.StopAllCoroutines();
+  }
 
-	private GameObject worldMapUIRoot;
+  public override void Exit()
+  {
+    if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
+      MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= new ScreenOrientationManager.OnScreenRotateDelegate(this.InitMapSprite);
+    if (this.spots != null)
+      this.spots.ClearAllSpot();
+    base.Exit();
+  }
 
-	private Transform worldMapObject;
+  protected override void OnDestroy()
+  {
+    if (Object.op_Inequality((Object) this.worldMapUIRoot, (Object) null))
+      Object.Destroy((Object) this.worldMapUIRoot);
+    if (Object.op_Inequality((Object) this.worldMapObject, (Object) null))
+      Object.Destroy((Object) ((Component) this.worldMapObject).gameObject);
+    base.OnDestroy();
+  }
 
-	private Transform playerMarker;
+  private void LateUpdate()
+  {
+    if (this.spots != null)
+      this.spots.Update();
+    if (!this.isUpdateRenderTexture)
+      return;
+    this.InitMapSprite(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
+    this.isUpdateRenderTexture = false;
+  }
 
-	private UITexture uiMapSprite;
+  public void FadeInMap(System.Action onComplete)
+  {
+    if (Object.op_Inequality((Object) this.worldMapObject, (Object) null))
+      ((Component) this.worldMapObject).gameObject.SetActive(true);
+    if (Object.op_Inequality((Object) this.uiMapSprite, (Object) null))
+      ((Component) this.uiMapSprite).gameObject.SetActive(true);
+    this.StartCoroutine(this.DoFadeMap(0.0f, 1f, 0.4f, (System.Action) (() =>
+    {
+      if (onComplete == null)
+        return;
+      onComplete();
+    })));
+  }
 
-	private SpotManager spots;
+  private IEnumerator DoFadeMap(float from, float to, float time, System.Action onComplete)
+  {
+    if (!Object.op_Equality((Object) this.worldMapObject, (Object) null))
+    {
+      Renderer r = ((Component) this.worldMapObject).gameObject.GetComponentInChildren<Renderer>();
+      if (!Object.op_Equality((Object) r, (Object) null))
+      {
+        for (float timer = 0.0f; (double) timer < (double) time; timer += Time.deltaTime)
+        {
+          r.material.SetFloat("_Alpha", Mathf.Lerp(from, to, timer / time));
+          yield return (object) null;
+        }
+        r.material.SetFloat("_Alpha", to);
+        if (onComplete != null)
+          onComplete();
+      }
+    }
+  }
 
-	private Transform[] regionAreas;
+  private void GlowRegion(Vector3 from, Vector3 to)
+  {
+    this.worldMapCamera.targetPos = from;
+    this.StartCoroutine(this.DoGlowRegion(from, to));
+  }
 
-	private Transform glowRegionTop;
+  private IEnumerator DoGlowRegion(Vector3 from, Vector3 to)
+  {
+    yield return (object) new WaitForSeconds(0.5f);
+    Vector3Interpolator ip = new Vector3Interpolator();
+    Vector3 zoomDownTo = Vector3.op_Addition(to, new Vector3(0.0f, 0.0f, -3f));
+    ip.Set(1f, from, zoomDownTo, (AnimationCurve) null, new Vector3(), (AnimationCurve) null);
+    ip.Play();
+    while (ip.IsPlaying())
+    {
+      ip.Update();
+      this.worldMapCamera.targetPos = ip.Get();
+      yield return (object) null;
+    }
+    Transform regionArea = this.regionAreas[(int) this.toRegionID];
+    ((Component) regionArea).gameObject.SetActive(true);
+    Renderer toRegionRenderer = ((Component) regionArea).GetComponent<Renderer>();
+    toRegionRenderer.material.SetFloat("_Alpha", 0.0f);
+    Renderer topRenderer = ((Component) this.glowRegionTop).GetComponent<Renderer>();
+    topRenderer.material.SetFloat("_Alpha", 0.0f);
+    topRenderer.material.SetFloat("_AddColor", 1f);
+    topRenderer.material.SetFloat("_BlendRate", 1f);
+    topRenderer.sortingOrder = 2;
+    ((Component) this.glowRegionTop).gameObject.SetActive(true);
+    this.DelayExecute(1f, (System.Action) (() =>
+    {
+      ((Component) this.mapGlowEffectA).gameObject.SetActive(true);
+      ((Component) this.mapGlowEffectA).GetComponent<Renderer>().sortingOrder = 1;
+    }));
+    yield return (object) new WaitForSeconds(1f);
+    ip.Set(1f, zoomDownTo, to, (AnimationCurve) null, new Vector3(), (AnimationCurve) null);
+    ip.Play();
+    while (ip.IsPlaying())
+    {
+      ip.Update();
+      this.worldMapCamera.targetPos = ip.Get();
+      yield return (object) null;
+    }
+    FloatInterpolator fip = new FloatInterpolator();
+    fip.Set(2f, 0.0f, 1.5f, (AnimationCurve) null, 0.0f, (AnimationCurve) null);
+    fip.Play();
+    SoundManager.PlayOneShotUISE(WorldMapOpenNewRegion.SE_ID_SMOKE);
+    while (fip.IsPlaying())
+    {
+      double num = (double) fip.Update();
+      topRenderer.material.SetFloat("_Alpha", fip.Get());
+      yield return (object) null;
+    }
+    toRegionRenderer.material.SetFloat("_Alpha", 1f);
+    this.mapGlowEffectParticleA.Stop();
+    ((Component) this.mapGlowEffectB).gameObject.SetActive(true);
+    yield return (object) new WaitForSeconds(0.0f);
+    fip.Set(0.2f, 1f, 0.0f, (AnimationCurve) null, 0.0f, (AnimationCurve) null);
+    fip.Play();
+    while (fip.IsPlaying())
+    {
+      double num = (double) fip.Update();
+      topRenderer.material.SetFloat("_Alpha", fip.Get());
+      yield return (object) null;
+    }
+    yield return (object) new WaitForSeconds(0.0f);
+    ((Component) this.targetRegionIcon).gameObject.SetActive(true);
+    ((Component) this.targetRegionIcon).GetComponent<TweenScale>().PlayForward();
+    yield return (object) new WaitForSeconds(1f);
+    this.mapGlowEffectParticleB.Stop();
+    bool isTweenEnd = false;
+    UITweenCtrl component = ((Component) this.telop).GetComponent<UITweenCtrl>();
+    component.Reset();
+    component.Play(onFinished: (EventDelegate.Callback) (() => isTweenEnd = true));
+    SoundManager.PlayOneShotUISE(WorldMapOpenNewRegion.SE_ID_LOGO);
+    while (!isTweenEnd)
+      yield return (object) null;
+    yield return (object) new WaitForSeconds(0.0f);
+    Vector3 scaleBegin = this.playerMarker.localScale;
+    Vector3 scaleEnd = new Vector3(0.0f, 0.0f, 0.0f);
+    ip.Set(0.5f, scaleBegin, scaleEnd, (AnimationCurve) null, new Vector3(), (AnimationCurve) null);
+    ip.Play();
+    while (ip.IsPlaying())
+    {
+      ip.Update();
+      this.playerMarker.localScale = ip.Get();
+      yield return (object) null;
+    }
+    RegionTable.Data data = this.openedRegionInfo[(int) this.toRegionID].data;
+    if (data != null)
+      this.playerMarker.localPosition = data.markerPos;
+    yield return (object) new WaitForSeconds(0.1f);
+    ip.Set(0.5f, scaleEnd, scaleBegin, (AnimationCurve) null, new Vector3(), (AnimationCurve) null);
+    ip.Play();
+    while (ip.IsPlaying())
+    {
+      ip.Update();
+      this.playerMarker.localScale = ip.Get();
+      yield return (object) null;
+    }
+    yield return (object) new WaitForSeconds(0.4f);
+    this.OnQuery_EXIT();
+  }
 
-	private Transform mapGlowEffectA;
+  private void MoveCamera(Vector3 from, Vector3 to)
+  {
+    this.StartCoroutine(this.DoMoveCamera(from, to));
+  }
 
-	private Transform mapGlowEffectB;
+  private IEnumerator DoMoveCamera(Vector3 from, Vector3 to)
+  {
+    Vector3Interpolator ip = new Vector3Interpolator();
+    yield return (object) new WaitForSeconds(0.5f);
+    Vector3 scaleBegin = this.playerMarker.localScale;
+    Vector3 scaleEnd = new Vector3(0.0f, 0.0f, 0.0f);
+    ip.Set(0.5f, scaleBegin, scaleEnd, (AnimationCurve) null, new Vector3(), (AnimationCurve) null);
+    ip.Play();
+    while (ip.IsPlaying())
+    {
+      ip.Update();
+      this.playerMarker.localScale = ip.Get();
+      yield return (object) null;
+    }
+    yield return (object) new WaitForSeconds(0.0f);
+    ip.Set(0.7f, from, to, (AnimationCurve) null, new Vector3(), (AnimationCurve) null);
+    ip.Play();
+    while (ip.IsPlaying())
+    {
+      ip.Update();
+      this.worldMapCamera.targetPos = ip.Get();
+      yield return (object) null;
+    }
+    RegionTable.Data data = this.openedRegionInfo[(int) this.toRegionID].data;
+    if (data != null)
+      this.playerMarker.localPosition = data.markerPos;
+    yield return (object) new WaitForSeconds(0.1f);
+    ip.Set(0.5f, scaleEnd, scaleBegin, (AnimationCurve) null, new Vector3(), (AnimationCurve) null);
+    ip.Play();
+    while (ip.IsPlaying())
+    {
+      ip.Update();
+      this.playerMarker.localScale = ip.Get();
+      yield return (object) null;
+    }
+    yield return (object) new WaitForSeconds(0.4f);
+    this.OnQuery_EXIT();
+  }
 
-	private ParticleSystem mapGlowEffectParticleA;
+  private void DelayExecute(float delayTime, System.Action func)
+  {
+    this.StartCoroutine(this.DoDelayExecute(delayTime, func));
+  }
 
-	private ParticleSystem mapGlowEffectParticleB;
+  private IEnumerator DoDelayExecute(float delayTime, System.Action func)
+  {
+    yield return (object) new WaitForSeconds(delayTime);
+    if (func != null)
+      func();
+  }
 
-	private uint fromRegionID;
+  private void OnApplicationPause(bool paused) => this.isUpdateRenderTexture = !paused;
 
-	private uint toRegionID;
+  private void onClick(GameObject g) => this.OnQuery_EXIT();
 
-	private Transform telop;
+  public enum EVENT_TYPE
+  {
+    NONE,
+    ONLY_CAMERA_MOVE,
+  }
 
-	private Transform targetRegionIcon;
+  public class SectionEventData
+  {
+    private WorldMapOpenNewRegion.EVENT_TYPE eventType;
 
-	private Material glowMaterial;
+    public SectionEventData(WorldMapOpenNewRegion.EVENT_TYPE _eventType)
+    {
+      this.eventType = _eventType;
+    }
 
-	private static readonly int SE_ID_SMOKE = 40000034;
+    public bool IsOnlyCameraMoveEvent()
+    {
+      return this.eventType == WorldMapOpenNewRegion.EVENT_TYPE.ONLY_CAMERA_MOVE;
+    }
+  }
 
-	private static readonly int SE_ID_LOGO = 40000160;
-
-	private bool calledExit;
-
-	private bool isUpdateRenderTexture;
-
-	private UIEventListener bgEventListener;
-
-	public override IEnumerable<string> requireDataTable
-	{
-		get
-		{
-			yield return "FieldMapTable";
-			yield return "RegionTable";
-		}
-	}
-
-	public WorldMapCameraController worldMapCamera
-	{
-		get;
-		private set;
-	}
-
-	public override void Initialize()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine("DoInitialize");
-	}
-
-	private IEnumerator DoInitialize()
-	{
-		eventData = (SectionEventData)GameSection.GetEventData();
-		FieldMapTable.PortalTableData portal = Singleton<FieldMapTable>.I.GetPortalData(MonoBehaviourSingleton<FieldManager>.I.currentPortalID);
-		FieldMapTable.FieldMapTableData mapA = Singleton<FieldMapTable>.I.GetFieldMapData(portal.srcMapID);
-		FieldMapTable.FieldMapTableData mapB = Singleton<FieldMapTable>.I.GetFieldMapData(portal.dstMapID);
-		fromRegionID = mapA.regionId;
-		toRegionID = mapB.regionId;
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject loadedWorldMap = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "WorldMap", false);
-		LoadObject loadedRegionSpotRoot = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "RegionSpotRoot", false);
-		LoadObject loadedRegionSpot = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "RegionSpot", false);
-		LoadObject loadedPlayerMarker = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "PlayerMarker", false);
-		LoadObject loadedMapGlowEffectA = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "MapGlowEffectA", false);
-		LoadObject loadedMapGlowEffectB = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "MapGlowEffectB", false);
-		LoadObject loadedTelop = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "TelopOpenRegion", false);
-		loadQueue.CacheSE(SE_ID_LOGO, null);
-		loadQueue.CacheSE(SE_ID_SMOKE, null);
-		uint[] openedRegionids = MonoBehaviourSingleton<WorldMapManager>.I.GetOpenRegionIdListInWorldMap();
-		if (openedRegionids.Length == 0)
-		{
-			openedRegionids = new uint[1];
-		}
-		LoadObject[] regionAreaLOs = new LoadObject[openedRegionids.Length];
-		string newRegionIcon = ResourceName.GetRegionIcon(0);
-		string passedRegionIcon = ResourceName.GetRegionIcon(1);
-		int lastIndex = openedRegionids.Length - 1;
-		openedRegionInfo = new OpendRegionInfo[openedRegionids.Length];
-		for (int j = 0; j < openedRegionids.Length; j++)
-		{
-			RegionTable.Data data = Singleton<RegionTable>.I.GetData(openedRegionids[j]);
-			if (!data.hasParentRegion())
-			{
-				string iconName = passedRegionIcon;
-				if (lastIndex == j)
-				{
-					iconName = newRegionIcon;
-				}
-				LoadObject loadedObj = loadQueue.Load(RESOURCE_CATEGORY.REGION_ICON, iconName, false);
-				openedRegionInfo[j] = new OpendRegionInfo(data, loadedObj);
-				if (j != 0)
-				{
-					regionAreaLOs[j] = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "WorldMapPart" + openedRegionids[j].ToString("D3"), false);
-				}
-			}
-		}
-		LoadObject loadedMaterial = null;
-		if (!eventData.IsOnlyCameraMoveEvent())
-		{
-			loadedMaterial = loadQueue.Load(RESOURCE_CATEGORY.WORLDMAP, "WorldMapPartGlow" + toRegionID.ToString("D3"), false);
-		}
-		if (loadQueue.IsLoading())
-		{
-			yield return (object)loadQueue.Wait();
-		}
-		worldMapUIRoot = ResourceUtility.Realizes(loadedWorldMap.loadedObject, MonoBehaviourSingleton<AppMain>.I._transform, -1).get_gameObject();
-		worldMapCamera = worldMapUIRoot.get_transform().Find("Camera").GetComponent<WorldMapCameraController>();
-		worldMapCamera.isInteractive = false;
-		worldMapObject = worldMapUIRoot.get_transform().FindChild("Map");
-		spots = new SpotManager(loadedRegionSpotRoot.loadedObject as GameObject, loadedRegionSpot.loadedObject as GameObject, worldMapCamera._camera);
-		spots.CreateSpotRoot();
-		GameObject bg = spots.spotRootTransform.Find("BG").get_gameObject();
-		bg.get_gameObject().SetActive(true);
-		bgEventListener = UIEventListener.Get(bg);
-		spots.spotRootTransform.Find("TaptoSkip").get_gameObject().SetActive(true);
-		mapGlowEffectA = ResourceUtility.Realizes(loadedMapGlowEffectA.loadedObject, worldMapObject, -1);
-		mapGlowEffectA.get_gameObject().SetActive(false);
-		mapGlowEffectParticleA = mapGlowEffectA.GetComponent<ParticleSystem>();
-		mapGlowEffectB = ResourceUtility.Realizes(loadedMapGlowEffectB.loadedObject, worldMapObject, -1);
-		mapGlowEffectB.get_gameObject().SetActive(false);
-		mapGlowEffectParticleB = mapGlowEffectB.GetComponent<ParticleSystem>();
-		playerMarker = ResourceUtility.Realizes(loadedPlayerMarker.loadedObject, base._transform, -1);
-		playerMarker.get_gameObject().SetActive(false);
-		if (loadedMaterial != null)
-		{
-			glowMaterial = (loadedMaterial.loadedObject as Material);
-		}
-		regionAreas = (Transform[])new Transform[regionAreaLOs.Length];
-		for (int i = 0; i < regionAreaLOs.Length; i++)
-		{
-			LoadObject areaLO = regionAreaLOs[i];
-			if (areaLO != null && null != areaLO.loadedObject)
-			{
-				Transform regionArea = ResourceUtility.Realizes(areaLO.loadedObject, worldMapObject, -1);
-				if (i == toRegionID)
-				{
-					if (eventData.IsOnlyCameraMoveEvent())
-					{
-						regionArea.get_gameObject().SetActive(true);
-					}
-					else
-					{
-						regionArea.get_gameObject().SetActive(false);
-					}
-					mapGlowEffectA.SetParent(regionArea);
-					mapGlowEffectA.set_localPosition(new Vector3(0f, 0f, 0f));
-					mapGlowEffectB.SetParent(regionArea);
-					mapGlowEffectB.set_localPosition(new Vector3(0f, 0f, 0f));
-					ShapeModule module = mapGlowEffectParticleB.get_shape();
-					MeshFilter meshFilter = regionArea.GetComponent<MeshFilter>();
-					module.set_mesh(meshFilter.get_sharedMesh());
-					glowRegionTop = ResourceUtility.Realizes(areaLO.loadedObject, worldMapObject, -1);
-					glowRegionTop.get_gameObject().SetActive(false);
-					glowRegionTop.set_localPosition(glowRegionTop.get_localPosition() + new Vector3(0f, 0f, 0.001f));
-					glowRegionTop.set_localScale(new Vector3(1.1f, 1.1f, 1.1f));
-					glowRegionTop.GetComponent<Renderer>().set_material(glowMaterial);
-				}
-				else
-				{
-					regionArea.get_gameObject().SetActive(true);
-				}
-				regionAreas[i] = regionArea;
-			}
-		}
-		telop = ResourceUtility.Realizes(loadedTelop.loadedObject, spots.spotRootTransform, -1);
-		Transform closeBtn = Utility.Find(spots.spotRootTransform, "CLOSE_BTN");
-		if (null != closeBtn)
-		{
-			closeBtn.get_gameObject().SetActive(false);
-		}
-		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
-		{
-			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += InitMapSprite;
-		}
-		base.Initialize();
-	}
-
-	public void InitRegionInfo()
-	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0158: Expected O, but got Unknown
-		//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-		if (spots != null)
-		{
-			Transform val = spots.SetRoot(base._transform);
-			if (uiMapSprite == null)
-			{
-				uiMapSprite = val.FindChild("Map").get_gameObject().GetComponent<UITexture>();
-			}
-			InitMapSprite(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
-			worldMapObject.get_gameObject().SetActive(true);
-			for (int i = 0; i < openedRegionInfo.Length; i++)
-			{
-				RegionTable.Data data = openedRegionInfo[i].data;
-				if (data != null)
-				{
-					SpotManager.Spot spot = spots.AddSpot((int)data.regionId, data.regionName, data.iconPos, SpotManager.ICON_TYPE.CLEARED, "OPEN_REGION", false, false, false, null, null, false, SpotManager.HAPPEN_CONDITION.NONE, 0);
-					spot.SetIconSprite("SPR_ICON", openedRegionInfo[i].icon.loadedObject as Texture2D, (int)data.iconSize.x, (int)data.iconSize.y);
-					if (fromRegionID == data.regionId)
-					{
-						playerMarker.get_gameObject().SetActive(true);
-						playerMarker.SetParent(worldMapObject.get_transform());
-						PlayerMarker component = playerMarker.GetComponent<PlayerMarker>();
-						component.SetWorldMode(true);
-						component.SetCamera(worldMapCamera._camera.get_transform());
-						playerMarker.set_localPosition(data.markerPos);
-					}
-					if (toRegionID == data.regionId)
-					{
-						targetRegionIcon = spot._transform;
-						if (!eventData.IsOnlyCameraMoveEvent())
-						{
-							spot._transform.get_gameObject().SetActive(false);
-						}
-						else
-						{
-							spot._transform.get_gameObject().SetActive(true);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private void InitMapSprite(bool isPortrait)
-	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Expected O, but got Unknown
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		if (uiMapSprite != null)
-		{
-			if (null == worldMapCamera._camera.get_targetTexture())
-			{
-				worldMapCamera.Restore();
-			}
-			uiMapSprite.mainTexture = worldMapCamera._camera.get_targetTexture();
-			uiMapSprite.width = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth;
-			uiMapSprite.height = MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight;
-		}
-		if (isPortrait)
-		{
-			if (null != telop)
-			{
-				telop.set_localPosition(new Vector3(0f, 0f, 0f));
-			}
-			if (null != mapGlowEffectA)
-			{
-				ParticleSystemRenderer component = mapGlowEffectA.GetComponent<ParticleSystemRenderer>();
-				component.set_minParticleSize(1f);
-				component.set_maxParticleSize(1f);
-			}
-			if (null != mapGlowEffectB)
-			{
-				ParticleSystemRenderer component2 = mapGlowEffectB.GetComponent<ParticleSystemRenderer>();
-				component2.set_minParticleSize(1f);
-				component2.set_maxParticleSize(1f);
-			}
-		}
-		else
-		{
-			if (null != telop)
-			{
-				telop.set_localPosition(new Vector3(0f, -90f, 0f));
-			}
-			if (null != mapGlowEffectA)
-			{
-				ParticleSystemRenderer component3 = mapGlowEffectA.GetComponent<ParticleSystemRenderer>();
-				component3.set_minParticleSize(0.5f);
-				component3.set_maxParticleSize(0.5f);
-			}
-			if (null != mapGlowEffectB)
-			{
-				ParticleSystemRenderer component4 = mapGlowEffectB.GetComponent<ParticleSystemRenderer>();
-				component4.set_minParticleSize(0.5f);
-				component4.set_maxParticleSize(0.5f);
-			}
-		}
-	}
-
-	protected override void OnOpen()
-	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		UIEventListener uIEventListener = bgEventListener;
-		uIEventListener.onClick = (UIEventListener.VoidDelegate)Delegate.Combine(uIEventListener.onClick, new UIEventListener.VoidDelegate(onClick));
-		worldMapObject.get_gameObject().SetActive(true);
-		Vector3 from = new Vector3(0f, 0f, 0f);
-		Vector3 to = new Vector3(0f, 0f, 0f);
-		RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
-		if (0 <= fromRegionID && data.Length > fromRegionID)
-		{
-			from = data[fromRegionID].iconPos;
-			worldMapCamera.targetPos = from;
-		}
-		if (0 <= toRegionID && data.Length > toRegionID)
-		{
-			to = data[toRegionID].iconPos;
-		}
-		FadeInMap(delegate
-		{
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			InitRegionInfo();
-			if (eventData.IsOnlyCameraMoveEvent())
-			{
-				MoveCamera(from, to);
-			}
-			else
-			{
-				GlowRegion(from, to);
-			}
-		});
-		base.collectUI = base._transform;
-		base.OnOpen();
-	}
-
-	private void OnQuery_EXIT()
-	{
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Expected O, but got Unknown
-		if (!calledExit)
-		{
-			UIEventListener uIEventListener = bgEventListener;
-			uIEventListener.onClick = (UIEventListener.VoidDelegate)Delegate.Remove(uIEventListener.onClick, new UIEventListener.VoidDelegate(onClick));
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("WorldMapOpenNewRegion", this.get_gameObject(), "INGAME_MAIN", null, null, true);
-			calledExit = true;
-		}
-		this.StopAllCoroutines();
-	}
-
-	public override void Exit()
-	{
-		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() == "InGameScene")
-		{
-			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= InitMapSprite;
-		}
-		if (spots != null)
-		{
-			spots.ClearAllSpot();
-		}
-		base.Exit();
-	}
-
-	protected override void OnDestroy()
-	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		if (worldMapUIRoot != null)
-		{
-			Object.Destroy(worldMapUIRoot);
-		}
-		if (worldMapObject != null)
-		{
-			Object.Destroy(worldMapObject.get_gameObject());
-		}
-		base.OnDestroy();
-	}
-
-	private void LateUpdate()
-	{
-		if (spots != null)
-		{
-			spots.Update();
-		}
-		if (isUpdateRenderTexture)
-		{
-			InitMapSprite(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
-			isUpdateRenderTexture = false;
-		}
-	}
-
-	public void FadeInMap(Action onComplete)
-	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		if (worldMapObject != null)
-		{
-			worldMapObject.get_gameObject().SetActive(true);
-		}
-		if (uiMapSprite != null)
-		{
-			uiMapSprite.get_gameObject().SetActive(true);
-		}
-		this.StartCoroutine(DoFadeMap(0f, 1f, 0.4f, delegate
-		{
-			if (onComplete != null)
-			{
-				onComplete();
-			}
-		}));
-	}
-
-	private IEnumerator DoFadeMap(float from, float to, float time, Action onComplete)
-	{
-		if (!(worldMapObject == null))
-		{
-			Renderer r = worldMapObject.get_gameObject().GetComponentInChildren<Renderer>();
-			if (!(r == null))
-			{
-				for (float timer = 0f; timer < time; timer += Time.get_deltaTime())
-				{
-					float alpha = Mathf.Lerp(from, to, timer / time);
-					r.get_material().SetFloat("_Alpha", alpha);
-					yield return (object)null;
-				}
-				r.get_material().SetFloat("_Alpha", to);
-				onComplete?.Invoke();
-			}
-		}
-	}
-
-	private void GlowRegion(Vector3 from, Vector3 to)
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		worldMapCamera.targetPos = from;
-		this.StartCoroutine(DoGlowRegion(from, to));
-	}
-
-	private IEnumerator DoGlowRegion(Vector3 from, Vector3 to)
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		yield return (object)new WaitForSeconds(0.5f);
-		Vector3Interpolator ip = new Vector3Interpolator();
-		Vector3 zoomDownTo = to + new Vector3(0f, 0f, -3f);
-		ip.Set(1f, from, zoomDownTo, null, default(Vector3), null);
-		ip.Play();
-		while (ip.IsPlaying())
-		{
-			ip.Update();
-			worldMapCamera.targetPos = ip.Get();
-			yield return (object)null;
-		}
-		Transform toRegion = regionAreas[toRegionID];
-		toRegion.get_gameObject().SetActive(true);
-		Renderer toRegionRenderer = toRegion.GetComponent<Renderer>();
-		toRegionRenderer.get_material().SetFloat("_Alpha", 0f);
-		Renderer topRenderer = glowRegionTop.GetComponent<Renderer>();
-		topRenderer.get_material().SetFloat("_Alpha", 0f);
-		topRenderer.get_material().SetFloat("_AddColor", 1f);
-		topRenderer.get_material().SetFloat("_BlendRate", 1f);
-		topRenderer.set_sortingOrder(2);
-		glowRegionTop.get_gameObject().SetActive(true);
-		DelayExecute(1f, delegate
-		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			((_003CDoGlowRegion_003Ec__Iterator16E)/*Error near IL_0211: stateMachine*/)._003C_003Ef__this.mapGlowEffectA.get_gameObject().SetActive(true);
-			Renderer component = ((_003CDoGlowRegion_003Ec__Iterator16E)/*Error near IL_0211: stateMachine*/)._003C_003Ef__this.mapGlowEffectA.GetComponent<Renderer>();
-			component.set_sortingOrder(1);
-		});
-		yield return (object)new WaitForSeconds(1f);
-		ip.Set(1f, zoomDownTo, to, null, default(Vector3), null);
-		ip.Play();
-		while (ip.IsPlaying())
-		{
-			ip.Update();
-			worldMapCamera.targetPos = ip.Get();
-			yield return (object)null;
-		}
-		FloatInterpolator fip = new FloatInterpolator();
-		fip.Set(2f, 0f, 1.5f, null, 0f, null);
-		fip.Play();
-		SoundManager.PlayOneShotUISE(SE_ID_SMOKE);
-		while (fip.IsPlaying())
-		{
-			fip.Update();
-			topRenderer.get_material().SetFloat("_Alpha", fip.Get());
-			yield return (object)null;
-		}
-		toRegionRenderer.get_material().SetFloat("_Alpha", 1f);
-		mapGlowEffectParticleA.Stop();
-		mapGlowEffectB.get_gameObject().SetActive(true);
-		yield return (object)new WaitForSeconds(0f);
-		fip.Set(0.2f, 1f, 0f, null, 0f, null);
-		fip.Play();
-		while (fip.IsPlaying())
-		{
-			fip.Update();
-			topRenderer.get_material().SetFloat("_Alpha", fip.Get());
-			yield return (object)null;
-		}
-		yield return (object)new WaitForSeconds(0f);
-		targetRegionIcon.get_gameObject().SetActive(true);
-		TweenScale tweenScale = targetRegionIcon.GetComponent<TweenScale>();
-		tweenScale.PlayForward();
-		yield return (object)new WaitForSeconds(1f);
-		mapGlowEffectParticleB.Stop();
-		bool isTweenEnd = false;
-		UITweenCtrl tweenCtrl = telop.GetComponent<UITweenCtrl>();
-		tweenCtrl.Reset();
-		tweenCtrl.Play(true, delegate
-		{
-			((_003CDoGlowRegion_003Ec__Iterator16E)/*Error near IL_04df: stateMachine*/)._003CisTweenEnd_003E__7 = true;
-		});
-		SoundManager.PlayOneShotUISE(SE_ID_LOGO);
-		while (!isTweenEnd)
-		{
-			yield return (object)null;
-		}
-		yield return (object)new WaitForSeconds(0f);
-		Vector3 scaleBegin = playerMarker.get_localScale();
-		Vector3 scaleEnd = new Vector3(0f, 0f, 0f);
-		ip.Set(0.5f, scaleBegin, scaleEnd, null, default(Vector3), null);
-		ip.Play();
-		while (ip.IsPlaying())
-		{
-			ip.Update();
-			playerMarker.set_localScale(ip.Get());
-			yield return (object)null;
-		}
-		RegionTable.Data targetData = openedRegionInfo[toRegionID].data;
-		if (targetData != null)
-		{
-			playerMarker.set_localPosition(targetData.markerPos);
-		}
-		yield return (object)new WaitForSeconds(0.1f);
-		ip.Set(0.5f, scaleEnd, scaleBegin, null, default(Vector3), null);
-		ip.Play();
-		while (ip.IsPlaying())
-		{
-			ip.Update();
-			playerMarker.set_localScale(ip.Get());
-			yield return (object)null;
-		}
-		yield return (object)new WaitForSeconds(0.4f);
-		OnQuery_EXIT();
-	}
-
-	private void MoveCamera(Vector3 from, Vector3 to)
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoMoveCamera(from, to));
-	}
-
-	private IEnumerator DoMoveCamera(Vector3 from, Vector3 to)
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		Vector3Interpolator ip = new Vector3Interpolator();
-		yield return (object)new WaitForSeconds(0.5f);
-		Vector3 scaleBegin = playerMarker.get_localScale();
-		Vector3 scaleEnd = new Vector3(0f, 0f, 0f);
-		ip.Set(0.5f, scaleBegin, scaleEnd, null, default(Vector3), null);
-		ip.Play();
-		while (ip.IsPlaying())
-		{
-			ip.Update();
-			playerMarker.set_localScale(ip.Get());
-			yield return (object)null;
-		}
-		yield return (object)new WaitForSeconds(0f);
-		ip.Set(0.7f, from, to, null, default(Vector3), null);
-		ip.Play();
-		while (ip.IsPlaying())
-		{
-			ip.Update();
-			worldMapCamera.targetPos = ip.Get();
-			yield return (object)null;
-		}
-		RegionTable.Data targetData = openedRegionInfo[toRegionID].data;
-		if (targetData != null)
-		{
-			playerMarker.set_localPosition(targetData.markerPos);
-		}
-		yield return (object)new WaitForSeconds(0.1f);
-		ip.Set(0.5f, scaleEnd, scaleBegin, null, default(Vector3), null);
-		ip.Play();
-		while (ip.IsPlaying())
-		{
-			ip.Update();
-			playerMarker.set_localScale(ip.Get());
-			yield return (object)null;
-		}
-		yield return (object)new WaitForSeconds(0.4f);
-		OnQuery_EXIT();
-	}
-
-	private void DelayExecute(float delayTime, Action func)
-	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoDelayExecute(delayTime, func));
-	}
-
-	private IEnumerator DoDelayExecute(float delayTime, Action func)
-	{
-		yield return (object)new WaitForSeconds(delayTime);
-		func?.Invoke();
-	}
-
-	private void OnApplicationPause(bool paused)
-	{
-		isUpdateRenderTexture = !paused;
-	}
-
-	private void onClick(GameObject g)
-	{
-		OnQuery_EXIT();
-	}
+  private struct OpendRegionInfo(RegionTable.Data _data, LoadObject _icon)
+  {
+    public RegionTable.Data data = _data;
+    public LoadObject icon = _icon;
+  }
 }

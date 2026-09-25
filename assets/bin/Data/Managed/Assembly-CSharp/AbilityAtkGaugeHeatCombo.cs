@@ -1,24 +1,23 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AbilityAtkGaugeHeatCombo
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class AbilityAtkGaugeHeatCombo : AbilityAtkWeapon
 {
-	public override void init(Player _player, string target, int val)
-	{
-		base.init(_player, "TWO_HAND_SWORD", val);
-	}
+  public override void init(Player _player, string target, int val)
+  {
+    base.init(_player, "TWO_HAND_SWORD", val);
+  }
 
-	public override AtkAttribute GetDamageRate(Character chara, AttackedHitStatusLocal status)
-	{
-		if (!player.CheckAttackModeAndSpType(Player.ATTACK_MODE.TWO_HAND_SWORD, SP_ATTACK_TYPE.HEAT))
-		{
-			return null;
-		}
-		if (status.attackInfo.attackType != AttackHitInfo.ATTACK_TYPE.THS_HEAT_COMBO)
-		{
-			return null;
-		}
-		if (player.useGaugeLevel <= 0)
-		{
-			return null;
-		}
-		return base.GetDamageRate(chara, status);
-	}
+  public override AtkAttribute GetDamageRate(Character chara, AttackedHitStatusLocal status)
+  {
+    if (!this.player.CheckAttackModeAndSpType(Player.ATTACK_MODE.TWO_HAND_SWORD, SP_ATTACK_TYPE.HEAT))
+      return (AtkAttribute) null;
+    if (status.attackInfo.attackType != AttackHitInfo.ATTACK_TYPE.THS_HEAT_COMBO)
+      return (AtkAttribute) null;
+    return this.player.useGaugeLevel <= 0 ? (AtkAttribute) null : base.GetDamageRate(chara, status);
+  }
 }

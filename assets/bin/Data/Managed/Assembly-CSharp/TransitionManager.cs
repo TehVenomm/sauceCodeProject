@@ -1,265 +1,212 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: TransitionManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class TransitionManager : MonoBehaviourSingleton<TransitionManager>
 {
-	public enum TYPE
-	{
-		NONE,
-		BLACK,
-		WHITE,
-		LOADING,
-		NEW_FILEDOPEN,
-		AUTO_EVENT
-	}
+  private const float BLACK_FADE_OUT_TIME = 0.15f;
+  private const float BLACK_FADE_IN_TIME = 0.15f;
+  private const float WHITE_FADE_OUT_TIME = 0.25f;
+  private const float WHITE_FADE_IN_TIME = 0.25f;
+  private const float LOADING_FADE_OUT_TIME = 0.25f;
+  private const float LOADING_FADE_IN_TIME = 0.25f;
+  private const float AUTO_EVENT_FADE_OUT_TIME = 0.1f;
+  private const float AUTO_EVENT_FADE_IN_TIME = 0.1f;
+  private UIPanel faderPanel;
+  private UITexture faderTexture;
+  private UISprite faderSprite;
+  private TweenAlpha faderTweenAlpha;
+  private bool isOut;
+  private TransitionManager.TYPE currentType;
 
-	private const float BLACK_FADE_OUT_TIME = 0.15f;
+  public bool isTransing { get; private set; }
 
-	private const float BLACK_FADE_IN_TIME = 0.15f;
+  public bool isChanging { get; private set; }
 
-	private const float WHITE_FADE_OUT_TIME = 0.25f;
+  private IEnumerator Start()
+  {
+    while (!MonoBehaviourSingleton<UIManager>.IsValid() || MonoBehaviourSingleton<UIManager>.I.isLoading)
+      yield return (object) null;
+    this.faderPanel = MonoBehaviourSingleton<UIManager>.I.faderPanel;
+    this.faderTexture = ((Component) MonoBehaviourSingleton<UIManager>.I.system.GetCtrl((Enum) UIManager.SYSTEM.FADER)).GetComponent<UITexture>();
+    this.faderSprite = ((Component) MonoBehaviourSingleton<UIManager>.I.system.GetCtrl((Enum) UIManager.SYSTEM.FADER)).GetComponent<UISprite>();
+    this.faderTweenAlpha = ((Component) MonoBehaviourSingleton<UIManager>.I.system.GetCtrl((Enum) UIManager.SYSTEM.FADER)).GetComponent<TweenAlpha>();
+    this.faderTweenAlpha.SetOnFinished(new EventDelegate(new EventDelegate.Callback(this.OnFaderTweenFinised)));
+    ((Component) this.faderTweenAlpha).gameObject.SetActive(false);
+  }
 
-	private const float WHITE_FADE_IN_TIME = 0.25f;
+  private void Update()
+  {
+  }
 
-	private const float LOADING_FADE_OUT_TIME = 0.25f;
+  private void OnFaderTweenFinised()
+  {
+    if (Object.op_Implicit((Object) this.faderTexture))
+      this.faderTexture.alpha = this.faderTweenAlpha.to;
+    if (Object.op_Implicit((Object) this.faderSprite))
+      this.faderSprite.alpha = this.faderTweenAlpha.to;
+    this.StartCoroutine(this.DoFaderTweenFinised());
+  }
 
-	private const float LOADING_FADE_IN_TIME = 0.25f;
+  private IEnumerator DoFaderTweenFinised()
+  {
+    yield return (object) null;
+    this.isChanging = false;
+    if (!this.isOut)
+    {
+      this.faderPanel.depth = 4000;
+      ((Component) this.faderTweenAlpha).gameObject.SetActive(false);
+      this.OnEnd();
+    }
+  }
 
-	private const float AUTO_EVENT_FADE_OUT_TIME = 0.1f;
+  private void OnEnd()
+  {
+    this.isTransing = false;
+    MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.TRANSITION, false);
+  }
 
-	private const float AUTO_EVENT_FADE_IN_TIME = 0.1f;
+  private void FadeOut(Color color, float time, int depth)
+  {
+    color.a = 0.0f;
+    if (Object.op_Implicit((Object) this.faderTexture))
+      this.faderTexture.color = color;
+    if (Object.op_Implicit((Object) this.faderSprite))
+      this.faderSprite.color = color;
+    this.faderPanel.depth = depth;
+    this.SetFade(1f, time);
+  }
 
-	private UIPanel faderPanel;
+  private void FadeIn(float time) => this.SetFade(0.0f, time);
 
-	private UITexture faderTexture;
+  private void SetFade(float to, float time)
+  {
+    this.faderTweenAlpha.from = this.faderTweenAlpha.to;
+    this.faderTweenAlpha.to = to;
+    ((Component) this.faderTweenAlpha).gameObject.SetActive(true);
+    this.faderTweenAlpha.duration = time;
+    ((Behaviour) this.faderTweenAlpha).enabled = true;
+    this.faderTweenAlpha.ResetToBeginning();
+  }
 
-	private UISprite faderSprite;
+  private void Begin(TransitionManager.TYPE type)
+  {
+    if (this.isTransing)
+    {
+      Log.Error("transing now.");
+    }
+    else
+    {
+      MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.TRANSITION, true);
+      this.isOut = true;
+      this.isChanging = true;
+      this.isTransing = true;
+      this.currentType = type;
+      switch (type)
+      {
+        case TransitionManager.TYPE.BLACK:
+          this.FadeOut(Color.black, 0.15f, 4000);
+          break;
+        case TransitionManager.TYPE.WHITE:
+          this.FadeOut(Color.white, 0.25f, 4000);
+          break;
+        case TransitionManager.TYPE.LOADING:
+          MonoBehaviourSingleton<UIManager>.I.loading.ShowTips(true);
+          this.FadeOut(Color.black, 0.25f, 4000);
+          break;
+        case TransitionManager.TYPE.AUTO_EVENT:
+          this.FadeOut(Color.black, 0.1f, 7000);
+          break;
+      }
+      MonoBehaviourSingleton<UIManager>.I.loading.ShowRushUI(true);
+      MonoBehaviourSingleton<UIManager>.I.loading.ShowArenaUI(true);
+    }
+  }
 
-	private TweenAlpha faderTweenAlpha;
+  private void End()
+  {
+    if (this.isChanging)
+    {
+      Log.Error("changing now.");
+    }
+    else
+    {
+      this.isOut = false;
+      this.isChanging = true;
+      switch (this.currentType)
+      {
+        case TransitionManager.TYPE.BLACK:
+          this.FadeIn(0.15f);
+          break;
+        case TransitionManager.TYPE.WHITE:
+          this.FadeIn(0.25f);
+          break;
+        case TransitionManager.TYPE.LOADING:
+          MonoBehaviourSingleton<UIManager>.I.loading.ShowTips(false);
+          if (MonoBehaviourSingleton<UIManager>.I.isShowingGGTutorialMessage)
+            MonoBehaviourSingleton<UIManager>.I.HideGGTutorialMessage();
+          this.FadeIn(0.25f);
+          break;
+        case TransitionManager.TYPE.AUTO_EVENT:
+          this.FadeIn(0.1f);
+          break;
+      }
+      MonoBehaviourSingleton<UIManager>.I.loading.ShowRushUI(false);
+      MonoBehaviourSingleton<UIManager>.I.loading.ShowArenaUI(false);
+      if (!MonoBehaviourSingleton<GameSceneManager>.IsValid())
+        return;
+      MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.TRANSITION_END);
+    }
+  }
 
-	private bool isOut;
+  public Coroutine Out(TransitionManager.TYPE type = TransitionManager.TYPE.BLACK)
+  {
+    return type == TransitionManager.TYPE.NONE ? (Coroutine) null : this.StartCoroutine(this.DoOut(type));
+  }
 
-	private TYPE currentType;
+  private IEnumerator DoOut(TransitionManager.TYPE type)
+  {
+    while (this.isChanging)
+      yield return (object) null;
+    if (!MonoBehaviourSingleton<TransitionManager>.I.isTransing)
+    {
+      MonoBehaviourSingleton<TransitionManager>.I.Begin(type);
+      while (MonoBehaviourSingleton<TransitionManager>.I.isChanging)
+        yield return (object) null;
+    }
+  }
 
-	public bool isTransing
-	{
-		get;
-		private set;
-	}
+  public Coroutine In()
+  {
+    return this.currentType == TransitionManager.TYPE.NONE ? (Coroutine) null : this.StartCoroutine(this.DoIn());
+  }
 
-	public bool isChanging
-	{
-		get;
-		private set;
-	}
+  private IEnumerator DoIn()
+  {
+    while (this.isChanging)
+      yield return (object) null;
+    if (MonoBehaviourSingleton<TransitionManager>.I.isTransing)
+    {
+      MonoBehaviourSingleton<TransitionManager>.I.End();
+      while (MonoBehaviourSingleton<TransitionManager>.I.isChanging)
+        yield return (object) null;
+    }
+  }
 
-	private IEnumerator Start()
-	{
-		while (!MonoBehaviourSingleton<UIManager>.IsValid() || MonoBehaviourSingleton<UIManager>.I.isLoading)
-		{
-			yield return (object)null;
-		}
-		faderPanel = MonoBehaviourSingleton<UIManager>.I.faderPanel;
-		faderTexture = MonoBehaviourSingleton<UIManager>.I.system.GetCtrl(UIManager.SYSTEM.FADER).GetComponent<UITexture>();
-		faderSprite = MonoBehaviourSingleton<UIManager>.I.system.GetCtrl(UIManager.SYSTEM.FADER).GetComponent<UISprite>();
-		faderTweenAlpha = MonoBehaviourSingleton<UIManager>.I.system.GetCtrl(UIManager.SYSTEM.FADER).GetComponent<TweenAlpha>();
-		faderTweenAlpha.SetOnFinished(new EventDelegate(OnFaderTweenFinised));
-		faderTweenAlpha.get_gameObject().SetActive(false);
-	}
-
-	private void Update()
-	{
-	}
-
-	private void OnFaderTweenFinised()
-	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		if (Object.op_Implicit(faderTexture))
-		{
-			faderTexture.alpha = faderTweenAlpha.to;
-		}
-		if (Object.op_Implicit(faderSprite))
-		{
-			faderSprite.alpha = faderTweenAlpha.to;
-		}
-		this.StartCoroutine(DoFaderTweenFinised());
-	}
-
-	private IEnumerator DoFaderTweenFinised()
-	{
-		yield return (object)null;
-		isChanging = false;
-		if (!isOut)
-		{
-			faderPanel.depth = 4000;
-			faderTweenAlpha.get_gameObject().SetActive(false);
-			OnEnd();
-		}
-	}
-
-	private void OnEnd()
-	{
-		isTransing = false;
-		MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.TRANSITION, false);
-	}
-
-	private void FadeOut(Color color, float time, int depth)
-	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		color.a = 0f;
-		if (Object.op_Implicit(faderTexture))
-		{
-			faderTexture.color = color;
-		}
-		if (Object.op_Implicit(faderSprite))
-		{
-			faderSprite.color = color;
-		}
-		faderPanel.depth = depth;
-		SetFade(1f, time);
-	}
-
-	private void FadeIn(float time)
-	{
-		SetFade(0f, time);
-	}
-
-	private void SetFade(float to, float time)
-	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		faderTweenAlpha.from = faderTweenAlpha.to;
-		faderTweenAlpha.to = to;
-		faderTweenAlpha.get_gameObject().SetActive(true);
-		faderTweenAlpha.duration = time;
-		faderTweenAlpha.set_enabled(true);
-		faderTweenAlpha.ResetToBeginning();
-	}
-
-	private void Begin(TYPE type)
-	{
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		if (isTransing)
-		{
-			Log.Error("transing now.");
-		}
-		else
-		{
-			MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.TRANSITION, true);
-			isOut = true;
-			isChanging = true;
-			isTransing = true;
-			currentType = type;
-			switch (type)
-			{
-			case TYPE.BLACK:
-				FadeOut(Color.get_black(), 0.15f, 4000);
-				break;
-			case TYPE.WHITE:
-				FadeOut(Color.get_white(), 0.25f, 4000);
-				break;
-			case TYPE.LOADING:
-				MonoBehaviourSingleton<UIManager>.I.loading.ShowTips(true);
-				FadeOut(Color.get_black(), 0.25f, 4000);
-				break;
-			case TYPE.AUTO_EVENT:
-				FadeOut(Color.get_black(), 0.1f, 7000);
-				break;
-			}
-			MonoBehaviourSingleton<UIManager>.I.loading.ShowRushUI(true);
-			MonoBehaviourSingleton<UIManager>.I.loading.ShowArenaUI(true);
-		}
-	}
-
-	private void End()
-	{
-		if (isChanging)
-		{
-			Log.Error("changing now.");
-		}
-		else
-		{
-			isOut = false;
-			isChanging = true;
-			switch (currentType)
-			{
-			case TYPE.BLACK:
-				FadeIn(0.15f);
-				break;
-			case TYPE.WHITE:
-				FadeIn(0.25f);
-				break;
-			case TYPE.LOADING:
-				MonoBehaviourSingleton<UIManager>.I.loading.ShowTips(false);
-				FadeIn(0.25f);
-				break;
-			case TYPE.AUTO_EVENT:
-				FadeIn(0.1f);
-				break;
-			}
-			MonoBehaviourSingleton<UIManager>.I.loading.ShowRushUI(false);
-			MonoBehaviourSingleton<UIManager>.I.loading.ShowArenaUI(false);
-			if (MonoBehaviourSingleton<GameSceneManager>.IsValid())
-			{
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.TRANSITION_END);
-			}
-		}
-	}
-
-	public Coroutine Out(TYPE type = TYPE.BLACK)
-	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Expected O, but got Unknown
-		if (type == TYPE.NONE)
-		{
-			return null;
-		}
-		return this.StartCoroutine(DoOut(type));
-	}
-
-	private IEnumerator DoOut(TYPE type)
-	{
-		while (isChanging)
-		{
-			yield return (object)null;
-		}
-		if (!MonoBehaviourSingleton<TransitionManager>.I.isTransing)
-		{
-			MonoBehaviourSingleton<TransitionManager>.I.Begin(type);
-			while (MonoBehaviourSingleton<TransitionManager>.I.isChanging)
-			{
-				yield return (object)null;
-			}
-		}
-	}
-
-	public Coroutine In()
-	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
-		if (currentType == TYPE.NONE)
-		{
-			return null;
-		}
-		return this.StartCoroutine(DoIn());
-	}
-
-	private IEnumerator DoIn()
-	{
-		while (isChanging)
-		{
-			yield return (object)null;
-		}
-		if (MonoBehaviourSingleton<TransitionManager>.I.isTransing)
-		{
-			MonoBehaviourSingleton<TransitionManager>.I.End();
-			while (MonoBehaviourSingleton<TransitionManager>.I.isChanging)
-			{
-				yield return (object)null;
-			}
-		}
-	}
+  public enum TYPE
+  {
+    NONE,
+    BLACK,
+    WHITE,
+    LOADING,
+    NEW_FILEDOPEN,
+    AUTO_EVENT,
+  }
 }

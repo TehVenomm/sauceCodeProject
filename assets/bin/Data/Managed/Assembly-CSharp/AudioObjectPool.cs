@@ -1,164 +1,132 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AudioObjectPool
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
+using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class AudioObjectPool : MonoBehaviourSingleton<AudioObjectPool>
 {
-	private const int STACK_MAX = 100;
+  private const int STACK_MAX = 20;
+  private int current_index;
+  private AudioObject[] audio_object_stack;
 
-	private int current_index;
+  public int CachedObjectCount => this.current_index;
 
-	private AudioObject[] audio_object_stack;
+  protected override void Awake()
+  {
+    base.Awake();
+    this.StartCoroutine(this.CreateStack());
+  }
 
-	public int CachedObjectCount => current_index;
+  public static void StopAllLentObjects()
+  {
+    if (!MonoBehaviourSingleton<AudioObjectPool>.IsValid())
+      return;
+    MonoBehaviourSingleton<AudioObjectPool>.I.ForEachLentObjects((Action<AudioObject>) (ao =>
+    {
+      if (!Object.op_Inequality((Object) ao, (Object) null))
+        return;
+      ao.Stop();
+    }));
+  }
 
-	protected override void Awake()
-	{
-		base.Awake();
-		CreateStack();
-	}
+  public static void StopAll()
+  {
+    if (!MonoBehaviourSingleton<AudioObjectPool>.IsValid())
+      return;
+    MonoBehaviourSingleton<AudioObjectPool>.I.ForEach((Action<AudioObject>) (ao =>
+    {
+      if (!Object.op_Inequality((Object) ao, (Object) null) || ao.PlayPhase != AudioObject.Phase.PLAYING)
+        return;
+      ao.Stop();
+    }));
+  }
 
-	public static void StopAllLentObjects()
-	{
-		if (MonoBehaviourSingleton<AudioObjectPool>.IsValid())
-		{
-			MonoBehaviourSingleton<AudioObjectPool>.I.ForEachLentObjects(delegate(AudioObject ao)
-			{
-				if (ao != null)
-				{
-					ao.Stop(0);
-				}
-			});
-		}
-	}
+  private void ForEach(Action<AudioObject> act)
+  {
+    if (this.audio_object_stack == null)
+      return;
+    foreach (AudioObject audioObject in this.audio_object_stack)
+      act(audioObject);
+  }
 
-	public static void StopAll()
-	{
-		if (MonoBehaviourSingleton<AudioObjectPool>.IsValid())
-		{
-			MonoBehaviourSingleton<AudioObjectPool>.I.ForEach(delegate(AudioObject ao)
-			{
-				if (ao != null && ao.PlayPhase == AudioObject.Phase.PLAYING)
-				{
-					ao.Stop(0);
-				}
-			});
-		}
-	}
+  private void ForEachLentObjects(Action<AudioObject> act)
+  {
+    if (this.audio_object_stack == null)
+      return;
+    int num = this.current_index - 1;
+    if (num < 0)
+      return;
+    for (int index = num; index < 20; ++index)
+      act(this.audio_object_stack[index]);
+  }
 
-	private void ForEach(Action<AudioObject> act)
-	{
-		if (audio_object_stack != null)
-		{
-			AudioObject[] array = audio_object_stack;
-			foreach (AudioObject obj in array)
-			{
-				act(obj);
-			}
-		}
-	}
+  private IEnumerator CreateStack()
+  {
+    this.audio_object_stack = new AudioObject[20];
+    for (int i = 0; i < 20; ++i)
+    {
+      this.audio_object_stack[i] = this.CreateObject(i + 1);
+      ((Component) this.audio_object_stack[i]).transform.parent = ((Component) this).transform;
+      ((Component) this.audio_object_stack[i]).gameObject.SetActive(false);
+      yield return (object) null;
+    }
+    this.SetCursorTail();
+  }
 
-	private void ForEachLentObjects(Action<AudioObject> act)
-	{
-		if (audio_object_stack != null)
-		{
-			int num = current_index - 1;
-			if (num >= 0)
-			{
-				for (int i = num; i < 100; i++)
-				{
-					act(audio_object_stack[i]);
-				}
-			}
-		}
-	}
+  private AudioObject CreateObject(int managed_id)
+  {
+    GameObject gameObject = new GameObject("AudioObject");
+    AudioObject audioObject = gameObject.AddComponent<AudioObject>();
+    AudioSource source = gameObject.AddComponent<AudioSource>();
+    source.playOnAwake = false;
+    AudioObject.Init(audioObject, source, managed_id);
+    return audioObject;
+  }
 
-	private void CreateStack()
-	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		audio_object_stack = new AudioObject[100];
-		for (int i = 0; i < 100; i++)
-		{
-			audio_object_stack[i] = CreateObject(i + 1);
-			audio_object_stack[i].get_transform().set_parent(this.get_transform());
-			audio_object_stack[i].get_gameObject().SetActive(false);
-		}
-		SetCursorTail();
-	}
+  public static AudioObject Borrow()
+  {
+    return !MonoBehaviourSingleton<AudioObjectPool>.IsValid() ? (AudioObject) null : MonoBehaviourSingleton<AudioObjectPool>.I.Borrow_Imm();
+  }
 
-	private AudioObject CreateObject(int managed_id)
-	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Expected O, but got Unknown
-		GameObject val = new GameObject("AudioObject");
-		AudioObject audioObject = val.AddComponent<AudioObject>();
-		AudioSource source = val.AddComponent<AudioSource>();
-		AudioObject.Init(audioObject, source, managed_id);
-		return audioObject;
-	}
+  private AudioObject Borrow_Imm()
+  {
+    if (this.CachedObjectCount <= 0)
+      return this.CreateObject(-1);
+    AudioObject audioObject = this.audio_object_stack[this.current_index];
+    ((Component) audioObject).gameObject.SetActive(true);
+    this.DownCursor();
+    return audioObject;
+  }
 
-	public static AudioObject Borrow()
-	{
-		if (!MonoBehaviourSingleton<AudioObjectPool>.IsValid())
-		{
-			return null;
-		}
-		return MonoBehaviourSingleton<AudioObjectPool>.I.Borrow_Imm();
-	}
+  public static void Release(AudioObject obj)
+  {
+    if (!MonoBehaviourSingleton<AudioObjectPool>.IsValid())
+      return;
+    MonoBehaviourSingleton<AudioObjectPool>.I.Release_Imm(obj);
+  }
 
-	private AudioObject Borrow_Imm()
-	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		if (CachedObjectCount > 0)
-		{
-			AudioObject audioObject = audio_object_stack[current_index];
-			audioObject.get_gameObject().SetActive(true);
-			DownCursor();
-			return audioObject;
-		}
-		return CreateObject(-1);
-	}
+  private void Release_Imm(AudioObject obj)
+  {
+    if (obj.ID > 0)
+    {
+      this.UpCursor();
+      this.audio_object_stack[this.current_index] = obj;
+      ((Component) this.audio_object_stack[this.current_index]).transform.parent = ((Component) this).transform;
+      ((Component) obj).gameObject.SetActive(false);
+    }
+    else
+      Object.Destroy((Object) ((Component) obj).gameObject);
+  }
 
-	public static void Release(AudioObject obj)
-	{
-		if (MonoBehaviourSingleton<AudioObjectPool>.IsValid())
-		{
-			MonoBehaviourSingleton<AudioObjectPool>.I.Release_Imm(obj);
-		}
-	}
+  private void SetCursorTail() => this.current_index = 19;
 
-	private void Release_Imm(AudioObject obj)
-	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		if (obj.ID > 0)
-		{
-			UpCursor();
-			audio_object_stack[current_index] = obj;
-			audio_object_stack[current_index].get_transform().set_parent(this.get_transform());
-			obj.get_gameObject().SetActive(false);
-		}
-		else
-		{
-			Object.Destroy(obj.get_gameObject());
-		}
-	}
+  private void UpCursor() => this.current_index = Mathf.Min(this.current_index + 1, 19);
 
-	private void SetCursorTail()
-	{
-		current_index = 99;
-	}
-
-	private void UpCursor()
-	{
-		current_index = Mathf.Min(current_index + 1, 99);
-	}
-
-	private void DownCursor()
-	{
-		current_index = Mathf.Max(current_index - 1, 0);
-	}
+  private void DownCursor() => this.current_index = Mathf.Max(this.current_index - 1, 0);
 }

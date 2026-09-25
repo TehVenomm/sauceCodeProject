@@ -1,131 +1,88 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: NodeObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class NodeObject
+#nullable disable
+public class NodeObject : MonoBehaviour
 {
-	protected float timeCount;
+  protected float timeCount;
 
-	public Transform _transform
-	{
-		get;
-		protected set;
-	}
+  public Transform _transform { get; protected set; }
 
-	public Rigidbody _rigidbody
-	{
-		get;
-		protected set;
-	}
+  public Rigidbody _rigidbody { get; protected set; }
 
-	public Collider _collider
-	{
-		get;
-		protected set;
-	}
+  public Collider _collider { get; protected set; }
 
-	public StageObject stageObject
-	{
-		get;
-		protected set;
-	}
+  public StageObject stageObject { get; protected set; }
 
-	public NodeObject()
-		: this()
-	{
-	}
+  protected virtual bool triggerColliderIsRequired() => true;
 
-	protected virtual bool triggerColliderIsRequired()
-	{
-		return true;
-	}
+  protected virtual void Awake()
+  {
+    this._transform = ((Component) this).transform;
+    this._rigidbody = ((Component) this).GetComponent<Rigidbody>();
+    this._collider = this.GetCollider();
+    if (!Object.op_Inequality((Object) this._collider, (Object) null) || !this.triggerColliderIsRequired())
+      return;
+    if (Object.op_Equality((Object) this._rigidbody, (Object) null))
+      this._rigidbody = ((Component) this).gameObject.AddComponent<Rigidbody>();
+    this._rigidbody.isKinematic = true;
+  }
 
-	protected virtual void Awake()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		_transform = this.get_transform();
-		_rigidbody = this.GetComponent<Rigidbody>();
-		_collider = GetCollider();
-		if (_collider != null && triggerColliderIsRequired())
-		{
-			if (_rigidbody == null)
-			{
-				_rigidbody = this.get_gameObject().AddComponent<Rigidbody>();
-			}
-			_rigidbody.set_isKinematic(true);
-		}
-	}
+  protected Collider GetCollider()
+  {
+    Collider component1 = ((Component) this).GetComponent<Collider>();
+    if (Object.op_Equality((Object) component1, (Object) null))
+      return (Collider) null;
+    bool flag = this.triggerColliderIsRequired();
+    if (component1.isTrigger == flag)
+      return component1;
+    foreach (Collider component2 in ((Component) this).gameObject.GetComponents<Collider>())
+    {
+      if (component2.isTrigger == flag)
+        return component2;
+    }
+    return (Collider) null;
+  }
 
-	protected Collider GetCollider()
-	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		Collider component = this.GetComponent<Collider>();
-		if (component == null)
-		{
-			return null;
-		}
-		bool flag = triggerColliderIsRequired();
-		if (component.get_isTrigger() == flag)
-		{
-			return component;
-		}
-		Collider[] components = this.get_gameObject().GetComponents<Collider>();
-		Collider[] array = components;
-		foreach (Collider val in array)
-		{
-			if (val.get_isTrigger() == flag)
-			{
-				return val;
-			}
-		}
-		return null;
-	}
+  protected virtual void Start()
+  {
+    if (!this.triggerColliderIsRequired())
+      return;
+    this.stageObject = ((Component) this).gameObject.GetComponentInParent<StageObject>();
+  }
 
-	protected virtual void Start()
-	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		if (triggerColliderIsRequired())
-		{
-			stageObject = this.get_gameObject().GetComponentInParent<StageObject>();
-		}
-	}
+  protected virtual void Update()
+  {
+    if (!Object.op_Inequality((Object) this._collider, (Object) null) || !this._collider.enabled)
+      return;
+    this.timeCount += Time.deltaTime;
+  }
 
-	protected virtual void Update()
-	{
-		if (_collider != null && _collider.get_enabled())
-		{
-			timeCount += Time.get_deltaTime();
-		}
-	}
+  private void OnTriggerEnter(Collider collider)
+  {
+    if (Object.op_Equality((Object) this._collider, (Object) null) || !this._collider.enabled || collider.isTrigger || Object.op_Equality((Object) this.stageObject, (Object) null) || Object.op_Equality((Object) ((Component) collider).gameObject, (Object) ((Component) this).gameObject))
+      return;
+    StageObject componentInParent = ((Component) collider).gameObject.GetComponentInParent<StageObject>();
+    if (Object.op_Equality((Object) componentInParent, (Object) null) || Object.op_Equality((Object) componentInParent, (Object) this.stageObject))
+      return;
+    this.OnHitTrigger(collider, componentInParent);
+  }
 
-	private void OnTriggerEnter(Collider collider)
-	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		if (!(_collider == null) && _collider.get_enabled() && !collider.get_isTrigger() && !(stageObject == null) && !(collider.get_gameObject() == this.get_gameObject()))
-		{
-			StageObject componentInParent = collider.get_gameObject().GetComponentInParent<StageObject>();
-			if (!(componentInParent == null) && !(componentInParent == stageObject))
-			{
-				OnHitTrigger(collider, componentInParent);
-			}
-		}
-	}
+  protected virtual void OnHitTrigger(Collider to_collider, StageObject to_object)
+  {
+  }
 
-	protected virtual void OnHitTrigger(Collider to_collider, StageObject to_object)
-	{
-	}
-
-	public void SetEnableTrigger(bool enable, bool init = true)
-	{
-		if (_collider != null && _collider.get_isTrigger())
-		{
-			_collider.set_enabled(enable);
-		}
-		if (enable && init)
-		{
-			timeCount = 0f;
-		}
-	}
+  public void SetEnableTrigger(bool enable, bool init = true)
+  {
+    if (Object.op_Inequality((Object) this._collider, (Object) null) && this._collider.isTrigger)
+      this._collider.enabled = enable;
+    if (!(enable & init))
+      return;
+    this.timeCount = 0.0f;
+  }
 }

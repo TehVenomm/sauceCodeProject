@@ -1,19 +1,20 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Coop_Model_EnemyAttack
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class Coop_Model_EnemyAttack : Coop_Model_Base
 {
-	public int sid;
+  public int sid;
+  public int dmg;
 
-	public int dmg;
+  public Coop_Model_EnemyAttack() => this.packetType = PACKET_TYPE.ENEMY_ATTACK;
 
-	public Coop_Model_EnemyAttack()
-	{
-		base.packetType = PACKET_TYPE.ENEMY_ATTACK;
-	}
-
-	public override string ToString()
-	{
-		string empty = string.Empty;
-		string text = empty;
-		empty = text + ",sid=" + sid + ",dmg=" + dmg;
-		return base.ToString() + empty;
-	}
+  public override string ToString()
+  {
+    string str = $",sid={(object) this.sid},dmg={(object) this.dmg}";
+    return base.ToString() + str;
+  }
 }

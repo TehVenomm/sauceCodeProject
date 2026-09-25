@@ -1,54 +1,62 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ItemInfo
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
+using System;
 using System.Collections.Generic;
 
-public class ItemInfo : ItemInfoBase<Item>
+#nullable disable
+public class ItemInfo : ItemInfoBase<Network.Item>
 {
-	public int num;
+  public int num;
+  public ItemTable.ItemData tableData;
+  public List<ExpiredItem> expiredAtItem;
 
-	public ItemTable.ItemData tableData;
+  public ItemInfo()
+  {
+  }
 
-	public List<ExpiredItem> expiredAtItem;
+  public ItemInfo(Network.Item recv_data) => this.SetValue(recv_data);
 
-	public ItemInfo()
-	{
-	}
+  public override void SetValue(Network.Item recv_data)
+  {
+    this.uniqueID = ulong.Parse(recv_data.uniqId);
+    this.tableID = (uint) recv_data.itemId;
+    this.num = recv_data.num;
+    this.tableData = Singleton<ItemTable>.I.GetItemData(this.tableID);
+  }
 
-	public ItemInfo(Item recv_data)
-	{
-		SetValue(recv_data);
-	}
+  public static InventoryList<ItemInfo, Network.Item> CreateList(List<Network.Item> recv_list)
+  {
+    InventoryList<ItemInfo, Network.Item> list = new InventoryList<ItemInfo, Network.Item>();
+    recv_list.ForEach((Action<Network.Item>) (o => list.Add(o)));
+    return list;
+  }
 
-	public override void SetValue(Item recv_data)
-	{
-		base.uniqueID = ulong.Parse(recv_data.uniqId);
-		base.tableID = (uint)recv_data.itemId;
-		num = recv_data.num;
-		tableData = Singleton<ItemTable>.I.GetItemData(base.tableID);
-	}
+  public static ItemInfo CreateItemInfo(Network.Item item)
+  {
+    ItemInfo itemInfo = new ItemInfo();
+    itemInfo.SetValue(item);
+    return itemInfo;
+  }
 
-	public static InventoryList<ItemInfo, Item> CreateList(List<Item> recv_list)
-	{
-		InventoryList<ItemInfo, Item> list = new InventoryList<ItemInfo, Item>();
-		recv_list.ForEach(delegate(Item o)
-		{
-			list.Add(o);
-		});
-		return list;
-	}
+  public static ItemInfo CreateItemInfo(int itemId)
+  {
+    return ItemInfo.CreateItemInfo(new Network.Item()
+    {
+      uniqId = "0",
+      itemId = itemId,
+      num = 0
+    });
+  }
 
-	public static ItemInfo CreateItemInfo(Item item)
-	{
-		ItemInfo itemInfo = new ItemInfo();
-		itemInfo.SetValue(item);
-		return itemInfo;
-	}
+  public ITEM_TYPE GetType() => this.tableData.type;
 
-	public int GetNum()
-	{
-		if (expiredAtItem == null)
-		{
-			return num;
-		}
-		return expiredAtItem.FindAll((ExpiredItem x) => x.CanUse()).Count;
-	}
+  public int GetNum()
+  {
+    return this.expiredAtItem == null ? this.num : this.expiredAtItem.FindAll((Predicate<ExpiredItem>) (x => x.CanUse())).Count;
+  }
 }

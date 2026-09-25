@@ -1,292 +1,235 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UITweenCtrl
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
-public class UITweenCtrl
+#nullable disable
+public class UITweenCtrl : MonoBehaviour
 {
-	[SerializeField]
-	private int _id;
+  [SerializeField]
+  private int _id;
+  public UITweener[] tweens;
+  protected bool isPlaying;
+  private UITable uiTable;
 
-	public UITweener[] tweens;
+  public static void Set(Transform root)
+  {
+    if (Object.op_Inequality((Object) ((Component) root).GetComponent<UITweenCtrl>(), (Object) null))
+      return;
+    UITweenCtrl uiTweenCtrl = ((Component) root).gameObject.AddComponent<UITweenCtrl>();
+    UITweener[] componentsInChildren = ((Component) root).GetComponentsInChildren<UITweener>();
+    int index = 0;
+    for (int length = componentsInChildren.Length; index < length; ++index)
+      ((Behaviour) componentsInChildren[index]).enabled = false;
+    uiTweenCtrl.tweens = componentsInChildren;
+  }
 
-	protected bool isPlaying;
+  private static UITweenCtrl SearchTweenCtrl(Transform root, int tween_ctrl_id)
+  {
+    UITweenCtrl[] components = ((Component) root).GetComponents<UITweenCtrl>();
+    if (components == null || components.Length == 0)
+      return (UITweenCtrl) null;
+    UITweenCtrl c = (UITweenCtrl) null;
+    if (components.Length == 1)
+      c = components[0];
+    else
+      Array.ForEach<UITweenCtrl>(components, (Action<UITweenCtrl>) (tw =>
+      {
+        if (Object.op_Inequality((Object) c, (Object) null) || tw.id != tween_ctrl_id)
+          return;
+        c = tw;
+      }));
+    return c;
+  }
 
-	private UITable uiTable;
+  public static void Play(
+    Transform root,
+    bool forward = true,
+    EventDelegate.Callback callback = null,
+    bool is_input_block = true,
+    int tween_ctrl_id = 0)
+  {
+    UITweenCtrl uiTweenCtrl = UITweenCtrl.SearchTweenCtrl(root, tween_ctrl_id);
+    if (Object.op_Equality((Object) uiTweenCtrl, (Object) null))
+      return;
+    if (is_input_block)
+      MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.UITWEEN_SMALL, true);
+    uiTweenCtrl.Play(forward, (EventDelegate.Callback) (() =>
+    {
+      if (is_input_block)
+        MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.UITWEEN_SMALL, false);
+      if (callback == null)
+        return;
+      callback();
+    }));
+  }
 
-	public int id => _id;
+  public static void Skip(Transform root, bool forward = true, int tween_ctrl_id = 0)
+  {
+    UITweenCtrl uiTweenCtrl = UITweenCtrl.SearchTweenCtrl(root, tween_ctrl_id);
+    if (Object.op_Equality((Object) uiTweenCtrl, (Object) null))
+      return;
+    uiTweenCtrl.Skip(forward);
+  }
 
-	public UITweenCtrl()
-		: this()
-	{
-	}
+  public static void Reset(Transform root, int tween_ctrl_id = 0)
+  {
+    UITweenCtrl uiTweenCtrl = UITweenCtrl.SearchTweenCtrl(root, tween_ctrl_id);
+    if (Object.op_Equality((Object) uiTweenCtrl, (Object) null))
+      return;
+    uiTweenCtrl.Reset();
+  }
 
-	public static void Set(Transform root)
-	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		UITweenCtrl component = root.GetComponent<UITweenCtrl>();
-		if (!(component != null))
-		{
-			component = root.get_gameObject().AddComponent<UITweenCtrl>();
-			UITweener[] componentsInChildren = root.GetComponentsInChildren<UITweener>();
-			int i = 0;
-			for (int num = componentsInChildren.Length; i < num; i++)
-			{
-				componentsInChildren[i].set_enabled(false);
-			}
-			component.tweens = componentsInChildren;
-		}
-	}
+  public static void SetDurationWithRate(Transform root, float rate, int tween_ctrl_id = 0)
+  {
+    foreach (UITweener tween in UITweenCtrl.SearchTweenCtrl(root, tween_ctrl_id).tweens)
+      tween.duration *= rate;
+  }
 
-	private static UITweenCtrl SearchTweenCtrl(Transform root, int tween_ctrl_id)
-	{
-		UITweenCtrl[] components = root.GetComponents<UITweenCtrl>();
-		if (components == null || components.Length == 0)
-		{
-			return null;
-		}
-		UITweenCtrl c = null;
-		if (components.Length == 1)
-		{
-			c = components[0];
-		}
-		else
-		{
-			Array.ForEach(components, delegate(UITweenCtrl tw)
-			{
-				if (!(c != null) && tw.id == tween_ctrl_id)
-				{
-					c = tw;
-				}
-			});
-		}
-		return c;
-	}
+  public int id => this._id;
 
-	public static void Play(Transform root, bool forward = true, EventDelegate.Callback callback = null, bool is_input_block = true, int tween_ctrl_id = 0)
-	{
-		UITweenCtrl uITweenCtrl = SearchTweenCtrl(root, tween_ctrl_id);
-		if (!(uITweenCtrl == null))
-		{
-			if (is_input_block)
-			{
-				MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.UITWEEN_SMALL, true);
-			}
-			uITweenCtrl.Play(forward, delegate
-			{
-				if (is_input_block)
-				{
-					MonoBehaviourSingleton<UIManager>.I.SetDisable(UIManager.DISABLE_FACTOR.UITWEEN_SMALL, false);
-				}
-				if (callback != null)
-				{
-					callback();
-				}
-			});
-		}
-	}
+  private void Awake()
+  {
+    if (this.tweens == null || this.tweens.Length == 0)
+      return;
+    this.FillInTheBlanks();
+    this.Reset();
+  }
 
-	public static void Skip(Transform root, bool forward = true, int tween_ctrl_id = 0)
-	{
-		UITweenCtrl uITweenCtrl = SearchTweenCtrl(root, tween_ctrl_id);
-		if (!(uITweenCtrl == null))
-		{
-			uITweenCtrl.Skip(forward);
-		}
-	}
+  public void Play(bool forward = true, EventDelegate.Callback onFinished = null)
+  {
+    this._Play(this.tweens, forward, onFinished);
+  }
 
-	public static void Reset(Transform root, int tween_ctrl_id = 0)
-	{
-		UITweenCtrl uITweenCtrl = SearchTweenCtrl(root, tween_ctrl_id);
-		if (!(uITweenCtrl == null))
-		{
-			uITweenCtrl.Reset();
-		}
-	}
+  protected void _Play(UITweener[] target_tweens, bool forward = true, EventDelegate.Callback onFinished = null)
+  {
+    if (target_tweens == null || target_tweens.Length == 0 || this.isPlaying)
+      return;
+    if (Object.op_Equality((Object) target_tweens[0], (Object) null))
+    {
+      Log.Error("tween[0] = null!");
+    }
+    else
+    {
+      this.isPlaying = true;
+      this.uiTable = ((Component) this).gameObject.GetComponentInParent<UITable>();
+      if (onFinished != null)
+        EventDelegate.Add(target_tweens[0].onFinished, onFinished, true);
+      EventDelegate.Add(target_tweens[0].onFinished, new EventDelegate.Callback(this.OnFinished));
+      int index1 = 0;
+      for (int length = target_tweens.Length; index1 < length; ++index1)
+      {
+        if (!Object.op_Equality((Object) target_tweens[index1], (Object) null))
+          this._TweenPlay(target_tweens[index1], forward);
+      }
+      if (!GameSceneManager.isAutoEventSkip)
+        return;
+      MonoBehaviourSingleton<AppMain>.I.onDelayCall += (System.Action) (() =>
+      {
+        if (!this.isPlaying)
+          return;
+        int index2 = 0;
+        for (int length = target_tweens.Length; index2 < length; ++index2)
+        {
+          if (Object.op_Inequality((Object) target_tweens[index2], (Object) null))
+            target_tweens[index2].tweenFactor = 1f;
+        }
+      });
+    }
+  }
 
-	public static void SetDurationWithRate(Transform root, float rate, int tween_ctrl_id = 0)
-	{
-		UITweenCtrl uITweenCtrl = SearchTweenCtrl(root, tween_ctrl_id);
-		UITweener[] array = uITweenCtrl.tweens;
-		for (int i = 0; i < array.Length; i++)
-		{
-			array[i].duration *= rate;
-		}
-	}
+  protected virtual void _TweenPlay(UITweener target, bool forward) => target.Play(forward);
 
-	private void Awake()
-	{
-		if (tweens != null && tweens.Length > 0)
-		{
-			FillInTheBlanks();
-			Reset();
-		}
-	}
+  public void Reset() => this._Reset(this.tweens);
 
-	public void Play(bool forward = true, EventDelegate.Callback onFinished = null)
-	{
-		_Play(tweens, forward, onFinished);
-	}
+  protected void _Reset(UITweener[] target_tweens)
+  {
+    if (target_tweens == null || target_tweens.Length == 0)
+      return;
+    if (Object.op_Equality((Object) target_tweens[0], (Object) null))
+    {
+      Log.Error("tween[0] = null!");
+    }
+    else
+    {
+      this.isPlaying = false;
+      this.uiTable = ((Component) this).gameObject.GetComponentInParent<UITable>();
+      EventDelegate.Set(target_tweens[0].onFinished, new EventDelegate.Callback(this.OnFinished));
+      int index = 0;
+      for (int length = target_tweens.Length; index < length; ++index)
+      {
+        if (!Object.op_Equality((Object) target_tweens[index], (Object) null))
+          this._TweenReset(target_tweens[index]);
+      }
+    }
+  }
 
-	protected void _Play(UITweener[] target_tweens, bool forward = true, EventDelegate.Callback onFinished = null)
-	{
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		if (target_tweens != null && target_tweens.Length != 0 && !isPlaying)
-		{
-			if (target_tweens[0] == null)
-			{
-				Log.Error("tween[0] = null!");
-			}
-			else
-			{
-				isPlaying = true;
-				uiTable = this.get_gameObject().GetComponentInParent<UITable>();
-				if (onFinished != null)
-				{
-					EventDelegate.Add(target_tweens[0].onFinished, onFinished, true);
-				}
-				EventDelegate.Add(target_tweens[0].onFinished, OnFinished);
-				int i = 0;
-				for (int num = target_tweens.Length; i < num; i++)
-				{
-					if (!(target_tweens[i] == null))
-					{
-						_TweenPlay(target_tweens[i], forward);
-					}
-				}
-				if (GameSceneManager.isAutoEventSkip)
-				{
-					AppMain i2 = MonoBehaviourSingleton<AppMain>.I;
-					i2.onDelayCall = (Action)Delegate.Combine(i2.onDelayCall, (Action)delegate
-					{
-						if (isPlaying)
-						{
-							int j = 0;
-							for (int num2 = target_tweens.Length; j < num2; j++)
-							{
-								if (target_tweens[j] != null)
-								{
-									target_tweens[j].tweenFactor = 1f;
-								}
-							}
-						}
-					});
-				}
-			}
-		}
-	}
+  protected virtual void _TweenReset(UITweener target)
+  {
+    float duration = target.duration;
+    float delay = target.delay;
+    UITweener.Style style = target.style;
+    target.duration = 0.0f;
+    target.delay = 0.0f;
+    target.style = UITweener.Style.Once;
+    target.Play(false);
+    target.style = style;
+    target.duration = duration;
+    target.delay = delay;
+  }
 
-	protected virtual void _TweenPlay(UITweener target, bool forward)
-	{
-		target.Play(forward);
-	}
+  public void Skip(bool forward = true) => this._Skip(this.tweens, forward);
 
-	public void Reset()
-	{
-		_Reset(tweens);
-	}
+  protected void _Skip(UITweener[] target_tweens, bool forward = true)
+  {
+    if (target_tweens == null || target_tweens.Length == 0)
+      return;
+    int index = 0;
+    for (int length = target_tweens.Length; index < length; ++index)
+    {
+      if (!Object.op_Equality((Object) target_tweens[index], (Object) null))
+      {
+        float num = forward ? 1f : 0.0f;
+        target_tweens[index].tweenFactor = num;
+        target_tweens[index].Sample(target_tweens[index].tweenFactor, false);
+      }
+    }
+  }
 
-	protected void _Reset(UITweener[] target_tweens)
-	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		if (target_tweens != null && target_tweens.Length != 0)
-		{
-			if (target_tweens[0] == null)
-			{
-				Log.Error("tween[0] = null!");
-			}
-			else
-			{
-				isPlaying = false;
-				uiTable = this.get_gameObject().GetComponentInParent<UITable>();
-				EventDelegate.Set(target_tweens[0].onFinished, OnFinished);
-				int i = 0;
-				for (int num = target_tweens.Length; i < num; i++)
-				{
-					if (!(target_tweens[i] == null))
-					{
-						_TweenReset(target_tweens[i]);
-					}
-				}
-			}
-		}
-	}
+  private void OnFinished()
+  {
+    this.isPlaying = false;
+    if (!Object.op_Inequality((Object) this.uiTable, (Object) null))
+      return;
+    this.uiTable.Reposition();
+    this.uiTable = (UITable) null;
+  }
 
-	protected virtual void _TweenReset(UITweener target)
-	{
-		float duration = target.duration;
-		float delay = target.delay;
-		UITweener.Style style = target.style;
-		target.duration = 0f;
-		target.delay = 0f;
-		target.style = UITweener.Style.Once;
-		target.Play(false);
-		target.style = style;
-		target.duration = duration;
-		target.delay = delay;
-	}
+  public void LateUpdate()
+  {
+    if (!Object.op_Inequality((Object) this.uiTable, (Object) null))
+      return;
+    this.uiTable.Reposition();
+  }
 
-	public void Skip(bool forward = true)
-	{
-		_Skip(tweens, forward);
-	}
-
-	protected void _Skip(UITweener[] target_tweens, bool forward = true)
-	{
-		if (target_tweens != null && target_tweens.Length != 0)
-		{
-			int i = 0;
-			for (int num = target_tweens.Length; i < num; i++)
-			{
-				if (!(target_tweens[i] == null))
-				{
-					float tweenFactor = (float)(forward ? 1 : 0);
-					target_tweens[i].tweenFactor = tweenFactor;
-					target_tweens[i].Sample(target_tweens[i].tweenFactor, false);
-				}
-			}
-		}
-	}
-
-	private void OnFinished()
-	{
-		isPlaying = false;
-		if (uiTable != null)
-		{
-			uiTable.Reposition();
-			uiTable = null;
-		}
-	}
-
-	public void LateUpdate()
-	{
-		if (uiTable != null)
-		{
-			uiTable.Reposition();
-		}
-	}
-
-	public void FillInTheBlanks()
-	{
-		int num = tweens.Length;
-		for (int i = 0; i < num; i++)
-		{
-			if (tweens[i] == null)
-			{
-				num--;
-				int j = i;
-				for (int num2 = tweens.Length; j < num2; j++)
-				{
-					if (j < num2 - 1)
-					{
-						tweens[j] = tweens[j + 1];
-					}
-					else
-					{
-						tweens[j] = null;
-					}
-				}
-				Array.Resize(ref tweens, num);
-				i--;
-			}
-		}
-	}
+  public void FillInTheBlanks()
+  {
+    int length1 = this.tweens.Length;
+    for (int index1 = 0; index1 < length1; ++index1)
+    {
+      if (Object.op_Equality((Object) this.tweens[index1], (Object) null))
+      {
+        --length1;
+        int index2 = index1;
+        for (int length2 = this.tweens.Length; index2 < length2; ++index2)
+          this.tweens[index2] = index2 >= length2 - 1 ? (UITweener) null : this.tweens[index2 + 1];
+        Array.Resize<UITweener>(ref this.tweens, length1);
+        --index1;
+      }
+    }
+  }
 }

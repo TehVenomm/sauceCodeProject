@@ -1,469 +1,342 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: UIRenderTexture
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections;
 using UnityEngine;
 
-public class UIRenderTexture
+#nullable disable
+public class UIRenderTexture : MonoBehaviour
 {
-	private const int BEGIN_LAYER = 24;
+  public const int BEGIN_LAYER = 24;
+  private const int ID_MAX = 16 /*0x10*/;
+  private const int CAMERA_DEPTH = 50;
+  private static int idFlags;
+  private int layer = -1;
+  private int id = -1;
+  private int texW;
+  private int texH;
+  private FilterMode filterMode;
+  private FloatInterpolator alpha;
 
-	private const int ID_MAX = 16;
+  public static bool ToRealSize(ref int w, ref int h)
+  {
+    float num1 = (float) Screen.width;
+    float num2 = (float) Screen.height;
+    if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.HasSafeArea)
+    {
+      DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
+      num1 = specialDeviceInfo.SafeArea.SafeWidth;
+      num2 = specialDeviceInfo.SafeArea.SafeHeight;
+    }
+    float num3 = num1 / (float) MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth * (float) w;
+    float num4 = num2 / (float) MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight * (float) h;
+    bool realSize = false;
+    if ((double) num3 > (double) num1 + 4.0)
+    {
+      num4 *= num1 / num3;
+      num3 = num1;
+      realSize = true;
+    }
+    if ((double) num4 > (double) num2 + 4.0)
+    {
+      num3 *= num2 / num4;
+      num4 = num2;
+      realSize = true;
+    }
+    w = Mathf.RoundToInt(num3);
+    h = Mathf.RoundToInt(num4);
+    return realSize;
+  }
 
-	private const int CAMERA_DEPTH = 50;
+  public static UIRenderTexture Get(
+    UITexture ui_texture,
+    float fov = -1f,
+    bool link_main_camera = false,
+    int layer = -1)
+  {
+    if (Object.op_Equality((Object) ui_texture, (Object) null))
+      return (UIRenderTexture) null;
+    UIRenderTexture uiRenderTexture = ((Component) ui_texture).GetComponent<UIRenderTexture>();
+    if (Object.op_Equality((Object) uiRenderTexture, (Object) null))
+      uiRenderTexture = ((Component) ui_texture).gameObject.AddComponent<UIRenderTexture>();
+    uiRenderTexture.uiTexture = ui_texture;
+    uiRenderTexture.fov = fov;
+    uiRenderTexture.linkMainCamera = link_main_camera;
+    uiRenderTexture.layer = layer;
+    uiRenderTexture.Init();
+    return uiRenderTexture;
+  }
 
-	private static int idFlags;
+  public UITexture uiTexture { get; private set; }
 
-	private int layer = -1;
+  public float fov { get; private set; }
 
-	private int id = -1;
+  public float nearClipPlane { get; set; }
 
-	private int texW;
+  public float farClipPlane { get; set; }
 
-	private int texH;
+  public float orthographicSize { get; set; }
 
-	private FilterMode filterMode;
+  public bool linkMainCamera { get; set; }
 
-	private FloatInterpolator alpha;
+  public Transform renderTransform { get; private set; }
 
-	public UITexture uiTexture
-	{
-		get;
-		private set;
-	}
+  public Transform modelTransform { get; private set; }
 
-	public float fov
-	{
-		get;
-		private set;
-	}
+  public Camera renderCamera { get; private set; }
 
-	public float nearClipPlane
-	{
-		get;
-		set;
-	}
+  public FilterBase postEffectFilter { get; set; }
 
-	public float farClipPlane
-	{
-		get;
-		set;
-	}
+  public PostEffector postEffector { get; private set; }
 
-	public float orthographicSize
-	{
-		get;
-		set;
-	}
+  private UIRenderTexture()
+  {
+    this.nearClipPlane = -1f;
+    this.farClipPlane = 500f;
+    this.orthographicSize = 0.0f;
+  }
 
-	public bool linkMainCamera
-	{
-		get;
-		set;
-	}
+  private void Init()
+  {
+    if (Object.op_Inequality((Object) this.renderTransform, (Object) null))
+      return;
+    if (this.layer == -1)
+    {
+      if (this.id != -1)
+        return;
+      for (int index = 0; index < 16 /*0x10*/; ++index)
+      {
+        int num = 1 << index;
+        if ((UIRenderTexture.idFlags & num) == 0)
+        {
+          UIRenderTexture.idFlags |= num;
+          this.id = index;
+          break;
+        }
+      }
+      if (this.id == -1)
+        return;
+    }
+    this.renderTransform = Utility.CreateGameObject("RenderTextureNode:" + (object) this.id, (Transform) null, this.renderLayer);
+    int num1 = this.id >> 2;
+    int num2 = this.id + 1 & 3;
+    this.renderTransform.localPosition = this.linkMainCamera || this.layer != -1 ? Vector3.zero : new Vector3((float) (num1 * 50), (float) (num2 * -50) + MonoBehaviourSingleton<UIManager>.I._transform.position.y, 0.0f);
+    this.renderTransform.parent = MonoBehaviourSingleton<UIManager>.I._transform;
+    this.renderTransform.localScale = Vector3.one;
+    this.modelTransform = Utility.CreateGameObject("ModelNode", (Transform) null, this.renderLayer);
+    this.modelTransform.parent = this.renderTransform;
+    this.modelTransform.localPosition = Vector3.zero;
+    this.modelTransform.localEulerAngles = Vector3.zero;
+  }
 
-	public Transform renderTransform
-	{
-		get;
-		private set;
-	}
+  public void Release()
+  {
+    this.Disable();
+    if (!AppMain.isApplicationQuit && Object.op_Inequality((Object) this.renderTransform, (Object) null))
+    {
+      Object.Destroy((Object) ((Component) this.renderTransform).gameObject);
+      this.renderTransform = (Transform) null;
+    }
+    if (this.id == -1)
+      return;
+    UIRenderTexture.idFlags &= ~(1 << this.id);
+    this.id = -1;
+  }
 
-	public Transform modelTransform
-	{
-		get;
-		private set;
-	}
+  private void OnEnable()
+  {
+    if (!Object.op_Inequality((Object) this.renderCamera, (Object) null))
+      return;
+    ((Behaviour) this.renderCamera).enabled = true;
+    Utility.SetLayerWithChildren(((Component) this.renderCamera).transform, this.renderLayer);
+  }
 
-	public Camera renderCamera
-	{
-		get;
-		private set;
-	}
+  private void OnDisable()
+  {
+    if (!Object.op_Inequality((Object) this.renderCamera, (Object) null))
+      return;
+    ((Behaviour) this.renderCamera).enabled = false;
+  }
 
-	public FilterBase postEffectFilter
-	{
-		get;
-		set;
-	}
+  private void OnDestroy()
+  {
+    this.StopAllCoroutines();
+    this.Release();
+  }
 
-	public PostEffector postEffector
-	{
-		get;
-		private set;
-	}
+  private void CreateRenderTexture()
+  {
+    if (!Object.op_Equality((Object) this.renderCamera.targetTexture, (Object) null))
+      return;
+    RenderTexture renderTexture = new RenderTexture(this.texW, this.texH, 24);
+    ((Object) renderTexture).name = "(UIRenderTexture)";
+    ((Texture) renderTexture).filterMode = this.filterMode;
+    renderTexture.Create();
+    this.renderCamera.targetTexture = renderTexture;
+    this.uiTexture.mainTexture = (Texture) renderTexture;
+  }
 
-	public int renderLayer
-	{
-		get
-		{
-			if (layer != -1)
-			{
-				return layer;
-			}
-			if (id == -1)
-			{
-				return 0;
-			}
-			return 24 + (id & 3);
-		}
-	}
+  private void DeleteRenderTexture()
+  {
+    if (!Object.op_Inequality((Object) this.renderCamera.targetTexture, (Object) null))
+      return;
+    this.renderCamera.targetTexture.DiscardContents();
+    Object.Destroy((Object) this.renderCamera.targetTexture);
+    this.renderCamera.targetTexture = (RenderTexture) null;
+    UIPanel panel = this.uiTexture.panel;
+    this.uiTexture.mainTexture = (Texture) null;
+    if (Object.op_Inequality((Object) this.uiTexture.drawCall, (Object) null))
+    {
+      this.uiTexture.drawCall.panel.drawCalls.Remove(this.uiTexture.drawCall);
+      UIDrawCall.Destroy(this.uiTexture.drawCall);
+      this.uiTexture.drawCall = (UIDrawCall) null;
+    }
+    else
+    {
+      if (!Object.op_Inequality((Object) panel, (Object) null))
+        return;
+      panel.ForceUpDate();
+    }
+  }
 
-	public bool enableTexture
-	{
-		get
-		{
-			return renderCamera != null;
-		}
-		set
-		{
-			if (value)
-			{
-				Enable(0.25f);
-			}
-			else
-			{
-				Disable();
-			}
-		}
-	}
+  public void Enable(float fadeTime = 0.25f)
+  {
+    this.Init();
+    if (this.layer == -1 && this.id == -1 || Object.op_Inequality((Object) this.renderCamera, (Object) null))
+      return;
+    this.renderCamera = ((Component) this.renderTransform).gameObject.AddComponent<Camera>();
+    this.renderCamera.depth = 50f;
+    this.renderCamera.clearFlags = (CameraClearFlags) 2;
+    this.renderCamera.backgroundColor = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+    this.renderCamera.renderingPath = (RenderingPath) 1;
+    this.renderCamera.cullingMask = 1 << this.renderLayer;
+    if ((double) this.orthographicSize == 0.0)
+    {
+      if ((double) this.fov <= 0.0)
+        this.fov = 10f;
+      this.renderCamera.fieldOfView = this.fov;
+    }
+    else
+    {
+      this.renderCamera.orthographic = true;
+      this.renderCamera.orthographicSize = this.orthographicSize;
+    }
+    if ((double) this.nearClipPlane == -1.0)
+      this.nearClipPlane = 0.01f;
+    this.renderCamera.nearClipPlane = this.nearClipPlane;
+    this.renderCamera.farClipPlane = this.farClipPlane;
+    if (Object.op_Inequality((Object) this.postEffectFilter, (Object) null))
+    {
+      this.postEffector = ((Component) this.renderTransform).gameObject.AddComponent<PostEffector>();
+      this.postEffector.SetFilter(this.postEffectFilter);
+    }
+    if (Object.op_Inequality((Object) this.uiTexture, (Object) null))
+    {
+      this.texW = this.uiTexture.width;
+      this.texH = this.uiTexture.height;
+      this.filterMode = !UIRenderTexture.ToRealSize(ref this.texW, ref this.texH) ? (FilterMode) 0 : (FilterMode) 1;
+    }
+    else
+      this.texW = this.texH = Mathf.Min(Screen.width, Screen.height);
+    this.CreateRenderTexture();
+    this.uiTexture.alpha = 0.0f;
+    this.alpha = new FloatInterpolator();
+    this.alpha.Set(fadeTime, 0.0f, 1f, Curves.easeLinear, 0.0f, (AnimationCurve) null);
+    this.alpha.Play();
+    Nexus6CrashWorkaround.Apply(this.renderCamera);
+  }
 
-	private UIRenderTexture()
-		: this()
-	{
-		nearClipPlane = -1f;
-		farClipPlane = 500f;
-		orthographicSize = 0f;
-	}
+  public void Disable()
+  {
+    if (this.layer == -1 && this.id == -1 || Object.op_Equality((Object) this.renderCamera, (Object) null))
+      return;
+    this.DeleteRenderTexture();
+    Object.Destroy((Object) this.renderCamera);
+    this.renderCamera = (Camera) null;
+    Object.Destroy((Object) this.postEffector);
+    this.postEffector = (PostEffector) null;
+    this.alpha = (FloatInterpolator) null;
+    this.uiTexture.alpha = 0.0f;
+  }
 
-	public static bool ToRealSize(ref int w, ref int h)
-	{
-		float num = (float)Screen.get_width();
-		float num2 = (float)Screen.get_height();
-		float num3 = num / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualWidth * (float)w;
-		float num4 = num2 / (float)MonoBehaviourSingleton<UIManager>.I.uiRoot.manualHeight * (float)h;
-		bool result = false;
-		if (num3 > num + 4f)
-		{
-			num4 *= num / num3;
-			num3 = num;
-			result = true;
-		}
-		if (num4 > num2 + 4f)
-		{
-			num3 *= num2 / num4;
-			num4 = num2;
-			result = true;
-		}
-		w = Mathf.RoundToInt(num3);
-		h = Mathf.RoundToInt(num4);
-		return result;
-	}
+  public void FadeOutDisable(float fadeTime = 0.25f)
+  {
+    this.StartCoroutine(this.DoFadeOutDisable(fadeTime));
+  }
 
-	public static UIRenderTexture Get(UITexture ui_texture, float fov = -1f, bool link_main_camera = false, int layer = -1)
-	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		if (ui_texture == null)
-		{
-			return null;
-		}
-		UIRenderTexture uIRenderTexture = ui_texture.GetComponent<UIRenderTexture>();
-		if (uIRenderTexture == null)
-		{
-			uIRenderTexture = ui_texture.get_gameObject().AddComponent<UIRenderTexture>();
-		}
-		uIRenderTexture.uiTexture = ui_texture;
-		uIRenderTexture.fov = fov;
-		uIRenderTexture.linkMainCamera = link_main_camera;
-		uIRenderTexture.layer = layer;
-		uIRenderTexture.Init();
-		return uIRenderTexture;
-	}
+  private IEnumerator DoFadeOutDisable(float fadeTime)
+  {
+    this.uiTexture.alpha = 1f;
+    this.alpha = new FloatInterpolator();
+    this.alpha.Set(fadeTime, 1f, 0.0f, Curves.easeLinear, 0.0f, (AnimationCurve) null);
+    this.alpha.Play();
+    while (this.alpha.IsPlaying())
+    {
+      yield return (object) null;
+      if (this.alpha == null)
+        break;
+    }
+    this.Disable();
+  }
 
-	private void Init()
-	{
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-		if (!(this.renderTransform != null))
-		{
-			if (layer == -1)
-			{
-				if (id != -1)
-				{
-					return;
-				}
-				for (int i = 0; i < 16; i++)
-				{
-					int num = 1 << i;
-					if ((idFlags & num) == 0)
-					{
-						idFlags |= num;
-						id = i;
-						break;
-					}
-				}
-				if (id == -1)
-				{
-					return;
-				}
-			}
-			this.renderTransform = Utility.CreateGameObject("RenderTextureNode:" + id, null, renderLayer);
-			int num2 = id >> 2;
-			int num3 = (id + 1) & 3;
-			object renderTransform = (object)this.renderTransform;
-			_003F localPosition;
-			if (!linkMainCamera && layer == -1)
-			{
-				float num4 = (float)(num2 * 50);
-				float num5 = (float)(num3 * -50);
-				Vector3 position = MonoBehaviourSingleton<UIManager>.I._transform.get_position();
-				localPosition = new Vector3(num4, num5 + position.y, 0f);
-			}
-			else
-			{
-				localPosition = Vector3.get_zero();
-			}
-			renderTransform.set_localPosition(localPosition);
-			this.renderTransform.set_parent(MonoBehaviourSingleton<UIManager>.I._transform);
-			this.renderTransform.set_localScale(Vector3.get_one());
-			modelTransform = Utility.CreateGameObject("ModelNode", null, renderLayer);
-			modelTransform.set_parent(this.renderTransform);
-			modelTransform.set_localPosition(Vector3.get_zero());
-			modelTransform.set_localEulerAngles(Vector3.get_zero());
-		}
-	}
+  private void LateUpdate()
+  {
+    if (this.layer == -1 && this.id == -1)
+      return;
+    if (this.alpha != null)
+    {
+      this.uiTexture.alpha = this.alpha.Update();
+      if (!this.alpha.IsPlaying())
+        this.alpha = (FloatInterpolator) null;
+    }
+    if (!this.linkMainCamera || !Object.op_Inequality((Object) this.renderCamera, (Object) null))
+      return;
+    this.modelTransform.parent = (Transform) null;
+    this.renderTransform.position = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.position;
+    this.renderTransform.rotation = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.rotation;
+    this.modelTransform.parent = this.renderTransform;
+    this.renderCamera.fieldOfView = MonoBehaviourSingleton<AppMain>.I.mainCamera.fieldOfView;
+  }
 
-	public void Release()
-	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		Disable();
-		if (!AppMain.isApplicationQuit && renderTransform != null)
-		{
-			Object.Destroy(renderTransform.get_gameObject());
-			renderTransform = null;
-		}
-		if (id != -1)
-		{
-			idFlags &= ~(1 << (id & 0x1F));
-			id = -1;
-		}
-	}
+  public int renderLayer
+  {
+    get
+    {
+      if (this.layer != -1)
+        return this.layer;
+      return this.id == -1 ? 0 : 24 + (this.id & 3);
+    }
+  }
 
-	private void OnEnable()
-	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
-		if (renderCamera != null)
-		{
-			renderCamera.set_enabled(true);
-			Utility.SetLayerWithChildren(renderCamera.get_transform(), renderLayer);
-		}
-	}
+  public bool enableTexture
+  {
+    get => Object.op_Inequality((Object) this.renderCamera, (Object) null);
+    set
+    {
+      if (value)
+        this.Enable();
+      else
+        this.Disable();
+    }
+  }
 
-	private void OnDisable()
-	{
-		if (renderCamera != null)
-		{
-			renderCamera.set_enabled(false);
-		}
-	}
+  private void OnApplicationPause(bool pauseStatus)
+  {
+    if (pauseStatus || !MonoBehaviourSingleton<AppMain>.IsValid())
+      return;
+    MonoBehaviourSingleton<AppMain>.I.onDelayCall += new System.Action(this.CheckRenderCameraTarget);
+  }
 
-	private void OnDestroy()
-	{
-		this.StopAllCoroutines();
-		Release();
-	}
-
-	private void CreateRenderTexture()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Expected O, but got Unknown
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		if (renderCamera.get_targetTexture() == null)
-		{
-			RenderTexture val = new RenderTexture(texW, texH, 24);
-			val.set_name("(UIRenderTexture)");
-			val.set_filterMode(filterMode);
-			val.Create();
-			renderCamera.set_targetTexture(val);
-			uiTexture.mainTexture = val;
-		}
-	}
-
-	private void DeleteRenderTexture()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		if (renderCamera.get_targetTexture() != null)
-		{
-			renderCamera.get_targetTexture().DiscardContents();
-			Object.Destroy(renderCamera.get_targetTexture());
-			renderCamera.set_targetTexture(null);
-			UIPanel panel = uiTexture.panel;
-			uiTexture.mainTexture = null;
-			if (uiTexture.drawCall != null)
-			{
-				uiTexture.drawCall.panel.drawCalls.Remove(uiTexture.drawCall);
-				UIDrawCall.Destroy(uiTexture.drawCall);
-				uiTexture.drawCall = null;
-			}
-			else if (panel != null)
-			{
-				panel.ForceUpDate();
-			}
-		}
-	}
-
-	public void Enable(float fadeTime = 0.25f)
-	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-		Init();
-		if ((layer != -1 || id != -1) && !(renderCamera != null))
-		{
-			renderCamera = renderTransform.get_gameObject().AddComponent<Camera>();
-			renderCamera.set_depth(50f);
-			renderCamera.set_clearFlags(2);
-			renderCamera.set_backgroundColor(new Color(0f, 0f, 0f, 0f));
-			renderCamera.set_renderingPath(1);
-			renderCamera.set_cullingMask(1 << renderLayer);
-			if (orthographicSize == 0f)
-			{
-				if (fov <= 0f)
-				{
-					fov = 10f;
-				}
-				renderCamera.set_fieldOfView(fov);
-			}
-			else
-			{
-				renderCamera.set_orthographic(true);
-				renderCamera.set_orthographicSize(orthographicSize);
-			}
-			if (nearClipPlane == -1f)
-			{
-				nearClipPlane = 0.01f;
-			}
-			renderCamera.set_nearClipPlane(nearClipPlane);
-			renderCamera.set_farClipPlane(farClipPlane);
-			if (postEffectFilter != null)
-			{
-				postEffector = renderTransform.get_gameObject().AddComponent<PostEffector>();
-				postEffector.SetFilter(postEffectFilter);
-			}
-			if (uiTexture != null)
-			{
-				texW = uiTexture.width;
-				texH = uiTexture.height;
-				if (ToRealSize(ref texW, ref texH))
-				{
-					filterMode = 1;
-				}
-				else
-				{
-					filterMode = 0;
-				}
-			}
-			else
-			{
-				texW = (texH = Mathf.Min(Screen.get_width(), Screen.get_height()));
-			}
-			CreateRenderTexture();
-			uiTexture.alpha = 0f;
-			alpha = new FloatInterpolator();
-			alpha.Set(fadeTime, 0f, 1f, Curves.easeLinear, 0f, null);
-			alpha.Play();
-			Nexus6CrashWorkaround.Apply(renderCamera);
-		}
-	}
-
-	public void Disable()
-	{
-		if ((layer != -1 || id != -1) && !(renderCamera == null))
-		{
-			DeleteRenderTexture();
-			Object.Destroy(renderCamera);
-			renderCamera = null;
-			Object.Destroy(postEffector);
-			postEffector = null;
-			alpha = null;
-			uiTexture.alpha = 0f;
-		}
-	}
-
-	public void FadeOutDisable(float fadeTime = 0.25f)
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoFadeOutDisable(fadeTime));
-	}
-
-	private IEnumerator DoFadeOutDisable(float fadeTime)
-	{
-		uiTexture.alpha = 1f;
-		alpha = new FloatInterpolator();
-		alpha.Set(fadeTime, 1f, 0f, Curves.easeLinear, 0f, null);
-		alpha.Play();
-		while (alpha.IsPlaying())
-		{
-			yield return (object)null;
-			if (alpha == null)
-			{
-				break;
-			}
-		}
-		Disable();
-	}
-
-	private void LateUpdate()
-	{
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		if (layer != -1 || id != -1)
-		{
-			if (alpha != null)
-			{
-				uiTexture.alpha = alpha.Update();
-				if (!alpha.IsPlaying())
-				{
-					alpha = null;
-				}
-			}
-			if (linkMainCamera && renderCamera != null)
-			{
-				modelTransform.set_parent(null);
-				renderTransform.set_position(MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_position());
-				renderTransform.set_rotation(MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_rotation());
-				modelTransform.set_parent(renderTransform);
-				renderCamera.set_fieldOfView(MonoBehaviourSingleton<AppMain>.I.mainCamera.get_fieldOfView());
-			}
-		}
-	}
-
-	private void OnApplicationPause(bool pauseStatus)
-	{
-		if (!pauseStatus && MonoBehaviourSingleton<AppMain>.IsValid())
-		{
-			AppMain i = MonoBehaviourSingleton<AppMain>.I;
-			i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, new Action(CheckRenderCameraTarget));
-		}
-	}
-
-	private void CheckRenderCameraTarget()
-	{
-		if (uiTexture != null && renderCamera != null && uiTexture.mainTexture != null)
-		{
-			RenderTexture val = uiTexture.mainTexture as RenderTexture;
-			if (val != null)
-			{
-				renderCamera.set_targetTexture(val);
-			}
-		}
-	}
+  private void CheckRenderCameraTarget()
+  {
+    if (!Object.op_Inequality((Object) this.uiTexture, (Object) null) || !Object.op_Inequality((Object) this.renderCamera, (Object) null) || !Object.op_Inequality((Object) this.uiTexture.mainTexture, (Object) null))
+      return;
+    RenderTexture mainTexture = this.uiTexture.mainTexture as RenderTexture;
+    if (!Object.op_Inequality((Object) mainTexture, (Object) null))
+      return;
+    this.renderCamera.targetTexture = mainTexture;
+  }
 }

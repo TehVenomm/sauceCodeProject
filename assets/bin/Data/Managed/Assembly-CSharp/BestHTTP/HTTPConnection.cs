@@ -1,3 +1,9 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: BestHTTP.HTTPConnection
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using BestHTTP.Authentication;
 using BestHTTP.Caching;
 using Org.BouncyCastle.Crypto.Tls;
@@ -6,354 +12,281 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 
-namespace BestHTTP
+#nullable disable
+namespace BestHTTP;
+
+internal sealed class HTTPConnection : IDisposable
 {
-	internal sealed class HTTPConnection : IDisposable
-	{
-		private enum RetryCauses
-		{
-			None,
-			Reconnect,
-			Authenticate
-		}
+  private TcpClient Client;
+  private Stream Stream;
+  private DateTime LastProcessTime;
 
-		private TcpClient Client;
+  internal string ServerAddress { get; private set; }
 
-		private Stream Stream;
+  internal HTTPConnectionStates State { get; private set; }
 
-		private DateTime LastProcessTime;
+  internal bool IsFree => this.State == HTTPConnectionStates.Free;
 
-		internal string ServerAddress
-		{
-			get;
-			private set;
-		}
+  internal HTTPRequest CurrentRequest { get; private set; }
 
-		internal HTTPConnectionStates State
-		{
-			get;
-			private set;
-		}
+  internal bool IsRemovable
+  {
+    get => DateTime.UtcNow - this.LastProcessTime > HTTPManager.MaxConnectionIdleTime;
+  }
 
-		internal bool IsFree => State == HTTPConnectionStates.Free;
+  internal HTTPConnection(string serverAddress)
+  {
+    this.ServerAddress = serverAddress;
+    this.State = HTTPConnectionStates.Initial;
+    this.LastProcessTime = DateTime.UtcNow;
+  }
 
-		internal HTTPRequest CurrentRequest
-		{
-			get;
-			private set;
-		}
+  internal void Process(HTTPRequest request)
+  {
+    this.State = this.State != HTTPConnectionStates.Processing ? HTTPConnectionStates.Processing : throw new Exception("Connection already processing a request!");
+    this.CurrentRequest = request;
+    ThreadPool.QueueUserWorkItem(new WaitCallback(this.ThreadFunc));
+  }
 
-		internal bool IsRemovable => DateTime.UtcNow - LastProcessTime > HTTPManager.MaxConnectionIdleTime;
+  internal void Recycle()
+  {
+    this.State = HTTPConnectionStates.Free;
+    this.CurrentRequest = (HTTPRequest) null;
+  }
 
-		internal HTTPConnection(string serverAddress)
-		{
-			ServerAddress = serverAddress;
-			State = HTTPConnectionStates.Initial;
-			LastProcessTime = DateTime.UtcNow;
-		}
+  private void ThreadFunc(object param)
+  {
+    bool flag1 = false;
+    bool flag2 = false;
+    HTTPConnection.RetryCauses retryCauses = HTTPConnection.RetryCauses.None;
+    object obj = (object) null;
+    try
+    {
+      if (!this.CurrentRequest.DisableCache)
+        Monitor.Enter(obj = HTTPCacheFileLock.Acquire(this.CurrentRequest.CurrentUri));
+      this.CurrentRequest.Processing = true;
+      if (this.TryLoadAllFromCache())
+        return;
+      if (this.Client != null && !this.Client.IsConnected())
+        this.Close();
+      do
+      {
+        if (retryCauses == HTTPConnection.RetryCauses.Reconnect)
+        {
+          this.Close();
+          Thread.Sleep(100);
+        }
+        retryCauses = HTTPConnection.RetryCauses.None;
+        this.Connect();
+        if (!this.CurrentRequest.DisableCache)
+          HTTPCacheService.SetHeaders(this.CurrentRequest);
+        int num = this.CurrentRequest.SendOutTo(this.Stream) ? 1 : 0;
+        if (num == 0)
+        {
+          this.Close();
+          if (!flag1)
+          {
+            flag1 = true;
+            retryCauses = HTTPConnection.RetryCauses.Reconnect;
+          }
+        }
+        if (num != 0)
+        {
+          if (!this.Receive() && !flag1)
+          {
+            flag1 = true;
+            retryCauses = HTTPConnection.RetryCauses.Reconnect;
+          }
+          if (this.CurrentRequest.Response != null)
+          {
+            switch (this.CurrentRequest.Response.StatusCode)
+            {
+              case 301:
+              case 302:
+              case 307:
+                if (this.CurrentRequest.RedirectCount < this.CurrentRequest.MaxRedirects)
+                {
+                  ++this.CurrentRequest.RedirectCount;
+                  string firstHeaderValue = this.CurrentRequest.Response.GetFirstHeaderValue("location");
+                  this.CurrentRequest.RedirectUri = !string.IsNullOrEmpty(firstHeaderValue) ? this.GetRedirectUri(firstHeaderValue) : throw new MissingFieldException($"Got redirect status({this.CurrentRequest.Response.StatusCode.ToString()}) without 'location' header!");
+                  this.CurrentRequest.Response = (HTTPResponse) null;
+                  flag2 = this.CurrentRequest.IsRedirected = true;
+                  break;
+                }
+                break;
+              case 401:
+                string firstHeaderValue1 = this.CurrentRequest.Response.GetFirstHeaderValue("www-authenticate");
+                if (!string.IsNullOrEmpty(firstHeaderValue1))
+                {
+                  Digest digest = DigestStore.GetOrCreate(this.CurrentRequest.CurrentUri);
+                  digest.ParseChallange(firstHeaderValue1);
+                  if (this.CurrentRequest.Credentials != null && digest.IsUriProtected(this.CurrentRequest.CurrentUri) && (!this.CurrentRequest.HasHeader("Authorization") || digest.Stale))
+                  {
+                    retryCauses = HTTPConnection.RetryCauses.Authenticate;
+                    break;
+                  }
+                  break;
+                }
+                break;
+            }
+            this.TryStoreInCache();
+            if (this.CurrentRequest.Response.HasHeaderWithValue("connection", "close") || this.CurrentRequest.UseAlternateSSL)
+              this.Close();
+          }
+        }
+      }
+      while (retryCauses != HTTPConnection.RetryCauses.None);
+    }
+    catch (Exception ex)
+    {
+      if (this.CurrentRequest.UseStreaming)
+        HTTPCacheService.DeleteEntity(this.CurrentRequest.CurrentUri);
+      this.CurrentRequest.Response = (HTTPResponse) null;
+      this.CurrentRequest.Exception = ex;
+      this.Close();
+    }
+    finally
+    {
+      if (!this.CurrentRequest.DisableCache && obj != null)
+        Monitor.Exit(obj);
+      HTTPCacheService.SaveLibrary();
+      this.CurrentRequest.Processing = false;
+      this.State = this.CurrentRequest == null || this.CurrentRequest.Response == null || !this.CurrentRequest.Response.IsUpgraded ? (flag2 ? HTTPConnectionStates.Redirected : (this.Client == null ? HTTPConnectionStates.Closed : HTTPConnectionStates.WaitForRecycle)) : HTTPConnectionStates.Upgraded;
+      this.LastProcessTime = DateTime.UtcNow;
+    }
+  }
 
-		internal void Process(HTTPRequest request)
-		{
-			if (State == HTTPConnectionStates.Processing)
-			{
-				throw new Exception("Connection already processing a request!");
-			}
-			State = HTTPConnectionStates.Processing;
-			CurrentRequest = request;
-			ThreadPool.QueueUserWorkItem(ThreadFunc);
-		}
+  private void Connect()
+  {
+    Uri currentUri = this.CurrentRequest.CurrentUri;
+    if (this.Client == null)
+      this.Client = new TcpClient();
+    if (!this.Client.Connected)
+      this.Client.Connect(currentUri.Host, currentUri.Port);
+    if (this.Stream != null)
+      return;
+    if (HTTPProtocolFactory.IsSecureProtocol(this.CurrentRequest.Uri))
+    {
+      if (this.CurrentRequest.UseAlternateSSL)
+      {
+        TlsProtocolHandler tlsProtocolHandler = new TlsProtocolHandler(this.Client.GetStream());
+        tlsProtocolHandler.Connect((TlsClient) new LegacyTlsClient((ICertificateVerifyer) new AlwaysValidVerifyer()));
+        this.Stream = tlsProtocolHandler.Stream;
+      }
+      else
+      {
+        SslStream sslStream = new SslStream(this.Client.GetStream(), false, (RemoteCertificateValidationCallback) ((sender, cert, chain, errors) => true));
+        if (!sslStream.IsAuthenticated)
+          sslStream.AuthenticateAsClient(currentUri.Host);
+        this.Stream = (Stream) sslStream;
+      }
+    }
+    else
+      this.Stream = this.Client.GetStream();
+  }
 
-		internal void Recycle()
-		{
-			State = HTTPConnectionStates.Free;
-			CurrentRequest = null;
-		}
+  private bool Receive()
+  {
+    this.CurrentRequest.Response = HTTPProtocolFactory.Get(HTTPProtocolFactory.GetProtocolFromUri(this.CurrentRequest.CurrentUri), this.CurrentRequest, this.Stream, this.CurrentRequest.UseStreaming, false);
+    if (!this.CurrentRequest.Response.Receive())
+    {
+      this.CurrentRequest.Response = (HTTPResponse) null;
+      return false;
+    }
+    if (this.CurrentRequest.Response.StatusCode == 304)
+    {
+      int length;
+      using (Stream body = HTTPCacheService.GetBody(this.CurrentRequest.CurrentUri, out length))
+      {
+        if (!this.CurrentRequest.Response.HasHeader("content-length"))
+          this.CurrentRequest.Response.Headers.Add("content-length", new List<string>()
+          {
+            length.ToString()
+          });
+        this.CurrentRequest.Response.ReadRaw(body, length);
+      }
+    }
+    return true;
+  }
 
-		private void ThreadFunc(object param)
-		{
-			bool flag = false;
-			bool flag2 = false;
-			RetryCauses retryCauses = RetryCauses.None;
-			object obj = null;
-			try
-			{
-				if (!CurrentRequest.DisableCache)
-				{
-					Monitor.Enter(obj = HTTPCacheFileLock.Acquire(CurrentRequest.CurrentUri));
-				}
-				CurrentRequest.Processing = true;
-				if (!TryLoadAllFromCache())
-				{
-					if (Client != null && !Client.IsConnected())
-					{
-						Close();
-					}
-					do
-					{
-						if (retryCauses == RetryCauses.Reconnect)
-						{
-							Close();
-							Thread.Sleep(100);
-						}
-						retryCauses = RetryCauses.None;
-						Connect();
-						if (!CurrentRequest.DisableCache)
-						{
-							HTTPCacheService.SetHeaders(CurrentRequest);
-						}
-						bool flag3 = CurrentRequest.SendOutTo(Stream);
-						if (!flag3)
-						{
-							Close();
-							if (!flag)
-							{
-								flag = true;
-								retryCauses = RetryCauses.Reconnect;
-							}
-						}
-						if (flag3)
-						{
-							if (!Receive() && !flag)
-							{
-								flag = true;
-								retryCauses = RetryCauses.Reconnect;
-							}
-							if (CurrentRequest.Response != null)
-							{
-								switch (CurrentRequest.Response.StatusCode)
-								{
-								case 401:
-								{
-									string firstHeaderValue2 = CurrentRequest.Response.GetFirstHeaderValue("www-authenticate");
-									if (!string.IsNullOrEmpty(firstHeaderValue2))
-									{
-										Digest orCreate = DigestStore.GetOrCreate(CurrentRequest.CurrentUri);
-										orCreate.ParseChallange(firstHeaderValue2);
-										if (CurrentRequest.Credentials != null && orCreate.IsUriProtected(CurrentRequest.CurrentUri) && (!CurrentRequest.HasHeader("Authorization") || orCreate.Stale))
-										{
-											retryCauses = RetryCauses.Authenticate;
-										}
-									}
-									break;
-								}
-								case 301:
-								case 302:
-								case 307:
-									if (CurrentRequest.RedirectCount < CurrentRequest.MaxRedirects)
-									{
-										CurrentRequest.RedirectCount++;
-										string firstHeaderValue = CurrentRequest.Response.GetFirstHeaderValue("location");
-										if (string.IsNullOrEmpty(firstHeaderValue))
-										{
-											throw new MissingFieldException($"Got redirect status({CurrentRequest.Response.StatusCode.ToString()}) without 'location' header!");
-										}
-										CurrentRequest.RedirectUri = GetRedirectUri(firstHeaderValue);
-										CurrentRequest.Response = null;
-										bool flag4 = true;
-										CurrentRequest.IsRedirected = flag4;
-										flag2 = flag4;
-									}
-									break;
-								}
-								TryStoreInCache();
-								if (CurrentRequest.Response.HasHeaderWithValue("connection", "close") || CurrentRequest.UseAlternateSSL)
-								{
-									Close();
-								}
-							}
-						}
-					}
-					while (retryCauses != 0);
-				}
-			}
-			catch (Exception exception)
-			{
-				if (CurrentRequest.UseStreaming)
-				{
-					HTTPCacheService.DeleteEntity(CurrentRequest.CurrentUri);
-				}
-				CurrentRequest.Response = null;
-				CurrentRequest.Exception = exception;
-				Close();
-			}
-			finally
-			{
-				if (!CurrentRequest.DisableCache && obj != null)
-				{
-					Monitor.Exit(obj);
-				}
-				HTTPCacheService.SaveLibrary();
-				CurrentRequest.Processing = false;
-				if (CurrentRequest != null && CurrentRequest.Response != null && CurrentRequest.Response.IsUpgraded)
-				{
-					State = HTTPConnectionStates.Upgraded;
-				}
-				else
-				{
-					State = (flag2 ? HTTPConnectionStates.Redirected : ((Client != null) ? HTTPConnectionStates.WaitForRecycle : HTTPConnectionStates.Closed));
-				}
-				LastProcessTime = DateTime.UtcNow;
-			}
-		}
+  private bool TryLoadAllFromCache()
+  {
+    if (this.CurrentRequest.DisableCache)
+      return false;
+    try
+    {
+      if (HTTPCacheService.IsCachedEntityExpiresInTheFuture(this.CurrentRequest))
+      {
+        this.CurrentRequest.Response = HTTPCacheService.GetFullResponse(this.CurrentRequest);
+        if (this.CurrentRequest.Response != null)
+          return true;
+      }
+    }
+    catch
+    {
+      HTTPCacheService.DeleteEntity(this.CurrentRequest.CurrentUri);
+    }
+    return false;
+  }
 
-		private void Connect()
-		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Expected O, but got Unknown
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Expected O, but got Unknown
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-			Uri currentUri = CurrentRequest.CurrentUri;
-			if (Client == null)
-			{
-				Client = new TcpClient();
-			}
-			if (!Client.get_Connected())
-			{
-				Client.Connect(currentUri.Host, currentUri.Port);
-			}
-			if (Stream == null)
-			{
-				if (HTTPProtocolFactory.IsSecureProtocol(CurrentRequest.Uri))
-				{
-					if (CurrentRequest.UseAlternateSSL)
-					{
-						TlsProtocolHandler val = new TlsProtocolHandler(Client.GetStream());
-						val.Connect(new LegacyTlsClient(new AlwaysValidVerifyer()));
-						Stream = val.get_Stream();
-					}
-					else
-					{
-						SslStream sslStream = new SslStream(Client.GetStream(), false, (object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors errors) => true);
-						if (!sslStream.IsAuthenticated)
-						{
-							sslStream.AuthenticateAsClient(currentUri.Host);
-						}
-						Stream = sslStream;
-					}
-				}
-				else
-				{
-					Stream = Client.GetStream();
-				}
-			}
-		}
+  private void TryStoreInCache()
+  {
+    if (this.CurrentRequest.UseStreaming || this.CurrentRequest.DisableCache || this.CurrentRequest.Response == null || !HTTPCacheService.IsCacheble(this.CurrentRequest.CurrentUri, this.CurrentRequest.MethodType, this.CurrentRequest.Response))
+      return;
+    HTTPCacheService.Store(this.CurrentRequest.CurrentUri, this.CurrentRequest.MethodType, this.CurrentRequest.Response);
+  }
 
-		private bool Receive()
-		{
-			CurrentRequest.Response = HTTPProtocolFactory.Get(HTTPProtocolFactory.GetProtocolFromUri(CurrentRequest.CurrentUri), CurrentRequest, Stream, CurrentRequest.UseStreaming, false);
-			if (!CurrentRequest.Response.Receive(-1))
-			{
-				CurrentRequest.Response = null;
-				return false;
-			}
-			if (CurrentRequest.Response.StatusCode == 304)
-			{
-				int length;
-				using (Stream stream = HTTPCacheService.GetBody(CurrentRequest.CurrentUri, out length))
-				{
-					if (!CurrentRequest.Response.HasHeader("content-length"))
-					{
-						CurrentRequest.Response.Headers.Add("content-length", new List<string>
-						{
-							length.ToString()
-						});
-					}
-					CurrentRequest.Response.ReadRaw(stream, length);
-				}
-			}
-			return true;
-		}
+  private Uri GetRedirectUri(string location)
+  {
+    try
+    {
+      return new Uri(location);
+    }
+    catch (UriFormatException ex)
+    {
+      Uri uri = this.CurrentRequest.Uri;
+      return new UriBuilder(uri.Scheme, uri.Host, uri.Port, location).Uri;
+    }
+  }
 
-		private bool TryLoadAllFromCache()
-		{
-			if (CurrentRequest.DisableCache)
-			{
-				return false;
-			}
-			try
-			{
-				if (HTTPCacheService.IsCachedEntityExpiresInTheFuture(CurrentRequest))
-				{
-					CurrentRequest.Response = HTTPCacheService.GetFullResponse(CurrentRequest);
-					if (CurrentRequest.Response != null)
-					{
-						return true;
-					}
-				}
-			}
-			catch
-			{
-				HTTPCacheService.DeleteEntity(CurrentRequest.CurrentUri);
-			}
-			return false;
-		}
+  internal void HandleCallback()
+  {
+    if (this.State == HTTPConnectionStates.Upgraded)
+    {
+      if (this.CurrentRequest != null && this.CurrentRequest.Response != null && this.CurrentRequest.Response.IsUpgraded)
+        this.CurrentRequest.UpgradeCallback();
+      this.State = HTTPConnectionStates.WaitForProtocolShutdown;
+    }
+    else
+      this.CurrentRequest.CallCallback();
+  }
 
-		private void TryStoreInCache()
-		{
-			if (!CurrentRequest.UseStreaming && !CurrentRequest.DisableCache && CurrentRequest.Response != null && HTTPCacheService.IsCacheble(CurrentRequest.CurrentUri, CurrentRequest.MethodType, CurrentRequest.Response))
-			{
-				HTTPCacheService.Store(CurrentRequest.CurrentUri, CurrentRequest.MethodType, CurrentRequest.Response);
-			}
-		}
+  private void Close()
+  {
+    if (this.Client == null)
+      return;
+    try
+    {
+      this.Client.Close();
+    }
+    catch
+    {
+    }
+    finally
+    {
+      this.Stream = (Stream) null;
+      this.Client = (TcpClient) null;
+    }
+  }
 
-		private Uri GetRedirectUri(string location)
-		{
-			Uri uri = null;
-			try
-			{
-				return new Uri(location);
-			}
-			catch (UriFormatException)
-			{
-				Uri uri2 = CurrentRequest.Uri;
-				UriBuilder uriBuilder = new UriBuilder(uri2.Scheme, uri2.Host, uri2.Port, location);
-				return uriBuilder.Uri;
-			}
-		}
+  public void Dispose() => this.Close();
 
-		internal void HandleCallback()
-		{
-			if (State == HTTPConnectionStates.Upgraded)
-			{
-				if (CurrentRequest != null && CurrentRequest.Response != null && CurrentRequest.Response.IsUpgraded)
-				{
-					CurrentRequest.UpgradeCallback();
-				}
-				State = HTTPConnectionStates.WaitForProtocolShutdown;
-			}
-			else
-			{
-				CurrentRequest.CallCallback();
-			}
-		}
-
-		private void Close()
-		{
-			if (Client != null)
-			{
-				try
-				{
-					Client.Close();
-				}
-				catch
-				{
-				}
-				finally
-				{
-					Stream = null;
-					Client = null;
-				}
-			}
-		}
-
-		public void Dispose()
-		{
-			Close();
-		}
-	}
+  private enum RetryCauses
+  {
+    None,
+    Reconnect,
+    Authenticate,
+  }
 }

@@ -1,346 +1,342 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: XMLSerializer
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
+#nullable disable
 public static class XMLSerializer
 {
-	public static T Deserialize<T>(string message) where T : new()
-	{
-		XMLInStream stream = new XMLInStream(message);
-		return (T)DeserializeObject(stream, typeof(T));
-	}
+  public static T Deserialize<T>(string message) where T : new()
+  {
+    return (T) XMLSerializer.DeserializeObject(new XMLInStream(message), typeof (T));
+  }
 
-	public static string Serialize<T>(T message)
-	{
-		XMLOutStream xMLOutStream = new XMLOutStream();
-		xMLOutStream.Start("object");
-		SerializeObject(xMLOutStream, typeof(T), message);
-		xMLOutStream.End();
-		return xMLOutStream.Serialize();
-	}
+  public static string Serialize<T>(T message)
+  {
+    XMLOutStream stream = new XMLOutStream();
+    stream.Start("object");
+    XMLSerializer.SerializeObject(stream, typeof (T), (object) message);
+    stream.End();
+    return stream.Serialize();
+  }
 
-	private static void SerializeObject(XMLOutStream stream, Type type, object message)
-	{
-		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-		FieldInfo[] fields = type.GetFields();
-		FieldInfo[] array = fields;
-		foreach (FieldInfo fieldInfo in array)
-		{
-			switch (fieldInfo.FieldType.ToString())
-			{
-			case "System.String":
-				stream.Content(fieldInfo.Name, (string)fieldInfo.GetValue(message));
-				break;
-			case "System.Single":
-				stream.Content(fieldInfo.Name, (float)fieldInfo.GetValue(message));
-				break;
-			case "System.Int32":
-				stream.Content(fieldInfo.Name, (int)fieldInfo.GetValue(message));
-				break;
-			case "System.Boolean":
-				stream.Content(fieldInfo.Name, (bool)fieldInfo.GetValue(message));
-				break;
-			case "UnityEngine.Vector3":
-				stream.Content(fieldInfo.Name, (Vector3)fieldInfo.GetValue(message));
-				break;
-			case "UnityEngine.Quaternion":
-				stream.Content(fieldInfo.Name, (Quaternion)fieldInfo.GetValue(message));
-				break;
-			case "UnityEngine.Color":
-				stream.Content(fieldInfo.Name, (Color)fieldInfo.GetValue(message));
-				break;
-			case "UnityEngine.Rect":
-				stream.Content(fieldInfo.Name, (Rect)fieldInfo.GetValue(message));
-				break;
-			case "UnityEngine.Vector2":
-				stream.Content(fieldInfo.Name, (Vector2)fieldInfo.GetValue(message));
-				break;
-			default:
-				if (fieldInfo.FieldType.IsEnum)
-				{
-					stream.Content(fieldInfo.Name, fieldInfo.GetValue(message).ToString());
-				}
-				else if (fieldInfo.FieldType.IsGenericType)
-				{
-					Type type2 = fieldInfo.FieldType.GetGenericArguments()[0];
-					Type typeFromHandle = typeof(List<>);
-					Type type3 = typeFromHandle.MakeGenericType(type2);
-					PropertyInfo property = type3.GetProperty("Count");
-					PropertyInfo property2 = type3.GetProperty("Item");
-					int num = (int)property.GetValue(fieldInfo.GetValue(message), new object[0]);
-					stream.Start(fieldInfo.Name);
-					for (int j = 0; j < num; j++)
-					{
-						object value = property2.GetValue(fieldInfo.GetValue(message), new object[1]
-						{
-							j
-						});
-						SerializeListElement(stream, type2, value, j);
-					}
-					stream.End();
-				}
-				else if (fieldInfo.FieldType.IsArray)
-				{
-					object[] array2 = ToObjectArray((IEnumerable)fieldInfo.GetValue(message));
-					Type type4 = Type.GetTypeArray(array2)[0];
-					stream.Start(fieldInfo.Name);
-					for (int k = 0; k < array2.Length; k++)
-					{
-						object message2 = array2[k];
-						SerializeListElement(stream, type4, message2, k);
-					}
-					stream.End();
-				}
-				else
-				{
-					stream.Start(fieldInfo.Name);
-					SerializeObject(stream, fieldInfo.FieldType, fieldInfo.GetValue(message));
-					stream.End();
-				}
-				break;
-			}
-		}
-	}
+  private static void SerializeObject(XMLOutStream stream, System.Type type, object message)
+  {
+    foreach (FieldInfo field in type.GetFields())
+    {
+      switch (field.FieldType.ToString())
+      {
+        case "System.Boolean":
+          stream.Content(field.Name, (bool) field.GetValue(message));
+          break;
+        case "System.Int32":
+          stream.Content(field.Name, (int) field.GetValue(message));
+          break;
+        case "System.Single":
+          stream.Content(field.Name, (float) field.GetValue(message));
+          break;
+        case "System.String":
+          stream.Content(field.Name, (string) field.GetValue(message));
+          break;
+        case "UnityEngine.Color":
+          stream.Content(field.Name, (Color) field.GetValue(message));
+          break;
+        case "UnityEngine.Quaternion":
+          stream.Content(field.Name, (Quaternion) field.GetValue(message));
+          break;
+        case "UnityEngine.Rect":
+          stream.Content(field.Name, (Rect) field.GetValue(message));
+          break;
+        case "UnityEngine.Vector2":
+          stream.Content(field.Name, (Vector2) field.GetValue(message));
+          break;
+        case "UnityEngine.Vector3":
+          stream.Content(field.Name, (Vector3) field.GetValue(message));
+          break;
+        default:
+          if (field.FieldType.IsEnum)
+          {
+            stream.Content(field.Name, field.GetValue(message).ToString());
+            break;
+          }
+          if (field.FieldType.IsGenericType)
+          {
+            System.Type genericArgument = field.FieldType.GetGenericArguments()[0];
+            System.Type type1 = typeof (List<>).MakeGenericType(genericArgument);
+            PropertyInfo property1 = type1.GetProperty("Count");
+            PropertyInfo property2 = type1.GetProperty("Item");
+            int num = (int) property1.GetValue(field.GetValue(message), new object[0]);
+            stream.Start(field.Name);
+            for (int i = 0; i < num; ++i)
+            {
+              object message1 = property2.GetValue(field.GetValue(message), new object[1]
+              {
+                (object) i
+              });
+              XMLSerializer.SerializeListElement(stream, genericArgument, message1, i);
+            }
+            stream.End();
+            break;
+          }
+          if (field.FieldType.IsArray)
+          {
+            object[] objectArray = XMLSerializer.ToObjectArray((IEnumerable) field.GetValue(message));
+            System.Type type2 = System.Type.GetTypeArray(objectArray)[0];
+            stream.Start(field.Name);
+            for (int i = 0; i < objectArray.Length; ++i)
+            {
+              object message2 = objectArray[i];
+              XMLSerializer.SerializeListElement(stream, type2, message2, i);
+            }
+            stream.End();
+            break;
+          }
+          stream.Start(field.Name);
+          XMLSerializer.SerializeObject(stream, field.FieldType, field.GetValue(message));
+          stream.End();
+          break;
+      }
+    }
+  }
 
-	private static object[] ToObjectArray(IEnumerable enumerableObject)
-	{
-		List<object> list = new List<object>();
-		foreach (object item in enumerableObject)
-		{
-			list.Add(item);
-		}
-		return list.ToArray();
-	}
+  private static object[] ToObjectArray(IEnumerable enumerableObject)
+  {
+    List<object> objectList = new List<object>();
+    foreach (object obj in enumerableObject)
+      objectList.Add(obj);
+    return objectList.ToArray();
+  }
 
-	private static void SerializeListElement(XMLOutStream stream, Type type, object message, int i)
-	{
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-		switch (type.ToString())
-		{
-		case "System.String":
-			stream.Content("item", (string)message);
-			break;
-		case "System.Single":
-			stream.Content("item", (float)message);
-			break;
-		case "System.Int32":
-			stream.Content("item", (int)message);
-			break;
-		case "System.Boolean":
-			stream.Content("item", (bool)message);
-			break;
-		case "UnityEngine.Vector3":
-			stream.Content("item", (Vector3)message);
-			break;
-		case "UnityEngine.Quaternion":
-			stream.Content("item", (Quaternion)message);
-			break;
-		case "UnityEngine.Color":
-			stream.Content("item", (Color)message);
-			break;
-		case "UnityEngine.Rect":
-			stream.Content("item", (Rect)message);
-			break;
-		case "UnityEngine.Vector2":
-			stream.Content("item", (Vector2)message);
-			break;
-		default:
-			stream.Start("item");
-			SerializeObject(stream, type, message);
-			stream.End();
-			break;
-		}
-	}
+  private static void SerializeListElement(XMLOutStream stream, System.Type type, object message, int i)
+  {
+    switch (type.ToString())
+    {
+      case "System.Boolean":
+        stream.Content("item", (bool) message);
+        break;
+      case "System.Int32":
+        stream.Content("item", (int) message);
+        break;
+      case "System.Single":
+        stream.Content("item", (float) message);
+        break;
+      case "System.String":
+        stream.Content("item", (string) message);
+        break;
+      case "UnityEngine.Color":
+        stream.Content("item", (Color) message);
+        break;
+      case "UnityEngine.Quaternion":
+        stream.Content("item", (Quaternion) message);
+        break;
+      case "UnityEngine.Rect":
+        stream.Content("item", (Rect) message);
+        break;
+      case "UnityEngine.Vector2":
+        stream.Content("item", (Vector2) message);
+        break;
+      case "UnityEngine.Vector3":
+        stream.Content("item", (Vector3) message);
+        break;
+      default:
+        stream.Start("item");
+        XMLSerializer.SerializeObject(stream, type, message);
+        stream.End();
+        break;
+    }
+  }
 
-	private static object DeserializeObject(XMLInStream stream, Type type)
-	{
-		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0285: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
-		object obj = Activator.CreateInstance(type);
-		FieldInfo[] fields = type.GetFields();
-		FieldInfo[] array = fields;
-		Type containedType;
-		MethodInfo addMethod;
-		object list;
-		Type containedType2;
-		MethodInfo addMethod2;
-		object list2;
-		foreach (FieldInfo fieldInfo in array)
-		{
-			switch (fieldInfo.FieldType.ToString())
-			{
-			case "System.String":
-				if (stream.Has(fieldInfo.Name))
-				{
-					stream.Content(fieldInfo.Name, out string value12);
-					fieldInfo.SetValue(obj, value12);
-				}
-				break;
-			case "System.Single":
-				if (stream.Has(fieldInfo.Name))
-				{
-					stream.Content(fieldInfo.Name, out float value7);
-					fieldInfo.SetValue(obj, value7);
-				}
-				break;
-			case "System.Int32":
-				if (stream.Has(fieldInfo.Name))
-				{
-					stream.Content(fieldInfo.Name, out int value9);
-					fieldInfo.SetValue(obj, value9);
-				}
-				break;
-			case "System.Boolean":
-				if (stream.Has(fieldInfo.Name))
-				{
-					stream.Content(fieldInfo.Name, out bool value5);
-					fieldInfo.SetValue(obj, value5);
-				}
-				break;
-			case "UnityEngine.Vector3":
-				if (stream.Has(fieldInfo.Name))
-				{
-					stream.Content(fieldInfo.Name, out Vector3 value10);
-					fieldInfo.SetValue(obj, value10);
-				}
-				break;
-			case "UnityEngine.Quaternion":
-				if (stream.Has(fieldInfo.Name))
-				{
-					stream.Content(fieldInfo.Name, out Quaternion value8);
-					fieldInfo.SetValue(obj, value8);
-				}
-				break;
-			case "UnityEngine.Color":
-				if (stream.Has(fieldInfo.Name))
-				{
-					stream.Content(fieldInfo.Name, out Color value6);
-					fieldInfo.SetValue(obj, value6);
-				}
-				break;
-			case "UnityEngine.Rect":
-				if (stream.Has(fieldInfo.Name))
-				{
-					stream.Content(fieldInfo.Name, out Rect value4);
-					fieldInfo.SetValue(obj, value4);
-				}
-				break;
-			case "UnityEngine.Vector2":
-				if (stream.Has(fieldInfo.Name))
-				{
-					stream.Content(fieldInfo.Name, out Vector2 value11);
-					fieldInfo.SetValue(obj, value11);
-				}
-				break;
-			default:
-				if (stream.Has(fieldInfo.Name))
-				{
-					if (fieldInfo.FieldType.IsEnum)
-					{
-						stream.Content(fieldInfo.Name, out string value);
-						fieldInfo.SetValue(obj, Enum.Parse(fieldInfo.FieldType, value));
-					}
-					else if (fieldInfo.FieldType.IsGenericType)
-					{
-						containedType = fieldInfo.FieldType.GetGenericArguments()[0];
-						Type typeFromHandle = typeof(List<>);
-						Type type2 = typeFromHandle.MakeGenericType(containedType);
-						addMethod = type2.GetMethod("Add");
-						list = Activator.CreateInstance(type2);
-						stream.Start(fieldInfo.Name).List("item", delegate(XMLInStream stream2)
-						{
-							object obj3 = DeserializeListElement(stream2, containedType);
-							addMethod.Invoke(list, new object[1]
-							{
-								obj3
-							});
-						}).End();
-						fieldInfo.SetValue(obj, list);
-					}
-					else if (fieldInfo.FieldType.IsArray)
-					{
-						containedType2 = fieldInfo.FieldType.GetElementType();
-						Type typeFromHandle2 = typeof(List<>);
-						Type type3 = typeFromHandle2.MakeGenericType(containedType2);
-						addMethod2 = type3.GetMethod("Add");
-						MethodInfo method = type3.GetMethod("ToArray");
-						list2 = Activator.CreateInstance(type3);
-						stream.Start(fieldInfo.Name).List("item", delegate(XMLInStream stream2)
-						{
-							object obj2 = DeserializeListElement(stream2, containedType2);
-							addMethod2.Invoke(list2, new object[1]
-							{
-								obj2
-							});
-						}).End();
-						object value2 = method.Invoke(list2, new object[0]);
-						fieldInfo.SetValue(obj, value2);
-					}
-					else
-					{
-						stream.Start(fieldInfo.Name);
-						object value3 = DeserializeObject(stream, fieldInfo.FieldType);
-						stream.End();
-						fieldInfo.SetValue(obj, value3);
-					}
-				}
-				break;
-			}
-		}
-		return obj;
-	}
+  private static object DeserializeObject(XMLInStream stream, System.Type type)
+  {
+    object instance = Activator.CreateInstance(type);
+    foreach (FieldInfo field in type.GetFields())
+    {
+      switch (field.FieldType.ToString())
+      {
+        case "System.Boolean":
+          if (stream.Has(field.Name))
+          {
+            bool flag;
+            stream.Content(field.Name, out flag);
+            field.SetValue(instance, (object) flag);
+            break;
+          }
+          break;
+        case "System.Int32":
+          if (stream.Has(field.Name))
+          {
+            int num;
+            stream.Content(field.Name, out num);
+            field.SetValue(instance, (object) num);
+            break;
+          }
+          break;
+        case "System.Single":
+          if (stream.Has(field.Name))
+          {
+            float num;
+            stream.Content(field.Name, out num);
+            field.SetValue(instance, (object) num);
+            break;
+          }
+          break;
+        case "System.String":
+          if (stream.Has(field.Name))
+          {
+            string str;
+            stream.Content(field.Name, out str);
+            field.SetValue(instance, (object) str);
+            break;
+          }
+          break;
+        case "UnityEngine.Color":
+          if (stream.Has(field.Name))
+          {
+            Color color;
+            stream.Content(field.Name, out color);
+            field.SetValue(instance, (object) color);
+            break;
+          }
+          break;
+        case "UnityEngine.Quaternion":
+          if (stream.Has(field.Name))
+          {
+            Quaternion quaternion;
+            stream.Content(field.Name, out quaternion);
+            field.SetValue(instance, (object) quaternion);
+            break;
+          }
+          break;
+        case "UnityEngine.Rect":
+          if (stream.Has(field.Name))
+          {
+            Rect rect;
+            stream.Content(field.Name, out rect);
+            field.SetValue(instance, (object) rect);
+            break;
+          }
+          break;
+        case "UnityEngine.Vector2":
+          if (stream.Has(field.Name))
+          {
+            Vector2 vector2;
+            stream.Content(field.Name, out vector2);
+            field.SetValue(instance, (object) vector2);
+            break;
+          }
+          break;
+        case "UnityEngine.Vector3":
+          if (stream.Has(field.Name))
+          {
+            Vector3 vector3;
+            stream.Content(field.Name, out vector3);
+            field.SetValue(instance, (object) vector3);
+            break;
+          }
+          break;
+        default:
+          if (stream.Has(field.Name))
+          {
+            if (field.FieldType.IsEnum)
+            {
+              string str;
+              stream.Content(field.Name, out str);
+              field.SetValue(instance, Enum.Parse(field.FieldType, str));
+              break;
+            }
+            if (field.FieldType.IsGenericType)
+            {
+              System.Type containedType = field.FieldType.GetGenericArguments()[0];
+              System.Type type1 = typeof (List<>).MakeGenericType(containedType);
+              MethodInfo addMethod = type1.GetMethod("Add");
+              object list = Activator.CreateInstance(type1);
+              stream.Start(field.Name).List("item", (Action<XMLInStream>) (stream2 =>
+              {
+                object obj = XMLSerializer.DeserializeListElement(stream2, containedType);
+                addMethod.Invoke(list, new object[1]{ obj });
+              })).End();
+              field.SetValue(instance, list);
+              break;
+            }
+            if (field.FieldType.IsArray)
+            {
+              System.Type containedType = field.FieldType.GetElementType();
+              System.Type type2 = typeof (List<>).MakeGenericType(containedType);
+              MethodInfo addMethod = type2.GetMethod("Add");
+              MethodInfo method = type2.GetMethod("ToArray");
+              object list = Activator.CreateInstance(type2);
+              stream.Start(field.Name).List("item", (Action<XMLInStream>) (stream2 =>
+              {
+                object obj = XMLSerializer.DeserializeListElement(stream2, containedType);
+                addMethod.Invoke(list, new object[1]{ obj });
+              })).End();
+              object obj1 = list;
+              object[] parameters = new object[0];
+              object obj2 = method.Invoke(obj1, parameters);
+              field.SetValue(instance, obj2);
+              break;
+            }
+            stream.Start(field.Name);
+            object obj3 = XMLSerializer.DeserializeObject(stream, field.FieldType);
+            stream.End();
+            field.SetValue(instance, obj3);
+            break;
+          }
+          break;
+      }
+    }
+    return instance;
+  }
 
-	private static object DeserializeListElement(XMLInStream stream, Type type)
-	{
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-		switch (type.ToString())
-		{
-		case "System.String":
-			stream.Content(out string value9);
-			return value9;
-		case "System.Single":
-			stream.Content(out float value8);
-			return value8;
-		case "System.Int32":
-			stream.Content(out int value7);
-			return value7;
-		case "System.Boolean":
-			stream.Content(out bool value6);
-			return value6;
-		case "UnityEngine.Vector3":
-			stream.Content(out Vector3 value5);
-			return value5;
-		case "UnityEngine.Quaternion":
-			stream.Content(out Quaternion value4);
-			return value4;
-		case "UnityEngine.Color":
-			stream.Content(out Color value3);
-			return value3;
-		case "UnityEngine.Rect":
-			stream.Content(out Rect value2);
-			return value2;
-		case "UnityEngine.Vector2":
-			stream.Content(out Vector2 value);
-			return value;
-		default:
-			return DeserializeObject(stream, type);
-		}
-	}
+  private static object DeserializeListElement(XMLInStream stream, System.Type type)
+  {
+    switch (type.ToString())
+    {
+      case "System.Boolean":
+        bool flag;
+        stream.Content(out flag);
+        return (object) flag;
+      case "System.Int32":
+        int num1;
+        stream.Content(out num1);
+        return (object) num1;
+      case "System.Single":
+        float num2;
+        stream.Content(out num2);
+        return (object) num2;
+      case "System.String":
+        string str;
+        stream.Content(out str);
+        return (object) str;
+      case "UnityEngine.Color":
+        Color color;
+        stream.Content(out color);
+        return (object) color;
+      case "UnityEngine.Quaternion":
+        Quaternion quaternion;
+        stream.Content(out quaternion);
+        return (object) quaternion;
+      case "UnityEngine.Rect":
+        Rect rect;
+        stream.Content(out rect);
+        return (object) rect;
+      case "UnityEngine.Vector2":
+        Vector2 vector2;
+        stream.Content(out vector2);
+        return (object) vector2;
+      case "UnityEngine.Vector3":
+        Vector3 vector3;
+        stream.Content(out vector3);
+        return (object) vector3;
+      default:
+        return XMLSerializer.DeserializeObject(stream, type);
+    }
+  }
 }

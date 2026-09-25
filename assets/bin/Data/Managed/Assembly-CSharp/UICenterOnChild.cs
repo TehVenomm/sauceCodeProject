@@ -1,298 +1,190 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: UICenterOnChild
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Interaction/Center Scroll View on Child")]
-public class UICenterOnChild
+public class UICenterOnChild : MonoBehaviour
 {
-	public delegate void OnCenterCallback(GameObject centeredObject);
+  public float springStrength = 8f;
+  public float nextPageThreshold;
+  public SpringPanel.OnFinished onFinished;
+  public UICenterOnChild.OnCenterCallback onCenter;
+  private UIScrollView mScrollView;
+  private GameObject mCenteredObject;
 
-	public float springStrength = 8f;
+  public GameObject centeredObject => this.mCenteredObject;
 
-	public float nextPageThreshold;
+  private void Start() => this.Recenter();
 
-	public SpringPanel.OnFinished onFinished;
+  private void OnEnable()
+  {
+    if (!Object.op_Implicit((Object) this.mScrollView))
+      return;
+    this.mScrollView.centerOnChild = this;
+    this.Recenter();
+  }
 
-	public OnCenterCallback onCenter;
+  private void OnDisable()
+  {
+    if (!Object.op_Implicit((Object) this.mScrollView))
+      return;
+    this.mScrollView.centerOnChild = (UICenterOnChild) null;
+  }
 
-	private UIScrollView mScrollView;
+  private void OnDragFinished()
+  {
+    if (!((Behaviour) this).enabled)
+      return;
+    this.Recenter();
+  }
 
-	private GameObject mCenteredObject;
+  private void OnValidate() => this.nextPageThreshold = Mathf.Abs(this.nextPageThreshold);
 
-	public GameObject centeredObject => mCenteredObject;
+  [ContextMenu("Execute")]
+  public void Recenter()
+  {
+    if (Object.op_Equality((Object) this.mScrollView, (Object) null))
+    {
+      this.mScrollView = NGUITools.FindInParents<UIScrollView>(((Component) this).gameObject);
+      if (Object.op_Equality((Object) this.mScrollView, (Object) null))
+      {
+        Debug.LogWarning((object) $"{(object) ((object) this).GetType()} requires {(object) typeof (UIScrollView)} on a parent object in order to work", (Object) this);
+        ((Behaviour) this).enabled = false;
+        return;
+      }
+      if (Object.op_Implicit((Object) this.mScrollView))
+      {
+        this.mScrollView.centerOnChild = this;
+        this.mScrollView.onDragFinished += new UIScrollView.OnDragNotification(this.OnDragFinished);
+      }
+      if (Object.op_Inequality((Object) this.mScrollView.horizontalScrollBar, (Object) null))
+        this.mScrollView.horizontalScrollBar.onDragFinished += new UIProgressBar.OnDragFinished(this.OnDragFinished);
+      if (Object.op_Inequality((Object) this.mScrollView.verticalScrollBar, (Object) null))
+        this.mScrollView.verticalScrollBar.onDragFinished += new UIProgressBar.OnDragFinished(this.OnDragFinished);
+    }
+    if (Object.op_Equality((Object) this.mScrollView.panel, (Object) null))
+      return;
+    Transform transform1 = ((Component) this).transform;
+    if (transform1.childCount == 0)
+      return;
+    Vector3[] worldCorners = this.mScrollView.panel.worldCorners;
+    Vector3 panelCenter = Vector3.op_Multiply(Vector3.op_Addition(worldCorners[2], worldCorners[0]), 0.5f);
+    Vector3 velocity = Vector3.op_Multiply(this.mScrollView.currentMomentum, this.mScrollView.momentumAmount);
+    Vector3 vector3_1 = NGUIMath.SpringDampen(ref velocity, 9f, 2f);
+    Vector3 vector3_2 = Vector3.op_Subtraction(panelCenter, Vector3.op_Multiply(vector3_1, 0.01f));
+    float num1 = float.MaxValue;
+    Transform target = (Transform) null;
+    int index1 = 0;
+    int num2 = 0;
+    UIGrid component = ((Component) this).GetComponent<UIGrid>();
+    List<Transform> transformList = (List<Transform>) null;
+    if (Object.op_Inequality((Object) component, (Object) null))
+    {
+      transformList = component.GetChildList();
+      int index2 = 0;
+      int count = transformList.Count;
+      int num3 = 0;
+      for (; index2 < count; ++index2)
+      {
+        Transform transform2 = transformList[index2];
+        if (((Component) transform2).gameObject.activeInHierarchy)
+        {
+          float num4 = Vector3.SqrMagnitude(Vector3.op_Subtraction(transform2.position, vector3_2));
+          if ((double) num4 < (double) num1)
+          {
+            num1 = num4;
+            target = transform2;
+            index1 = index2;
+            num2 = num3;
+          }
+          ++num3;
+        }
+      }
+    }
+    else
+    {
+      int num5 = 0;
+      int childCount = transform1.childCount;
+      int num6 = 0;
+      for (; num5 < childCount; ++num5)
+      {
+        Transform child = transform1.GetChild(num5);
+        if (((Component) child).gameObject.activeInHierarchy)
+        {
+          float num7 = Vector3.SqrMagnitude(Vector3.op_Subtraction(child.position, vector3_2));
+          if ((double) num7 < (double) num1)
+          {
+            num1 = num7;
+            target = child;
+            index1 = num5;
+            num2 = num6;
+          }
+          ++num6;
+        }
+      }
+    }
+    if ((double) this.nextPageThreshold > 0.0 && UICamera.currentTouch != null && Object.op_Inequality((Object) this.mCenteredObject, (Object) null) && Object.op_Equality((Object) this.mCenteredObject.transform, transformList != null ? (Object) transformList[index1] : (Object) transform1.GetChild(index1)))
+    {
+      Vector3 vector3_3 = Quaternion.op_Multiply(((Component) this).transform.rotation, Vector2.op_Implicit(UICamera.currentTouch.totalDelta));
+      float num8;
+      switch (this.mScrollView.movement)
+      {
+        case UIScrollView.Movement.Horizontal:
+          num8 = vector3_3.x;
+          break;
+        case UIScrollView.Movement.Vertical:
+          num8 = vector3_3.y;
+          break;
+        default:
+          num8 = ((Vector3) ref vector3_3).magnitude;
+          break;
+      }
+      if ((double) Mathf.Abs(num8) > (double) this.nextPageThreshold)
+      {
+        if ((double) num8 > (double) this.nextPageThreshold)
+          target = transformList == null ? (num2 <= 0 ? (Object.op_Equality((Object) ((Component) this).GetComponent<UIWrapContent>(), (Object) null) ? transform1.GetChild(0) : transform1.GetChild(transform1.childCount - 1)) : transform1.GetChild(num2 - 1)) : (num2 <= 0 ? (Object.op_Equality((Object) ((Component) this).GetComponent<UIWrapContent>(), (Object) null) ? transformList[0] : transformList[transformList.Count - 1]) : transformList[num2 - 1]);
+        else if ((double) num8 < -(double) this.nextPageThreshold)
+          target = transformList == null ? (num2 >= transform1.childCount - 1 ? (Object.op_Equality((Object) ((Component) this).GetComponent<UIWrapContent>(), (Object) null) ? transform1.GetChild(transform1.childCount - 1) : transform1.GetChild(0)) : transform1.GetChild(num2 + 1)) : (num2 >= transformList.Count - 1 ? (Object.op_Equality((Object) ((Component) this).GetComponent<UIWrapContent>(), (Object) null) ? transformList[transformList.Count - 1] : transformList[0]) : transformList[num2 + 1]);
+      }
+    }
+    this.CenterOn(target, panelCenter);
+  }
 
-	public UICenterOnChild()
-		: this()
-	{
-	}
+  private void CenterOn(Transform target, Vector3 panelCenter)
+  {
+    if (Object.op_Inequality((Object) target, (Object) null) && Object.op_Inequality((Object) this.mScrollView, (Object) null) && Object.op_Inequality((Object) this.mScrollView.panel, (Object) null))
+    {
+      Transform cachedTransform = this.mScrollView.panel.cachedTransform;
+      this.mCenteredObject = ((Component) target).gameObject;
+      Vector3 vector3 = Vector3.op_Subtraction(cachedTransform.InverseTransformPoint(target.position), cachedTransform.InverseTransformPoint(panelCenter));
+      if (!this.mScrollView.canMoveHorizontally)
+        vector3.x = 0.0f;
+      if (!this.mScrollView.canMoveVertically)
+        vector3.y = 0.0f;
+      vector3.z = 0.0f;
+      SpringPanel.Begin(this.mScrollView.panel.cachedGameObject, Vector3.op_Subtraction(cachedTransform.localPosition, vector3), this.springStrength).onFinished = this.onFinished;
+    }
+    else
+      this.mCenteredObject = (GameObject) null;
+    if (this.onCenter == null)
+      return;
+    this.onCenter(this.mCenteredObject);
+  }
 
-	private void Start()
-	{
-		Recenter();
-	}
+  public void CenterOn(Transform target)
+  {
+    if (!Object.op_Inequality((Object) this.mScrollView, (Object) null) || !Object.op_Inequality((Object) this.mScrollView.panel, (Object) null))
+      return;
+    Vector3[] worldCorners = this.mScrollView.panel.worldCorners;
+    Vector3 panelCenter = Vector3.op_Multiply(Vector3.op_Addition(worldCorners[2], worldCorners[0]), 0.5f);
+    this.CenterOn(target, panelCenter);
+  }
 
-	private void OnEnable()
-	{
-		if (Object.op_Implicit(mScrollView))
-		{
-			mScrollView.centerOnChild = this;
-			Recenter();
-		}
-	}
-
-	private void OnDisable()
-	{
-		if (Object.op_Implicit(mScrollView))
-		{
-			mScrollView.centerOnChild = null;
-		}
-	}
-
-	private void OnDragFinished()
-	{
-		if (this.get_enabled())
-		{
-			Recenter();
-		}
-	}
-
-	private void OnValidate()
-	{
-		nextPageThreshold = Mathf.Abs(nextPageThreshold);
-	}
-
-	[ContextMenu("Execute")]
-	public void Recenter()
-	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0156: Expected O, but got Unknown
-		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0247: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a8: Expected O, but got Unknown
-		//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0334: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0351: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0365: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0372: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0377: Unknown result type (might be due to invalid IL or missing references)
-		//IL_037c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_037e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0383: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0459: Unknown result type (might be due to invalid IL or missing references)
-		//IL_045e: Expected O, but got Unknown
-		//IL_0478: Unknown result type (might be due to invalid IL or missing references)
-		//IL_048b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0490: Expected O, but got Unknown
-		//IL_0517: Unknown result type (might be due to invalid IL or missing references)
-		//IL_051c: Expected O, but got Unknown
-		//IL_053d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0549: Unknown result type (might be due to invalid IL or missing references)
-		//IL_054e: Expected O, but got Unknown
-		//IL_0553: Unknown result type (might be due to invalid IL or missing references)
-		if (mScrollView == null)
-		{
-			mScrollView = NGUITools.FindInParents<UIScrollView>(this.get_gameObject());
-			if (mScrollView == null)
-			{
-				Debug.LogWarning((object)(GetType() + " requires " + typeof(UIScrollView) + " on a parent object in order to work"), this);
-				this.set_enabled(false);
-				return;
-			}
-			if (Object.op_Implicit(mScrollView))
-			{
-				mScrollView.centerOnChild = this;
-				UIScrollView uIScrollView = mScrollView;
-				uIScrollView.onDragFinished = (UIScrollView.OnDragNotification)Delegate.Combine(uIScrollView.onDragFinished, new UIScrollView.OnDragNotification(OnDragFinished));
-			}
-			if (mScrollView.horizontalScrollBar != null)
-			{
-				UIProgressBar horizontalScrollBar = mScrollView.horizontalScrollBar;
-				horizontalScrollBar.onDragFinished = (UIProgressBar.OnDragFinished)Delegate.Combine(horizontalScrollBar.onDragFinished, new UIProgressBar.OnDragFinished(OnDragFinished));
-			}
-			if (mScrollView.verticalScrollBar != null)
-			{
-				UIProgressBar verticalScrollBar = mScrollView.verticalScrollBar;
-				verticalScrollBar.onDragFinished = (UIProgressBar.OnDragFinished)Delegate.Combine(verticalScrollBar.onDragFinished, new UIProgressBar.OnDragFinished(OnDragFinished));
-			}
-		}
-		if (!(mScrollView.panel == null))
-		{
-			Transform val = this.get_transform();
-			if (val.get_childCount() != 0)
-			{
-				Vector3[] worldCorners = mScrollView.panel.worldCorners;
-				Vector3 val2 = (worldCorners[2] + worldCorners[0]) * 0.5f;
-				Vector3 velocity = mScrollView.currentMomentum * mScrollView.momentumAmount;
-				Vector3 val3 = NGUIMath.SpringDampen(ref velocity, 9f, 2f);
-				Vector3 val4 = val2 - val3 * 0.01f;
-				float num = 3.40282347E+38f;
-				Transform target = null;
-				int num2 = 0;
-				int num3 = 0;
-				UIGrid component = this.GetComponent<UIGrid>();
-				List<Transform> list = null;
-				if (component != null)
-				{
-					list = component.GetChildList();
-					int i = 0;
-					int count = list.Count;
-					int num4 = 0;
-					for (; i < count; i++)
-					{
-						Transform val5 = list[i];
-						if (val5.get_gameObject().get_activeInHierarchy())
-						{
-							float num5 = Vector3.SqrMagnitude(val5.get_position() - val4);
-							if (num5 < num)
-							{
-								num = num5;
-								target = val5;
-								num2 = i;
-								num3 = num4;
-							}
-							num4++;
-						}
-					}
-				}
-				else
-				{
-					int j = 0;
-					int childCount = val.get_childCount();
-					int num6 = 0;
-					for (; j < childCount; j++)
-					{
-						Transform val6 = val.GetChild(j);
-						if (val6.get_gameObject().get_activeInHierarchy())
-						{
-							float num7 = Vector3.SqrMagnitude(val6.get_position() - val4);
-							if (num7 < num)
-							{
-								num = num7;
-								target = val6;
-								num2 = j;
-								num3 = num6;
-							}
-							num6++;
-						}
-					}
-				}
-				if (nextPageThreshold > 0f && UICamera.currentTouch != null && mCenteredObject != null && mCenteredObject.get_transform() == ((list == null) ? ((object)val.GetChild(num2)) : ((object)list[num2])))
-				{
-					Vector3 val7 = Vector2.op_Implicit(UICamera.currentTouch.totalDelta);
-					val7 = this.get_transform().get_rotation() * val7;
-					float num8 = 0f;
-					switch (mScrollView.movement)
-					{
-					case UIScrollView.Movement.Horizontal:
-						num8 = val7.x;
-						break;
-					case UIScrollView.Movement.Vertical:
-						num8 = val7.y;
-						break;
-					default:
-						num8 = val7.get_magnitude();
-						break;
-					}
-					if (Mathf.Abs(num8) > nextPageThreshold)
-					{
-						if (num8 > nextPageThreshold)
-						{
-							target = ((list != null) ? ((object)((num3 <= 0) ? ((!(this.GetComponent<UIWrapContent>() == null)) ? list[list.Count - 1] : list[0]) : list[num3 - 1])) : ((object)((num3 <= 0) ? ((!(this.GetComponent<UIWrapContent>() == null)) ? val.GetChild(val.get_childCount() - 1) : val.GetChild(0)) : val.GetChild(num3 - 1))));
-						}
-						else if (num8 < 0f - nextPageThreshold)
-						{
-							target = ((list != null) ? ((object)((num3 >= list.Count - 1) ? ((!(this.GetComponent<UIWrapContent>() == null)) ? list[0] : list[list.Count - 1]) : list[num3 + 1])) : ((object)((num3 >= val.get_childCount() - 1) ? ((!(this.GetComponent<UIWrapContent>() == null)) ? val.GetChild(0) : val.GetChild(val.get_childCount() - 1)) : val.GetChild(num3 + 1))));
-						}
-					}
-				}
-				CenterOn(target, val2);
-			}
-		}
-	}
-
-	private void CenterOn(Transform target, Vector3 panelCenter)
-	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Expected O, but got Unknown
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		if (target != null && mScrollView != null && mScrollView.panel != null)
-		{
-			Transform cachedTransform = mScrollView.panel.cachedTransform;
-			mCenteredObject = target.get_gameObject();
-			Vector3 val = cachedTransform.InverseTransformPoint(target.get_position());
-			Vector3 val2 = cachedTransform.InverseTransformPoint(panelCenter);
-			Vector3 val3 = val - val2;
-			if (!mScrollView.canMoveHorizontally)
-			{
-				val3.x = 0f;
-			}
-			if (!mScrollView.canMoveVertically)
-			{
-				val3.y = 0f;
-			}
-			val3.z = 0f;
-			SpringPanel.Begin(mScrollView.panel.cachedGameObject, cachedTransform.get_localPosition() - val3, springStrength).onFinished = onFinished;
-		}
-		else
-		{
-			mCenteredObject = null;
-		}
-		if (onCenter != null)
-		{
-			onCenter(mCenteredObject);
-		}
-	}
-
-	public void CenterOn(Transform target)
-	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		if (mScrollView != null && mScrollView.panel != null)
-		{
-			Vector3[] worldCorners = mScrollView.panel.worldCorners;
-			Vector3 panelCenter = (worldCorners[2] + worldCorners[0]) * 0.5f;
-			CenterOn(target, panelCenter);
-		}
-	}
+  public delegate void OnCenterCallback(GameObject centeredObject);
 }

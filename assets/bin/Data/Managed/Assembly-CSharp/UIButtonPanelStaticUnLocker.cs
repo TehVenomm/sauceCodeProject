@@ -1,47 +1,39 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIButtonPanelStaticUnLocker
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-[RequireComponent(typeof(UIButton))]
-public class UIButtonPanelStaticUnLocker
+#nullable disable
+[RequireComponent(typeof (UIButton))]
+public class UIButtonPanelStaticUnLocker : MonoBehaviour
 {
-	[SerializeField]
-	protected UIStaticPanelChanger panelChange;
+  [SerializeField]
+  protected UIStaticPanelChanger panelChange;
+  private UIButton btn;
+  private bool isLock;
+  private float timer;
 
-	private UIButton btn;
+  private void Awake() => this.btn = ((Component) this).GetComponent<UIButton>();
 
-	private bool isLock;
+  private void OnPress(bool pressed)
+  {
+    if (!this.isLock)
+      this.panelChange.UnLock();
+    this.timer = this.btn.duration + 0.1f;
+    this.isLock = true;
+  }
 
-	private float timer;
-
-	public UIButtonPanelStaticUnLocker()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		btn = this.GetComponent<UIButton>();
-	}
-
-	private void OnPress(bool pressed)
-	{
-		if (!isLock)
-		{
-			panelChange.UnLock();
-		}
-		timer = btn.duration + 0.1f;
-		isLock = true;
-	}
-
-	private void LateUpdate()
-	{
-		if (isLock)
-		{
-			timer -= Time.get_deltaTime();
-			if (!(timer > 0f))
-			{
-				panelChange.Lock();
-				isLock = false;
-			}
-		}
-	}
+  private void LateUpdate()
+  {
+    if (!this.isLock)
+      return;
+    this.timer -= Time.deltaTime;
+    if ((double) this.timer > 0.0)
+      return;
+    this.panelChange.Lock();
+    this.isLock = false;
+  }
 }

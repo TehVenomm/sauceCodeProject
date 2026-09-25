@@ -1,90 +1,99 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AttackedHitStatusFix
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class AttackedHitStatusFix
 {
-	public AttackedHitStatus origin
-	{
-		get;
-		protected set;
-	}
+  public AttackedHitStatus origin { get; protected set; }
 
-	public AttackHitInfo attackInfo => origin.attackInfo;
+  public AttackedHitStatusFix() => this.origin = new AttackedHitStatus();
 
-	public int fromObjectID => origin.fromObjectID;
+  public AttackedHitStatusFix(AttackedHitStatus status) => this.origin = status;
 
-	public StageObject fromObject => origin.fromObject;
+  public AttackHitInfo attackInfo => this.origin.attackInfo;
 
-	public StageObject.OBJECT_TYPE fromType => origin.fromType;
+  public int fromObjectID => this.origin.fromObjectID;
 
-	public Vector3 hitPos => origin.hitPos;
+  public StageObject fromObject => this.origin.fromObject;
 
-	public int fromClientID => origin.fromClientID;
+  public StageObject.OBJECT_TYPE fromType => this.origin.fromType;
 
-	public SkillInfo.SkillParam skillParam => origin.skillParam;
+  public Vector3 hitPos => this.origin.hitPos;
 
-	public int regionID => origin.regionID;
+  public int fromClientID => this.origin.fromClientID;
 
-	public Enemy.WEAK_STATE weakState => origin.weakState;
+  public SkillInfo.SkillParam skillParam => this.origin.skillParam;
 
-	public bool IsSpAttackHit => origin.isSpAttackHit;
+  public int regionID => this.origin.regionID;
 
-	public int damage => origin.damage;
+  public bool isDamageRegionOnly => this.origin.isDamageRegionOnly;
 
-	public AtkAttribute damageDetails => origin.damageDetails;
+  public Enemy.WEAK_STATE weakState => this.origin.weakState;
 
-	public float downAddBase => origin.downAddBase;
+  public bool IsSpAttackHit => this.origin.isSpAttackHit;
 
-	public float downAddWeak => origin.downAddWeak;
+  public int damage => this.origin.damage;
 
-	public bool isArrowBleed => origin.isArrowBleed;
+  public AtkAttribute damageDetails => this.origin.damageDetails;
 
-	public int arrowBleedDamage => origin.arrowBleedDamage;
+  public float downAddBase => this.origin.downAddBase;
 
-	public int arrowBurstDamage => origin.arrowBurstDamage;
+  public float downAddWeak => this.origin.downAddWeak;
 
-	public bool isShadowSealing => origin.isShadowSealing;
+  public bool isForceDown => this.origin.isForceDown;
 
-	public Vector3 hostPos => origin.hostPos;
+  public float concussionAdd => this.origin.concussionAdd;
 
-	public float hostDir => origin.hostDir;
+  public bool isArrowBleed => this.origin.isArrowBleed;
 
-	public int afterHP => origin.afterHP;
+  public int arrowBleedDamage => this.origin.arrowBleedDamage;
 
-	public int afterRegionHP => origin.afterRegionHP;
+  public int arrowBurstDamage => this.origin.arrowBurstDamage;
 
-	public int afterHealHp => origin.afterHealHp;
+  public bool isShadowSealing => this.origin.isShadowSealing;
 
-	public bool breakRegion => origin.breakRegion;
+  public bool isArrowBomb => this.origin.isArrowBomb;
 
-	public int reactionType => origin.reactionType;
+  public Vector3 hostPos => this.origin.hostPos;
 
-	public Vector3 blowForce => origin.blowForce;
+  public float hostDir => this.origin.hostDir;
 
-	public float downTotal => origin.downTotal;
+  public int afterHP => this.origin.afterHP;
 
-	public BadStatus badStatusTotal => origin.badStatusTotal;
+  public int afterRegionHP => this.origin.afterRegionHP;
 
-	public float damageHpRate => origin.damageHpRate;
+  public int afterHealHp => this.origin.afterHealHp;
 
-	public bool arrowBleedSkipFirst => origin.arrowBleedSkipFirst;
+  public bool breakRegion => this.origin.breakRegion;
 
-	public int afterBarrierHp => origin.barrierHp;
+  public int reactionType => this.origin.reactionType;
 
-	public int afterShieldHp => origin.shieldHp;
+  public Vector3 blowForce => this.origin.blowForce;
 
-	public int afterGrabHp => origin.grabHp;
+  public float downTotal => this.origin.downTotal;
 
-	public int shieldDamage => origin.shieldDamage;
+  public float concussionTotal => this.origin.concussionTotal;
 
-	public EnemyAegisController.SyncParam aegisParam => origin.aegisParam;
+  public BadStatus badStatusTotal => this.origin.badStatusTotal;
 
-	public AttackedHitStatusFix()
-	{
-		origin = new AttackedHitStatus();
-	}
+  public float damageHpRate => this.origin.damageHpRate;
 
-	public AttackedHitStatusFix(AttackedHitStatus status)
-	{
-		origin = status;
-	}
+  public bool arrowBleedSkipFirst => this.origin.arrowBleedSkipFirst;
+
+  public int afterBarrierHp => this.origin.barrierHp;
+
+  public int afterShieldHp => this.origin.shieldHp;
+
+  public int afterGrabHp => this.origin.grabHp;
+
+  public int shieldDamage => this.origin.shieldDamage;
+
+  public EnemyAegisController.SyncParam aegisParam => this.origin.aegisParam;
+
+  public int deadReviveCount => this.origin.deadReviveCount;
 }

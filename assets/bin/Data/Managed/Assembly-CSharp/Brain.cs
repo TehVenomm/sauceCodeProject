@@ -1,296 +1,182 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Brain
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Brain
+#nullable disable
+public class Brain : MonoBehaviour
 {
-	public BrainParam param = new BrainParam();
+  public BrainParam param = new BrainParam();
+  private Transform _frontTransform;
+  private Transform _backTransform;
+  public bool canCheckAvoidAttack;
+  public bool canAvoidAttack;
 
-	public Transform _frontTransform;
+  public Character owner { get; private set; }
 
-	public Transform _backTransform;
+  public bool isInitialized { get; private set; }
 
-	public bool canCheckAvoidAttack;
+  public OpponentMemory opponentMem { get; private set; }
 
-	public bool canAvoidAttack;
+  public TargetController targetCtrl { get; private set; }
 
-	public Character owner
-	{
-		get;
-		private set;
-	}
+  public MoveController moveCtrl { get; private set; }
 
-	public bool isInitialized
-	{
-		get;
-		private set;
-	}
+  public WeaponController weaponCtrl { get; private set; }
 
-	public OpponentMemory opponentMem
-	{
-		get;
-		private set;
-	}
+  public StateMachine fsm { get; protected set; }
 
-	public TargetController targetCtrl
-	{
-		get;
-		private set;
-	}
+  public Goal_Think think { get; protected set; }
 
-	public MoveController moveCtrl
-	{
-		get;
-		private set;
-	}
+  public DangerRader dangerRader { get; protected set; }
 
-	public WeaponController weaponCtrl
-	{
-		get;
-		private set;
-	}
+  protected SpanTimer opponentMemSpanTimer { get; set; }
 
-	public StateMachine fsm
-	{
-		get;
-		protected set;
-	}
+  protected SpanTimer targetUpdateSpanTimer { get; set; }
 
-	public Goal_Think think
-	{
-		get;
-		protected set;
-	}
+  public float rootInternalRedius { get; private set; }
 
-	public DangerRader dangerRader
-	{
-		get;
-		protected set;
-	}
+  public float rootFrontDistance { get; private set; }
 
-	protected SpanTimer opponentMemSpanTimer
-	{
-		get;
-		set;
-	}
+  public float rootBackDistance { get; private set; }
 
-	protected SpanTimer targetUpdateSpanTimer
-	{
-		get;
-		set;
-	}
+  protected virtual void Awake()
+  {
+    this.owner = ((Component) this).GetComponentInParent<Character>();
+    this.isInitialized = false;
+  }
 
-	public float rootInternalRedius
-	{
-		get;
-		private set;
-	}
+  protected virtual void OnEnable() => this.Initialize();
 
-	public float rootFrontDistance
-	{
-		get;
-		private set;
-	}
+  protected virtual void Start()
+  {
+  }
 
-	public float rootBackDistance
-	{
-		get;
-		private set;
-	}
+  protected virtual void Update()
+  {
+    if (Object.op_Equality((Object) this.owner, (Object) null) || this.owner.isDead || this.owner.IsStone() || !this.isInitialized)
+      return;
+    if (this.opponentMemSpanTimer != null && this.opponentMemSpanTimer.IsReady())
+      this.opponentMem.Update();
+    if (this.targetUpdateSpanTimer != null && this.targetUpdateSpanTimer.IsReady())
+      this.targetCtrl.UpdateTarget();
+    if (this.fsm != null)
+      this.fsm.Update();
+    if (this.think == null)
+      return;
+    int num = (int) this.think.Update(this);
+  }
 
-	public Vector2 frontPositionXZ
-	{
-		get
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 position = _frontTransform.get_position();
-			return new Vector2(position.x, position.z);
-		}
-	}
+  protected virtual void OnDestroy()
+  {
+    if (this.think == null)
+      return;
+    Goal.Free((Goal) this.think);
+  }
 
-	public Vector2 frontForwardXZ
-	{
-		get
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 forward = _frontTransform.get_forward();
-			return new Vector2(forward.x, forward.z);
-		}
-	}
+  public void Initialize()
+  {
+    if (Object.op_Equality((Object) this.owner, (Object) null) || !this.owner.isInitialized || this.isInitialized)
+      return;
+    this.OnInitialize();
+    this.isInitialized = true;
+  }
 
-	public Vector2 backPositionXZ
-	{
-		get
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 position = _backTransform.get_position();
-			return new Vector2(position.x, position.z);
-		}
-	}
+  protected virtual void OnInitialize()
+  {
+    this.opponentMem = new OpponentMemory(this);
+    this.targetCtrl = new TargetController(this);
+    this.moveCtrl = new MoveController(this);
+    this.weaponCtrl = new WeaponController(this);
+    this.opponentMemSpanTimer = new SpanTimer(this.param.thinkParam.opponentMemorySpan);
+    this.targetUpdateSpanTimer = new SpanTimer(this.param.thinkParam.targetUpdateSpan);
+    this._frontTransform = this.GetFront();
+    this._backTransform = this.GetBack();
+    this.rootInternalRedius = this.param.sensorParam.internalRadius * this.GetScale();
+    Vector2 vector2_1 = Vector2.op_Subtraction(this.frontPositionXZ, this.owner.positionXZ);
+    this.rootFrontDistance = ((Vector2) ref vector2_1).magnitude - this.rootInternalRedius;
+    Vector2 vector2_2 = Vector2.op_Subtraction(this.backPositionXZ, this.owner.positionXZ);
+    this.rootBackDistance = ((Vector2) ref vector2_2).magnitude - this.rootInternalRedius;
+  }
 
-	public Vector2 backForwardXZ
-	{
-		get
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 forward = _backTransform.get_forward();
-			return new Vector2(forward.x, forward.z);
-		}
-	}
+  public void ResetInitialized() => this.OnInitialize();
 
-	public bool isNonActive => fsm != null && fsm.currentType == STATE_TYPE.NONACTIVE;
+  public virtual float GetScale() => 1f;
 
-	public Brain()
-		: this()
-	{
-	}
+  public virtual Transform GetFront() => this.owner._transform;
 
-	protected virtual void Awake()
-	{
-		owner = this.GetComponentInParent<Character>();
-		isInitialized = false;
-	}
+  public virtual Transform GetBack() => this.owner._transform;
 
-	protected virtual void OnEnable()
-	{
-		Initialize();
-	}
+  public Vector2 frontPositionXZ
+  {
+    get
+    {
+      Vector3 position = this._frontTransform.position;
+      return new Vector2(position.x, position.z);
+    }
+  }
 
-	protected virtual void Start()
-	{
-	}
+  public Vector2 frontForwardXZ
+  {
+    get
+    {
+      Vector3 forward = this._frontTransform.forward;
+      return new Vector2(forward.x, forward.z);
+    }
+  }
 
-	protected virtual void Update()
-	{
-		if (!(owner == null) && !owner.isDead && isInitialized)
-		{
-			if (opponentMemSpanTimer != null && opponentMemSpanTimer.IsReady())
-			{
-				opponentMem.Update();
-			}
-			if (targetUpdateSpanTimer != null && targetUpdateSpanTimer.IsReady())
-			{
-				targetCtrl.UpdateTarget();
-			}
-			if (fsm != null)
-			{
-				fsm.Update();
-			}
-			if (think != null)
-			{
-				think.Update(this);
-			}
-		}
-	}
+  public Vector2 backPositionXZ
+  {
+    get
+    {
+      Vector3 position = this._backTransform.position;
+      return new Vector2(position.x, position.z);
+    }
+  }
 
-	protected virtual void OnDestroy()
-	{
-		if (think != null)
-		{
-			Goal.Free(think);
-		}
-	}
+  public Vector2 backForwardXZ
+  {
+    get
+    {
+      Vector3 forward = this._backTransform.forward;
+      return new Vector2(forward.x, forward.z);
+    }
+  }
 
-	public void Initialize()
-	{
-		if (!(owner == null) && owner.isInitialized && !isInitialized)
-		{
-			OnInitialize();
-			isInitialized = true;
-		}
-	}
+  public bool isNonActive => this.fsm != null && this.fsm.currentType == STATE_TYPE.NONACTIVE;
 
-	protected virtual void OnInitialize()
-	{
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		opponentMem = new OpponentMemory(this);
-		targetCtrl = new TargetController(this);
-		moveCtrl = new MoveController(this);
-		weaponCtrl = new WeaponController(this);
-		opponentMemSpanTimer = new SpanTimer(param.thinkParam.opponentMemorySpan);
-		targetUpdateSpanTimer = new SpanTimer(param.thinkParam.targetUpdateSpan);
-		_frontTransform = GetFront();
-		_backTransform = GetBack();
-		rootInternalRedius = param.sensorParam.internalRadius * GetScale();
-		Vector2 val = frontPositionXZ - owner.positionXZ;
-		rootFrontDistance = val.get_magnitude() - rootInternalRedius;
-		Vector2 val2 = backPositionXZ - owner.positionXZ;
-		rootBackDistance = val2.get_magnitude() - rootInternalRedius;
-	}
+  public virtual List<StageObject> GetTargetObjectList()
+  {
+    return !MonoBehaviourSingleton<StageObjectManager>.IsValid() ? new List<StageObject>() : MonoBehaviourSingleton<StageObjectManager>.I.objectList;
+  }
 
-	public void ResetInitialized()
-	{
-		OnInitialize();
-	}
+  public virtual List<StageObject> GetAllyObjectList()
+  {
+    return !MonoBehaviourSingleton<StageObjectManager>.IsValid() ? new List<StageObject>() : MonoBehaviourSingleton<StageObjectManager>.I.objectList;
+  }
 
-	public virtual float GetScale()
-	{
-		return 1f;
-	}
-
-	public virtual Transform GetFront()
-	{
-		return owner._transform;
-	}
-
-	public virtual Transform GetBack()
-	{
-		return owner._transform;
-	}
-
-	public virtual List<StageObject> GetTargetObjectList()
-	{
-		return (!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? new List<StageObject>() : MonoBehaviourSingleton<StageObjectManager>.I.objectList;
-	}
-
-	public virtual List<StageObject> GetAllyObjectList()
-	{
-		return (!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? new List<StageObject>() : MonoBehaviourSingleton<StageObjectManager>.I.objectList;
-	}
-
-	public virtual void HandleEvent(BRAIN_EVENT ev, object param = null)
-	{
-		if (ev == BRAIN_EVENT.DESTROY_OBJECT)
-		{
-			StageObject stageObject = (StageObject)param;
-			if (opponentMem != null)
-			{
-				opponentMem.Remove(stageObject);
-			}
-			if (targetCtrl != null && targetCtrl.GetCurrentTarget() == stageObject)
-			{
-				targetCtrl.MissCurrentTarget();
-			}
-			if (targetCtrl != null && targetCtrl.GetAllyTarget() == stageObject)
-			{
-				targetCtrl.SetAllyTarget(null);
-			}
-			if (targetUpdateSpanTimer != null)
-			{
-				targetUpdateSpanTimer.SetTempSpan(0.5f);
-			}
-		}
-		if (fsm != null)
-		{
-			fsm.HandleEvent(ev, param);
-		}
-		if (think != null)
-		{
-			think.HandleEvent(this, ev, param);
-		}
-	}
+  public virtual void HandleEvent(BRAIN_EVENT ev, object param = null)
+  {
+    if (ev == BRAIN_EVENT.DESTROY_OBJECT)
+    {
+      StageObject stageObject = (StageObject) param;
+      if (this.opponentMem != null)
+        this.opponentMem.Remove(stageObject);
+      if (this.targetCtrl != null && Object.op_Equality((Object) this.targetCtrl.GetCurrentTarget(), (Object) stageObject))
+        this.targetCtrl.MissCurrentTarget();
+      if (this.targetCtrl != null && Object.op_Equality((Object) this.targetCtrl.GetAllyTarget(), (Object) stageObject))
+        this.targetCtrl.SetAllyTarget((StageObject) null);
+      if (this.targetUpdateSpanTimer != null)
+        this.targetUpdateSpanTimer.SetTempSpan(0.5f);
+    }
+    if (this.fsm != null)
+      this.fsm.HandleEvent(ev, param);
+    if (this.think == null)
+      return;
+    this.think.HandleEvent(this, ev, param);
+  }
 }

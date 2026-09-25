@@ -1,572 +1,469 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AttackFunnelBit
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackFunnelBit
+#nullable disable
+public class AttackFunnelBit : MonoBehaviour, IBulletObservable
 {
-	public enum Function
-	{
-		None,
-		Main,
-		Search,
-		Delete
-	}
+  public const float AIM_RAD_MIN = 0.00174532924f;
+  public const string ANIM_STATE_BREAK = "BREAK";
+  public const string ANIM_STATE_DISAPPEAR = "END";
+  private BulletData.BulletFunnel m_funnelData;
+  private StageObject m_attacker;
+  private AttackInfo m_atkInfo;
+  private Transform m_cachedTransform;
+  private StageObject m_targetObject;
+  private GameObject m_effectObj;
+  private string m_landHitEffectName = string.Empty;
+  private float m_aimAngleSpeed;
+  private float m_moveSpeed;
+  private float m_aliveTimer;
+  private bool m_isDeleted;
+  private AttackFunnelBit.Function m_func;
+  private int m_state;
+  private int m_effectDeleteAnimHash;
+  private Animator m_effectAnimator;
+  private float m_attackIntervalTimer;
+  private AtkAttribute m_exAtk;
+  private Player.ATTACK_MODE m_attackMode;
+  private SkillInfo.SkillParam m_skillParam;
+  private CapsuleCollider m_capsuleCollider;
+  private float m_radius;
+  private TargetPoint m_targetPoint;
+  public string m_finalAtkInfoName;
+  private int observedID;
+  private List<IBulletObserver> bulletObserverList = new List<IBulletObserver>();
 
-	public const float AIM_RAD_MIN = 0.00174532924f;
+  public TargetPoint targetPoint => this.m_targetPoint;
 
-	public const string ANIM_STATE_BREAK = "BREAK";
+  public virtual void Initialize(
+    StageObject attacker,
+    AttackInfo atkInfo,
+    StageObject targetObj,
+    Transform launchTrans,
+    Vector3 offsetPos,
+    Quaternion offsetRot)
+  {
+    this.m_attacker = attacker;
+    this.m_atkInfo = atkInfo;
+    if (atkInfo is AttackHitInfo attackHitInfo)
+      attackHitInfo.enableIdentityCheck = false;
+    BulletData bulletData = atkInfo.bulletData;
+    this.m_landHitEffectName = bulletData.data.landHiteffectName;
+    this.m_aliveTimer = bulletData.data.appearTime;
+    this.m_moveSpeed = bulletData.data.speed;
+    this.SetColliderByRadius(bulletData.data.radius);
+    BulletData.BulletFunnel dataFunnel = bulletData.dataFunnel;
+    this.m_aimAngleSpeed = dataFunnel.lookAtAngle * ((float) Math.PI / 180f);
+    this.m_funnelData = dataFunnel;
+    this.m_isDeleted = false;
+    this.m_finalAtkInfoName = dataFunnel.finalAtkInfoName;
+    this.m_cachedTransform = ((Component) this).transform;
+    this.m_cachedTransform.parent = MonoBehaviourSingleton<StageObjectManager>.IsValid() ? MonoBehaviourSingleton<StageObjectManager>.I._transform : MonoBehaviourSingleton<EffectManager>.I._transform;
+    this.m_cachedTransform.position = Vector3.op_Addition(launchTrans.position, Quaternion.op_Multiply(launchTrans.rotation, offsetPos));
+    this.m_cachedTransform.rotation = Quaternion.op_Multiply(launchTrans.rotation, offsetRot);
+    this.m_cachedTransform.localScale = bulletData.data.timeStartScale;
+    Transform effect = EffectManager.GetEffect(bulletData.data.effectName, ((Component) this).transform);
+    if (Object.op_Inequality((Object) effect, (Object) null))
+    {
+      effect.localPosition = bulletData.data.dispOffset;
+      effect.localRotation = Quaternion.Euler(bulletData.data.dispRotation);
+      effect.localScale = Vector3.one;
+      this.m_effectObj = ((Component) effect).gameObject;
+      this.m_effectAnimator = this.m_effectObj.GetComponent<Animator>();
+    }
+    this.RegisterObserver();
+    if (Object.op_Inequality((Object) targetObj, (Object) null))
+      this.RequestMain(targetObj);
+    else
+      this.RequestSearch();
+  }
 
-	public const string ANIM_STATE_DISAPPEAR = "END";
+  private void SetColliderByRadius(float _radius)
+  {
+    if ((double) _radius <= 0.0)
+      return;
+    this.m_radius = _radius;
+    this.m_capsuleCollider = ((Component) this).gameObject.AddComponent<CapsuleCollider>();
+    this.m_capsuleCollider.center = new Vector3(0.0f, 0.0f, 0.0f);
+    this.m_capsuleCollider.direction = 2;
+    ((Collider) this.m_capsuleCollider).isTrigger = true;
+    this.m_capsuleCollider.radius = this.m_radius;
+    this.m_capsuleCollider.height = this.m_radius * 2f;
+    Utility.SetLayerWithChildren(((Component) this).transform, 31 /*0x1F*/);
+    this.SetTargetPoint();
+  }
 
-	private BulletData.BulletFunnel m_funnelData;
+  private void SetTargetPoint()
+  {
+    this.m_targetPoint = ((Component) this).gameObject.AddComponent<TargetPoint>();
+    this.m_targetPoint.isAimEnable = false;
+    this.m_targetPoint.isTargetEnable = false;
+  }
 
-	private StageObject m_attacker;
+  private void Update()
+  {
+    switch (this.m_func)
+    {
+      case AttackFunnelBit.Function.Main:
+        this.FuncMain();
+        break;
+      case AttackFunnelBit.Function.Search:
+        this.FuncSearch();
+        break;
+      case AttackFunnelBit.Function.Delete:
+        this.FuncDelete();
+        break;
+    }
+  }
 
-	private AttackInfo m_atkInfo;
+  private void RequestMain(StageObject targetObj)
+  {
+    this.m_targetObject = targetObj;
+    this.RequestFunction(AttackFunnelBit.Function.Main);
+  }
 
-	private Transform m_cachedTransform;
+  private void FuncMain()
+  {
+    if (this.IsDeleted)
+      return;
+    this.m_aliveTimer -= Time.deltaTime;
+    if ((double) this.m_aliveTimer <= 0.0)
+      this.RequestDestroy(false);
+    else if (Object.op_Equality((Object) this.m_targetObject, (Object) null))
+    {
+      this.RequestDestroy(false);
+    }
+    else
+    {
+      switch (this.m_state)
+      {
+        case 1:
+          Vector3 position = ((Component) this.m_targetObject).transform.position;
+          position.y = this.GetFloatingHeight();
+          this.LookAtTarget(position);
+          Vector3 vector3 = Vector3.op_Addition(this.m_cachedTransform.position, Vector3.op_Multiply(this.m_cachedTransform.forward, this.m_moveSpeed * Time.deltaTime));
+          this.m_cachedTransform.position = vector3;
+          if ((double) Vector3.Distance(position, vector3) > (double) this.GetAttackStartRange())
+            break;
+          this.m_attackIntervalTimer = this.m_funnelData.attackInterval;
+          this.ForwardState();
+          break;
+        case 2:
+          this.RotateAroundTarget();
+          this.LookAtTarget(((Component) this.m_targetObject).transform.position);
+          this.m_attackIntervalTimer -= Time.deltaTime;
+          if ((double) this.m_attackIntervalTimer > 0.0)
+            break;
+          this.m_attackIntervalTimer = this.m_funnelData.attackInterval;
+          if (this.CheckTargetDead())
+          {
+            this.RequestDestroy(false);
+            break;
+          }
+          this.CreateBullet();
+          break;
+      }
+    }
+  }
 
-	private StageObject m_targetObject;
+  private void RotateAroundTarget()
+  {
+    BulletData.BulletFunnel funnelData = this.m_funnelData;
+    float floatingHeight = this.GetFloatingHeight();
+    Vector3 position1 = ((Component) this.m_targetObject).transform.position;
+    position1.y = floatingHeight;
+    Vector3 position2 = this.m_cachedTransform.position;
+    position2.y = floatingHeight;
+    Vector3 vector3_1 = Vector3.op_Subtraction(position2, position1);
+    ((Vector3) ref vector3_1).Normalize();
+    Vector3 vector3_2 = Vector3.op_Multiply(vector3_1, this.GetAttackStartRange());
+    Vector3 vector3_3 = Quaternion.op_Multiply(Quaternion.AngleAxis(funnelData.rotateAngle, Vector3.up), vector3_2);
+    Vector3 vector3_4 = Vector3.op_Subtraction(Vector3.op_Addition(position1, vector3_3), this.m_cachedTransform.position);
+    this.m_cachedTransform.position = Vector3.op_Addition(position2, Vector3.op_Multiply(vector3_4, Time.deltaTime));
+  }
 
-	private GameObject m_effectObj;
+  private void LookAtTarget(Vector3 targetPos)
+  {
+    Vector3 forward = this.m_cachedTransform.forward;
+    Vector3 position = this.m_cachedTransform.position;
+    Vector3 vector3 = Vector3.op_Subtraction(targetPos, position);
+    ((Vector3) ref vector3).Normalize();
+    float num1 = this.m_aimAngleSpeed * Time.deltaTime;
+    double num2 = (double) Vector3.Dot(forward, vector3);
+    float num3 = Mathf.Acos((float) num2);
+    if (num2 < 1.0 && (double) num1 < (double) num3 && (double) num3 >= 0.001745329238474369)
+    {
+      float num4 = num1 / num3;
+      this.m_cachedTransform.rotation = (double) num4 < 1.0 ? Quaternion.Slerp(Quaternion.LookRotation(forward), Quaternion.LookRotation(vector3), num4) : Quaternion.LookRotation(vector3);
+    }
+    else
+      this.m_cachedTransform.rotation = Quaternion.LookRotation(vector3);
+  }
 
-	private string m_landHitEffectName = string.Empty;
+  private AnimEventShot CreateBullet()
+  {
+    BulletData bulletData = this.m_atkInfo.bulletData;
+    if (Object.op_Equality((Object) bulletData, (Object) null))
+      return (AnimEventShot) null;
+    BulletData.BulletFunnel dataFunnel = bulletData.dataFunnel;
+    return dataFunnel == null ? (AnimEventShot) null : this.CreateShot(dataFunnel.bitBullet, this.m_atkInfo);
+  }
 
-	private float m_aimAngleSpeed;
+  private void RequestSearch() => this.RequestFunction(AttackFunnelBit.Function.Search);
 
-	private float m_moveSpeed;
+  private void FuncSearch()
+  {
+    if (this.IsDeleted)
+      return;
+    this.m_aliveTimer -= Time.deltaTime;
+    if ((double) this.m_aliveTimer <= 0.0)
+    {
+      this.RequestDestroy(false);
+    }
+    else
+    {
+      if (this.m_state != 1)
+        return;
+      Transform cachedTransform = this.m_cachedTransform;
+      Vector3 vector3 = Vector3.op_Addition(cachedTransform.position, Vector3.op_Multiply(cachedTransform.forward, this.m_moveSpeed * Time.deltaTime));
+      cachedTransform.position = vector3;
+      float searchRange = this.m_funnelData.searchRange;
+      if ((double) searchRange <= 0.0 || !MonoBehaviourSingleton<StageObjectManager>.IsValid())
+        return;
+      Vector2 zero = Vector2.zero;
+      zero.x = vector3.x;
+      zero.y = vector3.z;
+      StageObject targetObj = this.SearchNearestTarget(zero, searchRange);
+      if (!Object.op_Inequality((Object) targetObj, (Object) null))
+        return;
+      this.RequestMain(targetObj);
+    }
+  }
 
-	private float m_aliveTimer;
+  public void RequestDestroy(bool isPlayFallEffect = true)
+  {
+    if (this.m_func == AttackFunnelBit.Function.Delete || this.IsDeleted)
+      return;
+    this.RequestFunction(AttackFunnelBit.Function.Delete);
+    this.CreateEndBullet();
+    if (Object.op_Equality((Object) this.m_effectAnimator, (Object) null))
+    {
+      this.Destroy();
+    }
+    else
+    {
+      this.m_effectDeleteAnimHash = Animator.StringToHash(isPlayFallEffect ? "BREAK" : "END");
+      if (this.m_effectAnimator.HasState(0, this.m_effectDeleteAnimHash))
+      {
+        this.m_effectAnimator.Play(this.m_effectDeleteAnimHash, 0, 0.0f);
+        this.m_effectAnimator.Update(0.0f);
+      }
+      else
+      {
+        Debug.LogWarning((object) "Not found delete animation!!");
+        this.Destroy();
+      }
+    }
+  }
 
-	private bool m_isDeleted;
+  private void FuncDelete()
+  {
+    switch (this.m_state)
+    {
+      case 1:
+        if (Object.op_Equality((Object) this.m_effectAnimator, (Object) null))
+        {
+          this.ForwardState();
+          break;
+        }
+        AnimatorStateInfo animatorStateInfo = this.m_effectAnimator.GetCurrentAnimatorStateInfo(0);
+        if ((double) ((AnimatorStateInfo) ref animatorStateInfo).normalizedTime < 1.0)
+          break;
+        this.ForwardState();
+        break;
+      case 2:
+        this.Destroy();
+        this.ForwardState();
+        break;
+    }
+  }
 
-	private Function m_func;
+  private void Destroy()
+  {
+    if (this.IsDeleted)
+      return;
+    this.m_isDeleted = true;
+    if (!string.IsNullOrEmpty(this.m_landHitEffectName))
+    {
+      Transform effect = EffectManager.GetEffect(this.m_landHitEffectName);
+      if (Object.op_Inequality((Object) effect, (Object) null))
+      {
+        effect.position = this.m_cachedTransform.position;
+        effect.rotation = this.m_cachedTransform.rotation;
+      }
+    }
+    if (Object.op_Inequality((Object) this.m_attacker, (Object) null))
+    {
+      Enemy attacker = this.m_attacker as Enemy;
+      if (Object.op_Inequality((Object) attacker, (Object) null))
+        attacker.OnDestroyFunnel(this);
+      this.m_attacker = (StageObject) null;
+    }
+    this.NotifyDestroy();
+    Object.Destroy((Object) ((Component) this).gameObject);
+  }
 
-	private int m_state;
+  private void OnDestroy()
+  {
+    if (!Object.op_Inequality((Object) this.m_effectObj, (Object) null))
+      return;
+    EffectManager.ReleaseEffect(this.m_effectObj);
+    this.m_effectObj = (GameObject) null;
+  }
 
-	private int m_effectDeleteAnimHash;
+  private AnimEventShot CreateEndBullet()
+  {
+    if (string.IsNullOrEmpty(this.m_finalAtkInfoName))
+      return (AnimEventShot) null;
+    if (Object.op_Equality((Object) this.m_attacker, (Object) null))
+      return (AnimEventShot) null;
+    AttackInfo attackInfo = this.m_attacker.FindAttackInfo(this.m_finalAtkInfoName);
+    if (attackInfo == null)
+      return (AnimEventShot) null;
+    BulletData bulletData = attackInfo.bulletData;
+    return Object.op_Equality((Object) bulletData, (Object) null) ? (AnimEventShot) null : this.CreateShot(bulletData, attackInfo);
+  }
 
-	private Animator m_effectAnimator;
+  private AnimEventShot CreateShot(BulletData bltData, AttackInfo atkInfo)
+  {
+    if (Object.op_Equality((Object) this.m_attacker, (Object) null))
+    {
+      this.RequestDestroy();
+      return (AnimEventShot) null;
+    }
+    Quaternion rotation = this.m_cachedTransform.rotation;
+    Vector3 pos = Vector3.op_Addition(this.m_cachedTransform.position, Quaternion.op_Multiply(rotation, this.m_funnelData.offsetPosition));
+    AnimEventShot externalBulletData = AnimEventShot.CreateByExternalBulletData(bltData, this.m_attacker, atkInfo, pos, rotation, this.m_exAtk, this.m_attackMode, this.m_skillParam);
+    if (!Object.op_Equality((Object) externalBulletData, (Object) null))
+      return externalBulletData;
+    Log.Error("Failed to create AnimEventShot for Funnel!!");
+    return (AnimEventShot) null;
+  }
 
-	private float m_attackIntervalTimer;
+  protected virtual bool CheckTargetDead()
+  {
+    Player targetObject = this.m_targetObject as Player;
+    return Object.op_Equality((Object) targetObject, (Object) null) || targetObject.isDead;
+  }
 
-	private AtkAttribute m_exAtk;
+  protected virtual StageObject SearchNearestTarget(Vector2 bulletPos, float searchRadius)
+  {
+    float num1 = float.MaxValue;
+    float radius = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.radius;
+    StageObject stageObject = (StageObject) null;
+    int count = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Count;
+    for (int index = 0; index < count; ++index)
+    {
+      Player player = MonoBehaviourSingleton<StageObjectManager>.I.playerList[index] as Player;
+      if (!player.isDead)
+      {
+        float num2 = Vector2.Distance(player.positionXZ, bulletPos);
+        if ((double) num2 <= (double) radius + (double) searchRadius && (double) num2 <= (double) num1)
+        {
+          num1 = num2;
+          stageObject = (StageObject) player;
+        }
+      }
+    }
+    return stageObject;
+  }
 
-	private Player.ATTACK_MODE m_attackMode;
+  protected virtual float GetAttackStartRange() => this.m_funnelData.attackRange;
 
-	private SkillInfo.SkillParam m_skillParam;
+  protected virtual float GetFloatingHeight() => this.m_funnelData.floatingHeight;
 
-	protected StageObject TargetObject => m_targetObject;
+  protected void SetAttackMode(Player.ATTACK_MODE attackMode) => this.m_attackMode = attackMode;
 
-	public string AttackInfoName => m_atkInfo.name;
+  protected void SetExAtk(AtkAttribute atk) => this.m_exAtk = atk;
 
-	public bool IsDeleted => m_isDeleted;
+  protected void SetSkillParam(SkillInfo.SkillParam param) => this.m_skillParam = param;
 
-	public AttackFunnelBit()
-		: this()
-	{
-	}
+  protected StageObject TargetObject => this.m_targetObject;
 
-	public virtual void Initialize(StageObject attacker, AttackInfo atkInfo, StageObject targetObj, Transform launchTrans, Vector3 offsetPos, Quaternion offsetRot)
-	{
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Expected O, but got Unknown
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Expected O, but got Unknown
-		//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Expected O, but got Unknown
-		m_attacker = attacker;
-		m_atkInfo = atkInfo;
-		AttackHitInfo attackHitInfo = atkInfo as AttackHitInfo;
-		if (attackHitInfo != null)
-		{
-			attackHitInfo.enableIdentityCheck = false;
-		}
-		BulletData bulletData = atkInfo.bulletData;
-		m_landHitEffectName = bulletData.data.landHiteffectName;
-		m_aliveTimer = bulletData.data.appearTime;
-		m_moveSpeed = bulletData.data.speed;
-		BulletData.BulletFunnel dataFunnel = bulletData.dataFunnel;
-		m_aimAngleSpeed = dataFunnel.lookAtAngle * 0.0174532924f;
-		m_funnelData = dataFunnel;
-		m_isDeleted = false;
-		m_cachedTransform = this.get_transform();
-		m_cachedTransform.set_parent((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
-		m_cachedTransform.set_position(launchTrans.get_position() + launchTrans.get_rotation() * offsetPos);
-		m_cachedTransform.set_rotation(launchTrans.get_rotation() * offsetRot);
-		m_cachedTransform.set_localScale(bulletData.data.timeStartScale);
-		Transform effect = EffectManager.GetEffect(bulletData.data.effectName, this.get_transform());
-		effect.set_localPosition(bulletData.data.dispOffset);
-		effect.set_localRotation(Quaternion.Euler(bulletData.data.dispRotation));
-		effect.set_localScale(Vector3.get_one());
-		m_effectObj = effect.get_gameObject();
-		m_effectAnimator = m_effectObj.GetComponent<Animator>();
-		if (targetObj != null)
-		{
-			RequestMain(targetObj);
-		}
-		else
-		{
-			RequestSearch();
-		}
-	}
+  private void RequestFunction(AttackFunnelBit.Function func)
+  {
+    this.m_func = func;
+    this.SetState(1);
+  }
 
-	private void Update()
-	{
-		switch (m_func)
-		{
-		case Function.Main:
-			FuncMain();
-			break;
-		case Function.Search:
-			FuncSearch();
-			break;
-		case Function.Delete:
-			FuncDelete();
-			break;
-		}
-	}
+  private void SetState(int state) => this.m_state = state;
 
-	private void RequestMain(StageObject targetObj)
-	{
-		m_targetObject = targetObj;
-		RequestFunction(Function.Main);
-	}
+  private void ForwardState() => ++this.m_state;
 
-	private void FuncMain()
-	{
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-		if (!IsDeleted)
-		{
-			m_aliveTimer -= Time.get_deltaTime();
-			if (m_aliveTimer <= 0f)
-			{
-				RequestDestroy(false);
-			}
-			else if (!(m_targetObject == null))
-			{
-				switch (m_state)
-				{
-				case 1:
-				{
-					Vector3 position = m_targetObject.get_transform().get_position();
-					position.y = GetFloatingHeight();
-					LookAtTarget(position);
-					Vector3 forward = m_cachedTransform.get_forward();
-					Vector3 val = m_cachedTransform.get_position() + forward * (m_moveSpeed * Time.get_deltaTime());
-					m_cachedTransform.set_position(val);
-					if (Vector3.Distance(position, val) <= GetAttackStartRange())
-					{
-						m_attackIntervalTimer = m_funnelData.attackInterval;
-						ForwardState();
-					}
-					break;
-				}
-				case 2:
-					RotateAroundTarget();
-					LookAtTarget(m_targetObject.get_transform().get_position());
-					m_attackIntervalTimer -= Time.get_deltaTime();
-					if (!(m_attackIntervalTimer > 0f))
-					{
-						m_attackIntervalTimer = m_funnelData.attackInterval;
-						if (CheckTargetDead())
-						{
-							RequestDestroy(false);
-						}
-						else
-						{
-							CreateBullet();
-						}
-					}
-					break;
-				}
-			}
-			else
-			{
-				RequestDestroy(false);
-			}
-		}
-	}
+  private void BackState()
+  {
+    if (this.m_state <= 0)
+      return;
+    --this.m_state;
+  }
 
-	private void RotateAroundTarget()
-	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		BulletData.BulletFunnel funnelData = m_funnelData;
-		float floatingHeight = GetFloatingHeight();
-		Vector3 position = m_targetObject.get_transform().get_position();
-		position.y = floatingHeight;
-		Vector3 position2 = m_cachedTransform.get_position();
-		position2.y = floatingHeight;
-		Vector3 val = position2 - position;
-		val.Normalize();
-		val *= GetAttackStartRange();
-		val = Quaternion.AngleAxis(funnelData.rotateAngle, Vector3.get_up()) * val;
-		Vector3 val2 = position + val - m_cachedTransform.get_position();
-		m_cachedTransform.set_position(position2 + val2 * Time.get_deltaTime());
-	}
+  public string AttackInfoName => this.m_atkInfo.name;
 
-	private void LookAtTarget(Vector3 targetPos)
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 forward = m_cachedTransform.get_forward();
-		Vector3 position = m_cachedTransform.get_position();
-		Vector3 val = targetPos - position;
-		val.Normalize();
-		float num = m_aimAngleSpeed * Time.get_deltaTime();
-		float num2 = Vector3.Dot(forward, val);
-		float num3 = Mathf.Acos(num2);
-		if (num2 < 1f && num < num3 && num3 >= 0.00174532924f)
-		{
-			float num4 = num / num3;
-			Quaternion rotation;
-			if (num4 >= 1f)
-			{
-				rotation = Quaternion.LookRotation(val);
-			}
-			else
-			{
-				Quaternion val2 = Quaternion.LookRotation(forward);
-				Quaternion val3 = Quaternion.LookRotation(val);
-				rotation = Quaternion.Slerp(val2, val3, num4);
-			}
-			m_cachedTransform.set_rotation(rotation);
-		}
-		else
-		{
-			m_cachedTransform.set_rotation(Quaternion.LookRotation(val));
-		}
-	}
+  public bool IsDeleted => this.m_isDeleted;
 
-	private AnimEventShot CreateBullet()
-	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		BulletData bulletData = m_atkInfo.bulletData;
-		if (bulletData == null)
-		{
-			return null;
-		}
-		BulletData.BulletFunnel dataFunnel = bulletData.dataFunnel;
-		if (dataFunnel == null)
-		{
-			return null;
-		}
-		if (m_attacker == null)
-		{
-			return null;
-		}
-		Quaternion rotation = m_cachedTransform.get_rotation();
-		Vector3 pos = m_cachedTransform.get_position() + rotation * m_funnelData.offsetPosition;
-		AnimEventShot animEventShot = AnimEventShot.CreateByExternalBulletData(dataFunnel.bitBullet, m_attacker, m_atkInfo, pos, rotation, m_exAtk, m_attackMode, m_skillParam);
-		if (animEventShot == null)
-		{
-			Log.Error("Failed to create AnimEventShot for Funnel!!");
-			return null;
-		}
-		return animEventShot;
-	}
+  private void OnTriggerEnter(Collider collider)
+  {
+    if (this.m_isDeleted || ((Component) collider).gameObject.layer != 14)
+      return;
+    this.NotifyBroken(true);
+  }
 
-	private void RequestSearch()
-	{
-		RequestFunction(Function.Search);
-	}
+  private void OnTriggerStay(Collider collider)
+  {
+    if (this.m_isDeleted || ((Component) collider).gameObject.layer != 14)
+      return;
+    this.NotifyBroken(true);
+  }
 
-	private void FuncSearch()
-	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		if (!IsDeleted)
-		{
-			m_aliveTimer -= Time.get_deltaTime();
-			if (m_aliveTimer <= 0f)
-			{
-				RequestDestroy(false);
-			}
-			else
-			{
-				int state = m_state;
-				if (state == 1)
-				{
-					Transform cachedTransform = m_cachedTransform;
-					Vector3 position = cachedTransform.get_position() + cachedTransform.get_forward() * (m_moveSpeed * Time.get_deltaTime());
-					cachedTransform.set_position(position);
-					float searchRange = m_funnelData.searchRange;
-					if (!(searchRange <= 0f) && MonoBehaviourSingleton<StageObjectManager>.IsValid())
-					{
-						Vector2 zero = Vector2.get_zero();
-						zero.x = position.x;
-						zero.y = position.z;
-						StageObject stageObject = SearchNearestTarget(zero, searchRange);
-						if (stageObject != null)
-						{
-							RequestMain(stageObject);
-						}
-					}
-				}
-			}
-		}
-	}
+  public int GetObservedID() => this.observedID;
 
-	public void RequestDestroy(bool isPlayFallEffect = true)
-	{
-		if (m_func != Function.Delete && !IsDeleted)
-		{
-			RequestFunction(Function.Delete);
-			if (m_effectAnimator == null)
-			{
-				Destroy();
-			}
-			else
-			{
-				m_effectDeleteAnimHash = Animator.StringToHash((!isPlayFallEffect) ? "END" : "BREAK");
-				if (m_effectAnimator.HasState(0, m_effectDeleteAnimHash))
-				{
-					m_effectAnimator.Play(m_effectDeleteAnimHash, 0, 0f);
-					m_effectAnimator.Update(0f);
-				}
-				else
-				{
-					Debug.LogWarning((object)"Not found delete animation!!");
-					Destroy();
-				}
-			}
-		}
-	}
+  public void SetObservedID(int id) => this.observedID = id;
 
-	private void FuncDelete()
-	{
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		switch (m_state)
-		{
-		case 1:
-			if (m_effectAnimator == null)
-			{
-				ForwardState();
-			}
-			else
-			{
-				AnimatorStateInfo currentAnimatorStateInfo = m_effectAnimator.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_normalizedTime() >= 1f)
-				{
-					ForwardState();
-				}
-			}
-			break;
-		case 2:
-			Destroy();
-			ForwardState();
-			break;
-		}
-	}
+  public void RegisterObserver()
+  {
+    if (this.bulletObserverList.Contains((IBulletObserver) this.m_attacker))
+      return;
+    this.bulletObserverList.Add((IBulletObserver) this.m_attacker);
+    this.SetObservedID(this.m_attacker.GetObservedID());
+    this.m_attacker.RegisterObservable((IBulletObservable) this);
+  }
 
-	private void Destroy()
-	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		if (!IsDeleted)
-		{
-			m_isDeleted = true;
-			if (!string.IsNullOrEmpty(m_landHitEffectName))
-			{
-				Transform effect = EffectManager.GetEffect(m_landHitEffectName, null);
-				if (effect != null)
-				{
-					effect.set_position(m_cachedTransform.get_position());
-					effect.set_rotation(m_cachedTransform.get_rotation());
-				}
-			}
-			if (m_attacker != null)
-			{
-				Enemy enemy = m_attacker as Enemy;
-				if (enemy != null)
-				{
-					enemy.OnDestroyFunnel(this);
-				}
-				m_attacker = null;
-			}
-			Object.Destroy(this.get_gameObject());
-		}
-	}
+  public void NotifyBroken(bool isSendOnlyOriginal = true)
+  {
+    for (int index = 0; index < this.bulletObserverList.Count; ++index)
+      this.bulletObserverList[index].OnBreak(this.observedID, isSendOnlyOriginal);
+  }
 
-	private void OnDestroy()
-	{
-		if (m_effectObj != null)
-		{
-			EffectManager.ReleaseEffect(m_effectObj, true, false);
-			m_effectObj = null;
-		}
-	}
+  public void NotifyDestroy()
+  {
+    for (int index = 0; index < this.bulletObserverList.Count; ++index)
+      this.bulletObserverList[index].OnBulletDestroy(this.observedID);
+  }
 
-	protected virtual bool CheckTargetDead()
-	{
-		Player player = m_targetObject as Player;
-		return player == null || player.isDead;
-	}
+  public void ForceBreak() => this.RequestDestroy();
 
-	protected virtual StageObject SearchNearestTarget(Vector2 bulletPos, float searchRadius)
-	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		float num = 3.40282347E+38f;
-		float radius = MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.radius;
-		StageObject result = null;
-		int count = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Count;
-		for (int i = 0; i < count; i++)
-		{
-			Player player = MonoBehaviourSingleton<StageObjectManager>.I.playerList[i] as Player;
-			if (!player.isDead)
-			{
-				float num2 = Vector2.Distance(player.positionXZ, bulletPos);
-				if (num2 <= radius + searchRadius && num2 <= num)
-				{
-					num = num2;
-					result = player;
-				}
-			}
-		}
-		return result;
-	}
-
-	protected virtual float GetAttackStartRange()
-	{
-		return m_funnelData.attackRange;
-	}
-
-	protected virtual float GetFloatingHeight()
-	{
-		return m_funnelData.floatingHeight;
-	}
-
-	protected void SetAttackMode(Player.ATTACK_MODE attackMode)
-	{
-		m_attackMode = attackMode;
-	}
-
-	protected void SetExAtk(AtkAttribute atk)
-	{
-		m_exAtk = atk;
-	}
-
-	protected void SetSkillParam(SkillInfo.SkillParam param)
-	{
-		m_skillParam = param;
-	}
-
-	private void RequestFunction(Function func)
-	{
-		m_func = func;
-		SetState(1);
-	}
-
-	private void SetState(int state)
-	{
-		m_state = state;
-	}
-
-	private void ForwardState()
-	{
-		m_state++;
-	}
-
-	private void BackState()
-	{
-		if (m_state > 0)
-		{
-			m_state--;
-		}
-	}
+  public enum Function
+  {
+    None,
+    Main,
+    Search,
+    Delete,
+  }
 }

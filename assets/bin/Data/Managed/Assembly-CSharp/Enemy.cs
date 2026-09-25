@@ -1,3 +1,9 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Enemy
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using rhyme;
 using System;
@@ -6,10300 +12,9372 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+#nullable disable
 public class Enemy : Character
 {
-	public enum SUB_ACTION_ID
-	{
-		STEP = 12,
-		DOWN,
-		ANGRY,
-		ESCAPE,
-		COUNTER,
-		DIZZY,
-		SHADOWSEALING,
-		MAD_MODE,
-		MAX
-	}
-
-	public enum SUB_MOTION_ID
-	{
-		STEP = 115,
-		STEP_BACK = 116,
-		DOWN = 117,
-		DOWN_TIME = 118,
-		COUNTER = 119,
-		ESCAPE_START = 120,
-		ESCAPE = 121,
-		DIZZY = 122,
-		MAD_MODE = 123,
-		ANGRY_BEGIN = 124,
-		ANGRY_END = 140,
-		MAX = 141
-	}
-
-	[Serializable]
-	public class RegionInfo
-	{
-		[Serializable]
-		public class BreakEffect
-		{
-			public string effectName;
-
-			public Vector3 effectAngle;
-
-			public string nodeName;
-		}
-
-		[Serializable]
-		public class BreakDrop
-		{
-			public string dropNodeName;
-		}
-
-		[Serializable]
-		public class CounterInfo
-		{
-			[Tooltip("この部位があるとカウンタ\u30fcが有効かどうか")]
-			public bool enabled;
-
-			[Tooltip("カウンタ\u30fcが発動するのは何発受けたときか")]
-			public int counterLimitNum = 1;
-		}
-
-		[Serializable]
-		public class WeaponTypeRate
-		{
-			[Tooltip("対応する武器（EQUIPMENT_TYPE）")]
-			public EQUIPMENT_TYPE equipmentType = EQUIPMENT_TYPE.NONE;
-
-			[Tooltip("武器種倍率（小数）")]
-			public float rate = 1f;
-		}
-
-		[Serializable]
-		public class ModeChangeInfo
-		{
-			[Tooltip("設定されているモ\u30fcドへの変更を有効にする")]
-			public bool enabled;
-
-			[Tooltip("変更後モ\u30fcドID")]
-			public int modeID;
-		}
-
-		public string name;
-
-		public int maxHP = 10;
-
-		public string[] deactivateObjects;
-
-		[Tooltip("ヒット素材名(EnemyHitMaterialTable)")]
-		public string hitMaterialName;
-
-		public BreakEffect breakEffect;
-
-		public BreakDrop breakDrop;
-
-		[Tooltip("部位破壊時ダウンモ\u30fcション")]
-		public bool breakInDown;
-
-		[Tooltip("部位破壊時ダメ\u30fcジモ\u30fcション")]
-		public bool breakInDamage;
-
-		[Tooltip("部位破壊後ヒット有効フラグ")]
-		public bool breakAfterHit = true;
-
-		[Tooltip("耐性(%)")]
-		public AtkAttribute tolerance = new AtkAttribute();
-
-		[Tooltip("防御力(+)")]
-		public AtkAttribute defence = new AtkAttribute();
-
-		[Tooltip("親部位名（親破壊まで無効設定")]
-		public string parentRegionName;
-
-		[Tooltip("復活可能フラグ")]
-		public bool enableRevive;
-
-		[Tooltip("復活までの時間")]
-		public float reviveIntervalTime;
-
-		[Tooltip("特殊バフ適用時のバリアへのダメ\u30fcジ値")]
-		public int barrierDamageSp = 100;
-
-		[Tooltip("通常時のバリアへのダメ\u30fcジ値")]
-		public AtkAttribute atkBarrierDamage = new AtkAttribute();
-
-		[Tooltip("バリアによる耐性値上昇率(0.0〜1.0)")]
-		public float barrierToleranceRate;
-
-		[Tooltip("カウンタ\u30fc情報")]
-		public CounterInfo counterInfo = new CounterInfo();
-
-		[Tooltip("ダウン値係数")]
-		public int customDownRate;
-
-		[Tooltip("シ\u30fcルドダメ\u30fcジ有効フラグ")]
-		public bool isEnableShieldDamage;
-
-		[Tooltip("シ\u30fcルド時の掴み解除フラグ")]
-		public bool isGrabRelease;
-
-		[Tooltip("最終ダメ\u30fcジを最小にする")]
-		public bool isDamageMinimum;
-
-		public WeaponTypeRate[] weaponTypeRate;
-
-		[Tooltip("プレイヤ\u30fcの攻撃が当たるか")]
-		public bool isAtkColliderHit = true;
-
-		[Tooltip("モ\u30fcド変更情報")]
-		public ModeChangeInfo modeChangeInfo;
-	}
-
-	public enum WEAK_STATE
-	{
-		NONE,
-		WEAK,
-		DOWN,
-		WEAK_SP_ATTACK,
-		WEAK_SP_DOWN_MAX,
-		WEAK_ELEMENT_ATTACK,
-		WEAK_ELEMENT_SKILL_ATTACK,
-		WEAK_SKILL_ATTACK,
-		WEAK_HEAL_ATTACK,
-		WEAK_GRAB,
-		WEAK_CANNON
-	}
-
-	[Serializable]
-	public class BleedData
-	{
-		public int ownerID;
-
-		public int cnt;
-
-		public int damage;
-
-		public bool skipFirst;
-
-		public int lv;
-
-		public static readonly int MaxLv = 3;
-
-		public bool IsOwnerSelf()
-		{
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null && MonoBehaviourSingleton<StageObjectManager>.I.self.id == ownerID)
-			{
-				return true;
-			}
-			return false;
-		}
-
-		public bool IsMaxLv()
-		{
-			return MaxLv <= lv;
-		}
-	}
-
-	[Serializable]
-	public class BleedWork
-	{
-		public int ownerID;
-
-		public int showIndex;
-
-		public Transform bleedEffect;
-	}
-
-	[Serializable]
-	public class BleedSyncData
-	{
-		[Serializable]
-		public class BleedDamageData
-		{
-			public int ownerID;
-
-			public int damage;
-		}
-
-		[Serializable]
-		public class BleedRegionWork
-		{
-			public int id;
-
-			public int afterHP;
-
-			public List<BleedDamageData> damageList = new List<BleedDamageData>();
-		}
-
-		public int afterHP;
-
-		public List<BleedRegionWork> regionWorks = new List<BleedRegionWork>();
-	}
-
-	[Serializable]
-	public class ShadowSealingData
-	{
-		public bool isTarget;
-
-		public int ownerID;
-
-		public float existSec;
-
-		public float extendRate = 1f;
-
-		public bool IsOwnerSelf()
-		{
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null && MonoBehaviourSingleton<StageObjectManager>.I.self.id == ownerID)
-			{
-				return true;
-			}
-			return false;
-		}
-	}
-
-	[Serializable]
-	public class ShadowSealingSyncData
-	{
-		public int regionIndex;
-	}
-
-	[Serializable]
-	public class RegionWorkSyncData
-	{
-		public int hp;
-
-		public bool isBroke;
-
-		public List<BleedData> bleedList;
-
-		public int barrierHp;
-
-		public bool isShieldDamage;
-
-		public bool isShieldCriticalDamage;
-
-		public ShadowSealingData shadowSealingData;
-	}
-
-	public class RandomShotInfo
-	{
-		public class TargetInfo
-		{
-			public Quaternion rot;
-
-			public int targetId;
-
-			public TargetInfo()
-			{
-			}
-
-			public TargetInfo(Quaternion rot, int id)
-			{
-				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-				this.rot = rot;
-				targetId = id;
-			}
-		}
-
-		public const int TARGET_NONE = -1;
-
-		public AttackInfo atkInfo;
-
-		public float interval;
-
-		public float countTime;
-
-		public int shotCount;
-
-		public List<Vector3> points
-		{
-			get;
-			set;
-		}
-
-		public List<TargetInfo> targets
-		{
-			get;
-			set;
-		}
-	}
-
-	public class AnimationLayerWeightChangeInfo
-	{
-		public float weight;
-
-		public float spd;
-
-		public float target;
-
-		public int layerIndex;
-
-		public bool forceEndFlag;
-
-		public bool aliveFlag;
-	}
-
-	public class BlendColorChangeInfo
-	{
-		public Color currentColor;
-
-		public float currentBlendRate;
-
-		public float spdR;
-
-		public float spdG;
-
-		public float spdB;
-
-		public float spdBlendRate;
-
-		public Color targetColor;
-
-		public float targetblendRate;
-
-		public bool endFlagR;
-
-		public bool endFlagG;
-
-		public bool endFlagB;
-
-		public bool endFlagBlendRate;
-
-		public bool forceEndFlag;
-
-		public bool aliveFlag;
-
-		public List<Material> materialList;
-	}
-
-	private enum eCounterRegionState
-	{
-		NONE,
-		EXIST,
-		NOT_EXIST
-	}
-
-	public enum CANCEL_CONDITION
-	{
-		NONE,
-		FAILED_GRAB
-	}
-
-	private enum EFFECTIVE_TYPE
-	{
-		GOOD,
-		NORMAL,
-		BAD
-	}
-
-	public const int INVALID_REGIONID = -1;
-
-	public const int REGIONID_BODY = 0;
-
-	private const string DEF_HEAD_NAME = "Head";
-
-	private const string DEF_HIP_NAME = "Hip";
-
-	public const int SHOT_POINT_ALL_PLAYER = 0;
-
-	public const int SHOT_POINT_RANDOM_PICKUP = 1;
-
-	public const int SHOT_POINT_CURRENT_TARGET = 3;
-
-	public const float HPGAUGE_SHAKE_POWER = 5f;
-
-	public const float HPGAUGE_SHAKE_TIME = 0.5f;
-
-	public const float HPGAUGE_SHAKE_CYCLETIME = 0.05f;
-
-	public const float ROTATE_RAD_PER_FRAME = 0.0349065848f;
-
-	private const string SHIELD_PROPERTY_MATCAP_POW = "_MatCapPow";
-
-	public const float SHADOWSEALING_START_NORMALIZED_TIME = 0.1f;
-
-	private readonly uint kStrIdx_EnemyReaction_ElemTolChange;
-
-	private readonly uint kStrIdx_EnemyReaction_Counter = 1u;
-
-	private readonly uint kStrIdx_EnemyReaction_MadMode = 2u;
-
-	private readonly uint kStrIdx_EnemyReaction_BuffCancellation = 3u;
-
-	private readonly uint kStrIdx_EnemyReaction_BreakCounterRegion = 4u;
-
-	private readonly uint kStrIdx_EnemyReaction_ReviveCounterRegion = 5u;
-
-	private static int updateFrame = -1;
-
-	private static float selfHitEffectCool = 0f;
-
-	private static float otherHitEffectCool = 0f;
-
-	public bool isStoke;
-
-	private uint m_nowAngryId;
-
-	private List<uint> m_execAngryIds = new List<uint>();
-
-	public XorInt enemyLevel;
-
-	public QuestStartData.EnemyReward enemyReward;
-
-	public bool isRareSpecies;
-
-	public static readonly string[] subMotionStateName = new string[10]
-	{
-		"step",
-		"step_back",
-		"down",
-		"down_time",
-		"counter",
-		"escape_start",
-		"escape",
-		"dizzy",
-		"mad_mode",
-		"angry_{0:00}"
-	};
-
-	private static int[] subMotionHashCaches = new int[26];
-
-	[Tooltip("頭のオブジェクト名(頭からの距離測定起点)")]
-	public string headObjectName = "Head";
-
-	[Tooltip("尻のオブジェクト名(尻からの距離測定起点)")]
-	public string hipObjectName = "Hip";
-
-	private Transform _head;
-
-	private Transform _hip;
-
-	protected float bleedCounter;
-
-	[Tooltip("体の大きさ半径（マップとの当たり、影の大きさ")]
-	public float bodyRadius = 1f;
-
-	[Tooltip("UI高さ")]
-	public float uiHeight = 2f;
-
-	public AttackInfo[] convertAttackInfos;
-
-	public RegionInfo[] regionInfos;
-
-	public float downHeal = 10f;
-
-	public float downTotal;
-
-	public float downHealInterval;
-
-	public int downCount;
-
-	public float[] downMaxRate;
-
-	public int _downMax = 100;
-
-	protected bool hitShockLightFlag;
-
-	protected bool hitShockOffsetFlag;
-
-	protected float hitShockLightTime;
-
-	protected float hitShockOffsetTime;
-
-	protected Vector3 hitShockVec = Vector3.get_zero();
-
-	protected Vector3 hitShockOffset = Vector3.get_zero();
-
-	private bool canHitShockEffect = true;
-
-	protected Vector3 dashBeforePos = Vector3.get_zero();
-
-	protected float dashNowDistance;
-
-	protected float dashOverDistance;
-
-	protected float dashMinDistance;
-
-	protected float dashMaxDistance;
-
-	protected string dashEndTrigger;
-
-	protected bool dashOverFlag;
-
-	protected float dashOverCheckDistance;
-
-	protected bool warpViewFlag;
-
-	protected float warpViewRate;
-
-	protected float warpViewRatePerTime;
-
-	public float damageHpRate;
-
-	public float healDamageRate;
-
-	protected List<RandomShotInfo> randomShotInfo = new List<RandomShotInfo>();
-
-	protected List<RandomShotInfo> shotNetworkInfoQueue = new List<RandomShotInfo>();
-
-	protected List<RandomShotInfo> shotEventInfoQueue = new List<RandomShotInfo>();
-
-	protected bool radialBlurEnable;
-
-	public UIEnemyStatusGizmo uiEnemyStatusGizmo;
-
-	private Coroutine forceEnemyOutCoroutine;
-
-	private List<AttackNWayLaser> m_activeAttackLaserList = new List<AttackNWayLaser>();
-
-	private List<AttackFunnelBit> m_activeAttackFunnelList = new List<AttackFunnelBit>();
-
-	private List<AttackDig> m_activeAttackDigList = new List<AttackDig>();
-
-	private List<AttackActionMine> m_activeAttackActionMineList = new List<AttackActionMine>();
-
-	private List<AttackShotNodeLink> m_activeAttackObstacleList = new List<AttackShotNodeLink>();
-
-	private List<EnemyEffectObject> m_enemyEffectList = new List<EnemyEffectObject>();
-
-	public DrainAttackInfo[] drainAtkInfos;
-
-	private XorInt m_barrierHpMax = 0;
-
-	private XorInt m_barrierHp = 0;
-
-	public bool isRequireGhostShaderParam;
-
-	public float ghostBuffEndParam;
-
-	public float ghostBuffDuration;
-
-	public bool willStock;
-
-	public bool isHideSpawn;
-
-	public bool isHiding;
-
-	public float turnUpDistance;
-
-	public uint gatherPointViewId;
-
-	protected FieldMapTable.GatherPointViewTableData viewData;
-
-	protected Transform targetEffect;
-
-	protected Transform gatherEffect;
-
-	public float paralyzeLoopTime;
-
-	public ConverteElementToleranceTable[] converteElementToleranceTable = new ConverteElementToleranceTable[0];
-
-	public int madModeHpThreshold;
-
-	public int madModeLvThreshold;
-
-	private int madModeHp;
-
-	public float shadowSealingBindResist;
-
-	public float m_dizzyTime;
-
-	public TailController tailController;
-
-	public bool useDownLoopTime;
-
-	public float downLoopStartTime;
-
-	public float downLoopTime;
-
-	private float downTime;
-
-	private float downGaugeDecreaseStartTime;
-
-	private float currentDownValue;
-
-	private float downDecreaseValuePerSecond;
-
-	private float[] downDecreaseRates;
-
-	private ARENA_CONDITION[] arenaConditionList;
-
-	private bool isArenaDamageOffWeapon;
-
-	private bool isArenaDamageOffMagi;
-
-	private List<AnimationLayerWeightChangeInfo> animLayerWeightChangeInfo = new List<AnimationLayerWeightChangeInfo>();
-
-	private BlendColorChangeInfo blendColorChangeInfo;
-
-	private SkinnedMeshRenderer[] skinnedMeshRendererList;
-
-	private eCounterRegionState m_CounterRegionState;
-
-	private GameObject effectDrainRecover;
-
-	private float grabDrainRecoverTimer;
-
-	private GameObject m_effectBurning;
-
-	private GameObject m_effectSpeedDown;
-
-	private List<AttackHitColliderProcessor.HitParam> checkHitParam = new List<AttackHitColliderProcessor.HitParam>();
-
-	private List<float> checkLength = new List<float>();
-
-	private List<int> checkPriority = new List<int>();
-
-	private List<int> targetRegionIds = new List<int>();
-
-	private GameObject m_effectHitWhenGhost;
-
-	private EnemyAegisController aegisCtrl;
-
-	private List<ResidentEffectObject> m_residentEffectList = new List<ResidentEffectObject>();
-
-	private SystemEffectSetting m_residentEffectSetting;
-
-	private Transform debuffShadowSealingEffect;
-
-	private float debuffShadowSealingTimer;
-
-	private float debuffShadowSealingTimerDuration;
-
-	private float debuffShadowSealingRadius;
-
-	private int shadowSealingTarget;
-
-	public override int id
-	{
-		get
-		{
-			return base.id;
-		}
-		set
-		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			base.id = value;
-			this.get_gameObject().set_name("Enemy:" + value);
-		}
-	}
-
-	public EnemyLoader loader
-	{
-		get;
-		private set;
-	}
-
-	public InGameSettingsManager.Enemy enemyParameter
-	{
-		get;
-		private set;
-	}
-
-	public bool isPierceAfterTarget
-	{
-		get;
-		private set;
-	}
-
-	public int enemyID
-	{
-		get;
-		set;
-	}
-
-	public bool isBoss
-	{
-		get;
-		set;
-	}
-
-	public bool isWaveMatchBoss
-	{
-		get;
-		set;
-	}
-
-	public int enemyPopIndex
-	{
-		get;
-		set;
-	}
-
-	public EnemyTable.EnemyData enemyTableData
-	{
-		get;
-		set;
-	}
-
-	public GrowEnemyTable.GrowEnemyData growTableData
-	{
-		get;
-		set;
-	}
-
-	public BrainParam brainParam
-	{
-		get;
-		set;
-	}
-
-	public Transform head
-	{
-		get
-		{
-			if (_head != null)
-			{
-				return _head;
-			}
-			_head = Utility.Find(base._transform, headObjectName);
-			if (_head == null)
-			{
-				_head = base._transform;
-			}
-			_head = Utility.Find(base._transform, "Head");
-			if (_head == null)
-			{
-				_head = base._transform;
-			}
-			return _head;
-		}
-	}
-
-	public Transform hip
-	{
-		get
-		{
-			if (_hip != null)
-			{
-				return _hip;
-			}
-			_hip = Utility.Find(base._transform, hipObjectName);
-			if (_hip == null)
-			{
-				_hip = base._transform;
-			}
-			_hip = Utility.Find(base._transform, "Hip");
-			if (_hip == null)
-			{
-				_hip = base._transform;
-			}
-			return _hip;
-		}
-	}
-
-	public RegionInfo[] convertRegionInfos
-	{
-		get;
-		set;
-	}
-
-	public Collider[] colliders
-	{
-		get;
-		protected set;
-	}
-
-	public TargetPoint[] targetPoints
-	{
-		get;
-		protected set;
-	}
-
-	public RegionRoot[] regionRoots
-	{
-		get;
-		protected set;
-	}
-
-	public bool enableTargetPoint
-	{
-		get;
-		protected set;
-	}
-
-	public EnemyRegionWork[] regionWorks
-	{
-		get;
-		set;
-	}
-
-	public int downMax
-	{
-		get
-		{
-			if (downMaxRate != null)
-			{
-				int num = downMaxRate.Length;
-				if (num > 0)
-				{
-					return (int)((float)_downMax * downMaxRate[(downCount >= num - 1) ? (num - 1) : downCount]);
-				}
-			}
-			return _downMax;
-		}
-	}
-
-	public bool reviveRegionWaitSync
-	{
-		get;
-		protected set;
-	}
-
-	public bool enableDash
-	{
-		get;
-		protected set;
-	}
-
-	public bool warpWaitSync
-	{
-		get;
-		protected set;
-	}
-
-	public string baseHitMaterialName
-	{
-		get;
-		set;
-	}
-
-	public EnemyPacketReceiver enemyReceiver => (EnemyPacketReceiver)base.packetReceiver;
-
-	public EnemyPacketSender enemySender => (EnemyPacketSender)base.packetSender;
-
-	public int BarrierHpMax
-	{
-		get
-		{
-			return m_barrierHpMax;
-		}
-		set
-		{
-			m_barrierHpMax = value;
-		}
-	}
-
-	public XorInt BarrierHp
-	{
-		get
-		{
-			return m_barrierHp;
-		}
-		set
-		{
-			m_barrierHp = value;
-		}
-	}
-
-	public bool IsValidBarrier => BarrierHpMax > 0 && (int)BarrierHp > 0;
-
-	public AtkAttribute GhostFormParam
-	{
-		get;
-		set;
-	}
-
-	public GhostFormShaderParam GhostFormShaderParam
-	{
-		get;
-		set;
-	}
-
-	public AutoBuffParam[] AutoBuffParamList
-	{
-		get;
-		set;
-	}
-
-	public float DizzyReactionLoopTime
-	{
-		get;
-		set;
-	}
-
-	public XorInt GrabHpMax
-	{
-		get;
-		set;
-	}
-
-	public XorInt GrabHp
-	{
-		get;
-		set;
-	}
-
-	public XorInt GrabCannonDamage
-	{
-		get;
-		set;
-	}
-
-	public bool IsValidGrabHp => (int)GrabHpMax > 0 && (int)GrabHp > 0;
-
-	public int ExActionID
-	{
-		get;
-		set;
-	}
-
-	public int ExActionCondition
-	{
-		get;
-		set;
-	}
-
-	public int ExActionConditionValue
-	{
-		get;
-		set;
-	}
-
-	public StackBuffController stackBuffCtrl
-	{
-		get;
-		protected set;
-	}
-
-	public uint NowAngryID
-	{
-		get
-		{
-			return m_nowAngryId;
-		}
-		set
-		{
-			m_nowAngryId = value;
-		}
-	}
-
-	public List<uint> ExecAngryIDList
-	{
-		get
-		{
-			return m_execAngryIds;
-		}
-		set
-		{
-			m_execAngryIds = value;
-		}
-	}
-
-	public bool counterFlag
-	{
-		get;
-		set;
-	}
-
-	public Enemy()
-	{
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		enemyPopIndex = -1;
-		enemyTableData = null;
-		base.objectType = OBJECT_TYPE.ENEMY;
-		enableTargetPoint = true;
-		reviveRegionWaitSync = false;
-		warpWaitSync = false;
-		stackBuffCtrl = new StackBuffController();
-	}
-
-	public ENEMY_TYPE GetEnemyType()
-	{
-		return (enemyTableData != null) ? enemyTableData.type : ENEMY_TYPE.NONE;
-	}
-
-	public static bool IsWeakStateCheckAlreadyHit(WEAK_STATE state)
-	{
-		bool result = false;
-		if (state == WEAK_STATE.WEAK || state == WEAK_STATE.WEAK_SP_ATTACK || state == WEAK_STATE.WEAK_SP_DOWN_MAX || state == WEAK_STATE.WEAK_ELEMENT_ATTACK || state == WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK || state == WEAK_STATE.WEAK_SKILL_ATTACK || state == WEAK_STATE.WEAK_HEAL_ATTACK)
-		{
-			result = true;
-		}
-		return result;
-	}
-
-	public static bool IsWeakStateSpAttack(WEAK_STATE state)
-	{
-		bool result = false;
-		if (state == WEAK_STATE.WEAK_SP_ATTACK || state == WEAK_STATE.WEAK_SP_DOWN_MAX)
-		{
-			result = true;
-		}
-		return result;
-	}
-
-	public static bool IsWeakStateElementAttack(WEAK_STATE state)
-	{
-		bool result = false;
-		if (state == WEAK_STATE.WEAK_ELEMENT_ATTACK || state == WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK)
-		{
-			result = true;
-		}
-		return result;
-	}
-
-	public static bool IsWeakStateSkillAttack(WEAK_STATE state)
-	{
-		bool result = false;
-		if (state == WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK || state == WEAK_STATE.WEAK_SKILL_ATTACK)
-		{
-			result = true;
-		}
-		return result;
-	}
-
-	public static bool IsWeakStateHealAttack(WEAK_STATE state)
-	{
-		return state == WEAK_STATE.WEAK_HEAL_ATTACK;
-	}
-
-	public static bool IsWeakStateDisplaySign(WEAK_STATE state)
-	{
-		return state != 0 && state != WEAK_STATE.DOWN;
-	}
-
-	public static bool IsWeakStateCannonAttack(WEAK_STATE state)
-	{
-		return state == WEAK_STATE.WEAK_CANNON;
-	}
-
-	public static TargetMarker.EFFECT_TYPE WeakStateToEffectType(WEAK_STATE weakState)
-	{
-		TargetMarker.EFFECT_TYPE result = TargetMarker.EFFECT_TYPE.NONE;
-		switch (weakState)
-		{
-		case WEAK_STATE.WEAK_ELEMENT_ATTACK:
-			result = TargetMarker.EFFECT_TYPE.WEAK_ELEMENT_ATTACK;
-			break;
-		case WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK:
-			result = TargetMarker.EFFECT_TYPE.WEAK_ELEMENT_SKILL_ATTACK;
-			break;
-		case WEAK_STATE.WEAK_SKILL_ATTACK:
-			result = TargetMarker.EFFECT_TYPE.WEAK_SKILL_ATTACK;
-			break;
-		case WEAK_STATE.WEAK_HEAL_ATTACK:
-			result = TargetMarker.EFFECT_TYPE.WEAK_HEAL_ATTACK;
-			break;
-		case WEAK_STATE.WEAK_CANNON:
-			result = TargetMarker.EFFECT_TYPE.WEAK_CANNON;
-			break;
-		}
-		return result;
-	}
-
-	public bool isDispWeakMark()
-	{
-		for (int i = 0; i < regionWorks.Length; i++)
-		{
-			if (regionWorks[i].weakState == WEAK_STATE.WEAK)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public List<AttackActionMine> GetActionMineList()
-	{
-		return m_activeAttackActionMineList;
-	}
-
-	public DrainAttackInfo SearchDrainAttackInfo(int id)
-	{
-		if (drainAtkInfos == null)
-		{
-			return null;
-		}
-		DrainAttackInfo[] array = drainAtkInfos;
-		foreach (DrainAttackInfo drainAttackInfo in array)
-		{
-			if (drainAttackInfo.id == id)
-			{
-				return drainAttackInfo;
-			}
-		}
-		return null;
-	}
-
-	protected override void OnEnable()
-	{
-		base.OnEnable();
-		if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid() && isBoss)
-		{
-			MonoBehaviourSingleton<UIEnemyStatus>.I.SetTarget(this);
-		}
-		if (MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
-		{
-			MonoBehaviourSingleton<DropTargetMarkerManeger>.I.CheckTarget(this);
-		}
-		if (isRequireGhostShaderParam)
-		{
-			isRequireGhostShaderParam = false;
-			ChangeGhostShaderParam(ghostBuffEndParam, ghostBuffDuration);
-		}
-		if (isHideSpawn)
-		{
-			if (isHiding)
-			{
-				InitHide();
-			}
-			else
-			{
-				TurnUpImmediate();
-			}
-		}
-	}
-
-	protected override void OnDisable()
-	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		base.OnDisable();
-		if (forceEnemyOutCoroutine != null)
-		{
-			StopForceEnemyOut();
-			MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyOut(id, _position);
-		}
-		if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid() && isBoss)
-		{
-			MonoBehaviourSingleton<UIEnemyStatus>.I.SetTarget(null);
-		}
-		DeleteStatusGizmo();
-	}
-
-	public void CreateStatusGizmo()
-	{
-		if (!isBoss && !(uiEnemyStatusGizmo != null) && !isHiding && MonoBehaviourSingleton<UIStatusGizmoManager>.IsValid())
-		{
-			uiEnemyStatusGizmo = MonoBehaviourSingleton<UIStatusGizmoManager>.I.Create(this);
-		}
-	}
-
-	public void DeleteStatusGizmo()
-	{
-		if (uiEnemyStatusGizmo != null)
-		{
-			uiEnemyStatusGizmo.targetEnemy = null;
-			uiEnemyStatusGizmo = null;
-		}
-	}
-
-	protected override void Awake()
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		base.Awake();
-		loader = this.get_gameObject().AddComponent<EnemyLoader>();
-		enemyParameter = MonoBehaviourSingleton<InGameSettingsManager>.I.enemy;
-		downMaxRate = enemyParameter.downMaxRate;
-		isPierceAfterTarget = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.isPierceAfterTarget;
-		EnemyParam componentInChildren = this.get_gameObject().GetComponentInChildren<EnemyParam>();
-		if (componentInChildren != null)
-		{
-			componentInChildren.SetParam(this);
-			Object.DestroyImmediate(componentInChildren);
-			componentInChildren = null;
-		}
-		if (base._rigidbody == null)
-		{
-			base._rigidbody = this.get_gameObject().AddComponent<Rigidbody>();
-		}
-		base._rigidbody.set_collisionDetectionMode(1);
-		base._rigidbody.set_mass(1000f);
-		base._rigidbody.set_angularDrag(100f);
-		base._rigidbody.set_isKinematic(false);
-		base._rigidbody.set_constraints(116);
-		this.get_gameObject().set_layer(10);
-		stackBuffCtrl.Init();
-	}
-
-	protected override void Clear()
-	{
-		base.Clear();
-		regionInfos = null;
-		colliders = null;
-		targetPoints = null;
-		regionRoots = null;
-		m_nowAngryId = 0u;
-		if (m_execAngryIds != null)
-		{
-			m_execAngryIds.Clear();
-		}
-	}
-
-	public override void OnLoadComplete()
-	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0573: Unknown result type (might be due to invalid IL or missing references)
-		//IL_058b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05ca: Unknown result type (might be due to invalid IL or missing references)
-		if (base._collider == null)
-		{
-			SphereCollider val = this.get_gameObject().AddComponent<SphereCollider>();
-			val.set_radius(bodyRadius);
-			val.set_center(new Vector3(0f, bodyRadius, 0f));
-			base._collider = val;
-		}
-		Rigidbody val2 = base.body.get_gameObject().GetComponentInChildren<Rigidbody>();
-		if (val2 == null)
-		{
-			val2 = base.body.get_gameObject().AddComponent<Rigidbody>();
-		}
-		val2.set_useGravity(false);
-		val2.set_isKinematic(true);
-		EnemyTable.EnemyData enemyTableData = this.enemyTableData;
-		if (enemyTableData != null)
-		{
-			float num = 0f;
-			float num2 = 0f;
-			if (growTableData != null)
-			{
-				num = growTableData.hpRate;
-				num2 = growTableData.atkRate;
-			}
-			else
-			{
-				num = enemyTableData.hpRate;
-				num2 = enemyTableData.atkRate;
-			}
-			if (regionInfos == null)
-			{
-				Log.Error("regionInfos is null. Check enemy data.");
-			}
-			if (!string.IsNullOrEmpty(enemyTableData.convertRegionKey))
-			{
-				int i = 0;
-				for (int num3 = attackInfos.Length; i < num3; i++)
-				{
-					string b = attackInfos[i].name + "_" + enemyTableData.convertRegionKey;
-					int j = 0;
-					for (int num4 = convertAttackInfos.Length; j < num4; j++)
-					{
-						if (convertAttackInfos[j].name == b)
-						{
-							convertAttackInfos[j].name = attackInfos[i].name;
-							attackInfos[i] = convertAttackInfos[j];
-							break;
-						}
-					}
-				}
-				int k = 0;
-				for (int num5 = regionInfos.Length; k < num5; k++)
-				{
-					string b2 = regionInfos[k].name + "_" + enemyTableData.convertRegionKey;
-					int l = 0;
-					for (int num6 = convertRegionInfos.Length; l < num6; l++)
-					{
-						if (convertRegionInfos[l].name == b2)
-						{
-							convertRegionInfos[l].name = regionInfos[k].name;
-							regionInfos[k] = convertRegionInfos[l];
-							break;
-						}
-					}
-				}
-			}
-			int m = 0;
-			for (int num7 = regionInfos.Length; m < num7; m++)
-			{
-				float num8 = (float)regionInfos[m].maxHP * num;
-				regionInfos[m].maxHP = (int)(num8 + 0.001f);
-				regionInfos[m].tolerance.InitializeElementTolerance(converteElementToleranceTable);
-			}
-			int n = 0;
-			for (int num9 = attackInfos.Length; n < num9; n++)
-			{
-				AttackHitInfo attackHitInfo = attackInfos[n] as AttackHitInfo;
-				if (attackHitInfo != null)
-				{
-					attackHitInfo.atkRate = num2;
-				}
-			}
-		}
-		base.OnLoadComplete();
-		SetAnimUpdatePhysics(isBoss);
-		InitializeRegionWork();
-		BarrierHp = BarrierHpMax;
-		base.ignoreHitAttackColliders.Clear();
-		EnemyColliderSettings[] componentsInChildren = base.body.GetComponentsInChildren<EnemyColliderSettings>();
-		int num10 = 0;
-		for (int num11 = componentsInChildren.Length; num10 < num11; num10++)
-		{
-			if (!(componentsInChildren[num10].targetCollider == null) && componentsInChildren[num10].ignoreHitAttack)
-			{
-				base.ignoreHitAttackColliders.Add(componentsInChildren[num10].targetCollider);
-			}
-		}
-		Utility.SetLayerWithChildren(base._transform, 11);
-		this.get_gameObject().set_layer(10);
-		colliders = this.get_gameObject().GetComponentsInChildren<Collider>();
-		targetPoints = this.get_gameObject().GetComponentsInChildren<TargetPoint>();
-		regionRoots = this.get_gameObject().GetComponentsInChildren<RegionRoot>();
-		int num12 = 0;
-		for (int num13 = targetPoints.Length; num12 < num13; num12++)
-		{
-			targetPoints[num12].owner = this;
-			int num14 = 0;
-			for (int num15 = regionRoots.Length; num14 < num15; num14++)
-			{
-				if (Array.IndexOf(regionRoots[num14].subRegionIDs, targetPoints[num12].regionID) >= 0)
-				{
-					targetPoints[num12].subRegionRoot = regionRoots[num14];
-				}
-			}
-		}
-		int num16 = 0;
-		for (int num17 = regionRoots.Length; num16 < num17; num16++)
-		{
-			if (regionRoots[num16].isDeactive)
-			{
-				regionRoots[num16].get_gameObject().SetActive(false);
-			}
-		}
-		if (stepCtrl != null)
-		{
-			stepCtrl.stampDistance = enemyParameter.stampDistance;
-		}
-		if (MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
-		{
-			MonoBehaviourSingleton<TargetMarkerManager>.I.updateShadowSealingFlag = true;
-		}
-		if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid() && isBoss)
-		{
-			MonoBehaviourSingleton<UIEnemyStatus>.I.SetTarget(this);
-		}
-		if (MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
-		{
-			MonoBehaviourSingleton<DropTargetMarkerManeger>.I.CheckTarget(this);
-		}
-		if (!willStock)
-		{
-			AutoBuffProc();
-			if (isHideSpawn)
-			{
-				isHiding = true;
-				InitHide();
-			}
-		}
-		InitializeBarrierEffect();
-		tailController = this.get_gameObject().GetComponentInChildren<TailController>(true);
-		willStock = false;
-		ColliderWeightCtl[] componentsInChildren2 = this.get_gameObject().GetComponentsInChildren<ColliderWeightCtl>();
-		int num18 = 0;
-		for (int num19 = componentsInChildren2.Length; num18 < num19; num18++)
-		{
-			componentsInChildren2[num18].SetAnimator(loader.GetAnimator());
-		}
-		TargetPointWeightCtl[] componentsInChildren3 = this.get_gameObject().GetComponentsInChildren<TargetPointWeightCtl>();
-		int num20 = 0;
-		for (int num21 = componentsInChildren3.Length; num20 < num21; num20++)
-		{
-			componentsInChildren3[num20].SetAnimator(loader.GetAnimator());
-		}
-		skinnedMeshRendererList = this.GetComponentsInChildren<SkinnedMeshRenderer>();
-		if (MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo())
-		{
-			arenaConditionList = MonoBehaviourSingleton<InGameManager>.I.GetArenaConditions();
-			if (!arenaConditionList.IsNullOrEmpty())
-			{
-				for (int num22 = 0; num22 < arenaConditionList.Length; num22++)
-				{
-					switch (arenaConditionList[num22])
-					{
-					case ARENA_CONDITION.DAMAGE_OFF_WEAPON:
-						isArenaDamageOffWeapon = true;
-						break;
-					case ARENA_CONDITION.DAMAGE_OFF_MAGI:
-						isArenaDamageOffMagi = true;
-						break;
-					}
-				}
-			}
-		}
-	}
-
-	private void AutoBuffProc()
-	{
-		if (AutoBuffParamList != null && AutoBuffParamList.Length > 0)
-		{
-			AutoBuffParam[] autoBuffParamList = AutoBuffParamList;
-			foreach (AutoBuffParam autoBuffParam in autoBuffParamList)
-			{
-				float num = autoBuffParam.time;
-				if (num < 0f)
-				{
-					num = 43200f;
-				}
-				BuffParam.BuffData buffData = new BuffParam.BuffData();
-				buffData.type = autoBuffParam.type;
-				buffData.time = num;
-				buffData.value = autoBuffParam.value;
-				OnBuffStart(buffData);
-			}
-		}
-	}
-
-	private void InitializeRegionWork()
-	{
-		if (regionWorks == null)
-		{
-			regionWorks = new EnemyRegionWork[regionInfos.Length];
-		}
-		for (int i = 0; i < regionWorks.Length; i++)
-		{
-			RegionInfo regionInfo = regionInfos[i];
-			int parentRegionId = SearchRegionID(regionInfo.parentRegionName);
-			if (regionWorks[i] == null)
-			{
-				regionWorks[i] = new EnemyRegionWork();
-			}
-			regionWorks[i].Initialize(regionInfo, parentRegionId, i);
-		}
-		if (regionWorks.Length > 0)
-		{
-			int num3 = base.hpMax = (base.hp = regionWorks[0].hp);
-			if (madModeHpThreshold > 0 && (int)enemyLevel >= madModeLvThreshold)
-			{
-				madModeHp = Mathf.CeilToInt((float)madModeHpThreshold * 0.01f * (float)base.hpMax);
-			}
-			else
-			{
-				madModeHp = 0;
-			}
-		}
-	}
-
-	private int SearchRegionID(string targetRegionName)
-	{
-		if (string.IsNullOrEmpty(targetRegionName))
-		{
-			return -1;
-		}
-		if (regionInfos == null || regionInfos.Length <= 0)
-		{
-			return -1;
-		}
-		for (int i = 0; i < regionInfos.Length; i++)
-		{
-			if (regionInfos[i].name == targetRegionName)
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	protected override void Initialize()
-	{
-		base.Initialize();
-		if (!isBoss)
-		{
-			base.isLocalDamageApply = true;
-			localDamage = 0;
-		}
-	}
-
-	public void ApplyExploreBossStatus(ExploreBossStatus status)
-	{
-		if (status != null)
-		{
-			base.hp = status.hp;
-			BarrierHp = status.barrierHp;
-			downCount = status.downCount;
-			base.ShieldHp = status.shieldHp;
-			if (status.regionWorks != null)
-			{
-				for (int i = 0; i < regionWorks.Length; i++)
-				{
-					if (status.regionWorks.Length > i)
-					{
-						regionWorks[i].CopyFrom(status.regionWorks[i]);
-					}
-				}
-			}
-			UpdateRegionVisual();
-			if (IsValidShield())
-			{
-				RequestShieldShaderEffect();
-			}
-			NowAngryID = status.nowAngryId;
-			m_execAngryIds.Clear();
-			if (status.execAngryIds != null && status.execAngryIds.Length > 0)
-			{
-				m_execAngryIds.AddRange(status.execAngryIds);
-			}
-			if (status.isMadMode)
-			{
-				LocalMadModeStart();
-			}
-		}
-	}
-
-	protected override uint GetVoiceChannel()
-	{
-		return 1u;
-	}
-
-	protected override bool EnablePlaySound()
-	{
-		if (!MonoBehaviourSingleton<InGameProgress>.IsValid())
-		{
-			return true;
-		}
-		if (isBoss)
-		{
-			return true;
-		}
-		if (MonoBehaviourSingleton<InGameProgress>.I.isHappenQuestDirection)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	public override bool DestroyObject()
-	{
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		if (base.isLoading)
-		{
-			base.isDestroyWaitFlag = true;
-			return false;
-		}
-		aegisCtrl = null;
-		if (isBoss)
-		{
-			return base.DestroyObject();
-		}
-		if (base.packetSender != null)
-		{
-			base.packetSender.OnDestroyObject();
-		}
-		this.get_gameObject().SetActive(false);
-		MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(this);
-		base.isDestroyWaitFlag = false;
-		return true;
-	}
-
-	public void ClearDead()
-	{
-		base._collider.set_enabled(true);
-		if (colliders != null)
-		{
-			int i = 0;
-			for (int num = colliders.Length; i < num; i++)
-			{
-				colliders[i].set_enabled(true);
-			}
-		}
-		badStatusMax.Copy(badStatusBase);
-		base.isDead = false;
-		hitOffFlag = HIT_OFF_FLAG.NONE;
-		base.isSetAppearPos = false;
-		isStoke = true;
-		base.isCoopInitialized = false;
-		animatorBoolList.Clear();
-		changeTriggerList.Clear();
-		ActIdle(false, -1f);
-		localDamage = 0;
-		isRequireGhostShaderParam = false;
-		isHiding = isHideSpawn;
-		EnemyController enemyController = base.controller as EnemyController;
-		if (enemyController != null)
-		{
-			enemyController.Reset();
-		}
-		InitializeRegionWork();
-		BarrierHp = BarrierHpMax;
-		StopForceEnemyOut();
-		AutoBuffProc();
-	}
-
-	protected override void Update()
-	{
-		//IL_0233: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0243: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0284: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0290: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_082a: Unknown result type (might be due to invalid IL or missing references)
-		base.Update();
-		if (hitShockLightFlag)
-		{
-			hitShockLightTime += Time.get_deltaTime();
-			if (hitShockLightTime >= enemyParameter.hitShockLightTime)
-			{
-				loader.ResetRimParams();
-				hitShockLightFlag = false;
-				hitShockLightTime = 0f;
-			}
-			else if (loader.materialParamsList != null)
-			{
-				int ID_RIM_POWER = Shader.PropertyToID("_RimPower");
-				int ID_RIM_WIDTH = Shader.PropertyToID("_RimWidth");
-				float num = hitShockLightTime / enemyParameter.hitShockLightTime;
-				float sin = Mathf.Sin(3.14159274f * num);
-				loader.materialParamsList.ForEach(delegate(EnemyLoader.MaterialParams prm)
-				{
-					if (prm.hasRimPower)
-					{
-						float num6 = prm.defaultRimPower + (enemyParameter.hitShockLightRimPower - prm.defaultRimPower) * sin;
-						prm.material.SetFloat(ID_RIM_POWER, num6);
-					}
-					if (prm.hasRimWidth)
-					{
-						float num7 = prm.defaultRimWidth + (enemyParameter.hitShockLightRimWidth - prm.defaultRimWidth) * sin;
-						prm.material.SetFloat(ID_RIM_WIDTH, num7);
-					}
-				});
-			}
-		}
-		if (warpViewFlag)
-		{
-			warpViewRate += warpViewRatePerTime * Time.get_deltaTime();
-			if (warpViewRatePerTime >= 0f && warpViewRate >= 1f)
-			{
-				warpViewRate = 1f;
-				warpViewFlag = false;
-			}
-			else if (warpViewRatePerTime < 0f && warpViewRate <= 0f)
-			{
-				warpViewRate = 0f;
-				warpViewFlag = false;
-			}
-			SetWarpVisible(warpViewRate);
-		}
-		else if (warpViewRate > 0f)
-		{
-			SetWarpVisible(warpViewRate);
-		}
-		downHealInterval -= Time.get_deltaTime();
-		if (downHealInterval <= 0f)
-		{
-			downHealInterval = 0f;
-			downTotal -= downHeal * Time.get_deltaTime();
-			if (downTotal < 0f)
-			{
-				downTotal = 0f;
-			}
-		}
-		if (hitShockOffsetFlag)
-		{
-			hitShockOffsetTime += Time.get_deltaTime();
-			if (hitShockOffsetTime >= enemyParameter.hitShockOffsetTime)
-			{
-				base.body.set_localPosition(Vector3.get_zero());
-				hitShockOffset = Vector3.get_zero();
-				hitShockOffsetFlag = false;
-				hitShockOffsetTime = 0f;
-			}
-			else
-			{
-				float num2 = hitShockOffsetTime / enemyParameter.hitShockOffsetTime;
-				object body = (object)base.body;
-				body.set_position(body.get_position() - hitShockOffset);
-				hitShockOffset = hitShockVec * (enemyParameter.hitShockOffsetLength * Mathf.Sin(3.14159274f * num2));
-				object body2 = (object)base.body;
-				body2.set_position(body2.get_position() + hitShockOffset);
-			}
-		}
-		UpdateRandomShot();
-		if (regionWorks != null)
-		{
-			int num3 = regionWorks.Length;
-			for (int i = 0; i < num3; i++)
-			{
-				regionWorks[i].Update();
-			}
-		}
-		_UpdateBleed();
-		_UpdateShadowSealing();
-		if (base.isInitialized && isBoss)
-		{
-			DrainRecoverProc();
-		}
-		int count = animLayerWeightChangeInfo.Count;
-		if (count > 0)
-		{
-			Animator animator = loader.GetAnimator();
-			for (int j = 0; j < count; j++)
-			{
-				AnimationLayerWeightChangeInfo animationLayerWeightChangeInfo = animLayerWeightChangeInfo[j];
-				if (animationLayerWeightChangeInfo.aliveFlag)
-				{
-					float num4 = animationLayerWeightChangeInfo.spd * Time.get_deltaTime();
-					if (num4 > 0f)
-					{
-						if (animationLayerWeightChangeInfo.weight + num4 >= animationLayerWeightChangeInfo.target)
-						{
-							animationLayerWeightChangeInfo.weight = animationLayerWeightChangeInfo.target;
-							animationLayerWeightChangeInfo.aliveFlag = false;
-						}
-						else
-						{
-							animationLayerWeightChangeInfo.weight += num4;
-						}
-					}
-					else if (animationLayerWeightChangeInfo.weight + num4 <= animationLayerWeightChangeInfo.target)
-					{
-						animationLayerWeightChangeInfo.weight = animationLayerWeightChangeInfo.target;
-						animationLayerWeightChangeInfo.aliveFlag = false;
-					}
-					else
-					{
-						animationLayerWeightChangeInfo.weight += num4;
-					}
-					animator.SetLayerWeight(animationLayerWeightChangeInfo.layerIndex, animationLayerWeightChangeInfo.weight);
-				}
-			}
-		}
-		if (blendColorChangeInfo != null && blendColorChangeInfo.aliveFlag)
-		{
-			bool flag = true;
-			float num5 = 0f;
-			if (!blendColorChangeInfo.endFlagR)
-			{
-				num5 = blendColorChangeInfo.spdR * Time.get_deltaTime();
-				if (num5 > 0f)
-				{
-					if (blendColorChangeInfo.currentColor.r + num5 >= blendColorChangeInfo.targetColor.r)
-					{
-						blendColorChangeInfo.currentColor.r = blendColorChangeInfo.targetColor.r;
-						blendColorChangeInfo.endFlagR = true;
-					}
-					else
-					{
-						blendColorChangeInfo.currentColor.r += num5;
-						flag = false;
-					}
-				}
-				else if (blendColorChangeInfo.currentColor.r + num5 <= blendColorChangeInfo.targetColor.r)
-				{
-					blendColorChangeInfo.currentColor.r = blendColorChangeInfo.targetColor.r;
-					blendColorChangeInfo.endFlagR = true;
-				}
-				else
-				{
-					blendColorChangeInfo.currentColor.r += num5;
-					flag = false;
-				}
-			}
-			if (!blendColorChangeInfo.endFlagG)
-			{
-				num5 = blendColorChangeInfo.spdG * Time.get_deltaTime();
-				if (num5 > 0f)
-				{
-					if (blendColorChangeInfo.currentColor.g + num5 >= blendColorChangeInfo.targetColor.g)
-					{
-						blendColorChangeInfo.currentColor.g = blendColorChangeInfo.targetColor.g;
-						blendColorChangeInfo.endFlagG = true;
-					}
-					else
-					{
-						blendColorChangeInfo.currentColor.g += num5;
-						flag = false;
-					}
-				}
-				else if (blendColorChangeInfo.currentColor.g + num5 <= blendColorChangeInfo.targetColor.g)
-				{
-					blendColorChangeInfo.currentColor.g = blendColorChangeInfo.targetColor.g;
-					blendColorChangeInfo.endFlagG = true;
-				}
-				else
-				{
-					blendColorChangeInfo.currentColor.g += num5;
-					flag = false;
-				}
-			}
-			if (!blendColorChangeInfo.endFlagB)
-			{
-				num5 = blendColorChangeInfo.spdB * Time.get_deltaTime();
-				if (num5 > 0f)
-				{
-					if (blendColorChangeInfo.currentColor.b + num5 >= blendColorChangeInfo.targetColor.b)
-					{
-						blendColorChangeInfo.currentColor.b = blendColorChangeInfo.targetColor.b;
-						blendColorChangeInfo.endFlagB = true;
-					}
-					else
-					{
-						blendColorChangeInfo.currentColor.b += num5;
-						flag = false;
-					}
-				}
-				else if (blendColorChangeInfo.currentColor.b + num5 <= blendColorChangeInfo.targetColor.b)
-				{
-					blendColorChangeInfo.currentColor.b = blendColorChangeInfo.targetColor.b;
-					blendColorChangeInfo.endFlagB = true;
-				}
-				else
-				{
-					blendColorChangeInfo.currentColor.b += num5;
-					flag = false;
-				}
-			}
-			if (!blendColorChangeInfo.endFlagR || !blendColorChangeInfo.endFlagG || !blendColorChangeInfo.endFlagB)
-			{
-				int k = 0;
-				for (int count2 = blendColorChangeInfo.materialList.Count; k < count2; k++)
-				{
-					blendColorChangeInfo.materialList[k].SetColor("_BlendColor", blendColorChangeInfo.currentColor);
-				}
-			}
-			if (!blendColorChangeInfo.endFlagBlendRate)
-			{
-				num5 = blendColorChangeInfo.spdBlendRate * Time.get_deltaTime();
-				if (num5 > 0f)
-				{
-					if (blendColorChangeInfo.currentBlendRate + num5 >= blendColorChangeInfo.targetblendRate)
-					{
-						blendColorChangeInfo.currentBlendRate = blendColorChangeInfo.targetblendRate;
-						blendColorChangeInfo.endFlagBlendRate = true;
-					}
-					else
-					{
-						blendColorChangeInfo.currentBlendRate += num5;
-						flag = false;
-					}
-				}
-				else if (blendColorChangeInfo.currentBlendRate + num5 <= blendColorChangeInfo.targetblendRate)
-				{
-					blendColorChangeInfo.currentBlendRate = blendColorChangeInfo.targetblendRate;
-					blendColorChangeInfo.endFlagBlendRate = true;
-				}
-				else
-				{
-					blendColorChangeInfo.currentBlendRate += num5;
-					flag = false;
-				}
-				int l = 0;
-				for (int count3 = blendColorChangeInfo.materialList.Count; l < count3; l++)
-				{
-					blendColorChangeInfo.materialList[l].SetFloat("_BlendRate", blendColorChangeInfo.currentBlendRate);
-				}
-			}
-			if (flag)
-			{
-				blendColorChangeInfo.aliveFlag = false;
-			}
-		}
-	}
-
-	private void _UpdateBleed()
-	{
-		if ((IsCoopNone() || IsOriginal()) && !object.ReferenceEquals(regionWorks, null))
-		{
-			float num = bleedCounter;
-			bleedCounter += Time.get_deltaTime();
-			float arrowBleedTimeInterval = MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedTimeInterval;
-			if ((int)(num / arrowBleedTimeInterval) != (int)(bleedCounter / arrowBleedTimeInterval))
-			{
-				bool flag = false;
-				BleedSyncData bleedSyncData = new BleedSyncData();
-				bleedSyncData.afterHP = base.hp;
-				int i = 0;
-				for (int num2 = regionWorks.Length; i < num2; i++)
-				{
-					bool flag2 = false;
-					if ((int)regionWorks[i].hp <= 0 && regionInfos[i].maxHP > 0)
-					{
-						flag2 = true;
-					}
-					if (regionInfos[i].breakAfterHit || !flag2)
-					{
-						BleedSyncData.BleedRegionWork bleedRegionWork = null;
-						int j = 0;
-						for (int count = regionWorks[i].bleedList.Count; j < count; j++)
-						{
-							BleedData bleedData = regionWorks[i].bleedList[j];
-							flag = true;
-							if (bleedRegionWork == null)
-							{
-								bleedRegionWork = new BleedSyncData.BleedRegionWork();
-								bleedRegionWork.id = i;
-								bleedRegionWork.afterHP = regionWorks[i].hp;
-								bleedRegionWork.damageList = new List<BleedSyncData.BleedDamageData>();
-							}
-							BleedSyncData.BleedDamageData bleedDamageData = new BleedSyncData.BleedDamageData();
-							bleedRegionWork.damageList.Add(bleedDamageData);
-							if (bleedData.skipFirst)
-							{
-								bleedDamageData.ownerID = bleedData.ownerID;
-								bleedDamageData.damage = 0;
-							}
-							else
-							{
-								int num3 = Mathf.CeilToInt((float)bleedData.damage);
-								if (bleedSyncData.afterHP > 0)
-								{
-									bleedSyncData.afterHP -= num3;
-									if (bleedSyncData.afterHP < 1)
-									{
-										bleedSyncData.afterHP = 1;
-									}
-								}
-								if (bleedRegionWork.afterHP > 0)
-								{
-									bleedRegionWork.afterHP -= num3;
-									if (bleedRegionWork.afterHP < 1)
-									{
-										bleedRegionWork.afterHP = 1;
-									}
-								}
-								bleedDamageData.ownerID = bleedData.ownerID;
-								bleedDamageData.damage = num3;
-							}
-						}
-						if (bleedRegionWork != null)
-						{
-							bleedSyncData.regionWorks.Add(bleedRegionWork);
-						}
-					}
-				}
-				if (flag)
-				{
-					OnUpdateBleedDamage(bleedSyncData);
-				}
-			}
-		}
-	}
-
-	private void _UpdateShadowSealing()
-	{
-		if (!IsDebuffShadowSealing() && (IsCoopNone() || IsOriginal()) && !object.ReferenceEquals(regionWorks, null))
-		{
-			int i = 0;
-			for (int num = regionWorks.Length; i < num; i++)
-			{
-				ShadowSealingData shadowSealingData = regionWorks[i].shadowSealingData;
-				if (shadowSealingData.ownerID != 0)
-				{
-					shadowSealingData.existSec -= Time.get_deltaTime();
-					if (shadowSealingData.existSec <= 0f)
-					{
-						ShadowSealingSyncData shadowSealingSyncData = new ShadowSealingSyncData();
-						shadowSealingSyncData.regionIndex = i;
-						OnUpdateShadowSealing(shadowSealingSyncData);
-					}
-				}
-			}
-		}
-	}
-
-	private void DrainRecoverProc()
-	{
-		if (IsCoopNone() || IsOriginal())
-		{
-			EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-			if (!(enemyBrain == null))
-			{
-				GrabController grabController = enemyBrain.actionCtrl.grabController;
-				if (grabController != null && grabController.IsGrabing())
-				{
-					DrainAttackInfo drainAtkInfo = grabController.drainAtkInfo;
-					if (drainAtkInfo != null && grabController.IsAliveGrabbedPlayerAll())
-					{
-						int num = (int)((float)base.hpMax * (drainAtkInfo.recoverRate * 0.01f));
-						if (num > 0 && base.hp < base.hpMax)
-						{
-							grabDrainRecoverTimer -= Time.get_deltaTime();
-							if (grabDrainRecoverTimer <= 0f)
-							{
-								RecoverHp(num);
-								grabDrainRecoverTimer = drainAtkInfo.recoverInterval;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	public void RecoverHp(int recoverValue)
-	{
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Expected O, but got Unknown
-		base.hp += recoverValue;
-		if (base.hp > base.hpMax)
-		{
-			base.hp = base.hpMax;
-		}
-		if (MonoBehaviourSingleton<UIDamageManager>.IsValid())
-		{
-			MonoBehaviourSingleton<UIDamageManager>.I.CreateEnemyRecoverHp(this, recoverValue, UIPlayerDamageNum.DAMAGE_COLOR.HEAL);
-		}
-		if (enemySender != null)
-		{
-			enemySender.OnRecoverHp(recoverValue);
-		}
-		if (base.effectPlayProcessor != null && effectDrainRecover == null)
-		{
-			List<EffectPlayProcessor.EffectSetting> settings = base.effectPlayProcessor.GetSettings("RECOVER_HP");
-			if (settings != null && settings.Count > 0)
-			{
-				Transform val = base.effectPlayProcessor.PlayEffect(settings[0], base._transform);
-				if (val != null)
-				{
-					effectDrainRecover = val.get_gameObject();
-				}
-			}
-		}
-	}
-
-	protected override void FixedUpdate()
-	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-		ACTION_ID actionID = base.actionID;
-		if (actionID == ACTION_ID.ATTACK && enableDash)
-		{
-			if (IsWallStay())
-			{
-				SetDashEnd();
-			}
-			else
-			{
-				Vector3 val = _position - dashBeforePos;
-				val.y = 0f;
-				dashNowDistance += val.get_magnitude();
-				dashBeforePos = _position;
-				bool flag = dashNowDistance >= dashMinDistance;
-				if (!base.actionPositionFlag)
-				{
-					if (flag)
-					{
-						SetDashEnd();
-						goto IL_0174;
-					}
-				}
-				else if (!dashOverFlag)
-				{
-					if (dashNowDistance >= dashMaxDistance)
-					{
-						dashOverFlag = true;
-						dashOverCheckDistance = dashNowDistance;
-					}
-					else
-					{
-						Vector3 val2 = base.actionPosition - _position;
-						val2.y = 0f;
-						Vector3 forward = _forward;
-						forward.y = 0f;
-						forward.Normalize();
-						float num = Vector3.Angle(forward, val2);
-						if (num > 90f)
-						{
-							dashOverFlag = true;
-							dashOverCheckDistance = dashNowDistance;
-						}
-					}
-				}
-				if (dashOverFlag && flag && dashNowDistance - dashOverCheckDistance >= dashOverDistance)
-				{
-					SetDashEnd();
-				}
-			}
-		}
-		goto IL_0174;
-		IL_0174:
-		base.FixedUpdate();
-	}
-
-	protected override void LateUpdate()
-	{
-		base.LateUpdate();
-		if (updateFrame != Time.get_frameCount())
-		{
-			updateFrame = Time.get_frameCount();
-			selfHitEffectCool -= Time.get_deltaTime();
-			if (selfHitEffectCool < 0f)
-			{
-				selfHitEffectCool = 0f;
-			}
-			otherHitEffectCool -= Time.get_deltaTime();
-			if (otherHitEffectCool < 0f)
-			{
-				otherHitEffectCool = 0f;
-			}
-		}
-	}
-
-	public override void SetActionTarget(StageObject target, bool send = true)
-	{
-		bool flag = false;
-		if (base.actionTarget != target)
-		{
-			flag = true;
-		}
-		base.actionTarget = target;
-		if (send && flag && base.characterSender != null)
-		{
-			base.characterSender.OnSetActionTarget(target);
-		}
-	}
-
-	public void OnUpdateBleedDamage(BleedSyncData sync_data)
-	{
-		//IL_0320: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0359: Unknown result type (might be due to invalid IL or missing references)
-		//IL_035e: Expected O, but got Unknown
-		//IL_037b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_038e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d9: Expected O, but got Unknown
-		int num = base.hp - sync_data.afterHP;
-		if (num < 0)
-		{
-			num = 0;
-		}
-		base.hp = sync_data.afterHP;
-		if (regionWorks != null)
-		{
-			int i = 0;
-			for (int num2 = regionWorks.Length; i < num2; i++)
-			{
-				BleedSyncData.BleedRegionWork bleedRegionWork = null;
-				int j = 0;
-				for (int count = sync_data.regionWorks.Count; j < count; j++)
-				{
-					if (sync_data.regionWorks[j].id == i)
-					{
-						bleedRegionWork = sync_data.regionWorks[j];
-						regionWorks[i].hp = bleedRegionWork.afterHP;
-						break;
-					}
-				}
-				int num3 = 0;
-				while (num3 < regionWorks[i].bleedList.Count)
-				{
-					BleedData bleedData = regionWorks[i].bleedList[num3];
-					BleedWork bleedWork = null;
-					int k = 0;
-					for (int count2 = regionWorks[i].bleedWorkList.Count; k < count2; k++)
-					{
-						if (regionWorks[i].bleedWorkList[k].ownerID == bleedData.ownerID)
-						{
-							bleedWork = regionWorks[i].bleedWorkList[k];
-							break;
-						}
-					}
-					BleedSyncData.BleedDamageData bleedDamageData = null;
-					if (bleedRegionWork != null)
-					{
-						int l = 0;
-						for (int count3 = bleedRegionWork.damageList.Count; l < count3; l++)
-						{
-							if (bleedRegionWork.damageList[l].ownerID == bleedData.ownerID)
-							{
-								bleedDamageData = bleedRegionWork.damageList[l];
-								break;
-							}
-						}
-					}
-					bool flag = false;
-					bool flag2 = false;
-					if (bleedData.skipFirst)
-					{
-						bleedData.skipFirst = false;
-						if (bleedDamageData != null && bleedDamageData.damage == 0)
-						{
-							flag2 = true;
-						}
-					}
-					if (bleedDamageData == null)
-					{
-						flag = true;
-					}
-					else if (!flag2)
-					{
-						bleedData.cnt--;
-						if (bleedData.cnt <= 0)
-						{
-							flag = true;
-						}
-					}
-					if (bleedDamageData != null && !flag2)
-					{
-						if (MonoBehaviourSingleton<CoopManager>.IsValid())
-						{
-							MonoBehaviourSingleton<CoopManager>.I.coopStage.battleUserLog.Add(this, bleedDamageData);
-						}
-						int num4 = bleedDamageData.damage;
-						if (num4 > num)
-						{
-							num4 = num;
-						}
-						if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
-						{
-							MonoBehaviourSingleton<InGameRecorder>.I.RecordGivenDamage(bleedDamageData.ownerID, num4);
-						}
-						if (QuestManager.IsValidInGameExplore() && isBoss && bleedData.IsOwnerSelf())
-						{
-							ExplorePlayerStatus myExplorePlayerStatus = MonoBehaviourSingleton<QuestManager>.I.GetMyExplorePlayerStatus();
-							int num5 = myExplorePlayerStatus.givenTotalDamage + num4;
-							myExplorePlayerStatus.SyncTotalDamageToBoss(num5);
-							MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendExploreBossDamage(num5);
-						}
-						num -= num4;
-						if (bleedData.IsOwnerSelf() && bleedWork != null && bleedWork.bleedEffect != null)
-						{
-							if (enemyParameter.showDamageNum && MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedShowDamage)
-							{
-								AtkAttribute atkAttribute = new AtkAttribute();
-								atkAttribute.normal = (float)bleedDamageData.damage;
-								CreateDamageNum(bleedWork.bleedEffect.get_position(), atkAttribute, false, 0);
-							}
-							if (warpViewRate <= 0f)
-							{
-								Transform effect = EffectManager.GetEffect(MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedDamageEffectName, bleedWork.bleedEffect.get_parent());
-								if (effect != null)
-								{
-									effect.set_localScale(bleedWork.bleedEffect.get_localScale());
-									effect.set_localPosition(bleedWork.bleedEffect.get_localPosition());
-									effect.set_localRotation(bleedWork.bleedEffect.get_localRotation());
-								}
-							}
-						}
-					}
-					if (flag)
-					{
-						if (bleedWork != null)
-						{
-							if (bleedWork.bleedEffect != null)
-							{
-								EffectManager.ReleaseEffect(bleedWork.bleedEffect.get_gameObject(), true, false);
-								bleedWork.bleedEffect = null;
-							}
-							regionWorks[i].bleedWorkList.Remove(bleedWork);
-						}
-						regionWorks[i].bleedList.RemoveAt(num3);
-					}
-					else
-					{
-						num3++;
-					}
-				}
-			}
-			if (IsMirror() || IsPuppet())
-			{
-				bool flag3 = false;
-				int m = 0;
-				for (int num6 = regionWorks.Length; m < num6; m++)
-				{
-					if (regionWorks[m].bleedList.Count > 0)
-					{
-						flag3 = true;
-					}
-				}
-				if (flag3)
-				{
-					float arrowBleedTimeInterval = MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedTimeInterval;
-					StartWaitingPacket(WAITING_PACKET.ENEMY_UPDATE_BLEED_DAMAGE, false, arrowBleedTimeInterval * 2f);
-				}
-				else
-				{
-					EndWaitingPacket(WAITING_PACKET.ENEMY_UPDATE_BLEED_DAMAGE);
-				}
-			}
-		}
-		if (enemySender != null)
-		{
-			enemySender.OnUpdateBleedDamage(sync_data);
-		}
-	}
-
-	public void ClearBleedDamageAll()
-	{
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Expected O, but got Unknown
-		if (regionWorks != null)
-		{
-			int i = 0;
-			for (int num = regionWorks.Length; i < num; i++)
-			{
-				regionWorks[i].bleedList.Clear();
-				int j = 0;
-				for (int count = regionWorks[i].bleedWorkList.Count; j < count; j++)
-				{
-					BleedWork bleedWork = regionWorks[i].bleedWorkList[j];
-					if (bleedWork.bleedEffect != null)
-					{
-						EffectManager.ReleaseEffect(bleedWork.bleedEffect.get_gameObject(), true, false);
-						bleedWork.bleedEffect = null;
-					}
-				}
-				regionWorks[i].bleedWorkList.Clear();
-			}
-		}
-		if (IsMirror() || IsPuppet())
-		{
-			EndWaitingPacket(WAITING_PACKET.ENEMY_UPDATE_BLEED_DAMAGE);
-		}
-	}
-
-	public void OnUpdateShadowSealing(ShadowSealingSyncData syncData)
-	{
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Expected O, but got Unknown
-		if (!object.ReferenceEquals(regionWorks, null))
-		{
-			EnemyRegionWork enemyRegionWork = regionWorks[syncData.regionIndex];
-			ShadowSealingData shadowSealingData = enemyRegionWork.shadowSealingData;
-			shadowSealingData.ownerID = 0;
-			shadowSealingData.existSec = 0f;
-			shadowSealingData.extendRate = 1f;
-			if (!object.ReferenceEquals(enemyRegionWork.shadowSealingEffect, null))
-			{
-				EffectManager.ReleaseEffect(enemyRegionWork.shadowSealingEffect.get_gameObject(), true, false);
-				enemyRegionWork.shadowSealingEffect = null;
-			}
-		}
-		if (IsMirror() || IsPuppet())
-		{
-			EndWaitingPacket(WAITING_PACKET.ENEMY_UPDATE_SHADOWSEALING);
-		}
-		if (enemySender != null)
-		{
-			enemySender.OnUpdateShadowSealing(syncData);
-		}
-	}
-
-	public void ClearShadowSealingAll(bool isClearOwnerID = true, bool isEndPacket = true)
-	{
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Expected O, but got Unknown
-		if (!object.ReferenceEquals(regionWorks, null))
-		{
-			int i = 0;
-			for (int num = regionWorks.Length; i < num; i++)
-			{
-				ShadowSealingData shadowSealingData = regionWorks[i].shadowSealingData;
-				if (isClearOwnerID)
-				{
-					shadowSealingData.ownerID = 0;
-				}
-				shadowSealingData.existSec = 0f;
-				shadowSealingData.extendRate = 1f;
-				if (!object.ReferenceEquals(regionWorks[i].shadowSealingEffect, null))
-				{
-					EffectManager.ReleaseEffect(regionWorks[i].shadowSealingEffect.get_gameObject(), true, false);
-					regionWorks[i].shadowSealingEffect = null;
-				}
-			}
-		}
-		if (isEndPacket && (IsMirror() || IsPuppet()))
-		{
-			EndWaitingPacket(WAITING_PACKET.ENEMY_UPDATE_SHADOWSEALING);
-		}
-	}
-
-	public void SetDashEnd()
-	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		if (enableDash)
-		{
-			SetChangeTrigger(dashEndTrigger);
-			enableDash = false;
-			dashBeforePos = Vector3.get_zero();
-			dashNowDistance = 0f;
-			dashOverDistance = 0f;
-			dashMinDistance = 0f;
-			dashMaxDistance = 0f;
-			dashEndTrigger = null;
-			dashOverFlag = false;
-			dashOverCheckDistance = 0f;
-			rotateSafeMode = false;
-		}
-	}
-
-	public override void ActDead(bool force_sync = false, bool recieve_direct = false)
-	{
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
-		base.badStatusTotal.Reset();
-		badStatusMax.Copy(badStatusBase);
-		base.ActDead(force_sync, recieve_direct);
-		PlayMotion(7, 0f);
-		PrepareEnemyOut();
-		if (MonoBehaviourSingleton<CoopNetworkManager>.IsValid())
-		{
-			if (IsCoopNone() || IsOriginal())
-			{
-				StopForceEnemyOut();
-				MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyOut(id, _position);
-			}
-			else if (force_sync)
-			{
-				ForceEnemyOut();
-			}
-		}
-		bool flag = false;
-		if (MonoBehaviourSingleton<StageObjectManager>.I.boss == this)
-		{
-			UpdateBreakIDLists();
-			if (QuestManager.IsValidInGame() && MonoBehaviourSingleton<InGameProgress>.IsValid())
-			{
-				flag = true;
-				MonoBehaviourSingleton<InGameProgress>.I.BattleComplete(false);
-			}
-		}
-		if (!flag)
-		{
-			SetNextTrigger(0);
-		}
-		if (IsFieldEnemyBoss())
-		{
-			MonoBehaviourSingleton<CoopManager>.I.coopStage.OnDefeatFieldEnemyBoss();
-		}
-	}
-
-	private bool IsFieldEnemyBoss()
-	{
-		if (!MonoBehaviourSingleton<InGameProgress>.IsValid())
-		{
-			return false;
-		}
-		if (MonoBehaviourSingleton<CoopManager>.IsValid() && !MonoBehaviourSingleton<CoopManager>.I.coopStage.GetIsInFieldEnemyBossBattle())
-		{
-			return false;
-		}
-		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
-		{
-			return false;
-		}
-		if (MonoBehaviourSingleton<StageObjectManager>.I.IsFieldEnemyBoss(id))
-		{
-			return true;
-		}
-		return false;
-	}
-
-	private void PrepareEnemyOut()
-	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		DeleteStatusGizmo();
-		if (MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
-		{
-			MonoBehaviourSingleton<DropTargetMarkerManeger>.I.RemoveTarget(base._transform);
-		}
-		UpdateNextMotion();
-		SetVelocity(Vector3.get_zero(), VELOCITY_TYPE.NONE);
-		base._rigidbody.set_velocity(Vector3.get_zero());
-		base._collider.set_enabled(false);
-		if (!isBoss && colliders != null)
-		{
-			int i = 0;
-			for (int num = colliders.Length; i < num; i++)
-			{
-				colliders[i].set_enabled(false);
-			}
-		}
-		ClearBleedDamageAll();
-		ClearShadowSealingAll(true, true);
-		for (int num2 = m_activeAttackObstacleList.Count - 1; num2 >= 0; num2--)
-		{
-			AttackShotNodeLink attackShotNodeLink = m_activeAttackObstacleList[num2];
-			attackShotNodeLink.RequestDestroy();
-		}
-		if (m_effectElectricShock != null)
-		{
-			Object.Destroy(m_effectElectricShock);
-		}
-		if (m_effectBurning != null)
-		{
-			Object.Destroy(m_effectBurning);
-		}
-		if (m_effectSpeedDown != null)
-		{
-			Object.Destroy(m_effectSpeedDown);
-		}
-		m_effectElectricShock = null;
-		m_effectBurning = null;
-		m_effectSpeedDown = null;
-	}
-
-	public override void VanishLocal()
-	{
-		PrepareVanishLocal();
-		OnDeadEnd();
-	}
-
-	public override void PrepareVanishLocal()
-	{
-		ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
-		base.badStatusTotal.Reset();
-		badStatusMax.Copy(badStatusBase);
-		base.PrepareVanishLocal();
-		PrepareEnemyOut();
-		bool flag = false;
-		if (MonoBehaviourSingleton<StageObjectManager>.I.boss == this)
-		{
-			UpdateBreakIDLists();
-		}
-		if (!flag)
-		{
-			SetNextTrigger(0);
-		}
-	}
-
-	public void OnEndEscape()
-	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<CoopNetworkManager>.IsValid())
-		{
-			MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyOutEscape(id, _position);
-		}
-	}
-
-	private void ForceEnemyOut()
-	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
-		StopForceEnemyOut();
-		forceEnemyOutCoroutine = this.StartCoroutine(DoForceEnemyOut());
-	}
-
-	private IEnumerator DoForceEnemyOut()
-	{
-		yield return (object)new WaitForSeconds(enemyParameter.guestEnemyOutTime);
-		if (forceEnemyOutCoroutine != null)
-		{
-			forceEnemyOutCoroutine = null;
-		}
-		MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyOut(id, _position);
-	}
-
-	public void StopForceEnemyOut()
-	{
-		if (forceEnemyOutCoroutine != null)
-		{
-			this.StopCoroutine(forceEnemyOutCoroutine);
-			forceEnemyOutCoroutine = null;
-		}
-	}
-
-	public void UpdateBreakIDLists()
-	{
-		if (MonoBehaviourSingleton<StageObjectManager>.I.boss == this && MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopStage.bossBreakIDLists != null)
-		{
-			int index = 0;
-			if (QuestManager.IsValidInGame())
-			{
-				index = (int)MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex;
-			}
-			MonoBehaviourSingleton<CoopManager>.I.coopStage.bossBreakIDLists[index] = GetBreakRegionIDList();
-		}
-	}
-
-	public override void OnDeadEnd()
-	{
-		DestroyObject();
-	}
-
-	public virtual void ActStep(int motion_id = 0)
-	{
-		if (motion_id == 0)
-		{
-			motion_id = 115;
-		}
-		EndAction();
-		base.actionID = ACTION_ID.MAX;
-		PlayMotion(motion_id, -1f);
-		if (enemySender != null)
-		{
-			enemySender.OnActStep(motion_id);
-		}
-	}
-
-	public virtual void ActAngry(int angryActionId, uint angryId)
-	{
-		EndAction();
-		NowAngryID = angryId;
-		base.actionID = (ACTION_ID)14;
-		PlayMotion(124 + angryActionId, -1f);
-		if (enemySender != null)
-		{
-			enemySender.OnActAngry(angryActionId, angryId);
-		}
-	}
-
-	public void RegisterAngryID(uint angryId)
-	{
-		if (m_execAngryIds != null && !m_execAngryIds.Contains(angryId))
-		{
-			m_execAngryIds.Add(angryId);
-		}
-	}
-
-	public void UnRegisterAngryID(uint angryId)
-	{
-		if (m_execAngryIds != null && m_execAngryIds.Contains(angryId))
-		{
-			m_execAngryIds.Remove(angryId);
-		}
-	}
-
-	public bool CheckAngryID(uint angryId)
-	{
-		return m_execAngryIds.Contains(angryId);
-	}
-
-	public virtual void ActDown()
-	{
-		bool flag = !IsDebuffShadowSealing();
-		bool flag2 = IsDownTime();
-		if (flag)
-		{
-			EndAction();
-		}
-		ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
-		if (flag2)
-		{
-			downTime = Time.get_time() + downLoopStartTime + downLoopTime;
-			downGaugeDecreaseStartTime = Time.get_time() + downLoopStartTime;
-			downDecreaseValuePerSecond = (float)downMax / downLoopTime;
-			downDecreaseRates = MonoBehaviourSingleton<InGameSettingsManager>.I.player.ohsActionInfo.Soul_DownGaugeDecreaseRates;
-			currentDownValue = (float)downMax;
-		}
-		if (flag)
-		{
-			base.actionID = (ACTION_ID)13;
-			PlayMotion((!flag2) ? 117 : 118, -1f);
-		}
-		else
-		{
-			AnimEventData.EventData eventData = new AnimEventData.EventData();
-			eventData.attackMode = Player.ATTACK_MODE.NONE;
-			eventData.intArgs = new int[1]
-			{
-				1
-			};
-			EventWeakPointAllON(eventData);
-			if (!shadowSealingStackDebuff.Contains((ACTION_ID)13))
-			{
-				shadowSealingStackDebuff.Add((ACTION_ID)13);
-			}
-		}
-		OnActReaction();
-	}
-
-	private bool UpdateDownAction()
-	{
-		if (!IsDownTime())
-		{
-			return false;
-		}
-		if (downGaugeDecreaseStartTime - Time.get_time() < 0f)
-		{
-			int stackCount = stackBuffCtrl.GetStackCount(StackBuffController.STACK_TYPE.SNATCH);
-			if (!downDecreaseRates.IsNullOrEmpty())
-			{
-				int num = Mathf.Min(stackCount, downDecreaseRates.Length - 1);
-				currentDownValue -= downDecreaseValuePerSecond * Mathf.Max(0f, 1f - downDecreaseRates[num]) * Time.get_deltaTime();
-				if (stackCount > 0)
-				{
-					downTime += ((!(downDecreaseValuePerSecond <= 0f)) ? Mathf.Clamp01(downDecreaseValuePerSecond * downDecreaseRates[num] * Time.get_deltaTime() / downDecreaseValuePerSecond) : 0f);
-				}
-			}
-		}
-		if (downTime - Time.get_time() > 0f)
-		{
-			return false;
-		}
-		ActDownEnd();
-		if (!IsDebuffShadowSealing())
-		{
-			SetNextTrigger(0);
-		}
-		return true;
-	}
-
-	private void ActDownEnd()
-	{
-		if (IsDebuffShadowSealing())
-		{
-			_EndDebuffAction((ACTION_ID)13);
-			EventWeakPointAllOFF(null);
-			if (shadowSealingStackDebuff.Contains((ACTION_ID)13))
-			{
-				shadowSealingStackDebuff.Remove((ACTION_ID)13);
-			}
-		}
-	}
-
-	public bool IsActDown()
-	{
-		if (IsDownTime())
-		{
-			return base.actionID == (ACTION_ID)13 || shadowSealingStackDebuff.Contains((ACTION_ID)13);
-		}
-		return false;
-	}
-
-	private bool IsDownTime()
-	{
-		bool result = false;
-		if (useDownLoopTime && downLoopStartTime >= 0f && downLoopTime >= 0f)
-		{
-			result = true;
-		}
-		return result;
-	}
-
-	public float GetDownTimeRate()
-	{
-		float result = 0f;
-		if (IsDownTime())
-		{
-			float num = downLoopTime - (downTime - Time.get_time());
-			result = ((!(num < 0f)) ? Mathf.Clamp(1f - num / downLoopTime, 0f, 1f) : 1f);
-		}
-		return result;
-	}
-
-	public float GetDownTimeRateExistSnatch()
-	{
-		return Mathf.Clamp01(currentDownValue / (float)downMax);
-	}
-
-	public virtual void ActDizzy()
-	{
-		EndAction();
-		ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
-		m_dizzyTime = Time.get_time() + DizzyReactionLoopTime;
-		base.actionID = (ACTION_ID)17;
-		PlayMotion(122, -1f);
-		OnActReaction();
-	}
-
-	public void ActCounter(int targetId)
-	{
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		EndAction();
-		counterFlag = true;
-		base.actionID = (ACTION_ID)16;
-		PlayMotion(119, -1f);
-		if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
-		{
-			MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(enemyTableData.name, STRING_CATEGORY.ENEMY_REACTION, kStrIdx_EnemyReaction_Counter);
-		}
-		if (IsOriginal() || IsCoopNone())
-		{
-			EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-			if (enemyBrain.targetCtrl != null)
-			{
-				StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.FindObject(targetId);
-				if (stageObject != null)
-				{
-					enemyBrain.targetCtrl.SetCurrentTarget(stageObject);
-					SetActionTarget(stageObject, true);
-					SetActionPosition(stageObject._position, true);
-					enemyBrain.fsm.ChangeState(STATE_TYPE.SELECT);
-				}
-			}
-		}
-		OnActReaction();
-	}
-
-	public override void ActFreezeStart()
-	{
-		if (!IsFreeze())
-		{
-			ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
-			base.ActFreezeStart();
-			if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
-			{
-				MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
-			}
-		}
-	}
-
-	protected override void ActFreezeEnd()
-	{
-		if (IsFreeze())
-		{
-			base.ActFreezeEnd();
-			if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
-			{
-				MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
-			}
-		}
-	}
-
-	public override void ActParalyze()
-	{
-		if (!IsDebuffShadowSealing() || !shadowSealingStackDebuff.Contains(ACTION_ID.PARALYZE))
-		{
-			ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
-			base.ActParalyze();
-			paralyzeTime = Time.get_time() + paralyzeLoopTime;
-			if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
-			{
-				MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
-			}
-		}
-	}
-
-	protected override void ActParalyzeEnd()
-	{
-		if (IsParalyze())
-		{
-			base.ActParalyzeEnd();
-			if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
-			{
-				MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
-			}
-		}
-	}
-
-	public void ActElectricShock()
-	{
-		ActDamage();
-		ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
-		CreateElectricShockEffect();
-	}
-
-	public override void ActMovePoint(Vector3 targetPos)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		if (!IsArrivalPosition(targetPos, 0f))
-		{
-			EndAction();
-			base.actionID = ACTION_ID.MOVE_POINT;
-			SetStateMovePoint(STATE_MOVE_POINT.INIT);
-			if (enemySender != null)
-			{
-				enemySender.OnActMovePoint(targetPos);
-			}
-		}
-	}
-
-	protected override void UpdateMovePointAction()
-	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-		switch (base.stateMovePoint)
-		{
-		case STATE_MOVE_POINT.INIT:
-			if (IsArrivalPosition(base.movePointPos, 0f))
-			{
-				SetStateMovePoint(STATE_MOVE_POINT.FINISH);
-			}
-			else
-			{
-				Vector3 val = base.movePointPos - _position;
-				Vector3 normalized = val.get_normalized();
-				if (!IsNeedToRotate(normalized))
-				{
-					PlayMotion(13, -1f);
-					SetStateMovePoint(STATE_MOVE_POINT.CHECK);
-				}
-				else
-				{
-					m_rotateForActTime = 0f;
-					m_rotateForActFinishTime = Mathf.Acos(Vector3.Dot(_forward, normalized)) / 0.0349065848f * (1f / (float)Application.get_targetFrameRate());
-					m_rotateForActStart_Quat = Quaternion.LookRotation(_forward);
-					m_rotateForActEnd_Quat = Quaternion.LookRotation(normalized);
-					Vector3 val2 = Vector3.Cross(_forward, normalized);
-					m_rotateForActMotionId = ((!(val2.y >= 0f)) ? 4 : 5);
-					PlayMotion(m_rotateForActMotionId, -1f);
-					SetStateMovePoint(STATE_MOVE_POINT.ROTATE);
-				}
-			}
-			break;
-		case STATE_MOVE_POINT.ROTATE:
-		{
-			m_rotateForActTime += Time.get_deltaTime();
-			float num = Mathf.Clamp(m_rotateForActTime / m_rotateForActFinishTime, 0f, 1f);
-			if (!IsPlayingMotion(1, true))
-			{
-				_rotation = Quaternion.Lerp(m_rotateForActStart_Quat, m_rotateForActEnd_Quat, num);
-			}
-			else if (num < 1f)
-			{
-				PlayMotion(m_rotateForActMotionId, -1f);
-			}
-			else
-			{
-				PlayMotion(13, -1f);
-				SetStateMovePoint(STATE_MOVE_POINT.CHECK);
-			}
-			break;
-		}
-		case STATE_MOVE_POINT.CHECK:
-			if (IsArrivalPosition(base.movePointPos, 0f))
-			{
-				SetNextTrigger(0);
-				SetStateMovePoint(STATE_MOVE_POINT.FINISH);
-			}
-			break;
-		case STATE_MOVE_POINT.FINISH:
-			SetStateMovePoint(STATE_MOVE_POINT.NONE);
-			break;
-		}
-	}
-
-	public override void ActMoveLookAt(Vector3 moveLookAtPos, bool isPacket = false)
-	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		EndAction();
-		base.actionID = ACTION_ID.MOVE_LOOKAT;
-		SetStateMoveLookAt(STATE_MOVE_LOOKAT.INIT);
-		if (isPacket)
-		{
-			base.moveLookAtPos = moveLookAtPos;
-		}
-		if (enemySender != null)
-		{
-			enemySender.OnActMoveLookAt(moveLookAtPos);
-		}
-	}
-
-	protected override void UpdateMoveLookAtAction()
-	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-		switch (base.stateMoveLookAt)
-		{
-		case STATE_MOVE_LOOKAT.INIT:
-		{
-			Vector3 val5 = base.moveLookAtPos - _position;
-			m_moveLookAtInitTargetDir = val5.get_normalized();
-			PlayMotion(14, -1f);
-			SetStateMoveLookAt(STATE_MOVE_LOOKAT.MOVE);
-			break;
-		}
-		case STATE_MOVE_LOOKAT.MOVE:
-		{
-			Vector3 val = _position - base.moveLookAtPos;
-			float num = base.moveLookAtAngle * Time.get_deltaTime();
-			val = Quaternion.AngleAxis(num, Vector3.get_up()) * val;
-			Vector3 val2 = base.moveLookAtPos + val - _position;
-			if (!IsPlayingMotion(1, true))
-			{
-				Vector3 val3 = base.moveLookAtPos - _position;
-				_rotation = Quaternion.LookRotation(val3.get_normalized(), Vector3.get_up());
-				_position += val2;
-			}
-			else
-			{
-				PlayMotion(14, -1f);
-			}
-			Vector3 val4 = base.moveLookAtPos - _position;
-			Vector3 normalized = val4.get_normalized();
-			float num2 = Vector3.Angle(m_moveLookAtInitTargetDir, normalized);
-			if (num2 >= base.moveLookAtAngle)
-			{
-				SetNextTrigger(0);
-				SetStateMoveLookAt(STATE_MOVE_LOOKAT.FINISH);
-			}
-			break;
-		}
-		case STATE_MOVE_LOOKAT.FINISH:
-			SetStateMoveLookAt(STATE_MOVE_LOOKAT.NONE);
-			break;
-		}
-	}
-
-	protected override void OnPlayingEndMotion()
-	{
-		ACTION_ID actionID = base.actionID;
-		if (actionID == ACTION_ID.DEAD)
-		{
-			OnDeadEnd();
-		}
-		else
-		{
-			base.OnPlayingEndMotion();
-		}
-	}
-
-	protected override void EndAction()
-	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-		if (base.isInitialized)
-		{
-			ACTION_ID actionID = base.actionID;
-			base.EndAction();
-			_EndDebuffAction(actionID);
-			EndWaitingPacket(WAITING_PACKET.ENEMY_WARP);
-			if (loader.shadow != null && !loader.shadow.get_gameObject().get_activeSelf())
-			{
-				loader.shadow.get_gameObject().SetActive(true);
-			}
-			enableTargetPoint = true;
-			reviveRegionWaitSync = false;
-			enableDash = false;
-			dashBeforePos = Vector3.get_zero();
-			dashNowDistance = 0f;
-			dashOverDistance = 0f;
-			dashMinDistance = 0f;
-			dashMaxDistance = 0f;
-			dashEndTrigger = null;
-			dashOverFlag = false;
-			dashOverCheckDistance = 0f;
-			canHitShockEffect = true;
-			int num = regionWorks.Length;
-			for (int i = 0; i < num; i++)
-			{
-				if (!regionWorks[i].IsValidDisplayTimer)
-				{
-					regionWorks[i].ResetWeakState();
-				}
-			}
-			shotEventInfoQueue.Clear();
-			shotNetworkInfoQueue.Clear();
-			warpWaitSync = false;
-			if (warpViewFlag || warpViewRate != 0f)
-			{
-				warpViewFlag = true;
-				warpViewRatePerTime = -2f;
-			}
-			if (radialBlurEnable)
-			{
-				MonoBehaviourSingleton<InGameCameraManager>.I.EndRadialBlurFilter(0.1f);
-			}
-			radialBlurEnable = false;
-			if (loader.baseEffect != null && !loader.baseEffect.get_gameObject().get_activeSelf())
-			{
-				loader.baseEffect.get_gameObject().SetActive(true);
-			}
-			int count = animLayerWeightChangeInfo.Count;
-			if (count > 0)
-			{
-				Animator animator = loader.GetAnimator();
-				for (int j = 0; j < count; j++)
-				{
-					AnimationLayerWeightChangeInfo animationLayerWeightChangeInfo = animLayerWeightChangeInfo[j];
-					if (animationLayerWeightChangeInfo.aliveFlag && animationLayerWeightChangeInfo.forceEndFlag)
-					{
-						animationLayerWeightChangeInfo.aliveFlag = false;
-					}
-				}
-			}
-			if (blendColorChangeInfo != null && blendColorChangeInfo.aliveFlag && blendColorChangeInfo.forceEndFlag)
-			{
-				blendColorChangeInfo.aliveFlag = false;
-			}
-		}
-	}
-
-	protected override void _EndDebuffAction(ACTION_ID beforeActId)
-	{
-		switch (beforeActId)
-		{
-		case (ACTION_ID)13:
-			downTotal = 0f;
-			downCount++;
-			foreach (MissionCheckBase item in MonoBehaviourSingleton<InGameProgress>.I.missionCheck)
-			{
-				(item as MissionCheckDownCount)?.SetCount(downCount);
-			}
-			break;
-		case ACTION_ID.PARALYZE:
-			badStatusMax.paralyze *= 1.5f;
-			if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
-			{
-				MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
-			}
-			break;
-		case ACTION_ID.FREEZE:
-			badStatusMax.freeze *= 1.5f;
-			if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
-			{
-				MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
-			}
-			break;
-		case (ACTION_ID)18:
-			ActDebuffShadowSealingEnd();
-			break;
-		}
-	}
-
-	protected override string GetMotionStateName(int motion_id)
-	{
-		if (motion_id >= 124 && motion_id <= 140)
-		{
-			int num = 9;
-			Character.stateNameBuilder.Length = 0;
-			Character.stateNameBuilder.Append("Base Layer.");
-			Character.stateNameBuilder.AppendFormat(subMotionStateName[num], motion_id - 124);
-			return Character.stateNameBuilder.ToString();
-		}
-		if (motion_id - 115 >= 0 && motion_id - 115 < subMotionStateName.Length)
-		{
-			Character.stateNameBuilder.Length = 0;
-			Character.stateNameBuilder.Append("Base Layer.");
-			string text = subMotionStateName[motion_id - 115];
-			if (motion_id == 119)
-			{
-				EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-				if (enemyBrain != null)
-				{
-					EnemyActionController actionCtrl = enemyBrain.actionCtrl;
-					if (actionCtrl != null)
-					{
-						int nowModeCounterModeId = enemyBrain.actionCtrl.GetNowModeCounterModeId();
-						if (nowModeCounterModeId >= 2)
-						{
-							text = text + "_" + $"{nowModeCounterModeId:D2}";
-						}
-					}
-				}
-			}
-			Character.stateNameBuilder.Append(text);
-			return Character.stateNameBuilder.ToString();
-		}
-		return base.GetMotionStateName(motion_id);
-	}
-
-	protected override int _GetCachedHash(int motion_id)
-	{
-		if (motion_id < 115 || motion_id >= 141)
-		{
-			return base._GetCachedHash(motion_id);
-		}
-		return subMotionHashCaches[motion_id - 115];
-	}
-
-	protected override void _CacheHash(int motion_id, int hash)
-	{
-		if (motion_id < 115 || motion_id >= 141)
-		{
-			base._CacheHash(motion_id, hash);
-		}
-		else
-		{
-			subMotionHashCaches[motion_id - 115] = hash;
-		}
-	}
-
-	protected override float GetAnimatorSpeed()
-	{
-		if (IsHitStop())
-		{
-			return 0f;
-		}
-		if (!base.isPause)
-		{
-			switch (base.actionID)
-			{
-			case ACTION_ID.ATTACK:
-				return buffParam.GetAtkSpeed();
-			case ACTION_ID.MOVE:
-			case ACTION_ID.ROTATE:
-			case ACTION_ID.MOVE_POINT:
-			case ACTION_ID.MAX:
-				return buffParam.GetMoveSpeed();
-			default:
-				return 1f;
-			}
-		}
-		return 0f;
-	}
-
-	public override bool OnBuffStart(BuffParam.BuffData buffData)
-	{
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		if (CheckDisableBuffTypeByShield(buffData.type))
-		{
-			return false;
-		}
-		if (CheckDisableBuffTypeByMadMode(buffData.type))
-		{
-			return false;
-		}
-		if (!buffParam.BuffStart(buffData))
-		{
-			return false;
-		}
-		UpdateAnimatorSpeed();
-		if (buffData.sync)
-		{
-			SendBuffSync(buffData.type);
-		}
-		if (IsCoopNone() || IsOriginal())
-		{
-			buffData.isOwnerEnemyBuffStart = true;
-		}
-		switch (buffData.type)
-		{
-		case BuffParam.BUFFTYPE.GHOST_FORM:
-			if (this.get_gameObject().get_activeSelf())
-			{
-				ChangeGhostShaderParam(GhostFormShaderParam.disappearParam, GhostFormShaderParam.duration);
-			}
-			else
-			{
-				isRequireGhostShaderParam = true;
-				ghostBuffEndParam = GhostFormShaderParam.disappearParam;
-				ghostBuffDuration = GhostFormShaderParam.duration;
-			}
-			break;
-		case BuffParam.BUFFTYPE.BURNING:
-			CreateBurningEffect();
-			break;
-		case BuffParam.BUFFTYPE.MOVE_SPEED_DOWN:
-		case BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN:
-			CreateSpeedDownEffect();
-			break;
-		}
-		if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid() && buffData.isOwnerEnemyBuffStart)
-		{
-			MonoBehaviourSingleton<UIEnemyAnnounce>.I.StartBuff(enemyTableData.name, buffData.type);
-		}
-		if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
-		{
-			MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
-		}
-		buffData.isOwnerEnemyBuffStart = false;
-		return true;
-	}
-
-	public override void OnBuffRoutine(BuffParam.BuffData buffData, bool packet = false)
-	{
-		//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-		int hp = base.hp;
-		base.OnBuffRoutine(buffData, packet);
-		int num = hp - base.hp;
-		if (MonoBehaviourSingleton<InGameRecorder>.IsValid() && buffData.fromObjectID > 0)
-		{
-			MonoBehaviourSingleton<InGameRecorder>.I.RecordGivenDamage(buffData.fromObjectID, num);
-		}
-		if (QuestManager.IsValidInGameExplore() && isBoss && MonoBehaviourSingleton<CoopManager>.I.GetSelfID() == buffData.fromObjectID)
-		{
-			ExplorePlayerStatus myExplorePlayerStatus = MonoBehaviourSingleton<QuestManager>.I.GetMyExplorePlayerStatus();
-			int num2 = myExplorePlayerStatus.givenTotalDamage + num;
-			myExplorePlayerStatus.SyncTotalDamageToBoss(num2);
-			MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendExploreBossDamage(num2);
-		}
-		BuffParam.BUFFTYPE type = buffData.type;
-		if (type == BuffParam.BUFFTYPE.ELECTRIC_SHOCK)
-		{
-			if (!IsDebuffShadowSealing())
-			{
-				ReactionInfo reactionInfo = new ReactionInfo();
-				reactionInfo.reactionType = REACTION_TYPE.ELECTRIC_SHOCK;
-				if (base.enableReactionDelay && IsReactionDelayType((int)reactionInfo.reactionType))
-				{
-					DelayReactionInfo delayReactionInfo = new DelayReactionInfo();
-					delayReactionInfo.type = reactionInfo.reactionType;
-					RegisterReacionDelayInfo(delayReactionInfo);
-					reactionInfo.reactionType = REACTION_TYPE.NONE;
-					isReactionDelaySet = true;
-				}
-				ActReaction(reactionInfo, false);
-			}
-			if (!packet)
-			{
-				buffData.value = buffData.damage;
-			}
-		}
-		if (BuffParam.IsTypeShowDamageOnEnemy(buffData.type))
-		{
-			AtkAttribute atkAttribute = new AtkAttribute();
-			atkAttribute.normal = (float)buffData.value;
-			Vector3 position = _position;
-			GameObject loopEffect = buffParam.GetLoopEffect(buffData);
-			if (loopEffect != null)
-			{
-				position = loopEffect.get_transform().get_position();
-			}
-			CreateDamageNum(position, atkAttribute, false, 0);
-		}
-		if (MonoBehaviourSingleton<CoopManager>.IsValid())
-		{
-			MonoBehaviourSingleton<CoopManager>.I.coopStage.battleUserLog.Add(this, buffData.type, num);
-		}
-	}
-
-	public override bool OnBuffEnd(BuffParam.BUFFTYPE type, bool sync, bool isPlayEndEffect = true)
-	{
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		if (!base.OnBuffEnd(type, sync, isPlayEndEffect))
-		{
-			return false;
-		}
-		switch (type)
-		{
-		case BuffParam.BUFFTYPE.POISON:
-			badStatusMax.poison *= 1.5f;
-			break;
-		case BuffParam.BUFFTYPE.BURNING:
-			badStatusMax.burning *= 1.5f;
-			if (m_effectBurning != null)
-			{
-				Object.Destroy(m_effectBurning);
-				m_effectBurning = null;
-			}
-			break;
-		case BuffParam.BUFFTYPE.DEADLY_POISON:
-			badStatusMax.deadlyPoison *= 1.5f;
-			break;
-		case BuffParam.BUFFTYPE.GHOST_FORM:
-			if (this.get_gameObject().get_activeSelf())
-			{
-				ChangeGhostShaderParam(GhostFormShaderParam.appearParam, GhostFormShaderParam.duration);
-			}
-			else
-			{
-				isRequireGhostShaderParam = true;
-				ghostBuffEndParam = GhostFormShaderParam.appearParam;
-				ghostBuffDuration = GhostFormShaderParam.duration;
-			}
-			break;
-		case BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN:
-			badStatusMax.attackSpeedDown *= 1.5f;
-			if (m_effectSpeedDown != null && !buffParam.IsValidBuff(BuffParam.BUFFTYPE.MOVE_SPEED_DOWN))
-			{
-				Object.Destroy(m_effectSpeedDown);
-				m_effectSpeedDown = null;
-			}
-			break;
-		case BuffParam.BUFFTYPE.MOVE_SPEED_DOWN:
-			badStatusMax.speedDown *= 1.5f;
-			if (m_effectSpeedDown != null && !buffParam.IsValidBuff(BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN))
-			{
-				Object.Destroy(m_effectSpeedDown);
-				m_effectSpeedDown = null;
-			}
-			break;
-		}
-		if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
-		{
-			MonoBehaviourSingleton<UIEnemyAnnounce>.I.EndBuff(enemyTableData.name, type);
-		}
-		if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
-		{
-			MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
-		}
-		return true;
-	}
-
-	protected override void OnUIBuffRoutine(BuffParam.BUFFTYPE type, int value)
-	{
-		if (MonoBehaviourSingleton<UIDamageManager>.IsValid() && (type == BuffParam.BUFFTYPE.REGENERATE || type == BuffParam.BUFFTYPE.REGENERATE_PROPORTION))
-		{
-			MonoBehaviourSingleton<UIDamageManager>.I.CreateEnemyRecoverHp(this, value, UIPlayerDamageNum.DAMAGE_COLOR.HEAL);
-		}
-	}
-
-	public override void OnPoisonStart(int fromObjectID = 0)
-	{
-		BuffParam.BuffData buffData = new BuffParam.BuffData();
-		buffData.type = BuffParam.BUFFTYPE.POISON;
-		buffData.time = 20f;
-		buffData.valueType = BuffParam.VALUE_TYPE.RATE;
-		buffData.value = (int)((float)base.hpMax * 0.015f);
-		buffData.interval = 5f;
-		buffData.fromObjectID = fromObjectID;
-		OnBuffStart(buffData);
-	}
-
-	public void OnElectricShockStart(AttackHitInfo atkHitInfo, Player player)
-	{
-		if (atkHitInfo != null)
-		{
-			ElectricShockInfo electricShockInfo = atkHitInfo.electricShockInfo;
-			if (electricShockInfo != null)
-			{
-				BuffParam.BuffData buffData = new BuffParam.BuffData();
-				buffData.type = BuffParam.BUFFTYPE.ELECTRIC_SHOCK;
-				buffData.time = electricShockInfo.duration;
-				buffData.interval = electricShockInfo.damageInterval;
-				buffData.value = 1;
-				buffData.fromObjectID = player.id;
-				if (player != null)
-				{
-					BuffParam buffParam = player.buffParam;
-					InGameUtility.PlayerAtkCalcData playerAtkCalcData = new InGameUtility.PlayerAtkCalcData();
-					playerAtkCalcData.weaponAtk = player.attack;
-					playerAtkCalcData.statusAtk = player.playerAtk;
-					playerAtkCalcData.guardEquipAtk = player.GetGuardEquipmentAtk();
-					playerAtkCalcData.buffAtkRate = buffParam.GetBuffAtkRate();
-					playerAtkCalcData.passiveAtkRate = buffParam.GetPassiveAtkRate();
-					playerAtkCalcData.buffAtkConstant = buffParam.GetBuffAtkConstant();
-					playerAtkCalcData.buffAtkAllElementConstant = (float)buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_ALLELEMENT, true);
-					playerAtkCalcData.passiveAtkConstant = buffParam.GetPassiveAtkUpConstant();
-					playerAtkCalcData.passiveAtkAllElementConstant = buffParam.passive.atkAllElement;
-					AtkAttribute atkAttribute = InGameUtility.CalcPlayerATK(playerAtkCalcData);
-					buffData.damage = Mathf.FloorToInt(atkAttribute.CalcTotal() * ((float)electricShockInfo.atkRate * 0.01f));
-				}
-				OnBuffStart(buffData);
-			}
-		}
-	}
-
-	private void CreateBurningEffect()
-	{
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Expected O, but got Unknown
-		if (object.ReferenceEquals(m_effectBurning, null))
-		{
-			Transform effect = EffectManager.GetEffect("ef_btl_enm_fire_01", base._transform);
-			if (!(effect == null))
-			{
-				ParticleSystem[] componentsInChildren = effect.GetComponentsInChildren<ParticleSystem>(true);
-				if (componentsInChildren != null)
-				{
-					CalcFreezeEffectEmissionRadius();
-					for (int i = 0; i < componentsInChildren.Length; i++)
-					{
-						ShapeModule shape = componentsInChildren[i].get_shape();
-						shape.set_radius(GetEmittionRadius());
-					}
-					Transform obj = effect;
-					obj.set_localPosition(obj.get_localPosition() + Vector3.get_up() * GetEmittionRadius());
-					m_effectBurning = effect.get_gameObject();
-				}
-			}
-		}
-	}
-
-	private void CreateSpeedDownEffect()
-	{
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Expected O, but got Unknown
-		if (object.ReferenceEquals(m_effectSpeedDown, null))
-		{
-			Transform effect = EffectManager.GetEffect("ef_btl_pl_movedown_01", base._transform);
-			if (!(effect == null))
-			{
-				CalcFreezeEffectEmissionRadius();
-				float num = GetEmittionRadius() * MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.attackSpeedDownParam.enemyEffectSize;
-				Transform obj = effect;
-				obj.set_localScale(obj.get_localScale() * num);
-				m_effectSpeedDown = effect.get_gameObject();
-			}
-		}
-	}
-
-	public override AttackHitColliderProcessor.HitParam SelectHitCollider(AttackHitColliderProcessor processor, List<AttackHitColliderProcessor.HitParam> hit_params)
-	{
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0302: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0304: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0306: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0308: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0312: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0327: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0331: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0478: Unknown result type (might be due to invalid IL or missing references)
-		//IL_047a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0491: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0496: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04fd: Unknown result type (might be due to invalid IL or missing references)
-		checkHitParam.Clear();
-		checkLength.Clear();
-		checkPriority.Clear();
-		targetRegionIds.Clear();
-		if (processor.targetPointList != null)
-		{
-			int i = 0;
-			for (int count = processor.targetPointList.Count; i < count; i++)
-			{
-				TargetPoint targetPoint = processor.targetPointList[i];
-				if (targetPoint.IsEneble() && targetPoint.regionID >= 0 && targetPoint.owner == this)
-				{
-					targetRegionIds.Add(targetPoint.regionID);
-				}
-			}
-		}
-		BulletObject bulletObject = null;
-		AnimEventCollider.AtkColliderHiter atkColliderHiter = null;
-		bulletObject = (processor.colliderInterface as BulletObject);
-		if (bulletObject == null)
-		{
-			atkColliderHiter = (processor.colliderInterface as AnimEventCollider.AtkColliderHiter);
-		}
-		float num = 0f;
-		Vector3 val = Vector3.get_zero();
-		Vector3 val2 = Vector3.get_zero();
-		if (bulletObject != null)
-		{
-			Vector3 velocity = bulletObject._rigidbody.get_velocity();
-			num = velocity.get_magnitude();
-			Vector3 velocity2 = bulletObject._rigidbody.get_velocity();
-			val = velocity2.get_normalized();
-			val2 = bulletObject._transform.get_position();
-		}
-		float num2 = 3.40282347E+38f;
-		int j = 0;
-		for (int count2 = hit_params.Count; j < count2; j++)
-		{
-			int regionID = GetRegionID(hit_params[j].toCollider, targetRegionIds);
-			hit_params[j].regionID = regionID;
-			int item = 0;
-			EnemyRegionWork enemyRegionWork = regionWorks[regionID];
-			WEAK_STATE wEAK_STATE = enemyRegionWork.weakState;
-			if (regionID > 0)
-			{
-				item = 1;
-			}
-			if (IsWeakStateCheckAlreadyHit(wEAK_STATE) && hit_params[j].fromObject != null && enemyRegionWork.weakAttackIDs.Contains(hit_params[j].fromObject.id))
-			{
-				wEAK_STATE = WEAK_STATE.NONE;
-			}
-			if (IsWeakStateSpAttack(wEAK_STATE))
-			{
-				bool flag = false;
-				Player player = hit_params[j].fromObject as Player;
-				if (player != null)
-				{
-					flag = player.isSpecialActionHit((Player.ATTACK_MODE)enemyRegionWork.weakSubParam, processor.attackInfo as AttackHitInfo, hit_params[j]);
-				}
-				hit_params[j].isSpAttackHit = flag;
-				if (!flag)
-				{
-					wEAK_STATE = WEAK_STATE.NONE;
-				}
-			}
-			if (bulletObject != null && bulletObject.isAimBossMode)
-			{
-				bool flag2 = false;
-				if (processor.targetPointList != null)
-				{
-					int k = 0;
-					for (int count3 = processor.targetPointList.Count; k < count3; k++)
-					{
-						TargetPoint targetPoint2 = processor.targetPointList[k];
-						if (targetPoint2.IsEneble() && targetPoint2.regionID == regionID && targetPoint2.owner == this)
-						{
-							Vector3 markerPos = targetPoint2.param.markerPos;
-							float num3 = 0f;
-							float num4 = 0f;
-							if (val == Vector3.get_zero())
-							{
-								Vector3 val3 = markerPos - hit_params[j].point;
-								num3 = val3.get_magnitude();
-								num4 = num3;
-							}
-							else
-							{
-								Vector3 val4 = Vector3.Cross(val, markerPos - val2);
-								num3 = val4.get_magnitude();
-								num4 = Vector3.Dot(markerPos - hit_params[j].point, val);
-							}
-							float num5 = enemyParameter.aimMarkerHitRadius * targetPoint2.param.aimMarkerScale;
-							if (num3 <= num5 && (targetPoint2.isSkipDotCalc || Mathf.Abs(num4) <= enemyParameter.hitCompareAimDepthLimit))
-							{
-								flag2 = true;
-								hit_params[j].isHitAim = true;
-								break;
-							}
-						}
-					}
-				}
-				if (IsWeakStateSpAttack(wEAK_STATE))
-				{
-					item = 4;
-				}
-				else if (flag2)
-				{
-					item = 3;
-				}
-				else if (regionID > 0 && (int)enemyRegionWork.hp > 0)
-				{
-					item = 2;
-				}
-			}
-			else if (wEAK_STATE != 0)
-			{
-				item = 3;
-				if (regionID > 0 && (int)enemyRegionWork.hp > 0)
-				{
-					item = 4;
-				}
-			}
-			else if (regionID > 0 && (int)enemyRegionWork.hp > 0)
-			{
-				item = 2;
-			}
-			if (!regionInfos[hit_params[j].regionID].isAtkColliderHit)
-			{
-				item = 0;
-			}
-			float num6 = 0f;
-			if (bulletObject != null)
-			{
-				if (bulletObject._rigidbody != null && val != Vector3.get_zero())
-				{
-					num6 = Vector3.Dot(hit_params[j].point, val);
-				}
-				else
-				{
-					Vector3 val5 = hit_params[j].point - bulletObject._transform.get_position();
-					num6 = val5.get_magnitude();
-				}
-			}
-			else if (atkColliderHiter != null)
-			{
-				Vector3 val6 = hit_params[j].point - hit_params[j].crossCheckPoint;
-				num6 = val6.get_magnitude();
-			}
-			checkHitParam.Add(hit_params[j]);
-			checkLength.Add(num6);
-			checkPriority.Add(item);
-			if (num6 < num2)
-			{
-				num2 = num6;
-			}
-		}
-		AttackHitColliderProcessor.HitParam result = null;
-		float num7 = 3.40282347E+38f;
-		int num8 = 0;
-		int l = 0;
-		for (int count4 = checkHitParam.Count; l < count4; l++)
-		{
-			if ((!(bulletObject != null) || !(num >= enemyParameter.hitCompareSpeed) || !(checkLength[l] - num2 > enemyParameter.hitCompareLengthLimit)) && (checkPriority[l] > num8 || (checkPriority[l] == num8 && checkLength[l] < num7)))
-			{
-				result = checkHitParam[l];
-				num7 = checkLength[l];
-				num8 = checkPriority[l];
-			}
-		}
-		return result;
-	}
-
-	protected override bool IsValidAttackedHit(StageObject from_object)
-	{
-		if (from_object is Enemy)
-		{
-			return false;
-		}
-		return base.IsValidAttackedHit(from_object);
-	}
-
-	protected override void OnAttackedHitDirection(AttackedHitStatusDirection status)
-	{
-		Player player = status.fromObject as Player;
-		status.regionID = status.hitParam.regionID;
-		EnemyRegionWork enemyRegionWork = null;
-		if (status.regionID >= 0 && status.regionID < regionInfos.Length)
-		{
-			enemyRegionWork = regionWorks[status.regionID];
-		}
-		if (enemyRegionWork == null)
-		{
-			status.weakState = WEAK_STATE.NONE;
-		}
-		else
-		{
-			status.weakState = enemyRegionWork.weakState;
-			if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL)
-			{
-				status.weakState = WEAK_STATE.NONE;
-			}
-			if (IsWeakStateSpAttack(status.weakState))
-			{
-				bool flag = false;
-				if (player != null)
-				{
-					flag = player.isSpecialActionHit((Player.ATTACK_MODE)enemyRegionWork.weakSubParam, status.attackInfo, status.hitParam);
-				}
-				if (!flag)
-				{
-					status.weakState = WEAK_STATE.NONE;
-				}
-			}
-			if (IsWeakStateElementAttack(status.weakState) || IsWeakStateSkillAttack(status.weakState))
-			{
-				AtkAttribute atk = new AtkAttribute();
-				if (status.hitParam.processor != null)
-				{
-					BulletObject bulletObject = status.hitParam.processor.colliderInterface as BulletObject;
-					if (bulletObject != null)
-					{
-						atk = bulletObject.masterAtk;
-					}
-					else
-					{
-						status.fromObject.GetAtk(status.attackInfo, ref atk);
-					}
-				}
-				if (IsWeakStateElementAttack(status.weakState) && enemyRegionWork.validElementType != (int)atk.GetElementType())
-				{
-					status.weakState = WEAK_STATE.NONE;
-				}
-				if (IsWeakStateSkillAttack(status.weakState) && !status.attackInfo.isSkillReference)
-				{
-					status.weakState = WEAK_STATE.NONE;
-				}
-			}
-			if (IsWeakStateHealAttack(status.weakState) && status.attackInfo.attackType != AttackHitInfo.ATTACK_TYPE.HEAL_ATTACK)
-			{
-				status.weakState = WEAK_STATE.NONE;
-			}
-			if (IsWeakStateCheckAlreadyHit(status.weakState))
-			{
-				if (enemyRegionWork.weakAttackIDs.Contains(status.fromObjectID))
-				{
-					status.weakState = WEAK_STATE.NONE;
-				}
-				else if (!IsCoopNone() && !IsOriginal())
-				{
-					enemyRegionWork.weakAttackIDs.Add(status.fromObjectID);
-				}
-			}
-			if (IsWeakStateDisplaySign(status.weakState))
-			{
-				Self self = status.fromObject as Self;
-				if (self != null)
-				{
-					self.taskChecker.OnWeakAttack(status.weakState, 0);
-				}
-			}
-			if (IsCannonBallHitShieldRegion(enemyRegionWork, status.attackInfo) && MonoBehaviourSingleton<UIEnemyStatus>.IsValid() && enemyRegionWork.isShieldCriticalDamage)
-			{
-				MonoBehaviourSingleton<UIEnemyStatus>.I.PlayShakeHpGauge(5f, 0.5f, 0.05f, true);
-			}
-		}
-		if (!object.ReferenceEquals(player, null) && status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.JUMP)
-		{
-			player.HitJumpAttack();
-		}
-		base.OnAttackedHitDirection(status);
-	}
-
-	protected override void OnPlayAttackedHitEffect(AttackedHitStatusDirection status)
-	{
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0359: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0454: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0459: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_072e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0764: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0775: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0858: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0870: Unknown result type (might be due to invalid IL or missing references)
-		//IL_087c: Unknown result type (might be due to invalid IL or missing references)
-		bool flag = true;
-		bool is_self = status.fromObject is Self;
-		if (is_self)
-		{
-			if (selfHitEffectCool > 0f)
-			{
-				return;
-			}
-			SetHitShock(status.hitPos - status.fromObject._position);
-			if (MonoBehaviourSingleton<InGameManager>.I.graphicOptionType <= 1)
-			{
-				selfHitEffectCool = 0.1f;
-			}
-		}
-		else
-		{
-			if (otherHitEffectCool > 0f)
-			{
-				return;
-			}
-			string enemyOtherSimpleHitEffectName = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.enemyOtherSimpleHitEffectName;
-			if (!string.IsNullOrEmpty(enemyOtherSimpleHitEffectName))
-			{
-				EffectManager.OneShot(enemyOtherSimpleHitEffectName, status.hitPos, status.hitParam.rot, is_self);
-			}
-			flag = false;
-			if (MonoBehaviourSingleton<InGameManager>.I.graphicOptionType <= 1)
-			{
-				otherHitEffectCool = 0.5f;
-			}
-		}
-		if (regionInfos != null)
-		{
-			int regionID = status.regionID;
-			if (regionID >= 0 && regionID < regionInfos.Length)
-			{
-				RegionInfo regionInfo = regionInfos[regionID];
-				if (status.weakState != 0 && is_self)
-				{
-					SetHitLight();
-				}
-				if (status.badStatusAdd.paralyze > 0f)
-				{
-					string enemyParalyzeHitEffectName = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.enemyParalyzeHitEffectName;
-					if (!string.IsNullOrEmpty(enemyParalyzeHitEffectName) && flag)
-					{
-						EffectManager.OneShot(enemyParalyzeHitEffectName, status.hitPos, status.hitParam.rot, is_self);
-					}
-				}
-				if (status.badStatusAdd.poison > 0f)
-				{
-					string enemyPoisonHitEffectName = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.enemyPoisonHitEffectName;
-					if (!string.IsNullOrEmpty(enemyPoisonHitEffectName) && flag)
-					{
-						EffectManager.OneShot(enemyPoisonHitEffectName, status.hitPos, status.hitParam.rot, is_self);
-					}
-				}
-				if (status.skillParam != null && status.skillParam.tableData != null)
-				{
-					bool flag2 = false;
-					if (status.skillParam.tableData.hitSEID != 0)
-					{
-						if (EnablePlaySound())
-						{
-							SoundManager.PlayOneShotSE(status.skillParam.tableData.hitSEID, status.hitPos);
-						}
-						flag2 = true;
-					}
-					if (!string.IsNullOrEmpty(status.skillParam.tableData.hitEffectName))
-					{
-						if (flag)
-						{
-							EffectManager.OneShot(status.skillParam.tableData.hitEffectName, status.hitPos, status.hitParam.rot, is_self);
-						}
-						flag2 = true;
-					}
-					if (flag2)
-					{
-						return;
-					}
-				}
-				bool flag3 = false;
-				bool flag4 = false;
-				bool flag5 = false;
-				if (status.attackInfo.hitSEID != 0)
-				{
-					if (EnablePlaySound())
-					{
-						SoundManager.PlayOneShotSE(status.attackInfo.hitSEID, status.hitPos);
-					}
-					flag4 = true;
-					if (!status.attackInfo.playCommonHitEffect)
-					{
-						flag3 = true;
-					}
-				}
-				if (!string.IsNullOrEmpty(status.attackInfo.hitEffectName))
-				{
-					if (flag)
-					{
-						EffectManager.OneShot(status.attackInfo.hitEffectName, status.hitPos, status.hitParam.rot, is_self);
-					}
-					flag5 = true;
-					if (!status.attackInfo.playCommonHitSe)
-					{
-						flag3 = true;
-					}
-				}
-				if (!flag3 && status.skillParam == null)
-				{
-					ELEMENT_TYPE elementType = status.atk.GetElementType();
-					EFFECTIVE_TYPE effectiveType = GetEffectiveType(elementType, enemyTableData.element);
-					string text = status.attackInfo.toEnemy.hitTypeName;
-					EnemyHitTypeTable.TypeData typeData = null;
-					Vector3 scale = Vector3.get_one();
-					float delay = 0f;
-					if (is_self)
-					{
-						Player player = status.fromObject as Player;
-						if (!object.ReferenceEquals(player, null))
-						{
-							typeData = player.GetOverrideHitEffect(status, ref scale, ref delay);
-						}
-					}
-					if (typeData == null && !string.IsNullOrEmpty(text))
-					{
-						char c = text[text.Length - 1];
-						if (elementType == ELEMENT_TYPE.MAX)
-						{
-							typeData = Singleton<EnemyHitTypeTable>.I.GetData(text, FieldManager.IsValidInGameNoQuest());
-						}
-						else if (effectiveType == EFFECTIVE_TYPE.GOOD && c == 'S')
-						{
-							text = text.Substring(0, text.Length - 1) + "L";
-							typeData = Singleton<EnemyHitTypeTable>.I.GetData(text, FieldManager.IsValidInGameNoQuest());
-						}
-						else if (effectiveType != 0 && c == 'L')
-						{
-							text = text.Substring(0, text.Length - 1) + "S";
-							typeData = Singleton<EnemyHitTypeTable>.I.GetData(text, FieldManager.IsValidInGameNoQuest());
-						}
-						else
-						{
-							typeData = Singleton<EnemyHitTypeTable>.I.GetData(text, FieldManager.IsValidInGameNoQuest());
-						}
-					}
-					string text2 = regionInfo.hitMaterialName;
-					if (string.IsNullOrEmpty(text2))
-					{
-						text2 = baseHitMaterialName;
-					}
-					EnemyHitMaterialTable.MaterialData materialData = null;
-					if (!string.IsNullOrEmpty(text2))
-					{
-						materialData = Singleton<EnemyHitMaterialTable>.I.GetData(text2);
-					}
-					if (typeData != null && !flag5)
-					{
-						string element_effect_name = null;
-						if (elementType == ELEMENT_TYPE.MAX)
-						{
-							element_effect_name = typeData.baseEffectName;
-						}
-						else
-						{
-							element_effect_name = typeData.elementEffectNames[(int)elementType];
-						}
-						if (status.damageDistanceData != null && status.attackInfo.name.Contains("PLC05_attack_00") && status.damageDistanceData.IsMaxRate(status.distanceXZ))
-						{
-							element_effect_name = MonoBehaviourSingleton<InGameSettingsManager>.I.player.bestDistanceEffect;
-						}
-						if (!string.IsNullOrEmpty(element_effect_name) && flag)
-						{
-							if (delay > 0f)
-							{
-								AppMain.Delay(delay, delegate
-								{
-									//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-									//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-									//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-									EffectManager.OneShot(element_effect_name, status.hitPos, status.hitParam.rot, scale, is_self, null);
-								});
-							}
-							else
-							{
-								EffectManager.OneShot(element_effect_name, status.hitPos, status.hitParam.rot, scale, is_self, null);
-							}
-						}
-					}
-					if (elementType != ELEMENT_TYPE.MAX && !flag4)
-					{
-						int num = enemyParameter.elementHitSEIDs[(int)elementType];
-						if (num != 0 && EnablePlaySound())
-						{
-							SoundManager.PlayOneShotSE(num, status.hitPos);
-						}
-					}
-					if (materialData != null)
-					{
-						if (!string.IsNullOrEmpty(materialData.addEffectName) && flag)
-						{
-							EffectManager.OneShot(materialData.addEffectName, status.hitPos, status.hitParam.rot, is_self);
-						}
-						if (typeData != null && !flag4)
-						{
-							int typeSEID = materialData.GetTypeSEID(text);
-							if (typeSEID != 0 && EnablePlaySound())
-							{
-								SoundManager.PlayOneShotSE(typeSEID, status.hitPos);
-							}
-						}
-					}
-					EnemyRegionWork enemyRegionWork = regionWorks[regionID];
-					if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL)
-					{
-						string effect_name = "ef_btl_magibullet_landing_03";
-						if (IsCannonBallHitShieldRegion(enemyRegionWork, status.attackInfo))
-						{
-							effect_name = "ef_btl_magibullet_landing_01";
-							if (enemyRegionWork.isShieldCriticalDamage)
-							{
-								effect_name = "ef_btl_magibullet_landing_02";
-							}
-						}
-						else if (enemyRegionWork.isShieldDamage && enemyRegionWork.weakState == WEAK_STATE.WEAK_GRAB)
-						{
-							effect_name = "ef_btl_magibullet_landing_01";
-						}
-						Transform effect = EffectManager.GetEffect(effect_name, null);
-						effect.set_position(status.exHitPos);
-						effect.set_rotation(status.hitParam.rot);
-						effect.set_localScale(Vector3.get_one());
-					}
-				}
-			}
-		}
-	}
-
-	private void OnHitWeakPoint(string deleteAtkName, bool isSpWeak)
-	{
-		ActReleaseGrabbedPlayers(true, isSpWeak, false, 0f, 0f);
-		if (!string.IsNullOrEmpty(deleteAtkName))
-		{
-			for (int num = m_activeAttackLaserList.Count - 1; num >= 0; num--)
-			{
-				AttackNWayLaser attackNWayLaser = m_activeAttackLaserList[num];
-				if (attackNWayLaser.AttackInfoName == deleteAtkName)
-				{
-					attackNWayLaser.RequestDestroy();
-				}
-			}
-			for (int num2 = m_activeAttackFunnelList.Count - 1; num2 >= 0; num2--)
-			{
-				AttackFunnelBit attackFunnelBit = m_activeAttackFunnelList[num2];
-				if (attackFunnelBit.AttackInfoName == deleteAtkName)
-				{
-					attackFunnelBit.RequestDestroy(true);
-				}
-			}
-			for (int num3 = m_activeAttackDigList.Count - 1; num3 >= 0; num3--)
-			{
-				AttackDig attackDig = m_activeAttackDigList[num3];
-				if (attackDig.AttackInfoName == deleteAtkName)
-				{
-					attackDig.RequestDestroy(true);
-				}
-			}
-			for (int num4 = m_activeAttackActionMineList.Count - 1; num4 >= 0; num4--)
-			{
-				AttackActionMine attackActionMine = m_activeAttackActionMineList[num4];
-				if (attackActionMine.AttackInfoName == deleteAtkName)
-				{
-					attackActionMine.RequestDestroy(false);
-				}
-			}
-			for (int num5 = m_activeAttackObstacleList.Count - 1; num5 >= 0; num5--)
-			{
-				AttackShotNodeLink attackShotNodeLink = m_activeAttackObstacleList[num5];
-				if (attackShotNodeLink.AttackInfoName == deleteAtkName)
-				{
-					attackShotNodeLink.RequestDestroy();
-				}
-			}
-		}
-	}
-
-	public void OnDestroyFunnel(AttackFunnelBit delFunnel)
-	{
-		if (m_activeAttackFunnelList.Contains(delFunnel))
-		{
-			m_activeAttackFunnelList.Remove(delFunnel);
-		}
-	}
-
-	public void OnDestroyLaser(AttackNWayLaser delLaser)
-	{
-		if (m_activeAttackLaserList.Contains(delLaser))
-		{
-			m_activeAttackLaserList.Remove(delLaser);
-		}
-	}
-
-	public void OnDestroyDig(AttackDig delDig)
-	{
-		if (m_activeAttackDigList.Contains(delDig))
-		{
-			m_activeAttackDigList.Remove(delDig);
-		}
-	}
-
-	public void ActDestroyActionMine(int objId, bool isExplode)
-	{
-		AttackActionMine attackActionMine = m_activeAttackActionMineList.Find((AttackActionMine x) => x.objId == objId);
-		if (attackActionMine != null)
-		{
-			attackActionMine.RequestDestroy(isExplode);
-		}
-	}
-
-	public void OnDestroyActionMine(AttackActionMine mine)
-	{
-		if (m_activeAttackActionMineList.Contains(mine))
-		{
-			m_activeAttackActionMineList.Remove(mine);
-		}
-	}
-
-	public void OnDestroyObstacle(AttackShotNodeLink delObstacle)
-	{
-		if (m_activeAttackObstacleList.Contains(delObstacle))
-		{
-			m_activeAttackObstacleList.Remove(delObstacle);
-		}
-	}
-
-	protected override bool IsDamageValid(AttackedHitStatusDirection status)
-	{
-		return status.fromType == OBJECT_TYPE.PLAYER;
-	}
-
-	public override void AbsorptionProc(Character targetChar, AttackedHitStatusLocal status)
-	{
-		AttackHitInfo attackInfo = status.attackInfo;
-		if (attackInfo != null && attackInfo.absorptance > 0)
-		{
-			float num = (float)attackInfo.absorptance * 0.01f;
-			int num2 = (int)((float)base.hpMax * num);
-			if (num2 > 0)
-			{
-				Player player = targetChar as Player;
-				if (player != null)
-				{
-					player.StartEffectDrain(this);
-				}
-				RecoverHp(num2);
-			}
-		}
-	}
-
-	public override bool CutAndAbsorbDamageByBuff(Character targetCharacter, AttackedHitStatusLocal status)
-	{
-		List<BuffParam.BuffData> absorbBuffDataList = buffParam.GetAbsorbBuffDataList();
-		if (absorbBuffDataList.IsNullOrEmpty())
-		{
-			return false;
-		}
-		AtkAttribute atkAttribute = new AtkAttribute();
-		for (int i = 0; i < absorbBuffDataList.Count; i++)
-		{
-			switch (absorbBuffDataList[i].type)
-			{
-			case BuffParam.BUFFTYPE.ABSORB_NORMAL:
-				atkAttribute.normal += status.damageDetails.normal;
-				break;
-			case BuffParam.BUFFTYPE.ABSORB_FIRE:
-				atkAttribute.fire += status.damageDetails.fire;
-				break;
-			case BuffParam.BUFFTYPE.ABSORB_WATER:
-				atkAttribute.water += status.damageDetails.water;
-				break;
-			case BuffParam.BUFFTYPE.ABSORB_THUNDER:
-				atkAttribute.thunder += status.damageDetails.thunder;
-				break;
-			case BuffParam.BUFFTYPE.ABSORB_SOIL:
-				atkAttribute.soil += status.damageDetails.soil;
-				break;
-			case BuffParam.BUFFTYPE.ABSORB_LIGHT:
-				atkAttribute.light += status.damageDetails.light;
-				break;
-			case BuffParam.BUFFTYPE.ABSORB_DARK:
-				atkAttribute.dark += status.damageDetails.dark;
-				break;
-			}
-		}
-		atkAttribute.CheckMinus();
-		status.damageDetails.Sub(atkAttribute);
-		status.damage = Mathf.FloorToInt(status.damageDetails.CalcTotal());
-		int num = Mathf.FloorToInt(atkAttribute.CalcTotal());
-		int num2 = Mathf.FloorToInt((float)base.hpMax * MonoBehaviourSingleton<InGameSettingsManager>.I.buff.absorbDamageParam.limitRateEnemyAbsorbDamage);
-		if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid() && num > num2)
-		{
-			num = num2;
-		}
-		if (num <= 0)
-		{
-			return false;
-		}
-		RecoverHp(num);
-		return true;
-	}
-
-	protected override void OnAttackedHitLocal(AttackedHitStatusLocal status)
-	{
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-		base.OnAttackedHitLocal(status);
-		_CheckHitLocalArrow(status);
-		if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.BOMBROCK)
-		{
-			status.damage = Mathf.FloorToInt((float)base.hpMax * status.attackInfo.atk.normal * 0.01f);
-			status.damageDetails = new AtkAttribute();
-			status.damageDetails.normal = (float)status.damage;
-		}
-		if (status.attackInfo.isSkillReference && (isAvailableCounter(base.actionID) || base.actionID == (ACTION_ID)16))
-		{
-			EnemyRegionWork enabledCounterRegion = GetEnabledCounterRegion();
-			if (enabledCounterRegion != null)
-			{
-				status.damage = 0;
-				status.damageDetails = new AtkAttribute();
-			}
-		}
-		if (status.fromObject is Self && enemyParameter.showDamageNum && status.attackInfo.attackType != AttackHitInfo.ATTACK_TYPE.CANNON_BALL)
-		{
-			CreateDamageNum(status.hitPos, status.damageDetails, status.weakState != WEAK_STATE.NONE, status.attackInfo.damageNumAddGroup);
-		}
-		Player player = status.fromObject as Player;
-		if (player != null && !status.attackInfo.isSkillReference)
-		{
-			player.IncreaseSpActonGauge(status.attackInfo.attackType, status.hitPos, 0f, status.attackInfo.atkRate, status.attackInfo.toEnemy.isSpecialAttack, status.attackInfo.dontIncreaseGauge);
-			if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.NORMAL || status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.FROM_AVOID)
-			{
-				player.UpdateBoostHitCount();
-			}
-			if (player is Self && MonoBehaviourSingleton<InGameManager>.IsValid())
-			{
-				MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.AddDamageByWeapon(player.weaponIndex, status.damage);
-			}
-		}
-		status.downAddBase = 0f;
-		status.downAddWeak = 0f;
-		if (status.damage > 0)
-		{
-			status.downAddBase = status.attackInfo.down;
-			if (player != null)
-			{
-				int value = 0;
-				if (!player.GetOneHandSwordBoostDownValue(ref value, status.attackInfo.name))
-				{
-					switch (status.weakState)
-					{
-					case WEAK_STATE.WEAK:
-						status.downAddWeak = player.downPowerSimpleWeak * status.attackInfo.atkRate;
-						break;
-					case WEAK_STATE.WEAK_SP_ATTACK:
-					case WEAK_STATE.WEAK_ELEMENT_ATTACK:
-					case WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK:
-					case WEAK_STATE.WEAK_SKILL_ATTACK:
-					case WEAK_STATE.WEAK_HEAL_ATTACK:
-						status.downAddWeak = player.downPowerWeak * status.attackInfo.atkRate;
-						break;
-					case WEAK_STATE.WEAK_SP_DOWN_MAX:
-						status.downAddWeak = (float)downMax;
-						break;
-					}
-				}
-				else
-				{
-					status.downAddBase += (float)value;
-				}
-			}
-			if (status.downAddBase > 0f)
-			{
-				status.downAddBase += player.buffParam.passive.badStatusUp[2];
-			}
-			else if (status.downAddWeak > 0f)
-			{
-				status.downAddWeak += player.buffParam.passive.badStatusUp[2];
-			}
-		}
-		if (MonoBehaviourSingleton<CoopNetworkManager>.IsValid())
-		{
-			MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyAttack(id, status.damage);
-		}
-		RecordDeliveryBattleCheckerOnAttacked(status);
-	}
-
-	private void RecordDeliveryBattleCheckerOnAttacked(AttackedHitStatusLocal status)
-	{
-		Self self = status.fromObject as Self;
-		if (!(self == null) && MonoBehaviourSingleton<InGameManager>.IsValid())
-		{
-			MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.SetMaxDamageSelf(status.damage);
-			BattleCheckerBase.JudgementParam judgementParam = BattleCheckerBase.JudgementParam.Create(status.attackInfo, self);
-			MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnAttackHit(status.attackInfo.name, judgementParam, status.damage);
-			if (IsWeakStateDisplaySign(status.weakState))
-			{
-				MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnWeakAttack(status.weakState, status.origin.damage);
-			}
-			if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.JUMP)
-			{
-				MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnJump(status.origin.damage);
-			}
-		}
-	}
-
-	private void _CheckHitLocalArrow(AttackedHitStatusLocal status)
-	{
-		if (!object.ReferenceEquals(status.hitParam.processor, null))
-		{
-			BulletObject bulletObject = status.hitParam.processor.colliderInterface as BulletObject;
-			if (!object.ReferenceEquals(bulletObject, null) && !(status.attackInfo.rateInfoRate < 1f))
-			{
-				Character character = status.fromObject as Character;
-				status.isArrowBleed = false;
-				status.isShadowSealing = false;
-				if (status.hitParam.isHitAim)
-				{
-					if (status.attackInfo.spAttackType == SP_ATTACK_TYPE.HEAT)
-					{
-						status.isShadowSealing = true;
-						if (bulletObject.isBossPierceArrow && !isPierceAfterTarget)
-						{
-							EnemyRegionWork enemyRegionWork = regionWorks[status.regionID];
-							if (enemyRegionWork.shadowSealingData.ownerID == 0)
-							{
-								bulletObject.EndBossPierceArrow();
-							}
-						}
-					}
-					else
-					{
-						status.isArrowBleed = true;
-						float num = (!(character != null)) ? 1f : character.buffParam.GetBleedUp();
-						status.arrowBleedDamage = Mathf.CeilToInt((float)status.damage * MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedDamageRate * num);
-						if (status.arrowBleedDamage < 1)
-						{
-							status.arrowBleedDamage = 1;
-						}
-						float normal = status.damageDetails.normal;
-						ELEMENT_TYPE elementType = status.damageDetails.GetElementType();
-						status.damage = (int)((float)status.damage * num);
-						status.damageDetails.Mul(num);
-						if (normal > 0f && status.damageDetails.normal < 1f)
-						{
-							status.damageDetails.normal = 1f;
-							status.damage++;
-						}
-						if (elementType != ELEMENT_TYPE.MAX && status.damageDetails.GetElementType() == ELEMENT_TYPE.MAX)
-						{
-							status.damageDetails.SetTargetElement(elementType, 1f);
-							status.damage++;
-						}
-						if (status.damage < 1)
-						{
-							status.damageDetails.normal = 1f;
-							status.damage = 1;
-						}
-						BleedData bleedData = null;
-						EnemyRegionWork enemyRegionWork2 = regionWorks[status.regionID];
-						int i = 0;
-						for (int count = enemyRegionWork2.bleedList.Count; i < count; i++)
-						{
-							if (enemyRegionWork2.bleedList[i].ownerID == status.fromObjectID)
-							{
-								bleedData = enemyRegionWork2.bleedList[i];
-								break;
-							}
-						}
-						if (bleedData != null && BleedData.MaxLv == bleedData.lv + 1)
-						{
-							InGameSettingsManager.Player.SpecialActionInfo specialActionInfo = MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo;
-							int num2 = status.arrowBleedDamage / specialActionInfo.arrowBleedCount;
-							if (num2 < 1)
-							{
-								num2 = 1;
-							}
-							float num3 = (float)(bleedData.damage + num2) * specialActionInfo.arrowBurstDamageRate;
-							status.arrowBurstDamage = (int)num3;
-							status.damage += status.arrowBurstDamage;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	protected override void OnIgnoreHitAttack()
-	{
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Expected O, but got Unknown
-		base.OnIgnoreHitAttack();
-		if (IsValidBuff(BuffParam.BUFFTYPE.GHOST_FORM) && m_effectHitWhenGhost == null && !(base.effectPlayProcessor == null))
-		{
-			List<EffectPlayProcessor.EffectSetting> settings = base.effectPlayProcessor.GetSettings("GHOST_EFFECT");
-			if (settings != null && settings[0] != null)
-			{
-				Transform val = base.effectPlayProcessor.PlayEffect(settings[0], base._transform);
-				if (val != null)
-				{
-					m_effectHitWhenGhost = val.get_gameObject();
-				}
-			}
-		}
-	}
-
-	protected override bool CheckStatusForHitEffect(AttackedHitStatusDirection status)
-	{
-		if (IsValidBuff(BuffParam.BUFFTYPE.GHOST_FORM))
-		{
-			Player player = status.fromObject as Player;
-			if (player != null && player.CheckIgnoreBuff(BuffParam.BUFFTYPE.GHOST_FORM))
-			{
-				return true;
-			}
-			AtkAttribute damage_details = new AtkAttribute();
-			AttackedHitStatusLocal status2 = new AttackedHitStatusLocal(nowAttackedHitStatus);
-			if (CalcDamage(status2, ref damage_details) > 0)
-			{
-				return true;
-			}
-			return false;
-		}
-		return base.CheckStatusForHitEffect(status);
-	}
-
-	public override void GetAtk(AttackHitInfo info, ref AtkAttribute atk)
-	{
-		InGameUtility.EnemyAtkCalcData enemyAtkCalcData = new InGameUtility.EnemyAtkCalcData();
-		enemyAtkCalcData.atkInfo = info;
-		enemyAtkCalcData.buffAtkRate = buffParam.GetBuffAtkRate();
-		enemyAtkCalcData.buffAtkConstant = buffParam.GetBuffAtkConstant();
-		enemyAtkCalcData.buffAtkAllElementConstant = (float)buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_ALLELEMENT, true);
-		atk.Copy(InGameUtility.CalcEnemyATK(enemyAtkCalcData));
-	}
-
-	protected override int CalcDamage(AttackedHitStatusLocal status, ref AtkAttribute damage_details)
-	{
-		if (regionInfos == null)
-		{
-			return 0;
-		}
-		if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL_DIRECT)
-		{
-			damage_details.Copy(status.attackInfo.atk);
-			return Mathf.FloorToInt(status.attackInfo.atk.CalcTotal());
-		}
-		AtkAttribute atkAttribute = CalcAtk(status);
-		AtkAttribute atkAttribute2 = CalcTolerance(status);
-		AtkAttribute atkAttribute3 = CalcDefense(status);
-		damage_details.normal = (float)(int)InGameUtility.CalcDamageDetailToEnemy(atkAttribute.normal, atkAttribute3.normal, atkAttribute2.normal);
-		damage_details.fire = (float)(int)InGameUtility.CalcDamageDetailToEnemy(atkAttribute.fire, atkAttribute3.fire, atkAttribute2.fire);
-		damage_details.water = (float)(int)InGameUtility.CalcDamageDetailToEnemy(atkAttribute.water, atkAttribute3.water, atkAttribute2.water);
-		damage_details.thunder = (float)(int)InGameUtility.CalcDamageDetailToEnemy(atkAttribute.thunder, atkAttribute3.thunder, atkAttribute2.thunder);
-		damage_details.soil = (float)(int)InGameUtility.CalcDamageDetailToEnemy(atkAttribute.soil, atkAttribute3.soil, atkAttribute2.soil);
-		damage_details.light = (float)(int)InGameUtility.CalcDamageDetailToEnemy(atkAttribute.light, atkAttribute3.light, atkAttribute2.light);
-		damage_details.dark = (float)(int)InGameUtility.CalcDamageDetailToEnemy(atkAttribute.dark, atkAttribute3.dark, atkAttribute2.dark);
-		damage_details.CheckMinus();
-		float normal = atkAttribute.normal;
-		ELEMENT_TYPE elementType = atkAttribute.GetElementType();
-		if (regionInfos[status.regionID].isDamageMinimum)
-		{
-			damage_details.Set(0f);
-			if (normal > 0f)
-			{
-				damage_details.normal = 1f;
-			}
-			if (elementType != ELEMENT_TYPE.MAX)
-			{
-				damage_details.SetTargetElement(elementType, 1f);
-			}
-			int num = Mathf.FloorToInt(damage_details.CalcTotal());
-			if (num < 1)
-			{
-				damage_details.normal = 1f;
-				num = 1;
-			}
-			return num;
-		}
-		Player player = status.fromObject as Player;
-		if (player != null)
-		{
-			if (!status.attackInfo.isSkillReference)
-			{
-				RegionInfo regionInfo = regionInfos[status.regionID];
-				float val = 1f;
-				for (int i = 0; i < regionInfo.weaponTypeRate.Length; i++)
-				{
-					if (Player.ConvertEquipmentTypeToAttackMode(regionInfo.weaponTypeRate[i].equipmentType) == player.attackMode)
-					{
-						val = regionInfo.weaponTypeRate[i].rate;
-					}
-				}
-				damage_details.Mul(val);
-			}
-			BuffParam buffParam = player.buffParam;
-			AtkAttribute abilityDamageRate = buffParam.GetAbilityDamageRate(this, status);
-			abilityDamageRate.CheckMinus();
-			float damageUpRate = buffParam.GetDamageUpRate(player, status);
-			if (damageUpRate > 0f)
-			{
-				abilityDamageRate.AddRate(damageUpRate);
-			}
-			damage_details.Mul(abilityDamageRate);
-		}
-		if (status.attackInfo.isSkillReference && IsValidBuff(BuffParam.BUFFTYPE.MAD_MODE))
-		{
-			damage_details.Mul(MonoBehaviourSingleton<InGameSettingsManager>.I.madModeParam.skillDamagedRate);
-		}
-		int num2 = (int)damage_details.CalcTotal();
-		if (normal > 0f && damage_details.normal < 1f)
-		{
-			damage_details.normal = 1f;
-			num2++;
-		}
-		if (elementType != ELEMENT_TYPE.MAX && damage_details.GetElementType() == ELEMENT_TYPE.MAX)
-		{
-			damage_details.SetTargetElement(elementType, 1f);
-			num2++;
-		}
-		if (num2 < 1)
-		{
-			damage_details.normal = 1f;
-			num2 = 1;
-		}
-		if (player != null)
-		{
-			if (!status.attackInfo.isSkillReference)
-			{
-				if (player.CheckAttackModeAndSpType(Player.ATTACK_MODE.TWO_HAND_SWORD, SP_ATTACK_TYPE.NONE))
-				{
-					damage_details.MulElementOnly(player.CalcChargeExpandElementDamageUpRate());
-				}
-				float value = 1f;
-				if (player.GetOneHandSwordBoostDamageUpRate(ref value))
-				{
-					damage_details.MulElementOnly(value);
-				}
-				if (player.GetTwoHandSwordBoostDamageUpRate(ref value))
-				{
-					damage_details.MulElementOnly(value);
-				}
-				if (player.GetIaiNormalDamageUp(ref value))
-				{
-					damage_details.normal *= value;
-				}
-				if (player.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.HEAT))
-				{
-					damage_details.Mul(player.CalcPairSwordsBoostModeDamageUpRate());
-				}
-				if (player.GetSphinxElementDamageUpRate(status.attackInfo, ref value))
-				{
-					damage_details.MulElementOnly(value);
-				}
-				if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.JUMP)
-				{
-					damage_details.MulElementOnly(player.GetJumpElementDamageUpRate());
-				}
-				if (player.GetExRushElementDamageUpRate(status.attackInfo.attackType, ref value))
-				{
-					damage_details.MulElementOnly(value);
-				}
-				if (player.GetArrowBoostDamageUpRate(ref value))
-				{
-					damage_details.MulElementOnly(value);
-				}
-				num2 = (int)damage_details.CalcTotal();
-				if (num2 < 1)
-				{
-					num2 = 1;
-				}
-				if (isArenaDamageOffWeapon)
-				{
-					damage_details.Mul(0f);
-					num2 = (int)damage_details.CalcTotal();
-					if (num2 < 0)
-					{
-						num2 = 0;
-					}
-					return num2;
-				}
-			}
-			else if (isArenaDamageOffMagi)
-			{
-				damage_details.Mul(0f);
-				num2 = (int)damage_details.CalcTotal();
-				if (num2 < 0)
-				{
-					num2 = 0;
-				}
-				return num2;
-			}
-		}
-		if (base.buffParam.IsValidInvinsibleBuff())
-		{
-			AtkAttribute invinsibleMulRate = GetInvinsibleMulRate();
-			damage_details.Mul(invinsibleMulRate);
-			num2 = (int)damage_details.CalcTotal();
-			if (num2 < 0)
-			{
-				num2 = 0;
-			}
-		}
-		if (IsValidBuff(BuffParam.BUFFTYPE.GHOST_FORM))
-		{
-			if (player != null && player.CheckIgnoreBuff(BuffParam.BUFFTYPE.GHOST_FORM))
-			{
-				return num2;
-			}
-			damage_details.Mul(GhostFormParam);
-			num2 = (int)damage_details.CalcTotal();
-			if (num2 < 0)
-			{
-				num2 = 0;
-			}
-		}
-		if (IsValidShield())
-		{
-			damage_details.Mul(base.ShieldTolerance);
-			num2 = (int)damage_details.CalcTotal();
-			if (num2 < 0)
-			{
-				num2 = 0;
-			}
-		}
-		return num2;
-	}
-
-	private AtkAttribute GetInvinsibleMulRate()
-	{
-		AtkAttribute atkAttribute = new AtkAttribute();
-		atkAttribute.Set(1f);
-		List<BuffParam.BuffData> invincibleBuffDataList = buffParam.GetInvincibleBuffDataList();
-		if (invincibleBuffDataList.IsNullOrEmpty())
-		{
-			return atkAttribute;
-		}
-		for (int i = 0; i < invincibleBuffDataList.Count; i++)
-		{
-			switch (invincibleBuffDataList[i].type)
-			{
-			case BuffParam.BUFFTYPE.INVINCIBLE_NORMAL:
-				atkAttribute.normal = 0f;
-				break;
-			case BuffParam.BUFFTYPE.INVINCIBLE_FIRE:
-				atkAttribute.SetTargetElement(ELEMENT_TYPE.FIRE, 0f);
-				break;
-			case BuffParam.BUFFTYPE.INVINCIBLE_WATER:
-				atkAttribute.SetTargetElement(ELEMENT_TYPE.WATER, 0f);
-				break;
-			case BuffParam.BUFFTYPE.INVINCIBLE_THUNDER:
-				atkAttribute.SetTargetElement(ELEMENT_TYPE.THUNDER, 0f);
-				break;
-			case BuffParam.BUFFTYPE.INVINCIBLE_SOIL:
-				atkAttribute.SetTargetElement(ELEMENT_TYPE.SOIL, 0f);
-				break;
-			case BuffParam.BUFFTYPE.INVINCIBLE_LIGHT:
-				atkAttribute.SetTargetElement(ELEMENT_TYPE.LIGHT, 0f);
-				break;
-			case BuffParam.BUFFTYPE.INVINCIBLE_DARK:
-				atkAttribute.SetTargetElement(ELEMENT_TYPE.DARK, 0f);
-				break;
-			}
-		}
-		return atkAttribute;
-	}
-
-	protected override AtkAttribute CalcAtk(AttackedHitStatusLocal status)
-	{
-		Player player = status.fromObject as Player;
-		if (player == null)
-		{
-			return base.CalcAtk(status);
-		}
-		AtkAttribute atkAttribute = new AtkAttribute();
-		atkAttribute.Add(status.atk);
-		if (player.IsTwoHandSwordSpAttacking())
-		{
-			atkAttribute.normal += player.GetDefForTwoHandSwordSpAttack();
-		}
-		if (player.IsTwoHandSwordHeatUseGauge())
-		{
-			ELEMENT_TYPE elementType = atkAttribute.GetElementType();
-			atkAttribute.AddTargetElement(elementType, player.GetElementDefForTwoHandSwordHeatCombo());
-		}
-		if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.HEAL_ATTACK)
-		{
-			atkAttribute.Mul(player.healAtkRate);
-		}
-		else
-		{
-			atkAttribute.Mul(status.attackInfo.atkRate);
-			if (!status.attackInfo.isSkillReference)
-			{
-				atkAttribute.Mul(player.pairSwordsCtrl.GetAtkRate());
-			}
-		}
-		if (status.damageDistanceData != null)
-		{
-			float num = 1f;
-			num = ((!player.isBuffShadowSealing || player.playerParameter.arrowActionInfo.shadowSealingBuffDistanceRate == 0f) ? status.damageDistanceData.GetRate(status.distanceXZ) : player.playerParameter.arrowActionInfo.shadowSealingBuffDistanceRate);
-			atkAttribute.Mul(num);
-		}
-		float val = 1f;
-		if (IsFreeze())
-		{
-			val = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.freezeParam.damageRate;
-		}
-		else if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.TWO_HAND_SWORD_SP || status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.THS_HEAT_COMBO)
-		{
-			if (status.weakState != 0)
-			{
-				val = player.playerParameter.specialActionInfo.twoHandSwordWeakRate;
-			}
-		}
-		else
-		{
-			switch (status.weakState)
-			{
-			case WEAK_STATE.WEAK:
-			case WEAK_STATE.WEAK_SP_ATTACK:
-			case WEAK_STATE.WEAK_SP_DOWN_MAX:
-				val = player.attackWeakRate;
-				break;
-			case WEAK_STATE.DOWN:
-				val = player.attackDownRate;
-				break;
-			case WEAK_STATE.WEAK_ELEMENT_ATTACK:
-				val = player.elementWeakRate;
-				break;
-			case WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK:
-				val = player.elementSkillWeakRate;
-				break;
-			case WEAK_STATE.WEAK_SKILL_ATTACK:
-				val = player.skillWeakRate;
-				break;
-			case WEAK_STATE.WEAK_HEAL_ATTACK:
-				val = player.healWeakRate;
-				break;
-			}
-		}
-		atkAttribute.Mul(val);
-		return atkAttribute;
-	}
-
-	protected override AtkAttribute CalcTolerance(AttackedHitStatusLocal status)
-	{
-		int regionID = status.regionID;
-		if (regionID < 0 || regionID >= regionInfos.Length)
-		{
-			return base.CalcTolerance(status);
-		}
-		RegionInfo regionInfo = regionInfos[status.regionID];
-		AtkAttribute _tolerance = new AtkAttribute();
-		_tolerance.Add(regionInfo.tolerance);
-		_tolerance.normal -= (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_NORMAL, true) * 0.01f;
-		if (_tolerance.normal < 0f)
-		{
-			_tolerance.normal = 0f;
-		}
-		AtkAttribute atkAttribute = new AtkAttribute();
-		atkAttribute.SetTargetElement(ELEMENT_TYPE.FIRE, (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_FIRE, true) * 0.01f);
-		atkAttribute.SetTargetElement(ELEMENT_TYPE.WATER, (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_WATER, true) * 0.01f);
-		atkAttribute.SetTargetElement(ELEMENT_TYPE.THUNDER, (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_THUNDER, true) * 0.01f);
-		atkAttribute.SetTargetElement(ELEMENT_TYPE.SOIL, (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_SOIL, true) * 0.01f);
-		atkAttribute.SetTargetElement(ELEMENT_TYPE.LIGHT, (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_LIGHT, true) * 0.01f);
-		atkAttribute.SetTargetElement(ELEMENT_TYPE.DARK, (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_DARK, true) * 0.01f);
-		atkAttribute.AddElementOnly((float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_ALLELEMENT, true) * 0.01f);
-		_tolerance.Sub(atkAttribute);
-		_tolerance.CheckMinus();
-		if (CheckApplyDefenceUpBuff(status, regionWorks[regionID]))
-		{
-			AddToleranceBuff(ref _tolerance);
-			_tolerance.normal += (float)(buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_NORMAL, true) + buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT, true)) * 0.01f;
-		}
-		if (IsValidBarrier)
-		{
-			_tolerance.AddRate(regionWorks[regionID].GetBarrierToleranceRate());
-		}
-		return _tolerance;
-	}
-
-	private bool CheckApplyDefenceUpBuff(AttackedHitStatusLocal status, EnemyRegionWork regionWork)
-	{
-		bool result = true;
-		ENEMY_TYPE enemyType = GetEnemyType();
-		if (enemyType == ENEMY_TYPE.CRAB && regionWork.weakState == WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK && regionWork.validElementType == (int)status.atk.GetElementType() && status.attackInfo.isSkillReference && IsValidBuff(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT) && IsValidBuff(BuffParam.BUFFTYPE.DEFENCE_NORMAL))
-		{
-			OnBuffEnd(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT, true, true);
-			OnBuffEnd(BuffParam.BUFFTYPE.DEFENCE_NORMAL, true, true);
-			result = false;
-		}
-		return result;
-	}
-
-	protected override AtkAttribute CalcDefense(AttackedHitStatusLocal status)
-	{
-		if (status.regionID < 0 || status.regionID >= regionInfos.Length)
-		{
-			AtkAttribute _defence = new AtkAttribute();
-			_defence.Add(base.defense);
-			AtkAttribute atkAttribute = new AtkAttribute();
-			atkAttribute.Set(1f);
-			atkAttribute.Add(buffParam.GetBuffDefenceRate());
-			_defence.Mul(atkAttribute);
-			AddDefenceBuff(ref _defence);
-			_defence.CheckMinus();
-			return _defence;
-		}
-		RegionInfo regionInfo = regionInfos[status.regionID];
-		return regionInfo.defence;
-	}
-
-	public void CheckCounterRegion()
-	{
-		bool flag = GetEnabledCounterRegionIndex() >= 0;
-		uint stringID = kStrIdx_EnemyReaction_BreakCounterRegion;
-		switch (m_CounterRegionState)
-		{
-		case eCounterRegionState.NONE:
-			m_CounterRegionState = (flag ? eCounterRegionState.EXIST : eCounterRegionState.NOT_EXIST);
-			return;
-		case eCounterRegionState.EXIST:
-			if (flag)
-			{
-				return;
-			}
-			m_CounterRegionState = eCounterRegionState.NOT_EXIST;
-			stringID = kStrIdx_EnemyReaction_BreakCounterRegion;
-			break;
-		case eCounterRegionState.NOT_EXIST:
-			if (!flag)
-			{
-				return;
-			}
-			m_CounterRegionState = eCounterRegionState.EXIST;
-			stringID = kStrIdx_EnemyReaction_ReviveCounterRegion;
-			break;
-		}
-		if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
-		{
-			MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(string.Empty, STRING_CATEGORY.ENEMY_REACTION, stringID);
-		}
-	}
-
-	protected bool isAvailableCounter(ACTION_ID currentId)
-	{
-		if (currentId == ACTION_ID.FREEZE || currentId == ACTION_ID.PARALYZE || currentId == (ACTION_ID)13 || currentId == (ACTION_ID)16 || currentId == (ACTION_ID)17 || currentId == (ACTION_ID)19)
-		{
-			return false;
-		}
-		if (IsDebuffShadowSealing())
-		{
-			return false;
-		}
-		if (currentId == ACTION_ID.NONE)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	protected bool CheckCounter(AttackedHitStatusOwner status)
-	{
-		if (!isBoss)
-		{
-			return false;
-		}
-		if (!isAvailableCounter(base.actionID))
-		{
-			return false;
-		}
-		EnemyRegionWork enabledCounterRegion = GetEnabledCounterRegion();
-		if (enabledCounterRegion != null)
-		{
-			EnemyController enemyController = base.controller as EnemyController;
-			if (enemyController == null)
-			{
-				return false;
-			}
-			EnemyBrain enemyBrain = enemyController.brain as EnemyBrain;
-			if (enemyBrain == null)
-			{
-				return false;
-			}
-			int counterAttackId = enemyBrain.actionCtrl.GetCounterAttackId();
-			if (counterAttackId == 2147483647)
-			{
-				return false;
-			}
-			if ((uint)base.attackID == counterAttackId)
-			{
-				return false;
-			}
-			return true;
-		}
-		return false;
-	}
-
-	public override void OnAttackedHitOwner(AttackedHitStatusOwner status)
-	{
-		if (IsValidBuff(BuffParam.BUFFTYPE.MAD_MODE))
-		{
-			status.badStatusAdd.Mul(MonoBehaviourSingleton<InGameSettingsManager>.I.madModeParam.badStatusRate);
-		}
-		status.aegisParam.isChange = false;
-		if (!base.isDead && status.validDamage)
-		{
-			if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL)
-			{
-				status.damage = 0;
-				status.damageDetails.Set(0f);
-			}
-			int num = base.ShieldHp;
-			int num2 = GrabHp;
-			status.afterGrabHp = GrabHp;
-			status.afterBarrierHp = BarrierHp;
-			status.downTotal = downTotal;
-			if (status.regionID >= 0 && status.regionID < regionWorks.Length)
-			{
-				status.afterRegionHP = regionWorks[status.regionID].hp;
-			}
-			if (status.attackInfo.isSkillReference)
-			{
-				if (status.badStatusAdd.electricShock > 0f && enemyTableData.element == ELEMENT_TYPE.WATER)
-				{
-					Player player = status.fromObject as Player;
-					if (player != null)
-					{
-						OnElectricShockStart(status.attackInfo, player);
-					}
-				}
-				if (status.attackInfo.buffIDs != null && status.attackInfo.buffIDs.Length > 0)
-				{
-					ApplyBuffsByTable(status);
-				}
-				if (CheckCounter(status))
-				{
-					status.reactionType = 13;
-					if (MonoBehaviourSingleton<CoopManager>.IsValid())
-					{
-						MonoBehaviourSingleton<CoopManager>.I.coopStage.battleUserLog.Add(this, status);
-					}
-					base.OnAttackedHitOwner(status);
-					return;
-				}
-			}
-			bool flag = false;
-			if (!object.ReferenceEquals(aegisCtrl, null))
-			{
-				flag = aegisCtrl.IsValid();
-				aegisCtrl.FlagReset();
-			}
-			if (!flag && CheckMadMode(status))
-			{
-				status.reactionType = 18;
-				status.badStatusAdd.Reset();
-				downTotal = 0f;
-				status.downAddBase = 0f;
-				status.downAddWeak = 0f;
-				status.isArrowBleed = false;
-				status.isShadowSealing = false;
-			}
-			int num3 = 0;
-			if (status.regionID >= 0 && status.regionID < regionWorks.Length)
-			{
-				EnemyRegionWork enemyRegionWork = regionWorks[status.regionID];
-				RegionInfo regionInfo = regionInfos[status.regionID];
-				num3 = regionInfo.customDownRate;
-				float num4 = CalcRegionDamageRate(status);
-				int num5 = (int)((float)status.damage * num4);
-				if (flag)
-				{
-					if (aegisCtrl.Damage(num5))
-					{
-						status.aegisParam.Copy(aegisCtrl.syncParam);
-					}
-				}
-				else
-				{
-					status.afterRegionHP = (int)enemyRegionWork.hp - num5;
-					if (status.afterRegionHP < 0)
-					{
-						status.afterRegionHP = 0;
-					}
-				}
-				if (status.regionID != 0 && (int)enemyRegionWork.hp > 0 && status.afterRegionHP <= 0)
-				{
-					status.breakRegion = true;
-					if (!IsDebuffShadowSealing() && status.reactionType != 18)
-					{
-						if (regionInfo.breakInDown)
-						{
-							status.reactionType = 7;
-						}
-						else if (regionInfo.breakInDamage)
-						{
-							status.reactionType = 1;
-						}
-					}
-				}
-				if (IsValidBarrier)
-				{
-					int num6 = CalcBarrierDamage(enemyRegionWork, status);
-					status.afterBarrierHp = (int)BarrierHp - num6;
-					if (status.afterBarrierHp < 0)
-					{
-						status.afterBarrierHp = 0;
-					}
-				}
-				if (regionInfo.isEnableShieldDamage && status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL)
-				{
-					EFFECTIVE_TYPE effectiveType = GetEffectiveType(status.attackInfo.elementType, enemyTableData.element);
-					bool isElementCritical = effectiveType == EFFECTIVE_TYPE.GOOD;
-					status.shieldDamage = CalcShieldDamage(enemyRegionWork.isShieldCriticalDamage, isElementCritical, status.attackInfo);
-					if (enemyRegionWork.isShieldCriticalDamage && IsValidGrabHp)
-					{
-						status.afterGrabHp = (int)GrabHp - (int)GrabCannonDamage;
-						if (status.afterGrabHp < 0)
-						{
-							status.afterGrabHp = 0;
-						}
-					}
-				}
-				bool flag2 = false;
-				if ((int)enemyRegionWork.hp <= 0 && regionInfo.maxHP > 0)
-				{
-					flag2 = true;
-				}
-				if ((status.breakRegion || flag2) && !regionInfo.breakAfterHit)
-				{
-					status.isArrowBleed = false;
-				}
-				if (status.isArrowBleed)
-				{
-					float arrowBleedTimeInterval = MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedTimeInterval;
-					float num7 = 1f - MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedSkipTimeRate;
-					float num8 = bleedCounter % arrowBleedTimeInterval;
-					status.arrowBleedSkipFirst = (num8 >= arrowBleedTimeInterval * num7);
-				}
-				if ((flag2 && !regionInfo.breakAfterHit) || status.breakRegion)
-				{
-					status.isShadowSealing = false;
-				}
-				if (IsWeakStateCheckAlreadyHit(status.weakState) && status.downAddWeak > 0f && enemyRegionWork.weakAttackIDs.Count > 0)
-				{
-					status.downAddWeak = 0f;
-				}
-			}
-			if (base.actionID == (ACTION_ID)13)
-			{
-				float num11 = status.downAddBase = (status.downAddWeak = 0f);
-			}
-			else
-			{
-				float num12 = status.downAddBase + status.downAddWeak;
-				if (num3 != 0)
-				{
-					float num13 = (float)num3 * 0.01f;
-					num12 += num12 * num13;
-					if (num12 < 0f)
-					{
-						num12 = 0f;
-					}
-				}
-				status.downTotal = downTotal + num12;
-				if (status.downTotal >= (float)downMax)
-				{
-					status.reactionType = 7;
-					status.downTotal = (float)downMax;
-				}
-			}
-			if (base.actionID != (ACTION_ID)17)
-			{
-				int num14 = (int)base.ShieldHp - status.shieldDamage;
-				if (num14 <= 0 && num > 0 && (int)base.ShieldHpMax > 0)
-				{
-					status.reactionType = 16;
-				}
-			}
-			if (status.afterGrabHp <= 0 && num2 > 0 && (int)GrabHpMax > 0)
-			{
-				ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
-			}
-			if (MonoBehaviourSingleton<CoopManager>.IsValid())
-			{
-				MonoBehaviourSingleton<CoopManager>.I.coopStage.battleUserLog.Add(this, status);
-			}
-		}
-		base.OnAttackedHitOwner(status);
-	}
-
-	private void ApplyBuffsByTable(AttackedHitStatusOwner status)
-	{
-		if (Singleton<BuffTable>.IsValid())
-		{
-			uint[] buffIDs = status.attackInfo.buffIDs;
-			foreach (uint num in buffIDs)
-			{
-				if (num != 0)
-				{
-					BuffTable.BuffData data = Singleton<BuffTable>.I.GetData(num);
-					if (data != null)
-					{
-						BuffParam.BuffData buffData = new BuffParam.BuffData();
-						buffData.type = data.type;
-						buffData.interval = data.interval;
-						buffData.valueType = data.valueType;
-						buffData.time = data.duration;
-						buffData.fromObjectID = status.fromObjectID;
-						float num2 = (float)data.value;
-						GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(data.growID, status.skillParam.baseInfo.level);
-						if (growSkillItemData != null)
-						{
-							buffData.time = data.duration * (float)(int)growSkillItemData.supprtTime[0].rate * 0.01f + (float)growSkillItemData.supprtTime[0].add;
-							num2 = (float)(data.value * (int)growSkillItemData.supprtValue[0].rate) * 0.01f + (float)(int)growSkillItemData.supprtValue[0].add;
-						}
-						if (buffData.valueType == BuffParam.VALUE_TYPE.RATE && BuffParam.IsTypeValueBasedOnHP(buffData.type))
-						{
-							num2 = (float)base.hpMax * num2 * 0.01f;
-						}
-						buffData.value = Mathf.FloorToInt(num2);
-						switch (buffData.type)
-						{
-						case BuffParam.BUFFTYPE.ELECTRIC_SHOCK:
-							if (enemyTableData.element == ELEMENT_TYPE.WATER)
-							{
-								OnBuffStart(buffData);
-							}
-							break;
-						case BuffParam.BUFFTYPE.BURNING:
-							if (enemyTableData.element == ELEMENT_TYPE.SOIL)
-							{
-								OnBuffStart(buffData);
-							}
-							break;
-						case BuffParam.BUFFTYPE.MOVE_SPEED_DOWN:
-						case BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN:
-							if (enemyTableData.element == ELEMENT_TYPE.THUNDER)
-							{
-								OnBuffStart(buffData);
-							}
-							break;
-						default:
-							OnBuffStart(buffData);
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private float CalcRegionDamageRate(AttackedHitStatusOwner status)
-	{
-		Player player = status.fromObject as Player;
-		if (object.ReferenceEquals(player, null))
-		{
-			return 1f;
-		}
-		float regionDamageRate = player.GetRegionDamageRate();
-		AttackHitInfo.ToEnemy.DamageToRegionInfo damageToRegionInfo = status.attackInfo.toEnemy.damageToRegionInfo;
-		if (!damageToRegionInfo.isDamageUp)
-		{
-			return regionDamageRate;
-		}
-		int damageUpPercent = damageToRegionInfo.damageUpPercent;
-		if (damageUpPercent <= 0)
-		{
-			return regionDamageRate;
-		}
-		damageUpPercent = damageToRegionInfo.damageUpPercent;
-		if (status.attackInfo.isSkillReference)
-		{
-			SkillInfo.SkillParam skillParam = status.skillParam;
-			if (skillParam != null)
-			{
-				GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(skillParam.tableData.growID, skillParam.baseInfo.level);
-				if (growSkillItemData != null)
-				{
-					damageUpPercent = growSkillItemData.GetGrowResultSupportValue(damageUpPercent, 0);
-				}
-			}
-		}
-		return regionDamageRate + (float)damageUpPercent * 0.01f;
-	}
-
-	private int CalcBarrierDamage(EnemyRegionWork regionWork, AttackedHitStatusOwner status)
-	{
-		int num = 0;
-		RegionInfo regionInfo = regionWork.regionInfo;
-		AtkAttribute atkBarrierDamage = regionInfo.atkBarrierDamage;
-		Player player = status.fromObject as Player;
-		if (player != null && player.buffParam.IsValidBuff(BuffParam.BUFFTYPE.LUNATIC_TEAR))
-		{
-			num = regionWork.regionInfo.barrierDamageSp;
-		}
-		AtkAttribute damageDetails = status.damageDetails;
-		if (damageDetails.normal > 0f)
-		{
-			num += (int)atkBarrierDamage.normal;
-		}
-		if (damageDetails.fire > 0f)
-		{
-			num += (int)atkBarrierDamage.fire;
-		}
-		if (damageDetails.water > 0f)
-		{
-			num += (int)atkBarrierDamage.water;
-		}
-		if (damageDetails.thunder > 0f)
-		{
-			num += (int)atkBarrierDamage.thunder;
-		}
-		if (damageDetails.soil > 0f)
-		{
-			num += (int)atkBarrierDamage.soil;
-		}
-		if (damageDetails.light > 0f)
-		{
-			num += (int)atkBarrierDamage.light;
-		}
-		if (damageDetails.dark > 0f)
-		{
-			num += (int)atkBarrierDamage.dark;
-		}
-		return num;
-	}
-
-	public override bool IsEnableAttackedHitOwner()
-	{
-		if (MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopRoom.isOwnerFirstClear && MonoBehaviourSingleton<StageObjectManager>.I.boss == this && MonoBehaviourSingleton<InGameProgress>.I.isEnding)
-		{
-			return false;
-		}
-		return base.IsEnableAttackedHitOwner();
-	}
-
-	protected override bool IsHitReactionValid(AttackedHitStatusOwner status)
-	{
-		if (base.actionID == (ACTION_ID)13)
-		{
-			return false;
-		}
-		if (status.fromType == OBJECT_TYPE.ENEMY)
-		{
-			return false;
-		}
-		return base.IsHitReactionValid(status);
-	}
-
-	protected override bool IsReactionDelayType(int type)
-	{
-		switch (type)
-		{
-		case 7:
-		case 14:
-			return true;
-		case 13:
-			return true;
-		case 16:
-			return true;
-		case 17:
-			return true;
-		case 18:
-			return true;
-		default:
-			return base.IsReactionDelayType(type);
-		}
-	}
-
-	protected override REACTION_TYPE OnHitReaction(AttackedHitStatusOwner status)
-	{
-		AttackHitInfo.ToEnemy.REACTION_TYPE reactionType = status.attackInfo.toEnemy.reactionType;
-		if (status.attackInfo.isSkillReference && status.skillParam != null)
-		{
-			reactionType = status.skillParam.tableData.reactionType;
-		}
-		if (isBoss)
-		{
-			if (reactionType != 0)
-			{
-				switch (reactionType)
-				{
-				case AttackHitInfo.ToEnemy.REACTION_TYPE.DAMAGE:
-					return REACTION_TYPE.DAMAGE;
-				case AttackHitInfo.ToEnemy.REACTION_TYPE.DOWN:
-					return REACTION_TYPE.DOWN;
-				}
-			}
-			else
-			{
-				if (status.weakState == WEAK_STATE.WEAK && status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL_DIRECT && base.actionID != ACTION_ID.DAMAGE && base.actionID != (ACTION_ID)13)
-				{
-					return REACTION_TYPE.DAMAGE;
-				}
-				if (status.weakState == WEAK_STATE.WEAK && status.attackInfo.toEnemy.isWeakHitReaction && base.actionID != ACTION_ID.DAMAGE && base.actionID != (ACTION_ID)13)
-				{
-					return REACTION_TYPE.DAMAGE;
-				}
-				if ((IsWeakStateSpAttack(status.weakState) || IsWeakStateElementAttack(status.weakState) || IsWeakStateSkillAttack(status.weakState) || IsWeakStateHealAttack(status.weakState)) && base.actionID != ACTION_ID.DAMAGE && base.actionID != (ACTION_ID)13)
-				{
-					return REACTION_TYPE.DAMAGE;
-				}
-			}
-		}
-		return REACTION_TYPE.NONE;
-	}
-
-	public override void OnHitAttack(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
-	{
-		EnemyController enemyController = base.controller as EnemyController;
-		if (enemyController != null)
-		{
-			enemyController.OnHitAttack(hit_param.toObject);
-		}
-		GrabInfo grabInfo = info.grabInfo;
-		if (grabInfo.enable)
-		{
-			Player player = hit_param.toObject as Player;
-			if (player != null)
-			{
-				EnemyBrain enemyBrain = enemyController.brain as EnemyBrain;
-				if (enemyBrain != null)
-				{
-					DrainAttackInfo drainAttackInfo = SearchDrainAttackInfo(grabInfo.drainAttackId);
-					enemyBrain.actionCtrl.grabController.Grab(player, grabInfo, drainAttackInfo);
-					if (drainAttackInfo != null)
-					{
-						grabDrainRecoverTimer = drainAttackInfo.recoverInterval;
-					}
-				}
-			}
-		}
-		base.OnHitAttack(info, hit_param);
-	}
-
-	public override void OnAttackedHitFix(AttackedHitStatusFix status)
-	{
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0566: Unknown result type (might be due to invalid IL or missing references)
-		//IL_056d: Expected O, but got Unknown
-		//IL_05e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05f0: Expected O, but got Unknown
-		//IL_074e: Unknown result type (might be due to invalid IL or missing references)
-		Player player = status.fromObject as Player;
-		bool isDead = base.isDead;
-		int hp = base.hp;
-		int num = base.ShieldHp;
-		base.OnAttackedHitFix(status);
-		if (!isDead)
-		{
-			downHealInterval = 1f;
-			downTotal = status.downTotal;
-			if (status.downAddBase + status.downAddWeak > 0f && MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
-			{
-				MonoBehaviourSingleton<UIEnemyStatus>.I.DirectionDownGauge(status.hitPos);
-			}
-		}
-		BarrierHp = status.afterBarrierHp;
-		GrabHp = status.afterGrabHp;
-		if (!object.ReferenceEquals(aegisCtrl, null))
-		{
-			aegisCtrl.Sync(status.aegisParam);
-		}
-		if ((int)base.ShieldHp <= 0 && num > 0)
-		{
-			if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
-			{
-				MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(enemyTableData.name, STRING_CATEGORY.ENEMY_SHIELD, 1u);
-			}
-			EffectManager.GetEffect("ef_btl_goldbird_aura_01_01", base._transform);
-			ResetShieldShaderParam();
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
-			{
-				List<StageObject> playerList = MonoBehaviourSingleton<StageObjectManager>.I.playerList;
-				for (int i = 0; i < playerList.Count; i++)
-				{
-					Self self = playerList[i] as Self;
-					if (self != null)
-					{
-						self.CancelCannonMode();
-						self.ActIdle(false, -1f);
-					}
-					else
-					{
-						Player player2 = playerList[i] as Player;
-						if (player2 != null)
-						{
-							player2.CancelCannonMode();
-							player2.ActIdle(false, -1f);
-						}
-					}
-				}
-			}
-		}
-		if (status.regionID >= 0 && status.regionID < regionWorks.Length)
-		{
-			EnemyRegionWork enemyRegionWork = regionWorks[status.regionID];
-			RegionInfo region_info = regionInfos[status.regionID];
-			enemyRegionWork.hp = status.afterRegionHP;
-			if (!isDead)
-			{
-				if (IsWeakStateCheckAlreadyHit(status.weakState) && !enemyRegionWork.weakAttackIDs.Contains(status.fromObjectID))
-				{
-					enemyRegionWork.weakAttackIDs.Add(status.fromObjectID);
-				}
-				switch (status.weakState)
-				{
-				case WEAK_STATE.WEAK:
-					OnHitWeakPoint(enemyRegionWork.deleteAtkName, false);
-					break;
-				case WEAK_STATE.WEAK_SP_ATTACK:
-				case WEAK_STATE.WEAK_SP_DOWN_MAX:
-					if (status.IsSpAttackHit)
-					{
-						OnHitWeakPoint(enemyRegionWork.deleteAtkName, true);
-					}
-					break;
-				case WEAK_STATE.WEAK_ELEMENT_ATTACK:
-					if (enemyRegionWork.validElementType == (int)status.damageDetails.GetElementType())
-					{
-						OnHitWeakPoint(enemyRegionWork.deleteAtkName, true);
-					}
-					break;
-				case WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK:
-					if (status.attackInfo.isSkillReference && enemyRegionWork.validElementType == (int)status.attackInfo.atk.GetElementType())
-					{
-						OnHitWeakPoint(enemyRegionWork.deleteAtkName, true);
-					}
-					break;
-				case WEAK_STATE.WEAK_SKILL_ATTACK:
-					if (status.attackInfo.isSkillReference)
-					{
-						OnHitWeakPoint(enemyRegionWork.deleteAtkName, true);
-					}
-					break;
-				case WEAK_STATE.WEAK_HEAL_ATTACK:
-					if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.HEAL_ATTACK)
-					{
-						OnHitWeakPoint(enemyRegionWork.deleteAtkName, true);
-					}
-					break;
-				}
-				if (IsWeakStateDisplaySign(status.weakState))
-				{
-					enemyRegionWork.displayTimer = 0f;
-				}
-				_CheckHitFixArrow(status, enemyRegionWork);
-			}
-			if (status.breakRegion)
-			{
-				ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
-				bool isBroke = enemyRegionWork.isBroke;
-				enemyRegionWork.isBroke = true;
-				enemyRegionWork.breakTime = Time.get_time();
-				string[] deactivateObjects = region_info.deactivateObjects;
-				foreach (string name in deactivateObjects)
-				{
-					Transform val = FindNode(name);
-					if (val != null)
-					{
-						val.get_gameObject().SetActive(false);
-					}
-				}
-				int k = 0;
-				for (int num2 = regionWorks.Length; k < num2; k++)
-				{
-					regionWorks[k].OnBreakRegion(status.regionID);
-				}
-				if (!region_info.breakAfterHit)
-				{
-					int l = 0;
-					for (int count = enemyRegionWork.bleedWorkList.Count; l < count; l++)
-					{
-						BleedWork bleedWork = enemyRegionWork.bleedWorkList[l];
-						if (bleedWork.bleedEffect != null)
-						{
-							EffectManager.ReleaseEffect(bleedWork.bleedEffect.get_gameObject(), true, false);
-							bleedWork.bleedEffect = null;
-						}
-					}
-					enemyRegionWork.bleedWorkList.Clear();
-					enemyRegionWork.bleedList.Clear();
-				}
-				enemyRegionWork.shadowSealingData.ownerID = 0;
-				enemyRegionWork.shadowSealingData.existSec = 0f;
-				enemyRegionWork.shadowSealingData.extendRate = 1f;
-				if (!object.ReferenceEquals(enemyRegionWork.shadowSealingEffect, null))
-				{
-					EffectManager.ReleaseEffect(enemyRegionWork.shadowSealingEffect.get_gameObject(), false, true);
-					enemyRegionWork.shadowSealingEffect = null;
-				}
-				if (MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
-				{
-					MonoBehaviourSingleton<TargetMarkerManager>.I.updateShadowSealingFlag = true;
-				}
-				if (region_info.breakEffect != null && !string.IsNullOrEmpty(region_info.breakEffect.effectName))
-				{
-					PlayRegionBreakEffect(region_info);
-				}
-				if (enemyReward != null && !isBroke)
-				{
-					enemyReward.reward.ForEach(delegate(QuestStartData.RegionDropItem item)
-					{
-						if (item.regionId == status.regionID && item.breakReward.Count != 0)
-						{
-							item.breakReward.ForEach(delegate(QuestStartData.BreakItem breakItem)
-							{
-								CreateDropItemFromRegionBreak(region_info, MonoBehaviourSingleton<StageObjectManager>.I.self, breakItem.rarity);
-							});
-						}
-					});
-				}
-				if (player != null && MonoBehaviourSingleton<UIPlayerAnnounce>.IsValid())
-				{
-					if (player is Self)
-					{
-						MonoBehaviourSingleton<UIInGameSelfAnnounceManager>.I.PlayRegionBreak();
-						SoundManager.PlayOneshotJingle(40000156, null, null);
-					}
-					else
-					{
-						MonoBehaviourSingleton<UIPlayerAnnounce>.I.Announce(UIPlayerAnnounce.ANNOUNCE_TYPE.REGION, player);
-					}
-				}
-				UpdateBreakIDLists();
-			}
-		}
-		if (enemyReward != null)
-		{
-			int m = 0;
-			for (int count2 = enemyReward.drop.hpRate.Count; m < count2; m++)
-			{
-				if (!(enemyReward.drop.hpRate[m] < damageHpRate))
-				{
-					if (enemyReward.drop.hpRate[m] > status.damageHpRate)
-					{
-						break;
-					}
-					CreateDropItem(status.hitPos, MonoBehaviourSingleton<StageObjectManager>.I.self, enemyReward.drop.rarity[m], false);
-				}
-			}
-		}
-		damageHpRate = status.damageHpRate;
-		if (!object.ReferenceEquals(player, null) && MonoBehaviourSingleton<UIPlayerAnnounce>.IsValid())
-		{
-			if (IsWeakStateCheckAlreadyHit(status.weakState))
-			{
-				MonoBehaviourSingleton<UIPlayerAnnounce>.I.Announce(UIPlayerAnnounce.ANNOUNCE_TYPE.WEAK, player);
-			}
-			if (status.reactionType == 7)
-			{
-				MonoBehaviourSingleton<UIPlayerAnnounce>.I.Announce(UIPlayerAnnounce.ANNOUNCE_TYPE.DOWN, player);
-			}
-		}
-		if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
-		{
-			int num3 = status.damage;
-			int num4 = hp - base.hp;
-			if (num4 < 0)
-			{
-				num4 = 0;
-			}
-			if (num3 > num4)
-			{
-				num3 = num4;
-			}
-			MonoBehaviourSingleton<InGameRecorder>.I.RecordGivenDamage(status.fromObjectID, num3);
-			if (QuestManager.IsValidInGameExplore() && isBoss && MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId == status.fromClientID)
-			{
-				ExplorePlayerStatus myExplorePlayerStatus = MonoBehaviourSingleton<QuestManager>.I.GetMyExplorePlayerStatus();
-				int num5 = myExplorePlayerStatus.givenTotalDamage + num3;
-				myExplorePlayerStatus.SyncTotalDamageToBoss(num5);
-				MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendExploreBossDamage(num5);
-			}
-		}
-	}
-
-	private void _CheckHitFixArrow(AttackedHitStatusFix status, EnemyRegionWork region_work)
-	{
-		//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0536: Unknown result type (might be due to invalid IL or missing references)
-		if (!base.isDead)
-		{
-			TargetPoint targetPoint = null;
-			int i = 0;
-			for (int num = targetPoints.Length; i < num; i++)
-			{
-				if (targetPoints[i].regionID == status.regionID && targetPoints[i].isAimEnable)
-				{
-					targetPoint = targetPoints[i];
-					break;
-				}
-			}
-			if (status.isShadowSealing)
-			{
-				if (!IsDebuffShadowSealing())
-				{
-					ShadowSealingData shadowSealingData = region_work.shadowSealingData;
-					if (shadowSealingData.ownerID == 0)
-					{
-						shadowSealingData.ownerID = status.fromObjectID;
-						shadowSealingData.existSec = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.shadowSealingExistSec * badStatusMax.shadowSealing;
-						Player player = status.fromObject as Player;
-						if (!object.ReferenceEquals(player, null))
-						{
-							shadowSealingData.extendRate = player.buffParam.GetShadowSealingExtend();
-							shadowSealingData.existSec *= player.buffParam.GetShadowSealingExtendArrow();
-						}
-						else
-						{
-							shadowSealingData.extendRate = 1f;
-						}
-						if (shadowSealingData.existSec <= MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.shadowSealingExistMinSec)
-						{
-							shadowSealingData.existSec = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.shadowSealingExistMinSec;
-						}
-						if (!object.ReferenceEquals(targetPoint, null) && object.ReferenceEquals(region_work.shadowSealingEffect, null))
-						{
-							region_work.shadowSealingEffect = targetPoint.PlayArrowBleedEffect(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.shadowSealingEffectName, 0);
-							if (!object.ReferenceEquals(region_work.shadowSealingEffect, null))
-							{
-								EffectSizeCtrl component = region_work.shadowSealingEffect.GetComponent<EffectSizeCtrl>();
-								if (!object.ReferenceEquals(component, null))
-								{
-									component.Work(shadowSealingData.existSec);
-								}
-							}
-						}
-						if ((IsMirror() || IsPuppet()) && !IsValidWaitingPacket(WAITING_PACKET.ENEMY_UPDATE_SHADOWSEALING))
-						{
-							StartWaitingPacket(WAITING_PACKET.ENEMY_UPDATE_SHADOWSEALING, false, shadowSealingData.existSec);
-						}
-					}
-					if (_CheckShadowSealingFullStuck())
-					{
-						ActDebuffShadowSealingStart();
-					}
-					else if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
-					{
-						MonoBehaviourSingleton<UIEnemyStatus>.I.DirectionShadowSealingGauge(status.hitPos);
-					}
-				}
-			}
-			else if (status.isArrowBleed)
-			{
-				BleedData bleedData = null;
-				int j = 0;
-				for (int count = region_work.bleedList.Count; j < count; j++)
-				{
-					if (region_work.bleedList[j].ownerID == status.fromObjectID)
-					{
-						bleedData = region_work.bleedList[j];
-						break;
-					}
-				}
-				if (bleedData == null)
-				{
-					bleedData = new BleedData();
-					region_work.bleedList.Add(bleedData);
-				}
-				InGameSettingsManager.Player.SpecialActionInfo specialActionInfo = MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo;
-				bleedData.ownerID = status.fromObjectID;
-				if (bleedData.lv == 0)
-				{
-					bleedData.cnt = specialActionInfo.arrowBleedCount;
-					bleedData.skipFirst = status.arrowBleedSkipFirst;
-				}
-				int num2 = status.arrowBleedDamage / specialActionInfo.arrowBleedCount;
-				if (num2 < 1)
-				{
-					num2 = 1;
-				}
-				bleedData.damage += num2;
-				if (bleedData.IsOwnerSelf())
-				{
-					bleedData.lv++;
-				}
-				bool flag = true;
-				if (!specialActionInfo.arrowBleedOther.enable && !bleedData.IsOwnerSelf())
-				{
-					flag = false;
-				}
-				if (targetPoint != null && flag)
-				{
-					BleedWork bleedWork = null;
-					int num3 = 1;
-					int index = 0;
-					int k = 0;
-					for (int count2 = region_work.bleedWorkList.Count; k < count2; k++)
-					{
-						if (region_work.bleedWorkList[k].ownerID == status.fromObjectID)
-						{
-							bleedWork = region_work.bleedWorkList[k];
-							break;
-						}
-						if (num3 == region_work.bleedWorkList[k].showIndex)
-						{
-							num3++;
-							index = k + 1;
-						}
-					}
-					if (bleedWork == null)
-					{
-						bleedWork = new BleedWork();
-						if (bleedData.IsOwnerSelf())
-						{
-							region_work.bleedWorkList.Insert(0, bleedWork);
-							bleedWork.showIndex = 0;
-						}
-						else
-						{
-							region_work.bleedWorkList.Insert(index, bleedWork);
-							bleedWork.showIndex = num3;
-						}
-						bleedWork.ownerID = status.fromObjectID;
-					}
-					if (bleedWork.bleedEffect == null)
-					{
-						string effect_name = specialActionInfo.arrowBleedEffectName;
-						if (bleedWork.showIndex != 0)
-						{
-							effect_name = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.arrowBleedOtherEffectName;
-						}
-						bleedWork.bleedEffect = targetPoint.PlayArrowBleedEffect(effect_name, bleedWork.showIndex);
-					}
-					else if (bleedWork.showIndex == 0)
-					{
-						Animator component2 = bleedWork.bleedEffect.GetComponent<Animator>();
-						if (null != component2)
-						{
-							component2.Play("ACT" + (bleedData.lv - 1).ToString());
-						}
-					}
-					if (bleedData.IsMaxLv())
-					{
-						string burstEffectName = specialActionInfo.GetBurstEffectName(status.damageDetails.GetElementType());
-						Transform trs = null;
-						if (bleedWork != null)
-						{
-							trs = bleedWork.bleedEffect;
-						}
-						targetPoint.PlayArrowBurstEffect(burstEffectName, trs);
-						int num4 = 2;
-						if (status.damageDetails.GetElementType() != ELEMENT_TYPE.MAX)
-						{
-							num4++;
-						}
-						MonoBehaviourSingleton<UIDamageManager>.I.Create(status.hitPos, status.arrowBurstDamage, UIDamageNum.DAMAGE_COLOR.NONE, num4, 0);
-					}
-				}
-				if ((IsMirror() || IsPuppet()) && !IsValidWaitingPacket(WAITING_PACKET.ENEMY_UPDATE_BLEED_DAMAGE))
-				{
-					float arrowBleedTimeInterval = specialActionInfo.arrowBleedTimeInterval;
-					StartWaitingPacket(WAITING_PACKET.ENEMY_UPDATE_BLEED_DAMAGE, false, arrowBleedTimeInterval * 2f);
-				}
-			}
-		}
-	}
-
-	public override void ActReaction(ReactionInfo info, bool isSync = false)
-	{
-		base.ActReaction(info, false);
-		switch (info.reactionType)
-		{
-		case REACTION_TYPE.DEAD:
-		case REACTION_TYPE.GUARD_DAMAGE:
-		case REACTION_TYPE.PARALYZE:
-		case REACTION_TYPE.ANGRY:
-		case REACTION_TYPE.FREEZE:
-		case REACTION_TYPE.INK_SPLASH:
-			break;
-		case REACTION_TYPE.DOWN:
-			ActDown();
-			break;
-		case REACTION_TYPE.COUNTER:
-			ActCounter(info.targetId);
-			break;
-		case REACTION_TYPE.ELECTRIC_SHOCK:
-			ActElectricShock();
-			break;
-		case REACTION_TYPE.DIZZY:
-			ActDizzy();
-			break;
-		case REACTION_TYPE.SHADOWSEALING:
-			ActDebuffShadowSealingStart();
-			break;
-		case REACTION_TYPE.MAD_MODE:
-			ActMadMode();
-			break;
-		}
-	}
-
-	public override void OnReactionDelay(List<DelayReactionInfo> reactionDelayList)
-	{
-		if (m_reactionDelayList.Count >= 2)
-		{
-			DelayReactionInfo delayReactionInfo = SearchReactionDelayInfo(REACTION_TYPE.COUNTER);
-			if (delayReactionInfo != null)
-			{
-				m_reactionDelayList.Remove(delayReactionInfo);
-			}
-		}
-		base.OnReactionDelay(reactionDelayList);
-		int count = reactionDelayList.Count;
-		if (count > 0)
-		{
-			for (int i = 0; i < count; i++)
-			{
-				DelayReactionInfo delayReactionInfo2 = reactionDelayList[i];
-				switch (delayReactionInfo2.type)
-				{
-				case REACTION_TYPE.DOWN:
-					ActDown();
-					break;
-				case REACTION_TYPE.COUNTER:
-					ActCounter(delayReactionInfo2.targetId);
-					break;
-				case REACTION_TYPE.DIZZY:
-					ActDizzy();
-					break;
-				case REACTION_TYPE.SHADOWSEALING:
-					ActDebuffShadowSealingStart();
-					break;
-				case REACTION_TYPE.MAD_MODE:
-					ActMadMode();
-					break;
-				}
-			}
-		}
-	}
-
-	private int GetRegionID(Collider collider, List<int> target_region_ids)
-	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		int result = 0;
-		if (collider != null)
-		{
-			RegionRoot componentInParent = collider.get_gameObject().GetComponentInParent<RegionRoot>();
-			if (componentInParent != null)
-			{
-				for (int num = componentInParent.regionIDArray.Length - 1; num >= 0; num--)
-				{
-					int num2 = componentInParent.regionIDArray[num];
-					if (num2 >= 0 && num2 < regionWorks.Length)
-					{
-						EnemyRegionWork enemyRegionWork = regionWorks[num2];
-						RegionInfo regionInfo = regionInfos[num2];
-						while (!enemyRegionWork.enabled && enemyRegionWork.parentRegionID >= 0)
-						{
-							num2 = enemyRegionWork.parentRegionID;
-							enemyRegionWork = regionWorks[num2];
-							regionInfo = regionInfos[num2];
-						}
-						if (num == 0 || (target_region_ids != null && target_region_ids.Contains(num2)))
-						{
-							bool flag = false;
-							if ((int)enemyRegionWork.hp <= 0 && regionInfo.maxHP > 0)
-							{
-								flag = true;
-							}
-							if (regionInfo.breakAfterHit || !flag)
-							{
-								result = num2;
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-		return result;
-	}
-
-	public int GetEnabledCounterRegionIndex()
-	{
-		for (int i = 0; i < regionWorks.Length; i++)
-		{
-			EnemyRegionWork enemyRegionWork = regionWorks[i];
-			if (enemyRegionWork != null)
-			{
-				RegionInfo regionInfo = regionInfos[i];
-				if (regionInfo != null && !enemyRegionWork.isBroke && regionInfo.counterInfo.enabled)
-				{
-					return i;
-				}
-			}
-		}
-		return -1;
-	}
-
-	public EnemyRegionWork GetEnabledCounterRegion()
-	{
-		int enabledCounterRegionIndex = GetEnabledCounterRegionIndex();
-		if (enabledCounterRegionIndex < 0)
-		{
-			return null;
-		}
-		return regionWorks[enabledCounterRegionIndex];
-	}
-
-	public EnemyRegionWork SearchRegionWork(int regionId)
-	{
-		if (regionId < 0 || regionId >= regionWorks.Length)
-		{
-			return null;
-		}
-		return regionWorks[regionId];
-	}
-
-	public int GetRegionID(string name)
-	{
-		int i = 0;
-		for (int num = regionInfos.Length; i < num; i++)
-		{
-			if (regionInfos[i].name == name)
-			{
-				return i;
-			}
-		}
-		return 0;
-	}
-
-	public List<int> GetBreakRegionIDList()
-	{
-		List<int> list = new List<int>();
-		list.Add(0);
-		if (regionInfos == null)
-		{
-			return list;
-		}
-		int i = 1;
-		for (int num = regionInfos.Length; i < num; i++)
-		{
-			EnemyRegionWork enemyRegionWork = regionWorks[i];
-			if (enemyRegionWork.isBroke)
-			{
-				list.Add(i);
-			}
-		}
-		return list;
-	}
-
-	public void SetAttackInfos(AttackInfo[] attack_infos)
-	{
-		attackInfos = attack_infos;
-	}
-
-	protected void PlayRegionEffect(int region_id, string effect_name)
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		if (targetPoints != null)
-		{
-			Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-			Quaternion rotation = cameraTransform.get_rotation();
-			Vector3 position = cameraTransform.get_position();
-			int i = 0;
-			for (int num = targetPoints.Length; i < num; i++)
-			{
-				TargetPoint targetPoint = targetPoints[i];
-				if (targetPoint.regionID == region_id && targetPoint.isTargetEnable)
-				{
-					Vector3 position2 = targetPoint._transform.get_position();
-					position2 += targetPoint._transform.get_rotation() * targetPoint.scaledOffset;
-					Vector3 val = position - position2;
-					Vector3 pos = val.get_normalized() * targetPoint.scaledMarkerZShift + position2;
-					Quaternion rot = rotation;
-					EffectManager.OneShot(effect_name, pos, rot, true);
-				}
-			}
-		}
-	}
-
-	private void CreateDropItem(Vector3 pos, StageObject target, int rarity, bool is_region_break)
-	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		if (target is Self)
-		{
-			DropObject.Create(rarity, is_region_break, pos);
-		}
-	}
-
-	private void CreateDropItemFromRegionBreak(RegionInfo region_info, StageObject target, int rarity)
-	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		if (region_info.breakDrop != null)
-		{
-			Transform val = FindNode(region_info.breakDrop.dropNodeName);
-			if (!(val == null))
-			{
-				Vector3 position = val.get_position();
-				CreateDropItem(position, target, rarity, true);
-			}
-		}
-	}
-
-	private void CreateDamageNum(Vector3 pos, AtkAttribute damage, bool buff, int addGroup = 0)
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-		int num = addGroup;
-		if (damage.normal != 0f)
-		{
-			MonoBehaviourSingleton<UIDamageManager>.I.Create(pos, (int)damage.normal, buff ? UIDamageNum.DAMAGE_COLOR.BUFF : UIDamageNum.DAMAGE_COLOR.NONE, num++, 0);
-		}
-		float num3 = damage.fire + damage.water + damage.thunder + damage.soil + damage.light + damage.dark;
-		if (num3 != 0f)
-		{
-			UIDamageNum.DAMAGE_COLOR color = UIDamageNum.DAMAGE_COLOR.NONE;
-			switch (damage.GetElementType())
-			{
-			case ELEMENT_TYPE.FIRE:
-				color = UIDamageNum.DAMAGE_COLOR.FIRE;
-				break;
-			case ELEMENT_TYPE.WATER:
-				color = UIDamageNum.DAMAGE_COLOR.WATER;
-				break;
-			case ELEMENT_TYPE.THUNDER:
-				color = UIDamageNum.DAMAGE_COLOR.THUNDER;
-				break;
-			case ELEMENT_TYPE.SOIL:
-				color = UIDamageNum.DAMAGE_COLOR.SOIL;
-				break;
-			case ELEMENT_TYPE.LIGHT:
-				color = UIDamageNum.DAMAGE_COLOR.LIGHT;
-				break;
-			case ELEMENT_TYPE.DARK:
-				color = UIDamageNum.DAMAGE_COLOR.DARK;
-				break;
-			}
-			ELEMENT_TYPE elementType = damage.GetElementType();
-			EFFECTIVE_TYPE effectiveType = GetEffectiveType(elementType, enemyTableData.element);
-			int effective = 0;
-			switch (effectiveType)
-			{
-			case EFFECTIVE_TYPE.GOOD:
-				effective = 1;
-				break;
-			case EFFECTIVE_TYPE.BAD:
-				effective = -1;
-				break;
-			}
-			MonoBehaviourSingleton<UIDamageManager>.I.Create(pos, (int)num3, color, num++, effective);
-		}
-		if (num == 0)
-		{
-			MonoBehaviourSingleton<UIDamageManager>.I.Create(pos, (int)damage.normal, buff ? UIDamageNum.DAMAGE_COLOR.BUFF : UIDamageNum.DAMAGE_COLOR.NONE, num++, 0);
-		}
-	}
-
-	private void PlayRegionBreakEffect(RegionInfo region_info)
-	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Expected O, but got Unknown
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = FindNode(region_info.breakEffect.nodeName);
-		if (!(val == null))
-		{
-			Transform effect = EffectManager.GetEffect(region_info.breakEffect.effectName, null);
-			if (!(effect == null))
-			{
-				Transform val2 = val.get_transform();
-				effect.set_position(val2.get_position());
-				effect.set_rotation(val2.get_rotation() * Quaternion.Euler(region_info.breakEffect.effectAngle));
-			}
-		}
-	}
-
-	public void UpdateRegionVisual()
-	{
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016d: Expected O, but got Unknown
-		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c7: Expected O, but got Unknown
-		int i = 0;
-		for (int num = regionWorks.Length; i < num; i++)
-		{
-			EnemyRegionWork enemyRegionWork = regionWorks[i];
-			if ((int)enemyRegionWork.hp <= 0)
-			{
-				RegionInfo regionInfo = regionInfos[i];
-				string[] deactivateObjects = regionInfo.deactivateObjects;
-				foreach (string name in deactivateObjects)
-				{
-					Transform val = FindNode(name);
-					if (val != null)
-					{
-						val.get_gameObject().SetActive(false);
-					}
-				}
-				int k = 0;
-				for (int num2 = regionWorks.Length; k < num2; k++)
-				{
-					if (regionWorks[k].parentRegionID >= 0 && regionWorks[k].parentRegionID == i)
-					{
-						regionWorks[k].enabled = true;
-					}
-				}
-			}
-			int num3 = 0;
-			while (num3 < enemyRegionWork.bleedWorkList.Count)
-			{
-				BleedWork bleedWork = enemyRegionWork.bleedWorkList[num3];
-				bool flag = false;
-				int l = 0;
-				for (int count = enemyRegionWork.bleedList.Count; l < count; l++)
-				{
-					if (enemyRegionWork.bleedList[l].ownerID == bleedWork.ownerID)
-					{
-						flag = true;
-						break;
-					}
-				}
-				if (flag)
-				{
-					num3++;
-				}
-				else
-				{
-					if (bleedWork.bleedEffect != null)
-					{
-						EffectManager.ReleaseEffect(bleedWork.bleedEffect.get_gameObject(), true, false);
-						bleedWork.bleedEffect = null;
-					}
-					enemyRegionWork.bleedWorkList.RemoveAt(num3);
-				}
-			}
-			if (enemyRegionWork.shadowSealingData.ownerID == 0 && !object.ReferenceEquals(enemyRegionWork.shadowSealingEffect, null))
-			{
-				EffectManager.ReleaseEffect(enemyRegionWork.shadowSealingEffect.get_gameObject(), false, true);
-				enemyRegionWork.shadowSealingEffect = null;
-			}
-			TargetPoint targetPoint = null;
-			int m = 0;
-			for (int num4 = targetPoints.Length; m < num4; m++)
-			{
-				if (targetPoints[m].regionID == i && targetPoints[m].isAimEnable)
-				{
-					targetPoint = targetPoints[m];
-					break;
-				}
-			}
-			if (targetPoint != null)
-			{
-				int n = 0;
-				for (int count2 = enemyRegionWork.bleedList.Count; n < count2; n++)
-				{
-					BleedData bleedData = enemyRegionWork.bleedList[n];
-					bool flag2 = true;
-					if (!MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedOther.enable && !bleedData.IsOwnerSelf())
-					{
-						flag2 = false;
-					}
-					if (flag2)
-					{
-						BleedWork bleedWork2 = null;
-						int num5 = 1;
-						int index = 0;
-						int num6 = 0;
-						for (int count3 = enemyRegionWork.bleedWorkList.Count; num6 < count3; num6++)
-						{
-							if (enemyRegionWork.bleedWorkList[num6].ownerID == bleedData.ownerID)
-							{
-								bleedWork2 = enemyRegionWork.bleedWorkList[num6];
-								break;
-							}
-							if (num5 == enemyRegionWork.bleedWorkList[num6].showIndex)
-							{
-								num5++;
-								index = num6 + 1;
-							}
-						}
-						if (bleedWork2 == null)
-						{
-							bleedWork2 = new BleedWork();
-							if (bleedData.IsOwnerSelf())
-							{
-								enemyRegionWork.bleedWorkList.Insert(0, bleedWork2);
-								bleedWork2.showIndex = 0;
-							}
-							else
-							{
-								enemyRegionWork.bleedWorkList.Insert(index, bleedWork2);
-								bleedWork2.showIndex = num5;
-							}
-							bleedWork2.ownerID = bleedData.ownerID;
-						}
-						if (bleedWork2.bleedEffect == null)
-						{
-							string effect_name = MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedEffectName;
-							if (bleedWork2.showIndex != 0)
-							{
-								effect_name = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.arrowBleedOtherEffectName;
-							}
-							bleedWork2.bleedEffect = targetPoint.PlayArrowBleedEffect(effect_name, bleedWork2.showIndex);
-						}
-					}
-				}
-				if (enemyRegionWork.shadowSealingData.ownerID != 0 && object.ReferenceEquals(enemyRegionWork.shadowSealingEffect, null))
-				{
-					enemyRegionWork.shadowSealingEffect = targetPoint.PlayArrowBleedEffect(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.shadowSealingEffectName, 0);
-				}
-			}
-		}
-		InitializeBarrierEffect();
-		UpdateBreakIDLists();
-	}
-
-	private void InitializeBarrierEffect()
-	{
-		List<AnimEventData.EventData> list = animEventProcessor.ListUpEventData(AnimEventFormat.ID.EFFECT_LOOP_CUSTOM);
-		if (list != null && list.Count > 0)
-		{
-			foreach (AnimEventData.EventData item in list)
-			{
-				if (IsValidBarrier)
-				{
-					EventEffectLoopCustom(item);
-				}
-			}
-		}
-	}
-
-	public void ReviveRegion(int region_id)
-	{
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		if (region_id >= 0 && region_id < regionInfos.Length)
-		{
-			EnemyRegionWork enemyRegionWork = regionWorks[region_id];
-			RegionInfo regionInfo = regionInfos[region_id];
-			if (enemyRegionWork != null)
-			{
-				enemyRegionWork.hp = regionInfo.maxHP;
-				string[] deactivateObjects = regionInfo.deactivateObjects;
-				foreach (string name in deactivateObjects)
-				{
-					Transform val = FindNode(name);
-					if (val != null)
-					{
-						val.get_gameObject().SetActive(true);
-					}
-				}
-				int j = 0;
-				for (int num = regionWorks.Length; j < num; j++)
-				{
-					regionWorks[j].OnReviveRegion(region_id);
-				}
-				EnemyController enemyController = base.controller as EnemyController;
-				if (enemyController != null)
-				{
-					enemyController.OnReviveRegion(region_id);
-				}
-				reviveRegionWaitSync = false;
-				if (enemySender != null)
-				{
-					enemySender.OnReviveRegion(region_id);
-				}
-				if (MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
-				{
-					MonoBehaviourSingleton<TargetMarkerManager>.I.updateShadowSealingFlag = true;
-				}
-			}
-		}
-	}
-
-	public bool IsEnableReviveRegion(int region_id)
-	{
-		if (region_id < 0 || region_id >= regionInfos.Length)
-		{
-			Log.Error("RegionId is out of range!!");
-			return false;
-		}
-		EnemyRegionWork enemyRegionWork = regionWorks[region_id];
-		RegionInfo regionInfo = regionInfos[region_id];
-		if (regionInfo == null || enemyRegionWork == null)
-		{
-			return false;
-		}
-		if (!regionInfo.enableRevive)
-		{
-			return false;
-		}
-		if ((int)enemyRegionWork.hp > 0 || regionInfo.maxHP <= 0)
-		{
-			return false;
-		}
-		if (Time.get_time() - enemyRegionWork.breakTime < regionInfo.reviveIntervalTime)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	public void ActivateRegionNode(int[] regionIDs, bool isRandom = false, int randomSelectedID = -1)
-	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		if (!regionIDs.IsNullOrEmpty() && !regionRoots.IsNullOrEmpty())
-		{
-			foreach (int num in regionIDs)
-			{
-				for (int j = 0; j < regionRoots.Length; j++)
-				{
-					if (regionRoots[j].regionID == num)
-					{
-						if (!isRandom)
-						{
-							regionRoots[j].get_gameObject().SetActive(true);
-						}
-						else if (regionRoots[j].regionID != randomSelectedID)
-						{
-							regionRoots[j].get_gameObject().SetActive(false);
-						}
-						else
-						{
-							regionRoots[j].get_gameObject().SetActive(true);
-							RegionInfo regionInfo = regionInfos[randomSelectedID];
-							if (regionInfo != null && regionInfo.modeChangeInfo.enabled)
-							{
-								EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-								if (!(enemyBrain == null))
-								{
-									EnemyActionController actionCtrl = enemyBrain.actionCtrl;
-									if (actionCtrl != null)
-									{
-										actionCtrl.modeId = regionInfo.modeChangeInfo.modeID;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			if (enemySender != null)
-			{
-				enemySender.OnEnemyRegionNodeActivate(regionIDs, isRandom, randomSelectedID);
-			}
-		}
-	}
-
-	public bool IsBleedFromSelf(int region_id)
-	{
-		if (region_id < 0 || region_id >= regionWorks.Length)
-		{
-			Log.Error("RegionId is out of range!!");
-			return false;
-		}
-		EnemyRegionWork enemyRegionWork = regionWorks[region_id];
-		if (enemyRegionWork == null)
-		{
-			return false;
-		}
-		int i = 0;
-		for (int count = enemyRegionWork.bleedList.Count; i < count; i++)
-		{
-			if (enemyRegionWork.bleedList[i].IsOwnerSelf())
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public bool IsMaxLvBleedFromSelf(int region_id)
-	{
-		if (region_id < 0 || region_id >= regionWorks.Length)
-		{
-			Log.Error("RegionId is out of range!!");
-			return false;
-		}
-		EnemyRegionWork enemyRegionWork = regionWorks[region_id];
-		if (enemyRegionWork == null)
-		{
-			return false;
-		}
-		int i = 0;
-		for (int count = enemyRegionWork.bleedList.Count; i < count; i++)
-		{
-			if (enemyRegionWork.bleedList[i].IsOwnerSelf())
-			{
-				return enemyRegionWork.bleedList[i].IsMaxLv();
-			}
-		}
-		return false;
-	}
-
-	public bool IsShadowSealingStuck(int regionId)
-	{
-		if (IsDebuffShadowSealing())
-		{
-			return true;
-		}
-		if (regionId < 0 || regionId >= regionWorks.Length)
-		{
-			Log.Error("RegionId is out of range!!");
-			return false;
-		}
-		EnemyRegionWork enemyRegionWork = regionWorks[regionId];
-		if (enemyRegionWork == null)
-		{
-			return false;
-		}
-		return enemyRegionWork.shadowSealingData.ownerID != 0;
-	}
-
-	public void SetHitShock(Vector3 vec)
-	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		if (canHitShockEffect)
-		{
-			hitShockOffsetFlag = true;
-		}
-		hitShockLightTime = 0f;
-		hitShockOffsetTime = 0f;
-		hitShockVec = vec;
-		hitShockVec.y = 0f;
-		hitShockVec.Normalize();
-	}
-
-	public void SetHitLight()
-	{
-		hitShockLightFlag = true;
-	}
-
-	public override string EffectNameAnalyzer(string effect_name)
-	{
-		if (!string.IsNullOrEmpty(effect_name) && enemyTableData != null && !string.IsNullOrEmpty(enemyTableData.effectEnemyKey))
-		{
-			effect_name = effect_name.Replace("[ENEMY_KEY]", enemyTableData.effectEnemyKey);
-		}
-		return effect_name;
-	}
-
-	private void EventReviveRegion(AnimEventData.EventData data)
-	{
-		int num = data.intArgs[0];
-		if (num < 0 || num >= regionInfos.Length)
-		{
-			Log.Error("Out of region index !! id:" + num);
-		}
-		else if (IsCoopNone() || IsOriginal())
-		{
-			if (IsEnableReviveRegion(num))
-			{
-				ReviveRegion(num);
-			}
-		}
-		else if (!reviveRegionWaitSync)
-		{
-			reviveRegionWaitSync = true;
-		}
-	}
-
-	private void EventDashStart(AnimEventData.EventData data)
-	{
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		if (!enableDash)
-		{
-			string value = (data.stringArgs.Length <= 0) ? null : data.stringArgs[0];
-			float num = (data.floatArgs.Length <= 0) ? 0f : data.floatArgs[0];
-			float num2 = (data.floatArgs.Length <= 1) ? 0f : data.floatArgs[1];
-			wallStayTimer = 0f;
-			enableDash = true;
-			dashBeforePos = _position;
-			dashNowDistance = 0f;
-			dashOverDistance = num;
-			dashMinDistance = num2;
-			dashOverFlag = false;
-			dashOverCheckDistance = 0f;
-			if (string.IsNullOrEmpty(value))
-			{
-				dashEndTrigger = "next";
-			}
-			else
-			{
-				dashEndTrigger = value;
-			}
-			rotateSafeMode = true;
-			dashMaxDistance = 0f;
-			if (base.actionPositionFlag)
-			{
-				Vector3 val = base.actionPosition - _position;
-				val.y = 0f;
-				dashMaxDistance = val.get_magnitude();
-			}
-			if (dashMaxDistance < dashMinDistance)
-			{
-				dashMaxDistance = dashMinDistance;
-			}
-			dashMaxDistance *= enemyParameter.dashMaxDistanceRate;
-		}
-	}
-
-	private void EventWarpViewStart(AnimEventData.EventData data)
-	{
-		float num = data.floatArgs[0];
-		if (num <= 0f)
-		{
-			warpViewFlag = false;
-			warpViewRate = 1f;
-			warpViewRatePerTime = 0f;
-			SetWarpVisible(warpViewRate);
-		}
-		else
-		{
-			warpViewFlag = true;
-			warpViewRatePerTime = (1f - warpViewRate) / num;
-		}
-	}
-
-	private void EventWarpViewEnd(AnimEventData.EventData data)
-	{
-		float num = data.floatArgs[0];
-		if (num <= 0f)
-		{
-			warpViewFlag = false;
-			warpViewRate = 0f;
-			warpViewRatePerTime = 0f;
-			SetWarpVisible(warpViewRate);
-		}
-		else
-		{
-			warpViewFlag = true;
-			warpViewRatePerTime = (0f - warpViewRate) / num;
-		}
-	}
-
-	private void EventWarpToTarget(AnimEventData.EventData data)
-	{
-		float warp_distance = data.floatArgs[0];
-		SetWarpToTarget(warp_distance, false);
-	}
-
-	private void EventWarpToReverseTarget(AnimEventData.EventData data)
-	{
-		float warp_distance = data.floatArgs[0];
-		SetWarpToTarget(warp_distance, true);
-	}
-
-	private void EventWarpToRandom(AnimEventData.EventData data)
-	{
-		float warpMax = data.floatArgs[0];
-		float warpMin = (data.floatArgs.Length <= 1) ? 0f : data.floatArgs[1];
-		SetWarpToRandom(warpMax, warpMin);
-	}
-
-	private void EventRadialBlurStart(AnimEventData.EventData data)
-	{
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		float time = data.floatArgs[0];
-		float strength = data.floatArgs[1];
-		string text = data.stringArgs[0];
-		bool flag = (data.intArgs[0] != 0) ? true : false;
-		Transform val = FindNode(text);
-		if (val == null)
-		{
-			Log.Error("Not found node for RadialBlur!! " + text);
-		}
-		else
-		{
-			if (flag)
-			{
-				MonoBehaviourSingleton<InGameCameraManager>.I.StartRadialBlurFilter(time, strength, val);
-			}
-			else
-			{
-				MonoBehaviourSingleton<InGameCameraManager>.I.StartRadialBlurFilter(time, strength, val.get_position());
-			}
-			radialBlurEnable = true;
-		}
-	}
-
-	private void EventRadialBlurChange(AnimEventData.EventData data)
-	{
-		float time = data.floatArgs[0];
-		float num = data.floatArgs[1];
-		if (num <= 0f)
-		{
-			MonoBehaviourSingleton<InGameCameraManager>.I.EndRadialBlurFilter(time);
-			radialBlurEnable = false;
-		}
-		else
-		{
-			MonoBehaviourSingleton<InGameCameraManager>.I.ChangeRadialBlurFilter(time, num);
-		}
-	}
-
-	private void EventRadialBlurEnd(AnimEventData.EventData data)
-	{
-		float time = data.floatArgs[0];
-		MonoBehaviourSingleton<InGameCameraManager>.I.EndRadialBlurFilter(time);
-		radialBlurEnable = false;
-	}
-
-	private void EventShotTarget(AnimEventData.EventData data)
-	{
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0246: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0312: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0317: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0321: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0326: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03b6: Unknown result type (might be due to invalid IL or missing references)
-		AttackInfo atkInfo = FindAttackInfo(data.stringArgs[0], true, false);
-		if (atkInfo == null)
-		{
-			Log.Error("Not found AttackInfo !! " + data.stringArgs[0]);
-		}
-		else
-		{
-			Transform val = FindNode(data.stringArgs[1]);
-			if (val == null)
-			{
-				Log.Error("Not found node for ShotTarget!! " + data.stringArgs[1]);
-			}
-			else
-			{
-				Vector3 v = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-				Matrix4x4 localToWorldMatrix = val.get_localToWorldMatrix();
-				v = localToWorldMatrix.MultiplyPoint3x4(v);
-				switch (data.intArgs[0])
-				{
-				case 0:
-					MonoBehaviourSingleton<StageObjectManager>.I.playerList.ForEach(delegate(StageObject obj)
-					{
-						//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-						//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-						//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-						//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-						//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-						Vector3 position2 = obj._position;
-						position2.y += 1f;
-						Quaternion rot2 = Quaternion.LookRotation(position2 - v);
-						AnimEventShot animEventShot = AnimEventShot.Create(this, atkInfo, v, rot2, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
-						animEventShot.SetTarget(obj);
-					});
-					break;
-				case 1:
-				{
-					int num6 = data.intArgs[1];
-					if (IsOriginal() || IsCoopNone())
-					{
-						List<RandomShotInfo.TargetInfo> list2 = new List<RandomShotInfo.TargetInfo>(num6);
-						for (int k = 0; k < num6; k++)
-						{
-							int count = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Count;
-							int index = Random.Range(0, count);
-							StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.playerList[index];
-							if (stageObject == null)
-							{
-								list2.Add(new RandomShotInfo.TargetInfo(val.get_rotation(), -1));
-								break;
-							}
-							Vector3 position = stageObject._position;
-							position.y += 1f;
-							Quaternion rot = Quaternion.LookRotation(position - v);
-							list2.Add(new RandomShotInfo.TargetInfo(rot, stageObject.id));
-						}
-						TargetRandamShotEvent(list2);
-					}
-					RandomShotInfo randomShotInfo2 = null;
-					bool flag2 = false;
-					if (shotNetworkInfoQueue.Count > 0)
-					{
-						randomShotInfo2 = shotNetworkInfoQueue[0];
-						shotNetworkInfoQueue.Remove(randomShotInfo2);
-						flag2 = true;
-					}
-					else
-					{
-						randomShotInfo2 = new RandomShotInfo();
-					}
-					randomShotInfo2.atkInfo = atkInfo;
-					for (int l = 0; l < num6; l++)
-					{
-						randomShotInfo2.points[l] = v;
-					}
-					randomShotInfo2.shotCount = 0;
-					randomShotInfo2.countTime = 0f;
-					randomShotInfo2.interval = data.floatArgs[3];
-					if (flag2)
-					{
-						this.randomShotInfo.Add(randomShotInfo2);
-					}
-					else
-					{
-						shotEventInfoQueue.Add(randomShotInfo2);
-					}
-					break;
-				}
-				case 2:
-				{
-					int num = data.intArgs[1];
-					if (IsOriginal() || IsCoopNone())
-					{
-						List<RandomShotInfo.TargetInfo> list = new List<RandomShotInfo.TargetInfo>(num);
-						float num2 = data.floatArgs[4];
-						float num3 = data.floatArgs[5];
-						for (int i = 0; i < num; i++)
-						{
-							float num4 = Random.Range(0f - num2, num2);
-							float num5 = Random.Range(0f - num3, num3);
-							Quaternion val2 = Quaternion.Euler(new Vector3(num4, num5, 0f));
-							val2 *= val.get_rotation();
-							list.Add(new RandomShotInfo.TargetInfo(val2, -1));
-						}
-						TargetRandamShotEvent(list);
-					}
-					RandomShotInfo randomShotInfo = null;
-					bool flag = false;
-					if (shotNetworkInfoQueue.Count > 0)
-					{
-						randomShotInfo = shotNetworkInfoQueue[0];
-						shotNetworkInfoQueue.Remove(randomShotInfo);
-						flag = true;
-					}
-					else
-					{
-						randomShotInfo = new RandomShotInfo();
-					}
-					randomShotInfo.atkInfo = atkInfo;
-					for (int j = 0; j < num; j++)
-					{
-						randomShotInfo.points[j] = v;
-					}
-					randomShotInfo.shotCount = 0;
-					randomShotInfo.countTime = 0f;
-					randomShotInfo.interval = data.floatArgs[3];
-					if (flag)
-					{
-						this.randomShotInfo.Add(randomShotInfo);
-					}
-					else
-					{
-						shotEventInfoQueue.Add(randomShotInfo);
-					}
-					break;
-				}
-				}
-			}
-		}
-	}
-
-	private void EventShotPoint(AnimEventData.EventData data)
-	{
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0257: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0281: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0286: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0291: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_034c: Unknown result type (might be due to invalid IL or missing references)
-		AttackInfo info = FindAttackInfo(data.stringArgs[0], true, false);
-		if (info == null)
-		{
-			Log.Error("Not found AttackInfo !! " + data.stringArgs[0]);
-		}
-		else
-		{
-			bool bFixedY = data.intArgs.Length > 2;
-			Quaternion q = Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
-			q = _rotation * q;
-			int num = data.intArgs[0];
-			if (num == 0)
-			{
-				MonoBehaviourSingleton<StageObjectManager>.I.playerList.ForEach(delegate(StageObject obj)
-				{
-					//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-					//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-					//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-					Vector3 val3 = default(Vector3);
-					val3._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-					Matrix4x4 localToWorldMatrix2 = obj._transform.get_localToWorldMatrix();
-					val3 = localToWorldMatrix2.MultiplyPoint3x4(val3);
-					if (bFixedY && data.intArgs[2] != 0)
-					{
-						val3.y = data.floatArgs[1];
-					}
-					AnimEventShot animEventShot = AnimEventShot.Create(this, info, val3, q, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
-					animEventShot.SetTarget(obj);
-				});
-			}
-			else
-			{
-				int num2 = data.intArgs[1];
-				if (IsOriginal() || IsCoopNone())
-				{
-					List<Vector3> list = new List<Vector3>(num2);
-					for (int i = 0; i < num2; i++)
-					{
-						Transform transform = base._transform;
-						switch (num)
-						{
-						case 1:
-						{
-							int count = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Count;
-							int index = Random.Range(0, count);
-							StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.playerList[index];
-							if (stageObject != null)
-							{
-								transform = stageObject._transform;
-							}
-							break;
-						}
-						case 3:
-							if (base.actionTarget != null)
-							{
-								transform = base.actionTarget._transform;
-							}
-							break;
-						}
-						Vector3 val = default(Vector3);
-						val._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-						Matrix4x4 localToWorldMatrix = transform.get_localToWorldMatrix();
-						val = localToWorldMatrix.MultiplyPoint3x4(val);
-						if (bFixedY && data.intArgs[2] != 0)
-						{
-							val.y = data.floatArgs[1];
-						}
-						float num3 = (float)Random.Range(-180, 180);
-						Quaternion val2 = Quaternion.Euler(new Vector3(0f, num3, 0f));
-						val += val2 * transform.get_forward() * Random.Range(0f, data.floatArgs[8]);
-						val += transform.get_up() * Random.Range(0f - data.floatArgs[7], data.floatArgs[7]);
-						list.Add(val);
-					}
-					PointRandamShotEvent(list);
-				}
-				RandomShotInfo randomShotInfo = null;
-				bool flag = false;
-				if (shotNetworkInfoQueue.Count > 0)
-				{
-					randomShotInfo = shotNetworkInfoQueue[0];
-					shotNetworkInfoQueue.Remove(randomShotInfo);
-					flag = true;
-				}
-				else
-				{
-					randomShotInfo = new RandomShotInfo();
-				}
-				randomShotInfo.targets = new List<RandomShotInfo.TargetInfo>(num2);
-				randomShotInfo.atkInfo = info;
-				for (int j = 0; j < num2; j++)
-				{
-					randomShotInfo.targets.Add(new RandomShotInfo.TargetInfo(q, -1));
-				}
-				randomShotInfo.shotCount = 0;
-				randomShotInfo.countTime = 0f;
-				randomShotInfo.interval = data.floatArgs[6];
-				if (flag)
-				{
-					this.randomShotInfo.Add(randomShotInfo);
-				}
-				else
-				{
-					shotEventInfoQueue.Add(randomShotInfo);
-				}
-			}
-		}
-	}
-
-	private void EventShotWorldPoint(AnimEventData.EventData data)
-	{
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		AttackInfo attackInfo = FindAttackInfo(data.stringArgs[0], true, false);
-		if (attackInfo != null)
-		{
-			Vector3 pos = default(Vector3);
-			pos._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-			Quaternion rot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
-			AnimEventShot animEventShot = AnimEventShot.Create(this, attackInfo, pos, rot, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
-		}
-	}
-
-	private void EventWeakPointON(AnimEventData.EventData data)
-	{
-		int num = data.intArgs[0];
-		if (num < 0 || num >= regionInfos.Length)
-		{
-			Log.Error("Region Index is out of range!! ");
-		}
-		else
-		{
-			int weakType = -1;
-			if (data.intArgs.Length > 1)
-			{
-				weakType = data.intArgs[1];
-			}
-			int validElement = -1;
-			if (data.intArgs.Length > 2)
-			{
-				validElement = data.intArgs[2];
-			}
-			float displayTime = 0f;
-			if (data.floatArgs.Length > 0)
-			{
-				displayTime = data.floatArgs[0];
-			}
-			string deleteAttackName = string.Empty;
-			if (data.stringArgs.Length > 1)
-			{
-				deleteAttackName = data.stringArgs[1];
-			}
-			if (!regionWorks[num].IsValidDisplayTimer)
-			{
-				regionWorks[num].SetupWeakPoint(weakType, data.attackMode, displayTime, deleteAttackName, validElement);
-			}
-		}
-	}
-
-	private void EventWeakPointOFF(AnimEventData.EventData data)
-	{
-		int num = data.intArgs[0];
-		if (num < 0 || num >= regionInfos.Length)
-		{
-			Log.Error("Region Index is out of range!! ");
-		}
-		else
-		{
-			EnemyRegionWork enemyRegionWork = regionWorks[num];
-			if (!enemyRegionWork.IsValidDisplayTimer)
-			{
-				enemyRegionWork.weakState = WEAK_STATE.NONE;
-			}
-		}
-	}
-
-	private void EventWeakPointAllON(AnimEventData.EventData data)
-	{
-		int num = regionWorks.Length;
-		for (int i = 0; i < num; i++)
-		{
-			if (!regionWorks[i].IsValidDisplayTimer)
-			{
-				regionWorks[i].SetupWeakPoint(data.intArgs[0], data.attackMode, 0f, string.Empty, -1);
-			}
-		}
-	}
-
-	private void EventWeakPointAllOFF(AnimEventData.EventData data)
-	{
-		int i = 0;
-		for (int num = regionWorks.Length; i < num; i++)
-		{
-			if (!regionWorks[i].IsValidDisplayTimer)
-			{
-				regionWorks[i].weakState = WEAK_STATE.NONE;
-			}
-		}
-	}
-
-	private void EventHideBaseEffectON(AnimEventData.EventData data)
-	{
-		SetBaseEffecActivateFlag(false);
-	}
-
-	private void EventHideBaseEffectOFF(AnimEventData.EventData data)
-	{
-		SetBaseEffecActivateFlag(true);
-	}
-
-	protected override void EventNWayLaserAttack(AnimEventData.EventData data)
-	{
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Expected O, but got Unknown
-		string text = data.stringArgs[0];
-		string text2 = data.stringArgs[1];
-		int numLaser = data.intArgs[0];
-		Transform val = Utility.Find(base._transform, text2);
-		if (val == null)
-		{
-			Log.Error("Not found node!! name:" + text2);
-		}
-		else
-		{
-			AttackInfo attackInfo = FindAttackInfo(text, true, false);
-			if (attackInfo == null)
-			{
-				Log.Error("Not found AttackInfo!! name:" + text);
-			}
-			else
-			{
-				BulletData bulletData = attackInfo.bulletData;
-				if (bulletData == null || bulletData.dataLaser == null)
-				{
-					Log.Error("Not found BulletData!! atkInfoName:" + text);
-				}
-				else
-				{
-					GameObject val2 = new GameObject("AttackNWayLaser");
-					AttackNWayLaser attackNWayLaser = val2.AddComponent<AttackNWayLaser>();
-					attackNWayLaser.Initialize(this, val, attackInfo, numLaser);
-					m_activeAttackLaserList.Add(attackNWayLaser);
-				}
-			}
-		}
-	}
-
-	private void EventObstacleNodeLinkAttack(AnimEventData.EventData data)
-	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017e: Expected O, but got Unknown
-		string text = data.stringArgs[0];
-		string text2 = data.stringArgs[1];
-		Transform val = Utility.Find(base._transform, text2);
-		if (val == null)
-		{
-			Log.Error("Not found node!! name:" + text2);
-		}
-		else if (val.get_gameObject().get_activeSelf())
-		{
-			AttackInfo attackInfo = FindAttackInfo(text, true, false);
-			if (attackInfo == null)
-			{
-				Log.Error("Not found AttackInfo!! name:" + text);
-			}
-			else
-			{
-				AnimEventShot animEventShot = null;
-				Vector3 offset = default(Vector3);
-				offset._002Ector(0f, 0f, 0f);
-				if (data.intArgs.Length > 1 && data.intArgs[1] != 0)
-				{
-					if (base.actionTarget != null)
-					{
-						Vector3 val2 = default(Vector3);
-						val2._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-						Quaternion val3 = Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
-						val3 = _rotation * val3;
-						Matrix4x4 localToWorldMatrix = base.actionTarget._transform.get_localToWorldMatrix();
-						val2 = localToWorldMatrix.MultiplyPoint3x4(val2);
-						animEventShot = AnimEventShot.Create(this, attackInfo, val2, val3, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
-					}
-					else
-					{
-						offset.z += 2f;
-					}
-				}
-				if (animEventShot == null)
-				{
-					animEventShot = AnimEventShot.Create(this, data, attackInfo, offset);
-				}
-				GameObject val4 = new GameObject("AttackObstacleNodeLink");
-				AttackShotNodeLink attackShotNodeLink = val4.AddComponent<AttackShotNodeLink>();
-				attackShotNodeLink.Initialize(this, val, data, attackInfo, animEventShot);
-				m_activeAttackObstacleList.Add(attackShotNodeLink);
-			}
-		}
-	}
-
-	private void EventFunnelAttack(AnimEventData.EventData data)
-	{
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		string text = data.stringArgs[0];
-		string text2 = data.stringArgs[1];
-		Transform launchTrans = FindNode(text2);
-		if (launchTrans == null)
-		{
-			Log.Error("Not found transform for launch!! name:" + text2);
-		}
-		else
-		{
-			AttackInfo atkInfo = FindAttackInfo(text, true, false);
-			if (atkInfo == null)
-			{
-				Log.Error("Not found AttackInfo!! name:" + text);
-			}
-			else
-			{
-				BulletData bulletData = atkInfo.bulletData;
-				if (bulletData == null || bulletData.dataFunnel == null)
-				{
-					Log.Error("Not found BulletData!! atkInfoName:" + text);
-				}
-				else
-				{
-					Vector3 offsetPos = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-					Quaternion offsetRot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
-					MonoBehaviourSingleton<StageObjectManager>.I.playerList.ForEach(delegate(StageObject targetChar)
-					{
-						//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-						//IL_000a: Expected O, but got Unknown
-						//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-						//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-						GameObject val = new GameObject("AttackFunnelBit");
-						AttackFunnelBit attackFunnelBit = val.AddComponent<AttackFunnelBit>();
-						attackFunnelBit.Initialize(this, atkInfo, targetChar, launchTrans, offsetPos, offsetRot);
-						m_activeAttackFunnelList.Add(attackFunnelBit);
-					});
-				}
-			}
-		}
-	}
-
-	private void EventUndeadAttack(AnimEventData.EventData data)
-	{
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		string text = data.stringArgs[0];
-		string text2 = data.stringArgs[1];
-		Transform launchTrans = FindNode(text2);
-		if (launchTrans == null)
-		{
-			Log.Error("Not found transform for launch!! name:" + text2);
-		}
-		else
-		{
-			AttackInfo atkInfo = FindAttackInfo(text, true, false);
-			if (atkInfo == null)
-			{
-				Log.Error("Not found AttackInfo!! name:" + text);
-			}
-			else
-			{
-				BulletData bulletData = atkInfo.bulletData;
-				if (bulletData == null || bulletData.dataUndead == null)
-				{
-					Log.Error("Not found BulletData!! atkInfoName:" + text);
-				}
-				else
-				{
-					Vector3 offsetPos = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-					Quaternion offsetRot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
-					MonoBehaviourSingleton<StageObjectManager>.I.playerList.ForEach(delegate(StageObject targetChar)
-					{
-						//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-						//IL_000a: Expected O, but got Unknown
-						//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-						//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-						GameObject val = new GameObject("AttackUndead");
-						AttackUndead attackUndead = val.AddComponent<AttackUndead>();
-						attackUndead.Initialize(this, atkInfo, targetChar, launchTrans, offsetPos, offsetRot);
-					});
-				}
-			}
-		}
-	}
-
-	private void EventDigAttack(AnimEventData.EventData data)
-	{
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		string text = data.stringArgs[0];
-		string text2 = data.stringArgs[1];
-		Transform launchTrans = FindNode(text2);
-		if (launchTrans == null)
-		{
-			Log.Error("Not found transform for launch!! name:" + text2);
-		}
-		else
-		{
-			AttackInfo atkInfo = FindAttackInfo(text, true, false);
-			if (atkInfo == null)
-			{
-				Log.Error("Not found AttackInfo!! name:" + text);
-			}
-			else
-			{
-				BulletData bulletData = atkInfo.bulletData;
-				if (bulletData == null || bulletData.dataDig == null)
-				{
-					Log.Error("Not found BulletData!! atkInfoName:" + text);
-				}
-				else
-				{
-					Vector3 offsetPos = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-					Quaternion offsetRot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
-					MonoBehaviourSingleton<StageObjectManager>.I.playerList.ForEach(delegate(StageObject targetChar)
-					{
-						//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-						//IL_000a: Expected O, but got Unknown
-						//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-						//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-						GameObject val = new GameObject("AttackDig");
-						AttackDig attackDig = val.AddComponent<AttackDig>();
-						attackDig.Initialize(this, atkInfo, targetChar, launchTrans, offsetPos, offsetRot);
-						m_activeAttackDigList.Add(attackDig);
-					});
-				}
-			}
-		}
-	}
-
-	private void EventCancelAction(AnimEventData.EventData data)
-	{
-		if ((IsCoopNone() || IsOriginal()) && !base.isDead)
-		{
-			CANCEL_CONDITION cANCEL_CONDITION = (CANCEL_CONDITION)data.intArgs[0];
-			if (cANCEL_CONDITION != 0)
-			{
-				float transitionTime = data.floatArgs[0];
-				bool flag = false;
-				CANCEL_CONDITION cANCEL_CONDITION2 = cANCEL_CONDITION;
-				if (cANCEL_CONDITION2 == CANCEL_CONDITION.FAILED_GRAB)
-				{
-					EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-					if (!(enemyBrain == null))
-					{
-						GrabController grabController = enemyBrain.actionCtrl.grabController;
-						if (grabController != null && !grabController.IsGrabing())
-						{
-							flag = true;
-						}
-					}
-				}
-				if (flag)
-				{
-					ActIdle(true, transitionTime);
-				}
-			}
-		}
-	}
-
-	private void EventReleaseGrab(AnimEventData.EventData data)
-	{
-		ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
-	}
-
-	private void EventFloatingMineAttack(AnimEventData.EventData data)
-	{
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0115: Expected O, but got Unknown
-		string text = data.stringArgs[0];
-		string text2 = data.stringArgs[1];
-		Transform val = FindNode(text2);
-		if (val == null)
-		{
-			Log.Error("Not found transform for launch!! name: " + text2);
-		}
-		else
-		{
-			AttackInfo attackInfo = FindAttackInfo(text, true, false);
-			if (attackInfo == null)
-			{
-				Log.Error("Not found AttackInfo!! name: " + text);
-			}
-			else
-			{
-				BulletData bulletData = attackInfo.bulletData;
-				if (bulletData == null || bulletData.dataMine == null)
-				{
-					Log.Error("Not found BulletData!! atkInfoName: " + text);
-				}
-				else
-				{
-					Vector3 offsetPos = default(Vector3);
-					offsetPos._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-					Quaternion offsetRot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
-					AttackFloatingMine.InitParamFloatingMine initParamFloatingMine = new AttackFloatingMine.InitParamFloatingMine();
-					initParamFloatingMine.attacker = this;
-					initParamFloatingMine.atkInfo = attackInfo;
-					initParamFloatingMine.launchTrans = val;
-					initParamFloatingMine.offsetPos = offsetPos;
-					initParamFloatingMine.offsetRot = offsetRot;
-					GameObject val2 = new GameObject("AttackFloatingMine");
-					AttackFloatingMine attackFloatingMine = val2.AddComponent<AttackFloatingMine>();
-					attackFloatingMine.Initialize(initParamFloatingMine);
-				}
-			}
-		}
-	}
-
-	protected override void EventActionMineAttack(AnimEventData.EventData data)
-	{
-		if (IsOriginal() || IsCoopNone())
-		{
-			ActCreateActionMine(data.stringArgs[0]);
-		}
-	}
-
-	private void ActCreateActionMine(string atkInfoName)
-	{
-		int randSeed = Random.Range(-2147483648, 2147483647);
-		ActCreateActionMine(atkInfoName, randSeed);
-		if (enemySender != null)
-		{
-			enemySender.OnCreateActionMine(atkInfoName, randSeed);
-		}
-	}
-
-	public void ActCreateActionMine(string atkInfoName, int randSeed)
-	{
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0199: Expected O, but got Unknown
-		AttackInfo attackInfo = FindAttackInfo(atkInfoName, true, false);
-		if (attackInfo == null)
-		{
-			Log.Error("Not found AttackInfo!! name:" + atkInfoName);
-		}
-		else
-		{
-			BulletData bulletData = attackInfo.bulletData;
-			if (bulletData == null || bulletData.dataActionMine == null)
-			{
-				Log.Error("Not found BulletData!! atkInfoName:" + atkInfoName);
-			}
-			else
-			{
-				int settingNum = bulletData.dataActionMine.settingNum;
-				float settingRadius = bulletData.dataActionMine.settingRadius;
-				float centerConcentration = bulletData.dataActionMine.centerConcentration;
-				float settingHeight = bulletData.dataActionMine.settingHeight;
-				float settingNearLimit = bulletData.dataActionMine.settingNearLimit;
-				Vector3[] randomPosition = GetRandomPosition(settingNum, this.get_transform().get_position(), settingRadius, centerConcentration, settingHeight, settingNearLimit, randSeed);
-				Random random = new Random(randSeed);
-				for (int i = 0; i < randomPosition.Length; i++)
-				{
-					AttackActionMine.InitParamActionMine initParamActionMine = new AttackActionMine.InitParamActionMine();
-					initParamActionMine.attacker = this;
-					initParamActionMine.atkInfo = attackInfo;
-					initParamActionMine.position = randomPosition[i];
-					initParamActionMine.rotation = Quaternion.LookRotation(this.get_transform().get_position() - randomPosition[i]);
-					initParamActionMine.randomSeed = randSeed;
-					int tmp_id = 0;
-					for (int j = 0; j < 10; j++)
-					{
-						tmp_id = random.Next(1, 2147483647);
-						if (!m_activeAttackActionMineList.Exists((AttackActionMine x) => x.objId == tmp_id))
-						{
-							break;
-						}
-					}
-					initParamActionMine.id = tmp_id;
-					GameObject val = new GameObject("AttackActionMine");
-					AttackActionMine attackActionMine = val.AddComponent<AttackActionMine>();
-					attackActionMine.Initialize(initParamActionMine);
-					m_activeAttackActionMineList.Add(attackActionMine);
-				}
-			}
-		}
-	}
-
-	private Vector3[] GetRandomPosition(int num, Vector3 center, float radius, float concentration, float height, float nearLimit, int randomSeed)
-	{
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		Random random = new Random(randomSeed);
-		int num2 = 50;
-		List<Vector3> list = new List<Vector3>();
-		for (int i = 0; i < num; i++)
-		{
-			for (int j = 0; j < num2; j++)
-			{
-				float num3 = radius * Mathf.Pow((float)random.NextDouble(), concentration);
-				float num4 = 6.28f * (float)random.NextDouble();
-				float num5 = num3 * Mathf.Cos(num4);
-				float num6 = num3 * Mathf.Sin(num4);
-				Vector3 pos = new Vector3(num5 + center.x, height, num6 + center.z);
-				if (MonoBehaviourSingleton<StageManager>.I.CheckPosInside(pos) && !list.Exists((Vector3 v) => Vector3.Distance(v, pos) < nearLimit) && !m_activeAttackActionMineList.Exists((AttackActionMine m) => Vector3.Distance(m.get_transform().get_position(), pos) < nearLimit))
-				{
-					list.Add(pos);
-					break;
-				}
-			}
-		}
-		return list.ToArray();
-	}
-
-	protected override void EventReflectBulletAttack(AnimEventData.EventData data)
-	{
-		if (IsOriginal() || IsCoopNone())
-		{
-			string atkInfoName = data.stringArgs[0];
-			string nodeName = data.stringArgs[1];
-			int num = Random.Range(-2147483648, 2147483647);
-			ActCreateReflectBullet(atkInfoName, nodeName, -1, num);
-			if (enemySender != null)
-			{
-				enemySender.OnReflectBulletAttack(atkInfoName, nodeName, num);
-			}
-		}
-	}
-
-	public void ActCreateReflectBullet(string atkInfoName, string nodeName, int objId, int seed)
-	{
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		ActResetActionMineRandom(seed);
-		if (objId > 0)
-		{
-			AttackActionMine attackActionMine = m_activeAttackActionMineList.Find((AttackActionMine x) => x.objId == objId);
-			if (attackActionMine != null)
-			{
-				attackActionMine.CreateReflectBullet();
-			}
-		}
-		else if (!string.IsNullOrEmpty(atkInfoName))
-		{
-			AttackInfo attackInfo = FindAttackInfo(atkInfoName, true, false);
-			if (attackInfo == null)
-			{
-				Log.Error("Not found AttackInfo!! name:" + atkInfoName);
-			}
-			else
-			{
-				Transform val = (!string.IsNullOrEmpty(nodeName)) ? ((object)FindNode(nodeName)) : ((object)base._transform);
-				if (val == null)
-				{
-					Log.Error("Not found transform for launch!! name:" + nodeName);
-				}
-				else
-				{
-					Vector3 position = val.get_position();
-					Quaternion reflectBulletRotation = GetReflectBulletRotation(position, seed);
-					AnimEventShot animEventShot = AnimEventShot.Create(this, attackInfo, position, reflectBulletRotation, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
-					animEventShot.get_gameObject().AddComponent<AttackActionMine.ReflectBulletCondition>();
-				}
-			}
-		}
-	}
-
-	private Quaternion GetReflectBulletRotation(Vector3 nodePos, int randSeed)
-	{
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-		m_activeAttackActionMineList.RemoveAll((AttackActionMine x) => x == null);
-		AttackActionMine[] array = m_activeAttackActionMineList.ToArray();
-		Random random = new Random(randSeed);
-		if (array.Length > 0)
-		{
-			Vector3 position = array[random.Next(0, m_activeAttackActionMineList.Count)].get_transform().get_position();
-			return Quaternion.LookRotation(position - nodePos);
-		}
-		List<StageObject> list = new List<StageObject>(MonoBehaviourSingleton<StageObjectManager>.I.playerList);
-		list.RemoveAll(delegate(StageObject obj)
-		{
-			Player player = obj as Player;
-			if (player != null)
-			{
-				return player.hp <= 0;
-			}
-			return false;
-		});
-		list.Sort((StageObject a, StageObject b) => a.id - b.id);
-		if (list.Count > 0)
-		{
-			Vector3 position2 = list[random.Next(0, list.Count)]._position;
-			return Quaternion.LookRotation(position2 - nodePos);
-		}
-		return _rotation;
-	}
-
-	public void ActResetActionMineRandom(int seed)
-	{
-		for (int i = 0; i < m_activeAttackActionMineList.Count; i++)
-		{
-			m_activeAttackActionMineList[i].ResetRandomSeed(seed + i);
-		}
-	}
-
-	private void EventWeatherChange(AnimEventData.EventData data)
-	{
-		if (data.floatArgs.Length >= 2)
-		{
-			MonoBehaviourSingleton<SceneSettingsManager>.I.ChangeWeather(data.floatArgs[0], data.floatArgs[1]);
-		}
-	}
-
-	private void EventRecoverBarrierHp(AnimEventData.EventData data)
-	{
-		int num = data.intArgs[0];
-		if (num < 0 || num >= regionInfos.Length)
-		{
-			Log.Error("Region Index is out of range!! ");
-		}
-	}
-
-	private void EventRecoverBarrierHpAll(AnimEventData.EventData data)
-	{
-		int num = data.intArgs[0];
-		float num2 = (float)num * 0.01f;
-		int num3 = (int)((float)BarrierHpMax * num2);
-		if (num3 > 0)
-		{
-			m_barrierHp = (int)m_barrierHp + num3;
-			if ((int)m_barrierHp > BarrierHpMax)
-			{
-				m_barrierHp = BarrierHpMax;
-			}
-		}
-	}
-
-	private void EventShieldON(AnimEventData.EventData data)
-	{
-		base.ShieldHp = base.ShieldHpMax;
-		List<EnemyRegionWork> list = new List<EnemyRegionWork>();
-		for (int i = 0; i < regionInfos.Length; i++)
-		{
-			EnemyRegionWork enemyRegionWork = regionWorks[i];
-			enemyRegionWork.isShieldCriticalDamage = false;
-			if (enemyRegionWork.enabled && !enemyRegionWork.regionInfo.isGrabRelease && enemyRegionWork.isShieldDamage)
-			{
-				list.Add(regionWorks[i]);
-			}
-		}
-		if (list.Count > 0)
-		{
-			int index = 0;
-			if (list.Count > 1)
-			{
-				int seed = Random.get_seed();
-				Random.set_seed(base.SyncRandomSeed);
-				index = Random.Range(0, list.Count);
-				Random.set_seed(seed);
-			}
-			if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
-			{
-				MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(enemyTableData.name, STRING_CATEGORY.ENEMY_SHIELD, 0u);
-			}
-			list[index].isShieldCriticalDamage = true;
-			RequestShieldShaderEffect();
-		}
-	}
-
-	public void RequestShieldShaderEffect()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(SetShieldShaderParam());
-	}
-
-	private void EventGenerateAegis(AnimEventData.EventData data)
-	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Expected O, but got Unknown
-		if (object.ReferenceEquals(aegisCtrl, null))
-		{
-			GameObject val = new GameObject("AegisParent");
-			aegisCtrl = val.AddComponent<EnemyAegisController>();
-			aegisCtrl.Init(this);
-		}
-		aegisCtrl.Generate(data);
-	}
-
-	public EnemyAegisController.SetupParam GetAegisSetupParam()
-	{
-		if (object.ReferenceEquals(aegisCtrl, null))
-		{
-			return null;
-		}
-		return aegisCtrl.GetSetupParam();
-	}
-
-	public float GetAegisPercent()
-	{
-		if (object.ReferenceEquals(aegisCtrl, null))
-		{
-			return 0f;
-		}
-		return aegisCtrl.GetPercent();
-	}
-
-	public void SetupAegis(EnemyAegisController.SetupParam param)
-	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Expected O, but got Unknown
-		if (!object.ReferenceEquals(param, null))
-		{
-			if (object.ReferenceEquals(aegisCtrl, null))
-			{
-				GameObject val = new GameObject("AegisParent");
-				aegisCtrl = val.AddComponent<EnemyAegisController>();
-				aegisCtrl.Init(this);
-			}
-			aegisCtrl.Setup(param, false);
-		}
-	}
-
-	private void EventEffectLoopCustom(AnimEventData.EventData data)
-	{
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Expected O, but got Unknown
-		string str = data.stringArgs[0];
-		string str2 = data.stringArgs[1];
-		string text = str + str2;
-		foreach (EnemyEffectObject enemyEffect in m_enemyEffectList)
-		{
-			if (enemyEffect.UniqueName == text)
-			{
-				return;
-			}
-		}
-		Transform val = AnimEventFormat.EffectEventExec(data.id, data, base._transform, isBoss, ((Character)this).EffectNameAnalyzer, ((StageObject)this).FindNode, null);
-		if (!(val == null))
-		{
-			int num = data.intArgs[0];
-			int deleteCondition = data.intArgs[1];
-			GameObject val2 = val.get_gameObject();
-			EnemyEffectObject enemyEffectObject = val2.AddComponent<EnemyEffectObject>();
-			enemyEffectObject.Initialize(this, regionWorks[num], deleteCondition, text);
-			m_enemyEffectList.Add(enemyEffectObject);
-		}
-	}
-
-	public void OnNotifyDeleteEnemyEffect(EnemyEffectObject del)
-	{
-		if (del != null && m_enemyEffectList.Contains(del))
-		{
-			m_enemyEffectList.Remove(del);
-		}
-	}
-
-	public void SetResidentEffectSetting(SystemEffectSetting setting)
-	{
-		m_residentEffectSetting = setting;
-	}
-
-	private void EventGroupEffectON(AnimEventData.EventData data)
-	{
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Expected O, but got Unknown
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Expected O, but got Unknown
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ce: Expected O, but got Unknown
-		//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ed: Expected O, but got Unknown
-		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0237: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0245: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0253: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
-		int num = data.intArgs[0];
-		AnimEventData.ResidentEffectData[] residentEffectDataList = animEventData.residentEffectDataList;
-		if (residentEffectDataList != null && residentEffectDataList.Length > 0)
-		{
-			AnimEventData.ResidentEffectData[] array = residentEffectDataList;
-			foreach (AnimEventData.ResidentEffectData residentEffectData in array)
-			{
-				if (!string.IsNullOrEmpty(residentEffectData.effectName) && !string.IsNullOrEmpty(residentEffectData.linkNodeName) && residentEffectData.groupID == num)
-				{
-					Transform val = Utility.Find(base.body.get_transform(), residentEffectData.linkNodeName);
-					if (val == null)
-					{
-						val = base.body.get_transform();
-					}
-					if (!IsExistResidentEffect(residentEffectData.UniqueName))
-					{
-						Transform effect = EffectManager.GetEffect(residentEffectData.effectName, val);
-						if (effect != null)
-						{
-							Vector3 localScale = effect.get_localScale();
-							effect.set_localScale(localScale * residentEffectData.scale);
-							effect.set_localPosition(residentEffectData.offsetPos);
-							effect.set_localRotation(Quaternion.Euler(residentEffectData.offsetRot));
-							ResidentEffectObject residentEffectObject = effect.get_gameObject().AddComponent<ResidentEffectObject>();
-							residentEffectObject.Initialize(residentEffectData);
-							RegisterResidentEffect(residentEffectObject);
-						}
-					}
-				}
-			}
-		}
-		if (m_residentEffectSetting != null)
-		{
-			SystemEffectSetting.Data[] effectDataList = m_residentEffectSetting.effectDataList;
-			if (effectDataList != null && effectDataList.Length > 0)
-			{
-				SystemEffectSetting.Data[] array2 = effectDataList;
-				foreach (SystemEffectSetting.Data data2 in array2)
-				{
-					if (!string.IsNullOrEmpty(data2.effectName) && !string.IsNullOrEmpty(data2.linkNodeName) && data2.groupID == num)
-					{
-						Transform val2 = Utility.Find(base.body.get_transform(), data2.linkNodeName);
-						if (val2 == null)
-						{
-							val2 = base.body.get_transform();
-						}
-						if (!IsExistResidentEffect(data2.UniqueName))
-						{
-							Transform effect2 = EffectManager.GetEffect(data2.effectName, val2);
-							if (effect2 != null)
-							{
-								Vector3 localScale2 = effect2.get_localScale();
-								effect2.set_localScale(localScale2 * data2.scale);
-								effect2.set_localPosition(data2.offsetPos);
-								effect2.set_localRotation(Quaternion.Euler(data2.offsetRot));
-								ResidentEffectObject residentEffectObject2 = effect2.get_gameObject().AddComponent<ResidentEffectObject>();
-								residentEffectObject2.Initialize(data2);
-								RegisterResidentEffect(residentEffectObject2);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private void EventGroupEffectOFF(AnimEventData.EventData data)
-	{
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Expected O, but got Unknown
-		int num = data.intArgs[0];
-		List<ResidentEffectObject> list = new List<ResidentEffectObject>();
-		foreach (ResidentEffectObject residentEffect in m_residentEffectList)
-		{
-			if (residentEffect.GroupID == num)
-			{
-				list.Add(residentEffect);
-			}
-		}
-		foreach (ResidentEffectObject item in list)
-		{
-			EffectManager.ReleaseEffect(item.get_gameObject(), true, false);
-			m_residentEffectList.Remove(item);
-		}
-	}
-
-	public void RegisterResidentEffect(ResidentEffectObject effectObj)
-	{
-		m_residentEffectList.Add(effectObj);
-	}
-
-	private bool IsExistResidentEffect(string uniqueName)
-	{
-		foreach (ResidentEffectObject residentEffect in m_residentEffectList)
-		{
-			if (residentEffect.UniqueName == uniqueName)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private void EventTailControllON(AnimEventData.EventData data)
-	{
-		int num = data.intArgs[0];
-		if (tailController == null)
-		{
-			Debug.LogError((object)("Not found TailController!! ID:" + num));
-		}
-		else if (tailController.UniqueID == num)
-		{
-			tailController.SetUpdateFlag(true, true);
-		}
-	}
-
-	private void EventTailControllOFF(AnimEventData.EventData data)
-	{
-		int @int = data.GetInt(0, 0);
-		float @float = data.GetFloat(0, 0.8f);
-		if (tailController == null)
-		{
-			Debug.LogError((object)("Not found TailController!! ID:" + @int));
-		}
-		else if (tailController.UniqueID == @int)
-		{
-			tailController.SetUpdateFlag(false, true);
-			tailController.RequestLerp(@float);
-		}
-	}
-
-	private void EventRegionNodeActivate(AnimEventData.EventData data)
-	{
-		if (data.intArgs.Length > 0 && data.stringArgs.Length > 0 && !string.IsNullOrEmpty(data.stringArgs[0]) && (IsCoopNone() || IsOriginal()))
-		{
-			bool flag = data.intArgs[0] == 1;
-			int[] array = (from a in data.stringArgs[0].Split(':')
-			select int.Parse(a)).ToArray();
-			int randomSelectedID = flag ? array[Random.Range(0, array.Length)] : 0;
-			ActivateRegionNode(array, flag, randomSelectedID);
-		}
-	}
-
-	private void EventRegionNodeDeactivate(AnimEventData.EventData data)
-	{
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		if (data.stringArgs.Length > 0 && !string.IsNullOrEmpty(data.stringArgs[0]))
-		{
-			int[] array = (from a in data.stringArgs[0].Split(':')
-			select int.Parse(a)).ToArray();
-			foreach (int num in array)
-			{
-				for (int j = 0; j < regionRoots.Length; j++)
-				{
-					if (regionRoots[j].regionID == num)
-					{
-						regionRoots[j].get_gameObject().SetActive(false);
-					}
-				}
-			}
-		}
-	}
-
-	public override void OnAnimEvent(AnimEventData.EventData data)
-	{
-		switch (data.id)
-		{
-		case AnimEventFormat.ID.DAMAGE_SHAKE_ON:
-			canHitShockEffect = true;
-			break;
-		case AnimEventFormat.ID.DAMAGE_SHAKE_OFF:
-			canHitShockEffect = false;
-			break;
-		case AnimEventFormat.ID.GROUP_EFFECT_ON:
-			EventGroupEffectON(data);
-			break;
-		case AnimEventFormat.ID.GROUP_EFFECT_OFF:
-			EventGroupEffectOFF(data);
-			break;
-		case AnimEventFormat.ID.EFFECT_LOOP_CUSTOM:
-			EventEffectLoopCustom(data);
-			break;
-		case AnimEventFormat.ID.RECOVER_BARRIER_HP:
-			EventRecoverBarrierHp(data);
-			break;
-		case AnimEventFormat.ID.RECOVER_BARRIER_HP_ALL:
-			EventRecoverBarrierHpAll(data);
-			break;
-		case AnimEventFormat.ID.SHIELD_ON:
-			EventShieldON(data);
-			break;
-		case AnimEventFormat.ID.REVIVE_REGION:
-			EventReviveRegion(data);
-			break;
-		case AnimEventFormat.ID.DASH_START:
-			EventDashStart(data);
-			break;
-		case AnimEventFormat.ID.WARP_VIEW_START:
-			EventWarpViewStart(data);
-			break;
-		case AnimEventFormat.ID.WARP_VIEW_END:
-			EventWarpViewEnd(data);
-			break;
-		case AnimEventFormat.ID.WARP_TO_TARGET:
-			EventWarpToTarget(data);
-			break;
-		case AnimEventFormat.ID.WARP_TO_REVERSE_TARGET:
-			EventWarpToReverseTarget(data);
-			break;
-		case AnimEventFormat.ID.WARP_TO_RANDOM:
-			EventWarpToRandom(data);
-			break;
-		case AnimEventFormat.ID.RADIAL_BLUR_START:
-			EventRadialBlurStart(data);
-			break;
-		case AnimEventFormat.ID.RADIAL_BLUR_CHANGE:
-			EventRadialBlurChange(data);
-			break;
-		case AnimEventFormat.ID.RADIAL_BLUR_END:
-			EventRadialBlurEnd(data);
-			break;
-		case AnimEventFormat.ID.SHOT_TARGET:
-			EventShotTarget(data);
-			break;
-		case AnimEventFormat.ID.SHOT_POINT:
-			EventShotPoint(data);
-			break;
-		case AnimEventFormat.ID.SHOT_WORLD_POINT:
-			EventShotWorldPoint(data);
-			break;
-		case AnimEventFormat.ID.WEAKPOINT_ON:
-			EventWeakPointON(data);
-			break;
-		case AnimEventFormat.ID.WEAKPOINT_OFF:
-			EventWeakPointOFF(data);
-			break;
-		case AnimEventFormat.ID.WEAKPOINT_ALL_ON:
-			EventWeakPointAllON(data);
-			break;
-		case AnimEventFormat.ID.WEAKPOINT_ALL_OFF:
-			EventWeakPointAllOFF(data);
-			break;
-		case AnimEventFormat.ID.HIDE_BASE_EFFECT_ON:
-			EventHideBaseEffectON(data);
-			break;
-		case AnimEventFormat.ID.HIDE_BASE_EFFECT_OFF:
-			EventHideBaseEffectOFF(data);
-			break;
-		case AnimEventFormat.ID.FUNNEL_ATTACK:
-			EventFunnelAttack(data);
-			break;
-		case AnimEventFormat.ID.CANCEL_ACTION:
-			EventCancelAction(data);
-			break;
-		case AnimEventFormat.ID.RELEASE_GRAB:
-			EventReleaseGrab(data);
-			break;
-		case AnimEventFormat.ID.FLOATING_MINE_ATTACK:
-			EventFloatingMineAttack(data);
-			break;
-		case AnimEventFormat.ID.UNDEAD_ATTACK:
-			EventUndeadAttack(data);
-			break;
-		case AnimEventFormat.ID.WEATHER_CHANGE:
-			EventWeatherChange(data);
-			break;
-		case AnimEventFormat.ID.SHOT_RANDOM_AUTO:
-			KeepRandomShot(data);
-			break;
-		case AnimEventFormat.ID.ICE_FLOOR_CREATE:
-			EventCreateIceFloor(data);
-			break;
-		case AnimEventFormat.ID.DIG_ATTACK:
-			EventDigAttack(data);
-			break;
-		case AnimEventFormat.ID.ACTION_MINE_ATTACK:
-			EventActionMineAttack(data);
-			break;
-		case AnimEventFormat.ID.TAIL_CONTROL_ON:
-			EventTailControllON(data);
-			break;
-		case AnimEventFormat.ID.TAIL_CONTROL_OFF:
-			EventTailControllOFF(data);
-			break;
-		case AnimEventFormat.ID.ACTION_MODE_ID_CHANGE:
-			EventActionModeIdChange(data);
-			break;
-		case AnimEventFormat.ID.ANIMATION_LAYER_WEIGHT:
-			AnimationLayerWeightChange(data);
-			break;
-		case AnimEventFormat.ID.TARGET_CHANGE_HATE_RANKING:
-			EventTargetChangeHateRanking(data);
-			break;
-		case AnimEventFormat.ID.ELEMENT_CHANGE:
-			EventElementToleranceChange(data);
-			break;
-		case AnimEventFormat.ID.BLEND_COLOR_CHANGE:
-			EventBlendColorChange(data);
-			break;
-		case AnimEventFormat.ID.BLEND_COLOR_ON:
-			EventBlendColorEnable(true);
-			break;
-		case AnimEventFormat.ID.BLEND_COLOR_OFF:
-			EventBlendColorEnable(false);
-			break;
-		case AnimEventFormat.ID.SHOT_NODE_LINK:
-			EventObstacleNodeLinkAttack(data);
-			break;
-		case AnimEventFormat.ID.ELEMENT_ICON_CHANGE:
-			EventElementIconChange(data);
-			break;
-		case AnimEventFormat.ID.WEAK_ELEMENT_ICON_CHANGE:
-			EventWeakElementIconChange(data);
-			break;
-		case AnimEventFormat.ID.REGION_COLLIDER_ATK_HIT_ON:
-			EventRegionColliderAtkHitOn(data);
-			break;
-		case AnimEventFormat.ID.REGION_COLLIDER_ATK_HIT_OFF:
-			EventRegionColliderAtkHitOff(data);
-			break;
-		case AnimEventFormat.ID.COUNTER_ENABLED_ON:
-			EventCounterEnabledOn(data);
-			break;
-		case AnimEventFormat.ID.COUNTER_ENABLED_OFF:
-			EventCounterEnabledOff(data);
-			break;
-		case AnimEventFormat.ID.BUFF_CANCELLATION:
-			EventBuffCancellation(data);
-			break;
-		case AnimEventFormat.ID.DAMAGE_TO_ENDURANCE:
-			EventDamageToEndurance(data);
-			break;
-		case AnimEventFormat.ID.SYNC_ACTION_TARGET:
-			EventSyncActionTarget(data);
-			break;
-		case AnimEventFormat.ID.GENERATE_AEGIS:
-			EventGenerateAegis(data);
-			break;
-		case AnimEventFormat.ID.REGION_NODE_ACTIVATE:
-			EventRegionNodeActivate(data);
-			break;
-		case AnimEventFormat.ID.REGION_NODE_DEACTIVATE:
-			EventRegionNodeDeactivate(data);
-			break;
-		default:
-			base.OnAnimEvent(data);
-			break;
-		}
-	}
-
-	private void SetBaseEffecActivateFlag(bool flag)
-	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		if (!(loader == null))
-		{
-			if (loader.baseEffect == null)
-			{
-				Log.Warning("Not found baseEffect!!");
-			}
-			else
-			{
-				loader.baseEffect.get_gameObject().SetActive(flag);
-			}
-		}
-	}
-
-	public void SetWarpVisible(float rate)
-	{
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-		if (loader.materialParamsList != null)
-		{
-			rate = Mathf.Clamp(rate, 0f, 1f);
-			int ID_VANISH_FLAG = Shader.PropertyToID("_Vanish_flag");
-			int ID_VANISH_RATE = Shader.PropertyToID("_Vanish_rate");
-			loader.materialParamsList.ForEach(delegate(EnemyLoader.MaterialParams prm)
-			{
-				if (prm.hasVanishFlag)
-				{
-					float num3 = (!(rate <= 0f)) ? 1f : 0f;
-					prm.material.SetFloat(ID_VANISH_FLAG, num3);
-				}
-				if (prm.hasVanishRate)
-				{
-					float num4 = 1f - rate;
-					prm.material.SetFloat(ID_VANISH_RATE, num4);
-				}
-			});
-			if (rate <= 0f)
-			{
-				hitOffFlag &= ~HIT_OFF_FLAG.INVICIBLE;
-				enableTargetPoint = true;
-				if (loader.shadow != null)
-				{
-					loader.shadow.get_gameObject().SetActive(true);
-				}
-				base._transform.GetComponentsInChildren<rymFX>(Temporary.fxList);
-				int i = 0;
-				for (int count = Temporary.fxList.Count; i < count; i++)
-				{
-					SetWarpInvisibleEffect(Temporary.fxList[i], false);
-				}
-				Temporary.fxList.Clear();
-				int j = 0;
-				for (int num = regionWorks.Length; j < num; j++)
-				{
-					int k = 0;
-					for (int count2 = regionWorks[j].bleedWorkList.Count; k < count2; k++)
-					{
-						BleedWork bleedWork = regionWorks[j].bleedWorkList[k];
-						if (bleedWork.bleedEffect != null)
-						{
-							EffectCtrl component = bleedWork.bleedEffect.GetComponent<EffectCtrl>();
-							if (!object.ReferenceEquals(component, null))
-							{
-								component.Pause(false);
-							}
-						}
-					}
-					if (!object.ReferenceEquals(regionWorks[j].shadowSealingEffect, null))
-					{
-						EffectCtrl component2 = regionWorks[j].shadowSealingEffect.GetComponent<EffectCtrl>();
-						if (!object.ReferenceEquals(component2, null))
-						{
-							component2.Pause(false);
-						}
-					}
-				}
-			}
-			else
-			{
-				hitOffFlag |= HIT_OFF_FLAG.INVICIBLE;
-				enableTargetPoint = false;
-				if (loader.shadow != null)
-				{
-					loader.shadow.get_gameObject().SetActive(false);
-				}
-				base._transform.GetComponentsInChildren<rymFX>(Temporary.fxList);
-				int l = 0;
-				for (int count3 = Temporary.fxList.Count; l < count3; l++)
-				{
-					SetWarpInvisibleEffect(Temporary.fxList[l], true);
-				}
-				Temporary.fxList.Clear();
-				int m = 0;
-				for (int num2 = regionWorks.Length; m < num2; m++)
-				{
-					int n = 0;
-					for (int count4 = regionWorks[m].bleedWorkList.Count; n < count4; n++)
-					{
-						BleedWork bleedWork2 = regionWorks[m].bleedWorkList[n];
-						if (bleedWork2.bleedEffect != null)
-						{
-							EffectCtrl component3 = bleedWork2.bleedEffect.GetComponent<EffectCtrl>();
-							if (!object.ReferenceEquals(component3, null))
-							{
-								component3.Pause(true);
-							}
-						}
-					}
-					if (!object.ReferenceEquals(regionWorks[m].shadowSealingEffect, null))
-					{
-						EffectCtrl component4 = regionWorks[m].shadowSealingEffect.GetComponent<EffectCtrl>();
-						if (!object.ReferenceEquals(component4, null))
-						{
-							component4.Pause(true);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private void SetWarpInvisibleEffect(rymFX rym_fx, bool invisible)
-	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		if (!(rym_fx == null))
-		{
-			int num = invisible ? 1 : 0;
-			if (rym_fx.InvisibleFlags != num)
-			{
-				rym_fx.InvisibleFlags = num;
-				rym_fx.get_gameObject().GetComponentsInChildren<Renderer>(Temporary.rendererList);
-				int i = 0;
-				for (int count = Temporary.rendererList.Count; i < count; i++)
-				{
-					Temporary.rendererList[i].set_enabled(!invisible);
-				}
-				Temporary.rendererList.Clear();
-			}
-		}
-	}
-
-	public void SetWarpToTarget(float warp_distance, bool reverse = false)
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-		if (IsOriginal() || IsCoopNone())
-		{
-			Vector3 val = _position;
-			if (base.actionTarget != null)
-			{
-				Vector3 position = _position;
-				position.y = 0f;
-				Vector3 targetPosition = GetTargetPosition(base.actionTarget);
-				targetPosition.y = 0f;
-				if (targetPosition == position)
-				{
-					val = position;
-				}
-				else
-				{
-					Vector3 val2 = targetPosition - position;
-					float magnitude = val2.get_magnitude();
-					val2 /= magnitude;
-					float num = 0f;
-					if (reverse)
-					{
-						val2 = -val2;
-						num = warp_distance;
-					}
-					else
-					{
-						num = magnitude - warp_distance;
-						if (num < 0f)
-						{
-							num = 0f;
-						}
-					}
-					while (true)
-					{
-						val = position + val2 * num;
-						if (num <= 0f || MonoBehaviourSingleton<StageManager>.I.CheckPosInside(val))
-						{
-							break;
-						}
-						num -= 0.5f;
-						if (num < 0f)
-						{
-							num = 0f;
-						}
-					}
-				}
-			}
-			if (_position != val)
-			{
-				Vector3 val3 = val - _position;
-				val3.y = 0f;
-				if (reverse)
-				{
-					val3 = -val3;
-				}
-				_rotation = Quaternion.LookRotation(val3);
-			}
-			_position = val;
-			SetWarp();
-		}
-		else if (!warpWaitSync)
-		{
-			warpWaitSync = true;
-			StartWaitingPacket(WAITING_PACKET.ENEMY_WARP, false, 0f);
-		}
-	}
-
-	public void SetWarpToRandom(float warpMax, float warpMin)
-	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-		if (IsOriginal() || IsCoopNone())
-		{
-			SphereCollider val = base._collider as SphereCollider;
-			if (!(val == null))
-			{
-				if (warpMin > warpMax)
-				{
-					warpMin = warpMax;
-				}
-				Vector3 position = _position;
-				position.y = 0f;
-				bool valid = false;
-				Vector3 randomPosByInsideInfo = MonoBehaviourSingleton<StageManager>.I.GetRandomPosByInsideInfo(position, warpMax, warpMin, ref valid);
-				if (!valid)
-				{
-					Log.Error(LOG.INGAME, "Enemy.SetWarpToRandom() position is failed. from_pos : {0}, warp_max : {1}, warp_min : {2}", position.ToString("F1"), warpMax, warpMin);
-				}
-				_position = randomPosByInsideInfo;
-				if (position != randomPosByInsideInfo)
-				{
-					Vector3 val2 = randomPosByInsideInfo - position;
-					val2.y = 0f;
-					_rotation = Quaternion.LookRotation(val2);
-				}
-				SetWarp();
-			}
-		}
-		else if (!warpWaitSync)
-		{
-			warpWaitSync = true;
-			StartWaitingPacket(WAITING_PACKET.ENEMY_WARP, false, 0f);
-		}
-	}
-
-	public void SetWarp()
-	{
-		SetNextTrigger(0);
-		EndWaitingPacket(WAITING_PACKET.ENEMY_WARP);
-		warpWaitSync = false;
-		if (enemySender != null)
-		{
-			enemySender.OnSetWarp();
-		}
-	}
-
-	public void TargetRandamShotEvent(List<RandomShotInfo.TargetInfo> targets)
-	{
-		RandomShotInfo randomShotInfo = null;
-		bool flag = false;
-		if (shotEventInfoQueue.Count > 0)
-		{
-			randomShotInfo = shotEventInfoQueue[0];
-			shotEventInfoQueue.Remove(randomShotInfo);
-			flag = true;
-		}
-		else
-		{
-			randomShotInfo = new RandomShotInfo();
-		}
-		randomShotInfo.targets = targets;
-		if (flag)
-		{
-			this.randomShotInfo.Add(randomShotInfo);
-		}
-		else
-		{
-			shotNetworkInfoQueue.Add(randomShotInfo);
-		}
-		if (enemySender != null)
-		{
-			enemySender.TargetRandamShotEvent(targets);
-		}
-	}
-
-	public void PointRandamShotEvent(List<Vector3> points)
-	{
-		RandomShotInfo randomShotInfo = null;
-		bool flag = false;
-		if (shotEventInfoQueue.Count > 0)
-		{
-			randomShotInfo = shotEventInfoQueue[0];
-			shotEventInfoQueue.Remove(randomShotInfo);
-			flag = true;
-		}
-		else
-		{
-			randomShotInfo = new RandomShotInfo();
-		}
-		randomShotInfo.points = points;
-		if (flag)
-		{
-			this.randomShotInfo.Add(randomShotInfo);
-		}
-		else
-		{
-			shotNetworkInfoQueue.Add(randomShotInfo);
-		}
-		if (enemySender != null)
-		{
-			enemySender.TargetRandamShotEvent(points);
-		}
-	}
-
-	private void UpdateRandomShot()
-	{
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		int num = this.randomShotInfo.Count;
-		if (num > 0)
-		{
-			for (int i = 0; i < num; i++)
-			{
-				RandomShotInfo randomShotInfo = this.randomShotInfo[i];
-				randomShotInfo.countTime -= Time.get_deltaTime();
-				if (randomShotInfo.targets.Count > randomShotInfo.shotCount)
-				{
-					randomShotInfo.countTime -= Time.get_deltaTime();
-					if (randomShotInfo.countTime <= 0f)
-					{
-						AnimEventShot.Create(this, randomShotInfo.atkInfo, randomShotInfo.points[randomShotInfo.shotCount], randomShotInfo.targets[randomShotInfo.shotCount].rot, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
-						int targetId = randomShotInfo.targets[randomShotInfo.shotCount].targetId;
-						if (targetId != -1)
-						{
-							MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(targetId);
-						}
-						randomShotInfo.shotCount++;
-						randomShotInfo.countTime = randomShotInfo.interval;
-					}
-				}
-				else
-				{
-					this.randomShotInfo.RemoveAt(i);
-					num--;
-					i--;
-				}
-			}
-		}
-	}
-
-	public override void OnFailedWaitingPacket(WAITING_PACKET type)
-	{
-		switch (type)
-		{
-		case WAITING_PACKET.ENEMY_WARP:
-			ActIdle(false, -1f);
-			break;
-		case WAITING_PACKET.ENEMY_UPDATE_BLEED_DAMAGE:
-			ClearBleedDamageAll();
-			break;
-		case WAITING_PACKET.ENEMY_UPDATE_SHADOWSEALING:
-			ClearShadowSealingAll(true, true);
-			break;
-		}
-		base.OnFailedWaitingPacket(type);
-	}
-
-	public override Vector3 GetTargetPosition(StageObject target)
-	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		if (target == null)
-		{
-			return Vector3.get_zero();
-		}
-		return target.GetPredictivePosition();
-	}
-
-	public bool isValidPush()
-	{
-		if (base.isLoading || base.isDead || isBoss)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	public override void ApplySyncPosition(Vector3 pos, float dir, bool force_sync = false)
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		_rotation = Quaternion.AngleAxis(dir, Vector3.get_up());
-		if (!force_sync && !isBoss)
-		{
-			float lesserEnemiesPositionMargin = enemyParameter.lesserEnemiesPositionMargin;
-			Vector3 val = _position - pos;
-			if (val.get_sqrMagnitude() < lesserEnemiesPositionMargin * lesserEnemiesPositionMargin)
-			{
-				return;
-			}
-		}
-		_position = pos;
-	}
-
-	public void SetAppearPosEnemy()
-	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-		if (enemyPopIndex >= 0 && FieldManager.IsValidInGame())
-		{
-			FieldMapTable.EnemyPopTableData enemyPopData = Singleton<FieldMapTable>.I.GetEnemyPopData(MonoBehaviourSingleton<FieldManager>.I.currentMapID, enemyPopIndex);
-			if (enemyPopData != null)
-			{
-				bool valid = false;
-				Vector3 val = Vector3.get_zero();
-				Quaternion rotation = Quaternion.get_identity();
-				if (MonoBehaviourSingleton<StageManager>.I.insideColliderData != null && enemyPopData.popRadius < MonoBehaviourSingleton<StageManager>.I.insideColliderData.chipSize * 0.5f * 1.42f)
-				{
-					val._002Ector(enemyPopData.popX, 0f, enemyPopData.popZ);
-					valid = MonoBehaviourSingleton<StageManager>.I.CheckPosInside(val);
-				}
-				else
-				{
-					val = MonoBehaviourSingleton<StageManager>.I.GetRandomPosByInsideInfo(new Vector3(enemyPopData.popX, 0f, enemyPopData.popZ), enemyPopData.popRadius, 0f, ref valid);
-					if (!isHideSpawn)
-					{
-						rotation = Quaternion.AngleAxis(Random.get_value() * 360f, Vector3.get_up());
-					}
-				}
-				if (!valid)
-				{
-					Log.Error(LOG.INGAME, "FieldMapEnemyPop position is failed. mapID:{0} enemyID:{1} popIndex:{2}", enemyPopData.mapID, enemyPopData.enemyID, enemyPopIndex);
-				}
-				if (QuestManager.IsValidInGameDefenseBattle())
-				{
-					Vector3 bossAppearOffsetPos = MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.bossAppearOffsetPos;
-					float bossAppearAngleY = MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.bossAppearAngleY;
-					val = bossAppearOffsetPos;
-					rotation = Quaternion.Euler(0f, bossAppearAngleY, 0f);
-				}
-				_position = val;
-				_rotation = rotation;
-				SetAppearPos(val);
-			}
-		}
-		else
-		{
-			SetAppearPos(Vector3.get_zero());
-		}
-	}
-
-	private static ELEMENT_TYPE GetWeakType(ELEMENT_TYPE type)
-	{
-		switch (type)
-		{
-		case ELEMENT_TYPE.WATER:
-			return ELEMENT_TYPE.FIRE;
-		case ELEMENT_TYPE.FIRE:
-			return ELEMENT_TYPE.SOIL;
-		case ELEMENT_TYPE.SOIL:
-			return ELEMENT_TYPE.THUNDER;
-		case ELEMENT_TYPE.THUNDER:
-			return ELEMENT_TYPE.WATER;
-		case ELEMENT_TYPE.LIGHT:
-			return ELEMENT_TYPE.DARK;
-		case ELEMENT_TYPE.DARK:
-			return ELEMENT_TYPE.LIGHT;
-		default:
-			return ELEMENT_TYPE.MAX;
-		}
-	}
-
-	private static ELEMENT_TYPE GetStrongType(ELEMENT_TYPE type)
-	{
-		switch (type)
-		{
-		case ELEMENT_TYPE.WATER:
-			return ELEMENT_TYPE.THUNDER;
-		case ELEMENT_TYPE.FIRE:
-			return ELEMENT_TYPE.WATER;
-		case ELEMENT_TYPE.SOIL:
-			return ELEMENT_TYPE.FIRE;
-		case ELEMENT_TYPE.THUNDER:
-			return ELEMENT_TYPE.SOIL;
-		case ELEMENT_TYPE.LIGHT:
-			return ELEMENT_TYPE.MAX;
-		case ELEMENT_TYPE.DARK:
-			return ELEMENT_TYPE.MAX;
-		default:
-			return ELEMENT_TYPE.MAX;
-		}
-	}
-
-	private static EFFECTIVE_TYPE GetEffectiveType(ELEMENT_TYPE attack, ELEMENT_TYPE defense)
-	{
-		if (attack == ELEMENT_TYPE.MAX || defense == ELEMENT_TYPE.MAX)
-		{
-			return EFFECTIVE_TYPE.NORMAL;
-		}
-		if (defense == GetWeakType(attack))
-		{
-			return EFFECTIVE_TYPE.GOOD;
-		}
-		if (defense == GetStrongType(attack))
-		{
-			return EFFECTIVE_TYPE.BAD;
-		}
-		return EFFECTIVE_TYPE.NORMAL;
-	}
-
-	public void ActReleaseGrabbedPlayers(bool isWeakHit, bool isSpWeakhit, bool forceRelease, float angle = 0f, float power = 0f)
-	{
-		if (isBoss)
-		{
-			EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-			if (!(enemyBrain == null))
-			{
-				GrabController grabController = enemyBrain.actionCtrl.grabController;
-				if ((grabController.releaseByWeakHit && isWeakHit) || (grabController.releaseBySpWeakHit && isSpWeakhit) || forceRelease)
-				{
-					enemyBrain.actionCtrl.grabController.ReleaseAll(angle, power);
-					if (enemySender != null)
-					{
-						enemySender.OnReleaseGrabbed(angle, power);
-					}
-					GrabHp = 0;
-				}
-			}
-		}
-	}
-
-	private void KeepRandomShot(AnimEventData.EventData data)
-	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		if (IsOriginal() || IsCoopNone())
-		{
-			this.StartCoroutine(DoShotAutomaticRandom(data.stringArgs[0], data.floatArgs[0], data.floatArgs[1], data.floatArgs[2], data.intArgs[0]));
-		}
-	}
-
-	private IEnumerator DoShotAutomaticRandom(string atkName, float interval, float duration, float range, int shotNum)
-	{
-		if (shotNum <= 0)
-		{
-			shotNum = 1;
-		}
-		List<Vector3> pointList = new List<Vector3>(shotNum);
-		List<Quaternion> rotList = new List<Quaternion>(shotNum);
-		float timer = 0f;
-		float lastShotTime = 0f;
-		while (timer < duration && !base.isDead)
-		{
-			timer += Time.get_deltaTime();
-			if (timer - lastShotTime > interval)
-			{
-				pointList.Clear();
-				for (int i = 0; i < shotNum; i++)
-				{
-					Vector3 offset2 = Vector3.get_forward() * Random.Range(3f, range);
-					Quaternion dirRotation = Quaternion.AngleAxis(Random.Range(0f, 360f), Vector3.get_up());
-					offset2 = dirRotation * offset2;
-					pointList.Add(offset2 + base._transform.get_position());
-				}
-				ActShotBullet(atkName, pointList, rotList);
-				lastShotTime = timer;
-			}
-			yield return (object)null;
-		}
-	}
-
-	public void ActShotBullet(string atkName, List<Vector3> posList, List<Quaternion> rotList)
-	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		AttackInfo atk_info = FindAttackInfo(atkName, true, false);
-		Vector3 position = base._transform.get_position();
-		for (int i = 0; i < posList.Count; i++)
-		{
-			Vector3 pos = posList[i] - position;
-			Quaternion rot = Quaternion.get_identity();
-			if (i < rotList.Count)
-			{
-				rot = rotList[i];
-			}
-			AnimEventShot.Create(this, atk_info, pos, rot, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
-		}
-		if (enemySender != null)
-		{
-			enemySender.OnShotBullet(atkName, posList, rotList);
-		}
-	}
-
-	private void EventCreateIceFloor(AnimEventData.EventData data)
-	{
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-		string text = data.stringArgs[0];
-		BulletData.BulletIceFloor.TARGETING_TYPE tARGETING_TYPE = (BulletData.BulletIceFloor.TARGETING_TYPE)data.intArgs[0];
-		List<Vector3> list = new List<Vector3>(4);
-		List<Quaternion> list2 = new List<Quaternion>(4);
-		AttackInfo attackInfo = FindAttackInfo(text, true, false);
-		if (attackInfo == null)
-		{
-			Log.Error("[CREATE_ICE_FLOOR]Attack info is not found");
-		}
-		else
-		{
-			BulletData bulletData = attackInfo.bulletData;
-			if (bulletData == null)
-			{
-				Log.Error("[CREATE_ICE_FLOOR]BulletData is not found");
-			}
-			else if (bulletData.dataIceFloor == null)
-			{
-				Log.Error("[CREATE_ICE_FLOOR]BulletData.IceFloor is NULL");
-			}
-			else
-			{
-				List<StageObject> playerList = MonoBehaviourSingleton<StageObjectManager>.I.playerList;
-				int count = playerList.Count;
-				switch (tARGETING_TYPE)
-				{
-				case BulletData.BulletIceFloor.TARGETING_TYPE.NONE:
-				{
-					Vector3 zero = Vector3.get_zero();
-					if (data.floatArgs.Length >= 3)
-					{
-						zero._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-					}
-					list.Add(zero);
-					break;
-				}
-				case BulletData.BulletIceFloor.TARGETING_TYPE.NODE_OFFSET:
-				{
-					if (data.stringArgs.Length < 2)
-					{
-						Log.Error("[CREATE_ICE_FLOOR]AnimEventData Node Name is not found");
-						return;
-					}
-					string name = data.stringArgs[1];
-					Transform val = FindNode(name);
-					if (val == null)
-					{
-						Log.Error("[CREATE_ICE_FLOOR]AnimEventData Node is not found");
-						return;
-					}
-					Vector3 zero2 = Vector3.get_zero();
-					if (data.floatArgs.Length >= 3)
-					{
-						zero2._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-					}
-					Vector3 item = val.get_position() + zero2;
-					list.Add(item);
-					break;
-				}
-				case BulletData.BulletIceFloor.TARGETING_TYPE.RANDOM_CHOICE:
-					list.Add(playerList[Random.Range(0, count)]._position);
-					break;
-				case BulletData.BulletIceFloor.TARGETING_TYPE.ALL_PLAYERS:
-					for (int i = 0; i < count; i++)
-					{
-						list.Add(playerList[i]._position);
-					}
-					break;
-				}
-				ActCreateIceFloor(bulletData, list, list2);
-				if (enemySender != null)
-				{
-					enemySender.OnCreateIceFloor(text, list, list2);
-				}
-			}
-		}
-	}
-
-	public void ActCreateIceFloor(string attackInfoName, List<Vector3> posList, List<Quaternion> rotList)
-	{
-		AttackInfo attackInfo = FindAttackInfo(attackInfoName, true, false);
-		if (attackInfo != null && !(attackInfo.bulletData == null))
-		{
-			BulletData bulletData = attackInfo.bulletData;
-			if (!(bulletData == null))
-			{
-				ActCreateIceFloor(bulletData, posList, rotList);
-			}
-		}
-	}
-
-	public void ActCreateIceFloor(BulletData bulletData, List<Vector3> posList, List<Quaternion> rotList)
-	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		string effectName = bulletData.data.effectName;
-		for (int i = 0; i < posList.Count; i++)
-		{
-			Transform val = Utility.CreateGameObject(bulletData.get_name(), MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-			val.set_position(posList[i]);
-			val.get_gameObject().set_layer(LayerMask.NameToLayer("EnemyBullet"));
-			Transform effect = EffectManager.GetEffect(effectName, val);
-			if (effect != null)
-			{
-				effect.set_localScale(Vector3.get_one());
-			}
-			IceFloor iceFloor = val.get_gameObject().AddComponent<IceFloor>();
-			iceFloor.duration = bulletData.dataIceFloor.duration;
-			iceFloor.SetCollider(bulletData.data.radius, 2f);
-			iceFloor.SetEffect(effect);
-		}
-	}
-
-	public void EventActionModeIdChange(AnimEventData.EventData data)
-	{
-		EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-		if (!(enemyBrain == null))
-		{
-			EnemyActionController actionCtrl = enemyBrain.actionCtrl;
-			if (actionCtrl != null)
-			{
-				actionCtrl.modeId = data.intArgs[0];
-			}
-		}
-	}
-
-	public void AnimationLayerWeightChange(AnimEventData.EventData data)
-	{
-		AnimationLayerWeightChangeInfo animationLayerWeightChangeInfo = new AnimationLayerWeightChangeInfo();
-		Animator animator = loader.GetAnimator();
-		animationLayerWeightChangeInfo.aliveFlag = true;
-		animationLayerWeightChangeInfo.layerIndex = data.intArgs[0];
-		animationLayerWeightChangeInfo.target = data.floatArgs[1];
-		animationLayerWeightChangeInfo.weight = animator.GetLayerWeight(animationLayerWeightChangeInfo.layerIndex);
-		animationLayerWeightChangeInfo.forceEndFlag = ((data.intArgs[1] != 0) ? true : false);
-		if (animationLayerWeightChangeInfo.weight != animationLayerWeightChangeInfo.target)
-		{
-			if (animationLayerWeightChangeInfo.weight < animationLayerWeightChangeInfo.target)
-			{
-				animationLayerWeightChangeInfo.spd = data.floatArgs[0];
-			}
-			else
-			{
-				animationLayerWeightChangeInfo.spd = 0f - data.floatArgs[0];
-			}
-			if (animationLayerWeightChangeInfo.spd == 0f)
-			{
-				animator.SetLayerWeight(animationLayerWeightChangeInfo.layerIndex, animationLayerWeightChangeInfo.target);
-				animationLayerWeightChangeInfo.aliveFlag = false;
-			}
-			bool flag = false;
-			int i = 0;
-			for (int count = animLayerWeightChangeInfo.Count; i < count; i++)
-			{
-				if (animLayerWeightChangeInfo[i].layerIndex == animationLayerWeightChangeInfo.layerIndex)
-				{
-					animLayerWeightChangeInfo[i] = animationLayerWeightChangeInfo;
-					flag = true;
-					break;
-				}
-			}
-			if (!flag)
-			{
-				animLayerWeightChangeInfo.Add(animationLayerWeightChangeInfo);
-			}
-		}
-	}
-
-	public void EventTargetChangeHateRanking(AnimEventData.EventData data)
-	{
-		EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-		if (!(enemyBrain == null))
-		{
-			int num = data.intArgs[0];
-			bool isIncludeDead = (data.intArgs[1] == 0) ? true : false;
-			OpponentMemory.OpponentRecord[] hateRankingObjects = GetHateRankingObjects(isIncludeDead);
-			if (hateRankingObjects != null)
-			{
-				int num2 = num - 1;
-				if (num == 0)
-				{
-					num2 = Random.Range(0, hateRankingObjects.Length);
-				}
-				if (0 <= num2 && num2 < hateRankingObjects.Length)
-				{
-					enemyBrain.targetCtrl.SetCurrentTarget(hateRankingObjects[num2].obj);
-				}
-			}
-		}
-	}
-
-	public void EventElementToleranceChange(AnimEventData.EventData data)
-	{
-		int num = data.intArgs[0];
-		if (num >= regionInfos.Length)
-		{
-			Log.Error("Region Index is out of range!! ");
-		}
-		else
-		{
-			int scroll = data.intArgs[1];
-			if (num >= 0)
-			{
-				regionInfos[num].tolerance.ChangeElementTolerance(scroll);
-			}
-			else
-			{
-				int i = 0;
-				for (int num2 = regionInfos.Length; i < num2; i++)
-				{
-					regionInfos[i].tolerance.ChangeElementTolerance(scroll);
-				}
-			}
-			if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
-			{
-				MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(enemyTableData.name, STRING_CATEGORY.ENEMY_REACTION, kStrIdx_EnemyReaction_ElemTolChange);
-			}
-		}
-	}
-
-	public void EventBlendColorChange(AnimEventData.EventData data)
-	{
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0316: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0387: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0389: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0431: Unknown result type (might be due to invalid IL or missing references)
-		//IL_043c: Unknown result type (might be due to invalid IL or missing references)
-		blendColorChangeInfo = new BlendColorChangeInfo();
-		int num = data.intArgs[0];
-		int num2 = data.intArgs[1];
-		int num3 = data.intArgs[2];
-		float num4 = data.floatArgs[0];
-		if (num < 0 || 255 < num)
-		{
-			blendColorChangeInfo.endFlagR = true;
-		}
-		else
-		{
-			blendColorChangeInfo.endFlagR = false;
-		}
-		if (num2 < 0 || 255 < num2)
-		{
-			blendColorChangeInfo.endFlagG = true;
-		}
-		else
-		{
-			blendColorChangeInfo.endFlagG = false;
-		}
-		if (num3 < 0 || 255 < num3)
-		{
-			blendColorChangeInfo.endFlagB = true;
-		}
-		else
-		{
-			blendColorChangeInfo.endFlagB = false;
-		}
-		if (num4 < -1f || 1f < num4)
-		{
-			blendColorChangeInfo.endFlagBlendRate = true;
-		}
-		else
-		{
-			blendColorChangeInfo.endFlagBlendRate = false;
-		}
-		float num5 = (float)num / 255f;
-		float num6 = (float)num2 / 255f;
-		float num7 = (float)num3 / 255f;
-		Color targetColor = default(Color);
-		targetColor._002Ector(num5, num6, num7);
-		blendColorChangeInfo.materialList = new List<Material>();
-		blendColorChangeInfo.targetColor = targetColor;
-		blendColorChangeInfo.targetblendRate = num4;
-		float num8 = data.floatArgs[1];
-		if (num8 == 0f)
-		{
-			blendColorChangeInfo.aliveFlag = false;
-			int i = 0;
-			for (int num9 = skinnedMeshRendererList.Length; i < num9; i++)
-			{
-				int j = 0;
-				for (int num10 = skinnedMeshRendererList[i].get_materials().Length; j < num10; j++)
-				{
-					Material val = skinnedMeshRendererList[i].get_materials()[j];
-					if (val.get_shader().get_name().Contains("enemy_custamaizable_blend"))
-					{
-						Color color = val.GetColor("_BlendColor");
-						if (blendColorChangeInfo.endFlagR)
-						{
-							blendColorChangeInfo.targetColor.r = color.r;
-						}
-						if (blendColorChangeInfo.endFlagG)
-						{
-							blendColorChangeInfo.targetColor.g = color.g;
-						}
-						if (blendColorChangeInfo.endFlagB)
-						{
-							blendColorChangeInfo.targetColor.b = color.b;
-						}
-						val.SetColor("_BlendColor", blendColorChangeInfo.targetColor);
-						if (!blendColorChangeInfo.endFlagBlendRate)
-						{
-							val.SetFloat("_BlendRate", blendColorChangeInfo.targetblendRate);
-						}
-					}
-				}
-			}
-		}
-		else
-		{
-			Color currentColor = default(Color);
-			float currentBlendRate = 0f;
-			bool flag = false;
-			int k = 0;
-			for (int num11 = skinnedMeshRendererList.Length; k < num11; k++)
-			{
-				int l = 0;
-				for (int num12 = skinnedMeshRendererList[k].get_materials().Length; l < num12; l++)
-				{
-					Material val2 = skinnedMeshRendererList[k].get_materials()[l];
-					if (val2.get_shader().get_name().Contains("enemy_custamaizable_blend"))
-					{
-						currentColor = val2.GetColor("_BlendColor");
-						currentBlendRate = val2.GetFloat("_BlendRate");
-						blendColorChangeInfo.materialList.Add(val2);
-						flag = true;
-						break;
-					}
-				}
-			}
-			if (!flag)
-			{
-				blendColorChangeInfo.aliveFlag = false;
-				Debug.LogError((object)"not shader enemy_custamaizable_blend");
-			}
-			else
-			{
-				blendColorChangeInfo.currentColor = currentColor;
-				blendColorChangeInfo.currentBlendRate = currentBlendRate;
-				if (blendColorChangeInfo.endFlagR)
-				{
-					blendColorChangeInfo.targetColor.r = blendColorChangeInfo.currentColor.r;
-				}
-				if (blendColorChangeInfo.endFlagG)
-				{
-					blendColorChangeInfo.targetColor.g = blendColorChangeInfo.currentColor.g;
-				}
-				if (blendColorChangeInfo.endFlagB)
-				{
-					blendColorChangeInfo.targetColor.b = blendColorChangeInfo.currentColor.b;
-				}
-				if (blendColorChangeInfo.targetColor == blendColorChangeInfo.currentColor && blendColorChangeInfo.targetblendRate == blendColorChangeInfo.currentBlendRate && blendColorChangeInfo.targetblendRate >= 0f)
-				{
-					blendColorChangeInfo.aliveFlag = false;
-				}
-				else
-				{
-					blendColorChangeInfo.aliveFlag = true;
-					blendColorChangeInfo.forceEndFlag = ((data.intArgs[3] != 0) ? true : false);
-					blendColorChangeInfo.spdR = (blendColorChangeInfo.targetColor.r - blendColorChangeInfo.currentColor.r) / num8;
-					blendColorChangeInfo.spdG = (blendColorChangeInfo.targetColor.g - blendColorChangeInfo.currentColor.g) / num8;
-					blendColorChangeInfo.spdB = (blendColorChangeInfo.targetColor.b - blendColorChangeInfo.currentColor.b) / num8;
-					blendColorChangeInfo.spdBlendRate = (blendColorChangeInfo.targetblendRate - blendColorChangeInfo.currentBlendRate) / num8;
-				}
-			}
-		}
-	}
-
-	public void EventBlendColorEnable(bool isEnable)
-	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		int i = 0;
-		for (int num = skinnedMeshRendererList.Length; i < num; i++)
-		{
-			int j = 0;
-			for (int num2 = skinnedMeshRendererList[i].get_materials().Length; j < num2; j++)
-			{
-				Material val = skinnedMeshRendererList[i].get_materials()[j];
-				if (val.get_shader().get_name().Contains("enemy_custamaizable_blend"))
-				{
-					if (isEnable)
-					{
-						val.SetFloat("_BlendEnable", 1f);
-					}
-					else
-					{
-						val.SetFloat("_BlendEnable", 0f);
-					}
-				}
-			}
-		}
-	}
-
-	public void EventElementIconChange(AnimEventData.EventData data)
-	{
-		ELEMENT_TYPE elementIcon = (ELEMENT_TYPE)data.intArgs[0];
-		MonoBehaviourSingleton<UIEnemyStatus>.I.SetElementIcon(elementIcon);
-	}
-
-	public void EventWeakElementIconChange(AnimEventData.EventData data)
-	{
-		ELEMENT_TYPE weakElementIcon = (ELEMENT_TYPE)data.intArgs[0];
-		MonoBehaviourSingleton<UIEnemyStatus>.I.SetWeakElementIcon(weakElementIcon);
-	}
-
-	private void EventRegionColliderAtkHitOn(AnimEventData.EventData data)
-	{
-		int num = data.intArgs[0];
-		if (num < 0 || num >= regionInfos.Length)
-		{
-			Log.Error("Region Index is out of range!! ");
-		}
-		else
-		{
-			regionInfos[num].isAtkColliderHit = true;
-		}
-	}
-
-	private void EventRegionColliderAtkHitOff(AnimEventData.EventData data)
-	{
-		int num = data.intArgs[0];
-		if (num < 0 || num >= regionInfos.Length)
-		{
-			Log.Error("Region Index is out of range!! ");
-		}
-		else
-		{
-			regionInfos[num].isAtkColliderHit = false;
-		}
-	}
-
-	public void EventCounterEnabledOn(AnimEventData.EventData data)
-	{
-		int num = data.intArgs[0];
-		if (num < 0 || num >= regionInfos.Length)
-		{
-			Log.Error("Region Index is out of range!! ");
-		}
-		else
-		{
-			regionInfos[num].counterInfo.enabled = true;
-		}
-	}
-
-	public void EventCounterEnabledOff(AnimEventData.EventData data)
-	{
-		int num = data.intArgs[0];
-		if (num < 0 || num >= regionInfos.Length)
-		{
-			Log.Error("Region Index is out of range!! ");
-		}
-		else
-		{
-			regionInfos[num].counterInfo.enabled = false;
-		}
-	}
-
-	public void EventBuffCancellation(AnimEventData.EventData data)
-	{
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
-		{
-			List<StageObject> playerList = MonoBehaviourSingleton<StageObjectManager>.I.playerList;
-			int i = 0;
-			for (int count = playerList.Count; i < count; i++)
-			{
-				Player player = playerList[i] as Player;
-				if (!(player == null))
-				{
-					player.OnBuffCancellation();
-				}
-			}
-			if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
-			{
-				MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(string.Empty, STRING_CATEGORY.ENEMY_REACTION, kStrIdx_EnemyReaction_BuffCancellation);
-			}
-		}
-	}
-
-	private void EventDamageToEndurance(AnimEventData.EventData data)
-	{
-		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
-		{
-			int damage = data.intArgs[0];
-			MonoBehaviourSingleton<InGameProgress>.I.DamageToEndurance(damage);
-		}
-	}
-
-	private void EventSyncActionTarget(AnimEventData.EventData data)
-	{
-		if (enemySender != null)
-		{
-			enemySender.OnEnemySyncTarget(base.actionTarget);
-		}
-	}
-
-	protected override void EventCameraTargetOffsetOn(AnimEventData.EventData data)
-	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
-		{
-			float[] floatArgs = data.floatArgs;
-			InGameCameraManager.TargetOffset targetOffset = new InGameCameraManager.TargetOffset();
-			targetOffset.pos = new Vector3(floatArgs[0], floatArgs[1], floatArgs[2]);
-			targetOffset.rot = new Vector3(floatArgs[3], floatArgs[4], floatArgs[5]);
-			MonoBehaviourSingleton<InGameCameraManager>.I.SetAnimEventTargetOffsetByEnemy(targetOffset);
-		}
-	}
-
-	protected override void EventCameraTargetOffsetOff()
-	{
-		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
-		{
-			MonoBehaviourSingleton<InGameCameraManager>.I.ClearAnimEventTargetOffsetByEnemy();
-		}
-	}
-
-	protected override void UpdateAction()
-	{
-		base.UpdateAction();
-		switch (base.actionID)
-		{
-		case (ACTION_ID)14:
-		case (ACTION_ID)15:
-		case (ACTION_ID)16:
-			break;
-		case (ACTION_ID)17:
-			if (m_dizzyTime - Time.get_time() <= 0f)
-			{
-				SetNextTrigger(0);
-			}
-			if (IsPlayingMotion(1, true))
-			{
-				OnPlayingEndMotion();
-			}
-			break;
-		case (ACTION_ID)18:
-			UpdateDebuffShadowSealingAction();
-			break;
-		case (ACTION_ID)13:
-			UpdateDownAction();
-			break;
-		}
-	}
-
-	public bool HasValidTargetPoint()
-	{
-		if (base.isDead || !enableTargetPoint || targetPoints == null || targetPoints.Length <= 0 || isHiding)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	public Coop_Model_EnemyInitialize CreateBackup()
-	{
-		Coop_Model_EnemyInitialize coop_Model_EnemyInitialize = new Coop_Model_EnemyInitialize();
-		enemySender.SetupEnemyInitializeModel(coop_Model_EnemyInitialize, false, false);
-		return coop_Model_EnemyInitialize;
-	}
-
-	public void InitHide()
-	{
-		if (isHiding)
-		{
-			PlayMotion(11, 0f);
-			base.actionID = ACTION_ID.HIDE;
-			SetColliderStatuses(false);
-			viewData = Singleton<FieldMapTable>.I.GetGatherPointViewData(gatherPointViewId);
-			if (viewData == null)
-			{
-				Log.Error(LOG.INGAME, "Invalid GatherPointViewID enemyId:" + enemyID + " ViewID:" + gatherPointViewId);
-			}
-			else if (!string.IsNullOrEmpty(viewData.gatherEffectName) && gatherEffect == null)
-			{
-				gatherEffect = EffectManager.GetEffect(viewData.gatherEffectName, base._transform);
-			}
-		}
-	}
-
-	public void TurnUp()
-	{
-		SetNextTrigger(0);
-		_TurnUp();
-	}
-
-	public void TurnUpImmediate()
-	{
-		ActIdle(false, 0f);
-		_TurnUp();
-	}
-
-	private void _TurnUp()
-	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Expected O, but got Unknown
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Expected O, but got Unknown
-		isHiding = false;
-		enemySender.OnTurnUp();
-		SetColliderStatuses(true);
-		if (targetEffect != null)
-		{
-			EffectManager.ReleaseEffect(targetEffect.get_gameObject(), true, false);
-		}
-		if (gatherEffect != null)
-		{
-			EffectManager.ReleaseEffect(gatherEffect.get_gameObject(), true, false);
-		}
-	}
-
-	public void UpdateGatherTargetMarker(bool isNear)
-	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Expected O, but got Unknown
-		if (isHiding)
-		{
-			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			float num = 0f;
-			if (self != null)
-			{
-				num = Vector3.Distance(base._transform.get_position(), self._position);
-			}
-			if (self != null && num <= viewData.targetRadius)
-			{
-				if (targetEffect == null && !string.IsNullOrEmpty(viewData.targetEffectName))
-				{
-					targetEffect = EffectManager.GetEffect(viewData.targetEffectName, base._transform);
-				}
-				if (targetEffect != null)
-				{
-					Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-					Vector3 position = cameraTransform.get_position();
-					Quaternion rotation = cameraTransform.get_rotation();
-					Vector3 val = position - base._transform.get_position();
-					Vector3 pos = val.get_normalized() * viewData.targetEffectShift + Vector3.get_up() * viewData.targetEffectHeight + base._transform.get_position();
-					targetEffect.Set(pos, rotation);
-				}
-			}
-			else if (targetEffect != null)
-			{
-				EffectManager.ReleaseEffect(targetEffect.get_gameObject(), true, false);
-			}
-		}
-	}
-
-	private void SetColliderStatuses(bool enabled)
-	{
-		base._collider.set_enabled(enabled);
-		if (colliders != null)
-		{
-			for (int i = 0; i < colliders.Length; i++)
-			{
-				colliders[i].set_enabled(enabled);
-			}
-		}
-	}
-
-	public override void SafeActIdle()
-	{
-		if (!isHiding)
-		{
-			base.SafeActIdle();
-		}
-	}
-
-	public bool IsHideMotionPlaying()
-	{
-		return IsPlayingMotion(11, true) || IsPlayingMotion(12, true);
-	}
-
-	private bool IsCannonBallHitShieldRegion(EnemyRegionWork regionWork, AttackHitInfo atkInfo)
-	{
-		return IsValidShield() && regionWork.isShieldDamage && atkInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL;
-	}
-
-	private bool CheckDisableBuffTypeByShield(BuffParam.BUFFTYPE targetType)
-	{
-		bool result = false;
-		switch (targetType)
-		{
-		case BuffParam.BUFFTYPE.POISON:
-		case BuffParam.BUFFTYPE.BURNING:
-		case BuffParam.BUFFTYPE.DEADLY_POISON:
-		case BuffParam.BUFFTYPE.ELECTRIC_SHOCK:
-			return result;
-		default:
-			return result;
-		}
-	}
-
-	private void OnBreakShield()
-	{
-	}
-
-	public EnemyRegionWork SearchShieldCriticalRegionWork()
-	{
-		for (int i = 0; i < regionWorks.Length; i++)
-		{
-			if (regionWorks[i].isShieldCriticalDamage)
-			{
-				return regionWorks[i];
-			}
-		}
-		return null;
-	}
-
-	private int CalcShieldDamage(bool isCritical, bool isElementCritical, AttackHitInfo atkInfo)
-	{
-		int toShieldAtk = atkInfo.toShieldAtk;
-		float num = 1f;
-		if (isCritical)
-		{
-			num += atkInfo.toShieldCriticalRate - 1f;
-		}
-		if (isElementCritical)
-		{
-			num += atkInfo.toShieldElementCriticalRate - 1f;
-		}
-		return (int)((float)toShieldAtk * num);
-	}
-
-	private IEnumerator SetShieldShaderParam()
-	{
-		if (base._rendererArray != null)
-		{
-			float duration = 1f;
-			float matCapPow = 0f;
-			while (duration > 0f)
-			{
-				duration -= Time.get_deltaTime();
-				matCapPow += Time.get_deltaTime();
-				if (matCapPow >= 1f)
-				{
-					matCapPow = 1f;
-				}
-				Utility.MaterialForEach(base._rendererArray, delegate(Material material)
-				{
-					if (material.HasProperty("_MatCapPow"))
-					{
-						material.SetFloat("_MatCapPow", ((_003CSetShieldShaderParam_003Ec__Iterator1A7)/*Error near IL_009b: stateMachine*/)._003CmatCapPow_003E__1);
-					}
-				});
-				yield return (object)null;
-			}
-		}
-	}
-
-	private void ResetShieldShaderParam()
-	{
-		if (base._rendererArray != null)
-		{
-			Utility.MaterialForEach(base._rendererArray, delegate(Material material)
-			{
-				if (material.HasProperty("_MatCapPow"))
-				{
-					material.SetFloat("_MatCapPow", 0f);
-				}
-			});
-		}
-	}
-
-	public TargetPoint SearchTargetPoint(int regionID)
-	{
-		int num = targetPoints.Length;
-		for (int i = 0; i < num; i++)
-		{
-			if (targetPoints[i].regionID == regionID)
-			{
-				return targetPoints[i];
-			}
-		}
-		return null;
-	}
-
-	public virtual void ActDebuffShadowSealingStart()
-	{
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		if (!IsDebuffShadowSealing())
-		{
-			EndAction();
-			ActReleaseGrabbedPlayers(false, false, true, 0f, 0f);
-			float num = _GetShadowSealingExtendRate();
-			InGameSettingsManager.ShadowSealingParam shadowSealingParam = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.shadowSealingParam;
-			debuffShadowSealingTimerDuration = shadowSealingParam.duration * badStatusMax.shadowSealingBind * num;
-			if (debuffShadowSealingTimerDuration < shadowSealingParam.minDuration)
-			{
-				debuffShadowSealingTimerDuration = shadowSealingParam.minDuration;
-			}
-			debuffShadowSealingTimer = debuffShadowSealingTimerDuration;
-			base.actionID = (ACTION_ID)18;
-			PlayMotion(6, -1f);
-			CreateShadowSealingEffect();
-			if (shadowSealingParam.startSeId != 0)
-			{
-				SoundManager.PlayOneShotSE(shadowSealingParam.startSeId, base._transform.get_position());
-			}
-			if (shadowSealingParam.loopSeId != 0)
-			{
-				SoundManager.PlayLoopSE(shadowSealingParam.loopSeId, this, base._transform);
-			}
-			if (base._rigidbody != null)
-			{
-				base._rigidbody.set_velocity(Vector3.get_zero());
-			}
-			rotateEventKeep = false;
-			rotateToTargetFlag = false;
-			rotateEventSpeed = 0f;
-			ClearShadowSealingAll(false, true);
-			OnActReaction();
-			if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
-			{
-				MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
-			}
-		}
-	}
-
-	private void CreateShadowSealingEffect()
-	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		debuffShadowSealingEffect = EffectManager.GetEffect("ef_btl_wsk_bow_01_04", base._transform);
-		if (!object.ReferenceEquals(debuffShadowSealingEffect, null))
-		{
-			CalcShadowSealingEffectRadius();
-			Transform obj = debuffShadowSealingEffect;
-			obj.set_localScale(obj.get_localScale() * debuffShadowSealingRadius);
-		}
-	}
-
-	private void CalcShadowSealingEffectRadius()
-	{
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		if (!(debuffShadowSealingRadius > 0f))
-		{
-			debuffShadowSealingRadius = 1f;
-			if (!(base._collider == null))
-			{
-				SphereCollider val = base._collider as SphereCollider;
-				if (val != null)
-				{
-					float num = val.get_radius() / 4f;
-					Vector3 localScale = base._transform.get_localScale();
-					debuffShadowSealingRadius = num * localScale.x;
-				}
-				else
-				{
-					CapsuleCollider val2 = base._collider as CapsuleCollider;
-					if (val2 != null)
-					{
-						float num2 = val2.get_radius() / 4f;
-						Vector3 localScale2 = base._transform.get_localScale();
-						debuffShadowSealingRadius = num2 * localScale2.x;
-					}
-				}
-			}
-		}
-	}
-
-	protected virtual void ActDebuffShadowSealingEnd()
-	{
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Expected O, but got Unknown
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Expected O, but got Unknown
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		if (IsDebuffShadowSealing())
-		{
-			bool flag = true;
-			bool flag2 = false;
-			if (shadowSealingStackDebuff.Contains((ACTION_ID)13))
-			{
-				EndAction();
-				base.actionID = (ACTION_ID)13;
-				PlayMotion((!IsDownTime()) ? 117 : 118, -1f);
-				flag2 = true;
-			}
-			if (shadowSealingStackDebuff.Contains(ACTION_ID.PARALYZE))
-			{
-				if (flag2)
-				{
-					ActParalyzeEnd();
-				}
-				else
-				{
-					EndAction();
-					base.actionID = ACTION_ID.PARALYZE;
-					PlayMotion(8, -1f);
-				}
-				flag2 = true;
-			}
-			if (shadowSealingStackDebuff.Contains(ACTION_ID.FREEZE))
-			{
-				if (flag2)
-				{
-					ActFreezeEnd();
-				}
-				else
-				{
-					flag = false;
-					base.actionID = ACTION_ID.FREEZE;
-				}
-			}
-			if (!object.ReferenceEquals(paralyzeEffectTrans, null))
-			{
-				EffectManager.ReleaseEffect(paralyzeEffectTrans.get_gameObject(), true, false);
-				paralyzeEffectTrans = null;
-			}
-			if (!object.ReferenceEquals(debuffShadowSealingEffect, null))
-			{
-				EffectManager.ReleaseEffect(debuffShadowSealingEffect.get_gameObject(), true, false);
-				debuffShadowSealingEffect = null;
-			}
-			InGameSettingsManager.ShadowSealingParam shadowSealingParam = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.shadowSealingParam;
-			if (shadowSealingParam.loopSeId != 0)
-			{
-				SoundManager.StopLoopSE(shadowSealingParam.loopSeId, this);
-			}
-			if (shadowSealingParam.endSeId != 0)
-			{
-				SoundManager.PlayOneShotSE(shadowSealingParam.endSeId, base._transform.get_position());
-			}
-			badStatusMax.shadowSealing *= shadowSealingParam.resistRate;
-			badStatusMax.shadowSealingBind *= shadowSealingBindResist;
-			if (flag)
-			{
-				setPause(false);
-				m_isStopMotionByDebuff = false;
-			}
-			_CheckShadowSealingTask();
-			int i = 0;
-			for (int num = regionWorks.Length; i < num; i++)
-			{
-				regionWorks[i].shadowSealingData.ownerID = 0;
-			}
-			if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
-			{
-				MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
-			}
-			shadowSealingStackDebuff.Clear();
-		}
-	}
-
-	private void UpdateDebuffShadowSealingAction()
-	{
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		if (IsDebuffShadowSealing())
-		{
-			debuffShadowSealingTimer -= Time.get_deltaTime();
-			if (debuffShadowSealingTimer <= 0f)
-			{
-				ActDebuffShadowSealingEnd();
-			}
-			else
-			{
-				for (int i = 0; i < shadowSealingStackDebuff.Count; i++)
-				{
-					bool flag = false;
-					switch (shadowSealingStackDebuff[i])
-					{
-					case ACTION_ID.FREEZE:
-						flag = UpdateFreezeAction();
-						break;
-					case ACTION_ID.PARALYZE:
-						flag = UpdateParalyzeAction();
-						break;
-					case (ACTION_ID)13:
-						flag = UpdateDownAction();
-						break;
-					}
-					if (flag)
-					{
-						i--;
-					}
-				}
-				AnimatorStateInfo currentAnimatorStateInfo = base.animator.GetCurrentAnimatorStateInfo(0);
-				if (!(currentAnimatorStateInfo.get_normalizedTime() < 0.1f) && currentAnimatorStateInfo.get_fullPathHash() == Animator.StringToHash("Base Layer.damage") && !m_isStopMotionByDebuff)
-				{
-					setPause(true);
-					m_isStopMotionByDebuff = true;
-				}
-			}
-		}
-	}
-
-	public override bool IsDebuffShadowSealing()
-	{
-		return debuffShadowSealingEffect != null;
-	}
-
-	public float GetDebuffShadowSealingTimeRate()
-	{
-		return debuffShadowSealingTimer / debuffShadowSealingTimerDuration;
-	}
-
-	public void CountShadowSealingTarget()
-	{
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Expected O, but got Unknown
-		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ad: Expected O, but got Unknown
-		shadowSealingTarget = 0;
-		if (isBoss && !object.ReferenceEquals(regionWorks, null) && !targetPoints.IsNullOrEmpty())
-		{
-			int i = 0;
-			for (int num = regionWorks.Length; i < num; i++)
-			{
-				regionWorks[i].shadowSealingData.isTarget = false;
-			}
-			List<int> list = new List<int>();
-			int j = 0;
-			for (int num2 = targetPoints.Length; j < num2; j++)
-			{
-				TargetPoint targetPoint = targetPoints[j];
-				if (targetPoint.regionID >= 0 && targetPoint.regionID < regionWorks.Length)
-				{
-					EnemyRegionWork enemyRegionWork = regionWorks[targetPoint.regionID];
-					if (!targetPoint.isAimEnable || !targetPoint.param.isTargetEnable)
-					{
-						int k = 0;
-						for (int count = enemyRegionWork.bleedWorkList.Count; k < count; k++)
-						{
-							BleedWork bleedWork = enemyRegionWork.bleedWorkList[k];
-							if (!object.ReferenceEquals(bleedWork, null) && !object.ReferenceEquals(bleedWork.bleedEffect, null))
-							{
-								EffectManager.ReleaseEffect(bleedWork.bleedEffect.get_gameObject(), true, false);
-								bleedWork.bleedEffect = null;
-							}
-						}
-						enemyRegionWork.bleedList.Clear();
-						enemyRegionWork.bleedWorkList.Clear();
-						enemyRegionWork.shadowSealingData.ownerID = 0;
-						enemyRegionWork.shadowSealingData.existSec = 0f;
-						enemyRegionWork.shadowSealingData.extendRate = 1f;
-						if (!object.ReferenceEquals(enemyRegionWork.shadowSealingEffect, null))
-						{
-							EffectManager.ReleaseEffect(enemyRegionWork.shadowSealingEffect.get_gameObject(), false, true);
-							enemyRegionWork.shadowSealingEffect = null;
-						}
-					}
-					else if (!list.Contains(targetPoint.regionID))
-					{
-						enemyRegionWork.shadowSealingData.isTarget = true;
-						list.Add(targetPoint.regionID);
-					}
-				}
-			}
-			shadowSealingTarget = list.Count;
-			if (_CheckShadowSealingFullStuck())
-			{
-				ActDebuffShadowSealingStart();
-			}
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<StageObjectManager>.I.self != null)
-			{
-				MonoBehaviourSingleton<StageObjectManager>.I.self.ResetShadowSealingUI();
-			}
-		}
-	}
-
-	private bool _CheckShadowSealingFullStuck()
-	{
-		bool result = false;
-		int i = 0;
-		for (int num = regionWorks.Length; i < num; i++)
-		{
-			ShadowSealingData shadowSealingData = regionWorks[i].shadowSealingData;
-			if (shadowSealingData.isTarget)
-			{
-				result = true;
-				if (shadowSealingData.ownerID == 0)
-				{
-					return false;
-				}
-			}
-		}
-		return result;
-	}
-
-	private void _CheckShadowSealingTask()
-	{
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
-		{
-			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if (!object.ReferenceEquals(self, null))
-			{
-				int num = 0;
-				int num2 = regionWorks.Length;
-				while (true)
-				{
-					if (num >= num2)
-					{
-						return;
-					}
-					ShadowSealingData shadowSealingData = regionWorks[num].shadowSealingData;
-					if (shadowSealingData.isTarget && shadowSealingData.ownerID == self.id)
-					{
-						break;
-					}
-					num++;
-				}
-				self.taskChecker.OnShadowSealing();
-				if (MonoBehaviourSingleton<InGameManager>.IsValid())
-				{
-					MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnShadowSealing();
-				}
-			}
-		}
-	}
-
-	private float _GetShadowSealingExtendRate()
-	{
-		if (object.ReferenceEquals(regionWorks, null))
-		{
-			return 1f;
-		}
-		float num = 1f;
-		int i = 0;
-		for (int num2 = regionWorks.Length; i < num2; i++)
-		{
-			ShadowSealingData shadowSealingData = regionWorks[i].shadowSealingData;
-			if (shadowSealingData.isTarget && shadowSealingData.ownerID != 0 && num < shadowSealingData.extendRate)
-			{
-				num = shadowSealingData.extendRate;
-			}
-		}
-		return num;
-	}
-
-	public int GetShadowSealingStuckNum()
-	{
-		if (object.ReferenceEquals(regionWorks, null))
-		{
-			return 0;
-		}
-		int num = 0;
-		int i = 0;
-		for (int num2 = regionWorks.Length; i < num2; i++)
-		{
-			ShadowSealingData shadowSealingData = regionWorks[i].shadowSealingData;
-			if (shadowSealingData.isTarget && shadowSealingData.ownerID != 0)
-			{
-				num++;
-			}
-		}
-		return num;
-	}
-
-	public int GetShadowSealingNum()
-	{
-		return shadowSealingTarget;
-	}
-
-	public OpponentMemory.OpponentRecord[] GetHateRankingObjects(bool isIncludeDead)
-	{
-		EnemyBrain enemyBrain = base.controller.brain as EnemyBrain;
-		if (enemyBrain != null)
-		{
-			return enemyBrain.opponentMem.GetOpponentWithRankingHate(isIncludeDead, 4);
-		}
-		return null;
-	}
-
-	protected bool CheckMadMode(AttackedHitStatusOwner status)
-	{
-		if (madModeHp == 0)
-		{
-			return false;
-		}
-		if (IsValidBuff(BuffParam.BUFFTYPE.MAD_MODE))
-		{
-			return false;
-		}
-		int num = base.hp - status.damage;
-		if (num <= madModeHp)
-		{
-			status.damage -= madModeHp - num;
-			return true;
-		}
-		return false;
-	}
-
-	private bool CheckDisableBuffTypeByMadMode(BuffParam.BUFFTYPE targetType)
-	{
-		if (!IsValidBuff(BuffParam.BUFFTYPE.MAD_MODE))
-		{
-			return false;
-		}
-		if (MonoBehaviourSingleton<InGameSettingsManager>.I.madModeParam.onlyResistDebuff.Contains(targetType))
-		{
-			return false;
-		}
-		if (MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.ignoreBuffCancellation.Contains(targetType))
-		{
-			return true;
-		}
-		return false;
-	}
-
-	public void ActMadMode()
-	{
-		EndAction();
-		if (!PlayMotion(123, -1f))
-		{
-			ActIdle(false, -1f);
-		}
-		else
-		{
-			base.actionID = (ACTION_ID)19;
-			downTotal = 0f;
-			base.badStatusTotal.Reset();
-			ClearBleedDamageAll();
-			ClearShadowSealingAll(true, true);
-			bool flag = false;
-			List<BuffParam.BUFFTYPE> ignoreBuffCancellation = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.ignoreBuffCancellation;
-			int i = 0;
-			for (int count = ignoreBuffCancellation.Count; i < count; i++)
-			{
-				if (OnBuffEnd(ignoreBuffCancellation[i], false, true))
-				{
-					flag = true;
-				}
-			}
-			if (flag)
-			{
-				SendBuffSync(BuffParam.BUFFTYPE.NONE);
-			}
-			if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
-			{
-				MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(enemyTableData.name, STRING_CATEGORY.ENEMY_REACTION, kStrIdx_EnemyReaction_MadMode);
-			}
-			OnActReaction();
-		}
-	}
-
-	public void CheckFirstMadMode()
-	{
-		if ((IsCoopNone() || IsOriginal()) && madModeHpThreshold >= 100 && (int)enemyLevel >= madModeLvThreshold)
-		{
-			LocalMadModeStart();
-		}
-	}
-
-	public void LocalMadModeStart()
-	{
-		BuffParam.BuffData data = new BuffParam.BuffData();
-		data.type = BuffParam.BUFFTYPE.MAD_MODE;
-		data.time = -1f;
-		data.endless = true;
-		data.valueType = BuffParam.VALUE_TYPE.CONSTANT;
-		data.value = 1;
-		SetFromInfo(ref data);
-		OnBuffStart(data);
-	}
-
-	public override int GetObservedID()
-	{
-		string s = (id % 500000).ToString() + bulletIndex.ToString();
-		int result = -1;
-		if (int.TryParse(s, out result))
-		{
-			bulletIndex++;
-			return result;
-		}
-		return -1;
-	}
-
-	public override void OnBreak(int brokenBulletID)
-	{
-		if (!bulletObservableList.IsNullOrEmpty() && !bulletObservableIdList.IsNullOrEmpty() && bulletObservableIdList.Contains(brokenBulletID))
-		{
-			for (int i = 0; i < bulletObservableList.Count; i++)
-			{
-				if (bulletObservableList[i].GetObservedID() == brokenBulletID)
-				{
-					bulletObservableList[i].ForceBreak();
-				}
-			}
-			bulletObservableList.RemoveAll((IBulletObservable o) => o.GetObservedID() == brokenBulletID);
-			bulletObservableIdList.RemoveAll((int o) => o == brokenBulletID);
-			if (enemySender != null)
-			{
-				enemySender.OnBulletObservableBroken(brokenBulletID);
-			}
-		}
-	}
-
-	public override void OnBulletDestroy(int observedID)
-	{
-		bulletObservableList.RemoveAll((IBulletObservable o) => o.GetObservedID() == observedID);
-		bulletObservableIdList.RemoveAll((int o) => o == observedID);
-	}
+  private readonly uint kStrIdx_EnemyReaction_ElemTolChange;
+  private readonly uint kStrIdx_EnemyReaction_Counter = 1;
+  private readonly uint kStrIdx_EnemyReaction_MadMode = 2;
+  private readonly uint kStrIdx_EnemyReaction_BuffCancellation = 3;
+  private readonly uint kStrIdx_EnemyReaction_BreakCounterRegion = 4;
+  private readonly uint kStrIdx_EnemyReaction_ReviveCounterRegion = 5;
+  public const int INVALID_REGIONID = -1;
+  public const int REGIONID_BODY = 0;
+  private static int updateFrame = -1;
+  private static float selfHitEffectCool = 0.0f;
+  private static float otherHitEffectCool = 0.0f;
+  public bool isStoke;
+  private uint m_nowAngryId;
+  private List<uint> m_execAngryIds = new List<uint>();
+  public XorInt enemyLevel;
+  public QuestStartData.EnemyReward enemyReward;
+  public bool isRareSpecies;
+  public float walkSpeedRateFromTable = 1f;
+  public int enemyServantId = 490000;
+  public static readonly string[] subMotionStateName = new string[16 /*0x10*/]
+  {
+    "step",
+    "step_back",
+    "down",
+    "down_time",
+    "counter",
+    "escape_start",
+    "escape",
+    "dizzy",
+    "mad_mode",
+    "appear",
+    "dead_revive_01",
+    "dead_revive_02",
+    "dead_revive_03",
+    "dead_revive_04",
+    "dead_revive_05",
+    "angry_{0:00}"
+  };
+  private const string DEF_HEAD_NAME = "Head";
+  private const string DEF_HIP_NAME = "Hip";
+  [Tooltip("頭のオブジェクト名(頭からの距離測定起点)")]
+  public string headObjectName = "Head";
+  [Tooltip("尻のオブジェクト名(尻からの距離測定起点)")]
+  public string hipObjectName = "Hip";
+  private Transform _head;
+  private Transform _hip;
+  protected float bleedCounter;
+  [Tooltip("体の大きさ半径（マップとの当たり、影の大きさ")]
+  public float bodyRadius = 1f;
+  [Tooltip("バフ系(凍結,腐敗等)のエフェクト大きさ調整(0の場合は無視する")]
+  public float effectFreezeRadiusRate;
+  [Tooltip("シャドウシーリング/コンカッションのエフェクト大きさ調整(0の場合は無視する")]
+  public float effectShadowSealingRadiusRate;
+  [Tooltip("光輪のエフェクト大きさ調整(0の場合は無視する)")]
+  public float effectLightRingRadiusRate;
+  [Tooltip("UI高さ")]
+  public float uiHeight = 2f;
+  [Tooltip("UI表示距離")]
+  public float uiShowDistance;
+  public AttackInfo[] convertAttackInfos;
+  public Enemy.RegionInfo[] regionInfos;
+  public float downHeal = 10f;
+  public float downTotal;
+  public float downHealInterval;
+  public int downCount;
+  public float[] downMaxRate;
+  public int _downMax = 100;
+  protected bool hitShockLightFlag;
+  protected bool hitShockOffsetFlag;
+  protected float hitShockLightTime;
+  protected float hitShockOffsetTime;
+  protected Vector3 hitShockVec = Vector3.zero;
+  protected Vector3 hitShockOffset = Vector3.zero;
+  private bool canHitShockEffect = true;
+  protected Vector3 dashBeforePos = Vector3.zero;
+  protected float dashNowDistance;
+  protected float dashOverDistance;
+  protected float dashMinDistance;
+  protected float dashMaxDistance;
+  protected string dashEndTrigger;
+  protected bool dashOverFlag;
+  protected float dashOverCheckDistance;
+  protected bool warpViewFlag;
+  protected float warpViewRate;
+  protected float warpViewRatePerTime;
+  public float damageHpRate;
+  public float healDamageRate;
+  public const int SHOT_POINT_ALL_PLAYER = 0;
+  public const int SHOT_POINT_RANDOM_PICKUP = 1;
+  public const int SHOT_POINT_CURRENT_TARGET = 3;
+  protected List<Enemy.RandomShotInfo> randomShotInfo = new List<Enemy.RandomShotInfo>();
+  protected List<Enemy.RandomShotInfo> shotNetworkInfoQueue = new List<Enemy.RandomShotInfo>();
+  protected List<Enemy.RandomShotInfo> shotEventInfoQueue = new List<Enemy.RandomShotInfo>();
+  protected bool radialBlurEnable;
+  public UIEnemyStatusGizmo uiEnemyStatusGizmo;
+  private Coroutine forceEnemyOutCoroutine;
+  private List<AttackNWayLaser> m_activeAttackLaserList = new List<AttackNWayLaser>();
+  private List<AttackFunnelBit> m_activeAttackFunnelList = new List<AttackFunnelBit>();
+  private List<AttackDig> m_activeAttackDigList = new List<AttackDig>();
+  private List<AttackActionMine> m_activeAttackActionMineList = new List<AttackActionMine>();
+  private List<AttackShotNodeLink> m_activeAttackObstacleList = new List<AttackShotNodeLink>();
+  private List<EnemyEffectObject> m_enemyEffectList = new List<EnemyEffectObject>();
+  public DrainAttackInfo[] drainAtkInfos;
+  private XorInt m_barrierHpMax = (XorInt) 0;
+  private XorInt m_barrierHp = (XorInt) 0;
+  public bool isRequireGhostShaderParam;
+  public float ghostBuffEndParam;
+  public float ghostBuffDuration;
+  public bool willStock;
+  public bool isHideSpawn;
+  public bool isHiding;
+  public float turnUpDistance;
+  public uint gatherPointViewId;
+  protected FieldMapTable.GatherPointViewTableData viewData;
+  protected Transform targetEffect;
+  protected Transform gatherEffect;
+  public float paralyzeLoopTime;
+  public ConverteElementToleranceTable[] converteElementToleranceTable = new ConverteElementToleranceTable[0];
+  public int madModeHpThreshold;
+  public int madModeLvThreshold;
+  private int madModeHp;
+  public bool isFirstMadMode;
+  public float shadowSealingBindResist;
+  public float m_dizzyTime;
+  public TailController tailController;
+  public bool useDownLoopTime;
+  public float downLoopStartTime;
+  public float downLoopTime;
+  private float downTime;
+  private float downGaugeDecreaseStartTime;
+  private float[] downDecreaseRates;
+  private ARENA_CONDITION[] arenaConditionList;
+  private bool isArenaDamageOffWeapon;
+  private bool isArenaDamageOffMagi;
+  private List<Enemy.AnimationLayerWeightChangeInfo> animLayerWeightChangeInfo = new List<Enemy.AnimationLayerWeightChangeInfo>();
+  public ELEMENT_TYPE changeElementIcon = ELEMENT_TYPE.MAX;
+  public ELEMENT_TYPE changeWeakElementIcon = ELEMENT_TYPE.MAX;
+  public int changeToleranceRegionId = -1;
+  public int changeToleranceScroll = -1;
+  public BlendColorCtrl blendColorCtrl = new BlendColorCtrl();
+  private SkinnedMeshRenderer[] skinnedMeshRendererList;
+  private Enemy.eCounterRegionState m_CounterRegionState;
+  public int deadReviveCount;
+  public int deadReviveCountMax;
+  public int actDeadReviveCount;
+  public bool forceActMovePoint;
+  public bool enableAssimilation;
+  private GameObject effectDrainRecover;
+  private float grabDrainRecoverTimer;
+  private bool cachedIsFieldEnemyBoss;
+  private bool isCachedIsFieldEnemyBoss;
+  private float bindEndTime;
+  protected GameObject m_effectSoilShock;
+  private GameObject m_effectBurning;
+  private GameObject m_effectErosion;
+  private GameObject m_effectAcid;
+  private GameObject m_effectCorruption;
+  private GameObject m_effectStigmata;
+  private GameObject m_effectCyclonicThunderstorm;
+  private GameObject m_effectSpeedDown;
+  private List<AttackHitColliderProcessor.HitParam> checkHitParam = new List<AttackHitColliderProcessor.HitParam>();
+  private List<float> checkLength = new List<float>();
+  private List<int> checkPriority = new List<int>();
+  private List<int> targetRegionIds = new List<int>();
+  public const float HPGAUGE_SHAKE_POWER = 5f;
+  public const float HPGAUGE_SHAKE_TIME = 0.5f;
+  public const float HPGAUGE_SHAKE_CYCLETIME = 0.05f;
+  private GameObject m_effectHitWhenGhost;
+  private EnemyAegisController aegisCtrl;
+  private List<ResidentEffectObject> m_residentEffectList = new List<ResidentEffectObject>();
+  private SystemEffectSetting m_residentEffectSetting;
+  public const float ROTATE_RAD_PER_FRAME = 0.0349065848f;
+  private const string SHIELD_PROPERTY_MATCAP_POW = "_MatCapPow";
+  public float lightRingHeightOffset;
+  private float lightRingTime;
+  private float lightRingRadius;
+  private float lightRingHeight;
+  protected Transform effectLightRing;
+  public const float SHADOWSEALING_START_NORMALIZED_TIME = 0.1f;
+  private Transform debuffShadowSealingEffect;
+  private float debuffShadowSealingTimer;
+  private float debuffShadowSealingTimerDuration;
+  private float debuffShadowSealingRadius;
+  private int shadowSealingTarget;
+  public float concussionTotal;
+  public float concussionMax;
+  public float concussionExtend = 1f;
+  public float concussionTime;
+  public float concussionStartTime;
+  private Transform concussionEffect;
+  private float concussionRadius;
+  private Vector3 concussionPosition;
+  private List<int> concussionAddPlayerIdList = new List<int>();
+
+  public override int id
+  {
+    get => base.id;
+    set
+    {
+      try
+      {
+        base.id = value;
+        ((Object) ((Component) this).gameObject).name = "Enemy:" + (object) value;
+      }
+      catch (UnityException ex)
+      {
+      }
+    }
+  }
+
+  public EnemyLoader loader { get; private set; }
+
+  public InGameSettingsManager.Enemy enemyParameter { get; private set; }
+
+  public bool isPierceAfterTarget { get; private set; }
+
+  public int enemyID { get; set; }
+
+  public bool isBoss { get; set; }
+
+  public bool isWaveMatchBoss { get; set; }
+
+  public bool isBigMonster { get; set; }
+
+  public int enemyPopIndex { get; set; }
+
+  public bool isSummonAttack { get; set; }
+
+  public EnemyTable.EnemyData enemyTableData { get; set; }
+
+  public GrowEnemyTable.GrowEnemyData growTableData { get; set; }
+
+  public ENEMY_TYPE GetEnemyType()
+  {
+    return this.enemyTableData == null ? ENEMY_TYPE.NONE : this.enemyTableData.type;
+  }
+
+  public BrainParam brainParam { get; set; }
+
+  public Transform head
+  {
+    get
+    {
+      if (Object.op_Inequality((Object) this._head, (Object) null))
+        return this._head;
+      this._head = Utility.Find(this._transform, this.headObjectName);
+      if (Object.op_Equality((Object) this._head, (Object) null))
+        this._head = this._transform;
+      this._head = Utility.Find(this._transform, "Head");
+      if (Object.op_Equality((Object) this._head, (Object) null))
+        this._head = this._transform;
+      return this._head;
+    }
+  }
+
+  public Transform hip
+  {
+    get
+    {
+      if (Object.op_Inequality((Object) this._hip, (Object) null))
+        return this._hip;
+      this._hip = Utility.Find(this._transform, this.hipObjectName);
+      if (Object.op_Equality((Object) this._hip, (Object) null))
+        this._hip = this._transform;
+      this._hip = Utility.Find(this._transform, "Hip");
+      if (Object.op_Equality((Object) this._hip, (Object) null))
+        this._hip = this._transform;
+      return this._hip;
+    }
+  }
+
+  public static bool IsWeakStateCheckAlreadyHit(Enemy.WEAK_STATE state)
+  {
+    bool flag = false;
+    if (state == Enemy.WEAK_STATE.WEAK || state == Enemy.WEAK_STATE.WEAK_SP_ATTACK || state == Enemy.WEAK_STATE.WEAK_SP_DOWN_MAX || state == Enemy.WEAK_STATE.WEAK_ELEMENT_ATTACK || state == Enemy.WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK || state == Enemy.WEAK_STATE.WEAK_SKILL_ATTACK || state == Enemy.WEAK_STATE.WEAK_HEAL_ATTACK || state == Enemy.WEAK_STATE.WEAK_ELEMENT_SP_ATTACK)
+      flag = true;
+    return flag;
+  }
+
+  public static bool IsWeakStateSpAttack(Enemy.WEAK_STATE state)
+  {
+    bool flag = false;
+    if (state == Enemy.WEAK_STATE.WEAK_SP_ATTACK || state == Enemy.WEAK_STATE.WEAK_SP_DOWN_MAX || state == Enemy.WEAK_STATE.WEAK_ELEMENT_SP_ATTACK)
+      flag = true;
+    return flag;
+  }
+
+  public static bool IsWeakStateElementAttack(Enemy.WEAK_STATE state)
+  {
+    bool flag = false;
+    if (state == Enemy.WEAK_STATE.WEAK_ELEMENT_ATTACK || state == Enemy.WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK || state == Enemy.WEAK_STATE.WEAK_ELEMENT_SP_ATTACK)
+      flag = true;
+    return flag;
+  }
+
+  public static bool IsWeakStateSkillAttack(Enemy.WEAK_STATE state)
+  {
+    bool flag = false;
+    if (state == Enemy.WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK || state == Enemy.WEAK_STATE.WEAK_SKILL_ATTACK)
+      flag = true;
+    return flag;
+  }
+
+  public static bool IsWeakStateHealAttack(Enemy.WEAK_STATE state)
+  {
+    return state == Enemy.WEAK_STATE.WEAK_HEAL_ATTACK;
+  }
+
+  public static bool IsWeakStateDisplaySign(Enemy.WEAK_STATE state)
+  {
+    return state != Enemy.WEAK_STATE.NONE && state != Enemy.WEAK_STATE.DOWN;
+  }
+
+  public static bool IsWeakStateCannonAttack(Enemy.WEAK_STATE state)
+  {
+    return state == Enemy.WEAK_STATE.WEAK_CANNON;
+  }
+
+  public static TargetMarker.EFFECT_TYPE WeakStateToEffectType(Enemy.WEAK_STATE weakState)
+  {
+    TargetMarker.EFFECT_TYPE effectType = TargetMarker.EFFECT_TYPE.NONE;
+    switch (weakState)
+    {
+      case Enemy.WEAK_STATE.WEAK_ELEMENT_ATTACK:
+        effectType = TargetMarker.EFFECT_TYPE.WEAK_ELEMENT_ATTACK;
+        break;
+      case Enemy.WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK:
+        effectType = TargetMarker.EFFECT_TYPE.WEAK_ELEMENT_SKILL_ATTACK;
+        break;
+      case Enemy.WEAK_STATE.WEAK_SKILL_ATTACK:
+        effectType = TargetMarker.EFFECT_TYPE.WEAK_SKILL_ATTACK;
+        break;
+      case Enemy.WEAK_STATE.WEAK_HEAL_ATTACK:
+        effectType = TargetMarker.EFFECT_TYPE.WEAK_HEAL_ATTACK;
+        break;
+      case Enemy.WEAK_STATE.WEAK_CANNON:
+        effectType = TargetMarker.EFFECT_TYPE.WEAK_CANNON;
+        break;
+      case Enemy.WEAK_STATE.WEAK_ELEMENT_SP_ATTACK:
+        effectType = TargetMarker.EFFECT_TYPE.WEAK_ELEMENT_SP_ATTACK;
+        break;
+    }
+    return effectType;
+  }
+
+  public Enemy.RegionInfo[] convertRegionInfos { get; set; }
+
+  public Collider[] colliders { get; protected set; }
+
+  public TargetPoint[] targetPoints { get; protected set; }
+
+  public RegionRoot[] regionRoots { get; protected set; }
+
+  public bool enableTargetPoint { get; protected set; }
+
+  public EnemyRegionWork[] regionWorks { get; set; }
+
+  public bool isDispWeakMark()
+  {
+    for (int index = 0; index < this.regionWorks.Length; ++index)
+    {
+      if (this.regionWorks[index].weakState == Enemy.WEAK_STATE.WEAK)
+        return true;
+    }
+    return false;
+  }
+
+  public int downMax
+  {
+    get
+    {
+      if (this.downMaxRate != null)
+      {
+        int length = this.downMaxRate.Length;
+        if (length > 0)
+          return (int) ((double) this._downMax * (double) this.downMaxRate[this.downCount < length - 1 ? this.downCount : length - 1]);
+      }
+      return this._downMax;
+    }
+  }
+
+  public bool reviveRegionWaitSync { get; protected set; }
+
+  public bool enableDash { get; protected set; }
+
+  public bool warpWaitSync { get; protected set; }
+
+  public string baseHitMaterialName { get; set; }
+
+  public EnemyPacketReceiver enemyReceiver => (EnemyPacketReceiver) this.packetReceiver;
+
+  public EnemyPacketSender enemySender => (EnemyPacketSender) this.packetSender;
+
+  public List<AttackActionMine> GetActionMineList() => this.m_activeAttackActionMineList;
+
+  public DrainAttackInfo SearchDrainAttackInfo(int id)
+  {
+    if (this.drainAtkInfos == null)
+      return (DrainAttackInfo) null;
+    foreach (DrainAttackInfo drainAtkInfo in this.drainAtkInfos)
+    {
+      if (drainAtkInfo.id == id)
+        return drainAtkInfo;
+    }
+    return (DrainAttackInfo) null;
+  }
+
+  public int BarrierHpMax
+  {
+    get => (int) this.m_barrierHpMax;
+    set => this.m_barrierHpMax = (XorInt) value;
+  }
+
+  public XorInt BarrierHp
+  {
+    get => this.m_barrierHp;
+    set => this.m_barrierHp = value;
+  }
+
+  public bool IsValidBarrier => this.BarrierHpMax > 0 && (int) this.BarrierHp > 0;
+
+  public AtkAttribute GhostFormParam { get; set; }
+
+  public GhostFormShaderParam GhostFormShaderParam { get; set; }
+
+  public AutoBuffParam[] AutoBuffParamList { get; set; }
+
+  public float DizzyReactionLoopTime { get; set; }
+
+  public XorInt GrabHpMax { get; set; }
+
+  public XorInt GrabHp { get; set; }
+
+  public XorInt GrabCannonDamage { get; set; }
+
+  public bool IsValidGrabHp => (int) this.GrabHpMax > 0 && (int) this.GrabHp > 0;
+
+  public int ExActionID { get; set; }
+
+  public int ExActionCondition { get; set; }
+
+  public int ExActionConditionValue { get; set; }
+
+  public StackBuffController stackBuffCtrl { get; protected set; }
+
+  public bool isAbleToSkipAction { get; protected set; }
+
+  public bool enableToSkipActionByDamage { get; protected set; }
+
+  protected override void OnEnable()
+  {
+    base.OnEnable();
+    if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid() && this.isBoss && Object.op_Equality((Object) MonoBehaviourSingleton<StageObjectManager>.I.boss, (Object) this))
+      MonoBehaviourSingleton<UIEnemyStatus>.I.SetTarget(this);
+    if (MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
+      MonoBehaviourSingleton<DropTargetMarkerManeger>.I.CheckTarget(this);
+    if (this.isRequireGhostShaderParam)
+    {
+      this.isRequireGhostShaderParam = false;
+      this.ChangeGhostShaderParam(this.ghostBuffEndParam, this.ghostBuffDuration);
+    }
+    if (!this.isHideSpawn)
+      return;
+    if (this.isHiding)
+      this.InitHide();
+    else
+      this.TurnUpImmediate();
+  }
+
+  protected override void OnDisable()
+  {
+    base.OnDisable();
+    if (this.forceEnemyOutCoroutine != null)
+    {
+      this.StopForceEnemyOut();
+      MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyOut(this.id, this._position);
+    }
+    if (this.isBoss && Object.op_Equality((Object) MonoBehaviourSingleton<StageObjectManager>.I.boss, (Object) this) && MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+      MonoBehaviourSingleton<UIEnemyStatus>.I.SetTarget((Enemy) null);
+    this.DeleteStatusGizmo();
+  }
+
+  public void CreateStatusGizmo()
+  {
+    if (this.isBoss || this.isSummonAttack || Object.op_Inequality((Object) this.uiEnemyStatusGizmo, (Object) null) || this.isHiding || !MonoBehaviourSingleton<UIStatusGizmoManager>.IsValid())
+      return;
+    this.uiEnemyStatusGizmo = MonoBehaviourSingleton<UIStatusGizmoManager>.I.Create(this);
+  }
+
+  public void DeleteStatusGizmo()
+  {
+    if (!Object.op_Inequality((Object) this.uiEnemyStatusGizmo, (Object) null))
+      return;
+    this.uiEnemyStatusGizmo.targetEnemy = (Enemy) null;
+    this.uiEnemyStatusGizmo = (UIEnemyStatusGizmo) null;
+  }
+
+  protected override void Awake()
+  {
+    base.Awake();
+    this.enemyPopIndex = -1;
+    this.enemyTableData = (EnemyTable.EnemyData) null;
+    this.objectType = StageObject.OBJECT_TYPE.ENEMY;
+    this.enableTargetPoint = true;
+    this.reviveRegionWaitSync = false;
+    this.warpWaitSync = false;
+    this.stackBuffCtrl = new StackBuffController();
+    this.loader = ((Component) this).gameObject.AddComponent<EnemyLoader>();
+    this.enemyParameter = MonoBehaviourSingleton<InGameSettingsManager>.I.enemy;
+    this.downMaxRate = this.enemyParameter.downMaxRate;
+    this.ResetConcussion(true);
+    this.isPierceAfterTarget = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.isPierceAfterTarget;
+    EnemyParam componentInChildren = ((Component) this).gameObject.GetComponentInChildren<EnemyParam>();
+    if (Object.op_Inequality((Object) componentInChildren, (Object) null))
+    {
+      componentInChildren.SetParam(this);
+      Object.DestroyImmediate((Object) componentInChildren);
+    }
+    if (Object.op_Equality((Object) this._rigidbody, (Object) null))
+      this._rigidbody = ((Component) this).gameObject.AddComponent<Rigidbody>();
+    this._rigidbody.collisionDetectionMode = (CollisionDetectionMode) 1;
+    this._rigidbody.mass = 1000f;
+    this._rigidbody.angularDrag = 100f;
+    this._rigidbody.isKinematic = false;
+    this._rigidbody.constraints = (RigidbodyConstraints) 116;
+    ((Component) this).gameObject.layer = 10;
+    this.stackBuffCtrl.Init();
+  }
+
+  protected override void Clear()
+  {
+    base.Clear();
+    this.regionInfos = (Enemy.RegionInfo[]) null;
+    this.colliders = (Collider[]) null;
+    this.targetPoints = (TargetPoint[]) null;
+    this.regionRoots = (RegionRoot[]) null;
+    this.m_nowAngryId = 0U;
+    if (this.m_execAngryIds == null)
+      return;
+    this.m_execAngryIds.Clear();
+  }
+
+  public override void OnLoadComplete()
+  {
+    if (Object.op_Equality((Object) this._collider, (Object) null))
+    {
+      SphereCollider sphereCollider = ((Component) this).gameObject.AddComponent<SphereCollider>();
+      sphereCollider.radius = this.bodyRadius;
+      sphereCollider.center = new Vector3(0.0f, this.bodyRadius, 0.0f);
+      this._collider = (Collider) sphereCollider;
+    }
+    Rigidbody rigidbody = ((Component) this.body).gameObject.GetComponentInChildren<Rigidbody>();
+    if (Object.op_Equality((Object) rigidbody, (Object) null))
+      rigidbody = ((Component) this.body).gameObject.AddComponent<Rigidbody>();
+    rigidbody.useGravity = false;
+    rigidbody.isKinematic = true;
+    this.SetEnemyTableData();
+    base.OnLoadComplete();
+    this.SetAnimUpdatePhysics(this.isBoss);
+    this.InitializeRegionWork();
+    this.BarrierHp = (XorInt) this.BarrierHpMax;
+    this.ignoreHitAttackColliders.Clear();
+    EnemyColliderSettings[] componentsInChildren1 = ((Component) this.body).GetComponentsInChildren<EnemyColliderSettings>();
+    int index1 = 0;
+    for (int length = componentsInChildren1.Length; index1 < length; ++index1)
+    {
+      if (!Object.op_Equality((Object) componentsInChildren1[index1].targetCollider, (Object) null) && componentsInChildren1[index1].ignoreHitAttack)
+        this.ignoreHitAttackColliders.Add(componentsInChildren1[index1].targetCollider);
+    }
+    if (this.isSummonAttack)
+    {
+      Utility.SetLayerWithChildren(this._transform, 15);
+      ((Component) this).gameObject.layer = 15;
+    }
+    else
+    {
+      Utility.SetLayerWithChildren(this._transform, 11);
+      ((Component) this).gameObject.layer = 10;
+    }
+    this.colliders = ((Component) this).gameObject.GetComponentsInChildren<Collider>();
+    this.targetPoints = ((Component) this).gameObject.GetComponentsInChildren<TargetPoint>();
+    this.regionRoots = ((Component) this).gameObject.GetComponentsInChildren<RegionRoot>();
+    int index2 = 0;
+    for (int length1 = this.targetPoints.Length; index2 < length1; ++index2)
+    {
+      this.targetPoints[index2].owner = (StageObject) this;
+      int index3 = 0;
+      for (int length2 = this.regionRoots.Length; index3 < length2; ++index3)
+      {
+        if (Array.IndexOf<int>(this.regionRoots[index3].subRegionIDs, this.targetPoints[index2].regionID) >= 0)
+          this.targetPoints[index2].subRegionRoot = this.regionRoots[index3];
+      }
+    }
+    int index4 = 0;
+    for (int length = this.regionRoots.Length; index4 < length; ++index4)
+    {
+      if (this.regionRoots[index4].isDeactive)
+        ((Component) this.regionRoots[index4]).gameObject.SetActive(false);
+    }
+    if (Object.op_Inequality((Object) this.stepCtrl, (Object) null))
+      this.stepCtrl.stampDistance = this.enemyParameter.stampDistance;
+    if (MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
+      MonoBehaviourSingleton<TargetMarkerManager>.I.updateShadowSealingFlag = true;
+    if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid() && this.isBoss)
+      MonoBehaviourSingleton<UIEnemyStatus>.I.SetTarget(this);
+    if (MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
+      MonoBehaviourSingleton<DropTargetMarkerManeger>.I.CheckTarget(this);
+    if (!this.willStock)
+    {
+      this.AutoBuffProc();
+      if (this.isHideSpawn)
+      {
+        this.isHiding = true;
+        this.InitHide();
+      }
+    }
+    this.InitializeBarrierEffect();
+    this.tailController = ((Component) this).gameObject.GetComponentInChildren<TailController>(true);
+    this.willStock = false;
+    ColliderWeightCtl[] componentsInChildren2 = ((Component) this).gameObject.GetComponentsInChildren<ColliderWeightCtl>();
+    int index5 = 0;
+    for (int length = componentsInChildren2.Length; index5 < length; ++index5)
+      componentsInChildren2[index5].SetAnimator(this.loader.GetAnimator());
+    TargetPointWeightCtl[] componentsInChildren3 = ((Component) this).gameObject.GetComponentsInChildren<TargetPointWeightCtl>();
+    int index6 = 0;
+    for (int length = componentsInChildren3.Length; index6 < length; ++index6)
+      componentsInChildren3[index6].SetAnimator(this.loader.GetAnimator());
+    this.skinnedMeshRendererList = ((Component) this).GetComponentsInChildren<SkinnedMeshRenderer>();
+    if (!MonoBehaviourSingleton<InGameManager>.IsValid() || !MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo())
+      return;
+    this.arenaConditionList = MonoBehaviourSingleton<InGameManager>.I.GetArenaConditions();
+    if (((IList<ARENA_CONDITION>) this.arenaConditionList).IsNullOrEmpty<ARENA_CONDITION>())
+      return;
+    for (int index7 = 0; index7 < this.arenaConditionList.Length; ++index7)
+    {
+      switch (this.arenaConditionList[index7])
+      {
+        case ARENA_CONDITION.DAMAGE_OFF_WEAPON:
+          this.isArenaDamageOffWeapon = true;
+          break;
+        case ARENA_CONDITION.DAMAGE_OFF_MAGI:
+          this.isArenaDamageOffMagi = true;
+          break;
+      }
+    }
+  }
+
+  private void AutoBuffProc()
+  {
+    if (this.AutoBuffParamList == null || this.AutoBuffParamList.Length == 0)
+      return;
+    foreach (AutoBuffParam autoBuffParam in this.AutoBuffParamList)
+    {
+      float num = autoBuffParam.time;
+      if ((double) num < 0.0)
+        num = 43200f;
+      this.OnBuffStart(new BuffParam.BuffData()
+      {
+        type = autoBuffParam.type,
+        time = num,
+        value = autoBuffParam.value
+      });
+    }
+  }
+
+  private void InitializeRegionWork()
+  {
+    if (this.regionWorks == null)
+      this.regionWorks = new EnemyRegionWork[this.regionInfos.Length];
+    for (int _regionId = 0; _regionId < this.regionWorks.Length; ++_regionId)
+    {
+      Enemy.RegionInfo regionInfo1 = this.regionInfos[_regionId];
+      int parentRegionId = this.SearchRegionID(regionInfo1.parentRegionName);
+      if (this.regionWorks[_regionId] == null)
+        this.regionWorks[_regionId] = new EnemyRegionWork();
+      this.regionWorks[_regionId].Initialize(regionInfo1, parentRegionId, _regionId);
+      if ((int) this.regionWorks[_regionId].hp > 0)
+      {
+        Enemy.RegionInfo regionInfo2 = this.regionInfos[_regionId];
+        for (int index = 0; index < regionInfo2.deactivateObjects.Length; ++index)
+        {
+          Transform node = this.FindNode(regionInfo2.deactivateObjects[index]);
+          if (!Object.op_Equality((Object) node, (Object) null))
+            ((Component) node).gameObject.SetActive(true);
+        }
+      }
+    }
+    if (this.regionWorks.Length == 0)
+      return;
+    this.hpMax = this.hp = (int) this.regionWorks[0].hp;
+    if (this.madModeHpThreshold > 0 && (int) this.enemyLevel >= this.madModeLvThreshold)
+      this.madModeHp = Mathf.CeilToInt((float) this.madModeHpThreshold * 0.01f * (float) this.hpMax);
+    else
+      this.madModeHp = 0;
+  }
+
+  private int SearchRegionID(string targetRegionName)
+  {
+    if (string.IsNullOrEmpty(targetRegionName) || this.regionInfos == null || this.regionInfos.Length == 0)
+      return -1;
+    for (int index = 0; index < this.regionInfos.Length; ++index)
+    {
+      if (this.regionInfos[index].name == targetRegionName)
+        return index;
+    }
+    return -1;
+  }
+
+  private void SetEnemyTableData()
+  {
+    if (this.enemyTableData == null)
+      return;
+    float hpRate;
+    float atkRate;
+    if (this.growTableData != null)
+    {
+      hpRate = this.growTableData.hpRate;
+      atkRate = this.growTableData.atkRate;
+    }
+    else
+    {
+      hpRate = (float) this.enemyTableData.hpRate;
+      atkRate = (float) this.enemyTableData.atkRate;
+    }
+    if (this.regionInfos == null)
+      Log.Error("regionInfos is null. Check enemy data.");
+    if (!string.IsNullOrEmpty(this.enemyTableData.convertRegionKey))
+    {
+      int index1 = 0;
+      for (int length1 = this.attackInfos.Length; index1 < length1; ++index1)
+      {
+        string str = $"{this.attackInfos[index1].name}_{this.enemyTableData.convertRegionKey}";
+        int index2 = 0;
+        for (int length2 = this.convertAttackInfos.Length; index2 < length2; ++index2)
+        {
+          if (this.convertAttackInfos[index2].name == str)
+          {
+            this.convertAttackInfos[index2].name = this.attackInfos[index1].name;
+            this.attackInfos[index1] = this.convertAttackInfos[index2];
+            break;
+          }
+        }
+      }
+      int index3 = 0;
+      for (int length3 = this.regionInfos.Length; index3 < length3; ++index3)
+      {
+        string str = $"{this.regionInfos[index3].name}_{this.enemyTableData.convertRegionKey}";
+        int index4 = 0;
+        for (int length4 = this.convertRegionInfos.Length; index4 < length4; ++index4)
+        {
+          if (this.convertRegionInfos[index4].name == str)
+          {
+            this.convertRegionInfos[index4].name = this.regionInfos[index3].name;
+            this.regionInfos[index3] = this.convertRegionInfos[index4];
+            break;
+          }
+        }
+      }
+    }
+    int index5 = 0;
+    for (int length = this.regionInfos.Length; index5 < length; ++index5)
+    {
+      float num = (float) this.regionInfos[index5].maxHP * hpRate;
+      this.regionInfos[index5].maxHP = (int) ((double) num + 1.0 / 1000.0);
+      this.regionInfos[index5].tolerance.InitializeElementTolerance(this.converteElementToleranceTable);
+    }
+    int index6 = 0;
+    for (int length = this.attackInfos.Length; index6 < length; ++index6)
+    {
+      if (this.attackInfos[index6] is AttackHitInfo attackInfo)
+        attackInfo.atkRate = atkRate;
+    }
+  }
+
+  protected override void Initialize()
+  {
+    base.Initialize();
+    if (this.isBoss)
+      return;
+    this.isLocalDamageApply = true;
+    this.localDamage = 0;
+  }
+
+  public void ApplyExploreBossStatus(ExploreBossStatus status)
+  {
+    if (status == null)
+      return;
+    this.hp = (int) status.hp;
+    this.BarrierHp = status.barrierHp;
+    this.downCount = (int) status.downCount;
+    this.ShieldHp = status.shieldHp;
+    this.deadReviveCount = status.deadReviveCount;
+    if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+      MonoBehaviourSingleton<InGameRecorder>.I.SetEnemyRecoveredHP(this.id, status.recoveredHP);
+    if (status.regionWorks != null)
+    {
+      for (int index = 0; index < this.regionWorks.Length; ++index)
+      {
+        if (status.regionWorks.Length > index)
+          this.regionWorks[index].CopyFrom(status.regionWorks[index]);
+      }
+    }
+    this.UpdateRegionVisual();
+    if (this.IsValidShield())
+      this.RequestShieldShaderEffect();
+    this.NowAngryID = status.nowAngryId;
+    this.m_execAngryIds.Clear();
+    if (status.execAngryIds != null && status.execAngryIds.Length != 0)
+      this.m_execAngryIds.AddRange((IEnumerable<uint>) status.execAngryIds);
+    if (!status.isMadMode)
+      return;
+    this.LocalMadModeStart();
+  }
+
+  protected override uint GetVoiceChannel() => 1;
+
+  protected override bool EnablePlaySound()
+  {
+    return !MonoBehaviourSingleton<InGameProgress>.IsValid() || this.isBoss || !MonoBehaviourSingleton<InGameProgress>.I.isHappenQuestDirection;
+  }
+
+  public override bool DestroyObject()
+  {
+    if (this.isLoading)
+    {
+      this.isDestroyWaitFlag = true;
+      return false;
+    }
+    this.aegisCtrl = (EnemyAegisController) null;
+    if (this.isBoss)
+      return base.DestroyObject();
+    if (Object.op_Inequality((Object) this.packetSender, (Object) null))
+      this.packetSender.OnDestroyObject();
+    ((Component) this).gameObject.SetActive(false);
+    if (!this.isSummonAttack)
+      MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(this);
+    this.isDestroyWaitFlag = false;
+    return true;
+  }
+
+  public void ClearDead()
+  {
+    this._collider.enabled = true;
+    if (this.colliders != null)
+    {
+      int index = 0;
+      for (int length = this.colliders.Length; index < length; ++index)
+        this.colliders[index].enabled = true;
+    }
+    this.badStatusMax.Copy(this.badStatusBase);
+    this.isDead = false;
+    this.hitOffFlag = StageObject.HIT_OFF_FLAG.NONE;
+    this.isSetAppearPos = false;
+    this.isStoke = true;
+    this.isCoopInitialized = false;
+    this.animatorBoolList.Clear();
+    this.changeTriggerList.Clear();
+    this.ActIdle();
+    this.localDamage = 0;
+    this.isRequireGhostShaderParam = false;
+    this.isHiding = this.isHideSpawn;
+    this.isFirstMadMode = false;
+    EnemyController controller = this.controller as EnemyController;
+    if (Object.op_Inequality((Object) controller, (Object) null))
+      controller.Reset();
+    this.InitializeRegionWork();
+    this.BarrierHp = (XorInt) this.BarrierHpMax;
+    this.deadReviveCount = 0;
+    this.StopForceEnemyOut();
+    this.AutoBuffProc();
+  }
+
+  protected override void Update()
+  {
+    base.Update();
+    if (this.hitShockLightFlag)
+    {
+      this.hitShockLightTime += Time.deltaTime;
+      if ((double) this.hitShockLightTime >= (double) this.enemyParameter.hitShockLightTime)
+      {
+        this.loader.ResetRimParams();
+        this.hitShockLightFlag = false;
+        this.hitShockLightTime = 0.0f;
+      }
+      else if (this.loader.materialParamsList != null)
+      {
+        int ID_RIM_POWER = Shader.PropertyToID("_RimPower");
+        int ID_RIM_WIDTH = Shader.PropertyToID("_RimWidth");
+        float sin = Mathf.Sin(3.14159274f * (this.hitShockLightTime / this.enemyParameter.hitShockLightTime));
+        this.loader.materialParamsList.ForEach((Action<EnemyLoader.MaterialParams>) (prm =>
+        {
+          if (prm.hasRimPower)
+          {
+            float num = prm.defaultRimPower + (this.enemyParameter.hitShockLightRimPower - prm.defaultRimPower) * sin;
+            prm.material.SetFloat(ID_RIM_POWER, num);
+          }
+          if (!prm.hasRimWidth)
+            return;
+          float num1 = prm.defaultRimWidth + (this.enemyParameter.hitShockLightRimWidth - prm.defaultRimWidth) * sin;
+          prm.material.SetFloat(ID_RIM_WIDTH, num1);
+        }));
+      }
+    }
+    if (this.warpViewFlag)
+    {
+      this.warpViewRate += this.warpViewRatePerTime * Time.deltaTime;
+      if ((double) this.warpViewRatePerTime >= 0.0 && (double) this.warpViewRate >= 1.0)
+      {
+        this.warpViewRate = 1f;
+        this.warpViewFlag = false;
+      }
+      else if ((double) this.warpViewRatePerTime < 0.0 && (double) this.warpViewRate <= 0.0)
+      {
+        this.warpViewRate = 0.0f;
+        this.warpViewFlag = false;
+      }
+      this.SetWarpVisible(this.warpViewRate);
+    }
+    else if ((double) this.warpViewRate > 0.0)
+      this.SetWarpVisible(this.warpViewRate);
+    if (!this.IsConcussion())
+    {
+      this.downHealInterval -= Time.deltaTime;
+      if ((double) this.downHealInterval <= 0.0)
+      {
+        this.downHealInterval = 0.0f;
+        this.downTotal -= this.downHeal * Time.deltaTime;
+        if ((double) this.downTotal < 0.0)
+          this.downTotal = 0.0f;
+      }
+    }
+    if (this.hitShockOffsetFlag)
+    {
+      this.hitShockOffsetTime += Time.deltaTime;
+      if ((double) this.hitShockOffsetTime >= (double) this.enemyParameter.hitShockOffsetTime)
+      {
+        this.body.localPosition = Vector3.zero;
+        this.hitShockOffset = Vector3.zero;
+        this.hitShockOffsetFlag = false;
+        this.hitShockOffsetTime = 0.0f;
+      }
+      else
+      {
+        float num = this.hitShockOffsetTime / this.enemyParameter.hitShockOffsetTime;
+        Transform body1 = this.body;
+        body1.position = Vector3.op_Subtraction(body1.position, this.hitShockOffset);
+        this.hitShockOffset = Vector3.op_Multiply(this.hitShockVec, this.enemyParameter.hitShockOffsetLength * Mathf.Sin(3.14159274f * num));
+        Transform body2 = this.body;
+        body2.position = Vector3.op_Addition(body2.position, this.hitShockOffset);
+      }
+    }
+    this.UpdateRandomShot();
+    if (this.regionWorks != null)
+    {
+      int length = this.regionWorks.Length;
+      for (int index = 0; index < length; ++index)
+        this.regionWorks[index].Update();
+    }
+    this._UpdateBleed();
+    this._UpdateShadowSealing();
+    this._UpdateBombArrow();
+    if (this.isInitialized && this.isBoss)
+      this.DrainRecoverProc();
+    int count = this.animLayerWeightChangeInfo.Count;
+    if (count > 0)
+    {
+      Animator animator = this.loader.GetAnimator();
+      for (int index = 0; index < count; ++index)
+      {
+        Enemy.AnimationLayerWeightChangeInfo weightChangeInfo = this.animLayerWeightChangeInfo[index];
+        if (weightChangeInfo.aliveFlag)
+        {
+          float num = weightChangeInfo.spd * Time.deltaTime;
+          if ((double) num > 0.0)
+          {
+            if ((double) weightChangeInfo.weight + (double) num >= (double) weightChangeInfo.target)
+            {
+              weightChangeInfo.weight = weightChangeInfo.target;
+              weightChangeInfo.aliveFlag = false;
+            }
+            else
+              weightChangeInfo.weight += num;
+          }
+          else if ((double) weightChangeInfo.weight + (double) num <= (double) weightChangeInfo.target)
+          {
+            weightChangeInfo.weight = weightChangeInfo.target;
+            weightChangeInfo.aliveFlag = false;
+          }
+          else
+            weightChangeInfo.weight += num;
+          animator.SetLayerWeight(weightChangeInfo.layerIndex, weightChangeInfo.weight);
+        }
+      }
+    }
+    if (this.blendColorCtrl != null)
+      this.blendColorCtrl.Update();
+    if (!MonoBehaviourSingleton<InGameCameraCuller>.IsValid() || this.isBoss || !((Component) this).transform.hasChanged && !MonoBehaviourSingleton<InGameCameraCuller>.I.IsUpdated)
+      return;
+    ((Component) this).transform.hasChanged = false;
+    if (this.skinnedMeshRendererList == null)
+      return;
+    int index1 = 0;
+    for (int length = this.skinnedMeshRendererList.Length; index1 < length; ++index1)
+      ((Renderer) this.skinnedMeshRendererList[index1]).enabled = this.CheckShow(((Renderer) this.skinnedMeshRendererList[index1]).bounds);
+  }
+
+  private void _UpdateBleed()
+  {
+    if (!this.IsCoopNone() && !this.IsOriginal() || this.regionWorks == null)
+      return;
+    double bleedCounter = (double) this.bleedCounter;
+    this.bleedCounter += Time.deltaTime;
+    float bleedTimeInterval = MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedTimeInterval;
+    double num1 = (double) bleedTimeInterval;
+    if ((int) (bleedCounter / num1) == (int) ((double) this.bleedCounter / (double) bleedTimeInterval))
+      return;
+    bool flag1 = false;
+    Enemy.BleedSyncData sync_data = new Enemy.BleedSyncData();
+    sync_data.afterHP = this.hp;
+    int index1 = 0;
+    for (int length = this.regionWorks.Length; index1 < length; ++index1)
+    {
+      bool flag2 = false;
+      if ((int) this.regionWorks[index1].hp <= 0 && this.regionInfos[index1].maxHP > 0)
+        flag2 = true;
+      if (this.regionInfos[index1].breakAfterHit || !flag2)
+      {
+        Enemy.BleedSyncData.BleedRegionWork bleedRegionWork = (Enemy.BleedSyncData.BleedRegionWork) null;
+        int index2 = 0;
+        for (int count = this.regionWorks[index1].bleedList.Count; index2 < count; ++index2)
+        {
+          Enemy.BleedData bleed = this.regionWorks[index1].bleedList[index2];
+          flag1 = true;
+          if (bleedRegionWork == null)
+          {
+            bleedRegionWork = new Enemy.BleedSyncData.BleedRegionWork();
+            bleedRegionWork.id = index1;
+            bleedRegionWork.afterHP = (int) this.regionWorks[index1].hp;
+            bleedRegionWork.damageList = new List<Enemy.BleedSyncData.BleedDamageData>();
+          }
+          Enemy.BleedSyncData.BleedDamageData bleedDamageData = new Enemy.BleedSyncData.BleedDamageData();
+          bleedRegionWork.damageList.Add(bleedDamageData);
+          if (bleed.skipFirst)
+          {
+            bleedDamageData.ownerID = bleed.ownerID;
+            bleedDamageData.damage = 0;
+          }
+          else
+          {
+            int num2 = Mathf.CeilToInt((float) bleed.damage);
+            if (sync_data.afterHP > 0 && !this.regionInfos[index1].dragonArmorInfo.enabled)
+            {
+              sync_data.afterHP -= num2;
+              if (sync_data.afterHP < 1)
+                sync_data.afterHP = 1;
+            }
+            if (bleedRegionWork.afterHP > 0)
+            {
+              bleedRegionWork.afterHP -= num2;
+              if (bleedRegionWork.afterHP < 1)
+                bleedRegionWork.afterHP = 1;
+            }
+            bleedDamageData.ownerID = bleed.ownerID;
+            bleedDamageData.damage = num2;
+          }
+        }
+        if (bleedRegionWork != null)
+          sync_data.regionWorks.Add(bleedRegionWork);
+      }
+    }
+    if (!flag1)
+      return;
+    this.OnUpdateBleedDamage(sync_data);
+  }
+
+  private void _UpdateShadowSealing()
+  {
+    if (this.IsDebuffShadowSealing() || !this.IsCoopNone() && !this.IsOriginal() || this.regionWorks == null)
+      return;
+    int index = 0;
+    for (int length = this.regionWorks.Length; index < length; ++index)
+    {
+      Enemy.ShadowSealingData shadowSealingData = this.regionWorks[index].shadowSealingData;
+      if (shadowSealingData.ownerID != 0)
+      {
+        shadowSealingData.existSec -= Time.deltaTime;
+        if ((double) shadowSealingData.existSec <= 0.0)
+          this.OnUpdateShadowSealing(new Enemy.ShadowSealingSyncData()
+          {
+            regionIndex = index
+          });
+      }
+    }
+  }
+
+  private void _UpdateBombArrow()
+  {
+    if (!this.IsCoopNone() && !this.IsOriginal() || this.regionWorks == null)
+      return;
+    for (int regionId = 0; regionId < this.regionWorks.Length; ++regionId)
+    {
+      Enemy.BombArrowData bombArrowData = this.regionWorks[regionId].GetBombArrowData();
+      if (bombArrowData != null && (bombArrowData.ownerID == 0 || this.isDead || (double) bombArrowData.GetRemainingCount() <= 0.0))
+      {
+        this.OnUpdateBombArrow(regionId);
+        if (Object.op_Inequality((Object) this.enemySender, (Object) null))
+          this.enemySender.OnUpdateBombArrow(regionId);
+      }
+    }
+  }
+
+  private void DrainRecoverProc()
+  {
+    if (!this.IsCoopNone() && !this.IsOriginal())
+      return;
+    EnemyBrain brain = this.controller.brain as EnemyBrain;
+    if (Object.op_Equality((Object) brain, (Object) null))
+      return;
+    GrabController grabController = brain.actionCtrl.grabController;
+    if (grabController == null || !grabController.IsGrabing())
+      return;
+    DrainAttackInfo drainAtkInfo = grabController.drainAtkInfo;
+    if (drainAtkInfo == null || !grabController.IsAliveGrabbedPlayerAll())
+      return;
+    int recoverValue = (int) ((double) this.hpMax * (double) (drainAtkInfo.recoverRate * 0.01f));
+    if (recoverValue <= 0 || this.hp >= this.hpMax)
+      return;
+    this.grabDrainRecoverTimer -= Time.deltaTime;
+    if ((double) this.grabDrainRecoverTimer > 0.0)
+      return;
+    this.RecoverHp(recoverValue, true);
+    this.grabDrainRecoverTimer = drainAtkInfo.recoverInterval;
+  }
+
+  public override void RecoverHp(int recoverValue, bool isSend)
+  {
+    int num = 0;
+    this.hp += recoverValue;
+    if (this.hp > this.hpMax)
+    {
+      num = this.hp - this.hpMax;
+      this.hp = this.hpMax;
+    }
+    if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+      MonoBehaviourSingleton<InGameRecorder>.I.RecordEnemyRecoveredHP(this.id, recoverValue - num);
+    if (MonoBehaviourSingleton<UIDamageManager>.IsValid())
+      MonoBehaviourSingleton<UIDamageManager>.I.CreateEnemyRecoverHp((Character) this, recoverValue, UIPlayerDamageNum.DAMAGE_COLOR.HEAL);
+    if (Object.op_Inequality((Object) this.enemySender, (Object) null) & isSend)
+      this.enemySender.OnRecoverHp(recoverValue);
+    if (!Object.op_Inequality((Object) this.effectPlayProcessor, (Object) null) || !Object.op_Equality((Object) this.effectDrainRecover, (Object) null))
+      return;
+    List<EffectPlayProcessor.EffectSetting> settings = this.effectPlayProcessor.GetSettings("RECOVER_HP");
+    if (settings == null || settings.Count <= 0)
+      return;
+    Transform transform = this.effectPlayProcessor.PlayEffect(settings[0], this._transform);
+    if (!Object.op_Inequality((Object) transform, (Object) null))
+      return;
+    this.effectDrainRecover = ((Component) transform).gameObject;
+  }
+
+  protected override void FixedUpdate()
+  {
+    if (this.actionID == Character.ACTION_ID.ATTACK && this.enableDash)
+    {
+      if (this.IsWallStay())
+      {
+        this.SetDashEnd();
+      }
+      else
+      {
+        Vector3 vector3_1 = Vector3.op_Subtraction(this._position, this.dashBeforePos);
+        vector3_1.y = 0.0f;
+        this.dashNowDistance += ((Vector3) ref vector3_1).magnitude;
+        this.dashBeforePos = this._position;
+        bool flag = (double) this.dashNowDistance >= (double) this.dashMinDistance;
+        if (!this.actionPositionFlag)
+        {
+          if (flag)
+          {
+            this.SetDashEnd();
+            goto label_13;
+          }
+        }
+        else if (!this.dashOverFlag)
+        {
+          if ((double) this.dashNowDistance >= (double) this.dashMaxDistance)
+          {
+            this.dashOverFlag = true;
+            this.dashOverCheckDistance = this.dashNowDistance;
+          }
+          else
+          {
+            Vector3 vector3_2 = Vector3.op_Subtraction(this.actionPosition, this._position);
+            vector3_2.y = 0.0f;
+            Vector3 forward = this._forward;
+            forward.y = 0.0f;
+            ((Vector3) ref forward).Normalize();
+            if ((double) Vector3.Angle(forward, vector3_2) > 90.0)
+            {
+              this.dashOverFlag = true;
+              this.dashOverCheckDistance = this.dashNowDistance;
+            }
+          }
+        }
+        if (this.dashOverFlag && flag && (double) this.dashNowDistance - (double) this.dashOverCheckDistance >= (double) this.dashOverDistance)
+          this.SetDashEnd();
+      }
+    }
+label_13:
+    base.FixedUpdate();
+  }
+
+  protected override void LateUpdate()
+  {
+    base.LateUpdate();
+    if (Enemy.updateFrame == Time.frameCount)
+      return;
+    Enemy.updateFrame = Time.frameCount;
+    Enemy.selfHitEffectCool -= Time.deltaTime;
+    if ((double) Enemy.selfHitEffectCool < 0.0)
+      Enemy.selfHitEffectCool = 0.0f;
+    Enemy.otherHitEffectCool -= Time.deltaTime;
+    if ((double) Enemy.otherHitEffectCool >= 0.0)
+      return;
+    Enemy.otherHitEffectCool = 0.0f;
+  }
+
+  public override void SetActionTarget(StageObject target, bool send = true)
+  {
+    bool flag = false;
+    if (Object.op_Inequality((Object) this.actionTarget, (Object) target))
+      flag = true;
+    this.actionTarget = target;
+    if (!(send & flag) || !Object.op_Inequality((Object) this.characterSender, (Object) null))
+      return;
+    this.characterSender.OnSetActionTarget(target);
+  }
+
+  public void OnUpdateBleedDamage(Enemy.BleedSyncData sync_data)
+  {
+    int num1 = this.hp - sync_data.afterHP;
+    if (num1 < 0)
+      num1 = 0;
+    this.hp = sync_data.afterHP;
+    if (this.regionWorks != null)
+    {
+      int index1 = 0;
+      for (int length = this.regionWorks.Length; index1 < length; ++index1)
+      {
+        Enemy.BleedSyncData.BleedRegionWork bleedRegionWork = (Enemy.BleedSyncData.BleedRegionWork) null;
+        int index2 = 0;
+        for (int count = sync_data.regionWorks.Count; index2 < count; ++index2)
+        {
+          if (sync_data.regionWorks[index2].id == index1)
+          {
+            bleedRegionWork = sync_data.regionWorks[index2];
+            this.regionWorks[index1].hp = (XorInt) bleedRegionWork.afterHP;
+            break;
+          }
+        }
+        int index3 = 0;
+        while (index3 < this.regionWorks[index1].bleedList.Count)
+        {
+          Enemy.BleedData bleed = this.regionWorks[index1].bleedList[index3];
+          Enemy.BleedWork bleedWork = (Enemy.BleedWork) null;
+          int index4 = 0;
+          for (int count = this.regionWorks[index1].bleedWorkList.Count; index4 < count; ++index4)
+          {
+            if (this.regionWorks[index1].bleedWorkList[index4].ownerID == bleed.ownerID)
+            {
+              bleedWork = this.regionWorks[index1].bleedWorkList[index4];
+              break;
+            }
+          }
+          Enemy.BleedSyncData.BleedDamageData bleed_damage = (Enemy.BleedSyncData.BleedDamageData) null;
+          if (bleedRegionWork != null)
+          {
+            int index5 = 0;
+            for (int count = bleedRegionWork.damageList.Count; index5 < count; ++index5)
+            {
+              if (bleedRegionWork.damageList[index5].ownerID == bleed.ownerID)
+              {
+                bleed_damage = bleedRegionWork.damageList[index5];
+                break;
+              }
+            }
+          }
+          bool flag1 = false;
+          bool flag2 = false;
+          if (bleed.skipFirst)
+          {
+            bleed.skipFirst = false;
+            if (bleed_damage != null && bleed_damage.damage == 0)
+              flag2 = true;
+          }
+          if (bleed_damage == null)
+            flag1 = true;
+          else if (!flag2)
+          {
+            --bleed.cnt;
+            if (bleed.cnt <= 0)
+              flag1 = true;
+          }
+          if (bleed_damage != null && !flag2)
+          {
+            if (MonoBehaviourSingleton<CoopManager>.IsValid())
+              MonoBehaviourSingleton<CoopManager>.I.coopStage.battleUserLog.Add((Character) this, bleed_damage);
+            int damage1 = bleed_damage.damage;
+            if (damage1 > num1)
+              damage1 = num1;
+            if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+              MonoBehaviourSingleton<InGameRecorder>.I.RecordGivenDamage(bleed_damage.ownerID, damage1);
+            if (QuestManager.IsValidInGameExplore() && this.isBoss && bleed.IsOwnerSelf())
+            {
+              ExplorePlayerStatus explorePlayerStatus = MonoBehaviourSingleton<QuestManager>.I.GetMyExplorePlayerStatus();
+              int num2 = explorePlayerStatus.givenTotalDamage + damage1;
+              explorePlayerStatus.SyncTotalDamageToBoss(num2);
+              MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendExploreBossDamage(num2);
+            }
+            num1 -= damage1;
+            if (bleed.IsOwnerSelf() && bleedWork != null && Object.op_Inequality((Object) bleedWork.bleedEffect, (Object) null))
+            {
+              if (this.enemyParameter.showDamageNum && MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedShowDamage)
+              {
+                AtkAttribute damage2 = new AtkAttribute();
+                damage2.normal = (float) bleed_damage.damage;
+                bool enabled = this.regionWorks[index1].regionInfo.dragonArmorInfo.enabled;
+                this.CreateDamageNum(bleedWork.bleedEffect.position, damage2, false, enabled);
+              }
+              if ((double) this.warpViewRate <= 0.0)
+              {
+                Transform effect = EffectManager.GetEffect(MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedDamageEffectName, bleedWork.bleedEffect.parent);
+                if (Object.op_Inequality((Object) effect, (Object) null))
+                {
+                  effect.localScale = bleedWork.bleedEffect.localScale;
+                  effect.localPosition = bleedWork.bleedEffect.localPosition;
+                  effect.localRotation = bleedWork.bleedEffect.localRotation;
+                }
+              }
+            }
+          }
+          if (flag1)
+          {
+            if (bleedWork != null)
+            {
+              if (Object.op_Inequality((Object) bleedWork.bleedEffect, (Object) null))
+              {
+                EffectManager.ReleaseEffect(((Component) bleedWork.bleedEffect).gameObject);
+                bleedWork.bleedEffect = (Transform) null;
+              }
+              this.regionWorks[index1].bleedWorkList.Remove(bleedWork);
+            }
+            this.regionWorks[index1].bleedList.RemoveAt(index3);
+          }
+          else
+            ++index3;
+        }
+      }
+      if (this.IsMirror() || this.IsPuppet())
+      {
+        bool flag = false;
+        int index6 = 0;
+        for (int length = this.regionWorks.Length; index6 < length; ++index6)
+        {
+          if (this.regionWorks[index6].bleedList.Count > 0)
+            flag = true;
+        }
+        if (flag)
+          this.StartWaitingPacket(StageObject.WAITING_PACKET.ENEMY_UPDATE_BLEED_DAMAGE, false, MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedTimeInterval * 2f);
+        else
+          this.EndWaitingPacket(StageObject.WAITING_PACKET.ENEMY_UPDATE_BLEED_DAMAGE);
+      }
+    }
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.OnUpdateBleedDamage(sync_data);
+  }
+
+  public void ClearBleedDamageAll()
+  {
+    if (this.regionWorks != null)
+    {
+      int index1 = 0;
+      for (int length = this.regionWorks.Length; index1 < length; ++index1)
+      {
+        this.regionWorks[index1].bleedList.Clear();
+        int index2 = 0;
+        for (int count = this.regionWorks[index1].bleedWorkList.Count; index2 < count; ++index2)
+        {
+          Enemy.BleedWork bleedWork = this.regionWorks[index1].bleedWorkList[index2];
+          if (Object.op_Inequality((Object) bleedWork.bleedEffect, (Object) null))
+          {
+            EffectManager.ReleaseEffect(((Component) bleedWork.bleedEffect).gameObject);
+            bleedWork.bleedEffect = (Transform) null;
+          }
+        }
+        this.regionWorks[index1].bleedWorkList.Clear();
+      }
+    }
+    if (!this.IsMirror() && !this.IsPuppet())
+      return;
+    this.EndWaitingPacket(StageObject.WAITING_PACKET.ENEMY_UPDATE_BLEED_DAMAGE);
+  }
+
+  public void OnUpdateShadowSealing(Enemy.ShadowSealingSyncData syncData)
+  {
+    if (this.regionWorks != null)
+    {
+      EnemyRegionWork regionWork = this.regionWorks[syncData.regionIndex];
+      Enemy.ShadowSealingData shadowSealingData = regionWork.shadowSealingData;
+      shadowSealingData.ownerID = 0;
+      shadowSealingData.existSec = 0.0f;
+      shadowSealingData.extendRate = 1f;
+      if (regionWork.shadowSealingEffect != null)
+      {
+        EffectManager.ReleaseEffect(((Component) regionWork.shadowSealingEffect).gameObject);
+        regionWork.shadowSealingEffect = (Transform) null;
+      }
+    }
+    if (this.IsMirror() || this.IsPuppet())
+      this.EndWaitingPacket(StageObject.WAITING_PACKET.ENEMY_UPDATE_SHADOWSEALING);
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.OnUpdateShadowSealing(syncData);
+  }
+
+  public void ClearShadowSealingAll(bool isClearOwnerID = true, bool isEndPacket = true)
+  {
+    if (this.regionWorks != null)
+    {
+      int index = 0;
+      for (int length = this.regionWorks.Length; index < length; ++index)
+      {
+        Enemy.ShadowSealingData shadowSealingData = this.regionWorks[index].shadowSealingData;
+        if (isClearOwnerID)
+          shadowSealingData.ownerID = 0;
+        shadowSealingData.existSec = 0.0f;
+        shadowSealingData.extendRate = 1f;
+        if (this.regionWorks[index].shadowSealingEffect != null)
+        {
+          EffectManager.ReleaseEffect(((Component) this.regionWorks[index].shadowSealingEffect).gameObject);
+          this.regionWorks[index].shadowSealingEffect = (Transform) null;
+        }
+      }
+    }
+    if (!isEndPacket || !this.IsMirror() && !this.IsPuppet())
+      return;
+    this.EndWaitingPacket(StageObject.WAITING_PACKET.ENEMY_UPDATE_SHADOWSEALING);
+  }
+
+  public void OnUpdateBombArrow(int regionId)
+  {
+    if (this.IsMirror() || this.IsPuppet())
+      this.EndWaitingPacket(StageObject.WAITING_PACKET.ENEMY_UPDATE_BOMBARROW);
+    if (this.regionWorks == null)
+      return;
+    EnemyRegionWork regionWork = this.regionWorks[regionId];
+    TargetPoint targetPoint = (TargetPoint) null;
+    for (int index = 0; index < this.targetPoints.Length; ++index)
+    {
+      if (this.targetPoints[index].regionID == regionWork.regionId && this.targetPoints[index].isAimEnable)
+      {
+        targetPoint = this.targetPoints[index];
+        break;
+      }
+    }
+    if (Object.op_Equality((Object) targetPoint, (Object) null))
+      return;
+    List<Enemy.BombArrowData> arrowDataHistory = regionWork.bombArrowDataHistory;
+    for (int index = 0; index < arrowDataHistory.Count; ++index)
+    {
+      Enemy.BombArrowData bombArrowData = arrowDataHistory[index];
+      if (bombArrowData != null)
+      {
+        Player player = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(bombArrowData.ownerID) as Player;
+        if (!Object.op_Equality((Object) player, (Object) null))
+        {
+          float delay = 0.0f;
+          Vector3 pos = targetPoint._transform.position;
+          List<float> bombDelayFrameList = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.bombDelayFrameList;
+          List<Vector3> offsetPositionList = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.bombOffsetPositionList;
+          if (bombDelayFrameList.Count > index && offsetPositionList.Count > index)
+          {
+            delay = bombDelayFrameList[index];
+            pos = Vector3.op_Addition(pos, Quaternion.op_Multiply(Quaternion.Euler(player._transform.eulerAngles), offsetPositionList[index]));
+          }
+          this.StartCoroutine(this.FireBombArrow(player, bombArrowData.atk, index + 1, pos, player.isBoostMode, delay: delay));
+        }
+      }
+    }
+    regionWork.bombArrowDataHistory.Clear();
+    if (!Object.op_Inequality((Object) regionWork.bombArrowEffect, (Object) null))
+      return;
+    EffectManager.ReleaseEffect(((Component) regionWork.bombArrowEffect).gameObject, immediate: true);
+    regionWork.bombArrowEffect = (Transform) null;
+  }
+
+  public void ClearBombArrowAll()
+  {
+    if (this.regionWorks == null)
+      return;
+    for (int index = 0; index < this.regionWorks.Length; ++index)
+      this.OnUpdateBombArrow(this.regionWorks[index].regionId);
+  }
+
+  private IEnumerator FireBombArrow(
+    Player fromObject,
+    AtkAttribute atk,
+    int lv,
+    Vector3 pos,
+    bool boost,
+    bool visibled = true,
+    float delay = 0.0f)
+  {
+    while ((double) delay > 0.0)
+    {
+      delay -= Time.deltaTime;
+      yield return (object) null;
+    }
+    if (atk != null)
+    {
+      ELEMENT_TYPE elementType = atk.GetElementType();
+      if (visibled && elementType != ELEMENT_TYPE.MAX)
+      {
+        if (MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.bombSEIdList.Count >= lv)
+          SoundManager.PlayOneShotSE(MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.bombSEIdList[lv - 1], (DisableNotifyMonoBehaviour) this);
+        Transform effect = EffectManager.GetEffect(MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.GetBombEffectName(elementType));
+        List<float> burstEffectScaleList = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.bombArrowBurstEffectScaleList;
+        if (Object.op_Inequality((Object) effect, (Object) null))
+        {
+          effect.localPosition = pos;
+          if (burstEffectScaleList.Count >= lv)
+          {
+            Transform transform = effect;
+            transform.localScale = Vector3.op_Multiply(transform.localScale, burstEffectScaleList[lv - 1]);
+          }
+        }
+      }
+      if (Object.op_Inequality((Object) fromObject, (Object) null))
+      {
+        string arrowAttackInfoName = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.bombArrowAttackInfoName;
+        if (boost)
+          arrowAttackInfoName += "boost_";
+        AnimEventShot.Create((StageObject) fromObject, fromObject.FindAttackInfo(arrowAttackInfoName + (lv - 1).ToString()), pos, Quaternion.identity, exAtk: atk);
+      }
+    }
+  }
+
+  public void SetDashEnd()
+  {
+    if (!this.enableDash)
+      return;
+    this.SetChangeTrigger(this.dashEndTrigger);
+    this.enableDash = false;
+    this.dashBeforePos = Vector3.zero;
+    this.dashNowDistance = 0.0f;
+    this.dashOverDistance = 0.0f;
+    this.dashMinDistance = 0.0f;
+    this.dashMaxDistance = 0.0f;
+    this.dashEndTrigger = (string) null;
+    this.dashOverFlag = false;
+    this.dashOverCheckDistance = 0.0f;
+    this.rotateSafeMode = false;
+  }
+
+  public override void ActDead(bool force_sync = false, bool recieve_direct = false)
+  {
+    this.ActReleaseGrabbedPlayers(false, false, true);
+    this.badStatusTotal.Reset();
+    this.badStatusMax.Copy(this.badStatusBase);
+    base.ActDead(force_sync, recieve_direct);
+    this.ResetConcussion(true);
+    this.PlayMotion(7, 0.0f);
+    this.PrepareEnemyOut();
+    if (MonoBehaviourSingleton<CoopNetworkManager>.IsValid())
+    {
+      if (this.IsCoopNone() || this.IsOriginal())
+      {
+        this.StopForceEnemyOut();
+        MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyOut(this.id, this._position);
+      }
+      else if (force_sync)
+        this.ForceEnemyOut();
+    }
+    bool flag = false;
+    if (Object.op_Equality((Object) MonoBehaviourSingleton<StageObjectManager>.I.boss, (Object) this))
+    {
+      this.UpdateBreakIDLists();
+      if (QuestManager.IsValidInGame() && MonoBehaviourSingleton<InGameProgress>.IsValid())
+      {
+        flag = true;
+        if (MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeries() || MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeriesArena())
+        {
+          if (MonoBehaviourSingleton<QuestManager>.I.IsLastEnemyCurrentQuestSeries())
+            MonoBehaviourSingleton<InGameProgress>.I.BattleComplete();
+          else if (MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeriesArena())
+            MonoBehaviourSingleton<InGameProgress>.I.NextBattleStartForSeriesArena();
+        }
+        else
+          MonoBehaviourSingleton<InGameProgress>.I.BattleComplete();
+      }
+    }
+    if (!flag)
+      this.SetNextTrigger();
+    if (this.IsFieldEnemyBoss())
+      MonoBehaviourSingleton<CoopManager>.I.coopStage.OnDefeatFieldEnemyBoss();
+    if (!QuestManager.IsValidInGameWaveStrategy())
+      return;
+    FieldMapTable.EnemyPopTableData enemyPopData = Singleton<FieldMapTable>.I.GetEnemyPopData(MonoBehaviourSingleton<FieldManager>.I.currentMapID, this.enemyPopIndex);
+    if (enemyPopData != null)
+      MonoBehaviourSingleton<StageObjectManager>.I.CountDownByWaveNo(enemyPopData.waveNo, enemyPopData.GeneratePopPosVec3());
+    MonoBehaviourSingleton<StageObjectManager>.I.ClearWaveTargetLine();
+  }
+
+  public IEnumerator WaitForDeadMotionEnd(bool isSetNextTrigger = true)
+  {
+    yield return (object) null;
+    if (!Object.op_Equality((Object) this.animator, (Object) null))
+    {
+      AnimatorStateInfo animatorStateInfo = this.animator.GetCurrentAnimatorStateInfo(0);
+      if (((AnimatorStateInfo) ref animatorStateInfo).fullPathHash == Animator.StringToHash("Base Layer.dead_loop"))
+      {
+        if (isSetNextTrigger)
+          this.SetNextTrigger();
+      }
+      else
+      {
+        do
+        {
+          animatorStateInfo = this.animator.GetCurrentAnimatorStateInfo(0);
+          if (((AnimatorStateInfo) ref animatorStateInfo).fullPathHash != Animator.StringToHash("Base Layer.dead"))
+            yield return (object) null;
+          else
+            goto label_11;
+        }
+        while (!Object.op_Equality((Object) this.animator, (Object) null));
+        yield break;
+        do
+        {
+          animatorStateInfo = this.animator.GetCurrentAnimatorStateInfo(0);
+          if ((double) ((AnimatorStateInfo) ref animatorStateInfo).normalizedTime < 1.0)
+          {
+            yield return (object) null;
+            continue;
+          }
+          goto label_12;
+label_11:;
+        }
+        while (!Object.op_Equality((Object) this.animator, (Object) null));
+        yield break;
+label_12:
+        if (isSetNextTrigger)
+          this.SetNextTrigger();
+      }
+    }
+  }
+
+  protected override int GetDeadReviveCount()
+  {
+    return this.deadReviveCount < this.deadReviveCountMax ? this.deadReviveCount + 1 : base.GetDeadReviveCount();
+  }
+
+  public void ActDeadRevive(int deadReviveCount)
+  {
+    this.ActReleaseGrabbedPlayers(false, false, true);
+    this.EndAction();
+    this.actDeadReviveCount = deadReviveCount;
+    this.actionID = (Character.ACTION_ID) 24;
+    this.PlayMotion(124 + deadReviveCount);
+    this.hp = 1;
+    this.hitOffFlag |= StageObject.HIT_OFF_FLAG.DEAD_REVIVE;
+    this.downTotal = 0.0f;
+    this.downCount = 0;
+    this.ResetConcussion(true);
+    this.badStatusTotal.Reset();
+    this.BarrierHp = (XorInt) this.BarrierHpMax;
+    this.ResetBadReaction(true);
+    this.buffParam.AllBuffEnd(false);
+    this.badStatusMax.Copy(this.badStatusBase);
+    this.continusAttackParam.RemoveAll();
+    this.OnActReaction();
+  }
+
+  private bool IsFieldEnemyBoss()
+  {
+    if (this.isCachedIsFieldEnemyBoss)
+      return this.cachedIsFieldEnemyBoss;
+    if (!MonoBehaviourSingleton<InGameProgress>.IsValid() || MonoBehaviourSingleton<CoopManager>.IsValid() && !MonoBehaviourSingleton<CoopManager>.I.coopStage.GetIsInFieldEnemyBossBattle() || !MonoBehaviourSingleton<StageObjectManager>.IsValid())
+      return false;
+    if (MonoBehaviourSingleton<StageObjectManager>.I.IsFieldEnemyBoss(this.id))
+    {
+      this.isCachedIsFieldEnemyBoss = true;
+      this.cachedIsFieldEnemyBoss = true;
+      return this.cachedIsFieldEnemyBoss;
+    }
+    this.isCachedIsFieldEnemyBoss = true;
+    this.cachedIsFieldEnemyBoss = false;
+    return this.cachedIsFieldEnemyBoss;
+  }
+
+  private void PrepareEnemyOut()
+  {
+    this.DeleteStatusGizmo();
+    if (MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
+      MonoBehaviourSingleton<DropTargetMarkerManeger>.I.RemoveTarget(this._transform);
+    this.UpdateNextMotion();
+    this.SetVelocity(Vector3.zero);
+    this._rigidbody.velocity = Vector3.zero;
+    this._collider.enabled = false;
+    if (!this.isBoss && this.colliders != null)
+    {
+      int index = 0;
+      for (int length = this.colliders.Length; index < length; ++index)
+        this.colliders[index].enabled = false;
+    }
+    this.ClearBleedDamageAll();
+    this.ClearShadowSealingAll();
+    this.ClearBombArrowAll();
+    for (int index = this.m_activeAttackObstacleList.Count - 1; index >= 0; --index)
+      this.m_activeAttackObstacleList[index].RequestDestroy();
+    if (Object.op_Inequality((Object) this.m_effectElectricShock, (Object) null))
+      Object.Destroy((Object) this.m_effectElectricShock);
+    if (Object.op_Inequality((Object) this.m_effectSoilShock, (Object) null))
+      Object.Destroy((Object) this.m_effectSoilShock);
+    if (Object.op_Inequality((Object) this.m_effectBurning, (Object) null))
+      Object.Destroy((Object) this.m_effectBurning);
+    if (Object.op_Inequality((Object) this.m_effectSpeedDown, (Object) null))
+      Object.Destroy((Object) this.m_effectSpeedDown);
+    if (Object.op_Inequality((Object) this.effectLightRing, (Object) null))
+      Object.Destroy((Object) this.effectLightRing);
+    if (Object.op_Inequality((Object) this.m_effectErosion, (Object) null))
+      Object.Destroy((Object) this.m_effectErosion);
+    this.m_effectElectricShock = (GameObject) null;
+    this.m_effectSoilShock = (GameObject) null;
+    this.m_effectBurning = (GameObject) null;
+    this.m_effectSpeedDown = (GameObject) null;
+    this.effectLightRing = (Transform) null;
+    this.m_effectErosion = (GameObject) null;
+  }
+
+  public override void VanishLocal()
+  {
+    this.PrepareVanishLocal();
+    this.OnDeadEnd();
+  }
+
+  public override void PrepareVanishLocal()
+  {
+    this.ActReleaseGrabbedPlayers(false, false, true);
+    this.badStatusTotal.Reset();
+    this.badStatusMax.Copy(this.badStatusBase);
+    base.PrepareVanishLocal();
+    this.PrepareEnemyOut();
+    if (Object.op_Equality((Object) MonoBehaviourSingleton<StageObjectManager>.I.boss, (Object) this))
+      this.UpdateBreakIDLists();
+    if (false)
+      return;
+    this.SetNextTrigger();
+  }
+
+  public void OnEndEscape()
+  {
+    if (!MonoBehaviourSingleton<CoopNetworkManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyOutEscape(this.id, this._position);
+  }
+
+  private void ForceEnemyOut()
+  {
+    this.StopForceEnemyOut();
+    this.forceEnemyOutCoroutine = this.StartCoroutine(this.DoForceEnemyOut());
+  }
+
+  private IEnumerator DoForceEnemyOut()
+  {
+    yield return (object) new WaitForSeconds(this.enemyParameter.guestEnemyOutTime);
+    if (this.forceEnemyOutCoroutine != null)
+      this.forceEnemyOutCoroutine = (Coroutine) null;
+    MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyOut(this.id, this._position);
+  }
+
+  public void StopForceEnemyOut()
+  {
+    if (this.forceEnemyOutCoroutine == null)
+      return;
+    this.StopCoroutine(this.forceEnemyOutCoroutine);
+    this.forceEnemyOutCoroutine = (Coroutine) null;
+  }
+
+  public void UpdateBreakIDLists()
+  {
+    if (!Object.op_Equality((Object) MonoBehaviourSingleton<StageObjectManager>.I.boss, (Object) this) || !MonoBehaviourSingleton<CoopManager>.IsValid() || MonoBehaviourSingleton<CoopManager>.I.coopStage.bossBreakIDLists == null)
+      return;
+    int index = 0;
+    if (QuestManager.IsValidInGame())
+      index = (int) MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex;
+    MonoBehaviourSingleton<CoopManager>.I.coopStage.bossBreakIDLists[index] = this.GetBreakRegionIDList();
+  }
+
+  public override void OnDeadEnd() => this.DestroyObject();
+
+  public virtual void ActStep(int motion_id = 0)
+  {
+    if (motion_id == 0)
+      motion_id = 115;
+    this.EndAction();
+    this.actionID = Character.ACTION_ID.MAX;
+    this.PlayMotion(motion_id);
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.OnActStep(motion_id);
+  }
+
+  public virtual void ActAngry(int angryActionId, uint angryId)
+  {
+    this.EndAction();
+    this.NowAngryID = angryId;
+    this.actionID = Character.ACTION_ID.PARALYZE | Character.ACTION_ID.FREEZE;
+    this.PlayMotion(130 + angryActionId);
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.OnActAngry(angryActionId, angryId);
+  }
+
+  public void RegisterAngryID(uint angryId)
+  {
+    if (this.m_execAngryIds == null || this.m_execAngryIds.Contains(angryId))
+      return;
+    this.m_execAngryIds.Add(angryId);
+  }
+
+  public void UnRegisterAngryID(uint angryId)
+  {
+    if (this.m_execAngryIds == null || !this.m_execAngryIds.Contains(angryId))
+      return;
+    this.m_execAngryIds.Remove(angryId);
+  }
+
+  public bool CheckAngryID(uint angryId) => this.m_execAngryIds.Contains(angryId);
+
+  public uint NowAngryID
+  {
+    get => this.m_nowAngryId;
+    set => this.m_nowAngryId = value;
+  }
+
+  public List<uint> ExecAngryIDList
+  {
+    get => this.m_execAngryIds;
+    set => this.m_execAngryIds = value;
+  }
+
+  public void ActDown()
+  {
+    int num = this.IsDebuffShadowSealing() ? 0 : (!this.IsConcussion() ? 1 : 0);
+    bool useDownTime = this.IsAbleToUseDownTime();
+    if (num != 0)
+      this.EndAction();
+    this.ActReleaseGrabbedPlayers(false, false, true);
+    if (useDownTime)
+    {
+      this.downTime = Time.time + this.downLoopStartTime + this.downLoopTime;
+      this.downGaugeDecreaseStartTime = Time.time + this.downLoopStartTime;
+      this.downDecreaseRates = MonoBehaviourSingleton<InGameSettingsManager>.I.player.ohsActionInfo.Soul_DownGaugeDecreaseRates;
+    }
+    if (num != 0)
+    {
+      this.actionID = Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE;
+      this.PlayMotion(useDownTime ? 118 : 117);
+    }
+    else
+    {
+      if (this.IsConcussion())
+      {
+        this.ActConcussionEnd();
+        this.actionID = Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE;
+      }
+      else if (!this.shadowSealingStackDebuff.Contains(Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE))
+        this.shadowSealingStackDebuff.Add(Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE);
+      this.EventWeakPointAllON(new AnimEventData.EventData()
+      {
+        attackMode = Player.ATTACK_MODE.NONE,
+        intArgs = new int[1]{ 1 }
+      });
+    }
+    this.OnActReaction();
+  }
+
+  private bool UpdateDownAction()
+  {
+    if (!this.IsAbleToUseDownTime())
+      return false;
+    if ((double) this.downGaugeDecreaseStartTime - (double) Time.time < 0.0)
+    {
+      int stackCount = this.stackBuffCtrl.GetStackCount(StackBuffController.STACK_TYPE.SNATCH);
+      if (!((IList<float>) this.downDecreaseRates).IsNullOrEmpty<float>())
+      {
+        int index = Mathf.Min(stackCount, this.downDecreaseRates.Length - 1);
+        if (stackCount > 0)
+          this.downTime += this.downDecreaseRates[index] * Time.deltaTime;
+      }
+    }
+    if ((double) this.downTime - (double) Time.time > 0.0)
+      return false;
+    this.ActDownEnd();
+    if (!this.IsDebuffShadowSealing())
+      this.SetNextTrigger();
+    return true;
+  }
+
+  private void ActDownEnd()
+  {
+    if (!this.IsDebuffShadowSealing())
+      return;
+    this._EndDebuffAction(Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE);
+    this.EventWeakPointAllOFF((AnimEventData.EventData) null);
+    if (!this.shadowSealingStackDebuff.Contains(Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE))
+      return;
+    this.shadowSealingStackDebuff.Remove(Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE);
+  }
+
+  public bool IsActDown()
+  {
+    if (!this.IsAbleToUseDownTime())
+      return false;
+    return this.actionID == (Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE) || this.shadowSealingStackDebuff.Contains(Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE);
+  }
+
+  private bool IsAbleToUseDownTime()
+  {
+    bool useDownTime = false;
+    if (this.useDownLoopTime && (double) this.downLoopStartTime >= 0.0 && (double) this.downLoopTime >= 0.0)
+      useDownTime = true;
+    return useDownTime;
+  }
+
+  public float GetDownTimeRate()
+  {
+    float downTimeRate = 0.0f;
+    if (this.IsAbleToUseDownTime() && (double) this.downLoopTime > 0.0)
+      downTimeRate = Mathf.Clamp((this.downTime - Time.time) / this.downLoopTime, 0.0f, 1f);
+    return downTimeRate;
+  }
+
+  public void IncreaseDownTimeByAttack(float down)
+  {
+    if ((double) down <= 0.0 || this.downMax <= 0)
+      return;
+    float num = this.downTime + this.downLoopTime * (down / (float) this.downMax);
+    if ((double) num - (double) Time.time > (double) this.downLoopTime)
+      num = this.downLoopTime + Time.time;
+    this.downTime = num;
+  }
+
+  public void ActDizzy()
+  {
+    this.EndAction();
+    this.ActReleaseGrabbedPlayers(false, false, true);
+    this.m_dizzyTime = Time.time + this.DizzyReactionLoopTime;
+    this.actionID = (Character.ACTION_ID) 18;
+    this.PlayMotion(122);
+    this.OnActReaction();
+  }
+
+  public void ActCounter(int targetId)
+  {
+    this.EndAction();
+    this.counterFlag = true;
+    this.actionID = (Character.ACTION_ID) 17;
+    this.PlayMotion(119);
+    if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
+      MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(this.enemyTableData.name, STRING_CATEGORY.ENEMY_REACTION, this.kStrIdx_EnemyReaction_Counter);
+    if (this.IsOriginal() || this.IsCoopNone())
+    {
+      EnemyBrain brain = this.controller.brain as EnemyBrain;
+      if (brain.targetCtrl != null)
+      {
+        StageObject stageObject = MonoBehaviourSingleton<StageObjectManager>.I.FindObject(targetId);
+        if (Object.op_Inequality((Object) stageObject, (Object) null))
+        {
+          brain.targetCtrl.SetCurrentTarget(stageObject);
+          this.SetActionTarget(stageObject, true);
+          this.SetActionPosition(stageObject._position, true);
+          brain.fsm.ChangeState(STATE_TYPE.SELECT);
+        }
+      }
+    }
+    this.OnActReaction();
+  }
+
+  public bool counterFlag { get; set; }
+
+  public override void ActFreezeStart()
+  {
+    if (this.IsFreeze())
+      return;
+    this.ActReleaseGrabbedPlayers(false, false, true);
+    base.ActFreezeStart();
+    if (!MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+      return;
+    MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
+  }
+
+  protected override void ActFreezeEnd()
+  {
+    if (!this.IsFreeze())
+      return;
+    base.ActFreezeEnd();
+    if (!MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+      return;
+    MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
+  }
+
+  public override void ActParalyze()
+  {
+    if (this.IsDebuffShadowSealing() && this.shadowSealingStackDebuff.Contains(Character.ACTION_ID.PARALYZE))
+      return;
+    this.ActReleaseGrabbedPlayers(false, false, true);
+    base.ActParalyze();
+    this.paralyzeTime = Time.time + this.paralyzeLoopTime;
+    if (!MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+      return;
+    MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
+  }
+
+  protected override void ActParalyzeEnd()
+  {
+    if (!this.IsParalyze())
+      return;
+    base.ActParalyzeEnd();
+    if (!MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+      return;
+    MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
+  }
+
+  public void ActElectricShock()
+  {
+    this.ActDamage();
+    this.ActReleaseGrabbedPlayers(false, false, true);
+    this.CreateElectricShockEffect();
+  }
+
+  public void ActSoilShock()
+  {
+    this.ActDamage();
+    this.ActReleaseGrabbedPlayers(false, false, true);
+  }
+
+  public void ActBind(float loopTime)
+  {
+    bool flag1 = !this.IsDebuffShadowSealing();
+    bool flag2 = this.shadowSealingStackDebuff.Contains((Character.ACTION_ID) 23);
+    if (!flag1 & flag2)
+      return;
+    if (!flag1 && !flag2)
+      this.shadowSealingStackDebuff.Add((Character.ACTION_ID) 23);
+    this.ActReleaseGrabbedPlayers(false, false, true);
+    this.bindEndTime = Time.time + this.downLoopStartTime + loopTime;
+    if (flag1)
+    {
+      this.EndAction();
+      this.actionID = (Character.ACTION_ID) 23;
+      this.PlayMotion(118);
+    }
+    this.OnActReaction();
+  }
+
+  private bool UpdateBindAction()
+  {
+    if ((double) this.bindEndTime - (double) Time.time > 0.0)
+      return false;
+    this.ActBindEnd();
+    if (!this.IsDebuffShadowSealing())
+      this.SetNextTrigger();
+    return true;
+  }
+
+  private void ActBindEnd()
+  {
+    if (!this.IsDebuffShadowSealing() || !this.shadowSealingStackDebuff.Contains((Character.ACTION_ID) 23))
+      return;
+    this.shadowSealingStackDebuff.Remove((Character.ACTION_ID) 23);
+  }
+
+  private bool IsActBind()
+  {
+    return this.actionID == (Character.ACTION_ID) 23 || this.shadowSealingStackDebuff.Contains((Character.ACTION_ID) 23);
+  }
+
+  public void ActDamageMotionStopStart(float loopTime)
+  {
+    if (!this.IsReactionDamageMotionStop())
+      return;
+    this.EndAction();
+    this.PlayMotion(6, (double) this.stopMotionByDebuffNormalizedTime < 0.0 ? -1f : 0.0f);
+    if (Object.op_Inequality((Object) this._rigidbody, (Object) null))
+      this._rigidbody.velocity = Vector3.zero;
+    this.rotateEventKeep = false;
+    this.rotateToTargetFlag = false;
+    this.rotateEventSpeed = 0.0f;
+    this.OnActReaction();
+  }
+
+  public void ActDamageMotionStopEnd()
+  {
+    this.setPause(false);
+    this.m_isStopMotionByDebuff = false;
+  }
+
+  public bool UpdateDamageMotionStop()
+  {
+    float num = 0.1f;
+    AnimatorStateInfo animatorStateInfo = this.animator.GetCurrentAnimatorStateInfo(0);
+    if (this.actionID == Character.ACTION_ID.NONE && ((double) ((AnimatorStateInfo) ref animatorStateInfo).normalizedTime < (double) num || ((AnimatorStateInfo) ref animatorStateInfo).fullPathHash != Animator.StringToHash("Base Layer.damage")) || this.m_isStopMotionByDebuff)
+      return false;
+    this.setPause(true);
+    this.m_isStopMotionByDebuff = true;
+    return false;
+  }
+
+  public bool IsReactionDamageMotionStop()
+  {
+    switch (this.actionID)
+    {
+      case Character.ACTION_ID.PARALYZE:
+      case Character.ACTION_ID.FREEZE:
+      case Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE:
+      case (Character.ACTION_ID) 19:
+      case (Character.ACTION_ID) 22:
+      case (Character.ACTION_ID) 23:
+      case (Character.ACTION_ID) 25:
+        return false;
+      default:
+        return true;
+    }
+  }
+
+  public override void ActMovePoint(Vector3 targetPos)
+  {
+    if (this.IsArrivalPosition(targetPos) && !this.forceActMovePoint)
+      return;
+    this.EndAction();
+    this.actionID = Character.ACTION_ID.MOVE_POINT;
+    this.SetStateMovePoint(Character.STATE_MOVE_POINT.INIT);
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.OnActMovePoint(targetPos);
+  }
+
+  protected override void UpdateMovePointAction()
+  {
+    switch (this.stateMovePoint)
+    {
+      case Character.STATE_MOVE_POINT.INIT:
+        if (this.IsArrivalPosition(this.movePointPos) && !this.forceActMovePoint)
+        {
+          this.SetStateMovePoint(Character.STATE_MOVE_POINT.FINISH);
+          break;
+        }
+        Vector3 targetDir = this._forward;
+        Vector3 vector3 = Vector3.op_Subtraction(this.movePointPos, this._position);
+        vector3.y = 0.0f;
+        if (Vector3.op_Inequality(vector3, Vector3.zero))
+          targetDir = ((Vector3) ref vector3).normalized;
+        if (!this.IsNeedToRotate(targetDir))
+        {
+          this.PlayMotion(13);
+          this.SetStateMovePoint(Character.STATE_MOVE_POINT.CHECK);
+          break;
+        }
+        this.m_rotateForActTime = 0.0f;
+        this.m_rotateForActFinishTime = (float) ((double) Mathf.Acos(Vector3.Dot(this._forward, targetDir)) / (Math.PI / 90.0) * (1.0 / (double) Application.targetFrameRate));
+        this.m_rotateForActStart_Quat = Quaternion.LookRotation(this._forward);
+        this.m_rotateForActEnd_Quat = Quaternion.LookRotation(targetDir);
+        this.m_rotateForActMotionId = (double) Vector3.Cross(this._forward, targetDir).y >= 0.0 ? 5 : 4;
+        this.PlayMotion(this.m_rotateForActMotionId);
+        this.SetStateMovePoint(Character.STATE_MOVE_POINT.ROTATE);
+        break;
+      case Character.STATE_MOVE_POINT.ROTATE:
+        this.m_rotateForActTime += Time.deltaTime;
+        float num = Mathf.Clamp(this.m_rotateForActTime / this.m_rotateForActFinishTime, 0.0f, 1f);
+        if (!this.IsPlayingMotion(1))
+        {
+          this._rotation = Quaternion.Lerp(this.m_rotateForActStart_Quat, this.m_rotateForActEnd_Quat, num);
+          break;
+        }
+        if ((double) num < 1.0)
+        {
+          this.PlayMotion(this.m_rotateForActMotionId);
+          break;
+        }
+        this.PlayMotion(13);
+        this.SetStateMovePoint(Character.STATE_MOVE_POINT.CHECK);
+        break;
+      case Character.STATE_MOVE_POINT.CHECK:
+        if (!this.IsArrivalPosition(this.movePointPos))
+          break;
+        this.SetNextTrigger();
+        this.SetStateMovePoint(Character.STATE_MOVE_POINT.FINISH);
+        break;
+      case Character.STATE_MOVE_POINT.FINISH:
+        this.SetStateMovePoint(Character.STATE_MOVE_POINT.NONE);
+        break;
+    }
+  }
+
+  public override void ActMoveLookAt(Vector3 moveLookAtPos, bool isPacket = false)
+  {
+    this.EndAction();
+    this.actionID = Character.ACTION_ID.MOVE_LOOKAT;
+    this.SetStateMoveLookAt(Character.STATE_MOVE_LOOKAT.INIT);
+    if (isPacket)
+      this.moveLookAtPos = moveLookAtPos;
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.OnActMoveLookAt(moveLookAtPos);
+  }
+
+  protected override void UpdateMoveLookAtAction()
+  {
+    switch (this.stateMoveLookAt)
+    {
+      case Character.STATE_MOVE_LOOKAT.INIT:
+        Vector3 vector3_1 = Vector3.op_Subtraction(this.moveLookAtPos, this._position);
+        this.m_moveLookAtInitTargetDir = ((Vector3) ref vector3_1).normalized;
+        this.PlayMotion(14);
+        this.SetStateMoveLookAt(Character.STATE_MOVE_LOOKAT.MOVE);
+        break;
+      case Character.STATE_MOVE_LOOKAT.MOVE:
+        Vector3 vector3_2 = Vector3.op_Subtraction(this._position, this.moveLookAtPos);
+        Vector3 vector3_3 = Vector3.op_Subtraction(Vector3.op_Addition(this.moveLookAtPos, Quaternion.op_Multiply(Quaternion.AngleAxis(this.moveLookAtAngle * Time.deltaTime, Vector3.up), vector3_2)), this._position);
+        Vector3 vector3_4;
+        if (!this.IsPlayingMotion(1))
+        {
+          vector3_4 = Vector3.op_Subtraction(this.moveLookAtPos, this._position);
+          this._rotation = Quaternion.LookRotation(((Vector3) ref vector3_4).normalized, Vector3.up);
+          this._position = Vector3.op_Addition(this._position, vector3_3);
+        }
+        else
+          this.PlayMotion(14);
+        vector3_4 = Vector3.op_Subtraction(this.moveLookAtPos, this._position);
+        if ((double) Vector3.Angle(this.m_moveLookAtInitTargetDir, ((Vector3) ref vector3_4).normalized) < (double) this.moveLookAtAngle)
+          break;
+        this.SetNextTrigger();
+        this.SetStateMoveLookAt(Character.STATE_MOVE_LOOKAT.FINISH);
+        break;
+      case Character.STATE_MOVE_LOOKAT.FINISH:
+        this.SetStateMoveLookAt(Character.STATE_MOVE_LOOKAT.NONE);
+        break;
+    }
+  }
+
+  protected override void OnPlayingEndMotion()
+  {
+    switch (this.actionID)
+    {
+      case Character.ACTION_ID.DEAD:
+        this.OnDeadEnd();
+        return;
+      case (Character.ACTION_ID) 24:
+        if (this.isFirstMadMode)
+        {
+          this.ActMadMode();
+          return;
+        }
+        break;
+    }
+    base.OnPlayingEndMotion();
+  }
+
+  protected override void EndAction()
+  {
+    if (!this.isInitialized)
+      return;
+    Character.ACTION_ID actionId = this.actionID;
+    base.EndAction();
+    this._EndDebuffAction(actionId);
+    this.EndWaitingPacket(StageObject.WAITING_PACKET.ENEMY_WARP);
+    if (Object.op_Inequality((Object) this.loader.shadow, (Object) null) && !((Component) this.loader.shadow).gameObject.activeSelf)
+      ((Component) this.loader.shadow).gameObject.SetActive(true);
+    this.enableTargetPoint = true;
+    this.reviveRegionWaitSync = false;
+    this.enableDash = false;
+    this.dashBeforePos = Vector3.zero;
+    this.dashNowDistance = 0.0f;
+    this.dashOverDistance = 0.0f;
+    this.dashMinDistance = 0.0f;
+    this.dashMaxDistance = 0.0f;
+    this.dashEndTrigger = (string) null;
+    this.dashOverFlag = false;
+    this.dashOverCheckDistance = 0.0f;
+    this.canHitShockEffect = true;
+    this.isAbleToSkipAction = false;
+    this.enableAssimilation = false;
+    this.enableToSkipActionByDamage = false;
+    int length = this.regionWorks.Length;
+    for (int index = 0; index < length; ++index)
+    {
+      if (!this.regionWorks[index].IsValidDisplayTimer)
+        this.regionWorks[index].ResetWeakState();
+    }
+    this.shotEventInfoQueue.Clear();
+    this.shotNetworkInfoQueue.Clear();
+    this.warpWaitSync = false;
+    if (this.warpViewFlag || (double) this.warpViewRate != 0.0)
+    {
+      this.warpViewFlag = true;
+      this.warpViewRatePerTime = -2f;
+    }
+    if (this.radialBlurEnable)
+      MonoBehaviourSingleton<InGameCameraManager>.I.EndRadialBlurFilter(0.1f);
+    this.radialBlurEnable = false;
+    if (Object.op_Inequality((Object) this.loader.baseEffect, (Object) null) && !((Component) this.loader.baseEffect).gameObject.activeSelf)
+      ((Component) this.loader.baseEffect).gameObject.SetActive(true);
+    int count = this.animLayerWeightChangeInfo.Count;
+    if (count > 0)
+    {
+      this.loader.GetAnimator();
+      for (int index = 0; index < count; ++index)
+      {
+        Enemy.AnimationLayerWeightChangeInfo weightChangeInfo = this.animLayerWeightChangeInfo[index];
+        if (weightChangeInfo.aliveFlag && weightChangeInfo.forceEndFlag)
+          weightChangeInfo.aliveFlag = false;
+      }
+    }
+    if (this.blendColorCtrl != null)
+      this.blendColorCtrl.ForceEnd();
+    if (!this.isSummonAttack || actionId != Character.ACTION_ID.ATTACK)
+      return;
+    ((Component) this).gameObject.SetActive(false);
+  }
+
+  protected override void _EndDebuffAction(Character.ACTION_ID beforeActId)
+  {
+    switch (beforeActId)
+    {
+      case Character.ACTION_ID.PARALYZE:
+        this.badStatusMax.paralyze *= 1.5f;
+        if (!MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+          break;
+        MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
+        break;
+      case Character.ACTION_ID.FREEZE:
+        this.badStatusMax.freeze *= 1.5f;
+        if (!MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+          break;
+        MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
+        break;
+      case Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE:
+        this.downTotal = 0.0f;
+        ++this.downCount;
+        using (List<MissionCheckBase>.Enumerator enumerator = MonoBehaviourSingleton<InGameProgress>.I.missionCheck.GetEnumerator())
+        {
+          while (enumerator.MoveNext())
+          {
+            if (enumerator.Current is MissionCheckDownCount current)
+              current.SetCount(this.downCount);
+          }
+          break;
+        }
+      case (Character.ACTION_ID) 19:
+        this.ActDebuffShadowSealingEnd();
+        break;
+      case (Character.ACTION_ID) 22:
+        this.ActLightRingEnd();
+        break;
+      case (Character.ACTION_ID) 25:
+        this.ActConcussionEnd();
+        break;
+    }
+  }
+
+  protected override string GetMotionStateName(int motion_id, string _layerName = "")
+  {
+    if (motion_id >= 130 && motion_id <= 146)
+    {
+      int index = 15;
+      Character.stateNameBuilder.Length = 0;
+      Character.stateNameBuilder.Append("Base Layer.");
+      Character.stateNameBuilder.AppendFormat(Enemy.subMotionStateName[index], (object) (motion_id - 130));
+      return Character.stateNameBuilder.ToString();
+    }
+    if (motion_id - 115 < 0 || motion_id - 115 >= Enemy.subMotionStateName.Length)
+      return base.GetMotionStateName(motion_id, _layerName);
+    Character.stateNameBuilder.Length = 0;
+    Character.stateNameBuilder.Append("Base Layer.");
+    string str = Enemy.subMotionStateName[motion_id - 115];
+    if (motion_id == 119)
+    {
+      EnemyBrain brain = this.controller.brain as EnemyBrain;
+      if (Object.op_Inequality((Object) brain, (Object) null) && brain.actionCtrl != null)
+      {
+        int modeCounterModeId = brain.actionCtrl.GetNowModeCounterModeId();
+        if (modeCounterModeId >= 2)
+          str = $"{str}_{$"{modeCounterModeId:D2}"}";
+      }
+    }
+    Character.stateNameBuilder.Append(str);
+    return Character.stateNameBuilder.ToString();
+  }
+
+  protected override float GetAnimatorSpeed()
+  {
+    if (this.IsHitStop() || this.isPause)
+      return 0.0f;
+    switch (this.actionID)
+    {
+      case Character.ACTION_ID.MOVE:
+      case Character.ACTION_ID.ROTATE:
+      case Character.ACTION_ID.MOVE_POINT:
+      case Character.ACTION_ID.MAX:
+        return this.buffParam.GetMoveSpeed() * this.walkSpeedRateFromTable;
+      case Character.ACTION_ID.ATTACK:
+        return this.buffParam.GetAtkSpeed();
+      default:
+        return 1f;
+    }
+  }
+
+  public override bool OnBuffStart(BuffParam.BuffData buffData)
+  {
+    if (this.CheckDisableBuffTypeByShield(buffData.type) || this.CheckDisableBuffTypeByMadMode(buffData.type) || !this.buffParam.BuffStart(buffData))
+      return false;
+    this.UpdateAnimatorSpeed();
+    if (buffData.sync)
+      this.SendBuffSync(buffData.type);
+    if (this.IsCoopNone() || this.IsOriginal())
+      buffData.isOwnerEnemyBuffStart = true;
+    switch (buffData.type)
+    {
+      case BuffParam.BUFFTYPE.MOVE_SPEED_DOWN:
+      case BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN:
+        this.CreateSpeedDownEffect();
+        break;
+      case BuffParam.BUFFTYPE.BURNING:
+        this.CreateBurningEffect();
+        break;
+      case BuffParam.BUFFTYPE.GHOST_FORM:
+        if (((Component) this).gameObject.activeSelf)
+        {
+          this.ChangeGhostShaderParam(this.GhostFormShaderParam.disappearParam, this.GhostFormShaderParam.duration);
+          break;
+        }
+        this.isRequireGhostShaderParam = true;
+        this.ghostBuffEndParam = this.GhostFormShaderParam.disappearParam;
+        this.ghostBuffDuration = this.GhostFormShaderParam.duration;
+        break;
+      case BuffParam.BUFFTYPE.EROSION:
+        this.CreateErosionEffect();
+        break;
+      case BuffParam.BUFFTYPE.SOIL_SHOCK:
+        this.CreateSoilShockEffect();
+        break;
+      case BuffParam.BUFFTYPE.ACID:
+        this.CreateAcidEffect();
+        break;
+      case BuffParam.BUFFTYPE.DAMAGE_MOTION_STOP:
+        this.ActDamageMotionStopStart(buffData.time);
+        break;
+      case BuffParam.BUFFTYPE.CORRUPTION:
+        this.CreateCorruptionEffect();
+        break;
+      case BuffParam.BUFFTYPE.STIGMATA:
+        this.CreateStigmataEffect();
+        break;
+      case BuffParam.BUFFTYPE.CYCLONIC_THUNDERSTORM:
+        this.CreateCyclonicThunderstormEffect();
+        break;
+    }
+    if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid() && buffData.isOwnerEnemyBuffStart)
+      MonoBehaviourSingleton<UIEnemyAnnounce>.I.StartBuff(this.enemyTableData.name, buffData.type);
+    if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+      MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
+    buffData.isOwnerEnemyBuffStart = false;
+    return true;
+  }
+
+  public override void OnBuffRoutine(BuffParam.BuffData buffData, bool packet = false)
+  {
+    int hp1 = this.hp;
+    base.OnBuffRoutine(buffData, packet);
+    int hp2 = this.hp;
+    int damage1 = hp1 - hp2;
+    if (MonoBehaviourSingleton<InGameRecorder>.IsValid() && buffData.fromObjectID > 0)
+      MonoBehaviourSingleton<InGameRecorder>.I.RecordGivenDamage(buffData.fromObjectID, damage1);
+    if (QuestManager.IsValidInGameExplore() && this.isBoss && MonoBehaviourSingleton<CoopManager>.I.GetSelfID() == buffData.fromObjectID)
+    {
+      ExplorePlayerStatus explorePlayerStatus = MonoBehaviourSingleton<QuestManager>.I.GetMyExplorePlayerStatus();
+      int num = explorePlayerStatus.givenTotalDamage + damage1;
+      explorePlayerStatus.SyncTotalDamageToBoss(num);
+      MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendExploreBossDamage(num);
+    }
+    switch (buffData.type)
+    {
+      case BuffParam.BUFFTYPE.ELECTRIC_SHOCK:
+      case BuffParam.BUFFTYPE.SOIL_SHOCK:
+        if (!this.IsDebuffShadowSealing() && !this.IsConcussion())
+        {
+          Character.ReactionInfo info = new Character.ReactionInfo();
+          info.reactionType = buffData.type != BuffParam.BUFFTYPE.ELECTRIC_SHOCK ? Character.REACTION_TYPE.SOIL_SHOCK : Character.REACTION_TYPE.ELECTRIC_SHOCK;
+          if (this.enableReactionDelay && this.IsReactionDelayType((int) info.reactionType))
+          {
+            this.RegisterReacionDelayInfo(new Character.DelayReactionInfo()
+            {
+              type = info.reactionType
+            });
+            info.reactionType = Character.REACTION_TYPE.NONE;
+            this.isReactionDelaySet = true;
+          }
+          this.ActReaction(info, false);
+        }
+        if (!packet)
+        {
+          buffData.value = buffData.damage;
+          break;
+        }
+        break;
+      case BuffParam.BUFFTYPE.DAMAGE_MOTION_STOP:
+        this.UpdateDamageMotionStop();
+        break;
+    }
+    if (BuffParam.IsTypeShowDamageOnEnemy(buffData.type))
+    {
+      AtkAttribute damage2 = new AtkAttribute();
+      damage2.normal = (float) buffData.value;
+      Vector3 position = this._position;
+      GameObject loopEffect = this.buffParam.GetLoopEffect(buffData);
+      if (Object.op_Inequality((Object) loopEffect, (Object) null))
+        position = loopEffect.transform.position;
+      this.CreateDamageNum(position, damage2, false, false);
+    }
+    if (!MonoBehaviourSingleton<CoopManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<CoopManager>.I.coopStage.battleUserLog.Add((Character) this, buffData.type, damage1);
+  }
+
+  public override bool OnBuffEnd(BuffParam.BUFFTYPE type, bool sync, bool isPlayEndEffect = true)
+  {
+    if (!base.OnBuffEnd(type, sync, isPlayEndEffect))
+      return false;
+    switch (type)
+    {
+      case BuffParam.BUFFTYPE.MOVE_SPEED_DOWN:
+        this.badStatusMax.speedDown *= 1.5f;
+        if (Object.op_Inequality((Object) this.m_effectSpeedDown, (Object) null) && !this.buffParam.IsValidBuff(BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN))
+        {
+          Object.Destroy((Object) this.m_effectSpeedDown);
+          this.m_effectSpeedDown = (GameObject) null;
+          break;
+        }
+        break;
+      case BuffParam.BUFFTYPE.POISON:
+        this.badStatusMax.poison *= 1.5f;
+        break;
+      case BuffParam.BUFFTYPE.BURNING:
+        this.badStatusMax.burning *= 1.5f;
+        if (Object.op_Inequality((Object) this.m_effectBurning, (Object) null))
+        {
+          Object.Destroy((Object) this.m_effectBurning);
+          this.m_effectBurning = (GameObject) null;
+          break;
+        }
+        break;
+      case BuffParam.BUFFTYPE.DEADLY_POISON:
+        this.badStatusMax.deadlyPoison *= 1.5f;
+        break;
+      case BuffParam.BUFFTYPE.GHOST_FORM:
+        if (((Component) this).gameObject.activeSelf)
+        {
+          this.ChangeGhostShaderParam(this.GhostFormShaderParam.appearParam, this.GhostFormShaderParam.duration);
+          break;
+        }
+        this.isRequireGhostShaderParam = true;
+        this.ghostBuffEndParam = this.GhostFormShaderParam.appearParam;
+        this.ghostBuffDuration = this.GhostFormShaderParam.duration;
+        break;
+      case BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN:
+        this.badStatusMax.attackSpeedDown *= 1.5f;
+        if (Object.op_Inequality((Object) this.m_effectSpeedDown, (Object) null) && !this.buffParam.IsValidBuff(BuffParam.BUFFTYPE.MOVE_SPEED_DOWN))
+        {
+          Object.Destroy((Object) this.m_effectSpeedDown);
+          this.m_effectSpeedDown = (GameObject) null;
+          break;
+        }
+        break;
+      case BuffParam.BUFFTYPE.EROSION:
+        this.badStatusMax.erosion *= 1.5f;
+        if (Object.op_Inequality((Object) this.m_effectErosion, (Object) null))
+        {
+          Object.Destroy((Object) this.m_effectErosion);
+          this.m_effectErosion = (GameObject) null;
+          break;
+        }
+        break;
+      case BuffParam.BUFFTYPE.SOIL_SHOCK:
+        this.badStatusMax.soilShock *= 1.5f;
+        if (Object.op_Inequality((Object) this.m_effectSoilShock, (Object) null))
+        {
+          EffectManager.ReleaseEffect(this.m_effectSoilShock.gameObject);
+          this.m_effectSoilShock = (GameObject) null;
+          break;
+        }
+        break;
+      case BuffParam.BUFFTYPE.ACID:
+        this.badStatusMax.acid *= 1.5f;
+        if (Object.op_Inequality((Object) this.m_effectAcid, (Object) null))
+        {
+          EffectManager.ReleaseEffect(this.m_effectAcid.gameObject);
+          this.m_effectAcid = (GameObject) null;
+          break;
+        }
+        break;
+      case BuffParam.BUFFTYPE.DAMAGE_MOTION_STOP:
+        this.ActDamageMotionStopEnd();
+        break;
+      case BuffParam.BUFFTYPE.CORRUPTION:
+        this.badStatusMax.corruption *= 1.5f;
+        if (Object.op_Inequality((Object) this.m_effectCorruption, (Object) null))
+        {
+          EffectManager.ReleaseEffect(this.m_effectCorruption.gameObject);
+          this.m_effectCorruption = (GameObject) null;
+          break;
+        }
+        break;
+      case BuffParam.BUFFTYPE.STIGMATA:
+        if (Object.op_Inequality((Object) this.m_effectStigmata, (Object) null))
+        {
+          EffectManager.ReleaseEffect(this.m_effectStigmata.gameObject);
+          this.m_effectStigmata = (GameObject) null;
+          break;
+        }
+        break;
+      case BuffParam.BUFFTYPE.CYCLONIC_THUNDERSTORM:
+        if (Object.op_Inequality((Object) this.m_effectCyclonicThunderstorm, (Object) null))
+        {
+          EffectManager.ReleaseEffect(this.m_effectCyclonicThunderstorm.gameObject);
+          this.m_effectCyclonicThunderstorm = (GameObject) null;
+          break;
+        }
+        break;
+    }
+    if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
+      MonoBehaviourSingleton<UIEnemyAnnounce>.I.EndBuff(this.enemyTableData.name, type);
+    if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+      MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
+    return true;
+  }
+
+  protected override void OnUIBuffRoutine(BuffParam.BUFFTYPE type, int value)
+  {
+    if (!MonoBehaviourSingleton<UIDamageManager>.IsValid() || type != BuffParam.BUFFTYPE.REGENERATE && type != BuffParam.BUFFTYPE.REGENERATE_PROPORTION)
+      return;
+    MonoBehaviourSingleton<UIDamageManager>.I.CreateEnemyRecoverHp((Character) this, value, UIPlayerDamageNum.DAMAGE_COLOR.HEAL);
+  }
+
+  public override void OnPoisonStart(int fromObjectID = 0)
+  {
+    this.OnBuffStart(new BuffParam.BuffData()
+    {
+      type = BuffParam.BUFFTYPE.POISON,
+      time = 20f,
+      valueType = BuffParam.VALUE_TYPE.RATE,
+      value = (int) ((double) this.hpMax * 0.014999999664723873),
+      interval = 5f,
+      fromObjectID = fromObjectID
+    });
+  }
+
+  public void OnElectricShockStart(AttackHitInfo atkHitInfo, Player player)
+  {
+    if (atkHitInfo == null)
+      return;
+    ElectricShockInfo electricShockInfo = atkHitInfo.electricShockInfo;
+    if (electricShockInfo == null)
+      return;
+    BuffParam.BuffData buffData = new BuffParam.BuffData();
+    buffData.type = BuffParam.BUFFTYPE.ELECTRIC_SHOCK;
+    buffData.time = electricShockInfo.duration;
+    buffData.interval = electricShockInfo.damageInterval;
+    buffData.value = 1;
+    buffData.fromObjectID = player.id;
+    if (Object.op_Inequality((Object) player, (Object) null))
+    {
+      BuffParam buffParam = player.buffParam;
+      AtkAttribute atkAttribute = InGameUtility.CalcPlayerATK(new InGameUtility.PlayerAtkCalcData()
+      {
+        weaponAtk = player.attack,
+        statusAtk = player.playerAtk,
+        guardEquipAtk = player.GetGuardEquipmentAtk(),
+        buffAtkRate = buffParam.GetBuffAtkRate(),
+        passiveAtkRate = buffParam.GetPassiveAtkRate(),
+        buffAtkConstant = buffParam.GetBuffAtkConstant(),
+        buffAtkAllElementConstant = (float) buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_ALLELEMENT),
+        passiveAtkConstant = buffParam.GetPassiveAtkUpConstant(),
+        passiveAtkAllElementConstant = buffParam.passive.atkAllElement
+      });
+      buffData.damage = Mathf.FloorToInt(atkAttribute.CalcTotal() * ((float) electricShockInfo.atkRate * 0.01f));
+    }
+    this.OnBuffStart(buffData);
+  }
+
+  public override void OnDamageMotionStopStart(float time)
+  {
+    this.OnBuffStart(new BuffParam.BuffData()
+    {
+      type = BuffParam.BUFFTYPE.DAMAGE_MOTION_STOP,
+      time = time,
+      valueType = BuffParam.VALUE_TYPE.NONE
+    });
+  }
+
+  public void OnSoilShockStart(AttackHitInfo atkHitInfo, Player player)
+  {
+    if (atkHitInfo == null)
+      return;
+    ElectricShockInfo soilShockInfo = atkHitInfo.soilShockInfo;
+    if (soilShockInfo == null)
+      return;
+    BuffParam.BuffData buffData = new BuffParam.BuffData();
+    buffData.type = BuffParam.BUFFTYPE.SOIL_SHOCK;
+    buffData.time = soilShockInfo.duration;
+    buffData.interval = soilShockInfo.damageInterval;
+    buffData.value = 1;
+    buffData.fromObjectID = player.id;
+    if (Object.op_Inequality((Object) player, (Object) null))
+    {
+      BuffParam buffParam = player.buffParam;
+      AtkAttribute atkAttribute = InGameUtility.CalcPlayerATK(new InGameUtility.PlayerAtkCalcData()
+      {
+        weaponAtk = player.attack,
+        statusAtk = player.playerAtk,
+        guardEquipAtk = player.GetGuardEquipmentAtk(),
+        buffAtkRate = buffParam.GetBuffAtkRate(),
+        passiveAtkRate = buffParam.GetPassiveAtkRate(),
+        buffAtkConstant = buffParam.GetBuffAtkConstant(),
+        buffAtkAllElementConstant = (float) buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_ALLELEMENT),
+        passiveAtkConstant = buffParam.GetPassiveAtkUpConstant(),
+        passiveAtkAllElementConstant = buffParam.passive.atkAllElement
+      });
+      buffData.damage = Mathf.FloorToInt(atkAttribute.CalcTotal() * ((float) soilShockInfo.atkRate * 0.01f));
+    }
+    this.OnBuffStart(buffData);
+  }
+
+  protected void CreateSoilShockEffect()
+  {
+    if (this.m_effectSoilShock != null)
+      return;
+    Transform effect = EffectManager.GetEffect("ef_btl_enm_gravity_01", this._transform);
+    if (Object.op_Equality((Object) effect, (Object) null) || ((Component) effect).GetComponentsInChildren<ParticleSystem>(true) == null)
+      return;
+    this.CalcLightRingRadius();
+    Transform transform1 = effect;
+    transform1.localScale = Vector3.op_Multiply(transform1.localScale, this.lightRingRadius);
+    float num = this.lightRingHeight + this.lightRingHeightOffset;
+    Transform transform2 = effect;
+    transform2.localPosition = Vector3.op_Addition(transform2.localPosition, Vector3.op_Multiply(Vector3.up, num));
+    this.m_effectSoilShock = ((Component) effect).gameObject;
+  }
+
+  private void CreateBurningEffect()
+  {
+    if (this.m_effectBurning != null)
+      return;
+    Transform effect = EffectManager.GetEffect("ef_btl_enm_fire_01", this._transform);
+    if (Object.op_Equality((Object) effect, (Object) null))
+      return;
+    ParticleSystem[] componentsInChildren = ((Component) effect).GetComponentsInChildren<ParticleSystem>(true);
+    if (componentsInChildren == null)
+      return;
+    this.CalcFreezeEffectEmissionRadius();
+    for (int index = 0; index < componentsInChildren.Length; ++index)
+    {
+      ParticleSystem.ShapeModule shape = componentsInChildren[index].shape;
+      ((ParticleSystem.ShapeModule) ref shape).radius = this.GetEmittionRadius();
+    }
+    Transform transform = effect;
+    transform.localPosition = Vector3.op_Addition(transform.localPosition, Vector3.op_Multiply(Vector3.up, this.GetEmittionRadius()));
+    this.m_effectBurning = ((Component) effect).gameObject;
+  }
+
+  private void CreateErosionEffect()
+  {
+    if (this.m_effectErosion != null)
+      return;
+    Transform effect = EffectManager.GetEffect("ef_btl_enm_erosion_01", this._transform);
+    if (Object.op_Equality((Object) effect, (Object) null))
+      return;
+    ParticleSystem[] componentsInChildren = ((Component) effect).GetComponentsInChildren<ParticleSystem>(true);
+    if (componentsInChildren == null)
+      return;
+    this.CalcFreezeEffectEmissionRadius();
+    for (int index = 0; index < componentsInChildren.Length; ++index)
+    {
+      ParticleSystem.ShapeModule shape = componentsInChildren[index].shape;
+      ((ParticleSystem.ShapeModule) ref shape).radius = this.GetEmittionRadius();
+    }
+    Transform transform = effect;
+    transform.localPosition = Vector3.op_Addition(transform.localPosition, Vector3.op_Multiply(Vector3.up, this.GetEmittionRadius()));
+    this.m_effectErosion = ((Component) effect).gameObject;
+  }
+
+  private void CreateAcidEffect()
+  {
+    if (this.m_effectAcid != null)
+      return;
+    Transform effect = EffectManager.GetEffect("ef_btl_enm_acid_01", this._transform);
+    if (Object.op_Equality((Object) effect, (Object) null))
+      return;
+    ParticleSystem[] componentsInChildren = ((Component) effect).GetComponentsInChildren<ParticleSystem>(true);
+    if (componentsInChildren == null)
+      return;
+    this.CalcFreezeEffectEmissionRadius();
+    for (int index = 0; index < componentsInChildren.Length; ++index)
+    {
+      ParticleSystem.ShapeModule shape = componentsInChildren[index].shape;
+      ((ParticleSystem.ShapeModule) ref shape).radius = this.GetEmittionRadius();
+    }
+    Transform transform = effect;
+    transform.localPosition = Vector3.op_Addition(transform.localPosition, Vector3.op_Multiply(Vector3.up, this.GetEmittionRadius()));
+    this.m_effectAcid = ((Component) effect).gameObject;
+  }
+
+  private void CreateCorruptionEffect()
+  {
+    if (this.m_effectCorruption != null)
+      return;
+    Transform effect = EffectManager.GetEffect("ef_btl_enm_corruption_01", this._transform);
+    if (Object.op_Equality((Object) effect, (Object) null))
+      return;
+    ParticleSystem[] componentsInChildren = ((Component) effect).GetComponentsInChildren<ParticleSystem>(true);
+    if (componentsInChildren == null)
+      return;
+    this.CalcFreezeEffectEmissionRadius();
+    for (int index = 0; index < componentsInChildren.Length; ++index)
+    {
+      ParticleSystem.ShapeModule shape = componentsInChildren[index].shape;
+      ((ParticleSystem.ShapeModule) ref shape).radius = this.GetEmittionRadius();
+    }
+    Transform transform = effect;
+    transform.localPosition = Vector3.op_Addition(transform.localPosition, Vector3.op_Multiply(Vector3.up, this.GetEmittionRadius()));
+    this.m_effectCorruption = ((Component) effect).gameObject;
+  }
+
+  private void CreateStigmataEffect()
+  {
+    if (this.m_effectStigmata != null)
+      return;
+    Transform effect = EffectManager.GetEffect(MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.stigmataParam.effectName, this._transform);
+    if (Object.op_Equality((Object) effect, (Object) null))
+      return;
+    ParticleSystem[] componentsInChildren = ((Component) effect).GetComponentsInChildren<ParticleSystem>(true);
+    if (componentsInChildren == null)
+      return;
+    this.CalcFreezeEffectEmissionRadius();
+    for (int index = 0; index < componentsInChildren.Length; ++index)
+    {
+      ParticleSystem.ShapeModule shape = componentsInChildren[index].shape;
+      ((ParticleSystem.ShapeModule) ref shape).radius = this.GetEmittionRadius();
+    }
+    Transform transform = effect;
+    transform.localPosition = Vector3.op_Addition(transform.localPosition, Vector3.op_Multiply(Vector3.up, this.GetEmittionRadius()));
+    this.m_effectStigmata = ((Component) effect).gameObject;
+  }
+
+  private void CreateCyclonicThunderstormEffect()
+  {
+    if (this.m_effectCyclonicThunderstorm != null)
+      return;
+    Transform effect = EffectManager.GetEffect(MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.cyclonicThunderstormParam.effectName, this._transform);
+    if (Object.op_Equality((Object) effect, (Object) null))
+      return;
+    ParticleSystem[] componentsInChildren = ((Component) effect).GetComponentsInChildren<ParticleSystem>(true);
+    if (componentsInChildren == null)
+      return;
+    this.CalcFreezeEffectEmissionRadius();
+    for (int index = 0; index < componentsInChildren.Length; ++index)
+    {
+      ParticleSystem.ShapeModule shape = componentsInChildren[index].shape;
+      ((ParticleSystem.ShapeModule) ref shape).radius = this.GetEmittionRadius();
+    }
+    Transform transform = effect;
+    transform.localPosition = Vector3.op_Addition(transform.localPosition, Vector3.op_Multiply(Vector3.up, this.GetEmittionRadius()));
+    this.m_effectCyclonicThunderstorm = ((Component) effect).gameObject;
+  }
+
+  private void CreateSpeedDownEffect()
+  {
+    if (this.m_effectSpeedDown != null)
+      return;
+    Transform effect = EffectManager.GetEffect("ef_btl_pl_movedown_01", this._transform);
+    if (Object.op_Equality((Object) effect, (Object) null))
+      return;
+    this.CalcFreezeEffectEmissionRadius();
+    float num = this.GetEmittionRadius() * MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.attackSpeedDownParam.enemyEffectSize;
+    Transform transform = effect;
+    transform.localScale = Vector3.op_Multiply(transform.localScale, num);
+    this.m_effectSpeedDown = ((Component) effect).gameObject;
+  }
+
+  public override AttackHitColliderProcessor.HitParam SelectHitCollider(
+    AttackHitColliderProcessor processor,
+    List<AttackHitColliderProcessor.HitParam> hit_params)
+  {
+    this.checkHitParam.Clear();
+    this.checkLength.Clear();
+    this.checkPriority.Clear();
+    this.targetRegionIds.Clear();
+    if (processor.targetPointList != null)
+    {
+      int index = 0;
+      for (int count = processor.targetPointList.Count; index < count; ++index)
+      {
+        TargetPoint targetPoint = processor.targetPointList[index];
+        if (targetPoint.IsEneble() && targetPoint.regionID >= 0 && Object.op_Equality((Object) targetPoint.owner, (Object) this))
+          this.targetRegionIds.Add(targetPoint.regionID);
+      }
+    }
+    AnimEventCollider.AtkColliderHiter atkColliderHiter = (AnimEventCollider.AtkColliderHiter) null;
+    BulletObject colliderInterface = processor.colliderInterface as BulletObject;
+    if (Object.op_Equality((Object) colliderInterface, (Object) null))
+      atkColliderHiter = processor.colliderInterface as AnimEventCollider.AtkColliderHiter;
+    float num1 = 0.0f;
+    Vector3 vector3_1 = Vector3.zero;
+    Vector3 vector3_2 = Vector3.zero;
+    Vector3 vector3_3;
+    if (Object.op_Inequality((Object) colliderInterface, (Object) null))
+    {
+      Vector3 velocity = colliderInterface._rigidbody.velocity;
+      num1 = ((Vector3) ref velocity).magnitude;
+      vector3_3 = colliderInterface._rigidbody.velocity;
+      vector3_1 = ((Vector3) ref vector3_3).normalized;
+      vector3_2 = colliderInterface._transform.position;
+    }
+    float num2 = float.MaxValue;
+    int index1 = 0;
+    for (int count1 = hit_params.Count; index1 < count1; ++index1)
+    {
+      int regionId = this.GetRegionID(hit_params[index1].toCollider, this.targetRegionIds);
+      hit_params[index1].regionID = regionId;
+      int num3 = 0;
+      EnemyRegionWork regionWork = this.regionWorks[regionId];
+      Enemy.WEAK_STATE state = regionWork.weakState;
+      if (regionId > 0)
+        num3 = 1;
+      if (Enemy.IsWeakStateCheckAlreadyHit(state) && Object.op_Inequality((Object) hit_params[index1].fromObject, (Object) null) && regionWork.weakAttackIDs.Contains(hit_params[index1].fromObject.id))
+        state = Enemy.WEAK_STATE.NONE;
+      if (Enemy.IsWeakStateSpAttack(state))
+      {
+        bool flag = false;
+        Player fromObject = hit_params[index1].fromObject as Player;
+        if (Object.op_Inequality((Object) fromObject, (Object) null))
+          flag = fromObject.IsSpecialActionHit((Player.ATTACK_MODE) regionWork.weakSubParam, processor.attackInfo as AttackHitInfo, hit_params[index1]);
+        hit_params[index1].isSpAttackHit = flag;
+        if (!flag)
+          state = Enemy.WEAK_STATE.NONE;
+      }
+      if (Object.op_Inequality((Object) colliderInterface, (Object) null) && colliderInterface.isAimMode)
+      {
+        bool flag = false;
+        if (processor.targetPointList != null)
+        {
+          int index2 = 0;
+          for (int count2 = processor.targetPointList.Count; index2 < count2; ++index2)
+          {
+            TargetPoint targetPoint = processor.targetPointList[index2];
+            if (targetPoint.IsEneble() && targetPoint.regionID == regionId && Object.op_Equality((Object) targetPoint.owner, (Object) this))
+            {
+              Vector3 markerPos = targetPoint.param.markerPos;
+              float magnitude;
+              float num4;
+              if (Vector3.op_Equality(vector3_1, Vector3.zero))
+              {
+                vector3_3 = Vector3.op_Subtraction(markerPos, hit_params[index1].point);
+                magnitude = ((Vector3) ref vector3_3).magnitude;
+                num4 = magnitude;
+              }
+              else
+              {
+                vector3_3 = Vector3.Cross(vector3_1, Vector3.op_Subtraction(markerPos, vector3_2));
+                magnitude = ((Vector3) ref vector3_3).magnitude;
+                num4 = Vector3.Dot(Vector3.op_Subtraction(markerPos, hit_params[index1].point), vector3_1);
+              }
+              float num5 = this.enemyParameter.aimMarkerHitRadius * targetPoint.param.aimMarkerScale;
+              if ((double) magnitude <= (double) num5 && (targetPoint.isSkipDotCalc || (double) Mathf.Abs(num4) <= (double) this.enemyParameter.hitCompareAimDepthLimit))
+              {
+                flag = true;
+                hit_params[index1].isHitAim = true;
+                break;
+              }
+            }
+          }
+        }
+        if (Enemy.IsWeakStateSpAttack(state))
+          num3 = 4;
+        else if (flag)
+          num3 = 3;
+        else if (regionId > 0 && (int) regionWork.hp > 0)
+          num3 = 2;
+      }
+      else if (state != Enemy.WEAK_STATE.NONE)
+      {
+        num3 = 3;
+        if (regionId > 0 && (int) regionWork.hp > 0)
+          num3 = 4;
+      }
+      else if (regionId > 0 && (int) regionWork.hp > 0)
+        num3 = 2;
+      if (!this.regionInfos[hit_params[index1].regionID].isAtkColliderHit)
+        num3 = 0;
+      float num6 = 0.0f;
+      if (Object.op_Inequality((Object) colliderInterface, (Object) null))
+      {
+        if (Object.op_Inequality((Object) colliderInterface._rigidbody, (Object) null) && Vector3.op_Inequality(vector3_1, Vector3.zero))
+        {
+          num6 = Vector3.Dot(hit_params[index1].point, vector3_1);
+        }
+        else
+        {
+          vector3_3 = Vector3.op_Subtraction(hit_params[index1].point, colliderInterface._transform.position);
+          num6 = ((Vector3) ref vector3_3).magnitude;
+        }
+      }
+      else if (Object.op_Inequality((Object) atkColliderHiter, (Object) null))
+      {
+        vector3_3 = Vector3.op_Subtraction(hit_params[index1].point, hit_params[index1].crossCheckPoint);
+        num6 = ((Vector3) ref vector3_3).magnitude;
+      }
+      this.checkHitParam.Add(hit_params[index1]);
+      this.checkLength.Add(num6);
+      this.checkPriority.Add(num3);
+      if ((double) num6 < (double) num2)
+        num2 = num6;
+    }
+    AttackHitColliderProcessor.HitParam hitParam = (AttackHitColliderProcessor.HitParam) null;
+    float maxValue = float.MaxValue;
+    int num7 = 0;
+    int index3 = 0;
+    for (int count = this.checkHitParam.Count; index3 < count; ++index3)
+    {
+      if ((!Object.op_Inequality((Object) colliderInterface, (Object) null) || (double) num1 < (double) this.enemyParameter.hitCompareSpeed || (double) this.checkLength[index3] - (double) num2 <= (double) this.enemyParameter.hitCompareLengthLimit) && (this.checkPriority[index3] > num7 || this.checkPriority[index3] == num7 && (double) this.checkLength[index3] < (double) maxValue))
+      {
+        hitParam = this.checkHitParam[index3];
+        maxValue = this.checkLength[index3];
+        num7 = this.checkPriority[index3];
+      }
+    }
+    return hitParam;
+  }
+
+  protected override bool IsValidAttackedHit(StageObject from_object)
+  {
+    return !(from_object is Enemy) && base.IsValidAttackedHit(from_object);
+  }
+
+  protected override void OnAttackedHitDirection(AttackedHitStatusDirection status)
+  {
+    Player fromObject1 = status.fromObject as Player;
+    status.regionID = status.hitParam.regionID;
+    EnemyRegionWork regionWork = (EnemyRegionWork) null;
+    if (status.regionID >= 0 && status.regionID < this.regionInfos.Length)
+      regionWork = this.regionWorks[status.regionID];
+    if (regionWork == null)
+    {
+      status.weakState = Enemy.WEAK_STATE.NONE;
+    }
+    else
+    {
+      status.weakState = regionWork.weakState;
+      if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL)
+        status.weakState = Enemy.WEAK_STATE.NONE;
+      if (Enemy.IsWeakStateSpAttack(status.weakState))
+      {
+        bool flag = false;
+        if (Object.op_Inequality((Object) fromObject1, (Object) null))
+          flag = fromObject1.IsSpecialActionHit((Player.ATTACK_MODE) regionWork.weakSubParam, status.attackInfo, status.hitParam);
+        if (!flag)
+          status.weakState = Enemy.WEAK_STATE.NONE;
+      }
+      if (Enemy.IsWeakStateElementAttack(status.weakState) || Enemy.IsWeakStateSkillAttack(status.weakState))
+      {
+        AtkAttribute atk = new AtkAttribute();
+        if (status.hitParam.processor != null)
+        {
+          BulletObject colliderInterface = status.hitParam.processor.colliderInterface as BulletObject;
+          if (Object.op_Inequality((Object) colliderInterface, (Object) null))
+            atk = colliderInterface.masterAtk;
+          else
+            status.fromObject.GetAtk(status.attackInfo, ref atk);
+        }
+        if (Enemy.IsWeakStateElementAttack(status.weakState) && (ELEMENT_TYPE) regionWork.validElementType != atk.GetElementType())
+          status.weakState = Enemy.WEAK_STATE.NONE;
+        if (Enemy.IsWeakStateSkillAttack(status.weakState) && !status.attackInfo.isSkillReference)
+          status.weakState = Enemy.WEAK_STATE.NONE;
+      }
+      if (Enemy.IsWeakStateHealAttack(status.weakState) && status.attackInfo.attackType != AttackHitInfo.ATTACK_TYPE.HEAL_ATTACK)
+        status.weakState = Enemy.WEAK_STATE.NONE;
+      if (Enemy.IsWeakStateCheckAlreadyHit(status.weakState))
+      {
+        if (regionWork.weakAttackIDs.Contains(status.fromObjectID))
+          status.weakState = Enemy.WEAK_STATE.NONE;
+        else if (!this.IsCoopNone() && !this.IsOriginal())
+          regionWork.weakAttackIDs.Add(status.fromObjectID);
+      }
+      if (Enemy.IsWeakStateDisplaySign(status.weakState))
+      {
+        Self fromObject2 = status.fromObject as Self;
+        if (Object.op_Inequality((Object) fromObject2, (Object) null))
+          fromObject2.taskChecker.OnWeakAttack(status.weakState);
+      }
+      if (this.IsCannonBallHitShieldRegion(regionWork, status.attackInfo) && MonoBehaviourSingleton<UIEnemyStatus>.IsValid() && regionWork.isShieldCriticalDamage)
+        MonoBehaviourSingleton<UIEnemyStatus>.I.PlayShakeHpGauge(5f, 0.5f, 0.05f);
+      if (regionWork.regionInfo != null && regionWork.regionInfo.dragonArmorInfo.enabled)
+        status.isDamageRegionOnly = true;
+    }
+    if (fromObject1 != null && status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.JUMP)
+      fromObject1.HitJumpAttack();
+    base.OnAttackedHitDirection(status);
+  }
+
+  protected override void OnPlayAttackedHitEffect(AttackedHitStatusDirection status)
+  {
+    bool flag1 = true;
+    bool is_self = status.fromObject is Self;
+    if (is_self)
+    {
+      if ((double) Enemy.selfHitEffectCool > 0.0)
+        return;
+      this.SetHitShock(Vector3.op_Subtraction(status.hitPos, status.fromObject._position));
+      if (MonoBehaviourSingleton<InGameManager>.I.graphicOptionType <= 1)
+        Enemy.selfHitEffectCool = 0.1f;
+    }
+    else
+    {
+      if ((double) Enemy.otherHitEffectCool > 0.0)
+        return;
+      string simpleHitEffectName = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.enemyOtherSimpleHitEffectName;
+      if (!string.IsNullOrEmpty(simpleHitEffectName))
+        EffectManager.OneShot(simpleHitEffectName, status.hitPos, status.hitParam.rot, is_self);
+      flag1 = false;
+      if (MonoBehaviourSingleton<InGameManager>.I.graphicOptionType <= 1)
+        Enemy.otherHitEffectCool = 0.5f;
+    }
+    if (this.regionInfos == null)
+      return;
+    int regionId = status.regionID;
+    if (regionId < 0 || regionId >= this.regionInfos.Length)
+      return;
+    Enemy.RegionInfo regionInfo = this.regionInfos[regionId];
+    if (status.weakState != 0 & is_self)
+      this.SetHitLight();
+    if ((double) status.badStatusAdd.paralyze > 0.0)
+    {
+      string paralyzeHitEffectName = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.enemyParalyzeHitEffectName;
+      if (!string.IsNullOrEmpty(paralyzeHitEffectName) & flag1)
+        EffectManager.OneShot(paralyzeHitEffectName, status.hitPos, status.hitParam.rot, is_self);
+    }
+    if ((double) status.badStatusAdd.poison > 0.0)
+    {
+      string poisonHitEffectName = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.enemyPoisonHitEffectName;
+      if (!string.IsNullOrEmpty(poisonHitEffectName) & flag1)
+        EffectManager.OneShot(poisonHitEffectName, status.hitPos, status.hitParam.rot, is_self);
+    }
+    if ((double) status.badStatusAdd.freeze > 0.0)
+    {
+      string freezeHitEffectName = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.enemyFreezeHitEffectName;
+      if (!string.IsNullOrEmpty(freezeHitEffectName) & flag1)
+        EffectManager.OneShot(freezeHitEffectName, status.hitPos, status.hitParam.rot, is_self);
+    }
+    if (status.skillParam != null && status.skillParam.tableData != null)
+    {
+      bool flag2 = false;
+      if (status.skillParam.tableData.hitSEID != 0)
+      {
+        if (this.EnablePlaySound())
+          SoundManager.PlayOneShotSE(status.skillParam.tableData.hitSEID, status.hitPos);
+        flag2 = true;
+      }
+      if (!string.IsNullOrEmpty(status.skillParam.tableData.hitEffectName))
+      {
+        if (flag1)
+          EffectManager.OneShot(status.skillParam.tableData.hitEffectName, status.hitPos, status.hitParam.rot, is_self);
+        flag2 = true;
+      }
+      if (flag2)
+        return;
+    }
+    bool flag3 = false;
+    bool flag4 = false;
+    bool flag5 = false;
+    if (status.attackInfo.hitSEID != 0)
+    {
+      if (this.EnablePlaySound())
+        SoundManager.PlayOneShotSE(status.attackInfo.hitSEID, status.hitPos);
+      flag4 = true;
+      if (!status.attackInfo.playCommonHitEffect)
+        flag3 = true;
+    }
+    if (!string.IsNullOrEmpty(status.attackInfo.hitEffectName))
+    {
+      if (flag1)
+        EffectManager.OneShot(status.attackInfo.hitEffectName, status.hitPos, status.hitParam.rot, is_self);
+      flag5 = true;
+      if (!status.attackInfo.playCommonHitSe)
+        flag3 = true;
+    }
+    if (flag3 || status.skillParam != null)
+      return;
+    ELEMENT_TYPE elementType = status.atk.GetElementType();
+    Enemy.EFFECTIVE_TYPE effectiveType = Enemy.GetEffectiveType(elementType, this.GetElementType());
+    string str = status.attackInfo.toEnemy.hitTypeName;
+    EnemyHitTypeTable.TypeData typeData = (EnemyHitTypeTable.TypeData) null;
+    Vector3 scale = Vector3.one;
+    float delay = 0.0f;
+    if (is_self && status.fromObject is Player fromObject)
+      typeData = fromObject.GetOverrideHitEffect(status, ref scale, ref delay);
+    if (typeData == null && !string.IsNullOrEmpty(str))
+    {
+      char ch = str[str.Length - 1];
+      if (ELEMENT_TYPE.MAX == elementType)
+        typeData = Singleton<EnemyHitTypeTable>.I.GetData(str, FieldManager.IsValidInGameNoQuest());
+      else if (effectiveType == Enemy.EFFECTIVE_TYPE.GOOD && ch == 'S')
+      {
+        str = str.Substring(0, str.Length - 1) + "L";
+        typeData = Singleton<EnemyHitTypeTable>.I.GetData(str, FieldManager.IsValidInGameNoQuest());
+      }
+      else if (effectiveType != Enemy.EFFECTIVE_TYPE.GOOD && ch == 'L')
+      {
+        str = str.Substring(0, str.Length - 1) + "S";
+        typeData = Singleton<EnemyHitTypeTable>.I.GetData(str, FieldManager.IsValidInGameNoQuest());
+      }
+      else
+        typeData = Singleton<EnemyHitTypeTable>.I.GetData(str, FieldManager.IsValidInGameNoQuest());
+    }
+    string name = regionInfo.hitMaterialName;
+    if (string.IsNullOrEmpty(name))
+      name = this.baseHitMaterialName;
+    EnemyHitMaterialTable.MaterialData materialData = (EnemyHitMaterialTable.MaterialData) null;
+    if (!string.IsNullOrEmpty(name))
+      materialData = Singleton<EnemyHitMaterialTable>.I.GetData(name);
+    if (typeData != null && !flag5)
+    {
+      string element_effect_name = (string) null;
+      element_effect_name = elementType != ELEMENT_TYPE.MAX ? typeData.elementEffectNames[(int) elementType] : typeData.baseEffectName;
+      if (status.damageDistanceData != null && status.attackInfo.name.Contains("PLC05_attack_00") && status.damageDistanceData.IsMaxRate(status.distanceXZ))
+        element_effect_name = MonoBehaviourSingleton<InGameSettingsManager>.I.player.bestDistanceEffect;
+      if (!string.IsNullOrEmpty(element_effect_name) && flag1)
+      {
+        if ((double) delay > 0.0)
+          AppMain.Delay(delay, (System.Action) (() => EffectManager.OneShot(element_effect_name, status.hitPos, status.hitParam.rot, scale, is_self)));
+        else
+          EffectManager.OneShot(element_effect_name, status.hitPos, status.hitParam.rot, scale, is_self);
+      }
+    }
+    if (elementType != ELEMENT_TYPE.MAX && !flag4)
+    {
+      int elementHitSeiD = this.enemyParameter.elementHitSEIDs[(int) elementType];
+      if (elementHitSeiD != 0 && this.EnablePlaySound())
+        SoundManager.PlayOneShotSE(elementHitSeiD, status.hitPos);
+    }
+    if (materialData != null)
+    {
+      if (!string.IsNullOrEmpty(materialData.addEffectName) && flag1)
+        EffectManager.OneShot(materialData.addEffectName, status.hitPos, status.hitParam.rot, is_self);
+      if (typeData != null && !flag4)
+      {
+        int typeSeid = materialData.GetTypeSEID(str);
+        if (typeSeid != 0 && this.EnablePlaySound())
+          SoundManager.PlayOneShotSE(typeSeid, status.hitPos);
+      }
+    }
+    EnemyRegionWork regionWork = this.regionWorks[regionId];
+    if (status.attackInfo.attackType != AttackHitInfo.ATTACK_TYPE.CANNON_BALL)
+      return;
+    string effect_name = "ef_btl_magibullet_landing_03";
+    if (this.IsCannonBallHitShieldRegion(regionWork, status.attackInfo))
+    {
+      effect_name = "ef_btl_magibullet_landing_01";
+      if (regionWork.isShieldCriticalDamage)
+        effect_name = "ef_btl_magibullet_landing_02";
+    }
+    else if (regionWork.isShieldDamage && regionWork.weakState == Enemy.WEAK_STATE.WEAK_GRAB)
+      effect_name = "ef_btl_magibullet_landing_01";
+    Transform effect = EffectManager.GetEffect(effect_name);
+    effect.position = status.exHitPos;
+    effect.rotation = status.hitParam.rot;
+    effect.localScale = Vector3.one;
+  }
+
+  private void OnHitWeakPoint(string deleteAtkName, bool isSpWeak)
+  {
+    this.ActReleaseGrabbedPlayers(true, isSpWeak, false);
+    if (string.IsNullOrEmpty(deleteAtkName))
+      return;
+    for (int index = this.m_activeAttackLaserList.Count - 1; index >= 0; --index)
+    {
+      AttackNWayLaser activeAttackLaser = this.m_activeAttackLaserList[index];
+      if (activeAttackLaser.AttackInfoName == deleteAtkName)
+        activeAttackLaser.RequestDestroy();
+    }
+    for (int index = this.m_activeAttackFunnelList.Count - 1; index >= 0; --index)
+    {
+      AttackFunnelBit activeAttackFunnel = this.m_activeAttackFunnelList[index];
+      if (activeAttackFunnel.AttackInfoName == deleteAtkName)
+        activeAttackFunnel.RequestDestroy();
+    }
+    for (int index = this.m_activeAttackDigList.Count - 1; index >= 0; --index)
+    {
+      AttackDig activeAttackDig = this.m_activeAttackDigList[index];
+      if (activeAttackDig.AttackInfoName == deleteAtkName)
+        activeAttackDig.RequestDestroy();
+    }
+    for (int index = this.m_activeAttackActionMineList.Count - 1; index >= 0; --index)
+    {
+      AttackActionMine attackActionMine = this.m_activeAttackActionMineList[index];
+      if (attackActionMine.AttackInfoName == deleteAtkName)
+        attackActionMine.RequestDestroy(false);
+    }
+    for (int index = this.m_activeAttackObstacleList.Count - 1; index >= 0; --index)
+    {
+      AttackShotNodeLink activeAttackObstacle = this.m_activeAttackObstacleList[index];
+      if (activeAttackObstacle.AttackInfoName == deleteAtkName)
+        activeAttackObstacle.RequestDestroy();
+    }
+  }
+
+  public void OnDestroyFunnel(AttackFunnelBit delFunnel)
+  {
+    if (!this.m_activeAttackFunnelList.Contains(delFunnel))
+      return;
+    this.m_activeAttackFunnelList.Remove(delFunnel);
+  }
+
+  public void OnDestroyLaser(AttackNWayLaser delLaser)
+  {
+    if (!this.m_activeAttackLaserList.Contains(delLaser))
+      return;
+    this.m_activeAttackLaserList.Remove(delLaser);
+  }
+
+  public void OnDestroyDig(AttackDig delDig)
+  {
+    if (!this.m_activeAttackDigList.Contains(delDig))
+      return;
+    this.m_activeAttackDigList.Remove(delDig);
+  }
+
+  public void ActDestroyActionMine(int objId, bool isExplode)
+  {
+    AttackActionMine attackActionMine = this.m_activeAttackActionMineList.Find((Predicate<AttackActionMine>) (x => x.objId == objId));
+    if (!Object.op_Inequality((Object) attackActionMine, (Object) null))
+      return;
+    attackActionMine.RequestDestroy(isExplode);
+  }
+
+  public void OnDestroyActionMine(AttackActionMine mine)
+  {
+    if (!this.m_activeAttackActionMineList.Contains(mine))
+      return;
+    this.m_activeAttackActionMineList.Remove(mine);
+  }
+
+  public void OnDestroyObstacle(AttackShotNodeLink delObstacle)
+  {
+    if (!this.m_activeAttackObstacleList.Contains(delObstacle))
+      return;
+    this.m_activeAttackObstacleList.Remove(delObstacle);
+  }
+
+  protected override bool IsDamageValid(AttackedHitStatusDirection status)
+  {
+    return status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.GIMMICK_GENERATED || status.fromType == StageObject.OBJECT_TYPE.PLAYER;
+  }
+
+  public override void AbsorptionProc(Character targetChar, AttackedHitStatusLocal status)
+  {
+    AttackHitInfo attackInfo = status.attackInfo;
+    if (attackInfo == null || (double) attackInfo.absorptance <= 0.0)
+      return;
+    int recoverValue = (int) ((double) this.hpMax * (double) (attackInfo.absorptance * 0.01f));
+    if (recoverValue <= 0)
+      return;
+    Player player = targetChar as Player;
+    if (Object.op_Inequality((Object) player, (Object) null))
+      player.StartEffectDrain(this);
+    this.RecoverHp(recoverValue, true);
+  }
+
+  public override bool CutAndAbsorbDamageByBuff(
+    Character targetCharacter,
+    AttackedHitStatusLocal status)
+  {
+    List<BuffParam.BuffData> absorbBuffDataList = this.buffParam.GetAbsorbBuffDataList();
+    if (absorbBuffDataList.IsNullOrEmpty<BuffParam.BuffData>())
+      return false;
+    AtkAttribute val = new AtkAttribute();
+    for (int index = 0; index < absorbBuffDataList.Count; ++index)
+    {
+      switch (absorbBuffDataList[index].type)
+      {
+        case BuffParam.BUFFTYPE.ABSORB_NORMAL:
+          val.normal += status.damageDetails.normal;
+          break;
+        case BuffParam.BUFFTYPE.ABSORB_FIRE:
+          val.fire += status.damageDetails.fire;
+          break;
+        case BuffParam.BUFFTYPE.ABSORB_WATER:
+          val.water += status.damageDetails.water;
+          break;
+        case BuffParam.BUFFTYPE.ABSORB_THUNDER:
+          val.thunder += status.damageDetails.thunder;
+          break;
+        case BuffParam.BUFFTYPE.ABSORB_SOIL:
+          val.soil += status.damageDetails.soil;
+          break;
+        case BuffParam.BUFFTYPE.ABSORB_LIGHT:
+          val.light += status.damageDetails.light;
+          break;
+        case BuffParam.BUFFTYPE.ABSORB_DARK:
+          val.dark += status.damageDetails.dark;
+          break;
+      }
+    }
+    val.CheckMinus();
+    status.damageDetails.Sub(val);
+    status.damage = Mathf.FloorToInt(status.damageDetails.CalcTotal());
+    int recoverValue = Mathf.FloorToInt(val.CalcTotal());
+    int num = Mathf.FloorToInt((float) this.hpMax * MonoBehaviourSingleton<InGameSettingsManager>.I.buff.absorbDamageParam.limitRateEnemyAbsorbDamage);
+    if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid() && recoverValue > num)
+      recoverValue = num;
+    if (recoverValue <= 0)
+      return false;
+    this.RecoverHp(recoverValue, true);
+    return true;
+  }
+
+  protected override void OnAttackedHitLocal(AttackedHitStatusLocal status)
+  {
+    base.OnAttackedHitLocal(status);
+    this._CheckHitLocalArrow(status);
+    if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.BOMBROCK)
+    {
+      status.damage = Mathf.FloorToInt((float) ((double) this.hpMax * (double) status.attackInfo.atk.normal * 0.0099999997764825821));
+      status.damageDetails = new AtkAttribute();
+      status.damageDetails.normal = (float) status.damage;
+    }
+    if (status.attackInfo.isSkillReference && (this.isAvailableCounter(this.actionID) || this.actionID == (Character.ACTION_ID) 17) && this.GetEnabledCounterRegion() != null)
+    {
+      status.damage = 0;
+      status.damageDetails = new AtkAttribute();
+    }
+    if (this.enemyParameter.showDamageNum && (status.fromObject is Self || status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.GIMMICK_GENERATED) && status.attackInfo.attackType != AttackHitInfo.ATTACK_TYPE.CANNON_BALL)
+      this.CreateDamageNum(status.hitPos, status.damageDetails, status.weakState != 0, status.isDamageRegionOnly, status.attackInfo.damageNumAddGroup);
+    Player fromObject = status.fromObject as Player;
+    if (Object.op_Inequality((Object) fromObject, (Object) null) && !status.attackInfo.isSkillReference)
+    {
+      fromObject.CountHitAttack();
+      fromObject.IncreaseSpActonGauge(status.attackInfo, status.hitPos);
+      if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.NORMAL || status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.FROM_AVOID)
+        fromObject.UpdateBoostHitCount();
+      if (fromObject is Self && MonoBehaviourSingleton<InGameManager>.IsValid())
+        MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.AddDamageByWeapon(fromObject.weaponIndex, status.damage);
+    }
+    status.downAddBase = 0.0f;
+    status.downAddWeak = 0.0f;
+    if (status.damage > 0)
+    {
+      status.downAddBase = status.attackInfo.down;
+      status.isForceDown = status.attackInfo.isForceDown;
+      if (Object.op_Inequality((Object) fromObject, (Object) null))
+      {
+        int num = 0;
+        if (fromObject.GetOneHandSwordBoostDownValue(ref num, status.attackInfo.name))
+        {
+          status.downAddBase += (float) num;
+        }
+        else
+        {
+          switch (status.weakState)
+          {
+            case Enemy.WEAK_STATE.WEAK:
+              status.downAddWeak = fromObject.downPowerSimpleWeak * status.attackInfo.atkRate;
+              if ((double) status.attackInfo.toEnemy.concussion > 0.0)
+              {
+                status.concussionAdd = status.attackInfo.toEnemy.concussion;
+                break;
+              }
+              break;
+            case Enemy.WEAK_STATE.WEAK_SP_ATTACK:
+            case Enemy.WEAK_STATE.WEAK_ELEMENT_ATTACK:
+            case Enemy.WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK:
+            case Enemy.WEAK_STATE.WEAK_SKILL_ATTACK:
+            case Enemy.WEAK_STATE.WEAK_HEAL_ATTACK:
+            case Enemy.WEAK_STATE.WEAK_ELEMENT_SP_ATTACK:
+              status.downAddWeak = fromObject.downPowerWeak * status.attackInfo.atkRate;
+              if ((double) status.attackInfo.toEnemy.concussion > 0.0)
+              {
+                status.concussionAdd = status.attackInfo.toEnemy.concussion;
+                break;
+              }
+              break;
+            case Enemy.WEAK_STATE.WEAK_SP_DOWN_MAX:
+              status.downAddWeak = (float) this.downMax;
+              break;
+          }
+        }
+        float hitHealRate = status.attackInfo.hitHealRate;
+        if ((double) hitHealRate > 0.0 && fromObject.hp < fromObject.hpMax)
+        {
+          Character.HealData healData = new Character.HealData(Mathf.FloorToInt((float) status.damage * hitHealRate), HEAL_TYPE.NONE, HEAL_EFFECT_TYPE.BASIS, new List<int>()
+          {
+            80 /*0x50*/
+          });
+          fromObject.OnHealReceive(healData);
+        }
+      }
+      if ((double) status.downAddBase > 0.0)
+      {
+        status.downAddBase *= fromObject.buffParam.GetBadStatusRateUp(BuffParam.BAD_STATUS_UP.DOWN);
+        status.downAddBase += fromObject.buffParam.GetBadStatusUp(BuffParam.BAD_STATUS_UP.DOWN);
+      }
+      else if ((double) status.downAddWeak > 0.0)
+      {
+        status.downAddWeak *= fromObject.buffParam.GetBadStatusRateUp(BuffParam.BAD_STATUS_UP.DOWN);
+        status.downAddWeak += fromObject.buffParam.GetBadStatusUp(BuffParam.BAD_STATUS_UP.DOWN);
+      }
+      if ((double) status.concussionAdd > 0.0)
+      {
+        status.concussionAdd *= fromObject.buffParam.GetBadStatusRateUp(BuffParam.BAD_STATUS_UP.CONCUSSION);
+        status.concussionAdd += fromObject.buffParam.GetBadStatusUp(BuffParam.BAD_STATUS_UP.CONCUSSION);
+      }
+    }
+    if (MonoBehaviourSingleton<CoopNetworkManager>.IsValid())
+      MonoBehaviourSingleton<CoopNetworkManager>.I.EnemyAttack(this.id, status.damage);
+    this.RecordDeliveryBattleCheckerOnAttacked(status);
+  }
+
+  private void RecordDeliveryBattleCheckerOnAttacked(AttackedHitStatusLocal status)
+  {
+    Self fromObject = status.fromObject as Self;
+    if (Object.op_Equality((Object) fromObject, (Object) null) || !MonoBehaviourSingleton<InGameManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.SetMaxDamageSelf(status.damage);
+    BattleCheckerBase.JudgementParam judgementParam = BattleCheckerBase.JudgementParam.Create((AttackInfo) status.attackInfo, fromObject);
+    MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnAttackHit(status.attackInfo.name, judgementParam, status.damage);
+    if (Enemy.IsWeakStateDisplaySign(status.weakState))
+      MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnWeakAttack(status.weakState, status.origin.damage);
+    if (status.attackInfo.attackType != AttackHitInfo.ATTACK_TYPE.JUMP)
+      return;
+    MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnJump(status.origin.damage);
+  }
+
+  private void _CheckHitLocalArrow(AttackedHitStatusLocal status)
+  {
+    if (status.hitParam.processor == null || !(status.hitParam.processor.colliderInterface is BulletObject colliderInterface) || (double) status.attackInfo.rateInfoRate < 1.0)
+      return;
+    Character fromObject = status.fromObject as Character;
+    status.isArrowBleed = false;
+    status.isShadowSealing = false;
+    status.isArrowBomb = false;
+    if (!status.hitParam.isHitAim)
+      return;
+    switch (status.attackInfo.spAttackType)
+    {
+      case SP_ATTACK_TYPE.NONE:
+        status.isArrowBleed = true;
+        float val = Object.op_Inequality((Object) fromObject, (Object) null) ? fromObject.buffParam.GetBleedUp() : 1f;
+        status.arrowBleedDamage = Mathf.CeilToInt((float) status.damage * MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedDamageRate * val);
+        if (status.arrowBleedDamage < 1)
+          status.arrowBleedDamage = 1;
+        double normal = (double) status.damageDetails.normal;
+        ELEMENT_TYPE elementType = status.damageDetails.GetElementType();
+        status.damage = (int) ((double) status.damage * (double) val);
+        status.damageDetails.Mul(val);
+        if (normal > 0.0 && (double) status.damageDetails.normal < 1.0)
+        {
+          status.damageDetails.normal = 1f;
+          ++status.damage;
+        }
+        if (elementType != ELEMENT_TYPE.MAX && status.damageDetails.GetElementType() == ELEMENT_TYPE.MAX)
+        {
+          status.damageDetails.SetTargetElement(elementType, 1f);
+          ++status.damage;
+        }
+        if (status.damage < 1)
+        {
+          status.damageDetails.normal = 1f;
+          status.damage = 1;
+        }
+        Enemy.BleedData bleedData = (Enemy.BleedData) null;
+        EnemyRegionWork regionWork = this.regionWorks[status.regionID];
+        int index = 0;
+        for (int count = regionWork.bleedList.Count; index < count; ++index)
+        {
+          if (regionWork.bleedList[index].ownerID == status.fromObjectID)
+          {
+            bleedData = regionWork.bleedList[index];
+            break;
+          }
+        }
+        if (bleedData == null || Enemy.BleedData.MaxLv != bleedData.lv + 1)
+          break;
+        InGameSettingsManager.Player.SpecialActionInfo specialActionInfo = MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo;
+        int num1 = status.arrowBleedDamage / specialActionInfo.arrowBleedCount;
+        if (num1 < 1)
+          num1 = 1;
+        float num2 = (float) (bleedData.damage + num1) * specialActionInfo.arrowBurstDamageRate;
+        status.arrowBurstDamage = (int) num2;
+        status.damage += status.arrowBurstDamage;
+        break;
+      case SP_ATTACK_TYPE.HEAT:
+        status.isShadowSealing = true;
+        if (!colliderInterface.isBossPierceArrow || this.isPierceAfterTarget || this.regionWorks[status.regionID].shadowSealingData.ownerID != 0)
+          break;
+        colliderInterface.EndBossPierceArrow();
+        break;
+      case SP_ATTACK_TYPE.BURST:
+        status.isArrowBomb = true;
+        if (!colliderInterface.isBossPierceArrow || this.isPierceAfterTarget || this.regionWorks[status.regionID].shadowSealingData.ownerID != 0)
+          break;
+        colliderInterface.EndBossPierceArrow();
+        break;
+    }
+  }
+
+  protected override void OnIgnoreHitAttack()
+  {
+    base.OnIgnoreHitAttack();
+    if (!this.IsValidBuff(BuffParam.BUFFTYPE.GHOST_FORM) || !Object.op_Equality((Object) this.m_effectHitWhenGhost, (Object) null) || Object.op_Equality((Object) this.effectPlayProcessor, (Object) null))
+      return;
+    List<EffectPlayProcessor.EffectSetting> settings = this.effectPlayProcessor.GetSettings("GHOST_EFFECT");
+    if (settings == null || settings[0] == null)
+      return;
+    Transform transform = this.effectPlayProcessor.PlayEffect(settings[0], this._transform);
+    if (!Object.op_Inequality((Object) transform, (Object) null))
+      return;
+    this.m_effectHitWhenGhost = ((Component) transform).gameObject;
+  }
+
+  protected override bool CheckStatusForHitEffect(AttackedHitStatusDirection status)
+  {
+    if (!this.IsValidBuff(BuffParam.BUFFTYPE.GHOST_FORM))
+      return base.CheckStatusForHitEffect(status);
+    Player fromObject = status.fromObject as Player;
+    if (Object.op_Inequality((Object) fromObject, (Object) null) && fromObject.CheckIgnoreBuff(BuffParam.BUFFTYPE.GHOST_FORM))
+      return true;
+    AtkAttribute damage_details = new AtkAttribute();
+    return this.CalcDamage(new AttackedHitStatusLocal(this.nowAttackedHitStatus), ref damage_details) > 0;
+  }
+
+  public override void GetAtk(
+    AttackHitInfo info,
+    ref AtkAttribute atk,
+    SkillInfo.SkillParam skillParamInfo = null)
+  {
+    atk.Copy(InGameUtility.CalcEnemyATK(new InGameUtility.EnemyAtkCalcData()
+    {
+      atkInfo = info,
+      buffAtkRate = this.buffParam.GetBuffAtkRate(),
+      buffAtkConstant = this.buffParam.GetBuffAtkConstant(),
+      buffAtkAllElementConstant = (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_ALLELEMENT)
+    }));
+  }
+
+  protected override int CalcDamage(AttackedHitStatusLocal status, ref AtkAttribute damage_details)
+  {
+    if (this.regionInfos == null)
+      return 0;
+    if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL_DIRECT)
+    {
+      damage_details.Copy(status.attackInfo.atk);
+      return Mathf.FloorToInt(status.attackInfo.atk.CalcTotal());
+    }
+    if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.SHIELD_REFLECT)
+    {
+      float num = status.attackInfo.atk.normal;
+      if ((int) this.BarrierHp > 0)
+        num = 1f;
+      if (this.buffParam.IsValidInvincibleBuff())
+      {
+        AtkAttribute invinsibleMulRate = this.GetInvinsibleMulRate();
+        num *= invinsibleMulRate.normal;
+        if ((double) num < 0.0)
+          num = 0.0f;
+      }
+      if (this.IsValidBuff(BuffParam.BUFFTYPE.GHOST_FORM))
+      {
+        num *= this.GhostFormParam.normal;
+        if ((double) num < 0.0)
+          num = 0.0f;
+      }
+      if (this.IsValidShield())
+      {
+        num *= this.ShieldTolerance.normal;
+        if ((double) num < 0.0)
+          num = 0.0f;
+      }
+      damage_details.normal = num;
+      return Mathf.FloorToInt(num);
+    }
+    AtkAttribute atkAttribute1 = this.CalcAtk(status);
+    AtkAttribute atkAttribute2 = this.CalcTolerance(status);
+    AtkAttribute atkAttribute3 = this.CalcDefense(status);
+    if (status.attackInfo.toEnemy.damageToRegionInfo.ignoreWeakElementDefence && atkAttribute1.GetElementType() == this.GetAntiElementTypeByRegion())
+      atkAttribute2.SetTargetElement(atkAttribute1.GetElementType(), 0.0f);
+    damage_details.normal = (float) (int) InGameUtility.CalcDamageDetailToEnemy(atkAttribute1.normal, atkAttribute3.normal, atkAttribute2.normal);
+    damage_details.fire = (float) (int) InGameUtility.CalcDamageDetailToEnemy(atkAttribute1.fire, atkAttribute3.fire, atkAttribute2.fire);
+    damage_details.water = (float) (int) InGameUtility.CalcDamageDetailToEnemy(atkAttribute1.water, atkAttribute3.water, atkAttribute2.water);
+    damage_details.thunder = (float) (int) InGameUtility.CalcDamageDetailToEnemy(atkAttribute1.thunder, atkAttribute3.thunder, atkAttribute2.thunder);
+    damage_details.soil = (float) (int) InGameUtility.CalcDamageDetailToEnemy(atkAttribute1.soil, atkAttribute3.soil, atkAttribute2.soil);
+    damage_details.light = (float) (int) InGameUtility.CalcDamageDetailToEnemy(atkAttribute1.light, atkAttribute3.light, atkAttribute2.light);
+    damage_details.dark = (float) (int) InGameUtility.CalcDamageDetailToEnemy(atkAttribute1.dark, atkAttribute3.dark, atkAttribute2.dark);
+    damage_details.CheckMinus();
+    float normal = atkAttribute1.normal;
+    ELEMENT_TYPE elementType = atkAttribute1.GetElementType();
+    if (this.regionInfos[status.regionID].isDamageMinimum)
+    {
+      damage_details.Set(0.0f);
+      if ((double) normal > 0.0)
+        damage_details.normal = 1f;
+      if (elementType != ELEMENT_TYPE.MAX)
+        damage_details.SetTargetElement(elementType, 1f);
+      int num = Mathf.FloorToInt(damage_details.CalcTotal());
+      if (num < 1)
+      {
+        damage_details.normal = 1f;
+        num = 1;
+      }
+      return num;
+    }
+    Player fromObject = status.fromObject as Player;
+    if (Object.op_Inequality((Object) fromObject, (Object) null))
+    {
+      this.CalcDamageByRegionWeaponTypeRate(fromObject, status, ref damage_details);
+      BuffParam buffParam = fromObject.buffParam;
+      AtkAttribute abilityDamageRate = buffParam.GetAbilityDamageRate((Character) this, status);
+      abilityDamageRate.CheckMinus();
+      float damageUpRate = buffParam.GetDamageUpRate(fromObject, status);
+      if ((double) damageUpRate > 0.0)
+        abilityDamageRate.AddRate(damageUpRate);
+      damage_details.Mul(abilityDamageRate);
+      if (this.aegisCtrl != null && this.aegisCtrl.IsValid())
+        damage_details.Mul(status.attackInfo.toEnemy.aegisDamageRate);
+    }
+    if (status.attackInfo.isSkillReference && this.IsValidBuff(BuffParam.BUFFTYPE.MAD_MODE))
+      damage_details.Mul(MonoBehaviourSingleton<InGameSettingsManager>.I.madModeParam.skillDamagedRate);
+    if (this.regionInfos[status.regionID].dragonArmorInfo.enabled)
+      damage_details.Mul(status.attackInfo.toEnemy.damageToRegionInfo.dragonArmorDamageRate + fromObject.buffParam.GetDragonArmorDamageRate());
+    int num1 = (int) damage_details.CalcTotal();
+    if ((double) normal > 0.0 && (double) damage_details.normal < 1.0)
+    {
+      damage_details.normal = 1f;
+      ++num1;
+    }
+    if (elementType != ELEMENT_TYPE.MAX && damage_details.GetElementType() == ELEMENT_TYPE.MAX)
+    {
+      damage_details.SetTargetElement(elementType, 1f);
+      ++num1;
+    }
+    if (num1 < 1)
+    {
+      damage_details.normal = 1f;
+      num1 = 1;
+    }
+    if (Object.op_Inequality((Object) fromObject, (Object) null))
+    {
+      if (!status.attackInfo.isSkillReference)
+      {
+        this.CalcElementDamageByAttackerWeapon(fromObject, status, ref damage_details);
+        num1 = (int) damage_details.CalcTotal();
+        if (num1 < 1)
+          num1 = 1;
+        if (this.isArenaDamageOffWeapon)
+        {
+          damage_details.Mul(0.0f);
+          int num2 = (int) damage_details.CalcTotal();
+          if (num2 < 0)
+            num2 = 0;
+          return num2;
+        }
+      }
+      else if (this.isArenaDamageOffMagi)
+      {
+        damage_details.Mul(0.0f);
+        int num3 = (int) damage_details.CalcTotal();
+        if (num3 < 0)
+          num3 = 0;
+        return num3;
+      }
+    }
+    if (this.buffParam.IsValidInvincibleBuff())
+    {
+      AtkAttribute invinsibleMulRate = this.GetInvinsibleMulRate();
+      damage_details.Mul(invinsibleMulRate);
+      num1 = (int) damage_details.CalcTotal();
+      if (num1 < 0)
+        num1 = 0;
+    }
+    if (this.IsValidBuff(BuffParam.BUFFTYPE.GHOST_FORM))
+    {
+      if (Object.op_Inequality((Object) fromObject, (Object) null) && fromObject.CheckIgnoreBuff(BuffParam.BUFFTYPE.GHOST_FORM))
+        return num1;
+      damage_details.Mul(this.GhostFormParam);
+      num1 = (int) damage_details.CalcTotal();
+      if (num1 < 0)
+        num1 = 0;
+    }
+    if (this.IsValidShield())
+    {
+      damage_details.Mul(this.ShieldTolerance);
+      num1 = (int) damage_details.CalcTotal();
+      if (num1 < 0)
+        num1 = 0;
+    }
+    return num1;
+  }
+
+  private void CalcDamageByRegionWeaponTypeRate(
+    Player attacker,
+    AttackedHitStatusLocal status,
+    ref AtkAttribute damage_details)
+  {
+    Enemy.RegionInfo regionInfo = this.regionInfos[status.regionID];
+    if (status.attackInfo.isSkillReference || regionInfo.dragonArmorInfo.enabled)
+      return;
+    float val = 1f;
+    for (int index = 0; index < regionInfo.weaponTypeRate.Length; ++index)
+    {
+      if (Player.ConvertEquipmentTypeToAttackMode(regionInfo.weaponTypeRate[index].equipmentType) == attacker.attackMode)
+        val = regionInfo.weaponTypeRate[index].rate;
+    }
+    damage_details.Mul(val);
+  }
+
+  private void CalcElementDamageByAttackerWeapon(
+    Player attacker,
+    AttackedHitStatusLocal status,
+    ref AtkAttribute damage_details)
+  {
+    if (attacker.CheckAttackModeAndSpType(Player.ATTACK_MODE.TWO_HAND_SWORD, SP_ATTACK_TYPE.NONE))
+      damage_details.MulElementOnly(attacker.CalcChargeExpandElementDamageUpRate());
+    float num = 1f;
+    if (attacker.GetOneHandSwordBoostDamageUpRate(ref num))
+      damage_details.MulElementOnly(num);
+    if (attacker.GetTwoHandSwordBoostDamageUpRate(ref num))
+      damage_details.MulElementOnly(num);
+    if (attacker.GetIaiNormalDamageUp(ref num))
+      damage_details.normal *= num;
+    if (attacker.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.HEAT))
+      damage_details.Mul(attacker.CalcPairSwordsBoostModeDamageUpRate());
+    if (attacker.pairSwordsCtrl.GetElementDamageUpRate(ref num))
+      damage_details.MulElementOnly(num);
+    if (attacker.GetSphinxElementDamageUpRate(status.attackInfo, ref num))
+      damage_details.MulElementOnly(num);
+    if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.JUMP)
+      damage_details.MulElementOnly(attacker.GetJumpElementDamageUpRate());
+    if (attacker.GetExRushElementDamageUpRate(status.attackInfo.attackType, ref num))
+      damage_details.MulElementOnly(num);
+    if (attacker.spearCtrl.GetBoostDamageUpRate(ref num))
+      damage_details.MulElementOnly(num);
+    if (attacker.GetArrowBoostDamageUpRate(ref num))
+      damage_details.MulElementOnly(num);
+    if (attacker.GetBurstShotNormalDamageUpRate(status.attackInfo, ref num))
+      damage_details.normal *= num;
+    if (attacker.GetBurstShotElementDamageUpRate(status.attackInfo, ref num))
+      damage_details.MulElementOnly(num);
+    if (attacker.GetBurstArrowBombElementDamageUpRate(status.attackInfo, ref num))
+      damage_details.MulElementOnly(num);
+    if (attacker.IsOracleTwoHandSword())
+    {
+      if (attacker.thsCtrl.oracleCtrl.GetHorizontalDamageUpRate(status.attackInfo.name, ref num))
+        damage_details.Mul(num);
+      if (attacker.thsCtrl.oracleCtrl.GetChargeNormalDamageUpRate(status.attackInfo.attackType, ref num))
+        damage_details.normal *= num;
+      if (attacker.thsCtrl.oracleCtrl.GetChargeElementDamageUpRate(status.attackInfo.attackType, ref num))
+        damage_details.MulElementOnly(num);
+      if (attacker.thsCtrl.oracleCtrl.GetConcussionEnemyElementDamageUpRate(this, ref num))
+        damage_details.MulElementOnly(num);
+    }
+    if (attacker.GetOracleOHSElementDamageUpRate(status.attackInfo, ref num))
+      damage_details.MulElementOnly(num);
+    if (attacker.GetOracleSpearElementDamageUpRate(status.attackInfo, ref num))
+      damage_details.MulElementOnly(num);
+    if (!attacker.GetOraclePairSwordsElementDamageUpRate(status.attackInfo, ref num))
+      return;
+    damage_details.MulElementOnly(num);
+  }
+
+  protected override AtkAttribute CalcAtk(AttackedHitStatusLocal status)
+  {
+    Player fromObject = status.fromObject as Player;
+    if (Object.op_Equality((Object) fromObject, (Object) null))
+      return base.CalcAtk(status);
+    AtkAttribute atkAttribute = new AtkAttribute();
+    atkAttribute.Add(status.atk);
+    if (fromObject.IsTwoHandSwordSpAttacking())
+      atkAttribute.normal += fromObject.GetDefForTwoHandSwordSpAttack();
+    if (fromObject.IsTwoHandSwordHeatUseGauge())
+    {
+      ELEMENT_TYPE elementType = atkAttribute.GetElementType();
+      atkAttribute.AddTargetElement(elementType, fromObject.GetElementDefForTwoHandSwordHeatCombo());
+    }
+    if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.HEAL_ATTACK)
+    {
+      atkAttribute.Mul(fromObject.healAtkRate);
+    }
+    else
+    {
+      atkAttribute.Mul(status.attackInfo.atkRate);
+      if (!status.attackInfo.isSkillReference)
+        atkAttribute.Mul(fromObject.pairSwordsCtrl.GetAtkRate());
+      if ((status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.BURST_THS_SINGLE_SHOT || status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.BURST_THS_FULL_BURST) && fromObject.thsCtrl != null)
+        atkAttribute.Mul(fromObject.thsCtrl.GetAtkRate(this, fromObject));
+    }
+    if (status.damageDistanceData != null)
+    {
+      float val = !fromObject.isBuffShadowSealing || (double) fromObject.playerParameter.arrowActionInfo.shadowSealingBuffDistanceRate == 0.0 ? status.damageDistanceData.GetRate(status.distanceXZ) : fromObject.playerParameter.arrowActionInfo.shadowSealingBuffDistanceRate;
+      atkAttribute.Mul(val);
+    }
+    float val1 = 1f;
+    if (this.IsFreeze())
+      val1 = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.freezeParam.damageRate;
+    else if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.TWO_HAND_SWORD_SP || status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.THS_HEAT_COMBO)
+    {
+      if (status.weakState != Enemy.WEAK_STATE.NONE)
+        val1 = fromObject.playerParameter.specialActionInfo.twoHandSwordWeakRate;
+    }
+    else
+    {
+      switch (status.weakState)
+      {
+        case Enemy.WEAK_STATE.WEAK:
+        case Enemy.WEAK_STATE.WEAK_SP_ATTACK:
+        case Enemy.WEAK_STATE.WEAK_SP_DOWN_MAX:
+          val1 = fromObject.attackWeakRate;
+          break;
+        case Enemy.WEAK_STATE.DOWN:
+          val1 = fromObject.attackDownRate;
+          break;
+        case Enemy.WEAK_STATE.WEAK_ELEMENT_ATTACK:
+          val1 = fromObject.elementWeakRate;
+          break;
+        case Enemy.WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK:
+          val1 = fromObject.elementSkillWeakRate;
+          break;
+        case Enemy.WEAK_STATE.WEAK_SKILL_ATTACK:
+          val1 = fromObject.skillWeakRate;
+          break;
+        case Enemy.WEAK_STATE.WEAK_HEAL_ATTACK:
+          val1 = fromObject.healWeakRate;
+          break;
+        case Enemy.WEAK_STATE.WEAK_ELEMENT_SP_ATTACK:
+          val1 = fromObject.elementSpAttackWeakRate;
+          break;
+      }
+    }
+    atkAttribute.Mul(val1);
+    return atkAttribute;
+  }
+
+  protected override AtkAttribute CalcTolerance(AttackedHitStatusLocal status)
+  {
+    int regionId = status.regionID;
+    if (regionId < 0 || regionId >= this.regionInfos.Length)
+      return base.CalcTolerance(status);
+    Enemy.RegionInfo regionInfo = this.regionInfos[status.regionID];
+    AtkAttribute _tolerance = new AtkAttribute();
+    _tolerance.Add(regionInfo.tolerance);
+    _tolerance.normal -= (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_NORMAL) * 0.01f;
+    if ((double) _tolerance.normal < 0.0)
+      _tolerance.normal = 0.0f;
+    AtkAttribute val = new AtkAttribute();
+    val.SetTargetElement(ELEMENT_TYPE.FIRE, (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_FIRE) * 0.01f);
+    val.SetTargetElement(ELEMENT_TYPE.WATER, (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_WATER) * 0.01f);
+    val.SetTargetElement(ELEMENT_TYPE.THUNDER, (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_THUNDER) * 0.01f);
+    val.SetTargetElement(ELEMENT_TYPE.SOIL, (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_SOIL) * 0.01f);
+    val.SetTargetElement(ELEMENT_TYPE.LIGHT, (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_LIGHT) * 0.01f);
+    val.SetTargetElement(ELEMENT_TYPE.DARK, (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_DARK) * 0.01f);
+    val.AddElementOnly((float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFDOWN_RATE_ALLELEMENT) * 0.01f);
+    _tolerance.Sub(val);
+    _tolerance.CheckMinus();
+    if (this.CheckApplyDefenceUpBuff(status, this.regionWorks[regionId]))
+    {
+      this.AddToleranceBuff(ref _tolerance);
+      _tolerance.normal += (float) (this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_NORMAL) + this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT)) * 0.01f;
+    }
+    if (this.IsValidBarrier)
+      _tolerance.AddRate(this.regionWorks[regionId].GetBarrierToleranceRate());
+    return _tolerance;
+  }
+
+  private bool CheckApplyDefenceUpBuff(AttackedHitStatusLocal status, EnemyRegionWork regionWork)
+  {
+    bool flag = true;
+    if (this.GetEnemyType() == ENEMY_TYPE.CRAB && regionWork.weakState == Enemy.WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK && (ELEMENT_TYPE) regionWork.validElementType == status.atk.GetElementType() && status.attackInfo.isSkillReference && this.IsValidBuff(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT) && this.IsValidBuff(BuffParam.BUFFTYPE.DEFENCE_NORMAL))
+    {
+      this.OnBuffEnd(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT, true, true);
+      this.OnBuffEnd(BuffParam.BUFFTYPE.DEFENCE_NORMAL, true, true);
+      flag = false;
+    }
+    return flag;
+  }
+
+  protected override AtkAttribute CalcDefense(AttackedHitStatusLocal status)
+  {
+    if (status.regionID >= 0 && status.regionID < this.regionInfos.Length)
+      return this.regionInfos[status.regionID].defence;
+    AtkAttribute _defence = new AtkAttribute();
+    _defence.Add(this.defense);
+    AtkAttribute val = new AtkAttribute();
+    val.Set(1f);
+    val.Add(this.buffParam.GetBuffDefenceRate());
+    _defence.Mul(val);
+    this.AddDefenceBuff(ref _defence);
+    _defence.CheckMinus();
+    return _defence;
+  }
+
+  public void CheckCounterRegion()
+  {
+    bool flag = this.GetEnabledCounterRegionIndex() >= 0;
+    uint stringID = this.kStrIdx_EnemyReaction_BreakCounterRegion;
+    switch (this.m_CounterRegionState)
+    {
+      case Enemy.eCounterRegionState.NONE:
+        this.m_CounterRegionState = flag ? Enemy.eCounterRegionState.EXIST : Enemy.eCounterRegionState.NOT_EXIST;
+        return;
+      case Enemy.eCounterRegionState.EXIST:
+        if (flag)
+          return;
+        this.m_CounterRegionState = Enemy.eCounterRegionState.NOT_EXIST;
+        stringID = this.kStrIdx_EnemyReaction_BreakCounterRegion;
+        break;
+      case Enemy.eCounterRegionState.NOT_EXIST:
+        if (!flag)
+          return;
+        this.m_CounterRegionState = Enemy.eCounterRegionState.EXIST;
+        stringID = this.kStrIdx_EnemyReaction_ReviveCounterRegion;
+        break;
+    }
+    if (!MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
+      return;
+    MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce("", STRING_CATEGORY.ENEMY_REACTION, stringID);
+  }
+
+  protected bool isAvailableCounter(Character.ACTION_ID currentId)
+  {
+    return currentId != Character.ACTION_ID.FREEZE && currentId != Character.ACTION_ID.PARALYZE && currentId != (Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE) && currentId != (Character.ACTION_ID) 17 && currentId != (Character.ACTION_ID) 18 && currentId != (Character.ACTION_ID) 20 && currentId != (Character.ACTION_ID) 23 && !this.IsDebuffShadowSealing() && !this.IsLightRing() && !this.IsConcussion() && currentId != Character.ACTION_ID.NONE;
+  }
+
+  protected bool CheckCounter(AttackedHitStatusOwner status)
+  {
+    if (!this.isBoss || !this.isAvailableCounter(this.actionID) || this.GetEnabledCounterRegion() == null)
+      return false;
+    EnemyController controller = this.controller as EnemyController;
+    if (Object.op_Equality((Object) controller, (Object) null))
+      return false;
+    EnemyBrain brain = controller.brain as EnemyBrain;
+    if (Object.op_Equality((Object) brain, (Object) null))
+      return false;
+    int counterAttackId = brain.actionCtrl.GetCounterAttackId();
+    return counterAttackId != int.MaxValue && (long) (uint) this.attackID != (long) counterAttackId;
+  }
+
+  public override void OnAttackedHitOwner(AttackedHitStatusOwner status)
+  {
+    this.ApplyInvicibleCount(status);
+    bool flag1 = this.ApplyInvicibleBadStatus(status);
+    if (this.IsValidBuff(BuffParam.BUFFTYPE.MAD_MODE))
+      status.badStatusAdd.Mul(MonoBehaviourSingleton<InGameSettingsManager>.I.madModeParam.badStatusRate);
+    status.aegisParam.isChange = false;
+    if (!this.isDead && status.validDamage)
+    {
+      if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL)
+      {
+        status.damage = 0;
+        status.damageDetails.Set(0.0f);
+      }
+      int shieldHp = (int) this.ShieldHp;
+      int grabHp = (int) this.GrabHp;
+      status.afterGrabHp = (int) this.GrabHp;
+      status.afterBarrierHp = (int) this.BarrierHp;
+      status.downTotal = this.downTotal;
+      status.concussionTotal = this.concussionTotal;
+      if (status.regionID >= 0 && status.regionID < this.regionWorks.Length)
+        status.afterRegionHP = (int) this.regionWorks[status.regionID].hp;
+      if (status.attackInfo.isSkillReference)
+      {
+        if ((double) status.badStatusAdd.electricShock > 0.0 && this.GetElementType() == ELEMENT_TYPE.WATER)
+        {
+          Player fromObject = status.fromObject as Player;
+          if (Object.op_Inequality((Object) fromObject, (Object) null))
+            this.OnElectricShockStart(status.attackInfo, fromObject);
+        }
+        if ((double) status.badStatusAdd.soilShock > 0.0 && this.GetElementType() == ELEMENT_TYPE.THUNDER)
+        {
+          Player fromObject = status.fromObject as Player;
+          if (Object.op_Inequality((Object) fromObject, (Object) null))
+            this.OnSoilShockStart(status.attackInfo, fromObject);
+        }
+        if (status.attackInfo.buffIDs != null && status.attackInfo.buffIDs.Length != 0)
+          this.ApplyBuffsByTable(status);
+        if (this.CheckCounter(status))
+        {
+          status.reactionType = 13;
+          if (MonoBehaviourSingleton<CoopManager>.IsValid())
+            MonoBehaviourSingleton<CoopManager>.I.coopStage.battleUserLog.Add((Character) this, status);
+          base.OnAttackedHitOwner(status);
+          return;
+        }
+      }
+      bool flag2 = false;
+      if (this.aegisCtrl != null)
+      {
+        flag2 = this.aegisCtrl.IsValid();
+        this.aegisCtrl.FlagReset();
+      }
+      if (!flag2 && this.CheckMadMode(status))
+      {
+        status.reactionType = 18;
+        status.badStatusAdd.Reset();
+        this.downTotal = 0.0f;
+        status.downAddBase = 0.0f;
+        status.downAddWeak = 0.0f;
+        this.ResetConcussion();
+        status.concussionTotal = 0.0f;
+        status.concussionAdd = 0.0f;
+        status.isArrowBleed = false;
+        status.isShadowSealing = false;
+        status.isArrowBomb = false;
+      }
+      if (MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.shadowSealingParam.isReactionDamage && status.isShadowSealing && !this.IsDebuffShadowSealing())
+        status.reactionType = 1;
+      if (status.regionID >= 0 && status.regionID < this.regionWorks.Length)
+      {
+        EnemyRegionWork regionWork = this.regionWorks[status.regionID];
+        Enemy.RegionInfo regionInfo = this.regionInfos[status.regionID];
+        int customDownRate = regionInfo.customDownRate;
+        float num1 = this.CalcRegionDamageRate(status);
+        int damage = (int) ((double) status.damage * (double) num1);
+        if (flag2)
+        {
+          if (this.aegisCtrl.Damage(damage))
+            status.aegisParam.Copy(this.aegisCtrl.syncParam);
+        }
+        else
+        {
+          status.afterRegionHP = (int) regionWork.hp - damage;
+          if (status.afterRegionHP < 0)
+            status.afterRegionHP = 0;
+        }
+        if (status.regionID != 0 && (int) regionWork.hp > 0 && status.afterRegionHP <= 0)
+        {
+          status.breakRegion = true;
+          if (!this.IsDebuffShadowSealing() && !this.IsConcussion() && status.reactionType != 18)
+          {
+            if (regionInfo.breakInDown)
+              status.reactionType = 7;
+            else if (regionInfo.breakInDamage)
+              status.reactionType = 1;
+          }
+        }
+        if (this.IsValidBarrier)
+        {
+          int num2 = this.CalcBarrierDamage(regionWork, status);
+          status.afterBarrierHp = (int) this.BarrierHp - num2;
+          if (status.afterBarrierHp < 0)
+            status.afterBarrierHp = 0;
+        }
+        if (regionInfo.isEnableShieldDamage && status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL)
+        {
+          bool isElementCritical = Enemy.GetEffectiveType(status.attackInfo.elementType, this.GetElementType()) == Enemy.EFFECTIVE_TYPE.GOOD;
+          status.shieldDamage = this.CalcShieldDamage(regionWork.isShieldCriticalDamage, isElementCritical, status.attackInfo);
+          if (regionWork.isShieldCriticalDamage && this.IsValidGrabHp)
+          {
+            status.afterGrabHp = (int) this.GrabHp - (int) this.GrabCannonDamage;
+            if (status.afterGrabHp < 0)
+              status.afterGrabHp = 0;
+          }
+        }
+        bool flag3 = false;
+        if ((int) regionWork.hp <= 0 && regionInfo.maxHP > 0)
+          flag3 = true;
+        if (status.breakRegion | flag3 && !regionInfo.breakAfterHit)
+          status.isArrowBleed = false;
+        if (status.isArrowBleed)
+        {
+          float bleedTimeInterval = MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedTimeInterval;
+          float num3 = 1f - MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedSkipTimeRate;
+          float num4 = this.bleedCounter % bleedTimeInterval;
+          status.arrowBleedSkipFirst = (double) num4 >= (double) bleedTimeInterval * (double) num3;
+        }
+        if (flag3 && !regionInfo.breakAfterHit || status.breakRegion)
+          status.isShadowSealing = false;
+        if (Enemy.IsWeakStateCheckAlreadyHit(status.weakState) && (double) status.downAddWeak > 0.0 && regionWork.weakAttackIDs.Count > 0)
+          status.downAddWeak = 0.0f;
+      }
+      if (this.actionID == (Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE))
+      {
+        if (!status.isForceDown)
+          status.downAddBase = status.downAddWeak = 0.0f;
+      }
+      else
+      {
+        float num = this.CalcWorkDownTotal(status.downAddBase, status.downAddWeak, status.regionID);
+        status.downTotal = this.downTotal + num;
+        if ((double) status.downTotal >= (double) this.downMax)
+        {
+          status.reactionType = 7;
+          status.downTotal = (float) this.downMax;
+        }
+        if (this.actionID != (Character.ACTION_ID) 25 && (double) status.concussionAdd > 0.0)
+        {
+          status.concussionTotal = this.concussionTotal + status.concussionAdd;
+          if ((double) status.concussionTotal >= (double) this.concussionMax)
+          {
+            status.reactionType = 24;
+            status.concussionTotal = this.concussionMax;
+          }
+        }
+      }
+      if (this.actionID != (Character.ACTION_ID) 18 && (int) this.ShieldHp - status.shieldDamage <= 0 && shieldHp > 0 && (int) this.ShieldHpMax > 0)
+        status.reactionType = 16 /*0x10*/;
+      if (status.afterGrabHp <= 0 && grabHp > 0 && (int) this.GrabHpMax > 0)
+        this.ActReleaseGrabbedPlayers(false, false, true);
+      if (MonoBehaviourSingleton<CoopManager>.IsValid())
+        MonoBehaviourSingleton<CoopManager>.I.coopStage.battleUserLog.Add((Character) this, status);
+    }
+    if (flag1)
+      this.buffParam.DecreaseInvincibleBadStatus();
+    base.OnAttackedHitOwner(status);
+  }
+
+  private void ApplyBuffsByTable(AttackedHitStatusOwner status)
+  {
+    if (!Singleton<BuffTable>.IsValid())
+      return;
+    foreach (uint buffId in status.attackInfo.buffIDs)
+    {
+      if (buffId > 0U)
+      {
+        BuffTable.BuffData data = Singleton<BuffTable>.I.GetData(buffId);
+        if (data != null)
+        {
+          BuffParam.BuffData buffData = new BuffParam.BuffData();
+          buffData.type = data.type;
+          buffData.interval = data.interval;
+          buffData.valueType = data.valueType;
+          buffData.time = data.duration;
+          buffData.fromObjectID = status.fromObjectID;
+          float num = (float) data.value;
+          if (status.skillParam != null && status.skillParam.baseInfo != null)
+          {
+            GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(data.growID, status.skillParam.baseInfo.level, status.skillParam.baseInfo.exceedCnt);
+            if (growSkillItemData != null)
+            {
+              buffData.time = (float) ((double) data.duration * (double) (int) growSkillItemData.supprtTime[0].rate * 0.0099999997764825821) + (float) growSkillItemData.supprtTime[0].add;
+              num = (float) (data.value * (int) growSkillItemData.supprtValue[0].rate) * 0.01f + (float) (int) growSkillItemData.supprtValue[0].add;
+            }
+            num *= 1f + status.skillParam.GetSupportValueTotalAsRateByType(BuffParam.BUFFTYPE.TO_ENEMY_DEBUFF_VALUE_UP);
+          }
+          if (buffData.valueType == BuffParam.VALUE_TYPE.RATE && BuffParam.IsTypeValueBasedOnHP(buffData.type))
+            num = (float) ((double) this.hpMax * (double) num * 0.0099999997764825821);
+          buffData.value = Mathf.FloorToInt(num);
+          switch (buffData.type)
+          {
+            case BuffParam.BUFFTYPE.MOVE_SPEED_DOWN:
+            case BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN:
+            case BuffParam.BUFFTYPE.SOIL_SHOCK:
+              if (this.GetElementType() == ELEMENT_TYPE.THUNDER)
+              {
+                this.OnBuffStart(buffData);
+                continue;
+              }
+              continue;
+            case BuffParam.BUFFTYPE.BURNING:
+              if (this.GetElementType() == ELEMENT_TYPE.SOIL)
+              {
+                this.OnBuffStart(buffData);
+                continue;
+              }
+              continue;
+            case BuffParam.BUFFTYPE.ELECTRIC_SHOCK:
+              if (this.GetElementType() == ELEMENT_TYPE.WATER)
+              {
+                this.OnBuffStart(buffData);
+                continue;
+              }
+              continue;
+            case BuffParam.BUFFTYPE.EROSION:
+              if (this.GetElementType() == ELEMENT_TYPE.LIGHT)
+              {
+                this.OnBuffStart(buffData);
+                continue;
+              }
+              continue;
+            case BuffParam.BUFFTYPE.ACID:
+              if (this.GetElementType() == ELEMENT_TYPE.FIRE)
+              {
+                this.OnBuffStart(buffData);
+                continue;
+              }
+              continue;
+            case BuffParam.BUFFTYPE.CORRUPTION:
+              if (this.GetElementType() == ELEMENT_TYPE.THUNDER)
+              {
+                this.OnBuffStart(buffData);
+                continue;
+              }
+              continue;
+            case BuffParam.BUFFTYPE.STIGMATA:
+              if (this.GetElementType() == ELEMENT_TYPE.DARK)
+              {
+                this.OnBuffStart(buffData);
+                continue;
+              }
+              continue;
+            case BuffParam.BUFFTYPE.CYCLONIC_THUNDERSTORM:
+              if (this.GetElementType() == ELEMENT_TYPE.WATER)
+              {
+                this.OnBuffStart(buffData);
+                continue;
+              }
+              continue;
+            default:
+              this.OnBuffStart(buffData);
+              continue;
+          }
+        }
+      }
+    }
+  }
+
+  private void ResetElementDebuff(ELEMENT_TYPE prev, ELEMENT_TYPE now)
+  {
+    if (prev == now)
+      return;
+    switch (prev)
+    {
+      case ELEMENT_TYPE.FIRE:
+        this.OnBuffEnd(BuffParam.BUFFTYPE.ACID, true, true);
+        break;
+      case ELEMENT_TYPE.WATER:
+        this.OnBuffEnd(BuffParam.BUFFTYPE.ELECTRIC_SHOCK, true, true);
+        this.OnBuffEnd(BuffParam.BUFFTYPE.CYCLONIC_THUNDERSTORM, true, true);
+        break;
+      case ELEMENT_TYPE.THUNDER:
+        this.OnBuffEnd(BuffParam.BUFFTYPE.MOVE_SPEED_DOWN, true, true);
+        this.OnBuffEnd(BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN, true, true);
+        this.OnBuffEnd(BuffParam.BUFFTYPE.SOIL_SHOCK, true, true);
+        this.OnBuffEnd(BuffParam.BUFFTYPE.CORRUPTION, true, true);
+        break;
+      case ELEMENT_TYPE.SOIL:
+        this.OnBuffEnd(BuffParam.BUFFTYPE.BURNING, true, true);
+        break;
+      case ELEMENT_TYPE.LIGHT:
+        this.OnBuffEnd(BuffParam.BUFFTYPE.EROSION, true, true);
+        break;
+      case ELEMENT_TYPE.DARK:
+        this.OnBuffEnd(BuffParam.BUFFTYPE.LIGHT_RING, true, true);
+        this.OnBuffEnd(BuffParam.BUFFTYPE.STIGMATA, true, true);
+        break;
+    }
+  }
+
+  private float CalcRegionDamageRate(AttackedHitStatusOwner status)
+  {
+    if (!(status.fromObject is Player fromObject))
+      return 1f;
+    Enemy.RegionInfo regionInfo = (Enemy.RegionInfo) null;
+    if (this.regionInfos != null && status.regionID < this.regionInfos.Length)
+      regionInfo = this.regionInfos[status.regionID];
+    float num = 1f;
+    if (regionInfo != null)
+      num = fromObject.GetRegionDamageRate(regionInfo.dragonArmorInfo.enabled);
+    AttackHitInfo.ToEnemy.DamageToRegionInfo damageToRegionInfo = status.attackInfo.toEnemy.damageToRegionInfo;
+    if (!damageToRegionInfo.isDamageUp || damageToRegionInfo.damageUpPercent <= 0)
+      return num;
+    int base_value = damageToRegionInfo.damageUpPercent;
+    if (status.attackInfo.isSkillReference)
+    {
+      SkillInfo.SkillParam skillParam = status.skillParam;
+      if (skillParam != null)
+      {
+        GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(skillParam.tableData.growID, skillParam.baseInfo.level, skillParam.baseInfo.exceedCnt);
+        if (growSkillItemData != null)
+          base_value = growSkillItemData.GetGrowResultSupportValue(base_value, 0);
+      }
+    }
+    return num + (float) base_value * 0.01f;
+  }
+
+  private int CalcBarrierDamage(EnemyRegionWork regionWork, AttackedHitStatusOwner status)
+  {
+    int num = 0;
+    AtkAttribute atkBarrierDamage = regionWork.regionInfo.atkBarrierDamage;
+    Player fromObject = status.fromObject as Player;
+    if (Object.op_Inequality((Object) fromObject, (Object) null) && fromObject.buffParam.IsValidBuff(BuffParam.BUFFTYPE.LUNATIC_TEAR))
+      num = regionWork.regionInfo.barrierDamageSp;
+    AtkAttribute damageDetails = status.damageDetails;
+    if ((double) damageDetails.normal > 0.0)
+      num += (int) atkBarrierDamage.normal;
+    if ((double) damageDetails.fire > 0.0)
+      num += (int) atkBarrierDamage.fire;
+    if ((double) damageDetails.water > 0.0)
+      num += (int) atkBarrierDamage.water;
+    if ((double) damageDetails.thunder > 0.0)
+      num += (int) atkBarrierDamage.thunder;
+    if ((double) damageDetails.soil > 0.0)
+      num += (int) atkBarrierDamage.soil;
+    if ((double) damageDetails.light > 0.0)
+      num += (int) atkBarrierDamage.light;
+    if ((double) damageDetails.dark > 0.0)
+      num += (int) atkBarrierDamage.dark;
+    return Mathf.FloorToInt((float) num * status.attackInfo.toEnemy.damageToRegionInfo.barrierDamageRate);
+  }
+
+  public override bool IsEnableAttackedHitOwner()
+  {
+    return (!MonoBehaviourSingleton<CoopManager>.IsValid() || !MonoBehaviourSingleton<InGameProgress>.IsValid() || !MonoBehaviourSingleton<CoopManager>.I.coopRoom.isOwnerFirstClear || !Object.op_Equality((Object) MonoBehaviourSingleton<StageObjectManager>.I.boss, (Object) this) || !MonoBehaviourSingleton<InGameProgress>.I.isEnding) && this.actionID != (Character.ACTION_ID) 24 && base.IsEnableAttackedHitOwner();
+  }
+
+  protected override bool IsHitReactionValid(AttackedHitStatusOwner status)
+  {
+    return this.actionID != (Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE) && !this.IsDebuffShadowSealing() && status.fromType != StageObject.OBJECT_TYPE.ENEMY && base.IsHitReactionValid(status);
+  }
+
+  protected override bool IsReactionDelayType(int type)
+  {
+    switch ((Character.REACTION_TYPE) type)
+    {
+      case Character.REACTION_TYPE.DOWN:
+      case Character.REACTION_TYPE.ELECTRIC_SHOCK:
+      case Character.REACTION_TYPE.SOIL_SHOCK:
+        return true;
+      case Character.REACTION_TYPE.COUNTER:
+        return true;
+      case Character.REACTION_TYPE.DIZZY:
+        return true;
+      case Character.REACTION_TYPE.SHADOWSEALING:
+        return true;
+      case Character.REACTION_TYPE.MAD_MODE:
+        return true;
+      case Character.REACTION_TYPE.BIND:
+        return true;
+      default:
+        return base.IsReactionDelayType(type);
+    }
+  }
+
+  protected override Character.REACTION_TYPE OnHitReaction(AttackedHitStatusOwner status)
+  {
+    AttackHitInfo.ToEnemy.REACTION_TYPE reactionType = status.attackInfo.toEnemy.reactionType;
+    if (this.isBoss || this.isWaveMatchBoss || this.isBigMonster || this.IsFieldEnemyBoss())
+    {
+      switch (reactionType)
+      {
+        case AttackHitInfo.ToEnemy.REACTION_TYPE.NONE:
+          if (status.weakState == Enemy.WEAK_STATE.WEAK && status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL_DIRECT && this.actionID != Character.ACTION_ID.DAMAGE && this.actionID != (Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE) || status.weakState == Enemy.WEAK_STATE.WEAK && status.attackInfo.toEnemy.isWeakHitReaction && this.actionID != Character.ACTION_ID.DAMAGE && this.actionID != (Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE) || (Enemy.IsWeakStateSpAttack(status.weakState) || Enemy.IsWeakStateElementAttack(status.weakState) || Enemy.IsWeakStateSkillAttack(status.weakState) || Enemy.IsWeakStateHealAttack(status.weakState)) && this.actionID != Character.ACTION_ID.DAMAGE && this.actionID != (Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE))
+            return Character.REACTION_TYPE.DAMAGE;
+          break;
+        case AttackHitInfo.ToEnemy.REACTION_TYPE.DAMAGE:
+          return Character.REACTION_TYPE.DAMAGE;
+        case AttackHitInfo.ToEnemy.REACTION_TYPE.DOWN:
+          return Character.REACTION_TYPE.DOWN;
+        case AttackHitInfo.ToEnemy.REACTION_TYPE.BIND:
+          return Character.REACTION_TYPE.BIND;
+      }
+    }
+    return Character.REACTION_TYPE.NONE;
+  }
+
+  protected override Character.REACTION_TYPE CheckReActionTolerance(AttackedHitStatusOwner status)
+  {
+    Character.REACTION_TYPE reactionType = base.CheckReActionTolerance(status);
+    if (this.actionID == (Character.ACTION_ID) 25)
+    {
+      switch ((Character.REACTION_TYPE) status.reactionType)
+      {
+        case Character.REACTION_TYPE.DAMAGE:
+        case Character.REACTION_TYPE.DOWN:
+        case Character.REACTION_TYPE.PARALYZE:
+        case Character.REACTION_TYPE.FREEZE:
+        case Character.REACTION_TYPE.LIGHT_RING:
+          reactionType = Character.REACTION_TYPE.NONE;
+          break;
+      }
+    }
+    return reactionType;
+  }
+
+  public override void OnHitAttack(
+    AttackHitInfo info,
+    AttackHitColliderProcessor.HitParam hit_param)
+  {
+    EnemyController controller = this.controller as EnemyController;
+    if (Object.op_Inequality((Object) controller, (Object) null))
+      controller.OnHitAttack(hit_param.toObject);
+    GrabInfo grabInfo = info.grabInfo;
+    if (grabInfo.enable)
+    {
+      Player toObject = hit_param.toObject as Player;
+      if (Object.op_Inequality((Object) toObject, (Object) null))
+      {
+        EnemyBrain brain = controller.brain as EnemyBrain;
+        if (Object.op_Inequality((Object) brain, (Object) null))
+        {
+          DrainAttackInfo _drainAtkInfo = this.SearchDrainAttackInfo(grabInfo.drainAttackId);
+          brain.actionCtrl.grabController.Grab(toObject, grabInfo, _drainAtkInfo);
+          if (_drainAtkInfo != null)
+            this.grabDrainRecoverTimer = _drainAtkInfo.recoverInterval;
+        }
+      }
+    }
+    if (this.isAbleToSkipAction)
+    {
+      this.SetNextTrigger();
+      this.isAbleToSkipAction = false;
+    }
+    base.OnHitAttack(info, hit_param);
+  }
+
+  public float CalcWorkDownTotal(float downAddBase, float downAddWeak, int regionID)
+  {
+    float num1 = downAddBase + downAddWeak;
+    int num2 = 0;
+    if (regionID >= 0 && regionID < this.regionWorks.Length)
+      num2 = this.regionInfos[regionID].customDownRate;
+    if (num2 != 0)
+    {
+      float num3 = (float) num2 * 0.01f;
+      num1 += num1 * num3;
+      if ((double) num1 < 0.0)
+        num1 = 0.0f;
+    }
+    return num1;
+  }
+
+  public override void OnAttackedHitFix(AttackedHitStatusFix status)
+  {
+    Player fromObject = status.fromObject as Player;
+    bool isDead = this.isDead;
+    int hp = this.hp;
+    int shieldHp = (int) this.ShieldHp;
+    if (!this.isDead)
+    {
+      this.concussionTotal = status.concussionTotal;
+      if ((double) status.concussionAdd > 0.0)
+      {
+        float concussionExtend = fromObject.buffParam.GetConcussionExtend();
+        if ((double) this.concussionExtend < (double) concussionExtend)
+          this.concussionExtend = concussionExtend;
+        if (!this.concussionAddPlayerIdList.Contains(status.fromObjectID))
+          this.concussionAddPlayerIdList.Add(status.fromObjectID);
+        if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+          MonoBehaviourSingleton<UIEnemyStatus>.I.DirectionConcussionGauge(status.hitPos);
+      }
+    }
+    base.OnAttackedHitFix(status);
+    if (!isDead)
+    {
+      this.downHealInterval = 1f;
+      this.downTotal = status.downTotal;
+      if ((double) status.downAddBase + (double) status.downAddWeak > 0.0 && MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+        MonoBehaviourSingleton<UIEnemyStatus>.I.DirectionDownGauge(status);
+    }
+    this.BarrierHp = (XorInt) status.afterBarrierHp;
+    this.GrabHp = (XorInt) status.afterGrabHp;
+    if (this.aegisCtrl != null)
+      this.aegisCtrl.Sync(status.aegisParam);
+    if ((int) this.ShieldHp <= 0 && shieldHp > 0)
+    {
+      if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
+        MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(this.enemyTableData.name, STRING_CATEGORY.ENEMY_SHIELD, 1U);
+      EffectManager.GetEffect("ef_btl_goldbird_aura_01_01", this._transform);
+      this.ResetShieldShaderParam();
+      if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+      {
+        List<StageObject> playerList = MonoBehaviourSingleton<StageObjectManager>.I.playerList;
+        for (int index = 0; index < playerList.Count; ++index)
+        {
+          Self self = playerList[index] as Self;
+          if (Object.op_Inequality((Object) self, (Object) null))
+          {
+            self.CancelCannonMode();
+            self.ActIdle(false, -1f);
+          }
+          else
+          {
+            Player player = playerList[index] as Player;
+            if (Object.op_Inequality((Object) player, (Object) null))
+            {
+              player.CancelCannonMode();
+              player.ActIdle(false, -1f);
+            }
+          }
+        }
+      }
+    }
+    if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.BOOST_ARROW_RAIN)
+    {
+      int rainBoostBombLevel = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.arrowRainBoostBombLevel;
+      Vector3 vector3;
+      // ISSUE: explicit constructor call
+      ((Vector3) ref vector3).\u002Ector(0.0f, MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.arrowRainBoostBombOffsetY, 0.0f);
+      if (Object.op_Inequality((Object) fromObject, (Object) null))
+      {
+        AtkAttribute atk = new AtkAttribute();
+        fromObject.GetAtk(status.attackInfo, ref atk, (SkillInfo.SkillParam) null);
+        this.StartCoroutine(this.FireBombArrow(fromObject, atk, rainBoostBombLevel, Vector3.op_Addition(status.hitPos, vector3), true));
+      }
+    }
+    if (status.regionID >= 0 && status.regionID < this.regionWorks.Length)
+    {
+      EnemyRegionWork regionWork = this.regionWorks[status.regionID];
+      Enemy.RegionInfo region_info = this.regionInfos[status.regionID];
+      regionWork.hp = (XorInt) status.afterRegionHP;
+      if (!isDead)
+      {
+        if (Enemy.IsWeakStateCheckAlreadyHit(status.weakState) && !regionWork.weakAttackIDs.Contains(status.fromObjectID))
+          regionWork.weakAttackIDs.Add(status.fromObjectID);
+        switch (status.weakState)
+        {
+          case Enemy.WEAK_STATE.WEAK:
+            this.OnHitWeakPoint(regionWork.deleteAtkName, false);
+            break;
+          case Enemy.WEAK_STATE.WEAK_SP_ATTACK:
+          case Enemy.WEAK_STATE.WEAK_SP_DOWN_MAX:
+            if (status.IsSpAttackHit)
+            {
+              this.OnHitWeakPoint(regionWork.deleteAtkName, true);
+              break;
+            }
+            break;
+          case Enemy.WEAK_STATE.WEAK_ELEMENT_ATTACK:
+            if ((ELEMENT_TYPE) regionWork.validElementType == status.damageDetails.GetElementType())
+            {
+              this.OnHitWeakPoint(regionWork.deleteAtkName, true);
+              break;
+            }
+            break;
+          case Enemy.WEAK_STATE.WEAK_ELEMENT_SKILL_ATTACK:
+            if (status.attackInfo.isSkillReference && (ELEMENT_TYPE) regionWork.validElementType == status.attackInfo.atk.GetElementType())
+            {
+              this.OnHitWeakPoint(regionWork.deleteAtkName, true);
+              break;
+            }
+            break;
+          case Enemy.WEAK_STATE.WEAK_SKILL_ATTACK:
+            if (status.attackInfo.isSkillReference)
+            {
+              this.OnHitWeakPoint(regionWork.deleteAtkName, true);
+              break;
+            }
+            break;
+          case Enemy.WEAK_STATE.WEAK_HEAL_ATTACK:
+            if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.HEAL_ATTACK)
+            {
+              this.OnHitWeakPoint(regionWork.deleteAtkName, true);
+              break;
+            }
+            break;
+          case Enemy.WEAK_STATE.WEAK_ELEMENT_SP_ATTACK:
+            if ((ELEMENT_TYPE) regionWork.validElementType == status.damageDetails.GetElementType() && status.IsSpAttackHit)
+            {
+              this.OnHitWeakPoint(regionWork.deleteAtkName, true);
+              break;
+            }
+            break;
+        }
+        if (Enemy.IsWeakStateDisplaySign(status.weakState))
+          regionWork.displayTimer = 0.0f;
+        this._CheckHitFixArrow(status, regionWork);
+      }
+      if (status.breakRegion)
+      {
+        this.ActReleaseGrabbedPlayers(false, false, true);
+        bool isBroke = regionWork.isBroke;
+        regionWork.isBroke = true;
+        regionWork.breakTime = Time.time;
+        foreach (string deactivateObject in region_info.deactivateObjects)
+        {
+          Transform node = this.FindNode(deactivateObject);
+          if (Object.op_Inequality((Object) node, (Object) null))
+            ((Component) node).gameObject.SetActive(false);
+        }
+        int index1 = 0;
+        for (int length = this.regionWorks.Length; index1 < length; ++index1)
+          this.regionWorks[index1].OnBreakRegion(status.regionID);
+        if (!region_info.breakAfterHit)
+        {
+          int index2 = 0;
+          for (int count = regionWork.bleedWorkList.Count; index2 < count; ++index2)
+          {
+            Enemy.BleedWork bleedWork = regionWork.bleedWorkList[index2];
+            if (Object.op_Inequality((Object) bleedWork.bleedEffect, (Object) null))
+            {
+              EffectManager.ReleaseEffect(((Component) bleedWork.bleedEffect).gameObject);
+              bleedWork.bleedEffect = (Transform) null;
+            }
+          }
+          regionWork.bleedWorkList.Clear();
+          regionWork.bleedList.Clear();
+        }
+        regionWork.shadowSealingData.ownerID = 0;
+        regionWork.shadowSealingData.existSec = 0.0f;
+        regionWork.shadowSealingData.extendRate = 1f;
+        if (regionWork.shadowSealingEffect != null)
+        {
+          EffectManager.ReleaseEffect(((Component) regionWork.shadowSealingEffect).gameObject, false, true);
+          regionWork.shadowSealingEffect = (Transform) null;
+        }
+        if (MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
+          MonoBehaviourSingleton<TargetMarkerManager>.I.updateShadowSealingFlag = true;
+        if (region_info.breakEffect != null && !string.IsNullOrEmpty(region_info.breakEffect.effectName))
+          this.PlayRegionBreakEffect(region_info);
+        if (this.enemyReward != null && !isBroke)
+          this.enemyReward.reward.ForEach((Action<QuestStartData.RegionDropItem>) (item =>
+          {
+            if (item.regionId != status.regionID || item.breakReward.Count == 0)
+              return;
+            item.breakReward.ForEach((Action<QuestStartData.BreakItem>) (breakItem => this.CreateDropItemFromRegionBreak(region_info, (StageObject) MonoBehaviourSingleton<StageObjectManager>.I.self, breakItem.rarity)));
+          }));
+        if (Object.op_Inequality((Object) fromObject, (Object) null) && MonoBehaviourSingleton<UIPlayerAnnounce>.IsValid())
+        {
+          if (fromObject is Self)
+          {
+            if (region_info.dragonArmorInfo.enabled)
+              MonoBehaviourSingleton<UIInGameSelfAnnounceManager>.I.PlayDragonArmorBreak();
+            else
+              MonoBehaviourSingleton<UIInGameSelfAnnounceManager>.I.PlayRegionBreak();
+            SoundManager.PlayOneshotJingle(40000156);
+          }
+          else if (region_info.dragonArmorInfo.enabled)
+            MonoBehaviourSingleton<UIPlayerAnnounce>.I.Announce(UIPlayerAnnounce.ANNOUNCE_TYPE.DRAGON_ARMOR, fromObject);
+          else
+            MonoBehaviourSingleton<UIPlayerAnnounce>.I.Announce(UIPlayerAnnounce.ANNOUNCE_TYPE.REGION, fromObject);
+        }
+        this.ShotRegionBreakBullet(region_info.breakBullet);
+        this.OnUpdateBombArrow(status.regionID);
+        this.UpdateBreakIDLists();
+      }
+    }
+    if (this.enemyReward != null)
+    {
+      int index = 0;
+      for (int count = this.enemyReward.drop.hpRate.Count; index < count; ++index)
+      {
+        if ((double) this.enemyReward.drop.hpRate[index] >= (double) this.damageHpRate)
+        {
+          if ((double) this.enemyReward.drop.hpRate[index] <= (double) status.damageHpRate)
+            this.CreateDropItem(status.hitPos, (StageObject) MonoBehaviourSingleton<StageObjectManager>.I.self, this.enemyReward.drop.rarity[index], false);
+          else
+            break;
+        }
+      }
+    }
+    this.damageHpRate = status.damageHpRate;
+    if (fromObject != null && MonoBehaviourSingleton<UIPlayerAnnounce>.IsValid())
+    {
+      if (Enemy.IsWeakStateCheckAlreadyHit(status.weakState))
+        MonoBehaviourSingleton<UIPlayerAnnounce>.I.Announce(UIPlayerAnnounce.ANNOUNCE_TYPE.WEAK, fromObject);
+      if (status.reactionType == 7)
+        MonoBehaviourSingleton<UIPlayerAnnounce>.I.Announce(UIPlayerAnnounce.ANNOUNCE_TYPE.DOWN, fromObject);
+    }
+    if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+    {
+      int damage = status.damage;
+      int num1 = hp - this.hp;
+      if (num1 < 0)
+        num1 = 0;
+      if (damage > num1)
+        damage = num1;
+      MonoBehaviourSingleton<InGameRecorder>.I.RecordGivenDamage(status.fromObjectID, damage);
+      if (QuestManager.IsValidInGameExplore() && this.isBoss && MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId == status.fromClientID)
+      {
+        ExplorePlayerStatus explorePlayerStatus = MonoBehaviourSingleton<QuestManager>.I.GetMyExplorePlayerStatus();
+        int num2 = explorePlayerStatus.givenTotalDamage + damage;
+        explorePlayerStatus.SyncTotalDamageToBoss(num2);
+        MonoBehaviourSingleton<CoopManager>.I.coopRoom.packetSender.SendExploreBossDamage(num2);
+      }
+    }
+    if (this.hp <= 0 && Object.op_Inequality((Object) fromObject, (Object) null))
+    {
+      if (fromObject is Self)
+        MonoBehaviourSingleton<InGameProgress>.I.AddDefeatCount(this.isWaveMatchBoss);
+      if (this.isWaveMatchBoss)
+        MonoBehaviourSingleton<InGameProgress>.I.AddPartyDefeatBossCount();
+      MonoBehaviourSingleton<InGameProgress>.I.AddPartyDefeatCount();
+    }
+    if (!this.enableToSkipActionByDamage)
+      return;
+    this.enableToSkipActionByDamage = false;
+    this.SetNextTrigger();
+  }
+
+  protected override void MakeReactionInfo(
+    AttackedHitStatusFix status,
+    out Character.ReactionInfo reactionInfo)
+  {
+    reactionInfo = new Character.ReactionInfo();
+    reactionInfo.reactionType = (Character.REACTION_TYPE) status.reactionType;
+    reactionInfo.targetId = status.fromObjectID;
+    switch (reactionInfo.reactionType)
+    {
+      case Character.REACTION_TYPE.BIND:
+        reactionInfo.loopTime = status.attackInfo.toEnemy.reactionInfo.reactionLoopTime;
+        break;
+      case Character.REACTION_TYPE.DEAD_REVIVE:
+        reactionInfo.deadReviveCount = status.deadReviveCount;
+        break;
+    }
+  }
+
+  private void _CheckHitFixArrow(AttackedHitStatusFix status, EnemyRegionWork region_work)
+  {
+    if (this.isDead)
+      return;
+    TargetPoint targetPoint = (TargetPoint) null;
+    int index1 = 0;
+    for (int length = this.targetPoints.Length; index1 < length; ++index1)
+    {
+      if (this.targetPoints[index1].regionID == status.regionID && this.targetPoints[index1].isAimEnable)
+      {
+        targetPoint = this.targetPoints[index1];
+        break;
+      }
+    }
+    if (status.isShadowSealing)
+    {
+      if (this.IsDebuffShadowSealing())
+        return;
+      Enemy.ShadowSealingData shadowSealingData = region_work.shadowSealingData;
+      if (shadowSealingData.ownerID == 0)
+      {
+        shadowSealingData.ownerID = status.fromObjectID;
+        shadowSealingData.existSec = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.shadowSealingExistSec * this.badStatusMax.shadowSealing;
+        if (status.fromObject is Player fromObject)
+        {
+          shadowSealingData.extendRate = fromObject.buffParam.GetShadowSealingExtend();
+          shadowSealingData.existSec *= fromObject.buffParam.GetShadowSealingExtendArrow();
+        }
+        else
+          shadowSealingData.extendRate = 1f;
+        if ((double) shadowSealingData.existSec <= (double) MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.shadowSealingExistMinSec)
+          shadowSealingData.existSec = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.shadowSealingExistMinSec;
+        if (targetPoint != null && region_work.shadowSealingEffect == null)
+        {
+          region_work.shadowSealingEffect = targetPoint.PlayArrowBleedEffect(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.shadowSealingEffectName, 0);
+          if (region_work.shadowSealingEffect != null)
+            ((Component) region_work.shadowSealingEffect).GetComponent<EffectSizeCtrl>()?.Work(shadowSealingData.existSec);
+        }
+        if ((this.IsMirror() || this.IsPuppet()) && !this.IsValidWaitingPacket(StageObject.WAITING_PACKET.ENEMY_UPDATE_SHADOWSEALING))
+          this.StartWaitingPacket(StageObject.WAITING_PACKET.ENEMY_UPDATE_SHADOWSEALING, false, shadowSealingData.existSec);
+      }
+      if (this._CheckShadowSealingFullStuck())
+      {
+        this.ActDebuffShadowSealingStart();
+      }
+      else
+      {
+        if (!MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+          return;
+        MonoBehaviourSingleton<UIEnemyStatus>.I.DirectionShadowSealingGauge(status.hitPos);
+      }
+    }
+    else if (status.isArrowBleed)
+    {
+      Enemy.BleedData bleedData = (Enemy.BleedData) null;
+      int index2 = 0;
+      for (int count = region_work.bleedList.Count; index2 < count; ++index2)
+      {
+        if (region_work.bleedList[index2].ownerID == status.fromObjectID)
+        {
+          bleedData = region_work.bleedList[index2];
+          break;
+        }
+      }
+      if (bleedData == null)
+      {
+        bleedData = new Enemy.BleedData();
+        region_work.bleedList.Add(bleedData);
+      }
+      InGameSettingsManager.Player.SpecialActionInfo specialActionInfo = MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo;
+      bleedData.ownerID = status.fromObjectID;
+      if (bleedData.lv == 0)
+      {
+        bleedData.cnt = specialActionInfo.arrowBleedCount;
+        bleedData.skipFirst = status.arrowBleedSkipFirst;
+      }
+      int num1 = status.arrowBleedDamage / specialActionInfo.arrowBleedCount;
+      if (num1 < 1)
+        num1 = 1;
+      bleedData.damage += num1;
+      if (bleedData.IsOwnerSelf())
+        ++bleedData.lv;
+      bool flag = true;
+      if (!specialActionInfo.arrowBleedOther.enable && !bleedData.IsOwnerSelf())
+        flag = false;
+      if (Object.op_Inequality((Object) targetPoint, (Object) null) & flag)
+      {
+        Enemy.BleedWork bleedWork = (Enemy.BleedWork) null;
+        int num2 = 1;
+        int index3 = 0;
+        int index4 = 0;
+        for (int count = region_work.bleedWorkList.Count; index4 < count; ++index4)
+        {
+          if (region_work.bleedWorkList[index4].ownerID == status.fromObjectID)
+          {
+            bleedWork = region_work.bleedWorkList[index4];
+            break;
+          }
+          if (num2 == region_work.bleedWorkList[index4].showIndex)
+          {
+            ++num2;
+            index3 = index4 + 1;
+          }
+        }
+        if (bleedWork == null)
+        {
+          bleedWork = new Enemy.BleedWork();
+          if (bleedData.IsOwnerSelf())
+          {
+            region_work.bleedWorkList.Insert(0, bleedWork);
+            bleedWork.showIndex = 0;
+          }
+          else
+          {
+            region_work.bleedWorkList.Insert(index3, bleedWork);
+            bleedWork.showIndex = num2;
+          }
+          bleedWork.ownerID = status.fromObjectID;
+        }
+        if (Object.op_Equality((Object) bleedWork.bleedEffect, (Object) null))
+        {
+          string effect_name = specialActionInfo.arrowBleedEffectName;
+          if (bleedWork.showIndex != 0)
+            effect_name = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.arrowBleedOtherEffectName;
+          bleedWork.bleedEffect = targetPoint.PlayArrowBleedEffect(effect_name, bleedWork.showIndex);
+        }
+        else if (bleedWork.showIndex == 0)
+        {
+          Animator component = ((Component) bleedWork.bleedEffect).GetComponent<Animator>();
+          if (Object.op_Inequality((Object) null, (Object) component))
+            component.Play("ACT" + (bleedData.lv - 1).ToString());
+        }
+        if (bleedData.IsMaxLv())
+        {
+          string burstEffectName = specialActionInfo.GetBurstEffectName(status.damageDetails.GetElementType());
+          Transform trs = (Transform) null;
+          if (bleedWork != null)
+            trs = bleedWork.bleedEffect;
+          targetPoint.PlayArrowBurstEffect(burstEffectName, trs);
+          int groupOffset = 2;
+          if (status.damageDetails.GetElementType() != ELEMENT_TYPE.MAX)
+            ++groupOffset;
+          MonoBehaviourSingleton<UIDamageManager>.I.Create(status.hitPos, status.arrowBurstDamage, UIDamageNum.DAMAGE_COLOR.NONE, groupOffset, isRegionOnly: status.isDamageRegionOnly);
+        }
+      }
+      if (!this.IsMirror() && !this.IsPuppet() || this.IsValidWaitingPacket(StageObject.WAITING_PACKET.ENEMY_UPDATE_BLEED_DAMAGE))
+        return;
+      this.StartWaitingPacket(StageObject.WAITING_PACKET.ENEMY_UPDATE_BLEED_DAMAGE, false, specialActionInfo.arrowBleedTimeInterval * 2f);
+    }
+    else
+    {
+      if (!status.isArrowBomb || status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.BOOST_ARROW_RAIN || region_work.IsBombArrowLevelMax())
+        return;
+      InGameSettingsManager.Player.ArrowActionInfo arrowActionInfo = MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo;
+      int num = 1;
+      Player fromObject = status.fromObject as Player;
+      if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.BOOST_BOMB_ARROW && Object.op_Inequality((Object) fromObject, (Object) null) && fromObject.isBoostMode)
+        num = arrowActionInfo.bombArrowMaxLevel;
+      for (int index5 = 0; index5 < num; ++index5)
+      {
+        Enemy.BombArrowData data = new Enemy.BombArrowData();
+        data.ownerID = status.fromObjectID;
+        data.startTime = Time.time;
+        data.atk = new AtkAttribute();
+        if (Object.op_Inequality((Object) fromObject, (Object) null))
+          fromObject.GetAtk(status.attackInfo, ref data.atk, (SkillInfo.SkillParam) null);
+        region_work.StackBombArrow(data);
+      }
+      if (Object.op_Inequality((Object) targetPoint, (Object) null) && !region_work.IsBombArrowLevelMax())
+      {
+        Enemy.BombArrowData bombArrowData = region_work.GetBombArrowData();
+        if (Object.op_Equality((Object) region_work.bombArrowEffect, (Object) null) && bombArrowData != null && bombArrowData.atk != null && bombArrowData.atk.GetElementType() != ELEMENT_TYPE.MAX)
+        {
+          string bombArrowEffectName = arrowActionInfo.GetBombArrowEffectName(bombArrowData.atk.GetElementType());
+          region_work.bombArrowEffect = targetPoint.PlayArrowBleedEffect(bombArrowEffectName, 0);
+        }
+        int count = region_work.bombArrowDataHistory.Count;
+        Animator component = ((Component) region_work.bombArrowEffect).GetComponent<Animator>();
+        if (Object.op_Inequality((Object) null, (Object) component))
+          component.Play("AROW" + (count - 1).ToString());
+        List<int> bombArrowSeIdList = arrowActionInfo.bombArrowSEIdList;
+        if (bombArrowSeIdList.Count >= count)
+          SoundManager.PlayOneShotSE(bombArrowSeIdList[count - 1], (DisableNotifyMonoBehaviour) this, this.rootNode);
+      }
+      else if (region_work.IsBombArrowLevelMax())
+        this.OnUpdateBombArrow(region_work.regionId);
+      if (!this.IsMirror() && !this.IsPuppet() || this.IsValidWaitingPacket(StageObject.WAITING_PACKET.ENEMY_UPDATE_BOMBARROW))
+        return;
+      this.StartWaitingPacket(StageObject.WAITING_PACKET.ENEMY_UPDATE_BOMBARROW, false, arrowActionInfo.bombArrowCountSec * 2f);
+    }
+  }
+
+  public override void ActReaction(Character.ReactionInfo info, bool isSync = false)
+  {
+    base.ActReaction(info, isSync);
+    switch (info.reactionType)
+    {
+      case Character.REACTION_TYPE.DOWN:
+        this.ActDown();
+        break;
+      case Character.REACTION_TYPE.COUNTER:
+        this.ActCounter(info.targetId);
+        break;
+      case Character.REACTION_TYPE.ELECTRIC_SHOCK:
+        this.ActElectricShock();
+        break;
+      case Character.REACTION_TYPE.DIZZY:
+        this.ActDizzy();
+        break;
+      case Character.REACTION_TYPE.SHADOWSEALING:
+        this.ActDebuffShadowSealingStart();
+        break;
+      case Character.REACTION_TYPE.MAD_MODE:
+        this.ActMadMode();
+        break;
+      case Character.REACTION_TYPE.LIGHT_RING:
+        this.ActLightRing();
+        break;
+      case Character.REACTION_TYPE.BIND:
+        this.ActBind(info.loopTime);
+        break;
+      case Character.REACTION_TYPE.DEAD_REVIVE:
+        this.ActDeadRevive(info.deadReviveCount);
+        break;
+      case Character.REACTION_TYPE.SOIL_SHOCK:
+        this.ActSoilShock();
+        break;
+      case Character.REACTION_TYPE.CONCUSSION:
+        this.ActConcussionStart();
+        break;
+    }
+  }
+
+  public override void OnReactionDelay(
+    List<Character.DelayReactionInfo> reactionDelayList)
+  {
+    if (this.m_reactionDelayList.Count >= 2)
+    {
+      Character.DelayReactionInfo delayReactionInfo = this.SearchReactionDelayInfo(Character.REACTION_TYPE.COUNTER);
+      if (delayReactionInfo != null)
+        this.m_reactionDelayList.Remove(delayReactionInfo);
+    }
+    base.OnReactionDelay(reactionDelayList);
+    int count = reactionDelayList.Count;
+    if (count <= 0)
+      return;
+    for (int index = 0; index < count; ++index)
+    {
+      Character.DelayReactionInfo reactionDelay = reactionDelayList[index];
+      switch (reactionDelay.type)
+      {
+        case Character.REACTION_TYPE.DOWN:
+          this.ActDown();
+          break;
+        case Character.REACTION_TYPE.COUNTER:
+          this.ActCounter(reactionDelay.targetId);
+          break;
+        case Character.REACTION_TYPE.DIZZY:
+          this.ActDizzy();
+          break;
+        case Character.REACTION_TYPE.SHADOWSEALING:
+          this.ActDebuffShadowSealingStart();
+          break;
+        case Character.REACTION_TYPE.MAD_MODE:
+          this.ActMadMode();
+          break;
+        case Character.REACTION_TYPE.LIGHT_RING:
+          this.ActLightRing();
+          break;
+        case Character.REACTION_TYPE.BIND:
+          this.ActBind(reactionDelay.reactionLoopTime);
+          break;
+      }
+    }
+  }
+
+  private int GetRegionID(Collider collider, List<int> target_region_ids)
+  {
+    int regionId = 0;
+    if (Object.op_Inequality((Object) collider, (Object) null))
+    {
+      RegionRoot componentInParent = ((Component) collider).gameObject.GetComponentInParent<RegionRoot>();
+      if (Object.op_Inequality((Object) componentInParent, (Object) null))
+      {
+        for (int index1 = componentInParent.regionIDArray.Length - 1; index1 >= 0; --index1)
+        {
+          int index2 = componentInParent.regionIDArray[index1];
+          if (index2 >= 0 && index2 < this.regionWorks.Length)
+          {
+            EnemyRegionWork regionWork = this.regionWorks[index2];
+            Enemy.RegionInfo regionInfo = this.regionInfos[index2];
+            while (!regionWork.enabled && regionWork.parentRegionID >= 0)
+            {
+              index2 = regionWork.parentRegionID;
+              regionWork = this.regionWorks[index2];
+              regionInfo = this.regionInfos[index2];
+            }
+            if (index1 == 0 || target_region_ids != null && target_region_ids.Contains(index2))
+            {
+              bool flag = false;
+              if ((int) regionWork.hp <= 0 && regionInfo.maxHP > 0)
+                flag = true;
+              if (regionInfo.breakAfterHit || !flag)
+              {
+                regionId = index2;
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+    return regionId;
+  }
+
+  public int GetEnabledCounterRegionIndex()
+  {
+    for (int counterRegionIndex = 0; counterRegionIndex < this.regionWorks.Length; ++counterRegionIndex)
+    {
+      EnemyRegionWork regionWork = this.regionWorks[counterRegionIndex];
+      if (regionWork != null)
+      {
+        Enemy.RegionInfo regionInfo = this.regionInfos[counterRegionIndex];
+        if (regionInfo != null && !regionWork.isBroke && regionInfo.counterInfo.enabled)
+          return counterRegionIndex;
+      }
+    }
+    return -1;
+  }
+
+  public EnemyRegionWork GetEnabledCounterRegion()
+  {
+    int counterRegionIndex = this.GetEnabledCounterRegionIndex();
+    return counterRegionIndex < 0 ? (EnemyRegionWork) null : this.regionWorks[counterRegionIndex];
+  }
+
+  public EnemyRegionWork SearchRegionWork(int regionId)
+  {
+    return regionId < 0 || regionId >= this.regionWorks.Length ? (EnemyRegionWork) null : this.regionWorks[regionId];
+  }
+
+  public int GetRegionID(string name)
+  {
+    int regionId = 0;
+    for (int length = this.regionInfos.Length; regionId < length; ++regionId)
+    {
+      if (this.regionInfos[regionId].name == name)
+        return regionId;
+    }
+    return 0;
+  }
+
+  public List<int> GetBreakRegionIDList()
+  {
+    List<int> breakRegionIdList = new List<int>();
+    breakRegionIdList.Add(0);
+    if (this.regionInfos == null)
+      return breakRegionIdList;
+    int index = 1;
+    for (int length = this.regionInfos.Length; index < length; ++index)
+    {
+      if (this.regionWorks[index].isBroke)
+        breakRegionIdList.Add(index);
+    }
+    return breakRegionIdList;
+  }
+
+  public void SetAttackInfos(AttackInfo[] attack_infos) => this.attackInfos = attack_infos;
+
+  protected void PlayRegionEffect(int region_id, string effect_name)
+  {
+    if (this.targetPoints == null)
+      return;
+    Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
+    Quaternion rotation = cameraTransform.rotation;
+    Vector3 position = cameraTransform.position;
+    int index = 0;
+    for (int length = this.targetPoints.Length; index < length; ++index)
+    {
+      TargetPoint targetPoint = this.targetPoints[index];
+      if (targetPoint.regionID == region_id && targetPoint.isTargetEnable)
+      {
+        Vector3 vector3_1 = Vector3.op_Addition(targetPoint._transform.position, Quaternion.op_Multiply(targetPoint._transform.rotation, targetPoint.scaledOffset));
+        Vector3 vector3_2 = Vector3.op_Subtraction(position, vector3_1);
+        Vector3 pos = Vector3.op_Addition(Vector3.op_Multiply(((Vector3) ref vector3_2).normalized, targetPoint.scaledMarkerZShift), vector3_1);
+        Quaternion rot = rotation;
+        EffectManager.OneShot(effect_name, pos, rot, true);
+      }
+    }
+  }
+
+  private void CreateDropItem(Vector3 pos, StageObject target, int rarity, bool is_region_break)
+  {
+    if (!(target is Self))
+      return;
+    DropObject.Create(rarity, is_region_break, pos);
+  }
+
+  private void CreateDropItemFromRegionBreak(
+    Enemy.RegionInfo region_info,
+    StageObject target,
+    int rarity)
+  {
+    if (region_info.breakDrop == null)
+      return;
+    Transform node = this.FindNode(region_info.breakDrop.dropNodeName);
+    if (Object.op_Equality((Object) node, (Object) null))
+      return;
+    this.CreateDropItem(node.position, target, rarity, true);
+  }
+
+  private void ShotRegionBreakBullet(Enemy.RegionInfo.BreakBullet[] bullets)
+  {
+    if (((IList<Enemy.RegionInfo.BreakBullet>) bullets).IsNullOrEmpty<Enemy.RegionInfo.BreakBullet>())
+      return;
+    int index = 0;
+    for (int length = bullets.Length; index < length; ++index)
+    {
+      Enemy.RegionInfo.BreakBullet bullet = bullets[index];
+      AnimEventData.EventData data = new AnimEventData.EventData();
+      if (!((IList<string>) bullet.stringArgs).IsNullOrEmpty<string>())
+      {
+        data.stringArgs = new string[bullet.stringArgs.Length];
+        bullet.stringArgs.CopyTo((Array) data.stringArgs, 0);
+      }
+      if (!((IList<float>) bullet.floatArgs).IsNullOrEmpty<float>())
+      {
+        data.floatArgs = new float[bullet.floatArgs.Length];
+        bullet.floatArgs.CopyTo((Array) data.floatArgs, 0);
+      }
+      if (!((IList<int>) bullet.intArgs).IsNullOrEmpty<int>())
+      {
+        data.intArgs = new int[bullet.intArgs.Length];
+        bullet.intArgs.CopyTo((Array) data.intArgs, 0);
+      }
+      this.EventShotGeneric(data);
+    }
+  }
+
+  private void CreateDamageNum(
+    Vector3 pos,
+    AtkAttribute damage,
+    bool buff,
+    bool isRegionOnly,
+    int addGroup = 0)
+  {
+    int num1 = addGroup;
+    if ((double) damage.normal != 0.0)
+      MonoBehaviourSingleton<UIDamageManager>.I.Create(pos, (int) damage.normal, buff ? UIDamageNum.DAMAGE_COLOR.BUFF : UIDamageNum.DAMAGE_COLOR.NONE, num1++, isRegionOnly: isRegionOnly);
+    float damage1 = damage.fire + damage.water + damage.thunder + damage.soil + damage.light + damage.dark;
+    if ((double) damage1 != 0.0)
+    {
+      UIDamageNum.DAMAGE_COLOR color = UIDamageNum.DAMAGE_COLOR.NONE;
+      switch (damage.GetElementType())
+      {
+        case ELEMENT_TYPE.FIRE:
+          color = UIDamageNum.DAMAGE_COLOR.FIRE;
+          if (this.IsActDown())
+          {
+            color = UIDamageNum.DAMAGE_COLOR.GOOD;
+            break;
+          }
+          break;
+        case ELEMENT_TYPE.WATER:
+          color = UIDamageNum.DAMAGE_COLOR.WATER;
+          if (this.IsActDown())
+          {
+            color = UIDamageNum.DAMAGE_COLOR.GOOD;
+            break;
+          }
+          break;
+        case ELEMENT_TYPE.THUNDER:
+          color = UIDamageNum.DAMAGE_COLOR.THUNDER;
+          if (this.IsActDown())
+          {
+            color = UIDamageNum.DAMAGE_COLOR.GOOD;
+            break;
+          }
+          break;
+        case ELEMENT_TYPE.SOIL:
+          color = UIDamageNum.DAMAGE_COLOR.SOIL;
+          if (this.IsActDown())
+          {
+            color = UIDamageNum.DAMAGE_COLOR.GOOD;
+            break;
+          }
+          break;
+        case ELEMENT_TYPE.LIGHT:
+          color = UIDamageNum.DAMAGE_COLOR.LIGHT;
+          if (this.IsActDown())
+          {
+            color = UIDamageNum.DAMAGE_COLOR.GOOD;
+            break;
+          }
+          break;
+        case ELEMENT_TYPE.DARK:
+          color = UIDamageNum.DAMAGE_COLOR.DARK;
+          if (this.IsActDown())
+          {
+            color = UIDamageNum.DAMAGE_COLOR.GOOD;
+            break;
+          }
+          break;
+      }
+      Enemy.EFFECTIVE_TYPE effectiveType = Enemy.GetEffectiveType(damage.GetElementType(), this.GetElementType());
+      int effective = 0;
+      if (effectiveType == Enemy.EFFECTIVE_TYPE.GOOD)
+        effective = 1;
+      else if (Enemy.EFFECTIVE_TYPE.BAD == effectiveType)
+        effective = -1;
+      MonoBehaviourSingleton<UIDamageManager>.I.Create(pos, (int) damage1, color, num1++, effective, isRegionOnly);
+    }
+    if (num1 != 0)
+      return;
+    UIDamageManager i = MonoBehaviourSingleton<UIDamageManager>.I;
+    Vector3 pos1 = pos;
+    int normal = (int) damage.normal;
+    int color1 = buff ? 1 : 0;
+    int groupOffset = num1;
+    int num2 = groupOffset + 1;
+    int num3 = isRegionOnly ? 1 : 0;
+    i.Create(pos1, normal, (UIDamageNum.DAMAGE_COLOR) color1, groupOffset, isRegionOnly: num3 != 0);
+  }
+
+  private void PlayRegionBreakEffect(Enemy.RegionInfo region_info)
+  {
+    Transform node = this.FindNode(region_info.breakEffect.nodeName);
+    if (Object.op_Equality((Object) node, (Object) null))
+      return;
+    Transform effect = EffectManager.GetEffect(region_info.breakEffect.effectName);
+    if (Object.op_Equality((Object) effect, (Object) null))
+      return;
+    Transform transform = ((Component) node).transform;
+    effect.position = transform.position;
+    effect.rotation = Quaternion.op_Multiply(transform.rotation, Quaternion.Euler(region_info.breakEffect.effectAngle));
+  }
+
+  public void UpdateRegionVisual()
+  {
+    int index1 = 0;
+    for (int length1 = this.regionWorks.Length; index1 < length1; ++index1)
+    {
+      EnemyRegionWork regionWork = this.regionWorks[index1];
+      if ((int) regionWork.hp <= 0)
+      {
+        foreach (string deactivateObject in this.regionInfos[index1].deactivateObjects)
+        {
+          Transform node = this.FindNode(deactivateObject);
+          if (Object.op_Inequality((Object) node, (Object) null))
+            ((Component) node).gameObject.SetActive(false);
+        }
+        int index2 = 0;
+        for (int length2 = this.regionWorks.Length; index2 < length2; ++index2)
+        {
+          if (this.regionWorks[index2].parentRegionID >= 0 && this.regionWorks[index2].parentRegionID == index1)
+            this.regionWorks[index2].enabled = true;
+        }
+      }
+      int index3 = 0;
+      while (index3 < regionWork.bleedWorkList.Count)
+      {
+        Enemy.BleedWork bleedWork = regionWork.bleedWorkList[index3];
+        bool flag = false;
+        int index4 = 0;
+        for (int count = regionWork.bleedList.Count; index4 < count; ++index4)
+        {
+          if (regionWork.bleedList[index4].ownerID == bleedWork.ownerID)
+          {
+            flag = true;
+            break;
+          }
+        }
+        if (flag)
+        {
+          ++index3;
+        }
+        else
+        {
+          if (Object.op_Inequality((Object) bleedWork.bleedEffect, (Object) null))
+          {
+            EffectManager.ReleaseEffect(((Component) bleedWork.bleedEffect).gameObject);
+            bleedWork.bleedEffect = (Transform) null;
+          }
+          regionWork.bleedWorkList.RemoveAt(index3);
+        }
+      }
+      if (regionWork.shadowSealingData.ownerID == 0 && regionWork.shadowSealingEffect != null)
+      {
+        EffectManager.ReleaseEffect(((Component) regionWork.shadowSealingEffect).gameObject, false, true);
+        regionWork.shadowSealingEffect = (Transform) null;
+      }
+      TargetPoint targetPoint = (TargetPoint) null;
+      int index5 = 0;
+      for (int length3 = this.targetPoints.Length; index5 < length3; ++index5)
+      {
+        if (this.targetPoints[index5].regionID == index1 && this.targetPoints[index5].isAimEnable)
+        {
+          targetPoint = this.targetPoints[index5];
+          break;
+        }
+      }
+      if (Object.op_Inequality((Object) targetPoint, (Object) null))
+      {
+        int index6 = 0;
+        for (int count1 = regionWork.bleedList.Count; index6 < count1; ++index6)
+        {
+          Enemy.BleedData bleed = regionWork.bleedList[index6];
+          bool flag = true;
+          if (!MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedOther.enable && !bleed.IsOwnerSelf())
+            flag = false;
+          if (flag)
+          {
+            Enemy.BleedWork bleedWork = (Enemy.BleedWork) null;
+            int num = 1;
+            int index7 = 0;
+            int index8 = 0;
+            for (int count2 = regionWork.bleedWorkList.Count; index8 < count2; ++index8)
+            {
+              if (regionWork.bleedWorkList[index8].ownerID == bleed.ownerID)
+              {
+                bleedWork = regionWork.bleedWorkList[index8];
+                break;
+              }
+              if (num == regionWork.bleedWorkList[index8].showIndex)
+              {
+                ++num;
+                index7 = index8 + 1;
+              }
+            }
+            if (bleedWork == null)
+            {
+              bleedWork = new Enemy.BleedWork();
+              if (bleed.IsOwnerSelf())
+              {
+                regionWork.bleedWorkList.Insert(0, bleedWork);
+                bleedWork.showIndex = 0;
+              }
+              else
+              {
+                regionWork.bleedWorkList.Insert(index7, bleedWork);
+                bleedWork.showIndex = num;
+              }
+              bleedWork.ownerID = bleed.ownerID;
+            }
+            if (Object.op_Equality((Object) bleedWork.bleedEffect, (Object) null))
+            {
+              string effect_name = MonoBehaviourSingleton<InGameSettingsManager>.I.player.specialActionInfo.arrowBleedEffectName;
+              if (bleedWork.showIndex != 0)
+                effect_name = MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.arrowBleedOtherEffectName;
+              bleedWork.bleedEffect = targetPoint.PlayArrowBleedEffect(effect_name, bleedWork.showIndex);
+            }
+          }
+        }
+        if (regionWork.shadowSealingData.ownerID != 0 && regionWork.shadowSealingEffect == null)
+          regionWork.shadowSealingEffect = targetPoint.PlayArrowBleedEffect(MonoBehaviourSingleton<GlobalSettingsManager>.I.linkResources.shadowSealingEffectName, 0);
+      }
+    }
+    this.InitializeBarrierEffect();
+    this.UpdateBreakIDLists();
+  }
+
+  private void InitializeBarrierEffect()
+  {
+    List<AnimEventData.EventData> eventDataList = this.animEventProcessor.ListUpEventData(AnimEventFormat.ID.EFFECT_LOOP_CUSTOM);
+    if (eventDataList == null || eventDataList.Count <= 0)
+      return;
+    foreach (AnimEventData.EventData data in eventDataList)
+    {
+      if (this.IsValidBarrier)
+        this.EventEffectLoopCustom(data);
+    }
+  }
+
+  public void ReviveRegion(int region_id)
+  {
+    if (region_id < 0 || region_id >= this.regionInfos.Length)
+      return;
+    EnemyRegionWork regionWork = this.regionWorks[region_id];
+    Enemy.RegionInfo regionInfo = this.regionInfos[region_id];
+    if (regionWork == null)
+      return;
+    regionWork.hp = (XorInt) regionInfo.maxHP;
+    foreach (string deactivateObject in regionInfo.deactivateObjects)
+    {
+      Transform node = this.FindNode(deactivateObject);
+      if (Object.op_Inequality((Object) node, (Object) null))
+        ((Component) node).gameObject.SetActive(true);
+    }
+    int index = 0;
+    for (int length = this.regionWorks.Length; index < length; ++index)
+      this.regionWorks[index].OnReviveRegion(region_id);
+    EnemyController controller = this.controller as EnemyController;
+    if (Object.op_Inequality((Object) controller, (Object) null))
+      controller.OnReviveRegion(region_id);
+    this.reviveRegionWaitSync = false;
+    if (Object.op_Inequality((Object) this.enemySender, (Object) null))
+      this.enemySender.OnReviveRegion(region_id);
+    if (!MonoBehaviourSingleton<TargetMarkerManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<TargetMarkerManager>.I.updateShadowSealingFlag = true;
+  }
+
+  public bool IsEnableReviveRegion(int region_id)
+  {
+    if (region_id < 0 || region_id >= this.regionInfos.Length)
+    {
+      Log.Error("RegionId is out of range!!");
+      return false;
+    }
+    EnemyRegionWork regionWork = this.regionWorks[region_id];
+    Enemy.RegionInfo regionInfo = this.regionInfos[region_id];
+    return regionInfo != null && regionWork != null && regionInfo.enableRevive && (int) regionWork.hp <= 0 && regionInfo.maxHP > 0 && (double) Time.time - (double) regionWork.breakTime >= (double) regionInfo.reviveIntervalTime;
+  }
+
+  public void ActivateRegionNode(int[] regionIDs, bool isRandom = false, int randomSelectedID = -1)
+  {
+    if (((IList<int>) regionIDs).IsNullOrEmpty<int>() || ((IList<RegionRoot>) this.regionRoots).IsNullOrEmpty<RegionRoot>())
+      return;
+    for (int index1 = 0; index1 < regionIDs.Length; ++index1)
+    {
+      int regionId = regionIDs[index1];
+      for (int index2 = 0; index2 < this.regionRoots.Length; ++index2)
+      {
+        if (this.regionRoots[index2].regionID == regionId)
+        {
+          if (!isRandom)
+            ((Component) this.regionRoots[index2]).gameObject.SetActive(true);
+          else if (this.regionRoots[index2].regionID != randomSelectedID)
+          {
+            ((Component) this.regionRoots[index2]).gameObject.SetActive(false);
+          }
+          else
+          {
+            ((Component) this.regionRoots[index2]).gameObject.SetActive(true);
+            Enemy.RegionInfo regionInfo = this.regionInfos[randomSelectedID];
+            if (regionInfo != null && regionInfo.modeChangeInfo.enabled)
+            {
+              EnemyBrain brain = this.controller.brain as EnemyBrain;
+              if (!Object.op_Equality((Object) brain, (Object) null))
+              {
+                EnemyActionController actionCtrl = brain.actionCtrl;
+                if (actionCtrl != null)
+                  actionCtrl.modeId = regionInfo.modeChangeInfo.modeID;
+              }
+            }
+          }
+        }
+      }
+    }
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.OnEnemyRegionNodeActivate(regionIDs, isRandom, randomSelectedID);
+  }
+
+  public bool IsBleedFromSelf(int region_id)
+  {
+    if (region_id < 0 || region_id >= this.regionWorks.Length)
+    {
+      Log.Error("RegionId is out of range!!");
+      return false;
+    }
+    EnemyRegionWork regionWork = this.regionWorks[region_id];
+    if (regionWork == null)
+      return false;
+    int index = 0;
+    for (int count = regionWork.bleedList.Count; index < count; ++index)
+    {
+      if (regionWork.bleedList[index].IsOwnerSelf())
+        return true;
+    }
+    return false;
+  }
+
+  public bool IsMaxLvBleedFromSelf(int region_id)
+  {
+    if (region_id < 0 || region_id >= this.regionWorks.Length)
+    {
+      Log.Error("RegionId is out of range!!");
+      return false;
+    }
+    EnemyRegionWork regionWork = this.regionWorks[region_id];
+    if (regionWork == null)
+      return false;
+    int index = 0;
+    for (int count = regionWork.bleedList.Count; index < count; ++index)
+    {
+      if (regionWork.bleedList[index].IsOwnerSelf())
+        return regionWork.bleedList[index].IsMaxLv();
+    }
+    return false;
+  }
+
+  public bool IsShadowSealingStuck(int regionId)
+  {
+    if (this.IsDebuffShadowSealing())
+      return true;
+    if (regionId < 0 || regionId >= this.regionWorks.Length)
+    {
+      Log.Error("RegionId is out of range!!");
+      return false;
+    }
+    EnemyRegionWork regionWork = this.regionWorks[regionId];
+    return regionWork != null && regionWork.shadowSealingData.ownerID != 0;
+  }
+
+  public void SetHitShock(Vector3 vec)
+  {
+    if (this.canHitShockEffect)
+      this.hitShockOffsetFlag = true;
+    this.hitShockLightTime = 0.0f;
+    this.hitShockOffsetTime = 0.0f;
+    this.hitShockVec = vec;
+    this.hitShockVec.y = 0.0f;
+    ((Vector3) ref this.hitShockVec).Normalize();
+  }
+
+  public void SetHitLight() => this.hitShockLightFlag = true;
+
+  public override string EffectNameAnalyzer(string effect_name)
+  {
+    if (!string.IsNullOrEmpty(effect_name) && this.enemyTableData != null && !string.IsNullOrEmpty(this.enemyTableData.effectEnemyKey))
+      effect_name = effect_name.Replace("[ENEMY_KEY]", this.enemyTableData.effectEnemyKey);
+    return effect_name;
+  }
+
+  private void EventReviveRegion(AnimEventData.EventData data)
+  {
+    int intArg = data.intArgs[0];
+    if (intArg < 0 || intArg >= this.regionInfos.Length)
+      Log.Error("Out of region index !! id:" + (object) intArg);
+    else if (this.IsCoopNone() || this.IsOriginal())
+    {
+      if (!this.IsEnableReviveRegion(intArg))
+        return;
+      this.ReviveRegion(intArg);
+    }
+    else
+    {
+      if (this.reviveRegionWaitSync)
+        return;
+      this.reviveRegionWaitSync = true;
+    }
+  }
+
+  private void EventDashStart(AnimEventData.EventData data)
+  {
+    if (this.enableDash)
+      return;
+    string stringArg = data.stringArgs.Length != 0 ? data.stringArgs[0] : (string) null;
+    float num1 = data.floatArgs.Length != 0 ? data.floatArgs[0] : 0.0f;
+    float num2 = data.floatArgs.Length > 1 ? data.floatArgs[1] : 0.0f;
+    this.wallStayTimer = 0.0f;
+    this.enableDash = true;
+    this.dashBeforePos = this._position;
+    this.dashNowDistance = 0.0f;
+    this.dashOverDistance = num1;
+    this.dashMinDistance = num2;
+    this.dashOverFlag = false;
+    this.dashOverCheckDistance = 0.0f;
+    this.dashEndTrigger = !string.IsNullOrEmpty(stringArg) ? stringArg : "next";
+    this.rotateSafeMode = true;
+    this.dashMaxDistance = 0.0f;
+    if (this.actionPositionFlag)
+    {
+      Vector3 vector3 = Vector3.op_Subtraction(this.actionPosition, this._position);
+      vector3.y = 0.0f;
+      this.dashMaxDistance = ((Vector3) ref vector3).magnitude;
+    }
+    if ((double) this.dashMaxDistance < (double) this.dashMinDistance)
+      this.dashMaxDistance = this.dashMinDistance;
+    this.dashMaxDistance *= this.enemyParameter.dashMaxDistanceRate;
+  }
+
+  private void EventWarpViewStart(AnimEventData.EventData data)
+  {
+    float floatArg = data.floatArgs[0];
+    if ((double) floatArg <= 0.0)
+    {
+      this.warpViewFlag = false;
+      this.warpViewRate = 1f;
+      this.warpViewRatePerTime = 0.0f;
+      this.SetWarpVisible(this.warpViewRate);
+    }
+    else
+    {
+      this.warpViewFlag = true;
+      this.warpViewRatePerTime = (1f - this.warpViewRate) / floatArg;
+    }
+  }
+
+  private void EventWarpViewEnd(AnimEventData.EventData data)
+  {
+    float floatArg = data.floatArgs[0];
+    if ((double) floatArg <= 0.0)
+    {
+      this.warpViewFlag = false;
+      this.warpViewRate = 0.0f;
+      this.warpViewRatePerTime = 0.0f;
+      this.SetWarpVisible(this.warpViewRate);
+    }
+    else
+    {
+      this.warpViewFlag = true;
+      this.warpViewRatePerTime = -this.warpViewRate / floatArg;
+    }
+  }
+
+  private void EventWarpToTarget(AnimEventData.EventData data)
+  {
+    this.SetWarpToTarget(data.floatArgs[0]);
+  }
+
+  private void EventWarpToReverseTarget(AnimEventData.EventData data)
+  {
+    this.SetWarpToTarget(data.floatArgs[0], true);
+  }
+
+  private void EventWarpToRandom(AnimEventData.EventData data)
+  {
+    this.SetWarpToRandom(data.floatArgs[0], data.floatArgs.Length > 1 ? data.floatArgs[1] : 0.0f);
+  }
+
+  private void EventRadialBlurStart(AnimEventData.EventData data)
+  {
+    if (MonoBehaviourSingleton<GlobalSettingsManager>.I.noBlurEffectForDeviceModel.Any<string>((Func<string, bool>) (model => SystemInfo.deviceModel.ContainIgnoreCase(model))))
+    {
+      Log.Error("{0} is not allow to do blur effect", (object) SystemInfo.deviceModel);
+    }
+    else
+    {
+      float floatArg1 = data.floatArgs[0];
+      float floatArg2 = data.floatArgs[1];
+      string stringArg = data.stringArgs[0];
+      bool flag = data.intArgs[0] != 0;
+      Transform node = this.FindNode(stringArg);
+      if (Object.op_Equality((Object) node, (Object) null))
+      {
+        Log.Error("Not found node for RadialBlur!! " + stringArg);
+      }
+      else
+      {
+        if (flag)
+        {
+          if (MonoBehaviourSingleton<GlobalSettingsManager>.I.noBlurEffectBossId.Contains(this.enemyID) && MonoBehaviourSingleton<GlobalSettingsManager>.I.noBlurEffectEventId.Contains(Utility.GetCurrentEventID()))
+            return;
+          MonoBehaviourSingleton<InGameCameraManager>.I.StartRadialBlurFilter(floatArg1, floatArg2, node);
+        }
+        else
+          MonoBehaviourSingleton<InGameCameraManager>.I.StartRadialBlurFilter(floatArg1, floatArg2, node.position);
+        this.radialBlurEnable = true;
+      }
+    }
+  }
+
+  private void EventRadialBlurChange(AnimEventData.EventData data)
+  {
+    float floatArg1 = data.floatArgs[0];
+    float floatArg2 = data.floatArgs[1];
+    if ((double) floatArg2 <= 0.0)
+    {
+      MonoBehaviourSingleton<InGameCameraManager>.I.EndRadialBlurFilter(floatArg1);
+      this.radialBlurEnable = false;
+    }
+    else
+      MonoBehaviourSingleton<InGameCameraManager>.I.ChangeRadialBlurFilter(floatArg1, floatArg2);
+  }
+
+  private void EventRadialBlurEnd(AnimEventData.EventData data)
+  {
+    MonoBehaviourSingleton<InGameCameraManager>.I.EndRadialBlurFilter(data.floatArgs[0]);
+    this.radialBlurEnable = false;
+  }
+
+  private void EventShotTarget(AnimEventData.EventData data)
+  {
+    AttackInfo attackInfo = this.FindAttackInfo(data.stringArgs[0]);
+    if (attackInfo == null)
+    {
+      Log.Error("Not found AttackInfo !! " + data.stringArgs[0]);
+    }
+    else
+    {
+      Transform node = this.FindNode(data.stringArgs[1]);
+      if (Object.op_Equality((Object) node, (Object) null))
+      {
+        Log.Error("Not found node for ShotTarget!! " + data.stringArgs[1]);
+      }
+      else
+      {
+        Vector3 vector3;
+        // ISSUE: explicit constructor call
+        ((Vector3) ref vector3).\u002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+        Matrix4x4 localToWorldMatrix = node.localToWorldMatrix;
+        Vector3 pos = ((Matrix4x4) ref localToWorldMatrix).MultiplyPoint3x4(vector3);
+        switch (data.intArgs[0])
+        {
+          case 0:
+            List<StageObject> playerList = MonoBehaviourSingleton<StageObjectManager>.I.playerList;
+            if (playerList.IsNullOrEmpty<StageObject>())
+              break;
+            int index1 = 0;
+            for (int count = playerList.Count; index1 < count; ++index1)
+            {
+              Player player = playerList[index1] as Player;
+              if (!Object.op_Equality((Object) player, (Object) null) && !player.isDead)
+              {
+                Vector3 position = player._position;
+                ++position.y;
+                Quaternion rot = Quaternion.LookRotation(Vector3.op_Subtraction(position, pos));
+                AnimEventShot.Create((StageObject) this, attackInfo, pos, rot).SetTarget((StageObject) player);
+              }
+            }
+            break;
+          case 1:
+            int intArg1 = data.intArgs[1];
+            if (this.IsOriginal() || this.IsCoopNone())
+            {
+              List<Enemy.RandomShotInfo.TargetInfo> targets = new List<Enemy.RandomShotInfo.TargetInfo>(intArg1);
+              List<Player> alivePlayerList = MonoBehaviourSingleton<StageObjectManager>.I.GetAlivePlayerList();
+              int count = alivePlayerList.Count;
+              for (int index2 = 0; index2 < intArg1; ++index2)
+              {
+                int index3 = Random.Range(0, count);
+                Player player = alivePlayerList[index3];
+                if (Object.op_Equality((Object) player, (Object) null))
+                {
+                  targets.Add(new Enemy.RandomShotInfo.TargetInfo(node.rotation, -1));
+                }
+                else
+                {
+                  Vector3 position = player._position;
+                  ++position.y;
+                  Quaternion rot = Quaternion.LookRotation(Vector3.op_Subtraction(position, pos));
+                  targets.Add(new Enemy.RandomShotInfo.TargetInfo(rot, player.id));
+                }
+              }
+              this.TargetRandamShotEvent(targets);
+            }
+            this.SetRandomShotInfoForShotTarget(intArg1, pos, attackInfo, data);
+            break;
+          case 2:
+            int intArg2 = data.intArgs[1];
+            if (this.IsOriginal() || this.IsCoopNone())
+            {
+              List<Enemy.RandomShotInfo.TargetInfo> targets = new List<Enemy.RandomShotInfo.TargetInfo>(intArg2);
+              float floatArg1 = data.floatArgs[4];
+              float floatArg2 = data.floatArgs[5];
+              for (int index4 = 0; index4 < intArg2; ++index4)
+              {
+                Quaternion rot = Quaternion.op_Multiply(Quaternion.Euler(new Vector3(Random.Range(-floatArg1, floatArg1), Random.Range(-floatArg2, floatArg2), 0.0f)), node.rotation);
+                targets.Add(new Enemy.RandomShotInfo.TargetInfo(rot, -1));
+              }
+              this.TargetRandamShotEvent(targets);
+            }
+            this.SetRandomShotInfoForShotTarget(intArg2, pos, attackInfo, data);
+            break;
+        }
+      }
+    }
+  }
+
+  private void SetRandomShotInfoForShotTarget(
+    int numBullet,
+    Vector3 pos,
+    AttackInfo info,
+    AnimEventData.EventData data)
+  {
+    bool flag = false;
+    Enemy.RandomShotInfo randomShotInfo;
+    if (this.shotNetworkInfoQueue.Count > 0)
+    {
+      randomShotInfo = this.shotNetworkInfoQueue[0];
+      this.shotNetworkInfoQueue.Remove(randomShotInfo);
+      flag = true;
+    }
+    else
+      randomShotInfo = new Enemy.RandomShotInfo();
+    randomShotInfo.atkInfo = info;
+    for (int index = 0; index < numBullet; ++index)
+      randomShotInfo.points[index] = pos;
+    randomShotInfo.shotCount = 0;
+    randomShotInfo.countTime = 0.0f;
+    randomShotInfo.interval = data.floatArgs[3];
+    if (flag)
+      this.randomShotInfo.Add(randomShotInfo);
+    else
+      this.shotEventInfoQueue.Add(randomShotInfo);
+  }
+
+  private void EventShotPoint(AnimEventData.EventData data)
+  {
+    AttackInfo attackInfo = this.FindAttackInfo(data.stringArgs[0]);
+    if (attackInfo == null)
+    {
+      Log.Error("Not found AttackInfo !! " + data.stringArgs[0]);
+    }
+    else
+    {
+      bool isFixedY = data.intArgs.Length > 2;
+      Vector3 vector3;
+      // ISSUE: explicit constructor call
+      ((Vector3) ref vector3).\u002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+      switch (data.intArgs[0])
+      {
+        case 0:
+          List<StageObject> playerList = MonoBehaviourSingleton<StageObjectManager>.I.playerList;
+          if (playerList.IsNullOrEmpty<StageObject>())
+            break;
+          int index1 = 0;
+          for (int count = playerList.Count; index1 < count; ++index1)
+          {
+            Player player = playerList[index1] as Player;
+            if (!Object.op_Equality((Object) player, (Object) null) && !player.isDead)
+            {
+              Matrix4x4 localToWorldMatrix = player._transform.localToWorldMatrix;
+              Vector3 pos = ((Matrix4x4) ref localToWorldMatrix).MultiplyPoint3x4(vector3);
+              if (isFixedY && data.intArgs[2] != 0)
+                pos.y = data.floatArgs[1];
+              Quaternion rot = Quaternion.op_Multiply(this._rotation, Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5])));
+              AnimEventShot.Create((StageObject) this, attackInfo, pos, rot).SetTarget((StageObject) player);
+            }
+          }
+          break;
+        case 1:
+          int num1 = Mathf.Max(1, data.intArgs[1]);
+          if (this.IsOriginal() || this.IsCoopNone())
+          {
+            List<Vector3> points = new List<Vector3>(num1);
+            List<Player> alivePlayerList = MonoBehaviourSingleton<StageObjectManager>.I.GetAlivePlayerList();
+            int count = alivePlayerList.Count;
+            for (int index2 = 0; index2 < num1; ++index2)
+            {
+              int index3 = Random.Range(0, count);
+              Player player = alivePlayerList[index3];
+              if (!Object.op_Equality((Object) player, (Object) null))
+              {
+                Matrix4x4 localToWorldMatrix = player._transform.localToWorldMatrix;
+                Vector3 shotPoint = this.CreateShotPoint(((Matrix4x4) ref localToWorldMatrix).MultiplyPoint3x4(vector3), player._transform, isFixedY, data);
+                points.Add(shotPoint);
+              }
+            }
+            this.PointRandamShotEvent(points);
+          }
+          this.SetRandomShotInfo(num1, attackInfo, data);
+          break;
+        case 3:
+          int num2 = Mathf.Max(1, data.intArgs[1]);
+          if (this.IsOriginal() || this.IsCoopNone())
+          {
+            List<Vector3> points = new List<Vector3>(num2);
+            for (int index4 = 0; index4 < num2; ++index4)
+            {
+              if (!Object.op_Equality((Object) this.actionTarget, (Object) null))
+              {
+                Matrix4x4 localToWorldMatrix = this.actionTarget._transform.localToWorldMatrix;
+                Vector3 shotPoint = this.CreateShotPoint(((Matrix4x4) ref localToWorldMatrix).MultiplyPoint3x4(vector3), this.actionTarget._transform, isFixedY, data);
+                points.Add(shotPoint);
+              }
+            }
+            this.PointRandamShotEvent(points);
+          }
+          this.SetRandomShotInfo(num2, attackInfo, data);
+          break;
+      }
+    }
+  }
+
+  private Vector3 CreateShotPoint(
+    Vector3 pos,
+    Transform targetTrans,
+    bool isFixedY,
+    AnimEventData.EventData data)
+  {
+    if (isFixedY && data.intArgs[2] != 0)
+      pos.y = data.floatArgs[1];
+    Quaternion quaternion = Quaternion.Euler(new Vector3(0.0f, (float) Random.Range(-180, 180), 0.0f));
+    pos = Vector3.op_Addition(pos, Vector3.op_Multiply(Quaternion.op_Multiply(quaternion, targetTrans.forward), Random.Range(0.0f, data.floatArgs[8])));
+    pos = Vector3.op_Addition(pos, Vector3.op_Multiply(targetTrans.up, Random.Range(-data.floatArgs[7], data.floatArgs[7])));
+    return pos;
+  }
+
+  private void SetRandomShotInfo(int numBullet, AttackInfo info, AnimEventData.EventData data)
+  {
+    Quaternion rot = Quaternion.op_Multiply(this._rotation, Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5])));
+    bool flag = false;
+    Enemy.RandomShotInfo randomShotInfo;
+    if (this.shotNetworkInfoQueue.Count > 0)
+    {
+      randomShotInfo = this.shotNetworkInfoQueue[0];
+      this.shotNetworkInfoQueue.Remove(randomShotInfo);
+      flag = true;
+    }
+    else
+      randomShotInfo = new Enemy.RandomShotInfo();
+    randomShotInfo.targets = new List<Enemy.RandomShotInfo.TargetInfo>(numBullet);
+    randomShotInfo.atkInfo = info;
+    for (int index = 0; index < numBullet; ++index)
+      randomShotInfo.targets.Add(new Enemy.RandomShotInfo.TargetInfo(rot, -1));
+    randomShotInfo.shotCount = 0;
+    randomShotInfo.countTime = 0.0f;
+    randomShotInfo.interval = data.floatArgs[6];
+    if (flag)
+      this.randomShotInfo.Add(randomShotInfo);
+    else
+      this.shotEventInfoQueue.Add(randomShotInfo);
+  }
+
+  private void EventShotWorldPoint(AnimEventData.EventData data)
+  {
+    AttackInfo attackInfo = this.FindAttackInfo(data.stringArgs[0]);
+    if (attackInfo == null)
+      return;
+    Vector3 pos;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref pos).\u002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+    Quaternion rot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
+    AnimEventShot.Create((StageObject) this, attackInfo, pos, rot);
+  }
+
+  private void EventWeakPointON(AnimEventData.EventData data)
+  {
+    if (!this.CanSetWeakPoint())
+      return;
+    int intArg = data.intArgs[0];
+    if (intArg < 0 || intArg >= this.regionInfos.Length)
+    {
+      Log.Error("Region Index is out of range!! ");
+    }
+    else
+    {
+      int weakType = -1;
+      if (data.intArgs.Length > 1)
+        weakType = data.intArgs[1];
+      int validElement = -1;
+      if (data.intArgs.Length > 2)
+        validElement = data.intArgs[2];
+      float displayTime = 0.0f;
+      if (data.floatArgs.Length != 0)
+        displayTime = data.floatArgs[0];
+      string deleteAttackName = "";
+      if (data.stringArgs.Length > 1)
+        deleteAttackName = data.stringArgs[1];
+      if (this.regionWorks[intArg].IsValidDisplayTimer)
+        return;
+      this.regionWorks[intArg].SetupWeakPoint(weakType, data.attackMode, displayTime, deleteAttackName, validElement);
+    }
+  }
+
+  private void EventWeakPointOFF(AnimEventData.EventData data)
+  {
+    int intArg = data.intArgs[0];
+    if (intArg < 0 || intArg >= this.regionInfos.Length)
+    {
+      Log.Error("Region Index is out of range!! ");
+    }
+    else
+    {
+      EnemyRegionWork regionWork = this.regionWorks[intArg];
+      if (regionWork.IsValidDisplayTimer)
+        return;
+      regionWork.weakState = Enemy.WEAK_STATE.NONE;
+    }
+  }
+
+  private void EventWeakPointAllON(AnimEventData.EventData data)
+  {
+    if (!this.CanSetWeakPoint())
+      return;
+    int length = this.regionWorks.Length;
+    for (int index = 0; index < length; ++index)
+    {
+      if (!this.regionWorks[index].IsValidDisplayTimer)
+        this.regionWorks[index].SetupWeakPoint(data.intArgs[0], data.attackMode);
+    }
+  }
+
+  private void EventWeakPointAllOFF(AnimEventData.EventData data)
+  {
+    int index = 0;
+    for (int length = this.regionWorks.Length; index < length; ++index)
+    {
+      if (!this.regionWorks[index].IsValidDisplayTimer)
+        this.regionWorks[index].weakState = Enemy.WEAK_STATE.NONE;
+    }
+  }
+
+  private bool CanSetWeakPoint() => !this.IsActBind() && !this.IsActConcussion();
+
+  private void EventHideBaseEffectON(AnimEventData.EventData data)
+  {
+    this.SetBaseEffecActivateFlag(false);
+  }
+
+  private void EventHideBaseEffectOFF(AnimEventData.EventData data)
+  {
+    this.SetBaseEffecActivateFlag(true);
+  }
+
+  protected override void EventNWayLaserAttack(AnimEventData.EventData data)
+  {
+    string stringArg1 = data.stringArgs[0];
+    string stringArg2 = data.stringArgs[1];
+    int intArg = data.intArgs[0];
+    Transform parentTrans = Utility.Find(this._transform, stringArg2);
+    if (Object.op_Equality((Object) parentTrans, (Object) null))
+    {
+      Log.Error("Not found node!! name:" + stringArg2);
+    }
+    else
+    {
+      AttackInfo attackInfo = this.FindAttackInfo(stringArg1);
+      if (attackInfo == null)
+      {
+        Log.Error("Not found AttackInfo!! name:" + stringArg1);
+      }
+      else
+      {
+        BulletData bulletData = attackInfo.bulletData;
+        if (Object.op_Equality((Object) bulletData, (Object) null) || bulletData.dataLaser == null)
+        {
+          Log.Error("Not found BulletData!! atkInfoName:" + stringArg1);
+        }
+        else
+        {
+          AttackNWayLaser attackNwayLaser = new GameObject("AttackNWayLaser").AddComponent<AttackNWayLaser>();
+          attackNwayLaser.Initialize((StageObject) this, parentTrans, attackInfo, intArg);
+          this.m_activeAttackLaserList.Add(attackNwayLaser);
+        }
+      }
+    }
+  }
+
+  private void EventObstacleNodeLinkAttack(AnimEventData.EventData data)
+  {
+    string stringArg1 = data.stringArgs[0];
+    string stringArg2 = data.stringArgs[1];
+    Transform parentTrans = Utility.Find(this._transform, stringArg2);
+    if (Object.op_Equality((Object) parentTrans, (Object) null))
+    {
+      Log.Error("Not found node!! name:" + stringArg2);
+    }
+    else
+    {
+      if (!((Component) parentTrans).gameObject.activeSelf)
+        return;
+      AttackInfo attackInfo = this.FindAttackInfo(stringArg1);
+      if (attackInfo == null)
+      {
+        Log.Error("Not found AttackInfo!! name:" + stringArg1);
+      }
+      else
+      {
+        AnimEventShot childEventShot = (AnimEventShot) null;
+        Vector3 offset;
+        // ISSUE: explicit constructor call
+        ((Vector3) ref offset).\u002Ector(0.0f, 0.0f, 0.0f);
+        if (data.intArgs.Length > 1 && data.intArgs[1] != 0)
+        {
+          if (Object.op_Inequality((Object) this.actionTarget, (Object) null))
+          {
+            Vector3 vector3;
+            // ISSUE: explicit constructor call
+            ((Vector3) ref vector3).\u002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+            Quaternion rot = Quaternion.op_Multiply(this._rotation, Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5])));
+            Matrix4x4 localToWorldMatrix = this.actionTarget._transform.localToWorldMatrix;
+            Vector3 pos = ((Matrix4x4) ref localToWorldMatrix).MultiplyPoint3x4(vector3);
+            childEventShot = AnimEventShot.Create((StageObject) this, attackInfo, pos, rot);
+          }
+          else
+            offset.z += 2f;
+        }
+        if (Object.op_Equality((Object) childEventShot, (Object) null))
+          childEventShot = AnimEventShot.Create((StageObject) this, data, attackInfo, offset);
+        AttackShotNodeLink attackShotNodeLink = new GameObject("AttackObstacleNodeLink").AddComponent<AttackShotNodeLink>();
+        attackShotNodeLink.Initialize((StageObject) this, parentTrans, data, attackInfo, childEventShot);
+        this.m_activeAttackObstacleList.Add(attackShotNodeLink);
+      }
+    }
+  }
+
+  private void EventFunnelAttack(AnimEventData.EventData data)
+  {
+    string stringArg1 = data.stringArgs[0];
+    string stringArg2 = data.stringArgs[1];
+    Transform launchTrans = this.FindNode(stringArg2);
+    if (Object.op_Equality((Object) launchTrans, (Object) null))
+    {
+      Log.Error("Not found transform for launch!! name:" + stringArg2);
+    }
+    else
+    {
+      AttackInfo atkInfo = this.FindAttackInfo(stringArg1);
+      if (atkInfo == null)
+      {
+        Log.Error("Not found AttackInfo!! name:" + stringArg1);
+      }
+      else
+      {
+        BulletData bulletData = atkInfo.bulletData;
+        if (Object.op_Equality((Object) bulletData, (Object) null) || bulletData.dataFunnel == null)
+        {
+          Log.Error("Not found BulletData!! atkInfoName:" + stringArg1);
+        }
+        else
+        {
+          Vector3 offsetPos = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+          Quaternion offsetRot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
+          MonoBehaviourSingleton<StageObjectManager>.I.GetAlivePlayerList().ForEach((Action<Player>) (targetChar =>
+          {
+            AttackFunnelBit attackFunnelBit = new GameObject("AttackFunnelBit").AddComponent<AttackFunnelBit>();
+            attackFunnelBit.Initialize((StageObject) this, atkInfo, (StageObject) targetChar, launchTrans, offsetPos, offsetRot);
+            this.m_activeAttackFunnelList.Add(attackFunnelBit);
+          }));
+        }
+      }
+    }
+  }
+
+  private void EventUndeadAttack(AnimEventData.EventData data)
+  {
+    string stringArg1 = data.stringArgs[0];
+    string stringArg2 = data.stringArgs[1];
+    Transform launchTrans = this.FindNode(stringArg2);
+    if (Object.op_Equality((Object) launchTrans, (Object) null))
+    {
+      Log.Error("Not found transform for launch!! name:" + stringArg2);
+    }
+    else
+    {
+      AttackInfo atkInfo = this.FindAttackInfo(stringArg1);
+      if (atkInfo == null)
+      {
+        Log.Error("Not found AttackInfo!! name:" + stringArg1);
+      }
+      else
+      {
+        BulletData bulletData = atkInfo.bulletData;
+        if (Object.op_Equality((Object) bulletData, (Object) null) || bulletData.dataUndead == null)
+        {
+          Log.Error("Not found BulletData!! atkInfoName:" + stringArg1);
+        }
+        else
+        {
+          Vector3 offsetPos = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+          Quaternion offsetRot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
+          MonoBehaviourSingleton<StageObjectManager>.I.GetAlivePlayerList().ForEach((Action<Player>) (targetChar => new GameObject("AttackUndead").AddComponent<AttackUndead>().Initialize((StageObject) this, atkInfo, (StageObject) targetChar, launchTrans, offsetPos, offsetRot)));
+        }
+      }
+    }
+  }
+
+  private void EventDigAttack(AnimEventData.EventData data)
+  {
+    string stringArg1 = data.stringArgs[0];
+    string stringArg2 = data.stringArgs[1];
+    Transform launchTrans = this.FindNode(stringArg2);
+    if (Object.op_Equality((Object) launchTrans, (Object) null))
+    {
+      Log.Error("Not found transform for launch!! name:" + stringArg2);
+    }
+    else
+    {
+      AttackInfo atkInfo = this.FindAttackInfo(stringArg1);
+      if (atkInfo == null)
+      {
+        Log.Error("Not found AttackInfo!! name:" + stringArg1);
+      }
+      else
+      {
+        BulletData bulletData = atkInfo.bulletData;
+        if (Object.op_Equality((Object) bulletData, (Object) null) || bulletData.dataDig == null)
+        {
+          Log.Error("Not found BulletData!! atkInfoName:" + stringArg1);
+        }
+        else
+        {
+          Vector3 offsetPos = new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+          Quaternion offsetRot = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
+          MonoBehaviourSingleton<StageObjectManager>.I.playerList.ForEach((Action<StageObject>) (targetChar =>
+          {
+            AttackDig attackDig = new GameObject("AttackDig").AddComponent<AttackDig>();
+            attackDig.Initialize((StageObject) this, atkInfo, targetChar, launchTrans, offsetPos, offsetRot);
+            this.m_activeAttackDigList.Add(attackDig);
+          }));
+        }
+      }
+    }
+  }
+
+  private void EventCancelAction(AnimEventData.EventData data)
+  {
+    if (!this.IsCoopNone() && !this.IsOriginal() || this.isDead)
+      return;
+    Enemy.CANCEL_CONDITION intArg = (Enemy.CANCEL_CONDITION) data.intArgs[0];
+    if (intArg == Enemy.CANCEL_CONDITION.NONE)
+      return;
+    float floatArg = data.floatArgs[0];
+    bool flag = false;
+    if (intArg == Enemy.CANCEL_CONDITION.FAILED_GRAB)
+    {
+      EnemyBrain brain = this.controller.brain as EnemyBrain;
+      if (!Object.op_Equality((Object) brain, (Object) null))
+      {
+        GrabController grabController = brain.actionCtrl.grabController;
+        if (grabController != null && !grabController.IsGrabing())
+          flag = true;
+      }
+    }
+    if (!flag)
+      return;
+    this.ActIdle(true, floatArg);
+  }
+
+  private void EventReleaseGrab(AnimEventData.EventData data)
+  {
+    this.ActReleaseGrabbedPlayers(false, false, true);
+  }
+
+  private void EventFloatingMineAttack(AnimEventData.EventData data)
+  {
+    string stringArg1 = data.stringArgs[0];
+    string stringArg2 = data.stringArgs[1];
+    Transform node = this.FindNode(stringArg2);
+    if (Object.op_Equality((Object) node, (Object) null))
+    {
+      Log.Error("Not found transform for launch!! name: " + stringArg2);
+    }
+    else
+    {
+      AttackInfo attackInfo = this.FindAttackInfo(stringArg1);
+      if (attackInfo == null)
+      {
+        Log.Error("Not found AttackInfo!! name: " + stringArg1);
+      }
+      else
+      {
+        BulletData bulletData = attackInfo.bulletData;
+        if (Object.op_Equality((Object) bulletData, (Object) null) || bulletData.dataMine == null)
+        {
+          Log.Error("Not found BulletData!! atkInfoName: " + stringArg1);
+        }
+        else
+        {
+          Vector3 vector3;
+          // ISSUE: explicit constructor call
+          ((Vector3) ref vector3).\u002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+          Quaternion quaternion = Quaternion.Euler(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
+          new GameObject("AttackFloatingMine").AddComponent<AttackFloatingMine>().Initialize(new AttackFloatingMine.InitParamFloatingMine()
+          {
+            attacker = (StageObject) this,
+            atkInfo = attackInfo,
+            launchTrans = node,
+            offsetPos = vector3,
+            offsetRot = quaternion
+          });
+        }
+      }
+    }
+  }
+
+  protected override void EventActionMineAttack(AnimEventData.EventData data)
+  {
+    if (!this.IsOriginal() && !this.IsCoopNone())
+      return;
+    this.ActCreateActionMine(data.stringArgs[0]);
+  }
+
+  private void ActCreateActionMine(string atkInfoName)
+  {
+    int randSeed = Random.Range(int.MinValue, int.MaxValue);
+    this.ActCreateActionMine(atkInfoName, randSeed);
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.OnCreateActionMine(atkInfoName, randSeed);
+  }
+
+  public void ActCreateActionMine(string atkInfoName, int randSeed)
+  {
+    AttackInfo attackInfo = this.FindAttackInfo(atkInfoName);
+    if (attackInfo == null)
+    {
+      Log.Error("Not found AttackInfo!! name:" + atkInfoName);
+    }
+    else
+    {
+      BulletData bulletData = attackInfo.bulletData;
+      if (Object.op_Equality((Object) bulletData, (Object) null) || bulletData.dataActionMine == null)
+      {
+        Log.Error("Not found BulletData!! atkInfoName:" + atkInfoName);
+      }
+      else
+      {
+        Vector3[] randomPosition = this.GetRandomPosition(bulletData.dataActionMine.settingNum, ((Component) this).transform.position, bulletData.dataActionMine.settingRadius, bulletData.dataActionMine.centerConcentration, bulletData.dataActionMine.settingHeight, bulletData.dataActionMine.settingNearLimit, randSeed);
+        Random random = new Random(randSeed);
+        for (int index1 = 0; index1 < randomPosition.Length; ++index1)
+        {
+          AttackActionMine.InitParamActionMine initParam = new AttackActionMine.InitParamActionMine();
+          initParam.attacker = (StageObject) this;
+          initParam.atkInfo = attackInfo;
+          initParam.position = randomPosition[index1];
+          initParam.rotation = Quaternion.LookRotation(Vector3.op_Subtraction(((Component) this).transform.position, randomPosition[index1]));
+          initParam.randomSeed = randSeed;
+          int tmp_id = 0;
+          for (int index2 = 0; index2 < 10; ++index2)
+          {
+            tmp_id = random.Next(1, int.MaxValue);
+            if (!this.m_activeAttackActionMineList.Exists((Predicate<AttackActionMine>) (x => x.objId == tmp_id)))
+              break;
+          }
+          initParam.id = tmp_id;
+          AttackActionMine attackActionMine = new GameObject("AttackActionMine").AddComponent<AttackActionMine>();
+          attackActionMine.Initialize(initParam);
+          this.m_activeAttackActionMineList.Add(attackActionMine);
+        }
+      }
+    }
+  }
+
+  private Vector3[] GetRandomPosition(
+    int num,
+    Vector3 center,
+    float radius,
+    float concentration,
+    float height,
+    float nearLimit,
+    int randomSeed)
+  {
+    Random random = new Random(randomSeed);
+    int num1 = 50;
+    List<Vector3> vector3List = new List<Vector3>();
+    for (int index1 = 0; index1 < num; ++index1)
+    {
+      for (int index2 = 0; index2 < num1; ++index2)
+      {
+        double num2 = (double) radius * (double) Mathf.Pow((float) random.NextDouble(), concentration);
+        float num3 = 6.28f * (float) random.NextDouble();
+        float num4 = (float) num2 * Mathf.Cos(num3);
+        float num5 = (float) num2 * Mathf.Sin(num3);
+        Vector3 pos = new Vector3(num4 + center.x, height, num5 + center.z);
+        if (MonoBehaviourSingleton<StageManager>.I.CheckPosInside(pos) && !vector3List.Exists((Predicate<Vector3>) (v => (double) Vector3.Distance(v, pos) < (double) nearLimit)) && !this.m_activeAttackActionMineList.Exists((Predicate<AttackActionMine>) (m => (double) Vector3.Distance(((Component) m).transform.position, pos) < (double) nearLimit)))
+        {
+          vector3List.Add(pos);
+          break;
+        }
+      }
+    }
+    return vector3List.ToArray();
+  }
+
+  protected override void EventReflectBulletAttack(AnimEventData.EventData data)
+  {
+    if (!this.IsOriginal() && !this.IsCoopNone())
+      return;
+    string stringArg1 = data.stringArgs[0];
+    string stringArg2 = data.stringArgs[1];
+    int num = Random.Range(int.MinValue, int.MaxValue);
+    this.ActCreateReflectBullet(stringArg1, stringArg2, -1, num);
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.OnReflectBulletAttack(stringArg1, stringArg2, num);
+  }
+
+  public void ActCreateReflectBullet(string atkInfoName, string nodeName, int objId, int seed)
+  {
+    this.ActResetActionMineRandom(seed);
+    if (objId > 0)
+    {
+      AttackActionMine attackActionMine = this.m_activeAttackActionMineList.Find((Predicate<AttackActionMine>) (x => x.objId == objId));
+      if (!Object.op_Inequality((Object) attackActionMine, (Object) null))
+        return;
+      attackActionMine.CreateReflectBullet();
+    }
+    else
+    {
+      if (string.IsNullOrEmpty(atkInfoName))
+        return;
+      AttackInfo attackInfo = this.FindAttackInfo(atkInfoName);
+      if (attackInfo == null)
+      {
+        Log.Error("Not found AttackInfo!! name:" + atkInfoName);
+      }
+      else
+      {
+        Transform transform = string.IsNullOrEmpty(nodeName) ? this._transform : this.FindNode(nodeName);
+        if (Object.op_Equality((Object) transform, (Object) null))
+        {
+          Log.Error("Not found transform for launch!! name:" + nodeName);
+        }
+        else
+        {
+          Vector3 position = transform.position;
+          Quaternion reflectBulletRotation = this.GetReflectBulletRotation(position, seed);
+          ((Component) AnimEventShot.Create((StageObject) this, attackInfo, position, reflectBulletRotation)).gameObject.AddComponent<AttackActionMine.ReflectBulletCondition>();
+        }
+      }
+    }
+  }
+
+  private Quaternion GetReflectBulletRotation(Vector3 nodePos, int randSeed)
+  {
+    this.m_activeAttackActionMineList.RemoveAll((Predicate<AttackActionMine>) (x => Object.op_Equality((Object) x, (Object) null)));
+    AttackActionMine[] array = this.m_activeAttackActionMineList.ToArray();
+    Random random = new Random(randSeed);
+    if (array.Length != 0)
+      return Quaternion.LookRotation(Vector3.op_Subtraction(((Component) array[random.Next(0, this.m_activeAttackActionMineList.Count)]).transform.position, nodePos));
+    List<StageObject> stageObjectList = new List<StageObject>((IEnumerable<StageObject>) MonoBehaviourSingleton<StageObjectManager>.I.playerList);
+    stageObjectList.RemoveAll((Predicate<StageObject>) (obj =>
+    {
+      Player player = obj as Player;
+      return Object.op_Inequality((Object) player, (Object) null) && player.hp <= 0;
+    }));
+    stageObjectList.Sort((Comparison<StageObject>) ((a, b) => a.id - b.id));
+    return stageObjectList.Count > 0 ? Quaternion.LookRotation(Vector3.op_Subtraction(stageObjectList[random.Next(0, stageObjectList.Count)]._position, nodePos)) : this._rotation;
+  }
+
+  public void ActResetActionMineRandom(int seed)
+  {
+    for (int index = 0; index < this.m_activeAttackActionMineList.Count; ++index)
+      this.m_activeAttackActionMineList[index].ResetRandomSeed(seed + index);
+  }
+
+  private void EventWeatherChange(AnimEventData.EventData data)
+  {
+    if (data.floatArgs.Length < 2)
+      return;
+    MonoBehaviourSingleton<SceneSettingsManager>.I.ChangeWeather(data.floatArgs[0], data.floatArgs[1]);
+  }
+
+  private void EventWeatherChangeOff()
+  {
+    MonoBehaviourSingleton<SceneSettingsManager>.I.WeatherForceReturn = true;
+  }
+
+  private void EventRecoverBarrierHp(AnimEventData.EventData data)
+  {
+    int intArg = data.intArgs[0];
+    if (intArg >= 0 && intArg < this.regionInfos.Length)
+      return;
+    Log.Error("Region Index is out of range!! ");
+  }
+
+  private void EventRecoverBarrierHpAll(AnimEventData.EventData data)
+  {
+    int num = (int) ((double) this.BarrierHpMax * (double) ((float) data.intArgs[0] * 0.01f));
+    if (num <= 0)
+      return;
+    this.m_barrierHp = (XorInt) ((int) this.m_barrierHp + num);
+    if ((int) this.m_barrierHp <= this.BarrierHpMax)
+      return;
+    this.m_barrierHp = (XorInt) this.BarrierHpMax;
+  }
+
+  private void EventEnemyRecoverHp(AnimEventData.EventData data)
+  {
+    int intArg1 = data.intArgs[0];
+    if (intArg1 > 0)
+      this.RecoverHp(intArg1, false);
+    int intArg2 = data.intArgs[1];
+    if (intArg2 <= 0)
+      return;
+    this.RecoverHp((int) ((double) this.hpMax * (double) ((float) intArg2 * 0.01f)), false);
+  }
+
+  private void EventEnemyDeadRevive(AnimEventData.EventData data)
+  {
+    int num1 = data.intArgs[0];
+    if (num1 <= 0)
+      num1 = 1;
+    int num2 = (int) ((double) this.hpMax * (double) ((float) num1 * 0.01f) + 0.0099999997764825821);
+    if (num2 > this.hpMax)
+      num2 = this.hpMax;
+    this.hp = num2;
+    this.deadReviveCount = this.actDeadReviveCount;
+    if (MonoBehaviourSingleton<UIDamageManager>.IsValid())
+      MonoBehaviourSingleton<UIDamageManager>.I.CreateEnemyRecoverHp((Character) this, num2, UIPlayerDamageNum.DAMAGE_COLOR.HEAL);
+    if (Object.op_Inequality((Object) this.effectPlayProcessor, (Object) null) && Object.op_Equality((Object) this.effectDrainRecover, (Object) null))
+    {
+      List<EffectPlayProcessor.EffectSetting> settings = this.effectPlayProcessor.GetSettings("RECOVER_HP");
+      if (settings != null && settings.Count > 0)
+      {
+        Transform transform = this.effectPlayProcessor.PlayEffect(settings[0], this._transform);
+        if (Object.op_Inequality((Object) transform, (Object) null))
+          this.effectDrainRecover = ((Component) transform).gameObject;
+      }
+    }
+    if (!MonoBehaviourSingleton<InGameRecorder>.IsValid())
+      return;
+    MonoBehaviourSingleton<InGameRecorder>.I.RecordEnemyRecoveredHP(this.id, num2);
+  }
+
+  private void EventShieldON(AnimEventData.EventData data)
+  {
+    this.ShieldHp = this.ShieldHpMax;
+    List<EnemyRegionWork> enemyRegionWorkList = new List<EnemyRegionWork>();
+    for (int index = 0; index < this.regionInfos.Length; ++index)
+    {
+      EnemyRegionWork regionWork = this.regionWorks[index];
+      regionWork.isShieldCriticalDamage = false;
+      if (regionWork.enabled && !regionWork.regionInfo.isGrabRelease && regionWork.isShieldDamage)
+        enemyRegionWorkList.Add(this.regionWorks[index]);
+    }
+    if (enemyRegionWorkList.Count <= 0)
+      return;
+    int index1 = 0;
+    if (enemyRegionWorkList.Count > 1)
+    {
+      Random.State state = Random.state;
+      Random.InitState(this.SyncRandomSeed);
+      index1 = Random.Range(0, enemyRegionWorkList.Count);
+      Random.state = state;
+    }
+    if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
+      MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(this.enemyTableData.name, STRING_CATEGORY.ENEMY_SHIELD, 0U);
+    enemyRegionWorkList[index1].isShieldCriticalDamage = true;
+    this.RequestShieldShaderEffect();
+  }
+
+  public void RequestShieldShaderEffect() => this.StartCoroutine(this.SetShieldShaderParam());
+
+  private void EventGenerateAegis(AnimEventData.EventData data)
+  {
+    if (this.aegisCtrl == null)
+    {
+      this.aegisCtrl = new GameObject("AegisParent").AddComponent<EnemyAegisController>();
+      this.aegisCtrl.Init(this);
+    }
+    if (!Object.op_Inequality((Object) this.aegisCtrl, (Object) null))
+      return;
+    this.aegisCtrl.Generate(data);
+  }
+
+  public EnemyAegisController.SetupParam GetAegisSetupParam()
+  {
+    return this.aegisCtrl == null ? (EnemyAegisController.SetupParam) null : this.aegisCtrl.GetSetupParam();
+  }
+
+  public float GetAegisPercent() => this.aegisCtrl == null ? 0.0f : this.aegisCtrl.GetPercent();
+
+  public void SetupAegis(EnemyAegisController.SetupParam param)
+  {
+    if (param == null)
+      return;
+    if (this.aegisCtrl == null)
+    {
+      this.aegisCtrl = new GameObject("AegisParent").AddComponent<EnemyAegisController>();
+      this.aegisCtrl.Init(this);
+    }
+    this.aegisCtrl.Setup(param, false);
+  }
+
+  private void EventEffectLoopCustom(AnimEventData.EventData data)
+  {
+    string uniqueName = data.stringArgs[0] + data.stringArgs[1];
+    foreach (EnemyEffectObject enemyEffect in this.m_enemyEffectList)
+    {
+      if (enemyEffect.UniqueName == uniqueName)
+        return;
+    }
+    Transform transform = AnimEventFormat.EffectEventExec(data.id, data, this._transform, this.isBoss, new AnimEventFormat.EffectNameAnalyzer(((Character) this).EffectNameAnalyzer), new AnimEventFormat.NodeFinder(((StageObject) this).FindNode));
+    if (Object.op_Equality((Object) transform, (Object) null))
+      return;
+    int intArg1 = data.intArgs[0];
+    int intArg2 = data.intArgs[1];
+    EnemyEffectObject enemyEffectObject = ((Component) transform).gameObject.AddComponent<EnemyEffectObject>();
+    enemyEffectObject.Initialize(this, this.regionWorks[intArg1], intArg2, uniqueName);
+    this.m_enemyEffectList.Add(enemyEffectObject);
+  }
+
+  public void OnNotifyDeleteEnemyEffect(EnemyEffectObject del)
+  {
+    if (!Object.op_Inequality((Object) del, (Object) null) || !this.m_enemyEffectList.Contains(del))
+      return;
+    this.m_enemyEffectList.Remove(del);
+  }
+
+  public void SetResidentEffectSetting(SystemEffectSetting setting)
+  {
+    this.m_residentEffectSetting = setting;
+  }
+
+  private void EventGroupEffectON(AnimEventData.EventData data)
+  {
+    int intArg = data.intArgs[0];
+    AnimEventData.ResidentEffectData[] residentEffectDataList = this.animEventData.residentEffectDataList;
+    if (residentEffectDataList != null && residentEffectDataList.Length != 0)
+    {
+      foreach (AnimEventData.ResidentEffectData effectData in residentEffectDataList)
+      {
+        if (!string.IsNullOrEmpty(effectData.effectName) && !string.IsNullOrEmpty(effectData.linkNodeName) && effectData.groupID == intArg)
+        {
+          Transform transform = Utility.Find(((Component) this.body).transform, effectData.linkNodeName);
+          if (Object.op_Equality((Object) transform, (Object) null))
+            transform = ((Component) this.body).transform;
+          if (!this.IsExistResidentEffect(effectData.UniqueName))
+          {
+            Transform effect = EffectManager.GetEffect(effectData.effectName, transform);
+            if (Object.op_Inequality((Object) effect, (Object) null))
+            {
+              Vector3 localScale = effect.localScale;
+              effect.localScale = Vector3.op_Multiply(localScale, effectData.scale);
+              effect.localPosition = effectData.offsetPos;
+              effect.localRotation = Quaternion.Euler(effectData.offsetRot);
+              ResidentEffectObject effectObj = ((Component) effect).gameObject.AddComponent<ResidentEffectObject>();
+              effectObj.Initialize(effectData);
+              this.RegisterResidentEffect(effectObj);
+            }
+          }
+        }
+      }
+    }
+    if (!Object.op_Inequality((Object) this.m_residentEffectSetting, (Object) null))
+      return;
+    SystemEffectSetting.Data[] effectDataList = this.m_residentEffectSetting.effectDataList;
+    if (effectDataList == null || effectDataList.Length == 0)
+      return;
+    foreach (SystemEffectSetting.Data effectData in effectDataList)
+    {
+      if (!string.IsNullOrEmpty(effectData.effectName) && !string.IsNullOrEmpty(effectData.linkNodeName) && effectData.groupID == intArg)
+      {
+        Transform transform = Utility.Find(((Component) this.body).transform, effectData.linkNodeName);
+        if (Object.op_Equality((Object) transform, (Object) null))
+          transform = ((Component) this.body).transform;
+        if (!this.IsExistResidentEffect(effectData.UniqueName))
+        {
+          Transform effect = EffectManager.GetEffect(effectData.effectName, transform);
+          if (Object.op_Inequality((Object) effect, (Object) null))
+          {
+            Vector3 localScale = effect.localScale;
+            effect.localScale = Vector3.op_Multiply(localScale, effectData.scale);
+            effect.localPosition = effectData.offsetPos;
+            effect.localRotation = Quaternion.Euler(effectData.offsetRot);
+            ResidentEffectObject effectObj = ((Component) effect).gameObject.AddComponent<ResidentEffectObject>();
+            effectObj.Initialize(effectData);
+            this.RegisterResidentEffect(effectObj);
+          }
+        }
+      }
+    }
+  }
+
+  private void EventGroupEffectOFF(AnimEventData.EventData data)
+  {
+    int intArg = data.intArgs[0];
+    List<ResidentEffectObject> residentEffectObjectList = new List<ResidentEffectObject>();
+    foreach (ResidentEffectObject residentEffect in this.m_residentEffectList)
+    {
+      if (residentEffect.GroupID == intArg)
+        residentEffectObjectList.Add(residentEffect);
+    }
+    foreach (ResidentEffectObject residentEffectObject in residentEffectObjectList)
+    {
+      EffectManager.ReleaseEffect(((Component) residentEffectObject).gameObject);
+      this.m_residentEffectList.Remove(residentEffectObject);
+    }
+  }
+
+  public void RegisterResidentEffect(ResidentEffectObject effectObj)
+  {
+    this.m_residentEffectList.Add(effectObj);
+  }
+
+  private bool IsExistResidentEffect(string uniqueName)
+  {
+    foreach (ResidentEffectObject residentEffect in this.m_residentEffectList)
+    {
+      if (residentEffect.UniqueName == uniqueName)
+        return true;
+    }
+    return false;
+  }
+
+  private void EventTailControllON(AnimEventData.EventData data)
+  {
+    int intArg = data.intArgs[0];
+    if (Object.op_Equality((Object) this.tailController, (Object) null))
+    {
+      Debug.LogError((object) ("Not found TailController!! ID:" + (object) intArg));
+    }
+    else
+    {
+      if (this.tailController.UniqueID != intArg)
+        return;
+      this.tailController.SetUpdateFlag(true);
+    }
+  }
+
+  private void EventTailControllOFF(AnimEventData.EventData data)
+  {
+    int num = data.GetInt(0);
+    float lerpFinishTime = data.GetFloat(0, 0.8f);
+    if (Object.op_Equality((Object) this.tailController, (Object) null))
+    {
+      Debug.LogError((object) ("Not found TailController!! ID:" + (object) num));
+    }
+    else
+    {
+      if (this.tailController.UniqueID != num)
+        return;
+      this.tailController.SetUpdateFlag(false);
+      this.tailController.RequestLerp(lerpFinishTime);
+    }
+  }
+
+  private void EventRegionNodeActivate(AnimEventData.EventData data)
+  {
+    if (data.intArgs.Length == 0 || data.stringArgs.Length == 0 || string.IsNullOrEmpty(data.stringArgs[0]) || !this.IsCoopNone() && !this.IsOriginal())
+      return;
+    bool isRandom = data.intArgs[0] == 1;
+    int[] array = ((IEnumerable<string>) data.stringArgs[0].Split(':')).Select<string, int>((Func<string, int>) (a => int.Parse(a))).ToArray<int>();
+    int randomSelectedID = isRandom ? array[Random.Range(0, array.Length)] : 0;
+    this.ActivateRegionNode(array, isRandom, randomSelectedID);
+  }
+
+  private void EventRegionNodeDeactivate(AnimEventData.EventData data)
+  {
+    if (data.stringArgs.Length == 0 || string.IsNullOrEmpty(data.stringArgs[0]))
+      return;
+    string stringArg = data.stringArgs[0];
+    char[] chArray = new char[1]{ ':' };
+    foreach (int num in ((IEnumerable<string>) stringArg.Split(chArray)).Select<string, int>((Func<string, int>) (a => int.Parse(a))).ToArray<int>())
+    {
+      for (int index = 0; index < this.regionRoots.Length; ++index)
+      {
+        if (this.regionRoots[index].regionID == num)
+          ((Component) this.regionRoots[index]).gameObject.SetActive(false);
+      }
+    }
+  }
+
+  protected override void EventCameraCutOn(AnimEventData.EventData data)
+  {
+    if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid() || FieldManager.IsValidInGameNoBoss() || data.floatArgs.Length < 6)
+      return;
+    Vector3 cutPos;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref cutPos).\u002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+    Vector3 vector3;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref vector3).\u002Ector(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
+    InGameCameraManager i = MonoBehaviourSingleton<InGameCameraManager>.I;
+    i.SetCutPos(cutPos);
+    i.SetCutRot(Quaternion.Euler(vector3));
+    i.SetCameraMode(InGameCameraManager.CAMERA_MODE.CUT);
+  }
+
+  protected override void EventCameraCutOff()
+  {
+    if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<InGameCameraManager>.I.ClearCameraMode(InGameCameraManager.CAMERA_MODE.CUT);
+  }
+
+  private void EventSummonEnemy(AnimEventData.EventData data)
+  {
+    int summonedServantId = this.GetSummonedServantId();
+    int intArg1 = data.intArgs[0];
+    int intArg2 = data.intArgs[1];
+    if (intArg2 == 0 && data.intArgs[2] > 0)
+      intArg2 = Mathf.FloorToInt((float) ((int) this.enemyLevel / data.intArgs[2]));
+    Vector3 vector3;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref vector3).\u002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+    Quaternion quaternion = Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
+    if (data.intArgs.Length > 3 && data.intArgs[3] != 0)
+    {
+      vector3 = Vector3.op_Addition(this._position, Quaternion.op_Multiply(this._rotation, vector3));
+      quaternion = Quaternion.op_Multiply(this._rotation, quaternion);
+    }
+    if (!MonoBehaviourSingleton<StageManager>.I.CheckPosInside(vector3))
+      return;
+    MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyWithAI(summonedServantId, vector3, ((Quaternion) ref quaternion).eulerAngles.y, intArg1, intArg2, false, false, (EnemyLoader.OnCompleteLoad) (enemy =>
+    {
+      string summonEffectName = "ef_btl_enm_summon_01";
+      if (data.stringArgs != null && data.stringArgs.Length >= 1 && !string.IsNullOrEmpty(data.stringArgs[0]))
+        summonEffectName = data.stringArgs[0];
+      MonoBehaviourSingleton<StageObjectManager>.I.ShowEnemyFromUnderGroundForSummon(enemy, summonEffectName);
+      if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+        MonoBehaviourSingleton<InGameRecorder>.I.RecordEnemyHP(enemy.id, enemy.hpMax);
+      if (this.IsOriginal())
+        enemy.SetCoopMode(StageObject.COOP_MODE_TYPE.ORIGINAL, 0);
+      else if (this.IsMirror())
+        enemy.SetCoopMode(StageObject.COOP_MODE_TYPE.MIRROR, this.coopClientId);
+      if (!MonoBehaviourSingleton<CoopManager>.IsValid() || !MonoBehaviourSingleton<CoopManager>.I.isStageHost)
+        return;
+      MonoBehaviourSingleton<CoopManager>.I.coopStage.SendSyncPlayerRecord(0, false);
+    }));
+  }
+
+  private void EventSummonAttack(AnimEventData.EventData data)
+  {
+    if (!this.IsCoopNone() && !this.IsOriginal())
+      return;
+    int intArg1 = data.intArgs[0];
+    int intArg2 = data.intArgs[1];
+    Vector3 pos;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref pos).\u002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+    Vector3 rot;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref rot).\u002Ector(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
+    if (data.intArgs[2] == 1)
+    {
+      pos = Vector3.op_Addition(this._transform.position, Quaternion.op_Multiply(Quaternion.Euler(this._transform.eulerAngles), pos));
+      rot = Vector3.op_Addition(rot, this._transform.eulerAngles);
+    }
+    this.ActSummonAttack(intArg1, intArg2, pos, rot);
+  }
+
+  public void ActSummonAttack(int enemyId, int attackId, Vector3 pos, Vector3 rot)
+  {
+    MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyForSummonAttack(this.GetSummonedServantId(), pos, rot.y, enemyId, (int) this.enemyLevel, false, (EnemyLoader.OnCompleteLoad) (enemy =>
+    {
+      ((Component) enemy).gameObject.SetActive(true);
+      enemy.SetActionTarget(this.actionTarget, false);
+      enemy.ActAttack(attackId, false);
+      enemy.hitOffFlag |= StageObject.HIT_OFF_FLAG.INVICIBLE;
+    }));
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    int id = Object.op_Inequality((Object) this.actionTarget, (Object) null) ? this.actionTarget.id : 0;
+    this.enemySender.OnSummonAttack(enemyId, attackId, pos, rot, id);
+  }
+
+  private int GetSummonedServantId()
+  {
+    int summonedServantId = this.enemyServantId;
+    ++this.enemyServantId;
+    if (summonedServantId > 499999)
+      summonedServantId = this.enemyServantId = 490000;
+    return summonedServantId;
+  }
+
+  public override void OnAnimEvent(AnimEventData.EventData data)
+  {
+    switch (data.id)
+    {
+      case AnimEventFormat.ID.HIDE_BASE_EFFECT_ON:
+        this.EventHideBaseEffectON(data);
+        break;
+      case AnimEventFormat.ID.HIDE_BASE_EFFECT_OFF:
+        this.EventHideBaseEffectOFF(data);
+        break;
+      case AnimEventFormat.ID.EFFECT_LOOP_CUSTOM:
+        this.EventEffectLoopCustom(data);
+        break;
+      case AnimEventFormat.ID.GROUP_EFFECT_ON:
+        this.EventGroupEffectON(data);
+        break;
+      case AnimEventFormat.ID.GROUP_EFFECT_OFF:
+        this.EventGroupEffectOFF(data);
+        break;
+      case AnimEventFormat.ID.REVIVE_REGION:
+        this.EventReviveRegion(data);
+        break;
+      case AnimEventFormat.ID.DASH_START:
+        this.EventDashStart(data);
+        break;
+      case AnimEventFormat.ID.WARP_VIEW_START:
+        this.EventWarpViewStart(data);
+        break;
+      case AnimEventFormat.ID.WARP_VIEW_END:
+        this.EventWarpViewEnd(data);
+        break;
+      case AnimEventFormat.ID.WARP_TO_TARGET:
+        this.EventWarpToTarget(data);
+        break;
+      case AnimEventFormat.ID.WARP_TO_REVERSE_TARGET:
+        this.EventWarpToReverseTarget(data);
+        break;
+      case AnimEventFormat.ID.WARP_TO_RANDOM:
+        this.EventWarpToRandom(data);
+        break;
+      case AnimEventFormat.ID.RADIAL_BLUR_START:
+        if (QuestManager.IsValidInGameWaveMatch())
+          break;
+        this.EventRadialBlurStart(data);
+        break;
+      case AnimEventFormat.ID.RADIAL_BLUR_CHANGE:
+        if (QuestManager.IsValidInGameWaveMatch())
+          break;
+        this.EventRadialBlurChange(data);
+        break;
+      case AnimEventFormat.ID.RADIAL_BLUR_END:
+        if (QuestManager.IsValidInGameWaveMatch())
+          break;
+        this.EventRadialBlurEnd(data);
+        break;
+      case AnimEventFormat.ID.SHOT_TARGET:
+        this.EventShotTarget(data);
+        break;
+      case AnimEventFormat.ID.SHOT_POINT:
+        this.EventShotPoint(data);
+        break;
+      case AnimEventFormat.ID.WEAKPOINT_ON:
+        this.EventWeakPointON(data);
+        break;
+      case AnimEventFormat.ID.WEAKPOINT_OFF:
+        this.EventWeakPointOFF(data);
+        break;
+      case AnimEventFormat.ID.WEAKPOINT_ALL_ON:
+        this.EventWeakPointAllON(data);
+        break;
+      case AnimEventFormat.ID.WEAKPOINT_ALL_OFF:
+        this.EventWeakPointAllOFF(data);
+        break;
+      case AnimEventFormat.ID.FUNNEL_ATTACK:
+        this.EventFunnelAttack(data);
+        break;
+      case AnimEventFormat.ID.CANCEL_ACTION:
+        this.EventCancelAction(data);
+        break;
+      case AnimEventFormat.ID.RELEASE_GRAB:
+        this.EventReleaseGrab(data);
+        break;
+      case AnimEventFormat.ID.FLOATING_MINE_ATTACK:
+        this.EventFloatingMineAttack(data);
+        break;
+      case AnimEventFormat.ID.WEATHER_CHANGE:
+        this.EventWeatherChange(data);
+        break;
+      case AnimEventFormat.ID.WEATHER_CHANGE_OFF:
+        this.EventWeatherChangeOff();
+        break;
+      case AnimEventFormat.ID.SHOT_RANDOM_AUTO:
+        this.KeepRandomShot(data);
+        break;
+      case AnimEventFormat.ID.RECOVER_BARRIER_HP:
+        this.EventRecoverBarrierHp(data);
+        break;
+      case AnimEventFormat.ID.RECOVER_BARRIER_HP_ALL:
+        this.EventRecoverBarrierHpAll(data);
+        break;
+      case AnimEventFormat.ID.SHIELD_ON:
+        this.EventShieldON(data);
+        break;
+      case AnimEventFormat.ID.DAMAGE_SHAKE_ON:
+        this.canHitShockEffect = true;
+        break;
+      case AnimEventFormat.ID.DAMAGE_SHAKE_OFF:
+        this.canHitShockEffect = false;
+        break;
+      case AnimEventFormat.ID.UNDEAD_ATTACK:
+        this.EventUndeadAttack(data);
+        break;
+      case AnimEventFormat.ID.ICE_FLOOR_CREATE:
+        this.EventCreateIceFloor(data);
+        break;
+      case AnimEventFormat.ID.DIG_ATTACK:
+        this.EventDigAttack(data);
+        break;
+      case AnimEventFormat.ID.ACTION_MINE_ATTACK:
+        this.EventActionMineAttack(data);
+        break;
+      case AnimEventFormat.ID.TAIL_CONTROL_ON:
+        this.EventTailControllON(data);
+        break;
+      case AnimEventFormat.ID.TAIL_CONTROL_OFF:
+        this.EventTailControllOFF(data);
+        break;
+      case AnimEventFormat.ID.ACTION_MODE_ID_CHANGE:
+        this.EventActionModeIdChange(data);
+        break;
+      case AnimEventFormat.ID.ANIMATION_LAYER_WEIGHT:
+        this.AnimationLayerWeightChange(data);
+        break;
+      case AnimEventFormat.ID.ELEMENT_CHANGE:
+        this.EventElementToleranceChange(data);
+        break;
+      case AnimEventFormat.ID.BLEND_COLOR_CHANGE:
+        this.EventBlendColorChange(data);
+        break;
+      case AnimEventFormat.ID.SHOT_NODE_LINK:
+        this.EventObstacleNodeLinkAttack(data);
+        break;
+      case AnimEventFormat.ID.TARGET_CHANGE_HATE_RANKING:
+        this.EventTargetChangeHateRanking(data);
+        break;
+      case AnimEventFormat.ID.ELEMENT_ICON_CHANGE:
+        this.EventElementIconChange(data);
+        break;
+      case AnimEventFormat.ID.WEAK_ELEMENT_ICON_CHANGE:
+        this.EventWeakElementIconChange(data);
+        break;
+      case AnimEventFormat.ID.REGION_COLLIDER_ATK_HIT_ON:
+        this.EventRegionColliderAtkHitOn(data);
+        break;
+      case AnimEventFormat.ID.REGION_COLLIDER_ATK_HIT_OFF:
+        this.EventRegionColliderAtkHitOff(data);
+        break;
+      case AnimEventFormat.ID.COUNTER_ENABLED_ON:
+        this.EventCounterEnabledOn(data);
+        break;
+      case AnimEventFormat.ID.COUNTER_ENABLED_OFF:
+        this.EventCounterEnabledOff(data);
+        break;
+      case AnimEventFormat.ID.BUFF_CANCELLATION:
+        this.EventBuffCancellation(data);
+        break;
+      case AnimEventFormat.ID.DAMAGE_TO_ENDURANCE:
+        this.EventDamageToEndurance(data);
+        break;
+      case AnimEventFormat.ID.SHOT_WORLD_POINT:
+        this.EventShotWorldPoint(data);
+        break;
+      case AnimEventFormat.ID.SYNC_ACTION_TARGET:
+        this.EventSyncActionTarget(data);
+        break;
+      case AnimEventFormat.ID.SKIP_TO_SKILL_ACTION_ON:
+        this.isAbleToSkipAction = true;
+        break;
+      case AnimEventFormat.ID.SKIP_TO_SKILL_ACTION_OFF:
+        this.isAbleToSkipAction = false;
+        break;
+      case AnimEventFormat.ID.GENERATE_AEGIS:
+        this.EventGenerateAegis(data);
+        break;
+      case AnimEventFormat.ID.BLEND_COLOR_ON:
+        this.EventBlendColorEnable(data, true);
+        break;
+      case AnimEventFormat.ID.BLEND_COLOR_OFF:
+        this.EventBlendColorEnable(data, false);
+        break;
+      case AnimEventFormat.ID.REGION_NODE_ACTIVATE:
+        this.EventRegionNodeActivate(data);
+        break;
+      case AnimEventFormat.ID.REGION_NODE_DEACTIVATE:
+        this.EventRegionNodeDeactivate(data);
+        break;
+      case AnimEventFormat.ID.ENEMY_RECOVER_HP:
+        this.EventEnemyRecoverHp(data);
+        break;
+      case AnimEventFormat.ID.SUMMON_ENEMY:
+        this.EventSummonEnemy(data);
+        break;
+      case AnimEventFormat.ID.SUMMON_ATTACK:
+        this.EventSummonAttack(data);
+        break;
+      case AnimEventFormat.ID.ENEMY_DEAD_REVIVE:
+        this.EventEnemyDeadRevive(data);
+        break;
+      case AnimEventFormat.ID.ENEMY_ASSIMILATION:
+        this.enableAssimilation = true;
+        break;
+      case AnimEventFormat.ID.ENEMY_DISSIMILATION:
+        this.enableAssimilation = false;
+        break;
+      case AnimEventFormat.ID.SKIP_BY_DAMAGE_ON:
+        this.enableToSkipActionByDamage = true;
+        break;
+      case AnimEventFormat.ID.SKIP_BY_DAMAGE_OFF:
+        this.enableToSkipActionByDamage = false;
+        break;
+      default:
+        base.OnAnimEvent(data);
+        break;
+    }
+  }
+
+  private void SetBaseEffecActivateFlag(bool flag)
+  {
+    if (Object.op_Equality((Object) this.loader, (Object) null))
+      return;
+    if (Object.op_Equality((Object) this.loader.baseEffect, (Object) null))
+      Log.Warning("Not found baseEffect!!");
+    else
+      ((Component) this.loader.baseEffect).gameObject.SetActive(flag);
+  }
+
+  public void SetWarpVisible(float rate)
+  {
+    if (this.loader.materialParamsList == null)
+      return;
+    rate = Mathf.Clamp(rate, 0.0f, 1f);
+    int ID_VANISH_FLAG = Shader.PropertyToID("_Vanish_flag");
+    int ID_VANISH_RATE = Shader.PropertyToID("_Vanish_rate");
+    this.loader.materialParamsList.ForEach((Action<EnemyLoader.MaterialParams>) (prm =>
+    {
+      if (prm.hasVanishFlag)
+      {
+        float num = (double) rate <= 0.0 ? 0.0f : 1f;
+        prm.material.SetFloat(ID_VANISH_FLAG, num);
+      }
+      if (!prm.hasVanishRate)
+        return;
+      float num1 = 1f - rate;
+      prm.material.SetFloat(ID_VANISH_RATE, num1);
+    }));
+    if ((double) rate <= 0.0)
+    {
+      this.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.INVICIBLE;
+      this.enableTargetPoint = true;
+      if (Object.op_Inequality((Object) this.loader.shadow, (Object) null))
+        ((Component) this.loader.shadow).gameObject.SetActive(true);
+      ((Component) this._transform).GetComponentsInChildren<rymFX>(Temporary.fxList);
+      int index1 = 0;
+      for (int count = Temporary.fxList.Count; index1 < count; ++index1)
+        this.SetWarpInvisibleEffect(Temporary.fxList[index1], false);
+      Temporary.fxList.Clear();
+      int index2 = 0;
+      for (int length = this.regionWorks.Length; index2 < length; ++index2)
+      {
+        int index3 = 0;
+        for (int count = this.regionWorks[index2].bleedWorkList.Count; index3 < count; ++index3)
+        {
+          Enemy.BleedWork bleedWork = this.regionWorks[index2].bleedWorkList[index3];
+          if (Object.op_Inequality((Object) bleedWork.bleedEffect, (Object) null))
+            ((Component) bleedWork.bleedEffect).GetComponent<EffectCtrl>()?.Pause(false);
+        }
+        if (this.regionWorks[index2].shadowSealingEffect != null)
+          ((Component) this.regionWorks[index2].shadowSealingEffect).GetComponent<EffectCtrl>()?.Pause(false);
+      }
+    }
+    else
+    {
+      this.hitOffFlag |= StageObject.HIT_OFF_FLAG.INVICIBLE;
+      this.enableTargetPoint = false;
+      if (Object.op_Inequality((Object) this.loader.shadow, (Object) null))
+        ((Component) this.loader.shadow).gameObject.SetActive(false);
+      ((Component) this._transform).GetComponentsInChildren<rymFX>(Temporary.fxList);
+      int index4 = 0;
+      for (int count = Temporary.fxList.Count; index4 < count; ++index4)
+        this.SetWarpInvisibleEffect(Temporary.fxList[index4], true);
+      Temporary.fxList.Clear();
+      int index5 = 0;
+      for (int length = this.regionWorks.Length; index5 < length; ++index5)
+      {
+        int index6 = 0;
+        for (int count = this.regionWorks[index5].bleedWorkList.Count; index6 < count; ++index6)
+        {
+          Enemy.BleedWork bleedWork = this.regionWorks[index5].bleedWorkList[index6];
+          if (Object.op_Inequality((Object) bleedWork.bleedEffect, (Object) null))
+            ((Component) bleedWork.bleedEffect).GetComponent<EffectCtrl>()?.Pause(true);
+        }
+        if (this.regionWorks[index5].shadowSealingEffect != null)
+          ((Component) this.regionWorks[index5].shadowSealingEffect).GetComponent<EffectCtrl>()?.Pause(true);
+      }
+    }
+  }
+
+  private void SetWarpInvisibleEffect(rymFX rym_fx, bool invisible)
+  {
+    if (Object.op_Equality((Object) rym_fx, (Object) null))
+      return;
+    int num = invisible ? 1 : 0;
+    if (rym_fx.InvisibleFlags == num)
+      return;
+    rym_fx.InvisibleFlags = num;
+    ((Component) rym_fx).gameObject.GetComponentsInChildren<Renderer>(Temporary.rendererList);
+    int index = 0;
+    for (int count = Temporary.rendererList.Count; index < count; ++index)
+      Temporary.rendererList[index].enabled = !invisible;
+    Temporary.rendererList.Clear();
+  }
+
+  public void SetWarpToTarget(float warp_distance, bool reverse = false)
+  {
+    if (this.IsOriginal() || this.IsCoopNone())
+    {
+      Vector3 check_pos = this._position;
+      if (Object.op_Inequality((Object) this.actionTarget, (Object) null))
+      {
+        Vector3 position = this._position;
+        position.y = 0.0f;
+        Vector3 targetPosition = this.GetTargetPosition(this.actionTarget);
+        targetPosition.y = 0.0f;
+        if (Vector3.op_Equality(targetPosition, position))
+        {
+          check_pos = position;
+        }
+        else
+        {
+          Vector3 vector3_1 = Vector3.op_Subtraction(targetPosition, position);
+          float magnitude = ((Vector3) ref vector3_1).magnitude;
+          Vector3 vector3_2 = Vector3.op_Division(vector3_1, magnitude);
+          float num;
+          if (reverse)
+          {
+            vector3_2 = Vector3.op_UnaryNegation(vector3_2);
+            num = warp_distance;
+          }
+          else
+          {
+            num = magnitude - warp_distance;
+            if ((double) num < 0.0)
+              num = 0.0f;
+          }
+          while (true)
+          {
+            do
+            {
+              check_pos = Vector3.op_Addition(position, Vector3.op_Multiply(vector3_2, num));
+              if ((double) num > 0.0 && !MonoBehaviourSingleton<StageManager>.I.CheckPosInside(check_pos))
+                num -= 0.5f;
+              else
+                goto label_11;
+            }
+            while ((double) num >= 0.0);
+            num = 0.0f;
+          }
+        }
+      }
+label_11:
+      if (Vector3.op_Inequality(this._position, check_pos))
+      {
+        Vector3 vector3 = Vector3.op_Subtraction(check_pos, this._position);
+        vector3.y = 0.0f;
+        if (reverse)
+          vector3 = Vector3.op_UnaryNegation(vector3);
+        this._rotation = Quaternion.LookRotation(vector3);
+      }
+      this._position = check_pos;
+      this.SetWarp();
+    }
+    else
+    {
+      if (this.warpWaitSync)
+        return;
+      this.warpWaitSync = true;
+      this.StartWaitingPacket(StageObject.WAITING_PACKET.ENEMY_WARP, false);
+    }
+  }
+
+  public void SetWarpToRandom(float warpMax, float warpMin)
+  {
+    if (this.IsOriginal() || this.IsCoopNone())
+    {
+      if (Object.op_Equality((Object) (this._collider as SphereCollider), (Object) null))
+        return;
+      if ((double) warpMin > (double) warpMax)
+        warpMin = warpMax;
+      Vector3 position = this._position;
+      position.y = 0.0f;
+      bool valid = false;
+      Vector3 randomPosByInsideInfo = MonoBehaviourSingleton<StageManager>.I.GetRandomPosByInsideInfo(position, warpMax, warpMin, ref valid);
+      if (!valid)
+        Log.Error(LOG.INGAME, "Enemy.SetWarpToRandom() position is failed. from_pos : {0}, warp_max : {1}, warp_min : {2}", (object) ((Vector3) ref position).ToString("F1"), (object) warpMax, (object) warpMin);
+      this._position = randomPosByInsideInfo;
+      if (Vector3.op_Inequality(position, randomPosByInsideInfo))
+      {
+        Vector3 vector3 = Vector3.op_Subtraction(randomPosByInsideInfo, position);
+        vector3.y = 0.0f;
+        this._rotation = Quaternion.LookRotation(vector3);
+      }
+      this.SetWarp();
+    }
+    else
+    {
+      if (this.warpWaitSync)
+        return;
+      this.warpWaitSync = true;
+      this.StartWaitingPacket(StageObject.WAITING_PACKET.ENEMY_WARP, false);
+    }
+  }
+
+  public void SetWarp()
+  {
+    this.SetNextTrigger();
+    this.EndWaitingPacket(StageObject.WAITING_PACKET.ENEMY_WARP);
+    this.warpWaitSync = false;
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.OnSetWarp();
+  }
+
+  public void TargetRandamShotEvent(List<Enemy.RandomShotInfo.TargetInfo> targets)
+  {
+    bool flag = false;
+    Enemy.RandomShotInfo randomShotInfo;
+    if (this.shotEventInfoQueue.Count > 0)
+    {
+      randomShotInfo = this.shotEventInfoQueue[0];
+      this.shotEventInfoQueue.Remove(randomShotInfo);
+      flag = true;
+    }
+    else
+      randomShotInfo = new Enemy.RandomShotInfo();
+    randomShotInfo.targets = targets;
+    if (flag)
+      this.randomShotInfo.Add(randomShotInfo);
+    else
+      this.shotNetworkInfoQueue.Add(randomShotInfo);
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.TargetRandamShotEvent(targets);
+  }
+
+  public void PointRandamShotEvent(List<Vector3> points)
+  {
+    bool flag = false;
+    Enemy.RandomShotInfo randomShotInfo;
+    if (this.shotEventInfoQueue.Count > 0)
+    {
+      randomShotInfo = this.shotEventInfoQueue[0];
+      this.shotEventInfoQueue.Remove(randomShotInfo);
+      flag = true;
+    }
+    else
+      randomShotInfo = new Enemy.RandomShotInfo();
+    randomShotInfo.points = points;
+    if (flag)
+      this.randomShotInfo.Add(randomShotInfo);
+    else
+      this.shotNetworkInfoQueue.Add(randomShotInfo);
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.TargetRandamShotEvent(points);
+  }
+
+  private void UpdateRandomShot()
+  {
+    int count = this.randomShotInfo.Count;
+    if (count <= 0)
+      return;
+    for (int index = 0; index < count; ++index)
+    {
+      Enemy.RandomShotInfo randomShotInfo = this.randomShotInfo[index];
+      randomShotInfo.countTime -= Time.deltaTime;
+      if (randomShotInfo.targets.Count > randomShotInfo.shotCount)
+      {
+        randomShotInfo.countTime -= Time.deltaTime;
+        if ((double) randomShotInfo.countTime <= 0.0)
+        {
+          AnimEventShot.Create((StageObject) this, randomShotInfo.atkInfo, randomShotInfo.points[randomShotInfo.shotCount], randomShotInfo.targets[randomShotInfo.shotCount].rot);
+          int targetId = randomShotInfo.targets[randomShotInfo.shotCount].targetId;
+          if (targetId != -1)
+            MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(targetId);
+          ++randomShotInfo.shotCount;
+          randomShotInfo.countTime = randomShotInfo.interval;
+        }
+      }
+      else
+      {
+        this.randomShotInfo.RemoveAt(index);
+        --count;
+        --index;
+      }
+    }
+  }
+
+  public override void OnFailedWaitingPacket(StageObject.WAITING_PACKET type)
+  {
+    switch (type)
+    {
+      case StageObject.WAITING_PACKET.ENEMY_WARP:
+        this.ActIdle();
+        break;
+      case StageObject.WAITING_PACKET.ENEMY_UPDATE_BLEED_DAMAGE:
+        this.ClearBleedDamageAll();
+        break;
+      case StageObject.WAITING_PACKET.ENEMY_UPDATE_SHADOWSEALING:
+        this.ClearShadowSealingAll();
+        break;
+      case StageObject.WAITING_PACKET.ENEMY_UPDATE_BOMBARROW:
+        this.ClearBombArrowAll();
+        break;
+    }
+    base.OnFailedWaitingPacket(type);
+  }
+
+  public override Vector3 GetTargetPosition(StageObject target)
+  {
+    return Object.op_Equality((Object) target, (Object) null) ? Vector3.zero : target.GetPredictivePosition();
+  }
+
+  public bool isValidPush() => !this.isLoading && !this.isDead && !this.isBoss;
+
+  public override void ApplySyncPosition(Vector3 pos, float dir, bool force_sync = false)
+  {
+    this._rotation = Quaternion.AngleAxis(dir, Vector3.up);
+    if (!force_sync && !this.isBoss)
+    {
+      float enemiesPositionMargin = this.enemyParameter.lesserEnemiesPositionMargin;
+      Vector3 vector3 = Vector3.op_Subtraction(this._position, pos);
+      if ((double) ((Vector3) ref vector3).sqrMagnitude < (double) enemiesPositionMargin * (double) enemiesPositionMargin)
+        return;
+    }
+    this._position = pos;
+  }
+
+  public void SetAppearPosEnemy()
+  {
+    if (this.enemyPopIndex >= 0 && FieldManager.IsValidInGame())
+    {
+      FieldMapTable.EnemyPopTableData enemyPopData = Singleton<FieldMapTable>.I.GetEnemyPopData(MonoBehaviourSingleton<FieldManager>.I.currentMapID, this.enemyPopIndex);
+      if (enemyPopData == null)
+        return;
+      bool valid = false;
+      Vector3 vector3 = Vector3.zero;
+      Quaternion quaternion = Quaternion.identity;
+      float num = 0.0f;
+      if (enemyPopData.enablePopY)
+      {
+        this.onTheGround = false;
+        num = enemyPopData.popY;
+      }
+      if (MonoBehaviourSingleton<StageManager>.I.insideColliderData != null && (double) enemyPopData.popRadius < (double) MonoBehaviourSingleton<StageManager>.I.insideColliderData.chipSize * 0.5 * 1.4199999570846558)
+      {
+        // ISSUE: explicit constructor call
+        ((Vector3) ref vector3).\u002Ector(enemyPopData.popX, num, enemyPopData.popZ);
+        valid = MonoBehaviourSingleton<StageManager>.I.CheckPosInside(vector3);
+      }
+      else
+      {
+        vector3 = MonoBehaviourSingleton<StageManager>.I.GetRandomPosByInsideInfo(new Vector3(enemyPopData.popX, num, enemyPopData.popZ), enemyPopData.popRadius, 0.0f, ref valid);
+        if (!this.isHideSpawn)
+          quaternion = !enemyPopData.enableRotY ? Quaternion.AngleAxis(Random.value * 360f, Vector3.up) : Quaternion.AngleAxis(enemyPopData.rotY, Vector3.up);
+      }
+      if (!valid)
+        Log.Error(LOG.INGAME, "FieldMapEnemyPop position is failed. mapID:{0} enemyID:{1} popIndex:{2}", (object) enemyPopData.mapID, (object) enemyPopData.enemyID, (object) this.enemyPopIndex);
+      if (QuestManager.IsValidInGameDefenseBattle())
+      {
+        Vector3 bossAppearOffsetPos = MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.bossAppearOffsetPos;
+        float bossAppearAngleY = MonoBehaviourSingleton<InGameSettingsManager>.I.defenseBattleParam.bossAppearAngleY;
+        vector3 = bossAppearOffsetPos;
+        quaternion = Quaternion.Euler(0.0f, bossAppearAngleY, 0.0f);
+      }
+      this.walkSpeedRateFromTable = enemyPopData.GenerateWalkSpeed();
+      this._position = vector3;
+      this._rotation = quaternion;
+      this.SetAppearPos(vector3);
+    }
+    else
+      this.SetAppearPos(Vector3.zero);
+  }
+
+  public void SetAppearPosForce(Vector3 pos, FieldMapTable.EnemyPopTableData popData)
+  {
+    if (popData != null)
+      this.walkSpeedRateFromTable = popData.GenerateWalkSpeed();
+    this._position = pos;
+    this.SetAppearPos(pos);
+  }
+
+  private static ELEMENT_TYPE GetWeakType(ELEMENT_TYPE type)
+  {
+    switch (type)
+    {
+      case ELEMENT_TYPE.FIRE:
+        return ELEMENT_TYPE.SOIL;
+      case ELEMENT_TYPE.WATER:
+        return ELEMENT_TYPE.FIRE;
+      case ELEMENT_TYPE.THUNDER:
+        return ELEMENT_TYPE.WATER;
+      case ELEMENT_TYPE.SOIL:
+        return ELEMENT_TYPE.THUNDER;
+      case ELEMENT_TYPE.LIGHT:
+        return ELEMENT_TYPE.DARK;
+      case ELEMENT_TYPE.DARK:
+        return ELEMENT_TYPE.LIGHT;
+      default:
+        return ELEMENT_TYPE.MAX;
+    }
+  }
+
+  private static ELEMENT_TYPE GetStrongType(ELEMENT_TYPE type)
+  {
+    switch (type)
+    {
+      case ELEMENT_TYPE.FIRE:
+        return ELEMENT_TYPE.WATER;
+      case ELEMENT_TYPE.WATER:
+        return ELEMENT_TYPE.THUNDER;
+      case ELEMENT_TYPE.THUNDER:
+        return ELEMENT_TYPE.SOIL;
+      case ELEMENT_TYPE.SOIL:
+        return ELEMENT_TYPE.FIRE;
+      case ELEMENT_TYPE.LIGHT:
+        return ELEMENT_TYPE.MAX;
+      case ELEMENT_TYPE.DARK:
+        return ELEMENT_TYPE.MAX;
+      default:
+        return ELEMENT_TYPE.MAX;
+    }
+  }
+
+  private static Enemy.EFFECTIVE_TYPE GetEffectiveType(ELEMENT_TYPE attack, ELEMENT_TYPE defense)
+  {
+    if (ELEMENT_TYPE.MAX == attack || ELEMENT_TYPE.MAX == defense)
+      return Enemy.EFFECTIVE_TYPE.NORMAL;
+    if (defense == Enemy.GetWeakType(attack))
+      return Enemy.EFFECTIVE_TYPE.GOOD;
+    return defense == Enemy.GetStrongType(attack) ? Enemy.EFFECTIVE_TYPE.BAD : Enemy.EFFECTIVE_TYPE.NORMAL;
+  }
+
+  public void ActReleaseGrabbedPlayers(
+    bool isWeakHit,
+    bool isSpWeakhit,
+    bool forceRelease,
+    float angle = 0.0f,
+    float power = 0.0f)
+  {
+    if (!this.isBoss && !this.enemyID.ToString().StartsWith("9944"))
+      return;
+    EnemyBrain brain = this.controller.brain as EnemyBrain;
+    if (Object.op_Equality((Object) brain, (Object) null))
+      return;
+    GrabController grabController = brain.actionCtrl.grabController;
+    if (((grabController.releaseByWeakHit & isWeakHit ? 1 : (grabController.releaseBySpWeakHit & isSpWeakhit ? 1 : 0)) | (forceRelease ? 1 : 0)) == 0)
+      return;
+    brain.actionCtrl.grabController.ReleaseAll(angle, power);
+    if (Object.op_Inequality((Object) this.enemySender, (Object) null))
+      this.enemySender.OnReleaseGrabbed(angle, power);
+    this.GrabHp = (XorInt) 0;
+  }
+
+  private void KeepRandomShot(AnimEventData.EventData data)
+  {
+    if (!this.IsOriginal() && !this.IsCoopNone())
+      return;
+    this.StartCoroutine(this.DoShotAutomaticRandom(data.stringArgs[0], data.floatArgs[0], data.floatArgs[1], data.floatArgs[2], data.intArgs[0]));
+  }
+
+  private IEnumerator DoShotAutomaticRandom(
+    string atkName,
+    float interval,
+    float duration,
+    float range,
+    int shotNum)
+  {
+    if (shotNum <= 0)
+      shotNum = 1;
+    List<Vector3> pointList = new List<Vector3>(shotNum);
+    List<Quaternion> rotList = new List<Quaternion>(shotNum);
+    float timer = 0.0f;
+    float lastShotTime = 0.0f;
+    while ((double) timer < (double) duration && !this.isDead)
+    {
+      timer += Time.deltaTime;
+      if ((double) timer - (double) lastShotTime > (double) interval)
+      {
+        pointList.Clear();
+        for (int index = 0; index < shotNum; ++index)
+        {
+          Vector3 vector3 = Vector3.op_Multiply(Vector3.forward, Random.Range(3f, range));
+          pointList.Add(Vector3.op_Addition(Quaternion.op_Multiply(Quaternion.AngleAxis(Random.Range(0.0f, 360f), Vector3.up), vector3), this._transform.position));
+        }
+        this.ActShotBullet(atkName, pointList, rotList);
+        lastShotTime = timer;
+      }
+      yield return (object) null;
+    }
+  }
+
+  public void ActShotBullet(string atkName, List<Vector3> posList, List<Quaternion> rotList)
+  {
+    AttackInfo attackInfo = this.FindAttackInfo(atkName);
+    Vector3 position = this._transform.position;
+    for (int index = 0; index < posList.Count; ++index)
+    {
+      Vector3 pos = Vector3.op_Subtraction(posList[index], position);
+      Quaternion rot = Quaternion.identity;
+      if (index < rotList.Count)
+        rot = rotList[index];
+      AnimEventShot.Create((StageObject) this, attackInfo, pos, rot);
+    }
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.OnShotBullet(atkName, posList, rotList);
+  }
+
+  private void EventCreateIceFloor(AnimEventData.EventData data)
+  {
+    string stringArg = data.stringArgs[0];
+    BulletData.BulletIceFloor.TARGETING_TYPE intArg = (BulletData.BulletIceFloor.TARGETING_TYPE) data.intArgs[0];
+    List<Vector3> vector3List = new List<Vector3>(4);
+    List<Quaternion> quaternionList = new List<Quaternion>(4);
+    AttackInfo attackInfo = this.FindAttackInfo(stringArg);
+    if (attackInfo == null)
+    {
+      Log.Error("[CREATE_ICE_FLOOR]Attack info is not found");
+    }
+    else
+    {
+      BulletData bulletData = attackInfo.bulletData;
+      if (Object.op_Equality((Object) bulletData, (Object) null))
+        Log.Error("[CREATE_ICE_FLOOR]BulletData is not found");
+      else if (bulletData.dataIceFloor == null)
+      {
+        Log.Error("[CREATE_ICE_FLOOR]BulletData.IceFloor is NULL");
+      }
+      else
+      {
+        List<StageObject> playerList = MonoBehaviourSingleton<StageObjectManager>.I.playerList;
+        int count = playerList.Count;
+        switch (intArg)
+        {
+          case BulletData.BulletIceFloor.TARGETING_TYPE.NONE:
+            Vector3 zero1 = Vector3.zero;
+            if (data.floatArgs.Length >= 3)
+            {
+              // ISSUE: explicit constructor call
+              ((Vector3) ref zero1).\u002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+            }
+            vector3List.Add(zero1);
+            break;
+          case BulletData.BulletIceFloor.TARGETING_TYPE.NODE_OFFSET:
+            if (data.stringArgs.Length < 2)
+            {
+              Log.Error("[CREATE_ICE_FLOOR]AnimEventData Node Name is not found");
+              return;
+            }
+            Transform node = this.FindNode(data.stringArgs[1]);
+            if (Object.op_Equality((Object) node, (Object) null))
+            {
+              Log.Error("[CREATE_ICE_FLOOR]AnimEventData Node is not found");
+              return;
+            }
+            Vector3 zero2 = Vector3.zero;
+            if (data.floatArgs.Length >= 3)
+            {
+              // ISSUE: explicit constructor call
+              ((Vector3) ref zero2).\u002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+            }
+            Vector3 vector3 = Vector3.op_Addition(node.position, zero2);
+            vector3List.Add(vector3);
+            break;
+          case BulletData.BulletIceFloor.TARGETING_TYPE.ALL_PLAYERS:
+            for (int index = 0; index < count; ++index)
+              vector3List.Add(playerList[index]._position);
+            break;
+          case BulletData.BulletIceFloor.TARGETING_TYPE.RANDOM_CHOICE:
+            vector3List.Add(playerList[Random.Range(0, count)]._position);
+            break;
+        }
+        this.ActCreateIceFloor(bulletData, vector3List, quaternionList);
+        if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+          return;
+        this.enemySender.OnCreateIceFloor(stringArg, vector3List, quaternionList);
+      }
+    }
+  }
+
+  public void ActCreateIceFloor(
+    string attackInfoName,
+    List<Vector3> posList,
+    List<Quaternion> rotList)
+  {
+    AttackInfo attackInfo = this.FindAttackInfo(attackInfoName);
+    if (attackInfo == null || Object.op_Equality((Object) attackInfo.bulletData, (Object) null))
+      return;
+    BulletData bulletData = attackInfo.bulletData;
+    if (Object.op_Equality((Object) bulletData, (Object) null))
+      return;
+    this.ActCreateIceFloor(bulletData, posList, rotList);
+  }
+
+  public void ActCreateIceFloor(
+    BulletData bulletData,
+    List<Vector3> posList,
+    List<Quaternion> rotList)
+  {
+    string effectName = bulletData.data.effectName;
+    for (int index = 0; index < posList.Count; ++index)
+    {
+      Transform gameObject = Utility.CreateGameObject(((Object) bulletData).name, MonoBehaviourSingleton<StageObjectManager>.I._transform);
+      gameObject.position = posList[index];
+      ((Component) gameObject).gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
+      Transform effect = EffectManager.GetEffect(effectName, gameObject);
+      if (Object.op_Inequality((Object) effect, (Object) null))
+        effect.localScale = Vector3.one;
+      IceFloor iceFloor = ((Component) gameObject).gameObject.AddComponent<IceFloor>();
+      iceFloor.duration = bulletData.dataIceFloor.duration;
+      iceFloor.SetCollider(bulletData.data.radius);
+      iceFloor.SetEffect(effect);
+    }
+  }
+
+  public void EventActionModeIdChange(AnimEventData.EventData data)
+  {
+    EnemyBrain brain = this.controller.brain as EnemyBrain;
+    if (Object.op_Equality((Object) brain, (Object) null))
+      return;
+    EnemyActionController actionCtrl = brain.actionCtrl;
+    if (actionCtrl == null)
+      return;
+    actionCtrl.modeId = data.intArgs[0];
+  }
+
+  public void AnimationLayerWeightChange(AnimEventData.EventData data)
+  {
+    Enemy.AnimationLayerWeightChangeInfo weightChangeInfo = new Enemy.AnimationLayerWeightChangeInfo();
+    Animator animator = this.loader.GetAnimator();
+    weightChangeInfo.aliveFlag = true;
+    weightChangeInfo.layerIndex = data.intArgs[0];
+    weightChangeInfo.target = data.floatArgs[1];
+    weightChangeInfo.weight = animator.GetLayerWeight(weightChangeInfo.layerIndex);
+    weightChangeInfo.forceEndFlag = data.intArgs[1] != 0;
+    if ((double) weightChangeInfo.weight == (double) weightChangeInfo.target)
+      return;
+    weightChangeInfo.spd = (double) weightChangeInfo.weight >= (double) weightChangeInfo.target ? -data.floatArgs[0] : data.floatArgs[0];
+    if ((double) weightChangeInfo.spd == 0.0)
+    {
+      animator.SetLayerWeight(weightChangeInfo.layerIndex, weightChangeInfo.target);
+      weightChangeInfo.aliveFlag = false;
+    }
+    bool flag = false;
+    int index = 0;
+    for (int count = this.animLayerWeightChangeInfo.Count; index < count; ++index)
+    {
+      if (this.animLayerWeightChangeInfo[index].layerIndex == weightChangeInfo.layerIndex)
+      {
+        this.animLayerWeightChangeInfo[index] = weightChangeInfo;
+        flag = true;
+        break;
+      }
+    }
+    if (flag)
+      return;
+    this.animLayerWeightChangeInfo.Add(weightChangeInfo);
+  }
+
+  public void EventTargetChangeHateRanking(AnimEventData.EventData data)
+  {
+    if (data == null || Object.op_Equality((Object) this.controller, (Object) null) || Object.op_Equality((Object) this.controller.brain, (Object) null))
+      return;
+    EnemyBrain brain = this.controller.brain as EnemyBrain;
+    if (Object.op_Equality((Object) brain, (Object) null) || brain.opponentMem == null || !brain.opponentMem.haveHateControl)
+      return;
+    int intArg = data.intArgs[0];
+    OpponentMemory.OpponentRecord[] hateRankingObjects = this.GetHateRankingObjects(data.intArgs[1] == 0);
+    if (hateRankingObjects == null)
+      return;
+    int index = intArg - 1;
+    if (intArg == 0)
+      index = Random.Range(0, hateRankingObjects.Length);
+    if (0 > index || index >= hateRankingObjects.Length)
+      return;
+    brain.targetCtrl.SetCurrentTarget(hateRankingObjects[index].obj);
+  }
+
+  public void EventElementToleranceChange(AnimEventData.EventData data)
+  {
+    int intArg1 = data.intArgs[0];
+    if (intArg1 >= this.regionInfos.Length)
+    {
+      Log.Error("Region Index is out of range!! ");
+    }
+    else
+    {
+      int intArg2 = data.intArgs[1];
+      this.ProcessElementToleranceChange(intArg1, intArg2);
+      if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
+        MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(this.enemyTableData.name, STRING_CATEGORY.ENEMY_REACTION, this.kStrIdx_EnemyReaction_ElemTolChange);
+      this.changeToleranceRegionId = intArg1;
+      this.changeToleranceScroll = intArg2;
+    }
+  }
+
+  public void ProcessElementToleranceChange(int regionIndex, int scroll)
+  {
+    if (scroll < 0)
+      return;
+    if (regionIndex >= 0)
+    {
+      this.regionInfos[regionIndex].tolerance.ChangeElementTolerance(scroll);
+    }
+    else
+    {
+      int index = 0;
+      for (int length = this.regionInfos.Length; index < length; ++index)
+        this.regionInfos[index].tolerance.ChangeElementTolerance(scroll);
+    }
+  }
+
+  public void SetBlendColor(List<BlendColorCtrl.ShaderSyncParam> list)
+  {
+    if (this.blendColorCtrl == null)
+      return;
+    this.blendColorCtrl.Sync(this.skinnedMeshRendererList, list);
+  }
+
+  public void EventBlendColorChange(AnimEventData.EventData data)
+  {
+    if (this.blendColorCtrl == null)
+      return;
+    this.blendColorCtrl.Change(data, this.skinnedMeshRendererList);
+  }
+
+  public void EventBlendColorEnable(AnimEventData.EventData data, bool isEnable)
+  {
+    if (this.blendColorCtrl == null)
+      return;
+    this.blendColorCtrl.Enable(data, isEnable, this.skinnedMeshRendererList);
+  }
+
+  public void EventElementIconChange(AnimEventData.EventData data)
+  {
+    ELEMENT_TYPE elementType = this.GetElementType();
+    ELEMENT_TYPE intArg = (ELEMENT_TYPE) data.intArgs[0];
+    MonoBehaviourSingleton<UIEnemyStatus>.I.SetElementIcon(intArg);
+    this.changeElementIcon = intArg;
+    this.ResetElementDebuff(elementType, this.changeElementIcon);
+  }
+
+  public void EventWeakElementIconChange(AnimEventData.EventData data)
+  {
+    ELEMENT_TYPE intArg = (ELEMENT_TYPE) data.intArgs[0];
+    MonoBehaviourSingleton<UIEnemyStatus>.I.SetWeakElementIcon(intArg);
+    this.changeWeakElementIcon = intArg;
+  }
+
+  public ELEMENT_TYPE GetElementType()
+  {
+    return this.changeElementIcon != ELEMENT_TYPE.MAX ? this.changeElementIcon : this.GetElementTypeByRegion();
+  }
+
+  private void EventRegionColliderAtkHitOn(AnimEventData.EventData data)
+  {
+    int intArg = data.intArgs[0];
+    if (intArg < 0 || intArg >= this.regionInfos.Length)
+      Log.Error("Region Index is out of range!! ");
+    else
+      this.regionInfos[intArg].isAtkColliderHit = true;
+  }
+
+  private void EventRegionColliderAtkHitOff(AnimEventData.EventData data)
+  {
+    int intArg = data.intArgs[0];
+    if (intArg < 0 || intArg >= this.regionInfos.Length)
+      Log.Error("Region Index is out of range!! ");
+    else
+      this.regionInfos[intArg].isAtkColliderHit = false;
+  }
+
+  public void EventCounterEnabledOn(AnimEventData.EventData data)
+  {
+    int intArg = data.intArgs[0];
+    if (intArg < 0 || intArg >= this.regionInfos.Length)
+      Log.Error("Region Index is out of range!! ");
+    else
+      this.regionInfos[intArg].counterInfo.enabled = true;
+  }
+
+  public void EventCounterEnabledOff(AnimEventData.EventData data)
+  {
+    int intArg = data.intArgs[0];
+    if (intArg < 0 || intArg >= this.regionInfos.Length)
+      Log.Error("Region Index is out of range!! ");
+    else
+      this.regionInfos[intArg].counterInfo.enabled = false;
+  }
+
+  public void EventBuffCancellation(AnimEventData.EventData data)
+  {
+    if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+      return;
+    List<StageObject> playerList = MonoBehaviourSingleton<StageObjectManager>.I.playerList;
+    int index = 0;
+    for (int count = playerList.Count; index < count; ++index)
+    {
+      Player player = playerList[index] as Player;
+      if (!Object.op_Equality((Object) player, (Object) null) && (player.IsCoopNone() || player.IsOriginal()))
+        player.OnBuffCancellation();
+    }
+    if (!MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid() || MonoBehaviourSingleton<StageObjectManager>.I.self.IsInBarrier())
+      return;
+    MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(string.Empty, STRING_CATEGORY.ENEMY_REACTION, this.kStrIdx_EnemyReaction_BuffCancellation);
+  }
+
+  private void EventDamageToEndurance(AnimEventData.EventData data)
+  {
+    if (!MonoBehaviourSingleton<InGameProgress>.IsValid())
+      return;
+    MonoBehaviourSingleton<InGameProgress>.I.DamageToEndurance(data.intArgs[0]);
+  }
+
+  private void EventSyncActionTarget(AnimEventData.EventData data)
+  {
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.OnEnemySyncTarget(this.actionTarget);
+  }
+
+  protected override void EventCameraTargetOffsetOn(AnimEventData.EventData data)
+  {
+    if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+      return;
+    float[] floatArgs = data.floatArgs;
+    InGameCameraManager.TargetOffset targetOffset = new InGameCameraManager.TargetOffset();
+    targetOffset.pos = new Vector3(floatArgs[0], floatArgs[1], floatArgs[2]);
+    targetOffset.rot = new Vector3(floatArgs[3], floatArgs[4], floatArgs[5]);
+    if (floatArgs.Length > 6)
+      targetOffset.smoothMaxSpeed = floatArgs[6];
+    MonoBehaviourSingleton<InGameCameraManager>.I.SetAnimEventTargetOffsetByEnemy(targetOffset);
+  }
+
+  protected override void EventCameraTargetOffsetOff()
+  {
+    if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<InGameCameraManager>.I.ClearAnimEventTargetOffsetByEnemy();
+  }
+
+  public override void EventCameraTargetRotateOn(AnimEventData.EventData data)
+  {
+    if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+      return;
+    InGameCameraManager.TargetPosition targetPosition = new InGameCameraManager.TargetPosition();
+    if (data.intArgs[0] > 0)
+    {
+      Vector3 pos = Vector3.zero;
+      if (!this.GetTargetPos(out pos))
+        return;
+      targetPosition.pos = Vector3.op_Addition(pos, new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]));
+    }
+    else
+      targetPosition.pos = Vector3.op_Addition(this._position, new Vector3(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]));
+    if (data.floatArgs.Length > 3)
+      targetPosition.smoothMaxSpeed = data.floatArgs[3];
+    MonoBehaviourSingleton<InGameCameraManager>.I.SetAnimEventTargetPositionByEnemy(targetPosition);
+  }
+
+  public override void EventCameraTargetRotateOff()
+  {
+    if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<InGameCameraManager>.I.ClearAnimEventTargetPositionByEnemy();
+  }
+
+  protected override void UpdateAction()
+  {
+    base.UpdateAction();
+    switch (this.actionID)
+    {
+      case Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE:
+        this.UpdateDownAction();
+        break;
+      case (Character.ACTION_ID) 18:
+        if ((double) this.m_dizzyTime - (double) Time.time <= 0.0)
+          this.SetNextTrigger();
+        if (!this.IsPlayingMotion(1))
+          break;
+        this.OnPlayingEndMotion();
+        break;
+      case (Character.ACTION_ID) 19:
+        this.UpdateDebuffShadowSealingAction();
+        break;
+      case (Character.ACTION_ID) 22:
+        this.UpdateLightRingAction();
+        break;
+      case (Character.ACTION_ID) 23:
+        this.UpdateBindAction();
+        break;
+      case (Character.ACTION_ID) 25:
+        this.UpdateConcussion();
+        break;
+    }
+  }
+
+  public bool HasValidTargetPoint()
+  {
+    return !this.isDead && this.enableTargetPoint && this.targetPoints != null && this.targetPoints.Length != 0 && !this.isHiding && !this.isSummonAttack;
+  }
+
+  public Coop_Model_EnemyInitialize CreateBackup(bool isEndAction = true)
+  {
+    if (isEndAction)
+      this.EndAction();
+    Coop_Model_EnemyInitialize model = new Coop_Model_EnemyInitialize();
+    this.enemySender.SetupEnemyInitializeModel(model, false, false);
+    return model;
+  }
+
+  public void InitHide()
+  {
+    if (!this.isHiding)
+      return;
+    this.PlayMotion(11, 0.0f);
+    this.actionID = Character.ACTION_ID.HIDE;
+    this.SetColliderStatuses(false);
+    this.viewData = Singleton<FieldMapTable>.I.GetGatherPointViewData(this.gatherPointViewId);
+    if (this.viewData == null)
+    {
+      Log.Error(LOG.INGAME, $"Invalid GatherPointViewID enemyId:{(object) this.enemyID} ViewID:{(object) this.gatherPointViewId}");
+    }
+    else
+    {
+      if (string.IsNullOrEmpty(this.viewData.gatherEffectName) || !Object.op_Equality((Object) this.gatherEffect, (Object) null))
+        return;
+      this.gatherEffect = EffectManager.GetEffect(this.viewData.gatherEffectName, this._transform);
+    }
+  }
+
+  public void TurnUp()
+  {
+    this.SetNextTrigger();
+    this._TurnUp();
+  }
+
+  public void TurnUpImmediate()
+  {
+    this.ActIdle(transitionTime: 0.0f);
+    this._TurnUp();
+  }
+
+  private void _TurnUp()
+  {
+    this.isHiding = false;
+    this.enemySender.OnTurnUp();
+    this.SetColliderStatuses(true);
+    if (Object.op_Inequality((Object) this.targetEffect, (Object) null))
+      EffectManager.ReleaseEffect(((Component) this.targetEffect).gameObject);
+    if (!Object.op_Inequality((Object) this.gatherEffect, (Object) null))
+      return;
+    EffectManager.ReleaseEffect(((Component) this.gatherEffect).gameObject);
+  }
+
+  public void UpdateGatherTargetMarker(bool isNear)
+  {
+    if (!this.isHiding)
+      return;
+    Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
+    float num = 0.0f;
+    if (Object.op_Inequality((Object) self, (Object) null))
+      num = Vector3.Distance(this._transform.position, self._position);
+    if (Object.op_Inequality((Object) self, (Object) null) && (double) num <= (double) this.viewData.targetRadius)
+    {
+      if (Object.op_Equality((Object) this.targetEffect, (Object) null) && !string.IsNullOrEmpty(this.viewData.targetEffectName))
+        this.targetEffect = EffectManager.GetEffect(this.viewData.targetEffectName, this._transform);
+      if (!Object.op_Inequality((Object) this.targetEffect, (Object) null))
+        return;
+      Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
+      Vector3 position = cameraTransform.position;
+      Quaternion rotation = cameraTransform.rotation;
+      Vector3 vector3 = Vector3.op_Subtraction(position, this._transform.position);
+      this.targetEffect.Set(Vector3.op_Addition(Vector3.op_Addition(Vector3.op_Multiply(((Vector3) ref vector3).normalized, this.viewData.targetEffectShift), Vector3.op_Multiply(Vector3.up, this.viewData.targetEffectHeight)), this._transform.position), rotation);
+    }
+    else
+    {
+      if (!Object.op_Inequality((Object) this.targetEffect, (Object) null))
+        return;
+      EffectManager.ReleaseEffect(((Component) this.targetEffect).gameObject);
+    }
+  }
+
+  private void SetColliderStatuses(bool enabled)
+  {
+    this._collider.enabled = enabled;
+    if (this.colliders == null)
+      return;
+    for (int index = 0; index < this.colliders.Length; ++index)
+      this.colliders[index].enabled = enabled;
+  }
+
+  public override void SafeActIdle()
+  {
+    if (this.isHiding)
+      return;
+    base.SafeActIdle();
+  }
+
+  public bool IsHideMotionPlaying() => this.IsPlayingMotion(11) || this.IsPlayingMotion(12);
+
+  private bool IsCannonBallHitShieldRegion(EnemyRegionWork regionWork, AttackHitInfo atkInfo)
+  {
+    return this.IsValidShield() && regionWork.isShieldDamage && atkInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL;
+  }
+
+  private bool CheckDisableBuffTypeByShield(BuffParam.BUFFTYPE targetType)
+  {
+    bool flag = false;
+    switch (targetType)
+    {
+      case BuffParam.BUFFTYPE.POISON:
+      case BuffParam.BUFFTYPE.BURNING:
+      case BuffParam.BUFFTYPE.DEADLY_POISON:
+      case BuffParam.BUFFTYPE.ELECTRIC_SHOCK:
+      case BuffParam.BUFFTYPE.EROSION:
+      case BuffParam.BUFFTYPE.SOIL_SHOCK:
+      case BuffParam.BUFFTYPE.ACID:
+      case BuffParam.BUFFTYPE.CORRUPTION:
+      case BuffParam.BUFFTYPE.STIGMATA:
+      case BuffParam.BUFFTYPE.CYCLONIC_THUNDERSTORM:
+        return flag;
+      default:
+        return flag;
+    }
+  }
+
+  private void OnBreakShield()
+  {
+  }
+
+  public EnemyRegionWork SearchShieldCriticalRegionWork()
+  {
+    for (int index = 0; index < this.regionWorks.Length; ++index)
+    {
+      if (this.regionWorks[index].isShieldCriticalDamage)
+        return this.regionWorks[index];
+    }
+    return (EnemyRegionWork) null;
+  }
+
+  private int CalcShieldDamage(bool isCritical, bool isElementCritical, AttackHitInfo atkInfo)
+  {
+    int toShieldAtk = atkInfo.toShieldAtk;
+    float num = 1f;
+    if (isCritical)
+      num += atkInfo.toShieldCriticalRate - 1f;
+    if (isElementCritical)
+      num += atkInfo.toShieldElementCriticalRate - 1f;
+    return (int) ((double) toShieldAtk * (double) num);
+  }
+
+  private IEnumerator SetShieldShaderParam()
+  {
+    if (this._rendererArray != null)
+    {
+      float duration = 1f;
+      float matCapPow = 0.0f;
+      while ((double) duration > 0.0)
+      {
+        duration -= Time.deltaTime;
+        matCapPow += Time.deltaTime;
+        if ((double) matCapPow >= 1.0)
+          matCapPow = 1f;
+        Utility.MaterialForEach(this._rendererArray, (Action<Material>) (material =>
+        {
+          if (!material.HasProperty("_MatCapPow"))
+            return;
+          material.SetFloat("_MatCapPow", matCapPow);
+        }));
+        yield return (object) null;
+      }
+    }
+  }
+
+  private void ResetShieldShaderParam()
+  {
+    if (this._rendererArray == null)
+      return;
+    Utility.MaterialForEach(this._rendererArray, (Action<Material>) (material =>
+    {
+      if (!material.HasProperty("_MatCapPow"))
+        return;
+      material.SetFloat("_MatCapPow", 0.0f);
+    }));
+  }
+
+  public TargetPoint SearchTargetPoint(int regionID)
+  {
+    int length = this.targetPoints.Length;
+    for (int index = 0; index < length; ++index)
+    {
+      if (this.targetPoints[index].regionID == regionID)
+        return this.targetPoints[index];
+    }
+    return (TargetPoint) null;
+  }
+
+  public override bool IsValidLightRing() => this.GetElementType() == ELEMENT_TYPE.DARK;
+
+  public virtual void ActLightRing()
+  {
+    if (this.IsDebuffShadowSealing() && this.shadowSealingStackDebuff.Contains((Character.ACTION_ID) 22))
+      return;
+    this.ActReleaseGrabbedPlayers(false, false, true);
+    if (this.IsDebuffShadowSealing())
+    {
+      if (this.shadowSealingStackDebuff.Contains((Character.ACTION_ID) 22))
+        return;
+      this.shadowSealingStackDebuff.Add((Character.ACTION_ID) 22);
+    }
+    else
+    {
+      this.EndAction();
+      this.actionID = (Character.ACTION_ID) 22;
+      this.PlayMotion(6, (double) this.stopMotionByDebuffNormalizedTime < 0.0 ? -1f : 0.0f);
+      if (Object.op_Inequality((Object) this._rigidbody, (Object) null))
+        this._rigidbody.velocity = Vector3.zero;
+      this.rotateEventKeep = false;
+      this.rotateToTargetFlag = false;
+      this.rotateEventSpeed = 0.0f;
+    }
+    this.CreateLightRingEffect();
+    InGameSettingsManager.LightRingParam lightRingParam = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.lightRingParam;
+    if (lightRingParam.startSeId != 0)
+      SoundManager.PlayOneShotSE(lightRingParam.startSeId, this._transform.position);
+    if (lightRingParam.loopSeId != 0)
+      SoundManager.PlayLoopSE(lightRingParam.loopSeId, (DisableNotifyMonoBehaviour) this, this._transform);
+    this.OnActReaction();
+    this.lightRingTime = Time.time + lightRingParam.duration;
+    if (!MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+      return;
+    MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
+  }
+
+  protected bool UpdateLightRingAction()
+  {
+    if ((double) this.lightRingTime - (double) Time.time <= 0.0)
+    {
+      this.ActLightRingEnd();
+      return true;
+    }
+    float num = 0.1f;
+    if ((double) this.stopMotionByDebuffNormalizedTime >= 0.0)
+      num = this.stopMotionByDebuffNormalizedTime;
+    AnimatorStateInfo animatorStateInfo = this.animator.GetCurrentAnimatorStateInfo(0);
+    if ((double) ((AnimatorStateInfo) ref animatorStateInfo).normalizedTime < (double) num || ((AnimatorStateInfo) ref animatorStateInfo).fullPathHash != Animator.StringToHash("Base Layer.damage") || this.m_isStopMotionByDebuff)
+      return false;
+    this.setPause(true);
+    this.m_isStopMotionByDebuff = true;
+    return false;
+  }
+
+  protected virtual void ActLightRingEnd()
+  {
+    if (!this.IsLightRing())
+      return;
+    this.badStatusMax.lightRing *= 1.5f;
+    if (Object.op_Inequality((Object) this.effectLightRing, (Object) null))
+    {
+      EffectManager.ReleaseEffect(((Component) this.effectLightRing).gameObject);
+      this.effectLightRing = (Transform) null;
+    }
+    if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+      MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
+    this.badStatusTotal.lightRing = 0.0f;
+    InGameSettingsManager.LightRingParam lightRingParam = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.lightRingParam;
+    if (lightRingParam.loopSeId != 0)
+      SoundManager.StopLoopSE(lightRingParam.loopSeId, (DisableNotifyMonoBehaviour) this);
+    if (lightRingParam.endSeId != 0)
+      SoundManager.PlayOneShotSE(lightRingParam.endSeId, this._transform.position);
+    if (this.IsDebuffShadowSealing())
+    {
+      if (!this.shadowSealingStackDebuff.Contains((Character.ACTION_ID) 22))
+        return;
+      this.shadowSealingStackDebuff.Remove((Character.ACTION_ID) 22);
+    }
+    else
+    {
+      this.setPause(false);
+      this.m_isStopMotionByDebuff = false;
+    }
+  }
+
+  public override bool IsLightRing()
+  {
+    return Object.op_Inequality((Object) this.effectLightRing, (Object) null);
+  }
+
+  protected void CreateLightRingEffect()
+  {
+    if (this.effectLightRing != null)
+      return;
+    Transform effect = EffectManager.GetEffect("ef_btl_enm_bindring_01", this._transform);
+    if (Object.op_Equality((Object) effect, (Object) null) || ((Component) effect).GetComponentsInChildren<ParticleSystem>(true) == null)
+      return;
+    this.CalcLightRingRadius();
+    Transform transform1 = effect;
+    transform1.localScale = Vector3.op_Multiply(transform1.localScale, this.lightRingRadius);
+    float num = this.lightRingHeight + this.lightRingHeightOffset;
+    Transform transform2 = effect;
+    transform2.localPosition = Vector3.op_Addition(transform2.localPosition, Vector3.op_Multiply(Vector3.up, num));
+    this.effectLightRing = effect;
+  }
+
+  private void CalcLightRingRadius()
+  {
+    if ((double) this.lightRingRadius > 0.0)
+      return;
+    this.lightRingRadius = 1f;
+    this.lightRingHeight = 1f;
+    if (Object.op_Equality((Object) this._collider, (Object) null))
+      return;
+    float num1 = 1f;
+    SphereCollider collider1 = this._collider as SphereCollider;
+    if (Object.op_Inequality((Object) collider1, (Object) null))
+      num1 = collider1.radius;
+    CapsuleCollider collider2 = this._collider as CapsuleCollider;
+    if (Object.op_Inequality((Object) collider2, (Object) null))
+      num1 = collider2.radius;
+    if ((double) this.effectLightRingRadiusRate > 0.0)
+      num1 = this.effectLightRingRadiusRate;
+    float num2 = num1 * this._transform.localScale.x;
+    this.lightRingHeight = num2;
+    this.lightRingRadius = num2 * 0.33f;
+    this.lightRingRadius = Mathf.Clamp(this.lightRingRadius, 0.5f, 1.5f);
+  }
+
+  public virtual void ActDebuffShadowSealingStart()
+  {
+    if (this.IsDebuffShadowSealing())
+      return;
+    this.EndAction();
+    this.ActReleaseGrabbedPlayers(false, false, true);
+    float sealingExtendRate = this._GetShadowSealingExtendRate();
+    InGameSettingsManager.ShadowSealingParam shadowSealingParam = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.shadowSealingParam;
+    this.debuffShadowSealingTimerDuration = shadowSealingParam.duration * this.badStatusMax.shadowSealingBind * sealingExtendRate;
+    if ((double) this.debuffShadowSealingTimerDuration < (double) shadowSealingParam.minDuration)
+      this.debuffShadowSealingTimerDuration = shadowSealingParam.minDuration;
+    this.debuffShadowSealingTimer = this.debuffShadowSealingTimerDuration;
+    this.actionID = (Character.ACTION_ID) 19;
+    this.PlayMotion(6, (double) this.stopMotionByDebuffNormalizedTime < 0.0 ? -1f : 0.0f);
+    this.CreateShadowSealingEffect();
+    if (shadowSealingParam.startSeId != 0)
+      SoundManager.PlayOneShotSE(shadowSealingParam.startSeId, this._transform.position);
+    if (shadowSealingParam.loopSeId != 0)
+      SoundManager.PlayLoopSE(shadowSealingParam.loopSeId, (DisableNotifyMonoBehaviour) this, this._transform);
+    if (Object.op_Inequality((Object) this._rigidbody, (Object) null))
+      this._rigidbody.velocity = Vector3.zero;
+    this.rotateEventKeep = false;
+    this.rotateToTargetFlag = false;
+    this.rotateEventSpeed = 0.0f;
+    this.ClearShadowSealingAll(false);
+    this.OnActReaction();
+    if (!MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+      return;
+    MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
+  }
+
+  private void CreateShadowSealingEffect()
+  {
+    this.debuffShadowSealingEffect = EffectManager.GetEffect("ef_btl_wsk_bow_01_04", this._transform);
+    if (this.debuffShadowSealingEffect == null)
+      return;
+    this.CalcShadowSealingEffectRadius();
+    Transform shadowSealingEffect = this.debuffShadowSealingEffect;
+    shadowSealingEffect.localScale = Vector3.op_Multiply(shadowSealingEffect.localScale, this.debuffShadowSealingRadius);
+  }
+
+  private void CalcShadowSealingEffectRadius()
+  {
+    if ((double) this.debuffShadowSealingRadius > 0.0)
+      return;
+    this.debuffShadowSealingRadius = 1f;
+    if (Object.op_Equality((Object) this._collider, (Object) null))
+      return;
+    if ((double) this.effectShadowSealingRadiusRate > 0.0)
+    {
+      this.debuffShadowSealingRadius = this.effectShadowSealingRadiusRate / 4f * this._transform.localScale.x;
+    }
+    else
+    {
+      SphereCollider collider1 = this._collider as SphereCollider;
+      if (Object.op_Inequality((Object) collider1, (Object) null))
+      {
+        this.debuffShadowSealingRadius = collider1.radius / 4f * this._transform.localScale.x;
+      }
+      else
+      {
+        CapsuleCollider collider2 = this._collider as CapsuleCollider;
+        if (!Object.op_Inequality((Object) collider2, (Object) null))
+          return;
+        this.debuffShadowSealingRadius = collider2.radius / 4f * this._transform.localScale.x;
+      }
+    }
+  }
+
+  protected override float GetFreezeEffectRadiusRate()
+  {
+    return (double) this.effectFreezeRadiusRate > 0.0 ? this.effectFreezeRadiusRate : base.GetFreezeEffectRadiusRate();
+  }
+
+  protected virtual void ActDebuffShadowSealingEnd()
+  {
+    if (!this.IsDebuffShadowSealing())
+      return;
+    bool flag1 = true;
+    bool flag2 = false;
+    if (this.shadowSealingStackDebuff.Contains(Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE))
+    {
+      this.EndAction();
+      this.actionID = Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE;
+      this.PlayMotion(this.IsAbleToUseDownTime() ? 118 : 117);
+      flag2 = true;
+    }
+    if (this.shadowSealingStackDebuff.Contains((Character.ACTION_ID) 22))
+    {
+      if (flag2)
+      {
+        this.ActLightRingEnd();
+      }
+      else
+      {
+        this.EndAction();
+        this.actionID = (Character.ACTION_ID) 22;
+        this.PlayMotion(6, (double) this.stopMotionByDebuffNormalizedTime < 0.0 ? -1f : 0.0f);
+        if (Object.op_Inequality((Object) this._rigidbody, (Object) null))
+          this._rigidbody.velocity = Vector3.zero;
+        this.rotateEventKeep = false;
+        this.rotateToTargetFlag = false;
+        this.rotateEventSpeed = 0.0f;
+      }
+      flag2 = true;
+    }
+    if (this.shadowSealingStackDebuff.Contains(Character.ACTION_ID.PARALYZE))
+    {
+      if (flag2)
+      {
+        this.ActParalyzeEnd();
+      }
+      else
+      {
+        this.EndAction();
+        this.actionID = Character.ACTION_ID.PARALYZE;
+        this.PlayMotion(8);
+      }
+      flag2 = true;
+    }
+    if (this.shadowSealingStackDebuff.Contains(Character.ACTION_ID.FREEZE))
+    {
+      if (flag2)
+      {
+        this.ActFreezeEnd();
+      }
+      else
+      {
+        flag1 = false;
+        this.actionID = Character.ACTION_ID.FREEZE;
+      }
+    }
+    if (this.shadowSealingStackDebuff.Contains((Character.ACTION_ID) 23))
+    {
+      if (flag2)
+      {
+        this.ActBindEnd();
+      }
+      else
+      {
+        this.EndAction();
+        this.actionID = (Character.ACTION_ID) 23;
+        this.PlayMotion(118);
+      }
+    }
+    if (this.paralyzeEffectTrans != null)
+    {
+      EffectManager.ReleaseEffect(((Component) this.paralyzeEffectTrans).gameObject);
+      this.paralyzeEffectTrans = (Transform) null;
+    }
+    if (this.debuffShadowSealingEffect != null)
+    {
+      EffectManager.ReleaseEffect(((Component) this.debuffShadowSealingEffect).gameObject);
+      this.debuffShadowSealingEffect = (Transform) null;
+    }
+    InGameSettingsManager.ShadowSealingParam shadowSealingParam = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.shadowSealingParam;
+    if (shadowSealingParam.loopSeId != 0)
+      SoundManager.StopLoopSE(shadowSealingParam.loopSeId, (DisableNotifyMonoBehaviour) this);
+    if (shadowSealingParam.endSeId != 0)
+      SoundManager.PlayOneShotSE(shadowSealingParam.endSeId, this._transform.position);
+    this.badStatusMax.shadowSealing *= shadowSealingParam.resistRate;
+    this.badStatusMax.shadowSealingBind *= this.shadowSealingBindResist;
+    if (flag1)
+    {
+      this.setPause(false);
+      this.m_isStopMotionByDebuff = false;
+    }
+    this._CheckShadowSealingTask();
+    int index = 0;
+    for (int length = this.regionWorks.Length; index < length; ++index)
+      this.regionWorks[index].shadowSealingData.ownerID = 0;
+    if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+      MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
+    this.shadowSealingStackDebuff.Clear();
+  }
+
+  private void UpdateDebuffShadowSealingAction()
+  {
+    if (!this.IsDebuffShadowSealing())
+      return;
+    this.debuffShadowSealingTimer -= Time.deltaTime;
+    if ((double) this.debuffShadowSealingTimer <= 0.0)
+    {
+      this.ActDebuffShadowSealingEnd();
+    }
+    else
+    {
+      for (int index = 0; index < this.shadowSealingStackDebuff.Count; ++index)
+      {
+        bool flag = false;
+        switch (this.shadowSealingStackDebuff[index])
+        {
+          case Character.ACTION_ID.PARALYZE:
+            flag = this.UpdateParalyzeAction();
+            break;
+          case Character.ACTION_ID.FREEZE:
+            flag = this.UpdateFreezeAction();
+            break;
+          case Character.ACTION_ID.ATTACK | Character.ACTION_ID.FREEZE:
+            flag = this.UpdateDownAction();
+            break;
+          case (Character.ACTION_ID) 22:
+            flag = this.UpdateLightRingAction();
+            break;
+          case (Character.ACTION_ID) 23:
+            flag = this.UpdateBindAction();
+            break;
+        }
+        if (flag)
+          --index;
+      }
+      float num = 0.1f;
+      if ((double) this.stopMotionByDebuffNormalizedTime >= 0.0)
+        num = this.stopMotionByDebuffNormalizedTime;
+      AnimatorStateInfo animatorStateInfo = this.animator.GetCurrentAnimatorStateInfo(0);
+      if ((double) ((AnimatorStateInfo) ref animatorStateInfo).normalizedTime < (double) num || ((AnimatorStateInfo) ref animatorStateInfo).fullPathHash != Animator.StringToHash("Base Layer.damage") || this.m_isStopMotionByDebuff)
+        return;
+      this.setPause(true);
+      this.m_isStopMotionByDebuff = true;
+    }
+  }
+
+  public override bool IsDebuffShadowSealing()
+  {
+    return Object.op_Inequality((Object) this.debuffShadowSealingEffect, (Object) null);
+  }
+
+  public float GetDebuffShadowSealingTimeRate()
+  {
+    return this.debuffShadowSealingTimer / this.debuffShadowSealingTimerDuration;
+  }
+
+  public void CountShadowSealingTarget()
+  {
+    this.shadowSealingTarget = 0;
+    if (!this.isBoss || this.regionWorks == null || ((IList<TargetPoint>) this.targetPoints).IsNullOrEmpty<TargetPoint>())
+      return;
+    int index1 = 0;
+    for (int length = this.regionWorks.Length; index1 < length; ++index1)
+      this.regionWorks[index1].shadowSealingData.isTarget = false;
+    List<int> intList = new List<int>();
+    int index2 = 0;
+    for (int length = this.targetPoints.Length; index2 < length; ++index2)
+    {
+      TargetPoint targetPoint = this.targetPoints[index2];
+      if (targetPoint.regionID >= 0 && targetPoint.regionID < this.regionWorks.Length)
+      {
+        EnemyRegionWork regionWork = this.regionWorks[targetPoint.regionID];
+        if (!targetPoint.isAimEnable || !targetPoint.param.isTargetEnable)
+        {
+          int index3 = 0;
+          for (int count = regionWork.bleedWorkList.Count; index3 < count; ++index3)
+          {
+            Enemy.BleedWork bleedWork = regionWork.bleedWorkList[index3];
+            if (bleedWork != null && bleedWork.bleedEffect != null)
+            {
+              EffectManager.ReleaseEffect(((Component) bleedWork.bleedEffect).gameObject);
+              bleedWork.bleedEffect = (Transform) null;
+            }
+          }
+          regionWork.bleedList.Clear();
+          regionWork.bleedWorkList.Clear();
+          regionWork.shadowSealingData.ownerID = 0;
+          regionWork.shadowSealingData.existSec = 0.0f;
+          regionWork.shadowSealingData.extendRate = 1f;
+          if (regionWork.shadowSealingEffect != null)
+          {
+            EffectManager.ReleaseEffect(((Component) regionWork.shadowSealingEffect).gameObject, false, true);
+            regionWork.shadowSealingEffect = (Transform) null;
+          }
+        }
+        else if (!intList.Contains(targetPoint.regionID))
+        {
+          regionWork.shadowSealingData.isTarget = true;
+          intList.Add(targetPoint.regionID);
+        }
+      }
+    }
+    this.shadowSealingTarget = intList.Count;
+    if (this._CheckShadowSealingFullStuck())
+      this.ActDebuffShadowSealingStart();
+    if (!MonoBehaviourSingleton<StageObjectManager>.IsValid() || !Object.op_Inequality((Object) MonoBehaviourSingleton<StageObjectManager>.I.self, (Object) null))
+      return;
+    MonoBehaviourSingleton<StageObjectManager>.I.self.ResetShadowSealingUI();
+  }
+
+  private bool _CheckShadowSealingFullStuck()
+  {
+    bool flag = false;
+    int index = 0;
+    for (int length = this.regionWorks.Length; index < length; ++index)
+    {
+      Enemy.ShadowSealingData shadowSealingData = this.regionWorks[index].shadowSealingData;
+      if (shadowSealingData.isTarget)
+      {
+        flag = true;
+        if (shadowSealingData.ownerID == 0)
+          return false;
+      }
+    }
+    return flag;
+  }
+
+  private void _CheckShadowSealingTask()
+  {
+    if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+      return;
+    Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
+    if (self == null)
+      return;
+    int index = 0;
+    for (int length = this.regionWorks.Length; index < length; ++index)
+    {
+      Enemy.ShadowSealingData shadowSealingData = this.regionWorks[index].shadowSealingData;
+      if (shadowSealingData.isTarget && shadowSealingData.ownerID == self.id)
+      {
+        self.taskChecker.OnShadowSealing();
+        if (!MonoBehaviourSingleton<InGameManager>.IsValid())
+          break;
+        MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnShadowSealing();
+        break;
+      }
+    }
+  }
+
+  private float _GetShadowSealingExtendRate()
+  {
+    if (this.regionWorks == null)
+      return 1f;
+    float sealingExtendRate = 1f;
+    int index = 0;
+    for (int length = this.regionWorks.Length; index < length; ++index)
+    {
+      Enemy.ShadowSealingData shadowSealingData = this.regionWorks[index].shadowSealingData;
+      if (shadowSealingData.isTarget && shadowSealingData.ownerID != 0 && (double) sealingExtendRate < (double) shadowSealingData.extendRate)
+        sealingExtendRate = shadowSealingData.extendRate;
+    }
+    return sealingExtendRate;
+  }
+
+  public int GetShadowSealingStuckNum()
+  {
+    if (this.regionWorks == null)
+      return 0;
+    int shadowSealingStuckNum = 0;
+    int index = 0;
+    for (int length = this.regionWorks.Length; index < length; ++index)
+    {
+      Enemy.ShadowSealingData shadowSealingData = this.regionWorks[index].shadowSealingData;
+      if (shadowSealingData.isTarget && shadowSealingData.ownerID != 0)
+        ++shadowSealingStuckNum;
+    }
+    return shadowSealingStuckNum;
+  }
+
+  public int GetShadowSealingNum() => this.shadowSealingTarget;
+
+  public void ResetConcussion(bool isInitialize = false, bool isResistUp = false)
+  {
+    this.concussionTotal = 0.0f;
+    if (isInitialize)
+      this.concussionMax = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.concussion.resistBase;
+    if (isResistUp)
+      this.concussionMax *= MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.concussion.resistRate;
+    this.concussionExtend = 1f;
+    this.concussionAddPlayerIdList.Clear();
+  }
+
+  public bool IsActConcussion() => this.actionID == (Character.ACTION_ID) 25;
+
+  private void CreateConcussionEffect()
+  {
+    this.concussionEffect = EffectManager.GetEffect("ef_btl_enm_flinch_01", this._transform);
+    if (this.concussionEffect == null)
+      return;
+    this.CalcShadowSealingEffectRadius();
+    Transform concussionEffect = this.concussionEffect;
+    concussionEffect.localScale = Vector3.op_Multiply(concussionEffect.localScale, this.debuffShadowSealingRadius);
+  }
+
+  public void ActConcussionStart()
+  {
+    if (this.IsConcussion())
+      return;
+    this.EndAction();
+    this.ActReleaseGrabbedPlayers(false, false, true);
+    this.actionID = (Character.ACTION_ID) 25;
+    InGameSettingsManager.Concussion concussion = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.concussion;
+    this.concussionTime = (float) ((double) Time.time + (double) this.downLoopStartTime + (double) concussion.duration * (double) this.concussionExtend);
+    this.concussionStartTime = Time.time + this.downLoopStartTime;
+    this.PlayMotion(118);
+    this.CreateConcussionEffect();
+    if (concussion.startSeId != 0)
+      SoundManager.PlayOneShotSE(concussion.startSeId, this._transform.position);
+    if (concussion.loopSeId != 0)
+      SoundManager.PlayLoopSE(concussion.loopSeId, (DisableNotifyMonoBehaviour) this, this._transform);
+    this.OnActReaction();
+    if (!MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+      return;
+    MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
+  }
+
+  private void UpdateConcussion()
+  {
+    if (!this.IsConcussion() || (double) this.concussionTime > (double) Time.time)
+      return;
+    if ((double) this.downTotal >= (double) this.downMax)
+    {
+      this.ActDown();
+    }
+    else
+    {
+      this.SetNextTrigger();
+      this.ActConcussionEnd();
+    }
+  }
+
+  public void ActConcussionEnd()
+  {
+    if (!this.IsConcussion())
+      return;
+    if (this.concussionEffect != null)
+    {
+      EffectManager.ReleaseEffect(((Component) this.concussionEffect).gameObject);
+      this.concussionEffect = (Transform) null;
+    }
+    InGameSettingsManager.Concussion concussion = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.concussion;
+    if (concussion.loopSeId != 0)
+      SoundManager.StopLoopSE(concussion.loopSeId, (DisableNotifyMonoBehaviour) this);
+    if (concussion.endSeId != 0)
+      SoundManager.PlayOneShotSE(concussion.endSeId, this._transform.position);
+    if (MonoBehaviourSingleton<UIEnemyStatus>.IsValid())
+      MonoBehaviourSingleton<UIEnemyStatus>.I.UpDateStatusIcon();
+    this.CheckConcussionTask();
+    this.ResetConcussion(isResistUp: true);
+  }
+
+  public override bool IsConcussion()
+  {
+    return Object.op_Inequality((Object) this.concussionEffect, (Object) null);
+  }
+
+  public float GetConcussionTimeRate()
+  {
+    return Mathf.Clamp((float) (((double) this.concussionTime - (double) Time.time) / ((double) this.concussionTime - (double) this.concussionStartTime)), 0.0f, 1f);
+  }
+
+  private void CheckConcussionTask()
+  {
+    if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+      return;
+    Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
+    if (self == null || !this.concussionAddPlayerIdList.Contains(self.id))
+      return;
+    self.taskChecker.OnConcussion();
+    if (!MonoBehaviourSingleton<InGameManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<InGameManager>.I.deliveryBattleChecker.OnConcussion();
+  }
+
+  public OpponentMemory.OpponentRecord[] GetHateRankingObjects(bool isIncludeDead)
+  {
+    EnemyBrain brain = this.controller.brain as EnemyBrain;
+    return Object.op_Inequality((Object) brain, (Object) null) ? brain.opponentMem.GetOpponentWithRankingHate(isIncludeDead) : (OpponentMemory.OpponentRecord[]) null;
+  }
+
+  protected bool CheckMadMode(AttackedHitStatusOwner status)
+  {
+    if (this.madModeHp == 0 || status.isDamageRegionOnly || this.IsValidBuff(BuffParam.BUFFTYPE.MAD_MODE))
+      return false;
+    int num = this.hp - status.damage;
+    if (num > this.madModeHp)
+      return false;
+    status.damage -= this.madModeHp - num;
+    return true;
+  }
+
+  private bool CheckDisableBuffTypeByMadMode(BuffParam.BUFFTYPE targetType)
+  {
+    return this.IsValidBuff(BuffParam.BUFFTYPE.MAD_MODE) && !MonoBehaviourSingleton<InGameSettingsManager>.I.madModeParam.onlyResistDebuff.Contains(targetType) && MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.ignoreBuffCancellation.Contains(targetType);
+  }
+
+  public void ActMadMode()
+  {
+    this.EndAction();
+    if (!this.PlayMotion(123))
+    {
+      this.ActIdle();
+    }
+    else
+    {
+      this.actionID = (Character.ACTION_ID) 20;
+      this.downTotal = 0.0f;
+      this.ResetConcussion();
+      this.badStatusTotal.Reset();
+      this.ResetBadReaction(MonoBehaviourSingleton<InGameSettingsManager>.I.madModeParam.isClearStuckArrow);
+      bool flag = false;
+      List<BuffParam.BUFFTYPE> buffCancellation = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.ignoreBuffCancellation;
+      int index = 0;
+      for (int count = buffCancellation.Count; index < count; ++index)
+      {
+        if (this.OnBuffEnd(buffCancellation[index], false, true))
+          flag = true;
+      }
+      if (flag)
+        this.SendBuffSync();
+      if (MonoBehaviourSingleton<UIEnemyAnnounce>.IsValid())
+        MonoBehaviourSingleton<UIEnemyAnnounce>.I.RequestAnnounce(this.enemyTableData.name, STRING_CATEGORY.ENEMY_REACTION, this.kStrIdx_EnemyReaction_MadMode);
+      this.OnActReaction();
+    }
+  }
+
+  private void ResetBadReaction(bool clearStuck)
+  {
+    if (clearStuck)
+      this.ClearBleedDamageAll();
+    if (this.IsLightRing())
+      this.ActLightRingEnd();
+    if (this.IsFreeze())
+      this.ActFreezeEnd();
+    if (!(this.IsDebuffShadowSealing() | clearStuck))
+      return;
+    this.ClearShadowSealingAll();
+  }
+
+  public void CheckFirstMadMode()
+  {
+    if (!this.IsCoopNone() && !this.IsOriginal() || this.madModeHpThreshold < 100 || (int) this.enemyLevel < this.madModeLvThreshold)
+      return;
+    this.isFirstMadMode = true;
+    this.LocalMadModeStart();
+  }
+
+  private void LocalMadModeStart()
+  {
+    BuffParam.BuffData data = new BuffParam.BuffData();
+    data.type = BuffParam.BUFFTYPE.MAD_MODE;
+    data.time = -1f;
+    data.endless = new bool?(true);
+    data.valueType = BuffParam.VALUE_TYPE.CONSTANT;
+    data.value = 1;
+    this.SetFromInfo(ref data);
+    this.OnBuffStart(data);
+  }
+
+  public override int GetObservedID()
+  {
+    string s = (this.id % 500000).ToString() + this.bulletIndex.ToString();
+    int observedId = -1;
+    ref int local = ref observedId;
+    if (!int.TryParse(s, out local))
+      return -1;
+    ++this.bulletIndex;
+    return observedId;
+  }
+
+  public override void OnBreak(int brokenBulletID, bool isSendOnlyOrigin)
+  {
+    if (this.bulletObservableList.IsNullOrEmpty<IBulletObservable>() || this.bulletObservableIdList.IsNullOrEmpty<int>() || !this.bulletObservableIdList.Contains(brokenBulletID))
+      return;
+    for (int index = 0; index < this.bulletObservableList.Count; ++index)
+    {
+      if (this.bulletObservableList[index].GetObservedID() == brokenBulletID)
+        this.bulletObservableList[index].ForceBreak();
+    }
+    this.bulletObservableList.RemoveAll((Predicate<IBulletObservable>) (o => o.GetObservedID() == brokenBulletID));
+    this.bulletObservableIdList.RemoveAll((Predicate<int>) (o => o == brokenBulletID));
+    if (!Object.op_Inequality((Object) this.enemySender, (Object) null))
+      return;
+    this.enemySender.OnBulletObservableBroken(brokenBulletID, isSendOnlyOrigin);
+  }
+
+  public override void OnBulletDestroy(int observedID)
+  {
+    this.bulletObservableList.RemoveAll((Predicate<IBulletObservable>) (o => o.GetObservedID() == observedID));
+    this.bulletObservableIdList.RemoveAll((Predicate<int>) (o => o == observedID));
+  }
+
+  public ELEMENT_TYPE GetElementTypeByRegion()
+  {
+    return Utility.GetEffectiveElementType(this.GetAntiElementTypeByRegion());
+  }
+
+  public ELEMENT_TYPE GetAntiElementTypeByRegion()
+  {
+    if (((IList<Enemy.RegionInfo>) this.regionInfos).IsNullOrEmpty<Enemy.RegionInfo>())
+      return ELEMENT_TYPE.MAX;
+    Enemy.RegionInfo regionInfo = (Enemy.RegionInfo) null;
+    int index = 0;
+    for (int length = this.regionInfos.Length; index < length; ++index)
+    {
+      if (this.regionInfos[index].name == "body")
+      {
+        regionInfo = this.regionInfos[index];
+        break;
+      }
+    }
+    return regionInfo == null ? ELEMENT_TYPE.MAX : regionInfo.tolerance.GetAntiElementType();
+  }
+
+  public bool CheckShow(Bounds bound)
+  {
+    return !MonoBehaviourSingleton<InGameCameraCuller>.IsValid() || MonoBehaviourSingleton<InGameCameraCuller>.I.IsVisible(bound);
+  }
+
+  private Bounds getBounds(GameObject objeto)
+  {
+    Bounds renderBounds = this.getRenderBounds(objeto);
+    if ((double) ((Bounds) ref renderBounds).extents.x == 0.0)
+    {
+      // ISSUE: explicit constructor call
+      ((Bounds) ref renderBounds).\u002Ector(objeto.transform.position, Vector3.zero);
+      foreach (Transform transform in objeto.transform)
+      {
+        Renderer component = ((Component) transform).GetComponent<Renderer>();
+        if (Object.op_Implicit((Object) component))
+          ((Bounds) ref renderBounds).Encapsulate(component.bounds);
+        else
+          ((Bounds) ref renderBounds).Encapsulate(this.getBounds(((Component) transform).gameObject));
+      }
+    }
+    return renderBounds;
+  }
+
+  private Bounds getBounds(GameObject objeto, Renderer[] renders)
+  {
+    Bounds bounds;
+    // ISSUE: explicit constructor call
+    ((Bounds) ref bounds).\u002Ector(Vector3.zero, Vector3.zero);
+    if (renders != null && renders.Length != 0)
+    {
+      int index = 0;
+      for (int length = renders.Length; index < length; ++index)
+      {
+        if (Object.op_Inequality((Object) renders[index], (Object) null))
+          ((Bounds) ref bounds).Encapsulate(renders[index].bounds);
+      }
+    }
+    return bounds;
+  }
+
+  private Bounds getRenderBounds(GameObject objeto)
+  {
+    Bounds bounds;
+    // ISSUE: explicit constructor call
+    ((Bounds) ref bounds).\u002Ector(Vector3.zero, Vector3.zero);
+    Renderer component = objeto.GetComponent<Renderer>();
+    return Object.op_Inequality((Object) component, (Object) null) ? component.bounds : bounds;
+  }
+
+  public enum SUB_ACTION_ID
+  {
+    STEP = 13, // 0x0000000D
+    DOWN = 14, // 0x0000000E
+    ANGRY = 15, // 0x0000000F
+    ESCAPE = 16, // 0x00000010
+    COUNTER = 17, // 0x00000011
+    DIZZY = 18, // 0x00000012
+    SHADOWSEALING = 19, // 0x00000013
+    MAD_MODE = 20, // 0x00000014
+    APPEAR = 21, // 0x00000015
+    LIGHT_RING = 22, // 0x00000016
+    BIND = 23, // 0x00000017
+    DEAD_REVIVE = 24, // 0x00000018
+    CONCUSSION = 25, // 0x00000019
+    MAX = 26, // 0x0000001A
+  }
+
+  public enum SUB_MOTION_ID
+  {
+    STEP = 115, // 0x00000073
+    STEP_BACK = 116, // 0x00000074
+    DOWN = 117, // 0x00000075
+    DOWN_TIME = 118, // 0x00000076
+    COUNTER = 119, // 0x00000077
+    ESCAPE_START = 120, // 0x00000078
+    ESCAPE = 121, // 0x00000079
+    DIZZY = 122, // 0x0000007A
+    MAD_MODE = 123, // 0x0000007B
+    APPEAR = 124, // 0x0000007C
+    DEAD_REVIVE_01 = 125, // 0x0000007D
+    DEAD_REVIVE_02 = 126, // 0x0000007E
+    DEAD_REVIVE_03 = 127, // 0x0000007F
+    DEAD_REVIVE_04 = 128, // 0x00000080
+    DEAD_REVIVE_05 = 129, // 0x00000081
+    ANGRY_BEGIN = 130, // 0x00000082
+    ANGRY_END = 146, // 0x00000092
+    MAX = 147, // 0x00000093
+  }
+
+  [Serializable]
+  public class RegionInfo
+  {
+    public string name;
+    public int maxHP = 10;
+    public string[] deactivateObjects;
+    [Tooltip("ヒット素材名(EnemyHitMaterialTable)")]
+    public string hitMaterialName;
+    public Enemy.RegionInfo.BreakEffect breakEffect;
+    public Enemy.RegionInfo.BreakDrop breakDrop;
+    [Tooltip("部位破壊時ダウンモーション")]
+    public bool breakInDown;
+    [Tooltip("部位破壊時ダメージモーション")]
+    public bool breakInDamage;
+    [Tooltip("部位破壊後ヒット有効フラグ")]
+    public bool breakAfterHit = true;
+    [Tooltip("部位破壊後生成バレット")]
+    public Enemy.RegionInfo.BreakBullet[] breakBullet;
+    [Tooltip("耐性(%)")]
+    public AtkAttribute tolerance = new AtkAttribute();
+    [Tooltip("防御力(+)")]
+    public AtkAttribute defence = new AtkAttribute();
+    [Tooltip("親部位名（親破壊まで無効設定")]
+    public string parentRegionName;
+    [Tooltip("復活可能フラグ")]
+    public bool enableRevive;
+    [Tooltip("復活までの時間")]
+    public float reviveIntervalTime;
+    [Tooltip("特殊バフ適用時のバリアへのダメージ値")]
+    public int barrierDamageSp = 100;
+    [Tooltip("通常時のバリアへのダメージ値")]
+    public AtkAttribute atkBarrierDamage = new AtkAttribute();
+    [Tooltip("バリアによる耐性値上昇率(0.0〜1.0)")]
+    public float barrierToleranceRate;
+    [Tooltip("カウンター情報")]
+    public Enemy.RegionInfo.CounterInfo counterInfo = new Enemy.RegionInfo.CounterInfo();
+    [Tooltip("ダウン値係数")]
+    public int customDownRate;
+    [Tooltip("シールドダメージ有効フラグ")]
+    public bool isEnableShieldDamage;
+    [Tooltip("シールド時の掴み解除フラグ")]
+    public bool isGrabRelease;
+    [Tooltip("最終ダメージを最小にする")]
+    public bool isDamageMinimum;
+    public Enemy.RegionInfo.WeaponTypeRate[] weaponTypeRate;
+    [Tooltip("プレイヤーの攻撃が当たるか")]
+    public bool isAtkColliderHit = true;
+    [Tooltip("モード変更情報")]
+    public Enemy.RegionInfo.ModeChangeInfo modeChangeInfo;
+    [Tooltip("竜装情報")]
+    public Enemy.RegionInfo.DragonArmorInfo dragonArmorInfo;
+
+    [Serializable]
+    public class BreakEffect
+    {
+      public string effectName;
+      public Vector3 effectAngle;
+      public string nodeName;
+    }
+
+    [Serializable]
+    public class BreakDrop
+    {
+      public string dropNodeName;
+    }
+
+    [Serializable]
+    public class BreakBullet
+    {
+      public string[] stringArgs;
+      public float[] floatArgs;
+      public int[] intArgs;
+    }
+
+    [Serializable]
+    public class CounterInfo
+    {
+      [Tooltip("この部位があるとカウンターが有効かどうか")]
+      public bool enabled;
+      [Tooltip("カウンターが発動するのは何発受けたときか")]
+      public int counterLimitNum = 1;
+    }
+
+    [Serializable]
+    public class WeaponTypeRate
+    {
+      [Tooltip("対応する武器（EQUIPMENT_TYPE）")]
+      public EQUIPMENT_TYPE equipmentType = EQUIPMENT_TYPE.NONE;
+      [Tooltip("武器種倍率（小数）")]
+      public float rate = 1f;
+    }
+
+    [Serializable]
+    public class ModeChangeInfo
+    {
+      [Tooltip("設定されているモードへの変更を有効にする")]
+      public bool enabled;
+      [Tooltip("変更後モードID")]
+      public int modeID;
+    }
+
+    [Serializable]
+    public class DragonArmorInfo
+    {
+      [Tooltip("竜装が有効か")]
+      public bool enabled;
+      [Tooltip("両手剣バーストSP攻撃の倍率")]
+      public float thsBurstSpAttackRate = 1f;
+      [Tooltip("その他攻撃の倍率")]
+      public float otherAttackRate = 1f;
+    }
+  }
+
+  public enum WEAK_STATE
+  {
+    NONE,
+    WEAK,
+    DOWN,
+    WEAK_SP_ATTACK,
+    WEAK_SP_DOWN_MAX,
+    WEAK_ELEMENT_ATTACK,
+    WEAK_ELEMENT_SKILL_ATTACK,
+    WEAK_SKILL_ATTACK,
+    WEAK_HEAL_ATTACK,
+    WEAK_GRAB,
+    WEAK_CANNON,
+    WEAK_ELEMENT_SP_ATTACK,
+  }
+
+  [Serializable]
+  public class BleedData
+  {
+    public int ownerID;
+    public int cnt;
+    public int damage;
+    public bool skipFirst;
+    public int lv;
+    public static readonly int MaxLv = 3;
+
+    public bool IsOwnerSelf()
+    {
+      return MonoBehaviourSingleton<StageObjectManager>.IsValid() && Object.op_Inequality((Object) MonoBehaviourSingleton<StageObjectManager>.I.self, (Object) null) && MonoBehaviourSingleton<StageObjectManager>.I.self.id == this.ownerID;
+    }
+
+    public bool IsMaxLv() => Enemy.BleedData.MaxLv <= this.lv;
+  }
+
+  [Serializable]
+  public class BleedWork
+  {
+    public int ownerID;
+    public int showIndex;
+    public Transform bleedEffect;
+  }
+
+  [Serializable]
+  public class BleedSyncData
+  {
+    public int afterHP;
+    public List<Enemy.BleedSyncData.BleedRegionWork> regionWorks = new List<Enemy.BleedSyncData.BleedRegionWork>();
+
+    [Serializable]
+    public class BleedDamageData
+    {
+      public int ownerID;
+      public int damage;
+    }
+
+    [Serializable]
+    public class BleedRegionWork
+    {
+      public int id;
+      public int afterHP;
+      public List<Enemy.BleedSyncData.BleedDamageData> damageList = new List<Enemy.BleedSyncData.BleedDamageData>();
+    }
+  }
+
+  [Serializable]
+  public class ShadowSealingData
+  {
+    public bool isTarget;
+    public int ownerID;
+    public float existSec;
+    public float extendRate = 1f;
+
+    public bool IsOwnerSelf()
+    {
+      return MonoBehaviourSingleton<StageObjectManager>.IsValid() && Object.op_Inequality((Object) MonoBehaviourSingleton<StageObjectManager>.I.self, (Object) null) && MonoBehaviourSingleton<StageObjectManager>.I.self.id == this.ownerID;
+    }
+  }
+
+  [Serializable]
+  public class ShadowSealingSyncData
+  {
+    public int regionIndex;
+  }
+
+  [Serializable]
+  public class BombArrowData
+  {
+    public int ownerID;
+    public float startTime;
+    public AtkAttribute atk;
+
+    public float GetRemainingCount()
+    {
+      return Mathf.Max(0.0f, this.startTime + MonoBehaviourSingleton<InGameSettingsManager>.I.player.arrowActionInfo.bombArrowCountSec - Time.time);
+    }
+  }
+
+  [Serializable]
+  public class RegionWorkSyncData
+  {
+    public int hp;
+    public bool isBroke;
+    public List<Enemy.BleedData> bleedList;
+    public int barrierHp;
+    public bool isShieldDamage;
+    public bool isShieldCriticalDamage;
+    public Enemy.ShadowSealingData shadowSealingData;
+    public List<Enemy.BombArrowData> bombArrowDataHistory;
+  }
+
+  public class RandomShotInfo
+  {
+    public const int TARGET_NONE = -1;
+    public AttackInfo atkInfo;
+    public float interval;
+    public float countTime;
+    public int shotCount;
+
+    public List<Vector3> points { get; set; }
+
+    public List<Enemy.RandomShotInfo.TargetInfo> targets { get; set; }
+
+    public class TargetInfo
+    {
+      public Quaternion rot;
+      public int targetId;
+
+      public TargetInfo()
+      {
+      }
+
+      public TargetInfo(Quaternion rot, int id)
+      {
+        this.rot = rot;
+        this.targetId = id;
+      }
+    }
+  }
+
+  public class AnimationLayerWeightChangeInfo
+  {
+    public float weight;
+    public float spd;
+    public float target;
+    public int layerIndex;
+    public bool forceEndFlag;
+    public bool aliveFlag;
+  }
+
+  private enum eCounterRegionState
+  {
+    NONE,
+    EXIST,
+    NOT_EXIST,
+  }
+
+  public enum CANCEL_CONDITION
+  {
+    NONE,
+    FAILED_GRAB,
+  }
+
+  private enum EFFECTIVE_TYPE
+  {
+    GOOD,
+    NORMAL,
+    BAD,
+  }
 }

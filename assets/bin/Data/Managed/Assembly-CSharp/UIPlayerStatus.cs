@@ -1,799 +1,887 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIPlayerStatus
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class UIPlayerStatus : MonoBehaviourSingleton<UIPlayerStatus>
 {
-	[Serializable]
-	public class boostItem
-	{
-		public GameObject obj;
-
-		public UITweenCtrl anim;
-
-		public USE_ITEM_EFFECT_TYPE type;
-	}
-
-	[Serializable]
-	public class boosColor
-	{
-		public float rate;
-
-		public Color color;
-	}
-
-	[Serializable]
-	protected class ShieldHpGaugeEffect
-	{
-		[SerializeField]
-		public UISprite sprite;
-
-		[SerializeField]
-		public int sizeMin;
-
-		[SerializeField]
-		public int sizeMax;
-
-		[SerializeField]
-		public Color[] effectColor;
-	}
-
-	[Serializable]
-	protected class SpActionGaugeInfo
-	{
-		public enum ANIM_STATE
-		{
-			RESET,
-			HALF,
-			FULL,
-			BOOST
-		}
-
-		[SerializeField]
-		public GameObject root;
-
-		[SerializeField]
-		public Color gaugeColorNormal;
-
-		[SerializeField]
-		public Color gaugeColorCharged;
-
-		[SerializeField]
-		public UIHGauge gaugeUI;
-
-		[SerializeField]
-		public Renderer renderer;
-
-		[NonSerialized]
-		public int state;
-
-		[SerializeField]
-		public Color[] gaugeColorJump;
-
-		[SerializeField]
-		public Color[] gaugeColorSoul;
-
-		[SerializeField]
-		public Color[] gaugeColorSoulPairSwords;
-
-		[SerializeField]
-		public GameObject gaugeMemoriObj;
-
-		public bool IsPlayAnim(ANIM_STATE s)
-		{
-			return (state & (1 << (int)s)) > 0;
-		}
-
-		public void SetState(ANIM_STATE s)
-		{
-			state |= 1 << (int)s;
-		}
-	}
-
-	[SerializeField]
-	protected UILabel playerName;
-
-	[SerializeField]
-	protected UILabel playerHp;
-
-	[SerializeField]
-	protected UILabel playerShieldHp;
-
-	[SerializeField]
-	protected UIHGauge hpGaugeUI;
-
-	[SerializeField]
-	protected UIHGauge healHpGaugeUI;
-
-	[SerializeField]
-	protected UIHGauge shieldHpGaugeUI;
-
-	[SerializeField]
-	protected ShieldHpGaugeEffect shieldHpGaugeADD;
-
-	[SerializeField]
-	protected GameObject itemInfo;
-
-	[SerializeField]
-	protected Transform dropIconN;
-
-	[SerializeField]
-	protected UILabel dropInfoN;
-
-	[SerializeField]
-	protected Transform dropIconR;
-
-	[SerializeField]
-	protected UILabel dropInfoR;
-
-	[SerializeField]
-	protected UIWeaponChange weaponChange;
-
-	[SerializeField]
-	protected UIEvolveGauge evolveGauge;
-
-	[SerializeField]
-	protected UIStatusIcon statusIcons;
-
-	[SerializeField]
-	protected UILabel lv;
-
-	[SerializeField]
-	protected UIHGauge expGauge;
-
-	[SerializeField]
-	protected SpActionGaugeInfo spActionGaugeInfo;
-
-	[SerializeField]
-	protected ShieldHpGaugeEffect spActionGaugeADD_BOOST;
-
-	[SerializeField]
-	protected ShieldHpGaugeEffect spActionGaugeADD_HALF;
-
-	[SerializeField]
-	protected UILabel coins;
-
-	[SerializeField]
-	protected GameObject[] fieldInfo;
-
-	[SerializeField]
-	protected StatusBoostAnimator boostAnimator;
-
-	[SerializeField]
-	protected boostItem[] boostItems;
-
-	[SerializeField]
-	protected UILabel boostRate;
-
-	[SerializeField]
-	protected UILabel boostTime;
-
-	[SerializeField]
-	protected UIStaticPanelChanger panelChange;
-
-	[SerializeField]
-	protected float dropEffectTime = 1f;
-
-	[SerializeField]
-	protected AnimationCurve dropEffectEaseCurve = Curves.CreateEaseInCurve();
-
-	[SerializeField]
-	protected float dropEffectAddRandomMax;
-
-	[SerializeField]
-	protected AnimationCurve dropEffectAddCurve;
-
-	[SerializeField]
-	private Transform soulEffectDirection;
-
-	[SerializeField]
-	private float soulEffectTime = 1f;
-
-	[SerializeField]
-	private float soulEffectAddRandomMax = 200f;
-
-	[SerializeField]
-	private AnimationCurve soulEffectEaseCurve = Curves.CreateEaseInCurve();
-
-	[SerializeField]
-	private AnimationCurve soulEffectAddCurve;
-
-	public UIAutoBattleButton autoBattleButton;
-
-	private bool isField;
-
-	private bool permitHGPBoostUpdate = true;
-
-	private int lastHP = -1;
-
-	private int lastShieldHP = -1;
-
-	private int lastLV = -1;
-
-	private int lastMoney = -1;
-
-	private int preWeaponIndex;
-
-	public Player targetPlayer
-	{
-		get;
-		protected set;
-	}
-
-	public bool PermitHGPBoostUpdate => permitHGPBoostUpdate;
-
-	protected override void Awake()
-	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		base.Awake();
-		boostRate.fontStyle = 2;
-		boostTime.fontStyle = 2;
-		this.get_gameObject().SetActive(false);
-	}
-
-	private void Start()
-	{
-		EffectCtrl[] componentsInChildren = boostAnimator.GetComponentsInChildren<EffectCtrl>(true);
-		for (int i = 0; i < componentsInChildren.Length; i++)
-		{
-			componentsInChildren[i].SetRenderQueue(2000);
-		}
-	}
-
-	public void SetTarget(Player player)
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		targetPlayer = player;
-		if (targetPlayer == null)
-		{
-			this.get_gameObject().SetActive(false);
-		}
-		else
-		{
-			statusIcons.target = player;
-			if (weaponChange != null)
-			{
-				weaponChange.SetTarget(targetPlayer);
-			}
-			UpdateUI();
-			isField = FieldManager.IsValidInGameNoQuest();
-			itemInfo.SetActive(!isField);
-			int i = 0;
-			for (int num = fieldInfo.Length; i < num; i++)
-			{
-				fieldInfo[i].SetActive(isField);
-			}
-			if (!isField)
-			{
-				DropInfoUpdate();
-			}
-			UpDateStatusIcon();
-			SetUpBoostAnimator();
-			this.get_gameObject().SetActive(true);
-		}
-	}
-
-	public void SetUpBoostAnimator()
-	{
-		boostAnimator.SetupUI(delegate(BoostStatus update_boost)
-		{
-			if (update_boost != null)
-			{
-				UpdateShowBoost(update_boost);
-			}
-			else
-			{
-				EndShowBoost();
-			}
-		}, delegate(BoostStatus change_boost)
-		{
-			if (change_boost != null)
-			{
-				ChangeShowBoost((USE_ITEM_EFFECT_TYPE)change_boost.type);
-				UpdateShowBoost(change_boost);
-			}
-			else
-			{
-				EndShowBoost();
-			}
-		});
-	}
-
-	private void LateUpdate()
-	{
-		if (!(targetPlayer == null))
-		{
-			UpdateUI();
-			UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
-			if (lv != null && lastLV != (int)userStatus.level)
-			{
-				lv.text = userStatus.level.ToString();
-				lastLV = userStatus.level;
-			}
-			if (expGauge != null)
-			{
-				expGauge.SetPercent(userStatus.ExpProgress01, true);
-			}
-			if (isField && coins != null && lastMoney != userStatus.Money)
-			{
-				coins.text = userStatus.Money.ToString();
-				lastMoney = userStatus.Money;
-			}
-		}
-	}
-
-	private void UpdateUI()
-	{
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0244: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0439: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0454: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0459: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0486: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0496: Unknown result type (might be due to invalid IL or missing references)
-		//IL_049b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_049d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0615: Unknown result type (might be due to invalid IL or missing references)
-		//IL_061b: Expected O, but got Unknown
-		//IL_062b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0634: Expected O, but got Unknown
-		//IL_0672: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0688: Unknown result type (might be due to invalid IL or missing references)
-		//IL_069e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06a4: Expected O, but got Unknown
-		//IL_06b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06bd: Expected O, but got Unknown
-		//IL_06fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0711: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0727: Unknown result type (might be due to invalid IL or missing references)
-		//IL_072d: Expected O, but got Unknown
-		//IL_073d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0746: Expected O, but got Unknown
-		if (playerName != null && !string.IsNullOrEmpty(targetPlayer.charaName))
-		{
-			playerName.text = targetPlayer.charaName;
-		}
-		if (playerHp != null && lastHP != targetPlayer.hpShow)
-		{
-			lastHP = targetPlayer.hpShow;
-			playerHp.text = targetPlayer.hpShow.ToString();
-		}
-		if (playerShieldHp != null && lastShieldHP != (int)targetPlayer.ShieldHp)
-		{
-			lastShieldHP = targetPlayer.ShieldHp;
-			playerShieldHp.get_gameObject().SetActive(targetPlayer.IsValidShield());
-			playerShieldHp.text = targetPlayer.ShieldHp.ToString();
-		}
-		if (hpGaugeUI != null)
-		{
-			float num = (targetPlayer.hpMax <= 0) ? 0f : ((float)targetPlayer.hpShow / (float)targetPlayer.hpMax);
-			if (hpGaugeUI.nowPercent != num)
-			{
-				hpGaugeUI.SetPercent(num, true);
-			}
-		}
-		if (healHpGaugeUI != null)
-		{
-			float num2 = (targetPlayer.hpMax <= 0) ? 0f : ((float)targetPlayer.healHp / (float)targetPlayer.hpMax);
-			if (healHpGaugeUI.nowPercent != num2)
-			{
-				healHpGaugeUI.SetPercent(num2, false);
-			}
-		}
-		if (shieldHpGaugeUI != null && shieldHpGaugeADD.sprite != null)
-		{
-			float num3 = ((int)targetPlayer.ShieldHpMax <= 0) ? 0f : ((float)(int)targetPlayer.ShieldHp / (float)(int)targetPlayer.ShieldHpMax);
-			shieldHpGaugeUI.get_gameObject().SetActive(targetPlayer.IsValidShield());
-			shieldHpGaugeADD.sprite.get_gameObject().SetActive(targetPlayer.IsValidShield());
-			if (shieldHpGaugeUI.nowPercent != num3)
-			{
-				shieldHpGaugeUI.SetPercent(num3, false);
-				shieldHpGaugeADD.sprite.width = (int)(num3 * (float)shieldHpGaugeADD.sizeMax + (1f - num3) * (float)shieldHpGaugeADD.sizeMin);
-			}
-		}
-		if (preWeaponIndex != targetPlayer.weaponIndex)
-		{
-			ResetSpActionGaugeState();
-			preWeaponIndex = targetPlayer.weaponIndex;
-		}
-		bool flag = targetPlayer.IsValidSpActionMemori();
-		if (spActionGaugeInfo.gaugeMemoriObj.get_activeSelf() != flag)
-		{
-			spActionGaugeInfo.gaugeMemoriObj.SetActive(flag);
-		}
-		bool flag2 = targetPlayer.IsValidSpActionGauge();
-		if (spActionGaugeInfo.root != null && spActionGaugeInfo.root.get_activeSelf() != flag2)
-		{
-			spActionGaugeInfo.root.SetActive(flag2);
-		}
-		if (flag2)
-		{
-			if (spActionGaugeInfo.renderer != null)
-			{
-				int num4 = targetPlayer.CheckGaugeLevel();
-				Color val = (num4 != -1) ? ((!targetPlayer.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.SOUL)) ? spActionGaugeInfo.gaugeColorJump[num4] : spActionGaugeInfo.gaugeColorSoulPairSwords[num4]) : ((targetPlayer.spAttackType != SP_ATTACK_TYPE.SOUL) ? ((!targetPlayer.IsSpActionGaugeHalfCharged() && !targetPlayer.isBoostMode) ? spActionGaugeInfo.gaugeColorNormal : spActionGaugeInfo.gaugeColorCharged) : ((!targetPlayer.IsSpActionGaugeHalfCharged() && !targetPlayer.isBoostMode) ? spActionGaugeInfo.gaugeColorSoul[0] : spActionGaugeInfo.gaugeColorSoul[1]));
-				if (val != spActionGaugeInfo.renderer.get_material().get_color())
-				{
-					spActionGaugeInfo.renderer.get_material().set_color(val);
-				}
-			}
-			float num5 = (!(targetPlayer.CurrentWeaponSpActionGaugeMax > 0f)) ? 0f : (targetPlayer.CurrentWeaponSpActionGauge / targetPlayer.CurrentWeaponSpActionGaugeMax);
-			bool flag3 = false;
-			if (spActionGaugeInfo.gaugeUI != null)
-			{
-				flag3 = (spActionGaugeInfo.gaugeUI.nowPercent != num5);
-				if (flag3)
-				{
-					spActionGaugeInfo.gaugeUI.SetPercent(num5, false);
-				}
-			}
-			UISprite sprite = spActionGaugeADD_BOOST.sprite;
-			if (flag3)
-			{
-				sprite.width = (int)(num5 * (float)spActionGaugeADD_BOOST.sizeMax + (1f - num5) * (float)spActionGaugeADD_BOOST.sizeMin);
-			}
-			if (spActionGaugeInfo.root != null && spActionGaugeInfo.root.get_activeInHierarchy())
-			{
-				if (targetPlayer.IsSpActionGaugeHalfCharged() && !spActionGaugeInfo.IsPlayAnim(SpActionGaugeInfo.ANIM_STATE.HALF))
-				{
-					sprite.get_gameObject().SetActive(false);
-					spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(true);
-					UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 1);
-					UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), true, null, false, 1);
-					spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.HALF);
-					SoundManager.PlayOneShotUISE(40000358);
-				}
-				if (targetPlayer.IsSpActionGaugeFullCharged() && !spActionGaugeInfo.IsPlayAnim(SpActionGaugeInfo.ANIM_STATE.FULL))
-				{
-					sprite.get_gameObject().SetActive(false);
-					spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(true);
-					UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 2);
-					UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), true, null, false, 2);
-					spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.FULL);
-					SoundManager.PlayOneShotUISE(40000359);
-				}
-				if (targetPlayer.isBoostMode && !spActionGaugeInfo.IsPlayAnim(SpActionGaugeInfo.ANIM_STATE.BOOST))
-				{
-					sprite.get_gameObject().SetActive(true);
-					spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(false);
-					UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 0);
-					UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), true, null, false, 0);
-					spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.BOOST);
-				}
-			}
-			if ((!targetPlayer.isBoostMode && spActionGaugeInfo.IsPlayAnim(SpActionGaugeInfo.ANIM_STATE.BOOST)) || (spActionGaugeInfo.IsPlayAnim(SpActionGaugeInfo.ANIM_STATE.FULL) && !targetPlayer.IsSpActionGaugeFullCharged()))
-			{
-				ResetSpActionGaugeState();
-			}
-			if (targetPlayer.isDead && spActionGaugeInfo.state != 0)
-			{
-				ResetSpActionGaugeState();
-			}
-		}
-		else if (spActionGaugeInfo.state != 0)
-		{
-			ResetSpActionGaugeState();
-		}
-	}
-
-	public void SetGaugeEffectColor(SP_ATTACK_TYPE type)
-	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		spActionGaugeADD_BOOST.sprite.color = spActionGaugeADD_BOOST.effectColor[(int)type];
-	}
-
-	public void ResetSpActionGaugeState()
-	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Expected O, but got Unknown
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Expected O, but got Unknown
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Expected O, but got Unknown
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Expected O, but got Unknown
-		spActionGaugeADD_BOOST.sprite.get_gameObject().SetActive(false);
-		spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(false);
-		UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 0);
-		UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 1);
-		UITweenCtrl.Reset(spActionGaugeInfo.root.get_transform(), 2);
-		spActionGaugeInfo.state = 0;
-		if (!(targetPlayer == null))
-		{
-			if (targetPlayer.IsSpActionGaugeHalfCharged())
-			{
-				spActionGaugeADD_HALF.sprite.get_gameObject().SetActive(true);
-				if (spActionGaugeADD_HALF.sprite.get_gameObject().get_activeInHierarchy())
-				{
-					UITweenCtrl.Play(spActionGaugeInfo.root.get_transform(), true, null, false, 1);
-					spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.HALF);
-				}
-			}
-			if (targetPlayer.IsSpActionGaugeFullCharged())
-			{
-				spActionGaugeInfo.SetState(SpActionGaugeInfo.ANIM_STATE.FULL);
-			}
-		}
-	}
-
-	public void DropInfoUpdate()
-	{
-		if (MonoBehaviourSingleton<CoopManager>.IsValid())
-		{
-			if (dropInfoR != null)
-			{
-				dropInfoR.text = MonoBehaviourSingleton<CoopManager>.I.coopStage.bossDropRare.ToString();
-			}
-			if (dropInfoN != null)
-			{
-				dropInfoN.text = MonoBehaviourSingleton<CoopManager>.I.coopStage.bossDropNormal.ToString();
-			}
-		}
-	}
-
-	public void UpDateStatusIcon()
-	{
-		statusIcons.UpDateStatusIcon();
-	}
-
-	private void EndShowBoost()
-	{
-		ChangeShowBoost(USE_ITEM_EFFECT_TYPE.NONE);
-	}
-
-	private void ChangeShowBoost(USE_ITEM_EFFECT_TYPE type)
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		boostRate.get_gameObject().SetActive(type != USE_ITEM_EFFECT_TYPE.NONE);
-		boostTime.get_gameObject().SetActive(type != USE_ITEM_EFFECT_TYPE.NONE);
-		int i = 0;
-		for (int num = boostItems.Length; i < num; i++)
-		{
-			bool flag = boostItems[i].type == type;
-			boostItems[i].obj.SetActive(flag);
-			if (flag)
-			{
-				panelChange.UnLock();
-				boostItems[i].anim.Reset();
-				boostItems[i].anim.Play(true, delegate
-				{
-					panelChange.Lock();
-				});
-			}
-		}
-	}
-
-	private void UpdateShowBoost(BoostStatus boost)
-	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		switch (boost.type)
-		{
-		case 1:
-		case 2:
-		case 3:
-		case 201:
-			boostRate.text = boost.GetBoostRateText();
-			boostRate.color = boostAnimator.GetRateColor(boost.value);
-			boostTime.text = boost.GetRemainTime();
-			break;
-		}
-	}
-
-	public void AddItemNum(Vector3 world_hit_pos, int rarity, bool is_right)
-	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<InGameManager>.I.graphicOptionType > 0 && this.get_gameObject().get_activeInHierarchy())
-		{
-			this.StartCoroutine(_AddItemNum(world_hit_pos, rarity, is_right));
-		}
-		else
-		{
-			if (rarity > 0)
-			{
-				MonoBehaviourSingleton<CoopManager>.I.coopStage.bossDropRare++;
-			}
-			else
-			{
-				MonoBehaviourSingleton<CoopManager>.I.coopStage.bossDropNormal++;
-			}
-			MonoBehaviourSingleton<UIPlayerStatus>.I.DropInfoUpdate();
-		}
-	}
-
-	private IEnumerator _AddItemNum(Vector3 world_hit_pos, int rarity, bool is_right)
-	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		Transform parent;
-		Vector3 offset;
-		if (rarity > 0)
-		{
-			parent = dropIconR;
-			offset = dropInfoR.get_transform().get_localPosition() - dropIconR.get_localPosition();
-		}
-		else
-		{
-			parent = dropIconN;
-			offset = dropInfoN.get_transform().get_localPosition() - dropIconN.get_localPosition();
-		}
-		Transform effect = EffectManager.GetUIEffect("ef_ui_downenergy_01", parent, -0.001f, 0, null);
-		if (!(effect == null))
-		{
-			Vector3 screen_pos = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(world_hit_pos);
-			Vector3 ui_pos = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screen_pos);
-			ui_pos.z = 1f;
-			effect.set_position(ui_pos);
-			GameObject obj = effect.get_gameObject();
-			TransformInterpolator interp = obj.AddComponent<TransformInterpolator>();
-			if (!(interp == null))
-			{
-				interp.Translate(add_value: new Vector3((!is_right) ? ((0f - dropEffectAddRandomMax) * 2f) : dropEffectAddRandomMax, dropEffectAddRandomMax * 2f, 0f), _time: dropEffectTime, target: offset, ease_curve: dropEffectEaseCurve, add_curve: dropEffectAddCurve);
-				yield return (object)new WaitForSeconds(dropEffectTime);
-				EffectManager.ReleaseEffect(obj, true, false);
-				if (rarity > 0)
-				{
-					MonoBehaviourSingleton<CoopManager>.I.coopStage.bossDropRare++;
-					SoundManager.PlayOneShotUISE(40000154);
-				}
-				else
-				{
-					MonoBehaviourSingleton<CoopManager>.I.coopStage.bossDropNormal++;
-					SoundManager.PlayOneShotUISE(40000153);
-				}
-				DropInfoUpdate();
-			}
-		}
-	}
-
-	public void SetDisableButtons(bool disable)
-	{
-		if (weaponChange != null)
-		{
-			weaponChange.SetDisableButtons(disable);
-		}
-	}
-
-	public void DoEnable()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(true);
-	}
-
-	public void DoDisable()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(false);
-	}
-
-	public void SetHGPBoostUpdatePermitFlag(bool permit)
-	{
-		permitHGPBoostUpdate = permit;
-	}
-
-	public void DirectionSoulGauge(SoulEnergy soulEnergy, Vector3 worldHitPos)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_gameObject().get_activeInHierarchy())
-		{
-			this.StartCoroutine(_DirectionSoulGauge(soulEnergy, worldHitPos));
-		}
-	}
-
-	private IEnumerator _DirectionSoulGauge(SoulEnergy soulEnergy, Vector3 worldHitPos)
-	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		Transform trans = soulEnergy.GetEffectTrans(soulEffectDirection);
-		if (!object.ReferenceEquals(trans, null))
-		{
-			Vector3 screenPos = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(worldHitPos);
-			Vector3 uiPos = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenPos);
-			uiPos.z = 1f;
-			trans.set_position(uiPos);
-			TransformInterpolator interp = trans.get_gameObject().GetComponent<TransformInterpolator>();
-			if (object.ReferenceEquals(interp, null))
-			{
-				interp = trans.get_gameObject().AddComponent<TransformInterpolator>();
-			}
-			interp.Translate(add_value: new Vector3(Random.Range(0f - soulEffectAddRandomMax, soulEffectAddRandomMax), Random.Range(0f - soulEffectAddRandomMax, soulEffectAddRandomMax), 0f), _time: soulEffectTime, target: Vector3.get_zero(), ease_curve: soulEffectEaseCurve, add_curve: soulEffectAddCurve);
-			yield return (object)new WaitForSeconds(soulEffectTime);
-			soulEnergy.Absorbed();
-		}
-	}
-
-	public void PlayChangeEvolveIcon(bool start)
-	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		if (!object.ReferenceEquals(evolveGauge, null) && !object.ReferenceEquals(evolveGauge.evolveIcon, null) && evolveGauge.evolveIcon.get_gameObject().get_activeSelf() != start)
-		{
-			if (!object.ReferenceEquals(weaponChange, null))
-			{
-				if (start)
-				{
-					weaponChange.PlayEvolveIconAnim(delegate
-					{
-						EnableEvolveIcon(true);
-					});
-				}
-				else
-				{
-					weaponChange.PlayEvolveIconAnim(delegate
-					{
-						EnableEvolveIcon(false);
-					});
-				}
-			}
-			else
-			{
-				EnableEvolveIcon(true);
-			}
-		}
-	}
-
-	public void SetEvolveIcon(uint evolveId)
-	{
-		if (!object.ReferenceEquals(evolveGauge, null))
-		{
-			evolveGauge.SetEvolveIcon(evolveId);
-		}
-	}
-
-	public void EnableEvolveIcon(bool isEnable)
-	{
-		if (!object.ReferenceEquals(evolveGauge, null))
-		{
-			evolveGauge.EnableEvolveIcon(isEnable);
-		}
-	}
-
-	public void SetEvolveRate(float rate)
-	{
-		if (!object.ReferenceEquals(evolveGauge, null))
-		{
-			evolveGauge.SetRate(rate);
-			if (rate >= 1f)
-			{
-				SoundManager.PlayOneShotUISE(10000091);
-			}
-		}
-	}
-
-	public void RestrictPopMenu(bool isRestrict)
-	{
-		if (!object.ReferenceEquals(weaponChange, null))
-		{
-			weaponChange.SetRestrictPopMenu(isRestrict);
-		}
-	}
-
-	public void SetDisableRalltBtn(bool isDisable)
-	{
-		weaponChange.SetDisableRallyBtn(isDisable);
-	}
+  public static readonly string UI_BURST_BULLET = "InternalUI/UI_InGame/Burst/InGameUIBurstBullet";
+  public static readonly Vector3 UI_BURST_BULLET_POS = new Vector3(-35.3f, -55.5f, 0.0f);
+  [SerializeField]
+  protected UILabel playerName;
+  [SerializeField]
+  protected UILabel playerHp;
+  [SerializeField]
+  protected UILabel playerShieldHp;
+  [SerializeField]
+  protected UIHGauge hpGaugeUI;
+  [SerializeField]
+  protected UIHGauge healHpGaugeUI;
+  [SerializeField]
+  protected UIHGauge shieldHpGaugeUI;
+  [SerializeField]
+  protected UIPlayerStatus.ShieldHpGaugeEffect shieldHpGaugeADD;
+  [SerializeField]
+  protected GameObject itemInfo;
+  [SerializeField]
+  protected Transform dropIconN;
+  [SerializeField]
+  protected UILabel dropInfoN;
+  [SerializeField]
+  protected Transform dropIconR;
+  [SerializeField]
+  protected UILabel dropInfoR;
+  [SerializeField]
+  protected UIWeaponChange weaponChange;
+  [SerializeField]
+  protected UIEvolveGauge evolveGauge;
+  [SerializeField]
+  protected UIStatusIcon statusIcons;
+  [SerializeField]
+  protected UILabel lv;
+  [SerializeField]
+  protected UIHGauge expGauge;
+  [SerializeField]
+  protected UIPlayerStatus.SpActionGaugeInfo spActionGaugeInfo;
+  [SerializeField]
+  protected UIPlayerStatus.ShieldHpGaugeEffect spActionGaugeADD_BOOST;
+  [SerializeField]
+  protected UIPlayerStatus.ShieldHpGaugeEffect spActionGaugeADD_HALF;
+  [SerializeField]
+  protected UIPlayerStatus.ShieldHpGaugeEffect spActionTimerGaugeADD_BOOST;
+  [SerializeField]
+  protected UIPlayerStatus.ShieldHpGaugeEffect spActionTimerGaugeADD_HALF;
+  [SerializeField]
+  protected UIPlayerStatus.ShieldHpGaugeEffect burstSpActionTimerGaugeADD_HALF;
+  [SerializeField]
+  protected UILabel coins;
+  [SerializeField]
+  protected GameObject[] fieldInfo;
+  [SerializeField]
+  protected StatusBoostAnimator boostAnimator;
+  [SerializeField]
+  protected UIPlayerStatus.boostItem[] boostItems;
+  [SerializeField]
+  protected UILabel boostRate;
+  [SerializeField]
+  protected UILabel boostTime;
+  [SerializeField]
+  protected UIStaticPanelChanger panelChange;
+  [SerializeField]
+  protected float dropEffectTime = 1f;
+  [SerializeField]
+  protected AnimationCurve dropEffectEaseCurve = Curves.CreateEaseInCurve();
+  [SerializeField]
+  protected float dropEffectAddRandomMax;
+  [SerializeField]
+  protected AnimationCurve dropEffectAddCurve;
+  [SerializeField]
+  private Transform soulEffectDirection;
+  [SerializeField]
+  private float soulEffectTime = 1f;
+  [SerializeField]
+  private float soulEffectAddRandomMax = 200f;
+  [SerializeField]
+  private AnimationCurve soulEffectEaseCurve = Curves.CreateEaseInCurve();
+  [SerializeField]
+  private AnimationCurve soulEffectAddCurve;
+  public UIAutoBattleButton autoBattleButton;
+  [SerializeField]
+  private UIPlayerStatus.CoopFishingGaugeInfo coopFishingGaugeInfoPortrait;
+  [SerializeField]
+  private UIPlayerStatus.CoopFishingGaugeInfo coopFishingGaugeInfoLandscape;
+  [SerializeField]
+  private UIOracleStockUIController oracleStock;
+  private UIPlayerStatus.CoopFishingGaugeInfo validCoopFishingGaugeInfo;
+  private bool isField;
+  private bool permitHGPBoostUpdate = true;
+  private int lastHP = -1;
+  private int lastShieldHP = -1;
+  private int lastLV = -1;
+  private int lastMoney = -1;
+  private int preWeaponIndex;
+  private int preUniqueEquipmentIndex;
+  private UIBurstBulletUIController m_burstBulletCtrl;
+
+  public Player targetPlayer { get; protected set; }
+
+  public bool PermitHGPBoostUpdate => this.permitHGPBoostUpdate;
+
+  protected UIPlayerStatus.ShieldHpGaugeEffect GetSpActionGaugeADD_BOOST(
+    Player.ATTACK_MODE mode,
+    SP_ATTACK_TYPE spAttackType)
+  {
+    switch (spAttackType)
+    {
+      case SP_ATTACK_TYPE.BURST:
+        return this.spActionTimerGaugeADD_BOOST;
+      case SP_ATTACK_TYPE.ORACLE:
+        return mode == Player.ATTACK_MODE.SPEAR ? this.spActionTimerGaugeADD_BOOST : this.spActionGaugeADD_BOOST;
+      default:
+        return this.spActionGaugeADD_BOOST;
+    }
+  }
+
+  protected UIPlayerStatus.ShieldHpGaugeEffect GetSpActionGaugeADD_HALF(
+    Player.ATTACK_MODE mode,
+    SP_ATTACK_TYPE spAttackType)
+  {
+    switch (spAttackType)
+    {
+      case SP_ATTACK_TYPE.BURST:
+        return this.burstSpActionTimerGaugeADD_HALF;
+      case SP_ATTACK_TYPE.ORACLE:
+        if (mode == Player.ATTACK_MODE.SPEAR)
+          return this.burstSpActionTimerGaugeADD_HALF;
+        return mode == Player.ATTACK_MODE.PAIR_SWORDS ? this.spActionGaugeADD_HALF : this.spActionTimerGaugeADD_HALF;
+      default:
+        return this.spActionGaugeADD_HALF;
+    }
+  }
+
+  protected override void Awake()
+  {
+    base.Awake();
+    this.boostRate.fontStyle = (FontStyle) 2;
+    this.boostTime.fontStyle = (FontStyle) 2;
+    ((Component) this).gameObject.SetActive(false);
+    this.CreateBurstBulletUI();
+    if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+      MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += new ScreenOrientationManager.OnScreenRotateDelegate(this.OnScreenRotate);
+    this.SyncRotatePosition();
+  }
+
+  protected override void OnDestroySingleton()
+  {
+    base.OnDestroySingleton();
+    if (!MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= new ScreenOrientationManager.OnScreenRotateDelegate(this.OnScreenRotate);
+  }
+
+  private void OnScreenRotate(bool is_portrait) => this.SyncRotatePosition();
+
+  private void SyncRotatePosition()
+  {
+    if (!SpecialDeviceManager.HasSpecialDeviceInfo || !SpecialDeviceManager.SpecialDeviceInfo.NeedModifyInGamePlayerStatusPosition)
+      return;
+    DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
+    UIWidget component = ((Component) this).gameObject.GetComponent<UIWidget>();
+    if (!Object.op_Inequality((Object) component, (Object) null))
+      return;
+    if (SpecialDeviceManager.IsPortrait)
+    {
+      component.leftAnchor.absolute = specialDeviceInfo.InGameStatusAnchorPortrait.left;
+      component.rightAnchor.absolute = specialDeviceInfo.InGameStatusAnchorPortrait.right;
+      component.bottomAnchor.absolute = specialDeviceInfo.InGameStatusAnchorPortrait.bottom;
+      component.topAnchor.absolute = specialDeviceInfo.InGameStatusAnchorPortrait.top;
+    }
+    else
+    {
+      component.leftAnchor.absolute = specialDeviceInfo.InGameStatusAnchorLandscape.left;
+      component.rightAnchor.absolute = specialDeviceInfo.InGameStatusAnchorLandscape.right;
+      component.bottomAnchor.absolute = specialDeviceInfo.InGameStatusAnchorLandscape.bottom;
+      component.topAnchor.absolute = specialDeviceInfo.InGameStatusAnchorLandscape.top;
+    }
+    component.UpdateAnchors();
+  }
+
+  private void CreateBurstBulletUI()
+  {
+    if (Object.op_Inequality((Object) this.m_burstBulletCtrl, (Object) null))
+      return;
+    Transform transform = ResourceUtility.Realizes(Resources.Load(UIPlayerStatus.UI_BURST_BULLET), ((Component) this).transform);
+    if (Object.op_Equality((Object) transform, (Object) null))
+      return;
+    transform.localPosition = UIPlayerStatus.UI_BURST_BULLET_POS;
+    this.m_burstBulletCtrl = ((Component) transform).GetComponent<UIBurstBulletUIController>();
+    if (!Object.op_Inequality((Object) this.m_burstBulletCtrl, (Object) null))
+      return;
+    this.m_burstBulletCtrl.Initialize(new UIBurstBulletUIController.InitParam()
+    {
+      MaxBulletCount = 6,
+      CurrentRestBulletCount = 6
+    });
+  }
+
+  private void Start()
+  {
+    foreach (EffectCtrl componentsInChild in ((Component) this.boostAnimator).GetComponentsInChildren<EffectCtrl>(true))
+      componentsInChild.SetRenderQueue(2000);
+  }
+
+  public void SetTarget(Player player)
+  {
+    this.targetPlayer = player;
+    if (Object.op_Equality((Object) this.targetPlayer, (Object) null))
+    {
+      ((Component) this).gameObject.SetActive(false);
+    }
+    else
+    {
+      this.statusIcons.target = (Character) player;
+      if (Object.op_Inequality((Object) this.weaponChange, (Object) null))
+        this.weaponChange.SetTarget(this.targetPlayer);
+      this.UpdateUI();
+      this.isField = FieldManager.IsValidInGameNoQuest();
+      this.itemInfo.SetActive(!this.isField);
+      int index = 0;
+      for (int length = this.fieldInfo.Length; index < length; ++index)
+        this.fieldInfo[index].SetActive(this.isField);
+      if (!this.isField)
+        this.DropInfoUpdate();
+      this.UpDateStatusIcon();
+      this.SetUpBoostAnimator();
+      ((Component) this).gameObject.SetActive(true);
+    }
+  }
+
+  public void SetUpBoostAnimator()
+  {
+    this.boostAnimator.SetupUI((Action<BoostStatus>) (update_boost =>
+    {
+      if (update_boost != null)
+        this.UpdateShowBoost(update_boost);
+      else
+        this.EndShowBoost();
+    }), (Action<BoostStatus>) (change_boost =>
+    {
+      if (change_boost != null)
+      {
+        this.ChangeShowBoost((USE_ITEM_EFFECT_TYPE) change_boost.type);
+        this.UpdateShowBoost(change_boost);
+      }
+      else
+        this.EndShowBoost();
+    }));
+  }
+
+  private void LateUpdate()
+  {
+    if (Object.op_Equality((Object) this.targetPlayer, (Object) null))
+      return;
+    this.UpdateUI();
+    UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
+    if (Object.op_Inequality((Object) this.lv, (Object) null) && this.lastLV != (int) userStatus.level)
+    {
+      this.lv.text = userStatus.level.ToString();
+      this.lastLV = (int) userStatus.level;
+    }
+    if (Object.op_Inequality((Object) this.expGauge, (Object) null))
+      this.expGauge.SetPercent(userStatus.ExpProgress01);
+    if (!this.isField || !Object.op_Inequality((Object) this.coins, (Object) null) || this.lastMoney == userStatus.Money)
+      return;
+    this.coins.text = userStatus.Money.ToString();
+    this.lastMoney = userStatus.Money;
+  }
+
+  private void UpdateUI()
+  {
+    if (Object.op_Inequality((Object) this.playerName, (Object) null) && !string.IsNullOrEmpty(this.targetPlayer.charaName))
+      this.playerName.text = this.targetPlayer.charaName;
+    if (Object.op_Inequality((Object) this.playerHp, (Object) null) && this.lastHP != this.targetPlayer.hpShow)
+    {
+      this.lastHP = this.targetPlayer.hpShow;
+      this.playerHp.text = this.targetPlayer.hpShow.ToString();
+    }
+    if (Object.op_Inequality((Object) this.playerShieldHp, (Object) null) && this.lastShieldHP != (int) this.targetPlayer.ShieldHp)
+    {
+      this.lastShieldHP = (int) this.targetPlayer.ShieldHp;
+      ((Component) this.playerShieldHp).gameObject.SetActive(this.targetPlayer.IsValidShield());
+      this.playerShieldHp.text = this.targetPlayer.ShieldHp.ToString();
+    }
+    if (Object.op_Inequality((Object) this.hpGaugeUI, (Object) null))
+    {
+      float percent = this.targetPlayer.hpMax > 0 ? (float) this.targetPlayer.hpShow / (float) this.targetPlayer.hpMax : 0.0f;
+      if ((double) this.hpGaugeUI.nowPercent != (double) percent)
+        this.hpGaugeUI.SetPercent(percent);
+    }
+    if (Object.op_Inequality((Object) this.healHpGaugeUI, (Object) null))
+    {
+      float percent = this.targetPlayer.hpMax > 0 ? (float) this.targetPlayer.healHp / (float) this.targetPlayer.hpMax : 0.0f;
+      if ((double) this.healHpGaugeUI.nowPercent != (double) percent)
+        this.healHpGaugeUI.SetPercent(percent, false);
+    }
+    if (Object.op_Inequality((Object) this.shieldHpGaugeUI, (Object) null) && Object.op_Inequality((Object) this.shieldHpGaugeADD.sprite, (Object) null))
+    {
+      float percent = (int) this.targetPlayer.ShieldHpMax > 0 ? (float) (int) this.targetPlayer.ShieldHp / (float) (int) this.targetPlayer.ShieldHpMax : 0.0f;
+      ((Component) this.shieldHpGaugeUI).gameObject.SetActive(this.targetPlayer.IsValidShield());
+      if (!this.targetPlayer.IsValidShield())
+        this.shieldHpGaugeADD.sprite.alpha = 0.1f;
+      if ((double) this.shieldHpGaugeUI.nowPercent != (double) percent)
+      {
+        this.shieldHpGaugeUI.SetPercent(percent, false);
+        this.shieldHpGaugeADD.sprite.width = (int) ((double) percent * (double) this.shieldHpGaugeADD.sizeMax + (1.0 - (double) percent) * (double) this.shieldHpGaugeADD.sizeMin);
+      }
+    }
+    this.OnUpdateWeaponIndex();
+    bool flag1 = this.targetPlayer.IsValidSpActionMemori();
+    if (this.spActionGaugeInfo.gaugeMemoriObj.activeSelf != flag1)
+      this.spActionGaugeInfo.gaugeMemoriObj.SetActive(flag1);
+    bool isActive = !this.targetPlayer.CheckAttackModeAndSpType(Player.ATTACK_MODE.ONE_HAND_SWORD, SP_ATTACK_TYPE.BURST) ? this.targetPlayer.IsValidSpActionGauge() : this.targetPlayer.isBoostMode && this.targetPlayer.IsValidSpActionGauge();
+    GameObject root = this.spActionGaugeInfo.GetRoot(this.targetPlayer.spAttackType, this.targetPlayer.attackMode);
+    this.spActionGaugeInfo.SetActiveRoot(this.targetPlayer.spAttackType, this.targetPlayer.attackMode, isActive);
+    if (isActive)
+    {
+      Renderer renderer = this.spActionGaugeInfo.GetRenderer(this.targetPlayer.spAttackType, this.targetPlayer.attackMode);
+      if (Object.op_Inequality((Object) renderer, (Object) null))
+      {
+        int index = this.targetPlayer.CheckGaugeLevel();
+        Color color = index == -1 ? (this.targetPlayer.spAttackType != SP_ATTACK_TYPE.ORACLE ? (this.targetPlayer.spAttackType != SP_ATTACK_TYPE.BURST ? (this.targetPlayer.spAttackType != SP_ATTACK_TYPE.SOUL ? (this.targetPlayer.IsSpActionGaugeHalfCharged() || this.targetPlayer.isBoostMode ? this.spActionGaugeInfo.gaugeColorCharged : this.spActionGaugeInfo.gaugeColorNormal) : (this.targetPlayer.IsSpActionGaugeHalfCharged() || this.targetPlayer.isBoostMode ? this.spActionGaugeInfo.gaugeColorSoul[1] : this.spActionGaugeInfo.gaugeColorSoul[0])) : (this.targetPlayer.IsSpActionGaugeHalfCharged() || this.targetPlayer.isBoostMode ? this.spActionGaugeInfo.gaugeColorBurst[1] : this.spActionGaugeInfo.gaugeColorBurst[0])) : (this.targetPlayer.IsSpActionGaugeHalfCharged() || this.targetPlayer.isBoostMode ? this.spActionGaugeInfo.gaugeColorOracle[1] : this.spActionGaugeInfo.gaugeColorOracle[0])) : (!this.targetPlayer.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.SOUL) ? this.spActionGaugeInfo.gaugeColorJump[index] : this.spActionGaugeInfo.gaugeColorSoulPairSwords[index]);
+        if (Color.op_Inequality(color, renderer.material.color))
+          renderer.material.color = color;
+      }
+      float percent = (double) this.targetPlayer.CurrentWeaponSpActionGaugeMax > 0.0 ? this.targetPlayer.CurrentWeaponSpActionGauge / this.targetPlayer.CurrentWeaponSpActionGaugeMax : 0.0f;
+      bool flag2 = false;
+      UIHGauge gaugeUi = this.spActionGaugeInfo.GetGaugeUI(this.targetPlayer.spAttackType, this.targetPlayer.attackMode);
+      if (Object.op_Inequality((Object) gaugeUi, (Object) null))
+      {
+        flag2 = (double) gaugeUi.nowPercent != (double) percent;
+        if (flag2)
+          gaugeUi.SetPercent(percent, false);
+      }
+      UIPlayerStatus.ShieldHpGaugeEffect actionGaugeAddBoost = this.GetSpActionGaugeADD_BOOST(this.targetPlayer.attackMode, this.targetPlayer.spAttackType);
+      UIPlayerStatus.ShieldHpGaugeEffect actionGaugeAddHalf = this.GetSpActionGaugeADD_HALF(this.targetPlayer.attackMode, this.targetPlayer.spAttackType);
+      UISprite sprite = actionGaugeAddBoost.sprite;
+      if (flag2)
+        sprite.width = (int) ((double) percent * (double) actionGaugeAddBoost.sizeMax + (1.0 - (double) percent) * (double) actionGaugeAddBoost.sizeMin);
+      if (Object.op_Inequality((Object) root, (Object) null) && root.activeInHierarchy)
+      {
+        if (this.targetPlayer.IsSpActionGaugeHalfCharged() && !this.spActionGaugeInfo.IsPlayAnim(UIPlayerStatus.SpActionGaugeInfo.ANIM_STATE.HALF))
+        {
+          ((Component) sprite).gameObject.SetActive(false);
+          ((Component) actionGaugeAddHalf.sprite).gameObject.SetActive(true);
+          UITweenCtrl.Reset(root.transform, 1);
+          UITweenCtrl.Play(root.transform, is_input_block: false, tween_ctrl_id: 1);
+          this.spActionGaugeInfo.SetState(UIPlayerStatus.SpActionGaugeInfo.ANIM_STATE.HALF);
+          SoundManager.PlayOneShotUISE(40000358);
+        }
+        if (this.targetPlayer.IsSpActionGaugeFullCharged() && !this.targetPlayer.isBoostMode && !this.spActionGaugeInfo.IsPlayAnim(UIPlayerStatus.SpActionGaugeInfo.ANIM_STATE.FULL))
+        {
+          ((Component) sprite).gameObject.SetActive(false);
+          ((Component) actionGaugeAddHalf.sprite).gameObject.SetActive(true);
+          UITweenCtrl.Reset(root.transform, 2);
+          UITweenCtrl.Play(root.transform, is_input_block: false, tween_ctrl_id: 2);
+          this.spActionGaugeInfo.SetState(UIPlayerStatus.SpActionGaugeInfo.ANIM_STATE.FULL);
+          SoundManager.PlayOneShotUISE(40000359);
+        }
+        if (this.targetPlayer.isBoostMode && !this.spActionGaugeInfo.IsPlayAnim(UIPlayerStatus.SpActionGaugeInfo.ANIM_STATE.BOOST))
+        {
+          ((Component) sprite).gameObject.SetActive(true);
+          ((Component) actionGaugeAddHalf.sprite).gameObject.SetActive(false);
+          UITweenCtrl.Reset(root.transform);
+          UITweenCtrl.Play(root.transform, is_input_block: false);
+          this.spActionGaugeInfo.SetState(UIPlayerStatus.SpActionGaugeInfo.ANIM_STATE.BOOST);
+        }
+      }
+      if (!this.targetPlayer.isBoostMode && this.spActionGaugeInfo.IsPlayAnim(UIPlayerStatus.SpActionGaugeInfo.ANIM_STATE.BOOST) || this.spActionGaugeInfo.IsPlayAnim(UIPlayerStatus.SpActionGaugeInfo.ANIM_STATE.FULL) && !this.targetPlayer.IsSpActionGaugeFullCharged())
+        this.ResetSpActionGaugeState();
+      if (this.targetPlayer.isDead && this.spActionGaugeInfo.state != 0)
+        this.ResetSpActionGaugeState();
+    }
+    else if (this.spActionGaugeInfo.state != 0)
+      this.ResetSpActionGaugeState();
+    this.CheckVisibleBulletUI();
+    this.UpdateOracleStock();
+    bool flag3 = this.targetPlayer.fishingCtrl.IsFighting();
+    bool flag4 = this.targetPlayer.fishingCtrl.IsCooperating();
+    this.coopFishingGaugeInfoPortrait.root.SetActive(flag3 | flag4 && MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
+    this.coopFishingGaugeInfoLandscape.root.SetActive(flag3 | flag4 && !MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
+    if (flag3 | flag4)
+      this.validCoopFishingGaugeInfo = MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait ? this.coopFishingGaugeInfoPortrait : this.coopFishingGaugeInfoLandscape;
+    if (this.validCoopFishingGaugeInfo == null || !Object.op_Inequality((Object) this.validCoopFishingGaugeInfo.root, (Object) null) || !this.validCoopFishingGaugeInfo.root.activeInHierarchy)
+      return;
+    this.validCoopFishingGaugeInfo.SetRate(this.targetPlayer.fishingCtrl.GetCoopFishingGaugeRate());
+    this.validCoopFishingGaugeInfo.SetPositive(this.targetPlayer.fishingCtrl.IsGaugePositive());
+  }
+
+  private void OnUpdateWeaponIndex()
+  {
+    if (Object.op_Equality((Object) this.targetPlayer, (Object) null) || this.preWeaponIndex == this.targetPlayer.weaponIndex && this.preUniqueEquipmentIndex == this.targetPlayer.uniqueEquipmentIndex)
+      return;
+    this.preWeaponIndex = this.targetPlayer.weaponIndex;
+    this.preUniqueEquipmentIndex = this.targetPlayer.uniqueEquipmentIndex;
+    this.ResetSpActionGaugeState();
+    this.UpdateBurstUIInfo();
+  }
+
+  public void SetGaugeEffectColor(Player.ATTACK_MODE mode, SP_ATTACK_TYPE type)
+  {
+    UIPlayerStatus.ShieldHpGaugeEffect actionGaugeAddBoost = this.GetSpActionGaugeADD_BOOST(mode, type);
+    actionGaugeAddBoost.sprite.color = actionGaugeAddBoost.effectColor[(int) type];
+  }
+
+  public void ResetSpActionGaugeState()
+  {
+    UIPlayerStatus.ShieldHpGaugeEffect actionGaugeAddBoost = this.GetSpActionGaugeADD_BOOST(this.targetPlayer.attackMode, this.targetPlayer.spAttackType);
+    UIPlayerStatus.ShieldHpGaugeEffect actionGaugeAddHalf = this.GetSpActionGaugeADD_HALF(this.targetPlayer.attackMode, this.targetPlayer.spAttackType);
+    ((Component) actionGaugeAddBoost.sprite).gameObject.SetActive(false);
+    ((Component) actionGaugeAddHalf.sprite).gameObject.SetActive(false);
+    GameObject root = this.spActionGaugeInfo.GetRoot(this.targetPlayer.spAttackType, this.targetPlayer.attackMode);
+    UITweenCtrl.Reset(root.transform);
+    UITweenCtrl.Reset(root.transform, 1);
+    UITweenCtrl.Reset(root.transform, 2);
+    this.spActionGaugeInfo.state = 0;
+    if (Object.op_Equality((Object) this.targetPlayer, (Object) null))
+      return;
+    if (this.targetPlayer.IsSpActionGaugeHalfCharged())
+    {
+      ((Component) actionGaugeAddHalf.sprite).gameObject.SetActive(true);
+      if (((Component) actionGaugeAddHalf.sprite).gameObject.activeInHierarchy)
+      {
+        UITweenCtrl.Play(root.transform, is_input_block: false, tween_ctrl_id: 1);
+        this.spActionGaugeInfo.SetState(UIPlayerStatus.SpActionGaugeInfo.ANIM_STATE.HALF);
+      }
+    }
+    if (!this.targetPlayer.IsSpActionGaugeFullCharged())
+      return;
+    this.spActionGaugeInfo.SetState(UIPlayerStatus.SpActionGaugeInfo.ANIM_STATE.FULL);
+  }
+
+  public void DropInfoUpdate()
+  {
+    if (!MonoBehaviourSingleton<CoopManager>.IsValid())
+      return;
+    if (Object.op_Inequality((Object) this.dropInfoR, (Object) null))
+      this.dropInfoR.text = MonoBehaviourSingleton<CoopManager>.I.coopStage.bossDropRare.ToString();
+    if (!Object.op_Inequality((Object) this.dropInfoN, (Object) null))
+      return;
+    this.dropInfoN.text = MonoBehaviourSingleton<CoopManager>.I.coopStage.bossDropNormal.ToString();
+  }
+
+  public void UpDateStatusIcon() => this.statusIcons.UpDateStatusIcon();
+
+  private void EndShowBoost() => this.ChangeShowBoost(USE_ITEM_EFFECT_TYPE.NONE);
+
+  private void ChangeShowBoost(USE_ITEM_EFFECT_TYPE type)
+  {
+    ((Component) this.boostRate).gameObject.SetActive(type != 0);
+    ((Component) this.boostTime).gameObject.SetActive(type != 0);
+    int index = 0;
+    for (int length = this.boostItems.Length; index < length; ++index)
+    {
+      bool flag = this.boostItems[index].type == type;
+      this.boostItems[index].obj.SetActive(flag);
+      if (flag)
+      {
+        this.panelChange.UnLock();
+        this.boostItems[index].anim.Reset();
+        this.boostItems[index].anim.Play(onFinished: (EventDelegate.Callback) (() => this.panelChange.Lock()));
+      }
+    }
+  }
+
+  private void UpdateShowBoost(BoostStatus boost)
+  {
+    switch ((USE_ITEM_EFFECT_TYPE) boost.type)
+    {
+      case USE_ITEM_EFFECT_TYPE.EXP_UP:
+      case USE_ITEM_EFFECT_TYPE.MONEY_UP:
+      case USE_ITEM_EFFECT_TYPE.DROP_UP:
+      case USE_ITEM_EFFECT_TYPE.EVENT_POINT_UP:
+      case USE_ITEM_EFFECT_TYPE.NOVICE_DROP_UP:
+      case USE_ITEM_EFFECT_TYPE.HAPPEN_QUEST_UP:
+        this.boostRate.text = boost.GetBoostRateText();
+        this.boostRate.color = this.boostAnimator.GetRateColor(boost.value);
+        this.boostTime.text = boost.type == 210 ? "" : boost.GetRemainTime();
+        break;
+    }
+  }
+
+  public void AddItemNum(Vector3 world_hit_pos, int rarity, bool is_right)
+  {
+    if (MonoBehaviourSingleton<InGameManager>.I.graphicOptionType > 0 && ((Component) this).gameObject.activeInHierarchy)
+    {
+      this.StartCoroutine(this._AddItemNum(world_hit_pos, rarity, is_right));
+    }
+    else
+    {
+      if (rarity > 0)
+        ++MonoBehaviourSingleton<CoopManager>.I.coopStage.bossDropRare;
+      else
+        ++MonoBehaviourSingleton<CoopManager>.I.coopStage.bossDropNormal;
+      MonoBehaviourSingleton<UIPlayerStatus>.I.DropInfoUpdate();
+    }
+  }
+
+  private IEnumerator _AddItemNum(Vector3 world_hit_pos, int rarity, bool is_right)
+  {
+    Transform parent;
+    Vector3 target;
+    if (rarity > 0)
+    {
+      parent = this.dropIconR;
+      target = Vector3.op_Subtraction(((Component) this.dropInfoR).transform.localPosition, this.dropIconR.localPosition);
+    }
+    else
+    {
+      parent = this.dropIconN;
+      target = Vector3.op_Subtraction(((Component) this.dropInfoN).transform.localPosition, this.dropIconN.localPosition);
+    }
+    Transform uiEffect = EffectManager.GetUIEffect("ef_ui_downenergy_01", parent);
+    if (!Object.op_Equality((Object) uiEffect, (Object) null))
+    {
+      Vector3 worldPoint = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(world_hit_pos));
+      worldPoint.z = 1f;
+      uiEffect.position = worldPoint;
+      GameObject obj = ((Component) uiEffect).gameObject;
+      TransformInterpolator transformInterpolator = obj.AddComponent<TransformInterpolator>();
+      if (!Object.op_Equality((Object) transformInterpolator, (Object) null))
+      {
+        Vector3 add_value;
+        // ISSUE: explicit constructor call
+        ((Vector3) ref add_value).\u002Ector(is_right ? this.dropEffectAddRandomMax : (float) (-(double) this.dropEffectAddRandomMax * 2.0), this.dropEffectAddRandomMax * 2f, 0.0f);
+        transformInterpolator.Translate(this.dropEffectTime, target, this.dropEffectEaseCurve, add_value, this.dropEffectAddCurve);
+        yield return (object) new WaitForSeconds(this.dropEffectTime);
+        EffectManager.ReleaseEffect(obj);
+        if (rarity > 0)
+        {
+          ++MonoBehaviourSingleton<CoopManager>.I.coopStage.bossDropRare;
+          SoundManager.PlayOneShotUISE(40000154);
+        }
+        else
+        {
+          ++MonoBehaviourSingleton<CoopManager>.I.coopStage.bossDropNormal;
+          SoundManager.PlayOneShotUISE(40000153);
+        }
+        this.DropInfoUpdate();
+      }
+    }
+  }
+
+  public void SetDisableButtons(bool disable)
+  {
+    if (!Object.op_Inequality((Object) this.weaponChange, (Object) null))
+      return;
+    this.weaponChange.SetDisableButtons(disable);
+  }
+
+  public void DoEnable() => ((Component) this).gameObject.SetActive(true);
+
+  public void DoDisable() => ((Component) this).gameObject.SetActive(false);
+
+  public void SetHGPBoostUpdatePermitFlag(bool permit) => this.permitHGPBoostUpdate = permit;
+
+  public void DirectionSoulGauge(SoulEnergy soulEnergy, Vector3 worldHitPos)
+  {
+    if (!((Component) this).gameObject.activeInHierarchy)
+      return;
+    this.StartCoroutine(this._DirectionSoulGauge(soulEnergy, worldHitPos));
+  }
+
+  private IEnumerator _DirectionSoulGauge(SoulEnergy soulEnergy, Vector3 worldHitPos)
+  {
+    Transform effectTrans = soulEnergy.GetEffectTrans(this.soulEffectDirection);
+    if (effectTrans != null)
+    {
+      Vector3 worldPoint = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(worldHitPos));
+      worldPoint.z = 1f;
+      effectTrans.position = worldPoint;
+      TransformInterpolator transformInterpolator = ((Component) effectTrans).gameObject.GetComponent<TransformInterpolator>() ?? ((Component) effectTrans).gameObject.AddComponent<TransformInterpolator>();
+      Vector3 add_value;
+      // ISSUE: explicit constructor call
+      ((Vector3) ref add_value).\u002Ector(Random.Range(-this.soulEffectAddRandomMax, this.soulEffectAddRandomMax), Random.Range(-this.soulEffectAddRandomMax, this.soulEffectAddRandomMax), 0.0f);
+      transformInterpolator.Translate(this.soulEffectTime, Vector3.zero, this.soulEffectEaseCurve, add_value, this.soulEffectAddCurve);
+      yield return (object) new WaitForSeconds(this.soulEffectTime);
+      soulEnergy.Absorbed();
+    }
+  }
+
+  public void PlayChangeEvolveIcon(bool start)
+  {
+    if (this.evolveGauge == null || this.evolveGauge.evolveIcon == null || ((Component) this.evolveGauge.evolveIcon).gameObject.activeSelf == start)
+      return;
+    if (this.weaponChange != null)
+    {
+      if (start)
+        this.weaponChange.PlayEvolveIconAnim((System.Action) (() => this.EnableEvolveIcon(true)));
+      else
+        this.weaponChange.PlayEvolveIconAnim((System.Action) (() => this.EnableEvolveIcon(false)));
+    }
+    else
+      this.EnableEvolveIcon(true);
+  }
+
+  public void SetEvolveIcon(uint evolveId)
+  {
+    if (this.evolveGauge == null)
+      return;
+    this.evolveGauge.SetEvolveIcon(evolveId);
+  }
+
+  public void EnableEvolveIcon(bool isEnable)
+  {
+    if (this.evolveGauge == null)
+      return;
+    this.evolveGauge.EnableEvolveIcon(isEnable);
+  }
+
+  public void SetEvolveRate(float rate)
+  {
+    if (this.evolveGauge == null)
+      return;
+    this.evolveGauge.SetRate(rate);
+    if ((double) rate < 1.0)
+      return;
+    SoundManager.PlayOneShotUISE(10000091);
+  }
+
+  public void RestrictPopMenu(bool isRestrict)
+  {
+    if (this.weaponChange == null)
+      return;
+    this.weaponChange.SetRestrictPopMenu(isRestrict);
+  }
+
+  public void SetDisableRalltBtn(bool isDisable) => this.weaponChange.SetDisableRallyBtn(isDisable);
+
+  public bool DoFullBurstAction()
+  {
+    return !Object.op_Equality((Object) this.m_burstBulletCtrl, (Object) null) && this.m_burstBulletCtrl.FullBurstAction();
+  }
+
+  public bool DoShootAction()
+  {
+    return !Object.op_Equality((Object) this.m_burstBulletCtrl, (Object) null) && this.m_burstBulletCtrl.ConsumeBulletAction();
+  }
+
+  public bool DoReloadAction()
+  {
+    return !Object.op_Equality((Object) this.m_burstBulletCtrl, (Object) null) && this.m_burstBulletCtrl.ReloadAction();
+  }
+
+  private void CheckVisibleBulletUI()
+  {
+    if (Object.op_Equality((Object) this.m_burstBulletCtrl, (Object) null))
+      return;
+    if (this.targetPlayer.IsValidBurstBulletUI())
+      this.m_burstBulletCtrl.SetActivateIconRoot();
+    else
+      this.m_burstBulletCtrl.SetDeactivateIconRoot();
+  }
+
+  public void UpdateBurstUIInfo()
+  {
+    if (Object.op_Equality((Object) this.m_burstBulletCtrl, (Object) null) || Object.op_Equality((Object) this.targetPlayer, (Object) null) || this.targetPlayer.thsCtrl == null)
+      return;
+    this.m_burstBulletCtrl.Initialize(new UIBurstBulletUIController.InitParam()
+    {
+      MaxBulletCount = this.targetPlayer.thsCtrl.CurrentMaxBulletCount,
+      CurrentRestBulletCount = this.targetPlayer.thsCtrl.CurrentRestBulletCount
+    });
+  }
+
+  public static void OnLoadComplete()
+  {
+    if (!MonoBehaviourSingleton<UIPlayerStatus>.IsValid())
+      return;
+    MonoBehaviourSingleton<UIPlayerStatus>.I.UpdateBurstUIInfo();
+    MonoBehaviourSingleton<UIPlayerStatus>.I.InitializeOracleStock();
+  }
+
+  public void UpdateOracleStock()
+  {
+    if (this.targetPlayer.CheckAttackModeAndSpType(Player.ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.ORACLE))
+    {
+      this.oracleStock.SetActive(true);
+      this.oracleStock.UpdateStock(this.targetPlayer.spearCtrl.StockedCount);
+    }
+    else
+      this.oracleStock.SetActive(false);
+  }
+
+  public void InitializeOracleStock()
+  {
+    if (!MonoBehaviourSingleton<UIPlayerStatus>.IsValid() || !this.targetPlayer.CheckAttackModeAndSpType(Player.ATTACK_MODE.SPEAR, SP_ATTACK_TYPE.ORACLE))
+      return;
+    this.oracleStock.Initialize(this.targetPlayer.spearCtrl.MaxStockCount);
+  }
+
+  public void ChangeUniqueEquipment() => this.weaponChange.InitWepIcons();
+
+  public void SetEnableWeaponChangeButton(bool enabled)
+  {
+    this.weaponChange.SetEnableChangeButton(enabled);
+  }
+
+  public bool IsEnableWeaponChangeButton() => this.weaponChange.IsEnableChangeButton();
+
+  [Serializable]
+  public class boostItem
+  {
+    public GameObject obj;
+    public UITweenCtrl anim;
+    public USE_ITEM_EFFECT_TYPE type;
+  }
+
+  [Serializable]
+  public class boosColor
+  {
+    public float rate;
+    public Color color;
+  }
+
+  [Serializable]
+  protected class ShieldHpGaugeEffect
+  {
+    [SerializeField]
+    public UISprite sprite;
+    [SerializeField]
+    public int sizeMin;
+    [SerializeField]
+    public int sizeMax;
+    [SerializeField]
+    public Color[] effectColor;
+  }
+
+  [Serializable]
+  protected class SpActionGaugeInfo
+  {
+    [SerializeField]
+    public GameObject root;
+    [SerializeField]
+    public UIHGauge gaugeUI;
+    [SerializeField]
+    public Renderer renderer;
+    [SerializeField]
+    public GameObject timerRoot;
+    [SerializeField]
+    public UIHGauge timerGaugeUI;
+    [SerializeField]
+    public Renderer timerRenderer;
+    [SerializeField]
+    public Color gaugeColorNormal;
+    [SerializeField]
+    public Color gaugeColorCharged;
+    [NonSerialized]
+    public int state;
+    [SerializeField]
+    public Color[] gaugeColorJump;
+    [SerializeField]
+    public Color[] gaugeColorSoul;
+    [SerializeField]
+    public Color[] gaugeColorSoulPairSwords;
+    [SerializeField]
+    public Color[] gaugeColorBurst;
+    [SerializeField]
+    public Color[] gaugeColorOracle;
+    [SerializeField]
+    public GameObject gaugeMemoriObj;
+
+    public GameObject GetRoot(SP_ATTACK_TYPE spAttackType, Player.ATTACK_MODE mode)
+    {
+      switch (spAttackType)
+      {
+        case SP_ATTACK_TYPE.BURST:
+          return this.timerRoot;
+        case SP_ATTACK_TYPE.ORACLE:
+          return mode == Player.ATTACK_MODE.SPEAR ? this.timerRoot : this.root;
+        default:
+          return this.root;
+      }
+    }
+
+    public UIHGauge GetGaugeUI(SP_ATTACK_TYPE spAttackType, Player.ATTACK_MODE mode)
+    {
+      switch (spAttackType)
+      {
+        case SP_ATTACK_TYPE.BURST:
+          return this.timerGaugeUI;
+        case SP_ATTACK_TYPE.ORACLE:
+          return mode == Player.ATTACK_MODE.SPEAR ? this.timerGaugeUI : this.gaugeUI;
+        default:
+          return this.gaugeUI;
+      }
+    }
+
+    public Renderer GetRenderer(SP_ATTACK_TYPE spAttackType, Player.ATTACK_MODE mode)
+    {
+      switch (spAttackType)
+      {
+        case SP_ATTACK_TYPE.BURST:
+          return this.timerRenderer;
+        case SP_ATTACK_TYPE.ORACLE:
+          return mode == Player.ATTACK_MODE.SPEAR ? this.timerRenderer : this.renderer;
+        default:
+          return this.renderer;
+      }
+    }
+
+    public void SetActiveRoot(SP_ATTACK_TYPE spAttackType, Player.ATTACK_MODE mode, bool isActive)
+    {
+      GameObject root = this.GetRoot(spAttackType, mode);
+      GameObject gameObject = Object.op_Equality((Object) this.root, (Object) root) ? this.timerRoot : this.root;
+      if (Object.op_Inequality((Object) root, (Object) null) && root.activeSelf != isActive)
+        root.SetActive(isActive);
+      if (!Object.op_Inequality((Object) gameObject, (Object) null) || !gameObject.activeSelf)
+        return;
+      gameObject.SetActive(false);
+    }
+
+    public bool IsPlayAnim(UIPlayerStatus.SpActionGaugeInfo.ANIM_STATE s)
+    {
+      return (this.state & 1 << (int) (s & (UIPlayerStatus.SpActionGaugeInfo.ANIM_STATE) 31 /*0x1F*/)) > 0;
+    }
+
+    public void SetState(UIPlayerStatus.SpActionGaugeInfo.ANIM_STATE s)
+    {
+      this.state |= 1 << (int) (s & (UIPlayerStatus.SpActionGaugeInfo.ANIM_STATE) 31 /*0x1F*/);
+    }
+
+    public enum ANIM_STATE
+    {
+      RESET,
+      HALF,
+      FULL,
+      BOOST,
+    }
+  }
+
+  [Serializable]
+  protected class CoopFishingGaugeInfo
+  {
+    [SerializeField]
+    public GameObject root;
+    [SerializeField]
+    public UISprite gaugeBlue;
+    [SerializeField]
+    public UISprite gaugeRed;
+    [SerializeField]
+    public GameObject fishBlue;
+    [SerializeField]
+    public GameObject fishRed;
+    [SerializeField]
+    public UISprite fishBlueSprite;
+    [SerializeField]
+    public UISprite fishRedSprite;
+    [SerializeField]
+    private Vector3 startPos = Vector3.zero;
+    [SerializeField]
+    private Vector3 endPos = Vector3.zero;
+
+    public void SetRate(float rate)
+    {
+      this.gaugeBlue.fillAmount = rate;
+      this.gaugeRed.fillAmount = rate;
+      this.fishBlue.transform.localPosition = Vector3.Lerp(this.startPos, this.endPos, rate);
+      this.fishRed.transform.localPosition = Vector3.Lerp(this.startPos, this.endPos, rate);
+      this.fishBlueSprite.MarkAsChanged();
+      this.fishRedSprite.MarkAsChanged();
+    }
+
+    public void SetPositive(bool isPositive)
+    {
+      ((Component) this.gaugeBlue).gameObject.SetActive(isPositive);
+      ((Component) this.gaugeRed).gameObject.SetActive(!isPositive);
+      this.fishBlue.SetActive(isPositive);
+      this.fishRed.SetActive(!isPositive);
+    }
+  }
 }

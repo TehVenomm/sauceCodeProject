@@ -1,116 +1,72 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIButtonScale
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Interaction/Button Scale")]
-public class UIButtonScale
+public class UIButtonScale : MonoBehaviour
 {
-	public Transform tweenTarget;
+  public Transform tweenTarget;
+  public Vector3 hover = new Vector3(1.1f, 1.1f, 1.1f);
+  public Vector3 pressed = new Vector3(1.05f, 1.05f, 1.05f);
+  public float duration = 0.2f;
+  private Vector3 mScale;
+  private bool mStarted;
 
-	public Vector3 hover = new Vector3(1.1f, 1.1f, 1.1f);
+  private void Start()
+  {
+    if (this.mStarted)
+      return;
+    this.mStarted = true;
+    if (Object.op_Equality((Object) this.tweenTarget, (Object) null))
+      this.tweenTarget = ((Component) this).transform;
+    this.mScale = this.tweenTarget.localScale;
+  }
 
-	public Vector3 pressed = new Vector3(1.05f, 1.05f, 1.05f);
+  private void OnEnable()
+  {
+    if (!this.mStarted)
+      return;
+    this.OnHover(UICamera.IsHighlighted(((Component) this).gameObject));
+  }
 
-	public float duration = 0.2f;
+  private void OnDisable()
+  {
+    if (!this.mStarted || !Object.op_Inequality((Object) this.tweenTarget, (Object) null))
+      return;
+    TweenScale component = ((Component) this.tweenTarget).GetComponent<TweenScale>();
+    if (!Object.op_Inequality((Object) component, (Object) null))
+      return;
+    component.value = this.mScale;
+    ((Behaviour) component).enabled = false;
+  }
 
-	private Vector3 mScale;
+  private void OnPress(bool isPressed)
+  {
+    if (!((Behaviour) this).enabled)
+      return;
+    if (!this.mStarted)
+      this.Start();
+    TweenScale.Begin(((Component) this.tweenTarget).gameObject, this.duration, isPressed ? Vector3.Scale(this.mScale, this.pressed) : (UICamera.IsHighlighted(((Component) this).gameObject) ? Vector3.Scale(this.mScale, this.hover) : this.mScale)).method = UITweener.Method.EaseInOut;
+  }
 
-	private bool mStarted;
+  private void OnHover(bool isOver)
+  {
+    if (!((Behaviour) this).enabled)
+      return;
+    if (!this.mStarted)
+      this.Start();
+    TweenScale.Begin(((Component) this.tweenTarget).gameObject, this.duration, isOver ? Vector3.Scale(this.mScale, this.hover) : this.mScale).method = UITweener.Method.EaseInOut;
+  }
 
-	public UIButtonScale()
-		: this()
-	{
-	}//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-	//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-	//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-
-
-	private void Start()
-	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Expected O, but got Unknown
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		if (!mStarted)
-		{
-			mStarted = true;
-			if (tweenTarget == null)
-			{
-				tweenTarget = this.get_transform();
-			}
-			mScale = tweenTarget.get_localScale();
-		}
-	}
-
-	private void OnEnable()
-	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
-		if (mStarted)
-		{
-			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
-		}
-	}
-
-	private void OnDisable()
-	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		if (mStarted && tweenTarget != null)
-		{
-			TweenScale component = tweenTarget.GetComponent<TweenScale>();
-			if (component != null)
-			{
-				component.value = mScale;
-				component.set_enabled(false);
-			}
-		}
-	}
-
-	private void OnPress(bool isPressed)
-	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Expected O, but got Unknown
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Expected O, but got Unknown
-		if (this.get_enabled())
-		{
-			if (!mStarted)
-			{
-				Start();
-			}
-			TweenScale.Begin(tweenTarget.get_gameObject(), duration, isPressed ? Vector3.Scale(mScale, pressed) : ((!UICamera.IsHighlighted(this.get_gameObject())) ? mScale : Vector3.Scale(mScale, hover))).method = UITweener.Method.EaseInOut;
-		}
-	}
-
-	private void OnHover(bool isOver)
-	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Expected O, but got Unknown
-		if (this.get_enabled())
-		{
-			if (!mStarted)
-			{
-				Start();
-			}
-			TweenScale.Begin(tweenTarget.get_gameObject(), duration, (!isOver) ? mScale : Vector3.Scale(mScale, hover)).method = UITweener.Method.EaseInOut;
-		}
-	}
-
-	private void OnSelect(bool isSelected)
-	{
-		if (this.get_enabled() && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
-		{
-			OnHover(isSelected);
-		}
-	}
+  private void OnSelect(bool isSelected)
+  {
+    if (!((Behaviour) this).enabled || isSelected && UICamera.currentScheme != UICamera.ControlScheme.Controller)
+      return;
+    this.OnHover(isSelected);
+  }
 }

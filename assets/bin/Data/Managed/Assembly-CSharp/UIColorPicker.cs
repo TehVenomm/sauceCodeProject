@@ -1,362 +1,226 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIColorPicker
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(UITexture))]
-public class UIColorPicker
+#nullable disable
+[RequireComponent(typeof (UITexture))]
+public class UIColorPicker : MonoBehaviour
 {
-	public static UIColorPicker current;
+  public static UIColorPicker current;
+  public Color value = Color.white;
+  public UIWidget selectionWidget;
+  public List<EventDelegate> onChange = new List<EventDelegate>();
+  [NonSerialized]
+  private Transform mTrans;
+  [NonSerialized]
+  private UITexture mUITex;
+  [NonSerialized]
+  private Texture2D mTex;
+  [NonSerialized]
+  private UICamera mCam;
+  [NonSerialized]
+  private Vector2 mPos;
+  [NonSerialized]
+  private int mWidth;
+  [NonSerialized]
+  private int mHeight;
+  private static AnimationCurve mRed;
+  private static AnimationCurve mGreen;
+  private static AnimationCurve mBlue;
 
-	public Color value = Color.get_white();
+  private void Start()
+  {
+    this.mTrans = ((Component) this).transform;
+    this.mUITex = ((Component) this).GetComponent<UITexture>();
+    this.mCam = UICamera.FindCameraForLayer(((Component) this).gameObject.layer);
+    this.mWidth = this.mUITex.width;
+    this.mHeight = this.mUITex.height;
+    Color[] colorArray = new Color[this.mWidth * this.mHeight];
+    for (int index1 = 0; index1 < this.mHeight; ++index1)
+    {
+      float y = ((float) index1 - 1f) / (float) this.mHeight;
+      for (int index2 = 0; index2 < this.mWidth; ++index2)
+      {
+        float x = ((float) index2 - 1f) / (float) this.mWidth;
+        int index3 = index2 + index1 * this.mWidth;
+        colorArray[index3] = UIColorPicker.Sample(x, y);
+      }
+    }
+    this.mTex = new Texture2D(this.mWidth, this.mHeight, (TextureFormat) 3, false);
+    this.mTex.SetPixels(colorArray);
+    ((Texture) this.mTex).filterMode = (FilterMode) 2;
+    ((Texture) this.mTex).wrapMode = (TextureWrapMode) 1;
+    this.mTex.Apply();
+    this.mUITex.mainTexture = (Texture) this.mTex;
+    this.Select(this.value);
+  }
 
-	public UIWidget selectionWidget;
+  private void OnDestroy()
+  {
+    Object.Destroy((Object) this.mTex);
+    this.mTex = (Texture2D) null;
+  }
 
-	public List<EventDelegate> onChange = new List<EventDelegate>();
+  private void OnPress(bool pressed)
+  {
+    if (!(((Behaviour) this).enabled & pressed) || UICamera.currentScheme == UICamera.ControlScheme.Controller)
+      return;
+    this.Sample();
+  }
 
-	[NonSerialized]
-	private Transform mTrans;
+  private void OnDrag(Vector2 delta)
+  {
+    if (!((Behaviour) this).enabled)
+      return;
+    this.Sample();
+  }
 
-	[NonSerialized]
-	private UITexture mUITex;
+  private void OnPan(Vector2 delta)
+  {
+    if (!((Behaviour) this).enabled)
+      return;
+    this.mPos.x = Mathf.Clamp01(this.mPos.x + delta.x);
+    this.mPos.y = Mathf.Clamp01(this.mPos.y + delta.y);
+    this.Select(this.mPos);
+  }
 
-	[NonSerialized]
-	private Texture2D mTex;
+  private void Sample()
+  {
+    Vector3 vector3 = this.mTrans.InverseTransformPoint(this.mCam.cachedCamera.ScreenToWorldPoint(Vector2.op_Implicit(UICamera.lastEventPosition)));
+    Vector3[] localCorners = this.mUITex.localCorners;
+    this.mPos.x = Mathf.Clamp01((float) (((double) vector3.x - (double) localCorners[0].x) / ((double) localCorners[2].x - (double) localCorners[0].x)));
+    this.mPos.y = Mathf.Clamp01((float) (((double) vector3.y - (double) localCorners[0].y) / ((double) localCorners[2].y - (double) localCorners[0].y)));
+    if (Object.op_Inequality((Object) this.selectionWidget, (Object) null))
+    {
+      vector3.x = Mathf.Lerp(localCorners[0].x, localCorners[2].x, this.mPos.x);
+      vector3.y = Mathf.Lerp(localCorners[0].y, localCorners[2].y, this.mPos.y);
+      ((Component) this.selectionWidget).transform.OverlayPosition(this.mTrans.TransformPoint(vector3), this.mCam.cachedCamera);
+    }
+    this.value = UIColorPicker.Sample(this.mPos.x, this.mPos.y);
+    UIColorPicker.current = this;
+    EventDelegate.Execute(this.onChange);
+    UIColorPicker.current = (UIColorPicker) null;
+  }
 
-	[NonSerialized]
-	private UICamera mCam;
+  public void Select(Vector2 v)
+  {
+    v.x = Mathf.Clamp01(v.x);
+    v.y = Mathf.Clamp01(v.y);
+    this.mPos = v;
+    if (Object.op_Inequality((Object) this.selectionWidget, (Object) null))
+    {
+      Vector3[] localCorners = this.mUITex.localCorners;
+      v.x = Mathf.Lerp(localCorners[0].x, localCorners[2].x, this.mPos.x);
+      v.y = Mathf.Lerp(localCorners[0].y, localCorners[2].y, this.mPos.y);
+      v = Vector2.op_Implicit(this.mTrans.TransformPoint(Vector2.op_Implicit(v)));
+      ((Component) this.selectionWidget).transform.OverlayPosition(Vector2.op_Implicit(v), this.mCam.cachedCamera);
+    }
+    this.value = UIColorPicker.Sample(this.mPos.x, this.mPos.y);
+    UIColorPicker.current = this;
+    EventDelegate.Execute(this.onChange);
+    UIColorPicker.current = (UIColorPicker) null;
+  }
 
-	[NonSerialized]
-	private Vector2 mPos;
+  public Vector2 Select(Color c)
+  {
+    if (Object.op_Equality((Object) this.mUITex, (Object) null))
+    {
+      this.value = c;
+      return this.mPos;
+    }
+    float num1 = float.MaxValue;
+    for (int index1 = 0; index1 < this.mHeight; ++index1)
+    {
+      float y = ((float) index1 - 1f) / (float) this.mHeight;
+      for (int index2 = 0; index2 < this.mWidth; ++index2)
+      {
+        float x = ((float) index2 - 1f) / (float) this.mWidth;
+        Color color = UIColorPicker.Sample(x, y);
+        color.r -= c.r;
+        color.g -= c.g;
+        color.b -= c.b;
+        float num2 = (float) ((double) color.r * (double) color.r + (double) color.g * (double) color.g + (double) color.b * (double) color.b);
+        if ((double) num2 < (double) num1)
+        {
+          num1 = num2;
+          this.mPos.x = x;
+          this.mPos.y = y;
+        }
+      }
+    }
+    if (Object.op_Inequality((Object) this.selectionWidget, (Object) null))
+    {
+      Vector3[] localCorners = this.mUITex.localCorners;
+      Vector3 worldPos;
+      worldPos.x = Mathf.Lerp(localCorners[0].x, localCorners[2].x, this.mPos.x);
+      worldPos.y = Mathf.Lerp(localCorners[0].y, localCorners[2].y, this.mPos.y);
+      worldPos.z = 0.0f;
+      worldPos = this.mTrans.TransformPoint(worldPos);
+      ((Component) this.selectionWidget).transform.OverlayPosition(worldPos, this.mCam.cachedCamera);
+    }
+    this.value = c;
+    UIColorPicker.current = this;
+    EventDelegate.Execute(this.onChange);
+    UIColorPicker.current = (UIColorPicker) null;
+    return this.mPos;
+  }
 
-	[NonSerialized]
-	private int mWidth;
-
-	[NonSerialized]
-	private int mHeight;
-
-	private static AnimationCurve mRed;
-
-	private static AnimationCurve mGreen;
-
-	private static AnimationCurve mBlue;
-
-	public UIColorPicker()
-		: this()
-	{
-	}//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-
-
-	private void Start()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Expected O, but got Unknown
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		mTrans = this.get_transform();
-		mUITex = this.GetComponent<UITexture>();
-		mCam = UICamera.FindCameraForLayer(this.get_gameObject().get_layer());
-		mWidth = mUITex.width;
-		mHeight = mUITex.height;
-		Color[] array = (Color[])new Color[mWidth * mHeight];
-		for (int i = 0; i < mHeight; i++)
-		{
-			float y = ((float)i - 1f) / (float)mHeight;
-			for (int j = 0; j < mWidth; j++)
-			{
-				float x = ((float)j - 1f) / (float)mWidth;
-				int num = j + i * mWidth;
-				array[num] = Sample(x, y);
-			}
-		}
-		mTex = new Texture2D(mWidth, mHeight, 3, false);
-		mTex.SetPixels(array);
-		mTex.set_filterMode(2);
-		mTex.set_wrapMode(1);
-		mTex.Apply();
-		mUITex.mainTexture = mTex;
-		Select(value);
-	}
-
-	private void OnDestroy()
-	{
-		Object.Destroy(mTex);
-		mTex = null;
-	}
-
-	private void OnPress(bool pressed)
-	{
-		if (this.get_enabled() && pressed && UICamera.currentScheme != UICamera.ControlScheme.Controller)
-		{
-			Sample();
-		}
-	}
-
-	private void OnDrag(Vector2 delta)
-	{
-		if (this.get_enabled())
-		{
-			Sample();
-		}
-	}
-
-	private void OnPan(Vector2 delta)
-	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_enabled())
-		{
-			mPos.x = Mathf.Clamp01(mPos.x + delta.x);
-			mPos.y = Mathf.Clamp01(mPos.y + delta.y);
-			Select(mPos);
-		}
-	}
-
-	private void Sample()
-	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Expected O, but got Unknown
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = Vector2.op_Implicit(UICamera.lastEventPosition);
-		val = mCam.cachedCamera.ScreenToWorldPoint(val);
-		val = mTrans.InverseTransformPoint(val);
-		Vector3[] localCorners = mUITex.localCorners;
-		mPos.x = Mathf.Clamp01((val.x - localCorners[0].x) / (localCorners[2].x - localCorners[0].x));
-		mPos.y = Mathf.Clamp01((val.y - localCorners[0].y) / (localCorners[2].y - localCorners[0].y));
-		if (selectionWidget != null)
-		{
-			val.x = Mathf.Lerp(localCorners[0].x, localCorners[2].x, mPos.x);
-			val.y = Mathf.Lerp(localCorners[0].y, localCorners[2].y, mPos.y);
-			val = mTrans.TransformPoint(val);
-			selectionWidget.get_transform().OverlayPosition(val, mCam.cachedCamera);
-		}
-		value = Sample(mPos.x, mPos.y);
-		current = this;
-		EventDelegate.Execute(onChange);
-		current = null;
-	}
-
-	public void Select(Vector2 v)
-	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Expected O, but got Unknown
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-		v.x = Mathf.Clamp01(v.x);
-		v.y = Mathf.Clamp01(v.y);
-		mPos = v;
-		if (selectionWidget != null)
-		{
-			Vector3[] localCorners = mUITex.localCorners;
-			v.x = Mathf.Lerp(localCorners[0].x, localCorners[2].x, mPos.x);
-			v.y = Mathf.Lerp(localCorners[0].y, localCorners[2].y, mPos.y);
-			v = Vector2.op_Implicit(mTrans.TransformPoint(Vector2.op_Implicit(v)));
-			selectionWidget.get_transform().OverlayPosition(Vector2.op_Implicit(v), mCam.cachedCamera);
-		}
-		value = Sample(mPos.x, mPos.y);
-		current = this;
-		EventDelegate.Execute(onChange);
-		current = null;
-	}
-
-	public Vector2 Select(Color c)
-	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Expected O, but got Unknown
-		//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-		if (mUITex == null)
-		{
-			value = c;
-			return mPos;
-		}
-		float num = 3.40282347E+38f;
-		for (int i = 0; i < mHeight; i++)
-		{
-			float y = ((float)i - 1f) / (float)mHeight;
-			for (int j = 0; j < mWidth; j++)
-			{
-				float x = ((float)j - 1f) / (float)mWidth;
-				Color val = Sample(x, y);
-				Color val2 = val;
-				val2.r -= c.r;
-				val2.g -= c.g;
-				val2.b -= c.b;
-				float num2 = val2.r * val2.r + val2.g * val2.g + val2.b * val2.b;
-				if (num2 < num)
-				{
-					num = num2;
-					mPos.x = x;
-					mPos.y = y;
-				}
-			}
-		}
-		if (selectionWidget != null)
-		{
-			Vector3[] localCorners = mUITex.localCorners;
-			Vector3 val3 = default(Vector3);
-			val3.x = Mathf.Lerp(localCorners[0].x, localCorners[2].x, mPos.x);
-			val3.y = Mathf.Lerp(localCorners[0].y, localCorners[2].y, mPos.y);
-			val3.z = 0f;
-			val3 = mTrans.TransformPoint(val3);
-			selectionWidget.get_transform().OverlayPosition(val3, mCam.cachedCamera);
-		}
-		value = c;
-		current = this;
-		EventDelegate.Execute(onChange);
-		current = null;
-		return mPos;
-	}
-
-	public static Color Sample(float x, float y)
-	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ed: Expected O, but got Unknown
-		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d5: Expected O, but got Unknown
-		//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0211: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0242: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0247: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0262: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0278: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0293: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0298: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02bd: Expected O, but got Unknown
-		//IL_0330: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0331: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0343: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0348: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0363: Unknown result type (might be due to invalid IL or missing references)
-		if (mRed == null)
-		{
-			mRed = new AnimationCurve((Keyframe[])new Keyframe[8]
-			{
-				new Keyframe(0f, 1f),
-				new Keyframe(0.142857149f, 1f),
-				new Keyframe(0.2857143f, 0f),
-				new Keyframe(0.428571433f, 0f),
-				new Keyframe(0.5714286f, 0f),
-				new Keyframe(0.714285731f, 1f),
-				new Keyframe(0.857142866f, 1f),
-				new Keyframe(1f, 0.5f)
-			});
-			mGreen = new AnimationCurve((Keyframe[])new Keyframe[8]
-			{
-				new Keyframe(0f, 0f),
-				new Keyframe(0.142857149f, 1f),
-				new Keyframe(0.2857143f, 1f),
-				new Keyframe(0.428571433f, 1f),
-				new Keyframe(0.5714286f, 0f),
-				new Keyframe(0.714285731f, 0f),
-				new Keyframe(0.857142866f, 0f),
-				new Keyframe(1f, 0.5f)
-			});
-			mBlue = new AnimationCurve((Keyframe[])new Keyframe[8]
-			{
-				new Keyframe(0f, 0f),
-				new Keyframe(0.142857149f, 0f),
-				new Keyframe(0.2857143f, 0f),
-				new Keyframe(0.428571433f, 1f),
-				new Keyframe(0.5714286f, 1f),
-				new Keyframe(0.714285731f, 1f),
-				new Keyframe(0.857142866f, 0f),
-				new Keyframe(1f, 0.5f)
-			});
-		}
-		Vector3 val = default(Vector3);
-		val._002Ector(mRed.Evaluate(x), mGreen.Evaluate(x), mBlue.Evaluate(x));
-		if (y < 0.5f)
-		{
-			y *= 2f;
-			val.x *= y;
-			val.y *= y;
-			val.z *= y;
-		}
-		else
-		{
-			val = Vector3.Lerp(val, Vector3.get_one(), y * 2f - 1f);
-		}
-		return new Color(val.x, val.y, val.z, 1f);
-	}
+  public static Color Sample(float x, float y)
+  {
+    if (UIColorPicker.mRed == null)
+    {
+      UIColorPicker.mRed = new AnimationCurve(new Keyframe[8]
+      {
+        new Keyframe(0.0f, 1f),
+        new Keyframe(0.142857149f, 1f),
+        new Keyframe(0.2857143f, 0.0f),
+        new Keyframe(0.428571433f, 0.0f),
+        new Keyframe(0.5714286f, 0.0f),
+        new Keyframe(0.714285731f, 1f),
+        new Keyframe(0.857142866f, 1f),
+        new Keyframe(1f, 0.5f)
+      });
+      UIColorPicker.mGreen = new AnimationCurve(new Keyframe[8]
+      {
+        new Keyframe(0.0f, 0.0f),
+        new Keyframe(0.142857149f, 1f),
+        new Keyframe(0.2857143f, 1f),
+        new Keyframe(0.428571433f, 1f),
+        new Keyframe(0.5714286f, 0.0f),
+        new Keyframe(0.714285731f, 0.0f),
+        new Keyframe(0.857142866f, 0.0f),
+        new Keyframe(1f, 0.5f)
+      });
+      UIColorPicker.mBlue = new AnimationCurve(new Keyframe[8]
+      {
+        new Keyframe(0.0f, 0.0f),
+        new Keyframe(0.142857149f, 0.0f),
+        new Keyframe(0.2857143f, 0.0f),
+        new Keyframe(0.428571433f, 1f),
+        new Keyframe(0.5714286f, 1f),
+        new Keyframe(0.714285731f, 1f),
+        new Keyframe(0.857142866f, 0.0f),
+        new Keyframe(1f, 0.5f)
+      });
+    }
+    Vector3 vector3;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref vector3).\u002Ector(UIColorPicker.mRed.Evaluate(x), UIColorPicker.mGreen.Evaluate(x), UIColorPicker.mBlue.Evaluate(x));
+    if ((double) y < 0.5)
+    {
+      y *= 2f;
+      vector3.x *= y;
+      vector3.y *= y;
+      vector3.z *= y;
+    }
+    else
+      vector3 = Vector3.Lerp(vector3, Vector3.one, (float) ((double) y * 2.0 - 1.0));
+    return new Color(vector3.x, vector3.y, vector3.z, 1f);
+  }
 }
