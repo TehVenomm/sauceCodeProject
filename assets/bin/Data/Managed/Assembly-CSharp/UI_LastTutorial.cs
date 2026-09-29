@@ -1,48 +1,36 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UI_LastTutorial
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class UI_LastTutorial
+#nullable disable
+public class UI_LastTutorial : MonoBehaviour
 {
-	[SerializeField]
-	private UIPanel lastTutorialPanel;
+  [SerializeField]
+  private UIPanel lastTutorialPanel;
+  [SerializeField]
+  private UISprite lastTutorialSprite;
+  [SerializeField]
+  private UIButton lastTutorialButton;
 
-	[SerializeField]
-	private UISprite lastTutorialSprite;
+  public void OpenLastTutorial()
+  {
+    this.lastTutorialPanel.depth = 6500;
+    ((Component) this.lastTutorialPanel).gameObject.SetActive(true);
+    this.lastTutorialButton.onClick.Clear();
+    TweenAlpha.Begin(((Component) this.lastTutorialSprite).gameObject, 0.3f, 1f).AddOnFinished((EventDelegate.Callback) (() => this.lastTutorialButton.onClick.Add(new EventDelegate(new EventDelegate.Callback(this.CloseLastTutorial)))));
+  }
 
-	[SerializeField]
-	private UIButton lastTutorialButton;
-
-	public UI_LastTutorial()
-		: this()
-	{
-	}
-
-	public void OpenLastTutorial()
-	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Expected O, but got Unknown
-		lastTutorialPanel.depth = 6500;
-		lastTutorialPanel.get_gameObject().SetActive(true);
-		lastTutorialButton.onClick.Clear();
-		TweenAlpha tweenAlpha = TweenAlpha.Begin(lastTutorialSprite.get_gameObject(), 0.3f, 1f);
-		tweenAlpha.AddOnFinished(delegate
-		{
-			lastTutorialButton.onClick.Add(new EventDelegate(CloseLastTutorial));
-		});
-	}
-
-	public void CloseLastTutorial()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Expected O, but got Unknown
-		TweenAlpha tweenAlpha = TweenAlpha.Begin(lastTutorialSprite.get_gameObject(), 0.3f, 0f);
-		tweenAlpha.AddOnFinished(delegate
-		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			if (!AppMain.isApplicationQuit)
-			{
-				Object.Destroy(this.get_gameObject());
-			}
-		});
-	}
+  public void CloseLastTutorial()
+  {
+    TweenAlpha.Begin(((Component) this.lastTutorialSprite).gameObject, 0.3f, 0.0f).AddOnFinished((EventDelegate.Callback) (() =>
+    {
+      if (AppMain.isApplicationQuit)
+        return;
+      Object.Destroy((Object) ((Component) this).gameObject);
+    }));
+  }
 }

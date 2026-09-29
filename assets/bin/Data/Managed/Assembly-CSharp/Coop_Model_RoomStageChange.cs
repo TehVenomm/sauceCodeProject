@@ -1,16 +1,19 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Coop_Model_RoomStageChange
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class Coop_Model_RoomStageChange : Coop_Model_Base
 {
-	public int qId;
+  public int qId;
+  public int idx;
 
-	public int idx;
+  public Coop_Model_RoomStageChange() => this.packetType = PACKET_TYPE.ROOM_STAGE_CHANGE;
 
-	public Coop_Model_RoomStageChange()
-	{
-		base.packetType = PACKET_TYPE.ROOM_STAGE_CHANGE;
-	}
-
-	public override string ToString()
-	{
-		return base.ToString() + ",qId=" + qId + ",idx=" + idx;
-	}
+  public override string ToString()
+  {
+    return $"{base.ToString()},qId={(object) this.qId},idx={(object) this.idx}";
+  }
 }

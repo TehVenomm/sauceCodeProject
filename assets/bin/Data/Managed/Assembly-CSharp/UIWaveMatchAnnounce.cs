@@ -1,187 +1,177 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIWaveMatchAnnounce
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class UIWaveMatchAnnounce : UIAnnounceBase<UIWaveMatchAnnounce>
 {
-	private enum eState
-	{
-		None,
-		Announce,
-		CountDown,
-		CutIn
-	}
+  private const int kCountDownSec = 5;
+  private const string kCountDownSprPrefix = "WaveEncount_";
+  private const float kCutInDispSec = 2f;
+  private const string kCutInSprPrefix = "WaveCount_";
+  [SerializeField]
+  protected UILabel timeLabel;
+  [SerializeField]
+  protected GameObject CountDownObj;
+  [SerializeField]
+  protected UISprite CountDownSpr;
+  [SerializeField]
+  protected UITweener[] CutInAnim;
+  [SerializeField]
+  protected GameObject CutInObj;
+  [SerializeField]
+  protected GameObject CutInNumberObj;
+  [SerializeField]
+  protected UISprite CutInNumberSpr10;
+  [SerializeField]
+  protected UISprite CutInNumberSpr01;
+  [SerializeField]
+  protected GameObject CutInFinalObj;
+  private InGameSettingsManager.WaveMatchParam wmSetting;
+  private Coop_Model_WaveMatchInfo wmInfo;
+  private UIWaveMatchAnnounce.eState state;
+  private float countSec;
+  private int lastInteger;
+  private bool isShowWave;
+  private int dispDispSec = 3;
+  private bool isEvent;
 
-	private const int kCountDownSec = 5;
+  protected override float GetDispSec() => (float) this.dispDispSec;
 
-	private const string kCountDownSprPrefix = "WaveEncount_";
+  public void Announce(Coop_Model_WaveMatchInfo info)
+  {
+    this.wmInfo = info;
+    this.isEvent = QuestManager.IsValidInGameWaveMatch(true);
+    ((Behaviour) this.CutInAnim[0]).enabled = false;
+    this.CutInAnim[0].ResetToBeginning();
+    ((Behaviour) this.CutInAnim[1]).enabled = false;
+    this.CutInAnim[1].ResetToBeginning();
+    if (this.wmInfo.popGuardSec <= 0)
+      this.StartCutIn();
+    else if (this.wmInfo.popGuardSec <= 5)
+      this.StartCountDown();
+    else
+      this.StartAnnounce();
+    MonoBehaviourSingleton<InGameProgress>.I.SetWaveMatchWave(info.no);
+  }
 
-	private const float kCutInDispSec = 2f;
+  private void Update()
+  {
+    switch (this.state)
+    {
+      case UIWaveMatchAnnounce.eState.Announce:
+        this.UpdateAnnounce();
+        break;
+      case UIWaveMatchAnnounce.eState.CountDown:
+        this.UpdateCountDown();
+        break;
+      case UIWaveMatchAnnounce.eState.CutIn:
+        this.UpdateCutIn();
+        break;
+    }
+    if (!MonoBehaviourSingleton<UIQuestInfoWaveMatch>.IsValid() || !this.isShowWave)
+      return;
+    MonoBehaviourSingleton<UIQuestInfoWaveMatch>.I.SetWaveNow(this.wmInfo.no, this.wmInfo.finalNo, this.wmInfo.isFinal > 0);
+  }
 
-	private const string kCutInSprPrefix = "WaveCount_";
+  private void StartAnnounce()
+  {
+    this.dispDispSec = this.wmInfo.popGuardSec - 5;
+    if (!this.AnnounceStart())
+      return;
+    this.timeLabel.text = InGameProgress.GetTimeToStringMMSS(this.wmInfo.popGuardSec);
+    this.lastInteger = this.wmInfo.popGuardSec;
+    this.countSec = (float) this.wmInfo.popGuardSec;
+    this.state = UIWaveMatchAnnounce.eState.Announce;
+  }
 
-	[SerializeField]
-	protected UILabel timeLabel;
+  private void UpdateAnnounce()
+  {
+    this.countSec -= Time.deltaTime;
+    int time_int = Mathf.FloorToInt(this.countSec);
+    if (this.lastInteger != time_int)
+    {
+      this.lastInteger = time_int;
+      this.timeLabel.text = InGameProgress.GetTimeToStringMMSS(time_int);
+    }
+    if (this.lastInteger > 5)
+      return;
+    this.StartCountDown();
+  }
 
-	[SerializeField]
-	protected GameObject CountDownObj;
+  private void StartCountDown()
+  {
+    this.CountDownSpr.spriteName = "WaveEncount_5";
+    this.CountDownObj.SetActive(true);
+    this.state = UIWaveMatchAnnounce.eState.CountDown;
+  }
 
-	[SerializeField]
-	protected UISprite CountDownSpr;
+  private void UpdateCountDown()
+  {
+    this.countSec -= Time.deltaTime;
+    int num = Mathf.FloorToInt(this.countSec);
+    if (this.lastInteger != num)
+    {
+      this.lastInteger = num;
+      this.CountDownSpr.spriteName = "WaveEncount_" + (object) this.lastInteger;
+    }
+    if ((double) this.countSec > 1.0)
+      return;
+    this.CountDownObj.SetActive(false);
+    this.StartCutIn();
+  }
 
-	[SerializeField]
-	protected UITweener[] CutInAnim;
+  private void StartCutIn()
+  {
+    bool isFinal = this.wmInfo.isFinal > 0;
+    if (this.wmSetting == null)
+      this.wmSetting = MonoBehaviourSingleton<InGameSettingsManager>.I.GetWaveMatchParam();
+    SoundManager.PlayOneshotJingle(this.wmSetting.waveJingleId);
+    this.panelChange.UnLock();
+    ((Behaviour) this.CutInAnim[0]).enabled = true;
+    this.CutInAnim[0].PlayForward();
+    ((Behaviour) this.CutInAnim[1]).enabled = true;
+    this.CutInAnim[1].PlayForward();
+    if (!isFinal)
+    {
+      this.CutInNumberSpr10.spriteName = "WaveCount_" + (object) (this.wmInfo.no / 10);
+      this.CutInNumberSpr01.spriteName = "WaveCount_" + (object) (this.wmInfo.no % 10);
+    }
+    this.CutInFinalObj.SetActive(isFinal);
+    this.CutInNumberObj.SetActive(!isFinal);
+    this.CutInObj.SetActive(true);
+    this.countSec = 2f;
+    if (MonoBehaviourSingleton<UIQuestInfoWaveMatch>.IsValid())
+    {
+      this.isShowWave = true;
+      MonoBehaviourSingleton<UIQuestInfoWaveMatch>.I.SetWaveNow(this.wmInfo.no, this.wmInfo.finalNo, isFinal);
+    }
+    if (this.isEvent && MonoBehaviourSingleton<StageObjectManager>.IsValid() && Object.op_Inequality((Object) MonoBehaviourSingleton<StageObjectManager>.I.self, (Object) null))
+      MonoBehaviourSingleton<StageObjectManager>.I.self.CheckWaveMatchAutoRevive();
+    this.state = UIWaveMatchAnnounce.eState.CutIn;
+  }
 
-	[SerializeField]
-	protected GameObject CutInObj;
+  private void UpdateCutIn()
+  {
+    this.countSec -= Time.deltaTime;
+    if ((double) this.countSec > 0.0)
+      return;
+    this.CutInFinalObj.SetActive(false);
+    this.CutInNumberObj.SetActive(false);
+    this.CutInObj.SetActive(false);
+    this.panelChange.Lock();
+    this.state = UIWaveMatchAnnounce.eState.None;
+  }
 
-	[SerializeField]
-	protected GameObject CutInNumberObj;
-
-	[SerializeField]
-	protected UISprite CutInNumberSpr10;
-
-	[SerializeField]
-	protected UISprite CutInNumberSpr01;
-
-	[SerializeField]
-	protected GameObject CutInFinalObj;
-
-	private Coop_Model_WaveMatchInfo wmInfo;
-
-	private eState state;
-
-	private float countSec;
-
-	private int lastInteger;
-
-	private int dispDispSec = 3;
-
-	protected override float GetDispSec()
-	{
-		return (float)dispDispSec;
-	}
-
-	public void Announce(Coop_Model_WaveMatchInfo info)
-	{
-		wmInfo = info;
-		CutInAnim[0].set_enabled(false);
-		CutInAnim[0].ResetToBeginning();
-		CutInAnim[1].set_enabled(false);
-		CutInAnim[1].ResetToBeginning();
-		if (wmInfo.popGuardSec <= 0)
-		{
-			StartCutIn();
-		}
-		else if (wmInfo.popGuardSec <= 5)
-		{
-			StartCountDown();
-		}
-		else
-		{
-			StartAnnounce();
-		}
-	}
-
-	private void Update()
-	{
-		switch (state)
-		{
-		case eState.Announce:
-			UpdateAnnounce();
-			break;
-		case eState.CountDown:
-			UpdateCountDown();
-			break;
-		case eState.CutIn:
-			UpdateCutIn();
-			break;
-		}
-	}
-
-	private void StartAnnounce()
-	{
-		dispDispSec = wmInfo.popGuardSec - 5;
-		if (AnnounceStart())
-		{
-			timeLabel.text = InGameProgress.GetTimeToStringMMSS(wmInfo.popGuardSec);
-			lastInteger = wmInfo.popGuardSec;
-			countSec = (float)wmInfo.popGuardSec;
-			state = eState.Announce;
-		}
-	}
-
-	private void UpdateAnnounce()
-	{
-		countSec -= Time.get_deltaTime();
-		int num = Mathf.FloorToInt(countSec);
-		if (lastInteger != num)
-		{
-			lastInteger = num;
-			timeLabel.text = InGameProgress.GetTimeToStringMMSS(num);
-		}
-		if (lastInteger <= 5)
-		{
-			StartCountDown();
-		}
-	}
-
-	private void StartCountDown()
-	{
-		CountDownSpr.spriteName = "WaveEncount_5";
-		CountDownObj.SetActive(true);
-		state = eState.CountDown;
-	}
-
-	private void UpdateCountDown()
-	{
-		countSec -= Time.get_deltaTime();
-		int num = Mathf.FloorToInt(countSec);
-		if (lastInteger != num)
-		{
-			lastInteger = num;
-			CountDownSpr.spriteName = "WaveEncount_" + lastInteger;
-		}
-		if (countSec <= 1f)
-		{
-			CountDownObj.SetActive(false);
-			StartCutIn();
-		}
-	}
-
-	private void StartCutIn()
-	{
-		bool flag = wmInfo.isFinal > 0;
-		SoundManager.PlayOneshotJingle(MonoBehaviourSingleton<InGameSettingsManager>.I.waveMatchParam.waveJingleId, null, null);
-		panelChange.UnLock();
-		CutInAnim[0].set_enabled(true);
-		CutInAnim[0].PlayForward();
-		CutInAnim[1].set_enabled(true);
-		CutInAnim[1].PlayForward();
-		if (!flag)
-		{
-			CutInNumberSpr10.spriteName = "WaveCount_" + wmInfo.no / 10;
-			CutInNumberSpr01.spriteName = "WaveCount_" + wmInfo.no % 10;
-		}
-		CutInFinalObj.SetActive(flag);
-		CutInNumberObj.SetActive(!flag);
-		CutInObj.SetActive(true);
-		countSec = 2f;
-		if (MonoBehaviourSingleton<UIQuestInfoWaveMatch>.IsValid())
-		{
-			MonoBehaviourSingleton<UIQuestInfoWaveMatch>.I.SetWaveNow(wmInfo.no, flag);
-		}
-		state = eState.CutIn;
-	}
-
-	private void UpdateCutIn()
-	{
-		countSec -= Time.get_deltaTime();
-		if (countSec <= 0f)
-		{
-			CutInFinalObj.SetActive(false);
-			CutInNumberObj.SetActive(false);
-			CutInObj.SetActive(false);
-			panelChange.Lock();
-			state = eState.None;
-		}
-	}
+  private enum eState
+  {
+    None,
+    Announce,
+    CountDown,
+    CutIn,
+  }
 }

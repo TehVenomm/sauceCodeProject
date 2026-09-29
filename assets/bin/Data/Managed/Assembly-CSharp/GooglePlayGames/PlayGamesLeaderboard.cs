@@ -1,192 +1,129 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: GooglePlayGames.PlayGamesLeaderboard
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using GooglePlayGames.BasicApi;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
 
-namespace GooglePlayGames
+#nullable disable
+namespace GooglePlayGames;
+
+public class PlayGamesLeaderboard : ILeaderboard
 {
-	public class PlayGamesLeaderboard
-	{
-		private string mId;
+  private string mId;
+  private UserScope mUserScope;
+  private Range mRange;
+  private TimeScope mTimeScope;
+  private string[] mFilteredUserIds;
+  private bool mLoading;
+  private IScore mLocalUserScore;
+  private uint mMaxRange;
+  private List<PlayGamesScore> mScoreList = new List<PlayGamesScore>();
+  private string mTitle;
 
-		private UserScope mUserScope;
+  public PlayGamesLeaderboard(string id) => this.mId = id;
 
-		private Range mRange;
+  public void SetUserFilter(string[] userIDs) => this.mFilteredUserIds = userIDs;
 
-		private TimeScope mTimeScope;
+  public void LoadScores(Action<bool> callback)
+  {
+    PlayGamesPlatform.Instance.LoadScores((ILeaderboard) this, callback);
+  }
 
-		private string[] mFilteredUserIds;
+  public bool loading
+  {
+    get => this.mLoading;
+    internal set => this.mLoading = value;
+  }
 
-		private bool mLoading;
+  public string id
+  {
+    get => this.mId;
+    set => this.mId = value;
+  }
 
-		private IScore mLocalUserScore;
+  public UserScope userScope
+  {
+    get => this.mUserScope;
+    set => this.mUserScope = value;
+  }
 
-		private uint mMaxRange;
+  public Range range
+  {
+    get => this.mRange;
+    set => this.mRange = value;
+  }
 
-		private List<PlayGamesScore> mScoreList = new List<PlayGamesScore>();
+  public TimeScope timeScope
+  {
+    get => this.mTimeScope;
+    set => this.mTimeScope = value;
+  }
 
-		private string mTitle;
+  public IScore localUserScore => this.mLocalUserScore;
 
-		public bool loading
-		{
-			get
-			{
-				return mLoading;
-			}
-			internal set
-			{
-				mLoading = value;
-			}
-		}
+  public uint maxRange => this.mMaxRange;
 
-		public string id
-		{
-			get
-			{
-				return mId;
-			}
-			set
-			{
-				mId = value;
-			}
-		}
+  public IScore[] scores
+  {
+    get
+    {
+      PlayGamesScore[] array = new PlayGamesScore[this.mScoreList.Count];
+      this.mScoreList.CopyTo(array);
+      return (IScore[]) array;
+    }
+  }
 
-		public UserScope userScope
-		{
-			get
-			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				return mUserScope;
-			}
-			set
-			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-				mUserScope = value;
-			}
-		}
+  public string title => this.mTitle;
 
-		public Range range
-		{
-			get
-			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				return mRange;
-			}
-			set
-			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-				mRange = value;
-			}
-		}
+  internal bool SetFromData(LeaderboardScoreData data)
+  {
+    if (data.Valid)
+    {
+      Debug.Log((object) ("Setting leaderboard from: " + (object) data));
+      this.SetMaxRange(data.ApproximateCount);
+      this.SetTitle(data.Title);
+      this.SetLocalUserScore((PlayGamesScore) data.PlayerScore);
+      foreach (PlayGamesScore score in data.Scores)
+        this.AddScore(score);
+      this.mLoading = data.Scores.Length == 0 || this.HasAllScores();
+    }
+    return data.Valid;
+  }
 
-		public TimeScope timeScope
-		{
-			get
-			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				return mTimeScope;
-			}
-			set
-			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-				mTimeScope = value;
-			}
-		}
+  internal void SetMaxRange(ulong val) => this.mMaxRange = (uint) val;
 
-		public IScore localUserScore => mLocalUserScore;
+  internal void SetTitle(string value) => this.mTitle = value;
 
-		public uint maxRange => mMaxRange;
+  internal void SetLocalUserScore(PlayGamesScore score) => this.mLocalUserScore = (IScore) score;
 
-		public IScore[] scores
-		{
-			get
-			{
-				PlayGamesScore[] array = new PlayGamesScore[mScoreList.Count];
-				mScoreList.CopyTo(array);
-				return (IScore[])array;
-			}
-		}
+  internal int AddScore(PlayGamesScore score)
+  {
+    if (this.mFilteredUserIds == null || this.mFilteredUserIds.Length == 0)
+    {
+      this.mScoreList.Add(score);
+    }
+    else
+    {
+      foreach (string mFilteredUserId in this.mFilteredUserIds)
+      {
+        if (mFilteredUserId.Equals(score.userID))
+          return this.mScoreList.Count;
+      }
+      this.mScoreList.Add(score);
+    }
+    return this.mScoreList.Count;
+  }
 
-		public string title => mTitle;
+  public int ScoreCount => this.mScoreList.Count;
 
-		public int ScoreCount => mScoreList.Count;
-
-		public PlayGamesLeaderboard(string id)
-		{
-			mId = id;
-		}
-
-		public void SetUserFilter(string[] userIDs)
-		{
-			mFilteredUserIds = userIDs;
-		}
-
-		public void LoadScores(Action<bool> callback)
-		{
-			PlayGamesPlatform.Instance.LoadScores(this, callback);
-		}
-
-		internal bool SetFromData(LeaderboardScoreData data)
-		{
-			if (data.Valid)
-			{
-				Debug.Log((object)("Setting leaderboard from: " + data));
-				SetMaxRange(data.ApproximateCount);
-				SetTitle(data.Title);
-				SetLocalUserScore((PlayGamesScore)data.PlayerScore);
-				IScore[] scores = data.Scores;
-				foreach (IScore val in scores)
-				{
-					AddScore((PlayGamesScore)val);
-				}
-				mLoading = (data.Scores.Length == 0 || HasAllScores());
-			}
-			return data.Valid;
-		}
-
-		internal void SetMaxRange(ulong val)
-		{
-			mMaxRange = (uint)val;
-		}
-
-		internal void SetTitle(string value)
-		{
-			mTitle = value;
-		}
-
-		internal void SetLocalUserScore(PlayGamesScore score)
-		{
-			mLocalUserScore = score;
-		}
-
-		internal int AddScore(PlayGamesScore score)
-		{
-			if (mFilteredUserIds == null || mFilteredUserIds.Length == 0)
-			{
-				mScoreList.Add(score);
-			}
-			else
-			{
-				string[] array = mFilteredUserIds;
-				foreach (string text in array)
-				{
-					if (text.Equals(score.userID))
-					{
-						return mScoreList.Count;
-					}
-				}
-				mScoreList.Add(score);
-			}
-			return mScoreList.Count;
-		}
-
-		internal bool HasAllScores()
-		{
-			return mScoreList.Count >= mRange.count || mScoreList.Count >= maxRange;
-		}
-	}
+  internal bool HasAllScores()
+  {
+    return this.mScoreList.Count >= this.mRange.count || (long) this.mScoreList.Count >= (long) this.maxRange;
+  }
 }

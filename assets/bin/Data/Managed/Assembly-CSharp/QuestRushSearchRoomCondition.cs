@@ -1,222 +1,191 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestRushSearchRoomCondition
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class QuestRushSearchRoomCondition : QuestSearchRoomConditionBase
 {
-	private enum UI
-	{
-		POP_TARGET_MIN_FLOOR,
-		POP_TARGET_MAX_FLOOR,
-		LBL_TARGET_MIN_FLOOR,
-		LBL_TARGET_MAX_FLOOR
-	}
+  private QuestRushSearchRoomCondition.RushSearchRequestParam searchParam = new QuestRushSearchRoomCondition.RushSearchRequestParam();
+  private List<int> questIdList = new List<int>();
+  private string[] maxFloorList;
+  private string[] minFloorList;
+  private Transform minFloorPopup;
+  private Transform maxFloorPopup;
+  private static readonly string PopUpPrefabName = "ScrollablePopupList";
 
-	public class RushSearchRequestParam
-	{
-		public int minFloorQuestId;
+  public override void Initialize()
+  {
+    this.questIdList = MonoBehaviourSingleton<PartyManager>.I.nowRushQuestIds;
+    this.LoadSearchRequestParam();
+    this.CopySearchRequestParam();
+    this.CreateFloorPopText();
+    base.Initialize();
+  }
 
-		public int maxFloorQuestId;
+  public override void UpdateUI()
+  {
+    this.UpdateMinFloor();
+    this.UpdateMaxFloor();
+  }
 
-		public RushSearchRequestParam(int minQuestId, int maxQuestId)
-		{
-			minFloorQuestId = minQuestId;
-			maxFloorQuestId = maxQuestId;
-		}
+  private void UpdateMinFloor()
+  {
+    this.SetLabelText((Enum) QuestRushSearchRoomCondition.UI.LBL_TARGET_MIN_FLOOR, this.minFloorList[this.getCurrentSelectMinFloorIndex()]);
+  }
 
-		public RushSearchRequestParam()
-		{
-		}
-	}
+  private void UpdateMaxFloor()
+  {
+    this.SetLabelText((Enum) QuestRushSearchRoomCondition.UI.LBL_TARGET_MAX_FLOOR, this.maxFloorList[this.getCurrentSelectMaxFloorIndex()]);
+  }
 
-	private RushSearchRequestParam searchParam = new RushSearchRequestParam();
+  protected override void LoadSearchRequestParam()
+  {
+    MonoBehaviourSingleton<PartyManager>.I.SetRushRequestFromPrefs();
+    bool flag = true;
+    if (this.questIdList != null)
+      flag = flag & this.questIdList.Contains(MonoBehaviourSingleton<PartyManager>.I.rushSearchRequest.minFloorQuestId) & this.questIdList.Contains(MonoBehaviourSingleton<PartyManager>.I.rushSearchRequest.maxFloorQuestId);
+    if (flag)
+      return;
+    MonoBehaviourSingleton<PartyManager>.I.SetRushSearchRequest(new QuestRushSearchRoomCondition.RushSearchRequestParam(this.questIdList[0], this.questIdList[this.questIdList.Count - 1]));
+  }
 
-	private List<int> questIdList = new List<int>();
+  protected override void CopySearchRequestParam()
+  {
+    QuestRushSearchRoomCondition.RushSearchRequestParam rushSearchRequest = MonoBehaviourSingleton<PartyManager>.I.rushSearchRequest;
+    this.searchParam.minFloorQuestId = rushSearchRequest.minFloorQuestId;
+    this.searchParam.maxFloorQuestId = rushSearchRequest.maxFloorQuestId;
+  }
 
-	private string[] maxFloorList;
+  protected override void SetCondition()
+  {
+    MonoBehaviourSingleton<PartyManager>.I.SetRushSearchRequest(this.searchParam);
+  }
 
-	private string[] minFloorList;
+  protected override void SendSearch()
+  {
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<PartyManager>.I.SendRushSearch((Action<bool, Error>) ((is_success, err) =>
+    {
+      if (!is_success && err == Error.WRN_PARTY_SEARCH_NOT_FOUND_QUEST)
+        this.OnNotFoundQuest();
+      GameSection.ResumeEvent(true);
+    }), true);
+  }
 
-	private Transform minFloorPopup;
+  protected override void SendRandomMatching()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) false
+    });
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<PartyManager>.I.SendRushSearchRandomMatching((Action<bool, Error>) ((is_success, err) =>
+    {
+      if (!is_success)
+        this.OnNotFoundMatchingParty();
+      GameSection.ResumeEvent(true);
+    }));
+  }
 
-	private Transform maxFloorPopup;
+  private void CreateFloorPopText()
+  {
+    int count = this.questIdList.Count;
+    int num1 = 0;
+    this.maxFloorList = new string[count];
+    this.minFloorList = new string[count];
+    for (int index = 0; index < count; ++index)
+    {
+      this.minFloorList[index] = (num1 + 1).ToString();
+      int num2 = QuestTable.GetSameRushQuestData(Singleton<QuestTable>.I.GetQuestData((uint) this.questIdList[index]).rushId).Count - 1;
+      num1 += num2;
+      this.maxFloorList[index] = num1.ToString();
+    }
+  }
 
-	private static readonly string PopUpPrefabName = "ScrollablePopupList";
+  public void OnQuery_TARGET_MIN_FLOOR() => this.ShowMinFloorPopup();
 
-	public override void Initialize()
-	{
-		questIdList = MonoBehaviourSingleton<PartyManager>.I.nowRushQuestIds;
-		LoadSearchRequestParam();
-		CopySearchRequestParam();
-		CreateFloorPopText();
-		base.Initialize();
-	}
+  public void OnQuery_TARGET_MAX_FLOOR() => this.ShowMaxFloorPopup();
 
-	public override void UpdateUI()
-	{
-		UpdateMinFloor();
-		UpdateMaxFloor();
-	}
+  private void ShowMinFloorPopup()
+  {
+    if (Object.op_Equality((Object) this.minFloorPopup, (Object) null))
+      this.minFloorPopup = this.Realizes(QuestRushSearchRoomCondition.PopUpPrefabName, this.GetCtrl((Enum) QuestRushSearchRoomCondition.UI.POP_TARGET_MIN_FLOOR), false);
+    if (Object.op_Equality((Object) this.minFloorPopup, (Object) null))
+      return;
+    int selectMinFloorIndex = this.getCurrentSelectMinFloorIndex();
+    bool[] button_enable = new bool[this.minFloorList.Length];
+    for (int index = 0; index < button_enable.Length; ++index)
+      button_enable[index] = index <= this.getCurrentSelectMaxFloorIndex();
+    UIScrollablePopupList.CreatePopup(this.minFloorPopup, this.GetCtrl((Enum) QuestRushSearchRoomCondition.UI.POP_TARGET_MIN_FLOOR), 7, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, this.minFloorList, button_enable, selectMinFloorIndex, (Action<int>) (index =>
+    {
+      this.searchParam.minFloorQuestId = this.questIdList[index];
+      this.RefreshUI();
+    }));
+  }
 
-	private void UpdateMinFloor()
-	{
-		int currentSelectMinFloorIndex = getCurrentSelectMinFloorIndex();
-		SetLabelText((Enum)UI.LBL_TARGET_MIN_FLOOR, minFloorList[currentSelectMinFloorIndex]);
-	}
+  private void ShowMaxFloorPopup()
+  {
+    if (Object.op_Equality((Object) this.maxFloorPopup, (Object) null))
+      this.maxFloorPopup = this.Realizes(QuestRushSearchRoomCondition.PopUpPrefabName, this.GetCtrl((Enum) QuestRushSearchRoomCondition.UI.POP_TARGET_MAX_FLOOR), false);
+    if (Object.op_Equality((Object) this.maxFloorPopup, (Object) null))
+      return;
+    int selectMaxFloorIndex = this.getCurrentSelectMaxFloorIndex();
+    bool[] button_enable = new bool[this.maxFloorList.Length];
+    for (int index = 0; index < button_enable.Length; ++index)
+      button_enable[index] = index >= this.getCurrentSelectMinFloorIndex();
+    UIScrollablePopupList.CreatePopup(this.maxFloorPopup, this.GetCtrl((Enum) QuestRushSearchRoomCondition.UI.POP_TARGET_MAX_FLOOR), 7, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, this.maxFloorList, button_enable, selectMaxFloorIndex, (Action<int>) (index =>
+    {
+      this.searchParam.maxFloorQuestId = this.questIdList[index];
+      this.RefreshUI();
+    }));
+  }
 
-	private void UpdateMaxFloor()
-	{
-		int currentSelectMaxFloorIndex = getCurrentSelectMaxFloorIndex();
-		SetLabelText((Enum)UI.LBL_TARGET_MAX_FLOOR, maxFloorList[currentSelectMaxFloorIndex]);
-	}
+  private int getCurrentSelectMinFloorIndex()
+  {
+    return this.getFloorIndex(this.searchParam.minFloorQuestId);
+  }
 
-	protected override void LoadSearchRequestParam()
-	{
-		MonoBehaviourSingleton<PartyManager>.I.SetRushRequestFromPrefs();
-		bool flag = true;
-		if (questIdList != null)
-		{
-			flag &= questIdList.Contains(MonoBehaviourSingleton<PartyManager>.I.rushSearchRequest.minFloorQuestId);
-			flag &= questIdList.Contains(MonoBehaviourSingleton<PartyManager>.I.rushSearchRequest.maxFloorQuestId);
-		}
-		if (!flag)
-		{
-			RushSearchRequestParam rushSearchRequest = new RushSearchRequestParam(questIdList[0], questIdList[questIdList.Count - 1]);
-			MonoBehaviourSingleton<PartyManager>.I.SetRushSearchRequest(rushSearchRequest);
-		}
-	}
+  private int getCurrentSelectMaxFloorIndex()
+  {
+    return this.getFloorIndex(this.searchParam.maxFloorQuestId);
+  }
 
-	protected override void CopySearchRequestParam()
-	{
-		RushSearchRequestParam rushSearchRequest = MonoBehaviourSingleton<PartyManager>.I.rushSearchRequest;
-		searchParam.minFloorQuestId = rushSearchRequest.minFloorQuestId;
-		searchParam.maxFloorQuestId = rushSearchRequest.maxFloorQuestId;
-	}
+  private int getFloorIndex(int questId)
+  {
+    int floorIndex = this.questIdList.IndexOf(questId);
+    if (floorIndex <= -1)
+      floorIndex = 0;
+    return floorIndex;
+  }
 
-	protected override void SetCondition()
-	{
-		MonoBehaviourSingleton<PartyManager>.I.SetRushSearchRequest(searchParam);
-	}
+  private enum UI
+  {
+    POP_TARGET_MIN_FLOOR,
+    POP_TARGET_MAX_FLOOR,
+    LBL_TARGET_MIN_FLOOR,
+    LBL_TARGET_MAX_FLOOR,
+  }
 
-	protected override void SendSearch()
-	{
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<PartyManager>.I.SendRushSearch(delegate(bool is_success, Error err)
-		{
-			if (!is_success && err == Error.WRN_PARTY_SEARCH_NOT_FOUND_QUEST)
-			{
-				OnNotFoundQuest();
-			}
-			GameSection.ResumeEvent(true, null);
-		}, true);
-	}
+  public class RushSearchRequestParam
+  {
+    public int minFloorQuestId;
+    public int maxFloorQuestId;
 
-	protected override void SendRandomMatching()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			false
-		});
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<PartyManager>.I.SendRushSearchRandomMatching(delegate(bool is_success, Error err)
-		{
-			if (!is_success)
-			{
-				OnNotFoundMatchingParty();
-			}
-			GameSection.ResumeEvent(true, null);
-		});
-	}
+    public RushSearchRequestParam(int minQuestId, int maxQuestId)
+    {
+      this.minFloorQuestId = minQuestId;
+      this.maxFloorQuestId = maxQuestId;
+    }
 
-	private void CreateFloorPopText()
-	{
-		int count = questIdList.Count;
-		int num = 0;
-		maxFloorList = new string[count];
-		minFloorList = new string[count];
-		for (int i = 0; i < count; i++)
-		{
-			minFloorList[i] = (num + 1).ToString();
-			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)questIdList[i]);
-			List<QuestTable.QuestTableData> sameRushQuestData = QuestTable.GetSameRushQuestData(questData.rushId);
-			int num2 = sameRushQuestData.Count - 1;
-			num += num2;
-			maxFloorList[i] = num.ToString();
-		}
-	}
-
-	public void OnQuery_TARGET_MIN_FLOOR()
-	{
-		ShowMinFloorPopup();
-	}
-
-	public void OnQuery_TARGET_MAX_FLOOR()
-	{
-		ShowMaxFloorPopup();
-	}
-
-	private void ShowMinFloorPopup()
-	{
-		if (minFloorPopup == null)
-		{
-			minFloorPopup = Realizes(PopUpPrefabName, GetCtrl(UI.POP_TARGET_MIN_FLOOR), false);
-		}
-		if (!(minFloorPopup == null))
-		{
-			int currentSelectMinFloorIndex = getCurrentSelectMinFloorIndex();
-			bool[] array = new bool[minFloorList.Length];
-			for (int i = 0; i < array.Length; i++)
-			{
-				array[i] = (i <= getCurrentSelectMaxFloorIndex());
-			}
-			UIScrollablePopupList.CreatePopup(minFloorPopup, GetCtrl(UI.POP_TARGET_MIN_FLOOR), 7, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, minFloorList, array, currentSelectMinFloorIndex, delegate(int index)
-			{
-				searchParam.minFloorQuestId = questIdList[index];
-				RefreshUI();
-			});
-		}
-	}
-
-	private void ShowMaxFloorPopup()
-	{
-		if (maxFloorPopup == null)
-		{
-			maxFloorPopup = Realizes(PopUpPrefabName, GetCtrl(UI.POP_TARGET_MAX_FLOOR), false);
-		}
-		if (!(maxFloorPopup == null))
-		{
-			int currentSelectMaxFloorIndex = getCurrentSelectMaxFloorIndex();
-			bool[] array = new bool[maxFloorList.Length];
-			for (int i = 0; i < array.Length; i++)
-			{
-				array[i] = (i >= getCurrentSelectMinFloorIndex());
-			}
-			UIScrollablePopupList.CreatePopup(maxFloorPopup, GetCtrl(UI.POP_TARGET_MAX_FLOOR), 7, UIScrollablePopupList.ATTACH_DIRECTION.BOTTOM, true, maxFloorList, array, currentSelectMaxFloorIndex, delegate(int index)
-			{
-				searchParam.maxFloorQuestId = questIdList[index];
-				RefreshUI();
-			});
-		}
-	}
-
-	private int getCurrentSelectMinFloorIndex()
-	{
-		return getFloorIndex(searchParam.minFloorQuestId);
-	}
-
-	private int getCurrentSelectMaxFloorIndex()
-	{
-		return getFloorIndex(searchParam.maxFloorQuestId);
-	}
-
-	private int getFloorIndex(int questId)
-	{
-		int num = questIdList.IndexOf(questId);
-		if (num <= -1)
-		{
-			num = 0;
-		}
-		return num;
-	}
+    public RushSearchRequestParam()
+    {
+    }
+  }
 }

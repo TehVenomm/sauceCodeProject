@@ -1,770 +1,966 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: FriendInfo
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class FriendInfo : SkillInfoBase
 {
-	protected enum UI
-	{
-		LBL_NAME,
-		LBL_ATK,
-		LBL_DEF,
-		LBL_HP,
-		SPR_COMMENT,
-		LBL_COMMENT,
-		OBJ_LAST_LOGIN,
-		LBL_LAST_LOGIN,
-		LBL_LAST_LOGIN_TIME,
-		LBL_LEVEL,
-		OBJ_LEVEL_ROOT,
-		LBL_USER_ID,
-		OBJ_USER_ID_ROOT,
-		TEX_MODEL,
-		BTN_FOLLOW,
-		BTN_UNFOLLOW,
-		OBJ_BLACKLIST_ROOT,
-		BTN_BLACKLIST_IN,
-		BTN_BLACKLIST_OUT,
-		OBJ_ICON_WEAPON_1,
-		OBJ_ICON_WEAPON_2,
-		OBJ_ICON_WEAPON_3,
-		OBJ_ICON_ARMOR,
-		OBJ_ICON_HELM,
-		OBJ_ICON_ARM,
-		OBJ_ICON_LEG,
-		BTN_ICON_WEAPON_1,
-		BTN_ICON_WEAPON_2,
-		BTN_ICON_WEAPON_3,
-		BTN_ICON_ARMOR,
-		BTN_ICON_HELM,
-		BTN_ICON_ARM,
-		BTN_ICON_LEG,
-		OBJ_EQUIP_ROOT,
-		OBJ_EQUIP_SET_ROOT,
-		OBJ_FRIEND_INFO_ROOT,
-		OBJ_CHANGE_EQUIP_INFO_ROOT,
-		LBL_MAX,
-		LBL_NOW,
-		OBJ_FOLLOW_ARROW_ROOT,
-		SPR_FOLLOW_ARROW,
-		SPR_FOLLOWER_ARROW,
-		SPR_BLACKLIST_ICON,
-		LBL_LEVEL_WEAPON_1,
-		LBL_LEVEL_WEAPON_2,
-		LBL_LEVEL_WEAPON_3,
-		LBL_LEVEL_ARMOR,
-		LBL_LEVEL_HELM,
-		LBL_LEVEL_ARM,
-		LBL_LEVEL_LEG,
-		LBL_CHANGE_MODE,
-		BTN_MAGI,
-		LBL_SET_NAME,
-		OBJ_DEGREE_PLATE_ROOT,
-		BTN_DELETEFOLLOWER,
-		BTN_KICK,
-		BTN_JOIN
-	}
+  protected FriendInfo.UI[] icons = new FriendInfo.UI[7]
+  {
+    FriendInfo.UI.OBJ_ICON_WEAPON_1,
+    FriendInfo.UI.OBJ_ICON_WEAPON_2,
+    FriendInfo.UI.OBJ_ICON_WEAPON_3,
+    FriendInfo.UI.OBJ_ICON_ARMOR,
+    FriendInfo.UI.OBJ_ICON_HELM,
+    FriendInfo.UI.OBJ_ICON_ARM,
+    FriendInfo.UI.OBJ_ICON_LEG
+  };
+  protected FriendInfo.UI[] icons_btn = new FriendInfo.UI[7]
+  {
+    FriendInfo.UI.BTN_ICON_WEAPON_1,
+    FriendInfo.UI.BTN_ICON_WEAPON_2,
+    FriendInfo.UI.BTN_ICON_WEAPON_3,
+    FriendInfo.UI.BTN_ICON_ARMOR,
+    FriendInfo.UI.BTN_ICON_HELM,
+    FriendInfo.UI.BTN_ICON_ARM,
+    FriendInfo.UI.BTN_ICON_LEG
+  };
+  protected FriendInfo.UI[] icons_level = new FriendInfo.UI[7]
+  {
+    FriendInfo.UI.LBL_LEVEL_WEAPON_1,
+    FriendInfo.UI.LBL_LEVEL_WEAPON_2,
+    FriendInfo.UI.LBL_LEVEL_WEAPON_3,
+    FriendInfo.UI.LBL_LEVEL_ARMOR,
+    FriendInfo.UI.LBL_LEVEL_HELM,
+    FriendInfo.UI.LBL_LEVEL_ARM,
+    FriendInfo.UI.LBL_LEVEL_LEG
+  };
+  protected CharaInfo data;
+  protected FriendCharaInfo friendCharaInfo;
+  protected FriendMessageUserListModel.MessageUserInfo m_msgUserInfo;
+  protected CharaInfo clanCharaInfo;
+  protected ClanData userClanData;
+  protected PlayerLoader loader;
+  protected Transform transRoot;
+  protected string nowSectionName = string.Empty;
+  protected DegreePlate degree;
+  protected bool isVisualMode;
+  protected const string STR_VISUAL_EQUIP_EVENT_NAME = "VISUAL_DETAIL";
+  protected bool isFollowerList;
+  protected bool isFollowerListChengeTrans;
+  protected bool dataFollower;
+  protected bool dataFollowing;
+  protected bool m_isInitMoveMessageButton;
+  private SymbolMarkCtrl symbolMark;
 
-	protected const string STR_VISUAL_EQUIP_EVENT_NAME = "VISUAL_DETAIL";
+  protected virtual string GetCreatePrefabName() => "FriendInfoBase";
 
-	protected UI[] icons = new UI[7]
-	{
-		UI.OBJ_ICON_WEAPON_1,
-		UI.OBJ_ICON_WEAPON_2,
-		UI.OBJ_ICON_WEAPON_3,
-		UI.OBJ_ICON_ARMOR,
-		UI.OBJ_ICON_HELM,
-		UI.OBJ_ICON_ARM,
-		UI.OBJ_ICON_LEG
-	};
+  protected virtual bool IsFriendInfo => true;
 
-	protected UI[] icons_btn = new UI[7]
-	{
-		UI.BTN_ICON_WEAPON_1,
-		UI.BTN_ICON_WEAPON_2,
-		UI.BTN_ICON_WEAPON_3,
-		UI.BTN_ICON_ARMOR,
-		UI.BTN_ICON_HELM,
-		UI.BTN_ICON_ARM,
-		UI.BTN_ICON_LEG
-	};
+  protected virtual List<int> SelectedDegrees
+  {
+    get
+    {
+      return this.IsFriendInfo ? this.data.selectedDegrees : MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds;
+    }
+  }
 
-	protected UI[] icons_level = new UI[7]
-	{
-		UI.LBL_LEVEL_WEAPON_1,
-		UI.LBL_LEVEL_WEAPON_2,
-		UI.LBL_LEVEL_WEAPON_3,
-		UI.LBL_LEVEL_ARMOR,
-		UI.LBL_LEVEL_HELM,
-		UI.LBL_LEVEL_ARM,
-		UI.LBL_LEVEL_LEG
-	};
+  protected virtual bool showMagiButton => false;
 
-	protected CharaInfo data;
+  protected bool IsInitMoveMessageButton => this.m_isInitMoveMessageButton;
 
-	protected PlayerLoader loader;
+  public override void Initialize() => this.InitializeBase();
 
-	protected Transform transRoot;
+  protected void InitializeBase() => this.StartCoroutine(this.DoInitialize());
 
-	protected string nowSectionName = string.Empty;
+  protected IEnumerator DoInitialize()
+  {
+    if (MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsRegistered())
+    {
+      bool isWait = true;
+      MonoBehaviourSingleton<ClanMatchingManager>.I.RequestDetail("0", (Action<ClanDetailModel.Param>) (result => isWait = false));
+      while (isWait)
+        yield return (object) null;
+      this.userClanData = MonoBehaviourSingleton<ClanMatchingManager>.I.clanData;
+    }
+    base.Initialize();
+  }
 
-	protected DegreePlate degree;
+  protected override void OnOpen()
+  {
+    this.ReOpen();
+    base.OnOpen();
+  }
 
-	protected bool isVisualMode;
+  protected void ReOpen()
+  {
+    if (!(GameSection.GetEventData() is CharaInfo))
+      return;
+    this.friendCharaInfo = GameSection.GetEventData() as FriendCharaInfo;
+    this.data = GameSection.GetEventData() as CharaInfo;
+    this.m_msgUserInfo = GameSection.GetEventData() as FriendMessageUserListModel.MessageUserInfo;
+    if (this.friendCharaInfo != null)
+    {
+      this.dataFollower = this.friendCharaInfo.follower;
+      this.dataFollowing = this.friendCharaInfo.following;
+    }
+    this.nowSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
+    this.isFollowerList = Object.op_Implicit(Object.FindObjectOfType(typeof (FriendFollowerList)));
+    this.DisableClanInfo();
+  }
 
-	protected bool isFollowerList;
+  protected void OnEnable()
+  {
+    InputManager.OnDragAlways += new InputManager.OnTouchDelegate(this.OnDrag);
+  }
 
-	protected bool isFollowerListChengeTrans;
+  protected void OnDisable()
+  {
+    InputManager.OnDragAlways -= new InputManager.OnTouchDelegate(this.OnDrag);
+    this.nowSectionName = string.Empty;
+  }
 
-	protected bool dataFollower;
+  private void OnDrag(InputManager.TouchInfo touch_info)
+  {
+    if (Object.op_Equality((Object) this.loader, (Object) null) || MonoBehaviourSingleton<UIManager>.I.IsDisable())
+      return;
+    if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == this.nowSectionName)
+      ((Component) this.loader).transform.Rotate(GameDefine.GetCharaRotateVector(touch_info));
+    else if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == "QuestResultFriendDetail")
+    {
+      ((Component) this.loader).transform.Rotate(GameDefine.GetCharaRotateVector(touch_info));
+    }
+    else
+    {
+      if (!(this.nowSectionName == "ClanDetail"))
+        return;
+      ((Component) this.loader).transform.Rotate(GameDefine.GetCharaRotateVector(touch_info));
+    }
+  }
 
-	protected bool dataFollowing;
+  public override void UpdateUI()
+  {
+    this.transRoot = this.SetPrefab((Enum) FriendInfo.UI.OBJ_EQUIP_SET_ROOT, this.GetCreatePrefabName());
+    this.UpdateUserIDLabel();
+    this.UpdateHeader();
+    this.LoadModel();
+    this.UpdateEquipIcon(this.data.equipSet);
+    this.UpdateBottomButton();
+    this.CreateDegree();
+    if (this.data != null && this.data.userClanData != null)
+      this.UpdateClanInfo(this.data);
+    else
+      this.DisableClanInfo();
+  }
 
-	protected FriendCharaInfo friendCharaInfo;
+  protected virtual void UpdateUserIDLabel()
+  {
+    this.SetLabelText(this.transRoot, (Enum) FriendInfo.UI.LBL_USER_ID, this.data.code);
+  }
 
-	protected virtual bool IsFriendInfo => true;
+  protected void UpdateHeader()
+  {
+    EquipSetCalculator equipSetCalculator;
+    if (MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex == -1)
+    {
+      MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex = 0;
+      equipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(0);
+      equipSetCalculator.SetEquipSet(this.data.equipSet);
+    }
+    else
+      equipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex);
+    SimpleStatus finalStatus = equipSetCalculator.GetFinalStatus(0, (int) this.data.hp, (int) this.data.atk, (int) this.data.def);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.OBJ_LAST_LOGIN, true);
+    this.SetLabelText(this.transRoot, (Enum) FriendInfo.UI.LBL_NAME, this.data.name);
+    this.SetLabelText(this.transRoot, (Enum) FriendInfo.UI.LBL_COMMENT, this.data.comment);
+    this.SetLabelText(this.transRoot, (Enum) FriendInfo.UI.LBL_LAST_LOGIN, this.sectionData.GetText("LAST_LOGIN"));
+    this.SetLabelText(this.transRoot, (Enum) FriendInfo.UI.LBL_LAST_LOGIN_TIME, this.data.lastLogin);
+    this.SetLabelText(this.transRoot, (Enum) FriendInfo.UI.LBL_ATK, finalStatus.GetAttacksSum().ToString());
+    this.SetLabelText(this.transRoot, (Enum) FriendInfo.UI.LBL_DEF, finalStatus.GetDefencesSum().ToString());
+    this.SetLabelText(this.transRoot, (Enum) FriendInfo.UI.LBL_HP, finalStatus.hp.ToString());
+    this.SetLabelText(this.transRoot, (Enum) FriendInfo.UI.LBL_LEVEL, this.data.level.ToString());
+    bool black_list_user = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(this.data.userId);
+    bool same_clan_user = false;
+    if (this.data.userClanData != null && MonoBehaviourSingleton<UserInfoManager>.I.userClan != null && MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsRegistered())
+      same_clan_user = this.data.userClanData.cId == MonoBehaviourSingleton<UserInfoManager>.I.userClan.cId;
+    this.SetFollowStatus(this.dataFollowing, this.dataFollower, black_list_user, same_clan_user);
+  }
 
-	protected virtual List<int> SelectedDegrees
-	{
-		get
-		{
-			if (IsFriendInfo)
-			{
-				return data.selectedDegrees;
-			}
-			return MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds;
-		}
-	}
+  protected void SetFollowStatus(
+    bool following,
+    bool follower,
+    bool black_list_user,
+    bool same_clan_user)
+  {
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.SPR_FOLLOW_ARROW, !black_list_user & following);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.SPR_FOLLOWER_ARROW, !black_list_user & follower);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.SPR_BLACKLIST_ICON, black_list_user);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.SPR_SAME_CLAN_ICON, same_clan_user);
+  }
 
-	protected virtual bool showMagiButton => false;
+  protected virtual void LoadModel()
+  {
+    this.SetRenderPlayerModel(this.transRoot, (Enum) FriendInfo.UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(this.data, true, true, true, this.isVisualMode), PLAYER_ANIM_TYPE.GetStatus(this.data.sex), new Vector3(0.0f, -0.75f, 14f), new Vector3(0.0f, 180f, 0.0f), this.isVisualMode, (Action<PlayerLoader>) (player_loader =>
+    {
+      if (!Object.op_Inequality((Object) player_loader, (Object) null))
+        return;
+      this.loader = player_loader;
+    }));
+  }
 
-	protected virtual string GetCreatePrefabName()
-	{
-		return "FriendInfoBase";
-	}
+  protected virtual void CreateDegree()
+  {
+    ((Component) this.GetCtrl((Enum) FriendInfo.UI.OBJ_DEGREE_PLATE_ROOT)).GetComponent<DegreePlate>().Initialize(this.SelectedDegrees, false, (Action<DegreePlate>) (x => { }));
+  }
 
-	public override void Initialize()
-	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		friendCharaInfo = (GameSection.GetEventData() as FriendCharaInfo);
-		data = (GameSection.GetEventData() as CharaInfo);
-		if (friendCharaInfo != null)
-		{
-			dataFollower = friendCharaInfo.follower;
-			dataFollowing = friendCharaInfo.following;
-		}
-		nowSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-		isFollowerList = Object.op_Implicit(Object.FindObjectOfType(typeof(FriendFollowerList)));
-		InitializeBase();
-	}
+  protected virtual void UpdateEquipIcon(List<CharaInfo.EquipItem> equip_set_info)
+  {
+    int weapon_cnt = 0;
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.LBL_CHANGE_MODE, this.isVisualMode);
+    int index1 = 0;
+    for (int index2 = 7; index1 < index2; ++index1)
+    {
+      this.SetEvent(this.FindCtrl(this.transRoot, (Enum) this.icons[index1]), "EMPTY", 0);
+      this.SetEvent(this.FindCtrl(this.transRoot, (Enum) this.icons_btn[index1]), "EMPTY", 0);
+      this.SetLabelText(this.FindCtrl(this.transRoot, (Enum) this.icons_level[index1]), string.Empty);
+      this.SetActive(this.FindCtrl(this.transRoot, (Enum) this.icons[index1]), false);
+    }
+    bool need_visual_helm_icon = this.isVisualMode;
+    bool need_visual_armor_icon = this.isVisualMode;
+    bool need_visual_arm_icon = this.isVisualMode;
+    bool need_visual_leg_icon = this.isVisualMode;
+    equip_set_info.ForEach((Action<CharaInfo.EquipItem>) (equip_data =>
+    {
+      EquipItemTable.EquipItemData equipItemTableData = Singleton<EquipItemTable>.I.GetEquipItemData((uint) equip_data.eId);
+      if (equipItemTableData == null)
+        return;
+      if (this.isVisualMode && !equipItemTableData.IsWeapon())
+      {
+        equipItemTableData = this.GetVisualModeTargetTable(equipItemTableData.id, equipItemTableData.type, this.data);
+        if (equipItemTableData == null)
+          return;
+      }
+      Transform parent = (Transform) null;
+      int event_data = -1;
+      if (equipItemTableData.IsWeapon())
+      {
+        parent = this.FindCtrl(this.transRoot, (Enum) this.icons[weapon_cnt]);
+        event_data = weapon_cnt;
+        ++weapon_cnt;
+      }
+      else
+      {
+        switch (equipItemTableData.type)
+        {
+          case EQUIPMENT_TYPE.ARMOR:
+          case EQUIPMENT_TYPE.VISUAL_ARMOR:
+            event_data = 3;
+            need_visual_armor_icon = false;
+            break;
+          case EQUIPMENT_TYPE.HELM:
+          case EQUIPMENT_TYPE.VISUAL_HELM:
+            event_data = 4;
+            need_visual_helm_icon = false;
+            break;
+          case EQUIPMENT_TYPE.ARM:
+          case EQUIPMENT_TYPE.VISUAL_ARM:
+            event_data = 5;
+            need_visual_arm_icon = false;
+            break;
+          case EQUIPMENT_TYPE.LEG:
+          case EQUIPMENT_TYPE.VISUAL_LEG:
+            event_data = 6;
+            need_visual_leg_icon = false;
+            break;
+        }
+        if (event_data != -1)
+          parent = this.FindCtrl(this.transRoot, (Enum) this.icons[event_data]);
+      }
+      if (Object.op_Equality((Object) parent, (Object) null))
+        return;
+      this.SetActive(this.FindCtrl(this.transRoot, (Enum) this.icons[event_data]), true);
+      string event_name = this.isVisualMode ? "VISUAL_DETAIL" : "DETAIL";
+      ItemIcon byEquipItemTable = ItemIcon.CreateEquipItemIconByEquipItemTable(equipItemTableData, this.GetCharaSex(), parent, event_name: event_name, event_data: event_data);
+      this.SetLongTouch(byEquipItemTable.transform, event_name, (object) event_data);
+      this.SetEvent(this.FindCtrl(this.transRoot, (Enum) this.icons_btn[event_data]), event_name, event_data);
+      this.SetLongTouch(this.FindCtrl(this.transRoot, (Enum) this.icons_btn[event_data]), event_name, (object) event_data);
+      EquipItemInfo info = new EquipItemInfo(equip_data);
+      byEquipItemTable.SetEquipExtInvertedColor(info, this.GetComponent<UILabel>((Enum) this.icons_level[event_data]));
+      this.SetActive(this.FindCtrl(this.transRoot, (Enum) this.icons_level[event_data]), !this.isVisualMode);
+      if (equip_data == null)
+        return;
+      string text = string.Format(StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 1U), (object) equip_data.lv.ToString());
+      this.SetLabelText(this.FindCtrl(this.transRoot, (Enum) this.icons_level[event_data]), text);
+    }));
+    if (need_visual_helm_icon && this.data.hId != 0)
+      this.SetVisualModeIcon(4, this.data.hId, EQUIPMENT_TYPE.HELM, this.data);
+    if (need_visual_armor_icon && this.data.aId != 0)
+      this.SetVisualModeIcon(3, this.data.aId, EQUIPMENT_TYPE.ARMOR, this.data);
+    if (need_visual_arm_icon && this.data.rId != 0)
+      this.SetVisualModeIcon(5, this.data.rId, EQUIPMENT_TYPE.ARM, this.data);
+    if (!need_visual_leg_icon || this.data.lId == 0)
+      return;
+    this.SetVisualModeIcon(6, this.data.lId, EQUIPMENT_TYPE.LEG, this.data);
+  }
 
-	protected void InitializeBase()
-	{
-		base.Initialize();
-	}
+  protected void SetVisualModeIcon(
+    int index,
+    int table_id,
+    EQUIPMENT_TYPE e_type,
+    CharaInfo chara_info)
+  {
+    string event_name = "VISUAL_DETAIL";
+    Transform ctrl = this.FindCtrl(this.transRoot, (Enum) this.icons[index]);
+    EquipItemTable.EquipItemData visualModeTargetTable = this.GetVisualModeTargetTable((uint) table_id, e_type, chara_info);
+    if (visualModeTargetTable == null)
+      return;
+    ((Component) ctrl).GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
+    int index1 = 0;
+    for (int count = Temporary.itemIconList.Count; index1 < count; ++index1)
+      ((Component) Temporary.itemIconList[index1]).gameObject.SetActive(true);
+    Temporary.itemIconList.Clear();
+    this.SetActive(this.FindCtrl(this.transRoot, (Enum) this.icons[index]), true);
+    this.SetLongTouch(ItemIcon.CreateEquipItemIconByEquipItemTable(visualModeTargetTable, this.GetCharaSex(), ctrl, event_name: event_name, event_data: index).transform, event_name, (object) index);
+    this.SetEvent(this.FindCtrl(this.transRoot, (Enum) this.icons_btn[index]), event_name, index);
+    this.SetLongTouch(this.FindCtrl(this.transRoot, (Enum) this.icons_btn[index]), event_name, (object) index);
+    this.SetActive(this.FindCtrl(this.transRoot, (Enum) this.icons_level[index]), !this.isVisualMode);
+  }
 
-	protected void OnEnable()
-	{
-		InputManager.OnDragAlways = (InputManager.OnTouchDelegate)Delegate.Combine(InputManager.OnDragAlways, new InputManager.OnTouchDelegate(OnDrag));
-	}
+  protected void UpdateBottomButton()
+  {
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.OBJ_FRIEND_INFO_ROOT, this.IsFriendInfo);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.OBJ_CHANGE_EQUIP_INFO_ROOT, !this.IsFriendInfo);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_MAGI, this.showMagiButton);
+    bool flag = MonoBehaviourSingleton<FriendManager>.I.followNum == MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxFollow;
+    this.SetEvent(this.transRoot, (Enum) FriendInfo.UI.BTN_FOLLOW, "FOLLOW", 0);
+    if (!this.isFollowerList)
+    {
+      if (flag && !this.dataFollowing)
+      {
+        this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_FOLLOW, true);
+        this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_UNFOLLOW, false);
+        this.SetEvent(this.transRoot, (Enum) FriendInfo.UI.BTN_FOLLOW, "INVALID_FOLLOW", 0);
+      }
+      else
+      {
+        this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_FOLLOW, !this.dataFollowing);
+        this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_UNFOLLOW, this.dataFollowing);
+      }
+      this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_DELETEFOLLOWER, false);
+    }
+    else
+    {
+      this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_DELETEFOLLOWER, this.dataFollower);
+      if (!flag && !this.dataFollowing)
+      {
+        this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_FOLLOW, true);
+        if (!this.isFollowerListChengeTrans)
+        {
+          Transform ctrl = this.FindCtrl(this.transRoot, (Enum) FriendInfo.UI.BTN_FOLLOW);
+          ctrl.localPosition = new Vector3(ctrl.localPosition.x - 167f, ctrl.localPosition.y - 502f, ctrl.localPosition.z);
+          ctrl.localScale = new Vector3(1f, 1f, 1f);
+          this.isFollowerListChengeTrans = true;
+        }
+      }
+      else
+        this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_FOLLOW, false);
+      this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_UNFOLLOW, false);
+    }
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.OBJ_BLACKLIST_ROOT, true);
+    bool is_visible = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(this.data.userId);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_BLACKLIST_IN, !is_visible);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_BLACKLIST_OUT, is_visible);
+    this.SetMoveMessageButton();
+  }
 
-	protected void OnDisable()
-	{
-		InputManager.OnDragAlways = (InputManager.OnTouchDelegate)Delegate.Remove(InputManager.OnDragAlways, new InputManager.OnTouchDelegate(OnDrag));
-		nowSectionName = string.Empty;
-	}
+  protected void SetMoveMessageButton()
+  {
+    if (this.IsInitMoveMessageButton)
+      return;
+    this.m_isInitMoveMessageButton = true;
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_MOVE_TO_MSG, this.m_msgUserInfo != null & UserInfoManager.IsEnableCommunication() & MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName().Contains(nameof (FriendInfo)));
+  }
 
-	private void OnDrag(InputManager.TouchInfo touch_info)
-	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		if (!(loader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable() && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() == nowSectionName)
-		{
-			loader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
-		}
-	}
+  protected EquipItemTable.EquipItemData GetVisualModeTargetTable(
+    uint base_table_id,
+    EQUIPMENT_TYPE e_type,
+    CharaInfo chara_info)
+  {
+    EquipItemTable.EquipItemData visualModeTargetTable = (EquipItemTable.EquipItemData) null;
+    if (this.isVisualMode)
+    {
+      uint id = base_table_id;
+      switch (e_type)
+      {
+        case EQUIPMENT_TYPE.ARMOR:
+        case EQUIPMENT_TYPE.VISUAL_ARMOR:
+          if (chara_info.aId != 0)
+          {
+            id = (uint) chara_info.aId;
+            break;
+          }
+          break;
+        case EQUIPMENT_TYPE.HELM:
+        case EQUIPMENT_TYPE.VISUAL_HELM:
+          if (chara_info.showHelm != 0)
+          {
+            if (chara_info.hId != 0)
+            {
+              id = (uint) chara_info.hId;
+              break;
+            }
+            break;
+          }
+          id = 0U;
+          break;
+        case EQUIPMENT_TYPE.ARM:
+        case EQUIPMENT_TYPE.VISUAL_ARM:
+          if (chara_info.rId != 0)
+          {
+            id = (uint) chara_info.rId;
+            break;
+          }
+          break;
+        case EQUIPMENT_TYPE.LEG:
+        case EQUIPMENT_TYPE.VISUAL_LEG:
+          if (chara_info.lId != 0)
+          {
+            id = (uint) chara_info.lId;
+            break;
+          }
+          break;
+      }
+      if (id != 0U)
+        visualModeTargetTable = Singleton<EquipItemTable>.I.GetEquipItemData(id);
+    }
+    return visualModeTargetTable;
+  }
 
-	public override void UpdateUI()
-	{
-		transRoot = SetPrefab((Enum)UI.OBJ_EQUIP_SET_ROOT, GetCreatePrefabName());
-		UpdateUserIDLabel();
-		UpdateHeader();
-		LoadModel();
-		UpdateEquipIcon(data.equipSet);
-		UpdateBottomButton();
-		CreateDegree();
-	}
+  private bool IsLoopClanDetail()
+  {
+    List<GameSectionHistory.HistoryData> historyList = MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList();
+    for (int index = 0; index < historyList.Count; ++index)
+    {
+      if (historyList[index].sectionName == "ClanDetail")
+        return true;
+    }
+    return false;
+  }
 
-	protected virtual void UpdateUserIDLabel()
-	{
-		SetLabelText(transRoot, UI.LBL_USER_ID, data.code);
-	}
+  protected void UpdateClanInfo(CharaInfo charaInfo)
+  {
+    this.clanCharaInfo = charaInfo;
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.OBJ_CLAN_ROOT, false);
+    if (this.clanCharaInfo == null || this.IsLoopClanDetail())
+      return;
+    if (charaInfo.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)
+    {
+      if (this.clanCharaInfo.userClanData == null || this.clanCharaInfo.userClanData.stat == 0)
+        return;
+      this._showClanDetail();
+    }
+    else if (this.clanCharaInfo.userClanData != null && this.clanCharaInfo.userClanData.stat != 0)
+    {
+      this._showClanDetail();
+    }
+    else
+    {
+      if (!MonoBehaviourSingleton<UserInfoManager>.IsValid() || MonoBehaviourSingleton<UserInfoManager>.I.userClan == null || !MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsSubLeader() && !MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsLeader())
+        return;
+      this._showClanScout();
+    }
+  }
 
-	protected void UpdateHeader()
-	{
-		EquipSetCalculator otherEquipSetCalculator;
-		if (MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex == -1)
-		{
-			MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex = 0;
-			otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(0);
-			otherEquipSetCalculator.SetEquipSet(data.equipSet, false);
-		}
-		else
-		{
-			otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex);
-		}
-		SimpleStatus finalStatus = otherEquipSetCalculator.GetFinalStatus(0, data.hp, data.atk, data.def);
-		SetActive(transRoot, UI.OBJ_LAST_LOGIN, true);
-		SetLabelText(transRoot, UI.LBL_NAME, data.name);
-		SetLabelText(transRoot, UI.LBL_COMMENT, data.comment);
-		SetLabelText(transRoot, UI.LBL_LAST_LOGIN, base.sectionData.GetText("LAST_LOGIN"));
-		SetLabelText(transRoot, UI.LBL_LAST_LOGIN_TIME, data.lastLogin);
-		SetLabelText(transRoot, UI.LBL_ATK, finalStatus.GetAttacksSum().ToString());
-		SetLabelText(transRoot, UI.LBL_DEF, finalStatus.GetDefencesSum().ToString());
-		SetLabelText(transRoot, UI.LBL_HP, finalStatus.hp.ToString());
-		SetLabelText(transRoot, UI.LBL_LEVEL, data.level.ToString());
-		bool flag = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(data.userId);
-		SetActive(transRoot, UI.SPR_FOLLOW_ARROW, !flag && dataFollowing);
-		SetActive(transRoot, UI.SPR_FOLLOWER_ARROW, !flag && dataFollower);
-		SetActive(transRoot, UI.SPR_BLACKLIST_ICON, flag);
-	}
+  protected void DisableClanInfo()
+  {
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.OBJ_CLAN_ROOT, false);
+  }
 
-	protected virtual void LoadModel()
-	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		SetRenderPlayerModel(transRoot, UI.TEX_MODEL, PlayerLoadInfo.FromCharaInfo(data, true, true, true, isVisualMode), PLAYER_ANIM_TYPE.GetStatus(data.sex), new Vector3(0f, -0.75f, 14f), new Vector3(0f, 180f, 0f), isVisualMode, delegate(PlayerLoader player_loader)
-		{
-			if (player_loader != null)
-			{
-				loader = player_loader;
-			}
-		});
-	}
+  private void _showClanDetail()
+  {
+    if (this.clanCharaInfo == null)
+      return;
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.OBJ_CLAN_ROOT, true);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_CLAN_SCOUT, false);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_CLAN_SCOUT_CANCEL, false);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_CLAN_DETAIL, true);
+    this.SetLabelText(this.transRoot, (Enum) FriendInfo.UI.SPR_CLAN_NAME, this.clanCharaInfo.userClanData.name);
+    if (!Object.op_Equality((Object) this.FindCtrl(this.transRoot, (Enum) FriendInfo.UI.OBJ_SYMBOL_MARK), (Object) null))
+      return;
+    this.StartCoroutine(this.CreateSymbolMark());
+  }
 
-	protected virtual void CreateDegree()
-	{
-		DegreePlate component = GetCtrl(UI.OBJ_DEGREE_PLATE_ROOT).GetComponent<DegreePlate>();
-		component.Initialize(SelectedDegrees, false, delegate
-		{
-		});
-	}
+  private IEnumerator CreateSymbolMark()
+  {
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject symbolMarkLoadObj = loadingQueue.Load(RESOURCE_CATEGORY.UI, "ClanSymbolMark");
+    yield return (object) loadingQueue.Wait();
+    Transform transform = ResourceUtility.Realizes((Object) (symbolMarkLoadObj.loadedObject as GameObject), 5);
+    transform.parent = this.FindCtrl(this.transRoot, (Enum) FriendInfo.UI.OBJ_SYMBOL);
+    transform.localScale = Vector3.one;
+    transform.localPosition = Vector3.zero;
+    ((Object) transform).name = "OBJ_SYMBOL_MARK";
+    this.symbolMark = ((Component) transform).GetComponent<SymbolMarkCtrl>();
+    this.symbolMark.Initilize();
+    this.symbolMark.LoadSymbol(this.clanCharaInfo.userClanData.sym);
+    this.symbolMark.SetSize(20);
+  }
 
-	protected virtual void UpdateEquipIcon(List<CharaInfo.EquipItem> equip_set_info)
-	{
-		int weapon_cnt = 0;
-		SetActive(transRoot, UI.LBL_CHANGE_MODE, isVisualMode);
-		int i = 0;
-		for (int num = 7; i < num; i++)
-		{
-			SetEvent(FindCtrl(transRoot, icons[i]), "EMPTY", 0);
-			SetEvent(FindCtrl(transRoot, icons_btn[i]), "EMPTY", 0);
-			SetLabelText(FindCtrl(transRoot, icons_level[i]), string.Empty);
-			SetActive(FindCtrl(transRoot, icons[i]), false);
-		}
-		bool need_visual_helm_icon = isVisualMode;
-		bool need_visual_armor_icon = isVisualMode;
-		bool need_visual_arm_icon = isVisualMode;
-		bool need_visual_leg_icon = isVisualMode;
-		equip_set_info.ForEach(delegate(CharaInfo.EquipItem equip_data)
-		{
-			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)equip_data.eId);
-			if (equipItemData != null)
-			{
-				if (isVisualMode && !equipItemData.IsWeapon())
-				{
-					equipItemData = GetVisualModeTargetTable(equipItemData.id, equipItemData.type, data);
-					if (equipItemData == null)
-					{
-						return;
-					}
-				}
-				Transform val = null;
-				int num2 = -1;
-				if (equipItemData.IsWeapon())
-				{
-					val = FindCtrl(transRoot, icons[weapon_cnt]);
-					num2 = weapon_cnt;
-					weapon_cnt++;
-				}
-				else
-				{
-					switch (equipItemData.type)
-					{
-					case EQUIPMENT_TYPE.ARMOR:
-					case EQUIPMENT_TYPE.VISUAL_ARMOR:
-						num2 = 3;
-						need_visual_armor_icon = false;
-						break;
-					case EQUIPMENT_TYPE.HELM:
-					case EQUIPMENT_TYPE.VISUAL_HELM:
-						num2 = 4;
-						need_visual_helm_icon = false;
-						break;
-					case EQUIPMENT_TYPE.ARM:
-					case EQUIPMENT_TYPE.VISUAL_ARM:
-						num2 = 5;
-						need_visual_arm_icon = false;
-						break;
-					case EQUIPMENT_TYPE.LEG:
-					case EQUIPMENT_TYPE.VISUAL_LEG:
-						num2 = 6;
-						need_visual_leg_icon = false;
-						break;
-					}
-					if (num2 != -1)
-					{
-						val = FindCtrl(transRoot, icons[num2]);
-					}
-				}
-				if (!(val == null))
-				{
-					SetActive(FindCtrl(transRoot, icons[num2]), true);
-					string event_name = (!isVisualMode) ? "DETAIL" : "VISUAL_DETAIL";
-					ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemTable(equipItemData, GetCharaSex(), val, null, -1, event_name, num2, false, -1, false, null, false, false);
-					SetLongTouch(itemIcon.transform, event_name, num2);
-					SetEvent(FindCtrl(transRoot, icons_btn[num2]), event_name, num2);
-					SetLongTouch(FindCtrl(transRoot, icons_btn[num2]), event_name, num2);
-					EquipItemInfo info = new EquipItemInfo(equip_data);
-					itemIcon.SetEquipExtInvertedColor(info, base.GetComponent<UILabel>((Enum)icons_level[num2]));
-					SetActive(FindCtrl(transRoot, icons_level[num2]), !isVisualMode);
-					if (equip_data != null)
-					{
-						string text = string.Format(StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 1u), equip_data.lv.ToString());
-						SetLabelText(FindCtrl(transRoot, icons_level[num2]), text);
-					}
-				}
-			}
-		});
-		if (need_visual_helm_icon && data.hId != 0)
-		{
-			int index = 4;
-			int hId = data.hId;
-			EQUIPMENT_TYPE e_type = EQUIPMENT_TYPE.HELM;
-			CharaInfo chara_info = data;
-			SetVisualModeIcon(index, hId, e_type, chara_info);
-		}
-		if (need_visual_armor_icon && data.aId != 0)
-		{
-			int index2 = 3;
-			int aId = data.aId;
-			EQUIPMENT_TYPE e_type2 = EQUIPMENT_TYPE.ARMOR;
-			CharaInfo chara_info2 = data;
-			SetVisualModeIcon(index2, aId, e_type2, chara_info2);
-		}
-		if (need_visual_arm_icon && data.rId != 0)
-		{
-			int index3 = 5;
-			int rId = data.rId;
-			EQUIPMENT_TYPE e_type3 = EQUIPMENT_TYPE.ARM;
-			CharaInfo chara_info3 = data;
-			SetVisualModeIcon(index3, rId, e_type3, chara_info3);
-		}
-		if (need_visual_leg_icon && data.lId != 0)
-		{
-			int index4 = 6;
-			int lId = data.lId;
-			EQUIPMENT_TYPE e_type4 = EQUIPMENT_TYPE.LEG;
-			CharaInfo chara_info4 = data;
-			SetVisualModeIcon(index4, lId, e_type4, chara_info4);
-		}
-	}
+  private void _showClanScout()
+  {
+    if (this.clanCharaInfo == null)
+      return;
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.OBJ_CLAN_ROOT, true);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_CLAN_SCOUT, false);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_CLAN_SCOUT_CANCEL, false);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_CLAN_SCOUT_OFF, false);
+    this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_CLAN_DETAIL, false);
+    if ((int) this.clanCharaInfo.level < 15)
+      this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_CLAN_SCOUT_OFF, true);
+    else if (this.userClanData != null && this.userClanData.num >= MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.CLAN_MAX_MEMBER_NUM)
+    {
+      this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_CLAN_SCOUT_OFF, true);
+      this.SetEvent(this.transRoot, (Enum) FriendInfo.UI.BTN_CLAN_SCOUT_OFF, "CLAN_SCOUT_MAX_MEMBER", 0);
+    }
+    else if (this.clanCharaInfo.isInviteToClan)
+      this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_CLAN_SCOUT_CANCEL, true);
+    else
+      this.SetActive(this.transRoot, (Enum) FriendInfo.UI.BTN_CLAN_SCOUT, true);
+  }
 
-	protected void SetVisualModeIcon(int index, int table_id, EQUIPMENT_TYPE e_type, CharaInfo chara_info)
-	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		string event_name = "VISUAL_DETAIL";
-		Transform val = FindCtrl(transRoot, icons[index]);
-		EquipItemTable.EquipItemData visualModeTargetTable = GetVisualModeTargetTable((uint)table_id, e_type, chara_info);
-		if (visualModeTargetTable != null)
-		{
-			val.GetComponentsInChildren<ItemIcon>(true, Temporary.itemIconList);
-			int i = 0;
-			for (int count = Temporary.itemIconList.Count; i < count; i++)
-			{
-				Temporary.itemIconList[i].get_gameObject().SetActive(true);
-			}
-			Temporary.itemIconList.Clear();
-			SetActive(FindCtrl(transRoot, icons[index]), true);
-			ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemTable(visualModeTargetTable, GetCharaSex(), val, null, -1, event_name, index, false, -1, false, null, false, false);
-			SetLongTouch(itemIcon.transform, event_name, index);
-			SetEvent(FindCtrl(transRoot, icons_btn[index]), event_name, index);
-			SetLongTouch(FindCtrl(transRoot, icons_btn[index]), event_name, index);
-			SetActive(FindCtrl(transRoot, icons_level[index]), !isVisualMode);
-		}
-	}
+  public virtual int GetCharaSex() => this.data.sex;
 
-	protected void UpdateBottomButton()
-	{
-		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-		SetActive(transRoot, UI.OBJ_FRIEND_INFO_ROOT, IsFriendInfo);
-		SetActive(transRoot, UI.OBJ_CHANGE_EQUIP_INFO_ROOT, !IsFriendInfo);
-		SetActive(transRoot, UI.BTN_MAGI, showMagiButton);
-		bool flag = MonoBehaviourSingleton<FriendManager>.I.followNum == MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxFollow;
-		SetEvent(transRoot, UI.BTN_FOLLOW, "FOLLOW", 0);
-		if (!isFollowerList)
-		{
-			if (flag && !dataFollowing)
-			{
-				SetActive(transRoot, UI.BTN_FOLLOW, true);
-				SetActive(transRoot, UI.BTN_UNFOLLOW, false);
-				SetEvent(transRoot, UI.BTN_FOLLOW, "INVALID_FOLLOW", 0);
-			}
-			else
-			{
-				SetActive(transRoot, UI.BTN_FOLLOW, !dataFollowing);
-				SetActive(transRoot, UI.BTN_UNFOLLOW, dataFollowing);
-			}
-			SetActive(transRoot, UI.BTN_DELETEFOLLOWER, false);
-		}
-		else
-		{
-			SetActive(transRoot, UI.BTN_DELETEFOLLOWER, dataFollower);
-			if (!flag && !dataFollowing)
-			{
-				SetActive(transRoot, UI.BTN_FOLLOW, true);
-				if (!isFollowerListChengeTrans)
-				{
-					Transform val = FindCtrl(transRoot, UI.BTN_FOLLOW);
-					Transform obj = val;
-					Vector3 localPosition = val.get_localPosition();
-					float num = localPosition.x - 167f;
-					Vector3 localPosition2 = val.get_localPosition();
-					float num2 = localPosition2.y - 502f;
-					Vector3 localPosition3 = val.get_localPosition();
-					obj.set_localPosition(new Vector3(num, num2, localPosition3.z));
-					val.set_localScale(new Vector3(1f, 1f, 1f));
-					isFollowerListChengeTrans = true;
-				}
-			}
-			else
-			{
-				SetActive(transRoot, UI.BTN_FOLLOW, false);
-			}
-			SetActive(transRoot, UI.BTN_UNFOLLOW, false);
-		}
-		SetActive(transRoot, UI.OBJ_BLACKLIST_ROOT, true);
-		bool flag2 = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(data.userId);
-		SetActive(transRoot, UI.BTN_BLACKLIST_IN, !flag2);
-		SetActive(transRoot, UI.BTN_BLACKLIST_OUT, flag2);
-	}
+  protected virtual void OnQuery_FOLLOW()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.data.name
+    });
+    this.SendFollow(new List<int>() { this.data.userId }, (Action<bool>) (is_success =>
+    {
+      if (!is_success)
+        return;
+      this.UpdateFollowing();
+    }));
+  }
 
-	protected EquipItemTable.EquipItemData GetVisualModeTargetTable(uint base_table_id, EQUIPMENT_TYPE e_type, CharaInfo chara_info)
-	{
-		EquipItemTable.EquipItemData result = null;
-		if (isVisualMode)
-		{
-			uint num = base_table_id;
-			switch (e_type)
-			{
-			case EQUIPMENT_TYPE.ARMOR:
-			case EQUIPMENT_TYPE.VISUAL_ARMOR:
-				if (chara_info.aId != 0)
-				{
-					num = (uint)chara_info.aId;
-				}
-				break;
-			case EQUIPMENT_TYPE.HELM:
-			case EQUIPMENT_TYPE.VISUAL_HELM:
-				if (chara_info.showHelm != 0)
-				{
-					if (chara_info.hId != 0)
-					{
-						num = (uint)chara_info.hId;
-					}
-				}
-				else
-				{
-					num = 0u;
-				}
-				break;
-			case EQUIPMENT_TYPE.ARM:
-			case EQUIPMENT_TYPE.VISUAL_ARM:
-				if (chara_info.rId != 0)
-				{
-					num = (uint)chara_info.rId;
-				}
-				break;
-			case EQUIPMENT_TYPE.LEG:
-			case EQUIPMENT_TYPE.VISUAL_LEG:
-				if (chara_info.lId != 0)
-				{
-					num = (uint)chara_info.lId;
-				}
-				break;
-			}
-			if (num != 0)
-			{
-				result = Singleton<EquipItemTable>.I.GetEquipItemData(num);
-			}
-		}
-		return result;
-	}
+  protected virtual void OnQuery_UNFOLLOW()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.data.name
+    });
+  }
 
-	public virtual int GetCharaSex()
-	{
-		return data.sex;
-	}
+  protected virtual void OnQuery_FriendUnFollowMessage_YES()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.data.name
+    });
+    this.SendUnFollow(this.data.userId, (Action<bool>) (is_success =>
+    {
+      if (!is_success)
+        return;
+      this.UpdateFollowing();
+    }));
+  }
 
-	protected virtual void OnQuery_FOLLOW()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			data.name
-		});
-		List<int> list = new List<int>();
-		list.Add(data.userId);
-		SendFollow(list, delegate(bool is_success)
-		{
-			if (is_success)
-			{
-				UpdateFollowing();
-			}
-		});
-	}
+  private void UpdateFollowing()
+  {
+    this.dataFollowing = !this.dataFollowing;
+    if (this.friendCharaInfo == null)
+      return;
+    this.friendCharaInfo.following = this.dataFollowing;
+  }
 
-	protected virtual void OnQuery_UNFOLLOW()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			data.name
-		});
-	}
+  private void UpdateFollower()
+  {
+    this.dataFollower = !this.dataFollower;
+    if (this.friendCharaInfo == null)
+      return;
+    this.friendCharaInfo.follower = this.dataFollower;
+  }
 
-	protected virtual void OnQuery_FriendUnFollowMessage_YES()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			data.name
-		});
-		SendUnFollow(data.userId, delegate(bool is_success)
-		{
-			if (is_success)
-			{
-				UpdateFollowing();
-			}
-		});
-	}
+  private void UpdateClanInvite()
+  {
+    this.clanCharaInfo.isInviteToClan = !this.clanCharaInfo.isInviteToClan;
+  }
 
-	private void UpdateFollowing()
-	{
-		dataFollowing = !dataFollowing;
-		if (friendCharaInfo != null)
-		{
-			friendCharaInfo.following = dataFollowing;
-		}
-	}
+  protected virtual void OnQuery_DELETEFOLLOWER()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.data.name
+    });
+  }
 
-	private void UpdateFollower()
-	{
-		dataFollower = !dataFollower;
-		if (friendCharaInfo != null)
-		{
-			friendCharaInfo.follower = dataFollower;
-		}
-	}
+  protected virtual void OnQuery_FriendDeleteFollowerMessage_YES()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.data.name
+    });
+    this.SendDeleteFollower(this.data.userId, (Action<bool>) (is_success =>
+    {
+      if (!is_success)
+        return;
+      this.UpdateFollower();
+    }));
+  }
 
-	protected virtual void OnQuery_DELETEFOLLOWER()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			data.name
-		});
-	}
+  protected void SendFollow(List<int> send_follow_list, Action<bool> callback = null)
+  {
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(send_follow_list, (Action<Error, List<int>>) ((err, follow_list) =>
+    {
+      bool is_resume = err == Error.None && follow_list.Count > 0;
+      if (callback != null)
+        callback(is_resume);
+      GameSection.ResumeEvent(is_resume);
+    }));
+  }
 
-	protected virtual void OnQuery_FriendDeleteFollowerMessage_YES()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			data.name
-		});
-		SendDeleteFollower(data.userId, delegate(bool is_success)
-		{
-			if (is_success)
-			{
-				UpdateFollower();
-			}
-		});
-	}
+  protected void SendUnFollow(int send_unfollow, Action<bool> callback = null)
+  {
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<FriendManager>.I.SendUnfollowUser(send_unfollow, (Action<bool>) (is_success =>
+    {
+      if (callback != null)
+        callback(is_success);
+      GameSection.ResumeEvent(is_success);
+    }));
+  }
 
-	protected void SendFollow(List<int> send_follow_list, Action<bool> callback = null)
-	{
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<FriendManager>.I.SendFollowUser(send_follow_list, delegate(Error err, List<int> follow_list)
-		{
-			bool flag = err == Error.None && follow_list.Count > 0;
-			if (callback != null)
-			{
-				callback(flag);
-			}
-			GameSection.ResumeEvent(flag, null);
-		});
-	}
+  protected void SendDeleteFollower(int send_deletefollower, Action<bool> callback = null)
+  {
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<FriendManager>.I.SendDeleteFollower(send_deletefollower, (Action<bool>) (is_success =>
+    {
+      if (callback != null)
+        callback(is_success);
+      GameSection.ResumeEvent(is_success);
+    }));
+  }
 
-	protected void SendUnFollow(int send_unfollow, Action<bool> callback = null)
-	{
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<FriendManager>.I.SendUnfollowUser(send_unfollow, delegate(bool is_success)
-		{
-			if (callback != null)
-			{
-				callback(is_success);
-			}
-			GameSection.ResumeEvent(is_success, null);
-		});
-	}
+  protected void SendClanInvite(int send_userid, Action<bool> callback = null)
+  {
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<ClanMatchingManager>.I.SendClanInvite(send_userid, (Action<bool>) (is_success =>
+    {
+      if (callback != null)
+        callback(is_success);
+      GameSection.ResumeEvent(is_success);
+    }));
+  }
 
-	protected void SendDeleteFollower(int send_deletefollower, Action<bool> callback = null)
-	{
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<FriendManager>.I.SendDeleteFollower(send_deletefollower, delegate(bool is_success)
-		{
-			if (callback != null)
-			{
-				callback(is_success);
-			}
-			GameSection.ResumeEvent(is_success, null);
-		});
-	}
+  protected void SendClanCancelInvite(int send_userid, Action<bool> callback = null)
+  {
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<ClanMatchingManager>.I.SendClanCancelInvite(send_userid, (Action<bool>) (is_success =>
+    {
+      if (callback != null)
+        callback(is_success);
+      GameSection.ResumeEvent(true);
+    }));
+  }
 
-	protected virtual void OnQuery_BLACK_LIST_IN()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			data.name
-		});
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<BlackListManager>.I.SendAdd(data.userId, delegate(bool is_success)
-		{
-			if (is_success)
-			{
-				dataFollowing = false;
-				if (friendCharaInfo != null)
-				{
-					friendCharaInfo.following = false;
-				}
-			}
-			GameSection.ResumeEvent(is_success, null);
-		});
-	}
+  protected virtual void OnQuery_BLACK_LIST_IN()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.data.name
+    });
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<BlackListManager>.I.SendAdd(this.data.userId, (Action<bool>) (is_success =>
+    {
+      if (is_success)
+      {
+        this.dataFollowing = false;
+        if (this.friendCharaInfo != null)
+          this.friendCharaInfo.following = false;
+      }
+      GameSection.ResumeEvent(is_success);
+    }));
+  }
 
-	protected virtual void OnQuery_BLACK_LIST_OUT()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			data.name
-		});
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<BlackListManager>.I.SendDelete(data.userId, delegate(bool is_success)
-		{
-			GameSection.ResumeEvent(is_success, null);
-		});
-	}
+  protected virtual void OnQuery_BLACK_LIST_OUT()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.data.name
+    });
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<BlackListManager>.I.SendDelete(this.data.userId, (Action<bool>) (is_success => GameSection.ResumeEvent(is_success)));
+  }
 
-	protected virtual void OnQuery_CHANGE_MODE()
-	{
-		RefreshUI();
-		LoadModel();
-	}
+  protected virtual void OnQuery_CHANGE_MODE()
+  {
+    this.RefreshUI();
+    this.LoadModel();
+  }
 
-	protected virtual void OnQuery_DETAIL()
-	{
-		if (isVisualMode)
-		{
-			GameSection.ChangeEvent("VISUAL_DETAIL", null);
-			OnQuery_VISUAL_DETAIL();
-		}
-		else
-		{
-			int num = (int)GameSection.GetEventData();
-			object[] array = new object[4]
-			{
-				ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT,
-				GetEquipSetAttachSkillListData(data.equipSet)[num],
-				data.sex,
-				data.faceId
-			};
-			GameSection.SetEventData(new object[3]
-			{
-				array,
-				false,
-				false
-			});
-		}
-	}
+  protected virtual void OnQuery_DETAIL()
+  {
+    if (this.isVisualMode)
+    {
+      GameSection.ChangeEvent("VISUAL_DETAIL");
+      this.OnQuery_VISUAL_DETAIL();
+    }
+    else
+    {
+      int eventData = (int) GameSection.GetEventData();
+      GameSection.SetEventData((object) new object[3]
+      {
+        (object) new object[4]
+        {
+          (object) ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT,
+          (object) this.GetEquipSetAttachSkillListData(this.data.equipSet)[eventData],
+          (object) this.data.sex,
+          (object) this.data.faceId
+        },
+        (object) false,
+        (object) false
+      });
+    }
+  }
 
-	protected virtual void OnQuery_VISUAL_DETAIL()
-	{
-		GameSection.StopEvent();
-	}
+  protected virtual void OnQuery_VISUAL_DETAIL() => GameSection.StopEvent();
 
-	protected virtual void OnQuery_SKILL_LIST()
-	{
-		object[] array = new object[5]
-		{
-			ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT,
-			GetEquipSetAttachSkillListData(data.equipSet),
-			true,
-			data.sex,
-			data.faceId
-		};
-		GameSection.SetEventData(new object[3]
-		{
-			array,
-			false,
-			false
-		});
-	}
+  protected virtual void OnQuery_SKILL_LIST()
+  {
+    GameSection.SetEventData((object) new object[3]
+    {
+      (object) new object[5]
+      {
+        (object) ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT,
+        (object) this.GetEquipSetAttachSkillListData(this.data.equipSet),
+        (object) true,
+        (object) this.data.sex,
+        (object) this.data.faceId
+      },
+      (object) false,
+      (object) false
+    });
+  }
 
-	protected virtual void OnQuery_ABILITY()
-	{
-		EquipSetInfo equipSetInfo = MonoBehaviourSingleton<StatusManager>.I.CreateEquipSetData(data.equipSet);
-		object[] array = new object[3]
-		{
-			equipSetInfo,
-			MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(equipSetInfo, null),
-			new EquipSetDetailStatusAndAbilityTable.BaseStatus(data.atk, data.def, data.hp, data.equipSet)
-		};
-		GameSection.SetEventData(new object[3]
-		{
-			array,
-			false,
-			false
-		});
-	}
+  protected virtual void OnQuery_ABILITY()
+  {
+    EquipSetInfo equipSetData = MonoBehaviourSingleton<StatusManager>.I.CreateEquipSetData(this.data.equipSet);
+    GameSection.SetEventData((object) new object[3]
+    {
+      (object) new object[3]
+      {
+        (object) equipSetData,
+        (object) MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(equipSetData),
+        (object) new EquipSetDetailStatusAndAbilityTable.BaseStatus((int) this.data.atk, (int) this.data.def, (int) this.data.hp, this.data.equipSet)
+      },
+      (object) false,
+      (object) false
+    });
+  }
 
-	protected virtual void OnQuery_STATUS()
-	{
-		EquipSetInfo equipSetInfo = MonoBehaviourSingleton<StatusManager>.I.CreateEquipSetData(data.equipSet);
-		object[] array = new object[3]
-		{
-			equipSetInfo,
-			MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(equipSetInfo, null),
-			new EquipSetDetailStatusAndAbilityTable.BaseStatus(data.atk, data.def, data.hp, data.equipSet)
-		};
-		GameSection.SetEventData(new object[3]
-		{
-			array,
-			false,
-			false
-		});
-	}
+  protected virtual void OnQuery_STATUS()
+  {
+    EquipSetInfo equipSetData = MonoBehaviourSingleton<StatusManager>.I.CreateEquipSetData(this.data.equipSet);
+    GameSection.SetEventData((object) new object[3]
+    {
+      (object) new object[3]
+      {
+        (object) equipSetData,
+        (object) MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(equipSetData),
+        (object) new EquipSetDetailStatusAndAbilityTable.BaseStatus((int) this.data.atk, (int) this.data.def, (int) this.data.hp, this.data.equipSet)
+      },
+      (object) false,
+      (object) false
+    });
+  }
 
-	protected virtual void OnQuery_SECTION_BACK()
-	{
-		MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex = -1;
-	}
+  protected virtual void OnQuery_SECTION_BACK()
+  {
+    MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex = -1;
+  }
 
-	protected override NOTIFY_FLAG GetUpdateUINotifyFlags()
-	{
-		return NOTIFY_FLAG.UPDATE_FRIEND_PARAM;
-	}
+  protected override GameSection.NOTIFY_FLAG GetUpdateUINotifyFlags()
+  {
+    return GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM;
+  }
+
+  public void OnQuery_TO_MESSAGE()
+  {
+    if (this.m_msgUserInfo == null)
+    {
+      GameSection.StopEvent();
+    }
+    else
+    {
+      if (this.m_msgUserInfo.isPermitted)
+        return;
+      GameSection.ChangeEvent("NOT_PERMITTED");
+    }
+  }
+
+  public void OnQuery_FriendMessageConfirmMessage_YES()
+  {
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<FriendManager>.I.SendGetMessageDetailList(this.m_msgUserInfo.userId, 0, (Action<bool>) (is_success => GameSection.ResumeEvent(is_success)));
+    MonoBehaviourSingleton<FriendManager>.I.SetNoReadMessageNum(MonoBehaviourSingleton<FriendManager>.I.noReadMessageNum - this.m_msgUserInfo.noReadNum);
+    this.m_msgUserInfo.noReadNum = 0;
+  }
+
+  protected virtual void OnQuery_CLAN_SCOUT()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.clanCharaInfo.name
+    });
+  }
+
+  protected virtual void OnQuery_CLAN_SCOUT_OFF()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.clanCharaInfo.name
+    });
+  }
+
+  protected virtual void OnQuery_ClanScoutDialog_YES()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.clanCharaInfo.name
+    });
+    this.SendClanInvite(this.clanCharaInfo.userId, (Action<bool>) (is_success =>
+    {
+      if (is_success)
+      {
+        this.UpdateClanInvite();
+        GameSection.ChangeStayEvent("COMPLETE");
+        MonoBehaviourSingleton<FriendManager>.I.SetClanInviteToHomeCharaInfo(this.clanCharaInfo.userId, this.clanCharaInfo.isInviteToClan);
+      }
+      else
+      {
+        MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(new EventData[1]
+        {
+          new EventData("[BACK]")
+        });
+        this._showClanScout();
+      }
+    }));
+  }
+
+  protected virtual void OnQuery_CLAN_SCOUT_CANCEL()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.clanCharaInfo.name
+    });
+  }
+
+  protected virtual void OnQuery_ClanScoutCancelDialog_YES()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.clanCharaInfo.name
+    });
+    this.SendClanCancelInvite(this.clanCharaInfo.userId, (Action<bool>) (is_success =>
+    {
+      if (!is_success)
+        return;
+      this.UpdateClanInvite();
+      GameSection.ChangeStayEvent("COMPLETE");
+      MonoBehaviourSingleton<FriendManager>.I.SetClanInviteToHomeCharaInfo(this.clanCharaInfo.userId, this.clanCharaInfo.isInviteToClan);
+    }));
+  }
+
+  public void OnQuery_CLAN_DETAIL()
+  {
+    if (this.clanCharaInfo == null)
+      return;
+    if ((int) MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level < 15)
+      GameSection.StopEvent();
+    else
+      GameSection.SetEventData((object) this.clanCharaInfo.userClanData.cId);
+  }
+
+  protected enum UI
+  {
+    LBL_NAME,
+    LBL_ATK,
+    LBL_DEF,
+    LBL_HP,
+    SPR_COMMENT,
+    LBL_COMMENT,
+    OBJ_LAST_LOGIN,
+    LBL_LAST_LOGIN,
+    LBL_LAST_LOGIN_TIME,
+    LBL_LEVEL,
+    OBJ_LEVEL_ROOT,
+    LBL_USER_ID,
+    OBJ_USER_ID_ROOT,
+    TEX_MODEL,
+    BTN_FOLLOW,
+    BTN_UNFOLLOW,
+    OBJ_BLACKLIST_ROOT,
+    BTN_BLACKLIST_IN,
+    BTN_BLACKLIST_OUT,
+    OBJ_ICON_WEAPON_1,
+    OBJ_ICON_WEAPON_2,
+    OBJ_ICON_WEAPON_3,
+    OBJ_ICON_ARMOR,
+    OBJ_ICON_HELM,
+    OBJ_ICON_ARM,
+    OBJ_ICON_LEG,
+    BTN_ICON_WEAPON_1,
+    BTN_ICON_WEAPON_2,
+    BTN_ICON_WEAPON_3,
+    BTN_ICON_ARMOR,
+    BTN_ICON_HELM,
+    BTN_ICON_ARM,
+    BTN_ICON_LEG,
+    OBJ_EQUIP_ROOT,
+    OBJ_EQUIP_SET_ROOT,
+    OBJ_FRIEND_INFO_ROOT,
+    OBJ_CHANGE_EQUIP_INFO_ROOT,
+    LBL_MAX,
+    LBL_NOW,
+    OBJ_FOLLOW_ARROW_ROOT,
+    SPR_FOLLOW_ARROW,
+    SPR_FOLLOWER_ARROW,
+    SPR_BLACKLIST_ICON,
+    SPR_SAME_CLAN_ICON,
+    LBL_LEVEL_WEAPON_1,
+    LBL_LEVEL_WEAPON_2,
+    LBL_LEVEL_WEAPON_3,
+    LBL_LEVEL_ARMOR,
+    LBL_LEVEL_HELM,
+    LBL_LEVEL_ARM,
+    LBL_LEVEL_LEG,
+    LBL_CHANGE_MODE,
+    BTN_MAGI,
+    LBL_SET_NAME,
+    OBJ_DEGREE_PLATE_ROOT,
+    BTN_DELETEFOLLOWER,
+    BTN_KICK,
+    BTN_JOIN,
+    BTN_MOVE_TO_MSG,
+    OBJ_CLAN_ROOT,
+    BTN_CLAN_SCOUT,
+    SPR_CLAN_SCOUT,
+    BTN_CLAN_DETAIL,
+    TXT_CLAN_TITLE,
+    SPR_CLAN_NAME,
+    BTN_CLAN_SCOUT_CANCEL,
+    BTN_CLAN_SCOUT_OFF,
+    OBJ_SYMBOL,
+    OBJ_SYMBOL_MARK,
+  }
 }

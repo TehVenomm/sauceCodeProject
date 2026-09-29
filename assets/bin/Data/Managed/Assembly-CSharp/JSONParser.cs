@@ -1,206 +1,215 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: JSONParser
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class JSONParser
 {
-	private FlashCompatibleTextReader reader;
+  private FlashCompatibleTextReader reader;
 
-	public JSONNode Parse(FlashCompatibleTextReader reader)
-	{
-		this.reader = reader;
-		if (reader.Peek() == -1)
-		{
-			return null;
-		}
-		return ReadObject();
-	}
+  public JSONNode Parse(FlashCompatibleTextReader reader)
+  {
+    this.reader = reader;
+    return reader.Peek() == -1 ? (JSONNode) null : this.ReadObject();
+  }
 
-	private JSONNode ReadObject()
-	{
-		JSONNode jSONNode = new JSONNode();
-		SkipWhitespace();
-		if (reader.Peek() != 123)
-		{
-			Debug.LogError((object)"malformed json: no starting '{'");
-			return null;
-		}
-		reader.Read();
-		while (reader.Peek() != 125)
-		{
-			if (reader.Peek() == 44)
-			{
-				reader.Read();
-			}
-			if (reader.Peek() == 125)
-			{
-				break;
-			}
-			SkipWhitespace();
-			string fieldName = ReadFieldName().Trim();
-			SkipWhitespace();
-			reader.Read();
-			IJSONFieldValue val = ReadValue();
-			jSONNode.AddField(fieldName, val);
-			SkipWhitespace();
-		}
-		reader.Read();
-		return jSONNode;
-	}
+  private JSONNode ReadObject()
+  {
+    JSONNode jsonNode = new JSONNode();
+    this.SkipWhitespace();
+    if (this.reader.Peek() != 123)
+    {
+      Debug.LogError((object) "malformed json: no starting '{'");
+      return (JSONNode) null;
+    }
+    this.reader.Read();
+    while (this.reader.Peek() != 125)
+    {
+      if (this.reader.Peek() == 44)
+        this.reader.Read();
+      if (this.reader.Peek() != 125)
+      {
+        this.SkipWhitespace();
+        string fieldName = this.ReadFieldName().Trim();
+        this.SkipWhitespace();
+        this.reader.Read();
+        IJSONFieldValue val = this.ReadValue();
+        jsonNode.AddField(fieldName, val);
+        this.SkipWhitespace();
+      }
+      else
+        break;
+    }
+    this.reader.Read();
+    return jsonNode;
+  }
 
-	private IJSONFieldValue ReadValue()
-	{
-		SkipWhitespace();
-		char c = (char)reader.Peek();
-		if (c == '"' || c == '\'')
-		{
-			return new JSONStringFieldValue(ReadString());
-		}
-		if (!FlashCompatibleConvert.IsDigit(c))
-		{
-			switch (c)
-			{
-			case '-':
-				break;
-			case '[':
-				return new JSONListFieldValue(ReadList());
-			case '{':
-				return new JSONObjectFieldValue(ReadObject());
-			case 'f':
-			case 't':
-				return new JSONBooleanFieldValue(ReadBoolean());
-			case 'n':
-				ReadNull();
-				return new JSONNullFieldValue();
-			default:
-				return null;
-			}
-		}
-		return new JSONNumberFieldValue(ReadNumber());
-	}
+  private IJSONFieldValue ReadValue()
+  {
+    this.SkipWhitespace();
+    char c = (char) this.reader.Peek();
+    switch (c)
+    {
+      case '"':
+      case '\'':
+        return (IJSONFieldValue) new JSONStringFieldValue(this.ReadString());
+      default:
+        if (!FlashCompatibleConvert.IsDigit(c))
+        {
+          switch (c)
+          {
+            case '-':
+              break;
+            case '[':
+              return (IJSONFieldValue) new JSONListFieldValue(this.ReadList());
+            case 'f':
+            case 't':
+              return (IJSONFieldValue) new JSONBooleanFieldValue(this.ReadBoolean());
+            case 'n':
+              this.ReadNull();
+              return (IJSONFieldValue) new JSONNullFieldValue();
+            case '{':
+              return (IJSONFieldValue) new JSONObjectFieldValue(this.ReadObject());
+            default:
+              return (IJSONFieldValue) null;
+          }
+        }
+        return (IJSONFieldValue) new JSONNumberFieldValue(this.ReadNumber());
+    }
+  }
 
-	private void SkipWhitespace()
-	{
-		while (true)
-		{
-			int num = reader.Peek();
-			if (num == -1 || !char.IsWhiteSpace((char)num))
-			{
-				break;
-			}
-			reader.Read();
-		}
-	}
+  private void SkipWhitespace()
+  {
+    while (true)
+    {
+      int c = this.reader.Peek();
+      if (c != -1 && char.IsWhiteSpace((char) c))
+        this.reader.Read();
+      else
+        break;
+    }
+  }
 
-	private string ReadFieldName()
-	{
-		SkipWhitespace();
-		string text = string.Empty;
-		char c = (char)reader.Peek();
-		bool flag = c == '\'' || c == '"';
-		SkipWhitespace();
-		while (true)
-		{
-			switch (c)
-			{
-			case '}':
-				if (text == string.Empty)
-				{
-					return string.Empty;
-				}
-				Debug.LogError((object)"malformed json: read '}' before reading ':'");
-				return null;
-			case ':':
-				if (flag && (text.EndsWith("'") || text.EndsWith("\"")))
-				{
-					text = text.Substring(1, text.Length - 2);
-				}
-				return text;
-			}
-			text += ((char)(ushort)reader.Read()).ToString();
-			SkipWhitespace();
-			c = (char)reader.Peek();
-		}
-	}
+  private string ReadFieldName()
+  {
+    this.SkipWhitespace();
+    string str = "";
+    char ch = (char) this.reader.Peek();
+    bool flag = ch == '\'' || ch == '"';
+    this.SkipWhitespace();
+    while (true)
+    {
+      switch (ch)
+      {
+        case ':':
+          goto label_6;
+        case '}':
+          goto label_1;
+        default:
+          str += ((char) this.reader.Read()).ToString();
+          this.SkipWhitespace();
+          ch = (char) this.reader.Peek();
+          continue;
+      }
+    }
+label_1:
+    if (str == "")
+      return "";
+    Debug.LogError((object) "malformed json: read '}' before reading ':'");
+    return (string) null;
+label_6:
+    if (flag && (str.EndsWith("'") || str.EndsWith("\"")))
+      str = str.Substring(1, str.Length - 2);
+    return str;
+  }
 
-	private double ReadNumber()
-	{
-		string text = string.Empty;
-		while (true)
-		{
-			int num = reader.Peek();
-			if (num == -1 || num == 44 || num == 125 || num == 93 || char.IsWhiteSpace((char)num))
-			{
-				break;
-			}
-			text += ((char)(ushort)reader.Read()).ToString();
-		}
-		return FlashCompatibleConvert.ToDouble(text);
-	}
+  private double ReadNumber()
+  {
+    string s = "";
+    while (true)
+    {
+      int c = this.reader.Peek();
+      switch (c)
+      {
+        case -1:
+        case 44:
+        case 93:
+        case 125:
+          goto label_3;
+        default:
+          if (!char.IsWhiteSpace((char) c))
+          {
+            s += ((char) this.reader.Read()).ToString();
+            continue;
+          }
+          goto label_3;
+      }
+    }
+label_3:
+    return FlashCompatibleConvert.ToDouble(s);
+  }
 
-	private bool ReadBoolean()
-	{
-		char c = (char)reader.Peek();
-		bool flag = c == 't';
-		for (int i = 0; i < 4; i++)
-		{
-			reader.Read();
-		}
-		if (!flag)
-		{
-			reader.Read();
-		}
-		return flag;
-	}
+  private bool ReadBoolean()
+  {
+    bool flag = (ushort) this.reader.Peek() == (ushort) 116;
+    for (int index = 0; index < 4; ++index)
+      this.reader.Read();
+    if (!flag)
+      this.reader.Read();
+    return flag;
+  }
 
-	private void ReadNull()
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			reader.Read();
-		}
-	}
+  private void ReadNull()
+  {
+    for (int index = 0; index < 4; ++index)
+      this.reader.Read();
+  }
 
-	private string ReadString()
-	{
-		string text = string.Empty;
-		bool flag = (ushort)reader.Peek() == 39;
-		reader.Read();
-		while (true)
-		{
-			char c = (char)reader.Peek();
-			if ((!flag && c == '"') || (flag && c == '\''))
-			{
-				break;
-			}
-			text += ((char)(ushort)reader.Read()).ToString();
-		}
-		reader.Read();
-		return text;
-	}
+  private string ReadString()
+  {
+    string str = "";
+    bool flag = (ushort) this.reader.Peek() == (ushort) 39;
+    this.reader.Read();
+    while (true)
+    {
+      char ch = (char) this.reader.Peek();
+      if ((flag || ch != '"') && (!flag || ch != '\''))
+        str += ((char) this.reader.Read()).ToString();
+      else
+        break;
+    }
+    this.reader.Read();
+    return str;
+  }
 
-	private List<IJSONFieldValue> ReadList()
-	{
-		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		reader.Read();
-		while (true)
-		{
-			switch ((ushort)reader.Peek())
-			{
-			case 93:
-				reader.Read();
-				return list;
-			case 44:
-				reader.Read();
-				SkipWhitespace();
-				break;
-			default:
-			{
-				IJSONFieldValue item = ReadValue();
-				list.Add(item);
-				SkipWhitespace();
-				break;
-			}
-			}
-		}
-	}
+  private List<IJSONFieldValue> ReadList()
+  {
+    List<IJSONFieldValue> jsonFieldValueList = new List<IJSONFieldValue>();
+    this.reader.Read();
+    while (true)
+    {
+      switch ((char) this.reader.Peek())
+      {
+        case ',':
+          this.reader.Read();
+          this.SkipWhitespace();
+          continue;
+        case ']':
+          goto label_2;
+        default:
+          IJSONFieldValue jsonFieldValue = this.ReadValue();
+          jsonFieldValueList.Add(jsonFieldValue);
+          this.SkipWhitespace();
+          continue;
+      }
+    }
+label_2:
+    this.reader.Read();
+    return jsonFieldValueList;
+  }
 }

@@ -1,189 +1,149 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: CoopClientCollector
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
 
+using System;
+using UnityEngine;
+
+#nullable disable
 public class CoopClientCollector
 {
-	public const int MAX_CLIENT = 8;
+  public const int MAX_CLIENT = 8;
+  private CoopClient[] clientList = new CoopClient[8];
 
-	private CoopClient[] clientList = new CoopClient[8];
+  public CoopClient GetAt(int idx)
+  {
+    return idx < 0 || idx >= 8 ? (CoopClient) null : this.clientList[idx];
+  }
 
-	public CoopClient GetAt(int idx)
-	{
-		return (idx < 0 || idx >= 8) ? null : clientList[idx];
-	}
+  public void Add(CoopClient client)
+  {
+    int index = 0;
+    for (int length = this.clientList.Length; index < length; ++index)
+    {
+      if (Object.op_Equality((Object) this.clientList[index], (Object) null))
+      {
+        this.clientList[index] = client;
+        break;
+      }
+    }
+  }
 
-	public void Add(CoopClient client)
-	{
-		int num = 0;
-		int num2 = clientList.Length;
-		while (true)
-		{
-			if (num >= num2)
-			{
-				return;
-			}
-			if (clientList[num] == null)
-			{
-				break;
-			}
-			num++;
-		}
-		clientList[num] = client;
-	}
+  public void Remove(CoopClient client)
+  {
+    int index = 0;
+    for (int length = this.clientList.Length; index < length; ++index)
+    {
+      if (Object.op_Equality((Object) this.clientList[index], (Object) client))
+      {
+        this.clientList[index] = (CoopClient) null;
+        break;
+      }
+    }
+  }
 
-	public void Remove(CoopClient client)
-	{
-		int num = 0;
-		int num2 = clientList.Length;
-		while (true)
-		{
-			if (num >= num2)
-			{
-				return;
-			}
-			if (clientList[num] == client)
-			{
-				break;
-			}
-			num++;
-		}
-		clientList[num] = null;
-	}
+  public void Clear()
+  {
+    int index = 0;
+    for (int length = this.clientList.Length; index < length; ++index)
+      this.clientList[index] = (CoopClient) null;
+  }
 
-	public void Clear()
-	{
-		int i = 0;
-		for (int num = clientList.Length; i < num; i++)
-		{
-			clientList[i] = null;
-		}
-	}
+  public CoopClient Find(Predicate<CoopClient> predicate)
+  {
+    int index = 0;
+    for (int length = this.clientList.Length; index < length; ++index)
+    {
+      CoopClient client = this.clientList[index];
+      if (!Object.op_Equality((Object) client, (Object) null) && predicate(client))
+        return client;
+    }
+    return (CoopClient) null;
+  }
 
-	public CoopClient Find(Predicate<CoopClient> predicate)
-	{
-		int i = 0;
-		for (int num = clientList.Length; i < num; i++)
-		{
-			CoopClient coopClient = clientList[i];
-			if (!(coopClient == null) && predicate(coopClient))
-			{
-				return coopClient;
-			}
-		}
-		return null;
-	}
+  public int IndexOf(CoopClient client)
+  {
+    int index = 0;
+    for (int length = this.clientList.Length; index < length; ++index)
+    {
+      if (this.clientList[index].userId == client.userId)
+        return index;
+    }
+    return -1;
+  }
 
-	public int IndexOf(CoopClient client)
-	{
-		int i = 0;
-		for (int num = clientList.Length; i < num; i++)
-		{
-			CoopClient coopClient = clientList[i];
-			if (coopClient.userId == client.userId)
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
+  public void ForEach(Action<CoopClient> action)
+  {
+    int index = 0;
+    for (int length = this.clientList.Length; index < length; ++index)
+    {
+      CoopClient client = this.clientList[index];
+      if (!Object.op_Equality((Object) client, (Object) null))
+        action(client);
+    }
+  }
 
-	public void ForEach(Action<CoopClient> action)
-	{
-		int i = 0;
-		for (int num = clientList.Length; i < num; i++)
-		{
-			CoopClient coopClient = clientList[i];
-			if (!(coopClient == null))
-			{
-				action(coopClient);
-			}
-		}
-	}
+  public Player FindPlayer(Predicate<Player> predicate)
+  {
+    int index = 0;
+    for (int length = this.clientList.Length; index < length; ++index)
+    {
+      CoopClient client = this.clientList[index];
+      if (!Object.op_Equality((Object) client, (Object) null))
+      {
+        Player player = client.GetPlayer();
+        if (Object.op_Inequality((Object) player, (Object) null) && predicate(player))
+          return player;
+      }
+    }
+    return (Player) null;
+  }
 
-	public Player FindPlayer(Predicate<Player> predicate)
-	{
-		int i = 0;
-		for (int num = clientList.Length; i < num; i++)
-		{
-			CoopClient coopClient = clientList[i];
-			if (!(coopClient == null))
-			{
-				Player player = coopClient.GetPlayer();
-				if (player != null && predicate(player))
-				{
-					return player;
-				}
-			}
-		}
-		return null;
-	}
+  public CoopClient FindStageHost(int stage_id)
+  {
+    return this.Find((Predicate<CoopClient>) (c => c.stageId == stage_id && c.isStageHost));
+  }
 
-	public CoopClient FindStageHost(int stage_id)
-	{
-		return Find((CoopClient c) => c.stageId == stage_id && c.isStageHost);
-	}
+  public CoopClient FindPartyOwner() => this.Find((Predicate<CoopClient>) (c => c.isPartyOwner));
 
-	public CoopClient FindPartyOwner()
-	{
-		return Find((CoopClient c) => c.isPartyOwner);
-	}
+  public CoopClient FindByClientId(int client_id)
+  {
+    for (int index = 0; index < this.clientList.Length; ++index)
+    {
+      if (!Object.op_Equality((Object) this.clientList[index], (Object) null))
+      {
+        CoopClient client = this.clientList[index];
+        if (client.clientId == client_id)
+          return client;
+      }
+    }
+    return (CoopClient) null;
+  }
 
-	public CoopClient FindByClientId(int client_id)
-	{
-		for (int i = 0; i < clientList.Length; i++)
-		{
-			if (!(clientList[i] == null))
-			{
-				CoopClient coopClient = clientList[i];
-				if (coopClient.clientId == client_id)
-				{
-					return coopClient;
-				}
-			}
-		}
-		return null;
-	}
+  public CoopClient FindByToken(string token)
+  {
+    return this.Find((Predicate<CoopClient>) (c => c.userToken == token));
+  }
 
-	public CoopClient FindByToken(string token)
-	{
-		return Find((CoopClient c) => c.userToken == token);
-	}
+  public CoopClient FindByPlayerId(int player_id)
+  {
+    return this.Find((Predicate<CoopClient>) (c => c.playerId == player_id));
+  }
 
-	public CoopClient FindByPlayerId(int player_id)
-	{
-		return Find((CoopClient c) => c.playerId == player_id);
-	}
+  public CoopClient FindByUserId(int user_id)
+  {
+    return this.Find((Predicate<CoopClient>) (c => c.userId == user_id));
+  }
 
-	public CoopClient FindByUserId(int user_id)
-	{
-		return Find((CoopClient c) => c.userId == user_id);
-	}
+  public bool HasSeriesProgress()
+  {
+    return Object.op_Inequality((Object) this.Find((Predicate<CoopClient>) (c => !c.isLeave && !c.IsBattleEnd() && !c.isBattleRetire && c.IsStageRequest() && !c.isSeriesProgressEnd)), (Object) null);
+  }
 
-	public bool HasSeriesProgress()
-	{
-		return Find(delegate(CoopClient c)
-		{
-			if (c.isLeave)
-			{
-				return false;
-			}
-			if (c.IsBattleEnd())
-			{
-				return false;
-			}
-			if (c.isBattleRetire)
-			{
-				return false;
-			}
-			if (!c.IsStageRequest())
-			{
-				return false;
-			}
-			return !c.isSeriesProgressEnd;
-		}) != null;
-	}
-
-	public bool HasLoadingPlayer()
-	{
-		return FindPlayer((Player p) => p.isLoading) != null;
-	}
+  public bool HasLoadingPlayer()
+  {
+    return Object.op_Inequality((Object) this.FindPlayer((Predicate<Player>) (p => p.isLoading)), (Object) null);
+  }
 }

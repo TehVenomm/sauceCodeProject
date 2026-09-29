@@ -1,22 +1,21 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIDragDropContainer
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Interaction/Drag and Drop Container")]
-public class UIDragDropContainer
+public class UIDragDropContainer : MonoBehaviour
 {
-	public Transform reparentTarget;
+  public Transform reparentTarget;
 
-	public UIDragDropContainer()
-		: this()
-	{
-	}
-
-	protected virtual void Start()
-	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
-		if (reparentTarget == null)
-		{
-			reparentTarget = this.get_transform();
-		}
-	}
+  protected virtual void Start()
+  {
+    if (!Object.op_Equality((Object) this.reparentTarget, (Object) null))
+      return;
+    this.reparentTarget = ((Component) this).transform;
+  }
 }

@@ -1,19 +1,22 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Network.GuildRequest
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 
-namespace Network
+#nullable disable
+namespace Network;
+
+public class GuildRequest
 {
-	public class GuildRequest
-	{
-		public List<GuildRequestItem> guildRequestItemList;
+  public List<GuildRequestItem> guildRequestItemList;
 
-		public GuildRequest()
-		{
-			guildRequestItemList = new List<GuildRequestItem>();
-		}
+  public GuildRequest() => this.guildRequestItemList = new List<GuildRequestItem>();
 
-		public GuildRequest(List<GuildRequestItem> guildRequestItemList)
-		{
-			this.guildRequestItemList = guildRequestItemList;
-		}
-	}
+  public GuildRequest(List<GuildRequestItem> guildRequestItemList)
+  {
+    this.guildRequestItemList = guildRequestItemList;
+  }
 }

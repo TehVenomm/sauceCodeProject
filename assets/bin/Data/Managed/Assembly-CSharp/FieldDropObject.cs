@@ -1,548 +1,383 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: FieldDropObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using rhyme;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FieldDropObject : IAnimEvent
+#nullable disable
+public class FieldDropObject : MonoBehaviour, IAnimEvent
 {
-	protected enum AnimationStep
-	{
-		NONE,
-		MOVE_TO_TARGET_POS,
-		DROP_TO_GROUND,
-		OPEN,
-		GET
-	}
+  private static int startAnimHash = -1;
+  private static int endAnimHash = -1;
+  private static int openAnimHash = -1;
+  protected InGameSettingsManager.FieldDropItem parameter;
+  protected List<UIDropAnnounce.DropAnnounceInfo> announceInfo = new List<UIDropAnnounce.DropAnnounceInfo>();
+  protected List<InGameManager.DropItemInfo> itemInfo;
+  protected List<InGameManager.DropDeliveryInfo> deliveryInfo;
+  protected StageObject targetObject;
+  protected FloatInterpolator distanceAnim = new FloatInterpolator();
+  protected FloatInterpolator speedAnim = new FloatInterpolator();
+  protected FloatInterpolator scaleAnim = new FloatInterpolator();
+  protected FieldDropObject.AnimationStep animationStep;
+  protected float moveTime;
+  protected float distance;
+  protected bool isGet;
+  protected bool isDelete;
+  protected bool isRare;
+  protected AnimEventProcessor animEventProcessor;
+  private bool isOpend;
+  private Transform effect;
+  private float animationTimer;
+  private static readonly float MOVE_TO_TARGET_TIME = 0.5f;
+  private Vector3 dropPos;
+  private Vector3 targetPos;
+  private Vector3 prefabDefaultScale = Vector3.one;
 
-	private static int startAnimHash = -1;
+  public static FieldDropObject Create(
+    Coop_Model_EnemyDefeat model,
+    List<InGameManager.DropDeliveryInfo> deliveryList,
+    List<InGameManager.DropItemInfo> itemList)
+  {
+    if (itemList.Count <= 0 && deliveryList.Count <= 0)
+      return (FieldDropObject) null;
+    UIDropAnnounce.COLOR color = FieldDropObject.GetColor(model, deliveryList);
+    return FieldDropObject.CreateTreasureBox(model, deliveryList, itemList, color);
+  }
 
-	private static int endAnimHash = -1;
+  private static UIDropAnnounce.COLOR GetColor(
+    Coop_Model_EnemyDefeat model,
+    List<InGameManager.DropDeliveryInfo> deliveryList)
+  {
+    UIDropAnnounce.COLOR color = UIDropAnnounce.COLOR.NORMAL;
+    if (model.dropLoungeShare)
+      return UIDropAnnounce.COLOR.LOUNGE;
+    switch (model.boxType)
+    {
+      case 1:
+        return UIDropAnnounce.COLOR.SP_N;
+      case 2:
+        return UIDropAnnounce.COLOR.SP_HN;
+      case 3:
+        return UIDropAnnounce.COLOR.SP_R;
+      case 4:
+        return UIDropAnnounce.COLOR.HALLOWEEN;
+      case 5:
+        return UIDropAnnounce.COLOR.ESP_N;
+      case 6:
+        return UIDropAnnounce.COLOR.ESP_HN;
+      case 7:
+        return UIDropAnnounce.COLOR.ESP_R;
+      case 8:
+        return UIDropAnnounce.COLOR.SEASONAL;
+      default:
+        int index = 0;
+        for (int count = model.dropIds.Count; index < count; ++index)
+        {
+          if (color == UIDropAnnounce.COLOR.NORMAL)
+          {
+            switch ((REWARD_TYPE) model.dropTypes[index])
+            {
+              case REWARD_TYPE.EQUIP_ITEM:
+                EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint) model.dropItemIds[index]);
+                if (equipItemData != null && GameDefine.IsRare(equipItemData.rarity))
+                {
+                  color = UIDropAnnounce.COLOR.RARE;
+                  continue;
+                }
+                continue;
+              case REWARD_TYPE.SKILL_ITEM:
+                color = UIDropAnnounce.COLOR.RARE;
+                continue;
+              case REWARD_TYPE.ACCESSORY:
+                AccessoryTable.AccessoryData data = Singleton<AccessoryTable>.I.GetData((uint) model.dropItemIds[index]);
+                if (data != null && GameDefine.IsRare(data.rarity))
+                {
+                  color = UIDropAnnounce.COLOR.RARE;
+                  continue;
+                }
+                continue;
+              default:
+                ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint) model.dropItemIds[index]);
+                if (itemData != null && GameDefine.IsRare(itemData.rarity))
+                {
+                  color = UIDropAnnounce.COLOR.RARE;
+                  continue;
+                }
+                continue;
+            }
+          }
+        }
+        if (deliveryList.Count > 0 && color == UIDropAnnounce.COLOR.NORMAL)
+          color = UIDropAnnounce.COLOR.DELIVERY;
+        return color;
+    }
+  }
 
-	private static int openAnimHash = -1;
+  public static FieldDropObject CreateTreasureBox(
+    Coop_Model_EnemyDefeat model,
+    List<InGameManager.DropDeliveryInfo> deliveryList,
+    List<InGameManager.DropItemInfo> itemList,
+    UIDropAnnounce.COLOR color)
+  {
+    GameObject treasureBox1 = MonoBehaviourSingleton<InGameManager>.I.CreateTreasureBox(color);
+    FieldDropObject treasureBox2 = treasureBox1.GetComponent<FieldDropObject>();
+    if (Object.op_Equality((Object) treasureBox2, (Object) null))
+      treasureBox2 = treasureBox1.AddComponent<FieldDropObject>();
+    treasureBox2.itemInfo = itemList;
+    treasureBox2.deliveryInfo = deliveryList;
+    treasureBox2.rewardId = model.rewardId;
+    treasureBox2.isRare = color == UIDropAnnounce.COLOR.RARE;
+    Vector3 zero = Vector3.zero;
+    if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
+    {
+      InGameSettingsManager.FieldDropItem fieldDrop = MonoBehaviourSingleton<InGameSettingsManager>.I.fieldDrop;
+      float num1 = Random.value;
+      float num2 = Random.value;
+      float num3 = Random.value;
+      float num4 = (double) Random.value > 0.5 ? -1f : 1f;
+      float num5 = (double) Random.value > 0.5 ? -1f : 1f;
+      // ISSUE: explicit constructor call
+      ((Vector3) ref zero).\u002Ector(Mathf.Lerp(fieldDrop.offsetMin.x, fieldDrop.offsetMax.x, num1) * num4, Mathf.Lerp(fieldDrop.offsetMin.y, fieldDrop.offsetMax.y, num2), Mathf.Lerp(fieldDrop.offsetMin.z, fieldDrop.offsetMax.z, num3) * num5);
+    }
+    Vector3 vector3_1;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref vector3_1).\u002Ector((float) model.x, 0.0f, (float) model.z);
+    Vector3 vector3_2 = Vector3.op_Addition(vector3_1, zero);
+    int obstacleMask = AIUtility.GetObstacleMask();
+    RaycastHit hit = new RaycastHit();
+    if (AIUtility.RaycastForTargetPos(vector3_1, vector3_2, obstacleMask, out hit))
+    {
+      // ISSUE: explicit constructor call
+      ((Vector3) ref vector3_2).\u002Ector(((RaycastHit) ref hit).point.x, vector3_2.y, ((RaycastHit) ref hit).point.z);
+    }
+    treasureBox2.Drop(vector3_1, vector3_2);
+    return treasureBox2;
+  }
 
-	protected InGameSettingsManager.FieldDropItem parameter;
+  public Transform _transform { get; protected set; }
 
-	protected List<UIDropAnnounce.DropAnnounceInfo> announceInfo = new List<UIDropAnnounce.DropAnnounceInfo>();
+  public Animator animator { get; protected set; }
 
-	protected List<InGameManager.DropItemInfo> itemInfo;
+  public int rewardId { get; protected set; }
 
-	protected List<InGameManager.DropDeliveryInfo> deliveryInfo;
+  public TargetPoint targetPoint { set; get; }
 
-	protected StageObject targetObject;
+  private void Awake()
+  {
+    this._transform = ((Component) this).transform;
+    this.parameter = MonoBehaviourSingleton<InGameSettingsManager>.I.fieldDrop;
+    this.animator = ((Component) this).gameObject.GetComponentInChildren<Animator>();
+    if (FieldDropObject.startAnimHash == -1)
+      FieldDropObject.startAnimHash = Animator.StringToHash("Base Layer.Pop");
+    if (FieldDropObject.endAnimHash == -1)
+      FieldDropObject.endAnimHash = Animator.StringToHash("Base Layer.Idle");
+    if (FieldDropObject.openAnimHash == -1)
+      FieldDropObject.openAnimHash = Animator.StringToHash("Base Layer.Open");
+    if (!Object.op_Inequality((Object) this.parameter.animEventData, (Object) null) || !Object.op_Inequality((Object) this.animator, (Object) null))
+      return;
+    this.animEventProcessor = new AnimEventProcessor(this.parameter.animEventData, this.animator, (IAnimEvent) this);
+  }
 
-	protected FloatInterpolator distanceAnim = new FloatInterpolator();
+  private void OnEnable()
+  {
+    if (!this.isDelete)
+      this.prefabDefaultScale = this._transform.localScale;
+    this._transform.localScale = this.prefabDefaultScale;
+    this.isDelete = false;
+  }
 
-	protected FloatInterpolator speedAnim = new FloatInterpolator();
+  private void OnDisable()
+  {
+    if (this.isGet && MonoBehaviourSingleton<UIDropAnnounce>.IsValid())
+    {
+      int index = 0;
+      for (int count = this.announceInfo.Count; index < count; ++index)
+        MonoBehaviourSingleton<UIDropAnnounce>.I.Announce(this.announceInfo[index]);
+    }
+    if (!MonoBehaviourSingleton<InGameManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<InGameManager>.I.DeleteDropObject(this);
+  }
 
-	protected FloatInterpolator scaleAnim = new FloatInterpolator();
+  private void OnTriggerEnter(Collider collider)
+  {
+    if (!this.targetObject.isInitialized || this.isOpend || this.animationStep == FieldDropObject.AnimationStep.MOVE_TO_TARGET_POS || this.animationStep == FieldDropObject.AnimationStep.OPEN || !this.IsSelfAttack(((Component) collider).gameObject))
+      return;
+    this.OpenDropObject();
+  }
 
-	protected AnimationStep animationStep;
+  public bool IsSelfAttack(GameObject obj)
+  {
+    IAttackCollider component = obj.GetComponent<IAttackCollider>();
+    if (component == null || component is HealAttackObject)
+      return false;
+    StageObject fromObject = component.GetFromObject();
+    return fromObject != null && fromObject is Self;
+  }
 
-	protected float moveTime;
+  public void OpenDropObject()
+  {
+    if (this.isOpend)
+      return;
+    this.isOpend = true;
+    SoundManager.PlayOneShotUISE(10000071);
+    if (this.animEventProcessor != null)
+      this.animEventProcessor.CrossFade(FieldDropObject.openAnimHash, 0.0f);
+    this.effect = EffectManager.GetEffect("ef_btl_treasurebox_01");
+    this.effect.position = this._transform.position;
+    rymFX component = ((Component) this.effect).GetComponent<rymFX>();
+    if (Object.op_Inequality((Object) component, (Object) null))
+    {
+      component.AutoDelete = true;
+      component.LoopEnd = true;
+    }
+    MonoBehaviourSingleton<CoopNetworkManager>.I.RewardGet(this.rewardId);
+    if (this.deliveryInfo != null && this.deliveryInfo.Count > 0)
+      SoundManager.PlayOneShotUISE(40000155);
+    else if (this.isRare)
+      SoundManager.PlayOneShotUISE(40000154);
+    else
+      SoundManager.PlayOneShotUISE(10000064);
+    this.animationStep = FieldDropObject.AnimationStep.OPEN;
+  }
 
-	protected float distance;
+  private void LateUpdate()
+  {
+    if (Object.op_Equality((Object) this.targetObject, (Object) null))
+    {
+      ((Component) this).gameObject.SetActive(false);
+    }
+    else
+    {
+      if (this.animEventProcessor != null)
+        this.animEventProcessor.Update();
+      switch (this.animationStep)
+      {
+        case FieldDropObject.AnimationStep.MOVE_TO_TARGET_POS:
+          this.animationTimer += Time.deltaTime;
+          Vector3 vector3_1 = Vector3.Lerp(this.dropPos, this.targetPos, this.animationTimer / FieldDropObject.MOVE_TO_TARGET_TIME);
+          // ISSUE: explicit constructor call
+          ((Vector3) ref vector3_1).\u002Ector(vector3_1.x, this._transform.position.y, vector3_1.z);
+          this._transform.position = vector3_1;
+          if ((double) this.animationTimer < (double) FieldDropObject.MOVE_TO_TARGET_TIME)
+            break;
+          this.animationStep = FieldDropObject.AnimationStep.DROP_TO_GROUND;
+          break;
+        case FieldDropObject.AnimationStep.DROP_TO_GROUND:
+          AnimatorStateInfo animatorStateInfo1 = this.animator.GetCurrentAnimatorStateInfo(0);
+          if (((AnimatorStateInfo) ref animatorStateInfo1).fullPathHash == FieldDropObject.endAnimHash)
+          {
+            this.targetPoint = ((Component) this).GetComponent<TargetPoint>();
+            this.animationStep = FieldDropObject.AnimationStep.NONE;
+          }
+          if (this.isRare)
+          {
+            SoundManager.PlayOneShotUISE(10000061);
+            break;
+          }
+          SoundManager.PlayOneShotUISE(10000062);
+          break;
+        case FieldDropObject.AnimationStep.OPEN:
+          AnimatorStateInfo animatorStateInfo2 = this.animator.GetCurrentAnimatorStateInfo(0);
+          if (((AnimatorStateInfo) ref animatorStateInfo2).fullPathHash != FieldDropObject.openAnimHash || (double) ((AnimatorStateInfo) ref animatorStateInfo2).normalizedTime <= 0.99000000953674316)
+            break;
+          this.animationStep = FieldDropObject.AnimationStep.NONE;
+          if (Object.op_Inequality((Object) this.effect, (Object) null))
+            EffectManager.ReleaseEffect(((Component) this.effect).gameObject);
+          ((Component) this).gameObject.SetActive(false);
+          break;
+        case FieldDropObject.AnimationStep.GET:
+          if (this.distanceAnim.IsPlaying())
+          {
+            this.moveTime += Time.deltaTime;
+            Bounds bounds = this.targetObject._collider.bounds;
+            Vector3 center = ((Bounds) ref bounds).center;
+            Vector3 vector3_2 = Vector3.op_Subtraction(this._transform.position, center);
+            float magnitude = ((Vector3) ref vector3_2).magnitude;
+            if ((double) this.distance < (double) magnitude)
+              this.distance = magnitude;
+            Vector3 vector3_3 = Vector3.op_Multiply(Vector3.op_Multiply(((Vector3) ref vector3_2).normalized, this.distance), 1f - this.distanceAnim.Update());
+            Vector3 vector3_4 = Quaternion.op_Multiply(Quaternion.AngleAxis(this.moveTime * this.speedAnim.Update(), Vector3.up), vector3_3);
+            this._transform.position = Vector3.op_Addition(center, vector3_4);
+            Vector3 vector3_5 = Vector3.op_Multiply(Vector3.one, this.scaleAnim.Update());
+            if (!this.distanceAnim.IsPlaying())
+              break;
+            this._transform.localScale = vector3_5;
+            break;
+          }
+          Transform effect = EffectManager.GetEffect("ef_btl_mpdrop_01");
+          effect.position = this._transform.position;
+          rymFX component = ((Component) effect).GetComponent<rymFX>();
+          if (Object.op_Inequality((Object) component, (Object) null))
+          {
+            component.AutoDelete = true;
+            component.LoopEnd = true;
+          }
+          ((Component) this).gameObject.SetActive(false);
+          break;
+      }
+    }
+  }
 
-	protected bool isGet;
+  public virtual void Drop(Vector3 _dropPos, Vector3 _targetPos)
+  {
+    this.isOpend = false;
+    this.animationTimer = 0.0f;
+    this.animationStep = FieldDropObject.AnimationStep.MOVE_TO_TARGET_POS;
+    this.targetObject = (StageObject) MonoBehaviourSingleton<StageObjectManager>.I.self;
+    this.dropPos = _dropPos;
+    this._transform.position = _dropPos;
+    this.targetPos = _targetPos;
+    if (this.animEventProcessor == null)
+      return;
+    this.animEventProcessor.CrossFade(FieldDropObject.startAnimHash, 0.0f);
+  }
 
-	protected bool isDelete;
+  public void Delete(bool is_get)
+  {
+    if (this.isDelete)
+      return;
+    this.isDelete = true;
+    this.isGet = is_get;
+    if (is_get)
+    {
+      this.targetObject = (StageObject) MonoBehaviourSingleton<StageObjectManager>.I.self;
+      Bounds bounds = this.targetObject._collider.bounds;
+      this.distance = Vector3.Distance(((Bounds) ref bounds).center, this._transform.position);
+      this.distanceAnim.Set(this.parameter.getAnimTime, 0.0f, 1f, this.parameter.distanceAnim, 0.0f, (AnimationCurve) null);
+      this.distanceAnim.Play();
+      this.speedAnim.Set(this.parameter.getAnimTime, 0.0f, this.parameter.rotateSpeed, this.parameter.rotateSpeedAnim, 0.0f, (AnimationCurve) null);
+      this.speedAnim.Play();
+      this.scaleAnim.Set(this.parameter.getAnimTime, 0.0f, 1f, this.parameter.scaleAnim, 0.0f, (AnimationCurve) null);
+      this.scaleAnim.Play();
+      this.moveTime = 0.0f;
+      this.animationStep = FieldDropObject.AnimationStep.OPEN;
+      this.announceInfo = MonoBehaviourSingleton<InGameManager>.I.CreateDropAnnounceInfoList(this.deliveryInfo, this.itemInfo, true);
+    }
+    else
+      ((Component) this).gameObject.SetActive(false);
+  }
 
-	protected bool isRare;
+  public void OnAnimEvent(AnimEventData.EventData data)
+  {
+    if (data.id != AnimEventFormat.ID.SE_ONESHOT)
+      return;
+    int intArg = data.intArgs[0];
+    if (intArg == 0)
+      return;
+    SoundManager.PlayOneShotUISE(intArg);
+  }
 
-	protected AnimEventProcessor animEventProcessor;
-
-	private bool isOpend;
-
-	private Transform effect;
-
-	private float animationTimer;
-
-	private static readonly float MOVE_TO_TARGET_TIME = 0.5f;
-
-	private Vector3 dropPos;
-
-	private Vector3 targetPos;
-
-	private Vector3 prefabDefaultScale = Vector3.get_one();
-
-	public Transform _transform
-	{
-		get;
-		protected set;
-	}
-
-	public Animator animator
-	{
-		get;
-		protected set;
-	}
-
-	public int rewardId
-	{
-		get;
-		protected set;
-	}
-
-	public TargetPoint targetPoint
-	{
-		get;
-		set;
-	}
-
-	public FieldDropObject()
-		: this()
-	{
-	}//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-
-
-	public static FieldDropObject Create(Coop_Model_EnemyDefeat model, List<InGameManager.DropDeliveryInfo> deliveryList, List<InGameManager.DropItemInfo> itemList)
-	{
-		if (itemList.Count <= 0 && deliveryList.Count <= 0)
-		{
-			return null;
-		}
-		UIDropAnnounce.COLOR color = GetColor(model, deliveryList);
-		return CreateTreasureBox(model, deliveryList, itemList, color);
-	}
-
-	private static UIDropAnnounce.COLOR GetColor(Coop_Model_EnemyDefeat model, List<InGameManager.DropDeliveryInfo> deliveryList)
-	{
-		UIDropAnnounce.COLOR cOLOR = UIDropAnnounce.COLOR.NORMAL;
-		if (!model.dropLoungeShare)
-		{
-			switch (model.boxType)
-			{
-			case 1:
-				return UIDropAnnounce.COLOR.SP_N;
-			case 2:
-				return UIDropAnnounce.COLOR.SP_HN;
-			case 3:
-				return UIDropAnnounce.COLOR.SP_R;
-			case 4:
-				return UIDropAnnounce.COLOR.HALLOWEEN;
-			default:
-			{
-				int i = 0;
-				for (int count = model.dropIds.Count; i < count; i++)
-				{
-					if (cOLOR == UIDropAnnounce.COLOR.NORMAL)
-					{
-						switch (model.dropTypes[i])
-						{
-						case 5:
-							cOLOR = UIDropAnnounce.COLOR.RARE;
-							break;
-						case 4:
-						{
-							EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)model.dropItemIds[i]);
-							if (equipItemData != null && GameDefine.IsRare(equipItemData.rarity))
-							{
-								cOLOR = UIDropAnnounce.COLOR.RARE;
-							}
-							break;
-						}
-						default:
-						{
-							ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData((uint)model.dropItemIds[i]);
-							if (itemData != null && GameDefine.IsRare(itemData.rarity))
-							{
-								cOLOR = UIDropAnnounce.COLOR.RARE;
-							}
-							break;
-						}
-						}
-					}
-				}
-				if (deliveryList.Count > 0 && cOLOR == UIDropAnnounce.COLOR.NORMAL)
-				{
-					cOLOR = UIDropAnnounce.COLOR.DELIVERY;
-				}
-				return cOLOR;
-			}
-			}
-		}
-		return UIDropAnnounce.COLOR.LOUNGE;
-	}
-
-	public static FieldDropObject CreateTreasureBox(Coop_Model_EnemyDefeat model, List<InGameManager.DropDeliveryInfo> deliveryList, List<InGameManager.DropItemInfo> itemList, UIDropAnnounce.COLOR color)
-	{
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-		GameObject val = MonoBehaviourSingleton<InGameManager>.I.CreateTreasureBox(color);
-		FieldDropObject fieldDropObject = val.GetComponent<FieldDropObject>();
-		if (fieldDropObject == null)
-		{
-			fieldDropObject = val.AddComponent<FieldDropObject>();
-		}
-		fieldDropObject.itemInfo = itemList;
-		fieldDropObject.deliveryInfo = deliveryList;
-		fieldDropObject.rewardId = model.rewardId;
-		fieldDropObject.isRare = (color == UIDropAnnounce.COLOR.RARE);
-		Vector3 zero = Vector3.get_zero();
-		if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
-		{
-			InGameSettingsManager.FieldDropItem fieldDrop = MonoBehaviourSingleton<InGameSettingsManager>.I.fieldDrop;
-			float value = Random.get_value();
-			float value2 = Random.get_value();
-			float value3 = Random.get_value();
-			float num = (!(Random.get_value() > 0.5f)) ? 1f : (-1f);
-			float num2 = (!(Random.get_value() > 0.5f)) ? 1f : (-1f);
-			zero._002Ector(Mathf.Lerp(fieldDrop.offsetMin.x, fieldDrop.offsetMax.x, value) * num, Mathf.Lerp(fieldDrop.offsetMin.y, fieldDrop.offsetMax.y, value2), Mathf.Lerp(fieldDrop.offsetMin.z, fieldDrop.offsetMax.z, value3) * num2);
-		}
-		Vector3 val2 = default(Vector3);
-		val2._002Ector((float)model.x, 0f, (float)model.z);
-		Vector3 target = val2 + zero;
-		int obstacleMask = AIUtility.GetObstacleMask();
-		RaycastHit hit = default(RaycastHit);
-		if (AIUtility.RaycastForTargetPos(val2, target, obstacleMask, out hit))
-		{
-			Vector3 point = hit.get_point();
-			float x = point.x;
-			float y = target.y;
-			Vector3 point2 = hit.get_point();
-			target._002Ector(x, y, point2.z);
-		}
-		fieldDropObject.Drop(val2, target);
-		return fieldDropObject;
-	}
-
-	private void Awake()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		_transform = this.get_transform();
-		parameter = MonoBehaviourSingleton<InGameSettingsManager>.I.fieldDrop;
-		animator = this.get_gameObject().GetComponentInChildren<Animator>();
-		if (startAnimHash == -1)
-		{
-			startAnimHash = Animator.StringToHash("Base Layer.Pop");
-		}
-		if (endAnimHash == -1)
-		{
-			endAnimHash = Animator.StringToHash("Base Layer.Idle");
-		}
-		if (openAnimHash == -1)
-		{
-			openAnimHash = Animator.StringToHash("Base Layer.Open");
-		}
-		if (parameter.animEventData != null && animator != null)
-		{
-			animEventProcessor = new AnimEventProcessor(parameter.animEventData, animator, this);
-		}
-	}
-
-	private void OnEnable()
-	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		if (!isDelete)
-		{
-			prefabDefaultScale = _transform.get_localScale();
-		}
-		_transform.set_localScale(prefabDefaultScale);
-		isDelete = false;
-	}
-
-	private void OnDisable()
-	{
-		if (isGet && MonoBehaviourSingleton<UIDropAnnounce>.IsValid())
-		{
-			int i = 0;
-			for (int count = announceInfo.Count; i < count; i++)
-			{
-				MonoBehaviourSingleton<UIDropAnnounce>.I.Announce(announceInfo[i]);
-			}
-		}
-		if (MonoBehaviourSingleton<InGameManager>.IsValid())
-		{
-			MonoBehaviourSingleton<InGameManager>.I.DeleteDropObject(this);
-		}
-	}
-
-	private void OnTriggerEnter(Collider collider)
-	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Expected O, but got Unknown
-		if (targetObject.isInitialized && !isOpend && animationStep != AnimationStep.MOVE_TO_TARGET_POS && animationStep != AnimationStep.OPEN && IsSelfAttack(collider.get_gameObject()))
-		{
-			OpenDropObject();
-		}
-	}
-
-	public bool IsSelfAttack(GameObject obj)
-	{
-		IAttackCollider component = obj.GetComponent<IAttackCollider>();
-		if (object.ReferenceEquals(component, null))
-		{
-			return false;
-		}
-		if (component is HealAttackObject)
-		{
-			return false;
-		}
-		StageObject fromObject = component.GetFromObject();
-		if (object.ReferenceEquals(fromObject, null))
-		{
-			return false;
-		}
-		return fromObject is Self;
-	}
-
-	public void OpenDropObject()
-	{
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		if (!isOpend)
-		{
-			isOpend = true;
-			SoundManager.PlayOneShotUISE(10000071);
-			if (animEventProcessor != null)
-			{
-				animEventProcessor.CrossFade(openAnimHash, 0f);
-			}
-			effect = EffectManager.GetEffect("ef_btl_treasurebox_01", null);
-			effect.set_position(_transform.get_position());
-			rymFX component = effect.GetComponent<rymFX>();
-			if (component != null)
-			{
-				component.AutoDelete = true;
-				component.LoopEnd = true;
-			}
-			MonoBehaviourSingleton<CoopNetworkManager>.I.RewardGet(rewardId);
-			if (deliveryInfo != null && deliveryInfo.Count > 0)
-			{
-				SoundManager.PlayOneShotUISE(40000155);
-			}
-			else if (isRare)
-			{
-				SoundManager.PlayOneShotUISE(40000154);
-			}
-			else
-			{
-				SoundManager.PlayOneShotUISE(10000064);
-			}
-			animationStep = AnimationStep.OPEN;
-		}
-	}
-
-	private void LateUpdate()
-	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018a: Expected O, but got Unknown
-		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0234: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0247: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0251: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0257: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0261: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0270: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0280: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0285: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
-		if (targetObject == null)
-		{
-			this.get_gameObject().SetActive(false);
-		}
-		else
-		{
-			if (animEventProcessor != null)
-			{
-				animEventProcessor.Update();
-			}
-			switch (animationStep)
-			{
-			case AnimationStep.MOVE_TO_TARGET_POS:
-			{
-				animationTimer += Time.get_deltaTime();
-				Vector3 position2 = Vector3.Lerp(dropPos, targetPos, animationTimer / MOVE_TO_TARGET_TIME);
-				float x = position2.x;
-				Vector3 position3 = _transform.get_position();
-				position2._002Ector(x, position3.y, position2.z);
-				_transform.set_position(position2);
-				if (animationTimer >= MOVE_TO_TARGET_TIME)
-				{
-					animationStep = AnimationStep.DROP_TO_GROUND;
-				}
-				break;
-			}
-			case AnimationStep.DROP_TO_GROUND:
-			{
-				AnimatorStateInfo currentAnimatorStateInfo2 = animator.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo2.get_fullPathHash() == endAnimHash)
-				{
-					targetPoint = this.GetComponent<TargetPoint>();
-					animationStep = AnimationStep.NONE;
-				}
-				if (isRare)
-				{
-					SoundManager.PlayOneShotUISE(10000061);
-				}
-				else
-				{
-					SoundManager.PlayOneShotUISE(10000062);
-				}
-				break;
-			}
-			case AnimationStep.OPEN:
-			{
-				AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_fullPathHash() == openAnimHash && currentAnimatorStateInfo.get_normalizedTime() > 0.99f)
-				{
-					animationStep = AnimationStep.NONE;
-					if (effect != null)
-					{
-						EffectManager.ReleaseEffect(effect.get_gameObject(), true, false);
-					}
-					this.get_gameObject().SetActive(false);
-				}
-				break;
-			}
-			case AnimationStep.GET:
-				if (distanceAnim.IsPlaying())
-				{
-					moveTime += Time.get_deltaTime();
-					Bounds bounds = targetObject._collider.get_bounds();
-					Vector3 center = bounds.get_center();
-					Vector3 val = _transform.get_position() - center;
-					float magnitude = val.get_magnitude();
-					if (distance < magnitude)
-					{
-						distance = magnitude;
-					}
-					val = val.get_normalized() * distance * (1f - distanceAnim.Update());
-					Vector3 val2 = Quaternion.AngleAxis(moveTime * speedAnim.Update(), Vector3.get_up()) * val;
-					Vector3 position = center + val2;
-					_transform.set_position(position);
-					Vector3 localScale = Vector3.get_one() * scaleAnim.Update();
-					if (distanceAnim.IsPlaying())
-					{
-						_transform.set_localScale(localScale);
-					}
-				}
-				else
-				{
-					Transform val3 = EffectManager.GetEffect("ef_btl_mpdrop_01", null);
-					val3.set_position(_transform.get_position());
-					rymFX component = val3.GetComponent<rymFX>();
-					if (component != null)
-					{
-						component.AutoDelete = true;
-						component.LoopEnd = true;
-					}
-					this.get_gameObject().SetActive(false);
-				}
-				break;
-			}
-		}
-	}
-
-	public virtual void Drop(Vector3 _dropPos, Vector3 _targetPos)
-	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		isOpend = false;
-		animationTimer = 0f;
-		animationStep = AnimationStep.MOVE_TO_TARGET_POS;
-		targetObject = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		dropPos = _dropPos;
-		_transform.set_position(_dropPos);
-		targetPos = _targetPos;
-		if (animEventProcessor != null)
-		{
-			animEventProcessor.CrossFade(startAnimHash, 0f);
-		}
-	}
-
-	public void Delete(bool is_get)
-	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		if (!isDelete)
-		{
-			isDelete = true;
-			isGet = is_get;
-			if (is_get)
-			{
-				targetObject = MonoBehaviourSingleton<StageObjectManager>.I.self;
-				Bounds bounds = targetObject._collider.get_bounds();
-				distance = Vector3.Distance(bounds.get_center(), _transform.get_position());
-				distanceAnim.Set(parameter.getAnimTime, 0f, 1f, parameter.distanceAnim, 0f, null);
-				distanceAnim.Play();
-				speedAnim.Set(parameter.getAnimTime, 0f, parameter.rotateSpeed, parameter.rotateSpeedAnim, 0f, null);
-				speedAnim.Play();
-				scaleAnim.Set(parameter.getAnimTime, 0f, 1f, parameter.scaleAnim, 0f, null);
-				scaleAnim.Play();
-				moveTime = 0f;
-				animationStep = AnimationStep.OPEN;
-				announceInfo = MonoBehaviourSingleton<InGameManager>.I.CreateDropAnnounceInfoList(deliveryInfo, itemInfo, true);
-			}
-			else
-			{
-				this.get_gameObject().SetActive(false);
-			}
-		}
-	}
-
-	public void OnAnimEvent(AnimEventData.EventData data)
-	{
-		AnimEventFormat.ID id = data.id;
-		if (id == AnimEventFormat.ID.SE_ONESHOT)
-		{
-			int num = data.intArgs[0];
-			if (num != 0)
-			{
-				SoundManager.PlayOneShotUISE(num);
-			}
-		}
-	}
+  protected enum AnimationStep
+  {
+    NONE,
+    MOVE_TO_TARGET_POS,
+    DROP_TO_GROUND,
+    OPEN,
+    GET,
+  }
 }

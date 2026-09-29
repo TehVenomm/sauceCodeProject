@@ -1,137 +1,116 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: BlackListManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
+#nullable disable
 public class BlackListManager : MonoBehaviourSingleton<BlackListManager>
 {
-	private List<int> blackUserIdList = new List<int>();
+  private List<int> blackUserIdList = new List<int>();
+  private bool firstSetAllList = true;
 
-	private bool firstSetAllList = true;
+  private void _addBlackUserId(List<int> add)
+  {
+    this.blackUserIdList.AddRange((IEnumerable<int>) add);
+  }
 
-	private void _addBlackUserId(List<int> add)
-	{
-		blackUserIdList.AddRange(add);
-	}
+  private void _delBlackUserId(List<int> del)
+  {
+    del.ForEach((Action<int>) (userId => this.blackUserIdList.Remove(userId)));
+  }
 
-	private void _delBlackUserId(List<int> del)
-	{
-		del.ForEach(delegate(int userId)
-		{
-			blackUserIdList.Remove(userId);
-		});
-	}
+  public bool CheckBlackList(int userId) => this.blackUserIdList.Contains(userId);
 
-	public bool CheckBlackList(int userId)
-	{
-		return blackUserIdList.Contains(userId);
-	}
+  public int GetBlackListUserNum() => this.blackUserIdList.Count;
 
-	public int GetBlackListUserNum()
-	{
-		return blackUserIdList.Count;
-	}
+  public void SetAllList()
+  {
+    if (!this.firstSetAllList)
+      return;
+    this.firstSetAllList = false;
+    this.blackUserIdList = MonoBehaviourSingleton<OnceManager>.I.result.blacklist;
+  }
 
-	public void SetAllList()
-	{
-		if (firstSetAllList)
-		{
-			firstSetAllList = false;
-			blackUserIdList = MonoBehaviourSingleton<OnceManager>.I.result.blacklist;
-		}
-	}
+  public void SendList(int page, Action<bool, BlackListListModel.Param> call_back)
+  {
+    Protocol.Send<BlackListListModel.RequestSendForm, BlackListListModel>(BlackListListModel.URL, new BlackListListModel.RequestSendForm()
+    {
+      page = page
+    }, (Action<BlackListListModel>) (ret =>
+    {
+      bool flag = false;
+      if (ret.Error == Error.None)
+      {
+        flag = true;
+        MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
+      }
+      call_back(flag, ret.result);
+    }));
+  }
 
-	public void SendList(int page, Action<bool, BlackListListModel.Param> call_back)
-	{
-		BlackListListModel.RequestSendForm requestSendForm = new BlackListListModel.RequestSendForm();
-		requestSendForm.page = page;
-		Protocol.Send(BlackListListModel.URL, requestSendForm, delegate(BlackListListModel ret)
-		{
-			bool arg = false;
-			if (ret.Error == Error.None)
-			{
-				arg = true;
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
-			}
-			call_back(arg, ret.result);
-		}, string.Empty);
-	}
+  public void SendAdd(int targetId, Action<bool> call_back)
+  {
+    Protocol.Send<BlackListAddModel.RequestSendForm, BlackListAddModel>(BlackListAddModel.URL, new BlackListAddModel.RequestSendForm()
+    {
+      id = targetId
+    }, (Action<BlackListAddModel>) (ret =>
+    {
+      bool flag = false;
+      if (ret.Error == Error.None)
+      {
+        flag = true;
+        if (MonoBehaviourSingleton<FriendManager>.IsValid())
+          MonoBehaviourSingleton<FriendManager>.I.SetFollowToHomeCharaInfo(targetId, false);
+        if (MonoBehaviourSingleton<QuestManager>.IsValid())
+          MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.SetResultBlacklistInfo(targetId);
+        MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
+      }
+      call_back(flag);
+    }));
+  }
 
-	public void SendAdd(int targetId, Action<bool> call_back)
-	{
-		BlackListAddModel.RequestSendForm requestSendForm = new BlackListAddModel.RequestSendForm();
-		requestSendForm.id = targetId;
-		Protocol.Send(BlackListAddModel.URL, requestSendForm, delegate(BlackListAddModel ret)
-		{
-			bool obj = false;
-			if (ret.Error == Error.None)
-			{
-				obj = true;
-				if (MonoBehaviourSingleton<FriendManager>.IsValid())
-				{
-					MonoBehaviourSingleton<FriendManager>.I.SetFollowToHomeCharaInfo(targetId, false);
-				}
-				if (MonoBehaviourSingleton<QuestManager>.IsValid())
-				{
-					MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.SetResultBlacklistInfo(targetId);
-				}
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
-			}
-			call_back(obj);
-		}, string.Empty);
-	}
+  public void SendDelete(int targetId, Action<bool> call_back)
+  {
+    Protocol.Send<BlackListDeleteModel.RequestSendForm, BlackListDeleteModel>(BlackListDeleteModel.URL, new BlackListDeleteModel.RequestSendForm()
+    {
+      id = targetId
+    }, (Action<BlackListDeleteModel>) (ret =>
+    {
+      bool flag = false;
+      if (ret.Error == Error.None)
+      {
+        flag = true;
+        MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
+      }
+      call_back(flag);
+    }));
+  }
 
-	public void SendDelete(int targetId, Action<bool> call_back)
-	{
-		BlackListDeleteModel.RequestSendForm requestSendForm = new BlackListDeleteModel.RequestSendForm();
-		requestSendForm.id = targetId;
-		Protocol.Send(BlackListDeleteModel.URL, requestSendForm, delegate(BlackListDeleteModel ret)
-		{
-			bool obj = false;
-			if (ret.Error == Error.None)
-			{
-				obj = true;
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
-			}
-			call_back(obj);
-		}, string.Empty);
-	}
+  public void Dirty()
+  {
+  }
 
-	public void SendDebugRegsteredBlackList(int targetId, int delete, Action<bool> call_back)
-	{
-		DebugRegisteredBlackListModel.RequestSendForm requestSendForm = new DebugRegisteredBlackListModel.RequestSendForm();
-		requestSendForm.id = targetId;
-		requestSendForm.del = delete;
-		Protocol.Send(DebugRegisteredBlackListModel.URL, requestSendForm, delegate(DebugRegisteredBlackListModel ret)
-		{
-			bool obj = false;
-			if (ret.Error == Error.None)
-			{
-				obj = true;
-			}
-			call_back(obj);
-		}, string.Empty);
-	}
-
-	public void Dirty()
-	{
-	}
-
-	public void OnDiff(BaseModelDiff.DiffBlackList diff)
-	{
-		bool flag = false;
-		if (Utility.IsExist(diff.add))
-		{
-			_addBlackUserId(diff.add);
-			flag = true;
-		}
-		if (Utility.IsExist(diff.del))
-		{
-			_delBlackUserId(diff.del);
-			flag = true;
-		}
-		if (flag)
-		{
-			Dirty();
-		}
-	}
+  public void OnDiff(BaseModelDiff.DiffBlackList diff)
+  {
+    bool flag = false;
+    if (Utility.IsExist((ICollection) diff.add))
+    {
+      this._addBlackUserId(diff.add);
+      flag = true;
+    }
+    if (Utility.IsExist((ICollection) diff.del))
+    {
+      this._delBlackUserId(diff.del);
+      flag = true;
+    }
+    if (!flag)
+      return;
+    this.Dirty();
+  }
 }

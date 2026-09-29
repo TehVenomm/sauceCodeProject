@@ -1,13 +1,18 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: DebugAddSkillItemModel
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class DebugAddSkillItemModel : BaseModel
 {
-	public class RequestSendForm
-	{
-		public int skillItemId;
+  public static string URL = "ajax/debug/addskillitem";
 
-		public int level;
-
-		public int exceed;
-	}
-
-	public static string URL = "ajax/debug/addskillitem";
+  public class RequestSendForm
+  {
+    public int skillItemId;
+    public int level;
+    public int exceed;
+  }
 }

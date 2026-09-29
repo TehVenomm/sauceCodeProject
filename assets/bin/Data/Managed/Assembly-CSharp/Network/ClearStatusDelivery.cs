@@ -1,35 +1,33 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Network.ClearStatusDelivery
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 
-namespace Network
+#nullable disable
+namespace Network;
+
+[Serializable]
+public class ClearStatusDelivery
 {
-	[Serializable]
-	public class ClearStatusDelivery
-	{
-		public int deliveryId;
+  public int deliveryId;
+  public int deliveryStatus;
+  public List<int> needCount = new List<int>();
 
-		public int deliveryStatus;
+  public int GetNeedCount(uint idx = 0)
+  {
+    return (long) idx >= (long) this.needCount.Count ? 0 : this.needCount[(int) idx];
+  }
 
-		public List<int> needCount = new List<int>();
-
-		public int GetNeedCount(uint idx = 0)
-		{
-			if (idx >= needCount.Count)
-			{
-				return 0;
-			}
-			return needCount[(int)idx];
-		}
-
-		public int GetAllNeedCount()
-		{
-			int num = 0;
-			int i = 0;
-			for (int count = needCount.Count; i < count; i++)
-			{
-				num += needCount[i];
-			}
-			return num;
-		}
-	}
+  public int GetAllNeedCount()
+  {
+    int allNeedCount = 0;
+    int index = 0;
+    for (int count = this.needCount.Count; index < count; ++index)
+      allNeedCount += this.needCount[index];
+    return allNeedCount;
+  }
 }

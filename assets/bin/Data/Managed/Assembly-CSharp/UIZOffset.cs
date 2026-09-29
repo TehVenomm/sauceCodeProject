@@ -1,40 +1,36 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIZOffset
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class UIZOffset
+#nullable disable
+public class UIZOffset : MonoBehaviour
 {
-	private Material _mat;
+  private Material _mat;
+  [SerializeField]
+  private int zOffset;
+  private int sourceQueue;
 
-	[SerializeField]
-	private int zOffset;
+  private void Awake()
+  {
+    MeshRenderer component = ((Component) this).GetComponent<MeshRenderer>();
+    this._mat = new Material(((Renderer) component).sharedMaterial);
+    this.sourceQueue = this._mat.renderQueue;
+    this._mat.renderQueue = this.sourceQueue + this.zOffset;
+    ((Renderer) component).material = this._mat;
+  }
 
-	private int sourceQueue;
+  private void Update()
+  {
+  }
 
-	public UIZOffset()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
-		MeshRenderer component = this.GetComponent<MeshRenderer>();
-		_mat = new Material(component.get_sharedMaterial());
-		sourceQueue = _mat.get_renderQueue();
-		_mat.set_renderQueue(sourceQueue + zOffset);
-		component.set_material(_mat);
-	}
-
-	private void Update()
-	{
-	}
-
-	private void OnDestroy()
-	{
-		if (_mat != null)
-		{
-			Object.Destroy(_mat);
-		}
-	}
+  private void OnDestroy()
+  {
+    if (!Object.op_Inequality((Object) this._mat, (Object) null))
+      return;
+    Object.Destroy((Object) this._mat);
+  }
 }

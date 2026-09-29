@@ -1,121 +1,112 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: GooglePlayGames.PlayGamesUserProfile
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using GooglePlayGames.OurUtils;
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SocialPlatforms;
 
-namespace GooglePlayGames
+#nullable disable
+namespace GooglePlayGames;
+
+public class PlayGamesUserProfile : IUserProfile
 {
-	public class PlayGamesUserProfile
-	{
-		private string mDisplayName;
+  private string mDisplayName;
+  private string mPlayerId;
+  private string mAvatarUrl;
+  private volatile bool mImageLoading;
+  private Texture2D mImage;
 
-		private string mPlayerId;
+  internal PlayGamesUserProfile(string displayName, string playerId, string avatarUrl)
+  {
+    this.mDisplayName = displayName;
+    this.mPlayerId = playerId;
+    this.mAvatarUrl = avatarUrl;
+    this.mImageLoading = false;
+  }
 
-		private string mAvatarUrl;
+  protected void ResetIdentity(string displayName, string playerId, string avatarUrl)
+  {
+    this.mDisplayName = displayName;
+    this.mPlayerId = playerId;
+    if (this.mAvatarUrl != avatarUrl)
+    {
+      this.mImage = (Texture2D) null;
+      this.mAvatarUrl = avatarUrl;
+    }
+    this.mImageLoading = false;
+  }
 
-		private volatile bool mImageLoading;
+  public string userName => this.mDisplayName;
 
-		private Texture2D mImage;
+  public string id => this.mPlayerId;
 
-		public string userName => mDisplayName;
+  public bool isFriend => true;
 
-		public string id => mPlayerId;
+  public UserState state => (UserState) 0;
 
-		public bool isFriend => true;
+  public Texture2D image
+  {
+    get
+    {
+      if (!this.mImageLoading && Object.op_Equality((Object) this.mImage, (Object) null) && !string.IsNullOrEmpty(this.AvatarURL))
+      {
+        Debug.Log((object) ("Starting to load image: " + this.AvatarURL));
+        this.mImageLoading = true;
+        PlayGamesHelperObject.RunCoroutine(this.LoadImage());
+      }
+      return this.mImage;
+    }
+  }
 
-		public UserState state => 0;
+  public string AvatarURL => this.mAvatarUrl;
 
-		public Texture2D image
-		{
-			get
-			{
-				if (!mImageLoading && mImage == null && !string.IsNullOrEmpty(AvatarURL))
-				{
-					Debug.Log((object)("Starting to load image: " + AvatarURL));
-					mImageLoading = true;
-					PlayGamesHelperObject.RunCoroutine(LoadImage());
-				}
-				return mImage;
-			}
-		}
+  internal IEnumerator LoadImage()
+  {
+    if (!string.IsNullOrEmpty(this.AvatarURL))
+    {
+      UnityWebRequest www = UnityWebRequestTexture.GetTexture(this.AvatarURL);
+      www.SendWebRequest();
+      while (!www.isDone)
+        yield return (object) null;
+      if (www.error == null)
+      {
+        this.mImage = DownloadHandlerTexture.GetContent(www);
+      }
+      else
+      {
+        this.mImage = Texture2D.blackTexture;
+        Debug.Log((object) ("Error downloading image: " + www.error));
+      }
+      this.mImageLoading = false;
+      www = (UnityWebRequest) null;
+    }
+    else
+    {
+      Debug.Log((object) "No URL found.");
+      this.mImage = Texture2D.blackTexture;
+      this.mImageLoading = false;
+    }
+  }
 
-		public string AvatarURL => mAvatarUrl;
+  public override bool Equals(object obj)
+  {
+    if (obj == null)
+      return false;
+    if (this == obj)
+      return true;
+    return obj is PlayGamesUserProfile gamesUserProfile && StringComparer.Ordinal.Equals(this.mPlayerId, gamesUserProfile.mPlayerId);
+  }
 
-		internal PlayGamesUserProfile(string displayName, string playerId, string avatarUrl)
-		{
-			mDisplayName = displayName;
-			mPlayerId = playerId;
-			mAvatarUrl = avatarUrl;
-			mImageLoading = false;
-		}
+  public override int GetHashCode()
+  {
+    return typeof (PlayGamesUserProfile).GetHashCode() ^ this.mPlayerId.GetHashCode();
+  }
 
-		protected void ResetIdentity(string displayName, string playerId, string avatarUrl)
-		{
-			mDisplayName = displayName;
-			mPlayerId = playerId;
-			if (mAvatarUrl != avatarUrl)
-			{
-				mImage = null;
-				mAvatarUrl = avatarUrl;
-			}
-			mImageLoading = false;
-		}
-
-		internal IEnumerator LoadImage()
-		{
-			if (!string.IsNullOrEmpty(AvatarURL))
-			{
-				WWW www = new WWW(AvatarURL);
-				while (!www.get_isDone())
-				{
-					yield return (object)null;
-				}
-				if (www.get_error() == null)
-				{
-					mImage = www.get_texture();
-				}
-				else
-				{
-					mImage = Texture2D.get_blackTexture();
-					Debug.Log((object)("Error downloading image: " + www.get_error()));
-				}
-				mImageLoading = false;
-			}
-			else
-			{
-				Debug.Log((object)"No URL found.");
-				mImage = Texture2D.get_blackTexture();
-				mImageLoading = false;
-			}
-		}
-
-		public override bool Equals(object obj)
-		{
-			if (obj == null)
-			{
-				return false;
-			}
-			if (object.ReferenceEquals(this, obj))
-			{
-				return true;
-			}
-			PlayGamesUserProfile playGamesUserProfile = obj as PlayGamesUserProfile;
-			if (playGamesUserProfile == null)
-			{
-				return false;
-			}
-			return StringComparer.Ordinal.Equals(mPlayerId, playGamesUserProfile.mPlayerId);
-		}
-
-		public override int GetHashCode()
-		{
-			return typeof(PlayGamesUserProfile).GetHashCode() ^ mPlayerId.GetHashCode();
-		}
-
-		public override string ToString()
-		{
-			return $"[Player: '{mDisplayName}' (id {mPlayerId})]";
-		}
-	}
+  public override string ToString() => $"[Player: '{this.mDisplayName}' (id {this.mPlayerId})]";
 }

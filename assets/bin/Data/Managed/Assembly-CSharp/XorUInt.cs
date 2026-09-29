@@ -1,99 +1,70 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: XorUInt
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Threading;
 
+#nullable disable
 public class XorUInt
 {
-	private const int gens = 5;
+  private uint key;
+  private const int gens = 5;
+  private static Random[] s_rnds = new Random[5]
+  {
+    new Random(),
+    new Random(),
+    new Random(),
+    new Random(),
+    new Random()
+  };
+  private static int cnt = 0;
 
-	private uint key;
+  public XorUInt()
+    : this(0U)
+  {
+  }
 
-	private static Random[] s_rnds = new Random[5]
-	{
-		new Random(),
-		new Random(),
-		new Random(),
-		new Random(),
-		new Random()
-	};
+  public XorUInt(uint value)
+  {
+    this.GenerateKey();
+    this.rawValue = this.Xor(value);
+  }
 
-	private static int cnt = 0;
+  private void GenerateKey()
+  {
+    Interlocked.Increment(ref XorUInt.cnt);
+    Random rnd = XorUInt.s_rnds[XorUInt.cnt % 5];
+    lock (rnd)
+      this.key = (uint) rnd.Next();
+  }
 
-	public uint rawValue
-	{
-		get;
-		private set;
-	}
+  public uint rawValue { get; private set; }
 
-	public uint value
-	{
-		get
-		{
-			return Xor(rawValue);
-		}
-		set
-		{
-			rawValue = Xor(value);
-		}
-	}
+  public uint value
+  {
+    get => this.Xor(this.rawValue);
+    set => this.rawValue = this.Xor(value);
+  }
 
-	public XorUInt()
-		: this(0u)
-	{
-	}
+  private uint Xor(uint x) => x ^ this.key;
 
-	public XorUInt(uint value)
-	{
-		GenerateKey();
-		rawValue = Xor(value);
-	}
+  public static implicit operator uint(XorUInt xor) => xor == null ? 0U : xor.value;
 
-	private void GenerateKey()
-	{
-		Interlocked.Increment(ref cnt);
-		Random random = s_rnds[cnt % 5];
-		lock (random)
-		{
-			key = (uint)random.Next();
-		}
-	}
+  public static explicit operator int(XorUInt xor) => xor == null ? 0 : (int) xor.value;
 
-	private uint Xor(uint x)
-	{
-		return x ^ key;
-	}
+  public static implicit operator XorUInt(uint val) => new XorUInt(val);
 
-	public override string ToString()
-	{
-		return value.ToString();
-	}
+  public override string ToString() => this.value.ToString();
 
-	public string ToString(string format)
-	{
-		return value.ToString(format);
-	}
+  public string ToString(string format) => this.value.ToString(format);
 
-	public string ToString(IFormatProvider provider)
-	{
-		return value.ToString(provider);
-	}
+  public string ToString(IFormatProvider provider) => this.value.ToString(provider);
 
-	public string ToString(string format, IFormatProvider provider)
-	{
-		return value.ToString(format, provider);
-	}
-
-	public static implicit operator uint(XorUInt xor)
-	{
-		return xor?.value ?? 0;
-	}
-
-	public static explicit operator int(XorUInt xor)
-	{
-		return (int)(xor?.value ?? 0);
-	}
-
-	public static implicit operator XorUInt(uint val)
-	{
-		return new XorUInt(val);
-	}
+  public string ToString(string format, IFormatProvider provider)
+  {
+    return this.value.ToString(format, provider);
+  }
 }

@@ -1,123 +1,107 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: GoGameTimeManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class GoGameTimeManager : MonoBehaviourSingleton<GoGameTimeManager>
 {
-	[Flags]
-	public enum STOP_FLAG
-	{
-		DEBUG_MANAGER = 0x1,
-		DEBUG_FUNC = 0x2
-	}
+  private DateTime? currentTime;
+  private float elapsedTime;
 
-	private DateTime? currentTime;
+  public GoGameTimeManager.STOP_FLAG stopFlags { get; private set; }
 
-	private float elapsedTime;
+  protected override void Awake()
+  {
+    base.Awake();
+    Time.timeScale = 1f;
+  }
 
-	public STOP_FLAG stopFlags
-	{
-		get;
-		private set;
-	}
+  public void SetStop(GoGameTimeManager.STOP_FLAG flag, bool is_stop)
+  {
+    if (is_stop)
+      this.stopFlags |= flag;
+    else
+      this.stopFlags &= ~flag;
+    Time.timeScale = this.IsStop() ? 0.0f : 1f;
+  }
 
-	protected override void Awake()
-	{
-		base.Awake();
-		Time.set_timeScale(1f);
-	}
+  public bool IsStop() => this.stopFlags != 0;
 
-	public void SetStop(STOP_FLAG flag, bool is_stop)
-	{
-		if (is_stop)
-		{
-			stopFlags |= flag;
-		}
-		else
-		{
-			stopFlags &= ~flag;
-		}
-		Time.set_timeScale((!IsStop()) ? 1f : 0f);
-	}
+  public static DateTime GetNow()
+  {
+    return !MonoBehaviourSingleton<GoGameTimeManager>.IsValid() || !MonoBehaviourSingleton<GoGameTimeManager>.I.currentTime.HasValue ? DateTime.Now : MonoBehaviourSingleton<GoGameTimeManager>.I.currentTime.Value.AddSeconds((double) MonoBehaviourSingleton<GoGameTimeManager>.I.elapsedTime);
+  }
 
-	public bool IsStop()
-	{
-		return stopFlags != (STOP_FLAG)0;
-	}
+  public static void SetServerTime(string time)
+  {
+    DateTime result;
+    if (!DateTime.TryParse(time, out result))
+      return;
+    MonoBehaviourSingleton<GoGameTimeManager>.I.currentTime = new DateTime?(result);
+    MonoBehaviourSingleton<GoGameTimeManager>.I.elapsedTime = 0.0f;
+  }
 
-	public static DateTime GetNow()
-	{
-		if (!MonoBehaviourSingleton<GoGameTimeManager>.IsValid() || !MonoBehaviourSingleton<GoGameTimeManager>.I.currentTime.HasValue)
-		{
-			return DateTime.Now;
-		}
-		return MonoBehaviourSingleton<GoGameTimeManager>.I.currentTime.Value.AddSeconds((double)MonoBehaviourSingleton<GoGameTimeManager>.I.elapsedTime);
-	}
+  public static string GetRemainTimeToText(TimeSpan span, int digitNum = 3)
+  {
+    string str = "";
+    if (span.Seconds > 0)
+      span = span.Add(TimeSpan.FromMinutes(1.0));
+    int num1 = 0;
+    if (span.Days > 0 && num1 < digitNum)
+    {
+      str += string.Format(StringTable.Get(STRING_CATEGORY.TIME, 0U), (object) span.Days);
+      ++num1;
+    }
+    if (span.Hours > 0 && num1 < digitNum)
+    {
+      str += string.Format(StringTable.Get(STRING_CATEGORY.TIME, 1U), (object) span.Hours);
+      ++num1;
+    }
+    if (span.Minutes > 0 && num1 < digitNum)
+    {
+      str += string.Format(StringTable.Get(STRING_CATEGORY.TIME, 2U), (object) span.Minutes);
+      int num2 = num1 + 1;
+    }
+    return str == "" ? string.Format(StringTable.Get(STRING_CATEGORY.TIME, 2U), (object) 0) : str;
+  }
 
-	public static void SetServerTime(string time)
-	{
-		if (DateTime.TryParse(time, out DateTime result))
-		{
-			MonoBehaviourSingleton<GoGameTimeManager>.I.currentTime = result;
-			MonoBehaviourSingleton<GoGameTimeManager>.I.elapsedTime = 0f;
-		}
-	}
+  public static string GetRemainTimeToText(string targetDateTime, int digitNum = 3)
+  {
+    return GoGameTimeManager.GetRemainTimeToText(GoGameTimeManager.GetRemainTime(targetDateTime), digitNum);
+  }
 
-	public static string GetRemainTimeToText(TimeSpan span, int digitNum = 3)
-	{
-		string text = string.Empty;
-		if (span.Seconds > 0)
-		{
-			span = span.Add(TimeSpan.FromMinutes(1.0));
-		}
-		int num = 0;
-		if (span.Days > 0 && num < digitNum)
-		{
-			text += string.Format(StringTable.Get(STRING_CATEGORY.TIME, 0u), span.Days);
-			num++;
-		}
-		if (span.Hours > 0 && num < digitNum)
-		{
-			text += string.Format(StringTable.Get(STRING_CATEGORY.TIME, 1u), span.Hours);
-			num++;
-		}
-		if (span.Minutes > 0 && num < digitNum)
-		{
-			text += string.Format(StringTable.Get(STRING_CATEGORY.TIME, 2u), span.Minutes);
-			num++;
-		}
-		if (text == string.Empty)
-		{
-			return string.Format(StringTable.Get(STRING_CATEGORY.TIME, 2u), 0);
-		}
-		return text;
-	}
+  public static TimeSpan GetRemainTime(string targetDateTime)
+  {
+    DateTime result;
+    return DateTime.TryParse(targetDateTime, out result) ? GoGameTimeManager.GetRemainTime(result) : TimeSpan.FromDays(99.0);
+  }
 
-	public static string GetRemainTimeToText(string targetDateTime, int digitNum = 3)
-	{
-		return GetRemainTimeToText(GetRemainTime(targetDateTime), digitNum);
-	}
+  private static TimeSpan GetRemainTime(DateTime targetDateTime)
+  {
+    return targetDateTime - GoGameTimeManager.GetNow();
+  }
 
-	public static TimeSpan GetRemainTime(string targetDateTime)
-	{
-		if (DateTime.TryParse(targetDateTime, out DateTime result))
-		{
-			return GetRemainTime(result);
-		}
-		return TimeSpan.FromDays(99.0);
-	}
+  private void Update() => this.elapsedTime += Time.unscaledDeltaTime;
 
-	private static TimeSpan GetRemainTime(DateTime targetDateTime)
-	{
-		return targetDateTime - GetNow();
-	}
+  public static DateTime CombineDateAndTime(DateTime date, DateTime time)
+  {
+    return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second);
+  }
 
-	private void Update()
-	{
-		elapsedTime += Time.get_unscaledDeltaTime();
-	}
+  public static bool HasValue()
+  {
+    return MonoBehaviourSingleton<GoGameTimeManager>.IsValid() && MonoBehaviourSingleton<GoGameTimeManager>.I.currentTime.HasValue;
+  }
 
-	public static DateTime CombineDateAndTime(DateTime date, DateTime time)
-	{
-		return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second);
-	}
+  [Flags]
+  public enum STOP_FLAG
+  {
+    DEBUG_MANAGER = 1,
+    DEBUG_FUNC = 2,
+  }
 }

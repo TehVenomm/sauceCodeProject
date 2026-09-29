@@ -1,79 +1,77 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIPlayerAnnounce
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class UIPlayerAnnounce : UIAnnounceBase<UIPlayerAnnounce>
 {
-	public enum ANNOUNCE_TYPE
-	{
-		REGION,
-		WEAK,
-		DOWN,
-		SKILL,
-		LEVEL_UP,
-		SHIELD_ON,
-		SHIELD_OFF,
-		MAX
-	}
+  [SerializeField]
+  protected UILabel playerName;
+  [SerializeField]
+  protected UILabel announceName;
+  [SerializeField]
+  protected UILabel announceEffect;
+  [SerializeField]
+  protected UIPlayerAnnounce.LabelSettings[] labelSettings = new UIPlayerAnnounce.LabelSettings[9];
 
-	[Serializable]
-	public class LabelSettings
-	{
-		public string text;
+  public void Announce(UIPlayerAnnounce.ANNOUNCE_TYPE type, Player player)
+  {
+    ((Component) this).gameObject.SetActive(true);
+    if (!this.AnnounceStart(player))
+      return;
+    this.announceName.text = this.labelSettings[(int) type].text;
+    this.announceName.gradientTop = this.labelSettings[(int) type].topColor;
+    this.announceName.gradientBottom = this.labelSettings[(int) type].bottomColor;
+    this.announceEffect.text = this.labelSettings[(int) type].text;
+    this.playerName.text = player.charaName;
+    this.announceName.fontStyle = this.style;
+    this.announceEffect.fontStyle = this.style;
+    this.playerName.fontStyle = this.style;
+  }
 
-		public Color topColor;
+  public void StartSkill(string skill_name, Player player)
+  {
+    ((Component) this).gameObject.SetActive(true);
+    if (!this.AnnounceStart(player))
+      return;
+    this.announceName.text = skill_name;
+    this.announceName.gradientTop = this.labelSettings[3].topColor;
+    this.announceName.gradientBottom = this.labelSettings[3].bottomColor;
+    this.announceEffect.text = skill_name;
+    this.playerName.text = player.charaName;
+    this.announceName.fontStyle = this.style;
+    this.announceEffect.fontStyle = this.style;
+    this.playerName.fontStyle = this.style;
+  }
 
-		public Color bottomColor;
-	}
+  protected override void OnStart() => ((Component) this).gameObject.SetActive(false);
 
-	[SerializeField]
-	protected UILabel playerName;
+  protected override void OnAfterAnimation() => ((Component) this).gameObject.SetActive(false);
 
-	[SerializeField]
-	protected UILabel announceName;
+  public enum ANNOUNCE_TYPE
+  {
+    REGION,
+    WEAK,
+    DOWN,
+    SKILL,
+    LEVEL_UP,
+    SHIELD_ON,
+    SHIELD_OFF,
+    DRAGON_ARMOR,
+    GIMMICK_EVOLVE,
+    MAX,
+  }
 
-	[SerializeField]
-	protected UILabel announceEffect;
-
-	[SerializeField]
-	protected LabelSettings[] labelSettings = new LabelSettings[7];
-
-	public void Announce(ANNOUNCE_TYPE type, Player player)
-	{
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		if (AnnounceStart(player))
-		{
-			announceName.text = labelSettings[(int)type].text;
-			announceName.gradientTop = labelSettings[(int)type].topColor;
-			announceName.gradientBottom = labelSettings[(int)type].bottomColor;
-			announceEffect.text = labelSettings[(int)type].text;
-			playerName.text = player.charaName;
-			announceName.fontStyle = style;
-			announceEffect.fontStyle = style;
-			playerName.fontStyle = style;
-		}
-	}
-
-	public void StartSkill(string skill_name, Player player)
-	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		if (AnnounceStart(player))
-		{
-			announceName.text = skill_name;
-			announceName.gradientTop = labelSettings[3].topColor;
-			announceName.gradientBottom = labelSettings[3].bottomColor;
-			announceEffect.text = skill_name;
-			playerName.text = player.charaName;
-			announceName.fontStyle = style;
-			announceEffect.fontStyle = style;
-			playerName.fontStyle = style;
-		}
-	}
+  [Serializable]
+  public class LabelSettings
+  {
+    public string text;
+    public Color topColor;
+    public Color bottomColor;
+  }
 }

@@ -1,531 +1,573 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: FriendManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
+#nullable disable
 public class FriendManager : MonoBehaviourSingleton<FriendManager>
 {
-	public const int DRAW_FOLLOW_MAX = 10;
+  private bool _isHomeCharaCached;
+  public const int DRAW_FOLLOW_MAX = 10;
+  private FriendFollowListModel.Param recvFollowList;
+  private FriendFollowListModel.Param recvFollowerList;
+  private FriendMessageUserListModel.Param recvMessageUserList;
+  private List<FriendMessageUserListModel.MessageUserInfo> recvUserListAtLeastGetMessageOnce;
+  private string mutualFollowValue = "";
+  private FriendSearchResult recvSearchList;
 
-	private FriendFollowListModel.Param recvFollowList;
+  public HomeCharaInfoList homeCharas { get; private set; }
 
-	private FriendFollowListModel.Param recvFollowerList;
+  public bool IsHomeCharaCached => this._isHomeCharaCached;
 
-	private FriendMessageUserListModel.Param recvMessageUserList;
+  public void SetFollowToHomeCharaInfo(int userId, bool follow)
+  {
+    FriendCharaInfo friendCharaInfo = this.homeCharas.chara.Find((Predicate<FriendCharaInfo>) (c => c.userId == userId));
+    if (friendCharaInfo == null)
+      return;
+    friendCharaInfo.following = follow;
+  }
 
-	private string mutualFollowValue = string.Empty;
+  public void SetFollowerToHomeCharaInfo(int userId, bool follower)
+  {
+    FriendCharaInfo friendCharaInfo = this.homeCharas.chara.Find((Predicate<FriendCharaInfo>) (c => c.userId == userId));
+    if (friendCharaInfo == null)
+      return;
+    friendCharaInfo.follower = follower;
+  }
 
-	private FriendSearchResult recvSearchList;
+  public void SetClanInviteToHomeCharaInfo(int userId, bool isInvite)
+  {
+    FriendCharaInfo friendCharaInfo = this.homeCharas.chara.Find((Predicate<FriendCharaInfo>) (c => c.userId == userId));
+    if (friendCharaInfo == null)
+      return;
+    friendCharaInfo.isInviteToClan = isInvite;
+  }
 
-	public HomeCharaInfoList homeCharas
-	{
-		get;
-		private set;
-	}
+  public FriendMessageUserListModel.MessageUserInfo talkUser { private set; get; }
 
-	public FriendMessageUserListModel.MessageUserInfo talkUser
-	{
-		get;
-		private set;
-	}
+  public FriendFollowLinkResult followLinkResult { get; private set; }
 
-	public FriendFollowLinkResult followLinkResult
-	{
-		get;
-		private set;
-	}
+  public FriendMutualFollowResult mutualFollowResult { get; private set; }
 
-	public FriendMutualFollowResult mutualFollowResult
-	{
-		get;
-		private set;
-	}
+  public string MutualFollowValue
+  {
+    get => this.mutualFollowValue;
+    set => this.mutualFollowValue = value;
+  }
 
-	public string MutualFollowValue
-	{
-		get
-		{
-			return mutualFollowValue;
-		}
-		set
-		{
-			mutualFollowValue = value;
-		}
-	}
+  public int messagePageMax { private set; get; }
 
-	public int messagePageMax
-	{
-		get;
-		private set;
-	}
+  public List<FriendMessageData> messageDetailList { private set; get; }
 
-	public List<FriendMessageData> messageDetailList
-	{
-		get;
-		private set;
-	}
+  private void AddMessageDetailList(List<FriendMessageData> addMessageList)
+  {
+    addMessageList.ForEach((Action<FriendMessageData>) (message =>
+    {
+      if (this.messageDetailList.Find((Predicate<FriendMessageData>) (m => m.id == message.id)) != null)
+        return;
+      this.messageDetailList.Add(message);
+    }));
+    this.messageDetailList.Sort((Comparison<FriendMessageData>) ((l, r) => l.lid.CompareTo(r.lid)));
+  }
 
-	public int followNum
-	{
-		get;
-		private set;
-	}
+  public int followNum { get; private set; }
 
-	public int followerNum
-	{
-		get;
-		private set;
-	}
+  public int followerNum { get; private set; }
 
-	public int noReadMessageNum
-	{
-		get;
-		private set;
-	}
+  public void SetFollowNum(int num) => this.followNum = num;
 
-	public void SetFollowToHomeCharaInfo(int userId, bool follow)
-	{
-		FriendCharaInfo friendCharaInfo = homeCharas.chara.Find((FriendCharaInfo c) => c.userId == userId);
-		if (friendCharaInfo != null)
-		{
-			friendCharaInfo.following = follow;
-		}
-	}
+  public void SetFollowerNum(int num) => this.followerNum = num;
 
-	public void SetFollowerToHomeCharaInfo(int userId, bool follower)
-	{
-		FriendCharaInfo friendCharaInfo = homeCharas.chara.Find((FriendCharaInfo c) => c.userId == userId);
-		if (friendCharaInfo != null)
-		{
-			friendCharaInfo.follower = follower;
-		}
-	}
+  public int noReadMessageNum { get; private set; }
 
-	private void AddMessageDetailList(List<FriendMessageData> addMessageList)
-	{
-		addMessageList.ForEach(delegate(FriendMessageData message)
-		{
-			FriendManager friendManager = this;
-			FriendMessageData friendMessageData = messageDetailList.Find((FriendMessageData m) => m.id == message.id);
-			if (friendMessageData == null)
-			{
-				messageDetailList.Add(message);
-			}
-		});
-		messageDetailList.Sort((FriendMessageData l, FriendMessageData r) => l.lid.CompareTo(r.lid));
-	}
+  public void SetNoReadMessageNum(int num)
+  {
+    if (0 > num)
+      num = 0;
+    this.noReadMessageNum = num;
+  }
 
-	public void SetFollowNum(int num)
-	{
-		followNum = num;
-	}
+  protected override void Awake()
+  {
+    base.Awake();
+    this.homeCharas = new HomeCharaInfoList();
+    this.messageDetailList = new List<FriendMessageData>();
+    this.noReadMessageNum = 0;
+  }
 
-	public void SetFollowerNum(int num)
-	{
-		followerNum = num;
-	}
+  public void SendHomeCharaList(Action<bool> callback)
+  {
+    Protocol.SendAsync<HomeCharaListModel>("ajax/home/charalist", (Action<HomeCharaListModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+      {
+        this.homeCharas = ret.result;
+        this._isHomeCharaCached = true;
+      }
+      if (callback == null)
+        return;
+      callback(flag);
+    }));
+  }
 
-	public void SetNoReadMessageNum(int num)
-	{
-		if (0 > num)
-		{
-			num = 0;
-		}
-		noReadMessageNum = num;
-	}
+  public void SendGetChara(int[] userIds, Action<bool, List<FriendCharaInfo>> callback)
+  {
+    HomeGetCharaModel.RequestSendForm postData = new HomeGetCharaModel.RequestSendForm();
+    int index = 0;
+    for (int length = userIds.Length; index < length; ++index)
+      postData.ids.Add(userIds[index]);
+    Protocol.Send<HomeGetCharaModel.RequestSendForm, HomeGetCharaModel>(HomeGetCharaModel.URL, postData, (Action<HomeGetCharaModel>) (ret => callback(ErrorCodeChecker.IsSuccess(ret.Error), ret.result)));
+  }
 
-	protected override void Awake()
-	{
-		base.Awake();
-		homeCharas = new HomeCharaInfoList();
-		messageDetailList = new List<FriendMessageData>();
-		noReadMessageNum = 0;
-	}
+  public void SendGetFollowList(int page, Action<bool, FriendFollowListModel.Param> callback)
+  {
+    Protocol.Send<FriendFollowListModel.RequestSendForm, FriendFollowListModel>(FriendFollowListModel.URL, new FriendFollowListModel.RequestSendForm()
+    {
+      page = page
+    }, (Action<FriendFollowListModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+      {
+        this.recvFollowList = ret.result;
+        MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
+      }
+      callback(flag, this.recvFollowList);
+    }));
+  }
 
-	public void SendHomeCharaList(Action<bool> callback)
-	{
-		Protocol.Send(HomeCharaListModel.URL, delegate(HomeCharaListModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				homeCharas = ret.result;
-			}
-			callback(flag);
-		}, string.Empty);
-	}
+  public void SendGetFollowerList(
+    int _chunkIndex,
+    int _sortTypeIndex,
+    Action<bool, FriendFollowerListModel.Param> callback)
+  {
+    Protocol.Send<FriendFollowerListModel.RequestSendForm, FriendFollowerListModel>(FriendFollowerListModel.URL, new FriendFollowerListModel.RequestSendForm()
+    {
+      page = _chunkIndex,
+      sortType = _sortTypeIndex
+    }, (Action<FriendFollowerListModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+      {
+        this.recvFollowerList = (FriendFollowListModel.Param) ret.result;
+        MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
+      }
+      callback(flag, ret.result);
+    }));
+  }
 
-	public void SendGetChara(int[] userIds, Action<bool, List<FriendCharaInfo>> callback)
-	{
-		HomeGetCharaModel.RequestSendForm requestSendForm = new HomeGetCharaModel.RequestSendForm();
-		int i = 0;
-		for (int num = userIds.Length; i < num; i++)
-		{
-			requestSendForm.ids.Add(userIds[i]);
-		}
-		Protocol.Send(HomeGetCharaModel.URL, requestSendForm, delegate(HomeGetCharaModel ret)
-		{
-			bool arg = ErrorCodeChecker.IsSuccess(ret.Error);
-			callback(arg, ret.result);
-		}, string.Empty);
-	}
+  public void SendGetFollowLink(Action<bool> callback)
+  {
+    Protocol.Send<FriendFollowLinkModel>(FriendFollowLinkModel.URL, (Action<FriendFollowLinkModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (ret.Error == Error.None)
+      {
+        this.followLinkResult = ret.result;
+        flag = true;
+      }
+      callback(flag);
+    }));
+  }
 
-	public void SendGetFollowList(int page, Action<bool, FriendFollowListModel.Param> callback)
-	{
-		FriendFollowListModel.RequestSendForm requestSendForm = new FriendFollowListModel.RequestSendForm();
-		requestSendForm.page = page;
-		Protocol.Send(FriendFollowListModel.URL, requestSendForm, delegate(FriendFollowListModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				recvFollowList = ret.result;
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
-			}
-			callback(flag, recvFollowList);
-		}, string.Empty);
-	}
+  public void SendFollowUser(List<int> id_list, Action<Error, List<int>> callback)
+  {
+    Protocol.Send<FriendFollowModel.RequestSendForm, FriendFollowModel>(FriendFollowModel.URL, new FriendFollowModel.RequestSendForm()
+    {
+      ids = id_list
+    }, (Action<FriendFollowModel>) (ret =>
+    {
+      List<int> intList = new List<int>();
+      if (ErrorCodeChecker.IsSuccess(ret.Error))
+      {
+        intList = ret.result.success;
+        if (MonoBehaviourSingleton<QuestManager>.IsValid())
+          MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.SetResultFollowInfo(ret.result);
+        MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
+      }
+      callback(ret.Error, intList);
+    }));
+    MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Friend_request", "Social");
+  }
 
-	public void SendGetFollowerList(int page, Action<bool, FriendFollowListModel.Param> callback)
-	{
-		FriendFollowerListModel.RequestSendForm requestSendForm = new FriendFollowerListModel.RequestSendForm();
-		requestSendForm.page = page;
-		Protocol.Send(FriendFollowerListModel.URL, requestSendForm, delegate(FriendFollowerListModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				recvFollowerList = ret.result;
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
-			}
-			callback(flag, recvFollowerList);
-		}, string.Empty);
-	}
+  public void SendMutualFollow(string targetCode, Action<bool> callback)
+  {
+    Protocol.Send<FriendMutualFollowModel.RequestSendForm, FriendMutualFollowModel>(FriendMutualFollowModel.URL, new FriendMutualFollowModel.RequestSendForm()
+    {
+      targetCode = targetCode
+    }, (Action<FriendMutualFollowModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (ret.Error == Error.None)
+      {
+        this.mutualFollowResult = ret.result;
+        flag = true;
+      }
+      callback(flag);
+    }));
+  }
 
-	public void SendGetFollowLink(Action<bool> callback)
-	{
-		Protocol.Send(FriendFollowLinkModel.URL, delegate(FriendFollowLinkModel ret)
-		{
-			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (ret.Error == Error.None)
-			{
-				followLinkResult = ret.result;
-				obj = true;
-			}
-			callback(obj);
-		}, string.Empty);
-	}
+  public void SendUnfollowUser(int user_id, Action<bool> callback)
+  {
+    Protocol.Send<FriendUnfollowModel.RequestSendForm, FriendUnfollowModel>(FriendUnfollowModel.URL, new FriendUnfollowModel.RequestSendForm()
+    {
+      followUserId = user_id
+    }, (Action<FriendUnfollowModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+      {
+        flag = ret.result.success == 1;
+        if (MonoBehaviourSingleton<QuestManager>.IsValid())
+          MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.SetResultUnfollowInfo(ret.result, user_id);
+        MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
+      }
+      callback(flag);
+    }));
+  }
 
-	public void SendFollowUser(List<int> id_list, Action<Error, List<int>> callback)
-	{
-		FriendFollowModel.RequestSendForm requestSendForm = new FriendFollowModel.RequestSendForm();
-		requestSendForm.ids = id_list;
-		Protocol.Send(FriendFollowModel.URL, requestSendForm, delegate(FriendFollowModel ret)
-		{
-			List<int> arg = new List<int>();
-			if (ErrorCodeChecker.IsSuccess(ret.Error))
-			{
-				arg = ret.result.success;
-				if (MonoBehaviourSingleton<QuestManager>.IsValid())
-				{
-					MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.SetResultFollowInfo(ret.result);
-				}
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
-			}
-			callback(ret.Error, arg);
-		}, string.Empty);
-		MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Friend_request", "Social");
-	}
+  public void SendDeleteFollower(int user_id, Action<bool> callback)
+  {
+    Protocol.Send<FriendDeleteFollowerModel.RequestSendForm, FriendDeleteFollowerModel>(FriendDeleteFollowerModel.URL, new FriendDeleteFollowerModel.RequestSendForm()
+    {
+      followerUserId = user_id
+    }, (Action<FriendDeleteFollowerModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+      {
+        flag = ret.result.success == 1;
+        MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
+      }
+      callback(flag);
+    }));
+  }
 
-	public void SendMutualFollow(string targetCode, Action<bool> callback)
-	{
-		FriendMutualFollowModel.RequestSendForm requestSendForm = new FriendMutualFollowModel.RequestSendForm();
-		requestSendForm.targetCode = targetCode;
-		Protocol.Send(FriendMutualFollowModel.URL, requestSendForm, delegate(FriendMutualFollowModel ret)
-		{
-			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (ret.Error == Error.None)
-			{
-				mutualFollowResult = ret.result;
-				obj = true;
-			}
-			callback(obj);
-		}, string.Empty);
-	}
+  public void SendGetUserListMessagedOnce(
+    bool isCalledByOther,
+    Action<bool, FriendMessagedMutualFollowerListModel.Param> _callback)
+  {
+    if (!isCalledByOther)
+      this.SendGetUserListMessagedOnce(_callback);
+    else
+      Protocol.Try((System.Action) (() => this.SendGetUserListMessagedOnce(_callback)));
+  }
 
-	public void SendUnfollowUser(int user_id, Action<bool> callback)
-	{
-		FriendUnfollowModel.RequestSendForm requestSendForm = new FriendUnfollowModel.RequestSendForm();
-		requestSendForm.followUserId = user_id;
-		Protocol.Send(FriendUnfollowModel.URL, requestSendForm, delegate(FriendUnfollowModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				flag = (ret.result.success == 1);
-				if (MonoBehaviourSingleton<QuestManager>.IsValid())
-				{
-					MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.SetResultUnfollowInfo(ret.result, user_id);
-				}
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
-			}
-			callback(flag);
-		}, string.Empty);
-	}
+  public void SendGetUserListMessagedOnce(
+    Action<bool, FriendMessagedMutualFollowerListModel.Param> callback)
+  {
+    FriendMessagedMutualFollowerListModel.RequestSendForm postData = new FriendMessagedMutualFollowerListModel.RequestSendForm();
+    Protocol.Send<FriendMessagedMutualFollowerListModel.RequestSendForm, FriendMessagedMutualFollowerListModel>(FriendMessagedMutualFollowerListModel.URL, postData, (Action<FriendMessagedMutualFollowerListModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+        this.recvUserListAtLeastGetMessageOnce = ret.result.messageFollowList;
+      callback(flag, ret.result);
+    }));
+  }
 
-	public void SendDeleteFollower(int user_id, Action<bool> callback)
-	{
-		FriendDeleteFollowerModel.RequestSendForm requestSendForm = new FriendDeleteFollowerModel.RequestSendForm();
-		requestSendForm.followerUserId = user_id;
-		Protocol.Send(FriendDeleteFollowerModel.URL, requestSendForm, delegate(FriendDeleteFollowerModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				flag = (ret.result.success == 1);
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM);
-			}
-			callback(flag);
-		}, string.Empty);
-	}
+  public void SendGetMessageUserList(
+    int page,
+    Action<bool, FriendMessageUserListModel.Param> callback)
+  {
+    Protocol.Send<FriendMessageUserListModel.RequestSendForm, FriendMessageUserListModel>(FriendMessageUserListModel.URL, new FriendMessageUserListModel.RequestSendForm()
+    {
+      page = page
+    }, (Action<FriendMessageUserListModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+      {
+        this.recvMessageUserList = ret.result;
+        MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
+      }
+      callback(flag, this.recvMessageUserList);
+    }));
+  }
 
-	public void SendGetMessageUserList(int page, Action<bool, FriendMessageUserListModel.Param> callback)
-	{
-		FriendMessageUserListModel.RequestSendForm requestSendForm = new FriendMessageUserListModel.RequestSendForm();
-		requestSendForm.page = page;
-		Protocol.Send(FriendMessageUserListModel.URL, requestSendForm, delegate(FriendMessageUserListModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				recvMessageUserList = ret.result;
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
-			}
-			callback(flag, recvMessageUserList);
-		}, string.Empty);
-	}
+  public void SendGetMessageUserList(
+    int page,
+    bool isCalledByOther,
+    Action<bool, FriendMessageUserListModel.Param> callback)
+  {
+    if (!isCalledByOther)
+      this.SendGetMessageUserList(page, callback);
+    else
+      Protocol.Try((System.Action) (() => this.SendGetMessageUserList(page, callback)));
+  }
 
-	public void SendGetMessageDetailList(int user_id, int page, Action<bool> callback)
-	{
-		FriendMessageDetailListModel.RequestSendForm requestSendForm = new FriendMessageDetailListModel.RequestSendForm();
-		requestSendForm.userId = user_id;
-		requestSendForm.page = page;
-		if (talkUser == null || talkUser.userId != user_id)
-		{
-			talkUser = null;
-			messageDetailList.Clear();
-		}
-		Protocol.Send(FriendMessageDetailListModel.URL, requestSendForm, delegate(FriendMessageDetailListModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				messagePageMax = ret.result.pageNumMax;
-				AddMessageDetailList(ret.result.message);
-				FriendMessageUserListModel.MessageUserInfo messageUserInfo = recvMessageUserList.messageUser.Find((FriendMessageUserListModel.MessageUserInfo user) => user.userId == user_id);
-				if (messageUserInfo != null)
-				{
-					talkUser = messageUserInfo;
-				}
-			}
-			callback(flag);
-		}, string.Empty);
-	}
+  public void SendGetMessageDetailList(
+    int user_id,
+    int page,
+    bool isCalledByOther,
+    Action<bool> callback)
+  {
+    if (!isCalledByOther)
+      this.SendGetMessageDetailList(user_id, page, callback);
+    else
+      Protocol.Try((System.Action) (() => this.SendGetMessageDetailList(user_id, page, callback)));
+  }
 
-	public void SendFriendMessage(int user_id, string message, Action<bool> callback)
-	{
-		FriendSendMessageModel.RequestSendForm requestSendForm = new FriendSendMessageModel.RequestSendForm();
-		requestSendForm.toUserId = user_id;
-		requestSendForm.message = message;
-		Protocol.Send(FriendSendMessageModel.URL, requestSendForm, delegate(FriendSendMessageModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				flag = (ret.result.success == 1);
-			}
-			callback(flag);
-		}, string.Empty);
-	}
+  public void SendGetMessageDetailList(int user_id, int page, Action<bool> callback)
+  {
+    FriendMessageDetailListModel.RequestSendForm postData = new FriendMessageDetailListModel.RequestSendForm();
+    postData.userId = user_id;
+    postData.page = page;
+    if (this.talkUser == null || this.talkUser.userId != user_id)
+    {
+      this.talkUser = (FriendMessageUserListModel.MessageUserInfo) null;
+      this.messageDetailList.Clear();
+    }
+    Protocol.Send<FriendMessageDetailListModel.RequestSendForm, FriendMessageDetailListModel>(FriendMessageDetailListModel.URL, postData, (Action<FriendMessageDetailListModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+      {
+        this.messagePageMax = ret.result.pageNumMax;
+        this.AddMessageDetailList(ret.result.message);
+        FriendMessageUserListModel.MessageUserInfo messageUser = this.FindMessageUser(user_id);
+        if (messageUser != null)
+          this.talkUser = messageUser;
+      }
+      callback(flag);
+    }));
+  }
 
-	public void SendGetNoreadMessage(Action<bool> callback)
-	{
-		if (talkUser == null)
-		{
-			callback(false);
-		}
-		else
-		{
-			FriendGetNoReadMessageModel.RequestSendForm requestSendForm = new FriendGetNoReadMessageModel.RequestSendForm();
-			requestSendForm.userId = talkUser.userId;
-			Protocol.Send(FriendGetNoReadMessageModel.URL, requestSendForm, delegate(FriendGetNoReadMessageModel ret)
-			{
-				bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
-				callback(obj);
-			}, string.Empty);
-		}
-	}
+  private FriendMessageUserListModel.MessageUserInfo FindMessageUser(int userId)
+  {
+    if (this.recvMessageUserList != null && this.recvMessageUserList.messageUser != null)
+    {
+      FriendMessageUserListModel.MessageUserInfo messageUser = this.recvMessageUserList.messageUser.Find((Predicate<FriendMessageUserListModel.MessageUserInfo>) (user => user.userId == userId));
+      if (messageUser != null)
+        return messageUser;
+    }
+    if (this.recvUserListAtLeastGetMessageOnce != null)
+    {
+      FriendMessageUserListModel.MessageUserInfo messageUser = this.recvUserListAtLeastGetMessageOnce.Find((Predicate<FriendMessageUserListModel.MessageUserInfo>) (user => user.userId == userId));
+      if (messageUser != null)
+        return messageUser;
+    }
+    return (FriendMessageUserListModel.MessageUserInfo) null;
+  }
 
-	public void SendSearchName(string name, int page, Action<bool, FriendSearchResult> callback)
-	{
-		FriendSearchByNameModel.RequestSendForm requestSendForm = new FriendSearchByNameModel.RequestSendForm();
-		requestSendForm.name = name;
-		requestSendForm.page = page;
-		Protocol.Send(FriendSearchByNameModel.URL, requestSendForm, delegate(FriendSearchByNameModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				recvSearchList = ret.result;
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
-			}
-			callback(flag, recvSearchList);
-		}, string.Empty);
-	}
+  public void SendFriendMessage(
+    int user_id,
+    string message,
+    bool isCalledByOther,
+    Action<bool> callback)
+  {
+    if (!isCalledByOther)
+      this.SendFriendMessage(user_id, message, callback);
+    else
+      Protocol.Try((System.Action) (() => this.SendFriendMessage(user_id, message, callback)));
+  }
 
-	public void SendSearchLevel(int page, Action<bool, FriendSearchResult> callback)
-	{
-		FriendSearchByLevelModel.RequestSendForm requestSendForm = new FriendSearchByLevelModel.RequestSendForm();
-		requestSendForm.page = page;
-		Protocol.Send(FriendSearchByLevelModel.URL, requestSendForm, delegate(FriendSearchByLevelModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				recvSearchList = ret.result;
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
-			}
-			callback(flag, recvSearchList);
-		}, string.Empty);
-	}
+  public void SendFriendMessage(int user_id, string message, Action<bool> callback)
+  {
+    Protocol.Send<FriendSendMessageModel.RequestSendForm, FriendSendMessageModel>(FriendSendMessageModel.URL, new FriendSendMessageModel.RequestSendForm()
+    {
+      toUserId = user_id,
+      message = message
+    }, (Action<FriendSendMessageModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+        flag = ret.result.success == 1;
+      callback(flag);
+    }));
+  }
 
-	public void SendSearchID(string code, Action<bool, FriendSearchResult> callback)
-	{
-		FriendSearchByCodeModel.RequestSendForm requestSendForm = new FriendSearchByCodeModel.RequestSendForm();
-		requestSendForm.code = code;
-		Protocol.Send(FriendSearchByCodeModel.URL, requestSendForm, delegate(FriendSearchByCodeModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				recvSearchList = ret.result;
-				MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
-			}
-			callback(flag, recvSearchList);
-		}, string.Empty);
-	}
+  public void SendGetNoreadMessage(bool isCalledByOther, Action<bool> callback)
+  {
+    if (!isCalledByOther)
+      this.SendGetNoreadMessage(callback);
+    else
+      Protocol.Try((System.Action) (() => this.SendGetNoreadMessage(callback)));
+  }
 
-	public void SendGetArenaRanking(int group, int isContaionSelf, Action<bool, List<ArenaRankingData>> callback)
-	{
-		ArenaRankingModel.RequestSendForm requestSendForm = new ArenaRankingModel.RequestSendForm();
-		requestSendForm.groupId = group;
-		requestSendForm.isContainSelf = isContaionSelf;
-		List<ArenaRankingData> rankingDataList = null;
-		Protocol.Send(ArenaRankingModel.URL, requestSendForm, delegate(ArenaRankingModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				rankingDataList = ret.result;
-			}
-			callback(flag, rankingDataList);
-		}, string.Empty);
-	}
+  public void SendGetNoreadMessage(Action<bool> callback)
+  {
+    if (this.talkUser == null)
+      callback(false);
+    else
+      Protocol.Send<FriendGetNoReadMessageModel.RequestSendForm, FriendGetNoReadMessageModel>(FriendGetNoReadMessageModel.URL, new FriendGetNoReadMessageModel.RequestSendForm()
+      {
+        userId = this.talkUser.userId
+      }, (Action<FriendGetNoReadMessageModel>) (ret => callback(ErrorCodeChecker.IsSuccess(ret.Error))));
+  }
 
-	public void SendGetLastRanking(int group, int isContaionSelf, Action<bool, ArenaLastRankingModel.Param> callback)
-	{
-		ArenaLastRankingModel.RequestSendForm requestSendForm = new ArenaLastRankingModel.RequestSendForm();
-		requestSendForm.groupId = group;
-		requestSendForm.isContainSelf = isContaionSelf;
-		ArenaLastRankingModel.Param result = null;
-		Protocol.Send(ArenaLastRankingModel.URL, requestSendForm, delegate(ArenaLastRankingModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				result = ret.result;
-			}
-			callback(flag, result);
-		}, string.Empty);
-	}
+  public void SendSearchName(string name, int page, Action<bool, FriendSearchResult> callback)
+  {
+    Protocol.Send<FriendSearchByNameModel.RequestSendForm, FriendSearchByNameModel>(FriendSearchByNameModel.URL, new FriendSearchByNameModel.RequestSendForm()
+    {
+      name = name,
+      page = page
+    }, (Action<FriendSearchByNameModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+      {
+        this.recvSearchList = ret.result;
+        MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
+      }
+      callback(flag, this.recvSearchList);
+    }));
+  }
 
-	public void SendGetFriendRanking(int group, int isContaionSelf, Action<bool, List<ArenaRankingData>> callback)
-	{
-		ArenaFriendRankingModel.RequestSendForm requestSendForm = new ArenaFriendRankingModel.RequestSendForm();
-		requestSendForm.groupId = group;
-		requestSendForm.isContainSelf = isContaionSelf;
-		List<ArenaRankingData> rankingDataList = null;
-		Protocol.Send(ArenaFriendRankingModel.URL, requestSendForm, delegate(ArenaFriendRankingModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				rankingDataList = ret.result;
-			}
-			callback(flag, rankingDataList);
-		}, string.Empty);
-	}
+  public void SendSearchLevel(int page, Action<bool, FriendSearchResult> callback)
+  {
+    Protocol.Send<FriendSearchByLevelModel.RequestSendForm, FriendSearchByLevelModel>(FriendSearchByLevelModel.URL, new FriendSearchByLevelModel.RequestSendForm()
+    {
+      page = page
+    }, (Action<FriendSearchByLevelModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+      {
+        this.recvSearchList = ret.result;
+        MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
+      }
+      callback(flag, this.recvSearchList);
+    }));
+  }
 
-	public void SendGetLegendRanking(Action<bool, List<ArenaLegendRankingModel.Param>> callback)
-	{
-		List<ArenaLegendRankingModel.Param> result = new List<ArenaLegendRankingModel.Param>();
-		Protocol.Send(ArenaLegendRankingModel.URL, null, delegate(ArenaLegendRankingModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				result = ret.result;
-			}
-			callback(flag, result);
-		}, string.Empty);
-	}
+  public void SendSearchID(string code, Action<bool, FriendSearchResult> callback)
+  {
+    Protocol.Send<FriendSearchByCodeModel.RequestSendForm, FriendSearchByCodeModel>(FriendSearchByCodeModel.URL, new FriendSearchByCodeModel.RequestSendForm()
+    {
+      code = code
+    }, (Action<FriendSearchByCodeModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+      {
+        this.recvSearchList = ret.result;
+        MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_FRIEND_LIST);
+      }
+      callback(flag, this.recvSearchList);
+    }));
+  }
 
-	public void Dirty()
-	{
-	}
+  public void SendGetArenaRanking(
+    int group,
+    int isContaionSelf,
+    Action<bool, List<ArenaRankingData>> callback)
+  {
+    ArenaRankingModel.RequestSendForm postData = new ArenaRankingModel.RequestSendForm();
+    postData.groupId = group;
+    postData.isContainSelf = isContaionSelf;
+    List<ArenaRankingData> rankingDataList = (List<ArenaRankingData>) null;
+    Protocol.Send<ArenaRankingModel.RequestSendForm, ArenaRankingModel>(ArenaRankingModel.URL, postData, (Action<ArenaRankingModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+        rankingDataList = ret.result;
+      callback(flag, rankingDataList);
+    }));
+  }
 
-	public void OnDiff(BaseModelDiff.DiffFriend diff)
-	{
-		bool flag = false;
-		if (Utility.IsExist(diff.follow))
-		{
-			followNum = diff.follow[0];
-			flag = true;
-		}
-		if (Utility.IsExist(diff.follower))
-		{
-			followerNum = diff.follower[0];
-			flag = true;
-		}
-		if (flag)
-		{
-			Dirty();
-		}
-	}
+  public void SendGetLastRanking(
+    int group,
+    int isContaionSelf,
+    Action<bool, ArenaLastRankingModel.Param> callback)
+  {
+    ArenaLastRankingModel.RequestSendForm postData = new ArenaLastRankingModel.RequestSendForm();
+    postData.groupId = group;
+    postData.isContainSelf = isContaionSelf;
+    ArenaLastRankingModel.Param result = (ArenaLastRankingModel.Param) null;
+    Protocol.Send<ArenaLastRankingModel.RequestSendForm, ArenaLastRankingModel>(ArenaLastRankingModel.URL, postData, (Action<ArenaLastRankingModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+        result = ret.result;
+      callback(flag, result);
+    }));
+  }
 
-	public void DirtyMessage()
-	{
-	}
+  public void SendGetFriendRanking(
+    int group,
+    int isContaionSelf,
+    Action<bool, List<ArenaRankingData>> callback)
+  {
+    ArenaFriendRankingModel.RequestSendForm postData = new ArenaFriendRankingModel.RequestSendForm();
+    postData.groupId = group;
+    postData.isContainSelf = isContaionSelf;
+    List<ArenaRankingData> rankingDataList = (List<ArenaRankingData>) null;
+    Protocol.Send<ArenaFriendRankingModel.RequestSendForm, ArenaFriendRankingModel>(ArenaFriendRankingModel.URL, postData, (Action<ArenaFriendRankingModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+        rankingDataList = ret.result;
+      callback(flag, rankingDataList);
+    }));
+  }
 
-	public void OnDiff(BaseModelDiff.DiffMessage diff)
-	{
-		bool flag = false;
-		if (Utility.IsExist(diff.add))
-		{
-			AddMessageDetailList(diff.add);
-			flag = true;
-		}
-		if (flag)
-		{
-			DirtyMessage();
-		}
-	}
+  public void SendGetLegendRanking(
+    Action<bool, List<ArenaLegendRankingModel.Param>> callback)
+  {
+    List<ArenaLegendRankingModel.Param> result = new List<ArenaLegendRankingModel.Param>();
+    Protocol.Send<ArenaLegendRankingModel>(ArenaLegendRankingModel.URL, (WWWForm) null, (Action<ArenaLegendRankingModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+        result = ret.result;
+      callback(flag, result);
+    }));
+  }
 
-	public void ResetUser()
-	{
-		talkUser = null;
-		if (messageDetailList != null)
-		{
-			messageDetailList.Clear();
-		}
-	}
+  public void Dirty()
+  {
+  }
+
+  public void OnDiff(BaseModelDiff.DiffFriend diff)
+  {
+    bool flag = false;
+    if (Utility.IsExist((ICollection) diff.follow))
+    {
+      this.followNum = diff.follow[0];
+      flag = true;
+    }
+    if (Utility.IsExist((ICollection) diff.follower))
+    {
+      this.followerNum = diff.follower[0];
+      flag = true;
+    }
+    if (!flag)
+      return;
+    this.Dirty();
+  }
+
+  public void DirtyMessage()
+  {
+  }
+
+  public void OnDiff(BaseModelDiff.DiffMessage diff)
+  {
+    bool flag = false;
+    if (Utility.IsExist((ICollection) diff.add))
+    {
+      this.AddMessageDetailList(diff.add);
+      flag = true;
+    }
+    if (!flag)
+      return;
+    this.DirtyMessage();
+  }
+
+  public void ResetUser()
+  {
+    this.talkUser = (FriendMessageUserListModel.MessageUserInfo) null;
+    if (this.messageDetailList == null)
+      return;
+    this.messageDetailList.Clear();
+  }
 }

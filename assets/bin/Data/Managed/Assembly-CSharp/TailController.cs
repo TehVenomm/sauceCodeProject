@@ -1,259 +1,163 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: TailController
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TailController
+#nullable disable
+public class TailController : MonoBehaviour
 {
-	public class JointInfo
-	{
-		public float distance = 1f;
+  public const float DEFAULT_LERP_FRAME = 0.8f;
+  [SerializeField]
+  private float gravity = 9.8f;
+  [SerializeField]
+  private float angleMax = 30f;
+  [SerializeField]
+  private float groundHeight;
+  [SerializeField]
+  private float radius = 1.5f;
+  [SerializeField]
+  private int uniqueID;
+  [SerializeField]
+  private bool isUpdate = true;
+  [SerializeField]
+  private Transform[] pointList;
+  private List<TailController.JointInfo> m_jointInfoList = new List<TailController.JointInfo>();
+  private Vector3[] m_prevPositionList;
+  private Quaternion[] m_lerpRotationList;
+  private Vector3[] m_lerpPositionList;
+  private float m_finishLerpTime;
+  private float m_lerpTime;
 
-		public Vector3 basisAxis = Vector3.get_zero();
-	}
+  private void Awake()
+  {
+    int length = this.pointList.Length;
+    for (int index = 1; index < length; ++index)
+    {
+      Vector3 localPosition = this.pointList[index].localPosition;
+      this.m_jointInfoList.Add(new TailController.JointInfo()
+      {
+        distance = ((Vector3) ref localPosition).magnitude,
+        basisAxis = ((Vector3) ref localPosition).normalized
+      });
+    }
+    this.m_prevPositionList = new Vector3[length];
+    this.UpdatePreviousPositionList();
+    this.m_lerpPositionList = new Vector3[length];
+    this.m_lerpRotationList = new Quaternion[length];
+    this.UpdateLerpInfo();
+  }
 
-	public const float DEFAULT_LERP_FRAME = 0.8f;
+  private void LateUpdate()
+  {
+    if (this.isUpdate)
+    {
+      float num = this.groundHeight + this.radius;
+      for (int index = 1; index < this.pointList.Length; ++index)
+      {
+        TailController.JointInfo jointInfo = this.m_jointInfoList[index - 1];
+        Transform point1 = this.pointList[index - 1];
+        Transform point2 = this.pointList[index];
+        Vector3 position = point1.position;
+        Vector3 vector3_1 = point1.TransformDirection(jointInfo.basisAxis);
+        Vector3 normalized1 = ((Vector3) ref vector3_1).normalized;
+        vector3_1 = Vector3.op_Subtraction(this.m_prevPositionList[index], position);
+        Vector3 normalized2 = ((Vector3) ref vector3_1).normalized;
+        normalized2.y -= this.gravity * Time.deltaTime;
+        Quaternion quaternion1 = Quaternion.AngleAxis(Mathf.Min(Vector3.Angle(normalized1, normalized2), this.angleMax), Vector3.Cross(normalized1, normalized2));
+        Vector3 vector3_2 = Quaternion.op_Multiply(quaternion1, normalized1);
+        ((Vector3) ref vector3_2).Normalize();
+        Vector3 vector3_3 = Vector3.op_Addition(position, Vector3.op_Multiply(vector3_2, jointInfo.distance));
+        Quaternion quaternion2 = Quaternion.op_Multiply(quaternion1, point1.rotation);
+        Vector3 vector3_4 = vector3_3;
+        if ((double) vector3_4.y < (double) num)
+        {
+          vector3_4.y = num;
+          vector3_1 = Vector3.op_Subtraction(vector3_3, position);
+          Vector3 normalized3 = ((Vector3) ref vector3_1).normalized;
+          vector3_1 = Vector3.op_Subtraction(vector3_4, position);
+          Vector3 normalized4 = ((Vector3) ref vector3_1).normalized;
+          Vector3 vector3_5 = normalized4;
+          quaternion2 = Quaternion.op_Multiply(Quaternion.FromToRotation(normalized3, vector3_5), quaternion2);
+          vector3_3 = Vector3.op_Addition(position, Vector3.op_Multiply(normalized4, jointInfo.distance));
+        }
+        point2.position = vector3_3;
+        point2.rotation = quaternion2;
+      }
+      this.UpdatePreviousPositionList();
+    }
+    else
+    {
+      if ((double) this.m_finishLerpTime <= 0.0)
+        return;
+      this.m_lerpTime += Time.deltaTime;
+      float num = Mathf.Clamp01(this.m_lerpTime / this.m_finishLerpTime);
+      int length = this.pointList.Length;
+      for (int index = 0; index < length; ++index)
+      {
+        Transform point = this.pointList[index];
+        point.localRotation = Quaternion.Lerp(this.m_lerpRotationList[index], point.localRotation, num);
+        point.localPosition = Vector3.Lerp(this.m_lerpPositionList[index], point.localPosition, num);
+      }
+      if ((double) num < 1.0)
+        return;
+      this.m_finishLerpTime = 0.0f;
+    }
+  }
 
-	[SerializeField]
-	private float gravity = 9.8f;
+  public void RequestLerp(float lerpFinishTime)
+  {
+    if ((double) lerpFinishTime <= 0.0)
+      return;
+    this.m_finishLerpTime = lerpFinishTime;
+    this.m_lerpTime = 0.0f;
+    this.UpdateLerpInfo();
+  }
 
-	[SerializeField]
-	private float angleMax = 30f;
+  private void UpdateLerpInfo()
+  {
+    for (int index = 0; index < this.m_prevPositionList.Length; ++index)
+    {
+      this.m_lerpRotationList[index] = this.pointList[index].localRotation;
+      this.m_lerpPositionList[index] = this.pointList[index].localPosition;
+    }
+  }
 
-	[SerializeField]
-	private float groundHeight;
+  private void UpdatePreviousPositionList()
+  {
+    for (int index = 0; index < this.m_prevPositionList.Length; ++index)
+      this.m_prevPositionList[index] = this.pointList[index].position;
+  }
 
-	[SerializeField]
-	private float radius = 1.5f;
+  public void SetPreviousPositionList(Vector3[] posList)
+  {
+    if (posList == null || this.m_prevPositionList == null || posList.Length != this.m_prevPositionList.Length)
+      return;
+    int length = posList.Length;
+    for (int index = 0; index < length; ++index)
+      this.m_prevPositionList[index] = posList[index];
+  }
 
-	[SerializeField]
-	private int uniqueID;
+  public Vector3[] PreviousPositionList => this.m_prevPositionList;
 
-	[SerializeField]
-	private bool isUpdate = true;
+  public void SetUpdateFlag(bool flag, bool isUpdatePreviousPosition = true)
+  {
+    if (this.isUpdate == flag)
+      return;
+    this.isUpdate = flag;
+    if (!(this.isUpdate & isUpdatePreviousPosition))
+      return;
+    this.UpdatePreviousPositionList();
+  }
 
-	[SerializeField]
-	private Transform[] pointList;
+  public int UniqueID => this.uniqueID;
 
-	private List<JointInfo> m_jointInfoList = new List<JointInfo>();
-
-	private Vector3[] m_prevPositionList;
-
-	private Quaternion[] m_lerpRotationList;
-
-	private Vector3[] m_lerpPositionList;
-
-	private float m_finishLerpTime;
-
-	private float m_lerpTime;
-
-	public Vector3[] PreviousPositionList => m_prevPositionList;
-
-	public int UniqueID => uniqueID;
-
-	public TailController()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		int num = pointList.Length;
-		for (int i = 1; i < num; i++)
-		{
-			Vector3 localPosition = pointList[i].get_localPosition();
-			JointInfo jointInfo = new JointInfo();
-			jointInfo.distance = localPosition.get_magnitude();
-			jointInfo.basisAxis = localPosition.get_normalized();
-			m_jointInfoList.Add(jointInfo);
-		}
-		m_prevPositionList = (Vector3[])new Vector3[num];
-		UpdatePreviousPositionList();
-		m_lerpPositionList = (Vector3[])new Vector3[num];
-		m_lerpRotationList = (Quaternion[])new Quaternion[num];
-		UpdateLerpInfo();
-	}
-
-	private void LateUpdate()
-	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-		if (isUpdate)
-		{
-			float num = groundHeight + radius;
-			for (int i = 1; i < pointList.Length; i++)
-			{
-				JointInfo jointInfo = m_jointInfoList[i - 1];
-				Transform val = pointList[i - 1];
-				Transform val2 = pointList[i];
-				Vector3 position = val.get_position();
-				Vector3 val3 = val.TransformDirection(jointInfo.basisAxis);
-				Vector3 normalized = val3.get_normalized();
-				Vector3 val4 = m_prevPositionList[i] - position;
-				Vector3 normalized2 = val4.get_normalized();
-				normalized2.y -= gravity * Time.get_deltaTime();
-				float num2 = Mathf.Min(Vector3.Angle(normalized, normalized2), angleMax);
-				Quaternion val5 = Quaternion.AngleAxis(num2, Vector3.Cross(normalized, normalized2));
-				Vector3 val6 = val5 * normalized;
-				val6.Normalize();
-				Vector3 val7 = position + val6 * jointInfo.distance;
-				Quaternion val8 = val5 * val.get_rotation();
-				Vector3 val9 = val7;
-				if (val9.y < num)
-				{
-					val9.y = num;
-					Vector3 val10 = val7 - position;
-					Vector3 normalized3 = val10.get_normalized();
-					Vector3 val11 = val9 - position;
-					Vector3 normalized4 = val11.get_normalized();
-					val8 = Quaternion.FromToRotation(normalized3, normalized4) * val8;
-					val7 = position + normalized4 * jointInfo.distance;
-				}
-				val2.set_position(val7);
-				val2.set_rotation(val8);
-			}
-			UpdatePreviousPositionList();
-		}
-		else if (m_finishLerpTime > 0f)
-		{
-			m_lerpTime += Time.get_deltaTime();
-			float num3 = Mathf.Clamp01(m_lerpTime / m_finishLerpTime);
-			int num4 = pointList.Length;
-			for (int j = 0; j < num4; j++)
-			{
-				Transform val12 = pointList[j];
-				val12.set_localRotation(Quaternion.Lerp(m_lerpRotationList[j], val12.get_localRotation(), num3));
-				val12.set_localPosition(Vector3.Lerp(m_lerpPositionList[j], val12.get_localPosition(), num3));
-			}
-			if (num3 >= 1f)
-			{
-				m_finishLerpTime = 0f;
-			}
-		}
-	}
-
-	public void RequestLerp(float lerpFinishTime)
-	{
-		if (!(lerpFinishTime <= 0f))
-		{
-			m_finishLerpTime = lerpFinishTime;
-			m_lerpTime = 0f;
-			UpdateLerpInfo();
-		}
-	}
-
-	private void UpdateLerpInfo()
-	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		for (int i = 0; i < m_prevPositionList.Length; i++)
-		{
-			m_lerpRotationList[i] = pointList[i].get_localRotation();
-			m_lerpPositionList[i] = pointList[i].get_localPosition();
-		}
-	}
-
-	private void UpdatePreviousPositionList()
-	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		for (int i = 0; i < m_prevPositionList.Length; i++)
-		{
-			m_prevPositionList[i] = pointList[i].get_position();
-		}
-	}
-
-	public void SetPreviousPositionList(Vector3[] posList)
-	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		if (posList != null && m_prevPositionList != null && posList.Length == m_prevPositionList.Length)
-		{
-			int num = posList.Length;
-			for (int i = 0; i < num; i++)
-			{
-				m_prevPositionList[i] = posList[i];
-			}
-		}
-	}
-
-	public void SetUpdateFlag(bool flag, bool isUpdatePreviousPosition = true)
-	{
-		if (isUpdate != flag)
-		{
-			isUpdate = flag;
-			if (isUpdate && isUpdatePreviousPosition)
-			{
-				UpdatePreviousPositionList();
-			}
-		}
-	}
+  public class JointInfo
+  {
+    public float distance = 1f;
+    public Vector3 basisAxis = Vector3.zero;
+  }
 }

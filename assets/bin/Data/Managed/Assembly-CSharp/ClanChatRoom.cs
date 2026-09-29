@@ -1,255 +1,211 @@
-using Network;
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: ClanChatRoom
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
 
+using Network;
+
+#nullable disable
 public class ClanChatRoom
 {
-	public delegate void OnJoin(CHAT_ERROR_TYPE errorType, string userId);
+  private ChatSendLimitter sendLimitter;
 
-	public delegate void OnLeave(CHAT_ERROR_TYPE errorType, string userId);
+  public string FromId { get; set; }
 
-	public delegate void OnReceiveText(ClanChatLogMessageData clanChatMsgData);
+  public string MyName { get; private set; }
 
-	public delegate void OnReceiveStamp(ClanChatLogMessageData clanChatMsgData);
+  public string RoomId { get; private set; }
 
-	public delegate void OnReceiveNotification(string message);
+  public int RoomNo { get; private set; }
 
-	public delegate void OnDisconnect();
+  public bool HasConnect => this.connection != null && this.connection.isEstablished;
 
-	public delegate void OnReceiveUpdateStatus(ClanUpdateStatusData statusData);
+  public bool IsConnecting => this.connection != null && this.connection.isConnecting;
 
-	private ChatSendLimitter sendLimitter;
+  public IClanChatConnection connection { get; private set; }
 
-	public string FromId
-	{
-		get;
-		set;
-	}
+  public event ClanChatRoom.OnJoin onJoin;
 
-	public string MyName
-	{
-		get;
-		private set;
-	}
+  public event ClanChatRoom.OnLeave onLeave;
 
-	public string RoomId
-	{
-		get;
-		private set;
-	}
+  public event ClanChatRoom.OnReceiveText onReceiveText;
 
-	public int RoomNo
-	{
-		get;
-		private set;
-	}
+  public event ClanChatRoom.OnReceiveStamp onReceiveStamp;
 
-	public bool HasConnect => connection != null && connection.isEstablished;
+  public event ClanChatRoom.OnReceiveText onReceivePrivateText;
 
-	public bool IsConnecting => connection != null && connection.isConnecting;
+  public event ClanChatRoom.OnReceiveStamp onReceivePrivateStamp;
 
-	public IClanChatConnection connection
-	{
-		get;
-		private set;
-	}
+  public event ClanChatRoom.OnReceiveNotification onReceiveNotification;
 
-	public event OnJoin onJoin;
+  public event ClanChatRoom.OnReceiveUpdateStatus onReceiveUpdateStatus;
 
-	public event OnLeave onLeave;
+  public event ClanChatRoom.OnDisconnect onDisconnect;
 
-	public event OnReceiveText onReceiveText;
+  public ClanChatRoom()
+  {
+    GlobalSettingsManager.ChatParam chatParam = MonoBehaviourSingleton<GlobalSettingsManager>.I.chatParam;
+    this.sendLimitter = new ChatSendLimitter(chatParam.limitCount, chatParam.limitDuration);
+  }
 
-	public event OnReceiveStamp onReceiveStamp;
+  public bool CanSendMessage() => !this.sendLimitter.IsLimit();
 
-	public event OnReceiveText onReceivePrivateText;
+  public void SetConnection(IClanChatConnection connection)
+  {
+    if (this.connection != null)
+    {
+      if (this.connection.isEstablished)
+        this.connection.Disconnect();
+      connection.onJoin -= new ClanChatRoom.OnJoin(this._OnJoin);
+      connection.onLeave -= new ClanChatRoom.OnLeave(this._OnLeave);
+      connection.onReceiveText -= new ClanChatRoom.OnReceiveText(this._OnReceiveText);
+      connection.onReceiveStamp -= new ClanChatRoom.OnReceiveStamp(this._OnReceiveStamp);
+      connection.onReceivePrivateText -= new ClanChatRoom.OnReceiveText(this._OnReceivePrivateText);
+      connection.onReceivePrivateStamp -= new ClanChatRoom.OnReceiveStamp(this._OnReceivePrivateStamp);
+      connection.onReceiveNotification -= new ClanChatRoom.OnReceiveNotification(this._OnReceiveNotification);
+      connection.onReceiveUpdateStatus -= new ClanChatRoom.OnReceiveUpdateStatus(this._OnReceiveUpdateStatus);
+    }
+    this.connection = connection;
+    connection.onJoin += new ClanChatRoom.OnJoin(this._OnJoin);
+    connection.onLeave += new ClanChatRoom.OnLeave(this._OnLeave);
+    connection.onReceiveText += new ClanChatRoom.OnReceiveText(this._OnReceiveText);
+    connection.onReceiveStamp += new ClanChatRoom.OnReceiveStamp(this._OnReceiveStamp);
+    connection.onReceivePrivateText += new ClanChatRoom.OnReceiveText(this._OnReceivePrivateText);
+    connection.onReceivePrivateStamp += new ClanChatRoom.OnReceiveStamp(this._OnReceivePrivateStamp);
+    connection.onReceiveNotification += new ClanChatRoom.OnReceiveNotification(this._OnReceiveNotification);
+    connection.onDisconnect += new ClanChatRoom.OnDisconnect(this._OnDisconnect);
+    connection.onReceiveUpdateStatus += new ClanChatRoom.OnReceiveUpdateStatus(this._OnReceiveUpdateStatus);
+  }
 
-	public event OnReceiveStamp onReceivePrivateStamp;
+  public void JoinRoom(int roomNo)
+  {
+    if (!MonoBehaviourSingleton<UserInfoManager>.IsValid())
+      return;
+    this.connection.Join(roomNo, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name);
+  }
 
-	public event OnReceiveNotification onReceiveNotification;
+  public void LeaveRoom(int roomNo)
+  {
+    if (!MonoBehaviourSingleton<UserInfoManager>.IsValid())
+      return;
+    this.connection.Leave(roomNo, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name);
+  }
 
-	public event OnReceiveUpdateStatus onReceiveUpdateStatus;
+  public bool SendMessage(string message)
+  {
+    if (this.sendLimitter.IsLimit())
+      return false;
+    this.sendLimitter.Touch();
+    this.connection.SendText(message);
+    return !this.sendLimitter.IsLimit();
+  }
 
-	public event OnDisconnect onDisconnect;
+  public bool SendStamp(int stampId)
+  {
+    if (this.sendLimitter.IsLimit())
+      return false;
+    this.sendLimitter.Touch();
+    this.connection.SendStamp(stampId);
+    return !this.sendLimitter.IsLimit();
+  }
 
-	public ClanChatRoom()
-	{
-		GlobalSettingsManager.ChatParam chatParam = MonoBehaviourSingleton<GlobalSettingsManager>.I.chatParam;
-		sendLimitter = new ChatSendLimitter(chatParam.limitCount, chatParam.limitDuration);
-	}
+  public bool SendPrivateMessage(string target_id, string message)
+  {
+    if (this.sendLimitter.IsLimit())
+      return false;
+    this.sendLimitter.Touch();
+    this.connection.SendPrivateText(target_id, message);
+    return !this.sendLimitter.IsLimit();
+  }
 
-	public bool CanSendMessage()
-	{
-		return !sendLimitter.IsLimit();
-	}
+  public bool SendPrivateStamp(string target_id, int stampId)
+  {
+    if (this.sendLimitter.IsLimit())
+      return false;
+    this.sendLimitter.Touch();
+    this.connection.SendPrivateStamp(target_id, stampId);
+    return !this.sendLimitter.IsLimit();
+  }
 
-	public void SetConnection(IClanChatConnection connection)
-	{
-		if (this.connection != null)
-		{
-			if (this.connection.isEstablished)
-			{
-				this.connection.Disconnect(null);
-			}
-			connection.onJoin -= _OnJoin;
-			connection.onLeave -= _OnLeave;
-			connection.onReceiveText -= _OnReceiveText;
-			connection.onReceiveStamp -= _OnReceiveStamp;
-			connection.onReceivePrivateText -= _OnReceivePrivateText;
-			connection.onReceivePrivateStamp -= _OnReceivePrivateStamp;
-			connection.onReceiveNotification -= _OnReceiveNotification;
-			connection.onReceiveUpdateStatus -= _OnReceiveUpdateStatus;
-		}
-		this.connection = connection;
-		connection.onJoin += _OnJoin;
-		connection.onLeave += _OnLeave;
-		connection.onReceiveText += _OnReceiveText;
-		connection.onReceiveStamp += _OnReceiveStamp;
-		connection.onReceivePrivateText += _OnReceivePrivateText;
-		connection.onReceivePrivateStamp += _OnReceivePrivateStamp;
-		connection.onReceiveNotification += _OnReceiveNotification;
-		connection.onDisconnect += _OnDisconnect;
-		connection.onReceiveUpdateStatus += _OnReceiveUpdateStatus;
-	}
+  public void Disconnect(System.Action onFinished = null) => this.connection.Disconnect(onFinished);
 
-	public void JoinRoom(int roomNo)
-	{
-		if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
-		{
-			connection.Join(roomNo, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name);
-		}
-	}
+  private void _OnJoin(CHAT_ERROR_TYPE errorType, string userId)
+  {
+    if (this.onJoin == null)
+      return;
+    this.onJoin(errorType, userId);
+  }
 
-	public void LeaveRoom(int roomNo)
-	{
-		if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
-		{
-			connection.Leave(roomNo, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name);
-		}
-	}
+  private void _OnLeave(CHAT_ERROR_TYPE errorType, string userId)
+  {
+    if (this.onLeave == null)
+      return;
+    this.onLeave(errorType, userId);
+  }
 
-	public bool SendMessage(string message)
-	{
-		if (sendLimitter.IsLimit())
-		{
-			return false;
-		}
-		sendLimitter.Touch();
-		connection.SendText(message);
-		return !sendLimitter.IsLimit();
-	}
+  private void _OnReceiveText(ClanChatLogMessageData clanChatMsgData)
+  {
+    if (this.onReceiveText == null)
+      return;
+    this.onReceiveText(clanChatMsgData);
+  }
 
-	public bool SendStamp(int stampId)
-	{
-		if (sendLimitter.IsLimit())
-		{
-			return false;
-		}
-		sendLimitter.Touch();
-		connection.SendStamp(stampId);
-		return !sendLimitter.IsLimit();
-	}
+  private void _OnReceiveStamp(ClanChatLogMessageData clanChatMsgData)
+  {
+    if (this.onReceiveStamp == null)
+      return;
+    this.onReceiveStamp(clanChatMsgData);
+  }
 
-	public bool SendPrivateMessage(string target_id, string message)
-	{
-		if (sendLimitter.IsLimit())
-		{
-			return false;
-		}
-		sendLimitter.Touch();
-		connection.SendPrivateText(target_id, message);
-		return !sendLimitter.IsLimit();
-	}
+  private void _OnReceivePrivateText(ClanChatLogMessageData clanChatMsgData)
+  {
+    if (this.onReceivePrivateText == null)
+      return;
+    this.onReceivePrivateText(clanChatMsgData);
+  }
 
-	public bool SendPrivateStamp(string target_id, int stampId)
-	{
-		if (sendLimitter.IsLimit())
-		{
-			return false;
-		}
-		sendLimitter.Touch();
-		connection.SendPrivateStamp(target_id, stampId);
-		return !sendLimitter.IsLimit();
-	}
+  private void _OnReceivePrivateStamp(ClanChatLogMessageData clanChatMsgData)
+  {
+    if (this.onReceivePrivateStamp == null)
+      return;
+    this.onReceivePrivateStamp(clanChatMsgData);
+  }
 
-	public void Disconnect(Action onFinished = null)
-	{
-		connection.Disconnect(onFinished);
-	}
+  private void _OnReceiveNotification(string message)
+  {
+    if (this.onReceiveNotification == null)
+      return;
+    this.onReceiveNotification(message);
+  }
 
-	private void _OnJoin(CHAT_ERROR_TYPE errorType, string userId)
-	{
-		if (this.onJoin != null)
-		{
-			this.onJoin(errorType, userId);
-		}
-	}
+  private void _OnReceiveUpdateStatus(ClanUpdateStatusData clanUpdateStatusData)
+  {
+    if (this.onReceiveUpdateStatus == null)
+      return;
+    this.onReceiveUpdateStatus(clanUpdateStatusData);
+  }
 
-	private void _OnLeave(CHAT_ERROR_TYPE errorType, string userId)
-	{
-		if (this.onLeave != null)
-		{
-			this.onLeave(errorType, userId);
-		}
-	}
+  private void _OnDisconnect()
+  {
+    if (this.onDisconnect == null)
+      return;
+    this.onDisconnect();
+  }
 
-	private void _OnReceiveText(ClanChatLogMessageData clanChatMsgData)
-	{
-		if (this.onReceiveText != null)
-		{
-			this.onReceiveText(clanChatMsgData);
-		}
-	}
+  public override string ToString() => this.connection.ToString();
 
-	private void _OnReceiveStamp(ClanChatLogMessageData clanChatMsgData)
-	{
-		if (this.onReceiveStamp != null)
-		{
-			this.onReceiveStamp(clanChatMsgData);
-		}
-	}
+  public delegate void OnJoin(CHAT_ERROR_TYPE errorType, string userId);
 
-	private void _OnReceivePrivateText(ClanChatLogMessageData clanChatMsgData)
-	{
-		if (this.onReceivePrivateText != null)
-		{
-			this.onReceivePrivateText(clanChatMsgData);
-		}
-	}
+  public delegate void OnLeave(CHAT_ERROR_TYPE errorType, string userId);
 
-	private void _OnReceivePrivateStamp(ClanChatLogMessageData clanChatMsgData)
-	{
-		if (this.onReceivePrivateStamp != null)
-		{
-			this.onReceivePrivateStamp(clanChatMsgData);
-		}
-	}
+  public delegate void OnReceiveText(ClanChatLogMessageData clanChatMsgData);
 
-	private void _OnReceiveNotification(string message)
-	{
-		if (this.onReceiveNotification != null)
-		{
-			this.onReceiveNotification(message);
-		}
-	}
+  public delegate void OnReceiveStamp(ClanChatLogMessageData clanChatMsgData);
 
-	private void _OnReceiveUpdateStatus(ClanUpdateStatusData clanUpdateStatusData)
-	{
-		if (this.onReceiveUpdateStatus != null)
-		{
-			this.onReceiveUpdateStatus(clanUpdateStatusData);
-		}
-	}
+  public delegate void OnReceiveNotification(string message);
 
-	private void _OnDisconnect()
-	{
-		if (this.onDisconnect != null)
-		{
-			this.onDisconnect();
-		}
-	}
+  public delegate void OnDisconnect();
 
-	public override string ToString()
-	{
-		return connection.ToString();
-	}
+  public delegate void OnReceiveUpdateStatus(ClanUpdateStatusData statusData);
 }

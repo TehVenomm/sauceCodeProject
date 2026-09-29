@@ -1,25 +1,22 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Coop_Model_RoomLeaved
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class Coop_Model_RoomLeaved : Coop_Model_Base
 {
-	public int cid;
+  public int cid;
+  public string token = "";
+  public int stgid;
+  public int stghostid;
 
-	public string token = string.Empty;
+  public Coop_Model_RoomLeaved() => this.packetType = PACKET_TYPE.ROOM_LEAVED;
 
-	public int stgid;
-
-	public int stghostid;
-
-	public Coop_Model_RoomLeaved()
-	{
-		base.packetType = PACKET_TYPE.ROOM_LEAVED;
-	}
-
-	public override string ToString()
-	{
-		string empty = string.Empty;
-		empty = empty + ",cid=" + cid;
-		empty = empty + ",token=" + token;
-		empty = empty + ",stgid=" + stgid;
-		empty = empty + ",stghostid=" + stghostid;
-		return base.ToString() + empty;
-	}
+  public override string ToString()
+  {
+    string str = $"{$"{$"{$",cid={(object) this.cid}"},token={this.token}"},stgid={(object) this.stgid}"},stghostid={(object) this.stghostid}";
+    return base.ToString() + str;
+  }
 }

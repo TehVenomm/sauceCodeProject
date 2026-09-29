@@ -1,23 +1,26 @@
-public class ResidentEffectObject
+﻿// Decompiled with JetBrains decompiler
+// Type: ResidentEffectObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using UnityEngine;
+
+#nullable disable
+public class ResidentEffectObject : MonoBehaviour
 {
-	public int GroupID;
+  public int GroupID;
+  public string UniqueName = string.Empty;
 
-	public string UniqueName = string.Empty;
+  public void Initialize(SystemEffectSetting.Data effectData)
+  {
+    this.GroupID = effectData.groupID;
+    this.UniqueName = effectData.UniqueName;
+  }
 
-	public ResidentEffectObject()
-		: this()
-	{
-	}
-
-	public void Initialize(SystemEffectSetting.Data effectData)
-	{
-		GroupID = effectData.groupID;
-		UniqueName = effectData.UniqueName;
-	}
-
-	public void Initialize(AnimEventData.ResidentEffectData effectData)
-	{
-		GroupID = effectData.groupID;
-		UniqueName = effectData.UniqueName;
-	}
+  public void Initialize(AnimEventData.ResidentEffectData effectData)
+  {
+    this.GroupID = effectData.groupID;
+    this.UniqueName = effectData.UniqueName;
+  }
 }

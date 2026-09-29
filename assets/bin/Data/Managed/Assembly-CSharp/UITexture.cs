@@ -1,377 +1,310 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UITexture
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/NGUI Texture")]
 public class UITexture : UIBasicSprite
 {
-	[HideInInspector]
-	[SerializeField]
-	private Rect mRect = new Rect(0f, 0f, 1f, 1f);
+  [HideInInspector]
+  [SerializeField]
+  private Rect mRect = new Rect(0.0f, 0.0f, 1f, 1f);
+  [HideInInspector]
+  [SerializeField]
+  private Texture mTexture;
+  [HideInInspector]
+  [SerializeField]
+  private Material mMat;
+  [HideInInspector]
+  [SerializeField]
+  private Shader mShader;
+  [HideInInspector]
+  [SerializeField]
+  private Vector4 mBorder = Vector4.zero;
+  [HideInInspector]
+  [SerializeField]
+  private bool mFixedAspect;
+  [NonSerialized]
+  private int mPMA = -1;
 
-	[SerializeField]
-	[HideInInspector]
-	private Texture mTexture;
+  public override Texture mainTexture
+  {
+    get
+    {
+      if (Object.op_Inequality((Object) this.mTexture, (Object) null))
+        return this.mTexture;
+      return Object.op_Inequality((Object) this.mMat, (Object) null) ? this.mMat.mainTexture : (Texture) null;
+    }
+    set
+    {
+      if (!Object.op_Inequality((Object) this.mTexture, (Object) value))
+        return;
+      if (Object.op_Inequality((Object) this.drawCall, (Object) null) && this.drawCall.widgetCount == 1 && Object.op_Equality((Object) this.mMat, (Object) null))
+      {
+        this.mTexture = value;
+        this.drawCall.mainTexture = value;
+      }
+      else
+      {
+        this.RemoveFromPanel();
+        this.mTexture = value;
+        this.mPMA = -1;
+        this.MarkAsChanged();
+      }
+    }
+  }
 
-	[HideInInspector]
-	[SerializeField]
-	private Material mMat;
+  public override Material material
+  {
+    get => this.mMat;
+    set
+    {
+      if (!Object.op_Inequality((Object) this.mMat, (Object) value))
+        return;
+      this.RemoveFromPanel();
+      this.mShader = (Shader) null;
+      this.mMat = value;
+      this.mPMA = -1;
+      this.MarkAsChanged();
+    }
+  }
 
-	[HideInInspector]
-	[SerializeField]
-	private Shader mShader;
+  public override Shader shader
+  {
+    get
+    {
+      if (Object.op_Inequality((Object) this.mMat, (Object) null))
+        return this.mMat.shader;
+      if (Object.op_Equality((Object) this.mShader, (Object) null))
+        this.mShader = Shader.Find("Unlit/Transparent Colored");
+      return this.mShader;
+    }
+    set
+    {
+      if (!Object.op_Inequality((Object) this.mShader, (Object) value))
+        return;
+      if (Object.op_Inequality((Object) this.drawCall, (Object) null) && this.drawCall.widgetCount == 1 && Object.op_Equality((Object) this.mMat, (Object) null))
+      {
+        this.mShader = value;
+        this.drawCall.shader = value;
+      }
+      else
+      {
+        this.RemoveFromPanel();
+        this.mShader = value;
+        this.mPMA = -1;
+        this.mMat = (Material) null;
+        this.MarkAsChanged();
+      }
+    }
+  }
 
-	[HideInInspector]
-	[SerializeField]
-	private Vector4 mBorder = Vector4.get_zero();
+  public override bool premultipliedAlpha
+  {
+    get
+    {
+      if (this.mPMA == -1)
+      {
+        Material material = this.material;
+        this.mPMA = !Object.op_Inequality((Object) material, (Object) null) || !Object.op_Inequality((Object) material.shader, (Object) null) || !((Object) material.shader).name.Contains("Premultiplied") ? 0 : 1;
+      }
+      return this.mPMA == 1;
+    }
+  }
 
-	[SerializeField]
-	[HideInInspector]
-	private bool mFixedAspect;
+  public override Vector4 border
+  {
+    get => this.mBorder;
+    set
+    {
+      if (!Vector4.op_Inequality(this.mBorder, value))
+        return;
+      this.mBorder = value;
+      this.MarkAsChanged();
+    }
+  }
 
-	[NonSerialized]
-	private int mPMA = -1;
+  public Rect uvRect
+  {
+    get => this.mRect;
+    set
+    {
+      if (!Rect.op_Inequality(this.mRect, value))
+        return;
+      this.mRect = value;
+      this.MarkAsChanged();
+    }
+  }
 
-	public override Texture mainTexture
-	{
-		get
-		{
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Expected O, but got Unknown
-			if (mTexture != null)
-			{
-				return mTexture;
-			}
-			if (mMat != null)
-			{
-				return mMat.get_mainTexture();
-			}
-			return null;
-		}
-		set
-		{
-			if (mTexture != value)
-			{
-				if (drawCall != null && drawCall.widgetCount == 1 && mMat == null)
-				{
-					mTexture = value;
-					drawCall.mainTexture = value;
-				}
-				else
-				{
-					RemoveFromPanel();
-					mTexture = value;
-					mPMA = -1;
-					MarkAsChanged();
-				}
-			}
-		}
-	}
+  public override Vector4 drawingDimensions
+  {
+    get
+    {
+      Vector2 pivotOffset = this.pivotOffset;
+      float num1 = -pivotOffset.x * (float) this.mWidth;
+      float num2 = -pivotOffset.y * (float) this.mHeight;
+      float num3 = num1 + (float) this.mWidth;
+      float num4 = num2 + (float) this.mHeight;
+      if (Object.op_Inequality((Object) this.mTexture, (Object) null) && this.mType != UIBasicSprite.Type.Tiled)
+      {
+        int width = this.mTexture.width;
+        int height = this.mTexture.height;
+        int num5 = 0;
+        int num6 = 0;
+        float num7 = 1f;
+        float num8 = 1f;
+        if (width > 0 && height > 0 && (this.mType == UIBasicSprite.Type.Simple || this.mType == UIBasicSprite.Type.Filled))
+        {
+          if ((width & 1) != 0)
+            ++num5;
+          if ((height & 1) != 0)
+            ++num6;
+          num7 = 1f / (float) width * (float) this.mWidth;
+          num8 = 1f / (float) height * (float) this.mHeight;
+        }
+        if (this.mFlip == UIBasicSprite.Flip.Horizontally || this.mFlip == UIBasicSprite.Flip.Both)
+          num1 += (float) num5 * num7;
+        else
+          num3 -= (float) num5 * num7;
+        if (this.mFlip == UIBasicSprite.Flip.Vertically || this.mFlip == UIBasicSprite.Flip.Both)
+          num2 += (float) num6 * num8;
+        else
+          num4 -= (float) num6 * num8;
+      }
+      float num9;
+      float num10;
+      if (this.mFixedAspect)
+      {
+        num9 = 0.0f;
+        num10 = 0.0f;
+      }
+      else
+      {
+        Vector4 border = this.border;
+        num9 = border.x + border.z;
+        num10 = border.y + border.w;
+      }
+      double num11 = (double) Mathf.Lerp(num1, num3 - num9, this.mDrawRegion.x);
+      float num12 = Mathf.Lerp(num2, num4 - num10, this.mDrawRegion.y);
+      float num13 = Mathf.Lerp(num1 + num9, num3, this.mDrawRegion.z);
+      float num14 = Mathf.Lerp(num2 + num10, num4, this.mDrawRegion.w);
+      double num15 = (double) num12;
+      double num16 = (double) num13;
+      double num17 = (double) num14;
+      return new Vector4((float) num11, (float) num15, (float) num16, (float) num17);
+    }
+  }
 
-	public override Material material
-	{
-		get
-		{
-			return mMat;
-		}
-		set
-		{
-			if (mMat != value)
-			{
-				RemoveFromPanel();
-				mShader = null;
-				mMat = value;
-				mPMA = -1;
-				MarkAsChanged();
-			}
-		}
-	}
+  public bool fixedAspect
+  {
+    get => this.mFixedAspect;
+    set
+    {
+      if (this.mFixedAspect == value)
+        return;
+      this.mFixedAspect = value;
+      this.mDrawRegion = new Vector4(0.0f, 0.0f, 1f, 1f);
+      this.MarkAsChanged();
+    }
+  }
 
-	public override Shader shader
-	{
-		get
-		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Expected O, but got Unknown
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Expected O, but got Unknown
-			if (mMat != null)
-			{
-				return mMat.get_shader();
-			}
-			if (mShader == null)
-			{
-				mShader = Shader.Find("Unlit/Transparent Colored");
-			}
-			return mShader;
-		}
-		set
-		{
-			if (mShader != value)
-			{
-				if (drawCall != null && drawCall.widgetCount == 1 && mMat == null)
-				{
-					mShader = value;
-					drawCall.shader = value;
-				}
-				else
-				{
-					RemoveFromPanel();
-					mShader = value;
-					mPMA = -1;
-					mMat = null;
-					MarkAsChanged();
-				}
-			}
-		}
-	}
+  public override void MakePixelPerfect()
+  {
+    base.MakePixelPerfect();
+    if (this.mType == UIBasicSprite.Type.Tiled)
+      return;
+    Texture mainTexture = this.mainTexture;
+    if (Object.op_Equality((Object) mainTexture, (Object) null) || this.mType != UIBasicSprite.Type.Simple && this.mType != UIBasicSprite.Type.Filled && this.hasBorder || !Object.op_Inequality((Object) mainTexture, (Object) null))
+      return;
+    int width = mainTexture.width;
+    int height = mainTexture.height;
+    if ((width & 1) == 1)
+      ++width;
+    if ((height & 1) == 1)
+      ++height;
+    this.width = width;
+    this.height = height;
+  }
 
-	public override bool premultipliedAlpha
-	{
-		get
-		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			if (mPMA == -1)
-			{
-				Material material = this.material;
-				mPMA = ((material != null && material.get_shader() != null && material.get_shader().get_name().Contains("Premultiplied")) ? 1 : 0);
-			}
-			return mPMA == 1;
-		}
-	}
+  protected override void OnUpdate()
+  {
+    base.OnUpdate();
+    if (!this.mFixedAspect)
+      return;
+    Texture mainTexture = this.mainTexture;
+    if (!Object.op_Inequality((Object) mainTexture, (Object) null))
+      return;
+    int width = mainTexture.width;
+    int height = mainTexture.height;
+    if ((width & 1) == 1)
+      ++width;
+    if ((height & 1) == 1)
+      ++height;
+    float mWidth = (float) this.mWidth;
+    float mHeight = (float) this.mHeight;
+    float num1 = mWidth / mHeight;
+    float num2 = (float) width / (float) height;
+    if ((double) num2 < (double) num1)
+    {
+      float num3 = (float) (((double) mWidth - (double) mHeight * (double) num2) / (double) mWidth * 0.5);
+      this.drawRegion = new Vector4(num3, 0.0f, 1f - num3, 1f);
+    }
+    else
+    {
+      float num4 = (float) (((double) mHeight - (double) mWidth / (double) num2) / (double) mHeight * 0.5);
+      this.drawRegion = new Vector4(0.0f, num4, 1f, 1f - num4);
+    }
+  }
 
-	public override Vector4 border
-	{
-		get
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			return mBorder;
-		}
-		set
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			if (mBorder != value)
-			{
-				mBorder = value;
-				MarkAsChanged();
-			}
-		}
-	}
-
-	public Rect uvRect
-	{
-		get
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			return mRect;
-		}
-		set
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			if (mRect != value)
-			{
-				mRect = value;
-				MarkAsChanged();
-			}
-		}
-	}
-
-	public override Vector4 drawingDimensions
-	{
-		get
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-			Vector2 pivotOffset = base.pivotOffset;
-			float num = (0f - pivotOffset.x) * (float)mWidth;
-			float num2 = (0f - pivotOffset.y) * (float)mHeight;
-			float num3 = num + (float)mWidth;
-			float num4 = num2 + (float)mHeight;
-			if (mTexture != null && mType != Type.Tiled)
-			{
-				int width = mTexture.get_width();
-				int height = mTexture.get_height();
-				int num5 = 0;
-				int num6 = 0;
-				float num7 = 1f;
-				float num8 = 1f;
-				if (width > 0 && height > 0 && (mType == Type.Simple || mType == Type.Filled))
-				{
-					if ((width & 1) != 0)
-					{
-						num5++;
-					}
-					if ((height & 1) != 0)
-					{
-						num6++;
-					}
-					num7 = 1f / (float)width * (float)mWidth;
-					num8 = 1f / (float)height * (float)mHeight;
-				}
-				if (mFlip == Flip.Horizontally || mFlip == Flip.Both)
-				{
-					num += (float)num5 * num7;
-				}
-				else
-				{
-					num3 -= (float)num5 * num7;
-				}
-				if (mFlip == Flip.Vertically || mFlip == Flip.Both)
-				{
-					num2 += (float)num6 * num8;
-				}
-				else
-				{
-					num4 -= (float)num6 * num8;
-				}
-			}
-			float num9;
-			float num10;
-			if (mFixedAspect)
-			{
-				num9 = 0f;
-				num10 = 0f;
-			}
-			else
-			{
-				Vector4 border = this.border;
-				num9 = border.x + border.z;
-				num10 = border.y + border.w;
-			}
-			float num11 = Mathf.Lerp(num, num3 - num9, mDrawRegion.x);
-			float num12 = Mathf.Lerp(num2, num4 - num10, mDrawRegion.y);
-			float num13 = Mathf.Lerp(num + num9, num3, mDrawRegion.z);
-			float num14 = Mathf.Lerp(num2 + num10, num4, mDrawRegion.w);
-			return new Vector4(num11, num12, num13, num14);
-		}
-	}
-
-	public bool fixedAspect
-	{
-		get
-		{
-			return mFixedAspect;
-		}
-		set
-		{
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			if (mFixedAspect != value)
-			{
-				mFixedAspect = value;
-				mDrawRegion = new Vector4(0f, 0f, 1f, 1f);
-				MarkAsChanged();
-			}
-		}
-	}
-
-	public override void MakePixelPerfect()
-	{
-		base.MakePixelPerfect();
-		if (mType != Type.Tiled)
-		{
-			Texture mainTexture = this.mainTexture;
-			if (!(mainTexture == null) && (mType == Type.Simple || mType == Type.Filled || !base.hasBorder) && mainTexture != null)
-			{
-				int num = mainTexture.get_width();
-				int num2 = mainTexture.get_height();
-				if ((num & 1) == 1)
-				{
-					num++;
-				}
-				if ((num2 & 1) == 1)
-				{
-					num2++;
-				}
-				base.width = num;
-				base.height = num2;
-			}
-		}
-	}
-
-	protected override void OnUpdate()
-	{
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		base.OnUpdate();
-		if (mFixedAspect)
-		{
-			Texture mainTexture = this.mainTexture;
-			if (mainTexture != null)
-			{
-				int num = mainTexture.get_width();
-				int num2 = mainTexture.get_height();
-				if ((num & 1) == 1)
-				{
-					num++;
-				}
-				if ((num2 & 1) == 1)
-				{
-					num2++;
-				}
-				float num3 = (float)mWidth;
-				float num4 = (float)mHeight;
-				float num5 = num3 / num4;
-				float num6 = (float)num / (float)num2;
-				if (num6 < num5)
-				{
-					float num7 = (num3 - num4 * num6) / num3 * 0.5f;
-					base.drawRegion = new Vector4(num7, 0f, 1f - num7, 1f);
-				}
-				else
-				{
-					float num8 = (num4 - num3 / num6) / num4 * 0.5f;
-					base.drawRegion = new Vector4(0f, num8, 1f, 1f - num8);
-				}
-			}
-		}
-	}
-
-	public override void OnFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
-	{
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-		Texture mainTexture = this.mainTexture;
-		if (!(mainTexture == null))
-		{
-			Rect val = default(Rect);
-			val._002Ector(mRect.get_x() * (float)mainTexture.get_width(), mRect.get_y() * (float)mainTexture.get_height(), (float)mainTexture.get_width() * mRect.get_width(), (float)mainTexture.get_height() * mRect.get_height());
-			Rect inner = val;
-			Vector4 border = this.border;
-			inner.set_xMin(inner.get_xMin() + border.x);
-			inner.set_yMin(inner.get_yMin() + border.y);
-			inner.set_xMax(inner.get_xMax() - border.z);
-			inner.set_yMax(inner.get_yMax() - border.w);
-			float num = 1f / (float)mainTexture.get_width();
-			float num2 = 1f / (float)mainTexture.get_height();
-			val.set_xMin(val.get_xMin() * num);
-			val.set_xMax(val.get_xMax() * num);
-			val.set_yMin(val.get_yMin() * num2);
-			val.set_yMax(val.get_yMax() * num2);
-			inner.set_xMin(inner.get_xMin() * num);
-			inner.set_xMax(inner.get_xMax() * num);
-			inner.set_yMin(inner.get_yMin() * num2);
-			inner.set_yMax(inner.get_yMax() * num2);
-			int size = verts.size;
-			Fill(verts, uvs, cols, val, inner);
-			if (onPostFill != null)
-			{
-				onPostFill(this, size, verts, uvs, cols);
-			}
-		}
-	}
+  public override void OnFill(
+    BetterList<Vector3> verts,
+    BetterList<Vector2> uvs,
+    BetterList<Color32> cols)
+  {
+    Texture mainTexture = this.mainTexture;
+    if (Object.op_Equality((Object) mainTexture, (Object) null))
+      return;
+    Rect outer;
+    // ISSUE: explicit constructor call
+    ((Rect) ref outer).\u002Ector(((Rect) ref this.mRect).x * (float) mainTexture.width, ((Rect) ref this.mRect).y * (float) mainTexture.height, (float) mainTexture.width * ((Rect) ref this.mRect).width, (float) mainTexture.height * ((Rect) ref this.mRect).height);
+    Rect inner = outer;
+    Vector4 border = this.border;
+    ref Rect local1 = ref inner;
+    ((Rect) ref local1).xMin = ((Rect) ref local1).xMin + border.x;
+    ref Rect local2 = ref inner;
+    ((Rect) ref local2).yMin = ((Rect) ref local2).yMin + border.y;
+    ref Rect local3 = ref inner;
+    ((Rect) ref local3).xMax = ((Rect) ref local3).xMax - border.z;
+    ref Rect local4 = ref inner;
+    ((Rect) ref local4).yMax = ((Rect) ref local4).yMax - border.w;
+    float num1 = 1f / (float) mainTexture.width;
+    float num2 = 1f / (float) mainTexture.height;
+    ref Rect local5 = ref outer;
+    ((Rect) ref local5).xMin = ((Rect) ref local5).xMin * num1;
+    ref Rect local6 = ref outer;
+    ((Rect) ref local6).xMax = ((Rect) ref local6).xMax * num1;
+    ref Rect local7 = ref outer;
+    ((Rect) ref local7).yMin = ((Rect) ref local7).yMin * num2;
+    ref Rect local8 = ref outer;
+    ((Rect) ref local8).yMax = ((Rect) ref local8).yMax * num2;
+    ref Rect local9 = ref inner;
+    ((Rect) ref local9).xMin = ((Rect) ref local9).xMin * num1;
+    ref Rect local10 = ref inner;
+    ((Rect) ref local10).xMax = ((Rect) ref local10).xMax * num1;
+    ref Rect local11 = ref inner;
+    ((Rect) ref local11).yMin = ((Rect) ref local11).yMin * num2;
+    ref Rect local12 = ref inner;
+    ((Rect) ref local12).yMax = ((Rect) ref local12).yMax * num2;
+    int size = verts.size;
+    this.Fill(verts, uvs, cols, outer, inner);
+    if (this.onPostFill == null)
+      return;
+    this.onPostFill((UIWidget) this, size, verts, uvs, cols);
+  }
 }

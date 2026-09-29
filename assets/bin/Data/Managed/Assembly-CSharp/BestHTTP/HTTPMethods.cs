@@ -1,12 +1,18 @@
-namespace BestHTTP
+﻿// Decompiled with JetBrains decompiler
+// Type: BestHTTP.HTTPMethods
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
+namespace BestHTTP;
+
+public enum HTTPMethods
 {
-	public enum HTTPMethods
-	{
-		Get,
-		Head,
-		Post,
-		Put,
-		Delete,
-		Patch
-	}
+  Get,
+  Head,
+  Post,
+  Put,
+  Delete,
+  Patch,
 }

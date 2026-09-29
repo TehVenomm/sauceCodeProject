@@ -1,59 +1,50 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: HomeNPCArenaSoldier
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class HomeNPCArenaSoldier : HomeNPCCharacter
 {
-	protected const float TURN_DEGREE_MAX = 90f;
+  protected const float TURN_DEGREE_MAX = 90f;
+  private const int TURN_FRAME = 25;
+  private const float TURN_DEGREE_PER_FRAME = 3.6f;
+  private bool isTurned;
+  private float rotatedDegree;
 
-	private const int TURN_FRAME = 25;
+  protected override void PlayNearAnim(HomeNPCCharacter npc)
+  {
+    if (!MonoBehaviourSingleton<UserInfoManager>.I.isArenaOpen)
+      this.animCtrl.Play(npc.nearAnim);
+    else if (MonoBehaviourSingleton<UserInfoManager>.I.isJoinedArenaRanking && this.animCtrl.playingAnim == PLCA.IDLE_01 && this.isTurned)
+      this.animCtrl.Play(PLCA.THROUGH_BOW);
+    else if ((int) MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level >= 50)
+    {
+      if (this.isTurned)
+        return;
+      this.StartCoroutine(this.PlayThroughTurn());
+      this.isTurned = true;
+    }
+    else
+      this.animCtrl.Play(npc.nearAnim);
+  }
 
-	private const float TURN_DEGREE_PER_FRAME = 3.6f;
-
-	private bool isTurned;
-
-	private float rotatedDegree;
-
-	protected override void PlayNearAnim(HomeNPCCharacter npc)
-	{
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		if (!MonoBehaviourSingleton<UserInfoManager>.I.isArenaOpen)
-		{
-			animCtrl.Play(npc.nearAnim, false);
-		}
-		else if (MonoBehaviourSingleton<UserInfoManager>.I.isJoinedArenaRanking && animCtrl.playingAnim == PLCA.IDLE_01 && isTurned)
-		{
-			animCtrl.Play(PLCA.THROUGH_BOW, false);
-		}
-		else if ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level >= 50)
-		{
-			if (!isTurned)
-			{
-				this.StartCoroutine(PlayThroughTurn());
-				isTurned = true;
-			}
-		}
-		else
-		{
-			animCtrl.Play(npc.nearAnim, false);
-		}
-	}
-
-	private IEnumerator PlayThroughTurn()
-	{
-		animCtrl.Play(PLCA.THROUGH_TURN, false);
-		int turnSign = (base.npcInfo.scaleX > 0f) ? 1 : (-1);
-		Vector3 eulerAngles = base._transform.get_eulerAngles();
-		float beforeTurnRot = eulerAngles.y;
-		while (rotatedDegree <= 90f)
-		{
-			rotatedDegree += 3.6f;
-			if (rotatedDegree > 90f)
-			{
-				rotatedDegree = 90f;
-			}
-			float rotateY = beforeTurnRot + rotatedDegree * (float)turnSign;
-			base._transform.set_rotation(Quaternion.Euler(0f, rotateY, 0f));
-			yield return (object)null;
-		}
-	}
+  private IEnumerator PlayThroughTurn()
+  {
+    this.animCtrl.Play(PLCA.THROUGH_TURN);
+    int turnSign = (double) this.npcInfo.scaleX > 0.0 ? 1 : -1;
+    float beforeTurnRot = this._transform.eulerAngles.y;
+    while ((double) this.rotatedDegree <= 90.0)
+    {
+      this.rotatedDegree += 3.6f;
+      if ((double) this.rotatedDegree > 90.0)
+        this.rotatedDegree = 90f;
+      this._transform.rotation = Quaternion.Euler(0.0f, beforeTurnRot + this.rotatedDegree * (float) turnSign, 0.0f);
+      yield return (object) null;
+    }
+  }
 }

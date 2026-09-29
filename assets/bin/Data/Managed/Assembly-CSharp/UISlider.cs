@@ -1,173 +1,139 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UISlider
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/NGUI Slider")]
 public class UISlider : UIProgressBar
 {
-	private enum Direction
-	{
-		Horizontal,
-		Vertical,
-		Upgraded
-	}
+  [HideInInspector]
+  [SerializeField]
+  private Transform foreground;
+  [HideInInspector]
+  [SerializeField]
+  private float rawValue = 1f;
+  [HideInInspector]
+  [SerializeField]
+  private UISlider.Direction direction = UISlider.Direction.Upgraded;
+  [HideInInspector]
+  [SerializeField]
+  protected bool mInverted;
 
-	[HideInInspector]
-	[SerializeField]
-	private Transform foreground;
+  public bool isColliderEnabled
+  {
+    get
+    {
+      Collider component1 = ((Component) this).GetComponent<Collider>();
+      if (Object.op_Inequality((Object) component1, (Object) null))
+        return component1.enabled;
+      Collider2D component2 = ((Component) this).GetComponent<Collider2D>();
+      return Object.op_Inequality((Object) component2, (Object) null) && ((Behaviour) component2).enabled;
+    }
+  }
 
-	[HideInInspector]
-	[SerializeField]
-	private float rawValue = 1f;
+  [Obsolete("Use 'value' instead")]
+  public float sliderValue
+  {
+    get => this.value;
+    set => this.value = value;
+  }
 
-	[HideInInspector]
-	[SerializeField]
-	private Direction direction = Direction.Upgraded;
+  [Obsolete("Use 'fillDirection' instead")]
+  public bool inverted
+  {
+    get => this.isInverted;
+    set
+    {
+    }
+  }
 
-	[SerializeField]
-	[HideInInspector]
-	protected bool mInverted;
+  protected override void Upgrade()
+  {
+    if (this.direction == UISlider.Direction.Upgraded)
+      return;
+    this.mValue = this.rawValue;
+    if (Object.op_Inequality((Object) this.foreground, (Object) null))
+      this.mFG = ((Component) this.foreground).GetComponent<UIWidget>();
+    if (this.direction == UISlider.Direction.Horizontal)
+      this.mFill = this.mInverted ? UIProgressBar.FillDirection.RightToLeft : UIProgressBar.FillDirection.LeftToRight;
+    else
+      this.mFill = this.mInverted ? UIProgressBar.FillDirection.TopToBottom : UIProgressBar.FillDirection.BottomToTop;
+    this.direction = UISlider.Direction.Upgraded;
+  }
 
-	public bool isColliderEnabled
-	{
-		get
-		{
-			Collider component = this.GetComponent<Collider>();
-			if (component != null)
-			{
-				return component.get_enabled();
-			}
-			Collider2D component2 = this.GetComponent<Collider2D>();
-			return component2 != null && component2.get_enabled();
-		}
-	}
+  protected override void OnStart()
+  {
+    UIEventListener uiEventListener1 = UIEventListener.Get(!Object.op_Inequality((Object) this.mBG, (Object) null) || !Object.op_Inequality((Object) ((Component) this.mBG).GetComponent<Collider>(), (Object) null) && !Object.op_Inequality((Object) ((Component) this.mBG).GetComponent<Collider2D>(), (Object) null) ? ((Component) this).gameObject : ((Component) this.mBG).gameObject);
+    uiEventListener1.onPress += new UIEventListener.BoolDelegate(this.OnPressBackground);
+    uiEventListener1.onDrag += new UIEventListener.VectorDelegate(this.OnDragBackground);
+    if (!Object.op_Inequality((Object) this.thumb, (Object) null) || !Object.op_Inequality((Object) ((Component) this.thumb).GetComponent<Collider>(), (Object) null) && !Object.op_Inequality((Object) ((Component) this.thumb).GetComponent<Collider2D>(), (Object) null) || !Object.op_Equality((Object) this.mFG, (Object) null) && !Object.op_Inequality((Object) this.thumb, (Object) this.mFG.cachedTransform))
+      return;
+    UIEventListener uiEventListener2 = UIEventListener.Get(((Component) this.thumb).gameObject);
+    uiEventListener2.onPress += new UIEventListener.BoolDelegate(this.OnPressForeground);
+    uiEventListener2.onDrag += new UIEventListener.VectorDelegate(this.OnDragForeground);
+  }
 
-	[Obsolete("Use 'value' instead")]
-	public float sliderValue
-	{
-		get
-		{
-			return base.value;
-		}
-		set
-		{
-			base.value = value;
-		}
-	}
+  protected void OnPressBackground(GameObject go, bool isPressed)
+  {
+    if (UICamera.currentScheme == UICamera.ControlScheme.Controller)
+      return;
+    this.mCam = UICamera.currentCamera;
+    this.value = this.ScreenToValue(UICamera.lastEventPosition);
+    if (isPressed || this.onDragFinished == null)
+      return;
+    this.onDragFinished();
+  }
 
-	[Obsolete("Use 'fillDirection' instead")]
-	public bool inverted
-	{
-		get
-		{
-			return base.isInverted;
-		}
-		set
-		{
-		}
-	}
+  protected void OnDragBackground(GameObject go, Vector2 delta)
+  {
+    if (UICamera.currentScheme == UICamera.ControlScheme.Controller)
+      return;
+    this.mCam = UICamera.currentCamera;
+    this.value = this.ScreenToValue(UICamera.lastEventPosition);
+  }
 
-	protected override void Upgrade()
-	{
-		if (direction != Direction.Upgraded)
-		{
-			mValue = rawValue;
-			if (foreground != null)
-			{
-				mFG = foreground.GetComponent<UIWidget>();
-			}
-			if (direction == Direction.Horizontal)
-			{
-				mFill = (mInverted ? FillDirection.RightToLeft : FillDirection.LeftToRight);
-			}
-			else
-			{
-				mFill = ((!mInverted) ? FillDirection.BottomToTop : FillDirection.TopToBottom);
-			}
-			direction = Direction.Upgraded;
-		}
-	}
+  protected void OnPressForeground(GameObject go, bool isPressed)
+  {
+    if (UICamera.currentScheme == UICamera.ControlScheme.Controller)
+      return;
+    this.mCam = UICamera.currentCamera;
+    if (isPressed)
+    {
+      this.mOffset = Object.op_Equality((Object) this.mFG, (Object) null) ? 0.0f : this.value - this.ScreenToValue(UICamera.lastEventPosition);
+    }
+    else
+    {
+      if (this.onDragFinished == null)
+        return;
+      this.onDragFinished();
+    }
+  }
 
-	protected override void OnStart()
-	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Expected O, but got Unknown
-		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0113: Expected O, but got Unknown
-		GameObject go = (!(mBG != null) || (!(mBG.GetComponent<Collider>() != null) && !(mBG.GetComponent<Collider2D>() != null))) ? this.get_gameObject() : mBG.get_gameObject();
-		UIEventListener uIEventListener = UIEventListener.Get(go);
-		UIEventListener uIEventListener2 = uIEventListener;
-		uIEventListener2.onPress = (UIEventListener.BoolDelegate)Delegate.Combine(uIEventListener2.onPress, new UIEventListener.BoolDelegate(OnPressBackground));
-		UIEventListener uIEventListener3 = uIEventListener;
-		uIEventListener3.onDrag = (UIEventListener.VectorDelegate)Delegate.Combine(uIEventListener3.onDrag, new UIEventListener.VectorDelegate(OnDragBackground));
-		if (thumb != null && (thumb.GetComponent<Collider>() != null || thumb.GetComponent<Collider2D>() != null) && (mFG == null || thumb != mFG.cachedTransform))
-		{
-			UIEventListener uIEventListener4 = UIEventListener.Get(thumb.get_gameObject());
-			UIEventListener uIEventListener5 = uIEventListener4;
-			uIEventListener5.onPress = (UIEventListener.BoolDelegate)Delegate.Combine(uIEventListener5.onPress, new UIEventListener.BoolDelegate(OnPressForeground));
-			UIEventListener uIEventListener6 = uIEventListener4;
-			uIEventListener6.onDrag = (UIEventListener.VectorDelegate)Delegate.Combine(uIEventListener6.onDrag, new UIEventListener.VectorDelegate(OnDragForeground));
-		}
-	}
+  protected void OnDragForeground(GameObject go, Vector2 delta)
+  {
+    if (UICamera.currentScheme == UICamera.ControlScheme.Controller)
+      return;
+    this.mCam = UICamera.currentCamera;
+    this.value = this.mOffset + this.ScreenToValue(UICamera.lastEventPosition);
+  }
 
-	protected void OnPressBackground(GameObject go, bool isPressed)
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		if (UICamera.currentScheme != UICamera.ControlScheme.Controller)
-		{
-			mCam = UICamera.currentCamera;
-			base.value = ScreenToValue(UICamera.lastEventPosition);
-			if (!isPressed && onDragFinished != null)
-			{
-				onDragFinished();
-			}
-		}
-	}
+  public override void OnPan(Vector2 delta)
+  {
+    if (!((Behaviour) this).enabled || !this.isColliderEnabled)
+      return;
+    base.OnPan(delta);
+  }
 
-	protected void OnDragBackground(GameObject go, Vector2 delta)
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		if (UICamera.currentScheme != UICamera.ControlScheme.Controller)
-		{
-			mCam = UICamera.currentCamera;
-			base.value = ScreenToValue(UICamera.lastEventPosition);
-		}
-	}
-
-	protected void OnPressForeground(GameObject go, bool isPressed)
-	{
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		if (UICamera.currentScheme != UICamera.ControlScheme.Controller)
-		{
-			mCam = UICamera.currentCamera;
-			if (isPressed)
-			{
-				mOffset = ((!(mFG == null)) ? (base.value - ScreenToValue(UICamera.lastEventPosition)) : 0f);
-			}
-			else if (onDragFinished != null)
-			{
-				onDragFinished();
-			}
-		}
-	}
-
-	protected void OnDragForeground(GameObject go, Vector2 delta)
-	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		if (UICamera.currentScheme != UICamera.ControlScheme.Controller)
-		{
-			mCam = UICamera.currentCamera;
-			base.value = mOffset + ScreenToValue(UICamera.lastEventPosition);
-		}
-	}
-
-	public override void OnPan(Vector2 delta)
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_enabled() && isColliderEnabled)
-		{
-			base.OnPan(delta);
-		}
-	}
+  private enum Direction
+  {
+    Horizontal,
+    Vertical,
+    Upgraded,
+  }
 }

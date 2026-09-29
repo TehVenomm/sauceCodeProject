@@ -1,7 +1,13 @@
-namespace Network
+﻿// Decompiled with JetBrains decompiler
+// Type: Network.QuestArenaCompleteData
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
+namespace Network;
+
+public class QuestArenaCompleteData : QuestCompleteData
 {
-	public class QuestArenaCompleteData : QuestCompleteData
-	{
-		public XorInt previousClearMilliSec = 0;
-	}
+  public XorInt previousClearMilliSec = (XorInt) 0;
 }

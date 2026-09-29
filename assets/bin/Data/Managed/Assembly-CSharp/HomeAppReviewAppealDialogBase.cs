@@ -1,118 +1,108 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: HomeAppReviewAppealDialogBase
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
 
+using System;
+using UnityEngine;
+
+#nullable disable
 public class HomeAppReviewAppealDialogBase : GameSection
 {
-	protected enum UI
-	{
-		LBL_ITEM_TEXT,
-		SPR_BTN_YES,
-		LBL_BTN_YES,
-		BTN_STAR1,
-		BTN_STAR2,
-		BTN_STAR3,
-		BTN_STAR4,
-		BTN_STAR5,
-		OBJ_ON,
-		OBJ_OFF
-	}
+  protected int starValue;
+  private static readonly HomeAppReviewAppealDialogBase.UI[] StarButtons = new HomeAppReviewAppealDialogBase.UI[5]
+  {
+    HomeAppReviewAppealDialogBase.UI.BTN_STAR1,
+    HomeAppReviewAppealDialogBase.UI.BTN_STAR2,
+    HomeAppReviewAppealDialogBase.UI.BTN_STAR3,
+    HomeAppReviewAppealDialogBase.UI.BTN_STAR4,
+    HomeAppReviewAppealDialogBase.UI.BTN_STAR5
+  };
+  private string itemString;
 
-	public enum ReplyAction
-	{
-		NO_NOSTAR,
-		YES_SUMSTAR,
-		NO_SUMSTAR,
-		YES_MAXSTAR,
-		NO_MAXSTAR
-	}
+  public override void UpdateUI()
+  {
+    this.UpdateStarUI();
+    base.UpdateUI();
+  }
 
-	public struct Info
-	{
-		public int starValue;
+  protected void UpdateStarUI()
+  {
+    int length = HomeAppReviewAppealDialogBase.StarButtons.Length;
+    for (int index = 0; index < length; ++index)
+    {
+      if (index < this.starValue)
+        this.SetStarVisualActive(index, true);
+      else
+        this.SetStarVisualActive(index, false);
+    }
+  }
 
-		public int replyAction;
+  protected void DisableStarButton()
+  {
+    int length = HomeAppReviewAppealDialogBase.StarButtons.Length;
+    for (int index = 0; index < length; ++index)
+      ((Component) this.GetCtrl((Enum) HomeAppReviewAppealDialogBase.StarButtons[index])).GetComponent<UIButton>().isEnabled = false;
+  }
 
-		public Info(int starValue, int replyAction)
-		{
-			this.starValue = starValue;
-			this.replyAction = replyAction;
-		}
-	}
+  protected void SetStarVisualActive(int index, bool active)
+  {
+    this.SetActive(this.GetCtrl((Enum) HomeAppReviewAppealDialogBase.StarButtons[index]), (Enum) HomeAppReviewAppealDialogBase.UI.OBJ_ON, active);
+    this.SetActive(this.GetCtrl((Enum) HomeAppReviewAppealDialogBase.StarButtons[index]), (Enum) HomeAppReviewAppealDialogBase.UI.OBJ_OFF, !active);
+  }
 
-	protected int starValue;
+  protected void SendInfo(int replyAction, System.Action callback = null)
+  {
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<UserInfoManager>.I.SendAppReviewInfo(this.starValue, replyAction, (Action<bool>) (is_success =>
+    {
+      GameSection.ResumeEvent(is_success);
+      callback.SafeInvoke();
+    }));
+  }
 
-	private static readonly UI[] StarButtons = new UI[5]
-	{
-		UI.BTN_STAR1,
-		UI.BTN_STAR2,
-		UI.BTN_STAR3,
-		UI.BTN_STAR4,
-		UI.BTN_STAR5
-	};
+  protected virtual void OnQuery_YES()
+  {
+  }
 
-	private string itemString;
+  protected virtual void OnQuery_NO()
+  {
+  }
 
-	public override void UpdateUI()
-	{
-		UpdateStarUI();
-		base.UpdateUI();
-	}
+  protected void SetStarsEvent()
+  {
+    int length = HomeAppReviewAppealDialogBase.StarButtons.Length;
+    for (int event_data = 0; event_data < length; ++event_data)
+      this.SetEvent((Enum) HomeAppReviewAppealDialogBase.StarButtons[event_data], "STAR", event_data);
+  }
 
-	protected void UpdateStarUI()
-	{
-		int num = StarButtons.Length;
-		for (int i = 0; i < num; i++)
-		{
-			if (i < starValue)
-			{
-				SetStarVisualActive(i, true);
-			}
-			else
-			{
-				SetStarVisualActive(i, false);
-			}
-		}
-	}
+  protected enum UI
+  {
+    LBL_ITEM_TEXT,
+    SPR_BTN_YES,
+    LBL_BTN_YES,
+    BTN_STAR1,
+    BTN_STAR2,
+    BTN_STAR3,
+    BTN_STAR4,
+    BTN_STAR5,
+    OBJ_ON,
+    OBJ_OFF,
+  }
 
-	protected void DisableStarButton()
-	{
-		int num = StarButtons.Length;
-		for (int i = 0; i < num; i++)
-		{
-			UIButton component = GetCtrl(StarButtons[i]).GetComponent<UIButton>();
-			component.isEnabled = false;
-		}
-	}
+  public enum ReplyAction
+  {
+    NO_NOSTAR,
+    YES_SUMSTAR,
+    NO_SUMSTAR,
+    YES_MAXSTAR,
+    NO_MAXSTAR,
+  }
 
-	protected void SetStarVisualActive(int index, bool active)
-	{
-		SetActive(GetCtrl(StarButtons[index]), UI.OBJ_ON, active);
-		SetActive(GetCtrl(StarButtons[index]), UI.OBJ_OFF, !active);
-	}
-
-	protected void SendInfo(int replyAction, Action callback = null)
-	{
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<UserInfoManager>.I.SendAppReviewInfo(starValue, replyAction, delegate(bool is_success)
-		{
-			GameSection.ResumeEvent(is_success, null);
-			callback.SafeInvoke();
-		});
-	}
-
-	protected virtual void OnQuery_YES()
-	{
-	}
-
-	protected virtual void OnQuery_NO()
-	{
-	}
-
-	protected void SetStarsEvent()
-	{
-		int num = StarButtons.Length;
-		for (int i = 0; i < num; i++)
-		{
-			SetEvent((Enum)StarButtons[i], "STAR", i);
-		}
-	}
+  public struct Info(int starValue, int replyAction)
+  {
+    public int starValue = starValue;
+    public int replyAction = replyAction;
+  }
 }

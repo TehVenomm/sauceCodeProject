@@ -1,65 +1,71 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: ConfigName
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
 
+using System;
+using System.Text.RegularExpressions;
+
+#nullable disable
 public class ConfigName : GameSection
 {
-	private enum UI
-	{
-		IPT_TEXT,
-		BTN_OK,
-		SPR_TITLE_CHANGE_NAME,
-		SPR_TITLE_CHANGE_COMMENT,
-		SPR_TITLE_SEARCH_NAME,
-		SPR_TITLE_SEARCH_ID
-	}
+  protected ConfigName.SECTION_TYPE sectionType;
+  protected string before_text;
+  protected int inputMaxLength;
 
-	protected enum SECTION_TYPE
-	{
-		CHANGE_NAME,
-		CHANGE_COMMENT,
-		SEARCH_NAME,
-		SEARCH_ID
-	}
+  protected virtual void SetBeforeText()
+  {
+    this.before_text = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name;
+    this.inputMaxLength = 14;
+  }
 
-	protected SECTION_TYPE sectionType;
+  public override void Initialize()
+  {
+    this.SetBeforeText();
+    base.Initialize();
+  }
 
-	protected string before_text;
+  public override void UpdateUI()
+  {
+    this.SetActive((Enum) ConfigName.UI.SPR_TITLE_CHANGE_NAME, this.sectionType == ConfigName.SECTION_TYPE.CHANGE_NAME);
+    this.SetActive((Enum) ConfigName.UI.SPR_TITLE_CHANGE_COMMENT, this.sectionType == ConfigName.SECTION_TYPE.CHANGE_COMMENT);
+    this.SetActive((Enum) ConfigName.UI.SPR_TITLE_SEARCH_NAME, this.sectionType == ConfigName.SECTION_TYPE.SEARCH_NAME);
+    this.SetActive((Enum) ConfigName.UI.SPR_TITLE_SEARCH_ID, this.sectionType == ConfigName.SECTION_TYPE.SEARCH_ID);
+    this.SetInput((Enum) ConfigName.UI.IPT_TEXT, this.before_text, this.inputMaxLength, new EventDelegate.Callback(this.UpdateButton));
+  }
 
-	protected int inputMaxLength;
+  private void UpdateButton()
+  {
+    string str = this.CheckString(this.GetInputValue((Enum) ConfigName.UI.IPT_TEXT));
+    this.SetInputValue((Enum) ConfigName.UI.IPT_TEXT, str);
+    this.SetButtonEnabled((Enum) ConfigName.UI.BTN_OK, str != this.before_text && str.Length > 0);
+  }
 
-	protected virtual void SetBeforeText()
-	{
-		before_text = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name;
-		inputMaxLength = 12;
-	}
+  private void OnQuery_OK()
+  {
+    string inputValue = this.GetInputValue((Enum) ConfigName.UI.IPT_TEXT);
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<UserInfoManager>.I.SendChangeName(inputValue, (Action<bool>) (is_success => GameSection.ResumeEvent(is_success)));
+  }
 
-	public override void Initialize()
-	{
-		SetBeforeText();
-		base.Initialize();
-	}
+  private string CheckString(string s) => Regex.Replace(s, "\\p{Cs}", "");
 
-	public override void UpdateUI()
-	{
-		SetActive((Enum)UI.SPR_TITLE_CHANGE_NAME, sectionType == SECTION_TYPE.CHANGE_NAME);
-		SetActive((Enum)UI.SPR_TITLE_CHANGE_COMMENT, sectionType == SECTION_TYPE.CHANGE_COMMENT);
-		SetActive((Enum)UI.SPR_TITLE_SEARCH_NAME, sectionType == SECTION_TYPE.SEARCH_NAME);
-		SetActive((Enum)UI.SPR_TITLE_SEARCH_ID, sectionType == SECTION_TYPE.SEARCH_ID);
-		SetInput((Enum)UI.IPT_TEXT, before_text, inputMaxLength, (EventDelegate.Callback)UpdateButton);
-	}
+  private enum UI
+  {
+    IPT_TEXT,
+    BTN_OK,
+    SPR_TITLE_CHANGE_NAME,
+    SPR_TITLE_CHANGE_COMMENT,
+    SPR_TITLE_SEARCH_NAME,
+    SPR_TITLE_SEARCH_ID,
+  }
 
-	private void UpdateButton()
-	{
-		string inputValue = GetInputValue((Enum)UI.IPT_TEXT);
-		SetButtonEnabled((Enum)UI.BTN_OK, inputValue != before_text && inputValue.Length > 0);
-	}
-
-	private void OnQuery_OK()
-	{
-		string inputValue = GetInputValue((Enum)UI.IPT_TEXT);
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<UserInfoManager>.I.SendChangeName(inputValue, delegate(bool is_success)
-		{
-			GameSection.ResumeEvent(is_success, null);
-		});
-	}
+  protected enum SECTION_TYPE
+  {
+    CHANGE_NAME,
+    CHANGE_COMMENT,
+    SEARCH_NAME,
+    SEARCH_ID,
+  }
 }

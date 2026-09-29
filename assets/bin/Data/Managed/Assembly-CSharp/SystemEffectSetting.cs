@@ -1,96 +1,73 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SystemEffectSetting
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 [Serializable]
-public class SystemEffectSetting
+public class SystemEffectSetting : ScriptableObject
 {
-	[Serializable]
-	public class Data
-	{
-		public string effectName;
+  public int[] startGroupIds;
+  public SystemEffectSetting.Data[] effectDataList;
 
-		public string linkNodeName;
+  public SystemEffectSetting.Data AddNewData()
+  {
+    List<SystemEffectSetting.Data> dataList = new List<SystemEffectSetting.Data>();
+    if (this.effectDataList != null && this.effectDataList.Length != 0)
+      dataList.AddRange((IEnumerable<SystemEffectSetting.Data>) this.effectDataList);
+    SystemEffectSetting.Data data = new SystemEffectSetting.Data();
+    data.effectName = string.Empty;
+    data.linkNodeName = string.Empty;
+    data.offsetPos = Vector3.zero;
+    data.offsetRot = Vector3.zero;
+    data.groupID = 0;
+    data.handle = 0;
+    data.scale = 1f;
+    dataList.Add(data);
+    this.effectDataList = dataList.ToArray();
+    return data;
+  }
 
-		public Vector3 offsetPos;
+  public void DeleteData(SystemEffectSetting.Data targetData)
+  {
+    List<SystemEffectSetting.Data> dataList = new List<SystemEffectSetting.Data>();
+    if (this.effectDataList != null && this.effectDataList.Length != 0)
+      dataList.AddRange((IEnumerable<SystemEffectSetting.Data>) this.effectDataList);
+    if (dataList.Contains(targetData))
+      dataList.Remove(targetData);
+    if (dataList.Count > 0)
+      this.effectDataList = dataList.ToArray();
+    else
+      this.effectDataList = (SystemEffectSetting.Data[]) null;
+  }
 
-		public Vector3 offsetRot;
+  [Serializable]
+  public class Data
+  {
+    public string effectName;
+    public string linkNodeName;
+    public Vector3 offsetPos;
+    public Vector3 offsetRot;
+    public int groupID;
+    public int handle;
+    public float scale = 1f;
 
-		public int groupID;
+    public void Copy(SystemEffectSetting.Data srcInfo)
+    {
+      this.effectName = srcInfo.effectName;
+      this.linkNodeName = srcInfo.linkNodeName;
+      this.offsetPos = srcInfo.offsetPos;
+      this.offsetRot = srcInfo.offsetRot;
+      this.groupID = srcInfo.groupID;
+      this.handle = srcInfo.handle;
+      this.scale = srcInfo.scale;
+    }
 
-		public int handle;
-
-		public float scale = 1f;
-
-		public string UniqueName => effectName + linkNodeName + groupID;
-
-		public void Copy(Data srcInfo)
-		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			effectName = srcInfo.effectName;
-			linkNodeName = srcInfo.linkNodeName;
-			offsetPos = srcInfo.offsetPos;
-			offsetRot = srcInfo.offsetRot;
-			groupID = srcInfo.groupID;
-			handle = srcInfo.handle;
-			scale = srcInfo.scale;
-		}
-	}
-
-	public int[] startGroupIds;
-
-	public Data[] effectDataList;
-
-	public SystemEffectSetting()
-		: this()
-	{
-	}
-
-	public Data AddNewData()
-	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		List<Data> list = new List<Data>();
-		if (effectDataList != null && effectDataList.Length > 0)
-		{
-			list.AddRange(effectDataList);
-		}
-		Data data = new Data();
-		data.effectName = string.Empty;
-		data.linkNodeName = string.Empty;
-		data.offsetPos = Vector3.get_zero();
-		data.offsetRot = Vector3.get_zero();
-		data.groupID = 0;
-		data.handle = 0;
-		data.scale = 1f;
-		list.Add(data);
-		effectDataList = list.ToArray();
-		return data;
-	}
-
-	public void DeleteData(Data targetData)
-	{
-		List<Data> list = new List<Data>();
-		if (effectDataList != null && effectDataList.Length > 0)
-		{
-			list.AddRange(effectDataList);
-		}
-		if (list.Contains(targetData))
-		{
-			list.Remove(targetData);
-		}
-		if (list.Count > 0)
-		{
-			effectDataList = list.ToArray();
-		}
-		else
-		{
-			effectDataList = null;
-		}
-	}
+    public string UniqueName => this.effectName + this.linkNodeName + (object) this.groupID;
+  }
 }

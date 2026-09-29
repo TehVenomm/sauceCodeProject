@@ -1,120 +1,96 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: CutSceneData
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CutSceneData
+#nullable disable
+public class CutSceneData : ScriptableObject
 {
-	public enum ATTACHMENT_TYPE
-	{
-		NONE,
-		CAMERA,
-		MY_CHARACTER,
-		PLAYER_1,
-		PLAYER_2,
-		PLAYER_3,
-		ENEMY,
-		ACTOR_1,
-		ACTOR_2,
-		ACTOR_3,
-		ACTOR_4,
-		MAX
-	}
+  public CutSceneData.PlayerData[] playerData;
+  public CutSceneData.EnemyData enemyData;
+  public CutSceneData.ActorData[] actorData;
+  public RuntimeAnimatorController cameraController;
+  public List<CutSceneData.SEKeyData> seDataList = new List<CutSceneData.SEKeyData>();
+  public List<CutSceneData.EffectKeyData> effectKeyData = new List<CutSceneData.EffectKeyData>();
+  public const int NOT_REQUEST_BGM = 0;
+  public int bgm;
+  public string mixerName;
+  public const int NOT_REQUEST_STORY = 0;
+  public int storyId;
 
-	[Serializable]
-	public class PlayerData
-	{
-		public enum TYPE
-		{
-			MY_CHARACTER,
-			PLAYER_1,
-			PLAYER_2,
-			PLAYER_3,
-			MAX_NUM
-		}
+  public enum ATTACHMENT_TYPE
+  {
+    NONE,
+    CAMERA,
+    MY_CHARACTER,
+    PLAYER_1,
+    PLAYER_2,
+    PLAYER_3,
+    ENEMY,
+    ACTOR_1,
+    ACTOR_2,
+    ACTOR_3,
+    ACTOR_4,
+    MAX,
+  }
 
-		public TYPE type;
+  [Serializable]
+  public class PlayerData
+  {
+    public CutSceneData.PlayerData.TYPE type;
+    public Vector3 startPos;
+    public float startAngleY;
+    public RuntimeAnimatorController controller;
 
-		public Vector3 startPos;
+    public enum TYPE
+    {
+      MY_CHARACTER,
+      PLAYER_1,
+      PLAYER_2,
+      PLAYER_3,
+      MAX_NUM,
+    }
+  }
 
-		public float startAngleY;
+  [Serializable]
+  public class EnemyData
+  {
+    public Vector3 startPos;
+    public float startAngleY;
+    public RuntimeAnimatorController controller;
+  }
 
-		public RuntimeAnimatorController controller;
-	}
+  [Serializable]
+  public class ActorData
+  {
+    public GameObject prefab;
+    public RuntimeAnimatorController animatorController;
+    public Vector3 position;
+    public Vector3 rotation;
+    public CutSceneData.ATTACHMENT_TYPE attachmentType;
+    public string nodeName;
+  }
 
-	[Serializable]
-	public class EnemyData
-	{
-		public Vector3 startPos;
+  [Serializable]
+  public class SEKeyData
+  {
+    public float time;
+    public int seId;
+  }
 
-		public float startAngleY;
-
-		public RuntimeAnimatorController controller;
-	}
-
-	[Serializable]
-	public class ActorData
-	{
-		public GameObject prefab;
-
-		public RuntimeAnimatorController animatorController;
-
-		public Vector3 position;
-
-		public Vector3 rotation;
-
-		public ATTACHMENT_TYPE attachmentType;
-
-		public string nodeName;
-	}
-
-	[Serializable]
-	public class SEKeyData
-	{
-		public float time;
-
-		public int seId;
-	}
-
-	[Serializable]
-	public class EffectKeyData
-	{
-		public float time;
-
-		public string effectId;
-
-		public Vector3 position;
-
-		public Vector3 rotation;
-
-		public ATTACHMENT_TYPE attachmentType;
-
-		public string nodeName;
-	}
-
-	public const int NOT_REQUEST_BGM = 0;
-
-	public const int NOT_REQUEST_STORY = 0;
-
-	public PlayerData[] playerData;
-
-	public EnemyData enemyData;
-
-	public ActorData[] actorData;
-
-	public RuntimeAnimatorController cameraController;
-
-	public List<SEKeyData> seDataList = new List<SEKeyData>();
-
-	public List<EffectKeyData> effectKeyData = new List<EffectKeyData>();
-
-	public int bgm;
-
-	public string mixerName;
-
-	public int storyId;
-
-	public CutSceneData()
-		: this()
-	{
-	}
+  [Serializable]
+  public class EffectKeyData
+  {
+    public float time;
+    public string effectId;
+    public Vector3 position;
+    public Vector3 rotation;
+    public CutSceneData.ATTACHMENT_TYPE attachmentType;
+    public string nodeName;
+  }
 }

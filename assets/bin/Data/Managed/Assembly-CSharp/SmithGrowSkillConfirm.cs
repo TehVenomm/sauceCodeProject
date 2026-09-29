@@ -1,230 +1,198 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SmithGrowSkillConfirm
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Text;
 using UnityEngine;
 
+#nullable disable
 public class SmithGrowSkillConfirm : GameSection
 {
-	private enum UI
-	{
-		LBL_NAME,
-		LBL_MONEY,
-		GRD_MATERIAL,
-		STR_TITLE_R,
-		PNL_MATERIAL_INFO,
-		LBL_MATERIAL_2,
-		OBJ_MONEY
-	}
+  private SkillItemInfo baseSkill;
+  private SkillItemInfo[] material;
+  private int total;
+  private bool isRareConfirm;
+  private bool isEquipConfirm;
+  private bool isExceedConfirm;
+  private bool isExceed;
 
-	private SkillItemInfo baseSkill;
+  public override string overrideBackKeyEvent => "CANCEL";
 
-	private SkillItemInfo[] material;
+  public override void Initialize()
+  {
+    object[] eventData = GameSection.GetEventData() as object[];
+    this.baseSkill = eventData[0] as SkillItemInfo;
+    SkillItemInfo[] skillItemInfoArray = eventData[1] as SkillItemInfo[];
+    this.material = new SkillItemInfo[skillItemInfoArray.Length];
+    int index1 = 0;
+    for (int length = skillItemInfoArray.Length; index1 < length; ++index1)
+      this.material[index1] = skillItemInfoArray[index1];
+    this.total = (int) ((double) this.baseSkill.growCost * (double) this.material.Length);
+    this.isEquipConfirm = false;
+    this.isRareConfirm = false;
+    int index2 = 0;
+    for (int length = this.material.Length; index2 < length && (!this.isRareConfirm || !this.isEquipConfirm || !this.isExceedConfirm); ++index2)
+    {
+      if (!this.isRareConfirm && GameDefine.IsRare(this.material[index2].tableData.rarity))
+        this.isRareConfirm = true;
+      if (!this.isEquipConfirm && (this.material[index2].isAttached || this.material[index2].isUniqueAttached))
+        this.isEquipConfirm = true;
+      if (!this.isExceedConfirm && this.material[index2].IsExceeded())
+        this.isExceedConfirm = true;
+    }
+    Array.Sort<SkillItemInfo>(this.material, (Comparison<SkillItemInfo>) ((l, r) =>
+    {
+      ulong num1 = (ulong) (((long) r.tableData.rarity << 61) + ((long) (uint.MaxValue - r.tableData.id) << 16 /*0x10*/)) + (ulong) r.level;
+      ulong num2 = (ulong) (((long) l.tableData.rarity << 61) + ((long) (uint.MaxValue - l.tableData.id) << 16 /*0x10*/)) + (ulong) l.level;
+      int num3 = (long) num1 == (long) num2 ? 0 : (num1 > num2 ? 1 : -1);
+      if (num3 == 0)
+      {
+        num3 = r.exp == l.exp ? 0 : (r.exp > l.exp ? 1 : -1);
+        if (num3 == 0)
+          num3 = (long) r.uniqueID == (long) l.uniqueID ? 0 : (r.uniqueID > l.uniqueID ? 1 : -1);
+      }
+      return num3;
+    }));
+    this.isExceed = this.baseSkill.IsLevelMax();
+    base.Initialize();
+  }
 
-	private int total;
+  public override void UpdateUI()
+  {
+    this.SetLabelText((Enum) SmithGrowSkillConfirm.UI.STR_TITLE_R, this.sectionData.GetText("STR_TITLE"));
+    this.SetLabelText((Enum) SmithGrowSkillConfirm.UI.LBL_NAME, this.baseSkill.tableData.name);
+    this.SetLabelText((Enum) SmithGrowSkillConfirm.UI.LBL_MATERIAL_2, this.isExceed ? this.sectionData.GetText("TEXT_EXCEED") : this.sectionData.GetText("TEXT_GROW"));
+    this.SetActive((Enum) SmithGrowSkillConfirm.UI.OBJ_MONEY, !this.isExceed);
+    if (!this.isExceed)
+      this.SetLabelText((Enum) SmithGrowSkillConfirm.UI.LBL_MONEY, this.total.ToString());
+    this.SetGrid((Enum) SmithGrowSkillConfirm.UI.GRD_MATERIAL, (string) null, this.material.Length, false, (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+    {
+      SkillItemInfo skillItemInfo = this.material[i];
+      ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(skillItemInfo.tableData.type), skillItemInfo.tableData.iconID, new RARITY_TYPE?(skillItemInfo.tableData.rarity), t, magi_enable_icon_type: skillItemInfo.tableData.GetEnableEquipType(), event_name: "DETAIL", event_data: i, is_equipping: skillItemInfo.isAttached || skillItemInfo.isUniqueAttached);
+      Transform ctrl = this.GetCtrl((Enum) SmithGrowSkillConfirm.UI.PNL_MATERIAL_INFO);
+      this.SetMaterialInfo(itemIcon.transform, REWARD_TYPE.SKILL_ITEM, skillItemInfo.tableID, ctrl);
+    }));
+  }
 
-	private bool isRareConfirm;
+  private void OnQuery_DECISION()
+  {
+    StringBuilder stringBuilder = new StringBuilder();
+    if (this.isRareConfirm || this.isEquipConfirm || this.isExceedConfirm)
+    {
+      stringBuilder.Append("[BB]");
+      stringBuilder.AppendLine(this.sectionData.GetText("TEXT_INCLUDE_CONFIRM"));
+      if (this.isRareConfirm)
+        stringBuilder.AppendLine(this.sectionData.GetText("TEXT_INCLUDE_RARE"));
+      if (this.isEquipConfirm)
+        stringBuilder.AppendLine(this.sectionData.GetText("TEXT_INCLUDE_EQUIP"));
+      if (this.isExceedConfirm)
+        stringBuilder.AppendLine(this.sectionData.GetText("TEXT_INCLUDE_EXCEED"));
+      stringBuilder.AppendLine("");
+      stringBuilder.Append(this.sectionData.GetText("TEXT_GROW_CONFIRM"));
+      GameSection.ChangeEvent("INCLUDE_RARE", (object) stringBuilder.ToString());
+    }
+    else
+    {
+      GameSection.StayEvent();
+      if (this.isExceed)
+        MonoBehaviourSingleton<SmithManager>.I.SendExceedSkill(this.baseSkill, this.material, (Action<SkillItemInfo, bool>) ((ret_skill_item, isGreat) =>
+        {
+          if (ret_skill_item != null)
+          {
+            GameSection.ChangeStayEvent("DECISION", (object) new object[4]
+            {
+              (object) new SmithManager.ResultData()
+              {
+                itemData = (object) ret_skill_item,
+                beforeRarity = (int) this.baseSkill.tableData.rarity,
+                beforeMaxLevel = this.baseSkill.tableData.GetMaxLv(ret_skill_item.exceedCnt),
+                beforeExceedCnt = this.baseSkill.exceedCnt,
+                beforeLevel = this.baseSkill.level,
+                beforeExp = this.baseSkill.exp,
+                beforeAtk = this.baseSkill.atk,
+                beforeDef = this.baseSkill.def,
+                beforeHp = this.baseSkill.hp,
+                beforeElemAtk = this.baseSkill.elemAtk,
+                beforeElemDef = this.baseSkill.elemDef
+              },
+              (object) isGreat,
+              (object) this.material,
+              (object) this.isExceed
+            });
+            MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
+            GameSection.ResumeEvent(true);
+          }
+          else
+            GameSection.ResumeEvent(false);
+        }));
+      else
+        MonoBehaviourSingleton<SmithManager>.I.SendGrowSkill(this.baseSkill, this.material, (Action<SkillItemInfo, bool>) ((ret_skill_item, is_great) =>
+        {
+          if (ret_skill_item != null)
+          {
+            GameSection.ChangeStayEvent("DECISION", (object) new object[4]
+            {
+              (object) new SmithManager.ResultData()
+              {
+                itemData = (object) ret_skill_item,
+                beforeRarity = (int) this.baseSkill.tableData.rarity,
+                beforeMaxLevel = this.baseSkill.tableData.GetMaxLv(ret_skill_item.exceedCnt),
+                beforeExceedCnt = this.baseSkill.exceedCnt,
+                beforeLevel = this.baseSkill.level,
+                beforeExp = this.baseSkill.exp,
+                beforeAtk = this.baseSkill.atk,
+                beforeDef = this.baseSkill.def,
+                beforeHp = this.baseSkill.hp,
+                beforeElemAtk = this.baseSkill.elemAtk,
+                beforeElemDef = this.baseSkill.elemDef
+              },
+              (object) is_great,
+              (object) this.material,
+              (object) this.isExceed
+            });
+            MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
+            GameSection.ResumeEvent(true);
+          }
+          else
+            GameSection.ResumeEvent(false);
+        }));
+    }
+  }
 
-	private bool isEquipConfirm;
+  private void OnQuery_DETAIL()
+  {
+    GameSection.SetEventData((object) new object[2]
+    {
+      (object) ItemDetailEquip.CURRENT_SECTION.SMITH_SKILL_MATERIAL,
+      (object) this.material[(int) GameSection.GetEventData()]
+    });
+  }
 
-	private bool isExceedConfirm;
+  private void OnQuery_SmithMaterialIncludeRareConfirm_YES()
+  {
+    bool isRareConfirm = this.isRareConfirm;
+    bool isEquipConfirm = this.isEquipConfirm;
+    bool isExceedConfirm = this.isExceedConfirm;
+    this.isRareConfirm = false;
+    this.isEquipConfirm = false;
+    this.isExceedConfirm = false;
+    this.OnQuery_DECISION();
+    this.isRareConfirm = isRareConfirm;
+    this.isEquipConfirm = isEquipConfirm;
+    this.isExceedConfirm = isExceedConfirm;
+  }
 
-	private bool isExceed;
-
-	public override string overrideBackKeyEvent => "CANCEL";
-
-	public override void Initialize()
-	{
-		object[] array = GameSection.GetEventData() as object[];
-		baseSkill = (array[0] as SkillItemInfo);
-		SkillItemInfo[] array2 = array[1] as SkillItemInfo[];
-		material = new SkillItemInfo[array2.Length];
-		int i = 0;
-		for (int num = array2.Length; i < num; i++)
-		{
-			material[i] = array2[i];
-		}
-		total = (int)(baseSkill.growCost * (float)material.Length);
-		isEquipConfirm = false;
-		isRareConfirm = false;
-		int j = 0;
-		for (int num2 = material.Length; j < num2; j++)
-		{
-			if (isRareConfirm && isEquipConfirm && isExceedConfirm)
-			{
-				break;
-			}
-			if (!isRareConfirm && GameDefine.IsRare(material[j].tableData.rarity))
-			{
-				isRareConfirm = true;
-			}
-			if (!isEquipConfirm && material[j].isAttached)
-			{
-				isEquipConfirm = true;
-			}
-			if (!isExceedConfirm && material[j].IsExceeded())
-			{
-				isExceedConfirm = true;
-			}
-		}
-		Array.Sort(material, delegate(SkillItemInfo l, SkillItemInfo r)
-		{
-			ulong num3 = (ulong)(((long)r.tableData.rarity << 61) + (long)((ulong)(uint)(-1 - (int)r.tableData.id) << 16) + r.level);
-			ulong num4 = (ulong)(((long)l.tableData.rarity << 61) + (long)((ulong)(uint)(-1 - (int)l.tableData.id) << 16) + l.level);
-			int num5 = (num3 != num4) ? ((num3 > num4) ? 1 : (-1)) : 0;
-			if (num5 == 0)
-			{
-				num5 = ((r.exp != l.exp) ? ((r.exp > l.exp) ? 1 : (-1)) : 0);
-				if (num5 == 0)
-				{
-					num5 = ((r.uniqueID != l.uniqueID) ? ((r.uniqueID > l.uniqueID) ? 1 : (-1)) : 0);
-				}
-			}
-			return num5;
-		});
-		isExceed = baseSkill.IsLevelMax();
-		base.Initialize();
-	}
-
-	public override void UpdateUI()
-	{
-		SetLabelText((Enum)UI.STR_TITLE_R, base.sectionData.GetText("STR_TITLE"));
-		SetLabelText((Enum)UI.LBL_NAME, baseSkill.tableData.name);
-		SetLabelText((Enum)UI.LBL_MATERIAL_2, (!isExceed) ? base.sectionData.GetText("TEXT_GROW") : base.sectionData.GetText("TEXT_EXCEED"));
-		SetActive((Enum)UI.OBJ_MONEY, !isExceed);
-		if (!isExceed)
-		{
-			SetLabelText((Enum)UI.LBL_MONEY, total.ToString());
-		}
-		SetGrid(UI.GRD_MATERIAL, null, material.Length, false, delegate(int i, Transform t, bool is_recycle)
-		{
-			SkillItemInfo skillItemInfo = material[i];
-			ItemIcon itemIcon = ItemIcon.Create(ItemIcon.GetItemIconType(skillItemInfo.tableData.type), skillItemInfo.tableData.iconID, skillItemInfo.tableData.rarity, t, ELEMENT_TYPE.MAX, skillItemInfo.tableData.GetEnableEquipType(), -1, "DETAIL", i, false, -1, false, null, skillItemInfo.isAttached, 0, 0, false, GET_TYPE.PAY);
-			Transform ctrl = GetCtrl(UI.PNL_MATERIAL_INFO);
-			SetMaterialInfo(itemIcon.transform, REWARD_TYPE.SKILL_ITEM, skillItemInfo.tableID, ctrl);
-		});
-	}
-
-	private void OnQuery_DECISION()
-	{
-		StringBuilder stringBuilder = new StringBuilder();
-		if (isRareConfirm || isEquipConfirm || isExceedConfirm)
-		{
-			stringBuilder.Append("[BB]");
-			stringBuilder.AppendLine(base.sectionData.GetText("TEXT_INCLUDE_CONFIRM"));
-			if (isRareConfirm)
-			{
-				stringBuilder.AppendLine(base.sectionData.GetText("TEXT_INCLUDE_RARE"));
-			}
-			if (isEquipConfirm)
-			{
-				stringBuilder.AppendLine(base.sectionData.GetText("TEXT_INCLUDE_EQUIP"));
-			}
-			if (isExceedConfirm)
-			{
-				stringBuilder.AppendLine(base.sectionData.GetText("TEXT_INCLUDE_EXCEED"));
-			}
-			stringBuilder.AppendLine(string.Empty);
-			stringBuilder.Append(base.sectionData.GetText("TEXT_GROW_CONFIRM"));
-			GameSection.ChangeEvent("INCLUDE_RARE", stringBuilder.ToString());
-		}
-		else
-		{
-			GameSection.StayEvent();
-			if (isExceed)
-			{
-				MonoBehaviourSingleton<SmithManager>.I.SendExceedSkill(baseSkill, material, delegate(SkillItemInfo ret_skill_item, bool isGreat)
-				{
-					if (ret_skill_item != null)
-					{
-						SmithManager.ResultData resultData2 = new SmithManager.ResultData
-						{
-							itemData = ret_skill_item,
-							beforeRarity = baseSkill.tableData.rarity,
-							beforeMaxLevel = baseSkill.tableData.GetMaxLv(ret_skill_item.exceedCnt),
-							beforeExceedCnt = baseSkill.exceedCnt,
-							beforeLevel = baseSkill.level,
-							beforeExp = baseSkill.exp,
-							beforeAtk = baseSkill.atk,
-							beforeDef = baseSkill.def,
-							beforeHp = baseSkill.hp,
-							beforeElemAtk = baseSkill.elemAtk,
-							beforeElemDef = baseSkill.elemDef
-						};
-						GameSection.ChangeStayEvent("DECISION", new object[4]
-						{
-							resultData2,
-							isGreat,
-							material,
-							isExceed
-						});
-						MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
-						GameSection.ResumeEvent(true, null);
-					}
-					else
-					{
-						GameSection.ResumeEvent(false, null);
-					}
-				});
-			}
-			else
-			{
-				MonoBehaviourSingleton<SmithManager>.I.SendGrowSkill(baseSkill, material, delegate(SkillItemInfo ret_skill_item, bool is_great)
-				{
-					if (ret_skill_item != null)
-					{
-						SmithManager.ResultData resultData = new SmithManager.ResultData
-						{
-							itemData = ret_skill_item,
-							beforeRarity = baseSkill.tableData.rarity,
-							beforeMaxLevel = baseSkill.tableData.GetMaxLv(ret_skill_item.exceedCnt),
-							beforeExceedCnt = baseSkill.exceedCnt,
-							beforeLevel = baseSkill.level,
-							beforeExp = baseSkill.exp,
-							beforeAtk = baseSkill.atk,
-							beforeDef = baseSkill.def,
-							beforeHp = baseSkill.hp,
-							beforeElemAtk = baseSkill.elemAtk,
-							beforeElemDef = baseSkill.elemDef
-						};
-						GameSection.ChangeStayEvent("DECISION", new object[4]
-						{
-							resultData,
-							is_great,
-							material,
-							isExceed
-						});
-						MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
-						GameSection.ResumeEvent(true, null);
-					}
-					else
-					{
-						GameSection.ResumeEvent(false, null);
-					}
-				});
-			}
-		}
-	}
-
-	private void OnQuery_DETAIL()
-	{
-		int num = (int)GameSection.GetEventData();
-		GameSection.SetEventData(new object[2]
-		{
-			ItemDetailEquip.CURRENT_SECTION.SMITH_SKILL_MATERIAL,
-			material[num]
-		});
-	}
-
-	private void OnQuery_SmithMaterialIncludeRareConfirm_YES()
-	{
-		bool flag = isRareConfirm;
-		bool flag2 = isEquipConfirm;
-		bool flag3 = isExceedConfirm;
-		isRareConfirm = false;
-		isEquipConfirm = false;
-		isExceedConfirm = false;
-		OnQuery_DECISION();
-		isRareConfirm = flag;
-		isEquipConfirm = flag2;
-		isExceedConfirm = flag3;
-	}
+  private enum UI
+  {
+    LBL_NAME,
+    LBL_MONEY,
+    GRD_MATERIAL,
+    STR_TITLE_R,
+    PNL_MATERIAL_INFO,
+    LBL_MATERIAL_2,
+    OBJ_MONEY,
+  }
 }

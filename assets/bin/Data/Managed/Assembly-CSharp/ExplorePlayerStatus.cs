@@ -1,242 +1,193 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ExplorePlayerStatus
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class ExplorePlayerStatus
 {
-	public List<int> extraStatus = new List<int>();
+  public List<int> extraStatus = new List<int>();
+  private int weaponEquipmentId;
+  private EquipItemTable.EquipItemData weaponEquipItemData;
+  private CharaInfo charaInfo;
 
-	private int weaponEquipmentId;
+  public bool isInitialized
+  {
+    get
+    {
+      return this.weaponEquipItemData != null && Object.op_Inequality((Object) this.coopClient, (Object) null);
+    }
+  }
 
-	private EquipItemTable.EquipItemData weaponEquipItemData;
+  public int hp { get; private set; }
 
-	private CharaInfo charaInfo;
+  public BuffParam buff { get; private set; }
 
-	public bool isInitialized => weaponEquipItemData != null && coopClient != null;
+  public EQUIPMENT_TYPE weaponType
+  {
+    get
+    {
+      return this.weaponEquipItemData == null ? EQUIPMENT_TYPE.ONE_HAND_SWORD : this.weaponEquipItemData.type;
+    }
+  }
 
-	public int hp
-	{
-		get;
-		private set;
-	}
+  public ELEMENT_TYPE weaponElementType
+  {
+    get
+    {
+      return this.weaponEquipItemData == null ? ELEMENT_TYPE.MAX : (ELEMENT_TYPE) this.weaponEquipItemData.GetElemAtkType();
+    }
+  }
 
-	public BuffParam buff
-	{
-		get;
-		private set;
-	}
+  public CoopClient coopClient { get; private set; }
 
-	public EQUIPMENT_TYPE weaponType
-	{
-		get
-		{
-			if (weaponEquipItemData == null)
-			{
-				return EQUIPMENT_TYPE.ONE_HAND_SWORD;
-			}
-			return weaponEquipItemData.type;
-		}
-	}
+  public int userId => this.charaInfo.userId;
 
-	public ELEMENT_TYPE weaponElementType
-	{
-		get
-		{
-			if (weaponEquipItemData == null)
-			{
-				return ELEMENT_TYPE.MAX;
-			}
-			return (ELEMENT_TYPE)weaponEquipItemData.GetElemAtkType(null);
-		}
-	}
+  public string userName => this.charaInfo.name;
 
-	public CoopClient coopClient
-	{
-		get;
-		private set;
-	}
+  public int hpMax { get; private set; }
 
-	public int userId => charaInfo.userId;
+  public int givenTotalDamage { get; private set; }
 
-	public string userName => charaInfo.name;
+  public bool isSelf { get; private set; }
 
-	public int hpMax
-	{
-		get;
-		private set;
-	}
+  public event System.Action onInitialize;
 
-	public int givenTotalDamage
-	{
-		get;
-		private set;
-	}
+  public event System.Action onUpdateWeapon;
 
-	public bool isSelf
-	{
-		get;
-		private set;
-	}
+  public event System.Action onUpdateBuff;
 
-	public event Action onInitialize;
+  public event System.Action onUpdateHp;
 
-	public event Action onUpdateWeapon;
+  public ExplorePlayerStatus(CharaInfo charaInfo, bool isSelf)
+  {
+    this.isSelf = isSelf;
+    this.charaInfo = charaInfo;
+    int _hp;
+    MonoBehaviourSingleton<StatusManager>.I.CalcUserStatusParam(charaInfo, out int _, out int _, out _hp);
+    this.hpMax = _hp;
+    this.buff = new BuffParam((Character) null);
+  }
 
-	public event Action onUpdateBuff;
+  public void Activate(CoopClient coopClient)
+  {
+    this.coopClient = coopClient;
+    this.charaInfo = coopClient.userInfo;
+  }
 
-	public event Action onUpdateHp;
+  public void Sync(Coop_Model_RoomSyncPlayerStatus status)
+  {
+    this.UpdatePlayerStatus(status.hp, status.buff, status.wid);
+    List<int> extraStatus = this.extraStatus;
+    if (status.exst != null)
+      this.extraStatus = status.exst;
+    if (extraStatus == null || extraStatus.Count != this.extraStatus.Count)
+    {
+      if (this.onUpdateBuff == null)
+        return;
+      this.onUpdateBuff();
+    }
+    else
+    {
+      for (int index = 0; index < extraStatus.Count; ++index)
+      {
+        int num = extraStatus[index];
+        if (!status.exst.Contains(num))
+        {
+          if (this.onUpdateBuff == null)
+            break;
+          this.onUpdateBuff();
+          break;
+        }
+      }
+    }
+  }
 
-	public ExplorePlayerStatus(CharaInfo charaInfo, bool isSelf)
-	{
-		this.isSelf = isSelf;
-		this.charaInfo = charaInfo;
-		MonoBehaviourSingleton<StatusManager>.I.CalcUserStatusParam(charaInfo, out int _, out int _, out int _hp);
-		hpMax = _hp;
-		buff = new BuffParam(null);
-	}
+  public void SyncFromPlayer(Player player)
+  {
+    if (!Object.op_Implicit((Object) player) || !player.isInitialized)
+      return;
+    this.UpdatePlayerStatus(player.hp, player.buffParam.CreateSyncParam(), player.weaponData.eId);
+    List<int> intList = (List<int>) null;
+    for (int index = 0; index < UIStatusIcon.NON_BUFF_STATUS.Length; ++index)
+    {
+      UIStatusIcon.STATUS_TYPE status = UIStatusIcon.NON_BUFF_STATUS[index];
+      if (Coop_Model_RoomSyncPlayerStatus.StatusEnabled(player, status))
+      {
+        if (!this.extraStatus.Contains((int) status))
+        {
+          if (intList == null)
+            intList = new List<int>();
+          intList.Add((int) status);
+        }
+      }
+      else if (this.extraStatus.Contains((int) status) && intList == null)
+        intList = new List<int>();
+    }
+    if (intList == null)
+      return;
+    this.extraStatus = intList;
+    if (this.onUpdateBuff == null)
+      return;
+    this.onUpdateBuff();
+  }
 
-	public void Activate(CoopClient coopClient)
-	{
-		this.coopClient = coopClient;
-		charaInfo = coopClient.userInfo;
-	}
+  private void UpdatePlayerStatus(
+    int hp,
+    BuffParam.BuffSyncParam buffSyncParam,
+    int weaponEquipmentId)
+  {
+    if (this.hp != hp)
+    {
+      this.hp = hp;
+      if (this.hp > this.hpMax)
+        this.hpMax = hp;
+      if (this.onUpdateHp != null)
+        this.onUpdateHp();
+    }
+    if (buffSyncParam != null)
+    {
+      this.buff.SetSyncParamForExplorePlayerStatus(buffSyncParam);
+      if (this.onUpdateBuff != null)
+        this.onUpdateBuff();
+    }
+    if (this.weaponEquipmentId == weaponEquipmentId)
+      return;
+    this.weaponEquipmentId = weaponEquipmentId;
+    int num = this.weaponEquipItemData == null ? 1 : 0;
+    this.weaponEquipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint) weaponEquipmentId);
+    if (num != 0 && this.onInitialize != null)
+      this.onInitialize();
+    if (this.onUpdateWeapon == null)
+      return;
+    this.onUpdateWeapon();
+  }
 
-	public void Sync(Coop_Model_RoomSyncPlayerStatus status)
-	{
-		UpdatePlayerStatus(status.hp, status.buff, status.wid);
-		List<int> list = extraStatus;
-		if (status.exst != null)
-		{
-			extraStatus = status.exst;
-		}
-		if (list == null || list.Count != extraStatus.Count)
-		{
-			if (this.onUpdateBuff != null)
-			{
-				this.onUpdateBuff();
-			}
-		}
-		else
-		{
-			int num = 0;
-			while (true)
-			{
-				if (num >= list.Count)
-				{
-					return;
-				}
-				int item = list[num];
-				if (!status.exst.Contains(item))
-				{
-					break;
-				}
-				num++;
-			}
-			if (this.onUpdateBuff != null)
-			{
-				this.onUpdateBuff();
-			}
-		}
-	}
+  public void SyncTotalDamageToBoss(int total)
+  {
+    if (total <= this.givenTotalDamage)
+      return;
+    this.givenTotalDamage = total;
+  }
 
-	public void SyncFromPlayer(Player player)
-	{
-		if (Object.op_Implicit(player) && player.isInitialized)
-		{
-			UpdatePlayerStatus(player.hp, player.buffParam.CreateSyncParam(BuffParam.BUFFTYPE.NONE), player.weaponData.eId);
-			List<int> list = null;
-			for (int i = 0; i < UIStatusIcon.NON_BUFF_STATUS.Length; i++)
-			{
-				UIStatusIcon.STATUS_TYPE sTATUS_TYPE = UIStatusIcon.NON_BUFF_STATUS[i];
-				if (Coop_Model_RoomSyncPlayerStatus.StatusEnabled(player, sTATUS_TYPE))
-				{
-					if (!extraStatus.Contains((int)sTATUS_TYPE))
-					{
-						if (list == null)
-						{
-							list = new List<int>();
-						}
-						list.Add((int)sTATUS_TYPE);
-					}
-				}
-				else if (extraStatus.Contains((int)sTATUS_TYPE) && list == null)
-				{
-					list = new List<int>();
-				}
-			}
-			if (list != null)
-			{
-				extraStatus = list;
-				if (this.onUpdateBuff != null)
-				{
-					this.onUpdateBuff();
-				}
-			}
-		}
-	}
-
-	private void UpdatePlayerStatus(int hp, BuffParam.BuffSyncParam buffSyncParam, int weaponEquipmentId)
-	{
-		if (this.hp != hp)
-		{
-			this.hp = hp;
-			if (this.hp > hpMax)
-			{
-				hpMax = hp;
-			}
-			if (this.onUpdateHp != null)
-			{
-				this.onUpdateHp();
-			}
-		}
-		if (buffSyncParam != null)
-		{
-			buff.SetSyncParamForExplorePlayerStatus(buffSyncParam);
-			if (this.onUpdateBuff != null)
-			{
-				this.onUpdateBuff();
-			}
-		}
-		if (this.weaponEquipmentId != weaponEquipmentId)
-		{
-			this.weaponEquipmentId = weaponEquipmentId;
-			bool flag = weaponEquipItemData == null;
-			weaponEquipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)weaponEquipmentId);
-			if (flag && this.onInitialize != null)
-			{
-				this.onInitialize();
-			}
-			if (this.onUpdateWeapon != null)
-			{
-				this.onUpdateWeapon();
-			}
-		}
-	}
-
-	public void SyncTotalDamageToBoss(int total)
-	{
-		if (total > givenTotalDamage)
-		{
-			givenTotalDamage = total;
-		}
-	}
-
-	public InGameRecorder.PlayerRecord CreateInGameRecord(CharaInfo _charaInfo)
-	{
-		if (_charaInfo != null)
-		{
-			charaInfo = _charaInfo;
-		}
-		InGameRecorder.PlayerRecord playerRecord = new InGameRecorder.PlayerRecord();
-		playerRecord.id = ((!isSelf) ? charaInfo.userId : 0);
-		playerRecord.isNPC = false;
-		playerRecord.isSelf = isSelf;
-		playerRecord.charaInfo = charaInfo;
-		playerRecord.beforeLevel = charaInfo.level;
-		playerRecord.playerLoadInfo = PlayerLoadInfo.FromCharaInfo(charaInfo, true, true, true, false);
-		playerRecord.animID = playerRecord.playerLoadInfo.weaponModelID / 1000;
-		playerRecord.givenTotalDamage = givenTotalDamage;
-		return playerRecord;
-	}
+  public InGameRecorder.PlayerRecord CreateInGameRecord(CharaInfo _charaInfo)
+  {
+    if (_charaInfo != null)
+      this.charaInfo = _charaInfo;
+    InGameRecorder.PlayerRecord inGameRecord = new InGameRecorder.PlayerRecord();
+    inGameRecord.id = this.isSelf ? 0 : this.charaInfo.userId;
+    inGameRecord.isNPC = false;
+    inGameRecord.isSelf = this.isSelf;
+    inGameRecord.charaInfo = this.charaInfo;
+    inGameRecord.beforeLevel = (int) this.charaInfo.level;
+    inGameRecord.playerLoadInfo = PlayerLoadInfo.FromCharaInfo(this.charaInfo, true, true, true, false);
+    inGameRecord.animID = inGameRecord.playerLoadInfo.weaponModelID / 1000;
+    inGameRecord.givenTotalDamage = this.givenTotalDamage;
+    return inGameRecord;
+  }
 }

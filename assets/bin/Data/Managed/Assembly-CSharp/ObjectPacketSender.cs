@@ -1,304 +1,303 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ObjectPacketSender
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectPacketSender
+#nullable disable
+public class ObjectPacketSender : MonoBehaviour
 {
-	public class ActionHistoryData
-	{
-		public float startTime = -1f;
+  protected List<Coop_Model_ObjectBase> actionHistoryList = new List<Coop_Model_ObjectBase>();
+  protected ObjectPacketSender.ActionHistoryData actionHistoryData;
 
-		public Vector3 startPos = Vector3.get_zero();
+  public StageObject owner { get; protected set; }
 
-		public float startDir;
-	}
+  public bool enableSend { get; set; }
 
-	protected List<Coop_Model_ObjectBase> actionHistoryList = new List<Coop_Model_ObjectBase>();
+  public float needWaitSyncTime { get; protected set; }
 
-	protected ActionHistoryData actionHistoryData;
+  public static ObjectPacketSender SetupComponent(StageObject set_object)
+  {
+    switch (set_object)
+    {
+      case Enemy _:
+        return (ObjectPacketSender) ((Component) set_object).gameObject.AddComponent<EnemyPacketSender>();
+      case Player _:
+        return (ObjectPacketSender) ((Component) set_object).gameObject.AddComponent<PlayerPacketSender>();
+      case Character _:
+        return (ObjectPacketSender) ((Component) set_object).gameObject.AddComponent<CharacterPacketSender>();
+      default:
+        return ((Component) set_object).gameObject.AddComponent<ObjectPacketSender>();
+    }
+  }
 
-	public StageObject owner
-	{
-		get;
-		protected set;
-	}
+  public ObjectPacketSender()
+  {
+    this.needWaitSyncTime = 0.0f;
+    this.enableSend = true;
+  }
 
-	public bool enableSend
-	{
-		get;
-		set;
-	}
+  protected virtual void Awake() => this.owner = ((Component) this).GetComponent<StageObject>();
 
-	public float needWaitSyncTime
-	{
-		get;
-		protected set;
-	}
+  protected int SendTo<T>(
+    int to_client_id,
+    T model,
+    bool promise = false,
+    Func<Coop_Model_ACK, bool> onReceiveAck = null,
+    Func<Coop_Model_Base, bool> onPreResend = null)
+    where T : Coop_Model_Base
+  {
+    if (!this.enableSend)
+      Log.Error(LOG.COOP, "ObjectPacketSender::SendTo() Err. ( enableSend == false ) type : " + (object) (PACKET_TYPE) model.c);
+    return MonoBehaviourSingleton<CoopNetworkManager>.I.SendToInBattle<T>(to_client_id, model, promise, onReceiveAck, onPreResend);
+  }
 
-	public ObjectPacketSender()
-		: this()
-	{
-		needWaitSyncTime = 0f;
-		enableSend = true;
-	}
+  protected int SendBroadcast<T>(
+    T model,
+    bool promise = false,
+    Func<Coop_Model_ACK, bool> onReceiveAck = null,
+    Func<Coop_Model_Base, bool> onPreResend = null)
+    where T : Coop_Model_Base
+  {
+    if (!this.enableSend)
+      Log.Error(LOG.COOP, "ObjectPacketSender::SendTo() Err. ( enableSend == false ) type : " + (object) (PACKET_TYPE) model.c);
+    return MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcastInBattle<T>(model, promise, onReceiveAck, onPreResend);
+  }
 
-	public static ObjectPacketSender SetupComponent(StageObject set_object)
-	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		if (set_object is Enemy)
-		{
-			return set_object.get_gameObject().AddComponent<EnemyPacketSender>();
-		}
-		if (set_object is Player)
-		{
-			return set_object.get_gameObject().AddComponent<PlayerPacketSender>();
-		}
-		if (set_object is Character)
-		{
-			return set_object.get_gameObject().AddComponent<CharacterPacketSender>();
-		}
-		return set_object.get_gameObject().AddComponent<ObjectPacketSender>();
-	}
+  protected int SendToExtra<T>(
+    int to_client_id,
+    T model,
+    bool promise = false,
+    Func<Coop_Model_ACK, bool> onReceiveAck = null,
+    Func<Coop_Model_Base, bool> onPreResend = null)
+    where T : Coop_Model_Base
+  {
+    if (!this.enableSend)
+      Log.Error(LOG.COOP, "ObjectPacketSender::SendTo() Err. ( enableSend == false ) type : " + (object) (PACKET_TYPE) model.c);
+    return MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo<T>(to_client_id, model, promise, onReceiveAck, onPreResend);
+  }
 
-	protected virtual void Awake()
-	{
-		owner = this.GetComponent<StageObject>();
-	}
+  public virtual bool IsEnableWaitSync() => false;
 
-	protected int SendTo<T>(int to_client_id, T model, bool promise = false, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null) where T : Coop_Model_Base
-	{
-		if (!enableSend)
-		{
-			Log.Error(LOG.COOP, "ObjectPacketSender::SendTo() Err. ( enableSend == false ) type : " + (PACKET_TYPE)model.c);
-		}
-		return MonoBehaviourSingleton<CoopNetworkManager>.I.SendToInBattle(to_client_id, model, promise, onReceiveAck, onPreResend);
-	}
+  public virtual float GetWaitTime(float base_time)
+  {
+    if (!this.IsEnableWaitSync())
+      return base_time;
+    float waitTime = this.needWaitSyncTime;
+    if ((double) waitTime > (double) this.owner.objectParameter.maxWaitSyncTime)
+      waitTime = this.owner.objectParameter.maxWaitSyncTime;
+    if ((double) waitTime < (double) base_time)
+      waitTime = base_time;
+    return waitTime;
+  }
 
-	protected int SendBroadcast<T>(T model, bool promise = false, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null) where T : Coop_Model_Base
-	{
-		if (!enableSend)
-		{
-			Log.Error(LOG.COOP, "ObjectPacketSender::SendTo() Err. ( enableSend == false ) type : " + (PACKET_TYPE)model.c);
-		}
-		return MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcastInBattle(model, promise, onReceiveAck, onPreResend);
-	}
+  protected virtual void ClearActionHistory()
+  {
+    this.actionHistoryList.Clear();
+    this.actionHistoryData = (ObjectPacketSender.ActionHistoryData) null;
+  }
 
-	protected int SendToExtra<T>(int to_client_id, T model, bool promise = false, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null) where T : Coop_Model_Base
-	{
-		if (!enableSend)
-		{
-			Log.Error(LOG.COOP, "ObjectPacketSender::SendTo() Err. ( enableSend == false ) type : " + (PACKET_TYPE)model.c);
-		}
-		return MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo(to_client_id, model, promise, onReceiveAck, onPreResend);
-	}
+  protected virtual void StackActionHistory(Coop_Model_ObjectBase stack_model, bool is_act_model)
+  {
+    if (is_act_model)
+      this.ClearActionHistory();
+    else if (this.actionHistoryList.Count <= 0)
+      return;
+    if (this.actionHistoryList.Count <= 0)
+    {
+      this.actionHistoryData = new ObjectPacketSender.ActionHistoryData();
+      this.actionHistoryData.startTime = Time.time;
+      this.actionHistoryData.startPos = this.owner._position;
+      ObjectPacketSender.ActionHistoryData actionHistoryData = this.actionHistoryData;
+      Quaternion rotation = this.owner._rotation;
+      double y = (double) ((Quaternion) ref rotation).eulerAngles.y;
+      actionHistoryData.startDir = (float) y;
+    }
+    this.actionHistoryList.Add(stack_model);
+  }
 
-	public virtual bool IsEnableWaitSync()
-	{
-		return false;
-	}
+  protected virtual void SendActionHistory(int to_client_id = 0)
+  {
+    int index = 0;
+    for (int count = this.actionHistoryList.Count; index < count; ++index)
+    {
+      if (to_client_id == 0)
+        this.SendBroadcast<Coop_Model_ObjectBase>(this.actionHistoryList[index]);
+      else
+        this.SendToExtra<Coop_Model_ObjectBase>(to_client_id, this.actionHistoryList[index]);
+    }
+    this.SaveNeedWaitSyncTime();
+  }
 
-	public virtual float GetWaitTime(float base_time)
-	{
-		if (!IsEnableWaitSync())
-		{
-			return base_time;
-		}
-		float num = needWaitSyncTime;
-		if (num > owner.objectParameter.maxWaitSyncTime)
-		{
-			num = owner.objectParameter.maxWaitSyncTime;
-		}
-		if (num < base_time)
-		{
-			num = base_time;
-		}
-		return num;
-	}
+  public void SaveNeedWaitSyncTime()
+  {
+    float num = 0.0f;
+    if (this.actionHistoryData != null && (double) this.actionHistoryData.startTime >= 0.0)
+      num = Time.time - this.actionHistoryData.startTime;
+    if ((double) num <= (double) this.needWaitSyncTime)
+      return;
+    this.needWaitSyncTime = num;
+  }
 
-	protected virtual void ClearActionHistory()
-	{
-		actionHistoryList.Clear();
-		actionHistoryData = null;
-	}
+  public void PassNeedWaitSyncTime(float time)
+  {
+    if ((double) time <= 0.0 || (double) this.needWaitSyncTime <= 0.0)
+      return;
+    this.needWaitSyncTime -= time;
+    if ((double) this.needWaitSyncTime >= 0.0)
+      return;
+    this.needWaitSyncTime = 0.0f;
+  }
 
-	protected virtual void StackActionHistory(Coop_Model_ObjectBase stack_model, bool is_act_model)
-	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		if (is_act_model)
-		{
-			ClearActionHistory();
-		}
-		else if (actionHistoryList.Count <= 0)
-		{
-			return;
-		}
-		if (actionHistoryList.Count <= 0)
-		{
-			actionHistoryData = new ActionHistoryData();
-			actionHistoryData.startTime = Time.get_time();
-			actionHistoryData.startPos = owner._position;
-			ActionHistoryData obj = actionHistoryData;
-			Quaternion rotation = owner._rotation;
-			Vector3 eulerAngles = rotation.get_eulerAngles();
-			obj.startDir = eulerAngles.y;
-		}
-		actionHistoryList.Add(stack_model);
-	}
+  public virtual void OnUpdate()
+  {
+  }
 
-	protected virtual void SendActionHistory(int to_client_id = 0)
-	{
-		int i = 0;
-		for (int count = actionHistoryList.Count; i < count; i++)
-		{
-			if (to_client_id == 0)
-			{
-				SendBroadcast(actionHistoryList[i], false, null, null);
-			}
-			else
-			{
-				SendToExtra(to_client_id, actionHistoryList[i], false, null, null);
-			}
-		}
-		SaveNeedWaitSyncTime();
-	}
+  public virtual void OnDestroyObject()
+  {
+    if (!this.enableSend || !this.owner.IsOriginal())
+      return;
+    Coop_Model_ObjectDestroy model = new Coop_Model_ObjectDestroy();
+    model.id = this.owner.id;
+    this.SendBroadcast<Coop_Model_ObjectDestroy>(model, true);
+  }
 
-	public void SaveNeedWaitSyncTime()
-	{
-		float num = 0f;
-		if (actionHistoryData != null && actionHistoryData.startTime >= 0f)
-		{
-			num = Time.get_time() - actionHistoryData.startTime;
-		}
-		if (num > needWaitSyncTime)
-		{
-			needWaitSyncTime = num;
-		}
-	}
+  public virtual void OnAttackedHitOwner(AttackedHitStatusOwner status)
+  {
+    if (!this.enableSend || this.owner.IsCoopNone())
+      return;
+    Coop_Model_ObjectAttackedHitOwner model = new Coop_Model_ObjectAttackedHitOwner();
+    model.id = this.owner.id;
+    model.SetAttackedHitStatus(status);
+    this.SendTo<Coop_Model_ObjectAttackedHitOwner>(this.owner.coopClientId, model);
+  }
 
-	public void PassNeedWaitSyncTime(float time)
-	{
-		if (!(time <= 0f) && needWaitSyncTime > 0f)
-		{
-			needWaitSyncTime -= time;
-			if (needWaitSyncTime < 0f)
-			{
-				needWaitSyncTime = 0f;
-			}
-		}
-	}
+  public virtual void OnAttackedHitFix(AttackedHitStatusFix status)
+  {
+    if (!this.enableSend || !this.owner.IsOriginal())
+      return;
+    bool flag = false;
+    if (status.afterHP <= 0)
+      flag = true;
+    if (status.breakRegion)
+      flag = true;
+    if (status.reactionType == 22)
+      flag = true;
+    Coop_Model_ObjectAttackedHitFix model = new Coop_Model_ObjectAttackedHitFix();
+    model.id = this.owner.id;
+    model.SetAttackedHitStatus(status);
+    if (flag)
+      this.SendBroadcast<Coop_Model_ObjectAttackedHitFix>(model, true, onPreResend: (Func<Coop_Model_Base, bool>) (send_model =>
+      {
+        if (Object.op_Equality((Object) this.owner, (Object) null))
+          return false;
+        Coop_Model_ObjectAttackedHitFix objectAttackedHitFix = send_model as Coop_Model_ObjectAttackedHitFix;
+        Character owner1 = this.owner as Character;
+        if (Object.op_Inequality((Object) owner1, (Object) null))
+        {
+          objectAttackedHitFix.afterHP = owner1.hp;
+          Player owner2 = this.owner as Player;
+          if (Object.op_Inequality((Object) owner2, (Object) null))
+            objectAttackedHitFix.afterHealHp = owner2.healHp;
+          if (objectAttackedHitFix.afterHP > 0 && objectAttackedHitFix.reactionType == 8)
+            objectAttackedHitFix.reactionType = 0;
+        }
+        BarrierBulletObject owner3 = this.owner as BarrierBulletObject;
+        if (Object.op_Inequality((Object) owner3, (Object) null))
+          objectAttackedHitFix.afterHP = owner3.GetHp();
+        return true;
+      }));
+    else
+      this.SendBroadcast<Coop_Model_ObjectAttackedHitFix>(model);
+  }
 
-	public virtual void OnUpdate()
-	{
-	}
+  public virtual void OnKeepWaitingPacket(StageObject.WAITING_PACKET waiting_packet_type)
+  {
+    if (!this.enableSend || !this.owner.IsOriginal())
+      return;
+    Coop_Model_ObjectKeepWaitingPacket model = new Coop_Model_ObjectKeepWaitingPacket();
+    model.id = this.owner.id;
+    model.type = (int) waiting_packet_type;
+    this.SendBroadcast<Coop_Model_ObjectKeepWaitingPacket>(model);
+  }
 
-	public virtual void OnDestroyObject()
-	{
-		if (enableSend && owner.IsOriginal())
-		{
-			Coop_Model_ObjectDestroy coop_Model_ObjectDestroy = new Coop_Model_ObjectDestroy();
-			coop_Model_ObjectDestroy.id = owner.id;
-			SendBroadcast(coop_Model_ObjectDestroy, true, null, null);
-		}
-	}
+  public void OnBulletObservableSet(int observedID)
+  {
+    if (!this.enableSend || !this.owner.IsOriginal())
+      return;
+    Coop_Model_ObjectBulletObservableSet model = new Coop_Model_ObjectBulletObservableSet();
+    model.id = this.owner.id;
+    model.observedID = observedID;
+    this.SendBroadcast<Coop_Model_ObjectBulletObservableSet>(model);
+  }
 
-	public virtual void OnAttackedHitOwner(AttackedHitStatusOwner status)
-	{
-		if (enableSend && !owner.IsCoopNone())
-		{
-			Coop_Model_ObjectAttackedHitOwner coop_Model_ObjectAttackedHitOwner = new Coop_Model_ObjectAttackedHitOwner();
-			coop_Model_ObjectAttackedHitOwner.id = owner.id;
-			coop_Model_ObjectAttackedHitOwner.SetAttackedHitStatus(status);
-			SendTo(owner.coopClientId, coop_Model_ObjectAttackedHitOwner, false, null, null);
-		}
-	}
+  public void OnBulletObservableBroken(int observedID, bool isSendOnlyOriginal)
+  {
+    if (!this.enableSend)
+      return;
+    if (isSendOnlyOriginal)
+    {
+      if (!this.owner.IsOriginal())
+        return;
+    }
+    else if (this.owner.IsCoopNone())
+      return;
+    Coop_Model_ObjectBulletObservableBroken model = new Coop_Model_ObjectBulletObservableBroken();
+    model.id = this.owner.id;
+    model.observedID = observedID;
+    this.SendBroadcast<Coop_Model_ObjectBulletObservableBroken>(model);
+  }
 
-	public virtual void OnAttackedHitFix(AttackedHitStatusFix status)
-	{
-		if (enableSend && owner.IsOriginal())
-		{
-			bool flag = false;
-			if (status.afterHP <= 0)
-			{
-				flag = true;
-			}
-			if (status.breakRegion)
-			{
-				flag = true;
-			}
-			Coop_Model_ObjectAttackedHitFix coop_Model_ObjectAttackedHitFix = new Coop_Model_ObjectAttackedHitFix();
-			coop_Model_ObjectAttackedHitFix.id = owner.id;
-			coop_Model_ObjectAttackedHitFix.SetAttackedHitStatus(status);
-			if (flag)
-			{
-				SendBroadcast(coop_Model_ObjectAttackedHitFix, true, null, delegate(Coop_Model_Base send_model)
-				{
-					if (owner == null)
-					{
-						return false;
-					}
-					Coop_Model_ObjectAttackedHitFix coop_Model_ObjectAttackedHitFix2 = send_model as Coop_Model_ObjectAttackedHitFix;
-					Character character = owner as Character;
-					if (character != null)
-					{
-						coop_Model_ObjectAttackedHitFix2.afterHP = character.hp;
-						Player player = owner as Player;
-						if (player != null)
-						{
-							coop_Model_ObjectAttackedHitFix2.afterHealHp = player.healHp;
-						}
-						if (coop_Model_ObjectAttackedHitFix2.afterHP > 0 && coop_Model_ObjectAttackedHitFix2.reactionType == 8)
-						{
-							coop_Model_ObjectAttackedHitFix2.reactionType = 0;
-						}
-					}
-					return true;
-				});
-			}
-			else
-			{
-				SendBroadcast(coop_Model_ObjectAttackedHitFix, false, null, null);
-			}
-		}
-	}
+  public void OnBulletObservableSearchTarget(int observedID, int targetId)
+  {
+    if (!this.enableSend || !this.owner.IsOriginal())
+      return;
+    Coop_Model_ObjectBulletObservableSearchTarget model = new Coop_Model_ObjectBulletObservableSearchTarget();
+    model.id = this.owner.id;
+    model.observedID = observedID;
+    model.targetId = targetId;
+    this.SendBroadcast<Coop_Model_ObjectBulletObservableSearchTarget>(model);
+  }
 
-	public virtual void OnKeepWaitingPacket(StageObject.WAITING_PACKET waiting_packet_type)
-	{
-		if (enableSend && owner.IsOriginal())
-		{
-			Coop_Model_ObjectKeepWaitingPacket coop_Model_ObjectKeepWaitingPacket = new Coop_Model_ObjectKeepWaitingPacket();
-			coop_Model_ObjectKeepWaitingPacket.id = owner.id;
-			coop_Model_ObjectKeepWaitingPacket.type = (int)waiting_packet_type;
-			SendBroadcast(coop_Model_ObjectKeepWaitingPacket, false, null, null);
-		}
-	}
+  public void OnBulletObservableTurretBitTarget(int observedID, int targetId, int regionId)
+  {
+    if (!this.enableSend || !this.owner.IsOriginal())
+      return;
+    Coop_Model_ObjectBulletObservableTurretBitTarget model = new Coop_Model_ObjectBulletObservableTurretBitTarget();
+    model.id = this.owner.id;
+    model.observedID = observedID;
+    model.targetId = targetId;
+    this.SendBroadcast<Coop_Model_ObjectBulletObservableTurretBitTarget>(model);
+  }
 
-	public void OnBulletObservableSet(int observedID)
-	{
-		if (enableSend && owner.IsOriginal())
-		{
-			Coop_Model_ObjectBulletObservableSet coop_Model_ObjectBulletObservableSet = new Coop_Model_ObjectBulletObservableSet();
-			coop_Model_ObjectBulletObservableSet.id = owner.id;
-			coop_Model_ObjectBulletObservableSet.observedID = observedID;
-			SendBroadcast(coop_Model_ObjectBulletObservableSet, false, null, null);
-		}
-	}
+  public void OnShotGimmickGenerator(Vector3 pos)
+  {
+    if (!this.enableSend || !this.owner.IsOriginal())
+      return;
+    Coop_Model_ObjectShotGimmickGenerator model = new Coop_Model_ObjectShotGimmickGenerator();
+    model.id = this.owner.id;
+    model.pos = pos;
+    this.SendBroadcast<Coop_Model_ObjectShotGimmickGenerator>(model);
+  }
 
-	public void OnBulletObservableBroken(int observedID)
-	{
-		if (enableSend && owner.IsOriginal())
-		{
-			Coop_Model_ObjectBulletObservableBroken coop_Model_ObjectBulletObservableBroken = new Coop_Model_ObjectBulletObservableBroken();
-			coop_Model_ObjectBulletObservableBroken.id = owner.id;
-			coop_Model_ObjectBulletObservableBroken.observedID = observedID;
-			SendBroadcast(coop_Model_ObjectBulletObservableBroken, false, null, null);
-		}
-	}
+  public void OnSetCoopMode(StageObject.COOP_MODE_TYPE coopModeType)
+  {
+    if (!this.enableSend || !this.owner.IsOriginal())
+      return;
+    Coop_Model_ObjectCoopInfo model = new Coop_Model_ObjectCoopInfo();
+    model.id = this.owner.id;
+    model.CoopModeType = coopModeType;
+    this.SendBroadcast<Coop_Model_ObjectCoopInfo>(model);
+  }
+
+  public class ActionHistoryData
+  {
+    public float startTime = -1f;
+    public Vector3 startPos = Vector3.zero;
+    public float startDir;
+  }
 }

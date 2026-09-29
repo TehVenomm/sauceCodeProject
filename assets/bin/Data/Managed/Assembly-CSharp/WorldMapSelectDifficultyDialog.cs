@@ -1,73 +1,65 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: WorldMapSelectDifficultyDialog
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
 
+using System;
+using UnityEngine;
+
+#nullable disable
 public class WorldMapSelectDifficultyDialog : GameSection
 {
-	protected enum UI
-	{
-		BTN_HARD,
-		BTN_HARD_GRAY,
-		STR_NORMAL,
-		STR_HARD,
-		STR_HARD_LV
-	}
+  private bool isRegion;
+  private bool isOpenedHard;
+  private bool enableHardLevel;
 
-	private bool isRegion;
+  public override void Initialize()
+  {
+    object[] eventData = GameSection.GetEventData() as object[];
+    this.isRegion = (bool) eventData[0];
+    this.isOpenedHard = (bool) eventData[1];
+    this.enableHardLevel = (int) MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level >= 150;
+    bool is_visible = this.enableHardLevel;
+    if (is_visible && this.isRegion)
+      is_visible = this.isOpenedHard;
+    this.SetActive((Enum) WorldMapSelectDifficultyDialog.UI.BTN_HARD, is_visible);
+    this.SetActive((Enum) WorldMapSelectDifficultyDialog.UI.BTN_HARD_GRAY, !is_visible);
+    this.SetText();
+    base.Initialize();
+  }
 
-	private bool isOpenedHard;
+  private void SetText()
+  {
+    this.SetLabelText((Enum) WorldMapSelectDifficultyDialog.UI.STR_NORMAL, this.sectionData.GetText("NORMAL"));
+    this.SetLabelText((Enum) WorldMapSelectDifficultyDialog.UI.STR_HARD, this.sectionData.GetText("HARD"));
+    string text = string.Format(this.sectionData.GetText("HARD_LV"), (object) 150);
+    ((Component) this.GetCtrl((Enum) WorldMapSelectDifficultyDialog.UI.STR_HARD_LV)).GetComponent<UILabel>().text = text;
+    ((Component) this.GetCtrl((Enum) WorldMapSelectDifficultyDialog.UI.STR_HARD_LV)).GetComponent<UILabel>().supportEncoding = true;
+    this.SetLabelText((Enum) WorldMapSelectDifficultyDialog.UI.STR_HARD_LV, text);
+  }
 
-	private bool enableHardLevel;
+  private void OnQuery_HARD() => GameSection.SetEventData((object) REGION_DIFFICULTY_TYPE.HARD);
 
-	public override void Initialize()
-	{
-		object[] array = GameSection.GetEventData() as object[];
-		isRegion = (bool)array[0];
-		isOpenedHard = (bool)array[1];
-		enableHardLevel = ((int)MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level >= 150);
-		bool flag = enableHardLevel;
-		if (flag && isRegion)
-		{
-			flag = isOpenedHard;
-		}
-		SetActive((Enum)UI.BTN_HARD, flag);
-		SetActive((Enum)UI.BTN_HARD_GRAY, !flag);
-		SetText();
-		base.Initialize();
-	}
+  private void OnQuery_NORMAL() => GameSection.SetEventData((object) REGION_DIFFICULTY_TYPE.NORMAL);
 
-	private void SetText()
-	{
-		SetLabelText((Enum)UI.STR_NORMAL, base.sectionData.GetText("NORMAL"));
-		SetLabelText((Enum)UI.STR_HARD, base.sectionData.GetText("HARD"));
-		string text = base.sectionData.GetText("HARD_LV");
-		text = string.Format(text, 150);
-		UILabel component = GetCtrl(UI.STR_HARD_LV).GetComponent<UILabel>();
-		component.text = text;
-		GetCtrl(UI.STR_HARD_LV).GetComponent<UILabel>().supportEncoding = true;
-		SetLabelText((Enum)UI.STR_HARD_LV, text);
-	}
+  private void OnQuery_HARD_GRAY()
+  {
+    if (!this.isRegion || !this.enableHardLevel)
+      GameSection.SetEventData((object) new object[1]
+      {
+        (object) 150.ToString()
+      });
+    else
+      GameSection.ChangeEvent("HARD_NOT_OPEN");
+  }
 
-	private void OnQuery_HARD()
-	{
-		GameSection.SetEventData(REGION_DIFFICULTY_TYPE.HARD);
-	}
-
-	private void OnQuery_NORMAL()
-	{
-		GameSection.SetEventData(REGION_DIFFICULTY_TYPE.NORMAL);
-	}
-
-	private void OnQuery_HARD_GRAY()
-	{
-		if (!isRegion || !enableHardLevel)
-		{
-			GameSection.SetEventData(new object[1]
-			{
-				150.ToString()
-			});
-		}
-		else
-		{
-			GameSection.ChangeEvent("HARD_NOT_OPEN", null);
-		}
-	}
+  protected enum UI
+  {
+    BTN_HARD,
+    BTN_HARD_GRAY,
+    STR_NORMAL,
+    STR_HARD,
+    STR_HARD_LV,
+  }
 }

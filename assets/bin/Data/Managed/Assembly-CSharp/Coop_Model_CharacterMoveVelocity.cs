@@ -1,45 +1,34 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Coop_Model_CharacterMoveVelocity
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class Coop_Model_CharacterMoveVelocity : Coop_Model_ObjectBase
 {
-	public float time;
+  public float time;
+  public Vector3 pos = Vector3.zero;
+  public int motion_id;
+  public int target_id;
 
-	public Vector3 pos = Vector3.get_zero();
+  public Coop_Model_CharacterMoveVelocity()
+  {
+    this.packetType = PACKET_TYPE.CHARACTER_MOVE_VELOCITY;
+  }
 
-	public int motion_id;
+  public override Vector3 GetObjectPosition() => this.pos;
 
-	public int target_id;
+  public override bool IsHaveObjectPosition() => true;
 
-	public Coop_Model_CharacterMoveVelocity()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		base.packetType = PACKET_TYPE.CHARACTER_MOVE_VELOCITY;
-	}
-
-	public override Vector3 GetObjectPosition()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		return pos;
-	}
-
-	public override bool IsHaveObjectPosition()
-	{
-		return true;
-	}
-
-	public override bool IsHandleable(StageObject owner)
-	{
-		Character character = owner as Character;
-		bool flag = false;
-		if (character.actionID == Character.ACTION_ID.MOVE && character.moveType == Character.MOVE_TYPE.SYNC_VELOCITY)
-		{
-			flag = true;
-		}
-		if (!character.IsChangeableAction(Character.ACTION_ID.MOVE) && !flag)
-		{
-			return false;
-		}
-		return base.IsHandleable(owner);
-	}
+  public override bool IsHandleable(StageObject owner)
+  {
+    Character character = owner as Character;
+    bool flag = false;
+    if (character.actionID == Character.ACTION_ID.MOVE && character.moveType == Character.MOVE_TYPE.SYNC_VELOCITY)
+      flag = true;
+    return (character.IsChangeableAction(Character.ACTION_ID.MOVE) || flag) && base.IsHandleable(owner);
+  }
 }

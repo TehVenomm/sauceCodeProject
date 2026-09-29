@@ -1,41 +1,35 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: EscapePointObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class EscapePointObject : StageObject
 {
-	public bool isEnemyOnEscapePoint
-	{
-		get;
-		private set;
-	}
+  public bool isEnemyOnEscapePoint { get; private set; }
 
-	protected override bool IsValidAttackedHit(StageObject from_object)
-	{
-		return false;
-	}
+  protected override bool IsValidAttackedHit(StageObject from_object) => false;
 
-	protected override void Awake()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Expected O, but got Unknown
-		base.Awake();
-		Utility.SetLayerWithChildren(this.get_transform(), 31);
-	}
+  protected override void Awake()
+  {
+    base.Awake();
+    Utility.SetLayerWithChildren(((Component) this).transform, 31 /*0x1F*/);
+  }
 
-	private void OnTriggerStay(Collider collider)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		if (collider.get_gameObject().get_layer() == 10)
-		{
-			isEnemyOnEscapePoint = true;
-		}
-	}
+  private void OnTriggerStay(Collider collider)
+  {
+    if (((Component) collider).gameObject.layer != 10)
+      return;
+    this.isEnemyOnEscapePoint = true;
+  }
 
-	private void OnTriggerExit(Collider collider)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		if (collider.get_gameObject().get_layer() == 10)
-		{
-			isEnemyOnEscapePoint = false;
-		}
-	}
+  private void OnTriggerExit(Collider collider)
+  {
+    if (((Component) collider).gameObject.layer != 10)
+      return;
+    this.isEnemyOnEscapePoint = false;
+  }
 }

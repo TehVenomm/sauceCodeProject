@@ -1,257 +1,366 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: HomeTutorialManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class HomeTutorialManager
+#nullable disable
+public class HomeTutorialManager : MonoBehaviour
 {
-	private enum DialogType
-	{
-		TALK_WITH_PAMERA,
-		LAST_TUTORIAL,
-		AFTER_GACHA2
-	}
+  private bool is_loading;
+  private HomeTop m_home_top;
+  private Object prefab_dialog;
+  private Object prefab_target_area;
+  private Transform t_target_area;
+  private UITutorialHomeDialog ui_tutorial_dialog;
+  private UI_LastTutorial last_tutorial;
+  private Transform pamelaArrow;
+  private Transform questArrow;
+  private Vector3 pamelaPosition = new Vector3(-4.28f, 1.66f, 4125f * (float) Math.PI / 887f);
+  private Vector3 questPosition = new Vector3(3.2f, 2.8f, 14f);
 
-	private bool is_loading;
+  public UITutorialHomeDialog dialog
+  {
+    get
+    {
+      if (Object.op_Equality((Object) this.ui_tutorial_dialog, (Object) null) && Object.op_Inequality(this.prefab_dialog, (Object) null))
+      {
+        this.ui_tutorial_dialog = ((Component) ResourceUtility.Realizes(this.prefab_dialog)).GetComponent<UITutorialHomeDialog>();
+        this.ui_tutorial_dialog.Close();
+      }
+      return this.ui_tutorial_dialog;
+    }
+  }
 
-	private HomeTop m_home_top;
+  public void OnDestroy()
+  {
+    if (!Object.op_Inequality((Object) this.dialog, (Object) null))
+      return;
+    Object.Destroy((Object) ((Component) this.dialog).gameObject);
+  }
 
-	private Object prefab_dialog;
+  public static bool DoesTutorial()
+  {
+    return TutorialStep.IsPlayingFirstAccept() || TutorialStep.IsPlayingFirstDelivery();
+  }
 
-	private Object prefab_target_area;
+  public static bool DoesTutorialAfterGacha2()
+  {
+    return MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP) && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.UPGRADE_ITEM) && (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2) || !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_QUEST) || !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_MAINSTATUS));
+  }
 
-	private Transform t_target_area;
+  public static bool ShouldRunGachaTutorial()
+  {
+    return MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA1) && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA_QUEST_START);
+  }
 
-	private UITutorialHomeDialog ui_tutorial_dialog;
+  public static bool ShouldRunQuestShadowTutorial()
+  {
+    return MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.DONE_CHANGE_WEAPON) && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SHADOW_QUEST_WIN);
+  }
 
-	private UI_LastTutorial last_tutorial;
+  public void Setup()
+  {
+    this.is_loading = true;
+    if (HomeTutorialManager.DoesTutorial())
+      this.StartCoroutine(this.DoSetupFirstHome());
+    else if (HomeTutorialManager.DoesTutorialAfterGacha2())
+      this.StartCoroutine(this.DoSetupTutorialAfterGacha2());
+    else
+      this.is_loading = false;
+  }
 
-	public UITutorialHomeDialog dialog
-	{
-		get
-		{
-			if (ui_tutorial_dialog == null && prefab_dialog != null)
-			{
-				ui_tutorial_dialog = ResourceUtility.Realizes(prefab_dialog, -1).GetComponent<UITutorialHomeDialog>();
-				ui_tutorial_dialog.Close(0, null);
-			}
-			return ui_tutorial_dialog;
-		}
-	}
+  public void ExcuteDoSetupTutorialAfterGacha2()
+  {
+    this.StartCoroutine(this.DoSetupTutorialAfterGacha2());
+  }
 
-	public HomeTutorialManager()
-		: this()
-	{
-	}
+  private IEnumerator DoSetupFirstHome()
+  {
+    if (Object.op_Equality((Object) this.m_home_top, (Object) null))
+      this.m_home_top = ((Component) this).GetComponent<HomeTop>();
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject obj_target_area = loadingQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01");
+    LoadObject obj_tutorial_dialog = loadingQueue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialHomeDialog");
+    if (loadingQueue.IsLoading())
+      yield return (object) loadingQueue.Wait();
+    this.prefab_target_area = obj_target_area.loadedObject;
+    this.prefab_dialog = obj_tutorial_dialog.loadedObject;
+    this.HidePassengers();
+    this.SetTargetAreaNPC(0);
+    this.SetDialog(HomeTutorialManager.DialogType.TALK_WITH_PAMERA);
+    this.is_loading = false;
+  }
 
-	public void OnDestroy()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (dialog != null)
-		{
-			Object.Destroy(dialog.get_gameObject());
-		}
-	}
+  private IEnumerator DoSetupTutorialAfterGacha2()
+  {
+    if (Object.op_Equality((Object) this.m_home_top, (Object) null))
+      this.m_home_top = ((Component) this).GetComponent<HomeTop>();
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject obj_target_area = loadingQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01");
+    LoadObject obj_tutorial_dialog = loadingQueue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialHomeDialog");
+    if (loadingQueue.IsLoading())
+      yield return (object) loadingQueue.Wait();
+    this.prefab_target_area = obj_target_area.loadedObject;
+    this.prefab_dialog = obj_tutorial_dialog.loadedObject;
+    this.HidePassengers();
+    this.SetDialog(HomeTutorialManager.DialogType.AFTER_GACHA2);
+    this.is_loading = false;
+  }
 
-	public static bool DoesTutorial()
-	{
-		if (TutorialStep.IsPlayingFirstAccept() || TutorialStep.IsPlayingFirstDelivery())
-		{
-			return true;
-		}
-		return false;
-	}
+  public void SetupGachaQuestTutorial()
+  {
+    this.is_loading = true;
+    this.StartCoroutine(this.DoSetupGachaQuestTutorial());
+  }
 
-	public static bool DoesTutorialAfterGacha2()
-	{
-		if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.IsTutorialBitReady && MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.SKILL_EQUIP) && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2))
-		{
-			return true;
-		}
-		return false;
-	}
+  private IEnumerator DoSetupGachaQuestTutorial()
+  {
+    if (Object.op_Equality((Object) this.m_home_top, (Object) null))
+      this.m_home_top = ((Component) this).GetComponent<HomeTop>();
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject obj_target_area = loadingQueue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01");
+    LoadObject obj_tutorial_dialog = loadingQueue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialHomeDialog");
+    if (loadingQueue.IsLoading())
+      yield return (object) loadingQueue.Wait();
+    this.prefab_target_area = obj_target_area.loadedObject;
+    this.prefab_dialog = obj_tutorial_dialog.loadedObject;
+    this.HidePassengers();
+    this.SetTargetAreaNPC(2);
+    this.is_loading = false;
+  }
 
-	public static bool ShouldRunGachaTutorial()
-	{
-		if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA1) && !MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.GACHA_QUEST_START))
-		{
-			return true;
-		}
-		return false;
-	}
+  private void HidePassengers()
+  {
+    if (!MonoBehaviourSingleton<HomeManager>.IsValid() || MonoBehaviourSingleton<HomeManager>.I.IHomePeople == null)
+      return;
+    MonoBehaviourSingleton<HomeManager>.I.IHomePeople.charas.ForEach((Action<HomeCharacterBase>) (o =>
+    {
+      if (!(o is HomePlayerCharacter))
+        return;
+      ((Component) o).gameObject.SetActive(false);
+      if (!Object.op_Inequality((Object) null, (Object) o.GetNamePlate()))
+        return;
+      ((Component) o.GetNamePlate()).gameObject.SetActive(false);
+    }));
+  }
 
-	public void Setup()
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		is_loading = true;
-		if (DoesTutorial())
-		{
-			this.StartCoroutine(DoSetupFirstHome());
-		}
-		else
-		{
-			is_loading = false;
-		}
-	}
+  private void SetTargetAreaNPC(int npc_id)
+  {
+    if (Object.op_Equality(this.prefab_target_area, (Object) null) || !MonoBehaviourSingleton<HomeManager>.IsValid() || MonoBehaviourSingleton<HomeManager>.I.IHomePeople == null)
+      return;
+    HomeNPCCharacter homeNpcCharacter = MonoBehaviourSingleton<HomeManager>.I.IHomePeople.GetHomeNPCCharacter(npc_id);
+    if (Object.op_Equality((Object) homeNpcCharacter, (Object) null))
+      return;
+    this.t_target_area = ResourceUtility.Realizes(this.prefab_target_area, ((Component) homeNpcCharacter).transform);
+    this.t_target_area.position = ((Component) homeNpcCharacter).transform.position;
+  }
 
-	public void ExcuteDoSetupTutorialAfterGacha2()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoSetupTutorialAfterGacha2());
-	}
+  private void SetDialog(HomeTutorialManager.DialogType type)
+  {
+    switch (type)
+    {
+      case HomeTutorialManager.DialogType.TALK_WITH_PAMERA:
+        if (!Object.op_Inequality((Object) this.dialog, (Object) null))
+          break;
+        this.dialog.Open(0, "Tutorial_Request_Text_0701");
+        break;
+      case HomeTutorialManager.DialogType.LAST_TUTORIAL:
+        if (!Object.op_Inequality((Object) this.last_tutorial, (Object) null))
+          break;
+        this.last_tutorial.OpenLastTutorial();
+        break;
+      case HomeTutorialManager.DialogType.AFTER_GACHA2:
+        if (!Object.op_Inequality((Object) this.dialog, (Object) null))
+          break;
+        this.StartCoroutine(this.IEAfterGacha());
+        break;
+    }
+  }
 
-	private IEnumerator DoSetupFirstHome()
-	{
-		if (m_home_top == null)
-		{
-			m_home_top = this.GetComponent<HomeTop>();
-		}
-		LoadingQueue lo_queue = new LoadingQueue(this);
-		LoadObject obj_target_area = lo_queue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01", false);
-		LoadObject obj_tutorial_dialog = lo_queue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialHomeDialog", false);
-		if (lo_queue.IsLoading())
-		{
-			yield return (object)lo_queue.Wait();
-		}
-		prefab_target_area = obj_target_area.loadedObject;
-		prefab_dialog = obj_tutorial_dialog.loadedObject;
-		HidePassengers();
-		SetTargetAreaNPC(0);
-		SetDialog(DialogType.TALK_WITH_PAMERA);
-		is_loading = false;
-	}
+  private IEnumerator IEAfterGacha()
+  {
+    yield return (object) this.SetupAllArrow();
+  }
 
-	private IEnumerator DoSetupTutorialAfterGacha2()
-	{
-		if (m_home_top == null)
-		{
-			m_home_top = this.GetComponent<HomeTop>();
-		}
-		LoadingQueue lo_queue = new LoadingQueue(this);
-		LoadObject obj_target_area = lo_queue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01", false);
-		LoadObject obj_tutorial_dialog = lo_queue.Load(RESOURCE_CATEGORY.UI, "UI_TutorialHomeDialog", false);
-		if (lo_queue.IsLoading())
-		{
-			yield return (object)lo_queue.Wait();
-		}
-		prefab_target_area = obj_target_area.loadedObject;
-		prefab_dialog = obj_tutorial_dialog.loadedObject;
-		HidePassengers();
-		SetDialog(DialogType.AFTER_GACHA2);
-		is_loading = false;
-	}
+  private IEnumerator SetupArrow(Vector3 position, bool isPamela = true)
+  {
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject loadedArrow = loadingQueue.Load(RESOURCE_CATEGORY.SYSTEM, "SystemCommon", new string[1]
+    {
+      "mdl_arrow_01"
+    });
+    if (loadingQueue.IsLoading())
+      yield return (object) loadingQueue.Wait();
+    Vector3 vector3_1 = position;
+    Vector3 vector3_2;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref vector3_2).\u002Ector(4f, 4f, 4f);
+    if (isPamela)
+    {
+      if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2))
+      {
+        this.pamelaArrow = Utility.CreateGameObject("MdlArrow", MonoBehaviourSingleton<AppMain>.I._transform);
+        ResourceUtility.Realizes(loadedArrow.loadedObject, this.pamelaArrow);
+        this.pamelaArrow.localScale = vector3_2;
+        this.pamelaArrow.position = vector3_1;
+        this.dialog.OpenAfterGacha2();
+        this.dialog.OpenMessage(StringTable.Get(STRING_CATEGORY.TUTORIAL_NEW_STR, 1U).Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
+      }
+    }
+    else if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_QUEST))
+    {
+      this.questArrow = Utility.CreateGameObject("MdlArrow", MonoBehaviourSingleton<AppMain>.I._transform);
+      ResourceUtility.Realizes(loadedArrow.loadedObject, this.questArrow);
+      this.questArrow.localScale = vector3_2;
+      this.questArrow.position = vector3_1;
+      this.dialog.OpenAfterGacha2();
+      this.dialog.OpenMessage(StringTable.Get(STRING_CATEGORY.TUTORIAL_NEW_STR, 2U).Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
+    }
+  }
 
-	public void SetupGachaQuestTutorial()
-	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		is_loading = true;
-		this.StartCoroutine(DoSetupGachaQuestTutorial());
-	}
+  private IEnumerator SetupAllArrow()
+  {
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject loadedArrow = loadingQueue.Load(RESOURCE_CATEGORY.SYSTEM, "SystemCommon", new string[1]
+    {
+      "mdl_arrow_01"
+    });
+    if (loadingQueue.IsLoading())
+      yield return (object) loadingQueue.Wait();
+    Vector3 ARROW_SCALE = new Vector3(4f, 4f, 4f);
+    if (HomeBase.isFirstTimeDisplayTextTutorial)
+    {
+      bool showMessage = false;
+      if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2))
+      {
+        yield return (object) new WaitForSeconds(2f);
+        this.pamelaArrow = Utility.CreateGameObject("MdlArrow", MonoBehaviourSingleton<AppMain>.I._transform);
+        ResourceUtility.Realizes(loadedArrow.loadedObject, this.pamelaArrow);
+        this.pamelaArrow.localScale = ARROW_SCALE;
+        this.pamelaArrow.position = this.pamelaPosition;
+        yield return (object) new WaitForSeconds(0.5f);
+        this.dialog.OpenAfterGacha2();
+        this.dialog.OpenMessage(StringTable.Get(STRING_CATEGORY.TUTORIAL_NEW_STR, 1U).Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
+        showMessage = true;
+        yield return (object) new WaitForSeconds(3.5f);
+      }
+      if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_QUEST))
+      {
+        if (showMessage)
+          this.dialog.Close();
+        this.questArrow = Utility.CreateGameObject("MdlArrow", MonoBehaviourSingleton<AppMain>.I._transform);
+        ResourceUtility.Realizes(loadedArrow.loadedObject, this.questArrow);
+        this.questArrow.localScale = ARROW_SCALE;
+        this.questArrow.position = this.questPosition;
+        yield return (object) new WaitForSeconds(0.5f);
+        this.dialog.OpenAfterGacha2();
+        this.dialog.OpenMessage(StringTable.Get(STRING_CATEGORY.TUTORIAL_NEW_STR, 2U).Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
+        showMessage = true;
+        yield return (object) new WaitForSeconds(3.5f);
+      }
+      if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_MAINSTATUS))
+      {
+        if (showMessage)
+          this.dialog.Close();
+        MonoBehaviourSingleton<UIManager>.I.mainStatus.SetTutArrowActive(true);
+        yield return (object) new WaitForSeconds(0.5f);
+        this.dialog.OpenAfterGacha2();
+        this.dialog.OpenMessage(StringTable.Get(STRING_CATEGORY.TUTORIAL_NEW_STR, 3U).Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
+        yield return (object) new WaitForSeconds(3.5f);
+      }
+      this.dialog.Close();
+    }
+    else
+    {
+      if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_GACHA2))
+      {
+        this.pamelaArrow = Utility.CreateGameObject("MdlArrow", MonoBehaviourSingleton<AppMain>.I._transform);
+        ResourceUtility.Realizes(loadedArrow.loadedObject, this.pamelaArrow);
+        this.pamelaArrow.localScale = ARROW_SCALE;
+        this.pamelaArrow.position = this.pamelaPosition;
+      }
+      if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_QUEST))
+      {
+        this.questArrow = Utility.CreateGameObject("MdlArrow", MonoBehaviourSingleton<AppMain>.I._transform);
+        ResourceUtility.Realizes(loadedArrow.loadedObject, this.questArrow);
+        this.questArrow.localScale = ARROW_SCALE;
+        this.questArrow.position = this.questPosition;
+      }
+      if (!MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_MAINSTATUS))
+        MonoBehaviourSingleton<UIManager>.I.mainStatus.SetTutArrowActive(true);
+    }
+  }
 
-	private IEnumerator DoSetupGachaQuestTutorial()
-	{
-		if (m_home_top == null)
-		{
-			m_home_top = this.GetComponent<HomeTop>();
-		}
-		LoadingQueue lo_queue = new LoadingQueue(this);
-		LoadObject obj_target_area = lo_queue.Load(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_tutorial_area_01", false);
-		if (lo_queue.IsLoading())
-		{
-			yield return (object)lo_queue.Wait();
-		}
-		prefab_target_area = obj_target_area.loadedObject;
-		HidePassengers();
-		SetTargetAreaNPC(2);
-		is_loading = false;
-	}
+  private void SetupUIArrow()
+  {
+    if (MonoBehaviourSingleton<UserInfoManager>.I.CheckTutorialBit(TUTORIAL_MENU_BIT.AFTER_MAINSTATUS))
+    {
+      if (!Object.op_Inequality((Object) MonoBehaviourSingleton<UIManager>.I.mainStatus, (Object) null))
+        return;
+      MonoBehaviourSingleton<UIManager>.I.mainStatus.SetTutArrowActive(false);
+    }
+    else
+    {
+      MonoBehaviourSingleton<UIManager>.I.mainStatus.SetTutArrowActive(true);
+      this.dialog.OpenAfterGacha2();
+      this.dialog.OpenMessage(StringTable.Get(STRING_CATEGORY.TUTORIAL_NEW_STR, 3U).Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
+    }
+  }
 
-	private void HidePassengers()
-	{
-		if (MonoBehaviourSingleton<HomeManager>.IsValid() && !(MonoBehaviourSingleton<HomeManager>.I.HomePeople == null))
-		{
-			List<HomeCharacterBase> charas = MonoBehaviourSingleton<HomeManager>.I.HomePeople.charas;
-			charas.ForEach(delegate(HomeCharacterBase o)
-			{
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-				if (o is HomePlayerCharacter)
-				{
-					o.get_gameObject().SetActive(false);
-					Transform namePlate = o.GetNamePlate();
-					if (null != namePlate)
-					{
-						o.GetNamePlate().get_gameObject().SetActive(false);
-					}
-				}
-			});
-		}
-	}
+  public void DeleteArrow()
+  {
+    if (Object.op_Inequality((Object) this.pamelaArrow, (Object) null))
+      Object.Destroy((Object) ((Component) this.pamelaArrow).gameObject);
+    if (!Object.op_Inequality((Object) this.questArrow, (Object) null))
+      return;
+    Object.Destroy((Object) ((Component) this.questArrow).gameObject);
+  }
 
-	private void SetTargetAreaNPC(int npc_id)
-	{
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Expected O, but got Unknown
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		if (!(prefab_target_area == null) && MonoBehaviourSingleton<HomeManager>.IsValid() && !(MonoBehaviourSingleton<HomeManager>.I.HomePeople == null))
-		{
-			HomeNPCCharacter homeNPCCharacter = MonoBehaviourSingleton<HomeManager>.I.HomePeople.GetHomeNPCCharacter(npc_id);
-			if (!(homeNPCCharacter == null))
-			{
-				t_target_area = ResourceUtility.Realizes(prefab_target_area, homeNPCCharacter.get_transform(), -1);
-				t_target_area.set_position(homeNPCCharacter.get_transform().get_position());
-			}
-		}
-	}
+  public void ForceDeleteArrow(bool isPamela)
+  {
+    if (isPamela && Object.op_Inequality((Object) this.pamelaArrow, (Object) null))
+    {
+      Object.Destroy((Object) ((Component) this.pamelaArrow).gameObject);
+    }
+    else
+    {
+      if (isPamela || !Object.op_Inequality((Object) this.questArrow, (Object) null))
+        return;
+      Object.Destroy((Object) ((Component) this.questArrow).gameObject);
+    }
+  }
 
-	private void SetDialog(DialogType type)
-	{
-		switch (type)
-		{
-		case DialogType.TALK_WITH_PAMERA:
-			if (dialog != null)
-			{
-				dialog.Open(0, "Tutorial_Request_Text_0701");
-			}
-			break;
-		case DialogType.LAST_TUTORIAL:
-			if (last_tutorial != null)
-			{
-				last_tutorial.OpenLastTutorial();
-			}
-			break;
-		case DialogType.AFTER_GACHA2:
-			if (dialog != null)
-			{
-				dialog.OpenAfterGacha2();
-			}
-			break;
-		}
-	}
+  private void OpenDialog()
+  {
+  }
 
-	private void OpenDialog()
-	{
-	}
+  public void CloseDialog()
+  {
+    if (!Object.op_Inequality((Object) this.dialog, (Object) null))
+      return;
+    this.dialog.Close();
+  }
 
-	public void CloseDialog()
-	{
-		if (dialog != null)
-		{
-			dialog.Close(0, null);
-		}
-	}
+  public bool IsLoading() => this.is_loading;
 
-	public bool IsLoading()
-	{
-		return is_loading;
-	}
+  public void DisableTargetArea()
+  {
+    if (!Object.op_Inequality((Object) this.t_target_area, (Object) null))
+      return;
+    ((Component) this.t_target_area).gameObject.SetActive(false);
+  }
 
-	public void DisableTargetArea()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (t_target_area != null)
-		{
-			t_target_area.get_gameObject().SetActive(false);
-		}
-	}
+  private void OnDisable() => this.DeleteArrow();
+
+  private enum DialogType
+  {
+    TALK_WITH_PAMERA,
+    LAST_TUTORIAL,
+    AFTER_GACHA2,
+  }
 }

@@ -1,34 +1,33 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIPhaseNumber
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using UnityEngine;
 
-public class UIPhaseNumber
+#nullable disable
+public class UIPhaseNumber : MonoBehaviour
 {
-	[SerializeField]
-	protected UILabel label;
+  [SerializeField]
+  protected UILabel label;
+  [SerializeField]
+  protected UITweener[] anims;
 
-	[SerializeField]
-	protected UITweener[] anims;
+  protected void Awake()
+  {
+    this.label.text = $"Phase {(ValueType) (uint) ((int) MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex + 1)} / {MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestSeriesNum()}";
+  }
 
-	public UIPhaseNumber()
-		: this()
-	{
-	}
-
-	protected void Awake()
-	{
-		label.text = $"Phase {MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex + 1} / {MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestSeriesNum()}";
-	}
-
-	private void Update()
-	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		int i = 0;
-		for (int num = anims.Length; i < num; i++)
-		{
-			if (anims[i].get_enabled())
-			{
-				return;
-			}
-		}
-		Object.Destroy(this.get_gameObject());
-	}
+  private void Update()
+  {
+    int index = 0;
+    for (int length = this.anims.Length; index < length; ++index)
+    {
+      if (((Behaviour) this.anims[index]).enabled)
+        return;
+    }
+    Object.Destroy((Object) ((Component) this).gameObject);
+  }
 }

@@ -1,287 +1,210 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: FieldGimmickGeyserObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class FieldGimmickGeyserObject : FieldGimmickObject
 {
-	public enum STATE
-	{
-		IDLE,
-		READY,
-		ACTION
-	}
+  private const string ANIM_STATE_IDLE = "START1";
+  private const string ANIM_STATE_READY = "START2";
+  private const string ANIM_STATE_ACTION = "LOOP2";
+  private readonly int IDLE_ANIM_HASH = Animator.StringToHash("START1");
+  private readonly int READY_ANIM_HASH = Animator.StringToHash("START2");
+  private readonly int ACTION_ANIM_HASH = Animator.StringToHash("LOOP2");
+  private readonly int STATE_LENGTH = Enum.GetValues(typeof (FieldGimmickGeyserObject.STATE)).Length;
+  public const string EFFECT_NAME = "ef_btl_bg_geyser_01";
+  public Character.REACTION_TYPE reactionType;
+  private EffectCtrl effectCtrl;
+  private float INTERVAL = 5f;
+  private float DURATION = 5f;
+  protected CapsuleCollider actCollider;
+  private Self self;
+  private int selfInstanceId;
+  private float timer;
+  private const float COOL_TIME = 1f;
 
-	private const string ANIM_STATE_IDLE = "START1";
+  public override string GetObjectName() => "GeyserGimmick";
 
-	private const string ANIM_STATE_READY = "START2";
+  public FieldGimmickGeyserObject.STATE state { get; private set; }
 
-	private const string ANIM_STATE_ACTION = "LOOP2";
+  public FieldMapTable.FieldGimmickActionTableData actionData { get; protected set; }
 
-	public const string EFFECT_NAME = "ef_btl_bg_geyser_01";
+  public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
+  {
+    base.Initialize(pointData);
+    this.actionData = Singleton<FieldMapTable>.I.GetFieldGimmickActionData((uint) this.m_pointData.value1);
+    Transform effect = EffectManager.GetEffect("ef_btl_bg_geyser_01", ((Component) this).transform);
+    if (Object.op_Inequality((Object) effect, (Object) null))
+      this.effectCtrl = ((Component) effect).GetComponent<EffectCtrl>();
+    if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+      this.self = MonoBehaviourSingleton<StageObjectManager>.I.self;
+    if (Object.op_Inequality((Object) this.self, (Object) null))
+      this.selfInstanceId = ((Object) ((Component) this.self).gameObject).GetInstanceID();
+    this.reactionType = this.actionData.reactionType;
+    this.actCollider = ((Component) this).gameObject.AddComponent<CapsuleCollider>();
+    this.Reset();
+  }
 
-	private const float COOL_TIME = 1f;
+  public void Reset()
+  {
+    this.state = FieldGimmickGeyserObject.STATE.IDLE;
+    if (this.actionData != null)
+    {
+      this.timer = (double) this.actionData.start >= 0.0 ? this.actionData.start : Random.value * this.INTERVAL;
+      this.INTERVAL = this.actionData.interval;
+      this.DURATION = this.actionData.duration;
+    }
+    if (Object.op_Inequality((Object) this.actCollider, (Object) null))
+    {
+      float num1 = this.actionData != null ? this.actionData.radius : 1f;
+      float num2 = (float) ((double) num1 * 2.0 + 3.0);
+      this.actCollider.radius = num1;
+      this.actCollider.height = num2;
+      this.actCollider.center = new Vector3(0.0f, num2 / 2f - num1, 0.0f);
+      ((Collider) this.actCollider).isTrigger = true;
+      ((Collider) this.actCollider).enabled = false;
+    }
+    ((Behaviour) this).enabled = true;
+  }
 
-	private readonly int IDLE_ANIM_HASH = Animator.StringToHash("START1");
+  public override void RequestDestroy()
+  {
+    this.SetEnableAction(false);
+    if (Object.op_Inequality((Object) this.effectCtrl, (Object) null))
+      EffectManager.ReleaseEffect(((Component) this.effectCtrl).gameObject);
+    base.RequestDestroy();
+  }
 
-	private readonly int READY_ANIM_HASH = Animator.StringToHash("START2");
+  public override void OnNotify(object value)
+  {
+    base.OnNotify(value);
+    this.SetEnableAction(!(bool) value);
+  }
 
-	private readonly int ACTION_ANIM_HASH = Animator.StringToHash("LOOP2");
+  private void SetEnableAction(bool value)
+  {
+    if (((Behaviour) this).enabled != value)
+      this.Reset();
+    ((Behaviour) this).enabled = value;
+    if (!Object.op_Inequality((Object) this.effectCtrl, (Object) null))
+      return;
+    ((Component) this.effectCtrl).gameObject.SetActive(value);
+  }
 
-	private readonly int STATE_LENGTH = Enum.GetValues(typeof(STATE)).Length;
+  private void Update()
+  {
+    if (Object.op_Equality((Object) this.effectCtrl, (Object) null))
+      return;
+    this.timer += Time.deltaTime;
+    switch (this.state)
+    {
+      case FieldGimmickGeyserObject.STATE.IDLE:
+        if ((double) this.timer <= (double) this.INTERVAL)
+          break;
+        this.effectCtrl.Play(this.READY_ANIM_HASH);
+        this.NextState();
+        break;
+      case FieldGimmickGeyserObject.STATE.READY:
+        if (!this.effectCtrl.IsCurrentState(this.ACTION_ANIM_HASH))
+          break;
+        ((Collider) this.actCollider).enabled = true;
+        this.NextState();
+        break;
+      case FieldGimmickGeyserObject.STATE.ACTION:
+        if ((double) this.timer <= (double) this.DURATION)
+          break;
+        ((Collider) this.actCollider).enabled = false;
+        this.effectCtrl.CrossFade(this.IDLE_ANIM_HASH, 0.3f);
+        this.NextState();
+        break;
+    }
+  }
 
-	public Character.REACTION_TYPE reactionType;
+  private void NextState()
+  {
+    this.timer = 0.0f;
+    int num = (int) (this.state + 1);
+    if (num < this.STATE_LENGTH)
+      this.state = (FieldGimmickGeyserObject.STATE) num;
+    else
+      this.state = FieldGimmickGeyserObject.STATE.IDLE;
+  }
 
-	private EffectCtrl effectCtrl;
+  public void SetEnableCollider(bool value)
+  {
+    if (!Object.op_Inequality((Object) this.actCollider, (Object) null))
+      return;
+    ((Collider) this.actCollider).enabled = value;
+  }
 
-	private float INTERVAL = 5f;
+  public void ReactPlayer(Player self)
+  {
+    self.isGatherInterruption = true;
+    Vector3 vector3_1 = Vector3.op_Subtraction(self._transform.position, this.m_transform.position);
+    Vector3 normalized = ((Vector3) ref vector3_1).normalized;
+    switch (this.reactionType)
+    {
+      case Character.REACTION_TYPE.BLOW:
+      case Character.REACTION_TYPE.STUNNED_BLOW:
+      case Character.REACTION_TYPE.FALL_BLOW:
+      case Character.REACTION_TYPE.CHARM_BLOW:
+        self._forward = Vector3.op_UnaryNegation(normalized);
+        break;
+    }
+    Vector3 vector3_2 = Vector3.op_Multiply(Quaternion.op_Multiply(Quaternion.AngleAxis(this.actionData.angle, self._right), normalized), this.actionData.force);
+    self.ActReaction(new Character.ReactionInfo()
+    {
+      reactionType = this.reactionType,
+      blowForce = vector3_2,
+      loopTime = this.actionData.loopTime,
+      targetId = self.id
+    }, true);
+  }
 
-	private float DURATION = 5f;
+  private void OnTriggerEnter(Collider other)
+  {
+    if (this.selfInstanceId != ((Object) ((Component) other).gameObject).GetInstanceID() || !Object.op_Inequality((Object) this.self, (Object) null))
+      return;
+    bool flag = this.self.hitOffFlag == StageObject.HIT_OFF_FLAG.NONE;
+    switch (this.self.actionID)
+    {
+      case Character.ACTION_ID.DAMAGE:
+      case Character.ACTION_ID.MAX:
+      case (Character.ACTION_ID) 20:
+      case (Character.ACTION_ID) 33:
+        flag = true;
+        break;
+    }
+    if (this.self.isActSpecialAction)
+      flag = true;
+    if (!flag || !((Behaviour) this).enabled)
+      return;
+    this.SetEnableCollider(false);
+    this.StartCoroutine(this.SetEnableCollider(true, 1f));
+    this.ReactPlayer((Player) this.self);
+  }
 
-	protected CapsuleCollider actCollider;
+  private IEnumerator SetEnableCollider(bool value, float delay)
+  {
+    yield return (object) new WaitForSeconds(delay);
+    if (this.state == FieldGimmickGeyserObject.STATE.ACTION)
+      this.SetEnableCollider(value);
+  }
 
-	private Self self;
+  protected override void Awake()
+  {
+  }
 
-	private int selfInstanceId;
-
-	private float timer;
-
-	public STATE state
-	{
-		get;
-		private set;
-	}
-
-	public FieldMapTable.FieldGimmickActionTableData actionData
-	{
-		get;
-		protected set;
-	}
-
-	public override string GetObjectName()
-	{
-		return "GeyserGimmick";
-	}
-
-	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
-	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		base.Initialize(pointData);
-		actionData = Singleton<FieldMapTable>.I.GetFieldGimmickActionData((uint)base.m_pointData.value1);
-		Transform effect = EffectManager.GetEffect("ef_btl_bg_geyser_01", this.get_transform());
-		if (effect != null)
-		{
-			effectCtrl = effect.GetComponent<EffectCtrl>();
-		}
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
-		{
-			self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		}
-		if (self != null)
-		{
-			selfInstanceId = self.get_gameObject().GetInstanceID();
-		}
-		reactionType = actionData.reactionType;
-		actCollider = this.get_gameObject().AddComponent<CapsuleCollider>();
-		Reset();
-	}
-
-	public void Reset()
-	{
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		state = STATE.IDLE;
-		if (actionData != null)
-		{
-			if (actionData.start < 0f)
-			{
-				timer = Random.get_value() * INTERVAL;
-			}
-			else
-			{
-				timer = actionData.start;
-			}
-			INTERVAL = actionData.interval;
-			DURATION = actionData.duration;
-		}
-		if (actCollider != null)
-		{
-			float num = (actionData == null) ? 1f : actionData.radius;
-			float num2 = num * 2f + 3f;
-			actCollider.set_radius(num);
-			actCollider.set_height(num2);
-			actCollider.set_center(new Vector3(0f, num2 / 2f - num, 0f));
-			actCollider.set_isTrigger(true);
-			actCollider.set_enabled(false);
-		}
-		this.set_enabled(true);
-	}
-
-	public override void RequestDestroy()
-	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Expected O, but got Unknown
-		SetEnableAction(false);
-		if (effectCtrl != null)
-		{
-			EffectManager.ReleaseEffect(effectCtrl.get_gameObject(), true, false);
-		}
-		base.RequestDestroy();
-	}
-
-	public override void OnNotify(object value)
-	{
-		base.OnNotify(value);
-		bool flag = (bool)value;
-		SetEnableAction(!flag);
-	}
-
-	private void SetEnableAction(bool value)
-	{
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_enabled() != value)
-		{
-			Reset();
-		}
-		this.set_enabled(value);
-		if (effectCtrl != null)
-		{
-			effectCtrl.get_gameObject().SetActive(value);
-		}
-	}
-
-	private void Update()
-	{
-		if (!(effectCtrl == null))
-		{
-			timer += Time.get_deltaTime();
-			switch (state)
-			{
-			case STATE.IDLE:
-				if (timer > INTERVAL)
-				{
-					effectCtrl.Play(READY_ANIM_HASH);
-					NextState();
-				}
-				break;
-			case STATE.READY:
-				if (effectCtrl.IsCurrentState(ACTION_ANIM_HASH))
-				{
-					actCollider.set_enabled(true);
-					NextState();
-				}
-				break;
-			case STATE.ACTION:
-				if (timer > DURATION)
-				{
-					actCollider.set_enabled(false);
-					effectCtrl.CrossFade(IDLE_ANIM_HASH, 0.3f);
-					NextState();
-				}
-				break;
-			}
-		}
-	}
-
-	private void NextState()
-	{
-		timer = 0f;
-		int num = (int)(state + 1);
-		if (num < STATE_LENGTH)
-		{
-			state = (STATE)num;
-		}
-		else
-		{
-			state = STATE.IDLE;
-		}
-	}
-
-	public void SetEnableCollider(bool value)
-	{
-		if (actCollider != null)
-		{
-			actCollider.set_enabled(value);
-		}
-	}
-
-	public void ReactPlayer(Player self)
-	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		self.isGatherInterruption = true;
-		Vector3 val = self._transform.get_position() - m_transform.get_position();
-		Vector3 normalized = val.get_normalized();
-		switch (reactionType)
-		{
-		case Character.REACTION_TYPE.BLOW:
-		case Character.REACTION_TYPE.STUNNED_BLOW:
-		case Character.REACTION_TYPE.FALL_BLOW:
-			self._forward = -normalized;
-			break;
-		}
-		normalized = Quaternion.AngleAxis(actionData.angle, self._right) * normalized;
-		normalized *= actionData.force;
-		Character.ReactionInfo reactionInfo = new Character.ReactionInfo();
-		reactionInfo.reactionType = reactionType;
-		reactionInfo.blowForce = normalized;
-		reactionInfo.loopTime = actionData.loopTime;
-		reactionInfo.targetId = self.id;
-		self.ActReaction(reactionInfo, true);
-	}
-
-	private void OnTriggerEnter(Collider other)
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		if (selfInstanceId == other.get_gameObject().GetInstanceID() && self != null)
-		{
-			bool flag = self.hitOffFlag == StageObject.HIT_OFF_FLAG.NONE;
-			Character.ACTION_ID actionID = self.actionID;
-			if (actionID == Character.ACTION_ID.DAMAGE || actionID == Character.ACTION_ID.MAX || actionID == (Character.ACTION_ID)19 || actionID == (Character.ACTION_ID)31)
-			{
-				flag = true;
-			}
-			if (self.isActSpecialAction)
-			{
-				flag = true;
-			}
-			if (flag && this.get_enabled())
-			{
-				SetEnableCollider(false);
-				this.StartCoroutine(SetEnableCollider(true, 1f));
-				ReactPlayer(self);
-			}
-		}
-	}
-
-	private IEnumerator SetEnableCollider(bool value, float delay)
-	{
-		yield return (object)new WaitForSeconds(delay);
-		if (state == STATE.ACTION)
-		{
-			SetEnableCollider(value);
-		}
-	}
-
-	protected override void Awake()
-	{
-	}
+  public enum STATE
+  {
+    IDLE,
+    READY,
+    ACTION,
+  }
 }

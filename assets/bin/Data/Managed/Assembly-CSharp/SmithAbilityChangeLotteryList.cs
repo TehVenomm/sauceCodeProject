@@ -1,153 +1,141 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SmithAbilityChangeLotteryList
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class SmithAbilityChangeLotteryList : GameSection
 {
-	private enum UI
-	{
-		STR_TITLE_REFLECT,
-		GRD_ABILITY,
-		LBL_ABILITY_DETAIL_NAME,
-		LBL_ABILITY_DETAIL_DESC,
-		LBL_ABILITY_DETAIL_POINT
-	}
+  private List<Transform> touchAndReleaseButtons = new List<Transform>();
+  private List<EquipItemAbility> abilities;
+  private List<SmithAbilityChangeLotteryList.MinMaxAp> minMaxAps;
 
-	private struct MinMaxAp
-	{
-		public int minAp;
+  public override void Initialize() => this.StartCoroutine(this.DoInitialize());
 
-		public int maxAp;
+  protected virtual IEnumerator DoInitialize()
+  {
+    object[] eventData = GameSection.GetEventData() as object[];
+    EquipItemInfo equipItemInfo = eventData[0] as EquipItemInfo;
+    SmithEquipBase.SmithType smithType = (SmithEquipBase.SmithType) eventData[1];
+    bool wait = true;
+    switch (smithType)
+    {
+      case SmithEquipBase.SmithType.GENERATE:
+        MonoBehaviourSingleton<SmithManager>.I.SendGetAbilityListPreGenerate(MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>().createEquipItemTable.id, (Action<Error, List<SmithGetAbilityListForCreateModel.Param>>) ((error, list) =>
+        {
+          wait = false;
+          this.SetAbilities(list);
+        }));
+        break;
+      case SmithEquipBase.SmithType.ABILITY_CHANGE:
+        MonoBehaviourSingleton<SmithManager>.I.SendGetAbilityList(equipItemInfo.uniqueID, (Action<Error, List<SmithGetAbilityList.Param>>) ((error, list) =>
+        {
+          wait = false;
+          this.SetAbilities(list);
+        }));
+        break;
+    }
+    while (wait)
+      yield return (object) null;
+    base.Initialize();
+  }
 
-		public MinMaxAp(int minAp, int maxAp)
-		{
-			this.minAp = minAp;
-			this.maxAp = maxAp;
-		}
-	}
+  protected void InitializeBase() => base.Initialize();
 
-	private List<Transform> touchAndReleaseButtons = new List<Transform>();
+  protected void SetAbilities(List<SmithGetAbilityListForCreateModel.Param> list)
+  {
+    this.ClearAbilities();
+    if (list == null)
+      return;
+    foreach (SmithGetAbilityListForCreateModel.Param obj in list)
+    {
+      this.abilities.Add(new EquipItemAbility((uint) obj.aid, 0));
+      this.minMaxAps.Add(new SmithAbilityChangeLotteryList.MinMaxAp(obj.minap, obj.maxap));
+    }
+  }
 
-	private List<EquipItemAbility> abilities;
+  private void SetAbilities(List<SmithGetAbilityList.Param> list)
+  {
+    this.ClearAbilities();
+    if (list == null)
+      return;
+    foreach (SmithGetAbilityList.Param obj in list)
+    {
+      this.abilities.Add(new EquipItemAbility((uint) obj.aid, 0));
+      this.minMaxAps.Add(new SmithAbilityChangeLotteryList.MinMaxAp(obj.minap, obj.maxap));
+    }
+  }
 
-	private List<MinMaxAp> minMaxAps;
+  private void ClearAbilities()
+  {
+    this.abilities = new List<EquipItemAbility>();
+    this.minMaxAps = new List<SmithAbilityChangeLotteryList.MinMaxAp>();
+  }
 
-	public override void Initialize()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoInitialize());
-	}
+  public override void UpdateUI()
+  {
+    this.SetLabelText((Enum) SmithAbilityChangeLotteryList.UI.STR_TITLE_REFLECT, this.sectionData.GetText("STR_TITLE"));
+    this.SetDynamicList((Enum) SmithAbilityChangeLotteryList.UI.GRD_ABILITY, "SmithAbilityChangeLotteryListItem", this.abilities.Count, false, (Func<int, bool>) null, (Func<int, Transform, Transform>) null, (Action<int, Transform, bool>) ((index, t, reset) =>
+    {
+      EquipItemAbility ability = this.abilities[index];
+      SmithAbilityChangeLotteryList.MinMaxAp minMaxAp = this.minMaxAps[index];
+      string ap;
+      string description;
+      this.GetAbilityDetail(ability, minMaxAp.minAp, minMaxAp.maxAp, out ap, out description);
+      this.SetLabelText(t, (Enum) SmithAbilityChangeLotteryList.UI.LBL_ABILITY_DETAIL_NAME, ability.GetName());
+      this.SetLabelText(t, (Enum) SmithAbilityChangeLotteryList.UI.LBL_ABILITY_DETAIL_POINT, ap);
+      this.SetLabelText(t, (Enum) SmithAbilityChangeLotteryList.UI.LBL_ABILITY_DETAIL_DESC, description);
+    }));
+  }
 
-	protected virtual IEnumerator DoInitialize()
-	{
-		object[] datas = GameSection.GetEventData() as object[];
-		EquipItemInfo info = datas[0] as EquipItemInfo;
-		SmithEquipBase.SmithType smithType = (SmithEquipBase.SmithType)(int)datas[1];
-		bool wait = true;
-		switch (smithType)
-		{
-		case SmithEquipBase.SmithType.ABILITY_CHANGE:
-			MonoBehaviourSingleton<SmithManager>.I.SendGetAbilityList(info.uniqueID, delegate(Error error, List<SmithGetAbilityList.Param> list)
-			{
-				((_003CDoInitialize_003Ec__IteratorC4)/*Error near IL_0087: stateMachine*/)._003Cwait_003E__3 = false;
-				((_003CDoInitialize_003Ec__IteratorC4)/*Error near IL_0087: stateMachine*/)._003C_003Ef__this.SetAbilities(list);
-			});
-			break;
-		case SmithEquipBase.SmithType.GENERATE:
-		{
-			SmithManager.SmithCreateData createdata = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithCreateData>();
-			MonoBehaviourSingleton<SmithManager>.I.SendGetAbilityListPreGenerate(createdata.createEquipItemTable.id, delegate(Error error, List<SmithGetAbilityListForCreateModel.Param> list)
-			{
-				((_003CDoInitialize_003Ec__IteratorC4)/*Error near IL_00c2: stateMachine*/)._003Cwait_003E__3 = false;
-				((_003CDoInitialize_003Ec__IteratorC4)/*Error near IL_00c2: stateMachine*/)._003C_003Ef__this.SetAbilities(list);
-			});
-			break;
-		}
-		}
-		while (wait)
-		{
-			yield return (object)null;
-		}
-		base.Initialize();
-	}
+  public override void OnNotify(GameSection.NOTIFY_FLAG flags)
+  {
+    base.OnNotify(flags);
+    if ((flags & GameSection.NOTIFY_FLAG.PRETREAT_SCENE) == (GameSection.NOTIFY_FLAG) 0)
+      return;
+    this.NoEventReleaseTouchAndReleases(this.touchAndReleaseButtons);
+  }
 
-	protected void InitializeBase()
-	{
-		base.Initialize();
-	}
+  private void GetAbilityDetail(
+    EquipItemAbility ability,
+    int minAp,
+    int maxAp,
+    out string ap,
+    out string description)
+  {
+    ap = "";
+    description = "";
+    if (minAp == maxAp)
+    {
+      ap = "+" + minAp.ToString();
+      description = Singleton<AbilityDataTable>.I.GetAbilityData(ability.id, minAp).description;
+    }
+    else
+    {
+      ap = $"+{minAp.ToString()}〜{maxAp.ToString()}";
+      description = Singleton<AbilityDataTable>.I.GenerateAbilityDescriptionPreGrant(ability.id, minAp, maxAp);
+    }
+  }
 
-	protected void SetAbilities(List<SmithGetAbilityListForCreateModel.Param> list)
-	{
-		ClearAbilities();
-		if (list != null)
-		{
-			foreach (SmithGetAbilityListForCreateModel.Param item2 in list)
-			{
-				EquipItemAbility item = new EquipItemAbility((uint)item2.aid, 0);
-				abilities.Add(item);
-				minMaxAps.Add(new MinMaxAp(item2.minap, item2.maxap));
-			}
-		}
-	}
+  private enum UI
+  {
+    STR_TITLE_REFLECT,
+    GRD_ABILITY,
+    LBL_ABILITY_DETAIL_NAME,
+    LBL_ABILITY_DETAIL_DESC,
+    LBL_ABILITY_DETAIL_POINT,
+  }
 
-	private void SetAbilities(List<SmithGetAbilityList.Param> list)
-	{
-		ClearAbilities();
-		if (list != null)
-		{
-			foreach (SmithGetAbilityList.Param item2 in list)
-			{
-				EquipItemAbility item = new EquipItemAbility((uint)item2.aid, 0);
-				abilities.Add(item);
-				minMaxAps.Add(new MinMaxAp(item2.minap, item2.maxap));
-			}
-		}
-	}
-
-	private void ClearAbilities()
-	{
-		abilities = new List<EquipItemAbility>();
-		minMaxAps = new List<MinMaxAp>();
-	}
-
-	public override void UpdateUI()
-	{
-		SetLabelText((Enum)UI.STR_TITLE_REFLECT, base.sectionData.GetText("STR_TITLE"));
-		SetDynamicList((Enum)UI.GRD_ABILITY, "SmithAbilityChangeLotteryListItem", abilities.Count, false, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int index, Transform t, bool reset)
-		{
-			EquipItemAbility equipItemAbility = abilities[index];
-			MinMaxAp minMaxAp = minMaxAps[index];
-			GetAbilityDetail(equipItemAbility, minMaxAp.minAp, minMaxAp.maxAp, out string ap, out string description);
-			SetLabelText(t, UI.LBL_ABILITY_DETAIL_NAME, equipItemAbility.GetName());
-			SetLabelText(t, UI.LBL_ABILITY_DETAIL_POINT, ap);
-			SetLabelText(t, UI.LBL_ABILITY_DETAIL_DESC, description);
-		});
-	}
-
-	public override void OnNotify(NOTIFY_FLAG flags)
-	{
-		base.OnNotify(flags);
-		if ((flags & NOTIFY_FLAG.PRETREAT_SCENE) != (NOTIFY_FLAG)0L)
-		{
-			NoEventReleaseTouchAndReleases(touchAndReleaseButtons);
-		}
-	}
-
-	private void GetAbilityDetail(EquipItemAbility ability, int minAp, int maxAp, out string ap, out string description)
-	{
-		ap = string.Empty;
-		description = string.Empty;
-		if (minAp == maxAp)
-		{
-			ap = "+" + minAp.ToString();
-			description = Singleton<AbilityDataTable>.I.GetAbilityData(ability.id, minAp).description;
-		}
-		else
-		{
-			ap = "+" + minAp.ToString() + "〜" + maxAp.ToString();
-			description = Singleton<AbilityDataTable>.I.GenerateAbilityDescriptionPreGrant(ability.id, minAp, maxAp);
-		}
-	}
+  private struct MinMaxAp(int minAp, int maxAp)
+  {
+    public int minAp = minAp;
+    public int maxAp = maxAp;
+  }
 }

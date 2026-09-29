@@ -1,497 +1,364 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: BestHTTP.HTTPRequest
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using BestHTTP.Authentication;
-using BestHTTP.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
 
-namespace BestHTTP
+#nullable disable
+namespace BestHTTP;
+
+public sealed class HTTPRequest
 {
-	public sealed class HTTPRequest
-	{
-		internal static readonly byte[] EOL = new byte[2]
-		{
-			13,
-			10
-		};
+  internal static readonly byte[] EOL = new byte[2]
+  {
+    (byte) 13,
+    (byte) 10
+  };
+  public Action<HTTPRequest, HTTPResponse> OnUpgraded;
+  private bool isKeepAlive;
+  private bool disableCache;
+  private int streamFragmentSize;
+  private bool useStreaming;
+  private Action<HTTPRequest, HTTPResponse> callback;
 
-		public Action<HTTPRequest, HTTPResponse> OnUpgraded;
+  public Uri Uri { get; private set; }
 
-		private bool isKeepAlive;
+  public HTTPMethods MethodType { get; private set; }
 
-		private bool disableCache;
+  public byte[] RawData { get; set; }
 
-		private int streamFragmentSize;
+  public bool IsKeepAlive
+  {
+    get => this.isKeepAlive;
+    set
+    {
+      this.isKeepAlive = !this.isKeepAlive ? value : throw new NotSupportedException("Changing the IsKeepAlive property while processing the request is not supported.");
+    }
+  }
 
-		private bool useStreaming;
+  public bool DisableCache
+  {
+    get => this.disableCache;
+    set
+    {
+      if (this.Processing)
+        throw new NotSupportedException("Changing the DisableCache property while processing the request is not supported.");
+      this.disableCache = value;
+    }
+  }
 
-		private Action<HTTPRequest, HTTPResponse> callback;
+  public bool UseStreaming
+  {
+    get => this.useStreaming;
+    set
+    {
+      if (this.Processing)
+        throw new NotSupportedException("Changing the UseStreaming property while processing the request is not supported.");
+      this.useStreaming = value;
+    }
+  }
 
-		public Uri Uri
-		{
-			get;
-			private set;
-		}
+  public int StreamFragmentSize
+  {
+    get => this.streamFragmentSize;
+    set
+    {
+      if (this.Processing)
+        throw new NotSupportedException("Changing the StreamFragmentSize property while processing the request is not supported.");
+      this.streamFragmentSize = value >= 1 ? value : throw new ArgumentException("StreamFragmentSize must be at least 1.");
+    }
+  }
 
-		public HTTPMethods MethodType
-		{
-			get;
-			private set;
-		}
+  public Action<HTTPRequest, HTTPResponse> Callback
+  {
+    get => this.callback;
+    set
+    {
+      if (this.Processing)
+        throw new NotSupportedException("Changing the StreamFragmentSize property while processing the request is not supported.");
+      this.callback = value;
+    }
+  }
 
-		public byte[] RawData
-		{
-			get;
-			set;
-		}
+  public bool DisableRetry { get; set; }
 
-		public bool IsKeepAlive
-		{
-			get
-			{
-				return isKeepAlive;
-			}
-			set
-			{
-				if (isKeepAlive)
-				{
-					throw new NotSupportedException("Changing the IsKeepAlive property while processing the request is not supported.");
-				}
-				isKeepAlive = value;
-			}
-		}
+  public bool IsRedirected { get; internal set; }
 
-		public bool DisableCache
-		{
-			get
-			{
-				return disableCache;
-			}
-			set
-			{
-				if (Processing)
-				{
-					throw new NotSupportedException("Changing the DisableCache property while processing the request is not supported.");
-				}
-				disableCache = value;
-			}
-		}
+  public Uri RedirectUri { get; internal set; }
 
-		public bool UseStreaming
-		{
-			get
-			{
-				return useStreaming;
-			}
-			set
-			{
-				if (Processing)
-				{
-					throw new NotSupportedException("Changing the UseStreaming property while processing the request is not supported.");
-				}
-				useStreaming = value;
-			}
-		}
+  public Uri CurrentUri => !this.IsRedirected ? this.Uri : this.RedirectUri;
 
-		public int StreamFragmentSize
-		{
-			get
-			{
-				return streamFragmentSize;
-			}
-			set
-			{
-				if (Processing)
-				{
-					throw new NotSupportedException("Changing the StreamFragmentSize property while processing the request is not supported.");
-				}
-				if (value < 1)
-				{
-					throw new ArgumentException("StreamFragmentSize must be at least 1.");
-				}
-				streamFragmentSize = value;
-			}
-		}
+  public HTTPResponse Response { get; internal set; }
 
-		public Action<HTTPRequest, HTTPResponse> Callback
-		{
-			get
-			{
-				return callback;
-			}
-			set
-			{
-				if (Processing)
-				{
-					throw new NotSupportedException("Changing the StreamFragmentSize property while processing the request is not supported.");
-				}
-				callback = value;
-			}
-		}
+  public Exception Exception { get; internal set; }
 
-		public bool DisableRetry
-		{
-			get;
-			set;
-		}
+  public object Tag { get; set; }
 
-		public bool IsRedirected
-		{
-			get;
-			internal set;
-		}
+  public Credentials Credentials { get; set; }
 
-		public Uri RedirectUri
-		{
-			get;
-			internal set;
-		}
+  public int MaxRedirects { get; set; }
 
-		public Uri CurrentUri => (!IsRedirected) ? Uri : RedirectUri;
+  public bool UseAlternateSSL { get; set; }
 
-		public HTTPResponse Response
-		{
-			get;
-			internal set;
-		}
+  internal bool Processing { get; set; }
 
-		public Exception Exception
-		{
-			get;
-			internal set;
-		}
+  internal int RedirectCount { get; set; }
 
-		public object Tag
-		{
-			get;
-			set;
-		}
+  private Dictionary<string, List<string>> Headers { get; set; }
 
-		public Credentials Credentials
-		{
-			get;
-			set;
-		}
+  private WWWForm FieldsImpl { get; set; }
 
-		public int MaxRedirects
-		{
-			get;
-			set;
-		}
+  public HTTPRequest(Uri uri)
+    : this(uri, HTTPMethods.Get, HTTPManager.KeepAliveDefaultValue, HTTPManager.IsCachingDisabled, (Action<HTTPRequest, HTTPResponse>) null)
+  {
+  }
 
-		public bool UseAlternateSSL
-		{
-			get;
-			set;
-		}
+  public HTTPRequest(Uri uri, Action<HTTPRequest, HTTPResponse> callback)
+    : this(uri, HTTPMethods.Get, HTTPManager.KeepAliveDefaultValue, HTTPManager.IsCachingDisabled, callback)
+  {
+  }
 
-		internal bool Processing
-		{
-			get;
-			set;
-		}
+  public HTTPRequest(Uri uri, bool isKeepAlive, Action<HTTPRequest, HTTPResponse> callback)
+    : this(uri, HTTPMethods.Get, isKeepAlive, HTTPManager.IsCachingDisabled, callback)
+  {
+  }
 
-		internal int RedirectCount
-		{
-			get;
-			set;
-		}
+  public HTTPRequest(
+    Uri uri,
+    bool isKeepAlive,
+    bool disableCache,
+    Action<HTTPRequest, HTTPResponse> callback)
+    : this(uri, HTTPMethods.Get, isKeepAlive, disableCache, callback)
+  {
+  }
 
-		private Dictionary<string, List<string>> Headers
-		{
-			get;
-			set;
-		}
+  public HTTPRequest(Uri uri, HTTPMethods methodType, Action<HTTPRequest, HTTPResponse> callback)
+    : this(uri, methodType, HTTPManager.KeepAliveDefaultValue, HTTPManager.IsCachingDisabled, callback)
+  {
+  }
 
-		private WWWForm FieldsImpl
-		{
-			get;
-			set;
-		}
+  public HTTPRequest(
+    Uri uri,
+    HTTPMethods methodType,
+    bool isKeepAlive,
+    Action<HTTPRequest, HTTPResponse> callback)
+    : this(uri, methodType, isKeepAlive, HTTPManager.IsCachingDisabled, callback)
+  {
+  }
 
-		public HTTPRequest(Uri uri)
-			: this(uri, HTTPMethods.Get, HTTPManager.KeepAliveDefaultValue, HTTPManager.IsCachingDisabled, null)
-		{
-		}
+  public HTTPRequest(
+    Uri uri,
+    HTTPMethods methodType,
+    bool isKeepAlive,
+    bool disableCache,
+    Action<HTTPRequest, HTTPResponse> callback)
+  {
+    this.Uri = uri;
+    this.MethodType = methodType;
+    this.IsKeepAlive = isKeepAlive;
+    this.DisableCache = disableCache;
+    this.Callback = callback;
+    this.StreamFragmentSize = 4096 /*0x1000*/;
+    this.DisableRetry = methodType == HTTPMethods.Post;
+    this.MaxRedirects = int.MaxValue;
+    this.RedirectCount = 0;
+  }
 
-		public HTTPRequest(Uri uri, Action<HTTPRequest, HTTPResponse> callback)
-			: this(uri, HTTPMethods.Get, HTTPManager.KeepAliveDefaultValue, HTTPManager.IsCachingDisabled, callback)
-		{
-		}
+  public void AddField(string fieldName, string value)
+  {
+    if (this.FieldsImpl == null)
+      this.FieldsImpl = new WWWForm();
+    this.FieldsImpl.AddField(fieldName, value);
+  }
 
-		public HTTPRequest(Uri uri, bool isKeepAlive, Action<HTTPRequest, HTTPResponse> callback)
-			: this(uri, HTTPMethods.Get, isKeepAlive, HTTPManager.IsCachingDisabled, callback)
-		{
-		}
+  public void AddBinaryData(string fieldName, byte[] contents)
+  {
+    if (this.FieldsImpl == null)
+      this.FieldsImpl = new WWWForm();
+    this.FieldsImpl.AddBinaryData(fieldName, contents);
+  }
 
-		public HTTPRequest(Uri uri, bool isKeepAlive, bool disableCache, Action<HTTPRequest, HTTPResponse> callback)
-			: this(uri, HTTPMethods.Get, isKeepAlive, disableCache, callback)
-		{
-		}
+  public void SetFields(WWWForm wwwForm) => this.FieldsImpl = wwwForm;
 
-		public HTTPRequest(Uri uri, HTTPMethods methodType, Action<HTTPRequest, HTTPResponse> callback)
-			: this(uri, methodType, HTTPManager.KeepAliveDefaultValue, HTTPManager.IsCachingDisabled, callback)
-		{
-		}
+  public void AddHeader(string name, string value)
+  {
+    if (this.Headers == null)
+      this.Headers = new Dictionary<string, List<string>>();
+    List<string> stringList;
+    if (!this.Headers.TryGetValue(name, out stringList))
+      this.Headers.Add(name, stringList = new List<string>(1));
+    stringList.Add(value);
+  }
 
-		public HTTPRequest(Uri uri, HTTPMethods methodType, bool isKeepAlive, Action<HTTPRequest, HTTPResponse> callback)
-			: this(uri, methodType, isKeepAlive, HTTPManager.IsCachingDisabled, callback)
-		{
-		}
+  public void SetHeader(string name, string value)
+  {
+    if (this.Headers == null)
+      this.Headers = new Dictionary<string, List<string>>();
+    List<string> stringList;
+    if (!this.Headers.TryGetValue(name, out stringList))
+      this.Headers.Add(name, stringList = new List<string>(1));
+    stringList.Clear();
+    stringList.Add(value);
+  }
 
-		public HTTPRequest(Uri uri, HTTPMethods methodType, bool isKeepAlive, bool disableCache, Action<HTTPRequest, HTTPResponse> callback)
-		{
-			Uri = uri;
-			MethodType = methodType;
-			IsKeepAlive = isKeepAlive;
-			DisableCache = disableCache;
-			Callback = callback;
-			StreamFragmentSize = 4096;
-			DisableRetry = (methodType == HTTPMethods.Post);
-			MaxRedirects = 2147483647;
-			RedirectCount = 0;
-		}
+  public bool HasHeader(string name) => this.Headers != null && this.Headers.ContainsKey(name);
 
-		public void AddField(string fieldName, string value)
-		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Expected O, but got Unknown
-			if ((object)FieldsImpl == null)
-			{
-				FieldsImpl = new WWWForm();
-			}
-			FieldsImpl.AddField(fieldName, value);
-		}
+  public string GetFirstHeaderValue(string name)
+  {
+    if (this.Headers == null)
+      return (string) null;
+    List<string> stringList = (List<string>) null;
+    return this.Headers.TryGetValue(name, out stringList) && stringList.Count > 0 ? stringList[0] : (string) null;
+  }
 
-		public void AddBinaryData(string fieldName, byte[] contents)
-		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Expected O, but got Unknown
-			if ((object)FieldsImpl == null)
-			{
-				FieldsImpl = new WWWForm();
-			}
-			FieldsImpl.AddBinaryData(fieldName, contents);
-		}
+  public void SetRangeHeader(int firstBytePos) => this.SetHeader("Range", $"bytes={firstBytePos}-");
 
-		public void SetFields(WWWForm wwwForm)
-		{
-			FieldsImpl = wwwForm;
-		}
+  public void SetRangeHeader(int firstBytePos, int lastBytePos)
+  {
+    this.SetHeader("Range", $"bytes={firstBytePos}-{lastBytePos}");
+  }
 
-		public void AddHeader(string name, string value)
-		{
-			if (Headers == null)
-			{
-				Headers = new Dictionary<string, List<string>>();
-			}
-			if (!Headers.TryGetValue(name, out List<string> value2))
-			{
-				Headers.Add(name, value2 = new List<string>(1));
-			}
-			value2.Add(value);
-		}
+  private void SendHeaders(BinaryWriter stream)
+  {
+    this.SetHeader("Host", this.CurrentUri.Host);
+    if (this.IsRedirected && !this.HasHeader("Referer"))
+      this.AddHeader("Referer", this.Uri.ToString());
+    if (!this.HasHeader("Accept-Encoding"))
+      this.AddHeader("Accept-Encoding", "gzip, deflate, identity");
+    if (!this.HasHeader("Connection"))
+      this.AddHeader("Connection", this.IsKeepAlive ? "Keep-Alive, TE" : "Close, TE");
+    if (!this.HasHeader("TE"))
+      this.AddHeader("TE", "chunked, identity");
+    byte[] entityBody = this.GetEntityBody();
+    int length = entityBody != null ? entityBody.Length : 0;
+    if (this.RawData == null)
+    {
+      byte[] data = this.FieldsImpl != null ? this.FieldsImpl.data : (byte[]) null;
+      if (data != null && data.Length != 0 && !this.HasHeader("Content-Type"))
+        this.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+    }
+    if (!this.HasHeader("Content-Length") && length != 0)
+      this.AddHeader("Content-Length", length.ToString());
+    if (this.Credentials != null)
+    {
+      switch (this.Credentials.Type)
+      {
+        case AuthenticationTypes.Unknown:
+        case AuthenticationTypes.Digest:
+          Digest digest = DigestStore.Get(this.CurrentUri);
+          if (digest != null)
+          {
+            string responseHeader = digest.GenerateResponseHeader(this);
+            if (!string.IsNullOrEmpty(responseHeader))
+            {
+              this.SetHeader("Authorization", responseHeader);
+              break;
+            }
+            break;
+          }
+          break;
+        case AuthenticationTypes.Basic:
+          this.SetHeader("Authorization", "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes($"{this.Credentials.UserName}:{this.Credentials.Password}")));
+          break;
+      }
+    }
+    foreach (KeyValuePair<string, List<string>> header in this.Headers)
+    {
+      byte[] asciiBytes = (header.Key + ": ").GetASCIIBytes();
+      for (int index = 0; index < header.Value.Count; ++index)
+      {
+        stream.Write(asciiBytes);
+        stream.Write(header.Value[index].GetASCIIBytes());
+        stream.Write(HTTPRequest.EOL);
+      }
+    }
+  }
 
-		public void SetHeader(string name, string value)
-		{
-			if (Headers == null)
-			{
-				Headers = new Dictionary<string, List<string>>();
-			}
-			if (!Headers.TryGetValue(name, out List<string> value2))
-			{
-				Headers.Add(name, value2 = new List<string>(1));
-			}
-			value2.Clear();
-			value2.Add(value);
-		}
+  public string DumpHeaders()
+  {
+    using (MemoryStream output = new MemoryStream())
+    {
+      using (BinaryWriter stream = new BinaryWriter((Stream) output))
+      {
+        this.SendHeaders(stream);
+        return output.ToArray().AsciiToString();
+      }
+    }
+  }
 
-		public bool HasHeader(string name)
-		{
-			return Headers != null && Headers.ContainsKey(name);
-		}
+  internal byte[] GetEntityBody()
+  {
+    if (this.RawData != null)
+      return this.RawData;
+    return this.FieldsImpl == null ? (byte[]) null : this.FieldsImpl.data;
+  }
 
-		public string GetFirstHeaderValue(string name)
-		{
-			if (Headers == null)
-			{
-				return null;
-			}
-			List<string> value = null;
-			if (Headers.TryGetValue(name, out value) && value.Count > 0)
-			{
-				return value[0];
-			}
-			return null;
-		}
+  internal bool SendOutTo(Stream stream)
+  {
+    bool flag = false;
+    try
+    {
+      BinaryWriter stream1 = new BinaryWriter(stream);
+      stream1.Write($"{this.MethodType.ToString().ToUpper()} {this.CurrentUri.PathAndQuery} HTTP/1.1".GetASCIIBytes());
+      stream1.Write(HTTPRequest.EOL);
+      this.SendHeaders(stream1);
+      stream1.Write(HTTPRequest.EOL);
+      byte[] buffer = this.RawData != null ? this.RawData : (this.FieldsImpl != null ? this.FieldsImpl.data : (byte[]) null);
+      if (buffer != null && buffer.Length != 0)
+        stream1.Write(buffer, 0, buffer.Length);
+      flag = true;
+    }
+    catch
+    {
+    }
+    return flag;
+  }
 
-		public void SetRangeHeader(int firstBytePos)
-		{
-			SetHeader("Range", $"bytes={firstBytePos}-");
-		}
+  internal void UpgradeCallback()
+  {
+    if (this.Response == null)
+      return;
+    if (!this.Response.IsUpgraded)
+      return;
+    try
+    {
+      if (this.OnUpgraded == null)
+        return;
+      this.OnUpgraded(this, this.Response);
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError((object) $"{ex.Message}: {ex.StackTrace}");
+    }
+  }
 
-		public void SetRangeHeader(int firstBytePos, int lastBytePos)
-		{
-			SetHeader("Range", $"bytes={firstBytePos}-{lastBytePos}");
-		}
+  internal void CallCallback()
+  {
+    try
+    {
+      if (this.Callback == null)
+        return;
+      this.Callback(this, this.Response);
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError((object) $"{ex.Message}: {ex.StackTrace}");
+    }
+  }
 
-		private void SendHeaders(BinaryWriter stream)
-		{
-			SetHeader("Host", CurrentUri.Host);
-			if (IsRedirected && !HasHeader("Referer"))
-			{
-				AddHeader("Referer", Uri.ToString());
-			}
-			if (!HasHeader("Accept-Encoding"))
-			{
-				AddHeader("Accept-Encoding", "gzip, deflate, identity");
-			}
-			if (!HasHeader("Connection"))
-			{
-				AddHeader("Connection", (!IsKeepAlive) ? "Close, TE" : "Keep-Alive, TE");
-			}
-			if (!HasHeader("TE"))
-			{
-				AddHeader("TE", "chunked, identity");
-			}
-			byte[] entityBody = GetEntityBody();
-			int num = (entityBody != null) ? entityBody.Length : 0;
-			if (RawData == null)
-			{
-				byte[] array = ((object)FieldsImpl == null) ? null : FieldsImpl.get_data();
-				if (array != null && array.Length > 0 && !HasHeader("Content-Type"))
-				{
-					AddHeader("Content-Type", "application/x-www-form-urlencoded");
-				}
-			}
-			if (!HasHeader("Content-Length") && num != 0)
-			{
-				AddHeader("Content-Length", num.ToString());
-			}
-			if (Credentials != null)
-			{
-				switch (Credentials.Type)
-				{
-				case AuthenticationTypes.Basic:
-					SetHeader("Authorization", "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(Credentials.UserName + ":" + Credentials.Password)));
-					break;
-				case AuthenticationTypes.Unknown:
-				case AuthenticationTypes.Digest:
-				{
-					Digest digest = DigestStore.Get(CurrentUri);
-					if (digest != null)
-					{
-						string value = digest.GenerateResponseHeader(this);
-						if (!string.IsNullOrEmpty(value))
-						{
-							SetHeader("Authorization", value);
-						}
-					}
-					break;
-				}
-				}
-			}
-			foreach (KeyValuePair<string, List<string>> header in Headers)
-			{
-				byte[] aSCIIBytes = (header.Key + ": ").GetASCIIBytes();
-				for (int i = 0; i < header.Value.Count; i++)
-				{
-					stream.Write(aSCIIBytes);
-					stream.Write(header.Value[i].GetASCIIBytes());
-					stream.Write(EOL);
-				}
-			}
-		}
+  internal void FinishStreaming()
+  {
+    if (this.Response == null || !this.UseStreaming)
+      return;
+    this.Response.FinishStreaming();
+  }
 
-		public string DumpHeaders()
-		{
-			using (MemoryStream memoryStream = new MemoryStream())
-			{
-				using (BinaryWriter stream = new BinaryWriter(memoryStream))
-				{
-					SendHeaders(stream);
-					return memoryStream.ToArray().AsciiToString();
-					IL_0025:
-					string result;
-					return result;
-				}
-			}
-		}
-
-		internal byte[] GetEntityBody()
-		{
-			return (RawData != null) ? RawData : (((object)FieldsImpl == null) ? null : FieldsImpl.get_data());
-		}
-
-		internal bool SendOutTo(Stream stream)
-		{
-			bool result = false;
-			try
-			{
-				BinaryWriter binaryWriter = new BinaryWriter(stream);
-				binaryWriter.Write($"{MethodType.ToString().ToUpper()} {CurrentUri.PathAndQuery} HTTP/1.1".GetASCIIBytes());
-				binaryWriter.Write(EOL);
-				SendHeaders(binaryWriter);
-				binaryWriter.Write(EOL);
-				byte[] array = (RawData != null) ? RawData : (((object)FieldsImpl == null) ? null : FieldsImpl.get_data());
-				if (array != null && array.Length > 0)
-				{
-					binaryWriter.Write(array, 0, array.Length);
-				}
-				result = true;
-				return result;
-			}
-			catch
-			{
-				return result;
-			}
-		}
-
-		internal void UpgradeCallback()
-		{
-			if (Response != null && Response.IsUpgraded)
-			{
-				try
-				{
-					if (OnUpgraded != null)
-					{
-						OnUpgraded(this, Response);
-					}
-				}
-				catch (Exception ex)
-				{
-					Debug.LogError((object)$"{ex.Message}: {ex.StackTrace}");
-				}
-			}
-		}
-
-		internal void CallCallback()
-		{
-			try
-			{
-				if (Callback != null)
-				{
-					Callback(this, Response);
-				}
-			}
-			catch (Exception ex)
-			{
-				Debug.LogError((object)$"{ex.Message}: {ex.StackTrace}");
-			}
-		}
-
-		internal void FinishStreaming()
-		{
-			if (Response != null && UseStreaming)
-			{
-				Response.FinishStreaming();
-			}
-		}
-
-		public void Send()
-		{
-			HTTPManager.SendRequest(this);
-		}
-	}
+  public void Send() => HTTPManager.SendRequest(this);
 }

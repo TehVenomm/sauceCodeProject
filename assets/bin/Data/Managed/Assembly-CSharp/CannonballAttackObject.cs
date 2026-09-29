@@ -1,86 +1,57 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: CannonballAttackObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class CannonballAttackObject : AttackColliderObject
 {
-	public int ignoreLayerMask;
+  public int ignoreLayerMask;
+  private AttackCannonball owner;
+  private float fixedTime;
 
-	private AttackCannonball owner;
+  public bool isHit { get; private set; }
 
-	private float fixedTime;
+  public int hitLayer { get; private set; }
 
-	public bool isHit
-	{
-		get;
-		private set;
-	}
+  public Enemy hitEnemy { get; private set; }
 
-	public int hitLayer
-	{
-		get;
-		private set;
-	}
+  public void SetIgnoreLayerMask(int mask) => this.ignoreLayerMask = mask;
 
-	public Enemy hitEnemy
-	{
-		get;
-		private set;
-	}
+  public void SetOwner(AttackCannonball owner)
+  {
+    this.owner = owner;
+    this.fixedTime = 0.0f;
+  }
 
-	public void SetIgnoreLayerMask(int mask)
-	{
-		ignoreLayerMask = mask;
-	}
+  public void ResetHit()
+  {
+    this.isHit = false;
+    this.ActivateOwnCollider();
+  }
 
-	public void SetOwner(AttackCannonball owner)
-	{
-		this.owner = owner;
-		fixedTime = 0f;
-	}
+  public override float GetTime() => this.fixedTime;
 
-	public void ResetHit()
-	{
-		isHit = false;
-		ActivateOwnCollider();
-	}
+  private void FixedUpdate() => this.fixedTime += Time.fixedDeltaTime;
 
-	public override float GetTime()
-	{
-		return fixedTime;
-	}
-
-	private void FixedUpdate()
-	{
-		fixedTime += Time.get_fixedDeltaTime();
-	}
-
-	protected override void OnTriggerEnter(Collider collider)
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		hitLayer = collider.get_gameObject().get_layer();
-		if (((1 << hitLayer) & ignoreLayerMask) == 0)
-		{
-			if (hitLayer == 11)
-			{
-				hitEnemy = collider.get_gameObject().GetComponent<Enemy>();
-			}
-			else if (hitLayer == 31)
-			{
-				EscapePointObject component = collider.get_gameObject().GetComponent<EscapePointObject>();
-				if (component != null)
-				{
-					return;
-				}
-			}
-			isHit = true;
-			base.OnTriggerEnter(collider);
-			DeactivateOwnCollider();
-			Destroy();
-			if (owner != null)
-			{
-				owner.OnHit();
-			}
-		}
-	}
+  protected override void OnTriggerEnter(Collider collider)
+  {
+    this.hitLayer = ((Component) collider).gameObject.layer;
+    if ((1 << this.hitLayer & this.ignoreLayerMask) != 0)
+      return;
+    if (this.hitLayer == 11)
+      this.hitEnemy = ((Component) collider).gameObject.GetComponent<Enemy>();
+    else if (this.hitLayer == 31 /*0x1F*/ && (Object.op_Inequality((Object) ((Component) collider).gameObject.GetComponent<EscapePointObject>(), (Object) null) || Object.op_Inequality((Object) ((Component) collider).gameObject.GetComponent<BarrierBulletObject>(), (Object) null)))
+      return;
+    this.isHit = true;
+    base.OnTriggerEnter(collider);
+    this.DeactivateOwnCollider();
+    this.Destroy();
+    if (!Object.op_Inequality((Object) this.owner, (Object) null))
+      return;
+    this.owner.OnHit();
+  }
 }

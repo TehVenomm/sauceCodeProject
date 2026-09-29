@@ -1,217 +1,142 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: SlimeAnimation
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class SlimeAnimation
 {
-	private class SlimeParamAnimator<T, T2> where T : SlimeAnimBase<T2>, new()where T2 : new()
-	{
-		private T anim;
+  private SlimeAnimation.SlimeParamAnimator<SlimePosAnim, Vector3> posAnimator;
+  private SlimeAnimation.SlimeParamAnimator<SlimeScaleAnim, Vector3> scaleAnimator;
+  private SlimeAnimation.SlimeParamAnimator<SlimeColorAnim, Color> colorAnimator;
+  private bool isFadeOut;
+  private SlimeController slime;
+  private Transform slimeTransform;
+  private Material slimeMaterial;
+  private const float INTERPOLATION_TIME_POS = 0.2f;
+  private const float INTERPOLATION_TIME_SCALE = 0.1f;
+  private const float INTERPOLATION_TIME_COLOR = 0.5f;
+  private const float FADEIN_ALPHA_MIN = 0.0f;
+  private const float FADEIN_ALPHA_MAX = 0.5f;
+  private const float FADEOUT_ALPHA_MIN = 0.0f;
+  private const float FADEOUT_ALPHA_MAX = 0.5f;
+  private const float CRUSH_ALPHA_MIN = 0.0f;
+  private const float CRUSH_ALPHA_MAX = 0.5f;
+  private const float NON_ANIM_TIME = 1f;
+  private readonly AnimationCurve SLIME_ANIM_CURVE_ZERO = AnimationCurve.Linear(0.0f, 0.0f, 0.0f, 0.0f);
+  private readonly AnimationCurve SLIME_ANIM_CURVE_ONE = AnimationCurve.Linear(0.0f, 1f, 0.0f, 1f);
+  private readonly AnimationCurve SLIME_ANIM_CURVE_HALF = AnimationCurve.Linear(0.0f, 0.5f, 0.0f, 0.5f);
 
-		public SlimeParamAnimator(float time, float start = 0f, float end = 1f)
-		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Expected O, but got Unknown
-			anim = new T();
-			anim.SetBlendParam(AnimationCurve.Linear(0f, start, time, end), time);
-		}
+  public SlimeAnimation(SlimeController slime_controller)
+  {
+    this.slime = slime_controller;
+    this.slimeTransform = ((Component) this.slime).transform;
+    this.slimeMaterial = ((Component) this.slime).GetComponent<Renderer>().material;
+    this.posAnimator = new SlimeAnimation.SlimeParamAnimator<SlimePosAnim, Vector3>(0.2f);
+    this.scaleAnimator = new SlimeAnimation.SlimeParamAnimator<SlimeScaleAnim, Vector3>(0.1f);
+    this.colorAnimator = new SlimeAnimation.SlimeParamAnimator<SlimeColorAnim, Color>(0.5f);
+  }
 
-		public T2 Update()
-		{
-			return anim.Update();
-		}
+  public void Update()
+  {
+    if (this.posAnimator.IsPlaying())
+      this.slimeTransform.localPosition = this.posAnimator.Update();
+    if (this.scaleAnimator.IsPlaying())
+      this.slimeTransform.localScale = this.scaleAnimator.Update();
+    if (this.colorAnimator.IsPlaying())
+    {
+      Color color = this.colorAnimator.Update();
+      this.slimeMaterial.color = color;
+      if ((double) color.a <= 0.0099999997764825821 && this.isFadeOut)
+        this.slime.SetInvisible();
+      else
+        this.slime.SetVisible();
+    }
+    else
+    {
+      if (!this.slime.IsVisible() || (double) this.slimeMaterial.color.a <= 0.0 || !this.isFadeOut)
+        return;
+      this.slimeMaterial.color = this.colorAnimator.Update();
+      this.slime.SetInvisible();
+    }
+  }
 
-		public void SetAnimation(AnimationCurve curve, float time, bool is_blend, T2 param, Action cb)
-		{
-			anim.InitAnim(curve, time, is_blend, param, cb);
-		}
+  public bool IsPlaying()
+  {
+    return this.posAnimator.IsPlaying() || this.scaleAnimator.IsPlaying() || this.colorAnimator.IsPlaying();
+  }
 
-		public bool IsPlaying()
-		{
-			return anim.isPlaying;
-		}
+  public void TouchOn(System.Action CallBackPos = null, System.Action CallBackScale = null, System.Action CallBackColor = null)
+  {
+    this.posAnimator.SetAnimation(this.SLIME_ANIM_CURVE_ZERO, 1f, true, this.slimeTransform.localPosition, CallBackPos);
+    this.scaleAnimator.SetAnimation(this.slime.animFadeIn, this.slime.fadeInAnimTime, true, this.slimeTransform.localScale, CallBackScale);
+    this.colorAnimator.SetAnimation(AnimationCurve.Linear(0.0f, 0.0f, 1f, 0.5f), this.slime.fadeInColorAnimTime, false, this.slimeMaterial.color, CallBackColor);
+    this.isFadeOut = false;
+  }
 
-		public void Terminate()
-		{
-			anim.Terminate();
-		}
+  public void TouchOff(System.Action CallBackPos = null, System.Action CallBackScale = null, System.Action CallBackColor = null)
+  {
+    this.posAnimator.SetAnimation(this.slime.animFadeOut, this.slime.fadeOutAnimTime, true, this.slimeTransform.localPosition, CallBackPos);
+    this.scaleAnimator.SetAnimation(this.SLIME_ANIM_CURVE_ONE, 1f, true, this.slimeTransform.localScale, CallBackScale);
+    this.colorAnimator.SetAnimation(AnimationCurve.Linear(0.0f, 0.5f, 1f, 0.0f), this.slime.fadeOutColorAnimTime, true, this.slimeMaterial.color, CallBackColor);
+    this.isFadeOut = true;
+  }
 
-		public T GetAnimData()
-		{
-			return anim;
-		}
-	}
+  public void Crush(System.Action CallBackPos = null, System.Action CallBackScale = null, System.Action CallBackColor = null)
+  {
+    this.posAnimator.SetAnimation(this.SLIME_ANIM_CURVE_ZERO, 1f, false, this.slimeTransform.localPosition, CallBackPos);
+    this.scaleAnimator.SetAnimation(this.slime.animCrush, this.slime.crushAnimTime, true, this.slimeTransform.localScale, CallBackScale);
+    this.colorAnimator.SetAnimation(AnimationCurve.Linear(0.0f, 0.5f, 1f, 0.0f), this.slime.crushColorAnimTime, false, this.slimeMaterial.color, CallBackColor);
+    this.isFadeOut = true;
+  }
 
-	private const float INTERPOLATION_TIME_POS = 0.2f;
+  public void ScaleUp(System.Action CallBackPos = null, System.Action CallBackScale = null, System.Action CallBackColor = null)
+  {
+    this.posAnimator.SetAnimation(this.SLIME_ANIM_CURVE_ZERO, 1f, true, this.slimeTransform.localPosition, CallBackPos);
+    this.scaleAnimator.SetAnimation(AnimationCurve.Linear(0.0f, 1f, this.slime.scaleupAnimTime, this.slime.scaleupAnimMaxScale), this.slime.scaleupAnimTime, true, this.slimeTransform.localScale, CallBackScale);
+    this.colorAnimator.SetAnimation(this.SLIME_ANIM_CURVE_HALF, 1f, false, this.slimeMaterial.color, CallBackColor);
+    this.isFadeOut = false;
+  }
 
-	private const float INTERPOLATION_TIME_SCALE = 0.1f;
+  public void ScaleUpDown(System.Action CallBackPos = null, System.Action CallBackScale = null, System.Action CallBackColor = null)
+  {
+    this.posAnimator.SetAnimation(this.SLIME_ANIM_CURVE_ZERO, 1f, true, this.slimeTransform.localPosition, CallBackPos);
+    this.scaleAnimator.SetAnimation(this.slime.animScaleUpDown, this.slime.scaleUpDownAnimTime, true, this.slimeTransform.localScale, CallBackScale);
+    this.colorAnimator.SetAnimation(this.SLIME_ANIM_CURVE_HALF, 1f, false, this.slimeMaterial.color, CallBackColor);
+    this.isFadeOut = false;
+  }
 
-	private const float INTERPOLATION_TIME_COLOR = 0.5f;
+  private class SlimeParamAnimator<T, T2>
+    where T : SlimeAnimBase<T2>, new()
+    where T2 : new()
+  {
+    private T anim;
 
-	private const float FADEIN_ALPHA_MIN = 0f;
+    public SlimeParamAnimator(float time, float start = 0.0f, float end = 1f)
+    {
+      this.anim = new T();
+      this.anim.SetBlendParam(AnimationCurve.Linear(0.0f, start, time, end), time);
+    }
 
-	private const float FADEIN_ALPHA_MAX = 0.5f;
+    public T2 Update() => this.anim.Update();
 
-	private const float FADEOUT_ALPHA_MIN = 0f;
+    public void SetAnimation(
+      AnimationCurve curve,
+      float time,
+      bool is_blend,
+      T2 param,
+      System.Action cb)
+    {
+      this.anim.InitAnim(curve, time, is_blend, param, cb);
+    }
 
-	private const float FADEOUT_ALPHA_MAX = 0.5f;
+    public bool IsPlaying() => this.anim.isPlaying;
 
-	private const float CRUSH_ALPHA_MIN = 0f;
+    public void Terminate() => this.anim.Terminate();
 
-	private const float CRUSH_ALPHA_MAX = 0.5f;
-
-	private const float NON_ANIM_TIME = 1f;
-
-	private SlimeParamAnimator<SlimePosAnim, Vector3> posAnimator;
-
-	private SlimeParamAnimator<SlimeScaleAnim, Vector3> scaleAnimator;
-
-	private SlimeParamAnimator<SlimeColorAnim, Color> colorAnimator;
-
-	private bool isFadeOut;
-
-	private SlimeController slime;
-
-	private Transform slimeTransform;
-
-	private Material slimeMaterial;
-
-	private readonly AnimationCurve SLIME_ANIM_CURVE_ZERO = AnimationCurve.Linear(0f, 0f, 0f, 0f);
-
-	private readonly AnimationCurve SLIME_ANIM_CURVE_ONE = AnimationCurve.Linear(0f, 1f, 0f, 1f);
-
-	private readonly AnimationCurve SLIME_ANIM_CURVE_HALF = AnimationCurve.Linear(0f, 0.5f, 0f, 0.5f);
-
-	public SlimeAnimation(SlimeController slime_controller)
-	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Expected O, but got Unknown
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Expected O, but got Unknown
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Expected O, but got Unknown
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Expected O, but got Unknown
-		slime = slime_controller;
-		slimeTransform = slime.get_transform();
-		slimeMaterial = slime.GetComponent<Renderer>().get_material();
-		posAnimator = new SlimeParamAnimator<SlimePosAnim, Vector3>(0.2f, 0f, 1f);
-		scaleAnimator = new SlimeParamAnimator<SlimeScaleAnim, Vector3>(0.1f, 0f, 1f);
-		colorAnimator = new SlimeParamAnimator<SlimeColorAnim, Color>(0.5f, 0f, 1f);
-	}
-
-	public void Update()
-	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		if (posAnimator.IsPlaying())
-		{
-			slimeTransform.set_localPosition(posAnimator.Update());
-		}
-		if (scaleAnimator.IsPlaying())
-		{
-			slimeTransform.set_localScale(scaleAnimator.Update());
-		}
-		if (colorAnimator.IsPlaying())
-		{
-			Color color = colorAnimator.Update();
-			slimeMaterial.set_color(color);
-			if (color.a <= 0.01f && isFadeOut)
-			{
-				slime.SetInvisible();
-			}
-			else
-			{
-				slime.SetVisible();
-			}
-		}
-		else if (slime.IsVisible())
-		{
-			Color color2 = slimeMaterial.get_color();
-			if (color2.a > 0f && isFadeOut)
-			{
-				slimeMaterial.set_color(colorAnimator.Update());
-				slime.SetInvisible();
-			}
-		}
-	}
-
-	public bool IsPlaying()
-	{
-		if (!posAnimator.IsPlaying() && !scaleAnimator.IsPlaying() && !colorAnimator.IsPlaying())
-		{
-			return false;
-		}
-		return true;
-	}
-
-	public void TouchOn(Action CallBackPos = null, Action CallBackScale = null, Action CallBackColor = null)
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Expected O, but got Unknown
-		posAnimator.SetAnimation(SLIME_ANIM_CURVE_ZERO, 1f, true, slimeTransform.get_localPosition(), CallBackPos);
-		scaleAnimator.SetAnimation(slime.animFadeIn, slime.fadeInAnimTime, true, slimeTransform.get_localScale(), CallBackScale);
-		colorAnimator.SetAnimation(AnimationCurve.Linear(0f, 0f, 1f, 0.5f), slime.fadeInColorAnimTime, false, slimeMaterial.get_color(), CallBackColor);
-		isFadeOut = false;
-	}
-
-	public void TouchOff(Action CallBackPos = null, Action CallBackScale = null, Action CallBackColor = null)
-	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Expected O, but got Unknown
-		posAnimator.SetAnimation(slime.animFadeOut, slime.fadeOutAnimTime, true, slimeTransform.get_localPosition(), CallBackPos);
-		scaleAnimator.SetAnimation(SLIME_ANIM_CURVE_ONE, 1f, true, slimeTransform.get_localScale(), CallBackScale);
-		colorAnimator.SetAnimation(AnimationCurve.Linear(0f, 0.5f, 1f, 0f), slime.fadeOutColorAnimTime, true, slimeMaterial.get_color(), CallBackColor);
-		isFadeOut = true;
-	}
-
-	public void Crush(Action CallBackPos = null, Action CallBackScale = null, Action CallBackColor = null)
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Expected O, but got Unknown
-		posAnimator.SetAnimation(SLIME_ANIM_CURVE_ZERO, 1f, false, slimeTransform.get_localPosition(), CallBackPos);
-		scaleAnimator.SetAnimation(slime.animCrush, slime.crushAnimTime, true, slimeTransform.get_localScale(), CallBackScale);
-		colorAnimator.SetAnimation(AnimationCurve.Linear(0f, 0.5f, 1f, 0f), slime.crushColorAnimTime, false, slimeMaterial.get_color(), CallBackColor);
-		isFadeOut = true;
-	}
-
-	public void ScaleUp(Action CallBackPos = null, Action CallBackScale = null, Action CallBackColor = null)
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Expected O, but got Unknown
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		posAnimator.SetAnimation(SLIME_ANIM_CURVE_ZERO, 1f, true, slimeTransform.get_localPosition(), CallBackPos);
-		scaleAnimator.SetAnimation(AnimationCurve.Linear(0f, 1f, slime.scaleupAnimTime, slime.scaleupAnimMaxScale), slime.scaleupAnimTime, true, slimeTransform.get_localScale(), CallBackScale);
-		colorAnimator.SetAnimation(SLIME_ANIM_CURVE_HALF, 1f, false, slimeMaterial.get_color(), CallBackColor);
-		isFadeOut = false;
-	}
-
-	public void ScaleUpDown(Action CallBackPos = null, Action CallBackScale = null, Action CallBackColor = null)
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		posAnimator.SetAnimation(SLIME_ANIM_CURVE_ZERO, 1f, true, slimeTransform.get_localPosition(), CallBackPos);
-		scaleAnimator.SetAnimation(slime.animScaleUpDown, slime.scaleUpDownAnimTime, true, slimeTransform.get_localScale(), CallBackScale);
-		colorAnimator.SetAnimation(SLIME_ANIM_CURVE_HALF, 1f, false, slimeMaterial.get_color(), CallBackColor);
-		isFadeOut = false;
-	}
+    public T GetAnimData() => this.anim;
+  }
 }

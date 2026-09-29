@@ -1,434 +1,449 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: GachaManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+#nullable disable
 public class GachaManager : MonoBehaviourSingleton<GachaManager>
 {
-	public GachaList gachaData
-	{
-		get;
-		private set;
-	}
+  private int currentGachaIndex;
 
-	public GachaResult gachaResult
-	{
-		get;
-		private set;
-	}
+  public GachaList gachaData { get; private set; }
 
-	public int gachaResultPresentCount
-	{
-		get;
-		private set;
-	}
+  public List<GachaResult> gachaResultList { get; private set; }
 
-	public GachaList.Gacha selectGacha
-	{
-		get;
-		private set;
-	}
+  public GachaResult gachaResultBonus { get; private set; }
 
-	public GACHA_TYPE selectGachaType
-	{
-		get;
-		private set;
-	}
+  public bool enableFeverDirector { get; private set; }
 
-	public GACHA_TYPE selectGachaRealType
-	{
-		get;
-		private set;
-	}
+  public bool IsMultiResult() => this.gachaResultList.Count > 1;
 
-	public GachaGuaranteeCampaignInfo selectGachaGuarantee
-	{
-		get;
-		private set;
-	}
+  public bool IsExistNextGachaResult() => this.gachaResultList.Count > this.currentGachaIndex + 1;
 
-	public GachaManager()
-	{
-		gachaData = new GachaList();
-	}
+  public bool IsResultBonus() => this.gachaResultBonus != null;
 
-	public void ResetGachaType()
-	{
-		selectGachaType = GACHA_TYPE.QUEST;
-		selectGachaRealType = GACHA_TYPE.QUEST;
-	}
+  public void ResetGachaIndex()
+  {
+    this.currentGachaIndex = 0;
+    this.enableFeverDirector = false;
+  }
 
-	public bool IsSelectTutorialGacha()
-	{
-		return selectGachaRealType == GACHA_TYPE.TUTORIAL1 || selectGachaRealType == GACHA_TYPE.TUTORIAL2;
-	}
+  public void IncrementGachaIndex() => ++this.currentGachaIndex;
 
-	public void Dirty()
-	{
-	}
+  public void SetNextFever() => this.enableFeverDirector = true;
 
-	public void SelectGacha(int gachaId, int gachaIndex)
-	{
-		selectGacha = FindGacha(gachaId, gachaIndex, out GACHA_TYPE gacha_type, out GACHA_TYPE real_type, out GachaGuaranteeCampaignInfo guaranteeInfo);
-		selectGachaType = gacha_type;
-		selectGachaRealType = real_type;
-		selectGachaGuarantee = guaranteeInfo;
-	}
+  public GachaResult GetCurrentGachaResult()
+  {
+    return this.gachaResultList == null ? (GachaResult) null : this.gachaResultList[this.currentGachaIndex];
+  }
 
-	private GachaList.Gacha FindGacha(int gachaId, int gachaIndex, out GACHA_TYPE gacha_type, out GACHA_TYPE real_type, out GachaGuaranteeCampaignInfo guaranteeInfo)
-	{
-		GachaList.Gacha result = null;
-		gacha_type = (GACHA_TYPE)0;
-		real_type = (GACHA_TYPE)0;
-		guaranteeInfo = new GachaGuaranteeCampaignInfo();
-		for (int i = 0; i < gachaData.types.Count; i++)
-		{
-			GachaList.GachaType gachaType = gachaData.types[i];
-			for (int j = 0; j < gachaType.groups.Count; j++)
-			{
-				GachaList.GachaGroup gachaGroup = gachaType.groups[j];
-				if (gachaGroup.gachas.Count > gachaIndex)
-				{
-					GachaList.Gacha gacha = gachaGroup.gachas[gachaIndex];
-					if (gacha.gachaId == gachaId)
-					{
-						result = gacha;
-						gacha_type = gachaType.ViewType;
-						real_type = gachaType.Type;
-						guaranteeInfo = gachaGroup.gachaGuaranteeCampaignInfo.Find((GachaGuaranteeCampaignInfo info) => info.gachaId == gachaId);
-						if (guaranteeInfo == null)
-						{
-							guaranteeInfo = new GachaGuaranteeCampaignInfo();
-						}
-						return result;
-					}
-				}
-			}
-		}
-		return result;
-	}
+  public GachaResult GetNextGachaResult()
+  {
+    if (this.gachaResultList == null)
+      return (GachaResult) null;
+    return this.gachaResultList.Count <= this.currentGachaIndex + 1 ? (GachaResult) null : this.gachaResultList[this.currentGachaIndex + 1];
+  }
 
-	public void SetSelectGachaGuarantee(GachaGuaranteeCampaignInfo guaranteeInfo)
-	{
-		selectGachaGuarantee = guaranteeInfo;
-	}
+  public GachaList.Gacha selectGacha { get; private set; }
 
-	public RARITY_TYPE GetMaxRarity()
-	{
-		RARITY_TYPE rARITY_TYPE = RARITY_TYPE.D;
-		if (gachaResult != null && gachaResult.reward != null)
-		{
-			int i = 0;
-			for (int count = gachaResult.reward.Count; i < count; i++)
-			{
-				GachaResult.GachaReward gachaReward = gachaResult.reward[i];
-				RARITY_TYPE rARITY_TYPE2 = RARITY_TYPE.D;
-				switch (selectGachaType)
-				{
-				case GACHA_TYPE.QUEST:
-				{
-					QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)gachaReward.itemId);
-					if (questData != null)
-					{
-						rARITY_TYPE2 = questData.rarity;
-					}
-					break;
-				}
-				case GACHA_TYPE.SKILL:
-				{
-					SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)gachaReward.itemId);
-					if (skillItemData != null)
-					{
-						rARITY_TYPE2 = skillItemData.rarity;
-					}
-					break;
-				}
-				}
-				if (rARITY_TYPE < rARITY_TYPE2)
-				{
-					rARITY_TYPE = rARITY_TYPE2;
-				}
-			}
-		}
-		return rARITY_TYPE;
-	}
+  public GACHA_TYPE selectGachaType { get; private set; }
 
-	public bool IsReam()
-	{
-		if (selectGacha == null)
-		{
-			return false;
-		}
-		return selectGacha.num > 1;
-	}
+  public GACHA_TYPE selectGachaRealType { get; private set; }
 
-	private void CheckGachaShowBannerInvite()
-	{
-		if ((selectGacha.crystalNum != 0 || selectGacha.requiredItemId != 0) && selectGacha.requiredItemId != 0)
-		{
-			GameSaveData.instance.spentSummonTicket += selectGacha.needItemNum;
-		}
-	}
+  public GachaGuaranteeCampaignInfo selectGachaGuarantee { get; private set; }
 
-	private void TrackGachaEvent()
-	{
-		if (selectGacha.crystalNum != 0 || selectGacha.requiredItemId != 0)
-		{
-			if (selectGachaType == GACHA_TYPE.QUEST)
-			{
-				int[] array = new int[gachaResult.reward.Count];
-				int i = 0;
-				for (int count = gachaResult.reward.Count; i < count; i++)
-				{
-					array[i] = gachaResult.reward[i].itemId;
-				}
-				Dictionary<string, object> dictionary = new Dictionary<string, object>();
-				dictionary.Add("quest_id", array.ToJoinString(",", null));
-				dictionary.Add("amount", array.Length);
-				if (selectGacha.crystalNum > 0)
-				{
-					dictionary.Add("currency_type", "gem");
-					dictionary.Add("currency_value", selectGacha.crystalNum);
-				}
-				else if (selectGacha.requiredItemId != 0)
-				{
-					dictionary.Add("currency_type", "ticket");
-					dictionary.Add("currency_value", selectGacha.needItemNum);
-				}
-				MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Credit_Spend_gacha_monster", "Credit_Spend", dictionary);
-			}
-			else if (selectGachaType == GACHA_TYPE.SKILL)
-			{
-				int[] array2 = new int[gachaResult.reward.Count];
-				int j = 0;
-				for (int count2 = gachaResult.reward.Count; j < count2; j++)
-				{
-					array2[j] = gachaResult.reward[j].itemId;
-				}
-				Dictionary<string, object> dictionary2 = new Dictionary<string, object>();
-				dictionary2.Add("skill_id", array2.ToJoinString(",", null));
-				dictionary2.Add("amount", array2.Length);
-				if (selectGacha.crystalNum > 0)
-				{
-					dictionary2.Add("currency_type", "gem");
-					dictionary2.Add("currency_value", selectGacha.crystalNum);
-				}
-				else if (selectGacha.requiredItemId != 0)
-				{
-					dictionary2.Add("currency_type", "ticket");
-					dictionary2.Add("currency_value", selectGacha.needItemNum);
-				}
-				MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Credit_Spend_gacha_magi", "Credit_Spend", dictionary2);
-			}
-		}
-	}
+  public void ResetGachaType()
+  {
+    this.selectGachaType = GACHA_TYPE.QUEST;
+    this.selectGachaRealType = GACHA_TYPE.QUEST;
+  }
 
-	private void SortGachaResult()
-	{
-		int num = -1;
-		int index = -1;
-		if (selectGachaType == GACHA_TYPE.QUEST)
-		{
-			int i = 0;
-			for (int count = gachaResult.reward.Count; i < count; i++)
-			{
-				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)gachaResult.reward[i].itemId);
-				if (questData != null && (int)questData.rarity > num)
-				{
-					num = (int)questData.rarity;
-					index = i;
-				}
-			}
-		}
-		else
-		{
-			if (selectGachaType != GACHA_TYPE.SKILL)
-			{
-				return;
-			}
-			int j = 0;
-			for (int count2 = gachaResult.reward.Count; j < count2; j++)
-			{
-				SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)gachaResult.reward[j].itemId);
-				if (skillItemData != null && (int)skillItemData.rarity > num)
-				{
-					num = (int)skillItemData.rarity;
-					index = j;
-				}
-			}
-		}
-		GachaResult.GachaReward value = gachaResult.reward[index];
-		gachaResult.reward[index] = gachaResult.reward[gachaResult.reward.Count - 1];
-		gachaResult.reward[gachaResult.reward.Count - 1] = value;
-	}
+  public bool IsSelectTutorialGacha()
+  {
+    return this.selectGachaRealType == GACHA_TYPE.TUTORIAL1 || this.selectGachaRealType == GACHA_TYPE.TUTORIAL2;
+  }
 
-	public void SendGetGacha(Action<bool> call_back)
-	{
-		gachaData = null;
-		Protocol.Send(GachaListModel.URL, delegate(GachaListModel ret)
-		{
-			bool obj = false;
-			if (ret.Error == Error.None)
-			{
-				obj = true;
-				gachaData = ret.result;
-				gachaData.types.ForEach(delegate(GachaList.GachaType o)
-				{
-					o.groups.Sort((GachaList.GachaGroup x, GachaList.GachaGroup y) => y.priority - x.priority);
-				});
-				gachaData.types.ForEach(delegate(GachaList.GachaType type)
-				{
-					type.groups.ForEach(delegate(GachaList.GachaGroup gr)
-					{
-						List<GachaList.Gacha> source = (from g in gr.gachas
-						where g.IsOncePurchase()
-						select g).ToList();
-						int num = source.Count();
-						for (int i = 0; i < num; i++)
-						{
-							GachaList.Gacha gacha = source.ElementAt(i);
-							int gachaId = gacha.gachaId;
-							gr.gachas.Remove(gacha);
-							int targetSubGroup = (from g in gr.gachas
-							where g.gachaId == gachaId
-							select g.subGroup).First();
-							int index = (from ano in gr.gachas.Select((GachaList.Gacha g, int j) => new
-							{
-								Content = g,
-								Index = j
-							})
-							where ano.Content.subGroup == targetSubGroup
-							select ano.Index).First();
-							gr.gachas.Insert(index, gacha);
-						}
-					});
-				});
-				Dirty();
-			}
-			call_back(obj);
-		}, string.Empty);
-	}
+  public GachaManager() => this.gachaData = new GachaList();
 
-	public void SendGachaGacha(int gachaId, int requiredItemId, string productId, int campaignId, int campaignType, int remainCount, int userCount, bool isStepUpTicket, Action<Error> call_back)
-	{
-		GachaGachaModel.RequestSendForm requestSendForm = new GachaGachaModel.RequestSendForm();
-		requestSendForm.id = gachaId;
-		requestSendForm.crystalCL = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
-		requestSendForm.ticketCL = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((ItemInfo x) => x.tableData.id == requiredItemId, 1, true);
-		requestSendForm.productId = productId;
-		requestSendForm.guaranteeCampaignId = campaignId;
-		requestSendForm.guaranteeCampaignType = campaignType;
-		requestSendForm.guaranteeRemainCount = remainCount;
-		requestSendForm.guaranteeUserCount = userCount;
-		requestSendForm.useStepUpTicket = (isStepUpTicket ? 1 : 0);
-		gachaResult = null;
-		int old_present_num = MonoBehaviourSingleton<PresentManager>.I.presentNum;
-		Protocol.Send(GachaGachaModel.URL, requestSendForm, delegate(GachaGachaModel ret)
-		{
-			if (ret.Error == Error.None)
-			{
-				gachaResult = ret.result;
-				if (gachaResult.oncePurchaseItemToShop == null || string.IsNullOrEmpty(gachaResult.oncePurchaseItemToShop.productId))
-				{
-					gachaResultPresentCount = MonoBehaviourSingleton<PresentManager>.I.presentNum - old_present_num;
-					SortGachaResult();
-					if (selectGachaType == GACHA_TYPE.QUEST)
-					{
-						GameSaveData.instance.recommendedOrderCheck = 1;
-						GameSaveData.Save();
-					}
-					Dirty();
-					CheckGachaShowBannerInvite();
-					TrackGachaEvent();
-				}
-			}
-			call_back(ret.Error);
-		}, string.Empty);
-	}
+  public void Dirty()
+  {
+  }
 
-	public bool IsTutorial()
-	{
-		return IsTutorialQuestGacha() || IsTutorialSkillGacha();
-	}
+  public void SelectGacha(int gachaId, int gachaIndex)
+  {
+    GACHA_TYPE gacha_type;
+    GACHA_TYPE real_type;
+    GachaGuaranteeCampaignInfo guaranteeInfo;
+    this.selectGacha = this.FindGacha(gachaId, gachaIndex, out gacha_type, out real_type, out guaranteeInfo);
+    this.selectGachaType = gacha_type;
+    this.selectGachaRealType = real_type;
+    this.selectGachaGuarantee = guaranteeInfo;
+  }
 
-	public bool IsTutorialQuestGacha()
-	{
-		return IsExistGachaType(GACHA_TYPE.TUTORIAL1);
-	}
+  private GachaList.Gacha FindGacha(
+    int gachaId,
+    int gachaIndex,
+    out GACHA_TYPE gacha_type,
+    out GACHA_TYPE real_type,
+    out GachaGuaranteeCampaignInfo guaranteeInfo)
+  {
+    GachaList.Gacha gacha1 = (GachaList.Gacha) null;
+    gacha_type = (GACHA_TYPE) 0;
+    real_type = (GACHA_TYPE) 0;
+    guaranteeInfo = new GachaGuaranteeCampaignInfo();
+    for (int index1 = 0; index1 < this.gachaData.types.Count; ++index1)
+    {
+      GachaList.GachaType type = this.gachaData.types[index1];
+      for (int index2 = 0; index2 < type.groups.Count; ++index2)
+      {
+        GachaList.GachaGroup group = type.groups[index2];
+        if (group.gachas.Count > gachaIndex)
+        {
+          GachaList.Gacha gacha2 = group.gachas[gachaIndex];
+          if (gacha2.gachaId == gachaId)
+          {
+            GachaList.Gacha gacha3 = gacha2;
+            gacha_type = type.ViewType;
+            real_type = type.Type;
+            guaranteeInfo = group.gachaGuaranteeCampaignInfo.Find((Predicate<GachaGuaranteeCampaignInfo>) (info => info.gachaId == gachaId));
+            if (guaranteeInfo == null)
+              guaranteeInfo = new GachaGuaranteeCampaignInfo();
+            return gacha3;
+          }
+        }
+      }
+    }
+    return gacha1;
+  }
 
-	public bool IsTutorialSkillGacha()
-	{
-		return IsExistGachaType(GACHA_TYPE.TUTORIAL2);
-	}
+  public void SetSelectGachaGuarantee(GachaGuaranteeCampaignInfo guaranteeInfo)
+  {
+    this.selectGachaGuarantee = guaranteeInfo;
+  }
 
-	private bool IsExistGachaType(GACHA_TYPE targetType)
-	{
-		if (gachaData == null)
-		{
-			return false;
-		}
-		if (gachaData.types == null || gachaData.types.Count <= 0)
-		{
-			return false;
-		}
-		foreach (GachaList.GachaType type in gachaData.types)
-		{
-			if (type.type == (int)targetType)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+  public RARITY_TYPE GetMaxRarity() => this.GetMaxRarity(this.GetCurrentGachaResult().reward);
 
-	public bool HasBeenShowAdvertisement()
-	{
-		return PlayerPrefs.HasKey("SHOP_TOP_ADVERTISEMENT");
-	}
+  public RARITY_TYPE GetMaxRarity(List<GachaResult.GachaReward> rewardList)
+  {
+    RARITY_TYPE maxRarity = RARITY_TYPE.D;
+    if (rewardList != null)
+    {
+      int index = 0;
+      for (int count = rewardList.Count; index < count; ++index)
+      {
+        GachaResult.GachaReward reward = rewardList[index];
+        RARITY_TYPE rarityType = RARITY_TYPE.D;
+        switch (this.selectGachaType)
+        {
+          case GACHA_TYPE.SKILL:
+            SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint) reward.itemId);
+            if (skillItemData != null)
+            {
+              rarityType = skillItemData.rarity;
+              break;
+            }
+            break;
+          case GACHA_TYPE.QUEST:
+            QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint) reward.itemId);
+            if (questData != null)
+            {
+              rarityType = questData.rarity;
+              break;
+            }
+            break;
+        }
+        if (maxRarity < rarityType)
+          maxRarity = rarityType;
+      }
+    }
+    return maxRarity;
+  }
 
-	public void SetTimeShowShopAdvertisement(DateTime startAt)
-	{
-		PlayerPrefs.SetString("SHOP_TOP_ADVERTISEMENT", startAt.ToBinary().ToString());
-	}
+  public int GetCountOverRarity(List<GachaResult.GachaReward> rewardList, RARITY_TYPE rarity)
+  {
+    int countOverRarity = 0;
+    if (rewardList != null)
+    {
+      for (int index = 0; index < rewardList.Count; ++index)
+      {
+        GachaResult.GachaReward reward = rewardList[index];
+        switch (this.selectGachaType)
+        {
+          case GACHA_TYPE.SKILL:
+            SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint) reward.itemId);
+            if (skillItemData != null && skillItemData.rarity >= rarity)
+            {
+              ++countOverRarity;
+              break;
+            }
+            break;
+          case GACHA_TYPE.QUEST:
+            QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint) reward.itemId);
+            if (questData != null && questData.rarity >= rarity)
+            {
+              ++countOverRarity;
+              break;
+            }
+            break;
+        }
+      }
+    }
+    return countOverRarity;
+  }
 
-	public DateTime GetTimeShowShopAdvertisement()
-	{
-		string @string = PlayerPrefs.GetString("SHOP_TOP_ADVERTISEMENT");
-		return DateTime.FromBinary(Convert.ToInt64(@string));
-	}
+  public bool IsReam() => this.selectGacha != null && this.selectGacha.num > 1;
 
-	public string CreateButtonBaseName(GachaList.Gacha gacha, GachaGuaranteeCampaignInfo guarantee, bool resultScene = false)
-	{
-		string text = string.Empty;
-		if (!resultScene || (gacha != null && gacha.requiredItemId > 0))
-		{
-			text = gacha.buttonImg;
-		}
-		if (guarantee != null && guarantee.IsValid())
-		{
-			string buttonImageName = guarantee.GetButtonImageName();
-			if (buttonImageName != string.Empty)
-			{
-				text = buttonImageName;
-			}
-			if (gacha.IsOncePurchase() && guarantee.IsStepUp())
-			{
-				text = "BTN_GACHA_STEP10_Pay";
-			}
-			if (guarantee.IsStepUp())
-			{
-				text = ((!guarantee.hasFreeGachaReward) ? (text + "_" + guarantee.GetImageCount()) : (text + "_FREE"));
-			}
-		}
-		if (resultScene && MonoBehaviourSingleton<GachaManager>.I.gachaResult != null && !string.IsNullOrEmpty(MonoBehaviourSingleton<GachaManager>.I.gachaResult.buttonImg) && string.IsNullOrEmpty(text))
-		{
-			text = MonoBehaviourSingleton<GachaManager>.I.gachaResult.buttonImg;
-		}
-		if (string.IsNullOrEmpty(text))
-		{
-			text = "BTN_GACHA_NORMAL1" + ((gacha.num != 1) ? "0" : string.Empty);
-		}
-		return text;
-	}
+  private void CheckGachaShowBannerInvite()
+  {
+    if (this.selectGacha.crystalNum == 0 && this.selectGacha.requiredItemId == 0 || this.selectGacha.requiredItemId == 0)
+      return;
+    GameSaveData.instance.spentSummonTicket += this.selectGacha.needItemNum;
+  }
+
+  private void TrackGachaEvent(GachaResult result)
+  {
+    if (this.selectGacha.crystalNum == 0 && this.selectGacha.requiredItemId == 0 || result == null || result.reward == null || result.reward.Count == 0)
+      return;
+    if (this.selectGachaType == GACHA_TYPE.QUEST)
+    {
+      int[] array = new int[result.reward.Count];
+      int index = 0;
+      for (int count = result.reward.Count; index < count; ++index)
+        array[index] = result.reward[index].itemId;
+      Dictionary<string, object> values = new Dictionary<string, object>();
+      values.Add("quest_id", (object) array.ToJoinString<int>());
+      values.Add("amount", (object) array.Length);
+      if (this.selectGacha.crystalNum > 0)
+      {
+        values.Add("currency_type", (object) "gem");
+        values.Add("currency_value", (object) this.selectGacha.crystalNum);
+      }
+      else if (this.selectGacha.requiredItemId != 0)
+      {
+        values.Add("currency_type", (object) "ticket");
+        values.Add("currency_value", (object) this.selectGacha.needItemNum);
+      }
+      MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Credit_Spend_gacha_monster", "Credit_Spend", values);
+    }
+    else
+    {
+      if (this.selectGachaType != GACHA_TYPE.SKILL)
+        return;
+      int[] array = new int[result.reward.Count];
+      int index = 0;
+      for (int count = result.reward.Count; index < count; ++index)
+        array[index] = result.reward[index].itemId;
+      Dictionary<string, object> values = new Dictionary<string, object>();
+      values.Add("skill_id", (object) array.ToJoinString<int>());
+      values.Add("amount", (object) array.Length);
+      if (this.selectGacha.crystalNum > 0)
+      {
+        values.Add("currency_type", (object) "gem");
+        values.Add("currency_value", (object) this.selectGacha.crystalNum);
+      }
+      else if (this.selectGacha.requiredItemId != 0)
+      {
+        values.Add("currency_type", (object) "ticket");
+        values.Add("currency_value", (object) this.selectGacha.needItemNum);
+      }
+      MonoBehaviourSingleton<GoWrapManager>.I.trackEvent("Credit_Spend_gacha_magi", "Credit_Spend", values);
+    }
+  }
+
+  private void SortGachaResult(List<GachaResult.GachaReward> rewardList)
+  {
+    int num = -1;
+    bool flag = false;
+    int index1 = -1;
+    if (rewardList[0].rewardType == 6)
+    {
+      int index2 = 0;
+      for (int count = rewardList.Count; index2 < count; ++index2)
+      {
+        QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint) rewardList[index2].itemId);
+        if (questData != null && (questData.rarity > (RARITY_TYPE) num || questData.rarity == (RARITY_TYPE) num && !flag && 0 < rewardList[index2].lotGroupNo))
+        {
+          num = (int) questData.rarity;
+          flag = 0 < rewardList[index2].lotGroupNo;
+          index1 = index2;
+        }
+      }
+    }
+    else
+    {
+      if (rewardList[0].rewardType != 5)
+        return;
+      int index3 = 0;
+      for (int count = rewardList.Count; index3 < count; ++index3)
+      {
+        SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint) rewardList[index3].itemId);
+        if (skillItemData != null && (skillItemData.rarity > (RARITY_TYPE) num || skillItemData.rarity == (RARITY_TYPE) num && !flag && 0 < rewardList[index3].lotGroupNo))
+        {
+          num = (int) skillItemData.rarity;
+          flag = 0 < rewardList[index3].lotGroupNo;
+          index1 = index3;
+        }
+      }
+    }
+    GachaResult.GachaReward reward = rewardList[index1];
+    rewardList[index1] = rewardList[rewardList.Count - 1];
+    rewardList[rewardList.Count - 1] = reward;
+  }
+
+  public void SendGetGacha(Action<bool> call_back)
+  {
+    this.gachaData = (GachaList) null;
+    Protocol.Send<GachaListModel>(GachaListModel.URL, (Action<GachaListModel>) (ret =>
+    {
+      bool flag = false;
+      if (ret.Error == Error.None)
+      {
+        flag = true;
+        this.gachaData = ret.result;
+        this.gachaData.types.ForEach((Action<GachaList.GachaType>) (o => o.groups.Sort((Comparison<GachaList.GachaGroup>) ((x, y) => y.priority - x.priority))));
+        this.gachaData.types.ForEach((Action<GachaList.GachaType>) (type => type.groups.ForEach((Action<GachaList.GachaGroup>) (gr =>
+        {
+          List<GachaList.Gacha> oncePurchaseGachaList = gr.gachas.Where<GachaList.Gacha>((Func<GachaList.Gacha, bool>) (g => g.IsOncePurchase())).ToList<GachaList.Gacha>();
+          int num = oncePurchaseGachaList.Count<GachaList.Gacha>();
+          for (int index3 = 0; index3 < num; ++index3)
+          {
+            GachaList.Gacha gacha = oncePurchaseGachaList.ElementAt<GachaList.Gacha>(index3);
+            int gachaId = gacha.gachaId;
+            if (gr.gachas.Where<GachaList.Gacha>((Func<GachaList.Gacha, bool>) (g => g.gachaId == gachaId)).Where<GachaList.Gacha>((Func<GachaList.Gacha, bool>) (g => oncePurchaseGachaList.IndexOf(g) == -1)).ToList<GachaList.Gacha>().Count > 0)
+            {
+              gr.gachas.Remove(gacha);
+              int targetSubGroup = gr.gachas.Where<GachaList.Gacha>((Func<GachaList.Gacha, bool>) (g => g.gachaId == gachaId)).Select<GachaList.Gacha, int>((Func<GachaList.Gacha, int>) (g => g.subGroup)).First<int>();
+              int index4 = gr.gachas.Select((g, j) => new
+              {
+                Content = g,
+                Index = j
+              }).Where(ano => ano.Content.subGroup == targetSubGroup).Select(ano => ano.Index).First<int>();
+              gr.gachas.Insert(index4, gacha);
+            }
+          }
+        }))));
+        this.Dirty();
+      }
+      call_back(flag);
+    }));
+  }
+
+  public void SendGachaGacha(
+    int gachaId,
+    int requiredItemId,
+    string productId,
+    int campaignId,
+    int campaignType,
+    int remainCount,
+    int userCount,
+    bool isStepUpTicket,
+    int seriesId,
+    Action<Error> call_back)
+  {
+    GachaGachaModel.RequestSendForm postData = new GachaGachaModel.RequestSendForm();
+    postData.id = gachaId;
+    postData.crystalCL = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
+    postData.ticketCL = MonoBehaviourSingleton<InventoryManager>.I.GetItemNum((Predicate<ItemInfo>) (x => (long) x.tableData.id == (long) requiredItemId), 1, true);
+    postData.productId = productId;
+    postData.guaranteeCampaignId = campaignId;
+    postData.guaranteeCampaignType = campaignType;
+    postData.guaranteeRemainCount = remainCount;
+    postData.guaranteeUserCount = userCount;
+    postData.useStepUpTicket = isStepUpTicket ? 1 : 0;
+    postData.seriesId = seriesId;
+    this.gachaResultList = new List<GachaResult>();
+    this.gachaResultBonus = (GachaResult) null;
+    int presentNum = MonoBehaviourSingleton<PresentManager>.I.presentNum;
+    Protocol.Send<GachaGachaModel.RequestSendForm, GachaGachaModel>(GachaGachaModel.URL, postData, (Action<GachaGachaModel>) (ret =>
+    {
+      if (ret.Error == Error.None)
+      {
+        this.gachaResultList.Add(ret.result);
+        if (ret.resultArray != null && ret.resultArray.Count > 0)
+          this.gachaResultList.AddRange((IEnumerable<GachaResult>) ret.resultArray);
+        if (ret.resultBonus.reward != null)
+          this.gachaResultBonus = ret.resultBonus;
+        this.ResetGachaIndex();
+        GachaResult currentGachaResult = this.GetCurrentGachaResult();
+        if (currentGachaResult == null || currentGachaResult.oncePurchaseItemToShop == null || string.IsNullOrEmpty(currentGachaResult.oncePurchaseItemToShop.productId))
+        {
+          for (int index = 0; index < this.gachaResultList.Count; ++index)
+            this.SortGachaResult(this.gachaResultList[index].reward);
+          if (this.IsResultBonus())
+            this.SortGachaResult(this.gachaResultBonus.reward);
+          if (this.selectGachaType == GACHA_TYPE.QUEST)
+          {
+            GameSaveData.instance.recommendedOrderCheck = 1;
+            GameSaveData.Save();
+          }
+          this.Dirty();
+          this.CheckGachaShowBannerInvite();
+          this.TrackGachaEvent(ret.result);
+        }
+      }
+      call_back(ret.Error);
+    }));
+  }
+
+  public bool IsTutorial() => this.IsTutorialQuestGacha() || this.IsTutorialSkillGacha();
+
+  public bool IsTutorialQuestGacha() => this.IsExistGachaType(GACHA_TYPE.TUTORIAL1);
+
+  public bool IsTutorialSkillGacha() => this.IsExistGachaType(GACHA_TYPE.TUTORIAL2);
+
+  private bool IsExistGachaType(GACHA_TYPE targetType)
+  {
+    if (this.gachaData == null || this.gachaData.types == null || this.gachaData.types.Count <= 0)
+      return false;
+    foreach (GachaList.GachaType type in this.gachaData.types)
+    {
+      if ((GACHA_TYPE) type.type == targetType)
+        return true;
+    }
+    return false;
+  }
+
+  public bool HasBeenShowAdvertisement() => PlayerPrefs.HasKey("SHOP_TOP_ADVERTISEMENT");
+
+  public void SetTimeShowShopAdvertisement(DateTime startAt)
+  {
+    PlayerPrefs.SetString("SHOP_TOP_ADVERTISEMENT", startAt.ToBinary().ToString());
+  }
+
+  public DateTime GetTimeShowShopAdvertisement()
+  {
+    return DateTime.FromBinary(Convert.ToInt64(PlayerPrefs.GetString("SHOP_TOP_ADVERTISEMENT")));
+  }
+
+  public string CreateButtonBaseName(
+    GachaList.Gacha gacha,
+    GachaGuaranteeCampaignInfo guarantee,
+    bool resultScene = false)
+  {
+    string buttonBaseName = string.Empty;
+    if (!resultScene || gacha != null && gacha.requiredItemId > 0)
+      buttonBaseName = gacha.buttonImg;
+    if (guarantee != null && guarantee.IsValid())
+    {
+      string buttonImageName = guarantee.GetButtonImageName();
+      if (buttonImageName != "")
+        buttonBaseName = buttonImageName;
+      if (gacha.IsOncePurchase() && guarantee.IsStepUp())
+        buttonBaseName = "BTN_GACHA_STEP10_Pay";
+      if (guarantee.IsStepUp() || guarantee.IsFever())
+        buttonBaseName = !guarantee.hasFreeGachaReward ? $"{buttonBaseName}_{(object) guarantee.GetImageCount()}" : buttonBaseName + "_FREE";
+    }
+    if (resultScene && MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult() != null && !string.IsNullOrEmpty(MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().buttonImg) && string.IsNullOrEmpty(buttonBaseName))
+      buttonBaseName = MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult().buttonImg;
+    if (string.IsNullOrEmpty(buttonBaseName))
+      buttonBaseName = "BTN_GACHA_NORMAL1" + (gacha.num == 1 ? "" : "0");
+    return buttonBaseName;
+  }
 }

@@ -1,148 +1,124 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UITutorialFieldHelper
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class UITutorialFieldHelper
+#nullable disable
+public class UITutorialFieldHelper : MonoBehaviour
 {
-	public enum MessageState
-	{
-		None,
-		Wait,
-		CollectItemImg,
-		CollectItem,
-		BackHome,
-		MenuPop
-	}
+  private InGameMain sectionIngameMain;
+  [SerializeField]
+  private UITweenCtrl tweenStratCtrl;
+  [SerializeField]
+  private UITweenCtrl tweenEndCtrl;
+  [SerializeField]
+  private UIButton skilBtn;
+  private static UITutorialFieldHelper instance;
 
-	private InGameMain sectionIngameMain;
+  public static UITutorialFieldHelper.MessageState m_State { private set; get; }
 
-	[SerializeField]
-	private UITweenCtrl tweenStratCtrl;
+  public bool IsLoading { private set; get; }
 
-	[SerializeField]
-	private UITweenCtrl tweenEndCtrl;
+  public static UITutorialFieldHelper I => UITutorialFieldHelper.instance;
 
-	[SerializeField]
-	private UIButton skilBtn;
+  public static bool IsValid()
+  {
+    return Object.op_Inequality((Object) UITutorialFieldHelper.instance, (Object) null);
+  }
 
-	private static UITutorialFieldHelper instance;
+  public static bool IsCollectedFieldItem()
+  {
+    return Object.op_Inequality((Object) UITutorialFieldHelper.instance, (Object) null) && UITutorialFieldHelper.m_State == UITutorialFieldHelper.MessageState.BackHome;
+  }
 
-	public static MessageState m_State
-	{
-		get;
-		private set;
-	}
+  private void Awake() => UITutorialFieldHelper.instance = this;
 
-	public bool IsLoading
-	{
-		get;
-		private set;
-	}
+  private void OnDestroy()
+  {
+    if (AppMain.isApplicationQuit || !Object.op_Equality((Object) UITutorialFieldHelper.instance, (Object) this))
+      return;
+    UITutorialFieldHelper.instance = (UITutorialFieldHelper) null;
+  }
 
-	public static UITutorialFieldHelper I => instance;
+  public void Setup(InGameMain ingame_main_section)
+  {
+    this.sectionIngameMain = ingame_main_section;
+    switch (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep)
+    {
+      case 0:
+      case 1:
+      case 2:
+      case 3:
+        UITutorialFieldHelper.m_State = UITutorialFieldHelper.MessageState.CollectItem;
+        break;
+      case 4:
+        UITutorialFieldHelper.m_State = UITutorialFieldHelper.MessageState.BackHome;
+        break;
+    }
+    this.SetState(UITutorialFieldHelper.m_State);
+  }
 
-	public UITutorialFieldHelper()
-		: this()
-	{
-	}
+  private void UpdateMessage()
+  {
+    switch (UITutorialFieldHelper.m_State)
+    {
+      case UITutorialFieldHelper.MessageState.CollectItemImg:
+      case UITutorialFieldHelper.MessageState.CollectItem:
+        if (!UIInGameFieldMenu.IsValid())
+          break;
+        UIInGameFieldMenu.I.SetDisableButtons(true);
+        ((Component) UIInGameFieldMenu.I).gameObject.SetActive(false);
+        break;
+      case UITutorialFieldHelper.MessageState.BackHome:
+        if (!UIInGameFieldMenu.IsValid())
+          break;
+        ((Component) this.tweenEndCtrl).gameObject.SetActive(true);
+        UIInGameFieldMenu.I.SetDisableButtons(true);
+        ((Component) UIInGameFieldMenu.I).gameObject.SetActive(true);
+        UIInGameFieldMenu.I.SetEnableButton("BTN_REQUEST", true);
+        break;
+    }
+  }
 
-	public static bool IsValid()
-	{
-		return instance != null;
-	}
+  public void OpenTutorialFirstDelivery()
+  {
+    this.tweenStratCtrl.Reset();
+    this.tweenEndCtrl.Reset();
+    this.tweenStratCtrl.Play(onFinished: (EventDelegate.Callback) (() =>
+    {
+      this.SetState(UITutorialFieldHelper.MessageState.CollectItemImg);
+      this.tweenEndCtrl.Play(onFinished: (EventDelegate.Callback) (() =>
+      {
+        ((Component) this.tweenStratCtrl).gameObject.SetActive(false);
+        ((Component) this.tweenEndCtrl).gameObject.SetActive(false);
+      }));
+    }));
+    this.skilBtn.onClick.Clear();
+    this.skilBtn.onClick.Add(new EventDelegate((EventDelegate.Callback) (() => this.tweenStratCtrl.Skip())));
+  }
 
-	public static bool IsCollectedFieldItem()
-	{
-		return instance != null && m_State == MessageState.BackHome;
-	}
+  public void OnCollectItem()
+  {
+    this.SetState(UITutorialFieldHelper.MessageState.BackHome);
+    this.sectionIngameMain.NoticeTutorialOnCollectItem();
+  }
 
-	private void Awake()
-	{
-		instance = this;
-	}
+  private void SetState(UITutorialFieldHelper.MessageState state)
+  {
+    UITutorialFieldHelper.m_State = state;
+    this.UpdateMessage();
+  }
 
-	private void OnDestroy()
-	{
-		if (!AppMain.isApplicationQuit && instance == this)
-		{
-			instance = null;
-		}
-	}
-
-	public void Setup(InGameMain ingame_main_section)
-	{
-		sectionIngameMain = ingame_main_section;
-		switch (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-			m_State = MessageState.CollectItem;
-			break;
-		case 4:
-			m_State = MessageState.BackHome;
-			break;
-		}
-		SetState(m_State);
-	}
-
-	private void UpdateMessage()
-	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		switch (m_State)
-		{
-		case MessageState.CollectItemImg:
-		case MessageState.CollectItem:
-			if (UIInGameFieldMenu.IsValid())
-			{
-				UIInGameFieldMenu.I.SetDisableButtons(true);
-				UIInGameFieldMenu.I.get_gameObject().SetActive(false);
-			}
-			break;
-		case MessageState.BackHome:
-			if (UIInGameFieldMenu.IsValid())
-			{
-				tweenEndCtrl.get_gameObject().SetActive(true);
-				UIInGameFieldMenu.I.SetDisableButtons(true);
-				UIInGameFieldMenu.I.get_gameObject().SetActive(true);
-				UIInGameFieldMenu.I.SetEnableButton("BTN_REQUEST", true);
-			}
-			break;
-		}
-	}
-
-	public void OpenTutorialFirstDelivery()
-	{
-		tweenStratCtrl.Reset();
-		tweenEndCtrl.Reset();
-		tweenStratCtrl.Play(true, delegate
-		{
-			SetState(MessageState.CollectItemImg);
-			tweenEndCtrl.Play(true, delegate
-			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-				tweenStratCtrl.get_gameObject().SetActive(false);
-				tweenEndCtrl.get_gameObject().SetActive(false);
-			});
-		});
-		skilBtn.onClick.Clear();
-		skilBtn.onClick.Add(new EventDelegate(delegate
-		{
-			tweenStratCtrl.Skip(true);
-		}));
-	}
-
-	public void OnCollectItem()
-	{
-		SetState(MessageState.BackHome);
-		sectionIngameMain.NoticeTutorialOnCollectItem();
-	}
-
-	private void SetState(MessageState state)
-	{
-		m_State = state;
-		UpdateMessage();
-	}
+  public enum MessageState
+  {
+    None,
+    Wait,
+    CollectItemImg,
+    CollectItem,
+    BackHome,
+    MenuPop,
+  }
 }

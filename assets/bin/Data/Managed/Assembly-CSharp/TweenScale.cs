@@ -1,131 +1,84 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: TweenScale
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Tween/Tween Scale")]
 public class TweenScale : UITweener
 {
-	public Vector3 from = Vector3.get_one();
+  public Vector3 from = Vector3.one;
+  public Vector3 to = Vector3.one;
+  public bool updateTable;
+  private Transform mTrans;
+  private UITable mTable;
 
-	public Vector3 to = Vector3.get_one();
+  public Transform cachedTransform
+  {
+    get
+    {
+      if (Object.op_Equality((Object) this.mTrans, (Object) null))
+        this.mTrans = ((Component) this).transform;
+      return this.mTrans;
+    }
+  }
 
-	public bool updateTable;
+  public Vector3 value
+  {
+    get => this.cachedTransform.localScale;
+    set => this.cachedTransform.localScale = value;
+  }
 
-	private Transform mTrans;
+  [Obsolete("Use 'value' instead")]
+  public Vector3 scale
+  {
+    get => this.value;
+    set => this.value = value;
+  }
 
-	private UITable mTable;
+  protected override void OnUpdate(float factor, bool isFinished)
+  {
+    this.value = Vector3.op_Addition(Vector3.op_Multiply(this.from, 1f - factor), Vector3.op_Multiply(this.to, factor));
+    if (!this.updateTable)
+      return;
+    if (Object.op_Equality((Object) this.mTable, (Object) null))
+    {
+      this.mTable = NGUITools.FindInParents<UITable>(((Component) this).gameObject);
+      if (Object.op_Equality((Object) this.mTable, (Object) null))
+      {
+        this.updateTable = false;
+        return;
+      }
+    }
+    this.mTable.repositionNow = true;
+  }
 
-	public Transform cachedTransform
-	{
-		get
-		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
-			if (mTrans == null)
-			{
-				mTrans = this.get_transform();
-			}
-			return mTrans;
-		}
-	}
+  public static TweenScale Begin(GameObject go, float duration, Vector3 scale)
+  {
+    TweenScale tweenScale = UITweener.Begin<TweenScale>(go, duration);
+    tweenScale.from = tweenScale.value;
+    tweenScale.to = scale;
+    if ((double) duration <= 0.0)
+    {
+      tweenScale.Sample(1f, true);
+      ((Behaviour) tweenScale).enabled = false;
+    }
+    return tweenScale;
+  }
 
-	public Vector3 value
-	{
-		get
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			return cachedTransform.get_localScale();
-		}
-		set
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			cachedTransform.set_localScale(value);
-		}
-	}
+  [ContextMenu("Set 'From' to current value")]
+  public override void SetStartToCurrentValue() => this.from = this.value;
 
-	[Obsolete("Use 'value' instead")]
-	public Vector3 scale
-	{
-		get
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			return value;
-		}
-		set
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			this.value = value;
-		}
-	}
+  [ContextMenu("Set 'To' to current value")]
+  public override void SetEndToCurrentValue() => this.to = this.value;
 
-	protected override void OnUpdate(float factor, bool isFinished)
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Expected O, but got Unknown
-		value = from * (1f - factor) + to * factor;
-		if (updateTable)
-		{
-			if (mTable == null)
-			{
-				mTable = NGUITools.FindInParents<UITable>(this.get_gameObject());
-				if (mTable == null)
-				{
-					updateTable = false;
-					return;
-				}
-			}
-			mTable.repositionNow = true;
-		}
-	}
+  [ContextMenu("Assume value of 'From'")]
+  private void SetCurrentValueToStart() => this.value = this.from;
 
-	public static TweenScale Begin(GameObject go, float duration, Vector3 scale)
-	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		TweenScale tweenScale = UITweener.Begin<TweenScale>(go, duration, true);
-		tweenScale.from = tweenScale.value;
-		tweenScale.to = scale;
-		if (duration <= 0f)
-		{
-			tweenScale.Sample(1f, true);
-			tweenScale.set_enabled(false);
-		}
-		return tweenScale;
-	}
-
-	[ContextMenu("Set 'From' to current value")]
-	public override void SetStartToCurrentValue()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		from = value;
-	}
-
-	[ContextMenu("Set 'To' to current value")]
-	public override void SetEndToCurrentValue()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		to = value;
-	}
-
-	[ContextMenu("Assume value of 'From'")]
-	private void SetCurrentValueToStart()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		value = from;
-	}
-
-	[ContextMenu("Assume value of 'To'")]
-	private void SetCurrentValueToEnd()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		value = to;
-	}
+  [ContextMenu("Assume value of 'To'")]
+  private void SetCurrentValueToEnd() => this.value = this.to;
 }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:background="?hs__tabletConversationContainerBackgroundColor" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <androidx.cardview.widget.CardView android:id="@id/hs__conversation_cardview_container" android:background="?android:windowBackground" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginLeft="@dimen/hs__fragmentContainerPaddingLeft" android:layout_marginTop="@dimen/hs__fragmentContainerPaddingTop" android:layout_marginRight="@dimen/hs__fragmentContainerPaddingRight" android:layout_marginBottom="@dimen/hs__fragmentContainerPaddingBottom" android:layout_marginStart="@dimen/hs__fragmentContainerPaddingLeft" android:layout_marginEnd="@dimen/hs__fragmentContainerPaddingRight">
+        <include layout="@layout/hs__conversation_layout" />
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

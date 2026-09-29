@@ -1,473 +1,339 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: FieldGimmickCannonObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using UnityEngine;
 
+#nullable disable
 public class FieldGimmickCannonObject : FieldGimmickObject, IFieldGimmickCannon, IFieldGimmickObject
 {
-	private enum STATE
-	{
-		NONE,
-		STANDBY,
-		ROTATE,
-		READY,
-		COOLTIME,
-		DISABLE
-	}
+  private const string NAME_FIELD_GIMMICK_CANNON = "FieldGimmickCannon";
+  private const string NAME_NODE_BASE = "CMN_cannon01_Origin/Move/Root/base/rot";
+  private const string NAME_NODE_CANNON = "CMN_cannon01_Origin/Move/Root/base/rot/cannon_rot";
+  private const string NAME_ANIM_SHOT_REACTION = "Reaction";
+  private const float ROTATE_RAD_PER_FRAME = 0.17453292f;
+  private const float RADIUS_TARGET_CANNON = 2f;
+  private const float SQR_RADIUS_TARGET_CANNON = 4f;
+  private const float TIME_DEFAULT_COOL_TIME = 2f;
+  public const int SE_ID_TURN_TO_TARGET = 10000079;
+  private Transform m_baseTrans;
+  private Transform m_cannonTrans;
+  private Player m_owner;
+  private Enemy m_boss;
+  private Transform m_targetEffect;
+  private FieldGimmickCannonObject.STATE m_state = FieldGimmickCannonObject.STATE.DISABLE;
+  private float m_rotateTime;
+  private float m_rotateFinishTime;
+  private Quaternion m_rotStart = Quaternion.identity;
+  private Quaternion m_rotEnd = Quaternion.identity;
+  private BallisticLineRenderer ballisticLineRenderer;
+  private float m_coolTime;
+  private float m_coolFinishTime;
 
-	private const string NAME_FIELD_GIMMICK_CANNON = "FieldGimmickCannon";
+  private Animator _animator { get; set; }
 
-	private const string NAME_NODE_BASE = "CMN_cannon01_Origin/Move/Root/base/rot";
+  private Transform _transform { get; set; }
 
-	private const string NAME_NODE_CANNON = "CMN_cannon01_Origin/Move/Root/base/rot/cannon_rot";
+  public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
+  {
+    base.Initialize(pointData);
+    this.m_coolFinishTime = pointData.value1;
+    this.m_baseTrans = this.modelTrans.Find("CMN_cannon01_Origin/Move/Root/base/rot");
+    this.m_cannonTrans = this.modelTrans.Find("CMN_cannon01_Origin/Move/Root/base/rot/cannon_rot");
+    this.m_baseTrans.LookAt(Vector3.zero);
+    this._animator = ((Component) this).gameObject.GetComponentInChildren<Animator>();
+    if (MonoBehaviourSingleton<UIStatusGizmoManager>.IsValid())
+      MonoBehaviourSingleton<UIStatusGizmoManager>.I.Create(this);
+    if (!Object.op_Equality((Object) this.ballisticLineRenderer, (Object) null))
+      return;
+    this.ballisticLineRenderer = ((Component) this).gameObject.AddComponent<BallisticLineRenderer>();
+  }
 
-	private const string NAME_ANIM_SHOT_REACTION = "Reaction";
+  public bool IsUsing() => Object.op_Inequality((Object) this.m_owner, (Object) null);
 
-	private const float ROTATE_RAD_PER_FRAME = 0.17453292f;
+  public bool IsAbleToUse()
+  {
+    return Object.op_Equality((Object) this.m_owner, (Object) null) && this.m_state == FieldGimmickCannonObject.STATE.NONE;
+  }
 
-	private const float RADIUS_TARGET_CANNON = 2f;
+  public bool IsAbleToShot()
+  {
+    return this.IsUsing() && this.m_state == FieldGimmickCannonObject.STATE.READY;
+  }
 
-	private const float TIME_DEFAULT_COOL_TIME = 2f;
+  public bool IsCooling() => this.m_state == FieldGimmickCannonObject.STATE.COOLTIME;
 
-	public const int SE_ID_TURN_TO_TARGET = 10000079;
+  public bool IsAimCamera() => true;
 
-	private Transform m_baseTrans;
+  public override float GetTargetRadius() => 2f;
 
-	private Transform m_cannonTrans;
+  public override float GetTargetSqrRadius() => 4f;
 
-	private Player m_owner;
+  private void SetState(FieldGimmickCannonObject.STATE state) => this.m_state = state;
 
-	private Enemy m_boss;
+  public void OnLeave()
+  {
+    this.m_owner = (Player) null;
+    this.ballisticLineRenderer.SetVisible(false);
+    this.SetState(FieldGimmickCannonObject.STATE.NONE);
+  }
 
-	private Transform m_targetEffect;
+  public void OnBoard(Player player)
+  {
+    this.m_owner = player;
+    AttackInfo attackHitInfo = this.GetAttackHitInfo(player.GetCurrentWeaponElement());
+    if (attackHitInfo != null)
+      this.ballisticLineRenderer.SetBulletData(attackHitInfo.bulletData);
+    this.SetState(FieldGimmickCannonObject.STATE.STANDBY);
+  }
 
-	private STATE m_state = STATE.DISABLE;
+  public void SetStateReady()
+  {
+    if (this.m_owner is Self)
+      this.ballisticLineRenderer.SetVisible(true);
+    this.SetState(FieldGimmickCannonObject.STATE.READY);
+  }
 
-	private float m_rotateTime;
+  public void SetStateRotate() => this.SetState(FieldGimmickCannonObject.STATE.ROTATE);
 
-	private float m_rotateFinishTime;
+  public void SetStateCooltime()
+  {
+    this.m_coolTime = 2f;
+    if ((double) this.m_coolFinishTime > 0.0)
+      this.m_coolTime = this.m_coolFinishTime;
+    this.SetState(FieldGimmickCannonObject.STATE.COOLTIME);
+  }
 
-	private Quaternion m_rotStart = Quaternion.get_identity();
+  private bool IsReadyForShot() => this.m_state == FieldGimmickCannonObject.STATE.READY;
 
-	private Quaternion m_rotEnd = Quaternion.get_identity();
+  private bool IsRemainCooltime() => (double) this.m_coolTime > 0.0;
 
-	private BallisticLineRenderer ballisticLineRenderer;
+  protected override void Awake()
+  {
+    this._transform = ((Component) this).transform;
+    Utility.SetLayerWithChildren(((Component) this).transform, 19);
+  }
 
-	private float m_coolTime;
+  private void Update()
+  {
+    switch (this.m_state)
+    {
+      case FieldGimmickCannonObject.STATE.NONE:
+        if (Object.op_Equality((Object) this.m_boss, (Object) null) && MonoBehaviourSingleton<StageObjectManager>.IsValid())
+          this.m_boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+        if (!this.m_boss.IsValidShield())
+        {
+          this.SetState(FieldGimmickCannonObject.STATE.DISABLE);
+          break;
+        }
+        break;
+      case FieldGimmickCannonObject.STATE.STANDBY:
+        if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && !Object.op_Equality((Object) MonoBehaviourSingleton<StageObjectManager>.I.boss, (Object) null))
+        {
+          Vector3 position = MonoBehaviourSingleton<StageObjectManager>.I.boss._position;
+          position.y = 0.0f;
+          Vector3 vector3 = Vector3.op_Subtraction(position, this._transform.position);
+          Vector3 normalized = ((Vector3) ref vector3).normalized;
+          float num = Vector3.Dot(this.m_baseTrans.forward, normalized);
+          this.m_rotateTime = 0.0f;
+          this.m_rotateFinishTime = (float) ((double) Mathf.Acos(num) / 0.17453292012214661 * (1.0 / (double) Application.targetFrameRate));
+          this.m_rotStart = Quaternion.LookRotation(this.m_baseTrans.forward);
+          this.m_rotEnd = Quaternion.LookRotation(normalized);
+          if ((double) num >= 1.0)
+          {
+            this.SetStateReady();
+            break;
+          }
+          this.SetStateRotate();
+          SoundManager.PlayOneShotSE(10000079, this._transform.position);
+          break;
+        }
+        break;
+      case FieldGimmickCannonObject.STATE.ROTATE:
+        this.m_rotateTime += Time.deltaTime;
+        if ((double) this.m_rotateFinishTime <= 0.0)
+        {
+          this.SetStateReady();
+          break;
+        }
+        float num1 = Mathf.Clamp(this.m_rotateTime / this.m_rotateFinishTime, 0.0f, 1f);
+        if ((double) num1 >= 1.0)
+        {
+          this.SetStateReady();
+          break;
+        }
+        this.m_baseTrans.localRotation = Quaternion.Lerp(this.m_rotStart, this.m_rotEnd, num1);
+        break;
+      case FieldGimmickCannonObject.STATE.READY:
+        if (this.IsRemainCooltime())
+        {
+          this.SetState(FieldGimmickCannonObject.STATE.COOLTIME);
+          break;
+        }
+        break;
+      case FieldGimmickCannonObject.STATE.COOLTIME:
+        if ((double) this.m_coolTime <= 0.0)
+        {
+          this.SetStateReady();
+          break;
+        }
+        break;
+      case FieldGimmickCannonObject.STATE.DISABLE:
+        if (Object.op_Equality((Object) this.m_boss, (Object) null) && MonoBehaviourSingleton<StageObjectManager>.IsValid())
+          this.m_boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+        if (this.m_boss.IsValidShield())
+        {
+          this.OnLeave();
+          break;
+        }
+        break;
+    }
+    if ((double) this.m_coolTime < 0.0)
+      return;
+    this.m_coolTime -= Time.deltaTime;
+  }
 
-	private float m_coolFinishTime;
+  private void LateUpdate()
+  {
+    switch (this.m_state)
+    {
+      case FieldGimmickCannonObject.STATE.READY:
+      case FieldGimmickCannonObject.STATE.COOLTIME:
+        this.UpdateCannonRotation();
+        this.UpdateCannonAngle();
+        break;
+    }
+  }
 
-	private Animator _animator
-	{
-		get;
-		set;
-	}
+  public override void UpdateTargetMarker(bool isNear)
+  {
+    Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
+    Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+    if (((!Object.op_Inequality((Object) boss, (Object) null) || !boss.IsValidShield() ? 0 : (!this.IsUsing() ? 1 : 0)) & (isNear ? 1 : 0)) != 0 && Object.op_Inequality((Object) self, (Object) null) && self.IsChangeableAction((Character.ACTION_ID) 31 /*0x1F*/))
+    {
+      if (Object.op_Equality((Object) this.m_targetEffect, (Object) null) && !string.IsNullOrEmpty(ResourceName.GetFieldGimmickCannonTargetEffect()))
+        this.m_targetEffect = EffectManager.GetEffect(ResourceName.GetFieldGimmickCannonTargetEffect(), this._transform);
+      if (!Object.op_Inequality((Object) this.m_targetEffect, (Object) null))
+        return;
+      Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
+      Vector3 position = cameraTransform.position;
+      Quaternion rotation = cameraTransform.rotation;
+      Vector3 vector3 = Vector3.op_Subtraction(position, this._transform.position);
+      this.m_targetEffect.Set(Vector3.op_Addition(Vector3.op_Addition(((Vector3) ref vector3).normalized, Vector3.up), this._transform.position), rotation);
+    }
+    else
+    {
+      if (!Object.op_Inequality((Object) this.m_targetEffect, (Object) null))
+        return;
+      EffectManager.ReleaseEffect(((Component) this.m_targetEffect).gameObject);
+    }
+  }
 
-	private Transform _transform
-	{
-		get;
-		set;
-	}
+  private void UpdateCannonAngle()
+  {
+    if (Object.op_Equality((Object) this.m_cannonTrans, (Object) null) || Object.op_Equality((Object) this.m_owner, (Object) null))
+      return;
+    Self owner = this.m_owner as Self;
+    if (Object.op_Equality((Object) owner, (Object) null))
+      return;
+    this.m_cannonTrans.localRotation = Quaternion.Euler(owner.GetCannonShotEuler());
+    this.ballisticLineRenderer.UpdateLine(this.m_cannonTrans.position, Quaternion.op_Multiply(this.m_cannonTrans.rotation, Vector3.forward));
+  }
 
-	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
-	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Expected O, but got Unknown
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		base.Initialize(pointData);
-		m_coolFinishTime = pointData.value1;
-		m_baseTrans = modelTrans.Find("CMN_cannon01_Origin/Move/Root/base/rot");
-		m_cannonTrans = modelTrans.Find("CMN_cannon01_Origin/Move/Root/base/rot/cannon_rot");
-		m_baseTrans.LookAt(Vector3.get_zero());
-		_animator = this.get_gameObject().GetComponentInChildren<Animator>();
-		if (MonoBehaviourSingleton<UIStatusGizmoManager>.IsValid())
-		{
-			MonoBehaviourSingleton<UIStatusGizmoManager>.I.Create(this);
-		}
-		if (ballisticLineRenderer == null)
-		{
-			ballisticLineRenderer = this.get_gameObject().AddComponent<BallisticLineRenderer>();
-		}
-	}
+  private void UpdateCannonRotation()
+  {
+    if (Object.op_Equality((Object) this.m_baseTrans, (Object) null) || Object.op_Equality((Object) this.m_owner, (Object) null))
+      return;
+    this.m_baseTrans.localRotation = this.m_owner._rigidbody.rotation;
+  }
 
-	public bool IsUsing()
-	{
-		return m_owner != null;
-	}
+  private AttackInfo GetAttackHitInfo(int weaponElement)
+  {
+    string attackInfoName = "cannonball_";
+    switch (weaponElement)
+    {
+      case 0:
+        attackInfoName += "fire";
+        break;
+      case 1:
+        attackInfoName += "water";
+        break;
+      case 2:
+        attackInfoName += "thunder";
+        break;
+      case 3:
+        attackInfoName += "soil";
+        break;
+      case 4:
+        attackInfoName += "light";
+        break;
+      case 5:
+        attackInfoName += "dark";
+        break;
+      default:
+        attackInfoName += "normal";
+        break;
+    }
+    AttackInfo attackHitInfo = this.m_owner.GetAttackInfos().Find<AttackInfo>((Predicate<AttackInfo>) (info => info.name == attackInfoName));
+    if (attackHitInfo != null)
+      return attackHitInfo;
+    Log.Error(LOG.INGAME, "Not found cannon attackInfo. name = " + attackInfoName);
+    return (AttackInfo) null;
+  }
 
-	public bool IsAbleToUse()
-	{
-		return m_owner == null && m_state == STATE.NONE;
-	}
+  public void Shot()
+  {
+    if (!this.IsReadyForShot())
+      return;
+    if (Object.op_Inequality((Object) this._animator, (Object) null))
+      this._animator.Play("Reaction", 0, 0.0f);
+    AttackInfo attackHitInfo = this.GetAttackHitInfo(this.m_owner.GetCurrentWeaponElement());
+    if (attackHitInfo == null)
+      return;
+    new GameObject("AttackCannonball").AddComponent<AttackCannonball>().Initialize(new AttackCannonball.InitParamCannonball()
+    {
+      attacker = (StageObject) this.m_owner,
+      atkInfo = attackHitInfo,
+      launchTrans = this.m_cannonTrans,
+      offsetPos = Vector3.zero,
+      offsetRot = Quaternion.identity,
+      shotRotation = this.m_cannonTrans.rotation
+    });
+    EffectManager.GetEffect("ef_btl_magibullet_shot_01", this.m_cannonTrans);
+    this.SetStateCooltime();
+  }
 
-	public bool IsAbleToShot()
-	{
-		return IsUsing() && m_state == STATE.READY;
-	}
+  public Transform GetCannonTransform() => this.m_cannonTrans;
 
-	public bool IsCooling()
-	{
-		return m_state == STATE.COOLTIME;
-	}
+  public Transform GetBaseTransform() => this.m_baseTrans;
 
-	public override float GetTargetRadius()
-	{
-		return 2f;
-	}
+  public Vector3 GetBaseTransformForward()
+  {
+    return Object.op_Equality((Object) this.m_baseTrans, (Object) null) ? Vector3.forward : this.m_baseTrans.forward;
+  }
 
-	private void SetState(STATE state)
-	{
-		m_state = state;
-	}
+  public Vector3 GetPosition() => this._transform.position;
 
-	public void OnLeave()
-	{
-		m_owner = null;
-		ballisticLineRenderer.SetVisible(false);
-		SetState(STATE.NONE);
-	}
+  public void ApplyCannonVector(Vector3 cannonVec)
+  {
+    Vector3 vector3 = cannonVec;
+    vector3.y = 0.0f;
+    this.m_baseTrans.rotation = Quaternion.LookRotation(vector3);
+    this.m_cannonTrans.rotation = Quaternion.LookRotation(cannonVec);
+  }
 
-	public void OnBoard(Player player)
-	{
-		m_owner = player;
-		AttackInfo attackHitInfo = GetAttackHitInfo(player.GetCurrentWeaponElement());
-		if (attackHitInfo != null)
-		{
-			ballisticLineRenderer.SetBulletData(attackHitInfo.bulletData);
-		}
-		SetState(STATE.STANDBY);
-	}
+  public override string GetObjectName() => "FieldGimmickCannon";
 
-	public void SetStateReady()
-	{
-		if (m_owner is Self)
-		{
-			ballisticLineRenderer.SetVisible(true);
-		}
-		SetState(STATE.READY);
-	}
-
-	public void SetStateRotate()
-	{
-		SetState(STATE.ROTATE);
-	}
-
-	public void SetStateCooltime()
-	{
-		m_coolTime = 2f;
-		if (m_coolFinishTime > 0f)
-		{
-			m_coolTime = m_coolFinishTime;
-		}
-		SetState(STATE.COOLTIME);
-	}
-
-	private bool IsReadyForShot()
-	{
-		return m_state == STATE.READY;
-	}
-
-	private bool IsRemainCooltime()
-	{
-		return m_coolTime > 0f;
-	}
-
-	protected override void Awake()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
-		_transform = this.get_transform();
-		Utility.SetLayerWithChildren(this.get_transform(), 19);
-	}
-
-	private void Update()
-	{
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-		switch (m_state)
-		{
-		case STATE.NONE:
-			if (m_boss == null && MonoBehaviourSingleton<StageObjectManager>.IsValid())
-			{
-				m_boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-			}
-			if (!m_boss.IsValidShield())
-			{
-				SetState(STATE.DISABLE);
-			}
-			break;
-		case STATE.STANDBY:
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && !(MonoBehaviourSingleton<StageObjectManager>.I.boss == null))
-			{
-				Vector3 position = MonoBehaviourSingleton<StageObjectManager>.I.boss._position;
-				position.y = 0f;
-				Vector3 val = position - _transform.get_position();
-				Vector3 normalized = val.get_normalized();
-				float num = Vector3.Dot(m_baseTrans.get_forward(), normalized);
-				m_rotateTime = 0f;
-				m_rotateFinishTime = Mathf.Acos(num) / 0.17453292f * (1f / (float)Application.get_targetFrameRate());
-				m_rotStart = Quaternion.LookRotation(m_baseTrans.get_forward());
-				m_rotEnd = Quaternion.LookRotation(normalized);
-				if (num >= 1f)
-				{
-					SetStateReady();
-				}
-				else
-				{
-					SetStateRotate();
-					SoundManager.PlayOneShotSE(10000079, _transform.get_position());
-				}
-			}
-			break;
-		case STATE.ROTATE:
-			m_rotateTime += Time.get_deltaTime();
-			if (m_rotateFinishTime <= 0f)
-			{
-				SetStateReady();
-			}
-			else
-			{
-				float num2 = Mathf.Clamp(m_rotateTime / m_rotateFinishTime, 0f, 1f);
-				if (num2 >= 1f)
-				{
-					SetStateReady();
-				}
-				else
-				{
-					m_baseTrans.set_localRotation(Quaternion.Lerp(m_rotStart, m_rotEnd, num2));
-				}
-			}
-			break;
-		case STATE.READY:
-			if (IsRemainCooltime())
-			{
-				SetState(STATE.COOLTIME);
-			}
-			break;
-		case STATE.COOLTIME:
-			if (m_coolTime <= 0f)
-			{
-				SetStateReady();
-			}
-			break;
-		case STATE.DISABLE:
-			if (m_boss == null && MonoBehaviourSingleton<StageObjectManager>.IsValid())
-			{
-				m_boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-			}
-			if (m_boss.IsValidShield())
-			{
-				OnLeave();
-			}
-			break;
-		}
-		if (m_coolTime >= 0f)
-		{
-			m_coolTime -= Time.get_deltaTime();
-		}
-	}
-
-	private void LateUpdate()
-	{
-		STATE state = m_state;
-		if (state == STATE.READY || state == STATE.COOLTIME)
-		{
-			UpdateCannonRotation();
-			UpdateCannonAngle();
-		}
-	}
-
-	public void UpdateTargetMarker(bool isNear)
-	{
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Expected O, but got Unknown
-		Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-		Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-		if (boss != null && boss.IsValidShield() && !IsUsing() && isNear && self != null && self.IsChangeableAction((Character.ACTION_ID)29))
-		{
-			if (m_targetEffect == null && !string.IsNullOrEmpty(ResourceName.GetFieldGimmickCannonTargetEffect()))
-			{
-				m_targetEffect = EffectManager.GetEffect(ResourceName.GetFieldGimmickCannonTargetEffect(), _transform);
-			}
-			if (m_targetEffect != null)
-			{
-				Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-				Vector3 position = cameraTransform.get_position();
-				Quaternion rotation = cameraTransform.get_rotation();
-				Vector3 val = position - _transform.get_position();
-				Vector3 pos = val.get_normalized() + Vector3.get_up() + _transform.get_position();
-				m_targetEffect.Set(pos, rotation);
-			}
-		}
-		else if (m_targetEffect != null)
-		{
-			EffectManager.ReleaseEffect(m_targetEffect.get_gameObject(), true, false);
-		}
-	}
-
-	private void UpdateCannonAngle()
-	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		if (!(m_cannonTrans == null) && !(m_owner == null))
-		{
-			Self self = m_owner as Self;
-			if (!(self == null))
-			{
-				m_cannonTrans.set_localRotation(Quaternion.Euler(self.GetCannonShotEuler()));
-				ballisticLineRenderer.UpdateLine(m_cannonTrans.get_position(), m_cannonTrans.get_rotation() * Vector3.get_forward());
-			}
-		}
-	}
-
-	private void UpdateCannonRotation()
-	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		if (!(m_baseTrans == null) && !(m_owner == null))
-		{
-			m_baseTrans.set_localRotation(m_owner._rigidbody.get_rotation());
-		}
-	}
-
-	private AttackInfo GetAttackHitInfo(int weaponElement)
-	{
-		string attackInfoName = "cannonball_";
-		switch (weaponElement)
-		{
-		case 0:
-			attackInfoName += "fire";
-			break;
-		case 1:
-			attackInfoName += "water";
-			break;
-		case 2:
-			attackInfoName += "thunder";
-			break;
-		case 3:
-			attackInfoName += "soil";
-			break;
-		case 4:
-			attackInfoName += "light";
-			break;
-		case 5:
-			attackInfoName += "dark";
-			break;
-		default:
-			attackInfoName += "normal";
-			break;
-		}
-		AttackInfo attackInfo = m_owner.GetAttackInfos().Find((AttackInfo info) => info.name == attackInfoName);
-		if (attackInfo == null)
-		{
-			Log.Error(LOG.INGAME, "Not found cannon attackInfo. name = " + attackInfoName);
-			return null;
-		}
-		return attackInfo;
-	}
-
-	public void Shot()
-	{
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Expected O, but got Unknown
-		if (IsReadyForShot())
-		{
-			if (_animator != null)
-			{
-				_animator.Play("Reaction", 0, 0f);
-			}
-			AttackInfo attackHitInfo = GetAttackHitInfo(m_owner.GetCurrentWeaponElement());
-			if (attackHitInfo != null)
-			{
-				AttackCannonball.InitParamCannonball initParamCannonball = new AttackCannonball.InitParamCannonball();
-				initParamCannonball.attacker = m_owner;
-				initParamCannonball.atkInfo = attackHitInfo;
-				initParamCannonball.launchTrans = m_cannonTrans;
-				initParamCannonball.offsetPos = Vector3.get_zero();
-				initParamCannonball.offsetRot = Quaternion.get_identity();
-				initParamCannonball.shotRotation = m_cannonTrans.get_rotation();
-				GameObject val = new GameObject("AttackCannonball");
-				AttackCannonball attackCannonball = val.AddComponent<AttackCannonball>();
-				attackCannonball.Initialize(initParamCannonball);
-				EffectManager.GetEffect("ef_btl_magibullet_shot_01", m_cannonTrans);
-				SetStateCooltime();
-			}
-		}
-	}
-
-	public Transform GetCannonTransform()
-	{
-		return m_cannonTrans;
-	}
-
-	public Vector3 GetPosition()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		return _transform.get_position();
-	}
-
-	public void ApplyCannonVector(Vector3 cannonVec)
-	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = cannonVec;
-		val.y = 0f;
-		m_baseTrans.set_rotation(Quaternion.LookRotation(val));
-		m_cannonTrans.set_rotation(Quaternion.LookRotation(cannonVec));
-	}
-
-	public override string GetObjectName()
-	{
-		return "FieldGimmickCannon";
-	}
+  private enum STATE
+  {
+    NONE,
+    STANDBY,
+    ROTATE,
+    READY,
+    COOLTIME,
+    DISABLE,
+  }
 }

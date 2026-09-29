@@ -1,1379 +1,1166 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: StageObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class StageObject : ControlObject, IBulletObserver
 {
-	public enum OBJECT_TYPE
-	{
-		STAGE_OBJECT,
-		CHARACTER,
-		PLAYER,
-		ENEMY,
-		SELF,
-		DECOY,
-		WAVE_TARGET
-	}
-
-	public class AttackedContinuationStatus
-	{
-		public AttackContinuationInfo attackInfo;
-
-		public Collider fromCollider;
-
-		public StageObject fromObject;
-
-		public float hitTime;
-
-		public float hitStartTime;
-	}
-
-	[Serializable]
-	public class StampInfo
-	{
-		[Tooltip("カメラ揺れ大きさ")]
-		public float shakeCameraPercent;
-
-		[Tooltip("カメラ揺れ周期（0で共通設定")]
-		public float shakeCycleTime;
-
-		[Tooltip("足踏みエフェクト名")]
-		public string effectName;
-
-		[Tooltip("足踏みエフェクトスケ\u30fcル")]
-		public float effectScale = 1f;
-
-		[Tooltip("足踏みSEID")]
-		public int seID;
-	}
-
-	public enum COOP_MODE_TYPE
-	{
-		NONE,
-		ORIGINAL,
-		MIRROR,
-		PUPPET
-	}
-
-	[Flags]
-	public enum HIT_OFF_FLAG
-	{
-		NONE = 0x0,
-		FORCE = 0x1,
-		OPEN_MENU = 0x2,
-		INVICIBLE = 0x4,
-		DEAD = 0x8,
-		LOAD = 0x10,
-		INITIALIZE = 0x20,
-		BATTLE_START = 0x40,
-		DEAD_STANDUP = 0x80,
-		PLAY_MOTION = 0x100,
-		TUTORIAL = 0x200,
-		UNLOCK_EVENT = 0x400,
-		TEST = 0x800,
-		GRAB = 0x1000
-	}
-
-	protected class HitOffTimer
-	{
-		public HIT_OFF_FLAG hitOffFlag;
-
-		public float endTime;
-	}
-
-	public enum WAITING_PACKET
-	{
-		CHARACTER_MOVE_VELOCITY,
-		CHARACTER_UPDATE_ACTION_POSITION,
-		CHARACTER_UPDATE_DIRECTION,
-		PLAYER_CHARGE_RELEASE,
-		PLAYER_PRAYER_END,
-		PLAYER_APPLY_CHANGE_WEAPON,
-		ENEMY_WARP,
-		ENEMY_UPDATE_BLEED_DAMAGE,
-		ENEMY_UPDATE_SHADOWSEALING,
-		PLAYER_JUMP_END,
-		PLAYER_SOUL_BOOST,
-		EVOLVE,
-		PLAYER_PAIR_SWORDS_LASER_END,
-		PLAYER_ONE_HAND_SWORD_MOVE_END,
-		NUM
-	}
-
-	protected class WaitingPacketParam
-	{
-		public WAITING_PACKET type;
-
-		public float startTime;
-
-		public bool keepSync;
-
-		public float addMarginTime;
-	}
-
-	protected class NodeTable : StringKeyTable<Transform>
-	{
-		public Item GetNodeItem(string key)
-		{
-			if (string.IsNullOrEmpty(key))
-			{
-				return null;
-			}
-			List<Item> list = GetList(key);
-			if (list == null)
-			{
-				return null;
-			}
-			return GetItem(list, key);
-		}
-	}
-
-	private class CastHitInfo
-	{
-		public float distance;
-
-		public bool faceToTarget;
-
-		public Collider collider;
-
-		public bool enable = true;
-
-		public bool checkCollider;
-	}
-
-	private int _id;
-
-	protected List<AttackedContinuationStatus> continuationList = new List<AttackedContinuationStatus>();
-
-	protected uint voiceChannel;
-
-	public HIT_OFF_FLAG hitOffFlag;
-
-	protected List<HitOffTimer> hitOffTimers = new List<HitOffTimer>();
-
-	private Collider[] ignoreColliders;
-
-	public List<int> loopSeForceEndList = new List<int>();
-
-	protected bool isWallStay;
-
-	protected float wallStayTimer;
-
-	protected WaitingPacketParam[] waitingPacketParams = new WaitingPacketParam[14];
-
-	protected NodeTable nodeCache = new NodeTable();
-
-	protected AttackedHitStatus nowAttackedHitStatus;
-
-	protected List<IBulletObservable> bulletObservableList = new List<IBulletObservable>();
-
-	protected List<int> bulletObservableIdList = new List<int>();
-
-	public int bulletIndex;
-
-	public InGameSettingsManager.StageObjectParam objectParameter
-	{
-		get;
-		private set;
-	}
-
-	public OBJECT_TYPE objectType
-	{
-		get;
-		protected set;
-	}
-
-	public virtual int id
-	{
-		get
-		{
-			return _id;
-		}
-		set
-		{
-			_id = value;
-		}
-	}
-
-	public ControllerBase controller
-	{
-		get;
-		set;
-	}
-
-	public bool isInitialized
-	{
-		get;
-		private set;
-	}
-
-	public bool isLoading
-	{
-		get;
-		private set;
-	}
-
-	public Rigidbody _rigidbody
-	{
-		get;
-		protected set;
-	}
-
-	public Collider _collider
-	{
-		get;
-		protected set;
-	}
-
-	public ObjectPacketReceiver packetReceiver
-	{
-		get;
-		protected set;
-	}
-
-	public ObjectPacketSender packetSender
-	{
-		get;
-		protected set;
-	}
-
-	public COOP_MODE_TYPE coopMode
-	{
-		get;
-		protected set;
-	}
-
-	public int coopClientId
-	{
-		get;
-		protected set;
-	}
-
-	public bool isCoopInitialized
-	{
-		get;
-		set;
-	}
-
-	public List<Collider> ignoreHitAttackColliders
-	{
-		get;
-		protected set;
-	}
-
-	public bool isDestroyWaitFlag
-	{
-		get;
-		protected set;
-	}
-
-	public Vector2 positionXZ
-	{
-		get
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 position = _position;
-			return new Vector2(position.x, position.z);
-		}
-		set
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 position = _position;
-			position.x = value.x;
-			position.z = value.y;
-			_position = position;
-		}
-	}
-
-	public Vector2 forwardXZ
-	{
-		get
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 forward = _forward;
-			return new Vector2(forward.x, forward.z);
-		}
-	}
-
-	public StageObject()
-	{
-		objectType = OBJECT_TYPE.STAGE_OBJECT;
-		id = 0;
-		isInitialized = false;
-		coopMode = COOP_MODE_TYPE.NONE;
-		coopClientId = 0;
-		isCoopInitialized = false;
-		hitOffFlag = HIT_OFF_FLAG.NONE;
-		ignoreHitAttackColliders = new List<Collider>();
-	}
-
-	public bool IsCoopNone()
-	{
-		return coopMode == COOP_MODE_TYPE.NONE;
-	}
-
-	public bool IsOriginal()
-	{
-		return coopMode == COOP_MODE_TYPE.ORIGINAL;
-	}
-
-	public bool IsMirror()
-	{
-		return coopMode == COOP_MODE_TYPE.MIRROR;
-	}
-
-	public bool IsPuppet()
-	{
-		return coopMode == COOP_MODE_TYPE.PUPPET;
-	}
-
-	public bool IsWallStay()
-	{
-		if (objectParameter == null)
-		{
-			return false;
-		}
-		return wallStayTimer >= objectParameter.wallStayCheckTime;
-	}
-
-	public void AddController<T>() where T : ControllerBase
-	{
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		if (controller == null)
-		{
-			if (!CoopStageObjectUtility.CanControll(this))
-			{
-				Log.Error(LOG.INGAME, "StageObject::AddController. field block obj({0},{1}) to {2}", this, coopMode, typeof(T));
-			}
-			else
-			{
-				this.get_gameObject().AddComponent<T>();
-			}
-		}
-	}
-
-	public void RemoveController()
-	{
-		if (controller != null)
-		{
-			controller.SetEnableControll(false, ControllerBase.DISABLE_FLAG.DEFAULT);
-			Object.Destroy(controller);
-		}
-	}
-
-	public void LookAt(Vector3 pos)
-	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 position = _position;
-		pos.y = position.y;
-		_LookAt(pos);
-	}
-
-	protected virtual void OnEnable()
-	{
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
-		{
-			SetNotifyMaster(MonoBehaviourSingleton<StageObjectManager>.I);
-		}
-		if (MonoBehaviourSingleton<MiniMap>.IsValid())
-		{
-			MonoBehaviourSingleton<MiniMap>.I.Attach(this);
-		}
-	}
-
-	protected override void OnDisable()
-	{
-		base.OnDisable();
-		if (MonoBehaviourSingleton<MiniMap>.IsValid())
-		{
-			MonoBehaviourSingleton<MiniMap>.I.Detach(this);
-		}
-	}
-
-	protected override void Awake()
-	{
-		base.Awake();
-		_rigidbody = this.GetComponent<Rigidbody>();
-		_collider = this.GetComponent<Collider>();
-		if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
-		{
-			objectParameter = MonoBehaviourSingleton<InGameSettingsManager>.I.stageObject;
-		}
-		else
-		{
-			objectParameter = new InGameSettingsManager.StageObjectParam();
-		}
-		if (packetReceiver == null)
-		{
-			packetReceiver = ObjectPacketReceiver.SetupComponent(this);
-		}
-		if (packetSender == null)
-		{
-			packetSender = ObjectPacketSender.SetupComponent(this);
-		}
-	}
-
-	protected virtual void Start()
-	{
-	}
-
-	protected virtual void Clear()
-	{
-	}
-
-	public virtual void OnLoadStart()
-	{
-		isLoading = true;
-		Clear();
-		hitOffFlag |= HIT_OFF_FLAG.LOAD;
-	}
-
-	public virtual void OnLoadComplete()
-	{
-		nodeCache.Clear();
-		hitOffFlag &= ~HIT_OFF_FLAG.LOAD;
-		isLoading = false;
-		_rigidbody = this.GetComponent<Rigidbody>();
-		_collider = this.GetComponent<Collider>();
-		if (!isInitialized)
-		{
-			Initialize();
-		}
-		if (MonoBehaviourSingleton<MiniMap>.IsValid())
-		{
-			MonoBehaviourSingleton<MiniMap>.I.Attach(this);
-		}
-	}
-
-	protected virtual void Initialize()
-	{
-		voiceChannel = GetVoiceChannel();
-		isInitialized = true;
-	}
-
-	protected virtual uint GetVoiceChannel()
-	{
-		return 0u;
-	}
-
-	protected virtual bool EnablePlaySound()
-	{
-		return true;
-	}
-
-	public virtual bool DestroyObject()
-	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		isDestroyWaitFlag = false;
-		if (packetSender != null)
-		{
-			packetSender.OnDestroyObject();
-		}
-		MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(this);
-		Object.Destroy(this.get_gameObject());
-		return true;
-	}
-
-	protected virtual void Update()
-	{
-		int num = 0;
-		while (num < hitOffTimers.Count)
-		{
-			if (hitOffTimers[num].endTime <= Time.get_time())
-			{
-				hitOffFlag &= ~hitOffTimers[num].hitOffFlag;
-				hitOffTimers.RemoveAt(num);
-			}
-			else
-			{
-				num++;
-			}
-		}
-		if (packetReceiver != null)
-		{
-			packetReceiver.OnUpdate();
-		}
-		if (packetSender != null)
-		{
-			packetSender.OnUpdate();
-		}
-		UpdateWaitingPacket();
-		int i = 0;
-		for (int count = continuationList.Count; i < count; i++)
-		{
-			OnAttackedContinuationUpdate(continuationList[i]);
-		}
-	}
-
-	protected virtual void LateUpdate()
-	{
-	}
-
-	protected virtual void FixedUpdate()
-	{
-		if (isWallStay)
-		{
-			wallStayTimer += Time.get_deltaTime();
-		}
-		else
-		{
-			wallStayTimer -= Time.get_deltaTime() * 0.5f;
-			if (wallStayTimer < 0f)
-			{
-				wallStayTimer = 0f;
-			}
-		}
-		isWallStay = false;
-		for (int i = 0; i < continuationList.Count; i++)
-		{
-			if (!object.ReferenceEquals(continuationList[i], null))
-			{
-				OnAttackedContinuationFixedUpdate(continuationList[i]);
-			}
-		}
-	}
-
-	protected virtual void OnCollisionEnter(Collision collision)
-	{
-	}
-
-	protected virtual void OnCollisionStay(Collision collision)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		if (collision.get_gameObject().get_layer() == 9 || collision.get_gameObject().get_layer() == 17 || collision.get_gameObject().get_layer() == 18)
-		{
-			isWallStay = true;
-		}
-	}
-
-	protected virtual void OnCollisionExit(Collision collision)
-	{
-	}
-
-	public virtual void OnAnimatorMove()
-	{
-	}
-
-	public virtual void OnDetachedObject(StageObject stage_object)
-	{
-		if (stage_object is Enemy && (stage_object as Enemy).colliders == ignoreColliders)
-		{
-			ResetIgnoreColliders();
-		}
-	}
-
-	public virtual bool CheckHitAttack(AttackHitInfo info, Collider to_collider, StageObject to_object)
-	{
-		return true;
-	}
-
-	public virtual void OnHitAttack(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
-	{
-		hit_param.toObject.OnAttackedHit(info, hit_param);
-	}
-
-	public virtual AttackHitColliderProcessor.HitParam SelectHitCollider(AttackHitColliderProcessor processor, List<AttackHitColliderProcessor.HitParam> hit_params)
-	{
-		return hit_params[0];
-	}
-
-	public virtual void OnAttackedHit(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
-	{
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		AttackedHitStatus attackedHitStatus = new AttackedHitStatus();
-		attackedHitStatus.hitParam = hit_param;
-		attackedHitStatus.attackInfo = info;
-		attackedHitStatus.fromObjectID = hit_param.fromObject.id;
-		attackedHitStatus.fromObject = hit_param.fromObject;
-		attackedHitStatus.fromType = hit_param.fromObject.objectType;
-		attackedHitStatus.fromPos = hit_param.fromObject._position;
-		attackedHitStatus.hitPos = hit_param.point;
-		attackedHitStatus.distanceXZ = hit_param.distanceXZ;
-		attackedHitStatus.hitTime = hit_param.time;
-		attackedHitStatus.isSpAttackHit = hit_param.isSpAttackHit;
-		attackedHitStatus.attackMode = hit_param.attackMode;
-		attackedHitStatus.damageDistanceData = hit_param.damageDistanceData;
-		attackedHitStatus.exHitPos = hit_param.exHitPos;
-		nowAttackedHitStatus = attackedHitStatus;
-		if (MonoBehaviourSingleton<CoopManager>.IsValid())
-		{
-			attackedHitStatus.fromClientID = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId;
-		}
-		if (attackedHitStatus.fromType == OBJECT_TYPE.SELF)
-		{
-			attackedHitStatus.fromType = OBJECT_TYPE.PLAYER;
-		}
-		OnAttackedHitDirection(new AttackedHitStatusDirection(attackedHitStatus));
-		if (IsValidAttackedHit(hit_param.fromObject) && !IsPuppet() && !hit_param.fromObject.IsPuppet())
-		{
-			OnAttackedHitLocal(new AttackedHitStatusLocal(attackedHitStatus));
-			if (IsMirror() || IsPuppet())
-			{
-				if (packetSender != null)
-				{
-					packetSender.OnAttackedHitOwner(new AttackedHitStatusOwner(attackedHitStatus));
-				}
-			}
-			else if (IsEnableAttackedHitOwner())
-			{
-				OnAttackedHitOwner(new AttackedHitStatusOwner(attackedHitStatus));
-				AttackedHitStatusFix status = new AttackedHitStatusFix(attackedHitStatus);
-				OnAttackedHitFix(status);
-				if (packetSender != null)
-				{
-					packetSender.OnAttackedHitFix(status);
-				}
-			}
-		}
-	}
-
-	protected virtual bool IsValidAttackedHit(StageObject from_object)
-	{
-		return true;
-	}
-
-	protected virtual void OnAttackedHitDirection(AttackedHitStatusDirection status)
-	{
-		if (!CheckStatusForHitEffect(status))
-		{
-			OnIgnoreHitAttack();
-		}
-		else
-		{
-			status.fromObject.OnAttackFromHitDirection(status, this);
-			OnPlayAttackedHitEffect(status);
-		}
-	}
-
-	protected virtual void OnIgnoreHitAttack()
-	{
-	}
-
-	protected virtual bool CheckStatusForHitEffect(AttackedHitStatusDirection status)
-	{
-		return true;
-	}
-
-	protected virtual void OnAttackFromHitDirection(AttackedHitStatusDirection status, StageObject to_object)
-	{
-	}
-
-	protected virtual void OnPlayAttackedHitEffect(AttackedHitStatusDirection status)
-	{
-	}
-
-	protected virtual void OnAttackedHitLocal(AttackedHitStatusLocal status)
-	{
-	}
-
-	public virtual void AbsorptionProc(Character targetChar, AttackedHitStatusLocal status)
-	{
-	}
-
-	public virtual void AbsorptionProcByBuff(AttackedHitStatusLocal status)
-	{
-	}
-
-	public virtual bool CutAndAbsorbDamageByBuff(Character targetCharacter, AttackedHitStatusLocal status)
-	{
-		return false;
-	}
-
-	public virtual bool ChargeSkillWhenDamagedByBuff()
-	{
-		return false;
-	}
-
-	public virtual void GetAtk(AttackHitInfo info, ref AtkAttribute atk)
-	{
-		if (info != null)
-		{
-			atk.Add(info.atk);
-		}
-	}
-
-	public virtual void OnAttackedHitOwner(AttackedHitStatusOwner status)
-	{
-	}
-
-	public virtual bool IsEnableAttackedHitOwner()
-	{
-		return true;
-	}
-
-	public virtual void OnAttackedHitFix(AttackedHitStatusFix status)
-	{
-	}
-
-	public virtual bool OnContinuationEnter(AttackContinuationInfo info, StageObject from_object, Collider from_collider, float time)
-	{
-		int i = 0;
-		for (int count = continuationList.Count; i < count; i++)
-		{
-			if (continuationList[i].attackInfo == info && continuationList[i].fromCollider == from_collider)
-			{
-				return false;
-			}
-		}
-		AttackedContinuationStatus attackedContinuationStatus = new AttackedContinuationStatus();
-		attackedContinuationStatus.attackInfo = info;
-		attackedContinuationStatus.fromObject = from_object;
-		attackedContinuationStatus.fromCollider = from_collider;
-		attackedContinuationStatus.hitTime = time;
-		attackedContinuationStatus.hitStartTime = Time.get_time();
-		continuationList.Add(attackedContinuationStatus);
-		OnAttackedContinuationStart(attackedContinuationStatus);
-		return true;
-	}
-
-	public virtual void OnContinuationExit(AttackContinuationInfo info, Collider from_collider)
-	{
-		int num = 0;
-		int count = continuationList.Count;
-		while (true)
-		{
-			if (num >= count)
-			{
-				return;
-			}
-			if (continuationList[num].attackInfo == info && continuationList[num].fromCollider == from_collider)
-			{
-				break;
-			}
-			num++;
-		}
-		OnAttackedContinuationEnd(continuationList[num]);
-		continuationList.RemoveAt(num);
-	}
-
-	protected virtual void OnAttackedContinuationStart(AttackedContinuationStatus status)
-	{
-	}
-
-	protected virtual void OnAttackedContinuationUpdate(AttackedContinuationStatus status)
-	{
-	}
-
-	protected virtual void OnAttackedContinuationFixedUpdate(AttackedContinuationStatus status)
-	{
-	}
-
-	protected virtual void OnAttackedContinuationEnd(AttackedContinuationStatus status)
-	{
-	}
-
-	protected float GetContinuationTimeChangeRate(AttackedContinuationStatus status)
-	{
-		if (status.attackInfo == null)
-		{
-			return 1f;
-		}
-		float num = status.hitTime + Time.get_time() - status.hitStartTime;
-		float result = 1f;
-		AttackInfo.TimeChange timeChange = status.attackInfo.timeChange;
-		if (timeChange.intervalTime > 0f)
-		{
-			float num2 = (num - timeChange.startTime) / timeChange.intervalTime;
-			if (num2 < 0f)
-			{
-				num2 = 0f;
-			}
-			if (num2 > 1f)
-			{
-				num2 = 1f;
-			}
-			result = timeChange.startRate + (timeChange.endRate - timeChange.startRate) * num2;
-		}
-		return result;
-	}
-
-	public virtual Vector3 GetCameraTargetPos()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		return _position + new Vector3(0f, 1f, 0f);
-	}
-
-	protected void IgnoreColliders(Collider[] colliders)
-	{
-		if (!(_collider == null) && colliders != null)
-		{
-			if (ignoreColliders != null)
-			{
-				Utility.IgnoreCollision(_collider, ignoreColliders, false);
-			}
-			Utility.IgnoreCollision(_collider, colliders, true);
-			ignoreColliders = colliders;
-		}
-	}
-
-	protected void ResetIgnoreColliders()
-	{
-		if (!(_collider == null) && ignoreColliders != null)
-		{
-			Utility.IgnoreCollision(_collider, ignoreColliders, false);
-			ignoreColliders = null;
-		}
-	}
-
-	public void SetCoopMode(COOP_MODE_TYPE coop_mode, int client_id)
-	{
-		if ((coop_mode == COOP_MODE_TYPE.NONE || coop_mode == COOP_MODE_TYPE.ORIGINAL) && client_id != 0)
-		{
-			Log.Error(LOG.INGAME, "StageObject::SetCoopMode() Err ( client_id is invalid. )");
-		}
-		if (coop_mode == COOP_MODE_TYPE.ORIGINAL && !CoopStageObjectUtility.CanControll(this))
-		{
-			Log.Error(LOG.INGAME, "StageObject::SetCoopMode. field block obj({0}) to {1}", this, coop_mode);
-		}
-		else
-		{
-			if (coopMode != 0)
-			{
-				bool flag = false;
-				if (CoopManager.IsValidInCoop())
-				{
-					flag = true;
-				}
-				if (!flag)
-				{
-					Log.Error(LOG.INGAME, "StageObject::SetCoopMode() Err ( not coop )");
-					return;
-				}
-			}
-			coopMode = coop_mode;
-			coopClientId = client_id;
-		}
-	}
-
-	public virtual Transform FindNode(string name)
-	{
-		if (string.IsNullOrEmpty(name))
-		{
-			return base._transform;
-		}
-		StringKeyTableBase.Item nodeItem = nodeCache.GetNodeItem(name);
-		if (nodeItem != null)
-		{
-			return nodeItem.value as Transform;
-		}
-		Transform val = Utility.Find(base._transform, name);
-		nodeCache.Add(name, val);
-		return val;
-	}
-
-	public virtual void OnAnimEvent(AnimEventData.EventData data)
-	{
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		switch (data.id)
-		{
-		case AnimEventFormat.ID.SHAKE_CAMERA:
-		{
-			float percent = data.floatArgs[0];
-			float cycle_time = (data.floatArgs.Length <= 1) ? 0f : data.floatArgs[1];
-			if (MonoBehaviourSingleton<InGameCameraManager>.IsValid())
-			{
-				MonoBehaviourSingleton<InGameCameraManager>.I.SetShakeCamera(_position, percent, cycle_time);
-			}
-			return;
-		}
-		case AnimEventFormat.ID.INVICIBLE_ON:
-			hitOffFlag |= HIT_OFF_FLAG.INVICIBLE;
-			return;
-		case AnimEventFormat.ID.INVICIBLE_OFF:
-			hitOffFlag &= ~HIT_OFF_FLAG.INVICIBLE;
-			return;
-		case AnimEventFormat.ID.SE_ONESHOT:
-		{
-			int num2 = data.intArgs[0];
-			string name2 = data.stringArgs[0];
-			if (num2 != 0)
-			{
-				if (EnablePlaySound())
-				{
-					SoundManager.PlayOneShotSE(num2, this, FindNode(name2));
-				}
-				return;
-			}
-			break;
-		}
-		case AnimEventFormat.ID.SE_LOOP_PLAY:
-		{
-			int num = data.intArgs[0];
-			if (data.intArgs.Length > 1 && data.intArgs[1] != 0)
-			{
-				loopSeForceEndList.Add(num);
-			}
-			string name = data.stringArgs[0];
-			if (EnablePlaySound())
-			{
-				SoundManager.PlayLoopSE(num, this, FindNode(name));
-			}
-			return;
-		}
-		case AnimEventFormat.ID.SE_LOOP_STOP:
-		{
-			int se_id = data.intArgs[0];
-			SoundManager.StopLoopSE(se_id, this);
-			return;
-		}
-		}
-		Log.Error(LOG.INGAME, "AnimEvent Error! Event={0} Object={1}", data.name, this.get_name());
-	}
-
-	public virtual AttackInfo[] GetAttackInfos()
-	{
-		return null;
-	}
-
-	public virtual float GetAttackInfoRate()
-	{
-		return 0f;
-	}
-
-	public virtual AttackInfo FindAttackInfo(string name, bool fix_rate = true, bool isDuplicate = false)
-	{
-		AttackInfo[] attackInfos = GetAttackInfos();
-		return _FindAttackInfo(attackInfos, name, fix_rate, GetAttackInfoRate(), isDuplicate);
-	}
-
-	public virtual AttackInfo FindAttackInfoExternal(string name, bool fix_rate, float rate)
-	{
-		AttackInfo[] attackInfos = GetAttackInfos();
-		return _FindAttackInfo(attackInfos, name, fix_rate, rate, false);
-	}
-
-	protected virtual AttackInfo _FindAttackInfo(AttackInfo[] attack_infos, string name, bool fix_rate, float rate, bool isDuplicate = false)
-	{
-		if (string.IsNullOrEmpty(name))
-		{
-			return null;
-		}
-		if (attack_infos == null)
-		{
-			return null;
-		}
-		AttackInfo attackInfo = null;
-		int i = 0;
-		for (int num = attack_infos.Length; i < num; i++)
-		{
-			AttackInfo attackInfo2 = attack_infos[i];
-			if (attackInfo2.name == name)
-			{
-				if (fix_rate && !string.IsNullOrEmpty(attackInfo2.rateInfoName) && rate != 0f)
-				{
-					AttackInfo rate_info = _FindAttackInfo(attack_infos, attackInfo2.rateInfoName, false, 0f, false);
-					attackInfo = attackInfo2.GetRateAttackInfo(rate_info, rate);
-				}
-				else
-				{
-					attackInfo = attackInfo2;
-				}
-				break;
-			}
-		}
-		if (attackInfo == null)
-		{
-			Log.Error(LOG.INGAME, "FindAttackInfo not found. name : " + name);
-			attackInfo = attack_infos[0];
-		}
-		if (isDuplicate)
-		{
-			return attackInfo.Duplicate();
-		}
-		return attackInfo;
-	}
-
-	public virtual SkillInfo.SkillParam GetSkillParam(int index)
-	{
-		return null;
-	}
-
-	public virtual void SetHitOffTimer(HIT_OFF_FLAG flag, float time)
-	{
-		if (!(time <= 0f) && flag != 0)
-		{
-			hitOffFlag |= flag;
-			float num = Time.get_time() + time;
-			int i = 0;
-			for (int count = hitOffTimers.Count; i < count; i++)
-			{
-				if (hitOffTimers[i].hitOffFlag == flag)
-				{
-					if (hitOffTimers[i].endTime < num)
-					{
-						hitOffTimers[i].endTime = num;
-					}
-					return;
-				}
-			}
-			HitOffTimer hitOffTimer = new HitOffTimer();
-			hitOffTimer.endTime = num;
-			hitOffTimer.hitOffFlag = flag;
-			hitOffTimers.Add(hitOffTimer);
-		}
-	}
-
-	public virtual void StartWaitingPacket(WAITING_PACKET type, bool keep_sync, float add_margin_time = 0f)
-	{
-		if (!IsCoopNone())
-		{
-			WaitingPacketParam waitingPacketParam = new WaitingPacketParam();
-			waitingPacketParam.type = type;
-			waitingPacketParam.startTime = Time.get_time();
-			waitingPacketParam.keepSync = keep_sync;
-			waitingPacketParam.addMarginTime = add_margin_time;
-			waitingPacketParams[(int)type] = waitingPacketParam;
-		}
-	}
-
-	public virtual bool IsValidWaitingPacket(WAITING_PACKET type)
-	{
-		if (IsCoopNone())
-		{
-			return false;
-		}
-		return waitingPacketParams[(int)type] != null;
-	}
-
-	public virtual void UpdateWaitingPacket()
-	{
-		if (!IsCoopNone())
-		{
-			int num = 0;
-			int num2 = 14;
-			while (true)
-			{
-				if (num >= num2)
-				{
-					return;
-				}
-				WaitingPacketParam waitingPacketParam = waitingPacketParams[num];
-				if (waitingPacketParam != null)
-				{
-					if (waitingPacketParam.startTime <= 0f)
-					{
-						break;
-					}
-					if (IsOriginal())
-					{
-						if (waitingPacketParam.keepSync && Time.get_time() >= waitingPacketParam.startTime + objectParameter.waitingPacketIntervalTime)
-						{
-							KeepWaitingPacket(waitingPacketParam.type);
-						}
-					}
-					else if (IsPuppet() || IsMirror())
-					{
-						float num3 = objectParameter.waitingPacketMarginTime + waitingPacketParam.addMarginTime;
-						if (waitingPacketParam.keepSync)
-						{
-							num3 += objectParameter.waitingPacketIntervalTime;
-						}
-						if (Time.get_time() > waitingPacketParam.startTime + num3)
-						{
-							OnFailedWaitingPacket(waitingPacketParam.type);
-						}
-					}
-				}
-				num++;
-			}
-			Log.Error("StageObject::UpdateWaitingPacket() Err ( waitingPacketStartTime <= 0.0f )");
-		}
-	}
-
-	public void KeepWaitingPacket(WAITING_PACKET type)
-	{
-		WaitingPacketParam waitingPacketParam = waitingPacketParams[(int)type];
-		if (waitingPacketParam != null)
-		{
-			waitingPacketParam.startTime = Time.get_time();
-			if (packetSender != null)
-			{
-				packetSender.OnKeepWaitingPacket(waitingPacketParam.type);
-			}
-		}
-	}
-
-	public virtual void OnFailedWaitingPacket(WAITING_PACKET type)
-	{
-		EndWaitingPacket(type);
-	}
-
-	public virtual void EndWaitingPacket(WAITING_PACKET type)
-	{
-		waitingPacketParams[(int)type] = null;
-	}
-
-	public static Vector3 GetAppearToTargetPos(Vector3 from_pos, Vector3 target_pos, Vector3 col_offset, float col_radius, float appear_distance, float appear_margin)
-	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		bool just_appear;
-		return _GetAppearToTargetPos(from_pos, target_pos, col_offset, col_radius, appear_distance, appear_margin, true, true, out just_appear);
-	}
-
-	private static Vector3 _GetAppearToTargetPos(Vector3 from_pos, Vector3 target_pos, Vector3 col_offset, float col_radius, float appear_distance, float appear_margin, bool from_inside, bool target_inside, out bool just_appear)
-	{
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Expected O, but got Unknown
-		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014e: Expected O, but got Unknown
-		//IL_0367: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0369: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0373: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0378: Unknown result type (might be due to invalid IL or missing references)
-		just_appear = false;
-		Vector3 val = target_pos - from_pos;
-		float magnitude = val.get_magnitude();
-		if (magnitude <= 0f)
-		{
-			just_appear = true;
-			return from_pos;
-		}
-		if (appear_distance >= magnitude)
-		{
-			return from_pos;
-		}
-		if (col_offset.y <= 0f)
-		{
-			col_offset.y = 0.1f;
-		}
-		List<CastHitInfo> list = new List<CastHitInfo>();
-		RaycastHit[] array = Physics.RaycastAll(target_pos + col_offset, -val, magnitude, 393728);
-		int i = 0;
-		for (int num = array.Length; i < num; i++)
-		{
-			CastHitInfo castHitInfo = new CastHitInfo();
-			castHitInfo.distance = array[i].get_distance() - col_radius;
-			castHitInfo.faceToTarget = true;
-			castHitInfo.collider = array[i].get_collider();
-			list.Add(castHitInfo);
-		}
-		CastHitInfo castHitInfo2 = new CastHitInfo();
-		castHitInfo2.distance = 0f;
-		castHitInfo2.faceToTarget = !target_inside;
-		castHitInfo2.collider = null;
-		list.Add(castHitInfo2);
-		array = Physics.RaycastAll(from_pos + col_offset, val, magnitude, 393728);
-		int j = 0;
-		for (int num2 = array.Length; j < num2; j++)
-		{
-			CastHitInfo castHitInfo3 = new CastHitInfo();
-			castHitInfo3.distance = magnitude - array[j].get_distance() + col_radius;
-			castHitInfo3.faceToTarget = false;
-			castHitInfo3.collider = array[j].get_collider();
-			list.Add(castHitInfo3);
-		}
-		CastHitInfo castHitInfo4 = new CastHitInfo();
-		castHitInfo4.distance = magnitude;
-		castHitInfo4.faceToTarget = from_inside;
-		castHitInfo4.collider = null;
-		list.Add(castHitInfo4);
-		list.Sort(delegate(CastHitInfo a, CastHitInfo b)
-		{
-			float num6 = a.distance - b.distance;
-			if (num6 == 0f)
-			{
-				if (a.faceToTarget == b.faceToTarget)
-				{
-					return 0;
-				}
-				return a.faceToTarget ? 1 : (-1);
-			}
-			return (num6 > 0f) ? 1 : (-1);
-		});
-		int k = 0;
-		for (int count = list.Count; k < count; k++)
-		{
-			CastHitInfo castHitInfo5 = list[k];
-			if (!castHitInfo5.checkCollider && !(castHitInfo5.collider == null))
-			{
-				int num3 = k;
-				while (0 <= num3 && num3 < count)
-				{
-					CastHitInfo castHitInfo6 = list[num3];
-					if (num3 != k)
-					{
-						if (castHitInfo6.collider == castHitInfo5.collider)
-						{
-							castHitInfo6.checkCollider = true;
-							break;
-						}
-						castHitInfo6.enable = false;
-					}
-					num3 = ((!castHitInfo5.faceToTarget) ? (num3 - 1) : (num3 + 1));
-				}
-			}
-		}
-		float num4 = magnitude;
-		for (int num5 = list.Count - 2; num5 >= 0; num5--)
-		{
-			CastHitInfo castHitInfo7 = list[num5];
-			CastHitInfo castHitInfo8 = list[num5 + 1];
-			if (castHitInfo7.enable && castHitInfo8.enable && castHitInfo7.distance != castHitInfo8.distance && !castHitInfo7.faceToTarget && castHitInfo8.faceToTarget)
-			{
-				if (castHitInfo7.distance <= appear_distance && castHitInfo8.distance >= appear_distance)
-				{
-					num4 = appear_distance;
-					just_appear = true;
-					break;
-				}
-				if (castHitInfo7.distance >= appear_distance)
-				{
-					num4 = castHitInfo7.distance;
-				}
-				else if (castHitInfo8.distance >= appear_distance - appear_margin)
-				{
-					num4 = castHitInfo8.distance;
-					break;
-				}
-			}
-		}
-		if (num4 == magnitude)
-		{
-			return from_pos;
-		}
-		return target_pos - val.get_normalized() * num4;
-	}
-
-	public virtual Vector3 GetPredictivePosition()
-	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		if ((IsPuppet() || IsMirror()) && packetReceiver != null && packetReceiver.GetPredictivePosition(out Vector3 pos))
-		{
-			return pos;
-		}
-		return _position;
-	}
-
-	public virtual Vector3 GetTargetPosition(StageObject target)
-	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		if (target == null)
-		{
-			return Vector3.get_zero();
-		}
-		return target._position;
-	}
-
-	public virtual void ApplySyncPosition(Vector3 pos, float dir, bool force_sync = false)
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		_rotation = Quaternion.AngleAxis(dir, Vector3.get_up());
-		_position = pos;
-	}
-
-	public virtual bool isProgressStop()
-	{
-		if (!MonoBehaviourSingleton<InGameProgress>.IsValid())
-		{
-			return false;
-		}
-		bool result = false;
-		if (MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop)
-		{
-			result = true;
-		}
-		else if (IsCoopNone() || IsOriginal())
-		{
-			if (!MonoBehaviourSingleton<InGameProgress>.I.isBattleStart)
-			{
-				result = true;
-			}
-		}
-		else if (MonoBehaviourSingleton<CoopManager>.IsValid())
-		{
-			CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(coopClientId);
-			if (coopClient != null && !coopClient.IsBattleStart())
-			{
-				result = true;
-			}
-		}
-		return result;
-	}
-
-	public virtual AttackHitChecker ReferenceAttackHitChecker()
-	{
-		return null;
-	}
-
-	public List<IBulletObservable> GetBulletObservableList()
-	{
-		return bulletObservableList;
-	}
-
-	public virtual int GetObservedID()
-	{
-		return -1;
-	}
-
-	public virtual void RegisterObservable(IBulletObservable observable)
-	{
-		if (!bulletObservableList.Contains(observable))
-		{
-			bulletObservableList.Add(observable);
-			if (IsCoopNone() || IsOriginal())
-			{
-				RegisterObservableID(observable.GetObservedID());
-			}
-		}
-	}
-
-	public void RegisterObservableID(int observedID)
-	{
-		if (!bulletObservableIdList.Contains(observedID))
-		{
-			bulletObservableIdList.Add(observedID);
-			if (packetSender != null)
-			{
-				packetSender.OnBulletObservableSet(observedID);
-			}
-		}
-	}
-
-	public virtual void OnBreak(int brokenBulletID)
-	{
-	}
-
-	public virtual void OnBulletDestroy(int observedID)
-	{
-	}
+  private int _id;
+  protected List<StageObject.AttackedContinuationStatus> continuationList = new List<StageObject.AttackedContinuationStatus>();
+  protected List<StageObject.HitIntervalStatus> hitIntervalList = new List<StageObject.HitIntervalStatus>();
+  protected uint voiceChannel;
+  public StageObject.HIT_OFF_FLAG hitOffFlag;
+  protected List<StageObject.HitOffTimer> hitOffTimers = new List<StageObject.HitOffTimer>();
+  private Collider[] ignoreColliders;
+  public List<int> loopSeForceEndList = new List<int>();
+  protected bool isWallStay;
+  protected float wallStayTimer;
+  protected StageObject.WaitingPacketParam[] waitingPacketParams = new StageObject.WaitingPacketParam[16 /*0x10*/];
+  protected StageObject.NodeTable nodeCache = new StageObject.NodeTable();
+  protected AttackedHitStatus nowAttackedHitStatus;
+  private bool isRegisteredStageObjectManager;
+  protected List<IBulletObservable> bulletObservableList = new List<IBulletObservable>();
+  protected List<int> bulletObservableIdList = new List<int>();
+  public int bulletIndex;
+
+  public InGameSettingsManager.StageObjectParam objectParameter { get; private set; }
+
+  public StageObject.OBJECT_TYPE objectType { get; protected set; }
+
+  public virtual int id
+  {
+    get => this._id;
+    set => this._id = value;
+  }
+
+  public ControllerBase controller { get; set; }
+
+  public bool isInitialized { get; protected set; }
+
+  public bool isLoading { get; private set; }
+
+  public Rigidbody _rigidbody { get; protected set; }
+
+  public Collider _collider { get; protected set; }
+
+  public ObjectPacketReceiver packetReceiver { get; protected set; }
+
+  public ObjectPacketSender packetSender { get; protected set; }
+
+  public StageObject.COOP_MODE_TYPE coopMode { get; protected set; }
+
+  public bool IsCoopNone() => this.coopMode == StageObject.COOP_MODE_TYPE.NONE;
+
+  public bool IsOriginal() => this.coopMode == StageObject.COOP_MODE_TYPE.ORIGINAL;
+
+  public bool IsMirror() => this.coopMode == StageObject.COOP_MODE_TYPE.MIRROR;
+
+  public bool IsPuppet() => this.coopMode == StageObject.COOP_MODE_TYPE.PUPPET;
+
+  public int coopClientId { get; protected set; }
+
+  public bool isCoopInitialized { get; set; }
+
+  public void SetHitOffFlag(bool enable, StageObject.HIT_OFF_FLAG flag)
+  {
+    if (enable)
+      this.hitOffFlag |= flag;
+    else
+      this.hitOffFlag &= ~flag;
+  }
+
+  public List<Collider> ignoreHitAttackColliders { get; protected set; }
+
+  public bool IsWallStay()
+  {
+    return this.objectParameter != null && (double) this.wallStayTimer >= (double) this.objectParameter.wallStayCheckTime;
+  }
+
+  public bool isDestroyWaitFlag { get; protected set; }
+
+  public bool IsRegisteredStageObjectManager => this.isRegisteredStageObjectManager;
+
+  public void AddController<T>() where T : ControllerBase
+  {
+    if (!Object.op_Equality((Object) this.controller, (Object) null))
+      return;
+    if (!CoopStageObjectUtility.CanControll(this))
+      Log.Error(LOG.INGAME, "StageObject::AddController. field block obj({0},{1}) to {2}", (object) this, (object) this.coopMode, (object) typeof (T));
+    else
+      ((Component) this).gameObject.AddComponent<T>();
+  }
+
+  public void RemoveController()
+  {
+    if (!Object.op_Inequality((Object) this.controller, (Object) null))
+      return;
+    this.controller.SetEnableControll(false);
+    Object.Destroy((Object) this.controller);
+  }
+
+  public Vector2 positionXZ
+  {
+    get
+    {
+      Vector3 position = this._position;
+      return new Vector2(position.x, position.z);
+    }
+    set
+    {
+      Vector3 position = this._position;
+      position.x = value.x;
+      position.z = value.y;
+      this._position = position;
+    }
+  }
+
+  public Vector2 forwardXZ
+  {
+    get
+    {
+      Vector3 forward = this._forward;
+      return new Vector2(forward.x, forward.z);
+    }
+  }
+
+  public virtual void LookAt(Vector3 pos, bool isBlindEnable = false)
+  {
+    pos.y = this._position.y;
+    this._LookAt(pos);
+  }
+
+  protected virtual void OnEnable()
+  {
+    if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+    {
+      this.SetNotifyMaster((DisableNotifyMonoBehaviour) MonoBehaviourSingleton<StageObjectManager>.I);
+      this.isRegisteredStageObjectManager = true;
+    }
+    if (!MonoBehaviourSingleton<MiniMap>.IsValid())
+      return;
+    MonoBehaviourSingleton<MiniMap>.I.Attach((MonoBehaviour) this);
+  }
+
+  protected override void OnDisable()
+  {
+    base.OnDisable();
+    if (!MonoBehaviourSingleton<MiniMap>.IsValid())
+      return;
+    MonoBehaviourSingleton<MiniMap>.I.Detach((MonoBehaviour) this);
+  }
+
+  protected override void Awake()
+  {
+    base.Awake();
+    this.id = 0;
+    this.objectType = StageObject.OBJECT_TYPE.STAGE_OBJECT;
+    this.id = 0;
+    this.isInitialized = false;
+    this.coopMode = StageObject.COOP_MODE_TYPE.NONE;
+    this.coopClientId = 0;
+    this.isCoopInitialized = false;
+    this.hitOffFlag = StageObject.HIT_OFF_FLAG.NONE;
+    this.ignoreHitAttackColliders = new List<Collider>();
+    this._rigidbody = ((Component) this).GetComponent<Rigidbody>();
+    this._collider = ((Component) this).GetComponent<Collider>();
+    this.objectParameter = !MonoBehaviourSingleton<InGameSettingsManager>.IsValid() ? new InGameSettingsManager.StageObjectParam() : MonoBehaviourSingleton<InGameSettingsManager>.I.stageObject;
+    if (Object.op_Equality((Object) this.packetReceiver, (Object) null))
+      this.packetReceiver = ObjectPacketReceiver.SetupComponent(this);
+    if (!Object.op_Equality((Object) this.packetSender, (Object) null))
+      return;
+    this.packetSender = ObjectPacketSender.SetupComponent(this);
+  }
+
+  protected virtual void Start()
+  {
+  }
+
+  protected virtual void Clear()
+  {
+  }
+
+  public virtual void OnLoadStart()
+  {
+    this.isLoading = true;
+    this.Clear();
+    this.hitOffFlag |= StageObject.HIT_OFF_FLAG.LOAD;
+  }
+
+  public virtual void OnLoadComplete()
+  {
+    this.nodeCache.Clear();
+    this.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.LOAD;
+    this.isLoading = false;
+    this._rigidbody = ((Component) this).GetComponent<Rigidbody>();
+    this._collider = ((Component) this).GetComponent<Collider>();
+    if (!this.isInitialized)
+      this.Initialize();
+    if (!MonoBehaviourSingleton<MiniMap>.IsValid())
+      return;
+    MonoBehaviourSingleton<MiniMap>.I.Attach((MonoBehaviour) this);
+  }
+
+  protected virtual void Initialize()
+  {
+    this.voiceChannel = this.GetVoiceChannel();
+    this.isInitialized = true;
+  }
+
+  protected virtual uint GetVoiceChannel() => 0;
+
+  protected virtual bool EnablePlaySound() => true;
+
+  public virtual bool DestroyObject()
+  {
+    this.isDestroyWaitFlag = false;
+    if (Object.op_Inequality((Object) this.packetSender, (Object) null))
+      this.packetSender.OnDestroyObject();
+    if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+      MonoBehaviourSingleton<StageObjectManager>.I.RemoveCacheObject(this);
+    Object.Destroy((Object) ((Component) this).gameObject);
+    return true;
+  }
+
+  protected virtual void Update()
+  {
+    int index1 = 0;
+    while (index1 < this.hitOffTimers.Count)
+    {
+      if ((double) this.hitOffTimers[index1].endTime <= (double) Time.time)
+      {
+        this.hitOffFlag &= ~this.hitOffTimers[index1].hitOffFlag;
+        this.hitOffTimers.RemoveAt(index1);
+      }
+      else
+        ++index1;
+    }
+    if (Object.op_Inequality((Object) this.packetReceiver, (Object) null))
+      this.packetReceiver.OnUpdate();
+    if (Object.op_Inequality((Object) this.packetSender, (Object) null))
+      this.packetSender.OnUpdate();
+    this.UpdateWaitingPacket();
+    int index2 = 0;
+    for (int count = this.continuationList.Count; index2 < count; ++index2)
+      this.OnAttackedContinuationUpdate(this.continuationList[index2]);
+    if (this.hitIntervalList.IsNullOrEmpty<StageObject.HitIntervalStatus>())
+      return;
+    this.hitIntervalList.RemoveAll((Predicate<StageObject.HitIntervalStatus>) (item => !item.enable));
+  }
+
+  protected virtual void LateUpdate()
+  {
+  }
+
+  protected virtual void FixedUpdate()
+  {
+    if (this.isWallStay)
+    {
+      this.wallStayTimer += Time.deltaTime;
+    }
+    else
+    {
+      this.wallStayTimer -= Time.deltaTime * 0.5f;
+      if ((double) this.wallStayTimer < 0.0)
+        this.wallStayTimer = 0.0f;
+    }
+    this.isWallStay = false;
+    for (int index = 0; index < this.continuationList.Count; ++index)
+    {
+      if (this.continuationList[index] != null)
+        this.OnAttackedContinuationFixedUpdate(this.continuationList[index]);
+    }
+    if (this.hitIntervalList.IsNullOrEmpty<StageObject.HitIntervalStatus>())
+      return;
+    int index1 = 0;
+    for (int count = this.hitIntervalList.Count; index1 < count; ++index1)
+      this.hitIntervalList[index1].hitIntervalTimer -= Time.deltaTime;
+  }
+
+  protected virtual void OnCollisionEnter(Collision collision)
+  {
+  }
+
+  protected virtual void OnCollisionStay(Collision collision)
+  {
+    if (collision.gameObject.layer != 9 && collision.gameObject.layer != 17 && collision.gameObject.layer != 18)
+      return;
+    this.isWallStay = true;
+  }
+
+  protected virtual void OnCollisionExit(Collision collision)
+  {
+  }
+
+  public virtual void OnAnimatorMove()
+  {
+  }
+
+  public virtual void OnDetachedObject(StageObject stage_object)
+  {
+    if (!(stage_object is Enemy) || (stage_object as Enemy).colliders != this.ignoreColliders)
+      return;
+    this.ResetIgnoreColliders();
+  }
+
+  public virtual bool CheckHitAttack(
+    AttackHitInfo info,
+    Collider to_collider,
+    StageObject to_object)
+  {
+    return true;
+  }
+
+  public virtual void OnAvoidHit(StageObject fromObject, AttackHitInfo attackHitInfo)
+  {
+  }
+
+  public virtual void OnHitAttack(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
+  {
+    hit_param.toObject.OnAttackedHit(info, hit_param);
+  }
+
+  public virtual AttackHitColliderProcessor.HitParam SelectHitCollider(
+    AttackHitColliderProcessor processor,
+    List<AttackHitColliderProcessor.HitParam> hit_params)
+  {
+    return hit_params[0];
+  }
+
+  public virtual void OnAttackedHit(
+    AttackHitInfo info,
+    AttackHitColliderProcessor.HitParam hit_param)
+  {
+    AttackedHitStatus status1 = new AttackedHitStatus();
+    status1.hitParam = hit_param;
+    status1.attackInfo = info;
+    status1.fromObjectID = hit_param.fromObject.id;
+    status1.fromObject = hit_param.fromObject;
+    status1.fromType = hit_param.fromObject.objectType;
+    status1.fromPos = hit_param.fromObject._position;
+    status1.hitPos = hit_param.point;
+    status1.distanceXZ = hit_param.distanceXZ;
+    status1.hitTime = hit_param.time;
+    status1.isSpAttackHit = hit_param.isSpAttackHit;
+    status1.attackMode = hit_param.attackMode;
+    status1.damageDistanceData = hit_param.damageDistanceData;
+    status1.exHitPos = hit_param.exHitPos;
+    this.nowAttackedHitStatus = status1;
+    if (MonoBehaviourSingleton<CoopManager>.IsValid())
+      status1.fromClientID = MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId;
+    if (status1.fromType == StageObject.OBJECT_TYPE.SELF)
+      status1.fromType = StageObject.OBJECT_TYPE.PLAYER;
+    this.OnAttackedHitDirection(new AttackedHitStatusDirection(status1));
+    if (!this.IsValidAttackedHit(hit_param.fromObject) || this.IsPuppet() || hit_param.fromObject.IsPuppet())
+      return;
+    this.OnAttackedHitLocal(new AttackedHitStatusLocal(status1));
+    if (this.IsMirror() || this.IsPuppet())
+    {
+      if (!Object.op_Inequality((Object) this.packetSender, (Object) null))
+        return;
+      this.packetSender.OnAttackedHitOwner(new AttackedHitStatusOwner(status1));
+    }
+    else
+    {
+      if (!this.IsEnableAttackedHitOwner())
+        return;
+      this.OnAttackedHitOwner(new AttackedHitStatusOwner(status1));
+      AttackedHitStatusFix status2 = new AttackedHitStatusFix(status1);
+      this.OnAttackedHitFix(status2);
+      if (!Object.op_Inequality((Object) this.packetSender, (Object) null))
+        return;
+      this.packetSender.OnAttackedHitFix(status2);
+    }
+  }
+
+  protected virtual bool IsValidAttackedHit(StageObject from_object) => true;
+
+  protected virtual void OnAttackedHitDirection(AttackedHitStatusDirection status)
+  {
+    if (!this.CheckStatusForHitEffect(status))
+    {
+      this.OnIgnoreHitAttack();
+    }
+    else
+    {
+      status.fromObject.OnAttackFromHitDirection(status, this);
+      this.OnPlayAttackedHitEffect(status);
+    }
+  }
+
+  protected virtual void OnIgnoreHitAttack()
+  {
+  }
+
+  protected virtual bool CheckStatusForHitEffect(AttackedHitStatusDirection status) => true;
+
+  protected virtual void OnAttackFromHitDirection(
+    AttackedHitStatusDirection status,
+    StageObject to_object)
+  {
+  }
+
+  protected virtual void OnPlayAttackedHitEffect(AttackedHitStatusDirection status)
+  {
+  }
+
+  protected virtual void OnAttackedHitLocal(AttackedHitStatusLocal status)
+  {
+  }
+
+  public virtual void AbsorptionProc(Character targetChar, AttackedHitStatusLocal status)
+  {
+  }
+
+  public virtual void AbsorptionProcByBuff(AttackedHitStatusLocal status)
+  {
+  }
+
+  public virtual bool CutAndAbsorbDamageByBuff(
+    Character targetCharacter,
+    AttackedHitStatusLocal status)
+  {
+    return false;
+  }
+
+  public virtual bool ChargeSkillWhenDamagedByBuff() => false;
+
+  public virtual bool InvincibleDamageByBuff(
+    Character targetCharacter,
+    AttackedHitStatusLocal status)
+  {
+    return false;
+  }
+
+  public virtual void GetAtk(
+    AttackHitInfo info,
+    ref AtkAttribute atk,
+    SkillInfo.SkillParam skillParamInfo = null)
+  {
+    if (info == null)
+      return;
+    atk.Add(info.atk);
+  }
+
+  public virtual void OnAttackedHitOwner(AttackedHitStatusOwner status)
+  {
+  }
+
+  public virtual bool IsEnableAttackedHitOwner() => true;
+
+  public virtual void OnAttackedHitFix(AttackedHitStatusFix status)
+  {
+  }
+
+  public virtual bool OnContinuationEnter(
+    AttackContinuationInfo info,
+    StageObject from_object,
+    Collider from_collider,
+    float time)
+  {
+    int index = 0;
+    for (int count = this.continuationList.Count; index < count; ++index)
+    {
+      if (this.continuationList[index].attackInfo == info && Object.op_Equality((Object) this.continuationList[index].fromCollider, (Object) from_collider))
+        return false;
+    }
+    StageObject.AttackedContinuationStatus status = new StageObject.AttackedContinuationStatus();
+    status.attackInfo = info;
+    status.fromObject = from_object;
+    status.fromCollider = from_collider;
+    status.hitTime = time;
+    status.hitStartTime = Time.time;
+    this.continuationList.Add(status);
+    this.OnAttackedContinuationStart(status);
+    return true;
+  }
+
+  public virtual void OnContinuationExit(AttackContinuationInfo info, Collider from_collider)
+  {
+    int index = 0;
+    for (int count = this.continuationList.Count; index < count; ++index)
+    {
+      if (this.continuationList[index].attackInfo == info && Object.op_Equality((Object) this.continuationList[index].fromCollider, (Object) from_collider))
+      {
+        this.OnAttackedContinuationEnd(this.continuationList[index]);
+        this.continuationList.RemoveAt(index);
+        break;
+      }
+    }
+  }
+
+  protected virtual void OnAttackedContinuationStart(StageObject.AttackedContinuationStatus status)
+  {
+  }
+
+  protected virtual void OnAttackedContinuationUpdate(StageObject.AttackedContinuationStatus status)
+  {
+  }
+
+  protected virtual void OnAttackedContinuationFixedUpdate(
+    StageObject.AttackedContinuationStatus status)
+  {
+  }
+
+  protected virtual void OnAttackedContinuationEnd(StageObject.AttackedContinuationStatus status)
+  {
+  }
+
+  protected float GetContinuationTimeChangeRate(StageObject.AttackedContinuationStatus status)
+  {
+    if (status.attackInfo == null)
+      return 1f;
+    float num1 = status.hitTime + Time.time - status.hitStartTime;
+    float continuationTimeChangeRate = 1f;
+    AttackInfo.TimeChange timeChange = status.attackInfo.timeChange;
+    if ((double) timeChange.intervalTime > 0.0)
+    {
+      float num2 = (num1 - timeChange.startTime) / timeChange.intervalTime;
+      if ((double) num2 < 0.0)
+        num2 = 0.0f;
+      if ((double) num2 > 1.0)
+        num2 = 1f;
+      continuationTimeChangeRate = timeChange.startRate + (timeChange.endRate - timeChange.startRate) * num2;
+    }
+    return continuationTimeChangeRate;
+  }
+
+  public virtual Vector3 GetCameraTargetPos()
+  {
+    return Vector3.op_Addition(this._position, new Vector3(0.0f, 1f, 0.0f));
+  }
+
+  protected void IgnoreColliders(Collider[] colliders)
+  {
+    if (Object.op_Equality((Object) this._collider, (Object) null) || colliders == null)
+      return;
+    if (this.ignoreColliders != null)
+      Utility.IgnoreCollision(this._collider, this.ignoreColliders, false);
+    Utility.IgnoreCollision(this._collider, colliders, true);
+    this.ignoreColliders = colliders;
+  }
+
+  protected void ResetIgnoreColliders()
+  {
+    if (Object.op_Equality((Object) this._collider, (Object) null) || this.ignoreColliders == null)
+      return;
+    Utility.IgnoreCollision(this._collider, this.ignoreColliders, false);
+    this.ignoreColliders = (Collider[]) null;
+  }
+
+  public void SetCoopMode(StageObject.COOP_MODE_TYPE coop_mode, int client_id)
+  {
+    if ((coop_mode == StageObject.COOP_MODE_TYPE.NONE || coop_mode == StageObject.COOP_MODE_TYPE.ORIGINAL) && client_id != 0)
+      Log.Error(LOG.INGAME, "StageObject::SetCoopMode() Err ( client_id is invalid. )");
+    if (coop_mode == StageObject.COOP_MODE_TYPE.ORIGINAL && !CoopStageObjectUtility.CanControll(this))
+    {
+      Log.Error(LOG.INGAME, "StageObject::SetCoopMode. field block obj({0}) to {1}", (object) this, (object) coop_mode);
+    }
+    else
+    {
+      if (this.coopMode != StageObject.COOP_MODE_TYPE.NONE)
+      {
+        bool flag = false;
+        if (CoopManager.IsValidInCoop())
+          flag = true;
+        if (!flag)
+        {
+          Log.Error(LOG.INGAME, "StageObject::SetCoopMode() Err ( not coop )");
+          return;
+        }
+      }
+      this.coopMode = coop_mode;
+      this.coopClientId = client_id;
+    }
+  }
+
+  public virtual Transform FindNode(string name)
+  {
+    if (string.IsNullOrEmpty(name))
+      return this._transform;
+    StringKeyTableBase.Item nodeItem = this.nodeCache.GetNodeItem(name);
+    if (nodeItem != null)
+    {
+      if (nodeItem.value != null)
+        return nodeItem.value as Transform;
+      this.nodeCache.Remove(name);
+    }
+    Transform node = Utility.Find(this._transform, name);
+    if (Object.op_Inequality((Object) node, (Object) null))
+      this.nodeCache.Add(name, node);
+    return node;
+  }
+
+  public virtual void OnAnimEvent(AnimEventData.EventData data)
+  {
+    switch (data.id)
+    {
+      case AnimEventFormat.ID.INVICIBLE_ON:
+        this.hitOffFlag |= StageObject.HIT_OFF_FLAG.INVICIBLE;
+        return;
+      case AnimEventFormat.ID.INVICIBLE_OFF:
+        this.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.INVICIBLE;
+        return;
+      case AnimEventFormat.ID.SHAKE_CAMERA:
+        float floatArg = data.floatArgs[0];
+        float cycle_time = data.floatArgs.Length > 1 ? data.floatArgs[1] : 0.0f;
+        if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+          return;
+        MonoBehaviourSingleton<InGameCameraManager>.I.SetShakeCamera(this._position, floatArg, cycle_time);
+        return;
+      case AnimEventFormat.ID.SE_ONESHOT:
+        int intArg1 = data.intArgs[0];
+        string stringArg1 = data.stringArgs[0];
+        if (intArg1 != 0)
+        {
+          if (!this.EnablePlaySound())
+            return;
+          SoundManager.PlayOneShotSE(intArg1, (DisableNotifyMonoBehaviour) this, this.FindNode(stringArg1));
+          return;
+        }
+        break;
+      case AnimEventFormat.ID.SE_LOOP_PLAY:
+        int intArg2 = data.intArgs[0];
+        if (data.intArgs.Length > 1 && data.intArgs[1] != 0)
+          this.loopSeForceEndList.Add(intArg2);
+        string stringArg2 = data.stringArgs[0];
+        if (!this.EnablePlaySound())
+          return;
+        SoundManager.PlayLoopSE(intArg2, (DisableNotifyMonoBehaviour) this, this.FindNode(stringArg2));
+        return;
+      case AnimEventFormat.ID.SE_LOOP_STOP:
+        SoundManager.StopLoopSE(data.intArgs[0], (DisableNotifyMonoBehaviour) this);
+        return;
+    }
+    Log.Error(LOG.INGAME, "AnimEvent Error! Event={0} Object={1}", (object) data.name, (object) ((Object) this).name);
+  }
+
+  public virtual AttackInfo[] GetAttackInfos() => (AttackInfo[]) null;
+
+  public virtual float GetAttackInfoRate() => 0.0f;
+
+  public virtual AttackInfo FindAttackInfo(string name, bool fix_rate = true, bool isDuplicate = false)
+  {
+    return this._FindAttackInfo(this.GetAttackInfos(), name, fix_rate, this.GetAttackInfoRate(), isDuplicate);
+  }
+
+  public virtual AttackInfo FindAttackInfoExternal(string name, bool fix_rate, float rate)
+  {
+    return this._FindAttackInfo(this.GetAttackInfos(), name, fix_rate, rate);
+  }
+
+  protected virtual AttackInfo _FindAttackInfo(
+    AttackInfo[] attack_infos,
+    string name,
+    bool fix_rate,
+    float rate,
+    bool isDuplicate = false)
+  {
+    if (string.IsNullOrEmpty(name))
+      return (AttackInfo) null;
+    if (attack_infos == null)
+      return (AttackInfo) null;
+    AttackInfo attackInfo1 = (AttackInfo) null;
+    int index = 0;
+    for (int length = attack_infos.Length; index < length; ++index)
+    {
+      AttackInfo attackInfo2 = attack_infos[index];
+      if (attackInfo2.name == name)
+      {
+        if (fix_rate && !string.IsNullOrEmpty(attackInfo2.rateInfoName) && (double) rate != 0.0)
+        {
+          AttackInfo attackInfo3 = this._FindAttackInfo(attack_infos, attackInfo2.rateInfoName, false, 0.0f);
+          attackInfo1 = attackInfo2.GetRateAttackInfo(attackInfo3, rate);
+          break;
+        }
+        attackInfo1 = attackInfo2;
+        break;
+      }
+    }
+    if (attackInfo1 == null)
+    {
+      Log.Error(LOG.INGAME, "FindAttackInfo not found. name : " + name);
+      attackInfo1 = attack_infos[0];
+    }
+    return isDuplicate ? attackInfo1.Duplicate() : attackInfo1;
+  }
+
+  public virtual SkillInfo.SkillParam GetSkillParam(int index) => (SkillInfo.SkillParam) null;
+
+  public virtual void SetHitOffTimer(StageObject.HIT_OFF_FLAG flag, float time)
+  {
+    if ((double) time <= 0.0 || flag == StageObject.HIT_OFF_FLAG.NONE)
+      return;
+    this.hitOffFlag |= flag;
+    float num = Time.time + time;
+    int index = 0;
+    for (int count = this.hitOffTimers.Count; index < count; ++index)
+    {
+      if (this.hitOffTimers[index].hitOffFlag == flag)
+      {
+        if ((double) this.hitOffTimers[index].endTime >= (double) num)
+          return;
+        this.hitOffTimers[index].endTime = num;
+        return;
+      }
+    }
+    this.hitOffTimers.Add(new StageObject.HitOffTimer()
+    {
+      endTime = num,
+      hitOffFlag = flag
+    });
+  }
+
+  public virtual void StartWaitingPacket(
+    StageObject.WAITING_PACKET type,
+    bool keep_sync,
+    float add_margin_time = 0.0f)
+  {
+    if (this.IsCoopNone())
+      return;
+    this.waitingPacketParams[(int) type] = new StageObject.WaitingPacketParam()
+    {
+      type = type,
+      startTime = Time.time,
+      keepSync = keep_sync,
+      addMarginTime = add_margin_time
+    };
+  }
+
+  public virtual bool IsValidWaitingPacket(StageObject.WAITING_PACKET type)
+  {
+    return !this.IsCoopNone() && this.waitingPacketParams[(int) type] != null;
+  }
+
+  public virtual void UpdateWaitingPacket()
+  {
+    if (this.IsCoopNone())
+      return;
+    int index1 = 0;
+    for (int index2 = 16 /*0x10*/; index1 < index2; ++index1)
+    {
+      StageObject.WaitingPacketParam waitingPacketParam = this.waitingPacketParams[index1];
+      if (waitingPacketParam != null)
+      {
+        if ((double) waitingPacketParam.startTime <= 0.0)
+        {
+          Log.Error("StageObject::UpdateWaitingPacket() Err ( waitingPacketStartTime <= 0.0f )");
+          break;
+        }
+        if (this.IsOriginal())
+        {
+          if (waitingPacketParam.keepSync && (double) Time.time >= (double) waitingPacketParam.startTime + (double) this.objectParameter.waitingPacketIntervalTime)
+            this.KeepWaitingPacket(waitingPacketParam.type);
+        }
+        else if (this.IsPuppet() || this.IsMirror())
+        {
+          float num = this.objectParameter.waitingPacketMarginTime + waitingPacketParam.addMarginTime;
+          if (waitingPacketParam.keepSync)
+            num += this.objectParameter.waitingPacketIntervalTime;
+          if ((double) Time.time > (double) waitingPacketParam.startTime + (double) num)
+            this.OnFailedWaitingPacket(waitingPacketParam.type);
+        }
+      }
+    }
+  }
+
+  public void KeepWaitingPacket(StageObject.WAITING_PACKET type)
+  {
+    StageObject.WaitingPacketParam waitingPacketParam = this.waitingPacketParams[(int) type];
+    if (waitingPacketParam == null)
+      return;
+    waitingPacketParam.startTime = Time.time;
+    if (!Object.op_Inequality((Object) this.packetSender, (Object) null))
+      return;
+    this.packetSender.OnKeepWaitingPacket(waitingPacketParam.type);
+  }
+
+  public virtual void OnFailedWaitingPacket(StageObject.WAITING_PACKET type)
+  {
+    this.EndWaitingPacket(type);
+  }
+
+  public virtual void EndWaitingPacket(StageObject.WAITING_PACKET type)
+  {
+    this.waitingPacketParams[(int) type] = (StageObject.WaitingPacketParam) null;
+  }
+
+  public static Vector3 GetAppearToTargetPos(
+    Vector3 from_pos,
+    Vector3 target_pos,
+    Vector3 col_offset,
+    float col_radius,
+    float appear_distance,
+    float appear_margin)
+  {
+    return StageObject._GetAppearToTargetPos(from_pos, target_pos, col_offset, col_radius, appear_distance, appear_margin, true, true, out bool _);
+  }
+
+  private static Vector3 _GetAppearToTargetPos(
+    Vector3 from_pos,
+    Vector3 target_pos,
+    Vector3 col_offset,
+    float col_radius,
+    float appear_distance,
+    float appear_margin,
+    bool from_inside,
+    bool target_inside,
+    out bool just_appear)
+  {
+    just_appear = false;
+    Vector3 vector3 = Vector3.op_Subtraction(target_pos, from_pos);
+    float magnitude = ((Vector3) ref vector3).magnitude;
+    if ((double) magnitude <= 0.0)
+    {
+      just_appear = true;
+      return from_pos;
+    }
+    if ((double) appear_distance >= (double) magnitude)
+      return from_pos;
+    if ((double) col_offset.y <= 0.0)
+      col_offset.y = 0.1f;
+    List<StageObject.CastHitInfo> castHitInfoList = new List<StageObject.CastHitInfo>();
+    RaycastHit[] raycastHitArray1 = Physics.RaycastAll(Vector3.op_Addition(target_pos, col_offset), Vector3.op_UnaryNegation(vector3), magnitude, 393728 /*0x060200*/);
+    int index1 = 0;
+    for (int length = raycastHitArray1.Length; index1 < length; ++index1)
+      castHitInfoList.Add(new StageObject.CastHitInfo()
+      {
+        distance = ((RaycastHit) ref raycastHitArray1[index1]).distance - col_radius,
+        faceToTarget = true,
+        collider = ((RaycastHit) ref raycastHitArray1[index1]).collider
+      });
+    castHitInfoList.Add(new StageObject.CastHitInfo()
+    {
+      distance = 0.0f,
+      faceToTarget = !target_inside,
+      collider = (Collider) null
+    });
+    RaycastHit[] raycastHitArray2 = Physics.RaycastAll(Vector3.op_Addition(from_pos, col_offset), vector3, magnitude, 393728 /*0x060200*/);
+    int index2 = 0;
+    for (int length = raycastHitArray2.Length; index2 < length; ++index2)
+      castHitInfoList.Add(new StageObject.CastHitInfo()
+      {
+        distance = magnitude - ((RaycastHit) ref raycastHitArray2[index2]).distance + col_radius,
+        faceToTarget = false,
+        collider = ((RaycastHit) ref raycastHitArray2[index2]).collider
+      });
+    castHitInfoList.Add(new StageObject.CastHitInfo()
+    {
+      distance = magnitude,
+      faceToTarget = from_inside,
+      collider = (Collider) null
+    });
+    castHitInfoList.Sort((Comparison<StageObject.CastHitInfo>) ((a, b) =>
+    {
+      float num = a.distance - b.distance;
+      if ((double) num == 0.0)
+      {
+        if (a.faceToTarget == b.faceToTarget)
+          return 0;
+        return !a.faceToTarget ? -1 : 1;
+      }
+      return (double) num <= 0.0 ? -1 : 1;
+    }));
+    int index3 = 0;
+    for (int count = castHitInfoList.Count; index3 < count; ++index3)
+    {
+      StageObject.CastHitInfo castHitInfo1 = castHitInfoList[index3];
+      if (!castHitInfo1.checkCollider && !Object.op_Equality((Object) castHitInfo1.collider, (Object) null))
+      {
+        int index4 = index3;
+        while (0 <= index4 && index4 < count)
+        {
+          StageObject.CastHitInfo castHitInfo2 = castHitInfoList[index4];
+          if (index4 != index3)
+          {
+            if (Object.op_Equality((Object) castHitInfo2.collider, (Object) castHitInfo1.collider))
+            {
+              castHitInfo2.checkCollider = true;
+              break;
+            }
+            castHitInfo2.enable = false;
+          }
+          if (castHitInfo1.faceToTarget)
+            ++index4;
+          else
+            --index4;
+        }
+      }
+    }
+    float num1 = magnitude;
+    for (int index5 = castHitInfoList.Count - 2; index5 >= 0; --index5)
+    {
+      StageObject.CastHitInfo castHitInfo3 = castHitInfoList[index5];
+      StageObject.CastHitInfo castHitInfo4 = castHitInfoList[index5 + 1];
+      if (castHitInfo3.enable && castHitInfo4.enable && (double) castHitInfo3.distance != (double) castHitInfo4.distance && !castHitInfo3.faceToTarget && castHitInfo4.faceToTarget)
+      {
+        if ((double) castHitInfo3.distance <= (double) appear_distance && (double) castHitInfo4.distance >= (double) appear_distance)
+        {
+          num1 = appear_distance;
+          just_appear = true;
+          break;
+        }
+        if ((double) castHitInfo3.distance >= (double) appear_distance)
+          num1 = castHitInfo3.distance;
+        else if ((double) castHitInfo4.distance >= (double) appear_distance - (double) appear_margin)
+        {
+          num1 = castHitInfo4.distance;
+          break;
+        }
+      }
+    }
+    return (double) num1 == (double) magnitude ? from_pos : Vector3.op_Subtraction(target_pos, Vector3.op_Multiply(((Vector3) ref vector3).normalized, num1));
+  }
+
+  public virtual Vector3 GetPredictivePosition()
+  {
+    Vector3 pos;
+    return (this.IsPuppet() || this.IsMirror()) && Object.op_Inequality((Object) this.packetReceiver, (Object) null) && this.packetReceiver.GetPredictivePosition(out pos) ? pos : this._position;
+  }
+
+  public virtual Vector3 GetTargetPosition(StageObject target)
+  {
+    return Object.op_Equality((Object) target, (Object) null) ? Vector3.zero : target._position;
+  }
+
+  public virtual void ApplySyncPosition(Vector3 pos, float dir, bool force_sync = false)
+  {
+    this._rotation = Quaternion.AngleAxis(dir, Vector3.up);
+    this._position = pos;
+  }
+
+  public virtual bool isProgressStop()
+  {
+    if (!MonoBehaviourSingleton<InGameProgress>.IsValid())
+      return false;
+    bool flag = false;
+    if (MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop)
+      flag = true;
+    else if (this.IsCoopNone() || this.IsOriginal())
+    {
+      if (!MonoBehaviourSingleton<InGameProgress>.I.isBattleStart)
+        flag = true;
+    }
+    else if (MonoBehaviourSingleton<CoopManager>.IsValid())
+    {
+      CoopClient byClientId = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByClientId(this.coopClientId);
+      if (Object.op_Inequality((Object) byClientId, (Object) null) && !byClientId.IsBattleStart())
+        flag = true;
+    }
+    return flag;
+  }
+
+  public virtual AttackHitChecker ReferenceAttackHitChecker() => (AttackHitChecker) null;
+
+  public List<IBulletObservable> GetBulletObservableList() => this.bulletObservableList;
+
+  public virtual int GetObservedID() => -1;
+
+  public virtual void RegisterObservable(IBulletObservable observable)
+  {
+    if (this.bulletObservableList.Contains(observable))
+      return;
+    this.bulletObservableList.Add(observable);
+    if (!this.IsCoopNone() && !this.IsOriginal())
+      return;
+    this.RegisterObservableID(observable.GetObservedID());
+  }
+
+  public void RegisterObservableID(int observedID)
+  {
+    if (this.bulletObservableIdList.Contains(observedID))
+      return;
+    this.bulletObservableIdList.Add(observedID);
+    if (!Object.op_Inequality((Object) this.packetSender, (Object) null))
+      return;
+    this.packetSender.OnBulletObservableSet(observedID);
+  }
+
+  public virtual void OnBreak(int brokenBulletID, bool isSendOnlyOriginal)
+  {
+  }
+
+  public virtual void OnBulletDestroy(int observedID)
+  {
+  }
+
+  public virtual void OnSetSearchTarget(int observedID, int targetID)
+  {
+  }
+
+  public virtual void OnSetTurretBitTarget(int observedID, int targetID, int regionID)
+  {
+  }
+
+  public bool IsIgnoreByHitInterval(Collider fromCollider)
+  {
+    if (this.hitIntervalList.IsNullOrEmpty<StageObject.HitIntervalStatus>())
+      return false;
+    int index = 0;
+    for (int count = this.hitIntervalList.Count; index < count; ++index)
+    {
+      if (Object.op_Equality((Object) this.hitIntervalList[index].fromCollider, (Object) fromCollider))
+      {
+        if ((double) this.hitIntervalList[index].hitIntervalTimer > 0.0)
+          return true;
+        this.hitIntervalList[index].enable = false;
+        return false;
+      }
+    }
+    return false;
+  }
+
+  public void SetHitIntervalStatus(Collider fromCollider, float hitInterval)
+  {
+    int index = 0;
+    for (int count = this.hitIntervalList.Count; index < count; ++index)
+    {
+      if (Object.op_Equality((Object) this.hitIntervalList[index].fromCollider, (Object) fromCollider))
+        return;
+    }
+    this.hitIntervalList.Add(new StageObject.HitIntervalStatus(fromCollider, hitInterval));
+  }
+
+  public virtual void OnRecvSetCoopMode(Coop_Model_ObjectCoopInfo model, CoopPacket packet)
+  {
+  }
+
+  public enum OBJECT_TYPE
+  {
+    STAGE_OBJECT,
+    CHARACTER,
+    PLAYER,
+    ENEMY,
+    SELF,
+    DECOY,
+    WAVE_TARGET,
+  }
+
+  public class AttackedContinuationStatus
+  {
+    public AttackContinuationInfo attackInfo;
+    public Collider fromCollider;
+    public StageObject fromObject;
+    public float hitTime;
+    public float hitStartTime;
+  }
+
+  public class HitIntervalStatus
+  {
+    public Collider fromCollider;
+    public float hitInterval;
+    public float hitIntervalTimer;
+    public bool enable;
+
+    public HitIntervalStatus(Collider fromCollider, float hitInterval)
+    {
+      this.fromCollider = fromCollider;
+      this.hitInterval = hitInterval;
+      this.hitIntervalTimer = hitInterval;
+      this.enable = true;
+    }
+  }
+
+  [Serializable]
+  public class StampInfo
+  {
+    [Tooltip("カメラ揺れ大きさ")]
+    public float shakeCameraPercent;
+    [Tooltip("カメラ揺れ周期（0で共通設定")]
+    public float shakeCycleTime;
+    [Tooltip("足踏みエフェクト名")]
+    public string effectName;
+    [Tooltip("足踏みエフェクトスケール")]
+    public float effectScale = 1f;
+    [Tooltip("足踏みSEID")]
+    public int seID;
+  }
+
+  public enum COOP_MODE_TYPE
+  {
+    NONE,
+    ORIGINAL,
+    MIRROR,
+    PUPPET,
+  }
+
+  [Flags]
+  public enum HIT_OFF_FLAG
+  {
+    NONE = 0,
+    FORCE = 1,
+    OPEN_MENU = 2,
+    INVICIBLE = 4,
+    DEAD = 8,
+    LOAD = 16, // 0x00000010
+    INITIALIZE = 32, // 0x00000020
+    BATTLE_START = 64, // 0x00000040
+    DEAD_STANDUP = 128, // 0x00000080
+    PLAY_MOTION = 256, // 0x00000100
+    TUTORIAL = 512, // 0x00000200
+    UNLOCK_EVENT = 1024, // 0x00000400
+    TEST = 2048, // 0x00000800
+    GRAB = 4096, // 0x00001000
+    DEAD_REVIVE = 8192, // 0x00002000
+  }
+
+  protected class HitOffTimer
+  {
+    public StageObject.HIT_OFF_FLAG hitOffFlag;
+    public float endTime;
+  }
+
+  public enum WAITING_PACKET
+  {
+    CHARACTER_MOVE_VELOCITY,
+    CHARACTER_UPDATE_ACTION_POSITION,
+    CHARACTER_UPDATE_DIRECTION,
+    PLAYER_CHARGE_RELEASE,
+    PLAYER_PRAYER_END,
+    PLAYER_APPLY_CHANGE_WEAPON,
+    ENEMY_WARP,
+    ENEMY_UPDATE_BLEED_DAMAGE,
+    ENEMY_UPDATE_SHADOWSEALING,
+    PLAYER_JUMP_END,
+    PLAYER_SOUL_BOOST,
+    EVOLVE,
+    PLAYER_PAIR_SWORDS_LASER_END,
+    PLAYER_ONE_HAND_SWORD_MOVE_END,
+    PLAYER_GATHER_GIMMICK,
+    ENEMY_UPDATE_BOMBARROW,
+    NUM,
+  }
+
+  protected class WaitingPacketParam
+  {
+    public StageObject.WAITING_PACKET type;
+    public float startTime;
+    public bool keepSync;
+    public float addMarginTime;
+  }
+
+  protected class NodeTable : StringKeyTable<Transform>
+  {
+    public StringKeyTableBase.Item GetNodeItem(string key)
+    {
+      if (string.IsNullOrEmpty(key))
+        return (StringKeyTableBase.Item) null;
+      List<StringKeyTableBase.Item> list = this.GetList(key);
+      return list == null ? (StringKeyTableBase.Item) null : this.GetItem(list, key);
+    }
+  }
+
+  private class CastHitInfo
+  {
+    public float distance;
+    public bool faceToTarget;
+    public Collider collider;
+    public bool enable = true;
+    public bool checkCollider;
+  }
 }

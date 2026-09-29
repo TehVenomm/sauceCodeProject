@@ -1,319 +1,270 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AudioObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 using UnityEngine.Audio;
 
+#nullable disable
 public class AudioObject : DisableNotifyMonoBehaviour
 {
-	public enum Phase
-	{
-		NONE,
-		PREPLAY,
-		PLAYING,
-		PRESTOP,
-		STOP
-	}
+  public Transform parentObject;
+  private AudioSource audioSource;
+  private bool needParent;
+  private float fadeoutVolume;
+  private const int MIN_FADEOUT_FRAMECOUNT = 4;
+  private AudioControlGroup m_masterGroup;
+  private bool m_IsSpatialSound;
+  private bool m_IsStaticPosition;
 
-	private const int MIN_FADEOUT_FRAMECOUNT = 4;
+  public AudioObject.Phase PlayPhase { get; protected set; }
 
-	public Transform parentObject;
+  public bool IsPlayingSound
+  {
+    get
+    {
+      return this.PlayPhase == AudioObject.Phase.PLAYING || this.PlayPhase == AudioObject.Phase.PREPLAY;
+    }
+  }
 
-	private AudioSource audioSource;
+  public static AudioObject Create(
+    AudioClip clip,
+    int clip_id,
+    float volume,
+    bool loop,
+    AudioMixerGroup mixer_group,
+    AudioControlGroup controlGroup,
+    bool is3DSound = false,
+    DisableNotifyMonoBehaviour master = null,
+    Transform parent = null,
+    Vector3? initPos = null)
+  {
+    if (Object.op_Equality((Object) clip, (Object) null))
+      return (AudioObject) null;
+    AudioObject audioObject = AudioObjectPool.Borrow();
+    Object.op_Equality((Object) audioObject, (Object) null);
+    audioObject._transform.parent = MonoBehaviourSingleton<SoundManager>.I._transform;
+    audioObject.m_masterGroup = controlGroup;
+    audioObject.m_IsSpatialSound = is3DSound;
+    if (initPos.HasValue)
+    {
+      audioObject._transform.position = initPos ?? Vector3.zero;
+      audioObject.m_IsStaticPosition = true;
+    }
+    audioObject.Play(clip, clip_id, volume, loop, mixer_group, master, parent);
+    return audioObject;
+  }
 
-	private bool needParent;
+  public int ID { get; private set; }
 
-	private float fadeoutVolume;
+  public static void Init(AudioObject obj, AudioSource source, int managed_id = -1)
+  {
+    obj.InitParams();
+    obj.audioSource = source;
+    obj.ID = managed_id;
+  }
 
-	private AudioControlGroup m_masterGroup;
+  private void InitParams()
+  {
+    this.parentObject = (Transform) null;
+    this.clipId = 0;
+    this.timeAtPlay = 0.0f;
+    this.PlayPhase = AudioObject.Phase.NONE;
+    this.fadeoutVolume = 0.0f;
+    this.needParent = false;
+    this.m_IsSpatialSound = false;
+    this.m_IsStaticPosition = false;
+  }
 
-	private bool m_IsSpatialSound;
+  private void InitAudioSource()
+  {
+    if (Object.op_Equality((Object) this.audioSource, (Object) null))
+      return;
+    this.audioSource.outputAudioMixerGroup = (AudioMixerGroup) null;
+    this.audioSource.spatialBlend = 0.0f;
+    this.audioSource.spread = 0.0f;
+    this.audioSource.priority = 128 /*0x80*/;
+    this.audioSource.rolloffMode = (AudioRolloffMode) 1;
+    this.audioSource.minDistance = 0.0f;
+    this.audioSource.maxDistance = 999f;
+    this.audioSource.pitch = 1f;
+    this.audioSource.dopplerLevel = 0.0f;
+    this.audioSource.clip = (AudioClip) null;
+    this.audioSource.loop = false;
+    this.audioSource.volume = 1f;
+  }
 
-	private bool m_IsStaticPosition;
+  public int clipId { get; private set; }
 
-	public Phase PlayPhase
-	{
-		get;
-		protected set;
-	}
+  public float timeAtPlay { get; private set; }
 
-	public bool IsPlayingSound
-	{
-		get
-		{
-			if (PlayPhase == Phase.PLAYING || PlayPhase == Phase.PREPLAY)
-			{
-				return true;
-			}
-			return false;
-		}
-	}
+  private void Play(
+    AudioClip clip,
+    int clip_id,
+    float volume,
+    bool loop,
+    AudioMixerGroup mixer_group,
+    DisableNotifyMonoBehaviour master,
+    Transform parent)
+  {
+    if (Object.op_Inequality((Object) master, (Object) null))
+      this.SetNotifyMaster(master);
+    else
+      this.ResetNotifyMaster();
+    this.clipId = clip_id;
+    this.PlayPhase = AudioObject.Phase.PREPLAY;
+    if (Object.op_Inequality((Object) this.audioSource, (Object) null))
+    {
+      this.audioSource.outputAudioMixerGroup = mixer_group;
+      if (this.m_IsSpatialSound)
+      {
+        this.audioSource.spatialBlend = 1f;
+        this.audioSource.spread = 360f;
+      }
+      else
+      {
+        this.audioSource.spatialBlend = 0.0f;
+        this.audioSource.spread = 0.0f;
+      }
+      this.audioSource.priority = 100;
+      this.audioSource.rolloffMode = MonoBehaviourSingleton<SoundManager>.I.CurrentPreset.rollOffMode;
+      this.audioSource.minDistance = MonoBehaviourSingleton<SoundManager>.I.CurrentPreset.minDistance;
+      this.audioSource.maxDistance = MonoBehaviourSingleton<SoundManager>.I.CurrentPreset.maxDistance;
+      this.audioSource.pitch = 1f;
+    }
+    float num1 = 1f;
+    float num2 = 0.0f;
+    SETable.Data seData = Singleton<SETable>.I.GetSeData((uint) clip_id);
+    if (seData != null)
+    {
+      this.audioSource.priority = (int) seData.priority;
+      num1 = seData.volumeScale;
+      num2 = seData.dopplerLevel;
+      if ((double) seData.minDistance > 0.0)
+        this.audioSource.minDistance = seData.minDistance;
+      if ((double) seData.maxDistance > 0.0)
+        this.audioSource.maxDistance = seData.maxDistance;
+      if ((double) seData.randomPitch > 0.0)
+        this.audioSource.pitch = this.GenRandomPitch();
+    }
+    this.audioSource.dopplerLevel = num2;
+    this.audioSource.clip = clip;
+    this.audioSource.loop = loop;
+    this.audioSource.volume = volume * num1;
+    this.parentObject = parent;
+    this.needParent = Object.op_Inequality((Object) parent, (Object) null);
+    this.fadeoutVolume = 0.0f;
+    this.TraceParent();
+    this.audioSource.Play();
+    if (Object.op_Inequality((Object) this.m_masterGroup, (Object) null))
+      this.m_masterGroup.NotifyOnStart(this);
+    this.PlayPhase = AudioObject.Phase.PLAYING;
+    this.timeAtPlay = Time.time;
+  }
 
-	public int ID
-	{
-		get;
-		private set;
-	}
+  private float GenRandomPitch() => Utility.Random(0.6f) + 0.7f;
 
-	public int clipId
-	{
-		get;
-		private set;
-	}
+  protected override void OnDisableMaster()
+  {
+    if (Object.op_Equality((Object) this.audioSource, (Object) null))
+      return;
+    if (this.audioSource.loop)
+      this.Stop();
+    this.parentObject = (Transform) null;
+    this.needParent = false;
+  }
 
-	public float timeAtPlay
-	{
-		get;
-		private set;
-	}
+  private void LateUpdate()
+  {
+    if (this.needParent)
+    {
+      if (Object.op_Inequality((Object) this.parentObject, (Object) null))
+        this.TraceParent();
+      else if (this.audioSource.loop)
+      {
+        this.Stop();
+        this.needParent = false;
+      }
+    }
+    if ((double) this.fadeoutVolume > 0.0)
+    {
+      this.audioSource.volume = Mathf.Max(this.audioSource.volume - this.fadeoutVolume, 0.0f);
+      if ((double) this.audioSource.volume == 0.0)
+        this.StopImmidiate();
+    }
+    if (this.audioSource.isPlaying)
+      return;
+    if (Object.op_Inequality((Object) this.m_masterGroup, (Object) null))
+    {
+      this.m_masterGroup.NotifyOnStop(this);
+      this.m_masterGroup = (AudioControlGroup) null;
+    }
+    this.Dispose();
+  }
 
-	public static AudioObject Create(AudioClip clip, int clip_id, float volume, bool loop, AudioMixerGroup mixer_group, AudioControlGroup controlGroup, bool is3DSound = false, DisableNotifyMonoBehaviour master = null, Transform parent = null, Vector3? initPos = default(Vector3?))
-	{
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		if (clip == null)
-		{
-			return null;
-		}
-		AudioObject audioObject = AudioObjectPool.Borrow();
-		if (!(audioObject == null))
-		{
-			goto IL_0020;
-		}
-		goto IL_0020;
-		IL_0020:
-		audioObject._transform.set_parent(MonoBehaviourSingleton<SoundManager>.I._transform);
-		audioObject.m_masterGroup = controlGroup;
-		audioObject.m_IsSpatialSound = is3DSound;
-		if (initPos.HasValue)
-		{
-			audioObject._transform.set_position((!initPos.HasValue) ? Vector3.get_zero() : initPos.Value);
-			audioObject.m_IsStaticPosition = true;
-		}
-		audioObject.Play(clip, clip_id, volume, loop, mixer_group, master, parent);
-		return audioObject;
-	}
+  private void TraceParent()
+  {
+    if (this.m_IsStaticPosition || !this.needParent || !Object.op_Inequality((Object) this.parentObject, (Object) null))
+      return;
+    this._transform.position = this.parentObject.position;
+  }
 
-	public static void Init(AudioObject obj, AudioSource source, int managed_id = -1)
-	{
-		obj.InitParams();
-		obj.audioSource = source;
-		obj.ID = managed_id;
-	}
+  public void Stop(int fadeout_framecount = 0)
+  {
+    if (Object.op_Equality((Object) this.audioSource, (Object) null) || (double) this.fadeoutVolume > 0.0)
+      return;
+    if (fadeout_framecount < 4)
+      fadeout_framecount = 4;
+    this.fadeoutVolume = this.audioSource.volume / (float) fadeout_framecount;
+    if (Object.op_Inequality((Object) this.m_masterGroup, (Object) null))
+    {
+      this.m_masterGroup.NotifyOnRelease(this);
+      this.m_masterGroup = (AudioControlGroup) null;
+    }
+    this.PlayPhase = AudioObject.Phase.PRESTOP;
+  }
 
-	private void InitParams()
-	{
-		parentObject = null;
-		clipId = 0;
-		timeAtPlay = 0f;
-		PlayPhase = Phase.NONE;
-		fadeoutVolume = 0f;
-		needParent = false;
-		m_IsSpatialSound = false;
-		m_IsStaticPosition = false;
-	}
+  public void SetLoopFlag(bool flag) => this.audioSource.loop = flag;
 
-	private void InitAudioSource()
-	{
-		if (!(audioSource == null))
-		{
-			audioSource.set_outputAudioMixerGroup(null);
-			audioSource.set_spatialBlend(0f);
-			audioSource.set_spread(0f);
-			audioSource.set_priority(128);
-			audioSource.set_rolloffMode(1);
-			audioSource.set_minDistance(0f);
-			audioSource.set_maxDistance(999f);
-			audioSource.set_pitch(1f);
-			audioSource.set_dopplerLevel(0f);
-			audioSource.set_clip(null);
-			audioSource.set_loop(false);
-			audioSource.set_volume(1f);
-		}
-	}
+  public bool GetLoopFlag() => this.audioSource.loop;
 
-	private void Play(AudioClip clip, int clip_id, float volume, bool loop, AudioMixerGroup mixer_group, DisableNotifyMonoBehaviour master, Transform parent)
-	{
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		if (master != null)
-		{
-			SetNotifyMaster(master);
-		}
-		else
-		{
-			ResetNotifyMaster();
-		}
-		clipId = clip_id;
-		PlayPhase = Phase.PREPLAY;
-		if (audioSource != null)
-		{
-			audioSource.set_outputAudioMixerGroup(mixer_group);
-			if (m_IsSpatialSound)
-			{
-				audioSource.set_spatialBlend(1f);
-				audioSource.set_spread(360f);
-			}
-			else
-			{
-				audioSource.set_spatialBlend(0f);
-				audioSource.set_spread(0f);
-			}
-			audioSource.set_priority(100);
-			audioSource.set_rolloffMode(MonoBehaviourSingleton<SoundManager>.I.CurrentPreset.rollOffMode);
-			audioSource.set_minDistance(MonoBehaviourSingleton<SoundManager>.I.CurrentPreset.minDistance);
-			audioSource.set_maxDistance(MonoBehaviourSingleton<SoundManager>.I.CurrentPreset.maxDistance);
-			audioSource.set_pitch(1f);
-		}
-		float num = 1f;
-		float dopplerLevel = 0f;
-		SETable.Data seData = Singleton<SETable>.I.GetSeData((uint)clip_id);
-		if (seData != null)
-		{
-			audioSource.set_priority((int)seData.priority);
-			num = seData.volumeScale;
-			dopplerLevel = seData.dopplerLevel;
-			if (seData.minDistance > 0f)
-			{
-				audioSource.set_minDistance(seData.minDistance);
-			}
-			if (seData.maxDistance > 0f)
-			{
-				audioSource.set_maxDistance(seData.maxDistance);
-			}
-			if (seData.randomPitch > 0f)
-			{
-				audioSource.set_pitch(GenRandomPitch());
-			}
-		}
-		audioSource.set_dopplerLevel(dopplerLevel);
-		audioSource.set_clip(clip);
-		audioSource.set_loop(loop);
-		audioSource.set_volume(volume * num);
-		parentObject = parent;
-		needParent = (parent != null);
-		fadeoutVolume = 0f;
-		TraceParent();
-		audioSource.Play();
-		if (m_masterGroup != null)
-		{
-			m_masterGroup.NotifyOnStart(this);
-		}
-		PlayPhase = Phase.PLAYING;
-		timeAtPlay = Time.get_time();
-	}
+  private void StopImmidiate()
+  {
+    if (Object.op_Equality((Object) this.audioSource, (Object) null) || this.PlayPhase == AudioObject.Phase.NONE || this.PlayPhase == AudioObject.Phase.STOP)
+      return;
+    this.audioSource.Stop();
+    if (Object.op_Inequality((Object) this.m_masterGroup, (Object) null))
+    {
+      this.m_masterGroup.NotifyOnStop(this);
+      this.m_masterGroup = (AudioControlGroup) null;
+    }
+    this.PlayPhase = AudioObject.Phase.STOP;
+  }
 
-	private float GenRandomPitch()
-	{
-		return Utility.Random(0.6f) + 0.7f;
-	}
+  private void Dispose()
+  {
+    this.InitParams();
+    if (Object.op_Inequality((Object) this.audioSource, (Object) null))
+    {
+      this.audioSource.Stop();
+      this.InitAudioSource();
+    }
+    if (Object.op_Inequality((Object) this.m_masterGroup, (Object) null))
+    {
+      this.m_masterGroup.NotifyOnStop(this);
+      this.m_masterGroup = (AudioControlGroup) null;
+    }
+    AudioObjectPool.Release(this);
+  }
 
-	protected override void OnDisableMaster()
-	{
-		if (!(audioSource == null))
-		{
-			if (audioSource.get_loop())
-			{
-				Stop(0);
-			}
-			parentObject = null;
-			needParent = false;
-		}
-	}
-
-	private void LateUpdate()
-	{
-		if (needParent)
-		{
-			if (parentObject != null)
-			{
-				TraceParent();
-			}
-			else if (audioSource.get_loop())
-			{
-				Stop(0);
-				needParent = false;
-			}
-		}
-		if (fadeoutVolume > 0f)
-		{
-			audioSource.set_volume(Mathf.Max(audioSource.get_volume() - fadeoutVolume, 0f));
-			if (audioSource.get_volume() == 0f)
-			{
-				StopImmidiate();
-			}
-		}
-		if (!audioSource.get_isPlaying())
-		{
-			if (m_masterGroup != null)
-			{
-				m_masterGroup.NotifyOnStop(this);
-				m_masterGroup = null;
-			}
-			Dispose();
-		}
-	}
-
-	private void TraceParent()
-	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		if (!m_IsStaticPosition && needParent && parentObject != null)
-		{
-			base._transform.set_position(parentObject.get_position());
-		}
-	}
-
-	public void Stop(int fadeout_framecount = 0)
-	{
-		if (!(audioSource == null) && !(fadeoutVolume > 0f))
-		{
-			if (fadeout_framecount < 4)
-			{
-				fadeout_framecount = 4;
-			}
-			fadeoutVolume = audioSource.get_volume() / (float)fadeout_framecount;
-			if (m_masterGroup != null)
-			{
-				m_masterGroup.NotifyOnRelease(this);
-				m_masterGroup = null;
-			}
-			PlayPhase = Phase.PRESTOP;
-		}
-	}
-
-	public void SetLoopFlag(bool flag)
-	{
-		audioSource.set_loop(flag);
-	}
-
-	public bool GetLoopFlag()
-	{
-		return audioSource.get_loop();
-	}
-
-	private void StopImmidiate()
-	{
-		if (!(audioSource == null) && PlayPhase != 0 && PlayPhase != Phase.STOP)
-		{
-			audioSource.Stop();
-			if (m_masterGroup != null)
-			{
-				m_masterGroup.NotifyOnStop(this);
-				m_masterGroup = null;
-			}
-			PlayPhase = Phase.STOP;
-		}
-	}
-
-	private void Dispose()
-	{
-		InitParams();
-		if (audioSource != null)
-		{
-			audioSource.Stop();
-			InitAudioSource();
-		}
-		if (m_masterGroup != null)
-		{
-			m_masterGroup.NotifyOnStop(this);
-			m_masterGroup = null;
-		}
-		AudioObjectPool.Release(this);
-	}
+  public enum Phase
+  {
+    NONE,
+    PREPLAY,
+    PLAYING,
+    PRESTOP,
+    STOP,
+  }
 }

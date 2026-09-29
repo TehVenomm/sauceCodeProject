@@ -1,33 +1,33 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Network.QuestData
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 
-namespace Network
+#nullable disable
+namespace Network;
+
+[Serializable]
+public class QuestData
 {
-	[Serializable]
-	public class QuestData
-	{
-		public class QuestRewardList
-		{
-			public List<int> types = new List<int>();
+  public int questId;
+  public int crystalNum;
+  public QuestData.QuestRewardList reward = new QuestData.QuestRewardList();
+  public QuestData.OrderQuestInfo order;
+  public List<float> remainTimes = new List<float>();
 
-			public List<int> itemIds = new List<int>();
+  public class QuestRewardList
+  {
+    public List<int> types = new List<int>();
+    public List<int> itemIds = new List<int>();
+    public List<int> pri = new List<int>();
+  }
 
-			public List<int> pri = new List<int>();
-		}
-
-		public class OrderQuestInfo
-		{
-			public int num;
-		}
-
-		public int questId;
-
-		public int crystalNum;
-
-		public QuestRewardList reward = new QuestRewardList();
-
-		public OrderQuestInfo order;
-
-		public List<float> remainTimes = new List<float>();
-	}
+  public class OrderQuestInfo
+  {
+    public int num;
+  }
 }

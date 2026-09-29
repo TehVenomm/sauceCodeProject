@@ -1,46 +1,35 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIOrthoCamera
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-[AddComponentMenu("NGUI/UI/Orthographic Camera")]
-[RequireComponent(typeof(Camera))]
+#nullable disable
 [ExecuteInEditMode]
-public class UIOrthoCamera
+[RequireComponent(typeof (Camera))]
+[AddComponentMenu("NGUI/UI/Orthographic Camera")]
+public class UIOrthoCamera : MonoBehaviour
 {
-	private Camera mCam;
+  private Camera mCam;
+  private Transform mTrans;
 
-	private Transform mTrans;
+  private void Start()
+  {
+    this.mCam = ((Component) this).GetComponent<Camera>();
+    this.mTrans = ((Component) this).transform;
+    this.mCam.orthographic = true;
+  }
 
-	public UIOrthoCamera()
-		: this()
-	{
-	}
-
-	private void Start()
-	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Expected O, but got Unknown
-		mCam = this.GetComponent<Camera>();
-		mTrans = this.get_transform();
-		mCam.set_orthographic(true);
-	}
-
-	private void Update()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		Rect rect = mCam.get_rect();
-		float num = rect.get_yMin() * (float)Screen.get_height();
-		Rect rect2 = mCam.get_rect();
-		float num2 = rect2.get_yMax() * (float)Screen.get_height();
-		float num3 = (num2 - num) * 0.5f;
-		Vector3 lossyScale = mTrans.get_lossyScale();
-		float num4 = num3 * lossyScale.y;
-		if (!Mathf.Approximately(mCam.get_orthographicSize(), num4))
-		{
-			mCam.set_orthographicSize(num4);
-		}
-	}
+  private void Update()
+  {
+    Rect rect1 = this.mCam.rect;
+    float num1 = ((Rect) ref rect1).yMin * (float) Screen.height;
+    Rect rect2 = this.mCam.rect;
+    float num2 = (float) (((double) ((Rect) ref rect2).yMax * (double) Screen.height - (double) num1) * 0.5) * this.mTrans.lossyScale.y;
+    if (Mathf.Approximately(this.mCam.orthographicSize, num2))
+      return;
+    this.mCam.orthographicSize = num2;
+  }
 }

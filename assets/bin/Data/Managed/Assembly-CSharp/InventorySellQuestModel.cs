@@ -1,23 +1,28 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: InventorySellQuestModel
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections.Generic;
 
+#nullable disable
 public class InventorySellQuestModel : BaseModel
 {
-	[Serializable]
-	public class Param
-	{
-		public SellQuestItemReward reward = new SellQuestItemReward();
-	}
+  public static string URL = "ajax/inventory/sellquest";
+  public InventorySellQuestModel.Param result = new InventorySellQuestModel.Param();
 
-	public class RequestSendForm
-	{
-		public List<string> uids = new List<string>();
+  [Serializable]
+  public class Param
+  {
+    public SellQuestItemReward reward = new SellQuestItemReward();
+  }
 
-		public List<int> nums;
-	}
-
-	public static string URL = "ajax/inventory/sellquest";
-
-	public Param result = new Param();
+  public class RequestSendForm
+  {
+    public List<string> uids = new List<string>();
+    public List<int> nums;
+  }
 }

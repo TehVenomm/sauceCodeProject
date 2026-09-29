@@ -1,203 +1,158 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ResultExpGaugeCtrl
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(UISprite))]
-public class ResultExpGaugeCtrl
+#nullable disable
+[RequireComponent(typeof (UISprite))]
+public class ResultExpGaugeCtrl : MonoBehaviour
 {
-	public AnimationCurve lvUpCurve;
+  public AnimationCurve lvUpCurve;
+  public AnimationCurve lastDirectionCurve;
+  private float time = -1f;
+  private float totalExp;
+  private int startLevel;
+  private bool isProgressAnim;
+  [HideInInspector]
+  public UISprite progress;
+  [HideInInspector]
+  public float getExp;
+  [HideInInspector]
+  public float addCountExpValue;
+  [HideInInspector]
+  public float startExp;
+  [HideInInspector]
+  public int nowLevel;
+  [HideInInspector]
+  public int remainLevelUpCnt;
+  [HideInInspector]
+  public int beforeUpdateLevel;
+  [HideInInspector]
+  public UserLevelTable.UserLevelData levelTable;
+  [HideInInspector]
+  public UserLevelTable.UserLevelData nowLevelTable;
+  private bool skip;
+  public System.Action callBack;
+  public Action<bool, int, ResultExpGaugeCtrl> OnUpdate;
 
-	public AnimationCurve lastDirectionCurve;
+  public bool isEnd { get; private set; }
 
-	private float time = -1f;
+  public void InitDirection(Action<ResultExpGaugeCtrl> initialize_call = null)
+  {
+    this.progress = ((Component) this).GetComponent<UISprite>();
+    if (initialize_call != null)
+      initialize_call(this);
+    this.totalExp = this.getExp + this.startExp;
+    this.startLevel = this.nowLevel;
+    if (this.nowLevel < Singleton<UserLevelTable>.I.GetMaxLevel())
+    {
+      this.time = -1f;
+      this.UpdateAddCountExp(this.nowLevel);
+      this.SetFillAmount((float) ((int) this.startExp - (int) this.nowLevelTable.needExp) / (float) ((int) this.levelTable.needExp - (int) this.nowLevelTable.needExp));
+    }
+    else
+    {
+      this.SetFillAmount(0.0f);
+      this.getExp = 0.0f;
+    }
+  }
 
-	private float totalExp;
+  public void SetFillAmount(float amount) => this.progress.fillAmount = amount;
 
-	private int startLevel;
+  public void StartAnim() => this.isProgressAnim = true;
 
-	private bool isProgressAnim;
+  public void Skip() => this.skip = true;
 
-	[HideInInspector]
-	public UISprite progress;
+  private void UpdateAddCountExp(int now_level)
+  {
+    this.levelTable = Singleton<UserLevelTable>.I.GetLevelTable(now_level + 1);
+    this.nowLevelTable = Singleton<UserLevelTable>.I.GetLevelTable(now_level);
+    if ((double) this.time >= 0.0)
+    {
+      this.UpdateCurveEvaluate();
+    }
+    else
+    {
+      this.time = 0.0f;
+      this.addCountExpValue = 0.0f;
+    }
+  }
 
-	[HideInInspector]
-	public float getExp;
+  public void UpdateCurveEvaluate()
+  {
+    int num1 = this.remainLevelUpCnt > 0 ? 1 : 0;
+    float num2 = (float) ((int) this.levelTable.needExp - (int) this.nowLevelTable.needExp);
+    float num3 = num1 == 0 ? (this.nowLevel != this.startLevel ? this.totalExp - (float) (int) this.nowLevelTable.needExp : this.getExp) : num2;
+    float num4 = (float) (int) this.nowLevelTable.needExp;
+    if (this.nowLevel == this.startLevel)
+      num4 = this.startExp;
+    this.time += Time.deltaTime;
+    if (num1 != 0)
+      this.addCountExpValue = this.lvUpCurve.Evaluate(Mathf.Clamp(this.time, 0.0f, ((Keyframe) ref this.lvUpCurve.keys[this.lvUpCurve.length - 1]).time)) * num3 + num4;
+    else
+      this.addCountExpValue = this.lastDirectionCurve.Evaluate(Mathf.Clamp(this.time, 0.0f, ((Keyframe) ref this.lastDirectionCurve.keys[this.lastDirectionCurve.length - 1]).time)) * num3 + num4;
+  }
 
-	[HideInInspector]
-	public float addCountExpValue;
-
-	[HideInInspector]
-	public float startExp;
-
-	[HideInInspector]
-	public int nowLevel;
-
-	[HideInInspector]
-	public int remainLevelUpCnt;
-
-	[HideInInspector]
-	public int beforeUpdateLevel;
-
-	[HideInInspector]
-	public UserLevelTable.UserLevelData levelTable;
-
-	[HideInInspector]
-	public UserLevelTable.UserLevelData nowLevelTable;
-
-	private bool skip;
-
-	public Action callBack;
-
-	public Action<bool, int, ResultExpGaugeCtrl> OnUpdate;
-
-	public bool isEnd
-	{
-		get;
-		private set;
-	}
-
-	public ResultExpGaugeCtrl()
-		: this()
-	{
-	}
-
-	public void InitDirection(Action<ResultExpGaugeCtrl> initialize_call = null)
-	{
-		progress = this.GetComponent<UISprite>();
-		initialize_call?.Invoke(this);
-		totalExp = getExp + startExp;
-		startLevel = nowLevel;
-		if (nowLevel < Singleton<UserLevelTable>.I.GetMaxLevel())
-		{
-			time = -1f;
-			UpdateAddCountExp(nowLevel);
-			SetFillAmount((float)((int)startExp - (int)nowLevelTable.needExp) / (float)((int)levelTable.needExp - (int)nowLevelTable.needExp));
-		}
-		else
-		{
-			SetFillAmount(0f);
-			getExp = 0f;
-		}
-	}
-
-	public void SetFillAmount(float amount)
-	{
-		progress.fillAmount = amount;
-	}
-
-	public void StartAnim()
-	{
-		isProgressAnim = true;
-	}
-
-	public void Skip()
-	{
-		skip = true;
-	}
-
-	private void UpdateAddCountExp(int now_level)
-	{
-		levelTable = Singleton<UserLevelTable>.I.GetLevelTable(now_level + 1);
-		nowLevelTable = Singleton<UserLevelTable>.I.GetLevelTable(now_level);
-		if (time >= 0f)
-		{
-			UpdateCurveEvaluate();
-		}
-		else
-		{
-			time = 0f;
-			addCountExpValue = 0f;
-		}
-	}
-
-	public void UpdateCurveEvaluate()
-	{
-		bool flag = remainLevelUpCnt > 0;
-		float num = (float)((int)levelTable.needExp - (int)nowLevelTable.needExp);
-		float num2 = flag ? num : ((nowLevel != startLevel) ? (totalExp - (float)(int)nowLevelTable.needExp) : getExp);
-		float num3 = (float)(int)nowLevelTable.needExp;
-		if (nowLevel == startLevel)
-		{
-			num3 = startExp;
-		}
-		float deltaTime = Time.get_deltaTime();
-		time += deltaTime;
-		if (flag)
-		{
-			float num4 = lvUpCurve.get_keys()[lvUpCurve.get_length() - 1].get_time();
-			addCountExpValue = lvUpCurve.Evaluate(Mathf.Clamp(time, 0f, num4)) * num2 + num3;
-		}
-		else
-		{
-			float num5 = lastDirectionCurve.get_keys()[lastDirectionCurve.get_length() - 1].get_time();
-			addCountExpValue = lastDirectionCurve.Evaluate(Mathf.Clamp(time, 0f, num5)) * num2 + num3;
-		}
-	}
-
-	public void Update()
-	{
-		if (isProgressAnim)
-		{
-			if (getExp > 0f)
-			{
-				bool flag = false;
-				bool arg = false;
-				beforeUpdateLevel = nowLevel;
-				UpdateCurveEvaluate();
-				float num = addCountExpValue;
-				if (num >= totalExp || skip)
-				{
-					flag = skip;
-					skip = false;
-					num = totalExp;
-					isProgressAnim = false;
-					isEnd = true;
-					if (callBack != null)
-					{
-						callBack();
-					}
-				}
-				float num2 = 0f;
-				do
-				{
-					num2 = (num - (float)(int)nowLevelTable.needExp) / (float)((int)levelTable.needExp - (int)nowLevelTable.needExp);
-					if (num2 >= 1f)
-					{
-						arg = true;
-						progress.fillAmount = 0f;
-						nowLevel++;
-						remainLevelUpCnt--;
-						time = -1f;
-						UpdateAddCountExp(nowLevel);
-						if ((int)nowLevelTable.lv >= Singleton<UserLevelTable>.I.GetMaxLevel())
-						{
-							num2 = 0f;
-							progress.fillAmount = num2;
-						}
-						if (!flag)
-						{
-							num = (float)(int)nowLevelTable.needExp;
-						}
-					}
-					else
-					{
-						progress.fillAmount = num2;
-					}
-				}
-				while (num2 >= 1f);
-				if (OnUpdate != null)
-				{
-					OnUpdate(arg, (int)(num - startExp), this);
-				}
-			}
-			else
-			{
-				isProgressAnim = false;
-				isEnd = true;
-				if (callBack != null)
-				{
-					callBack();
-				}
-			}
-		}
-	}
+  public void Update()
+  {
+    if (!this.isProgressAnim)
+      return;
+    if ((double) this.getExp > 0.0)
+    {
+      bool flag1 = false;
+      bool flag2 = false;
+      this.beforeUpdateLevel = this.nowLevel;
+      this.UpdateCurveEvaluate();
+      float num1 = this.addCountExpValue;
+      if ((double) num1 >= (double) this.totalExp || this.skip)
+      {
+        flag1 = this.skip;
+        this.skip = false;
+        num1 = this.totalExp;
+        this.isProgressAnim = false;
+        this.isEnd = true;
+        if (this.callBack != null)
+          this.callBack();
+      }
+      float num2;
+      do
+      {
+        num2 = (num1 - (float) (int) this.nowLevelTable.needExp) / (float) ((int) this.levelTable.needExp - (int) this.nowLevelTable.needExp);
+        if ((double) num2 >= 1.0)
+        {
+          flag2 = true;
+          this.progress.fillAmount = 0.0f;
+          ++this.nowLevel;
+          --this.remainLevelUpCnt;
+          this.time = -1f;
+          this.UpdateAddCountExp(this.nowLevel);
+          if ((int) this.nowLevelTable.lv >= Singleton<UserLevelTable>.I.GetMaxLevel())
+          {
+            num2 = 0.0f;
+            this.progress.fillAmount = num2;
+          }
+          if (!flag1)
+            num1 = (float) (int) this.nowLevelTable.needExp;
+        }
+        else
+          this.progress.fillAmount = num2;
+      }
+      while ((double) num2 >= 1.0);
+      if (this.OnUpdate == null)
+        return;
+      this.OnUpdate(flag2, (int) ((double) num1 - (double) this.startExp), this);
+    }
+    else
+    {
+      this.isProgressAnim = false;
+      this.isEnd = true;
+      if (this.callBack == null)
+        return;
+      this.callBack();
+    }
+  }
 }

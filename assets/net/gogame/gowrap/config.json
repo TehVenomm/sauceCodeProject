@@ -7,12 +7,18 @@
           "facebookUrl" : "https://www.facebook.com/groups/DragonProjectEvents/",
           "twitterUrl" : "https://twitter.com/dragonprojectgl",
           "youtubeUrl" : "https://www.youtube.com/c/DragonProject",
-          "instagramUrl" : "https://www.instagram.com/dragonprojectglobal/"
+          "instagramUrl" : "https://www.instagram.com/dragonprojectglobal/",
+          "wikiUrl" : "",
+          "forumUrl" : null
         }
       },
       "supportedLocales" : [ "default" ],
       "slideOut" : true,
       "slideIn" : true
     }
+  },
+  "settings" : {
+    "chatBotEnabled" : false,
+    "newsWidgetVersion" : "2017-1"
   }
 }

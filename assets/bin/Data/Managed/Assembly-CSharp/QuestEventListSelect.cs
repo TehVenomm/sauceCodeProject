@@ -1,84 +1,80 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestEventListSelect
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class QuestEventListSelect : QuestListSelectBase
 {
-	private EventLocationData[] eventLocation;
+  private EventLocationData[] eventLocation;
 
-	public override void Initialize()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoInitialize());
-	}
+  public override void Initialize() => this.StartCoroutine(this.DoInitialize());
 
-	private IEnumerator DoInitialize()
-	{
-		bool is_recv = true;
-		while (!is_recv)
-		{
-			yield return (object)null;
-		}
-		base.Initialize();
-	}
+  private IEnumerator DoInitialize()
+  {
+    bool is_recv = false;
+    is_recv = true;
+    while (!is_recv)
+      yield return (object) null;
+    base.Initialize();
+  }
 
-	public override void UpdateUI()
-	{
-		SetActive((Enum)UI.BTN_SORT, false);
-		if (eventLocation == null || eventLocation.Length == 0)
-		{
-			SetActive((Enum)UI.STR_NON_LIST, true);
-		}
-		else
-		{
-			SetActive((Enum)UI.STR_NON_LIST, false);
-			SetGrid(UI.GRD_QUEST, "QuestEventListSelectItem", eventLocation.Length, true, delegate(int i, Transform t, bool is_recycle)
-			{
-				SetEvent(t, "SELECT_EVENT", i);
-				SetTexture(t, UI.TEX_EVENT_BANNER, null);
-				SetLabelText(t, UI.LBL_QUEST_NAME, string.Empty);
-				SetLabelText(t, UI.LBL_REMAIN_TIME, eventLocation[i].eventAppearRemain);
-				if (eventLocation[i].isPayingLocation)
-				{
-					SetActive(t, UI.SPR_CRYSTAL, true);
-					SetActive(t, UI.SPR_FREE_PLAY, eventLocation[i].isFreePlaying);
-					SetLabelText(t, UI.LBL_PAYING_REMAIN, eventLocation[i].eventFreePayingRemain);
-				}
-				else
-				{
-					SetActive(t, UI.SPR_CRYSTAL, false);
-				}
-			});
-			base.UpdateUI();
-		}
-	}
+  public override void UpdateUI()
+  {
+    this.SetActive((Enum) QuestListSelectBase.UI.BTN_SORT, false);
+    if (this.eventLocation == null || this.eventLocation.Length == 0)
+    {
+      this.SetActive((Enum) QuestListSelectBase.UI.STR_NON_LIST, true);
+    }
+    else
+    {
+      this.SetActive((Enum) QuestListSelectBase.UI.STR_NON_LIST, false);
+      this.SetGrid((Enum) QuestListSelectBase.UI.GRD_QUEST, "QuestEventListSelectItem", this.eventLocation.Length, true, (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+      {
+        this.SetEvent(t, "SELECT_EVENT", i);
+        this.SetTexture(t, (Enum) QuestListSelectBase.UI.TEX_EVENT_BANNER, (Texture) null);
+        this.SetLabelText(t, (Enum) QuestListSelectBase.UI.LBL_QUEST_NAME, string.Empty);
+        this.SetLabelText(t, (Enum) QuestListSelectBase.UI.LBL_REMAIN_TIME, this.eventLocation[i].eventAppearRemain);
+        if (this.eventLocation[i].isPayingLocation)
+        {
+          this.SetActive(t, (Enum) QuestListSelectBase.UI.SPR_CRYSTAL, true);
+          this.SetActive(t, (Enum) QuestListSelectBase.UI.SPR_FREE_PLAY, this.eventLocation[i].isFreePlaying);
+          this.SetLabelText(t, (Enum) QuestListSelectBase.UI.LBL_PAYING_REMAIN, this.eventLocation[i].eventFreePayingRemain);
+        }
+        else
+          this.SetActive(t, (Enum) QuestListSelectBase.UI.SPR_CRYSTAL, false);
+      }));
+      base.UpdateUI();
+    }
+  }
 
-	public void OnQuery_SELECT_EVENT()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			QUEST_TYPE.EVENT
-		});
-	}
+  public void OnQuery_SELECT_EVENT()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) QUEST_TYPE.EVENT
+    });
+  }
 
-	public override EventData CheckAutoEvent(string event_name, object event_data)
-	{
-		if (event_name == "SELECT_EVENT")
-		{
-			int num = -1;
-			EventLocationData eventLocationData = null;
-			if (eventLocationData != null)
-			{
-				num = Array.IndexOf(eventLocation, eventLocationData);
-			}
-			if (num == -1)
-			{
-				MonoBehaviourSingleton<QuestManager>.I.EndHowToGetAutoEvent();
-				event_name = "AUTO_TARGET_NONE";
-				num = 0;
-			}
-			return new EventData(event_name, num);
-		}
-		return base.CheckAutoEvent(event_name, event_data);
-	}
+  public override EventData CheckAutoEvent(string event_name, object event_data)
+  {
+    if (!(event_name == "SELECT_EVENT"))
+      return base.CheckAutoEvent(event_name, event_data);
+    int _data = -1;
+    EventLocationData eventLocationData = (EventLocationData) null;
+    if (eventLocationData != null)
+      _data = Array.IndexOf<EventLocationData>(this.eventLocation, eventLocationData);
+    if (_data == -1)
+    {
+      MonoBehaviourSingleton<QuestManager>.I.EndHowToGetAutoEvent();
+      event_name = "AUTO_TARGET_NONE";
+      _data = 0;
+    }
+    return new EventData(event_name, (object) _data);
+  }
 }

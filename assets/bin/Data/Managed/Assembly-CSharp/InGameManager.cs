@@ -1,1529 +1,1397 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: InGameManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using App.Scripts.GoGame.Optimization;
 using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class InGameManager : MonoBehaviourSingleton<InGameManager>
 {
-	public enum VoiceOption
-	{
-		ENGLISH,
-		JAPANESE,
-		MUTE
-	}
+  public const string defaultVariant = "en-sd";
+  public static string[] voiceVariants = new string[2]
+  {
+    "en-sd",
+    "jp-sd"
+  };
+  public static string[] languageVariants = new string[8]
+  {
+    "en-sd",
+    "fr-sd",
+    "ge-sd",
+    "it-sd",
+    "po-sd",
+    "th-sd",
+    "vn-sd",
+    "es-sd"
+  };
+  public const int GRAPHIC_OPTION_LOW = 0;
+  public const int GRAPHIC_OPTION_STANDARD = 1;
+  public const int GRAPHIC_OPTION_HIGH = 2;
+  public const int GRAPHIC_OPTION_HIGHEST = 3;
+  public const string GRAPHIC_OPTION_KEY_LOW = "low";
+  public const string GRAPHIC_OPTION_KEY_STANDARD = "standard";
+  public const string GRAPHIC_OPTION_KEY_HIGH = "high";
+  public const string GRAPHIC_OPTION_KEY_HIGHEST = "highest";
+  public const int ARROW_CAMERA_OPTION_A = 0;
+  public const int ARROW_CAMERA_OPTION_B = 1;
+  public const string ARROW_CAMERA_OPTION_KEY_A = "typea";
+  public const string ARROW_CAMERA_OPTION_KEY_B = "typeb";
+  [NonSerialized]
+  public int graphicOptionType;
+  [NonSerialized]
+  public int arrowCameraType = 1;
+  public List<UIInGamePopupDialog.Desc> dialogOpenInfoList = new List<UIInGamePopupDialog.Desc>();
+  protected List<FieldDropObject> dropList = new List<FieldDropObject>();
+  protected List<GameObject> dropNCaches = new List<GameObject>();
+  protected List<GameObject> dropHNCaches = new List<GameObject>();
+  protected List<GameObject> dropRCaches = new List<GameObject>();
+  protected List<GameObject> dropLoungeCaches = new List<GameObject>();
+  protected List<GameObject> bossDropNCaches = new List<GameObject>();
+  protected List<GameObject> bossDropRCaches = new List<GameObject>();
+  protected List<GameObject> bossDropRegionBreakCaches = new List<GameObject>();
+  protected List<GameObject> dropSPNCaches = new List<GameObject>();
+  protected List<GameObject> dropSPHNCaches = new List<GameObject>();
+  protected List<GameObject> dropSPRCaches = new List<GameObject>();
+  protected List<GameObject> dropHalloweenCaches = new List<GameObject>();
+  protected List<GameObject> dropESPNCaches = new List<GameObject>();
+  protected List<GameObject> dropESPHNCaches = new List<GameObject>();
+  protected List<GameObject> dropESPRCaches = new List<GameObject>();
+  protected List<GameObject> dropSeasonalCaches = new List<GameObject>();
+  public InGameManager.IntervalTransferInfo intervalTransferInfo;
+  [NonSerialized]
+  public DeliveryBattleChecker deliveryBattleChecker = new DeliveryBattleChecker();
+  [NonSerialized]
+  public bool isAlreadyBattleStarted;
+  public EventData[] requestEventData;
+  [NonSerialized]
+  public List<uint> disableHappenQuestIdList = new List<uint>();
+  public List<Coop_Model_EventHappenQuestStatus.Status> happenQuestStatusList;
+  public InGameManager.QuestTransferInfo questTransferInfo;
+  private int rushIndex;
+  private PartyModel.RushInfo rushInfo;
+  private Coop_Model_EnemyInitialize rushBossBackup;
+  private int arenaIndex;
+  private PartyModel.ArenaInfo arenaInfo;
+  private Coop_Model_EnemyInitialize seriesBossBackup;
+  [NonSerialized]
+  public CoopClient.CLIENT_JOIN_TYPE currentJoinType;
+  private IEnumerator updateIntervalTransferInfoRemaindTime;
+  private static string[] disableEffectsGraphicLow = new string[23]
+  {
+    "ef_btl_pl_runsmoke_",
+    "ef_ui_skillgauge_",
+    "ef_btl_pl_avoidsmoke_",
+    "ef_btl_pl_landingsmoke_",
+    "ef_btl_bg_takingspot_",
+    "ef_btl_damage_add_blood",
+    "ef_btl_wyvern_downsmoke_",
+    "ef_btl_pl_downsmoke_",
+    "ef_btl_bg_birds_",
+    "ef_btl_bg_spray_01",
+    "ef_btl_bg_rain_01",
+    "ef_btl_pl_attacksmoke_",
+    "ef_btl_pl01_attack02smoke_",
+    "ef_btl_pl02_attack03smoke_",
+    "ef_btl_bg_magma_01",
+    "ef_btl_bg_sparks_",
+    "ef_ui_downgauge_",
+    "ef_btl_dragon_downsmoke_",
+    "ef_btl_dragon_walksmoke",
+    "ef_btl_enemy_landingsmoke_m_",
+    "ef_btl_pl_jump_01",
+    "ef_btl_wyvern_walksmoke1_",
+    "ef_btl_pl_impactsmoke_"
+  };
+
+  public List<FieldDropObject> dropItemList => this.dropList;
+
+  public GameObject selfCacheObject { get; private set; }
+
+  public bool isValidGimmickObject { get; protected set; }
 
-	public enum LanguageOption
-	{
-		ENGLISH,
-		FRENCH,
-		GERMAN,
-		ITALIAN,
-		PORTUGUESE,
-		THAI,
-		VIETNAM,
-		SPANISH
-	}
-
-	public class IntervalTransferInfo
-	{
-		public class PlayerInfo
-		{
-			public int id;
-
-			public StageObjectManager.CreatePlayerInfo createInfo;
-
-			public StageObjectManager.PlayerTransferInfo transferInfo;
-
-			public bool isSelf;
-
-			public StageObject.COOP_MODE_TYPE coopMode;
-
-			public int coopClientId;
-
-			public bool isNpcController;
-
-			public bool isCoopPlayer;
-
-			public TaskChecker taskChecker = new TaskChecker();
-		}
-
-		public float remaindTime = -1f;
-
-		public float elapsedTime = -1f;
-
-		public List<PlayerInfo> playerInfoList = new List<PlayerInfo>();
-	}
+  public bool IsQuestInField()
+  {
+    return this.isQuestHappen || this.isQuestGate || this.isQuestPortal || this.isQuestFromGimmick;
+  }
 
-	public class DropItemInfo
-	{
-		public REWARD_TYPE type;
+  public bool IsQuestInPortal() => this.isQuestGate || this.isQuestPortal;
 
-		public uint id;
+  public bool isQuestHappen { get; set; }
 
-		public int num;
+  public bool isQuestGate { get; set; }
 
-		public DropItemInfo(REWARD_TYPE _type, uint _id, int _num)
-		{
-			type = _type;
-			id = _id;
-			num = _num;
-		}
+  public bool isQuestPortal { get; set; }
 
-		public UIDropAnnounce.DropAnnounceInfo CreateAnnounceInfo(out bool is_rare)
-		{
-			is_rare = false;
-			UIDropAnnounce.DropAnnounceInfo dropAnnounceInfo = null;
-			switch (type)
-			{
-			case REWARD_TYPE.SKILL_ITEM:
-				return UIDropAnnounce.DropAnnounceInfo.CreateSkillItemInfo(id, num, out is_rare);
-			case REWARD_TYPE.EQUIP_ITEM:
-				return UIDropAnnounce.DropAnnounceInfo.CreateEquipItemInfo(id, num, out is_rare);
-			default:
-				return UIDropAnnounce.DropAnnounceInfo.CreateItemInfo(id, num, out is_rare);
-			}
-		}
-	}
+  public bool isQuestFromGimmick { get; set; }
 
-	public class DropDeliveryInfo
-	{
-		public int id;
+  public bool isStoryPortal { get; set; }
 
-		public int index;
+  public bool isGateQuestClear { get; set; }
 
-		public string name;
+  public bool isTransitionFieldToQuest { get; set; }
 
-		public string itemName;
+  public bool isTransitionQuestToField { get; set; }
 
-		public int num;
+  public bool isTransitionQuestToFieldExplore { get; set; }
 
-		public List<DELIVERY_CONDITION_TYPE> conditionTypes;
+  public bool isTransitionFieldReentry { get; set; }
 
-		private bool? isCountUpAtKillFieldEnemy;
+  public bool isRetry { get; set; }
 
-		public DropDeliveryInfo(int delivery_id, int delivery_index, string _name, string item_name, int _num, List<DELIVERY_CONDITION_TYPE> condition_type)
-		{
-			id = delivery_id;
-			index = delivery_index;
-			name = _name;
-			itemName = item_name;
-			num = _num;
-			conditionTypes = condition_type;
-		}
+  public bool isTransitionQuestToQuest { get; set; }
 
-		public bool IsCountUpAtDefeatFieldEnemy()
-		{
-			bool? nullable = isCountUpAtKillFieldEnemy;
-			if (nullable.HasValue)
-			{
-				bool? nullable2 = isCountUpAtKillFieldEnemy;
-				return nullable2.Value;
-			}
-			int i = 0;
-			for (int count = conditionTypes.Count; i < count; i++)
-			{
-				if (MonoBehaviourSingleton<DeliveryManager>.I.IsDefeatFieldConditionType(conditionTypes[i]))
-				{
-					isCountUpAtKillFieldEnemy = true;
-					return true;
-				}
-			}
-			isCountUpAtKillFieldEnemy = false;
-			return false;
-		}
-	}
+  public static bool IsReentry()
+  {
+    return InGameManager.IsValidRush() || FieldManager.IsValidInGameNoQuest() || QuestManager.IsValidInGameExplore() || QuestManager.IsValidInGameSeries() || QuestManager.IsValidInGameWaveMatch();
+  }
 
-	public class QuestTransferInfo
-	{
-		public IntervalTransferInfo intervalTransferInfo;
+  public static bool IsReentryNotLeaveParty()
+  {
+    return InGameManager.IsValidRush() || QuestManager.IsValidInGameExplore() || QuestManager.IsValidInGameSeries() || QuestManager.IsValidInGameWaveMatch();
+  }
 
-		public bool isQuestHappen;
+  public static bool IsReentryMapId()
+  {
+    return InGameManager.IsValidRush() || QuestManager.IsValidInGameExplore() || QuestManager.IsValidInGameSeries() || QuestManager.IsValidInGameWaveMatch();
+  }
 
-		public bool isQuestGate;
+  public bool isQuestResultFieldLeave { get; set; }
 
-		public bool isQuestPortal;
+  public int readStoryID { get; set; }
 
-		public bool isGateQuestClear;
+  public uint beforePortalID { get; set; }
 
-		public bool isTransitionFieldToQuest;
+  public FieldManager.FieldTransitionInfo backTransitionInfo { get; set; }
 
-		public bool isTransitionQuestToField;
+  public int rushId { get; private set; }
 
-		public bool isTransitionFieldReentry;
+  public bool isResultedRush { get; private set; }
 
-		public bool isStoryPortal;
+  public List<QuestCompleteRewardList> rushRewards { get; private set; }
 
-		public uint beforePortalID;
+  public List<PointShopResultData> rushPointShops { get; private set; }
 
-		public FieldManager.FieldTransitionInfo backTransitionInfo;
-	}
+  public List<PointEventCurrentData> rushPointEvents { get; private set; }
 
-	public class RushWaveSyncData
-	{
-		public float elapsedTime;
+  public bool isRushReentry { get; private set; }
 
-		public List<int> bossBreakIds;
-	}
+  public List<InGameManager.RushWaveSyncData> rushWaveSyncDataList { get; private set; }
 
-	public const string defaultVariant = "en-sd";
+  public bool IsRush() => this.rushInfo != null;
 
-	public const int GRAPHIC_OPTION_LOW = 0;
+  public static bool IsValidRush()
+  {
+    return MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.IsRush();
+  }
 
-	public const int GRAPHIC_OPTION_STANDARD = 1;
+  public void ClearRush()
+  {
+    this.rushInfo = (PartyModel.RushInfo) null;
+    this.rushId = 0;
+    this.rushIndex = 0;
+    this.rushRewards = (List<QuestCompleteRewardList>) null;
+    this.rushPointEvents = (List<PointEventCurrentData>) null;
+    this.rushPointShops = (List<PointShopResultData>) null;
+    this.rushWaveSyncDataList = (List<InGameManager.RushWaveSyncData>) null;
+    this.isResultedRush = false;
+  }
 
-	public const int GRAPHIC_OPTION_HIGH = 2;
+  public void SetRushInfo(int rushId, PartyModel.RushInfo rushInfo)
+  {
+    this.rushId = rushId;
+    this.rushInfo = rushInfo;
+    this.rushIndex = 0;
+    this.rushRewards = new List<QuestCompleteRewardList>();
+    this.rushPointShops = new List<PointShopResultData>();
+    this.rushPointEvents = new List<PointEventCurrentData>();
+    this.rushWaveSyncDataList = new List<InGameManager.RushWaveSyncData>();
+  }
 
-	public const int GRAPHIC_OPTION_HIGHEST = 3;
+  public void SetResultedRush() => this.isResultedRush = true;
 
-	public const string GRAPHIC_OPTION_KEY_LOW = "low";
+  public void ProgressRush() => ++this.rushIndex;
 
-	public const string GRAPHIC_OPTION_KEY_STANDARD = "standard";
+  public bool IsLastRash() => this.rushInfo.waves.Count - 1 <= this.rushIndex;
 
-	public const string GRAPHIC_OPTION_KEY_HIGH = "high";
+  public int GetRushIndex() => this.rushIndex;
 
-	public const string GRAPHIC_OPTION_KEY_HIGHEST = "highest";
+  public uint GetCurrentRushQuestId() => (uint) this.rushInfo.waves[this.rushIndex].questId;
 
-	public const int ARROW_CAMERA_OPTION_A = 0;
+  public int GetCurrentWaveNum() => this.rushInfo.waves[this.rushIndex].wave;
 
-	public const int ARROW_CAMERA_OPTION_B = 1;
+  public int GetWaveNum(int index) => this.rushInfo.waves[index].wave;
+
+  public int GetCurrentRushRescureResetNum() => this.rushInfo.waves[this.rushIndex].rescueResetNum;
+
+  public bool CanRushPayContinue() => this.rushInfo.continueFlag > 0;
+
+  public int GetRushQuestId(int wave)
+  {
+    return this.rushInfo.waves.Find((Predicate<PartyModel.RushInfo.WaveInfo>) (w => w.wave == wave)).questId;
+  }
+
+  public void AddWaveResult(
+    QuestCompleteRewardList reward,
+    List<PointEventCurrentData> pointEvent,
+    List<PointShopResultData> pointShop)
+  {
+    this.rushRewards.Add(reward);
+    this.rushPointEvents.AddRange((IEnumerable<PointEventCurrentData>) pointEvent);
+    this.AddRushPointShop(pointShop);
+  }
+
+  private void AddRushPointShop(List<PointShopResultData> pointShop)
+  {
+    foreach (PointShopResultData pointShopResultData1 in pointShop)
+    {
+      PointShopResultData add_data = pointShopResultData1;
+      PointShopResultData pointShopResultData2 = this.rushPointShops.Find((Predicate<PointShopResultData>) (list_data => list_data.pointShopId == add_data.pointShopId));
+      if (pointShopResultData2 == null)
+      {
+        this.rushPointShops.Add(add_data);
+      }
+      else
+      {
+        pointShopResultData2.getPoint += add_data.getPoint;
+        pointShopResultData2.totalPoint = add_data.totalPoint;
+      }
+    }
+  }
 
-	public const string ARROW_CAMERA_OPTION_KEY_A = "typea";
+  public void BackupRushStageInReentry()
+  {
+    this.rushBossBackup = (Coop_Model_EnemyInitialize) null;
+    Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+    if (Object.op_Inequality((Object) boss, (Object) null))
+      this.rushBossBackup = boss.CreateBackup();
+    this.isRushReentry = true;
+  }
 
-	public const string ARROW_CAMERA_OPTION_KEY_B = "typeb";
+  public void RestoreRushInReentry()
+  {
+    Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+    if (!Object.op_Inequality((Object) boss, (Object) null) || this.rushBossBackup == null)
+      return;
+    boss.enemyReceiver.Set(new CoopPacket()
+    {
+      model = (Coop_Model_Base) this.rushBossBackup
+    });
+  }
 
-	public static string[] voiceVariants = new string[2]
-	{
-		"en-sd",
-		"jp-sd"
-	};
-
-	public static string[] languageVariants = new string[8]
-	{
-		"en-sd",
-		"fr-sd",
-		"ge-sd",
-		"it-sd",
-		"po-sd",
-		"th-sd",
-		"vn-sd",
-		"es-sd"
-	};
-
-	[NonSerialized]
-	public int graphicOptionType;
-
-	[NonSerialized]
-	public int arrowCameraType = 1;
-
-	public List<UIInGamePopupDialog.Desc> dialogOpenInfoList = new List<UIInGamePopupDialog.Desc>();
-
-	protected List<FieldDropObject> dropList = new List<FieldDropObject>();
-
-	protected List<GameObject> dropNCaches = new List<GameObject>();
-
-	protected List<GameObject> dropHNCaches = new List<GameObject>();
-
-	protected List<GameObject> dropRCaches = new List<GameObject>();
-
-	protected List<GameObject> dropLoungeCaches = new List<GameObject>();
-
-	protected List<GameObject> bossDropNCaches = new List<GameObject>();
-
-	protected List<GameObject> bossDropRCaches = new List<GameObject>();
-
-	protected List<GameObject> bossDropRegionBreakCaches = new List<GameObject>();
-
-	protected List<GameObject> dropSPNCaches = new List<GameObject>();
-
-	protected List<GameObject> dropSPHNCaches = new List<GameObject>();
-
-	protected List<GameObject> dropSPRCaches = new List<GameObject>();
-
-	protected List<GameObject> dropHalloweenCaches = new List<GameObject>();
-
-	public IntervalTransferInfo intervalTransferInfo;
-
-	[NonSerialized]
-	public DeliveryBattleChecker deliveryBattleChecker = new DeliveryBattleChecker();
-
-	[NonSerialized]
-	public bool isAlreadyBattleStarted;
-
-	[NonSerialized]
-	public List<uint> disableHappenQuestIdList = new List<uint>();
-
-	public QuestTransferInfo questTransferInfo;
-
-	private int rushIndex;
-
-	private PartyModel.RushInfo rushInfo;
-
-	private Coop_Model_EnemyInitialize rushBossBackup;
-
-	private int arenaIndex;
-
-	private PartyModel.ArenaInfo arenaInfo;
-
-	[NonSerialized]
-	public CoopClient.CLIENT_JOIN_TYPE currentJoinType;
-
-	private IEnumerator updateIntervalTransferInfoRemaindTime;
-
-	private static string[] disableEffectsGraphicLow = new string[23]
-	{
-		"ef_btl_pl_runsmoke_",
-		"ef_ui_skillgauge_",
-		"ef_btl_pl_avoidsmoke_",
-		"ef_btl_pl_landingsmoke_",
-		"ef_btl_bg_takingspot_",
-		"ef_btl_damage_add_blood",
-		"ef_btl_wyvern_downsmoke_",
-		"ef_btl_pl_downsmoke_",
-		"ef_btl_bg_birds_",
-		"ef_btl_bg_spray_01",
-		"ef_btl_bg_rain_01",
-		"ef_btl_pl_attacksmoke_",
-		"ef_btl_pl01_attack02smoke_",
-		"ef_btl_pl02_attack03smoke_",
-		"ef_btl_bg_magma_01",
-		"ef_btl_bg_sparks_",
-		"ef_ui_downgauge_",
-		"ef_btl_dragon_downsmoke_",
-		"ef_btl_dragon_walksmoke",
-		"ef_btl_enemy_landingsmoke_m_",
-		"ef_btl_pl_jump_01",
-		"ef_btl_wyvern_walksmoke1_",
-		"ef_btl_pl_impactsmoke_"
-	};
-
-	public List<FieldDropObject> dropItemList => dropList;
-
-	public GameObject selfCacheObject
-	{
-		get;
-		private set;
-	}
-
-	public bool isValidGimmickObject
-	{
-		get;
-		protected set;
-	}
-
-	public bool isQuestHappen
-	{
-		get;
-		set;
-	}
-
-	public bool isQuestGate
-	{
-		get;
-		set;
-	}
-
-	public bool isQuestPortal
-	{
-		get;
-		set;
-	}
-
-	public bool isStoryPortal
-	{
-		get;
-		set;
-	}
-
-	public bool isGateQuestClear
-	{
-		get;
-		set;
-	}
-
-	public bool isTransitionFieldToQuest
-	{
-		get;
-		set;
-	}
-
-	public bool isTransitionQuestToField
-	{
-		get;
-		set;
-	}
-
-	public bool isTransitionQuestToFieldExplore
-	{
-		get;
-		set;
-	}
-
-	public bool isTransitionFieldReentry
-	{
-		get;
-		set;
-	}
-
-	public bool isRetry
-	{
-		get;
-		set;
-	}
-
-	public bool isTransitionQuestToQuest
-	{
-		get;
-		set;
-	}
-
-	public bool isQuestResultFieldLeave
-	{
-		get;
-		set;
-	}
-
-	public uint beforePortalID
-	{
-		get;
-		set;
-	}
-
-	public FieldManager.FieldTransitionInfo backTransitionInfo
-	{
-		get;
-		set;
-	}
-
-	public int rushId
-	{
-		get;
-		private set;
-	}
-
-	public List<QuestCompleteRewardList> rushRewards
-	{
-		get;
-		private set;
-	}
-
-	public List<PointShopResultData> rushPointShops
-	{
-		get;
-		private set;
-	}
-
-	public List<PointEventCurrentData> rushPointEvents
-	{
-		get;
-		private set;
-	}
-
-	public bool isRushReentry
-	{
-		get;
-		private set;
-	}
-
-	public List<RushWaveSyncData> rushWaveSyncDataList
-	{
-		get;
-		private set;
-	}
-
-	public List<QuestCompleteRewardList> arenaRewards
-	{
-		get;
-		private set;
-	}
-
-	public List<PointShopResultData> arenaPointShops
-	{
-		get;
-		private set;
-	}
-
-	public bool IsQuestInField()
-	{
-		return isQuestHappen || isQuestGate || isQuestPortal;
-	}
-
-	public bool IsQuestInPortal()
-	{
-		return isQuestGate || isQuestPortal;
-	}
-
-	public static bool IsReentry()
-	{
-		return IsValidRush() || FieldManager.IsValidInGameNoQuest() || QuestManager.IsValidInGameExplore();
-	}
-
-	public static bool IsReentryNotLeaveParty()
-	{
-		return IsValidRush() || QuestManager.IsValidInGameExplore();
-	}
-
-	public static bool IsReentryMapId()
-	{
-		return IsValidRush() || QuestManager.IsValidInGameExplore();
-	}
-
-	public bool IsRush()
-	{
-		return rushInfo != null;
-	}
-
-	public static bool IsValidRush()
-	{
-		return MonoBehaviourSingleton<InGameManager>.IsValid() && MonoBehaviourSingleton<InGameManager>.I.IsRush();
-	}
-
-	public void ClearRush()
-	{
-		rushInfo = null;
-		rushId = 0;
-		rushIndex = 0;
-		rushRewards = null;
-		rushPointEvents = null;
-		rushPointShops = null;
-		rushWaveSyncDataList = null;
-	}
-
-	public void SetRushInfo(int rushId, PartyModel.RushInfo rushInfo)
-	{
-		this.rushId = rushId;
-		this.rushInfo = rushInfo;
-		rushIndex = 0;
-		rushRewards = new List<QuestCompleteRewardList>();
-		rushPointShops = new List<PointShopResultData>();
-		rushPointEvents = new List<PointEventCurrentData>();
-		rushWaveSyncDataList = new List<RushWaveSyncData>();
-	}
-
-	public void ProgressRush()
-	{
-		rushIndex++;
-	}
-
-	public bool IsLastRash()
-	{
-		return rushInfo.waves.Count - 1 <= rushIndex;
-	}
-
-	public int GetRushIndex()
-	{
-		return rushIndex;
-	}
-
-	public uint GetCurrentRushQuestId()
-	{
-		return (uint)rushInfo.waves[rushIndex].questId;
-	}
-
-	public int GetCurrentWaveNum()
-	{
-		return rushInfo.waves[rushIndex].wave;
-	}
-
-	public int GetWaveNum(int index)
-	{
-		return rushInfo.waves[index].wave;
-	}
-
-	public int GetCurrentRushRescureResetNum()
-	{
-		return rushInfo.waves[rushIndex].rescueResetNum;
-	}
-
-	public bool CanRushPayContinue()
-	{
-		return rushInfo.continueFlag > 0;
-	}
-
-	public int GetRushQuestId(int wave)
-	{
-		return rushInfo.waves.Find((PartyModel.RushInfo.WaveInfo w) => w.wave == wave).questId;
-	}
-
-	public void AddWaveResult(QuestCompleteRewardList reward, List<PointEventCurrentData> pointEvent, List<PointShopResultData> pointShop)
-	{
-		rushRewards.Add(reward);
-		rushPointEvents.AddRange(pointEvent);
-		AddRushPointShop(pointShop);
-	}
-
-	private void AddRushPointShop(List<PointShopResultData> pointShop)
-	{
-		using (List<PointShopResultData>.Enumerator enumerator = pointShop.GetEnumerator())
-		{
-			PointShopResultData add_data;
-			while (enumerator.MoveNext())
-			{
-				add_data = enumerator.Current;
-				PointShopResultData pointShopResultData = rushPointShops.Find((PointShopResultData list_data) => list_data.pointShopId == add_data.pointShopId);
-				if (pointShopResultData == null)
-				{
-					rushPointShops.Add(add_data);
-				}
-				else
-				{
-					pointShopResultData.getPoint += add_data.getPoint;
-					pointShopResultData.totalPoint = add_data.totalPoint;
-				}
-			}
-		}
-	}
-
-	public void BackupRushStageInReentry()
-	{
-		rushBossBackup = null;
-		Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-		if (boss != null)
-		{
-			rushBossBackup = boss.CreateBackup();
-		}
-		isRushReentry = true;
-	}
-
-	public void RestoreRushInReentry()
-	{
-		Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-		if (boss != null && rushBossBackup != null)
-		{
-			CoopPacket coopPacket = new CoopPacket();
-			coopPacket.model = rushBossBackup;
-			boss.enemyReceiver.Set(coopPacket);
-		}
-	}
-
-	public void ResetRushInReentry()
-	{
-		isRushReentry = false;
-		rushBossBackup = null;
-	}
-
-	public int GetCurrentRushStandupHpPer()
-	{
-		return rushInfo.waves[rushIndex].standupHpPer;
-	}
-
-	public void RecordRushWaveSyncData()
-	{
-		CoopStage coopStage = MonoBehaviourSingleton<CoopManager>.I.coopStage;
-		RushWaveSyncData rushWaveSyncData = new RushWaveSyncData();
-		rushWaveSyncData.bossBreakIds = coopStage.bossBreakIDLists[0];
-		rushWaveSyncData.elapsedTime = MonoBehaviourSingleton<InGameProgress>.I.GetElapsedTime();
-		rushWaveSyncDataList.Add(rushWaveSyncData);
-	}
-
-	public RushWaveSyncData GetRushSyncData(int index)
-	{
-		if (rushWaveSyncDataList.Count > index)
-		{
-			return rushWaveSyncDataList[index];
-		}
-		return null;
-	}
-
-	public void SetArenaInfo(int arenaId)
-	{
-		ArenaTable.ArenaData arenaData = Singleton<ArenaTable>.I.GetArenaData(arenaId);
-		arenaInfo = new PartyModel.ArenaInfo();
-		arenaInfo.arenaData = arenaData;
-		for (int i = 0; i < 5; i++)
-		{
-			if (arenaData.questIds[i] > 0)
-			{
-				PartyModel.ArenaInfo.WaveInfo waveInfo = new PartyModel.ArenaInfo.WaveInfo();
-				waveInfo.wave = i + 1;
-				waveInfo.questId = arenaData.questIds[i];
-				arenaInfo.waves.Add(waveInfo);
-			}
-		}
-		arenaIndex = 0;
-		arenaRewards = new List<QuestCompleteRewardList>();
-		arenaPointShops = new List<PointShopResultData>();
-	}
-
-	public void ClearArenaInfo()
-	{
-		arenaInfo = null;
-		arenaIndex = 0;
-		arenaRewards = null;
-		arenaPointShops = null;
-	}
-
-	public bool HasArenaInfo()
-	{
-		return arenaInfo != null;
-	}
-
-	public bool IsArenaTimeAttack()
-	{
-		return HasArenaInfo() && arenaInfo.arenaData.rank == ARENA_RANK.S;
-	}
-
-	public ARENA_CONDITION[] GetArenaConditions()
-	{
-		if (arenaInfo == null)
-		{
-			return null;
-		}
-		if (arenaInfo.arenaData == null)
-		{
-			return null;
-		}
-		return arenaInfo.arenaData.conditions;
-	}
-
-	public void ProgressArena()
-	{
-		arenaIndex++;
-	}
-
-	public bool IsArenaFirstWave()
-	{
-		return arenaIndex <= 0;
-	}
-
-	public bool IsArenaFinalWave()
-	{
-		return arenaInfo.waves.Count - 1 <= arenaIndex;
-	}
-
-	public int GetArenaWaveMax()
-	{
-		return arenaInfo.waves.Count;
-	}
-
-	public int GetCurrentArenaWaveNum()
-	{
-		return arenaInfo.waves[arenaIndex].wave;
-	}
-
-	public uint GetCurrentArenaQuestId()
-	{
-		return (uint)arenaInfo.waves[arenaIndex].questId;
-	}
-
-	public uint GetFirstArenaQuestId()
-	{
-		return (uint)arenaInfo.waves[0].questId;
-	}
-
-	public bool ContainsArenaCondition(ARENA_CONDITION condition)
-	{
-		if (!HasArenaInfo())
-		{
-			return false;
-		}
-		Debug.Log((object)arenaInfo.arenaData.id);
-		for (int i = 0; i < arenaInfo.arenaData.conditions.Length; i++)
-		{
-			if (arenaInfo.arenaData.conditions[i] == condition)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public ARENA_GROUP GetCurrentArenaGroup()
-	{
-		return arenaInfo.arenaData.group;
-	}
-
-	public ARENA_RANK GetCurrentArenaRank()
-	{
-		return arenaInfo.arenaData.rank;
-	}
-
-	public void AddArenaWaveResult(QuestCompleteRewardList reward, List<PointShopResultData> pointShop)
-	{
-		arenaRewards.Add(reward);
-		AddArenaPointShop(pointShop);
-	}
-
-	private void AddArenaPointShop(List<PointShopResultData> pointShop)
-	{
-		using (List<PointShopResultData>.Enumerator enumerator = pointShop.GetEnumerator())
-		{
-			PointShopResultData addData;
-			while (enumerator.MoveNext())
-			{
-				addData = enumerator.Current;
-				PointShopResultData pointShopResultData = arenaPointShops.Find((PointShopResultData listData) => listData.pointShopId == addData.pointShopId);
-				if (pointShopResultData == null)
-				{
-					arenaPointShops.Add(addData);
-				}
-				else
-				{
-					pointShopResultData.getPoint += addData.getPoint;
-					pointShopResultData.totalPoint = addData.totalPoint;
-				}
-			}
-		}
-	}
-
-	public static bool IsValidInGameTest()
-	{
-		bool flag = false;
-		return MonoBehaviourSingleton<InGameManager>.IsValid() && flag;
-	}
-
-	public static bool IsValidInGameTestField()
-	{
-		bool flag = false;
-		return MonoBehaviourSingleton<InGameManager>.IsValid() && flag;
-	}
-
-	protected override void Awake()
-	{
-		base.Awake();
-		UpdateConfig();
-	}
-
-	public static int GetGraphicOptionType(string key)
-	{
-		int result = 1;
-		switch (key)
-		{
-		case "low":
-			result = 0;
-			break;
-		case "standard":
-			result = 1;
-			break;
-		case "high":
-			result = 2;
-			break;
-		case "highest":
-			result = 3;
-			break;
-		}
-		return result;
-	}
-
-	public void UpdateConfig()
-	{
-		graphicOptionType = 0;
-		arrowCameraType = 1;
-		if (GameSaveData.instance != null)
-		{
-			graphicOptionType = GetGraphicOptionType(GameSaveData.instance.graphicOptionKey);
-			arrowCameraType = GetArrowCameraType(GameSaveData.instance.arrowCameraKey);
-		}
-	}
-
-	public static int GetArrowCameraType(string key)
-	{
-		int result = 1;
-		switch (key)
-		{
-		case "typea":
-			result = 0;
-			break;
-		case "typeb":
-			result = 1;
-			break;
-		}
-		return result;
-	}
-
-	public void OnEndInGameScene()
-	{
-		dialogOpenInfoList = new List<UIInGamePopupDialog.Desc>();
-		intervalTransferInfo = null;
-		isQuestHappen = false;
-		isQuestGate = false;
-		isQuestPortal = false;
-		isGateQuestClear = false;
-		isTransitionFieldToQuest = false;
-		isTransitionQuestToField = false;
-		isTransitionQuestToFieldExplore = false;
-		isTransitionFieldReentry = false;
-		isStoryPortal = false;
-		isAlreadyBattleStarted = false;
-		beforePortalID = 0u;
-		backTransitionInfo = null;
-		currentJoinType = CoopClient.CLIENT_JOIN_TYPE.NONE;
-		MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_GRAB, false);
-		MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_COMMAND, false);
-		ClearAllDrop();
-		StopIntervalTransferInfoRemaindTimeUpdate();
-	}
-
-	public string GetCurrentStageName()
-	{
-		string result = "ST011D_01";
-		if (MonoBehaviourSingleton<FieldManager>.IsValid())
-		{
-			result = MonoBehaviourSingleton<FieldManager>.I.GetCurrentMapStageName();
-		}
-		return result;
-	}
-
-	public float GetCurrentLimitTime()
-	{
-		float result = 0f;
-		if (QuestManager.IsValidInGameExplore())
-		{
-			if (MonoBehaviourSingleton<QuestManager>.I.currentQuestID != 0)
-			{
-				result = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestLimitTime();
-			}
-		}
-		else if (IsRush())
-		{
-			int questId = rushInfo.waves[0].questId;
-			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)questId);
-			result = questData.limitTime;
-			if (intervalTransferInfo != null && intervalTransferInfo.remaindTime >= 0f)
-			{
-				result = intervalTransferInfo.remaindTime;
-			}
-		}
-		else if (HasArenaInfo())
-		{
-			result = (float)arenaInfo.arenaData.timeLimit * 0.001f;
-			if (intervalTransferInfo != null && intervalTransferInfo.remaindTime >= 0f)
-			{
-				result = intervalTransferInfo.remaindTime;
-			}
-		}
-		else if (QuestManager.IsValidInGame())
-		{
-			if (intervalTransferInfo != null && intervalTransferInfo.remaindTime >= 0f)
-			{
-				result = intervalTransferInfo.remaindTime;
-			}
-			else if (MonoBehaviourSingleton<QuestManager>.I.currentQuestID != 0)
-			{
-				result = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestLimitTime();
-			}
-		}
-		else
-		{
-			result = 0f;
-		}
-		return result;
-	}
-
-	public bool IsNeedInitBoss()
-	{
-		bool result = false;
-		if (QuestManager.IsValidInGame())
-		{
-			if (MonoBehaviourSingleton<QuestManager>.I.IsExplore())
-			{
-				QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
-				uint mapId = questData.mapId;
-				result = (MonoBehaviourSingleton<FieldManager>.I.currentMapID == mapId);
-				if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsExploreBossDead())
-				{
-					result = false;
-				}
-			}
-			else
-			{
-				QuestTable.QuestTableData questData2 = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
-				result = (questData2.enemyID[MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex] > 0);
-			}
-		}
-		else if (FieldManager.IsValidInGame())
-		{
-			result = false;
-		}
-		return result;
-	}
-
-	public void CheckStageInitialState()
-	{
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		isValidGimmickObject = (MonoBehaviourSingleton<StageObjectManager>.I.gimmickList.Count > 0);
-		if (FieldManager.IsValidInGameNoBoss())
-		{
-			MonoBehaviourSingleton<InGameCameraManager>.I.hitObjectType = InGameCameraManager.CAM_HIT_OBJ_TYPE.NONE;
-		}
-		else
-		{
-			bool flag = false;
-			Transform[] componentsInChildren = MonoBehaviourSingleton<StageManager>.I._transform.GetComponentsInChildren<Transform>();
-			int i = 0;
-			for (int num = componentsInChildren.Length; i < num; i++)
-			{
-				if (componentsInChildren[i].get_gameObject().get_layer() == 18 || componentsInChildren[i].get_gameObject().get_layer() == 9 || componentsInChildren[i].get_gameObject().get_layer() == 21)
-				{
-					flag = true;
-					break;
-				}
-			}
-			if (flag)
-			{
-				MonoBehaviourSingleton<InGameCameraManager>.I.hitObjectType = InGameCameraManager.CAM_HIT_OBJ_TYPE.ZOOM;
-			}
-			else
-			{
-				MonoBehaviourSingleton<InGameCameraManager>.I.hitObjectType = InGameCameraManager.CAM_HIT_OBJ_TYPE.NONE;
-			}
-		}
-	}
-
-	public IEnumerator InitializeEnemyPop()
-	{
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<FieldManager>.IsValid())
-		{
-			List<FieldMapTable.EnemyPopTableData> enemy_pop_list = Singleton<FieldMapTable>.I.GetEnemyPopList(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
-			if (enemy_pop_list != null && enemy_pop_list.Count > 0)
-			{
-				uint quest_enemy_id = 0u;
-				int quest_enemy_lv = 0;
-				if (QuestManager.IsValidInGame())
-				{
-					quest_enemy_id = (uint)MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyID();
-					quest_enemy_lv = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyLv();
-				}
-				if (HasArenaInfo())
-				{
-					quest_enemy_lv = arenaInfo.arenaData.level;
-				}
-				List<uint> enemy_list = new List<uint>();
-				int load_count = 0;
-				int i = 0;
-				for (int len = enemy_pop_list.Count; i < len; i++)
-				{
-					FieldMapTable.EnemyPopTableData enemy_pop = enemy_pop_list[i];
-					if (enemy_pop != null)
-					{
-						uint enemy_id;
-						int enemy_level;
-						if (enemy_pop.enemyID != 0)
-						{
-							enemy_id = enemy_pop.enemyID;
-							enemy_level = (int)enemy_pop.enemyLv;
-						}
-						else
-						{
-							if (quest_enemy_id == 0)
-							{
-								continue;
-							}
-							enemy_id = quest_enemy_id;
-							enemy_level = quest_enemy_lv;
-						}
-						if (!enemy_list.Contains(enemy_id))
-						{
-							enemy_list.Add(enemy_pop.enemyID);
-							MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(0, Vector3.get_zero(), 0f, (int)enemy_id, enemy_level, enemy_pop.bossFlag, true, true, delegate(Enemy o)
-							{
-								//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-								o.get_gameObject().SetActive(false);
-								MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(o);
-								((_003CInitializeEnemyPop_003Ec__Iterator1F2)/*Error near IL_01fc: stateMachine*/)._003Cload_count_003E__4++;
-							});
-						}
-					}
-				}
-				while (load_count < enemy_list.Count)
-				{
-					yield return (object)null;
-				}
-			}
-		}
-	}
-
-	public GameObject CreateBossDropObject(int rarity)
-	{
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Expected O, but got Unknown
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0143: Expected O, but got Unknown
-		//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e6: Expected O, but got Unknown
-		GameObject val = null;
-		switch (rarity)
-		{
-		case 2:
-		{
-			int k = 0;
-			for (int count3 = bossDropRegionBreakCaches.Count; k < count3; k++)
-			{
-				if (!bossDropRegionBreakCaches[k].get_activeSelf())
-				{
-					val = bossDropRegionBreakCaches[k];
-					val.SetActive(true);
-					break;
-				}
-			}
-			if (val == null)
-			{
-				Transform val4 = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropRegionBreak, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-				if (val4 != null)
-				{
-					val = val4.get_gameObject();
-					bossDropRegionBreakCaches.Add(val);
-				}
-			}
-			break;
-		}
-		case 1:
-		{
-			int j = 0;
-			for (int count2 = bossDropRCaches.Count; j < count2; j++)
-			{
-				if (!bossDropRCaches[j].get_activeSelf())
-				{
-					val = bossDropRCaches[j];
-					val.SetActive(true);
-					break;
-				}
-			}
-			if (val == null)
-			{
-				Transform val3 = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropR, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-				if (val3 != null)
-				{
-					val = val3.get_gameObject();
-					bossDropRCaches.Add(val);
-				}
-			}
-			break;
-		}
-		default:
-		{
-			int i = 0;
-			for (int count = bossDropNCaches.Count; i < count; i++)
-			{
-				if (!bossDropNCaches[i].get_activeSelf())
-				{
-					val = bossDropNCaches[i];
-					val.SetActive(true);
-					break;
-				}
-			}
-			if (val == null)
-			{
-				Transform val2 = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropN, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-				if (val2 != null)
-				{
-					val = val2.get_gameObject();
-					bossDropNCaches.Add(val);
-				}
-			}
-			break;
-		}
-		}
-		return val;
-	}
-
-	public void CreateDropObject(Coop_Model_EnemyDefeat model, List<DropDeliveryInfo> deliveryList, List<DropItemInfo> itemList)
-	{
-		FieldDropObject fieldDropObject = FieldDropObject.Create(model, deliveryList, itemList);
-		if (fieldDropObject != null)
-		{
-			dropList.Add(fieldDropObject);
-			if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<InGameProgress>.I.isHappenQuestDirection)
-			{
-				OpenAllDropObject();
-			}
-		}
-	}
-
-	public void CreateDropInfoList(Coop_Model_EnemyDefeat model, out List<DropDeliveryInfo> deliveryList, out List<DropItemInfo> itemList)
-	{
-		itemList = new List<DropItemInfo>();
-		deliveryList = new List<DropDeliveryInfo>();
-		int i = 0;
-		for (int count = model.dropIds.Count; i < count; i++)
-		{
-			itemList.Add(new DropItemInfo((REWARD_TYPE)model.dropTypes[i], (uint)model.dropItemIds[i], model.dropNums[i]));
-		}
-		int mapId = MonoBehaviourSingleton<FieldManager>.I.GetMapId();
-		Delivery[] deliveryList2 = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList(false);
-		int j = 0;
-		for (int num = deliveryList2.Length; j < num; j++)
-		{
-			DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryList2[j].dId);
-			if (deliveryTableData != null)
-			{
-				int k = 0;
-				for (int num2 = deliveryTableData.needs.Length; k < num2; k++)
-				{
-					uint num3 = (uint)k;
-					if (deliveryTableData.IsNeedTarget(num3, (uint)model.eid, (uint)mapId) && (model.deliver & (1 << (int)deliveryTableData.GetRateType(num3))) > 0)
-					{
-						int have = 0;
-						int need = 0;
-						MonoBehaviourSingleton<DeliveryManager>.I.GetProgressDelivery(deliveryList2[j].dId, out have, out need, num3);
-						if (have < need)
-						{
-							int num4 = 1;
-							if ((model.boostBit & (1 << (int)deliveryTableData.GetRateType(num3))) > 0)
-							{
-								num4 += model.boostNum;
-							}
-							deliveryList.Add(new DropDeliveryInfo(deliveryList2[j].dId, (int)num3, deliveryTableData.name, deliveryTableData.GetNeedItemName(num3), num4, new List<DELIVERY_CONDITION_TYPE>
-							{
-								deliveryTableData.GetConditionType(0u),
-								deliveryTableData.GetConditionType(1u),
-								deliveryTableData.GetConditionType(2u),
-								deliveryTableData.GetConditionType(3u),
-								deliveryTableData.GetConditionType(4u)
-							}));
-						}
-					}
-				}
-			}
-		}
-	}
-
-	public void OpenAllDropObject()
-	{
-		for (int i = 0; i < dropList.Count; i++)
-		{
-			dropList[i].OpenDropObject();
-		}
-	}
-
-	public void DeleteDropObject(FieldDropObject obj)
-	{
-		dropList.Remove(obj);
-	}
-
-	public void DeleteDropObject(int reward_id, bool is_get)
-	{
-		FieldDropObject fieldDropObject = dropList.Find((FieldDropObject o) => o.rewardId == reward_id);
-		if (fieldDropObject != null)
-		{
-			fieldDropObject.Delete(is_get);
-		}
-		dropList.Remove(fieldDropObject);
-	}
-
-	public void ClearAllDrop()
-	{
-		dropList.Clear();
-		ClearDrop(dropNCaches);
-		ClearDrop(dropHNCaches);
-		ClearDrop(dropRCaches);
-		ClearDrop(dropLoungeCaches);
-		ClearDrop(bossDropNCaches);
-		ClearDrop(bossDropRCaches);
-		ClearDrop(bossDropRegionBreakCaches);
-		ClearDrop(dropSPNCaches);
-		ClearDrop(dropSPHNCaches);
-		ClearDrop(dropSPRCaches);
-		ClearDrop(dropHalloweenCaches);
-	}
-
-	public void ClearDrop(List<GameObject> dropCaches)
-	{
-		int i = 0;
-		for (int count = dropCaches.Count; i < count; i++)
-		{
-			Object.Destroy(dropCaches[i]);
-		}
-		dropCaches.Clear();
-	}
-
-	public GameObject CreateTreasureBox(UIDropAnnounce.COLOR color)
-	{
-		switch (color)
-		{
-		case UIDropAnnounce.COLOR.NORMAL:
-			return RealizeTreasureBox(dropNCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxN);
-		case UIDropAnnounce.COLOR.DELIVERY:
-			return RealizeTreasureBox(dropHNCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxHN);
-		case UIDropAnnounce.COLOR.RARE:
-			return RealizeTreasureBox(dropRCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxR);
-		case UIDropAnnounce.COLOR.LOUNGE:
-			return RealizeTreasureBox(dropLoungeCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemLoungeShare);
-		case UIDropAnnounce.COLOR.SP_N:
-			return RealizeTreasureBox(dropSPNCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxSPN);
-		case UIDropAnnounce.COLOR.SP_HN:
-			return RealizeTreasureBox(dropSPHNCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxSPHN);
-		case UIDropAnnounce.COLOR.SP_R:
-			return RealizeTreasureBox(dropSPRCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxSPR);
-		case UIDropAnnounce.COLOR.HALLOWEEN:
-			return RealizeTreasureBox(dropHalloweenCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemHalloween);
-		default:
-			return null;
-		}
-	}
-
-	private GameObject RealizeTreasureBox(List<GameObject> caches, GameObject prefab)
-	{
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Expected O, but got Unknown
-		int i = 0;
-		for (int count = caches.Count; i < count; i++)
-		{
-			if (caches[i] != null && !caches[i].get_activeSelf())
-			{
-				GameObject val = caches[i];
-				val.SetActive(true);
-				return val;
-			}
-		}
-		Transform val2 = ResourceUtility.Realizes(prefab, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-		if (val2 != null)
-		{
-			GameObject val3 = val2.get_gameObject();
-			caches.Add(val3);
-			return val3;
-		}
-		return null;
-	}
-
-	public List<UIDropAnnounce.DropAnnounceInfo> CreateDropAnnounceInfoList(List<DropDeliveryInfo> deliveryInfo, List<DropItemInfo> itemInfo, bool isTreasureBox)
-	{
-		List<UIDropAnnounce.DropAnnounceInfo> list = new List<UIDropAnnounce.DropAnnounceInfo>();
-		int i = 0;
-		for (int count = deliveryInfo.Count; i < count; i++)
-		{
-			bool flag = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(deliveryInfo[i].id);
-			MonoBehaviourSingleton<DeliveryManager>.I.ProgressDelivery(deliveryInfo[i].id, deliveryInfo[i].index, deliveryInfo[i].num);
-			int have = 0;
-			int need = 0;
-			MonoBehaviourSingleton<DeliveryManager>.I.GetProgressDelivery(deliveryInfo[i].id, out have, out need, (uint)deliveryInfo[i].index);
-			UIDropAnnounce.DropAnnounceInfo dropAnnounceInfo = new UIDropAnnounce.DropAnnounceInfo();
-			dropAnnounceInfo.text = StringTable.Format(STRING_CATEGORY.IN_GAME, 2001u, deliveryInfo[i].itemName, deliveryInfo[i].num, have, need);
-			dropAnnounceInfo.color = UIDropAnnounce.COLOR.DELIVERY;
-			list.Add(dropAnnounceInfo);
-			if (have >= need)
-			{
-				GameSection currentSection = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection();
-				if (currentSection != null)
-				{
-					InGameMain component = currentSection.GetComponent<InGameMain>();
-					if (component != null)
-					{
-						component.OnNoticeCompletedDelivery();
-					}
-				}
-				if (flag != MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(deliveryInfo[i].id) && MonoBehaviourSingleton<UIAnnounceBand>.IsValid())
-				{
-					string empty = string.Empty;
-					empty = ((!DeliveryManager.IsDeliveryBingo((uint)deliveryInfo[i].id)) ? StringTable.Get(STRING_CATEGORY.DELIVERY_COMPLETE, 0u) : StringTable.Get(STRING_CATEGORY.DELIVERY_COMPLETE, 2u));
-					MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(deliveryInfo[i].name, empty);
-					SoundManager.PlayOneshotJingle(40000030, null, null);
-					MonoBehaviourSingleton<CoopManager>.I.coopStage.fieldRewardPool.SendFieldDrop(null);
-				}
-				if (MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
-				{
-					MonoBehaviourSingleton<DropTargetMarkerManeger>.I.UpdateList();
-				}
-			}
-		}
-		if (MonoBehaviourSingleton<InventoryManager>.IsValid() && isTreasureBox)
-		{
-			int j = 0;
-			for (int count2 = itemInfo.Count; j < count2; j++)
-			{
-				MonoBehaviourSingleton<InventoryManager>.I.AddInGameTempItem(itemInfo[j].id, itemInfo[j].num);
-				bool is_rare = false;
-				list.Add(itemInfo[j].CreateAnnounceInfo(out is_rare));
-				if (is_rare)
-				{
-					MonoBehaviourSingleton<StageObjectManager>.I.self.OnGetRareDrop(itemInfo[j].type, (int)itemInfo[j].id);
-				}
-			}
-		}
-		return list;
-	}
-
-	public void SetIntervalTransferInfo(bool enable_limit_time, float remaind_time, float elapsed_time, bool transfer_other, bool keep_dead, bool isReentry, bool isQuestToField)
-	{
-		intervalTransferInfo = new IntervalTransferInfo();
-		if (enable_limit_time)
-		{
-			intervalTransferInfo.remaindTime = remaind_time;
-		}
-		else
-		{
-			intervalTransferInfo.remaindTime = -1f;
-		}
-		intervalTransferInfo.elapsedTime = elapsed_time;
-		int i = 0;
-		for (int count = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Count; i < count; i++)
-		{
-			Player player = MonoBehaviourSingleton<StageObjectManager>.I.playerList[i] as Player;
-			if (!(player == null) && (transfer_other || player is Self))
-			{
-				if (!keep_dead && player.hp <= 0)
-				{
-					player.hp = 1;
-				}
-				if (isQuestToField)
-				{
-					player.hp = player.hpMax;
-				}
-				if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && !keep_dead)
-				{
-					int currentRushStandupHpPer = MonoBehaviourSingleton<InGameManager>.I.GetCurrentRushStandupHpPer();
-					int num = (int)((float)player.hpMax * ((float)currentRushStandupHpPer / 100f));
-					player.hp = Mathf.Max(player.hp, num);
-				}
-				IntervalTransferInfo.PlayerInfo playerInfo = new IntervalTransferInfo.PlayerInfo();
-				playerInfo.id = player.id;
-				playerInfo.createInfo = player.createInfo;
-				playerInfo.transferInfo = player.CreateTransferInfo();
-				if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && !isReentry)
-				{
-					int currentRushRescureResetNum = MonoBehaviourSingleton<InGameManager>.I.GetCurrentRushRescureResetNum();
-					if (currentRushRescureResetNum > 0)
-					{
-						playerInfo.transferInfo.rescueCount = Mathf.Max(0, playerInfo.transferInfo.rescueCount - currentRushRescureResetNum);
-					}
-				}
-				playerInfo.isSelf = (player is Self);
-				playerInfo.coopMode = player.coopMode;
-				playerInfo.coopClientId = player.coopClientId;
-				playerInfo.isNpcController = (player.controller is NpcController);
-				playerInfo.isCoopPlayer = false;
-				if (player is Self)
-				{
-					Self self = player as Self;
-					if (self != null)
-					{
-						playerInfo.taskChecker = self.taskChecker;
-					}
-				}
-				if (player.coopClientId != 0 && MonoBehaviourSingleton<CoopManager>.IsValid())
-				{
-					CoopClient coopClient = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByPlayerId(player.id);
-					if (coopClient != null)
-					{
-						playerInfo.coopClientId = coopClient.clientId;
-						playerInfo.isCoopPlayer = true;
-					}
-				}
-				intervalTransferInfo.playerInfoList.Add(playerInfo);
-			}
-		}
-	}
-
-	public void SetIntervalTransferSelf()
-	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Expected O, but got Unknown
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		if (!(selfCacheObject != null))
-		{
-			selfCacheObject = new GameObject();
-			selfCacheObject.set_name("SelfCacheObject");
-			selfCacheObject.get_transform().set_parent(MonoBehaviourSingleton<AppMain>.I._transform);
-			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			self.OnCached();
-			GameObject val = self.get_gameObject();
-			val.get_transform().set_parent(selfCacheObject.get_transform());
-			val.get_gameObject().set_name("SelfCache");
-			val.get_gameObject().SetActive(false);
-		}
-	}
-
-	public void DestroySelfCache()
-	{
-		if (!(selfCacheObject == null))
-		{
-			Object.Destroy(selfCacheObject);
-			selfCacheObject = null;
-		}
-	}
-
-	public void SetEnableIntervalTransferInfoRemaindTimeUpdate()
-	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		if (updateIntervalTransferInfoRemaindTime == null)
-		{
-			updateIntervalTransferInfoRemaindTime = UpdateIntervalTransferInfoRemaindTime();
-			this.StartCoroutine(updateIntervalTransferInfoRemaindTime);
-		}
-	}
-
-	public void StopIntervalTransferInfoRemaindTimeUpdate()
-	{
-		if (updateIntervalTransferInfoRemaindTime != null)
-		{
-			this.StopCoroutine(updateIntervalTransferInfoRemaindTime);
-			updateIntervalTransferInfoRemaindTime = null;
-		}
-	}
-
-	private IEnumerator UpdateIntervalTransferInfoRemaindTime()
-	{
-		float startTime = Time.get_realtimeSinceStartup();
-		float startRemaindTime = intervalTransferInfo.remaindTime;
-		while (intervalTransferInfo != null)
-		{
-			intervalTransferInfo.remaindTime = startRemaindTime - (Time.get_realtimeSinceStartup() - startTime);
-			yield return (object)null;
-		}
-	}
-
-	public void SaveQuestTransferInfo()
-	{
-		if (questTransferInfo == null)
-		{
-			questTransferInfo = new QuestTransferInfo();
-		}
-		questTransferInfo.intervalTransferInfo = intervalTransferInfo;
-		questTransferInfo.isQuestHappen = isQuestHappen;
-		questTransferInfo.isQuestGate = isQuestGate;
-		questTransferInfo.isQuestPortal = isQuestPortal;
-		questTransferInfo.isGateQuestClear = isGateQuestClear;
-		questTransferInfo.isTransitionFieldToQuest = isTransitionFieldToQuest;
-		questTransferInfo.isTransitionQuestToField = isTransitionQuestToField;
-		questTransferInfo.isTransitionFieldReentry = isTransitionFieldReentry;
-		questTransferInfo.isStoryPortal = isStoryPortal;
-		questTransferInfo.beforePortalID = beforePortalID;
-		questTransferInfo.backTransitionInfo = backTransitionInfo;
-	}
-
-	public void ResumeQuestTransferInfo()
-	{
-		if (questTransferInfo != null)
-		{
-			intervalTransferInfo = questTransferInfo.intervalTransferInfo;
-			isQuestHappen = questTransferInfo.isQuestHappen;
-			isQuestGate = questTransferInfo.isQuestGate;
-			isQuestPortal = questTransferInfo.isQuestPortal;
-			isGateQuestClear = questTransferInfo.isGateQuestClear;
-			isTransitionFieldToQuest = questTransferInfo.isTransitionFieldToQuest;
-			isTransitionQuestToField = questTransferInfo.isTransitionQuestToField;
-			isTransitionFieldReentry = questTransferInfo.isTransitionFieldReentry;
-			isStoryPortal = questTransferInfo.isStoryPortal;
-			beforePortalID = questTransferInfo.beforePortalID;
-			backTransitionInfo = questTransferInfo.backTransitionInfo;
-			questTransferInfo = null;
-		}
-	}
-
-	public bool IsDisableEffectGraphicLow(string effectName)
-	{
-		if (effectName.Length == 0)
-		{
-			return false;
-		}
-		if (graphicOptionType <= 0)
-		{
-			for (int i = 0; i < disableEffectsGraphicLow.Length; i++)
-			{
-				if (effectName.StartsWith(disableEffectsGraphicLow[i]))
-				{
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+  public void ResetRushInReentry()
+  {
+    this.isRushReentry = false;
+    this.rushBossBackup = (Coop_Model_EnemyInitialize) null;
+  }
+
+  public int GetCurrentRushStandupHpPer() => this.rushInfo.waves[this.rushIndex].standupHpPer;
+
+  public void RecordRushWaveSyncData()
+  {
+    CoopStage coopStage = MonoBehaviourSingleton<CoopManager>.I.coopStage;
+    this.rushWaveSyncDataList.Add(new InGameManager.RushWaveSyncData()
+    {
+      bossBreakIds = coopStage.bossBreakIDLists[0],
+      elapsedTime = MonoBehaviourSingleton<InGameProgress>.I.GetElapsedTime()
+    });
+  }
+
+  public InGameManager.RushWaveSyncData GetRushSyncData(int index)
+  {
+    return this.rushWaveSyncDataList.Count > index ? this.rushWaveSyncDataList[index] : (InGameManager.RushWaveSyncData) null;
+  }
+
+  public List<QuestCompleteRewardList> arenaRewards { get; private set; }
+
+  public List<PointShopResultData> arenaPointShops { get; private set; }
+
+  public void SetArenaInfo(int arenaId)
+  {
+    ArenaTable.ArenaData arenaData = Singleton<ArenaTable>.I.GetArenaData(arenaId);
+    this.arenaInfo = new PartyModel.ArenaInfo();
+    this.arenaInfo.arenaData = arenaData;
+    for (int index = 0; index < 5; ++index)
+    {
+      if (arenaData.questIds[index] > 0)
+        this.arenaInfo.waves.Add(new PartyModel.ArenaInfo.WaveInfo()
+        {
+          wave = index + 1,
+          questId = arenaData.questIds[index]
+        });
+    }
+    this.arenaIndex = 0;
+    this.arenaRewards = new List<QuestCompleteRewardList>();
+    this.arenaPointShops = new List<PointShopResultData>();
+  }
+
+  public void ClearArenaInfo()
+  {
+    this.arenaInfo = (PartyModel.ArenaInfo) null;
+    this.arenaIndex = 0;
+    this.arenaRewards = (List<QuestCompleteRewardList>) null;
+    this.arenaPointShops = (List<PointShopResultData>) null;
+  }
+
+  public bool HasArenaInfo() => this.arenaInfo != null;
+
+  public bool IsArenaTimeAttack()
+  {
+    return this.HasArenaInfo() && this.arenaInfo.arenaData.rank == ARENA_RANK.S;
+  }
+
+  public ARENA_CONDITION[] GetArenaConditions()
+  {
+    if (this.arenaInfo == null)
+      return (ARENA_CONDITION[]) null;
+    return this.arenaInfo.arenaData == null ? (ARENA_CONDITION[]) null : this.arenaInfo.arenaData.conditions;
+  }
+
+  public void ProgressArena() => ++this.arenaIndex;
+
+  public bool IsArenaFirstWave() => this.arenaIndex <= 0;
+
+  public bool IsArenaFinalWave() => this.arenaInfo.waves.Count - 1 <= this.arenaIndex;
+
+  public int GetArenaWaveMax() => this.arenaInfo.waves.Count;
+
+  public int GetCurrentArenaWaveNum() => this.arenaInfo.waves[this.arenaIndex].wave;
+
+  public uint GetCurrentArenaQuestId() => (uint) this.arenaInfo.waves[this.arenaIndex].questId;
+
+  public uint GetFirstArenaQuestId() => (uint) this.arenaInfo.waves[0].questId;
+
+  public bool ContainsArenaCondition(ARENA_CONDITION condition)
+  {
+    if (!this.HasArenaInfo())
+      return false;
+    for (int index = 0; index < this.arenaInfo.arenaData.conditions.Length; ++index)
+    {
+      if (this.arenaInfo.arenaData.conditions[index] == condition)
+        return true;
+    }
+    return false;
+  }
+
+  public ARENA_GROUP GetCurrentArenaGroup() => this.arenaInfo.arenaData.group;
+
+  public ARENA_RANK GetCurrentArenaRank() => this.arenaInfo.arenaData.rank;
+
+  public void AddArenaWaveResult(
+    QuestCompleteRewardList reward,
+    List<PointShopResultData> pointShop)
+  {
+    this.arenaRewards.Add(reward);
+    this.AddArenaPointShop(pointShop);
+  }
+
+  private void AddArenaPointShop(List<PointShopResultData> pointShop)
+  {
+    foreach (PointShopResultData pointShopResultData1 in pointShop)
+    {
+      PointShopResultData addData = pointShopResultData1;
+      PointShopResultData pointShopResultData2 = this.arenaPointShops.Find((Predicate<PointShopResultData>) (listData => listData.pointShopId == addData.pointShopId));
+      if (pointShopResultData2 == null)
+      {
+        this.arenaPointShops.Add(addData);
+      }
+      else
+      {
+        pointShopResultData2.getPoint += addData.getPoint;
+        pointShopResultData2.totalPoint = addData.totalPoint;
+      }
+    }
+  }
+
+  public bool isSeriesReentry { get; private set; }
+
+  public void BackupSeriesStageInReentry()
+  {
+    this.seriesBossBackup = (Coop_Model_EnemyInitialize) null;
+    Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+    if (Object.op_Inequality((Object) boss, (Object) null) && !boss.isDead)
+      this.seriesBossBackup = boss.CreateBackup();
+    this.isSeriesReentry = true;
+  }
+
+  public void RestoreSeriesInReentry()
+  {
+    Enemy boss = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+    if (!Object.op_Inequality((Object) boss, (Object) null) || this.seriesBossBackup == null)
+      return;
+    boss.enemyReceiver.Set(new CoopPacket()
+    {
+      model = (Coop_Model_Base) this.seriesBossBackup
+    });
+  }
+
+  public void ResetSeriesInReentry()
+  {
+    this.isSeriesReentry = false;
+    this.seriesBossBackup = (Coop_Model_EnemyInitialize) null;
+  }
+
+  public static bool IsValidInGameTest()
+  {
+    bool flag = false;
+    return MonoBehaviourSingleton<InGameManager>.IsValid() & flag;
+  }
+
+  public static bool IsValidInGameTestField()
+  {
+    bool flag = false;
+    return MonoBehaviourSingleton<InGameManager>.IsValid() & flag;
+  }
+
+  protected override void Awake()
+  {
+    base.Awake();
+    this.UpdateConfig();
+  }
+
+  public static int GetGraphicOptionType(string key)
+  {
+    int graphicOptionType = 1;
+    switch (key)
+    {
+      case "low":
+        graphicOptionType = 0;
+        break;
+      case "standard":
+        graphicOptionType = 1;
+        break;
+      case "high":
+        graphicOptionType = 2;
+        break;
+      case "highest":
+        graphicOptionType = 3;
+        break;
+    }
+    return graphicOptionType;
+  }
+
+  public void UpdateConfig()
+  {
+    this.graphicOptionType = 0;
+    this.arrowCameraType = 1;
+    if (GameSaveData.instance == null)
+      return;
+    this.graphicOptionType = InGameManager.GetGraphicOptionType(GameSaveData.instance.graphicOptionKey);
+    this.arrowCameraType = InGameManager.GetArrowCameraType(GameSaveData.instance.arrowCameraKey);
+  }
+
+  public static int GetArrowCameraType(string key)
+  {
+    int arrowCameraType = 1;
+    switch (key)
+    {
+      case "typea":
+        arrowCameraType = 0;
+        break;
+      case "typeb":
+        arrowCameraType = 1;
+        break;
+    }
+    return arrowCameraType;
+  }
+
+  public void OnEndInGameScene()
+  {
+    this.dialogOpenInfoList = new List<UIInGamePopupDialog.Desc>();
+    this.intervalTransferInfo = (InGameManager.IntervalTransferInfo) null;
+    this.isQuestHappen = false;
+    this.isQuestGate = false;
+    this.isQuestPortal = false;
+    this.isQuestFromGimmick = false;
+    this.isGateQuestClear = false;
+    this.isTransitionFieldToQuest = false;
+    this.isTransitionQuestToField = false;
+    this.isTransitionQuestToFieldExplore = false;
+    this.isTransitionFieldReentry = false;
+    this.isStoryPortal = false;
+    this.isAlreadyBattleStarted = false;
+    this.beforePortalID = 0U;
+    this.backTransitionInfo = (FieldManager.FieldTransitionInfo) null;
+    this.currentJoinType = CoopClient.CLIENT_JOIN_TYPE.NONE;
+    MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_GRAB, false);
+    MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_COMMAND, false);
+    this.ClearAllDrop();
+    this.StopIntervalTransferInfoRemaindTimeUpdate();
+  }
+
+  public string GetCurrentStageName()
+  {
+    string currentStageName = "ST011D_01";
+    if (MonoBehaviourSingleton<FieldManager>.IsValid())
+      currentStageName = MonoBehaviourSingleton<FieldManager>.I.GetCurrentMapStageName();
+    return currentStageName;
+  }
+
+  public float GetCurrentLimitTime()
+  {
+    float currentLimitTime = 0.0f;
+    if (QuestManager.IsValidInGameExplore())
+    {
+      if (MonoBehaviourSingleton<QuestManager>.I.currentQuestID != 0U)
+        currentLimitTime = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestLimitTime();
+    }
+    else if (this.IsRush())
+    {
+      int questId = this.rushInfo.waves[0].questId;
+      currentLimitTime = Singleton<QuestTable>.I.GetQuestData((uint) questId).limitTime;
+      if (this.intervalTransferInfo != null && (double) this.intervalTransferInfo.remaindTime >= 0.0)
+        currentLimitTime = this.intervalTransferInfo.remaindTime;
+    }
+    else if (this.HasArenaInfo())
+    {
+      currentLimitTime = (float) this.arenaInfo.arenaData.timeLimit * (1f / 1000f);
+      if (this.intervalTransferInfo != null && (double) this.intervalTransferInfo.remaindTime >= 0.0)
+        currentLimitTime = this.intervalTransferInfo.remaindTime;
+    }
+    else if (QuestManager.IsValidInGame())
+    {
+      if (this.intervalTransferInfo != null && (double) this.intervalTransferInfo.remaindTime >= 0.0)
+        currentLimitTime = this.intervalTransferInfo.remaindTime;
+      else if (MonoBehaviourSingleton<QuestManager>.I.currentQuestID != 0U)
+        currentLimitTime = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestLimitTime();
+    }
+    else
+      currentLimitTime = 0.0f;
+    return currentLimitTime;
+  }
+
+  public bool IsNeedInitBoss()
+  {
+    bool flag = false;
+    if (QuestManager.IsValidInGame())
+    {
+      if (MonoBehaviourSingleton<QuestManager>.I.IsExplore())
+      {
+        flag = (int) MonoBehaviourSingleton<FieldManager>.I.currentMapID == (int) Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID).mapId;
+        if (MonoBehaviourSingleton<InGameProgress>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.IsExploreBossDead())
+          flag = false;
+      }
+      else
+        flag = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID).enemyID[(int) MonoBehaviourSingleton<QuestManager>.I.currentQuestSeriesIndex] > 0;
+    }
+    else if (FieldManager.IsValidInGame())
+      flag = false;
+    return flag;
+  }
+
+  public void CheckStageInitialState()
+  {
+    this.isValidGimmickObject = MonoBehaviourSingleton<StageObjectManager>.I.gimmickList.Count > 0;
+    if (FieldManager.IsValidInGameNoBoss())
+    {
+      MonoBehaviourSingleton<InGameCameraManager>.I.hitObjectType = InGameCameraManager.CAM_HIT_OBJ_TYPE.NONE;
+    }
+    else
+    {
+      bool flag = false;
+      Transform[] componentsInChildren = ((Component) MonoBehaviourSingleton<StageManager>.I._transform).GetComponentsInChildren<Transform>();
+      int index = 0;
+      for (int length = componentsInChildren.Length; index < length; ++index)
+      {
+        if (((Component) componentsInChildren[index]).gameObject.layer == 18 || ((Component) componentsInChildren[index]).gameObject.layer == 9 || ((Component) componentsInChildren[index]).gameObject.layer == 21)
+        {
+          flag = true;
+          break;
+        }
+      }
+      if (flag)
+        MonoBehaviourSingleton<InGameCameraManager>.I.hitObjectType = InGameCameraManager.CAM_HIT_OBJ_TYPE.ZOOM;
+      else
+        MonoBehaviourSingleton<InGameCameraManager>.I.hitObjectType = InGameCameraManager.CAM_HIT_OBJ_TYPE.NONE;
+    }
+  }
+
+  public IEnumerator InitializeEnemyPop()
+  {
+    if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<FieldManager>.IsValid())
+    {
+      if (MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeries() || MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeriesArena())
+      {
+        this.StartCoroutine(this.InitializeEnemyPopForSeries());
+      }
+      else
+      {
+        List<FieldMapTable.EnemyPopTableData> enemyPopList = Singleton<FieldMapTable>.I.GetEnemyPopList(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
+        if (enemyPopList != null && enemyPopList.Count > 0)
+        {
+          uint num1 = 0;
+          int num2 = 0;
+          if (QuestManager.IsValidInGame())
+          {
+            num1 = (uint) MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyID();
+            num2 = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyLv();
+          }
+          if (this.HasArenaInfo())
+            num2 = this.arenaInfo.arenaData.level;
+          List<uint> enemy_list = new List<uint>();
+          int load_count = 0;
+          int index = 0;
+          for (int count = enemyPopList.Count; index < count; ++index)
+          {
+            FieldMapTable.EnemyPopTableData enemyPopTableData = enemyPopList[index];
+            if (enemyPopTableData != null)
+            {
+              uint enemy_id;
+              int enemy_lv;
+              if (enemyPopTableData.enemyID > 0U)
+              {
+                enemy_id = enemyPopTableData.enemyID;
+                enemy_lv = (int) enemyPopTableData.enemyLv;
+              }
+              else if (num1 > 0U)
+              {
+                enemy_id = num1;
+                enemy_lv = num2;
+              }
+              else
+                continue;
+              if (!enemy_list.Contains(enemy_id))
+              {
+                enemy_list.Add(enemyPopTableData.enemyID);
+                MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(0, Vector3.zero, 0.0f, (int) enemy_id, enemy_lv, enemyPopTableData.bossFlag, enemyPopTableData.bigMonsterFlag, willStock: true, callback: (EnemyLoader.OnCompleteLoad) (o =>
+                {
+                  ((Component) o).gameObject.SetActive(false);
+                  MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(o);
+                  ++load_count;
+                }));
+              }
+            }
+          }
+          while (load_count < enemy_list.Count)
+            yield return (object) null;
+        }
+      }
+    }
+  }
+
+  public IEnumerator InitializeEnemyPop_GG_Optimize(Action<bool> callBack, System.Action effectCallBack)
+  {
+    if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+      callBack(false);
+    else if (!MonoBehaviourSingleton<FieldManager>.IsValid())
+      callBack(false);
+    else if (MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeries() || MonoBehaviourSingleton<QuestManager>.I.IsCurrentQuestTypeSeriesArena())
+    {
+      this.StartCoroutine(this.InitializeEnemyPopForSeries());
+      callBack(true);
+    }
+    else
+    {
+      List<FieldMapTable.EnemyPopTableData> enemyPopList = Singleton<FieldMapTable>.I.GetEnemyPopList(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
+      if (enemyPopList != null && enemyPopList.Count > 0)
+      {
+        uint num1 = 0;
+        int num2 = 0;
+        if (QuestManager.IsValidInGame())
+        {
+          num1 = (uint) MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyID();
+          num2 = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestEnemyLv();
+        }
+        if (this.HasArenaInfo())
+          num2 = this.arenaInfo.arenaData.level;
+        List<uint> enemy_list = new List<uint>();
+        int load_count = 0;
+        int index = 0;
+        for (int count = enemyPopList.Count; index < count; ++index)
+        {
+          FieldMapTable.EnemyPopTableData enemyPopTableData = enemyPopList[index];
+          if (enemyPopTableData != null)
+          {
+            uint enemy_id;
+            int enemy_lv;
+            if (enemyPopTableData.enemyID > 0U)
+            {
+              enemy_id = enemyPopTableData.enemyID;
+              enemy_lv = (int) enemyPopTableData.enemyLv;
+            }
+            else if (num1 > 0U)
+            {
+              enemy_id = num1;
+              enemy_lv = num2;
+            }
+            else
+              continue;
+            if (!enemy_list.Contains(enemy_id))
+            {
+              enemy_list.Add(enemyPopTableData.enemyID);
+              MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy_GG_Optimize(0, Vector3.zero, 0.0f, (int) enemy_id, enemy_lv, enemyPopTableData.bossFlag, enemyPopTableData.bigMonsterFlag, willStock: true, callback: (EnemyLoader.OnCompleteLoad) (o =>
+              {
+                ((Component) o).gameObject.SetActive(false);
+                MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(o);
+                ++load_count;
+              }), EffectCallBack: effectCallBack, use_later_load: enemyPopTableData.bossFlag);
+            }
+          }
+        }
+        while (load_count < enemy_list.Count)
+          yield return (object) null;
+        callBack(true);
+      }
+    }
+  }
+
+  private IEnumerator InitializeEnemyPopForSeries()
+  {
+    QuestManager i = MonoBehaviourSingleton<QuestManager>.I;
+    int count = i.GetCurrentQuestSeriesNum();
+    int loadCount = 0;
+    for (int index = 0; index < count; ++index)
+    {
+      uint currentQuestEnemyId = (uint) i.GetCurrentQuestEnemyID(index);
+      int currentQuestEnemyLv = i.GetCurrentQuestEnemyLv(index);
+      if (currentQuestEnemyId > 0U && currentQuestEnemyLv > 0)
+        MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(0, Vector3.zero, 0.0f, (int) currentQuestEnemyId, currentQuestEnemyLv, true, true, willStock: true, callback: (EnemyLoader.OnCompleteLoad) (o =>
+        {
+          ((Component) o).gameObject.SetActive(false);
+          MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(o);
+          ++loadCount;
+        }));
+    }
+    while (loadCount < count)
+      yield return (object) null;
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    loadingQueue.CacheEffect(RESOURCE_CATEGORY.EFFECT_ACTION, "ef_btl_enemy_entry_01");
+    while (loadingQueue.IsLoading())
+      yield return (object) loadingQueue.Wait();
+  }
+
+  public IEnumerator InitializeEnemyPopForSummon(int enemyId, int enemyLv)
+  {
+    if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+    {
+      bool isLoading = true;
+      MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemy(0, Vector3.zero, 0.0f, enemyId, enemyLv, false, false, willStock: true, callback: (EnemyLoader.OnCompleteLoad) (o =>
+      {
+        ((Component) o).gameObject.SetActive(false);
+        MonoBehaviourSingleton<StageObjectManager>.I.enemyStokeList.Add(o);
+        isLoading = false;
+      }));
+      while (isLoading)
+        yield return (object) null;
+    }
+  }
+
+  public IEnumerator InitializeEnemyPopForSummonAttack(int enemyId, int enemyLv)
+  {
+    if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+    {
+      bool isLoading = true;
+      MonoBehaviourSingleton<StageObjectManager>.I.CreateEnemyForSummonAttack(0, Vector3.zero, 0.0f, enemyId, enemyLv, true, (EnemyLoader.OnCompleteLoad) (o =>
+      {
+        ((Component) o).gameObject.SetActive(false);
+        MonoBehaviourSingleton<StageObjectManager>.I.enemySummonStokeList.Add(o);
+        isLoading = false;
+      }));
+      while (isLoading)
+        yield return (object) null;
+    }
+  }
+
+  public GameObject CreateBossDropObject(int rarity)
+  {
+    GameObject bossDropObject = (GameObject) null;
+    switch (rarity)
+    {
+      case 1:
+        int index1 = 0;
+        for (int count = this.bossDropRCaches.Count; index1 < count; ++index1)
+        {
+          if (!this.bossDropRCaches[index1].activeSelf)
+          {
+            bossDropObject = this.bossDropRCaches[index1];
+            bossDropObject.SetActive(true);
+            break;
+          }
+        }
+        if (Object.op_Equality((Object) bossDropObject, (Object) null))
+        {
+          Transform transform = ResourceUtility.Realizes((Object) MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropR, MonoBehaviourSingleton<StageObjectManager>.I._transform);
+          if (Object.op_Inequality((Object) transform, (Object) null))
+          {
+            bossDropObject = ((Component) transform).gameObject;
+            this.bossDropRCaches.Add(bossDropObject);
+            break;
+          }
+          break;
+        }
+        break;
+      case 2:
+        int index2 = 0;
+        for (int count = this.bossDropRegionBreakCaches.Count; index2 < count; ++index2)
+        {
+          if (!this.bossDropRegionBreakCaches[index2].activeSelf)
+          {
+            bossDropObject = this.bossDropRegionBreakCaches[index2];
+            bossDropObject.SetActive(true);
+            break;
+          }
+        }
+        if (Object.op_Equality((Object) bossDropObject, (Object) null))
+        {
+          Transform transform = ResourceUtility.Realizes((Object) MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropRegionBreak, MonoBehaviourSingleton<StageObjectManager>.I._transform);
+          if (Object.op_Inequality((Object) transform, (Object) null))
+          {
+            bossDropObject = ((Component) transform).gameObject;
+            this.bossDropRegionBreakCaches.Add(bossDropObject);
+            break;
+          }
+          break;
+        }
+        break;
+      default:
+        int index3 = 0;
+        for (int count = this.bossDropNCaches.Count; index3 < count; ++index3)
+        {
+          if (!this.bossDropNCaches[index3].activeSelf)
+          {
+            bossDropObject = this.bossDropNCaches[index3];
+            bossDropObject.SetActive(true);
+            break;
+          }
+        }
+        if (Object.op_Equality((Object) bossDropObject, (Object) null))
+        {
+          Transform transform = ResourceUtility.Realizes((Object) MonoBehaviourSingleton<InGameLinkResourcesQuest>.I.bossDropN, MonoBehaviourSingleton<StageObjectManager>.I._transform);
+          if (Object.op_Inequality((Object) transform, (Object) null))
+          {
+            bossDropObject = ((Component) transform).gameObject;
+            this.bossDropNCaches.Add(bossDropObject);
+            break;
+          }
+          break;
+        }
+        break;
+    }
+    return bossDropObject;
+  }
+
+  public void CreateDropObject(
+    Coop_Model_EnemyDefeat model,
+    List<InGameManager.DropDeliveryInfo> deliveryList,
+    List<InGameManager.DropItemInfo> itemList)
+  {
+    FieldDropObject fieldDropObject = FieldDropObject.Create(model, deliveryList, itemList);
+    if (!Object.op_Inequality((Object) fieldDropObject, (Object) null))
+      return;
+    this.dropList.Add(fieldDropObject);
+    if (!MonoBehaviourSingleton<InGameProgress>.IsValid() || !MonoBehaviourSingleton<InGameProgress>.I.isHappenQuestDirection)
+      return;
+    this.OpenAllDropObject();
+  }
+
+  public void CreateDropInfoList(
+    Coop_Model_EnemyDefeat model,
+    out List<InGameManager.DropDeliveryInfo> deliveryList,
+    out List<InGameManager.DropItemInfo> itemList)
+  {
+    itemList = new List<InGameManager.DropItemInfo>();
+    deliveryList = new List<InGameManager.DropDeliveryInfo>();
+    int index1 = 0;
+    for (int count = model.dropIds.Count; index1 < count; ++index1)
+      itemList.Add(new InGameManager.DropItemInfo((REWARD_TYPE) model.dropTypes[index1], (uint) model.dropItemIds[index1], model.dropNums[index1]));
+    int mapId = MonoBehaviourSingleton<FieldManager>.I.GetMapId();
+    Delivery[] deliveryList1 = MonoBehaviourSingleton<DeliveryManager>.I.GetDeliveryList(false);
+    int index2 = 0;
+    for (int length1 = deliveryList1.Length; index2 < length1; ++index2)
+    {
+      DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint) deliveryList1[index2].dId);
+      if (deliveryTableData != null)
+      {
+        int num1 = 0;
+        for (int length2 = deliveryTableData.needs.Length; num1 < length2; ++num1)
+        {
+          uint num2 = (uint) num1;
+          if (deliveryTableData.IsNeedTarget(num2, (uint) model.eid, (uint) mapId) && (model.deliver & 1 << (int) (deliveryTableData.GetRateType(num2) & DELIVERY_RATE_TYPE.RATE_1)) > 0)
+          {
+            int have = 0;
+            int need = 0;
+            MonoBehaviourSingleton<DeliveryManager>.I.GetProgressDelivery(deliveryList1[index2].dId, out have, out need, num2);
+            if (have < need)
+            {
+              int _num = 1;
+              if ((model.boostBit & 1 << (int) (deliveryTableData.GetRateType(num2) & DELIVERY_RATE_TYPE.RATE_1)) > 0)
+                _num += model.boostNum;
+              deliveryList.Add(new InGameManager.DropDeliveryInfo(deliveryList1[index2].dId, (int) num2, deliveryTableData.name, deliveryTableData.GetNeedItemName(num2), _num, new List<DELIVERY_CONDITION_TYPE>()
+              {
+                deliveryTableData.GetConditionType(),
+                deliveryTableData.GetConditionType(1U),
+                deliveryTableData.GetConditionType(2U),
+                deliveryTableData.GetConditionType(3U),
+                deliveryTableData.GetConditionType(4U)
+              }));
+            }
+          }
+        }
+      }
+    }
+  }
+
+  public void OpenAllDropObject()
+  {
+    for (int index = 0; index < this.dropList.Count; ++index)
+      this.dropList[index].OpenDropObject();
+  }
+
+  public void DeleteDropObject(FieldDropObject obj) => this.dropList.Remove(obj);
+
+  public void DeleteDropObject(int reward_id, bool is_get)
+  {
+    FieldDropObject fieldDropObject = this.dropList.Find((Predicate<FieldDropObject>) (o => o.rewardId == reward_id));
+    if (Object.op_Inequality((Object) fieldDropObject, (Object) null))
+      fieldDropObject.Delete(is_get);
+    this.dropList.Remove(fieldDropObject);
+  }
+
+  public void ClearAllDrop()
+  {
+    this.dropList.Clear();
+    this.ClearDrop(this.dropNCaches);
+    this.ClearDrop(this.dropHNCaches);
+    this.ClearDrop(this.dropRCaches);
+    this.ClearDrop(this.dropLoungeCaches);
+    this.ClearDrop(this.bossDropNCaches);
+    this.ClearDrop(this.bossDropRCaches);
+    this.ClearDrop(this.bossDropRegionBreakCaches);
+    this.ClearDrop(this.dropSPNCaches);
+    this.ClearDrop(this.dropSPHNCaches);
+    this.ClearDrop(this.dropSPRCaches);
+    this.ClearDrop(this.dropHalloweenCaches);
+    this.ClearDrop(this.dropESPNCaches);
+    this.ClearDrop(this.dropESPHNCaches);
+    this.ClearDrop(this.dropESPRCaches);
+    this.ClearDrop(this.dropSeasonalCaches);
+  }
+
+  public void ClearDrop(List<GameObject> dropCaches)
+  {
+    int index = 0;
+    for (int count = dropCaches.Count; index < count; ++index)
+      Object.Destroy((Object) dropCaches[index]);
+    dropCaches.Clear();
+  }
+
+  public GameObject CreateTreasureBox(UIDropAnnounce.COLOR color)
+  {
+    switch (color)
+    {
+      case UIDropAnnounce.COLOR.NORMAL:
+        return this.RealizeTreasureBox(this.dropNCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxN);
+      case UIDropAnnounce.COLOR.RARE:
+        return this.RealizeTreasureBox(this.dropRCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxR);
+      case UIDropAnnounce.COLOR.DELIVERY:
+        return this.RealizeTreasureBox(this.dropHNCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxHN);
+      case UIDropAnnounce.COLOR.LOUNGE:
+        return this.RealizeTreasureBox(this.dropLoungeCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemLoungeShare);
+      case UIDropAnnounce.COLOR.SP_N:
+        return this.RealizeTreasureBox(this.dropSPNCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxSPN);
+      case UIDropAnnounce.COLOR.SP_HN:
+        return this.RealizeTreasureBox(this.dropSPHNCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxSPHN);
+      case UIDropAnnounce.COLOR.SP_R:
+        return this.RealizeTreasureBox(this.dropSPRCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxSPR);
+      case UIDropAnnounce.COLOR.HALLOWEEN:
+        return this.RealizeTreasureBox(this.dropHalloweenCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemHalloween);
+      case UIDropAnnounce.COLOR.ESP_N:
+        return this.RealizeTreasureBox(this.dropESPNCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxESPN);
+      case UIDropAnnounce.COLOR.ESP_HN:
+        return this.RealizeTreasureBox(this.dropESPHNCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxESPHN);
+      case UIDropAnnounce.COLOR.ESP_R:
+        return this.RealizeTreasureBox(this.dropESPRCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemBoxESPR);
+      case UIDropAnnounce.COLOR.SEASONAL:
+        return this.RealizeTreasureBox(this.dropSeasonalCaches, MonoBehaviourSingleton<InGameLinkResourcesField>.I.dropItemSeasonal);
+      default:
+        return (GameObject) null;
+    }
+  }
+
+  private GameObject RealizeTreasureBox(List<GameObject> caches, GameObject prefab)
+  {
+    int index = 0;
+    for (int count = caches.Count; index < count; ++index)
+    {
+      if (Object.op_Inequality((Object) caches[index], (Object) null) && !caches[index].activeSelf)
+      {
+        GameObject cach = caches[index];
+        cach.SetActive(true);
+        return cach;
+      }
+    }
+    Transform transform = ResourceUtility.Realizes((Object) prefab, MonoBehaviourSingleton<StageObjectManager>.I._transform);
+    if (!Object.op_Inequality((Object) transform, (Object) null))
+      return (GameObject) null;
+    GameObject gameObject = ((Component) transform).gameObject;
+    caches.Add(gameObject);
+    return gameObject;
+  }
+
+  public List<UIDropAnnounce.DropAnnounceInfo> CreateDropAnnounceInfoList(
+    List<InGameManager.DropDeliveryInfo> deliveryInfo,
+    List<InGameManager.DropItemInfo> itemInfo,
+    bool isTreasureBox)
+  {
+    List<UIDropAnnounce.DropAnnounceInfo> announceInfoList = new List<UIDropAnnounce.DropAnnounceInfo>();
+    int index1 = 0;
+    for (int count = deliveryInfo.Count; index1 < count; ++index1)
+    {
+      bool flag = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(deliveryInfo[index1].id);
+      MonoBehaviourSingleton<DeliveryManager>.I.ProgressDelivery(deliveryInfo[index1].id, deliveryInfo[index1].index, deliveryInfo[index1].num);
+      int have = 0;
+      int need = 0;
+      MonoBehaviourSingleton<DeliveryManager>.I.GetProgressDelivery(deliveryInfo[index1].id, out have, out need, (uint) deliveryInfo[index1].index);
+      announceInfoList.Add(new UIDropAnnounce.DropAnnounceInfo()
+      {
+        text = StringTable.Format(STRING_CATEGORY.IN_GAME, 2001U, (object) deliveryInfo[index1].itemName, (object) deliveryInfo[index1].num, (object) have, (object) need),
+        color = UIDropAnnounce.COLOR.DELIVERY
+      });
+      if (have >= need)
+      {
+        GameSection currentSection = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSection();
+        if (Object.op_Inequality((Object) currentSection, (Object) null))
+        {
+          InGameMain component = ((Component) currentSection).GetComponent<InGameMain>();
+          if (Object.op_Inequality((Object) component, (Object) null))
+            component.OnNoticeCompletedDelivery();
+        }
+        if (flag != MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(deliveryInfo[index1].id) && MonoBehaviourSingleton<UIAnnounceBand>.IsValid())
+        {
+          string conditionTitle = !DeliveryManager.IsDeliveryBingo((uint) deliveryInfo[index1].id) ? StringTable.Get(STRING_CATEGORY.DELIVERY_COMPLETE, 0U) : StringTable.Get(STRING_CATEGORY.DELIVERY_COMPLETE, 2U);
+          MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce(deliveryInfo[index1].name, conditionTitle);
+          SoundManager.PlayOneshotJingle(40000030);
+          MonoBehaviourSingleton<CoopManager>.I.coopStage.fieldRewardPool.SendFieldDrop();
+        }
+        if (MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
+          MonoBehaviourSingleton<DropTargetMarkerManeger>.I.UpdateList();
+      }
+    }
+    if (MonoBehaviourSingleton<InventoryManager>.IsValid() & isTreasureBox)
+    {
+      int index2 = 0;
+      for (int count = itemInfo.Count; index2 < count; ++index2)
+      {
+        MonoBehaviourSingleton<InventoryManager>.I.AddInGameTempItem(itemInfo[index2].id, itemInfo[index2].num);
+        bool is_rare = false;
+        announceInfoList.Add(itemInfo[index2].CreateAnnounceInfo(out is_rare));
+        if (is_rare)
+          MonoBehaviourSingleton<StageObjectManager>.I.self.OnGetRareDrop(itemInfo[index2].type, (int) itemInfo[index2].id);
+      }
+    }
+    return announceInfoList;
+  }
+
+  public void SetIntervalTransferInfo(
+    bool enable_limit_time,
+    float remaind_time,
+    float elapsed_time,
+    bool transfer_other,
+    bool keep_dead,
+    bool isReentry,
+    bool isQuestToField)
+  {
+    this.intervalTransferInfo = new InGameManager.IntervalTransferInfo();
+    this.intervalTransferInfo.remaindTime = !enable_limit_time ? -1f : remaind_time;
+    this.intervalTransferInfo.elapsedTime = elapsed_time;
+    int index = 0;
+    for (int count = MonoBehaviourSingleton<StageObjectManager>.I.playerList.Count; index < count; ++index)
+    {
+      Player player = MonoBehaviourSingleton<StageObjectManager>.I.playerList[index] as Player;
+      if (!Object.op_Equality((Object) player, (Object) null) && (transfer_other || player is Self))
+      {
+        if (!keep_dead && player.hp <= 0)
+          player.hp = 1;
+        if (isQuestToField)
+          player.hp = player.hpMax;
+        if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && !keep_dead)
+        {
+          int rushStandupHpPer = MonoBehaviourSingleton<InGameManager>.I.GetCurrentRushStandupHpPer();
+          int num = (int) ((double) player.hpMax * ((double) rushStandupHpPer / 100.0));
+          player.hp = Mathf.Max(player.hp, num);
+        }
+        InGameManager.IntervalTransferInfo.PlayerInfo playerInfo = new InGameManager.IntervalTransferInfo.PlayerInfo();
+        playerInfo.id = player.id;
+        playerInfo.createInfo = player.createInfo;
+        playerInfo.transferInfo = player.CreateTransferInfo();
+        if (MonoBehaviourSingleton<InGameManager>.I.IsRush() && !isReentry)
+        {
+          int rushRescureResetNum = MonoBehaviourSingleton<InGameManager>.I.GetCurrentRushRescureResetNum();
+          if (rushRescureResetNum > 0)
+            playerInfo.transferInfo.rescueCount = Mathf.Max(0, playerInfo.transferInfo.rescueCount - rushRescureResetNum);
+        }
+        playerInfo.isSelf = player is Self;
+        playerInfo.coopMode = player.coopMode;
+        playerInfo.coopClientId = player.coopClientId;
+        playerInfo.isNpcController = player.controller is NpcController;
+        playerInfo.isCoopPlayer = false;
+        if (player is Self)
+        {
+          Self self = player as Self;
+          if (Object.op_Inequality((Object) self, (Object) null))
+            playerInfo.taskChecker = self.taskChecker;
+        }
+        if (player.coopClientId != 0 && MonoBehaviourSingleton<CoopManager>.IsValid())
+        {
+          CoopClient byPlayerId = MonoBehaviourSingleton<CoopManager>.I.coopRoom.clients.FindByPlayerId(player.id);
+          if (Object.op_Inequality((Object) byPlayerId, (Object) null))
+          {
+            playerInfo.coopClientId = byPlayerId.clientId;
+            playerInfo.isCoopPlayer = true;
+          }
+        }
+        this.intervalTransferInfo.playerInfoList.Add(playerInfo);
+      }
+    }
+  }
+
+  public void SetIntervalTransferSelf()
+  {
+    if (Object.op_Inequality((Object) this.selfCacheObject, (Object) null))
+      return;
+    this.selfCacheObject = new GameObject();
+    ((Object) this.selfCacheObject).name = "SelfCacheObject";
+    this.selfCacheObject.transform.parent = MonoBehaviourSingleton<AppMain>.I._transform;
+    Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
+    self.OnCached();
+    GameObject gameObject = ((Component) self).gameObject;
+    gameObject.transform.parent = this.selfCacheObject.transform;
+    ((Object) gameObject.gameObject).name = "SelfCache";
+    gameObject.gameObject.SetActive(false);
+  }
+
+  public void DestroySelfCache()
+  {
+    if (Object.op_Equality((Object) this.selfCacheObject, (Object) null))
+      return;
+    MonoBehaviourSingleton<GoGameCacheManager>.I.CacheSelfPlayerModel();
+    Object.Destroy((Object) this.selfCacheObject);
+    this.selfCacheObject = (GameObject) null;
+  }
+
+  public void SetEnableIntervalTransferInfoRemaindTimeUpdate()
+  {
+    if (this.updateIntervalTransferInfoRemaindTime != null)
+      return;
+    this.updateIntervalTransferInfoRemaindTime = this.UpdateIntervalTransferInfoRemaindTime();
+    this.StartCoroutine(this.updateIntervalTransferInfoRemaindTime);
+  }
+
+  public void StopIntervalTransferInfoRemaindTimeUpdate()
+  {
+    if (this.updateIntervalTransferInfoRemaindTime == null)
+      return;
+    this.StopCoroutine(this.updateIntervalTransferInfoRemaindTime);
+    this.updateIntervalTransferInfoRemaindTime = (IEnumerator) null;
+  }
+
+  private IEnumerator UpdateIntervalTransferInfoRemaindTime()
+  {
+    float startTime = Time.realtimeSinceStartup;
+    float startRemaindTime = this.intervalTransferInfo.remaindTime;
+    while (this.intervalTransferInfo != null)
+    {
+      this.intervalTransferInfo.remaindTime = startRemaindTime - (Time.realtimeSinceStartup - startTime);
+      yield return (object) null;
+    }
+  }
+
+  public void SaveQuestTransferInfo()
+  {
+    if (this.questTransferInfo == null)
+      this.questTransferInfo = new InGameManager.QuestTransferInfo();
+    this.questTransferInfo.intervalTransferInfo = this.intervalTransferInfo;
+    this.questTransferInfo.isQuestHappen = this.isQuestHappen;
+    this.questTransferInfo.isQuestGate = this.isQuestGate;
+    this.questTransferInfo.isQuestPortal = this.isQuestPortal;
+    this.questTransferInfo.isQuestFromGimmick = this.isQuestFromGimmick;
+    this.questTransferInfo.isGateQuestClear = this.isGateQuestClear;
+    this.questTransferInfo.isTransitionFieldToQuest = this.isTransitionFieldToQuest;
+    this.questTransferInfo.isTransitionQuestToField = this.isTransitionQuestToField;
+    this.questTransferInfo.isTransitionFieldReentry = this.isTransitionFieldReentry;
+    this.questTransferInfo.isStoryPortal = this.isStoryPortal;
+    this.questTransferInfo.readStoryID = this.readStoryID;
+    this.questTransferInfo.beforePortalID = this.beforePortalID;
+    this.questTransferInfo.backTransitionInfo = this.backTransitionInfo;
+  }
+
+  public void ResumeQuestTransferInfo()
+  {
+    if (this.questTransferInfo == null)
+      return;
+    this.intervalTransferInfo = this.questTransferInfo.intervalTransferInfo;
+    this.isQuestHappen = this.questTransferInfo.isQuestHappen;
+    this.isQuestGate = this.questTransferInfo.isQuestGate;
+    this.isQuestPortal = this.questTransferInfo.isQuestPortal;
+    this.isQuestFromGimmick = this.questTransferInfo.isQuestFromGimmick;
+    this.isGateQuestClear = this.questTransferInfo.isGateQuestClear;
+    this.isTransitionFieldToQuest = this.questTransferInfo.isTransitionFieldToQuest;
+    this.isTransitionQuestToField = this.questTransferInfo.isTransitionQuestToField;
+    this.isTransitionFieldReentry = this.questTransferInfo.isTransitionFieldReentry;
+    this.isStoryPortal = this.questTransferInfo.isStoryPortal;
+    this.readStoryID = this.questTransferInfo.readStoryID;
+    this.beforePortalID = this.questTransferInfo.beforePortalID;
+    this.backTransitionInfo = this.questTransferInfo.backTransitionInfo;
+    this.questTransferInfo = (InGameManager.QuestTransferInfo) null;
+  }
+
+  public bool IsDisableEffectGraphicLow(string effectName)
+  {
+    if (effectName.Length == 0 || this.graphicOptionType > 0)
+      return false;
+    for (int index = 0; index < InGameManager.disableEffectsGraphicLow.Length; ++index)
+    {
+      if (effectName.StartsWith(InGameManager.disableEffectsGraphicLow[index]))
+        return true;
+    }
+    return false;
+  }
+
+  public enum VoiceOption
+  {
+    ENGLISH,
+    JAPANESE,
+    MUTE,
+  }
+
+  public enum LanguageOption
+  {
+    ENGLISH,
+    FRENCH,
+    GERMAN,
+    ITALIAN,
+    PORTUGUESE,
+    THAI,
+    VIETNAM,
+    SPANISH,
+  }
+
+  public class IntervalTransferInfo
+  {
+    public float remaindTime = -1f;
+    public float elapsedTime = -1f;
+    public List<InGameManager.IntervalTransferInfo.PlayerInfo> playerInfoList = new List<InGameManager.IntervalTransferInfo.PlayerInfo>();
+
+    public class PlayerInfo
+    {
+      public int id;
+      public StageObjectManager.CreatePlayerInfo createInfo;
+      public StageObjectManager.PlayerTransferInfo transferInfo;
+      public bool isSelf;
+      public StageObject.COOP_MODE_TYPE coopMode;
+      public int coopClientId;
+      public bool isNpcController;
+      public bool isCoopPlayer;
+      public TaskChecker taskChecker = new TaskChecker();
+    }
+  }
+
+  public class DropItemInfo
+  {
+    public REWARD_TYPE type;
+    public uint id;
+    public int num;
+
+    public DropItemInfo(REWARD_TYPE _type, uint _id, int _num)
+    {
+      this.type = _type;
+      this.id = _id;
+      this.num = _num;
+    }
+
+    public UIDropAnnounce.DropAnnounceInfo CreateAnnounceInfo(out bool is_rare)
+    {
+      is_rare = false;
+      UIDropAnnounce.DropAnnounceInfo announceInfo;
+      switch (this.type)
+      {
+        case REWARD_TYPE.EQUIP_ITEM:
+          announceInfo = UIDropAnnounce.DropAnnounceInfo.CreateEquipItemInfo(this.id, this.num, out is_rare);
+          break;
+        case REWARD_TYPE.SKILL_ITEM:
+          announceInfo = UIDropAnnounce.DropAnnounceInfo.CreateSkillItemInfo(this.id, this.num, out is_rare);
+          break;
+        case REWARD_TYPE.ACCESSORY:
+          announceInfo = UIDropAnnounce.DropAnnounceInfo.CreateAccessoryItemInfo(this.id, this.num, out is_rare);
+          break;
+        default:
+          announceInfo = UIDropAnnounce.DropAnnounceInfo.CreateItemInfo(this.id, this.num, out is_rare);
+          break;
+      }
+      return announceInfo;
+    }
+  }
+
+  public class DropDeliveryInfo
+  {
+    public int id;
+    public int index;
+    public string name;
+    public string itemName;
+    public int num;
+    public List<DELIVERY_CONDITION_TYPE> conditionTypes;
+    private bool? isCountUpAtKillFieldEnemy;
+
+    public DropDeliveryInfo(
+      int delivery_id,
+      int delivery_index,
+      string _name,
+      string item_name,
+      int _num,
+      List<DELIVERY_CONDITION_TYPE> condition_type)
+    {
+      this.id = delivery_id;
+      this.index = delivery_index;
+      this.name = _name;
+      this.itemName = item_name;
+      this.num = _num;
+      this.conditionTypes = condition_type;
+    }
+
+    public bool IsCountUpAtDefeatFieldEnemy()
+    {
+      if (this.isCountUpAtKillFieldEnemy.HasValue)
+        return this.isCountUpAtKillFieldEnemy.Value;
+      int index = 0;
+      for (int count = this.conditionTypes.Count; index < count; ++index)
+      {
+        if (MonoBehaviourSingleton<DeliveryManager>.I.IsDefeatFieldConditionType(this.conditionTypes[index]))
+        {
+          this.isCountUpAtKillFieldEnemy = new bool?(true);
+          return true;
+        }
+      }
+      this.isCountUpAtKillFieldEnemy = new bool?(false);
+      return false;
+    }
+  }
+
+  public class QuestTransferInfo
+  {
+    public InGameManager.IntervalTransferInfo intervalTransferInfo;
+    public bool isQuestHappen;
+    public bool isQuestGate;
+    public bool isQuestPortal;
+    public bool isQuestFromGimmick;
+    public bool isGateQuestClear;
+    public bool isTransitionFieldToQuest;
+    public bool isTransitionQuestToField;
+    public bool isTransitionFieldReentry;
+    public bool isStoryPortal;
+    public int readStoryID;
+    public uint beforePortalID;
+    public FieldManager.FieldTransitionInfo backTransitionInfo;
+  }
+
+  public class RushWaveSyncData
+  {
+    public float elapsedTime;
+    public List<int> bossBreakIds;
+  }
 }

@@ -1,110 +1,88 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AttackHitChecker
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class AttackHitChecker
 {
-	protected class HitRecord
-	{
-		public StageObject target;
+  protected StringKeyTable<List<AttackHitChecker.HitRecord>> attackHitList = new StringKeyTable<List<AttackHitChecker.HitRecord>>();
 
-		public float lastHitTime = -1f;
-	}
+  public void OnHitAttack(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
+  {
+    List<AttackHitChecker.HitRecord> hitRecordList = this.attackHitList.Get(info.name);
+    if (hitRecordList == null)
+    {
+      hitRecordList = new List<AttackHitChecker.HitRecord>();
+      this.attackHitList.Add(info.name, hitRecordList);
+    }
+    AttackHitChecker.HitRecord hitRecord = (AttackHitChecker.HitRecord) null;
+    int index = 0;
+    for (int count = hitRecordList.Count; index < count; ++index)
+    {
+      if (Object.op_Equality((Object) hitRecordList[index].target, (Object) hit_param.toObject))
+      {
+        hitRecord = hitRecordList[index];
+        break;
+      }
+    }
+    if (hitRecord == null)
+    {
+      hitRecord = new AttackHitChecker.HitRecord();
+      hitRecord.target = hit_param.toObject;
+      hitRecordList.Add(hitRecord);
+    }
+    hitRecord.lastHitTime = Time.time;
+    ++hitRecord.hitCount;
+  }
 
-	protected StringKeyTable<List<HitRecord>> attackHitList = new StringKeyTable<List<HitRecord>>();
+  public bool CheckHitAttack(AttackHitInfo info, Collider to_collider, StageObject to_object)
+  {
+    List<AttackHitChecker.HitRecord> hitRecordList = this.attackHitList.Get(info.name);
+    if (hitRecordList != null)
+    {
+      int index = 0;
+      for (int count = hitRecordList.Count; index < count; ++index)
+      {
+        AttackHitChecker.HitRecord hitRecord = hitRecordList[index];
+        if (Object.op_Equality((Object) hitRecord.target, (Object) to_object) && (info.enableIdentityCheck || (double) Time.time - (double) hitRecord.lastHitTime <= (double) info.hitIntervalTime || info.hitCountMax > 0 && info.hitCountMax <= hitRecord.hitCount))
+          return false;
+      }
+    }
+    return true;
+  }
 
-	public void OnHitAttack(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
-	{
-		List<HitRecord> list = attackHitList.Get(info.name);
-		if (list == null)
-		{
-			list = new List<HitRecord>();
-			attackHitList.Add(info.name, list);
-		}
-		HitRecord hitRecord = null;
-		int i = 0;
-		for (int count = list.Count; i < count; i++)
-		{
-			if (list[i].target == hit_param.toObject)
-			{
-				hitRecord = list[i];
-				break;
-			}
-		}
-		if (hitRecord == null)
-		{
-			hitRecord = new HitRecord();
-			hitRecord.target = hit_param.toObject;
-			list.Add(hitRecord);
-		}
-		hitRecord.lastHitTime = Time.get_time();
-	}
+  public void ClearAll() => this.attackHitList.Clear();
 
-	public bool CheckHitAttack(AttackHitInfo info, Collider to_collider, StageObject to_object)
-	{
-		List<HitRecord> list = attackHitList.Get(info.name);
-		if (list != null)
-		{
-			int i = 0;
-			for (int count = list.Count; i < count; i++)
-			{
-				HitRecord hitRecord = list[i];
-				if (hitRecord.target == to_object)
-				{
-					if (info.enableIdentityCheck)
-					{
-						return false;
-					}
-					if (Time.get_time() - hitRecord.lastHitTime <= info.hitIntervalTime)
-					{
-						return false;
-					}
-				}
-			}
-		}
-		return true;
-	}
+  public void ClearHitInfo(AttackHitInfo info) => this.ClearHitInfo(info.name);
 
-	public void ClearAll()
-	{
-		attackHitList.Clear();
-	}
+  public void ClearHitInfo(string infoName) => this.attackHitList.Get(infoName)?.Clear();
 
-	public void ClearHitInfo(AttackHitInfo info)
-	{
-		ClearHitInfo(info.name);
-	}
+  public void ClearTarget(AttackInfo info, StageObject target)
+  {
+    List<AttackHitChecker.HitRecord> hitRecordList = this.attackHitList.Get(info.name);
+    if (hitRecordList == null)
+      return;
+    int index = 0;
+    for (int count = hitRecordList.Count; index < count; ++index)
+    {
+      AttackHitChecker.HitRecord hitRecord = hitRecordList[index];
+      if (Object.op_Equality((Object) hitRecord.target, (Object) target))
+      {
+        hitRecordList.Remove(hitRecord);
+        break;
+      }
+    }
+  }
 
-	public void ClearHitInfo(string infoName)
-	{
-		List<HitRecord> list = attackHitList.Get(infoName);
-		if (!object.ReferenceEquals(list, null))
-		{
-			list.Clear();
-		}
-	}
-
-	public void ClearTarget(AttackInfo info, StageObject target)
-	{
-		List<HitRecord> list = attackHitList.Get(info.name);
-		if (!object.ReferenceEquals(list, null))
-		{
-			int num = 0;
-			int count = list.Count;
-			HitRecord hitRecord;
-			while (true)
-			{
-				if (num >= count)
-				{
-					return;
-				}
-				hitRecord = list[num];
-				if (hitRecord.target == target)
-				{
-					break;
-				}
-				num++;
-			}
-			list.Remove(hitRecord);
-		}
-	}
+  protected class HitRecord
+  {
+    public StageObject target;
+    public float lastHitTime = -1f;
+    public int hitCount;
+  }
 }

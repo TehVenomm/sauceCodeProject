@@ -1,65 +1,50 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: EquipItemAbility
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class EquipItemAbility
 {
-	public uint id;
+  public uint id;
+  public int ap;
 
-	public int ap;
+  public EquipItemAbility(uint _id, int _ap)
+  {
+    this.id = _id;
+    this.ap = _ap;
+  }
 
-	public EquipItemAbility(uint _id, int _ap)
-	{
-		id = _id;
-		ap = _ap;
-	}
+  public string GetName()
+  {
+    AbilityTable.Ability ability = Singleton<AbilityTable>.I.GetAbility(this.id);
+    return ability == null ? string.Empty : ability.name;
+  }
 
-	public string GetName()
-	{
-		AbilityTable.Ability ability = Singleton<AbilityTable>.I.GetAbility(id);
-		if (ability == null)
-		{
-			return string.Empty;
-		}
-		return ability.name;
-	}
+  public string GetNameAndAP()
+  {
+    return this.ap >= 0 ? $"{this.GetName()} +{this.ap}" : $"{this.GetName()} {this.ap}";
+  }
 
-	public string GetNameAndAP()
-	{
-		if (ap >= 0)
-		{
-			return $"{GetName()} +{ap}";
-		}
-		return $"{GetName()} {ap}";
-	}
+  public string GetAP() => this.ap >= 0 ? $"+{this.ap}" : $"{this.ap}";
 
-	public string GetAP()
-	{
-		if (ap >= 0)
-		{
-			return $"+{ap}";
-		}
-		return $"{ap}";
-	}
+  public string GetDescription()
+  {
+    return (Singleton<AbilityDataTable>.I.GetAbilityData(this.id, this.ap) ?? Singleton<AbilityDataTable>.I.GetMinimumAbilityData(this.id)).description;
+  }
 
-	public string GetDescription()
-	{
-		AbilityDataTable.AbilityData abilityData = Singleton<AbilityDataTable>.I.GetAbilityData(id, ap);
-		if (abilityData == null)
-		{
-			abilityData = Singleton<AbilityDataTable>.I.GetMinimumAbilityData(id);
-		}
-		return abilityData.description;
-	}
+  public bool IsNeedUpdate()
+  {
+    AbilityDataTable.AbilityData minimumAbilityData = Singleton<AbilityDataTable>.I.GetMinimumAbilityData(this.id);
+    return minimumAbilityData != null && minimumAbilityData.HasNeedUpdateAbility();
+  }
 
-	public bool IsNeedUpdate()
-	{
-		return Singleton<AbilityDataTable>.I.GetMinimumAbilityData(id)?.HasNeedUpdateAbility() ?? false;
-	}
+  public bool IsActiveAbility()
+  {
+    AbilityTable.Ability ability = Singleton<AbilityTable>.I.GetAbility(this.id);
+    return ability != null && ability.IsActive();
+  }
 
-	public bool IsActiveAbility()
-	{
-		return Singleton<AbilityTable>.I.GetAbility(id)?.IsActive() ?? false;
-	}
-
-	public EquipItemAbility Inverse()
-	{
-		return new EquipItemAbility(id, -ap);
-	}
+  public EquipItemAbility Inverse() => new EquipItemAbility(this.id, -this.ap);
 }

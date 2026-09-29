@@ -1,192 +1,154 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: HomeFeatureBanner
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System.Collections;
 using UnityEngine;
 
-public class HomeFeatureBanner
+#nullable disable
+public class HomeFeatureBanner : MonoBehaviour
 {
-	private string MODEL_FORMAT = "NPC011_{0:000}";
+  private string MODEL_FORMAT = "NPC011_{0:000}";
+  private Transform parent;
+  private Vector3 position;
+  private Quaternion rotation;
+  private HomeStageTouchEvent touchEvent;
+  private int currentVariation = -1;
+  private int currentBannerId = -1;
+  private Transform modelTransform;
+  private Material bannerMaterial;
 
-	private Transform parent;
+  public bool isLoading { get; private set; }
 
-	private Vector3 position;
+  public void Setup(Transform parent, Vector3 position, Quaternion rotation)
+  {
+    this.parent = parent;
+    this.position = position;
+    this.rotation = rotation;
+    this.Reposition();
+  }
 
-	private Quaternion rotation;
+  private void Reposition()
+  {
+    if (!Object.op_Implicit((Object) this.modelTransform))
+      return;
+    this.modelTransform.parent = this.parent;
+    this.modelTransform.localPosition = this.position;
+    this.modelTransform.rotation = this.rotation;
+    this.modelTransform.localScale = Vector3.one;
+  }
 
-	private HomeStageTouchEvent touchEvent;
+  public void SetBanner(int bannerId)
+  {
+    if (this.currentBannerId != -1 && bannerId == this.currentBannerId)
+      return;
+    this.Load(1, bannerId);
+  }
 
-	private int currentVariation = -1;
+  private void Load(int variation, int bannerId)
+  {
+    this.isLoading = true;
+    this.StartCoroutine(this._Load(variation, bannerId));
+  }
 
-	private int currentBannerId = -1;
+  private IEnumerator _Load(int variation, int bannerId)
+  {
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject lo_model = (LoadObject) null;
+    LoadObject lo_tex = (LoadObject) null;
+    bool loadModel = this.currentVariation != variation;
+    bool loadTex = this.currentBannerId != bannerId;
+    if (loadModel)
+      lo_model = loadingQueue.Load(RESOURCE_CATEGORY.NPC_MODEL, string.Format(this.MODEL_FORMAT, (object) variation));
+    if (loadTex)
+      lo_tex = loadingQueue.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetHomePointSHopBannerImageName(bannerId));
+    if (loadingQueue.IsLoading())
+      yield return (object) loadingQueue.Wait();
+    if (loadModel)
+    {
+      GameObject go = Object.Instantiate(lo_model.loadedObject) as GameObject;
+      this.modelTransform = go.transform;
+      this.bannerMaterial = this.FindBannerMaterial(go);
+      this.Reposition();
+      this.SetTouchEvent(go);
+      this.currentVariation = variation;
+    }
+    if (loadTex)
+    {
+      if (Object.op_Implicit((Object) this.bannerMaterial))
+        this.bannerMaterial.mainTexture = (Texture) (lo_tex.loadedObject as Texture2D);
+      this.currentBannerId = bannerId;
+    }
+    this.isLoading = false;
+  }
 
-	private Transform modelTransform;
+  private void SetTouchEvent(GameObject go)
+  {
+    GameObject go1 = new GameObject("BANNER_TOUCH_EVENT");
+    Transform transform = go1.transform;
+    transform.parent = go.transform;
+    transform.localPosition = Vector3.zero;
+    transform.localRotation = Quaternion.identity;
+    this.SetCollider(go1);
+    this.touchEvent = go1.AddComponent<HomeStageTouchEvent>();
+  }
 
-	private Material bannerMaterial;
+  private void SetCollider(GameObject go)
+  {
+    CapsuleCollider capsuleCollider = go.AddComponent<CapsuleCollider>();
+    capsuleCollider.radius = 0.5f;
+    capsuleCollider.height = 2.2f;
+    capsuleCollider.direction = 0;
+    capsuleCollider.center = new Vector3(0.0f, 0.1f, 0.0f);
+  }
 
-	public bool isLoading
-	{
-		get;
-		private set;
-	}
+  private void SetBannerEvent(HomeStageTouchEvent touchEvent, EventBanner banner)
+  {
+    switch (banner.LinkType)
+    {
+      case LINK_TYPE.PAYMENT:
+        touchEvent.eventName = "BANNER_CRYSTAL_SHOP";
+        touchEvent.eventData = (object) 0;
+        break;
+      case LINK_TYPE.GACHA:
+        touchEvent.eventName = "BANNER_GACHA";
+        touchEvent.eventData = (object) banner.param;
+        break;
+      case LINK_TYPE.NEWS:
+        touchEvent.eventName = "BANNER_NEWS";
+        touchEvent.eventData = (object) banner.param;
+        break;
+      case LINK_TYPE.EVENT_DELIVERY:
+        touchEvent.eventName = "BANNER_EVENT_DELIVERY";
+        touchEvent.eventData = (object) banner.param;
+        break;
+      case LINK_TYPE.EXPLORE_DELIVERY:
+        touchEvent.eventName = "BANNER_EXPLORE_DELIVERY";
+        touchEvent.eventData = (object) banner.param;
+        break;
+      case LINK_TYPE.LOGIN_BONUS:
+        touchEvent.eventName = "BANNER_LOGIN_BONUS";
+        touchEvent.eventData = (object) banner.param;
+        break;
+      default:
+        touchEvent.eventName = "BANNER_NEWS";
+        touchEvent.eventData = (object) 0;
+        break;
+    }
+  }
 
-	public HomeFeatureBanner()
-		: this()
-	{
-	}
-
-	public void Setup(Transform parent, Vector3 position, Quaternion rotation)
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		this.parent = parent;
-		this.position = position;
-		this.rotation = rotation;
-		Reposition();
-	}
-
-	private void Reposition()
-	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		if (Object.op_Implicit(modelTransform))
-		{
-			modelTransform.set_parent(parent);
-			modelTransform.set_localPosition(position);
-			modelTransform.set_rotation(rotation);
-			modelTransform.set_localScale(Vector3.get_one());
-		}
-	}
-
-	public void SetBanner(int bannerId)
-	{
-		if (currentBannerId == -1 || bannerId != currentBannerId)
-		{
-			Load(1, bannerId);
-		}
-	}
-
-	private void Load(int variation, int bannerId)
-	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		isLoading = true;
-		this.StartCoroutine(_Load(variation, bannerId));
-	}
-
-	private IEnumerator _Load(int variation, int bannerId)
-	{
-		LoadingQueue lo = new LoadingQueue(this);
-		LoadObject lo_model = null;
-		LoadObject lo_tex = null;
-		bool loadModel = currentVariation != variation;
-		bool loadTex = currentBannerId != bannerId;
-		if (loadModel)
-		{
-			lo_model = lo.Load(RESOURCE_CATEGORY.NPC_MODEL, string.Format(MODEL_FORMAT, variation), false);
-		}
-		if (loadTex)
-		{
-			lo_tex = lo.Load(RESOURCE_CATEGORY.COMMON, ResourceName.GetHomePointSHopBannerImageName(bannerId), false);
-		}
-		if (lo.IsLoading())
-		{
-			yield return (object)lo.Wait();
-		}
-		if (loadModel)
-		{
-			GameObject model = Object.Instantiate(lo_model.loadedObject) as GameObject;
-			modelTransform = model.get_transform();
-			bannerMaterial = FindBannerMaterial(model);
-			Reposition();
-			SetTouchEvent(model);
-			currentVariation = variation;
-		}
-		if (loadTex)
-		{
-			if (Object.op_Implicit(bannerMaterial))
-			{
-				bannerMaterial.set_mainTexture(lo_tex.loadedObject as Texture2D);
-			}
-			currentBannerId = bannerId;
-		}
-		isLoading = false;
-	}
-
-	private void SetTouchEvent(GameObject go)
-	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Expected O, but got Unknown
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		GameObject val = new GameObject("BANNER_TOUCH_EVENT");
-		Transform val2 = val.get_transform();
-		val2.set_parent(go.get_transform());
-		val2.set_localPosition(Vector3.get_zero());
-		val2.set_localRotation(Quaternion.get_identity());
-		SetCollider(val);
-		touchEvent = val.AddComponent<HomeStageTouchEvent>();
-	}
-
-	private void SetCollider(GameObject go)
-	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		CapsuleCollider val = go.AddComponent<CapsuleCollider>();
-		val.set_radius(0.5f);
-		val.set_height(2.2f);
-		val.set_direction(0);
-		val.set_center(new Vector3(0f, 0.1f, 0f));
-	}
-
-	private void SetBannerEvent(HomeStageTouchEvent touchEvent, EventBanner banner)
-	{
-		switch (banner.LinkType)
-		{
-		case LINK_TYPE.GACHA:
-			touchEvent.eventName = "BANNER_GACHA";
-			touchEvent.eventData = banner.param;
-			break;
-		case LINK_TYPE.EVENT_DELIVERY:
-			touchEvent.eventName = "BANNER_EVENT_DELIVERY";
-			touchEvent.eventData = banner.param;
-			break;
-		case LINK_TYPE.NEWS:
-			touchEvent.eventName = "BANNER_NEWS";
-			touchEvent.eventData = banner.param;
-			break;
-		case LINK_TYPE.PAYMENT:
-			touchEvent.eventName = "BANNER_CRYSTAL_SHOP";
-			touchEvent.eventData = 0;
-			break;
-		case LINK_TYPE.EXPLORE_DELIVERY:
-			touchEvent.eventName = "BANNER_EXPLORE_DELIVERY";
-			touchEvent.eventData = banner.param;
-			break;
-		case LINK_TYPE.LOGIN_BONUS:
-			touchEvent.eventName = "BANNER_LOGIN_BONUS";
-			touchEvent.eventData = banner.param;
-			break;
-		default:
-			touchEvent.eventName = "BANNER_NEWS";
-			touchEvent.eventData = 0;
-			break;
-		}
-	}
-
-	private Material FindBannerMaterial(GameObject go)
-	{
-		Renderer componentInChildren = go.GetComponentInChildren<Renderer>();
-		int i = 0;
-		for (int num = componentInChildren.get_sharedMaterials().Length; i < num; i++)
-		{
-			if (componentInChildren.get_sharedMaterials()[i].get_name().ToLower().EndsWith("_banner"))
-			{
-				return componentInChildren.get_materials()[i];
-			}
-		}
-		return null;
-	}
+  private Material FindBannerMaterial(GameObject go)
+  {
+    Renderer componentInChildren = go.GetComponentInChildren<Renderer>();
+    int index = 0;
+    for (int length = componentInChildren.sharedMaterials.Length; index < length; ++index)
+    {
+      if (((Object) componentInChildren.sharedMaterials[index]).name.ToLower().EndsWith("_banner"))
+        return componentInChildren.materials[index];
+    }
+    return (Material) null;
+  }
 }

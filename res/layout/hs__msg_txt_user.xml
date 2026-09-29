@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/user_text_message_layout" android:paddingRight="@dimen/hs__chatBubbleMargin" android:focusable="true" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/hs__listPreferredItemPaddingTop" android:paddingEnd="@dimen/hs__chatBubbleMargin"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <FrameLayout android:gravity="end" android:id="@id/user_message_container" android:layout_marginLeft="@dimen/hs__user_msg_left_margin" android:layout_alignParentRight="true" android:layout_alignParentEnd="true" style="@style/Helpshift.Style.UserTextMessageContainer">
+        <com.helpshift.views.HSTextView android:id="@id/user_message_text" style="@style/Helpshift.Style.UserTextMessage" />
+    </FrameLayout>
+    <com.helpshift.views.HSTextView android:id="@id/user_date_text" android:layout_below="@id/user_message_container" android:layout_alignRight="@id/user_message_container" style="@style/Helpshift.Style.UserMessageDate" />
+    <ImageView android:id="@id/user_message_retry_button" android:padding="4.0dp" android:visibility="gone" android:layout_width="@dimen/hs__download_icon_preview_size" android:layout_height="@dimen/hs__download_icon_preview_size" android:layout_marginLeft="-36.0dp" android:src="@drawable/hs_action_retry" android:scaleType="fitCenter" android:tint="?colorAccent" android:layout_alignLeft="@id/user_message_container" android:contentDescription="@string/hs__retry_button_voice_over" />
+</RelativeLayout>

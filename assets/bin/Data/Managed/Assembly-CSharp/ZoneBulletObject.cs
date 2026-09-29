@@ -1,262 +1,176 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ZoneBulletObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ZoneBulletObject
+#nullable disable
+public class ZoneBulletObject : MonoBehaviour
 {
-	private readonly string OBJ_NAME = "ZoneBullet:";
+  private readonly string OBJ_NAME = "ZoneBullet:";
+  private readonly string HEALATK_NAME = "HealAttackObject";
+  private Player ownerPlayer;
+  private Player usePlayer;
+  private BulletData bulletData;
+  private SkillInfo.SkillParam skillParam;
+  private Transform cachedPlayerTransform;
+  private Transform cachedTransform;
+  private Transform cachedEffectTransform;
+  private SphereCollider cachedCollider;
+  private int ignoreLayerMask;
+  private int healValue;
+  private float lifeTime;
+  private float intervalTime;
+  private bool isInitialized;
+  private Vector3 tmpVector;
+  private Character.HealData healData;
+  private Dictionary<int, float> validSecCollection = new Dictionary<int, float>();
 
-	private readonly string HEALATK_NAME = "HealAttackObject";
+  public void Initialize(
+    Player player,
+    BulletData bullet,
+    Vector3 position,
+    SkillInfo.SkillParam skill,
+    bool isHealDamgeEnemy,
+    bool isOwner)
+  {
+    if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+    {
+      Log.Error(LOG.INGAME, "StageObjectManager is invalid. Can't initialize PresentBulletObject.");
+    }
+    else
+    {
+      this.ownerPlayer = isOwner ? player : (Player) null;
+      this.usePlayer = player;
+      this.bulletData = bullet;
+      this.skillParam = skill;
+      this.healValue = this.bulletData.dataZone.type == BulletData.BulletZone.TYPE.HEAL ? skill.supportValue[0] : 0;
+      this.lifeTime = skill.supportTime[0];
+      this.intervalTime = bullet.dataZone.intervalTime;
+      ((Object) ((Component) this).gameObject).name = this.OBJ_NAME + (object) skill.tableData.id;
+      this.cachedPlayerTransform = ((Component) player).transform;
+      this.cachedTransform = ((Component) this).transform;
+      this.cachedTransform.SetParent(MonoBehaviourSingleton<StageObjectManager>.I._transform);
+      this.cachedTransform.position = position;
+      this.cachedTransform.localScale = Vector3.one;
+      if (MonoBehaviourSingleton<EffectManager>.IsValid())
+      {
+        this.cachedEffectTransform = EffectManager.GetEffect(this.bulletData.data.effectName, MonoBehaviourSingleton<EffectManager>.I._transform);
+        if (this.cachedEffectTransform != null)
+        {
+          this.cachedEffectTransform.position = Vector3.op_Addition(this.cachedTransform.position, this.bulletData.data.dispOffset);
+          this.cachedEffectTransform.localRotation = Quaternion.Euler(this.bulletData.data.dispRotation);
+        }
+      }
+      ((Component) this).gameObject.layer = 31 /*0x1F*/;
+      this.ignoreLayerMask |= 41984;
+      this.ignoreLayerMask |= 20480 /*0x5000*/;
+      this.ignoreLayerMask |= 2490880;
+      this.cachedCollider = ((Component) this).gameObject.AddComponent<SphereCollider>();
+      this.cachedCollider.radius = this.bulletData.data.radius;
+      ((Collider) this.cachedCollider).isTrigger = true;
+      ((Collider) this.cachedCollider).enabled = true;
+      this.validSecCollection.Clear();
+      if (isHealDamgeEnemy && this.healValue > 0)
+        new GameObject(this.HEALATK_NAME).AddComponent<HealAttackZoneObject>().Setup(this.ownerPlayer, this.cachedTransform, bullet, skill);
+      this.healData = new Character.HealData(this.healValue, this.bulletData.dataZone.healType, HEAL_EFFECT_TYPE.BASIS, new List<int>()
+      {
+        10
+      });
+      this.isInitialized = true;
+    }
+  }
 
-	private Player ownerPlayer;
+  private void Destroy() => this.OnDisappear();
 
-	private Player usePlayer;
+  private void Update()
+  {
+    if (!this.isInitialized)
+      return;
+    if (this.bulletData.dataZone.isCarry)
+    {
+      if (Object.op_Inequality((Object) this.usePlayer, (Object) null) && !this.usePlayer.isDead)
+      {
+        this.tmpVector = this.cachedPlayerTransform.position;
+        this.tmpVector.y = this.bulletData.data.dispOffset.y;
+        this.cachedTransform.position = this.tmpVector;
+        this.cachedEffectTransform.position = this.tmpVector;
+      }
+      else
+        this.lifeTime = 0.0f;
+    }
+    this.lifeTime -= Time.deltaTime;
+    if ((double) this.lifeTime > 0.0)
+      return;
+    this.OnDisappear();
+  }
 
-	private BulletData bulletData;
+  private void OnDisappear()
+  {
+    this.ownerPlayer = (Player) null;
+    this.usePlayer = (Player) null;
+    this.bulletData = (BulletData) null;
+    this.skillParam = (SkillInfo.SkillParam) null;
+    this.cachedPlayerTransform = (Transform) null;
+    this.cachedTransform = (Transform) null;
+    if (this.cachedCollider != null)
+      ((Collider) this.cachedCollider).enabled = false;
+    this.cachedCollider = (SphereCollider) null;
+    if (Object.op_Inequality((Object) this.cachedEffectTransform, (Object) null) && Object.op_Inequality((Object) ((Component) this.cachedEffectTransform).gameObject, (Object) null))
+      EffectManager.ReleaseEffect(((Component) this.cachedEffectTransform).gameObject);
+    this.cachedEffectTransform = (Transform) null;
+    if (((Component) this).gameObject != null)
+      Object.Destroy((Object) ((Component) this).gameObject);
+    this.isInitialized = false;
+  }
 
-	private SkillInfo.SkillParam skillParam;
+  private void OnTriggerEnter(Collider collider)
+  {
+    Player validPlayer = this._GetValidPlayer(collider);
+    if (validPlayer == null)
+      return;
+    if (!this.validSecCollection.ContainsKey(validPlayer.id))
+      this.validSecCollection.Add(validPlayer.id, 0.0f);
+    else
+      this.validSecCollection[validPlayer.id] = 0.0f;
+  }
 
-	private Transform cachedPlayerTransform;
+  private void OnTriggerStay(Collider collider)
+  {
+    Player validPlayer = this._GetValidPlayer(collider);
+    if (validPlayer == null)
+      return;
+    if (!this.validSecCollection.ContainsKey(validPlayer.id))
+      this.validSecCollection.Add(validPlayer.id, 0.0f);
+    this.validSecCollection[validPlayer.id] += Time.deltaTime;
+    if ((double) this.validSecCollection[validPlayer.id] < (double) this.intervalTime)
+      return;
+    this.validSecCollection[validPlayer.id] -= this.intervalTime;
+    if (this.healValue > 0)
+      validPlayer.OnHealReceive(this.healData);
+    if (this.bulletData.dataZone.buffType == BuffParam.BUFFTYPE.NONE)
+      return;
+    validPlayer.SetSelfBuff(this.skillParam.tableData.id, this.bulletData.dataZone.buffType, this.skillParam.supportValue[1], this.skillParam.supportTime[1], this.skillParam.skillIndex);
+  }
 
-	private Transform cachedTransform;
+  private void OnTriggerExit(Collider collider)
+  {
+    Player validPlayer = this._GetValidPlayer(collider);
+    if (validPlayer == null || !this.validSecCollection.ContainsKey(validPlayer.id))
+      return;
+    this.validSecCollection.Remove(validPlayer.id);
+  }
 
-	private Transform cachedEffectTransform;
-
-	private SphereCollider cachedCollider;
-
-	private int ignoreLayerMask;
-
-	private int healValue;
-
-	private float lifeTime;
-
-	private float intervalTime;
-
-	private bool isInitialized;
-
-	private Vector3 tmpVector = default(Vector3);
-
-	private Dictionary<int, float> validSecCollection = new Dictionary<int, float>();
-
-	public ZoneBulletObject()
-		: this()
-	{
-	}//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-	//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-
-
-	public void Initialize(Player player, BulletData bullet, Vector3 position, SkillInfo.SkillParam skill, bool isHealDamgeEnemy, bool isOwner)
-	{
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Expected O, but got Unknown
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Expected O, but got Unknown
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0238: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023d: Expected O, but got Unknown
-		if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
-		{
-			Log.Error(LOG.INGAME, "StageObjectManager is invalid. Can't initialize PresentBulletObject.");
-		}
-		else
-		{
-			ownerPlayer = ((!isOwner) ? null : player);
-			usePlayer = player;
-			bulletData = bullet;
-			skillParam = skill;
-			healValue = ((bulletData.dataZone.type == BulletData.BulletZone.TYPE.HEAL) ? skill.supportValue[0] : 0);
-			lifeTime = skill.supportTime[0];
-			intervalTime = bullet.dataZone.intervalTime;
-			this.get_gameObject().set_name(OBJ_NAME + skill.tableData.id);
-			cachedPlayerTransform = player.get_transform();
-			cachedTransform = this.get_transform();
-			cachedTransform.SetParent(MonoBehaviourSingleton<StageObjectManager>.I._transform);
-			cachedTransform.set_position(position);
-			cachedTransform.set_localScale(Vector3.get_one());
-			if (MonoBehaviourSingleton<EffectManager>.IsValid())
-			{
-				cachedEffectTransform = EffectManager.GetEffect(bulletData.data.effectName, MonoBehaviourSingleton<EffectManager>.I._transform);
-				if (!object.ReferenceEquals(cachedEffectTransform, null))
-				{
-					cachedEffectTransform.set_position(cachedTransform.get_position() + bulletData.data.dispOffset);
-					cachedEffectTransform.set_localRotation(Quaternion.Euler(bulletData.data.dispRotation));
-				}
-			}
-			this.get_gameObject().set_layer(31);
-			ignoreLayerMask |= 41984;
-			ignoreLayerMask |= 20480;
-			ignoreLayerMask |= 2490880;
-			cachedCollider = this.get_gameObject().AddComponent<SphereCollider>();
-			cachedCollider.set_radius(bulletData.data.radius);
-			cachedCollider.set_isTrigger(true);
-			cachedCollider.set_enabled(true);
-			validSecCollection.Clear();
-			if (isHealDamgeEnemy && healValue > 0)
-			{
-				GameObject val = new GameObject(HEALATK_NAME);
-				HealAttackZoneObject healAttackZoneObject = val.AddComponent<HealAttackZoneObject>();
-				healAttackZoneObject.Setup(ownerPlayer, cachedTransform, bullet, skill);
-			}
-			isInitialized = true;
-		}
-	}
-
-	private void Destroy()
-	{
-		OnDisappear();
-	}
-
-	private void Update()
-	{
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		if (isInitialized)
-		{
-			if (bulletData.dataZone.isCarry)
-			{
-				if (usePlayer != null && !usePlayer.isDead)
-				{
-					tmpVector = cachedPlayerTransform.get_position();
-					tmpVector.y = bulletData.data.dispOffset.y;
-					cachedTransform.set_position(tmpVector);
-					cachedEffectTransform.set_position(tmpVector);
-				}
-				else
-				{
-					lifeTime = 0f;
-				}
-			}
-			lifeTime -= Time.get_deltaTime();
-			if (lifeTime <= 0f)
-			{
-				OnDisappear();
-			}
-		}
-	}
-
-	private void OnDisappear()
-	{
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Expected O, but got Unknown
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Expected O, but got Unknown
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		ownerPlayer = null;
-		usePlayer = null;
-		bulletData = null;
-		skillParam = null;
-		cachedPlayerTransform = null;
-		cachedTransform = null;
-		if (!object.ReferenceEquals(cachedCollider, null))
-		{
-			cachedCollider.set_enabled(false);
-		}
-		cachedCollider = null;
-		if (cachedEffectTransform != null && cachedEffectTransform.get_gameObject() != null)
-		{
-			EffectManager.ReleaseEffect(cachedEffectTransform.get_gameObject(), true, false);
-		}
-		cachedEffectTransform = null;
-		if (!object.ReferenceEquals((object)this.get_gameObject(), null))
-		{
-			Object.Destroy(this.get_gameObject());
-		}
-		isInitialized = false;
-	}
-
-	private void OnTriggerEnter(Collider collider)
-	{
-		Player player = _GetValidPlayer(collider);
-		if (!object.ReferenceEquals(player, null))
-		{
-			if (!validSecCollection.ContainsKey(player.id))
-			{
-				validSecCollection.Add(player.id, 0f);
-			}
-			else
-			{
-				validSecCollection[player.id] = 0f;
-			}
-		}
-	}
-
-	private void OnTriggerStay(Collider collider)
-	{
-		Player player = _GetValidPlayer(collider);
-		if (!object.ReferenceEquals(player, null))
-		{
-			if (!validSecCollection.ContainsKey(player.id))
-			{
-				validSecCollection.Add(player.id, 0f);
-			}
-			Dictionary<int, float> dictionary;
-			Dictionary<int, float> dictionary2 = dictionary = validSecCollection;
-			int id;
-			int key = id = player.id;
-			float num = dictionary[id];
-			dictionary2[key] = num + Time.get_deltaTime();
-			if (validSecCollection[player.id] >= intervalTime)
-			{
-				Dictionary<int, float> dictionary3;
-				Dictionary<int, float> dictionary4 = dictionary3 = validSecCollection;
-				int key2 = id = player.id;
-				num = dictionary3[id];
-				dictionary4[key2] = num - intervalTime;
-				if (healValue > 0)
-				{
-					player.OnHealReceive(healValue, bulletData.dataZone.healType, HEAL_EFFECT_TYPE.BASIS, true);
-				}
-				if (bulletData.dataZone.buffType != BuffParam.BUFFTYPE.NONE)
-				{
-					player.SetSelfBuff(skillParam.tableData.id, bulletData.dataZone.buffType, skillParam.supportValue[1], skillParam.supportTime[1], skillParam.skillIndex);
-				}
-			}
-		}
-	}
-
-	private void OnTriggerExit(Collider collider)
-	{
-		Player player = _GetValidPlayer(collider);
-		if (!object.ReferenceEquals(player, null) && validSecCollection.ContainsKey(player.id))
-		{
-			validSecCollection.Remove(player.id);
-		}
-	}
-
-	private Player _GetValidPlayer(Collider collider)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		int layer = collider.get_gameObject().get_layer();
-		if (((1 << layer) & ignoreLayerMask) > 0)
-		{
-			return null;
-		}
-		Player component = collider.get_gameObject().GetComponent<Player>();
-		if (object.ReferenceEquals(component, null))
-		{
-			return null;
-		}
-		if (component.IsCoopNone() || component.IsOriginal())
-		{
-			return component;
-		}
-		if (!object.ReferenceEquals(ownerPlayer, null) && component.isNpc)
-		{
-			return component;
-		}
-		return null;
-	}
+  private Player _GetValidPlayer(Collider collider)
+  {
+    if ((1 << ((Component) collider).gameObject.layer & this.ignoreLayerMask) > 0)
+      return (Player) null;
+    Player component = ((Component) collider).gameObject.GetComponent<Player>();
+    if (component == null)
+      return (Player) null;
+    return component.IsCoopNone() || component.IsOriginal() || this.ownerPlayer != null && component.isNpc ? component : (Player) null;
+  }
 }

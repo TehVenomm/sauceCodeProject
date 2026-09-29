@@ -1,168 +1,131 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIInGameMenu
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class UIInGameMenu : MonoBehaviourSingleton<UIInGameMenu>
 {
-	[SerializeField]
-	protected GameObject partyMenuUI;
+  [SerializeField]
+  protected GameObject partyMenuUI;
+  [SerializeField]
+  protected GameObject normalMenuUI;
+  [SerializeField]
+  protected GameObject happenMenuUI;
+  [SerializeField]
+  protected GameObject retryableMenuUI;
+  [SerializeField]
+  protected UILabel partyNumber;
+  [SerializeField]
+  protected GameObject m_missionRoot;
+  [SerializeField]
+  protected UILabel[] m_missionTexts;
+  [SerializeField]
+  protected GameObject[] m_missionCrownOn;
+  [SerializeField]
+  protected GameObject[] m_missionCrownOff;
 
-	[SerializeField]
-	protected GameObject normalMenuUI;
+  protected override void Awake()
+  {
+    base.Awake();
+    ((Component) this).gameObject.SetActive(false);
+  }
 
-	[SerializeField]
-	protected GameObject happenMenuUI;
+  public void Initialize()
+  {
+    QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
+    if (MonoBehaviourSingleton<QuestManager>.I.IsExplore())
+    {
+      this.partyMenuUI.SetActive(true);
+      this.normalMenuUI.SetActive(false);
+      this.happenMenuUI.SetActive(false);
+      this.retryableMenuUI.SetActive(false);
+      string partyNumber = MonoBehaviourSingleton<PartyManager>.I.GetPartyNumber();
+      this.partyNumber.text = !string.IsNullOrEmpty(partyNumber) ? partyNumber : "-";
+    }
+    else if (questData != null && (questData.questType == QUEST_TYPE.HAPPEN || questData.questType == QUEST_TYPE.SERIES_ARENA))
+    {
+      this.partyMenuUI.SetActive(false);
+      this.normalMenuUI.SetActive(false);
+      this.happenMenuUI.SetActive(true);
+      this.retryableMenuUI.SetActive(false);
+      QuestInfoData.Mission[] missionData = QuestInfoData.CreateMissionData(questData);
+      if (missionData != null)
+      {
+        int index = 0;
+        for (int length = missionData.Length; index < length; ++index)
+        {
+          QuestInfoData.Mission mission = missionData[index];
+          this.m_missionCrownOn[index].SetActive(CLEAR_STATUS.CLEAR == mission.state);
+          this.m_missionCrownOff[index].SetActive(CLEAR_STATUS.CLEAR != mission.state);
+          this.m_missionTexts[index].text = mission.tableData.missionText;
+        }
+      }
+    }
+    else if (questData != null && questData.questType == QUEST_TYPE.ARENA)
+    {
+      this.partyMenuUI.SetActive(false);
+      this.normalMenuUI.SetActive(false);
+      this.happenMenuUI.SetActive(false);
+      this.retryableMenuUI.SetActive(true);
+    }
+    else
+    {
+      this.partyMenuUI.SetActive(false);
+      this.normalMenuUI.SetActive(true);
+      this.happenMenuUI.SetActive(false);
+      this.retryableMenuUI.SetActive(false);
+    }
+    if (MonoBehaviourSingleton<UIManager>.IsValid() && Object.op_Inequality((Object) MonoBehaviourSingleton<UIManager>.I.mainChat, (Object) null))
+      MonoBehaviourSingleton<UIManager>.I.mainChat.HideAll();
+    ((Component) this).gameObject.SetActive(true);
+  }
 
-	[SerializeField]
-	protected GameObject retryableMenuUI;
+  public void OnClickClose()
+  {
+    MonoBehaviourSingleton<InGameProgress>.I.CloseDialog();
+    this.Close();
+  }
 
-	[SerializeField]
-	protected UILabel partyNumber;
+  public void Close() => ((Component) this).gameObject.SetActive(false);
 
-	[SerializeField]
-	protected GameObject m_missionRoot;
+  public void OnClickOption()
+  {
+    if (!MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+      return;
+    MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameMenu.OnClickOption", ((Component) this).gameObject, "OPTION");
+  }
 
-	[SerializeField]
-	protected UILabel[] m_missionTexts;
+  public void OnClickRetire()
+  {
+    if (!MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+      return;
+    if (FieldManager.IsValidInGameNoBoss())
+    {
+      Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
+      if (Object.op_Inequality((Object) self, (Object) null) && (double) self.rescueTime > 0.0)
+        MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRetire", ((Component) this).gameObject, "RETIRE", (object) StringTable.Get(STRING_CATEGORY.IN_GAME, 1008U));
+      else
+        MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRetire", ((Component) this).gameObject, "RETIRE", (object) StringTable.Get(STRING_CATEGORY.IN_GAME, 1009U));
+    }
+    else
+      MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameMenu.OnClickRetire", ((Component) this).gameObject, "RETIRE");
+  }
 
-	[SerializeField]
-	protected GameObject[] m_missionCrownOn;
+  public void DoRetire()
+  {
+    if (!MonoBehaviourSingleton<InGameProgress>.IsValid())
+      return;
+    MonoBehaviourSingleton<InGameProgress>.I.BattleRetire();
+  }
 
-	[SerializeField]
-	protected GameObject[] m_missionCrownOff;
-
-	protected override void Awake()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		base.Awake();
-		this.get_gameObject().SetActive(false);
-	}
-
-	public void Initialize()
-	{
-		//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
-		if (MonoBehaviourSingleton<QuestManager>.I.IsExplore())
-		{
-			partyMenuUI.SetActive(true);
-			normalMenuUI.SetActive(false);
-			happenMenuUI.SetActive(false);
-			retryableMenuUI.SetActive(false);
-			string text = MonoBehaviourSingleton<PartyManager>.I.GetPartyNumber();
-			if (string.IsNullOrEmpty(text))
-			{
-				partyNumber.text = "-";
-			}
-			else
-			{
-				partyNumber.text = text;
-			}
-		}
-		else if (questData != null && questData.questType == QUEST_TYPE.HAPPEN)
-		{
-			partyMenuUI.SetActive(false);
-			normalMenuUI.SetActive(false);
-			happenMenuUI.SetActive(true);
-			retryableMenuUI.SetActive(false);
-			QuestInfoData.Mission[] array = null;
-			array = QuestInfoData.CreateMissionData(questData);
-			if (array != null)
-			{
-				int i = 0;
-				for (int num = array.Length; i < num; i++)
-				{
-					QuestInfoData.Mission mission = array[i];
-					m_missionCrownOn[i].SetActive(CLEAR_STATUS.CLEAR == mission.state);
-					m_missionCrownOff[i].SetActive(CLEAR_STATUS.CLEAR != mission.state);
-					m_missionTexts[i].text = mission.tableData.missionText;
-				}
-			}
-		}
-		else if (questData != null && questData.questType == QUEST_TYPE.ARENA)
-		{
-			partyMenuUI.SetActive(false);
-			normalMenuUI.SetActive(false);
-			happenMenuUI.SetActive(false);
-			retryableMenuUI.SetActive(true);
-		}
-		else
-		{
-			partyMenuUI.SetActive(false);
-			normalMenuUI.SetActive(true);
-			happenMenuUI.SetActive(false);
-			retryableMenuUI.SetActive(false);
-		}
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
-		{
-			MonoBehaviourSingleton<UIManager>.I.mainChat.HideAll();
-		}
-		this.get_gameObject().SetActive(true);
-	}
-
-	public void OnClickClose()
-	{
-		MonoBehaviourSingleton<InGameProgress>.I.CloseDialog();
-		Close();
-	}
-
-	public void Close()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(false);
-	}
-
-	public void OnClickOption()
-	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Expected O, but got Unknown
-		if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameMenu.OnClickOption", this.get_gameObject(), "OPTION", null, null, true);
-		}
-	}
-
-	public void OnClickRetire()
-	{
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Expected O, but got Unknown
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Expected O, but got Unknown
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Expected O, but got Unknown
-		if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-		{
-			if (FieldManager.IsValidInGameNoBoss())
-			{
-				Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-				if (self != null && self.rescueTime > 0f)
-				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRetire", this.get_gameObject(), "RETIRE", StringTable.Get(STRING_CATEGORY.IN_GAME, 1008u), null, true);
-				}
-				else
-				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIContinueButton.OnClickRetire", this.get_gameObject(), "RETIRE", StringTable.Get(STRING_CATEGORY.IN_GAME, 1009u), null, true);
-				}
-			}
-			else
-			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameMenu.OnClickRetire", this.get_gameObject(), "RETIRE", null, null, true);
-			}
-		}
-	}
-
-	public void DoRetire()
-	{
-		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
-		{
-			MonoBehaviourSingleton<InGameProgress>.I.BattleRetire();
-		}
-	}
-
-	public void OnClickRetry()
-	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Expected O, but got Unknown
-		if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameMenu.OnClickRetry", this.get_gameObject(), "RETRY", null, null, true);
-		}
-	}
+  public void OnClickRetry()
+  {
+    if (!MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+      return;
+    MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("UIInGameMenu.OnClickRetry", ((Component) this).gameObject, "RETRY");
+  }
 }

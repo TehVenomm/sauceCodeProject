@@ -1,118 +1,99 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIDragScrollView
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Interaction/Drag Scroll View")]
-public class UIDragScrollView
+public class UIDragScrollView : MonoBehaviour
 {
-	public UIScrollView scrollView;
+  public UIScrollView scrollView;
+  [HideInInspector]
+  [SerializeField]
+  private UIScrollView draggablePanel;
+  private Transform mTrans;
+  private UIScrollView mScroll;
+  private bool mAutoFind;
+  private bool mStarted;
 
-	[HideInInspector]
-	[SerializeField]
-	private UIScrollView draggablePanel;
+  private void OnEnable()
+  {
+    this.mTrans = ((Component) this).transform;
+    if (Object.op_Equality((Object) this.scrollView, (Object) null) && Object.op_Inequality((Object) this.draggablePanel, (Object) null))
+    {
+      this.scrollView = this.draggablePanel;
+      this.draggablePanel = (UIScrollView) null;
+    }
+    if (!this.mStarted || !this.mAutoFind && !Object.op_Equality((Object) this.mScroll, (Object) null))
+      return;
+    this.FindScrollView();
+  }
 
-	private Transform mTrans;
+  private void Start()
+  {
+    this.mStarted = true;
+    this.FindScrollView();
+    this.AttachUIButtonEffect();
+  }
 
-	private UIScrollView mScroll;
+  private void FindScrollView()
+  {
+    UIScrollView inParents = NGUITools.FindInParents<UIScrollView>(this.mTrans);
+    if (Object.op_Equality((Object) this.scrollView, (Object) null) || this.mAutoFind && Object.op_Inequality((Object) inParents, (Object) this.scrollView))
+    {
+      this.scrollView = inParents;
+      this.mAutoFind = true;
+    }
+    else if (Object.op_Equality((Object) this.scrollView, (Object) inParents))
+      this.mAutoFind = true;
+    this.mScroll = this.scrollView;
+  }
 
-	private bool mAutoFind;
+  private void AttachUIButtonEffect()
+  {
+    UIButton component = ((Component) this).GetComponent<UIButton>();
+    if (!Object.op_Inequality((Object) component, (Object) null) || !Object.op_Equality((Object) ((Component) this).GetComponent<UINoAuto>(), (Object) null) || !Object.op_Equality((Object) ((Component) component).GetComponent<UIButtonEffect>(), (Object) null))
+      return;
+    ((Component) component).gameObject.AddComponent<UIButtonEffect>().isSimple = true;
+  }
 
-	private bool mStarted;
+  private void OnPress(bool pressed)
+  {
+    if (this.mAutoFind && Object.op_Inequality((Object) this.mScroll, (Object) this.scrollView))
+    {
+      this.mScroll = this.scrollView;
+      this.mAutoFind = false;
+    }
+    if (!Object.op_Implicit((Object) this.scrollView) || !((Behaviour) this).enabled || !NGUITools.GetActive(((Component) this).gameObject))
+      return;
+    this.scrollView.Press(pressed);
+    if (pressed || !this.mAutoFind)
+      return;
+    this.scrollView = NGUITools.FindInParents<UIScrollView>(this.mTrans);
+    this.mScroll = this.scrollView;
+  }
 
-	public UIDragScrollView()
-		: this()
-	{
-	}
+  private void OnDrag(Vector2 delta)
+  {
+    if (!Object.op_Implicit((Object) this.scrollView) || !NGUITools.GetActive((Behaviour) this))
+      return;
+    this.scrollView.Drag();
+  }
 
-	private void OnEnable()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		mTrans = this.get_transform();
-		if (scrollView == null && draggablePanel != null)
-		{
-			scrollView = draggablePanel;
-			draggablePanel = null;
-		}
-		if (mStarted && (mAutoFind || mScroll == null))
-		{
-			FindScrollView();
-		}
-	}
+  private void OnScroll(float delta)
+  {
+    if (!Object.op_Implicit((Object) this.scrollView) || !NGUITools.GetActive((Behaviour) this))
+      return;
+    this.scrollView.Scroll(delta);
+  }
 
-	private void Start()
-	{
-		mStarted = true;
-		FindScrollView();
-		AttachUIButtonEffect();
-	}
-
-	private void FindScrollView()
-	{
-		UIScrollView uIScrollView = NGUITools.FindInParents<UIScrollView>(mTrans);
-		if (scrollView == null || (mAutoFind && uIScrollView != scrollView))
-		{
-			scrollView = uIScrollView;
-			mAutoFind = true;
-		}
-		else if (scrollView == uIScrollView)
-		{
-			mAutoFind = true;
-		}
-		mScroll = scrollView;
-	}
-
-	private void AttachUIButtonEffect()
-	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		UIButton component = this.GetComponent<UIButton>();
-		if (component != null && this.GetComponent<UINoAuto>() == null && component.GetComponent<UIButtonEffect>() == null)
-		{
-			UIButtonEffect uIButtonEffect = component.get_gameObject().AddComponent<UIButtonEffect>();
-			uIButtonEffect.isSimple = true;
-		}
-	}
-
-	private void OnPress(bool pressed)
-	{
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Expected O, but got Unknown
-		if (mAutoFind && mScroll != scrollView)
-		{
-			mScroll = scrollView;
-			mAutoFind = false;
-		}
-		if (Object.op_Implicit(scrollView) && this.get_enabled() && NGUITools.GetActive(this.get_gameObject()))
-		{
-			scrollView.Press(pressed);
-			if (!pressed && mAutoFind)
-			{
-				scrollView = NGUITools.FindInParents<UIScrollView>(mTrans);
-				mScroll = scrollView;
-			}
-		}
-	}
-
-	private void OnDrag(Vector2 delta)
-	{
-		if (Object.op_Implicit(scrollView) && NGUITools.GetActive(this))
-		{
-			scrollView.Drag();
-		}
-	}
-
-	private void OnScroll(float delta)
-	{
-		if (Object.op_Implicit(scrollView) && NGUITools.GetActive(this))
-		{
-			scrollView.Scroll(delta);
-		}
-	}
-
-	public void OnPan(Vector2 delta)
-	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		if (Object.op_Implicit(scrollView) && NGUITools.GetActive(this))
-		{
-			scrollView.OnPan(delta);
-		}
-	}
+  public void OnPan(Vector2 delta)
+  {
+    if (!Object.op_Implicit((Object) this.scrollView) || !NGUITools.GetActive((Behaviour) this))
+      return;
+    this.scrollView.OnPan(delta);
+  }
 }

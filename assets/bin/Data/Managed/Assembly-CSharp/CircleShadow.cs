@@ -1,41 +1,27 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: CircleShadow
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class CircleShadow
+#nullable disable
+public class CircleShadow : MonoBehaviour
 {
-	private Transform _transform;
+  private Transform _transform;
+  private Transform animTransform;
 
-	private Transform animTransform;
+  private void Awake() => this._transform = ((Component) this).transform;
 
-	public CircleShadow()
-		: this()
-	{
-	}
+  private void LateUpdate()
+  {
+    Vector3 position = this._transform.position;
+    if (Object.op_Inequality((Object) this.animTransform, (Object) null))
+      position = this.animTransform.position;
+    position.y = 0.005f;
+    this._transform.position = position;
+  }
 
-	private void Awake()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		_transform = this.get_transform();
-	}
-
-	private void LateUpdate()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 position = _transform.get_position();
-		if (animTransform != null)
-		{
-			position = animTransform.get_position();
-		}
-		position.y = 0.005f;
-		_transform.set_position(position);
-	}
-
-	public void setAnimTransform(Transform target)
-	{
-		animTransform = target;
-	}
+  public void setAnimTransform(Transform target) => this.animTransform = target;
 }

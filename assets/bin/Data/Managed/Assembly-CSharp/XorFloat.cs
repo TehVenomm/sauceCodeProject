@@ -1,105 +1,77 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: XorFloat
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Threading;
 
+#nullable disable
 public class XorFloat
 {
-	private const int gens = 5;
+  private byte[] key;
+  private byte[] rawValue = new byte[4];
+  private byte[] tmpValue = new byte[4];
+  private const int gens = 5;
+  private static Random[] s_rnds = new Random[5]
+  {
+    new Random(),
+    new Random(),
+    new Random(),
+    new Random(),
+    new Random()
+  };
+  private static int cnt = 0;
 
-	private byte[] key;
+  public XorFloat()
+    : this(0.0f)
+  {
+  }
 
-	private byte[] rawValue = new byte[4];
+  public XorFloat(float value)
+  {
+    this.GenerateKey();
+    this.XorAndSet(BitConverter.GetBytes(value), this.rawValue);
+  }
 
-	private byte[] tmpValue = new byte[4];
+  private void GenerateKey()
+  {
+    byte[] buffer = new byte[4];
+    Interlocked.Increment(ref XorFloat.cnt);
+    Random rnd = XorFloat.s_rnds[XorFloat.cnt % 5];
+    lock (rnd)
+      rnd.NextBytes(buffer);
+    this.key = buffer;
+  }
 
-	private static Random[] s_rnds = new Random[5]
-	{
-		new Random(),
-		new Random(),
-		new Random(),
-		new Random(),
-		new Random()
-	};
+  public float value
+  {
+    get => BitConverter.ToSingle(this.XorAndSet(this.rawValue, this.tmpValue), 0);
+    set => this.rawValue = this.XorAndSet(BitConverter.GetBytes(value), this.rawValue);
+  }
 
-	private static int cnt = 0;
+  private byte[] XorAndSet(byte[] buf, byte[] outBuf)
+  {
+    for (int index = 0; index < 4; ++index)
+      outBuf[index] = (byte) ((uint) buf[index] ^ (uint) this.key[index]);
+    return outBuf;
+  }
 
-	public float value
-	{
-		get
-		{
-			return BitConverter.ToSingle(XorAndSet(rawValue, tmpValue), 0);
-		}
-		set
-		{
-			rawValue = XorAndSet(BitConverter.GetBytes(value), rawValue);
-		}
-	}
+  public static implicit operator float(XorFloat xor) => xor == null ? 0.0f : xor.value;
 
-	public XorFloat()
-		: this(0f)
-	{
-	}
+  public static implicit operator XorFloat(float val) => new XorFloat(val);
 
-	public XorFloat(float value)
-	{
-		GenerateKey();
-		XorAndSet(BitConverter.GetBytes(value), rawValue);
-	}
+  public override string ToString() => this.value.ToString();
 
-	private void GenerateKey()
-	{
-		byte[] buffer = new byte[4];
-		Interlocked.Increment(ref cnt);
-		Random random = s_rnds[cnt % 5];
-		lock (random)
-		{
-			random.NextBytes(buffer);
-		}
-		key = buffer;
-	}
+  public string ToString(string format) => this.value.ToString(format);
 
-	private byte[] XorAndSet(byte[] buf, byte[] outBuf)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			outBuf[i] = (byte)(buf[i] ^ key[i]);
-		}
-		return outBuf;
-	}
+  public string ToString(IFormatProvider provider) => this.value.ToString(provider);
 
-	public override string ToString()
-	{
-		return value.ToString();
-	}
+  public string ToString(string format, IFormatProvider provider)
+  {
+    return this.value.ToString(format, provider);
+  }
 
-	public string ToString(string format)
-	{
-		return value.ToString(format);
-	}
-
-	public string ToString(IFormatProvider provider)
-	{
-		return value.ToString(provider);
-	}
-
-	public string ToString(string format, IFormatProvider provider)
-	{
-		return value.ToString(format, provider);
-	}
-
-	public static implicit operator float(XorFloat xor)
-	{
-		return xor?.value ?? 0f;
-	}
-
-	public static implicit operator XorFloat(float val)
-	{
-		return new XorFloat(val);
-	}
-
-	public static XorFloat operator ++(XorFloat value)
-	{
-		float num = value;
-		num += 1f;
-		return num;
-	}
+  public static XorFloat operator ++(XorFloat value) => (XorFloat) ((float) value + 1f);
 }

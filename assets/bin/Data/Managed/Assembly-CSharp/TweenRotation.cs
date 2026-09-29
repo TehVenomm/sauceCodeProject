@@ -1,128 +1,82 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: TweenRotation
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Tween/Tween Rotation")]
 public class TweenRotation : UITweener
 {
-	public Vector3 from;
+  public Vector3 from;
+  public Vector3 to;
+  public bool quaternionLerp;
+  private Transform mTrans;
 
-	public Vector3 to;
+  public Transform cachedTransform
+  {
+    get
+    {
+      if (Object.op_Equality((Object) this.mTrans, (Object) null))
+        this.mTrans = ((Component) this).transform;
+      return this.mTrans;
+    }
+  }
 
-	public bool quaternionLerp;
+  [Obsolete("Use 'value' instead")]
+  public Quaternion rotation
+  {
+    get => this.value;
+    set => this.value = value;
+  }
 
-	private Transform mTrans;
+  public Quaternion value
+  {
+    get => this.cachedTransform.localRotation;
+    set => this.cachedTransform.localRotation = value;
+  }
 
-	public Transform cachedTransform
-	{
-		get
-		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
-			if (mTrans == null)
-			{
-				mTrans = this.get_transform();
-			}
-			return mTrans;
-		}
-	}
+  protected override void OnUpdate(float factor, bool isFinished)
+  {
+    this.value = this.quaternionLerp ? Quaternion.Slerp(Quaternion.Euler(this.from), Quaternion.Euler(this.to), factor) : Quaternion.Euler(new Vector3(Mathf.Lerp(this.from.x, this.to.x, factor), Mathf.Lerp(this.from.y, this.to.y, factor), Mathf.Lerp(this.from.z, this.to.z, factor)));
+  }
 
-	[Obsolete("Use 'value' instead")]
-	public Quaternion rotation
-	{
-		get
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			return value;
-		}
-		set
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			this.value = value;
-		}
-	}
+  public static TweenRotation Begin(GameObject go, float duration, Quaternion rot)
+  {
+    TweenRotation tweenRotation1 = UITweener.Begin<TweenRotation>(go, duration);
+    TweenRotation tweenRotation2 = tweenRotation1;
+    Quaternion quaternion = tweenRotation1.value;
+    Vector3 eulerAngles = ((Quaternion) ref quaternion).eulerAngles;
+    tweenRotation2.from = eulerAngles;
+    tweenRotation1.to = ((Quaternion) ref rot).eulerAngles;
+    if ((double) duration <= 0.0)
+    {
+      tweenRotation1.Sample(1f, true);
+      ((Behaviour) tweenRotation1).enabled = false;
+    }
+    return tweenRotation1;
+  }
 
-	public Quaternion value
-	{
-		get
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			return cachedTransform.get_localRotation();
-		}
-		set
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			cachedTransform.set_localRotation(value);
-		}
-	}
+  [ContextMenu("Set 'From' to current value")]
+  public override void SetStartToCurrentValue()
+  {
+    Quaternion quaternion = this.value;
+    this.from = ((Quaternion) ref quaternion).eulerAngles;
+  }
 
-	protected override void OnUpdate(float factor, bool isFinished)
-	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		value = ((!quaternionLerp) ? Quaternion.Euler(new Vector3(Mathf.Lerp(from.x, to.x, factor), Mathf.Lerp(from.y, to.y, factor), Mathf.Lerp(from.z, to.z, factor))) : Quaternion.Slerp(Quaternion.Euler(from), Quaternion.Euler(to), factor));
-	}
+  [ContextMenu("Set 'To' to current value")]
+  public override void SetEndToCurrentValue()
+  {
+    Quaternion quaternion = this.value;
+    this.to = ((Quaternion) ref quaternion).eulerAngles;
+  }
 
-	public static TweenRotation Begin(GameObject go, float duration, Quaternion rot)
-	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		TweenRotation tweenRotation = UITweener.Begin<TweenRotation>(go, duration, true);
-		TweenRotation tweenRotation2 = tweenRotation;
-		Quaternion value = tweenRotation.value;
-		tweenRotation2.from = value.get_eulerAngles();
-		tweenRotation.to = rot.get_eulerAngles();
-		if (duration <= 0f)
-		{
-			tweenRotation.Sample(1f, true);
-			tweenRotation.set_enabled(false);
-		}
-		return tweenRotation;
-	}
+  [ContextMenu("Assume value of 'From'")]
+  private void SetCurrentValueToStart() => this.value = Quaternion.Euler(this.from);
 
-	[ContextMenu("Set 'From' to current value")]
-	public override void SetStartToCurrentValue()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		Quaternion value = this.value;
-		from = value.get_eulerAngles();
-	}
-
-	[ContextMenu("Set 'To' to current value")]
-	public override void SetEndToCurrentValue()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		Quaternion value = this.value;
-		to = value.get_eulerAngles();
-	}
-
-	[ContextMenu("Assume value of 'From'")]
-	private void SetCurrentValueToStart()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		value = Quaternion.Euler(from);
-	}
-
-	[ContextMenu("Assume value of 'To'")]
-	private void SetCurrentValueToEnd()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		value = Quaternion.Euler(to);
-	}
+  [ContextMenu("Assume value of 'To'")]
+  private void SetCurrentValueToEnd() => this.value = Quaternion.Euler(this.to);
 }

@@ -1,65 +1,47 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: FieldGimmickCannonHeavy
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using UnityEngine;
 
+#nullable disable
 public class FieldGimmickCannonHeavy : FieldGimmickCannonBase
 {
-	public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
-	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Expected O, but got Unknown
-		base.Initialize(pointData);
-		m_coolTime = MonoBehaviourSingleton<InGameSettingsManager>.I.cannonParam.coolTimeForHeavy;
-		m_baseTrans = modelTrans.Find("CMN_cannon01_Origin/Move/Root/base/rot");
-		m_cannonTrans = modelTrans.Find("CMN_cannon01_Origin/Move/Root/base/rot/cannon_rot");
-	}
+  public override void Initialize(FieldMapTable.FieldGimmickPointTableData pointData)
+  {
+    base.Initialize(pointData);
+    this.m_coolTime = MonoBehaviourSingleton<InGameSettingsManager>.I.cannonParam.coolTimeForHeavy;
+    this.m_baseTrans = this.modelTrans.Find("CMN_cannon01_Origin/Move/Root/base/rot");
+    this.m_cannonTrans = this.modelTrans.Find("CMN_cannon01_Origin/Move/Root/base/rot/cannon_rot");
+  }
 
-	public override void Shot()
-	{
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Expected O, but got Unknown
-		if (IsReadyForShot())
-		{
-			if (base._animator != null)
-			{
-				base._animator.Play("Reaction", 0, 0f);
-			}
-			AttackInfo attackHitInfo = GetAttackHitInfo();
-			if (attackHitInfo != null)
-			{
-				AttackCannonball.InitParamCannonball initParamCannonball = new AttackCannonball.InitParamCannonball();
-				initParamCannonball.attacker = m_owner;
-				initParamCannonball.atkInfo = attackHitInfo;
-				initParamCannonball.launchTrans = m_cannonTrans;
-				initParamCannonball.offsetPos = Vector3.get_zero();
-				initParamCannonball.offsetRot = Quaternion.get_identity();
-				initParamCannonball.shotRotation = m_cannonTrans.get_rotation();
-				GameObject val = new GameObject("HeavyCannonball");
-				AttackCannonball attackCannonball = val.AddComponent<AttackCannonball>();
-				attackCannonball.Initialize(initParamCannonball);
-				StartCoolTime();
-				SetState(STATE.COOLTIME);
-			}
-		}
-	}
+  public override void Shot()
+  {
+    if (!this.IsReadyForShot())
+      return;
+    if (Object.op_Inequality((Object) this._animator, (Object) null))
+      this._animator.Play("Reaction", 0, 0.0f);
+    AttackInfo attackHitInfo = this.GetAttackHitInfo();
+    if (attackHitInfo == null)
+      return;
+    new GameObject("HeavyCannonball").AddComponent<AttackCannonball>().Initialize(new AttackCannonball.InitParamCannonball()
+    {
+      attacker = (StageObject) this.m_owner,
+      atkInfo = attackHitInfo,
+      launchTrans = this.m_cannonTrans,
+      offsetPos = Vector3.zero,
+      offsetRot = Quaternion.identity,
+      shotRotation = this.m_cannonTrans.rotation
+    });
+    this.StartCoolTime();
+    this.SetState(FieldGimmickCannonBase.STATE.COOLTIME);
+  }
 
-	protected override AttackInfo GetAttackHitInfo()
-	{
-		if (m_owner == null)
-		{
-			return null;
-		}
-		AttackInfo attackInfo = m_owner.GetAttackInfos().Find((AttackInfo info) => info.name == "cannonball_heavy");
-		if (attackInfo == null)
-		{
-			return null;
-		}
-		return attackInfo;
-	}
+  protected override AttackInfo GetAttackHitInfo()
+  {
+    return Object.op_Equality((Object) this.m_owner, (Object) null) ? (AttackInfo) null : this.m_owner.GetAttackInfos().Find<AttackInfo>((Predicate<AttackInfo>) (info => info.name == "cannonball_heavy")) ?? (AttackInfo) null;
+  }
 }

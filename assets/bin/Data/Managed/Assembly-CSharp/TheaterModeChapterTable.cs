@@ -1,101 +1,90 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: TheaterModeChapterTable
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 
+#nullable disable
 public class TheaterModeChapterTable : MonoBehaviourSingleton<TheaterModeChapterTable>, IDataTable
 {
-	[Serializable]
-	public class TheaterModeChapterData
-	{
-		public const string NT = "chapter_id,chapter_name,order,is_main,banner_id";
+  private UIntKeyTable<TheaterModeChapterTable.TheaterModeChapterData> dataTable;
 
-		public uint chapter_id;
+  public bool isLoading { get; private set; }
 
-		public string chapter_name;
+  protected override void Awake()
+  {
+    base.Awake();
+    this.LoadTable();
+  }
 
-		public int order;
+  private void LoadTable()
+  {
+    this.isLoading = true;
+    MonoBehaviourSingleton<DataTableManager>.I.RequestLoadTable(nameof (TheaterModeChapterTable), (IDataTable) this, (System.Action) (() => this.isLoading = false));
+  }
 
-		public int is_main;
+  public void CreateTable(string csv)
+  {
+    this.dataTable = TableUtility.CreateUIntKeyTable<TheaterModeChapterTable.TheaterModeChapterData>(csv, new TableUtility.CallBackUIntKeyReadCSV<TheaterModeChapterTable.TheaterModeChapterData>(TheaterModeChapterTable.TheaterModeChapterData.CB), "chapter_id,chapter_name,order,is_main,banner_id");
+    this.dataTable.TrimExcess();
+  }
 
-		public int banner_id;
+  public void AllChapterData(
+    Action<TheaterModeChapterTable.TheaterModeChapterData> call_back)
+  {
+    if (this.dataTable == null || call_back == null)
+      return;
+    this.dataTable.ForEach((Action<TheaterModeChapterTable.TheaterModeChapterData>) (data => call_back(data)));
+  }
 
-		public static bool CB(CSVReader csv, TheaterModeChapterData data, ref uint key1)
-		{
-			data.chapter_id = key1;
-			csv.Pop(ref data.chapter_name);
-			csv.Pop(ref data.order);
-			csv.Pop(ref data.is_main);
-			csv.Pop(ref data.banner_id);
-			return true;
-		}
+  public TheaterModeChapterTable.TheaterModeChapterData GetData(uint chapter_id)
+  {
+    return this.dataTable.Get(chapter_id);
+  }
 
-		public override string ToString()
-		{
-			string empty = string.Empty;
-			string text = empty;
-			return text + chapter_id + "," + chapter_name + "," + order + "," + is_main + "," + banner_id;
-		}
-	}
+  public List<TheaterModeChapterTable.TheaterModeChapterData> GetPickedData(List<uint> chapter_ids)
+  {
+    List<TheaterModeChapterTable.TheaterModeChapterData> list = new List<TheaterModeChapterTable.TheaterModeChapterData>(this.dataTable.GetCount());
+    this.dataTable.ForEach((Action<TheaterModeChapterTable.TheaterModeChapterData>) (data =>
+    {
+      if (!chapter_ids.Contains(data.chapter_id))
+        return;
+      list.Add(data);
+    }));
+    return list;
+  }
 
-	private UIntKeyTable<TheaterModeChapterData> dataTable;
+  public int GetCount() => this.dataTable.GetCount();
 
-	public bool isLoading
-	{
-		get;
-		private set;
-	}
+  [Serializable]
+  public class TheaterModeChapterData
+  {
+    public uint chapter_id;
+    public string chapter_name;
+    public int order;
+    public int is_main;
+    public int banner_id;
+    public const string NT = "chapter_id,chapter_name,order,is_main,banner_id";
 
-	protected override void Awake()
-	{
-		base.Awake();
-		LoadTable();
-	}
+    public static bool CB(
+      CSVReader csv,
+      TheaterModeChapterTable.TheaterModeChapterData data,
+      ref uint key1)
+    {
+      data.chapter_id = key1;
+      csv.Pop(ref data.chapter_name);
+      csv.Pop(ref data.order);
+      csv.Pop(ref data.is_main);
+      csv.Pop(ref data.banner_id);
+      return true;
+    }
 
-	private void LoadTable()
-	{
-		isLoading = true;
-		MonoBehaviourSingleton<DataTableManager>.I.RequestLoadTable("TheaterModeChapterTable", this, delegate
-		{
-			isLoading = false;
-		}, false);
-	}
-
-	public void CreateTable(string csv)
-	{
-		dataTable = TableUtility.CreateUIntKeyTable<TheaterModeChapterData>(csv, TheaterModeChapterData.CB, "chapter_id,chapter_name,order,is_main,banner_id", null);
-		dataTable.TrimExcess();
-	}
-
-	public void AllChapterData(Action<TheaterModeChapterData> call_back)
-	{
-		if (dataTable != null && call_back != null)
-		{
-			dataTable.ForEach(delegate(TheaterModeChapterData data)
-			{
-				call_back(data);
-			});
-		}
-	}
-
-	public TheaterModeChapterData GetData(uint chapter_id)
-	{
-		return dataTable.Get(chapter_id);
-	}
-
-	public List<TheaterModeChapterData> GetPickedData(List<uint> chapter_ids)
-	{
-		List<TheaterModeChapterData> list = new List<TheaterModeChapterData>(dataTable.GetCount());
-		dataTable.ForEach(delegate(TheaterModeChapterData data)
-		{
-			if (chapter_ids.Contains(data.chapter_id))
-			{
-				list.Add(data);
-			}
-		});
-		return list;
-	}
-
-	public int GetCount()
-	{
-		return dataTable.GetCount();
-	}
+    public override string ToString()
+    {
+      return $"{string.Empty}{(object) this.chapter_id},{this.chapter_name},{(object) this.order},{(object) this.is_main},{(object) this.banner_id}";
+    }
+  }
 }

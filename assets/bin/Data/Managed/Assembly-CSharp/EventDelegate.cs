@@ -1,670 +1,551 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: EventDelegate
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
+#nullable disable
 [Serializable]
 public class EventDelegate
 {
-	[Serializable]
-	public class Parameter
-	{
-		public Object obj;
+  [SerializeField]
+  private MonoBehaviour mTarget;
+  [SerializeField]
+  private string mMethodName;
+  [SerializeField]
+  private EventDelegate.Parameter[] mParameters;
+  public bool oneShot;
+  [NonSerialized]
+  private EventDelegate.Callback mCachedCallback;
+  [NonSerialized]
+  private bool mRawDelegate;
+  [NonSerialized]
+  private bool mCached;
+  [NonSerialized]
+  private MethodInfo mMethod;
+  [NonSerialized]
+  private ParameterInfo[] mParameterInfos;
+  [NonSerialized]
+  private object[] mArgs;
+  private static int s_Hash = nameof (EventDelegate).GetHashCode();
 
-		public string field;
+  public MonoBehaviour target
+  {
+    get => this.mTarget;
+    set
+    {
+      this.mTarget = value;
+      this.mCachedCallback = (EventDelegate.Callback) null;
+      this.mRawDelegate = false;
+      this.mCached = false;
+      this.mMethod = (MethodInfo) null;
+      this.mParameterInfos = (ParameterInfo[]) null;
+      this.mParameters = (EventDelegate.Parameter[]) null;
+    }
+  }
 
-		[NonSerialized]
-		private object mValue;
+  public string methodName
+  {
+    get => this.mMethodName;
+    set
+    {
+      this.mMethodName = value;
+      this.mCachedCallback = (EventDelegate.Callback) null;
+      this.mRawDelegate = false;
+      this.mCached = false;
+      this.mMethod = (MethodInfo) null;
+      this.mParameterInfos = (ParameterInfo[]) null;
+      this.mParameters = (EventDelegate.Parameter[]) null;
+    }
+  }
 
-		[NonSerialized]
-		public Type expectedType = typeof(void);
+  public EventDelegate.Parameter[] parameters
+  {
+    get
+    {
+      if (!this.mCached)
+        this.Cache();
+      return this.mParameters;
+    }
+  }
 
-		[NonSerialized]
-		public bool cached;
+  public bool isValid
+  {
+    get
+    {
+      if (!this.mCached)
+        this.Cache();
+      if (this.mRawDelegate && this.mCachedCallback != null)
+        return true;
+      return Object.op_Inequality((Object) this.mTarget, (Object) null) && !string.IsNullOrEmpty(this.mMethodName);
+    }
+  }
 
-		[NonSerialized]
-		public PropertyInfo propInfo;
+  public bool isEnabled
+  {
+    get
+    {
+      if (!this.mCached)
+        this.Cache();
+      if (this.mRawDelegate && this.mCachedCallback != null)
+        return true;
+      if (Object.op_Equality((Object) this.mTarget, (Object) null))
+        return false;
+      MonoBehaviour mTarget = this.mTarget;
+      return Object.op_Equality((Object) mTarget, (Object) null) || ((Behaviour) mTarget).enabled;
+    }
+  }
 
-		[NonSerialized]
-		public FieldInfo fieldInfo;
+  public EventDelegate()
+  {
+  }
 
-		public object value
-		{
-			get
-			{
-				if (mValue != null)
-				{
-					return mValue;
-				}
-				if (!cached)
-				{
-					cached = true;
-					fieldInfo = null;
-					propInfo = null;
-					if (obj != null && !string.IsNullOrEmpty(field))
-					{
-						Type type = ((object)obj).GetType();
-						propInfo = type.GetProperty(field);
-						if (propInfo == null)
-						{
-							fieldInfo = type.GetField(field);
-						}
-					}
-				}
-				if (propInfo != null)
-				{
-					return propInfo.GetValue(obj, null);
-				}
-				if (fieldInfo != null)
-				{
-					return fieldInfo.GetValue(obj);
-				}
-				if (obj != null)
-				{
-					return obj;
-				}
-				if (expectedType != null && expectedType.IsValueType)
-				{
-					return null;
-				}
-				return Convert.ChangeType(null, expectedType);
-			}
-			set
-			{
-				mValue = value;
-			}
-		}
+  public EventDelegate(EventDelegate.Callback call) => this.Set(call);
 
-		public Type type
-		{
-			get
-			{
-				if (mValue != null)
-				{
-					return mValue.GetType();
-				}
-				if (obj == null)
-				{
-					return typeof(void);
-				}
-				return ((object)obj).GetType();
-			}
-		}
+  public EventDelegate(MonoBehaviour target, string methodName) => this.Set(target, methodName);
 
-		public Parameter()
-		{
-		}
+  private static string GetMethodName(EventDelegate.Callback callback) => callback.Method.Name;
 
-		public Parameter(Object obj, string field)
-		{
-			this.obj = obj;
-			this.field = field;
-		}
+  private static bool IsValid(EventDelegate.Callback callback)
+  {
+    return callback != null && callback.Method != (MethodInfo) null;
+  }
 
-		public Parameter(object val)
-		{
-			mValue = val;
-		}
-	}
+  public override bool Equals(object obj)
+  {
+    switch (obj)
+    {
+      case null:
+        return !this.isValid;
+      case EventDelegate.Callback _:
+        EventDelegate.Callback callback = obj as EventDelegate.Callback;
+        if (callback.Equals((object) this.mCachedCallback))
+          return true;
+        return Object.op_Equality((Object) this.mTarget, (Object) (callback.Target as MonoBehaviour)) && string.Equals(this.mMethodName, EventDelegate.GetMethodName(callback));
+      case EventDelegate _:
+        EventDelegate eventDelegate = obj as EventDelegate;
+        return Object.op_Equality((Object) this.mTarget, (Object) eventDelegate.mTarget) && string.Equals(this.mMethodName, eventDelegate.mMethodName);
+      default:
+        return false;
+    }
+  }
 
-	public delegate void Callback();
+  public override int GetHashCode() => EventDelegate.s_Hash;
 
-	[SerializeField]
-	private MonoBehaviour mTarget;
+  private void Set(EventDelegate.Callback call)
+  {
+    this.Clear();
+    if (call == null || !EventDelegate.IsValid(call))
+      return;
+    this.mTarget = call.Target as MonoBehaviour;
+    if (Object.op_Equality((Object) this.mTarget, (Object) null))
+    {
+      this.mRawDelegate = true;
+      this.mCachedCallback = call;
+      this.mMethodName = (string) null;
+    }
+    else
+    {
+      this.mMethodName = EventDelegate.GetMethodName(call);
+      this.mRawDelegate = false;
+    }
+  }
 
-	[SerializeField]
-	private string mMethodName;
+  public void Set(MonoBehaviour target, string methodName)
+  {
+    this.Clear();
+    this.mTarget = target;
+    this.mMethodName = methodName;
+  }
 
-	[SerializeField]
-	private Parameter[] mParameters;
+  private void Cache()
+  {
+    this.mCached = true;
+    if (this.mRawDelegate || this.mCachedCallback != null && !Object.op_Inequality((Object) (this.mCachedCallback.Target as MonoBehaviour), (Object) this.mTarget) && !(EventDelegate.GetMethodName(this.mCachedCallback) != this.mMethodName) || !Object.op_Inequality((Object) this.mTarget, (Object) null) || string.IsNullOrEmpty(this.mMethodName))
+      return;
+    System.Type type = this.mTarget.GetType();
+    this.mMethod = (MethodInfo) null;
+    for (; type != (System.Type) null; type = type.BaseType)
+    {
+      try
+      {
+        this.mMethod = type.GetMethod(this.mMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        if (this.mMethod != (MethodInfo) null)
+          break;
+      }
+      catch (Exception ex)
+      {
+      }
+    }
+    if (this.mMethod == (MethodInfo) null)
+      Debug.LogError((object) $"Could not find method '{this.mMethodName}' on {(object) this.mTarget.GetType()}", (Object) this.mTarget);
+    else if (this.mMethod.ReturnType != typeof (void))
+    {
+      Debug.LogError((object) $"{(object) this.mTarget.GetType()}.{this.mMethodName} must have a 'void' return type.", (Object) this.mTarget);
+    }
+    else
+    {
+      this.mParameterInfos = this.mMethod.GetParameters();
+      if (this.mParameterInfos.Length == 0)
+      {
+        this.mCachedCallback = (EventDelegate.Callback) Delegate.CreateDelegate(typeof (EventDelegate.Callback), (object) this.mTarget, this.mMethodName);
+        this.mArgs = (object[]) null;
+        this.mParameters = (EventDelegate.Parameter[]) null;
+      }
+      else
+      {
+        this.mCachedCallback = (EventDelegate.Callback) null;
+        if (this.mParameters == null || this.mParameters.Length != this.mParameterInfos.Length)
+        {
+          this.mParameters = new EventDelegate.Parameter[this.mParameterInfos.Length];
+          int index = 0;
+          for (int length = this.mParameters.Length; index < length; ++index)
+            this.mParameters[index] = new EventDelegate.Parameter();
+        }
+        int index1 = 0;
+        for (int length = this.mParameters.Length; index1 < length; ++index1)
+          this.mParameters[index1].expectedType = this.mParameterInfos[index1].ParameterType;
+      }
+    }
+  }
 
-	public bool oneShot;
+  public bool Execute()
+  {
+    if (!this.mCached)
+      this.Cache();
+    if (this.mCachedCallback != null)
+    {
+      this.mCachedCallback();
+      return true;
+    }
+    if (!(this.mMethod != (MethodInfo) null))
+      return false;
+    if ((this.mParameters != null ? this.mParameters.Length : 0) == 0)
+    {
+      this.mMethod.Invoke((object) this.mTarget, (object[]) null);
+    }
+    else
+    {
+      if (this.mArgs == null || this.mArgs.Length != this.mParameters.Length)
+        this.mArgs = new object[this.mParameters.Length];
+      int index1 = 0;
+      for (int length = this.mParameters.Length; index1 < length; ++index1)
+        this.mArgs[index1] = this.mParameters[index1].value;
+      try
+      {
+        this.mMethod.Invoke((object) this.mTarget, this.mArgs);
+      }
+      catch (ArgumentException ex)
+      {
+        string str1 = "Error calling ";
+        string str2;
+        if (Object.op_Equality((Object) this.mTarget, (Object) null))
+          str2 = str1 + this.mMethod.Name;
+        else
+          str2 = $"{str1}{(object) this.mTarget.GetType()}.{this.mMethod.Name}";
+        string str3 = $"{str2}: {ex.Message}" + "\n  Expected: ";
+        string str4;
+        if (this.mParameterInfos.Length == 0)
+        {
+          str4 = str3 + "no arguments";
+        }
+        else
+        {
+          str4 = str3 + (object) this.mParameterInfos[0];
+          for (int index2 = 1; index2 < this.mParameterInfos.Length; ++index2)
+            str4 = $"{str4}, {(object) this.mParameterInfos[index2].ParameterType}";
+        }
+        string str5 = str4 + "\n  Received: ";
+        string str6;
+        if (this.mParameters.Length == 0)
+        {
+          str6 = str5 + "no arguments";
+        }
+        else
+        {
+          str6 = str5 + (object) this.mParameters[0].type;
+          for (int index3 = 1; index3 < this.mParameters.Length; ++index3)
+            str6 = $"{str6}, {(object) this.mParameters[index3].type}";
+        }
+        Debug.LogError((object) (str6 + "\n"));
+      }
+      int index4 = 0;
+      for (int length = this.mArgs.Length; index4 < length; ++index4)
+      {
+        if (this.mParameterInfos[index4].IsIn || this.mParameterInfos[index4].IsOut)
+          this.mParameters[index4].value = this.mArgs[index4];
+        this.mArgs[index4] = (object) null;
+      }
+    }
+    return true;
+  }
 
-	[NonSerialized]
-	private Callback mCachedCallback;
+  public void Clear()
+  {
+    this.mTarget = (MonoBehaviour) null;
+    this.mMethodName = (string) null;
+    this.mRawDelegate = false;
+    this.mCachedCallback = (EventDelegate.Callback) null;
+    this.mParameters = (EventDelegate.Parameter[]) null;
+    this.mCached = false;
+    this.mMethod = (MethodInfo) null;
+    this.mParameterInfos = (ParameterInfo[]) null;
+    this.mArgs = (object[]) null;
+  }
 
-	[NonSerialized]
-	private bool mRawDelegate;
+  public override string ToString()
+  {
+    if (Object.op_Inequality((Object) this.mTarget, (Object) null))
+    {
+      string str = this.mTarget.GetType().ToString();
+      int num = str.LastIndexOf('.');
+      if (num > 0)
+        str = str.Substring(num + 1);
+      return !string.IsNullOrEmpty(this.methodName) ? $"{str}/{this.methodName}" : str + "/[delegate]";
+    }
+    return !this.mRawDelegate ? (string) null : "[delegate]";
+  }
 
-	[NonSerialized]
-	private bool mCached;
+  public static void Execute(List<EventDelegate> list)
+  {
+    if (list == null)
+      return;
+    int index = 0;
+    while (index < list.Count)
+    {
+      EventDelegate eventDelegate = list[index];
+      if (eventDelegate != null)
+      {
+        try
+        {
+          eventDelegate.Execute();
+        }
+        catch (Exception ex)
+        {
+          if (ex.InnerException != null)
+            Debug.LogError((object) ex.InnerException.Message);
+          else
+            Debug.LogError((object) ex.Message);
+        }
+        if (index >= list.Count)
+          break;
+        if (list[index] == eventDelegate)
+        {
+          if (eventDelegate.oneShot)
+          {
+            list.RemoveAt(index);
+            continue;
+          }
+        }
+        else
+          continue;
+      }
+      ++index;
+    }
+  }
 
-	[NonSerialized]
-	private MethodInfo mMethod;
+  public static bool IsValid(List<EventDelegate> list)
+  {
+    if (list != null)
+    {
+      int index = 0;
+      for (int count = list.Count; index < count; ++index)
+      {
+        EventDelegate eventDelegate = list[index];
+        if (eventDelegate != null && eventDelegate.isValid)
+          return true;
+      }
+    }
+    return false;
+  }
 
-	[NonSerialized]
-	private ParameterInfo[] mParameterInfos;
+  public static EventDelegate Set(List<EventDelegate> list, EventDelegate.Callback callback)
+  {
+    if (list == null)
+      return (EventDelegate) null;
+    EventDelegate eventDelegate = new EventDelegate(callback);
+    list.Clear();
+    list.Add(eventDelegate);
+    return eventDelegate;
+  }
 
-	[NonSerialized]
-	private object[] mArgs;
+  public static void Set(List<EventDelegate> list, EventDelegate del)
+  {
+    if (list == null)
+      return;
+    list.Clear();
+    list.Add(del);
+  }
 
-	private static int s_Hash = "EventDelegate".GetHashCode();
+  public static EventDelegate Add(List<EventDelegate> list, EventDelegate.Callback callback)
+  {
+    return EventDelegate.Add(list, callback, false);
+  }
 
-	public MonoBehaviour target
-	{
-		get
-		{
-			return mTarget;
-		}
-		set
-		{
-			mTarget = value;
-			mCachedCallback = null;
-			mRawDelegate = false;
-			mCached = false;
-			mMethod = null;
-			mParameterInfos = null;
-			mParameters = null;
-		}
-	}
+  public static EventDelegate Add(
+    List<EventDelegate> list,
+    EventDelegate.Callback callback,
+    bool oneShot)
+  {
+    if (list != null)
+    {
+      int index = 0;
+      for (int count = list.Count; index < count; ++index)
+      {
+        EventDelegate eventDelegate = list[index];
+        if (eventDelegate != null && eventDelegate.Equals((object) callback))
+          return eventDelegate;
+      }
+      EventDelegate eventDelegate1 = new EventDelegate(callback);
+      eventDelegate1.oneShot = oneShot;
+      list.Add(eventDelegate1);
+      return eventDelegate1;
+    }
+    Debug.LogWarning((object) "Attempting to add a callback to a list that's null");
+    return (EventDelegate) null;
+  }
 
-	public string methodName
-	{
-		get
-		{
-			return mMethodName;
-		}
-		set
-		{
-			mMethodName = value;
-			mCachedCallback = null;
-			mRawDelegate = false;
-			mCached = false;
-			mMethod = null;
-			mParameterInfos = null;
-			mParameters = null;
-		}
-	}
+  public static void Add(List<EventDelegate> list, EventDelegate ev)
+  {
+    EventDelegate.Add(list, ev, ev.oneShot);
+  }
 
-	public Parameter[] parameters
-	{
-		get
-		{
-			if (!mCached)
-			{
-				Cache();
-			}
-			return mParameters;
-		}
-	}
+  public static void Add(List<EventDelegate> list, EventDelegate ev, bool oneShot)
+  {
+    if (ev.mRawDelegate || Object.op_Equality((Object) ev.target, (Object) null) || string.IsNullOrEmpty(ev.methodName))
+      EventDelegate.Add(list, ev.mCachedCallback, oneShot);
+    else if (list != null)
+    {
+      int index1 = 0;
+      for (int count = list.Count; index1 < count; ++index1)
+      {
+        EventDelegate eventDelegate = list[index1];
+        if (eventDelegate != null && eventDelegate.Equals((object) ev))
+          return;
+      }
+      EventDelegate eventDelegate1 = new EventDelegate(ev.target, ev.methodName);
+      eventDelegate1.oneShot = oneShot;
+      if (ev.mParameters != null && ev.mParameters.Length != 0)
+      {
+        eventDelegate1.mParameters = new EventDelegate.Parameter[ev.mParameters.Length];
+        for (int index2 = 0; index2 < ev.mParameters.Length; ++index2)
+          eventDelegate1.mParameters[index2] = ev.mParameters[index2];
+      }
+      list.Add(eventDelegate1);
+    }
+    else
+      Debug.LogWarning((object) "Attempting to add a callback to a list that's null");
+  }
 
-	public bool isValid
-	{
-		get
-		{
-			if (!mCached)
-			{
-				Cache();
-			}
-			return (mRawDelegate && mCachedCallback != null) || (mTarget != null && !string.IsNullOrEmpty(mMethodName));
-		}
-	}
+  public static bool Remove(List<EventDelegate> list, EventDelegate.Callback callback)
+  {
+    if (list != null)
+    {
+      int index = 0;
+      for (int count = list.Count; index < count; ++index)
+      {
+        EventDelegate eventDelegate = list[index];
+        if (eventDelegate != null && eventDelegate.Equals((object) callback))
+        {
+          list.RemoveAt(index);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
-	public bool isEnabled
-	{
-		get
-		{
-			if (!mCached)
-			{
-				Cache();
-			}
-			if (mRawDelegate && mCachedCallback != null)
-			{
-				return true;
-			}
-			if (mTarget == null)
-			{
-				return false;
-			}
-			MonoBehaviour val = mTarget;
-			return val == null || val.get_enabled();
-		}
-	}
+  public static bool Remove(List<EventDelegate> list, EventDelegate ev)
+  {
+    if (list != null)
+    {
+      int index = 0;
+      for (int count = list.Count; index < count; ++index)
+      {
+        EventDelegate eventDelegate = list[index];
+        if (eventDelegate != null && eventDelegate.Equals((object) ev))
+        {
+          list.RemoveAt(index);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
-	public EventDelegate()
-	{
-	}
+  [Serializable]
+  public class Parameter
+  {
+    public Object obj;
+    public string field;
+    [NonSerialized]
+    private object mValue;
+    [NonSerialized]
+    public System.Type expectedType = typeof (void);
+    [NonSerialized]
+    public bool cached;
+    [NonSerialized]
+    public PropertyInfo propInfo;
+    [NonSerialized]
+    public FieldInfo fieldInfo;
 
-	public EventDelegate(Callback call)
-	{
-		Set(call);
-	}
+    public Parameter()
+    {
+    }
 
-	public EventDelegate(MonoBehaviour target, string methodName)
-	{
-		Set(target, methodName);
-	}
+    public Parameter(Object obj, string field)
+    {
+      this.obj = obj;
+      this.field = field;
+    }
 
-	private static string GetMethodName(Callback callback)
-	{
-		return callback.Method.Name;
-	}
+    public Parameter(object val) => this.mValue = val;
 
-	private static bool IsValid(Callback callback)
-	{
-		return callback != null && callback.Method != null;
-	}
+    public object value
+    {
+      get
+      {
+        if (this.mValue != null)
+          return this.mValue;
+        if (!this.cached)
+        {
+          this.cached = true;
+          this.fieldInfo = (FieldInfo) null;
+          this.propInfo = (PropertyInfo) null;
+          if (Object.op_Inequality(this.obj, (Object) null) && !string.IsNullOrEmpty(this.field))
+          {
+            System.Type type = this.obj.GetType();
+            this.propInfo = type.GetProperty(this.field);
+            if (this.propInfo == (PropertyInfo) null)
+              this.fieldInfo = type.GetField(this.field);
+          }
+        }
+        if (this.propInfo != (PropertyInfo) null)
+          return this.propInfo.GetValue((object) this.obj, (object[]) null);
+        if (this.fieldInfo != (FieldInfo) null)
+          return this.fieldInfo.GetValue((object) this.obj);
+        if (Object.op_Inequality(this.obj, (Object) null))
+          return (object) this.obj;
+        return this.expectedType != (System.Type) null && this.expectedType.IsValueType ? (object) null : Convert.ChangeType((object) null, this.expectedType);
+      }
+      set => this.mValue = value;
+    }
 
-	public override bool Equals(object obj)
-	{
-		if (obj == null)
-		{
-			return !isValid;
-		}
-		if (obj is Callback)
-		{
-			Callback callback = obj as Callback;
-			if (callback.Equals(mCachedCallback))
-			{
-				return true;
-			}
-			MonoBehaviour val = callback.Target as MonoBehaviour;
-			return mTarget == val && string.Equals(mMethodName, GetMethodName(callback));
-		}
-		if (obj is EventDelegate)
-		{
-			EventDelegate eventDelegate = obj as EventDelegate;
-			return mTarget == eventDelegate.mTarget && string.Equals(mMethodName, eventDelegate.mMethodName);
-		}
-		return false;
-	}
+    public System.Type type
+    {
+      get
+      {
+        if (this.mValue != null)
+          return this.mValue.GetType();
+        return Object.op_Equality(this.obj, (Object) null) ? typeof (void) : this.obj.GetType();
+      }
+    }
+  }
 
-	public override int GetHashCode()
-	{
-		return s_Hash;
-	}
-
-	private void Set(Callback call)
-	{
-		Clear();
-		if (call != null && IsValid(call))
-		{
-			mTarget = (call.Target as MonoBehaviour);
-			if (mTarget == null)
-			{
-				mRawDelegate = true;
-				mCachedCallback = call;
-				mMethodName = null;
-			}
-			else
-			{
-				mMethodName = GetMethodName(call);
-				mRawDelegate = false;
-			}
-		}
-	}
-
-	public void Set(MonoBehaviour target, string methodName)
-	{
-		Clear();
-		mTarget = target;
-		mMethodName = methodName;
-	}
-
-	private void Cache()
-	{
-		mCached = true;
-		if (!mRawDelegate && (mCachedCallback == null || mCachedCallback.Target as MonoBehaviour != mTarget || GetMethodName(mCachedCallback) != mMethodName) && mTarget != null && !string.IsNullOrEmpty(mMethodName))
-		{
-			Type type = ((object)mTarget).GetType();
-			mMethod = null;
-			while (type != null)
-			{
-				try
-				{
-					mMethod = type.GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-					if (mMethod != null)
-					{
-						break;
-					}
-				}
-				catch (Exception)
-				{
-				}
-				type = type.BaseType;
-			}
-			if (mMethod == null)
-			{
-				Debug.LogError((object)("Could not find method '" + mMethodName + "' on " + ((object)mTarget).GetType()), mTarget);
-			}
-			else if (mMethod.ReturnType != typeof(void))
-			{
-				Debug.LogError((object)(((object)mTarget).GetType() + "." + mMethodName + " must have a 'void' return type."), mTarget);
-			}
-			else
-			{
-				mParameterInfos = mMethod.GetParameters();
-				if (mParameterInfos.Length == 0)
-				{
-					mCachedCallback = (Callback)Delegate.CreateDelegate(typeof(Callback), mTarget, mMethodName);
-					mArgs = null;
-					mParameters = null;
-				}
-				else
-				{
-					mCachedCallback = null;
-					if (mParameters == null || mParameters.Length != mParameterInfos.Length)
-					{
-						mParameters = new Parameter[mParameterInfos.Length];
-						int i = 0;
-						for (int num = mParameters.Length; i < num; i++)
-						{
-							mParameters[i] = new Parameter();
-						}
-					}
-					int j = 0;
-					for (int num2 = mParameters.Length; j < num2; j++)
-					{
-						mParameters[j].expectedType = mParameterInfos[j].ParameterType;
-					}
-				}
-			}
-		}
-	}
-
-	public bool Execute()
-	{
-		if (!mCached)
-		{
-			Cache();
-		}
-		if (mCachedCallback != null)
-		{
-			mCachedCallback();
-			return true;
-		}
-		if (mMethod != null)
-		{
-			if (mParameters == null || mParameters.Length == 0)
-			{
-				mMethod.Invoke(mTarget, null);
-			}
-			else
-			{
-				if (mArgs == null || mArgs.Length != mParameters.Length)
-				{
-					mArgs = new object[mParameters.Length];
-				}
-				int i = 0;
-				for (int num = mParameters.Length; i < num; i++)
-				{
-					mArgs[i] = mParameters[i].value;
-				}
-				try
-				{
-					mMethod.Invoke(mTarget, mArgs);
-				}
-				catch (ArgumentException ex)
-				{
-					string text = "Error calling ";
-					if (mTarget == null)
-					{
-						text += mMethod.Name;
-					}
-					else
-					{
-						string text2 = text;
-						text = text2 + ((object)mTarget).GetType() + "." + mMethod.Name;
-					}
-					text = text + ": " + ex.Message;
-					text += "\n  Expected: ";
-					if (mParameterInfos.Length == 0)
-					{
-						text += "no arguments";
-					}
-					else
-					{
-						text += mParameterInfos[0];
-						for (int j = 1; j < mParameterInfos.Length; j++)
-						{
-							text = text + ", " + mParameterInfos[j].ParameterType;
-						}
-					}
-					text += "\n  Received: ";
-					if (mParameters.Length == 0)
-					{
-						text += "no arguments";
-					}
-					else
-					{
-						text += mParameters[0].type;
-						for (int k = 1; k < mParameters.Length; k++)
-						{
-							text = text + ", " + mParameters[k].type;
-						}
-					}
-					text += "\n";
-					Debug.LogError((object)text);
-				}
-				int l = 0;
-				for (int num2 = mArgs.Length; l < num2; l++)
-				{
-					if (mParameterInfos[l].IsIn || mParameterInfos[l].IsOut)
-					{
-						mParameters[l].value = mArgs[l];
-					}
-					mArgs[l] = null;
-				}
-			}
-			return true;
-		}
-		return false;
-	}
-
-	public void Clear()
-	{
-		mTarget = null;
-		mMethodName = null;
-		mRawDelegate = false;
-		mCachedCallback = null;
-		mParameters = null;
-		mCached = false;
-		mMethod = null;
-		mParameterInfos = null;
-		mArgs = null;
-	}
-
-	public override string ToString()
-	{
-		if (mTarget != null)
-		{
-			string text = ((object)mTarget).GetType().ToString();
-			int num = text.LastIndexOf('.');
-			if (num > 0)
-			{
-				text = text.Substring(num + 1);
-			}
-			if (!string.IsNullOrEmpty(methodName))
-			{
-				return text + "/" + methodName;
-			}
-			return text + "/[delegate]";
-		}
-		return (!mRawDelegate) ? null : "[delegate]";
-	}
-
-	public static void Execute(List<EventDelegate> list)
-	{
-		if (list != null)
-		{
-			int num = 0;
-			while (num < list.Count)
-			{
-				EventDelegate eventDelegate = list[num];
-				if (eventDelegate != null)
-				{
-					try
-					{
-						eventDelegate.Execute();
-					}
-					catch (Exception ex)
-					{
-						if (ex.InnerException != null)
-						{
-							Debug.LogError((object)ex.InnerException.Message);
-						}
-						else
-						{
-							Debug.LogError((object)ex.Message);
-						}
-					}
-					if (num >= list.Count)
-					{
-						break;
-					}
-					if (list[num] != eventDelegate)
-					{
-						continue;
-					}
-					if (eventDelegate.oneShot)
-					{
-						list.RemoveAt(num);
-						continue;
-					}
-				}
-				num++;
-			}
-		}
-	}
-
-	public static bool IsValid(List<EventDelegate> list)
-	{
-		if (list != null)
-		{
-			int i = 0;
-			for (int count = list.Count; i < count; i++)
-			{
-				EventDelegate eventDelegate = list[i];
-				if (eventDelegate != null && eventDelegate.isValid)
-				{
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public static EventDelegate Set(List<EventDelegate> list, Callback callback)
-	{
-		if (list != null)
-		{
-			EventDelegate eventDelegate = new EventDelegate(callback);
-			list.Clear();
-			list.Add(eventDelegate);
-			return eventDelegate;
-		}
-		return null;
-	}
-
-	public static void Set(List<EventDelegate> list, EventDelegate del)
-	{
-		if (list != null)
-		{
-			list.Clear();
-			list.Add(del);
-		}
-	}
-
-	public static EventDelegate Add(List<EventDelegate> list, Callback callback)
-	{
-		return Add(list, callback, false);
-	}
-
-	public static EventDelegate Add(List<EventDelegate> list, Callback callback, bool oneShot)
-	{
-		if (list != null)
-		{
-			int i = 0;
-			for (int count = list.Count; i < count; i++)
-			{
-				EventDelegate eventDelegate = list[i];
-				if (eventDelegate != null && eventDelegate.Equals(callback))
-				{
-					return eventDelegate;
-				}
-			}
-			EventDelegate eventDelegate2 = new EventDelegate(callback);
-			eventDelegate2.oneShot = oneShot;
-			list.Add(eventDelegate2);
-			return eventDelegate2;
-		}
-		Debug.LogWarning((object)"Attempting to add a callback to a list that's null");
-		return null;
-	}
-
-	public static void Add(List<EventDelegate> list, EventDelegate ev)
-	{
-		Add(list, ev, ev.oneShot);
-	}
-
-	public static void Add(List<EventDelegate> list, EventDelegate ev, bool oneShot)
-	{
-		if (ev.mRawDelegate || ev.target == null || string.IsNullOrEmpty(ev.methodName))
-		{
-			Add(list, ev.mCachedCallback, oneShot);
-		}
-		else if (list != null)
-		{
-			int i = 0;
-			for (int count = list.Count; i < count; i++)
-			{
-				EventDelegate eventDelegate = list[i];
-				if (eventDelegate != null && eventDelegate.Equals(ev))
-				{
-					return;
-				}
-			}
-			EventDelegate eventDelegate2 = new EventDelegate(ev.target, ev.methodName);
-			eventDelegate2.oneShot = oneShot;
-			if (ev.mParameters != null && ev.mParameters.Length > 0)
-			{
-				eventDelegate2.mParameters = new Parameter[ev.mParameters.Length];
-				for (int j = 0; j < ev.mParameters.Length; j++)
-				{
-					eventDelegate2.mParameters[j] = ev.mParameters[j];
-				}
-			}
-			list.Add(eventDelegate2);
-		}
-		else
-		{
-			Debug.LogWarning((object)"Attempting to add a callback to a list that's null");
-		}
-	}
-
-	public static bool Remove(List<EventDelegate> list, Callback callback)
-	{
-		if (list != null)
-		{
-			int i = 0;
-			for (int count = list.Count; i < count; i++)
-			{
-				EventDelegate eventDelegate = list[i];
-				if (eventDelegate != null && eventDelegate.Equals(callback))
-				{
-					list.RemoveAt(i);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public static bool Remove(List<EventDelegate> list, EventDelegate ev)
-	{
-		if (list != null)
-		{
-			int i = 0;
-			for (int count = list.Count; i < count; i++)
-			{
-				EventDelegate eventDelegate = list[i];
-				if (eventDelegate != null && eventDelegate.Equals(ev))
-				{
-					list.RemoveAt(i);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+  public delegate void Callback();
 }

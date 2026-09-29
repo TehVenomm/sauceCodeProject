@@ -1,88 +1,81 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: CoopClientPacketSender
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
+using UnityEngine;
 
-public class CoopClientPacketSender
+#nullable disable
+public class CoopClientPacketSender : MonoBehaviour
 {
-	private CoopClient coopClient
-	{
-		get;
-		set;
-	}
+  private CoopClient coopClient { get; set; }
 
-	public CoopClientPacketSender()
-		: this()
-	{
-	}
+  protected virtual void Awake()
+  {
+    this.coopClient = ((Component) this).gameObject.GetComponent<CoopClient>();
+  }
 
-	protected virtual void Awake()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		coopClient = this.get_gameObject().GetComponent<CoopClient>();
-	}
+  protected virtual void Start()
+  {
+  }
 
-	protected virtual void Start()
-	{
-	}
+  private int Send<T>(
+    T model,
+    bool promise = true,
+    int to_client_id = 0,
+    Func<Coop_Model_ACK, bool> onReceiveAck = null,
+    Func<Coop_Model_Base, bool> onPreResend = null)
+    where T : Coop_Model_Base
+  {
+    return to_client_id == 0 ? MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast<T>(model, promise, onReceiveAck, onPreResend) : MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo<T>(to_client_id, model, promise, onReceiveAck, onPreResend);
+  }
 
-	private int Send<T>(T model, bool promise = true, int to_client_id = 0, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null) where T : Coop_Model_Base
-	{
-		if (to_client_id == 0)
-		{
-			return MonoBehaviourSingleton<CoopNetworkManager>.I.SendBroadcast(model, promise, onReceiveAck, onPreResend);
-		}
-		return MonoBehaviourSingleton<CoopNetworkManager>.I.SendTo(to_client_id, model, promise, onReceiveAck, onPreResend);
-	}
+  public void SendClientStatus(int to_client_id = 0)
+  {
+    Coop_Model_ClientStatus model = new Coop_Model_ClientStatus();
+    model.id = 1003;
+    model.status = (int) this.coopClient.status;
+    model.joinType = (int) this.coopClient.joinType;
+    this.Send<Coop_Model_ClientStatus>(model, to_client_id: to_client_id, onPreResend: (Func<Coop_Model_Base, bool>) (send_model => (CoopClient.CLIENT_STATUS) model.status == this.coopClient.status));
+  }
 
-	public void SendClientStatus(int to_client_id = 0)
-	{
-		Coop_Model_ClientStatus model = new Coop_Model_ClientStatus();
-		model.id = 1003;
-		model.status = (int)coopClient.status;
-		model.joinType = (int)coopClient.joinType;
-		Send(model, true, to_client_id, null, delegate
-		{
-			if (model.status != (int)coopClient.status)
-			{
-				return false;
-			}
-			return true;
-		});
-	}
+  public void SendClientBecameHost(int to_client_id = 0)
+  {
+    Coop_Model_ClientBecameHost model = new Coop_Model_ClientBecameHost();
+    model.id = 1003;
+    this.Send<Coop_Model_ClientBecameHost>(model, to_client_id: to_client_id);
+  }
 
-	public void SendClientBecameHost(int to_client_id = 0)
-	{
-		Coop_Model_ClientBecameHost coop_Model_ClientBecameHost = new Coop_Model_ClientBecameHost();
-		coop_Model_ClientBecameHost.id = 1003;
-		Send(coop_Model_ClientBecameHost, true, to_client_id, null, null);
-	}
+  public void SendClientLoadingProgress()
+  {
+    Coop_Model_ClientLoadingProgress model = new Coop_Model_ClientLoadingProgress();
+    model.id = 1003;
+    model.per = this.coopClient.loadingPer;
+    this.Send<Coop_Model_ClientLoadingProgress>(model, false);
+  }
 
-	public void SendClientLoadingProgress()
-	{
-		Coop_Model_ClientLoadingProgress coop_Model_ClientLoadingProgress = new Coop_Model_ClientLoadingProgress();
-		coop_Model_ClientLoadingProgress.id = 1003;
-		coop_Model_ClientLoadingProgress.per = coopClient.loadingPer;
-		Send(coop_Model_ClientLoadingProgress, false, 0, null, null);
-	}
+  public void SendClientChangeEquip()
+  {
+    Coop_Model_ClientChangeEquip model = new Coop_Model_ClientChangeEquip();
+    model.id = 1003;
+    model.userInfo = this.coopClient.userInfo;
+    this.Send<Coop_Model_ClientChangeEquip>(model);
+  }
 
-	public void SendClientChangeEquip()
-	{
-		Coop_Model_ClientChangeEquip coop_Model_ClientChangeEquip = new Coop_Model_ClientChangeEquip();
-		coop_Model_ClientChangeEquip.id = 1003;
-		coop_Model_ClientChangeEquip.userInfo = coopClient.userInfo;
-		Send(coop_Model_ClientChangeEquip, true, 0, null, null);
-	}
+  public void SendClientBattleRetire()
+  {
+    Coop_Model_ClientBattleRetire model = new Coop_Model_ClientBattleRetire();
+    model.id = 1003;
+    this.Send<Coop_Model_ClientBattleRetire>(model);
+  }
 
-	public void SendClientBattleRetire()
-	{
-		Coop_Model_ClientBattleRetire coop_Model_ClientBattleRetire = new Coop_Model_ClientBattleRetire();
-		coop_Model_ClientBattleRetire.id = 1003;
-		Send(coop_Model_ClientBattleRetire, true, 0, null, null);
-	}
-
-	public void SendClientSeriesProgress(int endPhase)
-	{
-		Coop_Model_ClientSeriesProgress coop_Model_ClientSeriesProgress = new Coop_Model_ClientSeriesProgress();
-		coop_Model_ClientSeriesProgress.id = 1003;
-		coop_Model_ClientSeriesProgress.ep = endPhase;
-		Send(coop_Model_ClientSeriesProgress, true, 0, null, null);
-	}
+  public void SendClientSeriesProgress(int endPhase)
+  {
+    Coop_Model_ClientSeriesProgress model = new Coop_Model_ClientSeriesProgress();
+    model.id = 1003;
+    model.ep = endPhase;
+    this.Send<Coop_Model_ClientSeriesProgress>(model);
+  }
 }

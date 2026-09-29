@@ -1,103 +1,86 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIForwardEvents
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Interaction/Forward Events (Legacy)")]
-public class UIForwardEvents
+public class UIForwardEvents : MonoBehaviour
 {
-	public GameObject target;
+  public GameObject target;
+  public bool onHover;
+  public bool onPress;
+  public bool onClick;
+  public bool onDoubleClick;
+  public bool onSelect;
+  public bool onDrag;
+  public bool onDrop;
+  public bool onSubmit;
+  public bool onScroll;
 
-	public bool onHover;
+  private void OnHover(bool isOver)
+  {
+    if (!this.onHover || !Object.op_Inequality((Object) this.target, (Object) null))
+      return;
+    this.target.SendMessage(nameof (OnHover), (object) isOver, (SendMessageOptions) 1);
+  }
 
-	public bool onPress;
+  private void OnPress(bool pressed)
+  {
+    if (!this.onPress || !Object.op_Inequality((Object) this.target, (Object) null))
+      return;
+    this.target.SendMessage(nameof (OnPress), (object) pressed, (SendMessageOptions) 1);
+  }
 
-	public bool onClick;
+  private void OnClick()
+  {
+    if (!this.onClick || !Object.op_Inequality((Object) this.target, (Object) null))
+      return;
+    this.target.SendMessage(nameof (OnClick), (SendMessageOptions) 1);
+  }
 
-	public bool onDoubleClick;
+  private void OnDoubleClick()
+  {
+    if (!this.onDoubleClick || !Object.op_Inequality((Object) this.target, (Object) null))
+      return;
+    this.target.SendMessage(nameof (OnDoubleClick), (SendMessageOptions) 1);
+  }
 
-	public bool onSelect;
+  private void OnSelect(bool selected)
+  {
+    if (!this.onSelect || !Object.op_Inequality((Object) this.target, (Object) null))
+      return;
+    this.target.SendMessage(nameof (OnSelect), (object) selected, (SendMessageOptions) 1);
+  }
 
-	public bool onDrag;
+  private void OnDrag(Vector2 delta)
+  {
+    if (!this.onDrag || !Object.op_Inequality((Object) this.target, (Object) null))
+      return;
+    this.target.SendMessage(nameof (OnDrag), (object) delta, (SendMessageOptions) 1);
+  }
 
-	public bool onDrop;
+  private void OnDrop(GameObject go)
+  {
+    if (!this.onDrop || !Object.op_Inequality((Object) this.target, (Object) null))
+      return;
+    this.target.SendMessage(nameof (OnDrop), (object) go, (SendMessageOptions) 1);
+  }
 
-	public bool onSubmit;
+  private void OnSubmit()
+  {
+    if (!this.onSubmit || !Object.op_Inequality((Object) this.target, (Object) null))
+      return;
+    this.target.SendMessage(nameof (OnSubmit), (SendMessageOptions) 1);
+  }
 
-	public bool onScroll;
-
-	public UIForwardEvents()
-		: this()
-	{
-	}
-
-	private void OnHover(bool isOver)
-	{
-		if (onHover && target != null)
-		{
-			target.SendMessage("OnHover", (object)isOver, 1);
-		}
-	}
-
-	private void OnPress(bool pressed)
-	{
-		if (onPress && target != null)
-		{
-			target.SendMessage("OnPress", (object)pressed, 1);
-		}
-	}
-
-	private void OnClick()
-	{
-		if (onClick && target != null)
-		{
-			target.SendMessage("OnClick", 1);
-		}
-	}
-
-	private void OnDoubleClick()
-	{
-		if (onDoubleClick && target != null)
-		{
-			target.SendMessage("OnDoubleClick", 1);
-		}
-	}
-
-	private void OnSelect(bool selected)
-	{
-		if (onSelect && target != null)
-		{
-			target.SendMessage("OnSelect", (object)selected, 1);
-		}
-	}
-
-	private void OnDrag(Vector2 delta)
-	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		if (onDrag && target != null)
-		{
-			target.SendMessage("OnDrag", (object)delta, 1);
-		}
-	}
-
-	private void OnDrop(GameObject go)
-	{
-		if (onDrop && target != null)
-		{
-			target.SendMessage("OnDrop", (object)go, 1);
-		}
-	}
-
-	private void OnSubmit()
-	{
-		if (onSubmit && target != null)
-		{
-			target.SendMessage("OnSubmit", 1);
-		}
-	}
-
-	private void OnScroll(float delta)
-	{
-		if (onScroll && target != null)
-		{
-			target.SendMessage("OnScroll", (object)delta, 1);
-		}
-	}
+  private void OnScroll(float delta)
+  {
+    if (!this.onScroll || !Object.op_Inequality((Object) this.target, (Object) null))
+      return;
+    this.target.SendMessage(nameof (OnScroll), (object) delta, (SendMessageOptions) 1);
+  }
 }

@@ -1,3 +1,9 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: GuildInfoDetailDialog
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections;
@@ -5,59 +11,54 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+#nullable disable
 public class GuildInfoDetailDialog : GameSection
 {
-	private enum UI
-	{
-		LBL_HUNTER,
-		SCR_LIST,
-		GRD_LIST,
-		LBL_NAME
-	}
+  private List<FriendCharaInfo> members;
+  private GuildStatisticInfo _info;
+  private int _clanId;
+  private int _clanMasterUserId;
 
-	private List<FriendCharaInfo> members;
+  public override void Initialize()
+  {
+    object[] eventData = GameSection.GetEventData() as object[];
+    this._info = eventData[0] as GuildStatisticInfo;
+    this._clanId = (int) eventData[1];
+    this.StartCoroutine(this.DoInitialize());
+  }
 
-	private GuildStatisticInfo _info;
+  private IEnumerator DoInitialize()
+  {
+    bool is_finish = false;
+    MonoBehaviourSingleton<GuildManager>.I.SendMemberList(this._clanId, (Action<bool, GuildMemberListModel>) ((success, ret) =>
+    {
+      this.members = new List<FriendCharaInfo>((IEnumerable<FriendCharaInfo>) ret.result.list);
+      this.members.Remove(this.members.FirstOrDefault<FriendCharaInfo>((Func<FriendCharaInfo, bool>) (o => o.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id)));
+      this._clanMasterUserId = ret.result.clanMasterId;
+      is_finish = true;
+    }));
+    while (!is_finish)
+      yield return (object) null;
+    base.Initialize();
+  }
 
-	private int _clanId;
+  public override void UpdateUI()
+  {
+    this.SetLabelText((Enum) GuildInfoDetailDialog.UI.LBL_HUNTER, string.Format(this.sectionData.GetText("TEXT_HUNTER"), (object) this._info.currentMem, (object) this._info.memCap));
+    this.SetGrid((Enum) GuildInfoDetailDialog.UI.GRD_LIST, "GuildInfoDetailListItem", this.members.Count, true, (Action<int, Transform, bool>) ((i, t, b) =>
+    {
+      FriendCharaInfo member = this.members[i];
+      string str = member.userId == this._clanMasterUserId ? $"({this.sectionData.GetText("TEXT_MASTER")})" : "";
+      this.SetLabelText(t, (Enum) GuildInfoDetailDialog.UI.LBL_NAME, member.name + str);
+      this.SetEvent(t, "DETAIL", (object) member);
+    }));
+  }
 
-	private int _clanMasterUserId;
-
-	public override void Initialize()
-	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		object[] array = GameSection.GetEventData() as object[];
-		_info = (array[0] as GuildStatisticInfo);
-		_clanId = (int)array[1];
-		this.StartCoroutine(DoInitialize());
-	}
-
-	private IEnumerator DoInitialize()
-	{
-		bool is_finish = false;
-		MonoBehaviourSingleton<GuildManager>.I.SendMemberList(_clanId, delegate(bool success, GuildMemberListModel ret)
-		{
-			((_003CDoInitialize_003Ec__Iterator4A)/*Error near IL_0038: stateMachine*/)._003C_003Ef__this.members = new List<FriendCharaInfo>(ret.result.list);
-			((_003CDoInitialize_003Ec__Iterator4A)/*Error near IL_0038: stateMachine*/)._003C_003Ef__this.members.Remove(((_003CDoInitialize_003Ec__Iterator4A)/*Error near IL_0038: stateMachine*/)._003C_003Ef__this.members.FirstOrDefault((FriendCharaInfo o) => o.userId == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id));
-			((_003CDoInitialize_003Ec__Iterator4A)/*Error near IL_0038: stateMachine*/)._003C_003Ef__this._clanMasterUserId = ret.result.clanMasterId;
-			((_003CDoInitialize_003Ec__Iterator4A)/*Error near IL_0038: stateMachine*/)._003Cis_finish_003E__0 = true;
-		});
-		while (!is_finish)
-		{
-			yield return (object)null;
-		}
-		base.Initialize();
-	}
-
-	public override void UpdateUI()
-	{
-		SetLabelText((Enum)UI.LBL_HUNTER, string.Format(base.sectionData.GetText("TEXT_HUNTER"), _info.currentMem, _info.memCap));
-		SetGrid(UI.GRD_LIST, "GuildInfoDetailListItem", members.Count, true, delegate(int i, Transform t, bool b)
-		{
-			FriendCharaInfo friendCharaInfo = members[i];
-			string str = (friendCharaInfo.userId != _clanMasterUserId) ? string.Empty : string.Format("({0})", base.sectionData.GetText("TEXT_MASTER"));
-			SetLabelText(t, UI.LBL_NAME, friendCharaInfo.name + str);
-			SetEvent(t, "DETAIL", friendCharaInfo);
-		});
-	}
+  private enum UI
+  {
+    LBL_HUNTER,
+    SCR_LIST,
+    GRD_LIST,
+    LBL_NAME,
+  }
 }

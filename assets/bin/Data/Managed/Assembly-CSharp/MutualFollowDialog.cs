@@ -1,97 +1,113 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: MutualFollowDialog
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections;
 using System.Text;
 using UnityEngine;
 
+#nullable disable
 public class MutualFollowDialog : GameSection
 {
-	private enum UI
-	{
-		SPR_MUTUAL_FOLLOW_BANNER,
-		LBL_FOLLOWER_NUM,
-		LBL_REMAIN_NUM,
-		LBL_MESSAGE,
-		LBL_LOUNGE_REMAIN_NUM,
-		OBJ_FIRST_MET_LOUNGE
-	}
+  private string linkMessage;
+  private FriendFollowLinkResult followLinkResult;
+  private const string MUTUAL_FOLLOW_BANNER_NAME = "IMG_00000001";
+  private LoadingQueue loadQueue;
 
-	private const string MUTUAL_FOLLOW_BANNER_NAME = "IMG_00000001";
+  public override void Initialize()
+  {
+    this.followLinkResult = MonoBehaviourSingleton<FriendManager>.I.followLinkResult;
+    this.SetLabelText((Enum) MutualFollowDialog.UI.LBL_FOLLOWER_NUM, $"{this.followLinkResult.followCnt.ToString()}/{this.followLinkResult.followMaxCnt.ToString()}");
+    string text1 = this.sectionData.GetText("REMAIN");
+    string text2 = this.sectionData.GetText("PEOPLE");
+    this.SetLabelText((Enum) MutualFollowDialog.UI.LBL_REMAIN_NUM, $"{text1} {this.followLinkResult.remainedCampaignNum.ToString()} {text2}");
+    string text3;
+    if (this.followLinkResult.remainedLoungeFirstMetNum < 0)
+      text3 = this.sectionData.GetText("NON_CAMPAIN");
+    else
+      text3 = $"{text1} {this.followLinkResult.remainedLoungeFirstMetNum.ToString()} {text2}";
+    this.SetLabelText((Enum) MutualFollowDialog.UI.LBL_LOUNGE_REMAIN_NUM, text3);
+    this.linkMessage = string.Format(this.followLinkResult.message, (object) this.followLinkResult.link);
+    this.linkMessage = this.linkMessage.Replace("<BR>", "\n");
+    if (!MonoBehaviourSingleton<AccountManager>.I.usageLimitMode)
+    {
+      this.SetActive((Enum) MutualFollowDialog.UI.OBJ_AREA, true);
+      this.SetActive((Enum) MutualFollowDialog.UI.OBJ_AREA2, false);
+      this.SetActive((Enum) MutualFollowDialog.UI.LBL_SERVICE_MESSAGE, false);
+      this.SetActive((Enum) MutualFollowDialog.UI.LBL_INVITE, true);
+      this.StartCoroutine(this.LoadTopBanner());
+    }
+    else
+    {
+      this.SetActive((Enum) MutualFollowDialog.UI.LBL_INVITE, false);
+      this.SetActive((Enum) MutualFollowDialog.UI.OBJ_AREA, false);
+      this.SetActive((Enum) MutualFollowDialog.UI.OBJ_AREA2, false);
+      this.SetActive((Enum) MutualFollowDialog.UI.OBJ_LINE_ROOT, false);
+      this.SetActive((Enum) MutualFollowDialog.UI.OBJ_TWITTER_ROOT, false);
+      this.SetActive((Enum) MutualFollowDialog.UI.BTN_DETAIL, false);
+      this.SetActive((Enum) MutualFollowDialog.UI.LBL_SERVICE_MESSAGE, true);
+      this.SetLabelText((Enum) MutualFollowDialog.UI.LBL_SERVICE_MESSAGE, this.sectionData.GetText("SERVICE_LIMITED"));
+    }
+    base.Initialize();
+  }
 
-	private string linkMessage;
+  private IEnumerator LoadTopBanner()
+  {
+    if (this.loadQueue == null)
+      this.loadQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject lo_image = this.loadQueue.Load(RESOURCE_CATEGORY.COMMON, "IMG_00000001");
+    if (this.loadQueue.IsLoading())
+      yield return (object) this.loadQueue.Wait();
+    if (!Object.op_Equality(lo_image.loadedObject, (Object) null))
+    {
+      Texture loadedObject = lo_image.loadedObject as Texture;
+      ((Component) this.GetCtrl((Enum) MutualFollowDialog.UI.SPR_MUTUAL_FOLLOW_BANNER)).GetComponent<UITexture>().mainTexture = loadedObject;
+    }
+  }
 
-	private FriendFollowLinkResult followLinkResult;
+  private void OnQuery_LINE()
+  {
+    Native.OpenURL("https://line.naver.jp/R/msg/text/?" + WWW.EscapeURL(this.linkMessage, Encoding.UTF8));
+  }
 
-	private LoadingQueue loadQueue;
+  private void OnQuery_TWITTER()
+  {
+    Native.OpenURL("https://twitter.com/intent/tweet?text=" + WWW.EscapeURL(this.linkMessage));
+  }
 
-	public override void Initialize()
-	{
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		followLinkResult = MonoBehaviourSingleton<FriendManager>.I.followLinkResult;
-		SetLabelText((Enum)UI.LBL_FOLLOWER_NUM, followLinkResult.followCnt.ToString() + "/" + followLinkResult.followMaxCnt.ToString());
-		string text = base.sectionData.GetText("REMAIN");
-		string text2 = base.sectionData.GetText("PEOPLE");
-		SetLabelText((Enum)UI.LBL_REMAIN_NUM, text + " " + followLinkResult.remainedCampaignNum.ToString() + " " + text2);
-		string empty = string.Empty;
-		SetLabelText(text: (followLinkResult.remainedLoungeFirstMetNum >= 0) ? (text + " " + followLinkResult.remainedLoungeFirstMetNum.ToString() + " " + text2) : base.sectionData.GetText("NON_CAMPAIN"), label_enum: UI.LBL_LOUNGE_REMAIN_NUM);
-		string message = followLinkResult.message;
-		linkMessage = string.Format(message, followLinkResult.link);
-		linkMessage = linkMessage.Replace("<BR>", "\n");
-		this.StartCoroutine(LoadTopBanner());
-		base.Initialize();
-	}
+  private void OnQuery_FACEBOOK()
+  {
+    if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUserFacebook)
+    {
+      if (MonoBehaviourSingleton<FBManager>.I.isLoggedIn)
+        return;
+      GameSection.StayEvent();
+      MonoBehaviourSingleton<FBManager>.I.LoginWithReadPermission((Action<bool, string>) ((success, r) => GameSection.ResumeEvent(success)));
+    }
+    else
+      GameSection.ChangeEvent("FACEBOOK_CONNECT");
+  }
 
-	private IEnumerator LoadTopBanner()
-	{
-		if (loadQueue == null)
-		{
-			loadQueue = new LoadingQueue(this);
-		}
-		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.COMMON, "IMG_00000001", false);
-		if (loadQueue.IsLoading())
-		{
-			yield return (object)loadQueue.Wait();
-		}
-		if (!(lo_image.loadedObject == null))
-		{
-			Texture bannerImg = lo_image.loadedObject as Texture;
-			Transform banner = GetCtrl(UI.SPR_MUTUAL_FOLLOW_BANNER);
-			UITexture uiTexture = banner.GetComponent<UITexture>();
-			uiTexture.mainTexture = bannerImg;
-		}
-	}
+  private void OnQuery_DETAIL() => GameSection.SetEventData((object) this.followLinkResult.linkUrl);
 
-	private void OnQuery_LINE()
-	{
-		Native.OpenURL("https://line.naver.jp/R/msg/text/?" + WWW.EscapeURL(linkMessage, Encoding.UTF8));
-	}
-
-	private void OnQuery_TWITTER()
-	{
-		Native.OpenURL("https://twitter.com/intent/tweet?text=" + WWW.EscapeURL(linkMessage));
-	}
-
-	private void OnQuery_FACEBOOK()
-	{
-		if (MonoBehaviourSingleton<UserInfoManager>.I.userInfo.isAdvancedUserFacebook)
-		{
-			if (!MonoBehaviourSingleton<FBManager>.I.isLoggedIn)
-			{
-				GameSection.StayEvent();
-				MonoBehaviourSingleton<FBManager>.I.LoginWithReadPermission(delegate(bool success, string r)
-				{
-					GameSection.ResumeEvent(success, null);
-				});
-			}
-		}
-		else
-		{
-			GameSection.ChangeEvent("FACEBOOK_CONNECT", null);
-		}
-	}
-
-	private void OnQuery_DETAIL()
-	{
-		GameSection.SetEventData(followLinkResult.linkUrl);
-	}
+  private enum UI
+  {
+    SPR_MUTUAL_FOLLOW_BANNER,
+    LBL_FOLLOWER_NUM,
+    LBL_REMAIN_NUM,
+    LBL_MESSAGE,
+    LBL_LOUNGE_REMAIN_NUM,
+    OBJ_FIRST_MET_LOUNGE,
+    OBJ_AREA,
+    OBJ_AREA2,
+    OBJ_TWITTER_ROOT,
+    OBJ_LINE_ROOT,
+    BTN_DETAIL,
+    LBL_SERVICE_MESSAGE,
+    LBL_INVITE,
+  }
 }

@@ -1,75 +1,65 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: RenderTargetSetter
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class RenderTargetSetter
+#nullable disable
+public class RenderTargetSetter : MonoBehaviour
 {
-	[Serializable]
-	public class TextureSetInfo
-	{
-		public Renderer targetRenderer;
+  [SerializeField]
+  private RenderTargetSetter.TextureSetInfo[] infos;
+  [SerializeField]
+  private CameraEvent cameraEvent = (CameraEvent) 11;
+  private RenderTexture renderTexture;
+  private GrabCommand grabCommand;
 
-		public string texturePropertyName;
-	}
+  private void OnDestroy()
+  {
+    this.renderTexture = (RenderTexture) null;
+    if (!Object.op_Inequality((Object) this.grabCommand, (Object) null))
+      return;
+    this.grabCommand.releaseRenderTexture(((Component) this).gameObject);
+  }
 
-	[SerializeField]
-	private TextureSetInfo[] infos;
+  private IEnumerator Start()
+  {
+    if (this.infos != null)
+    {
+      while (!MonoBehaviourSingleton<AppMain>.IsValid() || Object.op_Equality((Object) MonoBehaviourSingleton<AppMain>.I.mainCamera, (Object) null))
+        yield return (object) null;
+      this.grabCommand = ((Component) MonoBehaviourSingleton<AppMain>.I.mainCamera).gameObject.GetComponent<GrabCommand>();
+      if (Object.op_Equality((Object) this.grabCommand, (Object) null))
+      {
+        this.grabCommand = ((Component) MonoBehaviourSingleton<AppMain>.I.mainCamera).gameObject.AddComponent<GrabCommand>();
+        this.grabCommand.ApplyCommandBuffer(this.cameraEvent);
+      }
+      this.renderTexture = this.grabCommand.useRenderTexture(((Component) this).gameObject);
+      for (int index1 = 0; index1 < this.infos.Length; ++index1)
+      {
+        if (!Object.op_Equality((Object) this.infos[index1].targetRenderer, (Object) null) && !string.IsNullOrEmpty(this.infos[index1].texturePropertyName))
+        {
+          RenderTargetSetter.TextureSetInfo info = this.infos[index1];
+          Renderer targetRenderer = info.targetRenderer;
+          for (int index2 = 0; index2 < targetRenderer.sharedMaterials.Length; ++index2)
+          {
+            if (targetRenderer.sharedMaterials[index2].HasProperty(info.texturePropertyName))
+              targetRenderer.sharedMaterials[index2].SetTexture(info.texturePropertyName, (Texture) this.renderTexture);
+          }
+        }
+      }
+    }
+  }
 
-	[SerializeField]
-	private CameraEvent cameraEvent = 11;
-
-	private RenderTexture renderTexture;
-
-	private GrabCommand grabCommand;
-
-	public RenderTargetSetter()
-		: this()
-	{
-	}//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-
-
-	private void OnDestroy()
-	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
-		renderTexture = null;
-		if (grabCommand != null)
-		{
-			grabCommand.releaseRenderTexture(this.get_gameObject());
-		}
-	}
-
-	private IEnumerator Start()
-	{
-		if (infos != null)
-		{
-			while (!MonoBehaviourSingleton<AppMain>.IsValid() || MonoBehaviourSingleton<AppMain>.I.mainCamera == null)
-			{
-				yield return (object)null;
-			}
-			grabCommand = MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().GetComponent<GrabCommand>();
-			if (grabCommand == null)
-			{
-				grabCommand = MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().AddComponent<GrabCommand>();
-				grabCommand.ApplyCommandBuffer(cameraEvent);
-			}
-			renderTexture = grabCommand.useRenderTexture(this.get_gameObject());
-			for (int j = 0; j < infos.Length; j++)
-			{
-				if (!(infos[j].targetRenderer == null) && !string.IsNullOrEmpty(infos[j].texturePropertyName))
-				{
-					TextureSetInfo info = infos[j];
-					Renderer renderer = info.targetRenderer;
-					for (int i = 0; i < renderer.get_sharedMaterials().Length; i++)
-					{
-						if (renderer.get_sharedMaterials()[i].HasProperty(info.texturePropertyName))
-						{
-							renderer.get_sharedMaterials()[i].SetTexture(info.texturePropertyName, renderTexture);
-						}
-					}
-				}
-			}
-		}
-	}
+  [Serializable]
+  public class TextureSetInfo
+  {
+    public Renderer targetRenderer;
+    public string texturePropertyName;
+  }
 }

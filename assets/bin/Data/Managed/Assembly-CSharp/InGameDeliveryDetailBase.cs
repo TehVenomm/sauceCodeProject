@@ -1,130 +1,139 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: InGameDeliveryDetailBase
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
 
+using System;
+using UnityEngine;
+
+#nullable disable
 public class InGameDeliveryDetailBase : QuestDeliveryDetail
 {
-	private new enum UI
-	{
-		OBJ_BASE_ROOT,
-		OBJ_BACK,
-		OBJ_COMPLETE_ROOT,
-		BTN_COMPLETE,
-		CHARA_ALL,
-		OBJ_UNLOCK_PORTAL_ROOT,
-		LBL_UNLOCK_PORTAL,
-		LBL_QUEST_TITLE,
-		LBL_CHARA_MESSAGE,
-		LBL_PERSON_NAME,
-		TEX_NPC,
-		BTN_JUMP_QUEST,
-		BTN_JUMP_INVALID,
-		BTN_JUMP_MAP,
-		BTN_JUMP_GACHATOP,
-		GRD_REWARD,
-		LBL_MONEY,
-		LBL_EXP,
-		SPR_WINDOW,
-		SPR_MESSAGE_BG,
-		OBJ_NEED_ITEM_ROOT,
-		LBL_NEED_ITEM_NAME,
-		LBL_NEED,
-		LBL_HAVE,
-		LBL_PLACE_NAME,
-		LBL_ENEMY_NAME,
-		OBJ_DIFFICULTY_ROOT,
-		OBJ_ENEMY_NAME_ROOT,
-		LBL_GET_PLACE,
-		BTN_SUBMISSION,
-		STR_BTN_SUBMISSION,
-		STR_BTN_SUBMISSION_BACK,
-		OBJ_TOP_CROWN_ROOT,
-		OBJ_TOP_CROWN_1,
-		OBJ_TOP_CROWN_2,
-		OBJ_TOP_CROWN_3,
-		STR_MISSION_EMPTY,
-		SPR_CROWN_1,
-		SPR_CROWN_2,
-		SPR_CROWN_3,
-		OBJ_SUBMISSION_ROOT,
-		OBJ_MISSION_INFO,
-		OBJ_MISSION_INFO_1,
-		OBJ_MISSION_INFO_2,
-		OBJ_MISSION_INFO_3,
-		LBL_MISSION_INFO_1,
-		LBL_MISSION_INFO_2,
-		LBL_MISSION_INFO_3,
-		SPR_MISSION_INFO_CROWN_1,
-		SPR_MISSION_INFO_CROWN_2,
-		SPR_MISSION_INFO_CROWN_3,
-		STR_MISSION,
-		OBJ_BASE_FRAME,
-		OBJ_TARGET_FRAME,
-		OBJ_SUBMISSION_FRAME,
-		OBJ_NORMAL_ROOT,
-		OBJ_EVENT_ROOT,
-		LBL_POINT_NORMAL,
-		TEX_NORMAL_ICON,
-		LBL_POINT_EVENT,
-		TEX_EVENT_ICON,
-		BTN_CREATE,
-		BTN_JOIN,
-		BTN_MATCHING,
-		PORTRAIT_WINDOW,
-		PORTRAIT_BACK,
-		LANDSCAPE_WINDOW,
-		LANDSCAPE_BACK
-	}
+  private bool isUpdatedUI;
 
-	private bool isUpdatedUI;
+  public override void Initialize()
+  {
+    base.Initialize();
+    if (!MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += new ScreenOrientationManager.OnScreenRotateDelegate(this.OnScreenRotate);
+  }
 
-	public override void Initialize()
-	{
-		base.Initialize();
-		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
-		{
-			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
-		}
-	}
+  public override void UpdateUI()
+  {
+    base.UpdateUI();
+    this.SetPrefab((Enum) InGameDeliveryDetailBase.UI.OBJ_BASE_ROOT, "InGameDeliveryDetailSettings");
+    this.isUpdatedUI = true;
+    this.OnScreenRotate(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
+  }
 
-	public override void UpdateUI()
-	{
-		base.UpdateUI();
-		SetPrefab((Enum)UI.OBJ_BASE_ROOT, "InGameDeliveryDetailSettings");
-		isUpdatedUI = true;
-		OnScreenRotate(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
-	}
+  public override void Exit()
+  {
+    base.Exit();
+    if (!MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= new ScreenOrientationManager.OnScreenRotateDelegate(this.OnScreenRotate);
+  }
 
-	public override void Exit()
-	{
-		base.Exit();
-		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
-		{
-			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= OnScreenRotate;
-		}
-	}
+  private void OnScreenRotate(bool is_portrait)
+  {
+    if (!this.isUpdatedUI)
+      return;
+    if (is_portrait)
+    {
+      this.SetActive((Enum) InGameDeliveryDetailBase.UI.CHARA_ALL, true);
+      this.SetActive((Enum) InGameDeliveryDetailBase.UI.PORTRAIT_BACK, true);
+      this.SetActive((Enum) InGameDeliveryDetailBase.UI.LANDSCAPE_BACK, false);
+      if (Object.op_Inequality((Object) this.GetCtrl((Enum) InGameDeliveryDetailBase.UI.PORTRAIT_WINDOW), (Object) null))
+      {
+        this.GetCtrl((Enum) InGameDeliveryDetailBase.UI.SPR_WINDOW).localPosition = this.GetCtrl((Enum) InGameDeliveryDetailBase.UI.PORTRAIT_WINDOW).localPosition;
+        this.SetHeight((Enum) InGameDeliveryDetailBase.UI.SPR_WINDOW, this.GetHeight((Enum) InGameDeliveryDetailBase.UI.PORTRAIT_WINDOW));
+      }
+    }
+    else
+    {
+      this.SetActive((Enum) InGameDeliveryDetailBase.UI.CHARA_ALL, false);
+      this.SetActive((Enum) InGameDeliveryDetailBase.UI.PORTRAIT_BACK, false);
+      this.SetActive((Enum) InGameDeliveryDetailBase.UI.LANDSCAPE_BACK, true);
+      if (Object.op_Inequality((Object) this.GetCtrl((Enum) InGameDeliveryDetailBase.UI.LANDSCAPE_WINDOW), (Object) null))
+      {
+        this.GetCtrl((Enum) InGameDeliveryDetailBase.UI.SPR_WINDOW).localPosition = this.GetCtrl((Enum) InGameDeliveryDetailBase.UI.LANDSCAPE_WINDOW).localPosition;
+        this.SetHeight((Enum) InGameDeliveryDetailBase.UI.SPR_WINDOW, this.GetHeight((Enum) InGameDeliveryDetailBase.UI.LANDSCAPE_WINDOW));
+      }
+    }
+    this.UpdateAnchors();
+  }
 
-	private void OnScreenRotate(bool is_portrait)
-	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		if (isUpdatedUI)
-		{
-			if (is_portrait)
-			{
-				SetActive((Enum)UI.CHARA_ALL, true);
-				SetActive((Enum)UI.PORTRAIT_BACK, true);
-				SetActive((Enum)UI.LANDSCAPE_BACK, false);
-				GetCtrl(UI.SPR_WINDOW).set_localPosition(GetCtrl(UI.PORTRAIT_WINDOW).get_localPosition());
-				SetHeight((Enum)UI.SPR_WINDOW, GetHeight(UI.PORTRAIT_WINDOW));
-			}
-			else
-			{
-				SetActive((Enum)UI.CHARA_ALL, false);
-				SetActive((Enum)UI.PORTRAIT_BACK, false);
-				SetActive((Enum)UI.LANDSCAPE_BACK, true);
-				GetCtrl(UI.SPR_WINDOW).set_localPosition(GetCtrl(UI.LANDSCAPE_WINDOW).get_localPosition());
-				SetHeight((Enum)UI.SPR_WINDOW, GetHeight(UI.LANDSCAPE_WINDOW));
-			}
-			UpdateAnchors();
-		}
-	}
+  private new enum UI
+  {
+    OBJ_BASE_ROOT,
+    OBJ_BACK,
+    OBJ_COMPLETE_ROOT,
+    BTN_COMPLETE,
+    CHARA_ALL,
+    OBJ_UNLOCK_PORTAL_ROOT,
+    LBL_UNLOCK_PORTAL,
+    LBL_QUEST_TITLE,
+    LBL_CHARA_MESSAGE,
+    LBL_PERSON_NAME,
+    TEX_NPC,
+    BTN_JUMP_QUEST,
+    BTN_JUMP_INVALID,
+    BTN_JUMP_MAP,
+    BTN_JUMP_GACHATOP,
+    GRD_REWARD,
+    LBL_MONEY,
+    LBL_EXP,
+    SPR_WINDOW,
+    SPR_MESSAGE_BG,
+    OBJ_NEED_ITEM_ROOT,
+    LBL_NEED_ITEM_NAME,
+    LBL_NEED,
+    LBL_HAVE,
+    LBL_PLACE_NAME,
+    LBL_ENEMY_NAME,
+    OBJ_DIFFICULTY_ROOT,
+    OBJ_ENEMY_NAME_ROOT,
+    LBL_GET_PLACE,
+    BTN_SUBMISSION,
+    STR_BTN_SUBMISSION,
+    STR_BTN_SUBMISSION_BACK,
+    OBJ_TOP_CROWN_ROOT,
+    OBJ_TOP_CROWN_1,
+    OBJ_TOP_CROWN_2,
+    OBJ_TOP_CROWN_3,
+    STR_MISSION_EMPTY,
+    SPR_CROWN_1,
+    SPR_CROWN_2,
+    SPR_CROWN_3,
+    OBJ_SUBMISSION_ROOT,
+    OBJ_MISSION_INFO,
+    OBJ_MISSION_INFO_1,
+    OBJ_MISSION_INFO_2,
+    OBJ_MISSION_INFO_3,
+    LBL_MISSION_INFO_1,
+    LBL_MISSION_INFO_2,
+    LBL_MISSION_INFO_3,
+    SPR_MISSION_INFO_CROWN_1,
+    SPR_MISSION_INFO_CROWN_2,
+    SPR_MISSION_INFO_CROWN_3,
+    STR_MISSION,
+    OBJ_BASE_FRAME,
+    OBJ_TARGET_FRAME,
+    OBJ_SUBMISSION_FRAME,
+    OBJ_NORMAL_ROOT,
+    OBJ_EVENT_ROOT,
+    LBL_POINT_NORMAL,
+    TEX_NORMAL_ICON,
+    LBL_POINT_EVENT,
+    TEX_EVENT_ICON,
+    BTN_CREATE,
+    BTN_JOIN,
+    BTN_MATCHING,
+    PORTRAIT_WINDOW,
+    PORTRAIT_BACK,
+    LANDSCAPE_WINDOW,
+    LANDSCAPE_BACK,
+  }
 }

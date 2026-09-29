@@ -1,300 +1,239 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: NetworkNative
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class NetworkNative
 {
-	public class GoogleAccountInfo
-	{
-		public List<GoogleAccount> googleAccounts = new List<GoogleAccount>();
-	}
+  public const string UNIQUEDEVICE_NUM = "e87e03526ab";
 
-	public class GoogleAccount
-	{
-		public string key;
+  public static NetworkNative.GoogleAccountInfo getGoogleAccounts()
+  {
+    NetworkNative.GoogleAccountInfo googleAccounts = new NetworkNative.GoogleAccountInfo();
+    try
+    {
+      googleAccounts = JSONSerializer.Deserialize<NetworkNative.GoogleAccountInfo>(((AndroidJavaObject) new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper")).CallStatic<string>(nameof (getGoogleAccounts), new object[1]
+      {
+        (object) NetworkNative.getUniqueDeviceId()
+      }));
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError((object) ex);
+    }
+    return googleAccounts;
+  }
 
-		public string name;
+  public static string getAppStr() => AppMain.appStr;
 
-		public GoogleAccount()
-		{
-		}
+  public static string getUniqueDeviceId()
+  {
+    string uniqueDeviceId = "TestDevice";
+    try
+    {
+      uniqueDeviceId = ((AndroidJavaObject) new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper")).CallStatic<string>("getUniqueId", new object[1]
+      {
+        (object) "e87e03526ab"
+      });
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError((object) ex);
+    }
+    return uniqueDeviceId;
+  }
 
-		public GoogleAccount(string _k, string _n)
-		{
-			key = _k;
-			name = _n;
-		}
-	}
+  public static void createRegistrationId() => MonoBehaviourSingleton<FCMManager>.I.StartRegist();
 
-	public const string UNIQUEDEVICE_NUM = "e87e03526ab";
+  public static int getNativeVersionCode()
+  {
+    int nativeVersionCode = 1;
+    try
+    {
+      nativeVersionCode = ((AndroidJavaObject) new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper")).CallStatic<int>("getVersionCode", Array.Empty<object>());
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError((object) ex);
+    }
+    return nativeVersionCode;
+  }
 
-	public static GoogleAccountInfo getGoogleAccounts()
-	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
-		GoogleAccountInfo result = new GoogleAccountInfo();
-		try
-		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper");
-			string uniqueDeviceId = getUniqueDeviceId();
-			string message = val.CallStatic<string>("getGoogleAccounts", new object[1]
-			{
-				uniqueDeviceId
-			});
-			result = JSONSerializer.Deserialize<GoogleAccountInfo>(message);
-			return result;
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError((object)ex);
-			return result;
-		}
-	}
+  public static string getNativeVersionName()
+  {
+    string nativeVersionName = "1.0.29";
+    try
+    {
+      nativeVersionName = ((AndroidJavaObject) new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper")).CallStatic<string>("getVersionName", Array.Empty<object>());
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError((object) ex);
+    }
+    return nativeVersionName;
+  }
 
-	public static string getUniqueDeviceId()
-	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
-		string result = "TestDevice";
-		try
-		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper");
-			result = val.CallStatic<string>("getUniqueId", new object[1]
-			{
-				"e87e03526ab"
-			});
-			return result;
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError((object)ex);
-			return result;
-		}
-	}
+  public static Version getNativeVersionFromName()
+  {
+    return new Version(NetworkNative.getNativeVersionName());
+  }
 
-	public static void createRegistrationId()
-	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Expected O, but got Unknown
-		try
-		{
-			AndroidJavaClass val = new AndroidJavaClass("jp.colopl.gcm.RegistrarHelper");
-			val.CallStatic("CreateRegistrationId", new object[0]);
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError((object)ex);
-		}
-		MonoBehaviourSingleton<FCMManager>.I.StartRegist();
-	}
+  public static string getNativeVersionNameRemoveDot()
+  {
+    return NetworkNative.getNativeVersionName().Replace(".", "");
+  }
 
-	public static int getNativeVersionCode()
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
-		int result = 1;
-		try
-		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper");
-			result = val.CallStatic<int>("getVersionCode", new object[0]);
-			return result;
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError((object)ex);
-			return result;
-		}
-	}
+  public static bool isRazerPhone()
+  {
+    bool flag = false;
+    try
+    {
+      flag = ((AndroidJavaObject) new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper")).CallStatic<bool>(nameof (isRazerPhone), Array.Empty<object>());
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError((object) ex);
+    }
+    return flag;
+  }
 
-	public static string getNativeVersionName()
-	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
-		string result = "1.0.29";
-		try
-		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper");
-			result = val.CallStatic<string>("getVersionName", new object[0]);
-			return result;
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError((object)ex);
-			return result;
-		}
-	}
+  public static string getSystemPropertys(string key)
+  {
+    string systemPropertys = "--";
+    try
+    {
+      systemPropertys = ((AndroidJavaObject) new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper")).CallStatic<string>("getSystemProperty", new object[1]
+      {
+        (object) key
+      });
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError((object) ex);
+    }
+    return systemPropertys;
+  }
 
-	public static Version getNativeVersionFromName()
-	{
-		return new Version(getNativeVersionName());
-	}
+  public static bool isRunOnRazerPhone() => false;
 
-	public static string getNativeVersionNameRemoveDot()
-	{
-		return getNativeVersionName().Replace(".", string.Empty);
-	}
+  public static int getNativeAsset()
+  {
+    int nativeAsset = 1;
+    try
+    {
+      nativeAsset = ((AndroidJavaObject) new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper")).CallStatic<int>("getAsset", new object[1]
+      {
+        (object) "start"
+      });
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError((object) ex);
+    }
+    return nativeAsset;
+  }
 
-	public static bool isRazerPhone()
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
-		bool result = false;
-		try
-		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper");
-			result = val.CallStatic<bool>("isRazerPhone", new object[0]);
-			return result;
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError((object)ex);
-			return result;
-		}
-	}
+  public static void getNativeiOSAsset()
+  {
+  }
 
-	public static string getSystemPropertys(string key)
-	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
-		string result = "--";
-		try
-		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper");
-			result = val.CallStatic<string>("getSystemProperty", new object[1]
-			{
-				key
-			});
-			return result;
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError((object)ex);
-			return result;
-		}
-	}
+  public static int getAnalytics()
+  {
+    int analytics = 1;
+    try
+    {
+      analytics = ((AndroidJavaObject) new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper")).CallStatic<int>(nameof (getAnalytics), Array.Empty<object>());
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError((object) ex);
+    }
+    return analytics;
+  }
 
-	public static bool isRunOnRazerPhone()
-	{
-		bool result = false;
-		if (getSystemPropertys("ro.product.brand") == "razer" && getSystemPropertys("ro.razer.internal.mask") == "254" && getSystemPropertys("ro.razer.internal.api") == "1" && getSystemPropertys("ro.razer.internal.list") == "9" && getSystemPropertys("ro.razer.internal.zval") == "26")
-		{
-			result = true;
-		}
-		return result;
-	}
+  public static void setSidToken(string token)
+  {
+    try
+    {
+      ((AndroidJavaObject) new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper")).CallStatic(nameof (setSidToken), new object[1]
+      {
+        (object) token
+      });
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError((object) ex);
+    }
+  }
 
-	public static int getNativeAsset()
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
-		int result = 1;
-		try
-		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper");
-			result = val.CallStatic<int>("getAsset", new object[1]
-			{
-				"start"
-			});
-			return result;
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError((object)ex);
-			return result;
-		}
-	}
+  public static void setHost(string host)
+  {
+    try
+    {
+      ((AndroidJavaObject) new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper")).CallStatic(nameof (setHost), new object[1]
+      {
+        (object) host
+      });
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError((object) ex);
+    }
+  }
 
-	public static void getNativeiOSAsset()
-	{
-	}
+  public static void setCookieToken(string token)
+  {
+    try
+    {
+      ((AndroidJavaObject) new AndroidJavaClass("jp.colopl.libs.Cookie")).CallStatic(nameof (setCookieToken), new object[1]
+      {
+        (object) token
+      });
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError((object) ex);
+    }
+  }
 
-	public static int getAnalytics()
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Expected O, but got Unknown
-		int result = 1;
-		try
-		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper");
-			result = val.CallStatic<int>("getAnalytics", new object[0]);
-			return result;
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError((object)ex);
-			return result;
-		}
-	}
+  public static string getDefaultUserAgent()
+  {
+    string defaultUserAgent = "Android";
+    try
+    {
+      defaultUserAgent = ((AndroidJavaObject) new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper")).CallStatic<string>(nameof (getDefaultUserAgent), Array.Empty<object>());
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError((object) ex);
+    }
+    return defaultUserAgent;
+  }
 
-	public static void setSidToken(string token)
-	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
-		try
-		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper");
-			val.CallStatic("setSidToken", new object[1]
-			{
-				token
-			});
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError((object)ex);
-		}
-	}
+  public class GoogleAccountInfo
+  {
+    public List<NetworkNative.GoogleAccount> googleAccounts = new List<NetworkNative.GoogleAccount>();
+  }
 
-	public static void setHost(string host)
-	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Expected O, but got Unknown
-		try
-		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper");
-			val.CallStatic("setHost", new object[1]
-			{
-				host
-			});
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError((object)ex);
-		}
-	}
+  public class GoogleAccount
+  {
+    public string key;
+    public string name;
 
-	public static void setCookieToken(string token)
-	{
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000a: Expected O, but got Unknown
-		try
-		{
-			AndroidJavaClass val = new AndroidJavaClass("jp.colopl.libs.Cookie");
-			val.CallStatic("setCookieToken", new object[1]
-			{
-				token
-			});
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError((object)ex);
-		}
-	}
+    public GoogleAccount()
+    {
+    }
 
-	public static string getDefaultUserAgent()
-	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Expected O, but got Unknown
-		string result = string.Empty;
-		try
-		{
-			AndroidJavaClass val = new AndroidJavaClass(Property.BundleIdentifier + ".NetworkHelper");
-			result = val.CallStatic<string>("getDefaultUserAgent", new object[0]);
-			return result;
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError((object)ex);
-			return result;
-		}
-	}
+    public GoogleAccount(string _k, string _n)
+    {
+      this.key = _k;
+      this.name = _n;
+    }
+  }
 }

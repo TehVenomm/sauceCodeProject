@@ -1,638 +1,614 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestArenaSelectList
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class QuestArenaSelectList : QuestEventSelectList
 {
-	protected new enum UI
-	{
-		TEX_EVENT_BG,
-		BTN_INFO,
-		TGL_BUTTON_ROOT,
-		SPR_DELIVERY_BTN_SELECTED,
-		OBJ_DELIVERY_ROOT,
-		TEX_NPCMODEL,
-		LBL_NPC_MESSAGE,
-		GRD_DELIVERY_QUEST,
-		TBL_DELIVERY_QUEST,
-		STR_DELIVERY_NON_LIST,
-		OBJ_REQUEST_COMPLETED,
-		LBL_LOCATION_NAME,
-		LBL_LOCATION_NAME_EFFECT,
-		WGT_LOCATION_NAME_LIMIT,
-		SCR_DELIVERY_QUEST,
-		OBJ_IMAGE,
-		BTN_EVENT,
-		OBJ_FRAME,
-		SPR_BG_FRAME,
-		LBL_STORY_TITLE,
-		SPR_FRAME,
-		LBL_SUB_TITLE
-	}
+  private int m_lastBGMId;
+  private const string ARENA_FRAME_SPRITE = "RequestPlate_Arena";
+  private List<Delivery> visibleDeliveryList = new List<Delivery>();
+  private List<DeliveryTable.DeliveryData> notClearDevliveries = new List<DeliveryTable.DeliveryData>();
+  private List<uint> timeAttackDeliveryIds = new List<uint>();
+  private List<ArenaTable.ArenaData> arenaDataList = new List<ArenaTable.ArenaData>();
+  private ArenaUserRecordModel.Param record;
 
-	private const string ARENA_FRAME_SPRITE = "RequestPlate_Arena";
+  public override IEnumerable<string> requireDataTable
+  {
+    get
+    {
+      yield return "DeliveryRewardTable";
+      yield return "FieldMapTable";
+      yield return "ArenaTable";
+    }
+  }
 
-	private int m_lastBGMId;
+  protected override bool showMap => false;
 
-	private List<Delivery> visibleDeliveryList = new List<Delivery>();
+  public override void Initialize() => base.Initialize();
 
-	private List<ArenaTable.ArenaData> arenaDataList = new List<ArenaTable.ArenaData>();
+  protected override IEnumerator DoInitialize()
+  {
+    if (GameSection.GetEventData() == null)
+    {
+      bool is_recv_delivery = false;
+      MonoBehaviourSingleton<QuestManager>.I.SendGetEventList((Action<bool>) (b => is_recv_delivery = true));
+      while (!is_recv_delivery)
+        yield return (object) null;
+      Network.EventData arenaDataFromList = MonoBehaviourSingleton<QuestManager>.I.FindArenaDataFromList();
+      this.eventData = arenaDataFromList;
+      GameSection.SetEventData((object) arenaDataFromList);
+      MonoBehaviourSingleton<DeliveryManager>.I.DeleteCleardDeliveryId();
+    }
+    if (this.eventData == null)
+    {
+      this.StartCoroutine(this.LoadDisableBanner());
+    }
+    else
+    {
+      if (MonoBehaviourSingleton<SoundManager>.IsValid())
+      {
+        this.m_lastBGMId = MonoBehaviourSingleton<SoundManager>.I.requestBGMID;
+        SoundManager.RequestBGM(3);
+      }
+      if (MonoBehaviourSingleton<UserInfoManager>.I.isJoinedArenaRanking)
+        yield return (object) this.StartCoroutine(this.SendGetMyRcord());
+      this.StartCoroutine(base.DoInitialize());
+    }
+  }
 
-	private List<DeliveryTable.DeliveryData> VisibleClearedDeliveries;
+  private IEnumerator LoadDisableBanner()
+  {
+    string eventBg = ResourceName.GetEventBG(10012200);
+    Hash128 hash128 = new Hash128();
+    if (Object.op_Inequality((Object) MonoBehaviourSingleton<ResourceManager>.I.event_manifest, (Object) null))
+      hash128 = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(eventBg));
+    if (Object.op_Equality((Object) MonoBehaviourSingleton<ResourceManager>.I.event_manifest, (Object) null) || ((Hash128) ref hash128).isValid)
+    {
+      LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+      LoadObject lo_bg = loadingQueue.Load(true, RESOURCE_CATEGORY.EVENT_BG, eventBg);
+      if (loadingQueue.IsLoading())
+        yield return (object) loadingQueue.Wait();
+      this.SetTexture((Enum) QuestArenaSelectList.UI.TEX_EVENT_BG, (Texture) (lo_bg.loadedObject as Texture2D));
+      lo_bg = (LoadObject) null;
+    }
+    this.EndInitialize();
+  }
 
-	private ArenaUserRecordModel.Param record;
+  public override void UpdateUI()
+  {
+    if (this.eventData == null)
+    {
+      this.SetActive((Enum) QuestArenaSelectList.UI.BTN_INFO, false);
+      this.SetActive((Enum) QuestArenaSelectList.UI.LBL_SUB_TITLE, false);
+      this.UpdateTitle();
+      this.UpdateNoArenaTable();
+    }
+    else
+    {
+      this.CreateArenaList();
+      this.CreateVisibleDeliveryList();
+      base.UpdateUI();
+      this.UpdateSubTitle();
+      this.UpdateTitle();
+    }
+  }
 
-	public override IEnumerable<string> requireDataTable
-	{
-		get
-		{
-			yield return "DeliveryRewardTable";
-			yield return "FieldMapTable";
-			yield return "ArenaTable";
-		}
-	}
+  public override void StartSection()
+  {
+    base.StartSection();
+    if (this.eventData == null)
+      return;
+    if (!this.IsPlayableVersion())
+    {
+      this.RequestEvent("SELECT_VERSION", (object) string.Format(this.sectionData.GetText("REQUIRE_HIGHER_VERSION"), (object) this.eventData.minVersion));
+    }
+    else
+    {
+      if (this.eventData.readPrologueStory || this.eventData.prologueStoryId <= 0)
+        return;
+      this.StartAutoPrologue();
+    }
+  }
 
-	protected override bool showMap => false;
+  private bool IsPlayableVersion()
+  {
+    return this.eventData == null || this.eventData.IsPlayableWith(NetworkNative.getNativeVersionFromName());
+  }
 
-	public override void Initialize()
-	{
-		base.Initialize();
-	}
+  private void StartAutoPrologue()
+  {
+    MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(new EventData[1]
+    {
+      new EventData("AUTO_PROLOGUE", (object) new object[4]
+      {
+        (object) this.eventData.prologueStoryId,
+        (object) "",
+        (object) "",
+        (object) new EventData[2]
+        {
+          new EventData(GameSection.GetGoingHomeEvent(), (object) null),
+          new EventData("ARENA_LIST", (object) this.eventData)
+        }
+      })
+    });
+  }
 
-	protected override IEnumerator DoInitialize()
-	{
-		if (GameSection.GetEventData() == null)
-		{
-			bool is_recv_delivery = false;
-			MonoBehaviourSingleton<QuestManager>.I.SendGetEventList(delegate
-			{
-				((_003CDoInitialize_003Ec__IteratorF7)/*Error near IL_003b: stateMachine*/)._003Cis_recv_delivery_003E__0 = true;
-			});
-			while (!is_recv_delivery)
-			{
-				yield return (object)null;
-			}
-			GameSection.SetEventData(eventData = MonoBehaviourSingleton<QuestManager>.I.FindArenaDataFromList());
-			MonoBehaviourSingleton<DeliveryManager>.I.DeleteCleardDeliveryId();
-		}
-		if (eventData == null)
-		{
-			this.StartCoroutine(LoadDisableBanner());
-		}
-		else
-		{
-			if (MonoBehaviourSingleton<SoundManager>.IsValid())
-			{
-				m_lastBGMId = MonoBehaviourSingleton<SoundManager>.I.requestBGMID;
-				SoundManager.RequestBGM(3, true);
-			}
-			if (MonoBehaviourSingleton<UserInfoManager>.I.isJoinedArenaRanking)
-			{
-				yield return (object)this.StartCoroutine(SendGetMyRcord());
-			}
-			this.StartCoroutine(base.DoInitialize());
-		}
-	}
+  private void OnQuery_AUTO_PROLOGUE()
+  {
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<QuestManager>.I.SendQuestReadEventStory(this.eventData.eventId, (Action<bool, Error>) ((success, error) =>
+    {
+      this.eventData.readPrologueStory = true;
+      GameSection.ResumeEvent(success);
+    }));
+  }
 
-	private IEnumerator LoadDisableBanner()
-	{
-		string resourceName = ResourceName.GetEventBG(10012200);
-		Hash128 hash = default(Hash128);
-		if (MonoBehaviourSingleton<ResourceManager>.I.manifest != null)
-		{
-			hash = MonoBehaviourSingleton<ResourceManager>.I.manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(resourceName));
-		}
-		if (MonoBehaviourSingleton<ResourceManager>.I.manifest == null || hash.get_isValid())
-		{
-			LoadingQueue load_queue = new LoadingQueue(this);
-			LoadObject lo_bg = load_queue.Load(RESOURCE_CATEGORY.EVENT_BG, resourceName, false);
-			if (load_queue.IsLoading())
-			{
-				yield return (object)load_queue.Wait();
-			}
-			SetTexture(texture: lo_bg.loadedObject as Texture2D, texture_enum: UI.TEX_EVENT_BG);
-		}
-		EndInitialize();
-	}
+  private IEnumerator SendGetMyRcord()
+  {
+    bool isFinishGetRecord = false;
+    MonoBehaviourSingleton<QuestManager>.I.SendGetArenaUserRecord(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, this.eventData.eventId, (Action<bool, ArenaUserRecordModel.Param>) ((b, result) =>
+    {
+      isFinishGetRecord = true;
+      this.record = result;
+    }));
+    while (!isFinishGetRecord)
+      yield return (object) null;
+  }
 
-	public override void UpdateUI()
-	{
-		if (eventData == null)
-		{
-			SetActive((Enum)UI.BTN_INFO, false);
-			SetActive((Enum)UI.LBL_SUB_TITLE, false);
-			UpdateTitle();
-			UpdateNoArenaTable();
-		}
-		else
-		{
-			CreateArenaList();
-			CreateVisibleDeliveryList();
-			base.UpdateUI();
-			UpdateSubTitle();
-			UpdateTitle();
-		}
-	}
+  private void UpdateSubTitle()
+  {
+    this.SetActive((Enum) QuestArenaSelectList.UI.LBL_SUB_TITLE, false);
+    this.SetLabelText((Enum) QuestArenaSelectList.UI.LBL_SUB_TITLE, this.eventData.name);
+  }
 
-	public override void StartSection()
-	{
-		base.StartSection();
-		if (eventData != null)
-		{
-			if (!IsPlayableVersion())
-			{
-				string event_data = string.Format(base.sectionData.GetText("REQUIRE_HIGHER_VERSION"), eventData.minVersion);
-				RequestEvent("SELECT_VERSION", event_data);
-			}
-			else if (!eventData.readPrologueStory && eventData.prologueStoryId > 0)
-			{
-				StartAutoPrologue();
-			}
-		}
-	}
+  private void UpdateTitle()
+  {
+    string text = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 27U);
+    this.SetLabelText((Enum) QuestArenaSelectList.UI.LBL_LOCATION_NAME, text);
+    this.SetLabelText((Enum) QuestArenaSelectList.UI.LBL_LOCATION_NAME_EFFECT, text);
+  }
 
-	private bool IsPlayableVersion()
-	{
-		if (eventData == null)
-		{
-			return true;
-		}
-		Version nativeVersionFromName = NetworkNative.getNativeVersionFromName();
-		return eventData.IsPlayableWith(nativeVersionFromName);
-	}
+  protected override void UpdateTable()
+  {
+    int num1 = 0;
+    if (this.stories.Count > 0)
+      ++num1;
+    this._SorteliveryList();
+    int item_num = this.notClearDevliveries.Count + this.clearedDeliveries.Count + 1;
+    if (this.showStory)
+      item_num += num1 + this.stories.Count;
+    if (this.notClearDevliveries == null || item_num == 0)
+    {
+      this.SetActive((Enum) QuestArenaSelectList.UI.STR_DELIVERY_NON_LIST, true);
+      this.SetActive((Enum) QuestArenaSelectList.UI.GRD_DELIVERY_QUEST, false);
+      this.SetActive((Enum) QuestArenaSelectList.UI.TBL_DELIVERY_QUEST, false);
+    }
+    else
+    {
+      this.SetActive((Enum) QuestArenaSelectList.UI.STR_DELIVERY_NON_LIST, false);
+      this.SetActive((Enum) QuestArenaSelectList.UI.GRD_DELIVERY_QUEST, false);
+      this.SetActive((Enum) QuestArenaSelectList.UI.TBL_DELIVERY_QUEST, true);
+      int questStartIndex = 0;
+      questStartIndex++;
+      int completedStartIndex = this.notClearDevliveries.Count + questStartIndex;
+      int borderIndex = completedStartIndex + this.clearedDeliveries.Count;
+      int storyStartIndex = borderIndex;
+      if (this.stories.Count > 0)
+        ++storyStartIndex;
+      Transform ctrl = this.GetCtrl((Enum) QuestArenaSelectList.UI.TBL_DELIVERY_QUEST);
+      if (Object.op_Implicit((Object) ctrl))
+      {
+        int num2 = 0;
+        for (int childCount = ctrl.childCount; num2 < childCount; ++num2)
+        {
+          Transform child = ctrl.GetChild(0);
+          child.parent = (Transform) null;
+          Object.Destroy((Object) ((Component) child).gameObject);
+        }
+      }
+      bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
+      this.SetTable((Enum) QuestArenaSelectList.UI.TBL_DELIVERY_QUEST, "", item_num, false, (Func<int, Transform, Transform>) ((i, parent) =>
+      {
+        Transform transform = (Transform) null;
+        if (i >= storyStartIndex)
+          return !this.HasChapterStory() || i == storyStartIndex || !isRenewalFlag ? this.Realizes("QuestEventStoryItem", parent) : (Transform) null;
+        if (i >= borderIndex)
+          transform = this.Realizes("QuestEventBorderItem", parent);
+        else if (i >= questStartIndex)
+          transform = this.Realizes("QuestRequestItemArena", parent);
+        else if (i == 0)
+          transform = this.Realizes("QuestArenaRequestItemToRanking", parent);
+        return transform;
+      }), (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+      {
+        if (Object.op_Equality((Object) t, (Object) null))
+          return;
+        this.SetActive(t, true);
+        if (i >= storyStartIndex)
+          this.InitStory(i - storyStartIndex, t);
+        else if (i < borderIndex)
+        {
+          if (i >= completedStartIndex)
+            this.InitCompletedDelivery(i - completedStartIndex, t);
+          else if (i >= questStartIndex)
+            this.InitNormalDelivery(i - questStartIndex, t);
+          else if (i == 0)
+            this.InitGoToRankingButton(t);
+        }
+        if (i >= storyStartIndex || i == 0)
+          return;
+        this.SetSprite(t, (Enum) QuestArenaSelectList.UI.SPR_FRAME, "RequestPlate_Arena");
+      }));
+      ((Behaviour) this.GetComponent<UIScrollView>((Enum) QuestArenaSelectList.UI.SCR_DELIVERY_QUEST)).enabled = true;
+      this.RepositionTable();
+    }
+  }
 
-	private void StartAutoPrologue()
-	{
-		string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
-		EventData[] array = new EventData[2]
-		{
-			new EventData(name, null),
-			new EventData("ARENA_LIST", eventData)
-		};
-		EventData[] autoEvents = new EventData[1]
-		{
-			new EventData("AUTO_PROLOGUE", new object[4]
-			{
-				eventData.prologueStoryId,
-				string.Empty,
-				string.Empty,
-				array
-			})
-		};
-		MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
-	}
+  protected void UpdateNoArenaTable()
+  {
+    this.SetTable((Enum) QuestArenaSelectList.UI.TBL_DELIVERY_QUEST, "", 1, false, (Func<int, Transform, Transform>) ((i, parent) =>
+    {
+      Transform transform = (Transform) null;
+      if (i == 0)
+        transform = this.Realizes("QuestArenaRequestItemToRanking", parent);
+      return transform;
+    }), (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+    {
+      this.SetActive(t, true);
+      if (i != 0)
+        return;
+      this.InitGoToRankingButton(t);
+    }));
+    ((Behaviour) this.GetComponent<UIScrollView>((Enum) QuestArenaSelectList.UI.SCR_DELIVERY_QUEST)).enabled = false;
+    this.RepositionTable();
+  }
 
-	private void OnQuery_AUTO_PROLOGUE()
-	{
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<QuestManager>.I.SendQuestReadEventStory(eventData.eventId, delegate(bool success, Error error)
-		{
-			eventData.readPrologueStory = true;
-			GameSection.ResumeEvent(success, null);
-		});
-	}
+  private void CreateArenaList()
+  {
+    this.arenaDataList.Clear();
+    for (int index = 0; index < this.deliveryInfo.Length; ++index)
+    {
+      DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint) this.deliveryInfo[index].dId);
+      ArenaTable.ArenaData arenaData = deliveryTableData.GetArenaData();
+      if (arenaData == null)
+        Debug.LogError((object) $"{((Object) this).name} {deliveryTableData.name} : arenaDataが見つかりません");
+      else
+        this.arenaDataList.Add(arenaData);
+    }
+  }
 
-	private IEnumerator SendGetMyRcord()
-	{
-		bool isFinishGetRecord = false;
-		MonoBehaviourSingleton<QuestManager>.I.SendGetArenaUserRecord(MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, eventData.eventId, delegate(bool b, ArenaUserRecordModel.Param result)
-		{
-			((_003CSendGetMyRcord_003Ec__IteratorF9)/*Error near IL_004c: stateMachine*/)._003CisFinishGetRecord_003E__0 = true;
-			((_003CSendGetMyRcord_003Ec__IteratorF9)/*Error near IL_004c: stateMachine*/)._003C_003Ef__this.record = result;
-		});
-		while (!isFinishGetRecord)
-		{
-			yield return (object)null;
-		}
-	}
+  private void CreateVisibleDeliveryList()
+  {
+    this.visibleDeliveryList.Clear();
+    int index = 0;
+    for (int length = this.deliveryInfo.Length; index < length; ++index)
+      this.visibleDeliveryList.Add(this.deliveryInfo[index]);
+  }
 
-	private void UpdateSubTitle()
-	{
-		SetLabelText((Enum)UI.LBL_SUB_TITLE, eventData.name);
-	}
+  protected override List<DeliveryTable.DeliveryData> CreateClearedDliveryList()
+  {
+    return this.CreateClearedDliveryList(ARENA_RANK.S);
+  }
 
-	private void UpdateTitle()
-	{
-		string text = StringTable.Get(STRING_CATEGORY.TEXT_SCRIPT, 27u);
-		SetLabelText((Enum)UI.LBL_LOCATION_NAME, text);
-		SetLabelText((Enum)UI.LBL_LOCATION_NAME_EFFECT, text);
-	}
+  private List<DeliveryTable.DeliveryData> CreateClearedDliveryList(ARENA_RANK borderRank)
+  {
+    List<DeliveryTable.DeliveryData> clearedDliveryList = new List<DeliveryTable.DeliveryData>();
+    List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
+    int index = 0;
+    for (int count = clearStatusDelivery.Count; index < count; ++index)
+    {
+      ClearStatusDelivery d = clearStatusDelivery[index];
+      if (d.deliveryStatus == 3)
+      {
+        DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint) d.deliveryId);
+        if (deliveryTableData.eventID == this.eventData.eventId && !Array.Exists<Delivery>(this.deliveryInfo, (Predicate<Delivery>) (x => x.dId == d.deliveryId)))
+        {
+          ArenaTable.ArenaData arenaData = deliveryTableData.GetArenaData();
+          if (arenaData != null && arenaData.rank >= borderRank && deliveryTableData.GetConditionType() != DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
+          {
+            clearedDliveryList.Add(deliveryTableData);
+            if (deliveryTableData.clearEventID > 0U)
+            {
+              string title = deliveryTableData.clearEventTitle;
+              if (string.IsNullOrEmpty(title))
+                title = deliveryTableData.name;
+              this.stories.Add(new QuestEventSelectList.Story((int) deliveryTableData.clearEventID, title));
+            }
+          }
+        }
+      }
+    }
+    return clearedDliveryList;
+  }
 
-	protected override void UpdateTable()
-	{
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Expected O, but got Unknown
-		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-		int num = 0;
-		int count = stories.Count;
-		if (count > 0)
-		{
-			num++;
-		}
-		int num2 = visibleDeliveryList.Count + clearedDeliveries.Count;
-		num2++;
-		if (showStory)
-		{
-			num2 += num + stories.Count;
-		}
-		if (visibleDeliveryList == null || num2 == 0)
-		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, true);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
-			SetActive((Enum)UI.TBL_DELIVERY_QUEST, false);
-		}
-		else
-		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, false);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
-			SetActive((Enum)UI.TBL_DELIVERY_QUEST, true);
-			int questStartIndex = 0;
-			questStartIndex++;
-			int completedStartIndex = visibleDeliveryList.Count + questStartIndex;
-			int borderIndex = completedStartIndex + clearedDeliveries.Count;
-			int storyStartIndex = borderIndex;
-			if (stories.Count > 0)
-			{
-				storyStartIndex++;
-			}
-			Transform ctrl = GetCtrl(UI.TBL_DELIVERY_QUEST);
-			if (Object.op_Implicit(ctrl))
-			{
-				int j = 0;
-				for (int childCount = ctrl.get_childCount(); j < childCount; j++)
-				{
-					Transform val = ctrl.GetChild(0);
-					val.set_parent(null);
-					Object.Destroy(val.get_gameObject());
-				}
-			}
-			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, false, delegate(int i, Transform parent)
-			{
-				Transform result = null;
-				if (i >= storyStartIndex)
-				{
-					result = Realizes("QuestEventStoryItem", parent, true);
-				}
-				else if (i >= borderIndex)
-				{
-					result = Realizes("QuestEventBorderItem", parent, true);
-				}
-				else if (i >= questStartIndex)
-				{
-					result = Realizes("QuestRequestItemArena", parent, true);
-				}
-				else if (i == 0)
-				{
-					result = Realizes("QuestArenaRequestItemToRanking", parent, true);
-				}
-				return result;
-			}, delegate(int i, Transform t, bool is_recycle)
-			{
-				SetActive(t, true);
-				if (i >= storyStartIndex)
-				{
-					int index = i - storyStartIndex;
-					InitStory(index, t);
-				}
-				else if (i < borderIndex)
-				{
-					if (i >= completedStartIndex)
-					{
-						int completedIndex = i - completedStartIndex;
-						InitCompletedDelivery(completedIndex, t);
-					}
-					else if (i >= questStartIndex)
-					{
-						InitNormalDelivery(i - questStartIndex, t);
-					}
-					else if (i == 0)
-					{
-						InitGoToRankingButton(t);
-					}
-				}
-				if (i < storyStartIndex && i != 0)
-				{
-					SetSprite(t, UI.SPR_FRAME, "RequestPlate_Arena");
-				}
-			});
-			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-			component.set_enabled(true);
-			RepositionTable();
-		}
-	}
+  protected override void InitStory(int index, Transform t)
+  {
+    bool flag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
+    if (this.HasChapterStory() & flag)
+    {
+      base.InitStory(index, t);
+    }
+    else
+    {
+      this.SetEvent(t, "SELECT_RUSH_STORY", index);
+      this.SetLabelText(t, (Enum) QuestArenaSelectList.UI.LBL_STORY_TITLE, this.stories[index].title);
+    }
+  }
 
-	protected void UpdateNoArenaTable()
-	{
-		int item_num = 1;
-		SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, item_num, false, delegate(int i, Transform parent)
-		{
-			Transform result = null;
-			if (i == 0)
-			{
-				result = Realizes("QuestArenaRequestItemToRanking", parent, true);
-			}
-			return result;
-		}, delegate(int i, Transform t, bool is_recycle)
-		{
-			SetActive(t, true);
-			if (i == 0)
-			{
-				InitGoToRankingButton(t);
-			}
-		});
-		UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-		component.set_enabled(false);
-		RepositionTable();
-	}
+  protected override void InitNormalDelivery(int index, Transform t)
+  {
+    DeliveryTable.DeliveryData notClearDevlivery = this.notClearDevliveries[index];
+    if (this.timeAttackDeliveryIds.Contains(notClearDevlivery.id))
+    {
+      this.SetEvent(t, "SELECT_TIMEATTACK_RUSH", index);
+      this.SetUpCompletedArenaListItem(t, notClearDevlivery);
+      this.SetCompletedHaveCount(t, notClearDevlivery);
+    }
+    else
+    {
+      this.SetEvent(t, "SELECT_RUSH", index);
+      if (notClearDevlivery.GetConditionType() == DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
+        this.SetUpArenaListItemRankUp(t, notClearDevlivery);
+      else
+        this.SetUpArenaListItem(t, notClearDevlivery);
+    }
+  }
 
-	private void CreateArenaList()
-	{
-		arenaDataList.Clear();
-		for (int i = 0; i < deliveryInfo.Length; i++)
-		{
-			DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryInfo[i].dId);
-			ArenaTable.ArenaData arenaData = deliveryTableData.GetArenaData();
-			if (arenaData == null)
-			{
-				Debug.LogError((object)(this.get_name() + " " + deliveryTableData.name + " : arenaDataが見つかりません"));
-			}
-			else
-			{
-				arenaDataList.Add(arenaData);
-			}
-		}
-	}
+  private void SetUpArenaListItem(Transform t, DeliveryTable.DeliveryData info)
+  {
+    QuestRequestItemArena requestItemArena = ((Component) t).GetComponent<QuestRequestItemArena>();
+    if (Object.op_Equality((Object) requestItemArena, (Object) null))
+      requestItemArena = ((Component) t).gameObject.AddComponent<QuestRequestItemArena>();
+    requestItemArena.InitUI();
+    requestItemArena.Setup(t, info);
+  }
 
-	private void CreateVisibleDeliveryList()
-	{
-		visibleDeliveryList.Clear();
-		int i = 0;
-		for (int num = deliveryInfo.Length; i < num; i++)
-		{
-			Delivery item = deliveryInfo[i];
-			visibleDeliveryList.Add(item);
-		}
-	}
+  private void SetUpArenaListItemRankUp(Transform t, DeliveryTable.DeliveryData info)
+  {
+    QuestRequestItemArenaRankUp requestItemArenaRankUp = ((Component) t).GetComponent<QuestRequestItemArenaRankUp>();
+    if (Object.op_Equality((Object) requestItemArenaRankUp, (Object) null))
+      requestItemArenaRankUp = ((Component) t).gameObject.AddComponent<QuestRequestItemArenaRankUp>();
+    requestItemArenaRankUp.InitUI();
+    requestItemArenaRankUp.Setup(t, info);
+  }
 
-	protected override List<DeliveryTable.DeliveryData> CreateClearedDliveryList()
-	{
-		return CreateClearedDliveryList(ARENA_RANK.S);
-	}
+  private void SetUpCompletedArenaListItem(Transform t, DeliveryTable.DeliveryData info)
+  {
+    QuestRequestItemArena requestItemArena = ((Component) t).GetComponent<QuestRequestItemArena>();
+    if (Object.op_Equality((Object) requestItemArena, (Object) null))
+      requestItemArena = ((Component) t).gameObject.AddComponent<QuestRequestItemArena>();
+    requestItemArena.InitUI();
+    requestItemArena.SetupComplete(t, info, this.record);
+  }
 
-	private List<DeliveryTable.DeliveryData> CreateClearedDliveryList(ARENA_RANK borderRank)
-	{
-		List<DeliveryTable.DeliveryData> list = new List<DeliveryTable.DeliveryData>();
-		List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
-		int i = 0;
-		for (int count = clearStatusDelivery.Count; i < count; i++)
-		{
-			ClearStatusDelivery d = clearStatusDelivery[i];
-			if (d.deliveryStatus == 3)
-			{
-				DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)d.deliveryId);
-				if (deliveryTableData.eventID == eventData.eventId && !Array.Exists(deliveryInfo, (Delivery x) => x.dId == d.deliveryId))
-				{
-					ArenaTable.ArenaData arenaData = deliveryTableData.GetArenaData();
-					if (arenaData != null && arenaData.rank >= borderRank && deliveryTableData.GetConditionType(0u) != DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
-					{
-						list.Add(deliveryTableData);
-						if (deliveryTableData.clearEventID != 0)
-						{
-							string text = deliveryTableData.clearEventTitle;
-							if (string.IsNullOrEmpty(text))
-							{
-								text = deliveryTableData.name;
-							}
-							stories.Add(new Story((int)deliveryTableData.clearEventID, text));
-						}
-					}
-				}
-			}
-		}
-		return list;
-	}
+  protected override void InitCompletedDelivery(int completedIndex, Transform t)
+  {
+    DeliveryTable.DeliveryData clearedDelivery = this.clearedDeliveries[completedIndex];
+    this.SetEvent(t, "SELECT_COMPLETED_RUSH", completedIndex);
+    if (clearedDelivery.GetConditionType() == DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
+    {
+      this.SetUpArenaListItemRankUp(t, clearedDelivery);
+      this.SetActive(t, (Enum) QuestArenaSelectList.UI.OBJ_REQUEST_COMPLETED, true);
+    }
+    else
+      this.SetUpCompletedArenaListItem(t, clearedDelivery);
+    this.SetCompletedHaveCount(t, clearedDelivery);
+  }
 
-	protected override void InitStory(int index, Transform t)
-	{
-		SetEvent(t, "SELECT_RUSH_STORY", index);
-		SetLabelText(t, UI.LBL_STORY_TITLE, stories[index].title);
-	}
+  private void OnQuery_SELECT_RUSH()
+  {
+    DeliveryTable.DeliveryData dd = this.notClearDevliveries[(int) GameSection.GetEventData()];
+    Delivery notClearDelivery = this.GetNotClearDelivery(dd.id);
+    if (MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int) dd.id))
+    {
+      this.changeToDeliveryClearEvent = true;
+      bool is_tutorial = !TutorialStep.HasFirstDeliveryCompleted();
+      bool enable_clear_event = dd.clearEventID > 0U;
+      GameSection.StayEvent();
+      MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
+      MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(notClearDelivery.uId, enable_clear_event, (Action<bool, DeliveryRewardList>) ((is_success, recv_reward) =>
+      {
+        if (is_success)
+        {
+          if (is_tutorial)
+            TutorialStep.isSendFirstRewardComplete = true;
+          if (!enable_clear_event)
+          {
+            MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
+            GameSection.ChangeStayEvent("RUSH_REWARD", (object) new object[2]
+            {
+              (object) (int) dd.id,
+              (object) recv_reward
+            });
+          }
+          else
+            GameSection.ChangeStayEvent("CLEAR_EVENT", (object) new object[3]
+            {
+              (object) (int) dd.clearEventID,
+              (object) (int) dd.id,
+              (object) recv_reward
+            });
+        }
+        else
+          this.changeToDeliveryClearEvent = false;
+        GameSection.ResumeEvent(is_success);
+      }));
+    }
+    else if (dd.GetConditionType() == DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
+    {
+      GameSection.SetEventData((object) new object[2]
+      {
+        (object) (int) dd.id,
+        null
+      });
+    }
+    else
+    {
+      ArenaTable.ArenaData arenaData = dd.GetArenaData();
+      MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID((uint) arenaData.questIds[0]);
+      MonoBehaviourSingleton<QuestManager>.I.SetCurrentArenaId(arenaData.id);
+      GameSection.ChangeEvent("TO_ROOM", (object) dd);
+    }
+  }
 
-	protected override void InitNormalDelivery(int index, Transform t)
-	{
-		SetEvent(t, "SELECT_RUSH", index);
-		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)visibleDeliveryList[index].dId);
-		if (deliveryTableData.GetConditionType(0u) == DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
-		{
-			SetUpArenaListItemRankUp(t, deliveryTableData);
-		}
-		else
-		{
-			SetUpArenaListItem(t, deliveryTableData);
-		}
-	}
+  private void InitGoToRankingButton(Transform t)
+  {
+    this.SetEvent(t, "RANKING", (object) this.eventData);
+  }
 
-	private void SetUpArenaListItem(Transform t, DeliveryTable.DeliveryData info)
-	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		QuestRequestItemArena questRequestItemArena = t.GetComponent<QuestRequestItemArena>();
-		if (questRequestItemArena == null)
-		{
-			questRequestItemArena = t.get_gameObject().AddComponent<QuestRequestItemArena>();
-		}
-		questRequestItemArena.InitUI();
-		questRequestItemArena.Setup(t, info);
-	}
+  private void OnQuery_RANKING()
+  {
+    if (GameSection.GetEventData() is Network.EventData)
+      return;
+    MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(new EventData[2]
+    {
+      new EventData("RANK", (object) null),
+      new EventData("LAST", (object) new object[2]
+      {
+        (object) "null",
+        (object) -1
+      })
+    });
+  }
 
-	private void SetUpArenaListItemRankUp(Transform t, DeliveryTable.DeliveryData info)
-	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		QuestRequestItemArenaRankUp questRequestItemArenaRankUp = t.GetComponent<QuestRequestItemArenaRankUp>();
-		if (questRequestItemArenaRankUp == null)
-		{
-			questRequestItemArenaRankUp = t.get_gameObject().AddComponent<QuestRequestItemArenaRankUp>();
-		}
-		questRequestItemArenaRankUp.InitUI();
-		questRequestItemArenaRankUp.Setup(t, info);
-	}
+  private void OnQuery_SELECT_COMPLETED_RUSH()
+  {
+    DeliveryTable.DeliveryData clearedDelivery = this.clearedDeliveries[(int) GameSection.GetEventData()];
+    if (clearedDelivery.GetConditionType() == DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
+    {
+      GameSection.SetEventData((object) new object[3]
+      {
+        (object) (int) clearedDelivery.id,
+        (object) new DeliveryRewardList(),
+        (object) true
+      });
+    }
+    else
+    {
+      ArenaTable.ArenaData arenaData = clearedDelivery.GetArenaData();
+      MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID((uint) arenaData.questIds[0]);
+      MonoBehaviourSingleton<QuestManager>.I.SetCurrentArenaId(arenaData.id);
+      GameSection.ChangeEvent("TO_ROOM", (object) clearedDelivery);
+    }
+  }
 
-	private void SetUpCompletedArenaListItem(Transform t, DeliveryTable.DeliveryData info)
-	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		QuestRequestItemArena questRequestItemArena = t.GetComponent<QuestRequestItemArena>();
-		if (questRequestItemArena == null)
-		{
-			questRequestItemArena = t.get_gameObject().AddComponent<QuestRequestItemArena>();
-		}
-		questRequestItemArena.InitUI();
-		questRequestItemArena.SetupComplete(t, info, record);
-	}
+  private void OnQuery_SELECT_TIMEATTACK_RUSH()
+  {
+    DeliveryTable.DeliveryData notClearDevlivery = this.notClearDevliveries[(int) GameSection.GetEventData()];
+    ArenaTable.ArenaData arenaData = notClearDevlivery.GetArenaData();
+    MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID((uint) arenaData.questIds[0]);
+    MonoBehaviourSingleton<QuestManager>.I.SetCurrentArenaId(arenaData.id);
+    GameSection.ChangeEvent("TO_ROOM", (object) notClearDevlivery);
+  }
 
-	protected override void InitCompletedDelivery(int completedIndex, Transform t)
-	{
-		DeliveryTable.DeliveryData deliveryData = clearedDeliveries[completedIndex];
-		SetEvent(t, "SELECT_COMPLETED_RUSH", completedIndex);
-		if (deliveryData.GetConditionType(0u) == DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
-		{
-			SetUpArenaListItemRankUp(t, deliveryData);
-			SetActive(t, UI.OBJ_REQUEST_COMPLETED, true);
-		}
-		else
-		{
-			SetUpCompletedArenaListItem(t, deliveryData);
-		}
-		SetCompletedHaveCount(t, deliveryData);
-	}
+  private void OnQuery_SELECT_RUSH_STORY()
+  {
+    GameSection.SetEventData((object) new object[4]
+    {
+      (object) this.stories[(int) GameSection.GetEventData()].id,
+      (object) "",
+      (object) "",
+      (object) new EventData[2]
+      {
+        new EventData(GameSection.GetGoingHomeEvent(), (object) null),
+        new EventData("ARENA_LIST", (object) this.eventData)
+      }
+    });
+  }
 
-	private void OnQuery_SELECT_RUSH()
-	{
-		int index = (int)GameSection.GetEventData();
-		bool flag = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(visibleDeliveryList[index].dId);
-		int delivery_id = visibleDeliveryList[index].dId;
-		if (flag)
-		{
-			DeliveryTable.DeliveryData table = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)visibleDeliveryList[index].dId);
-			changeToDeliveryClearEvent = true;
-			bool is_tutorial = !TutorialStep.HasFirstDeliveryCompleted();
-			bool enable_clear_event = table.clearEventID != 0;
-			GameSection.StayEvent();
-			MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-			MonoBehaviourSingleton<DeliveryManager>.I.SendDeliveryComplete(visibleDeliveryList[index].uId, enable_clear_event, delegate(bool is_success, DeliveryRewardList recv_reward)
-			{
-				if (is_success)
-				{
-					if (is_tutorial)
-					{
-						TutorialStep.isSendFirstRewardComplete = true;
-					}
-					if (!enable_clear_event)
-					{
-						MonoBehaviourSingleton<DeliveryManager>.I.isStoryEventEnd = false;
-						GameSection.ChangeStayEvent("RUSH_REWARD", new object[2]
-						{
-							delivery_id,
-							recv_reward
-						});
-					}
-					else
-					{
-						GameSection.ChangeStayEvent("CLEAR_EVENT", new object[3]
-						{
-							(int)table.clearEventID,
-							delivery_id,
-							recv_reward
-						});
-					}
-				}
-				else
-				{
-					changeToDeliveryClearEvent = false;
-				}
-				GameSection.ResumeEvent(is_success, null);
-			});
-		}
-		else
-		{
-			DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)delivery_id);
-			if (deliveryTableData.GetConditionType(0u) == DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
-			{
-				GameSection.SetEventData(new object[2]
-				{
-					delivery_id,
-					null
-				});
-			}
-			else
-			{
-				ArenaTable.ArenaData arenaData = deliveryTableData.GetArenaData();
-				MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID((uint)arenaData.questIds[0], true);
-				MonoBehaviourSingleton<QuestManager>.I.SetCurrentArenaId(arenaData.id);
-				GameSection.ChangeEvent("TO_ROOM", deliveryTableData);
-			}
-		}
-	}
+  private void OnQuery_CLOSE()
+  {
+    if (this.m_lastBGMId <= 0)
+      return;
+    SoundManager.RequestBGM(this.m_lastBGMId);
+  }
 
-	private void InitGoToRankingButton(Transform t)
-	{
-		SetEvent(t, "RANKING", eventData);
-	}
+  private void OnQuery_SECTION_BACK()
+  {
+    if (this.m_lastBGMId <= 0)
+      return;
+    SoundManager.RequestBGM(this.m_lastBGMId);
+  }
 
-	private void OnQuery_RANKING()
-	{
-		Network.EventData eventData = GameSection.GetEventData() as Network.EventData;
-		if (eventData == null)
-		{
-			EventData[] autoEvents = new EventData[2]
-			{
-				new EventData("RANK", null),
-				new EventData("LAST", new object[2]
-				{
-					"null",
-					-1
-				})
-			};
-			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
-		}
-	}
+  private void _SorteliveryList()
+  {
+    this.notClearDevliveries.Clear();
+    this.timeAttackDeliveryIds.Clear();
+    for (int index = 0; index < this.visibleDeliveryList.Count; ++index)
+    {
+      DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint) this.visibleDeliveryList[index].dId);
+      if (deliveryTableData != null)
+        this.notClearDevliveries.Add(deliveryTableData);
+    }
+    for (int index = 0; index < this.clearedDeliveries.Count; ++index)
+    {
+      DeliveryTable.DeliveryData clearedDelivery = this.clearedDeliveries[index];
+      if (clearedDelivery != null)
+      {
+        ArenaTable.ArenaData arenaData = clearedDelivery.GetArenaData();
+        if (arenaData != null && arenaData.rank == ARENA_RANK.S)
+        {
+          this.notClearDevliveries.Add(clearedDelivery);
+          this.clearedDeliveries.Remove(clearedDelivery);
+          this.timeAttackDeliveryIds.Add(clearedDelivery.id);
+          --index;
+        }
+      }
+    }
+    this.notClearDevliveries.Sort((IComparer<DeliveryTable.DeliveryData>) new QuestArenaSelectList.ArenaSort());
+  }
 
-	private void OnQuery_SELECT_COMPLETED_RUSH()
-	{
-		int index = (int)GameSection.GetEventData();
-		DeliveryTable.DeliveryData deliveryData = clearedDeliveries[index];
-		if (deliveryData.GetConditionType(0u) == DELIVERY_CONDITION_TYPE.COMPLETE_DELIVERY_ID)
-		{
-			int id = (int)deliveryData.id;
-			DeliveryRewardList deliveryRewardList = new DeliveryRewardList();
-			GameSection.SetEventData(new object[3]
-			{
-				id,
-				deliveryRewardList,
-				true
-			});
-		}
-		else
-		{
-			ArenaTable.ArenaData arenaData = deliveryData.GetArenaData();
-			MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID((uint)arenaData.questIds[0], true);
-			MonoBehaviourSingleton<QuestManager>.I.SetCurrentArenaId(arenaData.id);
-			GameSection.ChangeEvent("TO_ROOM", deliveryData);
-		}
-	}
+  private Delivery GetNotClearDelivery(uint deliveryId)
+  {
+    return this.visibleDeliveryList.Find((Predicate<Delivery>) (d => (long) d.dId == (long) deliveryId));
+  }
 
-	private void OnQuery_SELECT_RUSH_STORY()
-	{
-		int index = (int)GameSection.GetEventData();
-		Story story = stories[index];
-		string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
-		EventData[] array = new EventData[2]
-		{
-			new EventData(name, null),
-			new EventData("ARENA_LIST", eventData)
-		};
-		GameSection.SetEventData(new object[4]
-		{
-			story.id,
-			string.Empty,
-			string.Empty,
-			array
-		});
-	}
+  private void OnQuery_HOW_TO() => GameSection.SetEventData((object) WebViewManager.Arena);
 
-	private void OnQuery_CLOSE()
-	{
-		if (m_lastBGMId > 0)
-		{
-			SoundManager.RequestBGM(m_lastBGMId, true);
-		}
-	}
+  protected new enum UI
+  {
+    TEX_EVENT_BG,
+    BTN_INFO,
+    TGL_BUTTON_ROOT,
+    SPR_DELIVERY_BTN_SELECTED,
+    OBJ_DELIVERY_ROOT,
+    TEX_NPCMODEL,
+    LBL_NPC_MESSAGE,
+    GRD_DELIVERY_QUEST,
+    TBL_DELIVERY_QUEST,
+    STR_DELIVERY_NON_LIST,
+    OBJ_REQUEST_COMPLETED,
+    LBL_LOCATION_NAME,
+    LBL_LOCATION_NAME_EFFECT,
+    WGT_LOCATION_NAME_LIMIT,
+    SCR_DELIVERY_QUEST,
+    OBJ_IMAGE,
+    BTN_EVENT,
+    OBJ_FRAME,
+    SPR_BG_FRAME,
+    LBL_STORY_TITLE,
+    SPR_FRAME,
+    LBL_SUB_TITLE,
+  }
 
-	private void OnQuery_SECTION_BACK()
-	{
-		if (m_lastBGMId > 0)
-		{
-			SoundManager.RequestBGM(m_lastBGMId, true);
-		}
-	}
+  public class ArenaSort : IComparer<DeliveryTable.DeliveryData>
+  {
+    public int Compare(DeliveryTable.DeliveryData x, DeliveryTable.DeliveryData y)
+    {
+      bool flag1 = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int) x.id);
+      bool flag2 = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery((int) y.id);
+      if (flag1 == flag2)
+        return y.displayOrder - x.displayOrder;
+      return flag1 ? -1 : 1;
+    }
+  }
 }

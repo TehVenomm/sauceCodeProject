@@ -1,411 +1,383 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: StoryMain
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
+#nullable disable
 public class StoryMain : GameSection, StoryDirector.IStoryEventReceiver
 {
-	private enum UI
-	{
-		BTN_NEXT,
-		SCR_MESSAGE,
-		TBL_MESSAGE,
-		SPR_NEXT,
-		TEX_FADER,
-		TEX_LOCATION,
-		TEX_IMAGE,
-		TEX_MODEL0,
-		TEX_MODEL1,
-		TEX_MODEL2,
-		TEX_MODEL3,
-		TEX_EFFECT,
-		SPR_BALLOON,
-		SPR_TAIL_L,
-		SPR_TAIL_R,
-		SPR_TAIL_C,
-		LBL_NAME,
-		LBL_MESSAGE,
-		BTN_SKIP
-	}
+  private int messageNum;
+  private IEnumerator coroutine;
+  private Transform lastMessageItem;
+  private bool lastMessageFocus;
+  private UISprite balloon;
+  private Transform tailLeft;
+  private Transform tailRight;
+  private Transform tailCenter;
+  private UILabel nameLabel;
+  private UILabel messageLabel;
+  private TypewriterEffect typewriter;
+  private int initBaseHeight;
+  private int initMessageHeight;
+  private int messageHeight;
+  private System.Action addMessageFunc;
+  private object[] eventData;
+  private int? eventID;
+  private string requestEndEvent;
+  private EventData[] requestEndEventArray;
+  private UIButton m_btnNext;
 
-	[CompilerGenerated]
-	private sealed class AddMessage_003Ec__AnonStorey36B
-	{
-		internal string name;
+  public override void Initialize()
+  {
+    if (GameSection.GetEventData() is object[] eventData)
+    {
+      this.eventID = new int?((int) eventData[0]);
+      this.eventData = new object[2]
+      {
+        eventData[1],
+        eventData[2]
+      };
+      if (eventData.Length > 3)
+      {
+        this.requestEndEvent = eventData[3] as string;
+        if (string.IsNullOrEmpty(this.requestEndEvent))
+          this.requestEndEventArray = eventData[3] as EventData[];
+      }
+    }
+    Transform ctrl = this.FindCtrl(((Component) this).transform, (Enum) StoryMain.UI.TEX_FADER_HEADER);
+    if (Object.op_Inequality((Object) ctrl, (Object) null))
+      ((Component) ctrl).gameObject.SetActive(false);
+    base.Initialize();
+    this.SyncSpecialDeviceAnctor();
+  }
 
-		internal string msg;
+  private void CollectTweens()
+  {
+  }
 
-		internal StoryDirector.POS tail_dir;
+  private void SyncSpecialDeviceAnctor()
+  {
+    if (!SpecialDeviceManager.HasSpecialDeviceInfo || !SpecialDeviceManager.SpecialDeviceInfo.NeedModifyStoryAnchor)
+      return;
+    DeviceIndividualInfo specialDeviceInfo = SpecialDeviceManager.SpecialDeviceInfo;
+    Transform ctrl1 = this.FindCtrl(((Component) this).transform, (Enum) StoryMain.UI.MesBase);
+    if (Object.op_Inequality((Object) ctrl1, (Object) null))
+    {
+      UIWidget component = ((Component) ctrl1).GetComponent<UIWidget>();
+      component.leftAnchor.absolute = specialDeviceInfo.StoryMessageBaseAnchor.left;
+      component.rightAnchor.absolute = specialDeviceInfo.StoryMessageBaseAnchor.right;
+      component.bottomAnchor.absolute = specialDeviceInfo.StoryMessageBaseAnchor.bottom;
+      component.topAnchor.absolute = specialDeviceInfo.StoryMessageBaseAnchor.top;
+      component.UpdateAnchors();
+    }
+    Transform ctrl2 = this.FindCtrl(((Component) this).transform, (Enum) StoryMain.UI.fukidashibaseflame);
+    if (!Object.op_Inequality((Object) ctrl2, (Object) null))
+      return;
+    UIWidget component1 = ((Component) ctrl2).GetComponent<UIWidget>();
+    component1.leftAnchor.absolute = specialDeviceInfo.StoryMainFukidashiBaseFlameAnchor.left;
+    component1.rightAnchor.absolute = specialDeviceInfo.StoryMainFukidashiBaseFlameAnchor.right;
+    component1.bottomAnchor.absolute = specialDeviceInfo.StoryMainFukidashiBaseFlameAnchor.bottom;
+    component1.topAnchor.absolute = specialDeviceInfo.StoryMainFukidashiBaseFlameAnchor.top;
+    component1.UpdateAnchors();
+  }
 
-		internal StoryDirector.MSG_TYPE msg_type;
+  private UIButton BtnNext
+  {
+    get
+    {
+      if (Object.op_Equality((Object) this.m_btnNext, (Object) null))
+      {
+        Transform ctrl = this.GetCtrl((Enum) StoryMain.UI.BTN_NEXT);
+        if (Object.op_Inequality((Object) ctrl, (Object) null))
+          this.m_btnNext = ((Component) ctrl).GetComponent<UIButton>();
+      }
+      return this.m_btnNext;
+    }
+  }
 
-		internal StoryMain _003C_003Ef__this;
+  protected override void OnOpen()
+  {
+    base.OnOpen();
+    this.SetColor((Enum) StoryMain.UI.TEX_FADER, new Color(0.0f, 0.0f, 0.0f, 1f));
+    this.SetActive((Enum) StoryMain.UI.SPR_NEXT, false);
+    this.SetActive((Enum) StoryMain.UI.BTN_SKIP, false);
+    MonoBehaviourSingleton<StoryDirector>.I.StartScript(this.eventID ?? 1, this.GetComponent<UITexture>((Enum) StoryMain.UI.TEX_LOCATION), this.GetComponent<UITexture>((Enum) StoryMain.UI.TEX_EFFECT), (StoryDirector.IStoryEventReceiver) this);
+  }
 
-		internal void _003C_003Em__322()
-		{
-			_003C_003Ef__this.AddMessage(name, msg, tail_dir, msg_type);
-		}
-	}
+  public override void UpdateUI()
+  {
+  }
 
-	private int messageNum;
+  public void AddMessage(
+    string name,
+    string msg,
+    StoryDirector.POS tail_dir,
+    StoryDirector.MSG_TYPE msg_type,
+    StoryDirector.LabelOption labelOption = null)
+  {
+    this.StartCoroutine(this.coroutine = this.DoAddMessage(name, msg, tail_dir, msg_type, labelOption));
+  }
 
-	private IEnumerator coroutine;
+  private IEnumerator DoAddMessage(
+    string name,
+    string msg,
+    StoryDirector.POS tail_dir,
+    StoryDirector.MSG_TYPE msg_type,
+    StoryDirector.LabelOption labelOption = null)
+  {
+    this.typewriter = (TypewriterEffect) null;
+    Transform ctrl = this.GetCtrl((Enum) StoryMain.UI.TBL_MESSAGE);
+    string prefab_name = "StoryMessageItem0";
+    if (msg_type == StoryDirector.MSG_TYPE.MONOLOGUE)
+      prefab_name = "StoryMessageItem1";
+    Transform root = this.Realizes(prefab_name, ctrl);
+    root.SetSiblingIndex(0);
+    UIWidget message_item_w = ((Component) root).GetComponent<UIWidget>();
+    this.lastMessageItem = root;
+    this.balloon = this.GetComponent<UISprite>(root, (Enum) StoryMain.UI.SPR_BALLOON);
+    this.tailLeft = this.FindCtrl(root, (Enum) StoryMain.UI.SPR_TAIL_L);
+    this.tailRight = this.FindCtrl(root, (Enum) StoryMain.UI.SPR_TAIL_R);
+    this.tailCenter = this.FindCtrl(root, (Enum) StoryMain.UI.SPR_TAIL_C);
+    this.nameLabel = this.GetComponent<UILabel>(root, (Enum) StoryMain.UI.LBL_NAME);
+    this.messageLabel = this.GetComponent<UILabel>(root, (Enum) StoryMain.UI.LBL_MESSAGE);
+    this.initBaseHeight = message_item_w.height;
+    this.messageLabel.text = " ";
+    this.initMessageHeight = this.messageLabel.height;
+    this.messageHeight = this.initMessageHeight;
+    if (labelOption != null)
+    {
+      this.messageLabel.supportEncoding = labelOption.BBCode;
+      this.messageLabel.alignment = labelOption.Alignment;
+      this.messageLabel.fontSize = labelOption.FontSize;
+    }
+    string final = "";
+    if (this.messageLabel.Wrap(msg, out final))
+      msg = WordWrap.Convert(this.messageLabel, msg);
+    this.SetLastMessageFocus(true);
+    this.SetMessageDragEnabled(false);
+    if (msg_type == StoryDirector.MSG_TYPE.NORMAL)
+    {
+      if (Object.op_Inequality((Object) this.tailLeft, (Object) null) && tail_dir != StoryDirector.POS.LEFT)
+        ((Component) this.tailLeft).gameObject.SetActive(false);
+      if (Object.op_Inequality((Object) this.tailRight, (Object) null) && tail_dir != StoryDirector.POS.RIGHT)
+        ((Component) this.tailRight).gameObject.SetActive(false);
+      if (Object.op_Inequality((Object) this.tailCenter, (Object) null) && tail_dir != StoryDirector.POS.CENTER)
+        ((Component) this.tailCenter).gameObject.SetActive(false);
+      this.nameLabel.text = name;
+    }
+    UIWidget next_arrow_w = this.GetComponent<UIWidget>((Enum) StoryMain.UI.SPR_NEXT);
+    ((Component) next_arrow_w).gameObject.SetActive(false);
+    List<UITweener> tweens = new List<UITweener>();
+    ((Component) root).GetComponentsInChildren<UITweener>(tweens);
+    while (Object.op_Inequality((Object) tweens.Find((Predicate<UITweener>) (o => ((Behaviour) o).enabled)), (Object) null))
+      yield return (object) null;
+    SoundManager.PlaySystemSE(SoundID.UISE.POPUP);
+    this.messageLabel.text = msg;
+    this.typewriter = ((Component) this.messageLabel).gameObject.AddComponent<TypewriterEffect>();
+    this.typewriter.charsPerSecond = StoryDirector.SPEED_TYPEWRITER;
+    this.typewriter.ResetToBeginning();
+    while (this.typewriter.isActive)
+      yield return (object) null;
+    yield return (object) null;
+    ((Component) next_arrow_w).gameObject.SetActive(true);
+    Vector3[] worldCorners1 = message_item_w.worldCorners;
+    Vector3[] worldCorners2 = next_arrow_w.worldCorners;
+    next_arrow_w.SetAnchor((Transform) null);
+    next_arrow_w.cachedTransform.position = new Vector3((float) (((double) worldCorners2[0].x + (double) worldCorners2[2].x) * 0.5), worldCorners1[0].y - (float) (((double) worldCorners2[1].y - (double) worldCorners2[0].y) * 0.5), worldCorners2[0].z);
+    this.SetMessageDragEnabled(true);
+    Object.Destroy((Object) this.typewriter);
+    this.typewriter = (TypewriterEffect) null;
+    this.messageHeight = 0;
+    ++this.messageNum;
+    this.coroutine = (IEnumerator) null;
+  }
 
-	private Transform lastMessageItem;
+  private void OnQuery_NEXT()
+  {
+    if (Object.op_Inequality((Object) this.typewriter, (Object) null))
+      this.typewriter.charsPerSecond = 1000;
+    if (this.coroutine != null)
+      return;
+    MonoBehaviourSingleton<StoryDirector>.I.OnNextMessage();
+  }
 
-	private bool lastMessageFocus;
+  private void OnQuery_SKIP()
+  {
+    GameSection.StopEvent();
+    int? eventId = this.eventID;
+    int num = 80000001;
+    if (eventId.GetValueOrDefault() == num & eventId.HasValue)
+    {
+      if (LoungeMatchingManager.IsValidInLounge())
+        MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Lounge");
+      else
+        MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Home");
+    }
+    else if (!string.IsNullOrEmpty(this.requestEndEvent))
+      MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(new EventData[1]
+      {
+        new EventData(this.requestEndEvent, (object) null)
+      });
+    else if (this.requestEndEventArray != null)
+    {
+      MonoBehaviourSingleton<StoryDirector>.I.HideBG();
+      MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(this.requestEndEventArray);
+    }
+    else if (MonoBehaviourSingleton<InGameManager>.I.questTransferInfo != null)
+    {
+      ((Component) MonoBehaviourSingleton<AppMain>.I.mainCamera).gameObject.SetActive(false);
+      MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", ((Component) this).gameObject, "INTERVAL");
+    }
+    else
+    {
+      MonoBehaviourSingleton<StoryDirector>.I.HideBG();
+      MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(new EventData[2]
+      {
+        new EventData(GameSection.GetGoingHomeEvent(), (object) null),
+        new EventData("DELIVERY_CLEAR_REWARD", (object) this.eventData)
+      });
+    }
+  }
 
-	private UISprite balloon;
+  private void LateUpdate()
+  {
+    if (Object.op_Inequality((Object) this.lastMessageItem, (Object) null))
+    {
+      if (this.messageHeight > 0)
+      {
+        if (this.messageHeight < this.messageLabel.height)
+        {
+          this.messageHeight = this.messageLabel.height;
+          ((Component) this.lastMessageItem).GetComponent<UIWidget>().height = this.initBaseHeight + this.messageHeight - this.initMessageHeight;
+        }
+        this.GetComponent<UITable>((Enum) StoryMain.UI.TBL_MESSAGE).Reposition();
+        this.GetComponent<UIScrollView>((Enum) StoryMain.UI.SCR_MESSAGE).ResetPosition();
+      }
+      else if (this.lastMessageFocus)
+      {
+        Vector3[] worldCorners = this.GetComponent<UIPanel>((Enum) StoryMain.UI.SCR_MESSAGE).worldCorners;
+        if ((double) UIUtility.GetWorldTopY((UIWidget) this.balloon) > (double) worldCorners[1].y)
+          this.SetLastMessageFocus(false);
+      }
+    }
+    if (this.addMessageFunc == null)
+      return;
+    this.addMessageFunc();
+    this.addMessageFunc = (System.Action) null;
+  }
 
-	private Transform tailLeft;
+  private void SetLastMessageFocus(bool is_focus)
+  {
+    this.lastMessageFocus = is_focus;
+    float num1 = is_focus ? 0.6f : 1f;
+    Transform ctrl = this.GetCtrl((Enum) StoryMain.UI.TBL_MESSAGE);
+    int num2 = 1;
+    for (int childCount = ctrl.childCount; num2 < childCount; ++num2)
+      this.GetComponent<UISprite>(ctrl.GetChild(num2), (Enum) StoryMain.UI.SPR_BALLOON).alpha = num1;
+  }
 
-	private Transform tailRight;
+  private void SetMessageDragEnabled(bool is_enable)
+  {
+    Transform ctrl = this.GetCtrl((Enum) StoryMain.UI.TBL_MESSAGE);
+    int num = 0;
+    for (int childCount = ctrl.childCount; num < childCount; ++num)
+      ((Behaviour) ((Component) ctrl.GetChild(num)).GetComponent<UIDragScrollView>()).enabled = is_enable;
+  }
 
-	private Transform tailCenter;
+  void StoryDirector.IStoryEventReceiver.FadeIn()
+  {
+    if (Object.op_Equality((Object) this, (Object) null))
+      return;
+    TweenColor.Begin(((Component) this.GetCtrl((Enum) StoryMain.UI.TEX_FADER)).gameObject, 1f, new Color(0.0f, 0.0f, 0.0f, 0.0f));
+  }
 
-	private UILabel nameLabel;
+  void StoryDirector.IStoryEventReceiver.FadeOut(Color fadeout_color)
+  {
+    if (Object.op_Equality((Object) this, (Object) null))
+      return;
+    TweenColor.Begin(((Component) this.GetCtrl((Enum) StoryMain.UI.TEX_FADER)).gameObject, 1f, fadeout_color);
+  }
 
-	private UILabel messageLabel;
+  void StoryDirector.IStoryEventReceiver.FadeIn(float fade_time)
+  {
+    if (Object.op_Equality((Object) this, (Object) null))
+      return;
+    TweenColor.Begin(((Component) this.GetCtrl((Enum) StoryMain.UI.TEX_FADER)).gameObject, fade_time, new Color(0.0f, 0.0f, 0.0f, 0.0f));
+  }
 
-	private TypewriterEffect typewriter;
+  void StoryDirector.IStoryEventReceiver.FadeOut(Color fadeout_color, float fade_time)
+  {
+    if (Object.op_Equality((Object) this, (Object) null))
+      return;
+    TweenColor.Begin(((Component) this.GetCtrl((Enum) StoryMain.UI.TEX_FADER)).gameObject, fade_time, fadeout_color);
+  }
 
-	private int initBaseHeight;
+  void StoryDirector.IStoryEventReceiver.AddMessage(
+    string name,
+    string msg,
+    StoryDirector.POS tail_dir,
+    StoryDirector.MSG_TYPE msg_type,
+    StoryDirector.LabelOption labelOption)
+  {
+    if (Object.op_Equality((Object) this, (Object) null))
+      return;
+    this.addMessageFunc = (System.Action) (() => this.AddMessage(name, msg, tail_dir, msg_type, labelOption));
+  }
 
-	private int initMessageHeight;
+  UITexture StoryDirector.IStoryEventReceiver.GetModelUITexture(int id)
+  {
+    return Object.op_Equality((Object) this, (Object) null) ? (UITexture) null : this.GetComponent<UITexture>((Enum) (StoryMain.UI) (7 + id));
+  }
 
-	private int messageHeight;
+  void StoryDirector.IStoryEventReceiver.EndLoadFirstBG()
+  {
+    if (Object.op_Equality((Object) this, (Object) null))
+      return;
+    this.SetActive((Enum) StoryMain.UI.BTN_SKIP, true);
+  }
 
-	private Action addMessageFunc;
+  void StoryDirector.IStoryEventReceiver.EndStory()
+  {
+    if (Object.op_Equality((Object) this, (Object) null))
+      return;
+    this.DispatchEvent("SKIP");
+  }
 
-	private object[] eventData;
+  protected override void OnCloseStart()
+  {
+    SoundManager.StopVoice(fadeout_frame: 6);
+    base.OnCloseStart();
+  }
 
-	private int? eventID;
-
-	private string requestEndEvent;
-
-	private EventData[] requestEndEventArray;
-
-	private UIButton m_btnNext;
-
-	private UIButton BtnNext
-	{
-		get
-		{
-			if (m_btnNext == null)
-			{
-				Transform ctrl = GetCtrl(UI.BTN_NEXT);
-				if (ctrl != null)
-				{
-					m_btnNext = ctrl.GetComponent<UIButton>();
-				}
-			}
-			return m_btnNext;
-		}
-	}
-
-	void StoryDirector.IStoryEventReceiver.FadeIn()
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Expected O, but got Unknown
-		if (!(this == null))
-		{
-			TweenColor.Begin(GetCtrl(UI.TEX_FADER).get_gameObject(), 1f, new Color(0f, 0f, 0f, 0f));
-		}
-	}
-
-	void StoryDirector.IStoryEventReceiver.FadeOut(Color fadeout_color)
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
-		if (!(this == null))
-		{
-			TweenColor.Begin(GetCtrl(UI.TEX_FADER).get_gameObject(), 1f, fadeout_color);
-		}
-	}
-
-	void StoryDirector.IStoryEventReceiver.AddMessage(string name, string msg, StoryDirector.POS tail_dir, StoryDirector.MSG_TYPE msg_type)
-	{
-		if (!(this == null))
-		{
-			addMessageFunc = delegate
-			{
-				AddMessage(name, msg, tail_dir, msg_type);
-			};
-		}
-	}
-
-	UITexture StoryDirector.IStoryEventReceiver.GetModelUITexture(int id)
-	{
-		if (this == null)
-		{
-			return null;
-		}
-		return base.GetComponent<UITexture>((Enum)(UI)(7 + id));
-	}
-
-	void StoryDirector.IStoryEventReceiver.EndLoadFirstBG()
-	{
-		if (!(this == null))
-		{
-			SetActive((Enum)UI.BTN_SKIP, true);
-		}
-	}
-
-	void StoryDirector.IStoryEventReceiver.EndStory()
-	{
-		if (!(this == null))
-		{
-			DispatchEvent("SKIP", null);
-		}
-	}
-
-	public override void Initialize()
-	{
-		object[] array = GameSection.GetEventData() as object[];
-		if (array != null)
-		{
-			eventID = (int)array[0];
-			eventData = new object[2]
-			{
-				array[1],
-				array[2]
-			};
-			if (array.Length > 3)
-			{
-				requestEndEvent = (array[3] as string);
-				if (string.IsNullOrEmpty(requestEndEvent))
-				{
-					requestEndEventArray = (array[3] as EventData[]);
-				}
-			}
-		}
-		base.Initialize();
-	}
-
-	private void CollectTweens()
-	{
-	}
-
-	protected override void OnOpen()
-	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		base.OnOpen();
-		SetColor((Enum)UI.TEX_FADER, new Color(0f, 0f, 0f, 1f));
-		SetActive((Enum)UI.SPR_NEXT, false);
-		SetActive((Enum)UI.BTN_SKIP, false);
-		int? nullable = eventID;
-		int script_id = (!nullable.HasValue) ? 1 : nullable.Value;
-		MonoBehaviourSingleton<StoryDirector>.I.StartScript(script_id, base.GetComponent<UITexture>((Enum)UI.TEX_LOCATION), base.GetComponent<UITexture>((Enum)UI.TEX_EFFECT), this);
-	}
-
-	public override void UpdateUI()
-	{
-	}
-
-	public void AddMessage(string name, string msg, StoryDirector.POS tail_dir, StoryDirector.MSG_TYPE msg_type)
-	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(coroutine = DoAddMessage(name, msg, tail_dir, msg_type));
-	}
-
-	private IEnumerator DoAddMessage(string name, string msg, StoryDirector.POS tail_dir, StoryDirector.MSG_TYPE msg_type)
-	{
-		typewriter = null;
-		Transform table_t = GetCtrl(UI.TBL_MESSAGE);
-		string prefab_name = "StoryMessageItem0";
-		if (msg_type == StoryDirector.MSG_TYPE.MONOLOGUE)
-		{
-			prefab_name = "StoryMessageItem1";
-		}
-		Transform message_item_t = Realizes(prefab_name, table_t, true);
-		message_item_t.SetSiblingIndex(0);
-		UIWidget message_item_w = message_item_t.GetComponent<UIWidget>();
-		lastMessageItem = message_item_t;
-		balloon = base.GetComponent<UISprite>(message_item_t, (Enum)UI.SPR_BALLOON);
-		tailLeft = FindCtrl(message_item_t, UI.SPR_TAIL_L);
-		tailRight = FindCtrl(message_item_t, UI.SPR_TAIL_R);
-		tailCenter = FindCtrl(message_item_t, UI.SPR_TAIL_C);
-		nameLabel = base.GetComponent<UILabel>(message_item_t, (Enum)UI.LBL_NAME);
-		messageLabel = base.GetComponent<UILabel>(message_item_t, (Enum)UI.LBL_MESSAGE);
-		initBaseHeight = message_item_w.height;
-		messageLabel.text = " ";
-		initMessageHeight = messageLabel.height;
-		messageHeight = initMessageHeight;
-		string temp = string.Empty;
-		if (messageLabel.Wrap(msg, out temp))
-		{
-			msg = WordWrap.Convert(messageLabel, msg);
-		}
-		SetLastMessageFocus(true);
-		SetMessageDragEnabled(false);
-		if (msg_type == StoryDirector.MSG_TYPE.NORMAL)
-		{
-			if (tailLeft != null && tail_dir != StoryDirector.POS.LEFT)
-			{
-				tailLeft.get_gameObject().SetActive(false);
-			}
-			if (tailRight != null && tail_dir != StoryDirector.POS.RIGHT)
-			{
-				tailRight.get_gameObject().SetActive(false);
-			}
-			if (tailCenter != null && tail_dir != StoryDirector.POS.CENTER)
-			{
-				tailCenter.get_gameObject().SetActive(false);
-			}
-			nameLabel.text = name;
-		}
-		UIWidget next_arrow_w = base.GetComponent<UIWidget>((Enum)UI.SPR_NEXT);
-		next_arrow_w.get_gameObject().SetActive(false);
-		List<UITweener> tweens = new List<UITweener>();
-		message_item_t.GetComponentsInChildren<UITweener>(tweens);
-		while (tweens.Find((UITweener o) => o.get_enabled()) != null)
-		{
-			yield return (object)null;
-		}
-		SoundManager.PlaySystemSE(SoundID.UISE.POPUP, 1f);
-		messageLabel.text = msg;
-		typewriter = messageLabel.get_gameObject().AddComponent<TypewriterEffect>();
-		typewriter.charsPerSecond = StoryDirector.SPEED_TYPEWRITER;
-		typewriter.ResetToBeginning();
-		while (typewriter.isActive)
-		{
-			yield return (object)null;
-		}
-		yield return (object)null;
-		next_arrow_w.get_gameObject().SetActive(true);
-		Vector3[] message_corners = message_item_w.worldCorners;
-		Vector3[] next_arrow_corners = next_arrow_w.worldCorners;
-		((UIRect)next_arrow_w).SetAnchor(null);
-		next_arrow_w.cachedTransform.set_position(new Vector3((next_arrow_corners[0].x + next_arrow_corners[2].x) * 0.5f, message_corners[0].y - (next_arrow_corners[1].y - next_arrow_corners[0].y) * 0.5f, next_arrow_corners[0].z));
-		SetMessageDragEnabled(true);
-		Object.Destroy(typewriter);
-		typewriter = null;
-		messageHeight = 0;
-		messageNum++;
-		coroutine = null;
-	}
-
-	private void OnQuery_NEXT()
-	{
-		if (typewriter != null)
-		{
-			typewriter.charsPerSecond = 1000;
-		}
-		if (coroutine == null)
-		{
-			MonoBehaviourSingleton<StoryDirector>.I.OnNextMessage();
-		}
-	}
-
-	private void OnQuery_SKIP()
-	{
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Expected O, but got Unknown
-		GameSection.StopEvent();
-		if (eventID == 80000001)
-		{
-			if (LoungeMatchingManager.IsValidInLounge())
-			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Lounge", null, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
-			}
-			else
-			{
-				MonoBehaviourSingleton<GameSceneManager>.I.ChangeScene("Home", null, UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
-			}
-		}
-		else if (!string.IsNullOrEmpty(requestEndEvent))
-		{
-			EventData[] autoEvents = new EventData[1]
-			{
-				new EventData(requestEndEvent, null)
-			};
-			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
-		}
-		else if (requestEndEventArray != null)
-		{
-			MonoBehaviourSingleton<StoryDirector>.I.HideBG();
-			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(requestEndEventArray);
-		}
-		else if (MonoBehaviourSingleton<InGameManager>.I.questTransferInfo != null)
-		{
-			MonoBehaviourSingleton<AppMain>.I.mainCamera.get_gameObject().SetActive(false);
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("InGameProgress", this.get_gameObject(), "INTERVAL", null, null, true);
-		}
-		else
-		{
-			MonoBehaviourSingleton<StoryDirector>.I.HideBG();
-			string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
-			EventData[] autoEvents2 = new EventData[2]
-			{
-				new EventData(name, null),
-				new EventData("DELIVERY_CLEAR_REWARD", eventData)
-			};
-			MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents2);
-		}
-	}
-
-	private void LateUpdate()
-	{
-		if (lastMessageItem != null)
-		{
-			if (messageHeight > 0)
-			{
-				if (messageHeight < messageLabel.height)
-				{
-					messageHeight = messageLabel.height;
-					lastMessageItem.GetComponent<UIWidget>().height = initBaseHeight + messageHeight - initMessageHeight;
-				}
-				base.GetComponent<UITable>((Enum)UI.TBL_MESSAGE).Reposition();
-				base.GetComponent<UIScrollView>((Enum)UI.SCR_MESSAGE).ResetPosition();
-			}
-			else if (lastMessageFocus)
-			{
-				Vector3[] worldCorners = base.GetComponent<UIPanel>((Enum)UI.SCR_MESSAGE).worldCorners;
-				if (UIUtility.GetWorldTopY(balloon) > worldCorners[1].y)
-				{
-					SetLastMessageFocus(false);
-				}
-			}
-		}
-		if (addMessageFunc != null)
-		{
-			addMessageFunc();
-			addMessageFunc = null;
-		}
-	}
-
-	private void SetLastMessageFocus(bool is_focus)
-	{
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Expected O, but got Unknown
-		lastMessageFocus = is_focus;
-		float alpha = (!is_focus) ? 1f : 0.6f;
-		Transform ctrl = GetCtrl(UI.TBL_MESSAGE);
-		int i = 1;
-		for (int childCount = ctrl.get_childCount(); i < childCount; i++)
-		{
-			base.GetComponent<UISprite>(ctrl.GetChild(i), (Enum)UI.SPR_BALLOON).alpha = alpha;
-		}
-	}
-
-	private void SetMessageDragEnabled(bool is_enable)
-	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		Transform ctrl = GetCtrl(UI.TBL_MESSAGE);
-		int i = 0;
-		for (int childCount = ctrl.get_childCount(); i < childCount; i++)
-		{
-			ctrl.GetChild(i).GetComponent<UIDragScrollView>().set_enabled(is_enable);
-		}
-	}
-
-	protected override void OnCloseStart()
-	{
-		SoundManager.StopVoice(0u, 6);
-		base.OnCloseStart();
-	}
+  private enum UI
+  {
+    BTN_NEXT,
+    SCR_MESSAGE,
+    TBL_MESSAGE,
+    SPR_NEXT,
+    TEX_FADER,
+    TEX_LOCATION,
+    TEX_IMAGE,
+    TEX_MODEL0,
+    TEX_MODEL1,
+    TEX_MODEL2,
+    TEX_MODEL3,
+    TEX_EFFECT,
+    TEX_FADER_HEADER,
+    SPR_BALLOON,
+    SPR_TAIL_L,
+    SPR_TAIL_R,
+    SPR_TAIL_C,
+    LBL_NAME,
+    LBL_MESSAGE,
+    MesBase,
+    fukidashibaseflame,
+    BTN_SKIP,
+  }
 }

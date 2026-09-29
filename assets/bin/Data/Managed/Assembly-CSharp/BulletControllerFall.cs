@@ -1,35 +1,36 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: BulletControllerFall
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class BulletControllerFall : BulletControllerBase
 {
-	protected float gravityStartTime;
+  protected float gravityStartTime;
+  protected float gravityRate;
 
-	protected float gravityRate;
+  public override void FixedUpdate()
+  {
+    base.FixedUpdate();
+    if ((double) this.gravityStartTime < 0.0 || (double) this.timeCount < (double) this.gravityStartTime)
+      return;
+    this._rigidbody.AddForce(Vector3.op_Multiply(Physics.gravity, this.gravityRate), (ForceMode) 5);
+    if (!Vector3.op_Inequality(this._rigidbody.velocity, Vector3.zero))
+      return;
+    this._transform.forward = this._rigidbody.velocity;
+  }
 
-	public override void FixedUpdate()
-	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		base.FixedUpdate();
-		if (gravityStartTime >= 0f && base.timeCount >= gravityStartTime)
-		{
-			base._rigidbody.AddForce(Physics.get_gravity() * gravityRate, 5);
-			if (base._rigidbody.get_velocity() != Vector3.get_zero())
-			{
-				base._transform.set_forward(base._rigidbody.get_velocity());
-			}
-		}
-	}
-
-	public override void Initialize(BulletData bullet, SkillInfo.SkillParam _skillInfoParam, Vector3 pos, Quaternion rot)
-	{
-		//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-		base.Initialize(bullet, _skillInfoParam, pos, rot);
-		gravityStartTime = bullet.dataFall.gravityStartTime;
-		gravityRate = bullet.dataFall.gravityRate;
-	}
+  public override void Initialize(
+    BulletData bullet,
+    SkillInfo.SkillParam _skillInfoParam,
+    Vector3 pos,
+    Quaternion rot)
+  {
+    base.Initialize(bullet, _skillInfoParam, pos, rot);
+    this.gravityStartTime = bullet.dataFall.gravityStartTime;
+    this.gravityRate = bullet.dataFall.gravityRate;
+  }
 }

@@ -1,303 +1,278 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: RushResultPoint
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class RushResultPoint : GameSection
 {
-	private enum UI
-	{
-		OBJ_TITLE,
-		LBL_QUEST_NAME,
-		SPR_TITLE,
-		OBJ_RUSH_POINT,
-		OBJ_GET_POINT,
-		LBL_GET_POINT,
-		GRD_POINT_DETAIL,
-		OBJ_POINT_DETAIL_ITEM,
-		LBL_POINT,
-		LBL_POINT_NAME,
-		STR_POINT_NEXT,
-		OBJ_TOTAL_POINT,
-		LBL_TOTAL_POINT,
-		OBJ_NEXT_REWARD,
-		GRD_NEXT_ITEM_ROOT,
-		OBJ_NEXT_ITEM_ROOT,
-		BTN_NEXT,
-		BTN_SKIP_FULL_SCREEN,
-		BTN_SKIP_IN_SCROLL,
-		OBJ_GET_REWARD_ROOT,
-		GRD_ITEM_ROOT,
-		OBJ_ITEM_ROOT
-	}
+  private const float COUNT_ANIM_SPEED = 4f;
+  private bool is_skip;
+  private PointEventCurrentData allPointEvents;
+  private RushResultPoint.RESULT_ANIM_STATE animState;
 
-	private enum AUDIO
-	{
-		CATEGORY = 40000228,
-		COUNTUP = 40000012,
-		POINTREWARD = 40000230
-	}
+  public override void Initialize() => this.StartCoroutine(this.DoInitialize());
 
-	private enum RESULT_ANIM_STATE
-	{
-		IDLE,
-		POINT,
-		COUNT_UP,
-		NEXT_REWARD,
-		REWARD,
-		END
-	}
+  private IEnumerator DoInitialize()
+  {
+    MonoBehaviourSingleton<UIManager>.I.loading.SetActiveDragon(true);
+    yield return (object) new WaitForEndOfFrame();
+    yield return (object) MonoBehaviourSingleton<AppMain>.I.UnloadUnusedAssets(true);
+    yield return (object) new WaitForEndOfFrame();
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    foreach (int se_id in (int[]) Enum.GetValues(typeof (RushResultPoint.AUDIO)))
+      loadingQueue.CacheSE(se_id);
+    if (loadingQueue.IsLoading())
+      yield return (object) loadingQueue.Wait();
+    GC.Collect();
+    MonoBehaviourSingleton<UIManager>.I.loading.SetActiveDragon(false);
+    base.Initialize();
+  }
 
-	private const float COUNT_ANIM_SPEED = 4f;
+  public override void UpdateUI()
+  {
+    this.allPointEvents = new PointEventCurrentData();
+    this.allPointEvents.pointRankingData = new PointEventCurrentData.PointResultData();
+    for (int index = 0; index < MonoBehaviourSingleton<InGameManager>.I.rushPointEvents.Count; ++index)
+    {
+      PointEventCurrentData rushPointEvent = MonoBehaviourSingleton<InGameManager>.I.rushPointEvents[index];
+      if (index == 0)
+        this.allPointEvents.pointRankingData.userPoint = rushPointEvent.pointRankingData.userPoint;
+      this.AddPointEventData(rushPointEvent);
+    }
+    PointEventCurrentData.PointResultData d = this.allPointEvents.pointRankingData;
+    this.SetLabelText((Enum) RushResultPoint.UI.LBL_QUEST_NAME, Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID).questText);
+    this.SetFontStyle((Enum) RushResultPoint.UI.LBL_GET_POINT, (FontStyle) 2);
+    this.SetLabelText((Enum) RushResultPoint.UI.LBL_GET_POINT, "0pt");
+    this.SetFontStyle((Enum) RushResultPoint.UI.LBL_TOTAL_POINT, (FontStyle) 2);
+    this.SetLabelText((Enum) RushResultPoint.UI.LBL_TOTAL_POINT, d.userPoint.ToString("N0") + "pt");
+    this.SetGrid((Enum) RushResultPoint.UI.GRD_POINT_DETAIL, "RushResultPointDetailItem", d.bonusPoint.Count, true, (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+    {
+      UILabel component1 = ((Component) this.FindCtrl(t, (Enum) RushResultPoint.UI.LBL_POINT)).GetComponent<UILabel>();
+      component1.alpha = 1f;
+      component1.text = d.bonusPoint[i].point.ToString("N0");
+      component1.fontStyle = (FontStyle) 2;
+      UILabel component2 = ((Component) this.FindCtrl(t, (Enum) RushResultPoint.UI.LBL_POINT_NAME)).GetComponent<UILabel>();
+      component2.alpha = 1f;
+      component2.text = d.bonusPoint[i].name;
+      component2.fontStyle = (FontStyle) 2;
+    }));
+    if (d.nextReward != null)
+    {
+      this.SetAllRewardItem(RushResultPoint.UI.GRD_NEXT_ITEM_ROOT, d.nextReward.reward);
+      this.SetPoint(RushResultPoint.UI.OBJ_NEXT_REWARD, d.nextReward.point - (d.userPoint + d.getPoint));
+    }
+    else
+    {
+      this.SetActive((Enum) RushResultPoint.UI.STR_POINT_NEXT, false);
+      this.SetFontStyle(this.GetCtrl((Enum) RushResultPoint.UI.OBJ_NEXT_REWARD), (Enum) RushResultPoint.UI.LBL_POINT, (FontStyle) 2);
+      this.SetLabelText(this.GetCtrl((Enum) RushResultPoint.UI.OBJ_NEXT_REWARD), (Enum) RushResultPoint.UI.LBL_POINT, "None");
+    }
+    List<PointEventCurrentData.Reward> rewardList = new List<PointEventCurrentData.Reward>();
+    foreach (PointEventCurrentData.PointRewardData pointRewardData in d.getReward)
+      rewardList.AddRange((IEnumerable<PointEventCurrentData.Reward>) pointRewardData.reward);
+    this.SetAllRewardItem(RushResultPoint.UI.GRD_ITEM_ROOT, rewardList);
+    if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.HasSafeArea)
+    {
+      UIVirtualScreen componentInChildren = ((Component) this).GetComponentInChildren<UIVirtualScreen>();
+      UIWidget component = ((Component) this.GetCtrl((Enum) RushResultPoint.UI.SHADOW)).GetComponent<UIWidget>();
+      if (Object.op_Inequality((Object) componentInChildren, (Object) null) && Object.op_Inequality((Object) component, (Object) null))
+      {
+        component.width = (int) componentInChildren.ScreenWidthFull;
+        component.height = (int) componentInChildren.ScreenHeightFull;
+      }
+    }
+    this.StartCoroutine(this.PlayAnimation());
+  }
 
-	private bool is_skip;
+  private void SetAllRewardItem(
+    RushResultPoint.UI targetGrid,
+    List<PointEventCurrentData.Reward> rewardList)
+  {
+    this.SetGrid((Enum) targetGrid, "ItemIconReward", rewardList.Count, true, (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+    {
+      PointEventCurrentData.Reward reward = rewardList[i];
+      ItemIcon rewardItemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE) reward.type, (uint) reward.itemId, t, reward.num);
+      if (Object.op_Inequality((Object) rewardItemIcon, (Object) null))
+        rewardItemIcon.SetEnableCollider(false);
+      ((Component) t.Find("itemNum")).GetComponent<UILabel>().text = "×" + (object) rewardList[i].num;
+      if (targetGrid != RushResultPoint.UI.GRD_NEXT_ITEM_ROOT)
+        return;
+      t.localScale = new Vector3(0.7f, 0.7f, 1f);
+      if (i <= 2)
+        return;
+      rewardItemIcon.VisibleIcon(false);
+    }));
+  }
 
-	private PointEventCurrentData allPointEvents;
+  private void SetPoint(RushResultPoint.UI parent, int point)
+  {
+    this.SetFontStyle(this.GetCtrl((Enum) parent), (Enum) RushResultPoint.UI.LBL_POINT, (FontStyle) 2);
+    this.SetLabelText(this.GetCtrl((Enum) parent), (Enum) RushResultPoint.UI.LBL_POINT, point.ToString("N0") + "pt");
+  }
 
-	private RESULT_ANIM_STATE animState;
+  private void AddPointEventData(PointEventCurrentData add_data)
+  {
+    if (add_data == null || Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID).eventId != add_data.eventId)
+      return;
+    this.allPointEvents.pointRankingData.getPoint += add_data.pointRankingData.getPoint;
+    foreach (PointEventCurrentData.BonusPointData bonusPointData1 in add_data.pointRankingData.bonusPoint)
+    {
+      PointEventCurrentData.BonusPointData add_bonus = bonusPointData1;
+      PointEventCurrentData.BonusPointData bonusPointData2 = this.allPointEvents.pointRankingData.bonusPoint.Find((Predicate<PointEventCurrentData.BonusPointData>) (bp => bp.name == add_bonus.name));
+      if (bonusPointData2 == null)
+        this.allPointEvents.pointRankingData.bonusPoint.Add(add_bonus);
+      else
+        bonusPointData2.point += add_bonus.point;
+    }
+    this.allPointEvents.pointRankingData.nextReward = add_data.pointRankingData.nextReward;
+    this.allPointEvents.pointRankingData.getReward.AddRange((IEnumerable<PointEventCurrentData.PointRewardData>) add_data.pointRankingData.getReward);
+  }
 
-	public override void Initialize()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(LoadSE());
-		base.Initialize();
-	}
+  private IEnumerator PlayAnimation()
+  {
+    this.is_skip = false;
+    this.PlayTween((Enum) RushResultPoint.UI.OBJ_TITLE);
+    this.SkipTween((Enum) RushResultPoint.UI.OBJ_TITLE);
+    this.animState = RushResultPoint.RESULT_ANIM_STATE.POINT;
+    this.PlayTween((Enum) RushResultPoint.UI.OBJ_RUSH_POINT, callback: (EventDelegate.Callback) (() =>
+    {
+      SoundManager.PlayOneShotUISE(40000228);
+      this.animState = RushResultPoint.RESULT_ANIM_STATE.IDLE;
+    }), is_input_block: false);
+    while (this.animState != RushResultPoint.RESULT_ANIM_STATE.IDLE && !this.is_skip)
+      yield return (object) null;
+    this.animState = RushResultPoint.RESULT_ANIM_STATE.COUNT_UP;
+    this.StartCoroutine(this.GetPointAnimation((System.Action) (() => this.animState = RushResultPoint.RESULT_ANIM_STATE.IDLE)));
+    while (this.animState != RushResultPoint.RESULT_ANIM_STATE.IDLE && !this.is_skip)
+      yield return (object) null;
+    this.animState = RushResultPoint.RESULT_ANIM_STATE.NEXT_REWARD;
+    this.PlayTween((Enum) RushResultPoint.UI.OBJ_NEXT_REWARD, callback: (EventDelegate.Callback) (() => this.animState = RushResultPoint.RESULT_ANIM_STATE.IDLE), is_input_block: false);
+    SoundManager.PlayOneShotUISE(40000228);
+    if (this.allPointEvents.pointRankingData.getReward.Count > 0)
+    {
+      this.animState = RushResultPoint.RESULT_ANIM_STATE.REWARD;
+      this.PlayTween((Enum) RushResultPoint.UI.OBJ_GET_REWARD_ROOT, callback: (EventDelegate.Callback) (() => this.animState = RushResultPoint.RESULT_ANIM_STATE.IDLE), is_input_block: false);
+    }
+    this.animState = RushResultPoint.RESULT_ANIM_STATE.END;
+    this.VisibleEndButton();
+  }
 
-	private IEnumerator LoadSE()
-	{
-		LoadingQueue load_queue = new LoadingQueue(this);
-		int[] ids = (int[])Enum.GetValues(typeof(AUDIO));
-		int[] array = ids;
-		foreach (int id in array)
-		{
-			load_queue.CacheSE(id, null);
-		}
-		if (load_queue.IsLoading())
-		{
-			yield return (object)load_queue.Wait();
-		}
-	}
+  private IEnumerator GetPointAnimation(System.Action callback)
+  {
+    int getPoint = this.allPointEvents.pointRankingData.getPoint;
+    int userPoint = this.allPointEvents.pointRankingData.userPoint;
+    int totalPoint = userPoint + getPoint;
+    this.SetFontStyle((Enum) RushResultPoint.UI.LBL_GET_POINT, (FontStyle) 2);
+    yield return (object) this.StartCoroutine(this.CountUpAnimation(0.0f, getPoint, RushResultPoint.UI.LBL_GET_POINT));
+    this.SetFontStyle((Enum) RushResultPoint.UI.LBL_TOTAL_POINT, (FontStyle) 2);
+    yield return (object) this.StartCoroutine(this.CountUpAnimation((float) userPoint, totalPoint, RushResultPoint.UI.LBL_TOTAL_POINT));
+    callback();
+  }
 
-	public override void UpdateUI()
-	{
-		//IL_0254: Unknown result type (might be due to invalid IL or missing references)
-		allPointEvents = new PointEventCurrentData();
-		allPointEvents.pointRankingData = new PointEventCurrentData.PointResultData();
-		for (int j = 0; j < MonoBehaviourSingleton<InGameManager>.I.rushPointEvents.Count; j++)
-		{
-			PointEventCurrentData pointEventCurrentData = MonoBehaviourSingleton<InGameManager>.I.rushPointEvents[j];
-			if (j == 0)
-			{
-				allPointEvents.pointRankingData.userPoint = pointEventCurrentData.pointRankingData.userPoint;
-			}
-			AddPointEventData(pointEventCurrentData);
-		}
-		PointEventCurrentData.PointResultData d = allPointEvents.pointRankingData;
-		QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID);
-		SetLabelText((Enum)UI.LBL_QUEST_NAME, questData.questText);
-		SetFontStyle((Enum)UI.LBL_GET_POINT, 2);
-		SetLabelText((Enum)UI.LBL_GET_POINT, "0pt");
-		SetFontStyle((Enum)UI.LBL_TOTAL_POINT, 2);
-		SetLabelText((Enum)UI.LBL_TOTAL_POINT, d.userPoint.ToString("N0") + "pt");
-		SetGrid(UI.GRD_POINT_DETAIL, "RushResultPointDetailItem", d.bonusPoint.Count, true, delegate(int i, Transform t, bool is_recycle)
-		{
-			UILabel component = FindCtrl(t, UI.LBL_POINT).GetComponent<UILabel>();
-			component.alpha = 1f;
-			component.text = d.bonusPoint[i].point.ToString("N0");
-			component.fontStyle = 2;
-			UILabel component2 = FindCtrl(t, UI.LBL_POINT_NAME).GetComponent<UILabel>();
-			component2.alpha = 1f;
-			component2.text = d.bonusPoint[i].name;
-			component2.fontStyle = 2;
-		});
-		if (d.nextReward != null)
-		{
-			List<PointEventCurrentData.Reward> reward = d.nextReward.reward;
-			SetAllRewardItem(UI.GRD_NEXT_ITEM_ROOT, reward);
-			SetPoint(UI.OBJ_NEXT_REWARD, d.nextReward.point - (d.userPoint + d.getPoint));
-		}
-		else
-		{
-			SetActive((Enum)UI.STR_POINT_NEXT, false);
-			SetFontStyle(GetCtrl(UI.OBJ_NEXT_REWARD), UI.LBL_POINT, 2);
-			SetLabelText(GetCtrl(UI.OBJ_NEXT_REWARD), UI.LBL_POINT, "なし");
-		}
-		List<PointEventCurrentData.Reward> list = new List<PointEventCurrentData.Reward>();
-		foreach (PointEventCurrentData.PointRewardData item in d.getReward)
-		{
-			list.AddRange(item.reward);
-		}
-		SetAllRewardItem(UI.GRD_ITEM_ROOT, list);
-		this.StartCoroutine(PlayAnimation());
-	}
+  private IEnumerator CountUpAnimation(
+    float currentPoint,
+    int targetPoint,
+    RushResultPoint.UI targetUI)
+  {
+    while ((double) currentPoint < (double) targetPoint)
+    {
+      yield return (object) 0;
+      if (this.is_skip)
+        currentPoint = (float) targetPoint;
+      int num1 = Mathf.FloorToInt(currentPoint);
+      currentPoint += Mathf.Max(((float) targetPoint - currentPoint) * RushResultPoint.CountDownCube(Time.deltaTime * 4f), 1f);
+      currentPoint = Mathf.Min(currentPoint, (float) targetPoint);
+      int num2 = Mathf.FloorToInt(currentPoint);
+      if (num1 < num2)
+        SoundManager.PlayOneShotUISE(40000012);
+      this.SetLabelText((Enum) targetUI, Mathf.FloorToInt(currentPoint).ToString("N0") + "pt");
+    }
+  }
 
-	private void SetAllRewardItem(UI targetGrid, List<PointEventCurrentData.Reward> rewardList)
-	{
-		SetGrid(targetGrid, "ItemIconReward", rewardList.Count, true, delegate(int i, Transform t, bool is_recycle)
-		{
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			PointEventCurrentData.Reward reward = rewardList[i];
-			ItemIcon itemIcon = ItemIcon.CreateRewardItemIcon((REWARD_TYPE)reward.type, (uint)reward.itemId, t, reward.num, null, 0, false, -1, false, null, false, false, ItemIcon.QUEST_ICON_SIZE_TYPE.DEFAULT);
-			if (itemIcon != null)
-			{
-				itemIcon.SetEnableCollider(false);
-			}
-			t.FindChild("itemNum").GetComponent<UILabel>().text = "×" + rewardList[i].num;
-			if (targetGrid == UI.GRD_NEXT_ITEM_ROOT)
-			{
-				t.set_localScale(new Vector3(0.7f, 0.7f, 1f));
-				if (i > 2)
-				{
-					itemIcon.VisibleIcon(false, true);
-				}
-			}
-		});
-	}
+  private static float CountDownCube(float currentValue) => currentValue * (2f - currentValue);
 
-	private void SetPoint(UI parent, int point)
-	{
-		SetFontStyle(GetCtrl(parent), UI.LBL_POINT, 2);
-		SetLabelText(GetCtrl(parent), UI.LBL_POINT, point.ToString("N0") + "pt");
-	}
+  private void VisibleEndButton()
+  {
+    this.SetActive((Enum) RushResultPoint.UI.BTN_NEXT, this.animState == RushResultPoint.RESULT_ANIM_STATE.END);
+    this.SetActive((Enum) RushResultPoint.UI.BTN_SKIP_FULL_SCREEN, this.animState != RushResultPoint.RESULT_ANIM_STATE.END);
+    this.SetActive((Enum) RushResultPoint.UI.BTN_SKIP_IN_SCROLL, this.animState != RushResultPoint.RESULT_ANIM_STATE.END);
+  }
 
-	private void AddPointEventData(PointEventCurrentData add_data)
-	{
-		if (add_data != null && Singleton<QuestTable>.I.GetQuestData(MonoBehaviourSingleton<QuestManager>.I.currentQuestID).eventId == add_data.eventId)
-		{
-			allPointEvents.pointRankingData.getPoint += add_data.pointRankingData.getPoint;
-			using (List<PointEventCurrentData.BonusPointData>.Enumerator enumerator = add_data.pointRankingData.bonusPoint.GetEnumerator())
-			{
-				PointEventCurrentData.BonusPointData add_bonus;
-				while (enumerator.MoveNext())
-				{
-					add_bonus = enumerator.Current;
-					PointEventCurrentData.BonusPointData bonusPointData = allPointEvents.pointRankingData.bonusPoint.Find((PointEventCurrentData.BonusPointData bp) => bp.name == add_bonus.name);
-					if (bonusPointData == null)
-					{
-						allPointEvents.pointRankingData.bonusPoint.Add(add_bonus);
-					}
-					else
-					{
-						bonusPointData.point += add_bonus.point;
-					}
-				}
-			}
-			allPointEvents.pointRankingData.nextReward = add_data.pointRankingData.nextReward;
-			allPointEvents.pointRankingData.getReward.AddRange(add_data.pointRankingData.getReward);
-		}
-	}
+  private void OnQuery_SKIP()
+  {
+    this.is_skip = true;
+    switch (this.animState)
+    {
+      case RushResultPoint.RESULT_ANIM_STATE.POINT:
+      case RushResultPoint.RESULT_ANIM_STATE.COUNT_UP:
+      case RushResultPoint.RESULT_ANIM_STATE.NEXT_REWARD:
+        this.SkipTween((Enum) RushResultPoint.UI.OBJ_RUSH_POINT);
+        this.SkipTween((Enum) RushResultPoint.UI.OBJ_NEXT_REWARD);
+        break;
+      case RushResultPoint.RESULT_ANIM_STATE.REWARD:
+        this.SkipTween((Enum) RushResultPoint.UI.OBJ_GET_REWARD_ROOT);
+        break;
+    }
+  }
 
-	private IEnumerator PlayAnimation()
-	{
-		is_skip = false;
-		PlayTween((Enum)UI.OBJ_TITLE, true, (EventDelegate.Callback)null, true, 0);
-		SkipTween((Enum)UI.OBJ_TITLE, true, 0);
-		animState = RESULT_ANIM_STATE.POINT;
-		PlayTween((Enum)UI.OBJ_RUSH_POINT, true, (EventDelegate.Callback)delegate
-		{
-			SoundManager.PlayOneShotUISE(40000228);
-			((_003CPlayAnimation_003Ec__Iterator11C)/*Error near IL_0072: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-		}, false, 0);
-		while (animState != 0 && !is_skip)
-		{
-			yield return (object)null;
-		}
-		animState = RESULT_ANIM_STATE.COUNT_UP;
-		this.StartCoroutine(GetPointAnimation(delegate
-		{
-			((_003CPlayAnimation_003Ec__Iterator11C)/*Error near IL_00d5: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-		}));
-		while (animState != 0 && !is_skip)
-		{
-			yield return (object)null;
-		}
-		animState = RESULT_ANIM_STATE.NEXT_REWARD;
-		PlayTween((Enum)UI.OBJ_NEXT_REWARD, true, (EventDelegate.Callback)delegate
-		{
-			((_003CPlayAnimation_003Ec__Iterator11C)/*Error near IL_013e: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-		}, false, 0);
-		SoundManager.PlayOneShotUISE(40000228);
-		if (allPointEvents.pointRankingData.getReward.Count > 0)
-		{
-			animState = RESULT_ANIM_STATE.REWARD;
-			PlayTween((Enum)UI.OBJ_GET_REWARD_ROOT, true, (EventDelegate.Callback)delegate
-			{
-				((_003CPlayAnimation_003Ec__Iterator11C)/*Error near IL_0195: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-			}, false, 0);
-		}
-		animState = RESULT_ANIM_STATE.END;
-		VisibleEndButton();
-	}
+  private void OnQuery_NEXT()
+  {
+    if (MonoBehaviourSingleton<InGameManager>.IsValid())
+      MonoBehaviourSingleton<InGameManager>.I.SetResultedRush();
+    if (MonoBehaviourSingleton<QuestManager>.I.compData != null)
+      return;
+    GameSection.ChangeEvent("FAILED");
+  }
 
-	private IEnumerator GetPointAnimation(Action callback)
-	{
-		int getPoint = allPointEvents.pointRankingData.getPoint;
-		int userPoint = allPointEvents.pointRankingData.userPoint;
-		int totalPoint = userPoint + getPoint;
-		SetFontStyle((Enum)UI.LBL_GET_POINT, 2);
-		yield return (object)this.StartCoroutine(CountUpAnimation(0f, getPoint, UI.LBL_GET_POINT));
-		SetFontStyle((Enum)UI.LBL_TOTAL_POINT, 2);
-		yield return (object)this.StartCoroutine(CountUpAnimation((float)userPoint, totalPoint, UI.LBL_TOTAL_POINT));
-		callback();
-	}
+  private enum UI
+  {
+    OBJ_TITLE,
+    LBL_QUEST_NAME,
+    SPR_TITLE,
+    OBJ_RUSH_POINT,
+    OBJ_GET_POINT,
+    LBL_GET_POINT,
+    GRD_POINT_DETAIL,
+    OBJ_POINT_DETAIL_ITEM,
+    LBL_POINT,
+    LBL_POINT_NAME,
+    STR_POINT_NEXT,
+    OBJ_TOTAL_POINT,
+    LBL_TOTAL_POINT,
+    OBJ_NEXT_REWARD,
+    GRD_NEXT_ITEM_ROOT,
+    OBJ_NEXT_ITEM_ROOT,
+    BTN_NEXT,
+    BTN_SKIP_FULL_SCREEN,
+    BTN_SKIP_IN_SCROLL,
+    OBJ_GET_REWARD_ROOT,
+    GRD_ITEM_ROOT,
+    OBJ_ITEM_ROOT,
+    SHADOW,
+  }
 
-	private IEnumerator CountUpAnimation(float currentPoint, int targetPoint, UI targetUI)
-	{
-		while (currentPoint < (float)targetPoint)
-		{
-			yield return (object)0;
-			if (is_skip)
-			{
-				currentPoint = (float)targetPoint;
-			}
-			int before = Mathf.FloorToInt(currentPoint);
-			float addingPoint = Mathf.Max(((float)targetPoint - currentPoint) * CountDownCube(Time.get_deltaTime() * 4f), 1f);
-			currentPoint += addingPoint;
-			currentPoint = Mathf.Min(currentPoint, (float)targetPoint);
-			if (before < Mathf.FloorToInt(currentPoint))
-			{
-				SoundManager.PlayOneShotUISE(40000012);
-			}
-			SetLabelText((Enum)targetUI, Mathf.FloorToInt(currentPoint).ToString("N0") + "pt");
-		}
-	}
+  private enum AUDIO
+  {
+    COUNTUP = 40000012, // 0x02625A0C
+    CATEGORY = 40000228, // 0x02625AE4
+    POINTREWARD = 40000230, // 0x02625AE6
+  }
 
-	private static float CountDownCube(float currentValue)
-	{
-		return currentValue * (2f - currentValue);
-	}
-
-	private void VisibleEndButton()
-	{
-		SetActive((Enum)UI.BTN_NEXT, animState == RESULT_ANIM_STATE.END);
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, animState != RESULT_ANIM_STATE.END);
-		SetActive((Enum)UI.BTN_SKIP_IN_SCROLL, animState != RESULT_ANIM_STATE.END);
-	}
-
-	private void OnQuery_SKIP()
-	{
-		is_skip = true;
-		switch (animState)
-		{
-		case RESULT_ANIM_STATE.POINT:
-		case RESULT_ANIM_STATE.COUNT_UP:
-		case RESULT_ANIM_STATE.NEXT_REWARD:
-			SkipTween((Enum)UI.OBJ_RUSH_POINT, true, 0);
-			SkipTween((Enum)UI.OBJ_NEXT_REWARD, true, 0);
-			break;
-		case RESULT_ANIM_STATE.REWARD:
-			SkipTween((Enum)UI.OBJ_GET_REWARD_ROOT, true, 0);
-			break;
-		}
-	}
-
-	private void OnQuery_NEXT()
-	{
-		if (MonoBehaviourSingleton<QuestManager>.I.compData == null)
-		{
-			GameSection.ChangeEvent("FAILED", null);
-		}
-	}
+  private enum RESULT_ANIM_STATE
+  {
+    IDLE,
+    POINT,
+    COUNT_UP,
+    NEXT_REWARD,
+    REWARD,
+    END,
+  }
 }

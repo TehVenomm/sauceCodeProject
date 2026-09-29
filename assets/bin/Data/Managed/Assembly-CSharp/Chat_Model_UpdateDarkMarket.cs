@@ -1,41 +1,30 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Chat_Model_UpdateDarkMarket
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class Chat_Model_UpdateDarkMarket : Chat_Model_Base
 {
-	public string itemMarketId
-	{
-		get;
-		protected set;
-	}
+  public string itemMarketId { get; protected set; }
 
-	public string soldNum
-	{
-		get;
-		protected set;
-	}
+  public string soldNum { get; protected set; }
 
-	public Chat_Model_UpdateDarkMarket()
-	{
-		m_packetType = CHAT_PACKET_TYPE.DARK_MARKET_UPDATE;
-	}
+  public Chat_Model_UpdateDarkMarket() => this.m_packetType = CHAT_PACKET_TYPE.DARK_MARKET_UPDATE;
 
-	public override string Serialize()
-	{
-		return $"{itemMarketId}--{soldNum}";
-	}
+  public override string Serialize() => $"{this.itemMarketId}--{this.soldNum}";
 
-	public override string ToString()
-	{
-		return Serialize();
-	}
+  public override string ToString() => this.Serialize();
 
-	public static Chat_Model_Base Parse(string str)
-	{
-		Chat_Model_UpdateDarkMarket chat_Model_UpdateDarkMarket = new Chat_Model_UpdateDarkMarket();
-		chat_Model_UpdateDarkMarket.m_packetType = CHAT_PACKET_TYPE.DARK_MARKET_UPDATE;
-		chat_Model_UpdateDarkMarket.payload = str.Substring(Chat_Model_Base.PAYLOAD_ORIGIN_INDEX);
-		chat_Model_UpdateDarkMarket.itemMarketId = str.Substring(40, 10);
-		chat_Model_UpdateDarkMarket.soldNum = str.Substring(50, 10);
-		Chat_Model_UpdateDarkMarket chat_Model_UpdateDarkMarket2 = chat_Model_UpdateDarkMarket;
-		chat_Model_UpdateDarkMarket2.SetErrorType("0");
-		return chat_Model_UpdateDarkMarket2;
-	}
+  public static Chat_Model_Base Parse(string str)
+  {
+    Chat_Model_UpdateDarkMarket updateDarkMarket = new Chat_Model_UpdateDarkMarket();
+    updateDarkMarket.m_packetType = CHAT_PACKET_TYPE.DARK_MARKET_UPDATE;
+    updateDarkMarket.payload = str.Substring(Chat_Model_Base.PAYLOAD_ORIGIN_INDEX);
+    updateDarkMarket.itemMarketId = str.Substring(40, 10);
+    updateDarkMarket.soldNum = str.Substring(50, 10);
+    updateDarkMarket.SetErrorType("0");
+    return (Chat_Model_Base) updateDarkMarket;
+  }
 }

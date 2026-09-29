@@ -1,312 +1,236 @@
-using BestHTTP.WebSocket;
+﻿// Decompiled with JetBrains decompiler
+// Type: ClanChatWebSocket
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class ClanChatWebSocket : MonoBehaviourSingleton<ClanChatWebSocket>
 {
-	public enum CONNECTION_STATUS
-	{
-		NONE,
-		CONNECTED,
-		OPENING,
-		CLOSED,
-		ERROR
-	}
+  public const int SERVER_ID = -1000;
+  public const int BROADCAST_ID = -2000;
+  public const int PROTCOL_VER = 0;
+  public const string SERVER_TOKEN = "###########";
+  public const string BROADCAST_TOKEN = "@@@@@@@@@@@";
+  public const string PROTOCOL_VERSION = "00";
+  private BestHTTP.WebSocket.WebSocket sock;
+  private bool isConnect;
+  public ClanChatWebSocket.CONNECTION_STATUS CurrentConnectionStatus;
+  public Action<ChatPacket> ReceivePacketAction;
+  private Queue<PacketStream> temporaryQueue = new Queue<PacketStream>();
+  [SerializeField]
+  private string _relayServer;
+  private string _fromId;
+  [SerializeField]
+  private int _ackPrefix;
+  [SerializeField]
+  private int _packetSendCount;
+  private const int SEQUENCE_MAX = 10000000;
+  public const float HEARTBEAT_TIMEOUT = 10f;
+  public const float HEARTBEAT_INTERVAL = 3f;
+  private DateTime lastPacketReceivedTime;
 
-	public const int SERVER_ID = -1000;
+  public event EventHandler ErrorOccurred;
 
-	public const int BROADCAST_ID = -2000;
+  public string relayServer
+  {
+    get => this._relayServer;
+    private set => this._relayServer = value;
+  }
 
-	public const int PROTCOL_VER = 0;
+  public string fromId
+  {
+    get => this._fromId;
+    private set => this._fromId = value;
+  }
 
-	public const string SERVER_TOKEN = "###########";
+  public int ackPrefix
+  {
+    get => this._ackPrefix;
+    private set => this._ackPrefix = value;
+  }
 
-	public const string BROADCAST_TOKEN = "@@@@@@@@@@@";
+  public int packetSendCount
+  {
+    get => this._packetSendCount;
+    private set => this._packetSendCount = value;
+  }
 
-	public const string PROTOCOL_VERSION = "00";
+  public int sequence { get; private set; }
 
-	private const int SEQUENCE_MAX = 10000000;
+  public event System.Action OnClosed;
 
-	public const float HEARTBEAT_TIMEOUT = 10f;
+  public event Action<double> OnPong;
 
-	public const float HEARTBEAT_INTERVAL = 3f;
+  private void OnApplicationQuit()
+  {
+  }
 
-	private WebSocket sock;
+  private void OnApplicationPause(bool pause)
+  {
+    if (pause)
+      return;
+    MonoBehaviourSingleton<ChatManager>.I.CreateClanChat(MonoBehaviourSingleton<GuildManager>.I.guildInfos.chat, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId);
+  }
 
-	private bool isConnect;
+  public void Setup()
+  {
+  }
 
-	public CONNECTION_STATUS CurrentConnectionStatus;
+  public void Connect() => this.Connect(this.relayServer, this.fromId, this.ackPrefix);
 
-	public Action<ChatPacket> ReceivePacketAction;
+  public void Connect(string path, string from_id, int ack_prefix)
+  {
+    this.temporaryQueue.Clear();
+    this.relayServer = path;
+    this.fromId = from_id;
+    this.ackPrefix = ack_prefix;
+    this.NativeConnect(this.relayServer);
+  }
 
-	private Queue<PacketStream> temporaryQueue = new Queue<PacketStream>();
+  private void NativeConnect(string relayServer)
+  {
+    this.sock = new BestHTTP.WebSocket.WebSocket(new Uri(relayServer));
+    this.CurrentConnectionStatus = ClanChatWebSocket.CONNECTION_STATUS.OPENING;
+    this.sock.OnOpen += (Action<BestHTTP.WebSocket.WebSocket>) (ws =>
+    {
+      this.LogDebug("OnOpen {0}", (object) ws.InternalRequest.Uri);
+      this.ClearLastPacketReceivedTime();
+      this.isConnect = true;
+      this.CurrentConnectionStatus = ClanChatWebSocket.CONNECTION_STATUS.CONNECTED;
+    });
+    this.sock.OnBinary += (Action<BestHTTP.WebSocket.WebSocket, byte[]>) ((ws, binary) =>
+    {
+      this.LogDebug("OnBinary {0}", (object) binary.Length);
+      this.ClearLastPacketReceivedTime();
+      this.temporaryQueue.Enqueue(new PacketStream((object) binary));
+    });
+    this.sock.OnMessage += (Action<BestHTTP.WebSocket.WebSocket, string>) ((ws, message) =>
+    {
+      this.LogDebug("OnMessage {0}", (object) message);
+      this.ClearLastPacketReceivedTime();
+      this.temporaryQueue.Enqueue(new PacketStream((object) message));
+    });
+    this.sock.OnClosed += (Action<BestHTTP.WebSocket.WebSocket, ushort, string>) ((ws, code, message) =>
+    {
+      this.OnPrepareClose();
+      this.temporaryQueue.Clear();
+      if (this.OnClosed != null)
+        this.OnClosed();
+      this.LogDebug("OnClosed Code {0}", (object) code);
+      this.LogDebug("OnClosed Message {0}", (object) message);
+    });
+    this.sock.OnError += (Action<BestHTTP.WebSocket.WebSocket, Exception>) ((ws, ex) =>
+    {
+      this.CurrentConnectionStatus = ClanChatWebSocket.CONNECTION_STATUS.ERROR;
+      this.OnErrorOccurred(EventArgs.Empty, ex);
+      this.LogDebug("OnError Message {0}", (object) ex.Message);
+      this.LogDebug("OnError StackTrace {0}", (object) ex.StackTrace);
+    });
+    this.sock.OnPong += (Action<BestHTTP.WebSocket.WebSocket, byte[]>) ((ws, data) =>
+    {
+      if (this.OnPong != null)
+        this.OnPong((DateTime.Now - this.lastPacketReceivedTime).TotalMilliseconds - 3000.0);
+      this.ClearLastPacketReceivedTime();
+    });
+    this.sock.StartPingThread = true;
+    this.sock.PingFrequency = 3000;
+    this.sock.Open();
+  }
 
-	[SerializeField]
-	private string _relayServer;
+  public void Close(ushort code = 1000, string msg = "Bye!")
+  {
+    this.OnPrepareClose();
+    this.sock.Close(code, msg);
+  }
 
-	private string _fromId;
+  private void OnPrepareClose()
+  {
+    this.ReceivePacketAction = (Action<ChatPacket>) null;
+    this.isConnect = false;
+    this.CurrentConnectionStatus = ClanChatWebSocket.CONNECTION_STATUS.CLOSED;
+  }
 
-	[SerializeField]
-	private int _ackPrefix;
+  protected virtual void OnErrorOccurred(EventArgs e, Exception ex)
+  {
+    if (this.ErrorOccurred == null)
+      return;
+    this.ErrorOccurred((object) this, e);
+  }
 
-	[SerializeField]
-	private int _packetSendCount;
+  public int Send<T>(T model, int to_id, bool promise = true) where T : Chat_Model_Base
+  {
+    return this.Send((Chat_Model_Base) model, typeof (T), to_id, promise);
+  }
 
-	private DateTime lastPacketReceivedTime;
+  public int Send(
+    Chat_Model_Base model,
+    System.Type type,
+    int to_id,
+    bool promise = true,
+    Func<Coop_Model_ACK, bool> onReceiveAck = null,
+    Func<Coop_Model_Base, bool> onPreResend = null)
+  {
+    PacketStream stream = new ChatPacket()
+    {
+      header = new ChatPacketHeader(0, model.commandId, this.fromId),
+      model = model
+    }.Serialize();
+    int commandId = model.commandId;
+    this.NativeSend(stream);
+    return 0;
+  }
 
-	public string relayServer
-	{
-		get
-		{
-			return _relayServer;
-		}
-		private set
-		{
-			_relayServer = value;
-		}
-	}
+  private void NativeSend(PacketStream stream)
+  {
+    if (stream.IsBuffer())
+    {
+      this.sock.Send(stream.ToBuffer());
+    }
+    else
+    {
+      if (!stream.IsString())
+        return;
+      this.sock.Send(stream.ToString());
+    }
+  }
 
-	public string fromId
-	{
-		get
-		{
-			return _fromId;
-		}
-		private set
-		{
-			_fromId = value;
-		}
-	}
+  private void ReceivePacket(PacketStream stream)
+  {
+    if (stream == null || stream.Length <= 0)
+      return;
+    ChatPacket chatPacket = ChatPacket.Deserialize(stream);
+    if (chatPacket == null || this.ReceivePacketAction == null)
+      return;
+    this.ReceivePacketAction(chatPacket);
+  }
 
-	public int ackPrefix
-	{
-		get
-		{
-			return _ackPrefix;
-		}
-		private set
-		{
-			_ackPrefix = value;
-		}
-	}
+  public void ClearLastPacketReceivedTime() => this.lastPacketReceivedTime = DateTime.Now;
 
-	public int packetSendCount
-	{
-		get
-		{
-			return _packetSendCount;
-		}
-		private set
-		{
-			_packetSendCount = value;
-		}
-	}
+  public bool IsConnected() => this.isConnect;
 
-	public int sequence
-	{
-		get;
-		private set;
-	}
+  public bool IsOpen() => this.sock != null && this.sock.IsOpen;
 
-	public event EventHandler ErrorOccurred;
+  private void Update()
+  {
+    while (this.IsConnected() && this.temporaryQueue.Count > 0)
+      this.ReceivePacket(this.temporaryQueue.Dequeue());
+  }
 
-	public event Action OnClosed;
+  public void LogDebug(string message, params object[] args)
+  {
+  }
 
-	public event Action<double> OnPong;
-
-	private void OnApplicationQuit()
-	{
-		if (MonoBehaviourSingleton<ChatManager>.I.clanChat != null && MonoBehaviourSingleton<ChatManager>.I.clanChat.HasConnect)
-		{
-			MonoBehaviourSingleton<ChatManager>.I.DestroyClanChat();
-		}
-	}
-
-	private void OnApplicationPause(bool pause)
-	{
-		if (pause)
-		{
-			if (MonoBehaviourSingleton<ChatManager>.I.clanChat != null && MonoBehaviourSingleton<ChatManager>.I.clanChat.HasConnect)
-			{
-				MonoBehaviourSingleton<ChatManager>.I.DestroyClanChat();
-			}
-		}
-		else
-		{
-			MonoBehaviourSingleton<ChatManager>.I.CreateClanChat(MonoBehaviourSingleton<GuildManager>.I.guildInfos.chat, MonoBehaviourSingleton<UserInfoManager>.I.userStatus.clanId, null);
-		}
-	}
-
-	public void Setup()
-	{
-	}
-
-	public void Connect()
-	{
-		Connect(relayServer, fromId, ackPrefix);
-	}
-
-	public void Connect(string path, string from_id, int ack_prefix)
-	{
-		temporaryQueue.Clear();
-		relayServer = path;
-		fromId = from_id;
-		ackPrefix = ack_prefix;
-		NativeConnect(relayServer);
-	}
-
-	private void NativeConnect(string relayServer)
-	{
-		sock = new WebSocket(new Uri(relayServer));
-		CurrentConnectionStatus = CONNECTION_STATUS.OPENING;
-		WebSocket webSocket = sock;
-		webSocket.OnOpen = (Action<WebSocket>)Delegate.Combine(webSocket.OnOpen, (Action<WebSocket>)delegate(WebSocket ws)
-		{
-			LogDebug("OnOpen {0}", ws.InternalRequest.Uri);
-			ClearLastPacketReceivedTime();
-			isConnect = true;
-			CurrentConnectionStatus = CONNECTION_STATUS.CONNECTED;
-		});
-		WebSocket webSocket2 = sock;
-		webSocket2.OnBinary = (Action<WebSocket, byte[]>)Delegate.Combine(webSocket2.OnBinary, (Action<WebSocket, byte[]>)delegate(WebSocket ws, byte[] binary)
-		{
-			LogDebug("OnBinary {0}", binary.Length);
-			ClearLastPacketReceivedTime();
-			temporaryQueue.Enqueue(new PacketStream(binary));
-		});
-		WebSocket webSocket3 = sock;
-		webSocket3.OnMessage = (Action<WebSocket, string>)Delegate.Combine(webSocket3.OnMessage, (Action<WebSocket, string>)delegate(WebSocket ws, string message)
-		{
-			LogDebug("OnMessage {0}", message);
-			ClearLastPacketReceivedTime();
-			temporaryQueue.Enqueue(new PacketStream(message));
-		});
-		WebSocket webSocket4 = sock;
-		webSocket4.OnClosed = (Action<WebSocket, ushort, string>)Delegate.Combine(webSocket4.OnClosed, (Action<WebSocket, ushort, string>)delegate(WebSocket ws, ushort code, string message)
-		{
-			OnPrepareClose();
-			temporaryQueue.Clear();
-			if (this.OnClosed != null)
-			{
-				this.OnClosed();
-			}
-			LogDebug("OnClosed Code {0}", code);
-			LogDebug("OnClosed Message {0}", message);
-		});
-		WebSocket webSocket5 = sock;
-		webSocket5.OnError = (Action<WebSocket, Exception>)Delegate.Combine(webSocket5.OnError, (Action<WebSocket, Exception>)delegate(WebSocket ws, Exception ex)
-		{
-			CurrentConnectionStatus = CONNECTION_STATUS.ERROR;
-			OnErrorOccurred(EventArgs.Empty, ex);
-			LogDebug("OnError Message {0}", ex.Message);
-			LogDebug("OnError StackTrace {0}", ex.StackTrace);
-		});
-		WebSocket webSocket6 = sock;
-		webSocket6.OnPong = (Action<WebSocket, byte[]>)Delegate.Combine(webSocket6.OnPong, (Action<WebSocket, byte[]>)delegate
-		{
-			if (this.OnPong != null)
-			{
-				this.OnPong((DateTime.Now - lastPacketReceivedTime).TotalMilliseconds - 3000.0);
-			}
-			ClearLastPacketReceivedTime();
-		});
-		sock.StartPingThread = true;
-		sock.PingFrequency = 3000;
-		sock.Open();
-	}
-
-	public void Close(ushort code = 1000, string msg = "Bye!")
-	{
-		OnPrepareClose();
-		sock.Close(code, msg);
-	}
-
-	private void OnPrepareClose()
-	{
-		ReceivePacketAction = null;
-		isConnect = false;
-		CurrentConnectionStatus = CONNECTION_STATUS.CLOSED;
-	}
-
-	protected virtual void OnErrorOccurred(EventArgs e, Exception ex)
-	{
-		if (this.ErrorOccurred != null)
-		{
-			this.ErrorOccurred(this, e);
-		}
-	}
-
-	public int Send<T>(T model, int to_id, bool promise = true) where T : Chat_Model_Base
-	{
-		return Send(model, typeof(T), to_id, promise, null, null);
-	}
-
-	public int Send(Chat_Model_Base model, Type type, int to_id, bool promise = true, Func<Coop_Model_ACK, bool> onReceiveAck = null, Func<Coop_Model_Base, bool> onPreResend = null)
-	{
-		int result = 0;
-		ChatPacket chatPacket = new ChatPacket();
-		ChatPacketHeader chatPacketHeader2 = chatPacket.header = new ChatPacketHeader(0, model.commandId, fromId);
-		chatPacket.model = model;
-		PacketStream stream = chatPacket.Serialize();
-		if (model.commandId == 502)
-		{
-			goto IL_0040;
-		}
-		goto IL_0040;
-		IL_0040:
-		NativeSend(stream);
-		return result;
-	}
-
-	private void NativeSend(PacketStream stream)
-	{
-		if (stream.IsBuffer())
-		{
-			sock.Send(stream.ToBuffer());
-		}
-		else if (stream.IsString())
-		{
-			sock.Send(stream.ToString());
-		}
-	}
-
-	private void ReceivePacket(PacketStream stream)
-	{
-		if (stream != null && stream.Length > 0)
-		{
-			ChatPacket chatPacket = ChatPacket.Deserialize(stream);
-			if (chatPacket != null && ReceivePacketAction != null)
-			{
-				ReceivePacketAction(chatPacket);
-			}
-		}
-	}
-
-	public void ClearLastPacketReceivedTime()
-	{
-		lastPacketReceivedTime = DateTime.Now;
-	}
-
-	public bool IsConnected()
-	{
-		return isConnect;
-	}
-
-	public bool IsOpen()
-	{
-		return sock != null && sock.IsOpen;
-	}
-
-	private void Update()
-	{
-		while (IsConnected() && temporaryQueue.Count > 0)
-		{
-			ReceivePacket(temporaryQueue.Dequeue());
-		}
-	}
-
-	public void LogDebug(string message, params object[] args)
-	{
-	}
+  public enum CONNECTION_STATUS
+  {
+    NONE,
+    CONNECTED,
+    OPENING,
+    CLOSED,
+    ERROR,
+  }
 }

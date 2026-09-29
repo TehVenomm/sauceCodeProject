@@ -1,178 +1,147 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: StatusAvatarEquipSelect
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 
+#nullable disable
 public class StatusAvatarEquipSelect : StatusEquip
 {
-	private EQUIPMENT_TYPE changeTargetType;
+  private EQUIPMENT_TYPE changeTargetType;
+  private EquipItemInfo equippingItem;
+  private EquipItemInfo selectItem;
 
-	private EquipItemInfo equippingItem;
+  protected override EquipItemInfo EquipItem
+  {
+    get => this.selectItem;
+    set => this.selectItem = value;
+  }
 
-	private EquipItemInfo selectItem;
+  protected override EquipItemInfo GetCompareItemData() => this.equippingItem;
 
-	protected override EquipItemInfo EquipItem
-	{
-		get
-		{
-			return selectItem;
-		}
-		set
-		{
-			selectItem = value;
-		}
-	}
+  public override void Initialize()
+  {
+    object[] eventData = GameSection.GetEventData() as object[];
+    this.changeTargetType = (EQUIPMENT_TYPE) eventData[0];
+    this.equippingItem = eventData[1] as EquipItemInfo;
+    this.selectEquipSetData = eventData[2] as StatusEquip.LocalEquipSetData;
+    this.EquipItem = this.equippingItem;
+    if (this.equippingItem == null)
+      this.selectInventoryIndex = -1;
+    else
+      this.selectInventoryIndex = this.GetSelectItemIndex();
+    GameSection.SetEventData((object) this.selectEquipSetData);
+    MonoBehaviourSingleton<StatusManager>.I.SetEquippingItem(this.equippingItem);
+    base.Initialize();
+  }
 
-	protected override EquipItemInfo GetCompareItemData()
-	{
-		return equippingItem;
-	}
+  protected override void InitSort()
+  {
+    this.sortSettings = SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.ARMOR, SortSettings.SETTINGS_TYPE.EQUIP_ITEM);
+  }
 
-	public override void Initialize()
-	{
-		object[] array = GameSection.GetEventData() as object[];
-		changeTargetType = (EQUIPMENT_TYPE)(int)array[0];
-		equippingItem = (array[1] as EquipItemInfo);
-		base.selectEquipSetData = (array[2] as LocalEquipSetData);
-		EquipItem = equippingItem;
-		if (equippingItem == null)
-		{
-			selectInventoryIndex = -1;
-		}
-		else
-		{
-			selectInventoryIndex = GetSelectItemIndex();
-		}
-		GameSection.SetEventData(base.selectEquipSetData);
-		MonoBehaviourSingleton<StatusManager>.I.SetEquippingItem(equippingItem);
-		base.Initialize();
-	}
+  protected override void InitLocalInventory()
+  {
+    this.localInventoryEquipData = (SortCompareData[]) this.CreateLocalnventory();
+    this.sortSettings.Sort<EquipItemSortData>(this.localInventoryEquipData as EquipItemSortData[]);
+  }
 
-	protected override void InitSort()
-	{
-		sortSettings = SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.ARMOR, SortSettings.SETTINGS_TYPE.EQUIP_ITEM);
-	}
+  protected override void SelectingInventoryFirst() => this.selectInventoryIndex = -1;
 
-	protected override void InitLocalInventory()
-	{
-		localInventoryEquipData = CreateLocalnventory();
-		sortSettings.Sort(localInventoryEquipData as EquipItemSortData[]);
-	}
+  protected override bool IsNotEquip(bool is_not_equip_any_slot, bool is_equip_now_slot)
+  {
+    return !is_equip_now_slot;
+  }
 
-	protected override void SelectingInventoryFirst()
-	{
-		selectInventoryIndex = -1;
-	}
+  public override void UpdateUI()
+  {
+    this.SetActive((Enum) EquipSelectBase.UI.OBJ_STATUS_ROOT, false);
+    base.UpdateUI();
+  }
 
-	protected override bool IsNotEquip(bool is_not_equip_any_slot, bool is_equip_now_slot)
-	{
-		return !is_equip_now_slot;
-	}
+  protected override void EquipParam()
+  {
+  }
 
-	public override void UpdateUI()
-	{
-		SetActive((Enum)UI.OBJ_STATUS_ROOT, false);
-		base.UpdateUI();
-	}
+  protected override void EquipImg()
+  {
+    if (this.EquipItem != null)
+      this.SetRenderEquipModel((Enum) EquipSelectBase.UI.TEX_MODEL, this.EquipItem.tableID);
+    else
+      this.ClearRenderModel((Enum) EquipSelectBase.UI.TEX_MODEL);
+  }
 
-	protected override void EquipParam()
-	{
-	}
+  protected override void OnQuery_TRY_ON()
+  {
+    base.OnQuery_TRY_ON();
+    if (this.EquipItem != null && !MonoBehaviourSingleton<GameSceneManager>.I.CheckEquipItemAndOpenUpdateAppDialog(this.EquipItem.tableData, new System.Action(((StatusEquip) this).OnCancelSelect)))
+      GameSection.StopEvent();
+    else
+      this.EquipImg();
+  }
 
-	protected override void EquipImg()
-	{
-		if (EquipItem != null)
-		{
-			SetRenderEquipModel((Enum)UI.TEX_MODEL, EquipItem.tableID, -1, -1, 1f);
-		}
-		else
-		{
-			ClearRenderModel((Enum)UI.TEX_MODEL);
-		}
-	}
+  protected override bool IsCreateRemoveButton() => true;
 
-	protected override void OnQuery_TRY_ON()
-	{
-		base.OnQuery_TRY_ON();
-		if (EquipItem != null && !MonoBehaviourSingleton<GameSceneManager>.I.CheckEquipItemAndOpenUpdateAppDialog(EquipItem.tableData, base.OnCancelSelect))
-		{
-			GameSection.StopEvent();
-		}
-		else
-		{
-			EquipImg();
-		}
-	}
+  protected override bool IsAlreadyEquipItem(EquipItemInfo item) => false;
 
-	protected override bool IsCreateRemoveButton()
-	{
-		return true;
-	}
+  private EquipItemSortData[] CreateLocalnventory()
+  {
+    EquipItemInfo[] array;
+    switch (this.changeTargetType)
+    {
+      case EQUIPMENT_TYPE.HELM:
+        array = MonoBehaviourSingleton<InventoryManager>.I.GetVisualHelmInventory().ToArray();
+        break;
+      case EQUIPMENT_TYPE.ARM:
+        array = MonoBehaviourSingleton<InventoryManager>.I.GetVisualArmInventory().ToArray();
+        break;
+      case EQUIPMENT_TYPE.LEG:
+        array = MonoBehaviourSingleton<InventoryManager>.I.GetVisualLegInventory().ToArray();
+        break;
+      default:
+        array = MonoBehaviourSingleton<InventoryManager>.I.GetVisualArmorInventory().ToArray();
+        break;
+    }
+    return this.sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortData>(array);
+  }
 
-	protected override bool IsAlreadyEquipItem(EquipItemInfo item)
-	{
-		return false;
-	}
+  protected override void OnQueryDetail()
+  {
+    int eventData = (int) GameSection.GetEventData();
+    this.detailItem = (EquipItemInfo) null;
+    if (eventData >= 0 && this.localInventoryEquipData != null)
+      this.detailItem = this.localInventoryEquipData[eventData].GetItemData() as EquipItemInfo;
+    if (this.detailItem == null)
+      GameSection.StopEvent();
+    else
+      GameSection.SetEventData((object) new object[3]
+      {
+        (object) ItemDetailEquip.CURRENT_SECTION.STATUS_AVATAR,
+        (object) this.detailItem,
+        (object) this.selectEquipSetData.setNo
+      });
+  }
 
-	private EquipItemSortData[] CreateLocalnventory()
-	{
-		EquipItemInfo[] array = null;
-		switch (changeTargetType)
-		{
-		default:
-			array = MonoBehaviourSingleton<InventoryManager>.I.GetVisualArmorInventory().ToArray();
-			break;
-		case EQUIPMENT_TYPE.HELM:
-			array = MonoBehaviourSingleton<InventoryManager>.I.GetVisualHelmInventory().ToArray();
-			break;
-		case EQUIPMENT_TYPE.ARM:
-			array = MonoBehaviourSingleton<InventoryManager>.I.GetVisualArmInventory().ToArray();
-			break;
-		case EQUIPMENT_TYPE.LEG:
-			array = MonoBehaviourSingleton<InventoryManager>.I.GetVisualLegInventory().ToArray();
-			break;
-		}
-		return sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortData>(array);
-	}
-
-	protected override void OnQueryDetail()
-	{
-		int num = (int)GameSection.GetEventData();
-		detailItem = null;
-		if (num >= 0 && localInventoryEquipData != null)
-		{
-			detailItem = (localInventoryEquipData[num].GetItemData() as EquipItemInfo);
-		}
-		if (detailItem == null)
-		{
-			GameSection.StopEvent();
-		}
-		else
-		{
-			GameSection.SetEventData(new object[3]
-			{
-				ItemDetailEquip.CURRENT_SECTION.STATUS_AVATAR,
-				detailItem,
-				base.selectEquipSetData.setNo
-			});
-		}
-	}
-
-	protected override string GetSelectTypeText()
-	{
-		string result = string.Empty;
-		switch (changeTargetType)
-		{
-		case EQUIPMENT_TYPE.ARMOR:
-			result = base.sectionData.GetText("SELECT_ARMOR");
-			break;
-		case EQUIPMENT_TYPE.HELM:
-			result = base.sectionData.GetText("SELECT_HELM");
-			break;
-		case EQUIPMENT_TYPE.ARM:
-			result = base.sectionData.GetText("SELECT_ARM");
-			break;
-		case EQUIPMENT_TYPE.LEG:
-			result = base.sectionData.GetText("SELECT_LEG");
-			break;
-		}
-		return result;
-	}
+  protected override string GetSelectTypeText()
+  {
+    string selectTypeText = string.Empty;
+    switch (this.changeTargetType)
+    {
+      case EQUIPMENT_TYPE.ARMOR:
+        selectTypeText = this.sectionData.GetText("SELECT_ARMOR");
+        break;
+      case EQUIPMENT_TYPE.HELM:
+        selectTypeText = this.sectionData.GetText("SELECT_HELM");
+        break;
+      case EQUIPMENT_TYPE.ARM:
+        selectTypeText = this.sectionData.GetText("SELECT_ARM");
+        break;
+      case EQUIPMENT_TYPE.LEG:
+        selectTypeText = this.sectionData.GetText("SELECT_LEG");
+        break;
+    }
+    return selectTypeText;
+  }
 }

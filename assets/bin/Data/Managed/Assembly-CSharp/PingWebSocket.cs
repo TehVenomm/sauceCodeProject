@@ -1,85 +1,70 @@
-using BestHTTP.WebSocket;
+﻿// Decompiled with JetBrains decompiler
+// Type: PingWebSocket
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
+using UnityEngine;
 
-public class PingWebSocket
+#nullable disable
+public class PingWebSocket : MonoBehaviour
 {
-	private const float HEARTBEAT_TIMEOUT = 5f;
+  private const float HEARTBEAT_TIMEOUT = 5f;
+  private const float HEARTBEAT_INTERVAL = 1f;
+  private BestHTTP.WebSocket.WebSocket sock;
+  private DateTime lastPacketReceivedTime;
+  private bool isConnect;
 
-	private const float HEARTBEAT_INTERVAL = 1f;
+  public event System.Action OnOpen;
 
-	private WebSocket sock;
+  public event System.Action OnClosed;
 
-	private DateTime lastPacketReceivedTime;
+  public event System.Action OnError;
 
-	private bool isConnect;
+  public event Action<double> OnPong;
 
-	public event Action OnOpen;
+  public void Connect(string relayServer)
+  {
+    this.sock = new BestHTTP.WebSocket.WebSocket(new Uri(relayServer));
+    this.sock.OnOpen += (Action<BestHTTP.WebSocket.WebSocket>) (ws =>
+    {
+      this.lastPacketReceivedTime = DateTime.Now;
+      this.isConnect = true;
+      if (this.OnOpen == null)
+        return;
+      this.OnOpen();
+    });
+    this.sock.OnClosed += (Action<BestHTTP.WebSocket.WebSocket, ushort, string>) ((ws, code, message) =>
+    {
+      this.isConnect = false;
+      if (this.OnClosed == null)
+        return;
+      this.OnClosed();
+    });
+    this.sock.OnError += (Action<BestHTTP.WebSocket.WebSocket, Exception>) ((ws, ex) =>
+    {
+      if (this.OnError == null)
+        return;
+      this.OnError();
+    });
+    this.sock.OnPong += (Action<BestHTTP.WebSocket.WebSocket, byte[]>) ((ws, data) =>
+    {
+      if (this.OnPong != null)
+        this.OnPong((DateTime.Now - this.lastPacketReceivedTime).TotalMilliseconds - 1000.0);
+      this.lastPacketReceivedTime = DateTime.Now;
+    });
+    this.sock.StartPingThread = true;
+    this.sock.PingFrequency = 1000;
+    this.sock.Open();
+  }
 
-	public event Action OnClosed;
+  public void Close(ushort code = 1000, string msg = "Bye!")
+  {
+    if (this.sock == null)
+      return;
+    this.sock.Close(code, msg);
+  }
 
-	public event Action OnError;
-
-	public event Action<double> OnPong;
-
-	public PingWebSocket()
-		: this()
-	{
-	}
-
-	public void Connect(string relayServer)
-	{
-		sock = new WebSocket(new Uri(relayServer));
-		WebSocket webSocket = sock;
-		webSocket.OnOpen = (Action<WebSocket>)Delegate.Combine(webSocket.OnOpen, (Action<WebSocket>)delegate
-		{
-			lastPacketReceivedTime = DateTime.Now;
-			isConnect = true;
-			if (this.OnOpen != null)
-			{
-				this.OnOpen();
-			}
-		});
-		WebSocket webSocket2 = sock;
-		webSocket2.OnClosed = (Action<WebSocket, ushort, string>)Delegate.Combine(webSocket2.OnClosed, (Action<WebSocket, ushort, string>)delegate
-		{
-			isConnect = false;
-			if (this.OnClosed != null)
-			{
-				this.OnClosed();
-			}
-		});
-		WebSocket webSocket3 = sock;
-		webSocket3.OnError = (Action<WebSocket, Exception>)Delegate.Combine(webSocket3.OnError, (Action<WebSocket, Exception>)delegate
-		{
-			if (this.OnError != null)
-			{
-				this.OnError();
-			}
-		});
-		WebSocket webSocket4 = sock;
-		webSocket4.OnPong = (Action<WebSocket, byte[]>)Delegate.Combine(webSocket4.OnPong, (Action<WebSocket, byte[]>)delegate
-		{
-			if (this.OnPong != null)
-			{
-				this.OnPong((DateTime.Now - lastPacketReceivedTime).TotalMilliseconds - 1000.0);
-			}
-			lastPacketReceivedTime = DateTime.Now;
-		});
-		sock.StartPingThread = true;
-		sock.PingFrequency = 1000;
-		sock.Open();
-	}
-
-	public void Close(ushort code = 1000, string msg = "Bye!")
-	{
-		if (sock != null)
-		{
-			sock.Close(code, msg);
-		}
-	}
-
-	public bool IsConnected()
-	{
-		return isConnect;
-	}
+  public bool IsConnected() => this.isConnect;
 }

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list
   xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:left="3.0dip" android:top="3.0dip">
+    <item android:left="3.0dp" android:top="3.0dp">
         <shape android:shape="rectangle">
-            <corners android:radius="4.0dip" />
+            <corners android:radius="4.0dp" />
             <solid android:color="#c0202020" />
         </shape>
     </item>
-    <item android:right="3.0dip" android:bottom="3.0dip">
+    <item android:right="3.0dp" android:bottom="3.0dp">
         <shape android:shape="rectangle">
-            <corners android:radius="4.0dip" />
-            <stroke android:width="2.0dip" android:color="#ff202020" />
-            <gradient android:startColor="#fff5f4f2" android:endColor="#ffc0bdb7" android:angle="270.0" android:type="linear" />
-            <padding android:left="16.0dip" android:top="8.0dip" android:right="16.0dip" android:bottom="8.0dip" />
+            <corners android:radius="4.0dp" />
+            <stroke android:width="2.0dp" android:color="#202020" />
+            <gradient android:startColor="#f5f4f2" android:endColor="#c0bdb7" android:angle="270.0" android:type="linear" />
+            <padding android:left="16.0dp" android:top="8.0dp" android:right="16.0dp" android:bottom="8.0dp" />
         </shape>
     </item>
 </layer-list>

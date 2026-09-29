@@ -1,124 +1,83 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: OnePF.Inventory
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace OnePF
+#nullable disable
+namespace OnePF;
+
+public class Inventory
 {
-	public class Inventory
-	{
-		private Dictionary<string, SkuDetails> _skuMap = new Dictionary<string, SkuDetails>();
+  private Dictionary<string, SkuDetails> _skuMap = new Dictionary<string, SkuDetails>();
+  private Dictionary<string, Purchase> _purchaseMap = new Dictionary<string, Purchase>();
 
-		private Dictionary<string, Purchase> _purchaseMap = new Dictionary<string, Purchase>();
+  public Inventory(string json)
+  {
+    JSON json1 = new JSON(json);
+    foreach (List<object> objectList in (List<object>) json1.fields["purchaseMap"])
+      this._purchaseMap.Add(objectList[0].ToString(), new Purchase(objectList[1].ToString()));
+    foreach (List<object> objectList in (List<object>) json1.fields["skuMap"])
+      this._skuMap.Add(objectList[0].ToString(), new SkuDetails(objectList[1].ToString()));
+  }
 
-		public Inventory(string json)
-		{
-			JSON jSON = new JSON(json);
-			foreach (object item in (List<object>)jSON.fields["purchaseMap"])
-			{
-				List<object> list = (List<object>)item;
-				string key = list[0].ToString();
-				Purchase value = new Purchase(list[1].ToString());
-				_purchaseMap.Add(key, value);
-			}
-			foreach (object item2 in (List<object>)jSON.fields["skuMap"])
-			{
-				List<object> list2 = (List<object>)item2;
-				string key2 = list2[0].ToString();
-				SkuDetails value2 = new SkuDetails(list2[1].ToString());
-				_skuMap.Add(key2, value2);
-			}
-		}
+  public override string ToString()
+  {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.Append("{purchaseMap:{");
+    foreach (KeyValuePair<string, Purchase> purchase in this._purchaseMap)
+      stringBuilder.Append($"\"{purchase.Key}\":{{{purchase.Value.ToString()}}},");
+    stringBuilder.Append("},");
+    stringBuilder.Append("skuMap:{");
+    foreach (KeyValuePair<string, SkuDetails> sku in this._skuMap)
+      stringBuilder.Append($"\"{sku.Key}\":{{{sku.Value.ToString()}}},");
+    stringBuilder.Append("}}");
+    return stringBuilder.ToString();
+  }
 
-		public override string ToString()
-		{
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.Append("{purchaseMap:{");
-			foreach (KeyValuePair<string, Purchase> item in _purchaseMap)
-			{
-				stringBuilder.Append("\"" + item.Key + "\":{" + item.Value.ToString() + "},");
-			}
-			stringBuilder.Append("},");
-			stringBuilder.Append("skuMap:{");
-			foreach (KeyValuePair<string, SkuDetails> item2 in _skuMap)
-			{
-				stringBuilder.Append("\"" + item2.Key + "\":{" + item2.Value.ToString() + "},");
-			}
-			stringBuilder.Append("}}");
-			return stringBuilder.ToString();
-		}
+  public SkuDetails GetSkuDetails(string sku)
+  {
+    return !this._skuMap.ContainsKey(sku) ? (SkuDetails) null : this._skuMap[sku];
+  }
 
-		public SkuDetails GetSkuDetails(string sku)
-		{
-			if (!_skuMap.ContainsKey(sku))
-			{
-				return null;
-			}
-			return _skuMap[sku];
-		}
+  public Purchase GetPurchase(string sku)
+  {
+    return !this._purchaseMap.ContainsKey(sku) ? (Purchase) null : this._purchaseMap[sku];
+  }
 
-		public Purchase GetPurchase(string sku)
-		{
-			if (!_purchaseMap.ContainsKey(sku))
-			{
-				return null;
-			}
-			return _purchaseMap[sku];
-		}
+  public bool HasPurchase(string sku) => this._purchaseMap.ContainsKey(sku);
 
-		public bool HasPurchase(string sku)
-		{
-			return _purchaseMap.ContainsKey(sku);
-		}
+  public bool HasDetails(string sku) => this._skuMap.ContainsKey(sku);
 
-		public bool HasDetails(string sku)
-		{
-			return _skuMap.ContainsKey(sku);
-		}
+  public void ErasePurchase(string sku)
+  {
+    if (!this._purchaseMap.ContainsKey(sku))
+      return;
+    this._purchaseMap.Remove(sku);
+  }
 
-		public void ErasePurchase(string sku)
-		{
-			if (_purchaseMap.ContainsKey(sku))
-			{
-				_purchaseMap.Remove(sku);
-			}
-		}
+  public List<string> GetAllOwnedSkus() => this._purchaseMap.Keys.ToList<string>();
 
-		public List<string> GetAllOwnedSkus()
-		{
-			return _purchaseMap.Keys.ToList();
-		}
+  public List<string> GetAllOwnedSkus(string itemType)
+  {
+    List<string> allOwnedSkus = new List<string>();
+    foreach (Purchase purchase in this._purchaseMap.Values)
+    {
+      if (purchase.ItemType == itemType)
+        allOwnedSkus.Add(purchase.Sku);
+    }
+    return allOwnedSkus;
+  }
 
-		public List<string> GetAllOwnedSkus(string itemType)
-		{
-			List<string> list = new List<string>();
-			foreach (Purchase value in _purchaseMap.Values)
-			{
-				if (value.ItemType == itemType)
-				{
-					list.Add(value.Sku);
-				}
-			}
-			return list;
-		}
+  public List<Purchase> GetAllPurchases() => this._purchaseMap.Values.ToList<Purchase>();
 
-		public List<Purchase> GetAllPurchases()
-		{
-			return _purchaseMap.Values.ToList();
-		}
+  public List<SkuDetails> GetAllAvailableSkus() => this._skuMap.Values.ToList<SkuDetails>();
 
-		public List<SkuDetails> GetAllAvailableSkus()
-		{
-			return _skuMap.Values.ToList();
-		}
+  public void AddSkuDetails(SkuDetails d) => this._skuMap.Add(d.Sku, d);
 
-		public void AddSkuDetails(SkuDetails d)
-		{
-			_skuMap.Add(d.Sku, d);
-		}
-
-		public void AddPurchase(Purchase p)
-		{
-			_purchaseMap.Add(p.Sku, p);
-		}
-	}
+  public void AddPurchase(Purchase p) => this._purchaseMap.Add(p.Sku, p);
 }

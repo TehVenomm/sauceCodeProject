@@ -1,125 +1,102 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIDropAnnounceItem
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using UnityEngine;
 
-public class UIDropAnnounceItem
+#nullable disable
+public class UIDropAnnounceItem : MonoBehaviour
 {
-	[SerializeField]
-	protected UILabel itemName;
+  [SerializeField]
+  protected UILabel itemName;
+  [SerializeField]
+  protected UITweener[] animStart;
+  [SerializeField]
+  protected UITweener[] animEnd;
+  private Transform _transform;
+  private Vector3Interpolator anim = new Vector3Interpolator();
+  private bool isStop;
+  protected Action<UIDropAnnounceItem> onEndCallback;
 
-	[SerializeField]
-	protected UITweener[] animStart;
+  protected void Awake()
+  {
+    int index1 = 0;
+    for (int length = this.animStart.Length; index1 < length; ++index1)
+    {
+      ((Behaviour) this.animStart[index1]).enabled = false;
+      this.animStart[index1].Sample(1f, true);
+    }
+    int index2 = 0;
+    for (int length = this.animEnd.Length; index2 < length; ++index2)
+      ((Behaviour) this.animEnd[index2]).enabled = false;
+    this._transform = ((Component) this).transform;
+  }
 
-	[SerializeField]
-	protected UITweener[] animEnd;
+  public void StartAnnounce(
+    string text,
+    Color color,
+    bool stop,
+    Action<UIDropAnnounceItem> end_callback)
+  {
+    if (!((Component) this).gameObject.activeSelf)
+      ((Component) this).gameObject.SetActive(true);
+    this.itemName.text = text;
+    this.itemName.color = color;
+    this.onEndCallback = end_callback;
+    this.isStop = stop;
+    int index = 0;
+    for (int length = this.animStart.Length; index < length; ++index)
+    {
+      this.animStart[index].ResetToBeginning();
+      this.animStart[index].PlayForward();
+    }
+    this.StartCoroutine(this.Direction());
+  }
 
-	private Transform _transform;
+  protected IEnumerator Direction()
+  {
+    int i = 0;
+    int n;
+    for (n = this.animStart.Length; i < n; ++i)
+    {
+      while (((Behaviour) this.animStart[i]).enabled)
+        yield return (object) null;
+    }
+    while (this.isStop)
+      yield return (object) null;
+    yield return (object) new WaitForSeconds(0.3f);
+    if (this.onEndCallback != null)
+      this.onEndCallback(this);
+    int index = 0;
+    for (int length = this.animEnd.Length; index < length; ++index)
+    {
+      this.animEnd[index].ResetToBeginning();
+      this.animEnd[index].PlayForward();
+    }
+    n = 0;
+    for (i = this.animEnd.Length; n < i; ++n)
+    {
+      while (((Behaviour) this.animEnd[n]).enabled)
+        yield return (object) null;
+    }
+    ((Component) this).gameObject.SetActive(false);
+  }
 
-	private Vector3Interpolator anim = new Vector3Interpolator();
+  public void MovePos(bool stop, Vector3 pos, float time)
+  {
+    this.anim.Set(time, this._transform.localPosition, pos, (AnimationCurve) null, new Vector3(), (AnimationCurve) null);
+    this.anim.Play();
+    this.isStop = stop;
+  }
 
-	private bool isStop;
-
-	protected Action<UIDropAnnounceItem> onEndCallback;
-
-	public UIDropAnnounceItem()
-		: this()
-	{
-	}
-
-	protected void Awake()
-	{
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Expected O, but got Unknown
-		int i = 0;
-		for (int num = animStart.Length; i < num; i++)
-		{
-			animStart[i].set_enabled(false);
-			animStart[i].Sample(1f, true);
-		}
-		int j = 0;
-		for (int num2 = animEnd.Length; j < num2; j++)
-		{
-			animEnd[j].set_enabled(false);
-		}
-		_transform = this.get_transform();
-	}
-
-	public void StartAnnounce(string text, Color color, bool stop, Action<UIDropAnnounceItem> end_callback)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		if (!this.get_gameObject().get_activeSelf())
-		{
-			this.get_gameObject().SetActive(true);
-		}
-		itemName.text = text;
-		itemName.color = color;
-		onEndCallback = end_callback;
-		isStop = stop;
-		int i = 0;
-		for (int num = animStart.Length; i < num; i++)
-		{
-			animStart[i].ResetToBeginning();
-			animStart[i].PlayForward();
-		}
-		this.StartCoroutine(Direction());
-	}
-
-	protected IEnumerator Direction()
-	{
-		int n = 0;
-		for (int m = animStart.Length; n < m; n++)
-		{
-			while (animStart[n].get_enabled())
-			{
-				yield return (object)null;
-			}
-		}
-		while (isStop)
-		{
-			yield return (object)null;
-		}
-		yield return (object)new WaitForSeconds(0.3f);
-		if (onEndCallback != null)
-		{
-			onEndCallback(this);
-		}
-		int l = 0;
-		for (int k = animEnd.Length; l < k; l++)
-		{
-			animEnd[l].ResetToBeginning();
-			animEnd[l].PlayForward();
-		}
-		int j = 0;
-		for (int i = animEnd.Length; j < i; j++)
-		{
-			while (animEnd[j].get_enabled())
-			{
-				yield return (object)null;
-			}
-		}
-		this.get_gameObject().SetActive(false);
-	}
-
-	public void MovePos(bool stop, Vector3 pos, float time)
-	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		anim.Set(time, _transform.get_localPosition(), pos, null, default(Vector3), null);
-		anim.Play();
-		isStop = stop;
-	}
-
-	private void LateUpdate()
-	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		if (anim.IsPlaying())
-		{
-			_transform.set_localPosition(anim.Update());
-		}
-	}
+  private void LateUpdate()
+  {
+    if (!this.anim.IsPlaying())
+      return;
+    this._transform.localPosition = this.anim.Update();
+  }
 }

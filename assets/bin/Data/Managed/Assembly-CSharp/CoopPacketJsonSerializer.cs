@@ -1,113 +1,104 @@
-using System;
-using System.Collections.Generic;
+﻿// Decompiled with JetBrains decompiler
+// Type: CoopPacketJsonSerializer
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Globalization;
 
+#nullable disable
 public class CoopPacketJsonSerializer : CoopPacketSerializer
 {
-	public string version = "10";
+  public string version = "10";
 
-	public string ConvertUserToken(int client_id, int user_token_len)
-	{
-		string empty = string.Empty;
-		switch (client_id)
-		{
-		case -1000:
-			return string.Empty;
-		case -2000:
-			return " ";
-		default:
-			return client_id.ToString().PadLeft(user_token_len);
-		}
-	}
+  public string ConvertUserToken(int client_id, int user_token_len)
+  {
+    string str;
+    switch (client_id)
+    {
+      case -2000:
+        str = " ";
+        break;
+      case -1000:
+        str = "";
+        break;
+      default:
+        str = client_id.ToString().PadLeft(user_token_len);
+        break;
+    }
+    return str;
+  }
 
-	public int ConvertClientId(string user_token)
-	{
-		int num = 0;
-		if (user_token != null)
-		{
-			if (_003C_003Ef__switch_0024mapE == null)
-			{
-				Dictionary<string, int> dictionary = new Dictionary<string, int>(2);
-				dictionary.Add(string.Empty, 0);
-				dictionary.Add(" ", 1);
-				_003C_003Ef__switch_0024mapE = dictionary;
-			}
-			if (_003C_003Ef__switch_0024mapE.TryGetValue(user_token, out int value))
-			{
-				switch (value)
-				{
-				case 0:
-					return -1000;
-				case 1:
-					return -2000;
-				}
-			}
-		}
-		return int.Parse(user_token);
-	}
+  public int ConvertClientId(string user_token)
+  {
+    int num;
+    switch (user_token)
+    {
+      case "":
+        num = -1000;
+        break;
+      case " ":
+        num = -2000;
+        break;
+      default:
+        num = int.Parse(user_token);
+        break;
+    }
+    return num;
+  }
 
-	public override PacketStream Serialize(CoopPacket packet)
-	{
-		return SerializeString(packet);
-	}
+  public override PacketStream Serialize(CoopPacket packet) => this.SerializeString(packet);
 
-	protected override void OnSerializeStringPrefix(PacketStringStream stream)
-	{
-		version = "10";
-		stream.Write(version);
-	}
+  protected override void OnSerializeStringPrefix(PacketStringStream stream)
+  {
+    this.version = "10";
+    stream.Write(this.version);
+  }
 
-	protected override void OnSerializeStringHeader(PacketStringStream stream, CoopPacketHeader header)
-	{
-		int user_token_len = (!(version == "00")) ? 1 : 11;
-		string empty = string.Empty;
-		empty += ConvertUserToken(header.from, user_token_len);
-		empty += ConvertUserToken(header.to, user_token_len);
-		empty += ((!header.promise) ? "0" : "1");
-		empty += header.sequenceNo.ToString().PadLeft(16);
-		string str = empty.Length.ToString("X4");
-		stream.Write(str);
-		stream.Write(empty);
-	}
+  protected override void OnSerializeStringHeader(
+    PacketStringStream stream,
+    CoopPacketHeader header)
+  {
+    int user_token_len = this.version == "00" ? 11 : 1;
+    string str1 = "" + this.ConvertUserToken(header.from, user_token_len) + this.ConvertUserToken(header.to, user_token_len) + (header.promise ? "1" : "0") + header.sequenceNo.ToString().PadLeft(16 /*0x10*/);
+    string str2 = str1.Length.ToString("X4");
+    stream.Write(str2);
+    stream.Write(str1);
+  }
 
-	protected override void OnSerializeStringModel(PacketStringStream stream, Coop_Model_Base model)
-	{
-		Type modelType = ((PACKET_TYPE)model.c).GetModelType();
-		string str = JSONSerializer.Serialize(model, modelType);
-		stream.Write(str);
-	}
+  protected override void OnSerializeStringModel(PacketStringStream stream, Coop_Model_Base model)
+  {
+    System.Type modelType = ((PACKET_TYPE) model.c).GetModelType();
+    string str = JSONSerializer.Serialize((object) model, modelType);
+    stream.Write(str);
+  }
 
-	protected override void OnDeserializeStringPrefix(PacketStringStream stream)
-	{
-		version = stream.Read("10".Length);
-	}
+  protected override void OnDeserializeStringPrefix(PacketStringStream stream)
+  {
+    this.version = stream.Read("10".Length);
+  }
 
-	protected override CoopPacketHeader OnDeserializeStringHeader(PacketStringStream stream)
-	{
-		string text = stream.Read(4);
-		int len = (!(version == "00")) ? 1 : 11;
-		int position = stream.Position;
-		string user_token = stream.Read(len);
-		string user_token2 = stream.Read(len);
-		string a = stream.Read(1);
-		string s = stream.Read(16);
-		int num = stream.Position - position;
-		if (num.ToString("X4") != text)
-		{
-			Log.Error(LOG.WEBSOCK, "break header packet! {0} != {1}", num, int.Parse(text, NumberStyles.HexNumber));
-		}
-		int from = ConvertClientId(user_token);
-		int to = ConvertClientId(user_token2);
-		bool promise = a == "1";
-		int sequence_no = int.Parse(s);
-		return new CoopPacketHeader(0, from, to, promise, sequence_no);
-	}
+  protected override CoopPacketHeader OnDeserializeStringHeader(PacketStringStream stream)
+  {
+    string s1 = stream.Read(4);
+    int len = this.version == "00" ? 11 : 1;
+    int position = stream.Position;
+    string user_token1 = stream.Read(len);
+    string user_token2 = stream.Read(len);
+    string str = stream.Read(1);
+    string s2 = stream.Read(16 /*0x10*/);
+    int num = stream.Position - position;
+    if (num.ToString("X4") != s1)
+      Log.Error(LOG.WEBSOCK, "break header packet! {0} != {1}", (object) num, (object) int.Parse(s1, NumberStyles.HexNumber));
+    return new CoopPacketHeader(0, this.ConvertClientId(user_token1), this.ConvertClientId(user_token2), str == "1", int.Parse(s2));
+  }
 
-	protected override Coop_Model_Base OnDeserializeStringModel(PacketStringStream stream, Type type, CoopPacketHeader header)
-	{
-		string message = stream.Read();
-		Coop_Model_Base coop_Model_Base = JSONSerializer.Deserialize<Coop_Model_Base>(message);
-		Type modelType = ((PACKET_TYPE)coop_Model_Base.c).GetModelType();
-		return JSONSerializer.Deserialize<Coop_Model_Base>(message, modelType);
-	}
+  protected override Coop_Model_Base OnDeserializeStringModel(
+    PacketStringStream stream,
+    System.Type type,
+    CoopPacketHeader header)
+  {
+    string message = stream.Read();
+    return JSONSerializer.Deserialize<Coop_Model_Base>(message, ((PACKET_TYPE) JSONSerializer.Deserialize<Coop_Model_Base>(message).c).GetModelType());
+  }
 }

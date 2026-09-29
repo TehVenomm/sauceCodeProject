@@ -1,194 +1,145 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIKeyBinding
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Interaction/Key Binding")]
-public class UIKeyBinding
+public class UIKeyBinding : MonoBehaviour
 {
-	public enum Action
-	{
-		PressAndClick,
-		Select,
-		All
-	}
+  private static List<UIKeyBinding> mList = new List<UIKeyBinding>();
+  public KeyCode keyCode;
+  public UIKeyBinding.Modifier modifier;
+  public UIKeyBinding.Action action;
+  [NonSerialized]
+  private bool mIgnoreUp;
+  [NonSerialized]
+  private bool mIsInput;
+  [NonSerialized]
+  private bool mPress;
 
-	public enum Modifier
-	{
-		Any,
-		Shift,
-		Control,
-		Alt,
-		None
-	}
+  public static bool IsBound(KeyCode key)
+  {
+    int index = 0;
+    for (int count = UIKeyBinding.mList.Count; index < count; ++index)
+    {
+      UIKeyBinding m = UIKeyBinding.mList[index];
+      if (Object.op_Inequality((Object) m, (Object) null) && m.keyCode == key)
+        return true;
+    }
+    return false;
+  }
 
-	private static List<UIKeyBinding> mList = new List<UIKeyBinding>();
+  protected virtual void OnEnable() => UIKeyBinding.mList.Add(this);
 
-	public KeyCode keyCode;
+  protected virtual void OnDisable() => UIKeyBinding.mList.Remove(this);
 
-	public Modifier modifier;
+  protected virtual void Start()
+  {
+    UIInput component = ((Component) this).GetComponent<UIInput>();
+    this.mIsInput = Object.op_Inequality((Object) component, (Object) null);
+    if (!Object.op_Inequality((Object) component, (Object) null))
+      return;
+    EventDelegate.Add(component.onSubmit, new EventDelegate.Callback(this.OnSubmit));
+  }
 
-	public Action action;
+  protected virtual void OnSubmit()
+  {
+    if (UICamera.currentKey != this.keyCode || !this.IsModifierActive())
+      return;
+    this.mIgnoreUp = true;
+  }
 
-	[NonSerialized]
-	private bool mIgnoreUp;
+  protected virtual bool IsModifierActive()
+  {
+    if (this.modifier == UIKeyBinding.Modifier.Any)
+      return true;
+    if (this.modifier == UIKeyBinding.Modifier.Alt)
+    {
+      if (UICamera.GetKey((KeyCode) 308) || UICamera.GetKey((KeyCode) 307))
+        return true;
+    }
+    else if (this.modifier == UIKeyBinding.Modifier.Control)
+    {
+      if (UICamera.GetKey((KeyCode) 306) || UICamera.GetKey((KeyCode) 305))
+        return true;
+    }
+    else if (this.modifier == UIKeyBinding.Modifier.Shift)
+    {
+      if (UICamera.GetKey((KeyCode) 304) || UICamera.GetKey((KeyCode) 303))
+        return true;
+    }
+    else if (this.modifier == UIKeyBinding.Modifier.None && !UICamera.GetKey((KeyCode) 308) && !UICamera.GetKey((KeyCode) 307) && !UICamera.GetKey((KeyCode) 306) && !UICamera.GetKey((KeyCode) 305) && !UICamera.GetKey((KeyCode) 304))
+      return !UICamera.GetKey((KeyCode) 303);
+    return false;
+  }
 
-	[NonSerialized]
-	private bool mIsInput;
+  protected virtual void Update()
+  {
+    if (UICamera.inputHasFocus || this.keyCode == null || !this.IsModifierActive())
+      return;
+    bool flag1 = UICamera.GetKeyDown(this.keyCode);
+    bool flag2 = UICamera.GetKeyUp(this.keyCode);
+    if (flag1)
+      this.mPress = true;
+    if (this.action == UIKeyBinding.Action.PressAndClick || this.action == UIKeyBinding.Action.All)
+    {
+      if (flag1)
+      {
+        UICamera.currentKey = this.keyCode;
+        this.OnBindingPress(true);
+      }
+      if (this.mPress & flag2)
+      {
+        UICamera.currentKey = this.keyCode;
+        this.OnBindingPress(false);
+        this.OnBindingClick();
+      }
+    }
+    if ((this.action == UIKeyBinding.Action.Select || this.action == UIKeyBinding.Action.All) && flag2)
+    {
+      if (this.mIsInput)
+      {
+        if (!this.mIgnoreUp && !UICamera.inputHasFocus && this.mPress)
+          UICamera.selectedObject = ((Component) this).gameObject;
+        this.mIgnoreUp = false;
+      }
+      else if (this.mPress)
+        UICamera.hoveredObject = ((Component) this).gameObject;
+    }
+    if (!flag2)
+      return;
+    this.mPress = false;
+  }
 
-	[NonSerialized]
-	private bool mPress;
+  protected virtual void OnBindingPress(bool pressed)
+  {
+    UICamera.Notify(((Component) this).gameObject, "OnPress", (object) pressed);
+  }
 
-	public UIKeyBinding()
-		: this()
-	{
-	}
+  protected virtual void OnBindingClick()
+  {
+    UICamera.Notify(((Component) this).gameObject, "OnClick", (object) null);
+  }
 
-	public static bool IsBound(KeyCode key)
-	{
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		int i = 0;
-		for (int count = mList.Count; i < count; i++)
-		{
-			UIKeyBinding uIKeyBinding = mList[i];
-			if (uIKeyBinding != null && uIKeyBinding.keyCode == key)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+  public enum Action
+  {
+    PressAndClick,
+    Select,
+    All,
+  }
 
-	protected virtual void OnEnable()
-	{
-		mList.Add(this);
-	}
-
-	protected virtual void OnDisable()
-	{
-		mList.Remove(this);
-	}
-
-	protected virtual void Start()
-	{
-		UIInput component = this.GetComponent<UIInput>();
-		mIsInput = (component != null);
-		if (component != null)
-		{
-			EventDelegate.Add(component.onSubmit, OnSubmit);
-		}
-	}
-
-	protected virtual void OnSubmit()
-	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		if (UICamera.currentKey == keyCode && IsModifierActive())
-		{
-			mIgnoreUp = true;
-		}
-	}
-
-	protected virtual bool IsModifierActive()
-	{
-		if (modifier == Modifier.Any)
-		{
-			return true;
-		}
-		if (modifier == Modifier.Alt)
-		{
-			if (UICamera.GetKey(308) || UICamera.GetKey(307))
-			{
-				return true;
-			}
-		}
-		else if (modifier == Modifier.Control)
-		{
-			if (UICamera.GetKey(306) || UICamera.GetKey(305))
-			{
-				return true;
-			}
-		}
-		else if (modifier == Modifier.Shift)
-		{
-			if (UICamera.GetKey(304) || UICamera.GetKey(303))
-			{
-				return true;
-			}
-		}
-		else if (modifier == Modifier.None)
-		{
-			return !UICamera.GetKey(308) && !UICamera.GetKey(307) && !UICamera.GetKey(306) && !UICamera.GetKey(305) && !UICamera.GetKey(304) && !UICamera.GetKey(303);
-		}
-		return false;
-	}
-
-	protected virtual void Update()
-	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f8: Expected O, but got Unknown
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Expected O, but got Unknown
-		if (!UICamera.inputHasFocus && (int)keyCode != 0 && IsModifierActive())
-		{
-			bool flag = UICamera.GetKeyDown(keyCode);
-			bool flag2 = UICamera.GetKeyUp(keyCode);
-			if (flag)
-			{
-				mPress = true;
-			}
-			if (action == Action.PressAndClick || action == Action.All)
-			{
-				if (flag)
-				{
-					UICamera.currentKey = keyCode;
-					OnBindingPress(true);
-				}
-				if (mPress && flag2)
-				{
-					UICamera.currentKey = keyCode;
-					OnBindingPress(false);
-					OnBindingClick();
-				}
-			}
-			if ((action == Action.Select || action == Action.All) && flag2)
-			{
-				if (mIsInput)
-				{
-					if (!mIgnoreUp && !UICamera.inputHasFocus && mPress)
-					{
-						UICamera.selectedObject = this.get_gameObject();
-					}
-					mIgnoreUp = false;
-				}
-				else if (mPress)
-				{
-					UICamera.hoveredObject = this.get_gameObject();
-				}
-			}
-			if (flag2)
-			{
-				mPress = false;
-			}
-		}
-	}
-
-	protected virtual void OnBindingPress(bool pressed)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
-		UICamera.Notify(this.get_gameObject(), "OnPress", pressed);
-	}
-
-	protected virtual void OnBindingClick()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Expected O, but got Unknown
-		UICamera.Notify(this.get_gameObject(), "OnClick", null);
-	}
+  public enum Modifier
+  {
+    Any,
+    Shift,
+    Control,
+    Alt,
+    None,
+  }
 }

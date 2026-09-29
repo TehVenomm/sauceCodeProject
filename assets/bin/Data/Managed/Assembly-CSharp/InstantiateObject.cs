@@ -1,33 +1,25 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: InstantiateObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class InstantiateObject
+#nullable disable
+public class InstantiateObject : MonoBehaviour
 {
-	public GameObject prefab;
+  public GameObject prefab;
 
-	public InstantiateObject()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Expected O, but got Unknown
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Expected O, but got Unknown
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		if (prefab != null)
-		{
-			Transform val = this.get_transform();
-			Transform val2 = ResourceUtility.Realizes(prefab, val.get_parent(), this.get_gameObject().get_layer());
-			val2.set_localPosition(val.get_localPosition());
-			val2.set_localRotation(val.get_localRotation());
-			val2.set_localScale(val.get_localScale());
-			Object.DestroyImmediate(this.get_gameObject());
-		}
-	}
+  private void Awake()
+  {
+    if (!Object.op_Inequality((Object) this.prefab, (Object) null))
+      return;
+    Transform transform1 = ((Component) this).transform;
+    Transform transform2 = ResourceUtility.Realizes((Object) this.prefab, transform1.parent, ((Component) this).gameObject.layer);
+    transform2.localPosition = transform1.localPosition;
+    transform2.localRotation = transform1.localRotation;
+    transform2.localScale = transform1.localScale;
+    Object.DestroyImmediate((Object) ((Component) this).gameObject);
+  }
 }

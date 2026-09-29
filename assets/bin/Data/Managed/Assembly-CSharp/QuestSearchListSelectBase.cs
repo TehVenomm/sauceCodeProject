@@ -1,175 +1,171 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestSearchListSelectBase
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public abstract class QuestSearchListSelectBase : GameSection
 {
-	protected enum UI
-	{
-		GRD_QUEST,
-		LBL_HOST_NAME,
-		LBL_HOST_LV,
-		TGL_MEMBER_1,
-		TGL_MEMBER_2,
-		TGL_MEMBER_3,
-		LBL_LV,
-		TEX_NPCMODEL,
-		LBL_NPC_MESSAGE
-	}
+  protected QuestSearchListSelectBase.UI[] ui = new QuestSearchListSelectBase.UI[3]
+  {
+    QuestSearchListSelectBase.UI.TGL_MEMBER_1,
+    QuestSearchListSelectBase.UI.TGL_MEMBER_2,
+    QuestSearchListSelectBase.UI.TGL_MEMBER_3
+  };
+  protected bool recommentUpdate;
 
-	protected UI[] ui = new UI[3]
-	{
-		UI.TGL_MEMBER_1,
-		UI.TGL_MEMBER_2,
-		UI.TGL_MEMBER_3
-	};
+  protected abstract void SendSearchRequest(System.Action onFinish, Action<bool> cb);
 
-	protected bool recommentUpdate;
+  protected abstract void ResetSearchRequest();
 
-	protected abstract void SendSearchRequest(Action onFinish, Action<bool> cb);
+  protected abstract void SetQuestData(QuestTable.QuestTableData questData, Transform t);
 
-	protected abstract void ResetSearchRequest();
+  protected void CloseSearchRoomCondition() => this.recommentUpdate = true;
 
-	protected abstract void SetQuestData(QuestTable.QuestTableData questData, Transform t);
+  public override void Initialize() => this.StartCoroutine(this.DoInitialize());
 
-	protected void CloseSearchRoomCondition()
-	{
-		recommentUpdate = true;
-	}
+  private IEnumerator DoInitialize()
+  {
+    this.ResetSearchRequest();
+    bool is_recv = false;
+    this.SendGetChallengeInfo((System.Action) (() => is_recv = true), (Action<bool>) null);
+    while (!is_recv)
+      yield return (object) null;
+    yield return (object) this.StartCoroutine(this.Reload());
+    base.Initialize();
+  }
 
-	public override void Initialize()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoInitialize());
-	}
+  private IEnumerator Reload(Action<bool> cb = null)
+  {
+    bool is_recv = false;
+    this.SendSearchRequest((System.Action) (() => is_recv = true), cb);
+    while (!is_recv)
+      yield return (object) null;
+    this.SetDirty((Enum) QuestSearchListSelectBase.UI.GRD_QUEST);
+    this.RefreshUI();
+  }
 
-	private IEnumerator DoInitialize()
-	{
-		ResetSearchRequest();
-		bool is_recv = false;
-		SendGetChallengeInfo(delegate
-		{
-			((_003CDoInitialize_003Ec__IteratorB3)/*Error near IL_003d: stateMachine*/)._003Cis_recv_003E__0 = true;
-		}, null);
-		while (!is_recv)
-		{
-			yield return (object)null;
-		}
-		yield return (object)this.StartCoroutine(Reload(null));
-		base.Initialize();
-	}
+  protected void SetNpcMessage()
+  {
+    string messageBySectionData = Singleton<NPCMessageTable>.I.GetNPCMessageBySectionData(this.sectionData);
+    this.SetRenderNPCModel((Enum) QuestSearchListSelectBase.UI.TEX_NPCMODEL, 2, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCRot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCFOV);
+    this.SetLabelText((Enum) QuestSearchListSelectBase.UI.LBL_NPC_MESSAGE, messageBySectionData);
+  }
 
-	private IEnumerator Reload(Action<bool> cb = null)
-	{
-		bool is_recv = false;
-		SendSearchRequest(delegate
-		{
-			((_003CReload_003Ec__IteratorB4)/*Error near IL_002e: stateMachine*/)._003Cis_recv_003E__0 = true;
-		}, cb);
-		while (!is_recv)
-		{
-			yield return (object)null;
-		}
-		SetDirty(UI.GRD_QUEST);
-		RefreshUI();
-	}
+  protected void SetPartyData(PartyModel.Party party, Transform t)
+  {
+    int member_num = 0;
+    party.slotInfos.ForEach((Action<PartyModel.SlotInfo>) (data =>
+    {
+      if (data == null || data.userInfo == null)
+        return;
+      if (data.userInfo.userId == party.ownerUserId)
+      {
+        this.SetLabelText(t, (Enum) QuestSearchListSelectBase.UI.LBL_HOST_NAME, data.userInfo.name);
+        this.SetLabelText(t, (Enum) QuestSearchListSelectBase.UI.LBL_HOST_LV, data.userInfo.level.ToString());
+      }
+      else
+        ++member_num;
+    }));
+    for (int index = 0; index < 3; ++index)
+      this.SetToggle(t, (Enum) this.ui[index], index < member_num);
+    this.SetLabelText(t, (Enum) QuestSearchListSelectBase.UI.LBL_LV, this.sectionData.GetText("LV"));
+  }
 
-	protected void SetNpcMessage()
-	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		string nPCMessageBySectionData = Singleton<NPCMessageTable>.I.GetNPCMessageBySectionData(base.sectionData);
-		SetRenderNPCModel((Enum)UI.TEX_NPCMODEL, 2, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCPos, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCRot, MonoBehaviourSingleton<OutGameSettingsManager>.I.homeScene.orderCenterNPCFOV, (Action<NPCLoader>)null);
-		SetLabelText((Enum)UI.LBL_NPC_MESSAGE, nPCMessageBySectionData);
-	}
+  protected void SetStatusIconInfo(PartyModel.Party _partyParam, Transform _targetObject)
+  {
+    if (Object.op_Equality((Object) _targetObject, (Object) null) || _partyParam == null)
+      return;
+    QuestUserStatusIconController componentInChildren = ((Component) _targetObject).GetComponentInChildren<QuestUserStatusIconController>();
+    if (!Object.op_Inequality((Object) componentInChildren, (Object) null))
+      return;
+    componentInChildren.Initialize(new QuestUserStatusIconController.InitParam()
+    {
+      StatusBit = (uint) _partyParam.iconBit
+    });
+  }
 
-	protected void SetPartyData(PartyModel.Party party, Transform t)
-	{
-		int member_num = 0;
-		party.slotInfos.ForEach(delegate(PartyModel.SlotInfo data)
-		{
-			if (data != null && data.userInfo != null)
-			{
-				if (data.userInfo.userId == party.ownerUserId)
-				{
-					SetLabelText(t, UI.LBL_HOST_NAME, data.userInfo.name);
-					SetLabelText(t, UI.LBL_HOST_LV, data.userInfo.level.ToString());
-				}
-				else
-				{
-					member_num++;
-				}
-			}
-		});
-		for (int i = 0; i < 3; i++)
-		{
-			SetToggle(t, ui[i], i < member_num);
-		}
-		SetLabelText(t, UI.LBL_LV, base.sectionData.GetText("LV"));
-	}
+  public virtual void OnQuery_SELECT_ROOM()
+  {
+    int eventData = (int) GameSection.GetEventData();
+    if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog((uint) MonoBehaviourSingleton<PartyManager>.I.partys[eventData].quest.questId))
+    {
+      GameSection.StopEvent();
+    }
+    else
+    {
+      GameSection.SetEventData((object) new object[1]
+      {
+        (object) false
+      });
+      GameSection.StayEvent();
+      MonoBehaviourSingleton<PartyManager>.I.SendEntry(MonoBehaviourSingleton<PartyManager>.I.partys[eventData].id, false, (Action<bool>) (is_success => GameSection.ResumeEvent(is_success)));
+    }
+  }
 
-	public virtual void OnQuery_SELECT_ROOM()
-	{
-		int index = (int)GameSection.GetEventData();
-		if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog((uint)MonoBehaviourSingleton<PartyManager>.I.partys[index].quest.questId, true))
-		{
-			GameSection.StopEvent();
-		}
-		else
-		{
-			GameSection.SetEventData(new object[1]
-			{
-				false
-			});
-			GameSection.StayEvent();
-			MonoBehaviourSingleton<PartyManager>.I.SendEntry(MonoBehaviourSingleton<PartyManager>.I.partys[index].id, false, delegate(bool is_success)
-			{
-				GameSection.ResumeEvent(is_success, null);
-			});
-		}
-	}
+  public virtual void OnQuery_RELOAD()
+  {
+    GameSection.StayEvent();
+    this.StartCoroutine(this.Reload((Action<bool>) (b => GameSection.ResumeEvent(b))));
+  }
 
-	public virtual void OnQuery_RELOAD()
-	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		GameSection.StayEvent();
-		this.StartCoroutine(Reload(delegate(bool b)
-		{
-			GameSection.ResumeEvent(b, null);
-		}));
-	}
+  private void Update()
+  {
+    if (!this.recommentUpdate)
+      return;
+    this.recommentUpdate = false;
+    this.RefreshUI();
+  }
 
-	private void Update()
-	{
-		if (recommentUpdate)
-		{
-			recommentUpdate = false;
-			RefreshUI();
-		}
-	}
+  public void OnCloseDialog_QuestAcceptRoomInvalid()
+  {
+    this.StartCoroutine(this.Reload((Action<bool>) (b => GameSection.ResumeEvent(b))));
+  }
 
-	public void OnCloseDialog_QuestAcceptRoomInvalid()
-	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(Reload(delegate(bool b)
-		{
-			GameSection.ResumeEvent(b, null);
-		}));
-	}
+  protected void SendGetChallengeInfo(System.Action onFinish, Action<bool> cb)
+  {
+    MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo((Action<bool, Error>) ((is_success, err) =>
+    {
+      if (onFinish != null)
+        onFinish();
+      if (cb == null)
+        return;
+      cb(is_success);
+    }));
+  }
 
-	protected void SendGetChallengeInfo(Action onFinish, Action<bool> cb)
-	{
-		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(delegate(bool is_success, Error err)
-		{
-			if (onFinish != null)
-			{
-				onFinish();
-			}
-			if (cb != null)
-			{
-				cb(is_success);
-			}
-		});
-	}
+  protected void SetMemberIcon(Transform t, QuestTable.QuestTableData table)
+  {
+    if (table == null)
+      return;
+    this.SetActive(t, (Enum) QuestSearchListSelectBase.UI.TGL_MEMBER_3, true);
+    this.SetActive(t, (Enum) QuestSearchListSelectBase.UI.TGL_MEMBER_2, true);
+    this.SetActive(t, (Enum) QuestSearchListSelectBase.UI.TGL_MEMBER_1, true);
+    if (table.userNumLimit < 4)
+      this.SetActive(t, (Enum) QuestSearchListSelectBase.UI.TGL_MEMBER_3, false);
+    if (table.userNumLimit < 3)
+      this.SetActive(t, (Enum) QuestSearchListSelectBase.UI.TGL_MEMBER_2, false);
+    if (table.userNumLimit >= 2)
+      return;
+    this.SetActive(t, (Enum) QuestSearchListSelectBase.UI.TGL_MEMBER_1, false);
+  }
+
+  protected enum UI
+  {
+    GRD_QUEST,
+    LBL_HOST_NAME,
+    LBL_HOST_LV,
+    TGL_MEMBER_1,
+    TGL_MEMBER_2,
+    TGL_MEMBER_3,
+    LBL_LV,
+    TEX_NPCMODEL,
+    LBL_NPC_MESSAGE,
+  }
 }

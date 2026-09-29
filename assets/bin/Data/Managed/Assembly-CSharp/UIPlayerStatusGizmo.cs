@@ -1,742 +1,591 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIPlayerStatusGizmo
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class UIPlayerStatusGizmo : UIStatusGizmoBase
 {
-	[SerializeField]
-	protected Rigidbody2D rigidbody;
+  [SerializeField]
+  protected Rigidbody2D rigidbody;
+  [SerializeField]
+  protected GameObject nearUI;
+  [SerializeField]
+  protected UIHGauge gaugeUI;
+  [SerializeField]
+  protected UIHGauge healGaugeUI;
+  [SerializeField]
+  protected UIHGauge shieldGaugeUI;
+  [SerializeField]
+  protected UILabel nameLabel;
+  [SerializeField]
+  protected GameObject farUI;
+  [SerializeField]
+  protected GameObject arrowUI;
+  [SerializeField]
+  protected UILabel distanceLabel;
+  [SerializeField]
+  protected UISprite vitalSprite;
+  [SerializeField]
+  protected UISprite hostEffect;
+  [SerializeField]
+  protected GameObject chatUI;
+  [SerializeField]
+  protected UILabel chatLabel;
+  [SerializeField]
+  protected TweenScale chatTween;
+  [SerializeField]
+  protected GameObject chatStampUI;
+  [SerializeField]
+  protected UITexture chatStampTexture;
+  [SerializeField]
+  protected TweenScale chatStampTween;
+  [SerializeField]
+  protected UIHGauge prayerGauge;
+  [SerializeField]
+  protected UIHGauge prayerGaugeAdd;
+  [SerializeField]
+  protected UILabel prayerGaugeText;
+  [SerializeField]
+  protected GameObject nowPrayer;
+  [SerializeField]
+  protected UISprite prayerGaugeSprite;
+  [SerializeField]
+  protected UISprite prayerGaugeAddSprite;
+  [SerializeField]
+  protected Color prayerGaugeColor1;
+  [SerializeField]
+  protected Color prayerGaugeColor2;
+  [SerializeField]
+  protected Color prayerGaugeColor3;
+  [SerializeField]
+  [Tooltip("自キャラ表示時間")]
+  protected float selfShowTime = 5f;
+  [SerializeField]
+  [Tooltip("矢印横表示時のXオフセット")]
+  protected float arrowSideOffset = 25f;
+  [SerializeField]
+  [Tooltip("スクリーン横オフセット")]
+  protected float screenSideOffset = 36f;
+  [SerializeField]
+  [Tooltip("スクリーン下オフセット")]
+  protected float screenBottomOffset = 107f;
+  [SerializeField]
+  [Tooltip("スクリーン下オフセット、フィールド時")]
+  protected float screenBottomFieldOffset = 107f;
+  [SerializeField]
+  [Tooltip("チャット横オフセット")]
+  protected float chatSideOffset = 60f;
+  [SerializeField]
+  [Tooltip("チャット上オフセット")]
+  protected float chatTopOffset = 120f;
+  [SerializeField]
+  [Tooltip("チャットスタンプ横オフセット")]
+  protected float chatStampSideOffset = 60f;
+  [SerializeField]
+  [Tooltip("チャットスタンプ上オフセット")]
+  protected float chatStampTopOffset = 120f;
+  [SerializeField]
+  protected UISprite friendIcon;
+  [SerializeField]
+  protected float nameLabelOffsetWithFriendIconX;
+  [SerializeField]
+  protected GameObject emotionUI;
+  [SerializeField]
+  protected TweenScale emotionTweenS;
+  [SerializeField]
+  protected TweenAlpha emotionTweenA;
+  private Player _targetPlayer;
+  protected float damagedTimer = -1f;
+  protected Vector3 chatUILocalPos = Vector3.zero;
+  protected Transform chatTransform;
+  protected Vector3 chatStampUILocalPos = Vector3.zero;
+  protected Transform chatStampTransform;
+  protected Vector3 emotionUILocalPos = Vector3.zero;
+  protected Transform emotionTransform;
+  protected Transform arrowTransform;
+  private int currentUserId = -1;
 
-	[SerializeField]
-	protected GameObject nearUI;
+  public Player targetPlayer
+  {
+    get => this._targetPlayer;
+    set
+    {
+      this._targetPlayer = value;
+      if (Object.op_Inequality((Object) this._targetPlayer, (Object) null))
+      {
+        ((Component) this).gameObject.SetActive(true);
+        this.currentUserId = -1;
+        this.UpdateParam();
+      }
+      else
+        ((Component) this).gameObject.SetActive(false);
+    }
+  }
 
-	[SerializeField]
-	protected UIHGauge gaugeUI;
+  public bool isVisible { get; protected set; }
 
-	[SerializeField]
-	protected UIHGauge healGaugeUI;
+  public UIPlayerStatusGizmo() => this.isVisible = true;
 
-	[SerializeField]
-	protected UIHGauge shieldGaugeUI;
+  protected override void OnEnable()
+  {
+    base.OnEnable();
+    if (Object.op_Inequality((Object) this.chatUI, (Object) null))
+    {
+      this.chatTransform = this.chatUI.transform;
+      this.chatUILocalPos = this.chatTransform.localPosition;
+      this.chatUI.SetActive(false);
+    }
+    if (Object.op_Inequality((Object) this.chatStampUI, (Object) null))
+    {
+      this.chatStampTransform = this.chatStampUI.transform;
+      this.chatStampUILocalPos = this.chatStampTransform.localPosition;
+      this.chatStampUI.SetActive(false);
+    }
+    if (Object.op_Inequality((Object) this.emotionUI, (Object) null))
+    {
+      this.emotionTransform = this.emotionUI.transform;
+      this.emotionUILocalPos = this.emotionTransform.localPosition;
+      this.emotionUI.SetActive(false);
+    }
+    if (Object.op_Inequality((Object) this.chatTween, (Object) null))
+      this.chatTween.SetOnFinished(new EventDelegate.Callback(this.OnFinishChat));
+    if (Object.op_Inequality((Object) this.chatStampTween, (Object) null))
+      this.chatStampTween.SetOnFinished(new EventDelegate.Callback(this.OnFinishedChatStamp));
+    if (Object.op_Inequality((Object) this.prayerGauge, (Object) null))
+      ((Component) this.prayerGauge).gameObject.SetActive(false);
+    if (Object.op_Inequality((Object) this.prayerGaugeAdd, (Object) null))
+      ((Component) this.prayerGaugeAdd).gameObject.SetActive(false);
+    this.nearUI.SetActive(false);
+    this.farUI.SetActive(false);
+    if (Object.op_Inequality((Object) this.arrowUI, (Object) null))
+    {
+      this.arrowTransform = this.arrowUI.transform;
+      this.arrowUI.SetActive(false);
+    }
+    if (Object.op_Inequality((Object) this.friendIcon, (Object) null))
+      ((Component) this.friendIcon).gameObject.SetActive(false);
+    if (!Object.op_Inequality((Object) this.hostEffect, (Object) null))
+      return;
+    ((Behaviour) this.hostEffect).enabled = false;
+  }
 
-	[SerializeField]
-	protected UILabel nameLabel;
+  protected override void UpdateParam()
+  {
+    if (Object.op_Equality((Object) this.targetPlayer, (Object) null) || !((Component) this.targetPlayer).gameObject.activeSelf || this.targetPlayer.isLoading || !MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop && this.targetPlayer.isStopCounter || !this.targetPlayer.isCoopInitialized && this.targetPlayer.IsPuppet() || !this.isVisible)
+    {
+      this.SetActiveSafe(this.nearUI, false);
+      this.SetActiveSafe(this.farUI, false);
+      if (Object.op_Inequality((Object) this.arrowUI, (Object) null))
+        this.SetActiveSafe(this.arrowUI, false);
+      if (!Object.op_Inequality((Object) this.prayerGauge, (Object) null))
+        return;
+      this.SetActiveSafe(((Component) this.prayerGauge).gameObject, false);
+    }
+    else
+    {
+      if (MonoBehaviourSingleton<CoopManager>.IsValid())
+        this.isHostPlayer = MonoBehaviourSingleton<CoopManager>.I.GetPartyOwnerPlayerID() == this.targetPlayer.id;
+      Vector3 position = this.targetPlayer._position;
+      position.y += this.targetPlayer.playerParameter.uiHeight;
+      Vector3 screenUiPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, position);
+      this.screenZ = screenUiPosition.z;
+      screenUiPosition.z = 0.0f;
+      float num1 = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
+      if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.NeedModifyPlayerStatusGizmo)
+      {
+        if (SpecialDeviceManager.IsPortrait)
+        {
+          this.screenSideOffset = SpecialDeviceManager.SpecialDeviceInfo.UIPlayerStatusGizmoScreenSideOffsetPortrait;
+          this.screenBottomOffset = SpecialDeviceManager.SpecialDeviceInfo.UIPlayerStatusGizmoScreenBottomOffsetPortrait;
+        }
+        else
+        {
+          this.screenSideOffset = SpecialDeviceManager.SpecialDeviceInfo.UIPlayerStatusGizmoScreenSideOffsetLandScape;
+          this.screenBottomOffset = SpecialDeviceManager.SpecialDeviceInfo.UIPlayerStatusGizmoScreenBottomOffsetLandScape;
+        }
+      }
+      Vector3 vector3_1 = screenUiPosition;
+      bool flag1 = false;
+      float width = (float) Screen.width;
+      float height = (float) Screen.height;
+      if ((double) screenUiPosition.x < (double) this.screenSideOffset * (double) num1)
+      {
+        screenUiPosition.x = this.screenSideOffset * num1;
+        flag1 = true;
+      }
+      else if ((double) screenUiPosition.x > (double) width - (double) this.screenSideOffset * (double) num1)
+      {
+        screenUiPosition.x = width - this.screenSideOffset * num1;
+        flag1 = true;
+      }
+      float num2 = this.screenBottomOffset;
+      if (FieldManager.IsValidInGameNoQuest())
+        num2 = this.screenBottomFieldOffset;
+      if ((double) screenUiPosition.y < (double) num2 * (double) num1)
+      {
+        screenUiPosition.y = num2 * num1;
+        flag1 = true;
+      }
+      Vector3 vector3_2 = screenUiPosition;
+      if (this.chatUI.activeSelf)
+      {
+        if ((double) vector3_2.x < (double) this.chatSideOffset * (double) num1)
+          vector3_2.x = this.chatSideOffset * num1;
+        else if ((double) vector3_2.x > (double) width - (double) this.chatSideOffset * (double) num1)
+          vector3_2.x = width - this.chatSideOffset * num1;
+        if ((double) vector3_2.y > (double) height - (double) this.chatTopOffset * (double) num1)
+          vector3_2.y = height - this.chatTopOffset * num1;
+      }
+      Vector3 vector3_3 = screenUiPosition;
+      if (this.chatStampUI.activeSelf || this.emotionUI.activeSelf)
+      {
+        if ((double) vector3_3.x < (double) this.chatStampSideOffset * (double) num1)
+          vector3_3.x = this.chatStampSideOffset * num1;
+        else if ((double) vector3_3.x > (double) width - (double) this.chatStampSideOffset * (double) num1)
+          vector3_3.x = width - this.chatStampSideOffset * num1;
+        if ((double) vector3_3.y > (double) height - (double) this.chatStampTopOffset * (double) num1)
+          vector3_3.y = height - this.chatStampTopOffset * num1;
+      }
+      Vector3 worldPoint = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUiPosition);
+      Vector3 vector3_4 = worldPoint;
+      Vector3 vector3_5 = worldPoint;
+      if (this.chatUI.activeSelf)
+        vector3_4 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(vector3_2);
+      if (this.chatStampUI.activeSelf || this.emotionUI.activeSelf)
+        vector3_5 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(vector3_3);
+      Vector3 vector3_6 = Vector3.op_Subtraction(this.transform.position, worldPoint);
+      if ((double) ((Vector3) ref vector3_6).sqrMagnitude >= 1.9999999494757503E-05)
+        this.transform.position = worldPoint;
+      Matrix4x4 worldToLocalMatrix;
+      if (this.chatUI.activeSelf)
+      {
+        worldToLocalMatrix = this.transform.worldToLocalMatrix;
+        Vector3 vector3_7 = ((Matrix4x4) ref worldToLocalMatrix).MultiplyPoint3x4(vector3_4);
+        vector3_7.y += this.chatUILocalPos.y;
+        vector3_7.z = 0.0f;
+        this.chatTransform.localPosition = vector3_7;
+      }
+      if (this.chatStampUI.activeSelf || this.emotionUI.activeSelf)
+      {
+        worldToLocalMatrix = this.transform.worldToLocalMatrix;
+        Vector3 vector3_8 = ((Matrix4x4) ref worldToLocalMatrix).MultiplyPoint3x4(vector3_5);
+        vector3_8.y += this.chatUILocalPos.y;
+        vector3_8.z = 0.0f;
+        this.chatStampTransform.localPosition = vector3_8;
+        this.emotionTransform.localPosition = vector3_8;
+      }
+      if (Object.op_Inequality((Object) this.prayerGauge, (Object) null))
+      {
+        if ((double) this.targetPlayer.revivalTimePercent > 0.0)
+        {
+          this.SetActiveSafe(((Component) this.prayerGauge).gameObject, true);
+          this.prayerGauge.SetPercent(this.targetPlayer.revivalTimePercent);
+          if (Object.op_Inequality((Object) this.nowPrayer, (Object) null))
+            this.SetActiveSafe(this.nowPrayer.gameObject, this.targetPlayer.IsPrayed());
+          if (this.targetPlayer.IsPrayed())
+          {
+            if (this.targetPlayer.isDead)
+              this.prayerGaugeText.text = string.Format(StringTable.Get(STRING_CATEGORY.IN_GAME, 1011U));
+            else if (this.targetPlayer.IsStone())
+              this.prayerGaugeText.text = string.Format(StringTable.Get(STRING_CATEGORY.IN_GAME, 1012U));
+            this.SetActiveSafe(((Component) this.prayerGaugeAdd).gameObject, true);
+            this.prayerGaugeAdd.SetPercent(this.targetPlayer.revivalTimePercent);
+            switch (this.targetPlayer.prayerIds.Count)
+            {
+              case 2:
+                this.SetUISpriteColor(this.prayerGaugeSprite, this.prayerGaugeColor2);
+                this.SetUISpriteColor(this.prayerGaugeAddSprite, this.prayerGaugeColor2);
+                break;
+              case 3:
+                this.SetUISpriteColor(this.prayerGaugeSprite, this.prayerGaugeColor3);
+                this.SetUISpriteColor(this.prayerGaugeAddSprite, this.prayerGaugeColor3);
+                break;
+              default:
+                this.SetUISpriteColor(this.prayerGaugeSprite, this.prayerGaugeColor1);
+                this.SetUISpriteColor(this.prayerGaugeAddSprite, this.prayerGaugeColor1);
+                break;
+            }
+          }
+          else
+            this.SetActiveSafe(((Component) this.prayerGaugeAdd).gameObject, false);
+        }
+        else
+          this.SetActiveSafe(((Component) this.prayerGauge).gameObject, false);
+      }
+      Self targetPlayer = this.targetPlayer as Self;
+      if (Object.op_Inequality((Object) targetPlayer, (Object) null))
+      {
+        bool flag2 = false;
+        if ((double) this.damagedTimer >= 0.0)
+        {
+          if ((double) Time.time - (double) this.damagedTimer >= (double) this.selfShowTime)
+            this.damagedTimer = -1f;
+          else
+            flag2 = true;
+        }
+        if (!flag2)
+        {
+          this.SetActiveSafe(this.nearUI, false);
+          this.SetActiveSafe(this.farUI, false);
+          return;
+        }
+      }
+      if (flag1 && FieldManager.IsValidInGameNoQuest() || !GameSaveData.instance.headName)
+      {
+        this.SetActiveSafe(this.nearUI, false);
+        this.SetActiveSafe(this.farUI, false);
+      }
+      else
+      {
+        if ((double) this.targetPlayer.rescueTime > 0.0 || (double) this.targetPlayer.stoneRescueTime > 0.0)
+          flag1 = true;
+        if (flag1 && Object.op_Equality((Object) targetPlayer, (Object) null))
+        {
+          this.SetActiveSafe(this.nearUI, false);
+          this.SetActiveSafe(this.farUI, true);
+          if (Object.op_Inequality((Object) this.arrowUI, (Object) null))
+          {
+            Vector3 vector3_9 = Vector3.op_Subtraction(vector3_1, screenUiPosition);
+            if (Vector3.op_Inequality(vector3_9, Vector3.zero))
+            {
+              float num3 = 90f - Vector3.Angle(Vector3.right, vector3_9);
+              this.arrowTransform.eulerAngles = new Vector3(0.0f, 0.0f, num3);
+              this.SetActiveSafe(this.arrowUI, true);
+              Vector3 vector3_10;
+              // ISSUE: explicit constructor call
+              ((Vector3) ref vector3_10).\u002Ector(0.0f, 0.0f, 0.0f);
+              float num4 = Mathf.Sin(num3 * ((float) Math.PI / 180f));
+              if ((double) num4 > 0.0099999997764825821)
+                vector3_10.x = this.arrowSideOffset;
+              else if ((double) num4 < -0.0099999997764825821)
+                vector3_10.x = -this.arrowSideOffset;
+              this.arrowTransform.localPosition = vector3_10;
+            }
+            else
+              this.SetActiveSafe(this.arrowUI, false);
+          }
+          if (Object.op_Inequality((Object) this.distanceLabel, (Object) null))
+          {
+            if ((double) this.targetPlayer.rescueTime > 0.0)
+              this.distanceLabel.text = Mathf.CeilToInt(this.targetPlayer.rescueTime).ToString() + "　";
+            else if ((double) this.targetPlayer.stoneRescueTime > 0.0)
+              this.distanceLabel.text = Mathf.CeilToInt(this.targetPlayer.stoneRescueTime).ToString() + " ";
+            else if (Object.op_Inequality((Object) MonoBehaviourSingleton<StageObjectManager>.I.self, (Object) null))
+            {
+              Vector3 vector3_11 = Vector3.op_Subtraction(this.targetPlayer._position, MonoBehaviourSingleton<StageObjectManager>.I.self._position);
+              this.distanceLabel.text = ((int) ((Vector3) ref vector3_11).magnitude).ToString() + "m";
+            }
+          }
+          this.SetVitalSprite(this.isHostPlayer);
+        }
+        else
+        {
+          this.SetActiveSafe(this.nearUI, true);
+          this.SetActiveSafe(this.farUI, false);
+          if (Object.op_Inequality((Object) this.gaugeUI, (Object) null))
+          {
+            float percent = (float) this.targetPlayer.hp / (float) this.targetPlayer.hpMax;
+            if ((double) percent < 0.0)
+              percent = 0.0f;
+            if ((double) this.gaugeUI.nowPercent != (double) percent)
+              this.gaugeUI.SetPercent(percent);
+          }
+          if (Object.op_Inequality((Object) this.healGaugeUI, (Object) null))
+          {
+            float percent = (float) this.targetPlayer.healHp / (float) this.targetPlayer.hpMax;
+            if ((double) percent < 0.0)
+              percent = 0.0f;
+            if ((double) this.healGaugeUI.nowPercent != (double) percent)
+              this.healGaugeUI.SetPercent(percent);
+          }
+          if (Object.op_Inequality((Object) this.shieldGaugeUI, (Object) null))
+          {
+            float percent = !this.targetPlayer.IsValidShield() ? 0.0f : (float) (int) this.targetPlayer.ShieldHp / (float) (int) this.targetPlayer.ShieldHpMax;
+            if ((double) percent < 0.0)
+              percent = 0.0f;
+            if ((double) this.shieldGaugeUI.nowPercent != (double) percent)
+              this.shieldGaugeUI.SetPercent(percent);
+          }
+          if (!Object.op_Inequality((Object) this.nameLabel, (Object) null))
+            return;
+          if (this.targetPlayer.createInfo != null && this.targetPlayer.createInfo.charaInfo != null && MonoBehaviourSingleton<FieldManager>.IsValid() && MonoBehaviourSingleton<FieldManager>.I.fieldData != null && MonoBehaviourSingleton<FieldManager>.I.fieldData.field != null && MonoBehaviourSingleton<FieldManager>.I.fieldData.field.slotInfos != null && this.currentUserId != this.targetPlayer.createInfo.charaInfo.userId)
+          {
+            List<FieldModel.SlotInfo> slotInfos = MonoBehaviourSingleton<FieldManager>.I.fieldData.field.slotInfos;
+            FriendCharaInfo friendCharaInfo = (FriendCharaInfo) null;
+            int index = 0;
+            for (int count = slotInfos.Count; index < count; ++index)
+            {
+              if (slotInfos[index].userId == this.targetPlayer.createInfo.charaInfo.userId)
+                friendCharaInfo = slotInfos[index].userInfo;
+            }
+            if (friendCharaInfo != null)
+            {
+              if (friendCharaInfo.follower && friendCharaInfo.following)
+                ((Component) this.friendIcon).gameObject.SetActive(true);
+              else
+                ((Component) this.friendIcon).gameObject.SetActive(false);
+              this.currentUserId = this.targetPlayer.createInfo.charaInfo.userId;
+            }
+          }
+          this.nameLabel.text = this.targetPlayer.fullName;
+          this.nameLabel.supportEncoding = true;
+        }
+      }
+    }
+  }
 
-	[SerializeField]
-	protected GameObject farUI;
+  private void SetVitalSprite(bool _isOwner)
+  {
+    if (Object.op_Equality((Object) this.vitalSprite, (Object) null) || Object.op_Equality((Object) this.hostEffect, (Object) null))
+      return;
+    GameObject gameObject = ((Component) this.hostEffect).gameObject;
+    ((Behaviour) this.hostEffect).enabled = false;
+    string str;
+    if (this.targetPlayer.hp <= 0)
+    {
+      if (this.targetPlayer.IsRescuable() || this.targetPlayer.IsStone())
+      {
+        str = "Ingame_member_vitalsign_red";
+        if (!((Behaviour) this.hostEffect).enabled & _isOwner)
+          ((Behaviour) this.hostEffect).enabled = true;
+      }
+      else
+        str = "Ingame_member_vitalsign_gray";
+    }
+    else
+      str = (double) this.targetPlayer.hp > (double) this.targetPlayer.hpMax * 0.25 ? "Ingame_member_vitalsign_green" : "Ingame_member_vitalsign_yellow";
+    this.vitalSprite.spriteName = str;
+  }
 
-	[SerializeField]
-	protected GameObject arrowUI;
+  public void SetUISpriteColor(UISprite sprite, Color c)
+  {
+    if (!Object.op_Inequality((Object) sprite, (Object) null))
+      return;
+    Color color = sprite.color;
+    if ((double) color.r == (double) c.r && (double) color.g == (double) c.g && (double) color.b == (double) c.b)
+      return;
+    color.r = c.r;
+    color.g = c.g;
+    color.b = c.b;
+    sprite.color = color;
+  }
 
-	[SerializeField]
-	protected UILabel distanceLabel;
+  public void SetVisible(bool visible) => this.isVisible = visible;
 
-	[SerializeField]
-	protected UISprite vitalSprite;
+  public void SayChat(int chatID)
+  {
+    this.DisplayChat(MonoBehaviourSingleton<UIChatButtonBase>.I.GetChatSayText(chatID));
+  }
 
-	[SerializeField]
-	protected GameObject chatUI;
+  public void SayChat(string message) => this.DisplayChat(message);
 
-	[SerializeField]
-	protected UILabel chatLabel;
+  public void SetChatDuration(float duration)
+  {
+    if (!Object.op_Inequality((Object) this.chatTween, (Object) null))
+      return;
+    this.chatTween.duration = duration;
+  }
 
-	[SerializeField]
-	protected TweenScale chatTween;
+  private void DisplayChat(string message)
+  {
+    if (!this.CanDisplayChat())
+      return;
+    this.chatLabel.text = message;
+    this.chatUI.SetActive(true);
+    if (!Object.op_Inequality((Object) this.chatTween, (Object) null))
+      return;
+    this.chatTween.ResetToBeginning();
+    this.chatTween.PlayForward();
+  }
 
-	[SerializeField]
-	protected GameObject chatStampUI;
+  public void SayChatStamp(int stampId) => this.StartCoroutine(this.DoDisplayChatStamp(stampId));
 
-	[SerializeField]
-	protected UITexture chatStampTexture;
+  private IEnumerator DoDisplayChatStamp(int stampId)
+  {
+    this.chatStampUI.SetActive(false);
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject lostamp = loadingQueue.LoadChatStamp(stampId, true);
+    yield return (object) loadingQueue.Wait();
+    if (!Object.op_Equality(lostamp.loadedObject, (Object) null))
+    {
+      if (Object.op_Inequality((Object) this.chatStampTexture, (Object) null))
+        this.chatStampTexture.mainTexture = (Texture) (lostamp.loadedObject as Texture2D);
+      if (this.CanDisplayChat())
+      {
+        this.chatStampUI.SetActive(true);
+        if (Object.op_Inequality((Object) this.chatStampTween, (Object) null))
+        {
+          this.chatStampTween.ResetToBeginning();
+          this.chatStampTween.PlayForward();
+        }
+      }
+    }
+  }
 
-	[SerializeField]
-	protected TweenScale chatStampTween;
+  private bool CanDisplayChat()
+  {
+    return Object.op_Inequality((Object) this.targetPlayer, (Object) null) && this.targetPlayer.isInitialized;
+  }
 
-	[SerializeField]
-	protected UIHGauge prayerGauge;
+  public void OnFinishChat() => this.chatUI.SetActive(false);
 
-	[SerializeField]
-	protected UIHGauge prayerGaugeAdd;
+  public void OnFinishedChatStamp() => this.chatStampUI.SetActive(false);
 
-	[SerializeField]
-	protected GameObject nowPrayer;
+  public void OnDamageSelf() => this.damagedTimer = Time.time;
 
-	[SerializeField]
-	protected UISprite prayerGaugeSprite;
+  public void OnDispEmotion(bool isDisp)
+  {
+    this.emotionUI.SetActive(isDisp);
+    if (!isDisp)
+      return;
+    this.emotionTweenS.ResetToBeginning();
+    this.emotionTweenS.PlayForward();
+    this.emotionTweenA.ResetToBeginning();
+    this.emotionTweenA.PlayForward();
+  }
 
-	[SerializeField]
-	protected UISprite prayerGaugeAddSprite;
+  public void SetEmotionDuration(float duration)
+  {
+    this.emotionTweenS.duration = duration;
+    this.emotionTweenA.duration = duration;
+  }
 
-	[SerializeField]
-	protected Color prayerGaugeColor1;
+  protected override void SortAll()
+  {
+    UIStatusGizmoBase.uiList.Sort((Comparison<UIStatusGizmoBase>) ((a, b) =>
+    {
+      if (a.isHostPlayer)
+        return 1;
+      if (b.isHostPlayer)
+        return -1;
+      if ((double) a.ScreenZ == (double) b.ScreenZ)
+        return 0;
+      return (double) a.ScreenZ >= (double) b.ScreenZ ? -1 : 1;
+    }));
+    this.UpdateUIDepth();
+  }
 
-	[SerializeField]
-	protected Color prayerGaugeColor2;
-
-	[SerializeField]
-	protected Color prayerGaugeColor3;
-
-	[SerializeField]
-	[Tooltip("自キャラ表示時間")]
-	protected float selfShowTime = 5f;
-
-	[Tooltip("矢印横表示時のXオフセット")]
-	[SerializeField]
-	protected float arrowSideOffset = 25f;
-
-	[Tooltip("スクリ\u30fcン横オフセット")]
-	[SerializeField]
-	protected float screenSideOffset = 36f;
-
-	[SerializeField]
-	[Tooltip("スクリ\u30fcン下オフセット")]
-	protected float screenBottomOffset = 107f;
-
-	[SerializeField]
-	[Tooltip("スクリ\u30fcン下オフセット、フィ\u30fcルド時")]
-	protected float screenBottomFieldOffset = 107f;
-
-	[Tooltip("チャット横オフセット")]
-	[SerializeField]
-	protected float chatSideOffset = 60f;
-
-	[Tooltip("チャット上オフセット")]
-	[SerializeField]
-	protected float chatTopOffset = 120f;
-
-	[SerializeField]
-	[Tooltip("チャットスタンプ横オフセット")]
-	protected float chatStampSideOffset = 60f;
-
-	[SerializeField]
-	[Tooltip("チャットスタンプ上オフセット")]
-	protected float chatStampTopOffset = 120f;
-
-	[SerializeField]
-	protected UISprite friendIcon;
-
-	[SerializeField]
-	protected float nameLabelOffsetWithFriendIconX;
-
-	private Player _targetPlayer;
-
-	protected float damagedTimer = -1f;
-
-	protected Vector3 chatUILocalPos = Vector3.get_zero();
-
-	protected Transform chatTransform;
-
-	protected Vector3 chatStampUILocalPos = Vector3.get_zero();
-
-	protected Transform chatStampTransform;
-
-	protected Transform arrowTransform;
-
-	private int currentUserId = -1;
-
-	public Player targetPlayer
-	{
-		get
-		{
-			return _targetPlayer;
-		}
-		set
-		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			_targetPlayer = value;
-			if (_targetPlayer != null)
-			{
-				this.get_gameObject().SetActive(true);
-				currentUserId = -1;
-				UpdateParam();
-			}
-			else
-			{
-				this.get_gameObject().SetActive(false);
-			}
-		}
-	}
-
-	public bool isVisible
-	{
-		get;
-		protected set;
-	}
-
-	public UIPlayerStatusGizmo()
-	{
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		isVisible = true;
-	}
-
-	protected override void OnEnable()
-	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Expected O, but got Unknown
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014d: Expected O, but got Unknown
-		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-		base.OnEnable();
-		if (chatUI != null)
-		{
-			chatTransform = chatUI.get_transform();
-			chatUILocalPos = chatTransform.get_localPosition();
-			chatUI.SetActive(false);
-		}
-		if (chatStampUI != null)
-		{
-			chatStampTransform = chatStampUI.get_transform();
-			chatStampUILocalPos = chatStampTransform.get_localPosition();
-			chatStampUI.SetActive(false);
-		}
-		if (chatTween != null)
-		{
-			chatTween.SetOnFinished(OnFinishChat);
-		}
-		if (chatStampTween != null)
-		{
-			chatStampTween.SetOnFinished(OnFinishedChatStamp);
-		}
-		if (prayerGauge != null)
-		{
-			prayerGauge.get_gameObject().SetActive(false);
-		}
-		if (prayerGaugeAdd != null)
-		{
-			prayerGaugeAdd.get_gameObject().SetActive(false);
-		}
-		nearUI.SetActive(false);
-		farUI.SetActive(false);
-		if (arrowUI != null)
-		{
-			arrowTransform = arrowUI.get_transform();
-			arrowUI.SetActive(false);
-		}
-		if (friendIcon != null)
-		{
-			friendIcon.get_gameObject().SetActive(false);
-		}
-	}
-
-	protected override void UpdateParam()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Expected O, but got Unknown
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0281: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0282: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0318: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0319: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0320: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0322: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0324: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0326: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0342: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0344: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0349: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0365: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0367: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0374: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0379: Unknown result type (might be due to invalid IL or missing references)
-		//IL_037b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0380: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0399: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0410: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0415: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0419: Unknown result type (might be due to invalid IL or missing references)
-		//IL_041b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0420: Unknown result type (might be due to invalid IL or missing references)
-		//IL_044d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0481: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0487: Expected O, but got Unknown
-		//IL_04bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04cb: Expected O, but got Unknown
-		//IL_04e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ed: Expected O, but got Unknown
-		//IL_0538: Unknown result type (might be due to invalid IL or missing references)
-		//IL_054a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0561: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0573: Unknown result type (might be due to invalid IL or missing references)
-		//IL_058a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_059c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05bd: Expected O, but got Unknown
-		//IL_05ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05d4: Expected O, but got Unknown
-		//IL_06e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0703: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0708: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0724: Unknown result type (might be due to invalid IL or missing references)
-		//IL_079e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_082c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_083b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0840: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0845: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0bb4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0bca: Unknown result type (might be due to invalid IL or missing references)
-		if (targetPlayer == null || !targetPlayer.get_gameObject().get_activeSelf() || targetPlayer.isLoading || (!MonoBehaviourSingleton<InGameProgress>.I.isGameProgressStop && targetPlayer.isStopCounter) || (!targetPlayer.isCoopInitialized && targetPlayer.IsPuppet()) || !isVisible)
-		{
-			SetActiveSafe(nearUI, false);
-			SetActiveSafe(farUI, false);
-			if (arrowUI != null)
-			{
-				SetActiveSafe(arrowUI, false);
-			}
-			if (prayerGauge != null)
-			{
-				SetActiveSafe(prayerGauge.get_gameObject(), false);
-			}
-		}
-		else
-		{
-			Vector3 position = targetPlayer._position;
-			position.y += targetPlayer.playerParameter.uiHeight;
-			Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, position);
-			screenZ = screenUIPosition.z;
-			screenUIPosition.z = 0f;
-			float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
-			Vector3 val = screenUIPosition;
-			bool flag = false;
-			float num2 = (float)Screen.get_width();
-			float num3 = (float)Screen.get_height();
-			if (screenUIPosition.x < screenSideOffset * num)
-			{
-				screenUIPosition.x = screenSideOffset * num;
-				flag = true;
-			}
-			else if (screenUIPosition.x > num2 - screenSideOffset * num)
-			{
-				screenUIPosition.x = num2 - screenSideOffset * num;
-				flag = true;
-			}
-			float num4 = screenBottomOffset;
-			if (FieldManager.IsValidInGameNoQuest())
-			{
-				num4 = screenBottomFieldOffset;
-			}
-			if (screenUIPosition.y < num4 * num)
-			{
-				screenUIPosition.y = num4 * num;
-				flag = true;
-			}
-			Vector3 val2 = screenUIPosition;
-			if (chatUI.get_activeSelf())
-			{
-				if (val2.x < chatSideOffset * num)
-				{
-					val2.x = chatSideOffset * num;
-				}
-				else if (val2.x > num2 - chatSideOffset * num)
-				{
-					val2.x = num2 - chatSideOffset * num;
-				}
-				if (val2.y > num3 - chatTopOffset * num)
-				{
-					val2.y = num3 - chatTopOffset * num;
-				}
-			}
-			Vector3 val3 = screenUIPosition;
-			if (chatStampUI.get_activeSelf())
-			{
-				if (val3.x < chatStampSideOffset * num)
-				{
-					val3.x = chatStampSideOffset * num;
-				}
-				else if (val3.x > num2 - chatStampSideOffset * num)
-				{
-					val3.x = num2 - chatStampSideOffset * num;
-				}
-				if (val3.y > num3 - chatStampTopOffset * num)
-				{
-					val3.y = num3 - chatStampTopOffset * num;
-				}
-			}
-			Vector3 val4 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
-			Vector3 val5 = val4;
-			Vector3 val6 = val4;
-			if (chatUI.get_activeSelf())
-			{
-				val5 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val2);
-			}
-			if (chatStampUI.get_activeSelf())
-			{
-				val6 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val3);
-			}
-			Vector3 val7 = transform.get_position() - val4;
-			if (val7.get_sqrMagnitude() >= 2E-05f)
-			{
-				transform.set_position(val4);
-			}
-			if (chatUI.get_activeSelf())
-			{
-				Matrix4x4 worldToLocalMatrix = transform.get_worldToLocalMatrix();
-				Vector3 localPosition = worldToLocalMatrix.MultiplyPoint3x4(val5);
-				localPosition.y += chatUILocalPos.y;
-				localPosition.z = 0f;
-				chatTransform.set_localPosition(localPosition);
-			}
-			if (chatStampUI.get_activeSelf())
-			{
-				Matrix4x4 worldToLocalMatrix2 = transform.get_worldToLocalMatrix();
-				Vector3 localPosition2 = worldToLocalMatrix2.MultiplyPoint3x4(val6);
-				localPosition2.y += chatUILocalPos.y;
-				localPosition2.z = 0f;
-				chatStampTransform.set_localPosition(localPosition2);
-			}
-			if (prayerGauge != null)
-			{
-				if (targetPlayer.revivalTimePercent > 0f)
-				{
-					SetActiveSafe(prayerGauge.get_gameObject(), true);
-					prayerGauge.SetPercent(targetPlayer.revivalTimePercent, true);
-					if (nowPrayer != null)
-					{
-						SetActiveSafe(nowPrayer.get_gameObject(), targetPlayer.isPrayer);
-					}
-					if (targetPlayer.isPrayer)
-					{
-						SetActiveSafe(prayerGaugeAdd.get_gameObject(), true);
-						prayerGaugeAdd.SetPercent(targetPlayer.revivalTimePercent, true);
-						switch (targetPlayer.prayerNum)
-						{
-						default:
-							SetUISpriteColor(prayerGaugeSprite, prayerGaugeColor1);
-							SetUISpriteColor(prayerGaugeAddSprite, prayerGaugeColor1);
-							break;
-						case 2:
-							SetUISpriteColor(prayerGaugeSprite, prayerGaugeColor2);
-							SetUISpriteColor(prayerGaugeAddSprite, prayerGaugeColor2);
-							break;
-						case 3:
-							SetUISpriteColor(prayerGaugeSprite, prayerGaugeColor3);
-							SetUISpriteColor(prayerGaugeAddSprite, prayerGaugeColor3);
-							break;
-						}
-					}
-					else
-					{
-						SetActiveSafe(prayerGaugeAdd.get_gameObject(), false);
-					}
-				}
-				else
-				{
-					SetActiveSafe(prayerGauge.get_gameObject(), false);
-				}
-			}
-			Self self = targetPlayer as Self;
-			if (self != null)
-			{
-				bool flag2 = false;
-				if (damagedTimer >= 0f)
-				{
-					if (Time.get_time() - damagedTimer >= selfShowTime)
-					{
-						damagedTimer = -1f;
-					}
-					else
-					{
-						flag2 = true;
-					}
-				}
-				if (!flag2)
-				{
-					SetActiveSafe(nearUI, false);
-					SetActiveSafe(farUI, false);
-					return;
-				}
-			}
-			if ((flag && FieldManager.IsValidInGameNoQuest()) || !GameSaveData.instance.headName)
-			{
-				SetActiveSafe(nearUI, false);
-				SetActiveSafe(farUI, false);
-			}
-			else
-			{
-				if (targetPlayer.rescueTime > 0f)
-				{
-					flag = true;
-				}
-				if (flag && self == null)
-				{
-					SetActiveSafe(nearUI, false);
-					SetActiveSafe(farUI, true);
-					if (arrowUI != null)
-					{
-						Vector3 val8 = val - screenUIPosition;
-						if (val8 != Vector3.get_zero())
-						{
-							float num5 = 90f - Vector3.Angle(Vector3.get_right(), val8);
-							arrowTransform.set_eulerAngles(new Vector3(0f, 0f, num5));
-							SetActiveSafe(arrowUI, true);
-							Vector3 localPosition3 = default(Vector3);
-							localPosition3._002Ector(0f, 0f, 0f);
-							float num6 = Mathf.Sin(num5 * 0.0174532924f);
-							if (num6 > 0.01f)
-							{
-								localPosition3.x = arrowSideOffset;
-							}
-							else if (num6 < -0.01f)
-							{
-								localPosition3.x = 0f - arrowSideOffset;
-							}
-							arrowTransform.set_localPosition(localPosition3);
-						}
-						else
-						{
-							SetActiveSafe(arrowUI, false);
-						}
-					}
-					if (distanceLabel != null)
-					{
-						if (targetPlayer.rescueTime > 0f)
-						{
-							distanceLabel.text = string.Empty + Mathf.CeilToInt(targetPlayer.rescueTime) + "\u3000";
-						}
-						else if (MonoBehaviourSingleton<StageObjectManager>.I.self != null)
-						{
-							Vector3 val9 = targetPlayer._position - MonoBehaviourSingleton<StageObjectManager>.I.self._position;
-							int num7 = (int)val9.get_magnitude();
-							distanceLabel.text = string.Empty + num7 + "m";
-						}
-					}
-					if (vitalSprite != null)
-					{
-						if (targetPlayer.hp <= 0)
-						{
-							if (targetPlayer.IsRescuable())
-							{
-								vitalSprite.spriteName = "Ingame_member_vitalsign_red";
-							}
-							else
-							{
-								vitalSprite.spriteName = "Ingame_member_vitalsign_gray";
-							}
-						}
-						else if ((float)targetPlayer.hp <= (float)targetPlayer.hpMax * 0.25f)
-						{
-							vitalSprite.spriteName = "Ingame_member_vitalsign_yellow";
-						}
-						else
-						{
-							vitalSprite.spriteName = "Ingame_member_vitalsign_green";
-						}
-					}
-				}
-				else
-				{
-					SetActiveSafe(nearUI, true);
-					SetActiveSafe(farUI, false);
-					if (gaugeUI != null)
-					{
-						float num8 = (float)targetPlayer.hp / (float)targetPlayer.hpMax;
-						if (num8 < 0f)
-						{
-							num8 = 0f;
-						}
-						if (gaugeUI.nowPercent != num8)
-						{
-							gaugeUI.SetPercent(num8, true);
-						}
-					}
-					if (healGaugeUI != null)
-					{
-						float num9 = (float)targetPlayer.healHp / (float)targetPlayer.hpMax;
-						if (num9 < 0f)
-						{
-							num9 = 0f;
-						}
-						if (healGaugeUI.nowPercent != num9)
-						{
-							healGaugeUI.SetPercent(num9, true);
-						}
-					}
-					if (shieldGaugeUI != null)
-					{
-						float num10 = 0f;
-						num10 = ((!targetPlayer.IsValidShield()) ? 0f : ((float)(int)targetPlayer.ShieldHp / (float)(int)targetPlayer.ShieldHpMax));
-						if (num10 < 0f)
-						{
-							num10 = 0f;
-						}
-						if (shieldGaugeUI.nowPercent != num10)
-						{
-							shieldGaugeUI.SetPercent(num10, true);
-						}
-					}
-					if (nameLabel != null)
-					{
-						if (targetPlayer.createInfo != null && targetPlayer.createInfo.charaInfo != null && MonoBehaviourSingleton<FieldManager>.IsValid() && MonoBehaviourSingleton<FieldManager>.I.fieldData != null && MonoBehaviourSingleton<FieldManager>.I.fieldData.field != null && MonoBehaviourSingleton<FieldManager>.I.fieldData.field.slotInfos != null && currentUserId != targetPlayer.createInfo.charaInfo.userId)
-						{
-							List<FieldModel.SlotInfo> slotInfos = MonoBehaviourSingleton<FieldManager>.I.fieldData.field.slotInfos;
-							FriendCharaInfo friendCharaInfo = null;
-							bool flag3 = false;
-							int i = 0;
-							for (int count = slotInfos.Count; i < count; i++)
-							{
-								if (slotInfos[i].userId == targetPlayer.createInfo.charaInfo.userId)
-								{
-									friendCharaInfo = slotInfos[i].userInfo;
-								}
-							}
-							if (friendCharaInfo != null)
-							{
-								if (friendCharaInfo.follower && friendCharaInfo.following)
-								{
-									friendIcon.get_gameObject().SetActive(true);
-								}
-								else
-								{
-									friendIcon.get_gameObject().SetActive(false);
-								}
-								currentUserId = targetPlayer.createInfo.charaInfo.userId;
-							}
-						}
-						nameLabel.text = targetPlayer.fullName;
-						nameLabel.supportEncoding = true;
-					}
-				}
-			}
-		}
-	}
-
-	public void SetUISpriteColor(UISprite sprite, Color c)
-	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		if (sprite != null)
-		{
-			Color color = sprite.color;
-			if (color.r != c.r || color.g != c.g || color.b != c.b)
-			{
-				color.r = c.r;
-				color.g = c.g;
-				color.b = c.b;
-				sprite.color = color;
-			}
-		}
-	}
-
-	public void SetVisible(bool visible)
-	{
-		isVisible = visible;
-	}
-
-	public void SayChat(int chatID)
-	{
-		string chatSayText = MonoBehaviourSingleton<UIChatButtonBase>.I.GetChatSayText(chatID);
-		DisplayChat(chatSayText);
-	}
-
-	public void SayChat(string message)
-	{
-		DisplayChat(message);
-	}
-
-	public void SetChatDuration(float duration)
-	{
-		if (chatTween != null)
-		{
-			chatTween.duration = duration;
-		}
-	}
-
-	private void DisplayChat(string message)
-	{
-		if (CanDisplayChat())
-		{
-			chatLabel.text = message;
-			chatUI.SetActive(true);
-			if (chatTween != null)
-			{
-				chatTween.ResetToBeginning();
-				chatTween.PlayForward();
-			}
-		}
-	}
-
-	public void SayChatStamp(int stampId)
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoDisplayChatStamp(stampId));
-	}
-
-	private IEnumerator DoDisplayChatStamp(int stampId)
-	{
-		chatStampUI.SetActive(false);
-		LoadingQueue lqstamp = new LoadingQueue(this);
-		LoadObject lostamp = lqstamp.LoadChatStamp(stampId, true);
-		yield return (object)lqstamp.Wait();
-		if (!(lostamp.loadedObject == null))
-		{
-			if (chatStampTexture != null)
-			{
-				chatStampTexture.mainTexture = (lostamp.loadedObject as Texture2D);
-			}
-			if (CanDisplayChat())
-			{
-				chatStampUI.SetActive(true);
-				if (chatStampTween != null)
-				{
-					chatStampTween.ResetToBeginning();
-					chatStampTween.PlayForward();
-				}
-			}
-		}
-	}
-
-	private bool CanDisplayChat()
-	{
-		return targetPlayer != null && targetPlayer.isInitialized;
-	}
-
-	public void OnFinishChat()
-	{
-		chatUI.SetActive(false);
-	}
-
-	public void OnFinishedChatStamp()
-	{
-		chatStampUI.SetActive(false);
-	}
-
-	public void OnDamageSelf()
-	{
-		damagedTimer = Time.get_time();
-	}
+  protected void UpdateUIDepth()
+  {
+    int index = 0;
+    for (int count = UIStatusGizmoBase.uiList.Count; index < count; ++index)
+    {
+      UIStatusGizmoBase ui = UIStatusGizmoBase.uiList[index];
+      int num = index * 10;
+      if (ui.depthOffset != num)
+      {
+        UIStatusGizmoBase.AdjustDepth(((Component) ui).gameObject, num - ui.depthOffset);
+        ui.BasePanel.depth = num;
+        ui.depthOffset = num;
+      }
+    }
+  }
 }

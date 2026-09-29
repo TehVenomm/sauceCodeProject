@@ -1,698 +1,595 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AutoSelfController
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class AutoSelfController : SelfController
 {
-	protected IEnumerator mainCoroutine;
+  protected IEnumerator mainCoroutine;
+  protected bool isStart;
+  protected float startWaitTime;
+  public TargetPoint actionTargetPoint;
+  private bool isWaitingSpecial;
+  private bool isActSpecialOneSwordSoul;
 
-	protected bool isStart;
+  public AutoBrain autoBrain { get; private set; }
 
-	protected float startWaitTime;
+  public InGameSettingsManager.NpcController npcParameter { get; private set; }
 
-	public TargetPoint actionTargetPoint;
+  private bool isAttack
+  {
+    get
+    {
+      return Object.op_Inequality((Object) this.self, (Object) null) && this.self.actionID == Character.ACTION_ID.ATTACK;
+    }
+  }
 
-	private bool isActSpecialOneSwordSoul;
+  private bool isGuard
+  {
+    get
+    {
+      return Object.op_Inequality((Object) this.self, (Object) null) && this.self.actionID == (Character.ACTION_ID) 19;
+    }
+  }
 
-	public AutoBrain autoBrain
-	{
-		get;
-		private set;
-	}
+  private bool isMove
+  {
+    get
+    {
+      return Object.op_Inequality((Object) this.self, (Object) null) && this.self.actionID == Character.ACTION_ID.MOVE;
+    }
+  }
 
-	public InGameSettingsManager.NpcController npcParameter
-	{
-		get;
-		private set;
-	}
+  private bool isChangeableAttack
+  {
+    get
+    {
+      return Object.op_Inequality((Object) this.self, (Object) null) && this.self.IsChangeableAction(Character.ACTION_ID.ATTACK);
+    }
+  }
 
-	private bool isAttack => base.self != null && base.self.actionID == Character.ACTION_ID.ATTACK;
+  private bool isChangeableSpecialAction
+  {
+    get
+    {
+      return Object.op_Inequality((Object) this.self, (Object) null) && this.self.IsChangeableAction((Character.ACTION_ID) 33);
+    }
+  }
 
-	private bool isGuard => base.self != null && base.self.actionID == (Character.ACTION_ID)18;
+  private StageObject target
+  {
+    get
+    {
+      return !Object.op_Inequality((Object) this.brain, (Object) null) ? (StageObject) null : this.brain.targetCtrl.GetCurrentTarget();
+    }
+  }
 
-	private bool isMove => base.self != null && base.self.actionID == Character.ACTION_ID.MOVE;
+  protected override void Awake()
+  {
+    base.Awake();
+    this.autoBrain = this.AttachBrain<AutoBrain>();
+  }
 
-	private bool isChangeableAttack => base.self != null && base.self.IsChangeableAction(Character.ACTION_ID.ATTACK);
+  protected override void Start()
+  {
+    base.Start();
+    this.npcParameter = MonoBehaviourSingleton<InGameSettingsManager>.I.npcController;
+    this.isStart = true;
+    if (!this.IsEnableControll())
+      return;
+    this.OnChangeEnableControll(true);
+  }
 
-	private bool isChangeableSpecialAction => base.self != null && base.self.IsChangeableAction((Character.ACTION_ID)31);
+  private bool IsTouchedInAutoMode()
+  {
+    InputManager.TouchInfo stickInfo = MonoBehaviourSingleton<InputManager>.I.GetStickInfo();
+    return this.touchInfo != null || stickInfo != null;
+  }
 
-	private StageObject target => (!(base.brain != null)) ? null : base.brain.targetCtrl.GetCurrentTarget();
+  protected override void Update()
+  {
+    if (this.IsTouchedInAutoMode())
+    {
+      base.Update();
+    }
+    else
+    {
+      if (this.self.actionID != (Character.ACTION_ID) 27)
+      {
+        bool flag = false;
+        if (this.self.isGuardWalk || this.self.actionID == (Character.ACTION_ID) 19 || this.self.actionID == (Character.ACTION_ID) 20)
+          flag = true;
+        if (!flag && this.nextCommand != null)
+        {
+          if (this.CheckCommand(this.nextCommand))
+          {
+            this.ActCommand(this.nextCommand);
+            this.nextCommand = (SelfController.Command) null;
+            return;
+          }
+          if ((double) this.nextCommand.deltaTime >= (double) this.parameter.inputCommandValidTime[(int) this.nextCommand.type])
+            this.nextCommand = (SelfController.Command) null;
+        }
+      }
+      if (!this.IsEnableControll())
+        return;
+      this.OnDead();
+    }
+  }
 
-	protected override void Awake()
-	{
-		base.Awake();
-		autoBrain = AttachBrain<AutoBrain>();
-	}
+  protected override void OnDisable()
+  {
+    this.self.SetEnableTap(false);
+    base.OnDisable();
+  }
 
-	protected override void Start()
-	{
-		base.Start();
-		npcParameter = MonoBehaviourSingleton<InGameSettingsManager>.I.npcController;
-		isStart = true;
-		if (IsEnableControll())
-		{
-			OnChangeEnableControll(true);
-		}
-	}
+  public override void OnChangeEnableControll(bool enable)
+  {
+    if (enable && !CoopStageObjectUtility.CanControll((StageObject) this.self))
+    {
+      Log.Error(LOG.INGAME, "NpcController:OnChangeEnableControll. field block enable. obj={0}", (object) this.self);
+      enable = false;
+    }
+    base.OnChangeEnableControll(enable);
+    if (enable)
+    {
+      if (!this.isStart || !((Behaviour) this).enabled || !Object.op_Inequality((Object) this.self, (Object) null) || this.mainCoroutine != null)
+        return;
+      this.mainCoroutine = this.AIMain();
+      this.StartCoroutine(this.mainCoroutine);
+    }
+    else
+    {
+      if (this.mainCoroutine != null)
+      {
+        this.StopAllCoroutines();
+        this.mainCoroutine = (IEnumerator) null;
+      }
+      if (!this.isGuard)
+        return;
+      this.self.ActIdle(false, -1f);
+    }
+  }
 
-	private bool IsTouchedInAutoMode()
-	{
-		InputManager.TouchInfo stickInfo = MonoBehaviourSingleton<InputManager>.I.GetStickInfo();
-		return touchInfo != null || stickInfo != null;
-	}
+  private IEnumerator AIMain()
+  {
+    while (Object.op_Equality((Object) this.brain, (Object) null) || !this.brain.isInitialized)
+      yield return (object) 0;
+    while (!this.self.isControllable)
+      yield return (object) 0;
+    if ((double) this.startWaitTime > 0.0)
+      yield return (object) new WaitForSeconds(this.startWaitTime);
+    while (((Behaviour) this).enabled)
+    {
+      while (this.self.IsMirror())
+        yield return (object) new WaitForSeconds(1f);
+      while (this.IsTouchedInAutoMode())
+        yield return (object) 0;
+      this.OnMove();
+      this.OnWeapon();
+      float num = 0.0f;
+      if (Object.op_Inequality((Object) this.self.packetSender, (Object) null))
+        num = this.self.packetSender.GetWaitTime(0.0f);
+      if ((double) num > 0.0)
+        yield return (object) new WaitForSeconds(num);
+      else
+        yield return (object) 0;
+    }
+    this.mainCoroutine = (IEnumerator) null;
+  }
 
-	protected override void Update()
-	{
-		if (IsTouchedInAutoMode())
-		{
-			base.Update();
-		}
-		else
-		{
-			if (base.self.actionID != (Character.ACTION_ID)25)
-			{
-				bool flag = false;
-				if (base.self.isGuardWalk || base.self.actionID == (Character.ACTION_ID)18 || base.self.actionID == (Character.ACTION_ID)19)
-				{
-					flag = true;
-				}
-				if (!flag && base.nextCommand != null)
-				{
-					if (CheckCommand(base.nextCommand))
-					{
-						ActCommand(base.nextCommand);
-						base.nextCommand = null;
-						return;
-					}
-					if (base.nextCommand.deltaTime >= base.parameter.inputCommandValidTime[(int)base.nextCommand.type])
-					{
-						base.nextCommand = null;
-					}
-				}
-			}
-			if (IsEnableControll())
-			{
-				OnDead();
-			}
-		}
-	}
+  private void OnDead()
+  {
+    if (this.self.isControllable || this.self.actionID != (Character.ACTION_ID) 24 || (double) this.self.rescueTime > 0.0 || (double) this.self.deadStartTime < 0.0 || this.self.isProgressStop() || this.self != null)
+      return;
+    this.self.DestroyObject();
+  }
 
-	private new void OnDisable()
-	{
-		base.self.SetEnableTap(false);
-	}
+  public void OnSkill()
+  {
+    if (!this.autoBrain.skillCtr.IsAct || !this.self.IsActSkillAction(this.autoBrain.skillCtr.skillIndex))
+      return;
+    this.self.ActSkillAction(this.autoBrain.skillCtr.skillIndex, false);
+    this.autoBrain.skillCtr.RemoveSkillIndex();
+  }
 
-	public override void OnChangeEnableControll(bool enable)
-	{
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		if (enable && !CoopStageObjectUtility.CanControll(base.self))
-		{
-			Log.Error(LOG.INGAME, "NpcController:OnChangeEnableControll. field block enable. obj={0}", base.self);
-			enable = false;
-		}
-		base.OnChangeEnableControll(enable);
-		if (enable)
-		{
-			if (isStart && this.get_enabled() && base.self != null && mainCoroutine == null)
-			{
-				mainCoroutine = AIMain();
-				this.StartCoroutine(mainCoroutine);
-			}
-		}
-		else
-		{
-			if (mainCoroutine != null)
-			{
-				this.StopAllCoroutines();
-				mainCoroutine = null;
-			}
-			if (isGuard)
-			{
-				base.self.ActIdle(false, -1f);
-			}
-		}
-	}
+  private void OnMove()
+  {
+    bool flag = true;
+    if (this.brain.moveCtrl.IsAvoid())
+    {
+      if (!this.self.IsChangeableAction(Character.ACTION_ID.MAX))
+        return;
+      this.OnAvoid(this.brain.moveCtrl.avoidPlace);
+      flag = true;
+    }
+    else if (this.brain.moveCtrl.IsSeek())
+    {
+      if (!this.character.IsChangeableAction(Character.ACTION_ID.MOVE))
+        return;
+      this.OnMoveStick(this.brain.moveCtrl.stickVec, this.brain.moveCtrl.targetPos);
+      flag = true;
+    }
+    else if (this.brain.moveCtrl.IsStop())
+      flag = false;
+    if (flag || !this.isMove)
+      return;
+    this.character.ActIdle();
+  }
 
-	private IEnumerator AIMain()
-	{
-		while (base.brain == null || !base.brain.isInitialized)
-		{
-			yield return (object)0;
-		}
-		while (!base.self.isControllable)
-		{
-			yield return (object)0;
-		}
-		if (startWaitTime > 0f)
-		{
-			yield return (object)new WaitForSeconds(startWaitTime);
-		}
-		while (this.get_enabled())
-		{
-			while (base.self.IsMirror())
-			{
-				yield return (object)new WaitForSeconds(1f);
-			}
-			while (IsTouchedInAutoMode())
-			{
-				yield return (object)0;
-			}
-			OnMove();
-			OnWeapon();
-			float time = 0f;
-			if (base.self.packetSender != null)
-			{
-				time = base.self.packetSender.GetWaitTime(0f);
-			}
-			if (time > 0f)
-			{
-				yield return (object)new WaitForSeconds(time);
-			}
-			else
-			{
-				yield return (object)0;
-			}
-		}
-		mainCoroutine = null;
-	}
+  private void OnMoveStick(Vector2 stick_vec, Vector3 target_pos)
+  {
+    ((Vector2) ref stick_vec).Normalize();
+    Vector3 position = ((Component) this).transform.position;
+    Vector3 vector3_1 = Vector3.op_Subtraction(target_pos, position);
+    vector3_1.y = 0.0f;
+    ((Vector3) ref vector3_1).Normalize();
+    Vector3 vector3_2 = Quaternion.op_Multiply(Quaternion.Euler(0.0f, 90f, 0.0f), vector3_1);
+    Vector3 vector3_3 = vector3_1;
+    Vector3 velocity = !Object.op_Inequality((Object) this.self.actionTarget, (Object) null) ? Vector3.op_Addition(Vector3.op_Multiply(Vector3.op_Multiply(vector3_2, stick_vec.x), this.parameter.moveForwardSpeed), Vector3.op_Multiply(Vector3.op_Multiply(vector3_3, stick_vec.y), this.parameter.moveForwardSpeed)) : Vector3.op_Addition(Vector3.op_Multiply(Vector3.op_Multiply(vector3_2, stick_vec.x), this.parameter.moveSideSpeed), Vector3.op_Multiply(Vector3.op_Multiply(vector3_3, stick_vec.y), this.parameter.moveForwardSpeed));
+    this.character.ActMoveVelocity(this.parameter.enableRootMotion ? Vector3.zero : velocity, this.parameter.moveForwardSpeed);
+    this.character.SetLerpRotation(velocity);
+  }
 
-	private void OnDead()
-	{
-		if (!base.self.isControllable && base.self.actionID == (Character.ACTION_ID)22 && base.self.rescueTime <= 0f && base.self.deadStartTime >= 0f && !base.self.isProgressStop() && !(base.self is Self))
-		{
-			base.self.DestroyObject();
-		}
-	}
+  private void OnAvoid(PLACE avoid_place)
+  {
+    if (Object.op_Equality((Object) this.target, (Object) null))
+      return;
+    Vector3 vector3_1 = Vector3.op_Subtraction(this.target._transform.position, this.character._transform.position);
+    vector3_1.y = 0.0f;
+    Quaternion quaternion = Quaternion.LookRotation(vector3_1);
+    Vector3 vector3_2 = Vector3.zero;
+    switch (avoid_place)
+    {
+      case PLACE.FRONT:
+        vector3_2 = Quaternion.op_Multiply(quaternion, Vector3.forward);
+        break;
+      case PLACE.RIGHT:
+        vector3_2 = Quaternion.op_Multiply(quaternion, Vector3.right);
+        break;
+      case PLACE.LEFT:
+        vector3_2 = Quaternion.op_Multiply(quaternion, Vector3.left);
+        break;
+      case PLACE.BACK:
+        vector3_2 = Quaternion.op_Multiply(quaternion, Vector3.back);
+        break;
+    }
+    this.character.LookAt(Vector3.op_Addition(this.character._transform.position, vector3_2), false);
+    this.self.ActAvoid();
+  }
 
-	public void OnSkill()
-	{
-		if (autoBrain.skillCtr.IsAct && base.self.IsActSkillAction(autoBrain.skillCtr.skillIndex))
-		{
-			base.self.ActSkillAction(autoBrain.skillCtr.skillIndex);
-			autoBrain.skillCtr.RemoveSkillIndex();
-		}
-	}
+  private void OnWeapon()
+  {
+    if (this.brain.weaponCtrl.IsAttack())
+    {
+      if (this.self.attackMode == Player.ATTACK_MODE.ARROW)
+        this.OnArrowAttack();
+      else
+        this.OnAttack();
+    }
+    else if (this.brain.weaponCtrl.IsSpecial())
+    {
+      if (this.self.attackMode == Player.ATTACK_MODE.ARROW)
+        this.OnArrowAttack();
+      else
+        this.OnSpecialAttack();
+    }
+    else if (this.brain.weaponCtrl.IsGuard())
+    {
+      this.OnGuard();
+    }
+    else
+    {
+      if (this.self.actionID == (Character.ACTION_ID) 19)
+        this.self.ActIdle(true, -1f);
+      if (this.self.enableInputCharge)
+        this.self.SetEnableTap(false);
+    }
+    if (this.brain.weaponCtrl.changeIndex < 0)
+      return;
+    this.OnChangeWeapon();
+  }
 
-	private void OnMove()
-	{
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		bool flag = true;
-		if (base.brain.moveCtrl.IsAvoid())
-		{
-			if (!base.self.IsChangeableAction(Character.ACTION_ID.MAX))
-			{
-				return;
-			}
-			OnAvoid(base.brain.moveCtrl.avoidPlace);
-			flag = true;
-		}
-		else if (base.brain.moveCtrl.IsSeek())
-		{
-			if (!character.IsChangeableAction(Character.ACTION_ID.MOVE))
-			{
-				return;
-			}
-			OnMoveStick(base.brain.moveCtrl.stickVec, base.brain.moveCtrl.targetPos);
-			flag = true;
-		}
-		else if (base.brain.moveCtrl.IsStop())
-		{
-			flag = false;
-		}
-		if (!flag && isMove)
-		{
-			character.ActIdle(false, -1f);
-		}
-	}
+  private void OnAttack()
+  {
+    if (this.isActSpecialOneSwordSoul)
+      return;
+    bool flag = false;
+    if (this.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.SOUL) && Object.op_Equality((Object) this.self.targetingPoint, (Object) null))
+    {
+      this.self.targetingPointList.Add(this.actionTargetPoint);
+      flag = true;
+    }
+    if (this.self.enableTap)
+      this.self.SetEnableTap(false);
+    if (this.isAttack && this.self.enableInputCombo)
+    {
+      if (flag)
+      {
+        Vector3 vector3 = Vector3.op_Subtraction(this.self.targetingPoint.GetTargetPoint(), this.self._position);
+        vector3.y = 0.0f;
+        this.self.SetLerpRotation(((Vector3) ref vector3).normalized);
+      }
+      if (this.brain.weaponCtrl.beforeAttackId != 0 && this.brain.weaponCtrl.beforeAttackId == this.self.attackID)
+        return;
+      this.brain.weaponCtrl.ComboOn();
+      this.brain.weaponCtrl.SetBeforeAttackId(this.self.attackID);
+      this.self.InputAttackCombo();
+    }
+    else
+    {
+      if (!this.isChangeableAttack)
+        return;
+      if (flag)
+      {
+        Vector3 vector3 = Vector3.op_Subtraction(this.self.targetingPoint.GetTargetPoint(), this.self._position);
+        vector3.y = 0.0f;
+        this.self.SetLerpRotation(((Vector3) ref vector3).normalized);
+      }
+      if (this.brain.weaponCtrl.IsAvoidAttack())
+      {
+        if (this.self.actionID == Character.ACTION_ID.MAX)
+          return;
+        this.self.ActAvoid();
+        this.StartCoroutine(this.WaitArmorBreakAttach());
+      }
+      else
+      {
+        string _motionLayerName = "Base Layer.";
+        this.self.ActAttack(this.self.GetNormalAttackId(this.self.attackMode, this.self.spAttackType, this.self.extraAttackType, out _motionLayerName), true, false, _motionLayerName, "");
+        this.brain.weaponCtrl.ComboOff();
+        this.brain.weaponCtrl.SetBeforeAttackId(0);
+      }
+    }
+  }
 
-	private void OnMoveStick(Vector2 stick_vec, Vector3 target_pos)
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-		stick_vec.Normalize();
-		Vector3 position = this.get_transform().get_position();
-		Vector3 val = target_pos - position;
-		val.y = 0f;
-		val.Normalize();
-		Vector3 val2 = Quaternion.Euler(0f, 90f, 0f) * val;
-		Vector3 val3 = val;
-		Vector3 val4 = (!(base.self.actionTarget != null)) ? (val2 * stick_vec.x * base.parameter.moveForwardSpeed + val3 * stick_vec.y * base.parameter.moveForwardSpeed) : (val2 * stick_vec.x * base.parameter.moveSideSpeed + val3 * stick_vec.y * base.parameter.moveForwardSpeed);
-		character.ActMoveVelocity((!base.parameter.enableRootMotion) ? val4 : Vector3.get_zero(), base.parameter.moveForwardSpeed, Character.MOTION_ID.WALK);
-		character.SetLerpRotation(val4);
-	}
+  private IEnumerator WaitArmorBreakAttach()
+  {
+    yield return (object) new WaitForSeconds(0.1f);
+    while (!this.self.CheckAvoidAttack())
+      yield return (object) null;
+    this.brain.weaponCtrl.AvoidAttackOff();
+  }
 
-	private void OnAvoid(PLACE avoid_place)
-	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		if (!(target == null))
-		{
-			Vector3 val = target._transform.get_position() - character._transform.get_position();
-			val.y = 0f;
-			Quaternion val2 = Quaternion.LookRotation(val);
-			Vector3 val3 = Vector3.get_zero();
-			switch (avoid_place)
-			{
-			case PLACE.FRONT:
-				val3 = val2 * Vector3.get_forward();
-				break;
-			case PLACE.BACK:
-				val3 = val2 * Vector3.get_back();
-				break;
-			case PLACE.LEFT:
-				val3 = val2 * Vector3.get_left();
-				break;
-			case PLACE.RIGHT:
-				val3 = val2 * Vector3.get_right();
-				break;
-			}
-			character.LookAt(character._transform.get_position() + val3);
-			base.self.ActAvoid();
-		}
-	}
+  private void OnSpecialAttack()
+  {
+    if (!this.self.isActSpecialAction && this.isChangeableSpecialAction)
+    {
+      this.self.SetEnableTap(true);
+      if (this.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.HEAT))
+        this.self.ActSpecialAction(true, true);
+      else if (this.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.SOUL))
+      {
+        this.self.ActSpecialAction(true, true);
+        this.StartCoroutine(this.ActSpecialPairSoulSword());
+      }
+      else if (this.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.ONE_HAND_SWORD, SP_ATTACK_TYPE.SOUL))
+      {
+        if (this.isActSpecialOneSwordSoul)
+          return;
+        this.StartCoroutine(this.ActSpecialOneSwordSoul());
+      }
+      else if (this.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.TWO_HAND_SWORD, SP_ATTACK_TYPE.BURST))
+      {
+        if (this.isWaitingSpecial)
+          return;
+        if (this.self.thsCtrl.IsRequiredReloadAction())
+          this.StartCoroutine(this.ActSpecialBurstReload());
+        else
+          this.StartCoroutine(this.ActSpecialBurstFire());
+      }
+      else
+      {
+        this.self.ActSpecialAction(true, true);
+        if (this.self.CheckAttackMode(Player.ATTACK_MODE.SPEAR))
+        {
+          if (this.self.spAttackType != SP_ATTACK_TYPE.NONE)
+            this.brain.weaponCtrl.SetChargeRate(1f);
+          else
+            this.brain.weaponCtrl.SetChargeRate(0.5f);
+        }
+        else if (this.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.ONE_HAND_SWORD, SP_ATTACK_TYPE.SOUL))
+          this.brain.weaponCtrl.SetChargeRate(0.5f);
+        else
+          this.brain.weaponCtrl.SetChargeRate(1f);
+      }
+    }
+    else
+    {
+      if (!this.self.enableInputCharge || (double) this.self.GetChargingRate() < (double) this.brain.weaponCtrl.chargeRate)
+        return;
+      if (this.self.CheckAttackMode(Player.ATTACK_MODE.SPEAR))
+      {
+        switch (this.self.spAttackType)
+        {
+          case SP_ATTACK_TYPE.NONE:
+            if (Object.op_Inequality((Object) this.self.targetingPoint, (Object) null))
+            {
+              Vector3 vector3 = Vector3.op_Subtraction(this.self.targetingPoint.GetTargetPoint(), this.self._position);
+              vector3.y = 0.0f;
+              this.self.SetLerpRotation(((Vector3) ref vector3).normalized);
+              break;
+            }
+            break;
+          case SP_ATTACK_TYPE.HEAT:
+            if (Object.op_Inequality((Object) this.self.targetingPoint, (Object) null))
+            {
+              Vector3 vec = Vector3.op_Subtraction(this.self.targetingPoint.GetTargetPoint(), this.self._position);
+              vec.y = 0.0f;
+              this.self.SetSpearCursorPos(vec);
+              break;
+            }
+            Vector3 vec1 = Vector3.op_Subtraction(this.actionTargetPoint.GetTargetPoint(), this.self._position);
+            vec1.y = 0.0f;
+            this.self.SetSpearCursorPos(vec1);
+            break;
+        }
+      }
+      this.self.SetEnableTap(false);
+    }
+  }
 
-	private void OnWeapon()
-	{
-		if (base.brain.weaponCtrl.IsAttack())
-		{
-			if (base.self.attackMode == Player.ATTACK_MODE.ARROW)
-			{
-				OnArrowAttack();
-			}
-			else
-			{
-				OnAttack();
-			}
-		}
-		else if (base.brain.weaponCtrl.IsSpecial())
-		{
-			if (base.self.attackMode == Player.ATTACK_MODE.ARROW)
-			{
-				OnArrowAttack();
-			}
-			else
-			{
-				OnSpecialAttack();
-			}
-		}
-		else if (base.brain.weaponCtrl.IsGuard())
-		{
-			OnGuard();
-		}
-		else
-		{
-			if (base.self.actionID == (Character.ACTION_ID)18)
-			{
-				base.self.ActIdle(true, -1f);
-			}
-			if (base.self.enableInputCharge)
-			{
-				base.self.SetEnableTap(false);
-			}
-		}
-		if (base.brain.weaponCtrl.changeIndex >= 0)
-		{
-			OnChangeWeapon();
-		}
-	}
+  private IEnumerator ActSpecialBurstReload()
+  {
+    this.isWaitingSpecial = true;
+    this.self.ActSpecialAction(true, true);
+    yield return (object) new WaitForSeconds(0.5f);
+    this.isWaitingSpecial = false;
+    this.self.SetEnableTap(false);
+  }
 
-	private void OnAttack()
-	{
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-		if (!isActSpecialOneSwordSoul)
-		{
-			bool flag = false;
-			if (base.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.SOUL) && base.self.targetingPoint == null)
-			{
-				base.self.targetingPointList.Add(actionTargetPoint);
-				flag = true;
-			}
-			if (base.self.enableTap)
-			{
-				base.self.SetEnableTap(false);
-			}
-			if (isAttack && base.self.enableInputCombo)
-			{
-				if (flag)
-				{
-					Vector3 val = base.self.targetingPoint.GetTargetPoint() - base.self._position;
-					val.y = 0f;
-					base.self.SetLerpRotation(val.get_normalized());
-				}
-				if (base.brain.weaponCtrl.beforeAttackId == 0 || base.brain.weaponCtrl.beforeAttackId != base.self.attackID)
-				{
-					base.brain.weaponCtrl.ComboOn();
-					base.brain.weaponCtrl.SetBeforeAttackId(base.self.attackID);
-					base.self.InputAttackCombo();
-				}
-			}
-			else if (isChangeableAttack)
-			{
-				if (flag)
-				{
-					Vector3 val2 = base.self.targetingPoint.GetTargetPoint() - base.self._position;
-					val2.y = 0f;
-					base.self.SetLerpRotation(val2.get_normalized());
-				}
-				if (base.brain.weaponCtrl.IsAvoidAttack())
-				{
-					if (base.self.actionID != Character.ACTION_ID.MAX)
-					{
-						base.self.ActAvoid();
-						this.StartCoroutine(WaitArmorBreakAttach());
-					}
-				}
-				else
-				{
-					base.self.ActAttack(base.self.GetNormalAttackId(base.self.attackMode, base.self.spAttackType), true, false);
-					base.brain.weaponCtrl.ComboOff();
-					base.brain.weaponCtrl.SetBeforeAttackId(0);
-				}
-			}
-		}
-	}
+  private IEnumerator ActSpecialBurstFire()
+  {
+    this.isWaitingSpecial = true;
+    this.self.ActSpecialAction(true, true);
+    yield return (object) new WaitForSeconds(0.5f);
+    if (Object.op_Equality((Object) this.self.targetingPoint, (Object) null))
+      this.self.targetingPointList.Add(this.actionTargetPoint);
+    if (Object.op_Inequality((Object) this.self.targetingPoint, (Object) null))
+    {
+      Vector3 vector3 = Vector3.op_Subtraction(this.self.targetingPoint.GetTargetPoint(), this.self._position);
+      vector3.y = 0.0f;
+      this.self.SetLerpRotation(((Vector3) ref vector3).normalized);
+    }
+    this.self.SetEnableTap(false);
+    this.isWaitingSpecial = false;
+  }
 
-	private IEnumerator WaitArmorBreakAttach()
-	{
-		yield return (object)new WaitForSeconds(0.1f);
-		while (!base.self.CheckAvoidAttack())
-		{
-			yield return (object)null;
-		}
-		base.brain.weaponCtrl.AvoidAttackOff();
-	}
+  private IEnumerator ActSpecialOneSwordSoul()
+  {
+    if (Object.op_Equality((Object) this.self.targetingPoint, (Object) null))
+      this.self.targetingPointList.Add(this.actionTargetPoint);
+    if (Object.op_Inequality((Object) this.self.targetingPoint, (Object) null))
+    {
+      Vector3 vector3 = Vector3.op_Subtraction(this.self.targetingPoint.GetTargetPoint(), this.self._position);
+      vector3.y = 0.0f;
+      this.self.SetLerpRotation(((Vector3) ref vector3).normalized);
+    }
+    this.isActSpecialOneSwordSoul = true;
+    this.self.ActSpecialAction(true, true);
+    yield return (object) new WaitForSeconds(2f);
+    this.self.SetEnableTap(false);
+    if (Utility.Dice100(65))
+    {
+      this.self.SetFlickDirection(SelfController.FLICK_DIRECTION.FRONT);
+      while (this.self.isActSpecialAction && !this.self.ActSpAttackContinue())
+        yield return (object) null;
+    }
+    this.isActSpecialOneSwordSoul = false;
+  }
 
-	private void OnSpecialAttack()
-	{
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0203: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0218: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0247: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0251: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0264: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0290: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ba: Unknown result type (might be due to invalid IL or missing references)
-		if (!base.self.isActSpecialAction && isChangeableSpecialAction)
-		{
-			base.self.SetEnableTap(true);
-			if (base.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.HEAT))
-			{
-				base.self.ActSpecialAction(true, true);
-			}
-			else if (base.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.PAIR_SWORDS, SP_ATTACK_TYPE.SOUL))
-			{
-				base.self.ActSpecialAction(true, true);
-				this.StartCoroutine(ActSpecialPairSoulSword());
-			}
-			else if (base.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.ONE_HAND_SWORD, SP_ATTACK_TYPE.SOUL))
-			{
-				if (!isActSpecialOneSwordSoul)
-				{
-					this.StartCoroutine(ActSpecialOneSwordSoul());
-				}
-			}
-			else
-			{
-				base.self.ActSpecialAction(true, true);
-				if (base.self.CheckAttackMode(Player.ATTACK_MODE.SPEAR))
-				{
-					switch (base.self.spAttackType)
-					{
-					case SP_ATTACK_TYPE.HEAT:
-						base.brain.weaponCtrl.SetChargeRate(1f);
-						break;
-					case SP_ATTACK_TYPE.NONE:
-						base.brain.weaponCtrl.SetChargeRate(0.5f);
-						break;
-					default:
-						base.brain.weaponCtrl.SetChargeRate(1f);
-						break;
-					}
-				}
-				else if (base.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.ONE_HAND_SWORD, SP_ATTACK_TYPE.SOUL))
-				{
-					base.brain.weaponCtrl.SetChargeRate(0.5f);
-				}
-				else
-				{
-					base.brain.weaponCtrl.SetChargeRate(1f);
-				}
-			}
-		}
-		else if (base.self.enableInputCharge && base.self.GetChargingRate() >= base.brain.weaponCtrl.chargeRate)
-		{
-			if (base.self.CheckAttackMode(Player.ATTACK_MODE.SPEAR))
-			{
-				switch (base.self.spAttackType)
-				{
-				case SP_ATTACK_TYPE.HEAT:
-					if (base.self.targetingPoint != null)
-					{
-						Vector3 spearCursorPos = base.self.targetingPoint.GetTargetPoint() - base.self._position;
-						spearCursorPos.y = 0f;
-						base.self.SetSpearCursorPos(spearCursorPos);
-					}
-					else
-					{
-						Vector3 spearCursorPos2 = actionTargetPoint.GetTargetPoint() - base.self._position;
-						spearCursorPos2.y = 0f;
-						base.self.SetSpearCursorPos(spearCursorPos2);
-					}
-					break;
-				case SP_ATTACK_TYPE.NONE:
-					if (base.self.targetingPoint != null)
-					{
-						Vector3 val = base.self.targetingPoint.GetTargetPoint() - base.self._position;
-						val.y = 0f;
-						base.self.SetLerpRotation(val.get_normalized());
-					}
-					break;
-				}
-			}
-			base.self.SetEnableTap(false);
-		}
-	}
+  private IEnumerator ActSpecialPairSoulSword()
+  {
+    yield return (object) new WaitForSeconds(0.5f);
+    this.self.SetEnableTap(false);
+  }
 
-	private IEnumerator ActSpecialOneSwordSoul()
-	{
-		if (base.self.targetingPoint == null)
-		{
-			base.self.targetingPointList.Add(actionTargetPoint);
-		}
-		if (base.self.targetingPoint != null)
-		{
-			Vector3 dir = base.self.targetingPoint.GetTargetPoint() - base.self._position;
-			dir.y = 0f;
-			base.self.SetLerpRotation(dir.get_normalized());
-		}
-		isActSpecialOneSwordSoul = true;
-		base.self.ActSpecialAction(true, true);
-		yield return (object)new WaitForSeconds(2f);
-		base.self.SetEnableTap(false);
-		if (Utility.Dice100(65))
-		{
-			base.self.SetFlickDirection(FLICK_DIRECTION.FRONT);
-			while (base.self.isActSpecialAction && !base.self.ActSpAttackContinue())
-			{
-				yield return (object)null;
-			}
-		}
-		isActSpecialOneSwordSoul = false;
-	}
+  private void OnArrowAttack()
+  {
+    if (Object.op_Equality((Object) this.self.targetingPoint, (Object) null))
+      this.self.targetingPointList.Add(this.actionTargetPoint);
+    if (this.self.isControllable)
+    {
+      this.self.SetEnableTap(true);
+      string _motionLayerName = "Base Layer.";
+      this.self.ActAttack(this.self.GetNormalAttackId(this.self.attackMode, this.self.spAttackType, this.self.extraAttackType, out _motionLayerName), true, false, _motionLayerName, "");
+      if (this.brain.weaponCtrl.IsSpecial())
+        this.brain.weaponCtrl.SetChargeRate(1f);
+      else if (this.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.ARROW, SP_ATTACK_TYPE.SOUL))
+        this.brain.weaponCtrl.SetChargeRate(1f);
+      else
+        this.brain.weaponCtrl.SetChargeRate(Random.value);
+    }
+    else if (this.self.enableInputCharge && (double) this.self.GetChargingRate() >= (double) this.brain.weaponCtrl.chargeRate)
+    {
+      this.self.SetEnableTap(false);
+    }
+    else
+    {
+      if (!this.self.CheckAttackModeAndSpType(Player.ATTACK_MODE.ARROW, SP_ATTACK_TYPE.SOUL))
+        return;
+      if (!this.self.isArrowAimLesserMode)
+        this.self.SetArrowAimLesserMode(true);
+      Vector3 zero = Vector3.zero;
+      Vector3 vector3_1 = !Object.op_Inequality((Object) this.self.targetingPoint, (Object) null) ? this.actionTargetPoint.GetTargetPoint() : this.self.targetingPoint.GetTargetPoint();
+      Vector3 lesserCursorEffect = this.self.GetArrowAimLesserCursorEffect();
+      if ((double) Vector3.Distance(lesserCursorEffect, vector3_1) > 1.0)
+      {
+        Vector3 vector3_2 = Vector3.op_Subtraction(lesserCursorEffect, vector3_1);
+        Vector2 vector2;
+        // ISSUE: explicit constructor call
+        ((Vector2) ref vector2).\u002Ector(vector3_2.x, vector3_2.z);
+        this.self.UpdateArrowAimLesserMode(((Vector2) ref vector2).normalized);
+      }
+      else
+        this.self.UpdateArrowAimLesserMode(Vector2.zero);
+    }
+  }
 
-	private IEnumerator ActSpecialPairSoulSword()
-	{
-		yield return (object)new WaitForSeconds(0.5f);
-		base.self.SetEnableTap(false);
-	}
+  private void OnGuard()
+  {
+    if (!this.self.isGuardAttackMode || this.self.isActSpecialAction || !this.isChangeableSpecialAction)
+      return;
+    this.self.ActSpecialAction(true, true);
+  }
 
-	private void OnArrowAttack()
-	{
-		if (base.self.targetingPoint == null)
-		{
-			base.self.targetingPointList.Add(actionTargetPoint);
-		}
-		if (base.self.isControllable)
-		{
-			base.self.SetEnableTap(true);
-			base.self.ActAttack(base.self.GetNormalAttackId(base.self.attackMode, base.self.spAttackType), true, false);
-			if (base.brain.weaponCtrl.IsSpecial())
-			{
-				base.brain.weaponCtrl.SetChargeRate(1f);
-			}
-			else
-			{
-				base.brain.weaponCtrl.SetChargeRate(Random.get_value());
-			}
-		}
-		else if (base.self.enableInputCharge && base.self.GetChargingRate() >= base.brain.weaponCtrl.chargeRate)
-		{
-			base.self.SetEnableTap(false);
-		}
-	}
+  private void OnChangeWeapon()
+  {
+    int changeIndex = this.brain.weaponCtrl.changeIndex;
+    if (changeIndex < 0 || this.self.equipWeaponList.Count <= changeIndex || changeIndex == this.self.weaponIndex || this.self.equipWeaponList[changeIndex] == null)
+      return;
+    this.self.ActChangeWeapon(this.self.equipWeaponList[changeIndex], changeIndex);
+    this.brain.weaponCtrl.ResetChangeIndex();
+  }
 
-	private void OnGuard()
-	{
-		if (base.self.isGuardAttackMode && !base.self.isActSpecialAction && isChangeableSpecialAction)
-		{
-			base.self.ActSpecialAction(true, true);
-		}
-	}
+  public void UpdateTarget()
+  {
+    this.brain.targetCtrl.UpdateTarget();
+    if (this.self.attackMode != Player.ATTACK_MODE.ARROW)
+      return;
+    this.UpdateRegionTarget();
+  }
 
-	private void OnChangeWeapon()
-	{
-		int changeIndex = base.brain.weaponCtrl.changeIndex;
-		if (changeIndex >= 0 && base.self.equipWeaponList.Count > changeIndex && changeIndex != base.self.weaponIndex && base.self.equipWeaponList[changeIndex] != null)
-		{
-			base.self.ActChangeWeapon(base.self.equipWeaponList[changeIndex], changeIndex);
-			base.brain.weaponCtrl.ResetChangeIndex();
-		}
-	}
-
-	public void UpdateTarget()
-	{
-		base.brain.targetCtrl.UpdateTarget();
-		if (base.self.attackMode == Player.ATTACK_MODE.ARROW)
-		{
-			UpdateRegionTarget();
-		}
-	}
-
-	private void UpdateRegionTarget()
-	{
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		if (!(base.self == null))
-		{
-			base.self.targetingPointList.Clear();
-			if (!(target == null))
-			{
-				Enemy enemy = target as Enemy;
-				if (!(enemy == null) && !enemy.isDead && enemy.enableTargetPoint)
-				{
-					TargetPoint[] targetPoints = enemy.targetPoints;
-					if (targetPoints != null && targetPoints.Length != 0)
-					{
-						TargetPoint targetPoint = null;
-						float num = 3.40282347E+38f;
-						Vector3 position = base.self._transform.get_position();
-						Vector2 val = position.ToVector2XZ();
-						Vector2 forwardXZ = base.self.forwardXZ;
-						forwardXZ.Normalize();
-						int i = 0;
-						for (int num2 = targetPoints.Length; i < num2; i++)
-						{
-							TargetPoint targetPoint2 = targetPoints[i];
-							if (targetPoint2.get_gameObject().get_activeInHierarchy())
-							{
-								Vector3 targetPoint3 = targetPoint2.GetTargetPoint();
-								Vector2 val2 = targetPoint3.ToVector2XZ();
-								Vector2 val3 = val2 - val;
-								float sqrMagnitude = val3.get_sqrMagnitude();
-								if (targetPoint == null || sqrMagnitude < num)
-								{
-									targetPoint = targetPoint2;
-									num = sqrMagnitude;
-								}
-							}
-						}
-						if (targetPoint != null)
-						{
-							base.self.targetingPointList.Add(targetPoint);
-						}
-					}
-				}
-			}
-		}
-	}
+  private void UpdateRegionTarget()
+  {
+    if (Object.op_Equality((Object) this.self, (Object) null))
+      return;
+    this.self.targetingPointList.Clear();
+    if (Object.op_Equality((Object) this.target, (Object) null))
+      return;
+    Enemy target = this.target as Enemy;
+    if (Object.op_Equality((Object) target, (Object) null) || target.isDead || !target.enableTargetPoint)
+      return;
+    TargetPoint[] targetPoints = target.targetPoints;
+    if (targetPoints == null || targetPoints.Length == 0)
+      return;
+    TargetPoint targetPoint1 = (TargetPoint) null;
+    float num = float.MaxValue;
+    Vector2 vector2Xz = this.self._transform.position.ToVector2XZ();
+    Vector2 forwardXz = this.self.forwardXZ;
+    ((Vector2) ref forwardXz).Normalize();
+    int index = 0;
+    for (int length = targetPoints.Length; index < length; ++index)
+    {
+      TargetPoint targetPoint2 = targetPoints[index];
+      if (((Component) targetPoint2).gameObject.activeInHierarchy)
+      {
+        Vector2 vector2 = Vector2.op_Subtraction(targetPoint2.GetTargetPoint().ToVector2XZ(), vector2Xz);
+        float sqrMagnitude = ((Vector2) ref vector2).sqrMagnitude;
+        if (Object.op_Equality((Object) targetPoint1, (Object) null) || (double) sqrMagnitude < (double) num)
+        {
+          targetPoint1 = targetPoint2;
+          num = sqrMagnitude;
+        }
+      }
+    }
+    if (!Object.op_Inequality((Object) targetPoint1, (Object) null))
+      return;
+    this.self.targetingPointList.Add(targetPoint1);
+  }
 }

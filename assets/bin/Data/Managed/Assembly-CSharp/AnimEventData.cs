@@ -1,271 +1,221 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AnimEventData
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AnimEventData
+#nullable disable
+public class AnimEventData : ScriptableObject
 {
-	[Serializable]
-	public class EventData
-	{
-		public string name;
+  public const string ANIMATOR_DEF_LAYER_NAME = "Base Layer.";
+  public const float FIRST_EXECUTE_TIME = -3.40282347E+38f;
+  public const float LAST_EXECUTE_TIME = 3.402823E+38f;
+  public AnimEventData.AnimData[] animations = new AnimEventData.AnimData[0];
+  [NonSerialized]
+  private int[] hashs;
+  public static int[] idHashs;
+  public static int[] ids;
+  public AnimEventData.ResidentEffectData[] residentEffectDataList;
 
-		public float time;
+  public void Initialize()
+  {
+    int length1 = this.animations.Length;
+    int[] hashs = this.hashs;
+    if (hashs != null && hashs.Length >= length1)
+      return;
+    int[] numArray;
+    this.hashs = numArray = new int[length1];
+    for (int index1 = 0; index1 < length1; ++index1)
+    {
+      numArray[index1] = Animator.StringToHash(this.animations[index1].GetAnimName());
+      AnimEventData.AnimData animation = this.animations[index1];
+      AnimEventData.EventData[] events = this.animations[index1].events;
+      if (!animation.initIDs)
+      {
+        int index2 = 0;
+        for (int length2 = events.Length; index2 < length2; ++index2)
+          events[index2].id = AnimEventData.StringToID(events[index2].name);
+        animation.initIDs = true;
+      }
+    }
+  }
 
-		public int[] intArgs;
+  public AnimEventData.EventData[] GetEventDatas(int hash)
+  {
+    int length1 = this.animations.Length;
+    if (length1 == 0)
+      return (AnimEventData.EventData[]) null;
+    int[] numArray = this.hashs;
+    if (numArray == null || numArray.Length < length1)
+    {
+      this.hashs = numArray = new int[length1];
+      for (int index = 0; index < length1; ++index)
+        numArray[index] = Animator.StringToHash(this.animations[index].GetAnimName());
+    }
+    for (int index1 = 0; index1 < length1; ++index1)
+    {
+      if (numArray[index1] == hash)
+      {
+        AnimEventData.AnimData animation = this.animations[index1];
+        AnimEventData.EventData[] events = this.animations[index1].events;
+        if (!animation.initIDs)
+        {
+          int index2 = 0;
+          for (int length2 = events.Length; index2 < length2; ++index2)
+            events[index2].id = AnimEventData.StringToID(events[index2].name);
+          animation.initIDs = true;
+        }
+        return events;
+      }
+    }
+    return (AnimEventData.EventData[]) null;
+  }
 
-		public float[] floatArgs;
+  static AnimEventData()
+  {
+    string[] names = Enum.GetNames(typeof (AnimEventFormat.ID));
+    int length = names != null ? names.Length : 0;
+    AnimEventData.idHashs = new int[length];
+    for (int index = 0; index < length; ++index)
+      AnimEventData.idHashs[index] = Animator.StringToHash(names[index]);
+    AnimEventData.ids = (int[]) Enum.GetValues(typeof (AnimEventFormat.ID));
+  }
 
-		public string[] stringArgs;
+  public static AnimEventFormat.ID StringToID(string name)
+  {
+    int hash = Animator.StringToHash(name);
+    int index = 0;
+    for (int length = AnimEventData.idHashs.Length; index < length; ++index)
+    {
+      if (AnimEventData.idHashs[index] == hash)
+        return (AnimEventFormat.ID) AnimEventData.ids[index];
+    }
+    return ~AnimEventFormat.ID.SHOT_ARROW;
+  }
 
-		[NonSerialized]
-		public AnimEventFormat.ID id;
+  public AnimEventData.ResidentEffectData AddResidentEffectData()
+  {
+    List<AnimEventData.ResidentEffectData> residentEffectDataList = new List<AnimEventData.ResidentEffectData>();
+    if (this.residentEffectDataList != null && this.residentEffectDataList.Length != 0)
+      residentEffectDataList.AddRange((IEnumerable<AnimEventData.ResidentEffectData>) this.residentEffectDataList);
+    AnimEventData.ResidentEffectData residentEffectData = new AnimEventData.ResidentEffectData();
+    residentEffectData.effectName = string.Empty;
+    residentEffectData.linkNodeName = string.Empty;
+    residentEffectData.offsetPos = Vector3.zero;
+    residentEffectData.offsetRot = Vector3.zero;
+    residentEffectData.groupID = 0;
+    residentEffectData.handle = 0;
+    residentEffectData.scale = 1f;
+    residentEffectDataList.Add(residentEffectData);
+    this.residentEffectDataList = residentEffectDataList.ToArray();
+    return residentEffectData;
+  }
 
-		[NonSerialized]
-		public Player.ATTACK_MODE attackMode;
+  public void DeleteResidentEffectData(AnimEventData.ResidentEffectData targetData)
+  {
+    List<AnimEventData.ResidentEffectData> residentEffectDataList = new List<AnimEventData.ResidentEffectData>();
+    if (this.residentEffectDataList != null && this.residentEffectDataList.Length != 0)
+      residentEffectDataList.AddRange((IEnumerable<AnimEventData.ResidentEffectData>) this.residentEffectDataList);
+    if (residentEffectDataList.Contains(targetData))
+      residentEffectDataList.Remove(targetData);
+    if (residentEffectDataList.Count > 0)
+      this.residentEffectDataList = residentEffectDataList.ToArray();
+    else
+      this.residentEffectDataList = (AnimEventData.ResidentEffectData[]) null;
+  }
 
-		public int GetInt(int index, int defVal = 0)
-		{
-			return (!HasInt(0)) ? defVal : intArgs[index];
-		}
+  [Serializable]
+  public class EventData
+  {
+    public string name;
+    public float time;
+    public int[] intArgs;
+    public float[] floatArgs;
+    public string[] stringArgs;
+    [NonSerialized]
+    public AnimEventFormat.ID id;
+    [NonSerialized]
+    public Player.ATTACK_MODE attackMode;
 
-		public float GetFloat(int index, float defVal = 0f)
-		{
-			return (!HasFloat(0)) ? defVal : floatArgs[index];
-		}
+    public int GetInt(int index, int defVal = 0) => !this.HasInt(0) ? defVal : this.intArgs[index];
 
-		public string GetString(int index, string defVal = "")
-		{
-			return (!HasString(0)) ? defVal : stringArgs[index];
-		}
+    public float GetFloat(int index, float defVal = 0.0f)
+    {
+      return !this.HasFloat(0) ? defVal : this.floatArgs[index];
+    }
 
-		public bool HasInt(int index)
-		{
-			return intArgs != null && index >= 0 && index < intArgs.Length;
-		}
+    public string GetString(int index, string defVal = "")
+    {
+      return !this.HasString(0) ? defVal : this.stringArgs[index];
+    }
 
-		public bool HasFloat(int index)
-		{
-			return floatArgs != null && index >= 0 && index < floatArgs.Length;
-		}
+    public bool HasInt(int index)
+    {
+      return this.intArgs != null && index >= 0 && index < this.intArgs.Length;
+    }
 
-		public bool HasString(int index)
-		{
-			return stringArgs != null && index >= 0 && index < stringArgs.Length;
-		}
+    public bool HasFloat(int index)
+    {
+      return this.floatArgs != null && index >= 0 && index < this.floatArgs.Length;
+    }
 
-		public void Copy(EventData from_data, bool with_time)
-		{
-			if (with_time)
-			{
-				time = from_data.time;
-			}
-			id = from_data.id;
-			name = from_data.name;
-			intArgs = ((from_data.intArgs == null) ? null : ((int[])from_data.intArgs.Clone()));
-			floatArgs = ((from_data.floatArgs == null) ? null : ((float[])from_data.floatArgs.Clone()));
-			stringArgs = ((from_data.stringArgs == null) ? null : ((string[])from_data.stringArgs.Clone()));
-		}
-	}
+    public bool HasString(int index)
+    {
+      return this.stringArgs != null && index >= 0 && index < this.stringArgs.Length;
+    }
 
-	[Serializable]
-	public class AnimData
-	{
-		public string name;
+    public void Copy(AnimEventData.EventData from_data, bool with_time)
+    {
+      if (with_time)
+        this.time = from_data.time;
+      this.id = from_data.id;
+      this.name = from_data.name;
+      this.intArgs = from_data.intArgs != null ? (int[]) from_data.intArgs.Clone() : (int[]) null;
+      this.floatArgs = from_data.floatArgs != null ? (float[]) from_data.floatArgs.Clone() : (float[]) null;
+      this.stringArgs = from_data.stringArgs != null ? (string[]) from_data.stringArgs.Clone() : (string[]) null;
+    }
+  }
 
-		public EventData[] events;
+  [Serializable]
+  public class AnimData
+  {
+    public string name;
+    public string layerName = "Base Layer.";
+    public AnimEventData.EventData[] events;
+    [NonSerialized]
+    public bool initIDs;
 
-		[NonSerialized]
-		public bool initIDs;
-	}
+    public string GetAnimName() => this.layerName + this.name;
 
-	[Serializable]
-	public class ResidentEffectData
-	{
-		public string effectName;
+    public string GetUniqueName() => this.layerName.Substring("Base Layer.".Length) + this.name;
+  }
 
-		public string linkNodeName;
+  [Serializable]
+  public class ResidentEffectData
+  {
+    public string effectName;
+    public string linkNodeName;
+    public Vector3 offsetPos;
+    public Vector3 offsetRot;
+    public int groupID;
+    public int handle;
+    public float scale = 1f;
 
-		public Vector3 offsetPos;
+    public void Copy(AnimEventData.ResidentEffectData srcInfo)
+    {
+      this.effectName = srcInfo.effectName;
+      this.linkNodeName = srcInfo.linkNodeName;
+      this.offsetPos = srcInfo.offsetPos;
+      this.offsetRot = srcInfo.offsetRot;
+      this.groupID = srcInfo.groupID;
+      this.handle = srcInfo.handle;
+      this.scale = srcInfo.scale;
+    }
 
-		public Vector3 offsetRot;
-
-		public int groupID;
-
-		public int handle;
-
-		public float scale = 1f;
-
-		public string UniqueName => effectName + linkNodeName + groupID;
-
-		public void Copy(ResidentEffectData srcInfo)
-		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			effectName = srcInfo.effectName;
-			linkNodeName = srcInfo.linkNodeName;
-			offsetPos = srcInfo.offsetPos;
-			offsetRot = srcInfo.offsetRot;
-			groupID = srcInfo.groupID;
-			handle = srcInfo.handle;
-			scale = srcInfo.scale;
-		}
-	}
-
-	protected const string ANIMATOR_DEF_LAYER_NAME = "Base Layer.";
-
-	public const float FIRST_EXECUTE_TIME = float.MinValue;
-
-	public const float LAST_EXECUTE_TIME = 3.402823E+38f;
-
-	public AnimData[] animations = new AnimData[0];
-
-	[NonSerialized]
-	private int[] hashs;
-
-	public static int[] idHashs;
-
-	public static int[] ids;
-
-	public ResidentEffectData[] residentEffectDataList;
-
-	public AnimEventData()
-		: this()
-	{
-	}
-
-	static AnimEventData()
-	{
-		string[] names = Enum.GetNames(typeof(AnimEventFormat.ID));
-		int num = (names != null) ? names.Length : 0;
-		idHashs = new int[num];
-		for (int i = 0; i < num; i++)
-		{
-			idHashs[i] = Animator.StringToHash(names[i]);
-		}
-		ids = (int[])Enum.GetValues(typeof(AnimEventFormat.ID));
-		names = null;
-	}
-
-	public void Initialize()
-	{
-		int num = animations.Length;
-		int[] array = hashs;
-		if (array == null || array.Length < num)
-		{
-			array = (hashs = new int[num]);
-			for (int i = 0; i < num; i++)
-			{
-				array[i] = Animator.StringToHash("Base Layer." + animations[i].name);
-				AnimData animData = animations[i];
-				EventData[] events = animations[i].events;
-				if (!animData.initIDs)
-				{
-					int j = 0;
-					for (int num2 = events.Length; j < num2; j++)
-					{
-						events[j].id = StringToID(events[j].name);
-					}
-					animData.initIDs = true;
-				}
-			}
-		}
-	}
-
-	public EventData[] GetEventDatas(int hash)
-	{
-		int num = animations.Length;
-		if (num == 0)
-		{
-			return null;
-		}
-		int[] array = hashs;
-		if (array == null || array.Length < num)
-		{
-			array = (hashs = new int[num]);
-			for (int i = 0; i < num; i++)
-			{
-				array[i] = Animator.StringToHash("Base Layer." + animations[i].name);
-			}
-		}
-		for (int j = 0; j < num; j++)
-		{
-			if (array[j] == hash)
-			{
-				AnimData animData = animations[j];
-				EventData[] events = animations[j].events;
-				if (!animData.initIDs)
-				{
-					int k = 0;
-					for (int num2 = events.Length; k < num2; k++)
-					{
-						events[k].id = StringToID(events[k].name);
-					}
-					animData.initIDs = true;
-				}
-				return events;
-			}
-		}
-		return null;
-	}
-
-	public static AnimEventFormat.ID StringToID(string name)
-	{
-		int num = Animator.StringToHash(name);
-		int i = 0;
-		for (int num2 = idHashs.Length; i < num2; i++)
-		{
-			if (idHashs[i] == num)
-			{
-				return (AnimEventFormat.ID)ids[i];
-			}
-		}
-		return (AnimEventFormat.ID)(-1);
-	}
-
-	public ResidentEffectData AddResidentEffectData()
-	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		List<ResidentEffectData> list = new List<ResidentEffectData>();
-		if (residentEffectDataList != null && residentEffectDataList.Length > 0)
-		{
-			list.AddRange(residentEffectDataList);
-		}
-		ResidentEffectData residentEffectData = new ResidentEffectData();
-		residentEffectData.effectName = string.Empty;
-		residentEffectData.linkNodeName = string.Empty;
-		residentEffectData.offsetPos = Vector3.get_zero();
-		residentEffectData.offsetRot = Vector3.get_zero();
-		residentEffectData.groupID = 0;
-		residentEffectData.handle = 0;
-		residentEffectData.scale = 1f;
-		list.Add(residentEffectData);
-		residentEffectDataList = list.ToArray();
-		return residentEffectData;
-	}
-
-	public void DeleteResidentEffectData(ResidentEffectData targetData)
-	{
-		List<ResidentEffectData> list = new List<ResidentEffectData>();
-		if (residentEffectDataList != null && residentEffectDataList.Length > 0)
-		{
-			list.AddRange(residentEffectDataList);
-		}
-		if (list.Contains(targetData))
-		{
-			list.Remove(targetData);
-		}
-		if (list.Count > 0)
-		{
-			residentEffectDataList = list.ToArray();
-		}
-		else
-		{
-			residentEffectDataList = null;
-		}
-	}
+    public string UniqueName => this.effectName + this.linkNodeName + (object) this.groupID;
+  }
 }

@@ -1,45 +1,40 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIChatItem
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-[RequireComponent(typeof(UIButton))]
-public class UIChatItem
+#nullable disable
+[RequireComponent(typeof (UIButton))]
+public class UIChatItem : MonoBehaviour
 {
-	[SerializeField]
-	protected UILabel chatText;
+  [SerializeField]
+  protected UILabel chatText;
+  protected int chatID;
+  protected UIChatButtonBase chatButton;
 
-	protected int chatID;
+  public void SetChatData(UIChatButtonBase parent, string str, int chat_id)
+  {
+    this.chatButton = parent;
+    this.chatID = chat_id;
+    if (Object.op_Inequality((Object) this.chatText, (Object) null))
+      this.chatText.text = str;
+    ((Component) this).gameObject.SetActive(false);
+  }
 
-	protected UIChatButtonBase chatButton;
+  private void OnDragOver(GameObject drag)
+  {
+    if (!Object.op_Inequality((Object) this.chatButton, (Object) null))
+      return;
+    this.chatButton.ChatSay(this.chatID);
+  }
 
-	public UIChatItem()
-		: this()
-	{
-	}
-
-	public void SetChatData(UIChatButtonBase parent, string str, int chat_id)
-	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		chatButton = parent;
-		chatID = chat_id;
-		if (chatText != null)
-		{
-			chatText.text = str;
-		}
-		this.get_gameObject().SetActive(false);
-	}
-
-	private void OnDragOver(GameObject drag)
-	{
-		if (chatButton != null)
-		{
-			chatButton.ChatSay(chatID);
-		}
-	}
-
-	private void OnDragOut(GameObject drag)
-	{
-		if (chatButton != null)
-		{
-			chatButton.ChatCancel(chatID);
-		}
-	}
+  private void OnDragOut(GameObject drag)
+  {
+    if (!Object.op_Inequality((Object) this.chatButton, (Object) null))
+      return;
+    this.chatButton.ChatCancel(this.chatID);
+  }
 }

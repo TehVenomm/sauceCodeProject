@@ -1,229 +1,105 @@
-using Network;
-using System.Collections.Generic;
+﻿// Decompiled with JetBrains decompiler
+// Type: GatherPointObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class GatherPointObject
+#nullable disable
+public abstract class GatherPointObject : MonoBehaviour
 {
-	protected Transform modelView;
+  protected Transform modelView;
+  protected Transform gatherEffect;
+  protected Transform targetEffect;
+  protected Self self;
+  public FieldGimmickObject gimmick;
 
-	protected Transform gatherEffect;
+  public Transform _transform { get; private set; }
 
-	protected Transform targetEffect;
+  public FieldMapTable.GatherPointTableData pointData { get; protected set; }
 
-	protected Self self;
+  public FieldMapTable.GatherPointViewTableData viewData { get; protected set; }
 
-	public FieldGimmickObject gimmick;
+  public bool isGathered { get; protected set; }
 
-	public Transform _transform
-	{
-		get;
-		private set;
-	}
+  public static T Create<T>(FieldMapTable.GatherPointTableData point_data, Transform parent) where T : GatherPointObject
+  {
+    Transform gameObject = Utility.CreateGameObject("GatherPoint", parent, 9);
+    gameObject.position = new Vector3(point_data.pointX, 0.0f, point_data.pointZ);
+    gameObject.rotation = Quaternion.AngleAxis(point_data.pointDir, Vector3.up);
+    T obj = ((Component) gameObject).gameObject.AddComponent<T>();
+    if (Object.op_Equality((Object) (object) obj, (Object) null))
+      return default (T);
+    obj.Initialize(point_data);
+    return obj;
+  }
 
-	public FieldMapTable.GatherPointTableData pointData
-	{
-		get;
-		protected set;
-	}
+  private void Awake() => this._transform = ((Component) this).transform;
 
-	public FieldMapTable.GatherPointViewTableData viewData
-	{
-		get;
-		protected set;
-	}
+  public virtual void Initialize(FieldMapTable.GatherPointTableData point_data)
+  {
+    this.pointData = point_data;
+    this.viewData = Singleton<FieldMapTable>.I.GetGatherPointViewData(this.pointData.viewID);
+    if (this.viewData == null)
+    {
+      Log.Error(LOG.INGAME, "GatherPointObject::Initialize() viewData is null. pointID = {0}, viewID = {1}", (object) this.pointData.pointID, (object) this.pointData.viewID);
+    }
+    else
+    {
+      if (this.viewData.viewID != 0U)
+        this.modelView = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameProgress>.I.gatherPointModelTable.Get(this.viewData.viewID).loadedObject, this._transform);
+      if (!string.IsNullOrEmpty(this.viewData.gatherEffectName))
+        this.gatherEffect = EffectManager.GetEffect(this.viewData.gatherEffectName, this._transform);
+      if ((double) this.viewData.colRadius > 0.0)
+      {
+        SphereCollider sphereCollider = ((Component) this).gameObject.AddComponent<SphereCollider>();
+        sphereCollider.center = new Vector3(0.0f, 0.0f, 0.0f);
+        sphereCollider.radius = this.viewData.colRadius;
+      }
+      if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+        this.self = MonoBehaviourSingleton<StageObjectManager>.I.self;
+      this.CheckGather();
+    }
+  }
 
-	public bool isGathered
-	{
-		get;
-		protected set;
-	}
+  public virtual void CheckGather() => this.UpdateView();
 
-	public GatherPointObject()
-		: this()
-	{
-	}
+  public virtual void Gather()
+  {
+  }
 
-	public static T Create<T>(FieldMapTable.GatherPointTableData point_data, Transform parent) where T : GatherPointObject
-	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		Transform val = Utility.CreateGameObject("GatherPoint", parent, 9);
-		val.set_position(new Vector3(point_data.pointX, 0f, point_data.pointZ));
-		val.set_rotation(Quaternion.AngleAxis(point_data.pointDir, Vector3.get_up()));
-		T val2 = val.get_gameObject().AddComponent<T>();
-		if (val2 == null)
-		{
-			return (T)null;
-		}
-		val2.Initialize(point_data);
-		return val2;
-	}
+  public virtual void UpdateView()
+  {
+    if (Object.op_Inequality((Object) this.gatherEffect, (Object) null))
+      ((Component) this.gatherEffect).gameObject.SetActive(!this.isGathered);
+    if (!Object.op_Inequality((Object) this.modelView, (Object) null) || string.IsNullOrEmpty(this.viewData.modelHideNodeName))
+      return;
+    Transform transform = Utility.Find(this.modelView, this.viewData.modelHideNodeName);
+    if (!Object.op_Inequality((Object) transform, (Object) null))
+      return;
+    ((Component) transform).gameObject.SetActive(!this.isGathered);
+  }
 
-	private void Awake()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		_transform = this.get_transform();
-	}
-
-	public virtual void Initialize(FieldMapTable.GatherPointTableData point_data)
-	{
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-		pointData = point_data;
-		viewData = Singleton<FieldMapTable>.I.GetGatherPointViewData(pointData.viewID);
-		if (viewData == null)
-		{
-			Log.Error(LOG.INGAME, "GatherPointObject::Initialize() viewData is null. pointID = {0}, viewID = {1}", pointData.pointID, pointData.viewID);
-		}
-		else
-		{
-			if (viewData.viewID != 0)
-			{
-				LoadObject loadObject = MonoBehaviourSingleton<InGameProgress>.I.gatherPointModelTable.Get(viewData.viewID);
-				modelView = ResourceUtility.Realizes(loadObject.loadedObject, _transform, -1);
-			}
-			if (!string.IsNullOrEmpty(viewData.gatherEffectName))
-			{
-				gatherEffect = EffectManager.GetEffect(viewData.gatherEffectName, _transform);
-			}
-			if (viewData.colRadius > 0f)
-			{
-				SphereCollider val = this.get_gameObject().AddComponent<SphereCollider>();
-				val.set_center(new Vector3(0f, 0f, 0f));
-				val.set_radius(viewData.colRadius);
-			}
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
-			{
-				self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			}
-			CheckGather();
-		}
-	}
-
-	public void CheckGather()
-	{
-		List<int> currentFieldPointIdList = MonoBehaviourSingleton<FieldManager>.I.currentFieldPointIdList;
-		isGathered = true;
-		int i = 0;
-		for (int count = currentFieldPointIdList.Count; i < count; i++)
-		{
-			if (pointData.pointID == currentFieldPointIdList[i])
-			{
-				isGathered = false;
-				break;
-			}
-		}
-		UpdateView();
-	}
-
-	public void Gather()
-	{
-		if (CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected())
-		{
-			isGathered = true;
-			UpdateView();
-			MonoBehaviourSingleton<FieldManager>.I.SendFieldGather((int)pointData.pointID, delegate(bool b, FieldGatherRewardList list)
-			{
-				if (MonoBehaviourSingleton<UIDropAnnounce>.IsValid())
-				{
-					int i = 0;
-					for (int count = list.fieldGather.skillItem.Count; i < count; i++)
-					{
-						QuestCompleteReward.SkillItem skillItem = list.fieldGather.skillItem[i];
-						bool is_rare = false;
-						MonoBehaviourSingleton<UIDropAnnounce>.I.Announce(UIDropAnnounce.DropAnnounceInfo.CreateSkillItemInfo((uint)skillItem.skillItemId, skillItem.num, out is_rare));
-						int se_id = 40000154;
-						SoundManager.PlayOneShotUISE(se_id);
-					}
-					int j = 0;
-					for (int count2 = list.fieldGather.equipItem.Count; j < count2; j++)
-					{
-						QuestCompleteReward.EquipItem equipItem = list.fieldGather.equipItem[j];
-						bool is_rare2 = false;
-						MonoBehaviourSingleton<UIDropAnnounce>.I.Announce(UIDropAnnounce.DropAnnounceInfo.CreateEquipItemInfo((uint)equipItem.equipItemId, equipItem.num, out is_rare2));
-						int se_id2 = 40000154;
-						SoundManager.PlayOneShotUISE(se_id2);
-					}
-					int k = 0;
-					for (int count3 = list.fieldGather.item.Count; k < count3; k++)
-					{
-						QuestCompleteReward.Item item = list.fieldGather.item[k];
-						bool is_rare3 = false;
-						MonoBehaviourSingleton<UIDropAnnounce>.I.Announce(UIDropAnnounce.DropAnnounceInfo.CreateItemInfo((uint)item.itemId, item.num, out is_rare3));
-						int se_id3 = (!is_rare3) ? 40000153 : 40000154;
-						SoundManager.PlayOneShotUISE(se_id3);
-					}
-				}
-			});
-		}
-	}
-
-	public virtual void UpdateView()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		if (gatherEffect != null)
-		{
-			gatherEffect.get_gameObject().SetActive(!isGathered);
-		}
-		if (modelView != null && !string.IsNullOrEmpty(viewData.modelHideNodeName))
-		{
-			Transform val = Utility.Find(modelView, viewData.modelHideNodeName);
-			if (val != null)
-			{
-				val.get_gameObject().SetActive(!isGathered);
-			}
-		}
-		if (gimmick != null)
-		{
-			gimmick.OnNotify(isGathered);
-		}
-	}
-
-	public void UpdateTargetMarker(bool is_near)
-	{
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Expected O, but got Unknown
-		if (is_near && self != null && self.IsChangeableAction((Character.ACTION_ID)26))
-		{
-			if (targetEffect == null && !string.IsNullOrEmpty(viewData.targetEffectName))
-			{
-				targetEffect = EffectManager.GetEffect(viewData.targetEffectName, _transform);
-			}
-			if (targetEffect != null)
-			{
-				Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-				Vector3 position = cameraTransform.get_position();
-				Quaternion rotation = cameraTransform.get_rotation();
-				Vector3 val = position - _transform.get_position();
-				Vector3 pos = val.get_normalized() * viewData.targetEffectShift + Vector3.get_up() * viewData.targetEffectHeight + _transform.get_position();
-				targetEffect.Set(pos, rotation);
-			}
-		}
-		else if (targetEffect != null)
-		{
-			EffectManager.ReleaseEffect(targetEffect.get_gameObject(), true, false);
-		}
-	}
+  public virtual void UpdateTargetMarker(bool is_near)
+  {
+    if (is_near && Object.op_Inequality((Object) this.self, (Object) null) && this.self.IsChangeableAction((Character.ACTION_ID) 28))
+    {
+      if (Object.op_Equality((Object) this.targetEffect, (Object) null) && !string.IsNullOrEmpty(this.viewData.targetEffectName))
+        this.targetEffect = EffectManager.GetEffect(this.viewData.targetEffectName, this._transform);
+      if (!Object.op_Inequality((Object) this.targetEffect, (Object) null))
+        return;
+      Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
+      Vector3 position = cameraTransform.position;
+      Quaternion rotation = cameraTransform.rotation;
+      Vector3 vector3 = Vector3.op_Subtraction(position, this._transform.position);
+      this.targetEffect.Set(Vector3.op_Addition(Vector3.op_Addition(Vector3.op_Multiply(((Vector3) ref vector3).normalized, this.viewData.targetEffectShift), Vector3.op_Multiply(Vector3.up, this.viewData.targetEffectHeight)), this._transform.position), rotation);
+    }
+    else
+    {
+      if (!Object.op_Inequality((Object) this.targetEffect, (Object) null))
+        return;
+      EffectManager.ReleaseEffect(((Component) this.targetEffect).gameObject);
+    }
+  }
 }

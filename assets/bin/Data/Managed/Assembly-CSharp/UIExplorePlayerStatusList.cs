@@ -1,71 +1,63 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIExplorePlayerStatusList
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIExplorePlayerStatusList
+#nullable disable
+public class UIExplorePlayerStatusList : MonoBehaviour
 {
-	[SerializeField]
-	private UIExplorePlayerStatus[] statuses = new UIExplorePlayerStatus[3];
+  [SerializeField]
+  private UIExplorePlayerStatus[] statuses = new UIExplorePlayerStatus[3];
+  private ExploreStatus exploreStatus;
 
-	private ExploreStatus exploreStatus;
+  public void Initialize(ExploreStatus exploreStatus)
+  {
+    if (this.exploreStatus != exploreStatus)
+    {
+      this.Clear();
+      this.exploreStatus = exploreStatus;
+      exploreStatus.onChangeExploreMemberList += new System.Action(this.OnChangeExploreMemberList);
+    }
+    this.OnChangeExploreMemberList();
+  }
 
-	public UIExplorePlayerStatusList()
-		: this()
-	{
-	}
+  private void Clear()
+  {
+    if (this.exploreStatus == null)
+      return;
+    this.exploreStatus.onChangeExploreMemberList -= new System.Action(this.OnChangeExploreMemberList);
+    this.exploreStatus = (ExploreStatus) null;
+  }
 
-	public void Initialize(ExploreStatus exploreStatus)
-	{
-		if (this.exploreStatus != exploreStatus)
-		{
-			Clear();
-			this.exploreStatus = exploreStatus;
-			exploreStatus.onChangeExploreMemberList += OnChangeExploreMemberList;
-		}
-		OnChangeExploreMemberList();
-	}
+  private void OnDestroy() => this.Clear();
 
-	private void Clear()
-	{
-		if (exploreStatus != null)
-		{
-			exploreStatus.onChangeExploreMemberList -= OnChangeExploreMemberList;
-			exploreStatus = null;
-		}
-	}
-
-	private void OnDestroy()
-	{
-		Clear();
-	}
-
-	private void OnChangeExploreMemberList()
-	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		for (int i = 0; i < statuses.Length; i++)
-		{
-			statuses[i].get_gameObject().SetActive(false);
-		}
-		List<ExplorePlayerStatus> enabledPlayerStatusList = exploreStatus.GetEnabledPlayerStatusList();
-		bool flag = false;
-		for (int j = 0; j < enabledPlayerStatusList.Count; j++)
-		{
-			ExplorePlayerStatus explorePlayerStatus = enabledPlayerStatusList[j];
-			if (explorePlayerStatus.isSelf)
-			{
-				flag = true;
-			}
-			else
-			{
-				int num = explorePlayerStatus.coopClient.slotIndex;
-				if (num >= 0)
-				{
-					if (flag)
-					{
-						num--;
-					}
-					statuses[num].Initialize(explorePlayerStatus);
-				}
-			}
-		}
-	}
+  private void OnChangeExploreMemberList()
+  {
+    for (int index = 0; index < this.statuses.Length; ++index)
+      ((Component) this.statuses[index]).gameObject.SetActive(false);
+    List<ExplorePlayerStatus> playerStatusList = this.exploreStatus.GetEnabledPlayerStatusList();
+    bool flag = false;
+    for (int index = 0; index < playerStatusList.Count; ++index)
+    {
+      ExplorePlayerStatus playerStatus = playerStatusList[index];
+      if (playerStatus.isSelf)
+      {
+        flag = true;
+      }
+      else
+      {
+        int slotIndex = playerStatus.coopClient.slotIndex;
+        if (slotIndex >= 0)
+        {
+          if (flag)
+            --slotIndex;
+          this.statuses[slotIndex].Initialize(playerStatus);
+        }
+      }
+    }
+  }
 }

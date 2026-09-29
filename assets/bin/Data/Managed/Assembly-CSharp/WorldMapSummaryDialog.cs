@@ -1,101 +1,101 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: WorldMapSummaryDialog
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 
+#nullable disable
 public class WorldMapSummaryDialog : GameSection
 {
-	protected enum UI
-	{
-		LBL_SUMMARY,
-		LBL_NOW,
-		LBL_MAX,
-		OBJ_ACTIVE_ARROW_R,
-		OBJ_ACTIVE_ARROW_L,
-		SPR_INACTIVE_ARROW_R,
-		SPR_INACTIVE_ARROW_L
-	}
+  private int maxPage;
+  private int currentPage;
+  private string[] splitedSummary;
 
-	private int maxPage;
+  public override void Initialize()
+  {
+    int id = (int) GameSection.GetEventData();
+    for (int index = id - 1; index < 1; --index)
+    {
+      RegionTable.Data data = Singleton<RegionTable>.I.GetData((uint) id);
+      if (data.difficulty == REGION_DIFFICULTY_TYPE.NORMAL)
+      {
+        id = (int) data.regionId;
+        break;
+      }
+    }
+    this.splitedSummary = StringTable.Get(STRING_CATEGORY.SUMMARY, (uint) id).Split('@');
+    this.currentPage = 1;
+    this.maxPage = this.splitedSummary.Length;
+    base.Initialize();
+  }
 
-	private int currentPage;
+  public override void UpdateUI()
+  {
+    base.UpdateUI();
+    this.UpdatePageUI();
+    this.UpdateSummary();
+  }
 
-	private string[] splitedSummary;
+  private void UpdateSummary()
+  {
+    this.SetLabelText((Enum) WorldMapSummaryDialog.UI.LBL_SUMMARY, this.splitedSummary[this.currentPage - 1].Replace("{USER_NAME}", MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name));
+  }
 
-	public override void Initialize()
-	{
-		int num = (int)GameSection.GetEventData();
-		int num2 = num - 1;
-		for (int num3 = num2; num3 < 1; num3--)
-		{
-			RegionTable.Data data = Singleton<RegionTable>.I.GetData((uint)num);
-			if (data.difficulty == REGION_DIFFICULTY_TYPE.NORMAL)
-			{
-				num = (int)data.regionId;
-				break;
-			}
-		}
-		string text = StringTable.Get(STRING_CATEGORY.SUMMARY, (uint)num);
-		splitedSummary = text.Split('@');
-		currentPage = 1;
-		maxPage = splitedSummary.Length;
-		base.Initialize();
-	}
+  private void UpdatePageUI()
+  {
+    this.SetLabelText((Enum) WorldMapSummaryDialog.UI.LBL_NOW, this.currentPage.ToString());
+    this.SetLabelText((Enum) WorldMapSummaryDialog.UI.LBL_MAX, this.maxPage.ToString());
+    this.UpdatePageArrows();
+  }
 
-	public override void UpdateUI()
-	{
-		base.UpdateUI();
-		UpdatePageUI();
-		UpdateSummary();
-	}
+  private void UpdatePageArrows()
+  {
+    if (this.currentPage == 1)
+    {
+      bool is_visible = this.currentPage < this.maxPage;
+      this.SetActive((Enum) WorldMapSummaryDialog.UI.OBJ_ACTIVE_ARROW_L, false);
+      this.SetActive((Enum) WorldMapSummaryDialog.UI.OBJ_ACTIVE_ARROW_R, is_visible);
+      this.SetActive((Enum) WorldMapSummaryDialog.UI.SPR_INACTIVE_ARROW_L, true);
+      this.SetActive((Enum) WorldMapSummaryDialog.UI.SPR_INACTIVE_ARROW_R, !is_visible);
+    }
+    else if (this.currentPage >= this.maxPage)
+    {
+      this.SetActive((Enum) WorldMapSummaryDialog.UI.OBJ_ACTIVE_ARROW_L, true);
+      this.SetActive((Enum) WorldMapSummaryDialog.UI.OBJ_ACTIVE_ARROW_R, false);
+      this.SetActive((Enum) WorldMapSummaryDialog.UI.SPR_INACTIVE_ARROW_L, false);
+      this.SetActive((Enum) WorldMapSummaryDialog.UI.SPR_INACTIVE_ARROW_R, true);
+    }
+    else
+    {
+      this.SetActive((Enum) WorldMapSummaryDialog.UI.OBJ_ACTIVE_ARROW_L, true);
+      this.SetActive((Enum) WorldMapSummaryDialog.UI.OBJ_ACTIVE_ARROW_R, true);
+      this.SetActive((Enum) WorldMapSummaryDialog.UI.SPR_INACTIVE_ARROW_L, false);
+      this.SetActive((Enum) WorldMapSummaryDialog.UI.SPR_INACTIVE_ARROW_R, false);
+    }
+  }
 
-	private void UpdateSummary()
-	{
-		string text = splitedSummary[currentPage - 1];
-		string name = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name;
-		text = text.Replace("{USER_NAME}", name);
-		SetLabelText((Enum)UI.LBL_SUMMARY, text);
-	}
+  private void OnQuery_PAGE_NEXT()
+  {
+    ++this.currentPage;
+    this.RefreshUI();
+  }
 
-	private void UpdatePageUI()
-	{
-		SetLabelText((Enum)UI.LBL_NOW, currentPage.ToString());
-		SetLabelText((Enum)UI.LBL_MAX, maxPage.ToString());
-		UpdatePageArrows();
-	}
+  private void OnQuery_PAGE_PREV()
+  {
+    --this.currentPage;
+    this.RefreshUI();
+  }
 
-	private void UpdatePageArrows()
-	{
-		if (currentPage == 1)
-		{
-			bool flag = currentPage < maxPage;
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_L, false);
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_R, flag);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_L, true);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_R, !flag);
-		}
-		else if (currentPage >= maxPage)
-		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_L, true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_R, false);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_L, false);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_R, true);
-		}
-		else
-		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_L, true);
-			SetActive((Enum)UI.OBJ_ACTIVE_ARROW_R, true);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_L, false);
-			SetActive((Enum)UI.SPR_INACTIVE_ARROW_R, false);
-		}
-	}
-
-	private void OnQuery_PAGE_NEXT()
-	{
-		currentPage++;
-		RefreshUI();
-	}
-
-	private void OnQuery_PAGE_PREV()
-	{
-		currentPage--;
-		RefreshUI();
-	}
+  protected enum UI
+  {
+    LBL_SUMMARY,
+    LBL_NOW,
+    LBL_MAX,
+    OBJ_ACTIVE_ARROW_R,
+    OBJ_ACTIVE_ARROW_L,
+    SPR_INACTIVE_ARROW_R,
+    SPR_INACTIVE_ARROW_L,
+  }
 }

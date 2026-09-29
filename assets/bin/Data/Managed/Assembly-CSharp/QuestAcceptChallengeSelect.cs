@@ -1,168 +1,153 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestAcceptChallengeSelect
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class QuestAcceptChallengeSelect : QuestAcceptSelect
 {
-	private class QuestDataSet
-	{
-		public QuestInfoData questInfoData;
+  private List<QuestAcceptChallengeSelect.QuestDataSet> enableQuestList;
+  private int selectedQuestIndex;
 
-		public QuestTable.QuestTableData tableData;
+  public void OnCloseDialog_QuestAcceptChallengeRoomSettings() => this._OnCloseRoomSettings();
 
-		public QuestDataSet(QuestData questData, QuestTable.QuestTableData tableData)
-		{
-			questInfoData = MonoBehaviourSingleton<QuestManager>.I.CreateQuestChallengeInfoData(questData, tableData);
-			this.tableData = tableData;
-		}
-	}
+  public override void Initialize()
+  {
+    this.root = this.SetPrefab(this.collectUI, nameof (QuestAcceptChallengeSelect));
+    this.StartCoroutine(this.DoInitialize());
+  }
 
-	private List<QuestDataSet> enableQuestList;
+  private IEnumerator DoInitialize()
+  {
+    yield return (object) this._Initialize();
+    bool sended = false;
+    MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeEnmey(this.questInfo.questData.tableData.enemyID[0], (Action<bool, QuestChallengeEnemyModel.Param>) ((isSuccess, result) =>
+    {
+      this.OnSendFinished(isSuccess, result);
+      sended = true;
+    }));
+    if (!sended)
+      yield return (object) null;
+    this.InitializeBase();
+  }
 
-	private int selectedQuestIndex;
+  private void OnSendFinished(bool isSuccess, QuestChallengeEnemyModel.Param result)
+  {
+    this.SetupQuestList(result.shadow);
+  }
 
-	public void OnCloseDialog_QuestAcceptChallengeRoomSettings()
-	{
-		_OnCloseRoomSettings();
-	}
+  public override void UpdateUI()
+  {
+    base.UpdateUI();
+    this.UpdateEnemyLevelLabel();
+    this.UpdateEnemyLevelButton();
+    this.UpdateButtons();
+  }
 
-	public override void Initialize()
-	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		root = SetPrefab(base.collectUI, "QuestAcceptChallengeSelect", true);
-		this.StartCoroutine(DoInitialize());
-	}
+  private void UpdateEnemyLevelLabel()
+  {
+    this.SetLabelText((Enum) QuestSelect.UI.LBL_ENEMY_LEVEL, StringTable.Format(STRING_CATEGORY.MAIN_STATUS, 1U, (object) this.GetSelectedQuestDataSet().tableData.enemyLv[0]));
+  }
 
-	private IEnumerator DoInitialize()
-	{
-		yield return (object)_Initialize();
-		bool sended = false;
-		MonoBehaviourSingleton<QuestManager>.I.SendGetChallengeEnmey(questInfo.questData.tableData.enemyID[0], delegate(bool isSuccess, QuestChallengeEnemyModel.Param result)
-		{
-			((_003CDoInitialize_003Ec__Iterator109)/*Error near IL_006a: stateMachine*/)._003C_003Ef__this.OnSendFinished(isSuccess, result);
-			((_003CDoInitialize_003Ec__Iterator109)/*Error near IL_006a: stateMachine*/)._003Csended_003E__0 = true;
-		});
-		if (!sended)
-		{
-			yield return (object)null;
-		}
-		InitializeBase();
-	}
+  private void UpdateEnemyLevelButton()
+  {
+    if (this.selectedQuestIndex >= this.enableQuestList.Count - 1)
+    {
+      this.SetColor((Enum) QuestSelect.UI.OBJ_LEVEL_R, Color.clear);
+      this.SetActive((Enum) QuestSelect.UI.OBJ_LEVEL_INACTIVE_R, true);
+    }
+    else
+    {
+      this.SetColor((Enum) QuestSelect.UI.OBJ_LEVEL_R, Color.white);
+      this.SetActive((Enum) QuestSelect.UI.OBJ_LEVEL_INACTIVE_R, false);
+    }
+    if (this.selectedQuestIndex <= 0)
+    {
+      this.SetColor((Enum) QuestSelect.UI.OBJ_LEVEL_L, Color.clear);
+      this.SetActive((Enum) QuestSelect.UI.OBJ_LEVEL_INACTIVE_L, true);
+    }
+    else
+    {
+      this.SetColor((Enum) QuestSelect.UI.OBJ_LEVEL_L, Color.white);
+      this.SetActive((Enum) QuestSelect.UI.OBJ_LEVEL_INACTIVE_L, false);
+    }
+  }
 
-	private void OnSendFinished(bool isSuccess, QuestChallengeEnemyModel.Param result)
-	{
-		SetupQuestList(result.shadow);
-	}
+  private void UpdateButtons()
+  {
+    if (!MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
+      return;
+    this.GetCtrl((Enum) QuestSelect.UI.BTN_GUILD_REQUEST).localPosition = new Vector3(136f, 10f, 0.0f);
+    this.GetCtrl((Enum) QuestSelect.UI.BTN_GUILD_REQUEST).localScale = new Vector3(0.462f, 0.462f, 0.0f);
+    this.GetCtrl((Enum) QuestSelect.UI.BTN_PARTY).localPosition = new Vector3(-34f, 10f, 0.0f);
+    this.GetCtrl((Enum) QuestSelect.UI.BTN_PARTY).localScale = new Vector3(0.462f, 0.462f, 0.0f);
+  }
 
-	public override void UpdateUI()
-	{
-		base.UpdateUI();
-		UpdateEnemyLevelLabel();
-		UpdateEnemyLevelButton();
-		UpdateButtons();
-	}
+  private void OnQuery_LEVEL_R()
+  {
+    ++this.selectedQuestIndex;
+    this.OnLevelLRButton();
+  }
 
-	private void UpdateEnemyLevelLabel()
-	{
-		string text = StringTable.Format(STRING_CATEGORY.MAIN_STATUS, 1u, GetSelectedQuestDataSet().tableData.enemyLv[0]);
-		SetLabelText((Enum)UI.LBL_ENEMY_LEVEL, text);
-	}
+  private void OnQuery_LEVEL_L()
+  {
+    --this.selectedQuestIndex;
+    this.OnLevelLRButton();
+  }
 
-	private void UpdateEnemyLevelButton()
-	{
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		if (selectedQuestIndex >= enableQuestList.Count - 1)
-		{
-			SetColor((Enum)UI.OBJ_LEVEL_R, Color.get_clear());
-			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_R, true);
-		}
-		else
-		{
-			SetColor((Enum)UI.OBJ_LEVEL_R, Color.get_white());
-			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_R, false);
-		}
-		if (selectedQuestIndex <= 0)
-		{
-			SetColor((Enum)UI.OBJ_LEVEL_L, Color.get_clear());
-			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_L, true);
-		}
-		else
-		{
-			SetColor((Enum)UI.OBJ_LEVEL_L, Color.get_white());
-			SetActive((Enum)UI.OBJ_LEVEL_INACTIVE_L, false);
-		}
-	}
+  private void OnLevelLRButton()
+  {
+    this.questInfo = this.GetSelectedQuestDataSet().questInfoData;
+    this.RefreshUI();
+  }
 
-	private void UpdateButtons()
-	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<UserInfoManager>.I.isGuildRequestOpen)
-		{
-			GetCtrl(UI.BTN_GUILD_REQUEST).set_localPosition(new Vector3(136f, 10f, 0f));
-			GetCtrl(UI.BTN_GUILD_REQUEST).set_localScale(new Vector3(0.462f, 0.462f, 0f));
-			GetCtrl(UI.BTN_PARTY).set_localPosition(new Vector3(-34f, 10f, 0f));
-			GetCtrl(UI.BTN_PARTY).set_localScale(new Vector3(0.462f, 0.462f, 0f));
-		}
-	}
+  private QuestAcceptChallengeSelect.QuestDataSet GetSelectedQuestDataSet()
+  {
+    return this.enableQuestList[this.selectedQuestIndex];
+  }
 
-	private void OnQuery_LEVEL_R()
-	{
-		selectedQuestIndex++;
-		OnLevelLRButton();
-	}
+  private void SetupQuestList(List<QuestData> allQuest)
+  {
+    int levelFromUserLevel = MonoBehaviourSingleton<UserInfoManager>.I.GetEnemyLevelFromUserLevel();
+    this.enableQuestList = new List<QuestAcceptChallengeSelect.QuestDataSet>();
+    int index = 0;
+    for (int count = allQuest.Count; index < count; ++index)
+    {
+      QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint) allQuest[index].questId);
+      if (questData.enemyLv[0] == Singleton<QuestTable>.I.GetQuestData(this.questInfo.questData.tableData.questID).enemyLv[0])
+        this.selectedQuestIndex = index;
+      if (questData.enemyLv[0] <= levelFromUserLevel)
+        this.enableQuestList.Add(new QuestAcceptChallengeSelect.QuestDataSet(allQuest[index], questData));
+    }
+  }
 
-	private void OnQuery_LEVEL_L()
-	{
-		selectedQuestIndex--;
-		OnLevelLRButton();
-	}
+  protected override void OnQuery_CREATE_ROOM()
+  {
+    MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(this.questInfo.questData.tableData.questID);
+    base.OnQuery_CREATE_ROOM();
+  }
 
-	private void OnLevelLRButton()
-	{
-		questInfo = GetSelectedQuestDataSet().questInfoData;
-		RefreshUI();
-	}
+  protected override void OnQuery_GUILD_REQUEST()
+  {
+    GameSection.SetEventData((object) this.questInfo);
+  }
 
-	private QuestDataSet GetSelectedQuestDataSet()
-	{
-		return enableQuestList[selectedQuestIndex];
-	}
+  private class QuestDataSet
+  {
+    public QuestInfoData questInfoData;
+    public QuestTable.QuestTableData tableData;
 
-	private void SetupQuestList(List<QuestData> allQuest)
-	{
-		int enemyLevelFromUserLevel = MonoBehaviourSingleton<UserInfoManager>.I.GetEnemyLevelFromUserLevel();
-		enableQuestList = new List<QuestDataSet>();
-		int i = 0;
-		for (int count = allQuest.Count; i < count; i++)
-		{
-			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData((uint)allQuest[i].questId);
-			if (questData.enemyLv[0] == Singleton<QuestTable>.I.GetQuestData(questInfo.questData.tableData.questID).enemyLv[0])
-			{
-				selectedQuestIndex = i;
-			}
-			if (questData.enemyLv[0] <= enemyLevelFromUserLevel)
-			{
-				enableQuestList.Add(new QuestDataSet(allQuest[i], questData));
-			}
-		}
-	}
-
-	protected override void OnQuery_CREATE_ROOM()
-	{
-		MonoBehaviourSingleton<QuestManager>.I.SetCurrentQuestID(questInfo.questData.tableData.questID, true);
-		base.OnQuery_CREATE_ROOM();
-	}
-
-	protected override void OnQuery_GUILD_REQUEST()
-	{
-		GameSection.SetEventData(questInfo);
-	}
+    public QuestDataSet(QuestData questData, QuestTable.QuestTableData tableData)
+    {
+      this.questInfoData = MonoBehaviourSingleton<QuestManager>.I.CreateQuestChallengeInfoData(questData, tableData);
+      this.tableData = tableData;
+    }
+  }
 }

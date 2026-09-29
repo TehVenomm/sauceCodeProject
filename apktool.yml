@@ -1,100 +1,107 @@
-!!brut.androlib.meta.MetaInfo
-apkFileName: DragonProject_v1.2.9_apkpure.com.apk
-compressionType: false
-doNotCompress:
-- arsc
-- MF
-- assets/META-INF/maven/com.squareup.picasso/picasso/pom.properties
-- assets/META-INF/maven/org.apache.commons/commons-lang3/pom.properties
-- assets/META-INF/services/com.fasterxml.jackson.core.JsonFactory
-- assets/META-INF/services/com.fasterxml.jackson.core.ObjectCodec
-- resource
-- png
-- res/drawable-hdpi-v4/com_facebook_tooltip_black_background.9.png
-- res/drawable-hdpi-v4/com_facebook_tooltip_blue_background.9.png
-- res/drawable-hdpi-v4/common_google_signin_btn_icon_dark_normal_background.9.png
-- res/drawable-hdpi-v4/common_google_signin_btn_icon_light_normal_background.9.png
-- res/drawable-hdpi-v4/common_google_signin_btn_text_dark_normal_background.9.png
-- res/drawable-hdpi-v4/common_google_signin_btn_text_light_normal_background.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_button_background_facebook.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_button_background_forum.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_button_background_instagram.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_button_background_twitter.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_button_background_wiki.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_button_background_youtube.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_default_button_background.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_armory_equipment_foreground.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_armory_summary_background.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_edittext_background.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_center_default.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_center_selected.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_default_background.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_left_default.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_left_selected.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_right_default.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_button_right_selected.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_friends_background.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_dpro_ranking_page_indicator_background.9.png
-- jpg
-- res/drawable-hdpi-v4/net_gogame_gowrap_edittext_background.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_admin_bottom.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_admin_top.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_event_bottom.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_event_top.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_important_bottom.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_important_top.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_notice_bottom.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_notice_top.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_summon_bottom.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_summon_top.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_tips_bottom.9.png
-- res/drawable-hdpi-v4/net_gogame_gowrap_icon_news_tips_top.9.png
-- res/drawable-mdpi-v4/com_facebook_tooltip_black_background.9.png
-- res/drawable-mdpi-v4/com_facebook_tooltip_blue_background.9.png
-- res/drawable-mdpi-v4/common_google_signin_btn_icon_dark_normal_background.9.png
-- res/drawable-mdpi-v4/common_google_signin_btn_icon_light_normal_background.9.png
-- res/drawable-mdpi-v4/common_google_signin_btn_text_dark_normal_background.9.png
-- res/drawable-mdpi-v4/common_google_signin_btn_text_light_normal_background.9.png
-- res/drawable-xhdpi-v4/com_facebook_tooltip_black_background.9.png
-- res/drawable-xhdpi-v4/com_facebook_tooltip_blue_background.9.png
-- res/drawable-xhdpi-v4/common_google_signin_btn_icon_dark_normal_background.9.png
-- res/drawable-xhdpi-v4/common_google_signin_btn_icon_light_normal_background.9.png
-- res/drawable-xhdpi-v4/common_google_signin_btn_text_dark_normal_background.9.png
-- res/drawable-xhdpi-v4/common_google_signin_btn_text_light_normal_background.9.png
-- res/drawable-xhdpi-v4/net_gogame_gowrap_dialog_background_bottom.9.png
-- res/drawable-xhdpi-v4/net_gogame_gowrap_dialog_background_top.9.png
-- res/drawable-xhdpi-v4/net_gogame_gowrap_dpro_equip_item_frame.9.png
-- res/drawable-xhdpi-v4/net_gogame_gowrap_sns_button_background.9.png
-- res/drawable-xxhdpi-v4/common_google_signin_btn_icon_dark_normal_background.9.png
-- res/drawable-xxhdpi-v4/common_google_signin_btn_icon_light_normal_background.9.png
-- res/drawable-xxhdpi-v4/common_google_signin_btn_text_dark_normal_background.9.png
-- res/drawable-xxhdpi-v4/common_google_signin_btn_text_light_normal_background.9.png
-- res/drawable-xxhdpi-v4/net_gogame_gowrap_button_background.9.png
-- res/drawable-xxhdpi-v4/net_gogame_gowrap_button_background_disabled.9.png
-- res/drawable-xxhdpi-v4/net_gogame_gowrap_faq_child_entry_background.9.png
-- res/drawable-xxhdpi-v4/net_gogame_gowrap_faq_section_header_background.9.png
-- res/drawable-xxhdpi-v4/net_gogame_gowrap_navbar_background.9.png
-- res/drawable-xxhdpi-v4/net_gogame_gowrap_panel_background.9.png
-- res/drawable-xxhdpi-v4/net_gogame_gowrap_panel_background_bottom.9.png
-- res/drawable-xxhdpi-v4/net_gogame_gowrap_panel_background_middle.9.png
-- res/drawable-xxhdpi-v4/net_gogame_gowrap_panel_background_top.9.png
-- res/drawable-xxhdpi-v4/net_gogame_gowrap_panel_foreground.9.png
-- res/drawable-xxhdpi-v4/net_gogame_gowrap_search_background.9.png
-isFrameworkApk: false
-packageInfo:
-  forcedPackageId: '127'
-  renameManifestPackage: null
-sdkInfo:
-  minSdkVersion: '16'
-  targetSdkVersion: '25'
-sharedLibrary: false
-sparseResources: false
-unknownFiles: {}
+version: 3.0.3
+apkFileName: dragonproject1.8.9.apk
 usesFramework:
   ids:
   - 1
-  tag: null
-version: 2.3.3
+sdkInfo:
+  minSdkVersion: 19
+  targetSdkVersion: 29
 versionInfo:
-  versionCode: '2018052302'
-  versionName: 1.2.9
+  versionCode: 2020070202
+  versionName: 1.8.9
+resourcesInfo:
+  packageId: 127
+doNotCompress:
+- arsc
+- png
+- META-INF/android.support.design_material.version
+- META-INF/androidx.appcompat_appcompat.version
+- META-INF/androidx.arch.core_core-runtime.version
+- META-INF/androidx.asynclayoutinflater_asynclayoutinflater.version
+- META-INF/androidx.browser_browser.version
+- META-INF/androidx.cardview_cardview.version
+- META-INF/androidx.coordinatorlayout_coordinatorlayout.version
+- META-INF/androidx.core_core.version
+- META-INF/androidx.cursoradapter_cursoradapter.version
+- META-INF/androidx.customview_customview.version
+- META-INF/androidx.documentfile_documentfile.version
+- META-INF/androidx.drawerlayout_drawerlayout.version
+- META-INF/androidx.fragment_fragment.version
+- META-INF/androidx.interpolator_interpolator.version
+- META-INF/androidx.legacy_legacy-support-core-ui.version
+- META-INF/androidx.legacy_legacy-support-core-utils.version
+- META-INF/androidx.legacy_legacy-support-v4.version
+- META-INF/androidx.lifecycle_lifecycle-livedata-core.version
+- META-INF/androidx.lifecycle_lifecycle-livedata.version
+- META-INF/androidx.lifecycle_lifecycle-runtime.version
+- META-INF/androidx.lifecycle_lifecycle-viewmodel.version
+- META-INF/androidx.loader_loader.version
+- META-INF/androidx.localbroadcastmanager_localbroadcastmanager.version
+- META-INF/androidx.media_media.version
+- META-INF/androidx.print_print.version
+- META-INF/androidx.recyclerview_recyclerview.version
+- META-INF/androidx.slidingpanelayout_slidingpanelayout.version
+- META-INF/androidx.swiperefreshlayout_swiperefreshlayout.version
+- META-INF/androidx.transition_transition.version
+- META-INF/androidx.vectordrawable_vectordrawable-animated.version
+- META-INF/androidx.vectordrawable_vectordrawable.version
+- META-INF/androidx.versionedparcelable_versionedparcelable.version
+- META-INF/androidx.viewpager_viewpager.version
+- META-INF/com.google.android.material_material.version
+- META-INF/services/com.fasterxml.jackson.core.JsonFactory
+- META-INF/services/com.fasterxml.jackson.core.ObjectCodec
+- androidsupportmultidexversion.txt
+- assets/bin/Data/035c95d07584b4e589d122052db2f580.resource
+- assets/bin/Data/057a75eb15cf249bb953281fbff65c53.resource
+- assets/bin/Data/07262f6b78c3d4515a72e2a96c9116d3.resource
+- assets/bin/Data/0a6370deeff474e80be078d103adc298.resource
+- assets/bin/Data/0b9124fc7f27040ca84da4c2bd69d995.resource
+- assets/bin/Data/0e1b1e6e4e32c4c4b9df94f46e0e4768.resource
+- assets/bin/Data/1d262af0622664b579e0caa405b17f46.resource
+- assets/bin/Data/1dc1df42243be4fe880fb9be00fdda58.resource
+- assets/bin/Data/358d1cf55bd164feda807a3093e5a1af.resource
+- assets/bin/Data/36e058f25c911469596918e408738180.resource
+- assets/bin/Data/3e1f6fcb120344bb185877da04a26bc8.resource
+- assets/bin/Data/403fd774ce5124ebf9a6a3cca86838d8.resource
+- assets/bin/Data/4178c9b2b6a65422085b8db2f09858e8.resource
+- assets/bin/Data/43c35ac9c143345db9f27c96612a3a08.resource
+- assets/bin/Data/4839564a99ba749f3b66199f61612d8a.resource
+- assets/bin/Data/4ea948fc734764a8984619fd21f6c912.resource
+- assets/bin/Data/4eb418cf4f0ea442a8420cf9ac0ec998.resource
+- assets/bin/Data/4edf2e94d81bf417eb6b41944d4e6890.resource
+- assets/bin/Data/504506042a21d482b879ce88da78cfe0.resource
+- assets/bin/Data/556865c2ae3a04e68b45a88eb05aa078.resource
+- assets/bin/Data/636bb5e3fdc634b4491437cf3b0e4077.resource
+- assets/bin/Data/6422f117e50874a958dd42b335abff69.resource
+- assets/bin/Data/6d4ee2d949cba4a4ea906850fa5900d8.resource
+- assets/bin/Data/7097c0c8a0cef499c98ced7f685f668d.resource
+- assets/bin/Data/7732c9613a3f74b6c8d64755a381b8af.resource
+- assets/bin/Data/77e7e864c5e2bf34abcc630218e1c258.resource
+- assets/bin/Data/7b6187431bbb64e9fac04773e0a8b584.resource
+- assets/bin/Data/87605fcab1e57d04a9c305cf3d1075ac.resource
+- assets/bin/Data/8989b2b616e2643cea31c75995253b60.resource
+- assets/bin/Data/97e6205eb79d9f5458a9d7e954c00c31.resource
+- assets/bin/Data/9b2a8d95db5ae4ef98738ebfc3b6c549.resource
+- assets/bin/Data/a03840916166a4ce3b6a6d25829e1ed6.resource
+- assets/bin/Data/a983c023e2f3c4759b7de63e65d88545.resource
+- assets/bin/Data/b5d5f5805c4434bbaa90632a22452c40.resource
+- assets/bin/Data/ba62ee33273dd4620bb9e6ae69c52f49.resource
+- assets/bin/Data/bb9437432ecd84f98be0aa3ccbb49f6f.resource
+- assets/bin/Data/bc1c8d48a642643e18e20531a1743870.resource
+- assets/bin/Data/d168ee9f94c47704bb0c56ea742d23e3.resource
+- assets/bin/Data/d1a81405a36924fa7ae591aef76c37fe.resource
+- assets/bin/Data/d35b4f235a8e3482e8e65c23d6eda27e.resource
+- assets/bin/Data/d5e42f3b2073f43aab58fafaa5c57166.resource
+- assets/bin/Data/d7404a4382f364012ac75c5d4fa674ae.resource
+- assets/bin/Data/dab211853fc2d4e40a95e2b5dd05a206.resource
+- assets/bin/Data/dc37ef00b1345472288d1ce0fe568e1c.resource
+- assets/bin/Data/df47648095a83484ab12200ce0b37f78.resource
+- assets/bin/Data/e26c9d0c123754a0095525eb17b663c6.resource
+- assets/bin/Data/e750fa57dffee435b8a176a8b2f1f8cc.resource
+- assets/bin/Data/ec04d12031d76406ca968b3b90e6a57b.resource
+- assets/bin/Data/ee42f3fdeaec040b28688bebc94c0843.resource
+- assets/bin/Data/f3f9fee107d4d794c8bc195ae4622583.resource
+- assets/bin/Data/fbd3253d845b34760a519b38969cc8a6.resource
+- assets/bin/Data/fbe2afebabdf5415381ac7659cc97306.resource
+- assets/bin/Data/fefd5a5262b5a47ccade21f07af80ded.resource
+- assets/google-services-desktop.json

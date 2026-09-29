@@ -1,190 +1,158 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: EquipValue
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System.Collections.Generic;
 
+#nullable disable
 public class EquipValue
 {
-	public class SkillSupport
-	{
-		public ENABLE_EQUIP_TYPE targetEquip;
+  public EQUIPMENT_TYPE type;
+  public SP_ATTACK_TYPE spAttackType;
+  public SimpleStatus baseStatus = new SimpleStatus();
+  public int constHp;
+  public int[] constAtks = new int[7];
+  public int[] constDefs = new int[7];
+  public int[] constTols = new int[6];
+  public List<EquipValue.SkillSupport> skillSupport = new List<EquipValue.SkillSupport>();
+  public Dictionary<int, int> ability = new Dictionary<int, int>();
 
-		public BuffParam.BUFFTYPE type;
+  private void _Reset()
+  {
+    this.type = EQUIPMENT_TYPE.NONE;
+    this.spAttackType = SP_ATTACK_TYPE.NONE;
+    this.baseStatus.Reset();
+    this.constHp = 0;
+    for (int index = 0; index < 7; ++index)
+    {
+      this.constAtks[index] = 0;
+      this.constDefs[index] = 0;
+    }
+    for (int index = 0; index < 6; ++index)
+      this.constTols[index] = 0;
+    this.skillSupport.Clear();
+    this.ability.Clear();
+  }
 
-		public SP_ATTACK_TYPE targetSpAttackType;
+  public void Parse(CharaInfo.EquipItem item, EquipItemTable.EquipItemData data)
+  {
+    this._Reset();
+    this.type = data.type;
+    this.spAttackType = data.spAttackType;
+    GrowEquipItemTable.GrowEquipItemData growEquipItemData = Singleton<GrowEquipItemTable>.I.GetGrowEquipItemData(data.growID, (uint) item.lv);
+    if (growEquipItemData == null)
+    {
+      this.baseStatus.hp = (int) data.baseHp;
+      this.baseStatus.attacks[0] = (int) data.baseAtk;
+      this.baseStatus.defences[0] = (int) data.baseDef;
+      for (int index = 0; index < 6; ++index)
+      {
+        this.baseStatus.attacks[index + 1] = data.atkElement[index];
+        this.baseStatus.tolerances[index] = data.defElement[index];
+      }
+    }
+    else
+    {
+      this.baseStatus.hp = growEquipItemData.GetGrowParamHp((int) data.baseHp);
+      this.baseStatus.attacks[0] = growEquipItemData.GetGrowParamAtk((int) data.baseAtk);
+      this.baseStatus.defences[0] = growEquipItemData.GetGrowParamDef((int) data.baseDef);
+      int[] growParamElemAtk = growEquipItemData.GetGrowParamElemAtk(data.atkElement);
+      int[] growParamElemDef = growEquipItemData.GetGrowParamElemDef(data.defElement);
+      for (int index = 0; index < 6; ++index)
+      {
+        this.baseStatus.attacks[index + 1] = growParamElemAtk[index];
+        this.baseStatus.tolerances[index] = growParamElemDef[index];
+      }
+    }
+    EquipItemExceedParamTable.EquipItemExceedParamAll exceedParam = data.GetExceedParam((uint) item.exceed);
+    if (exceedParam != null)
+    {
+      this.baseStatus.hp += (int) exceedParam.hp;
+      this.baseStatus.attacks[0] += (int) exceedParam.atk;
+      this.baseStatus.defences[0] += (int) exceedParam.def;
+      for (int index = 0; index < 6; ++index)
+      {
+        this.baseStatus.attacks[index + 1] += exceedParam.atkElement[index];
+        this.baseStatus.tolerances[index] += exceedParam.defElement[index];
+      }
+    }
+    int num = 0;
+    for (int count = item.sIds.Count; num < count; ++num)
+    {
+      SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint) item.sIds[num]);
+      GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(skillItemData.growID, item.sLvs[num], item.GetSkillExceed(num));
+      this.constHp += growSkillItemData.GetGrowParamHp((int) skillItemData.baseHp);
+      this.constAtks[0] += growSkillItemData.GetGrowParamAtk((int) skillItemData.baseAtk);
+      this.constDefs[0] += growSkillItemData.GetGrowParamDef((int) skillItemData.baseDef);
+      int[] growParamElemAtk = growSkillItemData.GetGrowParamElemAtk(skillItemData.atkElement);
+      int[] growParamElemDef = growSkillItemData.GetGrowParamElemDef(skillItemData.defElement);
+      for (int index = 0; index < 6; ++index)
+      {
+        this.constAtks[index + 1] += growParamElemAtk[index];
+        this.constTols[index] += growParamElemDef[index];
+      }
+      if (skillItemData.IsPassive())
+      {
+        int index = 0;
+        for (int length = skillItemData.supportType.Length; index < length; ++index)
+        {
+          if (skillItemData.supportType[index] != BuffParam.BUFFTYPE.NONE)
+            this.skillSupport.Add(new EquipValue.SkillSupport(skillItemData.supportPassiveEqType[index], skillItemData.supportType[index], growSkillItemData.GetGrowParamSupprtValue(skillItemData.supportValue, index), skillItemData.supportPassiveSpAttackType));
+        }
+      }
+    }
+    int index1 = 0;
+    for (int count = item.aIds.Count; index1 < count; ++index1)
+    {
+      int aId = item.aIds[index1];
+      int aPt = item.aPts[index1];
+      if (this.ability.ContainsKey(aId))
+        this.ability[aId] += aPt;
+      else
+        this.ability.Add(aId, aPt);
+    }
+    int index2 = 0;
+    for (int length = data.fixedAbility.Length; index2 < length; ++index2)
+    {
+      EquipItem.Ability ability = data.fixedAbility[index2];
+      if (this.ability.ContainsKey(ability.id))
+        this.ability[ability.id] += ability.pt;
+      else
+        this.ability.Add(ability.id, ability.pt);
+    }
+    if (exceedParam == null)
+      return;
+    int index3 = 0;
+    for (int length = exceedParam.ability.Length; index3 < length; ++index3)
+    {
+      EquipItem.Ability ability = exceedParam.ability[index3];
+      if (this.ability.ContainsKey(ability.id))
+        this.ability[ability.id] += ability.pt;
+      else
+        this.ability.Add(ability.id, ability.pt);
+    }
+  }
 
-		public int value;
+  public class SkillSupport
+  {
+    public ENABLE_EQUIP_TYPE targetEquip;
+    public BuffParam.BUFFTYPE type;
+    public SP_ATTACK_TYPE targetSpAttackType;
+    public int value;
 
-		public SkillSupport(ENABLE_EQUIP_TYPE e, BuffParam.BUFFTYPE t, int v, SP_ATTACK_TYPE spAttackType)
-		{
-			targetEquip = e;
-			type = t;
-			value = v;
-			targetSpAttackType = spAttackType;
-		}
-	}
-
-	public EQUIPMENT_TYPE type;
-
-	public SP_ATTACK_TYPE spAttackType;
-
-	public SimpleStatus baseStatus = new SimpleStatus();
-
-	public int constHp;
-
-	public int[] constAtks = new int[7];
-
-	public int[] constDefs = new int[7];
-
-	public int[] constTols = new int[6];
-
-	public List<SkillSupport> skillSupport = new List<SkillSupport>();
-
-	public Dictionary<int, int> ability = new Dictionary<int, int>();
-
-	private void _Reset()
-	{
-		type = EQUIPMENT_TYPE.NONE;
-		spAttackType = SP_ATTACK_TYPE.NONE;
-		baseStatus.Reset();
-		constHp = 0;
-		for (int i = 0; i < 7; i++)
-		{
-			constAtks[i] = 0;
-			constDefs[i] = 0;
-		}
-		for (int j = 0; j < 6; j++)
-		{
-			constTols[j] = 0;
-		}
-		skillSupport.Clear();
-		ability.Clear();
-	}
-
-	public void Parse(CharaInfo.EquipItem item, EquipItemTable.EquipItemData data)
-	{
-		_Reset();
-		type = data.type;
-		spAttackType = data.spAttackType;
-		GrowEquipItemTable.GrowEquipItemData growEquipItemData = Singleton<GrowEquipItemTable>.I.GetGrowEquipItemData(data.growID, (uint)item.lv);
-		if (object.ReferenceEquals(growEquipItemData, null))
-		{
-			baseStatus.hp = data.baseHp;
-			baseStatus.attacks[0] = data.baseAtk;
-			baseStatus.defences[0] = data.baseDef;
-			for (int i = 0; i < 6; i++)
-			{
-				baseStatus.attacks[i + 1] = data.atkElement[i];
-				baseStatus.tolerances[i] = data.defElement[i];
-			}
-		}
-		else
-		{
-			baseStatus.hp = growEquipItemData.GetGrowParamHp(data.baseHp);
-			baseStatus.attacks[0] = growEquipItemData.GetGrowParamAtk(data.baseAtk);
-			baseStatus.defences[0] = growEquipItemData.GetGrowParamDef(data.baseDef);
-			int[] growParamElemAtk = growEquipItemData.GetGrowParamElemAtk(data.atkElement);
-			int[] growParamElemDef = growEquipItemData.GetGrowParamElemDef(data.defElement);
-			for (int j = 0; j < 6; j++)
-			{
-				baseStatus.attacks[j + 1] = growParamElemAtk[j];
-				baseStatus.tolerances[j] = growParamElemDef[j];
-			}
-		}
-		EquipItemExceedParamTable.EquipItemExceedParamAll exceedParam = data.GetExceedParam((uint)item.exceed);
-		if (!object.ReferenceEquals(exceedParam, null))
-		{
-			baseStatus.hp += exceedParam.hp;
-			baseStatus.attacks[0] += exceedParam.atk;
-			baseStatus.defences[0] += exceedParam.def;
-			for (int k = 0; k < 6; k++)
-			{
-				baseStatus.attacks[k + 1] += exceedParam.atkElement[k];
-				baseStatus.tolerances[k] += exceedParam.defElement[k];
-			}
-		}
-		int l = 0;
-		for (int count = item.sIds.Count; l < count; l++)
-		{
-			SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData((uint)item.sIds[l]);
-			GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(skillItemData.growID, item.sLvs[l]);
-			constHp += growSkillItemData.GetGrowParamHp(skillItemData.baseHp);
-			constAtks[0] += growSkillItemData.GetGrowParamAtk(skillItemData.baseAtk);
-			constDefs[0] += growSkillItemData.GetGrowParamDef(skillItemData.baseDef);
-			int[] growParamElemAtk2 = growSkillItemData.GetGrowParamElemAtk(skillItemData.atkElement);
-			int[] growParamElemDef2 = growSkillItemData.GetGrowParamElemDef(skillItemData.defElement);
-			for (int m = 0; m < 6; m++)
-			{
-				constAtks[m + 1] += growParamElemAtk2[m];
-				constTols[m] += growParamElemDef2[m];
-			}
-			if (skillItemData.IsPassive())
-			{
-				int n = 0;
-				for (int num = skillItemData.supportType.Length; n < num; n++)
-				{
-					if (skillItemData.supportType[n] != BuffParam.BUFFTYPE.NONE)
-					{
-						skillSupport.Add(new SkillSupport(skillItemData.supportPassiveEqType[n], skillItemData.supportType[n], growSkillItemData.GetGrowParamSupprtValue(skillItemData.supportValue, n), skillItemData.supportPassiveSpAttackType));
-					}
-				}
-			}
-		}
-		int num2 = 0;
-		for (int count2 = item.aIds.Count; num2 < count2; num2++)
-		{
-			int num3 = item.aIds[num2];
-			int num4 = item.aPts[num2];
-			if (this.ability.ContainsKey(num3))
-			{
-				Dictionary<int, int> dictionary;
-				Dictionary<int, int> dictionary2 = dictionary = this.ability;
-				int key;
-				int key2 = key = num3;
-				key = dictionary[key];
-				dictionary2[key2] = key + num4;
-			}
-			else
-			{
-				this.ability.Add(num3, num4);
-			}
-		}
-		int num5 = 0;
-		for (int num6 = data.fixedAbility.Length; num5 < num6; num5++)
-		{
-			EquipItem.Ability ability = data.fixedAbility[num5];
-			if (this.ability.ContainsKey(ability.id))
-			{
-				Dictionary<int, int> dictionary3;
-				Dictionary<int, int> dictionary4 = dictionary3 = this.ability;
-				int key;
-				int key3 = key = ability.id;
-				key = dictionary3[key];
-				dictionary4[key3] = key + ability.pt;
-			}
-			else
-			{
-				this.ability.Add(ability.id, ability.pt);
-			}
-		}
-		if (!object.ReferenceEquals(exceedParam, null))
-		{
-			int num7 = 0;
-			for (int num8 = exceedParam.ability.Length; num7 < num8; num7++)
-			{
-				EquipItem.Ability ability2 = exceedParam.ability[num7];
-				if (this.ability.ContainsKey(ability2.id))
-				{
-					Dictionary<int, int> dictionary5;
-					Dictionary<int, int> dictionary6 = dictionary5 = this.ability;
-					int key;
-					int key4 = key = ability2.id;
-					key = dictionary5[key];
-					dictionary6[key4] = key + ability2.pt;
-				}
-				else
-				{
-					this.ability.Add(ability2.id, ability2.pt);
-				}
-			}
-		}
-	}
+    public SkillSupport(
+      ENABLE_EQUIP_TYPE e,
+      BuffParam.BUFFTYPE t,
+      int v,
+      SP_ATTACK_TYPE spAttackType)
+    {
+      this.targetEquip = e;
+      this.type = t;
+      this.value = v;
+      this.targetSpAttackType = spAttackType;
+    }
+  }
 }

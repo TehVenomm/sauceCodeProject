@@ -1,12 +1,19 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ELEMENT_TYPE
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public enum ELEMENT_TYPE
 {
-	FIRE = 0,
-	WATER = 1,
-	THUNDER = 2,
-	SOIL = 3,
-	LIGHT = 4,
-	DARK = 5,
-	MAX = 6,
-	NONE = 6,
-	MULTI = -1
+  MULTI = -1, // 0xFFFFFFFF
+  FIRE = 0,
+  WATER = 1,
+  THUNDER = 2,
+  SOIL = 3,
+  LIGHT = 4,
+  DARK = 5,
+  MAX = 6,
+  NONE = 6,
 }

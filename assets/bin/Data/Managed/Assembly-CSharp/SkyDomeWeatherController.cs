@@ -1,72 +1,64 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SkyDomeWeatherController
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class SkyDomeWeatherController
+#nullable disable
+public class SkyDomeWeatherController : MonoBehaviour
 {
-	[SerializeField]
-	private Renderer[] originalRenderer;
+  [SerializeField]
+  private Renderer[] originalRenderer;
+  [SerializeField]
+  private Renderer[] afterRenderer;
+  private int MATERIALCOLOR_PROPERTY_KEY;
 
-	[SerializeField]
-	private Renderer[] afterRenderer;
+  private void Awake()
+  {
+    this.MATERIALCOLOR_PROPERTY_KEY = Shader.PropertyToID("_MainColor");
+    this.UpdateRenderers(0.0f);
+  }
 
-	private int MATERIALCOLOR_PROPERTY_KEY;
-
-	public SkyDomeWeatherController()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		MATERIALCOLOR_PROPERTY_KEY = Shader.PropertyToID("_MainColor");
-		UpdateRenderers(0f);
-	}
-
-	public void UpdateRenderers(float rate)
-	{
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-		if (originalRenderer != null)
-		{
-			for (int i = 0; i < originalRenderer.Length; i++)
-			{
-				if (!(originalRenderer[i] == null))
-				{
-					Material[] sharedMaterials = originalRenderer[i].get_sharedMaterials();
-					foreach (Material val in sharedMaterials)
-					{
-						if (!(val == null) && val.HasProperty(MATERIALCOLOR_PROPERTY_KEY))
-						{
-							Color color = val.GetColor(MATERIALCOLOR_PROPERTY_KEY);
-							color.a = 1f - rate;
-							val.SetColor(MATERIALCOLOR_PROPERTY_KEY, color);
-						}
-					}
-				}
-			}
-		}
-		if (afterRenderer != null)
-		{
-			for (int k = 0; k < afterRenderer.Length; k++)
-			{
-				if (!(afterRenderer[k] == null))
-				{
-					Material[] materials = afterRenderer[k].get_materials();
-					for (int l = 0; l < afterRenderer[k].get_materials().Length; l++)
-					{
-						Material val2 = afterRenderer[k].get_sharedMaterials()[l];
-						if (!(val2 == null) && val2.HasProperty(MATERIALCOLOR_PROPERTY_KEY))
-						{
-							Color color2 = val2.GetColor(MATERIALCOLOR_PROPERTY_KEY);
-							color2.a = rate;
-							val2.SetColor(MATERIALCOLOR_PROPERTY_KEY, color2);
-						}
-					}
-				}
-			}
-		}
-	}
+  public void UpdateRenderers(float rate)
+  {
+    if (this.originalRenderer != null)
+    {
+      for (int index = 0; index < this.originalRenderer.Length; ++index)
+      {
+        if (!Object.op_Equality((Object) this.originalRenderer[index], (Object) null))
+        {
+          foreach (Material sharedMaterial in this.originalRenderer[index].sharedMaterials)
+          {
+            if (!Object.op_Equality((Object) sharedMaterial, (Object) null) && sharedMaterial.HasProperty(this.MATERIALCOLOR_PROPERTY_KEY))
+            {
+              Color color = sharedMaterial.GetColor(this.MATERIALCOLOR_PROPERTY_KEY);
+              color.a = 1f - rate;
+              sharedMaterial.SetColor(this.MATERIALCOLOR_PROPERTY_KEY, color);
+            }
+          }
+        }
+      }
+    }
+    if (this.afterRenderer == null)
+      return;
+    for (int index1 = 0; index1 < this.afterRenderer.Length; ++index1)
+    {
+      if (!Object.op_Equality((Object) this.afterRenderer[index1], (Object) null))
+      {
+        Material[] materials = this.afterRenderer[index1].materials;
+        for (int index2 = 0; index2 < this.afterRenderer[index1].materials.Length; ++index2)
+        {
+          Material sharedMaterial = this.afterRenderer[index1].sharedMaterials[index2];
+          if (!Object.op_Equality((Object) sharedMaterial, (Object) null) && sharedMaterial.HasProperty(this.MATERIALCOLOR_PROPERTY_KEY))
+          {
+            Color color = sharedMaterial.GetColor(this.MATERIALCOLOR_PROPERTY_KEY);
+            color.a = rate;
+            sharedMaterial.SetColor(this.MATERIALCOLOR_PROPERTY_KEY, color);
+          }
+        }
+      }
+    }
+  }
 }

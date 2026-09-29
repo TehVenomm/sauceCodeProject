@@ -1,389 +1,319 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ItemSortBase
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class ItemSortBase : SortBase
 {
-	private enum UI
-	{
-		MATERIAL_ROOT,
-		RARITY_ROOT,
-		EQUIP_FILTER_ROOT,
-		ELEMENT_ROOT,
-		BTN_N,
-		BTN_HN,
-		BTN_R,
-		BTN_HR,
-		BTN_SR,
-		BTN_HSR,
-		BTN_SSR,
-		BTN_COMMON,
-		BTN_UNIQUE,
-		BTN_LITHOGRAPH,
-		BTN_EQUIP,
-		BTN_METAL,
-		BTN_EQUIP_PAY,
-		BTN_EQUIP_NO_PAY,
-		BTN_EQUIP_CREATABLE,
-		BTN_EQUIP_NO_CREATABLE,
-		BTN_EQUIP_OBTAINED,
-		BTN_EQUIP_NO_OBTAINED,
-		BTN_FIRE,
-		BTN_WATER,
-		BTN_THUNDER,
-		BTN_SOIL,
-		BTN_LIGHT,
-		BTN_DARK,
-		BTN_NO_ELEMENT,
-		BTN_ID,
-		BTN_NUM,
-		BTN_GET,
-		BTN_RARITY,
-		BTN_LEVEL,
-		BTN_ATK,
-		BTN_DEF,
-		BTN_SELL,
-		BTN_SOCKET,
-		BTN_PRICE,
-		BTN_HP,
-		BTN_ELEMENT,
-		BTN_ASC,
-		BTN_DESC,
-		OBJ_HEIGHT_ANCHOR,
-		GRD_REQUIREMENT
-	}
+  private static readonly ItemSortBase.UI[] rarityButton = new ItemSortBase.UI[7]
+  {
+    ItemSortBase.UI.BTN_N,
+    ItemSortBase.UI.BTN_HN,
+    ItemSortBase.UI.BTN_R,
+    ItemSortBase.UI.BTN_HR,
+    ItemSortBase.UI.BTN_SR,
+    ItemSortBase.UI.BTN_HSR,
+    ItemSortBase.UI.BTN_SSR
+  };
+  private static readonly ItemSortBase.UI[] materialButton = new ItemSortBase.UI[5]
+  {
+    ItemSortBase.UI.BTN_COMMON,
+    ItemSortBase.UI.BTN_UNIQUE,
+    ItemSortBase.UI.BTN_LITHOGRAPH,
+    ItemSortBase.UI.BTN_EQUIP,
+    ItemSortBase.UI.BTN_METAL
+  };
+  private static readonly ItemSortBase.UI[] equipFilterButton = new ItemSortBase.UI[6]
+  {
+    ItemSortBase.UI.BTN_EQUIP_PAY,
+    ItemSortBase.UI.BTN_EQUIP_NO_PAY,
+    ItemSortBase.UI.BTN_EQUIP_CREATABLE,
+    ItemSortBase.UI.BTN_EQUIP_NO_CREATABLE,
+    ItemSortBase.UI.BTN_EQUIP_OBTAINED,
+    ItemSortBase.UI.BTN_EQUIP_NO_OBTAINED
+  };
+  private static readonly ItemSortBase.UI?[] requirementButton;
+  private static readonly ItemSortBase.UI[] elementButton;
+  private static readonly ItemSortBase.UI[] ascButton;
 
-	private static readonly UI[] rarityButton = new UI[7]
-	{
-		UI.BTN_N,
-		UI.BTN_HN,
-		UI.BTN_R,
-		UI.BTN_HR,
-		UI.BTN_SR,
-		UI.BTN_HSR,
-		UI.BTN_SSR
-	};
+  public override void Initialize() => base.Initialize();
 
-	private static readonly UI[] materialButton = new UI[5]
-	{
-		UI.BTN_COMMON,
-		UI.BTN_UNIQUE,
-		UI.BTN_LITHOGRAPH,
-		UI.BTN_EQUIP,
-		UI.BTN_METAL
-	};
+  public override void UpdateUI()
+  {
+    if (this.sortOrder.dialogType == SortBase.DIALOG_TYPE.MATERIAL)
+    {
+      this.SetActive((Enum) ItemSortBase.UI.MATERIAL_ROOT, true);
+      this.SetActive((Enum) ItemSortBase.UI.RARITY_ROOT, false);
+      this.SetActive((Enum) ItemSortBase.UI.EQUIP_FILTER_ROOT, false);
+      this.SetActive((Enum) ItemSortBase.UI.ELEMENT_ROOT, true);
+      int event_data1 = 0;
+      for (int length = ItemSortBase.materialButton.Length; event_data1 < length; ++event_data1)
+      {
+        bool flag = (this.sortOrder.type & 1 << event_data1) != 0;
+        this.SetEvent((Enum) ItemSortBase.materialButton[event_data1], "MATERIAL", event_data1);
+        this.SetToggle(this.GetCtrl((Enum) ItemSortBase.materialButton[event_data1]).parent, flag);
+      }
+      int event_data2 = 0;
+      for (int length = ItemSortBase.elementButton.Length; event_data2 < length; ++event_data2)
+      {
+        bool flag = (this.sortOrder.element & 1 << event_data2) != 0;
+        this.SetEvent((Enum) ItemSortBase.elementButton[event_data2], "ELEMENT", event_data2);
+        this.SetToggle(this.GetCtrl((Enum) ItemSortBase.elementButton[event_data2]).parent, flag);
+      }
+      GameObject.Find("ItemSortFrame").gameObject.GetComponent<UIWidget>().height = 633;
+      this.GetCtrl((Enum) ItemSortBase.UI.ELEMENT_ROOT).localPosition = new Vector3(0.0f, -153f, 0.0f);
+      GameObject.Find("sort").gameObject.transform.localPosition = new Vector3(0.0f, -322f, 0.0f);
+    }
+    else if (this.sortOrder.dialogType == SortBase.DIALOG_TYPE.SMITH_CREATE_WEAPON || this.sortOrder.dialogType == SortBase.DIALOG_TYPE.SMITH_CREATE_ARMOR)
+    {
+      this.SetActive((Enum) ItemSortBase.UI.MATERIAL_ROOT, false);
+      this.SetActive((Enum) ItemSortBase.UI.EQUIP_FILTER_ROOT, true);
+      this.SetActive((Enum) ItemSortBase.UI.RARITY_ROOT, true);
+      this.SetActive((Enum) ItemSortBase.UI.ELEMENT_ROOT, true);
+      int event_data3 = 0;
+      for (int length = ItemSortBase.rarityButton.Length; event_data3 < length; ++event_data3)
+      {
+        bool flag = (this.sortOrder.rarity & 1 << event_data3) != 0;
+        this.SetEvent((Enum) ItemSortBase.rarityButton[event_data3], "RARITY", event_data3);
+        this.SetToggle(this.GetCtrl((Enum) ItemSortBase.rarityButton[event_data3]).parent, flag);
+      }
+      int event_data4 = 0;
+      for (int length = ItemSortBase.equipFilterButton.Length; event_data4 < length; ++event_data4)
+      {
+        bool flag = (this.sortOrder.equipFilter & 1 << event_data4) != 0;
+        this.SetEvent((Enum) ItemSortBase.equipFilterButton[event_data4], "EQUIPFILTER", event_data4);
+        this.SetToggle(this.GetCtrl((Enum) ItemSortBase.equipFilterButton[event_data4]).parent, flag);
+      }
+      int event_data5 = 0;
+      for (int length = ItemSortBase.elementButton.Length; event_data5 < length; ++event_data5)
+      {
+        bool flag = (this.sortOrder.element & 1 << event_data5) != 0;
+        this.SetEvent((Enum) ItemSortBase.elementButton[event_data5], "ELEMENT", event_data5);
+        this.SetToggle(this.GetCtrl((Enum) ItemSortBase.elementButton[event_data5]).parent, flag);
+      }
+      UIWidget component = GameObject.Find("ItemSortFrame").gameObject.GetComponent<UIWidget>();
+      Transform transform1 = ((Component) component).transform;
+      Vector3 vector3_1;
+      // ISSUE: explicit constructor call
+      ((Vector3) ref vector3_1).\u002Ector(transform1.localPosition.x, transform1.localPosition.y + 40f, transform1.localPosition.z);
+      transform1.localPosition = vector3_1;
+      component.height = 750;
+      Transform transform2 = GameObject.Find("sort").gameObject.transform;
+      Vector3 vector3_2;
+      // ISSUE: explicit constructor call
+      ((Vector3) ref vector3_2).\u002Ector(transform2.localPosition.x, transform2.localPosition.y - 240f, transform2.localPosition.z);
+      transform2.localPosition = vector3_2;
+    }
+    else if (this.sortOrder.dialogType == SortBase.DIALOG_TYPE.ABILITY_ITEM)
+    {
+      this.SetActive((Enum) ItemSortBase.UI.MATERIAL_ROOT, false);
+      this.SetActive((Enum) ItemSortBase.UI.EQUIP_FILTER_ROOT, false);
+      this.SetActive((Enum) ItemSortBase.UI.RARITY_ROOT, true);
+      this.SetActive((Enum) ItemSortBase.UI.ELEMENT_ROOT, true);
+      int event_data6 = 0;
+      for (int length = ItemSortBase.rarityButton.Length; event_data6 < length; ++event_data6)
+      {
+        bool flag = (this.sortOrder.rarity & 1 << event_data6) != 0;
+        this.SetEvent((Enum) ItemSortBase.rarityButton[event_data6], "RARITY", event_data6);
+        this.SetToggle(this.GetCtrl((Enum) ItemSortBase.rarityButton[event_data6]).parent, flag);
+      }
+      int event_data7 = 0;
+      for (int length = ItemSortBase.elementButton.Length; event_data7 < length; ++event_data7)
+      {
+        bool flag = (this.sortOrder.element & 1 << event_data7) != 0;
+        this.SetEvent((Enum) ItemSortBase.elementButton[event_data7], "ELEMENT", event_data7);
+        this.SetToggle(this.GetCtrl((Enum) ItemSortBase.elementButton[event_data7]).parent, flag);
+      }
+      GameObject.Find("ItemSortFrame").gameObject.GetComponent<UIWidget>().height = 583;
+      this.GetCtrl((Enum) ItemSortBase.UI.ELEMENT_ROOT).localPosition = new Vector3(0.0f, -98f, 0.0f);
+      GameObject.Find("sort").gameObject.transform.localPosition = new Vector3(0.0f, -264f, 0.0f);
+    }
+    else
+    {
+      this.SetActive((Enum) ItemSortBase.UI.MATERIAL_ROOT, false);
+      this.SetActive((Enum) ItemSortBase.UI.EQUIP_FILTER_ROOT, false);
+      this.SetActive((Enum) ItemSortBase.UI.RARITY_ROOT, true);
+      this.SetActive((Enum) ItemSortBase.UI.ELEMENT_ROOT, false);
+      int event_data = 0;
+      for (int length = ItemSortBase.rarityButton.Length; event_data < length; ++event_data)
+      {
+        bool flag = (this.sortOrder.rarity & 1 << event_data) != 0;
+        this.SetEvent((Enum) ItemSortBase.rarityButton[event_data], "RARITY", event_data);
+        this.SetToggle(this.GetCtrl((Enum) ItemSortBase.rarityButton[event_data]).parent, flag);
+      }
+    }
+    int num;
+    switch (this.sortOrder.dialogType)
+    {
+      case SortBase.DIALOG_TYPE.STORAGE_EQUIP:
+      case SortBase.DIALOG_TYPE.STORAGE_SKILL:
+        num = 8604;
+        break;
+      case SortBase.DIALOG_TYPE.SMITH_CREATE_WEAPON:
+        num = 8488;
+        break;
+      case SortBase.DIALOG_TYPE.SMITH_CREATE_ARMOR:
+        num = 8520;
+        break;
+      case SortBase.DIALOG_TYPE.SMITH_CREATE_PICKUP_WEAPON:
+        num = 8489;
+        break;
+      case SortBase.DIALOG_TYPE.SMITH_CREATE_PICKUP_ARMOR:
+        num = 8521;
+        break;
+      default:
+        num = 138;
+        break;
+    }
+    ItemSortBase.UI? label_enum = new ItemSortBase.UI?();
+    int index = 0;
+    for (int length = ItemSortBase.requirementButton.Length; index < length; ++index)
+    {
+      if (ItemSortBase.requirementButton[index].HasValue)
+      {
+        int event_data = 1 << index;
+        if ((event_data & num) != 0)
+        {
+          bool flag = this.sortOrder.requirement == (SortBase.SORT_REQUIREMENT) event_data;
+          this.SetEvent((Enum) (ValueType) ItemSortBase.requirementButton[index], "REQUIREMENT", event_data);
+          this.SetToggle((Enum) (ValueType) ItemSortBase.requirementButton[index], flag);
+          label_enum = ItemSortBase.requirementButton[index];
+        }
+        else
+          this.SetActive((Enum) (ValueType) ItemSortBase.requirementButton[index], false);
+      }
+    }
+    if (label_enum.HasValue)
+    {
+      this.GetComponent<UIGrid>((Enum) ItemSortBase.UI.GRD_REQUIREMENT).Reposition();
+      this.GetCtrl((Enum) ItemSortBase.UI.OBJ_HEIGHT_ANCHOR).position = this.GetCtrl((Enum) (ValueType) label_enum).position;
+    }
+    int event_data8 = 0;
+    for (int length = ItemSortBase.ascButton.Length; event_data8 < length; ++event_data8)
+    {
+      bool flag = false;
+      if (event_data8 == 0 && this.sortOrder.orderTypeAsc || event_data8 == 1 && !this.sortOrder.orderTypeAsc)
+        flag = true;
+      this.SetEvent((Enum) ItemSortBase.ascButton[event_data8], "ORDER_TYPE", event_data8);
+      this.SetToggle((Enum) ItemSortBase.ascButton[event_data8], flag);
+    }
+  }
 
-	private static readonly UI[] equipFilterButton = new UI[6]
-	{
-		UI.BTN_EQUIP_PAY,
-		UI.BTN_EQUIP_NO_PAY,
-		UI.BTN_EQUIP_CREATABLE,
-		UI.BTN_EQUIP_NO_CREATABLE,
-		UI.BTN_EQUIP_OBTAINED,
-		UI.BTN_EQUIP_NO_OBTAINED
-	};
+  private void OnQuery_RARITY()
+  {
+    int _index;
+    bool _is_enable;
+    this.OnQueryEvent_Rarity(out _index, out _is_enable);
+    this.SetToggle(this.GetCtrl((Enum) ItemSortBase.rarityButton[_index]).parent, _is_enable);
+  }
 
-	private static readonly UI?[] requirementButton = new UI?[14]
-	{
-		UI.BTN_ID,
-		UI.BTN_NUM,
-		UI.BTN_GET,
-		UI.BTN_RARITY,
-		UI.BTN_LEVEL,
-		UI.BTN_ATK,
-		UI.BTN_DEF,
-		UI.BTN_SELL,
-		UI.BTN_SOCKET,
-		UI.BTN_PRICE,
-		null,
-		null,
-		null,
-		UI.BTN_ELEMENT
-	};
+  private void OnQuery_MATERIAL()
+  {
+    int _index;
+    bool _is_enable;
+    this.OnQueryEvent_Type(out _index, out _is_enable);
+    this.SetToggle(this.GetCtrl((Enum) ItemSortBase.materialButton[_index]).parent, _is_enable);
+  }
 
-	private static readonly UI[] elementButton = new UI[7]
-	{
-		UI.BTN_FIRE,
-		UI.BTN_WATER,
-		UI.BTN_THUNDER,
-		UI.BTN_SOIL,
-		UI.BTN_LIGHT,
-		UI.BTN_DARK,
-		UI.BTN_NO_ELEMENT
-	};
+  private void OnQuery_EQUIPFILTER()
+  {
+    int _index;
+    bool _is_enable;
+    this.OnQueryEvent_EquipFilter(out _index, out _is_enable);
+    this.SetToggle(this.GetCtrl((Enum) ItemSortBase.equipFilterButton[_index]).parent, _is_enable);
+  }
 
-	private static readonly UI[] ascButton = new UI[2]
-	{
-		UI.BTN_ASC,
-		UI.BTN_DESC
-	};
+  private void OnQuery_ELEMENT()
+  {
+    int _index;
+    bool _is_enable;
+    this.OnQueryEvent_Element(out _index, out _is_enable);
+    this.SetToggle(this.GetCtrl((Enum) ItemSortBase.elementButton[_index]).parent, _is_enable);
+  }
 
-	public override void Initialize()
-	{
-		base.Initialize();
-	}
+  static ItemSortBase()
+  {
+    ItemSortBase.UI?[] nullableArray = new ItemSortBase.UI?[14];
+    nullableArray[0] = new ItemSortBase.UI?(ItemSortBase.UI.BTN_ID);
+    nullableArray[1] = new ItemSortBase.UI?(ItemSortBase.UI.BTN_NUM);
+    nullableArray[2] = new ItemSortBase.UI?(ItemSortBase.UI.BTN_GET);
+    nullableArray[3] = new ItemSortBase.UI?(ItemSortBase.UI.BTN_RARITY);
+    nullableArray[4] = new ItemSortBase.UI?(ItemSortBase.UI.BTN_LEVEL);
+    nullableArray[5] = new ItemSortBase.UI?(ItemSortBase.UI.BTN_ATK);
+    nullableArray[6] = new ItemSortBase.UI?(ItemSortBase.UI.BTN_DEF);
+    nullableArray[7] = new ItemSortBase.UI?(ItemSortBase.UI.BTN_SELL);
+    nullableArray[8] = new ItemSortBase.UI?(ItemSortBase.UI.BTN_SOCKET);
+    nullableArray[9] = new ItemSortBase.UI?(ItemSortBase.UI.BTN_PRICE);
+    nullableArray[13] = new ItemSortBase.UI?(ItemSortBase.UI.BTN_ELEMENT);
+    ItemSortBase.requirementButton = nullableArray;
+    ItemSortBase.elementButton = new ItemSortBase.UI[7]
+    {
+      ItemSortBase.UI.BTN_FIRE,
+      ItemSortBase.UI.BTN_WATER,
+      ItemSortBase.UI.BTN_THUNDER,
+      ItemSortBase.UI.BTN_SOIL,
+      ItemSortBase.UI.BTN_LIGHT,
+      ItemSortBase.UI.BTN_DARK,
+      ItemSortBase.UI.BTN_NO_ELEMENT
+    };
+    ItemSortBase.ascButton = new ItemSortBase.UI[2]
+    {
+      ItemSortBase.UI.BTN_ASC,
+      ItemSortBase.UI.BTN_DESC
+    };
+  }
 
-	public override void UpdateUI()
-	{
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Expected O, but got Unknown
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010a: Expected O, but got Unknown
-		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0176: Expected O, but got Unknown
-		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024f: Expected O, but got Unknown
-		//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c4: Expected O, but got Unknown
-		//IL_0332: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0339: Expected O, but got Unknown
-		//IL_0352: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0357: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0365: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036a: Expected O, but got Unknown
-		//IL_0370: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0375: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0380: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0385: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0396: Unknown result type (might be due to invalid IL or missing references)
-		//IL_039b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d2: Expected O, but got Unknown
-		//IL_03d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0403: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0413: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c6: Expected O, but got Unknown
-		//IL_0534: Unknown result type (might be due to invalid IL or missing references)
-		//IL_053b: Expected O, but got Unknown
-		//IL_0554: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0559: Unknown result type (might be due to invalid IL or missing references)
-		//IL_058c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_059b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05aa: Expected O, but got Unknown
-		//IL_05bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_065a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0661: Expected O, but got Unknown
-		//IL_0827: Unknown result type (might be due to invalid IL or missing references)
-		if (sortOrder.dialogType == DIALOG_TYPE.MATERIAL)
-		{
-			SetActive((Enum)UI.MATERIAL_ROOT, true);
-			SetActive((Enum)UI.RARITY_ROOT, false);
-			SetActive((Enum)UI.EQUIP_FILTER_ROOT, false);
-			SetActive((Enum)UI.ELEMENT_ROOT, true);
-			int i = 0;
-			for (int num = materialButton.Length; i < num; i++)
-			{
-				bool value = (sortOrder.type & (1 << i)) != 0;
-				SetEvent((Enum)materialButton[i], "MATERIAL", i);
-				SetToggle(GetCtrl(materialButton[i]).get_parent(), value);
-			}
-			int j = 0;
-			for (int num2 = elementButton.Length; j < num2; j++)
-			{
-				bool value2 = (sortOrder.element & (1 << j)) != 0;
-				SetEvent((Enum)elementButton[j], "ELEMENT", j);
-				SetToggle(GetCtrl(elementButton[j]).get_parent(), value2);
-			}
-			UIWidget component = GameObject.Find("ItemSortFrame").get_gameObject().GetComponent<UIWidget>();
-			component.height = 633;
-			GetCtrl(UI.ELEMENT_ROOT).set_localPosition(new Vector3(0f, -153f, 0f));
-			Transform val = GameObject.Find("sort").get_gameObject().get_transform();
-			val.set_localPosition(new Vector3(0f, -322f, 0f));
-		}
-		else if (sortOrder.dialogType == DIALOG_TYPE.SMITH_CREATE_WEAPON || sortOrder.dialogType == DIALOG_TYPE.SMITH_CREATE_ARMOR)
-		{
-			SetActive((Enum)UI.MATERIAL_ROOT, false);
-			SetActive((Enum)UI.EQUIP_FILTER_ROOT, true);
-			SetActive((Enum)UI.RARITY_ROOT, true);
-			SetActive((Enum)UI.ELEMENT_ROOT, true);
-			int k = 0;
-			for (int num3 = rarityButton.Length; k < num3; k++)
-			{
-				bool value3 = (sortOrder.rarity & (1 << k)) != 0;
-				SetEvent((Enum)rarityButton[k], "RARITY", k);
-				SetToggle(GetCtrl(rarityButton[k]).get_parent(), value3);
-			}
-			int l = 0;
-			for (int num4 = equipFilterButton.Length; l < num4; l++)
-			{
-				bool value4 = (sortOrder.equipFilter & (1 << l)) != 0;
-				SetEvent((Enum)equipFilterButton[l], "EQUIPFILTER", l);
-				SetToggle(GetCtrl(equipFilterButton[l]).get_parent(), value4);
-			}
-			int m = 0;
-			for (int num5 = elementButton.Length; m < num5; m++)
-			{
-				bool value5 = (sortOrder.element & (1 << m)) != 0;
-				SetEvent((Enum)elementButton[m], "ELEMENT", m);
-				SetToggle(GetCtrl(elementButton[m]).get_parent(), value5);
-			}
-			UIWidget component2 = GameObject.Find("ItemSortFrame").get_gameObject().GetComponent<UIWidget>();
-			Transform val2 = component2.get_transform();
-			Vector3 localPosition = val2.get_localPosition();
-			float x = localPosition.x;
-			Vector3 localPosition2 = val2.get_localPosition();
-			float num6 = localPosition2.y + 40f;
-			Vector3 localPosition3 = val2.get_localPosition();
-			Vector3 localPosition4 = default(Vector3);
-			localPosition4._002Ector(x, num6, localPosition3.z);
-			val2.set_localPosition(localPosition4);
-			component2.height = 700;
-			Transform val3 = GameObject.Find("sort").get_gameObject().get_transform();
-			Vector3 localPosition5 = val3.get_localPosition();
-			float x2 = localPosition5.x;
-			Vector3 localPosition6 = val3.get_localPosition();
-			float num7 = localPosition6.y - 185f;
-			Vector3 localPosition7 = val3.get_localPosition();
-			Vector3 localPosition8 = default(Vector3);
-			localPosition8._002Ector(x2, num7, localPosition7.z);
-			val3.set_localPosition(localPosition8);
-		}
-		else if (sortOrder.dialogType == DIALOG_TYPE.ABILITY_ITEM)
-		{
-			SetActive((Enum)UI.MATERIAL_ROOT, false);
-			SetActive((Enum)UI.EQUIP_FILTER_ROOT, false);
-			SetActive((Enum)UI.RARITY_ROOT, true);
-			SetActive((Enum)UI.ELEMENT_ROOT, true);
-			int n = 0;
-			for (int num8 = rarityButton.Length; n < num8; n++)
-			{
-				bool value6 = (sortOrder.rarity & (1 << n)) != 0;
-				SetEvent((Enum)rarityButton[n], "RARITY", n);
-				SetToggle(GetCtrl(rarityButton[n]).get_parent(), value6);
-			}
-			int num9 = 0;
-			for (int num10 = elementButton.Length; num9 < num10; num9++)
-			{
-				bool value7 = (sortOrder.element & (1 << num9)) != 0;
-				SetEvent((Enum)elementButton[num9], "ELEMENT", num9);
-				SetToggle(GetCtrl(elementButton[num9]).get_parent(), value7);
-			}
-			UIWidget component3 = GameObject.Find("ItemSortFrame").get_gameObject().GetComponent<UIWidget>();
-			component3.height = 583;
-			GetCtrl(UI.ELEMENT_ROOT).set_localPosition(new Vector3(0f, -98f, 0f));
-			Transform val4 = GameObject.Find("sort").get_gameObject().get_transform();
-			val4.set_localPosition(new Vector3(0f, -264f, 0f));
-		}
-		else
-		{
-			SetActive((Enum)UI.MATERIAL_ROOT, false);
-			SetActive((Enum)UI.EQUIP_FILTER_ROOT, false);
-			SetActive((Enum)UI.RARITY_ROOT, true);
-			SetActive((Enum)UI.ELEMENT_ROOT, false);
-			int num11 = 0;
-			for (int num12 = rarityButton.Length; num11 < num12; num11++)
-			{
-				bool value8 = (sortOrder.rarity & (1 << num11)) != 0;
-				SetEvent((Enum)rarityButton[num11], "RARITY", num11);
-				SetToggle(GetCtrl(rarityButton[num11]).get_parent(), value8);
-			}
-		}
-		int num13;
-		switch (sortOrder.dialogType)
-		{
-		default:
-			num13 = 138;
-			break;
-		case DIALOG_TYPE.STORAGE_EQUIP:
-		case DIALOG_TYPE.STORAGE_SKILL:
-			num13 = 8604;
-			break;
-		case DIALOG_TYPE.SMITH_CREATE_WEAPON:
-			num13 = 8488;
-			break;
-		case DIALOG_TYPE.SMITH_CREATE_ARMOR:
-			num13 = 8520;
-			break;
-		case DIALOG_TYPE.SMITH_CREATE_PICKUP_WEAPON:
-			num13 = 8489;
-			break;
-		case DIALOG_TYPE.SMITH_CREATE_PICKUP_ARMOR:
-			num13 = 8521;
-			break;
-		}
-		UI? nullable = null;
-		int num14 = 0;
-		for (int num15 = requirementButton.Length; num14 < num15; num14++)
-		{
-			UI? nullable2 = requirementButton[num14];
-			if (nullable2.HasValue)
-			{
-				int num16 = 1 << num14;
-				if ((num16 & num13) != 0)
-				{
-					bool value9 = sortOrder.requirement == (SORT_REQUIREMENT)num16;
-					SetEvent((Enum)requirementButton[num14], "REQUIREMENT", num16);
-					SetToggle((Enum)requirementButton[num14], value9);
-					nullable = requirementButton[num14];
-				}
-				else
-				{
-					SetActive((Enum)requirementButton[num14], false);
-				}
-			}
-		}
-		if (nullable.HasValue)
-		{
-			base.GetComponent<UIGrid>((Enum)UI.GRD_REQUIREMENT).Reposition();
-			GetCtrl(UI.OBJ_HEIGHT_ANCHOR).set_position(GetCtrl(nullable).get_position());
-		}
-		int num17 = 0;
-		for (int num18 = ascButton.Length; num17 < num18; num17++)
-		{
-			bool value10 = false;
-			if ((num17 == 0 && sortOrder.orderTypeAsc) || (num17 == 1 && !sortOrder.orderTypeAsc))
-			{
-				value10 = true;
-			}
-			SetEvent((Enum)ascButton[num17], "ORDER_TYPE", num17);
-			SetToggle((Enum)ascButton[num17], value10);
-		}
-	}
-
-	private void OnQuery_RARITY()
-	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
-		OnQueryEvent_Rarity(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl(rarityButton[_index]).get_parent(), _is_enable);
-	}
-
-	private void OnQuery_MATERIAL()
-	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
-		OnQueryEvent_Type(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl(materialButton[_index]).get_parent(), _is_enable);
-	}
-
-	private void OnQuery_EQUIPFILTER()
-	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
-		OnQueryEvent_EquipFilter(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl(equipFilterButton[_index]).get_parent(), _is_enable);
-	}
-
-	private void OnQuery_ELEMENT()
-	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
-		OnQueryEvent_Element(out int _index, out bool _is_enable);
-		SetToggle(GetCtrl(elementButton[_index]).get_parent(), _is_enable);
-	}
+  private enum UI
+  {
+    MATERIAL_ROOT,
+    RARITY_ROOT,
+    EQUIP_FILTER_ROOT,
+    ELEMENT_ROOT,
+    BTN_N,
+    BTN_HN,
+    BTN_R,
+    BTN_HR,
+    BTN_SR,
+    BTN_HSR,
+    BTN_SSR,
+    BTN_COMMON,
+    BTN_UNIQUE,
+    BTN_LITHOGRAPH,
+    BTN_EQUIP,
+    BTN_METAL,
+    BTN_EQUIP_PAY,
+    BTN_EQUIP_NO_PAY,
+    BTN_EQUIP_CREATABLE,
+    BTN_EQUIP_NO_CREATABLE,
+    BTN_EQUIP_OBTAINED,
+    BTN_EQUIP_NO_OBTAINED,
+    BTN_FIRE,
+    BTN_WATER,
+    BTN_THUNDER,
+    BTN_SOIL,
+    BTN_LIGHT,
+    BTN_DARK,
+    BTN_NO_ELEMENT,
+    BTN_ID,
+    BTN_NUM,
+    BTN_GET,
+    BTN_RARITY,
+    BTN_LEVEL,
+    BTN_ATK,
+    BTN_DEF,
+    BTN_SELL,
+    BTN_SOCKET,
+    BTN_PRICE,
+    BTN_HP,
+    BTN_ELEMENT,
+    BTN_ASC,
+    BTN_DESC,
+    OBJ_HEIGHT_ANCHOR,
+    GRD_REQUIREMENT,
+  }
 }

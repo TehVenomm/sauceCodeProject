@@ -1,3 +1,9 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: DataTableManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Ionic.Zlib;
 using System;
 using System.Collections.Generic;
@@ -5,869 +11,792 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
+#nullable disable
 public class DataTableManager : MonoBehaviourSingleton<DataTableManager>
 {
-	private enum LoadStatus
-	{
-		NotInitialize,
-		LoadingInitialTable,
-		LoadingAllTable,
-		LoadComplete
-	}
-
-	private class RequestParam
-	{
-		public string tableName;
-
-		public Action<byte[]> processBinary;
-
-		public RequestParam(string tableName, Action<byte[]> processBinary = null)
-		{
-			this.tableName = tableName;
-			this.processBinary = processBinary;
-		}
-	}
-
-	private class DataTableInterfaceProxy : IDataTable
-	{
-		private Action<string> create;
-
-		public DataTableInterfaceProxy(Action<string> create)
-		{
-			this.create = create;
-		}
-
-		public void CreateTable(string csv)
-		{
-			create(csv);
-		}
-	}
-
-	private class DataTableContainer : IDataTable
-	{
-		private IDataTable table;
-
-		private DataTableContainer dependencyTable;
-
-		public bool isInitialized
-		{
-			get;
-			private set;
-		}
-
-		public string name
-		{
-			get;
-			private set;
-		}
-
-		public DataTableContainer(string name, IDataTable table)
-		{
-			this.name = name;
-			this.table = table;
-		}
-
-		public void SetDependency(DataTableContainer table)
-		{
-			dependencyTable = table;
-		}
-
-		public DataTableContainer GetDependency()
-		{
-			return dependencyTable;
-		}
-
-		public bool CanLoad()
-		{
-			if (dependencyTable == null)
-			{
-				return true;
-			}
-			return dependencyTable.isInitialized;
-		}
-
-		public void CreateTable(string csv)
-		{
-			table.CreateTable(csv);
-			isInitialized = true;
-		}
-	}
-
-	private static string MANIFEST_NAME = "manifest";
-
-	private DataTableManifest manifest;
-
-	public DataTableCache cache;
-
-	private Dictionary<string, DataTableContainer> tables = new Dictionary<string, DataTableContainer>();
-
-	private List<DataLoadRequest> erroredRequests = new List<DataLoadRequest>();
-
-	private LoadStatus loadStatus;
-
-	public DataLoader dataLoader;
-
-	private XorInt vm = new XorInt(1);
-
-	private int lastReceiveManifestVersion = -1;
-
-	private static readonly string DATA_TABLE_DIRECTORY = "tables";
-
-	private List<DataLoadRequest> verifyErroredRequest = new List<DataLoadRequest>();
-
-	private List<Action> afterProcesses = new List<Action>();
-
-	private List<KeyValuePair<string, string>> unresolvedDependencies = new List<KeyValuePair<string, string>>();
-
-	public bool shouldUpdateManifest => manifest == null || lastReceiveManifestVersion != manifest.version;
-
-	public int manifestVersion => (manifest == null) ? (-1) : manifest.version;
-
-	public bool hasManifest => manifest != null;
-
-	public bool reportOnly => (int)vm == 1;
-
-	public bool forceLoadCSV
-	{
-		get;
-		set;
-	}
-
-	public event Action<DataTableLoadError, Action> onError;
-
-	protected override void Awake()
-	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		base.Awake();
-		cache = new DataTableCache(null);
-		dataLoader = this.get_gameObject().AddComponent<DataLoader>();
-		dataLoader.SetCache(new DataTableCache(null));
-		forceLoadCSV = false;
-		loadStatus = LoadStatus.NotInitialize;
-	}
-
-	public void OnReceiveTableManifestVersion(int version)
-	{
-		if (lastReceiveManifestVersion == version)
-		{
-			goto IL_000c;
-		}
-		goto IL_000c;
-		IL_000c:
-		lastReceiveManifestVersion = version;
-	}
-
-	public void OnReceiveVM(XorInt vm)
-	{
-		this.vm = vm;
-	}
-
-	public void UpdateManifest(Action onComplete)
-	{
-		int version = lastReceiveManifestVersion;
-		DataLoadRequest dataLoadRequest = CreateRequest(MANIFEST_NAME, new ManifestVersion(version), DATA_TABLE_DIRECTORY, false);
-		dataLoadRequest.processCompressedTextData = delegate(byte[] bytes)
-		{
-			try
-			{
-				string csv = DecompressToString(bytes);
-				manifest = DataTableManifest.Create(csv, version);
-			}
-			catch (Exception ex)
-			{
-				Log.Error(LOG.DATA_TABLE, "manifest load error: {0}", ex.ToString());
-				throw;
-				IL_0040:;
-			}
-		};
-		dataLoadRequest.onComplete += onComplete;
-		dataLoader.RequestManifest(dataLoadRequest);
-	}
-
-	public List<DataLoadRequest> LoadInitialTable(Action onComplete, bool downloadOnly = false)
-	{
-		if (!downloadOnly)
-		{
-			loadStatus = LoadStatus.LoadingInitialTable;
-		}
-		RequestParam[] array = new RequestParam[21]
-		{
-			new RequestParam("AvatarTable", null),
-			new RequestParam("CreateEquipItemTable", null),
-			new RequestParam("CreatePickupItemTable", null),
-			new RequestParam("DeliveryTable", null),
-			new RequestParam("EquipItemTable", null),
-			new RequestParam("EquipModelTable", null),
-			new RequestParam("GrowSkillItemTable", null),
-			new RequestParam("HomeThemeTable", null),
-			new RequestParam("CountdownTable", null),
-			new RequestParam("NPCMessageTable", null),
-			new RequestParam("NPCTable", null),
-			new RequestParam("QuestTable", null),
-			new RequestParam("SkillItemTable", null),
-			new RequestParam("ExceedSkillItemTable", null),
-			new RequestParam("StageTable", null),
-			new RequestParam("TutorialMessageTable", null),
-			new RequestParam("StampTypeTable", null),
-			new RequestParam("EquipItemExceedParamTable", null),
-			new RequestParam("RegionTable", null),
-			new RequestParam("FieldMapTable", null),
-			new RequestParam("FieldMapPortalTable", null)
-		};
-		List<DataLoadRequest> list = new List<DataLoadRequest>();
-		int i = 0;
-		for (int num = array.Length; i < num; i++)
-		{
-			RequestParam requestParam = array[i];
-			DataLoadRequest item = CreateRequestLoadTable(requestParam.tableName, downloadOnly, requestParam.processBinary);
-			list.Add(item);
-		}
-		SetDepends(list);
-		int reqCount = list.Count;
-		foreach (DataLoadRequest item2 in list)
-		{
-			item2.onComplete += delegate
-			{
-				reqCount--;
-				if (reqCount <= 0)
-				{
-					onComplete();
-					if (!downloadOnly)
-					{
-						loadStatus = LoadStatus.LoadingAllTable;
-					}
-				}
-			};
-		}
-		Request(list);
-		return list;
-	}
-
-	public List<DataLoadRequest> LoadAllTable(Action onComplete, bool downloadOnly = false)
-	{
-		RequestParam[] array = new RequestParam[43]
-		{
-			new RequestParam("AbilityDataTable", null),
-			new RequestParam("AbilityTable", null),
-			new RequestParam("AudioSettingTable", null),
-			new RequestParam("DeliveryRewardTable", null),
-			new RequestParam("EnemyTable", null),
-			new RequestParam("EquipItemExceedTable", null),
-			new RequestParam("EvolveEquipItemTable", null),
-			new RequestParam("GrowEnemyTable", null),
-			new RequestParam("ItemTable", null),
-			new RequestParam("SETable", null),
-			new RequestParam("StringTable", null),
-			new RequestParam("TaskTable", null),
-			new RequestParam("UserLevelTable", null),
-			new RequestParam("GrowEquipItemTable", null),
-			new RequestParam("GrowEquipItemNeedItemTable", null),
-			new RequestParam("GrowEquipItemNeedUniqueItemTable", null),
-			new RequestParam("MissionTable", null),
-			new RequestParam("RegionTable", null),
-			new RequestParam("FieldMapTable", null),
-			new RequestParam("FieldMapPortalTable", null),
-			new RequestParam("FieldMapEnemyPopTable", null),
-			new RequestParam("FieldMapGatherPointTable", null),
-			new RequestParam("FieldMapGatherPointViewTable", null),
-			new RequestParam("FieldMapGimmickPointTable", null),
-			new RequestParam("FieldMapGimmickActionTable", null),
-			new RequestParam("QuestToFieldTable", null),
-			new RequestParam("ItemToFieldTable", null),
-			new RequestParam("EnemyHitTypeTable", null),
-			new RequestParam("EnemyHitMaterialTable", null),
-			new RequestParam("EnemyPersonalityTable", null),
-			new RequestParam("PointShopGetPointTable", null),
-			new RequestParam("DegreeTable", null),
-			new RequestParam("DamageDistanceTable", null),
-			new RequestParam("GachaSearchEnemyTable", null),
-			new RequestParam("BuffTable", null),
-			new RequestParam("FieldBuffTable", null),
-			new RequestParam("LimitedEquipItemExceedTable", null),
-			new RequestParam("PlayDataTable", null),
-			new RequestParam("ArenaTable", null),
-			new RequestParam("EnemyAngryTable", null),
-			new RequestParam("EnemyActionTable", null),
-			new RequestParam("NpcLevelTable", null),
-			new RequestParam("FieldMapEnemyPopTimeZoneTable", null)
-		};
-		List<DataLoadRequest> list = new List<DataLoadRequest>();
-		int i = 0;
-		for (int num = array.Length; i < num; i++)
-		{
-			RequestParam requestParam = array[i];
-			DataLoadRequest item = CreateRequestLoadTable(requestParam.tableName, downloadOnly, requestParam.processBinary);
-			list.Add(item);
-		}
-		SetDepends(list);
-		int reqCount = list.Count;
-		foreach (DataLoadRequest item2 in list)
-		{
-			item2.onComplete += delegate
-			{
-				reqCount--;
-				if (reqCount <= 0)
-				{
-					onComplete();
-					if (!downloadOnly)
-					{
-						loadStatus = LoadStatus.LoadComplete;
-					}
-				}
-			};
-		}
-		Request(list);
-		return list;
-	}
-
-	private void SetDepends(List<DataLoadRequest> reqs)
-	{
-		int i = 0;
-		for (int count = reqs.Count; i < count; i++)
-		{
-			DataLoadRequest dataLoadRequest = reqs[i];
-			DataTableContainer value = null;
-			if (tables.TryGetValue(dataLoadRequest.name, out value))
-			{
-				DataTableContainer dependency = value.GetDependency();
-				if (dependency != null)
-				{
-					DataLoadRequest dataLoadRequest2 = reqs.Find((DataLoadRequest o) => o.name == dependency.name);
-					if (dataLoadRequest2 != null)
-					{
-						dataLoadRequest.DependsOn(dataLoadRequest2);
-					}
-				}
-			}
-		}
-	}
-
-	public DataLoadRequest RequestLoadTable(string name, IDataTable table, Action onComplete, bool downloadOnly = false)
-	{
-		DataLoadRequest dataLoadRequest = CreateRequestLoadTable(name, table, downloadOnly, null);
-		dataLoadRequest.onComplete += onComplete;
-		Request(dataLoadRequest);
-		return dataLoadRequest;
-	}
-
-	public DataLoadRequest RequestLoadTable(string name, Action onComplete, bool downloadOnly = false)
-	{
-		tables.TryGetValue(name, out DataTableContainer value);
-		DataLoadRequest dataLoadRequest = CreateRequestLoadTable(name, value, downloadOnly, null);
-		dataLoadRequest.onComplete += onComplete;
-		Request(dataLoadRequest);
-		return dataLoadRequest;
-	}
-
-	public DataLoadRequest RequestLoadTable(string name, Action<byte[]> processBinaryData, Action onComplete, bool downloadOnly = false)
-	{
-		tables.TryGetValue(name, out DataTableContainer value);
-		DataLoadRequest dataLoadRequest = CreateRequestLoadTable(name, value, downloadOnly, null);
-		dataLoadRequest.onComplete += onComplete;
-		if (processBinaryData != null)
-		{
-			dataLoadRequest.processCompressedBinaryData = processBinaryData;
-		}
-		Request(dataLoadRequest);
-		return dataLoadRequest;
-	}
-
-	private DataLoadRequest CreateRequestLoadTable(string name, bool downloadOnly = false, Action<byte[]> processBinary = null)
-	{
-		tables.TryGetValue(name, out DataTableContainer value);
-		return CreateRequestLoadTable(name, value, downloadOnly, processBinary);
-	}
-
-	private DataLoadRequest CreateRequestLoadTable(string name, IDataTable table, bool downloadOnly = false, Action<byte[]> processBinary = null)
-	{
-		if (downloadOnly || forceLoadCSV)
-		{
-			processBinary = null;
-		}
-		DataLoadRequest dataLoadRequest = CreateRequest(name, manifest.GetTableHash(name), DATA_TABLE_DIRECTORY, downloadOnly);
-		dataLoadRequest.processCompressedTextData = delegate(byte[] bytes)
-		{
-			if (table != null)
-			{
-				if (bytes.Length < 256)
-				{
-					throw new ApplicationException("seek error");
-				}
-				string text = DecompressToString(bytes);
-				if (!string.IsNullOrEmpty(text))
-				{
-					table.CreateTable(text);
-				}
-				else if (text == null)
-				{
-					throw new ApplicationException();
-				}
-			}
-		};
-		if (processBinary != null)
-		{
-			dataLoadRequest.SetupLoadBinary(manifest, processBinary);
-		}
-		return dataLoadRequest;
-	}
-
-	private DataLoadRequest CreateRequest(string name, IDataTableRequestHash hash, string directory, bool downloadOnly = false)
-	{
-		DataLoadRequest req = new DataLoadRequest(name, hash, directory, downloadOnly);
-		req.onVerifyError += delegate(string filehash)
-		{
-			ReportVerifyError(name, filehash);
-			if (reportOnly)
-			{
-				Log.Error(LOG.DATA_TABLE, "VerifyError(report-only): {0}", req.name);
-				return true;
-			}
-			if (!verifyErroredRequest.Contains(req))
-			{
-				Log.Error(LOG.DATA_TABLE, "VerifyError(auto-retry): {0}", req.name);
-				cache.Remove(req);
-				verifyErroredRequest.Add(req);
-			}
-			return false;
-		};
-		req.onError += delegate(DataTableLoadError error)
-		{
-			Log.Error(LOG.DATA_TABLE, "load error ({1}): {0}", req.name, error.ToString());
-			erroredRequests.Add(req);
-			cache.Remove(req);
-			if (this.onError != null)
-			{
-				this.onError(error, Retry);
-			}
-		};
-		req.onComplete += delegate
-		{
-			verifyErroredRequest.Remove(req);
-		};
-		return req;
-	}
-
-	private void Request(List<DataLoadRequest> reqs)
-	{
-		dataLoader.Request(reqs);
-	}
-
-	private void Request(DataLoadRequest req)
-	{
-		dataLoader.Request(req);
-	}
-
-	private void Retry()
-	{
-		int i = 0;
-		for (int count = erroredRequests.Count; i < count; i++)
-		{
-			DataLoadRequest dataLoadRequest = erroredRequests[i];
-			dataLoadRequest.Reset();
-			dataLoader.Request(dataLoadRequest);
-		}
-		erroredRequests.Clear();
-	}
-
-	private void ReportVerifyError(string filename, string filehash)
-	{
-		ReportVerifyModel.RequestSendForm requestSendForm = new ReportVerifyModel.RequestSendForm();
-		requestSendForm.fileName = filename.ToLower();
-		requestSendForm.fileHash = filehash;
-		Protocol.Send<ReportVerifyModel.RequestSendForm, ReportVerifyModel>(ReportVerifyModel.URL, requestSendForm, delegate
-		{
-		}, string.Empty);
-	}
-
-	private void AfterAllLoad()
-	{
-		foreach (Action afterProcess in afterProcesses)
-		{
-			afterProcess();
-		}
-	}
-
-	public void Clear()
-	{
-		this.StopAllCoroutines();
-		tables.Clear();
-		erroredRequests.Clear();
-	}
-
-	public void Initialize()
-	{
-		Clear();
-		Singleton<AbilityDataTable>.Create();
-		Singleton<AbilityTable>.Create();
-		Singleton<AudioSettingTable>.Create();
-		Singleton<AvatarTable>.Create();
-		Singleton<CreateEquipItemTable>.Create();
-		Singleton<CreatePickupItemTable>.Create();
-		Singleton<DeliveryRewardTable>.Create();
-		Singleton<DeliveryTable>.Create();
-		Singleton<EnemyHitMaterialTable>.Create();
-		Singleton<EnemyHitTypeTable>.Create();
-		Singleton<EnemyPersonalityTable>.Create();
-		Singleton<EnemyTable>.Create();
-		Singleton<EquipItemExceedParamTable>.Create();
-		Singleton<EquipItemExceedTable>.Create();
-		Singleton<EquipItemTable>.Create();
-		Singleton<EquipModelTable>.Create();
-		Singleton<EvolveEquipItemTable>.Create();
-		Singleton<FieldMapTable>.Create();
-		Singleton<GrowEnemyTable>.Create();
-		Singleton<GrowEquipItemTable>.Create();
-		Singleton<GrowSkillItemTable>.Create();
-		Singleton<ItemTable>.Create();
-		Singleton<ItemToFieldTable>.Create();
-		Singleton<ItemToQuestTable>.Create();
-		Singleton<NPCMessageTable>.Create();
-		Singleton<NPCTable>.Create();
-		Singleton<QuestTable>.Create();
-		Singleton<QuestToFieldTable>.Create();
-		Singleton<RegionTable>.Create();
-		Singleton<SETable>.Create();
-		Singleton<SkillItemTable>.Create();
-		Singleton<ExceedSkillItemTable>.Create();
-		Singleton<StageTable>.Create();
-		Singleton<StampTable>.Create();
-		Singleton<StringTable>.Create();
-		Singleton<TaskTable>.Create();
-		Singleton<TutorialMessageTable>.Create();
-		Singleton<UserLevelTable>.Create();
-		Singleton<PointShopGetPointTable>.Create();
-		Singleton<DegreeTable>.Create();
-		Singleton<DamageDistanceTable>.Create();
-		Singleton<GachaSearchEnemyTable>.Create();
-		Singleton<HomeThemeTable>.Create();
-		Singleton<CountdownTable>.Create();
-		Singleton<BuffTable>.Create();
-		Singleton<FieldBuffTable>.Create();
-		Singleton<LimitedEquipItemExceedTable>.Create();
-		Singleton<PlayDataTable>.Create();
-		Singleton<ArenaTable>.Create();
-		Singleton<EnemyAngryTable>.Create();
-		Singleton<EnemyActionTable>.Create();
-		Singleton<NpcLevelTable>.Create();
-		Singleton<FieldMapEnemyPopTimeZoneTable>.Create();
-		RegisterTable("AbilityDataTable", Singleton<AbilityDataTable>.I, null);
-		RegisterTable("AbilityTable", Singleton<AbilityTable>.I, null);
-		RegisterTable("AudioSettingTable", Singleton<AudioSettingTable>.I, null);
-		RegisterTable("AvatarTable", Singleton<AvatarTable>.I, null);
-		RegisterTable("CreateEquipItemTable", Singleton<CreateEquipItemTable>.I, null);
-		RegisterTable("CreatePickupItemTable", Singleton<CreatePickupItemTable>.I, null);
-		RegisterTable("DeliveryRewardTable", Singleton<DeliveryRewardTable>.I, null);
-		RegisterTable("DeliveryTable", Singleton<DeliveryTable>.I, null);
-		EnemyTable i = Singleton<EnemyTable>.I;
-		RegisterTable("EnemyTable", new DataTableInterfaceProxy(i.CreateTable), null);
-		RegisterTable("EquipItemExceedParamTable", Singleton<EquipItemExceedParamTable>.I, null);
-		RegisterTable("EquipItemExceedTable", Singleton<EquipItemExceedTable>.I, null);
-		EquipItemTable i2 = Singleton<EquipItemTable>.I;
-		RegisterTable("EquipItemTable", new DataTableInterfaceProxy(i2.CreateTable), null);
-		RegisterTable("EquipModelTable", Singleton<EquipModelTable>.I, null);
-		RegisterTable("EvolveEquipItemTable", Singleton<EvolveEquipItemTable>.I, null);
-		RegisterTable("GrowEnemyTable", Singleton<GrowEnemyTable>.I, null);
-		GrowSkillItemTable i3 = Singleton<GrowSkillItemTable>.I;
-		RegisterTable("GrowSkillItemTable", new DataTableInterfaceProxy(i3.CreateTable), null);
-		RegisterTable("ItemTable", Singleton<ItemTable>.I, null);
-		RegisterTable("NPCMessageTable", Singleton<NPCMessageTable>.I, null);
-		RegisterTable("NPCTable", Singleton<NPCTable>.I, null);
-		RegisterTable("SETable", Singleton<SETable>.I, null);
-		RegisterTable("SkillItemTable", Singleton<SkillItemTable>.I, null);
-		RegisterTable("ExceedSkillItemTable", Singleton<ExceedSkillItemTable>.I, null);
-		RegisterTable("StageTable", Singleton<StageTable>.I, null);
-		RegisterTable("StampTypeTable", Singleton<StampTable>.I, null);
-		RegisterTable("StringTable", Singleton<StringTable>.I, null);
-		RegisterTable("TaskTable", Singleton<TaskTable>.I, null);
-		RegisterTable("TutorialMessageTable", Singleton<TutorialMessageTable>.I, null);
-		RegisterTable("UserLevelTable", Singleton<UserLevelTable>.I, null);
-		RegisterTable("GachaSearchEnemyTable", Singleton<GachaSearchEnemyTable>.I, null);
-		RegisterTable("HomeThemeTable", Singleton<HomeThemeTable>.I, null);
-		RegisterTable("CountdownTable", Singleton<CountdownTable>.I, null);
-		RegisterTable("LimitedEquipItemExceedTable", Singleton<LimitedEquipItemExceedTable>.I, "ItemTable");
-		RegisterTable("PlayDataTable", Singleton<PlayDataTable>.I, null);
-		RegisterTable("ArenaTable", Singleton<ArenaTable>.I, null);
-		RegisterTable("EnemyAngryTable", Singleton<EnemyAngryTable>.I, null);
-		RegisterTable("EnemyActionTable", Singleton<EnemyActionTable>.I, null);
-		RegisterTable("NpcLevelTable", Singleton<NpcLevelTable>.I, null);
-		RegisterTable("GrowEquipItemTable", new DataTableInterfaceProxy(Singleton<GrowEquipItemTable>.I.CreateGrowTable), "ItemTable");
-		RegisterTable("GrowEquipItemNeedItemTable", new DataTableInterfaceProxy(Singleton<GrowEquipItemTable>.I.CreateNeedTable), "ItemTable");
-		RegisterTable("GrowEquipItemNeedUniqueItemTable", new DataTableInterfaceProxy(Singleton<GrowEquipItemTable>.I.CreateNeedUniqueTable), "ItemTable");
-		RegisterTable("QuestTable", new DataTableInterfaceProxy(delegate(string csv)
-		{
-			Singleton<QuestTable>.I.CreateQuestTable(csv);
-			afterProcesses.Add(delegate
-			{
-				Singleton<QuestTable>.I.InitQuestDependencyData();
-			});
-		}), null);
-		RegisterTable("MissionTable", new DataTableInterfaceProxy(Singleton<QuestTable>.I.CreateMissionTable), null);
-		RegisterTable("RegionTable", Singleton<RegionTable>.I, null);
-		RegisterTable("FieldMapTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateFieldMapTable), null);
-		RegisterTable("FieldMapPortalTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreatePortalTable), null);
-		RegisterTable("FieldMapEnemyPopTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateEnemyPopTable), null);
-		RegisterTable("FieldMapGatherPointTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateGatherPointTable), null);
-		RegisterTable("FieldMapGatherPointViewTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateGatherPointViewTable), null);
-		RegisterTable("FieldMapGimmickPointTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateGimmickPointTable), null);
-		RegisterTable("FieldMapGimmickActionTable", new DataTableInterfaceProxy(Singleton<FieldMapTable>.I.CreateGimmickActionTable), null);
-		RegisterTable("QuestToFieldTable", new DataTableInterfaceProxy(delegate(string csv)
-		{
-			Singleton<QuestToFieldTable>.I.CreateTable(csv);
-			afterProcesses.Add(delegate
-			{
-				Singleton<QuestToFieldTable>.I.InitDependencyData();
-			});
-		}), null);
-		RegisterTable("ItemToFieldTable", new DataTableInterfaceProxy(delegate(string csv)
-		{
-			Singleton<ItemToFieldTable>.I.CreateTable(csv);
-			afterProcesses.Add(delegate
-			{
-				Singleton<ItemToFieldTable>.I.InitDependencyData();
-			});
-		}), null);
-		RegisterTable("EnemyHitTypeTable", Singleton<EnemyHitTypeTable>.I, null);
-		RegisterTable("EnemyHitMaterialTable", Singleton<EnemyHitMaterialTable>.I, "EnemyHitTypeTable");
-		RegisterTable("EnemyPersonalityTable", Singleton<EnemyPersonalityTable>.I, null);
-		RegisterTable("PointShopGetPointTable", Singleton<PointShopGetPointTable>.I, null);
-		RegisterTable("DegreeTable", Singleton<DegreeTable>.I, null);
-		RegisterTable("DamageDistanceTable", Singleton<DamageDistanceTable>.I, null);
-		RegisterTable("BuffTable", Singleton<BuffTable>.I, null);
-		RegisterTable("FieldBuffTable", Singleton<FieldBuffTable>.I, null);
-		RegisterTable("FieldMapEnemyPopTimeZoneTable", Singleton<FieldMapEnemyPopTimeZoneTable>.I, null);
-		UpdateDependency();
-	}
-
-	public void InitializeForDownload()
-	{
-		Clear();
-		DataTableInterfaceProxy table = new DataTableInterfaceProxy(delegate
-		{
-		});
-		RegisterTable("AvatarTable", table, null);
-		RegisterTable("CreateEquipItemTable", table, null);
-		RegisterTable("CreatePickupItemTable", table, null);
-		RegisterTable("DeliveryTable", table, null);
-		RegisterTable("EquipItemTable", table, null);
-		RegisterTable("EquipModelTable", table, null);
-		RegisterTable("GrowSkillItemTable", table, null);
-		RegisterTable("HomeThemeTable", table, null);
-		RegisterTable("CountdownTable", table, null);
-		RegisterTable("NPCMessageTable", table, null);
-		RegisterTable("NPCTable", table, null);
-		RegisterTable("QuestTable", table, null);
-		RegisterTable("SkillItemTable", table, null);
-		RegisterTable("ExceedSkillItemTable", table, null);
-		RegisterTable("StageTable", table, null);
-		RegisterTable("TutorialMessageTable", table, null);
-		RegisterTable("StampTypeTable", table, null);
-		RegisterTable("EquipItemExceedParamTable", table, null);
-		RegisterTable("AbilityDataTable", table, null);
-		RegisterTable("AbilityTable", table, null);
-		RegisterTable("AudioSettingTable", table, null);
-		RegisterTable("DeliveryRewardTable", table, null);
-		RegisterTable("EnemyTable", table, null);
-		RegisterTable("EquipItemExceedTable", table, null);
-		RegisterTable("EvolveEquipItemTable", table, null);
-		RegisterTable("GrowEnemyTable", table, null);
-		RegisterTable("ItemTable", table, null);
-		RegisterTable("SETable", table, null);
-		RegisterTable("StringTable", table, null);
-		RegisterTable("TaskTable", table, null);
-		RegisterTable("UserLevelTable", table, null);
-		RegisterTable("GrowEquipItemTable", table, null);
-		RegisterTable("GrowEquipItemNeedItemTable", table, null);
-		RegisterTable("GrowEquipItemNeedUniqueItemTable", table, null);
-		RegisterTable("MissionTable", table, null);
-		RegisterTable("RegionTable", table, null);
-		RegisterTable("FieldMapTable", table, null);
-		RegisterTable("FieldMapPortalTable", table, null);
-		RegisterTable("FieldMapEnemyPopTable", table, null);
-		RegisterTable("FieldMapGatherPointTable", table, null);
-		RegisterTable("FieldMapGatherPointViewTable", table, null);
-		RegisterTable("FieldMapGimmickPointTable", table, null);
-		RegisterTable("FieldMapGimmickActionTable", table, null);
-		RegisterTable("QuestToFieldTable", table, null);
-		RegisterTable("ItemToFieldTable", table, null);
-		RegisterTable("EnemyHitTypeTable", table, null);
-		RegisterTable("EnemyHitMaterialTable", table, null);
-		RegisterTable("EnemyPersonalityTable", table, null);
-		RegisterTable("PointShopGetPointTable", table, null);
-		RegisterTable("DegreeTable", table, null);
-		RegisterTable("DamageDistanceTable", table, null);
-		RegisterTable("GachaSearchEnemyTable", table, null);
-		RegisterTable("BuffTable", table, null);
-		RegisterTable("FieldBuffTable", table, null);
-		RegisterTable("LimitedEquipItemExceedTable", table, null);
-		RegisterTable("PlayDataTable", table, null);
-		RegisterTable("ArenaTable", table, null);
-		RegisterTable("EnemyAngryTable", table, null);
-		RegisterTable("EnemyActionTable", table, null);
-		RegisterTable("NpcLevelTable", table, null);
-		RegisterTable("FieldMapEnemyPopTimeZoneTable", table, null);
-	}
-
-	public void RegisterTable(string name, IDataTable table, string dependencyTableName = null)
-	{
-		tables.Add(name, new DataTableContainer(name, table));
-		if (!string.IsNullOrEmpty(dependencyTableName))
-		{
-			unresolvedDependencies.Add(new KeyValuePair<string, string>(name, dependencyTableName));
-		}
-	}
-
-	public void UnregisterTable(string name)
-	{
-		tables.Remove(name);
-	}
-
-	private void UpdateDependency()
-	{
-		int i = 0;
-		for (int count = unresolvedDependencies.Count; i < count; i++)
-		{
-			KeyValuePair<string, string> keyValuePair = unresolvedDependencies[i];
-			if (tables.TryGetValue(keyValuePair.Key, out DataTableContainer value))
-			{
-				if (tables.TryGetValue(keyValuePair.Value, out DataTableContainer value2))
-				{
-					value.SetDependency(value2);
-				}
-				else
-				{
-					Log.Error(LOG.DATA_TABLE, "Not found dependency table: {0} ---> {1}", keyValuePair.Key, keyValuePair.Value);
-				}
-			}
-			else
-			{
-				Log.Error(LOG.DATA_TABLE, "Not found table: {0}", keyValuePair.Key);
-			}
-		}
-	}
-
-	public static string Decrypt(string encrypted_csv_text)
-	{
-		return Cipher.DecryptRJ128("Auto_XlS_To_CSV.", "yCNBH$$rCNGvC+#f", encrypted_csv_text);
-	}
-
-	public static byte[] DecryptToBytes(string encrypted_csv_text)
-	{
-		return Cipher.DecryptRJ128Byte("Auto_XlS_To_CSV.", "yCNBH$$rCNGvC+#f", encrypted_csv_text);
-	}
-
-	public static string DecompressToString(byte[] bytes)
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
-		string text = null;
-		using (MemoryStream memoryStream = new MemoryStream(bytes))
-		{
-			memoryStream.Seek(256L, SeekOrigin.Begin);
-			ZlibStream val = new ZlibStream((Stream)memoryStream, 1);
-			try
-			{
-				using (StreamReader streamReader = new StreamReader((Stream)val))
-				{
-					try
-					{
-						return streamReader.ReadToEnd();
-					}
-					catch (Exception)
-					{
-						throw;
-						IL_0035:
-						return text;
-					}
-				}
-			}
-			finally
-			{
-				((IDisposable)val)?.Dispose();
-			}
-		}
-	}
-
-	public static Action<byte[]> CreateCompressedBinaryTableProcess(Action<MemoryStream> create)
-	{
-		return delegate(byte[] bytes)
-		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Expected O, but got Unknown
-			MemoryStream memoryStream = new MemoryStream();
-			using (MemoryStream memoryStream2 = new MemoryStream(bytes))
-			{
-				byte[] array = new byte[1024];
-				ZlibStream val = new ZlibStream((Stream)memoryStream2, 1);
-				try
-				{
-					try
-					{
-						int count;
-						while ((count = val.Read(array, 0, array.Length)) != 0)
-						{
-							memoryStream.Write(array, 0, count);
-						}
-					}
-					finally
-					{
-						((IDisposable)val)?.Dispose();
-					}
-				}
-				finally
-				{
-					((IDisposable)val)?.Dispose();
-				}
-			}
-			memoryStream.Seek(0L, SeekOrigin.Begin);
-			create(memoryStream);
-		};
-	}
-
-	public void DumpManifest()
-	{
-		StringBuilder stringBuilder = new StringBuilder();
-		foreach (string allFileName in manifest.GetAllFileNames())
-		{
-			MD5Hash tableHash = manifest.GetTableHash(allFileName);
-			stringBuilder.AppendLine($"{allFileName} : {tableHash.ToString()}");
-		}
-		Debug.Log((object)stringBuilder.ToString());
-	}
-
-	public void ChangePriorityTop(string tableName)
-	{
-		if (null != dataLoader)
-		{
-			dataLoader.ChangePriorityTop(tableName);
-		}
-	}
-
-	public bool IsLoading()
-	{
-		return loadStatus != LoadStatus.LoadComplete;
-	}
-
-	public bool IsLoading(string tableName)
-	{
-		if (loadStatus == LoadStatus.LoadComplete)
-		{
-			return false;
-		}
-		if (loadStatus != LoadStatus.LoadingAllTable)
-		{
-			return true;
-		}
-		if (null != dataLoader)
-		{
-			return dataLoader.IsLoading(tableName);
-		}
-		return false;
-	}
-
-	public void LoadStory(string storyName, Action<string> onComplete)
-	{
-		DataTableInterfaceProxy table = new DataTableInterfaceProxy(onComplete);
-		DataLoadRequest req = CreateRequestLoadTable(storyName, table, false, null);
-		Request(req);
-	}
+  private static string MANIFEST_NAME = nameof (manifest);
+  private DataTableManifest manifest;
+  public DataTableCache cache;
+  private Dictionary<string, DataTableManager.DataTableContainer> tables = new Dictionary<string, DataTableManager.DataTableContainer>();
+  private List<DataLoadRequest> erroredRequests = new List<DataLoadRequest>();
+  private DataTableManager.LoadStatus loadStatus;
+  public DataLoader dataLoader;
+  private XorInt vm = new XorInt(1);
+  private int lastReceiveManifestVersion = -1;
+  private static readonly string DATA_TABLE_DIRECTORY = nameof (tables);
+  private List<DataLoadRequest> verifyErroredRequest = new List<DataLoadRequest>();
+  private List<System.Action> afterProcesses = new List<System.Action>();
+  private List<KeyValuePair<string, string>> unresolvedDependencies = new List<KeyValuePair<string, string>>();
+
+  public event Action<DataTableLoadError, System.Action> onError;
+
+  public bool shouldUpdateManifest
+  {
+    get => this.manifest == null || this.lastReceiveManifestVersion != this.manifest.version;
+  }
+
+  public int manifestVersion => this.manifest == null ? -1 : this.manifest.version;
+
+  public bool hasManifest => this.manifest != null;
+
+  public bool reportOnly => (int) this.vm == 1;
+
+  public bool forceLoadCSV { get; set; }
+
+  protected override void Awake()
+  {
+    base.Awake();
+    this.cache = new DataTableCache();
+    this.dataLoader = ((Component) this).gameObject.AddComponent<DataLoader>();
+    this.dataLoader.SetCache((DataCache) new DataTableCache());
+    this.forceLoadCSV = false;
+    this.loadStatus = DataTableManager.LoadStatus.NotInitialize;
+  }
+
+  public void OnReceiveTableManifestVersion(int version)
+  {
+    int receiveManifestVersion = this.lastReceiveManifestVersion;
+    this.lastReceiveManifestVersion = version;
+  }
+
+  public void OnReceiveVM(XorInt vm) => this.vm = vm;
+
+  public void UpdateManifest(System.Action onComplete)
+  {
+    int version = this.lastReceiveManifestVersion;
+    DataLoadRequest request = this.CreateRequest(DataTableManager.MANIFEST_NAME, (IDataTableRequestHash) new ManifestVersion(version), DataTableManager.DATA_TABLE_DIRECTORY);
+    request.processCompressedTextData = (Action<byte[]>) (bytes =>
+    {
+      try
+      {
+        this.manifest = DataTableManifest.Create(DataTableManager.DecompressToString(bytes), version);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(LOG.DATA_TABLE, "manifest load error: {0}", (object) ex.ToString());
+        throw;
+      }
+    });
+    request.onComplete += onComplete;
+    this.dataLoader.RequestManifest(request);
+  }
+
+  public List<DataLoadRequest> LoadInitialTable(System.Action onComplete, bool downloadOnly = false)
+  {
+    if (!downloadOnly)
+      this.loadStatus = DataTableManager.LoadStatus.LoadingInitialTable;
+    DataTableManager.RequestParam[] requestParamArray = new DataTableManager.RequestParam[23]
+    {
+      new DataTableManager.RequestParam("AvatarTable"),
+      new DataTableManager.RequestParam("AccessoryTable"),
+      new DataTableManager.RequestParam("AccessoryInfoTable"),
+      new DataTableManager.RequestParam("CreateEquipItemTable"),
+      new DataTableManager.RequestParam("CreatePickupItemTable"),
+      new DataTableManager.RequestParam("DeliveryTable"),
+      new DataTableManager.RequestParam("EquipItemTable"),
+      new DataTableManager.RequestParam("EquipModelTable"),
+      new DataTableManager.RequestParam("GrowSkillItemTable"),
+      new DataTableManager.RequestParam("HomeThemeTable"),
+      new DataTableManager.RequestParam("CountdownTable"),
+      new DataTableManager.RequestParam("NPCMessageTable"),
+      new DataTableManager.RequestParam("NPCTable"),
+      new DataTableManager.RequestParam("QuestTable"),
+      new DataTableManager.RequestParam("SkillItemTable"),
+      new DataTableManager.RequestParam("ExceedSkillItemTable"),
+      new DataTableManager.RequestParam("StageTable"),
+      new DataTableManager.RequestParam("TutorialMessageTable"),
+      new DataTableManager.RequestParam("StampTypeTable"),
+      new DataTableManager.RequestParam("EquipItemExceedParamTable"),
+      new DataTableManager.RequestParam("RegionTable"),
+      new DataTableManager.RequestParam("FieldMapTable"),
+      new DataTableManager.RequestParam("FieldMapPortalTable")
+    };
+    List<DataLoadRequest> reqs = new List<DataLoadRequest>();
+    int index = 0;
+    for (int length = requestParamArray.Length; index < length; ++index)
+    {
+      DataTableManager.RequestParam requestParam = requestParamArray[index];
+      DataLoadRequest requestLoadTable = this.CreateRequestLoadTable(requestParam.tableName, downloadOnly, requestParam.processBinary);
+      reqs.Add(requestLoadTable);
+    }
+    this.SetDepends(reqs);
+    int reqCount = reqs.Count;
+    foreach (DataLoadRequest dataLoadRequest in reqs)
+      dataLoadRequest.onComplete += (System.Action) (() =>
+      {
+        --reqCount;
+        if (reqCount > 0)
+          return;
+        onComplete();
+        if (downloadOnly)
+          return;
+        this.loadStatus = DataTableManager.LoadStatus.LoadingAllTable;
+      });
+    this.Request(reqs);
+    return reqs;
+  }
+
+  public List<DataLoadRequest> LoadAllTable(System.Action onComplete, bool downloadOnly = false)
+  {
+    DataTableManager.RequestParam[] requestParamArray = new DataTableManager.RequestParam[52]
+    {
+      new DataTableManager.RequestParam("AbilityDataTable"),
+      new DataTableManager.RequestParam("AbilityTable"),
+      new DataTableManager.RequestParam("AbilityItemLotTable"),
+      new DataTableManager.RequestParam("AudioSettingTable"),
+      new DataTableManager.RequestParam("DeliveryRewardTable"),
+      new DataTableManager.RequestParam("EnemyTable"),
+      new DataTableManager.RequestParam("EquipItemExceedTable"),
+      new DataTableManager.RequestParam("EvolveEquipItemTable"),
+      new DataTableManager.RequestParam("GrowEnemyTable"),
+      new DataTableManager.RequestParam("ItemTable"),
+      new DataTableManager.RequestParam("TutorialGearSetTable"),
+      new DataTableManager.RequestParam("TradingPostTable"),
+      new DataTableManager.RequestParam("SETable"),
+      new DataTableManager.RequestParam("StringTable"),
+      new DataTableManager.RequestParam("TaskTable"),
+      new DataTableManager.RequestParam("UserLevelTable"),
+      new DataTableManager.RequestParam("GrowEquipItemTable"),
+      new DataTableManager.RequestParam("GrowEquipItemNeedItemTable"),
+      new DataTableManager.RequestParam("GrowEquipItemNeedUniqueItemTable"),
+      new DataTableManager.RequestParam("MissionTable"),
+      new DataTableManager.RequestParam("RegionTable"),
+      new DataTableManager.RequestParam("FieldMapTable"),
+      new DataTableManager.RequestParam("FieldMapPortalTable"),
+      new DataTableManager.RequestParam("FieldMapEnemyPopTable"),
+      new DataTableManager.RequestParam("FieldMapGatherPointTable"),
+      new DataTableManager.RequestParam("FieldMapGatherPointViewTable"),
+      new DataTableManager.RequestParam("FieldMapGimmickPointTable"),
+      new DataTableManager.RequestParam("FieldMapGimmickActionTable"),
+      new DataTableManager.RequestParam("QuestToFieldTable"),
+      new DataTableManager.RequestParam("ItemToFieldTable"),
+      new DataTableManager.RequestParam("EnemyHitTypeTable"),
+      new DataTableManager.RequestParam("EnemyHitMaterialTable"),
+      new DataTableManager.RequestParam("EnemyPersonalityTable"),
+      new DataTableManager.RequestParam("PointShopGetPointTable"),
+      new DataTableManager.RequestParam("DegreeTable"),
+      new DataTableManager.RequestParam("DamageDistanceTable"),
+      new DataTableManager.RequestParam("GachaSearchEnemyTable"),
+      new DataTableManager.RequestParam("BuffTable"),
+      new DataTableManager.RequestParam("FieldBuffTable"),
+      new DataTableManager.RequestParam("WaveMatchDropTable"),
+      new DataTableManager.RequestParam("LimitedEquipItemExceedTable"),
+      new DataTableManager.RequestParam("PlayDataTable"),
+      new DataTableManager.RequestParam("ArenaTable"),
+      new DataTableManager.RequestParam("EnemyAngryTable"),
+      new DataTableManager.RequestParam("EnemyActionTable"),
+      new DataTableManager.RequestParam("NpcLevelTable"),
+      new DataTableManager.RequestParam("NpcLevelSpecialTable"),
+      new DataTableManager.RequestParam("FieldMapEnemyPopTimeZoneTable"),
+      new DataTableManager.RequestParam("GatherItemTable"),
+      new DataTableManager.RequestParam("AssignedEquipmentTable"),
+      new DataTableManager.RequestParam("SymbolTable"),
+      new DataTableManager.RequestParam("ProductDataTable")
+    };
+    List<DataLoadRequest> reqs = new List<DataLoadRequest>();
+    int index = 0;
+    for (int length = requestParamArray.Length; index < length; ++index)
+    {
+      DataTableManager.RequestParam requestParam = requestParamArray[index];
+      DataLoadRequest requestLoadTable = this.CreateRequestLoadTable(requestParam.tableName, downloadOnly, requestParam.processBinary);
+      reqs.Add(requestLoadTable);
+    }
+    this.SetDepends(reqs);
+    int reqCount = reqs.Count;
+    foreach (DataLoadRequest dataLoadRequest in reqs)
+      dataLoadRequest.onComplete += (System.Action) (() =>
+      {
+        --reqCount;
+        if (reqCount > 0)
+          return;
+        onComplete();
+        if (downloadOnly)
+          return;
+        this.loadStatus = DataTableManager.LoadStatus.LoadComplete;
+      });
+    this.Request(reqs);
+    return reqs;
+  }
+
+  private void SetDepends(List<DataLoadRequest> reqs)
+  {
+    int index = 0;
+    for (int count = reqs.Count; index < count; ++index)
+    {
+      DataLoadRequest req = reqs[index];
+      DataTableManager.DataTableContainer dataTableContainer = (DataTableManager.DataTableContainer) null;
+      if (this.tables.TryGetValue(req.name, out dataTableContainer))
+      {
+        DataTableManager.DataTableContainer dependency = dataTableContainer.GetDependency();
+        if (dependency != null)
+        {
+          DataLoadRequest depReq = reqs.Find((Predicate<DataLoadRequest>) (o => o.name == dependency.name));
+          if (depReq != null)
+            req.DependsOn(depReq);
+        }
+      }
+    }
+  }
+
+  public DataLoadRequest RequestLoadTable(
+    string name,
+    IDataTable table,
+    System.Action onComplete,
+    bool downloadOnly = false)
+  {
+    DataLoadRequest requestLoadTable = this.CreateRequestLoadTable(name, table, downloadOnly);
+    requestLoadTable.onComplete += onComplete;
+    this.Request(requestLoadTable);
+    return requestLoadTable;
+  }
+
+  public DataLoadRequest RequestLoadTable(string name, System.Action onComplete, bool downloadOnly = false)
+  {
+    DataTableManager.DataTableContainer table;
+    this.tables.TryGetValue(name, out table);
+    DataLoadRequest requestLoadTable = this.CreateRequestLoadTable(name, (IDataTable) table, downloadOnly);
+    requestLoadTable.onComplete += onComplete;
+    this.Request(requestLoadTable);
+    return requestLoadTable;
+  }
+
+  public DataLoadRequest RequestLoadTable(
+    string name,
+    Action<byte[]> processBinaryData,
+    System.Action onComplete,
+    bool downloadOnly = false)
+  {
+    DataTableManager.DataTableContainer table;
+    this.tables.TryGetValue(name, out table);
+    DataLoadRequest requestLoadTable = this.CreateRequestLoadTable(name, (IDataTable) table, downloadOnly);
+    requestLoadTable.onComplete += onComplete;
+    if (processBinaryData != null)
+      requestLoadTable.processCompressedBinaryData = processBinaryData;
+    this.Request(requestLoadTable);
+    return requestLoadTable;
+  }
+
+  private DataLoadRequest CreateRequestLoadTable(
+    string name,
+    bool downloadOnly = false,
+    Action<byte[]> processBinary = null)
+  {
+    DataTableManager.DataTableContainer table;
+    this.tables.TryGetValue(name, out table);
+    return this.CreateRequestLoadTable(name, (IDataTable) table, downloadOnly, processBinary);
+  }
+
+  private DataLoadRequest CreateRequestLoadTable(
+    string name,
+    IDataTable table,
+    bool downloadOnly = false,
+    Action<byte[]> processBinary = null)
+  {
+    if (downloadOnly || this.forceLoadCSV)
+      processBinary = (Action<byte[]>) null;
+    DataLoadRequest request = this.CreateRequest(name, (IDataTableRequestHash) this.manifest.GetTableHash(name), DataTableManager.DATA_TABLE_DIRECTORY, downloadOnly);
+    request.processCompressedTextData = (Action<byte[]>) (bytes =>
+    {
+      if (table == null)
+        return;
+      string csv = bytes.Length >= 256 /*0x0100*/ ? DataTableManager.DecompressToString(bytes) : throw new ApplicationException("seek error");
+      if (!string.IsNullOrEmpty(csv))
+        table.CreateTable(csv);
+      else if (csv == null)
+        throw new ApplicationException();
+    });
+    if (processBinary != null)
+      request.SetupLoadBinary(this.manifest, processBinary);
+    return request;
+  }
+
+  private DataLoadRequest CreateRequest(
+    string name,
+    IDataTableRequestHash hash,
+    string directory,
+    bool downloadOnly = false)
+  {
+    DataLoadRequest req = new DataLoadRequest(name, hash, directory, downloadOnly);
+    req.onVerifyError += (Func<string, bool>) (filehash =>
+    {
+      this.ReportVerifyError(name, filehash);
+      if (this.reportOnly)
+      {
+        Log.Error(LOG.DATA_TABLE, "VerifyError(report-only): {0}", (object) req.name);
+        return true;
+      }
+      if (!this.verifyErroredRequest.Contains(req))
+      {
+        Log.Error(LOG.DATA_TABLE, "VerifyError(auto-retry): {0}", (object) req.name);
+        this.cache.Remove(req);
+        this.verifyErroredRequest.Add(req);
+      }
+      return false;
+    });
+    req.onError += (Action<DataTableLoadError>) (error =>
+    {
+      Log.Error(LOG.DATA_TABLE, "load error ({1}): {0}", (object) req.name, (object) error.ToString());
+      this.erroredRequests.Add(req);
+      this.cache.Remove(req);
+      if (this.onError == null)
+        return;
+      this.onError(error, new System.Action(this.Retry));
+    });
+    req.onComplete += (System.Action) (() => this.verifyErroredRequest.Remove(req));
+    return req;
+  }
+
+  private void Request(List<DataLoadRequest> reqs) => this.dataLoader.Request(reqs);
+
+  private void Request(DataLoadRequest req) => this.dataLoader.Request(req);
+
+  private void Retry()
+  {
+    int index = 0;
+    for (int count = this.erroredRequests.Count; index < count; ++index)
+    {
+      DataLoadRequest erroredRequest = this.erroredRequests[index];
+      erroredRequest.Reset();
+      this.dataLoader.Request(erroredRequest);
+    }
+    this.erroredRequests.Clear();
+  }
+
+  private void ReportVerifyError(string filename, string filehash)
+  {
+    Protocol.Send<ReportVerifyModel.RequestSendForm, ReportVerifyModel>(ReportVerifyModel.URL, new ReportVerifyModel.RequestSendForm()
+    {
+      fileName = filename.ToLower(),
+      fileHash = filehash
+    }, (Action<ReportVerifyModel>) (model => { }));
+  }
+
+  private void AfterAllLoad()
+  {
+    foreach (System.Action afterProcess in this.afterProcesses)
+      afterProcess();
+  }
+
+  public void Clear()
+  {
+    this.StopAllCoroutines();
+    this.tables.Clear();
+    this.erroredRequests.Clear();
+  }
+
+  public void Initialize()
+  {
+    this.Clear();
+    Singleton<AbilityDataTable>.Create();
+    Singleton<AbilityTable>.Create();
+    Singleton<AbilityItemLotTable>.Create();
+    Singleton<AccessoryTable>.Create();
+    Singleton<AudioSettingTable>.Create();
+    Singleton<AvatarTable>.Create();
+    Singleton<CreateEquipItemTable>.Create();
+    Singleton<CreatePickupItemTable>.Create();
+    Singleton<DeliveryRewardTable>.Create();
+    Singleton<DeliveryTable>.Create();
+    Singleton<EnemyHitMaterialTable>.Create();
+    Singleton<EnemyHitTypeTable>.Create();
+    Singleton<EnemyPersonalityTable>.Create();
+    Singleton<EnemyTable>.Create();
+    Singleton<EquipItemExceedParamTable>.Create();
+    Singleton<EquipItemExceedTable>.Create();
+    Singleton<EquipItemTable>.Create();
+    Singleton<EquipModelTable>.Create();
+    Singleton<EvolveEquipItemTable>.Create();
+    Singleton<FieldMapTable>.Create();
+    Singleton<GrowEnemyTable>.Create();
+    Singleton<GrowEquipItemTable>.Create();
+    Singleton<GrowSkillItemTable>.Create();
+    Singleton<ItemTable>.Create();
+    Singleton<TutorialGearSetTable>.Create();
+    Singleton<TradingPostTable>.Create();
+    Singleton<ItemToFieldTable>.Create();
+    Singleton<ItemToQuestTable>.Create();
+    Singleton<NPCMessageTable>.Create();
+    Singleton<NPCTable>.Create();
+    Singleton<QuestTable>.Create();
+    Singleton<QuestToFieldTable>.Create();
+    Singleton<RegionTable>.Create();
+    Singleton<SETable>.Create();
+    Singleton<SkillItemTable>.Create();
+    Singleton<ExceedSkillItemTable>.Create();
+    Singleton<StageTable>.Create();
+    Singleton<StampTable>.Create();
+    Singleton<StringTable>.Create();
+    Singleton<TaskTable>.Create();
+    Singleton<TutorialMessageTable>.Create();
+    Singleton<UserLevelTable>.Create();
+    Singleton<PointShopGetPointTable>.Create();
+    Singleton<DegreeTable>.Create();
+    Singleton<DamageDistanceTable>.Create();
+    Singleton<GachaSearchEnemyTable>.Create();
+    Singleton<HomeThemeTable>.Create();
+    Singleton<CountdownTable>.Create();
+    Singleton<BuffTable>.Create();
+    Singleton<FieldBuffTable>.Create();
+    Singleton<WaveMatchDropTable>.Create();
+    Singleton<LimitedEquipItemExceedTable>.Create();
+    Singleton<PlayDataTable>.Create();
+    Singleton<ArenaTable>.Create();
+    Singleton<EnemyAngryTable>.Create();
+    Singleton<EnemyActionTable>.Create();
+    Singleton<NpcLevelTable>.Create();
+    Singleton<NpcLevelSpecialTable>.Create();
+    Singleton<FieldMapEnemyPopTimeZoneTable>.Create();
+    Singleton<GatherItemTable>.Create();
+    Singleton<AssignedEquipmentTable>.Create();
+    Singleton<SymbolTable>.Create();
+    Singleton<ProductDataTable>.Create();
+    this.RegisterTable("AbilityDataTable", (IDataTable) Singleton<AbilityDataTable>.I);
+    this.RegisterTable("AbilityTable", (IDataTable) Singleton<AbilityTable>.I);
+    this.RegisterTable("AbilityItemLotTable", (IDataTable) Singleton<AbilityItemLotTable>.I);
+    this.RegisterTable("AccessoryTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<AccessoryTable>.I.CreateTable)));
+    this.RegisterTable("AccessoryInfoTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<AccessoryTable>.I.CreateInfoTable)));
+    this.RegisterTable("AudioSettingTable", (IDataTable) Singleton<AudioSettingTable>.I);
+    this.RegisterTable("AvatarTable", (IDataTable) Singleton<AvatarTable>.I);
+    this.RegisterTable("CreateEquipItemTable", (IDataTable) Singleton<CreateEquipItemTable>.I);
+    this.RegisterTable("CreatePickupItemTable", (IDataTable) Singleton<CreatePickupItemTable>.I);
+    this.RegisterTable("DeliveryRewardTable", (IDataTable) Singleton<DeliveryRewardTable>.I);
+    this.RegisterTable("DeliveryTable", (IDataTable) Singleton<DeliveryTable>.I);
+    this.RegisterTable("EnemyTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<EnemyTable>.I.CreateTable)));
+    this.RegisterTable("EquipItemExceedParamTable", (IDataTable) Singleton<EquipItemExceedParamTable>.I);
+    this.RegisterTable("EquipItemExceedTable", (IDataTable) Singleton<EquipItemExceedTable>.I);
+    this.RegisterTable("EquipItemTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<EquipItemTable>.I.CreateTable)));
+    this.RegisterTable("EquipModelTable", (IDataTable) Singleton<EquipModelTable>.I);
+    this.RegisterTable("EvolveEquipItemTable", (IDataTable) Singleton<EvolveEquipItemTable>.I);
+    this.RegisterTable("GrowEnemyTable", (IDataTable) Singleton<GrowEnemyTable>.I);
+    this.RegisterTable("GrowSkillItemTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<GrowSkillItemTable>.I.CreateTable)));
+    this.RegisterTable("ItemTable", (IDataTable) Singleton<ItemTable>.I);
+    this.RegisterTable("TutorialGearSetTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<TutorialGearSetTable>.I.CreateTable)));
+    this.RegisterTable("TradingPostTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<TradingPostTable>.I.CreateTable)));
+    this.RegisterTable("NPCMessageTable", (IDataTable) Singleton<NPCMessageTable>.I);
+    this.RegisterTable("NPCTable", (IDataTable) Singleton<NPCTable>.I);
+    this.RegisterTable("SETable", (IDataTable) Singleton<SETable>.I);
+    this.RegisterTable("SkillItemTable", (IDataTable) Singleton<SkillItemTable>.I);
+    this.RegisterTable("ExceedSkillItemTable", (IDataTable) Singleton<ExceedSkillItemTable>.I);
+    this.RegisterTable("StageTable", (IDataTable) Singleton<StageTable>.I);
+    this.RegisterTable("StampTypeTable", (IDataTable) Singleton<StampTable>.I);
+    this.RegisterTable("StringTable", (IDataTable) Singleton<StringTable>.I);
+    this.RegisterTable("TaskTable", (IDataTable) Singleton<TaskTable>.I);
+    this.RegisterTable("TutorialMessageTable", (IDataTable) Singleton<TutorialMessageTable>.I);
+    this.RegisterTable("UserLevelTable", (IDataTable) Singleton<UserLevelTable>.I);
+    this.RegisterTable("GachaSearchEnemyTable", (IDataTable) Singleton<GachaSearchEnemyTable>.I);
+    this.RegisterTable("HomeThemeTable", (IDataTable) Singleton<HomeThemeTable>.I);
+    this.RegisterTable("CountdownTable", (IDataTable) Singleton<CountdownTable>.I);
+    this.RegisterTable("LimitedEquipItemExceedTable", (IDataTable) Singleton<LimitedEquipItemExceedTable>.I, "ItemTable");
+    this.RegisterTable("PlayDataTable", (IDataTable) Singleton<PlayDataTable>.I);
+    this.RegisterTable("ArenaTable", (IDataTable) Singleton<ArenaTable>.I);
+    this.RegisterTable("EnemyAngryTable", (IDataTable) Singleton<EnemyAngryTable>.I);
+    this.RegisterTable("EnemyActionTable", (IDataTable) Singleton<EnemyActionTable>.I);
+    this.RegisterTable("NpcLevelTable", (IDataTable) Singleton<NpcLevelTable>.I);
+    this.RegisterTable("NpcLevelSpecialTable", (IDataTable) Singleton<NpcLevelSpecialTable>.I);
+    this.RegisterTable("AssignedEquipmentTable", (IDataTable) Singleton<AssignedEquipmentTable>.I);
+    this.RegisterTable("SymbolTable", (IDataTable) Singleton<SymbolTable>.I);
+    this.RegisterTable("GrowEquipItemTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<GrowEquipItemTable>.I.CreateGrowTable)), "ItemTable");
+    this.RegisterTable("GrowEquipItemNeedItemTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<GrowEquipItemTable>.I.CreateNeedTable)), "ItemTable");
+    this.RegisterTable("GrowEquipItemNeedUniqueItemTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<GrowEquipItemTable>.I.CreateNeedUniqueTable)), "ItemTable");
+    this.RegisterTable("QuestTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy((Action<string>) (csv =>
+    {
+      Singleton<QuestTable>.I.CreateQuestTable(csv);
+      this.afterProcesses.Add((System.Action) (() => Singleton<QuestTable>.I.InitQuestDependencyData()));
+    })));
+    this.RegisterTable("MissionTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<QuestTable>.I.CreateMissionTable)));
+    this.RegisterTable("RegionTable", (IDataTable) Singleton<RegionTable>.I);
+    this.RegisterTable("FieldMapTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<FieldMapTable>.I.CreateFieldMapTable)));
+    this.RegisterTable("FieldMapPortalTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<FieldMapTable>.I.CreatePortalTable)));
+    this.RegisterTable("FieldMapEnemyPopTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<FieldMapTable>.I.CreateEnemyPopTable)));
+    this.RegisterTable("FieldMapGatherPointTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<FieldMapTable>.I.CreateGatherPointTable)));
+    this.RegisterTable("FieldMapGatherPointViewTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<FieldMapTable>.I.CreateGatherPointViewTable)));
+    this.RegisterTable("FieldMapGimmickPointTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<FieldMapTable>.I.CreateGimmickPointTable)));
+    this.RegisterTable("FieldMapGimmickActionTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy(new Action<string>(Singleton<FieldMapTable>.I.CreateGimmickActionTable)));
+    this.RegisterTable("QuestToFieldTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy((Action<string>) (csv =>
+    {
+      Singleton<QuestToFieldTable>.I.CreateTable(csv);
+      this.afterProcesses.Add((System.Action) (() => Singleton<QuestToFieldTable>.I.InitDependencyData()));
+    })));
+    this.RegisterTable("ItemToFieldTable", (IDataTable) new DataTableManager.DataTableInterfaceProxy((Action<string>) (csv =>
+    {
+      Singleton<ItemToFieldTable>.I.CreateTable(csv);
+      this.afterProcesses.Add((System.Action) (() => Singleton<ItemToFieldTable>.I.InitDependencyData()));
+    })));
+    this.RegisterTable("EnemyHitTypeTable", (IDataTable) Singleton<EnemyHitTypeTable>.I);
+    this.RegisterTable("EnemyHitMaterialTable", (IDataTable) Singleton<EnemyHitMaterialTable>.I, "EnemyHitTypeTable");
+    this.RegisterTable("EnemyPersonalityTable", (IDataTable) Singleton<EnemyPersonalityTable>.I);
+    this.RegisterTable("PointShopGetPointTable", (IDataTable) Singleton<PointShopGetPointTable>.I);
+    this.RegisterTable("DegreeTable", (IDataTable) Singleton<DegreeTable>.I);
+    this.RegisterTable("DamageDistanceTable", (IDataTable) Singleton<DamageDistanceTable>.I);
+    this.RegisterTable("BuffTable", (IDataTable) Singleton<BuffTable>.I);
+    this.RegisterTable("FieldBuffTable", (IDataTable) Singleton<FieldBuffTable>.I);
+    this.RegisterTable("WaveMatchDropTable", (IDataTable) Singleton<WaveMatchDropTable>.I);
+    this.RegisterTable("FieldMapEnemyPopTimeZoneTable", (IDataTable) Singleton<FieldMapEnemyPopTimeZoneTable>.I);
+    this.RegisterTable("GatherItemTable", (IDataTable) Singleton<GatherItemTable>.I);
+    this.RegisterTable("ProductDataTable", (IDataTable) Singleton<ProductDataTable>.I);
+    this.UpdateDependency();
+  }
+
+  public void InitializeForDownload()
+  {
+    this.Clear();
+    DataTableManager.DataTableInterfaceProxy table = new DataTableManager.DataTableInterfaceProxy((Action<string>) (csv => { }));
+    this.RegisterTable("AvatarTable", (IDataTable) table);
+    this.RegisterTable("AccessoryTable", (IDataTable) table);
+    this.RegisterTable("AccessoryInfoTable", (IDataTable) table);
+    this.RegisterTable("AccessoryDataTable", (IDataTable) table);
+    this.RegisterTable("CreateEquipItemTable", (IDataTable) table);
+    this.RegisterTable("CreatePickupItemTable", (IDataTable) table);
+    this.RegisterTable("DeliveryTable", (IDataTable) table);
+    this.RegisterTable("EquipItemTable", (IDataTable) table);
+    this.RegisterTable("EquipModelTable", (IDataTable) table);
+    this.RegisterTable("GrowSkillItemTable", (IDataTable) table);
+    this.RegisterTable("HomeThemeTable", (IDataTable) table);
+    this.RegisterTable("CountdownTable", (IDataTable) table);
+    this.RegisterTable("NPCMessageTable", (IDataTable) table);
+    this.RegisterTable("NPCTable", (IDataTable) table);
+    this.RegisterTable("QuestTable", (IDataTable) table);
+    this.RegisterTable("SkillItemTable", (IDataTable) table);
+    this.RegisterTable("ExceedSkillItemTable", (IDataTable) table);
+    this.RegisterTable("StageTable", (IDataTable) table);
+    this.RegisterTable("TutorialMessageTable", (IDataTable) table);
+    this.RegisterTable("StampTypeTable", (IDataTable) table);
+    this.RegisterTable("EquipItemExceedParamTable", (IDataTable) table);
+    this.RegisterTable("AbilityDataTable", (IDataTable) table);
+    this.RegisterTable("AbilityTable", (IDataTable) table);
+    this.RegisterTable("AbilityItemLotTable", (IDataTable) table);
+    this.RegisterTable("AudioSettingTable", (IDataTable) table);
+    this.RegisterTable("DeliveryRewardTable", (IDataTable) table);
+    this.RegisterTable("EnemyTable", (IDataTable) table);
+    this.RegisterTable("EquipItemExceedTable", (IDataTable) table);
+    this.RegisterTable("EvolveEquipItemTable", (IDataTable) table);
+    this.RegisterTable("GrowEnemyTable", (IDataTable) table);
+    this.RegisterTable("ItemTable", (IDataTable) table);
+    this.RegisterTable("TutorialGearSetTable", (IDataTable) table);
+    this.RegisterTable("TradingPostTable", (IDataTable) table);
+    this.RegisterTable("SETable", (IDataTable) table);
+    this.RegisterTable("StringTable", (IDataTable) table);
+    this.RegisterTable("TaskTable", (IDataTable) table);
+    this.RegisterTable("UserLevelTable", (IDataTable) table);
+    this.RegisterTable("GrowEquipItemTable", (IDataTable) table);
+    this.RegisterTable("GrowEquipItemNeedItemTable", (IDataTable) table);
+    this.RegisterTable("GrowEquipItemNeedUniqueItemTable", (IDataTable) table);
+    this.RegisterTable("MissionTable", (IDataTable) table);
+    this.RegisterTable("RegionTable", (IDataTable) table);
+    this.RegisterTable("FieldMapTable", (IDataTable) table);
+    this.RegisterTable("FieldMapPortalTable", (IDataTable) table);
+    this.RegisterTable("FieldMapEnemyPopTable", (IDataTable) table);
+    this.RegisterTable("FieldMapGatherPointTable", (IDataTable) table);
+    this.RegisterTable("FieldMapGatherPointViewTable", (IDataTable) table);
+    this.RegisterTable("FieldMapGimmickPointTable", (IDataTable) table);
+    this.RegisterTable("FieldMapGimmickActionTable", (IDataTable) table);
+    this.RegisterTable("QuestToFieldTable", (IDataTable) table);
+    this.RegisterTable("ItemToFieldTable", (IDataTable) table);
+    this.RegisterTable("EnemyHitTypeTable", (IDataTable) table);
+    this.RegisterTable("EnemyHitMaterialTable", (IDataTable) table);
+    this.RegisterTable("EnemyPersonalityTable", (IDataTable) table);
+    this.RegisterTable("PointShopGetPointTable", (IDataTable) table);
+    this.RegisterTable("DegreeTable", (IDataTable) table);
+    this.RegisterTable("DamageDistanceTable", (IDataTable) table);
+    this.RegisterTable("GachaSearchEnemyTable", (IDataTable) table);
+    this.RegisterTable("BuffTable", (IDataTable) table);
+    this.RegisterTable("FieldBuffTable", (IDataTable) table);
+    this.RegisterTable("WaveMatchDropTable", (IDataTable) table);
+    this.RegisterTable("LimitedEquipItemExceedTable", (IDataTable) table);
+    this.RegisterTable("PlayDataTable", (IDataTable) table);
+    this.RegisterTable("ArenaTable", (IDataTable) table);
+    this.RegisterTable("EnemyAngryTable", (IDataTable) table);
+    this.RegisterTable("EnemyActionTable", (IDataTable) table);
+    this.RegisterTable("NpcLevelTable", (IDataTable) table);
+    this.RegisterTable("NpcLevelSpecialTable", (IDataTable) table);
+    this.RegisterTable("FieldMapEnemyPopTimeZoneTable", (IDataTable) table);
+    this.RegisterTable("GatherItemTable", (IDataTable) table);
+    this.RegisterTable("AssignedEquipmentTable", (IDataTable) table);
+    this.RegisterTable("SymbolTable", (IDataTable) table);
+    this.RegisterTable("ProductDataTable", (IDataTable) table);
+  }
+
+  public void RegisterTable(string name, IDataTable table, string dependencyTableName = null)
+  {
+    this.tables.Add(name, new DataTableManager.DataTableContainer(name, table));
+    if (string.IsNullOrEmpty(dependencyTableName))
+      return;
+    this.unresolvedDependencies.Add(new KeyValuePair<string, string>(name, dependencyTableName));
+  }
+
+  public void UnregisterTable(string name) => this.tables.Remove(name);
+
+  private void UpdateDependency()
+  {
+    int index = 0;
+    for (int count = this.unresolvedDependencies.Count; index < count; ++index)
+    {
+      KeyValuePair<string, string> unresolvedDependency = this.unresolvedDependencies[index];
+      DataTableManager.DataTableContainer dataTableContainer;
+      if (this.tables.TryGetValue(unresolvedDependency.Key, out dataTableContainer))
+      {
+        DataTableManager.DataTableContainer table;
+        if (this.tables.TryGetValue(unresolvedDependency.Value, out table))
+          dataTableContainer.SetDependency(table);
+        else
+          Log.Error(LOG.DATA_TABLE, "Not found dependency table: {0} ---> {1}", (object) unresolvedDependency.Key, (object) unresolvedDependency.Value);
+      }
+      else
+        Log.Error(LOG.DATA_TABLE, "Not found table: {0}", (object) unresolvedDependency.Key);
+    }
+  }
+
+  public static string Decrypt(string encrypted_csv_text)
+  {
+    return Cipher.DecryptRJ128("Auto_XlS_To_CSV.", "yCNBH$$rCNGvC+#f", encrypted_csv_text);
+  }
+
+  public static byte[] DecryptToBytes(string encrypted_csv_text)
+  {
+    return Cipher.DecryptRJ128Byte("Auto_XlS_To_CSV.", "yCNBH$$rCNGvC+#f", encrypted_csv_text);
+  }
+
+  public static string DecompressToString(byte[] bytes)
+  {
+    using (MemoryStream memoryStream = new MemoryStream(bytes))
+    {
+      memoryStream.Seek(256L /*0x0100*/, SeekOrigin.Begin);
+      using (ZlibStream zlibStream = new ZlibStream((Stream) memoryStream, (CompressionMode) 1))
+      {
+        using (StreamReader streamReader = new StreamReader((Stream) zlibStream))
+        {
+          try
+          {
+            return streamReader.ReadToEnd();
+          }
+          catch (Exception ex)
+          {
+            throw;
+          }
+        }
+      }
+    }
+  }
+
+  public static Action<byte[]> CreateCompressedBinaryTableProcess(Action<MemoryStream> create)
+  {
+    return (Action<byte[]>) (bytes =>
+    {
+      MemoryStream memoryStream1 = new MemoryStream();
+      using (MemoryStream memoryStream2 = new MemoryStream(bytes))
+      {
+        byte[] buffer = new byte[1024 /*0x0400*/];
+        using (ZlibStream zlibStream = new ZlibStream((Stream) memoryStream2, (CompressionMode) 1))
+        {
+          try
+          {
+            int count;
+            while ((count = ((Stream) zlibStream).Read(buffer, 0, buffer.Length)) != 0)
+              memoryStream1.Write(buffer, 0, count);
+          }
+          finally
+          {
+            ((IDisposable) zlibStream)?.Dispose();
+          }
+        }
+      }
+      memoryStream1.Seek(0L, SeekOrigin.Begin);
+      create(memoryStream1);
+    });
+  }
+
+  public void DumpManifest()
+  {
+    StringBuilder stringBuilder = new StringBuilder();
+    foreach (string allFileName in this.manifest.GetAllFileNames())
+    {
+      MD5Hash tableHash = this.manifest.GetTableHash(allFileName);
+      stringBuilder.AppendLine($"{allFileName} : {tableHash.ToString()}");
+    }
+    Debug.Log((object) stringBuilder.ToString());
+  }
+
+  public void ChangePriorityTop(string tableName)
+  {
+    if (!Object.op_Inequality((Object) null, (Object) this.dataLoader))
+      return;
+    this.dataLoader.ChangePriorityTop(tableName);
+  }
+
+  public bool IsLoading() => this.loadStatus != DataTableManager.LoadStatus.LoadComplete;
+
+  public bool IsLoading(string tableName)
+  {
+    if (this.loadStatus == DataTableManager.LoadStatus.LoadComplete)
+      return false;
+    if (this.loadStatus != DataTableManager.LoadStatus.LoadingAllTable)
+      return true;
+    return Object.op_Inequality((Object) null, (Object) this.dataLoader) && this.dataLoader.IsLoading(tableName);
+  }
+
+  public void LoadStory(string storyName, Action<string> onComplete)
+  {
+    DataTableManager.DataTableInterfaceProxy table = new DataTableManager.DataTableInterfaceProxy(onComplete);
+    this.Request(this.CreateRequestLoadTable(storyName, (IDataTable) table));
+  }
+
+  private enum LoadStatus
+  {
+    NotInitialize,
+    LoadingInitialTable,
+    LoadingAllTable,
+    LoadComplete,
+  }
+
+  private class RequestParam
+  {
+    public string tableName;
+    public Action<byte[]> processBinary;
+
+    public RequestParam(string tableName, Action<byte[]> processBinary = null)
+    {
+      this.tableName = tableName;
+      this.processBinary = processBinary;
+    }
+  }
+
+  private class DataTableInterfaceProxy : IDataTable
+  {
+    private Action<string> create;
+
+    public DataTableInterfaceProxy(Action<string> create) => this.create = create;
+
+    public void CreateTable(string csv) => this.create(csv);
+  }
+
+  private class DataTableContainer : IDataTable
+  {
+    private IDataTable table;
+    private DataTableManager.DataTableContainer dependencyTable;
+
+    public bool isInitialized { get; private set; }
+
+    public string name { get; private set; }
+
+    public DataTableContainer(string name, IDataTable table)
+    {
+      this.name = name;
+      this.table = table;
+    }
+
+    public void SetDependency(DataTableManager.DataTableContainer table)
+    {
+      this.dependencyTable = table;
+    }
+
+    public DataTableManager.DataTableContainer GetDependency() => this.dependencyTable;
+
+    public bool CanLoad() => this.dependencyTable == null || this.dependencyTable.isInitialized;
+
+    public void CreateTable(string csv)
+    {
+      this.table.CreateTable(csv);
+      this.isInitialized = true;
+    }
+  }
 }

@@ -1,166 +1,126 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestEntryPassRoom
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 
+#nullable disable
 public class QuestEntryPassRoom : GameSection
 {
-	protected enum UI
-	{
-		LBL_INPUT_PASS_1,
-		LBL_INPUT_PASS_2,
-		LBL_INPUT_PASS_3,
-		LBL_INPUT_PASS_4,
-		LBL_INPUT_PASS_5,
-		STR_NON_SETTINGS
-	}
+  private const int PASS_CODE_MAX_DIGIT = 5;
+  protected const string PASS_CODE_RESET_NUM = "-";
+  protected int digit = 5;
+  protected string[] passCode = new string[5]
+  {
+    "-",
+    "-",
+    "-",
+    "-",
+    "-"
+  };
+  protected int passCodeIndex;
 
-	private const int PASS_CODE_MAX_DIGIT = 5;
+  public override string overrideBackKeyEvent => "CLOSE";
 
-	protected const string PASS_CODE_RESET_NUM = "-";
+  public override void Initialize() => base.Initialize();
 
-	protected int digit = 5;
+  public override void UpdateUI()
+  {
+    this.SetActive((Enum) QuestEntryPassRoom.UI.STR_NON_SETTINGS, false);
+    this.SetLabelText((Enum) QuestEntryPassRoom.UI.LBL_INPUT_PASS_1, this.passCode[0]);
+    this.SetLabelText((Enum) QuestEntryPassRoom.UI.LBL_INPUT_PASS_2, this.passCode[1]);
+    this.SetLabelText((Enum) QuestEntryPassRoom.UI.LBL_INPUT_PASS_3, this.passCode[2]);
+    this.SetLabelText((Enum) QuestEntryPassRoom.UI.LBL_INPUT_PASS_4, this.passCode[3]);
+    this.SetLabelText((Enum) QuestEntryPassRoom.UI.LBL_INPUT_PASS_5, this.passCode[4]);
+  }
 
-	protected string[] passCode = new string[5]
-	{
-		"-",
-		"-",
-		"-",
-		"-",
-		"-"
-	};
+  protected override void OnOpen()
+  {
+    if (!MonoBehaviourSingleton<CoopManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<CoopManager>.I.Clear();
+  }
 
-	protected int passCodeIndex;
+  protected virtual void OnQuery_0() => this.InputNumber(0);
 
-	public override string overrideBackKeyEvent => "CLOSE";
+  private void OnQuery_1() => this.InputNumber(1);
 
-	public override void Initialize()
-	{
-		base.Initialize();
-	}
+  private void OnQuery_2() => this.InputNumber(2);
 
-	public override void UpdateUI()
-	{
-		SetActive((Enum)UI.STR_NON_SETTINGS, false);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_1, passCode[0]);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_2, passCode[1]);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_3, passCode[2]);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_4, passCode[3]);
-		SetLabelText((Enum)UI.LBL_INPUT_PASS_5, passCode[4]);
-	}
+  private void OnQuery_3() => this.InputNumber(3);
 
-	protected override void OnOpen()
-	{
-		if (MonoBehaviourSingleton<CoopManager>.IsValid())
-		{
-			MonoBehaviourSingleton<CoopManager>.I.Clear();
-		}
-	}
+  private void OnQuery_4() => this.InputNumber(4);
 
-	protected virtual void OnQuery_0()
-	{
-		InputNumber(0);
-	}
+  private void OnQuery_5() => this.InputNumber(5);
 
-	private void OnQuery_1()
-	{
-		InputNumber(1);
-	}
+  private void OnQuery_6() => this.InputNumber(6);
 
-	private void OnQuery_2()
-	{
-		InputNumber(2);
-	}
+  private void OnQuery_7() => this.InputNumber(7);
 
-	private void OnQuery_3()
-	{
-		InputNumber(3);
-	}
+  private void OnQuery_8() => this.InputNumber(8);
 
-	private void OnQuery_4()
-	{
-		InputNumber(4);
-	}
+  private void OnQuery_9() => this.InputNumber(9);
 
-	private void OnQuery_5()
-	{
-		InputNumber(5);
-	}
+  private void OnQuery_CLEAR()
+  {
+    this.passCodeIndex = 0;
+    for (int index = 0; index < this.digit; ++index)
+      this.passCode[index] = this.GetResetString();
+    this.RefreshUI();
+  }
 
-	private void OnQuery_6()
-	{
-		InputNumber(6);
-	}
+  protected virtual string GetResetString() => "-";
 
-	private void OnQuery_7()
-	{
-		InputNumber(7);
-	}
+  private void InputNumber(int num)
+  {
+    if (this.passCodeIndex == this.digit)
+      return;
+    this.passCode[this.passCodeIndex++] = num.ToString();
+    this.RefreshUI();
+  }
 
-	private void OnQuery_8()
-	{
-		InputNumber(8);
-	}
+  protected virtual void OnQuery_ROOM() => this.SendApply();
 
-	private void OnQuery_9()
-	{
-		InputNumber(9);
-	}
+  protected void SendApply(int questId = 0)
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) true
+    });
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<PartyManager>.I.SendApply(string.Join("", this.passCode), (Action<bool, Error>) ((is_apply, ret_code) =>
+    {
+      if (is_apply && !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(MonoBehaviourSingleton<PartyManager>.I.GetQuestId()))
+      {
+        Protocol.Force((System.Action) (() => MonoBehaviourSingleton<PartyManager>.I.SendLeave((Action<bool>) (b => { }))));
+      }
+      else
+      {
+        switch (ret_code)
+        {
+          case Error.WRN_PARTY_SEARCH_NOT_FOUND_PARTY:
+          case Error.WRN_PARTY_OWNER_REJOIN:
+            GameSection.ChangeStayEvent("NOT_FOUND_PARTY");
+            GameSection.ResumeEvent(true);
+            break;
+          default:
+            GameSection.ResumeEvent(is_apply);
+            break;
+        }
+      }
+    }), questId);
+  }
 
-	private void OnQuery_CLEAR()
-	{
-		passCodeIndex = 0;
-		for (int i = 0; i < digit; i++)
-		{
-			passCode[i] = GetResetString();
-		}
-		RefreshUI();
-	}
-
-	protected virtual string GetResetString()
-	{
-		return "-";
-	}
-
-	private void InputNumber(int num)
-	{
-		if (passCodeIndex != digit)
-		{
-			passCode[passCodeIndex++] = num.ToString();
-			RefreshUI();
-		}
-	}
-
-	protected virtual void OnQuery_ROOM()
-	{
-		SendApply(0);
-	}
-
-	protected void SendApply(int questId = 0)
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			true
-		});
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<PartyManager>.I.SendApply(string.Join(string.Empty, passCode), delegate(bool is_apply, Error ret_code)
-		{
-			if (is_apply && !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(MonoBehaviourSingleton<PartyManager>.I.GetQuestId(), true))
-			{
-				Protocol.Force(delegate
-				{
-					MonoBehaviourSingleton<PartyManager>.I.SendLeave(delegate
-					{
-					});
-				});
-			}
-			else if (ret_code == Error.WRN_PARTY_SEARCH_NOT_FOUND_PARTY || ret_code == Error.WRN_PARTY_OWNER_REJOIN)
-			{
-				GameSection.ChangeStayEvent("NOT_FOUND_PARTY", null);
-				GameSection.ResumeEvent(true, null);
-			}
-			else
-			{
-				GameSection.ResumeEvent(is_apply, null);
-			}
-		}, questId);
-	}
+  protected enum UI
+  {
+    LBL_INPUT_PASS_1,
+    LBL_INPUT_PASS_2,
+    LBL_INPUT_PASS_3,
+    LBL_INPUT_PASS_4,
+    LBL_INPUT_PASS_5,
+    STR_NON_SETTINGS,
+  }
 }

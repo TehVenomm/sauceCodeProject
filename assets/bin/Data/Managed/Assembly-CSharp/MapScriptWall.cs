@@ -1,41 +1,29 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: MapScriptWall
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapScriptWall
+#nullable disable
+public class MapScriptWall : MonoBehaviour
 {
-	[Tooltip("壁半径")]
-	public float wallRadius = 40f;
+  [Tooltip("壁半径")]
+  public float wallRadius = 40f;
 
-	public MapScriptWall()
-		: this()
-	{
-	}
-
-	private void LateUpdate()
-	{
-		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
-		{
-			Vector3 zero = Vector3.get_zero();
-			List<StageObject> characterList = MonoBehaviourSingleton<StageObjectManager>.I.characterList;
-			List<StageObject>.Enumerator enumerator = characterList.GetEnumerator();
-			while (enumerator.MoveNext())
-			{
-				Vector3 val = enumerator.Current._transform.get_position() - zero;
-				if (val.get_magnitude() > wallRadius)
-				{
-					enumerator.Current._transform.set_position(zero + val.get_normalized() * wallRadius);
-				}
-			}
-		}
-	}
+  private void LateUpdate()
+  {
+    if (!MonoBehaviourSingleton<StageObjectManager>.IsValid())
+      return;
+    Vector3 zero = Vector3.zero;
+    List<StageObject>.Enumerator enumerator = MonoBehaviourSingleton<StageObjectManager>.I.characterList.GetEnumerator();
+    while (enumerator.MoveNext())
+    {
+      Vector3 vector3 = Vector3.op_Subtraction(enumerator.Current._transform.position, zero);
+      if ((double) ((Vector3) ref vector3).magnitude > (double) this.wallRadius)
+        enumerator.Current._transform.position = Vector3.op_Addition(zero, Vector3.op_Multiply(((Vector3) ref vector3).normalized, this.wallRadius));
+    }
+  }
 }

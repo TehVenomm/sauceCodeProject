@@ -1,634 +1,481 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIWeaponChange
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class UIWeaponChange : UIInGamePopBase
 {
-	[Serializable]
-	public class WeaponIcons
-	{
-		public UIButton button;
+  public static readonly string[] WEAPONICON_PATH = new string[6]
+  {
+    "WeaponIconSword",
+    "WeaponIconBrade",
+    "WeaponIconLance",
+    "dummy",
+    "WeaponIconEdge",
+    "WeaponIconAllow"
+  };
+  public static readonly string[] ELEMENT_PATH = new string[6]
+  {
+    "IconElementFire",
+    "IconElementWater",
+    "IconElementThunder",
+    "IconElementSoil",
+    "IconElementLight",
+    "IconElementDark"
+  };
+  [SerializeField]
+  protected UIWeaponChange.WeaponIcons[] weaponIcons;
+  [SerializeField]
+  protected UISpriteAnimation changeAnim;
+  [SerializeField]
+  protected float animDelay;
+  [SerializeField]
+  protected UISprite animSprite;
+  [SerializeField]
+  protected UITweener[] changeStartAnimTweens;
+  [SerializeField]
+  protected UITweener[] changeEndAnimTweens;
+  [SerializeField]
+  protected UIButton changeButton;
+  [SerializeField]
+  protected GameObject[] oldUI;
+  [SerializeField]
+  protected GameObject[] newUI;
+  [SerializeField]
+  protected UIButton[] disableButton;
+  [SerializeField]
+  protected UISprite changeBtnWepSprite;
+  [SerializeField]
+  protected UISprite changeBtnEleSprite;
+  [SerializeField]
+  protected GameObject changeBtnEleObj;
+  protected Player targetPlayer;
+  private int prevIndex = -1;
+  private int prevUniqueEquipmentIndex = -1;
+  private bool requestCheck;
+  private IEnumerator routineWork;
+  public Transform rallyBtn;
+  public Transform autoBtn;
+  public Transform btnRootGroup;
+  public Transform btnFrame;
+  public Transform btnFrameOver;
 
-		public UISprite weaponIcon;
+  public bool restrictPopMenu { get; protected set; }
 
-		public GameObject elementIconBase;
+  public void SetRestrictPopMenu(bool isRestrict) => this.restrictPopMenu = isRestrict;
 
-		public UISprite elementIcon;
+  protected override void Awake()
+  {
+    base.Awake();
+    this.InitAnim();
+    if (Object.op_Inequality((Object) this.changeButton, (Object) null))
+      ((Component) this.changeButton).gameObject.AddComponent<UIButtonEffect>().isSimple = true;
+    for (int index = 0; index < this.weaponIcons.Length; ++index)
+    {
+      UIWeaponChange.WeaponIcons weaponIcon = this.weaponIcons[index];
+      if (Object.op_Inequality((Object) weaponIcon.button, (Object) null))
+        ((Component) weaponIcon.button).gameObject.AddComponent<UIButtonEffect>().isSimple = true;
+    }
+    bool flag = TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02);
+    int index1 = 0;
+    for (int length = this.oldUI.Length; index1 < length; ++index1)
+      this.oldUI[index1].SetActive(!flag);
+    int index2 = 0;
+    for (int length = this.newUI.Length; index2 < length; ++index2)
+      this.newUI[index2].SetActive(flag);
+    if (flag)
+      this.InitRally();
+    this.restrictPopMenu = false;
+    this.InitWepIcons();
+  }
 
-		public UILabel weaponName;
+  private void InitRally()
+  {
+    if (LoungeMatchingManager.IsValidInLounge() && !QuestManager.IsValidInGameArena())
+    {
+      ((Component) this.rallyBtn).gameObject.SetActive(true);
+      ((Component) this.autoBtn).GetComponent<TweenPosition>().to = new Vector3(0.0f, 410f, 0.0f);
+      ((Component) this.btnRootGroup).GetComponent<TweenPosition>().from = new Vector3(0.0f, -40f, 0.0f);
+      ((Component) this.btnFrameOver).GetComponent<TweenPosition>().to = new Vector3(-4f, 337f, 0.0f);
+      ((Component) this.btnFrame).GetComponent<TweenWidth>().to = 550;
+    }
+    else
+    {
+      ((Component) this.rallyBtn).gameObject.SetActive(false);
+      ((Component) this.autoBtn).GetComponent<TweenPosition>().to = new Vector3(0.0f, 355f, 0.0f);
+      ((Component) this.btnRootGroup).GetComponent<TweenPosition>().from = new Vector3(0.0f, 24f, 0.0f);
+      ((Component) this.btnFrameOver).GetComponent<TweenPosition>().to = new Vector3(0.0f, 280f, 0.0f);
+      ((Component) this.btnFrame).GetComponent<TweenWidth>().to = 470;
+    }
+  }
 
-		public GameObject requestEffect;
+  public void SetDisableRallyBtn(bool isDisable)
+  {
+    ((Component) this.rallyBtn).GetComponentInChildren<UIButton>().isEnabled = !isDisable;
+  }
 
-		public int index = -1;
+  private void InitAnim()
+  {
+    int index1 = 0;
+    for (int length = this.weaponIcons.Length; index1 < length; ++index1)
+    {
+      if (Object.op_Inequality((Object) this.weaponIcons[index1].requestEffect, (Object) null))
+        this.weaponIcons[index1].requestEffect.SetActive(false);
+    }
+    int index2 = 0;
+    for (int length = this.changeStartAnimTweens.Length; index2 < length; ++index2)
+    {
+      ((Behaviour) this.changeStartAnimTweens[index2]).enabled = false;
+      this.changeStartAnimTweens[index2].Sample(1f, true);
+    }
+    int index3 = 0;
+    for (int length = this.changeEndAnimTweens.Length; index3 < length; ++index3)
+    {
+      ((Behaviour) this.changeEndAnimTweens[index3]).enabled = false;
+      this.changeEndAnimTweens[index3].Sample(1f, true);
+    }
+    if (!Object.op_Inequality((Object) this.animSprite, (Object) null))
+      return;
+    this.animSprite.alpha = 0.0f;
+  }
 
-		private bool enable = true;
+  public void InitWepIcons()
+  {
+    int index1 = 0;
+    int index2 = 0;
+    for (int count = this.targetPlayer.equipWeaponList.Count; index2 < count && index1 <= 3; ++index2)
+    {
+      if (this.targetPlayer.equipWeaponList[index2] != null)
+      {
+        this.SetWeaponData(this.weaponIcons[index1], this.targetPlayer.equipWeaponList[index2].eId, this.targetPlayer.equipWeaponList[index2].exceed);
+        this.weaponIcons[index1].index = index2;
+      }
+      else
+      {
+        this.SetWeaponData(this.weaponIcons[index1], -1);
+        this.weaponIcons[index1].index = -1;
+      }
+      ++index1;
+    }
+    int index3 = index1;
+    for (int length = this.weaponIcons.Length; index3 < length; ++index3)
+      this.SetWeaponData(this.weaponIcons[index3], -1);
+    this.ChangeWepBtnIcon(this.targetPlayer.weaponIndex);
+  }
 
-		public bool isEnable
-		{
-			get
-			{
-				return enable;
-			}
-			set
-			{
-				if (enable != value)
-				{
-					enable = value;
-					if (button != null)
-					{
-						button.isEnabled = value;
-					}
-				}
-			}
-		}
-	}
+  private void OnDisable()
+  {
+    if (this.routineWork == null)
+      return;
+    this.StopCoroutine(this.routineWork);
+    this.routineWork = (IEnumerator) null;
+    ((Component) this.changeAnim).gameObject.SetActive(false);
+    this.panelChange.Lock();
+    this.InitAnim();
+  }
 
-	[Serializable]
-	public class EndPoint
-	{
-		public Vector3 position;
+  public void SetTarget(Player player)
+  {
+    this.targetPlayer = player;
+    this.SetNowWeapon();
+  }
 
-		public int width;
-	}
+  public void SetEnableChangeButton(bool enabled)
+  {
+    ((Behaviour) this.changeButton).enabled = enabled;
+    if (enabled || !this.isPopMenu)
+      return;
+    this.OnClickPopMenu();
+  }
 
-	public static readonly string[] WEAPONICON_PATH = new string[6]
-	{
-		"WeaponIconSword",
-		"WeaponIconBrade",
-		"WeaponIconLance",
-		"dummy",
-		"WeaponIconEdge",
-		"WeaponIconAllow"
-	};
+  public bool IsEnableChangeButton() => ((Behaviour) this.changeButton).enabled;
 
-	public static readonly string[] ELEMENT_PATH = new string[6]
-	{
-		"IconElementFire",
-		"IconElementWater",
-		"IconElementThunder",
-		"IconElementSoil",
-		"IconElementLight",
-		"IconElementDark"
-	};
+  public override void OnClickPopMenu()
+  {
+    if (MonoBehaviourSingleton<UIManager>.IsValid() && Object.op_Inequality((Object) MonoBehaviourSingleton<UIManager>.I.mainChat, (Object) null) && MonoBehaviourSingleton<ScreenOrientationManager>.IsValid() && MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
+      MonoBehaviourSingleton<UIManager>.I.mainChat.HideAll();
+    if (this.restrictPopMenu && !this.isPopMenu)
+      return;
+    base.OnClickPopMenu();
+  }
 
-	[SerializeField]
-	protected WeaponIcons[] weaponIcons;
+  protected override void LateUpdate()
+  {
+    int index1 = 0;
+    for (int length = this.weaponIcons.Length; index1 < length; ++index1)
+    {
+      if (this.weaponIcons[index1].index != -1 && this.weaponIcons[index1].isEnable != this.IsEnable(index1))
+        this.weaponIcons[index1].isEnable = this.IsEnable(index1);
+    }
+    base.LateUpdate();
+    this.SetNowWeapon();
+    if (!this.requestCheck || this.IsSelfCommandCheck())
+      return;
+    int index2 = 0;
+    for (int length = this.weaponIcons.Length; index2 < length; ++index2)
+    {
+      if (Object.op_Inequality((Object) this.weaponIcons[index2].requestEffect, (Object) null))
+        this.weaponIcons[index2].requestEffect.SetActive(false);
+    }
+    this.requestCheck = false;
+  }
 
-	[SerializeField]
-	protected UISpriteAnimation changeAnim;
+  private void SetNowWeapon()
+  {
+    if (this.prevIndex == this.targetPlayer.weaponIndex && this.targetPlayer.weaponIndex != -1 && this.prevUniqueEquipmentIndex == this.targetPlayer.uniqueEquipmentIndex && this.targetPlayer.uniqueEquipmentIndex != -1)
+      return;
+    if (this.prevIndex != -1 && ((Component) this).gameObject.activeInHierarchy)
+    {
+      if (this.routineWork != null)
+      {
+        this.StopCoroutine(this.routineWork);
+        this.routineWork = (IEnumerator) null;
+      }
+      else
+        this.panelChange.UnLock();
+      if (this.isPopMenu)
+        this.OnClickPopMenu();
+      this.routineWork = this.ChangeAnim();
+      this.StartCoroutine(this.routineWork);
+    }
+    this.prevIndex = this.targetPlayer.weaponIndex;
+    this.prevUniqueEquipmentIndex = this.targetPlayer.uniqueEquipmentIndex;
+  }
 
-	[SerializeField]
-	protected float animDelay;
+  public void PlayEvolveIconAnim(System.Action cb)
+  {
+    if (!((Component) this).gameObject.activeInHierarchy)
+      return;
+    if (this.routineWork != null)
+    {
+      this.StopCoroutine(this.routineWork);
+      this.routineWork = (IEnumerator) null;
+    }
+    else
+      this.panelChange.UnLock();
+    if (this.isPopMenu)
+      this.OnClickPopMenu();
+    this.routineWork = this.ChangeAnim(false, cb);
+    this.StartCoroutine(this.routineWork);
+  }
 
-	[SerializeField]
-	protected UISprite animSprite;
+  private void SetWeaponData(
+    UIWeaponChange.WeaponIcons icon,
+    int weaponId,
+    int exceed = 0,
+    bool is_top = false)
+  {
+    if (weaponId == -1)
+    {
+      if (Object.op_Inequality((Object) icon.weaponName, (Object) null))
+        icon.weaponName.text = StringTable.Get(STRING_CATEGORY.IN_GAME, 3000U);
+      if (Object.op_Inequality((Object) icon.weaponIcon, (Object) null))
+        ((Component) icon.weaponIcon).gameObject.SetActive(false);
+      if (Object.op_Inequality((Object) icon.elementIconBase, (Object) null))
+        icon.elementIconBase.SetActive(false);
+      icon.isEnable = false;
+    }
+    else
+    {
+      if (!Singleton<EquipItemTable>.IsValid())
+        return;
+      EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint) weaponId);
+      if (equipItemData == null)
+        return;
+      icon.isEnable = true;
+      if (Object.op_Inequality((Object) icon.weaponName, (Object) null))
+        icon.weaponName.text = equipItemData.name;
+      if (Object.op_Inequality((Object) icon.weaponIcon, (Object) null))
+      {
+        if (!is_top)
+          ((Component) icon.weaponIcon).gameObject.SetActive(true);
+        icon.weaponIcon.spriteName = UIWeaponChange.WEAPONICON_PATH[(int) equipItemData.type];
+      }
+      EquipItemExceedParamTable.EquipItemExceedParamAll exceedParam = equipItemData.GetExceedParam((uint) exceed);
+      bool flag = false;
+      if (Object.op_Inequality((Object) icon.elementIcon, (Object) null))
+      {
+        int index = 0;
+        for (int length = equipItemData.atkElement.Length; index < length; ++index)
+        {
+          if (equipItemData.atkElement[index] > 0)
+          {
+            icon.elementIcon.spriteName = UIWeaponChange.ELEMENT_PATH[index];
+            flag = true;
+            break;
+          }
+          if (exceedParam != null && exceedParam.atkElement[index] > 0)
+          {
+            icon.elementIcon.spriteName = UIWeaponChange.ELEMENT_PATH[index];
+            flag = true;
+            break;
+          }
+        }
+      }
+      if (!Object.op_Inequality((Object) icon.elementIconBase, (Object) null))
+        return;
+      icon.elementIconBase.SetActive(flag);
+    }
+  }
 
-	[SerializeField]
-	protected UITweener[] changeStartAnimTweens;
+  public void OnChangeWeapon0()
+  {
+    this.ChangeWeapon(this.weaponIcons[0].index);
+    if (Object.op_Inequality((Object) this.weaponIcons[0].requestEffect, (Object) null))
+      this.weaponIcons[0].requestEffect.SetActive(true);
+    this.requestCheck = true;
+  }
 
-	[SerializeField]
-	protected UITweener[] changeEndAnimTweens;
+  public void OnChangeWeapon1()
+  {
+    this.ChangeWeapon(this.weaponIcons[1].index);
+    if (Object.op_Inequality((Object) this.weaponIcons[1].requestEffect, (Object) null))
+      this.weaponIcons[1].requestEffect.SetActive(true);
+    this.requestCheck = true;
+  }
 
-	[SerializeField]
-	protected UIButton changeButton;
+  public void OnChangeWeapon2()
+  {
+    this.ChangeWeapon(this.weaponIcons[2].index);
+    if (Object.op_Inequality((Object) this.weaponIcons[2].requestEffect, (Object) null))
+      this.weaponIcons[2].requestEffect.SetActive(true);
+    this.requestCheck = true;
+  }
 
-	[SerializeField]
-	protected GameObject[] oldUI;
+  private void ChangeWepBtnIcon(int index)
+  {
+    if (Object.op_Inequality((Object) this.animSprite, (Object) null))
+      this.animSprite.spriteName = this.weaponIcons[index].weaponIcon.spriteName;
+    this.changeBtnWepSprite.spriteName = this.weaponIcons[index].weaponIcon.spriteName;
+    this.changeBtnEleSprite.spriteName = this.weaponIcons[index].elementIcon.spriteName;
+    if (!this.weaponIcons[index].elementIconBase.activeSelf)
+      this.changeBtnEleObj.SetActive(false);
+    else
+      this.changeBtnEleObj.SetActive(true);
+  }
 
-	[SerializeField]
-	protected GameObject[] newUI;
+  private bool IsEnable(int index)
+  {
+    if (this.requestCheck || this.targetPlayer.isDead || this.targetPlayer.weaponIndex == index || !MonoBehaviourSingleton<StatusManager>.IsValid())
+      return false;
+    SelfController controller = this.targetPlayer.controller as SelfController;
+    return !Object.op_Equality((Object) controller, (Object) null) && (controller.nextCommand == null || controller.nextCommand.type != SelfController.COMMAND_TYPE.CHANGE_WEAPON);
+  }
 
-	[SerializeField]
-	protected UIButton[] disableButton;
+  private bool IsSelfCommandCheck()
+  {
+    if (this.targetPlayer.actionID == (Character.ACTION_ID) 27)
+      return true;
+    SelfController controller = this.targetPlayer.controller as SelfController;
+    return !Object.op_Equality((Object) controller, (Object) null) && controller.nextCommand != null && controller.nextCommand.type == SelfController.COMMAND_TYPE.CHANGE_WEAPON;
+  }
 
-	[SerializeField]
-	protected UISprite changeBtnWepSprite;
+  public void ChangeWeapon(int index)
+  {
+    if (!this.IsEnable(index))
+      return;
+    SelfController controller = this.targetPlayer.controller as SelfController;
+    if (Object.op_Equality((Object) controller, (Object) null))
+      return;
+    controller.OnWeaponChangeButtonPress(index);
+  }
 
-	[SerializeField]
-	protected UISprite changeBtnEleSprite;
+  private IEnumerator ChangeAnim(bool isChangeWeapon = true, System.Action cb = null)
+  {
+    yield return (object) new WaitForSeconds(this.animDelay);
+    if (isChangeWeapon && MonoBehaviourSingleton<UISkillButtonGroup>.IsValid())
+      MonoBehaviourSingleton<UISkillButtonGroup>.I.ChangeAnimStart();
+    ((Component) this.changeAnim).gameObject.SetActive(true);
+    this.changeAnim.Play();
+    int n = this.changeStartAnimTweens.Length;
+    for (int index = 0; index < n; ++index)
+    {
+      this.changeStartAnimTweens[index].ResetToBeginning();
+      this.changeStartAnimTweens[index].PlayForward();
+    }
+    int i;
+    for (i = 0; i < n; ++i)
+    {
+      while (((Behaviour) this.changeStartAnimTweens[i]).isActiveAndEnabled)
+        yield return (object) null;
+    }
+    if (isChangeWeapon)
+    {
+      this.ChangeWepBtnIcon(this.targetPlayer.weaponIndex);
+      if (MonoBehaviourSingleton<UISkillButtonGroup>.IsValid())
+      {
+        while (MonoBehaviourSingleton<UISkillButtonGroup>.I.isChangeAnimStartWait)
+          yield return (object) null;
+        MonoBehaviourSingleton<UISkillButtonGroup>.I.ChangeAnimEnd();
+      }
+    }
+    else if (cb != null)
+      cb();
+    n = this.changeEndAnimTweens.Length;
+    for (int index = 0; index < n; ++index)
+    {
+      this.changeEndAnimTweens[index].ResetToBeginning();
+      this.changeEndAnimTweens[index].PlayForward();
+    }
+    for (i = 0; i < n; ++i)
+    {
+      while (((Behaviour) this.changeEndAnimTweens[i]).isActiveAndEnabled)
+        yield return (object) null;
+    }
+    while (this.changeAnim.isPlaying)
+      yield return (object) null;
+    ((Component) this.changeAnim).gameObject.SetActive(false);
+    this.panelChange.Lock();
+    this.routineWork = (IEnumerator) null;
+  }
 
-	[SerializeField]
-	protected GameObject changeBtnEleObj;
+  public void SetDisableButtons(bool disable)
+  {
+    int index = 0;
+    for (int length = this.disableButton.Length; index < length; ++index)
+    {
+      if (Object.op_Inequality((Object) this.disableButton[index], (Object) null))
+        this.disableButton[index].isEnabled = !disable;
+    }
+  }
 
-	protected Player targetPlayer;
+  [Serializable]
+  public class WeaponIcons
+  {
+    public UIButton button;
+    public UISprite weaponIcon;
+    public GameObject elementIconBase;
+    public UISprite elementIcon;
+    public UILabel weaponName;
+    public GameObject requestEffect;
+    public int index = -1;
+    private bool enable = true;
 
-	private int prevIndex = -1;
+    public bool isEnable
+    {
+      get => this.enable;
+      set
+      {
+        if (this.enable == value)
+          return;
+        this.enable = value;
+        if (!Object.op_Inequality((Object) this.button, (Object) null))
+          return;
+        this.button.isEnabled = value;
+      }
+    }
+  }
 
-	private bool requestCheck;
-
-	private IEnumerator routineWork;
-
-	public Transform rallyBtn;
-
-	public Transform autoBtn;
-
-	public Transform btnRootGroup;
-
-	public Transform btnFrame;
-
-	public Transform btnFrameOver;
-
-	public bool restrictPopMenu
-	{
-		get;
-		protected set;
-	}
-
-	public void SetRestrictPopMenu(bool isRestrict)
-	{
-		restrictPopMenu = isRestrict;
-	}
-
-	protected override void Awake()
-	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		base.Awake();
-		InitAnim();
-		if (changeButton != null)
-		{
-			UIButtonEffect uIButtonEffect = changeButton.get_gameObject().AddComponent<UIButtonEffect>();
-			uIButtonEffect.isSimple = true;
-		}
-		for (int i = 0; i < this.weaponIcons.Length; i++)
-		{
-			WeaponIcons weaponIcons = this.weaponIcons[i];
-			if (weaponIcons.button != null)
-			{
-				UIButtonEffect uIButtonEffect2 = weaponIcons.button.get_gameObject().AddComponent<UIButtonEffect>();
-				uIButtonEffect2.isSimple = true;
-			}
-		}
-		bool flag = TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02);
-		int j = 0;
-		for (int num = oldUI.Length; j < num; j++)
-		{
-			oldUI[j].SetActive(!flag);
-		}
-		int k = 0;
-		for (int num2 = newUI.Length; k < num2; k++)
-		{
-			newUI[k].SetActive(flag);
-		}
-		if (flag)
-		{
-			InitRally();
-		}
-		restrictPopMenu = false;
-		InitWepIcons();
-	}
-
-	private void InitRally()
-	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		if (LoungeMatchingManager.IsValidInLounge() && !QuestManager.IsValidInGameArena())
-		{
-			rallyBtn.get_gameObject().SetActive(true);
-			autoBtn.GetComponent<TweenPosition>().to = new Vector3(0f, 410f, 0f);
-			btnRootGroup.GetComponent<TweenPosition>().from = new Vector3(0f, -40f, 0f);
-			btnFrameOver.GetComponent<TweenPosition>().to = new Vector3(-4f, 337f, 0f);
-			btnFrame.GetComponent<TweenWidth>().to = 550;
-		}
-		else
-		{
-			rallyBtn.get_gameObject().SetActive(false);
-			autoBtn.GetComponent<TweenPosition>().to = new Vector3(0f, 355f, 0f);
-			btnRootGroup.GetComponent<TweenPosition>().from = new Vector3(0f, 24f, 0f);
-			btnFrameOver.GetComponent<TweenPosition>().to = new Vector3(0f, 280f, 0f);
-			btnFrame.GetComponent<TweenWidth>().to = 470;
-		}
-	}
-
-	public void SetDisableRallyBtn(bool isDisable)
-	{
-		UIButton componentInChildren = rallyBtn.GetComponentInChildren<UIButton>();
-		componentInChildren.isEnabled = !isDisable;
-	}
-
-	private void InitAnim()
-	{
-		int i = 0;
-		for (int num = weaponIcons.Length; i < num; i++)
-		{
-			if (weaponIcons[i].requestEffect != null)
-			{
-				weaponIcons[i].requestEffect.SetActive(false);
-			}
-		}
-		int j = 0;
-		for (int num2 = changeStartAnimTweens.Length; j < num2; j++)
-		{
-			changeStartAnimTweens[j].set_enabled(false);
-			changeStartAnimTweens[j].Sample(1f, true);
-		}
-		int k = 0;
-		for (int num3 = changeEndAnimTweens.Length; k < num3; k++)
-		{
-			changeEndAnimTweens[k].set_enabled(false);
-			changeEndAnimTweens[k].Sample(1f, true);
-		}
-		if (animSprite != null)
-		{
-			animSprite.alpha = 0f;
-		}
-	}
-
-	private void InitWepIcons()
-	{
-		int num = 0;
-		int i = 0;
-		for (int count = targetPlayer.equipWeaponList.Count; i < count; i++)
-		{
-			if (num > 3)
-			{
-				break;
-			}
-			if (targetPlayer.equipWeaponList[i] != null)
-			{
-				SetWeaponData(weaponIcons[num], targetPlayer.equipWeaponList[i].eId, targetPlayer.equipWeaponList[i].exceed, false);
-				weaponIcons[num].index = i;
-			}
-			else
-			{
-				SetWeaponData(weaponIcons[num], -1, 0, false);
-				weaponIcons[num].index = -1;
-			}
-			num++;
-		}
-		int j = num;
-		for (int num2 = weaponIcons.Length; j < num2; j++)
-		{
-			SetWeaponData(weaponIcons[j], -1, 0, false);
-		}
-		ChangeWepBtnIcon(targetPlayer.weaponIndex);
-	}
-
-	private void OnDisable()
-	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		if (routineWork != null)
-		{
-			this.StopCoroutine(routineWork);
-			routineWork = null;
-			changeAnim.get_gameObject().SetActive(false);
-			panelChange.Lock();
-			InitAnim();
-		}
-	}
-
-	public void SetTarget(Player player)
-	{
-		targetPlayer = player;
-		SetNowWeapon();
-	}
-
-	public override void OnClickPopMenu()
-	{
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null && MonoBehaviourSingleton<ScreenOrientationManager>.IsValid() && MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait)
-		{
-			MonoBehaviourSingleton<UIManager>.I.mainChat.HideAll();
-		}
-		if (!restrictPopMenu || isPopMenu)
-		{
-			base.OnClickPopMenu();
-		}
-	}
-
-	protected override void LateUpdate()
-	{
-		int i = 0;
-		for (int num = weaponIcons.Length; i < num; i++)
-		{
-			if (weaponIcons[i].index != -1 && weaponIcons[i].isEnable != IsEnable(i))
-			{
-				weaponIcons[i].isEnable = IsEnable(i);
-			}
-		}
-		base.LateUpdate();
-		SetNowWeapon();
-		if (requestCheck && !IsSelfCommandCheck())
-		{
-			int j = 0;
-			for (int num2 = weaponIcons.Length; j < num2; j++)
-			{
-				if (weaponIcons[j].requestEffect != null)
-				{
-					weaponIcons[j].requestEffect.SetActive(false);
-				}
-			}
-			requestCheck = false;
-		}
-	}
-
-	private void SetNowWeapon()
-	{
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		if (prevIndex != targetPlayer.weaponIndex || targetPlayer.weaponIndex == -1)
-		{
-			if (prevIndex != -1 && this.get_gameObject().get_activeInHierarchy())
-			{
-				if (routineWork != null)
-				{
-					this.StopCoroutine(routineWork);
-					routineWork = null;
-				}
-				else
-				{
-					panelChange.UnLock();
-				}
-				if (isPopMenu)
-				{
-					OnClickPopMenu();
-				}
-				routineWork = ChangeAnim(true, null);
-				this.StartCoroutine(routineWork);
-			}
-			prevIndex = targetPlayer.weaponIndex;
-		}
-	}
-
-	public void PlayEvolveIconAnim(Action cb)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_gameObject().get_activeInHierarchy())
-		{
-			if (routineWork != null)
-			{
-				this.StopCoroutine(routineWork);
-				routineWork = null;
-			}
-			else
-			{
-				panelChange.UnLock();
-			}
-			if (isPopMenu)
-			{
-				OnClickPopMenu();
-			}
-			routineWork = ChangeAnim(false, cb);
-			this.StartCoroutine(routineWork);
-		}
-	}
-
-	private void SetWeaponData(WeaponIcons icon, int weaponId, int exceed = 0, bool is_top = false)
-	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		if (weaponId == -1)
-		{
-			if (icon.weaponName != null)
-			{
-				icon.weaponName.text = StringTable.Get(STRING_CATEGORY.IN_GAME, 3000u);
-			}
-			if (icon.weaponIcon != null)
-			{
-				icon.weaponIcon.get_gameObject().SetActive(false);
-			}
-			if (icon.elementIconBase != null)
-			{
-				icon.elementIconBase.SetActive(false);
-			}
-			icon.isEnable = false;
-		}
-		else if (Singleton<EquipItemTable>.IsValid())
-		{
-			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData((uint)weaponId);
-			if (equipItemData != null)
-			{
-				icon.isEnable = true;
-				if (icon.weaponName != null)
-				{
-					icon.weaponName.text = equipItemData.name;
-				}
-				if (icon.weaponIcon != null)
-				{
-					if (!is_top)
-					{
-						icon.weaponIcon.get_gameObject().SetActive(true);
-					}
-					icon.weaponIcon.spriteName = WEAPONICON_PATH[(int)equipItemData.type];
-				}
-				EquipItemExceedParamTable.EquipItemExceedParamAll exceedParam = equipItemData.GetExceedParam((uint)exceed);
-				bool active = false;
-				if (icon.elementIcon != null)
-				{
-					int i = 0;
-					for (int num = equipItemData.atkElement.Length; i < num; i++)
-					{
-						if (equipItemData.atkElement[i] > 0)
-						{
-							icon.elementIcon.spriteName = ELEMENT_PATH[i];
-							active = true;
-							break;
-						}
-						if (exceedParam != null && exceedParam.atkElement[i] > 0)
-						{
-							icon.elementIcon.spriteName = ELEMENT_PATH[i];
-							active = true;
-							break;
-						}
-					}
-				}
-				if (icon.elementIconBase != null)
-				{
-					icon.elementIconBase.SetActive(active);
-				}
-			}
-		}
-	}
-
-	public void OnChangeWeapon0()
-	{
-		ChangeWeapon(weaponIcons[0].index);
-		if (weaponIcons[0].requestEffect != null)
-		{
-			weaponIcons[0].requestEffect.SetActive(true);
-		}
-		requestCheck = true;
-	}
-
-	public void OnChangeWeapon1()
-	{
-		ChangeWeapon(weaponIcons[1].index);
-		if (weaponIcons[1].requestEffect != null)
-		{
-			weaponIcons[1].requestEffect.SetActive(true);
-		}
-		requestCheck = true;
-	}
-
-	public void OnChangeWeapon2()
-	{
-		ChangeWeapon(weaponIcons[2].index);
-		if (weaponIcons[2].requestEffect != null)
-		{
-			weaponIcons[2].requestEffect.SetActive(true);
-		}
-		requestCheck = true;
-	}
-
-	private void ChangeWepBtnIcon(int index)
-	{
-		if (animSprite != null)
-		{
-			animSprite.spriteName = weaponIcons[index].weaponIcon.spriteName;
-		}
-		changeBtnWepSprite.spriteName = weaponIcons[index].weaponIcon.spriteName;
-		changeBtnEleSprite.spriteName = weaponIcons[index].elementIcon.spriteName;
-		if (!weaponIcons[index].elementIconBase.get_activeSelf())
-		{
-			changeBtnEleObj.SetActive(false);
-		}
-		else
-		{
-			changeBtnEleObj.SetActive(true);
-		}
-	}
-
-	private bool IsEnable(int index)
-	{
-		if (requestCheck)
-		{
-			return false;
-		}
-		if (targetPlayer.isDead)
-		{
-			return false;
-		}
-		if (targetPlayer.weaponIndex == index)
-		{
-			return false;
-		}
-		if (!MonoBehaviourSingleton<StatusManager>.IsValid())
-		{
-			return false;
-		}
-		SelfController selfController = targetPlayer.controller as SelfController;
-		if (selfController == null)
-		{
-			return false;
-		}
-		if (selfController.nextCommand != null && selfController.nextCommand.type == SelfController.COMMAND_TYPE.CHANGE_WEAPON)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	private bool IsSelfCommandCheck()
-	{
-		if (targetPlayer.actionID == (Character.ACTION_ID)25)
-		{
-			return true;
-		}
-		SelfController selfController = targetPlayer.controller as SelfController;
-		if (selfController == null)
-		{
-			return false;
-		}
-		if (selfController.nextCommand != null && selfController.nextCommand.type == SelfController.COMMAND_TYPE.CHANGE_WEAPON)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	public void ChangeWeapon(int index)
-	{
-		if (IsEnable(index))
-		{
-			SelfController selfController = targetPlayer.controller as SelfController;
-			if (!(selfController == null))
-			{
-				selfController.OnWeaponChangeButtonPress(index);
-			}
-		}
-	}
-
-	private IEnumerator ChangeAnim(bool isChangeWeapon = true, Action cb = null)
-	{
-		yield return (object)new WaitForSeconds(animDelay);
-		if (isChangeWeapon && MonoBehaviourSingleton<UISkillButtonGroup>.IsValid())
-		{
-			MonoBehaviourSingleton<UISkillButtonGroup>.I.ChangeAnimStart();
-		}
-		changeAnim.get_gameObject().SetActive(true);
-		changeAnim.Play();
-		int n = changeStartAnimTweens.Length;
-		for (int m = 0; m < n; m++)
-		{
-			changeStartAnimTweens[m].ResetToBeginning();
-			changeStartAnimTweens[m].PlayForward();
-		}
-		for (int l = 0; l < n; l++)
-		{
-			while (changeStartAnimTweens[l].get_isActiveAndEnabled())
-			{
-				yield return (object)null;
-			}
-		}
-		if (isChangeWeapon)
-		{
-			ChangeWepBtnIcon(targetPlayer.weaponIndex);
-			if (MonoBehaviourSingleton<UISkillButtonGroup>.IsValid())
-			{
-				while (MonoBehaviourSingleton<UISkillButtonGroup>.I.isChangeAnimStartWait)
-				{
-					yield return (object)null;
-				}
-				MonoBehaviourSingleton<UISkillButtonGroup>.I.ChangeAnimEnd();
-			}
-		}
-		else if (!object.ReferenceEquals(cb, null))
-		{
-			cb();
-		}
-		n = changeEndAnimTweens.Length;
-		for (int j = 0; j < n; j++)
-		{
-			changeEndAnimTweens[j].ResetToBeginning();
-			changeEndAnimTweens[j].PlayForward();
-		}
-		for (int i = 0; i < n; i++)
-		{
-			while (changeEndAnimTweens[i].get_isActiveAndEnabled())
-			{
-				yield return (object)null;
-			}
-		}
-		while (changeAnim.isPlaying)
-		{
-			yield return (object)null;
-		}
-		changeAnim.get_gameObject().SetActive(false);
-		panelChange.Lock();
-		routineWork = null;
-	}
-
-	public void SetDisableButtons(bool disable)
-	{
-		int i = 0;
-		for (int num = disableButton.Length; i < num; i++)
-		{
-			if (disableButton[i] != null)
-			{
-				disableButton[i].isEnabled = !disable;
-			}
-		}
-	}
+  [Serializable]
+  public class EndPoint
+  {
+    public Vector3 position;
+    public int width;
+  }
 }

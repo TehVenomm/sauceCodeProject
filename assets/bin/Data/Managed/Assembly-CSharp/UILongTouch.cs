@@ -1,89 +1,66 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UILongTouch
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class UILongTouch
+#nullable disable
+public class UILongTouch : MonoBehaviour
 {
-	private const float TOUCH_TIME = 0.75f;
+  private const float TOUCH_TIME = 0.75f;
+  protected string eventName;
+  protected object eventData;
+  protected float time;
 
-	protected string eventName;
+  public static void Set(GameObject button, string event_name, object event_data = null)
+  {
+    if (Object.op_Equality((Object) button.GetComponent<UIButton>(), (Object) null))
+      return;
+    UILongTouch uiLongTouch = button.GetComponent<UILongTouch>();
+    if (Object.op_Equality((Object) uiLongTouch, (Object) null))
+      uiLongTouch = button.AddComponent<UILongTouch>();
+    uiLongTouch.eventName = event_name;
+    uiLongTouch.eventData = event_data;
+  }
 
-	protected object eventData;
+  private void OnHover(bool isOver)
+  {
+    if (isOver)
+      return;
+    this.time = 0.0f;
+  }
 
-	protected float time;
+  protected virtual void OnPress(bool isPressed)
+  {
+    if (!TutorialMessage.IsActiveButton(((Component) this).gameObject))
+      return;
+    if (isPressed)
+      this.time = 0.75f;
+    else
+      this.time = 0.0f;
+  }
 
-	public UILongTouch()
-		: this()
-	{
-	}
+  private void OnDragOut(GameObject go) => this.time = 0.0f;
 
-	public static void Set(GameObject button, string event_name, object event_data = null)
-	{
-		if (!(button.GetComponent<UIButton>() == null))
-		{
-			UILongTouch uILongTouch = button.GetComponent<UILongTouch>();
-			if (uILongTouch == null)
-			{
-				uILongTouch = button.AddComponent<UILongTouch>();
-			}
-			uILongTouch.eventName = event_name;
-			uILongTouch.eventData = event_data;
-		}
-	}
+  private void Update()
+  {
+    if ((double) this.time <= 0.0)
+      return;
+    this.time -= Time.deltaTime;
+    if ((double) this.time > 0.0)
+      return;
+    UIScrollView componentInParent = ((Component) this).GetComponentInParent<UIScrollView>();
+    if (!Object.op_Equality((Object) componentInParent, (Object) null) && (!Object.op_Inequality((Object) componentInParent, (Object) null) || componentInParent.isDragging) || !TutorialStep.HasAllTutorialCompleted() || MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() || !MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() || MonoBehaviourSingleton<GameSceneManager>.I.isChangeing || MonoBehaviourSingleton<GameSceneManager>.I.isCallingOnQuery)
+      return;
+    this._SendEvent();
+  }
 
-	private void OnHover(bool isOver)
-	{
-		if (!isOver)
-		{
-			time = 0f;
-		}
-	}
+  private void OnDisable() => this.time = 0.0f;
 
-	protected virtual void OnPress(bool isPressed)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Expected O, but got Unknown
-		if (TutorialMessage.IsActiveButton(this.get_gameObject()))
-		{
-			if (isPressed)
-			{
-				time = 0.75f;
-			}
-			else
-			{
-				time = 0f;
-			}
-		}
-	}
-
-	private void OnDragOut(GameObject go)
-	{
-		time = 0f;
-	}
-
-	private void Update()
-	{
-		if (!(time <= 0f))
-		{
-			time -= Time.get_deltaTime();
-			if (time <= 0f)
-			{
-				UIScrollView componentInParent = this.GetComponentInParent<UIScrollView>();
-				if ((componentInParent == null || (componentInParent != null && !componentInParent.isDragging)) && TutorialStep.HasAllTutorialCompleted() && !MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && !MonoBehaviourSingleton<GameSceneManager>.I.isCallingOnQuery)
-				{
-					_SendEvent();
-				}
-			}
-		}
-	}
-
-	private void OnDisable()
-	{
-		time = 0f;
-	}
-
-	protected virtual void _SendEvent()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
-		UIGameSceneEventSender.SendEvent("UILongTouch", this.get_gameObject(), eventName, eventData, null);
-	}
+  protected virtual void _SendEvent()
+  {
+    UIGameSceneEventSender.SendEvent(nameof (UILongTouch), ((Component) this).gameObject, this.eventName, this.eventData);
+  }
 }

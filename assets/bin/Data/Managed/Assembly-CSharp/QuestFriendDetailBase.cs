@@ -1,702 +1,641 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestFriendDetailBase
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class QuestFriendDetailBase : FriendInfo
 {
-	protected new enum UI
-	{
-		LBL_NAME,
-		LBL_ATK,
-		LBL_DEF,
-		LBL_HP,
-		SPR_COMMENT,
-		LBL_COMMENT,
-		OBJ_LAST_LOGIN,
-		LBL_LAST_LOGIN,
-		LBL_LAST_LOGIN_TIME,
-		LBL_LEVEL,
-		OBJ_LEVEL_ROOT,
-		LBL_USER_ID,
-		OBJ_USER_ID_ROOT,
-		TEX_MODEL,
-		BTN_FOLLOW,
-		BTN_UNFOLLOW,
-		OBJ_BLACKLIST_ROOT,
-		BTN_BLACKLIST_IN,
-		BTN_BLACKLIST_OUT,
-		OBJ_ICON_WEAPON_1,
-		OBJ_ICON_WEAPON_2,
-		OBJ_ICON_WEAPON_3,
-		OBJ_ICON_ARMOR,
-		OBJ_ICON_HELM,
-		OBJ_ICON_ARM,
-		OBJ_ICON_LEG,
-		BTN_ICON_WEAPON_1,
-		BTN_ICON_WEAPON_2,
-		BTN_ICON_WEAPON_3,
-		BTN_ICON_ARMOR,
-		BTN_ICON_HELM,
-		BTN_ICON_ARM,
-		BTN_ICON_LEG,
-		OBJ_EQUIP_ROOT,
-		OBJ_EQUIP_SET_ROOT,
-		OBJ_FRIEND_INFO_ROOT,
-		OBJ_CHANGE_EQUIP_INFO_ROOT,
-		LBL_MAX,
-		LBL_NOW,
-		OBJ_FOLLOW_ARROW_ROOT,
-		SPR_FOLLOW_ARROW,
-		SPR_FOLLOWER_ARROW,
-		SPR_BLACKLIST_ICON,
-		LBL_LEVEL_WEAPON_1,
-		LBL_LEVEL_WEAPON_2,
-		LBL_LEVEL_WEAPON_3,
-		LBL_LEVEL_ARMOR,
-		LBL_LEVEL_HELM,
-		LBL_LEVEL_ARM,
-		LBL_LEVEL_LEG,
-		LBL_CHANGE_MODE,
-		BTN_MAGI,
-		LBL_SET_NAME,
-		OBJ_DEGREE_PLATE_ROOT,
-		BTN_DELETEFOLLOWER
-	}
+  protected bool isLoading;
+  protected bool reloadModel;
+  protected InGameRecorder.PlayerRecord record;
+  protected bool isSelfData;
+  protected int detailUserID;
+  protected EquipSetInfo localEquipSet;
+  protected int selfCharaEquipSetNo;
+  protected bool isQuestResult;
+  protected bool isChangeEquip;
+  protected List<int> mSelectedDegrees;
 
-	protected bool isLoading;
+  protected bool AlwaysNowStatusModel { get; private set; }
 
-	protected bool reloadModel;
+  protected override bool showMagiButton => !this.IsFriendInfo && this.isSelfData;
 
-	protected InGameRecorder.PlayerRecord record;
+  protected override List<int> SelectedDegrees => this.mSelectedDegrees;
 
-	protected bool isSelfData;
+  private bool isSelfEventEquipSet
+  {
+    get
+    {
+      return this.isSelfData && MonoBehaviourSingleton<StatusManager>.I.HasEventEquipSet() && !this.isChangeEquip;
+    }
+  }
 
-	protected int detailUserID;
+  public override void Initialize()
+  {
+    this.detailUserID = 0;
+    this.isSelfData = false;
+    this.isQuestResult = false;
+    if (this.record == null)
+    {
+      this.record = GameSection.GetEventData() as InGameRecorder.PlayerRecord;
+      if (this.record != null)
+      {
+        this.detailUserID = this.record.id != 0 ? this.record.charaInfo.userId : MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
+        this.isSelfData = this.detailUserID == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
+        this.mSelectedDegrees = this.isSelfData ? MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds : this.record.charaInfo.selectedDegrees;
+        if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName().Contains("InGame"))
+          this.isQuestResult = true;
+        else if (!this.isChangeEquip && !this.isSelfEventEquipSet)
+          this.AlwaysNowStatusModel = true;
+      }
+    }
+    this.selfCharaEquipSetNo = this.isSelfData ? MonoBehaviourSingleton<UserInfoManager>.I.userStatus.eSetNo : -1;
+    this.transRoot = this.SetPrefab((Enum) QuestFriendDetailBase.UI.OBJ_EQUIP_SET_ROOT, "FriendInfoBase");
+    this.StartCoroutine(this.DoInitialize());
+  }
 
-	protected EquipSetInfo localEquipSet;
+  protected new IEnumerator DoInitialize()
+  {
+    this.LoadModel();
+    while (this.isLoading)
+      yield return (object) null;
+    GameSection.SetEventData((object) null);
+    base.Initialize();
+  }
 
-	protected int selfCharaEquipSetNo;
+  protected override void OnOpen()
+  {
+  }
 
-	protected bool isQuestResult;
+  protected override void LoadModel()
+  {
+    if (this.record == null)
+      return;
+    PlayerLoadInfo load_player_info = this.record.playerLoadInfo;
+    if (this.isSelfData)
+    {
+      if (this.reloadModel)
+      {
+        if (this.isQuestResult)
+        {
+          load_player_info = PlayerLoadInfo.FromCharaInfo(this.record.charaInfo, true, true, true, this.isVisualMode);
+          if (load_player_info.weaponModelID == -1)
+          {
+            EquipSetInfo equipSet = MonoBehaviourSingleton<StatusManager>.I.GetEquipSet(this.selfCharaEquipSetNo);
+            EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(equipSet.item[0].tableID);
+            if (equipItemData != null)
+            {
+              load_player_info.weaponModelID = equipItemData.GetModelID(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex);
+              load_player_info.weaponColor0 = equipItemData.modelColor0;
+              load_player_info.weaponColor1 = equipItemData.modelColor1;
+              load_player_info.weaponColor2 = equipItemData.modelColor2;
+              load_player_info.weaponEffectID = (int) equipItemData.effectID;
+              load_player_info.weaponEffectColor = equipItemData.effectColor;
+              load_player_info.weaponEffectParam = equipItemData.effectParam;
+              load_player_info.weaponSpAttackType = (uint) equipItemData.spAttackType;
+            }
+          }
+          else
+          {
+            load_player_info.weaponModelID = this.record.playerLoadInfo.weaponModelID;
+            load_player_info.weaponColor0 = this.record.playerLoadInfo.weaponColor0;
+            load_player_info.weaponColor1 = this.record.playerLoadInfo.weaponColor1;
+            load_player_info.weaponColor2 = this.record.playerLoadInfo.weaponColor2;
+            load_player_info.weaponEffectID = this.record.playerLoadInfo.weaponEffectID;
+            load_player_info.weaponEffectColor = this.record.playerLoadInfo.weaponEffectColor;
+            load_player_info.weaponEffectParam = this.record.playerLoadInfo.weaponEffectParam;
+            load_player_info.weaponSpAttackType = this.record.playerLoadInfo.weaponSpAttackType;
+          }
+          this.record.animID = -1;
+        }
+        else
+          load_player_info = PlayerLoadInfo.FromUserStatus(true, this.isVisualMode, this.selfCharaEquipSetNo);
+      }
+      else if (this.AlwaysNowStatusModel || this.IsNullWeaponSloat(this.record.playerLoadInfo.weaponModelID))
+      {
+        this.record.playerLoadInfo = PlayerLoadInfo.FromUserStatus(true, this.isVisualMode);
+        this.record.animID = -1;
+        load_player_info = this.record.playerLoadInfo;
+      }
+    }
+    else if (this.isVisualMode)
+    {
+      load_player_info = this.record.playerLoadInfo;
+    }
+    else
+    {
+      load_player_info = PlayerLoadInfo.FromCharaInfo(this.record.charaInfo, true, true, true, this.isVisualMode);
+      load_player_info.weaponModelID = this.record.playerLoadInfo.weaponModelID;
+      load_player_info.weaponColor0 = this.record.playerLoadInfo.weaponColor0;
+      load_player_info.weaponColor1 = this.record.playerLoadInfo.weaponColor1;
+      load_player_info.weaponColor2 = this.record.playerLoadInfo.weaponColor2;
+      load_player_info.weaponEffectID = this.record.playerLoadInfo.weaponEffectID;
+      load_player_info.weaponEffectColor = this.record.playerLoadInfo.weaponEffectColor;
+      load_player_info.weaponEffectParam = this.record.playerLoadInfo.weaponEffectParam;
+      load_player_info.weaponSpAttackType = this.record.playerLoadInfo.weaponSpAttackType;
+    }
+    this.SetRenderPlayerModel(load_player_info);
+  }
 
-	protected bool isChangeEquip;
+  protected virtual bool IsNullWeaponSloat(int id) => id == -1;
 
-	protected List<int> mSelectedDegrees;
+  protected void SetRenderPlayerModel(PlayerLoadInfo load_player_info)
+  {
+    this.SetRenderPlayerModel(this.transRoot, (Enum) QuestFriendDetailBase.UI.TEX_MODEL, load_player_info, this.record.animID, new Vector3(0.0f, -0.75f, 14f), new Vector3(0.0f, 180f, 0.0f), this.isVisualMode, (Action<PlayerLoader>) (player_loader =>
+    {
+      if (Object.op_Inequality((Object) player_loader, (Object) null))
+        this.loader = player_loader;
+      if (!Object.op_Inequality((Object) this.loader, (Object) null) || !Object.op_Inequality((Object) this.loader.animator, (Object) null))
+        return;
+      if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
+      {
+        if (!MonoBehaviourSingleton<InGameRecorder>.I.isVictory)
+          return;
+        this.loader.animator.Play(this.loader.GetWinLoopMotionState());
+      }
+      else
+        PlayerAnimCtrl.Get(this.loader.animator, PlayerAnimCtrl.battleAnims[this.record.playerLoadInfo.weaponModelID / 1000]);
+    }));
+  }
 
-	protected bool AlwaysNowStatusModel
-	{
-		get;
-		private set;
-	}
+  protected override void UpdateUserIDLabel()
+  {
+    if (!this.isSelfData)
+    {
+      bool is_visible = !this.record.isNPC;
+      this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.OBJ_USER_ID_ROOT, is_visible);
+      if (!is_visible)
+        return;
+      this.SetLabelText(this.transRoot, (Enum) QuestFriendDetailBase.UI.LBL_USER_ID, this.record.charaInfo.code);
+    }
+    else
+      this.SetLabelText(this.transRoot, (Enum) QuestFriendDetailBase.UI.LBL_USER_ID, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.code);
+  }
 
-	protected override bool showMagiButton => !IsFriendInfo && isSelfData;
+  public override int GetCharaSex() => this.record.charaInfo.sex;
 
-	protected override List<int> SelectedDegrees => mSelectedDegrees;
+  public virtual void SetupCommentText()
+  {
+    bool is_visible = !this.record.isNPC;
+    this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.SPR_COMMENT, is_visible);
+    if (!is_visible)
+      return;
+    this.SetLabelText(this.transRoot, (Enum) QuestFriendDetailBase.UI.LBL_COMMENT, this.record.charaInfo.comment);
+  }
 
-	public override void Initialize()
-	{
-		//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-		detailUserID = 0;
-		isSelfData = false;
-		isQuestResult = false;
-		if (record == null)
-		{
-			record = (GameSection.GetEventData() as InGameRecorder.PlayerRecord);
-			if (record != null)
-			{
-				detailUserID = ((record.id == 0) ? MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id : record.charaInfo.userId);
-				isSelfData = (detailUserID == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id);
-				mSelectedDegrees = ((!isSelfData) ? record.charaInfo.selectedDegrees : MonoBehaviourSingleton<UserInfoManager>.I.selectedDegreeIds);
-				if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName().Contains("InGame"))
-				{
-					isQuestResult = true;
-				}
-				else if (!isChangeEquip)
-				{
-					AlwaysNowStatusModel = true;
-				}
-			}
-		}
-		selfCharaEquipSetNo = ((!isSelfData) ? (-1) : MonoBehaviourSingleton<UserInfoManager>.I.userStatus.eSetNo);
-		transRoot = SetPrefab((Enum)UI.OBJ_EQUIP_SET_ROOT, "FriendInfoBase");
-		this.StartCoroutine(DoInitialize());
-	}
+  public virtual void SetupFollowButton()
+  {
+    bool isNpc = this.record.isNPC;
+    QuestResultUserCollection.ResultUserInfo userInfo = MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.GetUserInfo(this.detailUserID);
+    if (this.record.isSelf | isNpc || userInfo == null)
+    {
+      this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.BTN_FOLLOW, false);
+      this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.BTN_UNFOLLOW, false);
+      this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.OBJ_BLACKLIST_ROOT, false);
+      this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.OBJ_FOLLOW_ARROW_ROOT, true);
+      this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.SPR_FOLLOWER_ARROW, false);
+      this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.SPR_FOLLOW_ARROW, false);
+      this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.SPR_BLACKLIST_ICON, false);
+      this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.SPR_SAME_CLAN_ICON, true);
+    }
+    else
+    {
+      bool following = !userInfo.CanSendFollow;
+      bool isFollower = userInfo.IsFollower;
+      this.SetEvent(this.transRoot, (Enum) QuestFriendDetailBase.UI.BTN_FOLLOW, "FOLLOW", 0);
+      if (MonoBehaviourSingleton<FriendManager>.I.followNum == MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxFollow && !following)
+      {
+        this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.BTN_FOLLOW, true);
+        this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.BTN_UNFOLLOW, false);
+        this.SetEvent(this.transRoot, (Enum) QuestFriendDetailBase.UI.BTN_FOLLOW, "INVALID_FOLLOW", 0);
+      }
+      else
+      {
+        bool flag = !this.record.isNPC;
+        this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.BTN_FOLLOW, flag && !following);
+        this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.BTN_UNFOLLOW, flag && following);
+      }
+      bool flag1 = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(this.detailUserID);
+      this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.OBJ_BLACKLIST_ROOT, true);
+      this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.BTN_BLACKLIST_IN, !flag1);
+      this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.BTN_BLACKLIST_OUT, flag1);
+      bool same_clan_user = false;
+      if (this.record != null && this.record.charaInfo != null && this.record.charaInfo.userClanData != null && MonoBehaviourSingleton<UserInfoManager>.I.userClan != null && MonoBehaviourSingleton<UserInfoManager>.I.userClan.IsRegistered())
+        same_clan_user = this.record.charaInfo.userClanData.cId == MonoBehaviourSingleton<UserInfoManager>.I.userClan.cId;
+      this.SetFollowStatus(following, isFollower, flag1, same_clan_user);
+    }
+  }
 
-	protected IEnumerator DoInitialize()
-	{
-		LoadModel();
-		while (isLoading)
-		{
-			yield return (object)null;
-		}
-		GameSection.SetEventData(null);
-		base.Initialize();
-	}
+  protected virtual void SetupLastLogin()
+  {
+    this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.OBJ_LAST_LOGIN, false);
+  }
 
-	protected override void LoadModel()
-	{
-		if (record != null)
-		{
-			PlayerLoadInfo playerLoadInfo = record.playerLoadInfo;
-			if (isSelfData)
-			{
-				if (reloadModel)
-				{
-					if (isQuestResult)
-					{
-						playerLoadInfo = PlayerLoadInfo.FromCharaInfo(record.charaInfo, true, true, true, isVisualMode);
-						EquipItemTable.EquipItemData equipItemData = null;
-						if (playerLoadInfo.weaponModelID == -1)
-						{
-							EquipSetInfo equipSet = MonoBehaviourSingleton<StatusManager>.I.GetEquipSet(selfCharaEquipSetNo);
-							equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(equipSet.item[0].tableID);
-							if (equipItemData != null)
-							{
-								playerLoadInfo.weaponModelID = equipItemData.GetModelID(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex);
-								playerLoadInfo.weaponColor0 = equipItemData.modelColor0;
-								playerLoadInfo.weaponColor1 = equipItemData.modelColor1;
-								playerLoadInfo.weaponColor2 = equipItemData.modelColor2;
-								playerLoadInfo.weaponEffectID = equipItemData.effectID;
-								playerLoadInfo.weaponEffectColor = equipItemData.effectColor;
-								playerLoadInfo.weaponEffectParam = equipItemData.effectParam;
-								playerLoadInfo.weaponSpAttackType = (uint)equipItemData.spAttackType;
-							}
-						}
-						else
-						{
-							playerLoadInfo.weaponModelID = record.playerLoadInfo.weaponModelID;
-							playerLoadInfo.weaponColor0 = record.playerLoadInfo.weaponColor0;
-							playerLoadInfo.weaponColor1 = record.playerLoadInfo.weaponColor1;
-							playerLoadInfo.weaponColor2 = record.playerLoadInfo.weaponColor2;
-							playerLoadInfo.weaponEffectID = record.playerLoadInfo.weaponEffectID;
-							playerLoadInfo.weaponEffectColor = record.playerLoadInfo.weaponEffectColor;
-							playerLoadInfo.weaponEffectParam = record.playerLoadInfo.weaponEffectParam;
-							playerLoadInfo.weaponSpAttackType = record.playerLoadInfo.weaponSpAttackType;
-						}
-						record.animID = -1;
-					}
-					else
-					{
-						playerLoadInfo = PlayerLoadInfo.FromUserStatus(true, isVisualMode, selfCharaEquipSetNo);
-					}
-				}
-				else if (AlwaysNowStatusModel || record.playerLoadInfo.weaponModelID == -1)
-				{
-					record.playerLoadInfo = PlayerLoadInfo.FromUserStatus(true, isVisualMode, -1);
-					record.animID = -1;
-					playerLoadInfo = record.playerLoadInfo;
-				}
-			}
-			else if (isVisualMode)
-			{
-				playerLoadInfo = record.playerLoadInfo;
-			}
-			else
-			{
-				playerLoadInfo = PlayerLoadInfo.FromCharaInfo(record.charaInfo, true, true, true, isVisualMode);
-				playerLoadInfo.weaponModelID = record.playerLoadInfo.weaponModelID;
-				playerLoadInfo.weaponColor0 = record.playerLoadInfo.weaponColor0;
-				playerLoadInfo.weaponColor1 = record.playerLoadInfo.weaponColor1;
-				playerLoadInfo.weaponColor2 = record.playerLoadInfo.weaponColor2;
-				playerLoadInfo.weaponEffectID = record.playerLoadInfo.weaponEffectID;
-				playerLoadInfo.weaponEffectColor = record.playerLoadInfo.weaponEffectColor;
-				playerLoadInfo.weaponEffectParam = record.playerLoadInfo.weaponEffectParam;
-				playerLoadInfo.weaponSpAttackType = record.playerLoadInfo.weaponSpAttackType;
-			}
-			SetRenderPlayerModel(playerLoadInfo);
-		}
-	}
+  public override void UpdateUI()
+  {
+    this.localEquipSet = !this.isSelfData || this.isSelfEventEquipSet ? MonoBehaviourSingleton<StatusManager>.I.CreateEquipSetData(this.record.charaInfo.equipSet) : MonoBehaviourSingleton<StatusManager>.I.GetEquipSet(this.selfCharaEquipSetNo);
+    this.OnUpdateFriendDetailUI();
+  }
 
-	protected void SetRenderPlayerModel(PlayerLoadInfo load_player_info)
-	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		SetRenderPlayerModel(transRoot, UI.TEX_MODEL, load_player_info, record.animID, new Vector3(0f, -0.75f, 14f), new Vector3(0f, 180f, 0f), isVisualMode, delegate(PlayerLoader player_loader)
-		{
-			if (player_loader != null)
-			{
-				loader = player_loader;
-			}
-			if (loader != null && loader.animator != null)
-			{
-				if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
-				{
-					if (MonoBehaviourSingleton<InGameRecorder>.I.isVictory)
-					{
-						loader.animator.Play("win_loop");
-					}
-				}
-				else
-				{
-					PlayerAnimCtrl.Get(loader.animator, PlayerAnimCtrl.battleAnims[record.playerLoadInfo.weaponModelID / 1000], null, null, null);
-				}
-			}
-		});
-	}
+  protected void OnUpdateFriendDetailUI()
+  {
+    int num1;
+    int num2;
+    int hp;
+    int level;
+    if (!this.record.isSelf || MonoBehaviourSingleton<StatusManager>.I.HasEventEquipSet())
+    {
+      if (this.record.isNPC)
+      {
+        num1 = (int) this.record.charaInfo.atk;
+        num2 = (int) this.record.charaInfo.def;
+        hp = (int) this.record.charaInfo.hp;
+      }
+      else
+      {
+        EquipSetCalculator equipSetCalculator;
+        if (MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex == -1)
+        {
+          MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex = 0;
+          equipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(0);
+          equipSetCalculator.SetEquipSet(this.record.charaInfo.equipSet);
+        }
+        else
+          equipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex);
+        SimpleStatus finalStatus = equipSetCalculator.GetFinalStatus(0, (int) this.record.charaInfo.hp, (int) this.record.charaInfo.atk, (int) this.record.charaInfo.def);
+        num1 = finalStatus.GetAttacksSum();
+        num2 = finalStatus.GetDefencesSum();
+        hp = finalStatus.hp;
+      }
+      level = (int) this.record.charaInfo.level;
+      this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.OBJ_LEVEL_ROOT, !this.record.isNPC);
+    }
+    else
+    {
+      SimpleStatus finalStatus = MonoBehaviourSingleton<StatusManager>.I.GetEquipSetCalculator(this.selfCharaEquipSetNo).GetFinalStatus(0, MonoBehaviourSingleton<UserInfoManager>.I.userStatus);
+      num1 = finalStatus.GetAttacksSum();
+      num2 = finalStatus.GetDefencesSum();
+      hp = finalStatus.hp;
+      level = (int) MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level;
+    }
+    this.SetLabelText(this.transRoot, (Enum) QuestFriendDetailBase.UI.LBL_ATK, num1.ToString());
+    this.SetLabelText(this.transRoot, (Enum) QuestFriendDetailBase.UI.LBL_DEF, num2.ToString());
+    this.SetLabelText(this.transRoot, (Enum) QuestFriendDetailBase.UI.LBL_HP, hp.ToString());
+    this.SetLabelText(this.transRoot, (Enum) QuestFriendDetailBase.UI.LBL_LEVEL, level.ToString());
+    this.SetupInfo();
+    this.UpdateEquipIcon((List<CharaInfo.EquipItem>) null);
+    this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.BTN_MAGI, this.showMagiButton);
+    this.CreateDegree();
+    this.SetMoveMessageButton();
+    if (this.record != null && this.record.charaInfo != null && this.record.charaInfo.userClanData != null)
+      this.UpdateClanInfo(this.record.charaInfo);
+    else
+      this.DisableClanInfo();
+  }
 
-	protected override void UpdateUserIDLabel()
-	{
-		if (!isSelfData)
-		{
-			bool flag = !record.isNPC;
-			SetActive(transRoot, UI.OBJ_USER_ID_ROOT, flag);
-			if (flag)
-			{
-				SetLabelText(transRoot, UI.LBL_USER_ID, record.charaInfo.code);
-			}
-		}
-		else
-		{
-			SetLabelText(transRoot, UI.LBL_USER_ID, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.code);
-		}
-	}
+  protected void SetupInfo()
+  {
+    this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.OBJ_FRIEND_INFO_ROOT, this.IsFriendInfo);
+    this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.OBJ_CHANGE_EQUIP_INFO_ROOT, !this.IsFriendInfo);
+    if (!this.IsFriendInfo)
+      return;
+    this.UpdateUserIDLabel();
+    CharaInfo.ClanInfo clanInfo = this.record.charaInfo.clanInfo;
+    if (clanInfo == null)
+    {
+      clanInfo = new CharaInfo.ClanInfo();
+      clanInfo.clanId = -1;
+      clanInfo.tag = string.Empty;
+    }
+    bool isSameTeam = clanInfo.clanId > -1 && MonoBehaviourSingleton<GuildManager>.I.guildData != null && clanInfo.clanId == MonoBehaviourSingleton<GuildManager>.I.guildData.clanId;
+    this.SetSupportEncoding(this.transRoot, (Enum) QuestFriendDetailBase.UI.LBL_NAME, true);
+    this.SetLabelText(this.transRoot, (Enum) QuestFriendDetailBase.UI.LBL_NAME, Utility.GetNameWithColoredClanTag(clanInfo.tag, this.record.charaInfo.name, this.record.id == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, isSameTeam));
+    this.SetupCommentText();
+    this.SetupLastLogin();
+    this.SetupFollowButton();
+  }
 
-	public override int GetCharaSex()
-	{
-		return record.charaInfo.sex;
-	}
+  protected override void UpdateEquipIcon(List<CharaInfo.EquipItem> equip_set_info)
+  {
+    this.SetActive(this.transRoot, (Enum) QuestFriendDetailBase.UI.LBL_CHANGE_MODE, this.isVisualMode);
+    int index1 = 0;
+    for (int index2 = 7; index1 < index2; ++index1)
+    {
+      this.SetEvent(this.FindCtrl(this.transRoot, (Enum) this.icons[index1]), "EMPTY", 0);
+      this.SetEvent(this.FindCtrl(this.transRoot, (Enum) this.icons_btn[index1]), "EMPTY", 0);
+      this.SetLabelText(this.FindCtrl(this.transRoot, (Enum) this.icons_level[index1]), string.Empty);
+    }
+    bool flag1 = this.isVisualMode;
+    bool flag2 = this.isVisualMode;
+    bool flag3 = this.isVisualMode;
+    bool flag4 = this.isVisualMode;
+    int event_data = 0;
+    for (int length = this.localEquipSet.item.Length; event_data < length; ++event_data)
+    {
+      int num = -1;
+      EquipItemInfo equipItemInfo = this.localEquipSet.item[event_data];
+      EquipItemTable.EquipItemData equipItemData = (EquipItemTable.EquipItemData) null;
+      if (equipItemInfo != null)
+      {
+        switch (equipItemInfo.tableData.type)
+        {
+          case EQUIPMENT_TYPE.ARMOR:
+            flag2 = false;
+            break;
+          case EQUIPMENT_TYPE.HELM:
+            flag1 = false;
+            break;
+          case EQUIPMENT_TYPE.ARM:
+            flag3 = false;
+            break;
+          case EQUIPMENT_TYPE.LEG:
+            flag4 = false;
+            break;
+        }
+        equipItemData = !this.isVisualMode ? Singleton<EquipItemTable>.I.GetEquipItemData(equipItemInfo.tableID) : this.GetVisualModeTargetTable(equipItemInfo.tableData.id, equipItemInfo.tableData.type, this.record.charaInfo);
+      }
+      if (this.isVisualMode)
+      {
+        if (equipItemData != null)
+        {
+          num = equipItemData.GetIconID(this.GetCharaSex());
+          this.SetActive(this.FindCtrl(this.transRoot, (Enum) this.icons_level[event_data]), false);
+        }
+      }
+      else if (equipItemInfo != null && equipItemInfo.tableID != 0U)
+      {
+        num = equipItemData.GetIconID(this.GetCharaSex());
+        this.SetActive(this.FindCtrl(this.transRoot, (Enum) this.icons_level[event_data]), true);
+        string text = string.Format(StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 1U), (object) equipItemInfo.level.ToString());
+        this.SetLabelText(this.FindCtrl(this.transRoot, (Enum) this.icons_level[event_data]), text);
+      }
+      Transform ctrl = this.FindCtrl(this.transRoot, (Enum) this.icons[event_data]);
+      ItemIcon iconByEquipItemInfo = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, this.GetCharaSex(), ctrl, event_name: "EQUIP", event_data: event_data);
+      this.SetLongTouch(iconByEquipItemInfo.transform, "DETAIL", (object) event_data);
+      this.SetEvent(this.FindCtrl(this.transRoot, (Enum) this.icons_btn[event_data]), "DETAIL", event_data);
+      this.SetEvent(iconByEquipItemInfo.transform, "DETAIL", event_data);
+      ((Component) iconByEquipItemInfo).gameObject.SetActive(num != -1);
+      if (num != -1)
+        iconByEquipItemInfo.SetEquipExtInvertedColor(equipItemInfo, this.GetComponent<UILabel>(this.transRoot, (Enum) this.icons_level[event_data]));
+    }
+    if (flag1 && this.record.charaInfo.hId != 0)
+      this.SetVisualModeIcon(4, this.record.charaInfo.hId, EQUIPMENT_TYPE.HELM, this.record.charaInfo);
+    if (flag2 && this.record.charaInfo.aId != 0)
+      this.SetVisualModeIcon(3, this.record.charaInfo.aId, EQUIPMENT_TYPE.ARMOR, this.record.charaInfo);
+    if (flag3 && this.record.charaInfo.rId != 0)
+      this.SetVisualModeIcon(5, this.record.charaInfo.rId, EQUIPMENT_TYPE.ARM, this.record.charaInfo);
+    if (!flag4 || this.record.charaInfo.lId == 0)
+      return;
+    this.SetVisualModeIcon(6, this.record.charaInfo.lId, EQUIPMENT_TYPE.LEG, this.record.charaInfo);
+  }
 
-	public virtual void SetupCommentText()
-	{
-		bool flag = !record.isNPC;
-		SetActive(transRoot, UI.SPR_COMMENT, flag);
-		if (flag)
-		{
-			SetLabelText(transRoot, UI.LBL_COMMENT, record.charaInfo.comment);
-		}
-	}
+  protected override void OnQuery_DETAIL()
+  {
+    if (this.isVisualMode)
+    {
+      GameSection.ChangeEvent("VISUAL_DETAIL");
+      this.OnQuery_VISUAL_DETAIL();
+    }
+    else
+    {
+      int eventData = (int) GameSection.GetEventData();
+      if (this.localEquipSet.item[eventData] == null)
+        GameSection.StopEvent();
+      else if (this.isSelfData && !this.isSelfEventEquipSet)
+        GameSection.SetEventData((object) this.CreateSelfEventData(eventData));
+      else
+        GameSection.SetEventData((object) new object[4]
+        {
+          (object) ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT,
+          (object) this.GetEquipSetAttachSkillListData(this.record.charaInfo.equipSet)[eventData],
+          (object) this.record.charaInfo.sex,
+          (object) this.record.charaInfo.faceId
+        });
+    }
+  }
 
-	public virtual void SetupFollowButton()
-	{
-		bool isNPC = record.isNPC;
-		QuestResultUserCollection.ResultUserInfo userInfo = MonoBehaviourSingleton<QuestManager>.I.resultUserCollection.GetUserInfo(detailUserID);
-		if (record.isSelf || isNPC || userInfo == null)
-		{
-			SetActive(transRoot, UI.BTN_FOLLOW, false);
-			SetActive(transRoot, UI.BTN_UNFOLLOW, false);
-			SetActive(transRoot, UI.OBJ_FOLLOW_ARROW_ROOT, false);
-			SetActive(transRoot, UI.OBJ_BLACKLIST_ROOT, false);
-		}
-		else
-		{
-			bool flag = !userInfo.CanSendFollow;
-			bool isFollower = userInfo.IsFollower;
-			SetEvent(transRoot, UI.BTN_FOLLOW, "FOLLOW", 0);
-			if (MonoBehaviourSingleton<FriendManager>.I.followNum == MonoBehaviourSingleton<UserInfoManager>.I.userStatus.maxFollow && !flag)
-			{
-				SetActive(transRoot, UI.BTN_FOLLOW, true);
-				SetActive(transRoot, UI.BTN_UNFOLLOW, false);
-				SetEvent(transRoot, UI.BTN_FOLLOW, "INVALID_FOLLOW", 0);
-			}
-			else
-			{
-				bool flag2 = !record.isNPC;
-				SetActive(transRoot, UI.BTN_FOLLOW, flag2 && !flag);
-				SetActive(transRoot, UI.BTN_UNFOLLOW, flag2 && flag);
-			}
-			bool flag3 = MonoBehaviourSingleton<BlackListManager>.I.CheckBlackList(record.charaInfo.userId);
-			SetActive(transRoot, UI.OBJ_BLACKLIST_ROOT, true);
-			SetActive(transRoot, UI.BTN_BLACKLIST_IN, !flag3);
-			SetActive(transRoot, UI.BTN_BLACKLIST_OUT, flag3);
-			SetActive(transRoot, UI.SPR_FOLLOW_ARROW, !flag3 && flag);
-			SetActive(transRoot, UI.SPR_FOLLOWER_ARROW, !flag3 && isFollower);
-			SetActive(transRoot, UI.SPR_BLACKLIST_ICON, flag3);
-		}
-	}
+  protected object[] CreateSelfEventData(int index)
+  {
+    return new object[4]
+    {
+      (object) ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT,
+      (object) this.GetEquipSetAttachSkillListData(this.selfCharaEquipSetNo)[index],
+      (object) this.record.charaInfo.sex,
+      (object) this.record.charaInfo.faceId
+    };
+  }
 
-	protected virtual void SetupLastLogin()
-	{
-		SetActive(transRoot, UI.OBJ_LAST_LOGIN, false);
-	}
+  protected override void OnQuery_SKILL_LIST()
+  {
+    if (this.isSelfData)
+      GameSection.SetEventData((object) new object[4]
+      {
+        (object) ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT,
+        (object) this.GetEquipSetAttachSkillListData(this.selfCharaEquipSetNo),
+        (object) true,
+        (object) this.record.charaInfo.sex
+      });
+    else
+      GameSection.SetEventData((object) new object[4]
+      {
+        (object) ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT,
+        (object) this.GetEquipSetAttachSkillListData(this.record.charaInfo.equipSet),
+        (object) true,
+        (object) this.record.charaInfo.sex
+      });
+  }
 
-	public override void UpdateUI()
-	{
-		if (isSelfData)
-		{
-			localEquipSet = MonoBehaviourSingleton<StatusManager>.I.GetEquipSet(selfCharaEquipSetNo);
-		}
-		else
-		{
-			localEquipSet = MonoBehaviourSingleton<StatusManager>.I.CreateEquipSetData(record.charaInfo.equipSet);
-		}
-		OnUpdateFriendDetailUI();
-	}
+  protected override void OnQuery_ABILITY()
+  {
+    List<CharaInfo.EquipItem> equipSet = !this.isSelfData || this.isSelfEventEquipSet ? this.record.charaInfo.equipSet : (List<CharaInfo.EquipItem>) null;
+    GameSection.SetEventData((object) new object[3]
+    {
+      (object) this.localEquipSet,
+      (object) MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(this.localEquipSet),
+      (object) new EquipSetDetailStatusAndAbilityTable.BaseStatus((int) this.record.charaInfo.atk, (int) this.record.charaInfo.def, (int) this.record.charaInfo.hp, equipSet)
+    });
+  }
 
-	protected void OnUpdateFriendDetailUI()
-	{
-		int num;
-		int num2;
-		int num3;
-		int num4;
-		if (!record.isSelf)
-		{
-			if (record.isNPC)
-			{
-				num = record.charaInfo.atk;
-				num2 = record.charaInfo.def;
-				num3 = record.charaInfo.hp;
-			}
-			else
-			{
-				EquipSetCalculator otherEquipSetCalculator;
-				if (MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex == -1)
-				{
-					MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex = 0;
-					otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(0);
-					otherEquipSetCalculator.SetEquipSet(record.charaInfo.equipSet, false);
-				}
-				else
-				{
-					otherEquipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetOtherEquipSetCalculator(MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex);
-				}
-				SimpleStatus finalStatus = otherEquipSetCalculator.GetFinalStatus(0, record.charaInfo.hp, record.charaInfo.atk, record.charaInfo.def);
-				num = finalStatus.GetAttacksSum();
-				num2 = finalStatus.GetDefencesSum();
-				num3 = finalStatus.hp;
-			}
-			num4 = record.charaInfo.level;
-			SetActive(transRoot, UI.OBJ_LEVEL_ROOT, !record.isNPC);
-		}
-		else
-		{
-			EquipSetCalculator equipSetCalculator = MonoBehaviourSingleton<StatusManager>.I.GetEquipSetCalculator(selfCharaEquipSetNo);
-			SimpleStatus finalStatus2 = equipSetCalculator.GetFinalStatus(0, MonoBehaviourSingleton<UserInfoManager>.I.userStatus);
-			num = finalStatus2.GetAttacksSum();
-			num2 = finalStatus2.GetDefencesSum();
-			num3 = finalStatus2.hp;
-			num4 = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.level;
-		}
-		SetLabelText(transRoot, UI.LBL_ATK, num.ToString());
-		SetLabelText(transRoot, UI.LBL_DEF, num2.ToString());
-		SetLabelText(transRoot, UI.LBL_HP, num3.ToString());
-		SetLabelText(transRoot, UI.LBL_LEVEL, num4.ToString());
-		SetupInfo();
-		UpdateEquipIcon(null);
-		SetActive(transRoot, UI.BTN_MAGI, showMagiButton);
-		CreateDegree();
-	}
+  protected override void OnQuery_STATUS()
+  {
+    List<CharaInfo.EquipItem> equipSet = !this.isSelfData || this.isSelfEventEquipSet ? this.record.charaInfo.equipSet : (List<CharaInfo.EquipItem>) null;
+    GameSection.SetEventData((object) new object[3]
+    {
+      (object) this.localEquipSet,
+      (object) MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(this.localEquipSet),
+      (object) new EquipSetDetailStatusAndAbilityTable.BaseStatus((int) this.record.charaInfo.atk, (int) this.record.charaInfo.def, (int) this.record.charaInfo.hp, equipSet)
+    });
+  }
 
-	protected void SetupInfo()
-	{
-		SetActive(transRoot, UI.OBJ_FRIEND_INFO_ROOT, IsFriendInfo);
-		SetActive(transRoot, UI.OBJ_CHANGE_EQUIP_INFO_ROOT, !IsFriendInfo);
-		if (IsFriendInfo)
-		{
-			UpdateUserIDLabel();
-			CharaInfo.ClanInfo clanInfo = record.charaInfo.clanInfo;
-			if (clanInfo == null)
-			{
-				clanInfo = new CharaInfo.ClanInfo();
-				clanInfo.clanId = -1;
-				clanInfo.tag = string.Empty;
-			}
-			bool isSameTeam = clanInfo.clanId > -1 && MonoBehaviourSingleton<GuildManager>.I.guildData != null && clanInfo.clanId == MonoBehaviourSingleton<GuildManager>.I.guildData.clanId;
-			SetSupportEncoding(transRoot, UI.LBL_NAME, true);
-			SetLabelText(transRoot, UI.LBL_NAME, Utility.GetNameWithColoredClanTag(clanInfo.tag, record.charaInfo.name, record.id == MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id, isSameTeam));
-			SetupCommentText();
-			SetupLastLogin();
-			SetupFollowButton();
-		}
-	}
+  protected override void OnQuery_FOLLOW()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.record.charaInfo.name
+    });
+    List<int> send_follow_list = new List<int>();
+    send_follow_list.Add(this.record.charaInfo.userId);
+    if (this.isQuestResult)
+    {
+      this.SendFollow(send_follow_list, (Action<bool>) (is_success =>
+      {
+        if (!MonoBehaviourSingleton<CoopApp>.IsValid())
+          return;
+        CoopApp.UpdateField();
+      }));
+    }
+    else
+    {
+      GameSection.StayEvent();
+      MonoBehaviourSingleton<PartyManager>.I.SendFollowAgency(send_follow_list, (Action<bool>) (is_success =>
+      {
+        if (this.isQuestResult & is_success)
+          MonoBehaviourSingleton<FriendManager>.I.SetFollowToHomeCharaInfo(this.record.charaInfo.userId, true);
+        GameSection.ResumeEvent(is_success);
+      }));
+    }
+  }
 
-	protected override void UpdateEquipIcon(List<CharaInfo.EquipItem> equip_set_info)
-	{
-		//IL_0310: Unknown result type (might be due to invalid IL or missing references)
-		SetActive(transRoot, UI.LBL_CHANGE_MODE, isVisualMode);
-		int i = 0;
-		for (int num = 7; i < num; i++)
-		{
-			SetEvent(FindCtrl(transRoot, icons[i]), "EMPTY", 0);
-			SetEvent(FindCtrl(transRoot, icons_btn[i]), "EMPTY", 0);
-			SetLabelText(FindCtrl(transRoot, icons_level[i]), string.Empty);
-		}
-		bool flag = isVisualMode;
-		bool flag2 = isVisualMode;
-		bool flag3 = isVisualMode;
-		bool flag4 = isVisualMode;
-		int j = 0;
-		for (int num2 = localEquipSet.item.Length; j < num2; j++)
-		{
-			ITEM_ICON_TYPE iTEM_ICON_TYPE = ITEM_ICON_TYPE.NONE;
-			RARITY_TYPE? nullable = null;
-			ELEMENT_TYPE eLEMENT_TYPE = ELEMENT_TYPE.MAX;
-			int num3 = -1;
-			EquipItemInfo equipItemInfo = localEquipSet.item[j];
-			EquipItemTable.EquipItemData equipItemData = null;
-			if (equipItemInfo != null)
-			{
-				switch (equipItemInfo.tableData.type)
-				{
-				case EQUIPMENT_TYPE.ARMOR:
-					flag2 = false;
-					break;
-				case EQUIPMENT_TYPE.HELM:
-					flag = false;
-					break;
-				case EQUIPMENT_TYPE.ARM:
-					flag3 = false;
-					break;
-				case EQUIPMENT_TYPE.LEG:
-					flag4 = false;
-					break;
-				}
-				equipItemData = ((!isVisualMode) ? Singleton<EquipItemTable>.I.GetEquipItemData(equipItemInfo.tableID) : GetVisualModeTargetTable(equipItemInfo.tableData.id, equipItemInfo.tableData.type, record.charaInfo));
-			}
-			if (isVisualMode)
-			{
-				if (equipItemData != null)
-				{
-					num3 = equipItemData.GetIconID(GetCharaSex());
-					SetActive(FindCtrl(transRoot, icons_level[j]), false);
-				}
-			}
-			else if (equipItemInfo != null && equipItemInfo.tableID != 0)
-			{
-				num3 = equipItemData.GetIconID(GetCharaSex());
-				SetActive(FindCtrl(transRoot, icons_level[j]), true);
-				string text = string.Format(StringTable.Get(STRING_CATEGORY.MAIN_STATUS, 1u), equipItemInfo.level.ToString());
-				SetLabelText(FindCtrl(transRoot, icons_level[j]), text);
-			}
-			Transform parent = FindCtrl(transRoot, icons[j]);
-			ItemIcon itemIcon = ItemIcon.CreateEquipItemIconByEquipItemInfo(equipItemInfo, GetCharaSex(), parent, null, -1, "EQUIP", j, false, -1, false, null, false, false);
-			SetLongTouch(itemIcon.transform, "DETAIL", j);
-			SetEvent(FindCtrl(transRoot, icons_btn[j]), "DETAIL", j);
-			SetEvent(itemIcon.transform, "DETAIL", j);
-			itemIcon.get_gameObject().SetActive(num3 != -1);
-			if (num3 != -1)
-			{
-				itemIcon.SetEquipExtInvertedColor(equipItemInfo, base.GetComponent<UILabel>(transRoot, (Enum)icons_level[j]));
-			}
-		}
-		if (flag && record.charaInfo.hId != 0)
-		{
-			int index = 4;
-			int hId = record.charaInfo.hId;
-			EQUIPMENT_TYPE e_type = EQUIPMENT_TYPE.HELM;
-			CharaInfo charaInfo = record.charaInfo;
-			SetVisualModeIcon(index, hId, e_type, charaInfo);
-		}
-		if (flag2 && record.charaInfo.aId != 0)
-		{
-			int index2 = 3;
-			int aId = record.charaInfo.aId;
-			EQUIPMENT_TYPE e_type2 = EQUIPMENT_TYPE.ARMOR;
-			CharaInfo charaInfo2 = record.charaInfo;
-			SetVisualModeIcon(index2, aId, e_type2, charaInfo2);
-		}
-		if (flag3 && record.charaInfo.rId != 0)
-		{
-			int index3 = 5;
-			int rId = record.charaInfo.rId;
-			EQUIPMENT_TYPE e_type3 = EQUIPMENT_TYPE.ARM;
-			CharaInfo charaInfo3 = record.charaInfo;
-			SetVisualModeIcon(index3, rId, e_type3, charaInfo3);
-		}
-		if (flag4 && record.charaInfo.lId != 0)
-		{
-			int index4 = 6;
-			int lId = record.charaInfo.lId;
-			EQUIPMENT_TYPE e_type4 = EQUIPMENT_TYPE.LEG;
-			CharaInfo charaInfo4 = record.charaInfo;
-			SetVisualModeIcon(index4, lId, e_type4, charaInfo4);
-		}
-	}
+  protected override void OnQuery_UNFOLLOW()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.record.charaInfo.name
+    });
+  }
 
-	protected override void OnQuery_DETAIL()
-	{
-		if (isVisualMode)
-		{
-			GameSection.ChangeEvent("VISUAL_DETAIL", null);
-			OnQuery_VISUAL_DETAIL();
-		}
-		else
-		{
-			int num = (int)GameSection.GetEventData();
-			if (localEquipSet.item[num] == null)
-			{
-				GameSection.StopEvent();
-			}
-			else if (isSelfData)
-			{
-				GameSection.SetEventData(CreateSelfEventData(num));
-			}
-			else
-			{
-				GameSection.SetEventData(new object[4]
-				{
-					ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT,
-					GetEquipSetAttachSkillListData(record.charaInfo.equipSet)[num],
-					record.charaInfo.sex,
-					record.charaInfo.faceId
-				});
-			}
-		}
-	}
+  protected virtual void OnQuery_QuestResultFriendUnFollow_YES()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.record.charaInfo.name
+    });
+    if (this.isQuestResult)
+    {
+      this.SendUnFollow(this.record.charaInfo.userId, (Action<bool>) (is_success => { }));
+    }
+    else
+    {
+      GameSection.StayEvent();
+      MonoBehaviourSingleton<PartyManager>.I.SendUnFollowAgency(this.record.charaInfo.userId, (Action<bool>) (is_success =>
+      {
+        if (this.isQuestResult & is_success)
+          MonoBehaviourSingleton<FriendManager>.I.SetFollowToHomeCharaInfo(this.record.charaInfo.userId, false);
+        GameSection.ResumeEvent(is_success);
+      }));
+    }
+  }
 
-	protected object[] CreateSelfEventData(int index)
-	{
-		return new object[4]
-		{
-			ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT,
-			GetEquipSetAttachSkillListData(selfCharaEquipSetNo)[index],
-			record.charaInfo.sex,
-			record.charaInfo.faceId
-		};
-	}
+  protected override void OnQuery_BLACK_LIST_IN()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.record.charaInfo.name
+    });
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<BlackListManager>.I.SendAdd(this.record.charaInfo.userId, (Action<bool>) (is_success => GameSection.ResumeEvent(is_success)));
+  }
 
-	protected override void OnQuery_SKILL_LIST()
-	{
-		if (isSelfData)
-		{
-			GameSection.SetEventData(new object[4]
-			{
-				ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT,
-				GetEquipSetAttachSkillListData(selfCharaEquipSetNo),
-				true,
-				record.charaInfo.sex
-			});
-		}
-		else
-		{
-			GameSection.SetEventData(new object[4]
-			{
-				ItemDetailEquip.CURRENT_SECTION.QUEST_RESULT,
-				GetEquipSetAttachSkillListData(record.charaInfo.equipSet),
-				true,
-				record.charaInfo.sex
-			});
-		}
-	}
+  protected override void OnQuery_BLACK_LIST_OUT()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.record.charaInfo.name
+    });
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<BlackListManager>.I.SendDelete(this.record.charaInfo.userId, (Action<bool>) (is_success => GameSection.ResumeEvent(is_success)));
+  }
 
-	protected override void OnQuery_ABILITY()
-	{
-		List<CharaInfo.EquipItem> chara_list_equip_data = (!isSelfData) ? record.charaInfo.equipSet : null;
-		GameSection.SetEventData(new object[3]
-		{
-			localEquipSet,
-			MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(localEquipSet, null),
-			new EquipSetDetailStatusAndAbilityTable.BaseStatus(record.charaInfo.atk, record.charaInfo.def, record.charaInfo.hp, chara_list_equip_data)
-		});
-	}
+  protected override void OnQuery_CHANGE_MODE()
+  {
+    this.reloadModel = true;
+    base.OnQuery_CHANGE_MODE();
+  }
 
-	protected override void OnQuery_STATUS()
-	{
-		List<CharaInfo.EquipItem> chara_list_equip_data = (!isSelfData) ? record.charaInfo.equipSet : null;
-		GameSection.SetEventData(new object[3]
-		{
-			localEquipSet,
-			MonoBehaviourSingleton<StatusManager>.I.GetEquipSetAbility(localEquipSet, null),
-			new EquipSetDetailStatusAndAbilityTable.BaseStatus(record.charaInfo.atk, record.charaInfo.def, record.charaInfo.hp, chara_list_equip_data)
-		});
-	}
+  protected override void OnQuery_SECTION_BACK()
+  {
+    MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex = -1;
+  }
 
-	protected override void OnQuery_FOLLOW()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			record.charaInfo.name
-		});
-		List<int> list = new List<int>();
-		list.Add(record.charaInfo.userId);
-		if (isQuestResult)
-		{
-			SendFollow(list, delegate
-			{
-				if (MonoBehaviourSingleton<CoopApp>.IsValid())
-				{
-					CoopApp.UpdateField(null);
-				}
-			});
-		}
-		else
-		{
-			GameSection.StayEvent();
-			MonoBehaviourSingleton<PartyManager>.I.SendFollowAgency(list, delegate(bool is_success)
-			{
-				if (isQuestResult && is_success)
-				{
-					MonoBehaviourSingleton<FriendManager>.I.SetFollowToHomeCharaInfo(record.charaInfo.userId, true);
-				}
-				GameSection.ResumeEvent(is_success, null);
-			});
-		}
-	}
+  protected override GameSection.NOTIFY_FLAG GetUpdateUINotifyFlags()
+  {
+    return GameSection.NOTIFY_FLAG.UPDATE_FRIEND_PARAM;
+  }
 
-	protected override void OnQuery_UNFOLLOW()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			record.charaInfo.name
-		});
-	}
-
-	protected virtual void OnQuery_QuestResultFriendUnFollow_YES()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			record.charaInfo.name
-		});
-		if (isQuestResult)
-		{
-			SendUnFollow(record.charaInfo.userId, delegate
-			{
-			});
-		}
-		else
-		{
-			GameSection.StayEvent();
-			MonoBehaviourSingleton<PartyManager>.I.SendUnFollowAgency(record.charaInfo.userId, delegate(bool is_success)
-			{
-				if (isQuestResult && is_success)
-				{
-					MonoBehaviourSingleton<FriendManager>.I.SetFollowToHomeCharaInfo(record.charaInfo.userId, false);
-				}
-				GameSection.ResumeEvent(is_success, null);
-			});
-		}
-	}
-
-	protected override void OnQuery_BLACK_LIST_IN()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			record.charaInfo.name
-		});
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<BlackListManager>.I.SendAdd(record.charaInfo.userId, delegate(bool is_success)
-		{
-			GameSection.ResumeEvent(is_success, null);
-		});
-	}
-
-	protected override void OnQuery_BLACK_LIST_OUT()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			record.charaInfo.name
-		});
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<BlackListManager>.I.SendDelete(record.charaInfo.userId, delegate(bool is_success)
-		{
-			GameSection.ResumeEvent(is_success, null);
-		});
-	}
-
-	protected override void OnQuery_CHANGE_MODE()
-	{
-		reloadModel = true;
-		base.OnQuery_CHANGE_MODE();
-	}
-
-	protected override void OnQuery_SECTION_BACK()
-	{
-		MonoBehaviourSingleton<StatusManager>.I.otherEquipSetSaveIndex = -1;
-	}
-
-	protected override NOTIFY_FLAG GetUpdateUINotifyFlags()
-	{
-		return NOTIFY_FLAG.UPDATE_FRIEND_PARAM;
-	}
+  protected new enum UI
+  {
+    LBL_NAME,
+    LBL_ATK,
+    LBL_DEF,
+    LBL_HP,
+    SPR_COMMENT,
+    LBL_COMMENT,
+    OBJ_LAST_LOGIN,
+    LBL_LAST_LOGIN,
+    LBL_LAST_LOGIN_TIME,
+    LBL_LEVEL,
+    OBJ_LEVEL_ROOT,
+    LBL_USER_ID,
+    OBJ_USER_ID_ROOT,
+    TEX_MODEL,
+    BTN_FOLLOW,
+    BTN_UNFOLLOW,
+    OBJ_BLACKLIST_ROOT,
+    BTN_BLACKLIST_IN,
+    BTN_BLACKLIST_OUT,
+    OBJ_ICON_WEAPON_1,
+    OBJ_ICON_WEAPON_2,
+    OBJ_ICON_WEAPON_3,
+    OBJ_ICON_ARMOR,
+    OBJ_ICON_HELM,
+    OBJ_ICON_ARM,
+    OBJ_ICON_LEG,
+    BTN_ICON_WEAPON_1,
+    BTN_ICON_WEAPON_2,
+    BTN_ICON_WEAPON_3,
+    BTN_ICON_ARMOR,
+    BTN_ICON_HELM,
+    BTN_ICON_ARM,
+    BTN_ICON_LEG,
+    OBJ_EQUIP_ROOT,
+    OBJ_EQUIP_SET_ROOT,
+    OBJ_FRIEND_INFO_ROOT,
+    OBJ_CHANGE_EQUIP_INFO_ROOT,
+    LBL_MAX,
+    LBL_NOW,
+    OBJ_FOLLOW_ARROW_ROOT,
+    SPR_FOLLOW_ARROW,
+    SPR_FOLLOWER_ARROW,
+    SPR_BLACKLIST_ICON,
+    SPR_SAME_CLAN_ICON,
+    LBL_LEVEL_WEAPON_1,
+    LBL_LEVEL_WEAPON_2,
+    LBL_LEVEL_WEAPON_3,
+    LBL_LEVEL_ARMOR,
+    LBL_LEVEL_HELM,
+    LBL_LEVEL_ARM,
+    LBL_LEVEL_LEG,
+    LBL_CHANGE_MODE,
+    BTN_MAGI,
+    LBL_SET_NAME,
+    OBJ_DEGREE_PLATE_ROOT,
+    BTN_DELETEFOLLOWER,
+    BTN_MOVE_TO_MSG,
+    OBJ_CLAN_ROOT,
+    BTN_CLAN_SCOUT,
+    SPR_CLAN_SCOUT,
+    BTN_CLAN_DETAIL,
+    TXT_CLAN_TITLE,
+    SPR_CLAN_NAME,
+    BTN_CLAN_SCOUT_CANCEL,
+    BTN_CLAN_SCOUT_OFF,
+  }
 }

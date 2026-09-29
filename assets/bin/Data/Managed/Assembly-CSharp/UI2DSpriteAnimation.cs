@@ -1,126 +1,107 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UI2DSpriteAnimation
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class UI2DSpriteAnimation
+#nullable disable
+public class UI2DSpriteAnimation : MonoBehaviour
 {
-	[SerializeField]
-	protected int framerate = 20;
+  [SerializeField]
+  protected int framerate = 20;
+  public bool ignoreTimeScale = true;
+  public bool loop = true;
+  public Sprite[] frames;
+  private SpriteRenderer mUnitySprite;
+  private UI2DSprite mNguiSprite;
+  private int mIndex;
+  private float mUpdate;
 
-	public bool ignoreTimeScale = true;
+  public bool isPlaying => ((Behaviour) this).enabled;
 
-	public bool loop = true;
+  public int framesPerSecond
+  {
+    get => this.framerate;
+    set => this.framerate = value;
+  }
 
-	public Sprite[] frames;
+  public void Play()
+  {
+    if (this.frames == null || this.frames.Length == 0)
+      return;
+    if (!((Behaviour) this).enabled && !this.loop)
+    {
+      int num = this.framerate > 0 ? this.mIndex + 1 : this.mIndex - 1;
+      if (num < 0 || num >= this.frames.Length)
+        this.mIndex = this.framerate < 0 ? this.frames.Length - 1 : 0;
+    }
+    ((Behaviour) this).enabled = true;
+    this.UpdateSprite();
+  }
 
-	private SpriteRenderer mUnitySprite;
+  public void Pause() => ((Behaviour) this).enabled = false;
 
-	private UI2DSprite mNguiSprite;
+  public void ResetToBeginning()
+  {
+    this.mIndex = this.framerate < 0 ? this.frames.Length - 1 : 0;
+    this.UpdateSprite();
+  }
 
-	private int mIndex;
+  private void Start() => this.Play();
 
-	private float mUpdate;
+  private void Update()
+  {
+    if (this.frames == null || this.frames.Length == 0)
+    {
+      ((Behaviour) this).enabled = false;
+    }
+    else
+    {
+      if (this.framerate == 0)
+        return;
+      float num = this.ignoreTimeScale ? RealTime.time : Time.time;
+      if ((double) this.mUpdate >= (double) num)
+        return;
+      this.mUpdate = num;
+      int val = this.framerate > 0 ? this.mIndex + 1 : this.mIndex - 1;
+      if (!this.loop && (val < 0 || val >= this.frames.Length))
+      {
+        ((Behaviour) this).enabled = false;
+      }
+      else
+      {
+        this.mIndex = NGUIMath.RepeatIndex(val, this.frames.Length);
+        this.UpdateSprite();
+      }
+    }
+  }
 
-	public bool isPlaying => this.get_enabled();
-
-	public int framesPerSecond
-	{
-		get
-		{
-			return framerate;
-		}
-		set
-		{
-			framerate = value;
-		}
-	}
-
-	public UI2DSpriteAnimation()
-		: this()
-	{
-	}
-
-	public void Play()
-	{
-		if (frames != null && frames.Length > 0)
-		{
-			if (!this.get_enabled() && !loop)
-			{
-				int num = (framerate <= 0) ? (mIndex - 1) : (mIndex + 1);
-				if (num < 0 || num >= frames.Length)
-				{
-					mIndex = ((framerate < 0) ? (frames.Length - 1) : 0);
-				}
-			}
-			this.set_enabled(true);
-			UpdateSprite();
-		}
-	}
-
-	public void Pause()
-	{
-		this.set_enabled(false);
-	}
-
-	public void ResetToBeginning()
-	{
-		mIndex = ((framerate < 0) ? (frames.Length - 1) : 0);
-		UpdateSprite();
-	}
-
-	private void Start()
-	{
-		Play();
-	}
-
-	private void Update()
-	{
-		if (frames == null || frames.Length == 0)
-		{
-			this.set_enabled(false);
-		}
-		else if (framerate != 0)
-		{
-			float num = (!ignoreTimeScale) ? Time.get_time() : RealTime.time;
-			if (mUpdate < num)
-			{
-				mUpdate = num;
-				int num2 = (framerate <= 0) ? (mIndex - 1) : (mIndex + 1);
-				if (!loop && (num2 < 0 || num2 >= frames.Length))
-				{
-					this.set_enabled(false);
-				}
-				else
-				{
-					mIndex = NGUIMath.RepeatIndex(num2, frames.Length);
-					UpdateSprite();
-				}
-			}
-		}
-	}
-
-	private void UpdateSprite()
-	{
-		if (mUnitySprite == null && mNguiSprite == null)
-		{
-			mUnitySprite = this.GetComponent<SpriteRenderer>();
-			mNguiSprite = this.GetComponent<UI2DSprite>();
-			if (mUnitySprite == null && mNguiSprite == null)
-			{
-				this.set_enabled(false);
-				return;
-			}
-		}
-		float num = (!ignoreTimeScale) ? Time.get_time() : RealTime.time;
-		if (framerate != 0)
-		{
-			mUpdate = num + Mathf.Abs(1f / (float)framerate);
-		}
-		if (mUnitySprite != null)
-		{
-			mUnitySprite.set_sprite(frames[mIndex]);
-		}
-		else if (mNguiSprite != null)
-		{
-			mNguiSprite.nextSprite = frames[mIndex];
-		}
-	}
+  private void UpdateSprite()
+  {
+    if (Object.op_Equality((Object) this.mUnitySprite, (Object) null) && Object.op_Equality((Object) this.mNguiSprite, (Object) null))
+    {
+      this.mUnitySprite = ((Component) this).GetComponent<SpriteRenderer>();
+      this.mNguiSprite = ((Component) this).GetComponent<UI2DSprite>();
+      if (Object.op_Equality((Object) this.mUnitySprite, (Object) null) && Object.op_Equality((Object) this.mNguiSprite, (Object) null))
+      {
+        ((Behaviour) this).enabled = false;
+        return;
+      }
+    }
+    float num = this.ignoreTimeScale ? RealTime.time : Time.time;
+    if (this.framerate != 0)
+      this.mUpdate = num + Mathf.Abs(1f / (float) this.framerate);
+    if (Object.op_Inequality((Object) this.mUnitySprite, (Object) null))
+    {
+      this.mUnitySprite.sprite = this.frames[this.mIndex];
+    }
+    else
+    {
+      if (!Object.op_Inequality((Object) this.mNguiSprite, (Object) null))
+        return;
+      this.mNguiSprite.nextSprite = this.frames[this.mIndex];
+    }
+  }
 }

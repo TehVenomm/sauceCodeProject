@@ -1,141 +1,122 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIExplorePlayerStatus
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections;
 using UnityEngine;
 
-public class UIExplorePlayerStatus
+#nullable disable
+public class UIExplorePlayerStatus : MonoBehaviour
 {
-	[SerializeField]
-	private UILabel nameLabel;
+  [SerializeField]
+  private UILabel nameLabel;
+  [SerializeField]
+  private UIHGauge hpGauge;
+  [SerializeField]
+  private UISprite weaponIcon;
+  [SerializeField]
+  private UIStatusIcon statusIcon;
+  [SerializeField]
+  private float statusIconRotationInterval = 0.78f;
+  private float nextStatusIconRotate;
+  private int checkStatusType;
+  private ExplorePlayerStatus playerStatus;
+  private IEnumerator rotateUpdate;
 
-	[SerializeField]
-	private UIHGauge hpGauge;
+  public void Initialize(ExplorePlayerStatus playerStatus)
+  {
+    if (this.playerStatus != playerStatus)
+    {
+      this.Clear();
+      this.playerStatus = playerStatus;
+      playerStatus.onUpdateHp += new System.Action(this.UpdateHp);
+      playerStatus.onUpdateWeapon += new System.Action(this.UpdateWeapon);
+      playerStatus.onUpdateBuff += new System.Action(this.UpdateStatusIcon);
+    }
+    if (playerStatus.isInitialized)
+    {
+      this.OnInitializeStatus();
+    }
+    else
+    {
+      playerStatus.onInitialize += new System.Action(this.OnInitializeStatus);
+      ((Component) this).gameObject.SetActive(false);
+    }
+  }
 
-	[SerializeField]
-	private UISprite weaponIcon;
+  private void Clear()
+  {
+    if (this.playerStatus == null)
+      return;
+    this.playerStatus.onInitialize -= new System.Action(this.OnInitializeStatus);
+    this.playerStatus.onUpdateHp -= new System.Action(this.UpdateHp);
+    this.playerStatus.onUpdateWeapon -= new System.Action(this.UpdateWeapon);
+    this.playerStatus.onUpdateBuff -= new System.Action(this.UpdateStatusIcon);
+    this.playerStatus = (ExplorePlayerStatus) null;
+    if (this.rotateUpdate == null)
+      return;
+    this.StopCoroutine(this.rotateUpdate);
+    this.rotateUpdate = (IEnumerator) null;
+  }
 
-	[SerializeField]
-	private UIStatusIcon statusIcon;
+  private void OnInitializeStatus()
+  {
+    ((Component) this).gameObject.SetActive(true);
+    this.SetName();
+    this.UpdateHp();
+    this.UpdateWeapon();
+    this.UpdateStatusIcon();
+  }
 
-	[SerializeField]
-	private float statusIconRotationInterval = 0.78f;
+  private void OnDestroy() => this.Clear();
 
-	private float nextStatusIconRotate;
+  private void SetName() => this.nameLabel.text = this.playerStatus.userName;
 
-	private int checkStatusType;
+  private void UpdateHp()
+  {
+    this.hpGauge.SetPercent((float) this.playerStatus.hp / (float) this.playerStatus.hpMax);
+  }
 
-	private ExplorePlayerStatus playerStatus;
+  private void UpdateWeapon()
+  {
+    this.weaponIcon.spriteName = UIWeaponChange.WEAPONICON_PATH[(int) this.playerStatus.weaponType];
+  }
 
-	private IEnumerator rotateUpdate;
+  private void UpdateStatusIcon()
+  {
+    if (this.statusIcon.HasActiveMultipleBuffIcon(this.playerStatus.buff, this.playerStatus.extraStatus))
+    {
+      if (this.rotateUpdate != null)
+        return;
+      this.rotateUpdate = this.RotateUpdateStatusIcon();
+      this.StartCoroutine(this.rotateUpdate);
+    }
+    else
+    {
+      if (this.rotateUpdate != null)
+      {
+        this.StopCoroutine(this.rotateUpdate);
+        this.rotateUpdate = (IEnumerator) null;
+      }
+      this.checkStatusType = 0;
+      this.statusIcon.RotatedUpdateStatusIcon(this.checkStatusType, this.playerStatus.buff, this.playerStatus.extraStatus);
+    }
+  }
 
-	public UIExplorePlayerStatus()
-		: this()
-	{
-	}
-
-	public void Initialize(ExplorePlayerStatus playerStatus)
-	{
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		if (this.playerStatus != playerStatus)
-		{
-			Clear();
-			this.playerStatus = playerStatus;
-			playerStatus.onUpdateHp += UpdateHp;
-			playerStatus.onUpdateWeapon += UpdateWeapon;
-			playerStatus.onUpdateBuff += UpdateStatusIcon;
-		}
-		if (playerStatus.isInitialized)
-		{
-			OnInitializeStatus();
-		}
-		else
-		{
-			playerStatus.onInitialize += OnInitializeStatus;
-			this.get_gameObject().SetActive(false);
-		}
-	}
-
-	private void Clear()
-	{
-		if (playerStatus != null)
-		{
-			playerStatus.onInitialize -= OnInitializeStatus;
-			playerStatus.onUpdateHp -= UpdateHp;
-			playerStatus.onUpdateWeapon -= UpdateWeapon;
-			playerStatus.onUpdateBuff -= UpdateStatusIcon;
-			playerStatus = null;
-			if (rotateUpdate != null)
-			{
-				this.StopCoroutine(rotateUpdate);
-				rotateUpdate = null;
-			}
-		}
-	}
-
-	private void OnInitializeStatus()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(true);
-		SetName();
-		UpdateHp();
-		UpdateWeapon();
-		UpdateStatusIcon();
-	}
-
-	private void OnDestroy()
-	{
-		Clear();
-	}
-
-	private void SetName()
-	{
-		nameLabel.text = playerStatus.userName;
-	}
-
-	private void UpdateHp()
-	{
-		hpGauge.SetPercent((float)playerStatus.hp / (float)playerStatus.hpMax, true);
-	}
-
-	private void UpdateWeapon()
-	{
-		string spriteName = UIWeaponChange.WEAPONICON_PATH[(int)playerStatus.weaponType];
-		weaponIcon.spriteName = spriteName;
-	}
-
-	private void UpdateStatusIcon()
-	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		if (statusIcon.HasActiveMultipleBuffIcon(playerStatus.buff, playerStatus.extraStatus))
-		{
-			if (rotateUpdate == null)
-			{
-				rotateUpdate = RotateUpdateStatusIcon();
-				this.StartCoroutine(rotateUpdate);
-			}
-		}
-		else
-		{
-			if (rotateUpdate != null)
-			{
-				this.StopCoroutine(rotateUpdate);
-				rotateUpdate = null;
-			}
-			checkStatusType = 0;
-			statusIcon.RotatedUpdateStatusIcon(checkStatusType, playerStatus.buff, playerStatus.extraStatus);
-		}
-	}
-
-	private IEnumerator RotateUpdateStatusIcon()
-	{
-		while (true)
-		{
-			nextStatusIconRotate -= Time.get_deltaTime();
-			if (nextStatusIconRotate <= 0f)
-			{
-				checkStatusType = statusIcon.RotatedUpdateStatusIcon(checkStatusType, playerStatus.buff, playerStatus.extraStatus);
-				checkStatusType++;
-				nextStatusIconRotate = statusIconRotationInterval;
-			}
-			yield return (object)null;
-		}
-	}
+  private IEnumerator RotateUpdateStatusIcon()
+  {
+    while (true)
+    {
+      this.nextStatusIconRotate -= Time.deltaTime;
+      if ((double) this.nextStatusIconRotate <= 0.0)
+      {
+        this.checkStatusType = this.statusIcon.RotatedUpdateStatusIcon(this.checkStatusType, this.playerStatus.buff, this.playerStatus.extraStatus);
+        ++this.checkStatusType;
+        this.nextStatusIconRotate = this.statusIconRotationInterval;
+      }
+      yield return (object) null;
+    }
+  }
 }

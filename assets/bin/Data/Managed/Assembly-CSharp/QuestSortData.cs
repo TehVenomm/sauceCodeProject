@@ -1,188 +1,173 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestSortData
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class QuestSortData : SortCompareData
 {
-	public int enemyModelID;
+  public int enemyModelID;
+  public QuestItemInfo itemData;
 
-	public QuestItemInfo itemData;
+  public override object GetItemData() => (object) this.itemData;
 
-	public override object GetItemData()
-	{
-		return itemData;
-	}
+  public override void SetItem(object item)
+  {
+    this.itemData = (QuestItemInfo) item;
+    this.enemyModelID = Singleton<EnemyTable>.I.GetEnemyData((uint) this.GetMainEnemyID()).modelId;
+  }
 
-	public override void SetItem(object item)
-	{
-		itemData = (QuestItemInfo)item;
-		enemyModelID = Singleton<EnemyTable>.I.GetEnemyData((uint)GetMainEnemyID()).modelId;
-	}
+  public ELEMENT_TYPE GetEnemyElement()
+  {
+    EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint) this.GetMainEnemyID());
+    return enemyData == null ? ELEMENT_TYPE.MAX : enemyData.element;
+  }
 
-	public ELEMENT_TYPE GetEnemyElement()
-	{
-		return Singleton<EnemyTable>.I.GetEnemyData((uint)GetMainEnemyID())?.element ?? ELEMENT_TYPE.MAX;
-	}
+  public EnemyTable.EnemyData GetEnemyData()
+  {
+    return Singleton<EnemyTable>.I.GetEnemyData((uint) this.GetMainEnemyID());
+  }
 
-	public EnemyTable.EnemyData GetEnemyData()
-	{
-		return Singleton<EnemyTable>.I.GetEnemyData((uint)GetMainEnemyID());
-	}
+  private int GetMainEnemyID() => this.itemData.infoData.questData.tableData.GetMainEnemyID();
 
-	private int GetMainEnemyID()
-	{
-		return itemData.infoData.questData.tableData.GetMainEnemyID();
-	}
+  public override void SetupSortingData(
+    SortBase.SORT_REQUIREMENT requirement,
+    EquipItemStatus status = null)
+  {
+    switch (requirement)
+    {
+      case SortBase.SORT_REQUIREMENT.NUM:
+        this.sortingData = (long) this.itemData.infoData.questData.num;
+        break;
+      case SortBase.SORT_REQUIREMENT.RARITY:
+        this.sortingData = (long) this.itemData.infoData.questData.tableData.rarity;
+        break;
+      case SortBase.SORT_REQUIREMENT.DIFFICULTY:
+        this.sortingData = (long) this.itemData.infoData.questData.tableData.difficulty;
+        break;
+      case SortBase.SORT_REQUIREMENT.ENEMY:
+        EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint) this.itemData.infoData.questData.tableData.GetMainEnemyID());
+        if (enemyData == null)
+        {
+          this.sortingData = 0L;
+          break;
+        }
+        this.sortingData = (long) enemyData.type;
+        break;
+      default:
+        this.sortingData = (long) this.itemData.infoData.questData.tableData.questID;
+        break;
+    }
+  }
 
-	public override void SetupSortingData(SortBase.SORT_REQUIREMENT requirement, EquipItemStatus status = null)
-	{
-		switch (requirement)
-		{
-		default:
-			sortingData = itemData.infoData.questData.tableData.questID;
-			break;
-		case SortBase.SORT_REQUIREMENT.RARITY:
-			sortingData = (long)itemData.infoData.questData.tableData.rarity;
-			break;
-		case SortBase.SORT_REQUIREMENT.NUM:
-			sortingData = itemData.infoData.questData.num;
-			break;
-		case SortBase.SORT_REQUIREMENT.DIFFICULTY:
-			sortingData = (long)itemData.infoData.questData.tableData.difficulty;
-			break;
-		case SortBase.SORT_REQUIREMENT.ENEMY:
-		{
-			EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)itemData.infoData.questData.tableData.GetMainEnemyID());
-			if (enemyData == null)
-			{
-				sortingData = 0L;
-			}
-			else
-			{
-				sortingData = (long)enemyData.type;
-			}
-			break;
-		}
-		}
-	}
+  public override bool IsAbsFirst()
+  {
+    return MonoBehaviourSingleton<QuestManager>.I.IsTutorialOrderQuest(this.GetTableID());
+  }
 
-	public override bool IsAbsFirst()
-	{
-		return MonoBehaviourSingleton<QuestManager>.I.IsTutorialOrderQuest(GetTableID());
-	}
+  public override bool IsFavorite() => false;
 
-	public override bool IsFavorite()
-	{
-		return false;
-	}
+  public override ulong GetUniqID() => this.itemData.uniqueID;
 
-	public override ulong GetUniqID()
-	{
-		return itemData.uniqueID;
-	}
+  public override int GetItemType() => this.EnemyTypeToSortItemType();
 
-	public override int GetItemType()
-	{
-		return EnemyTypeToSortItemType();
-	}
+  public override int GetNum() => this.itemData.infoData.questData.num;
 
-	public override int GetNum()
-	{
-		return itemData.infoData.questData.num;
-	}
+  public override uint GetTableID() => this.itemData.infoData.questData.tableData.questID;
 
-	public override uint GetTableID()
-	{
-		return itemData.infoData.questData.tableData.questID;
-	}
+  public override string GetName() => this.itemData.infoData.questData.tableData.questText;
 
-	public override string GetName()
-	{
-		return itemData.infoData.questData.tableData.questText;
-	}
+  public override RARITY_TYPE GetRarity() => this.itemData.infoData.questData.tableData.rarity;
 
-	public override RARITY_TYPE GetRarity()
-	{
-		return itemData.infoData.questData.tableData.rarity;
-	}
+  public override ITEM_ICON_TYPE GetIconType()
+  {
+    return ItemIcon.GetItemIconType(this.itemData.infoData.questData.tableData.questType);
+  }
 
-	public override ITEM_ICON_TYPE GetIconType()
-	{
-		return ItemIcon.GetItemIconType(itemData.infoData.questData.tableData.questType);
-	}
+  public override ELEMENT_TYPE GetIconElement() => this.GetEnemyElement();
 
-	public override ELEMENT_TYPE GetIconElement()
-	{
-		return GetEnemyElement();
-	}
+  public override bool CanSale() => !this.itemData.infoData.questData.tableData.cantSale;
 
-	public override bool CanSale()
-	{
-		return !itemData.infoData.questData.tableData.cantSale;
-	}
+  public override REWARD_TYPE GetMaterialType() => REWARD_TYPE.QUEST_ITEM;
 
-	public override REWARD_TYPE GetMaterialType()
-	{
-		return REWARD_TYPE.QUEST_ITEM;
-	}
+  public override int GetIconID()
+  {
+    EnemyTable.EnemyData enemyData = this.GetEnemyData();
+    if (enemyData != null)
+      return enemyData.iconId;
+    Log.Error("ENEMY_TABLE_DATA is Not Found : main_enemy_id = " + (object) this.GetMainEnemyID());
+    return 0;
+  }
 
-	public override int GetIconID()
-	{
-		EnemyTable.EnemyData enemyData = GetEnemyData();
-		if (enemyData != null)
-		{
-			return enemyData.iconId;
-		}
-		Log.Error("ENEMY_TABLE_DATA is Not Found : main_enemy_id = " + GetMainEnemyID());
-		return 0;
-	}
-
-	private int EnemyTypeToSortItemType()
-	{
-		int num = 0;
-		EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint)GetMainEnemyID());
-		if (enemyData != null)
-		{
-			switch (enemyData.type)
-			{
-			default:
-				return 1;
-			case ENEMY_TYPE.GORILLA:
-				return 1;
-			case ENEMY_TYPE.RABBIT:
-				return 2;
-			case ENEMY_TYPE.CHIMERA:
-				return 4;
-			case ENEMY_TYPE.WOLF:
-				return 8;
-			case ENEMY_TYPE.DRAGON:
-				return 16;
-			case ENEMY_TYPE.DRAKE:
-				return 32;
-			case ENEMY_TYPE.WYVERN:
-				return 64;
-			case ENEMY_TYPE.UNDEAD_KNIGHT:
-				return 128;
-			case ENEMY_TYPE.WRAITH:
-				return 256;
-			case ENEMY_TYPE.GIANT:
-				return 512;
-			case ENEMY_TYPE.GOLEM:
-				return 1024;
-			case ENEMY_TYPE.ELEMENTAL:
-				return 2048;
-			case ENEMY_TYPE.CHICKEN:
-				return 4096;
-			case ENEMY_TYPE.MUSHROOM:
-				return 8192;
-			case ENEMY_TYPE.COW:
-				return 16384;
-			case ENEMY_TYPE.FROG:
-				return 32768;
-			case ENEMY_TYPE.BAT:
-				return 65536;
-			case ENEMY_TYPE.SLIME:
-				return 131072;
-			case ENEMY_TYPE.SAHUAGIN:
-				return 262144;
-			}
-		}
-		return 0;
-	}
+  private int EnemyTypeToSortItemType()
+  {
+    EnemyTable.EnemyData enemyData = Singleton<EnemyTable>.I.GetEnemyData((uint) this.GetMainEnemyID());
+    if (enemyData == null)
+      return 0;
+    int sortItemType;
+    switch (enemyData.type)
+    {
+      case ENEMY_TYPE.GORILLA:
+        sortItemType = 1;
+        break;
+      case ENEMY_TYPE.RABBIT:
+        sortItemType = 2;
+        break;
+      case ENEMY_TYPE.CHIMERA:
+        sortItemType = 4;
+        break;
+      case ENEMY_TYPE.WOLF:
+        sortItemType = 8;
+        break;
+      case ENEMY_TYPE.DRAGON:
+        sortItemType = 16 /*0x10*/;
+        break;
+      case ENEMY_TYPE.DRAKE:
+        sortItemType = 32 /*0x20*/;
+        break;
+      case ENEMY_TYPE.WYVERN:
+        sortItemType = 64 /*0x40*/;
+        break;
+      case ENEMY_TYPE.UNDEAD_KNIGHT:
+        sortItemType = 128 /*0x80*/;
+        break;
+      case ENEMY_TYPE.WRAITH:
+        sortItemType = 256 /*0x0100*/;
+        break;
+      case ENEMY_TYPE.GIANT:
+        sortItemType = 512 /*0x0200*/;
+        break;
+      case ENEMY_TYPE.GOLEM:
+        sortItemType = 1024 /*0x0400*/;
+        break;
+      case ENEMY_TYPE.ELEMENTAL:
+        sortItemType = 2048 /*0x0800*/;
+        break;
+      case ENEMY_TYPE.CHICKEN:
+        sortItemType = 4096 /*0x1000*/;
+        break;
+      case ENEMY_TYPE.MUSHROOM:
+        sortItemType = 8192 /*0x2000*/;
+        break;
+      case ENEMY_TYPE.COW:
+        sortItemType = 16384 /*0x4000*/;
+        break;
+      case ENEMY_TYPE.FROG:
+        sortItemType = 32768 /*0x8000*/;
+        break;
+      case ENEMY_TYPE.BAT:
+        sortItemType = 65536 /*0x010000*/;
+        break;
+      case ENEMY_TYPE.SLIME:
+        sortItemType = 131072 /*0x020000*/;
+        break;
+      case ENEMY_TYPE.SAHUAGIN:
+        sortItemType = 262144 /*0x040000*/;
+        break;
+      default:
+        return 1;
+    }
+    return sortItemType;
+  }
 }

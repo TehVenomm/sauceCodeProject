@@ -1,50 +1,46 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: LaserAttackObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class LaserAttackObject : AttackColliderObject
 {
-	private GameObject m_effectLaser;
+  private GameObject m_effectLaser;
+  public Animator m_effectAnimator;
+  public CapsuleCollider m_capCollider;
 
-	public Animator m_effectAnimator;
+  public void CreateEffect(BulletData.BulletBase bulletBase)
+  {
+    Transform effect = EffectManager.GetEffect(bulletBase.effectName);
+    if (Object.op_Equality((Object) effect, (Object) null))
+    {
+      Log.Error("Failed to create effect for LaserAttackObject!!");
+    }
+    else
+    {
+      effect.parent = ((Component) this).transform;
+      effect.localPosition = bulletBase.dispOffset;
+      effect.localRotation = Quaternion.Euler(bulletBase.dispRotation);
+      this.m_effectLaser = ((Component) effect).gameObject;
+      if (Object.op_Implicit((Object) this.m_effectLaser.GetComponent<Animator>()))
+        this.m_effectAnimator = this.m_effectLaser.GetComponent<Animator>();
+      if (!Object.op_Implicit((Object) ((Component) this).GetComponent<CapsuleCollider>()))
+        return;
+      this.m_capCollider = ((Component) this).GetComponent<CapsuleCollider>();
+    }
+  }
 
-	public CapsuleCollider m_capCollider;
-
-	public void CreateEffect(BulletData.BulletBase bulletBase)
-	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Expected O, but got Unknown
-		Transform effect = EffectManager.GetEffect(bulletBase.effectName, null);
-		if (effect == null)
-		{
-			Log.Error("Failed to create effect for LaserAttackObject!!");
-		}
-		else
-		{
-			effect.set_parent(this.get_transform());
-			effect.set_localPosition(bulletBase.dispOffset);
-			effect.set_localRotation(Quaternion.Euler(bulletBase.dispRotation));
-			m_effectLaser = effect.get_gameObject();
-			if (Object.op_Implicit(m_effectLaser.GetComponent<Animator>()))
-			{
-				m_effectAnimator = m_effectLaser.GetComponent<Animator>();
-			}
-			if (Object.op_Implicit(this.GetComponent<CapsuleCollider>()))
-			{
-				m_capCollider = this.GetComponent<CapsuleCollider>();
-			}
-		}
-	}
-
-	public override void Destroy()
-	{
-		if (m_effectLaser != null)
-		{
-			EffectManager.ReleaseEffect(m_effectLaser, true, false);
-			m_effectLaser = null;
-		}
-		base.Destroy();
-	}
+  public override void Destroy()
+  {
+    if (Object.op_Inequality((Object) this.m_effectLaser, (Object) null))
+    {
+      EffectManager.ReleaseEffect(this.m_effectLaser);
+      this.m_effectLaser = (GameObject) null;
+    }
+    base.Destroy();
+  }
 }

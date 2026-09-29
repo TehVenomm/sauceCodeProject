@@ -1,49 +1,47 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIQuestRepeat
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using UnityEngine;
 
+#nullable disable
 public class UIQuestRepeat : MonoBehaviourSingleton<UIQuestRepeat>
 {
-	[SerializeField]
-	protected UILabel repeatStatus;
+  [SerializeField]
+  protected UILabel repeatStatus;
+  [SerializeField]
+  protected UIButton repeatOffBtn;
 
-	[SerializeField]
-	protected UIButton repeatOffBtn;
+  public void OnVictory()
+  {
+    ((Component) this.repeatStatus).gameObject.SetActive(false);
+    ((Component) this.repeatOffBtn).gameObject.SetActive(false);
+  }
 
-	public void OnVictory()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		repeatStatus.get_gameObject().SetActive(false);
-		repeatOffBtn.get_gameObject().SetActive(false);
-	}
+  public void InitData()
+  {
+    if (!PartyManager.IsValidInParty() || MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id != MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId())
+      return;
+    ((Component) this.repeatStatus).gameObject.SetActive(MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+    ((Component) this.repeatOffBtn).gameObject.SetActive(MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
+  }
 
-	public void InitData()
-	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		if (PartyManager.IsValidInParty() && MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id == MonoBehaviourSingleton<PartyManager>.I.GetOwnerUserId())
-		{
-			repeatStatus.get_gameObject().SetActive(MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-			repeatOffBtn.get_gameObject().SetActive(MonoBehaviourSingleton<PartyManager>.I.is_repeat_quest);
-		}
-	}
-
-	public void OnEndHunt()
-	{
-		repeatOffBtn.SetState(UIButtonColor.State.Disabled, true);
-		MonoBehaviourSingleton<PartyManager>.I.SendRepeat(false, delegate(bool is_success)
-		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			if (is_success)
-			{
-				repeatStatus.get_gameObject().SetActive(false);
-				repeatOffBtn.get_gameObject().SetActive(false);
-				GameSaveData.instance.defaultRepeatPartyOn = false;
-			}
-			else
-			{
-				repeatOffBtn.SetState(UIButtonColor.State.Normal, true);
-			}
-		});
-	}
+  public void OnEndHunt()
+  {
+    this.repeatOffBtn.SetState(UIButtonColor.State.Disabled, true);
+    MonoBehaviourSingleton<PartyManager>.I.SendRepeat(false, (Action<bool>) (is_success =>
+    {
+      if (is_success)
+      {
+        ((Component) this.repeatStatus).gameObject.SetActive(false);
+        ((Component) this.repeatOffBtn).gameObject.SetActive(false);
+        GameSaveData.instance.defaultRepeatPartyOn = false;
+      }
+      else
+        this.repeatOffBtn.SetState(UIButtonColor.State.Normal, true);
+    }));
+  }
 }
