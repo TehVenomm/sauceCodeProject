@@ -1,173 +1,134 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIFieldName
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class UIFieldName
+#nullable disable
+public class UIFieldName : MonoBehaviour
 {
-	private enum Phase
-	{
-		StartWait,
-		FadeIn,
-		Display,
-		FadeOut,
-		None
-	}
+  private UIFieldName.Phase phase = UIFieldName.Phase.FadeIn;
+  private float waitSeconds;
+  private bool initialized;
+  private const float baseWidth = 120f;
+  private float bgLineWidth;
+  private float bgLineWidthMax;
+  private float bgLineWidthStep;
+  public UILabel nameLabelU;
+  public UILabel nameLabelD;
+  public Transform labelRoot;
+  public UITweenCtrl tweenCtrl;
+  public UIWidget bgLight;
+  public UIWidget bgBlack;
+  public UIWidget bgLine;
+  public TweenAlpha tweenTop;
 
-	private const float baseWidth = 120f;
+  private void Start()
+  {
+    if (Object.op_Equality((Object) null, (Object) this.nameLabelU) || Object.op_Equality((Object) null, (Object) this.nameLabelD) || Object.op_Equality((Object) null, (Object) this.labelRoot) || Object.op_Equality((Object) null, (Object) this.tweenCtrl) || Object.op_Equality((Object) null, (Object) this.bgLight) || Object.op_Equality((Object) null, (Object) this.bgBlack) || Object.op_Equality((Object) null, (Object) this.bgLine) || Object.op_Equality((Object) null, (Object) this.tweenTop))
+      return;
+    FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
+    if (fieldMapData == null)
+      ((Component) this).gameObject.SetActive(false);
+    else if (string.Compare(fieldMapData.stageName, 0, "FI", 0, 2) != 0)
+      ((Component) this).gameObject.SetActive(false);
+    else if (QuestManager.IsValidInGameWaveMatch())
+    {
+      ((Component) this).gameObject.SetActive(false);
+    }
+    else
+    {
+      this.nameLabelU.text = fieldMapData.mapName;
+      this.nameLabelD.text = fieldMapData.mapName;
+      float width = (float) this.nameLabelU.width;
+      Vector3 localPosition = this.labelRoot.localPosition;
+      localPosition.x += width * 0.5f;
+      this.labelRoot.localPosition = localPosition;
+      float num = width - 120f;
+      this.bgLight.width = (int) ((float) this.bgLight.width + num);
+      this.bgBlack.width = (int) ((float) this.bgBlack.width + num);
+      this.bgLineWidthMax = (float) this.bgLine.width + num;
+      this.bgLineWidth = 0.0f;
+      this.bgLine.width = (int) this.bgLineWidth;
+      this.bgLineWidthStep = this.bgLineWidthMax / 12f;
+      this.nameLabelU.fontStyle = (FontStyle) 2;
+      this.nameLabelD.fontStyle = (FontStyle) 2;
+      this.phase = UIFieldName.Phase.StartWait;
+      this.waitSeconds = 0.8f;
+      this.initialized = true;
+    }
+  }
 
-	private Phase phase = Phase.FadeIn;
+  private void Phase_StartWait()
+  {
+    if (0.0 < (double) this.waitSeconds)
+      return;
+    this.phase = UIFieldName.Phase.FadeIn;
+    this.waitSeconds = 1.2f;
+    UITweenCtrl.Reset(((Component) this.tweenCtrl).transform);
+    UITweenCtrl.Play(((Component) this.tweenCtrl).transform, is_input_block: false);
+  }
 
-	private float waitSeconds;
+  private void Phase_FadeIn()
+  {
+    this.bgLineWidth += this.bgLineWidthStep;
+    if ((double) this.bgLineWidthMax <= (double) this.bgLineWidth)
+      this.bgLineWidth = this.bgLineWidthMax;
+    this.bgLine.width = (int) this.bgLineWidth;
+    if (0.0 < (double) this.waitSeconds)
+      return;
+    this.phase = UIFieldName.Phase.Display;
+    this.waitSeconds = 2f;
+  }
 
-	private bool initialized;
+  private void Phase_Display()
+  {
+    if (0.0 < (double) this.waitSeconds)
+      return;
+    this.phase = UIFieldName.Phase.FadeOut;
+    this.waitSeconds = 1f;
+    this.tweenTop.ResetToBeginning();
+    this.tweenTop.PlayForward();
+  }
 
-	private float bgLineWidth;
+  private void Phase_FadeOut()
+  {
+    if (0.0 < (double) this.waitSeconds)
+      return;
+    ((Component) this).gameObject.SetActive(false);
+    this.phase = UIFieldName.Phase.None;
+  }
 
-	private float bgLineWidthMax;
+  private void Update()
+  {
+    if (!this.initialized)
+      return;
+    this.waitSeconds -= Time.deltaTime;
+    switch (this.phase)
+    {
+      case UIFieldName.Phase.StartWait:
+        this.Phase_StartWait();
+        break;
+      case UIFieldName.Phase.FadeIn:
+        this.Phase_FadeIn();
+        break;
+      case UIFieldName.Phase.Display:
+        this.Phase_Display();
+        break;
+      case UIFieldName.Phase.FadeOut:
+        this.Phase_FadeOut();
+        break;
+    }
+  }
 
-	private float bgLineWidthStep;
-
-	public UILabel nameLabelU;
-
-	public UILabel nameLabelD;
-
-	public Transform labelRoot;
-
-	public UITweenCtrl tweenCtrl;
-
-	public UIWidget bgLight;
-
-	public UIWidget bgBlack;
-
-	public UIWidget bgLine;
-
-	public TweenAlpha tweenTop;
-
-	public UIFieldName()
-		: this()
-	{
-	}
-
-	private void Start()
-	{
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-		if (!(null == nameLabelU) && !(null == nameLabelD) && !(null == labelRoot) && !(null == tweenCtrl) && !(null == bgLight) && !(null == bgBlack) && !(null == bgLine) && !(null == tweenTop))
-		{
-			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(MonoBehaviourSingleton<FieldManager>.I.currentMapID);
-			if (fieldMapData == null)
-			{
-				this.get_gameObject().SetActive(false);
-			}
-			else if (string.Compare(fieldMapData.stageName, 0, "FI", 0, 2) != 0)
-			{
-				this.get_gameObject().SetActive(false);
-			}
-			else if (QuestManager.IsValidInGameWaveMatch())
-			{
-				this.get_gameObject().SetActive(false);
-			}
-			else
-			{
-				nameLabelU.text = fieldMapData.mapName;
-				nameLabelD.text = fieldMapData.mapName;
-				float num = (float)nameLabelU.width;
-				Vector3 localPosition = labelRoot.get_localPosition();
-				localPosition.x += num * 0.5f;
-				labelRoot.set_localPosition(localPosition);
-				float num2 = num - 120f;
-				float num3 = (float)bgLight.width + num2;
-				bgLight.width = (int)num3;
-				num3 = (float)bgBlack.width + num2;
-				bgBlack.width = (int)num3;
-				bgLineWidthMax = (float)bgLine.width + num2;
-				bgLineWidth = 0f;
-				bgLine.width = (int)bgLineWidth;
-				bgLineWidthStep = bgLineWidthMax / 12f;
-				nameLabelU.fontStyle = 2;
-				nameLabelD.fontStyle = 2;
-				phase = Phase.StartWait;
-				waitSeconds = 0.8f;
-				initialized = true;
-			}
-		}
-	}
-
-	private void Phase_StartWait()
-	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Expected O, but got Unknown
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Expected O, but got Unknown
-		if (0f >= waitSeconds)
-		{
-			phase = Phase.FadeIn;
-			waitSeconds = 1.2f;
-			UITweenCtrl.Reset(tweenCtrl.get_transform(), 0);
-			UITweenCtrl.Play(tweenCtrl.get_transform(), true, null, false, 0);
-		}
-	}
-
-	private void Phase_FadeIn()
-	{
-		bgLineWidth += bgLineWidthStep;
-		if (bgLineWidthMax <= bgLineWidth)
-		{
-			bgLineWidth = bgLineWidthMax;
-		}
-		bgLine.width = (int)bgLineWidth;
-		if (0f >= waitSeconds)
-		{
-			phase = Phase.Display;
-			waitSeconds = 2f;
-		}
-	}
-
-	private void Phase_Display()
-	{
-		if (0f >= waitSeconds)
-		{
-			phase = Phase.FadeOut;
-			waitSeconds = 1f;
-			tweenTop.ResetToBeginning();
-			tweenTop.PlayForward();
-		}
-	}
-
-	private void Phase_FadeOut()
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		if (0f >= waitSeconds)
-		{
-			this.get_gameObject().SetActive(false);
-			phase = Phase.None;
-		}
-	}
-
-	private void Update()
-	{
-		if (initialized)
-		{
-			waitSeconds -= Time.get_deltaTime();
-			switch (phase)
-			{
-			case Phase.None:
-				break;
-			case Phase.StartWait:
-				Phase_StartWait();
-				break;
-			case Phase.FadeIn:
-				Phase_FadeIn();
-				break;
-			case Phase.Display:
-				Phase_Display();
-				break;
-			case Phase.FadeOut:
-				Phase_FadeOut();
-				break;
-			}
-		}
-	}
+  private enum Phase
+  {
+    StartWait,
+    FadeIn,
+    Display,
+    FadeOut,
+    None,
+  }
 }

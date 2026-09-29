@@ -1,18 +1,22 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Network.AchievementCounter
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 
-namespace Network
+#nullable disable
+namespace Network;
+
+[Serializable]
+public class AchievementCounter
 {
-	[Serializable]
-	public class AchievementCounter
-	{
-		public int type;
+  public int type;
+  public int subType;
+  public string count;
 
-		public int subType;
+  public ACHIEVEMENT_TYPE Type => (ACHIEVEMENT_TYPE) this.type;
 
-		public string count;
-
-		public ACHIEVEMENT_TYPE Type => (ACHIEVEMENT_TYPE)type;
-
-		public long Count => long.Parse(count);
-	}
+  public long Count => long.Parse(this.count);
 }

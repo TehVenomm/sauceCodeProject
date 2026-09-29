@@ -1,123 +1,112 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: RegionMapPortal
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 [Serializable]
-public class RegionMapPortal
+public class RegionMapPortal : MonoBehaviour
 {
-	private Transform _transform;
+  private Transform _transform;
+  [SerializeField]
+  private int _entranceId;
+  [SerializeField]
+  private int _exitId;
+  [SerializeField]
+  private RegionMapLocation _from;
+  [SerializeField]
+  private RegionMapLocation _to;
+  [SerializeField]
+  private MeshRenderer road;
+  [SerializeField]
+  private Transform effectRoot;
 
-	[SerializeField]
-	private int _entranceId;
+  public int entranceId => this._entranceId;
 
-	[SerializeField]
-	private int _exitId;
+  public int exitId => this._exitId;
 
-	[SerializeField]
-	private RegionMapLocation _from;
+  public RegionMapLocation fromLocation => this._from;
 
-	[SerializeField]
-	private RegionMapLocation _to;
+  public RegionMapLocation toLocation => this._to;
 
-	[SerializeField]
-	private MeshRenderer road;
+  public bool IsVisited()
+  {
+    return MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledPortal((uint) this.entranceId) || MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledPortal((uint) this.exitId);
+  }
 
-	[SerializeField]
-	private Transform effectRoot;
+  public bool IsShow()
+  {
+    return FieldManager.IsShowPortal((uint) this.entranceId) && FieldManager.IsShowPortal((uint) this.exitId);
+  }
 
-	public int entranceId => _entranceId;
+  public void Init(RegionMapLocation fromLoc, RegionMapLocation toLoc)
+  {
+    this._from = fromLoc;
+    this._to = toLoc;
+    this._transform = ((Component) this).transform;
+    for (int index = 0; index < this._transform.childCount; ++index)
+    {
+      Transform child = this._transform.GetChild(index);
+      if (((Object) ((Component) child).gameObject).name.StartsWith("road"))
+        this.road = ((Component) child).GetComponent<MeshRenderer>();
+      else if (((Object) ((Component) child).gameObject).name.StartsWith("effect"))
+        this.effectRoot = child;
+    }
+  }
 
-	public int exitId => _exitId;
+  public void Open()
+  {
+    ((Renderer) this.road).material.SetTextureOffset("_AlphaTex", new Vector2(-1f, 0.0f));
+  }
 
-	public RegionMapLocation fromLocation => _from;
+  public void Open(
+    Transform effect,
+    Animator animator,
+    bool reverse,
+    float endTime,
+    System.Action onComplete)
+  {
+    effect.parent = this.effectRoot;
+    effect.localPosition = Vector3.zero;
+    this.StartCoroutine(this.DoOpen(effect, animator, reverse, endTime, onComplete));
+  }
 
-	public RegionMapLocation toLocation => _to;
-
-	public RegionMapPortal()
-		: this()
-	{
-	}
-
-	public bool IsVisited()
-	{
-		return MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledPortal((uint)entranceId) || MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledPortal((uint)exitId);
-	}
-
-	public bool IsShow()
-	{
-		return FieldManager.IsShowPortal((uint)entranceId) && FieldManager.IsShowPortal((uint)exitId);
-	}
-
-	public void Init(RegionMapLocation fromLoc, RegionMapLocation toLoc)
-	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Expected O, but got Unknown
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		_from = fromLoc;
-		_to = toLoc;
-		_transform = this.get_transform();
-		for (int i = 0; i < _transform.get_childCount(); i++)
-		{
-			Transform val = _transform.GetChild(i);
-			if (val.get_gameObject().get_name().StartsWith("road"))
-			{
-				road = val.GetComponent<MeshRenderer>();
-			}
-			else if (val.get_gameObject().get_name().StartsWith("effect"))
-			{
-				effectRoot = val;
-			}
-		}
-	}
-
-	public void Open()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		road.get_material().SetTextureOffset("_AlphaTex", new Vector2(-1f, 0f));
-	}
-
-	public void Open(Transform effect, Animator animator, bool reverse, float endTime, Action onComplete)
-	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		effect.set_parent(effectRoot);
-		effect.set_localPosition(Vector3.get_zero());
-		this.StartCoroutine(DoOpen(effect, animator, reverse, endTime, onComplete));
-	}
-
-	private IEnumerator DoOpen(Transform effect, Animator animator, bool reverse, float endTime, Action onComplete)
-	{
-		if (reverse)
-		{
-			road.get_material().SetFloat("_Reverse", 1f);
-		}
-		while (true)
-		{
-			yield return (object)null;
-			AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-			float t = currentAnimatorStateInfo.get_normalizedTime();
-			if (t > endTime)
-			{
-				break;
-			}
-			road.get_material().SetTextureOffset("_AlphaTex", new Vector2(1f - t, 0f));
-		}
-		animator.set_enabled(false);
-		onComplete?.Invoke();
-		float timer = 0f;
-		while (true)
-		{
-			yield return (object)null;
-			timer += Time.get_deltaTime();
-			if (timer > endTime)
-			{
-				break;
-			}
-			road.get_material().SetTextureOffset("_AlphaTex", new Vector2(1f - (timer + endTime), 0f));
-		}
-	}
+  private IEnumerator DoOpen(
+    Transform effect,
+    Animator animator,
+    bool reverse,
+    float endTime,
+    System.Action onComplete)
+  {
+    if (reverse)
+      ((Renderer) this.road).material.SetFloat("_Reverse", 1f);
+    while (true)
+    {
+      yield return (object) null;
+      AnimatorStateInfo animatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+      float normalizedTime = ((AnimatorStateInfo) ref animatorStateInfo).normalizedTime;
+      if ((double) normalizedTime <= (double) endTime)
+        ((Renderer) this.road).material.SetTextureOffset("_AlphaTex", new Vector2(1f - normalizedTime, 0.0f));
+      else
+        break;
+    }
+    ((Behaviour) animator).enabled = false;
+    if (onComplete != null)
+      onComplete();
+    float timer = 0.0f;
+    while (true)
+    {
+      yield return (object) null;
+      timer += Time.deltaTime;
+      if ((double) timer <= (double) endTime)
+        ((Renderer) this.road).material.SetTextureOffset("_AlphaTex", new Vector2((float) (1.0 - ((double) timer + (double) endTime)), 0.0f));
+      else
+        break;
+    }
+  }
 }

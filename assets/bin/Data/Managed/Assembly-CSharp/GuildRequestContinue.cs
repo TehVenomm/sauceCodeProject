@@ -1,41 +1,44 @@
-using Network;
+﻿// Decompiled with JetBrains decompiler
+// Type: GuildRequestContinue
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 
+#nullable disable
 public class GuildRequestContinue : GameSection
 {
-	private enum UI
-	{
-		MESSAGE
-	}
+  public override void UpdateUI()
+  {
+    this.SetLabelText((Enum) GuildRequestContinue.UI.MESSAGE, GameSection.GetEventData() as string);
+    base.UpdateUI();
+  }
 
-	public override void UpdateUI()
-	{
-		string text = GameSection.GetEventData() as string;
-		SetLabelText((Enum)UI.MESSAGE, text);
-		base.UpdateUI();
-	}
+  private void OnQuery_YES()
+  {
+    if (!GameSection.CheckCrystal(MonoBehaviourSingleton<GuildRequestManager>.I.GetSelectedItem().crystalNum))
+      return;
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestExtend((Action<bool>) (questCompleteData =>
+    {
+      GameSection.ResumeEvent(questCompleteData);
+      GameSection.SetEventData((object) questCompleteData);
+    }));
+  }
 
-	private void OnQuery_YES()
-	{
-		GuildRequestItem selectedItem = MonoBehaviourSingleton<GuildRequestManager>.I.GetSelectedItem();
-		if (GameSection.CheckCrystal(selectedItem.crystalNum, 0, true))
-		{
-			GameSection.StayEvent();
-			MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestExtend(delegate(bool questCompleteData)
-			{
-				GameSection.ResumeEvent(true, null);
-				GameSection.SetEventData(questCompleteData);
-			});
-		}
-	}
+  private void OnQuery_NO()
+  {
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestRetire((Action<bool>) (questCompleteData =>
+    {
+      GameSection.ResumeEvent(questCompleteData);
+      GameSection.SetEventData((object) questCompleteData);
+    }));
+  }
 
-	private void OnQuery_NO()
-	{
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestRetire(delegate(bool questCompleteData)
-		{
-			GameSection.ResumeEvent(true, null);
-			GameSection.SetEventData(questCompleteData);
-		});
-	}
+  private enum UI
+  {
+    MESSAGE,
+  }
 }

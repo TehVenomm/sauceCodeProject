@@ -1,224 +1,139 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ParametricPlane
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
-[Serializable]
-[AddComponentMenu("Primitives/Plane")]
+#nullable disable
 [ExecuteInEditMode]
+[AddComponentMenu("Primitives/Plane")]
+[Serializable]
 public class ParametricPlane : ParametricPrimitive
 {
-	public float _height = 1f;
+  public float _height = 1f;
+  public float _width = 1f;
+  protected float height = 1f;
+  protected float width = 1f;
+  protected float demiHeight;
+  protected float demiWidth;
+  protected Vector3 topLeft;
+  protected Vector3 topRight;
+  protected Vector3 bottomLeft;
+  protected Vector3 bottomRight;
 
-	public float _width = 1f;
+  public void CreateMesh()
+  {
+    if (this.subdivisionsHeight == this._subdivisionsHeight && this.subdivisionsWidth == this._subdivisionsWidth && this.align == this._align && this.invert == this._invert && this.invertNormal == this._invertNormal && (double) this.width == (double) this._width && (double) this.height == (double) this._height)
+      return;
+    this.subdivisionsHeight = this._subdivisionsHeight;
+    this.subdivisionsWidth = this._subdivisionsWidth;
+    this.align = this._align;
+    this.invert = this._invert;
+    this.invertNormal = this._invertNormal;
+    this.width = this._width;
+    this.height = this._height;
+    this.ShowMesh();
+  }
 
-	protected float height = 1f;
+  protected void Update() => this.CreateMesh();
 
-	protected float width = 1f;
+  public override void Reset()
+  {
+    base.Reset();
+    this._height = 1f;
+    this._width = 1f;
+  }
 
-	protected float demiHeight;
+  public override void ShowMesh()
+  {
+    if (this.subdivisionsWidth < 1)
+      this.subdivisionsWidth = 1;
+    if (this.subdivisionsHeight < 1)
+      this.subdivisionsHeight = 1;
+    if ((double) this.height < 0.0)
+      this.height = 0.0f;
+    if ((double) this.width < 0.0)
+      this.width = 0.0f;
+    this.demiWidth = this.width / 2f;
+    this.demiHeight = this.height / 2f;
+    switch (this.align)
+    {
+      case ParametricPrimitive.eAlign.alignX:
+        this.topLeft = !this.invert ? new Vector3(0.0f, this.demiHeight, -this.demiWidth) : new Vector3(0.0f, this.demiHeight, this.demiWidth);
+        this.topRight = !this.invert ? new Vector3(0.0f, this.demiHeight, this.demiWidth) : new Vector3(0.0f, this.demiHeight, -this.demiWidth);
+        this.bottomLeft = !this.invert ? new Vector3(0.0f, -this.demiHeight, -this.demiWidth) : new Vector3(0.0f, -this.demiHeight, this.demiWidth);
+        this.bottomRight = !this.invert ? new Vector3(0.0f, -this.demiHeight, this.demiWidth) : new Vector3(0.0f, -this.demiHeight, -this.demiWidth);
+        break;
+      case ParametricPrimitive.eAlign.alignZ:
+        this.topLeft = !this.invert ? new Vector3(this.demiWidth, this.demiHeight, 0.0f) : new Vector3(-this.demiWidth, this.demiHeight, 0.0f);
+        this.topRight = !this.invert ? new Vector3(-this.demiWidth, this.demiHeight, 0.0f) : new Vector3(this.demiWidth, this.demiHeight, 0.0f);
+        this.bottomLeft = !this.invert ? new Vector3(this.demiWidth, -this.demiHeight, 0.0f) : new Vector3(-this.demiWidth, -this.demiHeight, 0.0f);
+        this.bottomRight = !this.invert ? new Vector3(-this.demiWidth, -this.demiHeight, 0.0f) : new Vector3(this.demiWidth, -this.demiHeight, 0.0f);
+        break;
+      default:
+        this.topLeft = !this.invert ? new Vector3(-this.demiWidth, 0.0f, this.demiHeight) : new Vector3(this.demiWidth, 0.0f, this.demiHeight);
+        this.topRight = !this.invert ? new Vector3(this.demiWidth, 0.0f, this.demiHeight) : new Vector3(-this.demiWidth, 0.0f, this.demiHeight);
+        this.bottomLeft = !this.invert ? new Vector3(-this.demiWidth, 0.0f, -this.demiHeight) : new Vector3(this.demiWidth, 0.0f, -this.demiHeight);
+        this.bottomRight = !this.invert ? new Vector3(this.demiWidth, 0.0f, -this.demiHeight) : new Vector3(-this.demiWidth, 0.0f, -this.demiHeight);
+        break;
+    }
+    this.normal = Vector3.Cross(Vector3.Normalize(Vector3.op_Subtraction(this.topLeft, this.bottomLeft)), Vector3.Normalize(Vector3.op_Subtraction(this.bottomRight, this.bottomLeft)));
+    this.normal = Vector3.op_Multiply(this.normal, this.invertNormal ? -1f : 1f);
+    this.newVertices.Clear();
+    this.newTriangles.Clear();
+    this.newUV.Clear();
+    this.newNormals.Clear();
+    this.mesh.Clear();
+    float num1 = this.width / (float) this.subdivisionsWidth;
+    float num2 = this.height / (float) this.subdivisionsHeight;
+    Vector3 vector3_1 = Vector3.Normalize(Vector3.op_Subtraction(this.bottomLeft, this.topLeft));
+    Vector3 vector3_2 = Vector3.Normalize(Vector3.op_Subtraction(this.topRight, this.topLeft));
+    for (int index1 = 0; index1 <= this.subdivisionsHeight; ++index1)
+    {
+      for (int index2 = 0; index2 <= this.subdivisionsWidth; ++index2)
+      {
+        this.newVertices.Add(Vector3.op_Addition(Vector3.op_Addition(this.topLeft, Vector3.op_Multiply((float) index2 * num1, vector3_2)), Vector3.op_Multiply((float) index1 * num2, vector3_1)));
+        this.newUV.Add(new Vector2((float) index2 / (float) this.subdivisionsWidth, (float) (1.0 - (double) index1 / (double) this.subdivisionsHeight)));
+        this.newNormals.Add(this.normal);
+      }
+    }
+    for (int index3 = 0; index3 < this.subdivisionsHeight; ++index3)
+    {
+      for (int index4 = 0; index4 < this.subdivisionsWidth; ++index4)
+      {
+        this.newTriangles.Add(index4 + (index3 + 1) * (this.subdivisionsWidth + 1));
+        if (!this.invertNormal)
+        {
+          this.newTriangles.Add(index4 + index3 * (this.subdivisionsWidth + 1));
+          this.newTriangles.Add(index4 + 1 + index3 * (this.subdivisionsWidth + 1));
+        }
+        else
+        {
+          this.newTriangles.Add(index4 + 1 + index3 * (this.subdivisionsWidth + 1));
+          this.newTriangles.Add(index4 + index3 * (this.subdivisionsWidth + 1));
+        }
+        this.newTriangles.Add(index4 + (index3 + 1) * (this.subdivisionsWidth + 1));
+        if (!this.invertNormal)
+        {
+          this.newTriangles.Add(index4 + 1 + index3 * (this.subdivisionsWidth + 1));
+          this.newTriangles.Add(index4 + 1 + (index3 + 1) * (this.subdivisionsWidth + 1));
+        }
+        else
+        {
+          this.newTriangles.Add(index4 + 1 + (index3 + 1) * (this.subdivisionsWidth + 1));
+          this.newTriangles.Add(index4 + 1 + index3 * (this.subdivisionsWidth + 1));
+        }
+      }
+    }
+    this.mesh.vertices = this.newVertices.ToArray();
+    this.mesh.triangles = this.newTriangles.ToArray();
+    this.mesh.uv = this.newUV.ToArray();
+    this.mesh.normals = this.newNormals.ToArray();
+    this.meshFilter.mesh = this.mesh;
+  }
 
-	protected float demiWidth;
-
-	protected Vector3 topLeft;
-
-	protected Vector3 topRight;
-
-	protected Vector3 bottomLeft;
-
-	protected Vector3 bottomRight;
-
-	public void CreateMesh()
-	{
-		if (subdivisionsHeight != _subdivisionsHeight || subdivisionsWidth != _subdivisionsWidth || align != _align || invert != _invert || invertNormal != _invertNormal || width != _width || height != _height)
-		{
-			subdivisionsHeight = _subdivisionsHeight;
-			subdivisionsWidth = _subdivisionsWidth;
-			align = _align;
-			invert = _invert;
-			invertNormal = _invertNormal;
-			width = _width;
-			height = _height;
-			ShowMesh();
-		}
-	}
-
-	protected void Update()
-	{
-		CreateMesh();
-	}
-
-	public override void Reset()
-	{
-		base.Reset();
-		_height = 1f;
-		_width = 1f;
-	}
-
-	public override void ShowMesh()
-	{
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0215: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0236: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0276: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0303: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0308: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0346: Unknown result type (might be due to invalid IL or missing references)
-		//IL_034b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_036e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_038b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0390: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0402: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0407: Unknown result type (might be due to invalid IL or missing references)
-		//IL_040c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0411: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0418: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0437: Unknown result type (might be due to invalid IL or missing references)
-		//IL_043c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0497: Unknown result type (might be due to invalid IL or missing references)
-		//IL_049d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0527: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0538: Unknown result type (might be due to invalid IL or missing references)
-		if (subdivisionsWidth < 1)
-		{
-			subdivisionsWidth = 1;
-		}
-		if (subdivisionsHeight < 1)
-		{
-			subdivisionsHeight = 1;
-		}
-		if (height < 0f)
-		{
-			height = 0f;
-		}
-		if (width < 0f)
-		{
-			width = 0f;
-		}
-		demiWidth = width / 2f;
-		demiHeight = height / 2f;
-		switch (align)
-		{
-		default:
-			topLeft = (invert ? new Vector3(demiWidth, 0f, demiHeight) : new Vector3(0f - demiWidth, 0f, demiHeight));
-			topRight = (invert ? new Vector3(0f - demiWidth, 0f, demiHeight) : new Vector3(demiWidth, 0f, demiHeight));
-			bottomLeft = (invert ? new Vector3(demiWidth, 0f, 0f - demiHeight) : new Vector3(0f - demiWidth, 0f, 0f - demiHeight));
-			bottomRight = (invert ? new Vector3(0f - demiWidth, 0f, 0f - demiHeight) : new Vector3(demiWidth, 0f, 0f - demiHeight));
-			break;
-		case eAlign.alignX:
-			topLeft = (invert ? new Vector3(0f, demiHeight, demiWidth) : new Vector3(0f, demiHeight, 0f - demiWidth));
-			topRight = (invert ? new Vector3(0f, demiHeight, 0f - demiWidth) : new Vector3(0f, demiHeight, demiWidth));
-			bottomLeft = (invert ? new Vector3(0f, 0f - demiHeight, demiWidth) : new Vector3(0f, 0f - demiHeight, 0f - demiWidth));
-			bottomRight = (invert ? new Vector3(0f, 0f - demiHeight, 0f - demiWidth) : new Vector3(0f, 0f - demiHeight, demiWidth));
-			break;
-		case eAlign.alignZ:
-			topLeft = (invert ? new Vector3(0f - demiWidth, demiHeight, 0f) : new Vector3(demiWidth, demiHeight, 0f));
-			topRight = (invert ? new Vector3(demiWidth, demiHeight, 0f) : new Vector3(0f - demiWidth, demiHeight, 0f));
-			bottomLeft = (invert ? new Vector3(0f - demiWidth, 0f - demiHeight, 0f) : new Vector3(demiWidth, 0f - demiHeight, 0f));
-			bottomRight = (invert ? new Vector3(demiWidth, 0f - demiHeight, 0f) : new Vector3(0f - demiWidth, 0f - demiHeight, 0f));
-			break;
-		}
-		normal = Vector3.Cross(Vector3.Normalize(topLeft - bottomLeft), Vector3.Normalize(bottomRight - bottomLeft));
-		normal *= ((!invertNormal) ? 1f : (-1f));
-		newVertices.Clear();
-		newTriangles.Clear();
-		newUV.Clear();
-		newNormals.Clear();
-		mesh.Clear();
-		float num = width / (float)subdivisionsWidth;
-		float num2 = height / (float)subdivisionsHeight;
-		Vector3 val = Vector3.Normalize(bottomLeft - topLeft);
-		Vector3 val2 = Vector3.Normalize(topRight - topLeft);
-		for (int i = 0; i <= subdivisionsHeight; i++)
-		{
-			for (int j = 0; j <= subdivisionsWidth; j++)
-			{
-				newVertices.Add(topLeft + (float)j * num * val2 + (float)i * num2 * val);
-				newUV.Add(new Vector2((float)j / (float)subdivisionsWidth, 1f - (float)i / (float)subdivisionsHeight));
-				newNormals.Add(normal);
-			}
-		}
-		for (int k = 0; k < subdivisionsHeight; k++)
-		{
-			for (int l = 0; l < subdivisionsWidth; l++)
-			{
-				newTriangles.Add(l + (k + 1) * (subdivisionsWidth + 1));
-				if (!invertNormal)
-				{
-					newTriangles.Add(l + k * (subdivisionsWidth + 1));
-					newTriangles.Add(l + 1 + k * (subdivisionsWidth + 1));
-				}
-				else
-				{
-					newTriangles.Add(l + 1 + k * (subdivisionsWidth + 1));
-					newTriangles.Add(l + k * (subdivisionsWidth + 1));
-				}
-				newTriangles.Add(l + (k + 1) * (subdivisionsWidth + 1));
-				if (!invertNormal)
-				{
-					newTriangles.Add(l + 1 + k * (subdivisionsWidth + 1));
-					newTriangles.Add(l + 1 + (k + 1) * (subdivisionsWidth + 1));
-				}
-				else
-				{
-					newTriangles.Add(l + 1 + (k + 1) * (subdivisionsWidth + 1));
-					newTriangles.Add(l + 1 + k * (subdivisionsWidth + 1));
-				}
-			}
-		}
-		mesh.set_vertices(newVertices.ToArray());
-		mesh.set_triangles(newTriangles.ToArray());
-		mesh.set_uv(newUV.ToArray());
-		mesh.set_normals(newNormals.ToArray());
-		meshFilter.set_mesh(mesh);
-	}
-
-	protected override string getName()
-	{
-		return "ParametricPlane";
-	}
+  protected override string getName() => nameof (ParametricPlane);
 }

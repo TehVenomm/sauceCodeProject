@@ -1,79 +1,61 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Goal_GoToTarget
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class Goal_GoToTarget : GoalComposite
 {
-	private const float FAULT_LENGTH = 3f;
+  private const float FAULT_LENGTH = 3f;
+  private Vector3 targetPos = Vector3.zero;
 
-	private Vector3 targetPos = Vector3.get_zero();
+  protected override GOAL_TYPE GetGoalType() => GOAL_TYPE.GO_TO_TARGET;
 
-	protected override GOAL_TYPE GetGoalType()
-	{
-		return GOAL_TYPE.GO_TO_TARGET;
-	}
+  protected override void Activate(Brain brain)
+  {
+    this.SetStatus(Goal.STATUS.ACTIVE);
+    if (!brain.targetCtrl.IsAliveTarget())
+    {
+      this.SetStatus(Goal.STATUS.COMPLETED);
+    }
+    else
+    {
+      this.targetPos = brain.targetCtrl.GetAttackPosition();
+      float num = 3f;
+      if (!brain.moveCtrl.CanSeekToOpponent(this.targetPos, num))
+      {
+        PLACE place = Utility.Coin() ? PLACE.RIGHT : PLACE.LEFT;
+        RaycastHit seekHit = brain.moveCtrl.seekHit;
+        Vector3 position = ((RaycastHit) ref seekHit).transform.position;
+        this.AddSubGoal<Goal_MoveToAround>().SetParam(place, position, num);
+      }
+      else if (!brain.targetCtrl.IsArrivalAttackPosition())
+        this.AddSubGoal<Goal_MoveToPosition>().SetParam(this.targetPos, num);
+      else
+        this.SetStatus(Goal.STATUS.COMPLETED);
+    }
+  }
 
-	protected override void Activate(Brain brain)
-	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		SetStatus(STATUS.ACTIVE);
-		if (!brain.targetCtrl.IsAliveTarget())
-		{
-			SetStatus(STATUS.COMPLETED);
-		}
-		else
-		{
-			targetPos = brain.targetCtrl.GetAttackPosition();
-			float num = 3f;
-			if (!brain.moveCtrl.CanSeekToOpponent(targetPos, num))
-			{
-				PLACE place = Utility.Coin() ? PLACE.RIGHT : PLACE.LEFT;
-				RaycastHit seekHit = brain.moveCtrl.seekHit;
-				Vector3 position = seekHit.get_transform().get_position();
-				AddSubGoal<Goal_MoveToAround>().SetParam(place, position, num);
-			}
-			else if (!brain.targetCtrl.IsArrivalAttackPosition())
-			{
-				AddSubGoal<Goal_MoveToPosition>().SetParam(targetPos, num);
-			}
-			else
-			{
-				SetStatus(STATUS.COMPLETED);
-			}
-		}
-	}
+  protected override Goal.STATUS Process(Brain brain)
+  {
+    this.SetStatus(this.UpdateSubGoals(brain));
+    if (!brain.targetCtrl.IsAliveTarget())
+      this.SetStatus(Goal.STATUS.COMPLETED);
+    if ((double) brain.targetCtrl.GetLengthWithAttackPos(this.targetPos) > 3.0)
+      this.SetStatus(Goal.STATUS.FAILED);
+    return this.status;
+  }
 
-	protected override STATUS Process(Brain brain)
-	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		STATUS status = UpdateSubGoals(brain);
-		SetStatus(status);
-		if (!brain.targetCtrl.IsAliveTarget())
-		{
-			SetStatus(STATUS.COMPLETED);
-		}
-		if (brain.targetCtrl.GetLengthWithAttackPos(targetPos) > 3f)
-		{
-			SetStatus(STATUS.FAILED);
-		}
-		return base.status;
-	}
+  protected override void Terminate(Brain brain)
+  {
+  }
 
-	protected override void Terminate(Brain brain)
-	{
-	}
-
-	public override string ToStringGoal()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		string str = $" target={targetPos}";
-		return base.ToStringGoal() + str;
-	}
+  public override string ToStringGoal()
+  {
+    string str = $" target={this.targetPos}";
+    return base.ToStringGoal() + str;
+  }
 }

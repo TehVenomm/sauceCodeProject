@@ -1,92 +1,79 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIButtonRepeater
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-[RequireComponent(typeof(UIGameSceneEventSender))]
+#nullable disable
+[RequireComponent(typeof (UIGameSceneEventSender))]
 public class UIButtonRepeater : UILongTouch
 {
-	private const float FAST_MODE_PUSH_TIME = -1f;
+  public float firstInterval = 0.15f;
+  public float interval = 0.05f;
+  public float shortInterval = 0.025f;
+  private const float FAST_MODE_PUSH_TIME = -1f;
+  private float pushTime;
+  private float repeatTime;
+  private bool isFirstWait = true;
+  private bool terminateRepeat;
 
-	public float firstInterval = 0.15f;
+  public static void SetRepeatButton(GameObject button, string event_name, object event_data = null)
+  {
+    if (Object.op_Equality((Object) button.GetComponent<UIButton>(), (Object) null))
+      return;
+    UIButtonRepeater uiButtonRepeater = button.GetComponent<UIButtonRepeater>();
+    if (Object.op_Equality((Object) uiButtonRepeater, (Object) null))
+      uiButtonRepeater = button.AddComponent<UIButtonRepeater>();
+    uiButtonRepeater.eventName = event_name;
+    uiButtonRepeater.eventData = event_data;
+  }
 
-	public float interval = 0.05f;
+  public void Terminate() => this.terminateRepeat = true;
 
-	public float shortInterval = 0.025f;
+  protected override void _SendEvent()
+  {
+    if (!this.CheckSendTime())
+      return;
+    UIGameSceneEventSender.SendEvent(nameof (UIButtonRepeater), ((Component) this).gameObject, this.eventName, this.eventData);
+  }
 
-	private float pushTime;
+  protected override void OnPress(bool isPressed)
+  {
+    this.repeatTime = 0.0f;
+    this.pushTime = 0.0f;
+    this.isFirstWait = true;
+    this.terminateRepeat = false;
+    base.OnPress(isPressed);
+  }
 
-	private float repeatTime;
+  private bool CheckSendTime()
+  {
+    if (this.terminateRepeat)
+    {
+      this.time = 0.0f;
+      return false;
+    }
+    this.time = 1f / 1000f;
+    this.repeatTime -= Time.deltaTime;
+    if ((double) this.repeatTime > 0.0)
+      return false;
+    this.repeatTime = this.GetIntervalTime();
+    return true;
+  }
 
-	private bool isFirstWait = true;
-
-	private bool terminateRepeat;
-
-	public static void SetRepeatButton(GameObject button, string event_name, object event_data = null)
-	{
-		if (!(button.GetComponent<UIButton>() == null))
-		{
-			UIButtonRepeater uIButtonRepeater = button.GetComponent<UIButtonRepeater>();
-			if (uIButtonRepeater == null)
-			{
-				uIButtonRepeater = button.AddComponent<UIButtonRepeater>();
-			}
-			uIButtonRepeater.eventName = event_name;
-			uIButtonRepeater.eventData = event_data;
-		}
-	}
-
-	public void Terminate()
-	{
-		terminateRepeat = true;
-	}
-
-	protected override void _SendEvent()
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
-		if (CheckSendTime())
-		{
-			UIGameSceneEventSender.SendEvent("UIButtonRepeater", this.get_gameObject(), eventName, eventData, null);
-		}
-	}
-
-	protected override void OnPress(bool isPressed)
-	{
-		repeatTime = 0f;
-		pushTime = 0f;
-		isFirstWait = true;
-		terminateRepeat = false;
-		base.OnPress(isPressed);
-	}
-
-	private bool CheckSendTime()
-	{
-		if (terminateRepeat)
-		{
-			time = 0f;
-			return false;
-		}
-		time = 0.001f;
-		repeatTime -= Time.get_deltaTime();
-		if (repeatTime > 0f)
-		{
-			return false;
-		}
-		repeatTime = GetIntervalTime();
-		return true;
-	}
-
-	private float GetIntervalTime()
-	{
-		pushTime -= Time.get_deltaTime();
-		float result;
-		if (isFirstWait)
-		{
-			result = firstInterval;
-			isFirstWait = false;
-		}
-		else
-		{
-			result = ((!(pushTime < -1f)) ? interval : shortInterval);
-		}
-		return result;
-	}
+  private float GetIntervalTime()
+  {
+    this.pushTime -= Time.deltaTime;
+    float intervalTime;
+    if (this.isFirstWait)
+    {
+      intervalTime = this.firstInterval;
+      this.isFirstWait = false;
+    }
+    else
+      intervalTime = (double) this.pushTime < -1.0 ? this.shortInterval : this.interval;
+    return intervalTime;
+  }
 }

@@ -1,18 +1,17 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: eel.EeL_gacha_quest_npc
+// Assembly: Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: BB1BE8DD-31E2-441F-A619-55A0A9A5488F
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp-firstpass.dll
+
+using rhyme;
 using UnityEngine;
 
-namespace eel
-{
-	[AddComponentMenu("EeL/EeL_gacha_quest_npc")]
-	public class EeL_gacha_quest_npc
-	{
-		public EeL_gacha_quest_npc()
-			: this()
-		{
-		}
+#nullable disable
+namespace eel;
 
-		public override string GetName()
-		{
-			return "EeL_gacha_quest_npc";
-		}
-	}
+[AddComponentMenu("EeL/EeL_gacha_quest_npc")]
+public class EeL_gacha_quest_npc : rymFXBinary
+{
+  public override string GetName() => nameof (EeL_gacha_quest_npc);
 }

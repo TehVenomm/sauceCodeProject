@@ -1,46 +1,32 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIColliderWideLock
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class UIColliderWideLock
+#nullable disable
+public class UIColliderWideLock : MonoBehaviour
 {
-	private BoxCollider attach_collider;
+  private BoxCollider attach_collider;
+  private float sizex;
 
-	private float sizex;
+  private void Awake()
+  {
+    this.attach_collider = ((Component) this).GetComponent<BoxCollider>();
+    if (Object.op_Inequality((Object) this.attach_collider, (Object) null))
+      this.sizex = this.attach_collider.size.x;
+    else
+      Object.Destroy((Object) this);
+  }
 
-	public UIColliderWideLock()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		attach_collider = this.GetComponent<BoxCollider>();
-		if (attach_collider != null)
-		{
-			Vector3 size = attach_collider.get_size();
-			sizex = size.x;
-		}
-		else
-		{
-			Object.Destroy(this);
-		}
-	}
-
-	private void LateUpdate()
-	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		float num = sizex;
-		Vector3 size = attach_collider.get_size();
-		if (num != size.x)
-		{
-			Vector3 size2 = attach_collider.get_size();
-			size2.x = sizex;
-			attach_collider.set_size(size2);
-		}
-	}
+  private void LateUpdate()
+  {
+    if ((double) this.sizex == (double) this.attach_collider.size.x)
+      return;
+    Vector3 size = this.attach_collider.size;
+    size.x = this.sizex;
+    this.attach_collider.size = size;
+  }
 }

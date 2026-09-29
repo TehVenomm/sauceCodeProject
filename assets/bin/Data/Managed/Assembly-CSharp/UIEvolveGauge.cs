@@ -1,99 +1,68 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIEvolveGauge
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class UIEvolveGauge
+#nullable disable
+public class UIEvolveGauge : MonoBehaviour
 {
-	public GameObject longTouchTarget;
+  public GameObject longTouchTarget;
+  public UISprite gauge;
+  public GameObject maxEffect;
+  public UISprite weaponIcon;
+  public UITexture evolveIcon;
+  private Transform effectTrans;
+  private Vector3 effectPos = new Vector3(-3f, -26f, 0.0f);
+  private Vector3 effectScale = new Vector3(0.85f, 0.85f, 0.0f);
 
-	public UISprite gauge;
+  protected void Awake()
+  {
+    UILongTouch.Set(this.longTouchTarget, "EVOLVE");
+    UITouchAndRelease.Set(this.longTouchTarget, "EVOLVE_TOUCH");
+    this.effectTrans = EffectManager.GetUIEffect("ef_ui_skillgauge_blue_01", ((Component) this.gauge).transform.parent, 0.0f, 1, (UIWidget) this.gauge);
+    if (this.effectTrans == null)
+      return;
+    ((Component) this.effectTrans).gameObject.SetActive(false);
+  }
 
-	public GameObject maxEffect;
+  private void OnDestroy() => EffectManager.ReleaseEffect(ref this.effectTrans);
 
-	public UISprite weaponIcon;
+  public void SetRate(float rate)
+  {
+    if ((double) rate <= 0.0)
+      rate = 0.0f;
+    if ((double) rate >= 1.0)
+      rate = 1f;
+    this.gauge.fillAmount = rate;
+    this.maxEffect.SetActive((double) rate >= 1.0);
+    this._CalcGaugeEffect(rate);
+  }
 
-	public UITexture evolveIcon;
+  public void SetEvolveIcon(uint evolveId)
+  {
+    ResourceLoad.LoadEvolveIconTexture(this.evolveIcon, evolveId);
+  }
 
-	private Transform effectTrans;
+  public void EnableEvolveIcon(bool isEnable)
+  {
+    ((Behaviour) this.weaponIcon).enabled = !isEnable;
+    ((Component) this.evolveIcon).gameObject.SetActive(isEnable);
+  }
 
-	private Vector3 effectPos = new Vector3(-3f, -26f, 0f);
-
-	private Vector3 effectScale = new Vector3(0.85f, 0.85f, 0f);
-
-	public UIEvolveGauge()
-		: this()
-	{
-	}//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-	//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-	//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-
-
-	protected void Awake()
-	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Expected O, but got Unknown
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		UILongTouch.Set(longTouchTarget, "EVOLVE", null);
-		UITouchAndRelease.Set(longTouchTarget, "EVOLVE_TOUCH", null, null);
-		effectTrans = EffectManager.GetUIEffect("ef_ui_skillgauge_blue_01", gauge.get_transform().get_parent(), 0f, 1, gauge);
-		if (!object.ReferenceEquals(effectTrans, null))
-		{
-			effectTrans.get_gameObject().SetActive(false);
-		}
-	}
-
-	private void OnDestroy()
-	{
-		EffectManager.ReleaseEffect(ref effectTrans);
-	}
-
-	public void SetRate(float rate)
-	{
-		if (rate <= 0f)
-		{
-			rate = 0f;
-		}
-		if (rate >= 1f)
-		{
-			rate = 1f;
-		}
-		gauge.fillAmount = rate;
-		maxEffect.SetActive(rate >= 1f);
-		_CalcGaugeEffect(rate);
-	}
-
-	public void SetEvolveIcon(uint evolveId)
-	{
-		ResourceLoad.LoadEvolveIconTexture(evolveIcon, evolveId);
-	}
-
-	public void EnableEvolveIcon(bool isEnable)
-	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		weaponIcon.set_enabled(!isEnable);
-		evolveIcon.get_gameObject().SetActive(isEnable);
-	}
-
-	private void _CalcGaugeEffect(float rate)
-	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		if (!object.ReferenceEquals(effectTrans, null))
-		{
-			float num = -28f + 60f * rate;
-			effectTrans.set_localPosition(new Vector3(-4f, num, 0f));
-			float num2 = 0.85f * Mathf.Sin(rate * 3.14159274f) + 0.2f;
-			if (num2 >= 0.8f)
-			{
-				num2 = 0.8f;
-			}
-			if (num2 <= 0f)
-			{
-				num2 = 0f;
-			}
-			effectTrans.set_localScale(new Vector3(num2, num2, 1f));
-			effectTrans.get_gameObject().SetActive(rate > 0f && rate < 1f);
-		}
-	}
+  private void _CalcGaugeEffect(float rate)
+  {
+    if (this.effectTrans == null)
+      return;
+    this.effectTrans.localPosition = new Vector3(-4f, (float) (60.0 * (double) rate - 28.0), 0.0f);
+    float num = (float) (0.85000002384185791 * (double) Mathf.Sin(rate * 3.14159274f) + 0.20000000298023224);
+    if ((double) num >= 0.800000011920929)
+      num = 0.8f;
+    if ((double) num <= 0.0)
+      num = 0.0f;
+    this.effectTrans.localScale = new Vector3(num, num, 1f);
+    ((Component) this.effectTrans).gameObject.SetActive((double) rate > 0.0 && (double) rate < 1.0);
+  }
 }

@@ -1,268 +1,207 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIPlayerDamageNum
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIPlayerDamageNum
+#nullable disable
+public class UIPlayerDamageNum : MonoBehaviour
 {
-	[Serializable]
-	public class LabelColor
-	{
-		public Color main;
+  [SerializeField]
+  protected UILabel damadeNum;
+  [SerializeField]
+  protected TweenPosition animPos;
+  [SerializeField]
+  protected TweenAlpha animAlpha;
+  [SerializeField]
+  protected TweenScale animScale;
+  [Tooltip("表示高さオフセット")]
+  public Vector3 offset = Vector3.zero;
+  [Tooltip("ダメージカラー")]
+  public UIPlayerDamageNum.LabelColor damageColor;
+  [Tooltip("回復カラー")]
+  public UIPlayerDamageNum.LabelColor healColor;
+  [Tooltip("属性カラー")]
+  public List<UIPlayerDamageNum.LabelColor> elementColor;
+  public UIPlayerDamageNum.LabelColor defaultColor;
+  protected Character chara;
+  protected int higthOffset;
+  private bool isPlaying;
+  private bool isAutoDelete;
+  public bool enable;
 
-		public Color effect;
-	}
+  public void EnableAutoDelete() => this.isAutoDelete = true;
 
-	public enum DAMAGE_COLOR
-	{
-		DAMAGE,
-		HEAL
-	}
+  private void OnDisable() => this.OnFinishAnimation();
 
-	[SerializeField]
-	protected UILabel damadeNum;
+  public bool Initialize(Character _chara, AttackedHitStatus status, bool isAutoPlay = true)
+  {
+    return this.Initialize(_chara, status.damage + status.shieldDamage, UIPlayerDamageNum.DAMAGE_COLOR.DAMAGE, status.damageDetails.GetElementType(), isAutoPlay);
+  }
 
-	[SerializeField]
-	protected TweenPosition animPos;
+  public bool Initialize(
+    Character _chara,
+    int damage,
+    UIPlayerDamageNum.DAMAGE_COLOR color,
+    bool isAutoPlay = true)
+  {
+    return this.Initialize(_chara, damage, color, ELEMENT_TYPE.MAX, isAutoPlay);
+  }
 
-	[SerializeField]
-	protected TweenAlpha animAlpha;
+  public bool Initialize(
+    Character _chara,
+    int damage,
+    UIPlayerDamageNum.DAMAGE_COLOR color,
+    ELEMENT_TYPE element,
+    bool isAutoPlay = true)
+  {
+    this.chara = _chara;
+    this.higthOffset = this.damadeNum.height;
+    if (!this.SetPosFromWorld(Vector3.op_Addition(this.chara._position, this.offset), true))
+      return false;
+    this.enable = true;
+    this.damadeNum.text = damage.ToString();
+    switch (color)
+    {
+      case UIPlayerDamageNum.DAMAGE_COLOR.DAMAGE:
+        if (damage == 0)
+        {
+          this.damadeNum.color = this.defaultColor.main;
+          this.damadeNum.effectColor = this.defaultColor.effect;
+          break;
+        }
+        if (this.elementColor.Count >= 0 && (ELEMENT_TYPE) this.elementColor.Count > element)
+        {
+          this.damadeNum.color = this.elementColor[(int) element].main;
+          this.damadeNum.effectColor = this.elementColor[(int) element].effect;
+          break;
+        }
+        this.damadeNum.color = this.elementColor[6].main;
+        this.damadeNum.effectColor = this.elementColor[6].effect;
+        break;
+      case UIPlayerDamageNum.DAMAGE_COLOR.HEAL:
+        this.damadeNum.color = this.healColor.main;
+        this.damadeNum.effectColor = this.healColor.effect;
+        break;
+    }
+    if (Object.op_Inequality((Object) this.animPos, (Object) null))
+    {
+      this.animPos.ResetToBeginning();
+      ((Behaviour) this.animPos).enabled = false;
+    }
+    if (Object.op_Inequality((Object) this.animAlpha, (Object) null))
+    {
+      this.animAlpha.ResetToBeginning();
+      ((Behaviour) this.animAlpha).enabled = false;
+    }
+    if (Object.op_Inequality((Object) this.animScale, (Object) null))
+    {
+      this.animScale.ResetToBeginning();
+      ((Behaviour) this.animScale).enabled = false;
+    }
+    ((Component) this).transform.localScale = Vector3.zero;
+    if (isAutoPlay)
+      this.Play();
+    return true;
+  }
 
-	[SerializeField]
-	protected TweenScale animScale;
+  private IEnumerator DirectionNumber()
+  {
+    if (Object.op_Inequality((Object) this.animPos, (Object) null))
+      this.animPos.PlayForward();
+    if (Object.op_Inequality((Object) this.animAlpha, (Object) null))
+      this.animAlpha.PlayForward();
+    if (Object.op_Inequality((Object) this.animScale, (Object) null))
+      this.animScale.PlayForward();
+    if (Object.op_Inequality((Object) this.animPos, (Object) null))
+    {
+      while (((Behaviour) this.animPos).enabled)
+        yield return (object) null;
+    }
+    if (Object.op_Inequality((Object) this.animAlpha, (Object) null))
+    {
+      while (((Behaviour) this.animAlpha).enabled)
+        yield return (object) null;
+    }
+    if (Object.op_Inequality((Object) this.animScale, (Object) null))
+    {
+      while (((Behaviour) this.animScale).enabled)
+        yield return (object) null;
+    }
+    this.OnFinishAnimation();
+  }
 
-	[Tooltip("表示高さオフセット")]
-	public Vector3 offset = Vector3.get_zero();
+  private void LateUpdate()
+  {
+    if (!this.isPlaying || !this.enable || Object.op_Equality((Object) this.chara, (Object) null) || this.SetPosFromWorld(Vector3.op_Addition(this.chara._transform.position, this.offset), false))
+      return;
+    this.OnFinishAnimation();
+  }
 
-	[Tooltip("ダメ\u30fcジカラ\u30fc")]
-	public LabelColor damageColor;
+  private void OnFinishAnimation()
+  {
+    this.enable = false;
+    this.damadeNum.alpha = 0.0f;
+    this.chara = (Character) null;
+    this.isPlaying = false;
+    if (!this.isAutoDelete)
+      return;
+    Object.Destroy((Object) ((Component) this).gameObject);
+    this.isAutoDelete = false;
+  }
 
-	[Tooltip("回復カラ\u30fc")]
-	public LabelColor healColor;
+  private bool SetPosFromWorld(Vector3 world_pos, bool bUpdatePosY)
+  {
+    if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+      return false;
+    Vector3 screenPoint = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(world_pos);
+    screenPoint.y += (float) this.higthOffset;
+    if ((double) screenPoint.z < 0.0)
+      return false;
+    screenPoint.z = 0.0f;
+    Vector3 worldPoint = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenPoint);
+    if (!bUpdatePosY)
+      worldPoint.y = ((Component) this).gameObject.transform.position.y;
+    ((Component) this).gameObject.transform.position = worldPoint;
+    return true;
+  }
 
-	[Tooltip("属性カラ\u30fc")]
-	public List<LabelColor> elementColor;
+  public void Play()
+  {
+    this.isPlaying = true;
+    if (Object.op_Inequality((Object) this.animPos, (Object) null))
+      ((Behaviour) this.animPos).enabled = true;
+    if (Object.op_Inequality((Object) this.animAlpha, (Object) null))
+      ((Behaviour) this.animAlpha).enabled = true;
+    if (Object.op_Inequality((Object) this.animScale, (Object) null))
+      ((Behaviour) this.animScale).enabled = true;
+    ((Component) this).transform.localScale = Vector3.one;
+    this.StartCoroutine(this.DirectionNumber());
+  }
 
-	protected Character chara;
+  public float AlphaRate
+  {
+    get
+    {
+      return !Object.op_Inequality((Object) this.damadeNum, (Object) null) ? 0.0f : this.damadeNum.alpha;
+    }
+  }
 
-	protected int higthOffset;
+  [Serializable]
+  public class LabelColor
+  {
+    public Color main;
+    public Color effect;
+  }
 
-	private bool isPlaying;
-
-	private bool isAutoDelete;
-
-	public bool enable;
-
-	public float AlphaRate => (!(damadeNum != null)) ? 0f : damadeNum.alpha;
-
-	public UIPlayerDamageNum()
-		: this()
-	{
-	}//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-
-
-	public void EnableAutoDelete()
-	{
-		isAutoDelete = true;
-	}
-
-	private void OnDisable()
-	{
-		OnFinishAnimation();
-	}
-
-	public bool Initialize(Character _chara, AttackedHitStatus status, bool isAutoPlay = true)
-	{
-		return Initialize(_chara, status.damage + status.shieldDamage, DAMAGE_COLOR.DAMAGE, status.damageDetails.GetElementType(), isAutoPlay);
-	}
-
-	public bool Initialize(Character _chara, int damage, DAMAGE_COLOR color, bool isAutoPlay = true)
-	{
-		return Initialize(_chara, damage, color, ELEMENT_TYPE.MAX, isAutoPlay);
-	}
-
-	public bool Initialize(Character _chara, int damage, DAMAGE_COLOR color, ELEMENT_TYPE element, bool isAutoPlay = true)
-	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-		chara = _chara;
-		higthOffset = damadeNum.height;
-		if (!SetPosFromWorld(chara._position + offset, true))
-		{
-			return false;
-		}
-		enable = true;
-		damadeNum.text = damage.ToString();
-		switch (color)
-		{
-		case DAMAGE_COLOR.DAMAGE:
-			if (elementColor.Count >= 0 && elementColor.Count > (int)element)
-			{
-				damadeNum.color = elementColor[(int)element].main;
-				damadeNum.effectColor = elementColor[(int)element].effect;
-			}
-			else
-			{
-				damadeNum.color = elementColor[6].main;
-				damadeNum.effectColor = elementColor[6].effect;
-			}
-			break;
-		case DAMAGE_COLOR.HEAL:
-			damadeNum.color = healColor.main;
-			damadeNum.effectColor = healColor.effect;
-			break;
-		}
-		if (animPos != null)
-		{
-			animPos.ResetToBeginning();
-			animPos.set_enabled(false);
-		}
-		if (animAlpha != null)
-		{
-			animAlpha.ResetToBeginning();
-			animAlpha.set_enabled(false);
-		}
-		if (animScale != null)
-		{
-			animScale.ResetToBeginning();
-			animScale.set_enabled(false);
-		}
-		this.get_transform().set_localScale(Vector3.get_zero());
-		if (isAutoPlay)
-		{
-			Play();
-		}
-		return true;
-	}
-
-	private IEnumerator DirectionNumber()
-	{
-		if (animPos != null)
-		{
-			animPos.PlayForward();
-		}
-		if (animAlpha != null)
-		{
-			animAlpha.PlayForward();
-		}
-		if (animScale != null)
-		{
-			animScale.PlayForward();
-		}
-		if (animPos != null)
-		{
-			while (animPos.get_enabled())
-			{
-				yield return (object)null;
-			}
-		}
-		if (animAlpha != null)
-		{
-			while (animAlpha.get_enabled())
-			{
-				yield return (object)null;
-			}
-		}
-		if (animScale != null)
-		{
-			while (animScale.get_enabled())
-			{
-				yield return (object)null;
-			}
-		}
-		OnFinishAnimation();
-	}
-
-	private void LateUpdate()
-	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		if (isPlaying && enable && !(chara == null) && !SetPosFromWorld(chara._transform.get_position() + offset, false))
-		{
-			OnFinishAnimation();
-		}
-	}
-
-	private void OnFinishAnimation()
-	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		enable = false;
-		damadeNum.alpha = 0f;
-		chara = null;
-		isPlaying = false;
-		if (isAutoDelete)
-		{
-			Object.Destroy(this.get_gameObject());
-			isAutoDelete = false;
-		}
-	}
-
-	private bool SetPosFromWorld(Vector3 world_pos, bool bUpdatePosY)
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid())
-		{
-			return false;
-		}
-		Vector3 val = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(world_pos);
-		val.y += (float)higthOffset;
-		if (val.z < 0f)
-		{
-			return false;
-		}
-		val.z = 0f;
-		Vector3 position = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(val);
-		if (!bUpdatePosY)
-		{
-			Vector3 position2 = this.get_gameObject().get_transform().get_position();
-			position.y = position2.y;
-		}
-		this.get_gameObject().get_transform().set_position(position);
-		return true;
-	}
-
-	public void Play()
-	{
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		isPlaying = true;
-		if (animPos != null)
-		{
-			animPos.set_enabled(true);
-		}
-		if (animAlpha != null)
-		{
-			animAlpha.set_enabled(true);
-		}
-		if (animScale != null)
-		{
-			animScale.set_enabled(true);
-		}
-		this.get_transform().set_localScale(Vector3.get_one());
-		this.StartCoroutine(DirectionNumber());
-	}
+  public enum DAMAGE_COLOR
+  {
+    DAMAGE,
+    HEAL,
+  }
 }

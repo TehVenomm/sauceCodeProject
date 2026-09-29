@@ -1,404 +1,286 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: StoryCharacter
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
-public class StoryCharacter
+#nullable disable
+public class StoryCharacter : MonoBehaviour
 {
-	public enum EaseDir
-	{
-		LEFT,
-		RIGHT
-	}
+  private UIRenderTexture renderTex;
+  private NPCLoader npcLoader;
+  private Vector3 basePos;
+  private Vector3 baseRot;
+  private Vector3Interpolator animPos = new Vector3Interpolator();
+  private QuaternionInterpolator animRot = new QuaternionInterpolator();
+  private Transform lookTransform;
+  private PLCA idleAnim;
+  private UITweenCtrl[] tweenAnimations;
+  private PlayerAnimCtrl playerAnimCtrl;
 
-	private UIRenderTexture renderTex;
+  public bool isLoading { get; private set; }
 
-	private NPCLoader npcLoader;
+  public bool isMoving => this.animPos.IsPlaying() || this.animRot.IsPlaying();
 
-	private Vector3 basePos;
+  public int id { get; private set; }
 
-	private Vector3 baseRot;
+  public string charaName { get; private set; }
 
-	private Vector3Interpolator animPos = new Vector3Interpolator();
+  public string displayName
+  {
+    get => !string.IsNullOrEmpty(this.aliasName) ? this.aliasName : this.charaName;
+  }
 
-	private QuaternionInterpolator animRot = new QuaternionInterpolator();
+  public string aliasName { get; private set; }
 
-	private Transform lookTransform;
+  public StoryDirector.POS dir { get; private set; }
 
-	private PLCA idleAnim;
+  public UITexture uiTex { get; private set; }
 
-	private UITweenCtrl[] tweenAnimations;
+  public Transform model { get; private set; }
 
-	private PlayerAnimCtrl playerAnimCtrl;
+  public static StoryCharacter Initialize(
+    int id,
+    UITexture ui_tex,
+    string _name,
+    string _dir,
+    string idle_anim,
+    int layer = -1)
+  {
+    NPCTable.NPCData npcData = Singleton<NPCTable>.I.GetNPCData(_name);
+    if (npcData == null)
+      return (StoryCharacter) null;
+    UIRenderTexture uiRenderTexture = UIRenderTexture.Get(ui_tex, link_main_camera: true, layer: layer);
+    uiRenderTexture.Disable();
+    uiRenderTexture.nearClipPlane = 1f;
+    uiRenderTexture.farClipPlane = 100f;
+    Transform gameObject = Utility.CreateGameObject("StoryModel", uiRenderTexture.modelTransform, uiRenderTexture.renderLayer);
+    StoryCharacter storyCharacter = ((Component) gameObject).gameObject.AddComponent<StoryCharacter>();
+    storyCharacter.model = gameObject;
+    storyCharacter.id = id;
+    storyCharacter.renderTex = uiRenderTexture;
+    storyCharacter.uiTex = ui_tex;
+    storyCharacter.charaName = _name;
+    storyCharacter.aliasName = string.Empty;
+    storyCharacter.SetStandPosition(_dir);
+    storyCharacter.idleAnim = !string.IsNullOrEmpty(idle_anim) ? PlayerAnimCtrl.StringToEnum(idle_anim) : PlayerAnimCtrl.StringToEnum(npcData.anim);
+    storyCharacter.isLoading = true;
+    ModelLoaderBase modelLoaderBase = npcData.LoadModel(((Component) gameObject).gameObject, false, false, new Action<Animator>(storyCharacter.OnModelLoadComplete), false);
+    storyCharacter.npcLoader = modelLoaderBase as NPCLoader;
+    storyCharacter.CollectTween(((Component) ui_tex).transform);
+    return storyCharacter;
+  }
 
-	public bool isLoading
-	{
-		get;
-		private set;
-	}
+  public void SetStandPosition(string _dir, bool doesSetImmidiate = false)
+  {
+    this.basePos = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
+    this.baseRot = new Vector3(0.0f, MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandRot, 0.0f);
+    this.dir = StoryDirector.POS.LEFT;
+    if (_dir == "R" || _dir == "UR")
+    {
+      this.basePos.x = -this.basePos.x;
+      this.baseRot.y = -this.baseRot.y;
+      this.dir = StoryDirector.POS.RIGHT;
+    }
+    else if (_dir == "C" || _dir == "UC")
+    {
+      this.basePos.x = 0.0f;
+      this.baseRot.y = 180f;
+      this.dir = StoryDirector.POS.CENTER;
+    }
+    if (_dir == "UR" || _dir == "UC" || _dir == "UL")
+      this.basePos.y += MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandUpOffset;
+    this.animPos.Set(this.basePos);
+    if (doesSetImmidiate)
+      this.model.localPosition = this.basePos;
+    this.animRot.Set(Quaternion.Euler(this.baseRot));
+  }
 
-	public bool isMoving => animPos.IsPlaying() || animRot.IsPlaying();
+  public void SetPosition(float x, float y, float time)
+  {
+    this.basePos = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
+    Vector3 end_value;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref end_value).\u002Ector(x, y, this.basePos.z);
+    this.animPos.Set(time, end_value, (AnimationCurve) null, new Vector3(), (AnimationCurve) null);
+    this.animPos.Play();
+  }
 
-	public int id
-	{
-		get;
-		private set;
-	}
+  public void SetModelScale(Vector3 scale) => this.model.localScale = scale;
 
-	public string charaName
-	{
-		get;
-		private set;
-	}
+  private void CollectTween(Transform t_ui_tex)
+  {
+    if (Object.op_Equality((Object) t_ui_tex, (Object) null))
+      return;
+    this.tweenAnimations = ((Component) t_ui_tex).GetComponentsInChildren<UITweenCtrl>();
+  }
 
-	public string displayName => (!string.IsNullOrEmpty(aliasName)) ? aliasName : charaName;
+  public void PlayTween(StoryCharacter.EaseDir type, bool forward = true, EventDelegate.Callback callback = null)
+  {
+    if (this.tweenAnimations == null)
+      return;
+    UITweenCtrl uiTweenCtrl = Array.Find<UITweenCtrl>(this.tweenAnimations, (Predicate<UITweenCtrl>) (t => (StoryCharacter.EaseDir) t.id == type));
+    if (!Object.op_Inequality((Object) uiTweenCtrl, (Object) null))
+      return;
+    uiTweenCtrl.Reset();
+    uiTweenCtrl.Play(forward, callback);
+  }
 
-	public string aliasName
-	{
-		get;
-		private set;
-	}
+  private void OnModelLoadComplete(Animator animator)
+  {
+    if (Object.op_Inequality((Object) animator, (Object) null))
+      this.playerAnimCtrl = PlayerAnimCtrl.Get(animator, this.idleAnim);
+    this.isLoading = false;
+  }
 
-	public StoryDirector.POS dir
-	{
-		get;
-		private set;
-	}
+  private void Update()
+  {
+    if (Object.op_Equality((Object) this.model, (Object) null))
+      return;
+    this.model.localPosition = this.animPos.Update();
+    this.model.localRotation = Quaternion.op_Multiply(Quaternion.Euler(new Vector3(-6f, 0.0f, 0.0f)), this.animRot.Update());
+  }
 
-	public UITexture uiTex
-	{
-		get;
-		private set;
-	}
+  public void Show() => this.renderTex.Enable();
 
-	public Transform model
-	{
-		get;
-		private set;
-	}
+  public void Hide() => this.renderTex.Disable();
 
-	public StoryCharacter()
-		: this()
-	{
-	}
+  public bool IsShow() => this.renderTex.enableTexture;
 
-	public static StoryCharacter Initialize(int id, UITexture ui_tex, string _name, string _dir, string idle_anim)
-	{
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Expected O, but got Unknown
-		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Expected O, but got Unknown
-		NPCTable.NPCData nPCData = Singleton<NPCTable>.I.GetNPCData(_name);
-		if (nPCData == null)
-		{
-			return null;
-		}
-		UIRenderTexture uIRenderTexture = UIRenderTexture.Get(ui_tex, -1f, true, -1);
-		uIRenderTexture.Disable();
-		uIRenderTexture.nearClipPlane = 1f;
-		uIRenderTexture.farClipPlane = 100f;
-		Transform val = Utility.CreateGameObject("StoryModel", uIRenderTexture.modelTransform, uIRenderTexture.renderLayer);
-		StoryCharacter storyCharacter = val.get_gameObject().AddComponent<StoryCharacter>();
-		storyCharacter.model = val;
-		storyCharacter.id = id;
-		storyCharacter.renderTex = uIRenderTexture;
-		storyCharacter.uiTex = ui_tex;
-		storyCharacter.charaName = _name;
-		storyCharacter.aliasName = string.Empty;
-		storyCharacter.SetStandPosition(_dir, false);
-		if (string.IsNullOrEmpty(idle_anim))
-		{
-			storyCharacter.idleAnim = PlayerAnimCtrl.StringToEnum(nPCData.anim);
-		}
-		else
-		{
-			storyCharacter.idleAnim = PlayerAnimCtrl.StringToEnum(idle_anim);
-		}
-		storyCharacter.isLoading = true;
-		ModelLoaderBase modelLoaderBase = nPCData.LoadModel(val.get_gameObject(), false, false, storyCharacter.OnModelLoadComplete, false);
-		storyCharacter.npcLoader = (modelLoaderBase as NPCLoader);
-		storyCharacter.CollectTween(ui_tex.get_transform());
-		return storyCharacter;
-	}
+  public void FadeIn()
+  {
+    float charaFadeTime = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.charaFadeTime;
+    this.renderTex.Enable(charaFadeTime);
+    float charaFadeMoveX = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.charaFadeMoveX;
+    Vector3 leftStandPos;
+    Vector3 begin_value;
+    if (StoryDirector.POS.LEFT == this.dir)
+    {
+      leftStandPos = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
+      begin_value = leftStandPos;
+      begin_value.x -= charaFadeMoveX;
+    }
+    else if (StoryDirector.POS.RIGHT == this.dir)
+    {
+      leftStandPos = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
+      leftStandPos.x = -leftStandPos.x;
+      begin_value = leftStandPos;
+      begin_value.x += charaFadeMoveX;
+    }
+    else
+    {
+      leftStandPos = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
+      leftStandPos.x = 0.0f;
+      begin_value = leftStandPos;
+    }
+    this.animPos.Set(charaFadeTime, begin_value, leftStandPos, (AnimationCurve) null, new Vector3(), (AnimationCurve) null);
+    this.animPos.Play();
+  }
 
-	public void SetStandPosition(string _dir, bool doesSetImmidiate = false)
-	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		basePos = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
-		baseRot = new Vector3(0f, MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandRot, 0f);
-		dir = StoryDirector.POS.LEFT;
-		switch (_dir)
-		{
-		case "R":
-		case "UR":
-			basePos.x = 0f - basePos.x;
-			baseRot.y = 0f - baseRot.y;
-			dir = StoryDirector.POS.RIGHT;
-			break;
-		case "C":
-		case "UC":
-			basePos.x = 0f;
-			baseRot.y = 180f;
-			dir = StoryDirector.POS.CENTER;
-			break;
-		}
-		if (_dir == "UR" || _dir == "UC" || _dir == "UL")
-		{
-			basePos.y += MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandUpOffset;
-		}
-		animPos.Set(basePos);
-		if (doesSetImmidiate)
-		{
-			model.set_localPosition(basePos);
-		}
-		animRot.Set(Quaternion.Euler(baseRot));
-	}
+  public void FadeOut()
+  {
+    float charaFadeTime = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.charaFadeTime;
+    this.renderTex.FadeOutDisable(charaFadeTime);
+    float charaFadeMoveX = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.charaFadeMoveX;
+    Vector3 begin_value = Vector3.zero;
+    Vector3 end_value = begin_value;
+    bool flag = false;
+    if (StoryDirector.POS.LEFT == this.dir)
+    {
+      begin_value = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
+      end_value = begin_value;
+      end_value.x -= charaFadeMoveX;
+      flag = true;
+    }
+    else if (StoryDirector.POS.RIGHT == this.dir)
+    {
+      begin_value = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
+      begin_value.x = -begin_value.x;
+      end_value = begin_value;
+      end_value.x += charaFadeMoveX;
+      flag = true;
+    }
+    if (!flag)
+      return;
+    this.animPos.Set(charaFadeTime, begin_value, end_value, (AnimationCurve) null, new Vector3(), (AnimationCurve) null);
+    this.animPos.Play();
+  }
 
-	public void SetModelScale(Vector3 scale)
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		model.set_localScale(scale);
-	}
+  public void RotateFront(float time = 0.5f) => this.RotateAngle(0.0f, time);
 
-	private void CollectTween(Transform t_ui_tex)
-	{
-		if (!(t_ui_tex == null))
-		{
-			tweenAnimations = t_ui_tex.GetComponentsInChildren<UITweenCtrl>();
-		}
-	}
+  public void RotateDefault(float time = 0.5f)
+  {
+    this.animRot.Set(time, this.model.localRotation, Quaternion.Euler(this.baseRot), (AnimationCurve) null, new Quaternion(), (AnimationCurve) null);
+    this.animRot.Play();
+  }
 
-	public void PlayTween(EaseDir type, bool forward = true, EventDelegate.Callback callback = null)
-	{
-		if (tweenAnimations != null)
-		{
-			UITweenCtrl uITweenCtrl = Array.Find(tweenAnimations, (UITweenCtrl t) => t.id == (int)type);
-			if (uITweenCtrl != null)
-			{
-				uITweenCtrl.Reset();
-				uITweenCtrl.Play(forward, callback);
-			}
-		}
-	}
+  public void RotateAngle(float angle, float time = 0.5f)
+  {
+    this.animRot.Set(time, this.model.localRotation, Quaternion.Euler(new Vector3(0.0f, 180f + angle, 0.0f)), (AnimationCurve) null, new Quaternion(), (AnimationCurve) null);
+    this.animRot.Play();
+  }
 
-	private void OnModelLoadComplete(Animator animator)
-	{
-		if (animator != null)
-		{
-			playerAnimCtrl = PlayerAnimCtrl.Get(animator, idleAnim, null, null, null);
-		}
-		isLoading = false;
-	}
+  public void RequestPose(string pose_name)
+  {
+    if (Object.op_Equality((Object) this.playerAnimCtrl, (Object) null))
+      return;
+    try
+    {
+      this.playerAnimCtrl.Play((PLCA) Enum.Parse(typeof (PLCA), pose_name));
+    }
+    catch
+    {
+      Log.Error(LOG.GAMESCENE, "不正なモーションコマンド：" + pose_name);
+    }
+  }
 
-	private void Update()
-	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		if (!(model == null))
-		{
-			model.set_localPosition(animPos.Update());
-			model.set_localRotation(Quaternion.Euler(new Vector3(-6f, 0f, 0f)) * animRot.Update());
-		}
-	}
+  public void RequestFace(string eye_type, string mouth_type)
+  {
+    if (Object.op_Equality((Object) this.npcLoader, (Object) null) || Object.op_Equality((Object) this.npcLoader.facial, (Object) null))
+      return;
+    NPCFacial facial = this.npcLoader.facial;
+    NPCFacial.TYPE eyeType = facial.eyeType;
+    NPCFacial.TYPE mouthType = facial.mouthType;
+    if (!string.IsNullOrEmpty(eye_type))
+    {
+      try
+      {
+        NPCFacial.TYPE type = (NPCFacial.TYPE) Enum.Parse(typeof (NPCFacial.TYPE), eye_type);
+        facial.eyeType = type;
+      }
+      catch
+      {
+        Log.Error(LOG.GAMESCENE, "不正な表情(目)：" + eye_type);
+      }
+    }
+    if (!string.IsNullOrEmpty(mouth_type))
+    {
+      try
+      {
+        NPCFacial.TYPE type = (NPCFacial.TYPE) Enum.Parse(typeof (NPCFacial.TYPE), mouth_type);
+        facial.mouthType = type;
+      }
+      catch
+      {
+        Log.Error(LOG.GAMESCENE, "不正な表情(口)：" + mouth_type);
+      }
+    }
+    if (eyeType == facial.eyeType && mouthType == facial.mouthType)
+      return;
+    if (facial.eyeType != NPCFacial.TYPE.NORMAL || facial.mouthType != NPCFacial.TYPE.NORMAL)
+      facial.enableAnim = false;
+    else
+      facial.enableAnim = true;
+  }
 
-	public void Show()
-	{
-		renderTex.Enable(0.25f);
-	}
+  public void SetAliasName(string _name) => this.aliasName = _name;
 
-	public void Hide()
-	{
-		renderTex.Disable();
-	}
-
-	public bool IsShow()
-	{
-		return renderTex.enableTexture;
-	}
-
-	public void FadeIn()
-	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-		float charaFadeTime = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.charaFadeTime;
-		renderTex.Enable(charaFadeTime);
-		float charaFadeMoveX = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.charaFadeMoveX;
-		Vector3 leftStandPos;
-		Vector3 begin_value;
-		if (dir == StoryDirector.POS.LEFT)
-		{
-			leftStandPos = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
-			begin_value = leftStandPos;
-			begin_value.x -= charaFadeMoveX;
-		}
-		else if (dir == StoryDirector.POS.RIGHT)
-		{
-			leftStandPos = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
-			leftStandPos.x = 0f - leftStandPos.x;
-			begin_value = leftStandPos;
-			begin_value.x += charaFadeMoveX;
-		}
-		else
-		{
-			leftStandPos = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
-			leftStandPos.x = 0f;
-			begin_value = leftStandPos;
-		}
-		animPos.Set(charaFadeTime, begin_value, leftStandPos, null, default(Vector3), null);
-		animPos.Play();
-	}
-
-	public void FadeOut()
-	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		float charaFadeTime = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.charaFadeTime;
-		renderTex.FadeOutDisable(charaFadeTime);
-		float charaFadeMoveX = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.charaFadeMoveX;
-		Vector3 val = Vector3.get_zero();
-		Vector3 end_value = val;
-		if (dir == StoryDirector.POS.LEFT)
-		{
-			val = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
-			end_value = val;
-			end_value.x -= charaFadeMoveX;
-		}
-		else if (dir == StoryDirector.POS.RIGHT)
-		{
-			val = MonoBehaviourSingleton<OutGameSettingsManager>.I.storyScene.leftStandPos;
-			val.x = 0f - val.x;
-			end_value = val;
-			end_value.x += charaFadeMoveX;
-		}
-		animPos.Set(charaFadeTime, val, end_value, null, default(Vector3), null);
-		animPos.Play();
-	}
-
-	public void RotateFront()
-	{
-		RotateAngle(0f);
-	}
-
-	public void RotateDefault()
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		animRot.Set(0.5f, model.get_localRotation(), Quaternion.Euler(baseRot), null, default(Quaternion), null);
-		animRot.Play();
-	}
-
-	public void RotateAngle(float angle)
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		animRot.Set(0.5f, model.get_localRotation(), Quaternion.Euler(new Vector3(0f, 180f + angle, 0f)), null, default(Quaternion), null);
-		animRot.Play();
-	}
-
-	public void RequestPose(string pose_name)
-	{
-		if (!(playerAnimCtrl == null))
-		{
-			try
-			{
-				PLCA anim = (PLCA)(int)Enum.Parse(typeof(PLCA), pose_name);
-				playerAnimCtrl.Play(anim, false);
-			}
-			catch
-			{
-				Log.Error(LOG.GAMESCENE, "不正なモ\u30fcションコマンド：" + pose_name);
-			}
-		}
-	}
-
-	public void RequestFace(string eye_type, string mouth_type)
-	{
-		if (!(npcLoader == null) && !(npcLoader.facial == null))
-		{
-			NPCFacial facial = npcLoader.facial;
-			NPCFacial.TYPE eyeType = facial.eyeType;
-			NPCFacial.TYPE mouthType = facial.mouthType;
-			if (!string.IsNullOrEmpty(eye_type))
-			{
-				try
-				{
-					NPCFacial.TYPE tYPE2 = facial.eyeType = (NPCFacial.TYPE)(int)Enum.Parse(typeof(NPCFacial.TYPE), eye_type);
-				}
-				catch
-				{
-					Log.Error(LOG.GAMESCENE, "不正な表情(目)：" + eye_type);
-				}
-			}
-			if (!string.IsNullOrEmpty(mouth_type))
-			{
-				try
-				{
-					NPCFacial.TYPE tYPE4 = facial.mouthType = (NPCFacial.TYPE)(int)Enum.Parse(typeof(NPCFacial.TYPE), mouth_type);
-				}
-				catch
-				{
-					Log.Error(LOG.GAMESCENE, "不正な表情(口)：" + mouth_type);
-				}
-			}
-			if (eyeType != facial.eyeType || mouthType != facial.mouthType)
-			{
-				if (facial.eyeType != 0 || facial.mouthType != 0)
-				{
-					facial.enableAnim = false;
-				}
-				else
-				{
-					facial.enableAnim = true;
-				}
-			}
-		}
-	}
-
-	public void SetAliasName(string _name)
-	{
-		aliasName = _name;
-	}
+  public enum EaseDir
+  {
+    LEFT,
+    RIGHT,
+  }
 }

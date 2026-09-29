@@ -1,756 +1,666 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ArenaResultTop
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class ArenaResultTop : QuestResultTop
 {
-	private enum UI
-	{
-		LBL_QUEST_NAME,
-		LBL_PLAYER_LV,
-		LBL_PLAYER_LVUP,
-		SPR_LEVELUP,
-		LBL_LVUP_NUM,
-		OBJ_GET_EXP_ROOT,
-		OBJ_MISSION_ROOT,
-		OBJ_MISSION_NEW_CLEAR_ROOT,
-		OBJ_TREASURE_ROOT,
-		STR_TITLE_EXP,
-		STR_TITLE_MISSION,
-		STR_TITLE_REWARD,
-		OBJ_EXP_REWARD_FRAME,
-		LBL_EXP,
-		SPR_GAUGE_UPPER,
-		PBR_EXP,
-		OBJ_RESULT_EXP_GAUGE_CTRL,
-		OBJ_MISSION_INFO_FRAME,
-		OBJ_MISSION_01,
-		OBJ_MISSION_02,
-		OBJ_MISSION_03,
-		LBL_MISSION_NAME_01,
-		LBL_MISSION_NAME_02,
-		LBL_MISSION_NAME_03,
-		SPR_CROWN_01,
-		SPR_CROWN_02,
-		SPR_CROWN_03,
-		SPR_CLEARED_CROWN_01,
-		SPR_CLEARED_CROWN_02,
-		SPR_CLEARED_CROWN_03,
-		STR_EMPTY_MISSION,
-		GET_ITEM,
-		GET_ITEM_2,
-		OBJ_QUEST_REWARD_FRAME,
-		LBL_REWARD_GOLD,
-		TBL_ITEM,
-		OBJ_SCROLL_VIEW,
-		OBJ_SCROLL_VIEW_2,
-		GRD_DROP_ITEM,
-		GRD_DROP_ITEM_2,
-		BTN_NEXT,
-		BTN_RETRY,
-		BTN_SKIP_FULL_SCREEN,
-		BTN_SKIP_IN_SCROLL,
-		BTN_SKIP_IN_SCROLL_2,
-		PNL_MATERIAL_INFO,
-		PNL_MATERIAL_INFO_2,
-		OBJ_TREASURE_ROOT_NON_MISSION,
-		OBJ_POINT_SHOP_RESULT_ROOT,
-		OBJ_NORMAL_POINT_SHOP_ROOT,
-		OBJ_EVENT_POINT_SHOP_ROOT,
-		LBL_NORMAL_GET_POINT_SHOP,
-		LBL_NORMAL_TOTAL_POINT_SHOP,
-		TEX_NORMAL_POINT_SHOP_ICON,
-		LBL_EVENT_GET_POINT_SHOP,
-		LBL_EVENT_TOTAL_POINT_SHOP,
-		TEX_EVENT_POINT_SHOP_ICON,
-		LBL_GUILD_REQUEST_GET_POINT,
-		OBJ_TITLE,
-		OBJ_WAVE,
-		LBL_WAVE,
-		OBJ_TIME,
-		LBL_TIME,
-		OBJ_MONEY,
-		OBJ_COIN,
-		OBJ_ARRIVAL_EFFECT_ROOT,
-		OBJ_ARRIVAL_EFFECT,
-		OBJ_ARRIVAL_BONUS,
-		GRD_ARRIVAL_ITEM_ICON,
-		STR_REWARD_TITLE,
-		SPR_WAVE_01,
-		SPR_WAVE_10,
-		SPR_WAVE_100,
-		TBL_DROP_ITEM,
-		LBL_DROP_ITEM_WAVE,
-		STR_TITLE_WAVE,
-		STR_TITLE_TIME,
-		LBL_EXPLORE_GET_POINT,
-		LBL_EXPLORE_TOTAL_POINT,
-		SPR_TITLE,
-		OBJ_EXP,
-		OBJ_REMAIN_TIME,
-		OBJ_CLEAR_TIME,
-		STR_CLEAR_TIME_NAME,
-		LBL_CLEAR_TIME,
-		OBJ_BEFORE_TIME,
-		SPR_BEFORE_TIME_NAME,
-		LBL_BEFORE_TIME,
-		SPR_BESTSCORE,
-		OBJ_CLEAR_EFFECT_ROOT,
-		OBJ_CLEAR_EFFECT,
-		OBJ_RANK_UP_ROOT,
-		OBJ_RANK_UP,
-		TEX_RANK_PRE,
-		TEX_RANK_NEW,
-		OBJ_PARTICLE,
-		OBJ_CONGRATULATIONS_ROOT,
-		OBJ_CONGRATULATIONS,
-		OBJ_CONGRATULATIONS_PARTICLE,
-		LBL_BOSS_NAME,
-		TBL_GUILD_REQUEST_RESULT,
-		OBJ_BONUS_POINT_SHOP,
-		TXT_BONUS_POINT_ICON,
-		LBL_BONUS_POINT_NUM,
-		TEX_MISSION_COIN_01,
-		TEX_MISSION_COIN_02,
-		TEX_MISSION_COIN_03,
-		SPR_CROWN01_OFF,
-		SPR_CROWN02_OFF,
-		SPR_CROWN03_OFF,
-		BTN_NEXT_ALL,
-		BTN_END_HUNT_CENTER,
-		BTN_END_HUNT_LEFT,
-		BTN_REPEAT_HUNT,
-		LBL_BTN_REPEAT_HUNT,
-		LBL_WAIT_FOR_HOST
-	}
+  private const float COUNT_ANIM_SPEED = 4f;
+  private bool is_skip;
+  private ResultReward[] resultRewards;
+  private PointEventCurrentData allPointEvents;
+  private ARENA_RANK m_rank;
+  private ARENA_RANK m_nextRank;
+  private ARENA_GROUP m_group;
+  private bool m_isTimeAttack;
+  private ArenaResultTop.RESULT_ANIM_STATE animState;
 
-	private enum AUDIO
-	{
-		ACHIEVEMENT = 40000028,
-		ADVENT = 40000026,
-		ARRIVAL = 40000269,
-		CATEGORY = 40000228,
-		COUNTUP = 40000012,
-		POINTREWARD = 40000230
-	}
+  public override void Initialize()
+  {
+    this.m_rank = MonoBehaviourSingleton<InGameManager>.I.GetCurrentArenaRank();
+    this.m_group = MonoBehaviourSingleton<InGameManager>.I.GetCurrentArenaGroup();
+    this.m_isTimeAttack = MonoBehaviourSingleton<InGameManager>.I.IsArenaTimeAttack();
+    base.Initialize();
+    this.m_nextRank = this.m_rank + 1;
+    if (this.m_nextRank > ARENA_RANK.SSS)
+      this.m_nextRank = ARENA_RANK.NONE;
+    ResourceLoad.LoadWithSetUITexture(((Component) this.GetCtrl((Enum) ArenaResultTop.UI.TEX_RANK_PRE)).GetComponent<UITexture>(), RESOURCE_CATEGORY.ARENA_RANK_ICON, ResourceName.GetArenaRankIconName(this.m_rank));
+    ResourceLoad.LoadWithSetUITexture(((Component) this.GetCtrl((Enum) ArenaResultTop.UI.TEX_RANK_NEW)).GetComponent<UITexture>(), RESOURCE_CATEGORY.ARENA_RANK_ICON, ResourceName.GetArenaRankIconName(this.m_rank + 1));
+    if (!MonoBehaviourSingleton<UIManager>.IsValid() || !Object.op_Inequality((Object) MonoBehaviourSingleton<UIManager>.I.mainChat, (Object) null))
+      return;
+    MonoBehaviourSingleton<UIManager>.I.mainChat.HideOpenButton();
+    MonoBehaviourSingleton<UIManager>.I.mainChat.HideAll();
+  }
 
-	private new enum RESULT_ANIM_STATE
-	{
-		IDLE,
-		TITLE,
-		DROP,
-		REMAIN_TIME,
-		CLEAR_TIME_COUNT_UP,
-		CLEAR_EFFECT,
-		BEST_SCORE,
-		EVENT,
-		END
-	}
+  protected override void InitReward()
+  {
+    List<ResultReward> resultRewardList = new List<ResultReward>();
+    this.dropItemNum = 0;
+    this.dropLineNum = 0;
+    this.eventRewardTitles = new List<string>();
+    if (MonoBehaviourSingleton<InGameManager>.I.arenaRewards.Count > 0)
+    {
+      foreach (QuestCompleteRewardList arenaReward in MonoBehaviourSingleton<InGameManager>.I.arenaRewards)
+      {
+        ResultReward resultReward = new ResultReward();
+        this.DevideRewardDropAndEvent(resultReward, arenaReward.drop);
+        List<SortCompareData> drop_ary = new List<SortCompareData>();
+        int start_ary_index1 = 0;
+        int start_ary_index2 = ResultUtility.SetDropData(drop_ary, start_ary_index1, resultReward.dropReward.item);
+        int start_ary_index3 = ResultUtility.SetDropData(drop_ary, start_ary_index2, resultReward.dropReward.equipItem);
+        int start_ary_index4 = ResultUtility.SetDropData(drop_ary, start_ary_index3, resultReward.dropReward.skillItem);
+        int start_ary_index5 = ResultUtility.SetDropData(drop_ary, start_ary_index4, resultReward.dropReward.questItem);
+        ResultUtility.SetDropData(drop_ary, start_ary_index5, resultReward.dropReward.accessoryItem);
+        drop_ary.Sort((Comparison<SortCompareData>) ((l, r) => r.GetSortValueQuestResult() - l.GetSortValueQuestResult()));
+        resultReward.dropItemIconData = drop_ary.ToArray();
+        this.dropItemNum += resultReward.dropItemIconData.Length;
+        resultRewardList.Add(resultReward);
+      }
+    }
+    this.pointShopResultData = MonoBehaviourSingleton<InGameManager>.I.arenaPointShops ?? new List<PointShopResultData>();
+    this.resultRewards = resultRewardList.ToArray();
+  }
 
-	private const float COUNT_ANIM_SPEED = 4f;
+  protected override void OnClose()
+  {
+    try
+    {
+      if (MonoBehaviourSingleton<InGameManager>.IsValid() && !MonoBehaviourSingleton<InGameManager>.I.isRetry)
+        MonoBehaviourSingleton<InGameManager>.I.ClearArenaInfo();
+      base.OnClose();
+    }
+    catch (Exception ex)
+    {
+      Log.Warning(LOG.UI, "ArenaResultTop OnClose\n{0}\n{1}", (object) ex.Message, (object) ex.StackTrace);
+    }
+  }
 
-	private bool is_skip;
+  public override void UpdateUI()
+  {
+    this.allPointEvents = new PointEventCurrentData();
+    this.allPointEvents.pointRankingData = new PointEventCurrentData.PointResultData();
+    this.isVictory = MonoBehaviourSingleton<QuestManager>.I.arenaCompData != null;
+    this.SetFullScreenButton((Enum) ArenaResultTop.UI.BTN_SKIP_FULL_SCREEN);
+    this.SetActive((Enum) ArenaResultTop.UI.BTN_NEXT, false);
+    this.SetActive((Enum) ArenaResultTop.UI.BTN_RETRY, false);
+    this.SetActive((Enum) ArenaResultTop.UI.OBJ_TIME, false);
+    this.SetActive((Enum) ArenaResultTop.UI.OBJ_CLEAR_EFFECT_ROOT, false);
+    this.SetActive((Enum) ArenaResultTop.UI.OBJ_CLEAR_EFFECT, false);
+    this.SetActive((Enum) ArenaResultTop.UI.OBJ_RANK_UP_ROOT, false);
+    this.SetActive((Enum) ArenaResultTop.UI.OBJ_CONGRATULATIONS_ROOT, false);
+    if (this.m_isTimeAttack)
+    {
+      this.SetActive((Enum) ArenaResultTop.UI.OBJ_REMAIN_TIME, false);
+      if (this.isVictory)
+        this.SetActive((Enum) ArenaResultTop.UI.OBJ_TIME, true);
+    }
+    this.SetLabelText((Enum) ArenaResultTop.UI.LBL_QUEST_NAME, $"{string.Format(StringTable.Get(STRING_CATEGORY.ARENA, 1U), (object) this.m_rank.ToString())} {string.Format(StringTable.Get(STRING_CATEGORY.ARENA, 0U), (object) this.m_group.ToString())}");
+    List<QuestCompleteRewardList> arenaRewards = MonoBehaviourSingleton<InGameManager>.I.arenaRewards;
+    int num1 = 0;
+    int num2 = 0;
+    for (int index = 0; index < arenaRewards.Count; ++index)
+    {
+      QuestCompleteRewardList completeRewardList = arenaRewards[index];
+      QuestCompleteReward drop = completeRewardList.drop;
+      QuestCompleteReward breakReward = completeRewardList.breakReward;
+      QuestCompleteReward order = completeRewardList.order;
+      num1 += drop.exp + breakReward.exp + order.exp;
+      num2 += drop.money + breakReward.money + order.money;
+    }
+    int my_user_id = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
+    if (MonoBehaviourSingleton<InGameRecorder>.I.players.Find((Predicate<InGameRecorder.PlayerRecord>) (data => data.charaInfo.userId == my_user_id)).beforeLevel >= Singleton<UserLevelTable>.I.GetMaxLevel())
+      num1 = 0;
+    this.SetLabelText((Enum) ArenaResultTop.UI.LBL_EXP, num1.ToString("N0"));
+    this.SetLabelText((Enum) ArenaResultTop.UI.LBL_REWARD_GOLD, num2.ToString("N0"));
+    this.SetLabelText((Enum) ArenaResultTop.UI.LBL_TIME, MonoBehaviourSingleton<InGameRecorder>.I.arenaRemainTimeToString);
+    this.SetLabelText((Enum) ArenaResultTop.UI.LBL_CLEAR_TIME, InGameProgress.GetTimeWithMilliSecToString(0.0f));
+    this.SetActive((Enum) ArenaResultTop.UI.SPR_BESTSCORE, false);
+    if (this.isVictory)
+      this.SetLabelText((Enum) ArenaResultTop.UI.LBL_BEFORE_TIME, InGameProgress.GetTimeWithMilliSecToString((float) (int) MonoBehaviourSingleton<QuestManager>.I.arenaCompData.previousClearMilliSec * (1f / 1000f)));
+    bool is_visible = this.pointShopResultData.Count > 0;
+    this.SetActive((Enum) ArenaResultTop.UI.OBJ_POINT_SHOP_RESULT_ROOT, is_visible);
+    if (is_visible)
+      this.SetGrid((Enum) ArenaResultTop.UI.OBJ_POINT_SHOP_RESULT_ROOT, "QuestResultPointShop", this.pointShopResultData.Count, true, (Action<int, Transform, bool>) ((i, t, b) =>
+      {
+        this.ResetTween(t);
+        PointShopResultData pointShopResultData = this.pointShopResultData[i];
+        this.SetActive(t, (Enum) ArenaResultTop.UI.OBJ_NORMAL_POINT_SHOP_ROOT, !pointShopResultData.isEvent);
+        if (!pointShopResultData.isEvent)
+        {
+          this.SetLabelText(t, (Enum) ArenaResultTop.UI.LBL_NORMAL_GET_POINT_SHOP, string.Format("+" + StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2U), (object) pointShopResultData.getPoint));
+          this.SetLabelText(t, (Enum) ArenaResultTop.UI.LBL_NORMAL_TOTAL_POINT_SHOP, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2U), (object) pointShopResultData.totalPoint));
+          ResourceLoad.LoadPointIconImageTexture(((Component) this.FindCtrl(t, (Enum) ArenaResultTop.UI.TEX_NORMAL_POINT_SHOP_ICON)).GetComponent<UITexture>(), (uint) pointShopResultData.pointShopId);
+        }
+        this.SetActive(t, (Enum) ArenaResultTop.UI.OBJ_EVENT_POINT_SHOP_ROOT, pointShopResultData.isEvent);
+        if (!pointShopResultData.isEvent)
+          return;
+        this.SetLabelText(t, (Enum) ArenaResultTop.UI.LBL_EVENT_GET_POINT_SHOP, string.Format("+" + StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2U), (object) pointShopResultData.getPoint));
+        this.SetLabelText(t, (Enum) ArenaResultTop.UI.LBL_EVENT_TOTAL_POINT_SHOP, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2U), (object) pointShopResultData.totalPoint));
+        ResourceLoad.LoadPointIconImageTexture(((Component) this.FindCtrl(t, (Enum) ArenaResultTop.UI.TEX_EVENT_POINT_SHOP_ICON)).GetComponent<UITexture>(), (uint) pointShopResultData.pointShopId);
+      }));
+    if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.HasSafeArea)
+    {
+      UIVirtualScreen componentInChildren = ((Component) this).GetComponentInChildren<UIVirtualScreen>();
+      UIWidget component = ((Component) this.GetCtrl((Enum) ArenaResultTop.UI.SHADOW)).GetComponent<UIWidget>();
+      if (Object.op_Inequality((Object) componentInChildren, (Object) null) && Object.op_Inequality((Object) component, (Object) null))
+      {
+        component.width = (int) componentInChildren.ScreenWidthFull;
+        component.height = (int) componentInChildren.ScreenHeightFull;
+      }
+    }
+    this.StartCoroutine(this.PlayAnimation());
+  }
 
-	private ResultReward[] resultRewards;
+  private void PlayAudio(ArenaResultTop.AUDIO type)
+  {
+    int se_id = (int) type;
+    if (!MonoBehaviourSingleton<SoundManager>.IsValid())
+      return;
+    SoundManager.PlayOneShotUISE(se_id);
+  }
 
-	private PointEventCurrentData allPointEvents;
+  private IEnumerator PlayAnimation()
+  {
+    this.is_skip = false;
+    this.animState = ArenaResultTop.RESULT_ANIM_STATE.TITLE;
+    this.PlayAudio(ArenaResultTop.AUDIO.ADVENT);
+    this.PlayTween((Enum) ArenaResultTop.UI.OBJ_TITLE, callback: (EventDelegate.Callback) (() => this.animState = ArenaResultTop.RESULT_ANIM_STATE.IDLE), is_input_block: false);
+    while (this.animState != ArenaResultTop.RESULT_ANIM_STATE.IDLE && !this.is_skip)
+      yield return (object) null;
+    this.animState = ArenaResultTop.RESULT_ANIM_STATE.DROP;
+    this.PlayAudio(ArenaResultTop.AUDIO.ACHIEVEMENT);
+    if (this.pointShopResultData.Count > 0)
+    {
+      foreach (Transform t in ((Component) this.GetCtrl((Enum) ArenaResultTop.UI.OBJ_POINT_SHOP_RESULT_ROOT)).transform)
+        this.PlayTween(t);
+    }
+    this.PlayTween((Enum) ArenaResultTop.UI.OBJ_EXP);
+    this.PlayTween((Enum) ArenaResultTop.UI.OBJ_MONEY, callback: (EventDelegate.Callback) (() => this.animState = ArenaResultTop.RESULT_ANIM_STATE.IDLE), is_input_block: false);
+    while (this.animState != ArenaResultTop.RESULT_ANIM_STATE.IDLE && !this.is_skip)
+      yield return (object) null;
+    if (!this.m_isTimeAttack)
+    {
+      this.animState = ArenaResultTop.RESULT_ANIM_STATE.REMAIN_TIME;
+      this.PlayTween((Enum) ArenaResultTop.UI.OBJ_REMAIN_TIME, callback: (EventDelegate.Callback) (() =>
+      {
+        SoundManager.PlayOneShotUISE(40000228);
+        this.animState = ArenaResultTop.RESULT_ANIM_STATE.IDLE;
+      }), is_input_block: false);
+      while (this.animState != ArenaResultTop.RESULT_ANIM_STATE.IDLE && !this.is_skip)
+        yield return (object) null;
+      if (this.isVictory)
+      {
+        if (this.m_nextRank == ARENA_RANK.NONE)
+        {
+          this.SetActive((Enum) ArenaResultTop.UI.OBJ_CONGRATULATIONS_ROOT, true);
+          this.ResetTween((Enum) ArenaResultTop.UI.OBJ_CONGRATULATIONS);
+          this.animState = ArenaResultTop.RESULT_ANIM_STATE.CLEAR_EFFECT;
+          ((Renderer) ((Component) ((Component) this.GetCtrl((Enum) ArenaResultTop.UI.OBJ_CONGRATULATIONS_PARTICLE)).GetComponent<ParticleSystem>()).GetComponent<ParticleSystemRenderer>()).sharedMaterial.renderQueue = 4000;
+          yield return (object) null;
+          this.PlayAudio(ArenaResultTop.AUDIO.ARRIVAL);
+          this.PlayTween((Enum) ArenaResultTop.UI.OBJ_CONGRATULATIONS, callback: (EventDelegate.Callback) (() => this.animState = ArenaResultTop.RESULT_ANIM_STATE.IDLE));
+          while (this.animState != ArenaResultTop.RESULT_ANIM_STATE.IDLE && !this.is_skip)
+            yield return (object) null;
+        }
+        else
+        {
+          this.SetActive((Enum) ArenaResultTop.UI.OBJ_RANK_UP_ROOT, true);
+          this.ResetTween((Enum) ArenaResultTop.UI.OBJ_RANK_UP);
+          this.animState = ArenaResultTop.RESULT_ANIM_STATE.CLEAR_EFFECT;
+          ((Renderer) ((Component) ((Component) this.GetCtrl((Enum) ArenaResultTop.UI.OBJ_PARTICLE)).GetComponent<ParticleSystem>()).GetComponent<ParticleSystemRenderer>()).sharedMaterial.renderQueue = 4000;
+          yield return (object) null;
+          this.PlayAudio(ArenaResultTop.AUDIO.ARRIVAL);
+          this.PlayTween((Enum) ArenaResultTop.UI.OBJ_RANK_UP, callback: (EventDelegate.Callback) (() => this.animState = ArenaResultTop.RESULT_ANIM_STATE.IDLE));
+          while (this.animState != ArenaResultTop.RESULT_ANIM_STATE.IDLE && !this.is_skip)
+            yield return (object) null;
+        }
+      }
+    }
+    if (this.m_isTimeAttack)
+    {
+      this.animState = ArenaResultTop.RESULT_ANIM_STATE.CLEAR_TIME_COUNT_UP;
+      this.StartCoroutine(this.PlayCountUpClearTimeAnim(MonoBehaviourSingleton<InGameRecorder>.I.arenaElapsedTime, (System.Action) (() => this.animState = ArenaResultTop.RESULT_ANIM_STATE.IDLE)));
+      while (this.animState != ArenaResultTop.RESULT_ANIM_STATE.IDLE && !this.is_skip)
+        yield return (object) null;
+      if (this.IsBreakRecord())
+      {
+        this.animState = ArenaResultTop.RESULT_ANIM_STATE.BEST_SCORE;
+        this.PlayAudio(ArenaResultTop.AUDIO.ARRIVAL);
+        this.SetActive((Enum) ArenaResultTop.UI.SPR_BESTSCORE, true);
+        this.PlayTween((Enum) ArenaResultTop.UI.SPR_BESTSCORE, callback: (EventDelegate.Callback) (() => this.animState = ArenaResultTop.RESULT_ANIM_STATE.IDLE));
+        while (this.animState != ArenaResultTop.RESULT_ANIM_STATE.IDLE && !this.is_skip)
+          yield return (object) null;
+      }
+    }
+    this.animState = ArenaResultTop.RESULT_ANIM_STATE.EVENT;
+    this.OpenAllEventRewardDialog((System.Action) (() => this.animState = ArenaResultTop.RESULT_ANIM_STATE.IDLE));
+    while (this.animState != ArenaResultTop.RESULT_ANIM_STATE.IDLE && !this.is_skip)
+      yield return (object) null;
+    this.animState = ArenaResultTop.RESULT_ANIM_STATE.END;
+    this.VisibleEndButton();
+  }
 
-	private ARENA_RANK m_rank;
+  private IEnumerator GetPointAnimation(System.Action callback)
+  {
+    int getPoint = this.allPointEvents.pointRankingData.getPoint;
+    int userPoint = this.allPointEvents.pointRankingData.userPoint;
+    yield return (object) null;
+    callback();
+  }
 
-	private ARENA_GROUP m_group;
+  private IEnumerator PlayCountUpClearTimeAnim(float targetTime, System.Action callBack)
+  {
+    float currentShowTime = 0.0f;
+    while ((double) currentShowTime < (double) targetTime)
+    {
+      yield return (object) null;
+      if (this.is_skip)
+        currentShowTime = targetTime;
+      int num1 = Mathf.FloorToInt(currentShowTime);
+      currentShowTime += Mathf.Max((targetTime - currentShowTime) * this.CountDownCube(Time.deltaTime * 4f), 1f);
+      currentShowTime = Mathf.Min(currentShowTime, targetTime);
+      int num2 = Mathf.FloorToInt(currentShowTime);
+      if (num1 < num2)
+        SoundManager.PlayOneShotUISE(40000012);
+      this.SetLabelText((Enum) ArenaResultTop.UI.LBL_CLEAR_TIME, InGameProgress.GetTimeWithMilliSecToString(currentShowTime));
+    }
+    if (callBack != null)
+      callBack();
+  }
 
-	private bool m_isTimeAttack;
+  private float CountDownCube(float currentValue) => currentValue * (2f - currentValue);
 
-	private new RESULT_ANIM_STATE animState;
+  protected override void VisibleEndButton()
+  {
+    this.SetActive((Enum) ArenaResultTop.UI.BTN_NEXT, this.animState == ArenaResultTop.RESULT_ANIM_STATE.END);
+    this.SetActive((Enum) ArenaResultTop.UI.BTN_SKIP_FULL_SCREEN, this.animState != ArenaResultTop.RESULT_ANIM_STATE.END);
+    if (this.m_isTimeAttack || MonoBehaviourSingleton<InGameRecorder>.I.progressEndType == InGameProgress.PROGRESS_END_TYPE.QUEST_RETIRE)
+    {
+      this.SetActive((Enum) ArenaResultTop.UI.BTN_RETRY, this.animState == ArenaResultTop.RESULT_ANIM_STATE.END);
+    }
+    else
+    {
+      this.SetActive((Enum) ArenaResultTop.UI.BTN_RETRY, false);
+      Vector3 localPosition = this.GetCtrl((Enum) ArenaResultTop.UI.BTN_NEXT).localPosition;
+      this.GetCtrl((Enum) ArenaResultTop.UI.BTN_NEXT).localPosition = new Vector3(0.0f, localPosition.y, localPosition.x);
+    }
+  }
 
-	public override void Initialize()
-	{
-		m_rank = MonoBehaviourSingleton<InGameManager>.I.GetCurrentArenaRank();
-		m_group = MonoBehaviourSingleton<InGameManager>.I.GetCurrentArenaGroup();
-		m_isTimeAttack = MonoBehaviourSingleton<InGameManager>.I.IsArenaTimeAttack();
-		base.Initialize();
-		UITexture component = GetCtrl(UI.TEX_RANK_PRE).GetComponent<UITexture>();
-		ResourceLoad.LoadWithSetUITexture(component, RESOURCE_CATEGORY.ARENA_RANK_ICON, ResourceName.GetArenaRankIconName(m_rank));
-		UITexture component2 = GetCtrl(UI.TEX_RANK_NEW).GetComponent<UITexture>();
-		ResourceLoad.LoadWithSetUITexture(component2, RESOURCE_CATEGORY.ARENA_RANK_ICON, ResourceName.GetArenaRankIconName(m_rank + 1));
-		if (MonoBehaviourSingleton<UIManager>.IsValid() && MonoBehaviourSingleton<UIManager>.I.mainChat != null)
-		{
-			MonoBehaviourSingleton<UIManager>.I.mainChat.HideOpenButton();
-			MonoBehaviourSingleton<UIManager>.I.mainChat.HideAll();
-		}
-	}
+  private bool IsBreakRecord()
+  {
+    return MonoBehaviourSingleton<InGameRecorder>.IsValid() && MonoBehaviourSingleton<QuestManager>.IsValid() && MonoBehaviourSingleton<QuestManager>.I.arenaCompData != null && Mathf.FloorToInt(MonoBehaviourSingleton<InGameRecorder>.I.arenaElapsedTime * 1000f) < (int) MonoBehaviourSingleton<QuestManager>.I.arenaCompData.previousClearMilliSec;
+  }
 
-	protected override void InitReward()
-	{
-		List<ResultReward> list = new List<ResultReward>();
-		dropItemNum = 0;
-		dropLineNum = 0;
-		eventRewardTitles = new List<string>();
-		if (MonoBehaviourSingleton<InGameManager>.I.arenaRewards.Count > 0)
-		{
-			foreach (QuestCompleteRewardList arenaReward in MonoBehaviourSingleton<InGameManager>.I.arenaRewards)
-			{
-				ResultReward resultReward = new ResultReward();
-				DevideRewardDropAndEvent(resultReward, arenaReward.drop);
-				List<SortCompareData> list2 = new List<SortCompareData>();
-				int start_ary_index = 0;
-				start_ary_index = ResultUtility.SetDropData(list2, start_ary_index, resultReward.dropReward.item, REWARD_CATEGORY.DROP);
-				start_ary_index = ResultUtility.SetDropData(list2, start_ary_index, resultReward.dropReward.equipItem, REWARD_CATEGORY.DROP);
-				start_ary_index = ResultUtility.SetDropData(list2, start_ary_index, resultReward.dropReward.skillItem, REWARD_CATEGORY.DROP);
-				start_ary_index = ResultUtility.SetDropData(list2, start_ary_index, resultReward.dropReward.questItem, REWARD_CATEGORY.DROP);
-				list2.Sort((SortCompareData l, SortCompareData r) => r.GetSortValueQuestResult() - l.GetSortValueQuestResult());
-				resultReward.dropItemIconData = list2.ToArray();
-				dropItemNum += resultReward.dropItemIconData.Length;
-				list.Add(resultReward);
-			}
-		}
-		pointShopResultData = (MonoBehaviourSingleton<InGameManager>.I.arenaPointShops ?? new List<PointShopResultData>());
-		resultRewards = list.ToArray();
-	}
+  private void DevideRewardDropAndEvent(ResultReward resultReward, QuestCompleteReward reward)
+  {
+    resultReward.dropReward = new QuestCompleteReward();
+    resultReward.eventReward = new QuestCompleteReward();
+    List<string> stringList = new List<string>();
+    resultReward.dropReward.exp = reward.exp;
+    int num1 = 0;
+    int num2 = 0;
+    for (int index = 0; index < reward.eventPrice.Count; ++index)
+    {
+      num1 += reward.eventPrice[index].gold;
+      num2 += reward.eventPrice[index].gold;
+      resultReward.eventReward.eventPrice.Add(reward.eventPrice[index]);
+      stringList.Add(reward.eventPrice[index].rewardTitle);
+    }
+    resultReward.dropReward.money = Mathf.Max(0, reward.money - num1);
+    resultReward.dropReward.crystal = Mathf.Max(0, reward.crystal - num2);
+    for (int index = 0; index < reward.item.Count; ++index)
+    {
+      if (string.IsNullOrEmpty(reward.item[index].rewardTitle))
+      {
+        resultReward.dropReward.item.Add(reward.item[index]);
+      }
+      else
+      {
+        resultReward.eventReward.item.Add(reward.item[index]);
+        stringList.Add(reward.item[index].rewardTitle);
+      }
+    }
+    for (int index = 0; index < reward.skillItem.Count; ++index)
+    {
+      if (string.IsNullOrEmpty(reward.skillItem[index].rewardTitle))
+      {
+        resultReward.dropReward.skillItem.Add(reward.skillItem[index]);
+      }
+      else
+      {
+        resultReward.eventReward.skillItem.Add(reward.skillItem[index]);
+        stringList.Add(reward.skillItem[index].rewardTitle);
+      }
+    }
+    for (int index = 0; index < reward.equipItem.Count; ++index)
+    {
+      if (string.IsNullOrEmpty(reward.equipItem[index].rewardTitle))
+      {
+        resultReward.dropReward.equipItem.Add(reward.equipItem[index]);
+      }
+      else
+      {
+        resultReward.eventReward.equipItem.Add(reward.equipItem[index]);
+        stringList.Add(reward.equipItem[index].rewardTitle);
+      }
+    }
+    for (int index = 0; index < reward.questItem.Count; ++index)
+    {
+      if (string.IsNullOrEmpty(reward.questItem[index].rewardTitle))
+      {
+        resultReward.dropReward.questItem.Add(reward.questItem[index]);
+      }
+      else
+      {
+        resultReward.eventReward.questItem.Add(reward.questItem[index]);
+        stringList.Add(reward.questItem[index].rewardTitle);
+      }
+    }
+    for (int index = 0; index < reward.accessoryItem.Count; ++index)
+    {
+      if (string.IsNullOrEmpty(reward.accessoryItem[index].rewardTitle))
+      {
+        resultReward.dropReward.accessoryItem.Add(reward.accessoryItem[index]);
+      }
+      else
+      {
+        resultReward.eventReward.accessoryItem.Add(reward.accessoryItem[index]);
+        stringList.Add(reward.accessoryItem[index].rewardTitle);
+      }
+    }
+    for (int index = 0; index < stringList.Count; ++index)
+    {
+      if (!this.eventRewardTitles.Contains(stringList[index]))
+        this.eventRewardTitles.Add(stringList[index]);
+    }
+  }
 
-	protected override void OnClose()
-	{
-		try
-		{
-			if (MonoBehaviourSingleton<InGameManager>.IsValid() && !MonoBehaviourSingleton<InGameManager>.I.isRetry)
-			{
-				MonoBehaviourSingleton<InGameManager>.I.ClearArenaInfo();
-			}
-			base.OnClose();
-		}
-		catch (Exception ex)
-		{
-			Log.Warning(LOG.UI, "ArenaResultTop OnClose\n{0}\n{1}", ex.Message, ex.StackTrace);
-		}
-	}
+  private new void OpenAllEventRewardDialog(System.Action endCallback)
+  {
+    this.eventRewardIndex = 0;
+    this.eventRewardList = new List<QuestCompleteReward>();
+    for (int index = 0; index < this.eventRewardTitles.Count; ++index)
+      this.eventRewardList.Add(new QuestCompleteReward());
+    foreach (ResultReward resultReward in this.resultRewards)
+    {
+      QuestCompleteReward eventReward = resultReward.eventReward;
+      for (int index1 = 0; index1 < eventReward.eventPrice.Count; ++index1)
+      {
+        for (int index2 = 0; index2 < this.eventRewardTitles.Count; ++index2)
+        {
+          if (this.eventRewardTitles[index2] == eventReward.eventPrice[index1].rewardTitle)
+            this.eventRewardList[index2].eventPrice.Add(eventReward.eventPrice[index1]);
+        }
+      }
+      for (int index3 = 0; index3 < eventReward.item.Count; ++index3)
+      {
+        for (int index4 = 0; index4 < this.eventRewardTitles.Count; ++index4)
+        {
+          if (this.eventRewardTitles[index4] == eventReward.item[index3].rewardTitle)
+            this.eventRewardList[index4].item.Add(eventReward.item[index3]);
+        }
+      }
+      for (int index5 = 0; index5 < eventReward.skillItem.Count; ++index5)
+      {
+        for (int index6 = 0; index6 < this.eventRewardTitles.Count; ++index6)
+        {
+          if (this.eventRewardTitles[index6] == eventReward.skillItem[index5].rewardTitle)
+            this.eventRewardList[index6].skillItem.Add(eventReward.skillItem[index5]);
+        }
+      }
+      for (int index7 = 0; index7 < eventReward.equipItem.Count; ++index7)
+      {
+        for (int index8 = 0; index8 < this.eventRewardTitles.Count; ++index8)
+        {
+          if (this.eventRewardTitles[index8] == eventReward.equipItem[index7].rewardTitle)
+            this.eventRewardList[index8].equipItem.Add(eventReward.equipItem[index7]);
+        }
+      }
+      for (int index9 = 0; index9 < eventReward.questItem.Count; ++index9)
+      {
+        for (int index10 = 0; index10 < this.eventRewardTitles.Count; ++index10)
+        {
+          if (this.eventRewardTitles[index10] == eventReward.questItem[index9].rewardTitle)
+            this.eventRewardList[index10].questItem.Add(eventReward.questItem[index9]);
+        }
+      }
+      for (int index11 = 0; index11 < eventReward.accessoryItem.Count; ++index11)
+      {
+        for (int index12 = 0; index12 < this.eventRewardTitles.Count; ++index12)
+        {
+          if (this.eventRewardTitles[index12] == eventReward.accessoryItem[index11].rewardTitle)
+            this.eventRewardList[index12].accessoryItem.Add(eventReward.accessoryItem[index11]);
+        }
+      }
+    }
+    if (this.eventRewardList.Count == 0)
+    {
+      if (endCallback == null)
+        return;
+      endCallback();
+    }
+    else
+    {
+      this.OpenEventRewardDialog(this.eventRewardList[this.eventRewardIndex], this.eventRewardTitles[this.eventRewardIndex], endCallback);
+      ++this.eventRewardIndex;
+    }
+  }
 
-	public override void UpdateUI()
-	{
-		//IL_0306: Unknown result type (might be due to invalid IL or missing references)
-		allPointEvents = new PointEventCurrentData();
-		allPointEvents.pointRankingData = new PointEventCurrentData.PointResultData();
-		isVictory = (MonoBehaviourSingleton<QuestManager>.I.arenaCompData != null);
-		SetFullScreenButton((Enum)UI.BTN_SKIP_FULL_SCREEN);
-		SetActive((Enum)UI.BTN_NEXT, false);
-		SetActive((Enum)UI.BTN_RETRY, false);
-		SetActive((Enum)UI.OBJ_TIME, false);
-		SetActive((Enum)UI.OBJ_CLEAR_EFFECT_ROOT, false);
-		SetActive((Enum)UI.OBJ_CLEAR_EFFECT, false);
-		SetActive((Enum)UI.OBJ_RANK_UP_ROOT, false);
-		SetActive((Enum)UI.OBJ_CONGRATULATIONS_ROOT, false);
-		if (m_isTimeAttack)
-		{
-			SetActive((Enum)UI.OBJ_REMAIN_TIME, false);
-			if (isVictory)
-			{
-				SetActive((Enum)UI.OBJ_TIME, true);
-			}
-		}
-		string arg = string.Format(StringTable.Get(STRING_CATEGORY.ARENA, 1u), m_rank.ToString());
-		string arg2 = string.Format(StringTable.Get(STRING_CATEGORY.ARENA, 0u), m_group.ToString());
-		SetLabelText((Enum)UI.LBL_QUEST_NAME, $"{arg} {arg2}");
-		List<QuestCompleteRewardList> arenaRewards = MonoBehaviourSingleton<InGameManager>.I.arenaRewards;
-		int num = 0;
-		int num2 = 0;
-		for (int j = 0; j < arenaRewards.Count; j++)
-		{
-			QuestCompleteRewardList questCompleteRewardList = arenaRewards[j];
-			QuestCompleteReward drop = questCompleteRewardList.drop;
-			QuestCompleteReward breakReward = questCompleteRewardList.breakReward;
-			QuestCompleteReward order = questCompleteRewardList.order;
-			num += drop.exp + breakReward.exp + order.exp;
-			num2 += drop.money + breakReward.money + order.money;
-		}
-		int my_user_id = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-		InGameRecorder.PlayerRecord playerRecord = MonoBehaviourSingleton<InGameRecorder>.I.players.Find((InGameRecorder.PlayerRecord data) => data.charaInfo.userId == my_user_id);
-		if (playerRecord.beforeLevel >= Singleton<UserLevelTable>.I.GetMaxLevel())
-		{
-			num = 0;
-		}
-		SetLabelText((Enum)UI.LBL_EXP, num.ToString("N0"));
-		SetLabelText((Enum)UI.LBL_REWARD_GOLD, num2.ToString("N0"));
-		SetLabelText((Enum)UI.LBL_TIME, MonoBehaviourSingleton<InGameProgress>.I.GetArenaRemainTimeToString());
-		SetLabelText((Enum)UI.LBL_CLEAR_TIME, InGameProgress.GetTimeWithMilliSecToString(0f));
-		SetActive((Enum)UI.SPR_BESTSCORE, false);
-		if (isVictory)
-		{
-			SetLabelText((Enum)UI.LBL_BEFORE_TIME, InGameProgress.GetTimeWithMilliSecToString((float)(int)MonoBehaviourSingleton<QuestManager>.I.arenaCompData.previousClearMilliSec * 0.001f));
-		}
-		bool flag = pointShopResultData.Count > 0;
-		SetActive((Enum)UI.OBJ_POINT_SHOP_RESULT_ROOT, flag);
-		if (flag)
-		{
-			SetGrid(UI.OBJ_POINT_SHOP_RESULT_ROOT, "QuestResultPointShop", pointShopResultData.Count, true, delegate(int i, Transform t, bool b)
-			{
-				ResetTween(t, 0);
-				PointShopResultData pointShopResultData = base.pointShopResultData[i];
-				SetActive(t, UI.OBJ_NORMAL_POINT_SHOP_ROOT, !pointShopResultData.isEvent);
-				if (!pointShopResultData.isEvent)
-				{
-					SetLabelText(t, UI.LBL_NORMAL_GET_POINT_SHOP, string.Format("+" + StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.getPoint));
-					SetLabelText(t, UI.LBL_NORMAL_TOTAL_POINT_SHOP, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.totalPoint));
-					UITexture component = FindCtrl(t, UI.TEX_NORMAL_POINT_SHOP_ICON).GetComponent<UITexture>();
-					ResourceLoad.LoadPointIconImageTexture(component, (uint)pointShopResultData.pointShopId);
-				}
-				SetActive(t, UI.OBJ_EVENT_POINT_SHOP_ROOT, pointShopResultData.isEvent);
-				if (pointShopResultData.isEvent)
-				{
-					SetLabelText(t, UI.LBL_EVENT_GET_POINT_SHOP, string.Format("+" + StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.getPoint));
-					SetLabelText(t, UI.LBL_EVENT_TOTAL_POINT_SHOP, string.Format(StringTable.Get(STRING_CATEGORY.POINT_SHOP, 2u), pointShopResultData.totalPoint));
-					UITexture component2 = FindCtrl(t, UI.TEX_EVENT_POINT_SHOP_ICON).GetComponent<UITexture>();
-					ResourceLoad.LoadPointIconImageTexture(component2, (uint)pointShopResultData.pointShopId);
-				}
-			});
-		}
-		this.StartCoroutine(PlayAnimation());
-	}
+  private void OnQuery_SKIP()
+  {
+    switch (this.animState)
+    {
+      case ArenaResultTop.RESULT_ANIM_STATE.TITLE:
+      case ArenaResultTop.RESULT_ANIM_STATE.DROP:
+      case ArenaResultTop.RESULT_ANIM_STATE.REMAIN_TIME:
+        this.SkipTween((Enum) ArenaResultTop.UI.OBJ_TITLE);
+        this.SkipTween((Enum) ArenaResultTop.UI.OBJ_POINT_SHOP_RESULT_ROOT);
+        this.SkipTween((Enum) ArenaResultTop.UI.OBJ_EXP);
+        this.SkipTween((Enum) ArenaResultTop.UI.OBJ_MONEY);
+        this.SkipTween((Enum) ArenaResultTop.UI.OBJ_REMAIN_TIME);
+        break;
+      case ArenaResultTop.RESULT_ANIM_STATE.CLEAR_EFFECT:
+        this.SkipTween((Enum) ArenaResultTop.UI.OBJ_RANK_UP);
+        break;
+      case ArenaResultTop.RESULT_ANIM_STATE.BEST_SCORE:
+        this.SkipTween((Enum) ArenaResultTop.UI.SPR_BESTSCORE);
+        break;
+    }
+    this.is_skip = true;
+    GameSection.StopEvent();
+  }
 
-	private void PlayAudio(AUDIO type)
-	{
-		if (MonoBehaviourSingleton<SoundManager>.IsValid())
-		{
-			SoundManager.PlayOneShotUISE((int)type);
-		}
-	}
+  private void OnQuery_NEXT()
+  {
+    if (this.animState == ArenaResultTop.RESULT_ANIM_STATE.IDLE)
+      this.GoArenaList();
+    else if (this.animState != ArenaResultTop.RESULT_ANIM_STATE.END)
+      this.OnQuery_SKIP();
+    else
+      this.GoArenaList();
+  }
 
-	private IEnumerator PlayAnimation()
-	{
-		is_skip = false;
-		animState = RESULT_ANIM_STATE.TITLE;
-		PlayAudio(AUDIO.ADVENT);
-		PlayTween((Enum)UI.OBJ_TITLE, true, (EventDelegate.Callback)delegate
-		{
-			((_003CPlayAnimation_003Ec__Iterator11)/*Error near IL_007b: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-		}, false, 0);
-		while (animState != 0 && !is_skip)
-		{
-			yield return (object)null;
-		}
-		animState = RESULT_ANIM_STATE.DROP;
-		PlayAudio(AUDIO.ACHIEVEMENT);
-		if (pointShopResultData.Count > 0)
-		{
-			foreach (Transform item in GetCtrl(UI.OBJ_POINT_SHOP_RESULT_ROOT).get_transform())
-			{
-				Transform t = item;
-				PlayTween(t, true, null, true, 0);
-			}
-		}
-		PlayTween((Enum)UI.OBJ_EXP, true, (EventDelegate.Callback)null, true, 0);
-		PlayTween((Enum)UI.OBJ_MONEY, true, (EventDelegate.Callback)delegate
-		{
-			((_003CPlayAnimation_003Ec__Iterator11)/*Error near IL_019a: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-		}, false, 0);
-		while (animState != 0 && !is_skip)
-		{
-			yield return (object)null;
-		}
-		if (!m_isTimeAttack)
-		{
-			animState = RESULT_ANIM_STATE.REMAIN_TIME;
-			PlayTween((Enum)UI.OBJ_REMAIN_TIME, true, (EventDelegate.Callback)delegate
-			{
-				SoundManager.PlayOneShotUISE(40000228);
-				((_003CPlayAnimation_003Ec__Iterator11)/*Error near IL_020f: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-			}, false, 0);
-			while (animState != 0 && !is_skip)
-			{
-				yield return (object)null;
-			}
-			if (isVictory)
-			{
-				if (m_rank == ARENA_RANK.SS)
-				{
-					SetActive((Enum)UI.OBJ_CONGRATULATIONS_ROOT, true);
-					ResetTween((Enum)UI.OBJ_CONGRATULATIONS, 0);
-					animState = RESULT_ANIM_STATE.CLEAR_EFFECT;
-					ParticleSystem particle2 = GetCtrl(UI.OBJ_CONGRATULATIONS_PARTICLE).GetComponent<ParticleSystem>();
-					particle2.GetComponent<ParticleSystemRenderer>().get_sharedMaterial().set_renderQueue(4000);
-					yield return (object)null;
-					PlayAudio(AUDIO.ARRIVAL);
-					PlayTween((Enum)UI.OBJ_CONGRATULATIONS, true, (EventDelegate.Callback)delegate
-					{
-						((_003CPlayAnimation_003Ec__Iterator11)/*Error near IL_0315: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-					}, true, 0);
-					while (animState != 0 && !is_skip)
-					{
-						yield return (object)null;
-					}
-				}
-				else
-				{
-					SetActive((Enum)UI.OBJ_RANK_UP_ROOT, true);
-					ResetTween((Enum)UI.OBJ_RANK_UP, 0);
-					animState = RESULT_ANIM_STATE.CLEAR_EFFECT;
-					ParticleSystem particle = GetCtrl(UI.OBJ_PARTICLE).GetComponent<ParticleSystem>();
-					particle.GetComponent<ParticleSystemRenderer>().get_sharedMaterial().set_renderQueue(4000);
-					yield return (object)null;
-					PlayAudio(AUDIO.ARRIVAL);
-					PlayTween((Enum)UI.OBJ_RANK_UP, true, (EventDelegate.Callback)delegate
-					{
-						((_003CPlayAnimation_003Ec__Iterator11)/*Error near IL_03ff: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-					}, true, 0);
-					while (animState != 0 && !is_skip)
-					{
-						yield return (object)null;
-					}
-				}
-			}
-		}
-		if (m_isTimeAttack)
-		{
-			animState = RESULT_ANIM_STATE.CLEAR_TIME_COUNT_UP;
-			this.StartCoroutine(PlayCountUpClearTimeAnim(MonoBehaviourSingleton<InGameProgress>.I.GetArenaElapsedTime(), delegate
-			{
-				((_003CPlayAnimation_003Ec__Iterator11)/*Error near IL_047c: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-			}));
-			while (animState != 0 && !is_skip)
-			{
-				yield return (object)null;
-			}
-			if (IsBreakRecord())
-			{
-				animState = RESULT_ANIM_STATE.BEST_SCORE;
-				PlayAudio(AUDIO.ARRIVAL);
-				SetActive((Enum)UI.SPR_BESTSCORE, true);
-				PlayTween((Enum)UI.SPR_BESTSCORE, true, (EventDelegate.Callback)delegate
-				{
-					((_003CPlayAnimation_003Ec__Iterator11)/*Error near IL_0518: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-				}, true, 0);
-				while (animState != 0 && !is_skip)
-				{
-					yield return (object)null;
-				}
-			}
-		}
-		animState = RESULT_ANIM_STATE.EVENT;
-		OpenAllEventRewardDialog(delegate
-		{
-			((_003CPlayAnimation_003Ec__Iterator11)/*Error near IL_0576: stateMachine*/)._003C_003Ef__this.animState = RESULT_ANIM_STATE.IDLE;
-		});
-		while (animState != 0 && !is_skip)
-		{
-			yield return (object)null;
-		}
-		animState = RESULT_ANIM_STATE.END;
-		VisibleEndButton();
-	}
+  private void GoArenaList()
+  {
+    if (MonoBehaviourSingleton<InGameManager>.IsValid())
+      MonoBehaviourSingleton<InGameManager>.I.ClearArenaInfo();
+    MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(new EventData[2]
+    {
+      new EventData(GameSection.GetGoingHomeEvent()),
+      new EventData("ARENA_LIST")
+    });
+  }
 
-	private IEnumerator GetPointAnimation(Action callback)
-	{
-		int getPoint = allPointEvents.pointRankingData.getPoint;
-		int userPoint = allPointEvents.pointRankingData.userPoint;
-		yield return (object)null;
-		callback();
-	}
+  private void OnQuery_RETRY()
+  {
+    if (this.animState == ArenaResultTop.RESULT_ANIM_STATE.IDLE)
+      this.ReloadScene();
+    else if (this.animState != ArenaResultTop.RESULT_ANIM_STATE.END)
+      this.OnQuery_SKIP();
+    else
+      this.ReloadScene();
+  }
 
-	private IEnumerator PlayCountUpClearTimeAnim(float targetTime, Action callBack)
-	{
-		float currentShowTime2 = 0f;
-		while (currentShowTime2 < targetTime)
-		{
-			yield return (object)null;
-			if (is_skip)
-			{
-				currentShowTime2 = targetTime;
-			}
-			int before = Mathf.FloorToInt(currentShowTime2);
-			float addingTime = Mathf.Max((targetTime - currentShowTime2) * CountDownCube(Time.get_deltaTime() * 4f), 1f);
-			currentShowTime2 += addingTime;
-			currentShowTime2 = Mathf.Min(currentShowTime2, targetTime);
-			if (before < Mathf.FloorToInt(currentShowTime2))
-			{
-				SoundManager.PlayOneShotUISE(40000012);
-			}
-			SetLabelText((Enum)UI.LBL_CLEAR_TIME, InGameProgress.GetTimeWithMilliSecToString(currentShowTime2));
-		}
-		callBack?.Invoke();
-	}
+  private void ReloadScene()
+  {
+    if (MonoBehaviourSingleton<CoopManager>.IsValid())
+      MonoBehaviourSingleton<CoopManager>.I.Clear();
+    if (MonoBehaviourSingleton<InGameManager>.IsValid())
+      MonoBehaviourSingleton<InGameManager>.I.isRetry = true;
+    MonoBehaviourSingleton<GameSceneManager>.I.ReloadScene();
+  }
 
-	private float CountDownCube(float currentValue)
-	{
-		return currentValue * (2f - currentValue);
-	}
+  protected override string GetSceneName() => nameof (ArenaResultTop);
 
-	protected override void VisibleEndButton()
-	{
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		SetActive((Enum)UI.BTN_NEXT, animState == RESULT_ANIM_STATE.END);
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, animState != RESULT_ANIM_STATE.END);
-		if (m_isTimeAttack || MonoBehaviourSingleton<InGameProgress>.I.progressEndType == InGameProgress.PROGRESS_END_TYPE.QUEST_RETIRE)
-		{
-			SetActive((Enum)UI.BTN_RETRY, animState == RESULT_ANIM_STATE.END);
-		}
-		else
-		{
-			SetActive((Enum)UI.BTN_RETRY, false);
-			Vector3 localPosition = GetCtrl(UI.BTN_NEXT).get_localPosition();
-			GetCtrl(UI.BTN_NEXT).set_localPosition(new Vector3(0f, localPosition.y, localPosition.x));
-		}
-	}
+  private new enum UI
+  {
+    LBL_QUEST_NAME,
+    LBL_PLAYER_LV,
+    LBL_PLAYER_LVUP,
+    SPR_LEVELUP,
+    LBL_LVUP_NUM,
+    OBJ_GET_EXP_ROOT,
+    OBJ_MISSION_ROOT,
+    OBJ_MISSION_NEW_CLEAR_ROOT,
+    OBJ_TREASURE_ROOT,
+    STR_TITLE_EXP,
+    STR_TITLE_MISSION,
+    STR_TITLE_REWARD,
+    OBJ_EXP_REWARD_FRAME,
+    LBL_EXP,
+    SPR_GAUGE_UPPER,
+    PBR_EXP,
+    OBJ_RESULT_EXP_GAUGE_CTRL,
+    OBJ_MISSION_INFO_FRAME,
+    OBJ_MISSION_01,
+    OBJ_MISSION_02,
+    OBJ_MISSION_03,
+    LBL_MISSION_NAME_01,
+    LBL_MISSION_NAME_02,
+    LBL_MISSION_NAME_03,
+    SPR_CROWN_01,
+    SPR_CROWN_02,
+    SPR_CROWN_03,
+    SPR_CLEARED_CROWN_01,
+    SPR_CLEARED_CROWN_02,
+    SPR_CLEARED_CROWN_03,
+    STR_EMPTY_MISSION,
+    GET_ITEM,
+    GET_ITEM_2,
+    OBJ_QUEST_REWARD_FRAME,
+    LBL_REWARD_GOLD,
+    TBL_ITEM,
+    OBJ_SCROLL_VIEW,
+    OBJ_SCROLL_VIEW_2,
+    GRD_DROP_ITEM,
+    GRD_DROP_ITEM_2,
+    BTN_NEXT,
+    BTN_RETRY,
+    BTN_SKIP_FULL_SCREEN,
+    BTN_SKIP_IN_SCROLL,
+    BTN_SKIP_IN_SCROLL_2,
+    PNL_MATERIAL_INFO,
+    PNL_MATERIAL_INFO_2,
+    OBJ_TREASURE_ROOT_NON_MISSION,
+    OBJ_POINT_SHOP_RESULT_ROOT,
+    OBJ_NORMAL_POINT_SHOP_ROOT,
+    OBJ_EVENT_POINT_SHOP_ROOT,
+    LBL_NORMAL_GET_POINT_SHOP,
+    LBL_NORMAL_TOTAL_POINT_SHOP,
+    TEX_NORMAL_POINT_SHOP_ICON,
+    LBL_EVENT_GET_POINT_SHOP,
+    LBL_EVENT_TOTAL_POINT_SHOP,
+    TEX_EVENT_POINT_SHOP_ICON,
+    LBL_GUILD_REQUEST_GET_POINT,
+    OBJ_TITLE,
+    OBJ_WAVE,
+    LBL_WAVE,
+    OBJ_TIME,
+    LBL_TIME,
+    OBJ_MONEY,
+    OBJ_COIN,
+    OBJ_ARRIVAL_EFFECT_ROOT,
+    OBJ_ARRIVAL_EFFECT,
+    OBJ_ARRIVAL_BONUS,
+    GRD_ARRIVAL_ITEM_ICON,
+    STR_REWARD_TITLE,
+    SPR_WAVE_01,
+    SPR_WAVE_10,
+    SPR_WAVE_100,
+    TBL_DROP_ITEM,
+    LBL_DROP_ITEM_WAVE,
+    STR_TITLE_WAVE,
+    STR_TITLE_TIME,
+    LBL_EXPLORE_GET_POINT,
+    LBL_EXPLORE_TOTAL_POINT,
+    SPR_TITLE,
+    OBJ_EXP,
+    OBJ_REMAIN_TIME,
+    OBJ_CLEAR_TIME,
+    STR_CLEAR_TIME_NAME,
+    LBL_CLEAR_TIME,
+    OBJ_BEFORE_TIME,
+    SPR_BEFORE_TIME_NAME,
+    LBL_BEFORE_TIME,
+    SPR_BESTSCORE,
+    OBJ_CLEAR_EFFECT_ROOT,
+    OBJ_CLEAR_EFFECT,
+    OBJ_RANK_UP_ROOT,
+    OBJ_RANK_UP,
+    TEX_RANK_PRE,
+    TEX_RANK_NEW,
+    OBJ_PARTICLE,
+    OBJ_CONGRATULATIONS_ROOT,
+    OBJ_CONGRATULATIONS,
+    OBJ_CONGRATULATIONS_PARTICLE,
+    LBL_BOSS_NAME,
+    TBL_GUILD_REQUEST_RESULT,
+    OBJ_BONUS_POINT_SHOP,
+    TXT_BONUS_POINT_ICON,
+    LBL_BONUS_POINT_NUM,
+    TEX_MISSION_COIN_01,
+    TEX_MISSION_COIN_02,
+    TEX_MISSION_COIN_03,
+    SPR_CROWN01_OFF,
+    SPR_CROWN02_OFF,
+    SPR_CROWN03_OFF,
+    SHADOW,
+    BTN_NEXT_ALL,
+    BTN_END_HUNT_CENTER,
+    BTN_END_HUNT_LEFT,
+    BTN_REPEAT_HUNT,
+    LBL_BTN_REPEAT_HUNT,
+    LBL_WAIT_FOR_HOST,
+  }
 
-	private bool IsBreakRecord()
-	{
-		if (!MonoBehaviourSingleton<InGameProgress>.IsValid())
-		{
-			return false;
-		}
-		if (!MonoBehaviourSingleton<QuestManager>.IsValid())
-		{
-			return false;
-		}
-		if (MonoBehaviourSingleton<QuestManager>.I.arenaCompData == null)
-		{
-			return false;
-		}
-		int num = Mathf.FloorToInt(MonoBehaviourSingleton<InGameProgress>.I.GetArenaElapsedTime() * 1000f);
-		int num2 = MonoBehaviourSingleton<QuestManager>.I.arenaCompData.previousClearMilliSec;
-		if (num < num2)
-		{
-			return true;
-		}
-		return false;
-	}
+  private new enum AUDIO
+  {
+    COUNTUP = 40000012, // 0x02625A0C
+    ADVENT = 40000026, // 0x02625A1A
+    ACHIEVEMENT = 40000028, // 0x02625A1C
+    CATEGORY = 40000228, // 0x02625AE4
+    POINTREWARD = 40000230, // 0x02625AE6
+    ARRIVAL = 40000269, // 0x02625B0D
+  }
 
-	private void DevideRewardDropAndEvent(ResultReward resultReward, QuestCompleteReward reward)
-	{
-		resultReward.dropReward = new QuestCompleteReward();
-		resultReward.eventReward = new QuestCompleteReward();
-		List<string> list = new List<string>();
-		resultReward.dropReward.exp = reward.exp;
-		int num = 0;
-		int num2 = 0;
-		for (int i = 0; i < reward.eventPrice.Count; i++)
-		{
-			num += reward.eventPrice[i].gold;
-			num2 += reward.eventPrice[i].gold;
-			resultReward.eventReward.eventPrice.Add(reward.eventPrice[i]);
-			list.Add(reward.eventPrice[i].rewardTitle);
-		}
-		resultReward.dropReward.money = Mathf.Max(0, reward.money - num);
-		resultReward.dropReward.crystal = Mathf.Max(0, reward.crystal - num2);
-		for (int j = 0; j < reward.item.Count; j++)
-		{
-			if (string.IsNullOrEmpty(reward.item[j].rewardTitle))
-			{
-				resultReward.dropReward.item.Add(reward.item[j]);
-			}
-			else
-			{
-				resultReward.eventReward.item.Add(reward.item[j]);
-				list.Add(reward.item[j].rewardTitle);
-			}
-		}
-		for (int k = 0; k < reward.skillItem.Count; k++)
-		{
-			if (string.IsNullOrEmpty(reward.skillItem[k].rewardTitle))
-			{
-				resultReward.dropReward.skillItem.Add(reward.skillItem[k]);
-			}
-			else
-			{
-				resultReward.eventReward.skillItem.Add(reward.skillItem[k]);
-				list.Add(reward.skillItem[k].rewardTitle);
-			}
-		}
-		for (int l = 0; l < reward.equipItem.Count; l++)
-		{
-			if (string.IsNullOrEmpty(reward.equipItem[l].rewardTitle))
-			{
-				resultReward.dropReward.equipItem.Add(reward.equipItem[l]);
-			}
-			else
-			{
-				resultReward.eventReward.equipItem.Add(reward.equipItem[l]);
-				list.Add(reward.equipItem[l].rewardTitle);
-			}
-		}
-		for (int m = 0; m < reward.questItem.Count; m++)
-		{
-			if (string.IsNullOrEmpty(reward.questItem[m].rewardTitle))
-			{
-				resultReward.dropReward.questItem.Add(reward.questItem[m]);
-			}
-			else
-			{
-				resultReward.eventReward.questItem.Add(reward.questItem[m]);
-				list.Add(reward.questItem[m].rewardTitle);
-			}
-		}
-		for (int n = 0; n < list.Count; n++)
-		{
-			if (!eventRewardTitles.Contains(list[n]))
-			{
-				eventRewardTitles.Add(list[n]);
-			}
-		}
-	}
-
-	private void OpenAllEventRewardDialog(Action endCallback)
-	{
-		eventRewardIndex = 0;
-		eventRewardList = new List<QuestCompleteReward>();
-		for (int i = 0; i < eventRewardTitles.Count; i++)
-		{
-			QuestCompleteReward item = new QuestCompleteReward();
-			eventRewardList.Add(item);
-		}
-		ResultReward[] array = resultRewards;
-		foreach (ResultReward resultReward in array)
-		{
-			QuestCompleteReward eventReward = resultReward.eventReward;
-			for (int k = 0; k < eventReward.eventPrice.Count; k++)
-			{
-				for (int l = 0; l < eventRewardTitles.Count; l++)
-				{
-					if (eventRewardTitles[l] == eventReward.eventPrice[k].rewardTitle)
-					{
-						eventRewardList[l].eventPrice.Add(eventReward.eventPrice[k]);
-					}
-				}
-			}
-			for (int m = 0; m < eventReward.item.Count; m++)
-			{
-				for (int n = 0; n < eventRewardTitles.Count; n++)
-				{
-					if (eventRewardTitles[n] == eventReward.item[m].rewardTitle)
-					{
-						eventRewardList[n].item.Add(eventReward.item[m]);
-					}
-				}
-			}
-			for (int num = 0; num < eventReward.skillItem.Count; num++)
-			{
-				for (int num2 = 0; num2 < eventRewardTitles.Count; num2++)
-				{
-					if (eventRewardTitles[num2] == eventReward.skillItem[num].rewardTitle)
-					{
-						eventRewardList[num2].skillItem.Add(eventReward.skillItem[num]);
-					}
-				}
-			}
-			for (int num3 = 0; num3 < eventReward.equipItem.Count; num3++)
-			{
-				for (int num4 = 0; num4 < eventRewardTitles.Count; num4++)
-				{
-					if (eventRewardTitles[num4] == eventReward.equipItem[num3].rewardTitle)
-					{
-						eventRewardList[num4].equipItem.Add(eventReward.equipItem[num3]);
-					}
-				}
-			}
-			for (int num5 = 0; num5 < eventReward.questItem.Count; num5++)
-			{
-				for (int num6 = 0; num6 < eventRewardTitles.Count; num6++)
-				{
-					if (eventRewardTitles[num6] == eventReward.questItem[num5].rewardTitle)
-					{
-						eventRewardList[num6].questItem.Add(eventReward.questItem[num5]);
-					}
-				}
-			}
-		}
-		if (eventRewardList.Count == 0)
-		{
-			endCallback?.Invoke();
-		}
-		else
-		{
-			OpenEventRewardDialog(eventRewardList[eventRewardIndex], eventRewardTitles[eventRewardIndex], endCallback);
-			eventRewardIndex++;
-		}
-	}
-
-	private void OnQuery_SKIP()
-	{
-		switch (animState)
-		{
-		case RESULT_ANIM_STATE.TITLE:
-		case RESULT_ANIM_STATE.DROP:
-		case RESULT_ANIM_STATE.REMAIN_TIME:
-			SkipTween((Enum)UI.OBJ_TITLE, true, 0);
-			SkipTween((Enum)UI.OBJ_POINT_SHOP_RESULT_ROOT, true, 0);
-			SkipTween((Enum)UI.OBJ_EXP, true, 0);
-			SkipTween((Enum)UI.OBJ_MONEY, true, 0);
-			SkipTween((Enum)UI.OBJ_REMAIN_TIME, true, 0);
-			break;
-		case RESULT_ANIM_STATE.BEST_SCORE:
-			SkipTween((Enum)UI.SPR_BESTSCORE, true, 0);
-			break;
-		case RESULT_ANIM_STATE.CLEAR_EFFECT:
-			SkipTween((Enum)UI.OBJ_RANK_UP, true, 0);
-			break;
-		}
-		is_skip = true;
-		GameSection.StopEvent();
-	}
-
-	private void OnQuery_NEXT()
-	{
-		if (animState == RESULT_ANIM_STATE.IDLE)
-		{
-			GoArenaList();
-		}
-		else if (animState != RESULT_ANIM_STATE.END)
-		{
-			OnQuery_SKIP();
-		}
-		else
-		{
-			GoArenaList();
-		}
-	}
-
-	private void GoArenaList()
-	{
-		if (MonoBehaviourSingleton<InGameManager>.IsValid())
-		{
-			MonoBehaviourSingleton<InGameManager>.I.ClearArenaInfo();
-		}
-		string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
-		EventData[] autoEvents = new EventData[2]
-		{
-			new EventData(name),
-			new EventData("ARENA_LIST")
-		};
-		MonoBehaviourSingleton<GameSceneManager>.I.SetAutoEvents(autoEvents);
-	}
-
-	private void OnQuery_RETRY()
-	{
-		if (animState == RESULT_ANIM_STATE.IDLE)
-		{
-			ReloadScene();
-		}
-		else if (animState != RESULT_ANIM_STATE.END)
-		{
-			OnQuery_SKIP();
-		}
-		else
-		{
-			ReloadScene();
-		}
-	}
-
-	private void ReloadScene()
-	{
-		if (MonoBehaviourSingleton<CoopManager>.IsValid())
-		{
-			MonoBehaviourSingleton<CoopManager>.I.Clear();
-		}
-		if (MonoBehaviourSingleton<InGameManager>.IsValid())
-		{
-			MonoBehaviourSingleton<InGameManager>.I.isRetry = true;
-		}
-		MonoBehaviourSingleton<GameSceneManager>.I.ReloadScene(UITransition.TYPE.CLOSE, UITransition.TYPE.OPEN, false);
-	}
-
-	protected override string GetSceneName()
-	{
-		return "ArenaResultTop";
-	}
+  private new enum RESULT_ANIM_STATE
+  {
+    IDLE,
+    TITLE,
+    DROP,
+    REMAIN_TIME,
+    CLEAR_TIME_COUNT_UP,
+    CLEAR_EFFECT,
+    BEST_SCORE,
+    EVENT,
+    END,
+  }
 }

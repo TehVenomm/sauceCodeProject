@@ -1,475 +1,497 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AtkAttribute
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+#nullable disable
 [Serializable]
 public class AtkAttribute
 {
-	[Tooltip("通常")]
-	public float normal;
+  [Tooltip("通常")]
+  public float normal;
+  [Tooltip("炎")]
+  public float fire;
+  [Tooltip("氷")]
+  [FormerlySerializedAs("ice")]
+  public float water;
+  [Tooltip("雷")]
+  [FormerlySerializedAs("wind")]
+  public float thunder;
+  [Tooltip("土")]
+  public float soil;
+  [Tooltip("光")]
+  public float light;
+  [Tooltip("闇")]
+  public float dark;
+  private float[] baseElementTolerances = new float[6];
+  private int[,] ElementToleranceScrollTable;
 
-	[Tooltip("炎")]
-	public float fire;
+  public void Set(float targetValue)
+  {
+    this.normal = this.fire = this.water = this.thunder = this.soil = this.light = this.dark = targetValue;
+  }
 
-	[Tooltip("氷")]
-	[FormerlySerializedAs("ice")]
-	public float water;
+  public void Copy(AtkAttribute srcAtk)
+  {
+    this.normal = srcAtk.normal;
+    this.fire = srcAtk.fire;
+    this.water = srcAtk.water;
+    this.thunder = srcAtk.thunder;
+    this.soil = srcAtk.soil;
+    this.light = srcAtk.light;
+    this.dark = srcAtk.dark;
+  }
 
-	[Tooltip("雷")]
-	[FormerlySerializedAs("wind")]
-	public float thunder;
+  public void Mul(AtkAttribute val)
+  {
+    this.normal *= val.normal;
+    this.fire *= val.fire;
+    this.water *= val.water;
+    this.thunder *= val.thunder;
+    this.soil *= val.soil;
+    this.light *= val.light;
+    this.dark *= val.dark;
+  }
 
-	[Tooltip("土")]
-	public float soil;
+  public void Mul(float val)
+  {
+    this.normal *= val;
+    this.fire *= val;
+    this.water *= val;
+    this.thunder *= val;
+    this.soil *= val;
+    this.light *= val;
+    this.dark *= val;
+  }
 
-	[Tooltip("光")]
-	public float light;
+  public void Div(float val)
+  {
+    if ((double) val == 0.0)
+      return;
+    this.normal /= val;
+    this.fire /= val;
+    this.water /= val;
+    this.thunder /= val;
+    this.soil /= val;
+    this.light /= val;
+    this.dark /= val;
+  }
 
-	[Tooltip("闇")]
-	public float dark;
+  public void Add(AtkAttribute val)
+  {
+    if (val == null)
+      return;
+    this.normal += val.normal;
+    this.fire += val.fire;
+    this.water += val.water;
+    this.thunder += val.thunder;
+    this.soil += val.soil;
+    this.light += val.light;
+    this.dark += val.dark;
+  }
 
-	private float[] baseElementTolerances = new float[6];
+  public void AddRate(float rate)
+  {
+    this.normal += rate;
+    this.fire += rate;
+    this.water += rate;
+    this.thunder += rate;
+    this.soil += rate;
+    this.light += rate;
+    this.dark += rate;
+  }
 
-	private int[,] ElementToleranceScrollTable;
+  public void Sub(AtkAttribute val)
+  {
+    this.normal -= val.normal;
+    this.fire -= val.fire;
+    this.water -= val.water;
+    this.thunder -= val.thunder;
+    this.soil -= val.soil;
+    this.light -= val.light;
+    this.dark -= val.dark;
+  }
 
-	public void Set(float targetValue)
-	{
-		normal = (fire = (water = (thunder = (soil = (light = (dark = targetValue))))));
-	}
+  public void ChangeElementType(ELEMENT_TYPE type)
+  {
+    float normal = this.normal;
+    switch (type)
+    {
+      case ELEMENT_TYPE.FIRE:
+        normal += this.fire;
+        break;
+      case ELEMENT_TYPE.WATER:
+        normal += this.water;
+        break;
+      case ELEMENT_TYPE.THUNDER:
+        normal += this.thunder;
+        break;
+      case ELEMENT_TYPE.SOIL:
+        normal += this.soil;
+        break;
+      case ELEMENT_TYPE.LIGHT:
+        normal += this.light;
+        break;
+      case ELEMENT_TYPE.DARK:
+        normal += this.dark;
+        break;
+    }
+    this.Mul(0.0f);
+    switch (type)
+    {
+      case ELEMENT_TYPE.FIRE:
+        this.fire = normal;
+        break;
+      case ELEMENT_TYPE.WATER:
+        this.water = normal;
+        break;
+      case ELEMENT_TYPE.THUNDER:
+        this.thunder = normal;
+        break;
+      case ELEMENT_TYPE.SOIL:
+        this.soil = normal;
+        break;
+      case ELEMENT_TYPE.LIGHT:
+        this.light = normal;
+        break;
+      case ELEMENT_TYPE.DARK:
+        this.dark = normal;
+        break;
+      default:
+        this.normal = normal;
+        break;
+    }
+  }
 
-	public void Copy(AtkAttribute srcAtk)
-	{
-		normal = srcAtk.normal;
-		fire = srcAtk.fire;
-		water = srcAtk.water;
-		thunder = srcAtk.thunder;
-		soil = srcAtk.soil;
-		light = srcAtk.light;
-		dark = srcAtk.dark;
-	}
+  public ELEMENT_TYPE GetElementType()
+  {
+    ELEMENT_TYPE elementType = ELEMENT_TYPE.MAX;
+    float num = 0.0f;
+    if ((double) this.fire > (double) num)
+    {
+      elementType = ELEMENT_TYPE.FIRE;
+      num = this.fire;
+    }
+    if ((double) this.water > (double) num)
+    {
+      elementType = ELEMENT_TYPE.WATER;
+      num = this.water;
+    }
+    if ((double) this.thunder > (double) num)
+    {
+      elementType = ELEMENT_TYPE.THUNDER;
+      num = this.thunder;
+    }
+    if ((double) this.soil > (double) num)
+    {
+      elementType = ELEMENT_TYPE.SOIL;
+      num = this.soil;
+    }
+    if ((double) this.light > (double) num)
+    {
+      elementType = ELEMENT_TYPE.LIGHT;
+      num = this.light;
+    }
+    if ((double) this.dark > (double) num)
+    {
+      elementType = ELEMENT_TYPE.DARK;
+      float dark = this.dark;
+    }
+    return elementType;
+  }
 
-	public void Mul(AtkAttribute val)
-	{
-		normal *= val.normal;
-		fire *= val.fire;
-		water *= val.water;
-		thunder *= val.thunder;
-		soil *= val.soil;
-		light *= val.light;
-		dark *= val.dark;
-	}
+  public ELEMENT_TYPE GetAntiElementType()
+  {
+    ELEMENT_TYPE antiElementType = ELEMENT_TYPE.MAX;
+    float num = 1f;
+    if ((double) this.normal < (double) num)
+    {
+      antiElementType = ELEMENT_TYPE.MAX;
+      num = this.normal;
+    }
+    if ((double) this.fire < (double) num)
+    {
+      antiElementType = ELEMENT_TYPE.FIRE;
+      num = this.fire;
+    }
+    if ((double) this.water < (double) num)
+    {
+      antiElementType = ELEMENT_TYPE.WATER;
+      num = this.water;
+    }
+    if ((double) this.thunder < (double) num)
+    {
+      antiElementType = ELEMENT_TYPE.THUNDER;
+      num = this.thunder;
+    }
+    if ((double) this.soil < (double) num)
+    {
+      antiElementType = ELEMENT_TYPE.SOIL;
+      num = this.soil;
+    }
+    if ((double) this.light < (double) num)
+    {
+      antiElementType = ELEMENT_TYPE.LIGHT;
+      num = this.light;
+    }
+    if ((double) this.dark < (double) num)
+    {
+      antiElementType = ELEMENT_TYPE.DARK;
+      float dark = this.dark;
+    }
+    return antiElementType;
+  }
 
-	public void Mul(float val)
-	{
-		normal *= val;
-		fire *= val;
-		water *= val;
-		thunder *= val;
-		soil *= val;
-		light *= val;
-		dark *= val;
-	}
+  public void AddElementValueWithCheck(float targetValue)
+  {
+    if ((double) this.fire > 0.0)
+      this.fire += targetValue;
+    if ((double) this.water > 0.0)
+      this.water += targetValue;
+    if ((double) this.thunder > 0.0)
+      this.thunder += targetValue;
+    if ((double) this.soil > 0.0)
+      this.soil += targetValue;
+    if ((double) this.light > 0.0)
+      this.light += targetValue;
+    if ((double) this.dark <= 0.0)
+      return;
+    this.dark += targetValue;
+  }
 
-	public void Div(float val)
-	{
-		if (val != 0f)
-		{
-			normal /= val;
-			fire /= val;
-			water /= val;
-			thunder /= val;
-			soil /= val;
-			light /= val;
-			dark /= val;
-		}
-	}
+  public void AddElementOnly(float targetValue)
+  {
+    this.fire += targetValue;
+    this.water += targetValue;
+    this.thunder += targetValue;
+    this.soil += targetValue;
+    this.light += targetValue;
+    this.dark += targetValue;
+  }
 
-	public void Add(AtkAttribute val)
-	{
-		if (val != null)
-		{
-			normal += val.normal;
-			fire += val.fire;
-			water += val.water;
-			thunder += val.thunder;
-			soil += val.soil;
-			light += val.light;
-			dark += val.dark;
-		}
-	}
+  public void AddAll(float targetValue)
+  {
+    this.normal += targetValue;
+    this.fire += targetValue;
+    this.water += targetValue;
+    this.thunder += targetValue;
+    this.soil += targetValue;
+    this.light += targetValue;
+    this.dark += targetValue;
+  }
 
-	public void AddRate(float rate)
-	{
-		normal += rate;
-		fire += rate;
-		water += rate;
-		thunder += rate;
-		soil += rate;
-		light += rate;
-		dark += rate;
-	}
+  public void MulElementOnly(float targetValue)
+  {
+    this.fire *= targetValue;
+    this.water *= targetValue;
+    this.thunder *= targetValue;
+    this.soil *= targetValue;
+    this.light *= targetValue;
+    this.dark *= targetValue;
+  }
 
-	public void Sub(AtkAttribute val)
-	{
-		normal -= val.normal;
-		fire -= val.fire;
-		water -= val.water;
-		thunder -= val.thunder;
-		soil -= val.soil;
-		light -= val.light;
-		dark -= val.dark;
-	}
+  public void SubElementOnly(float targetValue)
+  {
+    this.fire -= targetValue;
+    if ((double) this.fire < 0.0)
+      this.fire = 0.0f;
+    this.water -= targetValue;
+    if ((double) this.water < 0.0)
+      this.water = 0.0f;
+    this.thunder -= targetValue;
+    if ((double) this.thunder < 0.0)
+      this.thunder = 0.0f;
+    this.soil -= targetValue;
+    if ((double) this.soil < 0.0)
+      this.soil = 0.0f;
+    this.light -= targetValue;
+    if ((double) this.light < 0.0)
+      this.light = 0.0f;
+    this.dark -= targetValue;
+    if ((double) this.dark >= 0.0)
+      return;
+    this.dark = 0.0f;
+  }
 
-	public void ChangeElementType(ELEMENT_TYPE type)
-	{
-		float num = normal;
-		switch (type)
-		{
-		case ELEMENT_TYPE.FIRE:
-			num += fire;
-			break;
-		case ELEMENT_TYPE.WATER:
-			num += water;
-			break;
-		case ELEMENT_TYPE.THUNDER:
-			num += thunder;
-			break;
-		case ELEMENT_TYPE.SOIL:
-			num += soil;
-			break;
-		case ELEMENT_TYPE.LIGHT:
-			num += light;
-			break;
-		case ELEMENT_TYPE.DARK:
-			num += dark;
-			break;
-		}
-		Mul(0f);
-		switch (type)
-		{
-		case ELEMENT_TYPE.FIRE:
-			fire = num;
-			break;
-		case ELEMENT_TYPE.WATER:
-			water = num;
-			break;
-		case ELEMENT_TYPE.THUNDER:
-			thunder = num;
-			break;
-		case ELEMENT_TYPE.SOIL:
-			soil = num;
-			break;
-		case ELEMENT_TYPE.LIGHT:
-			light = num;
-			break;
-		case ELEMENT_TYPE.DARK:
-			dark = num;
-			break;
-		default:
-			normal = num;
-			break;
-		}
-	}
+  public void CheckMinus()
+  {
+    if ((double) this.normal < 0.0)
+      this.normal = 0.0f;
+    if ((double) this.fire < 0.0)
+      this.fire = 0.0f;
+    if ((double) this.water < 0.0)
+      this.water = 0.0f;
+    if ((double) this.thunder < 0.0)
+      this.thunder = 0.0f;
+    if ((double) this.soil < 0.0)
+      this.soil = 0.0f;
+    if ((double) this.light < 0.0)
+      this.light = 0.0f;
+    if ((double) this.dark >= 0.0)
+      return;
+    this.dark = 0.0f;
+  }
 
-	public ELEMENT_TYPE GetElementType()
-	{
-		ELEMENT_TYPE result = ELEMENT_TYPE.MAX;
-		float num = 0f;
-		if (fire > num)
-		{
-			result = ELEMENT_TYPE.FIRE;
-			num = fire;
-		}
-		if (water > num)
-		{
-			result = ELEMENT_TYPE.WATER;
-			num = water;
-		}
-		if (thunder > num)
-		{
-			result = ELEMENT_TYPE.THUNDER;
-			num = thunder;
-		}
-		if (soil > num)
-		{
-			result = ELEMENT_TYPE.SOIL;
-			num = soil;
-		}
-		if (light > num)
-		{
-			result = ELEMENT_TYPE.LIGHT;
-			num = light;
-		}
-		if (dark > num)
-		{
-			result = ELEMENT_TYPE.DARK;
-			num = dark;
-		}
-		return result;
-	}
+  public void SetTargetElemetAll(float val)
+  {
+    this.SetTargetElement(ELEMENT_TYPE.FIRE, val);
+    this.SetTargetElement(ELEMENT_TYPE.WATER, val);
+    this.SetTargetElement(ELEMENT_TYPE.THUNDER, val);
+    this.SetTargetElement(ELEMENT_TYPE.SOIL, val);
+    this.SetTargetElement(ELEMENT_TYPE.LIGHT, val);
+    this.SetTargetElement(ELEMENT_TYPE.DARK, val);
+  }
 
-	public void AddElementValueWithCheck(float targetValue)
-	{
-		if (fire > 0f)
-		{
-			fire += targetValue;
-		}
-		if (water > 0f)
-		{
-			water += targetValue;
-		}
-		if (thunder > 0f)
-		{
-			thunder += targetValue;
-		}
-		if (soil > 0f)
-		{
-			soil += targetValue;
-		}
-		if (light > 0f)
-		{
-			light += targetValue;
-		}
-		if (dark > 0f)
-		{
-			dark += targetValue;
-		}
-	}
+  public void SetTargetElement(ELEMENT_TYPE type, float val)
+  {
+    switch (type)
+    {
+      case ELEMENT_TYPE.FIRE:
+        this.fire = val;
+        break;
+      case ELEMENT_TYPE.WATER:
+        this.water = val;
+        break;
+      case ELEMENT_TYPE.THUNDER:
+        this.thunder = val;
+        break;
+      case ELEMENT_TYPE.SOIL:
+        this.soil = val;
+        break;
+      case ELEMENT_TYPE.LIGHT:
+        this.light = val;
+        break;
+      case ELEMENT_TYPE.DARK:
+        this.dark = val;
+        break;
+    }
+  }
 
-	public void AddElementOnly(float targetValue)
-	{
-		fire += targetValue;
-		water += targetValue;
-		thunder += targetValue;
-		soil += targetValue;
-		light += targetValue;
-		dark += targetValue;
-	}
+  public void AddTargetElement(ELEMENT_TYPE type, float val)
+  {
+    switch (type)
+    {
+      case ELEMENT_TYPE.FIRE:
+        this.fire += val;
+        break;
+      case ELEMENT_TYPE.WATER:
+        this.water += val;
+        break;
+      case ELEMENT_TYPE.THUNDER:
+        this.thunder += val;
+        break;
+      case ELEMENT_TYPE.SOIL:
+        this.soil += val;
+        break;
+      case ELEMENT_TYPE.LIGHT:
+        this.light += val;
+        break;
+      case ELEMENT_TYPE.DARK:
+        this.dark += val;
+        break;
+    }
+  }
 
-	public void MulElementOnly(float targetValue)
-	{
-		fire *= targetValue;
-		water *= targetValue;
-		thunder *= targetValue;
-		soil *= targetValue;
-		light *= targetValue;
-		dark *= targetValue;
-	}
+  public float CalcTotal()
+  {
+    return this.normal + this.fire + this.water + this.thunder + this.soil + this.light + this.dark;
+  }
 
-	public void SubElementOnly(float targetValue)
-	{
-		fire -= targetValue;
-		if (fire < 0f)
-		{
-			fire = 0f;
-		}
-		water -= targetValue;
-		if (water < 0f)
-		{
-			water = 0f;
-		}
-		thunder -= targetValue;
-		if (thunder < 0f)
-		{
-			thunder = 0f;
-		}
-		soil -= targetValue;
-		if (soil < 0f)
-		{
-			soil = 0f;
-		}
-		light -= targetValue;
-		if (light < 0f)
-		{
-			light = 0f;
-		}
-		dark -= targetValue;
-		if (dark < 0f)
-		{
-			dark = 0f;
-		}
-	}
+  public void InitializeElementTolerance(ConverteElementToleranceTable[] convTable)
+  {
+    int length = convTable.Length;
+    if (length > 0)
+    {
+      this.ElementToleranceScrollTable = new int[length, 6];
+      for (int index = 0; index < length; ++index)
+      {
+        for (int no = 0; no < 6; ++no)
+          this.ElementToleranceScrollTable[index, no] = convTable[index].GetChangeElement(no);
+      }
+    }
+    else
+      this.ElementToleranceScrollTable = new int[5, 6]
+      {
+        {
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        },
+        {
+          1,
+          2,
+          3,
+          0,
+          4,
+          5
+        },
+        {
+          2,
+          3,
+          0,
+          1,
+          4,
+          5
+        },
+        {
+          3,
+          0,
+          1,
+          2,
+          4,
+          5
+        },
+        {
+          0,
+          1,
+          2,
+          3,
+          5,
+          4
+        }
+      };
+    this.baseElementTolerances = new float[6];
+    this.baseElementTolerances[0] = this.fire;
+    this.baseElementTolerances[1] = this.water;
+    this.baseElementTolerances[2] = this.thunder;
+    this.baseElementTolerances[3] = this.soil;
+    this.baseElementTolerances[4] = this.light;
+    this.baseElementTolerances[5] = this.dark;
+  }
 
-	public void CheckMinus()
-	{
-		if (normal < 0f)
-		{
-			normal = 0f;
-		}
-		if (fire < 0f)
-		{
-			fire = 0f;
-		}
-		if (water < 0f)
-		{
-			water = 0f;
-		}
-		if (thunder < 0f)
-		{
-			thunder = 0f;
-		}
-		if (soil < 0f)
-		{
-			soil = 0f;
-		}
-		if (light < 0f)
-		{
-			light = 0f;
-		}
-		if (dark < 0f)
-		{
-			dark = 0f;
-		}
-	}
+  public void ChangeElementTolerance(int scroll)
+  {
+    int length = this.ElementToleranceScrollTable.GetLength(0);
+    if (scroll < 0 || scroll >= length)
+    {
+      Log.Error("scroll is out of range!! ");
+    }
+    else
+    {
+      int type = 0;
+      for (int index1 = 6; type < index1; ++type)
+      {
+        int index2 = this.ElementToleranceScrollTable[scroll, type];
+        this.SetTargetElement((ELEMENT_TYPE) type, this.baseElementTolerances[index2]);
+      }
+    }
+  }
 
-	public void SetTargetElement(ELEMENT_TYPE type, float val)
-	{
-		switch (type)
-		{
-		case ELEMENT_TYPE.FIRE:
-			fire = val;
-			break;
-		case ELEMENT_TYPE.WATER:
-			water = val;
-			break;
-		case ELEMENT_TYPE.THUNDER:
-			thunder = val;
-			break;
-		case ELEMENT_TYPE.SOIL:
-			soil = val;
-			break;
-		case ELEMENT_TYPE.LIGHT:
-			light = val;
-			break;
-		case ELEMENT_TYPE.DARK:
-			dark = val;
-			break;
-		}
-	}
+  public override string ToString()
+  {
+    return $"[AtkAttribute] normal:{this.normal} fire:{this.fire} water:{this.water} thunder:{this.thunder} soil:{this.soil} light:{this.light} dark:{this.dark}";
+  }
 
-	public void AddTargetElement(ELEMENT_TYPE type, float val)
-	{
-		switch (type)
-		{
-		case ELEMENT_TYPE.FIRE:
-			fire += val;
-			break;
-		case ELEMENT_TYPE.WATER:
-			water += val;
-			break;
-		case ELEMENT_TYPE.THUNDER:
-			thunder += val;
-			break;
-		case ELEMENT_TYPE.SOIL:
-			soil += val;
-			break;
-		case ELEMENT_TYPE.LIGHT:
-			light += val;
-			break;
-		case ELEMENT_TYPE.DARK:
-			dark += val;
-			break;
-		}
-	}
-
-	public float CalcTotal()
-	{
-		return normal + fire + water + thunder + soil + light + dark;
-	}
-
-	public void InitializeElementTolerance(ConverteElementToleranceTable[] convTable)
-	{
-		int num = convTable.Length;
-		if (num > 0)
-		{
-			ElementToleranceScrollTable = new int[num, 6];
-			for (int i = 0; i < num; i++)
-			{
-				for (int j = 0; j < 6; j++)
-				{
-					int[,] elementToleranceScrollTable = ElementToleranceScrollTable;
-					int num2 = i;
-					int num3 = j;
-					int changeElement = convTable[i].GetChangeElement(j);
-					elementToleranceScrollTable[num2, num3] = changeElement;
-				}
-			}
-		}
-		else
-		{
-			ElementToleranceScrollTable = new int[5, 6]
-			{
-				{
-					0,
-					1,
-					2,
-					3,
-					4,
-					5
-				},
-				{
-					1,
-					2,
-					3,
-					0,
-					4,
-					5
-				},
-				{
-					2,
-					3,
-					0,
-					1,
-					4,
-					5
-				},
-				{
-					3,
-					0,
-					1,
-					2,
-					4,
-					5
-				},
-				{
-					0,
-					1,
-					2,
-					3,
-					5,
-					4
-				}
-			};
-		}
-		baseElementTolerances = new float[6];
-		baseElementTolerances[0] = fire;
-		baseElementTolerances[1] = water;
-		baseElementTolerances[2] = thunder;
-		baseElementTolerances[3] = soil;
-		baseElementTolerances[4] = light;
-		baseElementTolerances[5] = dark;
-	}
-
-	public void ChangeElementTolerance(int scroll)
-	{
-		int length = ElementToleranceScrollTable.GetLength(0);
-		if (scroll < 0 || scroll >= length)
-		{
-			Log.Error("scroll is out of range!! ");
-		}
-		else
-		{
-			int i = 0;
-			for (int num = 6; i < num; i++)
-			{
-				int num2 = ElementToleranceScrollTable[scroll, i];
-				SetTargetElement((ELEMENT_TYPE)i, baseElementTolerances[num2]);
-			}
-		}
-	}
-
-	public override string ToString()
-	{
-		return $"[AtkAttribute] normal:{normal} fire:{fire} water:{water} thunder:{thunder} soil:{soil} light:{light} dark:{dark}";
-	}
+  public string ToShortString()
+  {
+    return $"{$"{$"{$"{$"{$"{$"n:{(object) this.normal} "}f:{(object) this.fire} "}w:{(object) this.water} "}t:{(object) this.thunder} "}s:{(object) this.soil} "}l:{(object) this.light} "}d:{(object) this.dark} ";
+  }
 }

@@ -1,134 +1,95 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: TaskChecker
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using UnityEngine;
 
+#nullable disable
 [Serializable]
 public class TaskChecker : BattleCheckerBase
 {
-	[SerializeField]
-	private TaskUpdateInfo taskCount = new TaskUpdateInfo();
+  [SerializeField]
+  private TaskUpdateInfo taskCount = new TaskUpdateInfo();
 
-	public void Clear()
-	{
-		taskCount = new TaskUpdateInfo();
-	}
+  public void Clear() => this.taskCount = new TaskUpdateInfo();
 
-	public TaskUpdateInfo GetTaskCount()
-	{
-		return taskCount;
-	}
+  public TaskUpdateInfo GetTaskCount() => this.taskCount;
 
-	public void OnRevival()
-	{
-		taskCount.revival++;
-	}
+  public void OnRevival() => ++this.taskCount.revival;
 
-	public void OnGuard()
-	{
-		taskCount.guard++;
-	}
+  public void OnGuard() => ++this.taskCount.guard;
 
-	protected override void OnCounter(int damage)
-	{
-		taskCount.counter++;
-	}
+  protected override void OnCounter(int damage) => ++this.taskCount.counter;
 
-	protected override void OnSpearSpecialAttack(int damage)
-	{
-		taskCount.lance++;
-	}
+  protected override void OnSpearSpecialAttack(int damage) => ++this.taskCount.lance;
 
-	protected override void OnSpearExChargeAttack(int damage)
-	{
-	}
+  protected override void OnSpearExChargeAttack(int damage)
+  {
+  }
 
-	protected override void OnPairSwordsCombo(int damage)
-	{
-		taskCount.combo++;
-		base.isEnableAttackCount = false;
-	}
+  protected override void OnPairSwordsCombo(int damage)
+  {
+    ++this.taskCount.combo;
+    this.isEnableAttackCount = false;
+  }
 
-	protected override void OnTwoHandSwordChargeAttack(int damage)
-	{
-		taskCount.chargesword++;
-	}
+  protected override void OnTwoHandSwordChargeAttack(int damage) => ++this.taskCount.chargesword;
 
-	protected override void OnTwoHandSwordExChargeAttack(int damage)
-	{
-	}
+  protected override void OnTwoHandSwordExChargeAttack(int damage)
+  {
+  }
 
-	protected override void OnArrowChargeAttack(int damage)
-	{
-		taskCount.chargebow++;
-	}
+  protected override void OnArrowChargeAttack(int damage) => ++this.taskCount.chargebow;
 
-	public void OnUseMagi()
-	{
-		taskCount.usemagi++;
-	}
+  public void OnUseMagi() => ++this.taskCount.usemagi;
 
-	protected override void OnNormalWeakHit(int damage)
-	{
-		taskCount.weak++;
-	}
+  protected override void OnNormalWeakHit(int damage) => ++this.taskCount.weak;
 
-	protected override void OnWeaponWeakHit(int damage)
-	{
-		taskCount.weaponweak++;
-	}
+  protected override void OnWeaponWeakHit(int damage) => ++this.taskCount.weaponweak;
 
-	public void OnDeath()
-	{
-		taskCount.death++;
-	}
+  public void OnDeath() => ++this.taskCount.death;
 
-	public void OnSoulOneHandSword()
-	{
-		taskCount.soulOneHandSword++;
-	}
+  public void OnJustGuard() => ++this.taskCount.justGuard;
 
-	protected override void OnHeatTwoHandSword(int damage)
-	{
-		taskCount.heatTwoHandSword++;
-	}
+  protected override void OnRevengeBurst(int damage) => ++this.taskCount.revengeBurst;
 
-	public void OnSoulTwoHandSword()
-	{
-		taskCount.soulTwoHandSword++;
-	}
+  protected override void OnHeatTwoHandSword(int damage) => ++this.taskCount.heatTwoHandSword;
 
-	public void OnHeatPairSwords()
-	{
-		taskCount.heatPairSwords++;
-	}
+  public void OnJump() => ++this.taskCount.jump;
 
-	public void OnSoulPairSwords()
-	{
-		taskCount.soulPairSwords++;
-	}
+  public void OnHeatPairSwords() => ++this.taskCount.heatPairSwords;
 
-	public void OnSoulArrow()
-	{
-		taskCount.soulArrow++;
-	}
+  public void OnShadowSealing() => ++this.taskCount.shadowSealing;
 
-	protected override void OnRevengeBurst(int damage)
-	{
-		taskCount.revengeBurst++;
-	}
+  public void OnSoulOneHandSword() => ++this.taskCount.soulOneHandSword;
 
-	public void OnJustGuard()
-	{
-		taskCount.justGuard++;
-	}
+  public void OnSoulTwoHandSword() => ++this.taskCount.soulTwoHandSword;
 
-	public void OnShadowSealing()
-	{
-		taskCount.shadowSealing++;
-	}
+  public void OnSoulSpear() => ++this.taskCount.soulSpear;
 
-	public void OnJump()
-	{
-		taskCount.jump++;
-	}
+  public void OnSoulPairSwords() => ++this.taskCount.soulPairSwords;
+
+  public void OnSoulArrow() => ++this.taskCount.soulArrow;
+
+  protected override void OnBurstOneHandSword(int damage) => ++this.taskCount.burstOneHandSword;
+
+  public void OnBurstTwoHandSword() => ++this.taskCount.thsFullBurst;
+
+  public void OnBurstPairSwords() => ++this.taskCount.burstPairSwords;
+
+  public void OnBurstSpear() => ++this.taskCount.burstSpear;
+
+  public void OnBurstArrow() => ++this.taskCount.burstArrow;
+
+  public void OnConcussion() => ++this.taskCount.concussion;
+
+  public void OnOracleOneHandSword() => ++this.taskCount.oracleOneHandSword;
+
+  public void OnOracleSpear() => ++this.taskCount.oracleSpear;
+
+  public void OnOraclePairSwords() => ++this.taskCount.oraclePairSwords;
 }

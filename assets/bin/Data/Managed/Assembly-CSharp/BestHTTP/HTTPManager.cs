@@ -1,260 +1,223 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: BestHTTP.HTTPManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using BestHTTP.Caching;
 using BestHTTP.WebSocket;
 using System;
 using System.Collections.Generic;
 
-namespace BestHTTP
+#nullable disable
+namespace BestHTTP;
+
+public static class HTTPManager
 {
-	public static class HTTPManager
-	{
-		private static byte maxConnectionPerServer;
+  private static byte maxConnectionPerServer;
+  private static Dictionary<string, List<HTTPConnection>> Connections = new Dictionary<string, List<HTTPConnection>>();
+  private static List<HTTPConnection> ActiveConnections = new List<HTTPConnection>();
+  private static List<HTTPConnection> RecycledConnections = new List<HTTPConnection>();
+  private static List<HTTPRequest> RequestQueue = new List<HTTPRequest>();
+  private static bool IsCallingCallbacks;
 
-		private static Dictionary<string, List<HTTPConnection>> Connections;
+  static HTTPManager()
+  {
+    HTTPManager.MaxConnectionPerServer = (byte) 4;
+    HTTPManager.KeepAliveDefaultValue = true;
+    HTTPManager.MaxPathLength = (int) byte.MaxValue;
+    HTTPManager.MaxConnectionIdleTime = TimeSpan.FromMinutes(2.0);
+  }
 
-		private static List<HTTPConnection> ActiveConnections;
+  public static byte MaxConnectionPerServer
+  {
+    get => HTTPManager.maxConnectionPerServer;
+    set
+    {
+      HTTPManager.maxConnectionPerServer = value > (byte) 0 ? value : throw new ArgumentOutOfRangeException("MaxConnectionPerServer must be greater than 0!");
+    }
+  }
 
-		private static List<HTTPConnection> RecycledConnections;
+  public static bool KeepAliveDefaultValue { get; set; }
 
-		private static List<HTTPRequest> RequestQueue;
+  public static bool IsCachingDisabled { get; set; }
 
-		private static bool IsCallingCallbacks;
+  public static TimeSpan MaxConnectionIdleTime { get; set; }
 
-		public static byte MaxConnectionPerServer
-		{
-			get
-			{
-				return maxConnectionPerServer;
-			}
-			set
-			{
-				if (value <= 0)
-				{
-					throw new ArgumentOutOfRangeException("MaxConnectionPerServer must be greater than 0!");
-				}
-				maxConnectionPerServer = value;
-			}
-		}
+  internal static int MaxPathLength { get; set; }
 
-		public static bool KeepAliveDefaultValue
-		{
-			get;
-			set;
-		}
+  public static HTTPRequest SendRequest(string url, Action<HTTPRequest, HTTPResponse> callback)
+  {
+    return HTTPManager.SendRequest(new HTTPRequest(new Uri(url), HTTPMethods.Get, callback));
+  }
 
-		public static bool IsCachingDisabled
-		{
-			get;
-			set;
-		}
+  public static HTTPRequest SendRequest(
+    string url,
+    HTTPMethods methodType,
+    Action<HTTPRequest, HTTPResponse> callback)
+  {
+    return HTTPManager.SendRequest(new HTTPRequest(new Uri(url), methodType, callback));
+  }
 
-		public static TimeSpan MaxConnectionIdleTime
-		{
-			get;
-			set;
-		}
+  public static HTTPRequest SendRequest(
+    string url,
+    HTTPMethods methodType,
+    bool isKeepAlive,
+    Action<HTTPRequest, HTTPResponse> callback)
+  {
+    return HTTPManager.SendRequest(new HTTPRequest(new Uri(url), methodType, isKeepAlive, callback));
+  }
 
-		internal static int MaxPathLength
-		{
-			get;
-			set;
-		}
+  public static HTTPRequest SendRequest(
+    string url,
+    HTTPMethods methodType,
+    bool isKeepAlive,
+    bool disableCache,
+    Action<HTTPRequest, HTTPResponse> callback)
+  {
+    return HTTPManager.SendRequest(new HTTPRequest(new Uri(url), methodType, isKeepAlive, disableCache, callback));
+  }
 
-		static HTTPManager()
-		{
-			Connections = new Dictionary<string, List<HTTPConnection>>();
-			ActiveConnections = new List<HTTPConnection>();
-			RecycledConnections = new List<HTTPConnection>();
-			RequestQueue = new List<HTTPRequest>();
-			MaxConnectionPerServer = 4;
-			KeepAliveDefaultValue = true;
-			MaxPathLength = 255;
-			MaxConnectionIdleTime = TimeSpan.FromMinutes(2.0);
-		}
+  public static HTTPRequest SendRequest(HTTPRequest request)
+  {
+    HTTPUpdateDelegator.CheckInstance();
+    if (HTTPManager.IsCallingCallbacks)
+      HTTPManager.RequestQueue.Add(request);
+    else
+      HTTPManager.SendRequestImpl(request);
+    return request;
+  }
 
-		public static HTTPRequest SendRequest(string url, Action<HTTPRequest, HTTPResponse> callback)
-		{
-			return SendRequest(new HTTPRequest(new Uri(url), HTTPMethods.Get, callback));
-		}
+  private static void SendRequestImpl(HTTPRequest request)
+  {
+    HTTPConnection conn = HTTPManager.FindOrCreateFreeConnection(request.CurrentUri);
+    if (conn != null)
+    {
+      if (HTTPManager.ActiveConnections.Find((Predicate<HTTPConnection>) (c => c == conn)) == null)
+        HTTPManager.ActiveConnections.Add(conn);
+      conn.Process(request);
+    }
+    else
+      HTTPManager.RequestQueue.Add(request);
+  }
 
-		public static HTTPRequest SendRequest(string url, HTTPMethods methodType, Action<HTTPRequest, HTTPResponse> callback)
-		{
-			return SendRequest(new HTTPRequest(new Uri(url), methodType, callback));
-		}
+  private static HTTPConnection FindOrCreateFreeConnection(Uri uri)
+  {
+    HTTPConnection createFreeConnection = (HTTPConnection) null;
+    string str = new UriBuilder(uri.Scheme, uri.Host, uri.Port).Uri.ToString();
+    List<HTTPConnection> httpConnectionList;
+    if (HTTPManager.Connections.TryGetValue(str, out httpConnectionList))
+    {
+      for (int index = 0; index < httpConnectionList.Count && createFreeConnection == null; ++index)
+      {
+        if (httpConnectionList[index] != null && httpConnectionList[index].IsFree)
+          createFreeConnection = httpConnectionList[index];
+      }
+    }
+    else
+      HTTPManager.Connections.Add(str, httpConnectionList = new List<HTTPConnection>((int) HTTPManager.MaxConnectionPerServer));
+    if (createFreeConnection == null)
+    {
+      if (httpConnectionList.Count == (int) HTTPManager.MaxConnectionPerServer)
+        return (HTTPConnection) null;
+      httpConnectionList.Add(createFreeConnection = new HTTPConnection(str));
+    }
+    return createFreeConnection;
+  }
 
-		public static HTTPRequest SendRequest(string url, HTTPMethods methodType, bool isKeepAlive, Action<HTTPRequest, HTTPResponse> callback)
-		{
-			return SendRequest(new HTTPRequest(new Uri(url), methodType, isKeepAlive, callback));
-		}
+  private static void RecycleConnection(HTTPConnection conn)
+  {
+    conn.Recycle();
+    HTTPManager.RecycledConnections.Add(conn);
+  }
 
-		public static HTTPRequest SendRequest(string url, HTTPMethods methodType, bool isKeepAlive, bool disableCache, Action<HTTPRequest, HTTPResponse> callback)
-		{
-			return SendRequest(new HTTPRequest(new Uri(url), methodType, isKeepAlive, disableCache, callback));
-		}
+  internal static void OnUpdate()
+  {
+    HTTPManager.IsCallingCallbacks = true;
+    try
+    {
+      for (int index = 0; index < HTTPManager.ActiveConnections.Count; ++index)
+      {
+        HTTPConnection activeConnection = HTTPManager.ActiveConnections[index];
+        switch (activeConnection.State)
+        {
+          case HTTPConnectionStates.Processing:
+            if (activeConnection.CurrentRequest.UseStreaming && activeConnection.CurrentRequest.Response != null && activeConnection.CurrentRequest.Response.HasStreamedFragments())
+            {
+              activeConnection.HandleCallback();
+              break;
+            }
+            break;
+          case HTTPConnectionStates.Redirected:
+            HTTPManager.SendRequest(activeConnection.CurrentRequest);
+            HTTPManager.RecycleConnection(activeConnection);
+            break;
+          case HTTPConnectionStates.Upgraded:
+            activeConnection.HandleCallback();
+            break;
+          case HTTPConnectionStates.WaitForProtocolShutdown:
+            WebSocketResponse response = activeConnection.CurrentRequest.Response as WebSocketResponse;
+            response.HandleEvents();
+            if (response.IsClosed)
+            {
+              activeConnection.HandleCallback();
+              activeConnection.Dispose();
+              HTTPManager.RecycleConnection(activeConnection);
+              break;
+            }
+            break;
+          case HTTPConnectionStates.WaitForRecycle:
+            activeConnection.CurrentRequest.FinishStreaming();
+            activeConnection.HandleCallback();
+            HTTPManager.RecycleConnection(activeConnection);
+            break;
+          case HTTPConnectionStates.Free:
+            if (activeConnection.IsRemovable)
+            {
+              activeConnection.Dispose();
+              HTTPManager.Connections[activeConnection.ServerAddress].Remove(activeConnection);
+              break;
+            }
+            break;
+          case HTTPConnectionStates.Closed:
+            activeConnection.CurrentRequest.FinishStreaming();
+            activeConnection.HandleCallback();
+            HTTPManager.RecycleConnection(activeConnection);
+            HTTPManager.Connections[activeConnection.ServerAddress].Remove(activeConnection);
+            break;
+        }
+      }
+    }
+    finally
+    {
+      HTTPManager.IsCallingCallbacks = false;
+    }
+    if (HTTPManager.RecycledConnections.Count > 0)
+    {
+      for (int index = 0; index < HTTPManager.RecycledConnections.Count; ++index)
+      {
+        if (HTTPManager.RecycledConnections[index].IsFree)
+          HTTPManager.ActiveConnections.Remove(HTTPManager.RecycledConnections[index]);
+      }
+      HTTPManager.RecycledConnections.Clear();
+    }
+    if (HTTPManager.RequestQueue.Count <= 0)
+      return;
+    HTTPRequest[] array = HTTPManager.RequestQueue.ToArray();
+    HTTPManager.RequestQueue.Clear();
+    for (int index = 0; index < array.Length; ++index)
+      HTTPManager.SendRequest(array[index]);
+  }
 
-		public static HTTPRequest SendRequest(HTTPRequest request)
-		{
-			HTTPUpdateDelegator.CheckInstance();
-			if (IsCallingCallbacks)
-			{
-				RequestQueue.Add(request);
-			}
-			else
-			{
-				SendRequestImpl(request);
-			}
-			return request;
-		}
-
-		private static void SendRequestImpl(HTTPRequest request)
-		{
-			HTTPConnection conn = FindOrCreateFreeConnection(request.CurrentUri);
-			if (conn != null)
-			{
-				if (ActiveConnections.Find((HTTPConnection c) => c == conn) == null)
-				{
-					ActiveConnections.Add(conn);
-				}
-				conn.Process(request);
-			}
-			else
-			{
-				RequestQueue.Add(request);
-			}
-		}
-
-		private static HTTPConnection FindOrCreateFreeConnection(Uri uri)
-		{
-			HTTPConnection hTTPConnection = null;
-			string text = new UriBuilder(uri.Scheme, uri.Host, uri.Port).Uri.ToString();
-			if (Connections.TryGetValue(text, out List<HTTPConnection> value))
-			{
-				for (int i = 0; i < value.Count; i++)
-				{
-					if (hTTPConnection != null)
-					{
-						break;
-					}
-					if (value[i] != null && value[i].IsFree)
-					{
-						hTTPConnection = value[i];
-					}
-				}
-			}
-			else
-			{
-				Connections.Add(text, value = new List<HTTPConnection>(MaxConnectionPerServer));
-			}
-			if (hTTPConnection == null)
-			{
-				if (value.Count == MaxConnectionPerServer)
-				{
-					return null;
-				}
-				value.Add(hTTPConnection = new HTTPConnection(text));
-			}
-			return hTTPConnection;
-		}
-
-		private static void RecycleConnection(HTTPConnection conn)
-		{
-			conn.Recycle();
-			RecycledConnections.Add(conn);
-		}
-
-		internal static void OnUpdate()
-		{
-			IsCallingCallbacks = true;
-			try
-			{
-				for (int i = 0; i < ActiveConnections.Count; i++)
-				{
-					HTTPConnection hTTPConnection = ActiveConnections[i];
-					switch (hTTPConnection.State)
-					{
-					case HTTPConnectionStates.Processing:
-						if (hTTPConnection.CurrentRequest.UseStreaming && hTTPConnection.CurrentRequest.Response != null && hTTPConnection.CurrentRequest.Response.HasStreamedFragments())
-						{
-							hTTPConnection.HandleCallback();
-						}
-						break;
-					case HTTPConnectionStates.Redirected:
-						SendRequest(hTTPConnection.CurrentRequest);
-						RecycleConnection(hTTPConnection);
-						break;
-					case HTTPConnectionStates.WaitForRecycle:
-						hTTPConnection.CurrentRequest.FinishStreaming();
-						hTTPConnection.HandleCallback();
-						RecycleConnection(hTTPConnection);
-						break;
-					case HTTPConnectionStates.Upgraded:
-						hTTPConnection.HandleCallback();
-						break;
-					case HTTPConnectionStates.WaitForProtocolShutdown:
-					{
-						WebSocketResponse webSocketResponse = hTTPConnection.CurrentRequest.Response as WebSocketResponse;
-						webSocketResponse.HandleEvents();
-						if (webSocketResponse.IsClosed)
-						{
-							hTTPConnection.HandleCallback();
-							hTTPConnection.Dispose();
-							RecycleConnection(hTTPConnection);
-						}
-						break;
-					}
-					case HTTPConnectionStates.Closed:
-						hTTPConnection.CurrentRequest.FinishStreaming();
-						hTTPConnection.HandleCallback();
-						RecycleConnection(hTTPConnection);
-						Connections[hTTPConnection.ServerAddress].Remove(hTTPConnection);
-						break;
-					case HTTPConnectionStates.Free:
-						if (hTTPConnection.IsRemovable)
-						{
-							hTTPConnection.Dispose();
-							Connections[hTTPConnection.ServerAddress].Remove(hTTPConnection);
-						}
-						break;
-					}
-				}
-			}
-			finally
-			{
-				IsCallingCallbacks = false;
-			}
-			if (RecycledConnections.Count > 0)
-			{
-				for (int j = 0; j < RecycledConnections.Count; j++)
-				{
-					if (RecycledConnections[j].IsFree)
-					{
-						ActiveConnections.Remove(RecycledConnections[j]);
-					}
-				}
-				RecycledConnections.Clear();
-			}
-			if (RequestQueue.Count > 0)
-			{
-				HTTPRequest[] array = RequestQueue.ToArray();
-				RequestQueue.Clear();
-				for (int k = 0; k < array.Length; k++)
-				{
-					SendRequest(array[k]);
-				}
-			}
-		}
-
-		internal static void OnQuit()
-		{
-			HTTPCacheService.SaveLibrary();
-			foreach (KeyValuePair<string, List<HTTPConnection>> connection in Connections)
-			{
-				foreach (HTTPConnection item in connection.Value)
-				{
-					item.Dispose();
-				}
-				connection.Value.Clear();
-			}
-			Connections.Clear();
-		}
-	}
+  internal static void OnQuit()
+  {
+    HTTPCacheService.SaveLibrary();
+    foreach (KeyValuePair<string, List<HTTPConnection>> connection in HTTPManager.Connections)
+    {
+      foreach (HTTPConnection httpConnection in connection.Value)
+        httpConnection.Dispose();
+      connection.Value.Clear();
+    }
+    HTTPManager.Connections.Clear();
+  }
 }

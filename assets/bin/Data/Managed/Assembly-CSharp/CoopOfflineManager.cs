@@ -1,192 +1,176 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: CoopOfflineManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
+#nullable disable
 public class CoopOfflineManager : MonoBehaviourSingleton<CoopOfflineManager>
 {
-	public class EnemyPopParam
-	{
-		public FieldMapTable.EnemyPopTableData data;
+  private CoopLocalServerSocket svSocket;
+  private CoopNetworkPacketReceiver packetReceiver;
+  private uint mapId;
+  private List<CoopOfflineManager.EnemyPopParam> enemyPopParams;
+  private int nowEnemyId = 500000;
 
-		public int count;
-	}
+  public bool isActivate { get; private set; }
 
-	private CoopLocalServerSocket svSocket;
+  public static bool IsValidActivate()
+  {
+    return MonoBehaviourSingleton<CoopOfflineManager>.IsValid() && MonoBehaviourSingleton<CoopOfflineManager>.I.isActivate;
+  }
 
-	private CoopNetworkPacketReceiver packetReceiver;
+  protected override void Awake()
+  {
+    base.Awake();
+    this.isActivate = false;
+    this.svSocket = new CoopLocalServerSocket();
+    this.packetReceiver = ((Component) this).gameObject.AddComponent<CoopNetworkPacketReceiver>();
+  }
 
-	private uint mapId;
+  private void Update()
+  {
+    if (!this.isActivate)
+      return;
+    this.svSocket.Update();
+    this.packetReceiver.OnUpdate();
+  }
 
-	private List<EnemyPopParam> enemyPopParams;
+  private void Logd(string str, params object[] objs)
+  {
+    int num = Log.enabled ? 1 : 0;
+  }
 
-	private int nowEnemyId = 500000;
+  public void Clear()
+  {
+    this.isActivate = false;
+    this.mapId = 0U;
+    this.enemyPopParams = (List<CoopOfflineManager.EnemyPopParam>) null;
+    this.packetReceiver.EraseAllPackets();
+    this.Logd(nameof (Clear));
+  }
 
-	public bool isActivate
-	{
-		get;
-		private set;
-	}
+  public void Deactivate()
+  {
+    this.isActivate = false;
+    this.packetReceiver.EraseAllPackets();
+    this.Logd("Deactivate.");
+  }
 
-	public static bool IsValidActivate()
-	{
-		return MonoBehaviourSingleton<CoopOfflineManager>.IsValid() && MonoBehaviourSingleton<CoopOfflineManager>.I.isActivate;
-	}
+  public void Activate()
+  {
+    if (CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected())
+    {
+      this.Logd("Activate failed with online.");
+    }
+    else
+    {
+      if (this.isActivate)
+        return;
+      this.isActivate = true;
+      this.packetReceiver.EraseAllPackets();
+      this.Logd("Activate.");
+      if (this.mapId > 0U)
+        this.svSocket.InitStage(this.mapId, this.enemyPopParams, this.nowEnemyId);
+      if (!MonoBehaviourSingleton<CoopManager>.I.coopStage.isActivateStart)
+        return;
+      MonoBehaviourSingleton<CoopNetworkManager>.I.RoomStageRequest();
+    }
+  }
 
-	protected override void Awake()
-	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		base.Awake();
-		isActivate = false;
-		svSocket = new CoopLocalServerSocket();
-		packetReceiver = this.get_gameObject().AddComponent<CoopNetworkPacketReceiver>();
-	}
+  public void OnStageActivate()
+  {
+    this.mapId = MonoBehaviourSingleton<FieldManager>.I.currentMapID;
+    this.InitEnemyPopParam(this.mapId);
+    this.Logd("OnStageActivate.");
+    if (!this.isActivate)
+      return;
+    this.svSocket.InitStage(this.mapId, this.enemyPopParams, this.nowEnemyId);
+  }
 
-	private void Update()
-	{
-		if (isActivate)
-		{
-			svSocket.Update();
-			packetReceiver.OnUpdate();
-		}
-	}
+  public void OnStageChangeInterval()
+  {
+    this.mapId = 0U;
+    this.enemyPopParams = (List<CoopOfflineManager.EnemyPopParam>) null;
+    this.svSocket.Clear();
+    this.packetReceiver.EraseAllPackets();
+    this.Logd("OnStageChangeInterval.");
+  }
 
-	private void Logd(string str, params object[] objs)
-	{
-		if (!Log.enabled)
-		{
-			return;
-		}
-	}
+  public void OnQuestSeriesInterval()
+  {
+    this.mapId = 0U;
+    this.enemyPopParams = (List<CoopOfflineManager.EnemyPopParam>) null;
+    this.svSocket.Clear();
+    this.packetReceiver.EraseAllPackets();
+    this.Logd("OnQuestSeriesInterval.");
+  }
 
-	public void Clear()
-	{
-		isActivate = false;
-		mapId = 0u;
-		enemyPopParams = null;
-		packetReceiver.EraseAllPackets();
-		Logd("Clear");
-	}
+  public int Send<T>(T model, bool promise = true, Func<Coop_Model_ACK, bool> onReceiveAck = null) where T : Coop_Model_Base
+  {
+    if (!this.isActivate)
+      return -1;
+    this.Logd("Recv. {0}", (object) model);
+    Coop_Model_ACK coopModelAck = this.svSocket.Recv((Coop_Model_Base) model);
+    if (onReceiveAck != null)
+    {
+      int num = onReceiveAck(coopModelAck) ? 1 : 0;
+    }
+    return 0;
+  }
 
-	public void Deactivate()
-	{
-		isActivate = false;
-		packetReceiver.EraseAllPackets();
-		Logd("Deactivate.");
-	}
+  public void Recv(CoopPacket packet)
+  {
+    if (!this.isActivate)
+      return;
+    this.Logd("Send. {0}", (object) packet);
+    this.packetReceiver.Set(packet);
+    this.packetReceiver.OnUpdate();
+  }
 
-	public void Activate()
-	{
-		if (CoopWebSocketSingleton<KtbWebSocket>.IsValidConnected())
-		{
-			Logd("Activate failed with online.");
-		}
-		else if (!isActivate)
-		{
-			isActivate = true;
-			packetReceiver.EraseAllPackets();
-			Logd("Activate.");
-			if (mapId != 0)
-			{
-				svSocket.InitStage(mapId, enemyPopParams, nowEnemyId);
-			}
-			if (MonoBehaviourSingleton<CoopManager>.I.coopStage.isActivateStart)
-			{
-				MonoBehaviourSingleton<CoopNetworkManager>.I.RoomStageRequest();
-			}
-		}
-	}
+  private void InitEnemyPopParam(uint map_id)
+  {
+    List<FieldMapTable.EnemyPopTableData> enemyPopList = Singleton<FieldMapTable>.I.GetEnemyPopList(map_id);
+    if (enemyPopList == null || enemyPopList.Count <= 0)
+      return;
+    this.nowEnemyId = 500000;
+    this.enemyPopParams = new List<CoopOfflineManager.EnemyPopParam>();
+    int index = 0;
+    for (int count = enemyPopList.Count; index < count; ++index)
+      this.enemyPopParams.Insert(index, new CoopOfflineManager.EnemyPopParam()
+      {
+        data = enemyPopList[index]
+      });
+  }
 
-	public void OnStageActivate()
-	{
-		mapId = MonoBehaviourSingleton<FieldManager>.I.currentMapID;
-		InitEnemyPopParam(mapId);
-		Logd("OnStageActivate.");
-		if (isActivate)
-		{
-			svSocket.InitStage(mapId, enemyPopParams, nowEnemyId);
-		}
-	}
+  public CoopOfflineManager.EnemyPopParam GetEnemyPopParam(int idx)
+  {
+    if (this.enemyPopParams == null)
+      return (CoopOfflineManager.EnemyPopParam) null;
+    return idx >= this.enemyPopParams.Count ? (CoopOfflineManager.EnemyPopParam) null : this.enemyPopParams[idx];
+  }
 
-	public void OnStageChangeInterval()
-	{
-		mapId = 0u;
-		enemyPopParams = null;
-		svSocket.Clear();
-		packetReceiver.EraseAllPackets();
-		Logd("OnStageChangeInterval.");
-	}
+  public void OnEnemyPop(int idx, int sid)
+  {
+    CoopOfflineManager.EnemyPopParam enemyPopParam = this.GetEnemyPopParam(idx);
+    if (enemyPopParam == null)
+      return;
+    ++enemyPopParam.count;
+    this.Logd("OnEnemyPop. idx={0},sid={1},count={2}", (object) idx, (object) sid, (object) enemyPopParam.count);
+    if (sid <= this.nowEnemyId)
+      return;
+    this.nowEnemyId = sid;
+  }
 
-	public void OnQuestSeriesInterval()
-	{
-		mapId = 0u;
-		enemyPopParams = null;
-		svSocket.Clear();
-		packetReceiver.EraseAllPackets();
-		Logd("OnQuestSeriesInterval.");
-	}
+  public void EnemyPopForSeriesArena(int index) => this.svSocket.SendEnemyPopForSeriesArena(index);
 
-	public int Send<T>(T model, bool promise = true, Func<Coop_Model_ACK, bool> onReceiveAck = null) where T : Coop_Model_Base
-	{
-		if (!isActivate)
-		{
-			return -1;
-		}
-		Logd("Recv. {0}", model);
-		Coop_Model_ACK arg = svSocket.Recv(model);
-		onReceiveAck?.Invoke(arg);
-		return 0;
-	}
-
-	public void Recv(CoopPacket packet)
-	{
-		if (isActivate)
-		{
-			Logd("Send. {0}", packet);
-			packetReceiver.Set(packet);
-			packetReceiver.OnUpdate();
-		}
-	}
-
-	private void InitEnemyPopParam(uint map_id)
-	{
-		List<FieldMapTable.EnemyPopTableData> enemyPopList = Singleton<FieldMapTable>.I.GetEnemyPopList(map_id);
-		if (enemyPopList != null && enemyPopList.Count > 0)
-		{
-			nowEnemyId = 500000;
-			enemyPopParams = new List<EnemyPopParam>();
-			int i = 0;
-			for (int count = enemyPopList.Count; i < count; i++)
-			{
-				EnemyPopParam enemyPopParam = new EnemyPopParam();
-				enemyPopParam.data = enemyPopList[i];
-				enemyPopParams.Insert(i, enemyPopParam);
-			}
-		}
-	}
-
-	public EnemyPopParam GetEnemyPopParam(int idx)
-	{
-		if (enemyPopParams == null)
-		{
-			return null;
-		}
-		if (idx >= enemyPopParams.Count)
-		{
-			return null;
-		}
-		return enemyPopParams[idx];
-	}
-
-	public void OnEnemyPop(int idx, int sid)
-	{
-		EnemyPopParam enemyPopParam = GetEnemyPopParam(idx);
-		if (enemyPopParam != null)
-		{
-			enemyPopParam.count++;
-			Logd("OnEnemyPop. idx={0},sid={1},count={2}", idx, sid, enemyPopParam.count);
-			if (sid > nowEnemyId)
-			{
-				nowEnemyId = sid;
-			}
-		}
-	}
+  public class EnemyPopParam
+  {
+    public FieldMapTable.EnemyPopTableData data;
+    public int count;
+  }
 }

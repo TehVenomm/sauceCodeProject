@@ -1,100 +1,98 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIDeadAnnounce
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class UIDeadAnnounce : UIAnnounceBase<UIDeadAnnounce>
 {
-	public enum ANNOUNCE_TYPE
-	{
-		DEAD,
-		RETIRE,
-		CONTINUE,
-		RESCURE,
-		AUTO_REVIVE,
-		MAX
-	}
+  [SerializeField]
+  protected UILabel playerName;
+  [SerializeField]
+  protected UILabel announceName;
+  [SerializeField]
+  protected UILabel announceEffect;
+  [SerializeField]
+  protected GameObject deadBack;
+  [SerializeField]
+  protected GameObject rescueBack;
+  [SerializeField]
+  protected GameObject deadEff;
+  [SerializeField]
+  protected GameObject rescueEff;
+  [SerializeField]
+  protected UIDeadAnnounce.LabelSettings[] labelSettings = new UIDeadAnnounce.LabelSettings[8];
 
-	[Serializable]
-	public class LabelSettings
-	{
-		public string text;
+  public void Announce(UIDeadAnnounce.ANNOUNCE_TYPE type, Player player)
+  {
+    ((Component) this).gameObject.SetActive(true);
+    if (!this.AnnounceStart(player))
+      return;
+    this.SetupAnnounce(type, player.charaName);
+  }
 
-		public Color topColor;
+  public void Announce(UIDeadAnnounce.ANNOUNCE_TYPE type, string charaName)
+  {
+    ((Component) this).gameObject.SetActive(true);
+    if (!this.AnnounceStart())
+      return;
+    this.SetupAnnounce(type, charaName);
+  }
 
-		public Color bottomColor;
+  private void SetupAnnounce(UIDeadAnnounce.ANNOUNCE_TYPE type, string charaName)
+  {
+    if (type == UIDeadAnnounce.ANNOUNCE_TYPE.DEAD || type == UIDeadAnnounce.ANNOUNCE_TYPE.RETIRE || type == UIDeadAnnounce.ANNOUNCE_TYPE.STONE)
+    {
+      this.deadBack.SetActive(true);
+      this.deadEff.SetActive(true);
+      this.rescueBack.SetActive(false);
+      this.rescueEff.SetActive(false);
+    }
+    else
+    {
+      this.deadBack.SetActive(false);
+      this.deadEff.SetActive(false);
+      this.rescueBack.SetActive(true);
+      this.rescueEff.SetActive(true);
+    }
+    this.announceName.text = this.labelSettings[(int) type].text;
+    this.announceName.gradientTop = this.labelSettings[(int) type].topColor;
+    this.announceName.gradientBottom = this.labelSettings[(int) type].bottomColor;
+    this.announceName.effectColor = this.labelSettings[(int) type].effectColor;
+    this.announceEffect.text = this.labelSettings[(int) type].text;
+    this.playerName.text = charaName;
+    this.announceName.fontStyle = this.style;
+    this.announceEffect.fontStyle = this.style;
+    this.playerName.fontStyle = this.style;
+  }
 
-		public Color effectColor;
-	}
+  protected override void OnStart() => ((Component) this).gameObject.SetActive(false);
 
-	[SerializeField]
-	protected UILabel playerName;
+  protected override void OnAfterAnimation() => ((Component) this).gameObject.SetActive(false);
 
-	[SerializeField]
-	protected UILabel announceName;
+  public enum ANNOUNCE_TYPE
+  {
+    DEAD,
+    RETIRE,
+    STONE,
+    CONTINUE,
+    RESCURE,
+    AUTO_REVIVE,
+    REACH_NEXT_WAVE,
+    RESCUE_STONE,
+    MAX,
+  }
 
-	[SerializeField]
-	protected UILabel announceEffect;
-
-	[SerializeField]
-	protected GameObject deadBack;
-
-	[SerializeField]
-	protected GameObject rescueBack;
-
-	[SerializeField]
-	protected GameObject deadEff;
-
-	[SerializeField]
-	protected GameObject rescueEff;
-
-	[SerializeField]
-	protected LabelSettings[] labelSettings = new LabelSettings[5];
-
-	public void Announce(ANNOUNCE_TYPE type, Player player)
-	{
-		if (AnnounceStart(player))
-		{
-			SetupAnnounce(type, player.charaName);
-		}
-	}
-
-	public void Announce(ANNOUNCE_TYPE type, string charaName)
-	{
-		if (AnnounceStart())
-		{
-			SetupAnnounce(type, charaName);
-		}
-	}
-
-	private void SetupAnnounce(ANNOUNCE_TYPE type, string charaName)
-	{
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-		if (type == ANNOUNCE_TYPE.DEAD || type == ANNOUNCE_TYPE.RETIRE)
-		{
-			deadBack.SetActive(true);
-			deadEff.SetActive(true);
-			rescueBack.SetActive(false);
-			rescueEff.SetActive(false);
-		}
-		else
-		{
-			deadBack.SetActive(false);
-			deadEff.SetActive(false);
-			rescueBack.SetActive(true);
-			rescueEff.SetActive(true);
-		}
-		announceName.text = labelSettings[(int)type].text;
-		announceName.gradientTop = labelSettings[(int)type].topColor;
-		announceName.gradientBottom = labelSettings[(int)type].bottomColor;
-		announceName.effectColor = labelSettings[(int)type].effectColor;
-		announceEffect.text = labelSettings[(int)type].text;
-		playerName.text = charaName;
-		announceName.fontStyle = style;
-		announceEffect.fontStyle = style;
-		playerName.fontStyle = style;
-	}
+  [Serializable]
+  public class LabelSettings
+  {
+    public string text;
+    public Color topColor;
+    public Color bottomColor;
+    public Color effectColor;
+  }
 }

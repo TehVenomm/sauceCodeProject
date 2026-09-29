@@ -1,48 +1,39 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Goal_Stop
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class Goal_Stop : Goal
 {
-	private double giveupLen;
+  private double giveupLen;
 
-	private Vector3 stopPos
-	{
-		get;
-		set;
-	}
+  protected override GOAL_TYPE GetGoalType() => GOAL_TYPE.STOP;
 
-	protected override GOAL_TYPE GetGoalType()
-	{
-		return GOAL_TYPE.STOP;
-	}
+  private Vector3 stopPos { get; set; }
 
-	public Goal_Stop SetGiveupLen(float len)
-	{
-		giveupLen = (double)len;
-		return this;
-	}
+  public Goal_Stop SetGiveupLen(float len)
+  {
+    this.giveupLen = (double) len;
+    return this;
+  }
 
-	protected override void Activate(Brain brain)
-	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		SetStatus(STATUS.ACTIVE);
-		brain.moveCtrl.StopOn();
-		stopPos = brain.owner._transform.get_position();
-	}
+  protected override void Activate(Brain brain)
+  {
+    this.SetStatus(Goal.STATUS.ACTIVE);
+    brain.moveCtrl.StopOn();
+    this.stopPos = brain.owner._transform.position;
+  }
 
-	protected override STATUS Process(Brain brain)
-	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		double num = (double)AIUtility.GetLengthWithBetweenPosition(brain.owner._transform.get_position(), stopPos);
-		if (num > giveupLen)
-		{
-			SetStatus(STATUS.COMPLETED);
-		}
-		return status;
-	}
+  protected override Goal.STATUS Process(Brain brain)
+  {
+    if ((double) AIUtility.GetLengthWithBetweenPosition(brain.owner._transform.position, this.stopPos) > this.giveupLen)
+      this.SetStatus(Goal.STATUS.COMPLETED);
+    return this.status;
+  }
 
-	protected override void Terminate(Brain brain)
-	{
-		brain.moveCtrl.StopOff();
-	}
+  protected override void Terminate(Brain brain) => brain.moveCtrl.StopOff();
 }

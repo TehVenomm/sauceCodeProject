@@ -1,332 +1,217 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AttackedHitStatusOwner
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class AttackedHitStatusOwner
 {
-	public AttackedHitStatus origin
-	{
-		get;
-		protected set;
-	}
+  public AttackedHitStatus origin { get; protected set; }
 
-	public AttackHitInfo attackInfo => origin.attackInfo;
+  public AttackedHitStatusOwner() => this.origin = new AttackedHitStatus();
 
-	public int fromObjectID => origin.fromObjectID;
+  public AttackedHitStatusOwner(AttackedHitStatus status) => this.origin = status;
 
-	public StageObject fromObject => origin.fromObject;
+  public AttackHitInfo attackInfo => this.origin.attackInfo;
 
-	public StageObject.OBJECT_TYPE fromType => origin.fromType;
+  public int fromObjectID => this.origin.fromObjectID;
 
-	public Vector3 fromPos => origin.fromPos;
+  public StageObject fromObject => this.origin.fromObject;
 
-	public Vector3 hitPos => origin.hitPos;
+  public StageObject.OBJECT_TYPE fromType => this.origin.fromType;
 
-	public int fromClientID => origin.fromClientID;
+  public Vector3 fromPos => this.origin.fromPos;
 
-	public SkillInfo.SkillParam skillParam => origin.skillParam;
+  public Vector3 hitPos => this.origin.hitPos;
 
-	public bool validDamage => origin.validDamage;
+  public int fromClientID => this.origin.fromClientID;
 
-	public BadStatus badStatusAdd => origin.badStatusAdd;
+  public SkillInfo.SkillParam skillParam => this.origin.skillParam;
 
-	public int regionID => origin.regionID;
+  public bool validDamage => this.origin.validDamage;
 
-	public Enemy.WEAK_STATE weakState => origin.weakState;
+  public BadStatus badStatusAdd => this.origin.badStatusAdd;
 
-	public bool IsSpAttackHit => origin.isSpAttackHit;
+  public int regionID => this.origin.regionID;
 
-	public int damage
-	{
-		get
-		{
-			return origin.damage;
-		}
-		set
-		{
-			origin.damage = value;
-		}
-	}
+  public bool isDamageRegionOnly => this.origin.isDamageRegionOnly;
 
-	public AtkAttribute damageDetails
-	{
-		get
-		{
-			return origin.damageDetails;
-		}
-		set
-		{
-			origin.damageDetails = value;
-		}
-	}
+  public Enemy.WEAK_STATE weakState => this.origin.weakState;
 
-	public float downAddBase
-	{
-		get
-		{
-			return origin.downAddBase;
-		}
-		set
-		{
-			origin.downAddBase = value;
-		}
-	}
+  public bool IsSpAttackHit => this.origin.isSpAttackHit;
 
-	public float downAddWeak
-	{
-		get
-		{
-			return origin.downAddWeak;
-		}
-		set
-		{
-			origin.downAddWeak = value;
-		}
-	}
+  public int damage
+  {
+    get => this.origin.damage;
+    set => this.origin.damage = value;
+  }
 
-	public bool isArrowBleed
-	{
-		get
-		{
-			return origin.isArrowBleed;
-		}
-		set
-		{
-			origin.isArrowBleed = value;
-		}
-	}
+  public AtkAttribute damageDetails
+  {
+    get => this.origin.damageDetails;
+    set => this.origin.damageDetails = value;
+  }
 
-	public int arrowBleedDamage => origin.arrowBleedDamage;
+  public float downAddBase
+  {
+    get => this.origin.downAddBase;
+    set => this.origin.downAddBase = value;
+  }
 
-	public int arrowBurstDamage => origin.arrowBurstDamage;
+  public float downAddWeak
+  {
+    get => this.origin.downAddWeak;
+    set => this.origin.downAddWeak = value;
+  }
 
-	public bool isShadowSealing
-	{
-		get
-		{
-			return origin.isShadowSealing;
-		}
-		set
-		{
-			origin.isShadowSealing = value;
-		}
-	}
+  public bool isForceDown
+  {
+    get => this.origin.isForceDown;
+    set => this.origin.isForceDown = value;
+  }
 
-	public Vector3 hostPos
-	{
-		get
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			return origin.hostPos;
-		}
-		set
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			origin.hostPos = value;
-		}
-	}
+  public float concussionAdd
+  {
+    get => this.origin.concussionAdd;
+    set => this.origin.concussionAdd = value;
+  }
 
-	public float hostDir
-	{
-		get
-		{
-			return origin.hostDir;
-		}
-		set
-		{
-			origin.hostDir = value;
-		}
-	}
+  public bool isArrowBleed
+  {
+    get => this.origin.isArrowBleed;
+    set => this.origin.isArrowBleed = value;
+  }
 
-	public int afterHP
-	{
-		get
-		{
-			return origin.afterHP;
-		}
-		set
-		{
-			origin.afterHP = value;
-		}
-	}
+  public int arrowBleedDamage => this.origin.arrowBleedDamage;
 
-	public int afterRegionHP
-	{
-		get
-		{
-			return origin.afterRegionHP;
-		}
-		set
-		{
-			origin.afterRegionHP = value;
-		}
-	}
+  public int arrowBurstDamage => this.origin.arrowBurstDamage;
 
-	public int afterHealHp
-	{
-		get
-		{
-			return origin.afterHealHp;
-		}
-		set
-		{
-			origin.afterHealHp = value;
-		}
-	}
+  public bool isShadowSealing
+  {
+    get => this.origin.isShadowSealing;
+    set => this.origin.isShadowSealing = value;
+  }
 
-	public bool breakRegion
-	{
-		get
-		{
-			return origin.breakRegion;
-		}
-		set
-		{
-			origin.breakRegion = value;
-		}
-	}
+  public bool isArrowBomb
+  {
+    get => this.origin.isArrowBomb;
+    set => this.origin.isArrowBomb = value;
+  }
 
-	public int reactionType
-	{
-		get
-		{
-			return origin.reactionType;
-		}
-		set
-		{
-			origin.reactionType = value;
-		}
-	}
+  public Vector3 hostPos
+  {
+    get => this.origin.hostPos;
+    set => this.origin.hostPos = value;
+  }
 
-	public Vector3 blowForce
-	{
-		get
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			return origin.blowForce;
-		}
-		set
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			origin.blowForce = value;
-		}
-	}
+  public float hostDir
+  {
+    get => this.origin.hostDir;
+    set => this.origin.hostDir = value;
+  }
 
-	public float downTotal
-	{
-		get
-		{
-			return origin.downTotal;
-		}
-		set
-		{
-			origin.downTotal = value;
-		}
-	}
+  public int afterHP
+  {
+    get => this.origin.afterHP;
+    set => this.origin.afterHP = value;
+  }
 
-	public BadStatus badStatusTotal
-	{
-		get
-		{
-			return origin.badStatusTotal;
-		}
-		set
-		{
-			origin.badStatusTotal = value;
-		}
-	}
+  public int afterRegionHP
+  {
+    get => this.origin.afterRegionHP;
+    set => this.origin.afterRegionHP = value;
+  }
 
-	public float damageHpRate
-	{
-		get
-		{
-			return origin.damageHpRate;
-		}
-		set
-		{
-			origin.damageHpRate = value;
-		}
-	}
+  public int afterHealHp
+  {
+    get => this.origin.afterHealHp;
+    set => this.origin.afterHealHp = value;
+  }
 
-	public bool arrowBleedSkipFirst
-	{
-		get
-		{
-			return origin.arrowBleedSkipFirst;
-		}
-		set
-		{
-			origin.arrowBleedSkipFirst = value;
-		}
-	}
+  public bool breakRegion
+  {
+    get => this.origin.breakRegion;
+    set => this.origin.breakRegion = value;
+  }
 
-	public int afterBarrierHp
-	{
-		get
-		{
-			return origin.barrierHp;
-		}
-		set
-		{
-			origin.barrierHp = value;
-		}
-	}
+  public int reactionType
+  {
+    get => this.origin.reactionType;
+    set => this.origin.reactionType = value;
+  }
 
-	public int afterShieldHp
-	{
-		get
-		{
-			return origin.shieldHp;
-		}
-		set
-		{
-			origin.shieldHp = value;
-		}
-	}
+  public Vector3 blowForce
+  {
+    get => this.origin.blowForce;
+    set => this.origin.blowForce = value;
+  }
 
-	public int afterGrabHp
-	{
-		get
-		{
-			return origin.grabHp;
-		}
-		set
-		{
-			origin.grabHp = value;
-		}
-	}
+  public float downTotal
+  {
+    get => this.origin.downTotal;
+    set => this.origin.downTotal = value;
+  }
 
-	public int shieldDamage
-	{
-		get
-		{
-			return origin.shieldDamage;
-		}
-		set
-		{
-			origin.shieldDamage = value;
-		}
-	}
+  public float concussionTotal
+  {
+    get => this.origin.concussionTotal;
+    set => this.origin.concussionTotal = value;
+  }
 
-	public EnemyAegisController.SyncParam aegisParam
-	{
-		get
-		{
-			return origin.aegisParam;
-		}
-		set
-		{
-			origin.aegisParam = value;
-		}
-	}
+  public BadStatus badStatusTotal
+  {
+    get => this.origin.badStatusTotal;
+    set => this.origin.badStatusTotal = value;
+  }
 
-	public AttackedHitStatusOwner()
-	{
-		origin = new AttackedHitStatus();
-	}
+  public float damageHpRate
+  {
+    get => this.origin.damageHpRate;
+    set => this.origin.damageHpRate = value;
+  }
 
-	public AttackedHitStatusOwner(AttackedHitStatus status)
-	{
-		origin = status;
-	}
+  public bool arrowBleedSkipFirst
+  {
+    get => this.origin.arrowBleedSkipFirst;
+    set => this.origin.arrowBleedSkipFirst = value;
+  }
+
+  public int afterBarrierHp
+  {
+    get => this.origin.barrierHp;
+    set => this.origin.barrierHp = value;
+  }
+
+  public int afterShieldHp
+  {
+    get => this.origin.shieldHp;
+    set => this.origin.shieldHp = value;
+  }
+
+  public int afterGrabHp
+  {
+    get => this.origin.grabHp;
+    set => this.origin.grabHp = value;
+  }
+
+  public int shieldDamage
+  {
+    get => this.origin.shieldDamage;
+    set => this.origin.shieldDamage = value;
+  }
+
+  public EnemyAegisController.SyncParam aegisParam
+  {
+    get => this.origin.aegisParam;
+    set => this.origin.aegisParam = value;
+  }
+
+  public int deadReviveCount
+  {
+    get => this.origin.deadReviveCount;
+    set => this.origin.deadReviveCount = value;
+  }
 }

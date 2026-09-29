@@ -1,117 +1,89 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIButtonMessage
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Interaction/Button Message (Legacy)")]
-public class UIButtonMessage
+public class UIButtonMessage : MonoBehaviour
 {
-	public enum Trigger
-	{
-		OnClick,
-		OnMouseOver,
-		OnMouseOut,
-		OnPress,
-		OnRelease,
-		OnDoubleClick
-	}
+  public GameObject target;
+  public string functionName;
+  public UIButtonMessage.Trigger trigger;
+  public bool includeChildren;
+  private bool mStarted;
 
-	public GameObject target;
+  private void Start() => this.mStarted = true;
 
-	public string functionName;
+  private void OnEnable()
+  {
+    if (!this.mStarted)
+      return;
+    this.OnHover(UICamera.IsHighlighted(((Component) this).gameObject));
+  }
 
-	public Trigger trigger;
+  private void OnHover(bool isOver)
+  {
+    if (!((Behaviour) this).enabled || (!isOver || this.trigger != UIButtonMessage.Trigger.OnMouseOver) && (isOver || this.trigger != UIButtonMessage.Trigger.OnMouseOut))
+      return;
+    this.Send();
+  }
 
-	public bool includeChildren;
+  private void OnPress(bool isPressed)
+  {
+    if (!((Behaviour) this).enabled || (!isPressed || this.trigger != UIButtonMessage.Trigger.OnPress) && (isPressed || this.trigger != UIButtonMessage.Trigger.OnRelease))
+      return;
+    this.Send();
+  }
 
-	private bool mStarted;
+  private void OnSelect(bool isSelected)
+  {
+    if (!((Behaviour) this).enabled || isSelected && UICamera.currentScheme != UICamera.ControlScheme.Controller)
+      return;
+    this.OnHover(isSelected);
+  }
 
-	public UIButtonMessage()
-		: this()
-	{
-	}
+  private void OnClick()
+  {
+    if (!((Behaviour) this).enabled || this.trigger != UIButtonMessage.Trigger.OnClick)
+      return;
+    this.Send();
+  }
 
-	private void Start()
-	{
-		mStarted = true;
-	}
+  private void OnDoubleClick()
+  {
+    if (!((Behaviour) this).enabled || this.trigger != UIButtonMessage.Trigger.OnDoubleClick)
+      return;
+    this.Send();
+  }
 
-	private void OnEnable()
-	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
-		if (mStarted)
-		{
-			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
-		}
-	}
+  private void Send()
+  {
+    if (string.IsNullOrEmpty(this.functionName))
+      return;
+    if (Object.op_Equality((Object) this.target, (Object) null))
+      this.target = ((Component) this).gameObject;
+    if (this.includeChildren)
+    {
+      Transform[] componentsInChildren = this.target.GetComponentsInChildren<Transform>();
+      int index = 0;
+      for (int length = componentsInChildren.Length; index < length; ++index)
+        ((Component) componentsInChildren[index]).gameObject.SendMessage(this.functionName, (object) ((Component) this).gameObject, (SendMessageOptions) 1);
+    }
+    else
+      this.target.SendMessage(this.functionName, (object) ((Component) this).gameObject, (SendMessageOptions) 1);
+  }
 
-	private void OnHover(bool isOver)
-	{
-		if (this.get_enabled() && ((isOver && trigger == Trigger.OnMouseOver) || (!isOver && trigger == Trigger.OnMouseOut)))
-		{
-			Send();
-		}
-	}
-
-	private void OnPress(bool isPressed)
-	{
-		if (this.get_enabled() && ((isPressed && trigger == Trigger.OnPress) || (!isPressed && trigger == Trigger.OnRelease)))
-		{
-			Send();
-		}
-	}
-
-	private void OnSelect(bool isSelected)
-	{
-		if (this.get_enabled() && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
-		{
-			OnHover(isSelected);
-		}
-	}
-
-	private void OnClick()
-	{
-		if (this.get_enabled() && trigger == Trigger.OnClick)
-		{
-			Send();
-		}
-	}
-
-	private void OnDoubleClick()
-	{
-		if (this.get_enabled() && trigger == Trigger.OnDoubleClick)
-		{
-			Send();
-		}
-	}
-
-	private void Send()
-	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Expected O, but got Unknown
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Expected O, but got Unknown
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Expected O, but got Unknown
-		if (!string.IsNullOrEmpty(functionName))
-		{
-			if (target == null)
-			{
-				target = this.get_gameObject();
-			}
-			if (includeChildren)
-			{
-				Transform[] componentsInChildren = target.GetComponentsInChildren<Transform>();
-				int i = 0;
-				for (int num = componentsInChildren.Length; i < num; i++)
-				{
-					Transform val = componentsInChildren[i];
-					val.get_gameObject().SendMessage(functionName, (object)this.get_gameObject(), 1);
-				}
-			}
-			else
-			{
-				target.SendMessage(functionName, (object)this.get_gameObject(), 1);
-			}
-		}
-	}
+  public enum Trigger
+  {
+    OnClick,
+    OnMouseOver,
+    OnMouseOut,
+    OnPress,
+    OnRelease,
+    OnDoubleClick,
+  }
 }

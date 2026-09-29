@@ -1,168 +1,140 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: UITransition
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
 
-public class UITransition
+using UnityEngine;
+
+#nullable disable
+public class UITransition : MonoBehaviour
 {
-	public enum TYPE
-	{
-		NONE,
-		OPEN,
-		CLOSE,
-		NEXT,
-		PREV
-	}
+  public UITweener[] openTweens;
+  public UITweener[] closeTweens;
+  public UITweener[] nextTweens;
+  public UITweener[] prevTweens;
+  private int busyCount;
+  private System.Action callback;
 
-	public UITweener[] openTweens;
+  public bool isBusy => this.busyCount != 0;
 
-	public UITweener[] closeTweens;
+  private void Awake() => this.InitTweens();
 
-	public UITweener[] nextTweens;
+  private void InitTweens(UITweener[] tweens)
+  {
+    if (tweens == null)
+      return;
+    int index = 0;
+    for (int length = tweens.Length; index < length; ++index)
+    {
+      ((Behaviour) tweens[index]).enabled = false;
+      tweens[index].AddOnFinished(new EventDelegate(new EventDelegate.Callback(this.OnFinished)));
+    }
+  }
 
-	public UITweener[] prevTweens;
+  public void InitTweens()
+  {
+    this.InitTweens(this.openTweens);
+    this.InitTweens(this.closeTweens);
+    this.InitTweens(this.nextTweens);
+    this.InitTweens(this.prevTweens);
+  }
 
-	private int busyCount;
+  private void OnFinished()
+  {
+    --this.busyCount;
+    if (this.busyCount != 0 || this.callback == null)
+      return;
+    this.callback();
+    this.callback = (System.Action) null;
+  }
 
-	private Action callback;
+  private void StartAnim(UITweener[] tweens, System.Action _callback)
+  {
+    if (this.busyCount != 0)
+      return;
+    this.callback = _callback;
+    if (tweens == null || tweens.Length == 0)
+    {
+      this.busyCount = 1;
+      MonoBehaviourSingleton<AppMain>.I.onDelayCall += (System.Action) (() => this.OnFinished());
+    }
+    else
+    {
+      this.busyCount = tweens.Length;
+      int index1 = 0;
+      for (int length = tweens.Length; index1 < length; ++index1)
+      {
+        ((Behaviour) tweens[index1]).enabled = true;
+        tweens[index1].ResetToBeginning();
+      }
+      if (!GameSceneManager.isAutoEventSkip || !this.isBusy)
+        return;
+      int index2 = 0;
+      for (int length = tweens.Length; index2 < length; ++index2)
+      {
+        if (Object.op_Inequality((Object) tweens[index2], (Object) null))
+        {
+          tweens[index2].tweenFactor = 1f;
+          tweens[index2].Sample(1f, false);
+        }
+      }
+    }
+  }
 
-	public bool isBusy => busyCount != 0;
+  public void Play(UITransition.TYPE type, System.Action callback)
+  {
+    this.StartAnim(this.GetTweens(type), callback);
+  }
 
-	public UITransition()
-		: this()
-	{
-	}
+  public void Open(System.Action callback) => this.Play(UITransition.TYPE.OPEN, callback);
 
-	private void Awake()
-	{
-		InitTweens();
-	}
+  public void Close(System.Action callback) => this.Play(UITransition.TYPE.CLOSE, callback);
 
-	private void InitTweens(UITweener[] tweens)
-	{
-		if (tweens != null)
-		{
-			int i = 0;
-			for (int num = tweens.Length; i < num; i++)
-			{
-				tweens[i].set_enabled(false);
-				tweens[i].AddOnFinished(new EventDelegate(OnFinished));
-			}
-		}
-	}
+  public UITweener[] GetTweens(UITransition.TYPE type)
+  {
+    switch (type)
+    {
+      case UITransition.TYPE.OPEN:
+        return this.openTweens;
+      case UITransition.TYPE.CLOSE:
+        return this.closeTweens;
+      case UITransition.TYPE.NEXT:
+        return this.nextTweens != null && this.nextTweens.Length != 0 ? this.nextTweens : this.closeTweens;
+      case UITransition.TYPE.PREV:
+        return this.prevTweens != null && this.prevTweens.Length != 0 ? this.prevTweens : this.openTweens;
+      default:
+        return (UITweener[]) null;
+    }
+  }
 
-	public void InitTweens()
-	{
-		InitTweens(openTweens);
-		InitTweens(closeTweens);
-		InitTweens(nextTweens);
-		InitTweens(prevTweens);
-	}
+  public static UITransition.TYPE GetType(char c)
+  {
+    switch (c)
+    {
+      case 'C':
+      case 'c':
+        return UITransition.TYPE.CLOSE;
+      case 'N':
+      case 'n':
+        return UITransition.TYPE.NEXT;
+      case 'O':
+      case 'o':
+        return UITransition.TYPE.OPEN;
+      case 'P':
+      case 'p':
+        return UITransition.TYPE.PREV;
+      default:
+        return UITransition.TYPE.NONE;
+    }
+  }
 
-	private void OnFinished()
-	{
-		busyCount--;
-		if (busyCount == 0 && callback != null)
-		{
-			callback();
-			callback = null;
-		}
-	}
-
-	private void StartAnim(UITweener[] tweens, Action _callback)
-	{
-		if (busyCount == 0)
-		{
-			callback = _callback;
-			if (tweens == null || tweens.Length == 0)
-			{
-				busyCount = 1;
-				AppMain i = MonoBehaviourSingleton<AppMain>.I;
-				i.onDelayCall = (Action)Delegate.Combine(i.onDelayCall, (Action)delegate
-				{
-					OnFinished();
-				});
-			}
-			else
-			{
-				busyCount = tweens.Length;
-				int j = 0;
-				for (int num = tweens.Length; j < num; j++)
-				{
-					tweens[j].set_enabled(true);
-					tweens[j].ResetToBeginning();
-				}
-				if (GameSceneManager.isAutoEventSkip && isBusy)
-				{
-					int k = 0;
-					for (int num2 = tweens.Length; k < num2; k++)
-					{
-						if (tweens[k] != null)
-						{
-							tweens[k].tweenFactor = 1f;
-							tweens[k].Sample(1f, false);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	public void Play(TYPE type, Action callback)
-	{
-		StartAnim(GetTweens(type), callback);
-	}
-
-	public void Open(Action callback)
-	{
-		Play(TYPE.OPEN, callback);
-	}
-
-	public void Close(Action callback)
-	{
-		Play(TYPE.CLOSE, callback);
-	}
-
-	public UITweener[] GetTweens(TYPE type)
-	{
-		switch (type)
-		{
-		case TYPE.OPEN:
-			return openTweens;
-		case TYPE.CLOSE:
-			return closeTweens;
-		case TYPE.NEXT:
-			if (nextTweens != null && nextTweens.Length > 0)
-			{
-				return nextTweens;
-			}
-			return closeTweens;
-		case TYPE.PREV:
-			if (prevTweens != null && prevTweens.Length > 0)
-			{
-				return prevTweens;
-			}
-			return openTweens;
-		default:
-			return null;
-		}
-	}
-
-	public static TYPE GetType(char c)
-	{
-		switch (c)
-		{
-		case 'O':
-		case 'o':
-			return TYPE.OPEN;
-		case 'C':
-		case 'c':
-			return TYPE.CLOSE;
-		case 'N':
-		case 'n':
-			return TYPE.NEXT;
-		case 'P':
-		case 'p':
-			return TYPE.PREV;
-		default:
-			return TYPE.NONE;
-		}
-	}
+  public enum TYPE
+  {
+    NONE,
+    OPEN,
+    CLOSE,
+    NEXT,
+    PREV,
+  }
 }

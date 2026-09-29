@@ -1,494 +1,324 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: PortalObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
+using System;
 using UnityEngine;
 
-public class PortalObject
+#nullable disable
+public class PortalObject : MonoBehaviour
 {
-	public enum VIEW_TYPE
-	{
-		NONE = -1,
-		NORMAL,
-		NOT_TRAVELED,
-		TO_HOME,
-		TO_HARD_MAP,
-		NOT_CLEAR_ORDER
-	}
+  protected Transform viewObject;
+  protected Animator viewAnimator;
+  protected ParticleSystem[] viewParticles;
+  private readonly uint NOT_UNLOCKED_TIME = 7002;
 
-	protected Transform viewObject;
+  public InGameSettingsManager.Portal parameter { get; protected set; }
 
-	protected Animator viewAnimator;
+  public Transform _transform { get; private set; }
 
-	protected ParticleSystem[] viewParticles;
+  public FieldMapPortalInfo portalInfo { get; protected set; }
 
-	private readonly uint NOT_UNLOCKED_TIME = 7002u;
+  public FieldMapTable.PortalTableData portalData { get; protected set; }
 
-	public InGameSettingsManager.Portal parameter
-	{
-		get;
-		protected set;
-	}
+  public uint portalID { get; protected set; }
 
-	public Transform _transform
-	{
-		get;
-		private set;
-	}
+  public PortalObject.VIEW_TYPE viewType { get; protected set; }
 
-	public FieldMapPortalInfo portalInfo
-	{
-		get;
-		protected set;
-	}
+  public bool isFull { get; protected set; }
 
-	public FieldMapTable.PortalTableData portalData
-	{
-		get;
-		protected set;
-	}
+  public bool isQuest { get; protected set; }
 
-	public uint portalID
-	{
-		get;
-		protected set;
-	}
+  public bool isLock { get; protected set; }
 
-	public VIEW_TYPE viewType
-	{
-		get;
-		protected set;
-	}
+  public bool isClearOrder { get; protected set; }
 
-	public bool isFull
-	{
-		get;
-		protected set;
-	}
+  public bool isToHardMap { get; protected set; }
 
-	public bool isQuest
-	{
-		get;
-		protected set;
-	}
+  public bool isUnlockedTime { get; protected set; }
 
-	public bool isLock
-	{
-		get;
-		protected set;
-	}
+  public int nowPoint { get; protected set; }
 
-	public bool isClearOrder
-	{
-		get;
-		protected set;
-	}
+  public int maxPoint { get; protected set; }
 
-	public bool isToHardMap
-	{
-		get;
-		protected set;
-	}
+  public UIPortalStatusGizmo uiGizmo { get; set; }
 
-	public bool isUnlockedTime
-	{
-		get;
-		protected set;
-	}
+  public static PortalObject Create(FieldMapPortalInfo portal_info, Transform parent)
+  {
+    if (portal_info == null)
+      return (PortalObject) null;
+    if (portal_info.portalData == null)
+      return (PortalObject) null;
+    Transform gameObject = Utility.CreateGameObject(nameof (PortalObject), parent, 19);
+    gameObject.position = new Vector3(portal_info.portalData.srcX, 0.0f, portal_info.portalData.srcZ);
+    PortalObject portalObject = ((Component) gameObject).gameObject.AddComponent<PortalObject>();
+    if (Object.op_Equality((Object) portalObject, (Object) null))
+      return (PortalObject) null;
+    portalObject.Initialize(portal_info);
+    return portalObject;
+  }
 
-	public int nowPoint
-	{
-		get;
-		protected set;
-	}
+  protected virtual void Awake()
+  {
+    this.parameter = MonoBehaviourSingleton<InGameSettingsManager>.I.portal;
+    this._transform = ((Component) this).transform;
+    SphereCollider sphereCollider = ((Component) this).gameObject.AddComponent<SphereCollider>();
+    sphereCollider.center = new Vector3(0.0f, 0.0f, 0.0f);
+    sphereCollider.radius = 1f;
+    ((Collider) sphereCollider).isTrigger = true;
+    if (MonoBehaviourSingleton<UIStatusGizmoManager>.IsValid())
+      MonoBehaviourSingleton<UIStatusGizmoManager>.I.Create(this);
+    if (!MonoBehaviourSingleton<MiniMap>.IsValid())
+      return;
+    MonoBehaviourSingleton<MiniMap>.I.Attach((MonoBehaviour) this);
+  }
 
-	public int maxPoint
-	{
-		get;
-		protected set;
-	}
+  public void Initialize(FieldMapPortalInfo portal_info)
+  {
+    this.portalInfo = portal_info;
+    this.portalData = this.portalInfo.portalData;
+    this.portalID = this.portalData.portalID;
+    this.isClearOrder = FieldManager.IsOpenPortalClearOrder(this.portalData) || FieldManager.IsOpenPortal(this.portalData);
+    if (GameSaveData.instance.isNewReleasePortal(this.portalID) && FieldManager.IsOpenPortal(this.portalData))
+      GameSaveData.instance.newReleasePortals.Remove(this.portalID);
+    this.isUnlockedTime = portal_info.portalData.isUnlockedTime();
+    this.isToHardMap = FieldManager.IsToHardPortal(this.portalData);
+    this.nowPoint = portal_info.GetNowPortalPoint();
+    this.maxPoint = (int) portal_info.GetMaxPortalPoint();
+    this.isFull = portal_info.IsFull();
+    this.viewType = PortalObject.VIEW_TYPE.NORMAL;
+    if (!this.isClearOrder || !this.isUnlockedTime)
+      this.viewType = PortalObject.VIEW_TYPE.NOT_CLEAR_ORDER;
+    else if (this.portalData.dstMapID == 0U)
+      this.viewType = PortalObject.VIEW_TYPE.TO_HOME;
+    else if (!MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledPortal(this.portalData))
+      this.viewType = PortalObject.VIEW_TYPE.NOT_TRAVELED;
+    else if (this.isToHardMap)
+      this.viewType = PortalObject.VIEW_TYPE.TO_HARD_MAP;
+    if (this.portalData.dstQuestID != 0U)
+    {
+      if (this.portalData.dstMapID != 0U)
+      {
+        int num = 0;
+        ClearStatusQuest clearStatusQuest = MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.Find((Predicate<ClearStatusQuest>) (data => (long) data.questId == (long) this.portalData.dstQuestID));
+        if (clearStatusQuest != null)
+          num = clearStatusQuest.questStatus;
+        if (num != 3 && num != 4)
+        {
+          this.isLock = true;
+          this.isQuest = true;
+        }
+      }
+      else
+        this.isQuest = true;
+    }
+    this.CreateView();
+    if (!MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
+      return;
+    MonoBehaviourSingleton<DropTargetMarkerManeger>.I.CheckTarget(this);
+  }
 
-	public UIPortalStatusGizmo uiGizmo
-	{
-		get;
-		set;
-	}
+  private void CreateView()
+  {
+    if (Object.op_Inequality((Object) this.viewObject, (Object) null))
+    {
+      Object.Destroy((Object) ((Component) this.viewObject).gameObject);
+      this.viewObject = (Transform) null;
+    }
+    if (this.viewType == PortalObject.VIEW_TYPE.NOT_TRAVELED && !this.isFull)
+    {
+      if (MonoBehaviourSingleton<InGameLinkResourcesField>.IsValid())
+        this.viewObject = ResourceUtility.Realizes((Object) MonoBehaviourSingleton<InGameLinkResourcesField>.I.portalIncomplete, this._transform);
+      if (Object.op_Inequality((Object) this.viewObject, (Object) null))
+      {
+        this.viewAnimator = ((Component) this.viewObject).GetComponent<Animator>();
+        if (Object.op_Inequality((Object) this.viewAnimator, (Object) null))
+          this.viewAnimator.speed = 0.0f;
+        this.viewParticles = ((Component) this.viewObject).GetComponentsInChildren<ParticleSystem>();
+      }
+    }
+    else
+      this.viewObject = EffectManager.GetEffect(this.parameter.effectNames[(int) this.viewType], this._transform);
+    this.UpdateView();
+  }
 
-	public PortalObject()
-		: this()
-	{
-	}
+  public void SetAndCreateView(PortalObject.VIEW_TYPE type)
+  {
+    this.viewType = type;
+    this.CreateView();
+  }
 
-	public static PortalObject Create(FieldMapPortalInfo portal_info, Transform parent)
-	{
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		if (portal_info == null)
-		{
-			return null;
-		}
-		if (portal_info.portalData == null)
-		{
-			return null;
-		}
-		Transform val = Utility.CreateGameObject("PortalObject", parent, 19);
-		val.set_position(new Vector3(portal_info.portalData.srcX, 0f, portal_info.portalData.srcZ));
-		PortalObject portalObject = val.get_gameObject().AddComponent<PortalObject>();
-		if (portalObject == null)
-		{
-			return null;
-		}
-		portalObject.Initialize(portal_info);
-		return portalObject;
-	}
+  public void UpdateView()
+  {
+    if (this.viewType != PortalObject.VIEW_TYPE.NOT_TRAVELED || this.isFull)
+      return;
+    float num = (float) this.nowPoint / (float) this.maxPoint;
+    if ((double) num > 1.0)
+      num = 1f;
+    if (!this.isClearOrder)
+      num = 0.0f;
+    if (Object.op_Inequality((Object) this.viewAnimator, (Object) null))
+    {
+      this.viewAnimator.speed = 1f;
+      this.viewAnimator.Play("ef_btl_warp_unuse_01", 0, num);
+      this.viewAnimator.Update(0.0f);
+      this.viewAnimator.speed = 0.0f;
+    }
+    if (this.viewParticles == null)
+      return;
+    bool flag = false;
+    FieldMapPortalInfo pointToPortalInfo = MonoBehaviourSingleton<FieldManager>.I.GetPortalPointToPortalInfo();
+    if (this.isClearOrder && (pointToPortalInfo == this.portalInfo || this.portalInfo.IsFull()))
+      flag = true;
+    int index = 0;
+    for (int length = this.viewParticles.Length; index < length; ++index)
+    {
+      if (Object.op_Inequality((Object) this.viewParticles[index], (Object) null))
+      {
+        if (flag)
+        {
+          if (this.viewParticles[index].isStopped)
+            this.viewParticles[index].Play();
+        }
+        else if (!this.viewParticles[index].isStopped)
+          this.viewParticles[index].Stop();
+      }
+    }
+  }
 
-	protected virtual void Awake()
-	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Expected O, but got Unknown
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		parameter = MonoBehaviourSingleton<InGameSettingsManager>.I.portal;
-		_transform = this.get_transform();
-		SphereCollider val = this.get_gameObject().AddComponent<SphereCollider>();
-		val.set_center(new Vector3(0f, 0f, 0f));
-		val.set_radius(1f);
-		val.set_isTrigger(true);
-		if (MonoBehaviourSingleton<UIStatusGizmoManager>.IsValid())
-		{
-			MonoBehaviourSingleton<UIStatusGizmoManager>.I.Create(this);
-		}
-		if (MonoBehaviourSingleton<MiniMap>.IsValid())
-		{
-			MonoBehaviourSingleton<MiniMap>.I.Attach(this);
-		}
-	}
+  private void OnTriggerEnter(Collider collider)
+  {
+    if (Object.op_Equality((Object) ((Component) collider).gameObject.GetComponent<Self>(), (Object) null) || !MonoBehaviourSingleton<InGameProgress>.I.isBattleStart || MonoBehaviourSingleton<InGameProgress>.I.progressEndType != InGameProgress.PROGRESS_END_TYPE.NONE || MonoBehaviourSingleton<InGameProgress>.I.isHappenQuestDirection || Object.op_Equality((Object) MonoBehaviourSingleton<StageObjectManager>.I.self, (Object) null) || MonoBehaviourSingleton<StageObjectManager>.I.self.isDead)
+      return;
+    if (!this.isClearOrder || !this.isUnlockedTime)
+    {
+      string str = this.portalData.notAppearText;
+      if (this.portalData.appearQuestId > 0U && string.IsNullOrEmpty(str) && !MonoBehaviourSingleton<QuestManager>.I.IsClearQuest(this.portalData.appearQuestId))
+        str = StringTable.Format(STRING_CATEGORY.IN_GAME, 7000U, (object) Singleton<QuestTable>.I.GetQuestData(this.portalData.appearQuestId).questText);
+      if (this.portalData.appearDeliveryId > 0U && string.IsNullOrEmpty(str) && !MonoBehaviourSingleton<DeliveryManager>.I.IsClearDelivery(this.portalData.appearDeliveryId))
+        str = StringTable.Format(STRING_CATEGORY.IN_GAME, 7001U, (object) Singleton<DeliveryTable>.I.GetDeliveryTableData(this.portalData.appearDeliveryId).name);
+      if (this.portalData.travelMapId > 0U && string.IsNullOrEmpty(str))
+        MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledMap((int) this.portalData.travelMapId);
+      if (!this.isUnlockedTime)
+        str = StringTable.Get(STRING_CATEGORY.IN_GAME, this.NOT_UNLOCKED_TIME);
+      if (string.IsNullOrEmpty(str) || !MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+        return;
+      MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", ((Component) this).gameObject, "PORTAL_NOT_APPEAR", (object) new object[1]
+      {
+        (object) str
+      });
+    }
+    else if (!this.isFull)
+    {
+      if (MonoBehaviourSingleton<FieldManager>.I.GetPortalPointToPortalInfo() == this.portalInfo || this.portalInfo.IsFull())
+      {
+        if (!MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+          return;
+        GameSceneManager i = MonoBehaviourSingleton<GameSceneManager>.I;
+        GameObject gameObject = ((Component) this).gameObject;
+        object[] user_data = new object[2];
+        int num = this.nowPoint;
+        user_data[0] = (object) num.ToString();
+        num = this.maxPoint;
+        user_data[1] = (object) num.ToString();
+        i.ExecuteSceneEvent("PortalObject.OnTriggerEnter", gameObject, "PORTAL_NOT_FULL", (object) user_data);
+      }
+      else
+      {
+        if (!MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+          return;
+        MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", ((Component) this).gameObject, "PORTAL_NOT_ACTIVE");
+      }
+    }
+    else
+    {
+      MonoBehaviourSingleton<InGameProgress>.I.checkPortalObject = this;
+      if (this.isQuest)
+      {
+        if (this.isLock)
+        {
+          if (!MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() || !MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(this.portalData, true))
+            return;
+          MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", ((Component) this).gameObject, "PORTAL_QUEST_LOCK");
+        }
+        else
+        {
+          if (!MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() || !MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(this.portalData.dstQuestID))
+            return;
+          MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", ((Component) this).gameObject, "PORTAL_QUEST");
+        }
+      }
+      else if (this.viewType == PortalObject.VIEW_TYPE.TO_HOME)
+      {
+        if (!MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+          return;
+        if (MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge())
+          MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", ((Component) this).gameObject, "PORTAL_LOUNGE");
+        else
+          MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", ((Component) this).gameObject, "PORTAL_HOME");
+      }
+      else
+      {
+        if (!MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+          return;
+        int tutorialStep = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep;
+        if (!MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(this.portalData, false))
+          return;
+        MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", ((Component) this).gameObject, "PORTAL_NEXT");
+      }
+    }
+  }
 
-	public void Initialize(FieldMapPortalInfo portal_info)
-	{
-		portalInfo = portal_info;
-		portalData = portalInfo.portalData;
-		portalID = portalData.portalID;
-		isClearOrder = (FieldManager.IsOpenPortalClearOrder(portalData) || FieldManager.IsOpenPortal(portalData));
-		if (GameSaveData.instance.isNewReleasePortal(portalID) && FieldManager.IsOpenPortal(portalData))
-		{
-			GameSaveData.instance.newReleasePortals.Remove(portalID);
-		}
-		isUnlockedTime = portal_info.portalData.isUnlockedTime();
-		isToHardMap = FieldManager.IsToHardPortal(portalData);
-		nowPoint = portal_info.GetNowPortalPoint();
-		maxPoint = (int)portal_info.GetMaxPortalPoint();
-		isFull = portal_info.IsFull();
-		viewType = VIEW_TYPE.NORMAL;
-		if (!isClearOrder || !isUnlockedTime)
-		{
-			viewType = VIEW_TYPE.NOT_CLEAR_ORDER;
-		}
-		else if (portalData.dstMapID == 0)
-		{
-			viewType = VIEW_TYPE.TO_HOME;
-		}
-		else if (!MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledPortal(portalData))
-		{
-			viewType = VIEW_TYPE.NOT_TRAVELED;
-		}
-		else if (isToHardMap)
-		{
-			viewType = VIEW_TYPE.TO_HARD_MAP;
-		}
-		if (portalData.dstQuestID != 0)
-		{
-			if (portalData.dstMapID != 0)
-			{
-				int num = 0;
-				ClearStatusQuest clearStatusQuest = MonoBehaviourSingleton<QuestManager>.I.clearStatusQuest.Find((ClearStatusQuest data) => data.questId == portalData.dstQuestID);
-				if (clearStatusQuest != null)
-				{
-					num = clearStatusQuest.questStatus;
-				}
-				if (num != 3 && num != 4)
-				{
-					isLock = true;
-					isQuest = true;
-				}
-			}
-			else
-			{
-				isQuest = true;
-			}
-		}
-		CreateView();
-		if (MonoBehaviourSingleton<DropTargetMarkerManeger>.IsValid())
-		{
-			MonoBehaviourSingleton<DropTargetMarkerManeger>.I.CheckTarget(this);
-		}
-	}
+  public void OnGetPortalPoint(int add_point)
+  {
+    EffectManager.OneShot(this.parameter.pointGetEffectName, this._transform.position, this._transform.rotation);
+    this.nowPoint += add_point;
+    if (this.nowPoint >= this.maxPoint)
+    {
+      if (!this.portalInfo.IsFull())
+        Log.Warning(LOG.INGAME, "PortalObject.OnGetPortalPoint() Portal is not full. id : {0}", (object) this.portalID);
+      this.isFull = true;
+      this.CreateView();
+      string str = "";
+      FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(this.portalData.dstMapID);
+      if (fieldMapData != null)
+        str = fieldMapData.mapName;
+      if (MonoBehaviourSingleton<FieldManager>.I.isTutorialField)
+        UIInGamePopupDialog.PushOpen(StringTable.Format(STRING_CATEGORY.IN_GAME, 6001U, (object) str), false, 1.4f);
+      else if (QuestManager.IsValidInGameExplore())
+      {
+        UIInGamePopupDialog.PushOpen(StringTable.Format(STRING_CATEGORY.IN_GAME, 6002U, (object) str), false, 1.4f);
+      }
+      else
+      {
+        int num = this.parameter.clearCrystalNum;
+        if (this.isToHardMap)
+          num = this.parameter.clearHardCrystalNum;
+        UIInGamePopupDialog.PushOpen(StringTable.Format(STRING_CATEGORY.IN_GAME, 6000U, (object) str, (object) num), false);
+      }
+      SoundManager.PlayOneShotUISE(40000069);
+      SoundManager.PlayOneshotJingle(40000071);
+    }
+    else
+    {
+      this.UpdateView();
+      SoundManager.PlayOneShotUISE(40000068);
+    }
+    if (!Object.op_Inequality((Object) this.uiGizmo, (Object) null))
+      return;
+    this.uiGizmo.OnGetPortalPoint();
+  }
 
-	private void CreateView()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (viewObject != null)
-		{
-			Object.Destroy(viewObject.get_gameObject());
-			viewObject = null;
-		}
-		if (viewType == VIEW_TYPE.NOT_TRAVELED && !isFull)
-		{
-			if (MonoBehaviourSingleton<InGameLinkResourcesField>.IsValid())
-			{
-				viewObject = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesField>.I.portalIncomplete, _transform, -1);
-			}
-			if (viewObject != null)
-			{
-				viewAnimator = viewObject.GetComponent<Animator>();
-				if (viewAnimator != null)
-				{
-					viewAnimator.set_speed(0f);
-				}
-				viewParticles = viewObject.GetComponentsInChildren<ParticleSystem>();
-			}
-		}
-		else
-		{
-			viewObject = EffectManager.GetEffect(parameter.effectNames[(int)viewType], _transform);
-		}
-		UpdateView();
-	}
-
-	public void SetAndCreateView(VIEW_TYPE type)
-	{
-		viewType = type;
-		CreateView();
-	}
-
-	public void UpdateView()
-	{
-		if (viewType == VIEW_TYPE.NOT_TRAVELED && !isFull)
-		{
-			float num = (float)nowPoint / (float)maxPoint;
-			if (num > 1f)
-			{
-				num = 1f;
-			}
-			if (!isClearOrder)
-			{
-				num = 0f;
-			}
-			if (viewAnimator != null)
-			{
-				viewAnimator.set_speed(1f);
-				viewAnimator.Play("ef_btl_warp_unuse_01", 0, num);
-				viewAnimator.Update(0f);
-				viewAnimator.set_speed(0f);
-			}
-			if (viewParticles != null)
-			{
-				bool flag = false;
-				FieldMapPortalInfo portalPointToPortalInfo = MonoBehaviourSingleton<FieldManager>.I.GetPortalPointToPortalInfo();
-				if (isClearOrder && (portalPointToPortalInfo == portalInfo || portalInfo.IsFull()))
-				{
-					flag = true;
-				}
-				int i = 0;
-				for (int num2 = viewParticles.Length; i < num2; i++)
-				{
-					if (viewParticles[i] != null)
-					{
-						if (flag)
-						{
-							if (viewParticles[i].get_isStopped())
-							{
-								viewParticles[i].Play();
-							}
-						}
-						else if (!viewParticles[i].get_isStopped())
-						{
-							viewParticles[i].Stop();
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private void OnTriggerEnter(Collider collider)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ec: Expected O, but got Unknown
-		//IL_023e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0274: Expected O, but got Unknown
-		//IL_0298: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a5: Expected O, but got Unknown
-		//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030a: Expected O, but got Unknown
-		//IL_0349: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0356: Expected O, but got Unknown
-		//IL_0386: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0393: Expected O, but got Unknown
-		//IL_03f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0400: Expected O, but got Unknown
-		if (collider.get_gameObject().GetComponent<Self>() == null)
-		{
-			return;
-		}
-		if (!MonoBehaviourSingleton<InGameProgress>.I.isBattleStart)
-		{
-			return;
-		}
-		if (MonoBehaviourSingleton<InGameProgress>.I.progressEndType != 0)
-		{
-			return;
-		}
-		if (MonoBehaviourSingleton<InGameProgress>.I.isHappenQuestDirection)
-		{
-			return;
-		}
-		if (MonoBehaviourSingleton<StageObjectManager>.I.self == null)
-		{
-			return;
-		}
-		if (MonoBehaviourSingleton<StageObjectManager>.I.self.isDead)
-		{
-			return;
-		}
-		if (isClearOrder && isUnlockedTime)
-		{
-			if (!isFull)
-			{
-				FieldMapPortalInfo portalPointToPortalInfo = MonoBehaviourSingleton<FieldManager>.I.GetPortalPointToPortalInfo();
-				if (portalPointToPortalInfo == portalInfo || portalInfo.IsFull())
-				{
-					if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-					{
-						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NOT_FULL", new object[2]
-						{
-							nowPoint.ToString(),
-							maxPoint.ToString()
-						}, null, true);
-					}
-				}
-				else if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-				{
-					MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NOT_ACTIVE", null, null, true);
-				}
-			}
-			else
-			{
-				MonoBehaviourSingleton<InGameProgress>.I.checkPortalObject = this;
-				if (isQuest)
-				{
-					if (isLock)
-					{
-						if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portalData, true, true))
-						{
-							MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_QUEST_LOCK", null, null, true);
-						}
-					}
-					else if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible() && MonoBehaviourSingleton<GameSceneManager>.I.CheckQuestAndOpenUpdateAppDialog(portalData.dstQuestID, true))
-					{
-						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_QUEST", null, null, true);
-					}
-				}
-				else if (viewType == VIEW_TYPE.TO_HOME)
-				{
-					if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-					{
-						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_HOME", null, null, true);
-					}
-				}
-				else if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-				{
-					if (MonoBehaviourSingleton<UserInfoManager>.I.userStatus.tutorialStep == 0)
-					{
-						MonoBehaviourSingleton<GoWrapManager>.I.trackTutorialStep(TRACK_TUTORIAL_STEP_BIT.tutorial_guide_movement4, "Tutorial");
-					}
-					if (MonoBehaviourSingleton<GameSceneManager>.I.CheckPortalAndOpenUpdateAppDialog(portalData, false, true))
-					{
-						MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NEXT", null, null, true);
-					}
-				}
-			}
-			return;
-		}
-		string text = portalData.notAppearText;
-		if (portalData.appearQuestId != 0 && string.IsNullOrEmpty(text) && !MonoBehaviourSingleton<QuestManager>.I.IsClearQuest(portalData.appearQuestId))
-		{
-			QuestTable.QuestTableData questData = Singleton<QuestTable>.I.GetQuestData(portalData.appearQuestId);
-			text = StringTable.Format(STRING_CATEGORY.IN_GAME, 7000u, questData.questText);
-		}
-		if (portalData.appearDeliveryId != 0 && string.IsNullOrEmpty(text) && !MonoBehaviourSingleton<DeliveryManager>.I.IsClearDelivery(portalData.appearDeliveryId))
-		{
-			DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData(portalData.appearDeliveryId);
-			text = StringTable.Format(STRING_CATEGORY.IN_GAME, 7001u, deliveryTableData.name);
-		}
-		if (portalData.travelMapId != 0 && string.IsNullOrEmpty(text) && MonoBehaviourSingleton<WorldMapManager>.I.IsTraveledMap((int)portalData.travelMapId))
-		{
-			goto IL_0198;
-		}
-		goto IL_0198;
-		IL_0198:
-		if (!isUnlockedTime)
-		{
-			text = StringTable.Get(STRING_CATEGORY.IN_GAME, NOT_UNLOCKED_TIME);
-		}
-		if (!string.IsNullOrEmpty(text) && MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("PortalObject.OnTriggerEnter", this.get_gameObject(), "PORTAL_NOT_APPEAR", new object[1]
-			{
-				text
-			}, null, true);
-		}
-	}
-
-	public void OnGetPortalPoint(int add_point)
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		EffectManager.OneShot(parameter.pointGetEffectName, _transform.get_position(), _transform.get_rotation(), false);
-		nowPoint += add_point;
-		if (nowPoint >= maxPoint)
-		{
-			if (!portalInfo.IsFull())
-			{
-				Log.Warning(LOG.INGAME, "PortalObject.OnGetPortalPoint() Portal is not full. id : {0}", portalID);
-			}
-			isFull = true;
-			CreateView();
-			string text = string.Empty;
-			FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(portalData.dstMapID);
-			if (fieldMapData != null)
-			{
-				text = fieldMapData.mapName;
-			}
-			if (MonoBehaviourSingleton<FieldManager>.I.isTutorialField)
-			{
-				string text2 = StringTable.Format(STRING_CATEGORY.IN_GAME, 6001u, text);
-				UIInGamePopupDialog.PushOpen(text2, false, 1.4f);
-			}
-			else if (QuestManager.IsValidInGameExplore())
-			{
-				string text3 = StringTable.Format(STRING_CATEGORY.IN_GAME, 6002u, text);
-				UIInGamePopupDialog.PushOpen(text3, false, 1.4f);
-			}
-			else
-			{
-				int num = parameter.clearCrystalNum;
-				if (isToHardMap)
-				{
-					num = parameter.clearHardCrystalNum;
-				}
-				string text4 = StringTable.Format(STRING_CATEGORY.IN_GAME, 6000u, text, num);
-				UIInGamePopupDialog.PushOpen(text4, false, 1.8f);
-			}
-			SoundManager.PlayOneShotUISE(40000069);
-			SoundManager.PlayOneshotJingle(40000071, null, null);
-		}
-		else
-		{
-			UpdateView();
-			SoundManager.PlayOneShotUISE(40000068);
-		}
-		if (uiGizmo != null)
-		{
-			uiGizmo.OnGetPortalPoint();
-		}
-	}
+  public enum VIEW_TYPE
+  {
+    NONE = -1, // 0xFFFFFFFF
+    NORMAL = 0,
+    NOT_TRAVELED = 1,
+    TO_HOME = 2,
+    TO_HARD_MAP = 3,
+    NOT_CLEAR_ORDER = 4,
+  }
 }

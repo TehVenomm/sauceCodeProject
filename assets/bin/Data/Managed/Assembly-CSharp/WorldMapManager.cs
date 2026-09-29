@@ -1,486 +1,386 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: WorldMapManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
+#nullable disable
 public class WorldMapManager : MonoBehaviourSingleton<WorldMapManager>
 {
-	public class TransferInfo
-	{
-		public int nextRegionId;
+  private List<int> traveledMapList = new List<int>();
+  private List<FieldPortal> fieldPortalList = new List<FieldPortal>();
+  private bool displayQuestTargetMode;
+  private int questTargetMapID;
+  private int[] questTargetPortalIDs;
+  private uint jumpPortalID;
+  private bool firstSetTravelList = true;
 
-		public bool nextInGame;
+  public WorldMapManager.TransferInfo transferInfo { get; set; }
 
-		public TransferInfo(int regionId, bool directInGame)
-		{
-			nextRegionId = regionId;
-			nextInGame = directInGame;
-		}
-	}
+  public int releaseRegionIdfromBoard { get; set; }
 
-	private List<int> traveledMapList = new List<int>();
+  public int openNewFieldId { get; set; }
 
-	private List<FieldPortal> fieldPortalList = new List<FieldPortal>();
+  public void PushDisplayQuestTarget(int mapID, int[] portalIDs)
+  {
+    this.displayQuestTargetMode = true;
+    this.questTargetMapID = mapID;
+    this.questTargetPortalIDs = portalIDs;
+  }
 
-	private bool displayQuestTargetMode;
+  public void PopDisplayQuestTarget(out int mapID, out int[] portalIDs)
+  {
+    mapID = this.questTargetMapID;
+    portalIDs = this.questTargetPortalIDs;
+    this.questTargetMapID = -1;
+    this.questTargetPortalIDs = (int[]) null;
+    this.displayQuestTargetMode = false;
+  }
 
-	private int questTargetMapID;
+  public bool isDisplayQuestTargetMode() => this.displayQuestTargetMode;
 
-	private int[] questTargetPortalIDs;
+  public bool ignoreTutorial { get; set; }
 
-	private uint jumpPortalID;
+  public int eventMapRegionID { get; set; }
 
-	private bool firstSetTravelList = true;
+  public int releaseCrystalNum { get; private set; }
 
-	public TransferInfo transferInfo
-	{
-		get;
-		set;
-	}
+  public List<int> releasedRegionIds { get; private set; }
 
-	public int openNewFieldId
-	{
-		get;
-		set;
-	}
+  public void SetReleasedRegion()
+  {
+    this.releasedRegionIds = MonoBehaviourSingleton<OnceManager>.I.result.region;
+  }
 
-	public bool ignoreTutorial
-	{
-		get;
-		set;
-	}
+  public void AddReleasedRegion(int regionId) => this.releasedRegionIds.Add(regionId);
 
-	public int eventMapRegionID
-	{
-		get;
-		set;
-	}
+  public bool IsTraveledMap(int mapId)
+  {
+    return QuestManager.IsValidInGameExplore() ? MonoBehaviourSingleton<QuestManager>.I.MapIsTraveldInExplore(mapId) : this.traveledMapList.IndexOf(mapId) >= 0;
+  }
 
-	public int releaseCrystalNum
-	{
-		get;
-		private set;
-	}
+  public uint[] GetOpenRegionIdList()
+  {
+    List<uint> uintList = new List<uint>();
+    foreach (RegionTable.Data data in Singleton<RegionTable>.I.GetData())
+    {
+      if (!data.HasStartAt() || !(data.startAt > TimeManager.GetNow()))
+      {
+        foreach (FieldMapTable.FieldMapTableData map in Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(data.regionId))
+        {
+          if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(map))
+          {
+            uintList.Add(map.regionId);
+            break;
+          }
+        }
+      }
+    }
+    return uintList.ToArray();
+  }
 
-	public List<int> releasedRegionIds
-	{
-		get;
-		private set;
-	}
+  public uint[] GetOpenRegionIdListInWorldMap()
+  {
+    List<uint> uintList = new List<uint>();
+    foreach (RegionTable.Data data in Singleton<RegionTable>.I.GetData())
+    {
+      if (100U > data.regionId && (!data.HasStartAt() || !(data.startAt > TimeManager.GetNow())))
+      {
+        foreach (FieldMapTable.FieldMapTableData map in Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(data.regionId))
+        {
+          if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(map))
+          {
+            uintList.Add(map.regionId);
+            break;
+          }
+        }
+      }
+    }
+    return uintList.ToArray();
+  }
 
-	public void PushDisplayQuestTarget(int mapID, int[] portalIDs)
-	{
-		displayQuestTargetMode = true;
-		questTargetMapID = mapID;
-		questTargetPortalIDs = portalIDs;
-	}
+  public uint[] GetOpenRegionIdListInWorldMap(REGION_DIFFICULTY_TYPE type)
+  {
+    List<uint> uintList = new List<uint>();
+    foreach (RegionTable.Data data in Singleton<RegionTable>.I.GetData())
+    {
+      if (100U > data.regionId && type == data.difficulty && (!data.HasStartAt() || !(data.startAt > TimeManager.GetNow())))
+      {
+        foreach (FieldMapTable.FieldMapTableData map in Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(data.regionId))
+        {
+          if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(map))
+          {
+            uintList.Add(map.regionId);
+            break;
+          }
+        }
+      }
+    }
+    return uintList.ToArray();
+  }
 
-	public void PopDisplayQuestTarget(out int mapID, out int[] portalIDs)
-	{
-		mapID = questTargetMapID;
-		portalIDs = questTargetPortalIDs;
-		questTargetMapID = -1;
-		questTargetPortalIDs = null;
-		displayQuestTargetMode = false;
-	}
+  public uint[] GetValidRegionIdListInWorldMap()
+  {
+    List<uint> uintList = new List<uint>();
+    foreach (RegionTable.Data data in Singleton<RegionTable>.I.GetData())
+    {
+      if (100U > data.regionId && (!data.HasStartAt() || !(data.startAt > TimeManager.GetNow())))
+        uintList.Add(data.regionId);
+    }
+    return uintList.ToArray();
+  }
 
-	public bool isDisplayQuestTargetMode()
-	{
-		return displayQuestTargetMode;
-	}
+  public uint[] GetValidRegionIdListInWorldMap(REGION_DIFFICULTY_TYPE type)
+  {
+    List<uint> uintList = new List<uint>();
+    foreach (RegionTable.Data data in Singleton<RegionTable>.I.GetData())
+    {
+      if (100U > data.regionId && (!data.HasStartAt() || !(data.startAt > TimeManager.GetNow())) && type == data.difficulty)
+        uintList.Add(data.regionId);
+    }
+    return uintList.ToArray();
+  }
 
-	public void SetReleasedRegion()
-	{
-		releasedRegionIds = MonoBehaviourSingleton<OnceManager>.I.result.region;
-	}
+  public bool IsAllOpenedMap(int regionId)
+  {
+    RegionTable.Data data = Singleton<RegionTable>.I.GetData((uint) regionId);
+    if (data == null)
+      return false;
+    foreach (FieldMapTable.FieldMapTableData map in Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(data.regionId))
+    {
+      if (!MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(map))
+        return false;
+    }
+    return true;
+  }
 
-	public void AddReleasedRegion(int regionId)
-	{
-		releasedRegionIds.Add(regionId);
-	}
+  public bool IsOpenRegion(uint regionId)
+  {
+    foreach (FieldMapTable.FieldMapTableData map in Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(regionId))
+    {
+      if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(map))
+        return true;
+    }
+    return false;
+  }
 
-	public bool IsTraveledMap(int mapId)
-	{
-		if (QuestManager.IsValidInGameExplore())
-		{
-			return MonoBehaviourSingleton<QuestManager>.I.MapIsTraveldInExplore(mapId);
-		}
-		int num = traveledMapList.IndexOf(mapId);
-		return num >= 0;
-	}
+  public FieldPortal GetFieldPortal(int portalId)
+  {
+    return this.fieldPortalList.Find((Predicate<FieldPortal>) (p => p.pId == portalId));
+  }
 
-	public uint[] GetOpenRegionIdList()
-	{
-		List<uint> list = new List<uint>();
-		RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
-		foreach (RegionTable.Data data2 in data)
-		{
-			if (!data2.HasStartAt() || !(data2.startAt > TimeManager.GetNow()))
-			{
-				FieldMapTable.FieldMapTableData[] fieldMapDataInRegion = Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(data2.regionId);
-				foreach (FieldMapTable.FieldMapTableData fieldMapTableData in fieldMapDataInRegion)
-				{
-					if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapTableData))
-					{
-						list.Add(fieldMapTableData.regionId);
-						break;
-					}
-				}
-			}
-		}
-		return list.ToArray();
-	}
+  public bool IsTraveledPortal(uint portalId)
+  {
+    FieldMapTable.PortalTableData portalData = Singleton<FieldMapTable>.I.GetPortalData(portalId);
+    return portalData != null && this.IsTraveledPortal(portalData);
+  }
 
-	public uint[] GetOpenRegionIdListInWorldMap()
-	{
-		List<uint> list = new List<uint>();
-		RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
-		foreach (RegionTable.Data data2 in data)
-		{
-			if (100 > data2.regionId && (!data2.HasStartAt() || !(data2.startAt > TimeManager.GetNow())))
-			{
-				FieldMapTable.FieldMapTableData[] fieldMapDataInRegion = Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(data2.regionId);
-				foreach (FieldMapTable.FieldMapTableData fieldMapTableData in fieldMapDataInRegion)
-				{
-					if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapTableData))
-					{
-						list.Add(fieldMapTableData.regionId);
-						break;
-					}
-				}
-			}
-		}
-		return list.ToArray();
-	}
+  public bool IsTraveledPortal(FieldMapTable.PortalTableData portal)
+  {
+    if (QuestManager.IsValidInGameExplore())
+      return MonoBehaviourSingleton<QuestManager>.I.PortalIsUsedInExplore((int) portal.portalID);
+    if (portal.srcMapID > 0U && !this.IsTraveledMap((int) portal.srcMapID))
+      return false;
+    FieldPortal fieldPortal = this.GetFieldPortal((int) portal.portalID);
+    return fieldPortal != null && fieldPortal.used;
+  }
 
-	public uint[] GetOpenRegionIdListInWorldMap(REGION_DIFFICULTY_TYPE type)
-	{
-		List<uint> list = new List<uint>();
-		RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
-		foreach (RegionTable.Data data2 in data)
-		{
-			if (100 > data2.regionId && type == data2.difficulty && (!data2.HasStartAt() || !(data2.startAt > TimeManager.GetNow())))
-			{
-				FieldMapTable.FieldMapTableData[] fieldMapDataInRegion = Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(data2.regionId);
-				foreach (FieldMapTable.FieldMapTableData fieldMapTableData in fieldMapDataInRegion)
-				{
-					if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(fieldMapTableData))
-					{
-						list.Add(fieldMapTableData.regionId);
-						break;
-					}
-				}
-			}
-		}
-		return list.ToArray();
-	}
+  public int GetPortalPoint(uint portalId)
+  {
+    FieldPortal fieldPortal = this.GetFieldPortal((int) portalId);
+    return fieldPortal == null ? 0 : fieldPortal.point;
+  }
 
-	public uint[] GetValidRegionIdListInWorldMap()
-	{
-		List<uint> list = new List<uint>();
-		RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
-		foreach (RegionTable.Data data2 in data)
-		{
-			if (100 > data2.regionId && (!data2.HasStartAt() || !(data2.startAt > TimeManager.GetNow())))
-			{
-				list.Add(data2.regionId);
-			}
-		}
-		return list.ToArray();
-	}
+  public void SetWorldMapTraveledList()
+  {
+    if (!this.firstSetTravelList)
+      return;
+    this.firstSetTravelList = false;
+    OnceTraveledListModel.Param traveledlist = MonoBehaviourSingleton<OnceManager>.I.result.traveledlist;
+    this.traveledMapList = traveledlist.travel;
+    this.fieldPortalList = traveledlist.portal;
+  }
 
-	public bool IsAllOpenedMap(int regionId)
-	{
-		RegionTable.Data data = Singleton<RegionTable>.I.GetData((uint)regionId);
-		if (data == null)
-		{
-			return false;
-		}
-		FieldMapTable.FieldMapTableData[] fieldMapDataInRegion = Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(data.regionId);
-		foreach (FieldMapTable.FieldMapTableData map in fieldMapDataInRegion)
-		{
-			if (!MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(map))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
+  public void SendDebugSetTraveled(int mapId, int cnt, Action<bool> call_back)
+  {
+    Protocol.Send<DebugSetTraveledModel.RequestSendForm, DebugSetTraveledModel>(DebugSetTraveledModel.URL, new DebugSetTraveledModel.RequestSendForm()
+    {
+      mapId = mapId,
+      cnt = cnt
+    }, (Action<DebugSetTraveledModel>) (ret =>
+    {
+      bool flag = false;
+      if (ret.Error == Error.None)
+        flag = true;
+      call_back(flag);
+    }));
+  }
 
-	public bool IsOpenRegion(uint regionId)
-	{
-		FieldMapTable.FieldMapTableData[] fieldMapDataInRegion = Singleton<FieldMapTable>.I.GetFieldMapDataInRegion(regionId);
-		foreach (FieldMapTable.FieldMapTableData map in fieldMapDataInRegion)
-		{
-			if (MonoBehaviourSingleton<FieldManager>.I.CanJumpToMap(map))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+  public void SendDebugUsedPortal(int portalId, int used, Action<bool> call_back)
+  {
+    Protocol.Send<DebugUsedPortalModel.RequestSendForm, DebugUsedPortalModel>(DebugUsedPortalModel.URL, new DebugUsedPortalModel.RequestSendForm()
+    {
+      pId = portalId,
+      used = used
+    }, (Action<DebugUsedPortalModel>) (ret => call_back(ErrorCodeChecker.IsSuccess(ret.Error))));
+  }
 
-	public FieldPortal GetFieldPortal(int portalId)
-	{
-		return fieldPortalList.Find((FieldPortal p) => p.pId == portalId);
-	}
+  public void SendDebugSetPortalPoint(int portalId, int point, Action<bool> call_back)
+  {
+    Protocol.Send<DebugSetPortalPointModel.RequestSendForm, DebugSetPortalPointModel>(DebugSetPortalPointModel.URL, new DebugSetPortalPointModel.RequestSendForm()
+    {
+      pId = portalId,
+      point = point
+    }, (Action<DebugSetPortalPointModel>) (ret => call_back(ErrorCodeChecker.IsSuccess(ret.Error))));
+  }
 
-	public bool IsTraveledPortal(uint portalId)
-	{
-		FieldMapTable.PortalTableData portalData = Singleton<FieldMapTable>.I.GetPortalData(portalId);
-		if (portalData == null)
-		{
-			return false;
-		}
-		return IsTraveledPortal(portalData);
-	}
+  public void Dirty()
+  {
+  }
 
-	public bool IsTraveledPortal(FieldMapTable.PortalTableData portal)
-	{
-		if (QuestManager.IsValidInGameExplore())
-		{
-			return MonoBehaviourSingleton<QuestManager>.I.PortalIsUsedInExplore((int)portal.portalID);
-		}
-		if (portal.srcMapID != 0 && !IsTraveledMap((int)portal.srcMapID))
-		{
-			return false;
-		}
-		return GetFieldPortal((int)portal.portalID)?.used ?? false;
-	}
+  public void OnDiff(BaseModelDiff.DiffTraveled diff)
+  {
+    bool flag = false;
+    if (Utility.IsExist((ICollection) diff.add))
+    {
+      uint[] idListInWorldMap = this.GetOpenRegionIdListInWorldMap();
+      this.traveledMapList.AddRange((IEnumerable<int>) diff.add);
+      flag = true;
+      if (diff.add.Contains(10010500))
+        GameSaveData.instance.happyTimeForRating = true;
+      List<uint> uintList = new List<uint>((IEnumerable<uint>) this.GetOpenRegionIdListInWorldMap());
+      for (int index = 0; index < idListInWorldMap.Length; ++index)
+        uintList.Remove(idListInWorldMap[index]);
+      if (uintList.Contains(1U) || uintList.Contains(3U) || uintList.Contains(5U) || uintList.Contains(7U))
+        GameSaveData.instance.happyTimeForRating = true;
+    }
+    if (!flag)
+      return;
+    this.Dirty();
+  }
 
-	public int GetPortalPoint(uint portalId)
-	{
-		return GetFieldPortal((int)portalId)?.point ?? 0;
-	}
+  public void OnDiff(BaseModelDiff.DiffFieldPortal diff)
+  {
+    bool flag = false;
+    if (Utility.IsExist((ICollection) diff.add))
+    {
+      this.fieldPortalList.AddRange((IEnumerable<FieldPortal>) diff.add);
+      flag = true;
+    }
+    if (Utility.IsExist((ICollection) diff.update))
+    {
+      diff.update.ForEach((Action<FieldPortal>) (portal =>
+      {
+        FieldPortal fieldPortal = this.fieldPortalList.Find((Predicate<FieldPortal>) (f => f.pId == portal.pId));
+        if (fieldPortal == null)
+          return;
+        fieldPortal.used = portal.used;
+        fieldPortal.point = portal.point;
+      }));
+      flag = true;
+    }
+    if (!flag)
+      return;
+    this.Dirty();
+  }
 
-	public void SetWorldMapTraveledList()
-	{
-		if (firstSetTravelList)
-		{
-			firstSetTravelList = false;
-			OnceTraveledListModel.Param traveledlist = MonoBehaviourSingleton<OnceManager>.I.result.traveledlist;
-			traveledMapList = traveledlist.travel;
-			fieldPortalList = traveledlist.portal;
-		}
-	}
+  public void SetJumpPortalID(uint portalID) => this.jumpPortalID = portalID;
 
-	public void SendDebugSetTraveled(int mapId, int cnt, Action<bool> call_back)
-	{
-		DebugSetTraveledModel.RequestSendForm requestSendForm = new DebugSetTraveledModel.RequestSendForm();
-		requestSendForm.mapId = mapId;
-		requestSendForm.cnt = cnt;
-		Protocol.Send(DebugSetTraveledModel.URL, requestSendForm, delegate(DebugSetTraveledModel ret)
-		{
-			bool obj = false;
-			if (ret.Error == Error.None)
-			{
-				obj = true;
-			}
-			call_back(obj);
-		}, string.Empty);
-	}
+  public uint GetJumpPortalID() => this.jumpPortalID;
 
-	public void SendDebugUsedPortal(int portalId, int used, Action<bool> call_back)
-	{
-		DebugUsedPortalModel.RequestSendForm requestSendForm = new DebugUsedPortalModel.RequestSendForm();
-		requestSendForm.pId = portalId;
-		requestSendForm.used = used;
-		Protocol.Send(DebugUsedPortalModel.URL, requestSendForm, delegate(DebugUsedPortalModel ret)
-		{
-			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
-			call_back(obj);
-		}, string.Empty);
-	}
+  public static bool IsValidPortalIDs(int[] ids) => ids != null && ids.Length != 0 && 0 < ids[0];
 
-	public void SendDebugSetPortalPoint(int portalId, int point, Action<bool> call_back)
-	{
-		DebugSetPortalPointModel.RequestSendForm requestSendForm = new DebugSetPortalPointModel.RequestSendForm();
-		requestSendForm.pId = portalId;
-		requestSendForm.point = point;
-		Protocol.Send(DebugSetPortalPointModel.URL, requestSendForm, delegate(DebugSetPortalPointModel ret)
-		{
-			bool obj = ErrorCodeChecker.IsSuccess(ret.Error);
-			call_back(obj);
-		}, string.Empty);
-	}
+  public void SendRegionCrystalNum(int regionId, Action<bool, string> call_back)
+  {
+    Protocol.Send<RegionCrystalNumModel.RequestSendForm, RegionCrystalNumModel>(RegionCrystalNumModel.URL, new RegionCrystalNumModel.RequestSendForm()
+    {
+      regionId = regionId
+    }, (Action<RegionCrystalNumModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      string str = "";
+      if (flag)
+      {
+        this.releaseCrystalNum = ret.result.crystalNum;
+        str = ret.result.text;
+      }
+      call_back(flag, str);
+    }));
+  }
 
-	public void Dirty()
-	{
-	}
+  public void SendRegionOpen(int regionId, Action<bool> call_back)
+  {
+    Protocol.Send<RegionOpenModel.RequestSendForm, RegionOpenModel>(RegionOpenModel.URL, new RegionOpenModel.RequestSendForm()
+    {
+      crystalCL = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal,
+      regionId = regionId,
+      useCrystal = this.releaseCrystalNum
+    }, (Action<RegionOpenModel>) (ret =>
+    {
+      bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
+      if (flag)
+        this.releasedRegionIds.Add(regionId);
+      call_back(flag);
+    }));
+  }
 
-	public void OnDiff(BaseModelDiff.DiffTraveled diff)
-	{
-		bool flag = false;
-		if (Utility.IsExist(diff.add))
-		{
-			uint[] openRegionIdListInWorldMap = GetOpenRegionIdListInWorldMap();
-			traveledMapList.AddRange(diff.add);
-			flag = true;
-			if (diff.add.Contains(10010500))
-			{
-				GameSaveData.instance.happyTimeForRating = true;
-			}
-			List<uint> list = new List<uint>(GetOpenRegionIdListInWorldMap());
-			for (int i = 0; i < openRegionIdListInWorldMap.Length; i++)
-			{
-				list.Remove(openRegionIdListInWorldMap[i]);
-			}
-			if (list.Contains(1u) || list.Contains(3u) || list.Contains(5u) || list.Contains(7u))
-			{
-				GameSaveData.instance.happyTimeForRating = true;
-			}
-		}
-		if (flag)
-		{
-			Dirty();
-		}
-	}
+  public bool IsShowedOpenRegion(int regionId)
+  {
+    RegionTable.Data data = Singleton<RegionTable>.I.GetData((uint) regionId);
+    if (data.difficulty != REGION_DIFFICULTY_TYPE.NORMAL || data.regionId == 0U || GameSaveData.instance.showedOpenRegionIds.Contains(regionId))
+      return true;
+    foreach (FieldMapTable.FieldMapTableData fieldMapTableData in Singleton<FieldMapTable>.I.GetFieldMapDataInRegion((uint) regionId))
+    {
+      if (this.traveledMapList.Contains((int) fieldMapTableData.mapID))
+      {
+        GameSaveData.instance.AddShowedOpenRegionId((int) fieldMapTableData.regionId);
+        if ((int) fieldMapTableData.mapID != this.openNewFieldId)
+          return true;
+      }
+    }
+    return false;
+  }
 
-	public void OnDiff(BaseModelDiff.DiffFieldPortal diff)
-	{
-		bool flag = false;
-		if (Utility.IsExist(diff.add))
-		{
-			fieldPortalList.AddRange(diff.add);
-			flag = true;
-		}
-		if (Utility.IsExist(diff.update))
-		{
-			diff.update.ForEach(delegate(FieldPortal portal)
-			{
-				WorldMapManager worldMapManager = this;
-				FieldPortal fieldPortal = fieldPortalList.Find((FieldPortal f) => f.pId == portal.pId);
-				if (fieldPortal != null)
-				{
-					fieldPortal.used = portal.used;
-					fieldPortal.point = portal.point;
-				}
-			});
-			flag = true;
-		}
-		if (flag)
-		{
-			Dirty();
-		}
-	}
+  public bool ExistRegionDirection()
+  {
+    foreach (uint regionIdListInWorld in this.GetOpenRegionIdListInWorldMap())
+    {
+      if (regionIdListInWorld != 0U && !this.IsShowedOpenRegion((int) regionIdListInWorld))
+        return true;
+    }
+    return false;
+  }
 
-	public void SetJumpPortalID(uint portalID)
-	{
-		jumpPortalID = portalID;
-	}
+  public bool IsExistedWorld2()
+  {
+    foreach (uint regionIdListInWorld in this.GetValidRegionIdListInWorldMap())
+    {
+      RegionTable.Data data = Singleton<RegionTable>.I.GetData(regionIdListInWorld);
+      if (data.regionId < 100U && data.worldId == 2)
+        return true;
+    }
+    return false;
+  }
 
-	public uint GetJumpPortalID()
-	{
-		return jumpPortalID;
-	}
+  public bool NeedDirectionOpenRegion(int regionId)
+  {
+    return regionId < 100 && !MonoBehaviourSingleton<GameSceneManager>.I.IsExecutionAutoEvent() && !this.IsShowedOpenRegion(regionId);
+  }
 
-	public static bool IsValidPortalIDs(int[] ids)
-	{
-		if (ids == null)
-		{
-			return false;
-		}
-		if (ids.Length == 0)
-		{
-			return false;
-		}
-		if (0 >= ids[0])
-		{
-			return false;
-		}
-		return true;
-	}
+  public class TransferInfo
+  {
+    public int nextRegionId;
+    public bool nextInGame;
 
-	public void SendRegionCrystalNum(int regionId, Action<bool, string> call_back)
-	{
-		RegionCrystalNumModel.RequestSendForm requestSendForm = new RegionCrystalNumModel.RequestSendForm();
-		requestSendForm.regionId = regionId;
-		Protocol.Send(RegionCrystalNumModel.URL, requestSendForm, delegate(RegionCrystalNumModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			string arg = string.Empty;
-			if (flag)
-			{
-				releaseCrystalNum = ret.result.crystalNum;
-				arg = ret.result.text;
-			}
-			call_back(flag, arg);
-		}, string.Empty);
-	}
-
-	public void SendRegionOpen(int regionId, Action<bool> call_back)
-	{
-		RegionOpenModel.RequestSendForm requestSendForm = new RegionOpenModel.RequestSendForm();
-		requestSendForm.crystalCL = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
-		requestSendForm.regionId = regionId;
-		requestSendForm.useCrystal = releaseCrystalNum;
-		Protocol.Send(RegionOpenModel.URL, requestSendForm, delegate(RegionOpenModel ret)
-		{
-			bool flag = ErrorCodeChecker.IsSuccess(ret.Error);
-			if (flag)
-			{
-				releasedRegionIds.Add(regionId);
-			}
-			call_back(flag);
-		}, string.Empty);
-	}
-
-	public bool IsShowedOpenRegion(int regionId)
-	{
-		RegionTable.Data data = Singleton<RegionTable>.I.GetData((uint)regionId);
-		if (data.difficulty != 0)
-		{
-			return true;
-		}
-		if (data.regionId == 0)
-		{
-			return true;
-		}
-		List<int> showedOpenRegionIds = GameSaveData.instance.showedOpenRegionIds;
-		if (showedOpenRegionIds.Contains(regionId))
-		{
-			return true;
-		}
-		FieldMapTable.FieldMapTableData[] fieldMapDataInRegion = Singleton<FieldMapTable>.I.GetFieldMapDataInRegion((uint)regionId);
-		foreach (FieldMapTable.FieldMapTableData fieldMapTableData in fieldMapDataInRegion)
-		{
-			if (traveledMapList.Contains((int)fieldMapTableData.mapID))
-			{
-				GameSaveData.instance.AddShowedOpenRegionId((int)fieldMapTableData.regionId);
-				if (fieldMapTableData.mapID != (uint)openNewFieldId)
-				{
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public bool ExistRegionDirection()
-	{
-		uint[] openRegionIdListInWorldMap = GetOpenRegionIdListInWorldMap();
-		uint[] array = openRegionIdListInWorldMap;
-		foreach (uint num in array)
-		{
-			if (num != 0 && !IsShowedOpenRegion((int)num))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public bool IsExistedWorld2()
-	{
-		uint[] validRegionIdListInWorldMap = GetValidRegionIdListInWorldMap();
-		uint[] array = validRegionIdListInWorldMap;
-		foreach (uint id in array)
-		{
-			RegionTable.Data data = Singleton<RegionTable>.I.GetData(id);
-			if (data.regionId < 100 && data.worldId == 2)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+    public TransferInfo(int regionId, bool directInGame)
+    {
+      this.nextRegionId = regionId;
+      this.nextInGame = directInGame;
+    }
+  }
 }

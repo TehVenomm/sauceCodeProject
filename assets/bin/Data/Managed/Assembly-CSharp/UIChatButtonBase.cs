@@ -1,70 +1,55 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIChatButtonBase
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-[RequireComponent(typeof(UIButton))]
+#nullable disable
+[RequireComponent(typeof (UIButton))]
 public class UIChatButtonBase : MonoBehaviourSingleton<UIChatButtonBase>
 {
-	[SerializeField]
-	protected UIChatItem[] chatItem;
+  [SerializeField]
+  protected UIChatItem[] chatItem;
+  protected int chatID = -1;
+  protected int chatCancelID = -1;
 
-	protected int chatID = -1;
+  private void Start()
+  {
+    int length = this.chatItem.Length;
+    for (int chat_id = 0; chat_id < length; ++chat_id)
+      this.chatItem[chat_id].SetChatData(this, string.Empty, chat_id);
+  }
 
-	protected int chatCancelID = -1;
+  private void Update()
+  {
+    if (this.chatID == -1 || this.chatID != this.chatCancelID)
+      return;
+    this.chatID = -1;
+    this.chatCancelID = -1;
+  }
 
-	private void Start()
-	{
-		int num = chatItem.Length;
-		for (int i = 0; i < num; i++)
-		{
-			chatItem[i].SetChatData(this, string.Empty, i);
-		}
-	}
+  public void ChatSay(int chat_id) => this.chatID = chat_id;
 
-	private void Update()
-	{
-		if (chatID != -1 && chatID == chatCancelID)
-		{
-			chatID = -1;
-			chatCancelID = -1;
-		}
-	}
+  public void ChatCancel(int chat_id) => this.chatCancelID = chat_id;
 
-	public void ChatSay(int chat_id)
-	{
-		chatID = chat_id;
-	}
+  private void OnPress(bool pressed)
+  {
+    if (!pressed)
+      this.chat(this.chatID);
+    this.chatID = -1;
+    this.chatCancelID = -1;
+    int index = 0;
+    for (int length = this.chatItem.Length; index < length; ++index)
+      ((Component) this.chatItem[index]).gameObject.SetActive(pressed);
+  }
 
-	public void ChatCancel(int chat_id)
-	{
-		chatCancelID = chat_id;
-	}
+  public virtual string GetChatSayText(int chatID) => string.Empty;
 
-	private void OnPress(bool pressed)
-	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		if (!pressed)
-		{
-			chat(chatID);
-		}
-		chatID = -1;
-		chatCancelID = -1;
-		int i = 0;
-		for (int num = chatItem.Length; i < num; i++)
-		{
-			chatItem[i].get_gameObject().SetActive(pressed);
-		}
-	}
+  protected virtual void chat(int id)
+  {
+  }
 
-	public virtual string GetChatSayText(int chatID)
-	{
-		return string.Empty;
-	}
-
-	protected virtual void chat(int id)
-	{
-	}
-
-	public void SetChatItem(UIChatItem[] items)
-	{
-		chatItem = items;
-	}
+  public void SetChatItem(UIChatItem[] items) => this.chatItem = items;
 }

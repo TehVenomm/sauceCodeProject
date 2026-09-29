@@ -1,111 +1,95 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: LoungeAnnounce
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class LoungeAnnounce : UIBehaviour
 {
-	public enum UI
-	{
-		WGT_ANCHOR_POINT,
-		OBJ_TWEENCTRL,
-		OBJ_EFFECT,
-		LBL_ANNOUNCE,
-		LBL_USER_NAME
-	}
+  protected UIWidget widget;
+  protected UITweenCtrl tweenCtrl;
 
-	public enum ANNOUNCE_TYPE
-	{
-		CREATED_PARTY,
-		JOIN_LOUNGE,
-		LEAVED_LOUNGE
-	}
+  public void Play(LoungeAnnounce.AnnounceData data, System.Action onComplete)
+  {
+    this.Play(data.type, data.name, onComplete);
+  }
 
-	public class AnnounceData
-	{
-		public ANNOUNCE_TYPE type
-		{
-			get;
-			private set;
-		}
+  public virtual void Play(LoungeAnnounce.ANNOUNCE_TYPE type, string userName, System.Action onComplete)
+  {
+    this.SetActive((Enum) LoungeAnnounce.UI.WGT_ANCHOR_POINT, true);
+    if (Object.op_Equality((Object) this.widget, (Object) null) || Object.op_Equality((Object) this.tweenCtrl, (Object) null))
+    {
+      if (onComplete == null)
+        return;
+      onComplete();
+    }
+    else
+    {
+      switch (type)
+      {
+        case LoungeAnnounce.ANNOUNCE_TYPE.CREATED_PARTY:
+          this.SetLabelText((Enum) LoungeAnnounce.UI.LBL_ANNOUNCE, StringTable.Get(STRING_CATEGORY.LOUNGE, 0U));
+          break;
+        case LoungeAnnounce.ANNOUNCE_TYPE.JOIN_LOUNGE:
+          this.SetLabelText((Enum) LoungeAnnounce.UI.LBL_ANNOUNCE, StringTable.Get(STRING_CATEGORY.LOUNGE, 1U));
+          break;
+        case LoungeAnnounce.ANNOUNCE_TYPE.LEAVED_LOUNGE:
+          this.SetLabelText((Enum) LoungeAnnounce.UI.LBL_ANNOUNCE, StringTable.Get(STRING_CATEGORY.LOUNGE, 2U));
+          break;
+      }
+      this.SetLabelText((Enum) LoungeAnnounce.UI.LBL_USER_NAME, userName);
+      this.SetFontStyle((Enum) LoungeAnnounce.UI.LBL_ANNOUNCE, (FontStyle) 2);
+      this.SetFontStyle((Enum) LoungeAnnounce.UI.LBL_USER_NAME, (FontStyle) 2);
+      this.tweenCtrl.Reset();
+      this.tweenCtrl.Play(onFinished: (EventDelegate.Callback) (() =>
+      {
+        if (onComplete == null)
+          return;
+        onComplete();
+      }));
+    }
+  }
 
-		public string name
-		{
-			get;
-			private set;
-		}
+  private void Start()
+  {
+    Transform ctrl = this.GetCtrl((Enum) LoungeAnnounce.UI.OBJ_EFFECT);
+    if (Object.op_Inequality((Object) ctrl, (Object) null))
+      ctrl.localScale = Vector3.zero;
+    this.widget = this.GetComponent<UIWidget>((Enum) LoungeAnnounce.UI.WGT_ANCHOR_POINT);
+    this.tweenCtrl = this.GetComponent<UITweenCtrl>((Enum) LoungeAnnounce.UI.OBJ_TWEENCTRL);
+    this.SetActive((Enum) LoungeAnnounce.UI.WGT_ANCHOR_POINT, false);
+  }
 
-		public AnnounceData(ANNOUNCE_TYPE setType, string setName)
-		{
-			type = setType;
-			name = setName;
-		}
-	}
+  public enum UI
+  {
+    WGT_ANCHOR_POINT,
+    OBJ_TWEENCTRL,
+    OBJ_EFFECT,
+    LBL_ANNOUNCE,
+    LBL_USER_NAME,
+  }
 
-	private UIWidget widget;
+  public enum ANNOUNCE_TYPE
+  {
+    CREATED_PARTY,
+    JOIN_LOUNGE,
+    LEAVED_LOUNGE,
+  }
 
-	private UITweenCtrl tweenCtrl;
+  public class AnnounceData
+  {
+    public LoungeAnnounce.ANNOUNCE_TYPE type { get; private set; }
 
-	public void Play(AnnounceData data, Action onComplete)
-	{
-		Play(data.type, data.name, onComplete);
-	}
+    public string name { get; private set; }
 
-	public void Play(ANNOUNCE_TYPE type, string userName, Action onComplete)
-	{
-		SetActive((Enum)UI.WGT_ANCHOR_POINT, true);
-		if (widget == null || tweenCtrl == null)
-		{
-			if (onComplete != null)
-			{
-				onComplete();
-			}
-		}
-		else
-		{
-			switch (type)
-			{
-			case ANNOUNCE_TYPE.CREATED_PARTY:
-			{
-				string text3 = StringTable.Get(STRING_CATEGORY.LOUNGE, 0u);
-				SetLabelText((Enum)UI.LBL_ANNOUNCE, text3);
-				break;
-			}
-			case ANNOUNCE_TYPE.JOIN_LOUNGE:
-			{
-				string text2 = StringTable.Get(STRING_CATEGORY.LOUNGE, 1u);
-				SetLabelText((Enum)UI.LBL_ANNOUNCE, text2);
-				break;
-			}
-			case ANNOUNCE_TYPE.LEAVED_LOUNGE:
-			{
-				string text = StringTable.Get(STRING_CATEGORY.LOUNGE, 2u);
-				SetLabelText((Enum)UI.LBL_ANNOUNCE, text);
-				break;
-			}
-			}
-			SetLabelText((Enum)UI.LBL_USER_NAME, userName);
-			SetFontStyle((Enum)UI.LBL_ANNOUNCE, 2);
-			SetFontStyle((Enum)UI.LBL_USER_NAME, 2);
-			tweenCtrl.Reset();
-			tweenCtrl.Play(true, delegate
-			{
-				if (onComplete != null)
-				{
-					onComplete();
-				}
-			});
-		}
-	}
-
-	private void Start()
-	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		Transform ctrl = GetCtrl(UI.OBJ_EFFECT);
-		if (ctrl != null)
-		{
-			ctrl.set_localScale(Vector3.get_zero());
-		}
-		widget = base.GetComponent<UIWidget>((Enum)UI.WGT_ANCHOR_POINT);
-		tweenCtrl = base.GetComponent<UITweenCtrl>((Enum)UI.OBJ_TWEENCTRL);
-		SetActive((Enum)UI.WGT_ANCHOR_POINT, false);
-	}
+    public AnnounceData(LoungeAnnounce.ANNOUNCE_TYPE setType, string setName)
+    {
+      this.type = setType;
+      this.name = setName;
+    }
+  }
 }

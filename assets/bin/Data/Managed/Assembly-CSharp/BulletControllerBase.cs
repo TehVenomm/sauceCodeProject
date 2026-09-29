@@ -1,136 +1,99 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: BulletControllerBase
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class BulletControllerBase
+#nullable disable
+public class BulletControllerBase : MonoBehaviour
 {
-	protected BulletObject bulletObject;
+  protected BulletObject bulletObject;
+  protected StageObject fromObject;
+  protected StageObject targetObject;
 
-	public Transform _transform
-	{
-		get;
-		protected set;
-	}
+  public Transform _transform { get; protected set; }
 
-	public Rigidbody _rigidbody
-	{
-		get;
-		protected set;
-	}
+  public Vector3 _position { get; protected set; }
 
-	public Collider _collider
-	{
-		get;
-		protected set;
-	}
+  public Rigidbody _rigidbody { get; protected set; }
 
-	protected float speed
-	{
-		get;
-		private set;
-	}
+  public Collider _collider { get; protected set; }
 
-	protected float initialVelocity
-	{
-		get;
-		private set;
-	}
+  protected float speed { get; private set; }
 
-	public float timeCount
-	{
-		get;
-		protected set;
-	}
+  protected float initialVelocity { get; private set; }
 
-	public SkillInfo.SkillParam bulletSkillInfoParam
-	{
-		get;
-		protected set;
-	}
+  public float timeCount { get; protected set; }
 
-	public BulletControllerBase()
-		: this()
-	{
-	}
+  public SkillInfo.SkillParam bulletSkillInfoParam { get; protected set; }
 
-	public void RegisterBulletObject(BulletObject b)
-	{
-		bulletObject = b;
-	}
+  public void RegisterBulletObject(BulletObject b) => this.bulletObject = b;
 
-	protected virtual void Awake()
-	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
-		timeCount = 0f;
-		bulletSkillInfoParam = null;
-		_transform = this.get_transform();
-		_rigidbody = this.GetComponent<Rigidbody>();
-		_collider = this.GetComponent<Collider>();
-	}
+  public virtual void RegisterFromObject(StageObject obj) => this.fromObject = obj;
 
-	public virtual void Initialize(BulletData bullet, SkillInfo.SkillParam skillParam, Vector3 pos, Quaternion rot)
-	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		speed = bullet.data.speed;
-		initialVelocity = bullet.data.speed;
-		bulletSkillInfoParam = skillParam;
-		Vector3 forward = Vector3.get_forward();
-		forward = rot * forward;
-		forward *= speed;
-		_transform.set_position(pos);
-		_transform.LookAt(pos + forward);
-		_rigidbody.set_velocity(forward);
-	}
+  public virtual void RegisterTargetObject(StageObject obj) => this.targetObject = obj;
 
-	public virtual void Update()
-	{
-		timeCount += Time.get_deltaTime();
-	}
+  protected virtual void Awake()
+  {
+    this.timeCount = 0.0f;
+    this.bulletSkillInfoParam = (SkillInfo.SkillParam) null;
+    this._transform = ((Component) this).transform;
+    this._position = ((Component) this).transform.position;
+    this._rigidbody = ((Component) this).GetComponent<Rigidbody>();
+    this._collider = ((Component) this).GetComponent<Collider>();
+  }
 
-	public virtual void FixedUpdate()
-	{
-	}
+  public virtual void Initialize(
+    BulletData bullet,
+    SkillInfo.SkillParam skillParam,
+    Vector3 pos,
+    Quaternion rot)
+  {
+    this.speed = bullet.data.speed;
+    this.initialVelocity = bullet.data.speed;
+    this.bulletSkillInfoParam = skillParam;
+    Vector3 forward = Vector3.forward;
+    Vector3 vector3 = Vector3.op_Multiply(Quaternion.op_Multiply(rot, forward), this.speed);
+    this._transform.position = pos;
+    this._transform.LookAt(Vector3.op_Addition(pos, vector3));
+    this._rigidbody.velocity = vector3;
+  }
 
-	public virtual void OnHit(Collider collider)
-	{
-	}
+  public virtual void PostInitialize()
+  {
+  }
 
-	public virtual void OnHitStay(Collider collider)
-	{
-	}
+  public virtual void DestroyBulletObject()
+  {
+  }
 
-	public virtual void OnLandHit()
-	{
-	}
+  public virtual void Update() => this.timeCount += Time.deltaTime;
 
-	public virtual void OnShot()
-	{
-	}
+  public virtual void FixedUpdate()
+  {
+  }
 
-	public virtual bool IsHit(Collider collider)
-	{
-		return true;
-	}
+  public virtual void OnHit(Collider collider)
+  {
+  }
 
-	public virtual bool IsBreak(Collider collider)
-	{
-		return false;
-	}
+  public virtual void OnHitStay(Collider collider)
+  {
+  }
 
-	protected void SetVelocity(float v)
-	{
-		speed = v;
-	}
+  public virtual void OnLandHit()
+  {
+  }
+
+  public virtual void OnShot()
+  {
+  }
+
+  public virtual bool IsHit(Collider collider) => true;
+
+  public virtual bool IsBreak(Collider collider) => false;
+
+  protected void SetVelocity(float v) => this.speed = v;
 }

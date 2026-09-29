@@ -1,156 +1,147 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ContinusAttackParam
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class ContinusAttackParam
 {
-	[Serializable]
-	public class ContinusAtkData
-	{
-		public int eventIndex;
+  private Character m_owner;
+  private List<ContinusAttackParam.ContinusAtkData> m_continusAtkDataList = new List<ContinusAttackParam.ContinusAtkData>();
 
-		public float endTime;
+  public ContinusAttackParam(Character chara) => this.m_owner = chara;
 
-		public AnimEventCollider eventCollider;
+  public void Register(
+    int eventIndex,
+    float endTime,
+    AnimEventCollider eventCollider,
+    Transform effectTrans)
+  {
+    ContinusAttackParam.ContinusAtkData continusAtkData = this.SearchByIndex(eventIndex);
+    if (continusAtkData != null)
+    {
+      continusAtkData.Release();
+      this.m_continusAtkDataList.Remove(continusAtkData);
+    }
+    this.m_continusAtkDataList.Add(new ContinusAttackParam.ContinusAtkData()
+    {
+      eventIndex = eventIndex,
+      endTime = endTime,
+      eventCollider = eventCollider,
+      effectTrans = effectTrans
+    });
+  }
 
-		public Transform effectTrans;
+  public void Update()
+  {
+    for (int index = this.m_continusAtkDataList.Count - 1; index >= 0; --index)
+    {
+      ContinusAttackParam.ContinusAtkData continusAtkData = this.m_continusAtkDataList[index];
+      continusAtkData.endTime -= Time.deltaTime;
+      if ((double) continusAtkData.endTime <= 0.0)
+      {
+        continusAtkData.Release();
+        this.m_continusAtkDataList.Remove(continusAtkData);
+      }
+    }
+  }
 
-		public void Release()
-		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Expected O, but got Unknown
-			if (effectTrans != null)
-			{
-				EffectManager.ReleaseEffect(effectTrans.get_gameObject(), true, false);
-				effectTrans = null;
-			}
-			if (eventCollider != null)
-			{
-				eventCollider.Destroy();
-				eventCollider = null;
-			}
-		}
-	}
+  public void RemoveAll()
+  {
+    if (this.m_continusAtkDataList == null)
+      return;
+    foreach (ContinusAttackParam.ContinusAtkData continusAtkData in this.m_continusAtkDataList)
+      continusAtkData.Release();
+    this.m_continusAtkDataList.Clear();
+  }
 
-	[Serializable]
-	public class SyncParam
-	{
-		public List<SyncData> syncDataList = new List<SyncData>();
-	}
+  public ContinusAttackParam.ContinusAtkData SearchByIndex(int eventIndex)
+  {
+    int count = this.m_continusAtkDataList.Count;
+    for (int index = 0; index < count; ++index)
+    {
+      if (this.m_continusAtkDataList[index].eventIndex == eventIndex)
+        return this.m_continusAtkDataList[index];
+    }
+    return (ContinusAttackParam.ContinusAtkData) null;
+  }
 
-	[Serializable]
-	public class SyncData
-	{
-		public int eventIndex;
+  public ContinusAttackParam.SyncParam CreateSyncParam()
+  {
+    ContinusAttackParam.SyncParam syncParam = new ContinusAttackParam.SyncParam();
+    foreach (ContinusAttackParam.ContinusAtkData continusAtkData in this.m_continusAtkDataList)
+      syncParam.syncDataList.Add(new ContinusAttackParam.SyncData()
+      {
+        eventIndex = continusAtkData.eventIndex,
+        endTime = continusAtkData.endTime
+      });
+    return syncParam;
+  }
 
-		public float endTime;
-	}
+  public void ApplySyncParam(ContinusAttackParam.SyncParam syncParam)
+  {
+    if (syncParam == null)
+    {
+      this.RemoveAll();
+    }
+    else
+    {
+      List<ContinusAttackParam.SyncData> syncDataList = syncParam.syncDataList;
+      if (syncDataList == null)
+      {
+        this.RemoveAll();
+      }
+      else
+      {
+        foreach (ContinusAttackParam.SyncData syncData in syncDataList)
+        {
+          ContinusAttackParam.ContinusAtkData continusAtkData = this.SearchByIndex(syncData.eventIndex);
+          if (continusAtkData != null)
+            continusAtkData.endTime = syncData.endTime;
+          else
+            this.m_owner.CreateContinusAttackBySyncData(syncData);
+        }
+      }
+    }
+  }
 
-	private Character m_owner;
+  [Serializable]
+  public class ContinusAtkData
+  {
+    public int eventIndex;
+    public float endTime;
+    public AnimEventCollider eventCollider;
+    public Transform effectTrans;
 
-	private List<ContinusAtkData> m_continusAtkDataList = new List<ContinusAtkData>();
+    public void Release()
+    {
+      if (Object.op_Inequality((Object) this.effectTrans, (Object) null))
+      {
+        EffectManager.ReleaseEffect(((Component) this.effectTrans).gameObject);
+        this.effectTrans = (Transform) null;
+      }
+      if (this.eventCollider == null)
+        return;
+      this.eventCollider.Destroy();
+      this.eventCollider = (AnimEventCollider) null;
+    }
+  }
 
-	public ContinusAttackParam(Character chara)
-	{
-		m_owner = chara;
-	}
+  [Serializable]
+  public class SyncParam
+  {
+    public List<ContinusAttackParam.SyncData> syncDataList = new List<ContinusAttackParam.SyncData>();
+  }
 
-	public void Register(int eventIndex, float endTime, AnimEventCollider eventCollider, Transform effectTrans)
-	{
-		ContinusAtkData continusAtkData = SearchByIndex(eventIndex);
-		if (continusAtkData != null)
-		{
-			continusAtkData.Release();
-			m_continusAtkDataList.Remove(continusAtkData);
-		}
-		continusAtkData = new ContinusAtkData();
-		continusAtkData.eventIndex = eventIndex;
-		continusAtkData.endTime = endTime;
-		continusAtkData.eventCollider = eventCollider;
-		continusAtkData.effectTrans = effectTrans;
-		m_continusAtkDataList.Add(continusAtkData);
-	}
-
-	public void Update()
-	{
-		for (int num = m_continusAtkDataList.Count - 1; num >= 0; num--)
-		{
-			ContinusAtkData continusAtkData = m_continusAtkDataList[num];
-			continusAtkData.endTime -= Time.get_deltaTime();
-			if (continusAtkData.endTime <= 0f)
-			{
-				continusAtkData.Release();
-				m_continusAtkDataList.Remove(continusAtkData);
-			}
-		}
-	}
-
-	public void RemoveAll()
-	{
-		if (m_continusAtkDataList != null)
-		{
-			foreach (ContinusAtkData continusAtkData in m_continusAtkDataList)
-			{
-				continusAtkData.Release();
-			}
-			m_continusAtkDataList.Clear();
-		}
-	}
-
-	public ContinusAtkData SearchByIndex(int eventIndex)
-	{
-		int count = m_continusAtkDataList.Count;
-		for (int i = 0; i < count; i++)
-		{
-			if (m_continusAtkDataList[i].eventIndex == eventIndex)
-			{
-				return m_continusAtkDataList[i];
-			}
-		}
-		return null;
-	}
-
-	public SyncParam CreateSyncParam()
-	{
-		SyncParam syncParam = new SyncParam();
-		foreach (ContinusAtkData continusAtkData in m_continusAtkDataList)
-		{
-			SyncData syncData = new SyncData();
-			syncData.eventIndex = continusAtkData.eventIndex;
-			syncData.endTime = continusAtkData.endTime;
-			syncParam.syncDataList.Add(syncData);
-		}
-		return syncParam;
-	}
-
-	public void ApplySyncParam(SyncParam syncParam)
-	{
-		if (syncParam == null)
-		{
-			RemoveAll();
-		}
-		else
-		{
-			List<SyncData> syncDataList = syncParam.syncDataList;
-			if (syncDataList == null)
-			{
-				RemoveAll();
-			}
-			else
-			{
-				foreach (SyncData item in syncDataList)
-				{
-					ContinusAtkData continusAtkData = SearchByIndex(item.eventIndex);
-					if (continusAtkData != null)
-					{
-						continusAtkData.endTime = item.endTime;
-					}
-					else
-					{
-						m_owner.CreateContinusAttackBySyncData(item);
-					}
-				}
-			}
-		}
-	}
+  [Serializable]
+  public class SyncData
+  {
+    public int eventIndex;
+    public float endTime;
+  }
 }

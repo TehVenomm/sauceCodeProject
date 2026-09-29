@@ -1,225 +1,230 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIDropAnnounce
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class UIDropAnnounce : MonoBehaviourSingleton<UIDropAnnounce>
 {
-	public enum COLOR
-	{
-		NORMAL,
-		RARE,
-		DELIVERY,
-		MAGI_AT,
-		MAGI_SU,
-		MAGI_HE,
-		MAGI_PA,
-		LOUNGE,
-		SP_N,
-		SP_HN,
-		SP_R,
-		HALLOWEEN,
-		MAX
-	}
+  [SerializeField]
+  protected GameObject announceItem;
+  [SerializeField]
+  protected UIStaticPanelChanger panelChange;
+  [SerializeField]
+  protected float announceItemSize;
+  [SerializeField]
+  protected int announceMax = 1;
+  [SerializeField]
+  protected Color[] announceColor = new Color[8]
+  {
+    new Color(1f, 1f, 1f),
+    new Color(1f, 0.5f, 0.0f),
+    new Color(1f, 1f, 0.0f),
+    new Color(1f, 0.0f, 0.0f),
+    new Color(0.0f, 1f, 0.0f),
+    new Color(0.0f, 0.0f, 1f),
+    new Color(0.8f, 1f, 0.0f),
+    new Color(0.5f, 0.9f, 0.5f)
+  };
+  private List<UIDropAnnounceItem> announceItems = new List<UIDropAnnounceItem>();
+  private List<UIDropAnnounceItem> announceDispItems = new List<UIDropAnnounceItem>();
+  private List<UIDropAnnounce.DropAnnounceInfo> announceQueue = new List<UIDropAnnounce.DropAnnounceInfo>();
 
-	public class DropAnnounceInfo
-	{
-		public string text;
+  protected override void OnDisable()
+  {
+    base.OnDisable();
+    this.announceQueue.Clear();
+    int index = 0;
+    for (int count = this.announceDispItems.Count; index < count; ++index)
+    {
+      if (Object.op_Inequality((Object) this.panelChange, (Object) null))
+        this.panelChange.Lock();
+      ((Component) this.announceDispItems[index]).gameObject.SetActive(false);
+    }
+    this.announceDispItems.Clear();
+  }
 
-		public COLOR color;
+  public void Announce(UIDropAnnounce.DropAnnounceInfo info)
+  {
+    if (!((Component) this).gameObject.activeInHierarchy)
+      return;
+    if (this.announceDispItems.Count == this.announceMax)
+    {
+      this.announceQueue.Add(info);
+    }
+    else
+    {
+      UIDropAnnounceItem dropAnnounceItem = (UIDropAnnounceItem) null;
+      int index = 0;
+      for (int count = this.announceItems.Count; index < count; ++index)
+      {
+        if (!((Component) this.announceItems[index]).gameObject.activeSelf)
+        {
+          dropAnnounceItem = this.announceItems[index];
+          break;
+        }
+      }
+      if (Object.op_Equality((Object) dropAnnounceItem, (Object) null))
+      {
+        GameObject gameObject = ResourceUtility.Instantiate<GameObject>(this.announceItem);
+        gameObject.transform.parent = ((Component) this).gameObject.transform;
+        gameObject.transform.localScale = Vector3.one;
+        dropAnnounceItem = gameObject.GetComponent<UIDropAnnounceItem>();
+        this.announceItems.Add(dropAnnounceItem);
+      }
+      if (Object.op_Inequality((Object) this.panelChange, (Object) null))
+        this.panelChange.UnLock();
+      dropAnnounceItem.StartAnnounce(info.text, this.announceColor[(int) info.color], this.announceDispItems.Count > 0, new Action<UIDropAnnounceItem>(this.OnEnd));
+      Vector3 zero = Vector3.zero;
+      zero.y = -this.announceItemSize * (float) this.announceDispItems.Count;
+      ((Component) dropAnnounceItem).transform.localPosition = zero;
+      this.announceDispItems.Add(dropAnnounceItem);
+    }
+  }
 
-		public static DropAnnounceInfo CreateSkillItemInfo(uint id, int num, out bool is_rare)
-		{
-			is_rare = false;
-			SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData(id);
-			if (skillItemData == null)
-			{
-				return null;
-			}
-			DropAnnounceInfo dropAnnounceInfo = new DropAnnounceInfo();
-			dropAnnounceInfo.text = StringTable.Format(STRING_CATEGORY.IN_GAME, 2002u, skillItemData.name, num);
-			switch (skillItemData.type)
-			{
-			case SKILL_SLOT_TYPE.ATTACK:
-				dropAnnounceInfo.color = COLOR.MAGI_AT;
-				break;
-			case SKILL_SLOT_TYPE.HEAL:
-				dropAnnounceInfo.color = COLOR.MAGI_HE;
-				break;
-			case SKILL_SLOT_TYPE.SUPPORT:
-				dropAnnounceInfo.color = COLOR.MAGI_SU;
-				break;
-			default:
-				dropAnnounceInfo.color = COLOR.MAGI_PA;
-				break;
-			}
-			is_rare = true;
-			return dropAnnounceInfo;
-		}
+  protected void OnEnd(UIDropAnnounceItem item)
+  {
+    this.announceDispItems.Remove(item);
+    int index = 0;
+    for (int count = this.announceDispItems.Count; index < count; ++index)
+      this.announceDispItems[index].MovePos(index != 0, new Vector3(0.0f, -this.announceItemSize * (float) index, 0.0f), 0.1f);
+    if (Object.op_Inequality((Object) this.panelChange, (Object) null))
+      this.panelChange.Lock();
+    if (this.announceQueue.Count <= 0)
+      return;
+    this.Announce(this.announceQueue[0]);
+    this.announceQueue.RemoveAt(0);
+  }
 
-		public static DropAnnounceInfo CreateEquipItemInfo(uint id, int num, out bool is_rare)
-		{
-			is_rare = false;
-			EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(id);
-			if (equipItemData == null)
-			{
-				return null;
-			}
-			DropAnnounceInfo dropAnnounceInfo = new DropAnnounceInfo();
-			dropAnnounceInfo.text = StringTable.Format(STRING_CATEGORY.IN_GAME, 2003u, equipItemData.name, num);
-			if (!GameDefine.IsRare(equipItemData.rarity))
-			{
-				dropAnnounceInfo.color = COLOR.NORMAL;
-			}
-			else
-			{
-				dropAnnounceInfo.color = COLOR.RARE;
-				is_rare = true;
-			}
-			return dropAnnounceInfo;
-		}
+  public enum COLOR
+  {
+    NORMAL,
+    RARE,
+    DELIVERY,
+    MAGI_AT,
+    MAGI_SU,
+    MAGI_HE,
+    MAGI_PA,
+    LOUNGE,
+    SP_N,
+    SP_HN,
+    SP_R,
+    HALLOWEEN,
+    ESP_N,
+    ESP_HN,
+    ESP_R,
+    SEASONAL,
+    MAX,
+  }
 
-		public static DropAnnounceInfo CreateItemInfo(uint id, int num, out bool is_rare)
-		{
-			is_rare = false;
-			ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(id);
-			if (itemData == null)
-			{
-				return null;
-			}
-			DropAnnounceInfo dropAnnounceInfo = new DropAnnounceInfo();
-			int haveingItemNum = MonoBehaviourSingleton<InventoryManager>.I.GetHaveingItemNum(id);
-			haveingItemNum = Mathf.Min(haveingItemNum, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.ITEM_NUM_MAX);
-			dropAnnounceInfo.text = StringTable.Format(STRING_CATEGORY.IN_GAME, 2000u, itemData.name, num, haveingItemNum);
-			if (!GameDefine.IsRare(itemData.rarity))
-			{
-				dropAnnounceInfo.color = COLOR.NORMAL;
-			}
-			else
-			{
-				dropAnnounceInfo.color = COLOR.RARE;
-				is_rare = true;
-			}
-			return dropAnnounceInfo;
-		}
-	}
+  public class DropAnnounceInfo
+  {
+    public string text;
+    public UIDropAnnounce.COLOR color;
 
-	[SerializeField]
-	protected GameObject announceItem;
+    public static UIDropAnnounce.DropAnnounceInfo CreateAccessoryItemInfo(
+      uint id,
+      int num,
+      out bool is_rare)
+    {
+      is_rare = false;
+      if (Singleton<AccessoryTable>.IsValid())
+        return (UIDropAnnounce.DropAnnounceInfo) null;
+      AccessoryTable.AccessoryData data = Singleton<AccessoryTable>.I.GetData(id);
+      if (data == null)
+        return (UIDropAnnounce.DropAnnounceInfo) null;
+      UIDropAnnounce.DropAnnounceInfo accessoryItemInfo = new UIDropAnnounce.DropAnnounceInfo();
+      accessoryItemInfo.text = StringTable.Format(STRING_CATEGORY.IN_GAME, 2004U, (object) data.name, (object) num);
+      if (GameDefine.IsRare(data.rarity))
+      {
+        accessoryItemInfo.color = UIDropAnnounce.COLOR.RARE;
+        is_rare = true;
+      }
+      else
+        accessoryItemInfo.color = UIDropAnnounce.COLOR.NORMAL;
+      return accessoryItemInfo;
+    }
 
-	[SerializeField]
-	protected UIStaticPanelChanger panelChange;
+    public static UIDropAnnounce.DropAnnounceInfo CreateSkillItemInfo(
+      uint id,
+      int num,
+      out bool is_rare)
+    {
+      is_rare = false;
+      SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData(id);
+      if (skillItemData == null)
+        return (UIDropAnnounce.DropAnnounceInfo) null;
+      UIDropAnnounce.DropAnnounceInfo skillItemInfo = new UIDropAnnounce.DropAnnounceInfo();
+      skillItemInfo.text = StringTable.Format(STRING_CATEGORY.IN_GAME, 2002U, (object) skillItemData.name, (object) num);
+      switch (skillItemData.type)
+      {
+        case SKILL_SLOT_TYPE.ATTACK:
+          skillItemInfo.color = UIDropAnnounce.COLOR.MAGI_AT;
+          break;
+        case SKILL_SLOT_TYPE.SUPPORT:
+          skillItemInfo.color = UIDropAnnounce.COLOR.MAGI_SU;
+          break;
+        case SKILL_SLOT_TYPE.HEAL:
+          skillItemInfo.color = UIDropAnnounce.COLOR.MAGI_HE;
+          break;
+        default:
+          skillItemInfo.color = UIDropAnnounce.COLOR.MAGI_PA;
+          break;
+      }
+      is_rare = true;
+      return skillItemInfo;
+    }
 
-	[SerializeField]
-	protected float announceItemSize;
+    public static UIDropAnnounce.DropAnnounceInfo CreateEquipItemInfo(
+      uint id,
+      int num,
+      out bool is_rare)
+    {
+      is_rare = false;
+      EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(id);
+      if (equipItemData == null)
+        return (UIDropAnnounce.DropAnnounceInfo) null;
+      UIDropAnnounce.DropAnnounceInfo equipItemInfo = new UIDropAnnounce.DropAnnounceInfo();
+      equipItemInfo.text = StringTable.Format(STRING_CATEGORY.IN_GAME, 2003U, (object) equipItemData.name, (object) num);
+      if (!GameDefine.IsRare(equipItemData.rarity))
+      {
+        equipItemInfo.color = UIDropAnnounce.COLOR.NORMAL;
+      }
+      else
+      {
+        equipItemInfo.color = UIDropAnnounce.COLOR.RARE;
+        is_rare = true;
+      }
+      return equipItemInfo;
+    }
 
-	[SerializeField]
-	protected int announceMax = 1;
-
-	[SerializeField]
-	protected Color[] announceColor = (Color[])new Color[8]
-	{
-		new Color(1f, 1f, 1f),
-		new Color(1f, 0.5f, 0f),
-		new Color(1f, 1f, 0f),
-		new Color(1f, 0f, 0f),
-		new Color(0f, 1f, 0f),
-		new Color(0f, 0f, 1f),
-		new Color(0.8f, 1f, 0f),
-		new Color(0.5f, 0.9f, 0.5f)
-	};
-
-	private List<UIDropAnnounceItem> announceItems = new List<UIDropAnnounceItem>();
-
-	private List<UIDropAnnounceItem> announceDispItems = new List<UIDropAnnounceItem>();
-
-	private List<DropAnnounceInfo> announceQueue = new List<DropAnnounceInfo>();
-
-	protected override void OnDisable()
-	{
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		base.OnDisable();
-		announceQueue.Clear();
-		int i = 0;
-		for (int count = announceDispItems.Count; i < count; i++)
-		{
-			if (panelChange != null)
-			{
-				panelChange.Lock();
-			}
-			announceDispItems[i].get_gameObject().SetActive(false);
-		}
-		announceDispItems.Clear();
-	}
-
-	public void Announce(DropAnnounceInfo info)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_gameObject().get_activeInHierarchy())
-		{
-			if (announceDispItems.Count == announceMax)
-			{
-				announceQueue.Add(info);
-			}
-			else
-			{
-				UIDropAnnounceItem uIDropAnnounceItem = null;
-				int i = 0;
-				for (int count = announceItems.Count; i < count; i++)
-				{
-					if (!announceItems[i].get_gameObject().get_activeSelf())
-					{
-						uIDropAnnounceItem = announceItems[i];
-						break;
-					}
-				}
-				if (uIDropAnnounceItem == null)
-				{
-					GameObject val = ResourceUtility.Instantiate<GameObject>(announceItem);
-					val.get_transform().set_parent(this.get_gameObject().get_transform());
-					val.get_transform().set_localScale(Vector3.get_one());
-					uIDropAnnounceItem = val.GetComponent<UIDropAnnounceItem>();
-					announceItems.Add(uIDropAnnounceItem);
-				}
-				if (panelChange != null)
-				{
-					panelChange.UnLock();
-				}
-				uIDropAnnounceItem.StartAnnounce(info.text, announceColor[(int)info.color], announceDispItems.Count > 0, OnEnd);
-				Vector3 zero = Vector3.get_zero();
-				zero.y = (0f - announceItemSize) * (float)announceDispItems.Count;
-				uIDropAnnounceItem.get_transform().set_localPosition(zero);
-				announceDispItems.Add(uIDropAnnounceItem);
-			}
-		}
-	}
-
-	protected void OnEnd(UIDropAnnounceItem item)
-	{
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		announceDispItems.Remove(item);
-		int i = 0;
-		for (int count = announceDispItems.Count; i < count; i++)
-		{
-			announceDispItems[i].MovePos(i != 0, new Vector3(0f, (0f - announceItemSize) * (float)i, 0f), 0.1f);
-		}
-		if (panelChange != null)
-		{
-			panelChange.Lock();
-		}
-		if (announceQueue.Count > 0)
-		{
-			Announce(announceQueue[0]);
-			announceQueue.RemoveAt(0);
-		}
-	}
+    public static UIDropAnnounce.DropAnnounceInfo CreateItemInfo(
+      uint id,
+      int num,
+      out bool is_rare)
+    {
+      is_rare = false;
+      ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(id);
+      if (itemData == null)
+        return (UIDropAnnounce.DropAnnounceInfo) null;
+      UIDropAnnounce.DropAnnounceInfo itemInfo = new UIDropAnnounce.DropAnnounceInfo();
+      int num1 = Mathf.Min(MonoBehaviourSingleton<InventoryManager>.I.GetHaveingItemNum(id), MonoBehaviourSingleton<UserInfoManager>.I.userInfo.constDefine.ITEM_NUM_MAX);
+      itemInfo.text = StringTable.Format(STRING_CATEGORY.IN_GAME, 2000U, (object) itemData.name, (object) num, (object) num1);
+      if (!GameDefine.IsRare(itemData.rarity))
+      {
+        itemInfo.color = UIDropAnnounce.COLOR.NORMAL;
+      }
+      else
+      {
+        itemInfo.color = UIDropAnnounce.COLOR.RARE;
+        is_rare = true;
+      }
+      return itemInfo;
+    }
+  }
 }

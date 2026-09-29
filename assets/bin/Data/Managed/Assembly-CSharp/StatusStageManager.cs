@@ -1,428 +1,313 @@
-using Network;
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: StatusStageManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class StatusStageManager : MonoBehaviourSingleton<StatusStageManager>
 {
-	public enum VIEW_TYPE
-	{
-		INIT,
-		STATUS,
-		SMITH
-	}
+  private StatusStageManager.VIEW_TYPE viewType;
+  private StatusStageManager.VIEW_MODE viewMode;
+  private UITexture uiTexture;
+  private UIRenderTexture renderTexture;
+  private PlayerLoader playerLoader;
+  private Transform playerShadow;
+  private Camera targetCamera;
+  private Transform targetCameraTransform;
+  private OutGameSettingsManager.StatusScene parameter;
+  private Vector3Interpolator cameraPosAnim = new Vector3Interpolator();
+  private QuaternionInterpolator cameraRotAnim = new QuaternionInterpolator();
+  private QuaternionInterpolator playerRotAnim = new QuaternionInterpolator();
+  private FloatInterpolator cameraFovAnim = new FloatInterpolator();
+  private bool cameraTurningMode;
+  private StatusEquip.LocalEquipSetData equipSetData;
+  private EquipItemInfo equipInfo;
+  private StatusSmithCharacter m_stSmithCharacter;
+  private StatusSmithCharacter m_stUniqueSmithCharacter;
 
-	public enum VIEW_MODE
-	{
-		EQUIP,
-		AVATAR
-	}
+  public bool isBusy => this.cameraPosAnim.IsPlaying() || this.cameraRotAnim.IsPlaying();
 
-	private VIEW_TYPE viewType;
+  public PlayerLoader GetPlayerLoader() => this.playerLoader;
 
-	private VIEW_MODE viewMode;
+  public int GetPlayerLayer() => this.renderTexture.renderLayer;
 
-	private UITexture uiTexture;
+  protected override void Awake()
+  {
+    base.Awake();
+    this.targetCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
+    this.targetCameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
+    this.parameter = MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene;
+    this.uiTexture = Utility.CreateGameObjectAndComponent("UITexture", MonoBehaviourSingleton<UIManager>.I.system._transform, 5) as UITexture;
+    this.uiTexture.shader = ResourceUtility.FindShader("Unlit/ui_render_tex");
+    this.uiTexture.SetAnchor(((Component) MonoBehaviourSingleton<UIManager>.I.system).gameObject, 0, 0, 0, 0);
+    this.uiTexture.UpdateAnchors();
+    if (SpecialDeviceManager.HasSpecialDeviceInfo && SpecialDeviceManager.SpecialDeviceInfo.HasSafeArea)
+    {
+      UIWidget component = ((Component) this.uiTexture).gameObject.GetComponent<UIWidget>();
+      component.width = 480;
+      component.height = 854;
+    }
+    this.m_stSmithCharacter = (StatusSmithCharacter) Utility.CreateGameObjectAndComponent("StatusSmithCharacter", this._transform);
+    this.m_stSmithCharacter.isUnique = false;
+    this.m_stUniqueSmithCharacter = (StatusSmithCharacter) Utility.CreateGameObjectAndComponent("StatusSmithCharacter", this._transform);
+    this.m_stUniqueSmithCharacter.isUnique = true;
+  }
 
-	private UIRenderTexture renderTexture;
+  protected override void _OnDestroy()
+  {
+    if (Object.op_Inequality((Object) this.uiTexture, (Object) null))
+      Object.Destroy((Object) ((Component) this.uiTexture).gameObject);
+    if (!Object.op_Inequality((Object) this.playerShadow, (Object) null))
+      return;
+    Object.Destroy((Object) ((Component) this.playerShadow).gameObject);
+  }
 
-	private PlayerLoader playerLoader;
+  private void OnEnable() => InputManager.OnDrag += new InputManager.OnTouchDelegate(this.OnDrag);
 
-	private Transform playerShadow;
+  protected override void OnDisable()
+  {
+    base.OnDisable();
+    InputManager.OnDrag -= new InputManager.OnTouchDelegate(this.OnDrag);
+  }
 
-	private Camera targetCamera;
+  private void OnDrag(InputManager.TouchInfo touch_info)
+  {
+    if (Object.op_Equality((Object) this.playerLoader, (Object) null) || MonoBehaviourSingleton<UIManager>.I.IsDisable())
+      return;
+    string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
+    if (currentSectionName != "StatusTop" && currentSectionName != "StatusAvatar" && currentSectionName != "StatusAccessory" && currentSectionName != "UniqueStatusTop")
+      return;
+    ((Component) this.playerLoader).transform.Rotate(GameDefine.GetCharaRotateVector(touch_info));
+  }
 
-	private Transform targetCameraTransform;
+  public void SetUITextureActive(bool active)
+  {
+    ((Component) this.uiTexture).gameObject.SetActive(active);
+  }
 
-	private OutGameSettingsManager.StatusScene parameter;
+  public void ClearPlayerLoaded(PlayerLoadInfo load_info)
+  {
+    if (Object.op_Inequality((Object) this.playerLoader, (Object) null) && this.playerLoader.loadInfo.Equals(load_info) || !Object.op_Inequality((Object) this.renderTexture, (Object) null))
+      return;
+    Object.DestroyImmediate((Object) this.renderTexture);
+  }
 
-	private Vector3Interpolator cameraPosAnim = new Vector3Interpolator();
+  public void LoadPlayer(PlayerLoadInfo load_info, int anim_id = 0)
+  {
+    if (Object.op_Equality((Object) this.playerShadow, (Object) null))
+    {
+      this.playerShadow = PlayerLoader.CreateShadow(MonoBehaviourSingleton<StageManager>.I.stageObject, false);
+      ((Component) this.playerShadow).transform.position = Vector3.op_Addition(this.parameter.playerPos, new Vector3(0.0f, 0.005f, 0.0f));
+    }
+    ShaderGlobal.lightProbe = false;
+    if (Object.op_Inequality((Object) this.playerLoader, (Object) null) && this.playerLoader.loadInfo.Equals(load_info))
+      return;
+    if (Object.op_Inequality((Object) this.renderTexture, (Object) null))
+      Object.DestroyImmediate((Object) this.renderTexture);
+    this.renderTexture = UIRenderTexture.Get(this.uiTexture, link_main_camera: true);
+    this.renderTexture.Disable();
+    this.renderTexture.nearClipPlane = this.parameter.renderTextureNearClip;
+    int use_hair_overlay = -1;
+    if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid())
+      use_hair_overlay = MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.isChangeHairShader ? MonoBehaviourSingleton<UserInfoManager>.I.userStatus.hairColorId : -1;
+    int anim_id1 = anim_id;
+    if (anim_id1 == 0)
+      anim_id1 = PLAYER_ANIM_TYPE.GetStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex);
+    this.playerLoader = ((Component) this.renderTexture.modelTransform).gameObject.AddComponent<PlayerLoader>();
+    this.playerLoader.StartLoad(load_info, this.renderTexture.renderLayer, anim_id1, false, false, false, false, false, true, true, true, SHADER_TYPE.NORMAL, (PlayerLoader.OnCompleteLoad) (o =>
+    {
+      ((Component) this.playerLoader).transform.position = this.parameter.playerPos;
+      ((Component) this.playerLoader).transform.eulerAngles = new Vector3(0.0f, this.viewMode == StatusStageManager.VIEW_MODE.EQUIP ? this.parameter.playerRot : this.parameter.avatarPlayerRot, 0.0f);
+      if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
+      {
+        float num = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex == 0 ? this.parameter.playerScaleMale : this.parameter.playerScaleFemale;
+        ((Component) this.playerLoader).transform.localScale = ((Component) this.playerLoader).transform.localScale.Mul(new Vector3(num, num, num));
+      }
+      this.renderTexture.Enable();
+    }), use_hair_overlay: use_hair_overlay);
+  }
 
-	private QuaternionInterpolator cameraRotAnim = new QuaternionInterpolator();
+  public void SetViewMode(StatusStageManager.VIEW_MODE view_mode)
+  {
+    if (this.viewMode == view_mode)
+      return;
+    this.equipSetData = (StatusEquip.LocalEquipSetData) null;
+    if (this.viewType == StatusStageManager.VIEW_TYPE.STATUS)
+      this.MoveCamera(this.viewType, this.viewType, this.viewMode, view_mode);
+    this.viewMode = view_mode;
+  }
 
-	private QuaternionInterpolator playerRotAnim = new QuaternionInterpolator();
+  public void SetEquipSetData(StatusEquip.LocalEquipSetData equip_set_data)
+  {
+    if (this.equipSetData == equip_set_data)
+      return;
+    this.equipInfo = (EquipItemInfo) null;
+    this.equipSetData = equip_set_data;
+    this.MoveCamera(this.viewType, this.viewType, this.viewMode, this.viewMode);
+  }
 
-	private FloatInterpolator cameraFovAnim = new FloatInterpolator();
+  public void SetEquipInfo(EquipItemInfo equip_info)
+  {
+    PlayerLoadInfo playerLoadInfo = this.playerLoader.loadInfo.Clone();
+    if (equip_info != null)
+      playerLoadInfo.SetEquip(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, equip_info.tableData);
+    else if (this.viewMode == StatusStageManager.VIEW_MODE.AVATAR)
+    {
+      int equip = EQUIP_SLOT.AvatatToEquip(this.equipSetData.index);
+      equip_info = this.equipSetData.equipSetInfo.item[equip];
+      if (equip_info == null)
+        playerLoadInfo.RemoveEquip(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, equip);
+      else
+        playerLoadInfo.SetEquip(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, equip_info.tableData);
+    }
+    else if (this.equipSetData != null)
+      playerLoadInfo.RemoveEquip(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, this.equipSetData.index);
+    if (this.equipInfo == equip_info)
+      return;
+    this.equipInfo = equip_info;
+    this.MoveCamera(this.viewType, this.viewType, this.viewMode, this.viewMode);
+  }
 
-	private bool cameraTurningMode;
+  public void UpdateCamera(
+    string scene_name,
+    string section_name,
+    GameSceneTables.SectionData section_data)
+  {
+    if (section_data.type.IsDialog())
+      return;
+    StatusStageManager.VIEW_TYPE viewType = this.viewType;
+    StatusStageManager.VIEW_TYPE type_to = !(scene_name == "StatusScene") && !(scene_name == "UniqueStatusScene") || !(section_name != "StatusToSmith") || !(section_name != "ItemStorageSell") || section_name.Contains("Exchange") || !(section_name != "UniqueStatusToSmith") ? StatusStageManager.VIEW_TYPE.SMITH : StatusStageManager.VIEW_TYPE.STATUS;
+    if (this.viewType == type_to)
+      return;
+    this.MoveCamera(this.viewType, type_to, this.viewMode, this.viewMode);
+    this.viewType = type_to;
+  }
 
-	private StatusEquip.LocalEquipSetData equipSetData;
+  private void MoveCamera(
+    StatusStageManager.VIEW_TYPE type_from,
+    StatusStageManager.VIEW_TYPE type_to,
+    StatusStageManager.VIEW_MODE mode_from,
+    StatusStageManager.VIEW_MODE mode_to)
+  {
+    Quaternion end_value1 = Quaternion.Euler(0.0f, this.parameter.playerRot, 0.0f);
+    Vector3 end_value2;
+    Quaternion end_value3;
+    float cameraFieldOfView;
+    if (type_to == StatusStageManager.VIEW_TYPE.STATUS)
+    {
+      Vector3 playerPos = this.parameter.playerPos;
+      if (mode_to == StatusStageManager.VIEW_MODE.AVATAR)
+        end_value1 = Quaternion.Euler(0.0f, this.parameter.avatarPlayerRot, 0.0f);
+      Vector3 vector3_1;
+      if (this.equipSetData != null)
+      {
+        OutGameSettingsManager.StatusScene.EquipViewInfo equipViewInfo = (OutGameSettingsManager.StatusScene.EquipViewInfo) null;
+        if (this.equipInfo != null)
+          equipViewInfo = this.parameter.GetEquipViewInfo(this.equipInfo.tableData.type.ToString());
+        if (equipViewInfo == null)
+          equipViewInfo = this.parameter.GetEquipViewInfo(EQUIP_SLOT.ToType(this.viewMode == StatusStageManager.VIEW_MODE.AVATAR ? EQUIP_SLOT.AvatatToEquip(this.equipSetData.index) : this.equipSetData.index).ToString());
+        Vector3 cameraTargetPos = equipViewInfo.cameraTargetPos;
+        if (mode_to == StatusStageManager.VIEW_MODE.AVATAR)
+          cameraTargetPos.x = 0.0f;
+        vector3_1 = Vector3.op_Addition(Quaternion.op_Multiply(end_value1, cameraTargetPos), playerPos);
+        Vector3 vector3_2 = Quaternion.op_Multiply(Quaternion.op_Multiply(Quaternion.AngleAxis(-equipViewInfo.cameraXAngle, Vector3.right), Quaternion.AngleAxis(-equipViewInfo.cameraYAngle, Vector3.up)), Vector3.forward);
+        Vector3 vector3_3 = Quaternion.op_Multiply(end_value1, vector3_2);
+        end_value2 = Vector3.op_Addition(vector3_1, Vector3.op_Multiply(vector3_3, equipViewInfo.cameraDistance));
+      }
+      else
+      {
+        Vector3 vector3_4 = Quaternion.op_Multiply(end_value1, Vector3.forward);
+        end_value2 = Vector3.op_Addition(Vector3.op_Addition(playerPos, Vector3.op_Multiply(vector3_4, this.parameter.cameraTargetDistance)), new Vector3(0.0f, this.parameter.cameraHeight, 0.0f));
+        vector3_1 = Vector3.op_Addition(playerPos, new Vector3(0.0f, this.parameter.cameraTargetHeight, 0.0f));
+      }
+      end_value3 = Quaternion.LookRotation(Vector3.op_Subtraction(vector3_1, end_value2));
+      cameraFieldOfView = this.parameter.cameraFieldOfView;
+    }
+    else
+    {
+      OutGameSettingsManager.SmithScene smithScene = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene;
+      end_value2 = smithScene.createCameraPos;
+      end_value3 = Quaternion.Euler(smithScene.createCameraRot);
+      cameraFieldOfView = smithScene.createCameraFieldOfView;
+      end_value1 = Quaternion.Euler(0.0f, this.parameter.playerRot, 0.0f);
+    }
+    float _time = this.parameter.cameraMoveTime;
+    if (MonoBehaviourSingleton<TransitionManager>.I.isTransing && !MonoBehaviourSingleton<TransitionManager>.I.isChanging)
+      _time = 0.0f;
+    this.cameraTurningMode = (double) _time > 0.0 && type_from == type_to && type_from == StatusStageManager.VIEW_TYPE.STATUS && mode_from != mode_to;
+    this.cameraPosAnim.Set(_time, this.targetCameraTransform.position, end_value2, (AnimationCurve) null, new Vector3(), (AnimationCurve) null);
+    this.cameraPosAnim.Play();
+    this.cameraRotAnim.Set(_time, this.targetCameraTransform.rotation, end_value3, (AnimationCurve) null, new Quaternion(), (AnimationCurve) null);
+    this.cameraRotAnim.Play();
+    this.cameraFovAnim.Set(_time, this.targetCamera.fieldOfView, cameraFieldOfView, (AnimationCurve) null, 0.0f, (AnimationCurve) null);
+    this.cameraFovAnim.Play();
+    if (!Object.op_Inequality((Object) this.playerLoader, (Object) null) || this.playerLoader.isLoading)
+      return;
+    this.playerRotAnim.Set(_time * 1.25f, ((Component) this.playerLoader).transform.rotation, end_value1, (AnimationCurve) null, new Quaternion(), (AnimationCurve) null);
+    this.playerRotAnim.Play();
+  }
 
-	private EquipItemInfo equipInfo;
+  private void LateUpdate()
+  {
+    if (this.playerRotAnim.IsPlaying() && Object.op_Inequality((Object) this.playerLoader, (Object) null) && !this.playerLoader.isLoading)
+      ((Component) this.playerLoader).transform.rotation = this.playerRotAnim.Update();
+    if (!this.cameraPosAnim.IsPlaying())
+      return;
+    this.targetCamera.fieldOfView = this.cameraFovAnim.Update();
+    this.targetCameraTransform.position = this.cameraPosAnim.Update();
+    this.targetCameraTransform.rotation = this.cameraRotAnim.Update();
+    if (!this.cameraTurningMode)
+      return;
+    Vector3 vector3 = Vector3.op_UnaryNegation(this.targetCameraTransform.forward);
+    vector3.x *= this.parameter.cameraTargetDistance;
+    vector3.y = this.parameter.cameraHeight;
+    vector3.z *= this.parameter.cameraTargetDistance;
+    this.targetCameraTransform.position = Vector3.op_Addition(vector3, this.parameter.playerPos);
+  }
 
-	private StatusSmithCharacter m_stSmithCharacter;
+  public void SetSmithCharacterActivate(bool active)
+  {
+    if (!Object.op_Inequality((Object) this.m_stSmithCharacter, (Object) null))
+      return;
+    this.m_stSmithCharacter.SetActive(active);
+  }
 
-	public bool isBusy => cameraPosAnim.IsPlaying() || cameraRotAnim.IsPlaying();
+  public void SetUniqueSmithCharacterActivate(bool active)
+  {
+    if (!Object.op_Inequality((Object) this.m_stUniqueSmithCharacter, (Object) null))
+      return;
+    this.m_stUniqueSmithCharacter.SetActive(active);
+  }
 
-	protected override void Awake()
-	{
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Expected O, but got Unknown
-		base.Awake();
-		targetCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
-		targetCameraTransform = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform;
-		parameter = MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene;
-		uiTexture = (Utility.CreateGameObjectAndComponent("UITexture", MonoBehaviourSingleton<UIManager>.I.system._transform, 5) as UITexture);
-		uiTexture.shader = ResourceUtility.FindShader("Unlit/ui_render_tex");
-		uiTexture.SetAnchor(MonoBehaviourSingleton<UIManager>.I.system.get_gameObject(), 0, 0, 0, 0);
-		uiTexture.UpdateAnchors();
-		m_stSmithCharacter = (StatusSmithCharacter)Utility.CreateGameObjectAndComponent("StatusSmithCharacter", base._transform, -1);
-	}
+  public void SetEnableSmithCharacterActivate(bool active)
+  {
+    if (StatusManager.IsUnique())
+      this.SetUniqueSmithCharacterActivate(active);
+    else
+      this.SetSmithCharacterActivate(active);
+  }
 
-	protected override void _OnDestroy()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		if (uiTexture != null)
-		{
-			Object.Destroy(uiTexture.get_gameObject());
-		}
-		if (playerShadow != null)
-		{
-			Object.Destroy(playerShadow.get_gameObject());
-		}
-	}
+  public void SetDisableSmithCharacterActivate(bool active)
+  {
+    if (!StatusManager.IsUnique())
+      this.SetUniqueSmithCharacterActivate(active);
+    else
+      this.SetSmithCharacterActivate(active);
+  }
 
-	private void OnEnable()
-	{
-		InputManager.OnDrag = (InputManager.OnTouchDelegate)Delegate.Combine(InputManager.OnDrag, new InputManager.OnTouchDelegate(OnDrag));
-	}
+  public enum VIEW_TYPE
+  {
+    INIT,
+    STATUS,
+    SMITH,
+  }
 
-	protected override void OnDisable()
-	{
-		base.OnDisable();
-		InputManager.OnDrag = (InputManager.OnTouchDelegate)Delegate.Remove(InputManager.OnDrag, new InputManager.OnTouchDelegate(OnDrag));
-	}
-
-	private void OnDrag(InputManager.TouchInfo touch_info)
-	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		if (!(playerLoader == null) && !MonoBehaviourSingleton<UIManager>.I.IsDisable())
-		{
-			string currentSectionName = MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName();
-			if (!(currentSectionName != "StatusTop") || !(currentSectionName != "StatusAvatar"))
-			{
-				playerLoader.get_transform().Rotate(GameDefine.GetCharaRotateVector(touch_info));
-			}
-		}
-	}
-
-	public void SetUITextureActive(bool active)
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		uiTexture.get_gameObject().SetActive(active);
-	}
-
-	public void ClearPlayerLoaded(PlayerLoadInfo load_info)
-	{
-		if ((!(playerLoader != null) || !playerLoader.loadInfo.Equals(load_info)) && renderTexture != null)
-		{
-			Object.DestroyImmediate(renderTexture);
-		}
-	}
-
-	public void LoadPlayer(PlayerLoadInfo load_info)
-	{
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-		if (playerShadow == null)
-		{
-			playerShadow = PlayerLoader.CreateShadow(MonoBehaviourSingleton<StageManager>.I.stageObject, false, -1, false);
-			playerShadow.get_transform().set_position(parameter.playerPos + new Vector3(0f, 0.005f, 0f));
-		}
-		ShaderGlobal.lightProbe = false;
-		if (!(playerLoader != null) || !playerLoader.loadInfo.Equals(load_info))
-		{
-			if (renderTexture != null)
-			{
-				Object.DestroyImmediate(renderTexture);
-			}
-			renderTexture = UIRenderTexture.Get(uiTexture, -1f, true, -1);
-			renderTexture.Disable();
-			renderTexture.nearClipPlane = parameter.renderTextureNearClip;
-			int num = -1;
-			if (MonoBehaviourSingleton<OutGameSettingsManager>.IsValid())
-			{
-				num = ((!MonoBehaviourSingleton<OutGameSettingsManager>.I.statusScene.isChangeHairShader) ? (-1) : MonoBehaviourSingleton<UserInfoManager>.I.userStatus.hairColorId);
-			}
-			playerLoader = renderTexture.modelTransform.get_gameObject().AddComponent<PlayerLoader>();
-			PlayerLoader obj = playerLoader;
-			int use_hair_overlay = num;
-			obj.StartLoad(load_info, renderTexture.renderLayer, PLAYER_ANIM_TYPE.GetStatus(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex), false, false, false, false, false, true, true, true, SHADER_TYPE.NORMAL, delegate
-			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-				playerLoader.get_transform().set_position(parameter.playerPos);
-				playerLoader.get_transform().set_eulerAngles(new Vector3(0f, (viewMode != 0) ? parameter.avatarPlayerRot : parameter.playerRot, 0f));
-				if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
-				{
-					UserStatus userStatus = MonoBehaviourSingleton<UserInfoManager>.I.userStatus;
-					float num2 = (userStatus.sex != 0) ? parameter.playerScaleFemale : parameter.playerScaleMale;
-					playerLoader.get_transform().set_localScale(playerLoader.get_transform().get_localScale().Mul(new Vector3(num2, num2, num2)));
-				}
-				renderTexture.Enable(0.25f);
-			}, true, use_hair_overlay);
-		}
-	}
-
-	public void SetViewMode(VIEW_MODE view_mode)
-	{
-		if (viewMode != view_mode)
-		{
-			equipSetData = null;
-			if (viewType == VIEW_TYPE.STATUS)
-			{
-				MoveCamera(viewType, viewType, viewMode, view_mode);
-			}
-			viewMode = view_mode;
-		}
-	}
-
-	public void SetEquipSetData(StatusEquip.LocalEquipSetData equip_set_data)
-	{
-		if (equipSetData != equip_set_data)
-		{
-			equipInfo = null;
-			equipSetData = equip_set_data;
-			MoveCamera(viewType, viewType, viewMode, viewMode);
-		}
-	}
-
-	public void SetEquipInfo(EquipItemInfo equip_info)
-	{
-		PlayerLoadInfo playerLoadInfo = playerLoader.loadInfo.Clone();
-		if (equip_info != null)
-		{
-			playerLoadInfo.SetEquip(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, equip_info.tableData, true, true, true);
-		}
-		else if (viewMode == VIEW_MODE.AVATAR)
-		{
-			int num = EQUIP_SLOT.AvatatToEquip(equipSetData.index);
-			equip_info = equipSetData.equipSetInfo.item[num];
-			if (equip_info == null)
-			{
-				playerLoadInfo.RemoveEquip(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, num);
-			}
-			else
-			{
-				playerLoadInfo.SetEquip(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, equip_info.tableData, true, true, true);
-			}
-		}
-		else if (equipSetData != null)
-		{
-			playerLoadInfo.RemoveEquip(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex, equipSetData.index);
-		}
-		LoadPlayer(playerLoadInfo);
-		if (equipInfo != equip_info)
-		{
-			equipInfo = equip_info;
-			MoveCamera(viewType, viewType, viewMode, viewMode);
-		}
-	}
-
-	public void UpdateCamera(string scene_name, string section_name, GameSceneTables.SectionData section_data)
-	{
-		if (!section_data.type.IsDialog())
-		{
-			VIEW_TYPE vIEW_TYPE = viewType;
-			vIEW_TYPE = ((scene_name == "StatusScene" && section_name != "StatusToSmith" && section_name != "ItemStorageSell" && !section_name.Contains("Exchange")) ? VIEW_TYPE.STATUS : VIEW_TYPE.SMITH);
-			if (viewType != vIEW_TYPE)
-			{
-				MoveCamera(viewType, vIEW_TYPE, viewMode, viewMode);
-				viewType = vIEW_TYPE;
-			}
-		}
-	}
-
-	private void MoveCamera(VIEW_TYPE type_from, VIEW_TYPE type_to, VIEW_MODE mode_from, VIEW_MODE mode_to)
-	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0203: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0230: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_034e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0353: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0358: Unknown result type (might be due to invalid IL or missing references)
-		//IL_035c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0362: Unknown result type (might be due to invalid IL or missing references)
-		Quaternion val = Quaternion.Euler(0f, parameter.playerRot, 0f);
-		Vector3 val2;
-		Quaternion end_value;
-		float end_value2;
-		if (type_to == VIEW_TYPE.STATUS)
-		{
-			Vector3 playerPos = parameter.playerPos;
-			if (mode_to == VIEW_MODE.AVATAR)
-			{
-				val = Quaternion.Euler(0f, parameter.avatarPlayerRot, 0f);
-			}
-			if (equipSetData != null)
-			{
-				OutGameSettingsManager.StatusScene.EquipViewInfo equipViewInfo = null;
-				if (equipInfo != null)
-				{
-					equipViewInfo = parameter.GetEquipViewInfo(equipInfo.tableData.type.ToString());
-				}
-				if (equipViewInfo == null)
-				{
-					equipViewInfo = parameter.GetEquipViewInfo(EQUIP_SLOT.ToType((viewMode != VIEW_MODE.AVATAR) ? equipSetData.index : EQUIP_SLOT.AvatatToEquip(equipSetData.index)).ToString());
-				}
-				Vector3 cameraTargetPos = equipViewInfo.cameraTargetPos;
-				if (mode_to == VIEW_MODE.AVATAR)
-				{
-					cameraTargetPos.x = 0f;
-				}
-				playerPos = val * cameraTargetPos + playerPos;
-				val2 = Quaternion.AngleAxis(0f - equipViewInfo.cameraXAngle, Vector3.get_right()) * Quaternion.AngleAxis(0f - equipViewInfo.cameraYAngle, Vector3.get_up()) * Vector3.get_forward();
-				val2 = val * val2;
-				val2 = playerPos + val2 * equipViewInfo.cameraDistance;
-			}
-			else
-			{
-				Vector3 val3 = val * Vector3.get_forward();
-				val2 = playerPos + val3 * parameter.cameraTargetDistance + new Vector3(0f, parameter.cameraHeight, 0f);
-				playerPos += new Vector3(0f, parameter.cameraTargetHeight, 0f);
-			}
-			end_value = Quaternion.LookRotation(playerPos - val2);
-			end_value2 = parameter.cameraFieldOfView;
-		}
-		else
-		{
-			OutGameSettingsManager.SmithScene smithScene = MonoBehaviourSingleton<OutGameSettingsManager>.I.smithScene;
-			val2 = smithScene.createCameraPos;
-			end_value = Quaternion.Euler(smithScene.createCameraRot);
-			end_value2 = smithScene.createCameraFieldOfView;
-			val = Quaternion.Euler(0f, parameter.playerRot, 0f);
-		}
-		float num = parameter.cameraMoveTime;
-		if (MonoBehaviourSingleton<TransitionManager>.I.isTransing && !MonoBehaviourSingleton<TransitionManager>.I.isChanging)
-		{
-			num = 0f;
-		}
-		cameraTurningMode = (num > 0f && type_from == type_to && type_from == VIEW_TYPE.STATUS && mode_from != mode_to);
-		cameraPosAnim.Set(num, targetCameraTransform.get_position(), val2, null, default(Vector3), null);
-		cameraPosAnim.Play();
-		cameraRotAnim.Set(num, targetCameraTransform.get_rotation(), end_value, null, default(Quaternion), null);
-		cameraRotAnim.Play();
-		cameraFovAnim.Set(num, targetCamera.get_fieldOfView(), end_value2, null, 0f, null);
-		cameraFovAnim.Play();
-		if (playerLoader != null && !playerLoader.isLoading)
-		{
-			playerRotAnim.Set(num * 1.25f, playerLoader.get_transform().get_rotation(), val, null, default(Quaternion), null);
-			playerRotAnim.Play();
-		}
-	}
-
-	private void LateUpdate()
-	{
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-		if (playerRotAnim.IsPlaying() && playerLoader != null && !playerLoader.isLoading)
-		{
-			playerLoader.get_transform().set_rotation(playerRotAnim.Update());
-		}
-		if (cameraPosAnim.IsPlaying())
-		{
-			targetCamera.set_fieldOfView(cameraFovAnim.Update());
-			targetCameraTransform.set_position(cameraPosAnim.Update());
-			targetCameraTransform.set_rotation(cameraRotAnim.Update());
-			if (cameraTurningMode)
-			{
-				Vector3 val = -targetCameraTransform.get_forward();
-				val.x *= parameter.cameraTargetDistance;
-				val.y = parameter.cameraHeight;
-				val.z *= parameter.cameraTargetDistance;
-				targetCameraTransform.set_position(val + parameter.playerPos);
-			}
-		}
-	}
-
-	public void SetSmithCharacterActivateFlag(bool isActivate)
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (m_stSmithCharacter != null)
-		{
-			m_stSmithCharacter.get_gameObject().SetActive(isActivate);
-		}
-	}
+  public enum VIEW_MODE
+  {
+    EQUIP,
+    AVATAR,
+  }
 }

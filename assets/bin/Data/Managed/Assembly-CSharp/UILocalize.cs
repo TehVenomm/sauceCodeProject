@@ -1,89 +1,75 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UILocalize
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 [ExecuteInEditMode]
+[RequireComponent(typeof (UIWidget))]
 [AddComponentMenu("NGUI/UI/Localize")]
-[RequireComponent(typeof(UIWidget))]
-public class UILocalize
+public class UILocalize : MonoBehaviour
 {
-	public string key;
+  public string key;
+  private bool mStarted;
 
-	private bool mStarted;
+  public string value
+  {
+    set
+    {
+      if (string.IsNullOrEmpty(value))
+        return;
+      UIWidget component = ((Component) this).GetComponent<UIWidget>();
+      UILabel uiLabel = component as UILabel;
+      UISprite uiSprite = component as UISprite;
+      if (Object.op_Inequality((Object) uiLabel, (Object) null))
+      {
+        UIInput inParents = NGUITools.FindInParents<UIInput>(((Component) uiLabel).gameObject);
+        if (Object.op_Inequality((Object) inParents, (Object) null) && Object.op_Equality((Object) inParents.label, (Object) uiLabel))
+          inParents.defaultText = value;
+        else
+          uiLabel.SetTextOnly(value);
+      }
+      else
+      {
+        if (!Object.op_Inequality((Object) uiSprite, (Object) null))
+          return;
+        UIButton inParents = NGUITools.FindInParents<UIButton>(((Component) uiSprite).gameObject);
+        if (Object.op_Inequality((Object) inParents, (Object) null) && Object.op_Equality((Object) inParents.tweenTarget, (Object) ((Component) uiSprite).gameObject))
+          inParents.normalSprite = value;
+        uiSprite.spriteName = value;
+        uiSprite.MakePixelPerfect();
+      }
+    }
+  }
 
-	public string value
-	{
-		set
-		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Expected O, but got Unknown
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Expected O, but got Unknown
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			if (!string.IsNullOrEmpty(value))
-			{
-				UIWidget component = this.GetComponent<UIWidget>();
-				UILabel uILabel = component as UILabel;
-				UISprite uISprite = component as UISprite;
-				if (uILabel != null)
-				{
-					UIInput uIInput = NGUITools.FindInParents<UIInput>(uILabel.get_gameObject());
-					if (uIInput != null && uIInput.label == uILabel)
-					{
-						uIInput.defaultText = value;
-					}
-					else
-					{
-						uILabel.SetTextOnly(value);
-					}
-				}
-				else if (uISprite != null)
-				{
-					UIButton uIButton = NGUITools.FindInParents<UIButton>(uISprite.get_gameObject());
-					if (uIButton != null && uIButton.tweenTarget == uISprite.get_gameObject())
-					{
-						uIButton.normalSprite = value;
-					}
-					uISprite.spriteName = value;
-					uISprite.MakePixelPerfect();
-				}
-			}
-		}
-	}
+  private void OnEnable()
+  {
+    if (!this.mStarted || !Localization.dictionary.ContainsKey(this.key))
+      return;
+    this.OnLocalize();
+  }
 
-	public UILocalize()
-		: this()
-	{
-	}
+  private void Start()
+  {
+    this.mStarted = true;
+    this.OnLocalize();
+  }
 
-	private void OnEnable()
-	{
-		if (mStarted && Localization.dictionary.ContainsKey(key))
-		{
-			OnLocalize();
-		}
-	}
-
-	private void Start()
-	{
-		mStarted = true;
-		OnLocalize();
-	}
-
-	private void OnLocalize()
-	{
-		if (Localization.dictionary.ContainsKey(key))
-		{
-			if (string.IsNullOrEmpty(key))
-			{
-				UILabel component = this.GetComponent<UILabel>();
-				if (component != null)
-				{
-					key = component.text;
-				}
-			}
-			if (!string.IsNullOrEmpty(key))
-			{
-				value = Localization.Get(key);
-			}
-		}
-	}
+  private void OnLocalize()
+  {
+    if (!Localization.dictionary.ContainsKey(this.key))
+      return;
+    if (string.IsNullOrEmpty(this.key))
+    {
+      UILabel component = ((Component) this).GetComponent<UILabel>();
+      if (Object.op_Inequality((Object) component, (Object) null))
+        this.key = component.text;
+    }
+    if (string.IsNullOrEmpty(this.key))
+      return;
+    this.value = Localization.Get(this.key);
+  }
 }

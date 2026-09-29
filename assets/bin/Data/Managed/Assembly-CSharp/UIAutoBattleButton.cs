@@ -1,460 +1,392 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIAutoBattleButton
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using UnityEngine;
 
+#nullable disable
 public class UIAutoBattleButton : UIBehaviour
 {
-	protected Self self;
+  protected Self self;
+  private bool isAbleCountCycle;
+  private bool cachedAutoFlg;
+  private bool updateTimer;
+  private bool btnEnable = true;
+  private bool needUpdateUI;
+  [SerializeField]
+  private GameObject sprAutoOn;
+  [SerializeField]
+  private GameObject sprAutoOff;
+  [SerializeField]
+  private GameObject sprAutoPlay;
+  [SerializeField]
+  private GameObject sprAutoPause;
+  [SerializeField]
+  private UILabel lblAutoTime;
+  [SerializeField]
+  private BoxCollider btnCollider;
+  private AutoModeStatus automodeStatus = new AutoModeStatus();
+  private bool canUseAutoMode;
 
-	private bool isAbleCountCycle;
+  public double stampCircle { get; private set; }
 
-	private bool cachedAutoFlg;
+  private void SetupAutoButton(double timeLeft)
+  {
+    this.self = MonoBehaviourSingleton<UIPlayerStatus>.I.targetPlayer as Self;
+    if (timeLeft < 0.0)
+      timeLeft = 0.0;
+    this.Initialize(timeLeft, GameSaveData.instance.isAutoMode);
+    if (TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02) && !QuestManager.IsValidInGame() && this.automodeStatus.IsRemain())
+      this.canUseAutoMode = true;
+    if (Object.op_Equality((Object) this.self, (Object) null))
+      this.canUseAutoMode = false;
+    ((Component) this).gameObject.SetActive(this.canUseAutoMode);
+    if (this.canUseAutoMode)
+    {
+      if (GameSaveData.instance.isAutoMode)
+      {
+        if (!this.cachedAutoFlg)
+          this.StartAutoMode();
+      }
+      else if (this.cachedAutoFlg)
+        this.StopAutoMode();
+      this.UpdateButton();
+    }
+    else if (GameSaveData.instance.isAutoMode)
+    {
+      if (!this.cachedAutoFlg)
+        return;
+      this.PauseAutoMode();
+    }
+    else
+    {
+      if (!this.cachedAutoFlg)
+        return;
+      this.StopAutoMode();
+    }
+  }
 
-	private bool updateTimer;
+  private void Initialize(double second, bool timerState)
+  {
+    this.updateTimer = timerState;
+    this.automodeStatus.Init(second);
+    this.lblAutoTime.text = this.automodeStatus.GetRemainTime();
+    this.resetStampCircle();
+  }
 
-	private bool btnEnable = true;
+  private void Update()
+  {
+    if (!this.cachedAutoFlg)
+      this.updateTimer = false;
+    if (!this.updateTimer)
+      return;
+    this.automodeStatus.SubTime((double) Time.deltaTime);
+    this.lblAutoTime.text = this.automodeStatus.GetRemainTime();
+    if (!this.automodeStatus.IsRemain())
+      this.PauseAutoMode();
+    if (!this.isAbleCountCycle)
+      return;
+    this.stampCircle -= (double) Time.deltaTime;
+    if (this.stampCircle >= 0.0)
+      return;
+    this.isAbleCountCycle = false;
+    this.AutoPlayTimestamp((Action<bool>) (b =>
+    {
+      if (!b)
+        return;
+      this.resetStampCircle();
+      this.isAbleCountCycle = true;
+    }));
+  }
 
-	private bool needUpdateUI;
+  private void UpdateButton()
+  {
+    if (this.cachedAutoFlg)
+    {
+      this.sprAutoOn.SetActive(false);
+      this.sprAutoOff.SetActive(true);
+      this.sprAutoPlay.SetActive(false);
+      this.sprAutoPause.SetActive(true);
+    }
+    else
+    {
+      this.sprAutoOn.SetActive(true);
+      this.sprAutoOff.SetActive(false);
+      this.sprAutoPlay.SetActive(true);
+      this.sprAutoPause.SetActive(false);
+    }
+    if (!this.automodeStatus.IsRemain())
+      this.canUseAutoMode = false;
+    ((Component) this).gameObject.SetActive(this.canUseAutoMode);
+  }
 
-	[SerializeField]
-	private GameObject sprAutoOn;
+  private bool IsAuto() => this.self.isAutoMode;
 
-	[SerializeField]
-	private GameObject sprAutoOff;
+  public void OnBtnClick()
+  {
+    if (this.IsAuto())
+    {
+      SoundManager.PlaySystemSE(SoundID.UISE.CANCEL);
+      this.StopAutoMode();
+    }
+    else if (this.automodeStatus.IsRemain())
+    {
+      SoundManager.PlaySystemSE(SoundID.UISE.CLICK);
+      this.StartAutoMode();
+    }
+    else
+      SoundManager.PlaySystemSE(SoundID.UISE.INVALID);
+  }
 
-	[SerializeField]
-	private GameObject sprAutoPlay;
+  private void ForcePauseAutoMode()
+  {
+    this.self.SwitchAutoBattle(false);
+    this.cachedAutoFlg = false;
+    this.UpdateButton();
+  }
 
-	[SerializeField]
-	private GameObject sprAutoPause;
+  private void ForceResumeAutoMode()
+  {
+    this.self.SwitchAutoBattle(true);
+    this.cachedAutoFlg = true;
+    this.updateTimer = true;
+    this.UpdateButton();
+  }
 
-	[SerializeField]
-	private UILabel lblAutoTime;
+  private void PauseAutoMode()
+  {
+    this.self.SwitchAutoBattle(false);
+    this.cachedAutoFlg = false;
+    this.AutoPlayStopConn((Action<bool>) (is_success =>
+    {
+      if (!is_success)
+        return;
+      this.UpdateButton();
+    }));
+  }
 
-	[SerializeField]
-	private BoxCollider btnCollider;
+  private void StopAutoMode()
+  {
+    this.self.SwitchAutoBattle(false);
+    GameSaveData.instance.isAutoMode = false;
+    this.cachedAutoFlg = false;
+    this.AutoPlayStopConn((Action<bool>) (is_success =>
+    {
+      if (!is_success)
+        return;
+      this.UpdateButton();
+    }));
+  }
 
-	private AutoModeStatus automodeStatus = new AutoModeStatus();
+  private void StartAutoMode()
+  {
+    this.resetStampCircle();
+    this.AutoPlayStartConn((Action<bool>) (is_success =>
+    {
+      if (!is_success)
+        return;
+      this.self.SwitchAutoBattle(true);
+      GameSaveData.instance.isAutoMode = true;
+      this.cachedAutoFlg = true;
+      this.updateTimer = true;
+      this.UpdateButton();
+    }));
+  }
 
-	private bool canUseAutoMode;
+  public void AutoPlaySwitch(int playState, Action<bool> call_back)
+  {
+    AutoPlaySwitchModel.RequestSendForm postData = new AutoPlaySwitchModel.RequestSendForm();
+    postData.type = playState;
+    if (!this.btnEnable)
+      return;
+    if (Object.op_Inequality((Object) this.btnCollider, (Object) null))
+      ((Collider) this.btnCollider).enabled = false;
+    this.btnEnable = false;
+    Protocol.Send<AutoPlaySwitchModel.RequestSendForm, AutoPlaySwitchModel>(AutoPlaySwitchModel.URL, postData, (Action<AutoPlaySwitchModel>) (ret =>
+    {
+      bool flag = false;
+      if (ret.Error == Error.None)
+      {
+        flag = true;
+        this.btnEnable = true;
+        if (Object.op_Inequality((Object) this.btnCollider, (Object) null))
+          ((Collider) this.btnCollider).enabled = true;
+        this.Initialize(ret.result.timeLeft, playState == 0);
+      }
+      call_back(flag);
+    }));
+  }
 
-	public double stampCircle
-	{
-		get;
-		private set;
-	}
+  public void AutoPlayStartConn(Action<bool> call_back = null)
+  {
+    this.AutoPlaySwitch(0, (Action<bool>) (b =>
+    {
+      if (b)
+        this.isAbleCountCycle = true;
+      if (call_back == null)
+        return;
+      call_back(b);
+    }));
+  }
 
-	private void SetupAutoButton(double timeLeft)
-	{
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		self = (MonoBehaviourSingleton<UIPlayerStatus>.I.targetPlayer as Self);
-		if (timeLeft < 0.0)
-		{
-			timeLeft = 0.0;
-		}
-		Initialize(timeLeft, GameSaveData.instance.isAutoMode);
-		if (TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02) && !QuestManager.IsValidInGame() && automodeStatus.IsRemain())
-		{
-			canUseAutoMode = true;
-		}
-		if (self == null)
-		{
-			canUseAutoMode = false;
-		}
-		this.get_gameObject().SetActive(canUseAutoMode);
-		if (canUseAutoMode)
-		{
-			if (GameSaveData.instance.isAutoMode)
-			{
-				if (!cachedAutoFlg)
-				{
-					StartAutoMode();
-				}
-			}
-			else if (cachedAutoFlg)
-			{
-				StopAutoMode();
-			}
-			UpdateButton();
-		}
-		else if (GameSaveData.instance.isAutoMode)
-		{
-			if (cachedAutoFlg)
-			{
-				PauseAutoMode();
-			}
-		}
-		else if (cachedAutoFlg)
-		{
-			StopAutoMode();
-		}
-	}
+  public void AutoPlayStopConn(Action<bool> call_back = null)
+  {
+    int playState = 1;
+    this.isAbleCountCycle = false;
+    this.AutoPlaySwitch(playState, (Action<bool>) (b =>
+    {
+      if (call_back == null)
+        return;
+      call_back(b);
+    }));
+  }
 
-	private void Initialize(double second, bool timerState)
-	{
-		updateTimer = timerState;
-		automodeStatus.Init(second);
-		lblAutoTime.text = automodeStatus.GetRemainTime();
-		resetStampCircle();
-	}
+  public void AutoPlayTimestamp(Action<bool> call_back)
+  {
+    Protocol.Send<AutoPlaySwitchModel.RequestSendForm, AutoPlayTimestampModel>(AutoPlayTimestampModel.URL, new AutoPlaySwitchModel.RequestSendForm()
+    {
+      type = 0
+    }, (Action<AutoPlayTimestampModel>) (ret =>
+    {
+      bool flag = false;
+      if (ret.Error == Error.None)
+      {
+        flag = true;
+        if (ret.result.timeLeft == 0.0)
+        {
+          this.self.SwitchAutoBattle(false);
+          GameSaveData.instance.isAutoMode = false;
+          this.cachedAutoFlg = false;
+          this.Initialize(0.0, false);
+        }
+        else if (this.needUpdateUI)
+        {
+          this.needUpdateUI = false;
+          this.ForceResumeAutoMode();
+          this.Initialize(ret.result.timeLeft, true);
+        }
+      }
+      if (!flag)
+      {
+        this.needUpdateUI = true;
+        this.ForcePauseAutoMode();
+      }
+      call_back(flag);
+    }));
+  }
 
-	private void Update()
-	{
-		if (!cachedAutoFlg)
-		{
-			updateTimer = false;
-		}
-		if (updateTimer)
-		{
-			automodeStatus.SubTime((double)Time.get_deltaTime());
-			lblAutoTime.text = automodeStatus.GetRemainTime();
-			if (!automodeStatus.IsRemain())
-			{
-				PauseAutoMode();
-			}
-			if (isAbleCountCycle)
-			{
-				stampCircle -= (double)Time.get_deltaTime();
-				if (stampCircle < 0.0)
-				{
-					isAbleCountCycle = false;
-					AutoPlayTimestamp(delegate(bool b)
-					{
-						if (b)
-						{
-							resetStampCircle();
-							isAbleCountCycle = true;
-						}
-					});
-				}
-			}
-		}
-	}
+  public void GetAutoPlayTime(Action<bool> call_back)
+  {
+    if (!TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02) || QuestManager.IsValidInGame())
+    {
+      this.SetupAutoButton(0.0);
+      call_back(true);
+    }
+    else
+      Protocol.Send<AutoPlayTimeModel>(AutoPlayTimeModel.URL, (WWWForm) null, (Action<AutoPlayTimeModel>) (ret =>
+      {
+        bool flag = false;
+        if (ret.Error == Error.None)
+        {
+          flag = true;
+          this.SetupAutoButton(ret.result.timeLeft);
+        }
+        call_back(flag);
+      }));
+  }
 
-	private void UpdateButton()
-	{
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		if (cachedAutoFlg)
-		{
-			sprAutoOn.SetActive(false);
-			sprAutoOff.SetActive(true);
-			sprAutoPlay.SetActive(false);
-			sprAutoPause.SetActive(true);
-		}
-		else
-		{
-			sprAutoOn.SetActive(true);
-			sprAutoOff.SetActive(false);
-			sprAutoPlay.SetActive(true);
-			sprAutoPause.SetActive(false);
-		}
-		if (!automodeStatus.IsRemain())
-		{
-			canUseAutoMode = false;
-		}
-		this.get_gameObject().SetActive(canUseAutoMode);
-	}
+  public void OnUseItem(double timeleft)
+  {
+    this.Initialize(timeleft, GameSaveData.instance.isAutoMode);
+    if (!this.automodeStatus.IsRemain())
+      return;
+    if (TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02) && !QuestManager.IsValidInGame())
+      this.canUseAutoMode = true;
+    if (this.canUseAutoMode)
+    {
+      if (GameSaveData.instance.isAutoMode)
+      {
+        if (this.cachedAutoFlg)
+          return;
+        this.StartAutoMode();
+      }
+      else
+        this.UpdateButton();
+    }
+    else
+      ((Component) this).gameObject.SetActive(false);
+  }
 
-	private bool IsAuto()
-	{
-		return self.isAutoMode;
-	}
+  public void EnableButton()
+  {
+    if (!this.btnEnable)
+      this.btnEnable = true;
+    if (((Collider) this.btnCollider).enabled)
+      return;
+    ((Collider) this.btnCollider).enabled = true;
+  }
 
-	public void OnBtnClick()
-	{
-		if (IsAuto())
-		{
-			SoundManager.PlaySystemSE(SoundID.UISE.CANCEL, 1f);
-			StopAutoMode();
-		}
-		else if (automodeStatus.IsRemain())
-		{
-			SoundManager.PlaySystemSE(SoundID.UISE.CLICK, 1f);
-			StartAutoMode();
-		}
-		else
-		{
-			SoundManager.PlaySystemSE(SoundID.UISE.INVALID, 1f);
-		}
-	}
+  public void DisableButton()
+  {
+    if (this.btnEnable)
+      this.btnEnable = false;
+    if (!((Collider) this.btnCollider).enabled)
+      return;
+    ((Collider) this.btnCollider).enabled = false;
+  }
 
-	private void ForcePauseAutoMode()
-	{
-		self.SwitchAutoBattle(false);
-		cachedAutoFlg = false;
-		UpdateButton();
-	}
+  private void resetStampCircle() => this.stampCircle = 10.0;
 
-	private void ForceResumeAutoMode()
-	{
-		self.SwitchAutoBattle(true);
-		cachedAutoFlg = true;
-		updateTimer = true;
-		UpdateButton();
-	}
+  protected override void OnDestroy()
+  {
+    if (MonoBehaviourSingleton<InGameManager>.I.isQuestHappen)
+    {
+      if (this.cachedAutoFlg)
+      {
+        if (Object.op_Inequality((Object) this.self, (Object) null))
+          this.self.SwitchAutoBattle(false);
+        this.cachedAutoFlg = false;
+        this.AutoPlayForceStop();
+      }
+    }
+    else if (this.cachedAutoFlg)
+    {
+      if (Object.op_Inequality((Object) this.self, (Object) null))
+        this.self.SwitchAutoBattle(false);
+      GameSaveData.instance.isAutoMode = false;
+      this.cachedAutoFlg = false;
+      this.AutoPlayForceStop();
+    }
+    base.OnDestroy();
+  }
 
-	private void PauseAutoMode()
-	{
-		self.SwitchAutoBattle(false);
-		cachedAutoFlg = false;
-		AutoPlayStopConn(delegate(bool is_success)
-		{
-			if (is_success)
-			{
-				UpdateButton();
-			}
-		});
-	}
+  private void OnApplicationQuit()
+  {
+    if (!this.cachedAutoFlg)
+      return;
+    if (Object.op_Inequality((Object) this.self, (Object) null))
+      this.self.SwitchAutoBattle(false);
+    GameSaveData.instance.isAutoMode = false;
+    this.cachedAutoFlg = false;
+    this.AutoPlayForceStop();
+  }
 
-	private void StopAutoMode()
-	{
-		self.SwitchAutoBattle(false);
-		GameSaveData.instance.isAutoMode = false;
-		cachedAutoFlg = false;
-		AutoPlayStopConn(delegate(bool is_success)
-		{
-			if (is_success)
-			{
-				UpdateButton();
-			}
-		});
-	}
+  private void OnApplicationPause(bool pause)
+  {
+    if (!pause || !this.IsAuto())
+      return;
+    this.StopAutoMode();
+  }
 
-	private void StartAutoMode()
-	{
-		resetStampCircle();
-		AutoPlayStartConn(delegate(bool is_success)
-		{
-			if (is_success)
-			{
-				self.SwitchAutoBattle(true);
-				GameSaveData.instance.isAutoMode = true;
-				cachedAutoFlg = true;
-				updateTimer = true;
-				UpdateButton();
-			}
-		});
-	}
-
-	public void AutoPlaySwitch(int playState, Action<bool> call_back)
-	{
-		AutoPlaySwitchModel.RequestSendForm requestSendForm = new AutoPlaySwitchModel.RequestSendForm();
-		requestSendForm.type = playState;
-		if (btnEnable)
-		{
-			if (btnCollider != null)
-			{
-				btnCollider.set_enabled(false);
-			}
-			btnEnable = false;
-			Protocol.Send(AutoPlaySwitchModel.URL, requestSendForm, delegate(AutoPlaySwitchModel ret)
-			{
-				bool obj = false;
-				if (ret.Error == Error.None)
-				{
-					obj = true;
-					btnEnable = true;
-					if (btnCollider != null)
-					{
-						btnCollider.set_enabled(true);
-					}
-					Initialize(ret.result.timeLeft, playState == 0);
-				}
-				call_back(obj);
-			}, string.Empty);
-		}
-	}
-
-	public void AutoPlayStartConn(Action<bool> call_back = null)
-	{
-		int playState = 0;
-		AutoPlaySwitch(playState, delegate(bool b)
-		{
-			if (b)
-			{
-				isAbleCountCycle = true;
-			}
-			if (call_back != null)
-			{
-				call_back(b);
-			}
-		});
-	}
-
-	public void AutoPlayStopConn(Action<bool> call_back = null)
-	{
-		int playState = 1;
-		isAbleCountCycle = false;
-		AutoPlaySwitch(playState, delegate(bool b)
-		{
-			if (call_back != null)
-			{
-				call_back(b);
-			}
-		});
-	}
-
-	public void AutoPlayTimestamp(Action<bool> call_back)
-	{
-		AutoPlaySwitchModel.RequestSendForm requestSendForm = new AutoPlaySwitchModel.RequestSendForm();
-		requestSendForm.type = 0;
-		Protocol.Send(AutoPlayTimestampModel.URL, requestSendForm, delegate(AutoPlayTimestampModel ret)
-		{
-			bool flag = false;
-			if (ret.Error == Error.None)
-			{
-				flag = true;
-				if (ret.result.timeLeft == 0.0)
-				{
-					self.SwitchAutoBattle(false);
-					GameSaveData.instance.isAutoMode = false;
-					cachedAutoFlg = false;
-					Initialize(0.0, false);
-				}
-				else if (needUpdateUI)
-				{
-					needUpdateUI = false;
-					ForceResumeAutoMode();
-					Initialize(ret.result.timeLeft, true);
-				}
-			}
-			if (!flag)
-			{
-				needUpdateUI = true;
-				ForcePauseAutoMode();
-			}
-			call_back(flag);
-		}, string.Empty);
-	}
-
-	public void GetAutoPlayTime(Action<bool> call_back)
-	{
-		if (!TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02) || QuestManager.IsValidInGame())
-		{
-			SetupAutoButton(0.0);
-			call_back(true);
-		}
-		else
-		{
-			Protocol.Send(AutoPlayTimeModel.URL, null, delegate(AutoPlayTimeModel ret)
-			{
-				bool obj = false;
-				if (ret.Error == Error.None)
-				{
-					obj = true;
-					SetupAutoButton(ret.result.timeLeft);
-				}
-				call_back(obj);
-			}, string.Empty);
-		}
-	}
-
-	public void OnUseItem(double timeleft)
-	{
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		Initialize(timeleft, GameSaveData.instance.isAutoMode);
-		if (automodeStatus.IsRemain())
-		{
-			if (TutorialStep.IsTheTutorialOver(TUTORIAL_STEP.USER_CREATE_02) && !QuestManager.IsValidInGame())
-			{
-				canUseAutoMode = true;
-			}
-			if (canUseAutoMode)
-			{
-				if (GameSaveData.instance.isAutoMode)
-				{
-					if (!cachedAutoFlg)
-					{
-						StartAutoMode();
-					}
-				}
-				else
-				{
-					UpdateButton();
-				}
-			}
-			else
-			{
-				this.get_gameObject().SetActive(false);
-			}
-		}
-	}
-
-	public void EnableButton()
-	{
-		if (!btnEnable)
-		{
-			btnEnable = true;
-		}
-		if (!btnCollider.get_enabled())
-		{
-			btnCollider.set_enabled(true);
-		}
-	}
-
-	public void DisableButton()
-	{
-		if (btnEnable)
-		{
-			btnEnable = false;
-		}
-		if (btnCollider.get_enabled())
-		{
-			btnCollider.set_enabled(false);
-		}
-	}
-
-	private void resetStampCircle()
-	{
-		stampCircle = 10.0;
-	}
-
-	protected override void OnDestroy()
-	{
-		if (MonoBehaviourSingleton<InGameManager>.I.isQuestHappen)
-		{
-			if (cachedAutoFlg)
-			{
-				self.SwitchAutoBattle(false);
-				cachedAutoFlg = false;
-				AutoPlayForceStop();
-			}
-		}
-		else if (cachedAutoFlg)
-		{
-			self.SwitchAutoBattle(false);
-			GameSaveData.instance.isAutoMode = false;
-			cachedAutoFlg = false;
-			AutoPlayForceStop();
-		}
-		base.OnDestroy();
-	}
-
-	private void OnApplicationQuit()
-	{
-		if (cachedAutoFlg)
-		{
-			self.SwitchAutoBattle(false);
-			GameSaveData.instance.isAutoMode = false;
-			cachedAutoFlg = false;
-			AutoPlayForceStop();
-		}
-	}
-
-	private void OnApplicationPause(bool pause)
-	{
-		if (pause && IsAuto())
-		{
-			StopAutoMode();
-		}
-	}
-
-	public void AutoPlayForceStop()
-	{
-		AutoPlaySwitchModel.RequestSendForm requestSendForm = new AutoPlaySwitchModel.RequestSendForm();
-		requestSendForm.type = 1;
-		Protocol.Send<AutoPlaySwitchModel.RequestSendForm, AutoPlaySwitchModel>(AutoPlaySwitchModel.URL, requestSendForm, delegate
-		{
-		}, string.Empty);
-	}
+  public void AutoPlayForceStop()
+  {
+    Protocol.Send<AutoPlaySwitchModel.RequestSendForm, AutoPlaySwitchModel>(AutoPlaySwitchModel.URL, new AutoPlaySwitchModel.RequestSendForm()
+    {
+      type = 1
+    }, (Action<AutoPlaySwitchModel>) (ret => { }));
+  }
 }

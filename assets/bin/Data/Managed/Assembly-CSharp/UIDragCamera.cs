@@ -1,54 +1,43 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIDragCamera
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Drag Camera")]
+#nullable disable
 [ExecuteInEditMode]
-public class UIDragCamera
+[AddComponentMenu("NGUI/Interaction/Drag Camera")]
+public class UIDragCamera : MonoBehaviour
 {
-	public UIDraggableCamera draggableCamera;
+  public UIDraggableCamera draggableCamera;
 
-	public UIDragCamera()
-		: this()
-	{
-	}
+  private void Awake()
+  {
+    if (!Object.op_Equality((Object) this.draggableCamera, (Object) null))
+      return;
+    this.draggableCamera = NGUITools.FindInParents<UIDraggableCamera>(((Component) this).gameObject);
+  }
 
-	private void Awake()
-	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
-		if (draggableCamera == null)
-		{
-			draggableCamera = NGUITools.FindInParents<UIDraggableCamera>(this.get_gameObject());
-		}
-	}
+  private void OnPress(bool isPressed)
+  {
+    if (!((Behaviour) this).enabled || !NGUITools.GetActive(((Component) this).gameObject) || !Object.op_Inequality((Object) this.draggableCamera, (Object) null))
+      return;
+    this.draggableCamera.Press(isPressed);
+  }
 
-	private void OnPress(bool isPressed)
-	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
-		if (this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && draggableCamera != null)
-		{
-			draggableCamera.Press(isPressed);
-		}
-	}
+  private void OnDrag(Vector2 delta)
+  {
+    if (!((Behaviour) this).enabled || !NGUITools.GetActive(((Component) this).gameObject) || !Object.op_Inequality((Object) this.draggableCamera, (Object) null))
+      return;
+    this.draggableCamera.Drag(delta);
+  }
 
-	private void OnDrag(Vector2 delta)
-	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && draggableCamera != null)
-		{
-			draggableCamera.Drag(delta);
-		}
-	}
-
-	private void OnScroll(float delta)
-	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
-		if (this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && draggableCamera != null)
-		{
-			draggableCamera.Scroll(delta);
-		}
-	}
+  private void OnScroll(float delta)
+  {
+    if (!((Behaviour) this).enabled || !NGUITools.GetActive(((Component) this).gameObject) || !Object.op_Inequality((Object) this.draggableCamera, (Object) null))
+      return;
+    this.draggableCamera.Scroll(delta);
+  }
 }

@@ -1,173 +1,125 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: GooglePlayGames.PlayGamesAchievement
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using GooglePlayGames.BasicApi;
 using System;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.SocialPlatforms;
 
-namespace GooglePlayGames
+#nullable disable
+namespace GooglePlayGames;
+
+internal class PlayGamesAchievement : IAchievement, IAchievementDescription
 {
-	internal class PlayGamesAchievement
-	{
-		private readonly ReportProgress mProgressCallback;
+  private readonly GooglePlayGames.ReportProgress mProgressCallback;
+  private string mId = string.Empty;
+  private bool mIsIncremental;
+  private int mCurrentSteps;
+  private int mTotalSteps;
+  private double mPercentComplete;
+  private bool mCompleted;
+  private bool mHidden;
+  private DateTime mLastModifiedTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+  private string mTitle = string.Empty;
+  private string mRevealedImageUrl = string.Empty;
+  private string mUnlockedImageUrl = string.Empty;
+  private UnityWebRequest mImageFetcher;
+  private Texture2D mImage;
+  private string mDescription = string.Empty;
+  private ulong mPoints;
 
-		private string mId;
+  internal PlayGamesAchievement()
+    : this(new GooglePlayGames.ReportProgress(PlayGamesPlatform.Instance.ReportProgress))
+  {
+  }
 
-		private bool mIsIncremental;
+  internal PlayGamesAchievement(GooglePlayGames.ReportProgress progressCallback)
+  {
+    this.mProgressCallback = progressCallback;
+  }
 
-		private int mCurrentSteps;
+  internal PlayGamesAchievement(Achievement ach)
+    : this()
+  {
+    this.mId = ach.Id;
+    this.mIsIncremental = ach.IsIncremental;
+    this.mCurrentSteps = ach.CurrentSteps;
+    this.mTotalSteps = ach.TotalSteps;
+    this.mPercentComplete = !ach.IsIncremental ? (ach.IsUnlocked ? 100.0 : 0.0) : (ach.TotalSteps <= 0 ? 0.0 : (double) ach.CurrentSteps / (double) ach.TotalSteps * 100.0);
+    this.mCompleted = ach.IsUnlocked;
+    this.mHidden = !ach.IsRevealed;
+    this.mLastModifiedTime = ach.LastModifiedTime;
+    this.mTitle = ach.Name;
+    this.mDescription = ach.Description;
+    this.mPoints = ach.Points;
+    this.mRevealedImageUrl = ach.RevealedImageUrl;
+    this.mUnlockedImageUrl = ach.UnlockedImageUrl;
+  }
 
-		private int mTotalSteps;
+  public void ReportProgress(Action<bool> callback)
+  {
+    this.mProgressCallback(this.mId, this.mPercentComplete, callback);
+  }
 
-		private double mPercentComplete;
+  private Texture2D LoadImage()
+  {
+    if (this.hidden)
+      return (Texture2D) null;
+    string str = this.completed ? this.mUnlockedImageUrl : this.mRevealedImageUrl;
+    if (!string.IsNullOrEmpty(str))
+    {
+      if (this.mImageFetcher == null || this.mImageFetcher.url != str)
+      {
+        this.mImageFetcher = UnityWebRequestTexture.GetTexture(str);
+        this.mImageFetcher.SendWebRequest();
+        this.mImage = (Texture2D) null;
+      }
+      if (Object.op_Inequality((Object) this.mImage, (Object) null))
+        return this.mImage;
+      if (this.mImageFetcher.isDone)
+      {
+        this.mImage = DownloadHandlerTexture.GetContent(this.mImageFetcher);
+        return this.mImage;
+      }
+    }
+    return (Texture2D) null;
+  }
 
-		private bool mCompleted;
+  public string id
+  {
+    get => this.mId;
+    set => this.mId = value;
+  }
 
-		private bool mHidden;
+  public bool isIncremental => this.mIsIncremental;
 
-		private DateTime mLastModifiedTime;
+  public int currentSteps => this.mCurrentSteps;
 
-		private string mTitle;
+  public int totalSteps => this.mTotalSteps;
 
-		private string mRevealedImageUrl;
+  public double percentCompleted
+  {
+    get => this.mPercentComplete;
+    set => this.mPercentComplete = value;
+  }
 
-		private string mUnlockedImageUrl;
+  public bool completed => this.mCompleted;
 
-		private WWW mImageFetcher;
+  public bool hidden => this.mHidden;
 
-		private Texture2D mImage;
+  public DateTime lastReportedDate => this.mLastModifiedTime;
 
-		private string mDescription;
+  public string title => this.mTitle;
 
-		private ulong mPoints;
+  public Texture2D image => this.LoadImage();
 
-		public string id
-		{
-			get
-			{
-				return mId;
-			}
-			set
-			{
-				mId = value;
-			}
-		}
+  public string achievedDescription => this.mDescription;
 
-		public bool isIncremental => mIsIncremental;
+  public string unachievedDescription => this.mDescription;
 
-		public int currentSteps => mCurrentSteps;
-
-		public int totalSteps => mTotalSteps;
-
-		public double percentCompleted
-		{
-			get
-			{
-				return mPercentComplete;
-			}
-			set
-			{
-				mPercentComplete = value;
-			}
-		}
-
-		public bool completed => mCompleted;
-
-		public bool hidden => mHidden;
-
-		public DateTime lastReportedDate => mLastModifiedTime;
-
-		public string title => mTitle;
-
-		public Texture2D image => LoadImage();
-
-		public string achievedDescription => mDescription;
-
-		public string unachievedDescription => mDescription;
-
-		public int points => (int)mPoints;
-
-		internal PlayGamesAchievement()
-		{
-			PlayGamesPlatform instance = PlayGamesPlatform.Instance;
-			this._002Ector(instance.ReportProgress);
-		}
-
-		internal PlayGamesAchievement(ReportProgress progressCallback)
-		{
-			mId = string.Empty;
-			mLastModifiedTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-			mTitle = string.Empty;
-			mRevealedImageUrl = string.Empty;
-			mUnlockedImageUrl = string.Empty;
-			mDescription = string.Empty;
-			base._002Ector();
-			mProgressCallback = progressCallback;
-		}
-
-		internal PlayGamesAchievement(Achievement ach)
-			: this()
-		{
-			mId = ach.Id;
-			mIsIncremental = ach.IsIncremental;
-			mCurrentSteps = ach.CurrentSteps;
-			mTotalSteps = ach.TotalSteps;
-			if (ach.IsIncremental)
-			{
-				if (ach.TotalSteps > 0)
-				{
-					mPercentComplete = (double)ach.CurrentSteps / (double)ach.TotalSteps * 100.0;
-				}
-				else
-				{
-					mPercentComplete = 0.0;
-				}
-			}
-			else
-			{
-				mPercentComplete = ((!ach.IsUnlocked) ? 0.0 : 100.0);
-			}
-			mCompleted = ach.IsUnlocked;
-			mHidden = !ach.IsRevealed;
-			mLastModifiedTime = ach.LastModifiedTime;
-			mTitle = ach.Name;
-			mDescription = ach.Description;
-			mPoints = ach.Points;
-			mRevealedImageUrl = ach.RevealedImageUrl;
-			mUnlockedImageUrl = ach.UnlockedImageUrl;
-		}
-
-		public void ReportProgress(Action<bool> callback)
-		{
-			mProgressCallback(mId, mPercentComplete, callback);
-		}
-
-		private Texture2D LoadImage()
-		{
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Expected O, but got Unknown
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Expected O, but got Unknown
-			if (hidden)
-			{
-				return null;
-			}
-			string text = (!completed) ? mRevealedImageUrl : mUnlockedImageUrl;
-			if (!string.IsNullOrEmpty(text))
-			{
-				if (mImageFetcher == null || mImageFetcher.get_url() != text)
-				{
-					mImageFetcher = new WWW(text);
-					mImage = null;
-				}
-				if (mImage != null)
-				{
-					return mImage;
-				}
-				if (mImageFetcher.get_isDone())
-				{
-					mImage = mImageFetcher.get_texture();
-					return mImage;
-				}
-			}
-			return null;
-		}
-	}
+  public int points => (int) this.mPoints;
 }

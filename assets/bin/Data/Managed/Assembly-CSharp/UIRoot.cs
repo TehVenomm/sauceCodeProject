@@ -1,264 +1,194 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIRoot
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/Root")]
-public class UIRoot
+public class UIRoot : MonoBehaviour
 {
-	public enum Scaling
-	{
-		Flexible,
-		Constrained,
-		ConstrainedOnMobiles
-	}
+  public static List<UIRoot> list = new List<UIRoot>();
+  public UIRoot.Scaling scalingStyle;
+  public int manualWidth = 1280 /*0x0500*/;
+  public int manualHeight = 720;
+  public int minimumHeight = 320;
+  public int maximumHeight = 1536 /*0x0600*/;
+  public bool fitWidth;
+  public bool fitHeight = true;
+  public bool adjustByDPI;
+  public bool shrinkPortraitUI;
+  private Transform mTrans;
 
-	public enum Constraint
-	{
-		Fit,
-		Fill,
-		FitWidth,
-		FitHeight
-	}
+  public UIRoot.Constraint constraint
+  {
+    get
+    {
+      return this.fitWidth ? (this.fitHeight ? UIRoot.Constraint.Fit : UIRoot.Constraint.FitWidth) : (this.fitHeight ? UIRoot.Constraint.FitHeight : UIRoot.Constraint.Fill);
+    }
+  }
 
-	public static List<UIRoot> list = new List<UIRoot>();
+  public UIRoot.Scaling activeScaling
+  {
+    get
+    {
+      UIRoot.Scaling scalingStyle = this.scalingStyle;
+      return scalingStyle == UIRoot.Scaling.ConstrainedOnMobiles ? UIRoot.Scaling.Constrained : scalingStyle;
+    }
+  }
 
-	public Scaling scalingStyle;
+  public int activeHeight
+  {
+    get
+    {
+      if (this.activeScaling == UIRoot.Scaling.Flexible)
+      {
+        Vector2 screenSize = NGUITools.screenSize;
+        float num = screenSize.x / screenSize.y;
+        if ((double) screenSize.y < (double) this.minimumHeight)
+        {
+          screenSize.y = (float) this.minimumHeight;
+          screenSize.x = screenSize.y * num;
+        }
+        else if ((double) screenSize.y > (double) this.maximumHeight)
+        {
+          screenSize.y = (float) this.maximumHeight;
+          screenSize.x = screenSize.y * num;
+        }
+        int height = Mathf.RoundToInt(!this.shrinkPortraitUI || (double) screenSize.y <= (double) screenSize.x ? screenSize.y : screenSize.y / num);
+        return !this.adjustByDPI ? height : NGUIMath.AdjustByDPI((float) height);
+      }
+      UIRoot.Constraint constraint = this.constraint;
+      if (constraint == UIRoot.Constraint.FitHeight)
+        return this.manualHeight;
+      Vector2 screenSize1 = NGUITools.screenSize;
+      float num1 = screenSize1.x / screenSize1.y;
+      float num2 = (float) this.manualWidth / (float) this.manualHeight;
+      switch (constraint)
+      {
+        case UIRoot.Constraint.Fit:
+          return (double) num2 <= (double) num1 ? this.manualHeight : Mathf.RoundToInt((float) this.manualWidth / num1);
+        case UIRoot.Constraint.Fill:
+          return (double) num2 >= (double) num1 ? this.manualHeight : Mathf.RoundToInt((float) this.manualWidth / num1);
+        case UIRoot.Constraint.FitWidth:
+          return Mathf.RoundToInt((float) this.manualWidth / num1);
+        default:
+          return this.manualHeight;
+      }
+    }
+  }
 
-	public int manualWidth = 1280;
+  public float pixelSizeAdjustment
+  {
+    get
+    {
+      int height = Mathf.RoundToInt(NGUITools.screenSize.y);
+      return height != -1 ? this.GetPixelSizeAdjustment(height) : 1f;
+    }
+  }
 
-	public int manualHeight = 720;
+  public static float GetPixelSizeAdjustment(GameObject go)
+  {
+    UIRoot inParents = NGUITools.FindInParents<UIRoot>(go);
+    return !Object.op_Inequality((Object) inParents, (Object) null) ? 1f : inParents.pixelSizeAdjustment;
+  }
 
-	public int minimumHeight = 320;
+  public float GetPixelSizeAdjustment(int height)
+  {
+    height = Mathf.Max(2, height);
+    if (this.activeScaling == UIRoot.Scaling.Constrained)
+      return (float) this.activeHeight / (float) height;
+    if (height < this.minimumHeight)
+      return (float) this.minimumHeight / (float) height;
+    return height > this.maximumHeight ? (float) this.maximumHeight / (float) height : 1f;
+  }
 
-	public int maximumHeight = 1536;
+  protected virtual void Awake() => this.mTrans = ((Component) this).transform;
 
-	public bool fitWidth;
+  protected virtual void OnEnable() => UIRoot.list.Add(this);
 
-	public bool fitHeight = true;
+  protected virtual void OnDisable() => UIRoot.list.Remove(this);
 
-	public bool adjustByDPI;
+  protected virtual void Start()
+  {
+    UIOrthoCamera componentInChildren = ((Component) this).GetComponentInChildren<UIOrthoCamera>();
+    if (Object.op_Inequality((Object) componentInChildren, (Object) null))
+    {
+      Debug.LogWarning((object) "UIRoot should not be active at the same time as UIOrthoCamera. Disabling UIOrthoCamera.", (Object) componentInChildren);
+      Camera component = ((Component) componentInChildren).gameObject.GetComponent<Camera>();
+      ((Behaviour) componentInChildren).enabled = false;
+      if (!Object.op_Inequality((Object) component, (Object) null))
+        return;
+      component.orthographicSize = 1f;
+    }
+    else
+      this.UpdateScale(false);
+  }
 
-	public bool shrinkPortraitUI;
+  private void Update() => this.UpdateScale();
 
-	private Transform mTrans;
+  public void UpdateScale(bool updateAnchors = true)
+  {
+    if (!Object.op_Inequality((Object) this.mTrans, (Object) null))
+      return;
+    float activeHeight = (float) this.activeHeight;
+    if ((double) activeHeight <= 0.0)
+      return;
+    float num = 2f / activeHeight;
+    Vector3 localScale = this.mTrans.localScale;
+    if ((double) Mathf.Abs(localScale.x - num) <= 1.4012984643248171E-45 && (double) Mathf.Abs(localScale.y - num) <= 1.4012984643248171E-45 && (double) Mathf.Abs(localScale.z - num) <= 1.4012984643248171E-45)
+      return;
+    this.mTrans.localScale = new Vector3(num, num, num);
+    if (!updateAnchors)
+      return;
+    ((Component) this).BroadcastMessage("UpdateAnchors");
+  }
 
-	public Constraint constraint
-	{
-		get
-		{
-			if (fitWidth)
-			{
-				if (fitHeight)
-				{
-					return Constraint.Fit;
-				}
-				return Constraint.FitWidth;
-			}
-			if (fitHeight)
-			{
-				return Constraint.FitHeight;
-			}
-			return Constraint.Fill;
-		}
-	}
+  public static void Broadcast(string funcName)
+  {
+    int index = 0;
+    for (int count = UIRoot.list.Count; index < count; ++index)
+    {
+      UIRoot uiRoot = UIRoot.list[index];
+      if (Object.op_Inequality((Object) uiRoot, (Object) null))
+        ((Component) uiRoot).BroadcastMessage(funcName, (SendMessageOptions) 1);
+    }
+  }
 
-	public Scaling activeScaling
-	{
-		get
-		{
-			Scaling scaling = scalingStyle;
-			if (scaling == Scaling.ConstrainedOnMobiles)
-			{
-				return Scaling.Constrained;
-			}
-			return scaling;
-		}
-	}
+  public static void Broadcast(string funcName, object param)
+  {
+    if (param == null)
+    {
+      Debug.LogError((object) "SendMessage is bugged when you try to pass 'null' in the parameter field. It behaves as if no parameter was specified.");
+    }
+    else
+    {
+      int index = 0;
+      for (int count = UIRoot.list.Count; index < count; ++index)
+      {
+        UIRoot uiRoot = UIRoot.list[index];
+        if (Object.op_Inequality((Object) uiRoot, (Object) null))
+          ((Component) uiRoot).BroadcastMessage(funcName, param, (SendMessageOptions) 1);
+      }
+    }
+  }
 
-	public int activeHeight
-	{
-		get
-		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			if (activeScaling == Scaling.Flexible)
-			{
-				Vector2 screenSize = NGUITools.screenSize;
-				float num = screenSize.x / screenSize.y;
-				if (screenSize.y < (float)minimumHeight)
-				{
-					screenSize.y = (float)minimumHeight;
-					screenSize.x = screenSize.y * num;
-				}
-				else if (screenSize.y > (float)maximumHeight)
-				{
-					screenSize.y = (float)maximumHeight;
-					screenSize.x = screenSize.y * num;
-				}
-				int num2 = Mathf.RoundToInt((!shrinkPortraitUI || !(screenSize.y > screenSize.x)) ? screenSize.y : (screenSize.y / num));
-				return (!adjustByDPI) ? num2 : NGUIMath.AdjustByDPI((float)num2);
-			}
-			Constraint constraint = this.constraint;
-			if (constraint != Constraint.FitHeight)
-			{
-				Vector2 screenSize2 = NGUITools.screenSize;
-				float num3 = screenSize2.x / screenSize2.y;
-				float num4 = (float)manualWidth / (float)manualHeight;
-				switch (constraint)
-				{
-				case Constraint.FitWidth:
-					return Mathf.RoundToInt((float)manualWidth / num3);
-				case Constraint.Fit:
-					return (!(num4 > num3)) ? manualHeight : Mathf.RoundToInt((float)manualWidth / num3);
-				case Constraint.Fill:
-					return (!(num4 < num3)) ? manualHeight : Mathf.RoundToInt((float)manualWidth / num3);
-				default:
-					return manualHeight;
-				}
-			}
-			return manualHeight;
-		}
-	}
+  public enum Scaling
+  {
+    Flexible,
+    Constrained,
+    ConstrainedOnMobiles,
+  }
 
-	public float pixelSizeAdjustment
-	{
-		get
-		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			Vector2 screenSize = NGUITools.screenSize;
-			int num = Mathf.RoundToInt(screenSize.y);
-			return (num != -1) ? GetPixelSizeAdjustment(num) : 1f;
-		}
-	}
-
-	public UIRoot()
-		: this()
-	{
-	}
-
-	public static float GetPixelSizeAdjustment(GameObject go)
-	{
-		UIRoot uIRoot = NGUITools.FindInParents<UIRoot>(go);
-		return (!(uIRoot != null)) ? 1f : uIRoot.pixelSizeAdjustment;
-	}
-
-	public float GetPixelSizeAdjustment(int height)
-	{
-		height = Mathf.Max(2, height);
-		if (activeScaling == Scaling.Constrained)
-		{
-			return (float)activeHeight / (float)height;
-		}
-		if (height < minimumHeight)
-		{
-			return (float)minimumHeight / (float)height;
-		}
-		if (height > maximumHeight)
-		{
-			return (float)maximumHeight / (float)height;
-		}
-		return 1f;
-	}
-
-	protected virtual void Awake()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		mTrans = this.get_transform();
-	}
-
-	protected virtual void OnEnable()
-	{
-		list.Add(this);
-	}
-
-	protected virtual void OnDisable()
-	{
-		list.Remove(this);
-	}
-
-	protected virtual void Start()
-	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		UIOrthoCamera componentInChildren = this.GetComponentInChildren<UIOrthoCamera>();
-		if (componentInChildren != null)
-		{
-			Debug.LogWarning((object)"UIRoot should not be active at the same time as UIOrthoCamera. Disabling UIOrthoCamera.", componentInChildren);
-			Camera component = componentInChildren.get_gameObject().GetComponent<Camera>();
-			componentInChildren.set_enabled(false);
-			if (component != null)
-			{
-				component.set_orthographicSize(1f);
-			}
-		}
-		else
-		{
-			UpdateScale(false);
-		}
-	}
-
-	private void Update()
-	{
-		UpdateScale(true);
-	}
-
-	public void UpdateScale(bool updateAnchors = true)
-	{
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		if (mTrans != null)
-		{
-			float num = (float)activeHeight;
-			if (num > 0f)
-			{
-				float num2 = 2f / num;
-				Vector3 localScale = mTrans.get_localScale();
-				if (!(Mathf.Abs(localScale.x - num2) <= 1.401298E-45f) || !(Mathf.Abs(localScale.y - num2) <= 1.401298E-45f) || !(Mathf.Abs(localScale.z - num2) <= 1.401298E-45f))
-				{
-					mTrans.set_localScale(new Vector3(num2, num2, num2));
-					if (updateAnchors)
-					{
-						this.BroadcastMessage("UpdateAnchors");
-					}
-				}
-			}
-		}
-	}
-
-	public static void Broadcast(string funcName)
-	{
-		int i = 0;
-		for (int count = list.Count; i < count; i++)
-		{
-			UIRoot uIRoot = list[i];
-			if (uIRoot != null)
-			{
-				uIRoot.BroadcastMessage(funcName, 1);
-			}
-		}
-	}
-
-	public static void Broadcast(string funcName, object param)
-	{
-		if (param == null)
-		{
-			Debug.LogError((object)"SendMessage is bugged when you try to pass 'null' in the parameter field. It behaves as if no parameter was specified.");
-		}
-		else
-		{
-			int i = 0;
-			for (int count = list.Count; i < count; i++)
-			{
-				UIRoot uIRoot = list[i];
-				if (uIRoot != null)
-				{
-					uIRoot.BroadcastMessage(funcName, param, 1);
-				}
-			}
-		}
-	}
+  public enum Constraint
+  {
+    Fit,
+    Fill,
+    FitWidth,
+    FitHeight,
+  }
 }

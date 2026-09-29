@@ -1,174 +1,148 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: TheaterStory
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class TheaterStory : GameSection
 {
-	protected enum UI
-	{
-		SCR_LIST,
-		GRD_LIST,
-		STR_STORY_NON_LIST,
-		LBL_CHAPTER_NAME,
-		LBL_STORY_TITLE,
-		OBJ_ACTIVE_ROOT,
-		OBJ_INACTIVE_ROOT,
-		LBL_NOW,
-		LBL_MAX
-	}
+  public const int PAGING = 10;
+  private List<TheaterModeTable.TheaterModeData> m_canViewStoryList;
+  private string m_chapterName = "";
+  private int m_nowPage = 1;
+  private int m_pageMax = 1;
 
-	public const int PAGING = 10;
+  public override string overrideBackKeyEvent => "CLOSE";
 
-	private List<TheaterModeTable.TheaterModeData> m_canViewStoryList;
+  public override void Initialize()
+  {
+    object[] eventData = GameSection.GetEventData() as object[];
+    this.m_canViewStoryList = eventData[0] as List<TheaterModeTable.TheaterModeData>;
+    this.m_chapterName = eventData[1] as string;
+    this.m_canViewStoryList.Sort((Comparison<TheaterModeTable.TheaterModeData>) ((a, b) =>
+    {
+      if (b.order != 0 && a.order != 0)
+        return a.order - b.order;
+      if (b.order != 0)
+        return 1;
+      return a.order != 0 ? -1 : (int) a.story_id - (int) b.story_id;
+    }));
+    this.SetPaging();
+    this.StartCoroutine("DoInitialize");
+  }
 
-	private string m_chapterName = string.Empty;
+  private IEnumerator DoInitialize()
+  {
+    yield return (object) null;
+    base.Initialize();
+  }
 
-	private int m_nowPage = 1;
+  public override void UpdateUI()
+  {
+    EventData[] events = new EventData[4]
+    {
+      new EventData(GameSection.GetGoingHomeEvent(), (object) null),
+      new EventData("MAIN_MENU_MENU", (object) null),
+      new EventData("THEATERMODE", (object) null),
+      new EventData("STORY", (object) new object[2]
+      {
+        (object) this.m_canViewStoryList,
+        (object) this.m_chapterName
+      })
+    };
+    if (this.m_canViewStoryList.Count > 0)
+      this.SetActive(((Component) this).gameObject.transform, (Enum) TheaterStory.UI.STR_STORY_NON_LIST, false);
+    else
+      this.SetActive(((Component) this).gameObject.transform, (Enum) TheaterStory.UI.STR_STORY_NON_LIST, true);
+    this.SetActive(((Component) this).gameObject.transform, (Enum) TheaterStory.UI.LBL_CHAPTER_NAME, true);
+    this.SetLabelText(((Component) this).gameObject.transform, (Enum) TheaterStory.UI.LBL_CHAPTER_NAME, this.m_chapterName);
+    this.SetLabelText((Enum) TheaterStory.UI.LBL_MAX, this.m_pageMax.ToString());
+    this.SetLabelText((Enum) TheaterStory.UI.LBL_NOW, this.m_nowPage.ToString());
+    List<TheaterModeTable.TheaterModeData> dispList = this.m_canViewStoryList;
+    if (this.m_pageMax > 1)
+    {
+      List<TheaterModeTable.TheaterModeData> theaterModeDataList = new List<TheaterModeTable.TheaterModeData>();
+      int index = 0;
+      for (int count = dispList.Count; index < count; ++index)
+      {
+        if (index >= (this.m_nowPage - 1) * 10 && index < this.m_nowPage * 10)
+          theaterModeDataList.Add(dispList[index]);
+      }
+      dispList = theaterModeDataList;
+    }
+    this.SetDynamicList((Enum) TheaterStory.UI.GRD_LIST, "TheaterStoryListItem", dispList.Count, true, (Func<int, bool>) null, (Func<int, Transform, Transform>) null, (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+    {
+      this.SetActive(t, (Enum) TheaterStory.UI.LBL_STORY_TITLE, true);
+      this.SetLabelText(t, (Enum) TheaterStory.UI.LBL_STORY_TITLE, dispList[i].title);
+      this.SetEvent(t, "PLAY_STORY", (object) new object[4]
+      {
+        (object) dispList[i].script_id,
+        (object) 0,
+        (object) 0,
+        (object) events
+      });
+    }));
+  }
 
-	private int m_pageMax = 1;
+  private void OnApplicationPause(bool pause)
+  {
+    if (pause)
+      return;
+    this.RefreshUI();
+  }
 
-	public override string overrideBackKeyEvent => "CLOSE";
+  private void OnQuery_PLAY_STORY()
+  {
+  }
 
-	public override void Initialize()
-	{
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		object[] array = GameSection.GetEventData() as object[];
-		m_canViewStoryList = (array[0] as List<TheaterModeTable.TheaterModeData>);
-		m_chapterName = (array[1] as string);
-		m_canViewStoryList.Sort(delegate(TheaterModeTable.TheaterModeData a, TheaterModeTable.TheaterModeData b)
-		{
-			if (b.order != 0 && a.order != 0)
-			{
-				return a.order - b.order;
-			}
-			if (b.order != 0)
-			{
-				return 1;
-			}
-			if (a.order != 0)
-			{
-				return -1;
-			}
-			return (int)(a.story_id - b.story_id);
-		});
-		SetPaging();
-		this.StartCoroutine("DoInitialize");
-	}
+  private void OnQuery_PAGE_PREV()
+  {
+    this.m_nowPage = this.m_nowPage > 1 ? this.m_nowPage - 1 : this.m_pageMax;
+    this.RefreshUI();
+  }
 
-	private IEnumerator DoInitialize()
-	{
-		yield return (object)null;
-		base.Initialize();
-	}
+  private void OnQuery_PAGE_NEXT()
+  {
+    this.m_nowPage = this.m_nowPage < this.m_pageMax ? this.m_nowPage + 1 : 1;
+    this.RefreshUI();
+  }
 
-	public override void UpdateUI()
-	{
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Expected O, but got Unknown
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Expected O, but got Unknown
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Expected O, but got Unknown
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Expected O, but got Unknown
-		string name = (!MonoBehaviourSingleton<LoungeMatchingManager>.I.IsInLounge()) ? "MAIN_MENU_HOME" : "MAIN_MENU_LOUNGE";
-		EventData[] events = new EventData[4]
-		{
-			new EventData(name, null),
-			new EventData("MAIN_MENU_MENU", null),
-			new EventData("THEATERMODE", null),
-			new EventData("STORY", new object[2]
-			{
-				m_canViewStoryList,
-				m_chapterName
-			})
-		};
-		if (m_canViewStoryList.Count > 0)
-		{
-			SetActive(this.get_gameObject().get_transform(), UI.STR_STORY_NON_LIST, false);
-		}
-		else
-		{
-			SetActive(this.get_gameObject().get_transform(), UI.STR_STORY_NON_LIST, true);
-		}
-		SetActive(this.get_gameObject().get_transform(), UI.LBL_CHAPTER_NAME, true);
-		SetLabelText(this.get_gameObject().get_transform(), UI.LBL_CHAPTER_NAME, m_chapterName);
-		SetLabelText((Enum)UI.LBL_MAX, m_pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, m_nowPage.ToString());
-		List<TheaterModeTable.TheaterModeData> dispList = m_canViewStoryList;
-		if (m_pageMax > 1)
-		{
-			List<TheaterModeTable.TheaterModeData> list = new List<TheaterModeTable.TheaterModeData>();
-			int j = 0;
-			for (int count = dispList.Count; j < count; j++)
-			{
-				if (j >= (m_nowPage - 1) * 10 && j < m_nowPage * 10)
-				{
-					list.Add(dispList[j]);
-				}
-			}
-			dispList = list;
-		}
-		SetDynamicList((Enum)UI.GRD_LIST, "TheaterStoryListItem", dispList.Count, true, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
-		{
-			SetActive(t, UI.LBL_STORY_TITLE, true);
-			SetLabelText(t, UI.LBL_STORY_TITLE, dispList[i].title);
-			SetEvent(t, "PLAY_STORY", new object[4]
-			{
-				dispList[i].script_id,
-				0,
-				0,
-				events
-			});
-		});
-	}
+  private void SetPaging()
+  {
+    this.m_nowPage = 1;
+    List<TheaterModeTable.TheaterModeData> canViewStoryList = this.m_canViewStoryList;
+    if (canViewStoryList.Count <= 10)
+    {
+      this.SetActive((Enum) TheaterStory.UI.OBJ_ACTIVE_ROOT, false);
+      this.SetActive((Enum) TheaterStory.UI.OBJ_INACTIVE_ROOT, true);
+      this.m_pageMax = 1;
+    }
+    else
+    {
+      this.SetActive((Enum) TheaterStory.UI.OBJ_ACTIVE_ROOT, true);
+      this.SetActive((Enum) TheaterStory.UI.OBJ_INACTIVE_ROOT, false);
+      this.m_pageMax = canViewStoryList.Count / 10 + 1;
+    }
+    this.SetLabelText((Enum) TheaterStory.UI.LBL_MAX, this.m_pageMax.ToString());
+    this.SetLabelText((Enum) TheaterStory.UI.LBL_NOW, this.m_nowPage.ToString());
+  }
 
-	private void OnApplicationPause(bool pause)
-	{
-		if (!pause)
-		{
-			RefreshUI();
-		}
-	}
-
-	private void OnQuery_PLAY_STORY()
-	{
-	}
-
-	private void OnQuery_PAGE_PREV()
-	{
-		m_nowPage = ((m_nowPage <= 1) ? m_pageMax : (m_nowPage - 1));
-		RefreshUI();
-	}
-
-	private void OnQuery_PAGE_NEXT()
-	{
-		m_nowPage = ((m_nowPage >= m_pageMax) ? 1 : (m_nowPage + 1));
-		RefreshUI();
-	}
-
-	private void SetPaging()
-	{
-		m_nowPage = 1;
-		List<TheaterModeTable.TheaterModeData> canViewStoryList = m_canViewStoryList;
-		if (canViewStoryList.Count <= 10)
-		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, false);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, true);
-			m_pageMax = 1;
-		}
-		else
-		{
-			SetActive((Enum)UI.OBJ_ACTIVE_ROOT, true);
-			SetActive((Enum)UI.OBJ_INACTIVE_ROOT, false);
-			m_pageMax = canViewStoryList.Count / 10 + 1;
-		}
-		SetLabelText((Enum)UI.LBL_MAX, m_pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, m_nowPage.ToString());
-	}
+  protected enum UI
+  {
+    SCR_LIST,
+    GRD_LIST,
+    STR_STORY_NON_LIST,
+    LBL_CHAPTER_NAME,
+    LBL_STORY_TITLE,
+    OBJ_ACTIVE_ROOT,
+    OBJ_INACTIVE_ROOT,
+    LBL_NOW,
+    LBL_MAX,
+  }
 }

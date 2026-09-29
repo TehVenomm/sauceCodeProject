@@ -1,163 +1,109 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: HomeNPCCharacter
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using UnityEngine;
 
+#nullable disable
 public class HomeNPCCharacter : HomeCharacterBase
 {
-	private const float LoungeBorudonScaleRate = 1.3f;
+  private NPCTable.NPCData npcData;
+  private const float LoungeBorudonScaleRate = 1.3f;
 
-	private NPCTable.NPCData npcData;
+  public OutGameSettingsManager.HomeScene.NPC npcInfo { get; private set; }
 
-	public OutGameSettingsManager.HomeScene.NPC npcInfo
-	{
-		get;
-		private set;
-	}
+  public PLCA nearAnim { get; private set; }
 
-	public PLCA nearAnim
-	{
-		get;
-		private set;
-	}
+  public void SetNPCInfo(OutGameSettingsManager.HomeScene.NPC npcInfo) => this.npcInfo = npcInfo;
 
-	public void SetNPCInfo(OutGameSettingsManager.HomeScene.NPC npcInfo)
-	{
-		this.npcInfo = npcInfo;
-	}
+  public void SetNPCData(NPCTable.NPCData data) => this.npcData = data;
 
-	public void SetNPCData(NPCTable.NPCData data)
-	{
-		npcData = data;
-	}
+  protected override ModelLoaderBase LoadModel()
+  {
+    bool useSpecialModel = false;
+    HomeThemeTable.HomeThemeData homeThemeData = Singleton<HomeThemeTable>.I.GetHomeThemeData(Singleton<HomeThemeTable>.I.CurrentHomeTheme);
+    if (homeThemeData != null && (this.npcData.specialModelID > 0 || homeThemeData.name != "NORMAL"))
+      useSpecialModel = true;
+    return this.npcData.LoadModel(((Component) this).gameObject, true, true, (Action<Animator>) null, useSpecialModel);
+  }
 
-	protected override ModelLoaderBase LoadModel()
-	{
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Expected O, but got Unknown
-		bool useSpecialModel = false;
-		HomeThemeTable.HomeThemeData homeThemeData = Singleton<HomeThemeTable>.I.GetHomeThemeData(Singleton<HomeThemeTable>.I.CurrentHomeTheme);
-		if (homeThemeData != null && (npcData.specialModelID > 0 || homeThemeData.name != "NORMAL"))
-		{
-			useSpecialModel = true;
-		}
-		return npcData.LoadModel(this.get_gameObject(), true, true, null, useSpecialModel);
-	}
+  protected override void InitCollider()
+  {
+    if (!string.IsNullOrEmpty(this.npcInfo.eventName))
+      base.InitCollider();
+    else
+      this.SetCollider(0.3f, 0.1f);
+  }
 
-	protected override void InitCollider()
-	{
-		if (!string.IsNullOrEmpty(npcInfo.eventName))
-		{
-			base.InitCollider();
-		}
-		else
-		{
-			SetCollider(0.3f, 0.1f);
-		}
-	}
+  protected override void ChangeScale()
+  {
+    if (!MonoBehaviourSingleton<LoungeManager>.IsValid() || this.npcInfo.npcID != 4)
+      return;
+    Vector3 localScale = ((Component) this).transform.localScale;
+    float num = 1.3f;
+    ((Component) this).transform.localScale = new Vector3(localScale.x * num, localScale.y * num, localScale.z * num);
+  }
 
-	protected override void ChangeScale()
-	{
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<LoungeManager>.IsValid() && npcInfo.npcID == 4)
-		{
-			Vector3 localScale = this.get_transform().get_localScale();
-			float num = 1.3f;
-			this.get_transform().set_localScale(new Vector3(localScale.x * num, localScale.y * num, localScale.z * num));
-		}
-	}
+  protected override void InitAnim()
+  {
+    PLCA default_anim = PLCA.IDLE_01;
+    string loopAnim = this.npcInfo.GetLoopAnim();
+    if (!string.IsNullOrEmpty(loopAnim))
+      default_anim = PlayerAnimCtrl.StringToEnum(loopAnim);
+    this.animCtrl = PlayerAnimCtrl.Get(this.animator, default_anim, new Action<PlayerAnimCtrl, PLCA>(((HomeCharacterBase) this).OnAnimPlay), on_end: new Action<PlayerAnimCtrl, PLCA>(((HomeCharacterBase) this).OnAnimEnd));
+    string nearAnim = this.npcInfo.GetNearAnim();
+    if (!string.IsNullOrEmpty(nearAnim))
+      this.nearAnim = PlayerAnimCtrl.StringToEnum(nearAnim);
+    else
+      this.nearAnim = PLCA.IDLE_01;
+  }
 
-	protected override void InitAnim()
-	{
-		PLCA default_anim = PLCA.IDLE_01;
-		string loopAnim = npcInfo.GetLoopAnim();
-		if (!string.IsNullOrEmpty(loopAnim))
-		{
-			default_anim = PlayerAnimCtrl.StringToEnum(loopAnim);
-		}
-		animCtrl = PlayerAnimCtrl.Get(animator, default_anim, OnAnimPlay, null, base.OnAnimEnd);
-		string nearAnim = npcInfo.GetNearAnim();
-		if (!string.IsNullOrEmpty(nearAnim))
-		{
-			this.nearAnim = PlayerAnimCtrl.StringToEnum(nearAnim);
-		}
-		else
-		{
-			this.nearAnim = PLCA.IDLE_01;
-		}
-	}
+  public void Play(PLCA anim, bool instant)
+  {
+    if (Object.op_Equality((Object) this.animCtrl, (Object) null))
+      this.InitAnim();
+    this.animCtrl.Play(anim, instant);
+  }
 
-	public void Play(PLCA anim, bool instant)
-	{
-		if (animCtrl == null)
-		{
-			InitAnim();
-		}
-		animCtrl.Play(anim, instant);
-	}
+  public override bool DispatchEvent()
+  {
+    if (!TutorialStep.HasAllTutorialCompleted() || MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() || Object.op_Inequality((Object) TutorialMessage.GetCursor(), (Object) null) || HomeBase.OnAfterGacha2Tutorial || this.state != HomeCharacterBase.STATE.FREE || this.npcInfo == null || string.IsNullOrEmpty(this.npcInfo.eventName))
+      return false;
+    MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent(nameof (HomeNPCCharacter), ((Component) this).gameObject, this.npcInfo.eventName);
+    return true;
+  }
 
-	public override bool DispatchEvent()
-	{
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Expected O, but got Unknown
-		if (!TutorialStep.HasAllTutorialCompleted() || MonoBehaviourSingleton<UIManager>.I.IsEnableTutorialMessage() || TutorialMessage.GetCursor(0) != null)
-		{
-			return false;
-		}
-		if (HomeBase.OnAfterGacha2Tutorial)
-		{
-			return false;
-		}
-		if (state == STATE.FREE && npcInfo != null && !string.IsNullOrEmpty(npcInfo.eventName))
-		{
-			MonoBehaviourSingleton<GameSceneManager>.I.ExecuteSceneEvent("HomeNPCCharacter", this.get_gameObject(), npcInfo.eventName, null, null, true);
-			return true;
-		}
-		return false;
-	}
+  public void SetQuestBalloon(Transform t)
+  {
+    ((Object) t).name = HomeBase.QuestBalloonName;
+    this.namePlate = t;
+  }
 
-	public void SetQuestBalloon(Transform t)
-	{
-		t.set_name(HomeBase.QuestBalloonName);
-		namePlate = t;
-	}
+  protected override bool IsVisibleNamePlate()
+  {
+    return this.state == HomeCharacterBase.STATE.FREE && base.IsVisibleNamePlate();
+  }
 
-	protected override bool IsVisibleNamePlate()
-	{
-		if (state != 0)
-		{
-			return false;
-		}
-		return base.IsVisibleNamePlate();
-	}
+  public bool IsLeaveState() => this.state == HomeCharacterBase.STATE.LEAVE;
 
-	public bool IsLeaveState()
-	{
-		return state == STATE.LEAVE;
-	}
-
-	public void HideShadow()
-	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Expected O, but got Unknown
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		NPCLoader nPCLoader = base.loader as NPCLoader;
-		if (Object.op_Implicit(nPCLoader))
-		{
-			if (Object.op_Implicit(nPCLoader.shadow))
-			{
-				nPCLoader.shadow.get_gameObject().SetActive(false);
-			}
-		}
-		else
-		{
-			Transform val = base._transform.Find("CircleShadow");
-			if (null != val)
-			{
-				val.get_gameObject().SetActive(false);
-			}
-		}
-	}
+  public void HideShadow()
+  {
+    NPCLoader loader = this.loader as NPCLoader;
+    if (Object.op_Implicit((Object) loader))
+    {
+      if (!Object.op_Implicit((Object) loader.shadow))
+        return;
+      ((Component) loader.shadow).gameObject.SetActive(false);
+    }
+    else
+    {
+      Transform transform = this._transform.Find("CircleShadow");
+      if (!Object.op_Inequality((Object) null, (Object) transform))
+        return;
+      ((Component) transform).gameObject.SetActive(false);
+    }
+  }
 }

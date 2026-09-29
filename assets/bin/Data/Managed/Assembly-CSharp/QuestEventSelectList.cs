@@ -1,601 +1,610 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestEventSelectList
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class QuestEventSelectList : QuestSpecialSelect
 {
-	protected new enum UI
-	{
-		TEX_EVENT_BG,
-		BTN_INFO,
-		TGL_BUTTON_ROOT,
-		SPR_DELIVERY_BTN_SELECTED,
-		OBJ_DELIVERY_ROOT,
-		TEX_NPCMODEL,
-		LBL_NPC_MESSAGE,
-		GRD_DELIVERY_QUEST,
-		TBL_DELIVERY_QUEST,
-		STR_DELIVERY_NON_LIST,
-		OBJ_REQUEST_COMPLETED,
-		LBL_LOCATION_NAME,
-		LBL_LOCATION_NAME_EFFECT,
-		WGT_LOCATION_NAME_LIMIT,
-		SCR_DELIVERY_QUEST,
-		OBJ_IMAGE,
-		BTN_EVENT,
-		OBJ_FRAME,
-		SPR_BG_FRAME,
-		LBL_STORY_TITLE,
-		OBJ_ACTIVE_ROOT,
-		OBJ_INACTIVE_ROOT,
-		LBL_MAX,
-		LBL_NOW
-	}
+  protected Network.EventData eventData;
+  protected List<DeliveryTable.DeliveryData> clearedDeliveries;
+  protected List<QuestEventSelectList.Story> stories = new List<QuestEventSelectList.Story>();
+  protected UIBehaviour.LabelWidthLimitter title;
+  protected UIBehaviour.LabelWidthLimitter titleEffect;
+  protected Transform mapItem;
+  protected bool isResetUI;
+  protected int nowPage = 1;
+  protected int pageMax = 1;
 
-	protected class Story
-	{
-		public int id;
+  protected virtual bool showStory => true;
 
-		public string title;
+  protected virtual bool showMap => true;
 
-		public Story(int id, string title)
-		{
-			this.id = id;
-			this.title = title;
-		}
-	}
+  public override void Initialize()
+  {
+    this.eventData = GameSection.GetEventData() as Network.EventData;
+    this.SkipTween((Enum) QuestEventSelectList.UI.SPR_DELIVERY_BTN_SELECTED);
+    this.SetActive((Enum) QuestEventSelectList.UI.OBJ_DELIVERY_ROOT, true);
+    int width = this.GetWidth((Enum) QuestEventSelectList.UI.WGT_LOCATION_NAME_LIMIT);
+    this.title = new UIBehaviour.LabelWidthLimitter(((Component) this.GetCtrl((Enum) QuestEventSelectList.UI.LBL_LOCATION_NAME)).GetComponent<UILabel>(), width, false);
+    this.titleEffect = new UIBehaviour.LabelWidthLimitter(((Component) this.GetCtrl((Enum) QuestEventSelectList.UI.LBL_LOCATION_NAME_EFFECT)).GetComponent<UILabel>(), width, true);
+    base.Initialize();
+  }
 
-	public class ShowDeliveryData
-	{
-		public int index = -1;
+  protected override IEnumerator DoInitialize()
+  {
+    string eventBg = ResourceName.GetEventBG(this.eventData.bannerId);
+    Hash128 hash128 = new Hash128();
+    if (Object.op_Inequality((Object) MonoBehaviourSingleton<ResourceManager>.I.event_manifest, (Object) null))
+      hash128 = MonoBehaviourSingleton<ResourceManager>.I.event_manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(eventBg));
+    if (Object.op_Equality((Object) MonoBehaviourSingleton<ResourceManager>.I.event_manifest, (Object) null) || ((Hash128) ref hash128).isValid)
+    {
+      LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+      LoadObject lo_bg = loadingQueue.Load(true, RESOURCE_CATEGORY.EVENT_BG, eventBg);
+      LoadObject lo_item = (LoadObject) null;
+      if (this.ShouldShowEventMapButton())
+        lo_item = loadingQueue.Load(RESOURCE_CATEGORY.QUEST_ITEM, "QEM_10000000");
+      if (loadingQueue.IsLoading())
+        yield return (object) loadingQueue.Wait();
+      this.SetTexture((Enum) QuestEventSelectList.UI.TEX_EVENT_BG, (Texture) (lo_bg.loadedObject as Texture2D));
+      if (lo_item != null && Object.op_Inequality((Object) null, lo_item.loadedObject))
+        this.mapItem = (lo_item.loadedObject as GameObject).transform;
+      lo_bg = (LoadObject) null;
+      lo_item = (LoadObject) null;
+    }
+    this.GetDeliveryList();
+    this.EndInitialize();
+  }
 
-		public bool isCompleted;
+  public override void Exit() => base.Exit();
 
-		public DeliveryTable.DeliveryData data;
+  protected override void OnOpen()
+  {
+    this.StartCoroutine(this.InitScroll());
+    base.OnOpen();
+  }
 
-		public ShowDeliveryData(int i, bool isComp, DeliveryTable.DeliveryData d)
-		{
-			index = i;
-			isCompleted = isComp;
-			data = d;
-		}
+  protected override void RemoveRecommend()
+  {
+  }
 
-		public ShowDeliveryData(int i, bool isComp, Delivery d)
-		{
-			index = i;
-			isCompleted = isComp;
-			data = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)d.dId);
-		}
-	}
+  private IEnumerator InitScroll()
+  {
+    UIScrollView scroll = this.GetComponent<UIScrollView>((Enum) QuestEventSelectList.UI.SCR_DELIVERY_QUEST);
+    while (this.state != UIBehaviour.STATE.OPEN)
+      yield return (object) null;
+    ((Behaviour) scroll).enabled = scroll.shouldMoveVertically;
+    this.RepositionTable();
+  }
 
-	protected Network.EventData eventData;
+  protected virtual bool ShouldShowEventMapButton()
+  {
+    return this.showMap && Array.Find<RegionTable.Data>(Singleton<RegionTable>.I.GetData(), (Predicate<RegionTable.Data>) (o => o.eventId == this.eventData.eventId)) != null;
+  }
 
-	protected List<DeliveryTable.DeliveryData> clearedDeliveries;
+  protected override bool IsVisibleDelivery(Delivery delivery, DeliveryTable.DeliveryData tableData)
+  {
+    return this.eventData != null && tableData.IsEvent() && tableData.eventID == this.eventData.eventId;
+  }
 
-	protected List<Story> stories = new List<Story>();
+  protected void RepositionTable()
+  {
+    UITable component = this.GetComponent<UITable>((Enum) QuestEventSelectList.UI.TBL_DELIVERY_QUEST);
+    if (!Object.op_Implicit((Object) component))
+      return;
+    component.Reposition();
+    List<Transform> childList = component.GetChildList();
+    int index = 0;
+    for (int count = childList.Count; index < count; ++index)
+    {
+      Vector3 localPosition = childList[index].localPosition;
+      localPosition.x = 0.0f;
+      childList[index].localPosition = localPosition;
+    }
+  }
 
-	protected LabelWidthLimitter title;
+  protected bool HasChapterStory() => this.GetChapterId() > 0;
 
-	protected LabelWidthLimitter titleEffect;
+  protected int GetChapterId()
+  {
+    if (!MonoBehaviourSingleton<TheaterModeTable>.IsValid() || this.stories == null || this.stories.Count < 1)
+      return -1;
+    int chapterId = -1;
+    MonoBehaviourSingleton<TheaterModeTable>.I.AllTheaterData((Action<TheaterModeTable.TheaterModeData>) (data =>
+    {
+      int index = 0;
+      for (int count = this.stories.Count; index < count; ++index)
+      {
+        if (data.script_id == this.stories[index].id)
+          chapterId = data.chapter_id;
+      }
+    }));
+    return chapterId;
+  }
 
-	protected Transform mapItem;
+  public override void UpdateUI()
+  {
+    this.SetLabelText((Enum) QuestEventSelectList.UI.LBL_LOCATION_NAME, this.eventData.name);
+    this.SetLabelText((Enum) QuestEventSelectList.UI.LBL_LOCATION_NAME_EFFECT, this.eventData.name);
+    this.SetActive((Enum) QuestEventSelectList.UI.BTN_INFO, !string.IsNullOrEmpty(this.eventData.linkName));
+    this.title.Update();
+    this.titleEffect.Update();
+    this.stories.Clear();
+    if (this.eventData.prologueStoryId > 0)
+      this.stories.Add(new QuestEventSelectList.Story(this.eventData.prologueStoryId, this.eventData.prologueTitle));
+    if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSceneName() != "InGameScene")
+      this.SetActive((Enum) QuestEventSelectList.UI.BTN_FISHING_RECORD, this.eventData.subButtonType == 1);
+    this.clearedDeliveries = this.CreateClearedDliveryList();
+    this.UpdateList();
+    this.UpdateAnchors();
+    this.isResetUI = false;
+  }
 
-	protected bool isResetUI;
+  protected virtual List<DeliveryTable.DeliveryData> CreateClearedDliveryList()
+  {
+    List<DeliveryTable.DeliveryData> clearedDliveryList = new List<DeliveryTable.DeliveryData>();
+    List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
+    int index = 0;
+    for (int count = clearStatusDelivery.Count; index < count; ++index)
+    {
+      ClearStatusDelivery d = clearStatusDelivery[index];
+      if (d.deliveryStatus == 3)
+      {
+        DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint) d.deliveryId);
+        if (deliveryTableData.eventID == this.eventData.eventId && !Array.Exists<Delivery>(this.deliveryInfo, (Predicate<Delivery>) (x => x.dId == d.deliveryId)))
+        {
+          clearedDliveryList.Add(deliveryTableData);
+          if (deliveryTableData.clearEventID > 0U)
+          {
+            string title = deliveryTableData.clearEventTitle;
+            if (string.IsNullOrEmpty(title))
+              title = deliveryTableData.name;
+            this.stories.Add(new QuestEventSelectList.Story((int) deliveryTableData.clearEventID, title));
+          }
+        }
+      }
+    }
+    return clearedDliveryList;
+  }
 
-	protected int nowPage = 1;
+  protected void UpdateList()
+  {
+    if (Object.op_Implicit((Object) this.GetCtrl((Enum) QuestEventSelectList.UI.TBL_DELIVERY_QUEST)))
+      this.UpdateTable();
+    else
+      this.UpdateGrid();
+  }
 
-	protected int pageMax = 1;
+  protected virtual void UpdateTable()
+  {
+    int num1 = 0;
+    if (this.stories.Count > 0)
+      ++num1;
+    List<QuestEventSelectList.ShowDeliveryData> showDeliveryDataList = new List<QuestEventSelectList.ShowDeliveryData>();
+    if (this.deliveryInfo != null)
+    {
+      for (int i = 0; i < this.deliveryInfo.Length; ++i)
+      {
+        QuestEventSelectList.ShowDeliveryData showDeliveryData = new QuestEventSelectList.ShowDeliveryData(i, false, this.deliveryInfo[i]);
+        showDeliveryDataList.Add(showDeliveryData);
+      }
+    }
+    if (this.clearedDeliveries != null)
+    {
+      for (int index = 0; index < this.clearedDeliveries.Count; ++index)
+      {
+        QuestEventSelectList.ShowDeliveryData showDeliveryData = new QuestEventSelectList.ShowDeliveryData(index, true, this.clearedDeliveries[index]);
+        showDeliveryDataList.Add(showDeliveryData);
+      }
+    }
+    this.pageMax = 1 + (showDeliveryDataList.Count - 1) / 10;
+    bool is_visible = this.pageMax > 1;
+    this.SetActive((Enum) QuestEventSelectList.UI.OBJ_ACTIVE_ROOT, is_visible);
+    this.SetActive((Enum) QuestEventSelectList.UI.OBJ_INACTIVE_ROOT, !is_visible);
+    this.SetLabelText((Enum) QuestEventSelectList.UI.LBL_MAX, this.pageMax.ToString());
+    this.SetLabelText((Enum) QuestEventSelectList.UI.LBL_NOW, this.nowPage.ToString());
+    QuestEventSelectList.ShowDeliveryData[] showList = this.GetPagingList<QuestEventSelectList.ShowDeliveryData>(showDeliveryDataList.ToArray(), 10, this.nowPage);
+    int length = showList.Length;
+    if (this.showStory)
+      length += num1 + this.stories.Count;
+    if (length == 0)
+    {
+      this.SetActive((Enum) QuestEventSelectList.UI.STR_DELIVERY_NON_LIST, true);
+      this.SetActive((Enum) QuestEventSelectList.UI.GRD_DELIVERY_QUEST, false);
+      this.SetActive((Enum) QuestEventSelectList.UI.TBL_DELIVERY_QUEST, false);
+    }
+    else
+    {
+      this.SetActive((Enum) QuestEventSelectList.UI.STR_DELIVERY_NON_LIST, false);
+      this.SetActive((Enum) QuestEventSelectList.UI.GRD_DELIVERY_QUEST, false);
+      this.SetActive((Enum) QuestEventSelectList.UI.TBL_DELIVERY_QUEST, true);
+      bool flag = false;
+      if (this.ShouldShowEventMapButton())
+      {
+        flag = true;
+        ++length;
+      }
+      int questStartIndex = 0;
+      if (flag)
+        ++questStartIndex;
+      int borderIndex = questStartIndex + showList.Length;
+      int storyStartIndex = borderIndex;
+      if (this.stories.Count > 0)
+        ++storyStartIndex;
+      Transform ctrl = this.GetCtrl((Enum) QuestEventSelectList.UI.TBL_DELIVERY_QUEST);
+      if (Object.op_Implicit((Object) ctrl))
+      {
+        int num2 = 0;
+        for (int childCount = ctrl.childCount; num2 < childCount; ++num2)
+        {
+          Transform child = ctrl.GetChild(0);
+          child.parent = (Transform) null;
+          Object.Destroy((Object) ((Component) child).gameObject);
+        }
+      }
+      bool isRenewalFlag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
+      this.SetTable((Enum) QuestEventSelectList.UI.TBL_DELIVERY_QUEST, "", length, this.isResetUI, (Func<int, Transform, Transform>) ((i, parent) =>
+      {
+        if (i < storyStartIndex)
+          return i < borderIndex ? (i < questStartIndex ? (!Object.op_Inequality((Object) null, (Object) this.mapItem) ? this.Realizes("QuestEventBorderItem", parent) : ResourceUtility.Realizes((Object) ((Component) this.mapItem).gameObject, parent)) : this.Realizes("QuestRequestItem", parent)) : this.Realizes("QuestEventBorderItem", parent);
+        return !this.HasChapterStory() || i == storyStartIndex || !isRenewalFlag ? this.Realizes("QuestEventStoryItem", parent) : (Transform) null;
+      }), (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+      {
+        if (Object.op_Equality((Object) t, (Object) null))
+          return;
+        this.SetActive(t, true);
+        if (i >= storyStartIndex)
+        {
+          this.InitStory(i - storyStartIndex, t);
+        }
+        else
+        {
+          if (i >= borderIndex && i < storyStartIndex)
+            return;
+          if (i >= questStartIndex && i < borderIndex)
+          {
+            this.InitDelivery(showList[i - questStartIndex], t);
+            this.ChangeDeliveryFrameSprite(t);
+          }
+          else
+          {
+            if (i >= questStartIndex)
+              return;
+            this.InitMap(t);
+          }
+        }
+      }));
+      ((Behaviour) this.GetComponent<UIScrollView>((Enum) QuestEventSelectList.UI.SCR_DELIVERY_QUEST)).enabled = true;
+      this.RepositionTable();
+    }
+  }
 
-	protected virtual bool showStory => true;
+  protected virtual void ChangeDeliveryFrameSprite(Transform parent)
+  {
+  }
 
-	protected virtual bool showMap => true;
+  protected virtual void UpdateGrid()
+  {
+    List<QuestEventSelectList.ShowDeliveryData> showDeliveryDataList = new List<QuestEventSelectList.ShowDeliveryData>();
+    if (this.deliveryInfo != null)
+    {
+      for (int i = 0; i < this.deliveryInfo.Length; ++i)
+      {
+        QuestEventSelectList.ShowDeliveryData showDeliveryData = new QuestEventSelectList.ShowDeliveryData(i, false, this.deliveryInfo[i]);
+        showDeliveryDataList.Add(showDeliveryData);
+      }
+    }
+    if (this.clearedDeliveries != null)
+    {
+      for (int index = 0; index < this.clearedDeliveries.Count; ++index)
+      {
+        QuestEventSelectList.ShowDeliveryData showDeliveryData = new QuestEventSelectList.ShowDeliveryData(index, true, this.clearedDeliveries[index]);
+        showDeliveryDataList.Add(showDeliveryData);
+      }
+    }
+    this.pageMax = 1 + (showDeliveryDataList.Count - 1) / 10;
+    bool is_visible = this.pageMax > 1;
+    this.SetActive((Enum) QuestEventSelectList.UI.OBJ_ACTIVE_ROOT, is_visible);
+    this.SetActive((Enum) QuestEventSelectList.UI.OBJ_INACTIVE_ROOT, !is_visible);
+    this.SetLabelText((Enum) QuestEventSelectList.UI.LBL_MAX, this.pageMax.ToString());
+    this.SetLabelText((Enum) QuestEventSelectList.UI.LBL_NOW, this.nowPage.ToString());
+    QuestEventSelectList.ShowDeliveryData[] showList = this.GetPagingList<QuestEventSelectList.ShowDeliveryData>(showDeliveryDataList.ToArray(), 10, this.nowPage);
+    if (showDeliveryDataList.Count == 0)
+    {
+      this.SetActive((Enum) QuestEventSelectList.UI.STR_DELIVERY_NON_LIST, true);
+      this.SetActive((Enum) QuestEventSelectList.UI.GRD_DELIVERY_QUEST, false);
+    }
+    else
+    {
+      this.SetActive((Enum) QuestEventSelectList.UI.STR_DELIVERY_NON_LIST, false);
+      this.SetActive((Enum) QuestEventSelectList.UI.GRD_DELIVERY_QUEST, true);
+      this.SetDynamicList((Enum) QuestEventSelectList.UI.GRD_DELIVERY_QUEST, "QuestRequestItem", showList.Length, this.isResetUI, (Func<int, bool>) null, (Func<int, Transform, Transform>) null, (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+      {
+        this.SetActive(t, true);
+        if (showList[i].data.subType == DELIVERY_SUB_TYPE.ASSIGNED_EQUIPMENT)
+          this.SetEvent(t, "COMPLETED_ASSIGNED_EQUIPMENT", showList[i].index);
+        else if (!showList[i].isCompleted)
+          this.SetEvent(t, "SELECT_DELIVERY", showList[i].index);
+        else
+          this.SetEvent(t, "SELECT_COMPLETED_DELIVERY", showList[i].index);
+        this.SetupDeliveryListItem(t, showList[i].data);
+        if (!showList[i].isCompleted)
+          return;
+        this.SetActive(t, (Enum) QuestEventSelectList.UI.OBJ_REQUEST_COMPLETED, true);
+      }));
+    }
+  }
 
-	public override void Initialize()
-	{
-		eventData = (GameSection.GetEventData() as Network.EventData);
-		SkipTween((Enum)UI.SPR_DELIVERY_BTN_SELECTED, true, 0);
-		SetActive((Enum)UI.OBJ_DELIVERY_ROOT, true);
-		int width = GetWidth(UI.WGT_LOCATION_NAME_LIMIT);
-		title = new LabelWidthLimitter(GetCtrl(UI.LBL_LOCATION_NAME).GetComponent<UILabel>(), width, false);
-		titleEffect = new LabelWidthLimitter(GetCtrl(UI.LBL_LOCATION_NAME_EFFECT).GetComponent<UILabel>(), width, true);
-		base.Initialize();
-	}
+  protected void InitDelivery(QuestEventSelectList.ShowDeliveryData showData, Transform t)
+  {
+    if (showData.isCompleted)
+    {
+      bool flag = false;
+      if (showData.data != null)
+      {
+        QuestTable.QuestTableData questData = showData.data.GetQuestData();
+        if (questData != null && questData.questType == QUEST_TYPE.HAPPEN)
+          flag = true;
+      }
+      if (flag)
+        this.SetEvent(t, "SELECT_COMPLETED_DELIVERY_HAPPEN", showData.index);
+      else if (showData.data.subType == DELIVERY_SUB_TYPE.ASSIGNED_EQUIPMENT)
+        this.SetEvent(t, "COMPLETED_ASSIGNED_EQUIPMENT", showData.index);
+      else
+        this.SetEvent(t, "SELECT_COMPLETED_DELIVERY", showData.index);
+      this.UpdateCompletedDeliveryUI(t);
+      this.SetupDeliveryListItem(t, showData.data);
+      this.SetActive(t, (Enum) QuestEventSelectList.UI.OBJ_REQUEST_COMPLETED, true);
+      this.SetCompletedHaveCount(t, showData.data);
+    }
+    else
+    {
+      if (showData.data != null && showData.data.subType == DELIVERY_SUB_TYPE.READ_STORY)
+        this.SetEvent(t, "READ_STORY", showData.index);
+      else if (showData.data != null && showData.data.subType == DELIVERY_SUB_TYPE.ASSIGNED_EQUIPMENT)
+        this.SetEvent(t, "ASSIGNED_EQUIPMENT", showData.index);
+      else
+        this.SetEvent(t, "SELECT_DELIVERY", showData.index);
+      this.SetupDeliveryListItem(t, showData.data);
+    }
+  }
 
-	protected override IEnumerator DoInitialize()
-	{
-		string resourceName = ResourceName.GetEventBG(eventData.bannerId);
-		Hash128 hash = default(Hash128);
-		if (MonoBehaviourSingleton<ResourceManager>.I.manifest != null)
-		{
-			hash = MonoBehaviourSingleton<ResourceManager>.I.manifest.GetAssetBundleHash(RESOURCE_CATEGORY.EVENT_BG.ToAssetBundleName(resourceName));
-		}
-		if (MonoBehaviourSingleton<ResourceManager>.I.manifest == null || hash.get_isValid())
-		{
-			LoadingQueue load_queue = new LoadingQueue(this);
-			LoadObject lo_bg = load_queue.Load(RESOURCE_CATEGORY.EVENT_BG, resourceName, false);
-			LoadObject lo_item = null;
-			if (ShouldShowEventMapButton())
-			{
-				lo_item = load_queue.Load(RESOURCE_CATEGORY.QUEST_ITEM, "QEM_10000000", false);
-			}
-			if (load_queue.IsLoading())
-			{
-				yield return (object)load_queue.Wait();
-			}
-			SetTexture(texture: lo_bg.loadedObject as Texture2D, texture_enum: UI.TEX_EVENT_BG);
-			if (lo_item != null && null != lo_item.loadedObject)
-			{
-				GameObject mapItemObj = lo_item.loadedObject as GameObject;
-				mapItem = mapItemObj.get_transform();
-			}
-		}
-		GetDeliveryList();
-		EndInitialize();
-	}
+  protected virtual void UpdateCompletedDeliveryUI(Transform parent)
+  {
+  }
 
-	public override void Exit()
-	{
-		base.Exit();
-	}
+  private void OnQuery_ASSIGNED_EQUIPMENT()
+  {
+    int eventData = (int) GameSection.GetEventData();
+    int dId = this.deliveryInfo[eventData].dId;
+    DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint) dId);
+    bool is_enough_material = MonoBehaviourSingleton<DeliveryManager>.I.IsCompletableDelivery(dId);
+    if (is_enough_material)
+    {
+      GameSection.StayEvent();
+      this.SendDeliveryComplete(eventData, dId, is_enough_material, false);
+    }
+    else
+      GameSection.SetEventData((object) deliveryTableData);
+  }
 
-	protected override void OnOpen()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(InitScroll());
-		base.OnOpen();
-	}
+  private void OnQuery_COMPLETED_ASSIGNED_EQUIPMENT()
+  {
+    GameSection.SetEventData((object) this.clearedDeliveries[(int) GameSection.GetEventData()]);
+  }
 
-	protected override void RemoveRecommend()
-	{
-	}
+  protected virtual void InitNormalDelivery(int index, Transform t)
+  {
+    this.SetEvent(t, "SELECT_DELIVERY", index);
+    DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint) this.deliveryInfo[index].dId);
+    this.SetupDeliveryListItem(t, deliveryTableData);
+  }
 
-	private IEnumerator InitScroll()
-	{
-		UIScrollView scroll = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-		while (base.state != STATE.OPEN)
-		{
-			yield return (object)null;
-		}
-		scroll.set_enabled(scroll.shouldMoveVertically);
-		RepositionTable();
-	}
+  protected virtual void InitCompletedDelivery(int completedIndex, Transform t)
+  {
+    DeliveryTable.DeliveryData clearedDelivery = this.clearedDeliveries[completedIndex];
+    bool flag = false;
+    if (clearedDelivery != null)
+    {
+      QuestTable.QuestTableData questData = clearedDelivery.GetQuestData();
+      if (questData != null && questData.questType == QUEST_TYPE.HAPPEN)
+        flag = true;
+    }
+    if (flag)
+      this.SetEvent(t, "SELECT_COMPLETED_DELIVERY_HAPPEN", completedIndex);
+    else
+      this.SetEvent(t, "SELECT_COMPLETED_DELIVERY", completedIndex);
+    this.SetupDeliveryListItem(t, clearedDelivery);
+    this.SetActive(t, (Enum) QuestEventSelectList.UI.OBJ_REQUEST_COMPLETED, true);
+    this.SetCompletedHaveCount(t, clearedDelivery);
+  }
 
-	protected virtual bool ShouldShowEventMapButton()
-	{
-		if (!showMap)
-		{
-			return false;
-		}
-		RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
-		RegionTable.Data data2 = Array.Find(data, (RegionTable.Data o) => o.eventId == eventData.eventId);
-		return null != data2;
-	}
+  protected virtual void InitStory(int storyIndex, Transform t)
+  {
+    bool flag = MonoBehaviourSingleton<UserInfoManager>.IsValid() && MonoBehaviourSingleton<UserInfoManager>.I.isTheaterRenewal;
+    if (this.HasChapterStory() & flag)
+    {
+      int eventId = this.eventData != null ? this.eventData.eventId : 0;
+      this.SetEvent(t, "JUMP_TO_STORY_PAGE", eventId);
+      this.SetLabelText(t, (Enum) QuestEventSelectList.UI.LBL_STORY_TITLE, "View All Stories");
+    }
+    else
+    {
+      this.SetEvent(t, "SELECT_STORY", storyIndex);
+      this.SetLabelText(t, (Enum) QuestEventSelectList.UI.LBL_STORY_TITLE, this.stories[storyIndex].title);
+    }
+  }
 
-	protected override bool IsVisibleDelivery(Delivery delivery, DeliveryTable.DeliveryData tableData)
-	{
-		if (eventData == null)
-		{
-			return false;
-		}
-		if (tableData.IsEvent() && tableData.eventID == eventData.eventId)
-		{
-			return true;
-		}
-		return false;
-	}
+  protected virtual void InitMap(Transform t)
+  {
+    this.SetEvent(t, "WORLDMAP", this.eventData.eventId);
+    this.SetLabelText(t, (Enum) QuestEventSelectList.UI.LBL_STORY_TITLE, "マップ");
+  }
 
-	protected void RepositionTable()
-	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		UITable component = base.GetComponent<UITable>((Enum)UI.TBL_DELIVERY_QUEST);
-		if (Object.op_Implicit(component))
-		{
-			component.Reposition();
-			List<Transform> childList = component.GetChildList();
-			int i = 0;
-			for (int count = childList.Count; i < count; i++)
-			{
-				Vector3 localPosition = childList[i].get_localPosition();
-				localPosition.x = 0f;
-				childList[i].set_localPosition(localPosition);
-			}
-		}
-	}
+  protected virtual void OnQuery_INFO()
+  {
+    GameSection.SetEventData((object) string.Format(WebViewManager.NewsWithLinkParamFormat, (object) this.eventData.linkName));
+  }
 
-	public override void UpdateUI()
-	{
-		SetLabelText((Enum)UI.LBL_LOCATION_NAME, eventData.name);
-		SetLabelText((Enum)UI.LBL_LOCATION_NAME_EFFECT, eventData.name);
-		SetActive((Enum)UI.BTN_INFO, !string.IsNullOrEmpty(eventData.linkName));
-		title.Update();
-		titleEffect.Update();
-		stories.Clear();
-		if (eventData.prologueStoryId > 0)
-		{
-			stories.Add(new Story(eventData.prologueStoryId, eventData.prologueTitle));
-		}
-		clearedDeliveries = CreateClearedDliveryList();
-		UpdateList();
-		UpdateAnchors();
-		isResetUI = false;
-	}
+  private void OnQuery_SELECT_COMPLETED_DELIVERY() => this.SetCompletedDeliveryEventData();
 
-	protected virtual List<DeliveryTable.DeliveryData> CreateClearedDliveryList()
-	{
-		List<DeliveryTable.DeliveryData> list = new List<DeliveryTable.DeliveryData>();
-		List<ClearStatusDelivery> clearStatusDelivery = MonoBehaviourSingleton<DeliveryManager>.I.clearStatusDelivery;
-		int i = 0;
-		for (int count = clearStatusDelivery.Count; i < count; i++)
-		{
-			ClearStatusDelivery d = clearStatusDelivery[i];
-			if (d.deliveryStatus == 3)
-			{
-				DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)d.deliveryId);
-				if (deliveryTableData.eventID == eventData.eventId && !Array.Exists(deliveryInfo, (Delivery x) => x.dId == d.deliveryId))
-				{
-					list.Add(deliveryTableData);
-					if (deliveryTableData.clearEventID != 0)
-					{
-						string value = deliveryTableData.clearEventTitle;
-						if (string.IsNullOrEmpty(value))
-						{
-							value = deliveryTableData.name;
-						}
-						stories.Add(new Story((int)deliveryTableData.clearEventID, value));
-					}
-				}
-			}
-		}
-		return list;
-	}
+  private void OnQuery_SELECT_COMPLETED_DELIVERY_HAPPEN() => this.SetCompletedDeliveryEventData();
 
-	protected void UpdateList()
-	{
-		if (Object.op_Implicit(GetCtrl(UI.TBL_DELIVERY_QUEST)))
-		{
-			UpdateTable();
-		}
-		else
-		{
-			UpdateGrid();
-		}
-	}
+  private void SetCompletedDeliveryEventData()
+  {
+    GameSection.SetEventData((object) new object[3]
+    {
+      (object) (int) this.clearedDeliveries[(int) GameSection.GetEventData()].id,
+      (object) new DeliveryRewardList(),
+      (object) true
+    });
+  }
 
-	protected virtual void UpdateTable()
-	{
-		//IL_026a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026f: Expected O, but got Unknown
-		//IL_027b: Unknown result type (might be due to invalid IL or missing references)
-		int num = 0;
-		int count = stories.Count;
-		if (count > 0)
-		{
-			num++;
-		}
-		List<ShowDeliveryData> list = new List<ShowDeliveryData>();
-		if (deliveryInfo != null)
-		{
-			for (int j = 0; j < deliveryInfo.Length; j++)
-			{
-				ShowDeliveryData item = new ShowDeliveryData(j, false, deliveryInfo[j]);
-				list.Add(item);
-			}
-		}
-		if (clearedDeliveries != null)
-		{
-			for (int k = 0; k < clearedDeliveries.Count; k++)
-			{
-				ShowDeliveryData item2 = new ShowDeliveryData(k, true, clearedDeliveries[k]);
-				list.Add(item2);
-			}
-		}
-		pageMax = 1 + (list.Count - 1) / 10;
-		bool flag = pageMax > 1;
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
-		SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
-		ShowDeliveryData[] showList = GetPagingList(list.ToArray(), 10, nowPage);
-		int num2 = showList.Length;
-		if (showStory)
-		{
-			num2 += num + stories.Count;
-		}
-		if (num2 == 0)
-		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, true);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
-			SetActive((Enum)UI.TBL_DELIVERY_QUEST, false);
-		}
-		else
-		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, false);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
-			SetActive((Enum)UI.TBL_DELIVERY_QUEST, true);
-			bool flag2 = false;
-			if (ShouldShowEventMapButton())
-			{
-				flag2 = true;
-				num2++;
-			}
-			int questStartIndex = 0;
-			if (flag2)
-			{
-				questStartIndex++;
-			}
-			int borderIndex = questStartIndex + showList.Length;
-			int storyStartIndex = borderIndex;
-			if (stories.Count > 0)
-			{
-				storyStartIndex++;
-			}
-			Transform ctrl = GetCtrl(UI.TBL_DELIVERY_QUEST);
-			if (Object.op_Implicit(ctrl))
-			{
-				int l = 0;
-				for (int childCount = ctrl.get_childCount(); l < childCount; l++)
-				{
-					Transform val = ctrl.GetChild(0);
-					val.set_parent(null);
-					Object.Destroy(val.get_gameObject());
-				}
-			}
-			SetTable(UI.TBL_DELIVERY_QUEST, string.Empty, num2, isResetUI, delegate(int i, Transform parent)
-			{
-				//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0096: Expected O, but got Unknown
-				Transform val2 = null;
-				if (i < storyStartIndex)
-				{
-					if (i < borderIndex)
-					{
-						if (i < questStartIndex)
-						{
-							if (!(null != mapItem))
-							{
-								return Realizes("QuestEventBorderItem", parent, true);
-							}
-							return ResourceUtility.Realizes(mapItem.get_gameObject(), parent, -1);
-						}
-						return Realizes("QuestRequestItem", parent, true);
-					}
-					return Realizes("QuestEventBorderItem", parent, true);
-				}
-				return Realizes("QuestEventStoryItem", parent, true);
-			}, delegate(int i, Transform t, bool is_recycle)
-			{
-				SetActive(t, true);
-				if (i >= storyStartIndex)
-				{
-					int storyIndex = i - storyStartIndex;
-					InitStory(storyIndex, t);
-				}
-				else if (i < borderIndex)
-				{
-					if (i >= questStartIndex)
-					{
-						int num3 = i - questStartIndex;
-						InitDelivery(showList[num3], t);
-					}
-					else
-					{
-						InitMap(t);
-					}
-				}
-			});
-			UIScrollView component = base.GetComponent<UIScrollView>((Enum)UI.SCR_DELIVERY_QUEST);
-			component.set_enabled(true);
-			RepositionTable();
-		}
-	}
+  protected virtual void OnQuery_JUMP_TO_STORY_PAGE()
+  {
+    EventData[] eventDataArray = new EventData[2]
+    {
+      new EventData("SELECT_EVENT", (object) null),
+      new EventData("SELECT_CHAPTER_FROM_OUTER", (object) null)
+    };
+    GameSection.SetEventData((object) new object[2]
+    {
+      (object) this.GetChapterId(),
+      (object) eventDataArray
+    });
+  }
 
-	protected virtual void UpdateGrid()
-	{
-		List<ShowDeliveryData> list = new List<ShowDeliveryData>();
-		if (deliveryInfo != null)
-		{
-			for (int j = 0; j < deliveryInfo.Length; j++)
-			{
-				ShowDeliveryData item = new ShowDeliveryData(j, false, deliveryInfo[j]);
-				list.Add(item);
-			}
-		}
-		if (clearedDeliveries != null)
-		{
-			for (int k = 0; k < clearedDeliveries.Count; k++)
-			{
-				ShowDeliveryData item2 = new ShowDeliveryData(k, true, clearedDeliveries[k]);
-				list.Add(item2);
-			}
-		}
-		pageMax = 1 + (list.Count - 1) / 10;
-		bool flag = pageMax > 1;
-		SetActive((Enum)UI.OBJ_ACTIVE_ROOT, flag);
-		SetActive((Enum)UI.OBJ_INACTIVE_ROOT, !flag);
-		SetLabelText((Enum)UI.LBL_MAX, pageMax.ToString());
-		SetLabelText((Enum)UI.LBL_NOW, nowPage.ToString());
-		ShowDeliveryData[] showList = GetPagingList(list.ToArray(), 10, nowPage);
-		if (list.Count == 0)
-		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, true);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, false);
-		}
-		else
-		{
-			SetActive((Enum)UI.STR_DELIVERY_NON_LIST, false);
-			SetActive((Enum)UI.GRD_DELIVERY_QUEST, true);
-			SetDynamicList((Enum)UI.GRD_DELIVERY_QUEST, "QuestRequestItem", showList.Length, isResetUI, (Func<int, bool>)null, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
-			{
-				SetActive(t, true);
-				if (!showList[i].isCompleted)
-				{
-					SetEvent(t, "SELECT_DELIVERY", showList[i].index);
-				}
-				else
-				{
-					SetEvent(t, "SELECT_COMPLETED_DELIVERY", showList[i].index);
-				}
-				SetupDeliveryListItem(t, showList[i].data);
-				if (showList[i].isCompleted)
-				{
-					SetActive(t, UI.OBJ_REQUEST_COMPLETED, true);
-				}
-			});
-		}
-	}
+  protected virtual void OnQuery_SELECT_STORY()
+  {
+    QuestEventSelectList.Story storey = this.stories[(int) GameSection.GetEventData()];
+    string goingHomeEvent = GameSection.GetGoingHomeEvent();
+    EventData[] eventDataArray;
+    if (this.eventData == null || !MonoBehaviourSingleton<DeliveryManager>.IsValid() || MonoBehaviourSingleton<DeliveryManager>.I.eventListData.IsNullOrEmpty<EventListData>() || MonoBehaviourSingleton<DeliveryManager>.I.GetEventListData(this.eventData.eventId) == null)
+    {
+      eventDataArray = new EventData[3]
+      {
+        new EventData(goingHomeEvent, (object) null),
+        new EventData("TO_EVENT", (object) null),
+        new EventData("SELECT", (object) this.eventData)
+      };
+    }
+    else
+    {
+      EventListData eventListData = MonoBehaviourSingleton<DeliveryManager>.I.GetEventListData(this.eventData.eventId);
+      eventDataArray = new EventData[4]
+      {
+        new EventData(goingHomeEvent, (object) null),
+        new EventData("TO_EVENT", (object) null),
+        eventListData.placeEnum == EVENT_DISPLAY_PLACE.PRESENT ? new EventData("TAB_PRESENT", (object) null) : new EventData("TAB_EVENT", (object) null),
+        new EventData("SELECT", (object) this.eventData)
+      };
+    }
+    GameSection.SetEventData((object) new object[4]
+    {
+      (object) storey.id,
+      (object) "",
+      (object) "",
+      (object) eventDataArray
+    });
+  }
 
-	protected void InitDelivery(ShowDeliveryData showData, Transform t)
-	{
-		if (showData.isCompleted)
-		{
-			bool flag = false;
-			if (showData.data != null)
-			{
-				QuestTable.QuestTableData questData = showData.data.GetQuestData();
-				if (questData != null && questData.questType == QUEST_TYPE.HAPPEN)
-				{
-					flag = true;
-				}
-			}
-			if (flag)
-			{
-				SetEvent(t, "SELECT_COMPLETED_DELIVERY_HAPPEN", showData.index);
-			}
-			else
-			{
-				SetEvent(t, "SELECT_COMPLETED_DELIVERY", showData.index);
-			}
-			SetupDeliveryListItem(t, showData.data);
-			SetActive(t, UI.OBJ_REQUEST_COMPLETED, true);
-			SetCompletedHaveCount(t, showData.data);
-		}
-		else
-		{
-			SetEvent(t, "SELECT_DELIVERY", showData.index);
-			SetupDeliveryListItem(t, showData.data);
-		}
-	}
+  protected virtual void OnQuery_WORLDMAP()
+  {
+    int eventId = (int) GameSection.GetEventData();
+    RegionTable.Data data = Array.Find<RegionTable.Data>(Singleton<RegionTable>.I.GetData(), (Predicate<RegionTable.Data>) (o => o.eventId == eventId));
+    if (data == null)
+      return;
+    MonoBehaviourSingleton<WorldMapManager>.I.ignoreTutorial = true;
+    this.RequestEvent("DIRECT_EVENT", (object) (int) data.regionId);
+  }
 
-	protected virtual void InitNormalDelivery(int index, Transform t)
-	{
-		SetEvent(t, "SELECT_DELIVERY", index);
-		DeliveryTable.DeliveryData deliveryTableData = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint)deliveryInfo[index].dId);
-		SetupDeliveryListItem(t, deliveryTableData);
-	}
+  private void OnQuery_PAGE_PREV()
+  {
+    this.isResetUI = true;
+    this.nowPage = this.nowPage > 1 ? this.nowPage - 1 : this.pageMax;
+    this.RefreshUI();
+  }
 
-	protected virtual void InitCompletedDelivery(int completedIndex, Transform t)
-	{
-		DeliveryTable.DeliveryData deliveryData = clearedDeliveries[completedIndex];
-		bool flag = false;
-		if (deliveryData != null)
-		{
-			QuestTable.QuestTableData questData = deliveryData.GetQuestData();
-			if (questData != null && questData.questType == QUEST_TYPE.HAPPEN)
-			{
-				flag = true;
-			}
-		}
-		if (flag)
-		{
-			SetEvent(t, "SELECT_COMPLETED_DELIVERY_HAPPEN", completedIndex);
-		}
-		else
-		{
-			SetEvent(t, "SELECT_COMPLETED_DELIVERY", completedIndex);
-		}
-		SetupDeliveryListItem(t, deliveryData);
-		SetActive(t, UI.OBJ_REQUEST_COMPLETED, true);
-		SetCompletedHaveCount(t, deliveryData);
-	}
+  private void OnQuery_PAGE_NEXT()
+  {
+    this.isResetUI = true;
+    this.nowPage = this.nowPage < this.pageMax ? this.nowPage + 1 : 1;
+    this.RefreshUI();
+  }
 
-	protected virtual void InitStory(int storyIndex, Transform t)
-	{
-		SetEvent(t, "SELECT_STORY", storyIndex);
-		SetLabelText(t, UI.LBL_STORY_TITLE, stories[storyIndex].title);
-	}
+  private void OnQuery_FISHING_RECORD()
+  {
+    GameSection.SetEventData((object) this.eventData.eventId);
+  }
 
-	protected virtual void InitMap(Transform t)
-	{
-		SetEvent(t, "WORLDMAP", eventData.eventId);
-		SetLabelText(t, UI.LBL_STORY_TITLE, "マップ");
-	}
+  protected new enum UI
+  {
+    TEX_EVENT_BG,
+    BTN_INFO,
+    TGL_BUTTON_ROOT,
+    SPR_DELIVERY_BTN_SELECTED,
+    OBJ_DELIVERY_ROOT,
+    TEX_NPCMODEL,
+    LBL_NPC_MESSAGE,
+    GRD_DELIVERY_QUEST,
+    TBL_DELIVERY_QUEST,
+    STR_DELIVERY_NON_LIST,
+    OBJ_REQUEST_COMPLETED,
+    LBL_LOCATION_NAME,
+    LBL_LOCATION_NAME_EFFECT,
+    WGT_LOCATION_NAME_LIMIT,
+    SCR_DELIVERY_QUEST,
+    OBJ_IMAGE,
+    BTN_EVENT,
+    OBJ_FRAME,
+    SPR_BG_FRAME,
+    LBL_STORY_TITLE,
+    OBJ_ACTIVE_ROOT,
+    OBJ_INACTIVE_ROOT,
+    LBL_MAX,
+    LBL_NOW,
+    BTN_INGAME_INFO,
+    BTN_FISHING_RECORD,
+    SPR_CLEARD_BLACK,
+  }
 
-	private void OnQuery_INFO()
-	{
-		string text = string.Format(WebViewManager.NewsWithLinkParamFormat, eventData.linkName);
-		GameSection.SetEventData(text);
-	}
+  protected class Story
+  {
+    public int id;
+    public string title;
 
-	private void OnQuery_SELECT_COMPLETED_DELIVERY()
-	{
-		SetCompletedDeliveryEventData();
-	}
+    public Story(int id, string title)
+    {
+      this.id = id;
+      this.title = title;
+    }
+  }
 
-	private void OnQuery_SELECT_COMPLETED_DELIVERY_HAPPEN()
-	{
-		SetCompletedDeliveryEventData();
-	}
+  public class ShowDeliveryData
+  {
+    public int index = -1;
+    public bool isCompleted;
+    public DeliveryTable.DeliveryData data;
 
-	private void SetCompletedDeliveryEventData()
-	{
-		int index = (int)GameSection.GetEventData();
-		DeliveryTable.DeliveryData deliveryData = clearedDeliveries[index];
-		int id = (int)deliveryData.id;
-		DeliveryRewardList deliveryRewardList = new DeliveryRewardList();
-		GameSection.SetEventData(new object[3]
-		{
-			id,
-			deliveryRewardList,
-			true
-		});
-	}
+    public ShowDeliveryData(int i, bool isComp, DeliveryTable.DeliveryData d)
+    {
+      this.index = i;
+      this.isCompleted = isComp;
+      this.data = d;
+    }
 
-	protected virtual void OnQuery_SELECT_STORY()
-	{
-		int index = (int)GameSection.GetEventData();
-		Story story = stories[index];
-		EventData[] array = new EventData[3]
-		{
-			new EventData("MAIN_MENU_HOME", null),
-			new EventData("TO_EVENT", null),
-			new EventData("SELECT", eventData)
-		};
-		GameSection.SetEventData(new object[4]
-		{
-			story.id,
-			string.Empty,
-			string.Empty,
-			array
-		});
-	}
-
-	protected virtual void OnQuery_WORLDMAP()
-	{
-		int eventId = (int)GameSection.GetEventData();
-		RegionTable.Data[] data = Singleton<RegionTable>.I.GetData();
-		RegionTable.Data data2 = Array.Find(data, (RegionTable.Data o) => o.eventId == eventId);
-		if (data2 != null)
-		{
-			MonoBehaviourSingleton<WorldMapManager>.I.ignoreTutorial = true;
-			RequestEvent("DIRECT_EVENT", (int)data2.regionId);
-		}
-	}
-
-	private void OnQuery_PAGE_PREV()
-	{
-		isResetUI = true;
-		nowPage = ((nowPage <= 1) ? pageMax : (nowPage - 1));
-		RefreshUI();
-	}
-
-	private void OnQuery_PAGE_NEXT()
-	{
-		isResetUI = true;
-		nowPage = ((nowPage >= pageMax) ? 1 : (nowPage + 1));
-		RefreshUI();
-	}
+    public ShowDeliveryData(int i, bool isComp, Delivery d)
+    {
+      this.index = i;
+      this.isCompleted = isComp;
+      this.data = Singleton<DeliveryTable>.I.GetDeliveryTableData((uint) d.dId);
+    }
+  }
 }

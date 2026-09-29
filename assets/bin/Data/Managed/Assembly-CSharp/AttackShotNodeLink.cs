@@ -1,325 +1,209 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AttackShotNodeLink
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class AttackShotNodeLink
+#nullable disable
+public class AttackShotNodeLink : MonoBehaviour
 {
-	private BulletData bulletData;
+  private BulletData bulletData;
+  private GameObject bulletObj;
+  private Transform bulletTrans;
+  private StageObject attacker;
+  private string atkInfoName = string.Empty;
+  private Transform parentTrans;
+  private bool isRequestDelete;
+  private bool isInit;
+  private Vector3 defaultPos;
+  private Vector3 defaultOffsetPos;
+  private Vector3 defaultOffsetRot;
+  private float rotSpd;
+  private float moveSpd;
+  private float moveDis;
+  private int moveDir;
+  private bool isChaseXPos = true;
+  private bool isChaseYPos = true;
+  private bool isChaseZPos = true;
+  private bool isUseChasePos;
+  private bool isChaseXRot = true;
+  private bool isChaseYRot = true;
+  private bool isChaseZRot = true;
+  private bool isUseChaseRot;
+  private bool isRot;
+  private bool isMove;
+  private bool isMinusMove;
+  private float currentRotAngle;
+  private float currentMoveDis;
+  private Transform _transform;
 
-	private GameObject bulletObj;
+  public string AttackInfoName => this.atkInfoName;
 
-	private Transform bulletTrans;
+  public void RequestDestroy() => this.isRequestDelete = true;
 
-	private StageObject attacker;
+  public void Initialize(
+    StageObject attacker,
+    Transform parentTrans,
+    AnimEventData.EventData data,
+    AttackInfo atkInfo,
+    AnimEventShot childEventShot)
+  {
+    this.bulletData = atkInfo.bulletData;
+    if (Object.op_Equality((Object) this.bulletData, (Object) null) || this.bulletData.data == null)
+      return;
+    this.attacker = attacker;
+    this.parentTrans = parentTrans;
+    Player player = attacker as Player;
+    if (atkInfo is AttackHitInfo attackHitInfo)
+      attackHitInfo.enableIdentityCheck = false;
+    this.atkInfoName = atkInfo.name;
+    this._transform = ((Component) this).transform;
+    this._transform.parent = MonoBehaviourSingleton<StageObjectManager>.IsValid() ? MonoBehaviourSingleton<StageObjectManager>.I._transform : MonoBehaviourSingleton<EffectManager>.I._transform;
+    this._transform.position = parentTrans.position;
+    switch (data.intArgs[0])
+    {
+      case 0:
+        this._transform.rotation = attacker._transform.rotation;
+        break;
+      case 1:
+        this._transform.rotation = parentTrans.rotation;
+        break;
+      case 2:
+        this._transform.rotation = Quaternion.identity;
+        break;
+    }
+    this.defaultPos = this._transform.position;
+    ((Component) childEventShot).transform.parent = this._transform;
+    this.bulletObj = ((Component) childEventShot).gameObject;
+    this.bulletTrans = this.bulletObj.transform;
+    Vector3 vector3;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref vector3).\u002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+    this.bulletTrans.localEulerAngles = new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]);
+    this.bulletTrans.localPosition = vector3;
+    this.rotSpd = data.floatArgs[6];
+    this.moveSpd = data.floatArgs[7];
+    this.moveDis = data.floatArgs[8];
+    this.isChaseXPos = data.intArgs[2] != 0;
+    this.isChaseYPos = data.intArgs[3] != 0;
+    this.isChaseZPos = data.intArgs[4] != 0;
+    this.isChaseXRot = data.intArgs[5] != 0;
+    this.isChaseYRot = data.intArgs[6] != 0;
+    this.isChaseZRot = data.intArgs[7] != 0;
+    this.isRot = data.intArgs[8] != 0;
+    this.isMove = data.intArgs[9] != 0;
+    this.moveDir = data.intArgs[10];
+    this.isMinusMove = data.intArgs[11] != 0;
+    if (Object.op_Inequality((Object) parentTrans, (Object) null))
+    {
+      this.defaultOffsetPos = Vector3.zero;
+      this.defaultOffsetRot = Vector3.op_Subtraction(this._transform.eulerAngles, parentTrans.eulerAngles);
+    }
+    else
+    {
+      this.defaultOffsetPos = Vector3.zero;
+      this.defaultOffsetRot = Vector3.zero;
+    }
+    if (this.isChaseXPos || this.isChaseYPos || this.isChaseZPos)
+      this.isUseChasePos = true;
+    if (this.isChaseXRot || this.isChaseYRot || this.isChaseZRot)
+      this.isUseChaseRot = true;
+    this.currentRotAngle = 0.0f;
+    this.isInit = true;
+  }
 
-	private string atkInfoName = string.Empty;
+  private void LateUpdate()
+  {
+    if (!this.isInit)
+      return;
+    if (Object.op_Equality((Object) this.bulletObj, (Object) null))
+      Object.Destroy((Object) ((Component) this).gameObject);
+    else if (this.isRequestDelete)
+      Object.Destroy((Object) this.bulletObj);
+    else if (Object.op_Equality((Object) this.parentTrans, (Object) null))
+    {
+      Object.Destroy((Object) this.bulletObj);
+    }
+    else
+    {
+      Vector3 position1 = this._transform.position;
+      Vector3 position2 = this.parentTrans.position;
+      Vector3 eulerAngles1 = this._transform.eulerAngles;
+      Vector3 eulerAngles2 = this.parentTrans.eulerAngles;
+      if (this.isUseChaseRot)
+      {
+        if (this.isChaseXRot)
+          eulerAngles1.x = eulerAngles2.x + this.defaultOffsetRot.x;
+        if (this.isChaseYRot)
+          eulerAngles1.y = eulerAngles2.y + this.defaultOffsetRot.y;
+        if (this.isChaseZRot)
+          eulerAngles1.z = eulerAngles2.z + this.defaultOffsetRot.z;
+      }
+      if (this.isRot)
+      {
+        if (this.isChaseYRot)
+          this.currentRotAngle += this.rotSpd * Time.deltaTime;
+        else
+          this.currentRotAngle = this.rotSpd * Time.deltaTime;
+        if ((double) this.currentRotAngle > 360.0)
+          this.currentRotAngle -= 360f;
+        else if ((double) this.currentRotAngle < 0.0)
+          this.currentRotAngle += 360f;
+        eulerAngles1.y += this.currentRotAngle;
+      }
+      this._transform.eulerAngles = eulerAngles1;
+      if (this.isUseChasePos)
+      {
+        if (this.isChaseXPos)
+          position1.x = position2.x + this.defaultOffsetPos.x;
+        if (this.isChaseYPos)
+          position1.y = position2.y + this.defaultOffsetPos.y;
+        if (this.isChaseZPos)
+          position1.z = position2.z + this.defaultOffsetPos.z;
+      }
+      if (this.isMove)
+      {
+        this.currentMoveDis += this.moveSpd * Time.deltaTime;
+        if ((double) this.currentMoveDis >= (double) this.moveDis)
+        {
+          this.currentMoveDis = this.moveDis;
+          this.moveSpd *= -1f;
+        }
+        else
+        {
+          float num = 0.0f;
+          if (this.isMinusMove)
+            num = -this.moveDis;
+          if ((double) this.currentMoveDis <= (double) num)
+          {
+            this.currentMoveDis = num;
+            this.moveSpd *= -1f;
+          }
+        }
+        Vector3 zero = Vector3.zero;
+        Vector3 vector3 = this.moveDir != 0 ? Vector3.op_Multiply(this.bulletTrans.right, this.currentMoveDis) : Vector3.op_Multiply(this.bulletTrans.forward, this.currentMoveDis);
+        if (this.isChaseXPos)
+          position1.x += vector3.x;
+        else
+          position1.x = this.defaultPos.x + vector3.x;
+        if (this.isChaseZPos)
+          position1.z += vector3.z;
+        else
+          position1.z = this.defaultPos.z + vector3.z;
+      }
+      this._transform.position = position1;
+    }
+  }
 
-	private Transform parentTrans;
-
-	private bool isRequestDelete;
-
-	private bool isInit;
-
-	private Vector3 defaultPos;
-
-	private Vector3 defaultOffsetPos;
-
-	private Vector3 defaultOffsetRot;
-
-	private float rotSpd;
-
-	private float moveSpd;
-
-	private float moveDis;
-
-	private int moveDir;
-
-	private bool isChaseXPos = true;
-
-	private bool isChaseYPos = true;
-
-	private bool isChaseZPos = true;
-
-	private bool isUseChasePos;
-
-	private bool isChaseXRot = true;
-
-	private bool isChaseYRot = true;
-
-	private bool isChaseZRot = true;
-
-	private bool isUseChaseRot;
-
-	private bool isRot;
-
-	private bool isMove;
-
-	private bool isMinusMove;
-
-	private float currentRotAngle;
-
-	private float currentMoveDis;
-
-	private Transform _transform;
-
-	public string AttackInfoName => atkInfoName;
-
-	public AttackShotNodeLink()
-		: this()
-	{
-	}
-
-	public void RequestDestroy()
-	{
-		isRequestDelete = true;
-	}
-
-	public void Initialize(StageObject attacker, Transform parentTrans, AnimEventData.EventData data, AttackInfo atkInfo, AnimEventShot childEventShot)
-	{
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Expected O, but got Unknown
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Expected O, but got Unknown
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0166: Expected O, but got Unknown
-		//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0301: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0307: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0311: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0321: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0327: Unknown result type (might be due to invalid IL or missing references)
-		//IL_032c: Unknown result type (might be due to invalid IL or missing references)
-		bulletData = atkInfo.bulletData;
-		if (!(bulletData == null))
-		{
-			BulletData.BulletBase data2 = bulletData.data;
-			if (data2 != null)
-			{
-				this.attacker = attacker;
-				this.parentTrans = parentTrans;
-				int num = (!(attacker is Player)) ? 15 : 14;
-				AttackHitInfo attackHitInfo = atkInfo as AttackHitInfo;
-				if (attackHitInfo != null)
-				{
-					attackHitInfo.enableIdentityCheck = false;
-				}
-				atkInfoName = atkInfo.name;
-				_transform = this.get_transform();
-				_transform.set_parent((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
-				_transform.set_position(parentTrans.get_position());
-				switch (data.intArgs[0])
-				{
-				case 0:
-					_transform.set_rotation(attacker._transform.get_rotation());
-					break;
-				case 1:
-					_transform.set_rotation(parentTrans.get_rotation());
-					break;
-				case 2:
-					_transform.set_rotation(Quaternion.get_identity());
-					break;
-				}
-				defaultPos = _transform.get_position();
-				childEventShot.get_transform().set_parent(_transform);
-				bulletObj = childEventShot.get_gameObject();
-				bulletTrans = bulletObj.get_transform();
-				Vector3 localPosition = default(Vector3);
-				localPosition._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-				bulletTrans.set_localEulerAngles(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
-				bulletTrans.set_localPosition(localPosition);
-				rotSpd = data.floatArgs[6];
-				moveSpd = data.floatArgs[7];
-				moveDis = data.floatArgs[8];
-				isChaseXPos = ((data.intArgs[2] != 0) ? true : false);
-				isChaseYPos = ((data.intArgs[3] != 0) ? true : false);
-				isChaseZPos = ((data.intArgs[4] != 0) ? true : false);
-				isChaseXRot = ((data.intArgs[5] != 0) ? true : false);
-				isChaseYRot = ((data.intArgs[6] != 0) ? true : false);
-				isChaseZRot = ((data.intArgs[7] != 0) ? true : false);
-				isRot = ((data.intArgs[8] != 0) ? true : false);
-				isMove = ((data.intArgs[9] != 0) ? true : false);
-				moveDir = data.intArgs[10];
-				isMinusMove = ((data.intArgs[11] != 0) ? true : false);
-				if (parentTrans != null)
-				{
-					defaultOffsetPos = Vector3.get_zero();
-					defaultOffsetRot = _transform.get_eulerAngles() - parentTrans.get_eulerAngles();
-				}
-				else
-				{
-					defaultOffsetPos = Vector3.get_zero();
-					defaultOffsetRot = Vector3.get_zero();
-				}
-				if (isChaseXPos || isChaseYPos || isChaseZPos)
-				{
-					isUseChasePos = true;
-				}
-				if (isChaseXRot || isChaseYRot || isChaseZRot)
-				{
-					isUseChaseRot = true;
-				}
-				currentRotAngle = 0f;
-				isInit = true;
-			}
-		}
-	}
-
-	private void LateUpdate()
-	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0395: Unknown result type (might be due to invalid IL or missing references)
-		if (isInit)
-		{
-			if (bulletObj == null)
-			{
-				Object.Destroy(this.get_gameObject());
-			}
-			else if (isRequestDelete)
-			{
-				Object.Destroy(bulletObj);
-			}
-			else if (parentTrans == null)
-			{
-				Object.Destroy(bulletObj);
-			}
-			else
-			{
-				Vector3 position = _transform.get_position();
-				Vector3 position2 = parentTrans.get_position();
-				Vector3 eulerAngles = _transform.get_eulerAngles();
-				Vector3 eulerAngles2 = parentTrans.get_eulerAngles();
-				if (isUseChaseRot)
-				{
-					if (isChaseXRot)
-					{
-						eulerAngles.x = eulerAngles2.x + defaultOffsetRot.x;
-					}
-					if (isChaseYRot)
-					{
-						eulerAngles.y = eulerAngles2.y + defaultOffsetRot.y;
-					}
-					if (isChaseZRot)
-					{
-						eulerAngles.z = eulerAngles2.z + defaultOffsetRot.z;
-					}
-				}
-				if (isRot)
-				{
-					if (isChaseYRot)
-					{
-						currentRotAngle += rotSpd * Time.get_deltaTime();
-					}
-					else
-					{
-						currentRotAngle = rotSpd * Time.get_deltaTime();
-					}
-					if (currentRotAngle > 360f)
-					{
-						currentRotAngle -= 360f;
-					}
-					else if (currentRotAngle < 0f)
-					{
-						currentRotAngle += 360f;
-					}
-					eulerAngles.y += currentRotAngle;
-				}
-				_transform.set_eulerAngles(eulerAngles);
-				if (isUseChasePos)
-				{
-					if (isChaseXPos)
-					{
-						position.x = position2.x + defaultOffsetPos.x;
-					}
-					if (isChaseYPos)
-					{
-						position.y = position2.y + defaultOffsetPos.y;
-					}
-					if (isChaseZPos)
-					{
-						position.z = position2.z + defaultOffsetPos.z;
-					}
-				}
-				if (isMove)
-				{
-					currentMoveDis += moveSpd * Time.get_deltaTime();
-					if (currentMoveDis >= moveDis)
-					{
-						currentMoveDis = moveDis;
-						moveSpd *= -1f;
-					}
-					else
-					{
-						float num = 0f;
-						if (isMinusMove)
-						{
-							num = 0f - moveDis;
-						}
-						if (currentMoveDis <= num)
-						{
-							currentMoveDis = num;
-							moveSpd *= -1f;
-						}
-					}
-					Vector3 zero = Vector3.get_zero();
-					zero = ((moveDir != 0) ? (bulletTrans.get_right() * currentMoveDis) : (bulletTrans.get_forward() * currentMoveDis));
-					if (isChaseXPos)
-					{
-						position.x += zero.x;
-					}
-					else
-					{
-						position.x = defaultPos.x + zero.x;
-					}
-					if (isChaseZPos)
-					{
-						position.z += zero.z;
-					}
-					else
-					{
-						position.z = defaultPos.z + zero.z;
-					}
-				}
-				_transform.set_position(position);
-			}
-		}
-	}
-
-	public void Destroy()
-	{
-		if (attacker != null)
-		{
-			Enemy enemy = attacker as Enemy;
-			if (enemy != null)
-			{
-				enemy.OnDestroyObstacle(this);
-			}
-		}
-	}
+  public void Destroy()
+  {
+    if (!Object.op_Inequality((Object) this.attacker, (Object) null))
+      return;
+    Enemy attacker = this.attacker as Enemy;
+    if (!Object.op_Inequality((Object) attacker, (Object) null))
+      return;
+    attacker.OnDestroyObstacle(this);
+  }
 }

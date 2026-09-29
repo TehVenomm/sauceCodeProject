@@ -1,97 +1,62 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: StampNode
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
-public class StampNode
+#nullable disable
+public class StampNode : MonoBehaviour
 {
-	[Serializable]
-	public class StampTrigger
-	{
-		public int eventID;
+  public Vector3 offset;
+  public StampNode.StampTrigger[] triggers;
+  public int autoStampInfoID;
+  public float autoBaseY = -1f;
+  private bool up;
 
-		public int StampInfoID;
-	}
+  public Transform _transform { get; private set; }
 
-	public Vector3 offset;
+  public Vector3 scaledeOffset { get; private set; }
 
-	public StampTrigger[] triggers;
+  private void Awake()
+  {
+    this._transform = ((Component) this).transform;
+    this.scaledeOffset = this.offset.Mul(this._transform.lossyScale);
+    if ((double) this.autoBaseY != -1.0)
+      this.autoBaseY *= this._transform.lossyScale.y;
+    this.up = false;
+  }
 
-	public int autoStampInfoID;
+  private void Start()
+  {
+  }
 
-	public float autoBaseY = -1f;
+  public bool UpdateStamp(float base_y)
+  {
+    float num1 = this._transform.position.y - base_y;
+    Matrix4x4 localToWorldMatrix = this._transform.localToWorldMatrix;
+    float num2 = ((Matrix4x4) ref localToWorldMatrix).MultiplyPoint(this.offset).y - base_y;
+    if ((double) this.autoBaseY == -1.0)
+      this.autoBaseY = num2 + 0.0f;
+    if (!this.up)
+    {
+      if ((double) num2 > (double) this.autoBaseY)
+        this.up = true;
+    }
+    else if ((double) num2 < (double) this.autoBaseY)
+    {
+      this.up = false;
+      return true;
+    }
+    return false;
+  }
 
-	private bool up;
-
-	public Transform _transform
-	{
-		get;
-		private set;
-	}
-
-	public Vector3 scaledeOffset
-	{
-		get;
-		private set;
-	}
-
-	public StampNode()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Expected O, but got Unknown
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		_transform = this.get_transform();
-		scaledeOffset = offset.Mul(_transform.get_lossyScale());
-		if (autoBaseY != -1f)
-		{
-			float num = autoBaseY;
-			Vector3 lossyScale = _transform.get_lossyScale();
-			autoBaseY = num * lossyScale.y;
-		}
-		up = false;
-	}
-
-	private void Start()
-	{
-	}
-
-	public bool UpdateStamp(float base_y)
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 position = _transform.get_position();
-		float num = position.y - base_y;
-		Matrix4x4 localToWorldMatrix = _transform.get_localToWorldMatrix();
-		Vector3 val = localToWorldMatrix.MultiplyPoint(offset);
-		num = val.y - base_y;
-		if (autoBaseY == -1f)
-		{
-			autoBaseY = num;
-		}
-		if (!up)
-		{
-			if (num > autoBaseY)
-			{
-				up = true;
-			}
-		}
-		else if (num < autoBaseY)
-		{
-			up = false;
-			return true;
-		}
-		return false;
-	}
+  [Serializable]
+  public class StampTrigger
+  {
+    public int eventID;
+    public int StampInfoID;
+  }
 }

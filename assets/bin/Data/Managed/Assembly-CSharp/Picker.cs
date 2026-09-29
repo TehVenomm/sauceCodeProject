@@ -1,63 +1,63 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Picker
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class Picker : GameSection
 {
-	public class DESC
-	{
-		public string[] text;
+  private Picker.DESC desc;
+  private int selectIndex;
 
-		public bool enableLoop;
+  public override void Initialize()
+  {
+    this.selectIndex = 0;
+    this.desc = GameSection.GetEventData() as Picker.DESC;
+    base.Initialize();
+  }
 
-		public DESC(string[] _texts, bool _enable_loop = true)
-		{
-			text = _texts;
-			enableLoop = _enable_loop;
-		}
-	}
+  public override void UpdateUI()
+  {
+    this.SetGrid((Enum) Picker.UI.GRD_PICKER, "PickerItem", this.desc.text.Length, false, (Action<int, Transform, bool>) ((i, t, is_recycle) => this.SetLabelText(t, (Enum) Picker.UI.LBL_PICKER, this.desc.text[i])));
+    UIWrapContent component = this.GetComponent<UIWrapContent>((Enum) Picker.UI.GRD_PICKER);
+    if (Object.op_Inequality((Object) component, (Object) null))
+      ((Behaviour) component).enabled = this.desc.enableLoop;
+    this.SetCenterOnChildFunc((Enum) Picker.UI.GRD_PICKER, new UICenterOnChild.OnCenterCallback(this.OnCenter));
+    this.SetCenter((Enum) Picker.UI.GRD_PICKER, this.selectIndex);
+  }
 
-	private enum UI
-	{
-		GRD_PICKER,
-		LBL_PICKER
-	}
+  public void OnCenter(GameObject go)
+  {
+    int result;
+    if (!int.TryParse(((Object) go).name, out result))
+      return;
+    this.selectIndex = result;
+  }
 
-	private DESC desc;
+  private void OnQuery_DECISION()
+  {
+    GameSection.SetEventData((object) this.desc.text[this.selectIndex]);
+  }
 
-	private int selectIndex;
+  public class DESC
+  {
+    public string[] text;
+    public bool enableLoop;
 
-	public override void Initialize()
-	{
-		selectIndex = 0;
-		desc = (GameSection.GetEventData() as DESC);
-		base.Initialize();
-	}
+    public DESC(string[] _texts, bool _enable_loop = true)
+    {
+      this.text = _texts;
+      this.enableLoop = _enable_loop;
+    }
+  }
 
-	public override void UpdateUI()
-	{
-		SetGrid(UI.GRD_PICKER, "PickerItem", desc.text.Length, false, delegate(int i, Transform t, bool is_recycle)
-		{
-			SetLabelText(t, UI.LBL_PICKER, desc.text[i]);
-		});
-		UIWrapContent component = base.GetComponent<UIWrapContent>((Enum)UI.GRD_PICKER);
-		if (component != null)
-		{
-			component.set_enabled(desc.enableLoop);
-		}
-		SetCenterOnChildFunc((Enum)UI.GRD_PICKER, (UICenterOnChild.OnCenterCallback)OnCenter);
-		SetCenter((Enum)UI.GRD_PICKER, selectIndex, false);
-	}
-
-	public void OnCenter(GameObject go)
-	{
-		if (int.TryParse(go.get_name(), out int result))
-		{
-			selectIndex = result;
-		}
-	}
-
-	private void OnQuery_DECISION()
-	{
-		GameSection.SetEventData(desc.text[selectIndex]);
-	}
+  private enum UI
+  {
+    GRD_PICKER,
+    LBL_PICKER,
+  }
 }

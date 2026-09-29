@@ -1,566 +1,411 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ExploreStatus
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class ExploreStatus
 {
-	public class TraceInfo
-	{
-		public int mapId;
+  private List<int> bossMapIdHistory = new List<int>();
+  private List<ExploreStatus.TraceInfo> bossTraceMapIdHistory = new List<ExploreStatus.TraceInfo>();
+  private List<ExplorePortalPoint> portals;
+  private List<MissionCheckBase> missionCheck;
+  private ExplorePlayerStatus[] playerStatuses = new ExplorePlayerStatus[8];
+  private ExplorePlayerStatus selfPlayerStatus;
 
-		public EXPLORE_HISTORY_TYPE historyType;
+  public bool isHost { get; private set; }
 
-		public string playerName;
+  public PartyModel.ExploreInfo exploreInfo { get; private set; }
 
-		public TraceInfo(int mapId, EXPLORE_HISTORY_TYPE type, string playerName)
-		{
-			this.mapId = mapId;
-			historyType = type;
-			this.playerName = playerName;
-		}
-	}
+  public ExploreStatus.TraceInfo reservedTraceInfo { get; private set; }
 
-	private List<int> bossMapIdHistory = new List<int>();
+  private FieldMapTable.PortalTableData lastUsePortal { get; set; }
 
-	private List<TraceInfo> bossTraceMapIdHistory = new List<TraceInfo>();
+  public ExploreBossStatus bossStatus { get; private set; }
 
-	private List<ExplorePortalPoint> portals;
+  public bool isBossDead => this.bossStatus != null && this.bossStatus.isDead;
 
-	private List<MissionCheckBase> missionCheck;
+  public bool isEncountered { get; private set; }
 
-	private ExplorePlayerStatus[] playerStatuses = new ExplorePlayerStatus[8];
+  public float bossMoveRemainTime { get; private set; }
 
-	private ExplorePlayerStatus selfPlayerStatus;
+  public float hostDCRemainTime { get; private set; }
 
-	public bool isHost
-	{
-		get;
-		private set;
-	}
+  public event System.Action onChangeExploreMemberList;
 
-	public PartyModel.ExploreInfo exploreInfo
-	{
-		get;
-		private set;
-	}
+  public ExploreStatus(PartyModel.ExploreInfo exploreInfo, bool host)
+  {
+    this.exploreInfo = exploreInfo;
+    this.isHost = host;
+    this.portals = this.InitPortalPoint(exploreInfo.mapIds);
+    this.hostDCRemainTime = 30f;
+  }
 
-	public TraceInfo reservedTraceInfo
-	{
-		get;
-		private set;
-	}
+  public void UpdateBossMap()
+  {
+    int count = this.GetEnabledPlayerStatusList().Count;
+    for (int statusIndex = 0; statusIndex < count; ++statusIndex)
+    {
+      if (MonoBehaviourSingleton<QuestManager>.I.GetExploreMapId(statusIndex) == this.exploreInfo.mapIds[this.exploreInfo.mapIds.Count - 1])
+        return;
+    }
+    int currentBossMapId = this.GetCurrentBossMapId();
+    if (currentBossMapId < 0)
+    {
+      int index = Random.Range(0, this.exploreInfo.mapIds.Count - 1);
+      int mapId = this.exploreInfo.mapIds[index];
+      if (index == 0 && this.exploreInfo.mapIds.Count > 1)
+        this.UpdateBossMap();
+      else
+        this.bossMapIdHistory.Add(mapId);
+    }
+    else
+    {
+      List<FieldMapTable.PortalTableData> portalListByMapId = Singleton<FieldMapTable>.I.GetPortalListByMapID((uint) currentBossMapId);
+      if (portalListByMapId == null)
+        return;
+      List<int> intList = new List<int>();
+      for (int index = 0; index < portalListByMapId.Count; ++index)
+      {
+        if (portalListByMapId[index].banEnemy != 1U)
+        {
+          int dstMapId = (int) portalListByMapId[index].dstMapID;
+          if (dstMapId != this.exploreInfo.mapIds[0])
+            intList.Add(dstMapId);
+        }
+      }
+      if (intList.Count <= 0)
+        return;
+      int index1 = Random.Range(0, intList.Count);
+      int num = intList[index1];
+      if (this.GetBeforeBossMapId() == num && intList.Count > 1)
+        this.UpdateBossMap();
+      else
+        this.bossMapIdHistory.Add(num);
+    }
+  }
 
-	private FieldMapTable.PortalTableData lastUsePortal
-	{
-		get;
-		set;
-	}
+  public int GetCurrentBossMapId()
+  {
+    return this.bossMapIdHistory == null || this.bossMapIdHistory.Count < 1 ? -1 : this.bossMapIdHistory[this.bossMapIdHistory.Count - 1];
+  }
 
-	public ExploreBossStatus bossStatus
-	{
-		get;
-		private set;
-	}
+  private int GetBeforeBossMapId()
+  {
+    return this.bossMapIdHistory == null || this.bossMapIdHistory.Count < 2 ? -1 : this.bossMapIdHistory[this.bossMapIdHistory.Count - 2];
+  }
 
-	public bool isBossDead => bossStatus != null && bossStatus.isDead;
+  public EXPLORE_HISTORY_TYPE GetHistoryTypeOfMap(int mapId)
+  {
+    if (this.bossMapIdHistory == null)
+      return EXPLORE_HISTORY_TYPE.NONE;
+    int? nullable1 = new int?();
+    for (int index = 0; index < this.bossMapIdHistory.Count; ++index)
+    {
+      if (this.bossMapIdHistory[index] == mapId)
+        nullable1 = new int?(index);
+    }
+    if (!nullable1.HasValue)
+      return EXPLORE_HISTORY_TYPE.NONE;
+    int count = this.bossMapIdHistory.Count;
+    int? nullable2 = nullable1;
+    int num1 = count - 1;
+    if (nullable2.GetValueOrDefault() == num1 & nullable2.HasValue)
+      return EXPLORE_HISTORY_TYPE.CURRENT;
+    int? nullable3 = nullable1;
+    int num2 = count - 2;
+    if (nullable3.GetValueOrDefault() == num2 & nullable3.HasValue)
+      return EXPLORE_HISTORY_TYPE.LAST;
+    nullable3 = nullable1;
+    int num3 = count - 3;
+    return nullable3.GetValueOrDefault() == num3 & nullable3.HasValue ? EXPLORE_HISTORY_TYPE.SECOND_LAST : EXPLORE_HISTORY_TYPE.NONE;
+  }
 
-	public bool isEncountered
-	{
-		get;
-		private set;
-	}
+  public bool IsBossAppearMap(int mapId) => this.GetCurrentBossMapId() == mapId;
 
-	public float bossMoveRemainTime
-	{
-		get;
-		private set;
-	}
+  public void SyncBoss(Coop_Model_RoomSyncExploreBoss boss)
+  {
+    if (this.bossMapIdHistory.Count == 0)
+      this.bossMapIdHistory.Add(boss.mId);
+    else if (this.bossMapIdHistory[this.bossMapIdHistory.Count - 1] != boss.mId)
+      this.bossMapIdHistory.Add(boss.mId);
+    if (boss.hp < 0)
+      return;
+    if (this.bossStatus == null)
+      this.bossStatus = new ExploreBossStatus();
+    this.bossStatus.UpdateStatus(boss);
+  }
 
-	public float hostDCRemainTime
-	{
-		get;
-		private set;
-	}
+  public void SyncBossMap(Coop_Model_RoomSyncExploreBossMap boss)
+  {
+    if (this.bossMapIdHistory.Count == 0)
+    {
+      this.bossMapIdHistory.Add(boss.mId);
+    }
+    else
+    {
+      if (this.bossMapIdHistory[this.bossMapIdHistory.Count - 1] == boss.mId)
+        return;
+      this.bossMapIdHistory.Add(boss.mId);
+    }
+  }
 
-	public event Action onChangeExploreMemberList;
+  public void SetBossDead(Coop_Model_RoomExploreBossDead model)
+  {
+    if (this.bossStatus == null)
+      this.bossStatus = new ExploreBossStatus();
+    this.bossStatus.UpdateStatus(model);
+  }
 
-	public ExploreStatus(PartyModel.ExploreInfo exploreInfo, bool host)
-	{
-		this.exploreInfo = exploreInfo;
-		isHost = host;
-		portals = InitPortalPoint(exploreInfo.mapIds);
-		hostDCRemainTime = 30f;
-	}
+  public void SyncPortalPoint(Coop_Model_RoomSyncAllPortalPoint model)
+  {
+    for (int index = 0; index < model.ps.Count; ++index)
+    {
+      Coop_Model_RoomSyncAllPortalPoint.PortalData p = model.ps[index];
+      ExplorePortalPoint portalData1 = this.GetPortalData(p.id);
+      if (portalData1 != null)
+      {
+        portalData1.UpdatePoint(p.pt);
+        portalData1.UpdateUsedFlag(p.u);
+        ExplorePortalPoint portalData2 = this.GetPortalData(portalData1.linkPortalId);
+        if (portalData2 != null)
+        {
+          portalData2.UpdatePoint(p.pt);
+          portalData2.UpdateUsedFlag(p.u);
+        }
+      }
+    }
+  }
 
-	public void UpdateBossMap()
-	{
-		int count = GetEnabledPlayerStatusList().Count;
-		for (int i = 0; i < count; i++)
-		{
-			int exploreMapId = MonoBehaviourSingleton<QuestManager>.I.GetExploreMapId(i);
-			if (exploreMapId == exploreInfo.mapIds[exploreInfo.mapIds.Count - 1])
-			{
-				return;
-			}
-		}
-		int currentBossMapId = GetCurrentBossMapId();
-		if (currentBossMapId < 0)
-		{
-			int num = Random.Range(0, exploreInfo.mapIds.Count - 1);
-			int item = exploreInfo.mapIds[num];
-			if (num == 0 && exploreInfo.mapIds.Count > 1)
-			{
-				UpdateBossMap();
-			}
-			else
-			{
-				bossMapIdHistory.Add(item);
-			}
-		}
-		else
-		{
-			List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID((uint)currentBossMapId, false);
-			if (portalListByMapID != null)
-			{
-				List<int> list = new List<int>();
-				for (int j = 0; j < portalListByMapID.Count; j++)
-				{
-					if (portalListByMapID[j].banEnemy != 1)
-					{
-						int dstMapID = (int)portalListByMapID[j].dstMapID;
-						if (dstMapID != exploreInfo.mapIds[0])
-						{
-							list.Add(dstMapID);
-						}
-					}
-				}
-				if (list.Count > 0)
-				{
-					int index = Random.Range(0, list.Count);
-					int num2 = list[index];
-					int beforeBossMapId = GetBeforeBossMapId();
-					if (beforeBossMapId == num2 && list.Count > 1)
-					{
-						UpdateBossMap();
-					}
-					else
-					{
-						bossMapIdHistory.Add(num2);
-					}
-				}
-			}
-		}
-	}
+  public void UpdateBossTraceMapIdHistory(
+    int mapId,
+    int lastCount,
+    string playerName,
+    bool reserve)
+  {
+    EXPLORE_HISTORY_TYPE type = EXPLORE_HISTORY_TYPE.NONE;
+    switch (lastCount)
+    {
+      case 0:
+        type = EXPLORE_HISTORY_TYPE.LAST;
+        break;
+      case 1:
+        type = EXPLORE_HISTORY_TYPE.SECOND_LAST;
+        break;
+    }
+    ExploreStatus.TraceInfo traceInfo = new ExploreStatus.TraceInfo(mapId, type, playerName);
+    this.bossTraceMapIdHistory.Add(traceInfo);
+    if (!reserve)
+      return;
+    this.reservedTraceInfo = traceInfo;
+  }
 
-	public int GetCurrentBossMapId()
-	{
-		if (bossMapIdHistory == null)
-		{
-			return -1;
-		}
-		if (bossMapIdHistory.Count < 1)
-		{
-			return -1;
-		}
-		return bossMapIdHistory[bossMapIdHistory.Count - 1];
-	}
+  public ExploreStatus.TraceInfo[] GetTraceInfoHistory() => this.bossTraceMapIdHistory.ToArray();
 
-	private int GetBeforeBossMapId()
-	{
-		if (bossMapIdHistory == null)
-		{
-			return -1;
-		}
-		if (bossMapIdHistory.Count < 2)
-		{
-			return -1;
-		}
-		return bossMapIdHistory[bossMapIdHistory.Count - 2];
-	}
+  public void CompleteShowedTrace() => this.reservedTraceInfo = (ExploreStatus.TraceInfo) null;
 
-	public EXPLORE_HISTORY_TYPE GetHistoryTypeOfMap(int mapId)
-	{
-		if (bossMapIdHistory == null)
-		{
-			return EXPLORE_HISTORY_TYPE.NONE;
-		}
-		int? nullable = null;
-		for (int i = 0; i < bossMapIdHistory.Count; i++)
-		{
-			if (bossMapIdHistory[i] == mapId)
-			{
-				nullable = i;
-			}
-		}
-		if (!nullable.HasValue)
-		{
-			return EXPLORE_HISTORY_TYPE.NONE;
-		}
-		int count = bossMapIdHistory.Count;
-		if (nullable == count - 1)
-		{
-			return EXPLORE_HISTORY_TYPE.CURRENT;
-		}
-		if (nullable == count - 2)
-		{
-			return EXPLORE_HISTORY_TYPE.LAST;
-		}
-		if (nullable == count - 3)
-		{
-			return EXPLORE_HISTORY_TYPE.SECOND_LAST;
-		}
-		return EXPLORE_HISTORY_TYPE.NONE;
-	}
+  public void UpdatePortalPoint(int portalId, int point, bool force = false)
+  {
+    ExplorePortalPoint portalData = this.GetPortalData(portalId);
+    if (portalData == null)
+      return;
+    portalData.UpdatePoint(point, force);
+    this.GetPortalData(portalData.linkPortalId)?.UpdatePoint(point, force);
+  }
 
-	public bool IsBossAppearMap(int mapId)
-	{
-		if (GetCurrentBossMapId() == mapId)
-		{
-			return true;
-		}
-		return false;
-	}
+  public void UpdatePortalUsedFlag(int portalId)
+  {
+    ExplorePortalPoint portalData = this.GetPortalData(portalId);
+    if (portalData == null)
+      return;
+    portalData.UpdateUsedFlag(ExplorePortalPoint.USEDFLAG_PASSED);
+    this.GetPortalData(portalData.linkPortalId)?.UpdateUsedFlag(ExplorePortalPoint.USEDFLAG_PASSED);
+  }
 
-	public void SyncBoss(Coop_Model_RoomSyncExploreBoss boss)
-	{
-		if (bossMapIdHistory.Count == 0)
-		{
-			bossMapIdHistory.Add(boss.mId);
-		}
-		else if (bossMapIdHistory[bossMapIdHistory.Count - 1] != boss.mId)
-		{
-			bossMapIdHistory.Add(boss.mId);
-		}
-		if (boss.hp >= 0)
-		{
-			if (bossStatus == null)
-			{
-				bossStatus = new ExploreBossStatus();
-			}
-			bossStatus.UpdateStatus(boss);
-		}
-	}
+  public ExplorePortalPoint GetPortalData(int portalId)
+  {
+    return this.portals.Find((Predicate<ExplorePortalPoint>) (x => x.portaiId == portalId));
+  }
 
-	public void SyncBossMap(Coop_Model_RoomSyncExploreBossMap boss)
-	{
-		if (bossMapIdHistory.Count == 0)
-		{
-			bossMapIdHistory.Add(boss.mId);
-		}
-		else if (bossMapIdHistory[bossMapIdHistory.Count - 1] != boss.mId)
-		{
-			bossMapIdHistory.Add(boss.mId);
-		}
-	}
+  public List<ExplorePortalPoint> GetAllPortalData() => this.portals;
 
-	public void SetBossDead(Coop_Model_RoomExploreBossDead model)
-	{
-		if (bossStatus == null)
-		{
-			bossStatus = new ExploreBossStatus();
-		}
-		bossStatus.UpdateStatus(model);
-	}
+  public List<ExplorePortalPoint> GetPortalDataFromMapId(int mapId)
+  {
+    return this.portals.FindAll((Predicate<ExplorePortalPoint>) (o => (int) o.portalData.dstMapID == mapId));
+  }
 
-	public void SyncPortalPoint(Coop_Model_RoomSyncAllPortalPoint model)
-	{
-		for (int i = 0; i < model.ps.Count; i++)
-		{
-			Coop_Model_RoomSyncAllPortalPoint.PortalData portalData = model.ps[i];
-			ExplorePortalPoint portalData2 = GetPortalData(portalData.id);
-			if (portalData2 != null)
-			{
-				portalData2.UpdatePoint(portalData.pt, false);
-				portalData2.UpdateUsedFlag(portalData.u);
-				portalData2 = GetPortalData(portalData2.linkPortalId);
-				if (portalData2 != null)
-				{
-					portalData2.UpdatePoint(portalData.pt, false);
-					portalData2.UpdateUsedFlag(portalData.u);
-				}
-			}
-		}
-	}
+  public List<ExplorePortalPoint> GetPortalDataFromSrcMapId(int mapId)
+  {
+    return this.portals.FindAll((Predicate<ExplorePortalPoint>) (o => (int) o.portalData.srcMapID == mapId));
+  }
 
-	public void UpdateBossTraceMapIdHistory(int mapId, int lastCount, string playerName, bool reserve)
-	{
-		EXPLORE_HISTORY_TYPE type = EXPLORE_HISTORY_TYPE.NONE;
-		switch (lastCount)
-		{
-		case 0:
-			type = EXPLORE_HISTORY_TYPE.LAST;
-			break;
-		case 1:
-			type = EXPLORE_HISTORY_TYPE.SECOND_LAST;
-			break;
-		}
-		TraceInfo traceInfo = new TraceInfo(mapId, type, playerName);
-		bossTraceMapIdHistory.Add(traceInfo);
-		if (reserve)
-		{
-			reservedTraceInfo = traceInfo;
-		}
-	}
+  public uint GetLastPortalId() => this.lastUsePortal != null ? this.lastUsePortal.portalID : 0U;
 
-	public TraceInfo[] GetTraceInfoHistory()
-	{
-		return bossTraceMapIdHistory.ToArray();
-	}
+  public void UpdateLastPortal(FieldMapTable.PortalTableData portal)
+  {
+    this.lastUsePortal = portal;
+    this.UpdatePortalUsedFlag((int) portal.portalID);
+  }
 
-	public void CompleteShowedTrace()
-	{
-		reservedTraceInfo = null;
-	}
+  public ExplorePlayerStatus GetMyPlayerStatus() => this.selfPlayerStatus;
 
-	public void UpdatePortalPoint(int portalId, int point, bool force = false)
-	{
-		ExplorePortalPoint portalData = GetPortalData(portalId);
-		if (portalData != null)
-		{
-			portalData.UpdatePoint(point, force);
-			GetPortalData(portalData.linkPortalId)?.UpdatePoint(point, force);
-		}
-	}
+  private ExplorePlayerStatus GetPlayerStatus(CoopClient coopClient)
+  {
+    return Object.op_Implicit((Object) coopClient) ? this.GetPlayerStatus(coopClient.userId) : (ExplorePlayerStatus) null;
+  }
 
-	public void UpdatePortalUsedFlag(int portalId)
-	{
-		ExplorePortalPoint portalData = GetPortalData(portalId);
-		if (portalData != null)
-		{
-			portalData.UpdateUsedFlag(ExplorePortalPoint.USEDFLAG_PASSED);
-			GetPortalData(portalData.linkPortalId)?.UpdateUsedFlag(ExplorePortalPoint.USEDFLAG_PASSED);
-		}
-	}
+  public ExplorePlayerStatus GetPlayerStatus(int userId)
+  {
+    for (int index = 0; index < 8; ++index)
+    {
+      ExplorePlayerStatus playerStatuse = this.playerStatuses[index];
+      if (playerStatuse != null && playerStatuse.userId == userId)
+        return playerStatuse;
+    }
+    return (ExplorePlayerStatus) null;
+  }
 
-	public ExplorePortalPoint GetPortalData(int portalId)
-	{
-		return portals.Find((ExplorePortalPoint x) => x.portaiId == portalId);
-	}
+  public void RemovePlayerStatus(CoopClient coopClient)
+  {
+    for (int index = 0; index < 8; ++index)
+    {
+      ExplorePlayerStatus playerStatuse = this.playerStatuses[index];
+      if (playerStatuse != null && playerStatuse.userId == coopClient.userId)
+      {
+        this.playerStatuses[index] = (ExplorePlayerStatus) null;
+        if (this.onChangeExploreMemberList == null)
+          break;
+        this.onChangeExploreMemberList();
+        break;
+      }
+    }
+  }
 
-	public List<ExplorePortalPoint> GetAllPortalData()
-	{
-		return portals;
-	}
+  public void ActivatePlayerStatus(CoopClient coopClient)
+  {
+    ExplorePlayerStatus explorePlayerStatus = this.GetPlayerStatus(coopClient);
+    if (explorePlayerStatus == null)
+    {
+      bool isSelf = coopClient is CoopMyClient;
+      explorePlayerStatus = new ExplorePlayerStatus(coopClient.userInfo, isSelf);
+      this.playerStatuses[coopClient.slotIndex] = explorePlayerStatus;
+      if (isSelf)
+        this.selfPlayerStatus = explorePlayerStatus;
+    }
+    explorePlayerStatus.Activate(coopClient);
+    if (this.onChangeExploreMemberList == null)
+      return;
+    this.onChangeExploreMemberList();
+  }
 
-	public List<ExplorePortalPoint> GetPortalDataFromMapId(int mapId)
-	{
-		return portals.FindAll(delegate(ExplorePortalPoint o)
-		{
-			if (o.portalData.dstMapID == (uint)mapId)
-			{
-				return true;
-			}
-			return false;
-		});
-	}
+  public void UpdatePlayerStatus(CoopClient coopClient, Coop_Model_RoomSyncPlayerStatus status)
+  {
+    this.GetPlayerStatus(coopClient)?.Sync(status);
+  }
 
-	public List<ExplorePortalPoint> GetPortalDataFromSrcMapId(int mapId)
-	{
-		return portals.FindAll(delegate(ExplorePortalPoint o)
-		{
-			if (o.portalData.srcMapID == (uint)mapId)
-			{
-				return true;
-			}
-			return false;
-		});
-	}
+  public void UpdatePlayerStatus(CoopClient coopClient)
+  {
+    ExplorePlayerStatus playerStatus = this.GetPlayerStatus(coopClient);
+    Player player = coopClient.GetPlayer();
+    if (playerStatus == null || !Object.op_Implicit((Object) player))
+      return;
+    playerStatus.SyncFromPlayer(player);
+  }
 
-	public uint GetLastPortalId()
-	{
-		if (lastUsePortal != null)
-		{
-			return lastUsePortal.portalID;
-		}
-		return 0u;
-	}
+  public void UpdateTotalDamageToBoss(CoopClient coopClient, int total)
+  {
+    this.UpdateTotalDamageToBoss(coopClient.userId, total);
+  }
 
-	public void UpdateLastPortal(FieldMapTable.PortalTableData portal)
-	{
-		lastUsePortal = portal;
-		UpdatePortalUsedFlag((int)portal.portalID);
-	}
+  public void UpdateTotalDamageToBoss(int userId, int total)
+  {
+    this.GetPlayerStatus(userId)?.SyncTotalDamageToBoss(total);
+  }
 
-	public ExplorePlayerStatus GetMyPlayerStatus()
-	{
-		return selfPlayerStatus;
-	}
+  public void UpdateBossMoveRemainTime(float time) => this.bossMoveRemainTime = time;
 
-	private ExplorePlayerStatus GetPlayerStatus(CoopClient coopClient)
-	{
-		if (Object.op_Implicit(coopClient))
-		{
-			return GetPlayerStatus(coopClient.userId);
-		}
-		return null;
-	}
+  public void UpdateHostDCRemainTime(float time) => this.hostDCRemainTime = time;
 
-	public ExplorePlayerStatus GetPlayerStatus(int userId)
-	{
-		for (int i = 0; i < 8; i++)
-		{
-			ExplorePlayerStatus explorePlayerStatus = playerStatuses[i];
-			if (explorePlayerStatus != null && explorePlayerStatus.userId == userId)
-			{
-				return explorePlayerStatus;
-			}
-		}
-		return null;
-	}
+  public List<ExplorePlayerStatus> GetEnabledPlayerStatusList()
+  {
+    List<ExplorePlayerStatus> playerStatusList = new List<ExplorePlayerStatus>();
+    foreach (ExplorePlayerStatus playerStatuse in this.playerStatuses)
+    {
+      if (playerStatuse != null)
+        playerStatusList.Add(playerStatuse);
+    }
+    return playerStatusList;
+  }
 
-	public void RemovePlayerStatus(CoopClient coopClient)
-	{
-		int num = 0;
-		while (true)
-		{
-			if (num >= 8)
-			{
-				return;
-			}
-			ExplorePlayerStatus explorePlayerStatus = playerStatuses[num];
-			if (explorePlayerStatus != null && explorePlayerStatus.userId == coopClient.userId)
-			{
-				break;
-			}
-			num++;
-		}
-		playerStatuses[num] = null;
-		if (this.onChangeExploreMemberList != null)
-		{
-			this.onChangeExploreMemberList();
-		}
-	}
+  public void SetEncountered(int mapId)
+  {
+    this.isEncountered = true;
+    if (this.GetCurrentBossMapId() == mapId)
+      return;
+    this.bossMapIdHistory.Add(mapId);
+  }
 
-	public void ActivatePlayerStatus(CoopClient coopClient)
-	{
-		ExplorePlayerStatus explorePlayerStatus = GetPlayerStatus(coopClient);
-		if (explorePlayerStatus == null)
-		{
-			bool flag = coopClient is CoopMyClient;
-			explorePlayerStatus = new ExplorePlayerStatus(coopClient.userInfo, flag);
-			playerStatuses[coopClient.slotIndex] = explorePlayerStatus;
-			if (flag)
-			{
-				selfPlayerStatus = explorePlayerStatus;
-			}
-		}
-		explorePlayerStatus.Activate(coopClient);
-		if (this.onChangeExploreMemberList != null)
-		{
-			this.onChangeExploreMemberList();
-		}
-	}
+  public void ResetMemberEncountered() => this.isEncountered = false;
 
-	public void UpdatePlayerStatus(CoopClient coopClient, Coop_Model_RoomSyncPlayerStatus status)
-	{
-		GetPlayerStatus(coopClient)?.Sync(status);
-	}
+  public void UpdateBossStatus(Enemy boss)
+  {
+    if (this.bossStatus == null)
+      this.bossStatus = new ExploreBossStatus();
+    this.bossStatus.UpdateStatus(boss);
+  }
 
-	public void UpdatePlayerStatus(CoopClient coopClient)
-	{
-		ExplorePlayerStatus playerStatus = GetPlayerStatus(coopClient);
-		Player player = coopClient.GetPlayer();
-		if (playerStatus != null && Object.op_Implicit(player))
-		{
-			playerStatus.SyncFromPlayer(player);
-		}
-	}
+  public void SetMissions(List<MissionCheckBase> missionCheck)
+  {
+    if (this.missionCheck != null)
+      return;
+    this.missionCheck = missionCheck;
+  }
 
-	public void UpdateTotalDamageToBoss(CoopClient coopClient, int total)
-	{
-		UpdateTotalDamageToBoss(coopClient.userId, total);
-	}
+  public List<MissionCheckBase> GetMissions() => this.missionCheck;
 
-	public void UpdateTotalDamageToBoss(int userId, int total)
-	{
-		GetPlayerStatus(userId)?.SyncTotalDamageToBoss(total);
-	}
+  private List<ExplorePortalPoint> InitPortalPoint(List<int> mapIds)
+  {
+    List<ExplorePortalPoint> explorePortalPointList = new List<ExplorePortalPoint>();
+    int index1 = 0;
+    for (int index2 = mapIds.Count - 1; index1 < index2; ++index1)
+    {
+      List<FieldMapTable.PortalTableData> portalListByMapId = Singleton<FieldMapTable>.I.GetPortalListByMapID((uint) mapIds[index1]);
+      int index3 = 0;
+      for (int count = portalListByMapId.Count; index3 < count; ++index3)
+      {
+        ExplorePortalPoint explorePortalPoint = new ExplorePortalPoint(portalListByMapId[index3]);
+        explorePortalPointList.Add(explorePortalPoint);
+      }
+    }
+    return explorePortalPointList;
+  }
 
-	public void UpdateBossMoveRemainTime(float time)
-	{
-		bossMoveRemainTime = time;
-	}
+  public void UpdatePassedPortal()
+  {
+    this.portals.ForEach((Action<ExplorePortalPoint>) (o =>
+    {
+      if (!o.passed)
+        return;
+      o.UpdateUsedFlag(ExplorePortalPoint.USEDFLAG_OPENED);
+    }));
+  }
 
-	public void UpdateHostDCRemainTime(float time)
-	{
-		hostDCRemainTime = time;
-	}
+  public class TraceInfo
+  {
+    public int mapId;
+    public EXPLORE_HISTORY_TYPE historyType;
+    public string playerName;
 
-	public List<ExplorePlayerStatus> GetEnabledPlayerStatusList()
-	{
-		List<ExplorePlayerStatus> list = new List<ExplorePlayerStatus>();
-		ExplorePlayerStatus[] array = playerStatuses;
-		foreach (ExplorePlayerStatus explorePlayerStatus in array)
-		{
-			if (explorePlayerStatus != null)
-			{
-				list.Add(explorePlayerStatus);
-			}
-		}
-		return list;
-	}
-
-	public void SetEncountered(int mapId)
-	{
-		isEncountered = true;
-		if (GetCurrentBossMapId() != mapId)
-		{
-			bossMapIdHistory.Add(mapId);
-		}
-	}
-
-	public void ResetMemberEncountered()
-	{
-		isEncountered = false;
-	}
-
-	public void UpdateBossStatus(Enemy boss)
-	{
-		if (bossStatus == null)
-		{
-			bossStatus = new ExploreBossStatus();
-		}
-		bossStatus.UpdateStatus(boss);
-	}
-
-	public void SetMissions(List<MissionCheckBase> missionCheck)
-	{
-		if (this.missionCheck == null)
-		{
-			this.missionCheck = missionCheck;
-		}
-	}
-
-	public List<MissionCheckBase> GetMissions()
-	{
-		return missionCheck;
-	}
-
-	private List<ExplorePortalPoint> InitPortalPoint(List<int> mapIds)
-	{
-		List<ExplorePortalPoint> list = new List<ExplorePortalPoint>();
-		int i = 0;
-		for (int num = mapIds.Count - 1; i < num; i++)
-		{
-			List<FieldMapTable.PortalTableData> portalListByMapID = Singleton<FieldMapTable>.I.GetPortalListByMapID((uint)mapIds[i], false);
-			int j = 0;
-			for (int count = portalListByMapID.Count; j < count; j++)
-			{
-				ExplorePortalPoint item = new ExplorePortalPoint(portalListByMapID[j]);
-				list.Add(item);
-			}
-		}
-		return list;
-	}
-
-	public void UpdatePassedPortal()
-	{
-		portals.ForEach(delegate(ExplorePortalPoint o)
-		{
-			if (o.passed)
-			{
-				o.UpdateUsedFlag(ExplorePortalPoint.USEDFLAG_OPENED);
-			}
-		});
-	}
+    public TraceInfo(int mapId, EXPLORE_HISTORY_TYPE type, string playerName)
+    {
+      this.mapId = mapId;
+      this.historyType = type;
+      this.playerName = playerName;
+    }
+  }
 }

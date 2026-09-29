@@ -1,149 +1,103 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: DataLoadRequest
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 
+#nullable disable
 public class DataLoadRequest
 {
-	private string directory;
+  private string directory;
+  private bool enableLoadBinary = true;
+  public Action<byte[]> processCompressedTextData;
+  public Action<byte[]> processCompressedBinaryData;
+  public List<DataLoadRequest> depReqs = new List<DataLoadRequest>();
 
-	private bool enableLoadBinary = true;
+  public string name { get; private set; }
 
-	public Action<byte[]> processCompressedTextData;
+  public IDataTableRequestHash hash { get; private set; }
 
-	public Action<byte[]> processCompressedBinaryData;
+  public IDataTableRequestHash hashBinary { get; private set; }
 
-	public List<DataLoadRequest> depReqs = new List<DataLoadRequest>();
+  public string filename
+  {
+    get => this.GetName().ToLower() + GoGameResourceManager.GetDefaultAssetBundleExtension();
+  }
 
-	public string name
-	{
-		get;
-		private set;
-	}
+  public string GetName() => this.enableLoadBinaryData ? this.name + "_b" : this.name;
 
-	public IDataTableRequestHash hash
-	{
-		get;
-		private set;
-	}
+  public IDataTableRequestHash GetHash() => this.enableLoadBinaryData ? this.hashBinary : this.hash;
 
-	public IDataTableRequestHash hashBinary
-	{
-		get;
-		private set;
-	}
+  public string path => $"{this.directory}/{this.filename}?v={this.GetHash().ToString()}";
 
-	public string filename => GetName().ToLower() + GoGameResourceManager.GetDefaultAssetBundleExtension();
+  public bool downloadOnly { get; private set; }
 
-	public string path => directory + "/" + filename + "?v=" + GetHash().ToString();
+  public bool enableLoadBinaryData
+  {
+    get => this.processCompressedBinaryData != null && this.enableLoadBinary;
+    set => this.enableLoadBinary = value;
+  }
 
-	public bool downloadOnly
-	{
-		get;
-		private set;
-	}
+  public event System.Action onComplete;
 
-	public bool enableLoadBinaryData
-	{
-		get
-		{
-			return processCompressedBinaryData != null && enableLoadBinary;
-		}
-		set
-		{
-			enableLoadBinary = value;
-		}
-	}
+  public event Action<DataTableLoadError> onError;
 
-	public float progress
-	{
-		get;
-		set;
-	}
+  public event Func<string, bool> onVerifyError;
 
-	public DataTableLoadError error
-	{
-		get;
-		private set;
-	}
+  public float progress { get; set; }
 
-	public bool isCompleted
-	{
-		get;
-		private set;
-	}
+  public DataTableLoadError error { get; private set; }
 
-	public event Action onComplete;
+  public bool isCompleted { get; private set; }
 
-	public event Action<DataTableLoadError> onError;
+  public DataLoadRequest(
+    string name,
+    IDataTableRequestHash hash,
+    string directory,
+    bool downloadOnly)
+  {
+    this.name = name;
+    this.hash = hash;
+    this.directory = directory;
+    this.downloadOnly = downloadOnly;
+  }
 
-	public event Func<string, bool> onVerifyError;
+  public void Reset()
+  {
+    this.progress = 0.0f;
+    this.enableLoadBinary = true;
+    this.error = DataTableLoadError.None;
+    this.isCompleted = false;
+  }
 
-	public DataLoadRequest(string name, IDataTableRequestHash hash, string directory, bool downloadOnly)
-	{
-		this.name = name;
-		this.hash = hash;
-		this.directory = directory;
-		this.downloadOnly = downloadOnly;
-	}
+  public void DependsOn(DataLoadRequest depReq) => this.depReqs.Add(depReq);
 
-	public string GetName()
-	{
-		if (enableLoadBinaryData)
-		{
-			return name + "_b";
-		}
-		return name;
-	}
+  public void OnComplete()
+  {
+    this.isCompleted = true;
+    if (this.onComplete == null)
+      return;
+    this.onComplete();
+  }
 
-	public IDataTableRequestHash GetHash()
-	{
-		if (enableLoadBinaryData)
-		{
-			return hashBinary;
-		}
-		return hash;
-	}
+  public void OnError(DataTableLoadError error)
+  {
+    this.error = error;
+    this.onError(error);
+  }
 
-	public void Reset()
-	{
-		progress = 0f;
-		enableLoadBinary = true;
-		error = DataTableLoadError.None;
-		isCompleted = false;
-	}
+  public bool OnVerifyError(string hash) => this.onVerifyError(hash);
 
-	public void DependsOn(DataLoadRequest depReq)
-	{
-		depReqs.Add(depReq);
-	}
-
-	public void OnComplete()
-	{
-		isCompleted = true;
-		if (this.onComplete != null)
-		{
-			this.onComplete();
-		}
-	}
-
-	public void OnError(DataTableLoadError error)
-	{
-		this.error = error;
-		this.onError(error);
-	}
-
-	public bool OnVerifyError(string hash)
-	{
-		return this.onVerifyError(hash);
-	}
-
-	public void SetupLoadBinary(DataTableManifest manifest, Action<byte[]> processBinary)
-	{
-		enableLoadBinary = true;
-		processCompressedBinaryData = processBinary;
-		hashBinary = manifest.GetTableHash(GetName());
-		if (hashBinary == null)
-		{
-			enableLoadBinary = false;
-		}
-	}
+  public void SetupLoadBinary(DataTableManifest manifest, Action<byte[]> processBinary)
+  {
+    this.enableLoadBinary = true;
+    this.processCompressedBinaryData = processBinary;
+    this.hashBinary = (IDataTableRequestHash) manifest.GetTableHash(this.GetName());
+    if (this.hashBinary != null)
+      return;
+    this.enableLoadBinary = false;
+  }
 }

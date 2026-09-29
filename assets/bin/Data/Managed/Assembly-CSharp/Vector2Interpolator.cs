@@ -1,30 +1,21 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Vector2Interpolator
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 [Serializable]
 public class Vector2Interpolator : InterpolatorBase<Vector2>
 {
-	protected override void Calc(float t, float r)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		Vector2 val = (endValue - beginValue) * r + beginValue;
-		if (addCurve != null && addCurve.get_length() > 0)
-		{
-			val = addValue * addCurve.Evaluate(t) + val;
-		}
-		nowValue = val;
-	}
+  protected override void Calc(float t, float r)
+  {
+    Vector2 vector2 = Vector2.op_Addition(Vector2.op_Multiply(Vector2.op_Subtraction(this.endValue, this.beginValue), r), this.beginValue);
+    if (this.addCurve != null && this.addCurve.length > 0)
+      vector2 = Vector2.op_Addition(Vector2.op_Multiply(this.addValue, this.addCurve.Evaluate(t)), vector2);
+    this.nowValue = vector2;
+  }
 }

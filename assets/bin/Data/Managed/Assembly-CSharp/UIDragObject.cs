@@ -1,423 +1,242 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIDragObject
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Drag Object")]
-public class UIDragObject
+public class UIDragObject : MonoBehaviour
 {
-	public enum DragEffect
-	{
-		None,
-		Momentum,
-		MomentumAndSpring
-	}
+  public Transform target;
+  public UIPanel panelRegion;
+  public Vector3 scrollMomentum = Vector3.zero;
+  public bool restrictWithinPanel;
+  public UIRect contentRect;
+  public UIDragObject.DragEffect dragEffect = UIDragObject.DragEffect.MomentumAndSpring;
+  public float momentumAmount = 35f;
+  [SerializeField]
+  protected Vector3 scale = new Vector3(1f, 1f, 0.0f);
+  [SerializeField]
+  [HideInInspector]
+  private float scrollWheelFactor;
+  private Plane mPlane;
+  private Vector3 mTargetPos;
+  private Vector3 mLastPos;
+  private Vector3 mMomentum = Vector3.zero;
+  private Vector3 mScroll = Vector3.zero;
+  private Bounds mBounds;
+  private int mTouchID;
+  private bool mStarted;
+  private bool mPressed;
 
-	public Transform target;
+  public Vector3 dragMovement
+  {
+    get => this.scale;
+    set => this.scale = value;
+  }
 
-	public UIPanel panelRegion;
+  private void OnEnable()
+  {
+    if ((double) this.scrollWheelFactor != 0.0)
+    {
+      this.scrollMomentum = Vector3.op_Multiply(this.scale, this.scrollWheelFactor);
+      this.scrollWheelFactor = 0.0f;
+    }
+    if (Object.op_Equality((Object) this.contentRect, (Object) null) && Object.op_Inequality((Object) this.target, (Object) null) && Application.isPlaying)
+    {
+      UIWidget component = ((Component) this.target).GetComponent<UIWidget>();
+      if (Object.op_Inequality((Object) component, (Object) null))
+        this.contentRect = (UIRect) component;
+    }
+    this.mTargetPos = Object.op_Inequality((Object) this.target, (Object) null) ? this.target.position : Vector3.zero;
+  }
 
-	public Vector3 scrollMomentum = Vector3.get_zero();
+  private void OnDisable() => this.mStarted = false;
 
-	public bool restrictWithinPanel;
+  private void FindPanel()
+  {
+    this.panelRegion = Object.op_Inequality((Object) this.target, (Object) null) ? UIPanel.Find(((Component) this.target).transform.parent) : (UIPanel) null;
+    if (!Object.op_Equality((Object) this.panelRegion, (Object) null))
+      return;
+    this.restrictWithinPanel = false;
+  }
 
-	public UIRect contentRect;
+  private void UpdateBounds()
+  {
+    if (Object.op_Implicit((Object) this.contentRect))
+    {
+      Matrix4x4 worldToLocalMatrix = this.panelRegion.cachedTransform.worldToLocalMatrix;
+      Vector3[] worldCorners = this.contentRect.worldCorners;
+      for (int index = 0; index < 4; ++index)
+        worldCorners[index] = ((Matrix4x4) ref worldToLocalMatrix).MultiplyPoint3x4(worldCorners[index]);
+      this.mBounds = new Bounds(worldCorners[0], Vector3.zero);
+      for (int index = 1; index < 4; ++index)
+        ((Bounds) ref this.mBounds).Encapsulate(worldCorners[index]);
+    }
+    else
+      this.mBounds = NGUIMath.CalculateRelativeWidgetBounds(this.panelRegion.cachedTransform, this.target);
+  }
 
-	public DragEffect dragEffect = DragEffect.MomentumAndSpring;
+  private void OnPress(bool pressed)
+  {
+    if (UICamera.currentTouchID == -2 || UICamera.currentTouchID == -3)
+      return;
+    float timeScale = Time.timeScale;
+    if ((double) timeScale < 0.0099999997764825821 && (double) timeScale != 0.0 || !((Behaviour) this).enabled || !NGUITools.GetActive(((Component) this).gameObject) || !Object.op_Inequality((Object) this.target, (Object) null))
+      return;
+    if (pressed)
+    {
+      if (this.mPressed)
+        return;
+      this.mTouchID = UICamera.currentTouchID;
+      this.mPressed = true;
+      this.mStarted = false;
+      this.CancelMovement();
+      if (this.restrictWithinPanel && Object.op_Equality((Object) this.panelRegion, (Object) null))
+        this.FindPanel();
+      if (this.restrictWithinPanel)
+        this.UpdateBounds();
+      this.CancelSpring();
+      Transform transform = ((Component) UICamera.currentCamera).transform;
+      this.mPlane = new Plane(Quaternion.op_Multiply(Object.op_Inequality((Object) this.panelRegion, (Object) null) ? this.panelRegion.cachedTransform.rotation : transform.rotation, Vector3.back), UICamera.lastWorldPosition);
+    }
+    else
+    {
+      if (!this.mPressed || this.mTouchID != UICamera.currentTouchID)
+        return;
+      this.mPressed = false;
+      if (!this.restrictWithinPanel || this.dragEffect != UIDragObject.DragEffect.MomentumAndSpring || !this.panelRegion.ConstrainTargetToBounds(this.target, ref this.mBounds, false))
+        return;
+      this.CancelMovement();
+    }
+  }
 
-	public float momentumAmount = 35f;
+  private void OnDrag(Vector2 delta)
+  {
+    if (!this.mPressed || this.mTouchID != UICamera.currentTouchID || !((Behaviour) this).enabled || !NGUITools.GetActive(((Component) this).gameObject) || !Object.op_Inequality((Object) this.target, (Object) null))
+      return;
+    UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
+    Ray ray = UICamera.currentCamera.ScreenPointToRay(Vector2.op_Implicit(UICamera.currentTouch.pos));
+    float num = 0.0f;
+    if (!((Plane) ref this.mPlane).Raycast(ray, ref num))
+      return;
+    Vector3 point = ((Ray) ref ray).GetPoint(num);
+    Vector3 worldDelta = Vector3.op_Subtraction(point, this.mLastPos);
+    this.mLastPos = point;
+    if (!this.mStarted)
+    {
+      this.mStarted = true;
+      worldDelta = Vector3.zero;
+    }
+    if ((double) worldDelta.x != 0.0 || (double) worldDelta.y != 0.0)
+    {
+      Vector3 vector3 = this.target.InverseTransformDirection(worldDelta);
+      ((Vector3) ref vector3).Scale(this.scale);
+      worldDelta = this.target.TransformDirection(vector3);
+    }
+    if (this.dragEffect != UIDragObject.DragEffect.None)
+      this.mMomentum = Vector3.Lerp(this.mMomentum, Vector3.op_Addition(this.mMomentum, Vector3.op_Multiply(worldDelta, 0.01f * this.momentumAmount)), 0.67f);
+    Vector3 localPosition = this.target.localPosition;
+    this.Move(worldDelta);
+    if (!this.restrictWithinPanel)
+      return;
+    ((Bounds) ref this.mBounds).center = Vector3.op_Addition(((Bounds) ref this.mBounds).center, Vector3.op_Subtraction(this.target.localPosition, localPosition));
+    if (this.dragEffect == UIDragObject.DragEffect.MomentumAndSpring || !this.panelRegion.ConstrainTargetToBounds(this.target, ref this.mBounds, true))
+      return;
+    this.CancelMovement();
+  }
 
-	[SerializeField]
-	protected Vector3 scale = new Vector3(1f, 1f, 0f);
+  private void Move(Vector3 worldDelta)
+  {
+    if (Object.op_Inequality((Object) this.panelRegion, (Object) null))
+    {
+      this.mTargetPos = Vector3.op_Addition(this.mTargetPos, worldDelta);
+      this.target.position = this.mTargetPos;
+      Vector3 localPosition = this.target.localPosition;
+      localPosition.x = Mathf.Round(localPosition.x);
+      localPosition.y = Mathf.Round(localPosition.y);
+      this.target.localPosition = localPosition;
+      UIScrollView component = ((Component) this.panelRegion).GetComponent<UIScrollView>();
+      if (!Object.op_Inequality((Object) component, (Object) null))
+        return;
+      component.UpdateScrollbars(true);
+    }
+    else
+    {
+      Transform target = this.target;
+      target.position = Vector3.op_Addition(target.position, worldDelta);
+    }
+  }
 
-	[HideInInspector]
-	[SerializeField]
-	private float scrollWheelFactor;
+  private void LateUpdate()
+  {
+    if (Object.op_Equality((Object) this.target, (Object) null))
+      return;
+    float deltaTime = RealTime.deltaTime;
+    this.mMomentum = Vector3.op_Subtraction(this.mMomentum, this.mScroll);
+    this.mScroll = NGUIMath.SpringLerp(this.mScroll, Vector3.zero, 20f, deltaTime);
+    if ((double) ((Vector3) ref this.mMomentum).magnitude < 9.9999997473787516E-05)
+      return;
+    if (!this.mPressed)
+    {
+      if (Object.op_Equality((Object) this.panelRegion, (Object) null))
+        this.FindPanel();
+      this.Move(NGUIMath.SpringDampen(ref this.mMomentum, 9f, deltaTime));
+      if (this.restrictWithinPanel && Object.op_Inequality((Object) this.panelRegion, (Object) null))
+      {
+        this.UpdateBounds();
+        if (this.panelRegion.ConstrainTargetToBounds(this.target, ref this.mBounds, this.dragEffect == UIDragObject.DragEffect.None))
+          this.CancelMovement();
+        else
+          this.CancelSpring();
+      }
+      NGUIMath.SpringDampen(ref this.mMomentum, 9f, deltaTime);
+      if ((double) ((Vector3) ref this.mMomentum).magnitude >= 9.9999997473787516E-05)
+        return;
+      this.CancelMovement();
+    }
+    else
+      NGUIMath.SpringDampen(ref this.mMomentum, 9f, deltaTime);
+  }
 
-	private Plane mPlane;
+  public void CancelMovement()
+  {
+    if (Object.op_Inequality((Object) this.target, (Object) null))
+    {
+      Vector3 localPosition = this.target.localPosition;
+      localPosition.x = (float) Mathf.RoundToInt(localPosition.x);
+      localPosition.y = (float) Mathf.RoundToInt(localPosition.y);
+      localPosition.z = (float) Mathf.RoundToInt(localPosition.z);
+      this.target.localPosition = localPosition;
+    }
+    this.mTargetPos = Object.op_Inequality((Object) this.target, (Object) null) ? this.target.position : Vector3.zero;
+    this.mMomentum = Vector3.zero;
+    this.mScroll = Vector3.zero;
+  }
 
-	private Vector3 mTargetPos;
+  public void CancelSpring()
+  {
+    SpringPosition component = ((Component) this.target).GetComponent<SpringPosition>();
+    if (!Object.op_Inequality((Object) component, (Object) null))
+      return;
+    ((Behaviour) component).enabled = false;
+  }
 
-	private Vector3 mLastPos;
+  private void OnScroll(float delta)
+  {
+    if (!((Behaviour) this).enabled || !NGUITools.GetActive(((Component) this).gameObject))
+      return;
+    this.mScroll = Vector3.op_Subtraction(this.mScroll, Vector3.op_Multiply(this.scrollMomentum, delta * 0.05f));
+  }
 
-	private Vector3 mMomentum = Vector3.get_zero();
-
-	private Vector3 mScroll = Vector3.get_zero();
-
-	private Bounds mBounds;
-
-	private int mTouchID;
-
-	private bool mStarted;
-
-	private bool mPressed;
-
-	public Vector3 dragMovement
-	{
-		get
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			return scale;
-		}
-		set
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			scale = value;
-		}
-	}
-
-	public UIDragObject()
-		: this()
-	{
-	}//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-	//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-	//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-
-
-	private void OnEnable()
-	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		if (scrollWheelFactor != 0f)
-		{
-			scrollMomentum = scale * scrollWheelFactor;
-			scrollWheelFactor = 0f;
-		}
-		if (contentRect == null && target != null && Application.get_isPlaying())
-		{
-			UIWidget component = target.GetComponent<UIWidget>();
-			if (component != null)
-			{
-				contentRect = component;
-			}
-		}
-		mTargetPos = ((!(target != null)) ? Vector3.get_zero() : target.get_position());
-	}
-
-	private void OnDisable()
-	{
-		mStarted = false;
-	}
-
-	private void FindPanel()
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
-		panelRegion = ((!(target != null)) ? null : UIPanel.Find(target.get_transform().get_parent()));
-		if (panelRegion == null)
-		{
-			restrictWithinPanel = false;
-		}
-	}
-
-	private void UpdateBounds()
-	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		if (Object.op_Implicit(contentRect))
-		{
-			Transform cachedTransform = panelRegion.cachedTransform;
-			Matrix4x4 worldToLocalMatrix = cachedTransform.get_worldToLocalMatrix();
-			Vector3[] worldCorners = contentRect.worldCorners;
-			for (int i = 0; i < 4; i++)
-			{
-				worldCorners[i] = worldToLocalMatrix.MultiplyPoint3x4(worldCorners[i]);
-			}
-			mBounds = new Bounds(worldCorners[0], Vector3.get_zero());
-			for (int j = 1; j < 4; j++)
-			{
-				mBounds.Encapsulate(worldCorners[j]);
-			}
-		}
-		else
-		{
-			mBounds = NGUIMath.CalculateRelativeWidgetBounds(panelRegion.cachedTransform, target);
-		}
-	}
-
-	private void OnPress(bool pressed)
-	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Expected O, but got Unknown
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Expected O, but got Unknown
-		//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		if (UICamera.currentTouchID != -2 && UICamera.currentTouchID != -3)
-		{
-			float timeScale = Time.get_timeScale();
-			if ((!(timeScale < 0.01f) || timeScale == 0f) && this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && target != null)
-			{
-				if (pressed)
-				{
-					if (!mPressed)
-					{
-						mTouchID = UICamera.currentTouchID;
-						mPressed = true;
-						mStarted = false;
-						CancelMovement();
-						if (restrictWithinPanel && panelRegion == null)
-						{
-							FindPanel();
-						}
-						if (restrictWithinPanel)
-						{
-							UpdateBounds();
-						}
-						CancelSpring();
-						Transform val = UICamera.currentCamera.get_transform();
-						mPlane = new Plane(((!(panelRegion != null)) ? val.get_rotation() : panelRegion.cachedTransform.get_rotation()) * Vector3.get_back(), UICamera.lastWorldPosition);
-					}
-				}
-				else if (mPressed && mTouchID == UICamera.currentTouchID)
-				{
-					mPressed = false;
-					if (restrictWithinPanel && dragEffect == DragEffect.MomentumAndSpring && panelRegion.ConstrainTargetToBounds(target, ref mBounds, false))
-					{
-						CancelMovement();
-					}
-				}
-			}
-		}
-	}
-
-	private void OnDrag(Vector2 delta)
-	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Expected O, but got Unknown
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-		if (mPressed && mTouchID == UICamera.currentTouchID && this.get_enabled() && NGUITools.GetActive(this.get_gameObject()) && target != null)
-		{
-			UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
-			Ray val = UICamera.currentCamera.ScreenPointToRay(Vector2.op_Implicit(UICamera.currentTouch.pos));
-			float num = 0f;
-			if (mPlane.Raycast(val, ref num))
-			{
-				Vector3 point = val.GetPoint(num);
-				Vector3 val2 = point - mLastPos;
-				mLastPos = point;
-				if (!mStarted)
-				{
-					mStarted = true;
-					val2 = Vector3.get_zero();
-				}
-				if (val2.x != 0f || val2.y != 0f)
-				{
-					val2 = target.InverseTransformDirection(val2);
-					val2.Scale(scale);
-					val2 = target.TransformDirection(val2);
-				}
-				if (dragEffect != 0)
-				{
-					mMomentum = Vector3.Lerp(mMomentum, mMomentum + val2 * (0.01f * momentumAmount), 0.67f);
-				}
-				Vector3 localPosition = target.get_localPosition();
-				Move(val2);
-				if (restrictWithinPanel)
-				{
-					mBounds.set_center(mBounds.get_center() + (target.get_localPosition() - localPosition));
-					if (dragEffect != DragEffect.MomentumAndSpring && panelRegion.ConstrainTargetToBounds(target, ref mBounds, true))
-					{
-						CancelMovement();
-					}
-				}
-			}
-		}
-	}
-
-	private void Move(Vector3 worldDelta)
-	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		if (panelRegion != null)
-		{
-			mTargetPos += worldDelta;
-			target.set_position(mTargetPos);
-			Vector3 localPosition = target.get_localPosition();
-			localPosition.x = Mathf.Round(localPosition.x);
-			localPosition.y = Mathf.Round(localPosition.y);
-			target.set_localPosition(localPosition);
-			UIScrollView component = panelRegion.GetComponent<UIScrollView>();
-			if (component != null)
-			{
-				component.UpdateScrollbars(true);
-			}
-		}
-		else
-		{
-			Transform obj = target;
-			obj.set_position(obj.get_position() + worldDelta);
-		}
-	}
-
-	private void LateUpdate()
-	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-		if (!(target == null))
-		{
-			float deltaTime = RealTime.deltaTime;
-			mMomentum -= mScroll;
-			mScroll = NGUIMath.SpringLerp(mScroll, Vector3.get_zero(), 20f, deltaTime);
-			if (!(mMomentum.get_magnitude() < 0.0001f))
-			{
-				if (!mPressed)
-				{
-					if (panelRegion == null)
-					{
-						FindPanel();
-					}
-					Move(NGUIMath.SpringDampen(ref mMomentum, 9f, deltaTime));
-					if (restrictWithinPanel && panelRegion != null)
-					{
-						UpdateBounds();
-						if (panelRegion.ConstrainTargetToBounds(target, ref mBounds, dragEffect == DragEffect.None))
-						{
-							CancelMovement();
-						}
-						else
-						{
-							CancelSpring();
-						}
-					}
-					NGUIMath.SpringDampen(ref mMomentum, 9f, deltaTime);
-					if (mMomentum.get_magnitude() < 0.0001f)
-					{
-						CancelMovement();
-					}
-				}
-				else
-				{
-					NGUIMath.SpringDampen(ref mMomentum, 9f, deltaTime);
-				}
-			}
-		}
-	}
-
-	public void CancelMovement()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		if (target != null)
-		{
-			Vector3 localPosition = target.get_localPosition();
-			localPosition.x = (float)Mathf.RoundToInt(localPosition.x);
-			localPosition.y = (float)Mathf.RoundToInt(localPosition.y);
-			localPosition.z = (float)Mathf.RoundToInt(localPosition.z);
-			target.set_localPosition(localPosition);
-		}
-		mTargetPos = ((!(target != null)) ? Vector3.get_zero() : target.get_position());
-		mMomentum = Vector3.get_zero();
-		mScroll = Vector3.get_zero();
-	}
-
-	public void CancelSpring()
-	{
-		SpringPosition component = target.GetComponent<SpringPosition>();
-		if (component != null)
-		{
-			component.set_enabled(false);
-		}
-	}
-
-	private void OnScroll(float delta)
-	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Expected O, but got Unknown
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_enabled() && NGUITools.GetActive(this.get_gameObject()))
-		{
-			mScroll -= scrollMomentum * (delta * 0.05f);
-		}
-	}
+  public enum DragEffect
+  {
+    None,
+    Momentum,
+    MomentumAndSpring,
+  }
 }

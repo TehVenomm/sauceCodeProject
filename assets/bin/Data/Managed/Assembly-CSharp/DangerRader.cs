@@ -1,297 +1,213 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: DangerRader
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DangerRader
+#nullable disable
+public class DangerRader : MonoBehaviour
 {
-	public class ColliderRecord
-	{
-		public float time;
+  public const float RADER_SPAN = 0.2f;
+  private SpanTimer triggerSpan = new SpanTimer(0.2f);
+  private const int RECORD_MAX = 20;
+  public LinkedList<DangerRader.ColliderRecord> records = new LinkedList<DangerRader.ColliderRecord>();
+  private float nearMoveTime;
+  private float nearWillBulletHitTime;
+  private float nearWillDashHitTime;
 
-		public Vector3 pos;
+  public Brain brain { get; private set; }
 
-		public float angle;
+  public Rigidbody _rigidbody { get; private set; }
 
-		public Vector3 forward;
+  public Collider _collider { get; private set; }
 
-		public float radius;
+  public static DangerRader Create(Brain brain, float radius)
+  {
+    DangerRader componentInChildren = ((Component) brain).gameObject.GetComponentInChildren<DangerRader>();
+    if (Object.op_Inequality((Object) componentInChildren, (Object) null))
+      return componentInChildren;
+    int layer = ((Component) brain.owner).gameObject.layer;
+    DangerRader objectAndComponent = (DangerRader) Utility.CreateGameObjectAndComponent(nameof (DangerRader), ((Component) brain).transform, layer);
+    if (Object.op_Equality((Object) objectAndComponent, (Object) null))
+      return (DangerRader) null;
+    objectAndComponent.SetRadius(radius);
+    return objectAndComponent;
+  }
 
-		public bool isDash;
+  public void SetRadius(float radius)
+  {
+    SphereCollider collider = this._collider as SphereCollider;
+    if (!Object.op_Inequality((Object) collider, (Object) null))
+      return;
+    collider.radius = radius;
+  }
 
-		public bool isBullet;
+  private void Awake()
+  {
+    this._rigidbody = ((Component) this).GetComponent<Rigidbody>();
+    this._collider = ((Component) this).GetComponent<Collider>();
+    if (Object.op_Equality((Object) this._collider, (Object) null))
+    {
+      SphereCollider sphereCollider = ((Component) this).gameObject.AddComponent<SphereCollider>();
+      sphereCollider.center = new Vector3(0.0f, 0.0f, 0.0f);
+      this._collider = (Collider) sphereCollider;
+    }
+    if (!Object.op_Inequality((Object) this._collider, (Object) null))
+      return;
+    this._collider.isTrigger = true;
+    if (Object.op_Equality((Object) this._rigidbody, (Object) null))
+      this._rigidbody = ((Component) this).gameObject.AddComponent<Rigidbody>();
+    this._rigidbody.isKinematic = true;
+  }
 
-		public bool isWillHit;
+  private void Start() => this.brain = ((Component) this).gameObject.GetComponentInParent<Brain>();
 
-		public bool isMove => isDash || isBullet;
-	}
+  private void Update()
+  {
+    if (!this.triggerSpan.IsReady())
+      return;
+    this._collider.enabled = false;
+    this._collider.enabled = true;
+  }
 
-	public const float RADER_SPAN = 0.2f;
+  private void OnTriggerEnter(Collider collider)
+  {
+    if (Object.op_Equality((Object) this.brain, (Object) null) || Object.op_Equality((Object) this._collider, (Object) null) || !this._collider.enabled || !collider.isTrigger || Object.op_Equality((Object) ((Component) collider).gameObject, (Object) ((Component) this).gameObject))
+      return;
+    BulletObject component = ((Component) collider).gameObject.GetComponent<BulletObject>();
+    StageObject stageObject = !Object.op_Inequality((Object) component, (Object) null) ? ((Component) collider).gameObject.GetComponentInParent<StageObject>() : component.stageObject;
+    if (Object.op_Equality((Object) stageObject, (Object) null) || Object.op_Equality((Object) stageObject, (Object) this.brain.owner))
+      return;
+    if (this.RecordCollider(collider, stageObject, component).isMove)
+      this.brain.HandleEvent(BRAIN_EVENT.BULLET_CATCH, (object) component);
+    else
+      this.brain.HandleEvent(BRAIN_EVENT.COLLIDER_CATCH, (object) stageObject);
+  }
 
-	private const int RECORD_MAX = 20;
+  public DangerRader.ColliderRecord firstRecord
+  {
+    get => this.records.Count > 0 ? this.records.First.Value : (DangerRader.ColliderRecord) null;
+  }
 
-	private SpanTimer triggerSpan = new SpanTimer(0.2f);
+  private DangerRader.ColliderRecord RecordCollider(
+    Collider collider,
+    StageObject obj,
+    BulletObject bullet)
+  {
+    DangerRader.ColliderRecord colliderRecord;
+    if (this.records.Count >= 20)
+    {
+      colliderRecord = this.records.Last.Value;
+      this.records.RemoveLast();
+    }
+    else
+      colliderRecord = new DangerRader.ColliderRecord();
+    colliderRecord.time = Time.time;
+    colliderRecord.pos = ((Component) collider).transform.position;
+    colliderRecord.forward = ((Component) collider).transform.forward;
+    colliderRecord.angle = AIUtility.GetAngle360OfTargetPos(this.brain.owner, colliderRecord.pos);
+    colliderRecord.radius = 1f;
+    switch (collider)
+    {
+      case SphereCollider _:
+        colliderRecord.radius = (collider as SphereCollider).radius;
+        break;
+      case CapsuleCollider _:
+        CapsuleCollider capsuleCollider = collider as CapsuleCollider;
+        colliderRecord.radius = Mathf.Max(capsuleCollider.radius, capsuleCollider.height);
+        break;
+    }
+    colliderRecord.isDash = false;
+    Enemy enemy = obj as Enemy;
+    if (Object.op_Inequality((Object) enemy, (Object) null))
+      colliderRecord.isDash = enemy.enableDash;
+    colliderRecord.isBullet = Object.op_Inequality((Object) bullet, (Object) null);
+    colliderRecord.isWillHit = false;
+    if (colliderRecord.isMove)
+    {
+      this.nearMoveTime = colliderRecord.time;
+      int opponentMask = AIUtility.GetOpponentMask(obj);
+      colliderRecord.isWillHit = AIUtility.IsHitObjectFromMoveObject(((Component) collider).transform, ((Component) this.brain.owner).transform, colliderRecord.radius, opponentMask);
+      if (colliderRecord.isWillHit)
+      {
+        if (colliderRecord.isDash)
+          this.nearWillDashHitTime = colliderRecord.time;
+        if (colliderRecord.isBullet)
+          this.nearWillBulletHitTime = colliderRecord.time;
+      }
+    }
+    this.records.AddFirst(colliderRecord);
+    return colliderRecord;
+  }
 
-	public LinkedList<ColliderRecord> records = new LinkedList<ColliderRecord>();
+  public PLACE GetSafetyPlace()
+  {
+    return this.firstRecord == null ? PLACE.BACK : AIUtility.GetPlaceOfAngle360(this.firstRecord.angle).Reverse();
+  }
 
-	private float nearMoveTime;
+  public PLACE GetSafetySide()
+  {
+    return this.firstRecord == null ? PLACE.LEFT : AIUtility.GetSideOfAngle360(this.firstRecord.angle).Reverse();
+  }
 
-	private float nearWillBulletHitTime;
+  public bool AskDanger(float pass = 0.2f)
+  {
+    float num = Time.time - pass;
+    return this.firstRecord != null && (double) this.firstRecord.time >= (double) num;
+  }
 
-	private float nearWillDashHitTime;
+  public bool AskDangerMove(float pass = 0.2f)
+  {
+    return (double) this.nearMoveTime >= (double) (Time.time - pass);
+  }
 
-	public Brain brain
-	{
-		get;
-		private set;
-	}
+  public bool AskWillHit(float pass = 0.2f)
+  {
+    return this.AskWillDashHit(pass) || this.AskWillBulletHit(pass);
+  }
 
-	public Rigidbody _rigidbody
-	{
-		get;
-		private set;
-	}
+  public bool AskWillBulletHit(float pass = 0.2f)
+  {
+    return (double) this.nearWillBulletHitTime >= (double) (Time.time - pass);
+  }
 
-	public Collider _collider
-	{
-		get;
-		private set;
-	}
+  public bool AskWillDashHit(float pass = 0.2f)
+  {
+    return (double) this.nearWillDashHitTime >= (double) (Time.time - pass);
+  }
 
-	public ColliderRecord firstRecord => (records.Count > 0) ? records.First.Value : null;
+  public bool AskDangerPosition(Vector3 pos, float pass = 0.2f)
+  {
+    if (this.records.Count <= 0)
+      return false;
+    float num = Time.time - pass;
+    foreach (DangerRader.ColliderRecord record in this.records)
+    {
+      if ((double) record.time >= (double) num)
+      {
+        if ((double) AIUtility.GetLengthWithBetweenPosition(record.pos, pos) < (double) record.radius)
+          return true;
+      }
+      else
+        break;
+    }
+    return false;
+  }
 
-	public DangerRader()
-		: this()
-	{
-	}
+  public class ColliderRecord
+  {
+    public float time;
+    public Vector3 pos;
+    public float angle;
+    public Vector3 forward;
+    public float radius;
+    public bool isDash;
+    public bool isBullet;
+    public bool isWillHit;
 
-	public static DangerRader Create(Brain brain, float radius)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Expected O, but got Unknown
-		DangerRader componentInChildren = brain.get_gameObject().GetComponentInChildren<DangerRader>();
-		if (componentInChildren != null)
-		{
-			return componentInChildren;
-		}
-		int layer = brain.owner.get_gameObject().get_layer();
-		componentInChildren = (DangerRader)Utility.CreateGameObjectAndComponent("DangerRader", brain.get_transform(), layer);
-		if (componentInChildren == null)
-		{
-			return null;
-		}
-		componentInChildren.SetRadius(radius);
-		return componentInChildren;
-	}
-
-	public void SetRadius(float radius)
-	{
-		SphereCollider val = _collider as SphereCollider;
-		if (val != null)
-		{
-			val.set_radius(radius);
-		}
-	}
-
-	private void Awake()
-	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		_rigidbody = this.GetComponent<Rigidbody>();
-		_collider = this.GetComponent<Collider>();
-		if (_collider == null)
-		{
-			SphereCollider val = this.get_gameObject().AddComponent<SphereCollider>();
-			val.set_center(new Vector3(0f, 0f, 0f));
-			_collider = val;
-		}
-		if (_collider != null)
-		{
-			_collider.set_isTrigger(true);
-			if (_rigidbody == null)
-			{
-				_rigidbody = this.get_gameObject().AddComponent<Rigidbody>();
-			}
-			_rigidbody.set_isKinematic(true);
-		}
-	}
-
-	private void Start()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		brain = this.get_gameObject().GetComponentInParent<Brain>();
-	}
-
-	private void Update()
-	{
-		if (triggerSpan.IsReady())
-		{
-			_collider.set_enabled(false);
-			_collider.set_enabled(true);
-		}
-	}
-
-	private void OnTriggerEnter(Collider collider)
-	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		if (!(brain == null) && !(_collider == null) && _collider.get_enabled() && collider.get_isTrigger() && !(collider.get_gameObject() == this.get_gameObject()))
-		{
-			StageObject stageObject = null;
-			BulletObject component = collider.get_gameObject().GetComponent<BulletObject>();
-			stageObject = ((!(component != null)) ? collider.get_gameObject().GetComponentInParent<StageObject>() : component.stageObject);
-			if (!(stageObject == null) && !(stageObject == brain.owner))
-			{
-				ColliderRecord colliderRecord = RecordCollider(collider, stageObject, component);
-				if (colliderRecord.isMove)
-				{
-					brain.HandleEvent(BRAIN_EVENT.BULLET_CATCH, component);
-				}
-				else
-				{
-					brain.HandleEvent(BRAIN_EVENT.COLLIDER_CATCH, stageObject);
-				}
-			}
-		}
-	}
-
-	private ColliderRecord RecordCollider(Collider collider, StageObject obj, BulletObject bullet)
-	{
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Expected O, but got Unknown
-		//IL_014f: Expected O, but got Unknown
-		ColliderRecord colliderRecord = null;
-		if (records.Count >= 20)
-		{
-			colliderRecord = records.Last.Value;
-			records.RemoveLast();
-		}
-		else
-		{
-			colliderRecord = new ColliderRecord();
-		}
-		colliderRecord.time = Time.get_time();
-		colliderRecord.pos = collider.get_transform().get_position();
-		colliderRecord.forward = collider.get_transform().get_forward();
-		colliderRecord.angle = AIUtility.GetAngle360OfTargetPos(brain.owner, colliderRecord.pos);
-		colliderRecord.radius = 1f;
-		if (collider is SphereCollider)
-		{
-			colliderRecord.radius = (collider as SphereCollider).get_radius();
-		}
-		else if (collider is CapsuleCollider)
-		{
-			CapsuleCollider val = collider as CapsuleCollider;
-			colliderRecord.radius = Mathf.Max(val.get_radius(), val.get_height());
-		}
-		colliderRecord.isDash = false;
-		Enemy enemy = obj as Enemy;
-		if (enemy != null)
-		{
-			colliderRecord.isDash = enemy.enableDash;
-		}
-		colliderRecord.isBullet = (bullet != null);
-		colliderRecord.isWillHit = false;
-		if (colliderRecord.isMove)
-		{
-			nearMoveTime = colliderRecord.time;
-			int opponentMask = AIUtility.GetOpponentMask(obj);
-			colliderRecord.isWillHit = AIUtility.IsHitObjectFromMoveObject(collider.get_transform(), brain.owner.get_transform(), colliderRecord.radius, opponentMask);
-			if (colliderRecord.isWillHit)
-			{
-				if (colliderRecord.isDash)
-				{
-					nearWillDashHitTime = colliderRecord.time;
-				}
-				if (colliderRecord.isBullet)
-				{
-					nearWillBulletHitTime = colliderRecord.time;
-				}
-			}
-		}
-		records.AddFirst(colliderRecord);
-		return colliderRecord;
-	}
-
-	public PLACE GetSafetyPlace()
-	{
-		if (firstRecord == null)
-		{
-			return PLACE.BACK;
-		}
-		return AIUtility.GetPlaceOfAngle360(firstRecord.angle).Reverse();
-	}
-
-	public PLACE GetSafetySide()
-	{
-		if (firstRecord == null)
-		{
-			return PLACE.LEFT;
-		}
-		return AIUtility.GetSideOfAngle360(firstRecord.angle).Reverse();
-	}
-
-	public bool AskDanger(float pass = 0.2f)
-	{
-		float num = Time.get_time() - pass;
-		return firstRecord != null && firstRecord.time >= num;
-	}
-
-	public bool AskDangerMove(float pass = 0.2f)
-	{
-		float num = Time.get_time() - pass;
-		return nearMoveTime >= num;
-	}
-
-	public bool AskWillHit(float pass = 0.2f)
-	{
-		return AskWillDashHit(pass) || AskWillBulletHit(pass);
-	}
-
-	public bool AskWillBulletHit(float pass = 0.2f)
-	{
-		float num = Time.get_time() - pass;
-		return nearWillBulletHitTime >= num;
-	}
-
-	public bool AskWillDashHit(float pass = 0.2f)
-	{
-		float num = Time.get_time() - pass;
-		return nearWillDashHitTime >= num;
-	}
-
-	public bool AskDangerPosition(Vector3 pos, float pass = 0.2f)
-	{
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		if (records.Count <= 0)
-		{
-			return false;
-		}
-		float num = Time.get_time() - pass;
-		foreach (ColliderRecord record in records)
-		{
-			if (record.time < num)
-			{
-				break;
-			}
-			float lengthWithBetweenPosition = AIUtility.GetLengthWithBetweenPosition(record.pos, pos);
-			if (lengthWithBetweenPosition < record.radius)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+    public bool isMove => this.isDash || this.isBullet;
+  }
 }

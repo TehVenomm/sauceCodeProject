@@ -1,145 +1,113 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: IceFloor
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
-public class IceFloor
+#nullable disable
+[RequireComponent(typeof (Rigidbody))]
+public class IceFloor : MonoBehaviour
 {
-	private enum STATE
-	{
-		UPDATE,
-		WAIT_FOR_END
-	}
+  private Rigidbody _rigidbody;
+  private Collider _collider;
+  private EffectCtrl _effect;
+  private float timer;
+  private List<Player> hittingPlayerList = new List<Player>(4);
+  private IceFloor.STATE state;
 
-	private Rigidbody _rigidbody;
+  public float duration { set; get; }
 
-	private Collider _collider;
+  private void Awake()
+  {
+    this._rigidbody = ((Component) this).GetComponent<Rigidbody>();
+    this._rigidbody.useGravity = false;
+    this._rigidbody.isKinematic = true;
+    this._collider = ((Component) this).GetComponentInChildren<Collider>();
+    if (!Object.op_Equality((Object) this._collider, (Object) null))
+      return;
+    CapsuleCollider capsuleCollider = ((Component) this).gameObject.AddComponent<CapsuleCollider>();
+    capsuleCollider.center = new Vector3(0.0f, 0.0f, 0.0f);
+    capsuleCollider.direction = 2;
+    ((Collider) capsuleCollider).isTrigger = true;
+    this._collider = (Collider) capsuleCollider;
+  }
 
-	private EffectCtrl _effect;
+  public void SetCollider(float radius, float height = 2f)
+  {
+    CapsuleCollider capsuleCollider = this._collider as CapsuleCollider;
+    if (Object.op_Equality((Object) capsuleCollider, (Object) null))
+    {
+      capsuleCollider = ((Component) this).gameObject.AddComponent<CapsuleCollider>();
+      this._collider = (Collider) capsuleCollider;
+    }
+    capsuleCollider.center = new Vector3(0.0f, 0.0f, 0.0f);
+    capsuleCollider.direction = 2;
+    capsuleCollider.radius = radius;
+    capsuleCollider.height = height;
+    ((Collider) capsuleCollider).isTrigger = true;
+  }
 
-	private float timer;
+  public void SetEffect(Transform eff)
+  {
+    this._effect = ((Component) eff).GetComponent<EffectCtrl>();
+  }
 
-	private List<Player> hittingPlayerList = new List<Player>(4);
+  private void Update()
+  {
+    switch (this.state)
+    {
+      case IceFloor.STATE.UPDATE:
+        this.timer += Time.deltaTime;
+        if ((double) this.timer <= (double) this.duration)
+          break;
+        if (Object.op_Inequality((Object) this._effect, (Object) null))
+          EffectManager.ReleaseEffect(((Component) this._effect).gameObject);
+        this.state = IceFloor.STATE.WAIT_FOR_END;
+        break;
+      case IceFloor.STATE.WAIT_FOR_END:
+        if (!Object.op_Equality((Object) this._effect, (Object) null))
+          break;
+        Object.Destroy((Object) ((Component) this).gameObject);
+        break;
+    }
+  }
 
-	private STATE state;
+  private void OnDestroy()
+  {
+    for (int index = 0; index < this.hittingPlayerList.Count; ++index)
+      this.hittingPlayerList[index].OnHitExitIceFloor(((Component) this).gameObject);
+  }
 
-	public float duration
-	{
-		get;
-		set;
-	}
+  private void OnTriggerEnter(Collider collider)
+  {
+    StageObject componentInParent = ((Component) collider).gameObject.GetComponentInParent<StageObject>();
+    if (Object.op_Equality((Object) componentInParent, (Object) null))
+      return;
+    Player player = componentInParent as Player;
+    if (Object.op_Equality((Object) player, (Object) null))
+      return;
+    this.hittingPlayerList.Add(player);
+    player.OnHitEnterIceFloor(((Component) this).gameObject);
+  }
 
-	public IceFloor()
-		: this()
-	{
-	}
+  private void OnTriggerExit(Collider collider)
+  {
+    StageObject componentInParent = ((Component) collider).gameObject.GetComponentInParent<StageObject>();
+    if (Object.op_Equality((Object) componentInParent, (Object) null))
+      return;
+    Player player = componentInParent as Player;
+    if (Object.op_Equality((Object) player, (Object) null))
+      return;
+    this.hittingPlayerList.Remove(player);
+    player.OnHitExitIceFloor(((Component) this).gameObject);
+  }
 
-	private void Awake()
-	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		_rigidbody = this.GetComponent<Rigidbody>();
-		_rigidbody.set_useGravity(false);
-		_rigidbody.set_isKinematic(true);
-		_collider = this.GetComponentInChildren<Collider>();
-		if (_collider == null)
-		{
-			CapsuleCollider val = this.get_gameObject().AddComponent<CapsuleCollider>();
-			val.set_center(new Vector3(0f, 0f, 0f));
-			val.set_direction(2);
-			val.set_isTrigger(true);
-			_collider = val;
-		}
-	}
-
-	public void SetCollider(float radius, float height = 2f)
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		CapsuleCollider val = _collider as CapsuleCollider;
-		if (val == null)
-		{
-			val = (_collider = this.get_gameObject().AddComponent<CapsuleCollider>());
-		}
-		val.set_center(new Vector3(0f, 0f, 0f));
-		val.set_direction(2);
-		val.set_radius(radius);
-		val.set_height(height);
-		val.set_isTrigger(true);
-	}
-
-	public void SetEffect(Transform eff)
-	{
-		_effect = eff.GetComponent<EffectCtrl>();
-	}
-
-	private void Update()
-	{
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Expected O, but got Unknown
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		switch (state)
-		{
-		case STATE.UPDATE:
-			timer += Time.get_deltaTime();
-			if (timer > duration)
-			{
-				if (_effect != null)
-				{
-					EffectManager.ReleaseEffect(_effect.get_gameObject(), true, false);
-				}
-				state = STATE.WAIT_FOR_END;
-			}
-			break;
-		case STATE.WAIT_FOR_END:
-			if (_effect == null)
-			{
-				Object.Destroy(this.get_gameObject());
-			}
-			break;
-		}
-	}
-
-	private void OnDestroy()
-	{
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Expected O, but got Unknown
-		for (int i = 0; i < hittingPlayerList.Count; i++)
-		{
-			hittingPlayerList[i].OnHitExitIceFloor(this.get_gameObject());
-		}
-	}
-
-	private void OnTriggerEnter(Collider collider)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Expected O, but got Unknown
-		StageObject componentInParent = collider.get_gameObject().GetComponentInParent<StageObject>();
-		if (!(componentInParent == null))
-		{
-			Player player = componentInParent as Player;
-			if (!(player == null))
-			{
-				hittingPlayerList.Add(player);
-				player.OnHitEnterIceFloor(this.get_gameObject());
-			}
-		}
-	}
-
-	private void OnTriggerExit(Collider collider)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Expected O, but got Unknown
-		StageObject componentInParent = collider.get_gameObject().GetComponentInParent<StageObject>();
-		if (!(componentInParent == null))
-		{
-			Player player = componentInParent as Player;
-			if (!(player == null))
-			{
-				hittingPlayerList.Remove(player);
-				player.OnHitExitIceFloor(this.get_gameObject());
-			}
-		}
-	}
+  private enum STATE
+  {
+    UPDATE,
+    WAIT_FOR_END,
+  }
 }

@@ -1,822 +1,630 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: EquipItemTable
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class EquipItemTable : Singleton<EquipItemTable>, IDataTable
 {
-	public class EquipItemDataUtil
-	{
-		public int GetElemType(int[] elem)
-		{
-			if (elem == null || elem.Length == 0)
-			{
-				return 6;
-			}
-			bool flag = true;
-			int num = -1;
-			int num2 = 0;
-			int i = 0;
-			for (int num3 = elem.Length; i < num3; i++)
-			{
-				if (num2 <= elem[i] && elem[i] > 0)
-				{
-					num2 = elem[i];
-					num = i;
-				}
-				if (elem[i] == 0 && flag)
-				{
-					flag = false;
-				}
-			}
-			if (num == -1)
-			{
-				return 6;
-			}
-			if (flag)
-			{
-				return -1;
-			}
-			return num;
-		}
-	}
-
-	public class EquipItemData : EquipItemDataUtil
-	{
-		public class Obtained
-		{
-			private const int CATEGORY_MAX = 64;
-
-			private const int ALPHABET_MAX = 26;
-
-			public string category = string.Empty;
-
-			public int flag = -1;
-
-			public Obtained(string obtained)
-			{
-				if (obtained.Length != 0)
-				{
-					string text = null;
-					int i = 0;
-					for (int length = obtained.Length; i < length; i++)
-					{
-						if (char.IsNumber(obtained[i]))
-						{
-							category = obtained.Substring(0, i).ToUpper();
-							text = obtained.Substring(i);
-							break;
-						}
-					}
-					if (text != null)
-					{
-						int.TryParse(text, out flag);
-					}
-				}
-			}
-
-			public int GetSequenceNumber()
-			{
-				int num = flag;
-				if (!string.IsNullOrEmpty(category))
-				{
-					string text = category.ToUpper();
-					int i = 0;
-					for (int length = text.Length; i < length; i++)
-					{
-						char c = text[i];
-						int num2 = c - 65;
-						int num3 = length - i;
-						if (num3 > 0)
-						{
-							int num4 = 64;
-							int j = 0;
-							for (int num5 = num3 - 1; j < num5; j++)
-							{
-								num4 *= 26;
-							}
-							if (num4 > 64)
-							{
-								num2++;
-							}
-							num += num2 * num4;
-						}
-						else
-						{
-							num += num2;
-						}
-					}
-				}
-				return num;
-			}
-		}
-
-		public const string NT = "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId";
-
-		public uint id;
-
-		public string appVer;
-
-		public EQUIPMENT_TYPE type;
-
-		public GET_TYPE getType;
-
-		public int eventId;
-
-		public string name;
-
-		public RARITY_TYPE rarity;
-
-		public int modelID0;
-
-		public int modelID1;
-
-		public int modelColor0;
-
-		public int modelColor1;
-
-		public int modelColor2;
-
-		public int effectColor;
-
-		public float effectParam;
-
-		public byte effectID;
-
-		public int __iconID;
-
-		public int maxLv;
-
-		public uint growID;
-
-		public uint needId;
-
-		public uint needUniqueId;
-
-		public uint exceedID;
-
-		public XorInt baseAtk;
-
-		public XorInt baseDef;
-
-		public XorInt baseHp;
-
-		public int[] atkElement;
-
-		public int[] defElement;
-
-		public int maxSlot;
-
-		public int fixedSkillLength;
-
-		public int sale;
-
-		private SkillItemTable.SkillSlotData[] _skillSlot;
-
-		public EquipItem.Ability[] fixedAbility;
-
-		public int listId;
-
-		public Obtained obtained;
-
-		public int damageDistanceId;
-
-		public ELEMENT_TYPE atkElementType;
-
-		public ELEMENT_TYPE defElementType;
-
-		public bool isFormer;
-
-		public SP_ATTACK_TYPE spAttackType;
-
-		public int spAttackRate;
-
-		public uint shadowEvolveEquipItemId;
-
-		public uint evolveId;
-
-		private bool? isEvolve;
-
-		public int baseElemAtk
-		{
-			get
-			{
-				if (atkElement == null)
-				{
-					return 0;
-				}
-				return Mathf.Max(atkElement);
-			}
-		}
-
-		public int baseElemDef
-		{
-			get
-			{
-				if (defElement == null)
-				{
-					return 0;
-				}
-				return Mathf.Max(defElement);
-			}
-		}
-
-		public string GetExceedParamName(int exceed_cnt)
-		{
-			if (exceed_cnt == 0)
-			{
-				return string.Empty;
-			}
-			EquipItemExceedParamTable.EquipItemExceedParam equipItemExceedParam = Singleton<EquipItemExceedParamTable>.I.GetEquipItemExceedParam(exceedID, (uint)exceed_cnt);
-			if (equipItemExceedParam == null)
-			{
-				return string.Empty;
-			}
-			return equipItemExceedParam.GetExceedParamName();
-		}
-
-		public SkillItemTable.SkillSlotData[] GetSkillSlot(int exceed_cnt)
-		{
-			int num = _skillSlot.Length;
-			SkillItemTable.SkillSlotData[] array = new SkillItemTable.SkillSlotData[num];
-			for (int i = 0; i < num; i++)
-			{
-				array[i] = _skillSlot[i];
-			}
-			EquipItemExceedParamTable.EquipItemExceedParamAll equipItemExceedParamAll = Singleton<EquipItemExceedParamTable>.I.GetEquipItemExceedParamAll(exceedID, (uint)exceed_cnt);
-			if (equipItemExceedParamAll != null && equipItemExceedParamAll.skillSlot.Length > 0)
-			{
-				Array.Resize(ref array, num + equipItemExceedParamAll.skillSlot.Length);
-				for (int j = 0; j < equipItemExceedParamAll.skillSlot.Length; j++)
-				{
-					array[num + j] = equipItemExceedParamAll.skillSlot[j];
-				}
-			}
-			return array;
-		}
-
-		public int GetModelID(int sex)
-		{
-			if (sex == 0)
-			{
-				return modelID0;
-			}
-			return modelID1;
-		}
-
-		public int GetIconID()
-		{
-			if (MonoBehaviourSingleton<UserInfoManager>.IsValid())
-			{
-				return GetIconID(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex);
-			}
-			return GetIconID(0);
-		}
-
-		public int GetIconID(int sex)
-		{
-			uint _iconID = id;
-			if (__iconID > 0)
-			{
-				_iconID = (uint)__iconID;
-			}
-			if (modelID0 == modelID1 || sex == 0)
-			{
-				return (int)(_iconID + 100000000);
-			}
-			return (int)(_iconID + 200000000);
-		}
-
-		public EquipModelTable.Data GetModelData(int sex)
-		{
-			return Singleton<EquipModelTable>.I.Get(type, GetModelID(sex));
-		}
-
-		public bool IsWeapon()
-		{
-			return type >= EQUIPMENT_TYPE.ONE_HAND_SWORD && type <= EQUIPMENT_TYPE.ARROW;
-		}
-
-		public bool IsVisual()
-		{
-			return type >= EQUIPMENT_TYPE.VISUAL_ARMOR && type <= EQUIPMENT_TYPE.VISUAL_LEG;
-		}
-
-		public bool IsEvolve()
-		{
-			bool? nullable = isEvolve;
-			if (!nullable.HasValue)
-			{
-				isEvolve = (GetEvolveTable() != null);
-			}
-			return isEvolve == true;
-		}
-
-		public bool IsShadow()
-		{
-			return shadowEvolveEquipItemId != 0;
-		}
-
-		public bool IsEquipableAbilityItem()
-		{
-			if (!IsWeapon() && (getType == GET_TYPE.PAY || IsShadow()))
-			{
-				return true;
-			}
-			return false;
-		}
-
-		public EvolveEquipItemTable.EvolveEquipItemData[] GetEvolveTable()
-		{
-			return Singleton<EvolveEquipItemTable>.I.GetEvolveEquipItemData(id);
-		}
-
-		public EquipItemData GetBaseEquipTable()
-		{
-			EvolveEquipItemTable.EvolveEquipItemData evolveEquipItemDataFromEvolveEquipId = Singleton<EvolveEquipItemTable>.I.GetEvolveEquipItemDataFromEvolveEquipId(id);
-			if (evolveEquipItemDataFromEvolveEquipId != null)
-			{
-				return Singleton<EquipItemTable>.I.GetEquipItemData(evolveEquipItemDataFromEvolveEquipId.equipBaseItemID);
-			}
-			return this;
-		}
-
-		public EquipItemData GetRootEquipTable()
-		{
-			EquipItemData equipItemData = GetBaseEquipTable();
-			if (equipItemData != null)
-			{
-				while (true)
-				{
-					EquipItemData baseEquipTable = equipItemData.GetBaseEquipTable();
-					if (baseEquipTable.id == equipItemData.id)
-					{
-						break;
-					}
-					equipItemData = baseEquipTable;
-				}
-				return equipItemData;
-			}
-			return null;
-		}
-
-		public EquipItemData GetShadowEvolveEquipTable()
-		{
-			if (!IsShadow())
-			{
-				return null;
-			}
-			return Singleton<EquipItemTable>.I.GetEquipItemData(shadowEvolveEquipItemId);
-		}
-
-		public EvolveEquipItemTable.EvolveEquipItemData GetEvolveTable(uint id)
-		{
-			EvolveEquipItemTable.EvolveEquipItemData result = null;
-			EvolveEquipItemTable.EvolveEquipItemData[] evolveEquipItemData = Singleton<EvolveEquipItemTable>.I.GetEvolveEquipItemData(id);
-			if (evolveEquipItemData != null)
-			{
-				int i = 0;
-				for (int num = evolveEquipItemData.Length; i < num; i++)
-				{
-					if (evolveEquipItemData[i].id == id)
-					{
-						result = evolveEquipItemData[i];
-						break;
-					}
-				}
-			}
-			return result;
-		}
-
-		public EquipItemStatus GetDefaultSkillBuffParam()
-		{
-			EquipItemStatus equipItemStatus = new EquipItemStatus();
-			_GetDefaultSkillBuffParam(out int[] atk, out int[] def, out int hp);
-			equipItemStatus.atk = atk[0];
-			equipItemStatus.def = def[0];
-			equipItemStatus.hp = hp;
-			int i = 0;
-			for (int num = 6; i < num; i++)
-			{
-				equipItemStatus.elemAtk[i] = atk[i + 1];
-				equipItemStatus.elemDef[i] = def[i + 1];
-			}
-			return equipItemStatus;
-		}
-
-		private void _GetDefaultSkillBuffParam(out int[] atk, out int[] def, out int hp)
-		{
-			atk = new int[7];
-			def = new int[7];
-			int i = 0;
-			for (int num = 7; i < num; i++)
-			{
-				atk[i] = 0;
-				def[i] = 0;
-			}
-			hp = 0;
-			int j = 0;
-			for (int num2 = maxSlot; j < num2; j++)
-			{
-				SkillItemTable.SkillSlotData skillSlotData = GetSkillSlot(0)[j];
-				if (skillSlotData != null && skillSlotData.skill_id != 0)
-				{
-					SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData(skillSlotData.skill_id);
-					if (skillItemData != null)
-					{
-						GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(skillItemData.growID, 1);
-						if (growSkillItemData != null)
-						{
-							atk[0] += growSkillItemData.GetGrowParamAtk(skillItemData.baseAtk);
-							def[0] += growSkillItemData.GetGrowParamDef(skillItemData.baseDef);
-							hp += growSkillItemData.GetGrowParamHp(skillItemData.baseHp);
-							int[] growParamElemAtk = growSkillItemData.GetGrowParamElemAtk(skillItemData.atkElement);
-							int[] growParamElemDef = growSkillItemData.GetGrowParamElemDef(skillItemData.defElement);
-							int k = 1;
-							for (int num3 = 7; k < num3; k++)
-							{
-								atk[k] += growParamElemAtk[k - 1];
-								def[k] += growParamElemDef[k - 1];
-							}
-						}
-					}
-				}
-			}
-		}
-
-		public int GetElemAtkType(int[] exceed_elem = null)
-		{
-			if (exceed_elem == null)
-			{
-				return GetElemType(atkElement);
-			}
-			int[] array = new int[atkElement.Length];
-			int i = 0;
-			for (int num = array.Length; i < num; i++)
-			{
-				array[i] = atkElement[i] + exceed_elem[i];
-			}
-			return GetElemType(array);
-		}
-
-		public int GetElemAtkTypePriorityToTable(int[] exceed_elem = null)
-		{
-			if (atkElementType != ELEMENT_TYPE.MAX)
-			{
-				return (int)atkElementType;
-			}
-			return GetElemAtkType(exceed_elem);
-		}
-
-		public int GetElemDefType(int[] exceed_elem = null)
-		{
-			if (exceed_elem == null)
-			{
-				return GetElemType(defElement);
-			}
-			int[] array = new int[defElement.Length];
-			int i = 0;
-			for (int num = array.Length; i < num; i++)
-			{
-				array[i] = defElement[i] + exceed_elem[i];
-			}
-			return GetElemType(array);
-		}
-
-		public int GetElemDefTypePriorityToTable(int[] exceed_elem = null)
-		{
-			if (defElementType != ELEMENT_TYPE.MAX)
-			{
-				return (int)defElementType;
-			}
-			return GetElemDefType(exceed_elem);
-		}
-
-		public ELEMENT_TYPE GetTargetElement(int exceed_cnt)
-		{
-			bool flag = IsWeapon();
-			if (exceed_cnt > 0)
-			{
-				EquipItemExceedParamTable.EquipItemExceedParamAll exceedParam = GetExceedParam((uint)exceed_cnt);
-				if (exceedParam != null)
-				{
-					return (ELEMENT_TYPE)((!flag) ? exceedParam.GetElemDefType(defElement) : exceedParam.GetElemAtkType(atkElement));
-				}
-			}
-			return (ELEMENT_TYPE)((!flag) ? GetElemDefType(null) : GetElemAtkType(null));
-		}
-
-		public ELEMENT_TYPE GetTargetElementPriorityToTable()
-		{
-			return (ELEMENT_TYPE)((!IsWeapon()) ? GetElemDefTypePriorityToTable(null) : GetElemAtkTypePriorityToTable(null));
-		}
-
-		public void GetMaxAtk(out int _atk, out int _elem_atk, out ELEMENT_TYPE _element)
-		{
-			GrowEquipItemTable.GrowEquipItemData growEquipItemData = Singleton<GrowEquipItemTable>.I.GetGrowEquipItemData(growID, (uint)maxLv);
-			_atk = growEquipItemData.GetGrowParamAtk(baseAtk);
-			int[] growParamElemAtk = growEquipItemData.GetGrowParamElemAtk(atkElement);
-			_elem_atk = 0;
-			_element = ELEMENT_TYPE.MAX;
-			int i = 0;
-			for (int num = growParamElemAtk.Length; i < num; i++)
-			{
-				if (_elem_atk < growParamElemAtk[i])
-				{
-					_elem_atk = growParamElemAtk[i];
-					_element = (ELEMENT_TYPE)i;
-				}
-			}
-		}
-
-		public void GetMaxDef(out int _def, out int _elem_def, out ELEMENT_TYPE _element)
-		{
-			GrowEquipItemTable.GrowEquipItemData growEquipItemData = Singleton<GrowEquipItemTable>.I.GetGrowEquipItemData(growID, (uint)maxLv);
-			_def = growEquipItemData.GetGrowParamDef(baseDef);
-			int[] growParamElemDef = growEquipItemData.GetGrowParamElemDef(defElement);
-			_elem_def = 0;
-			_element = ELEMENT_TYPE.MAX;
-			int i = 0;
-			for (int num = growParamElemDef.Length; i < num; i++)
-			{
-				if (_elem_def < growParamElemDef[i])
-				{
-					_elem_def = growParamElemDef[i];
-					_element = (ELEMENT_TYPE)i;
-				}
-			}
-		}
-
-		public bool IsEnableNowApplicationVersion()
-		{
-			return AppMain.CheckApplicationVersion(appVer);
-		}
-
-		public bool CanCollecting()
-		{
-			return obtained.category.Length > 0 && obtained.flag >= 0 && obtained.flag < 64 && !IsShadow();
-		}
-
-		public EquipItemExceedParamTable.EquipItemExceedParamAll GetExceedParam(uint exceed)
-		{
-			return Singleton<EquipItemExceedParamTable>.I.GetEquipItemExceedParamAll(exceedID, exceed);
-		}
-
-		public static bool cb(CSVReader csv_reader, EquipItemData data, ref uint key)
-		{
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
-			data.id = key;
-			csv_reader.Pop(ref data.appVer);
-			csv_reader.Pop(ref data.type);
-			csv_reader.Pop(ref data.getType);
-			csv_reader.Pop(ref data.eventId);
-			csv_reader.Pop(ref data.name);
-			csv_reader.Pop(ref data.rarity);
-			csv_reader.Pop(ref data.modelID0);
-			data.modelID1 = data.modelID0;
-			csv_reader.Pop(ref data.modelID1);
-			string value = string.Empty;
-			int num = -1;
-			csv_reader.Pop(ref value);
-			if (value.Length > 1)
-			{
-				num = (int)Enum.Parse(typeof(ELEMENT_TYPE), value);
-			}
-			if (!(bool)csv_reader.PopColor24(ref data.modelColor0))
-			{
-				if (num != -1)
-				{
-					data.modelColor0 = NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetModelElementColor(num));
-				}
-				else
-				{
-					data.modelColor0 = NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.modelBaseColor);
-				}
-			}
-			csv_reader.PopColor24(ref data.modelColor1);
-			if (!(bool)csv_reader.PopColor24(ref data.modelColor2))
-			{
-				if (num != -1)
-				{
-					data.modelColor2 = NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetModelElementColor2(num));
-				}
-				else
-				{
-					data.modelColor2 = NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.modelBaseColor2);
-				}
-			}
-			csv_reader.Pop(ref data.effectID);
-			data.effectParam = 1f;
-			csv_reader.Pop(ref data.effectParam);
-			if (!(bool)csv_reader.PopColor24(ref data.effectColor))
-			{
-				if (num != -1)
-				{
-					data.effectColor = NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetModelElementColor(num));
-				}
-				else
-				{
-					data.effectColor = NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.modelBaseColor);
-				}
-			}
-			csv_reader.Pop(ref data.__iconID);
-			csv_reader.Pop(ref data.maxLv);
-			csv_reader.Pop(ref data.growID);
-			csv_reader.Pop(ref data.needId);
-			csv_reader.Pop(ref data.needUniqueId);
-			csv_reader.Pop(ref data.exceedID);
-			csv_reader.Pop(ref data.shadowEvolveEquipItemId);
-			csv_reader.Pop(ref data.baseAtk);
-			csv_reader.Pop(ref data.baseDef);
-			csv_reader.Pop(ref data.baseHp);
-			data.atkElement = new int[6];
-			data.defElement = new int[6];
-			for (int i = 0; i < 6; i++)
-			{
-				csv_reader.Pop(ref data.atkElement[i]);
-			}
-			for (int j = 0; j < 6; j++)
-			{
-				csv_reader.Pop(ref data.defElement[j]);
-			}
-			List<SkillItemTable.SkillSlotData> list = new List<SkillItemTable.SkillSlotData>();
-			int num2 = 0;
-			int num3 = 0;
-			for (int k = 0; k < 9; k++)
-			{
-				string value2 = string.Empty;
-				uint value3 = 0u;
-				csv_reader.Pop(ref value2);
-				csv_reader.Pop(ref value3);
-				if (!string.IsNullOrEmpty(value2))
-				{
-					SkillItemTable.SkillSlotData skillSlotData = new SkillItemTable.SkillSlotData();
-					skillSlotData.slotType = (SKILL_SLOT_TYPE)(int)Enum.Parse(typeof(SKILL_SLOT_TYPE), value2);
-					if (skillSlotData.slotType != 0)
-					{
-						skillSlotData.skill_id = value3;
-						list.Add(skillSlotData);
-						num3++;
-						if (value3 != 0)
-						{
-							num2++;
-						}
-					}
-				}
-			}
-			data._skillSlot = list.ToArray();
-			data.fixedSkillLength = num2;
-			data.maxSlot = num3;
-			int[] array = new int[3];
-			int[] array2 = new int[3];
-			int[] array3 = new int[3];
-			int num4 = 0;
-			for (int l = 0; l < 3; l++)
-			{
-				csv_reader.Pop(ref array[l]);
-				csv_reader.Pop(ref array2[l]);
-				csv_reader.Pop(ref array3[l]);
-				if (array[l] != 0 && array2[l] != 0)
-				{
-					num4++;
-				}
-			}
-			data.fixedAbility = new EquipItem.Ability[num4];
-			for (int m = 0; m < num4; m++)
-			{
-				data.fixedAbility[m] = new EquipItem.Ability();
-				data.fixedAbility[m].id = array[m];
-				data.fixedAbility[m].pt = array2[m];
-				data.fixedAbility[m].vr = (0 < array3[m]);
-			}
-			csv_reader.Pop(ref data.sale);
-			csv_reader.Pop(ref data.listId);
-			string value4 = string.Empty;
-			csv_reader.Pop(ref value4);
-			data.obtained = new Obtained(value4);
-			if (!(bool)csv_reader.Pop(ref data.damageDistanceId))
-			{
-				if (data.type == EQUIPMENT_TYPE.ARROW)
-				{
-					data.damageDistanceId = 0;
-				}
-				else
-				{
-					data.damageDistanceId = -1;
-				}
-			}
-			csv_reader.PopEnum(ref data.atkElementType, ELEMENT_TYPE.MAX);
-			csv_reader.PopEnum(ref data.defElementType, ELEMENT_TYPE.MAX);
-			csv_reader.Pop(ref data.isFormer);
-			csv_reader.PopEnum(ref data.spAttackType, SP_ATTACK_TYPE.NONE);
-			csv_reader.Pop(ref data.spAttackRate);
-			csv_reader.Pop(ref data.evolveId);
-			return true;
-		}
-	}
-
-	public class ListCompare : IComparer<EquipItemData>
-	{
-		public int Compare(EquipItemData data1, EquipItemData data2)
-		{
-			if (data1.listId < data2.listId)
-			{
-				return -1;
-			}
-			return 1;
-		}
-	}
-
-	private UIntKeyTable<EquipItemData> equipItemTable;
-
-	private List<EquipItemData> equipList;
-
-	public void CreateTable(string csv_table)
-	{
-		equipItemTable = TableUtility.CreateUIntKeyTable<EquipItemData>(csv_table, EquipItemData.cb, "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId", null);
-	}
-
-	public void CreateTable(string csv_table, TableUtility.Progress progress)
-	{
-		equipItemTable = TableUtility.CreateUIntKeyTable<EquipItemData>(csv_table, EquipItemData.cb, "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId", progress);
-		equipItemTable.TrimExcess();
-	}
-
-	public void AddTable(string csv_table)
-	{
-		TableUtility.AddUIntKeyTable(equipItemTable, csv_table, EquipItemData.cb, "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId", null);
-	}
-
-	public bool IsWeapon(EQUIPMENT_TYPE type)
-	{
-		return type >= EQUIPMENT_TYPE.ONE_HAND_SWORD && type <= EQUIPMENT_TYPE.ARROW;
-	}
-
-	public bool IsVisual(EQUIPMENT_TYPE type)
-	{
-		return type >= EQUIPMENT_TYPE.VISUAL_ARMOR && type <= EQUIPMENT_TYPE.VISUAL_LEG;
-	}
-
-	public void CreateTableForEquipList()
-	{
-		equipList = new List<EquipItemData>(equipItemTable.GetCount());
-		ForEach(delegate(EquipItemData data)
-		{
-			if (data.CanCollecting())
-			{
-				equipList.Add(data);
-			}
-		});
-		ListCompare comparer = new ListCompare();
-		equipList.Sort(comparer);
-	}
-
-	public void ForEach(Action<EquipItemData> cb)
-	{
-		equipItemTable.ForEach(cb);
-	}
-
-	public EquipItemData GetEquipItemData(uint id)
-	{
-		if (equipItemTable == null)
-		{
-			return null;
-		}
-		EquipItemData equipItemData = equipItemTable.Get(id);
-		if (equipItemData == null)
-		{
-			Log.TableError(this, id);
-			equipItemData = new EquipItemData();
-			equipItemData.name = Log.NON_DATA_NAME;
-		}
-		return equipItemData;
-	}
-
-	public int GetEquipListCount()
-	{
-		if (equipList == null)
-		{
-			return 0;
-		}
-		return equipList.Count;
-	}
-
-	public EquipItemData GetEquipListData(int index)
-	{
-		if (equipList == null || equipList.Count <= index)
-		{
-			return null;
-		}
-		return equipList[index];
-	}
-
-	public static int GetIdFromIconId(int iconId)
-	{
-		return iconId % 100000000;
-	}
+  private UIntKeyTable<EquipItemTable.EquipItemData> equipItemTable;
+  private List<EquipItemTable.EquipItemData> equipList;
+
+  public void CreateTable(string csv_table)
+  {
+    this.equipItemTable = TableUtility.CreateUIntKeyTable<EquipItemTable.EquipItemData>(csv_table, new TableUtility.CallBackUIntKeyReadCSV<EquipItemTable.EquipItemData>(EquipItemTable.EquipItemData.cb), "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId,exAttackType");
+  }
+
+  public void CreateTable(string csv_table, TableUtility.Progress progress)
+  {
+    this.equipItemTable = TableUtility.CreateUIntKeyTable<EquipItemTable.EquipItemData>(csv_table, new TableUtility.CallBackUIntKeyReadCSV<EquipItemTable.EquipItemData>(EquipItemTable.EquipItemData.cb), "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId,exAttackType", progress);
+    this.equipItemTable.TrimExcess();
+  }
+
+  public void AddTable(string csv_table)
+  {
+    TableUtility.AddUIntKeyTable<EquipItemTable.EquipItemData>(this.equipItemTable, csv_table, new TableUtility.CallBackUIntKeyReadCSV<EquipItemTable.EquipItemData>(EquipItemTable.EquipItemData.cb), "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId,exAttackType");
+  }
+
+  public bool IsWeapon(EQUIPMENT_TYPE type)
+  {
+    return type >= EQUIPMENT_TYPE.ONE_HAND_SWORD && type <= EQUIPMENT_TYPE.ARROW;
+  }
+
+  public bool IsVisual(EQUIPMENT_TYPE type)
+  {
+    return type >= EQUIPMENT_TYPE.VISUAL_ARMOR && type <= EQUIPMENT_TYPE.VISUAL_LEG;
+  }
+
+  public void CreateTableForEquipList()
+  {
+    this.equipList = new List<EquipItemTable.EquipItemData>(this.equipItemTable.GetCount());
+    this.ForEach((Action<EquipItemTable.EquipItemData>) (data =>
+    {
+      if (!data.CanCollecting())
+        return;
+      this.equipList.Add(data);
+    }));
+    this.equipList.Sort((IComparer<EquipItemTable.EquipItemData>) new EquipItemTable.ListCompare());
+  }
+
+  public void ForEach(Action<EquipItemTable.EquipItemData> cb) => this.equipItemTable.ForEach(cb);
+
+  public EquipItemTable.EquipItemData GetEquipItemData(uint id)
+  {
+    if (this.equipItemTable == null)
+      return (EquipItemTable.EquipItemData) null;
+    EquipItemTable.EquipItemData equipItemData = this.equipItemTable.Get(id);
+    if (equipItemData == null)
+    {
+      Log.TableError((object) this, id);
+      equipItemData = new EquipItemTable.EquipItemData();
+      equipItemData.name = Log.NON_DATA_NAME;
+    }
+    return equipItemData;
+  }
+
+  public int GetEquipListCount() => this.equipList == null ? 0 : this.equipList.Count;
+
+  public EquipItemTable.EquipItemData GetEquipListData(int index)
+  {
+    return this.equipList == null || this.equipList.Count <= index ? (EquipItemTable.EquipItemData) null : this.equipList[index];
+  }
+
+  public static int GetIdFromIconId(int iconId) => iconId % 100000000;
+
+  public class EquipItemDataUtil
+  {
+    public int GetElemType(int[] elem)
+    {
+      if (elem == null || elem.Length == 0)
+        return 6;
+      bool flag = true;
+      int num1 = -1;
+      int num2 = 0;
+      int index = 0;
+      for (int length = elem.Length; index < length; ++index)
+      {
+        if (num2 <= elem[index] && elem[index] > 0)
+        {
+          num2 = elem[index];
+          num1 = index;
+        }
+        if (elem[index] == 0 & flag)
+          flag = false;
+      }
+      if (num1 == -1)
+        return 6;
+      return flag ? -1 : num1;
+    }
+  }
+
+  public class EquipItemData : EquipItemTable.EquipItemDataUtil
+  {
+    public uint id;
+    public string appVer;
+    public EQUIPMENT_TYPE type;
+    public GET_TYPE getType;
+    public int eventId;
+    public string name;
+    public RARITY_TYPE rarity;
+    public int modelID0;
+    public int modelID1;
+    public int modelColor0;
+    public int modelColor1;
+    public int modelColor2;
+    public int effectColor;
+    public float effectParam;
+    public byte effectID;
+    public int __iconID;
+    public int maxLv;
+    public uint growID;
+    public uint needId;
+    public uint needUniqueId;
+    public uint exceedID;
+    public XorInt baseAtk;
+    public XorInt baseDef;
+    public XorInt baseHp;
+    public int[] atkElement;
+    public int[] defElement;
+    public int maxSlot;
+    public int fixedSkillLength;
+    public int sale;
+    private SkillItemTable.SkillSlotData[] _skillSlot;
+    public EquipItem.Ability[] fixedAbility;
+    public int listId;
+    public EquipItemTable.EquipItemData.Obtained obtained;
+    public int damageDistanceId;
+    public ELEMENT_TYPE atkElementType;
+    public ELEMENT_TYPE defElementType;
+    public bool isFormer;
+    public SP_ATTACK_TYPE spAttackType;
+    public int spAttackRate;
+    public uint shadowEvolveEquipItemId;
+    public uint evolveId;
+    public EXTRA_ATTACK_TYPE exAttackType;
+    private bool? isEvolve;
+    public const string NT = "equipItemId,appVer,type,getType,eventId,name,rarity,modelID0,modelID1,colorAttr,R,G,B,R2,G2,B2,R3,G3,B3,EfID,EfP,EfR,EfG,EfB,iconId,maxLv,growId,needId,needUniqueId,exceedId,shadowEvolveEquipItemId,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType_0,skillItemId_0,skillType_1,skillItemId_1,skillType_2,skillItemId_2,skillType_3,skillItemId_3,skillType_4,skillItemId_4,skillType_5,skillItemId_5,skillType_6,skillItemId_6,skillType_7,skillItemId_7,skillType_8,skillItemId_8,abilityId_0,abilityPoint_0,variant_0,abilityId_1,abilityPoint_1,variant_1,abilityId_2,abilityPoint_2,variant_2,price,listId,obtained,damageDistanceId,atkElementType,defElementType,isFormer,spAttackType,spAttackRate,evolveId,exAttackType";
+
+    public string GetExceedParamName(int exceed_cnt)
+    {
+      if (exceed_cnt == 0)
+        return string.Empty;
+      EquipItemExceedParamTable.EquipItemExceedParam equipItemExceedParam = Singleton<EquipItemExceedParamTable>.I.GetEquipItemExceedParam(this.exceedID, (uint) exceed_cnt);
+      return equipItemExceedParam == null ? string.Empty : equipItemExceedParam.GetExceedParamName();
+    }
+
+    public SkillItemTable.SkillSlotData[] GetSkillSlot(int exceed_cnt)
+    {
+      int length = this._skillSlot.Length;
+      SkillItemTable.SkillSlotData[] array = new SkillItemTable.SkillSlotData[length];
+      for (int index = 0; index < length; ++index)
+        array[index] = this._skillSlot[index];
+      EquipItemExceedParamTable.EquipItemExceedParamAll itemExceedParamAll = Singleton<EquipItemExceedParamTable>.I.GetEquipItemExceedParamAll(this.exceedID, (uint) exceed_cnt);
+      if (itemExceedParamAll != null && itemExceedParamAll.skillSlot.Length != 0)
+      {
+        Array.Resize<SkillItemTable.SkillSlotData>(ref array, length + itemExceedParamAll.skillSlot.Length);
+        for (int index = 0; index < itemExceedParamAll.skillSlot.Length; ++index)
+          array[length + index] = itemExceedParamAll.skillSlot[index];
+      }
+      return array;
+    }
+
+    public int baseElemAtk => this.atkElement == null ? 0 : Mathf.Max(this.atkElement);
+
+    public int baseElemDef => this.defElement == null ? 0 : Mathf.Max(this.defElement);
+
+    public int GetModelID(int sex) => sex == 0 ? this.modelID0 : this.modelID1;
+
+    public int GetIconID()
+    {
+      return MonoBehaviourSingleton<UserInfoManager>.IsValid() ? this.GetIconID(MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex) : this.GetIconID(0);
+    }
+
+    public int GetIconID(int sex)
+    {
+      uint num = this.id;
+      if (this.__iconID > 0)
+        num = (uint) this.__iconID;
+      return this.modelID0 == this.modelID1 || sex == 0 ? (int) num + 100000000 : (int) num + 200000000;
+    }
+
+    public EquipModelTable.Data GetModelData(int sex)
+    {
+      return Singleton<EquipModelTable>.I.Get(this.type, this.GetModelID(sex));
+    }
+
+    public bool IsWeapon()
+    {
+      return this.type >= EQUIPMENT_TYPE.ONE_HAND_SWORD && this.type <= EQUIPMENT_TYPE.ARROW;
+    }
+
+    public bool IsVisual()
+    {
+      return this.type >= EQUIPMENT_TYPE.VISUAL_ARMOR && this.type <= EQUIPMENT_TYPE.VISUAL_LEG;
+    }
+
+    public bool IsEvolve()
+    {
+      if (!this.isEvolve.HasValue)
+        this.isEvolve = new bool?(this.GetEvolveTable() != null);
+      bool? isEvolve = this.isEvolve;
+      bool flag = true;
+      return isEvolve.GetValueOrDefault() == flag & isEvolve.HasValue;
+    }
+
+    public bool IsShadow() => this.shadowEvolveEquipItemId > 0U;
+
+    public bool IsEquipableAbilityItem()
+    {
+      return !this.IsWeapon() && (this.getType == GET_TYPE.PAY || this.IsShadow());
+    }
+
+    public EvolveEquipItemTable.EvolveEquipItemData[] GetEvolveTable()
+    {
+      return Singleton<EvolveEquipItemTable>.I.GetEvolveEquipItemData(this.id);
+    }
+
+    public EquipItemTable.EquipItemData GetBaseEquipTable()
+    {
+      EvolveEquipItemTable.EvolveEquipItemData fromEvolveEquipId = Singleton<EvolveEquipItemTable>.I.GetEvolveEquipItemDataFromEvolveEquipId(this.id);
+      return fromEvolveEquipId != null ? Singleton<EquipItemTable>.I.GetEquipItemData(fromEvolveEquipId.equipBaseItemID) : this;
+    }
+
+    public EquipItemTable.EquipItemData GetRootEquipTable()
+    {
+      EquipItemTable.EquipItemData rootEquipTable = this.GetBaseEquipTable();
+      if (rootEquipTable == null)
+        return (EquipItemTable.EquipItemData) null;
+      while (true)
+      {
+        EquipItemTable.EquipItemData baseEquipTable = rootEquipTable.GetBaseEquipTable();
+        if ((int) baseEquipTable.id != (int) rootEquipTable.id)
+          rootEquipTable = baseEquipTable;
+        else
+          break;
+      }
+      return rootEquipTable;
+    }
+
+    public bool IsRevertable() => this.GetRootLithograph() != null && this.getType == GET_TYPE.PAY;
+
+    public ItemTable.ItemData GetRootLithograph()
+    {
+      NeedMaterial[] rootMaterials = this.GetRootMaterials();
+      if (rootMaterials == null)
+        return (ItemTable.ItemData) null;
+      ItemTable i = Singleton<ItemTable>.I;
+      int length = rootMaterials.Length;
+      for (int index = 0; index < length; ++index)
+      {
+        uint itemId = rootMaterials[index].itemID;
+        ItemTable.ItemData itemData = i.GetItemData(itemId);
+        if (itemData.type == ITEM_TYPE.LITHOGRAPH)
+          return itemData;
+      }
+      return (ItemTable.ItemData) null;
+    }
+
+    public NeedMaterial[] GetRootMaterials()
+    {
+      uint id = this.GetRootEquipTable().id;
+      return Singleton<CreateEquipItemTable>.I.GetCreateItemDataByEquipItem(id)?.needMaterial;
+    }
+
+    public EquipItemTable.EquipItemData GetShadowEvolveEquipTable()
+    {
+      return !this.IsShadow() ? (EquipItemTable.EquipItemData) null : Singleton<EquipItemTable>.I.GetEquipItemData(this.shadowEvolveEquipItemId);
+    }
+
+    public EvolveEquipItemTable.EvolveEquipItemData GetEvolveTable(uint id)
+    {
+      EvolveEquipItemTable.EvolveEquipItemData evolveTable = (EvolveEquipItemTable.EvolveEquipItemData) null;
+      EvolveEquipItemTable.EvolveEquipItemData[] evolveEquipItemData = Singleton<EvolveEquipItemTable>.I.GetEvolveEquipItemData(id);
+      if (evolveEquipItemData != null)
+      {
+        int index = 0;
+        for (int length = evolveEquipItemData.Length; index < length; ++index)
+        {
+          if ((int) evolveEquipItemData[index].id == (int) id)
+          {
+            evolveTable = evolveEquipItemData[index];
+            break;
+          }
+        }
+      }
+      return evolveTable;
+    }
+
+    public EquipItemStatus GetDefaultSkillBuffParam()
+    {
+      EquipItemStatus defaultSkillBuffParam = new EquipItemStatus();
+      int[] atk;
+      int[] def;
+      int hp;
+      this._GetDefaultSkillBuffParam(out atk, out def, out hp);
+      defaultSkillBuffParam.atk = atk[0];
+      defaultSkillBuffParam.def = def[0];
+      defaultSkillBuffParam.hp = hp;
+      int index1 = 0;
+      for (int index2 = 6; index1 < index2; ++index1)
+      {
+        defaultSkillBuffParam.elemAtk[index1] = atk[index1 + 1];
+        defaultSkillBuffParam.elemDef[index1] = def[index1 + 1];
+      }
+      return defaultSkillBuffParam;
+    }
+
+    private void _GetDefaultSkillBuffParam(out int[] atk, out int[] def, out int hp)
+    {
+      atk = new int[7];
+      def = new int[7];
+      int index1 = 0;
+      for (int index2 = 7; index1 < index2; ++index1)
+      {
+        atk[index1] = 0;
+        def[index1] = 0;
+      }
+      hp = 0;
+      int index3 = 0;
+      for (int maxSlot = this.maxSlot; index3 < maxSlot; ++index3)
+      {
+        SkillItemTable.SkillSlotData skillSlotData = this.GetSkillSlot(0)[index3];
+        if (skillSlotData != null && skillSlotData.skill_id != 0U)
+        {
+          SkillItemTable.SkillItemData skillItemData = Singleton<SkillItemTable>.I.GetSkillItemData(skillSlotData.skill_id);
+          if (skillItemData != null)
+          {
+            GrowSkillItemTable.GrowSkillItemData growSkillItemData = Singleton<GrowSkillItemTable>.I.GetGrowSkillItemData(skillItemData.growID, 1, 0);
+            if (growSkillItemData != null)
+            {
+              atk[0] += growSkillItemData.GetGrowParamAtk((int) skillItemData.baseAtk);
+              def[0] += growSkillItemData.GetGrowParamDef((int) skillItemData.baseDef);
+              hp += growSkillItemData.GetGrowParamHp((int) skillItemData.baseHp);
+              int[] growParamElemAtk = growSkillItemData.GetGrowParamElemAtk(skillItemData.atkElement);
+              int[] growParamElemDef = growSkillItemData.GetGrowParamElemDef(skillItemData.defElement);
+              int index4 = 1;
+              for (int index5 = 7; index4 < index5; ++index4)
+              {
+                atk[index4] += growParamElemAtk[index4 - 1];
+                def[index4] += growParamElemDef[index4 - 1];
+              }
+            }
+          }
+        }
+      }
+    }
+
+    public int GetElemAtkType(int[] exceed_elem = null)
+    {
+      if (exceed_elem == null)
+        return this.GetElemType(this.atkElement);
+      int[] elem = new int[this.atkElement.Length];
+      int index = 0;
+      for (int length = elem.Length; index < length; ++index)
+        elem[index] = this.atkElement[index] + exceed_elem[index];
+      return this.GetElemType(elem);
+    }
+
+    public int GetElemAtkTypePriorityToTable(int[] exceed_elem = null)
+    {
+      return this.atkElementType != ELEMENT_TYPE.MAX ? (int) this.atkElementType : this.GetElemAtkType(exceed_elem);
+    }
+
+    public int GetElemDefType(int[] exceed_elem = null)
+    {
+      if (exceed_elem == null)
+        return this.GetElemType(this.defElement);
+      int[] elem = new int[this.defElement.Length];
+      int index = 0;
+      for (int length = elem.Length; index < length; ++index)
+        elem[index] = this.defElement[index] + exceed_elem[index];
+      return this.GetElemType(elem);
+    }
+
+    public int GetElemDefTypePriorityToTable(int[] exceed_elem = null)
+    {
+      return this.defElementType != ELEMENT_TYPE.MAX ? (int) this.defElementType : this.GetElemDefType(exceed_elem);
+    }
+
+    public ELEMENT_TYPE GetTargetElement(int exceed_cnt)
+    {
+      bool flag = this.IsWeapon();
+      if (exceed_cnt > 0)
+      {
+        EquipItemExceedParamTable.EquipItemExceedParamAll exceedParam = this.GetExceedParam((uint) exceed_cnt);
+        if (exceedParam != null)
+          return !flag ? (ELEMENT_TYPE) exceedParam.GetElemDefType(this.defElement) : (ELEMENT_TYPE) exceedParam.GetElemAtkType(this.atkElement);
+      }
+      return !flag ? (ELEMENT_TYPE) this.GetElemDefType() : (ELEMENT_TYPE) this.GetElemAtkType();
+    }
+
+    public ELEMENT_TYPE GetTargetElementPriorityToTable()
+    {
+      return !this.IsWeapon() ? (ELEMENT_TYPE) this.GetElemDefTypePriorityToTable() : (ELEMENT_TYPE) this.GetElemAtkTypePriorityToTable();
+    }
+
+    public void GetMaxAtk(out int _atk, out int _elem_atk, out ELEMENT_TYPE _element)
+    {
+      GrowEquipItemTable.GrowEquipItemData growEquipItemData = Singleton<GrowEquipItemTable>.I.GetGrowEquipItemData(this.growID, (uint) this.maxLv);
+      _atk = growEquipItemData.GetGrowParamAtk((int) this.baseAtk);
+      int[] growParamElemAtk = growEquipItemData.GetGrowParamElemAtk(this.atkElement);
+      _elem_atk = 0;
+      _element = ELEMENT_TYPE.MAX;
+      int index = 0;
+      for (int length = growParamElemAtk.Length; index < length; ++index)
+      {
+        if (_elem_atk < growParamElemAtk[index])
+        {
+          _elem_atk = growParamElemAtk[index];
+          _element = (ELEMENT_TYPE) index;
+        }
+      }
+    }
+
+    public void GetMaxDef(out int _def, out int _elem_def, out ELEMENT_TYPE _element)
+    {
+      GrowEquipItemTable.GrowEquipItemData growEquipItemData = Singleton<GrowEquipItemTable>.I.GetGrowEquipItemData(this.growID, (uint) this.maxLv);
+      _def = growEquipItemData.GetGrowParamDef((int) this.baseDef);
+      int[] growParamElemDef = growEquipItemData.GetGrowParamElemDef(this.defElement);
+      _elem_def = 0;
+      _element = ELEMENT_TYPE.MAX;
+      int index = 0;
+      for (int length = growParamElemDef.Length; index < length; ++index)
+      {
+        if (_elem_def < growParamElemDef[index])
+        {
+          _elem_def = growParamElemDef[index];
+          _element = (ELEMENT_TYPE) index;
+        }
+      }
+    }
+
+    public bool IsEnableNowApplicationVersion() => AppMain.CheckApplicationVersion(this.appVer);
+
+    public bool CanCollecting()
+    {
+      return this.obtained.category.Length > 0 && this.obtained.flag >= 0 && this.obtained.flag < 64 /*0x40*/ && !this.IsShadow();
+    }
+
+    public EquipItemExceedParamTable.EquipItemExceedParamAll GetExceedParam(uint exceed)
+    {
+      return Singleton<EquipItemExceedParamTable>.I.GetEquipItemExceedParamAll(this.exceedID, exceed);
+    }
+
+    public static bool cb(CSVReader csv_reader, EquipItemTable.EquipItemData data, ref uint key)
+    {
+      data.id = key;
+      csv_reader.Pop(ref data.appVer);
+      csv_reader.Pop<EQUIPMENT_TYPE>(ref data.type);
+      csv_reader.Pop<GET_TYPE>(ref data.getType);
+      csv_reader.Pop(ref data.eventId);
+      csv_reader.Pop(ref data.name);
+      csv_reader.Pop<RARITY_TYPE>(ref data.rarity);
+      csv_reader.Pop(ref data.modelID0);
+      data.modelID1 = data.modelID0;
+      csv_reader.Pop(ref data.modelID1);
+      string empty1 = string.Empty;
+      int id = -1;
+      csv_reader.Pop(ref empty1);
+      if (empty1.Length > 1)
+        id = (int) Enum.Parse(typeof (ELEMENT_TYPE), empty1);
+      if (!(bool) csv_reader.PopColor24(ref data.modelColor0))
+        data.modelColor0 = id == -1 ? NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.modelBaseColor) : NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetModelElementColor(id));
+      csv_reader.PopColor24(ref data.modelColor1);
+      if (!(bool) csv_reader.PopColor24(ref data.modelColor2))
+        data.modelColor2 = id == -1 ? NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.modelBaseColor2) : NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetModelElementColor2(id));
+      csv_reader.Pop(ref data.effectID);
+      data.effectParam = 1f;
+      csv_reader.Pop(ref data.effectParam);
+      if (!(bool) csv_reader.PopColor24(ref data.effectColor))
+        data.effectColor = id == -1 ? NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.modelBaseColor) : NGUIMath.ColorToInt(MonoBehaviourSingleton<GlobalSettingsManager>.I.playerVisual.GetModelElementColor(id));
+      csv_reader.Pop(ref data.__iconID);
+      csv_reader.Pop(ref data.maxLv);
+      csv_reader.Pop(ref data.growID);
+      csv_reader.Pop(ref data.needId);
+      csv_reader.Pop(ref data.needUniqueId);
+      csv_reader.Pop(ref data.exceedID);
+      csv_reader.Pop(ref data.shadowEvolveEquipItemId);
+      csv_reader.Pop(ref data.baseAtk);
+      csv_reader.Pop(ref data.baseDef);
+      csv_reader.Pop(ref data.baseHp);
+      data.atkElement = new int[6];
+      data.defElement = new int[6];
+      for (int index = 0; index < 6; ++index)
+        csv_reader.Pop(ref data.atkElement[index]);
+      for (int index = 0; index < 6; ++index)
+        csv_reader.Pop(ref data.defElement[index]);
+      List<SkillItemTable.SkillSlotData> skillSlotDataList = new List<SkillItemTable.SkillSlotData>();
+      int num1 = 0;
+      int num2 = 0;
+      for (int index = 0; index < 9; ++index)
+      {
+        string empty2 = string.Empty;
+        uint num3 = 0;
+        csv_reader.Pop(ref empty2);
+        csv_reader.Pop(ref num3);
+        if (!string.IsNullOrEmpty(empty2))
+        {
+          SkillItemTable.SkillSlotData skillSlotData = new SkillItemTable.SkillSlotData();
+          skillSlotData.slotType = (SKILL_SLOT_TYPE) Enum.Parse(typeof (SKILL_SLOT_TYPE), empty2);
+          if (skillSlotData.slotType != SKILL_SLOT_TYPE.NONE)
+          {
+            skillSlotData.skill_id = num3;
+            skillSlotDataList.Add(skillSlotData);
+            ++num2;
+            if (num3 != 0U)
+              ++num1;
+          }
+        }
+      }
+      data._skillSlot = skillSlotDataList.ToArray();
+      data.fixedSkillLength = num1;
+      data.maxSlot = num2;
+      int[] numArray1 = new int[3];
+      int[] numArray2 = new int[3];
+      int[] numArray3 = new int[3];
+      int length = 0;
+      for (int index = 0; index < 3; ++index)
+      {
+        csv_reader.Pop(ref numArray1[index]);
+        csv_reader.Pop(ref numArray2[index]);
+        csv_reader.Pop(ref numArray3[index]);
+        if (numArray1[index] != 0 && numArray2[index] != 0)
+          ++length;
+      }
+      data.fixedAbility = new EquipItem.Ability[length];
+      for (int index = 0; index < length; ++index)
+      {
+        data.fixedAbility[index] = new EquipItem.Ability();
+        data.fixedAbility[index].id = numArray1[index];
+        data.fixedAbility[index].pt = numArray2[index];
+        data.fixedAbility[index].vr = 0 < numArray3[index];
+      }
+      csv_reader.Pop(ref data.sale);
+      csv_reader.Pop(ref data.listId);
+      string obtained = "";
+      csv_reader.Pop(ref obtained);
+      data.obtained = new EquipItemTable.EquipItemData.Obtained(obtained);
+      if (!(bool) csv_reader.Pop(ref data.damageDistanceId))
+        data.damageDistanceId = data.type != EQUIPMENT_TYPE.ARROW ? -1 : 0;
+      csv_reader.PopEnum<ELEMENT_TYPE>(ref data.atkElementType, ELEMENT_TYPE.MAX);
+      csv_reader.PopEnum<ELEMENT_TYPE>(ref data.defElementType, ELEMENT_TYPE.MAX);
+      csv_reader.Pop(ref data.isFormer);
+      csv_reader.PopEnum<SP_ATTACK_TYPE>(ref data.spAttackType, SP_ATTACK_TYPE.NONE);
+      csv_reader.Pop(ref data.spAttackRate);
+      csv_reader.Pop(ref data.evolveId);
+      csv_reader.PopEnum<EXTRA_ATTACK_TYPE>(ref data.exAttackType, EXTRA_ATTACK_TYPE.NONE);
+      return true;
+    }
+
+    public class Obtained
+    {
+      public string category = "";
+      public int flag = -1;
+      private const int CATEGORY_MAX = 64 /*0x40*/;
+      private const int ALPHABET_MAX = 26;
+
+      public Obtained(string obtained)
+      {
+        if (obtained.Length == 0)
+          return;
+        string s = (string) null;
+        int num = 0;
+        for (int length = obtained.Length; num < length; ++num)
+        {
+          if (char.IsNumber(obtained[num]))
+          {
+            this.category = obtained.Substring(0, num).ToUpper();
+            s = obtained.Substring(num);
+            break;
+          }
+        }
+        if (s == null)
+          return;
+        int.TryParse(s, out this.flag);
+      }
+
+      public int GetSequenceNumber()
+      {
+        int flag = this.flag;
+        if (!string.IsNullOrEmpty(this.category))
+        {
+          string upper = this.category.ToUpper();
+          int index1 = 0;
+          for (int length = upper.Length; index1 < length; ++index1)
+          {
+            int num1 = (int) upper[index1] - 65;
+            int num2 = length - index1;
+            if (num2 > 0)
+            {
+              int num3 = 64 /*0x40*/;
+              int num4 = 0;
+              for (int index2 = num2 - 1; num4 < index2; ++num4)
+                num3 *= 26;
+              if (num3 > 64 /*0x40*/)
+                ++num1;
+              flag += num1 * num3;
+            }
+            else
+              flag += num1;
+          }
+        }
+        return flag;
+      }
+    }
+  }
+
+  public class ListCompare : IComparer<EquipItemTable.EquipItemData>
+  {
+    public int Compare(EquipItemTable.EquipItemData data1, EquipItemTable.EquipItemData data2)
+    {
+      return data1.listId < data2.listId ? -1 : 1;
+    }
+  }
 }

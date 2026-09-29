@@ -1,409 +1,277 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AttackDig
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using UnityEngine;
 
-public class AttackDig
+#nullable disable
+public class AttackDig : MonoBehaviour
 {
-	private enum Function
-	{
-		NONE,
-		MAIN,
-		DELETE
-	}
+  private const float AIM_RAD_MIN = 0.00174532924f;
+  public const string ANIM_STATE_BREAK = "BREAK";
+  private const string ANIM_STATE_END = "END";
+  private BulletData.BulletDig m_digData;
+  private StageObject m_attacker;
+  private AttackInfo m_atkInfo;
+  private Transform m_cachedTransform;
+  private StageObject m_targetObject;
+  private GameObject m_effectObj;
+  private string m_landHitEffectName = string.Empty;
+  private float m_aimAngleSpeed;
+  private float m_moveSpeed;
+  private float m_aliveTimer;
+  private bool m_isDeleted;
+  private AttackDig.Function m_func;
+  private AttackDig.State m_state;
+  private int m_effectDeleteAnimHash;
+  private Animator m_effectAnimator;
+  private float m_attackTimer;
+  private bool m_isCreatedBullet;
 
-	private enum State
-	{
-		NONE,
-		TRACKING,
-		ATTACK
-	}
+  public string AttackInfoName => this.m_atkInfo.name;
 
-	private const float AIM_RAD_MIN = 0.00174532924f;
+  public bool IsDeleted => this.m_isDeleted;
 
-	public const string ANIM_STATE_BREAK = "BREAK";
+  public void Initialize(
+    StageObject attacker,
+    AttackInfo atkInfo,
+    StageObject targetObj,
+    Transform launchTrans,
+    Vector3 offsetPos,
+    Quaternion offsetRot)
+  {
+    this.m_attacker = attacker;
+    this.m_atkInfo = atkInfo;
+    if (atkInfo is AttackHitInfo attackHitInfo)
+      attackHitInfo.enableIdentityCheck = false;
+    BulletData bulletData = atkInfo.bulletData;
+    this.m_landHitEffectName = bulletData.data.landHiteffectName;
+    this.m_aliveTimer = bulletData.data.appearTime;
+    this.m_moveSpeed = bulletData.data.speed;
+    BulletData.BulletDig dataDig = bulletData.dataDig;
+    this.m_aimAngleSpeed = dataDig.lookAtAngle * ((float) Math.PI / 180f);
+    this.m_digData = dataDig;
+    this.m_isDeleted = false;
+    this.m_cachedTransform = ((Component) this).transform;
+    this.m_cachedTransform.parent = MonoBehaviourSingleton<StageObjectManager>.IsValid() ? MonoBehaviourSingleton<StageObjectManager>.I._transform : MonoBehaviourSingleton<EffectManager>.I._transform;
+    this.m_cachedTransform.position = Vector3.op_Addition(launchTrans.position, Quaternion.op_Multiply(launchTrans.rotation, offsetPos));
+    this.m_cachedTransform.rotation = Quaternion.op_Multiply(launchTrans.rotation, offsetRot);
+    this.m_cachedTransform.localScale = bulletData.data.timeStartScale;
+    Transform effect = EffectManager.GetEffect(bulletData.data.effectName, ((Component) this).transform);
+    if (Object.op_Inequality((Object) effect, (Object) null))
+    {
+      effect.localPosition = bulletData.data.dispOffset;
+      effect.localRotation = Quaternion.Euler(bulletData.data.dispRotation);
+      effect.localScale = Vector3.one;
+      this.m_effectObj = ((Component) effect).gameObject;
+      this.m_effectAnimator = this.m_effectObj.GetComponent<Animator>();
+      this.m_targetObject = targetObj;
+    }
+    this.RequestMain();
+  }
 
-	private const string ANIM_STATE_END = "END";
+  private void Update()
+  {
+    switch (this.m_func)
+    {
+      case AttackDig.Function.MAIN:
+        this.FuncMain();
+        break;
+      case AttackDig.Function.DELETE:
+        this.FuncDelete();
+        break;
+    }
+  }
 
-	private BulletData.BulletDig m_digData;
+  private void RequestMain() => this.RequestFunction(AttackDig.Function.MAIN);
 
-	private StageObject m_attacker;
+  private void FuncMain()
+  {
+    if (this.m_isDeleted)
+      return;
+    this.m_aliveTimer -= Time.deltaTime;
+    if ((double) this.m_aliveTimer <= 0.0)
+      this.RequestDestroy(false);
+    else if (Object.op_Equality((Object) this.m_targetObject, (Object) null))
+      this.RequestDestroy(false);
+    else if (this.m_isCreatedBullet)
+    {
+      this.RequestDestroy(false);
+    }
+    else
+    {
+      Vector3 position = ((Component) this.m_targetObject).transform.position;
+      position.y = 0.0f;
+      switch (this.m_state)
+      {
+        case AttackDig.State.TRACKING:
+          this.LookAtTarget(position);
+          Vector3 vector3 = Vector3.op_Addition(this.m_cachedTransform.position, Vector3.op_Multiply(Vector3.op_Multiply(this.m_cachedTransform.forward, this.m_moveSpeed), Time.deltaTime));
+          vector3.y = this.m_digData.floatingHeight;
+          this.m_cachedTransform.position = vector3;
+          position.y = 0.0f;
+          vector3.y = 0.0f;
+          if ((double) Vector3.Distance(position, vector3) > (double) this.m_digData.attackRange)
+            break;
+          this.m_attackTimer = this.m_digData.attackDelay;
+          this.ForwardState();
+          break;
+        case AttackDig.State.ATTACK:
+          this.m_attackTimer -= Time.deltaTime;
+          if ((double) this.m_attackTimer > 0.0)
+            break;
+          Player targetObject = this.m_targetObject as Player;
+          if (Object.op_Equality((Object) targetObject, (Object) null) || targetObject.isDead)
+          {
+            this.RequestDestroy(false);
+            break;
+          }
+          this.CreateBullet();
+          break;
+      }
+    }
+  }
 
-	private AttackInfo m_atkInfo;
+  private AnimEventShot CreateBullet()
+  {
+    BulletData bulletData = this.m_atkInfo.bulletData;
+    if (Object.op_Equality((Object) bulletData, (Object) null))
+      return (AnimEventShot) null;
+    BulletData.BulletDig dataDig = bulletData.dataDig;
+    if (dataDig == null)
+      return (AnimEventShot) null;
+    if (Object.op_Equality((Object) this.m_attacker, (Object) null))
+      return (AnimEventShot) null;
+    Quaternion rotation = this.m_cachedTransform.rotation;
+    Vector3 position = this.m_cachedTransform.position;
+    AnimEventShot externalBulletData = AnimEventShot.CreateByExternalBulletData(dataDig.flyOutBullet, this.m_attacker, this.m_atkInfo, position, rotation);
+    if (Object.op_Equality((Object) externalBulletData, (Object) null))
+    {
+      Log.Error("Failed to create AnimEventShot for Dig!!");
+      return (AnimEventShot) null;
+    }
+    this.m_isCreatedBullet = true;
+    return externalBulletData;
+  }
 
-	private Transform m_cachedTransform;
+  private void LookAtTarget(Vector3 targetPos)
+  {
+    Vector3 forward = this.m_cachedTransform.forward;
+    Vector3 position = this.m_cachedTransform.position;
+    Vector3 vector3 = Vector3.op_Subtraction(targetPos, position);
+    ((Vector3) ref vector3).Normalize();
+    float num1 = this.m_aimAngleSpeed * Time.deltaTime;
+    double num2 = (double) Vector3.Dot(forward, vector3);
+    float num3 = Mathf.Acos((float) num2);
+    if (num2 >= 1.0 || (double) num1 >= (double) num3 || (double) num3 < 0.001745329238474369)
+      return;
+    float num4 = num1 / num3;
+    this.m_cachedTransform.rotation = (double) num4 < 1.0 ? Quaternion.Slerp(Quaternion.LookRotation(forward), Quaternion.LookRotation(vector3), num4) : Quaternion.LookRotation(vector3);
+  }
 
-	private StageObject m_targetObject;
+  public void RequestDestroy(bool isPlayBreakEffect = true)
+  {
+    if (this.m_func == AttackDig.Function.DELETE || this.m_isDeleted)
+      return;
+    this.RequestFunction(AttackDig.Function.DELETE);
+    if (Object.op_Equality((Object) this.m_effectAnimator, (Object) null))
+    {
+      this.Destroy();
+    }
+    else
+    {
+      this.m_effectDeleteAnimHash = !isPlayBreakEffect ? Animator.StringToHash("END") : Animator.StringToHash("BREAK");
+      if (this.m_effectAnimator.HasState(0, this.m_effectDeleteAnimHash))
+      {
+        this.m_effectAnimator.Play(this.m_effectDeleteAnimHash, 0, 0.0f);
+        this.m_effectAnimator.Update(0.0f);
+      }
+      else
+      {
+        Debug.LogWarning((object) "Not found delete animation!!");
+        this.Destroy();
+      }
+    }
+  }
 
-	private GameObject m_effectObj;
+  private void FuncDelete()
+  {
+    switch (this.m_state)
+    {
+      case AttackDig.State.TRACKING:
+        if (Object.op_Equality((Object) this.m_effectAnimator, (Object) null))
+        {
+          this.ForwardState();
+          break;
+        }
+        AnimatorStateInfo animatorStateInfo = this.m_effectAnimator.GetCurrentAnimatorStateInfo(0);
+        if ((double) ((AnimatorStateInfo) ref animatorStateInfo).normalizedTime < 1.0)
+          break;
+        this.ForwardState();
+        break;
+      case AttackDig.State.ATTACK:
+        this.Destroy();
+        this.ForwardState();
+        break;
+    }
+  }
 
-	private string m_landHitEffectName = string.Empty;
+  private void Destroy()
+  {
+    if (this.m_isDeleted)
+      return;
+    this.m_isDeleted = true;
+    if (!string.IsNullOrEmpty(this.m_landHitEffectName))
+    {
+      Transform effect = EffectManager.GetEffect(this.m_landHitEffectName);
+      if (Object.op_Inequality((Object) effect, (Object) null))
+      {
+        effect.position = this.m_cachedTransform.position;
+        effect.rotation = this.m_cachedTransform.rotation;
+      }
+    }
+    Object.Destroy((Object) ((Component) this).gameObject);
+  }
 
-	private float m_aimAngleSpeed;
+  private void OnDestroy()
+  {
+    if (!Object.op_Inequality((Object) this.m_effectObj, (Object) null))
+      return;
+    EffectManager.ReleaseEffect(this.m_effectObj);
+    this.m_effectObj = (GameObject) null;
+  }
 
-	private float m_moveSpeed;
+  private void RequestFunction(AttackDig.Function func)
+  {
+    this.m_func = func;
+    this.SetState(AttackDig.State.TRACKING);
+  }
 
-	private float m_aliveTimer;
+  private void SetState(AttackDig.State state) => this.m_state = state;
 
-	private bool m_isDeleted;
+  private void ForwardState() => ++this.m_state;
 
-	private Function m_func;
+  private void BackState()
+  {
+    if (this.m_state <= AttackDig.State.NONE)
+      return;
+    --this.m_state;
+  }
 
-	private State m_state;
+  private enum Function
+  {
+    NONE,
+    MAIN,
+    DELETE,
+  }
 
-	private int m_effectDeleteAnimHash;
-
-	private Animator m_effectAnimator;
-
-	private float m_attackTimer;
-
-	private bool m_isCreatedBullet;
-
-	public string AttackInfoName => m_atkInfo.name;
-
-	public bool IsDeleted => m_isDeleted;
-
-	public AttackDig()
-		: this()
-	{
-	}
-
-	public void Initialize(StageObject attacker, AttackInfo atkInfo, StageObject targetObj, Transform launchTrans, Vector3 offsetPos, Quaternion offsetRot)
-	{
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Expected O, but got Unknown
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Expected O, but got Unknown
-		//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Expected O, but got Unknown
-		m_attacker = attacker;
-		m_atkInfo = atkInfo;
-		AttackHitInfo attackHitInfo = atkInfo as AttackHitInfo;
-		if (attackHitInfo != null)
-		{
-			attackHitInfo.enableIdentityCheck = false;
-		}
-		BulletData bulletData = atkInfo.bulletData;
-		m_landHitEffectName = bulletData.data.landHiteffectName;
-		m_aliveTimer = bulletData.data.appearTime;
-		m_moveSpeed = bulletData.data.speed;
-		BulletData.BulletDig dataDig = bulletData.dataDig;
-		m_aimAngleSpeed = dataDig.lookAtAngle * 0.0174532924f;
-		m_digData = dataDig;
-		m_isDeleted = false;
-		m_cachedTransform = this.get_transform();
-		m_cachedTransform.set_parent((!MonoBehaviourSingleton<StageObjectManager>.IsValid()) ? MonoBehaviourSingleton<EffectManager>.I._transform : MonoBehaviourSingleton<StageObjectManager>.I._transform);
-		m_cachedTransform.set_position(launchTrans.get_position() + launchTrans.get_rotation() * offsetPos);
-		m_cachedTransform.set_rotation(launchTrans.get_rotation() * offsetRot);
-		m_cachedTransform.set_localScale(bulletData.data.timeStartScale);
-		Transform effect = EffectManager.GetEffect(bulletData.data.effectName, this.get_transform());
-		effect.set_localPosition(bulletData.data.dispOffset);
-		effect.set_localRotation(Quaternion.Euler(bulletData.data.dispRotation));
-		effect.set_localScale(Vector3.get_one());
-		m_effectObj = effect.get_gameObject();
-		m_effectAnimator = m_effectObj.GetComponent<Animator>();
-		m_targetObject = targetObj;
-		RequestMain();
-	}
-
-	private void Update()
-	{
-		switch (m_func)
-		{
-		case Function.MAIN:
-			FuncMain();
-			break;
-		case Function.DELETE:
-			FuncDelete();
-			break;
-		}
-	}
-
-	private void RequestMain()
-	{
-		RequestFunction(Function.MAIN);
-	}
-
-	private void FuncMain()
-	{
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		if (!m_isDeleted)
-		{
-			m_aliveTimer -= Time.get_deltaTime();
-			if (m_aliveTimer <= 0f)
-			{
-				RequestDestroy(false);
-			}
-			else if (m_targetObject == null)
-			{
-				RequestDestroy(false);
-			}
-			else if (m_isCreatedBullet)
-			{
-				RequestDestroy(false);
-			}
-			else
-			{
-				Vector3 position = m_targetObject.get_transform().get_position();
-				position.y = 0f;
-				switch (m_state)
-				{
-				case State.TRACKING:
-				{
-					LookAtTarget(position);
-					Vector3 forward = m_cachedTransform.get_forward();
-					Vector3 val = m_cachedTransform.get_position() + forward * m_moveSpeed * Time.get_deltaTime();
-					val.y = m_digData.floatingHeight;
-					m_cachedTransform.set_position(val);
-					position.y = 0f;
-					val.y = 0f;
-					if (Vector3.Distance(position, val) <= m_digData.attackRange)
-					{
-						m_attackTimer = m_digData.attackDelay;
-						ForwardState();
-					}
-					break;
-				}
-				case State.ATTACK:
-					m_attackTimer -= Time.get_deltaTime();
-					if (!(m_attackTimer > 0f))
-					{
-						Player player = m_targetObject as Player;
-						if (player == null || player.isDead)
-						{
-							RequestDestroy(false);
-						}
-						else
-						{
-							CreateBullet();
-						}
-					}
-					break;
-				}
-			}
-		}
-	}
-
-	private AnimEventShot CreateBullet()
-	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		BulletData bulletData = m_atkInfo.bulletData;
-		if (bulletData == null)
-		{
-			return null;
-		}
-		BulletData.BulletDig dataDig = bulletData.dataDig;
-		if (dataDig == null)
-		{
-			return null;
-		}
-		if (m_attacker == null)
-		{
-			return null;
-		}
-		Quaternion rotation = m_cachedTransform.get_rotation();
-		Vector3 position = m_cachedTransform.get_position();
-		AnimEventShot animEventShot = AnimEventShot.CreateByExternalBulletData(dataDig.flyOutBullet, m_attacker, m_atkInfo, position, rotation, null, Player.ATTACK_MODE.NONE, null);
-		if (animEventShot == null)
-		{
-			Log.Error("Failed to create AnimEventShot for Dig!!");
-			return null;
-		}
-		m_isCreatedBullet = true;
-		return animEventShot;
-	}
-
-	private void LookAtTarget(Vector3 targetPos)
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 forward = m_cachedTransform.get_forward();
-		Vector3 position = m_cachedTransform.get_position();
-		Vector3 val = targetPos - position;
-		val.Normalize();
-		float num = m_aimAngleSpeed * Time.get_deltaTime();
-		float num2 = Vector3.Dot(forward, val);
-		float num3 = Mathf.Acos(num2);
-		if (num2 < 1f && num < num3 && num3 >= 0.00174532924f)
-		{
-			float num4 = num / num3;
-			Quaternion rotation;
-			if (num4 >= 1f)
-			{
-				rotation = Quaternion.LookRotation(val);
-			}
-			else
-			{
-				Quaternion val2 = Quaternion.LookRotation(forward);
-				Quaternion val3 = Quaternion.LookRotation(val);
-				rotation = Quaternion.Slerp(val2, val3, num4);
-			}
-			m_cachedTransform.set_rotation(rotation);
-		}
-	}
-
-	public void RequestDestroy(bool isPlayBreakEffect = true)
-	{
-		if (m_func != Function.DELETE && !m_isDeleted)
-		{
-			RequestFunction(Function.DELETE);
-			if (m_effectAnimator == null)
-			{
-				Destroy();
-			}
-			else
-			{
-				if (isPlayBreakEffect)
-				{
-					m_effectDeleteAnimHash = Animator.StringToHash("BREAK");
-				}
-				else
-				{
-					m_effectDeleteAnimHash = Animator.StringToHash("END");
-				}
-				if (m_effectAnimator.HasState(0, m_effectDeleteAnimHash))
-				{
-					m_effectAnimator.Play(m_effectDeleteAnimHash, 0, 0f);
-					m_effectAnimator.Update(0f);
-				}
-				else
-				{
-					Debug.LogWarning((object)"Not found delete animation!!");
-					Destroy();
-				}
-			}
-		}
-	}
-
-	private void FuncDelete()
-	{
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		switch (m_state)
-		{
-		case State.TRACKING:
-			if (m_effectAnimator == null)
-			{
-				ForwardState();
-			}
-			else
-			{
-				AnimatorStateInfo currentAnimatorStateInfo = m_effectAnimator.GetCurrentAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_normalizedTime() >= 1f)
-				{
-					ForwardState();
-				}
-			}
-			break;
-		case State.ATTACK:
-			Destroy();
-			ForwardState();
-			break;
-		}
-	}
-
-	private void Destroy()
-	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		if (!m_isDeleted)
-		{
-			m_isDeleted = true;
-			if (!string.IsNullOrEmpty(m_landHitEffectName))
-			{
-				Transform effect = EffectManager.GetEffect(m_landHitEffectName, null);
-				if (effect != null)
-				{
-					effect.set_position(m_cachedTransform.get_position());
-					effect.set_rotation(m_cachedTransform.get_rotation());
-				}
-			}
-			Object.Destroy(this.get_gameObject());
-		}
-	}
-
-	private void OnDestroy()
-	{
-		if (m_effectObj != null)
-		{
-			EffectManager.ReleaseEffect(m_effectObj, true, false);
-			m_effectObj = null;
-		}
-	}
-
-	private void RequestFunction(Function func)
-	{
-		m_func = func;
-		SetState(State.TRACKING);
-	}
-
-	private void SetState(State state)
-	{
-		m_state = state;
-	}
-
-	private void ForwardState()
-	{
-		m_state++;
-	}
-
-	private void BackState()
-	{
-		if (m_state > State.NONE)
-		{
-			m_state--;
-		}
-	}
+  private enum State
+  {
+    NONE,
+    TRACKING,
+    ATTACK,
+  }
 }

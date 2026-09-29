@@ -1,24 +1,35 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: IFieldGimmickCannon
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public interface IFieldGimmickCannon : IFieldGimmickObject
 {
-	Vector3 GetPosition();
+  Vector3 GetPosition();
 
-	Transform GetCannonTransform();
+  Transform GetCannonTransform();
 
-	bool IsUsing();
+  Transform GetBaseTransform();
 
-	bool IsAbleToUse();
+  Vector3 GetBaseTransformForward();
 
-	bool IsCooling();
+  bool IsUsing();
 
-	void OnBoard(Player player);
+  bool IsAbleToUse();
 
-	void OnLeave();
+  bool IsCooling();
 
-	void Shot();
+  bool IsAimCamera();
 
-	void UpdateTargetMarker(bool isNear);
+  void OnBoard(Player player);
 
-	void ApplyCannonVector(Vector3 cannonVec);
+  void OnLeave();
+
+  void Shot();
+
+  void ApplyCannonVector(Vector3 cannonVec);
 }

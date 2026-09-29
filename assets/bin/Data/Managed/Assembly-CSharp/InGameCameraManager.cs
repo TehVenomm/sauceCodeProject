@@ -1,1817 +1,1145 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: InGameCameraManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class InGameCameraManager : MonoBehaviourSingleton<InGameCameraManager>
 {
-	public enum CAMERA_MODE
-	{
-		DEFAULT,
-		GRABBED,
-		ARROW_AIM_BOSS,
-		CANNON_AIM,
-		CANNON_BEAM_CHARGE,
-		CANNON_BEAM,
-		STOP,
-		MAX
-	}
-
-	[Serializable]
-	public class Settings
-	{
-		[Serializable]
-		public class ArrowAimSettings
-		{
-			[Tooltip("狙い中 ピッチ")]
-			public float targetingPitch = 10f;
-
-			[Tooltip("狙い中 距離")]
-			public float targetingDistance = 4f;
-
-			[Tooltip("狙い中(右側) オフセット")]
-			public Vector3 targetingOffset = Vector3.get_zero();
-
-			[Tooltip("狙い中(左側) オフセット")]
-			public Vector3 targetingLeftOffset = Vector3.get_zero();
-
-			[Tooltip("狙い中しゃがみ(右側) オフセット")]
-			public Vector3 targetingAvoidShotRightOffset = Vector3.get_zero();
-
-			[Tooltip("狙い中しゃがみ(左側) オフセット")]
-			public Vector3 targetingAvoidShotLeftOffset = Vector3.get_zero();
-
-			[Tooltip("狙い中 画角（0で変化無し")]
-			public float fieldOfView;
-
-			[Tooltip("狙い時の補正レ\u30fcト")]
-			public float smoothTargetingRate = 0.1f;
-		}
-
-		[Serializable]
-		public class CameraTargetOffsetSettings
-		{
-			[Tooltip("カメラオフセット補正位置")]
-			public Vector3 targetOffsetPos = Vector3.get_zero();
-
-			[Tooltip("カメラオフセット補正回転")]
-			public Vector3 targetOffsetRot = Vector3.get_zero();
-		}
-
-		[Serializable]
-		public class CannonAimSettings
-		{
-			[Tooltip("魔弾砲狙い時のカメラオフセット")]
-			public Vector3 aimCameraOffset = new Vector3(1.2f, 0.6f, -1f);
-
-			[Tooltip("魔弾砲狙い時の見下ろし角度")]
-			public float aimLookDownAngle = -5f;
-
-			[Tooltip("魔弾砲狙い時のカメラとプレイヤ\u30fcとの距離")]
-			public float aimDistanceToSelf = 2.6f;
-
-			[Tooltip("波動砲のカメラオフセット")]
-			public Vector3 beamChargeCameraOffset = Vector3.get_zero();
-
-			[Tooltip("波動砲のカメラ見下ろし角度")]
-			public float beamChargeCameraLookDownAngle;
-
-			[Tooltip("波動砲のカメラと自分との距離")]
-			public float beamChargeCameraDistanceToSelf;
-
-			[Tooltip("波動砲発射時のカメラ位置")]
-			public Vector3 beamCameraPosition = Vector3.get_zero();
-
-			[Tooltip("波動砲発射時のカメラ")]
-			public Vector3 beamCameraRotationEular = Vector3.get_zero();
-		}
-
-		[Tooltip("タ\u30fcゲットカメラ ピッチ")]
-		public float targetingPitch = 10f;
-
-		[Tooltip("タ\u30fcゲットカメラ ピッチ変化最短距離")]
-		public float targetingPitchNearDistance;
-
-		[Tooltip("タ\u30fcゲットカメラ ピッチ変化最長距離")]
-		public float targetingPitchFarDistance;
-
-		[Tooltip("タ\u30fcゲットカメラ ピッチ変化カ\u30fcブ最小角度")]
-		public float targetingPitchMinAngle = 10f;
-
-		[Tooltip("タ\u30fcゲットカメラ ピッチ変化カ\u30fcブ最大角度")]
-		public float targetingPitchMaxAngle = 10f;
-
-		[Tooltip("タ\u30fcゲットカメラ ピッチ変化カ\u30fcブ")]
-		public AnimationCurve targetingPitchCurve;
-
-		[Tooltip("タ\u30fcゲットカメラ 距離")]
-		public float targetingDistance = 4f;
-
-		[Tooltip("タ\u30fcゲットカメラ オフセット")]
-		public Vector3 targetingOffset = Vector3.get_zero();
-
-		[Tooltip("タ\u30fcゲットカメラ カメラ移動最大速度")]
-		public float targetingMaxSpeed = 999f;
-
-		[Tooltip("フリ\u30fcカメラ ピッチ")]
-		public float freePitch = 20f;
-
-		[Tooltip("フリ\u30fcカメラ 距離")]
-		public float freeDistance = 10f;
-
-		[Tooltip("フリ\u30fcカメラ オフセット")]
-		public Vector3 freeOffset = Vector3.get_zero();
-
-		[Tooltip("フリ\u30fcカメラ カメラ移動最大速度")]
-		public float freeMaxSpeed = 999f;
-
-		[Tooltip("true:タ\u30fcゲットカメラ抜け時方向固定")]
-		public bool normalEnable = true;
-
-		[Tooltip("true:タ\u30fcゲットカメラ有効")]
-		public bool targetEnable = true;
-
-		[Tooltip("敵可動領域角度")]
-		public float moveableTargetAngle = 10f;
-
-		[Tooltip("タ\u30fcゲットカメラの補正レ\u30fcト")]
-		public float smoothTargetingRate = 0.1f;
-
-		[Tooltip("フリ\u30fcカメラの補正レ\u30fcト")]
-		public float smoothFreeRate = 0.1f;
-
-		[Tooltip("カメラ切り替え時間")]
-		public float modeSwitchTime = 0.3f;
-
-		[Tooltip("カメラが寄る限界値")]
-		public float distanceLimit = 2f;
-
-		[Tooltip("カメラの距離が寄せてから元に戻るまでの時間")]
-		public float distanceLerpTime = 2f;
-
-		[Tooltip("タ\u30fcゲット追尾の後方オフセット")]
-		public float followBackOffset = 3.5f;
-
-		[Tooltip("タ\u30fcゲット追尾の左右割合")]
-		public float followSidePercent = 0.8f;
-
-		[Tooltip("タ\u30fcゲット追尾の補正レ\u30fcト")]
-		public float followRate = 0.1f;
-
-		[Tooltip("弓狙い設定")]
-		public ArrowAimSettings arrowAimSettings = new ArrowAimSettings();
-
-		[Tooltip("大型モンスタ\u30fc戦のカメラ補正設定")]
-		public CameraTargetOffsetSettings cameraTargetOffsetSettings = new CameraTargetOffsetSettings();
-
-		[Tooltip("フィ\u30fcルドのカメラ補正設定")]
-		public CameraTargetOffsetSettings cameraFieldOffsetSettings = new CameraTargetOffsetSettings();
-
-		[Tooltip("魔弾砲関連のカメラ補正設定")]
-		public CannonAimSettings cannonAimSettings = new CannonAimSettings();
-	}
-
-	protected class ShakeParam
-	{
-		public float shakeTime;
-
-		public float shakeLength;
-
-		public float shakeCycleTime;
-	}
-
-	public enum CAM_HIT_OBJ_TYPE
-	{
-		NONE,
-		ZOOM
-	}
-
-	public class GrabInfo
-	{
-		public bool enabled;
-
-		public Transform enemyRoot;
-
-		public Vector3 dir;
-
-		public float distance;
-	}
-
-	public class TargetOffset
-	{
-		public Vector3 pos = Vector3.get_zero();
-
-		public Vector3 rot = Vector3.get_zero();
-	}
-
-	private Camera ctrlCamera;
-
-	public Transform cameraTransform;
-
-	private StageObject targetObject;
-
-	private Player targetPlayer;
-
-	private Self targetSelf;
-
-	private CAMERA_MODE cameraMode;
-
-	[Tooltip("縦画面設定")]
-	public Settings portraitSettings = new Settings();
-
-	[Tooltip("横画面設定")]
-	public Settings landscapeSettings = new Settings();
-
-	private Vector3 requestPos = Vector3.get_zero();
-
-	private Quaternion requestRot = Quaternion.get_identity();
-
-	private Vector3 normalForward = Vector3.get_back();
-
-	private bool isBossExistsPast;
-
-	private bool switching;
-
-	private float switchTimer;
-
-	private Vector3 posVelocity = Vector3.get_zero();
-
-	private Vector3 rotVelocity = Vector3.get_zero();
-
-	private float distanceElapsedTime;
-
-	private float modeChangeTime;
-
-	private float ingameFieldOfView;
-
-	private float fieldOfViewVelocity;
-
-	private Vector3 stopPos = Vector3.get_zero();
-
-	private Vector3 stopRotEular = Vector3.get_zero();
-
-	protected bool adjustCamera;
-
-	[Tooltip("カメラ揺れ 基本周期（秒）")]
-	public float shakeCycleTime = 0.2f;
-
-	[Tooltip("カメラ揺れ 減衰率")]
-	public float shakeAttenuationPercent = 0.25f;
-
-	[Tooltip("カメラ揺れ 基本振幅")]
-	public float shakeAmplitude = 0.5f;
-
-	[Tooltip("カメラ揺れ 最大発生距離")]
-	public float shakeMaxFocusLength = 30f;
-
-	[Tooltip("カメラ揺れ 最大同時発生数（0で無制限")]
-	public int shakeMaxNum;
-
-	protected List<ShakeParam> shakeParams = new List<ShakeParam>();
-
-	[Tooltip("カメラがオブジェクトに当たった際の挙動")]
-	public CAM_HIT_OBJ_TYPE hitObjectType;
-
-	private RadialBlurFilter radialBlurFilter;
-
-	private float radialBlurStrengthPerTime;
-
-	private float radialBlurStrengthValue;
-
-	private Transform radialBlurCenterTransform;
-
-	private Vector3 radialBlurCenterPos = Vector3.get_zero();
-
-	private Vector3 beforeFollowVec = Vector3.get_zero();
-
-	private GrabInfo _grabInfo = new GrabInfo();
-
-	private TargetOffset validAnimEventTargetOffset;
-
-	private TargetOffset targetOffsetByPlayer;
-
-	private TargetOffset targetOffsetByEnemy;
-
-	public Vector3 movePosition
-	{
-		get;
-		protected set;
-	}
-
-	public Quaternion moveRotation
-	{
-		get;
-		protected set;
-	}
-
-	public Transform target
-	{
-		get;
-		set;
-	}
-
-	public Settings validSettings
-	{
-		get;
-		private set;
-	}
-
-	public int arrowCameraMode
-	{
-		get;
-		private set;
-	}
-
-	public bool isArrowAimBossMode
-	{
-		get;
-		protected set;
-	}
-
-	public bool isMotionCameraMode
-	{
-		get;
-		protected set;
-	}
-
-	public bool isFixedCameraMode
-	{
-		get;
-		protected set;
-	}
-
-	public Transform[] motionCameraTransforms
-	{
-		get;
-		protected set;
-	}
-
-	public Transform motionCameraParent
-	{
-		get;
-		protected set;
-	}
-
-	public GrabInfo grabInfo => _grabInfo;
-
-	public InGameCameraManager()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		isMotionCameraMode = false;
-		motionCameraTransforms = null;
-		motionCameraParent = null;
-		cameraMode = CAMERA_MODE.DEFAULT;
-		arrowCameraMode = InGameManager.GetArrowCameraType(GameSaveData.instance.arrowCameraKey);
-	}
-
-	public void SetCameraMode(CAMERA_MODE cameraMode)
-	{
-		this.cameraMode = cameraMode;
-	}
-
-	public bool IsCameraModeBeam()
-	{
-		return cameraMode == CAMERA_MODE.CANNON_BEAM;
-	}
-
-	public bool IsCameraMode(CAMERA_MODE mode)
-	{
-		return cameraMode == mode;
-	}
-
-	public void SetStopPos(Vector3 pos)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		stopPos = pos;
-	}
-
-	public void SetStopRotEular(Vector3 rotEular)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		stopRotEular = rotEular;
-	}
-
-	public void SetArrowCameraMode(int mode)
-	{
-		arrowCameraMode = mode;
-	}
-
-	public void SetAnimEventTargetOffsetByPlayer(TargetOffset targetOffset)
-	{
-		if (targetOffset != null)
-		{
-			targetOffsetByPlayer = targetOffset;
-		}
-	}
-
-	public void SetAnimEventTargetOffsetByEnemy(TargetOffset targetOffset)
-	{
-		if (targetOffset != null)
-		{
-			targetOffsetByEnemy = targetOffset;
-		}
-	}
-
-	public void ClearAnimEventTargetOffsetByPlayer()
-	{
-		validAnimEventTargetOffset = null;
-		targetOffsetByPlayer = null;
-	}
-
-	public void ClearAnimEventTargetOffsetByEnemy()
-	{
-		validAnimEventTargetOffset = null;
-		targetOffsetByEnemy = null;
-	}
-
-	public void AllClearAnimEventTargetOffset()
-	{
-		validAnimEventTargetOffset = null;
-		targetOffsetByPlayer = null;
-		targetOffsetByEnemy = null;
-	}
-
-	public void ClearStopCameraMode()
-	{
-		if (IsCameraMode(CAMERA_MODE.STOP))
-		{
-			SetCameraMode(CAMERA_MODE.DEFAULT);
-		}
-	}
-
-	protected override void Awake()
-	{
-		base.Awake();
-		OnScreenRotate(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
-		distanceElapsedTime = validSettings.distanceLerpTime;
-	}
-
-	private void OnEnable()
-	{
-		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
-		{
-			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
-		}
-		RenderTargetCacher component = MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>();
-		if (component != null)
-		{
-			component.set_enabled(false);
-		}
-	}
-
-	protected override void OnDisable()
-	{
-		base.OnDisable();
-		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
-		{
-			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= OnScreenRotate;
-		}
-		EndRadialBlurFilter(0f);
-		MonoBehaviourSingleton<GameSceneManager>.I.SetMainCameraCullingMask(GameSceneGlobalSettings.GetDefaultMainCameraCullingMask());
-		RenderTargetCacher component = MonoBehaviourSingleton<AppMain>.I.mainCamera.GetComponent<RenderTargetCacher>();
-		if (component != null)
-		{
-			component.set_enabled(true);
-		}
-	}
-
-	private void Start()
-	{
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		if (ctrlCamera == null)
-		{
-			ctrlCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
-		}
-		cameraTransform = ctrlCamera.get_transform();
-		movePosition = cameraTransform.get_position();
-		moveRotation = cameraTransform.get_rotation();
-		radialBlurFilter = ctrlCamera.GetComponent<RadialBlurFilter>();
-		if (radialBlurFilter != null)
-		{
-			radialBlurFilter.set_enabled(false);
-		}
-	}
-
-	private void UpdateRadialBlur()
-	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 zero = Vector3.get_zero();
-		zero = ((!(radialBlurCenterTransform != null)) ? radialBlurCenterPos : radialBlurCenterTransform.get_position());
-		Vector2 center = WorldToScreenPoint(zero).ToVector2XY();
-		center.x /= (float)Screen.get_width();
-		center.y /= (float)Screen.get_height();
-		radialBlurFilter.SetCenter(center);
-		if (radialBlurStrengthPerTime != 0f)
-		{
-			float strength = radialBlurFilter.strength;
-			strength += radialBlurStrengthPerTime * Time.get_deltaTime();
-			if (radialBlurStrengthPerTime > 0f)
-			{
-				if (strength >= radialBlurStrengthValue)
-				{
-					strength = radialBlurStrengthValue;
-					radialBlurStrengthPerTime = 0f;
-				}
-				radialBlurFilter.strength = strength;
-			}
-			else
-			{
-				if (strength <= radialBlurStrengthValue)
-				{
-					strength = radialBlurStrengthValue;
-					if (strength <= 0f)
-					{
-						EndRadialBlurFilter(0f);
-					}
-				}
-				radialBlurFilter.strength = strength;
-			}
-		}
-	}
-
-	private void UpdatePlayerCamera()
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0211: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0230: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0235: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0237: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0257: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0261: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0266: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0272: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0274: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0301: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0303: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0308: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_030e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0310: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0312: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0317: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0319: Unknown result type (might be due to invalid IL or missing references)
-		//IL_031e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0320: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0322: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0331: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0333: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0338: Unknown result type (might be due to invalid IL or missing references)
-		//IL_033d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_033f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0341: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0343: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0348: Unknown result type (might be due to invalid IL or missing references)
-		//IL_034a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_034c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_034e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0353: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0383: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0385: Unknown result type (might be due to invalid IL or missing references)
-		//IL_038a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_038f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0391: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0393: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0398: Unknown result type (might be due to invalid IL or missing references)
-		//IL_039d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0407: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0409: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0418: Unknown result type (might be due to invalid IL or missing references)
-		//IL_041a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_041f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0421: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0426: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0429: Unknown result type (might be due to invalid IL or missing references)
-		//IL_042e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0436: Unknown result type (might be due to invalid IL or missing references)
-		//IL_043b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_043e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0440: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0446: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0448: Unknown result type (might be due to invalid IL or missing references)
-		//IL_044a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_044f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0451: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0456: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0458: Unknown result type (might be due to invalid IL or missing references)
-		//IL_045d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0465: Unknown result type (might be due to invalid IL or missing references)
-		//IL_046a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_046f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0476: Unknown result type (might be due to invalid IL or missing references)
-		//IL_047c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0481: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0491: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0496: Unknown result type (might be due to invalid IL or missing references)
-		//IL_049b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0511: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0514: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0519: Unknown result type (might be due to invalid IL or missing references)
-		//IL_051e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_053b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_053c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_053e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0543: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0568: Unknown result type (might be due to invalid IL or missing references)
-		//IL_056a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0580: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0582: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0584: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0589: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0618: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0619: Unknown result type (might be due to invalid IL or missing references)
-		//IL_061b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0620: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0674: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0679: Unknown result type (might be due to invalid IL or missing references)
-		//IL_067e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0683: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0688: Unknown result type (might be due to invalid IL or missing references)
-		//IL_068a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0690: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0695: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06c9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06f8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_06fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_070d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0712: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0717: Unknown result type (might be due to invalid IL or missing references)
-		//IL_071c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0723: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0733: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0738: Unknown result type (might be due to invalid IL or missing references)
-		//IL_073d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0742: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0793: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0799: Unknown result type (might be due to invalid IL or missing references)
-		//IL_079e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07d4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0801: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0805: Unknown result type (might be due to invalid IL or missing references)
-		//IL_080d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0811: Unknown result type (might be due to invalid IL or missing references)
-		//IL_081b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_08ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0903: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0908: Unknown result type (might be due to invalid IL or missing references)
-		//IL_090d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09ed: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_09fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a12: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a17: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a19: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a1e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a22: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a27: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a2f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0a34: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ac9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ace: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ad2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ada: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0ae2: Unknown result type (might be due to invalid IL or missing references)
-		Settings validSettings = this.validSettings;
-		Vector3 movePosition = this.movePosition;
-		Quaternion moveRotation = this.moveRotation;
-		float fieldOfView = ctrlCamera.get_fieldOfView();
-		Vector3 cameraTargetPos = targetObject.GetCameraTargetPos();
-		if (!(targetPlayer == null))
-		{
-			StageObject stageObject = null;
-			if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
-			{
-				stageObject = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-			}
-			bool flag = stageObject != null;
-			float num = 0f;
-			float num2 = 999f;
-			bool flag2 = false;
-			if (isBossExistsPast != flag)
-			{
-				isBossExistsPast = flag;
-				switching = true;
-				switchTimer = validSettings.modeSwitchTime;
-				flag2 = true;
-			}
-			distanceElapsedTime += Time.get_deltaTime();
-			if (distanceElapsedTime > validSettings.distanceLerpTime)
-			{
-				distanceElapsedTime = validSettings.distanceLerpTime;
-			}
-			modeChangeTime -= Time.get_deltaTime();
-			if (modeChangeTime < 0f)
-			{
-				modeChangeTime = 0f;
-			}
-			float num3 = distanceElapsedTime / validSettings.distanceLerpTime;
-			float num4 = 0f;
-			fieldOfView = ingameFieldOfView;
-			if (!isFixedCameraMode)
-			{
-				if (isMotionCameraMode)
-				{
-					num = 0f;
-					if (motionCameraTransforms != null)
-					{
-						int num5 = 0;
-						if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
-						{
-							num5 = ((!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait) ? 1 : 0);
-						}
-						requestPos = motionCameraTransforms[num5].get_position();
-						requestRot = motionCameraTransforms[num5].get_rotation();
-						Vector3 localScale = motionCameraTransforms[num5].get_localScale();
-						float num6 = localScale.x;
-						if (num6 > 0f)
-						{
-							num6 = Utility.HorizontalToVerticalFOV(num6);
-						}
-						fieldOfView = num6;
-					}
-				}
-				else if (!flag || !validSettings.targetEnable)
-				{
-					num = validSettings.smoothFreeRate;
-					num4 = validSettings.freeDistance;
-					num2 = validSettings.freeMaxSpeed;
-					Vector3 back = Vector3.get_back();
-					if (validSettings.normalEnable)
-					{
-						back = normalForward;
-					}
-					Vector3 val = cameraTargetPos;
-					float num7 = 1f;
-					Vector3 val2 = Vector3.Cross(back, Vector3.get_up());
-					Vector3 val3 = Quaternion.AngleAxis(0f - validSettings.freePitch, val2) * back * Mathf.Lerp(validSettings.distanceLimit, num4, num3) * num7;
-					Vector3 val4 = Quaternion.LookRotation(back) * validSettings.freeOffset * num7;
-					Vector3 val5 = Vector3.get_zero();
-					if (targetPlayer.actionID == Character.ACTION_ID.ATTACK && !targetPlayer.isArrowAimLesserMode && targetPlayer.attackStartTarget != null && targetPlayer.attackStartTarget == targetPlayer.actionTarget && MonoBehaviourSingleton<TargetMarkerManager>.I.isTargetLock)
-					{
-						Vector3 val6 = targetPlayer.attackStartTarget._position - targetPlayer._position;
-						Quaternion val7 = Quaternion.get_identity();
-						Vector3 val8 = val3;
-						Vector3 val9 = val6 - val4;
-						Vector3 zero = Vector3.get_zero();
-						if (back != Vector3.get_forward())
-						{
-							val7 = Quaternion.FromToRotation(back, Vector3.get_forward());
-							val8 = val7 * val8;
-							val9 = val7 * val9;
-						}
-						if (val9.z < (0f - validSettings.followBackOffset) * num7)
-						{
-							zero.z = val9.z + validSettings.followBackOffset * num7;
-						}
-						Vector3 val10 = Quaternion.FromToRotation(val8, Vector3.get_forward()) * (val8 + val9);
-						float num8 = Mathf.Tan(0.0174532924f * fieldOfView * 0.5f) * ((float)Screen.get_width() / (float)Screen.get_height());
-						float num9 = Mathf.Abs(val10.x / val10.z);
-						float num10 = num9 / num8;
-						if (num10 > validSettings.followSidePercent)
-						{
-							zero.x = val9.x * (num10 - validSettings.followSidePercent) / num10;
-						}
-						if (back != Vector3.get_forward())
-						{
-							val5 = Quaternion.Inverse(val7) * zero;
-						}
-					}
-					requestPos = cameraTargetPos + (beforeFollowVec = Vector3.Lerp(beforeFollowVec, val5, validSettings.followRate)) - val3 + val4;
-					requestRot = Quaternion.LookRotation(val3.get_normalized());
-					requestPos += Quaternion.LookRotation(normalForward) * this.validSettings.cameraFieldOffsetSettings.targetOffsetPos;
-					requestRot *= Quaternion.Euler(this.validSettings.cameraFieldOffsetSettings.targetOffsetRot);
-				}
-				else
-				{
-					num = validSettings.smoothTargetingRate;
-					num4 = validSettings.targetingDistance;
-					num2 = validSettings.targetingMaxSpeed;
-					Vector3 val = stageObject.GetCameraTargetPos();
-					Vector3 val11 = val - requestPos;
-					val11.y = 0f;
-					val11.Normalize();
-					Vector3 val12 = cameraTargetPos - requestPos;
-					val12.y = 0f;
-					val12.Normalize();
-					if (flag2)
-					{
-						normalForward = val - cameraTargetPos;
-						normalForward.y = 0f;
-						normalForward.Normalize();
-					}
-					else
-					{
-						float num11 = Vector3.Angle(val11, val12);
-						if (num11 > validSettings.moveableTargetAngle)
-						{
-							Vector3 val13 = Vector3.Cross(val12, val11);
-							float num12 = (!(val13.y >= 0f)) ? (-1f) : 1f;
-							normalForward = Quaternion.AngleAxis((num11 - validSettings.moveableTargetAngle) * num12, Vector3.get_up()) * val12;
-						}
-					}
-					if (normalForward == Vector3.get_zero())
-					{
-						normalForward = Vector3.get_back();
-					}
-					float num13 = validSettings.targetingPitch;
-					if (validSettings.targetingPitchNearDistance != 0f || validSettings.targetingPitchFarDistance != 0f)
-					{
-						Vector3 val14 = val - cameraTargetPos;
-						float magnitude = val14.get_magnitude();
-						float num14 = Mathf.Clamp01((magnitude - validSettings.targetingPitchNearDistance) / (validSettings.targetingPitchFarDistance - validSettings.targetingPitchNearDistance));
-						num14 = validSettings.targetingPitchCurve.Evaluate(num14);
-						num13 = validSettings.targetingPitchMinAngle * (1f - num14) + validSettings.targetingPitchMaxAngle * num14;
-					}
-					Vector3 val15 = Vector3.Cross(normalForward, Vector3.get_up());
-					Vector3 val16 = Quaternion.AngleAxis(0f - num13, val15) * normalForward * Mathf.Lerp(validSettings.distanceLimit, num4, num3);
-					Vector3 val17 = Quaternion.LookRotation(normalForward) * validSettings.targetingOffset;
-					requestPos = cameraTargetPos - val16 + val17;
-					requestRot = Quaternion.LookRotation(val16.get_normalized());
-					requestPos += Quaternion.LookRotation(normalForward) * this.validSettings.cameraTargetOffsetSettings.targetOffsetPos;
-					requestRot *= Quaternion.Euler(this.validSettings.cameraTargetOffsetSettings.targetOffsetRot);
-					if (targetOffsetByPlayer != null)
-					{
-						validAnimEventTargetOffset = targetOffsetByPlayer;
-					}
-					else if (targetOffsetByEnemy != null)
-					{
-						validAnimEventTargetOffset = targetOffsetByEnemy;
-					}
-					else
-					{
-						validAnimEventTargetOffset = null;
-					}
-					if (validAnimEventTargetOffset != null)
-					{
-						requestPos += Quaternion.LookRotation(normalForward) * validAnimEventTargetOffset.pos;
-						requestRot *= Quaternion.Euler(validAnimEventTargetOffset.rot);
-					}
-				}
-			}
-			if (hitObjectType != 0 && !isMotionCameraMode)
-			{
-				Vector3 val18 = requestPos - cameraTargetPos;
-				RaycastHit val19 = default(RaycastHit);
-				Ray val20 = default(Ray);
-				val20._002Ector(cameraTargetPos, val18.get_normalized());
-				if (Physics.Raycast(val20, ref val19, num4, 2359808) && hitObjectType == CAM_HIT_OBJ_TYPE.ZOOM)
-				{
-					float num15 = val19.get_distance();
-					if (num15 < validSettings.distanceLimit)
-					{
-						num15 = validSettings.distanceLimit;
-					}
-					num15 -= validSettings.distanceLimit;
-					float num16 = num4 - validSettings.distanceLimit;
-					float num17 = 0f;
-					if (num16 > 0f)
-					{
-						num17 = validSettings.distanceLerpTime * (num15 / num16);
-					}
-					if (modeChangeTime <= 0f)
-					{
-						distanceElapsedTime -= Time.get_deltaTime() * 5f;
-						if (distanceElapsedTime < num17)
-						{
-							distanceElapsedTime = num17;
-						}
-					}
-					else
-					{
-						distanceElapsedTime = num17;
-					}
-					num3 = distanceElapsedTime / validSettings.distanceLerpTime;
-					requestPos = cameraTargetPos + val20.get_direction() * Mathf.Lerp(validSettings.distanceLimit, num4, num3);
-				}
-			}
-			if (num != 0f && modeChangeTime <= 0f)
-			{
-				num *= ((!(num3 < 0.1f)) ? num3 : 0.1f);
-			}
-			if (switching)
-			{
-				switchTimer -= Time.get_deltaTime();
-				if (switchTimer <= 0f)
-				{
-					switching = false;
-					switchTimer = 0f;
-				}
-				num = Mathf.Lerp(validSettings.modeSwitchTime, num, 1f - switchTimer / validSettings.modeSwitchTime);
-			}
-			if (adjustCamera || isMotionCameraMode || isFixedCameraMode)
-			{
-				if (adjustCamera)
-				{
-					adjustCamera = false;
-				}
-				this.movePosition = requestPos;
-				this.moveRotation = requestRot;
-			}
-			else
-			{
-				Vector3 movePosition2 = Vector3.SmoothDamp(movePosition, requestPos, ref posVelocity, num, num2, Time.get_deltaTime());
-				Vector3 zero2 = Vector3.get_zero();
-				Vector3 eulerAngles = moveRotation.get_eulerAngles();
-				Vector3 eulerAngles2 = requestRot.get_eulerAngles();
-				zero2.x = Mathf.SmoothDampAngle(eulerAngles.x, eulerAngles2.x, ref rotVelocity.x, num, 1000f, Time.get_deltaTime());
-				zero2.y = Mathf.SmoothDampAngle(eulerAngles.y, eulerAngles2.y, ref rotVelocity.y, num, 1000f, Time.get_deltaTime());
-				zero2.z = Mathf.SmoothDampAngle(eulerAngles.z, eulerAngles2.z, ref rotVelocity.z, num, 1000f, Time.get_deltaTime());
-				Quaternion identity = Quaternion.get_identity();
-				identity.set_eulerAngles(zero2);
-				this.movePosition = movePosition2;
-				this.moveRotation = identity;
-				fieldOfView = Mathf.SmoothDamp(ctrlCamera.get_fieldOfView(), fieldOfView, ref fieldOfViewVelocity, num, 1000f, Time.get_deltaTime());
-			}
-			ctrlCamera.set_fieldOfView(fieldOfView);
-		}
-	}
-
-	private void UpdateArrowAimBossModeCamera()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0215: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0290: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0295: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0299: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_039c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_039f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_046b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_046d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0481: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0486: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0488: Unknown result type (might be due to invalid IL or missing references)
-		//IL_048d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0491: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0496: Unknown result type (might be due to invalid IL or missing references)
-		//IL_049e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0538: Unknown result type (might be due to invalid IL or missing references)
-		//IL_053d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0541: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0549: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0551: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 cameraTargetPos = targetSelf.GetCameraTargetPos();
-		float num = ingameFieldOfView;
-		Vector3 movePosition = this.movePosition;
-		Quaternion moveRotation = this.moveRotation;
-		StageObject stageObject = null;
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
-		{
-			stageObject = MonoBehaviourSingleton<StageObjectManager>.I.boss;
-		}
-		bool flag = stageObject != null;
-		if (isBossExistsPast != flag)
-		{
-			isBossExistsPast = flag;
-			switching = true;
-			switchTimer = validSettings.modeSwitchTime;
-		}
-		distanceElapsedTime += Time.get_deltaTime();
-		if (distanceElapsedTime > validSettings.distanceLerpTime)
-		{
-			distanceElapsedTime = validSettings.distanceLerpTime;
-		}
-		modeChangeTime -= Time.get_deltaTime();
-		if (modeChangeTime < 0f)
-		{
-			modeChangeTime = 0f;
-		}
-		Settings.ArrowAimSettings arrowAimSettings = validSettings.arrowAimSettings;
-		float num2 = arrowAimSettings.smoothTargetingRate;
-		float targetingMaxSpeed = validSettings.targetingMaxSpeed;
-		float num3 = distanceElapsedTime / validSettings.distanceLerpTime;
-		float targetingDistance = arrowAimSettings.targetingDistance;
-		Vector3 arrowAimForward = targetSelf.arrowAimForward;
-		normalForward = arrowAimForward.get_normalized();
-		int arrowAimStartSign = targetSelf.arrowAimStartSign;
-		Vector3 val = Vector3.Cross(normalForward, Vector3.get_up());
-		Vector3 val2 = Quaternion.AngleAxis(0f - arrowAimSettings.targetingPitch, val) * normalForward * Mathf.Lerp(validSettings.distanceLimit, targetingDistance, num3);
-		Vector3 val3 = arrowAimSettings.targetingOffset;
-		if (arrowCameraMode == 1)
-		{
-			val3 = ((!targetSelf.IsAbleArrowSitShot()) ? ((arrowAimStartSign > 0) ? arrowAimSettings.targetingLeftOffset : arrowAimSettings.targetingOffset) : ((arrowAimStartSign > 0) ? arrowAimSettings.targetingAvoidShotLeftOffset : arrowAimSettings.targetingAvoidShotRightOffset));
-		}
-		Vector3 val4 = Quaternion.LookRotation(normalForward) * val3;
-		requestPos = cameraTargetPos - val2 + val4;
-		requestRot = Quaternion.LookRotation(val2.get_normalized());
-		if (!flag || !validSettings.targetEnable)
-		{
-			modeChangeTime = validSettings.smoothFreeRate;
-		}
-		else
-		{
-			modeChangeTime = validSettings.smoothTargetingRate;
-		}
-		distanceElapsedTime = validSettings.distanceLerpTime;
-		if (hitObjectType != 0 && !isMotionCameraMode)
-		{
-			Vector3 val5 = requestPos - cameraTargetPos;
-			RaycastHit val6 = default(RaycastHit);
-			Ray val7 = default(Ray);
-			val7._002Ector(cameraTargetPos, val5.get_normalized());
-			if (Physics.Raycast(val7, ref val6, targetingDistance, 2359808) && hitObjectType == CAM_HIT_OBJ_TYPE.ZOOM)
-			{
-				float num4 = val6.get_distance();
-				if (num4 < validSettings.distanceLimit)
-				{
-					num4 = validSettings.distanceLimit;
-				}
-				num4 -= validSettings.distanceLimit;
-				float num5 = targetingDistance - validSettings.distanceLimit;
-				float num6 = 0f;
-				if (num5 > 0f)
-				{
-					num6 = validSettings.distanceLerpTime * (num4 / num5);
-				}
-				if (modeChangeTime <= 0f)
-				{
-					distanceElapsedTime -= Time.get_deltaTime() * 5f;
-					if (distanceElapsedTime < num6)
-					{
-						distanceElapsedTime = num6;
-					}
-				}
-				else
-				{
-					distanceElapsedTime = num6;
-				}
-				num3 = distanceElapsedTime / validSettings.distanceLerpTime;
-				requestPos = cameraTargetPos + val7.get_direction() * Mathf.Lerp(validSettings.distanceLimit, targetingDistance, num3);
-			}
-		}
-		if (num2 != 0f && modeChangeTime <= 0f)
-		{
-			num2 *= ((!(num3 < 0.1f)) ? num3 : 0.1f);
-		}
-		if (switching)
-		{
-			switchTimer -= Time.get_deltaTime();
-			if (switchTimer <= 0f)
-			{
-				switching = false;
-				switchTimer = 0f;
-			}
-			num2 = Mathf.Lerp(validSettings.modeSwitchTime, num2, 1f - switchTimer / validSettings.modeSwitchTime);
-		}
-		Vector3 movePosition2 = Vector3.SmoothDamp(movePosition, requestPos, ref posVelocity, num2, targetingMaxSpeed, Time.get_deltaTime());
-		Vector3 zero = Vector3.get_zero();
-		Vector3 eulerAngles = moveRotation.get_eulerAngles();
-		Vector3 eulerAngles2 = requestRot.get_eulerAngles();
-		zero.x = Mathf.SmoothDampAngle(eulerAngles.x, eulerAngles2.x, ref rotVelocity.x, num2, 1000f, Time.get_deltaTime());
-		zero.y = Mathf.SmoothDampAngle(eulerAngles.y, eulerAngles2.y, ref rotVelocity.y, num2, 1000f, Time.get_deltaTime());
-		zero.z = Mathf.SmoothDampAngle(eulerAngles.z, eulerAngles2.z, ref rotVelocity.z, num2, 1000f, Time.get_deltaTime());
-		Quaternion identity = Quaternion.get_identity();
-		identity.set_eulerAngles(zero);
-		this.movePosition = movePosition2;
-		this.moveRotation = identity;
-		num = Mathf.SmoothDamp(ctrlCamera.get_fieldOfView(), num, ref fieldOfViewVelocity, num2, 1000f, Time.get_deltaTime());
-		ctrlCamera.set_fieldOfView(num);
-	}
-
-	private void UpdateGrabCamera()
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 position = target.get_position();
-		Vector3 movePosition = this.movePosition;
-		Quaternion moveRotation = this.moveRotation;
-		normalForward = grabInfo.dir;
-		Vector3 val = grabInfo.enemyRoot.get_rotation() * normalForward * grabInfo.distance;
-		requestPos = position + val;
-		requestRot = Quaternion.LookRotation(-val.get_normalized());
-		float smoothTargetingRate = validSettings.smoothTargetingRate;
-		float targetingDistance = validSettings.targetingDistance;
-		Vector3 movePosition2 = Vector3.SmoothDamp(movePosition, requestPos, ref posVelocity, smoothTargetingRate, targetingDistance, Time.get_deltaTime());
-		Vector3 zero = Vector3.get_zero();
-		Vector3 eulerAngles = moveRotation.get_eulerAngles();
-		Vector3 eulerAngles2 = requestRot.get_eulerAngles();
-		zero.x = Mathf.SmoothDampAngle(eulerAngles.x, eulerAngles2.x, ref rotVelocity.x, smoothTargetingRate, 1000f, Time.get_deltaTime());
-		zero.y = Mathf.SmoothDampAngle(eulerAngles.y, eulerAngles2.y, ref rotVelocity.y, smoothTargetingRate, 1000f, Time.get_deltaTime());
-		zero.z = Mathf.SmoothDampAngle(eulerAngles.z, eulerAngles2.z, ref rotVelocity.z, smoothTargetingRate, 1000f, Time.get_deltaTime());
-		Quaternion identity = Quaternion.get_identity();
-		identity.set_eulerAngles(zero);
-		this.movePosition = movePosition2;
-		this.moveRotation = identity;
-	}
-
-	private void UpdateCannonAimCamera()
-	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		Settings validSettings = this.validSettings;
-		Vector3 cameraTargetPos = targetSelf.GetCameraTargetPos();
-		normalForward = targetSelf.cannonAimForward.get_normalized();
-		Vector3 val = Vector3.Cross(normalForward, Vector3.get_up());
-		Vector3 val2 = Quaternion.AngleAxis(validSettings.cannonAimSettings.aimLookDownAngle, val) * normalForward * validSettings.cannonAimSettings.aimDistanceToSelf;
-		Vector3 val3 = Quaternion.LookRotation(normalForward) * validSettings.cannonAimSettings.aimCameraOffset;
-		movePosition = cameraTargetPos - val2 + val3;
-		moveRotation = Quaternion.LookRotation(val2.get_normalized());
-	}
-
-	private void UpdateCannonBeamChargeCamera()
-	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		Settings validSettings = this.validSettings;
-		Vector3 cameraTargetPos = targetSelf.GetCameraTargetPos();
-		normalForward = targetSelf.cannonAimForward.get_normalized();
-		Vector3 val = Vector3.Cross(normalForward, Vector3.get_up());
-		Vector3 val2 = Quaternion.AngleAxis(validSettings.cannonAimSettings.beamChargeCameraLookDownAngle, val) * normalForward * validSettings.cannonAimSettings.beamChargeCameraDistanceToSelf;
-		Vector3 val3 = Quaternion.LookRotation(normalForward) * validSettings.cannonAimSettings.beamChargeCameraOffset;
-		movePosition = cameraTargetPos - val2 + val3;
-		moveRotation = Quaternion.LookRotation(val2.get_normalized());
-	}
-
-	private void UpdateCannonBeamCamera()
-	{
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		Settings validSettings = this.validSettings;
-		movePosition = validSettings.cannonAimSettings.beamCameraPosition;
-		moveRotation = Quaternion.Euler(validSettings.cannonAimSettings.beamCameraRotationEular);
-	}
-
-	private void UpdateStopCamera()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 movePosition = this.movePosition;
-		Quaternion moveRotation = this.moveRotation;
-		float smoothTargetingRate = validSettings.smoothTargetingRate;
-		float targetingDistance = validSettings.targetingDistance;
-		Vector3 movePosition2 = Vector3.SmoothDamp(movePosition, stopPos, ref posVelocity, smoothTargetingRate, targetingDistance, Time.get_deltaTime());
-		Vector3 zero = Vector3.get_zero();
-		Vector3 eulerAngles = moveRotation.get_eulerAngles();
-		Vector3 val = stopRotEular;
-		zero.x = Mathf.SmoothDampAngle(eulerAngles.x, val.x, ref rotVelocity.x, smoothTargetingRate, 1000f, Time.get_deltaTime());
-		zero.y = Mathf.SmoothDampAngle(eulerAngles.y, val.y, ref rotVelocity.y, smoothTargetingRate, 1000f, Time.get_deltaTime());
-		zero.z = Mathf.SmoothDampAngle(eulerAngles.z, val.z, ref rotVelocity.z, smoothTargetingRate, 1000f, Time.get_deltaTime());
-		Quaternion identity = Quaternion.get_identity();
-		identity.set_eulerAngles(zero);
-		this.movePosition = movePosition2;
-		this.moveRotation = identity;
-	}
-
-	private void UpdateShake()
-	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = Vector3.get_zero();
-		int num = 0;
-		while (num < shakeParams.Count)
-		{
-			ShakeParam shakeParam = shakeParams[num];
-			float num2 = shakeParam.shakeCycleTime;
-			if (num2 <= 0f)
-			{
-				Log.Warning(LOG.INGAME, "カメラ揺れの振動周期が0");
-				shakeParams.RemoveAt(num);
-			}
-			else
-			{
-				int num3 = (int)(shakeParam.shakeTime * 2f / num2);
-				shakeParam.shakeTime += Time.get_deltaTime();
-				int num4 = (int)(shakeParam.shakeTime * 2f / num2);
-				bool flag = false;
-				if (num3 != num4)
-				{
-					shakeParam.shakeLength *= Mathf.Pow(shakeAttenuationPercent, (float)(num4 - num3));
-					if (shakeParam.shakeLength < 0.01f)
-					{
-						flag = true;
-					}
-				}
-				if (flag)
-				{
-					shakeParams.RemoveAt(num);
-				}
-				else
-				{
-					val += Vector3.get_up() * (shakeParam.shakeLength * Mathf.Sin(shakeParam.shakeTime * 3.14159274f * 2f / num2));
-					num++;
-				}
-			}
-		}
-		cameraTransform.set_position(movePosition + val);
-		cameraTransform.set_rotation(moveRotation);
-	}
-
-	private void LateUpdate()
-	{
-		if (radialBlurFilter != null && radialBlurFilter.get_enabled())
-		{
-			UpdateRadialBlur();
-		}
-		if (!(target == null))
-		{
-			if (targetObject == null || targetObject._transform != target)
-			{
-				targetObject = target.GetComponent<StageObject>();
-				targetPlayer = (targetObject as Player);
-				targetSelf = (targetObject as Self);
-			}
-			switch (cameraMode)
-			{
-			case CAMERA_MODE.GRABBED:
-				UpdateGrabCamera();
-				break;
-			case CAMERA_MODE.ARROW_AIM_BOSS:
-				UpdateArrowAimBossModeCamera();
-				break;
-			case CAMERA_MODE.CANNON_AIM:
-				UpdateCannonAimCamera();
-				break;
-			case CAMERA_MODE.CANNON_BEAM_CHARGE:
-				UpdateCannonBeamChargeCamera();
-				break;
-			case CAMERA_MODE.CANNON_BEAM:
-				UpdateCannonBeamCamera();
-				break;
-			case CAMERA_MODE.STOP:
-				UpdateStopCamera();
-				break;
-			default:
-				UpdatePlayerCamera();
-				break;
-			}
-			UpdateShake();
-		}
-	}
-
-	public Vector3 WorldToScreenPoint(Vector3 pos)
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		return ctrlCamera.WorldToScreenPoint(pos);
-	}
-
-	public Vector3 WorldToViewportPoint(Vector3 pos)
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		return ctrlCamera.WorldToViewportPoint(pos);
-	}
-
-	public Vector3 ScreenToWorldPoint(Vector3 pos)
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		return ctrlCamera.ScreenToWorldPoint(pos);
-	}
-
-	public float GetPixelHeight()
-	{
-		return (float)ctrlCamera.get_pixelHeight();
-	}
-
-	public void AdjustCameraPosition()
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		adjustCamera = true;
-		posVelocity = Vector3.get_zero();
-		rotVelocity = Vector3.get_zero();
-		fieldOfViewVelocity = 0f;
-		switching = false;
-		switchTimer = 0f;
-		modeChangeTime = 0f;
-	}
-
-	public void SetShakeCamera(Vector3 pos, float percent, float cycle_time = 0f)
-	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = pos - movePosition;
-		float magnitude = val.get_magnitude();
-		float num = (shakeMaxFocusLength - magnitude) / shakeMaxFocusLength;
-		if (num < 0f)
-		{
-			num = 0f;
-		}
-		float num2 = shakeAmplitude * percent * num;
-		if (num2 > 0.01f)
-		{
-			ShakeParam shakeParam = new ShakeParam();
-			shakeParam.shakeTime = 0f;
-			shakeParam.shakeLength = num2;
-			shakeParam.shakeCycleTime = cycle_time;
-			if (shakeParam.shakeCycleTime <= 0f)
-			{
-				shakeParam.shakeCycleTime = shakeCycleTime;
-			}
-			shakeParams.Add(shakeParam);
-			if (shakeMaxNum > 0 && shakeParams.Count > shakeMaxNum)
-			{
-				shakeParams.RemoveAt(0);
-			}
-		}
-	}
-
-	public void OnScreenRotate(bool is_portrait)
-	{
-		if (is_portrait)
-		{
-			validSettings = portraitSettings;
-			ingameFieldOfView = MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.inGamePortraitFieldOfView;
-		}
-		else
-		{
-			validSettings = landscapeSettings;
-			ingameFieldOfView = MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.inGameLandscapeFieldOfView;
-		}
-	}
-
-	public bool IsEndMotionCamera()
-	{
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		if (!isMotionCameraMode || motionCameraTransforms == null)
-		{
-			return true;
-		}
-		int num = 0;
-		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
-		{
-			num = ((!MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait) ? 1 : 0);
-		}
-		Animation component = motionCameraTransforms[num].get_gameObject().GetComponent<Animation>();
-		if (component == null)
-		{
-			return true;
-		}
-		return !component.get_isPlaying();
-	}
-
-	public void OnHappenQuestDirection(bool enable, Transform boss_transform = null, Object[] cameras = null, Vector3[] camera_offsets = null)
-	{
-		if (enable)
-		{
-			EndRadialBlurFilter(0f);
-			int mainCameraCullingMask = 262144;
-			MonoBehaviourSingleton<GameSceneManager>.I.SetMainCameraCullingMask(mainCameraCullingMask);
-			if (boss_transform != null && cameras != null)
-			{
-				SetMotionCamera(true, boss_transform, cameras, camera_offsets);
-			}
-			if (MonoBehaviourSingleton<AudioListenerManager>.IsValid())
-			{
-				MonoBehaviourSingleton<AudioListenerManager>.I.SetFlag(AudioListenerManager.STATUS_FLAGS.CAMERA_INGAME_ACTIVE, true);
-			}
-		}
-		else
-		{
-			SetMotionCamera(false, null, null, null);
-			MonoBehaviourSingleton<GameSceneManager>.I.SetMainCameraCullingMask(GameSceneGlobalSettings.GetDefaultMainCameraCullingMask());
-			if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
-			{
-				OnScreenRotate(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
-			}
-			if (MonoBehaviourSingleton<AudioListenerManager>.IsValid())
-			{
-				MonoBehaviourSingleton<AudioListenerManager>.I.SetFlag(AudioListenerManager.STATUS_FLAGS.CAMERA_INGAME_ACTIVE, false);
-			}
-			AdjustCameraPosition();
-		}
-	}
-
-	public void SetMotionCamera(bool enable, Transform target_transform = null, Object[] cameras = null, Vector3[] camera_offsets = null)
-	{
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-		if (enable)
-		{
-			motionCameraTransforms = (Transform[])new Transform[2];
-			Transform val = Utility.CreateGameObject("FieldQuestCamera", base._transform, -1);
-			val.set_position(target_transform.get_position());
-			val.set_rotation(target_transform.get_rotation());
-			Vector3 one = Vector3.get_one();
-			Vector3 lossyScale = target_transform.get_lossyScale();
-			float x = lossyScale.x;
-			Vector3 lossyScale2 = base._transform.get_lossyScale();
-			one.x = x / lossyScale2.x;
-			Vector3 lossyScale3 = target_transform.get_lossyScale();
-			float y = lossyScale3.y;
-			Vector3 lossyScale4 = base._transform.get_lossyScale();
-			one.y = y / lossyScale4.y;
-			Vector3 lossyScale5 = target_transform.get_lossyScale();
-			float z = lossyScale5.z;
-			Vector3 lossyScale6 = base._transform.get_lossyScale();
-			one.z = z / lossyScale6.z;
-			val.set_localScale(one);
-			motionCameraParent = val;
-			for (int i = 0; i < 2; i++)
-			{
-				Transform val2 = Utility.CreateGameObject("offset_" + i.ToString(), val, -1);
-				val2.set_localPosition(Vector3.get_zero());
-				val2.set_localRotation(Quaternion.get_identity());
-				val2.set_localScale(Vector3.get_one());
-				if (camera_offsets != null)
-				{
-					val2.set_localPosition(camera_offsets[i]);
-				}
-				Transform val3 = ResourceUtility.Realizes(cameras[i], val2, -1);
-				if (val3 == null)
-				{
-					Object.Destroy(val.get_gameObject());
-					return;
-				}
-				val3.set_localPosition(Vector3.get_zero());
-				val3.set_localRotation(Quaternion.get_identity());
-				val3.set_localScale(Vector3.get_zero());
-				motionCameraTransforms[i] = val3;
-			}
-			isMotionCameraMode = true;
-		}
-		else
-		{
-			isMotionCameraMode = false;
-			if (motionCameraParent != null)
-			{
-				Object.Destroy(motionCameraParent.get_gameObject());
-				motionCameraParent = null;
-			}
-			if (motionCameraTransforms != null)
-			{
-				motionCameraTransforms = null;
-			}
-		}
-	}
-
-	public void StartRadialBlurFilter(float time, float strength, Vector3 center_pos)
-	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		if (!(radialBlurFilter == null))
-		{
-			_StartRadialBlurFilter(time, strength);
-			radialBlurCenterPos = center_pos;
-			radialBlurCenterTransform = null;
-		}
-	}
-
-	public void StartRadialBlurFilter(float time, float strength, Transform center_transform)
-	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		if (!(radialBlurFilter == null))
-		{
-			_StartRadialBlurFilter(time, strength);
-			radialBlurCenterPos = Vector3.get_zero();
-			radialBlurCenterTransform = center_transform;
-		}
-	}
-
-	private void _StartRadialBlurFilter(float time, float strength)
-	{
-		if (!(radialBlurFilter == null))
-		{
-			radialBlurFilter.set_enabled(true);
-			radialBlurFilter.StartFilter();
-			radialBlurStrengthValue = strength;
-			if (time <= 0f)
-			{
-				radialBlurFilter.strength = strength;
-			}
-			else
-			{
-				radialBlurStrengthPerTime = strength / time;
-			}
-		}
-	}
-
-	public void ChangeRadialBlurFilter(float time, float strength)
-	{
-		if (!(radialBlurFilter == null) && radialBlurFilter.get_enabled())
-		{
-			if (time <= 0f)
-			{
-				radialBlurStrengthValue = strength;
-				if (strength <= 0f)
-				{
-					radialBlurFilter.strength = 0f;
-					radialBlurFilter.StopFilter();
-					radialBlurFilter.set_enabled(false);
-				}
-				else
-				{
-					radialBlurFilter.strength = strength;
-				}
-			}
-			else
-			{
-				radialBlurStrengthPerTime = (0f - (radialBlurStrengthValue - strength)) / time;
-				radialBlurStrengthValue = strength;
-			}
-		}
-	}
-
-	public void EndRadialBlurFilter(float time = 0f)
-	{
-		ChangeRadialBlurFilter(time, 0f);
-	}
-
-	public void ResetMovePositionAndRotaion()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		movePosition = ctrlCamera.get_transform().get_position();
-		moveRotation = ctrlCamera.get_transform().get_rotation();
-	}
+  private Camera ctrlCamera;
+  public Transform cameraTransform;
+  private StageObject targetObject;
+  private Player targetPlayer;
+  private Self targetSelf;
+  private InGameCameraManager.CAMERA_MODE cameraMode;
+  [Tooltip("縦画面設定")]
+  public InGameCameraManager.Settings portraitSettings = new InGameCameraManager.Settings();
+  [Tooltip("横画面設定")]
+  public InGameCameraManager.Settings landscapeSettings = new InGameCameraManager.Settings();
+  private Vector3 requestPos = Vector3.zero;
+  private Quaternion requestRot = Quaternion.identity;
+  private Vector3 normalForward = Vector3.back;
+  private bool isBossExistsPast;
+  private bool switching;
+  private float switchTimer;
+  private Vector3 posVelocity = Vector3.zero;
+  private Vector3 rotVelocity = Vector3.zero;
+  private float distanceElapsedTime;
+  private float modeChangeTime;
+  private float ingameFieldOfView;
+  private float fieldOfViewVelocity;
+  private Vector3 stopPos = Vector3.zero;
+  private Vector3 stopRotEular = Vector3.zero;
+  private float stopMaxSpeed;
+  private float stopMaxRotSpeed;
+  private Vector3 cutPos = Vector3.zero;
+  private Quaternion cutRot = Quaternion.identity;
+  protected bool adjustCamera;
+  [Tooltip("カメラ揺れ 基本周期（秒）")]
+  public float shakeCycleTime = 0.2f;
+  [Tooltip("カメラ揺れ 減衰率")]
+  public float shakeAttenuationPercent = 0.25f;
+  [Tooltip("カメラ揺れ 基本振幅")]
+  public float shakeAmplitude = 0.5f;
+  [Tooltip("カメラ揺れ 最大発生距離")]
+  public float shakeMaxFocusLength = 30f;
+  [Tooltip("カメラ揺れ 最大同時発生数（0で無制限")]
+  public int shakeMaxNum;
+  protected List<InGameCameraManager.ShakeParam> shakeParams = new List<InGameCameraManager.ShakeParam>();
+  [Tooltip("カメラがオブジェクトに当たった際の挙動")]
+  public InGameCameraManager.CAM_HIT_OBJ_TYPE hitObjectType;
+  private RadialBlurFilter radialBlurFilter;
+  private float radialBlurStrengthPerTime;
+  private float radialBlurStrengthValue;
+  private Transform radialBlurCenterTransform;
+  private Vector3 radialBlurCenterPos = Vector3.zero;
+  private Vector3 beforeFollowVec = Vector3.zero;
+  private InGameCameraManager.GrabInfo _grabInfo = new InGameCameraManager.GrabInfo();
+  private InGameCameraManager.TargetOffset validAnimEventTargetOffset;
+  private InGameCameraManager.TargetOffset targetOffsetByPlayer;
+  private InGameCameraManager.TargetOffset targetOffsetByEnemy;
+  private InGameCameraManager.TargetPosition validAnimEventTargetPosition;
+  private InGameCameraManager.TargetPosition targetPositionByPlayer;
+  private InGameCameraManager.TargetPosition targetPositionByEnemy;
+
+  public Vector3 movePosition { get; protected set; }
+
+  public Quaternion moveRotation { get; protected set; }
+
+  public Transform target { set; get; }
+
+  public void SetCameraMode(InGameCameraManager.CAMERA_MODE cameraMode)
+  {
+    this.cameraMode = cameraMode;
+  }
+
+  public bool IsCameraModeBeam() => this.cameraMode == InGameCameraManager.CAMERA_MODE.CANNON_BEAM;
+
+  public bool IsCameraMode(InGameCameraManager.CAMERA_MODE mode) => this.cameraMode == mode;
+
+  public InGameCameraManager.Settings validSettings { get; private set; }
+
+  public void SetStopPos(Vector3 pos) => this.stopPos = pos;
+
+  public void SetStopRotEular(Vector3 rotEular) => this.stopRotEular = rotEular;
+
+  public void SetStopMaxSpeed(float speed) => this.stopMaxSpeed = speed;
+
+  public void SetStopMaxRotSpeed(float speed) => this.stopMaxRotSpeed = speed;
+
+  public void SetCutPos(Vector3 cutPos) => this.cutPos = cutPos;
+
+  public void SetCutRot(Quaternion cutRot) => this.cutRot = cutRot;
+
+  public int arrowCameraMode { get; private set; }
+
+  public void SetArrowCameraMode(int mode) => this.arrowCameraMode = mode;
+
+  public bool isArrowAimBossMode { get; protected set; }
+
+  public bool isMotionCameraMode { get; protected set; }
+
+  public bool isFixedCameraMode { get; protected set; }
+
+  public Transform[] motionCameraTransforms { get; protected set; }
+
+  public Transform motionCameraParent { get; protected set; }
+
+  public InGameCameraManager.GrabInfo grabInfo => this._grabInfo;
+
+  public void SetAnimEventTargetOffsetByPlayer(InGameCameraManager.TargetOffset targetOffset)
+  {
+    if (targetOffset == null)
+      return;
+    this.targetOffsetByPlayer = targetOffset;
+  }
+
+  public void SetAnimEventTargetOffsetByEnemy(InGameCameraManager.TargetOffset targetOffset)
+  {
+    if (targetOffset == null)
+      return;
+    this.targetOffsetByEnemy = targetOffset;
+  }
+
+  public void SetAnimEventTargetPositionByPlayer(InGameCameraManager.TargetPosition targetPosition)
+  {
+    if (targetPosition == null)
+      return;
+    this.targetPositionByPlayer = targetPosition;
+  }
+
+  public void SetAnimEventTargetPositionByEnemy(InGameCameraManager.TargetPosition targetPosition)
+  {
+    if (targetPosition == null)
+      return;
+    this.targetPositionByEnemy = targetPosition;
+  }
+
+  public void ClearAnimEventTargetOffsetByPlayer()
+  {
+    this.validAnimEventTargetOffset = (InGameCameraManager.TargetOffset) null;
+    this.targetOffsetByPlayer = (InGameCameraManager.TargetOffset) null;
+  }
+
+  public void ClearAnimEventTargetOffsetByEnemy()
+  {
+    this.validAnimEventTargetOffset = (InGameCameraManager.TargetOffset) null;
+    this.targetOffsetByEnemy = (InGameCameraManager.TargetOffset) null;
+  }
+
+  public void ClearAnimEventTargetPositionByPlayer()
+  {
+    this.validAnimEventTargetPosition = (InGameCameraManager.TargetPosition) null;
+    this.targetPositionByPlayer = (InGameCameraManager.TargetPosition) null;
+  }
+
+  public void ClearAnimEventTargetPositionByEnemy()
+  {
+    this.validAnimEventTargetPosition = (InGameCameraManager.TargetPosition) null;
+    this.targetPositionByEnemy = (InGameCameraManager.TargetPosition) null;
+  }
+
+  public void ClearCameraMode(InGameCameraManager.CAMERA_MODE mode = InGameCameraManager.CAMERA_MODE.DEFAULT)
+  {
+    if (mode != InGameCameraManager.CAMERA_MODE.DEFAULT && !this.IsCameraMode(mode))
+      return;
+    this.SetCameraMode(InGameCameraManager.CAMERA_MODE.DEFAULT);
+  }
+
+  public InGameCameraManager()
+  {
+    this.isMotionCameraMode = false;
+    this.motionCameraTransforms = (Transform[]) null;
+    this.motionCameraParent = (Transform) null;
+    this.cameraMode = InGameCameraManager.CAMERA_MODE.DEFAULT;
+    this.arrowCameraMode = InGameManager.GetArrowCameraType(GameSaveData.instance.arrowCameraKey);
+  }
+
+  protected override void Awake()
+  {
+    base.Awake();
+    this.OnScreenRotate(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
+    this.distanceElapsedTime = this.validSettings.distanceLerpTime;
+  }
+
+  private void OnEnable()
+  {
+    if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+      MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += new ScreenOrientationManager.OnScreenRotateDelegate(this.OnScreenRotate);
+    RenderTargetCacher component = ((Component) MonoBehaviourSingleton<AppMain>.I.mainCamera).GetComponent<RenderTargetCacher>();
+    if (!Object.op_Inequality((Object) component, (Object) null))
+      return;
+    ((Behaviour) component).enabled = false;
+  }
+
+  protected override void OnDisable()
+  {
+    base.OnDisable();
+    if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+      MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= new ScreenOrientationManager.OnScreenRotateDelegate(this.OnScreenRotate);
+    this.EndRadialBlurFilter();
+    MonoBehaviourSingleton<GameSceneManager>.I.SetMainCameraCullingMask(GameSceneGlobalSettings.GetDefaultMainCameraCullingMask());
+    RenderTargetCacher component = ((Component) MonoBehaviourSingleton<AppMain>.I.mainCamera).GetComponent<RenderTargetCacher>();
+    if (!Object.op_Inequality((Object) component, (Object) null))
+      return;
+    ((Behaviour) component).enabled = true;
+  }
+
+  private void Start()
+  {
+    if (Object.op_Equality((Object) this.ctrlCamera, (Object) null))
+      this.ctrlCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
+    this.cameraTransform = ((Component) this.ctrlCamera).transform;
+    this.movePosition = this.cameraTransform.position;
+    this.moveRotation = this.cameraTransform.rotation;
+    this.radialBlurFilter = ((Component) this.ctrlCamera).GetComponent<RadialBlurFilter>();
+    if (Object.op_Inequality((Object) this.radialBlurFilter, (Object) null))
+      ((Behaviour) this.radialBlurFilter).enabled = false;
+    if (!Object.op_Equality((Object) ((Component) this.ctrlCamera).gameObject.GetComponent<InGameCameraCuller>(), (Object) null))
+      return;
+    ((Component) this.ctrlCamera).gameObject.AddComponent<InGameCameraCuller>();
+  }
+
+  private void UpdateRadialBlur()
+  {
+    Vector3 zero = Vector3.zero;
+    Vector2 vector2Xy = this.WorldToScreenPoint(!Object.op_Inequality((Object) this.radialBlurCenterTransform, (Object) null) ? this.radialBlurCenterPos : this.radialBlurCenterTransform.position).ToVector2XY();
+    vector2Xy.x /= (float) Screen.width;
+    vector2Xy.y /= (float) Screen.height;
+    this.radialBlurFilter.SetCenter(vector2Xy);
+    if ((double) this.radialBlurStrengthPerTime == 0.0)
+      return;
+    float num = this.radialBlurFilter.strength + this.radialBlurStrengthPerTime * Time.deltaTime;
+    if ((double) this.radialBlurStrengthPerTime > 0.0)
+    {
+      if ((double) num >= (double) this.radialBlurStrengthValue)
+      {
+        num = this.radialBlurStrengthValue;
+        this.radialBlurStrengthPerTime = 0.0f;
+      }
+      this.radialBlurFilter.strength = num;
+    }
+    else
+    {
+      if ((double) num <= (double) this.radialBlurStrengthValue)
+      {
+        num = this.radialBlurStrengthValue;
+        if ((double) num <= 0.0)
+          this.EndRadialBlurFilter();
+      }
+      this.radialBlurFilter.strength = num;
+    }
+  }
+
+  private void UpdatePlayerCamera()
+  {
+    InGameCameraManager.Settings validSettings = this.validSettings;
+    Vector3 movePosition = this.movePosition;
+    Quaternion moveRotation = this.moveRotation;
+    float fieldOfView = this.ctrlCamera.fieldOfView;
+    Vector3 cameraTargetPos1 = this.targetObject.GetCameraTargetPos();
+    if (Object.op_Equality((Object) this.targetPlayer, (Object) null))
+      return;
+    Enemy enemy = (Enemy) null;
+    if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+      enemy = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+    bool flag1 = Object.op_Inequality((Object) enemy, (Object) null) && !enemy.enableAssimilation;
+    float num1 = 0.0f;
+    float num2 = 999f;
+    float num3 = 999f;
+    bool flag2 = false;
+    if (this.isBossExistsPast != flag1)
+    {
+      this.isBossExistsPast = flag1;
+      this.switching = true;
+      this.switchTimer = validSettings.modeSwitchTime;
+      flag2 = true;
+    }
+    this.distanceElapsedTime += Time.deltaTime;
+    if ((double) this.distanceElapsedTime > (double) validSettings.distanceLerpTime)
+      this.distanceElapsedTime = validSettings.distanceLerpTime;
+    this.modeChangeTime -= Time.deltaTime;
+    if ((double) this.modeChangeTime < 0.0)
+      this.modeChangeTime = 0.0f;
+    float num4 = this.distanceElapsedTime / validSettings.distanceLerpTime;
+    float num5 = 0.0f;
+    float num6 = this.ingameFieldOfView;
+    if (!this.isFixedCameraMode)
+    {
+      if (this.isMotionCameraMode)
+      {
+        num1 = 0.0f;
+        if (this.motionCameraTransforms != null)
+        {
+          int index = 0;
+          if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+            index = MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait ? 0 : 1;
+          this.requestPos = this.motionCameraTransforms[index].position;
+          this.requestRot = this.motionCameraTransforms[index].rotation;
+          float Horizontal_fov = this.motionCameraTransforms[index].localScale.x;
+          if ((double) Horizontal_fov > 0.0)
+            Horizontal_fov = Utility.HorizontalToVerticalFOV(Horizontal_fov);
+          num6 = Horizontal_fov;
+        }
+      }
+      else if (!flag1 || !validSettings.targetEnable)
+      {
+        num1 = validSettings.smoothFreeRate;
+        num5 = validSettings.freeDistance;
+        num2 = validSettings.freeMaxSpeed;
+        num3 = validSettings.freeMaxRotateSpeed;
+        Vector3 vector3_1 = Vector3.back;
+        if (validSettings.normalEnable)
+          vector3_1 = this.normalForward;
+        float num7 = 1f;
+        Vector3 vector3_2 = Vector3.Cross(vector3_1, Vector3.up);
+        Vector3 vector3_3 = Vector3.op_Multiply(Vector3.op_Multiply(Quaternion.op_Multiply(Quaternion.AngleAxis(-validSettings.freePitch, vector3_2), vector3_1), Mathf.Lerp(validSettings.distanceLimit, num5, num4)), num7);
+        Vector3 vector3_4 = Vector3.op_Multiply(Quaternion.op_Multiply(Quaternion.LookRotation(vector3_1), validSettings.freeOffset), num7);
+        Vector3 vector3_5 = Vector3.zero;
+        if (this.targetPlayer.actionID == Character.ACTION_ID.ATTACK && !this.targetPlayer.isArrowAimLesserMode && Object.op_Inequality((Object) this.targetPlayer.attackStartTarget, (Object) null) && Object.op_Equality((Object) this.targetPlayer.attackStartTarget, (Object) this.targetPlayer.actionTarget) && MonoBehaviourSingleton<TargetMarkerManager>.I.isTargetLock)
+        {
+          Vector3 vector3_6 = Vector3.op_Subtraction(this.targetPlayer.attackStartTarget._position, this.targetPlayer._position);
+          Quaternion quaternion = Quaternion.identity;
+          Vector3 vector3_7 = vector3_3;
+          Vector3 vector3_8 = vector3_4;
+          Vector3 vector3_9 = Vector3.op_Subtraction(vector3_6, vector3_8);
+          Vector3 zero = Vector3.zero;
+          if (Vector3.op_Inequality(vector3_1, Vector3.forward))
+          {
+            quaternion = Quaternion.FromToRotation(vector3_1, Vector3.forward);
+            vector3_7 = Quaternion.op_Multiply(quaternion, vector3_7);
+            vector3_9 = Quaternion.op_Multiply(quaternion, vector3_9);
+          }
+          if ((double) vector3_9.z < -(double) validSettings.followBackOffset * (double) num7)
+            zero.z = vector3_9.z + validSettings.followBackOffset * num7;
+          Vector3 vector3_10 = Quaternion.op_Multiply(Quaternion.FromToRotation(vector3_7, Vector3.forward), Vector3.op_Addition(vector3_7, vector3_9));
+          float num8 = Mathf.Tan((float) (Math.PI / 180.0 * (double) num6 * 0.5)) * ((float) Screen.width / (float) Screen.height);
+          float num9 = Mathf.Abs(vector3_10.x / vector3_10.z) / num8;
+          if ((double) num9 > (double) validSettings.followSidePercent)
+            zero.x = vector3_9.x * (num9 - validSettings.followSidePercent) / num9;
+          if (Vector3.op_Inequality(vector3_1, Vector3.forward))
+            vector3_5 = Quaternion.op_Multiply(Quaternion.Inverse(quaternion), zero);
+        }
+        Vector3 vector3_11 = Vector3.Lerp(this.beforeFollowVec, vector3_5, validSettings.followRate);
+        this.beforeFollowVec = vector3_11;
+        this.requestPos = Vector3.op_Addition(Vector3.op_Subtraction(Vector3.op_Addition(cameraTargetPos1, vector3_11), vector3_3), vector3_4);
+        this.requestRot = Quaternion.LookRotation(((Vector3) ref vector3_3).normalized);
+        this.requestPos = Vector3.op_Addition(this.requestPos, Quaternion.op_Multiply(Quaternion.LookRotation(this.normalForward), this.validSettings.cameraFieldOffsetSettings.targetOffsetPos));
+        this.requestRot = Quaternion.op_Multiply(this.requestRot, Quaternion.Euler(this.validSettings.cameraFieldOffsetSettings.targetOffsetRot));
+        if (MonoBehaviourSingleton<FieldManager>.IsValid())
+        {
+          this.requestPos = Vector3.op_Addition(this.requestPos, Quaternion.op_Multiply(Quaternion.LookRotation(this.normalForward), MonoBehaviourSingleton<FieldManager>.I.cameraOffsetPos_Vec));
+          this.requestRot = Quaternion.op_Multiply(this.requestRot, MonoBehaviourSingleton<FieldManager>.I.cameraOffsetRot_Quat);
+        }
+      }
+      else
+      {
+        num1 = validSettings.smoothTargetingRate;
+        num5 = validSettings.targetingDistance;
+        num2 = validSettings.targetingMaxSpeed;
+        num3 = validSettings.targetingMaxRotateSpeed;
+        Vector3 cameraTargetPos2 = enemy.GetCameraTargetPos();
+        Vector3 vector3_12 = Vector3.op_Subtraction(cameraTargetPos2, this.requestPos);
+        vector3_12.y = 0.0f;
+        ((Vector3) ref vector3_12).Normalize();
+        Vector3 vector3_13 = Vector3.op_Subtraction(cameraTargetPos1, this.requestPos);
+        vector3_13.y = 0.0f;
+        ((Vector3) ref vector3_13).Normalize();
+        if (flag2)
+        {
+          this.normalForward = Vector3.op_Subtraction(cameraTargetPos2, cameraTargetPos1);
+          this.normalForward.y = 0.0f;
+          ((Vector3) ref this.normalForward).Normalize();
+        }
+        else
+        {
+          float num10 = Vector3.Angle(vector3_12, vector3_13);
+          if ((double) num10 > (double) validSettings.moveableTargetAngle)
+          {
+            float num11 = (double) Vector3.Cross(vector3_13, vector3_12).y >= 0.0 ? 1f : -1f;
+            this.normalForward = Quaternion.op_Multiply(Quaternion.AngleAxis((num10 - validSettings.moveableTargetAngle) * num11, Vector3.up), vector3_13);
+          }
+        }
+        if (Vector3.op_Equality(this.normalForward, Vector3.zero))
+          this.normalForward = Vector3.back;
+        float num12 = validSettings.targetingPitch;
+        if ((double) validSettings.targetingPitchNearDistance != 0.0 || (double) validSettings.targetingPitchFarDistance != 0.0)
+        {
+          Vector3 vector3_14 = Vector3.op_Subtraction(cameraTargetPos2, cameraTargetPos1);
+          float num13 = Mathf.Clamp01((float) (((double) ((Vector3) ref vector3_14).magnitude - (double) validSettings.targetingPitchNearDistance) / ((double) validSettings.targetingPitchFarDistance - (double) validSettings.targetingPitchNearDistance)));
+          float num14 = validSettings.targetingPitchCurve.Evaluate(num13);
+          num12 = (float) ((double) validSettings.targetingPitchMinAngle * (1.0 - (double) num14) + (double) validSettings.targetingPitchMaxAngle * (double) num14);
+        }
+        Vector3 vector3_15 = Vector3.Cross(this.normalForward, Vector3.up);
+        Vector3 vector3_16 = Vector3.op_Multiply(Quaternion.op_Multiply(Quaternion.AngleAxis(-num12, vector3_15), this.normalForward), Mathf.Lerp(validSettings.distanceLimit, num5, num4));
+        Vector3 vector3_17 = Quaternion.op_Multiply(Quaternion.LookRotation(this.normalForward), validSettings.targetingOffset);
+        this.requestPos = Vector3.op_Addition(Vector3.op_Subtraction(cameraTargetPos1, vector3_16), vector3_17);
+        this.requestRot = Quaternion.LookRotation(((Vector3) ref vector3_16).normalized);
+        this.requestPos = Vector3.op_Addition(this.requestPos, Quaternion.op_Multiply(Quaternion.LookRotation(this.normalForward), this.validSettings.cameraTargetOffsetSettings.targetOffsetPos));
+        this.requestRot = Quaternion.op_Multiply(this.requestRot, Quaternion.Euler(this.validSettings.cameraTargetOffsetSettings.targetOffsetRot));
+        if (MonoBehaviourSingleton<FieldManager>.IsValid())
+        {
+          this.requestPos = Vector3.op_Addition(this.requestPos, Quaternion.op_Multiply(Quaternion.LookRotation(this.normalForward), MonoBehaviourSingleton<FieldManager>.I.cameraOffsetPos_Vec));
+          this.requestRot = Quaternion.op_Multiply(this.requestRot, MonoBehaviourSingleton<FieldManager>.I.cameraOffsetRot_Quat);
+        }
+        this.validAnimEventTargetOffset = this.targetOffsetByPlayer == null ? (this.targetOffsetByEnemy == null ? (InGameCameraManager.TargetOffset) null : this.targetOffsetByEnemy) : this.targetOffsetByPlayer;
+        if (this.validAnimEventTargetOffset != null)
+        {
+          this.requestPos = Vector3.op_Addition(this.requestPos, Quaternion.op_Multiply(Quaternion.LookRotation(this.normalForward), this.validAnimEventTargetOffset.pos));
+          this.requestRot = Quaternion.op_Multiply(this.requestRot, Quaternion.Euler(this.validAnimEventTargetOffset.rot));
+          num2 = (double) this.validAnimEventTargetOffset.smoothMaxSpeed > 0.0 ? this.validAnimEventTargetOffset.smoothMaxSpeed : num2;
+        }
+        this.validAnimEventTargetPosition = this.targetPositionByPlayer == null ? (this.targetPositionByEnemy == null ? (InGameCameraManager.TargetPosition) null : this.targetPositionByEnemy) : this.targetPositionByPlayer;
+        if (this.validAnimEventTargetPosition != null)
+        {
+          this.requestRot = Quaternion.LookRotation(Vector3.op_Subtraction(this.validAnimEventTargetPosition.pos, this.cameraTransform.position));
+          num3 = (double) this.validAnimEventTargetPosition.smoothMaxSpeed > 0.0 ? this.validAnimEventTargetPosition.smoothMaxSpeed : num3;
+        }
+      }
+    }
+    if (this.hitObjectType != InGameCameraManager.CAM_HIT_OBJ_TYPE.NONE && !this.isMotionCameraMode)
+    {
+      Vector3 vector3 = Vector3.op_Subtraction(this.requestPos, cameraTargetPos1);
+      RaycastHit raycastHit = new RaycastHit();
+      Ray ray;
+      // ISSUE: explicit constructor call
+      ((Ray) ref ray).\u002Ector(cameraTargetPos1, ((Vector3) ref vector3).normalized);
+      if (Physics.Raycast(ray, ref raycastHit, num5, 2359808) && this.hitObjectType == InGameCameraManager.CAM_HIT_OBJ_TYPE.ZOOM)
+      {
+        float num15 = ((RaycastHit) ref raycastHit).distance;
+        if ((double) num15 < (double) validSettings.distanceLimit)
+          num15 = validSettings.distanceLimit;
+        float num16 = num15 - validSettings.distanceLimit;
+        float num17 = num5 - validSettings.distanceLimit;
+        float num18 = 0.0f;
+        if ((double) num17 > 0.0)
+          num18 = validSettings.distanceLerpTime * (num16 / num17);
+        if ((double) this.modeChangeTime <= 0.0)
+        {
+          this.distanceElapsedTime -= Time.deltaTime * 5f;
+          if ((double) this.distanceElapsedTime < (double) num18)
+            this.distanceElapsedTime = num18;
+        }
+        else
+          this.distanceElapsedTime = num18;
+        num4 = this.distanceElapsedTime / validSettings.distanceLerpTime;
+        this.requestPos = Vector3.op_Addition(cameraTargetPos1, Vector3.op_Multiply(((Ray) ref ray).direction, Mathf.Lerp(validSettings.distanceLimit, num5, num4)));
+      }
+    }
+    if ((double) num1 != 0.0 && (double) this.modeChangeTime <= 0.0)
+      num1 *= (double) num4 < 0.10000000149011612 ? 0.1f : num4;
+    if (this.switching)
+    {
+      this.switchTimer -= Time.deltaTime;
+      if ((double) this.switchTimer <= 0.0)
+      {
+        this.switching = false;
+        this.switchTimer = 0.0f;
+      }
+      num1 = Mathf.Lerp(validSettings.modeSwitchTime, num1, (float) (1.0 - (double) this.switchTimer / (double) validSettings.modeSwitchTime));
+    }
+    if (this.adjustCamera || this.isMotionCameraMode || this.isFixedCameraMode)
+    {
+      if (this.adjustCamera)
+        this.adjustCamera = false;
+      this.movePosition = this.requestPos;
+      this.moveRotation = this.requestRot;
+    }
+    else
+    {
+      Vector3 vector3 = Vector3.SmoothDamp(movePosition, this.requestPos, ref this.posVelocity, num1, num2, Time.deltaTime);
+      Vector3 zero = Vector3.zero;
+      Vector3 eulerAngles1 = ((Quaternion) ref moveRotation).eulerAngles;
+      Vector3 eulerAngles2 = ((Quaternion) ref this.requestRot).eulerAngles;
+      zero.x = Mathf.SmoothDampAngle(eulerAngles1.x, eulerAngles2.x, ref this.rotVelocity.x, num1, num3, Time.deltaTime);
+      zero.y = Mathf.SmoothDampAngle(eulerAngles1.y, eulerAngles2.y, ref this.rotVelocity.y, num1, num3, Time.deltaTime);
+      zero.z = Mathf.SmoothDampAngle(eulerAngles1.z, eulerAngles2.z, ref this.rotVelocity.z, num1, num3, Time.deltaTime);
+      Quaternion identity = Quaternion.identity;
+      ((Quaternion) ref identity).eulerAngles = zero;
+      this.movePosition = vector3;
+      this.moveRotation = identity;
+      num6 = Mathf.SmoothDamp(this.ctrlCamera.fieldOfView, num6, ref this.fieldOfViewVelocity, num1, num3, Time.deltaTime);
+    }
+    this.ctrlCamera.fieldOfView = num6;
+  }
+
+  private void UpdateArrowAimBossModeCamera()
+  {
+    Vector3 cameraTargetPos = this.targetSelf.GetCameraTargetPos();
+    float ingameFieldOfView = this.ingameFieldOfView;
+    Vector3 movePosition = this.movePosition;
+    Quaternion moveRotation = this.moveRotation;
+    Enemy enemy = (Enemy) null;
+    if (MonoBehaviourSingleton<StageObjectManager>.IsValid())
+      enemy = MonoBehaviourSingleton<StageObjectManager>.I.boss;
+    bool flag = Object.op_Inequality((Object) enemy, (Object) null) && !enemy.enableAssimilation;
+    if (this.isBossExistsPast != flag)
+    {
+      this.isBossExistsPast = flag;
+      this.switching = true;
+      this.switchTimer = this.validSettings.modeSwitchTime;
+    }
+    this.distanceElapsedTime += Time.deltaTime;
+    if ((double) this.distanceElapsedTime > (double) this.validSettings.distanceLerpTime)
+      this.distanceElapsedTime = this.validSettings.distanceLerpTime;
+    this.modeChangeTime -= Time.deltaTime;
+    if ((double) this.modeChangeTime < 0.0)
+      this.modeChangeTime = 0.0f;
+    InGameCameraManager.Settings.ArrowAimSettings arrowAimSettings = this.validSettings.arrowAimSettings;
+    float num1 = arrowAimSettings.smoothTargetingRate;
+    float targetingMaxSpeed = this.validSettings.targetingMaxSpeed;
+    float num2 = this.distanceElapsedTime / this.validSettings.distanceLerpTime;
+    float targetingDistance = arrowAimSettings.targetingDistance;
+    Vector3 arrowAimForward = this.targetSelf.arrowAimForward;
+    this.normalForward = ((Vector3) ref arrowAimForward).normalized;
+    int arrowAimStartSign = this.targetSelf.arrowAimStartSign;
+    Vector3 vector3_1 = Vector3.Cross(this.normalForward, Vector3.up);
+    Vector3 vector3_2 = Vector3.op_Multiply(Quaternion.op_Multiply(Quaternion.AngleAxis(-arrowAimSettings.targetingPitch, vector3_1), this.normalForward), Mathf.Lerp(this.validSettings.distanceLimit, targetingDistance, num2));
+    Vector3 vector3_3 = arrowAimSettings.targetingOffset;
+    if (this.arrowCameraMode == 1)
+      vector3_3 = !this.targetSelf.IsAbleArrowSitShot() ? (arrowAimStartSign <= 0 ? arrowAimSettings.targetingOffset : arrowAimSettings.targetingLeftOffset) : (arrowAimStartSign <= 0 ? arrowAimSettings.targetingAvoidShotRightOffset : arrowAimSettings.targetingAvoidShotLeftOffset);
+    Vector3 vector3_4 = Quaternion.op_Multiply(Quaternion.LookRotation(this.normalForward), vector3_3);
+    this.requestPos = Vector3.op_Addition(Vector3.op_Subtraction(cameraTargetPos, vector3_2), vector3_4);
+    this.requestRot = Quaternion.LookRotation(((Vector3) ref vector3_2).normalized);
+    this.modeChangeTime = !flag || !this.validSettings.targetEnable ? this.validSettings.smoothFreeRate : this.validSettings.smoothTargetingRate;
+    this.distanceElapsedTime = this.validSettings.distanceLerpTime;
+    if (this.hitObjectType != InGameCameraManager.CAM_HIT_OBJ_TYPE.NONE && !this.isMotionCameraMode)
+    {
+      Vector3 vector3_5 = Vector3.op_Subtraction(this.requestPos, cameraTargetPos);
+      RaycastHit raycastHit = new RaycastHit();
+      Ray ray;
+      // ISSUE: explicit constructor call
+      ((Ray) ref ray).\u002Ector(cameraTargetPos, ((Vector3) ref vector3_5).normalized);
+      if (Physics.Raycast(ray, ref raycastHit, targetingDistance, 2359808) && this.hitObjectType == InGameCameraManager.CAM_HIT_OBJ_TYPE.ZOOM)
+      {
+        float num3 = ((RaycastHit) ref raycastHit).distance;
+        if ((double) num3 < (double) this.validSettings.distanceLimit)
+          num3 = this.validSettings.distanceLimit;
+        float num4 = num3 - this.validSettings.distanceLimit;
+        float num5 = targetingDistance - this.validSettings.distanceLimit;
+        float num6 = 0.0f;
+        if ((double) num5 > 0.0)
+          num6 = this.validSettings.distanceLerpTime * (num4 / num5);
+        if ((double) this.modeChangeTime <= 0.0)
+        {
+          this.distanceElapsedTime -= Time.deltaTime * 5f;
+          if ((double) this.distanceElapsedTime < (double) num6)
+            this.distanceElapsedTime = num6;
+        }
+        else
+          this.distanceElapsedTime = num6;
+        num2 = this.distanceElapsedTime / this.validSettings.distanceLerpTime;
+        this.requestPos = Vector3.op_Addition(cameraTargetPos, Vector3.op_Multiply(((Ray) ref ray).direction, Mathf.Lerp(this.validSettings.distanceLimit, targetingDistance, num2)));
+      }
+    }
+    if ((double) num1 != 0.0 && (double) this.modeChangeTime <= 0.0)
+      num1 *= (double) num2 < 0.10000000149011612 ? 0.1f : num2;
+    if (this.switching)
+    {
+      this.switchTimer -= Time.deltaTime;
+      if ((double) this.switchTimer <= 0.0)
+      {
+        this.switching = false;
+        this.switchTimer = 0.0f;
+      }
+      num1 = Mathf.Lerp(this.validSettings.modeSwitchTime, num1, (float) (1.0 - (double) this.switchTimer / (double) this.validSettings.modeSwitchTime));
+    }
+    Vector3 requestPos = this.requestPos;
+    ref Vector3 local = ref this.posVelocity;
+    double num7 = (double) num1;
+    double num8 = (double) targetingMaxSpeed;
+    double deltaTime = (double) Time.deltaTime;
+    Vector3 vector3_6 = Vector3.SmoothDamp(movePosition, requestPos, ref local, (float) num7, (float) num8, (float) deltaTime);
+    Vector3 zero = Vector3.zero;
+    Vector3 eulerAngles1 = ((Quaternion) ref moveRotation).eulerAngles;
+    Vector3 eulerAngles2 = ((Quaternion) ref this.requestRot).eulerAngles;
+    zero.x = Mathf.SmoothDampAngle(eulerAngles1.x, eulerAngles2.x, ref this.rotVelocity.x, num1, 1000f, Time.deltaTime);
+    zero.y = Mathf.SmoothDampAngle(eulerAngles1.y, eulerAngles2.y, ref this.rotVelocity.y, num1, 1000f, Time.deltaTime);
+    zero.z = Mathf.SmoothDampAngle(eulerAngles1.z, eulerAngles2.z, ref this.rotVelocity.z, num1, 1000f, Time.deltaTime);
+    Quaternion identity = Quaternion.identity;
+    ((Quaternion) ref identity).eulerAngles = zero;
+    this.movePosition = vector3_6;
+    this.moveRotation = identity;
+    this.ctrlCamera.fieldOfView = Mathf.SmoothDamp(this.ctrlCamera.fieldOfView, ingameFieldOfView, ref this.fieldOfViewVelocity, num1, 1000f, Time.deltaTime);
+  }
+
+  private void UpdateGrabCamera()
+  {
+    Vector3 position = this.target.position;
+    Vector3 movePosition = this.movePosition;
+    Quaternion moveRotation = this.moveRotation;
+    this.normalForward = this.grabInfo.dir;
+    Vector3 vector3_1 = Vector3.op_Multiply(Quaternion.op_Multiply(this.grabInfo.enemyRoot.rotation, this.normalForward), this.grabInfo.distance);
+    this.requestPos = Vector3.op_Addition(position, vector3_1);
+    this.requestRot = Quaternion.LookRotation(Vector3.op_UnaryNegation(((Vector3) ref vector3_1).normalized));
+    float smoothTargetingRate = this.validSettings.smoothTargetingRate;
+    float num1 = (double) this.grabInfo.smoothMaxSpeed > 0.0 ? this.grabInfo.smoothMaxSpeed : this.validSettings.targetingDistance;
+    Vector3 requestPos = this.requestPos;
+    ref Vector3 local = ref this.posVelocity;
+    double num2 = (double) smoothTargetingRate;
+    double num3 = (double) num1;
+    double deltaTime = (double) Time.deltaTime;
+    Vector3 vector3_2 = Vector3.SmoothDamp(movePosition, requestPos, ref local, (float) num2, (float) num3, (float) deltaTime);
+    Vector3 zero = Vector3.zero;
+    Vector3 eulerAngles1 = ((Quaternion) ref moveRotation).eulerAngles;
+    Vector3 eulerAngles2 = ((Quaternion) ref this.requestRot).eulerAngles;
+    zero.x = Mathf.SmoothDampAngle(eulerAngles1.x, eulerAngles2.x, ref this.rotVelocity.x, smoothTargetingRate, 1000f, Time.deltaTime);
+    zero.y = Mathf.SmoothDampAngle(eulerAngles1.y, eulerAngles2.y, ref this.rotVelocity.y, smoothTargetingRate, 1000f, Time.deltaTime);
+    zero.z = Mathf.SmoothDampAngle(eulerAngles1.z, eulerAngles2.z, ref this.rotVelocity.z, smoothTargetingRate, 1000f, Time.deltaTime);
+    Quaternion identity = Quaternion.identity;
+    ((Quaternion) ref identity).eulerAngles = zero;
+    this.movePosition = vector3_2;
+    this.moveRotation = identity;
+  }
+
+  private void UpdateCannonAimCamera()
+  {
+    InGameCameraManager.Settings validSettings = this.validSettings;
+    Vector3 cameraTargetPos = this.targetSelf.GetCameraTargetPos();
+    this.normalForward = ((Vector3) ref this.targetSelf.cannonAimForward).normalized;
+    Vector3 vector3_1 = Vector3.Cross(this.normalForward, Vector3.up);
+    Vector3 vector3_2 = Vector3.op_Multiply(Quaternion.op_Multiply(Quaternion.AngleAxis(validSettings.cannonAimSettings.aimLookDownAngle, vector3_1), this.normalForward), validSettings.cannonAimSettings.aimDistanceToSelf);
+    Vector3 vector3_3 = Quaternion.op_Multiply(Quaternion.LookRotation(this.normalForward), validSettings.cannonAimSettings.aimCameraOffset);
+    this.movePosition = Vector3.op_Addition(Vector3.op_Subtraction(cameraTargetPos, vector3_2), vector3_3);
+    this.moveRotation = Quaternion.LookRotation(((Vector3) ref vector3_2).normalized);
+  }
+
+  private void UpdateCannonBeamChargeCamera()
+  {
+    InGameCameraManager.Settings validSettings = this.validSettings;
+    Vector3 cameraTargetPos = this.targetSelf.GetCameraTargetPos();
+    this.normalForward = ((Vector3) ref this.targetSelf.cannonAimForward).normalized;
+    Vector3 vector3_1 = Vector3.Cross(this.normalForward, Vector3.up);
+    Vector3 vector3_2 = Vector3.op_Multiply(Quaternion.op_Multiply(Quaternion.AngleAxis(validSettings.cannonAimSettings.beamChargeCameraLookDownAngle, vector3_1), this.normalForward), validSettings.cannonAimSettings.beamChargeCameraDistanceToSelf);
+    Vector3 vector3_3 = Quaternion.op_Multiply(Quaternion.LookRotation(this.normalForward), validSettings.cannonAimSettings.beamChargeCameraOffset);
+    this.movePosition = Vector3.op_Addition(Vector3.op_Subtraction(cameraTargetPos, vector3_2), vector3_3);
+    this.moveRotation = Quaternion.LookRotation(((Vector3) ref vector3_2).normalized);
+  }
+
+  private void UpdateCannonBeamCamera()
+  {
+    InGameCameraManager.Settings validSettings = this.validSettings;
+    this.movePosition = validSettings.cannonAimSettings.beamCameraPosition;
+    this.moveRotation = Quaternion.Euler(validSettings.cannonAimSettings.beamCameraRotationEular);
+  }
+
+  private void UpdateStopCamera()
+  {
+    Vector3 movePosition = this.movePosition;
+    Quaternion moveRotation = this.moveRotation;
+    float smoothTargetingRate = this.validSettings.smoothTargetingRate;
+    float num1 = this.validSettings.targetingDistance;
+    float num2 = 1000f;
+    if ((double) this.stopMaxSpeed > 0.0)
+    {
+      num1 = this.stopMaxSpeed;
+      num2 = this.stopMaxSpeed * (num2 / this.validSettings.targetingDistance);
+    }
+    if ((double) this.stopMaxRotSpeed > 0.0)
+      num2 = this.stopMaxRotSpeed;
+    Vector3 stopPos = this.stopPos;
+    ref Vector3 local = ref this.posVelocity;
+    double num3 = (double) smoothTargetingRate;
+    double num4 = (double) num1;
+    double deltaTime = (double) Time.deltaTime;
+    Vector3 vector3 = Vector3.SmoothDamp(movePosition, stopPos, ref local, (float) num3, (float) num4, (float) deltaTime);
+    Vector3 zero = Vector3.zero;
+    Vector3 eulerAngles = ((Quaternion) ref moveRotation).eulerAngles;
+    Vector3 stopRotEular = this.stopRotEular;
+    zero.x = Mathf.SmoothDampAngle(eulerAngles.x, stopRotEular.x, ref this.rotVelocity.x, smoothTargetingRate, num2, Time.deltaTime);
+    zero.y = Mathf.SmoothDampAngle(eulerAngles.y, stopRotEular.y, ref this.rotVelocity.y, smoothTargetingRate, num2, Time.deltaTime);
+    zero.z = Mathf.SmoothDampAngle(eulerAngles.z, stopRotEular.z, ref this.rotVelocity.z, smoothTargetingRate, num2, Time.deltaTime);
+    Quaternion identity = Quaternion.identity;
+    ((Quaternion) ref identity).eulerAngles = zero;
+    this.movePosition = vector3;
+    this.moveRotation = identity;
+  }
+
+  private void UpdateCutCamera()
+  {
+    this.movePosition = this.cutPos;
+    this.moveRotation = this.cutRot;
+  }
+
+  private void UpdateShake()
+  {
+    Vector3 vector3 = Vector3.zero;
+    int index = 0;
+    while (index < this.shakeParams.Count)
+    {
+      InGameCameraManager.ShakeParam shakeParam = this.shakeParams[index];
+      float shakeCycleTime = shakeParam.shakeCycleTime;
+      if ((double) shakeCycleTime <= 0.0)
+      {
+        Log.Warning(LOG.INGAME, "カメラ揺れの振動周期が0");
+        this.shakeParams.RemoveAt(index);
+      }
+      else
+      {
+        int num1 = (int) ((double) shakeParam.shakeTime * 2.0 / (double) shakeCycleTime);
+        shakeParam.shakeTime += Time.deltaTime;
+        int num2 = (int) ((double) shakeParam.shakeTime * 2.0 / (double) shakeCycleTime);
+        bool flag = false;
+        if (num1 != num2)
+        {
+          shakeParam.shakeLength *= Mathf.Pow(this.shakeAttenuationPercent, (float) (num2 - num1));
+          if ((double) shakeParam.shakeLength < 0.0099999997764825821)
+            flag = true;
+        }
+        if (flag)
+        {
+          this.shakeParams.RemoveAt(index);
+        }
+        else
+        {
+          vector3 = Vector3.op_Addition(vector3, Vector3.op_Multiply(Vector3.up, shakeParam.shakeLength * Mathf.Sin((float) ((double) shakeParam.shakeTime * 3.1415927410125732 * 2.0) / shakeCycleTime)));
+          ++index;
+        }
+      }
+    }
+    this.cameraTransform.position = Vector3.op_Addition(this.movePosition, vector3);
+    this.cameraTransform.rotation = this.moveRotation;
+  }
+
+  private void LateUpdate()
+  {
+    if (Object.op_Inequality((Object) this.radialBlurFilter, (Object) null) && ((Behaviour) this.radialBlurFilter).enabled)
+      this.UpdateRadialBlur();
+    if (Object.op_Equality((Object) this.target, (Object) null))
+      return;
+    if (Object.op_Equality((Object) this.targetObject, (Object) null) || Object.op_Inequality((Object) this.targetObject._transform, (Object) this.target))
+    {
+      this.targetObject = ((Component) this.target).GetComponent<StageObject>();
+      this.targetPlayer = this.targetObject as Player;
+      this.targetSelf = this.targetObject as Self;
+    }
+    switch (this.cameraMode)
+    {
+      case InGameCameraManager.CAMERA_MODE.GRABBED:
+        this.UpdateGrabCamera();
+        break;
+      case InGameCameraManager.CAMERA_MODE.ARROW_AIM_BOSS:
+        this.UpdateArrowAimBossModeCamera();
+        break;
+      case InGameCameraManager.CAMERA_MODE.CANNON_AIM:
+        this.UpdateCannonAimCamera();
+        break;
+      case InGameCameraManager.CAMERA_MODE.CANNON_BEAM_CHARGE:
+        this.UpdateCannonBeamChargeCamera();
+        break;
+      case InGameCameraManager.CAMERA_MODE.CANNON_BEAM:
+        this.UpdateCannonBeamCamera();
+        break;
+      case InGameCameraManager.CAMERA_MODE.STOP:
+        this.UpdateStopCamera();
+        break;
+      case InGameCameraManager.CAMERA_MODE.CUT:
+        this.UpdateCutCamera();
+        break;
+      default:
+        this.UpdatePlayerCamera();
+        break;
+    }
+    this.UpdateShake();
+  }
+
+  public Vector3 WorldToScreenPoint(Vector3 pos) => this.ctrlCamera.WorldToScreenPoint(pos);
+
+  public Vector3 WorldToViewportPoint(Vector3 pos) => this.ctrlCamera.WorldToViewportPoint(pos);
+
+  public Vector3 ScreenToWorldPoint(Vector3 pos) => this.ctrlCamera.ScreenToWorldPoint(pos);
+
+  public float GetPixelHeight() => (float) this.ctrlCamera.pixelHeight;
+
+  public void AdjustCameraPosition()
+  {
+    this.adjustCamera = true;
+    this.posVelocity = Vector3.zero;
+    this.rotVelocity = Vector3.zero;
+    this.fieldOfViewVelocity = 0.0f;
+    this.switching = false;
+    this.switchTimer = 0.0f;
+    this.modeChangeTime = 0.0f;
+  }
+
+  public void SetShakeCamera(Vector3 pos, float percent, float cycle_time = 0.0f)
+  {
+    Vector3 vector3 = Vector3.op_Subtraction(pos, this.movePosition);
+    float num1 = (this.shakeMaxFocusLength - ((Vector3) ref vector3).magnitude) / this.shakeMaxFocusLength;
+    if ((double) num1 < 0.0)
+      num1 = 0.0f;
+    float num2 = this.shakeAmplitude * percent * num1;
+    if ((double) num2 <= 0.0099999997764825821)
+      return;
+    InGameCameraManager.ShakeParam shakeParam = new InGameCameraManager.ShakeParam();
+    shakeParam.shakeTime = 0.0f;
+    shakeParam.shakeLength = num2;
+    shakeParam.shakeCycleTime = cycle_time;
+    if ((double) shakeParam.shakeCycleTime <= 0.0)
+      shakeParam.shakeCycleTime = this.shakeCycleTime;
+    this.shakeParams.Add(shakeParam);
+    if (this.shakeMaxNum <= 0 || this.shakeParams.Count <= this.shakeMaxNum)
+      return;
+    this.shakeParams.RemoveAt(0);
+  }
+
+  public void OnScreenRotate(bool is_portrait)
+  {
+    if (is_portrait)
+    {
+      this.validSettings = this.portraitSettings;
+      this.ingameFieldOfView = MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.inGamePortraitFieldOfView;
+    }
+    else
+    {
+      this.validSettings = this.landscapeSettings;
+      this.ingameFieldOfView = MonoBehaviourSingleton<GlobalSettingsManager>.I.cameraParam.inGameLandscapeFieldOfView;
+    }
+    if (!QuestManager.IsValidInGameWaveMatch() || !MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
+      return;
+    this.validSettings.cameraFieldOffsetSettings.targetOffsetPos.y = MonoBehaviourSingleton<InGameSettingsManager>.I.GetWaveMatchParam().cameraFieldOffsetY;
+  }
+
+  public bool IsEndMotionCamera()
+  {
+    if (!this.isMotionCameraMode || this.motionCameraTransforms == null)
+      return true;
+    int index = 0;
+    if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+      index = MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait ? 0 : 1;
+    Animation component = ((Component) this.motionCameraTransforms[index]).gameObject.GetComponent<Animation>();
+    return Object.op_Equality((Object) component, (Object) null) || !component.isPlaying;
+  }
+
+  public void OnHappenQuestDirection(
+    bool enable,
+    Transform boss_transform = null,
+    Object[] cameras = null,
+    Vector3[] camera_offsets = null)
+  {
+    if (enable)
+    {
+      this.EndRadialBlurFilter();
+      MonoBehaviourSingleton<GameSceneManager>.I.SetMainCameraCullingMask(262144 /*0x040000*/);
+      if (Object.op_Inequality((Object) boss_transform, (Object) null) && cameras != null)
+        this.SetMotionCamera(true, boss_transform, cameras, camera_offsets);
+      if (!MonoBehaviourSingleton<AudioListenerManager>.IsValid())
+        return;
+      MonoBehaviourSingleton<AudioListenerManager>.I.SetFlag(AudioListenerManager.STATUS_FLAGS.CAMERA_INGAME_ACTIVE, true);
+    }
+    else
+    {
+      this.SetMotionCamera(false);
+      MonoBehaviourSingleton<GameSceneManager>.I.SetMainCameraCullingMask(GameSceneGlobalSettings.GetDefaultMainCameraCullingMask());
+      if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+        this.OnScreenRotate(MonoBehaviourSingleton<ScreenOrientationManager>.I.isPortrait);
+      if (MonoBehaviourSingleton<AudioListenerManager>.IsValid())
+        MonoBehaviourSingleton<AudioListenerManager>.I.SetFlag(AudioListenerManager.STATUS_FLAGS.CAMERA_INGAME_ACTIVE, false);
+      this.AdjustCameraPosition();
+    }
+  }
+
+  public void SetMotionCamera(
+    bool enable,
+    Transform target_transform = null,
+    Object[] cameras = null,
+    Vector3[] camera_offsets = null)
+  {
+    if (enable)
+    {
+      this.motionCameraTransforms = new Transform[2];
+      Transform gameObject1 = Utility.CreateGameObject("FieldQuestCamera", this._transform);
+      gameObject1.position = target_transform.position;
+      gameObject1.rotation = target_transform.rotation;
+      Vector3 one = Vector3.one;
+      one.x = target_transform.lossyScale.x / this._transform.lossyScale.x;
+      one.y = target_transform.lossyScale.y / this._transform.lossyScale.y;
+      one.z = target_transform.lossyScale.z / this._transform.lossyScale.z;
+      gameObject1.localScale = one;
+      this.motionCameraParent = gameObject1;
+      for (int index = 0; index < 2; ++index)
+      {
+        Transform gameObject2 = Utility.CreateGameObject("offset_" + index.ToString(), gameObject1);
+        gameObject2.localPosition = Vector3.zero;
+        gameObject2.localRotation = Quaternion.identity;
+        gameObject2.localScale = Vector3.one;
+        if (camera_offsets != null)
+          gameObject2.localPosition = camera_offsets[index];
+        Transform transform = ResourceUtility.Realizes(cameras[index], gameObject2);
+        if (Object.op_Equality((Object) transform, (Object) null))
+        {
+          Object.Destroy((Object) ((Component) gameObject1).gameObject);
+          return;
+        }
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
+        transform.localScale = Vector3.zero;
+        this.motionCameraTransforms[index] = transform;
+      }
+      this.isMotionCameraMode = true;
+    }
+    else
+    {
+      this.isMotionCameraMode = false;
+      if (Object.op_Inequality((Object) this.motionCameraParent, (Object) null))
+      {
+        Object.Destroy((Object) ((Component) this.motionCameraParent).gameObject);
+        this.motionCameraParent = (Transform) null;
+      }
+      if (this.motionCameraTransforms == null)
+        return;
+      this.motionCameraTransforms = (Transform[]) null;
+    }
+  }
+
+  public void StartRadialBlurFilter(float time, float strength, Vector3 center_pos)
+  {
+    if (Object.op_Equality((Object) this.radialBlurFilter, (Object) null))
+      return;
+    this._StartRadialBlurFilter(time, strength);
+    this.radialBlurCenterPos = center_pos;
+    this.radialBlurCenterTransform = (Transform) null;
+  }
+
+  public void StartRadialBlurFilter(float time, float strength, Transform center_transform)
+  {
+    if (Object.op_Equality((Object) this.radialBlurFilter, (Object) null))
+      return;
+    this._StartRadialBlurFilter(time, strength);
+    this.radialBlurCenterPos = Vector3.zero;
+    this.radialBlurCenterTransform = center_transform;
+  }
+
+  private void _StartRadialBlurFilter(float time, float strength)
+  {
+    if (Object.op_Equality((Object) this.radialBlurFilter, (Object) null) || ((Behaviour) this.radialBlurFilter).enabled)
+      return;
+    ((Behaviour) this.radialBlurFilter).enabled = true;
+    this.radialBlurFilter.StartFilter();
+    this.radialBlurStrengthValue = strength;
+    if ((double) time <= 0.0)
+      this.radialBlurFilter.strength = strength;
+    else
+      this.radialBlurStrengthPerTime = strength / time;
+  }
+
+  public void ChangeRadialBlurFilter(float time, float strength)
+  {
+    if (Object.op_Equality((Object) this.radialBlurFilter, (Object) null) || !((Behaviour) this.radialBlurFilter).enabled)
+      return;
+    if ((double) time <= 0.0)
+    {
+      this.radialBlurStrengthValue = strength;
+      if ((double) strength <= 0.0)
+      {
+        this.radialBlurFilter.strength = 0.0f;
+        this.radialBlurFilter.StopFilter();
+        ((Behaviour) this.radialBlurFilter).enabled = false;
+      }
+      else
+        this.radialBlurFilter.strength = strength;
+    }
+    else
+    {
+      this.radialBlurStrengthPerTime = (float) -((double) this.radialBlurStrengthValue - (double) strength) / time;
+      this.radialBlurStrengthValue = strength;
+    }
+  }
+
+  public void EndRadialBlurFilter(float time = 0.0f) => this.ChangeRadialBlurFilter(time, 0.0f);
+
+  public void ResetMovePositionAndRotaion()
+  {
+    this.movePosition = ((Component) this.ctrlCamera).transform.position;
+    this.moveRotation = ((Component) this.ctrlCamera).transform.rotation;
+  }
+
+  public enum CAMERA_MODE
+  {
+    DEFAULT,
+    GRABBED,
+    ARROW_AIM_BOSS,
+    CANNON_AIM,
+    CANNON_BEAM_CHARGE,
+    CANNON_BEAM,
+    STOP,
+    CUT,
+    MAX,
+  }
+
+  [Serializable]
+  public class Settings
+  {
+    [Tooltip("ターゲットカメラ ピッチ")]
+    public float targetingPitch = 10f;
+    [Tooltip("ターゲットカメラ ピッチ変化最短距離")]
+    public float targetingPitchNearDistance;
+    [Tooltip("ターゲットカメラ ピッチ変化最長距離")]
+    public float targetingPitchFarDistance;
+    [Tooltip("ターゲットカメラ ピッチ変化カーブ最小角度")]
+    public float targetingPitchMinAngle = 10f;
+    [Tooltip("ターゲットカメラ ピッチ変化カーブ最大角度")]
+    public float targetingPitchMaxAngle = 10f;
+    [Tooltip("ターゲットカメラ ピッチ変化カーブ")]
+    public AnimationCurve targetingPitchCurve;
+    [Tooltip("ターゲットカメラ 距離")]
+    public float targetingDistance = 4f;
+    [Tooltip("ターゲットカメラ オフセット")]
+    public Vector3 targetingOffset = Vector3.zero;
+    [Tooltip("ターゲットカメラ カメラ移動最大速度")]
+    public float targetingMaxSpeed = 999f;
+    [Tooltip("ターゲットカメラ　カメラ回転最大速度")]
+    public float targetingMaxRotateSpeed = 999f;
+    [Tooltip("フリーカメラ ピッチ")]
+    public float freePitch = 20f;
+    [Tooltip("フリーカメラ 距離")]
+    public float freeDistance = 10f;
+    [Tooltip("フリーカメラ オフセット")]
+    public Vector3 freeOffset = Vector3.zero;
+    [Tooltip("フリーカメラ カメラ移動最大速度")]
+    public float freeMaxSpeed = 999f;
+    [Tooltip("フリーカメラ カメラ回転最大速度")]
+    public float freeMaxRotateSpeed = 999f;
+    [Tooltip("true:ターゲットカメラ抜け時方向固定")]
+    public bool normalEnable = true;
+    [Tooltip("true:ターゲットカメラ有効")]
+    public bool targetEnable = true;
+    [Tooltip("敵可動領域角度")]
+    public float moveableTargetAngle = 10f;
+    [Tooltip("ターゲットカメラの補正レート")]
+    public float smoothTargetingRate = 0.1f;
+    [Tooltip("フリーカメラの補正レート")]
+    public float smoothFreeRate = 0.1f;
+    [Tooltip("カメラ切り替え時間")]
+    public float modeSwitchTime = 0.3f;
+    [Tooltip("カメラが寄る限界値")]
+    public float distanceLimit = 2f;
+    [Tooltip("カメラの距離が寄せてから元に戻るまでの時間")]
+    public float distanceLerpTime = 2f;
+    [Tooltip("ターゲット追尾の後方オフセット")]
+    public float followBackOffset = 3.5f;
+    [Tooltip("ターゲット追尾の左右割合")]
+    public float followSidePercent = 0.8f;
+    [Tooltip("ターゲット追尾の補正レート")]
+    public float followRate = 0.1f;
+    [Tooltip("弓狙い設定")]
+    public InGameCameraManager.Settings.ArrowAimSettings arrowAimSettings = new InGameCameraManager.Settings.ArrowAimSettings();
+    [Tooltip("大型モンスター戦のカメラ補正設定")]
+    public InGameCameraManager.Settings.CameraTargetOffsetSettings cameraTargetOffsetSettings = new InGameCameraManager.Settings.CameraTargetOffsetSettings();
+    [Tooltip("フィールドのカメラ補正設定")]
+    public InGameCameraManager.Settings.CameraTargetOffsetSettings cameraFieldOffsetSettings = new InGameCameraManager.Settings.CameraTargetOffsetSettings();
+    [Tooltip("魔弾砲関連のカメラ補正設定")]
+    public InGameCameraManager.Settings.CannonAimSettings cannonAimSettings = new InGameCameraManager.Settings.CannonAimSettings();
+
+    [Serializable]
+    public class ArrowAimSettings
+    {
+      [Tooltip("狙い中 ピッチ")]
+      public float targetingPitch = 10f;
+      [Tooltip("狙い中 距離")]
+      public float targetingDistance = 4f;
+      [Tooltip("狙い中(右側) オフセット")]
+      public Vector3 targetingOffset = Vector3.zero;
+      [Tooltip("狙い中(左側) オフセット")]
+      public Vector3 targetingLeftOffset = Vector3.zero;
+      [Tooltip("狙い中しゃがみ(右側) オフセット")]
+      public Vector3 targetingAvoidShotRightOffset = Vector3.zero;
+      [Tooltip("狙い中しゃがみ(左側) オフセット")]
+      public Vector3 targetingAvoidShotLeftOffset = Vector3.zero;
+      [Tooltip("狙い中 画角（0で変化無し")]
+      public float fieldOfView;
+      [Tooltip("狙い時の補正レート")]
+      public float smoothTargetingRate = 0.1f;
+    }
+
+    [Serializable]
+    public class CameraTargetOffsetSettings
+    {
+      [Tooltip("カメラオフセット補正位置")]
+      public Vector3 targetOffsetPos = Vector3.zero;
+      [Tooltip("カメラオフセット補正回転")]
+      public Vector3 targetOffsetRot = Vector3.zero;
+    }
+
+    [Serializable]
+    public class CannonAimSettings
+    {
+      [Tooltip("魔弾砲狙い時のカメラオフセット")]
+      public Vector3 aimCameraOffset = new Vector3(1.2f, 0.6f, -1f);
+      [Tooltip("魔弾砲狙い時の見下ろし角度")]
+      public float aimLookDownAngle = -5f;
+      [Tooltip("魔弾砲狙い時のカメラとプレイヤーとの距離")]
+      public float aimDistanceToSelf = 2.6f;
+      [Tooltip("波動砲のカメラオフセット")]
+      public Vector3 beamChargeCameraOffset = Vector3.zero;
+      [Tooltip("波動砲のカメラ見下ろし角度")]
+      public float beamChargeCameraLookDownAngle;
+      [Tooltip("波動砲のカメラと自分との距離")]
+      public float beamChargeCameraDistanceToSelf;
+      [Tooltip("波動砲発射時のカメラ位置")]
+      public Vector3 beamCameraPosition = Vector3.zero;
+      [Tooltip("波動砲発射時のカメラ")]
+      public Vector3 beamCameraRotationEular = Vector3.zero;
+    }
+  }
+
+  protected class ShakeParam
+  {
+    public float shakeTime;
+    public float shakeLength;
+    public float shakeCycleTime;
+  }
+
+  public enum CAM_HIT_OBJ_TYPE
+  {
+    NONE,
+    ZOOM,
+  }
+
+  public class GrabInfo
+  {
+    public bool enabled;
+    public Transform enemyRoot;
+    public Vector3 dir;
+    public float distance;
+    public float smoothMaxSpeed;
+  }
+
+  public class TargetOffset
+  {
+    public Vector3 pos = Vector3.zero;
+    public Vector3 rot = Vector3.zero;
+    public float smoothMaxSpeed;
+  }
+
+  public class TargetPosition
+  {
+    public Vector3 pos = Vector3.zero;
+    public float smoothMaxSpeed;
+  }
 }

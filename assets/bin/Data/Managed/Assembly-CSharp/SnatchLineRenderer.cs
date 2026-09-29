@@ -1,68 +1,60 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SnatchLineRenderer
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class SnatchLineRenderer
+#nullable disable
+public class SnatchLineRenderer : MonoBehaviour
 {
-	private LineRenderer lineRenderer;
+  private LineRenderer lineRenderer;
 
-	public SnatchLineRenderer()
-		: this()
-	{
-	}
+  private void Start()
+  {
+    Transform transform = ResourceUtility.Realizes((Object) MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.snatchLine, MonoBehaviourSingleton<StageObjectManager>.I._transform);
+    if (Object.op_Equality((Object) transform, (Object) null))
+      return;
+    this.lineRenderer = ((Component) transform).GetComponent<LineRenderer>();
+    if (!Object.op_Inequality((Object) this.lineRenderer, (Object) null))
+      return;
+    ((Renderer) this.lineRenderer).enabled = false;
+  }
 
-	private void Start()
-	{
-		Transform val = ResourceUtility.Realizes(MonoBehaviourSingleton<InGameLinkResourcesCommon>.I.snatchLine, MonoBehaviourSingleton<StageObjectManager>.I._transform, -1);
-		if (!(val == null))
-		{
-			lineRenderer = val.GetComponent<LineRenderer>();
-			if (lineRenderer != null)
-			{
-				lineRenderer.set_enabled(false);
-			}
-		}
-	}
+  private void OnDestroy()
+  {
+    if (!Object.op_Inequality((Object) this.lineRenderer, (Object) null))
+      return;
+    Object.Destroy((Object) ((Component) this.lineRenderer).gameObject);
+    this.lineRenderer = (LineRenderer) null;
+  }
 
-	private void OnDestroy()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (lineRenderer != null)
-		{
-			Object.Destroy(lineRenderer.get_gameObject());
-			lineRenderer = null;
-		}
-	}
+  public void SetVisible()
+  {
+    if (!Object.op_Inequality((Object) this.lineRenderer, (Object) null))
+      return;
+    ((Renderer) this.lineRenderer).enabled = true;
+  }
 
-	public void SetVisible()
-	{
-		if (lineRenderer != null)
-		{
-			lineRenderer.set_enabled(true);
-		}
-	}
+  public void SetInvisible()
+  {
+    if (!Object.op_Inequality((Object) this.lineRenderer, (Object) null))
+      return;
+    ((Renderer) this.lineRenderer).enabled = false;
+  }
 
-	public void SetInvisible()
-	{
-		if (lineRenderer != null)
-		{
-			lineRenderer.set_enabled(false);
-		}
-	}
+  public void SetPositonStart(Vector3 pos)
+  {
+    if (!Object.op_Inequality((Object) this.lineRenderer, (Object) null))
+      return;
+    this.lineRenderer.SetPosition(0, pos);
+  }
 
-	public void SetPositonStart(Vector3 pos)
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		if (lineRenderer != null)
-		{
-			lineRenderer.SetPosition(0, pos);
-		}
-	}
-
-	public void SetPositionEnd(Vector3 pos)
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		if (lineRenderer != null)
-		{
-			lineRenderer.SetPosition(1, pos);
-		}
-	}
+  public void SetPositionEnd(Vector3 pos)
+  {
+    if (!Object.op_Inequality((Object) this.lineRenderer, (Object) null))
+      return;
+    this.lineRenderer.SetPosition(1, pos);
+  }
 }

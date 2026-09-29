@@ -1,204 +1,151 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: ChatInputFrame
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class ChatInputFrame
+#nullable disable
+public class ChatInputFrame : MonoBehaviour
 {
-	private const float INPUT_COLLIDER_MARGIN = 10f;
+  [SerializeField]
+  private UITweener[] m_OpenTweens;
+  [SerializeField]
+  private UITweener[] m_CloseTweens;
+  [SerializeField]
+  private UIButton m_OpenCloseBtn;
+  [SerializeField]
+  private UISprite m_OpenCloseSprite;
+  [SerializeField]
+  private UILabel m_InputTextLabel;
+  [SerializeField]
+  private UISprite m_BackgroundSprite;
+  [SerializeField]
+  private BoxCollider m_InputCollider;
+  private int m_BusyCount;
+  private const float INPUT_COLLIDER_MARGIN = 10f;
+  private const float FRAME_OFFSET = 4f;
+  private bool m_IsOpen;
+  public System.Action onChange;
+  public System.Action onSubmit;
+  [SerializeField]
+  private UISprite m_AgeConfirmSprite;
+  [SerializeField]
+  private UISprite m_DenyChatSprite;
 
-	private const float FRAME_OFFSET = 4f;
+  private bool IsBusy => this.m_BusyCount != 0;
 
-	[SerializeField]
-	private UITweener[] m_OpenTweens;
+  private void Awake()
+  {
+    this.InitTweens(this.m_OpenTweens);
+    this.InitTweens(this.m_CloseTweens);
+    this.m_IsOpen = true;
+  }
 
-	[SerializeField]
-	private UITweener[] m_CloseTweens;
+  private void InitTweens(UITweener[] tweens)
+  {
+    if (tweens == null)
+      return;
+    int index = 0;
+    for (int length = tweens.Length; index < length; ++index)
+    {
+      ((Behaviour) tweens[index]).enabled = false;
+      tweens[index].AddOnFinished(new EventDelegate(new EventDelegate.Callback(this.OnFinished)));
+    }
+  }
 
-	[SerializeField]
-	private UIButton m_OpenCloseBtn;
+  private void OnFinished()
+  {
+    --this.m_BusyCount;
+    if (this.IsBusy)
+      return;
+    ((Collider) this.m_InputCollider).enabled = this.m_IsOpen;
+  }
 
-	[SerializeField]
-	private UISprite m_OpenCloseSprite;
+  public void Open()
+  {
+    if (this.StartAnim(this.m_OpenTweens))
+      this.SetOpenCloseBtnSprite("ChatBtnHome");
+    this.m_IsOpen = true;
+  }
 
-	[SerializeField]
-	private UILabel m_InputTextLabel;
+  public void Close()
+  {
+    if (!this.StartAnim(this.m_CloseTweens))
+      return;
+    this.m_IsOpen = false;
+    this.SetOpenCloseBtnSprite("ChatBtnHome");
+  }
 
-	[SerializeField]
-	private UISprite m_BackgroundSprite;
+  public void Reset()
+  {
+    this.UpdateAgeConfirm();
+    this.m_IsOpen = false;
+    this.SetOpenCloseBtnSprite("ChatBtnHome");
+    this.FrameResize();
+  }
 
-	[SerializeField]
-	private BoxCollider m_InputCollider;
+  private void SetOpenCloseBtnSprite(string spriteName)
+  {
+  }
 
-	private int m_BusyCount;
+  private bool StartAnim(UITweener[] tweens)
+  {
+    if (this.IsBusy)
+      return false;
+    this.m_BusyCount = tweens.Length;
+    ((Collider) this.m_InputCollider).enabled = false;
+    int index = 0;
+    for (int length = tweens.Length; index < length; ++index)
+    {
+      ((Behaviour) tweens[index]).enabled = true;
+      tweens[index].ResetToBeginning();
+    }
+    return true;
+  }
 
-	private bool m_IsOpen;
+  public bool IsEnableInput() => !this.IsBusy && this.m_IsOpen;
 
-	public Action onChange;
+  public bool IsOpenOrBusy() => this.m_IsOpen || this.IsBusy;
 
-	public Action onSubmit;
+  public void FrameResize()
+  {
+    this.m_InputCollider.size = new Vector3(this.m_InputCollider.size.x, (float) this.m_BackgroundSprite.height + 10f, this.m_InputCollider.size.z);
+  }
 
-	[SerializeField]
-	private UISprite m_AgeConfirmSprite;
+  public void ChangeText()
+  {
+    if (this.onChange == null)
+      return;
+    this.onChange();
+  }
 
-	[SerializeField]
-	private UISprite m_DenyChatSprite;
+  public void SubmitText()
+  {
+    if (this.onSubmit == null)
+      return;
+    this.onSubmit();
+  }
 
-	private bool IsBusy => m_BusyCount != 0;
+  public void OnTouchOpenCloseBtn()
+  {
+    int num = this.IsBusy ? 1 : 0;
+  }
 
-	public ChatInputFrame()
-		: this()
-	{
-	}
+  public void OnTouchCloseBtn()
+  {
+    int num = this.IsBusy ? 1 : 0;
+  }
 
-	private void Awake()
-	{
-		InitTweens(m_OpenTweens);
-		InitTweens(m_CloseTweens);
-		m_IsOpen = true;
-	}
-
-	private void InitTweens(UITweener[] tweens)
-	{
-		if (tweens != null)
-		{
-			int i = 0;
-			for (int num = tweens.Length; i < num; i++)
-			{
-				tweens[i].set_enabled(false);
-				tweens[i].AddOnFinished(new EventDelegate(OnFinished));
-			}
-		}
-	}
-
-	private void OnFinished()
-	{
-		m_BusyCount--;
-		if (!IsBusy)
-		{
-			m_InputCollider.set_enabled(m_IsOpen);
-		}
-	}
-
-	public void Open()
-	{
-		if (StartAnim(m_OpenTweens))
-		{
-			SetOpenCloseBtnSprite("ChatBtnHome");
-		}
-		m_IsOpen = true;
-	}
-
-	public void Close()
-	{
-		if (StartAnim(m_CloseTweens))
-		{
-			m_IsOpen = false;
-			SetOpenCloseBtnSprite("ChatBtnHome");
-		}
-	}
-
-	public void Reset()
-	{
-		UpdateAgeConfirm();
-		m_IsOpen = false;
-		SetOpenCloseBtnSprite("ChatBtnHome");
-		FrameResize();
-	}
-
-	private void SetOpenCloseBtnSprite(string spriteName)
-	{
-	}
-
-	private bool StartAnim(UITweener[] tweens)
-	{
-		if (IsBusy)
-		{
-			return false;
-		}
-		m_BusyCount = tweens.Length;
-		m_InputCollider.set_enabled(false);
-		int i = 0;
-		for (int num = tweens.Length; i < num; i++)
-		{
-			tweens[i].set_enabled(true);
-			tweens[i].ResetToBeginning();
-		}
-		return true;
-	}
-
-	public bool IsEnableInput()
-	{
-		if (IsBusy)
-		{
-			return false;
-		}
-		return m_IsOpen;
-	}
-
-	public bool IsOpenOrBusy()
-	{
-		return m_IsOpen || IsBusy;
-	}
-
-	public void FrameResize()
-	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		BoxCollider inputCollider = m_InputCollider;
-		Vector3 size = m_InputCollider.get_size();
-		float x = size.x;
-		float num = (float)m_BackgroundSprite.height + 10f;
-		Vector3 size2 = m_InputCollider.get_size();
-		inputCollider.set_size(new Vector3(x, num, size2.z));
-	}
-
-	public void ChangeText()
-	{
-		if (onChange != null)
-		{
-			onChange();
-		}
-	}
-
-	public void SubmitText()
-	{
-		if (onSubmit != null)
-		{
-			onSubmit();
-		}
-	}
-
-	public void OnTouchOpenCloseBtn()
-	{
-		if (IsBusy)
-		{
-			return;
-		}
-	}
-
-	public void OnTouchCloseBtn()
-	{
-		if (IsBusy)
-		{
-			return;
-		}
-	}
-
-	public void UpdateAgeConfirm()
-	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		bool active = !UserInfoManager.IsRegisterdAge();
-		bool active2 = UserInfoManager.IsRegisterdAge() && !UserInfoManager.IsEnableCommunication();
-		if (m_AgeConfirmSprite != null)
-		{
-			m_AgeConfirmSprite.get_gameObject().SetActive(active);
-		}
-		if (m_DenyChatSprite != null)
-		{
-			m_DenyChatSprite.get_gameObject().SetActive(active2);
-		}
-	}
+  public void UpdateAgeConfirm()
+  {
+    bool flag1 = !UserInfoManager.IsRegisterdAge();
+    bool flag2 = UserInfoManager.IsRegisterdAge() && !UserInfoManager.IsEnableCommunication();
+    if (Object.op_Inequality((Object) this.m_AgeConfirmSprite, (Object) null))
+      ((Component) this.m_AgeConfirmSprite).gameObject.SetActive(flag1);
+    if (!Object.op_Inequality((Object) this.m_DenyChatSprite, (Object) null))
+      return;
+    ((Component) this.m_DenyChatSprite).gameObject.SetActive(flag2);
+  }
 }

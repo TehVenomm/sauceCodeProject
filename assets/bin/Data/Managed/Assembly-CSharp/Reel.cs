@@ -1,149 +1,129 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Reel
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class Reel : GameSection
 {
-	private enum UI
-	{
-		TBL_REEL,
-		OBJ_REEL_SIZE_BASE,
-		GRD_REEL_LIST,
-		SCR_LIST,
-		GRD_REEL_LIST_ITEM
-	}
+  private Reel.InitData initData;
+  private Reel.RecvData[] recvData;
 
-	public class InitData
-	{
-		public int[] digit;
+  public override void Initialize()
+  {
+    this.initData = GameSection.GetEventData() as Reel.InitData;
+    this.recvData = new Reel.RecvData[this.initData.digit.Length];
+    for (int index = 0; index < this.recvData.Length; ++index)
+    {
+      this.recvData[index] = new Reel.RecvData();
+      Reel.RecvData recvData = this.recvData[index];
+      recvData.digit = this.initData.digit[index];
+      recvData.selectValue = 0;
+      recvData.ancer = 0;
+    }
+    base.Initialize();
+  }
 
-		public int initValue;
+  public override void UpdateUI()
+  {
+    int width1 = this.GetWidth((Enum) Reel.UI.OBJ_REEL_SIZE_BASE);
+    int digits = 0;
+    Array.ForEach<int>(this.initData.digit, (Action<int>) (data => digits += data > 0 ? data : 1));
+    int reel_list_width_base = width1 / digits;
+    this.SetTable((Enum) Reel.UI.TBL_REEL, "ReelList", this.initData.digit.Length, false, (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+    {
+      if (this.initData.digit[i] <= 0)
+      {
+        this.SetActive(t, false);
+      }
+      else
+      {
+        this.SetActive(t, true);
+        float width = (float) (reel_list_width_base * this.initData.digit[i]);
+        this.SetWidth(t, (int) width);
+        UIScrollView component = this.GetComponent<UIScrollView>(t, (Enum) Reel.UI.SCR_LIST);
+        Vector4 baseClipRegion = component.panel.baseClipRegion;
+        baseClipRegion.z = width;
+        component.panel.baseClipRegion = baseClipRegion;
+        this.GetComponent<UIGrid>(t, (Enum) Reel.UI.GRD_REEL_LIST).cellWidth = (float) reel_list_width_base;
+        this.SetGrid(t, (Enum) Reel.UI.GRD_REEL_LIST, "ReelListItem", 10, false, (Action<int, Transform, bool>) ((i2, t2, is_recycle2) =>
+        {
+          this.GetComponent<UIGrid>(t2, (Enum) Reel.UI.GRD_REEL_LIST_ITEM).cellWidth = (float) reel_list_width_base;
+          this.SetWidth(t2, (int) width);
+          this.SetGrid(t2, (Enum) Reel.UI.GRD_REEL_LIST_ITEM, "ReelListText", this.initData.digit[i], false, (Action<int, Transform, bool>) ((i3, t3, is_recycle3) =>
+          {
+            int num = i3 == 0 ? i2 : 0;
+            this.SetLabelText(t3, num.ToString());
+            this.SetWidth(t3, (int) width);
+          }));
+        }));
+        int num = digits;
+        int index1 = 0;
+        for (int index2 = i; index1 < index2; ++index1)
+          num -= this.initData.digit[index1];
+        int index3 = this.initData.initValue / (int) Mathf.Pow(10f, (float) (num - 1)) % 10;
+        this.SetCenter(t, (Enum) Reel.UI.GRD_REEL_LIST, index3, true);
+        this.SetCenterOnChildFunc(t, (Enum) Reel.UI.GRD_REEL_LIST, new UICenterOnChild.OnCenterCallback(this.OnCenter));
+      }
+    }));
+  }
 
-		public Action<RecvData[]> callback;
+  public void OnCenter(GameObject go)
+  {
+    int result1 = 0;
+    if (!int.TryParse(((Object) go).name, out result1))
+      return;
+    int result2 = 0;
+    if (!int.TryParse(((Object) go.transform.parent.parent.parent).name, out result2) || result2 >= this.recvData.Length)
+      return;
+    int digits = 0;
+    Array.ForEach<int>(this.initData.digit, (Action<int>) (data => digits += data > 0 ? data : 1));
+    int num = digits;
+    int index1 = 0;
+    for (int index2 = result2; index1 < index2; ++index1)
+      num -= this.initData.digit[index1];
+    this.recvData[result2].selectValue = result1;
+    this.recvData[result2].ancer = result1 * (int) Mathf.Pow(10f, (float) (num - 1));
+  }
 
-		public InitData(int[] _digit, int _init_value = 0, Action<RecvData[]> _callback = null)
-		{
-			digit = _digit;
-			initValue = _init_value;
-			callback = _callback;
-		}
-	}
+  public void OnQuery_DECISION()
+  {
+    if (this.initData.callback == null)
+      return;
+    this.initData.callback(this.recvData);
+  }
 
-	public class RecvData
-	{
-		public int digit;
+  private enum UI
+  {
+    TBL_REEL,
+    OBJ_REEL_SIZE_BASE,
+    GRD_REEL_LIST,
+    SCR_LIST,
+    GRD_REEL_LIST_ITEM,
+  }
 
-		public int selectValue;
+  public class InitData
+  {
+    public int[] digit;
+    public int initValue;
+    public Action<Reel.RecvData[]> callback;
 
-		public int ancer;
-	}
+    public InitData(int[] _digit, int _init_value = 0, Action<Reel.RecvData[]> _callback = null)
+    {
+      this.digit = _digit;
+      this.initValue = _init_value;
+      this.callback = _callback;
+    }
+  }
 
-	private InitData initData;
-
-	private RecvData[] recvData;
-
-	public override void Initialize()
-	{
-		initData = (GameSection.GetEventData() as InitData);
-		this.recvData = new RecvData[initData.digit.Length];
-		for (int i = 0; i < this.recvData.Length; i++)
-		{
-			this.recvData[i] = new RecvData();
-			RecvData recvData = this.recvData[i];
-			recvData.digit = initData.digit[i];
-			recvData.selectValue = 0;
-			recvData.ancer = 0;
-		}
-		base.Initialize();
-	}
-
-	public override void UpdateUI()
-	{
-		int width = GetWidth(UI.OBJ_REEL_SIZE_BASE);
-		int digits = 0;
-		Array.ForEach(initData.digit, delegate(int data)
-		{
-			digits += ((data <= 0) ? 1 : data);
-		});
-		int reel_list_width_base = width / digits;
-		SetTable(UI.TBL_REEL, "ReelList", initData.digit.Length, false, delegate(int i, Transform t, bool is_recycle)
-		{
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			if (initData.digit[i] <= 0)
-			{
-				SetActive(t, false);
-			}
-			else
-			{
-				SetActive(t, true);
-				float width2 = (float)(reel_list_width_base * initData.digit[i]);
-				SetWidth(t, (int)width2);
-				UIScrollView component = base.GetComponent<UIScrollView>(t, (Enum)UI.SCR_LIST);
-				Vector4 baseClipRegion = component.panel.baseClipRegion;
-				baseClipRegion.z = width2;
-				component.panel.baseClipRegion = baseClipRegion;
-				base.GetComponent<UIGrid>(t, (Enum)UI.GRD_REEL_LIST).cellWidth = (float)reel_list_width_base;
-				SetGrid(t, UI.GRD_REEL_LIST, "ReelListItem", 10, false, delegate(int i2, Transform t2, bool is_recycle2)
-				{
-					base.GetComponent<UIGrid>(t2, (Enum)UI.GRD_REEL_LIST_ITEM).cellWidth = (float)reel_list_width_base;
-					SetWidth(t2, (int)width2);
-					SetGrid(t2, UI.GRD_REEL_LIST_ITEM, "ReelListText", initData.digit[i], false, delegate(int i3, Transform t3, bool is_recycle3)
-					{
-						int num3 = (i3 == 0) ? i2 : 0;
-						SetLabelText(t3, num3.ToString());
-						SetWidth(t3, (int)width2);
-					});
-				});
-				int num = digits;
-				int j = 0;
-				for (int num2 = i; j < num2; j++)
-				{
-					num -= initData.digit[j];
-				}
-				int index = initData.initValue / (int)Mathf.Pow(10f, (float)(num - 1)) % 10;
-				SetCenter(t, UI.GRD_REEL_LIST, index, true);
-				SetCenterOnChildFunc(t, UI.GRD_REEL_LIST, OnCenter);
-			}
-		});
-	}
-
-	public void OnCenter(GameObject go)
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		int result = 0;
-		if (int.TryParse(go.get_name(), out result))
-		{
-			int result2 = 0;
-			if (int.TryParse(go.get_transform().get_parent().get_parent()
-				.get_parent()
-				.get_name(), out result2) && result2 < recvData.Length)
-			{
-				int digits = 0;
-				Array.ForEach(initData.digit, delegate(int data)
-				{
-					digits += ((data <= 0) ? 1 : data);
-				});
-				int num = digits;
-				int i = 0;
-				for (int num2 = result2; i < num2; i++)
-				{
-					num -= initData.digit[i];
-				}
-				recvData[result2].selectValue = result;
-				recvData[result2].ancer = result * (int)Mathf.Pow(10f, (float)(num - 1));
-			}
-		}
-	}
-
-	public void OnQuery_DECISION()
-	{
-		if (initData.callback != null)
-		{
-			initData.callback(recvData);
-		}
-	}
+  public class RecvData
+  {
+    public int digit;
+    public int selectValue;
+    public int ancer;
+  }
 }

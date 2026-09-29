@@ -1,53 +1,42 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: CoopClientPacketReceiver
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using UnityEngine;
+
+#nullable disable
 public class CoopClientPacketReceiver : PacketReceiver
 {
-	private CoopClient coopClient
-	{
-		get;
-		set;
-	}
+  private CoopClient coopClient { get; set; }
 
-	protected virtual void Awake()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		coopClient = this.get_gameObject().GetComponent<CoopClient>();
-	}
+  protected virtual void Awake()
+  {
+    this.coopClient = ((Component) this).gameObject.GetComponent<CoopClient>();
+  }
 
-	protected override bool HandleCoopEvent(CoopPacket packet)
-	{
-		bool result = false;
-		switch (packet.packetType)
-		{
-		case PACKET_TYPE.CLIENT_STATUS:
-		{
-			Coop_Model_ClientStatus model5 = packet.GetModel<Coop_Model_ClientStatus>();
-			result = coopClient.OnRecvClientStatus(model5, packet);
-			break;
-		}
-		case PACKET_TYPE.CLIENT_LOADING_PROGRESS:
-		{
-			Coop_Model_ClientLoadingProgress model4 = packet.GetModel<Coop_Model_ClientLoadingProgress>();
-			result = coopClient.OnRecvClientLoadingProgress(model4);
-			break;
-		}
-		case PACKET_TYPE.CLIENT_CHANGE_EQUIP:
-		{
-			Coop_Model_ClientChangeEquip model3 = packet.GetModel<Coop_Model_ClientChangeEquip>();
-			result = coopClient.OnRecvClientChangeEquip(model3);
-			break;
-		}
-		case PACKET_TYPE.CLIENT_BATTLE_RETIRE:
-		{
-			Coop_Model_ClientBattleRetire model2 = packet.GetModel<Coop_Model_ClientBattleRetire>();
-			result = coopClient.OnRecvClientBattleRetire(model2);
-			break;
-		}
-		case PACKET_TYPE.CLIENT_SERIES_PROGRESS:
-		{
-			Coop_Model_ClientSeriesProgress model = packet.GetModel<Coop_Model_ClientSeriesProgress>();
-			result = coopClient.OnRecvClientSeriesProgress(model);
-			break;
-		}
-		}
-		return result;
-	}
+  protected override bool HandleCoopEvent(CoopPacket packet)
+  {
+    bool flag = false;
+    switch (packet.packetType)
+    {
+      case PACKET_TYPE.CLIENT_STATUS:
+        flag = this.coopClient.OnRecvClientStatus(packet.GetModel<Coop_Model_ClientStatus>(), packet);
+        break;
+      case PACKET_TYPE.CLIENT_LOADING_PROGRESS:
+        flag = this.coopClient.OnRecvClientLoadingProgress(packet.GetModel<Coop_Model_ClientLoadingProgress>());
+        break;
+      case PACKET_TYPE.CLIENT_CHANGE_EQUIP:
+        flag = this.coopClient.OnRecvClientChangeEquip(packet.GetModel<Coop_Model_ClientChangeEquip>());
+        break;
+      case PACKET_TYPE.CLIENT_BATTLE_RETIRE:
+        flag = this.coopClient.OnRecvClientBattleRetire(packet.GetModel<Coop_Model_ClientBattleRetire>());
+        break;
+      case PACKET_TYPE.CLIENT_SERIES_PROGRESS:
+        flag = this.coopClient.OnRecvClientSeriesProgress(packet.GetModel<Coop_Model_ClientSeriesProgress>());
+        break;
+    }
+    return flag;
+  }
 }

@@ -1,190 +1,120 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: CharacterStampCtrl
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using rhyme;
+using System;
 using UnityEngine;
 
-public class CharacterStampCtrl
+#nullable disable
+public class CharacterStampCtrl : MonoBehaviour
 {
-	private bool isPlayer;
+  private bool isPlayer;
+  private bool isSelf;
+  public StageObject.StampInfo[] stampInfos;
+  public bool enableAutoStampEffect = true;
+  public float stampDistance = 5f;
+  public int effectLayer = -1;
 
-	private bool isSelf;
+  public Transform _transform { get; private set; }
 
-	public StageObject.StampInfo[] stampInfos;
+  public Character owner { get; private set; }
 
-	public bool enableAutoStampEffect = true;
+  public bool isDirection { get; protected set; }
 
-	public float stampDistance = 5f;
+  public StampNode[] stampNodes { get; set; }
 
-	public int effectLayer = -1;
+  public void Init(StageObject.StampInfo[] stamp_nodes, Character _owner, bool is_direction = false)
+  {
+    this.stampInfos = stamp_nodes;
+    this.isDirection = is_direction;
+    this._transform = ((Component) this).transform;
+    this.owner = _owner;
+    this.isPlayer = _owner is Player;
+    this.isSelf = _owner is Self;
+    this.enableAutoStampEffect = true;
+    this.stampNodes = ((Component) this).gameObject.GetComponentsInChildren<StampNode>();
+  }
 
-	public Transform _transform
-	{
-		get;
-		private set;
-	}
+  private void Update()
+  {
+    if (!this.isDirection && MonoBehaviourSingleton<InGameManager>.I.graphicOptionType <= 0 || !this.isDirection && MonoBehaviourSingleton<InGameManager>.I.graphicOptionType <= 1 && FieldManager.IsValidInGameNoQuest() && this.isPlayer && !this.isSelf)
+      return;
+    bool flag = false;
+    if (this.isDirection || MonoBehaviourSingleton<InGameManager>.I.graphicOptionType >= 2)
+      flag = true;
+    if (this.stampNodes == null || this.stampNodes.Length == 0 || this.stampInfos == null || this.stampInfos.Length == 0 || !flag && !this.CheckDistance())
+      return;
+    float y = this._transform.position.y;
+    int index = 0;
+    for (int length = this.stampNodes.Length; index < length; ++index)
+    {
+      StampNode stampNode = this.stampNodes[index];
+      if (stampNode.UpdateStamp(y) && this.enableAutoStampEffect)
+        this.PlayStampEffect(!Object.op_Inequality((Object) this.owner, (Object) null) ? this.stampInfos[0] : (this.owner.actionID != Character.ACTION_ID.ATTACK || this.stampInfos.Length < 2 ? this.stampInfos[0] : this.stampInfos[1]), stampNode);
+    }
+  }
 
-	public Character owner
-	{
-		get;
-		private set;
-	}
+  public bool OnAnimEvent(AnimEventData.EventData data)
+  {
+    switch (data.id)
+    {
+      case AnimEventFormat.ID.STAMP:
+        if (!this.CheckDistance())
+          return true;
+        int intArg = data.intArgs[0];
+        if (this.stampInfos == null || this.stampNodes == null)
+          return true;
+        int index1 = 0;
+        for (int length1 = this.stampNodes.Length; index1 < length1; ++index1)
+        {
+          StampNode stampNode = this.stampNodes[index1];
+          int index2 = 0;
+          for (int length2 = stampNode.triggers.Length; index2 < length2; ++index2)
+          {
+            StampNode.StampTrigger trigger = stampNode.triggers[index2];
+            if (trigger.eventID == intArg)
+            {
+              this.PlayStampEffect(this.stampInfos[trigger.StampInfoID], stampNode);
+              break;
+            }
+          }
+        }
+        return true;
+      case AnimEventFormat.ID.AUTO_STAMP_ON:
+        this.enableAutoStampEffect = true;
+        return true;
+      case AnimEventFormat.ID.AUTO_STAMP_OFF:
+        this.enableAutoStampEffect = false;
+        return true;
+      default:
+        return false;
+    }
+  }
 
-	public bool isDirection
-	{
-		get;
-		protected set;
-	}
+  protected void PlayStampEffect(StageObject.StampInfo stamp_info, StampNode stamp_node)
+  {
+    Vector3 pos = StageManager.FitHeight(Vector3.op_Addition(stamp_node._transform.position, Quaternion.op_Multiply(stamp_node._transform.rotation, stamp_node.scaledeOffset)));
+    string effectName = stamp_info.effectName;
+    if (!string.IsNullOrEmpty(effectName))
+      EffectManager.OneShot(effectName, pos, this._transform.rotation, Vector3.op_Multiply(this._transform.localScale, stamp_info.effectScale), this.isSelf, (Action<Transform>) (effect =>
+      {
+        SceneSettingsManager.ApplyEffect(((Component) effect).gameObject.GetComponent<rymFX>(), true);
+        if (this.effectLayer == -1)
+          return;
+        Utility.SetLayerWithChildren(effect, this.effectLayer);
+      }));
+    if ((double) stamp_info.shakeCameraPercent > 0.0 && MonoBehaviourSingleton<InGameCameraManager>.IsValid())
+      MonoBehaviourSingleton<InGameCameraManager>.I.SetShakeCamera(pos, stamp_info.shakeCameraPercent, stamp_info.shakeCycleTime);
+    if (stamp_info.seID == 0)
+      return;
+    SoundManager.PlayOneShotSE(stamp_info.seID, pos);
+  }
 
-	public StampNode[] stampNodes
-	{
-		get;
-		set;
-	}
-
-	public CharacterStampCtrl()
-		: this()
-	{
-	}
-
-	public void Init(StageObject.StampInfo[] stamp_nodes, Character _owner, bool is_direction = false)
-	{
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0015: Expected O, but got Unknown
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		stampInfos = stamp_nodes;
-		isDirection = is_direction;
-		_transform = this.get_transform();
-		owner = _owner;
-		isPlayer = (_owner is Player);
-		isSelf = (_owner is Self);
-		enableAutoStampEffect = true;
-		stampNodes = this.get_gameObject().GetComponentsInChildren<StampNode>();
-	}
-
-	private void Update()
-	{
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		if ((isDirection || MonoBehaviourSingleton<InGameManager>.I.graphicOptionType > 0) && (isDirection || MonoBehaviourSingleton<InGameManager>.I.graphicOptionType > 1 || !FieldManager.IsValidInGameNoQuest() || !isPlayer || isSelf))
-		{
-			bool flag = false;
-			if (isDirection || MonoBehaviourSingleton<InGameManager>.I.graphicOptionType >= 2)
-			{
-				flag = true;
-			}
-			if (stampNodes != null && stampNodes.Length > 0 && stampInfos != null && stampInfos.Length > 0 && (flag || CheckDistance()))
-			{
-				Vector3 position = _transform.get_position();
-				float y = position.y;
-				int i = 0;
-				for (int num = stampNodes.Length; i < num; i++)
-				{
-					StampNode stampNode = stampNodes[i];
-					if (stampNode.UpdateStamp(y) && enableAutoStampEffect)
-					{
-						StageObject.StampInfo stamp_info = (!(owner != null)) ? stampInfos[0] : ((owner.actionID != Character.ACTION_ID.ATTACK || stampInfos.Length < 2) ? stampInfos[0] : stampInfos[1]);
-						PlayStampEffect(stamp_info, stampNode);
-					}
-				}
-			}
-		}
-	}
-
-	public bool OnAnimEvent(AnimEventData.EventData data)
-	{
-		switch (data.id)
-		{
-		case AnimEventFormat.ID.STAMP:
-		{
-			if (!CheckDistance())
-			{
-				return true;
-			}
-			int num = data.intArgs[0];
-			if (stampInfos == null || stampNodes == null)
-			{
-				return true;
-			}
-			int i = 0;
-			for (int num2 = stampNodes.Length; i < num2; i++)
-			{
-				StampNode stampNode = stampNodes[i];
-				int j = 0;
-				for (int num3 = stampNode.triggers.Length; j < num3; j++)
-				{
-					StampNode.StampTrigger stampTrigger = stampNode.triggers[j];
-					if (stampTrigger.eventID == num)
-					{
-						StageObject.StampInfo stamp_info = stampInfos[stampTrigger.StampInfoID];
-						PlayStampEffect(stamp_info, stampNode);
-						break;
-					}
-				}
-			}
-			return true;
-		}
-		case AnimEventFormat.ID.AUTO_STAMP_ON:
-			enableAutoStampEffect = true;
-			return true;
-		case AnimEventFormat.ID.AUTO_STAMP_OFF:
-			enableAutoStampEffect = false;
-			return true;
-		default:
-			return false;
-		}
-	}
-
-	protected void PlayStampEffect(StageObject.StampInfo stamp_info, StampNode stamp_node)
-	{
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 position = stamp_node._transform.get_position();
-		position += stamp_node._transform.get_rotation() * stamp_node.scaledeOffset;
-		position = StageManager.FitHeight(position);
-		string effectName = stamp_info.effectName;
-		if (!string.IsNullOrEmpty(effectName))
-		{
-			EffectManager.OneShot(effectName, position, _transform.get_rotation(), _transform.get_localScale() * stamp_info.effectScale, isSelf, delegate(Transform effect)
-			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				SceneSettingsManager.ApplyEffect(effect.get_gameObject().GetComponent<rymFX>(), true);
-				if (effectLayer != -1)
-				{
-					Utility.SetLayerWithChildren(effect, effectLayer);
-				}
-			});
-		}
-		if (stamp_info.shakeCameraPercent > 0f && MonoBehaviourSingleton<InGameCameraManager>.IsValid())
-		{
-			MonoBehaviourSingleton<InGameCameraManager>.I.SetShakeCamera(position, stamp_info.shakeCameraPercent, stamp_info.shakeCycleTime);
-		}
-		if (stamp_info.seID != 0)
-		{
-			SoundManager.PlayOneShotSE(stamp_info.seID, position);
-		}
-	}
-
-	private bool CheckDistance()
-	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		if (!MonoBehaviourSingleton<InGameCameraManager>.IsValid())
-		{
-			return true;
-		}
-		return Vector3.Distance(MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.get_position(), _transform.get_position()) < stampDistance;
-	}
+  private bool CheckDistance()
+  {
+    return !MonoBehaviourSingleton<InGameCameraManager>.IsValid() || (double) Vector3.Distance(MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform.position, this._transform.position) < (double) this.stampDistance;
+  }
 }

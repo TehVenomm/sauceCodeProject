@@ -1,47 +1,43 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: HomeIAPPopAd
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class HomeIAPPopAd : GameSection
 {
-	protected enum UI
-	{
-		OBJ_FRAME,
-		TEX_MAIN
-	}
+  private string productId = "";
 
-	private string productId = string.Empty;
+  public override void Initialize()
+  {
+    this.productId = GameSection.GetEventData() as string;
+    this.StartCoroutine(this.DoInitialize());
+  }
 
-	public override void Initialize()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		productId = (GameSection.GetEventData() as string);
-		this.StartCoroutine(DoInitialize());
-	}
+  private IEnumerator DoInitialize()
+  {
+    ProductDataTable.PackInfo pack = Singleton<ProductDataTable>.I.GetPack(this.productId);
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject loTex = loadingQueue.Load(RESOURCE_CATEGORY.GACHA_POP_UP_ADVERTISEMENT, pack.popupAdsBanner);
+    if (loadingQueue.IsLoading())
+      yield return (object) loadingQueue.Wait();
+    if (Object.op_Inequality(loTex.loadedObject, (Object) null))
+      this.SetTexture((Enum) HomeIAPPopAd.UI.TEX_MAIN, loTex.loadedObject as Texture);
+    base.Initialize();
+  }
 
-	private IEnumerator DoInitialize()
-	{
-		GlobalSettingsManager.PackParam.PackInfo pack_info = MonoBehaviourSingleton<GlobalSettingsManager>.I.packParam.GetPack(productId);
-		LoadingQueue loadQueue = new LoadingQueue(this);
-		LoadObject loTex = loadQueue.Load(RESOURCE_CATEGORY.GACHA_POP_UP_ADVERTISEMENT, pack_info.popupAdsBanner, false);
-		if (loadQueue.IsLoading())
-		{
-			yield return (object)loadQueue.Wait();
-		}
-		if (loTex.loadedObject != null)
-		{
-			SetTexture((Enum)UI.TEX_MAIN, loTex.loadedObject as Texture);
-		}
-		base.Initialize();
-	}
+  public override void UpdateUI() => base.UpdateUI();
 
-	public override void UpdateUI()
-	{
-		base.UpdateUI();
-	}
+  private void OnQuery_OK() => this.DispatchEvent("CRYSTAL_SHOP", (object) this.productId);
 
-	private void OnQuery_OK()
-	{
-		DispatchEvent("CRYSTAL_SHOP", productId);
-	}
+  protected enum UI
+  {
+    OBJ_FRAME,
+    TEX_MAIN,
+  }
 }

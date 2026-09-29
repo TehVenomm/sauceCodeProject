@@ -1,91 +1,75 @@
-using System;
+﻿// Decompiled with JetBrains decompiler
+// Type: UIInGameSelfAnnounce
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIInGameSelfAnnounce
+#nullable disable
+public class UIInGameSelfAnnounce : MonoBehaviour
 {
-	[SerializeField]
-	protected UITweenCtrl tweenCtrl;
+  [SerializeField]
+  protected UITweenCtrl tweenCtrl;
+  [SerializeField]
+  protected UIStaticPanelChanger panelChange;
+  [SerializeField]
+  protected float lockInterval;
+  [SerializeField]
+  protected List<GameObject> visibleTargets;
+  private bool isUnLock;
+  private bool isLockReq;
+  private float lockTimer;
 
-	[SerializeField]
-	protected UIStaticPanelChanger panelChange;
+  private void Awake() => this.SetVisible(false);
 
-	[SerializeField]
-	protected float lockInterval;
+  public void Play(System.Action callback = null)
+  {
+    if (Object.op_Equality((Object) this.tweenCtrl, (Object) null))
+      return;
+    this.SetVisible(true);
+    this.tweenCtrl.Reset();
+    this.tweenCtrl.Play(onFinished: (EventDelegate.Callback) (() =>
+    {
+      this.isLockReq = true;
+      this.lockTimer = this.lockInterval;
+      if (callback != null)
+        callback();
+      this.SetVisible(false);
+    }));
+    if (!this.isUnLock)
+    {
+      this.panelChange.UnLock();
+      this.isUnLock = true;
+    }
+    this.isLockReq = false;
+  }
 
-	[SerializeField]
-	protected List<GameObject> visibleTargets;
+  public void Skip()
+  {
+    this.isLockReq = true;
+    this.lockTimer = this.lockInterval;
+    this.tweenCtrl.Skip();
+  }
 
-	private bool isUnLock;
+  private void LateUpdate()
+  {
+    if (!this.isLockReq)
+      return;
+    this.lockTimer -= Time.deltaTime;
+    if ((double) this.lockTimer > 0.0)
+      return;
+    this.panelChange.Lock();
+    this.isLockReq = false;
+    this.isUnLock = false;
+  }
 
-	private bool isLockReq;
-
-	private float lockTimer;
-
-	public UIInGameSelfAnnounce()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		SetVisible(false);
-	}
-
-	public void Play(Action callback = null)
-	{
-		if (!(tweenCtrl == null))
-		{
-			SetVisible(true);
-			tweenCtrl.Reset();
-			tweenCtrl.Play(true, delegate
-			{
-				isLockReq = true;
-				lockTimer = lockInterval;
-				if (callback != null)
-				{
-					callback();
-				}
-				SetVisible(false);
-			});
-			if (!isUnLock)
-			{
-				panelChange.UnLock();
-				isUnLock = true;
-			}
-			isLockReq = false;
-		}
-	}
-
-	public void Skip()
-	{
-		isLockReq = true;
-		lockTimer = lockInterval;
-		tweenCtrl.Skip(true);
-	}
-
-	private void LateUpdate()
-	{
-		if (isLockReq)
-		{
-			lockTimer -= Time.get_deltaTime();
-			if (!(lockTimer > 0f))
-			{
-				panelChange.Lock();
-				isLockReq = false;
-				isUnLock = false;
-			}
-		}
-	}
-
-	private void SetVisible(bool isVisible)
-	{
-		if (!object.ReferenceEquals(visibleTargets, null) && visibleTargets.Count != 0)
-		{
-			for (int i = 0; i < visibleTargets.Count; i++)
-			{
-				visibleTargets[i].SetActive(isVisible);
-			}
-		}
-	}
+  private void SetVisible(bool isVisible)
+  {
+    if (this.visibleTargets == null || this.visibleTargets.Count == 0)
+      return;
+    for (int index = 0; index < this.visibleTargets.Count; ++index)
+      this.visibleTargets[index].SetActive(isVisible);
+  }
 }

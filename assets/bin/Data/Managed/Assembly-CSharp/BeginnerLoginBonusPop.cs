@@ -1,153 +1,125 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: BeginnerLoginBonusPop
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class BeginnerLoginBonusPop : GameSection
 {
-	private enum UI
-	{
-		OBJ_IMG_ROOT,
-		TEX,
-		BTN_SKIP_FULL_SCREEN
-	}
+  private const string POP_IMAGE_NAME = "BLBP";
+  private LoadingQueue loadQueue;
+  private BeginnerLoginBonusPop.State currentState;
+  private bool stateInitialized;
+  private float showTimer;
+  private bool skipRequest;
 
-	private enum AUDIO
-	{
-		START = 40000388
-	}
+  public override void Initialize()
+  {
+    this.SetFullScreenButton((Enum) BeginnerLoginBonusPop.UI.BTN_SKIP_FULL_SCREEN);
+    this.InitTween((Enum) BeginnerLoginBonusPop.UI.OBJ_IMG_ROOT);
+    this.StartCoroutine(this.DoInitialize());
+  }
 
-	private enum State
-	{
-		START,
-		SHOW,
-		END
-	}
+  private IEnumerator DoInitialize()
+  {
+    if (this.loadQueue == null)
+      this.loadQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject lo_image = this.loadQueue.Load(RESOURCE_CATEGORY.LOGINBONUS_IMAGE, "BLBP");
+    if (this.loadQueue.IsLoading())
+      yield return (object) this.loadQueue.Wait();
+    if (Object.op_Equality(lo_image.loadedObject, (Object) null))
+      yield return (object) null;
+    ((Component) this.GetCtrl((Enum) BeginnerLoginBonusPop.UI.TEX)).GetComponent<UITexture>().mainTexture = lo_image.loadedObject as Texture;
+    base.Initialize();
+  }
 
-	private const string POP_IMAGE_NAME = "BLBP";
+  private void Update()
+  {
+    if (this.stateInitialized)
+      return;
+    switch (this.currentState)
+    {
+      case BeginnerLoginBonusPop.State.START:
+        this.StartCoroutine(this.StartAnimation());
+        this.stateInitialized = true;
+        break;
+      case BeginnerLoginBonusPop.State.SHOW:
+        this.showTimer = 0.0f;
+        this.StartCoroutine(this.ShowCountdown());
+        this.stateInitialized = true;
+        break;
+      case BeginnerLoginBonusPop.State.END:
+        this.StartCoroutine(this.EndAnimation());
+        this.stateInitialized = true;
+        break;
+    }
+  }
 
-	private LoadingQueue loadQueue;
+  private void ChangeState(BeginnerLoginBonusPop.State nextState)
+  {
+    this.stateInitialized = false;
+    this.currentState = nextState;
+  }
 
-	private State currentState;
+  private IEnumerator StartAnimation()
+  {
+    this.SetActive((Enum) BeginnerLoginBonusPop.UI.BTN_SKIP_FULL_SCREEN, false);
+    bool wait = true;
+    this.PlayAudio((Enum) BeginnerLoginBonusPop.AUDIO.START, 1.3f);
+    this.PlayTween((Enum) BeginnerLoginBonusPop.UI.OBJ_IMG_ROOT, callback: (EventDelegate.Callback) (() => wait = false));
+    while (wait)
+      yield return (object) 0;
+    this.ChangeState(BeginnerLoginBonusPop.State.SHOW);
+  }
 
-	private bool stateInitialized;
+  private IEnumerator ShowCountdown()
+  {
+    bool wait = true;
+    Transform skip = this.GetCtrl((Enum) BeginnerLoginBonusPop.UI.BTN_SKIP_FULL_SCREEN);
+    while (wait)
+    {
+      this.showTimer += Time.deltaTime;
+      if (1.2000000476837158 < (double) this.showTimer && !((Component) skip).gameObject.activeSelf)
+        this.SetActive((Enum) BeginnerLoginBonusPop.UI.BTN_SKIP_FULL_SCREEN, true);
+      if (this.skipRequest && 1.2000000476837158 < (double) this.showTimer)
+        wait = false;
+      yield return (object) 0;
+    }
+    this.ChangeState(BeginnerLoginBonusPop.State.END);
+  }
 
-	private float showTimer;
+  private IEnumerator EndAnimation()
+  {
+    bool wait = true;
+    this.PlayTween((Enum) BeginnerLoginBonusPop.UI.OBJ_IMG_ROOT, false, (EventDelegate.Callback) (() => wait = false));
+    while (wait)
+      yield return (object) 0;
+    GameSection.BackSection();
+  }
 
-	private bool skipRequest;
+  private void OnQuery_SKIP() => this.skipRequest = true;
 
-	public override void Initialize()
-	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		SetFullScreenButton((Enum)UI.BTN_SKIP_FULL_SCREEN);
-		InitTween((Enum)UI.OBJ_IMG_ROOT);
-		this.StartCoroutine(DoInitialize());
-	}
+  private enum UI
+  {
+    OBJ_IMG_ROOT,
+    TEX,
+    BTN_SKIP_FULL_SCREEN,
+  }
 
-	private IEnumerator DoInitialize()
-	{
-		if (loadQueue == null)
-		{
-			loadQueue = new LoadingQueue(this);
-		}
-		LoadObject lo_image = loadQueue.Load(RESOURCE_CATEGORY.LOGINBONUS_IMAGE, "BLBP", false);
-		if (loadQueue.IsLoading())
-		{
-			yield return (object)loadQueue.Wait();
-		}
-		if (lo_image.loadedObject == null)
-		{
-			yield return (object)null;
-		}
-		Transform texture = GetCtrl(UI.TEX);
-		UITexture uiTexture = texture.GetComponent<UITexture>();
-		Texture image = uiTexture.mainTexture = (lo_image.loadedObject as Texture);
-		base.Initialize();
-	}
+  private enum AUDIO
+  {
+    START = 40000388, // 0x02625B84
+  }
 
-	private void Update()
-	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		if (!stateInitialized)
-		{
-			switch (currentState)
-			{
-			case State.START:
-				this.StartCoroutine(StartAnimation());
-				stateInitialized = true;
-				break;
-			case State.SHOW:
-				showTimer = 0f;
-				this.StartCoroutine(ShowCountdown());
-				stateInitialized = true;
-				break;
-			case State.END:
-				this.StartCoroutine(EndAnimation());
-				stateInitialized = true;
-				break;
-			}
-		}
-	}
-
-	private void ChangeState(State nextState)
-	{
-		stateInitialized = false;
-		currentState = nextState;
-	}
-
-	private IEnumerator StartAnimation()
-	{
-		SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, false);
-		bool wait = true;
-		PlayAudio(AUDIO.START, 1.3f, false);
-		PlayTween((Enum)UI.OBJ_IMG_ROOT, true, (EventDelegate.Callback)delegate
-		{
-			((_003CStartAnimation_003Ec__Iterator74)/*Error near IL_0062: stateMachine*/)._003Cwait_003E__0 = false;
-		}, true, 0);
-		while (wait)
-		{
-			yield return (object)0;
-		}
-		ChangeState(State.SHOW);
-	}
-
-	private IEnumerator ShowCountdown()
-	{
-		bool wait = true;
-		Transform skip = GetCtrl(UI.BTN_SKIP_FULL_SCREEN);
-		while (wait)
-		{
-			showTimer += Time.get_deltaTime();
-			if (1.2f < showTimer && !skip.get_gameObject().get_activeSelf())
-			{
-				SetActive((Enum)UI.BTN_SKIP_FULL_SCREEN, true);
-			}
-			if (skipRequest && 1.2f < showTimer)
-			{
-				wait = false;
-			}
-			yield return (object)0;
-		}
-		ChangeState(State.END);
-	}
-
-	private IEnumerator EndAnimation()
-	{
-		bool wait = true;
-		PlayTween((Enum)UI.OBJ_IMG_ROOT, false, (EventDelegate.Callback)delegate
-		{
-			((_003CEndAnimation_003Ec__Iterator76)/*Error near IL_0035: stateMachine*/)._003Cwait_003E__0 = false;
-		}, true, 0);
-		while (wait)
-		{
-			yield return (object)0;
-		}
-		GameSection.BackSection();
-	}
-
-	private void OnQuery_SKIP()
-	{
-		skipRequest = true;
-	}
+  private enum State
+  {
+    START,
+    SHOW,
+    END,
+  }
 }

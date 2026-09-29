@@ -1,24 +1,22 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SmithCreatePerformance
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class SmithCreatePerformance : SmithPerformanceBase
 {
-	public override void Initialize()
-	{
-		base.Initialize();
-	}
+  public override void Initialize() => base.Initialize();
 
-	protected override void OnOpen()
-	{
-		director.Reset();
-		director.StartCreate(OnEndDirection);
-		base.OnOpen();
-	}
+  protected override void OnOpen()
+  {
+    this.director.Reset();
+    this.director.StartCreate(new System.Action(((SmithPerformanceBase) this).OnEndDirection));
+    base.OnOpen();
+  }
 
-	public override void UpdateUI()
-	{
-		base.UpdateUI();
-	}
+  public override void UpdateUI() => base.UpdateUI();
 
-	protected override void OnClose()
-	{
-		base.OnClose();
-	}
+  protected override void OnClose() => base.OnClose();
 }

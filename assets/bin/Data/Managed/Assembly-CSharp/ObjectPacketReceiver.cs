@@ -1,268 +1,235 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ObjectPacketReceiver
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class ObjectPacketReceiver : PacketReceiver
 {
-	public enum FILTER_MODE
-	{
-		NONE,
-		WAIT_INITIALIZE
-	}
+  private static List<bool> forceFlags;
 
-	private static List<bool> forceFlags;
+  public StageObject owner { get; protected set; }
 
-	public StageObject owner
-	{
-		get;
-		protected set;
-	}
+  public ObjectPacketReceiver.FILTER_MODE filterMode { get; protected set; }
 
-	public FILTER_MODE filterMode
-	{
-		get;
-		protected set;
-	}
+  public static ObjectPacketReceiver SetupComponent(StageObject set_object)
+  {
+    switch (set_object)
+    {
+      case Enemy _:
+        return (ObjectPacketReceiver) ((Component) set_object).gameObject.AddComponent<EnemyPacketReceiver>();
+      case Player _:
+        return (ObjectPacketReceiver) ((Component) set_object).gameObject.AddComponent<PlayerPacketReceiver>();
+      case Character _:
+        return (ObjectPacketReceiver) ((Component) set_object).gameObject.AddComponent<CharacterPacketReceiver>();
+      default:
+        return ((Component) set_object).gameObject.AddComponent<ObjectPacketReceiver>();
+    }
+  }
 
-	public static ObjectPacketReceiver SetupComponent(StageObject set_object)
-	{
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		if (set_object is Enemy)
-		{
-			return set_object.get_gameObject().AddComponent<EnemyPacketReceiver>();
-		}
-		if (set_object is Player)
-		{
-			return set_object.get_gameObject().AddComponent<PlayerPacketReceiver>();
-		}
-		if (set_object is Character)
-		{
-			return set_object.get_gameObject().AddComponent<CharacterPacketReceiver>();
-		}
-		return set_object.get_gameObject().AddComponent<ObjectPacketReceiver>();
-	}
+  protected virtual void Awake() => this.owner = ((Component) this).GetComponent<StageObject>();
 
-	protected virtual void Awake()
-	{
-		owner = this.GetComponent<StageObject>();
-	}
+  public override void SetStopPacketUpdate(bool is_stop) => base.SetStopPacketUpdate(is_stop);
 
-	public override void SetStopPacketUpdate(bool is_stop)
-	{
-		base.SetStopPacketUpdate(is_stop);
-	}
+  public override void Set(CoopPacket packet)
+  {
+    base.Set(packet);
+    packet.GetModel<Coop_Model_ObjectBase>()?.SetReceiveTime(Time.time);
+  }
 
-	public override void Set(CoopPacket packet)
-	{
-		base.Set(packet);
-		packet.GetModel<Coop_Model_ObjectBase>()?.SetReceiveTime(Time.get_time());
-	}
+  protected override void PacketUpdate()
+  {
+    if (this.stopPacketUpdate)
+      return;
+    if (ObjectPacketReceiver.forceFlags == null)
+    {
+      ObjectPacketReceiver.forceFlags = new List<bool>(this.packets.Count);
+    }
+    else
+    {
+      ObjectPacketReceiver.forceFlags.Clear();
+      if (ObjectPacketReceiver.forceFlags.Capacity < this.packets.Count)
+        ObjectPacketReceiver.forceFlags.Capacity = this.packets.Count;
+    }
+    int index1 = 0;
+    for (int count = this.packets.Count; index1 < count; ++index1)
+    {
+      CoopPacket packet = this.packets[index1];
+      bool flag = false;
+      Coop_Model_ObjectBase model = packet.GetModel<Coop_Model_ObjectBase>();
+      if (model != null)
+        flag = model.IsForceHandleBefore(this.owner);
+      ObjectPacketReceiver.forceFlags.Add(flag);
+    }
+    int index2 = 0;
+    for (int count = this.packets.Count; index2 < count; ++index2)
+    {
+      CoopPacket packet = this.packets[index2];
+      if (!this.CheckFilterPacket(packet))
+      {
+        this.AddDeleteQueue(packet);
+      }
+      else
+      {
+        bool flag1 = true;
+        Coop_Model_ObjectBase model = packet.GetModel<Coop_Model_ObjectBase>();
+        if (model != null)
+        {
+          bool flag2 = false;
+          for (int index3 = index2 + 1; index3 < count; ++index3)
+          {
+            if (ObjectPacketReceiver.forceFlags[index3])
+            {
+              flag2 = true;
+              break;
+            }
+          }
+          if (!flag2)
+          {
+            float num1 = 0.0f;
+            if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
+              num1 = MonoBehaviourSingleton<InGameSettingsManager>.I.stageObject.packetHandleMarginTime;
+            if ((double) Time.time > (double) model.GetReceiveTime() + (double) num1)
+            {
+              flag1 = true;
+              if (!model.IsHandleable(this.owner))
+              {
+                int num2 = -1;
+                Character owner = this.owner as Character;
+                if (Object.op_Inequality((Object) owner, (Object) null))
+                  num2 = (int) owner.actionID;
+                Log.Warning(LOG.COOP, $"ObjectPacketReceiver::PacketUpdate() Err. ( Over packetHandleMarginTime. ) type : {(object) packet.packetType}, action_id : {(object) num2}");
+              }
+            }
+            else
+              flag1 = model.IsHandleable(this.owner);
+          }
+        }
+        if (flag1 && this.HandleCoopEvent(packet))
+        {
+          this.AddDeleteQueue(packet);
+          if (this.stopPacketUpdate)
+            break;
+        }
+        else
+        {
+          if ((double) Time.time > (double) model.GetReceiveTime() + 20.0)
+          {
+            Log.Warning(LOG.COOP, "ObjectPacketReceiver::PacketUpdate() Err. ( Over 20 Second. ) type : " + (object) packet.packetType);
+            break;
+          }
+          break;
+        }
+      }
+    }
+    this.EraseUsedPacket();
+  }
 
-	protected override void PacketUpdate()
-	{
-		if (!base.stopPacketUpdate)
-		{
-			if (forceFlags == null)
-			{
-				forceFlags = new List<bool>(base.packets.Count);
-			}
-			else
-			{
-				forceFlags.Clear();
-				if (forceFlags.Capacity < base.packets.Count)
-				{
-					forceFlags.Capacity = base.packets.Count;
-				}
-			}
-			int i = 0;
-			for (int count = base.packets.Count; i < count; i++)
-			{
-				CoopPacket coopPacket = base.packets[i];
-				bool item = false;
-				Coop_Model_ObjectBase model = coopPacket.GetModel<Coop_Model_ObjectBase>();
-				if (model != null)
-				{
-					item = model.IsForceHandleBefore(owner);
-				}
-				forceFlags.Add(item);
-			}
-			int j = 0;
-			for (int count2 = base.packets.Count; j < count2; j++)
-			{
-				CoopPacket coopPacket2 = base.packets[j];
-				if (!CheckFilterPacket(coopPacket2))
-				{
-					AddDeleteQueue(coopPacket2);
-				}
-				else
-				{
-					bool flag = true;
-					Coop_Model_ObjectBase model2 = coopPacket2.GetModel<Coop_Model_ObjectBase>();
-					if (model2 != null)
-					{
-						bool flag2 = false;
-						for (int k = j + 1; k < count2; k++)
-						{
-							if (forceFlags[k])
-							{
-								flag2 = true;
-								break;
-							}
-						}
-						if (!flag2)
-						{
-							float num = 0f;
-							if (MonoBehaviourSingleton<InGameSettingsManager>.IsValid())
-							{
-								num = MonoBehaviourSingleton<InGameSettingsManager>.I.stageObject.packetHandleMarginTime;
-							}
-							if (Time.get_time() > model2.GetReceiveTime() + num)
-							{
-								flag = true;
-								if (!model2.IsHandleable(owner))
-								{
-									int num2 = -1;
-									Character character = owner as Character;
-									if (character != null)
-									{
-										num2 = (int)character.actionID;
-									}
-									Log.Warning(LOG.COOP, "ObjectPacketReceiver::PacketUpdate() Err. ( Over packetHandleMarginTime. ) type : " + coopPacket2.packetType + ", action_id : " + num2);
-								}
-							}
-							else
-							{
-								flag = model2.IsHandleable(owner);
-							}
-						}
-					}
-					if (!flag || !HandleCoopEvent(coopPacket2))
-					{
-						if (Time.get_time() > model2.GetReceiveTime() + 20f)
-						{
-							Log.Warning(LOG.COOP, "ObjectPacketReceiver::PacketUpdate() Err. ( Over 20 Second. ) type : " + coopPacket2.packetType);
-						}
-						break;
-					}
-					AddDeleteQueue(coopPacket2);
-					if (base.stopPacketUpdate)
-					{
-						break;
-					}
-				}
-			}
-			EraseUsedPacket();
-		}
-	}
+  public virtual void SetFilterMode(ObjectPacketReceiver.FILTER_MODE filter_mode)
+  {
+    this.filterMode = filter_mode;
+    if (this.filterMode == ObjectPacketReceiver.FILTER_MODE.NONE)
+      return;
+    int index = 0;
+    for (int count = this.packets.Count; index < count; ++index)
+    {
+      CoopPacket packet = this.packets[index];
+      if (!this.CheckFilterPacket(packet))
+        this.AddDeleteQueue(packet);
+    }
+    this.EraseUsedPacket();
+  }
 
-	public virtual void SetFilterMode(FILTER_MODE filter_mode)
-	{
-		filterMode = filter_mode;
-		if (filterMode != 0)
-		{
-			int i = 0;
-			for (int count = base.packets.Count; i < count; i++)
-			{
-				CoopPacket packet = base.packets[i];
-				if (!CheckFilterPacket(packet))
-				{
-					AddDeleteQueue(packet);
-				}
-			}
-			EraseUsedPacket();
-		}
-	}
+  protected virtual bool CheckFilterPacket(CoopPacket packet)
+  {
+    return this.filterMode == ObjectPacketReceiver.FILTER_MODE.NONE || packet.packetType == PACKET_TYPE.OBJECT_DESTROY;
+  }
 
-	protected virtual bool CheckFilterPacket(CoopPacket packet)
-	{
-		if (filterMode == FILTER_MODE.NONE)
-		{
-			return true;
-		}
-		if (packet.packetType == PACKET_TYPE.OBJECT_DESTROY)
-		{
-			return true;
-		}
-		return false;
-	}
+  public virtual bool GetPredictivePosition(out Vector3 pos)
+  {
+    pos = Vector3.zero;
+    for (int index = this.packets.Count - 1; index >= 0; --index)
+    {
+      Coop_Model_ObjectBase model = this.packets[index].GetModel<Coop_Model_ObjectBase>();
+      if (model != null && model.IsHaveObjectPosition())
+      {
+        pos = model.GetObjectPosition();
+        return true;
+      }
+    }
+    return false;
+  }
 
-	public virtual bool GetPredictivePosition(out Vector3 pos)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		pos = Vector3.get_zero();
-		for (int num = base.packets.Count - 1; num >= 0; num--)
-		{
-			CoopPacket coopPacket = base.packets[num];
-			Coop_Model_ObjectBase model = coopPacket.GetModel<Coop_Model_ObjectBase>();
-			if (model != null && model.IsHaveObjectPosition())
-			{
-				pos = model.GetObjectPosition();
-				return true;
-			}
-		}
-		return false;
-	}
+  protected override bool HandleCoopEvent(CoopPacket packet)
+  {
+    switch (packet.packetType)
+    {
+      case PACKET_TYPE.OBJECT_DESTROY:
+        return this.owner is Self || this.owner.DestroyObject();
+      case PACKET_TYPE.OBJECT_ATTACKED_HIT_OWNER:
+        AttackedHitStatusOwner status1;
+        packet.GetModel<Coop_Model_ObjectAttackedHitOwner>().CopyAttackedHitStatus(out status1);
+        if (this.owner.IsEnableAttackedHitOwner())
+        {
+          this.owner.OnAttackedHitOwner(status1);
+          AttackedHitStatusFix status2 = new AttackedHitStatusFix(status1.origin);
+          this.owner.OnAttackedHitFix(status2);
+          if (Object.op_Inequality((Object) this.owner.packetSender, (Object) null))
+          {
+            this.owner.packetSender.OnAttackedHitFix(status2);
+            break;
+          }
+          break;
+        }
+        break;
+      case PACKET_TYPE.OBJECT_ATTACKED_HIT_FIX:
+        AttackedHitStatusFix status3;
+        packet.GetModel<Coop_Model_ObjectAttackedHitFix>().CopyAttackedHitStatus(out status3);
+        this.owner.OnAttackedHitFix(status3);
+        break;
+      case PACKET_TYPE.OBJECT_KEEP_WAITING_PACKET:
+        this.owner.KeepWaitingPacket((StageObject.WAITING_PACKET) packet.GetModel<Coop_Model_ObjectKeepWaitingPacket>().type);
+        break;
+      case PACKET_TYPE.OBJECT_BULLET_OBSERVABLE_SET:
+        this.owner.RegisterObservableID(packet.GetModel<Coop_Model_ObjectBulletObservableSet>().observedID);
+        break;
+      case PACKET_TYPE.OBJECT_BULLET_OBSERVABLE_BROKEN:
+        this.owner.OnBreak(packet.GetModel<Coop_Model_ObjectBulletObservableBroken>().observedID, false);
+        break;
+      case PACKET_TYPE.OBJECT_SHOT_GIMMICK_GENERATOR:
+        Coop_Model_ObjectShotGimmickGenerator model1 = packet.GetModel<Coop_Model_ObjectShotGimmickGenerator>();
+        GimmickGeneratorObject owner = this.owner as GimmickGeneratorObject;
+        if (Object.op_Inequality((Object) owner, (Object) null))
+        {
+          owner.OnGenerateForLinearMove(model1.pos);
+          break;
+        }
+        break;
+      case PACKET_TYPE.OBJECT_COOP_INFO:
+        this.owner.OnRecvSetCoopMode(packet.GetModel<Coop_Model_ObjectCoopInfo>(), packet);
+        break;
+      case PACKET_TYPE.OBJECT_BULLET_OBSERVABLE_SEARCH_TARGET:
+        Coop_Model_ObjectBulletObservableSearchTarget model2 = packet.GetModel<Coop_Model_ObjectBulletObservableSearchTarget>();
+        this.owner.OnSetSearchTarget(model2.observedID, model2.targetId);
+        break;
+      case PACKET_TYPE.OBJECT_BULLET_OBSERVABLE_TURRETBIT_TARGET:
+        Coop_Model_ObjectBulletObservableTurretBitTarget model3 = packet.GetModel<Coop_Model_ObjectBulletObservableTurretBitTarget>();
+        this.owner.OnSetTurretBitTarget(model3.observedID, model3.targetId, model3.regionId);
+        break;
+      default:
+        Log.Warning(LOG.COOP, "not valid packet");
+        return true;
+    }
+    return true;
+  }
 
-	protected override bool HandleCoopEvent(CoopPacket packet)
-	{
-		switch (packet.packetType)
-		{
-		case PACKET_TYPE.OBJECT_DESTROY:
-			if (owner is Self)
-			{
-				return true;
-			}
-			return owner.DestroyObject();
-		case PACKET_TYPE.OBJECT_ATTACKED_HIT_OWNER:
-		{
-			Coop_Model_ObjectAttackedHitOwner model5 = packet.GetModel<Coop_Model_ObjectAttackedHitOwner>();
-			model5.CopyAttackedHitStatus(out AttackedHitStatusOwner status2);
-			if (owner.IsEnableAttackedHitOwner())
-			{
-				owner.OnAttackedHitOwner(status2);
-				AttackedHitStatusFix status3 = new AttackedHitStatusFix(status2.origin);
-				owner.OnAttackedHitFix(status3);
-				if (owner.packetSender != null)
-				{
-					owner.packetSender.OnAttackedHitFix(status3);
-				}
-			}
-			break;
-		}
-		case PACKET_TYPE.OBJECT_ATTACKED_HIT_FIX:
-		{
-			Coop_Model_ObjectAttackedHitFix model4 = packet.GetModel<Coop_Model_ObjectAttackedHitFix>();
-			model4.CopyAttackedHitStatus(out AttackedHitStatusFix status);
-			owner.OnAttackedHitFix(status);
-			break;
-		}
-		case PACKET_TYPE.OBJECT_KEEP_WAITING_PACKET:
-		{
-			Coop_Model_ObjectKeepWaitingPacket model3 = packet.GetModel<Coop_Model_ObjectKeepWaitingPacket>();
-			owner.KeepWaitingPacket((StageObject.WAITING_PACKET)model3.type);
-			break;
-		}
-		case PACKET_TYPE.OBJECT_BULLET_OBSERVABLE_SET:
-		{
-			Coop_Model_ObjectBulletObservableSet model2 = packet.GetModel<Coop_Model_ObjectBulletObservableSet>();
-			owner.RegisterObservableID(model2.observedID);
-			break;
-		}
-		case PACKET_TYPE.OBJECT_BULLET_OBSERVABLE_BROKEN:
-		{
-			Coop_Model_ObjectBulletObservableBroken model = packet.GetModel<Coop_Model_ObjectBulletObservableBroken>();
-			owner.OnBreak(model.observedID);
-			break;
-		}
-		default:
-			Log.Warning(LOG.COOP, "not valid packet");
-			return true;
-		}
-		return true;
-	}
+  public enum FILTER_MODE
+  {
+    NONE,
+    WAIT_INITIALIZE,
+  }
 }

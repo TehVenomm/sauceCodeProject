@@ -1,66 +1,81 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: MissionCheckEqpip
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
 public class MissionCheckEqpip : MissionCheckBase
 {
-	private bool isClear;
+  private bool isClear;
 
-	protected override void Initialize(MISSION_REQUIRE require, int param)
-	{
-		EquipItemInfo equipmentWeaponInfo = MonoBehaviourSingleton<StatusManager>.I.GetEquipmentWeaponInfo(0, -1);
-		EQUIPMENT_TYPE type = equipmentWeaponInfo.tableData.type;
-		for (int i = 0; i < 3; i++)
-		{
-			EquipItemInfo equipmentWeaponInfo2 = MonoBehaviourSingleton<StatusManager>.I.GetEquipmentWeaponInfo(i, -1);
-			if (equipmentWeaponInfo2 != null)
-			{
-				switch (require)
-				{
-				case MISSION_REQUIRE.ONLY_PAIR_SWORDS:
-					if (equipmentWeaponInfo2.tableData.type != EQUIPMENT_TYPE.PAIR_SWORDS)
-					{
-						return;
-					}
-					break;
-				case MISSION_REQUIRE.ONLY_ONE_HAND_SWORD:
-					if (equipmentWeaponInfo2.tableData.type != 0)
-					{
-						return;
-					}
-					break;
-				case MISSION_REQUIRE.ONLY_TWO_HAND_SWORD:
-					if (equipmentWeaponInfo2.tableData.type != EQUIPMENT_TYPE.TWO_HAND_SWORD)
-					{
-						return;
-					}
-					break;
-				case MISSION_REQUIRE.ONLY_SPEAR:
-					if (equipmentWeaponInfo2.tableData.type != EQUIPMENT_TYPE.SPEAR)
-					{
-						return;
-					}
-					break;
-				case MISSION_REQUIRE.ONLY_ARROW:
-					if (equipmentWeaponInfo2.tableData.type != EQUIPMENT_TYPE.ARROW)
-					{
-						return;
-					}
-					break;
-				case MISSION_REQUIRE.MULTI_EQUIP:
-					if (equipmentWeaponInfo2.tableData.type != type)
-					{
-						isClear = true;
-						return;
-					}
-					break;
-				}
-			}
-		}
-		if (require != MISSION_REQUIRE.MULTI_EQUIP)
-		{
-			isClear = true;
-		}
-	}
+  protected override void Initialize(MISSION_REQUIRE require, int param)
+  {
+    EquipItemInfo baseWeapon = (EquipItemInfo) null;
+    if (QuestManager.IsValidInGameSeriesArena())
+    {
+      for (int order = 1; order <= MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestSeriesNum(); ++order)
+      {
+        EquipSetInfo orderUniqueEquipSet = MonoBehaviourSingleton<StatusManager>.I.GetOrderUniqueEquipSet(order);
+        if (orderUniqueEquipSet != null)
+        {
+          for (int index = 0; index < 3; ++index)
+          {
+            EquipItemInfo checkWeapon = orderUniqueEquipSet.item[index];
+            if (checkWeapon != null)
+            {
+              if (baseWeapon == null)
+                baseWeapon = checkWeapon;
+              if (this.Check(require, checkWeapon, baseWeapon))
+                return;
+            }
+          }
+        }
+      }
+    }
+    else
+    {
+      for (int equip_slot = 0; equip_slot < 3; ++equip_slot)
+      {
+        EquipItemInfo equipmentWeaponInfo = MonoBehaviourSingleton<StatusManager>.I.GetEquipmentWeaponInfo(equip_slot);
+        if (equipmentWeaponInfo != null)
+        {
+          if (baseWeapon == null)
+            baseWeapon = equipmentWeaponInfo;
+          if (this.Check(require, equipmentWeaponInfo, baseWeapon))
+            return;
+        }
+      }
+    }
+    if (require == MISSION_REQUIRE.MULTI_EQUIP)
+      return;
+    this.isClear = true;
+  }
 
-	public override bool IsMissionClear()
-	{
-		return isClear;
-	}
+  private bool Check(MISSION_REQUIRE require, EquipItemInfo checkWeapon, EquipItemInfo baseWeapon)
+  {
+    switch (require)
+    {
+      case MISSION_REQUIRE.ONLY_ONE_HAND_SWORD:
+        return checkWeapon.tableData.type != 0;
+      case MISSION_REQUIRE.ONLY_TWO_HAND_SWORD:
+        return checkWeapon.tableData.type != EQUIPMENT_TYPE.TWO_HAND_SWORD;
+      case MISSION_REQUIRE.ONLY_SPEAR:
+        return checkWeapon.tableData.type != EQUIPMENT_TYPE.SPEAR;
+      case MISSION_REQUIRE.ONLY_PAIR_SWORDS:
+        return checkWeapon.tableData.type != EQUIPMENT_TYPE.PAIR_SWORDS;
+      case MISSION_REQUIRE.ONLY_ARROW:
+        return checkWeapon.tableData.type != EQUIPMENT_TYPE.ARROW;
+      case MISSION_REQUIRE.MULTI_EQUIP:
+        int num = checkWeapon.tableData.type != baseWeapon.tableData.type ? 1 : 0;
+        if (num == 0)
+          return num != 0;
+        this.isClear = true;
+        return num != 0;
+      default:
+        return false;
+    }
+  }
+
+  public override bool IsMissionClear() => this.isClear;
 }

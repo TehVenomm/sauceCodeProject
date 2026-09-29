@@ -1,113 +1,85 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIPortalNextAreaName
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class UIPortalNextAreaName : MonoBehaviourSingleton<UIPortalNextAreaName>
 {
-	[SerializeField]
-	private GameObject noticeObject;
+  [SerializeField]
+  private GameObject noticeObject;
+  [SerializeField]
+  protected UILabel nameLabel;
+  [SerializeField]
+  protected UITweenCtrl animCtrl;
+  [SerializeField]
+  protected TweenAlpha noticeTween;
+  [SerializeField]
+  protected Vector3 offset = Vector3.zero;
+  protected PortalObject portal;
+  protected PortalObject portalReq;
 
-	[SerializeField]
-	protected UILabel nameLabel;
+  protected override void Awake()
+  {
+    base.Awake();
+    this.nameLabel.fontStyle = (FontStyle) 2;
+    this.noticeObject.SetActive(false);
+    ((Component) this).gameObject.SetActive(FieldManager.IsValidInGameNoQuest());
+  }
 
-	[SerializeField]
-	protected UITweenCtrl animCtrl;
+  private void Update()
+  {
+    if (!MonoBehaviourSingleton<StageObjectManager>.IsValid() || !MonoBehaviourSingleton<InGameProgress>.IsValid())
+      return;
+    Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
+    if (Object.op_Equality((Object) self, (Object) null))
+      return;
+    this.portalReq = (PortalObject) null;
+    int index = 0;
+    for (int count = MonoBehaviourSingleton<InGameProgress>.I.portalObjectList.Count; index < count; ++index)
+    {
+      PortalObject portalObject = MonoBehaviourSingleton<InGameProgress>.I.portalObjectList[index];
+      if (portalObject.isFull && portalObject.portalData.dstMapID != 0U && (double) Vector3.Distance(portalObject._transform.position, self._position) < 10.0)
+      {
+        this.portalReq = portalObject;
+        break;
+      }
+    }
+    if (Object.op_Equality((Object) this.portal, (Object) this.portalReq) || ((Behaviour) this.noticeTween).isActiveAndEnabled)
+      return;
+    if ((double) this.noticeTween.value == 0.0)
+    {
+      if (Object.op_Inequality((Object) this.portalReq, (Object) null))
+      {
+        if (string.IsNullOrEmpty(this.portalReq.portalData.placeText))
+        {
+          FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(this.portalReq.portalData.dstMapID);
+          if (fieldMapData == null)
+            return;
+          this.nameLabel.text = fieldMapData.mapName;
+        }
+        else
+          this.nameLabel.text = this.portalReq.portalData.placeText;
+        this.noticeObject.SetActive(true);
+        this.noticeTween.PlayForward();
+      }
+      else
+        this.noticeObject.SetActive(false);
+      this.portal = this.portalReq;
+    }
+    else
+      this.noticeTween.PlayReverse();
+  }
 
-	[SerializeField]
-	protected TweenAlpha noticeTween;
-
-	[SerializeField]
-	protected Vector3 offset;
-
-	protected PortalObject portal;
-
-	protected PortalObject portalReq;
-
-	protected override void Awake()
-	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		base.Awake();
-		nameLabel.fontStyle = 2;
-		noticeObject.SetActive(false);
-		this.get_gameObject().SetActive(FieldManager.IsValidInGameNoQuest());
-	}
-
-	private void Update()
-	{
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && MonoBehaviourSingleton<InGameProgress>.IsValid())
-		{
-			Self self = MonoBehaviourSingleton<StageObjectManager>.I.self;
-			if (!(self == null))
-			{
-				portalReq = null;
-				int i = 0;
-				for (int count = MonoBehaviourSingleton<InGameProgress>.I.portalObjectList.Count; i < count; i++)
-				{
-					PortalObject portalObject = MonoBehaviourSingleton<InGameProgress>.I.portalObjectList[i];
-					if (portalObject.isFull && portalObject.portalData.dstMapID != 0 && Vector3.Distance(portalObject._transform.get_position(), self._position) < 10f)
-					{
-						portalReq = portalObject;
-						break;
-					}
-				}
-				if (!(portal == portalReq) && !noticeTween.get_isActiveAndEnabled())
-				{
-					if (noticeTween.value == 0f)
-					{
-						if (portalReq != null)
-						{
-							if (string.IsNullOrEmpty(portalReq.portalData.placeText))
-							{
-								FieldMapTable.FieldMapTableData fieldMapData = Singleton<FieldMapTable>.I.GetFieldMapData(portalReq.portalData.dstMapID);
-								if (fieldMapData == null)
-								{
-									return;
-								}
-								nameLabel.text = fieldMapData.mapName;
-							}
-							else
-							{
-								nameLabel.text = portalReq.portalData.placeText;
-							}
-							noticeObject.SetActive(true);
-							noticeTween.PlayForward();
-						}
-						else
-						{
-							noticeObject.SetActive(false);
-						}
-						portal = portalReq;
-					}
-					else
-					{
-						noticeTween.PlayReverse();
-					}
-				}
-			}
-		}
-	}
-
-	private void LateUpdate()
-	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		if (!(portal == null))
-		{
-			Vector3 position = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToScreenPoint(portal._transform.get_position() + offset));
-			if (position.z >= 0f)
-			{
-				position.z = 0f;
-			}
-			else
-			{
-				position.z = -100f;
-			}
-			base._transform.set_position(position);
-		}
-	}
+  private void LateUpdate()
+  {
+    if (Object.op_Equality((Object) this.portal, (Object) null))
+      return;
+    Vector3 worldPoint = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(MonoBehaviourSingleton<AppMain>.I.mainCamera.WorldToScreenPoint(Vector3.op_Addition(this.portal._transform.position, this.offset)));
+    worldPoint.z = (double) worldPoint.z < 0.0 ? -100f : 0.0f;
+    this._transform.position = worldPoint;
+  }
 }

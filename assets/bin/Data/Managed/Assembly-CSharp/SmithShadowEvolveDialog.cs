@@ -1,90 +1,90 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SmithShadowEvolveDialog
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 
+#nullable disable
 public class SmithShadowEvolveDialog : GameSection
 {
-	private enum UI
-	{
-		OBJ_ICON_ROOT,
-		BTN_OK,
-		BTN_INACTIVE
-	}
+  private EquipItemInfo itemInfo;
+  private EquipItemTable.EquipItemData shadowEvolveData;
+  private CreateEquipItemTable.CreateEquipItemData createData;
 
-	private EquipItemInfo itemInfo;
+  public override void Initialize()
+  {
+    this.itemInfo = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>().selectEquipData;
+    this.shadowEvolveData = this.itemInfo.tableData.GetShadowEvolveEquipTable();
+    EquipItemTable.EquipItemData rootEquipTable = this.shadowEvolveData.GetRootEquipTable();
+    this.createData = Singleton<CreateEquipItemTable>.I.GetCreateItemDataByEquipItem(rootEquipTable.id);
+    base.Initialize();
+  }
 
-	private EquipItemTable.EquipItemData shadowEvolveData;
+  public override void UpdateUI()
+  {
+    ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(this.createData.needMaterial[0].itemID);
+    if (itemData == null)
+      return;
+    int haveingItemNum = MonoBehaviourSingleton<InventoryManager>.I.GetHaveingItemNum(itemData.id);
+    int num = this.createData.needMaterial[0].num;
+    bool is_visible = haveingItemNum >= num;
+    this.SetMaterialInfo(ItemIconMaterial.CreateMaterialIcon(ItemIcon.GetItemIconType(itemData.type), itemData, this.GetCtrl((Enum) SmithShadowEvolveDialog.UI.OBJ_ICON_ROOT), haveingItemNum, num, "MATERIAL")._transform, REWARD_TYPE.ITEM, itemData.id);
+    this.SetActive((Enum) SmithShadowEvolveDialog.UI.BTN_OK, is_visible);
+    this.SetActive((Enum) SmithShadowEvolveDialog.UI.BTN_INACTIVE, !is_visible);
+    base.UpdateUI();
+  }
 
-	private CreateEquipItemTable.CreateEquipItemData createData;
+  private SmithManager.ResultData CreateResultData()
+  {
+    return new SmithManager.ResultData()
+    {
+      beforeRarity = (int) this.itemInfo.tableData.rarity,
+      beforeLevel = this.itemInfo.level,
+      beforeMaxLevel = this.itemInfo.tableData.maxLv,
+      beforeExceedCnt = this.itemInfo.exceed,
+      beforeAtk = this.itemInfo.atk,
+      beforeDef = this.itemInfo.def,
+      beforeHp = this.itemInfo.hp,
+      beforeElemAtk = this.itemInfo.elemAtk,
+      beforeElemDef = this.itemInfo.elemDef
+    };
+  }
 
-	public override void Initialize()
-	{
-		SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
-		itemInfo = smithData.selectEquipData;
-		shadowEvolveData = itemInfo.tableData.GetShadowEvolveEquipTable();
-		EquipItemTable.EquipItemData rootEquipTable = shadowEvolveData.GetRootEquipTable();
-		createData = Singleton<CreateEquipItemTable>.I.GetCreateItemDataByEquipItem(rootEquipTable.id);
-		base.Initialize();
-	}
+  private void OnQuery_YES()
+  {
+    GameSection.SetEventData((object) new object[1]
+    {
+      (object) this.itemInfo.tableData.name
+    });
+  }
 
-	public override void UpdateUI()
-	{
-		ItemTable.ItemData itemData = Singleton<ItemTable>.I.GetItemData(createData.needMaterial[0].itemID);
-		if (itemData != null)
-		{
-			int haveingItemNum = MonoBehaviourSingleton<InventoryManager>.I.GetHaveingItemNum(itemData.id);
-			int num = createData.needMaterial[0].num;
-			bool flag = haveingItemNum >= num;
-			ItemIcon itemIcon = ItemIconMaterial.CreateMaterialIcon(ItemIcon.GetItemIconType(itemData.type), itemData, GetCtrl(UI.OBJ_ICON_ROOT), haveingItemNum, num, "MATERIAL", 0, false);
-			SetMaterialInfo(itemIcon._transform, REWARD_TYPE.ITEM, itemData.id, null);
-			SetActive((Enum)UI.BTN_OK, flag);
-			SetActive((Enum)UI.BTN_INACTIVE, !flag);
-			base.UpdateUI();
-		}
-	}
+  private void OnQuery_SmithShadowEvolveConfirm_YES()
+  {
+    SmithManager.ResultData result_data = this.CreateResultData();
+    GameSection.SetEventData((object) result_data);
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<SmithManager>.I.SendShadowEvolveEquipItem(this.itemInfo.uniqueID, this.createData.needMaterial[0].itemID, (Action<Error, EquipItemInfo>) ((error, info) =>
+    {
+      if (error == Error.None)
+      {
+        result_data.itemData = (object) info;
+        MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>().selectEquipData = info;
+        MonoBehaviourSingleton<SmithManager>.I.CreateLocalInventory();
+        MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
+        GameSection.ResumeEvent(true);
+      }
+      else
+        GameSection.ResumeEvent(false);
+    }));
+  }
 
-	private SmithManager.ResultData CreateResultData()
-	{
-		SmithManager.ResultData resultData = new SmithManager.ResultData();
-		resultData.beforeRarity = (int)itemInfo.tableData.rarity;
-		resultData.beforeLevel = itemInfo.level;
-		resultData.beforeMaxLevel = itemInfo.tableData.maxLv;
-		resultData.beforeExceedCnt = itemInfo.exceed;
-		resultData.beforeAtk = itemInfo.atk;
-		resultData.beforeDef = itemInfo.def;
-		resultData.beforeHp = itemInfo.hp;
-		resultData.beforeElemAtk = itemInfo.elemAtk;
-		resultData.beforeElemDef = itemInfo.elemDef;
-		return resultData;
-	}
-
-	private void OnQuery_YES()
-	{
-		GameSection.SetEventData(new object[1]
-		{
-			itemInfo.tableData.name
-		});
-	}
-
-	private void OnQuery_SmithShadowEvolveConfirm_YES()
-	{
-		SmithManager.ResultData result_data = CreateResultData();
-		GameSection.SetEventData(result_data);
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<SmithManager>.I.SendShadowEvolveEquipItem(itemInfo.uniqueID, createData.needMaterial[0].itemID, delegate(Error error, EquipItemInfo info)
-		{
-			if (error == Error.None)
-			{
-				result_data.itemData = info;
-				SmithManager.SmithGrowData smithData = MonoBehaviourSingleton<SmithManager>.I.GetSmithData<SmithManager.SmithGrowData>();
-				smithData.selectEquipData = info;
-				MonoBehaviourSingleton<SmithManager>.I.CreateLocalInventory();
-				MonoBehaviourSingleton<UIAnnounceBand>.I.isWait = true;
-				GameSection.ResumeEvent(true, null);
-			}
-			else
-			{
-				GameSection.ResumeEvent(false, null);
-			}
-		});
-	}
+  private enum UI
+  {
+    OBJ_ICON_ROOT,
+    BTN_OK,
+    BTN_INACTIVE,
+  }
 }

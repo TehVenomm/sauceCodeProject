@@ -1,149 +1,114 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: BlurFilter
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class BlurFilter : FilterBase
 {
-	private const int PASS_NUM = 3;
+  [SerializeField]
+  private float _blurStrength;
+  [SerializeField]
+  private float strengthLowLimit = 0.0001f;
+  [SerializeField]
+  private int downsample = 2;
+  [SerializeField]
+  private int iterationNum = 1;
+  private const int PASS_NUM = 3;
+  private Material[] _blurMaterial = new Material[3];
+  private PostEffector postEffector;
 
-	[SerializeField]
-	private float _blurStrength;
+  public float blurStrength
+  {
+    get => this._blurStrength;
+    set => this._blurStrength = value;
+  }
 
-	[SerializeField]
-	private float strengthLowLimit = 0.0001f;
+  public int downSample
+  {
+    get => this.downsample;
+    set => this.downsample = value;
+  }
 
-	[SerializeField]
-	private int downsample = 2;
+  public Material[] blurMaterial => this._blurMaterial;
 
-	[SerializeField]
-	private int iterationNum = 1;
+  private bool isValid
+  {
+    get
+    {
+      for (int index = 0; index < 3; ++index)
+      {
+        if (Object.op_Equality((Object) this._blurMaterial[index], (Object) null))
+          return false;
+      }
+      return true;
+    }
+  }
 
-	private Material[] _blurMaterial = (Material[])new Material[3];
+  private void Awake()
+  {
+    this._blurMaterial[0] = this.CreateMaterial("Custom/UI/Blur_Pass0");
+    this._blurMaterial[1] = this.CreateMaterial("Custom/UI/Blur_Pass1");
+    this._blurMaterial[2] = this.CreateMaterial("Custom/UI/Blur_Pass2");
+  }
 
-	private PostEffector postEffector;
+  private Material CreateMaterial(string shaderName)
+  {
+    Shader shader = ResourceUtility.FindShader(shaderName);
+    return Object.op_Equality((Object) shader, (Object) null) ? (Material) null : new Material(shader);
+  }
 
-	public float blurStrength
-	{
-		get
-		{
-			return _blurStrength;
-		}
-		set
-		{
-			_blurStrength = value;
-		}
-	}
+  public override void StartFilter()
+  {
+    this.postEffector = ((Component) this).gameObject.AddComponent<PostEffector>();
+    this.postEffector.SetFilter((FilterBase) this);
+  }
 
-	public int downSample
-	{
-		get
-		{
-			return downsample;
-		}
-		set
-		{
-			downsample = value;
-		}
-	}
+  public override void StopFilter()
+  {
+    if (!Object.op_Inequality((Object) this.postEffector, (Object) null))
+      return;
+    Object.Destroy((Object) this.postEffector);
+    this.postEffector = (PostEffector) null;
+  }
 
-	public Material[] blurMaterial => _blurMaterial;
-
-	private bool isValid
-	{
-		get
-		{
-			for (int i = 0; i < 3; i++)
-			{
-				if (_blurMaterial[i] == null)
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-	}
-
-	private void Awake()
-	{
-		_blurMaterial[0] = CreateMaterial("Custom/UI/Blur_Pass0");
-		_blurMaterial[1] = CreateMaterial("Custom/UI/Blur_Pass1");
-		_blurMaterial[2] = CreateMaterial("Custom/UI/Blur_Pass2");
-	}
-
-	private Material CreateMaterial(string shaderName)
-	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Expected O, but got Unknown
-		Shader val = ResourceUtility.FindShader(shaderName);
-		if (val == null)
-		{
-			return null;
-		}
-		return new Material(val);
-	}
-
-	public override void StartFilter()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		postEffector = this.get_gameObject().AddComponent<PostEffector>();
-		postEffector.SetFilter(this);
-	}
-
-	public override void StopFilter()
-	{
-		if (postEffector != null)
-		{
-			Object.Destroy(postEffector);
-			postEffector = null;
-		}
-	}
-
-	public override void PostEffectProc(RenderTexture src, RenderTexture dest)
-	{
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Expected O, but got Unknown
-		//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f1: Expected O, but got Unknown
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Expected O, but got Unknown
-		if (blurStrength <= strengthLowLimit)
-		{
-			Graphics.Blit(src, null);
-		}
-		else if (!isValid)
-		{
-			Graphics.Blit(src, dest);
-		}
-		else
-		{
-			int num = src.get_width() >> downsample;
-			int num2 = src.get_height() >> downsample;
-			RenderTexture val = RenderTexture.GetTemporary(num, num2, 0, src.get_format());
-			val.set_filterMode(1);
-			Graphics.Blit(src, val, blurMaterial[0]);
-			float num3 = 1f / (1f * (float)downsample);
-			for (int i = 0; i < iterationNum; i++)
-			{
-				float num4 = (float)i;
-				for (int j = 0; j < 3; j++)
-				{
-					blurMaterial[j].SetVector("_Parameter", new Vector4(blurStrength * num3 + num4, (0f - blurStrength) * num3 - num4, 0f, 0f));
-				}
-				RenderTexture val2 = RenderTexture.GetTemporary(num, num2, 0, src.get_format());
-				val2.set_filterMode(1);
-				Graphics.Blit(val, val2, blurMaterial[1]);
-				RenderTexture.ReleaseTemporary(val);
-				val = val2;
-				val2 = RenderTexture.GetTemporary(num, num2, 0, src.get_format());
-				val2.set_filterMode(1);
-				Graphics.Blit(val, val2, blurMaterial[2]);
-				RenderTexture.ReleaseTemporary(val);
-				val = val2;
-			}
-			Graphics.Blit(val, dest);
-			RenderTexture.ReleaseTemporary(val);
-		}
-	}
+  public override void PostEffectProc(RenderTexture src, RenderTexture dest)
+  {
+    if ((double) this.blurStrength <= (double) this.strengthLowLimit)
+      Graphics.Blit((Texture) src, (RenderTexture) null);
+    else if (!this.isValid)
+    {
+      Graphics.Blit((Texture) src, dest);
+    }
+    else
+    {
+      int num1 = ((Texture) src).width >> this.downsample;
+      int num2 = ((Texture) src).height >> this.downsample;
+      RenderTexture renderTexture1 = RenderTexture.GetTemporary(num1, num2, 0, src.format);
+      ((Texture) renderTexture1).filterMode = (FilterMode) 1;
+      Graphics.Blit((Texture) src, renderTexture1, this.blurMaterial[0]);
+      float num3 = (float) (1.0 / (1.0 * (double) this.downsample));
+      for (int index1 = 0; index1 < this.iterationNum; ++index1)
+      {
+        float num4 = (float) index1;
+        for (int index2 = 0; index2 < 3; ++index2)
+          this.blurMaterial[index2].SetVector("_Parameter", new Vector4(this.blurStrength * num3 + num4, -this.blurStrength * num3 - num4, 0.0f, 0.0f));
+        RenderTexture temporary1 = RenderTexture.GetTemporary(num1, num2, 0, src.format);
+        ((Texture) temporary1).filterMode = (FilterMode) 1;
+        Graphics.Blit((Texture) renderTexture1, temporary1, this.blurMaterial[1]);
+        RenderTexture.ReleaseTemporary(renderTexture1);
+        RenderTexture renderTexture2 = temporary1;
+        RenderTexture temporary2 = RenderTexture.GetTemporary(num1, num2, 0, src.format);
+        ((Texture) temporary2).filterMode = (FilterMode) 1;
+        Graphics.Blit((Texture) renderTexture2, temporary2, this.blurMaterial[2]);
+        RenderTexture.ReleaseTemporary(renderTexture2);
+        renderTexture1 = temporary2;
+      }
+      Graphics.Blit((Texture) renderTexture1, dest);
+      RenderTexture.ReleaseTemporary(renderTexture1);
+    }
+  }
 }

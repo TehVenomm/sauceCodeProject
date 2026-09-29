@@ -1,101 +1,76 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: JSONNode
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 
+#nullable disable
 public class JSONNode : IJSONFieldValue
 {
-	public JSONNode parent;
+  public JSONNode parent;
+  public List<JSONField> fields_ = new List<JSONField>();
+  public bool isList;
+  public string listName = "";
 
-	public List<JSONField> fields_ = new List<JSONField>();
+  public JSONNode()
+  {
+  }
 
-	public bool isList;
+  public JSONNode(JSONNode parent) => this.parent = parent;
 
-	public string listName = string.Empty;
+  public JSONNode(IJSONFieldValue val) => this.fields_.Add(new JSONField("0", val));
 
-	public JSONNode()
-	{
-	}
+  public JSONNode(List<IJSONFieldValue> list)
+  {
+    for (int index = 0; index < list.Count; ++index)
+      this.fields_.Add(new JSONField(index.ToString(), list[index]));
+  }
 
-	public JSONNode(JSONNode parent)
-	{
-		this.parent = parent;
-	}
+  public void AddField(string fieldName, IJSONFieldValue val)
+  {
+    this.fields_.Add(new JSONField(fieldName, val));
+  }
 
-	public JSONNode(IJSONFieldValue val)
-	{
-		fields_.Add(new JSONField("0", val));
-	}
+  public void AddField(int idx, IJSONFieldValue val)
+  {
+    this.fields_.Add(new JSONField(idx.ToString(), val));
+  }
 
-	public JSONNode(List<IJSONFieldValue> list)
-	{
-		for (int i = 0; i < list.Count; i++)
-		{
-			fields_.Add(new JSONField(i.ToString(), list[i]));
-		}
-	}
+  public void AddField(IJSONFieldValue val) => this.fields_.Add(new JSONField((string) null, val));
 
-	public void AddField(string fieldName, IJSONFieldValue val)
-	{
-		fields_.Add(new JSONField(fieldName, val));
-	}
+  public IJSONFieldValue GetField(string name)
+  {
+    foreach (JSONField field in this.fields_)
+    {
+      if (field.name == name)
+        return field.value;
+    }
+    return (IJSONFieldValue) null;
+  }
 
-	public void AddField(int idx, IJSONFieldValue val)
-	{
-		fields_.Add(new JSONField(idx.ToString(), val));
-	}
+  public IJSONFieldValue GetField(int index) => this.fields_[index].value;
 
-	public void AddField(IJSONFieldValue val)
-	{
-		fields_.Add(new JSONField(null, val));
-	}
+  public int GetFieldCount() => this.fields_.Count;
 
-	public IJSONFieldValue GetField(string name)
-	{
-		foreach (JSONField item in fields_)
-		{
-			if (item.name == name)
-			{
-				return item.value;
-			}
-		}
-		return null;
-	}
+  public JSONListFieldValue GetListFieldValue()
+  {
+    List<IJSONFieldValue> val = new List<IJSONFieldValue>();
+    for (int index = 0; index < this.fields_.Count; ++index)
+      val.Add(this.fields_[index].value);
+    return new JSONListFieldValue(val);
+  }
 
-	public IJSONFieldValue GetField(int index)
-	{
-		return fields_[index].value;
-	}
-
-	public int GetFieldCount()
-	{
-		return fields_.Count;
-	}
-
-	public JSONListFieldValue GetListFieldValue()
-	{
-		List<IJSONFieldValue> list = new List<IJSONFieldValue>();
-		for (int i = 0; i < fields_.Count; i++)
-		{
-			list.Add(fields_[i].value);
-		}
-		return new JSONListFieldValue(list);
-	}
-
-	public string Serialize()
-	{
-		if (fields_.Count == 1 && (fields_[0].name == string.Empty || fields_[0].name == null))
-		{
-			return fields_[0].value.Serialize();
-		}
-		string text = "{";
-		if (fields_.Count > 0)
-		{
-			string text2 = text;
-			text = text2 + "\"" + fields_[0].name + "\":" + fields_[0].value.Serialize();
-		}
-		for (int i = 1; i < fields_.Count; i++)
-		{
-			string text2 = text;
-			text = text2 + ",\"" + fields_[i].name + "\":" + fields_[i].value.Serialize();
-		}
-		return text + "}";
-	}
+  public string Serialize()
+  {
+    if (this.fields_.Count == 1 && (this.fields_[0].name == "" || this.fields_[0].name == null))
+      return this.fields_[0].value.Serialize();
+    string str = "{";
+    if (this.fields_.Count > 0)
+      str = $"{str}\"{this.fields_[0].name}\":{this.fields_[0].value.Serialize()}";
+    for (int index = 1; index < this.fields_.Count; ++index)
+      str = $"{str},\"{this.fields_[index].name}\":{this.fields_[index].value.Serialize()}";
+    return str + "}";
+  }
 }

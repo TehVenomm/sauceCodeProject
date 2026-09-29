@@ -1,395 +1,321 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: HomeSelfCharacter
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
+using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class HomeSelfCharacter : HomePlayerCharacterBase
 {
-	public static bool CTRL = true;
+  public static bool CTRL = true;
+  public bool InitedAnimation;
+  private InputManager.TouchInfo dragTouchInfo;
+  private Action<HomeStageAreaEvent> noticeCallback;
+  private HomeStageAreaEvent lastEvent;
+  private Vector3 sentPosition;
 
-	public bool InitedAnimation;
+  public HomeCharacterBase targetChara { get; private set; }
 
-	private InputManager.TouchInfo dragTouchInfo;
+  public int lastTargetNPCID { get; private set; }
 
-	private Action<HomeStageAreaEvent> noticeCallback;
+  public HomeStageAreaEvent targetEvent { get; private set; }
 
-	private HomeStageAreaEvent lastEvent;
+  public override int GetUserId()
+  {
+    return !UserInfoManager.IsValidUser() ? 0 : MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
+  }
 
-	private Vector3 sentPosition;
+  public bool IsEnableControl()
+  {
+    return !MonoBehaviourSingleton<GameSceneManager>.I.isChangeing && !GameSceneEvent.IsStay() && !this.isPlayingSitAnimation && !this.isPlayingStandAnimation && (!(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "HomeTop") || !(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "LoungeTop") || !(MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "ClanTop"));
+  }
 
-	public HomeCharacterBase targetChara
-	{
-		get;
-		private set;
-	}
+  public void SetNoticeCallback(Action<HomeStageAreaEvent> callback)
+  {
+    this.noticeCallback = callback;
+  }
 
-	public int lastTargetNPCID
-	{
-		get;
-		private set;
-	}
+  public void Sit()
+  {
+    this.CurrentActionType = LOUNGE_ACTION_TYPE.SIT;
+    this.isSitting = true;
+    if (MonoBehaviourSingleton<LoungeManager>.IsValid())
+      this.chairPoint = MonoBehaviourSingleton<LoungeManager>.I.TableSet.GetNearSitPoint(this._transform.position);
+    if (MonoBehaviourSingleton<ClanManager>.IsValid())
+      this.chairPoint = MonoBehaviourSingleton<ClanManager>.I.TableSet.GetNearSitPoint(this._transform.position);
+    this.SendMoveToSitPosition(((Component) this.chairPoint).transform.position);
+    this.SendSit();
+    this.StartCoroutine(this.DoSit());
+  }
 
-	public HomeStageAreaEvent targetEvent
-	{
-		get;
-		private set;
-	}
+  protected override IEnumerator StandUp()
+  {
+    this.CurrentActionType = LOUNGE_ACTION_TYPE.STAND_UP;
+    this.SendStandUp();
+    this.chairPoint.ResetSittingCharacter();
+    PLCA anim;
+    switch (this.chairPoint.chairType)
+    {
+      case ChairPoint.CHAIR_TYPE.BENTCH:
+        anim = this.sexType == 0 ? PLCA.STAND_BENCH_UP : PLCA.STAND_BENCH_UP_F;
+        break;
+      case ChairPoint.CHAIR_TYPE.SOFA:
+        anim = this.sexType == 0 ? PLCA.STAND_SOFA_UP : PLCA.STAND_SOFA_UP_F;
+        break;
+      default:
+        anim = this.sexType == 0 ? PLCA.STAND_UP : PLCA.STAND_UP_F;
+        break;
+    }
+    this.animCtrl.Play(anim);
+    GameSceneGlobalSettings.GetCurrentIHomeManager().HomeCamera.ChangeView(HomeCamera.VIEW_MODE.NORMAL);
+    this.isSitting = false;
+    this.isStanding = true;
+    this.isPlayingStandAnimation = true;
+    AnimatorStateInfo animatorStateInfo;
+    while (true)
+    {
+      animatorStateInfo = this.animCtrl.animator.GetCurrentAnimatorStateInfo(0);
+      if (1.0 < (double) ((AnimatorStateInfo) ref animatorStateInfo).normalizedTime)
+        yield return (object) null;
+      else
+        break;
+    }
+    while (true)
+    {
+      animatorStateInfo = this.animCtrl.animator.GetCurrentAnimatorStateInfo(0);
+      if (1.0 > (double) ((AnimatorStateInfo) ref animatorStateInfo).normalizedTime)
+        yield return (object) null;
+      else
+        break;
+    }
+    this.isPlayingStandAnimation = false;
+    this.isStanding = false;
+  }
 
-	public override int GetUserId()
-	{
-		return UserInfoManager.IsValidUser() ? MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id : 0;
-	}
+  protected override ModelLoaderBase LoadModel()
+  {
+    this.lastTargetNPCID = -1;
+    this.sexType = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex;
+    PlayerLoader playerLoader = ((Component) this).gameObject.AddComponent<PlayerLoader>();
+    PlayerLoadInfo player_load_info = PlayerLoadInfo.FromUserStatus(false, true);
+    player_load_info.isNeedToCache = true;
+    playerLoader.StartLoad(player_load_info, 8, 99, false, false, true, true, false, false, false, false, SHADER_TYPE.NORMAL, (PlayerLoader.OnCompleteLoad) null);
+    return (ModelLoaderBase) playerLoader;
+  }
 
-	public bool IsEnableControl()
-	{
-		if (MonoBehaviourSingleton<GameSceneManager>.I.isChangeing)
-		{
-			return false;
-		}
-		if (GameSceneEvent.IsStay())
-		{
-			return false;
-		}
-		if (isPlayingSitAnimation)
-		{
-			return false;
-		}
-		if (MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "HomeTop" && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "LoungeTop" && MonoBehaviourSingleton<GameSceneManager>.I.GetCurrentSectionName() != "GuildTop")
-		{
-			return false;
-		}
-		return true;
-	}
+  protected override void InitCollider()
+  {
+    base.InitCollider();
+    ((Component) this).gameObject.GetComponent<Rigidbody>().isKinematic = false;
+  }
 
-	public void SetNoticeCallback(Action<HomeStageAreaEvent> callback)
-	{
-		noticeCallback = callback;
-	}
+  protected override void InitAnim()
+  {
+    base.InitAnim();
+    this.animCtrl.moveAnim = this.sexType == 0 ? PLCA.RUN : PLCA.RUN_F;
+    this.animCtrl.transitionDuration = 0.15f;
+    this.animCtrl.animator.speed = 1f;
+    this.InitedAnimation = true;
+  }
 
-	public void Sit()
-	{
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		base.CurrentActionType = LOUNGE_ACTION_TYPE.SIT;
-		isSitting = true;
-		chairPoint = MonoBehaviourSingleton<LoungeManager>.I.TableSet.GetNearSitPoint(this);
-		Vector3 position = chairPoint.get_transform().get_position();
-		SendMoveToSitPosition(position);
-		SendSit();
-		this.StartCoroutine(DoSit());
-	}
+  private void OnEnable()
+  {
+    if (!HomeSelfCharacter.CTRL)
+      return;
+    InputManager.OnDrag += new InputManager.OnTouchDelegate(this.OnDrag);
+    InputManager.OnTap += new InputManager.OnTouchDelegate(this.OnTap);
+    this.dragTouchInfo = (InputManager.TouchInfo) null;
+  }
 
-	private void StandUp()
-	{
-		base.CurrentActionType = LOUNGE_ACTION_TYPE.STAND_UP;
-		SendStandUp();
-		chairPoint.ResetSittingCharacter();
-		PLCA anim = (sexType != 0) ? PLCA.STAND_UP_F : PLCA.STAND_UP;
-		animCtrl.Play(anim, false);
-		MonoBehaviourSingleton<LoungeManager>.I.HomeCamera.ChangeView(HomeCamera.VIEW_MODE.NORMAL);
-		isSitting = false;
-	}
+  private void OnDisable()
+  {
+    if (!HomeSelfCharacter.CTRL)
+      return;
+    InputManager.OnDrag -= new InputManager.OnTouchDelegate(this.OnDrag);
+    InputManager.OnTap -= new InputManager.OnTouchDelegate(this.OnTap);
+  }
 
-	protected override ModelLoaderBase LoadModel()
-	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		lastTargetNPCID = -1;
-		sexType = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.sex;
-		PlayerLoader playerLoader = this.get_gameObject().AddComponent<PlayerLoader>();
-		playerLoader.StartLoad(PlayerLoadInfo.FromUserStatus(false, true, -1), 8, 99, false, false, true, true, false, false, false, false, SHADER_TYPE.NORMAL, null, true, -1);
-		return playerLoader;
-	}
+  private void OnDrag(InputManager.TouchInfo info)
+  {
+    if (MonoBehaviourSingleton<UIManager>.I.IsDisable() || !this.IsEnableControl() || this.dragTouchInfo != null && this.dragTouchInfo.enable)
+      return;
+    this.dragTouchInfo = info;
+  }
 
-	protected override void InitCollider()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		base.InitCollider();
-		Rigidbody component = this.get_gameObject().GetComponent<Rigidbody>();
-		component.set_isKinematic(false);
-	}
+  private void OnTap(InputManager.TouchInfo info)
+  {
+    if (!this.IsEnableControl())
+      return;
+    HomeCamera homeCamera = (HomeCamera) null;
+    IHomeManager currentIhomeManager = GameSceneGlobalSettings.GetCurrentIHomeManager();
+    if (currentIhomeManager != null)
+      homeCamera = currentIhomeManager.HomeCamera;
+    if (homeCamera.viewMode != HomeCamera.VIEW_MODE.NORMAL)
+      return;
+    HomeCharacterBase homeCharacterBase = (HomeCharacterBase) null;
+    HomeStageTouchEvent homeStageTouchEvent = (HomeStageTouchEvent) null;
+    if (Object.op_Inequality((Object) this.targetEvent, (Object) null))
+      this.targetEvent.DispatchEvent();
+    else if (Object.op_Inequality((Object) this.targetChara, (Object) null))
+    {
+      homeCharacterBase = this.targetChara;
+    }
+    else
+    {
+      Ray ray = new Ray();
+      if (currentIhomeManager != null)
+        ray = homeCamera.targetCamera.ScreenPointToRay(Vector2.op_Implicit(info.position));
+      RaycastHit raycastHit;
+      if (Physics.Raycast(ray, ref raycastHit, 100f, 259))
+      {
+        homeCharacterBase = ((Component) ((RaycastHit) ref raycastHit).transform).GetComponent<HomeCharacterBase>();
+        homeStageTouchEvent = ((Component) ((RaycastHit) ref raycastHit).transform).GetComponent<HomeStageTouchEvent>();
+      }
+    }
+    if (Object.op_Inequality((Object) homeCharacterBase, (Object) null))
+    {
+      if (!MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+        return;
+      this.lastTargetNPCID = !(homeCharacterBase is HomeNPCCharacter) ? 0 : ((HomeNPCCharacter) homeCharacterBase).npcInfo.npcID;
+      if (!homeCharacterBase.DispatchEvent())
+        return;
+      homeCharacterBase.StopMoving();
+    }
+    else
+    {
+      if (!Object.op_Inequality((Object) homeStageTouchEvent, (Object) null))
+        return;
+      homeStageTouchEvent.DispatchEvent();
+    }
+  }
 
-	protected override void InitAnim()
-	{
-		base.InitAnim();
-		animCtrl.moveAnim = ((sexType != 0) ? PLCA.RUN_F : PLCA.RUN);
-		animCtrl.transitionDuration = 0.15f;
-		animCtrl.animator.set_speed(1f);
-		InitedAnimation = true;
-	}
+  private void Update()
+  {
+    if (Object.op_Equality((Object) this.animCtrl, (Object) null) || !((Behaviour) this.animCtrl.animator).enabled)
+      return;
+    Vector3 zero = Vector3.zero;
+    Vector3 vector3;
+    if (this.dragTouchInfo != null && this.dragTouchInfo.enable && MonoBehaviourSingleton<InputManager>.I.GetActiveInfoCount() == 1 && this.IsEnableControl())
+    {
+      if (this.isSitting)
+      {
+        this.StartCoroutine("StandUp");
+        vector3 = Vector3.zero;
+      }
+      else
+      {
+        vector3 = Quaternion.op_Multiply(MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.rotation, Vector2.op_Subtraction(this.dragTouchInfo.position, this.dragTouchInfo.beginPosition).ToVector3XZ());
+        vector3.y = 0.0f;
+        ((Vector3) ref vector3).Normalize();
+      }
+    }
+    else
+      vector3 = Vector3.zero;
+    if ((double) ((Vector3) ref vector3).sqrMagnitude > 0.0099999997764825821)
+    {
+      this._transform.rotation = Quaternion.Slerp(this._transform.rotation, Quaternion.LookRotation(vector3), 0.5f);
+      this.animCtrl.PlayMove();
+      this.CurrentActionType = LOUNGE_ACTION_TYPE.NONE;
+      if (MonoBehaviourSingleton<LoungeManager>.IsValid() || MonoBehaviourSingleton<ClanManager>.IsValid())
+        this.SendMove(true);
+    }
+    else if (!this.isSitting && !this.isStanding)
+    {
+      this.CurrentActionType = LOUNGE_ACTION_TYPE.NONE;
+      if (Vector3.op_Inequality(this.sentPosition, this._transform.position) && (MonoBehaviourSingleton<LoungeManager>.IsValid() || MonoBehaviourSingleton<ClanManager>.IsValid()))
+        this.SendMove(false);
+      this.animCtrl.PlayDefault();
+    }
+    if (!this.IsEnableControl())
+      return;
+    RaycastHit raycastHit;
+    if (Physics.Raycast(Vector3.op_Addition(this._transform.localPosition, new Vector3(0.0f, 50f, 0.0f)), Vector3.down, ref raycastHit, 50f, 4))
+    {
+      HomeStageAreaEvent component = ((Component) ((RaycastHit) ref raycastHit).collider).GetComponent<HomeStageAreaEvent>();
+      if (!Object.op_Inequality((Object) component, (Object) null))
+        return;
+      if (this.noticeCallback != null)
+        this.noticeCallback(component);
+      if (!MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
+        return;
+      float num = component.defaultRadius * component.defaultRadius;
+      Vector2 vector2 = Vector2.op_Subtraction(component._transform.TransformPoint(component._collider.center).ToVector2XZ(), this._transform.localPosition.ToVector2XZ());
+      if ((double) ((Vector2) ref vector2).sqrMagnitude <= (double) num)
+      {
+        if (!Object.op_Inequality((Object) this.lastEvent, (Object) component))
+          return;
+        component.DispatchEvent();
+        this.lastEvent = component;
+      }
+      else
+        this.lastEvent = (HomeStageAreaEvent) null;
+    }
+    else
+    {
+      if (this.noticeCallback != null)
+        this.noticeCallback((HomeStageAreaEvent) null);
+      this.lastEvent = (HomeStageAreaEvent) null;
+    }
+  }
 
-	private void OnEnable()
-	{
-		if (CTRL)
-		{
-			InputManager.OnDrag = (InputManager.OnTouchDelegate)Delegate.Combine(InputManager.OnDrag, new InputManager.OnTouchDelegate(OnDrag));
-			InputManager.OnTap = (InputManager.OnTouchDelegate)Delegate.Combine(InputManager.OnTap, new InputManager.OnTouchDelegate(OnTap));
-			dragTouchInfo = null;
-		}
-	}
+  private void SendMove(bool isMoving)
+  {
+    float num = isMoving ? 5f : 0.3f;
+    if ((double) Vector3.Distance(this.sentPosition, this._transform.position) <= (double) num)
+      return;
+    Lounge_Model_RoomMove model = new Lounge_Model_RoomMove();
+    model.id = 1005;
+    model.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
+    model.pos = this._transform.position;
+    if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
+      MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast<Lounge_Model_RoomMove>(model);
+    if (ClanMatchingManager.IsValidInClan() && MonoBehaviourSingleton<ClanNetworkManager>.IsValid())
+      MonoBehaviourSingleton<ClanNetworkManager>.I.SendBroadcast<Lounge_Model_RoomMove>(model);
+    this.sentPosition = model.pos;
+  }
 
-	private void OnDisable()
-	{
-		if (CTRL)
-		{
-			InputManager.OnDrag = (InputManager.OnTouchDelegate)Delegate.Remove(InputManager.OnDrag, new InputManager.OnTouchDelegate(OnDrag));
-			InputManager.OnTap = (InputManager.OnTouchDelegate)Delegate.Remove(InputManager.OnTap, new InputManager.OnTouchDelegate(OnTap));
-		}
-	}
+  private void SendMoveToSitPosition(Vector3 pos)
+  {
+    Lounge_Model_RoomMove model = new Lounge_Model_RoomMove();
+    model.id = 1005;
+    model.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
+    model.pos = pos;
+    if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
+      MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast<Lounge_Model_RoomMove>(model);
+    if (MonoBehaviourSingleton<ClanNetworkManager>.IsValid())
+      MonoBehaviourSingleton<ClanNetworkManager>.I.SendBroadcast<Lounge_Model_RoomMove>(model);
+    this.sentPosition = model.pos;
+  }
 
-	private void OnDrag(InputManager.TouchInfo info)
-	{
-		if (!MonoBehaviourSingleton<UIManager>.I.IsDisable() && IsEnableControl() && (dragTouchInfo == null || !dragTouchInfo.enable))
-		{
-			dragTouchInfo = info;
-		}
-	}
+  private void SendSit()
+  {
+    Lounge_Model_RoomAction model = new Lounge_Model_RoomAction();
+    model.id = 1005;
+    model.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
+    model.aid = 1;
+    if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
+      MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast<Lounge_Model_RoomAction>(model);
+    if (!MonoBehaviourSingleton<ClanNetworkManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<ClanNetworkManager>.I.SendBroadcast<Lounge_Model_RoomAction>(model);
+  }
 
-	private void OnTap(InputManager.TouchInfo info)
-	{
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-		if (IsEnableControl())
-		{
-			HomeCamera homeCamera = null;
-			if (MonoBehaviourSingleton<HomeManager>.IsValid())
-			{
-				homeCamera = MonoBehaviourSingleton<HomeManager>.I.HomeCamera;
-			}
-			else if (MonoBehaviourSingleton<LoungeManager>.IsValid())
-			{
-				homeCamera = MonoBehaviourSingleton<LoungeManager>.I.HomeCamera;
-			}
-			else if (MonoBehaviourSingleton<GuildStageManager>.IsValid())
-			{
-				homeCamera = MonoBehaviourSingleton<GuildStageManager>.I.HomeCamera;
-			}
-			if (homeCamera.viewMode == HomeCamera.VIEW_MODE.NORMAL)
-			{
-				HomeCharacterBase homeCharacterBase = null;
-				HomeStageTouchEvent homeStageTouchEvent = null;
-				if (targetEvent != null)
-				{
-					targetEvent.DispatchEvent();
-				}
-				else if (targetChara != null)
-				{
-					homeCharacterBase = targetChara;
-				}
-				else
-				{
-					Ray val = default(Ray);
-					if (MonoBehaviourSingleton<HomeManager>.IsValid() || MonoBehaviourSingleton<LoungeManager>.IsValid() || MonoBehaviourSingleton<GuildStageManager>.IsValid())
-					{
-						val = homeCamera.targetCamera.ScreenPointToRay(Vector2.op_Implicit(info.position));
-					}
-					RaycastHit val2 = default(RaycastHit);
-					if (Physics.Raycast(val, ref val2, 100f, 259))
-					{
-						homeCharacterBase = val2.get_transform().GetComponent<HomeCharacterBase>();
-						homeStageTouchEvent = val2.get_transform().GetComponent<HomeStageTouchEvent>();
-					}
-				}
-				if (homeCharacterBase != null)
-				{
-					if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-					{
-						if (homeCharacterBase is HomeNPCCharacter)
-						{
-							lastTargetNPCID = ((HomeNPCCharacter)homeCharacterBase).npcInfo.npcID;
-						}
-						else
-						{
-							lastTargetNPCID = 0;
-						}
-						if (homeCharacterBase.DispatchEvent())
-						{
-							homeCharacterBase.StopMoving();
-						}
-					}
-				}
-				else if (homeStageTouchEvent != null)
-				{
-					homeStageTouchEvent.DispatchEvent();
-				}
-			}
-		}
-	}
+  private void SendStandUp()
+  {
+    Lounge_Model_RoomAction model = new Lounge_Model_RoomAction();
+    model.id = 1005;
+    model.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
+    model.aid = 2;
+    if (MonoBehaviourSingleton<LoungeNetworkManager>.IsValid())
+      MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast<Lounge_Model_RoomAction>(model);
+    if (!MonoBehaviourSingleton<ClanNetworkManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<ClanNetworkManager>.I.SendBroadcast<Lounge_Model_RoomAction>(model);
+  }
 
-	private void Update()
-	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0218: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0232: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0237: Unknown result type (might be due to invalid IL or missing references)
-		if (!(animCtrl == null) && animCtrl.animator.get_enabled())
-		{
-			Vector3 val = Vector3.get_zero();
-			if (dragTouchInfo != null && dragTouchInfo.enable && MonoBehaviourSingleton<InputManager>.I.GetActiveInfoCount() == 1 && IsEnableControl())
-			{
-				val = (dragTouchInfo.position - dragTouchInfo.beginPosition).ToVector3XZ();
-				val = MonoBehaviourSingleton<AppMain>.I.mainCameraTransform.get_rotation() * val;
-				val.y = 0f;
-				val.Normalize();
-			}
-			else
-			{
-				val = Vector3.get_zero();
-			}
-			if (val.get_sqrMagnitude() > 0.01f)
-			{
-				base._transform.set_rotation(Quaternion.Slerp(base._transform.get_rotation(), Quaternion.LookRotation(val), 0.5f));
-				animCtrl.PlayMove(false);
-				base.CurrentActionType = LOUNGE_ACTION_TYPE.NONE;
-				if (MonoBehaviourSingleton<LoungeManager>.IsValid())
-				{
-					SendMove(true);
-				}
-				if (isSitting)
-				{
-					StandUp();
-				}
-			}
-			else if (!isSitting)
-			{
-				base.CurrentActionType = LOUNGE_ACTION_TYPE.NONE;
-				if (sentPosition != base._transform.get_position() && MonoBehaviourSingleton<LoungeManager>.IsValid())
-				{
-					SendMove(false);
-				}
-				animCtrl.PlayDefault(false);
-			}
-			if (IsEnableControl())
-			{
-				RaycastHit val2 = default(RaycastHit);
-				if (Physics.Raycast(base._transform.get_localPosition() + new Vector3(0f, 50f, 0f), Vector3.get_down(), ref val2, 50f, 4))
-				{
-					HomeStageAreaEvent component = val2.get_collider().GetComponent<HomeStageAreaEvent>();
-					if (component != null)
-					{
-						if (noticeCallback != null)
-						{
-							noticeCallback(component);
-						}
-						if (MonoBehaviourSingleton<GameSceneManager>.I.IsEventExecutionPossible())
-						{
-							float num = component.defaultRadius * component.defaultRadius;
-							Vector2 val3 = component._transform.TransformPoint(component._collider.get_center()).ToVector2XZ() - base._transform.get_localPosition().ToVector2XZ();
-							if (val3.get_sqrMagnitude() <= num)
-							{
-								if (lastEvent != component)
-								{
-									component.DispatchEvent();
-									lastEvent = component;
-								}
-							}
-							else
-							{
-								lastEvent = null;
-							}
-						}
-					}
-				}
-				else
-				{
-					if (noticeCallback != null)
-					{
-						noticeCallback(null);
-					}
-					lastEvent = null;
-				}
-			}
-		}
-	}
-
-	private void SendMove(bool isMoving)
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		float num = (!isMoving) ? 0.3f : 5f;
-		float num2 = Vector3.Distance(sentPosition, base._transform.get_position());
-		if (num2 > num)
-		{
-			Lounge_Model_RoomMove lounge_Model_RoomMove = new Lounge_Model_RoomMove();
-			lounge_Model_RoomMove.id = 1005;
-			lounge_Model_RoomMove.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-			lounge_Model_RoomMove.pos = base._transform.get_position();
-			MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomMove, false, null, null);
-			sentPosition = lounge_Model_RoomMove.pos;
-		}
-	}
-
-	private void SendMoveToSitPosition(Vector3 pos)
-	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		Lounge_Model_RoomMove lounge_Model_RoomMove = new Lounge_Model_RoomMove();
-		lounge_Model_RoomMove.id = 1005;
-		lounge_Model_RoomMove.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-		lounge_Model_RoomMove.pos = pos;
-		MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomMove, false, null, null);
-		sentPosition = lounge_Model_RoomMove.pos;
-	}
-
-	private void SendSit()
-	{
-		Lounge_Model_RoomAction lounge_Model_RoomAction = new Lounge_Model_RoomAction();
-		lounge_Model_RoomAction.id = 1005;
-		lounge_Model_RoomAction.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-		lounge_Model_RoomAction.aid = 1;
-		MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomAction, false, null, null);
-	}
-
-	private void SendStandUp()
-	{
-		Lounge_Model_RoomAction lounge_Model_RoomAction = new Lounge_Model_RoomAction();
-		lounge_Model_RoomAction.id = 1005;
-		lounge_Model_RoomAction.cid = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id;
-		lounge_Model_RoomAction.aid = 2;
-		MonoBehaviourSingleton<LoungeNetworkManager>.I.SendBroadcast(lounge_Model_RoomAction, false, null, null);
-	}
-
-	public LOUNGE_ACTION_TYPE GetActionType()
-	{
-		return base.CurrentActionType;
-	}
+  public LOUNGE_ACTION_TYPE GetActionType() => this.CurrentActionType;
 }

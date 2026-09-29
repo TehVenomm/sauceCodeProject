@@ -1,66 +1,57 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: GuildRequestAcceptSelect
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+#nullable disable
 public class GuildRequestAcceptSelect : QuestAcceptSelect
 {
-	public override void UpdateUI()
-	{
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		base.UpdateUI();
-		SetActive((Enum)UI.BTN_PARTY, false);
-		SetActive((Enum)UI.TWN_DIFFICULT_STAR, false);
-		GetCtrl(UI.BTN_GUILD_REQUEST).set_localPosition(new Vector3(0f, 0f, 0f));
-		SetLabelText((Enum)UI.LBL_LIMIT_TIME, "--:--");
-		RARITY_TYPE rarity = questInfo.questData.tableData.rarity;
-		SetActive((Enum)UI.LBL_GUILD_REQUEST_NEED_POINT, true);
-		string format = StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 6u);
-		string text = string.Format(format, MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedPoint(rarity), MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedTimeWithFormat(rarity));
-		SetLabelText((Enum)UI.LBL_GUILD_REQUEST_NEED_POINT, text);
-	}
+  public override void UpdateUI()
+  {
+    base.UpdateUI();
+    this.SetActive((Enum) QuestSelect.UI.BTN_PARTY, false);
+    this.SetActive((Enum) QuestSelect.UI.TWN_DIFFICULT_STAR, false);
+    this.GetCtrl((Enum) QuestSelect.UI.BTN_GUILD_REQUEST).localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+    this.SetLabelText((Enum) QuestSelect.UI.LBL_LIMIT_TIME, "--:--");
+    RARITY_TYPE rarity = this.questInfo.questData.tableData.rarity;
+    this.SetActive((Enum) QuestSelect.UI.LBL_GUILD_REQUEST_NEED_POINT, true);
+    this.SetLabelText((Enum) QuestSelect.UI.LBL_GUILD_REQUEST_NEED_POINT, string.Format(StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 6U), (object) MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedPoint(rarity), (object) MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedTimeWithFormat(rarity)));
+  }
 
-	protected override void OnQuery_GUILD_REQUEST()
-	{
-		GuildRequestItem selectedItem = MonoBehaviourSingleton<GuildRequestManager>.I.GetSelectedItem();
-		string arg = MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedPoint(questInfo.questData.tableData.rarity).ToString();
-		string needTimeWithFormat = MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedTimeWithFormat(questInfo.questData.tableData.rarity);
-		string houndRemainTimeWithFormat = selectedItem.GetHoundRemainTimeWithFormat();
-		TimeSpan needTime = MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedTime(questInfo.questData.tableData.rarity);
-		TimeSpan houndRemainTime = selectedItem.GetHoundRemainTime();
-		string eventData = (!(0.0 < houndRemainTime.TotalSeconds) || !(houndRemainTime < needTime)) ? string.Format(StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 0u), arg, needTimeWithFormat) : string.Format(StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 5u), arg, needTimeWithFormat, houndRemainTimeWithFormat);
-		GameSection.SetEventData(eventData);
-	}
+  protected override void OnQuery_GUILD_REQUEST()
+  {
+    GuildRequestItem selectedItem = MonoBehaviourSingleton<GuildRequestManager>.I.GetSelectedItem();
+    string str = MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedPoint(this.questInfo.questData.tableData.rarity).ToString();
+    string needTimeWithFormat = MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedTimeWithFormat(this.questInfo.questData.tableData.rarity);
+    string remainTimeWithFormat = selectedItem.GetHoundRemainTimeWithFormat();
+    TimeSpan needTime = MonoBehaviourSingleton<GuildRequestManager>.I.GetNeedTime(this.questInfo.questData.tableData.rarity);
+    TimeSpan houndRemainTime = selectedItem.GetHoundRemainTime();
+    GameSection.SetEventData(0.0 >= houndRemainTime.TotalSeconds || !(houndRemainTime < needTime) ? (object) string.Format(StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 0U), (object) str, (object) needTimeWithFormat) : (object) string.Format(StringTable.Get(STRING_CATEGORY.GUILD_REQUEST, 5U), (object) str, (object) needTimeWithFormat, (object) remainTimeWithFormat));
+  }
 
-	protected virtual void OnQuery_GuildRequestSortieMessage_YES()
-	{
-		GuildRequestItem selectedItem = MonoBehaviourSingleton<GuildRequestManager>.I.GetSelectedItem();
-		List<GameSectionHistory.HistoryData> historyList = MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList();
-		bool flag = historyList.Any((GameSectionHistory.HistoryData h) => h.sectionName == "QuestAcceptChallengeCounter" || h.sectionName == "GuildRequestChallengeCounter");
-		GameSection.StayEvent();
-		MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestStart(questInfo, !flag, delegate(bool isSuccess)
-		{
-			GuildRequestAcceptSelect guildRequestAcceptSelect = this;
-			SendGetChallengeInfo(delegate
-			{
-				GameSection.ResumeEvent(isSuccess, null);
-			}, null);
-		});
-	}
+  protected virtual void OnQuery_GuildRequestSortieMessage_YES()
+  {
+    MonoBehaviourSingleton<GuildRequestManager>.I.GetSelectedItem();
+    bool flag = MonoBehaviourSingleton<GameSceneManager>.I.GetHistoryList().Any<GameSectionHistory.HistoryData>((Func<GameSectionHistory.HistoryData, bool>) (h => h.sectionName == "QuestAcceptChallengeCounter" || h.sectionName == "GuildRequestChallengeCounter"));
+    GameSection.StayEvent();
+    MonoBehaviourSingleton<GuildRequestManager>.I.SendGuildRequestStart(this.questInfo, !flag, (Action<bool>) (isSuccess => this.SendGetChallengeInfo((System.Action) (() => GameSection.ResumeEvent(isSuccess)), (Action<bool>) null)));
+  }
 
-	private void SendGetChallengeInfo(Action onFinish, Action<bool> cb)
-	{
-		MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo(delegate(bool is_success, Error err)
-		{
-			if (onFinish != null)
-			{
-				onFinish();
-			}
-			if (cb != null)
-			{
-				cb(is_success);
-			}
-		});
-	}
+  private void SendGetChallengeInfo(System.Action onFinish, Action<bool> cb)
+  {
+    MonoBehaviourSingleton<PartyManager>.I.SendGetChallengeInfo((Action<bool, Error>) ((is_success, err) =>
+    {
+      if (onFinish != null)
+        onFinish();
+      if (cb == null)
+        return;
+      cb(is_success);
+    }));
+  }
 }

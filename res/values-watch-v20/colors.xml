@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="common_google_signin_btn_text_dark_default">#90000000</color>
-    <color name="common_google_signin_btn_text_dark_disabled">#1f000000</color>
     <color name="common_google_signin_btn_text_dark_focused">#90000000</color>
     <color name="common_google_signin_btn_text_dark_pressed">#de000000</color>
     <color name="common_google_signin_btn_text_light_default">@android:color/white</color>

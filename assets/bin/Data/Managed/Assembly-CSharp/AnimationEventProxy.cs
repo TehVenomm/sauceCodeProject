@@ -1,42 +1,43 @@
-public class AnimationEventProxy
+﻿// Decompiled with JetBrains decompiler
+// Type: AnimationEventProxy
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using UnityEngine;
+
+#nullable disable
+public class AnimationEventProxy : MonoBehaviour
 {
-	public interface IEvent
-	{
-		void OnEvent();
+  public AnimationEventProxy.IEvent listener;
 
-		void OnEventStr(string str);
+  private void OnEvent()
+  {
+    if (this.listener == null)
+      return;
+    this.listener.OnEvent();
+  }
 
-		void OnEventInt(int i);
-	}
+  private void OnEventStr(string str)
+  {
+    if (this.listener == null)
+      return;
+    this.listener.OnEventStr(str);
+  }
 
-	public IEvent listener;
+  private void OnEventInt(int i)
+  {
+    if (this.listener == null)
+      return;
+    this.listener.OnEventInt(i);
+  }
 
-	public AnimationEventProxy()
-		: this()
-	{
-	}
+  public interface IEvent
+  {
+    void OnEvent();
 
-	private void OnEvent()
-	{
-		if (listener != null)
-		{
-			listener.OnEvent();
-		}
-	}
+    void OnEventStr(string str);
 
-	private void OnEventStr(string str)
-	{
-		if (listener != null)
-		{
-			listener.OnEventStr(str);
-		}
-	}
-
-	private void OnEventInt(int i)
-	{
-		if (listener != null)
-		{
-			listener.OnEventInt(i);
-		}
-	}
+    void OnEventInt(int i);
+  }
 }

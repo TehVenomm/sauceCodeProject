@@ -1,29 +1,24 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: PostEffector
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class PostEffector
+#nullable disable
+public class PostEffector : MonoBehaviour
 {
-	[SerializeField]
-	private FilterBase filter;
+  [SerializeField]
+  private FilterBase filter;
 
-	public PostEffector()
-		: this()
-	{
-	}
+  public void SetFilter(FilterBase filter) => this.filter = filter;
 
-	public void SetFilter(FilterBase filter)
-	{
-		this.filter = filter;
-	}
-
-	private void OnRenderImage(RenderTexture src, RenderTexture dest)
-	{
-		if (filter == null)
-		{
-			Graphics.Blit(src, dest);
-		}
-		else
-		{
-			filter.PostEffectProc(src, dest);
-		}
-	}
+  private void OnRenderImage(RenderTexture src, RenderTexture dest)
+  {
+    if (Object.op_Equality((Object) this.filter, (Object) null))
+      Graphics.Blit((Texture) src, dest);
+    else
+      this.filter.PostEffectProc(src, dest);
+  }
 }

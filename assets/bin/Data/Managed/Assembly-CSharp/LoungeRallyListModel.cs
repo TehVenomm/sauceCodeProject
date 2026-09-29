@@ -1,13 +1,19 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: LoungeRallyListModel
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 
+#nullable disable
 public class LoungeRallyListModel : BaseModel
 {
-	public class RequestSendForm
-	{
-		public string id;
-	}
+  public static string URL = "ajax/lounge/rally";
+  public LoungeRallyCharaInfo result = new LoungeRallyCharaInfo();
 
-	public static string URL = "ajax/lounge/rally";
-
-	public LoungeRallyCharaInfo result = new LoungeRallyCharaInfo();
+  public class RequestSendForm
+  {
+    public string id;
+  }
 }

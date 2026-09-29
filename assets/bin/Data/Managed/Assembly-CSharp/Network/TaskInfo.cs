@@ -1,24 +1,27 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Network.TaskInfo
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 
-namespace Network
+#nullable disable
+namespace Network;
+
+[Serializable]
+public class TaskInfo
 {
-	[Serializable]
-	public class TaskInfo
-	{
-		public enum STATUS
-		{
-			NONE,
-			NOT_ACHIEVED,
-			NOT_RECIEVED,
-			RECEIVED
-		}
+  public int taskId;
+  public int status;
+  public int newFlg;
+  public int progress;
 
-		public int taskId;
-
-		public int status;
-
-		public int newFlg;
-
-		public int progress;
-	}
+  public enum STATUS
+  {
+    NONE,
+    NOT_ACHIEVED,
+    NOT_RECIEVED,
+    RECEIVED,
+  }
 }

@@ -1,272 +1,248 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SmithEvolveSelectMaterialEquipItem
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class SmithEvolveSelectMaterialEquipItem : EquipSelectBase
 {
-	public new enum UI
-	{
-		OBJ_CAPTION_3,
-		LBL_CAPTION,
-		OBJ_INFO_ROOT,
-		OBJ_ICON_ROOT,
-		STR_TITLE,
-		LBL_NAME,
-		STR_SELL,
-		LBL_SELL,
-		SPR_COIN,
-		SPR_SELL_BG,
-		SPR_NEED,
-		STR_NEED,
-		LBL_NEED_LV,
-		SPR_HAVE,
-		STR_HAVE,
-		LBL_HAVE_NUM,
-		BTN_CHANGE,
-		TGL_CHANGE_INVENTORY,
-		LBL_ICON_DISP,
-		SPR_SMALL_ICON,
-		BTN_SORT,
-		ICON_DESC,
-		TGL_ICON_ASC,
-		LBL_SORT,
-		OBJ_EQUIP_WINDOW,
-		SCR_INVENTORY,
-		GRD_INVENTORY,
-		GRD_INVENTORY_SMALL,
-		OBJ_BACK,
-		BTN_BACK
-	}
+  private uint equipId;
+  private int needLv;
+  private int equipIndex;
+  private ulong[] selectedUniqueId;
+  private EquipItemTable.EquipItemData data;
+  private Transform detailBase;
 
-	private uint equipId;
+  public override void Initialize()
+  {
+    object[] eventData = GameSection.GetEventData() as object[];
+    this.equipId = (uint) eventData[0];
+    this.needLv = (int) eventData[1];
+    this.selectedUniqueId = (ulong[]) eventData[2];
+    this.equipIndex = (int) eventData[3];
+    this.data = Singleton<EquipItemTable>.I.GetEquipItemData(this.equipId);
+    this.InitializeCaption(this.data.IsWeapon() ? this.sectionData.GetText("CAPTION_WEAPON") : this.sectionData.GetText("CAPTION_DEFENCE"));
+    base.Initialize();
+  }
 
-	private int needLv;
+  protected override void OnOpen() => this.InitLocalInventory();
 
-	private int equipIndex;
+  public override void UpdateUI()
+  {
+    this.detailBase = this.GetCtrl((Enum) SmithEvolveSelectMaterialEquipItem.UI.OBJ_INFO_ROOT);
+    if (Object.op_Inequality((Object) this.detailBase, (Object) null))
+    {
+      this.SetFontStyle(this.detailBase, (Enum) SmithEvolveSelectMaterialEquipItem.UI.STR_TITLE, (FontStyle) 2);
+      this.SetFontStyle(this.detailBase, (Enum) SmithEvolveSelectMaterialEquipItem.UI.STR_SELL, (FontStyle) 2);
+      this.SetFontStyle(this.detailBase, (Enum) SmithEvolveSelectMaterialEquipItem.UI.STR_NEED, (FontStyle) 2);
+      this.SetFontStyle(this.detailBase, (Enum) SmithEvolveSelectMaterialEquipItem.UI.STR_HAVE, (FontStyle) 2);
+      this.SetLabelText(this.detailBase, (Enum) SmithEvolveSelectMaterialEquipItem.UI.LBL_NAME, this.data.name);
+      ItemIcon.Create(new ItemIcon.ItemIconCreateParam()
+      {
+        icon_type = ItemIcon.GetItemIconType(this.data.type),
+        icon_id = this.data.GetIconID(),
+        rarity = new RARITY_TYPE?(this.data.rarity),
+        parent = this.FindCtrl(this.detailBase, (Enum) SmithEvolveSelectMaterialEquipItem.UI.OBJ_ICON_ROOT),
+        element = this.data.GetTargetElementPriorityToTable()
+      }).SetEnableCollider(false);
+      this.SetLabelText(this.detailBase, (Enum) SmithEvolveSelectMaterialEquipItem.UI.LBL_NEED_LV, this.needLv.ToString());
+      this.SetLabelText(this.detailBase, (Enum) SmithEvolveSelectMaterialEquipItem.UI.LBL_HAVE_NUM, MonoBehaviourSingleton<InventoryManager>.I.GetEquipItemNum(this.equipId).ToString());
+      this.SetLabelText(this.detailBase, (Enum) SmithEvolveSelectMaterialEquipItem.UI.LBL_SELL, this.data.sale.ToString());
+    }
+    this.LocalInventory();
+  }
 
-	private ulong[] selectedUniqueId;
+  private void InitializeCaption(string caption)
+  {
+    Transform ctrl = this.GetCtrl((Enum) SmithEvolveSelectMaterialEquipItem.UI.OBJ_CAPTION_3);
+    if (Object.op_Equality((Object) ctrl, (Object) null))
+      return;
+    this.SetLabelText(ctrl, (Enum) SmithEvolveSelectMaterialEquipItem.UI.LBL_CAPTION, caption);
+    UITweenCtrl component = ((Component) ctrl).gameObject.GetComponent<UITweenCtrl>();
+    if (!Object.op_Inequality((Object) component, (Object) null))
+      return;
+    component.Reset();
+    int index = 0;
+    for (int length = component.tweens.Length; index < length; ++index)
+      component.tweens[index].ResetToBeginning();
+    component.Play();
+  }
 
-	private EquipItemTable.EquipItemData data;
+  protected override void InitSort()
+  {
+    if (MonoBehaviourSingleton<InventoryManager>.I.IsWeaponInventoryType(MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType))
+      this.sortSettings = SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.WEAPON, SortSettings.SETTINGS_TYPE.EQUIP_ITEM);
+    else
+      this.sortSettings = SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.ARMOR, SortSettings.SETTINGS_TYPE.EQUIP_ITEM);
+  }
 
-	private Transform detailBase;
+  protected override void InitLocalInventory()
+  {
+    List<EquipItemInfo> inventory = new List<EquipItemInfo>();
+    MonoBehaviourSingleton<InventoryManager>.I.ForAllEquipItemInventory((Action<EquipItemInfo>) (item =>
+    {
+      for (int index = 0; index < this.selectedUniqueId.Length; ++index)
+      {
+        if ((long) this.selectedUniqueId[index] == (long) item.uniqueID)
+          return;
+      }
+      if ((int) item.tableID != (int) this.equipId)
+        return;
+      inventory.Add(item);
+    }));
+    this.localInventoryEquipData = (SortCompareData[]) this.sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortData>(inventory.ToArray());
+  }
 
-	public override void Initialize()
-	{
-		object[] array = GameSection.GetEventData() as object[];
-		equipId = (uint)array[0];
-		needLv = (int)array[1];
-		selectedUniqueId = (ulong[])array[2];
-		equipIndex = (int)array[3];
-		data = Singleton<EquipItemTable>.I.GetEquipItemData(equipId);
-		string caption = (!data.IsWeapon()) ? base.sectionData.GetText("CAPTION_DEFENCE") : base.sectionData.GetText("CAPTION_WEAPON");
-		InitializeCaption(caption);
-		base.Initialize();
-	}
+  protected override void LocalInventory()
+  {
+    this.SetupEnableInventoryUI();
+    if (this.localInventoryEquipData == null)
+      return;
+    this.SetLabelText((Enum) SmithEvolveSelectMaterialEquipItem.UI.LBL_SORT, this.sortSettings.GetSortLabel());
+    this.m_generatedIconList.Clear();
+    this.UpdateNewIconInfo();
+    this.SetDynamicList((Enum) this.InventoryUI, (string) null, this.localInventoryEquipData.Length + 1, false, (Func<int, bool>) (i =>
+    {
+      if (i == 0)
+        return true;
+      SortCompareData sortCompareData = this.localInventoryEquipData[i - 1];
+      return sortCompareData != null && sortCompareData.IsPriority(this.sortSettings.orderTypeAsc);
+    }), (Func<int, Transform, Transform>) null, (Action<int, Transform, bool>) ((i, t, is_recycle) =>
+    {
+      if (i == 0)
+      {
+        this.CreateRemoveIcon(t, "SELECT", -1, is_select: this.selectInventoryIndex == -1, name: this.sectionData.GetText("STR_DETACH"));
+      }
+      else
+      {
+        int index = i - 1;
+        uint tableId = this.localInventoryEquipData[index].GetTableID();
+        if (tableId == 0U)
+        {
+          this.SetActive(t, false);
+        }
+        else
+        {
+          this.SetActive(t, true);
+          Singleton<EquipItemTable>.I.GetEquipItemData(tableId);
+          EquipItemSortData equipItemSortData = this.localInventoryEquipData[index] as EquipItemSortData;
+          EquipItemInfo itemData = equipItemSortData.GetItemData() as EquipItemInfo;
+          bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(equipItemSortData.GetIconType(), equipItemSortData.GetUniqID());
+          SkillSlotUIData[] skillSlotData = this.GetSkillSlotData(itemData);
+          int equip_index = equipItemSortData.IsEquipping() ? 0 : -1;
+          ItemIcon itemIconDetail = this.CreateItemIconDetail(equipItemSortData, skillSlotData, this.IsShowMainStatus, t, "SELECT", i - 1, is_new: is_new, equip_index: equip_index);
+          itemIconDetail.SetItemID(equipItemSortData.GetTableID());
+          itemIconDetail.SetGrayout(itemData.level < this.needLv);
+          object[] event_data = new object[2]
+          {
+            (object) ItemDetailEquip.CURRENT_SECTION.SMITH_EVOLVE,
+            (object) itemData
+          };
+          this.SetLongTouch(itemIconDetail.transform, "DETAIL", (object) event_data);
+          if (Object.op_Inequality((Object) itemIconDetail, (Object) null) && equipItemSortData != null)
+            itemIconDetail.SetInitData((SortCompareData) equipItemSortData);
+          if (!Object.op_Inequality((Object) itemIconDetail, (Object) null) || this.m_generatedIconList.Contains(itemIconDetail))
+            return;
+          this.m_generatedIconList.Add(itemIconDetail);
+        }
+      }
+    }));
+  }
 
-	protected override void OnOpen()
-	{
-		InitLocalInventory();
-	}
+  protected override void EquipParam()
+  {
+  }
 
-	public override void UpdateUI()
-	{
-		detailBase = GetCtrl(UI.OBJ_INFO_ROOT);
-		if (detailBase != null)
-		{
-			SetFontStyle(detailBase, UI.STR_TITLE, 2);
-			SetFontStyle(detailBase, UI.STR_SELL, 2);
-			SetFontStyle(detailBase, UI.STR_NEED, 2);
-			SetFontStyle(detailBase, UI.STR_HAVE, 2);
-			SetLabelText(detailBase, UI.LBL_NAME, data.name);
-			ItemIcon.ItemIconCreateParam itemIconCreateParam = new ItemIcon.ItemIconCreateParam();
-			itemIconCreateParam.icon_type = ItemIcon.GetItemIconType(data.type);
-			itemIconCreateParam.icon_id = data.GetIconID();
-			itemIconCreateParam.rarity = data.rarity;
-			itemIconCreateParam.parent = FindCtrl(detailBase, UI.OBJ_ICON_ROOT);
-			itemIconCreateParam.element = data.GetTargetElementPriorityToTable();
-			ItemIcon itemIcon = ItemIcon.Create(itemIconCreateParam);
-			itemIcon.SetEnableCollider(false);
-			SetLabelText(detailBase, UI.LBL_NEED_LV, needLv.ToString());
-			SetLabelText(detailBase, UI.LBL_HAVE_NUM, MonoBehaviourSingleton<InventoryManager>.I.GetEquipItemNum(equipId).ToString());
-			SetLabelText(detailBase, UI.LBL_SELL, data.sale.ToString());
-		}
-		LocalInventory();
-	}
+  protected override int GetSelectItemIndex()
+  {
+    for (int selectItemIndex = 0; selectItemIndex < this.localInventoryEquipData.Length; ++selectItemIndex)
+    {
+      if ((long) this.selectedUniqueId[this.equipIndex] == (long) this.localInventoryEquipData[selectItemIndex].GetUniqID())
+        return selectItemIndex;
+    }
+    return -1;
+  }
 
-	private void InitializeCaption(string caption)
-	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		Transform ctrl = GetCtrl(UI.OBJ_CAPTION_3);
-		if (!(ctrl == null))
-		{
-			SetLabelText(ctrl, UI.LBL_CAPTION, caption);
-			UITweenCtrl component = ctrl.get_gameObject().GetComponent<UITweenCtrl>();
-			if (component != null)
-			{
-				component.Reset();
-				int i = 0;
-				for (int num = component.tweens.Length; i < num; i++)
-				{
-					component.tweens[i].ResetToBeginning();
-				}
-				component.Play(true, null);
-			}
-		}
-	}
+  private void OnQuery_SECTION_BACK() => GameSection.SetEventData((object) this.selectedUniqueId);
 
-	protected override void InitSort()
-	{
-		if (MonoBehaviourSingleton<InventoryManager>.I.IsWeaponInventoryType(MonoBehaviourSingleton<InventoryManager>.I.changeInventoryType))
-		{
-			sortSettings = SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.WEAPON, SortSettings.SETTINGS_TYPE.EQUIP_ITEM);
-		}
-		else
-		{
-			sortSettings = SortSettings.CreateMemSortSettings(SortBase.DIALOG_TYPE.ARMOR, SortSettings.SETTINGS_TYPE.EQUIP_ITEM);
-		}
-	}
+  private void OnQuery_SELECT()
+  {
+    this.selectInventoryIndex = (int) GameSection.GetEventData();
+    if (this.selectInventoryIndex == -1)
+    {
+      this.selectedUniqueId[this.equipIndex] = 0UL;
+    }
+    else
+    {
+      EquipItemSortData equipItemSortData = this.localInventoryEquipData[this.selectInventoryIndex] as EquipItemSortData;
+      if (equipItemSortData.IsFavorite())
+      {
+        GameSection.ChangeEvent("NOT_SELECT_FAVORITE");
+        return;
+      }
+      if (equipItemSortData.IsEquipping())
+      {
+        GameSection.ChangeEvent("NOT_SELECT_EQUIPPING");
+        return;
+      }
+      if (equipItemSortData.GetLevel() < this.needLv)
+      {
+        GameSection.ChangeEvent("NOT_SELECT_LOW_LEVEL");
+        return;
+      }
+      this.selectedUniqueId[this.equipIndex] = equipItemSortData.GetUniqID();
+    }
+    GameSection.SetEventData((object) this.selectedUniqueId);
+  }
 
-	protected override void InitLocalInventory()
-	{
-		List<EquipItemInfo> inventory = new List<EquipItemInfo>();
-		MonoBehaviourSingleton<InventoryManager>.I.ForAllEquipItemInventory(delegate(EquipItemInfo item)
-		{
-			for (int i = 0; i < selectedUniqueId.Length; i++)
-			{
-				if (selectedUniqueId[i] == item.uniqueID)
-				{
-					return;
-				}
-			}
-			if (item.tableID == equipId)
-			{
-				inventory.Add(item);
-			}
-		});
-		localInventoryEquipData = sortSettings.CreateSortAry<EquipItemInfo, EquipItemSortData>(inventory.ToArray());
-	}
+  protected override void OnQueryDetail()
+  {
+  }
 
-	protected override void LocalInventory()
-	{
-		SetupEnableInventoryUI();
-		if (localInventoryEquipData != null)
-		{
-			SetLabelText((Enum)UI.LBL_SORT, sortSettings.GetSortLabel());
-			SetDynamicList((Enum)InventoryUI, (string)null, localInventoryEquipData.Length + 1, false, (Func<int, bool>)delegate(int i)
-			{
-				if (i == 0)
-				{
-					return true;
-				}
-				int num2 = i - 1;
-				SortCompareData sortCompareData = localInventoryEquipData[num2];
-				if (sortCompareData == null || !sortCompareData.IsPriority(sortSettings.orderTypeAsc))
-				{
-					return false;
-				}
-				return true;
-			}, (Func<int, Transform, Transform>)null, (Action<int, Transform, bool>)delegate(int i, Transform t, bool is_recycle)
-			{
-				if (i == 0)
-				{
-					CreateRemoveIcon(t, "SELECT", -1, -1, selectInventoryIndex == -1, base.sectionData.GetText("STR_DETACH"));
-				}
-				else
-				{
-					int num = i - 1;
-					uint tableID = localInventoryEquipData[num].GetTableID();
-					if (tableID == 0)
-					{
-						SetActive(t, false);
-					}
-					else
-					{
-						SetActive(t, true);
-						EquipItemTable.EquipItemData equipItemData = Singleton<EquipItemTable>.I.GetEquipItemData(tableID);
-						EquipItemSortData equipItemSortData = localInventoryEquipData[num] as EquipItemSortData;
-						EquipItemInfo equipItemInfo = equipItemSortData.GetItemData() as EquipItemInfo;
-						ITEM_ICON_TYPE iconType = equipItemSortData.GetIconType();
-						bool is_new = MonoBehaviourSingleton<InventoryManager>.I.IsNewItem(iconType, equipItemSortData.GetUniqID());
-						SkillSlotUIData[] skillSlotData = GetSkillSlotData(equipItemInfo);
-						int equip_index = (!equipItemSortData.IsEquipping()) ? (-1) : 0;
-						ItemIcon itemIcon = CreateItemIconDetail(equipItemSortData, skillSlotData, base.IsShowMainStatus, t, "SELECT", i - 1, ItemIconDetail.ICON_STATUS.NONE, is_new, -1, false, equip_index);
-						itemIcon.SetItemID(equipItemSortData.GetTableID());
-						itemIcon.SetGrayout(equipItemInfo.level < needLv);
-						object[] event_data = new object[2]
-						{
-							ItemDetailEquip.CURRENT_SECTION.SMITH_EVOLVE,
-							equipItemInfo
-						};
-						SetLongTouch(itemIcon.transform, "DETAIL", event_data);
-					}
-				}
-			});
-		}
-	}
+  protected override bool sorting()
+  {
+    this.InitLocalInventory();
+    return true;
+  }
 
-	protected override void EquipParam()
-	{
-	}
+  protected void OnCloseDialog_SmithSelectEquipSort() => this.OnCloseSortDialog();
 
-	protected override int GetSelectItemIndex()
-	{
-		for (int i = 0; i < localInventoryEquipData.Length; i++)
-		{
-			if (selectedUniqueId[equipIndex] == localInventoryEquipData[i].GetUniqID())
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	private void OnQuery_SECTION_BACK()
-	{
-		GameSection.SetEventData(selectedUniqueId);
-	}
-
-	private void OnQuery_SELECT()
-	{
-		selectInventoryIndex = (int)GameSection.GetEventData();
-		if (selectInventoryIndex == -1)
-		{
-			selectedUniqueId[equipIndex] = 0uL;
-		}
-		else
-		{
-			EquipItemSortData equipItemSortData = localInventoryEquipData[selectInventoryIndex] as EquipItemSortData;
-			if (equipItemSortData.IsFavorite())
-			{
-				GameSection.ChangeEvent("NOT_SELECT_FAVORITE", null);
-				return;
-			}
-			if (equipItemSortData.IsEquipping())
-			{
-				GameSection.ChangeEvent("NOT_SELECT_EQUIPPING", null);
-				return;
-			}
-			if (equipItemSortData.GetLevel() < needLv)
-			{
-				GameSection.ChangeEvent("NOT_SELECT_LOW_LEVEL", null);
-				return;
-			}
-			selectedUniqueId[equipIndex] = equipItemSortData.GetUniqID();
-		}
-		GameSection.SetEventData(selectedUniqueId);
-	}
-
-	protected override void OnQueryDetail()
-	{
-	}
-
-	protected override bool sorting()
-	{
-		InitLocalInventory();
-		return true;
-	}
-
-	protected void OnCloseDialog_SmithSelectEquipSort()
-	{
-		OnCloseSortDialog();
-	}
+  public new enum UI
+  {
+    OBJ_CAPTION_3,
+    LBL_CAPTION,
+    OBJ_INFO_ROOT,
+    OBJ_ICON_ROOT,
+    STR_TITLE,
+    LBL_NAME,
+    STR_SELL,
+    LBL_SELL,
+    SPR_COIN,
+    SPR_SELL_BG,
+    SPR_NEED,
+    STR_NEED,
+    LBL_NEED_LV,
+    SPR_HAVE,
+    STR_HAVE,
+    LBL_HAVE_NUM,
+    BTN_CHANGE,
+    TGL_CHANGE_INVENTORY,
+    LBL_ICON_DISP,
+    SPR_SMALL_ICON,
+    BTN_SORT,
+    ICON_DESC,
+    TGL_ICON_ASC,
+    LBL_SORT,
+    OBJ_EQUIP_WINDOW,
+    SCR_INVENTORY,
+    GRD_INVENTORY,
+    GRD_INVENTORY_SMALL,
+    OBJ_BACK,
+    BTN_BACK,
+  }
 }

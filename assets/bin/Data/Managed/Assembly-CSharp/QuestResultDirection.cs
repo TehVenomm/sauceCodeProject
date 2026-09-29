@@ -1,131 +1,132 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestResultDirection
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class QuestResultDirection : GameSection
 {
-	private QuestResultDirector director;
+  private QuestResultDirector director;
+  private PlayerLoader[] players;
+  private int winnder_voice_id;
 
-	private PlayerLoader[] players;
+  public override void Initialize() => this.StartCoroutine(this.DoInitialize());
 
-	private int winnder_voice_id;
+  private IEnumerator DoInitialize()
+  {
+    MonoBehaviourSingleton<UIManager>.I.loading.SetActiveDragon(true);
+    yield return (object) new WaitForEndOfFrame();
+    yield return (object) MonoBehaviourSingleton<AppMain>.I.UnloadUnusedAssets(true);
+    yield return (object) new WaitForEndOfFrame();
+    if (MonoBehaviourSingleton<InGameRecorder>.IsValid() && MonoBehaviourSingleton<InGameRecorder>.I.players.Count > 0)
+    {
+      LoadingQueue load_queue = new LoadingQueue((MonoBehaviour) this);
+      LoadObject lo = load_queue.Load(RESOURCE_CATEGORY.UI, "QuestResultDirector");
+      List<InGameRecorder.PlayerRecord> players = MonoBehaviourSingleton<InGameRecorder>.I.players;
+      int index1 = 0;
+      while (index1 < players.Count)
+      {
+        InGameRecorder.PlayerRecord playerRecord = players[index1];
+        if (playerRecord == null || playerRecord.playerLoadInfo == null)
+          players.RemoveAt(index1);
+        else
+          ++index1;
+      }
+      bool waitLoad = true;
+      MonoBehaviourSingleton<InGameRecorder>.I.CreatePlayerModelsAsync((Action<PlayerLoader[]>) (loaders =>
+      {
+        this.players = loaders;
+        waitLoad = false;
+      }));
+      while (waitLoad)
+        yield return (object) null;
+      this.winnder_voice_id = 0;
+      if (this.players != null)
+      {
+        this.winnder_voice_id = this.players[0].GetVoiceId(ACTION_VOICE_ID.HAPPY_01);
+        load_queue.CacheActionVoice(this.winnder_voice_id);
+      }
+      if (load_queue.IsLoading())
+        yield return (object) load_queue.Wait();
+      int index2 = 0;
+      for (int length = this.players.Length; index2 < length; ++index2)
+        this.players[index2].animator.applyRootMotion = false;
+      this.director = ((Component) ResourceUtility.Realizes(lo.loadedObject, MonoBehaviourSingleton<StageManager>.I._transform)).GetComponent<QuestResultDirector>();
+      this.director.players = this.players;
+      load_queue = (LoadingQueue) null;
+      lo = (LoadObject) null;
+    }
+    if (MonoBehaviourSingleton<SceneSettingsManager>.IsValid())
+      MonoBehaviourSingleton<SceneSettingsManager>.I.DisableWaveTarget();
+    GC.Collect();
+    yield return (object) new WaitForEndOfFrame();
+    MonoBehaviourSingleton<UIManager>.I.loading.SetActiveDragon(false);
+    if (QuestManager.IsValidTrial() && MonoBehaviourSingleton<UIManager>.IsValid() && Object.op_Inequality((Object) MonoBehaviourSingleton<UIManager>.I.mainChat, (Object) null))
+    {
+      MonoBehaviourSingleton<UIManager>.I.mainChat.HideOpenButton();
+      MonoBehaviourSingleton<UIManager>.I.mainChat.HideAll();
+    }
+    base.Initialize();
+  }
 
-	public override void Initialize()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoInitialize());
-	}
+  private void LateUpdate()
+  {
+    if (!Object.op_Inequality((Object) this.director, (Object) null) || !((Behaviour) this.director).enabled || !Object.op_Inequality((Object) this.director.targetAnim, (Object) null) || this.director.targetAnim.isPlaying)
+      return;
+    this.OnDirectionFinished();
+  }
 
-	private IEnumerator DoInitialize()
-	{
-		if (MonoBehaviourSingleton<InGameRecorder>.IsValid() && MonoBehaviourSingleton<InGameRecorder>.I.players.Count > 0)
-		{
-			LoadingQueue load_queue = new LoadingQueue(this);
-			LoadObject lo = load_queue.Load(RESOURCE_CATEGORY.UI, "QuestResultDirector", false);
-			List<InGameRecorder.PlayerRecord> playerRecords = MonoBehaviourSingleton<InGameRecorder>.I.players;
-			int m = 0;
-			while (m < playerRecords.Count)
-			{
-				InGameRecorder.PlayerRecord p = playerRecords[m];
-				if (p == null || p.playerLoadInfo == null)
-				{
-					playerRecords.RemoveAt(m);
-				}
-				else
-				{
-					m++;
-				}
-			}
-			players = MonoBehaviourSingleton<InGameRecorder>.I.CreatePlayerModels();
-			winnder_voice_id = 0;
-			if (players != null)
-			{
-				winnder_voice_id = players[0].GetVoiceId(ACTION_VOICE_ID.HAPPY_01);
-				load_queue.CacheActionVoice(winnder_voice_id, null);
-			}
-			if (load_queue.IsLoading())
-			{
-				yield return (object)load_queue.Wait();
-			}
-			while (true)
-			{
-				bool wait = false;
-				int l = 0;
-				for (int k = players.Length; l < k; l++)
-				{
-					if (players[l].isLoading)
-					{
-						wait = true;
-						break;
-					}
-				}
-				if (!wait)
-				{
-					break;
-				}
-				yield return (object)null;
-			}
-			int j = 0;
-			for (int i = players.Length; j < i; j++)
-			{
-				players[j].animator.set_applyRootMotion(false);
-			}
-			director = ResourceUtility.Realizes(lo.loadedObject, MonoBehaviourSingleton<StageManager>.I._transform, -1).GetComponent<QuestResultDirector>();
-			director.players = players;
-		}
-		base.Initialize();
-	}
+  protected override void OnDestroy()
+  {
+    base.OnDestroy();
+    if (Object.op_Inequality((Object) this.director, (Object) null))
+      Object.Destroy((Object) ((Component) this.director).gameObject);
+    if (!MonoBehaviourSingleton<InGameRecorder>.IsValid())
+      return;
+    MonoBehaviourSingleton<InGameRecorder>.I.DeletePlayerModels();
+  }
 
-	private void LateUpdate()
-	{
-		if (director != null && director.get_enabled() && !director.cameraAnim.get_isPlaying())
-		{
-			OnDirectionFinished();
-		}
-	}
+  public override void StartSection()
+  {
+    if (MonoBehaviourSingleton<InGameRecorder>.IsValid() && MonoBehaviourSingleton<InGameRecorder>.I.players.Count != 0)
+      return;
+    this.OnDirectionFinished();
+  }
 
-	protected override void OnDestroy()
-	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		base.OnDestroy();
-		if (director != null)
-		{
-			Object.Destroy(director.get_gameObject());
-		}
-		if (MonoBehaviourSingleton<InGameRecorder>.IsValid())
-		{
-			MonoBehaviourSingleton<InGameRecorder>.I.DeletePlayerModels();
-		}
-	}
+  private void OnDirectionFinished()
+  {
+    if (this.winnder_voice_id > 0)
+      SoundManager.PlayActionVoice(this.winnder_voice_id);
+    ((Behaviour) this.director).enabled = false;
+    if (QuestManager.IsValidTrial())
+      this.DispatchEvent("NEXT_TRIAL");
+    else
+      this.DispatchEvent("NEXT");
+  }
 
-	public override void StartSection()
-	{
-		if (!MonoBehaviourSingleton<InGameRecorder>.IsValid() || MonoBehaviourSingleton<InGameRecorder>.I.players.Count == 0)
-		{
-			OnDirectionFinished();
-		}
-	}
+  private void OnQuery_NEXT()
+  {
+    if (!((Behaviour) this.director).enabled)
+      return;
+    this.director.Skip();
+    GameSection.StopEvent();
+  }
 
-	private void OnDirectionFinished()
-	{
-		if (winnder_voice_id > 0)
-		{
-			SoundManager.PlayActionVoice(winnder_voice_id, 1f, 0u, null, null);
-		}
-		director.set_enabled(false);
-		DispatchEvent("NEXT", null);
-	}
+  private void OnQuery_NEXT_TRIAL()
+  {
+    if (!((Behaviour) this.director).enabled)
+      return;
+    this.director.Skip();
+    GameSection.StopEvent();
+  }
 
-	private void OnQuery_NEXT()
-	{
-		if (director.get_enabled())
-		{
-			director.Skip();
-			GameSection.StopEvent();
-		}
-	}
-
-	public override void UpdateUI()
-	{
-	}
+  public override void UpdateUI()
+  {
+  }
 }

@@ -1,341 +1,277 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestReamGachaDirector
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class QuestReamGachaDirector : QuestGachaDirectorBase
 {
-	public const string ENEMY_MOTION_BASE_LAYER = "Base Layer.";
+  public const string ENEMY_MOTION_BASE_LAYER = "Base Layer.";
+  public const string ENEMY_MOTION_STATE_IDLE = "Base Layer.IDLE";
+  public const string ENEMY_MOTION_STATE_GACHA = "Base Layer.GACHA_SINGLE";
+  public const string ENEMY_MOTION_STATE_GACHA11 = "Base Layer.GACHA_11";
+  public const float MAGIC_CIRCLE_EFFECT_FINISH_TIME = 13.5f;
+  public const int REAM_MAX = 11;
+  public Transform[] magicCircles;
+  public Transform[] enemyPositions;
+  public float[] meteorTimings;
+  public float[] magicTimings;
+  public float[] meteorSETimings;
+  public float[] magicSETimings;
+  public float showRarityWaitTime = 1f;
+  public float lastShowRarityWaitTime = 2.5f;
+  private bool m_isSkipAll;
 
-	public const string ENEMY_MOTION_STATE_IDLE = "Base Layer.IDLE";
+  protected override IEnumerator GetDirectionCoroutine() => this.DoQuestGacha();
 
-	public const string ENEMY_MOTION_STATE_GACHA = "Base Layer.GACHA_SINGLE";
+  private IEnumerator DoQuestGacha()
+  {
+    this.m_isSkipAll = false;
+    this.Init();
+    this.SetLinkCamera(true);
+    EnemyLoader[] enemyLoaderList = new EnemyLoader[11];
+    EnemyTable.EnemyData[] enemy_datas = new EnemyTable.EnemyData[11];
+    QuestTable.QuestTableData[] quest_datas = new QuestTable.QuestTableData[11];
+    GachaResult currentGachaResult = MonoBehaviourSingleton<GachaManager>.I.GetCurrentGachaResult();
+    if (MonoBehaviourSingleton<GachaManager>.IsValid() && currentGachaResult != null)
+    {
+      int count = currentGachaResult.reward.Count;
+      int index1 = 0;
+      for (int index2 = count; index1 < index2; ++index1)
+      {
+        GachaResult.GachaReward gachaReward = currentGachaResult.reward[index1];
+        uint itemId = (uint) gachaReward.itemId;
+        quest_datas[index1] = Singleton<QuestTable>.I.GetQuestData(itemId);
+        if (quest_datas[index1] != null)
+        {
+          enemy_datas[index1] = Singleton<EnemyTable>.I.GetEnemyData((uint) quest_datas[index1].GetMainEnemyID());
+          if (enemy_datas[index1] == null)
+            Log.Error("EnemyTable[{0}] == null", (object) quest_datas[index1].GetMainEnemyID());
+        }
+        else
+        {
+          Log.Error("QuestTable[{0}] == null", (object) gachaReward.itemId);
+          quest_datas[index1] = new QuestTable.QuestTableData();
+          enemy_datas[index1] = new EnemyTable.EnemyData();
+        }
+      }
+    }
+    NPCLoader npc_loader = this.LoadNPC();
+    npc_loader.Load(Singleton<NPCTable>.I.GetNPCData(2).npcModelID, 0, false, true, SHADER_TYPE.NORMAL, (System.Action) null);
+    int index3 = 0;
+    for (int index4 = 11; index3 < index4; ++index3)
+    {
+      float displayScale = enemy_datas[index3].modelScale;
+      int animId = enemy_datas[index3].animId;
+      int modelId = enemy_datas[index3].modelId;
+      OutGameSettingsManager.EnemyDisplayInfo enemyDisplayInfo = MonoBehaviourSingleton<OutGameSettingsManager>.I.SearchEnemyDisplayInfoForGacha(enemy_datas[index3]);
+      if (enemyDisplayInfo != null)
+      {
+        animId = enemyDisplayInfo.animID;
+        displayScale = enemyDisplayInfo.gachaScale;
+      }
+      enemyLoaderList[index3] = this.LoadEnemy(this.enemyPositions[index3], modelId, animId, displayScale, enemy_datas[index3].baseEffectName, enemy_datas[index3].baseEffectNode);
+    }
+    int i = 0;
+    int n;
+    for (n = 11; i < n; ++i)
+    {
+      while (enemyLoaderList[i].isLoading)
+        yield return (object) null;
+      enemyLoaderList[i].ApplyGachaDisplayScaleToParentNode();
+      this.CheckAndReplaceShader(enemyLoaderList[i]);
+      ((Component) enemyLoaderList[i]).gameObject.SetActive(false);
+    }
+    LoadingQueue lo_queue = new LoadingQueue((MonoBehaviour) this);
+    this.CacheAudio(lo_queue);
+    for (int index5 = 0; index5 < 11; ++index5)
+      this.CacheEnemyAudio(enemy_datas[index5], lo_queue);
+    while (npc_loader.isLoading)
+      yield return (object) null;
+    while (lo_queue.IsLoading())
+      yield return (object) null;
+    PlayerAnimCtrl npc_anim = PlayerAnimCtrl.Get(npc_loader.animator, PLCA.IDLE_01);
+    this.CreateNPCEffect(npc_loader.model);
+    yield return (object) null;
+    this.stageAnimator.cullingMode = (AnimatorCullingMode) 0;
+    this.stageAnimator.Rebind();
+    this.stageAnimator.Play("StageAnim_Main");
+    this.Play("MainAnim_Start");
+    this.PlayEffect(this.startEffectPrefabs[0]);
+    npc_anim.Play(PLCA.QUEST_GACHA, true);
+    this.PlayAudio(QuestGachaDirectorBase.AUDIO.OPENING_01);
+    while (this.Step(0.5f))
+      yield return (object) null;
+    this.PlayAudio(QuestGachaDirectorBase.AUDIO.OPENING_02);
+    this.PlayAudio(QuestGachaDirectorBase.AUDIO.OPENING_03);
+    while (this.Step(1.4f))
+      yield return (object) null;
+    this.PlayAudio(QuestGachaDirectorBase.AUDIO.OPENING_04);
+    while (this.Step(2.6f))
+      yield return (object) null;
+    this.PlayAudio(QuestGachaDirectorBase.AUDIO.DOOR_01);
+    while (this.Step(3.2f))
+      yield return (object) null;
+    this.PlayAudio(QuestGachaDirectorBase.AUDIO.DOOR_02);
+    while (this.Step(3.38f))
+      yield return (object) null;
+    this.PlayAudio(QuestGachaDirectorBase.AUDIO.MAGI_INTRO_01);
+    while (this.Step(5.1f))
+      yield return (object) null;
+    this.PlayAudio(QuestGachaDirectorBase.AUDIO.MAGI_INTRO_02);
+    while (this.Step(5.5f))
+      yield return (object) null;
+    this.PlayEffect(this.startEffectPrefabs[1]);
+    Transform[] magic_effects = new Transform[11];
+    Transform[] end_effects = new Transform[11];
+    n = 0;
+    i = 0;
+    int max_step = 11;
+    this.time -= Time.deltaTime;
+    while (n < max_step || i < max_step)
+    {
+      this.time += Time.deltaTime;
+      if (n < max_step && (double) this.meteorTimings[n] <= (double) this.time)
+      {
+        this.PlayEffect(this.magicCircles[n], this.meteorEffectPrefabs[quest_datas[n].rarity.ToRarityExpressionID()]);
+        if (n == max_step - 1)
+          this.PlayAudio(QuestGachaDirectorBase.AUDIO.METEOR_01);
+        ++n;
+      }
+      if (i < max_step && (double) this.magicTimings[i] <= (double) this.time)
+      {
+        magic_effects[i] = this.PlayEffect(this.magicCircles[i], this.magicEffectPrefabs[quest_datas[i].rarity.ToRarityExpressionID()]);
+        this.PlayMagicAudio((int) quest_datas[i].rarity);
+        ++i;
+      }
+      yield return (object) null;
+    }
+    int index6 = i - 1;
+    if (index6 < max_step && index6 >= 0)
+      this.PlayMagicAudio((int) quest_datas[index6].rarity);
+    while (this.Step(13.5f))
+      yield return (object) null;
+    if (this.skip && !this.m_isSkipAll)
+    {
+      if (MonoBehaviourSingleton<TransitionManager>.I.isChanging)
+        yield return (object) null;
+      Time.timeScale = 1f;
+      this.skip = false;
+      this.time = 13.5f;
+      yield return (object) MonoBehaviourSingleton<TransitionManager>.I.In();
+      this.sectionCommandReceiver.ActivateSkipButton();
+    }
+    this.ActivateFirstSkipFlag();
+    max_step = 0;
+    float end_time = 13.5f;
+    float end_step_time = 1.5f;
+    float end_step_time_last = 2f;
+    RARITY_TYPE rarity_type;
+    while (true)
+    {
+      this.sectionCommandReceiver.OnHideRarity();
+      this.PlayAudio(QuestGachaDirectorBase.AUDIO.RARITY_EXPOSITION);
+      if (max_step > 0)
+      {
+        int index7 = max_step - 1;
+        if (Object.op_Inequality((Object) enemyLoaderList[index7], (Object) null))
+          ((Component) enemyLoaderList[index7]).gameObject.SetActive(false);
+        if (Object.op_Inequality((Object) magic_effects[index7], (Object) null))
+        {
+          Object.Destroy((Object) ((Component) magic_effects[index7]).gameObject);
+          magic_effects[index7] = (Transform) null;
+        }
+        if (Object.op_Inequality((Object) end_effects[index7], (Object) null))
+        {
+          Object.Destroy((Object) ((Component) end_effects[index7]).gameObject);
+          end_effects[index7] = (Transform) null;
+        }
+      }
+      EnemyLoader enemyLoader = enemyLoaderList[max_step];
+      ((Component) enemyLoader).gameObject.SetActive(true);
+      if (!this.skip)
+      {
+        string animStateName = "Base Layer.GACHA_11";
+        if (max_step == enemyLoaderList.Length - 1)
+          animStateName = "Base Layer.GACHA_SINGLE";
+        this.PlayEnemyAnimation(enemyLoader, animStateName);
+      }
+      rarity_type = quest_datas[max_step].rarity;
+      int index8 = rarity_type.ToRarityExpressionID();
+      if (rarity_type == RARITY_TYPE.SS)
+        index8 = 3;
+      end_effects[max_step] = this.PlayEffect(this.magicCircles[max_step], this.endEffectPrefabs[index8]);
+      this.Play($"MainAnim_End_{max_step + 1:D2}");
+      ++max_step;
+      bool is_short = max_step < 11;
+      this.PlayAppearAudio(rarity_type, is_short);
+      if (enemy_datas.Length >= max_step)
+        this.PlayEnemyAudio(enemy_datas[max_step - 1], is_short);
+      if (max_step < 11)
+      {
+        float waitTime = 0.0f;
+        while ((double) waitTime < (double) this.showRarityWaitTime)
+        {
+          waitTime += Time.deltaTime;
+          if (this.IsSkipAppearEnemy)
+            waitTime = this.showRarityWaitTime;
+          yield return (object) null;
+        }
+        if (!this.IsSkipAppearEnemy)
+          this.sectionCommandReceiver.OnShowRarity(rarity_type);
+        end_time += end_step_time;
+        while (this.Step(end_time))
+        {
+          if (this.IsSkipAppearEnemy)
+            this.time = end_time;
+          yield return (object) null;
+        }
+        this.sectionCommandReceiver.ActivateSkipButton();
+        this.ResetSkipAppearEnemyFlag();
+      }
+      else
+        break;
+    }
+    yield return (object) new WaitForSeconds(this.lastShowRarityWaitTime);
+    this.sectionCommandReceiver.OnShowRarity(rarity_type);
+    end_time += end_step_time_last;
+    while (this.Step(end_time))
+      yield return (object) null;
+    if (this.skip)
+    {
+      while (MonoBehaviourSingleton<TransitionManager>.I.isChanging)
+        yield return (object) null;
+      int index9 = enemyLoaderList.Length - 1;
+      if (index9 >= 0)
+        this.PlayEnemyAnimation(enemyLoaderList[index9], "Base Layer.IDLE");
+      Time.timeScale = 1f;
+      if (MonoBehaviourSingleton<TransitionManager>.I.isTransing)
+        yield return (object) MonoBehaviourSingleton<TransitionManager>.I.In();
+    }
+    else
+      this.skip = true;
+    this.sectionCommandReceiver.OnHideRarity();
+    Time.timeScale = 1f;
+    this.sectionCommandReceiver.OnEnd();
+  }
 
-	public const string ENEMY_MOTION_STATE_GACHA11 = "Base Layer.GACHA_11";
+  public override void SkipAll()
+  {
+    if (this.m_isSkipAll || this.skip)
+      return;
+    this.m_isSkipAll = true;
+    this.skip = true;
+    this.StartCoroutine(this.DoSkipAll());
+  }
 
-	public const float MAGIC_CIRCLE_EFFECT_FINISH_TIME = 13.5f;
-
-	public const int REAM_MAX = 11;
-
-	public Transform[] magicCircles;
-
-	public Transform[] enemyPositions;
-
-	public float[] meteorTimings;
-
-	public float[] magicTimings;
-
-	public float[] meteorSETimings;
-
-	public float[] magicSETimings;
-
-	public float showRarityWaitTime = 1f;
-
-	public float lastShowRarityWaitTime = 2.5f;
-
-	private bool m_isSkipAll;
-
-	protected override IEnumerator GetDirectionCoroutine()
-	{
-		return DoQuestGacha();
-	}
-
-	private IEnumerator DoQuestGacha()
-	{
-		m_isSkipAll = false;
-		Init();
-		SetLinkCamera(true);
-		EnemyLoader[] enemyLoaderList = new EnemyLoader[11];
-		EnemyTable.EnemyData[] enemy_datas = new EnemyTable.EnemyData[11];
-		QuestTable.QuestTableData[] quest_datas = new QuestTable.QuestTableData[11];
-		if (MonoBehaviourSingleton<GachaManager>.IsValid() && MonoBehaviourSingleton<GachaManager>.I.gachaResult != null)
-		{
-			int i = 0;
-			for (int n2 = MonoBehaviourSingleton<GachaManager>.I.gachaResult.reward.Count; i < n2; i++)
-			{
-				GachaResult.GachaReward reward = MonoBehaviourSingleton<GachaManager>.I.gachaResult.reward[i];
-				uint reward_quest_id = (uint)reward.itemId;
-				quest_datas[i] = Singleton<QuestTable>.I.GetQuestData(reward_quest_id);
-				if (quest_datas[i] != null)
-				{
-					enemy_datas[i] = Singleton<EnemyTable>.I.GetEnemyData((uint)quest_datas[i].GetMainEnemyID());
-					if (enemy_datas[i] == null)
-					{
-						Log.Error("EnemyTable[{0}] == null", quest_datas[i].GetMainEnemyID());
-					}
-				}
-				else
-				{
-					Log.Error("QuestTable[{0}] == null", reward.itemId);
-					quest_datas[i] = new QuestTable.QuestTableData();
-					enemy_datas[i] = new EnemyTable.EnemyData();
-				}
-			}
-		}
-		NPCLoader npc_loader = LoadNPC();
-		npc_loader.Load(Singleton<NPCTable>.I.GetNPCData(2).npcModelID, 0, false, true, SHADER_TYPE.NORMAL, null);
-		int n = 0;
-		for (int m = 11; n < m; n++)
-		{
-			float scale = enemy_datas[n].modelScale;
-			int displayAnimID = enemy_datas[n].animId;
-			int modelID = enemy_datas[n].modelId;
-			OutGameSettingsManager.EnemyDisplayInfo displayInfo = MonoBehaviourSingleton<OutGameSettingsManager>.I.SearchEnemyDisplayInfoForGacha(enemy_datas[n]);
-			if (displayInfo != null)
-			{
-				displayAnimID = displayInfo.animID;
-				scale = displayInfo.gachaScale;
-			}
-			enemyLoaderList[n] = LoadEnemy(enemyPositions[n], modelID, displayAnimID, scale, enemy_datas[n].baseEffectName, enemy_datas[n].baseEffectNode);
-		}
-		int l = 0;
-		for (int k = 11; l < k; l++)
-		{
-			while (enemyLoaderList[l].isLoading)
-			{
-				yield return (object)null;
-			}
-			enemyLoaderList[l].ApplyGachaDisplayScaleToParentNode();
-			CheckAndReplaceShader(enemyLoaderList[l]);
-			enemyLoaderList[l].get_gameObject().SetActive(false);
-		}
-		LoadingQueue lo_queue = new LoadingQueue(this);
-		CacheAudio(lo_queue);
-		for (int j = 0; j < 11; j++)
-		{
-			CacheEnemyAudio(enemy_datas[j], lo_queue);
-		}
-		while (npc_loader.isLoading)
-		{
-			yield return (object)null;
-		}
-		while (lo_queue.IsLoading())
-		{
-			yield return (object)null;
-		}
-		PlayerAnimCtrl npc_anim = PlayerAnimCtrl.Get(npc_loader.animator, PLCA.IDLE_01, null, null, null);
-		CreateNPCEffect(npc_loader.model);
-		yield return (object)null;
-		stageAnimator.set_cullingMode(0);
-		stageAnimator.Rebind();
-		stageAnimator.Play("StageAnim_Main");
-		Play("MainAnim_Start", null, 0f);
-		PlayEffect(startEffectPrefabs[0]);
-		npc_anim.Play(PLCA.QUEST_GACHA, true);
-		PlayAudio(AUDIO.OPENING_01);
-		while (Step(0.5f))
-		{
-			yield return (object)null;
-		}
-		PlayAudio(AUDIO.OPENING_02);
-		PlayAudio(AUDIO.OPENING_03);
-		while (Step(1.4f))
-		{
-			yield return (object)null;
-		}
-		PlayAudio(AUDIO.OPENING_04);
-		while (Step(2.6f))
-		{
-			yield return (object)null;
-		}
-		PlayAudio(AUDIO.DOOR_01);
-		while (Step(3.2f))
-		{
-			yield return (object)null;
-		}
-		PlayAudio(AUDIO.DOOR_02);
-		while (Step(3.38f))
-		{
-			yield return (object)null;
-		}
-		PlayAudio(AUDIO.MAGI_INTRO_01);
-		while (Step(5.1f))
-		{
-			yield return (object)null;
-		}
-		PlayAudio(AUDIO.MAGI_INTRO_02);
-		while (Step(5.5f))
-		{
-			yield return (object)null;
-		}
-		PlayEffect(startEffectPrefabs[1]);
-		Transform[] magic_effects = (Transform[])new Transform[11];
-		Transform[] end_effects = (Transform[])new Transform[11];
-		int meteor_step = 0;
-		int magic_step = 0;
-		int max_step = 11;
-		time -= Time.get_deltaTime();
-		while (meteor_step < max_step || magic_step < max_step)
-		{
-			time += Time.get_deltaTime();
-			if (meteor_step < max_step && meteorTimings[meteor_step] <= time)
-			{
-				PlayEffect(magicCircles[meteor_step], meteorEffectPrefabs[quest_datas[meteor_step].rarity.ToRarityExpressionID()]);
-				if (meteor_step == max_step - 1)
-				{
-					PlayAudio(AUDIO.METEOR_01);
-				}
-				meteor_step++;
-			}
-			if (magic_step < max_step && magicTimings[magic_step] <= time)
-			{
-				magic_effects[magic_step] = PlayEffect(magicCircles[magic_step], magicEffectPrefabs[quest_datas[magic_step].rarity.ToRarityExpressionID()]);
-				PlayMagicAudio((int)quest_datas[magic_step].rarity);
-				magic_step++;
-			}
-			yield return (object)null;
-		}
-		int idx = magic_step - 1;
-		if (idx < max_step && idx >= 0)
-		{
-			PlayMagicAudio((int)quest_datas[idx].rarity);
-		}
-		while (Step(13.5f))
-		{
-			yield return (object)null;
-		}
-		if (skip && !m_isSkipAll)
-		{
-			if (MonoBehaviourSingleton<TransitionManager>.I.isChanging)
-			{
-				yield return (object)null;
-			}
-			Time.set_timeScale(1f);
-			skip = false;
-			time = 13.5f;
-			yield return (object)MonoBehaviourSingleton<TransitionManager>.I.In();
-			sectionCommandReceiver.ActivateSkipButton();
-		}
-		ActivateFirstSkipFlag();
-		int end_step = 0;
-		float end_time2 = 13.5f;
-		float end_step_time = 1.5f;
-		float end_step_time_last = 2f;
-		RARITY_TYPE rarity_type;
-		while (true)
-		{
-			sectionCommandReceiver.OnHideRarity();
-			PlayAudio(AUDIO.RARITY_EXPOSITION);
-			if (end_step > 0)
-			{
-				int prevIndex = end_step - 1;
-				if (enemyLoaderList[prevIndex] != null)
-				{
-					enemyLoaderList[prevIndex].get_gameObject().SetActive(false);
-				}
-				if (magic_effects[prevIndex] != null)
-				{
-					Object.Destroy(magic_effects[prevIndex].get_gameObject());
-					magic_effects[prevIndex] = null;
-				}
-				if (end_effects[prevIndex] != null)
-				{
-					Object.Destroy(end_effects[prevIndex].get_gameObject());
-					end_effects[prevIndex] = null;
-				}
-			}
-			EnemyLoader nowEnemyLoader = enemyLoaderList[end_step];
-			nowEnemyLoader.get_gameObject().SetActive(true);
-			if (!skip)
-			{
-				string stateName = "Base Layer.GACHA_11";
-				if (end_step == enemyLoaderList.Length - 1)
-				{
-					stateName = "Base Layer.GACHA_SINGLE";
-				}
-				PlayEnemyAnimation(nowEnemyLoader, stateName);
-			}
-			rarity_type = quest_datas[end_step].rarity;
-			int effect_rarity = rarity_type.ToRarityExpressionID();
-			if (rarity_type == RARITY_TYPE.SS)
-			{
-				effect_rarity = 3;
-			}
-			end_effects[end_step] = PlayEffect(magicCircles[end_step], endEffectPrefabs[effect_rarity]);
-			Play($"MainAnim_End_{end_step + 1:D2}", null, 0f);
-			bool is_short = end_step < 11;
-			PlayAppearAudio(rarity_type, is_short);
-			if (enemy_datas.Length > end_step)
-			{
-				PlayEnemyAudio(enemy_datas[end_step], is_short);
-			}
-			end_step++;
-			if (end_step >= 11)
-			{
-				break;
-			}
-			float waitTime = 0f;
-			while (waitTime < showRarityWaitTime)
-			{
-				waitTime += Time.get_deltaTime();
-				if (base.IsSkipAppearEnemy)
-				{
-					waitTime = showRarityWaitTime;
-				}
-				yield return (object)null;
-			}
-			if (!base.IsSkipAppearEnemy)
-			{
-				sectionCommandReceiver.OnShowRarity(rarity_type);
-			}
-			end_time2 += end_step_time;
-			while (Step(end_time2))
-			{
-				if (base.IsSkipAppearEnemy)
-				{
-					time = end_time2;
-				}
-				yield return (object)null;
-			}
-			sectionCommandReceiver.ActivateSkipButton();
-			ResetSkipAppearEnemyFlag();
-		}
-		yield return (object)new WaitForSeconds(lastShowRarityWaitTime);
-		sectionCommandReceiver.OnShowRarity(rarity_type);
-		end_time2 += end_step_time_last;
-		while (Step(end_time2))
-		{
-			yield return (object)null;
-		}
-		if (skip)
-		{
-			while (MonoBehaviourSingleton<TransitionManager>.I.isChanging)
-			{
-				yield return (object)null;
-			}
-			int lastIndex = enemyLoaderList.Length - 1;
-			if (lastIndex >= 0)
-			{
-				PlayEnemyAnimation(enemyLoaderList[lastIndex], "Base Layer.IDLE");
-			}
-			Time.set_timeScale(1f);
-			if (MonoBehaviourSingleton<TransitionManager>.I.isTransing)
-			{
-				yield return (object)MonoBehaviourSingleton<TransitionManager>.I.In();
-			}
-		}
-		else
-		{
-			skip = true;
-		}
-		sectionCommandReceiver.OnHideRarity();
-		Time.set_timeScale(1f);
-		sectionCommandReceiver.OnEnd();
-	}
-
-	public override void SkipAll()
-	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		if (!m_isSkipAll && !skip)
-		{
-			m_isSkipAll = true;
-			skip = true;
-			this.StartCoroutine(DoSkipAll());
-		}
-	}
-
-	private IEnumerator DoSkipAll()
-	{
-		yield return (object)MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.BLACK);
-		Time.set_timeScale(100f);
-	}
+  private IEnumerator DoSkipAll()
+  {
+    yield return (object) MonoBehaviourSingleton<TransitionManager>.I.Out();
+    Time.timeScale = 100f;
+  }
 }

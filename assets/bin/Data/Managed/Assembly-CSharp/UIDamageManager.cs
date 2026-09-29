@@ -1,363 +1,300 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIDamageManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class UIDamageManager : MonoBehaviourSingleton<UIDamageManager>
 {
-	private static readonly Vector3 OFFSET_RECOVER_NUM = new Vector3(0f, 0.7f, 0f);
+  private static readonly Vector3 OFFSET_RECOVER_NUM = new Vector3(0.0f, 0.7f, 0.0f);
+  protected List<UIDamageNum> damageNumList = new List<UIDamageNum>();
+  protected List<UIAdditionalDamageNum> additionalDamageNumList = new List<UIAdditionalDamageNum>();
+  protected List<UIPlayerDamageNum> playerDamageNumList = new List<UIPlayerDamageNum>();
+  protected List<UIPlayerDamageNum> playerRecoverNumList = new List<UIPlayerDamageNum>();
+  protected List<UIPlayerDamageNum> enemyRecoverNumList = new List<UIPlayerDamageNum>();
+  private UIDamageNum originalDamage;
+  private UIPlayerDamageNum currentRecoverNum;
+  private Object m_playerDamageNumObj;
+  private Object m_damageNumObj;
+  private Object m_additionalDamageNumObj;
 
-	protected List<UIDamageNum> damageNumList = new List<UIDamageNum>();
+  public void RegisterDamageNumResources(
+    Object damageNumObj,
+    Object playerDamageNumObj,
+    Object additionalDamageNumObj)
+  {
+    this.m_damageNumObj = damageNumObj;
+    this.m_playerDamageNumObj = playerDamageNumObj;
+    this.m_additionalDamageNumObj = additionalDamageNumObj;
+  }
 
-	protected List<UIAdditionalDamageNum> additionalDamageNumList = new List<UIAdditionalDamageNum>();
+  public void Create(
+    Vector3 pos,
+    int damage,
+    UIDamageNum.DAMAGE_COLOR color,
+    int groupOffset = 0,
+    int effective = 0,
+    bool isRegionOnly = false)
+  {
+    if (!((Component) this).gameObject.activeInHierarchy)
+      return;
+    float pixelHeight = MonoBehaviourSingleton<InGameCameraManager>.I.GetPixelHeight();
+    Vector3 pos1;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref pos1).\u002Ector(pos.x, pos.y + MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.screenSaftyOffset, pos.z);
+    Vector3 screenPoint = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(pos1);
+    if ((double) screenPoint.y > (double) pixelHeight)
+    {
+      screenPoint.y = pixelHeight;
+      pos = MonoBehaviourSingleton<InGameCameraManager>.I.ScreenToWorldPoint(screenPoint);
+      pos.y -= MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.screenSaftyOffset;
+    }
+    bool flag = UIDamageNum.DAMAGE_COLOR.BUFF != color && color != 0;
+    if (isRegionOnly)
+      color = !flag ? (UIDamageNum.DAMAGE_COLOR.BUFF != color ? UIDamageNum.DAMAGE_COLOR.REGION_ONLY_NORMAL : UIDamageNum.DAMAGE_COLOR.REGION_ONLY_BUFF) : UIDamageNum.DAMAGE_COLOR.REGION_ONLY_ELEMENT;
+    if (groupOffset > 0 | flag)
+    {
+      this.CreateAdditionalDamage(pos, damage, color, groupOffset, this.originalDamage, effective);
+    }
+    else
+    {
+      UIDamageNum damage_num = (UIDamageNum) null;
+      int index = 0;
+      for (int count = this.damageNumList.Count; index < count; ++index)
+      {
+        if (!this.damageNumList[index].enable)
+        {
+          damage_num = this.damageNumList[index];
+          break;
+        }
+      }
+      if (Object.op_Equality((Object) damage_num, (Object) null))
+      {
+        GameObject gameObject = (GameObject) Object.Instantiate(this.m_damageNumObj);
+        if (Object.op_Equality((Object) gameObject, (Object) null))
+          return;
+        Utility.Attach(this._transform, gameObject.transform);
+        damage_num = gameObject.GetComponent<UIDamageNum>();
+        if (Object.op_Equality((Object) damage_num, (Object) null))
+        {
+          Object.Destroy((Object) gameObject);
+          return;
+        }
+        this.damageNumList.Add(damage_num);
+        int count = this.damageNumList.Count;
+      }
+      groupOffset = this.CalcOffsetPosition(pos, damage_num, groupOffset);
+      this.originalDamage = damage_num;
+      damage_num.Initialize(pos, damage, color, groupOffset);
+    }
+  }
 
-	protected List<UIPlayerDamageNum> playerDamageNumList = new List<UIPlayerDamageNum>();
+  private void CreateAdditionalDamage(
+    Vector3 pos,
+    int damage,
+    UIDamageNum.DAMAGE_COLOR color,
+    int groupOffset,
+    UIDamageNum originalDamage,
+    int effective)
+  {
+    UIAdditionalDamageNum damage_num = (UIAdditionalDamageNum) null;
+    int index = 0;
+    for (int count = this.additionalDamageNumList.Count; index < count; ++index)
+    {
+      if (!this.additionalDamageNumList[index].enable)
+      {
+        damage_num = this.additionalDamageNumList[index];
+        break;
+      }
+    }
+    if (Object.op_Equality((Object) damage_num, (Object) null))
+    {
+      GameObject gameObject = (GameObject) Object.Instantiate(this.m_additionalDamageNumObj);
+      if (Object.op_Equality((Object) gameObject, (Object) null))
+        return;
+      Utility.Attach(this._transform, gameObject.transform);
+      damage_num = gameObject.GetComponent<UIAdditionalDamageNum>();
+      if (Object.op_Equality((Object) damage_num, (Object) null))
+      {
+        Object.Destroy((Object) gameObject);
+        return;
+      }
+      this.additionalDamageNumList.Add(damage_num);
+    }
+    groupOffset = this.CalcOffsetPosition(pos, (UIDamageNum) damage_num, groupOffset);
+    damage_num.Initialize(pos, damage, color, groupOffset, originalDamage, effective);
+  }
 
-	protected List<UIPlayerDamageNum> playerRecoverNumList = new List<UIPlayerDamageNum>();
+  private int CalcOffsetPosition(Vector3 pos, UIDamageNum damage_num, int orgGroupOffet)
+  {
+    for (int index = 0; index < 10; ++index)
+    {
+      if (!this.isLabelOverlap(pos, damage_num, orgGroupOffet + index))
+        return orgGroupOffet + index;
+    }
+    return orgGroupOffet;
+  }
 
-	protected List<UIPlayerDamageNum> enemyRecoverNumList = new List<UIPlayerDamageNum>();
+  private bool isLabelOverlap(Vector3 pos, UIDamageNum damage_num, int groupOffset)
+  {
+    ((Component) damage_num).transform.position = damage_num.GetUIPosFromWorld(pos, groupOffset);
+    Vector3 localPosition = ((Component) damage_num).transform.localPosition;
+    for (int index = 0; index < this.damageNumList.Count; ++index)
+    {
+      if (this._isLabelOverlap(localPosition, damage_num, this.damageNumList[index]))
+        return true;
+    }
+    for (int index = 0; index < this.additionalDamageNumList.Count; ++index)
+    {
+      if (this._isLabelOverlap(localPosition, damage_num, (UIDamageNum) this.additionalDamageNumList[index]))
+        return true;
+    }
+    return false;
+  }
 
-	private int additionalGroupOffset;
+  private bool _isLabelOverlap(
+    Vector3 nextPosition,
+    UIDamageNum damage_num,
+    UIDamageNum damageNumLists)
+  {
+    if (Object.op_Equality((Object) damageNumLists, (Object) null) || Object.op_Equality((Object) damage_num, (Object) null) || !damageNumLists.enable || Object.op_Equality((Object) damage_num, (Object) damageNumLists))
+      return false;
+    Vector3 localPosition = ((Component) damageNumLists).transform.localPosition;
+    float num1 = Mathf.Abs(localPosition.x - nextPosition.x);
+    float num2 = Mathf.Abs(localPosition.y - nextPosition.y);
+    float num3 = 16f * (float) damageNumLists.DamageLength;
+    return (double) num1 < (double) num3 && (double) num2 < 15.0;
+  }
 
-	private UIDamageNum originalDamage;
+  public UIPlayerDamageNum CreatePlayerDamage(
+    Character chara,
+    int damage,
+    UIPlayerDamageNum.DAMAGE_COLOR color)
+  {
+    UIPlayerDamageNum playerDamageNum = this.CreatePlayerDamageNum();
+    if (Object.op_Equality((Object) playerDamageNum, (Object) null))
+      return (UIPlayerDamageNum) null;
+    return !playerDamageNum.Initialize(chara, damage, color) ? (UIPlayerDamageNum) null : playerDamageNum;
+  }
 
-	private UIPlayerDamageNum currentRecoverNum;
+  public UIPlayerDamageNum CreatePlayerDamage(Character chara, AttackedHitStatus status)
+  {
+    UIPlayerDamageNum playerDamageNum = this.CreatePlayerDamageNum();
+    if (Object.op_Equality((Object) playerDamageNum, (Object) null))
+      return (UIPlayerDamageNum) null;
+    return !playerDamageNum.Initialize(chara, status) ? (UIPlayerDamageNum) null : playerDamageNum;
+  }
 
-	private Object m_playerDamageNumObj;
+  public UIPlayerDamageNum CreatePlayerRecoverHp(
+    Character chara,
+    int damage,
+    UIPlayerDamageNum.DAMAGE_COLOR color)
+  {
+    if (!((Component) this).gameObject.activeInHierarchy)
+      return (UIPlayerDamageNum) null;
+    UIPlayerDamageNum uiPlayerDamageNum = (UIPlayerDamageNum) null;
+    for (int index = 0; index < this.playerRecoverNumList.Count; ++index)
+    {
+      if (!this.playerRecoverNumList[index].enable)
+      {
+        uiPlayerDamageNum = this.playerRecoverNumList[index];
+        break;
+      }
+    }
+    if (Object.op_Equality((Object) uiPlayerDamageNum, (Object) null))
+    {
+      GameObject gameObject = (GameObject) Object.Instantiate(this.m_playerDamageNumObj);
+      if (Object.op_Equality((Object) gameObject, (Object) null))
+        return (UIPlayerDamageNum) null;
+      Utility.Attach(this._transform, gameObject.transform);
+      uiPlayerDamageNum = gameObject.GetComponent<UIPlayerDamageNum>();
+      if (Object.op_Equality((Object) uiPlayerDamageNum, (Object) null))
+      {
+        Object.Destroy((Object) gameObject);
+        return (UIPlayerDamageNum) null;
+      }
+      uiPlayerDamageNum.offset = UIDamageManager.OFFSET_RECOVER_NUM;
+      this.playerRecoverNumList.Add(uiPlayerDamageNum);
+    }
+    return !uiPlayerDamageNum.Initialize(chara, damage, color) ? (UIPlayerDamageNum) null : uiPlayerDamageNum;
+  }
 
-	private Object m_damageNumObj;
+  private UIPlayerDamageNum CreatePlayerDamageNum()
+  {
+    if (!((Component) this).gameObject.activeInHierarchy)
+      return (UIPlayerDamageNum) null;
+    UIPlayerDamageNum playerDamageNum = (UIPlayerDamageNum) null;
+    int index = 0;
+    for (int count = this.playerDamageNumList.Count; index < count; ++index)
+    {
+      if (!this.playerDamageNumList[index].enable)
+      {
+        playerDamageNum = this.playerDamageNumList[index];
+        break;
+      }
+    }
+    if (Object.op_Equality((Object) playerDamageNum, (Object) null))
+    {
+      GameObject gameObject = (GameObject) Object.Instantiate(this.m_playerDamageNumObj);
+      if (Object.op_Equality((Object) gameObject, (Object) null))
+        return (UIPlayerDamageNum) null;
+      Utility.Attach(this._transform, gameObject.transform);
+      playerDamageNum = gameObject.GetComponent<UIPlayerDamageNum>();
+      if (Object.op_Equality((Object) playerDamageNum, (Object) null))
+      {
+        Object.Destroy((Object) gameObject);
+        return (UIPlayerDamageNum) null;
+      }
+      this.playerDamageNumList.Add(playerDamageNum);
+    }
+    return playerDamageNum;
+  }
 
-	private Object m_additionalDamageNumObj;
+  public UIPlayerDamageNum CreateEnemyRecoverHp(
+    Character chara,
+    int damage,
+    UIPlayerDamageNum.DAMAGE_COLOR color)
+  {
+    if (!((Component) this).gameObject.activeInHierarchy)
+      return (UIPlayerDamageNum) null;
+    GameObject gameObject = (GameObject) Object.Instantiate(this.m_playerDamageNumObj);
+    if (Object.op_Equality((Object) gameObject, (Object) null))
+      return (UIPlayerDamageNum) null;
+    Utility.Attach(this._transform, gameObject.transform);
+    UIPlayerDamageNum component = gameObject.GetComponent<UIPlayerDamageNum>();
+    if (Object.op_Equality((Object) component, (Object) null))
+    {
+      Object.Destroy((Object) gameObject);
+      return (UIPlayerDamageNum) null;
+    }
+    this.enemyRecoverNumList.Add(component);
+    if (!component.Initialize(chara, damage, color, false))
+      return (UIPlayerDamageNum) null;
+    component.EnableAutoDelete();
+    return component;
+  }
 
-	public void RegisterDamageNumResources(Object damageNumObj, Object playerDamageNumObj, Object additionalDamageNumObj)
-	{
-		m_damageNumObj = damageNumObj;
-		m_playerDamageNumObj = playerDamageNumObj;
-		m_additionalDamageNumObj = additionalDamageNumObj;
-	}
+  private void LateUpdate() => this.EnemyRecoverHpUIProc();
 
-	public void Create(Vector3 pos, int damage, UIDamageNum.DAMAGE_COLOR color, int groupOffset = 0, int effective = 0)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0138: Expected O, but got Unknown
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013d: Expected O, but got Unknown
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Expected O, but got Unknown
-		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
-		if (this.get_gameObject().get_activeInHierarchy())
-		{
-			float pixelHeight = MonoBehaviourSingleton<InGameCameraManager>.I.GetPixelHeight();
-			Vector3 pos2 = default(Vector3);
-			pos2._002Ector(pos.x, pos.y + MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.screenSaftyOffset, pos.z);
-			Vector3 pos3 = MonoBehaviourSingleton<InGameCameraManager>.I.WorldToScreenPoint(pos2);
-			if (pos3.y > pixelHeight)
-			{
-				pos3.y = pixelHeight;
-				pos = MonoBehaviourSingleton<InGameCameraManager>.I.ScreenToWorldPoint(pos3);
-				pos.y -= MonoBehaviourSingleton<InGameSettingsManager>.I.selfController.screenSaftyOffset;
-			}
-			bool flag = color != UIDamageNum.DAMAGE_COLOR.BUFF && UIDamageNum.DAMAGE_COLOR.NONE != color;
-			if (groupOffset > 0 || flag)
-			{
-				CreateAdditionalDamage(pos, damage, color, groupOffset, originalDamage, effective);
-			}
-			else
-			{
-				UIDamageNum uIDamageNum = null;
-				int num = 0;
-				int i = 0;
-				for (int count = damageNumList.Count; i < count; i++)
-				{
-					if (!damageNumList[i].enable)
-					{
-						uIDamageNum = damageNumList[i];
-						num = i;
-						break;
-					}
-				}
-				if (uIDamageNum == null)
-				{
-					GameObject val = Object.Instantiate(m_damageNumObj);
-					if (val == null)
-					{
-						return;
-					}
-					Utility.Attach(base._transform, val.get_transform());
-					uIDamageNum = val.GetComponent<UIDamageNum>();
-					if (uIDamageNum == null)
-					{
-						Object.Destroy(val);
-						return;
-					}
-					damageNumList.Add(uIDamageNum);
-					num = damageNumList.Count - 1;
-				}
-				additionalGroupOffset = 0;
-				originalDamage = null;
-				int num2 = 0;
-				int num3 = 0;
-				while (num2 < damageNumList.Count)
-				{
-					if (num2 != num && damageNumList[num2].enable)
-					{
-						if (num3 > 10)
-						{
-							groupOffset = 0;
-							additionalGroupOffset = 0;
-							break;
-						}
-						uIDamageNum.get_transform().set_position(uIDamageNum.GetUIPosFromWorld(pos, groupOffset));
-						Vector3 localPosition = uIDamageNum.get_transform().get_localPosition();
-						Vector3 localPosition2 = damageNumList[num2].get_transform().get_localPosition();
-						if (Mathf.Abs(localPosition2.x - localPosition.x) < uIDamageNum.grid.cellWidth * (float)damageNumList[num2].DamageLength && Mathf.Abs(localPosition2.y - localPosition.y) < uIDamageNum.grid.cellHeight - uIDamageNum.grid.cellHeight / 4f)
-						{
-							groupOffset++;
-							additionalGroupOffset++;
-							num2 = 0;
-							num3++;
-							continue;
-						}
-					}
-					num2++;
-				}
-				originalDamage = uIDamageNum;
-				if (!uIDamageNum.Initialize(pos, damage, color, groupOffset))
-				{
-					return;
-				}
-			}
-		}
-	}
-
-	private void CreateAdditionalDamage(Vector3 pos, int damage, UIDamageNum.DAMAGE_COLOR color, int groupOffet, UIDamageNum originalDamage, int effective)
-	{
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Expected O, but got Unknown
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Expected O, but got Unknown
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Expected O, but got Unknown
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		UIAdditionalDamageNum uIAdditionalDamageNum = null;
-		int i = 0;
-		for (int count = additionalDamageNumList.Count; i < count; i++)
-		{
-			if (!additionalDamageNumList[i].enable)
-			{
-				uIAdditionalDamageNum = additionalDamageNumList[i];
-				break;
-			}
-		}
-		if (uIAdditionalDamageNum == null)
-		{
-			GameObject val = Object.Instantiate(m_additionalDamageNumObj);
-			if (val == null)
-			{
-				return;
-			}
-			Utility.Attach(base._transform, val.get_transform());
-			uIAdditionalDamageNum = val.GetComponent<UIAdditionalDamageNum>();
-			if (uIAdditionalDamageNum == null)
-			{
-				Object.Destroy(val);
-				return;
-			}
-			additionalDamageNumList.Add(uIAdditionalDamageNum);
-		}
-		groupOffet += additionalGroupOffset;
-		if (!uIAdditionalDamageNum.Initialize(pos, damage, color, groupOffet, originalDamage, effective))
-		{
-			return;
-		}
-	}
-
-	public UIPlayerDamageNum CreatePlayerDamage(Character chara, int damage, UIPlayerDamageNum.DAMAGE_COLOR color)
-	{
-		UIPlayerDamageNum uIPlayerDamageNum = CreatePlayerDamageNum();
-		if (uIPlayerDamageNum == null)
-		{
-			return null;
-		}
-		if (!uIPlayerDamageNum.Initialize(chara, damage, color, true))
-		{
-			return null;
-		}
-		return uIPlayerDamageNum;
-	}
-
-	public UIPlayerDamageNum CreatePlayerDamage(Character chara, AttackedHitStatus status)
-	{
-		UIPlayerDamageNum uIPlayerDamageNum = CreatePlayerDamageNum();
-		if (uIPlayerDamageNum == null)
-		{
-			return null;
-		}
-		if (!uIPlayerDamageNum.Initialize(chara, status, true))
-		{
-			return null;
-		}
-		return uIPlayerDamageNum;
-	}
-
-	public UIPlayerDamageNum CreatePlayerRecoverHp(Character chara, int damage, UIPlayerDamageNum.DAMAGE_COLOR color)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006f: Expected O, but got Unknown
-		//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Expected O, but got Unknown
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Expected O, but got Unknown
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		if (!this.get_gameObject().get_activeInHierarchy())
-		{
-			return null;
-		}
-		UIPlayerDamageNum uIPlayerDamageNum = null;
-		for (int i = 0; i < playerRecoverNumList.Count; i++)
-		{
-			if (!playerRecoverNumList[i].enable)
-			{
-				uIPlayerDamageNum = playerRecoverNumList[i];
-				break;
-			}
-		}
-		if (uIPlayerDamageNum == null)
-		{
-			GameObject val = Object.Instantiate(m_playerDamageNumObj);
-			if (val == null)
-			{
-				return null;
-			}
-			Utility.Attach(base._transform, val.get_transform());
-			uIPlayerDamageNum = val.GetComponent<UIPlayerDamageNum>();
-			if (uIPlayerDamageNum == null)
-			{
-				Object.Destroy(val);
-				return null;
-			}
-			uIPlayerDamageNum.offset = OFFSET_RECOVER_NUM;
-			playerRecoverNumList.Add(uIPlayerDamageNum);
-		}
-		if (!uIPlayerDamageNum.Initialize(chara, damage, color, true))
-		{
-			return null;
-		}
-		return uIPlayerDamageNum;
-	}
-
-	private UIPlayerDamageNum CreatePlayerDamageNum()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0071: Expected O, but got Unknown
-		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Expected O, but got Unknown
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Expected O, but got Unknown
-		if (!this.get_gameObject().get_activeInHierarchy())
-		{
-			return null;
-		}
-		UIPlayerDamageNum uIPlayerDamageNum = null;
-		int i = 0;
-		for (int count = playerDamageNumList.Count; i < count; i++)
-		{
-			if (!playerDamageNumList[i].enable)
-			{
-				uIPlayerDamageNum = playerDamageNumList[i];
-				break;
-			}
-		}
-		if (uIPlayerDamageNum == null)
-		{
-			GameObject val = Object.Instantiate(m_playerDamageNumObj);
-			if (val == null)
-			{
-				return null;
-			}
-			Utility.Attach(base._transform, val.get_transform());
-			uIPlayerDamageNum = val.GetComponent<UIPlayerDamageNum>();
-			if (uIPlayerDamageNum == null)
-			{
-				Object.Destroy(val);
-				return null;
-			}
-			playerDamageNumList.Add(uIPlayerDamageNum);
-		}
-		return uIPlayerDamageNum;
-	}
-
-	public UIPlayerDamageNum CreateEnemyRecoverHp(Character chara, int damage, UIPlayerDamageNum.DAMAGE_COLOR color)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Expected O, but got Unknown
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Expected O, but got Unknown
-		if (!this.get_gameObject().get_activeInHierarchy())
-		{
-			return null;
-		}
-		GameObject val = Object.Instantiate(m_playerDamageNumObj);
-		if (val == null)
-		{
-			return null;
-		}
-		Utility.Attach(base._transform, val.get_transform());
-		UIPlayerDamageNum component = val.GetComponent<UIPlayerDamageNum>();
-		if (component == null)
-		{
-			Object.Destroy(val);
-			return null;
-		}
-		enemyRecoverNumList.Add(component);
-		if (!component.Initialize(chara, damage, color, false))
-		{
-			return null;
-		}
-		component.EnableAutoDelete();
-		return component;
-	}
-
-	private void LateUpdate()
-	{
-		EnemyRecoverHpUIProc();
-	}
-
-	private void EnemyRecoverHpUIProc()
-	{
-		if (currentRecoverNum != null)
-		{
-			if (currentRecoverNum.AlphaRate <= 0.8f || !currentRecoverNum.enable)
-			{
-				currentRecoverNum = null;
-			}
-		}
-		else if (enemyRecoverNumList.Count > 0)
-		{
-			currentRecoverNum = enemyRecoverNumList[0];
-			currentRecoverNum.Play();
-			enemyRecoverNumList.RemoveAt(0);
-		}
-	}
+  private void EnemyRecoverHpUIProc()
+  {
+    if (Object.op_Inequality((Object) this.currentRecoverNum, (Object) null))
+    {
+      if ((double) this.currentRecoverNum.AlphaRate > 0.800000011920929 && this.currentRecoverNum.enable)
+        return;
+      this.currentRecoverNum = (UIPlayerDamageNum) null;
+    }
+    else
+    {
+      if (this.enemyRecoverNumList.Count <= 0)
+        return;
+      this.currentRecoverNum = this.enemyRecoverNumList[0];
+      this.currentRecoverNum.Play();
+      this.enemyRecoverNumList.RemoveAt(0);
+    }
+  }
 }

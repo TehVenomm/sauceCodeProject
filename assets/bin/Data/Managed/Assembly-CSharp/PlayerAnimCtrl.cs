@@ -1,354 +1,252 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: PlayerAnimCtrl
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
-public class PlayerAnimCtrl
+#nullable disable
+public class PlayerAnimCtrl : MonoBehaviour
 {
-	public const string BASE_LAYER = "Base Layer.";
+  public static string[] animStateNames;
+  public static int[] animStateHashs;
+  public const string BASE_LAYER = "Base Layer.";
+  public static readonly PLCA[] idleAnims_m = new PLCA[3]
+  {
+    PLCA.IDLE_01,
+    PLCA.IDLE_02,
+    PLCA.IDLE_03
+  };
+  public static readonly PLCA[] idleAnims_f = new PLCA[3]
+  {
+    PLCA.IDLE_01_F,
+    PLCA.IDLE_02,
+    PLCA.IDLE_03
+  };
+  public static readonly PLCA[] emotionAnims = new PLCA[3]
+  {
+    PLCA.EMOTION_01,
+    PLCA.EMOTION_02,
+    PLCA.EMOTION_03
+  };
+  public static readonly PLCA[] talkAnims = new PLCA[2]
+  {
+    PLCA.TALK_01,
+    PLCA.TALK_02
+  };
+  public static readonly PLCA[] battleAnims = new PLCA[6]
+  {
+    PLCA.BATTLE_00,
+    PLCA.BATTLE_01,
+    PLCA.BATTLE_02,
+    PLCA.END,
+    PLCA.BATTLE_04,
+    PLCA.BATTLE_05
+  };
+  private int viaAnimHash;
+  private int loopAnimHash;
+  private int endAnimHash;
+  private int lastAnimHash;
+  private PLCA lastPlayingAnim;
 
-	public static string[] animStateNames;
+  public static PlayerAnimCtrl Get(
+    Animator _animator,
+    PLCA default_anim,
+    Action<PlayerAnimCtrl, PLCA> on_play = null,
+    Action<PlayerAnimCtrl, PLCA> on_change = null,
+    Action<PlayerAnimCtrl, PLCA> on_end = null)
+  {
+    if (Object.op_Equality((Object) _animator, (Object) null))
+      return (PlayerAnimCtrl) null;
+    PlayerAnimCtrl.InitTable();
+    PlayerAnimCtrl playerAnimCtrl = ((Component) _animator).GetComponent<PlayerAnimCtrl>();
+    if (Object.op_Equality((Object) playerAnimCtrl, (Object) null))
+      playerAnimCtrl = ((Component) _animator).gameObject.AddComponent<PlayerAnimCtrl>();
+    playerAnimCtrl.animator = _animator;
+    playerAnimCtrl.onPlay = on_play;
+    playerAnimCtrl.onChange = on_change;
+    playerAnimCtrl.onEnd = on_end;
+    playerAnimCtrl.transitionDuration = 0.1f;
+    playerAnimCtrl.defaultAnim = default_anim;
+    playerAnimCtrl.Play(default_anim, true);
+    return playerAnimCtrl;
+  }
 
-	public static int[] animStateHashs;
+  private static void InitTable()
+  {
+    if (PlayerAnimCtrl.animStateNames != null)
+      return;
+    PlayerAnimCtrl.animStateNames = Enum.GetNames(typeof (PLCA));
+    PlayerAnimCtrl.animStateHashs = new int[PlayerAnimCtrl.animStateNames.Length];
+    int index = 0;
+    for (int length = PlayerAnimCtrl.animStateNames.Length; index < length; ++index)
+      PlayerAnimCtrl.animStateHashs[index] = Animator.StringToHash("Base Layer." + PlayerAnimCtrl.animStateNames[index]);
+  }
 
-	public static readonly PLCA[] idleAnims_m = new PLCA[3]
-	{
-		PLCA.IDLE_01,
-		PLCA.IDLE_02,
-		PLCA.IDLE_03
-	};
+  public static PLCA StringToEnum(string state_name)
+  {
+    PlayerAnimCtrl.InitTable();
+    int index = 0;
+    for (int length = PlayerAnimCtrl.animStateNames.Length; index < length; ++index)
+    {
+      if (PlayerAnimCtrl.animStateNames[index] == state_name)
+        return (PLCA) index;
+    }
+    return PLCA.IDLE;
+  }
 
-	public static readonly PLCA[] idleAnims_f = new PLCA[3]
-	{
-		PLCA.IDLE_01_F,
-		PLCA.IDLE_02,
-		PLCA.IDLE_03
-	};
+  public Animator animator { get; private set; }
 
-	public static readonly PLCA[] emotionAnims = new PLCA[3]
-	{
-		PLCA.EMOTION_01,
-		PLCA.EMOTION_02,
-		PLCA.EMOTION_03
-	};
+  public PLCA playingAnim { get; private set; }
 
-	public static readonly PLCA[] talkAnims = new PLCA[2]
-	{
-		PLCA.TALK_01,
-		PLCA.TALK_02
-	};
+  public PLCA defaultAnim { get; set; }
 
-	public static readonly PLCA[] battleAnims = new PLCA[6]
-	{
-		PLCA.BATTLE_00,
-		PLCA.BATTLE_01,
-		PLCA.BATTLE_02,
-		PLCA.END,
-		PLCA.BATTLE_04,
-		PLCA.BATTLE_05
-	};
+  public PLCA moveAnim { get; set; }
 
-	private int viaAnimHash;
+  public float transitionDuration { get; set; }
 
-	private int loopAnimHash;
+  public Action<PlayerAnimCtrl, PLCA> onPlay { get; set; }
 
-	private int endAnimHash;
+  public Action<PlayerAnimCtrl, PLCA> onChange { get; set; }
 
-	private int lastAnimHash;
+  public Action<PlayerAnimCtrl, PLCA> onEnd { get; set; }
 
-	private PLCA lastPlayingAnim;
+  private void Awake() => this.moveAnim = PLCA.WALK;
 
-	public Animator animator
-	{
-		get;
-		private set;
-	}
+  private void FixedUpdate() => this.UpdateAnim();
 
-	public PLCA playingAnim
-	{
-		get;
-		private set;
-	}
+  private void UpdateAnim()
+  {
+    if (Object.op_Equality((Object) this.animator, (Object) null) || Object.op_Equality((Object) this.animator.runtimeAnimatorController, (Object) null))
+      return;
+    AnimatorStateInfo animatorStateInfo1 = this.animator.GetCurrentAnimatorStateInfo(0);
+    AnimatorStateInfo animatorStateInfo2 = this.animator.GetNextAnimatorStateInfo(0);
+    int num1 = PlayerAnimCtrl.animStateHashs[68];
+    if (((AnimatorStateInfo) ref animatorStateInfo1).fullPathHash == num1 || ((AnimatorStateInfo) ref animatorStateInfo2).fullPathHash == num1)
+    {
+      PLCA plca;
+      if (this.lastAnimHash == 0)
+      {
+        plca = this.playingAnim;
+        this.Play(this.defaultAnim);
+      }
+      else
+      {
+        plca = this.lastPlayingAnim;
+        this.Play(this.playingAnim);
+      }
+      if (this.onEnd != null)
+        this.onEnd(this, plca);
+    }
+    int num2 = PlayerAnimCtrl.animStateHashs[(int) this.playingAnim];
+    if (((AnimatorStateInfo) ref animatorStateInfo1).fullPathHash == num2 || ((AnimatorStateInfo) ref animatorStateInfo2).fullPathHash == num2 || ((AnimatorStateInfo) ref animatorStateInfo1).fullPathHash == this.viaAnimHash || this.loopAnimHash != 0 && (((AnimatorStateInfo) ref animatorStateInfo1).fullPathHash == this.loopAnimHash || ((AnimatorStateInfo) ref animatorStateInfo2).fullPathHash == this.loopAnimHash) || this.lastAnimHash != 0 && (((AnimatorStateInfo) ref animatorStateInfo1).fullPathHash == this.lastAnimHash || ((AnimatorStateInfo) ref animatorStateInfo2).fullPathHash == this.lastAnimHash))
+      return;
+    this.PlayAnimator(this.playingAnim);
+    if (this.onChange == null)
+      return;
+    this.onChange(this, this.playingAnim);
+  }
 
-	public PLCA defaultAnim
-	{
-		get;
-		set;
-	}
+  public void SetMoveRunAnim(int sex) => this.moveAnim = sex == 0 ? PLCA.RUN : PLCA.RUN_F;
 
-	public PLCA moveAnim
-	{
-		get;
-		set;
-	}
+  private void PlayAnimator(PLCA anim, bool instant = false)
+  {
+    if (!this.animator.HasState(0, PlayerAnimCtrl.animStateHashs[(int) anim]))
+      return;
+    string animStateName = PlayerAnimCtrl.animStateNames[(int) anim];
+    if (instant)
+      this.animator.Play(animStateName);
+    else
+      this.animator.CrossFade(animStateName, this.transitionDuration, 0);
+  }
 
-	public float transitionDuration
-	{
-		get;
-		set;
-	}
+  public void Play(PLCA anim, bool instant = false)
+  {
+    if (this.playingAnim == anim)
+    {
+      this.lastAnimHash = 0;
+    }
+    else
+    {
+      if (instant)
+        this.PlayAnimator(anim, instant);
+      else if (this.loopAnimHash != 0 && this.endAnimHash != 0)
+      {
+        AnimatorStateInfo animatorStateInfo1 = this.animator.GetCurrentAnimatorStateInfo(0);
+        AnimatorStateInfo animatorStateInfo2 = this.animator.GetNextAnimatorStateInfo(0);
+        if (((AnimatorStateInfo) ref animatorStateInfo1).fullPathHash == this.loopAnimHash || ((AnimatorStateInfo) ref animatorStateInfo2).fullPathHash == this.loopAnimHash)
+        {
+          this.animator.CrossFade(this.endAnimHash, this.transitionDuration, 0);
+          this.lastAnimHash = this.endAnimHash;
+          this.lastPlayingAnim = this.playingAnim;
+        }
+      }
+      string animStateName = PlayerAnimCtrl.animStateNames[(int) anim];
+      this.viaAnimHash = Animator.StringToHash($"Base Layer.{animStateName}_VIA");
+      if (!this.animator.HasState(0, this.viaAnimHash))
+        this.viaAnimHash = 0;
+      this.loopAnimHash = Animator.StringToHash($"Base Layer.{animStateName}_LOOP");
+      if (!this.animator.HasState(0, this.loopAnimHash))
+        this.loopAnimHash = 0;
+      if (this.loopAnimHash != 0)
+      {
+        this.endAnimHash = Animator.StringToHash($"Base Layer.{animStateName}_END");
+        if (!this.animator.HasState(0, this.endAnimHash))
+          this.endAnimHash = 0;
+      }
+      this.playingAnim = anim;
+      if (this.onPlay == null)
+        return;
+      this.onPlay(this, anim);
+    }
+  }
 
-	public Action<PlayerAnimCtrl, PLCA> onPlay
-	{
-		get;
-		set;
-	}
+  public void PlayDefault(bool instant = false) => this.Play(this.defaultAnim, instant);
 
-	public Action<PlayerAnimCtrl, PLCA> onChange
-	{
-		get;
-		set;
-	}
+  public void PlayMove(bool instant = false) => this.Play(this.moveAnim, instant);
 
-	public Action<PlayerAnimCtrl, PLCA> onEnd
-	{
-		get;
-		set;
-	}
+  public void Play(PLCA[] anims, bool instant = false)
+  {
+    if (this.IsPlaying(anims))
+      return;
+    this.Play(anims[Random.Range(0, anims.Length)], instant);
+  }
 
-	public PlayerAnimCtrl()
-		: this()
-	{
-	}
+  public void PlayIdleAnims(int sex, bool instant = false)
+  {
+    this.Play(sex == 0 ? PlayerAnimCtrl.idleAnims_m : PlayerAnimCtrl.idleAnims_f, instant);
+  }
 
-	public static PlayerAnimCtrl Get(Animator _animator, PLCA default_anim, Action<PlayerAnimCtrl, PLCA> on_play = null, Action<PlayerAnimCtrl, PLCA> on_change = null, Action<PlayerAnimCtrl, PLCA> on_end = null)
-	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		if (_animator == null)
-		{
-			return null;
-		}
-		InitTable();
-		PlayerAnimCtrl playerAnimCtrl = _animator.GetComponent<PlayerAnimCtrl>();
-		if (playerAnimCtrl == null)
-		{
-			playerAnimCtrl = _animator.get_gameObject().AddComponent<PlayerAnimCtrl>();
-		}
-		playerAnimCtrl.animator = _animator;
-		playerAnimCtrl.onPlay = on_play;
-		playerAnimCtrl.onChange = on_change;
-		playerAnimCtrl.onEnd = on_end;
-		playerAnimCtrl.transitionDuration = 0.1f;
-		playerAnimCtrl.defaultAnim = default_anim;
-		playerAnimCtrl.Play(default_anim, true);
-		return playerAnimCtrl;
-	}
+  public void PlayRunAnim(int sex, bool instant = false)
+  {
+    this.Play(sex == 0 ? PLCA.RUN : PLCA.RUN_F, instant);
+  }
 
-	private static void InitTable()
-	{
-		if (animStateNames == null)
-		{
-			animStateNames = Enum.GetNames(typeof(PLCA));
-			animStateHashs = new int[animStateNames.Length];
-			int i = 0;
-			for (int num = animStateNames.Length; i < num; i++)
-			{
-				animStateHashs[i] = Animator.StringToHash("Base Layer." + animStateNames[i]);
-			}
-		}
-	}
+  public bool IsPlaying(PLCA[] anims)
+  {
+    PLCA playingAnim = this.playingAnim;
+    int index = 0;
+    for (int length = anims.Length; index < length; ++index)
+    {
+      if (anims[index] == playingAnim)
+        return true;
+    }
+    return false;
+  }
 
-	public static PLCA StringToEnum(string state_name)
-	{
-		InitTable();
-		int i = 0;
-		for (int num = animStateNames.Length; i < num; i++)
-		{
-			if (animStateNames[i] == state_name)
-			{
-				return (PLCA)i;
-			}
-		}
-		return PLCA.IDLE;
-	}
+  public bool IsPlayingIdleAnims(int sex)
+  {
+    return this.IsPlaying(sex == 0 ? PlayerAnimCtrl.idleAnims_m : PlayerAnimCtrl.idleAnims_f);
+  }
 
-	private void Awake()
-	{
-		moveAnim = PLCA.WALK;
-	}
-
-	private void FixedUpdate()
-	{
-		UpdateAnim();
-	}
-
-	private void UpdateAnim()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		if (!(animator == null) && !(animator.get_runtimeAnimatorController() == null))
-		{
-			AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-			AnimatorStateInfo nextAnimatorStateInfo = animator.GetNextAnimatorStateInfo(0);
-			int num = animStateHashs[56];
-			if (currentAnimatorStateInfo.get_fullPathHash() == num || nextAnimatorStateInfo.get_fullPathHash() == num)
-			{
-				PLCA playingAnim;
-				if (lastAnimHash == 0)
-				{
-					playingAnim = this.playingAnim;
-					Play(defaultAnim, false);
-				}
-				else
-				{
-					playingAnim = lastPlayingAnim;
-					Play(this.playingAnim, false);
-				}
-				if (onEnd != null)
-				{
-					onEnd(this, playingAnim);
-				}
-			}
-			num = animStateHashs[(int)this.playingAnim];
-			if (currentAnimatorStateInfo.get_fullPathHash() != num && nextAnimatorStateInfo.get_fullPathHash() != num && currentAnimatorStateInfo.get_fullPathHash() != viaAnimHash && (loopAnimHash == 0 || (currentAnimatorStateInfo.get_fullPathHash() != loopAnimHash && nextAnimatorStateInfo.get_fullPathHash() != loopAnimHash)) && (lastAnimHash == 0 || (currentAnimatorStateInfo.get_fullPathHash() != lastAnimHash && nextAnimatorStateInfo.get_fullPathHash() != lastAnimHash)))
-			{
-				PlayAnimator(this.playingAnim, false);
-				if (onChange != null)
-				{
-					onChange(this, this.playingAnim);
-				}
-			}
-		}
-	}
-
-	public void SetMoveRunAnim(int sex)
-	{
-		moveAnim = ((sex != 0) ? PLCA.RUN_F : PLCA.RUN);
-	}
-
-	private void PlayAnimator(PLCA anim, bool instant = false)
-	{
-		if (animator.HasState(0, animStateHashs[(int)anim]))
-		{
-			string text = animStateNames[(int)anim];
-			if (instant)
-			{
-				animator.Play(text);
-			}
-			else
-			{
-				animator.CrossFade(text, transitionDuration, 0);
-			}
-		}
-	}
-
-	public void Play(PLCA anim, bool instant = false)
-	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		if (playingAnim == anim)
-		{
-			lastAnimHash = 0;
-		}
-		else
-		{
-			if (instant)
-			{
-				PlayAnimator(anim, instant);
-			}
-			else if (loopAnimHash != 0 && endAnimHash != 0)
-			{
-				AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-				AnimatorStateInfo nextAnimatorStateInfo = animator.GetNextAnimatorStateInfo(0);
-				if (currentAnimatorStateInfo.get_fullPathHash() == loopAnimHash || nextAnimatorStateInfo.get_fullPathHash() == loopAnimHash)
-				{
-					animator.CrossFade(endAnimHash, transitionDuration, 0);
-					lastAnimHash = endAnimHash;
-					lastPlayingAnim = playingAnim;
-				}
-			}
-			string str = animStateNames[(int)anim];
-			viaAnimHash = Animator.StringToHash("Base Layer." + str + "_VIA");
-			if (!animator.HasState(0, viaAnimHash))
-			{
-				viaAnimHash = 0;
-			}
-			loopAnimHash = Animator.StringToHash("Base Layer." + str + "_LOOP");
-			if (!animator.HasState(0, loopAnimHash))
-			{
-				loopAnimHash = 0;
-			}
-			if (loopAnimHash != 0)
-			{
-				endAnimHash = Animator.StringToHash("Base Layer." + str + "_END");
-				if (!animator.HasState(0, endAnimHash))
-				{
-					endAnimHash = 0;
-				}
-			}
-			playingAnim = anim;
-			if (onPlay != null)
-			{
-				onPlay(this, anim);
-			}
-		}
-	}
-
-	public void PlayDefault(bool instant = false)
-	{
-		Play(defaultAnim, instant);
-	}
-
-	public void PlayMove(bool instant = false)
-	{
-		Play(moveAnim, instant);
-	}
-
-	public void Play(PLCA[] anims, bool instant = false)
-	{
-		if (!IsPlaying(anims))
-		{
-			Play(anims[Random.Range(0, anims.Length)], instant);
-		}
-	}
-
-	public void PlayIdleAnims(int sex, bool instant = false)
-	{
-		PLCA[] anims = (sex != 0) ? idleAnims_f : idleAnims_m;
-		Play(anims, instant);
-	}
-
-	public void PlayRunAnim(int sex, bool instant = false)
-	{
-		Play((sex != 0) ? PLCA.RUN_F : PLCA.RUN, instant);
-	}
-
-	public bool IsPlaying(PLCA[] anims)
-	{
-		PLCA playingAnim = this.playingAnim;
-		int i = 0;
-		for (int num = anims.Length; i < num; i++)
-		{
-			if (anims[i] == playingAnim)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public bool IsPlayingIdleAnims(int sex)
-	{
-		PLCA[] anims = (sex != 0) ? idleAnims_f : idleAnims_m;
-		return IsPlaying(anims);
-	}
-
-	public bool IsCurrentState(PLCA anim)
-	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		if (PLCA.NORMAL > anim || (int)anim >= animStateHashs.Length)
-		{
-			return false;
-		}
-		AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-		if (currentAnimatorStateInfo.get_fullPathHash() != animStateHashs[(int)anim])
-		{
-			return false;
-		}
-		return true;
-	}
+  public bool IsCurrentState(PLCA anim)
+  {
+    int index = (int) anim;
+    if (0 > index || index >= PlayerAnimCtrl.animStateHashs.Length)
+      return false;
+    AnimatorStateInfo animatorStateInfo = this.animator.GetCurrentAnimatorStateInfo(0);
+    return ((AnimatorStateInfo) ref animatorStateInfo).fullPathHash == PlayerAnimCtrl.animStateHashs[index];
+  }
 }

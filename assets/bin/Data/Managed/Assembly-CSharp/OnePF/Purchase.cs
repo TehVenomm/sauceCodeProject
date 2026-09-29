@@ -1,134 +1,88 @@
-namespace OnePF
+﻿// Decompiled with JetBrains decompiler
+// Type: OnePF.Purchase
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+#nullable disable
+namespace OnePF;
+
+public class Purchase
 {
-	public class Purchase
-	{
-		public string ItemType
-		{
-			get;
-			private set;
-		}
+  public string ItemType { get; private set; }
 
-		public string OrderId
-		{
-			get;
-			private set;
-		}
+  public string OrderId { get; private set; }
 
-		public string PackageName
-		{
-			get;
-			private set;
-		}
+  public string PackageName { get; private set; }
 
-		public string Sku
-		{
-			get;
-			private set;
-		}
+  public string Sku { get; private set; }
 
-		public long PurchaseTime
-		{
-			get;
-			private set;
-		}
+  public long PurchaseTime { get; private set; }
 
-		public int PurchaseState
-		{
-			get;
-			private set;
-		}
+  public int PurchaseState { get; private set; }
 
-		public string DeveloperPayload
-		{
-			get;
-			private set;
-		}
+  public string DeveloperPayload { get; private set; }
 
-		public string Token
-		{
-			get;
-			private set;
-		}
+  public string Token { get; private set; }
 
-		public string OriginalJson
-		{
-			get;
-			private set;
-		}
+  public string OriginalJson { get; private set; }
 
-		public string Signature
-		{
-			get;
-			private set;
-		}
+  public string Signature { get; private set; }
 
-		public string AppstoreName
-		{
-			get;
-			private set;
-		}
+  public string AppstoreName { get; private set; }
 
-		public string Receipt
-		{
-			get;
-			private set;
-		}
+  public string Receipt { get; private set; }
 
-		private Purchase()
-		{
-		}
+  private Purchase()
+  {
+  }
 
-		public Purchase(string jsonString)
-		{
-			JSON jSON = new JSON(jsonString);
-			ItemType = jSON.ToString("itemType");
-			OrderId = jSON.ToString("orderId");
-			PackageName = jSON.ToString("packageName");
-			Sku = jSON.ToString("sku");
-			PurchaseTime = jSON.ToLong("purchaseTime");
-			PurchaseState = jSON.ToInt("purchaseState");
-			DeveloperPayload = jSON.ToString("developerPayload");
-			Token = jSON.ToString("token");
-			OriginalJson = jSON.ToString("originalJson");
-			Signature = jSON.ToString("signature");
-			AppstoreName = jSON.ToString("appstoreName");
-			Receipt = jSON.ToString("receipt");
-		}
+  public Purchase(string jsonString)
+  {
+    JSON json = new JSON(jsonString);
+    this.ItemType = json.ToString("itemType");
+    this.OrderId = json.ToString("orderId");
+    this.PackageName = json.ToString("packageName");
+    this.Sku = json.ToString("sku");
+    this.PurchaseTime = json.ToLong("purchaseTime");
+    this.PurchaseState = json.ToInt("purchaseState");
+    this.DeveloperPayload = json.ToString("developerPayload");
+    this.Token = json.ToString("token");
+    this.OriginalJson = json.ToString("originalJson");
+    this.Signature = json.ToString("signature");
+    this.AppstoreName = json.ToString("appstoreName");
+    this.Receipt = json.ToString("receipt");
+  }
 
-		public static Purchase CreateFromSku(string sku)
-		{
-			return CreateFromSku(sku, string.Empty);
-		}
+  public static Purchase CreateFromSku(string sku) => Purchase.CreateFromSku(sku, "");
 
-		public static Purchase CreateFromSku(string sku, string developerPayload)
-		{
-			Purchase purchase = new Purchase();
-			purchase.Sku = sku;
-			purchase.DeveloperPayload = developerPayload;
-			return purchase;
-		}
+  public static Purchase CreateFromSku(string sku, string developerPayload)
+  {
+    return new Purchase()
+    {
+      Sku = sku,
+      DeveloperPayload = developerPayload
+    };
+  }
 
-		public override string ToString()
-		{
-			return "SKU:" + Sku + ";" + OriginalJson;
-		}
+  public override string ToString() => $"SKU:{this.Sku};{this.OriginalJson}";
 
-		public string Serialize()
-		{
-			JSON jSON = new JSON();
-			jSON["itemType"] = ItemType;
-			jSON["orderId"] = OrderId;
-			jSON["packageName"] = PackageName;
-			jSON["sku"] = Sku;
-			jSON["purchaseTime"] = PurchaseTime;
-			jSON["purchaseState"] = PurchaseState;
-			jSON["developerPayload"] = DeveloperPayload;
-			jSON["token"] = Token;
-			jSON["originalJson"] = OriginalJson;
-			jSON["signature"] = Signature;
-			jSON["appstoreName"] = AppstoreName;
-			jSON["receipt"] = Receipt;
-			return jSON.serialized;
-		}
-	}
+  public string Serialize()
+  {
+    return new JSON()
+    {
+      ["itemType"] = ((object) this.ItemType),
+      ["orderId"] = ((object) this.OrderId),
+      ["packageName"] = ((object) this.PackageName),
+      ["sku"] = ((object) this.Sku),
+      ["purchaseTime"] = ((object) this.PurchaseTime),
+      ["purchaseState"] = ((object) this.PurchaseState),
+      ["developerPayload"] = ((object) this.DeveloperPayload),
+      ["token"] = ((object) this.Token),
+      ["originalJson"] = ((object) this.OriginalJson),
+      ["signature"] = ((object) this.Signature),
+      ["appstoreName"] = ((object) this.AppstoreName),
+      ["receipt"] = ((object) this.Receipt)
+    }.serialized;
+  }
 }

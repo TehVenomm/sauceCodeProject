@@ -1,298 +1,202 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ItemModelDisplayInfoEditor
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 [ExecuteInEditMode]
-public class ItemModelDisplayInfoEditor
+public class ItemModelDisplayInfoEditor : MonoBehaviour
 {
-	public GlobalSettingsManager globalSettingsManager;
+  public GlobalSettingsManager globalSettingsManager;
+  public Transform[] weapons;
+  public Transform armor;
+  public Transform helm;
+  public Transform arm;
+  public Transform leg;
+  public Transform item;
+  private bool pivotAutoRotate;
 
-	public Transform[] weapons;
+  private void OnValidate()
+  {
+    if (Application.isPlaying || !Object.op_Inequality((Object) this.globalSettingsManager, (Object) null))
+      return;
+    GlobalSettingsManager.UIModelRenderingParam uiModelRendering = this.globalSettingsManager.uiModelRendering;
+    GlobalSettingsManager.UIModelRenderingParam.DisplayInfo[] weaponDisplayInfos = uiModelRendering.WeaponDisplayInfos;
+    int index = 0;
+    int length1 = weaponDisplayInfos.Length;
+    for (int length2 = this.weapons.Length; index < length1 && index < length2; ++index)
+      this.LoadSettings(weaponDisplayInfos[index], this.weapons[index]);
+    this.LoadSettings(uiModelRendering.armorDisplayInfo, this.armor);
+    this.LoadSettings(uiModelRendering.helmDisplayInfo, this.helm);
+    this.LoadSettings(uiModelRendering.armDisplayInfo, this.arm);
+    this.LoadSettings(uiModelRendering.legDisplayInfo, this.leg);
+    this.LoadSettings(uiModelRendering.itemDisplayInfo, this.item);
+  }
 
-	public Transform armor;
+  private void LoadSettings(
+    GlobalSettingsManager.UIModelRenderingParam.DisplayInfo info,
+    Transform root)
+  {
+    if (info == null || Object.op_Equality((Object) root, (Object) null))
+      return;
+    Transform transform1 = root.Find("Pivot");
+    if (Object.op_Equality((Object) transform1, (Object) null))
+      return;
+    root.localPosition = Vector3.zero;
+    root.localEulerAngles = Vector3.zero;
+    root.localScale = Vector3.one;
+    transform1.localPosition = new Vector3(0.0f, 0.0f, info.zFromCamera);
+    transform1.localEulerAngles = Vector3.zero;
+    transform1.localScale = Vector3.one;
+    Transform transform2 = root.Find("Pivot/Model0");
+    Transform transform3 = root.Find("Pivot/Model1");
+    if (Object.op_Inequality((Object) transform2, (Object) null))
+    {
+      transform2.localPosition = info.mainPos;
+      transform2.localEulerAngles = info.mainRot;
+      transform2.localScale = Vector3.one;
+    }
+    if (!Object.op_Inequality((Object) transform3, (Object) null))
+      return;
+    transform3.localPosition = info.subPos;
+    transform3.localEulerAngles = info.subRot;
+    transform3.localScale = Vector3.one;
+  }
 
-	public Transform helm;
+  private void SaveSettings(
+    GlobalSettingsManager.UIModelRenderingParam.DisplayInfo info,
+    Transform root)
+  {
+    if (info == null || Object.op_Equality((Object) root, (Object) null))
+      return;
+    Transform transform1 = root.Find("Pivot");
+    if (Object.op_Equality((Object) transform1, (Object) null))
+      return;
+    info.zFromCamera = transform1.localPosition.z;
+    Transform transform2 = root.Find("Pivot/Model0");
+    Transform transform3 = root.Find("Pivot/Model1");
+    if (Object.op_Inequality((Object) transform2, (Object) null))
+    {
+      info.mainPos = transform2.localPosition;
+      info.mainRot = transform2.localEulerAngles;
+    }
+    if (Object.op_Inequality((Object) transform3, (Object) null))
+    {
+      info.subPos = transform3.localPosition;
+      info.subRot = transform3.localEulerAngles;
+    }
+    else
+    {
+      info.subPos = Vector3.zero;
+      info.subRot = Vector3.zero;
+    }
+  }
 
-	public Transform arm;
+  private void Update() => this.ForEachModels((Action<Transform>) (t => this.UpdateInfo(t)));
 
-	public Transform leg;
+  private void ForEachModels(Action<Transform> callback)
+  {
+    foreach (Transform weapon in this.weapons)
+      callback(weapon);
+    callback(this.armor);
+    callback(this.helm);
+    callback(this.arm);
+    callback(this.leg);
+    callback(this.item);
+  }
 
-	public Transform item;
+  private void UpdateInfo(Transform root)
+  {
+    if (Object.op_Equality((Object) root, (Object) null))
+      return;
+    Transform transform = root.Find("Pivot");
+    if (Object.op_Equality((Object) root, (Object) null))
+      return;
+    root.localPosition = Vector3.zero;
+    root.localEulerAngles = Vector3.zero;
+    Vector3 localPosition = transform.localPosition;
+    localPosition.x = 0.0f;
+    localPosition.y = 0.0f;
+    transform.localPosition = localPosition;
+    Vector3 localEulerAngles = transform.localEulerAngles;
+    localEulerAngles.x = 0.0f;
+    localEulerAngles.z = 0.0f;
+    if (this.pivotAutoRotate)
+      localEulerAngles.y = (float) (((double) localEulerAngles.y + 5.0) % 360.0);
+    transform.localEulerAngles = localEulerAngles;
+    this.UpdateModel(root.Find("Pivot/Model0"));
+    this.UpdateModel(root.Find("Pivot/Model1"));
+  }
 
-	private bool pivotAutoRotate;
+  private void UpdateModel(Transform model)
+  {
+    if (Object.op_Equality((Object) model, (Object) null))
+      return;
+    foreach (Transform transform in model)
+    {
+      transform.localPosition = Vector3.zero;
+      transform.localEulerAngles = Vector3.zero;
+    }
+  }
 
-	public ItemModelDisplayInfoEditor()
-		: this()
-	{
-	}
+  private void ResetPivotAngle(Transform root)
+  {
+    if (Object.op_Equality((Object) root, (Object) null))
+      return;
+    Transform transform = root.Find("Pivot");
+    if (Object.op_Equality((Object) transform, (Object) null))
+      return;
+    transform.localEulerAngles = Vector3.zero;
+  }
 
-	private void OnValidate()
-	{
-		if (!Application.get_isPlaying() && globalSettingsManager != null)
-		{
-			GlobalSettingsManager.UIModelRenderingParam uiModelRendering = globalSettingsManager.uiModelRendering;
-			GlobalSettingsManager.UIModelRenderingParam.DisplayInfo[] weaponDisplayInfos = uiModelRendering.WeaponDisplayInfos;
-			int i = 0;
-			int num = weaponDisplayInfos.Length;
-			for (int num2 = weapons.Length; i < num && i < num2; i++)
-			{
-				LoadSettings(weaponDisplayInfos[i], weapons[i]);
-			}
-			LoadSettings(uiModelRendering.armorDisplayInfo, armor);
-			LoadSettings(uiModelRendering.helmDisplayInfo, helm);
-			LoadSettings(uiModelRendering.armDisplayInfo, arm);
-			LoadSettings(uiModelRendering.legDisplayInfo, leg);
-			LoadSettings(uiModelRendering.itemDisplayInfo, item);
-		}
-	}
-
-	private void LoadSettings(GlobalSettingsManager.UIModelRenderingParam.DisplayInfo info, Transform root)
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Expected O, but got Unknown
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0095: Expected O, but got Unknown
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		if (info != null && !(root == null))
-		{
-			Transform val = root.Find("Pivot");
-			if (!(val == null))
-			{
-				root.set_localPosition(Vector3.get_zero());
-				root.set_localEulerAngles(Vector3.get_zero());
-				root.set_localScale(Vector3.get_one());
-				val.set_localPosition(new Vector3(0f, 0f, info.zFromCamera));
-				val.set_localEulerAngles(Vector3.get_zero());
-				val.set_localScale(Vector3.get_one());
-				Transform val2 = root.Find("Pivot/Model0");
-				Transform val3 = root.Find("Pivot/Model1");
-				if (val2 != null)
-				{
-					val2.set_localPosition(info.mainPos);
-					val2.set_localEulerAngles(info.mainRot);
-					val2.set_localScale(Vector3.get_one());
-				}
-				if (val3 != null)
-				{
-					val3.set_localPosition(info.subPos);
-					val3.set_localEulerAngles(info.subRot);
-					val3.set_localScale(Vector3.get_one());
-				}
-			}
-		}
-	}
-
-	private void SaveSettings(GlobalSettingsManager.UIModelRenderingParam.DisplayInfo info, Transform root)
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Expected O, but got Unknown
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Expected O, but got Unknown
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		if (info != null && !(root == null))
-		{
-			Transform val = root.Find("Pivot");
-			if (!(val == null))
-			{
-				Vector3 localPosition = val.get_localPosition();
-				info.zFromCamera = localPosition.z;
-				Transform val2 = root.Find("Pivot/Model0");
-				Transform val3 = root.Find("Pivot/Model1");
-				if (val2 != null)
-				{
-					info.mainPos = val2.get_localPosition();
-					info.mainRot = val2.get_localEulerAngles();
-				}
-				if (val3 != null)
-				{
-					info.subPos = val3.get_localPosition();
-					info.subRot = val3.get_localEulerAngles();
-				}
-				else
-				{
-					info.subPos = Vector3.get_zero();
-					info.subRot = Vector3.get_zero();
-				}
-			}
-		}
-	}
-
-	private void Update()
-	{
-		ForEachModels(delegate(Transform t)
-		{
-			UpdateInfo(t);
-		});
-	}
-
-	private void ForEachModels(Action<Transform> callback)
-	{
-		Transform[] array = weapons;
-		foreach (Transform obj in array)
-		{
-			callback(obj);
-		}
-		callback(armor);
-		callback(helm);
-		callback(arm);
-		callback(leg);
-		callback(item);
-	}
-
-	private void UpdateInfo(Transform root)
-	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Expected O, but got Unknown
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Expected O, but got Unknown
-		if (!(root == null))
-		{
-			Transform val = root.Find("Pivot");
-			if (!(root == null))
-			{
-				root.set_localPosition(Vector3.get_zero());
-				root.set_localEulerAngles(Vector3.get_zero());
-				Vector3 localPosition = val.get_localPosition();
-				localPosition.x = 0f;
-				localPosition.y = 0f;
-				val.set_localPosition(localPosition);
-				Vector3 localEulerAngles = val.get_localEulerAngles();
-				localEulerAngles.x = 0f;
-				localEulerAngles.z = 0f;
-				if (pivotAutoRotate)
-				{
-					localEulerAngles.y = (localEulerAngles.y + 5f) % 360f;
-				}
-				val.set_localEulerAngles(localEulerAngles);
-				UpdateModel(root.Find("Pivot/Model0"));
-				UpdateModel(root.Find("Pivot/Model1"));
-			}
-		}
-	}
-
-	private void UpdateModel(Transform model)
-	{
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Expected O, but got Unknown
-		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		if (!(model == null))
-		{
-			foreach (Transform item2 in model)
-			{
-				Transform val = item2;
-				val.set_localPosition(Vector3.get_zero());
-				val.set_localEulerAngles(Vector3.get_zero());
-			}
-		}
-	}
-
-	private void ResetPivotAngle(Transform root)
-	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Expected O, but got Unknown
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		if (!(root == null))
-		{
-			Transform val = root.Find("Pivot");
-			if (!(val == null))
-			{
-				val.set_localEulerAngles(Vector3.get_zero());
-			}
-		}
-	}
-
-	private void OnGUI()
-	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		GUILayout.BeginArea(new Rect(0f, 0f, (float)Screen.get_width(), (float)Screen.get_height()));
-		GUILayout.BeginHorizontal((GUILayoutOption[])new GUILayoutOption[0]);
-		GUILayout.FlexibleSpace();
-		GUILayout.BeginVertical((GUILayoutOption[])new GUILayoutOption[0]);
-		GUILayout.Label("item model display info editor", (GUILayoutOption[])new GUILayoutOption[0]);
-		if (!Application.get_isPlaying())
-		{
-			GUILayout.Label("実行して下さい。", (GUILayoutOption[])new GUILayoutOption[0]);
-		}
-		else
-		{
-			GUILayout.Label("中心点の前後の調整は「Pivot」のZ移動。\nモデルの位置・姿勢の調整は「Model0」「Model1」を移動・回転。", (GUILayoutOption[])new GUILayoutOption[0]);
-			if (!pivotAutoRotate)
-			{
-				if (GUILayout.Button("「Pivot」自動回転をON", (GUILayoutOption[])new GUILayoutOption[0]))
-				{
-					pivotAutoRotate = true;
-				}
-			}
-			else if (GUILayout.Button("「Pivot」自動回転をOFF", (GUILayoutOption[])new GUILayoutOption[0]))
-			{
-				pivotAutoRotate = false;
-			}
-			if (GUILayout.Button("PivotのY回転をリセット", (GUILayoutOption[])new GUILayoutOption[0]))
-			{
-				ForEachModels(delegate(Transform t)
-				{
-					ResetPivotAngle(t);
-				});
-				pivotAutoRotate = false;
-			}
-			if (GUILayout.Button("エディット内容をGlobalSettingsManagerに反映", (GUILayoutOption[])new GUILayoutOption[0]) && globalSettingsManager != null)
-			{
-				GlobalSettingsManager.UIModelRenderingParam uiModelRendering = globalSettingsManager.uiModelRendering;
-				GlobalSettingsManager.UIModelRenderingParam.DisplayInfo[] weaponDisplayInfos = globalSettingsManager.uiModelRendering.WeaponDisplayInfos;
-				int i = 0;
-				int num = weaponDisplayInfos.Length;
-				for (int num2 = weapons.Length; i < num && i < num2; i++)
-				{
-					SaveSettings(weaponDisplayInfos[i], weapons[i]);
-				}
-				SaveSettings(uiModelRendering.armorDisplayInfo, armor);
-				SaveSettings(uiModelRendering.helmDisplayInfo, helm);
-				SaveSettings(uiModelRendering.armDisplayInfo, arm);
-				SaveSettings(uiModelRendering.legDisplayInfo, leg);
-				SaveSettings(uiModelRendering.itemDisplayInfo, item);
-			}
-		}
-		GUILayout.EndVertical();
-		GUILayout.FlexibleSpace();
-		GUILayout.EndHorizontal();
-		GUILayout.EndArea();
-	}
+  private void OnGUI()
+  {
+    GUILayout.BeginArea(new Rect(0.0f, 0.0f, (float) Screen.width, (float) Screen.height));
+    GUILayout.BeginHorizontal(Array.Empty<GUILayoutOption>());
+    GUILayout.FlexibleSpace();
+    GUILayout.BeginVertical(Array.Empty<GUILayoutOption>());
+    GUILayout.Label("item model display info editor", Array.Empty<GUILayoutOption>());
+    if (!Application.isPlaying)
+    {
+      GUILayout.Label("実行して下さい。", Array.Empty<GUILayoutOption>());
+    }
+    else
+    {
+      GUILayout.Label("中心点の前後の調整は「Pivot」のZ移動。\nモデルの位置・姿勢の調整は「Model0」「Model1」を移動・回転。", Array.Empty<GUILayoutOption>());
+      if (!this.pivotAutoRotate)
+      {
+        if (GUILayout.Button("「Pivot」自動回転をON", Array.Empty<GUILayoutOption>()))
+          this.pivotAutoRotate = true;
+      }
+      else if (GUILayout.Button("「Pivot」自動回転をOFF", Array.Empty<GUILayoutOption>()))
+        this.pivotAutoRotate = false;
+      if (GUILayout.Button("PivotのY回転をリセット", Array.Empty<GUILayoutOption>()))
+      {
+        this.ForEachModels((Action<Transform>) (t => this.ResetPivotAngle(t)));
+        this.pivotAutoRotate = false;
+      }
+      if (GUILayout.Button("エディット内容をGlobalSettingsManagerに反映", Array.Empty<GUILayoutOption>()) && Object.op_Inequality((Object) this.globalSettingsManager, (Object) null))
+      {
+        GlobalSettingsManager.UIModelRenderingParam uiModelRendering = this.globalSettingsManager.uiModelRendering;
+        GlobalSettingsManager.UIModelRenderingParam.DisplayInfo[] weaponDisplayInfos = this.globalSettingsManager.uiModelRendering.WeaponDisplayInfos;
+        int index = 0;
+        int length1 = weaponDisplayInfos.Length;
+        for (int length2 = this.weapons.Length; index < length1 && index < length2; ++index)
+          this.SaveSettings(weaponDisplayInfos[index], this.weapons[index]);
+        this.SaveSettings(uiModelRendering.armorDisplayInfo, this.armor);
+        this.SaveSettings(uiModelRendering.helmDisplayInfo, this.helm);
+        this.SaveSettings(uiModelRendering.armDisplayInfo, this.arm);
+        this.SaveSettings(uiModelRendering.legDisplayInfo, this.leg);
+        this.SaveSettings(uiModelRendering.itemDisplayInfo, this.item);
+      }
+    }
+    GUILayout.EndVertical();
+    GUILayout.FlexibleSpace();
+    GUILayout.EndHorizontal();
+    GUILayout.EndArea();
+  }
 }

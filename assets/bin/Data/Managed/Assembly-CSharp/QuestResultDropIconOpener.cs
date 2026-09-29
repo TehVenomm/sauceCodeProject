@@ -1,106 +1,92 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: QuestResultDropIconOpener
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
-public class QuestResultDropIconOpener
+#nullable disable
+public class QuestResultDropIconOpener : MonoBehaviour
 {
-	public class Info
-	{
-		public bool IsRare;
+  [SerializeField]
+  private UISprite sprite;
+  [SerializeField]
+  private TweenAlpha iconParent;
+  [SerializeField]
+  private UISprite spriteRewardCategory;
+  private ItemIcon icon;
+  private bool isInitialize;
+  private QuestResultDropIconOpener.Info m_Info = new QuestResultDropIconOpener.Info();
+  private Action<Transform, QuestResultDropIconOpener.Info, bool> loadEffCallback;
+  private const string SPR_RARE_ICON = "ItemOpenerIcon_Gold";
+  private const string SPR_NORMAL_ICON = "ItemOpenerIcon_Silver";
+  private const string SPR_BREAK_ICON = "ItemOpenerIcon_Red";
 
-		public bool IsBroken;
-	}
+  public void Initialized(
+    ItemIcon _icon,
+    QuestResultDropIconOpener.Info info,
+    Action<Transform, QuestResultDropIconOpener.Info, bool> load_eff_callback)
+  {
+    if (Object.op_Equality((Object) this.iconParent, (Object) null))
+      return;
+    this.SetIcon(_icon);
+    this.m_Info = info;
+    this.loadEffCallback = load_eff_callback;
+    this.SetSpriteRare();
+    this.SetSpriteBreakReward(false);
+    this.isInitialize = true;
+  }
 
-	private const string SPR_RARE_ICON = "ItemOpenerIcon_Gold";
+  public void StartEffect(bool is_skip)
+  {
+    if (!this.isInitialize)
+      return;
+    if (is_skip)
+    {
+      this.iconParent.duration = 0.0f;
+      this.iconParent.delay = 0.0f;
+    }
+    this.loadEffCallback(this.icon._transform, this.m_Info, is_skip);
+    ((Behaviour) this.sprite).enabled = false;
+    this.OpenIcon();
+  }
 
-	private const string SPR_NORMAL_ICON = "ItemOpenerIcon_Silver";
+  private void SetIcon(ItemIcon _icon)
+  {
+    this.icon = _icon;
+    this.icon.transform.parent = ((Component) this.iconParent).transform;
+    this.icon.VisibleIcon(false);
+  }
 
-	private const string SPR_BREAK_ICON = "ItemOpenerIcon_Red";
+  private void SetSpriteRare()
+  {
+    string str = "ItemOpenerIcon_Silver";
+    if (this.m_Info.IsBroken)
+      str = "ItemOpenerIcon_Red";
+    else if (this.m_Info.IsRare)
+      str = "ItemOpenerIcon_Gold";
+    this.sprite.spriteName = str;
+  }
 
-	[SerializeField]
-	private UISprite sprite;
+  private void OpenIcon()
+  {
+    this.iconParent.Play(true);
+    this.icon.VisibleIcon(true);
+    this.SetSpriteBreakReward(this.m_Info.IsBroken);
+  }
 
-	[SerializeField]
-	private TweenAlpha iconParent;
+  private void SetSpriteBreakReward(bool visible)
+  {
+    if (!Object.op_Inequality((Object) this.spriteRewardCategory, (Object) null))
+      return;
+    ((Component) this.spriteRewardCategory).gameObject.SetActive(visible);
+  }
 
-	[SerializeField]
-	private UISprite spriteRewardCategory;
-
-	private ItemIcon icon;
-
-	private bool isInitialize;
-
-	private Info m_Info = new Info();
-
-	private Action<Transform, Info, bool> loadEffCallback;
-
-	public QuestResultDropIconOpener()
-		: this()
-	{
-	}
-
-	public void Initialized(ItemIcon _icon, Info info, Action<Transform, Info, bool> load_eff_callback)
-	{
-		if (!(iconParent == null))
-		{
-			SetIcon(_icon);
-			m_Info = info;
-			loadEffCallback = load_eff_callback;
-			SetSpriteRare();
-			SetSpriteBreakReward(false);
-			isInitialize = true;
-		}
-	}
-
-	public void StartEffect(bool is_skip)
-	{
-		if (isInitialize)
-		{
-			if (is_skip)
-			{
-				iconParent.duration = 0f;
-				iconParent.delay = 0f;
-			}
-			loadEffCallback(icon._transform, m_Info, is_skip);
-			sprite.set_enabled(false);
-			OpenIcon();
-		}
-	}
-
-	private void SetIcon(ItemIcon _icon)
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		icon = _icon;
-		icon.transform.set_parent(iconParent.get_transform());
-		icon.VisibleIcon(false, true);
-	}
-
-	private void SetSpriteRare()
-	{
-		string spriteName = "ItemOpenerIcon_Silver";
-		if (m_Info.IsBroken)
-		{
-			spriteName = "ItemOpenerIcon_Red";
-		}
-		else if (m_Info.IsRare)
-		{
-			spriteName = "ItemOpenerIcon_Gold";
-		}
-		sprite.spriteName = spriteName;
-	}
-
-	private void OpenIcon()
-	{
-		iconParent.Play(true);
-		icon.VisibleIcon(true, true);
-		SetSpriteBreakReward(m_Info.IsBroken);
-	}
-
-	private void SetSpriteBreakReward(bool visible)
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (spriteRewardCategory != null)
-		{
-			spriteRewardCategory.get_gameObject().SetActive(visible);
-		}
-	}
+  public class Info
+  {
+    public bool IsRare;
+    public bool IsBroken;
+  }
 }

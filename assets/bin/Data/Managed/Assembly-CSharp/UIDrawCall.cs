@@ -1,833 +1,664 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIDrawCall
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Internal/Draw Call")]
+#nullable disable
 [ExecuteInEditMode]
-public class UIDrawCall
+[AddComponentMenu("NGUI/Internal/Draw Call")]
+public class UIDrawCall : MonoBehaviour
 {
-	public enum Clipping
-	{
-		None = 0,
-		TextureMask = 1,
-		SoftClip = 3,
-		ConstrainButDontClip = 4
-	}
-
-	public delegate void OnRenderCallback(Material mat);
-
-	private const int maxIndexBufferCache = 10;
-
-	private static BetterList<UIDrawCall> mActiveList = new BetterList<UIDrawCall>();
-
-	private static BetterList<UIDrawCall> mInactiveList = new BetterList<UIDrawCall>();
-
-	[NonSerialized]
-	[HideInInspector]
-	public int widgetCount;
-
-	[NonSerialized]
-	[HideInInspector]
-	public int depthStart = 2147483647;
-
-	[NonSerialized]
-	[HideInInspector]
-	public int depthEnd = -2147483648;
-
-	[NonSerialized]
-	[HideInInspector]
-	public UIPanel manager;
-
-	[NonSerialized]
-	[HideInInspector]
-	public UIPanel panel;
-
-	[NonSerialized]
-	[HideInInspector]
-	public Texture2D clipTexture;
-
-	[NonSerialized]
-	[HideInInspector]
-	public bool alwaysOnScreen;
-
-	[NonSerialized]
-	[HideInInspector]
-	public BetterList<Vector3> verts = new BetterList<Vector3>();
-
-	[NonSerialized]
-	[HideInInspector]
-	public BetterList<Vector3> norms = new BetterList<Vector3>();
-
-	[NonSerialized]
-	[HideInInspector]
-	public BetterList<Vector4> tans = new BetterList<Vector4>();
-
-	[NonSerialized]
-	[HideInInspector]
-	public BetterList<Vector2> uvs = new BetterList<Vector2>();
-
-	[NonSerialized]
-	[HideInInspector]
-	public BetterList<Color32> cols = new BetterList<Color32>();
-
-	private Material mMaterial;
-
-	private Texture mTexture;
-
-	private Shader mShader;
-
-	private int mClipCount;
-
-	private Transform mTrans;
-
-	private Mesh mMesh;
-
-	private MeshFilter mFilter;
-
-	private MeshRenderer mRenderer;
-
-	private Material mDynamicMat;
-
-	private int[] mIndices;
-
-	private bool mRebuildMat = true;
-
-	private bool mLegacyShader;
-
-	private int mRenderQueue = 3000;
-
-	private int mTriangles;
-
-	[NonSerialized]
-	public bool isDirty;
-
-	[NonSerialized]
-	private bool mTextureClip;
-
-	public OnRenderCallback onRender;
-
-	private static List<int[]> mCache = new List<int[]>(10);
-
-	private static int[] ClipRange = null;
-
-	private static int[] ClipArgs = null;
-
-	[Obsolete("Use UIDrawCall.activeList")]
-	public static BetterList<UIDrawCall> list
-	{
-		get
-		{
-			return mActiveList;
-		}
-	}
-
-	public static BetterList<UIDrawCall> activeList => mActiveList;
-
-	public static BetterList<UIDrawCall> inactiveList => mInactiveList;
-
-	public int renderQueue
-	{
-		get
-		{
-			return mRenderQueue;
-		}
-		set
-		{
-			if (mRenderQueue != value)
-			{
-				mRenderQueue = value;
-				if (mDynamicMat != null)
-				{
-					mDynamicMat.set_renderQueue(value);
-				}
-			}
-		}
-	}
-
-	public int sortingOrder
-	{
-		get
-		{
-			return (mRenderer != null) ? mRenderer.get_sortingOrder() : 0;
-		}
-		set
-		{
-			if (mRenderer != null && mRenderer.get_sortingOrder() != value)
-			{
-				mRenderer.set_sortingOrder(value);
-			}
-		}
-	}
-
-	public int finalRenderQueue => (!(mDynamicMat != null)) ? mRenderQueue : mDynamicMat.get_renderQueue();
-
-	public Transform cachedTransform
-	{
-		get
-		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
-			if (mTrans == null)
-			{
-				mTrans = this.get_transform();
-			}
-			return mTrans;
-		}
-	}
-
-	public Material baseMaterial
-	{
-		get
-		{
-			return mMaterial;
-		}
-		set
-		{
-			if (mMaterial != value)
-			{
-				mMaterial = value;
-				mRebuildMat = true;
-			}
-		}
-	}
-
-	public Material dynamicMaterial => mDynamicMat;
-
-	public Texture mainTexture
-	{
-		get
-		{
-			return mTexture;
-		}
-		set
-		{
-			mTexture = value;
-			if (mDynamicMat != null)
-			{
-				mDynamicMat.set_mainTexture(value);
-			}
-		}
-	}
-
-	public Shader shader
-	{
-		get
-		{
-			return mShader;
-		}
-		set
-		{
-			if (mShader != value)
-			{
-				mShader = value;
-				mRebuildMat = true;
-			}
-		}
-	}
-
-	public int triangles => (mMesh != null) ? mTriangles : 0;
-
-	public bool isClipped => mClipCount != 0;
-
-	public UIDrawCall()
-		: this()
-	{
-	}
-
-	public static Shader ShaderFind(string name)
-	{
-		return ResourceUtility.FindShader(name);
-	}
-
-	private void CreateMaterial()
-	{
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0237: Unknown result type (might be due to invalid IL or missing references)
-		//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Expected O, but got Unknown
-		//IL_033b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0340: Expected O, but got Unknown
-		mTextureClip = false;
-		mLegacyShader = false;
-		mClipCount = panel.clipCount;
-		string text = (mShader != null) ? mShader.get_name() : ((!(mMaterial != null)) ? "Unlit/Transparent Colored" : mMaterial.get_shader().get_name());
-		text = text.Replace("GUI/Text Shader", "Unlit/Text");
-		if (text.Length > 2 && text[text.Length - 2] == ' ')
-		{
-			int num = text[text.Length - 1];
-			if (num > 48 && num <= 57)
-			{
-				text = text.Substring(0, text.Length - 2);
-			}
-		}
-		if (text.StartsWith("Hidden/"))
-		{
-			text = text.Substring(7);
-		}
-		text = text.Replace(" (SoftClip)", string.Empty);
-		text = text.Replace(" (TextureClip)", string.Empty);
-		if (panel.clipping == Clipping.TextureMask)
-		{
-			mTextureClip = true;
-			shader = ShaderFind("Hidden/" + text + " (TextureClip)");
-		}
-		else if (mClipCount != 0)
-		{
-			shader = ShaderFind("Hidden/" + text + " " + mClipCount);
-			if (shader == null)
-			{
-				shader = ShaderFind(text + " " + mClipCount);
-			}
-			if (shader == null && mClipCount == 1)
-			{
-				mLegacyShader = true;
-				shader = ShaderFind(text + " (SoftClip)");
-			}
-		}
-		else
-		{
-			shader = ShaderFind(text);
-		}
-		if (shader == null)
-		{
-			shader = ShaderFind("Unlit/Transparent Colored");
-		}
-		if (mMaterial != null && mMaterial.get_shader().get_isSupported())
-		{
-			mDynamicMat = new Material(mMaterial);
-			mDynamicMat.set_name("[NGUI] " + mMaterial.get_name());
-			mDynamicMat.set_hideFlags(60);
-			mDynamicMat.CopyPropertiesFromMaterial(mMaterial);
-			string[] shaderKeywords = mMaterial.get_shaderKeywords();
-			for (int i = 0; i < shaderKeywords.Length; i++)
-			{
-				mDynamicMat.EnableKeyword(shaderKeywords[i]);
-			}
-			if (shader != null)
-			{
-				mDynamicMat.set_shader(shader);
-			}
-			else if (mClipCount != 0)
-			{
-				Debug.LogError((object)(text + " shader doesn't have a clipped shader version for " + mClipCount + " clip regions"));
-			}
-		}
-		else
-		{
-			mDynamicMat = new Material(shader);
-			mDynamicMat.set_name("[NGUI] " + shader.get_name());
-			mDynamicMat.set_hideFlags(60);
-		}
-	}
-
-	private Material RebuildMaterial()
-	{
-		NGUITools.DestroyImmediate(mDynamicMat);
-		CreateMaterial();
-		mDynamicMat.set_renderQueue(mRenderQueue);
-		if (mTexture != null)
-		{
-			mDynamicMat.set_mainTexture(mTexture);
-		}
-		if (mRenderer != null)
-		{
-			mRenderer.set_sharedMaterials((Material[])new Material[1]
-			{
-				mDynamicMat
-			});
-		}
-		return mDynamicMat;
-	}
-
-	private void UpdateMaterials()
-	{
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		if (mRebuildMat || mDynamicMat == null || mClipCount != panel.clipCount || mTextureClip != (panel.clipping == Clipping.TextureMask))
-		{
-			RebuildMaterial();
-			mRebuildMat = false;
-		}
-		else if (mRenderer.get_sharedMaterial() != mDynamicMat)
-		{
-			mRenderer.set_sharedMaterials((Material[])new Material[1]
-			{
-				mDynamicMat
-			});
-		}
-	}
-
-	public void UpdateGeometry(int widgetCount)
-	{
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Expected O, but got Unknown
-		//IL_0415: Unknown result type (might be due to invalid IL or missing references)
-		//IL_042b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0467: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0489: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04bf: Unknown result type (might be due to invalid IL or missing references)
-		this.widgetCount = widgetCount;
-		int size = verts.size;
-		if (size > 0 && size == uvs.size && size == cols.size && size % 4 == 0)
-		{
-			if (mFilter == null)
-			{
-				mFilter = this.get_gameObject().GetComponent<MeshFilter>();
-			}
-			if (mFilter == null)
-			{
-				mFilter = this.get_gameObject().AddComponent<MeshFilter>();
-			}
-			if (verts.size < 65000)
-			{
-				int num = (size >> 1) * 3;
-				bool flag = mIndices == null || mIndices.Length != num;
-				if (mMesh == null)
-				{
-					mMesh = new Mesh();
-					mMesh.set_hideFlags(52);
-					mMesh.set_name((!(mMaterial != null)) ? "[NGUI] Mesh" : ("[NGUI] " + mMaterial.get_name()));
-					mMesh.MarkDynamic();
-					flag = true;
-				}
-				bool flag2 = uvs.buffer.Length != verts.buffer.Length || cols.buffer.Length != verts.buffer.Length || (norms.buffer != null && norms.buffer.Length != verts.buffer.Length) || (tans.buffer != null && tans.buffer.Length != verts.buffer.Length);
-				if (!flag2 && panel.renderQueue != 0)
-				{
-					flag2 = (mMesh == null || mMesh.get_vertexCount() != verts.buffer.Length);
-				}
-				mTriangles = verts.size >> 1;
-				if (flag2 || verts.buffer.Length > 65000)
-				{
-					if (flag2 || mMesh.get_vertexCount() != verts.size)
-					{
-						mMesh.Clear();
-						flag = true;
-					}
-					mMesh.set_vertices(verts.ToArray());
-					mMesh.set_uv(uvs.ToArray());
-					mMesh.set_colors32(cols.ToArray());
-					if (norms != null)
-					{
-						mMesh.set_normals(norms.ToArray());
-					}
-					if (tans != null)
-					{
-						mMesh.set_tangents(tans.ToArray());
-					}
-				}
-				else
-				{
-					if (mMesh.get_vertexCount() != verts.buffer.Length)
-					{
-						mMesh.Clear();
-						flag = true;
-					}
-					mMesh.set_vertices(verts.buffer);
-					mMesh.set_uv(uvs.buffer);
-					mMesh.set_colors32(cols.buffer);
-					if (norms != null)
-					{
-						mMesh.set_normals(norms.buffer);
-					}
-					if (tans != null)
-					{
-						mMesh.set_tangents(tans.buffer);
-					}
-				}
-				if (flag)
-				{
-					mIndices = GenerateCachedIndexBuffer(size, num);
-					mMesh.set_triangles(mIndices);
-				}
-				if (flag2 || !alwaysOnScreen)
-				{
-					mMesh.RecalculateBounds();
-				}
-				mFilter.set_mesh(mMesh);
-			}
-			else
-			{
-				mTriangles = 0;
-				if (mFilter.get_mesh() != null)
-				{
-					mFilter.get_mesh().Clear();
-				}
-				Debug.LogError((object)("Too many vertices on one panel: " + verts.size));
-			}
-			if (mRenderer == null)
-			{
-				mRenderer = this.get_gameObject().GetComponent<MeshRenderer>();
-			}
-			if (mRenderer == null)
-			{
-				mRenderer = this.get_gameObject().AddComponent<MeshRenderer>();
-			}
-			UpdateMaterials();
-		}
-		else
-		{
-			if (mFilter.get_mesh() != null)
-			{
-				mFilter.get_mesh().Clear();
-			}
-			Debug.LogError((object)("UIWidgets must fill the buffer with 4 vertices per quad. Found " + size));
-		}
-		verts.Clear();
-		uvs.Clear();
-		cols.Clear();
-		norms.Clear();
-		tans.Clear();
-	}
-
-	private int[] GenerateCachedIndexBuffer(int vertexCount, int indexCount)
-	{
-		int i = 0;
-		for (int count = mCache.Count; i < count; i++)
-		{
-			int[] array = mCache[i];
-			if (array != null && array.Length == indexCount)
-			{
-				return array;
-			}
-		}
-		int[] array2 = new int[indexCount];
-		int num = 0;
-		for (int j = 0; j < vertexCount; j += 4)
-		{
-			array2[num++] = j;
-			array2[num++] = j + 1;
-			array2[num++] = j + 2;
-			array2[num++] = j + 2;
-			array2[num++] = j + 3;
-			array2[num++] = j;
-		}
-		if (mCache.Count > 10)
-		{
-			mCache.RemoveAt(0);
-		}
-		mCache.Add(array2);
-		return array2;
-	}
-
-	private void OnWillRenderObject()
-	{
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0288: Unknown result type (might be due to invalid IL or missing references)
-		//IL_028b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0376: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0383: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0395: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0397: Unknown result type (might be due to invalid IL or missing references)
-		UpdateMaterials();
-		if (onRender != null)
-		{
-			onRender(mDynamicMat ?? mMaterial);
-		}
-		if (!(mDynamicMat == null) && mClipCount != 0)
-		{
-			if (mTextureClip)
-			{
-				Vector4 drawCallClipRange = panel.drawCallClipRange;
-				Vector2 clipSoftness = panel.clipSoftness;
-				Vector2 val = default(Vector2);
-				val._002Ector(1000f, 1000f);
-				if (clipSoftness.x > 0f)
-				{
-					val.x = drawCallClipRange.z / clipSoftness.x;
-				}
-				if (clipSoftness.y > 0f)
-				{
-					val.y = drawCallClipRange.w / clipSoftness.y;
-				}
-				mDynamicMat.SetVector(ClipRange[0], new Vector4((0f - drawCallClipRange.x) / drawCallClipRange.z, (0f - drawCallClipRange.y) / drawCallClipRange.w, 1f / drawCallClipRange.z, 1f / drawCallClipRange.w));
-				mDynamicMat.SetTexture("_ClipTex", clipTexture);
-			}
-			else if (!mLegacyShader)
-			{
-				UIPanel parentPanel = panel;
-				int num = 0;
-				while (parentPanel != null)
-				{
-					if (parentPanel.hasClipping)
-					{
-						float angle = 0f;
-						Vector4 drawCallClipRange2 = parentPanel.drawCallClipRange;
-						if (parentPanel != panel)
-						{
-							Vector3 val2 = parentPanel.cachedTransform.InverseTransformPoint(panel.cachedTransform.get_position());
-							drawCallClipRange2.x -= val2.x;
-							drawCallClipRange2.y -= val2.y;
-							Quaternion rotation = panel.cachedTransform.get_rotation();
-							Vector3 eulerAngles = rotation.get_eulerAngles();
-							Quaternion rotation2 = parentPanel.cachedTransform.get_rotation();
-							Vector3 eulerAngles2 = rotation2.get_eulerAngles();
-							Vector3 val3 = eulerAngles2 - eulerAngles;
-							val3.x = NGUIMath.WrapAngle(val3.x);
-							val3.y = NGUIMath.WrapAngle(val3.y);
-							val3.z = NGUIMath.WrapAngle(val3.z);
-							if (Mathf.Abs(val3.x) > 0.001f || Mathf.Abs(val3.y) > 0.001f)
-							{
-								Debug.LogWarning((object)"Panel can only be clipped properly if X and Y rotation is left at 0", panel);
-							}
-							angle = val3.z;
-						}
-						SetClipping(num++, drawCallClipRange2, parentPanel.clipSoftness, angle);
-					}
-					parentPanel = parentPanel.parentPanel;
-				}
-			}
-			else
-			{
-				Vector2 clipSoftness2 = panel.clipSoftness;
-				Vector4 drawCallClipRange3 = panel.drawCallClipRange;
-				Vector2 mainTextureOffset = default(Vector2);
-				mainTextureOffset._002Ector((0f - drawCallClipRange3.x) / drawCallClipRange3.z, (0f - drawCallClipRange3.y) / drawCallClipRange3.w);
-				Vector2 mainTextureScale = default(Vector2);
-				mainTextureScale._002Ector(1f / drawCallClipRange3.z, 1f / drawCallClipRange3.w);
-				Vector2 val4 = default(Vector2);
-				val4._002Ector(1000f, 1000f);
-				if (clipSoftness2.x > 0f)
-				{
-					val4.x = drawCallClipRange3.z / clipSoftness2.x;
-				}
-				if (clipSoftness2.y > 0f)
-				{
-					val4.y = drawCallClipRange3.w / clipSoftness2.y;
-				}
-				mDynamicMat.set_mainTextureOffset(mainTextureOffset);
-				mDynamicMat.set_mainTextureScale(mainTextureScale);
-				mDynamicMat.SetVector("_ClipSharpness", Vector4.op_Implicit(val4));
-			}
-		}
-	}
-
-	private void SetClipping(int index, Vector4 cr, Vector2 soft, float angle)
-	{
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		angle *= -0.0174532924f;
-		Vector2 val = default(Vector2);
-		val._002Ector(1000f, 1000f);
-		if (soft.x > 0f)
-		{
-			val.x = cr.z / soft.x;
-		}
-		if (soft.y > 0f)
-		{
-			val.y = cr.w / soft.y;
-		}
-		if (index < ClipRange.Length)
-		{
-			mDynamicMat.SetVector(ClipRange[index], new Vector4((0f - cr.x) / cr.z, (0f - cr.y) / cr.w, 1f / cr.z, 1f / cr.w));
-			mDynamicMat.SetVector(ClipArgs[index], new Vector4(val.x, val.y, Mathf.Sin(angle), Mathf.Cos(angle)));
-		}
-	}
-
-	private void Awake()
-	{
-		if (ClipRange == null)
-		{
-			ClipRange = new int[4]
-			{
-				Shader.PropertyToID("_ClipRange0"),
-				Shader.PropertyToID("_ClipRange1"),
-				Shader.PropertyToID("_ClipRange2"),
-				Shader.PropertyToID("_ClipRange4")
-			};
-		}
-		if (ClipArgs == null)
-		{
-			ClipArgs = new int[4]
-			{
-				Shader.PropertyToID("_ClipArgs0"),
-				Shader.PropertyToID("_ClipArgs1"),
-				Shader.PropertyToID("_ClipArgs2"),
-				Shader.PropertyToID("_ClipArgs3")
-			};
-		}
-	}
-
-	private void OnEnable()
-	{
-		mRebuildMat = true;
-	}
-
-	private void OnDisable()
-	{
-		depthStart = 2147483647;
-		depthEnd = -2147483648;
-		panel = null;
-		manager = null;
-		mMaterial = null;
-		mTexture = null;
-		clipTexture = null;
-		if (mRenderer != null)
-		{
-			mRenderer.set_sharedMaterials((Material[])new Material[0]);
-		}
-		NGUITools.DestroyImmediate(mDynamicMat);
-		mDynamicMat = null;
-	}
-
-	private void OnDestroy()
-	{
-		NGUITools.DestroyImmediate(mMesh);
-		mMesh = null;
-	}
-
-	public static UIDrawCall Create(UIPanel panel, Material mat, Texture tex, Shader shader)
-	{
-		return Create(null, panel, mat, tex, shader);
-	}
-
-	private static UIDrawCall Create(string name, UIPanel pan, Material mat, Texture tex, Shader shader)
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		UIDrawCall uIDrawCall = Create(name);
-		uIDrawCall.get_gameObject().set_layer(pan.cachedGameObject.get_layer());
-		uIDrawCall.baseMaterial = mat;
-		uIDrawCall.mainTexture = tex;
-		uIDrawCall.shader = shader;
-		uIDrawCall.renderQueue = pan.startingRenderQueue;
-		uIDrawCall.sortingOrder = pan.sortingOrder;
-		uIDrawCall.manager = pan;
-		return uIDrawCall;
-	}
-
-	private static UIDrawCall Create(string name)
-	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Expected O, but got Unknown
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Expected O, but got Unknown
-		if (mInactiveList.size > 0)
-		{
-			UIDrawCall uIDrawCall = mInactiveList.Pop();
-			mActiveList.Add(uIDrawCall);
-			if (name != null)
-			{
-				uIDrawCall.set_name(name);
-			}
-			NGUITools.SetActive(uIDrawCall.get_gameObject(), true);
-			return uIDrawCall;
-		}
-		GameObject val = new GameObject(name);
-		Object.DontDestroyOnLoad(val);
-		UIDrawCall uIDrawCall2 = val.AddComponent<UIDrawCall>();
-		mActiveList.Add(uIDrawCall2);
-		return uIDrawCall2;
-	}
-
-	public static void ClearAll()
-	{
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Expected O, but got Unknown
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004e: Expected O, but got Unknown
-		bool isPlaying = Application.get_isPlaying();
-		int num = mActiveList.size;
-		while (num > 0)
-		{
-			UIDrawCall uIDrawCall = mActiveList[--num];
-			if (Object.op_Implicit(uIDrawCall))
-			{
-				if (isPlaying)
-				{
-					NGUITools.SetActive(uIDrawCall.get_gameObject(), false);
-				}
-				else
-				{
-					NGUITools.DestroyImmediate(uIDrawCall.get_gameObject());
-				}
-			}
-		}
-		mActiveList.Clear();
-	}
-
-	public static void ReleaseAll()
-	{
-		ClearAll();
-		ReleaseInactive();
-	}
-
-	public static void ReleaseInactive()
-	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Expected O, but got Unknown
-		int num = mInactiveList.size;
-		while (num > 0)
-		{
-			UIDrawCall uIDrawCall = mInactiveList[--num];
-			if (Object.op_Implicit(uIDrawCall))
-			{
-				NGUITools.DestroyImmediate(uIDrawCall.get_gameObject());
-			}
-		}
-		mInactiveList.Clear();
-	}
-
-	public static int Count(UIPanel panel)
-	{
-		int num = 0;
-		for (int i = 0; i < mActiveList.size; i++)
-		{
-			if (mActiveList[i].manager == panel)
-			{
-				num++;
-			}
-		}
-		return num;
-	}
-
-	public static void Destroy(UIDrawCall dc)
-	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Expected O, but got Unknown
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Expected O, but got Unknown
-		if (Object.op_Implicit(dc))
-		{
-			dc.onRender = null;
-			if (Application.get_isPlaying())
-			{
-				if (mActiveList.Remove(dc))
-				{
-					NGUITools.SetActive(dc.get_gameObject(), false);
-					mInactiveList.Add(dc);
-				}
-			}
-			else
-			{
-				mActiveList.Remove(dc);
-				NGUITools.DestroyImmediate(dc.get_gameObject());
-			}
-		}
-	}
+  private static BetterList<UIDrawCall> mActiveList = new BetterList<UIDrawCall>();
+  private static BetterList<UIDrawCall> mInactiveList = new BetterList<UIDrawCall>();
+  [HideInInspector]
+  [NonSerialized]
+  public int widgetCount;
+  [HideInInspector]
+  [NonSerialized]
+  public int depthStart = int.MaxValue;
+  [HideInInspector]
+  [NonSerialized]
+  public int depthEnd = int.MinValue;
+  [HideInInspector]
+  [NonSerialized]
+  public UIPanel manager;
+  [HideInInspector]
+  [NonSerialized]
+  public UIPanel panel;
+  [HideInInspector]
+  [NonSerialized]
+  public Texture2D clipTexture;
+  [HideInInspector]
+  [NonSerialized]
+  public bool alwaysOnScreen;
+  [HideInInspector]
+  [NonSerialized]
+  public BetterList<Vector3> verts = new BetterList<Vector3>();
+  [HideInInspector]
+  [NonSerialized]
+  public BetterList<Vector3> norms = new BetterList<Vector3>();
+  [HideInInspector]
+  [NonSerialized]
+  public BetterList<Vector4> tans = new BetterList<Vector4>();
+  [HideInInspector]
+  [NonSerialized]
+  public BetterList<Vector2> uvs = new BetterList<Vector2>();
+  [HideInInspector]
+  [NonSerialized]
+  public BetterList<Color32> cols = new BetterList<Color32>();
+  private Material mMaterial;
+  private Texture mTexture;
+  private Shader mShader;
+  private int mClipCount;
+  private Transform mTrans;
+  private Mesh mMesh;
+  private MeshFilter mFilter;
+  private MeshRenderer mRenderer;
+  private Material mDynamicMat;
+  private int[] mIndices;
+  private bool mRebuildMat = true;
+  private bool mLegacyShader;
+  private int mRenderQueue = 3000;
+  private int mTriangles;
+  [NonSerialized]
+  public bool isDirty;
+  [NonSerialized]
+  private bool mTextureClip;
+  public UIDrawCall.OnRenderCallback onRender;
+  private const int maxIndexBufferCache = 10;
+  private static List<int[]> mCache = new List<int[]>(10);
+  private static int[] ClipRange = (int[]) null;
+  private static int[] ClipArgs = (int[]) null;
+
+  public static Shader ShaderFind(string name) => ResourceUtility.FindShader(name);
+
+  [Obsolete("Use UIDrawCall.activeList")]
+  public static BetterList<UIDrawCall> list => UIDrawCall.mActiveList;
+
+  public static BetterList<UIDrawCall> activeList => UIDrawCall.mActiveList;
+
+  public static BetterList<UIDrawCall> inactiveList => UIDrawCall.mInactiveList;
+
+  public int renderQueue
+  {
+    get => this.mRenderQueue;
+    set
+    {
+      if (this.mRenderQueue == value)
+        return;
+      this.mRenderQueue = value;
+      if (!Object.op_Inequality((Object) this.mDynamicMat, (Object) null))
+        return;
+      this.mDynamicMat.renderQueue = value;
+    }
+  }
+
+  public int sortingOrder
+  {
+    get
+    {
+      return !Object.op_Inequality((Object) this.mRenderer, (Object) null) ? 0 : ((Renderer) this.mRenderer).sortingOrder;
+    }
+    set
+    {
+      if (!Object.op_Inequality((Object) this.mRenderer, (Object) null) || ((Renderer) this.mRenderer).sortingOrder == value)
+        return;
+      ((Renderer) this.mRenderer).sortingOrder = value;
+    }
+  }
+
+  public int finalRenderQueue
+  {
+    get
+    {
+      return !Object.op_Inequality((Object) this.mDynamicMat, (Object) null) ? this.mRenderQueue : this.mDynamicMat.renderQueue;
+    }
+  }
+
+  public Transform cachedTransform
+  {
+    get
+    {
+      if (Object.op_Equality((Object) this.mTrans, (Object) null))
+        this.mTrans = ((Component) this).transform;
+      return this.mTrans;
+    }
+  }
+
+  public Material baseMaterial
+  {
+    get => this.mMaterial;
+    set
+    {
+      if (!Object.op_Inequality((Object) this.mMaterial, (Object) value))
+        return;
+      this.mMaterial = value;
+      this.mRebuildMat = true;
+    }
+  }
+
+  public Material dynamicMaterial => this.mDynamicMat;
+
+  public Texture mainTexture
+  {
+    get => this.mTexture;
+    set
+    {
+      this.mTexture = value;
+      if (!Object.op_Inequality((Object) this.mDynamicMat, (Object) null))
+        return;
+      this.mDynamicMat.mainTexture = value;
+    }
+  }
+
+  public Shader shader
+  {
+    get => this.mShader;
+    set
+    {
+      if (!Object.op_Inequality((Object) this.mShader, (Object) value))
+        return;
+      this.mShader = value;
+      this.mRebuildMat = true;
+    }
+  }
+
+  public int triangles
+  {
+    get => !Object.op_Inequality((Object) this.mMesh, (Object) null) ? 0 : this.mTriangles;
+  }
+
+  public bool isClipped => this.mClipCount != 0;
+
+  private void CreateMaterial()
+  {
+    this.mTextureClip = false;
+    this.mLegacyShader = false;
+    this.mClipCount = this.panel.clipCount;
+    string str = (Object.op_Inequality((Object) this.mShader, (Object) null) ? ((Object) this.mShader).name : (Object.op_Inequality((Object) this.mMaterial, (Object) null) ? ((Object) this.mMaterial.shader).name : "Unlit/Transparent Colored")).Replace("GUI/Text Shader", "Unlit/Text");
+    if (str.Length > 2 && str[str.Length - 2] == ' ')
+    {
+      int num = (int) str[str.Length - 1];
+      if (num > 48 /*0x30*/ && num <= 57)
+        str = str.Substring(0, str.Length - 2);
+    }
+    if (str.StartsWith("Hidden/"))
+      str = str.Substring(7);
+    string name = str.Replace(" (SoftClip)", "").Replace(" (TextureClip)", "");
+    if (this.panel.clipping == UIDrawCall.Clipping.TextureMask)
+    {
+      this.mTextureClip = true;
+      this.shader = UIDrawCall.ShaderFind($"Hidden/{name} (TextureClip)");
+    }
+    else if (this.mClipCount != 0)
+    {
+      this.shader = UIDrawCall.ShaderFind($"Hidden/{name} {(object) this.mClipCount}");
+      if (Object.op_Equality((Object) this.shader, (Object) null))
+        this.shader = UIDrawCall.ShaderFind($"{name} {(object) this.mClipCount}");
+      if (Object.op_Equality((Object) this.shader, (Object) null) && this.mClipCount == 1)
+      {
+        this.mLegacyShader = true;
+        this.shader = UIDrawCall.ShaderFind(name + " (SoftClip)");
+      }
+    }
+    else
+      this.shader = UIDrawCall.ShaderFind(name);
+    if (Object.op_Equality((Object) this.shader, (Object) null))
+      this.shader = UIDrawCall.ShaderFind("Unlit/Transparent Colored");
+    if (Object.op_Inequality((Object) this.mMaterial, (Object) null) && this.mMaterial.shader.isSupported)
+    {
+      this.mDynamicMat = new Material(this.mMaterial);
+      ((Object) this.mDynamicMat).name = "[NGUI] " + ((Object) this.mMaterial).name;
+      ((Object) this.mDynamicMat).hideFlags = (HideFlags) 60;
+      this.mDynamicMat.CopyPropertiesFromMaterial(this.mMaterial);
+      foreach (string shaderKeyword in this.mMaterial.shaderKeywords)
+        this.mDynamicMat.EnableKeyword(shaderKeyword);
+      if (Object.op_Inequality((Object) this.shader, (Object) null))
+      {
+        this.mDynamicMat.shader = this.shader;
+      }
+      else
+      {
+        if (this.mClipCount == 0)
+          return;
+        Debug.LogError((object) $"{name} shader doesn't have a clipped shader version for {(object) this.mClipCount} clip regions");
+      }
+    }
+    else
+    {
+      this.mDynamicMat = new Material(this.shader);
+      ((Object) this.mDynamicMat).name = "[NGUI] " + ((Object) this.shader).name;
+      ((Object) this.mDynamicMat).hideFlags = (HideFlags) 60;
+    }
+  }
+
+  private Material RebuildMaterial()
+  {
+    NGUITools.DestroyImmediate((Object) this.mDynamicMat);
+    this.CreateMaterial();
+    this.mDynamicMat.renderQueue = this.mRenderQueue;
+    if (Object.op_Inequality((Object) this.mTexture, (Object) null))
+      this.mDynamicMat.mainTexture = this.mTexture;
+    if (Object.op_Inequality((Object) this.mRenderer, (Object) null))
+      ((Renderer) this.mRenderer).sharedMaterials = new Material[1]
+      {
+        this.mDynamicMat
+      };
+    return this.mDynamicMat;
+  }
+
+  private void UpdateMaterials()
+  {
+    if (this.mRebuildMat || Object.op_Equality((Object) this.mDynamicMat, (Object) null) || this.mClipCount != this.panel.clipCount || this.mTextureClip != (this.panel.clipping == UIDrawCall.Clipping.TextureMask))
+    {
+      this.RebuildMaterial();
+      this.mRebuildMat = false;
+    }
+    else
+    {
+      if (!Object.op_Inequality((Object) ((Renderer) this.mRenderer).sharedMaterial, (Object) this.mDynamicMat))
+        return;
+      ((Renderer) this.mRenderer).sharedMaterials = new Material[1]
+      {
+        this.mDynamicMat
+      };
+    }
+  }
+
+  public void UpdateGeometry(int widgetCount)
+  {
+    this.widgetCount = widgetCount;
+    int size = this.verts.size;
+    if (size > 0 && size == this.uvs.size && size == this.cols.size && size % 4 == 0)
+    {
+      if (Object.op_Equality((Object) this.mFilter, (Object) null))
+        this.mFilter = ((Component) this).gameObject.GetComponent<MeshFilter>();
+      if (Object.op_Equality((Object) this.mFilter, (Object) null))
+        this.mFilter = ((Component) this).gameObject.AddComponent<MeshFilter>();
+      if (this.verts.size < 65000)
+      {
+        int indexCount = (size >> 1) * 3;
+        bool flag1 = this.mIndices == null || this.mIndices.Length != indexCount;
+        if (Object.op_Equality((Object) this.mMesh, (Object) null))
+        {
+          this.mMesh = new Mesh();
+          ((Object) this.mMesh).hideFlags = (HideFlags) 52;
+          ((Object) this.mMesh).name = Object.op_Inequality((Object) this.mMaterial, (Object) null) ? "[NGUI] " + ((Object) this.mMaterial).name : "[NGUI] Mesh";
+          this.mMesh.MarkDynamic();
+          flag1 = true;
+        }
+        bool flag2 = this.uvs.buffer.Length != this.verts.buffer.Length || this.cols.buffer.Length != this.verts.buffer.Length || this.norms.buffer != null && this.norms.buffer.Length != this.verts.buffer.Length || this.tans.buffer != null && this.tans.buffer.Length != this.verts.buffer.Length;
+        if (!flag2 && this.panel.renderQueue != UIPanel.RenderQueue.Automatic)
+          flag2 = Object.op_Equality((Object) this.mMesh, (Object) null) || this.mMesh.vertexCount != this.verts.buffer.Length;
+        this.mTriangles = this.verts.size >> 1;
+        if (flag2 || this.verts.buffer.Length > 65000)
+        {
+          if (flag2 || this.mMesh.vertexCount != this.verts.size)
+          {
+            this.mMesh.Clear();
+            flag1 = true;
+          }
+          this.mMesh.vertices = this.verts.ToArray();
+          this.mMesh.uv = this.uvs.ToArray();
+          this.mMesh.colors32 = this.cols.ToArray();
+          if (this.norms != null)
+            this.mMesh.normals = this.norms.ToArray();
+          if (this.tans != null)
+            this.mMesh.tangents = this.tans.ToArray();
+        }
+        else
+        {
+          if (this.mMesh.vertexCount != this.verts.buffer.Length)
+          {
+            this.mMesh.Clear();
+            flag1 = true;
+          }
+          this.mMesh.vertices = this.verts.buffer;
+          this.mMesh.uv = this.uvs.buffer;
+          this.mMesh.colors32 = this.cols.buffer;
+          if (this.norms != null)
+            this.mMesh.normals = this.norms.buffer;
+          if (this.tans != null)
+            this.mMesh.tangents = this.tans.buffer;
+        }
+        if (flag1)
+        {
+          this.mIndices = this.GenerateCachedIndexBuffer(size, indexCount);
+          this.mMesh.triangles = this.mIndices;
+        }
+        if (flag2 || !this.alwaysOnScreen)
+          this.mMesh.RecalculateBounds();
+        this.mFilter.mesh = this.mMesh;
+      }
+      else
+      {
+        this.mTriangles = 0;
+        if (Object.op_Inequality((Object) this.mFilter.mesh, (Object) null))
+          this.mFilter.mesh.Clear();
+        Debug.LogError((object) ("Too many vertices on one panel: " + (object) this.verts.size));
+      }
+      if (Object.op_Equality((Object) this.mRenderer, (Object) null))
+        this.mRenderer = ((Component) this).gameObject.GetComponent<MeshRenderer>();
+      if (Object.op_Equality((Object) this.mRenderer, (Object) null))
+        this.mRenderer = ((Component) this).gameObject.AddComponent<MeshRenderer>();
+      this.UpdateMaterials();
+    }
+    else
+    {
+      if (Object.op_Inequality((Object) this.mFilter.mesh, (Object) null))
+        this.mFilter.mesh.Clear();
+      Debug.LogError((object) ("UIWidgets must fill the buffer with 4 vertices per quad. Found " + (object) size));
+    }
+    this.verts.Clear();
+    this.uvs.Clear();
+    this.cols.Clear();
+    this.norms.Clear();
+    this.tans.Clear();
+  }
+
+  private int[] GenerateCachedIndexBuffer(int vertexCount, int indexCount)
+  {
+    int index1 = 0;
+    for (int count = UIDrawCall.mCache.Count; index1 < count; ++index1)
+    {
+      int[] cachedIndexBuffer = UIDrawCall.mCache[index1];
+      if (cachedIndexBuffer != null && cachedIndexBuffer.Length == indexCount)
+        return cachedIndexBuffer;
+    }
+    int[] cachedIndexBuffer1 = new int[indexCount];
+    int num1 = 0;
+    for (int index2 = 0; index2 < vertexCount; index2 += 4)
+    {
+      int[] numArray1 = cachedIndexBuffer1;
+      int index3 = num1;
+      int num2 = index3 + 1;
+      int num3 = index2;
+      numArray1[index3] = num3;
+      int[] numArray2 = cachedIndexBuffer1;
+      int index4 = num2;
+      int num4 = index4 + 1;
+      int num5 = index2 + 1;
+      numArray2[index4] = num5;
+      int[] numArray3 = cachedIndexBuffer1;
+      int index5 = num4;
+      int num6 = index5 + 1;
+      int num7 = index2 + 2;
+      numArray3[index5] = num7;
+      int[] numArray4 = cachedIndexBuffer1;
+      int index6 = num6;
+      int num8 = index6 + 1;
+      int num9 = index2 + 2;
+      numArray4[index6] = num9;
+      int[] numArray5 = cachedIndexBuffer1;
+      int index7 = num8;
+      int num10 = index7 + 1;
+      int num11 = index2 + 3;
+      numArray5[index7] = num11;
+      int[] numArray6 = cachedIndexBuffer1;
+      int index8 = num10;
+      num1 = index8 + 1;
+      int num12 = index2;
+      numArray6[index8] = num12;
+    }
+    if (UIDrawCall.mCache.Count > 10)
+      UIDrawCall.mCache.RemoveAt(0);
+    UIDrawCall.mCache.Add(cachedIndexBuffer1);
+    return cachedIndexBuffer1;
+  }
+
+  private void OnWillRenderObject()
+  {
+    this.UpdateMaterials();
+    if (this.onRender != null)
+      this.onRender(this.mDynamicMat ?? this.mMaterial);
+    if (Object.op_Equality((Object) this.mDynamicMat, (Object) null) || this.mClipCount == 0)
+      return;
+    if (this.mTextureClip)
+    {
+      Vector4 drawCallClipRange = this.panel.drawCallClipRange;
+      Vector2 clipSoftness = this.panel.clipSoftness;
+      Vector2 vector2;
+      // ISSUE: explicit constructor call
+      ((Vector2) ref vector2).\u002Ector(1000f, 1000f);
+      if ((double) clipSoftness.x > 0.0)
+        vector2.x = drawCallClipRange.z / clipSoftness.x;
+      if ((double) clipSoftness.y > 0.0)
+        vector2.y = drawCallClipRange.w / clipSoftness.y;
+      this.mDynamicMat.SetVector(UIDrawCall.ClipRange[0], new Vector4(-drawCallClipRange.x / drawCallClipRange.z, -drawCallClipRange.y / drawCallClipRange.w, 1f / drawCallClipRange.z, 1f / drawCallClipRange.w));
+      this.mDynamicMat.SetTexture("_ClipTex", (Texture) this.clipTexture);
+    }
+    else if (!this.mLegacyShader)
+    {
+      UIPanel uiPanel = this.panel;
+      int num = 0;
+      for (; Object.op_Inequality((Object) uiPanel, (Object) null); uiPanel = uiPanel.parentPanel)
+      {
+        if (uiPanel.hasClipping)
+        {
+          float angle = 0.0f;
+          Vector4 drawCallClipRange = uiPanel.drawCallClipRange;
+          if (Object.op_Inequality((Object) uiPanel, (Object) this.panel))
+          {
+            Vector3 vector3_1 = uiPanel.cachedTransform.InverseTransformPoint(this.panel.cachedTransform.position);
+            drawCallClipRange.x -= vector3_1.x;
+            drawCallClipRange.y -= vector3_1.y;
+            Quaternion rotation1 = this.panel.cachedTransform.rotation;
+            Vector3 eulerAngles = ((Quaternion) ref rotation1).eulerAngles;
+            Quaternion rotation2 = uiPanel.cachedTransform.rotation;
+            Vector3 vector3_2 = Vector3.op_Subtraction(((Quaternion) ref rotation2).eulerAngles, eulerAngles);
+            vector3_2.x = NGUIMath.WrapAngle(vector3_2.x);
+            vector3_2.y = NGUIMath.WrapAngle(vector3_2.y);
+            vector3_2.z = NGUIMath.WrapAngle(vector3_2.z);
+            if ((double) Mathf.Abs(vector3_2.x) > 1.0 / 1000.0 || (double) Mathf.Abs(vector3_2.y) > 1.0 / 1000.0)
+              Debug.LogWarning((object) "Panel can only be clipped properly if X and Y rotation is left at 0", (Object) this.panel);
+            angle = vector3_2.z;
+          }
+          this.SetClipping(num++, drawCallClipRange, uiPanel.clipSoftness, angle);
+        }
+      }
+    }
+    else
+    {
+      Vector2 clipSoftness = this.panel.clipSoftness;
+      Vector4 drawCallClipRange = this.panel.drawCallClipRange;
+      Vector2 vector2_1;
+      // ISSUE: explicit constructor call
+      ((Vector2) ref vector2_1).\u002Ector(-drawCallClipRange.x / drawCallClipRange.z, -drawCallClipRange.y / drawCallClipRange.w);
+      Vector2 vector2_2;
+      // ISSUE: explicit constructor call
+      ((Vector2) ref vector2_2).\u002Ector(1f / drawCallClipRange.z, 1f / drawCallClipRange.w);
+      Vector2 vector2_3;
+      // ISSUE: explicit constructor call
+      ((Vector2) ref vector2_3).\u002Ector(1000f, 1000f);
+      if ((double) clipSoftness.x > 0.0)
+        vector2_3.x = drawCallClipRange.z / clipSoftness.x;
+      if ((double) clipSoftness.y > 0.0)
+        vector2_3.y = drawCallClipRange.w / clipSoftness.y;
+      this.mDynamicMat.mainTextureOffset = vector2_1;
+      this.mDynamicMat.mainTextureScale = vector2_2;
+      this.mDynamicMat.SetVector("_ClipSharpness", Vector4.op_Implicit(vector2_3));
+    }
+  }
+
+  private void SetClipping(int index, Vector4 cr, Vector2 soft, float angle)
+  {
+    angle *= -1f * (float) Math.PI / 180f;
+    Vector2 vector2;
+    // ISSUE: explicit constructor call
+    ((Vector2) ref vector2).\u002Ector(1000f, 1000f);
+    if ((double) soft.x > 0.0)
+      vector2.x = cr.z / soft.x;
+    if ((double) soft.y > 0.0)
+      vector2.y = cr.w / soft.y;
+    if (index >= UIDrawCall.ClipRange.Length)
+      return;
+    this.mDynamicMat.SetVector(UIDrawCall.ClipRange[index], new Vector4(-cr.x / cr.z, -cr.y / cr.w, 1f / cr.z, 1f / cr.w));
+    this.mDynamicMat.SetVector(UIDrawCall.ClipArgs[index], new Vector4(vector2.x, vector2.y, Mathf.Sin(angle), Mathf.Cos(angle)));
+  }
+
+  private void Awake()
+  {
+    if (UIDrawCall.ClipRange == null)
+      UIDrawCall.ClipRange = new int[4]
+      {
+        Shader.PropertyToID("_ClipRange0"),
+        Shader.PropertyToID("_ClipRange1"),
+        Shader.PropertyToID("_ClipRange2"),
+        Shader.PropertyToID("_ClipRange4")
+      };
+    if (UIDrawCall.ClipArgs != null)
+      return;
+    UIDrawCall.ClipArgs = new int[4]
+    {
+      Shader.PropertyToID("_ClipArgs0"),
+      Shader.PropertyToID("_ClipArgs1"),
+      Shader.PropertyToID("_ClipArgs2"),
+      Shader.PropertyToID("_ClipArgs3")
+    };
+  }
+
+  private void OnEnable() => this.mRebuildMat = true;
+
+  private void OnDisable()
+  {
+    this.depthStart = int.MaxValue;
+    this.depthEnd = int.MinValue;
+    this.panel = (UIPanel) null;
+    this.manager = (UIPanel) null;
+    this.mMaterial = (Material) null;
+    this.mTexture = (Texture) null;
+    this.clipTexture = (Texture2D) null;
+    if (Object.op_Inequality((Object) this.mRenderer, (Object) null))
+      ((Renderer) this.mRenderer).sharedMaterials = new Material[0];
+    NGUITools.DestroyImmediate((Object) this.mDynamicMat);
+    this.mDynamicMat = (Material) null;
+  }
+
+  private void OnDestroy()
+  {
+    NGUITools.DestroyImmediate((Object) this.mMesh);
+    this.mMesh = (Mesh) null;
+  }
+
+  public static UIDrawCall Create(UIPanel panel, Material mat, Texture tex, Shader shader)
+  {
+    return UIDrawCall.Create((string) null, panel, mat, tex, shader);
+  }
+
+  private static UIDrawCall Create(
+    string name,
+    UIPanel pan,
+    Material mat,
+    Texture tex,
+    Shader shader)
+  {
+    UIDrawCall uiDrawCall = UIDrawCall.Create(name);
+    ((Component) uiDrawCall).gameObject.layer = pan.cachedGameObject.layer;
+    uiDrawCall.baseMaterial = mat;
+    uiDrawCall.mainTexture = tex;
+    uiDrawCall.shader = shader;
+    uiDrawCall.renderQueue = pan.startingRenderQueue;
+    uiDrawCall.sortingOrder = pan.sortingOrder;
+    uiDrawCall.manager = pan;
+    return uiDrawCall;
+  }
+
+  private static UIDrawCall Create(string name)
+  {
+    if (UIDrawCall.mInactiveList.size > 0)
+    {
+      UIDrawCall uiDrawCall = UIDrawCall.mInactiveList.Pop();
+      UIDrawCall.mActiveList.Add(uiDrawCall);
+      if (name != null)
+        ((Object) uiDrawCall).name = name;
+      NGUITools.SetActive(((Component) uiDrawCall).gameObject, true);
+      return uiDrawCall;
+    }
+    GameObject gameObject = new GameObject(name);
+    Object.DontDestroyOnLoad((Object) gameObject);
+    UIDrawCall uiDrawCall1 = gameObject.AddComponent<UIDrawCall>();
+    UIDrawCall.mActiveList.Add(uiDrawCall1);
+    return uiDrawCall1;
+  }
+
+  public static void ClearAll()
+  {
+    bool isPlaying = Application.isPlaying;
+    int size = UIDrawCall.mActiveList.size;
+    while (size > 0)
+    {
+      UIDrawCall mActive = UIDrawCall.mActiveList[--size];
+      if (Object.op_Implicit((Object) mActive))
+      {
+        if (isPlaying)
+          NGUITools.SetActive(((Component) mActive).gameObject, false);
+        else
+          NGUITools.DestroyImmediate((Object) ((Component) mActive).gameObject);
+      }
+    }
+    UIDrawCall.mActiveList.Clear();
+  }
+
+  public static void ReleaseAll()
+  {
+    UIDrawCall.ClearAll();
+    UIDrawCall.ReleaseInactive();
+  }
+
+  public static void ReleaseInactive()
+  {
+    int size = UIDrawCall.mInactiveList.size;
+    while (size > 0)
+    {
+      UIDrawCall mInactive = UIDrawCall.mInactiveList[--size];
+      if (Object.op_Implicit((Object) mInactive))
+        NGUITools.DestroyImmediate((Object) ((Component) mInactive).gameObject);
+    }
+    UIDrawCall.mInactiveList.Clear();
+  }
+
+  public static int Count(UIPanel panel)
+  {
+    int num = 0;
+    for (int i = 0; i < UIDrawCall.mActiveList.size; ++i)
+    {
+      if (Object.op_Equality((Object) UIDrawCall.mActiveList[i].manager, (Object) panel))
+        ++num;
+    }
+    return num;
+  }
+
+  public static void Destroy(UIDrawCall dc)
+  {
+    if (!Object.op_Implicit((Object) dc))
+      return;
+    dc.onRender = (UIDrawCall.OnRenderCallback) null;
+    if (Application.isPlaying)
+    {
+      if (!UIDrawCall.mActiveList.Remove(dc))
+        return;
+      NGUITools.SetActive(((Component) dc).gameObject, false);
+      UIDrawCall.mInactiveList.Add(dc);
+    }
+    else
+    {
+      UIDrawCall.mActiveList.Remove(dc);
+      NGUITools.DestroyImmediate((Object) ((Component) dc).gameObject);
+    }
+  }
+
+  public enum Clipping
+  {
+    None = 0,
+    TextureMask = 1,
+    SoftClip = 3,
+    ConstrainButDontClip = 4,
+  }
+
+  public delegate void OnRenderCallback(Material mat);
 }

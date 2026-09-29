@@ -1,161 +1,103 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: TweenPosition
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Tween/Tween Position")]
 public class TweenPosition : UITweener
 {
-	public Vector3 from;
+  public Vector3 from;
+  public Vector3 to;
+  [HideInInspector]
+  public bool worldSpace;
+  private Transform mTrans;
+  private UIRect mRect;
 
-	public Vector3 to;
+  public Transform cachedTransform
+  {
+    get
+    {
+      if (Object.op_Equality((Object) this.mTrans, (Object) null))
+        this.mTrans = ((Component) this).transform;
+      return this.mTrans;
+    }
+  }
 
-	[HideInInspector]
-	public bool worldSpace;
+  [Obsolete("Use 'value' instead")]
+  public Vector3 position
+  {
+    get => this.value;
+    set => this.value = value;
+  }
 
-	private Transform mTrans;
+  public Vector3 value
+  {
+    get => !this.worldSpace ? this.cachedTransform.localPosition : this.cachedTransform.position;
+    set
+    {
+      if (Object.op_Equality((Object) this.mRect, (Object) null) || !this.mRect.isAnchored || this.worldSpace)
+      {
+        if (this.worldSpace)
+          this.cachedTransform.position = value;
+        else
+          this.cachedTransform.localPosition = value;
+      }
+      else
+      {
+        value = Vector3.op_Subtraction(value, this.cachedTransform.localPosition);
+        NGUIMath.MoveRect(this.mRect, value.x, value.y);
+      }
+    }
+  }
 
-	private UIRect mRect;
+  private void Awake() => this.mRect = ((Component) this).GetComponent<UIRect>();
 
-	public Transform cachedTransform
-	{
-		get
-		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
-			if (mTrans == null)
-			{
-				mTrans = this.get_transform();
-			}
-			return mTrans;
-		}
-	}
+  protected override void OnUpdate(float factor, bool isFinished)
+  {
+    this.value = Vector3.op_Addition(Vector3.op_Multiply(this.from, 1f - factor), Vector3.op_Multiply(this.to, factor));
+  }
 
-	[Obsolete("Use 'value' instead")]
-	public Vector3 position
-	{
-		get
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			return value;
-		}
-		set
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			this.value = value;
-		}
-	}
+  public static TweenPosition Begin(GameObject go, float duration, Vector3 pos)
+  {
+    TweenPosition tweenPosition = UITweener.Begin<TweenPosition>(go, duration);
+    tweenPosition.from = tweenPosition.value;
+    tweenPosition.to = pos;
+    if ((double) duration <= 0.0)
+    {
+      tweenPosition.Sample(1f, true);
+      ((Behaviour) tweenPosition).enabled = false;
+    }
+    return tweenPosition;
+  }
 
-	public Vector3 value
-	{
-		get
-		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			return (!worldSpace) ? cachedTransform.get_localPosition() : cachedTransform.get_position();
-		}
-		set
-		{
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			if (mRect == null || !mRect.isAnchored || worldSpace)
-			{
-				if (worldSpace)
-				{
-					cachedTransform.set_position(value);
-				}
-				else
-				{
-					cachedTransform.set_localPosition(value);
-				}
-			}
-			else
-			{
-				value -= cachedTransform.get_localPosition();
-				NGUIMath.MoveRect(mRect, value.x, value.y);
-			}
-		}
-	}
+  public static TweenPosition Begin(GameObject go, float duration, Vector3 pos, bool worldSpace)
+  {
+    TweenPosition tweenPosition = UITweener.Begin<TweenPosition>(go, duration);
+    tweenPosition.worldSpace = worldSpace;
+    tweenPosition.from = tweenPosition.value;
+    tweenPosition.to = pos;
+    if ((double) duration <= 0.0)
+    {
+      tweenPosition.Sample(1f, true);
+      ((Behaviour) tweenPosition).enabled = false;
+    }
+    return tweenPosition;
+  }
 
-	private void Awake()
-	{
-		mRect = this.GetComponent<UIRect>();
-	}
+  [ContextMenu("Set 'From' to current value")]
+  public override void SetStartToCurrentValue() => this.from = this.value;
 
-	protected override void OnUpdate(float factor, bool isFinished)
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		value = from * (1f - factor) + to * factor;
-	}
+  [ContextMenu("Set 'To' to current value")]
+  public override void SetEndToCurrentValue() => this.to = this.value;
 
-	public static TweenPosition Begin(GameObject go, float duration, Vector3 pos)
-	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		TweenPosition tweenPosition = UITweener.Begin<TweenPosition>(go, duration, true);
-		tweenPosition.from = tweenPosition.value;
-		tweenPosition.to = pos;
-		if (duration <= 0f)
-		{
-			tweenPosition.Sample(1f, true);
-			tweenPosition.set_enabled(false);
-		}
-		return tweenPosition;
-	}
+  [ContextMenu("Assume value of 'From'")]
+  private void SetCurrentValueToStart() => this.value = this.from;
 
-	public static TweenPosition Begin(GameObject go, float duration, Vector3 pos, bool worldSpace)
-	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		TweenPosition tweenPosition = UITweener.Begin<TweenPosition>(go, duration, true);
-		tweenPosition.worldSpace = worldSpace;
-		tweenPosition.from = tweenPosition.value;
-		tweenPosition.to = pos;
-		if (duration <= 0f)
-		{
-			tweenPosition.Sample(1f, true);
-			tweenPosition.set_enabled(false);
-		}
-		return tweenPosition;
-	}
-
-	[ContextMenu("Set 'From' to current value")]
-	public override void SetStartToCurrentValue()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		from = value;
-	}
-
-	[ContextMenu("Set 'To' to current value")]
-	public override void SetEndToCurrentValue()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		to = value;
-	}
-
-	[ContextMenu("Assume value of 'From'")]
-	private void SetCurrentValueToStart()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		value = from;
-	}
-
-	[ContextMenu("Assume value of 'To'")]
-	private void SetCurrentValueToEnd()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		value = to;
-	}
+  [ContextMenu("Assume value of 'To'")]
+  private void SetCurrentValueToEnd() => this.value = this.to;
 }

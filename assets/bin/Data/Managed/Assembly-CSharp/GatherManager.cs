@@ -1,251 +1,195 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: GatherManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
+#nullable disable
 public class GatherManager : MonoBehaviourSingleton<GatherManager>
 {
-	public int gathering;
+  public int gathering;
+  public List<GatherPointData> gatherPointList = new List<GatherPointData>();
+  private bool firstSendGatherList = true;
 
-	public List<GatherPointData> gatherPointList = new List<GatherPointData>();
+  public void addGatherPoint(List<GatherPointData> list)
+  {
+    this.gatherPointList.AddRange((IEnumerable<GatherPointData>) list);
+  }
 
-	private bool firstSendGatherList = true;
+  public void updateGatherPoint(GatherPointData gatherPoint)
+  {
+    GatherPointData gatherPointData = this.gatherPointList.Find((Predicate<GatherPointData>) (list_data => list_data.gatherPointId == gatherPoint.gatherPointId));
+    if (gatherPointData == null)
+      return;
+    gatherPointData.gatherObjectId = gatherPoint.gatherObjectId;
+    gatherPointData.gatherCount = gatherPoint.gatherCount;
+    gatherPointData.status = gatherPoint.status;
+    gatherPointData.rest = gatherPoint.rest;
+    gatherPointData.attackTime = gatherPoint.attackTime;
+    gatherPointData.appearAt = gatherPoint.appearAt;
+    gatherPointData.disappearAt = gatherPoint.disappearAt;
+    gatherPointData.gatherEndAt = gatherPoint.gatherEndAt;
+  }
 
-	public void addGatherPoint(List<GatherPointData> list)
-	{
-		gatherPointList.AddRange(list);
-	}
+  public void updateGatherPoint(List<GatherPointData> list)
+  {
+    list.ForEach((Action<GatherPointData>) (gatherPoint => this.updateGatherPoint(gatherPoint)));
+  }
 
-	public void updateGatherPoint(GatherPointData gatherPoint)
-	{
-		GatherPointData gatherPointData = gatherPointList.Find((GatherPointData list_data) => list_data.gatherPointId == gatherPoint.gatherPointId);
-		if (gatherPointData != null)
-		{
-			gatherPointData.gatherObjectId = gatherPoint.gatherObjectId;
-			gatherPointData.gatherCount = gatherPoint.gatherCount;
-			gatherPointData.status = gatherPoint.status;
-			gatherPointData.rest = gatherPoint.rest;
-			gatherPointData.attackTime = gatherPoint.attackTime;
-			gatherPointData.appearAt = gatherPoint.appearAt;
-			gatherPointData.disappearAt = gatherPoint.disappearAt;
-			gatherPointData.gatherEndAt = gatherPoint.gatherEndAt;
-		}
-	}
+  public void updateGatherPointTime(int pointId, int rest, int attackTime)
+  {
+    GatherPointData gatherPointData = this.gatherPointList.Find((Predicate<GatherPointData>) (list_data => list_data.gatherPointId == pointId));
+    if (gatherPointData == null)
+      return;
+    gatherPointData.rest = rest;
+    gatherPointData.attackTime = attackTime;
+  }
 
-	public void updateGatherPoint(List<GatherPointData> list)
-	{
-		list.ForEach(delegate(GatherPointData gatherPoint)
-		{
-			updateGatherPoint(gatherPoint);
-		});
-	}
+  public void SendGatherList(Action<bool> call_back)
+  {
+    if (!this.firstSendGatherList)
+    {
+      call_back(true);
+    }
+    else
+    {
+      this.firstSendGatherList = false;
+      Protocol.Send<OnceGatherListModel>(OnceGatherListModel.URL, (Action<OnceGatherListModel>) (ret =>
+      {
+        bool flag = false;
+        if (ret.Error == Error.None)
+        {
+          flag = true;
+          this.gathering = ret.result.gathering;
+          this.gatherPointList = ret.result.gather;
+        }
+        call_back(flag);
+      }));
+    }
+  }
 
-	public void updateGatherPointTime(int pointId, int rest, int attackTime)
-	{
-		GatherPointData gatherPointData = gatherPointList.Find((GatherPointData list_data) => list_data.gatherPointId == pointId);
-		if (gatherPointData != null)
-		{
-			gatherPointData.rest = rest;
-			gatherPointData.attackTime = attackTime;
-		}
-	}
+  public void SendGatherEnter(Action<bool, GatherEnterData> call_back)
+  {
+    Protocol.Send<GatherEnterModel>(GatherEnterModel.URL, (Action<GatherEnterModel>) (ret =>
+    {
+      bool flag = false;
+      if (ret.Error == Error.None)
+        flag = true;
+      call_back(flag, ret.result);
+    }));
+  }
 
-	public void SendGatherList(Action<bool> call_back)
-	{
-		if (!firstSendGatherList)
-		{
-			call_back(true);
-		}
-		else
-		{
-			firstSendGatherList = false;
-			Protocol.Send(OnceGatherListModel.URL, delegate(OnceGatherListModel ret)
-			{
-				bool obj = false;
-				if (ret.Error == Error.None)
-				{
-					obj = true;
-					gathering = ret.result.gathering;
-					gatherPointList = ret.result.gather;
-				}
-				call_back(obj);
-			}, string.Empty);
-		}
-	}
+  public void SendGatherUpdate(Action<bool, GatherEnterData> call_back)
+  {
+    Protocol.Send<GatherUpdateModel>(GatherUpdateModel.URL, (Action<GatherUpdateModel>) (ret =>
+    {
+      bool flag = false;
+      if (ret.Error == Error.None)
+        flag = true;
+      call_back(flag, ret.result);
+    }));
+  }
 
-	public void SendGatherEnter(Action<bool, GatherEnterData> call_back)
-	{
-		Protocol.Send(GatherEnterModel.URL, delegate(GatherEnterModel ret)
-		{
-			bool arg = false;
-			if (ret.Error == Error.None)
-			{
-				arg = true;
-			}
-			call_back(arg, ret.result);
-		}, string.Empty);
-	}
+  public void SendGatherStart(int pointId, Action<bool, bool, int> call_back)
+  {
+    Protocol.Send<GatherStartModel.RequestSendForm, GatherStartModel>(GatherStartModel.URL, new GatherStartModel.RequestSendForm()
+    {
+      pid = pointId
+    }, (Action<GatherStartModel>) (ret =>
+    {
+      bool flag1 = false;
+      bool flag2 = false;
+      int num = 0;
+      if (ret.Error == Error.None)
+      {
+        flag1 = true;
+        if (ret.result.disappear.Count > 0)
+        {
+          flag2 = true;
+          num = ret.result.fairy.lost;
+        }
+      }
+      call_back(flag1, flag2, num);
+    }));
+  }
 
-	public void SendGatherUpdate(Action<bool, GatherEnterData> call_back)
-	{
-		Protocol.Send(GatherUpdateModel.URL, delegate(GatherUpdateModel ret)
-		{
-			bool arg = false;
-			if (ret.Error == Error.None)
-			{
-				arg = true;
-			}
-			call_back(arg, ret.result);
-		}, string.Empty);
-	}
+  public void SendGatherComplete(
+    int pointId,
+    Action<bool, bool, int, GatherRewardList> call_back)
+  {
+    Protocol.Send<GatherCompleteModel.RequestSendForm, GatherCompleteModel>(GatherCompleteModel.URL, new GatherCompleteModel.RequestSendForm()
+    {
+      pid = pointId
+    }, (Action<GatherCompleteModel>) (ret =>
+    {
+      bool flag1 = false;
+      bool flag2 = false;
+      int num = 0;
+      GatherRewardList gatherRewardList = (GatherRewardList) null;
+      if (ret.Error == Error.None)
+      {
+        flag1 = true;
+        flag2 = ret.result.isNewOpen;
+        num = ret.result.fairy.lost;
+        gatherRewardList = ret.result.reward;
+      }
+      call_back(flag1, flag2, num, gatherRewardList);
+    }));
+  }
 
-	public void SendGatherStart(int pointId, Action<bool, bool, int> call_back)
-	{
-		GatherStartModel.RequestSendForm requestSendForm = new GatherStartModel.RequestSendForm();
-		requestSendForm.pid = pointId;
-		Protocol.Send(GatherStartModel.URL, requestSendForm, delegate(GatherStartModel ret)
-		{
-			bool arg = false;
-			bool arg2 = false;
-			int arg3 = 0;
-			if (ret.Error == Error.None)
-			{
-				arg = true;
-				if (ret.result.disappear.Count > 0)
-				{
-					arg2 = true;
-					arg3 = ret.result.fairy.lost;
-				}
-			}
-			call_back(arg, arg2, arg3);
-		}, string.Empty);
-	}
+  public void SendGatherShortcut(int pointId, Action<bool> call_back)
+  {
+    Protocol.Send<GatherShortcutModel.RequestSendForm, GatherShortcutModel>(GatherShortcutModel.URL, new GatherShortcutModel.RequestSendForm()
+    {
+      pid = pointId,
+      crystalCL = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal
+    }, (Action<GatherShortcutModel>) (ret =>
+    {
+      bool flag = false;
+      if (ret.Error == Error.None)
+        flag = true;
+      call_back(flag);
+    }));
+  }
 
-	public void SendGatherComplete(int pointId, Action<bool, bool, int, GatherRewardList> call_back)
-	{
-		GatherCompleteModel.RequestSendForm requestSendForm = new GatherCompleteModel.RequestSendForm();
-		requestSendForm.pid = pointId;
-		Protocol.Send(GatherCompleteModel.URL, requestSendForm, delegate(GatherCompleteModel ret)
-		{
-			bool arg = false;
-			bool arg2 = false;
-			int arg3 = 0;
-			GatherRewardList arg4 = null;
-			if (ret.Error == Error.None)
-			{
-				arg = true;
-				arg2 = ret.result.isNewOpen;
-				arg3 = ret.result.fairy.lost;
-				arg4 = ret.result.reward;
-			}
-			call_back(arg, arg2, arg3, arg4);
-		}, string.Empty);
-	}
+  public void Dirty()
+  {
+    MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_GATHER_OBJECT);
+  }
 
-	public void SendGatherShortcut(int pointId, Action<bool> call_back)
-	{
-		GatherShortcutModel.RequestSendForm requestSendForm = new GatherShortcutModel.RequestSendForm();
-		requestSendForm.pid = pointId;
-		requestSendForm.crystalCL = MonoBehaviourSingleton<UserInfoManager>.I.userStatus.crystal;
-		Protocol.Send(GatherShortcutModel.URL, requestSendForm, delegate(GatherShortcutModel ret)
-		{
-			bool obj = false;
-			if (ret.Error == Error.None)
-			{
-				obj = true;
-			}
-			call_back(obj);
-		}, string.Empty);
-	}
+  public void OnDiff(BaseModelDiff.DiffStatus diff)
+  {
+    if (!Utility.IsExist((ICollection) diff.gathering))
+      return;
+    this.gathering = diff.gathering[0];
+    this.Dirty();
+  }
 
-	public void SendDebugSetFairyNum(int num, Action<bool> call_back)
-	{
-		DebugSetFairyNumModel.RequestSendForm requestSendForm = new DebugSetFairyNumModel.RequestSendForm();
-		requestSendForm.num = num;
-		Protocol.Send(DebugSetFairyNumModel.URL, requestSendForm, delegate(DebugSetFairyNumModel ret)
-		{
-			bool obj = false;
-			if (ret.Error == Error.None)
-			{
-				obj = true;
-			}
-			call_back(obj);
-		}, string.Empty);
-	}
-
-	public void SendDebugSetGather(int pid, int gid, int interval, Action<bool> call_back)
-	{
-		DebugSetGatherModel.RequestSendForm requestSendForm = new DebugSetGatherModel.RequestSendForm();
-		requestSendForm.pid = pid;
-		requestSendForm.gid = gid;
-		requestSendForm.interval = interval;
-		Protocol.Send(DebugSetGatherModel.URL, requestSendForm, delegate(DebugSetGatherModel ret)
-		{
-			bool obj = false;
-			if (ret.Error == Error.None)
-			{
-				obj = true;
-			}
-			call_back(obj);
-		}, string.Empty);
-	}
-
-	public void SendDebugChangeGatherTime(int pid, string appear, string disappear, string gatherStart, string gatherEnd, Action<bool> call_back)
-	{
-		DebugChangeGatherTimeModel.RequestSendForm requestSendForm = new DebugChangeGatherTimeModel.RequestSendForm();
-		requestSendForm.pid = pid;
-		requestSendForm.appear = appear;
-		requestSendForm.disappear = disappear;
-		requestSendForm.gatherStart = gatherStart;
-		requestSendForm.gatherEnd = gatherEnd;
-		Protocol.Send(DebugChangeGatherTimeModel.URL, requestSendForm, delegate(DebugChangeGatherTimeModel ret)
-		{
-			bool obj = false;
-			if (ret.Error == Error.None)
-			{
-				obj = true;
-			}
-			call_back(obj);
-		}, string.Empty);
-	}
-
-	public void Dirty()
-	{
-		MonoBehaviourSingleton<GameSceneManager>.I.SetNotify(GameSection.NOTIFY_FLAG.UPDATE_GATHER_OBJECT);
-	}
-
-	public void OnDiff(BaseModelDiff.DiffStatus diff)
-	{
-		if (Utility.IsExist(diff.gathering))
-		{
-			gathering = diff.gathering[0];
-			Dirty();
-		}
-	}
-
-	public void OnDiff(BaseModelDiff.DiffGatherPoint diff)
-	{
-		bool flag = false;
-		if (Utility.IsExist(diff.add))
-		{
-			addGatherPoint(diff.add);
-			flag = true;
-		}
-		if (Utility.IsExist(diff.update))
-		{
-			updateGatherPoint(diff.update);
-			flag = true;
-		}
-		if (Utility.IsExist(diff.rest))
-		{
-			diff.rest.ForEach(delegate(BaseModelDiff.DiffGatherPoint.RestTime rest)
-			{
-				updateGatherPointTime(rest.gatherPointId, rest.rest, rest.attackTime);
-			});
-			flag = true;
-		}
-		if (flag)
-		{
-			Dirty();
-		}
-	}
+  public void OnDiff(BaseModelDiff.DiffGatherPoint diff)
+  {
+    bool flag = false;
+    if (Utility.IsExist((ICollection) diff.add))
+    {
+      this.addGatherPoint(diff.add);
+      flag = true;
+    }
+    if (Utility.IsExist((ICollection) diff.update))
+    {
+      this.updateGatherPoint(diff.update);
+      flag = true;
+    }
+    if (Utility.IsExist((ICollection) diff.rest))
+    {
+      diff.rest.ForEach((Action<BaseModelDiff.DiffGatherPoint.RestTime>) (rest => this.updateGatherPointTime(rest.gatherPointId, rest.rest, rest.attackTime)));
+      flag = true;
+    }
+    if (!flag)
+      return;
+    this.Dirty();
+  }
 }

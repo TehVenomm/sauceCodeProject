@@ -1,3 +1,9 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Character
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using rhyme;
 using System;
 using System.Collections;
@@ -5,6278 +11,5006 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
+#nullable disable
 public class Character : StageObject, IAnimEvent
 {
-	public enum ACTION_ID
-	{
-		NONE,
-		IDLE,
-		MOVE,
-		ROTATE,
-		DAMAGE,
-		DEAD,
-		ATTACK,
-		PARALYZE,
-		FREEZE,
-		HIDE,
-		MOVE_POINT,
-		MOVE_LOOKAT,
-		MAX
-	}
-
-	public enum MOTION_ID
-	{
-		NONE = 0,
-		END = 1,
-		IDLE = 2,
-		WALK = 3,
-		ROTATE_L = 4,
-		ROTATE_R = 5,
-		DAMAGE = 6,
-		DEAD = 7,
-		PARALYZE = 8,
-		MOVE_SIDE_R = 9,
-		MOVE_SIDE_L = 10,
-		HIDE = 11,
-		HIDE_END = 12,
-		MOVE_POINT = 13,
-		MOVE_LOOKAT = 14,
-		ATTACK_ID_BEGIN = 0xF,
-		ATTACK_ID_END = 114,
-		MAX = 115,
-		ATTACK_ID_NUM = 100
-	}
-
-	protected class MotionHashTable : StringKeyTableBase
-	{
-		public void Add(string key, int value)
-		{
-			_Add(key, value);
-		}
-
-		public object Get(string key)
-		{
-			return _Get(key);
-		}
-	}
-
-	[Serializable]
-	public class PeriodicSyncActionPositionInfo
-	{
-		public float applyTime;
-
-		public Vector3 actionPosition = Vector3.get_zero();
-
-		public Vector3 targetPointPos = Vector3.get_zero();
-
-		public bool actionPositionFlag;
-	}
-
-	public enum MOVE_TYPE
-	{
-		NONE,
-		VELOCITY,
-		SYNC_VELOCITY,
-		TO_POSITION,
-		HOMING,
-		SIDEWAYS
-	}
-
-	public enum ROTATE_TYPE
-	{
-		NONE,
-		TO_DIRECTION,
-		MOTION_TO_TARGET,
-		MOTION_TO_DIRECTION
-	}
-
-	public enum VELOCITY_TYPE
-	{
-		NONE,
-		ROOT_MOTION,
-		EVENT_MOVE,
-		ACT_MOVE
-	}
-
-	public enum OBJECT_LIST_TYPE
-	{
-		DEFAULT,
-		STATIC,
-		ANIM_EVENT,
-		CHANGE_WEAPON,
-		NUM
-	}
-
-	public enum REACTION_TYPE
-	{
-		NONE,
-		DAMAGE,
-		BLOW,
-		STUNNED_BLOW,
-		STUMBLE,
-		FALL_BLOW,
-		SHAKE,
-		DOWN,
-		DEAD,
-		GUARD_DAMAGE,
-		PARALYZE,
-		ANGRY,
-		FREEZE,
-		COUNTER,
-		ELECTRIC_SHOCK,
-		INK_SPLASH,
-		DIZZY,
-		SHADOWSEALING,
-		MAD_MODE
-	}
-
-	public class ReactionInfo
-	{
-		public REACTION_TYPE reactionType;
-
-		public Vector3 blowForce = Vector3.get_zero();
-
-		public float loopTime;
-
-		public int targetId;
-	}
-
-	[Serializable]
-	public class DelayReactionInfo
-	{
-		public REACTION_TYPE type;
-
-		public int targetId;
-	}
-
-	public enum STATE_MOVE_POINT
-	{
-		NONE,
-		INIT,
-		ROTATE,
-		CHECK,
-		FINISH
-	}
-
-	protected enum STATE_MOVE_LOOKAT
-	{
-		NONE,
-		INIT,
-		MOVE,
-		FINISH
-	}
-
-	protected const string ANIMATOR_DEF_LAYER_NAME = "Base Layer.";
-
-	protected const string ANIMATOR_NEXT_TRIGGER_NAME = "next";
-
-	public const float FREEZE_START_NORMALIZED_TIME = 0.1f;
-
-	public const float FREEZE_EFFECT_HEIGHT = 30f;
-
-	public const float FREEZE_EFFECT_SPEED = 5f;
-
-	private const float DEFAULT_MOVE_ANGLE = 45f;
-
-	private const float DEFAULT_MOVE_ANGLE_SPEED_MAX = 20f;
-
-	public static readonly string[] motionStateName;
-
-	private static int[] motionHashCaches;
-
-	private static readonly MotionHashTable motionHash;
-
-	protected string lastAnimTrigger;
-
-	protected List<string> changeTriggerList = new List<string>();
-
-	protected bool periodicSyncActionPositionFlag;
-
-	protected float periodicSyncActionPositionLastTime;
-
-	protected List<PeriodicSyncActionPositionInfo> periodicSyncActionPositionList = new List<PeriodicSyncActionPositionInfo>();
-
-	protected StageObject periodicSyncTarget;
-
-	protected bool enableRootMotion = true;
-
-	protected bool enableEventMove;
-
-	protected Vector3 eventMoveVelocity = Vector3.get_zero();
-
-	protected float eventMoveTimeCount;
-
-	public AnimEventData animEventData;
-
-	protected CharacterStampCtrl stepCtrl;
-
-	[Tooltip("最短移動回転時間（回転始動と終了のスム\u30fcズに関係")]
-	public float moveRotateMinimumTime = 0.3f;
-
-	[Tooltip("移動回転最大速度（角度/s")]
-	public float moveRotateMaxSpeed = 60f;
-
-	[Tooltip("移動停止範囲")]
-	public float moveStopRange = 5f;
-
-	protected float moveSyncTime;
-
-	protected float moveSyncDirection;
-
-	protected float moveSyncDirectionTime;
-
-	protected bool moveSyncEnd;
-
-	protected float moveSyncEndDirection;
-
-	public int moveSyncMotionID;
-
-	protected Vector3 moveBeforePos = Vector3.get_zero();
-
-	protected float moveNowDistance;
-
-	protected float moveMaxDistance;
-
-	[Tooltip("最短回転時間（回転始動と終了のスム\u30fcズに関係")]
-	public float rotateMinimumTime = 0.1f;
-
-	[Tooltip("回転最大速度（角度/s")]
-	public float rotateMaxSpeed = 120f;
-
-	protected int rotateSign;
-
-	protected float rotateVelocity;
-
-	protected float rootRotationRate = 1f;
-
-	protected int rotateTargetCnt;
-
-	protected bool rotateTargetEnd;
-
-	protected GameObject damegeRemainEffect;
-
-	protected float rotateEventSpeed;
-
-	protected float rotateEventDirection;
-
-	protected bool rotateEventKeep;
-
-	protected bool rotateToTargetFlag;
-
-	protected float rotateToTargetDiffAngle;
-
-	protected bool rotateSafeMode;
-
-	private Vector3 _velocity = Vector3.get_zero();
-
-	public VELOCITY_TYPE velocityType;
-
-	protected float actionMoveRate = 1f;
-
-	protected float rootMotionMoveRate = 1f;
-
-	protected List<DelayReactionInfo> m_reactionDelayList = new List<DelayReactionInfo>();
-
-	protected bool isReactionDelaySet;
-
-	private XorInt _hpMax = 0;
-
-	private XorInt _hp = 0;
-
-	protected int localDamage;
-
-	protected XorInt m_shieldHpMax = 0;
-
-	public XorInt m_shieldHp = 0;
-
-	protected AttackInfo[] attackInfos;
-
-	private XorFloat _damageHealRate;
-
-	private XorFloat _attackWeakRate;
-
-	private XorFloat _attackDownRate;
-
-	private XorFloat _downPowerWeak;
-
-	private XorFloat _downPowerSimpleWeak;
-
-	private XorFloat _elementWeakRate;
-
-	private XorFloat _elementSkillWeakRate;
-
-	private XorFloat _skillWeakRate;
-
-	private XorFloat _healWeakRate;
-
-	private List<AttackColliderObject> m_exAtkColliderObjectList = new List<AttackColliderObject>();
-
-	protected bool[] objectTypeAutoDelete = new bool[4]
-	{
-		true,
-		false,
-		true,
-		true
-	};
-
-	protected List<List<GameObject>> objectList;
-
-	protected float hitStopTimer = -3.40282347E+38f;
-
-	protected AnimEventProcessor animEventProcessor;
-
-	protected bool animUpdatePhysics;
-
-	protected List<string> animatorBoolList = new List<string>();
-
-	protected List<AnimEventCollider> animEventColliderList = new List<AnimEventCollider>();
-
-	protected AttackHitChecker attackHitChecker = new AttackHitChecker();
-
-	protected bool referenceCheckerFlag;
-
-	protected List<string> hideRendererList = new List<string>();
-
-	protected bool isPlayingEndMotion;
-
-	public ContinusAttackParam continusAttackParam;
-
-	public List<AnimEventData.EventData> continusAtkEventDataList = new List<AnimEventData.EventData>();
-
-	public BuffParam buffParam;
-
-	protected float buffSyncLastTime;
-
-	public BadStatus badStatusMax = new BadStatus();
-
-	public BadStatus badStatusBase = new BadStatus();
-
-	protected float paralyzeTime;
-
-	public float paralyzeEffectScale = 1f;
-
-	public string paralyzeEffectName = "ef_btl_wyvern_paralyz_01";
-
-	protected Transform paralyzeEffectTrans;
-
-	protected string nowAnimCtrlName;
-
-	protected string nextAnimCtrlName;
-
-	protected int nextMotionHash;
-
-	protected float nextMotionTransitionTime = -1f;
-
-	protected GameObject actionRendererModel;
-
-	protected string actionRendererNodeName;
-
-	protected Transform actionRendererInstance;
-
-	protected float actMotionStartTime = -1f;
-
-	public bool onTheGround = true;
-
-	private List<GameObject> hittingIceFloor = new List<GameObject>(10);
-
-	private Renderer[] m_rendererList;
-
-	private GameObject m_effectFreeze;
-
-	private float m_freezeTimer;
-
-	private float m_freezeHeight;
-
-	private float m_emissionRadius;
-
-	protected bool m_isStopMotionByDebuff;
-
-	protected List<ACTION_ID> shadowSealingStackDebuff = new List<ACTION_ID>();
-
-	protected GameObject m_effectElectricShock;
-
-	private float m_moveAngle_deg = 45f;
-
-	private float m_moveAngleSpeed_deg = 20f;
-
-	private float m_movedAngle_deg;
-
-	private float m_diffAngle_deg;
-
-	private int m_moveAngleSign;
-
-	public static readonly Vector3 DEFAULT_MOVE_POINT;
-
-	protected int m_rotateForActMotionId = 4;
-
-	protected float m_rotateForActTime;
-
-	protected float m_rotateForActFinishTime;
-
-	protected Quaternion m_rotateForActStart_Quat = Quaternion.get_identity();
-
-	protected Quaternion m_rotateForActEnd_Quat = Quaternion.get_identity();
-
-	protected Vector3 m_moveLookAtInitTargetDir = Vector3.get_zero();
-
-	protected static StringBuilder stateNameBuilder;
-
-	private bool dbgTimeCountFlag;
-
-	private float dbgTimeCount;
-
-	public override Vector3 _position
-	{
-		get
-		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			return (!base.isInitialized) ? base._position : base._rigidbody.get_position();
-		}
-		set
-		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			if (!base.isInitialized)
-			{
-				base._position = value;
-			}
-			else
-			{
-				bool flag = false;
-				if ((base._rigidbody.get_constraints() & 2) != 0)
-				{
-					Vector3 position = base._rigidbody.get_position();
-					if (position.x != value.x)
-					{
-						flag = true;
-					}
-				}
-				if ((base._rigidbody.get_constraints() & 4) != 0)
-				{
-					Vector3 position2 = base._rigidbody.get_position();
-					if (position2.y != value.y)
-					{
-						flag = true;
-					}
-				}
-				if ((base._rigidbody.get_constraints() & 8) != 0)
-				{
-					Vector3 position3 = base._rigidbody.get_position();
-					if (position3.z != value.z)
-					{
-						flag = true;
-					}
-				}
-				if (!base._rigidbody.get_gameObject().get_activeInHierarchy())
-				{
-					flag = true;
-				}
-				base._rigidbody.set_position(value);
-				if (flag)
-				{
-					base._transform.set_position(value);
-				}
-			}
-		}
-	}
-
-	public override Quaternion _rotation
-	{
-		get
-		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			return (!base.isInitialized) ? base._rotation : base._rigidbody.get_rotation();
-		}
-		set
-		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			if (!base.isInitialized)
-			{
-				base._rotation = value;
-			}
-			else
-			{
-				bool flag = false;
-				if (!base._rigidbody.get_gameObject().get_activeInHierarchy())
-				{
-					flag = true;
-				}
-				base._rigidbody.set_rotation(value);
-				if (flag)
-				{
-					base._transform.set_rotation(value);
-				}
-			}
-		}
-	}
-
-	public override Vector3 _forward
-	{
-		get
-		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			return (!base.isInitialized) ? base._forward : (base._rigidbody.get_rotation() * Vector3.get_forward());
-		}
-		set
-		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			if (base.isInitialized)
-			{
-				base._rigidbody.set_rotation(Quaternion.LookRotation(value));
-			}
-			else
-			{
-				base._forward = value;
-			}
-		}
-	}
-
-	public override Vector3 _right
-	{
-		get
-		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			return (!base.isInitialized) ? base._right : (base._rigidbody.get_rotation() * Vector3.get_right());
-		}
-		set
-		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			if (base.isInitialized)
-			{
-				base._rigidbody.set_rotation(Quaternion.FromToRotation(Vector3.get_right(), value));
-			}
-			else
-			{
-				base._right = value;
-			}
-		}
-	}
-
-	public override Vector3 _up
-	{
-		get
-		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			return (!base.isInitialized) ? base._up : (base._rigidbody.get_rotation() * Vector3.get_up());
-		}
-		set
-		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			if (base.isInitialized)
-			{
-				base._rigidbody.set_rotation(Quaternion.FromToRotation(Vector3.get_up(), value));
-			}
-			else
-			{
-				base._up = value;
-			}
-		}
-	}
-
-	public InGameSettingsManager.Character charaParameter
-	{
-		get;
-		private set;
-	}
-
-	public string charaName
-	{
-		get;
-		set;
-	}
-
-	public string fullName
-	{
-		get;
-		set;
-	}
-
-	public Animator animator
-	{
-		get;
-		protected set;
-	}
-
-	public Transform body
-	{
-		get;
-		set;
-	}
-
-	public Transform rootNode
-	{
-		get;
-		protected set;
-	}
-
-	public ACTION_ID actionID
-	{
-		get;
-		protected set;
-	}
-
-	public ACTION_ID lastActionID
-	{
-		get;
-		protected set;
-	}
-
-	public int attackID
-	{
-		get;
-		protected set;
-	}
-
-	public bool isControllable
-	{
-		get;
-		protected set;
-	}
-
-	public bool isDead
-	{
-		get;
-		protected set;
-	}
-
-	public StageObject actionTarget
-	{
-		get;
-		protected set;
-	}
-
-	public Vector3 actionPosition
-	{
-		get;
-		protected set;
-	}
-
-	public bool actionPositionFlag
-	{
-		get;
-		protected set;
-	}
-
-	public Vector3 targetPointPos
-	{
-		get;
-		protected set;
-	}
-
-	public StageObject attackStartTarget
-	{
-		get;
-		protected set;
-	}
-
-	public bool actionPositionWaitSync
-	{
-		get;
-		protected set;
-	}
-
-	public string actionPositionWaitTrigger
-	{
-		get;
-		protected set;
-	}
-
-	public bool directionWaitSync
-	{
-		get;
-		protected set;
-	}
-
-	public string directionWaitTrigger
-	{
-		get;
-		protected set;
-	}
-
-	public List<Character> periodicSyncOwnerList
-	{
-		get;
-		protected set;
-	}
-
-	public Vector3 lerpRotateVec
-	{
-		get;
-		protected set;
-	}
-
-	public MOVE_TYPE moveType
-	{
-		get;
-		protected set;
-	}
-
-	public Vector3 moveTargetPos
-	{
-		get;
-		protected set;
-	}
-
-	public float moveSyncSpeed
-	{
-		get;
-		protected set;
-	}
-
-	public ROTATE_TYPE rotateType
-	{
-		get;
-		protected set;
-	}
-
-	public float rotateDirection
-	{
-		get;
-		protected set;
-	}
-
-	public bool rotateDisableMotion
-	{
-		get;
-		set;
-	}
-
-	public Vector3 externalVelocity
-	{
-		get;
-		protected set;
-	}
-
-	public Vector3 addForce
-	{
-		get;
-		protected set;
-	}
-
-	public bool enableAddForce
-	{
-		get;
-		protected set;
-	}
-
-	public Vector3 addForceBeforePos
-	{
-		get;
-		protected set;
-	}
-
-	public bool waitAddForce
-	{
-		get;
-		protected set;
-	}
-
-	public bool enableMotionCancel
-	{
-		get;
-		protected set;
-	}
-
-	public bool enableMoveSuppress
-	{
-		get;
-		protected set;
-	}
-
-	public bool enableReactionDelay
-	{
-		get;
-		protected set;
-	}
-
-	public int hpMax
-	{
-		get
-		{
-			return _hpMax;
-		}
-		set
-		{
-			_hpMax = value;
-		}
-	}
-
-	public int hp
-	{
-		get
-		{
-			return _hp;
-		}
-		set
-		{
-			_hp = value;
-		}
-	}
-
-	public int hpShow
-	{
-		get
-		{
-			if (isLocalDamageApply)
-			{
-				int num = hp - localDamage;
-				if (isDead)
-				{
-					if (num < 0)
-					{
-						num = 0;
-					}
-				}
-				else if (num < 1)
-				{
-					num = 1;
-				}
-				return num;
-			}
-			return hp;
-		}
-	}
-
-	public bool isLocalDamageApply
-	{
-		get;
-		protected set;
-	}
-
-	public AtkAttribute ShieldTolerance
-	{
-		get;
-		set;
-	}
-
-	public XorInt ShieldHpMax
-	{
-		get
-		{
-			return m_shieldHpMax;
-		}
-		set
-		{
-			m_shieldHpMax = value;
-		}
-	}
-
-	public XorInt ShieldHp
-	{
-		get
-		{
-			return m_shieldHp;
-		}
-		set
-		{
-			if (IsValidShield() && (int)value <= 0)
-			{
-				ActShieldBreak();
-			}
-			m_shieldHp = value;
-		}
-	}
-
-	public AtkAttribute attack
-	{
-		get;
-		protected set;
-	}
-
-	public AtkAttribute tolerance
-	{
-		get;
-		protected set;
-	}
-
-	public AtkAttribute defense
-	{
-		get;
-		protected set;
-	}
-
-	public float damageHealRate
-	{
-		get
-		{
-			return _damageHealRate;
-		}
-		protected set
-		{
-			_damageHealRate = value;
-		}
-	}
-
-	public float attackWeakRate
-	{
-		get
-		{
-			return _attackWeakRate;
-		}
-		protected set
-		{
-			_attackWeakRate = value;
-		}
-	}
-
-	public float attackDownRate
-	{
-		get
-		{
-			return _attackDownRate;
-		}
-		protected set
-		{
-			_attackDownRate = value;
-		}
-	}
-
-	public float downPowerWeak
-	{
-		get
-		{
-			return _downPowerWeak;
-		}
-		protected set
-		{
-			_downPowerWeak = value;
-		}
-	}
-
-	public float downPowerSimpleWeak
-	{
-		get
-		{
-			return _downPowerSimpleWeak;
-		}
-		protected set
-		{
-			_downPowerSimpleWeak = value;
-		}
-	}
-
-	public float elementWeakRate
-	{
-		get
-		{
-			return _elementWeakRate;
-		}
-		protected set
-		{
-			_elementWeakRate = value;
-		}
-	}
-
-	public float elementSkillWeakRate
-	{
-		get
-		{
-			return _elementSkillWeakRate;
-		}
-		protected set
-		{
-			_elementSkillWeakRate = value;
-		}
-	}
-
-	public float skillWeakRate
-	{
-		get
-		{
-			return _skillWeakRate;
-		}
-		protected set
-		{
-			_skillWeakRate = value;
-		}
-	}
-
-	public float healWeakRate
-	{
-		get
-		{
-			return _healWeakRate;
-		}
-		protected set
-		{
-			_healWeakRate = value;
-		}
-	}
-
-	public CharacterPacketReceiver characterReceiver => (CharacterPacketReceiver)base.packetReceiver;
-
-	public CharacterPacketSender characterSender => (CharacterPacketSender)base.packetSender;
-
-	public BadStatus atkBadStatus
-	{
-		get;
-		protected set;
-	}
-
-	public BadStatus badStatusTotal
-	{
-		get;
-		protected set;
-	}
-
-	public EffectPlayProcessor effectPlayProcessor
-	{
-		get;
-		set;
-	}
-
-	public bool isSetAppearPos
-	{
-		get;
-		protected set;
-	}
-
-	public Vector3 appearPos
-	{
-		get;
-		protected set;
-	}
-
-	public AttackTrackingTarget TrackingTargetBullet
-	{
-		get;
-		set;
-	}
-
-	public int SyncRandomSeed
-	{
-		get;
-		set;
-	}
-
-	public StringKeyTable<BulletData> cachedBulletDataTable
-	{
-		get;
-		set;
-	}
-
-	protected Renderer[] _rendererArray
-	{
-		get
-		{
-			return m_rendererList;
-		}
-		set
-		{
-			m_rendererList = value;
-		}
-	}
-
-	public bool isPause
-	{
-		get;
-		private set;
-	}
-
-	public float moveAngle_deg
-	{
-		get
-		{
-			return m_moveAngle_deg;
-		}
-		set
-		{
-			m_moveAngle_deg = value;
-		}
-	}
-
-	public float moveAngleSpeed_deg
-	{
-		get
-		{
-			return m_moveAngleSpeed_deg;
-		}
-		set
-		{
-			m_moveAngleSpeed_deg = value;
-		}
-	}
-
-	public Vector3 movePointPos
-	{
-		get;
-		set;
-	}
-
-	protected STATE_MOVE_POINT stateMovePoint
-	{
-		get;
-		private set;
-	}
-
-	public Vector3 moveLookAtPos
-	{
-		get;
-		set;
-	}
-
-	public float moveLookAtAngle
-	{
-		get;
-		set;
-	}
-
-	protected STATE_MOVE_LOOKAT stateMoveLookAt
-	{
-		get;
-		private set;
-	}
-
-	public Character()
-	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0218: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026f: Unknown result type (might be due to invalid IL or missing references)
-		base.objectType = OBJECT_TYPE.CHARACTER;
-		animator = null;
-		body = null;
-		actionID = ACTION_ID.IDLE;
-		lastActionID = ACTION_ID.NONE;
-		attackID = 0;
-		isControllable = true;
-		periodicSyncOwnerList = new List<Character>();
-		lerpRotateVec = Vector3.get_zero();
-		moveType = MOVE_TYPE.NONE;
-		moveTargetPos = Vector3.get_zero();
-		rotateType = ROTATE_TYPE.NONE;
-		rotateDirection = 0f;
-		rootRotationRate = 1f;
-		externalVelocity = Vector3.get_zero();
-		addForce = Vector3.get_zero();
-		enableAddForce = false;
-		addForceBeforePos = Vector3.get_zero();
-		waitAddForce = false;
-		enableMotionCancel = false;
-		enableMoveSuppress = false;
-		actionPositionFlag = false;
-		actionPositionWaitSync = false;
-		actionPositionWaitTrigger = null;
-		directionWaitSync = false;
-		directionWaitTrigger = null;
-		hpMax = 0;
-		hp = hpMax;
-		attack = new AtkAttribute();
-		tolerance = new AtkAttribute();
-		defense = new AtkAttribute();
-		damageHealRate = 1f;
-		downPowerWeak = 0f;
-		downPowerSimpleWeak = 0f;
-		objectList = new List<List<GameObject>>();
-		for (int i = 0; i < 4; i++)
-		{
-			objectList.Add(new List<GameObject>());
-		}
-		atkBadStatus = new BadStatus();
-		badStatusTotal = new BadStatus();
-		badStatusMax = new BadStatus(1f);
-		buffParam = new BuffParam(this);
-		continusAttackParam = new ContinusAttackParam(this);
-		effectPlayProcessor = null;
-		isSetAppearPos = false;
-		cachedBulletDataTable = new StringKeyTable<BulletData>();
-	}
-
-	static Character()
-	{
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		motionStateName = new string[16]
-		{
-			string.Empty,
-			"end",
-			"idle",
-			"walk",
-			"rotate_l",
-			"rotate_r",
-			"damage",
-			"dead",
-			"paralyze",
-			"move_side_r",
-			"move_side_l",
-			"hide",
-			"hide_end",
-			"move_point",
-			"move_lookat",
-			"attack_{0:00}"
-		};
-		motionHashCaches = new int[15];
-		DEFAULT_MOVE_POINT = Vector3.get_zero();
-		stateNameBuilder = new StringBuilder(1024);
-		motionHash = new MotionHashTable();
-	}
-
-	public override void _LookAt(Vector3 pos)
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		if (base.isInitialized)
-		{
-			base._rigidbody.set_rotation(Quaternion.LookRotation(pos - _position));
-		}
-		else
-		{
-			base._LookAt(pos);
-		}
-	}
-
-	public void SetVelocity(Vector3 set_vec, VELOCITY_TYPE type = VELOCITY_TYPE.NONE)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		_velocity = set_vec;
-		velocityType = type;
-	}
-
-	public Vector3 GetVelocity()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		return _velocity;
-	}
-
-	public virtual void ActShieldBreak()
-	{
-	}
-
-	public virtual float GetEffectScaleDependValue()
-	{
-		return 1f;
-	}
-
-	protected override void Awake()
-	{
-		base.Awake();
-		charaParameter = MonoBehaviourSingleton<InGameSettingsManager>.I.character;
-	}
-
-	protected override void Clear()
-	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		base.Clear();
-		animator = null;
-		animEventProcessor = null;
-		int i = 0;
-		for (int count = objectList.Count; i < count; i++)
-		{
-			int num = 0;
-			while (num < objectList[i].Count)
-			{
-				GameObject val = objectList[i][num];
-				if (val.get_transform().get_parent() == base._transform)
-				{
-					num++;
-				}
-				else
-				{
-					objectList[i].RemoveAt(num);
-				}
-			}
-		}
-		animatorBoolList.Clear();
-		changeTriggerList.Clear();
-		animEventColliderList.ForEach(delegate(AnimEventCollider o)
-		{
-			o.Destroy();
-		});
-		animEventColliderList.Clear();
-	}
-
-	public override void OnLoadComplete()
-	{
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Expected O, but got Unknown
-		//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-		base.OnLoadComplete();
-		rootNode = Utility.Find(base._transform, "Root");
-		if (base._collider != null && base._rigidbody == null)
-		{
-			base._rigidbody = this.get_gameObject().AddComponent<Rigidbody>();
-		}
-		if (!object.ReferenceEquals((object)body, null))
-		{
-			animator = body.GetComponent<Animator>();
-		}
-		if (object.ReferenceEquals((object)animator, null))
-		{
-			animator = this.get_gameObject().GetComponentInChildren<Animator>();
-		}
-		if (animator != null)
-		{
-			animator.set_applyRootMotion(true);
-			animator.set_cullingMode(0);
-			animator.Update(0f);
-			if (animUpdatePhysics)
-			{
-				animator.set_updateMode(1);
-			}
-			else
-			{
-				animator.set_updateMode(0);
-			}
-			Transform val = animator.get_transform();
-			if (val != base._transform)
-			{
-				base._transform.set_localScale(val.get_localScale());
-				val.set_localScale(Vector3.get_one());
-			}
-		}
-		nowAnimCtrlName = null;
-		nextAnimCtrlName = null;
-		nextMotionHash = 0;
-		nextMotionTransitionTime = -1f;
-		stepCtrl = this.get_gameObject().GetComponentInChildren<CharacterStampCtrl>();
-		if (animEventData != null && animator != null)
-		{
-			animEventProcessor = new AnimEventProcessor(animEventData, animator, this);
-		}
-		else
-		{
-			AnimEventComponent component = this.get_gameObject().GetComponent<AnimEventComponent>();
-			if (component != null && component.get_enabled() && component.animEventData != null)
-			{
-				animEventProcessor = new AnimEventProcessor(component.animEventData, animator, this);
-				Object.Destroy(component);
-			}
-		}
-		m_rendererList = this.get_transform().GetComponentsInChildren<Renderer>(true);
-	}
-
-	protected override void Initialize()
-	{
-		base.Initialize();
-		if (base.controller != null)
-		{
-			base.controller.OnCharacterInitialized();
-		}
-	}
-
-	protected override void Update()
-	{
-		//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-		base.Update();
-		UpdateAction();
-		if (hitStopTimer >= 0f)
-		{
-			hitStopTimer -= Time.get_deltaTime();
-			if (hitStopTimer <= 0f)
-			{
-				SetHitStop(-1f);
-			}
-		}
-		continusAttackParam.Update();
-		buffParam.UpdateConditionsAbility();
-		buffParam.Update();
-		if (IsOriginal() && buffSyncLastTime != 0f && Time.get_time() > buffSyncLastTime + charaParameter.buffSyncUpdateInterval)
-		{
-			SendBuffSync(BuffParam.BUFFTYPE.NONE);
-		}
-		if (lerpRotateVec != Vector3.get_zero())
-		{
-			Quaternion val = Quaternion.LookRotation(lerpRotateVec);
-			float num = Mathf.Abs(Vector3.Angle(_forward, lerpRotateVec));
-			float num2 = moveRotateMaxSpeed * Time.get_deltaTime() / num;
-			if (num2 > 1f)
-			{
-				lerpRotateVec = Vector3.get_zero();
-				num2 = 1f;
-			}
-			_rotation = Quaternion.Lerp(_rotation, val, num2);
-		}
-		UpdateReactionDelay();
-	}
-
-	protected override void FixedUpdate()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0236: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0238: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0241: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0272: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0277: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_034b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0350: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0360: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0363: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0432: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0446: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04f9: Unknown result type (might be due to invalid IL or missing references)
-		if (rotateToTargetFlag)
-		{
-			if (actionPositionFlag)
-			{
-				Vector3 val = actionPosition - _position;
-				val.y = 0f;
-				if (val.get_magnitude() < 0.1f)
-				{
-					val = _forward;
-				}
-				else if (rotateSafeMode)
-				{
-					float num = Vector3.Angle(-_forward, val);
-					if (num < 1f)
-					{
-						val = _forward;
-					}
-				}
-				Quaternion val2 = Quaternion.LookRotation(val);
-				Vector3 eulerAngles = val2.get_eulerAngles();
-				rotateEventDirection = eulerAngles.y + rotateToTargetDiffAngle;
-				if (rotateEventSpeed <= 0f)
-				{
-					_rotation = Quaternion.AngleAxis(rotateEventDirection, Vector3.get_up());
-				}
-			}
-			else
-			{
-				Quaternion rotation = _rotation;
-				Vector3 eulerAngles2 = rotation.get_eulerAngles();
-				rotateEventDirection = eulerAngles2.y;
-			}
-			if (!periodicSyncActionPositionFlag)
-			{
-				rotateToTargetFlag = false;
-			}
-		}
-		if (rotateEventKeep)
-		{
-			if (attackStartTarget != null)
-			{
-				Vector3 forward = _forward;
-				forward.y = 0f;
-				forward.Normalize();
-				Vector3 val3 = attackStartTarget._position - _position;
-				val3.y = 0f;
-				Vector3 val4 = Vector3.Cross(forward, val3);
-				int num2 = (val4.y >= 0f) ? 1 : (-1);
-				float num3 = Vector3.Angle(forward, val3);
-				Quaternion rotation2 = _rotation;
-				Vector3 eulerAngles3 = rotation2.get_eulerAngles();
-				float num4 = num3;
-				if (rotateEventSpeed > 0f)
-				{
-					num4 = rotateEventSpeed * Time.get_deltaTime();
-					if (num3 <= num4)
-					{
-						num4 = num3;
-					}
-				}
-				_rotation = Quaternion.Euler(eulerAngles3.x, eulerAngles3.y + (float)num2 * num4, eulerAngles3.z);
-			}
-		}
-		else if (rotateEventSpeed != 0f)
-		{
-			Vector3 forward2 = _forward;
-			forward2.y = 0f;
-			forward2.Normalize();
-			Vector3 val5 = Quaternion.AngleAxis(rotateEventDirection, Vector3.get_up()) * Vector3.get_forward();
-			Vector3 val6 = Vector3.Cross(forward2, val5);
-			int num5 = (val6.y >= 0f) ? 1 : (-1);
-			float num6 = Vector3.Angle(forward2, val5);
-			Quaternion rotation3 = _rotation;
-			Vector3 eulerAngles4 = rotation3.get_eulerAngles();
-			float num7 = rotateEventSpeed * Time.get_deltaTime();
-			if (num6 <= num7)
-			{
-				num7 = num6;
-				if (!rotateToTargetFlag)
-				{
-					rotateEventSpeed = 0f;
-					rotateEventDirection = 0f;
-				}
-			}
-			_rotation = Quaternion.Euler(eulerAngles4.x, eulerAngles4.y + (float)num5 * num7, eulerAngles4.z);
-		}
-		if ((IsCoopNone() || IsOriginal()) && periodicSyncActionPositionFlag)
-		{
-			if (periodicSyncTarget != actionTarget)
-			{
-				SetPeriodicSyncTarget(actionTarget);
-			}
-			float actMotionTime = GetActMotionTime();
-			float num8 = actMotionTime - periodicSyncActionPositionLastTime;
-			if (num8 >= charaParameter.periodicSyncActionPositionCheckTime)
-			{
-				Vector3 targetPosition = GetTargetPosition(actionTarget);
-				bool flag = actionTarget != null;
-				if (targetPosition != actionPosition || flag != actionPositionFlag)
-				{
-					PeriodicSyncActionPositionInfo periodicSyncActionPositionInfo = new PeriodicSyncActionPositionInfo();
-					periodicSyncActionPositionInfo.applyTime = actMotionTime + charaParameter.periodicSyncActionPositionApplyTime;
-					if (actionTarget != null)
-					{
-						periodicSyncActionPositionInfo.actionPosition = GetTargetPosition(actionTarget);
-						periodicSyncActionPositionInfo.actionPositionFlag = true;
-						GetTargetPos(out periodicSyncActionPositionInfo.targetPointPos);
-					}
-					AddPeriodicSyncActionPosition(periodicSyncActionPositionInfo);
-					periodicSyncActionPositionLastTime = actMotionTime + charaParameter.periodicSyncActionPositionApplyTime;
-				}
-			}
-		}
-		if (periodicSyncActionPositionList.Count > 0)
-		{
-			int num9 = 0;
-			while (num9 < periodicSyncActionPositionList.Count)
-			{
-				float actMotionTime2 = GetActMotionTime();
-				PeriodicSyncActionPositionInfo periodicSyncActionPositionInfo2 = periodicSyncActionPositionList[num9];
-				if (actMotionTime2 >= periodicSyncActionPositionInfo2.applyTime)
-				{
-					SetActionPosition(periodicSyncActionPositionInfo2.actionPosition, periodicSyncActionPositionInfo2.actionPositionFlag);
-					targetPointPos = periodicSyncActionPositionInfo2.targetPointPos;
-					periodicSyncActionPositionList.RemoveAt(num9);
-				}
-				else
-				{
-					num9++;
-				}
-			}
-		}
-		if (eventMoveTimeCount > 0f)
-		{
-			eventMoveTimeCount -= Time.get_deltaTime();
-			if (eventMoveTimeCount <= 0f)
-			{
-				eventMoveTimeCount = 0f;
-				enableEventMove = false;
-				enableAddForce = false;
-				SetVelocity(Vector3.get_zero(), VELOCITY_TYPE.NONE);
-				eventMoveVelocity = Vector3.get_zero();
-			}
-		}
-		if (enableEventMove)
-		{
-			SetVelocity(Quaternion.LookRotation(GetTransformForward()) * eventMoveVelocity, VELOCITY_TYPE.EVENT_MOVE);
-		}
-		base.FixedUpdate();
-		if (animEventProcessor != null)
-		{
-			animEventProcessor.Update();
-		}
-		FixedUpdatePhysics();
-		UpdateNextMotion();
-	}
-
-	protected virtual void FixedUpdatePhysics()
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0212: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0217: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0226: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0238: Unknown result type (might be due to invalid IL or missing references)
-		//IL_023e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0263: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0282: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0288: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0294: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0299: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02db: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02e8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0303: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0309: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0332: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0356: Unknown result type (might be due to invalid IL or missing references)
-		if (base.isInitialized)
-		{
-			if (enableAddForce)
-			{
-				Vector3 addForceBeforePos = this.addForceBeforePos;
-				addForceBeforePos.y = 0.1f;
-				Vector3 position = _position;
-				position.y = 0.1f;
-				if (addForceBeforePos != position)
-				{
-					Vector3 val = position - addForceBeforePos;
-					if (Physics.Raycast(addForceBeforePos, val, val.get_magnitude(), 393728))
-					{
-						Vector3 position2 = _position;
-						addForceBeforePos.y = position2.y;
-						_position = addForceBeforePos;
-					}
-					Vector3 position3 = _position;
-					position3.y = 0f;
-					this.addForceBeforePos = position3;
-				}
-			}
-			else if (!IsHitStop())
-			{
-				float num = 1f;
-				if (enableMoveSuppress && actionPositionFlag)
-				{
-					Vector3 val2 = actionPosition - _position;
-					val2.y = 0f;
-					if (val2.get_magnitude() <= charaParameter.moveSuppressLength)
-					{
-						num = charaParameter.moveSuppressRate;
-					}
-				}
-				Vector3 velocity = GetVelocity() * num * actionMoveRate;
-				Vector3 velocity2 = base._rigidbody.get_velocity();
-				velocity.y = velocity2.y;
-				base._rigidbody.set_velocity(velocity);
-			}
-			else
-			{
-				base._rigidbody.set_velocity(Vector3.get_zero());
-			}
-			Vector3 position4 = _position;
-			float height = StageManager.GetHeight(position4);
-			if (!waitAddForce)
-			{
-				if (this.addForce != Vector3.get_zero())
-				{
-					base._rigidbody.set_velocity(Vector3.get_zero());
-					base._rigidbody.AddForce(this.addForce * (0.02f / Time.get_fixedDeltaTime()));
-					Vector3 addForce = this.addForce;
-					if (addForce.y > 0f)
-					{
-						base._rigidbody.set_constraints(base._rigidbody.get_constraints() & -5);
-					}
-					this.addForce = Vector3.get_zero();
-					enableAddForce = true;
-					Vector3 position5 = _position;
-					position5.y = 0f;
-					this.addForceBeforePos = position5;
-				}
-				else if ((base._rigidbody.get_constraints() & 4) == 0 && position4.y <= height + 0.03f)
-				{
-					Vector3 velocity3 = base._rigidbody.get_velocity();
-					if (velocity3.y <= 0f)
-					{
-						base._rigidbody.set_constraints(base._rigidbody.get_constraints() | 4);
-						Vector3 velocity4 = base._rigidbody.get_velocity();
-						velocity4.y = 0f;
-						base._rigidbody.set_velocity(velocity4);
-						enableAddForce = false;
-					}
-				}
-			}
-			Vector3 externalVelocity = this.externalVelocity;
-			externalVelocity.y = 0f;
-			object rigidbody = (object)base._rigidbody;
-			rigidbody.set_velocity(rigidbody.get_velocity() + externalVelocity);
-			this.externalVelocity = Vector3.get_zero();
-			if (onTheGround)
-			{
-				if ((base._rigidbody.get_constraints() & 4) != 0)
-				{
-					if (Mathf.Abs(position4.y - height) > 0.01f)
-					{
-						position4.y = height;
-						_position = position4;
-					}
-				}
-				else if (position4.y < height)
-				{
-					position4.y = height;
-					_position = position4;
-				}
-			}
-		}
-	}
-
-	protected void UpdateNextMotion()
-	{
-		if (animEventProcessor != null && nextMotionHash != 0 && animator != null)
-		{
-			hitOffFlag &= ~HIT_OFF_FLAG.PLAY_MOTION;
-			string text = nextAnimCtrlName;
-			int motion_hash = nextMotionHash;
-			float motionTransitionTime = nextMotionTransitionTime;
-			if (motionTransitionTime < 0f)
-			{
-				motionTransitionTime = charaParameter.motionTransitionTime;
-			}
-			nextAnimCtrlName = null;
-			nextMotionHash = 0;
-			nextMotionTransitionTime = -1f;
-			if (text != nowAnimCtrlName)
-			{
-				RuntimeAnimatorController animCtrl = GetAnimCtrl(text);
-				AnimEventData animEvent = GetAnimEvent(text);
-				if (animCtrl != null && animEvent != null)
-				{
-					animEventProcessor.ChangeAnimCtrl(animCtrl, animEvent);
-					nowAnimCtrlName = text;
-				}
-				else
-				{
-					Log.Error(LOG.INGAME, "Character.UpdateNextMotion() anim_ctrl or anim_event is null. ctrlName = {0}", text);
-				}
-			}
-			animEventProcessor.CrossFade(motion_hash, motionTransitionTime);
-			UpdateAnimatorSpeed();
-			if (actMotionStartTime < 0f)
-			{
-				actMotionStartTime = Time.get_time();
-			}
-		}
-	}
-
-	public override void OnDetachedObject(StageObject stage_object)
-	{
-		base.OnDetachedObject(stage_object);
-		if (actionTarget == stage_object)
-		{
-			SetActionTarget(null, false);
-		}
-		if (attackStartTarget == stage_object)
-		{
-			attackStartTarget = null;
-		}
-		if (periodicSyncTarget == stage_object)
-		{
-			periodicSyncTarget = null;
-		}
-		int num = periodicSyncOwnerList.IndexOf(stage_object as Character);
-		if (num >= 0)
-		{
-			periodicSyncOwnerList.RemoveAt(num);
-		}
-		if (base.controller != null)
-		{
-			base.controller.OnDetachedObject(stage_object);
-		}
-	}
-
-	public override void OnAnimatorMove()
-	{
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-		if (animator != null && animator.get_applyRootMotion() && enableRootMotion && !enableEventMove && !enableAddForce)
-		{
-			float num = (!(Time.get_deltaTime() > 0f)) ? 0f : (1f / Time.get_deltaTime());
-			Vector3 val = animator.get_deltaPosition();
-			val.x *= num;
-			val.z *= num;
-			val *= rootMotionMoveRate;
-			if (lerpRotateVec != Vector3.get_zero())
-			{
-				SetVelocity(Quaternion.FromToRotation(_forward, lerpRotateVec) * val, VELOCITY_TYPE.ROOT_MOTION);
-			}
-			else
-			{
-				SetVelocity(val, VELOCITY_TYPE.ROOT_MOTION);
-			}
-			if (animator.get_deltaRotation() != Quaternion.get_identity())
-			{
-				if (rootRotationRate == 1f)
-				{
-					_rotation *= animator.get_deltaRotation();
-				}
-				else
-				{
-					_rotation = Quaternion.Lerp(_rotation, _rotation * animator.get_deltaRotation(), rootRotationRate);
-				}
-			}
-		}
-	}
-
-	public virtual void SetAnimUpdatePhysics(bool enable)
-	{
-		animUpdatePhysics = enable;
-		if (animator != null)
-		{
-			if (animUpdatePhysics)
-			{
-				animator.set_updateMode(1);
-			}
-			else
-			{
-				animator.set_updateMode(0);
-			}
-		}
-	}
-
-	public virtual void SetActionTarget(StageObject target, bool send = true)
-	{
-		bool flag = false;
-		if (actionTarget != target)
-		{
-			flag = true;
-		}
-		actionTarget = target;
-		if (send && flag && characterSender != null)
-		{
-			characterSender.OnSetActionTarget(target);
-		}
-	}
-
-	public virtual void SetActionPosition(Vector3 position, bool flag)
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		if (!flag)
-		{
-			position = _position + _forward * 3f;
-		}
-		actionPosition = position;
-		actionPositionFlag = flag;
-	}
-
-	public virtual void UpdateActionPosition(string trigger)
-	{
-		if (IsCoopNone() || IsOriginal())
-		{
-			SetAttackActionPosition();
-		}
-		SetChangeTrigger(trigger);
-		EndWaitingPacket(WAITING_PACKET.CHARACTER_UPDATE_ACTION_POSITION);
-		actionPositionWaitSync = false;
-		actionPositionWaitTrigger = null;
-		if (characterSender != null)
-		{
-			characterSender.OnUpdateActionPosition(trigger);
-		}
-	}
-
-	public virtual void UpdateDirection(string trigger)
-	{
-		SetChangeTrigger(trigger);
-		EndWaitingPacket(WAITING_PACKET.CHARACTER_UPDATE_DIRECTION);
-		directionWaitSync = false;
-		directionWaitTrigger = null;
-		if (characterSender != null)
-		{
-			characterSender.OnUpdateDirection(trigger);
-		}
-	}
-
-	public void AddPeriodicSyncActionPosition(PeriodicSyncActionPositionInfo info)
-	{
-		if (info != null)
-		{
-			int num = 0;
-			int i = 0;
-			for (int count = periodicSyncActionPositionList.Count; i < count && !(info.applyTime < periodicSyncActionPositionList[i].applyTime); i++)
-			{
-				num++;
-			}
-			periodicSyncActionPositionList.Insert(num, info);
-			if (characterSender != null)
-			{
-				characterSender.OnPeriodicSyncActionPosition(info);
-			}
-		}
-	}
-
-	public void SetHitStop(float time)
-	{
-		if (time < 0f)
-		{
-			time = -3.40282347E+38f;
-		}
-		bool flag = time != -3.40282347E+38f;
-		if (flag != (hitStopTimer != -3.40282347E+38f))
-		{
-			int i = 0;
-			for (int count = objectList.Count; i < count; i++)
-			{
-				List<GameObject> list = objectList[i];
-				int j = 0;
-				for (int count2 = list.Count; j < count2; j++)
-				{
-					list[j].GetComponentsInChildren<Trail>(Temporary.trailList);
-					int k = 0;
-					for (int count3 = Temporary.trailList.Count; k < count3; k++)
-					{
-						Temporary.trailList[k].pause = flag;
-					}
-					Temporary.trailList.Clear();
-				}
-			}
-		}
-		if (actMotionStartTime >= 0f && time > 0f)
-		{
-			actMotionStartTime += time;
-		}
-		hitStopTimer = time;
-		UpdateAnimatorSpeed();
-	}
-
-	public bool IsHitStop()
-	{
-		return hitStopTimer > 0f;
-	}
-
-	public void setPause(bool pause)
-	{
-		isPause = pause;
-		UpdateAnimatorSpeed();
-	}
-
-	protected virtual float GetAnimatorSpeed()
-	{
-		if (IsHitStop())
-		{
-			return 0f;
-		}
-		if (!isPause)
-		{
-			switch (actionID)
-			{
-			case ACTION_ID.ATTACK:
-				return buffParam.GetAtkSpeed();
-			case ACTION_ID.MOVE:
-				return buffParam.GetMoveSpeed();
-			default:
-				return 1f;
-			}
-		}
-		return 0f;
-	}
-
-	protected void UpdateAnimatorSpeed()
-	{
-		if (animator != null)
-		{
-			animator.set_speed(GetAnimatorSpeed());
-		}
-	}
-
-	public virtual float GetActMotionTime()
-	{
-		float result = 0f;
-		if (actMotionStartTime >= 0f)
-		{
-			result = Time.get_time() - actMotionStartTime;
-		}
-		return result;
-	}
-
-	public virtual bool IsChangeableAction(ACTION_ID action_id)
-	{
-		if (base.isLoading)
-		{
-			return false;
-		}
-		if (!isControllable && !enableMotionCancel)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	public virtual void OnActReaction()
-	{
-		if (base.controller != null)
-		{
-			base.controller.OnActReaction();
-		}
-	}
-
-	public virtual void ActIdle(bool is_sync = false, float transitionTime = -1f)
-	{
-		bool flag = false;
-		ACTION_ID lastActionID = this.lastActionID;
-		if (actionID == ACTION_ID.IDLE)
-		{
-			flag = true;
-		}
-		EndAction();
-		if (flag)
-		{
-			this.lastActionID = lastActionID;
-		}
-		actionID = ACTION_ID.IDLE;
-		if (!IsPlayingMotion(2, true))
-		{
-			PlayMotion(2, transitionTime);
-		}
-		isControllable = true;
-		if (characterSender != null)
-		{
-			characterSender.OnActIdle(is_sync);
-		}
-	}
-
-	public virtual void SafeActIdle()
-	{
-		if (!base.isLoading && !isDead)
-		{
-			ActIdle(false, -1f);
-		}
-	}
-
-	public virtual void SetLerpRotation(Vector3 velocity)
-	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		velocity.y = 0f;
-		lerpRotateVec = velocity;
-	}
-
-	public bool IsArrivalPosition(Vector3 pos, float margin = 0)
-	{
-		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 val = pos - _position;
-		val.y = 0f;
-		return val.get_magnitude() < moveStopRange + margin;
-	}
-
-	public bool IsHittingIceFloor()
-	{
-		return hittingIceFloor.Count > 0 && !isDead;
-	}
-
-	public void OnHitEnterIceFloor(GameObject iceFloor)
-	{
-		if (!hittingIceFloor.Contains(iceFloor))
-		{
-			hittingIceFloor.Add(iceFloor);
-		}
-	}
-
-	public void OnHitExitIceFloor(GameObject iceFloor)
-	{
-		hittingIceFloor.Remove(iceFloor);
-	}
-
-	public void ActMoveInertia(ref Vector3 slideVerocity)
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		SetVelocity(slideVerocity, VELOCITY_TYPE.ACT_MOVE);
-	}
-
-	public virtual void ActMoveVelocity(Vector3 velocity_, float sync_speed, MOTION_ID motion_id = MOTION_ID.WALK)
-	{
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-		if (actionID != ACTION_ID.MOVE || !IsPlayingMotion((int)motion_id, true))
-		{
-			EndAction();
-			actionID = ACTION_ID.MOVE;
-			if (!IsPlayingMotion((int)motion_id, true))
-			{
-				PlayMotion((int)motion_id, -1f);
-			}
-			if (characterSender != null)
-			{
-				characterSender.OnActMoveVelocity((int)motion_id);
-			}
-		}
-		moveType = MOVE_TYPE.VELOCITY;
-		moveSyncSpeed = sync_speed;
-		isControllable = true;
-		if (GetVelocity() != velocity_ && velocity_ != Vector3.get_zero())
-		{
-			SetVelocity(velocity_, VELOCITY_TYPE.ACT_MOVE);
-		}
-	}
-
-	public virtual void ActMoveSyncVelocity(float time, Vector3 pos, int motion_id)
-	{
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-		if (actionID != ACTION_ID.MOVE || !IsPlayingMotion(motion_id, true))
-		{
-			EndAction();
-			actionID = ACTION_ID.MOVE;
-			PlayMotion(motion_id, -1f);
-		}
-		moveType = MOVE_TYPE.SYNC_VELOCITY;
-		enableRootMotion = false;
-		moveSyncTime = time;
-		moveTargetPos = pos;
-		moveSyncEnd = false;
-		moveSyncMotionID = motion_id;
-		Vector3 val = moveTargetPos - _position;
-		val.y = 0f;
-		if (moveSyncTime > 0f)
-		{
-			SetVelocity(val.get_normalized() * (val.get_magnitude() / moveSyncTime), VELOCITY_TYPE.ACT_MOVE);
-		}
-		if (val == Vector3.get_zero())
-		{
-			moveSyncDirection = -3.40282347E+38f;
-		}
-		else
-		{
-			Quaternion val2 = Quaternion.LookRotation(val);
-			Vector3 eulerAngles = val2.get_eulerAngles();
-			moveSyncDirection = eulerAngles.y;
-		}
-		moveSyncDirectionTime = charaParameter.moveSyncRotateTime;
-		StartWaitingPacket(WAITING_PACKET.CHARACTER_MOVE_VELOCITY, false, charaParameter.moveSendInterval);
-	}
-
-	public virtual void SetMoveSyncVelocityEnd(float time, Vector3 pos, float direction, float sync_speed, int motion_id)
-	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-		moveSyncTime += time;
-		moveTargetPos = pos;
-		moveSyncEnd = true;
-		moveSyncEndDirection = direction;
-		moveSyncSpeed = sync_speed;
-		moveSyncMotionID = motion_id;
-		Vector3 val = moveTargetPos - _position;
-		val.y = 0f;
-		if (moveSyncSpeed > 0f)
-		{
-			float num = val.get_magnitude() / sync_speed;
-			if (num < moveSyncTime)
-			{
-				moveSyncTime = num;
-			}
-		}
-		if (moveSyncTime > 0f)
-		{
-			SetVelocity(val.get_normalized() * (val.get_magnitude() / moveSyncTime), VELOCITY_TYPE.ACT_MOVE);
-		}
-		if (val == Vector3.get_zero())
-		{
-			moveSyncDirection = -3.40282347E+38f;
-		}
-		else
-		{
-			Quaternion val2 = Quaternion.LookRotation(val);
-			Vector3 eulerAngles = val2.get_eulerAngles();
-			moveSyncDirection = eulerAngles.y;
-		}
-		moveSyncDirectionTime = charaParameter.moveSyncRotateTime;
-		EndWaitingPacket(WAITING_PACKET.CHARACTER_MOVE_VELOCITY);
-	}
-
-	public virtual bool ActMoveToTarget(float max_length = 0f, bool fix_rotate = false)
-	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-		if (actionTarget == null)
-		{
-			return false;
-		}
-		Vector3 val = GetTargetPosition(actionTarget) - _position;
-		val.y = 0f;
-		if (max_length > 0f)
-		{
-			float magnitude = val.get_magnitude();
-			if (magnitude > max_length)
-			{
-				val *= max_length / magnitude;
-			}
-		}
-		return ActMoveToPosition(_position + val, fix_rotate);
-	}
-
-	public virtual bool ActMoveToPosition(Vector3 target_pos, bool fix_rotate = false)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-		if (IsArrivalPosition(target_pos, 0f))
-		{
-			return false;
-		}
-		EndAction();
-		actionID = ACTION_ID.MOVE;
-		PlayMotion(3, -1f);
-		moveTargetPos = target_pos;
-		moveType = MOVE_TYPE.TO_POSITION;
-		if (fix_rotate)
-		{
-			LookAt(moveTargetPos);
-		}
-		if (characterSender != null)
-		{
-			characterSender.OnActMoveToPosition(target_pos);
-		}
-		return true;
-	}
-
-	public virtual bool ActMoveHoming(float max_length = 0f)
-	{
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-		if ((IsCoopNone() || IsOriginal()) && actionTarget == null)
-		{
-			return false;
-		}
-		EndAction();
-		if (IsCoopNone() || IsOriginal())
-		{
-			SetAttackActionPosition();
-		}
-		actionID = ACTION_ID.MOVE;
-		PlayMotion(3, -1f);
-		moveType = MOVE_TYPE.HOMING;
-		periodicSyncActionPositionLastTime = GetActMotionTime();
-		periodicSyncActionPositionFlag = true;
-		SetPeriodicSyncTarget(actionTarget);
-		moveBeforePos = _position;
-		moveMaxDistance = max_length;
-		if (characterSender != null)
-		{
-			characterSender.OnActMoveHoming(max_length);
-		}
-		return true;
-	}
-
-	public virtual bool ActRotateToTarget()
-	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		if (actionTarget == null)
-		{
-			return false;
-		}
-		Vector3 val = GetTargetPosition(actionTarget) - _position;
-		val.y = 0f;
-		if (val == Vector3.get_zero())
-		{
-			return false;
-		}
-		Quaternion val2 = Quaternion.LookRotation(val);
-		Vector3 eulerAngles = val2.get_eulerAngles();
-		float y = eulerAngles.y;
-		return ActRotateToDirection(y);
-	}
-
-	public virtual bool ActRotateToDirection(float direction)
-	{
-		float diff_angle = 0f;
-		int num = CalcDiffAngle(direction, ref diff_angle);
-		if (diff_angle < 1f)
-		{
-			return false;
-		}
-		EndAction();
-		actionID = ACTION_ID.ROTATE;
-		if (!rotateDisableMotion)
-		{
-			if (num > 0)
-			{
-				PlayMotion(5, -1f);
-			}
-			else
-			{
-				PlayMotion(4, -1f);
-			}
-		}
-		enableRootMotion = false;
-		rotateType = ROTATE_TYPE.TO_DIRECTION;
-		rotateDirection = direction;
-		rotateSign = num;
-		rotateVelocity = 0f;
-		if (characterSender != null)
-		{
-			characterSender.OnActRotate(rotateDirection);
-		}
-		return true;
-	}
-
-	public virtual bool ActRotateMotionToTarget(bool keep_rotate = false)
-	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-		if (actionTarget == null)
-		{
-			return false;
-		}
-		Vector3 val = GetTargetPosition(actionTarget) - _position;
-		val.y = 0f;
-		val.Normalize();
-		if (val == Vector3.get_zero())
-		{
-			return false;
-		}
-		Quaternion val2 = Quaternion.LookRotation(val);
-		Vector3 eulerAngles = val2.get_eulerAngles();
-		float y = eulerAngles.y;
-		float diff_angle = 0f;
-		int num = CalcDiffAngle(y, ref diff_angle);
-		float num2 = CalcRotateMotionRate(diff_angle);
-		int num3 = 0;
-		if (keep_rotate)
-		{
-			num3 = rotateTargetCnt + 1;
-		}
-		bool flag = false;
-		float direction = y;
-		if (num2 == 1f && num3 < charaParameter.rotateTargetMaxNum - 1)
-		{
-			Quaternion rotation = _rotation;
-			Vector3 eulerAngles2 = rotation.get_eulerAngles();
-			direction = eulerAngles2.y + (float)num * 90f;
-		}
-		else
-		{
-			flag = true;
-		}
-		bool flag2 = ActRotateMotionToDirection(direction);
-		if (flag2)
-		{
-			rotateType = ROTATE_TYPE.MOTION_TO_TARGET;
-			rotateTargetEnd = flag;
-			rotateTargetCnt = num3;
-		}
-		return flag2;
-	}
-
-	public virtual bool ActRotateMotionToDirection(float direction)
-	{
-		float diff_angle = 0f;
-		int num = CalcDiffAngle(direction, ref diff_angle);
-		if (diff_angle < 1f)
-		{
-			return false;
-		}
-		EndAction();
-		actionID = ACTION_ID.ROTATE;
-		if (num > 0)
-		{
-			PlayMotion(5, -1f);
-		}
-		else
-		{
-			PlayMotion(4, -1f);
-		}
-		rotateDirection = direction;
-		rotateSign = num;
-		rootRotationRate = CalcRotateMotionRate(diff_angle);
-		rotateType = ROTATE_TYPE.MOTION_TO_DIRECTION;
-		if (characterSender != null)
-		{
-			characterSender.OnActRotateMotion(direction);
-		}
-		return true;
-	}
-
-	protected float CalcRotateMotionRate(float diff_angle)
-	{
-		float num = Mathf.Abs(diff_angle) / 90f;
-		if (num > 1.2f)
-		{
-			num = 1f;
-		}
-		return num;
-	}
-
-	protected int CalcDiffAngle(float direction, ref float diff_angle)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 forward = _forward;
-		forward.y = 0f;
-		forward.Normalize();
-		Vector3 val = Quaternion.AngleAxis(direction, Vector3.get_up()) * Vector3.get_forward();
-		diff_angle = Vector3.Angle(forward, val);
-		Vector3 val2 = Vector3.Cross(forward, val);
-		return (val2.y >= 0f) ? 1 : (-1);
-	}
-
-	public virtual void ActDamage()
-	{
-		EndAction();
-		actionID = ACTION_ID.DAMAGE;
-		PlayMotion(6, -1f);
-		OnActReaction();
-	}
-
-	public virtual void ActDead(bool force_sync = false, bool recieve = false)
-	{
-		EndAction();
-		actionID = ACTION_ID.DEAD;
-		PlayMotion(7, -1f);
-		Die();
-		OnActReaction();
-		if (characterSender != null && force_sync)
-		{
-			characterSender.OnActDead();
-		}
-	}
-
-	public void Die()
-	{
-		hp = 0;
-		isDead = true;
-		hitOffFlag |= HIT_OFF_FLAG.DEAD;
-		base._collider.set_enabled(false);
-		buffParam.AllBuffEnd(false);
-		continusAttackParam.RemoveAll();
-	}
-
-	public virtual void VanishLocal()
-	{
-		PrepareVanishLocal();
-	}
-
-	public virtual void PrepareVanishLocal()
-	{
-		EndAction();
-		int hp = this.hp;
-		Die();
-		this.hp = hp;
-	}
-
-	public virtual void OnDeadEnd()
-	{
-	}
-
-	public virtual void ActParalyze()
-	{
-		if (IsDebuffShadowSealing())
-		{
-			if (shadowSealingStackDebuff.Contains(ACTION_ID.PARALYZE))
-			{
-				return;
-			}
-			shadowSealingStackDebuff.Add(ACTION_ID.PARALYZE);
-			if (object.ReferenceEquals(paralyzeEffectTrans, null))
-			{
-				AnimEventData.EventData eventData = new AnimEventData.EventData();
-				eventData.intArgs = new int[0];
-				eventData.floatArgs = new float[1]
-				{
-					paralyzeEffectScale
-				};
-				eventData.stringArgs = new string[2]
-				{
-					paralyzeEffectName,
-					string.Empty
-				};
-				paralyzeEffectTrans = AnimEventFormat.EffectEventExec(AnimEventFormat.ID.EFFECT, eventData, base._transform, true, EffectNameAnalyzer, ((StageObject)this).FindNode, this);
-			}
-		}
-		else
-		{
-			EndAction();
-			actionID = ACTION_ID.PARALYZE;
-			PlayMotion(8, -1f);
-		}
-		OnActReaction();
-	}
-
-	protected bool UpdateParalyzeAction()
-	{
-		if (paralyzeTime - Time.get_time() > 0f)
-		{
-			return false;
-		}
-		ActParalyzeEnd();
-		if (!IsDebuffShadowSealing())
-		{
-			SetNextTrigger(0);
-		}
-		return true;
-	}
-
-	protected virtual void ActParalyzeEnd()
-	{
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Expected O, but got Unknown
-		badStatusTotal.paralyze = 0f;
-		if (IsDebuffShadowSealing())
-		{
-			_EndDebuffAction(ACTION_ID.PARALYZE);
-			if (!object.ReferenceEquals(paralyzeEffectTrans, null))
-			{
-				EffectManager.ReleaseEffect(paralyzeEffectTrans.get_gameObject(), true, false);
-				paralyzeEffectTrans = null;
-			}
-			if (shadowSealingStackDebuff.Contains(ACTION_ID.PARALYZE))
-			{
-				shadowSealingStackDebuff.Remove(ACTION_ID.PARALYZE);
-			}
-		}
-	}
-
-	public bool IsParalyze()
-	{
-		return actionID == ACTION_ID.PARALYZE || shadowSealingStackDebuff.Contains(ACTION_ID.PARALYZE);
-	}
-
-	public virtual void ActFreezeStart()
-	{
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		if (!IsFreeze())
-		{
-			if (IsDebuffShadowSealing())
-			{
-				if (!shadowSealingStackDebuff.Contains(ACTION_ID.FREEZE))
-				{
-					shadowSealingStackDebuff.Add(ACTION_ID.FREEZE);
-				}
-			}
-			else
-			{
-				EndAction();
-				actionID = ACTION_ID.FREEZE;
-				PlayMotion(6, -1f);
-			}
-			CreateFreezeEffect();
-			SwitchFreezeShader();
-			m_freezeTimer = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.freezeParam.duration;
-			m_freezeHeight = 0f;
-			if (base._rigidbody != null)
-			{
-				base._rigidbody.set_velocity(Vector3.get_zero());
-			}
-			rotateEventKeep = false;
-			rotateToTargetFlag = false;
-			rotateEventSpeed = 0f;
-			OnActReaction();
-		}
-	}
-
-	protected virtual void ActFreezeEnd()
-	{
-		if (IsFreeze())
-		{
-			if (m_effectFreeze != null)
-			{
-				EffectManager.ReleaseEffect(m_effectFreeze, true, false);
-				m_effectFreeze = null;
-			}
-			RestoreShader();
-			badStatusTotal.freeze = 0f;
-			if (IsDebuffShadowSealing())
-			{
-				_EndDebuffAction(ACTION_ID.FREEZE);
-				if (shadowSealingStackDebuff.Contains(ACTION_ID.FREEZE))
-				{
-					shadowSealingStackDebuff.Remove(ACTION_ID.FREEZE);
-				}
-			}
-			else
-			{
-				setPause(false);
-				m_isStopMotionByDebuff = false;
-			}
-		}
-	}
-
-	protected bool UpdateFreezeAction()
-	{
-		//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		if (!IsFreeze())
-		{
-			return false;
-		}
-		UpdateFreezeShader();
-		m_freezeTimer -= Time.get_deltaTime();
-		if (m_freezeTimer <= 0f)
-		{
-			ActFreezeEnd();
-			return true;
-		}
-		AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-		if (currentAnimatorStateInfo.get_normalizedTime() < 0.1f || currentAnimatorStateInfo.get_fullPathHash() != Animator.StringToHash("Base Layer.damage"))
-		{
-			return false;
-		}
-		if (m_isStopMotionByDebuff)
-		{
-			return false;
-		}
-		setPause(true);
-		m_isStopMotionByDebuff = true;
-		return false;
-	}
-
-	private void SwitchFreezeShader()
-	{
-		if (m_rendererList != null)
-		{
-			Utility.MaterialForEach(m_rendererList, delegate(Material material)
-			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				string name = material.get_shader().get_name();
-				Shader val = ResourceUtility.FindShader(name.Replace("enemy_", "freeze_enemy_"));
-				if (val != null)
-				{
-					material.set_shader(val);
-					if (material.HasProperty("_Height"))
-					{
-						material.SetFloat("_Height", 0f);
-					}
-				}
-			});
-		}
-	}
-
-	private void RestoreShader()
-	{
-		if (m_rendererList != null)
-		{
-			Utility.MaterialForEach(m_rendererList, delegate(Material material)
-			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				string name = material.get_shader().get_name();
-				Shader val = ResourceUtility.FindShader(name.Replace("freeze_", string.Empty));
-				if (val != null)
-				{
-					material.set_shader(val);
-				}
-			});
-		}
-	}
-
-	private void UpdateFreezeShader()
-	{
-		if (m_rendererList != null)
-		{
-			m_freezeHeight += 5f * Time.get_deltaTime();
-			if (m_freezeHeight > 30f)
-			{
-				m_freezeHeight = 30f;
-			}
-			Utility.MaterialForEach(m_rendererList, delegate(Material material)
-			{
-				if (material.HasProperty("_Height"))
-				{
-					material.SetFloat("_Height", m_freezeHeight);
-				}
-			});
-		}
-	}
-
-	private void CreateFreezeEffect()
-	{
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Expected O, but got Unknown
-		Transform effect = EffectManager.GetEffect("ef_btl_pl_frozen_01", base._transform);
-		if (effect != null)
-		{
-			ParticleSystem[] componentsInChildren = effect.GetComponentsInChildren<ParticleSystem>(true);
-			if (componentsInChildren != null)
-			{
-				CalcFreezeEffectEmissionRadius();
-				for (int i = 0; i < componentsInChildren.Length; i++)
-				{
-					ShapeModule shape = componentsInChildren[i].get_shape();
-					shape.set_radius(m_emissionRadius);
-				}
-			}
-			Transform obj = effect;
-			obj.set_localPosition(obj.get_localPosition() + Vector3.get_up() * m_emissionRadius);
-			m_effectFreeze = effect.get_gameObject();
-		}
-	}
-
-	protected void CalcFreezeEffectEmissionRadius()
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		if (!(m_emissionRadius > 0f))
-		{
-			Vector3 localScale = base._transform.get_localScale();
-			m_emissionRadius = localScale.x;
-			if (!(base._collider == null))
-			{
-				SphereCollider val = base._collider as SphereCollider;
-				if (val != null)
-				{
-					m_emissionRadius *= val.get_radius();
-				}
-				else
-				{
-					CapsuleCollider val2 = base._collider as CapsuleCollider;
-					if (val2 != null)
-					{
-						m_emissionRadius *= val2.get_radius();
-					}
-				}
-			}
-		}
-	}
-
-	public bool IsFreeze()
-	{
-		return m_effectFreeze != null;
-	}
-
-	protected float GetEmittionRadius()
-	{
-		return m_emissionRadius;
-	}
-
-	public virtual bool IsDebuffShadowSealing()
-	{
-		return false;
-	}
-
-	protected void CreateElectricShockEffect()
-	{
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Expected O, but got Unknown
-		Transform effect = EffectManager.GetEffect("ef_btl_enm_shock_01", base._transform);
-		if (effect != null)
-		{
-			ParticleSystem[] componentsInChildren = effect.GetComponentsInChildren<ParticleSystem>(true);
-			if (componentsInChildren != null)
-			{
-				CalcFreezeEffectEmissionRadius();
-				for (int i = 0; i < componentsInChildren.Length; i++)
-				{
-					ShapeModule shape = componentsInChildren[i].get_shape();
-					shape.set_radius(m_emissionRadius);
-				}
-			}
-			Transform obj = effect;
-			obj.set_localPosition(obj.get_localPosition() + Vector3.get_up() * m_emissionRadius);
-			m_effectElectricShock = effect.get_gameObject();
-		}
-	}
-
-	public virtual bool IsInkSplash()
-	{
-		return false;
-	}
-
-	public virtual void ActAttack(int id, bool send_packet = true, bool sync_immediately = false)
-	{
-		EndAction();
-		isControllable = false;
-		actionID = ACTION_ID.ATTACK;
-		attackID = id;
-		PlayMotion(15 + id, -1f);
-		if (IsCoopNone() || IsOriginal())
-		{
-			SyncRandomSeed = Random.Range(-2147483648, 2147483647);
-			SetAttackActionPosition();
-		}
-		attackStartTarget = actionTarget;
-		if (send_packet && characterSender != null)
-		{
-			characterSender.OnActAttack(id, sync_immediately, SyncRandomSeed);
-		}
-	}
-
-	public virtual void SetAttackActionPosition()
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		if (actionTarget != null)
-		{
-			SetActionPosition(GetTargetPosition(actionTarget), true);
-		}
-		else
-		{
-			SetActionPosition(Vector3.get_zero(), false);
-		}
-	}
-
-	protected virtual void UpdateAction()
-	{
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-		//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0221: Unknown result type (might be due to invalid IL or missing references)
-		//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-		//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_027f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0295: Unknown result type (might be due to invalid IL or missing references)
-		//IL_029a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0389: Unknown result type (might be due to invalid IL or missing references)
-		//IL_038e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0392: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0397: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03df: Unknown result type (might be due to invalid IL or missing references)
-		switch (actionID)
-		{
-		case ACTION_ID.FREEZE:
-			UpdateFreezeAction();
-			break;
-		case ACTION_ID.MOVE:
-			if (moveType == MOVE_TYPE.TO_POSITION || moveType == MOVE_TYPE.HOMING)
-			{
-				if (moveType == MOVE_TYPE.HOMING)
-				{
-					if (!actionPositionFlag)
-					{
-						ActIdle(false, -1f);
-						break;
-					}
-					if (moveMaxDistance > 0f)
-					{
-						Vector3 val = _position - moveBeforePos;
-						val.y = 0f;
-						moveNowDistance += val.get_magnitude();
-						moveBeforePos = _position;
-						if (moveNowDistance >= moveMaxDistance)
-						{
-							ActIdle(false, -1f);
-							break;
-						}
-					}
-					moveTargetPos = actionPosition;
-				}
-				if (IsWallStay())
-				{
-					ActIdle(true, -1f);
-				}
-				else if (IsArrivalPosition(moveTargetPos, 0f))
-				{
-					ActIdle(false, -1f);
-				}
-				else
-				{
-					Vector3 val2 = moveTargetPos - _position;
-					val2.y = 0f;
-					val2.Normalize();
-					Vector3 forward = _forward;
-					forward.y = 0f;
-					forward.Normalize();
-					float num3 = Vector3.Angle(forward, val2);
-					if (num3 > 90f)
-					{
-						ActIdle(false, -1f);
-					}
-					else
-					{
-						Vector3 val3 = Vector3.Cross(forward, val2);
-						int num4 = (val3.y >= 0f) ? 1 : (-1);
-						Quaternion rotation2 = _rotation;
-						Vector3 eulerAngles2 = rotation2.get_eulerAngles();
-						float num5 = Mathf.SmoothDampAngle(0f, num3 * (float)num4, ref rotateVelocity, moveRotateMinimumTime, moveRotateMaxSpeed, Time.get_deltaTime());
-						_rotation = Quaternion.Euler(eulerAngles2.x, eulerAngles2.y + num5, eulerAngles2.z);
-					}
-				}
-			}
-			else if (moveType == MOVE_TYPE.SYNC_VELOCITY)
-			{
-				if (moveSyncDirection != -3.40282347E+38f)
-				{
-					if (moveSyncDirectionTime > 0f)
-					{
-						_rotation = Quaternion.Slerp(_rotation, Quaternion.AngleAxis(moveSyncDirection, Vector3.get_up()), Time.get_deltaTime() / moveSyncDirectionTime);
-					}
-					else
-					{
-						_rotation = Quaternion.AngleAxis(moveSyncDirection, Vector3.get_up());
-					}
-				}
-				moveSyncTime -= Time.get_deltaTime();
-				moveSyncDirectionTime -= Time.get_deltaTime();
-				if (moveSyncTime <= 0f)
-				{
-					_position = moveTargetPos;
-					if (moveSyncEnd)
-					{
-						_rotation = Quaternion.AngleAxis(moveSyncEndDirection, Vector3.get_up());
-						ActIdle(false, -1f);
-					}
-				}
-			}
-			else if (moveType == MOVE_TYPE.SIDEWAYS)
-			{
-				UpdateMoveSideAction();
-			}
-			break;
-		case ACTION_ID.ROTATE:
-			if (rotateType == ROTATE_TYPE.TO_DIRECTION)
-			{
-				float diff_angle = 0f;
-				int num = CalcDiffAngle(rotateDirection, ref diff_angle);
-				if (num != rotateSign)
-				{
-					ActIdle(false, -1f);
-					return;
-				}
-				if (diff_angle < 0.1f)
-				{
-					ActIdle(false, -1f);
-					return;
-				}
-				Quaternion rotation = _rotation;
-				Vector3 eulerAngles = rotation.get_eulerAngles();
-				float num2 = Mathf.SmoothDampAngle(0f, diff_angle * (float)rotateSign, ref rotateVelocity, rotateMinimumTime, rotateMaxSpeed, Time.get_deltaTime());
-				_rotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y + num2, eulerAngles.z);
-			}
-			break;
-		case ACTION_ID.PARALYZE:
-			UpdateParalyzeAction();
-			break;
-		case ACTION_ID.MOVE_POINT:
-			UpdateMovePointAction();
-			break;
-		case ACTION_ID.MOVE_LOOKAT:
-			UpdateMoveLookAtAction();
-			break;
-		}
-		if (IsPlayingMotion(1, true))
-		{
-			OnPlayingEndMotion();
-		}
-	}
-
-	public virtual bool ActMoveSideways(int moveAngleSign = 0, bool isPacket = false)
-	{
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-		if ((IsCoopNone() || IsOriginal()) && actionTarget == null)
-		{
-			return false;
-		}
-		EndAction();
-		if (IsCoopNone() || IsOriginal())
-		{
-			SetAttackActionPosition();
-		}
-		actionID = ACTION_ID.MOVE;
-		MOTION_ID motion_id = MOTION_ID.MOVE_SIDE_R;
-		if (!isPacket)
-		{
-			switch (moveAngleSign)
-			{
-			case 0:
-			{
-				Vector3 val = _position - actionPosition;
-				val.y = 0f;
-				Vector3 target_pos = actionPosition + Quaternion.AngleAxis(0f - moveAngle_deg, Vector3.get_up()) * val;
-				Vector3 target_pos2 = actionPosition + Quaternion.AngleAxis(moveAngle_deg, Vector3.get_up()) * val;
-				RaycastHit hit = default(RaycastHit);
-				RaycastHit hit2 = default(RaycastHit);
-				bool flag = AIUtility.RaycastObstacle(this, target_pos, out hit);
-				bool flag2 = AIUtility.RaycastObstacle(this, target_pos2, out hit2);
-				if (flag && flag2)
-				{
-					m_moveAngleSign = 0;
-				}
-				else if (flag)
-				{
-					m_moveAngleSign = 1;
-				}
-				else if (flag2)
-				{
-					m_moveAngleSign = -1;
-				}
-				else
-				{
-					m_moveAngleSign = ((Random.Range(0, 2) == 0) ? 1 : (-1));
-				}
-				break;
-			}
-			case -1:
-			case 1:
-				m_moveAngleSign = moveAngleSign;
-				break;
-			}
-		}
-		else if (moveAngleSign == 0 || moveAngleSign == 1 || moveAngleSign == -1)
-		{
-			m_moveAngleSign = moveAngleSign;
-		}
-		switch (m_moveAngleSign)
-		{
-		case 1:
-			motion_id = MOTION_ID.MOVE_SIDE_L;
-			break;
-		case -1:
-			motion_id = MOTION_ID.MOVE_SIDE_R;
-			break;
-		}
-		PlayMotion((int)motion_id, -1f);
-		moveType = MOVE_TYPE.SIDEWAYS;
-		if (characterSender != null)
-		{
-			characterSender.OnActMoveSideways(m_moveAngleSign);
-		}
-		return true;
-	}
-
-	private void UpdateMoveSideAction()
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-		//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-		//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-		if (m_moveAngleSign == 0)
-		{
-			ActIdle(false, -1f);
-		}
-		else
-		{
-			Vector3 val = actionPosition - _position;
-			val.y = 0f;
-			val.Normalize();
-			Vector3 forward = _forward;
-			forward.y = 0f;
-			forward.Normalize();
-			m_diffAngle_deg = Vector3.Angle(forward, val);
-			if (m_diffAngle_deg > 90f)
-			{
-				ActIdle(false, -1f);
-			}
-			else
-			{
-				Vector3 val2 = Vector3.Cross(forward, val);
-				int num = (val2.y >= 0f) ? 1 : (-1);
-				m_diffAngle_deg *= (float)num;
-				Quaternion rotation = _rotation;
-				Vector3 eulerAngles = rotation.get_eulerAngles();
-				float num2 = Mathf.SmoothDampAngle(0f, m_diffAngle_deg, ref rotateVelocity, rotateMinimumTime, rotateMaxSpeed, Time.get_deltaTime());
-				_rotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y + num2, eulerAngles.z);
-				Vector3 val3 = _position - actionPosition;
-				val3.Normalize();
-				val3 *= AIUtility.GetLengthWithBetweenPosition(_position, actionPosition);
-				float num3 = moveAngle_deg * Time.get_deltaTime();
-				float num4 = moveAngleSpeed_deg * Time.get_deltaTime();
-				if (num3 > num4)
-				{
-					num3 = num4;
-				}
-				val3 = Quaternion.AngleAxis(num3 * (float)m_moveAngleSign, Vector3.get_up()) * val3;
-				Vector3 val4 = actionPosition + val3 - _position;
-				_position += val4;
-				m_movedAngle_deg += num3;
-				if (moveAngle_deg <= m_movedAngle_deg)
-				{
-					SetNextTrigger(0);
-				}
-			}
-		}
-	}
-
-	protected void SetStateMovePoint(STATE_MOVE_POINT state)
-	{
-		stateMovePoint = state;
-	}
-
-	public virtual void ActMovePoint(Vector3 targetPos)
-	{
-	}
-
-	protected virtual void UpdateMovePointAction()
-	{
-	}
-
-	protected bool IsNeedToRotate(Vector3 targetDir)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		float num = Vector3.Dot(_forward, targetDir);
-		if (num >= 1f)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	protected void SetStateMoveLookAt(STATE_MOVE_LOOKAT state)
-	{
-		stateMoveLookAt = state;
-	}
-
-	public virtual void ActMoveLookAt(Vector3 moveLookAtPos, bool isPacket = false)
-	{
-	}
-
-	protected virtual void UpdateMoveLookAtAction()
-	{
-	}
-
-	protected virtual void OnPlayingEndMotion()
-	{
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-		bool flag = false;
-		ACTION_ID actionID = this.actionID;
-		if (actionID == ACTION_ID.ROTATE)
-		{
-			if (rotateType == ROTATE_TYPE.MOTION_TO_TARGET)
-			{
-				if (rotateTargetEnd)
-				{
-					ActIdle(false, -1f);
-					return;
-				}
-				if (actionTarget == null)
-				{
-					ActIdle(false, -1f);
-					return;
-				}
-				Vector3 val = GetTargetPosition(actionTarget) - _position;
-				val.y = 0f;
-				val.Normalize();
-				if (val == Vector3.get_zero())
-				{
-					ActIdle(false, -1f);
-					return;
-				}
-				Quaternion val2 = Quaternion.LookRotation(val);
-				Vector3 eulerAngles = val2.get_eulerAngles();
-				float y = eulerAngles.y;
-				float diff_angle = 0f;
-				int num = CalcDiffAngle(y, ref diff_angle);
-				if (num != rotateSign)
-				{
-					ActIdle(false, -1f);
-					return;
-				}
-				if (diff_angle < 10f)
-				{
-					ActIdle(false, -1f);
-					return;
-				}
-				ActRotateMotionToTarget(true);
-			}
-			else if (rotateType == ROTATE_TYPE.MOTION_TO_DIRECTION)
-			{
-				float diff_angle2 = 0f;
-				int num2 = CalcDiffAngle(rotateDirection, ref diff_angle2);
-				if (num2 != rotateSign)
-				{
-					ActIdle(false, -1f);
-					return;
-				}
-				if (diff_angle2 < 10f)
-				{
-					ActIdle(false, -1f);
-					return;
-				}
-				rootRotationRate = CalcRotateMotionRate(diff_angle2);
-				if (rotateSign > 0)
-				{
-					PlayMotion(5, -1f);
-				}
-				else
-				{
-					PlayMotion(4, -1f);
-				}
-			}
-			else
-			{
-				flag = true;
-			}
-		}
-		else
-		{
-			flag = true;
-		}
-		if (flag)
-		{
-			isPlayingEndMotion = true;
-			ActIdle(false, -1f);
-		}
-	}
-
-	protected virtual void EndAction()
-	{
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03da: Unknown result type (might be due to invalid IL or missing references)
-		//IL_047a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_047f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0497: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04bc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0520: Unknown result type (might be due to invalid IL or missing references)
-		//IL_05f6: Unknown result type (might be due to invalid IL or missing references)
-		if (base.isInitialized)
-		{
-			if (animEventProcessor != null)
-			{
-				animEventProcessor.ExecuteLastEvent(true);
-			}
-			if (characterSender != null)
-			{
-				characterSender.OnEndAction();
-			}
-			if (base.controller != null)
-			{
-				base.controller.OnCharacterEndAction((int)actionID);
-			}
-			switch (actionID)
-			{
-			case ACTION_ID.MOVE:
-				moveType = MOVE_TYPE.NONE;
-				rotateVelocity = 0f;
-				moveTargetPos = Vector3.get_zero();
-				moveSyncDirection = 0f;
-				moveSyncDirectionTime = 0f;
-				moveSyncTime = 0f;
-				moveSyncEnd = false;
-				moveSyncEndDirection = 0f;
-				moveSyncSpeed = 0f;
-				moveSyncMotionID = 0;
-				moveBeforePos = Vector3.get_zero();
-				moveNowDistance = 0f;
-				moveMaxDistance = 0f;
-				m_movedAngle_deg = 0f;
-				m_diffAngle_deg = 0f;
-				m_moveAngleSign = 0;
-				break;
-			case ACTION_ID.ROTATE:
-				rotateDirection = 0f;
-				rotateSign = 0;
-				rotateVelocity = 0f;
-				rootRotationRate = 1f;
-				rotateTargetEnd = false;
-				rotateTargetCnt = 0;
-				break;
-			case ACTION_ID.ATTACK:
-				attackID = 0;
-				break;
-			case ACTION_ID.PARALYZE:
-				ActParalyzeEnd();
-				break;
-			case ACTION_ID.FREEZE:
-				ActFreezeEnd();
-				break;
-			}
-			EndWaitingPacket(WAITING_PACKET.CHARACTER_MOVE_VELOCITY);
-			EndWaitingPacket(WAITING_PACKET.CHARACTER_UPDATE_ACTION_POSITION);
-			EndWaitingPacket(WAITING_PACKET.CHARACTER_UPDATE_DIRECTION);
-			int i = 0;
-			for (int count = objectList.Count; i < count; i++)
-			{
-				if (objectTypeAutoDelete[i])
-				{
-					DestroyObjectList((OBJECT_LIST_TYPE)i);
-				}
-			}
-			if (animator != null)
-			{
-				int j = 0;
-				for (int count2 = changeTriggerList.Count; j < count2; j++)
-				{
-					animator.ResetTrigger(changeTriggerList[j]);
-				}
-				changeTriggerList.Clear();
-			}
-			if (animator != null)
-			{
-				int k = 0;
-				for (int count3 = animatorBoolList.Count; k < count3; k++)
-				{
-					animator.SetBool(animatorBoolList[k], false);
-				}
-				animatorBoolList.Clear();
-			}
-			int l = 0;
-			for (int count4 = animEventColliderList.Count; l < count4; l++)
-			{
-				if (!animEventColliderList[l].isReleased)
-				{
-					animEventColliderList[l].ReserveRelease();
-				}
-			}
-			if (hideRendererList.Count > 0)
-			{
-				List<string> range = hideRendererList.GetRange(0, hideRendererList.Count);
-				int m = 0;
-				for (int count5 = range.Count; m < count5; m++)
-				{
-					SetEnableNodeRenderer(range[m], true);
-				}
-			}
-			if (referenceCheckerFlag)
-			{
-				attackHitChecker = new AttackHitChecker();
-				referenceCheckerFlag = false;
-			}
-			int n = 0;
-			for (int count6 = loopSeForceEndList.Count; n < count6; n++)
-			{
-				if (loopSeForceEndList[n] >= 0)
-				{
-					SoundManager.LoopOff(loopSeForceEndList[n], this);
-				}
-			}
-			loopSeForceEndList.Clear();
-			wallStayTimer = 0f;
-			isControllable = false;
-			enableMotionCancel = false;
-			enableMoveSuppress = false;
-			SetVelocity(Vector3.get_zero(), VELOCITY_TYPE.NONE);
-			addForce = Vector3.get_zero();
-			actionMoveRate = 1f;
-			rootMotionMoveRate = 1f;
-			if (animator != null)
-			{
-				animator.set_applyRootMotion(true);
-			}
-			enableRootMotion = true;
-			rotateEventSpeed = 0f;
-			rotateEventDirection = 0f;
-			rotateEventKeep = false;
-			rotateToTargetFlag = false;
-			rotateToTargetDiffAngle = 0f;
-			rotateSafeMode = false;
-			hitOffFlag &= ~HIT_OFF_FLAG.INVICIBLE;
-			hitOffFlag &= ~HIT_OFF_FLAG.DEAD;
-			enableEventMove = false;
-			eventMoveVelocity = Vector3.get_zero();
-			eventMoveTimeCount = 0f;
-			enableAddForce = false;
-			addForceBeforePos = Vector3.get_zero();
-			waitAddForce = false;
-			lastActionID = actionID;
-			actionID = ACTION_ID.NONE;
-			actionPosition = Vector3.get_zero();
-			targetPointPos = Vector3.get_zero();
-			actionPositionFlag = false;
-			actionPositionWaitSync = false;
-			actionPositionWaitTrigger = null;
-			directionWaitSync = false;
-			directionWaitTrigger = null;
-			periodicSyncActionPositionFlag = false;
-			periodicSyncActionPositionLastTime = 0f;
-			periodicSyncActionPositionList.Clear();
-			attackStartTarget = null;
-			isDead = false;
-			lerpRotateVec = Vector3.get_zero();
-			enableReactionDelay = false;
-			isPlayingEndMotion = false;
-			actionRendererModel = null;
-			actionRendererNodeName = null;
-			actMotionStartTime = -1f;
-			isWallStay = false;
-			wallStayTimer = 0f;
-			SetPeriodicSyncTarget(null);
-			if (stepCtrl != null)
-			{
-				stepCtrl.enableAutoStampEffect = true;
-			}
-			if (base._collider != null)
-			{
-				base._collider.set_enabled(true);
-			}
-			if (damegeRemainEffect != null)
-			{
-				EffectManager.ReleaseEffect(damegeRemainEffect, true, false);
-				damegeRemainEffect = null;
-			}
-			if (animEventProcessor != null)
-			{
-				animEventProcessor.IgnoreEventByNextAnim();
-			}
-			if (actionRendererInstance != null)
-			{
-				Object.Destroy(actionRendererInstance.get_gameObject());
-				actionRendererInstance = null;
-			}
-			DeleteExAtkColliderAll();
-		}
-	}
-
-	protected virtual void _EndDebuffAction(ACTION_ID beforeActId)
-	{
-	}
-
-	private static string _GetMotionStateName(int motion_id)
-	{
-		if (motion_id < 115)
-		{
-			stateNameBuilder.Length = 0;
-			stateNameBuilder.Append("Base Layer.");
-			if (motion_id >= 15 && motion_id <= 114)
-			{
-				stateNameBuilder.AppendFormat(motionStateName[15], motion_id - 15);
-			}
-			else
-			{
-				stateNameBuilder.Append(motionStateName[motion_id]);
-			}
-			return stateNameBuilder.ToString();
-		}
-		return null;
-	}
-
-	protected virtual string GetMotionStateName(int motion_id)
-	{
-		if (motion_id < 115)
-		{
-			return _GetMotionStateName(motion_id);
-		}
-		return null;
-	}
-
-	public int GetMotionHash(int motion_id)
-	{
-		int num = _GetCachedHash(motion_id);
-		if (num != 0)
-		{
-			return num;
-		}
-		string text = GetMotionStateName(motion_id);
-		if (text == null)
-		{
-			return 0;
-		}
-		num = GetMotionHash(text);
-		_CacheHash(motion_id, num);
-		return num;
-	}
-
-	protected virtual int _GetCachedHash(int motion_id)
-	{
-		if (motion_id < 0 || motion_id >= 15)
-		{
-			return 0;
-		}
-		return motionHashCaches[motion_id];
-	}
-
-	protected virtual void _CacheHash(int motion_id, int hash)
-	{
-		if (motion_id >= 0 && motion_id < 15)
-		{
-			motionHashCaches[motion_id] = hash;
-		}
-	}
-
-	public int GetMotionHash(string state_name)
-	{
-		int num = 0;
-		object obj = motionHash.Get(state_name);
-		if (obj == null)
-		{
-			num = Animator.StringToHash(state_name);
-			motionHash.Add(state_name, num);
-		}
-		else
-		{
-			num = (int)obj;
-		}
-		return num;
-	}
-
-	public bool PlayMotion(int motion_id, float transition_time = -1f)
-	{
-		string text = GetMotionStateName(motion_id);
-		if (string.IsNullOrEmpty(text))
-		{
-			Log.Warning(LOG.INGAME, "Character::PlayMotion motion_id is none");
-			return false;
-		}
-		bool result = _PlayMotion(text, null, transition_time);
-		if (base.controller != null)
-		{
-			base.controller.OnCharacterPlayMotion(motion_id);
-		}
-		return result;
-	}
-
-	public bool PlayMotion(string anim_format_name, float _transition_time = -1f)
-	{
-		if (string.IsNullOrEmpty(anim_format_name))
-		{
-			Log.Warning(LOG.INGAME, "Character::PlayMotion anim_format_name is null or empty");
-			return false;
-		}
-		SeparateAnimFormatName(anim_format_name, out string ctrl_name, out string state_name);
-		if (string.IsNullOrEmpty(state_name))
-		{
-			Log.Warning(LOG.INGAME, "Character::PlayMotion state_name is null or empty");
-			return false;
-		}
-		return _PlayMotion("Base Layer." + state_name, ctrl_name, _transition_time);
-	}
-
-	public static void SeparateAnimFormatName(string anim_format_name, out string ctrl_name, out string state_name)
-	{
-		ctrl_name = null;
-		state_name = null;
-		if (!string.IsNullOrEmpty(anim_format_name))
-		{
-			int num = anim_format_name.IndexOf("@");
-			if (num < 0)
-			{
-				state_name = anim_format_name;
-			}
-			else
-			{
-				ctrl_name = anim_format_name.Substring(0, num);
-				state_name = anim_format_name.Substring(num + 1, anim_format_name.Length - (num + 1));
-				if (ctrl_name == string.Empty)
-				{
-					ctrl_name = state_name.ToUpper();
-				}
-			}
-		}
-	}
-
-	public static string GetCtrlNameFromAnimFormatName(string anim_format_name)
-	{
-		SeparateAnimFormatName(anim_format_name, out string ctrl_name, out string _);
-		return ctrl_name;
-	}
-
-	protected bool _PlayMotion(string state_name, string controller_name = null, float _transition_time = -1f)
-	{
-		if (string.IsNullOrEmpty(state_name))
-		{
-			Log.Warning(LOG.INGAME, "Character::_PlayMotion state_name is null or empty");
-			return false;
-		}
-		nextAnimCtrlName = controller_name;
-		nextMotionHash = GetMotionHash(state_name);
-		nextMotionTransitionTime = _transition_time;
-		hitOffFlag |= HIT_OFF_FLAG.PLAY_MOTION;
-		return true;
-	}
-
-	public virtual RuntimeAnimatorController GetAnimCtrl(string ctrl_name)
-	{
-		return null;
-	}
-
-	public virtual AnimEventData GetAnimEvent(string ctrl_name)
-	{
-		return null;
-	}
-
-	public int GetPlayingMotionHash()
-	{
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		if (animator == null)
-		{
-			return 0;
-		}
-		int num = 0;
-		if (!animator.IsInTransition(0))
-		{
-			AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-			return currentAnimatorStateInfo.get_fullPathHash();
-		}
-		AnimatorStateInfo nextAnimatorStateInfo = animator.GetNextAnimatorStateInfo(0);
-		return nextAnimatorStateInfo.get_fullPathHash();
-	}
-
-	public bool IsPlayingMotion(int motion_id, bool check_next = true)
-	{
-		int num = GetMotionHash(motion_id);
-		if (check_next)
-		{
-			if (nextMotionHash != 0)
-			{
-				return nextMotionHash == num;
-			}
-			int num2 = 0;
-			if (animEventProcessor != null)
-			{
-				num2 = animEventProcessor.GetWaitMotionHash();
-			}
-			if (num2 != 0)
-			{
-				return num2 == num;
-			}
-		}
-		return GetPlayingMotionHash() == num;
-	}
-
-	public void SetNextTrigger(int index = 0)
-	{
-		string str = string.Empty;
-		if (index > 0)
-		{
-			str = (index + 1).ToString();
-		}
-		SetChangeTrigger("next" + str);
-	}
-
-	public void SetChangeTrigger(string motion_trigger)
-	{
-		if (!(animator == null))
-		{
-			animator.SetTrigger(motion_trigger);
-			changeTriggerList.Add(motion_trigger);
-		}
-	}
-
-	public void SendBuffSync(BuffParam.BUFFTYPE nowBuffType = BuffParam.BUFFTYPE.NONE)
-	{
-		if (IsOriginal())
-		{
-			BuffParam.BuffSyncParam sync_param = buffParam.CreateSyncParam(nowBuffType);
-			if (characterSender != null)
-			{
-				characterSender.OnSendBuffSync(sync_param);
-			}
-			buffSyncLastTime = Time.get_time();
-		}
-	}
-
-	public void OnBuffReceive(BuffParam.BuffData buffData)
-	{
-		if (IsCoopNone() || IsOriginal())
-		{
-			OnBuffStart(buffData);
-		}
-		else if (characterSender != null)
-		{
-			characterSender.OnBuffReceive(buffData.type, buffData.value, buffData.time);
-		}
-	}
-
-	public virtual bool OnBuffStart(BuffParam.BuffData buffData)
-	{
-		if (!buffParam.BuffStart(buffData))
-		{
-			return false;
-		}
-		UpdateAnimatorSpeed();
-		if (buffData.sync)
-		{
-			SendBuffSync(BuffParam.BUFFTYPE.NONE);
-		}
-		return true;
-	}
-
-	protected virtual void OnUIBuffRoutine(BuffParam.BUFFTYPE type, int value)
-	{
-	}
-
-	public virtual void OnBuffRoutine(BuffParam.BuffData buffData, bool packet = false)
-	{
-		BuffParam.BUFFTYPE type = buffData.type;
-		int value = buffData.value;
-		BuffParam.BUFFTYPE bUFFTYPE = type;
-		if (bUFFTYPE == BuffParam.BUFFTYPE.ELECTRIC_SHOCK && !packet)
-		{
-			value = buffData.damage;
-		}
-		OnBuffRoutine(type, value, packet);
-		if (characterSender != null && !packet)
-		{
-			characterSender.OnBuffRoutine(buffData.type, value, buffData.fromObjectID, buffData.fromEquipIndex, buffData.fromSkillIndex);
-		}
-	}
-
-	private void OnBuffRoutine(BuffParam.BUFFTYPE type, int value, bool packet = false)
-	{
-		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		switch (type)
-		{
-		case BuffParam.BUFFTYPE.INVINCIBLECOUNT:
-		{
-			string empty = string.Empty;
-			empty = ((value > 2) ? "ef_btl_barrier_01" : ((value > 1) ? "ef_btl_barrier_02" : ((value <= 0) ? "ef_btl_barrierbreak" : "ef_btl_barrier_03")));
-			Transform cameraTransform = MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform;
-			Vector3 position = _position;
-			position.y += 1f;
-			Vector3 val = cameraTransform.get_position() - position;
-			Vector3 pos = val.get_normalized() * -0.5f + position;
-			EffectManager.OneShot(empty, pos, cameraTransform.get_rotation(), this is Self);
-			buffParam.SetValue(type, value);
-			break;
-		}
-		case BuffParam.BUFFTYPE.REGENERATE:
-			value = (int)((float)value * buffParam.GetHealUp());
-			if (value <= 0)
-			{
-				value = 1;
-			}
-			hp += value;
-			if (hp > hpMax)
-			{
-				hp = hpMax;
-			}
-			EffectManager.GetEffect("ef_btl_sk_heal_02", FindNode("Hip"));
-			break;
-		case BuffParam.BUFFTYPE.POISON:
-		case BuffParam.BUFFTYPE.DEADLY_POISON:
-		{
-			float poisonDamageDownRate = buffParam.GetPoisonDamageDownRate();
-			if (poisonDamageDownRate > 0f)
-			{
-				float num2 = Mathf.Clamp(1f - poisonDamageDownRate, 0f, 1f);
-				value = (int)((float)value * num2);
-				if (value <= 0)
-				{
-					value = 1;
-				}
-			}
-			hp -= value;
-			if (hp <= 1)
-			{
-				hp = 1;
-			}
-			break;
-		}
-		case BuffParam.BUFFTYPE.BURNING:
-		{
-			float burnDamageDownRate = buffParam.GetBurnDamageDownRate();
-			if (burnDamageDownRate > 0f)
-			{
-				float num3 = Mathf.Clamp(1f - burnDamageDownRate, 0f, 1f);
-				value = (int)((float)value * num3);
-				if (value <= 0)
-				{
-					value = 1;
-				}
-			}
-			hp -= value;
-			if (hp <= 1)
-			{
-				hp = 1;
-			}
-			break;
-		}
-		case BuffParam.BUFFTYPE.ELECTRIC_SHOCK:
-			hp -= value;
-			if (hp <= 1)
-			{
-				hp = 1;
-			}
-			break;
-		case BuffParam.BUFFTYPE.REGENERATE_PROPORTION:
-		{
-			float num = Mathf.Clamp((float)value, 0f, 100f) / 100f;
-			value = (int)((float)hpMax * num);
-			hp += value;
-			if (hp > hpMax)
-			{
-				hp = hpMax;
-			}
-			EffectManager.GetEffect("ef_btl_sk_heal_02", FindNode("Hip"));
-			break;
-		}
-		}
-		OnUIBuffRoutine(type, value);
-	}
-
-	public virtual bool OnBuffEnd(BuffParam.BUFFTYPE type, bool sync, bool isPlayEndEffect = true)
-	{
-		if (!buffParam.BuffEnd(type, isPlayEndEffect))
-		{
-			return false;
-		}
-		switch (type)
-		{
-		case BuffParam.BUFFTYPE.MOVE_SPEED_DOWN:
-			badStatusTotal.speedDown = 0f;
-			break;
-		case BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN:
-			badStatusTotal.attackSpeedDown = 0f;
-			break;
-		case BuffParam.BUFFTYPE.POISON:
-			badStatusTotal.poison = 0f;
-			break;
-		case BuffParam.BUFFTYPE.BURNING:
-			badStatusTotal.burning = 0f;
-			break;
-		case BuffParam.BUFFTYPE.DEADLY_POISON:
-			badStatusTotal.deadlyPoison = 0f;
-			break;
-		case BuffParam.BUFFTYPE.INK_SPLASH:
-			badStatusTotal.inkSplash = 0f;
-			break;
-		case BuffParam.BUFFTYPE.SLIDE:
-			badStatusTotal.slide = 0f;
-			break;
-		case BuffParam.BUFFTYPE.SHIELD:
-			OnBuffEnd(BuffParam.BUFFTYPE.SHIELD_SUPER_ARMOR, false, true);
-			ShieldHp = 0;
-			break;
-		case BuffParam.BUFFTYPE.SILENCE:
-			badStatusTotal.silence = 0f;
-			break;
-		}
-		UpdateAnimatorSpeed();
-		if (sync)
-		{
-			SendBuffSync(BuffParam.BUFFTYPE.NONE);
-		}
-		return true;
-	}
-
-	public virtual void OnPoisonStart(int fromObjectID = 0)
-	{
-	}
-
-	public virtual void OnBurningStart()
-	{
-	}
-
-	public virtual void OnSpeedDown()
-	{
-	}
-
-	public virtual void OnAttackSpeedDown()
-	{
-	}
-
-	public virtual void OnDeadlyPoisonStart()
-	{
-	}
-
-	public virtual void OnInkSplash(InkSplashInfo info)
-	{
-	}
-
-	public virtual void OnSlideStart()
-	{
-	}
-
-	public virtual void OnSilenceStart()
-	{
-	}
-
-	public virtual void OnBuffCancellation()
-	{
-	}
-
-	public virtual bool IsValidBuff(BuffParam.BUFFTYPE targetType)
-	{
-		return buffParam.IsValidBuff(targetType);
-	}
-
-	public bool IsValidBuffByAbility(BuffParam.BUFFTYPE targetType)
-	{
-		return buffParam.IsValidBuffByAbility(targetType);
-	}
-
-	public override bool CheckHitAttack(AttackHitInfo info, Collider to_collider, StageObject to_object)
-	{
-		if (info.canAttackGrabbedPlayer)
-		{
-			if ((to_object.hitOffFlag & ~HIT_OFF_FLAG.GRAB) != 0)
-			{
-				return false;
-			}
-		}
-		else if (info.attackType == AttackHitInfo.ATTACK_TYPE.SNATCH)
-		{
-			if (to_object.hitOffFlag != 0 && (to_object.hitOffFlag & (HIT_OFF_FLAG.INVICIBLE | HIT_OFF_FLAG.DEAD)) == HIT_OFF_FLAG.NONE)
-			{
-				return false;
-			}
-		}
-		else if (to_object.hitOffFlag != 0)
-		{
-			return false;
-		}
-		return base.CheckHitAttack(info, to_collider, to_object);
-	}
-
-	public override void OnAttackedHit(AttackHitInfo info, AttackHitColliderProcessor.HitParam hit_param)
-	{
-		base.OnAttackedHit(info, hit_param);
-		if (IsValidAttackedHit(hit_param.fromObject) && !IsPuppet() && !hit_param.fromObject.IsPuppet() && (IsMirror() || IsPuppet()) && isLocalDamageApply && hp - localDamage <= 0)
-		{
-			ActDead(true, false);
-		}
-	}
-
-	protected override bool IsValidAttackedHit(StageObject from_object)
-	{
-		if (buffParam.CheckInvincible())
-		{
-			return false;
-		}
-		if (isDead)
-		{
-			return false;
-		}
-		return base.IsValidAttackedHit(from_object);
-	}
-
-	protected override void OnAttackedHitDirection(AttackedHitStatusDirection status)
-	{
-		if (status.hitParam.processor != null)
-		{
-			BulletObject bulletObject = status.hitParam.processor.colliderInterface as BulletObject;
-			if (bulletObject != null)
-			{
-				status.atk = bulletObject.masterAtk;
-				status.skillParam = bulletObject.masterSkill;
-			}
-			else
-			{
-				AtkAttribute atk = new AtkAttribute();
-				status.fromObject.GetAtk(status.attackInfo, ref atk);
-				status.atk = atk;
-				Player player = status.fromObject as Player;
-				if (player != null)
-				{
-					status.skillParam = player.skillInfo.actSkillParam;
-				}
-			}
-		}
-		if (IsDamageValid(status))
-		{
-			status.validDamage = true;
-			status.badStatusAdd.Copy(CalcBadStatus(status));
-		}
-		base.OnAttackedHitDirection(status);
-	}
-
-	protected virtual bool IsDamageValid(AttackedHitStatusDirection status)
-	{
-		return false;
-	}
-
-	protected virtual BadStatus CalcBadStatus(AttackedHitStatusDirection status)
-	{
-		BadStatus targetBadStatus = new BadStatus();
-		if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL)
-		{
-			return targetBadStatus;
-		}
-		targetBadStatus.Copy(status.attackInfo.badStatus);
-		if (status.attackInfo.isSkillReference && status.skillParam != null)
-		{
-			for (int i = 0; i < 3; i++)
-			{
-				switch (status.skillParam.tableData.supportType[i])
-				{
-				case BuffParam.BUFFTYPE.HIT_PARALYZE:
-					targetBadStatus.paralyze += (float)status.skillParam.supportValue[i];
-					break;
-				case BuffParam.BUFFTYPE.HIT_POISON:
-					targetBadStatus.poison += (float)status.skillParam.supportValue[i];
-					break;
-				}
-			}
-		}
-		Character character = status.fromObject as Character;
-		if (Object.op_Implicit(character))
-		{
-			targetBadStatus.Add(character.atkBadStatus);
-			targetBadStatus.paralyze += (float)character.buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_PARALYZE, true);
-			targetBadStatus.poison += (float)character.buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_POISON, true);
-			if (targetBadStatus.paralyze > 0f)
-			{
-				targetBadStatus.paralyze += character.buffParam.passive.badStatusUp[0];
-			}
-			if (targetBadStatus.poison > 0f)
-			{
-				targetBadStatus.poison += character.buffParam.passive.badStatusUp[1];
-			}
-		}
-		targetBadStatus.Mul(status.attackInfo.atkRate);
-		buffParam.ApplyBadStatusGuard(ref targetBadStatus);
-		return targetBadStatus;
-	}
-
-	protected override void OnAttackedHitLocal(AttackedHitStatusLocal status)
-	{
-		base.OnAttackedHitLocal(status);
-		if (status.validDamage)
-		{
-			AtkAttribute damage_details = new AtkAttribute();
-			status.damage = CalcDamage(status, ref damage_details);
-			status.damageDetails = damage_details;
-			StageObject fromObject = status.fromObject;
-			if (fromObject != null)
-			{
-				fromObject.AbsorptionProc(this, status);
-				fromObject.AbsorptionProcByBuff(status);
-			}
-			if (!CutAndAbsorbDamageByBuff(this, status))
-			{
-				ChargeSkillWhenDamagedByBuff();
-			}
-			if (isLocalDamageApply && (IsPuppet() || IsMirror()))
-			{
-				localDamage += status.damage;
-			}
-		}
-	}
-
-	protected virtual int CalcDamage(AttackedHitStatusLocal status, ref AtkAttribute damage_details)
-	{
-		return 0;
-	}
-
-	protected virtual AtkAttribute CalcAtk(AttackedHitStatusLocal status)
-	{
-		AtkAttribute atkAttribute = new AtkAttribute();
-		atkAttribute.Add(status.atk);
-		atkAttribute.Mul(status.attackInfo.atkRate);
-		if (status.damageDistanceData != null)
-		{
-			float rate = status.damageDistanceData.GetRate(status.distanceXZ);
-			atkAttribute.Mul(rate);
-		}
-		return atkAttribute;
-	}
-
-	protected virtual AtkAttribute CalcTolerance(AttackedHitStatusLocal status)
-	{
-		AtkAttribute _tolerance = new AtkAttribute();
-		_tolerance.Add(tolerance);
-		AtkAttribute atkAttribute = new AtkAttribute();
-		atkAttribute.Set(0f);
-		atkAttribute.AddElementOnly(1f);
-		atkAttribute.Add(buffParam.passive.tolUpRate);
-		atkAttribute.Sub(buffParam.passive.tolDownRate);
-		_tolerance.Mul(atkAttribute);
-		_tolerance.fire += (float)buffParam.passive.tolList[0];
-		_tolerance.water += (float)buffParam.passive.tolList[1];
-		_tolerance.thunder += (float)buffParam.passive.tolList[2];
-		_tolerance.soil += (float)buffParam.passive.tolList[3];
-		_tolerance.light += (float)buffParam.passive.tolList[4];
-		_tolerance.dark += (float)buffParam.passive.tolList[5];
-		_tolerance.CheckMinus();
-		atkAttribute.Set(0f);
-		atkAttribute.AddElementOnly(1f);
-		atkAttribute.Add(buffParam.GetBuffToleranceRate());
-		_tolerance.Mul(atkAttribute);
-		AddToleranceBuff(ref _tolerance);
-		_tolerance.CheckMinus();
-		return _tolerance;
-	}
-
-	public void AddToleranceBuff(ref AtkAttribute _tolerance)
-	{
-		float num = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT, true);
-		_tolerance.fire += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_FIRE, true) + num;
-		_tolerance.water += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_WATER, true) + num;
-		_tolerance.thunder += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_THUNDER, true) + num;
-		_tolerance.soil += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_SOIL, true) + num;
-		_tolerance.light += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_LIGHT, true) + num;
-		_tolerance.dark += (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_DARK, true) + num;
-	}
-
-	protected virtual AtkAttribute CalcDefense(AttackedHitStatusLocal status)
-	{
-		return defense;
-	}
-
-	public void AddDefenceBuff(ref AtkAttribute _defence)
-	{
-		float rate = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_NORMAL, true);
-		_defence.AddRate(rate);
-	}
-
-	public void AddElementDefenceBuff(ref AtkAttribute _defence)
-	{
-		float num = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT, true);
-		float num2 = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_FIRE, true);
-		_defence.AddTargetElement(ELEMENT_TYPE.FIRE, num2 + num);
-		num2 = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_WATER, true);
-		_defence.AddTargetElement(ELEMENT_TYPE.WATER, num2 + num);
-		num2 = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_THUNDER, true);
-		_defence.AddTargetElement(ELEMENT_TYPE.THUNDER, num2 + num);
-		num2 = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_SOIL, true);
-		_defence.AddTargetElement(ELEMENT_TYPE.SOIL, num2 + num);
-		num2 = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_LIGHT, true);
-		_defence.AddTargetElement(ELEMENT_TYPE.LIGHT, num2 + num);
-		num2 = (float)buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_DARK, true);
-		_defence.AddTargetElement(ELEMENT_TYPE.DARK, num2 + num);
-	}
-
-	public override void OnAttackedHitOwner(AttackedHitStatusOwner status)
-	{
-		//IL_02f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0384: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0389: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03f9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
-		if (base.controller != null)
-		{
-			base.controller.OnCharacterAttackedHitOwner(status);
-		}
-		bool flag = false;
-		if (status.attackInfo != null && status.attackInfo.isImmediateDeath)
-		{
-			status.damage = hpMax;
-			flag = true;
-		}
-		status.afterHP = hp;
-		status.afterShieldHp = ShieldHp;
-		if (status.validDamage && !status.aegisParam.isChange)
-		{
-			status.afterHP -= status.damage;
-			if (IsNarrowEscape(status))
-			{
-				status.afterHP = 1;
-			}
-			if (status.afterHP < 0)
-			{
-				status.afterHP = 0;
-			}
-			status.afterShieldHp -= status.shieldDamage;
-			if (status.afterShieldHp < 0)
-			{
-				status.afterShieldHp = 0;
-			}
-		}
-		status.badStatusTotal.Copy(badStatusTotal);
-		status.badStatusTotal.Add(status.badStatusAdd);
-		if (status.badStatusTotal.paralyze >= badStatusMax.paralyze && actionID != ACTION_ID.PARALYZE)
-		{
-			if (!buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.PARALYZE))
-			{
-				status.reactionType = 10;
-			}
-			else
-			{
-				status.badStatusTotal.paralyze = 0f;
-			}
-		}
-		if (status.badStatusTotal.freeze >= badStatusMax.freeze && !IsFreeze())
-		{
-			if (!buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.FREEZE))
-			{
-				status.reactionType = 12;
-			}
-			else
-			{
-				status.badStatusTotal.freeze = 0f;
-			}
-		}
-		if (IsFreeze())
-		{
-			ActFreezeEnd();
-			status.badStatusTotal.freeze = 0f;
-		}
-		if (status.badStatusTotal.poison >= badStatusMax.poison)
-		{
-			OnPoisonStart(status.fromObjectID);
-		}
-		if (status.badStatusTotal.deadlyPoison >= badStatusMax.deadlyPoison)
-		{
-			OnDeadlyPoisonStart();
-		}
-		if (status.badStatusTotal.burning >= badStatusMax.burning)
-		{
-			OnBurningStart();
-		}
-		if (status.badStatusTotal.speedDown >= badStatusMax.speedDown)
-		{
-			OnSpeedDown();
-		}
-		if (status.badStatusTotal.attackSpeedDown >= badStatusMax.attackSpeedDown)
-		{
-			OnAttackSpeedDown();
-		}
-		if (status.badStatusTotal.inkSplash >= badStatusMax.inkSplash && !IsInkSplash())
-		{
-			OnInkSplash(status.attackInfo.inkSplashInfo);
-		}
-		if (status.badStatusTotal.slide >= badStatusMax.slide)
-		{
-			OnSlideStart();
-		}
-		if (status.badStatusTotal.silence >= badStatusMax.silence)
-		{
-			OnSilenceStart();
-		}
-		Quaternion rotation = _rotation;
-		Vector3 eulerAngles = rotation.get_eulerAngles();
-		float y = eulerAngles.y;
-		if (status.afterHP <= 0)
-		{
-			status.reactionType = 8;
-			if (flag)
-			{
-				PlayImmediateDeathEffect();
-			}
-		}
-		else if (status.reactionType == 0 && !isDead)
-		{
-			REACTION_TYPE reactionType = REACTION_TYPE.NONE;
-			if (IsHitReactionValid(status))
-			{
-				reactionType = OnHitReaction(status);
-			}
-			status.reactionType = (int)reactionType;
-		}
-		if (status.reactionType != 0)
-		{
-			status.reactionType = (int)CheckReActionTolerance(status);
-			if (status.reactionType == 0)
-			{
-				_rotation = Quaternion.AngleAxis(y, Vector3.get_up());
-			}
-		}
-		if (enableReactionDelay && IsReactionDelayType(status.reactionType))
-		{
-			DelayReactionInfo delayReactionInfo = new DelayReactionInfo();
-			delayReactionInfo.type = (REACTION_TYPE)status.reactionType;
-			delayReactionInfo.targetId = status.fromObjectID;
-			RegisterReacionDelayInfo(delayReactionInfo);
-			status.reactionType = 0;
-			isReactionDelaySet = true;
-		}
-		status.hostPos = _position;
-		Quaternion rotation2 = _rotation;
-		Vector3 eulerAngles2 = rotation2.get_eulerAngles();
-		status.hostDir = eulerAngles2.y;
-		status.damageHpRate = (1f - (float)status.afterHP / (float)hpMax) * 100f;
-		base.OnAttackedHitOwner(status);
-	}
-
-	protected void PlayImmediateDeathEffect()
-	{
-		if (!(effectPlayProcessor == null))
-		{
-			List<EffectPlayProcessor.EffectSetting> settings = effectPlayProcessor.GetSettings("IMMEDIATE_DEATH_EFFECT");
-			if (settings != null)
-			{
-				for (int i = 0; i < settings.Count; i++)
-				{
-					if (settings[i] != null)
-					{
-						effectPlayProcessor.PlayEffect(settings[i], base._transform);
-					}
-				}
-			}
-		}
-	}
-
-	protected virtual bool IsNarrowEscape(AttackedHitStatusOwner status)
-	{
-		return false;
-	}
-
-	protected virtual bool IsHitReactionValid(AttackedHitStatusOwner status)
-	{
-		return true;
-	}
-
-	protected virtual bool IsReactionDelayType(int type)
-	{
-		switch (type)
-		{
-		case 10:
-		case 12:
-			return true;
-		default:
-			return false;
-		}
-	}
-
-	protected virtual REACTION_TYPE OnHitReaction(AttackedHitStatusOwner status)
-	{
-		return REACTION_TYPE.NONE;
-	}
-
-	protected virtual REACTION_TYPE CheckReActionTolerance(AttackedHitStatusOwner status)
-	{
-		REACTION_TYPE rEACTION_TYPE = (REACTION_TYPE)status.reactionType;
-		if (rEACTION_TYPE == REACTION_TYPE.GUARD_DAMAGE)
-		{
-			return rEACTION_TYPE;
-		}
-		AttackHitInfo.ATTACK_TYPE attackType = status.attackInfo.attackType;
-		if (attackType == AttackHitInfo.ATTACK_TYPE.SOUNDWAVE)
-		{
-			if (buffParam.IsHalfReaction(BuffParam.TOLERANCETYPE.SOUNDWAVE))
-			{
-				rEACTION_TYPE = REACTION_TYPE.DAMAGE;
-			}
-			else if (buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.SOUNDWAVE))
-			{
-				rEACTION_TYPE = REACTION_TYPE.NONE;
-			}
-		}
-		if (rEACTION_TYPE == REACTION_TYPE.STUNNED_BLOW && buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.STUMBLE))
-		{
-			rEACTION_TYPE = REACTION_TYPE.BLOW;
-		}
-		if (rEACTION_TYPE == REACTION_TYPE.SHAKE && buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.SHAKE))
-		{
-			rEACTION_TYPE = REACTION_TYPE.NONE;
-		}
-		return rEACTION_TYPE;
-	}
-
-	public override void OnAttackedHitFix(AttackedHitStatusFix status)
-	{
-		//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0172: Expected O, but got Unknown
-		base.OnAttackedHitFix(status);
-		if (MonoBehaviourSingleton<InGameProgress>.IsValid())
-		{
-			MonoBehaviourSingleton<InGameProgress>.I.OnDamage(status, this);
-		}
-		if (!isDead)
-		{
-			if (isLocalDamageApply && MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId == status.fromClientID)
-			{
-				localDamage -= status.damage;
-				if (localDamage <= 0)
-				{
-					localDamage = 0;
-				}
-			}
-			hp = status.afterHP;
-			ShieldHp = status.afterShieldHp;
-			badStatusTotal = status.badStatusTotal;
-			if (IsFreeze() && badStatusTotal.freeze <= 0f)
-			{
-				ActFreezeEnd();
-			}
-			ReactionInfo reactionInfo = new ReactionInfo();
-			reactionInfo.reactionType = (REACTION_TYPE)status.reactionType;
-			reactionInfo.blowForce = status.blowForce;
-			reactionInfo.loopTime = status.attackInfo.toPlayer.reactionLoopTime;
-			reactionInfo.targetId = status.fromObjectID;
-			if (reactionInfo.reactionType != 0)
-			{
-				ApplySyncPosition(status.hostPos, status.hostDir, false);
-			}
-			ActReaction(reactionInfo, false);
-			if (!string.IsNullOrEmpty(status.attackInfo.remainEffectName))
-			{
-				Transform effect = EffectManager.GetEffect(status.attackInfo.remainEffectName, rootNode);
-				if (effect != null)
-				{
-					damegeRemainEffect = effect.get_gameObject();
-				}
-			}
-		}
-	}
-
-	public virtual void ActReaction(ReactionInfo info, bool isSync = false)
-	{
-		switch (info.reactionType)
-		{
-		case REACTION_TYPE.DEAD:
-			ActDead(false, false);
-			break;
-		case REACTION_TYPE.DAMAGE:
-			ActDamage();
-			break;
-		case REACTION_TYPE.PARALYZE:
-			ActParalyze();
-			break;
-		case REACTION_TYPE.FREEZE:
-			ActFreezeStart();
-			break;
-		}
-		if (characterSender != null && info.reactionType != 0)
-		{
-			characterSender.OnActReaction(info, isSync);
-		}
-	}
-
-	protected void RegisterReacionDelayInfo(DelayReactionInfo newInfo)
-	{
-		if (SearchReactionDelayInfo(newInfo.type) == null)
-		{
-			m_reactionDelayList.Add(newInfo);
-		}
-	}
-
-	protected DelayReactionInfo SearchReactionDelayInfo(REACTION_TYPE targetType)
-	{
-		int count = m_reactionDelayList.Count;
-		for (int i = 0; i < count; i++)
-		{
-			if (m_reactionDelayList[i].type == targetType)
-			{
-				return m_reactionDelayList[i];
-			}
-		}
-		return null;
-	}
-
-	private void UpdateReactionDelay()
-	{
-		if (isReactionDelaySet && !enableReactionDelay && (IsCoopNone() || IsOriginal()))
-		{
-			OnReactionDelay(m_reactionDelayList);
-			m_reactionDelayList.Clear();
-			isReactionDelaySet = false;
-		}
-	}
-
-	public virtual void OnReactionDelay(List<DelayReactionInfo> reactionDelayList)
-	{
-		int count = reactionDelayList.Count;
-		if (count > 0)
-		{
-			for (int i = 0; i < count; i++)
-			{
-				DelayReactionInfo delayReactionInfo = reactionDelayList[i];
-				switch (delayReactionInfo.type)
-				{
-				case REACTION_TYPE.PARALYZE:
-					ActParalyze();
-					break;
-				case REACTION_TYPE.FREEZE:
-					ActFreezeStart();
-					break;
-				}
-			}
-			if (characterSender != null)
-			{
-				characterSender.OnReactionDelay(reactionDelayList);
-			}
-		}
-	}
-
-	protected override void OnAttackedContinuationFixedUpdate(AttackedContinuationStatus status)
-	{
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-		base.OnAttackedContinuationFixedUpdate(status);
-		if (!isDead)
-		{
-			float continuationTimeChangeRate = GetContinuationTimeChangeRate(status);
-			AttackContinuationInfo.CONTINUATION_TYPE type = status.attackInfo.type;
-			if (type == AttackContinuationInfo.CONTINUATION_TYPE.INHALE && (actionID != ACTION_ID.MOVE || moveType != MOVE_TYPE.SYNC_VELOCITY) && !object.ReferenceEquals(status.fromCollider, null))
-			{
-				Bounds bounds = status.fromCollider.get_bounds();
-				Vector3 val = bounds.get_center() - _position;
-				val.y = 0f;
-				float num = status.attackInfo.inhale.speed * continuationTimeChangeRate;
-				float magnitude = val.get_magnitude();
-				if (num * Time.get_fixedDeltaTime() > magnitude)
-				{
-					num = magnitude / Time.get_fixedDeltaTime();
-				}
-				val.Normalize();
-				externalVelocity = val * num;
-			}
-		}
-	}
-
-	protected virtual Vector3 GetTransformForward()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 result = _forward;
-		if (lerpRotateVec != Vector3.get_zero())
-		{
-			result = lerpRotateVec;
-		}
-		result.y = 0f;
-		return result;
-	}
-
-	public virtual void AddObjectList(GameObject game_object, OBJECT_LIST_TYPE type = OBJECT_LIST_TYPE.DEFAULT)
-	{
-		if (type >= OBJECT_LIST_TYPE.DEFAULT && type < OBJECT_LIST_TYPE.NUM)
-		{
-			DisableNotifyMonoBehaviour disableNotifyMonoBehaviour = game_object.AddComponent<DisableNotifyMonoBehaviour>();
-			disableNotifyMonoBehaviour.SetNotifyMaster(this);
-			objectList[(int)type].Add(game_object);
-		}
-	}
-
-	public virtual void DestroyObjectList(OBJECT_LIST_TYPE type)
-	{
-		List<GameObject> list = objectList[(int)type];
-		List<GameObject> range = list.GetRange(0, list.Count);
-		range.ForEach(delegate(GameObject o)
-		{
-			EffectManager.ReleaseEffect(o, true, false);
-		});
-		list.Clear();
-	}
-
-	protected override void OnDetachServant(DisableNotifyMonoBehaviour servant)
-	{
-		objectList.ForEach(delegate(List<GameObject> o)
-		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Expected O, but got Unknown
-			o.Remove(servant.get_gameObject());
-		});
-		buffParam.OnDetachServant(servant);
-	}
-
-	public virtual string EffectNameAnalyzer(string effect_name)
-	{
-		return effect_name;
-	}
-
-	public override Transform FindNode(string name)
-	{
-		if (name == "BODY" && body != null)
-		{
-			return body;
-		}
-		return base.FindNode(name);
-	}
-
-	public virtual bool CanPlayEffectEvent()
-	{
-		return true;
-	}
-
-	private void EventExAtkColliderStart(AnimEventData.EventData data)
-	{
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Expected O, but got Unknown
-		//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		float[] floatArgs = data.floatArgs;
-		Vector3 pos = default(Vector3);
-		pos._002Ector(floatArgs[0], floatArgs[1], floatArgs[2]);
-		Vector3 rot = default(Vector3);
-		rot._002Ector(floatArgs[3], floatArgs[4], floatArgs[5]);
-		float radius = floatArgs[6];
-		float height = floatArgs[7];
-		string name = data.stringArgs[0];
-		string name2 = data.stringArgs[1];
-		int uniqueID = data.intArgs[0];
-		AttackInfo attackInfo = FindAttackInfo(name, true, false);
-		if (attackInfo != null)
-		{
-			Transform val = FindNode(name2);
-			if (!(val == null))
-			{
-				int attackLayer = (base.objectType != OBJECT_TYPE.ENEMY) ? 14 : 15;
-				GameObject val2 = new GameObject("AttackColliderObject");
-				AttackColliderObject attackColliderObject = val2.AddComponent<AttackColliderObject>();
-				attackColliderObject.InitializeForExAtkCollider(this, val, attackInfo, pos, rot, radius, height, attackLayer);
-				attackColliderObject.UniqueID = uniqueID;
-				attackColliderObject.DetachRigidbody();
-				m_exAtkColliderObjectList.Add(attackColliderObject);
-			}
-		}
-	}
-
-	private void EventExAtkColliderEnd(AnimEventData.EventData data)
-	{
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		int num = data.intArgs[0];
-		for (int num2 = m_exAtkColliderObjectList.Count - 1; num2 >= 0; num2--)
-		{
-			AttackColliderObject attackColliderObject = m_exAtkColliderObjectList[num2];
-			if (attackColliderObject.UniqueID == num)
-			{
-				Object.Destroy(m_exAtkColliderObjectList[num2].get_gameObject());
-				m_exAtkColliderObjectList.RemoveAt(num2);
-			}
-		}
-	}
-
-	private void DeleteExAtkColliderAll()
-	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		for (int i = 0; i < m_exAtkColliderObjectList.Count; i++)
-		{
-			Object.Destroy(m_exAtkColliderObjectList[i].get_gameObject());
-		}
-		m_exAtkColliderObjectList.Clear();
-	}
-
-	private void EventRootMotionON(AnimEventData.EventData data)
-	{
-		animator.set_applyRootMotion(true);
-	}
-
-	private void EventRootMotionOFF(AnimEventData.EventData data)
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		animator.set_applyRootMotion(false);
-		if (velocityType == VELOCITY_TYPE.ROOT_MOTION)
-		{
-			SetVelocity(Vector3.get_zero(), VELOCITY_TYPE.NONE);
-		}
-	}
-
-	private void EventRootMotionMoveRate(AnimEventData.EventData data)
-	{
-		float num = rootMotionMoveRate = data.floatArgs[0];
-	}
-
-	private void EventHideRendererON(AnimEventData.EventData data)
-	{
-		string node_name = data.stringArgs[0];
-		SetEnableNodeRenderer(node_name, false);
-	}
-
-	private void EventHideRendererOFF(AnimEventData.EventData data)
-	{
-		string node_name = data.stringArgs[0];
-		SetEnableNodeRenderer(node_name, true);
-	}
-
-	private void EventActionRendererON(AnimEventData.EventData data)
-	{
-		if (actionRendererModel != null)
-		{
-			Transform val = FindNode(actionRendererNodeName);
-			if (val != null)
-			{
-				actionRendererInstance = ResourceUtility.Realizes(actionRendererModel, val, -1);
-			}
-		}
-	}
-
-	private void EventActionRendererOFF(AnimEventData.EventData data)
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		if (actionRendererInstance != null)
-		{
-			Object.Destroy(actionRendererInstance.get_gameObject());
-			actionRendererInstance = null;
-		}
-	}
-
-	private void EventEffectDelete(AnimEventData.EventData data)
-	{
-		string value = EffectNameAnalyzer(data.stringArgs[0]);
-		int count = objectList[2].Count;
-		List<GameObject> range = objectList[2].GetRange(0, count);
-		for (int i = 0; i < count; i++)
-		{
-			if (string.IsNullOrEmpty(value) || range[i].get_name().StartsWith(value))
-			{
-				EffectManager.ReleaseEffect(range[i], true, false);
-			}
-		}
-	}
-
-	private void EventUpdateActionPosition(AnimEventData.EventData data)
-	{
-		string text = (data.stringArgs.Length <= 0) ? null : data.stringArgs[0];
-		if (string.IsNullOrEmpty(text))
-		{
-			text = "next";
-		}
-		if (IsCoopNone() || IsOriginal())
-		{
-			UpdateActionPosition(text);
-		}
-		else if (actionPositionWaitSync)
-		{
-			Log.Error(LOG.INGAME, "Character UPDATE_ACTION_POSITION Err. ( WaitSync already. ) trigger : " + text);
-		}
-		else
-		{
-			actionPositionWaitSync = true;
-			actionPositionWaitTrigger = text;
-			StartWaitingPacket(WAITING_PACKET.CHARACTER_UPDATE_ACTION_POSITION, false, 0f);
-		}
-	}
-
-	private void EventUpdateDirection(AnimEventData.EventData data)
-	{
-		string text = (data.stringArgs.Length <= 0) ? null : data.stringArgs[0];
-		if (string.IsNullOrEmpty(text))
-		{
-			text = "next";
-		}
-		if (IsCoopNone() || IsOriginal())
-		{
-			UpdateDirection(text);
-		}
-		else if (directionWaitSync)
-		{
-			Log.Error(LOG.INGAME, "Character UPDATE_DIRECTION Err. ( WaitSync already. ) trigger : " + text);
-		}
-		else
-		{
-			directionWaitSync = true;
-			directionWaitTrigger = text;
-			StartWaitingPacket(WAITING_PACKET.CHARACTER_UPDATE_DIRECTION, false, 0f);
-		}
-	}
-
-	private void EventPeriodicSyncActionPositionStart(AnimEventData.EventData data)
-	{
-		periodicSyncActionPositionLastTime = GetActMotionTime();
-		periodicSyncActionPositionFlag = true;
-		SetPeriodicSyncTarget(actionTarget);
-	}
-
-	private void EventPeriodicSyncActionPositionEnd(AnimEventData.EventData data)
-	{
-		periodicSyncActionPositionFlag = false;
-		periodicSyncActionPositionLastTime = 0f;
-		SetPeriodicSyncTarget(null);
-	}
-
-	protected virtual void EventMoveStart(AnimEventData.EventData data, Vector3 targetDir)
-	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		float num = data.floatArgs[0];
-		EventMoveEnd();
-		enableEventMove = true;
-		enableAddForce = false;
-		eventMoveVelocity = targetDir * num;
-		SetVelocity(Quaternion.LookRotation(GetTransformForward()) * eventMoveVelocity, VELOCITY_TYPE.EVENT_MOVE);
-		eventMoveTimeCount = 0f;
-	}
-
-	private void EventMoveForwardToTarget(AnimEventData.EventData data)
-	{
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-		float num = data.floatArgs[0];
-		float num2 = (data.floatArgs.Length <= 1) ? 0f : data.floatArgs[1];
-		float num3 = (data.floatArgs.Length <= 2) ? 0f : data.floatArgs[2];
-		EventMoveEnd();
-		if (actionPositionFlag && !(num <= 0f))
-		{
-			Vector3 val = actionPosition - _position;
-			float num4 = val.get_magnitude() - num2;
-			if (num3 != 0f && num4 > num3)
-			{
-				num4 = num3;
-			}
-			float num5 = num4 / num;
-			enableEventMove = true;
-			enableAddForce = false;
-			eventMoveVelocity = Vector3.get_forward() * num5;
-			SetVelocity(Quaternion.LookRotation(GetTransformForward()) * eventMoveVelocity, VELOCITY_TYPE.EVENT_MOVE);
-			eventMoveTimeCount = num;
-		}
-	}
-
-	private void EventMoveToWorldPos(AnimEventData.EventData data)
-	{
-		//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-		float num = data.floatArgs[0];
-		Vector3 val = default(Vector3);
-		val.x = data.floatArgs[1];
-		val.y = data.floatArgs[2];
-		val.z = data.floatArgs[3];
-		EventMoveEnd();
-		Vector3 val2 = val - _position;
-		float magnitude = val2.get_magnitude();
-		if (!(num <= 1E-07f))
-		{
-			float num2 = magnitude / num;
-			if (!(num2 <= 0f))
-			{
-				Vector3 val3 = val - _position;
-				Vector3 normalized = val3.get_normalized();
-				enableEventMove = false;
-				enableAddForce = false;
-				enableRootMotion = false;
-				eventMoveVelocity = normalized * num;
-				SetVelocity(eventMoveVelocity, VELOCITY_TYPE.EVENT_MOVE);
-				eventMoveTimeCount = num2;
-			}
-		}
-	}
-
-	private void EventMoveSidewaysLookTarget(AnimEventData.EventData data)
-	{
-		if (data.floatArgs.Length >= 2)
-		{
-			moveAngle_deg = data.floatArgs[0];
-			moveAngleSpeed_deg = data.floatArgs[1];
-		}
-	}
-
-	private void EventMoveLookAtPosition(AnimEventData.EventData data)
-	{
-		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-		float num = data.floatArgs[0];
-		float moveLookAtAngle = data.floatArgs[1];
-		Vector3 moveLookAtPos = default(Vector3);
-		moveLookAtPos._002Ector(data.floatArgs[2], 0f, data.floatArgs[3]);
-		if (!(num <= 0f))
-		{
-			this.moveLookAtAngle = moveLookAtAngle;
-			this.moveLookAtPos = moveLookAtPos;
-		}
-	}
-
-	private void EventRotateToTargetStart(AnimEventData.EventData data)
-	{
-		float num = data.floatArgs[0];
-		float num2 = (data.floatArgs.Length <= 1) ? 0f : data.floatArgs[1];
-		EndRotate();
-		rotateToTargetFlag = true;
-		rotateEventSpeed = num;
-		rotateToTargetDiffAngle = num2;
-	}
-
-	private void EventRotateKeepToTargetStart(AnimEventData.EventData data)
-	{
-		float num = data.floatArgs[0];
-		EndRotate();
-		rotateEventSpeed = num;
-		rotateEventKeep = true;
-	}
-
-	private void EventRotateToAngleStart(AnimEventData.EventData data)
-	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		float num = data.floatArgs[0];
-		float num2 = data.floatArgs[1];
-		EndRotate();
-		Quaternion rotation = _rotation;
-		Vector3 eulerAngles = rotation.get_eulerAngles();
-		rotateEventDirection = eulerAngles.y + num2 * rootRotationRate;
-		if (num > 0f)
-		{
-			rotateEventSpeed = num;
-		}
-		else
-		{
-			_rotation = Quaternion.AngleAxis(rotateEventDirection, Vector3.get_up());
-		}
-	}
-
-	private void EventAnimatorBoolON(AnimEventData.EventData data)
-	{
-		string text = data.stringArgs[0];
-		animator.SetBool(text, true);
-		if (animatorBoolList.IndexOf(text) < 0)
-		{
-			animatorBoolList.Add(text);
-		}
-	}
-
-	private void EventAnimatorBoolOFF(AnimEventData.EventData data)
-	{
-		string text = data.stringArgs[0];
-		animator.SetBool(text, false);
-		animatorBoolList.Remove(text);
-	}
-
-	private void EventShotGeneric(AnimEventData.EventData data)
-	{
-		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-		AttackInfo attackInfo = FindAttackInfo(data.stringArgs[0], true, false);
-		if (attackInfo != null)
-		{
-			Vector3 offset = default(Vector3);
-			offset._002Ector(0f, 0f, 0f);
-			if (data.intArgs.Length > 1 && data.intArgs[1] != 0)
-			{
-				if (actionTarget != null)
-				{
-					Vector3 val = default(Vector3);
-					val._002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
-					Quaternion val2 = Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5]));
-					val2 = _rotation * val2;
-					Matrix4x4 localToWorldMatrix = actionTarget._transform.get_localToWorldMatrix();
-					val = localToWorldMatrix.MultiplyPoint3x4(val);
-					AnimEventShot.Create(this, attackInfo, val, val2, null, true, null, null, null, Player.ATTACK_MODE.NONE, null, null);
-					return;
-				}
-				offset.z += 2f;
-			}
-			AnimEventShot.Create(this, data, attackInfo, offset);
-		}
-	}
-
-	protected virtual void EventShotPresent(AnimEventData.EventData data)
-	{
-	}
-
-	protected virtual void EventShotZone(AnimEventData.EventData data)
-	{
-	}
-
-	protected virtual void EventShotDecoy(AnimEventData.EventData data)
-	{
-	}
-
-	private void EventGenerateTrackingAttack(AnimEventData.EventData data)
-	{
-		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0036: Expected O, but got Unknown
-		if (data.stringArgs == null || data.stringArgs.Length <= 0)
-		{
-			Log.Error(LOG.INGAME, "String Data is Empty. Check AnimEvent ( GENERATE_TRACKING ). ");
-		}
-		else
-		{
-			GameObject val = new GameObject("AttackTrackingTarget");
-			AttackTrackingTarget attackTrackingTarget = val.AddComponent<AttackTrackingTarget>();
-			attackTrackingTarget.Initialize(this, actionTarget, FindAttackInfo(data.stringArgs[0], true, false));
-			TrackingTargetBullet = attackTrackingTarget;
-		}
-	}
-
-	protected virtual void EventStatusUpDefenceON(AnimEventData.EventData data)
-	{
-	}
-
-	protected virtual void EventStatusUpDefenceOFF()
-	{
-	}
-
-	protected virtual void EventCameraTargetOffsetOn(AnimEventData.EventData data)
-	{
-	}
-
-	protected virtual void EventCameraTargetOffsetOff()
-	{
-	}
-
-	protected virtual void EventExecuteEvolve(AnimEventData.EventData data)
-	{
-	}
-
-	protected virtual void EventCameraStopOn(AnimEventData.EventData data)
-	{
-	}
-
-	protected virtual void EventCameraStopOff()
-	{
-	}
-
-	public override void OnAnimEvent(AnimEventData.EventData data)
-	{
-		//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01c8: Expected O, but got Unknown
-		//IL_04cf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04dc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04e1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_04ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_07f5: Unknown result type (might be due to invalid IL or missing references)
-		if (CanPlayEffectEvent())
-		{
-			bool settingFixedUpdate = false;
-			if (!animUpdatePhysics)
-			{
-				settingFixedUpdate = Trail.settingFixedUpdate;
-				Trail.settingFixedUpdate = false;
-			}
-			bool is_oneshot_priority = this is Self;
-			Enemy enemy = this as Enemy;
-			if (enemy != null)
-			{
-				is_oneshot_priority = enemy.isBoss;
-			}
-			bool flag = true;
-			if ((data.id == AnimEventFormat.ID.EFFECT || data.id == AnimEventFormat.ID.EFFECT_LOOP_CUSTOM || data.id == AnimEventFormat.ID.EFFECT_ONESHOT || data.id == AnimEventFormat.ID.EFFECT_STATIC || data.id == AnimEventFormat.ID.EFFECT_DEPEND_SP_ATTACK_TYPE || data.id == AnimEventFormat.ID.EFFECT_DEPEND_WEAPON_ELEMENT || data.id == AnimEventFormat.ID.EFFECT_SCALE_DEPEND_VALUE || data.id == AnimEventFormat.ID.CAMERA_EFFECT) && data.intArgs != null && data.intArgs.Length > 1)
-			{
-				switch (data.intArgs[0])
-				{
-				case 0:
-					flag = true;
-					break;
-				case 1:
-					flag = !buffParam.IsEnableBuff((BuffParam.BUFFTYPE)data.intArgs[1]);
-					break;
-				default:
-					Log.Error(LOG.EFFECT, "Not Defined EFFECT_EXEC_CONDITION");
-					break;
-				}
-			}
-			Transform val = null;
-			if (flag)
-			{
-				val = AnimEventFormat.EffectEventExec(data.id, data, base._transform, is_oneshot_priority, EffectNameAnalyzer, ((StageObject)this).FindNode, this);
-			}
-			if (!animUpdatePhysics)
-			{
-				Trail.settingFixedUpdate = settingFixedUpdate;
-			}
-			if (val != null)
-			{
-				if (data.id == AnimEventFormat.ID.EFFECT || data.id == AnimEventFormat.ID.EFFECT_DEPEND_SP_ATTACK_TYPE || data.id == AnimEventFormat.ID.EFFECT_DEPEND_WEAPON_ELEMENT || data.id == AnimEventFormat.ID.EFFECT_SCALE_DEPEND_VALUE)
-				{
-					AddObjectList(val.get_gameObject(), OBJECT_LIST_TYPE.ANIM_EVENT);
-				}
-				return;
-			}
-		}
-		if (!(stepCtrl != null) || !stepCtrl.OnAnimEvent(data))
-		{
-			switch (data.id)
-			{
-			case AnimEventFormat.ID.EFFECT:
-			case AnimEventFormat.ID.EFFECT_ONESHOT:
-			case AnimEventFormat.ID.EFFECT_STATIC:
-			case AnimEventFormat.ID.EFFECT_LOOP_CUSTOM:
-			case AnimEventFormat.ID.CAMERA_EFFECT:
-			case AnimEventFormat.ID.MOVE_POINT_DATA:
-			case AnimEventFormat.ID.EFFECT_DEPEND_SP_ATTACK_TYPE:
-			case AnimEventFormat.ID.EFFECT_DEPEND_WEAPON_ELEMENT:
-			case AnimEventFormat.ID.EFFECT_SCALE_DEPEND_VALUE:
-			case AnimEventFormat.ID.MOVE_LOOKAT_DATA:
-				break;
-			case AnimEventFormat.ID.EXATK_COLLIDER_START:
-				EventExAtkColliderStart(data);
-				break;
-			case AnimEventFormat.ID.EXATK_COLLIDER_END:
-				EventExAtkColliderEnd(data);
-				break;
-			case AnimEventFormat.ID.ROOT_MOTION_ON:
-				EventRootMotionON(data);
-				break;
-			case AnimEventFormat.ID.ROOT_MOTION_OFF:
-				EventRootMotionOFF(data);
-				break;
-			case AnimEventFormat.ID.ROOT_MOTION_MOVE_RATE:
-				EventRootMotionMoveRate(data);
-				break;
-			case AnimEventFormat.ID.HIDE_RENDERER_ON:
-				EventHideRendererON(data);
-				break;
-			case AnimEventFormat.ID.HIDE_RENDERER_OFF:
-				EventHideRendererOFF(data);
-				break;
-			case AnimEventFormat.ID.ACTION_RENDERER_ON:
-				EventActionRendererON(data);
-				break;
-			case AnimEventFormat.ID.ACTION_RENDERER_OFF:
-				EventActionRendererOFF(data);
-				break;
-			case AnimEventFormat.ID.EFFECT_DELETE:
-				EventEffectDelete(data);
-				break;
-			case AnimEventFormat.ID.UPDATE_ACTION_POSITION:
-				EventUpdateActionPosition(data);
-				break;
-			case AnimEventFormat.ID.UPDATE_DIRECTION:
-				EventUpdateDirection(data);
-				break;
-			case AnimEventFormat.ID.PERIODIC_SYNC_ACTION_POSITION_START:
-				EventPeriodicSyncActionPositionStart(data);
-				break;
-			case AnimEventFormat.ID.PERIODIC_SYNC_ACTION_POSITION_END:
-				EventPeriodicSyncActionPositionEnd(data);
-				break;
-			case AnimEventFormat.ID.MOVE_FORWARD_START:
-				EventMoveStart(data, Vector3.get_forward());
-				break;
-			case AnimEventFormat.ID.MOVE_LEFT_START:
-				EventMoveStart(data, -Vector3.get_right());
-				break;
-			case AnimEventFormat.ID.MOVE_RIGHT_START:
-				EventMoveStart(data, Vector3.get_right());
-				break;
-			case AnimEventFormat.ID.MOVE_FORWARD_TO_TARGET:
-				EventMoveForwardToTarget(data);
-				break;
-			case AnimEventFormat.ID.MOVE_TO_WORLDPOS_START:
-				EventMoveToWorldPos(data);
-				break;
-			case AnimEventFormat.ID.MOVE_END:
-				EventMoveEnd();
-				break;
-			case AnimEventFormat.ID.ROTATE_TO_TARGET_START:
-				EventRotateToTargetStart(data);
-				break;
-			case AnimEventFormat.ID.ROTATE_KEEP_TO_TARGET_START:
-				EventRotateKeepToTargetStart(data);
-				break;
-			case AnimEventFormat.ID.ROTATE_TO_ANGLE_START:
-				EventRotateToAngleStart(data);
-				break;
-			case AnimEventFormat.ID.ROTATE_END:
-				EndRotate();
-				break;
-			case AnimEventFormat.ID.MOTION_CANCEL_ON:
-				enableMotionCancel = true;
-				break;
-			case AnimEventFormat.ID.MOTION_CANCEL_OFF:
-				enableMotionCancel = false;
-				break;
-			case AnimEventFormat.ID.ANIMATOR_BOOL_ON:
-				EventAnimatorBoolON(data);
-				break;
-			case AnimEventFormat.ID.ANIMATOR_BOOL_OFF:
-				EventAnimatorBoolOFF(data);
-				break;
-			case AnimEventFormat.ID.ATK_COLLIDER_CAPSULE:
-			case AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_START:
-				CreateAttackCollider(data, true);
-				break;
-			case AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_END:
-				RemoveEventCollider(data.stringArgs[0]);
-				break;
-			case AnimEventFormat.ID.SHOT_GENERIC:
-				EventShotGeneric(data);
-				break;
-			case AnimEventFormat.ID.MOVE_SUPPRESS_ON:
-				enableMoveSuppress = true;
-				break;
-			case AnimEventFormat.ID.MOVE_SUPPRESS_OFF:
-				enableMoveSuppress = false;
-				break;
-			case AnimEventFormat.ID.ROOT_COLLIDER_ON:
-				base._collider.set_enabled(true);
-				break;
-			case AnimEventFormat.ID.ROOT_COLLIDER_OFF:
-				base._collider.set_enabled(false);
-				break;
-			case AnimEventFormat.ID.DELETE_REMAIN_DMG_EFFECT:
-				if (damegeRemainEffect != null)
-				{
-					EffectManager.ReleaseEffect(damegeRemainEffect, true, false);
-					damegeRemainEffect = null;
-				}
-				break;
-			case AnimEventFormat.ID.REACTON_DELAY_ON:
-				enableReactionDelay = true;
-				break;
-			case AnimEventFormat.ID.REACTON_DELAY_OFF:
-				enableReactionDelay = false;
-				break;
-			case AnimEventFormat.ID.BUFF_START:
-				if (IsCoopNone() || IsOriginal())
-				{
-					if (data.intArgs.Length <= 0 || data.floatArgs.Length <= 0)
-					{
-						Log.Error(LOG.INGAME, "No data. Check AnimEvent ( BUFF_START ).");
-					}
-					float num = data.floatArgs[0];
-					if (num <= 0f)
-					{
-						Log.Error(LOG.INGAME, "Not set Buff time. Check AnimEvent ( BUFF_START ).");
-					}
-					else
-					{
-						float interval = 0f;
-						if (data.floatArgs.Length > 1)
-						{
-							interval = data.floatArgs[1];
-						}
-						float num2 = 0f;
-						if (data.floatArgs.Length > 2)
-						{
-							num2 = data.floatArgs[2];
-						}
-						int num3 = data.intArgs[0];
-						if (num3 <= -1 || num3 >= 179)
-						{
-							Log.Error(LOG.INGAME, "Not set valid BUFFTYPE. CHECK AnimEvent ( BUFF_START ).");
-						}
-						else
-						{
-							BuffParam.VALUE_TYPE valueType = BuffParam.VALUE_TYPE.CONSTANT;
-							if (data.intArgs.Length >= 3)
-							{
-								valueType = (BuffParam.VALUE_TYPE)data.intArgs[2];
-							}
-							bool flag2 = false;
-							if (data.intArgs.Length >= 4)
-							{
-								flag2 = (data.intArgs[3] > 0);
-								if (flag2)
-								{
-									num = -1f;
-								}
-							}
-							BuffParam.BuffData data2 = new BuffParam.BuffData();
-							data2.type = (BuffParam.BUFFTYPE)num3;
-							data2.time = ((num2 != 0f) ? num2 : num);
-							data2.interval = interval;
-							data2.endless = flag2;
-							data2.valueType = valueType;
-							data2.value = data.intArgs[1];
-							SetFromInfo(ref data2);
-							OnBuffStart(data2);
-						}
-					}
-				}
-				break;
-			case AnimEventFormat.ID.BUFF_END:
-				if (IsCoopNone() || IsOriginal())
-				{
-					OnBuffEnd((BuffParam.BUFFTYPE)data.intArgs[0], true, true);
-				}
-				break;
-			case AnimEventFormat.ID.CONTINUS_ATTACK:
-				if (IsCoopNone() || IsOriginal())
-				{
-					CreateContinusAttack(data, true, 0f);
-				}
-				break;
-			case AnimEventFormat.ID.CHANGE_SHADER_PARAM:
-				EventChangeShaderParam(data);
-				break;
-			case AnimEventFormat.ID.PLAYER_DISABLE_MOVE:
-				if (MonoBehaviourSingleton<InputManager>.IsValid() && (MonoBehaviourSingleton<InputManager>.I.disableFlags & INPUT_DISABLE_FACTOR.INGAME_COMMAND) == (INPUT_DISABLE_FACTOR)0)
-				{
-					MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_COMMAND, true);
-					this.StartCoroutine(SetEnableInputAfterSeconds(data.floatArgs[0]));
-				}
-				break;
-			case AnimEventFormat.ID.GENERATE_TRACKING:
-				EventGenerateTrackingAttack(data);
-				break;
-			case AnimEventFormat.ID.MOVE_SIDEWAYS_LOOK_TARGET:
-				EventMoveSidewaysLookTarget(data);
-				break;
-			case AnimEventFormat.ID.ACTION_MINE_ATTACK:
-				EventActionMineAttack(data);
-				break;
-			case AnimEventFormat.ID.SHOT_REFLECT_BULLET:
-				EventReflectBulletAttack(data);
-				break;
-			case AnimEventFormat.ID.SHOT_PRESENT:
-				if (IsCoopNone() || IsOriginal())
-				{
-					EventShotPresent(data);
-				}
-				break;
-			case AnimEventFormat.ID.SHOT_ZONE:
-				if (IsCoopNone() || IsOriginal())
-				{
-					EventShotZone(data);
-				}
-				break;
-			case AnimEventFormat.ID.SHOT_DECOY:
-				if (IsCoopNone() || IsOriginal())
-				{
-					EventShotDecoy(data);
-				}
-				break;
-			case AnimEventFormat.ID.STATUS_UP_DEFENCE_ON:
-				EventStatusUpDefenceON(data);
-				break;
-			case AnimEventFormat.ID.STATUS_UP_DEFENCE_OFF:
-				EventStatusUpDefenceOFF();
-				break;
-			case AnimEventFormat.ID.ATTACKHIT_CLEAR_ALL:
-				AttackHitCheckerClearAll();
-				break;
-			case AnimEventFormat.ID.ATTACKHIT_CLEAR_INFO:
-				AttackHitCheckerClearInfo(data);
-				break;
-			case AnimEventFormat.ID.CAMERA_TARGET_OFFSET_ON:
-				EventCameraTargetOffsetOn(data);
-				break;
-			case AnimEventFormat.ID.CAMERA_TARGET_OFFSET_OFF:
-				EventCameraTargetOffsetOff();
-				break;
-			case AnimEventFormat.ID.EXECUTE_EVOLVE:
-				EventExecuteEvolve(data);
-				break;
-			case AnimEventFormat.ID.DBG_TIME_START:
-				DbgTimeCount(true);
-				break;
-			case AnimEventFormat.ID.DBG_TIME_END:
-				DbgTimeCount(false);
-				break;
-			case AnimEventFormat.ID.NWAY_LASER_ATTACK:
-				EventNWayLaserAttack(data);
-				break;
-			case AnimEventFormat.ID.CAMERA_STOP_ON:
-				EventCameraStopOn(data);
-				break;
-			case AnimEventFormat.ID.CAMERA_STOP_OFF:
-				EventCameraStopOff();
-				break;
-			default:
-				base.OnAnimEvent(data);
-				break;
-			}
-		}
-	}
-
-	protected virtual void SetFromInfo(ref BuffParam.BuffData data)
-	{
-	}
-
-	protected virtual void EventActionMineAttack(AnimEventData.EventData data)
-	{
-	}
-
-	protected virtual void EventReflectBulletAttack(AnimEventData.EventData data)
-	{
-	}
-
-	protected virtual void EventNWayLaserAttack(AnimEventData.EventData data)
-	{
-	}
-
-	private IEnumerator SetEnableInputAfterSeconds(float seconds)
-	{
-		yield return (object)new WaitForSeconds(seconds);
-		MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_COMMAND, false);
-	}
-
-	public void CreateContinusAttack(AnimEventData.EventData eventData, bool isSync, float exEndTime = 0)
-	{
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-		if (eventData != null)
-		{
-			float endTime = (float)eventData.intArgs[1];
-			if (exEndTime > 0f)
-			{
-				endTime = exEndTime;
-			}
-			int eventIndex = -1;
-			int count = continusAtkEventDataList.Count;
-			for (int i = 0; i < count; i++)
-			{
-				if (continusAtkEventDataList[i] == eventData)
-				{
-					eventIndex = i;
-					break;
-				}
-			}
-			AnimEventCollider animEventCollider = CreateAttackCollider(eventData, false);
-			animEventCollider.SetFixedUpdateFlag(false);
-			animEventCollider.SetFixTransformUpdateFlag(false);
-			animEventCollider.ValidTriggerStay();
-			Transform val = null;
-			string text = eventData.stringArgs[2];
-			string text2 = eventData.stringArgs[3];
-			if (!string.IsNullOrEmpty(text) && !string.IsNullOrEmpty(text2))
-			{
-				Vector3 zero = Vector3.get_zero();
-				Quaternion localRotation = Quaternion.get_identity();
-				float[] floatArgs = eventData.floatArgs;
-				if (floatArgs.Length > 8)
-				{
-					zero._002Ector(floatArgs[8], floatArgs[9], floatArgs[10]);
-					localRotation = Quaternion.Euler(floatArgs[11], floatArgs[12], floatArgs[13]);
-				}
-				Transform parent = Utility.Find(base._transform, text2);
-				val = EffectManager.GetEffect(text, parent);
-				val.set_localPosition(zero);
-				val.set_localRotation(localRotation);
-			}
-			continusAttackParam.Register(eventIndex, endTime, animEventCollider, val);
-			if (isSync)
-			{
-				SendContinusAttackSync();
-			}
-		}
-	}
-
-	public void CreateContinusAttackBySyncData(ContinusAttackParam.SyncData syncData)
-	{
-		int eventIndex = syncData.eventIndex;
-		if (eventIndex >= 0 && eventIndex < continusAtkEventDataList.Count)
-		{
-			AnimEventData.EventData eventData = continusAtkEventDataList[syncData.eventIndex];
-			CreateContinusAttack(eventData, false, syncData.endTime);
-		}
-	}
-
-	public void SendContinusAttackSync()
-	{
-		if (IsOriginal())
-		{
-			ContinusAttackParam.SyncParam syncParam = continusAttackParam.CreateSyncParam();
-			if (characterSender != null)
-			{
-				characterSender.OnSendContinusAttackSync(syncParam);
-			}
-		}
-	}
-
-	public void ReceiveContinusAttackParam(ContinusAttackParam.SyncParam syncParam)
-	{
-		continusAttackParam.ApplySyncParam(syncParam);
-	}
-
-	protected AnimEventCollider CreateAttackCollider(AnimEventData.EventData eventData, bool isUseColliderList = true)
-	{
-		bool flag = true;
-		AnimEventCollider animEventCollider = null;
-		if (isUseColliderList)
-		{
-			int i = 0;
-			for (int count = animEventColliderList.Count; i < count; i++)
-			{
-				if (animEventColliderList[i].isReleased)
-				{
-					animEventCollider = animEventColliderList[i];
-					flag = false;
-					break;
-				}
-			}
-		}
-		if (flag)
-		{
-			animEventCollider = new AnimEventCollider();
-			if (isUseColliderList)
-			{
-				animEventColliderList.Add(animEventCollider);
-			}
-		}
-		animEventCollider.Initialize(this, eventData, FindAttackInfo(eventData.stringArgs[0], true, false));
-		if (eventData.id == AnimEventFormat.ID.ATK_COLLIDER_CAPSULE || eventData.id == AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_DEPEND_VALUE)
-		{
-			animEventCollider.ReserveRelease();
-		}
-		return animEventCollider;
-	}
-
-	protected void RemoveEventCollider(string targetName)
-	{
-		int count = animEventColliderList.Count;
-		for (int i = 0; i < count; i++)
-		{
-			if (!animEventColliderList[i].isReleased)
-			{
-				AttackInfo attackInfo = animEventColliderList[i].attackInfo;
-				if (attackInfo != null && attackInfo.name == targetName)
-				{
-					animEventColliderList[i].ReserveRelease();
-				}
-			}
-		}
-	}
-
-	public void EventMoveEnd()
-	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		enableEventMove = false;
-		enableAddForce = false;
-		if (velocityType == VELOCITY_TYPE.EVENT_MOVE)
-		{
-			SetVelocity(Vector3.get_zero(), VELOCITY_TYPE.NONE);
-		}
-		eventMoveVelocity = Vector3.get_zero();
-		eventMoveTimeCount = 0f;
-	}
-
-	protected virtual void EndRotate()
-	{
-		rotateEventSpeed = 0f;
-		rotateEventDirection = 0f;
-		rotateEventKeep = false;
-		rotateToTargetFlag = false;
-		rotateToTargetDiffAngle = 0f;
-	}
-
-	protected void SetPeriodicSyncTarget(StageObject target)
-	{
-		Character character = periodicSyncTarget as Character;
-		if (character != null)
-		{
-			character.periodicSyncOwnerList.Remove(this);
-		}
-		periodicSyncTarget = null;
-		periodicSyncTarget = target;
-		Character character2 = periodicSyncTarget as Character;
-		if (character2 != null)
-		{
-			character2.periodicSyncOwnerList.Add(this);
-		}
-	}
-
-	public override AttackInfo[] GetAttackInfos()
-	{
-		return attackInfos;
-	}
-
-	public void SetEnableNodeRenderer(string node_name, bool enable)
-	{
-		Transform val = FindNode(node_name);
-		if (!(val == null))
-		{
-			val.GetComponentsInChildren<Renderer>(Temporary.rendererList);
-			int i = 0;
-			for (int count = Temporary.rendererList.Count; i < count; i++)
-			{
-				Temporary.rendererList[i].set_enabled(enable);
-			}
-			Temporary.rendererList.Clear();
-			val.GetComponentsInChildren<rymFX>(Temporary.fxList);
-			int j = 0;
-			for (int count2 = Temporary.fxList.Count; j < count2; j++)
-			{
-				Temporary.fxList[j].set_enabled(enable);
-			}
-			Temporary.fxList.Clear();
-			val.GetComponentsInChildren<TargetPoint>(Temporary.targetPointList);
-			int k = 0;
-			for (int count3 = Temporary.targetPointList.Count; k < count3; k++)
-			{
-				Temporary.targetPointList[k].set_enabled(enable);
-			}
-			Temporary.targetPointList.Clear();
-			if (enable)
-			{
-				hideRendererList.Remove(node_name);
-			}
-			else if (!hideRendererList.Contains(node_name))
-			{
-				hideRendererList.Add(node_name);
-			}
-		}
-	}
-
-	public void SetEnableNodeTrailRenderer(string node_name)
-	{
-		Transform val = FindNode(node_name);
-		if (!(val == null))
-		{
-			val.GetComponentsInChildren<Trail>(Temporary.trailList);
-			for (int i = 0; i < Temporary.trailList.Count; i++)
-			{
-				Temporary.trailList[i].Reset();
-			}
-			Temporary.trailList.Clear();
-		}
-	}
-
-	public virtual void ChatSay(int chatID)
-	{
-		if (IsOriginal() && MonoBehaviourSingleton<CoopManager>.IsValid())
-		{
-			MonoBehaviourSingleton<CoopManager>.I.coopStage.StageChat(id, chatID);
-		}
-		SoundManager.PlaySystemSE(SoundID.UISE.CHAT_BALOON, 1f);
-	}
-
-	public virtual void ChatSay(string message)
-	{
-		if (IsOriginal() && MonoBehaviourSingleton<CoopManager>.IsValid())
-		{
-			MonoBehaviourSingleton<CoopManager>.I.coopStage.SendChatMessage(id, message);
-		}
-		SoundManager.PlaySystemSE(SoundID.UISE.CHAT_BALOON, 1f);
-	}
-
-	public virtual void ChatSayStamp(int stamp_id)
-	{
-		if (IsOriginal() && MonoBehaviourSingleton<CoopManager>.IsValid())
-		{
-			if (QuestManager.IsValidInGameExplore())
-			{
-				MonoBehaviourSingleton<CoopManager>.I.coopRoom.SendChatStamp(stamp_id);
-			}
-			else
-			{
-				MonoBehaviourSingleton<CoopManager>.I.coopStage.SendChatStamp(id, stamp_id);
-			}
-		}
-		SoundManager.PlaySystemSE(SoundID.UISE.CHAT_BALOON, 1f);
-	}
-
-	protected void ResetStatusParam()
-	{
-		attack.Set(0f);
-		defense.Set(0f);
-		tolerance.Set(0f);
-	}
-
-	public override void OnFailedWaitingPacket(WAITING_PACKET type)
-	{
-		switch (type)
-		{
-		case WAITING_PACKET.CHARACTER_MOVE_VELOCITY:
-			ActIdle(false, -1f);
-			break;
-		case WAITING_PACKET.CHARACTER_UPDATE_ACTION_POSITION:
-			UpdateActionPosition(actionPositionWaitTrigger);
-			break;
-		case WAITING_PACKET.CHARACTER_UPDATE_DIRECTION:
-			UpdateDirection(directionWaitTrigger);
-			break;
-		case WAITING_PACKET.PLAYER_APPLY_CHANGE_WEAPON:
-			ActIdle(false, -1f);
-			break;
-		}
-		base.OnFailedWaitingPacket(type);
-	}
-
-	public override Vector3 GetPredictivePosition()
-	{
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-		if (IsPuppet() || IsMirror())
-		{
-			if (base.packetReceiver != null && base.packetReceiver.GetPredictivePosition(out Vector3 pos))
-			{
-				return pos;
-			}
-			if (actionID == ACTION_ID.MOVE && moveType == MOVE_TYPE.SYNC_VELOCITY)
-			{
-				return moveTargetPos;
-			}
-		}
-		return base.GetPredictivePosition();
-	}
-
-	public virtual void SetAppearPos(Vector3 pos)
-	{
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		isSetAppearPos = true;
-		appearPos = pos;
-	}
-
-	public virtual void SetAppearRandomPosFixDistance(Vector3 center_pos, float distance, int try_count)
-	{
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-		List<int> list = new List<int>(try_count);
-		for (int i = 0; i < try_count; i++)
-		{
-			list.Add(i);
-		}
-		float num = 360f / (float)try_count;
-		float num2 = num * Random.get_value();
-		Vector3 val = Vector3.get_zero();
-		for (int j = 0; j < try_count; j++)
-		{
-			int index = (int)((float)list.Count * Random.get_value());
-			int num3 = list[index];
-			list.RemoveAt(index);
-			float num4 = num2 + num * (float)num3;
-			if (num4 >= 360f)
-			{
-				num4 -= 360f;
-			}
-			Vector3 val2 = center_pos + Quaternion.Euler(0f, num4, 0f) * Vector3.get_forward() * distance;
-			if (MonoBehaviourSingleton<StageManager>.I.CheckPosInside(val2))
-			{
-				val = val2;
-				break;
-			}
-		}
-		_position = val;
-		_rotation = Quaternion.AngleAxis(Random.get_value() * 360f, Vector3.get_up());
-		SetAppearPos(val);
-	}
-
-	public override AttackHitChecker ReferenceAttackHitChecker()
-	{
-		referenceCheckerFlag = true;
-		return attackHitChecker;
-	}
-
-	public void AttackHitCheckerClearAll()
-	{
-		if (!object.ReferenceEquals(attackHitChecker, null))
-		{
-			attackHitChecker.ClearAll();
-		}
-	}
-
-	public void AttackHitCheckerClearInfo(AnimEventData.EventData evData)
-	{
-		if (!object.ReferenceEquals(attackHitChecker, null) && evData.stringArgs.Length != 0)
-		{
-			attackHitChecker.ClearHitInfo(evData.stringArgs[0]);
-		}
-	}
-
-	private void EventChangeShaderParam(AnimEventData.EventData evData)
-	{
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0061: Expected O, but got Unknown
-		//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-		if (evData != null)
-		{
-			int num = evData.stringArgs.Length;
-			if (num >= 2)
-			{
-				string text = evData.stringArgs[0];
-				if (!string.IsNullOrEmpty(text))
-				{
-					Transform val = Utility.Find(base._transform, text);
-					if (!(val == null))
-					{
-						Renderer component = val.GetComponent<Renderer>();
-						if (!(component == null))
-						{
-							Material val2 = component.get_material();
-							if (!(val2 == null))
-							{
-								int result = 0;
-								float result2 = 0f;
-								Color white = Color.get_white();
-								for (int i = 1; i < num; i++)
-								{
-									string[] array = evData.stringArgs[i].Split(':');
-									string text2 = array[0];
-									string text3 = array[1];
-									string text4 = array[2];
-									if (val2.HasProperty(text3))
-									{
-										switch (text2)
-										{
-										case "F":
-											if (float.TryParse(text4, out result2))
-											{
-												val2.SetFloat(text3, result2);
-											}
-											break;
-										case "I":
-											if (int.TryParse(text4, out result))
-											{
-												val2.SetInt(text3, result);
-											}
-											break;
-										case "C":
-											if (ColorUtility.TryParseHtmlString("#" + text4, ref white))
-											{
-												val2.SetColor(text3, white);
-											}
-											break;
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	protected void SetShader(string shaderName, string containsString)
-	{
-		if (!string.IsNullOrEmpty(shaderName) && m_rendererList != null)
-		{
-			Utility.MaterialForEach(m_rendererList, delegate(Material material)
-			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				if (material.get_shader().get_name().Contains(containsString))
-				{
-					Shader val = ResourceUtility.FindShader(shaderName);
-					if (val != null)
-					{
-						material.set_shader(val);
-					}
-				}
-			});
-		}
-	}
-
-	protected void ChangeGhostShaderParam(float endParam, float duration)
-	{
-		if (m_rendererList != null && m_rendererList.Length > 0)
-		{
-			string SHADER_PARAM_ALPHA = "_Alpha";
-			string SHADER_PARAM_ALPHA_BLUR = "_Blend";
-			Utility.MaterialForEach(m_rendererList, delegate(Material material)
-			{
-				//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-				if (material.HasProperty(SHADER_PARAM_ALPHA_BLUR))
-				{
-					this.StartCoroutine(ChangeShaderParam(material, SHADER_PARAM_ALPHA_BLUR, endParam, duration));
-				}
-				if (material.HasProperty(SHADER_PARAM_ALPHA) && material.get_shader().get_name().Contains("enemy_"))
-				{
-					this.StartCoroutine(ChangeShaderParam(material, SHADER_PARAM_ALPHA, endParam, duration));
-				}
-			});
-		}
-	}
-
-	private IEnumerator ChangeShaderParam(Material mat, string propertyName, float endParam, float duration)
-	{
-		if (!(mat == null))
-		{
-			float timer = duration;
-			float inputParam = mat.GetFloat(propertyName);
-			bool isPlus = endParam >= inputParam;
-			bool isFinish = false;
-			while (!isFinish)
-			{
-				timer -= duration * Time.get_deltaTime();
-				if (duration <= 0f)
-				{
-					inputParam = endParam;
-				}
-				else if (isPlus)
-				{
-					float calcedParam2 = endParam / duration * Time.get_deltaTime();
-					inputParam += calcedParam2;
-				}
-				else
-				{
-					float calcedParam2 = inputParam / duration * Time.get_deltaTime();
-					inputParam -= calcedParam2;
-				}
-				if ((isPlus && inputParam >= endParam) || (!isPlus && inputParam <= endParam))
-				{
-					inputParam = endParam;
-				}
-				mat.SetFloat(propertyName, inputParam);
-				if (timer <= 0f)
-				{
-					isFinish = true;
-				}
-				yield return (object)null;
-			}
-		}
-	}
-
-	public bool IsValidShield()
-	{
-		if ((int)m_shieldHpMax <= 0)
-		{
-			return false;
-		}
-		return (int)m_shieldHp > 0;
-	}
-
-	private void DbgTimeCount(bool start)
-	{
-	}
-
-	protected virtual bool GetTargetPos(out Vector3 pos)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		pos = Vector3.get_zero();
-		return false;
-	}
+  public static readonly string[] motionStateName = new string[16 /*0x10*/]
+  {
+    "",
+    "end",
+    "idle",
+    "walk",
+    "rotate_l",
+    "rotate_r",
+    "damage",
+    "dead",
+    "paralyze",
+    "move_side_r",
+    "move_side_l",
+    "hide",
+    "hide_end",
+    "move_point",
+    "move_lookat",
+    "attack_{0:00}"
+  };
+  public static readonly string poseStateName = "pose";
+  private static Dictionary<string, int> motionHashCaches = new Dictionary<string, int>();
+  public const string ANIMATOR_DEF_LAYER_NAME = "Base Layer.";
+  protected const string ANIMATOR_NEXT_TRIGGER_NAME = "next";
+  private static readonly Character.MotionHashTable motionHash;
+  protected string lastAnimTrigger;
+  protected List<string> changeTriggerList = new List<string>();
+  protected bool periodicSyncActionPositionFlag;
+  protected float periodicSyncActionPositionLastTime;
+  protected List<Character.PeriodicSyncActionPositionInfo> periodicSyncActionPositionList = new List<Character.PeriodicSyncActionPositionInfo>();
+  protected StageObject periodicSyncTarget;
+  protected bool enableRootMotion = true;
+  protected bool enableEventMove;
+  protected Vector3 eventMoveVelocity = Vector3.zero;
+  protected float eventMoveTimeCount;
+  public AnimEventData animEventData;
+  protected CharacterStampCtrl stepCtrl;
+  [Tooltip("最短移動回転時間（回転始動と終了のスムーズに関係")]
+  public float moveRotateMinimumTime = 0.3f;
+  [Tooltip("移動回転最大速度（角度/s")]
+  public float moveRotateMaxSpeed = 60f;
+  [Tooltip("移動回転最大速度変動掛け率")]
+  public float actionMoveRotateMaxSpeedRate = 1f;
+  [Tooltip("移動停止範囲")]
+  public float moveStopRange = 5f;
+  protected float moveSyncTime;
+  protected float moveSyncDirection;
+  protected float moveSyncDirectionTime;
+  protected bool moveSyncEnd;
+  protected float moveSyncEndDirection;
+  public int moveSyncMotionID;
+  protected Vector3 moveBeforePos = Vector3.zero;
+  protected float moveNowDistance;
+  protected float moveMaxDistance;
+  [Tooltip("最短回転時間（回転始動と終了のスムーズに関係")]
+  public float rotateMinimumTime = 0.1f;
+  [Tooltip("回転最大速度（角度/s")]
+  public float rotateMaxSpeed = 120f;
+  protected int rotateSign;
+  protected float rotateVelocity;
+  protected float rootRotationRate = 1f;
+  protected int rotateTargetCnt;
+  protected bool rotateTargetEnd;
+  protected GameObject damegeRemainEffect;
+  protected float rotateEventSpeed;
+  protected float rotateEventDirection;
+  protected bool rotateEventKeep;
+  protected bool rotateToTargetFlag;
+  protected float rotateToTargetDiffAngle;
+  protected bool rotateSafeMode;
+  private Vector3 _velocity = Vector3.zero;
+  public Character.VELOCITY_TYPE velocityType;
+  protected float actionMoveRate = 1f;
+  protected float rootMotionMoveRate = 1f;
+  protected List<Character.DelayReactionInfo> m_reactionDelayList = new List<Character.DelayReactionInfo>();
+  protected bool isReactionDelaySet;
+  private XorInt _hpMax = (XorInt) 0;
+  private XorInt _hp = (XorInt) 0;
+  protected int localDamage;
+  protected XorInt m_shieldHpMax = (XorInt) 0;
+  public XorInt m_shieldHp = (XorInt) 0;
+  protected AttackInfo[] attackInfos;
+  private XorFloat _damageHealRate;
+  private XorFloat _attackWeakRate;
+  private XorFloat _attackDownRate;
+  private XorFloat _downPowerWeak;
+  private XorFloat _downPowerSimpleWeak;
+  private XorFloat _elementWeakRate;
+  private XorFloat _elementSkillWeakRate;
+  private XorFloat _skillWeakRate;
+  private XorFloat _healWeakRate;
+  private XorFloat _elementSpAttackWeakRate;
+  private List<AttackColliderObject> m_exAtkColliderObjectList = new List<AttackColliderObject>();
+  protected bool[] objectTypeAutoDelete = new bool[4]
+  {
+    true,
+    false,
+    true,
+    true
+  };
+  protected List<List<GameObject>> objectList;
+  protected float hitStopTimer = float.MinValue;
+  protected AnimEventProcessor animEventProcessor;
+  protected bool animUpdatePhysics;
+  protected List<string> animatorBoolList = new List<string>();
+  protected List<AnimEventCollider> animEventColliderList = new List<AnimEventCollider>();
+  protected AttackHitChecker attackHitChecker = new AttackHitChecker();
+  protected bool referenceCheckerFlag;
+  protected List<string> hideRendererList = new List<string>();
+  protected bool isPlayingEndMotion;
+  private bool isImmortal;
+  public ContinusAttackParam continusAttackParam;
+  public List<AnimEventData.EventData> continusAtkEventDataList = new List<AnimEventData.EventData>();
+  public BuffParam buffParam;
+  protected float buffSyncLastTime;
+  public BadStatus badStatusMax = new BadStatus();
+  public BadStatus badStatusBase = new BadStatus();
+  protected float paralyzeTime;
+  public float paralyzeEffectScale = 1f;
+  public string paralyzeEffectName = "ef_btl_wyvern_paralyz_01";
+  protected Transform paralyzeEffectTrans;
+  protected string nowAnimCtrlName;
+  protected string nextAnimCtrlName;
+  protected int nextMotionHash;
+  protected float nextMotionTransitionTime = -1f;
+  protected GameObject actionRendererModel;
+  protected string actionRendererNodeName;
+  protected Transform actionRendererInstance;
+  protected float actMotionStartTime = -1f;
+  public bool onTheGround = true;
+  public bool isUseInvincibleBuff;
+  public float actionReceiveDamageRate = 1f;
+  public bool isUseInvincibleBadStatusBuff;
+  private List<GameObject> hittingIceFloor = new List<GameObject>(10);
+  public const float FREEZE_START_NORMALIZED_TIME = 0.1f;
+  public const float FREEZE_EFFECT_HEIGHT = 30f;
+  public const float FREEZE_EFFECT_SPEED = 5f;
+  private Renderer[] m_rendererList;
+  private GameObject m_effectFreeze;
+  private float m_freezeTimer;
+  private float m_freezeHeight;
+  private float m_emissionRadius;
+  protected bool m_isStopMotionByDebuff;
+  public float stopMotionByDebuffNormalizedTime = -1f;
+  protected List<Character.ACTION_ID> shadowSealingStackDebuff = new List<Character.ACTION_ID>();
+  protected GameObject m_effectElectricShock;
+  private const float DEFAULT_MOVE_ANGLE = 45f;
+  private const float DEFAULT_MOVE_ANGLE_SPEED_MAX = 20f;
+  private float m_moveAngle_deg = 45f;
+  private float m_moveAngleSpeed_deg = 20f;
+  private float m_movedAngle_deg;
+  private float m_diffAngle_deg;
+  private int m_moveAngleSign;
+  public static readonly Vector3 DEFAULT_MOVE_POINT = Vector3.zero;
+  protected int m_rotateForActMotionId = 4;
+  protected float m_rotateForActTime;
+  protected float m_rotateForActFinishTime;
+  protected Quaternion m_rotateForActStart_Quat = Quaternion.identity;
+  protected Quaternion m_rotateForActEnd_Quat = Quaternion.identity;
+  protected Vector3 m_moveLookAtInitTargetDir = Vector3.zero;
+  protected static StringBuilder stateNameBuilder = new StringBuilder(1024 /*0x0400*/);
+  private bool dbgTimeCountFlag;
+  private float dbgTimeCount;
+
+  public override Vector3 _position
+  {
+    get => !this.isInitialized ? base._position : this._rigidbody.position;
+    set
+    {
+      if (!this.isInitialized)
+      {
+        base._position = value;
+      }
+      else
+      {
+        bool flag = false;
+        if ((this._rigidbody.constraints & 2) != null && (double) this._rigidbody.position.x != (double) value.x)
+          flag = true;
+        if ((this._rigidbody.constraints & 4) != null && (double) this._rigidbody.position.y != (double) value.y)
+          flag = true;
+        if ((this._rigidbody.constraints & 8) != null && (double) this._rigidbody.position.z != (double) value.z)
+          flag = true;
+        if (!((Component) this._rigidbody).gameObject.activeInHierarchy)
+          flag = true;
+        this._rigidbody.position = value;
+        if (!flag)
+          return;
+        this._transform.position = value;
+      }
+    }
+  }
+
+  public override Quaternion _rotation
+  {
+    get => !this.isInitialized ? base._rotation : this._rigidbody.rotation;
+    set
+    {
+      if (!this.isInitialized)
+      {
+        base._rotation = value;
+      }
+      else
+      {
+        bool flag = false;
+        if (!((Component) this._rigidbody).gameObject.activeInHierarchy)
+          flag = true;
+        this._rigidbody.rotation = value;
+        if (!flag)
+          return;
+        this._transform.rotation = value;
+      }
+    }
+  }
+
+  public override Vector3 _forward
+  {
+    get
+    {
+      return !this.isInitialized ? base._forward : Quaternion.op_Multiply(this._rigidbody.rotation, Vector3.forward);
+    }
+    set
+    {
+      if (this.isInitialized)
+        this._rigidbody.rotation = Quaternion.LookRotation(value);
+      else
+        base._forward = value;
+    }
+  }
+
+  public override Vector3 _right
+  {
+    get
+    {
+      return !this.isInitialized ? base._right : Quaternion.op_Multiply(this._rigidbody.rotation, Vector3.right);
+    }
+    set
+    {
+      if (this.isInitialized)
+        this._rigidbody.rotation = Quaternion.FromToRotation(Vector3.right, value);
+      else
+        base._right = value;
+    }
+  }
+
+  public override Vector3 _up
+  {
+    get
+    {
+      return !this.isInitialized ? base._up : Quaternion.op_Multiply(this._rigidbody.rotation, Vector3.up);
+    }
+    set
+    {
+      if (this.isInitialized)
+        this._rigidbody.rotation = Quaternion.FromToRotation(Vector3.up, value);
+      else
+        base._up = value;
+    }
+  }
+
+  public override void _LookAt(Vector3 pos)
+  {
+    if (this.isInitialized)
+      this._rigidbody.rotation = Quaternion.LookRotation(Vector3.op_Subtraction(pos, this._position));
+    else
+      base._LookAt(pos);
+  }
+
+  public InGameSettingsManager.Character charaParameter { get; private set; }
+
+  public string charaName { get; set; }
+
+  public string fullName { get; set; }
+
+  public Animator animator { get; protected set; }
+
+  public Transform body { get; set; }
+
+  public Transform rootNode { get; protected set; }
+
+  public Character.ACTION_ID actionID { get; protected set; }
+
+  public Character.ACTION_ID lastActionID { get; protected set; }
+
+  public int attackID { get; protected set; }
+
+  public bool isControllable { get; protected set; }
+
+  public bool isDead { get; protected set; }
+
+  public StageObject actionTarget { get; protected set; }
+
+  public Vector3 actionPosition { get; protected set; }
+
+  public bool actionPositionFlag { get; protected set; }
+
+  public bool actionPositionThroughFlag { get; protected set; }
+
+  public Vector3 targetPointPos { get; protected set; }
+
+  public StageObject attackStartTarget { get; protected set; }
+
+  public bool actionPositionWaitSync { get; protected set; }
+
+  public string actionPositionWaitTrigger { get; protected set; }
+
+  public bool directionWaitSync { get; protected set; }
+
+  public string directionWaitTrigger { get; protected set; }
+
+  public List<Character> periodicSyncOwnerList { get; protected set; }
+
+  public Vector3 lerpRotateVec { get; protected set; }
+
+  public Character.MOVE_TYPE moveType { get; protected set; }
+
+  public Vector3 moveTargetPos { get; protected set; }
+
+  public float moveSyncSpeed { get; protected set; }
+
+  public Character.ROTATE_TYPE rotateType { get; protected set; }
+
+  public float rotateDirection { get; protected set; }
+
+  public bool rotateDisableMotion { get; set; }
+
+  public void SetVelocity(Vector3 set_vec, Character.VELOCITY_TYPE type = Character.VELOCITY_TYPE.NONE)
+  {
+    this._velocity = set_vec;
+    this.velocityType = type;
+  }
+
+  public Vector3 GetVelocity() => this._velocity;
+
+  public Vector3 externalVelocity { get; protected set; }
+
+  public Vector3 addForce { get; protected set; }
+
+  public bool enableAddForce { get; protected set; }
+
+  public Vector3 addForceBeforePos { get; protected set; }
+
+  public bool waitAddForce { get; protected set; }
+
+  public bool enableMotionCancel { get; protected set; }
+
+  public bool enableMoveSuppress { get; protected set; }
+
+  public bool enableReactionDelay { get; protected set; }
+
+  public int hpMax
+  {
+    get => (int) this._hpMax;
+    set => this._hpMax = (XorInt) value;
+  }
+
+  public int hp
+  {
+    get => (int) this._hp;
+    set => this._hp = (XorInt) value;
+  }
+
+  public int hpShow
+  {
+    get
+    {
+      if (!this.isLocalDamageApply)
+        return this.hp;
+      int hpShow = this.hp - this.localDamage;
+      if (this.isDead)
+      {
+        if (hpShow < 0)
+          hpShow = 0;
+      }
+      else if (hpShow < 1)
+        hpShow = 1;
+      return hpShow;
+    }
+  }
+
+  public bool isLocalDamageApply { get; protected set; }
+
+  public AtkAttribute ShieldTolerance { get; set; }
+
+  public XorInt ShieldHpMax
+  {
+    get => this.m_shieldHpMax;
+    set => this.m_shieldHpMax = value;
+  }
+
+  public XorInt ShieldHp
+  {
+    get => this.m_shieldHp;
+    set
+    {
+      if (this.IsValidShield() && (int) value <= 0)
+        this.ActShieldBreak();
+      this.m_shieldHp = value;
+    }
+  }
+
+  public virtual void ActShieldBreak()
+  {
+  }
+
+  public virtual float GetEffectScaleDependValue() => 1f;
+
+  public AtkAttribute attack { get; protected set; }
+
+  public AtkAttribute tolerance { get; protected set; }
+
+  public AtkAttribute defense { get; protected set; }
+
+  public float damageHealRate
+  {
+    get => (float) this._damageHealRate;
+    protected set => this._damageHealRate = (XorFloat) value;
+  }
+
+  public float attackWeakRate
+  {
+    get => (float) this._attackWeakRate;
+    protected set => this._attackWeakRate = (XorFloat) value;
+  }
+
+  public float attackDownRate
+  {
+    get => (float) this._attackDownRate;
+    protected set => this._attackDownRate = (XorFloat) value;
+  }
+
+  public float downPowerWeak
+  {
+    get => (float) this._downPowerWeak;
+    protected set => this._downPowerWeak = (XorFloat) value;
+  }
+
+  public float downPowerSimpleWeak
+  {
+    get => (float) this._downPowerSimpleWeak;
+    protected set => this._downPowerSimpleWeak = (XorFloat) value;
+  }
+
+  public float elementWeakRate
+  {
+    get => (float) this._elementWeakRate;
+    protected set => this._elementWeakRate = (XorFloat) value;
+  }
+
+  public float elementSkillWeakRate
+  {
+    get => (float) this._elementSkillWeakRate;
+    protected set => this._elementSkillWeakRate = (XorFloat) value;
+  }
+
+  public float skillWeakRate
+  {
+    get => (float) this._skillWeakRate;
+    protected set => this._skillWeakRate = (XorFloat) value;
+  }
+
+  public float healWeakRate
+  {
+    get => (float) this._healWeakRate;
+    protected set => this._healWeakRate = (XorFloat) value;
+  }
+
+  public float elementSpAttackWeakRate
+  {
+    get => (float) this._elementSpAttackWeakRate;
+    protected set => this._elementSpAttackWeakRate = (XorFloat) value;
+  }
+
+  public CharacterPacketReceiver characterReceiver => (CharacterPacketReceiver) this.packetReceiver;
+
+  public CharacterPacketSender characterSender => (CharacterPacketSender) this.packetSender;
+
+  public void SetImmortal() => this.isImmortal = true;
+
+  public BadStatus atkBadStatus { get; protected set; }
+
+  public BadStatus badStatusTotal { get; protected set; }
+
+  public EffectPlayProcessor effectPlayProcessor { get; set; }
+
+  public bool isSetAppearPos { get; protected set; }
+
+  public Vector3 appearPos { get; protected set; }
+
+  public AttackTrackingTarget TrackingTargetBullet { get; set; }
+
+  public int SyncRandomSeed { get; set; }
+
+  public StringKeyTable<BulletData> cachedBulletDataTable { get; set; }
+
+  protected Renderer[] _rendererArray
+  {
+    get => this.m_rendererList;
+    set => this.m_rendererList = value;
+  }
+
+  public bool IsAbleToInvincibleBuff()
+  {
+    return !this.isDead && !this.IsValidBuff(BuffParam.BUFFTYPE.AUTO_REVIVE) && !this.IsValidBuff(BuffParam.BUFFTYPE.INVINCIBLE_BADSTATUS) && !this.IsValidBuff(BuffParam.BUFFTYPE.INVINCIBLECOUNT) && !this.isUseInvincibleBuff;
+  }
+
+  public bool IsAbleToInvincibleBadStatusBuff()
+  {
+    return !this.isDead && !this.IsValidBuff(BuffParam.BUFFTYPE.AUTO_REVIVE) && !this.IsValidBuff(BuffParam.BUFFTYPE.INVINCIBLECOUNT) && !this.IsValidBuff(BuffParam.BUFFTYPE.INVINCIBLE_BADSTATUS) && !this.isUseInvincibleBadStatusBuff;
+  }
+
+  public override void LookAt(Vector3 pos, bool isBlindEnable = false)
+  {
+    if (isBlindEnable && this.IsValidBuffBlind())
+      return;
+    pos.y = this._position.y;
+    this._LookAt(pos);
+  }
+
+  static Character() => Character.motionHash = new Character.MotionHashTable();
+
+  protected override void Awake()
+  {
+    base.Awake();
+    this.objectType = StageObject.OBJECT_TYPE.CHARACTER;
+    this.animator = (Animator) null;
+    this.body = (Transform) null;
+    this.actionID = Character.ACTION_ID.IDLE;
+    this.lastActionID = Character.ACTION_ID.NONE;
+    this.attackID = 0;
+    this.isControllable = true;
+    this.periodicSyncOwnerList = new List<Character>();
+    this.lerpRotateVec = Vector3.zero;
+    this.moveType = Character.MOVE_TYPE.NONE;
+    this.moveTargetPos = Vector3.zero;
+    this.rotateType = Character.ROTATE_TYPE.NONE;
+    this.rotateDirection = 0.0f;
+    this.rootRotationRate = 1f;
+    this.externalVelocity = Vector3.zero;
+    this.addForce = Vector3.zero;
+    this.enableAddForce = false;
+    this.addForceBeforePos = Vector3.zero;
+    this.waitAddForce = false;
+    this.enableMotionCancel = false;
+    this.enableMoveSuppress = false;
+    this.actionPositionFlag = false;
+    this.actionPositionWaitSync = false;
+    this.actionPositionWaitTrigger = (string) null;
+    this.directionWaitSync = false;
+    this.directionWaitTrigger = (string) null;
+    this.hpMax = 0;
+    this.hp = this.hpMax;
+    this.attack = new AtkAttribute();
+    this.tolerance = new AtkAttribute();
+    this.defense = new AtkAttribute();
+    this.damageHealRate = 1f;
+    this.downPowerWeak = 0.0f;
+    this.downPowerSimpleWeak = 0.0f;
+    this.actionReceiveDamageRate = 1f;
+    this.actionMoveRotateMaxSpeedRate = 1f;
+    this.objectList = new List<List<GameObject>>();
+    for (int index = 0; index < 4; ++index)
+      this.objectList.Add(new List<GameObject>());
+    this.atkBadStatus = new BadStatus();
+    this.badStatusTotal = new BadStatus();
+    this.badStatusMax = new BadStatus(1f);
+    this.buffParam = new BuffParam(this);
+    this.continusAttackParam = new ContinusAttackParam(this);
+    this.effectPlayProcessor = (EffectPlayProcessor) null;
+    this.isSetAppearPos = false;
+    this.isUseInvincibleBuff = false;
+    this.isUseInvincibleBadStatusBuff = false;
+    this.cachedBulletDataTable = new StringKeyTable<BulletData>();
+    this.charaParameter = MonoBehaviourSingleton<InGameSettingsManager>.I.character;
+  }
+
+  protected override void Clear()
+  {
+    base.Clear();
+    this.animator = (Animator) null;
+    this.animEventProcessor = (AnimEventProcessor) null;
+    int index1 = 0;
+    for (int count = this.objectList.Count; index1 < count; ++index1)
+    {
+      int index2 = 0;
+      while (index2 < this.objectList[index1].Count)
+      {
+        if (Object.op_Equality((Object) this.objectList[index1][index2].transform.parent, (Object) this._transform))
+          ++index2;
+        else
+          this.objectList[index1].RemoveAt(index2);
+      }
+    }
+    this.animatorBoolList.Clear();
+    this.changeTriggerList.Clear();
+    this.animEventColliderList.ForEach((Action<AnimEventCollider>) (o => o.Destroy()));
+    this.animEventColliderList.Clear();
+  }
+
+  public override void OnLoadComplete()
+  {
+    base.OnLoadComplete();
+    this.rootNode = Utility.Find(this._transform, "Root");
+    if (Object.op_Inequality((Object) this._collider, (Object) null) && Object.op_Equality((Object) this._rigidbody, (Object) null))
+      this._rigidbody = ((Component) this).gameObject.AddComponent<Rigidbody>();
+    if (this.body != null)
+      this.animator = ((Component) this.body).GetComponent<Animator>();
+    if (this.animator == null)
+      this.animator = ((Component) this).gameObject.GetComponentInChildren<Animator>();
+    if (Object.op_Inequality((Object) this.animator, (Object) null))
+    {
+      this.animator.applyRootMotion = true;
+      this.animator.cullingMode = (AnimatorCullingMode) 0;
+      this.animator.Update(0.0f);
+      this.animator.updateMode = !this.animUpdatePhysics ? (AnimatorUpdateMode) 0 : (AnimatorUpdateMode) 1;
+      Transform transform = ((Component) this.animator).transform;
+      if (Object.op_Inequality((Object) transform, (Object) this._transform))
+      {
+        this._transform.localScale = transform.localScale;
+        transform.localScale = Vector3.one;
+      }
+    }
+    this.nowAnimCtrlName = (string) null;
+    this.nextAnimCtrlName = (string) null;
+    this.nextMotionHash = 0;
+    this.nextMotionTransitionTime = -1f;
+    this.stepCtrl = ((Component) this).gameObject.GetComponentInChildren<CharacterStampCtrl>();
+    if (Object.op_Inequality((Object) this.animEventData, (Object) null) && Object.op_Inequality((Object) this.animator, (Object) null))
+    {
+      this.animEventProcessor = new AnimEventProcessor(this.animEventData, this.animator, (IAnimEvent) this);
+    }
+    else
+    {
+      AnimEventComponent component = ((Component) this).gameObject.GetComponent<AnimEventComponent>();
+      if (Object.op_Inequality((Object) component, (Object) null) && ((Behaviour) component).enabled && Object.op_Inequality((Object) component.animEventData, (Object) null))
+      {
+        this.animEventProcessor = new AnimEventProcessor(component.animEventData, this.animator, (IAnimEvent) this);
+        Object.Destroy((Object) component);
+      }
+    }
+    this.m_rendererList = ((Component) ((Component) this).transform).GetComponentsInChildren<Renderer>(true);
+  }
+
+  protected override void Initialize()
+  {
+    base.Initialize();
+    if (!Object.op_Inequality((Object) this.controller, (Object) null))
+      return;
+    this.controller.OnCharacterInitialized();
+  }
+
+  protected override void Update()
+  {
+    base.Update();
+    this.UpdateAction();
+    if ((double) this.hitStopTimer >= 0.0)
+    {
+      this.hitStopTimer -= Time.deltaTime;
+      if ((double) this.hitStopTimer <= 0.0)
+        this.SetHitStop(-1f);
+    }
+    this.continusAttackParam.Update();
+    this.buffParam.UpdateConditionsAbility();
+    this.buffParam.Update();
+    if (this.IsOriginal() && (double) this.buffSyncLastTime != 0.0 && (double) Time.time > (double) this.buffSyncLastTime + (double) this.charaParameter.buffSyncUpdateInterval)
+      this.SendBuffSync();
+    if (Vector3.op_Inequality(this.lerpRotateVec, Vector3.zero))
+    {
+      Quaternion quaternion = Quaternion.LookRotation(this.lerpRotateVec);
+      float num = this.moveRotateMaxSpeed * this.actionMoveRotateMaxSpeedRate * Time.deltaTime / Mathf.Abs(Vector3.Angle(this._forward, this.lerpRotateVec));
+      if ((double) num > 1.0)
+      {
+        this.lerpRotateVec = Vector3.zero;
+        num = 1f;
+      }
+      this._rotation = Quaternion.Lerp(this._rotation, quaternion, num);
+    }
+    this.UpdateReactionDelay();
+  }
+
+  protected override void FixedUpdate()
+  {
+    if (this.rotateToTargetFlag)
+    {
+      if (this.actionPositionFlag)
+      {
+        Vector3 vector3 = Vector3.op_Subtraction(this.actionPosition, this._position);
+        vector3.y = 0.0f;
+        if ((double) ((Vector3) ref vector3).magnitude < 0.10000000149011612)
+          vector3 = this._forward;
+        else if (this.rotateSafeMode && (double) Vector3.Angle(Vector3.op_UnaryNegation(this._forward), vector3) < 1.0)
+          vector3 = this._forward;
+        Quaternion quaternion = Quaternion.LookRotation(vector3);
+        this.rotateEventDirection = ((Quaternion) ref quaternion).eulerAngles.y + this.rotateToTargetDiffAngle;
+        if ((double) this.rotateEventSpeed <= 0.0)
+          this._rotation = Quaternion.AngleAxis(this.rotateEventDirection, Vector3.up);
+      }
+      else
+      {
+        Quaternion rotation = this._rotation;
+        this.rotateEventDirection = ((Quaternion) ref rotation).eulerAngles.y;
+      }
+      if (!this.periodicSyncActionPositionFlag)
+        this.rotateToTargetFlag = false;
+    }
+    if (this.rotateEventKeep)
+    {
+      if (Object.op_Inequality((Object) this.attackStartTarget, (Object) null))
+      {
+        Vector3 forward = this._forward;
+        forward.y = 0.0f;
+        ((Vector3) ref forward).Normalize();
+        Vector3 vector3 = Vector3.op_Subtraction(this.attackStartTarget._position, this._position);
+        vector3.y = 0.0f;
+        int num1 = (double) Vector3.Cross(forward, vector3).y >= 0.0 ? 1 : -1;
+        float num2 = Vector3.Angle(forward, vector3);
+        Quaternion rotation = this._rotation;
+        Vector3 eulerAngles = ((Quaternion) ref rotation).eulerAngles;
+        float num3 = num2;
+        if ((double) this.rotateEventSpeed > 0.0)
+        {
+          num3 = this.rotateEventSpeed * Time.deltaTime;
+          if ((double) num2 <= (double) num3)
+            num3 = num2;
+        }
+        this._rotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y + (float) num1 * num3, eulerAngles.z);
+      }
+    }
+    else if ((double) this.rotateEventSpeed != 0.0)
+    {
+      Vector3 forward = this._forward;
+      forward.y = 0.0f;
+      ((Vector3) ref forward).Normalize();
+      Vector3 vector3 = Quaternion.op_Multiply(Quaternion.AngleAxis(this.rotateEventDirection, Vector3.up), Vector3.forward);
+      int num4 = (double) Vector3.Cross(forward, vector3).y >= 0.0 ? 1 : -1;
+      float num5 = Vector3.Angle(forward, vector3);
+      Quaternion rotation = this._rotation;
+      Vector3 eulerAngles = ((Quaternion) ref rotation).eulerAngles;
+      float num6 = this.rotateEventSpeed * Time.deltaTime;
+      if ((double) num5 <= (double) num6)
+      {
+        num6 = num5;
+        if (!this.rotateToTargetFlag)
+        {
+          this.rotateEventSpeed = 0.0f;
+          this.rotateEventDirection = 0.0f;
+        }
+      }
+      this._rotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y + (float) num4 * num6, eulerAngles.z);
+    }
+    if ((this.IsCoopNone() || this.IsOriginal()) && this.periodicSyncActionPositionFlag)
+    {
+      if (Object.op_Inequality((Object) this.periodicSyncTarget, (Object) this.actionTarget))
+        this.SetPeriodicSyncTarget(this.actionTarget);
+      float actMotionTime = this.GetActMotionTime();
+      if ((double) actMotionTime - (double) this.periodicSyncActionPositionLastTime >= (double) this.charaParameter.periodicSyncActionPositionCheckTime)
+      {
+        Vector3 targetPosition = this.GetTargetPosition(this.actionTarget);
+        bool flag = Object.op_Inequality((Object) this.actionTarget, (Object) null);
+        Vector3 actionPosition = this.actionPosition;
+        if (Vector3.op_Inequality(targetPosition, actionPosition) || flag != this.actionPositionFlag)
+        {
+          Character.PeriodicSyncActionPositionInfo info = new Character.PeriodicSyncActionPositionInfo();
+          info.applyTime = actMotionTime + this.charaParameter.periodicSyncActionPositionApplyTime;
+          if (Object.op_Inequality((Object) this.actionTarget, (Object) null))
+          {
+            info.actionPosition = this.GetTargetPosition(this.actionTarget);
+            info.actionPositionFlag = true;
+            this.GetTargetPos(out info.targetPointPos);
+          }
+          this.AddPeriodicSyncActionPosition(info);
+          this.periodicSyncActionPositionLastTime = actMotionTime + this.charaParameter.periodicSyncActionPositionApplyTime;
+        }
+      }
+    }
+    if (this.periodicSyncActionPositionList.Count > 0)
+    {
+      int index = 0;
+      while (index < this.periodicSyncActionPositionList.Count)
+      {
+        double actMotionTime = (double) this.GetActMotionTime();
+        Character.PeriodicSyncActionPositionInfo syncActionPosition = this.periodicSyncActionPositionList[index];
+        double applyTime = (double) syncActionPosition.applyTime;
+        if (actMotionTime >= applyTime)
+        {
+          this.SetActionPosition(syncActionPosition.actionPosition, syncActionPosition.actionPositionFlag);
+          this.targetPointPos = syncActionPosition.targetPointPos;
+          this.periodicSyncActionPositionList.RemoveAt(index);
+        }
+        else
+          ++index;
+      }
+    }
+    if ((double) this.eventMoveTimeCount > 0.0)
+    {
+      this.eventMoveTimeCount -= Time.deltaTime;
+      if ((double) this.eventMoveTimeCount <= 0.0)
+      {
+        this.eventMoveTimeCount = 0.0f;
+        this.enableEventMove = false;
+        this.enableAddForce = false;
+        this.SetVelocity(Vector3.zero);
+        this.eventMoveVelocity = Vector3.zero;
+      }
+    }
+    if (this.enableEventMove)
+      this.SetVelocity(Quaternion.op_Multiply(Quaternion.LookRotation(this.GetTransformForward()), this.eventMoveVelocity), Character.VELOCITY_TYPE.EVENT_MOVE);
+    base.FixedUpdate();
+    if (this.animEventProcessor != null)
+      this.animEventProcessor.Update();
+    this.FixedUpdatePhysics();
+    this.UpdateNextMotion();
+  }
+
+  protected virtual void FixedUpdatePhysics()
+  {
+    if (!this.isInitialized)
+      return;
+    if (this.enableAddForce)
+    {
+      Vector3 addForceBeforePos = this.addForceBeforePos;
+      addForceBeforePos.y = 0.1f;
+      Vector3 position1 = this._position;
+      position1.y = 0.1f;
+      if (Vector3.op_Inequality(addForceBeforePos, position1))
+      {
+        Vector3 vector3 = Vector3.op_Subtraction(position1, addForceBeforePos);
+        if (Physics.Raycast(addForceBeforePos, vector3, ((Vector3) ref vector3).magnitude, 393728 /*0x060200*/))
+        {
+          addForceBeforePos.y = this._position.y;
+          this._position = addForceBeforePos;
+        }
+        Vector3 position2 = this._position;
+        position2.y = 0.0f;
+        this.addForceBeforePos = position2;
+      }
+    }
+    else if (!this.IsHitStop())
+    {
+      float num = 1f;
+      if (this.enableMoveSuppress && this.actionPositionFlag && !this.actionPositionThroughFlag)
+      {
+        Vector3 vector3 = Vector3.op_Subtraction(this.actionPosition, this._position);
+        vector3.y = 0.0f;
+        if ((double) ((Vector3) ref vector3).magnitude <= (double) this.charaParameter.moveSuppressLength)
+          num = this.charaParameter.moveSuppressRate;
+      }
+      Vector3 vector3_1 = Vector3.op_Multiply(Vector3.op_Multiply(this.GetVelocity(), num), this.actionMoveRate);
+      vector3_1.y = this._rigidbody.velocity.y;
+      this._rigidbody.velocity = vector3_1;
+    }
+    else
+      this._rigidbody.velocity = Vector3.zero;
+    Vector3 position3 = this._position;
+    float height = StageManager.GetHeight(position3);
+    if (!this.waitAddForce)
+    {
+      if (Vector3.op_Inequality(this.addForce, Vector3.zero))
+      {
+        this._rigidbody.velocity = Vector3.zero;
+        this._rigidbody.AddForce(Vector3.op_Multiply(this.addForce, 0.02f / Time.fixedDeltaTime));
+        if ((double) this.addForce.y > 0.0)
+          this._rigidbody.constraints = (RigidbodyConstraints) (this._rigidbody.constraints & -5);
+        this.addForce = Vector3.zero;
+        this.enableAddForce = true;
+        Vector3 position4 = this._position;
+        position4.y = 0.0f;
+        this.addForceBeforePos = position4;
+      }
+      else if ((this._rigidbody.constraints & 4) == null && (double) position3.y <= (double) height + 0.029999999329447746 && (double) this._rigidbody.velocity.y <= 0.0)
+      {
+        this._rigidbody.constraints = (RigidbodyConstraints) (this._rigidbody.constraints | 4);
+        Vector3 velocity = this._rigidbody.velocity;
+        velocity.y = 0.0f;
+        this._rigidbody.velocity = velocity;
+        this.enableAddForce = false;
+      }
+    }
+    Vector3 externalVelocity = this.externalVelocity;
+    externalVelocity.y = 0.0f;
+    Rigidbody rigidbody = this._rigidbody;
+    rigidbody.velocity = Vector3.op_Addition(rigidbody.velocity, externalVelocity);
+    this.externalVelocity = Vector3.zero;
+    if (!this.onTheGround)
+      return;
+    if ((this._rigidbody.constraints & 4) != null)
+    {
+      if ((double) Mathf.Abs(position3.y - height) <= 0.0099999997764825821)
+        return;
+      position3.y = height;
+      this._position = position3;
+    }
+    else
+    {
+      if ((double) position3.y >= (double) height)
+        return;
+      position3.y = height;
+      this._position = position3;
+    }
+  }
+
+  protected void UpdateNextMotion()
+  {
+    if (this.animEventProcessor == null || this.nextMotionHash == 0 || !Object.op_Inequality((Object) this.animator, (Object) null))
+      return;
+    this.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.PLAY_MOTION;
+    string nextAnimCtrlName = this.nextAnimCtrlName;
+    int nextMotionHash = this.nextMotionHash;
+    float motionTransitionTime = this.nextMotionTransitionTime;
+    if ((double) motionTransitionTime < 0.0)
+      motionTransitionTime = this.charaParameter.motionTransitionTime;
+    this.nextAnimCtrlName = (string) null;
+    this.nextMotionHash = 0;
+    this.nextMotionTransitionTime = -1f;
+    if (nextAnimCtrlName != this.nowAnimCtrlName)
+    {
+      RuntimeAnimatorController animCtrl = this.GetAnimCtrl(nextAnimCtrlName);
+      AnimEventData animEvent = this.GetAnimEvent(nextAnimCtrlName);
+      if (Object.op_Inequality((Object) animCtrl, (Object) null) && Object.op_Inequality((Object) animEvent, (Object) null))
+      {
+        this.animEventProcessor.ChangeAnimCtrl(animCtrl, animEvent);
+        this.nowAnimCtrlName = nextAnimCtrlName;
+      }
+      else
+        Log.Error(LOG.INGAME, "Character.UpdateNextMotion() anim_ctrl or anim_event is null. ctrlName = {0}", (object) nextAnimCtrlName);
+    }
+    if (this.charaName == "Hellish Zaark" && nextMotionHash == 423958061)
+      Debug.Log((object) $"temp hash: {(object) nextMotionHash} {this.nowAnimCtrlName}");
+    this.animEventProcessor.CrossFade(nextMotionHash, motionTransitionTime);
+    this.UpdateAnimatorSpeed();
+    if ((double) this.actMotionStartTime >= 0.0)
+      return;
+    this.actMotionStartTime = Time.time;
+  }
+
+  public override void OnDetachedObject(StageObject stage_object)
+  {
+    base.OnDetachedObject(stage_object);
+    if (Object.op_Equality((Object) this.actionTarget, (Object) stage_object))
+      this.SetActionTarget((StageObject) null, false);
+    if (Object.op_Equality((Object) this.attackStartTarget, (Object) stage_object))
+      this.attackStartTarget = (StageObject) null;
+    if (Object.op_Equality((Object) this.periodicSyncTarget, (Object) stage_object))
+      this.periodicSyncTarget = (StageObject) null;
+    int index = this.periodicSyncOwnerList.IndexOf(stage_object as Character);
+    if (index >= 0)
+      this.periodicSyncOwnerList.RemoveAt(index);
+    if (!Object.op_Inequality((Object) this.controller, (Object) null))
+      return;
+    this.controller.OnDetachedObject(stage_object);
+  }
+
+  public override void OnAnimatorMove()
+  {
+    if (!Object.op_Inequality((Object) this.animator, (Object) null) || !this.animator.applyRootMotion || !this.enableRootMotion || this.enableEventMove || this.enableAddForce)
+      return;
+    float num = (double) Time.deltaTime > 0.0 ? 1f / Time.deltaTime : 0.0f;
+    Vector3 deltaPosition = this.animator.deltaPosition;
+    deltaPosition.x *= num;
+    deltaPosition.z *= num;
+    Vector3 set_vec = Vector3.op_Multiply(deltaPosition, this.rootMotionMoveRate);
+    if (Vector3.op_Inequality(this.lerpRotateVec, Vector3.zero))
+      this.SetVelocity(Quaternion.op_Multiply(Quaternion.FromToRotation(this._forward, this.lerpRotateVec), set_vec), Character.VELOCITY_TYPE.ROOT_MOTION);
+    else
+      this.SetVelocity(set_vec, Character.VELOCITY_TYPE.ROOT_MOTION);
+    if (!Quaternion.op_Inequality(this.animator.deltaRotation, Quaternion.identity))
+      return;
+    if ((double) this.rootRotationRate == 1.0)
+      this._rotation = Quaternion.op_Multiply(this._rotation, this.animator.deltaRotation);
+    else
+      this._rotation = Quaternion.Lerp(this._rotation, Quaternion.op_Multiply(this._rotation, this.animator.deltaRotation), this.rootRotationRate);
+  }
+
+  public virtual void SetAnimUpdatePhysics(bool enable)
+  {
+    this.animUpdatePhysics = enable;
+    if (!Object.op_Inequality((Object) this.animator, (Object) null))
+      return;
+    if (this.animUpdatePhysics)
+      this.animator.updateMode = (AnimatorUpdateMode) 1;
+    else
+      this.animator.updateMode = (AnimatorUpdateMode) 0;
+  }
+
+  public virtual void SetActionTarget(StageObject target, bool send = true)
+  {
+    bool flag = false;
+    if (Object.op_Inequality((Object) this.actionTarget, (Object) target))
+      flag = true;
+    this.actionTarget = target;
+    if (!(send & flag) || !Object.op_Inequality((Object) this.characterSender, (Object) null))
+      return;
+    this.characterSender.OnSetActionTarget(target);
+  }
+
+  public void SetActionPosition(Vector3 position, bool flag)
+  {
+    if (!flag || this.IsValidBuffBlind())
+    {
+      position = Vector3.op_Multiply(this._forward, 3f);
+      flag = false;
+    }
+    this.actionPosition = position;
+    this.actionPositionFlag = flag;
+  }
+
+  public virtual void UpdateActionPosition(string trigger)
+  {
+    if (this.IsCoopNone() || this.IsOriginal())
+      this.SetAttackActionPosition();
+    this.SetChangeTrigger(trigger);
+    this.EndWaitingPacket(StageObject.WAITING_PACKET.CHARACTER_UPDATE_ACTION_POSITION);
+    this.actionPositionWaitSync = false;
+    this.actionPositionWaitTrigger = (string) null;
+    if (!Object.op_Inequality((Object) this.characterSender, (Object) null))
+      return;
+    this.characterSender.OnUpdateActionPosition(trigger);
+  }
+
+  public virtual void UpdateDirection(string trigger)
+  {
+    this.SetChangeTrigger(trigger);
+    this.EndWaitingPacket(StageObject.WAITING_PACKET.CHARACTER_UPDATE_DIRECTION);
+    this.directionWaitSync = false;
+    this.directionWaitTrigger = (string) null;
+    if (!Object.op_Inequality((Object) this.characterSender, (Object) null))
+      return;
+    this.characterSender.OnUpdateDirection(trigger);
+  }
+
+  public void AddPeriodicSyncActionPosition(Character.PeriodicSyncActionPositionInfo info)
+  {
+    if (info == null)
+      return;
+    int index1 = 0;
+    int index2 = 0;
+    for (int count = this.periodicSyncActionPositionList.Count; index2 < count && (double) info.applyTime >= (double) this.periodicSyncActionPositionList[index2].applyTime; ++index2)
+      ++index1;
+    this.periodicSyncActionPositionList.Insert(index1, info);
+    if (!Object.op_Inequality((Object) this.characterSender, (Object) null))
+      return;
+    this.characterSender.OnPeriodicSyncActionPosition(info);
+  }
+
+  public void SetHitStop(float time)
+  {
+    if ((double) time < 0.0)
+      time = float.MinValue;
+    bool flag = (double) time != -3.4028234663852886E+38;
+    if (flag != ((double) this.hitStopTimer != -3.4028234663852886E+38))
+    {
+      int index1 = 0;
+      for (int count1 = this.objectList.Count; index1 < count1; ++index1)
+      {
+        List<GameObject> gameObjectList = this.objectList[index1];
+        int index2 = 0;
+        for (int count2 = gameObjectList.Count; index2 < count2; ++index2)
+        {
+          gameObjectList[index2].GetComponentsInChildren<Trail>(Temporary.trailList);
+          int index3 = 0;
+          for (int count3 = Temporary.trailList.Count; index3 < count3; ++index3)
+            Temporary.trailList[index3].pause = flag;
+          Temporary.trailList.Clear();
+        }
+      }
+    }
+    if ((double) this.actMotionStartTime >= 0.0 && (double) time > 0.0)
+      this.actMotionStartTime += time;
+    this.hitStopTimer = time;
+    this.UpdateAnimatorSpeed();
+  }
+
+  public bool IsHitStop() => (double) this.hitStopTimer > 0.0;
+
+  public bool isPause { private set; get; }
+
+  public void setPause(bool pause)
+  {
+    this.isPause = pause;
+    this.UpdateAnimatorSpeed();
+  }
+
+  public void setPauseWithAnim(bool pause)
+  {
+    if (!pause)
+      return;
+    this.ActIdle();
+  }
+
+  protected virtual float GetAnimatorSpeed()
+  {
+    if (this.IsHitStop() || this.isPause)
+      return 0.0f;
+    switch (this.actionID)
+    {
+      case Character.ACTION_ID.MOVE:
+        return this.buffParam.GetMoveSpeed();
+      case Character.ACTION_ID.ATTACK:
+        return this.buffParam.GetAtkSpeed();
+      default:
+        return 1f;
+    }
+  }
+
+  public void UpdateAnimatorSpeed()
+  {
+    if (!Object.op_Inequality((Object) this.animator, (Object) null))
+      return;
+    this.animator.speed = this.GetAnimatorSpeed();
+  }
+
+  public virtual float GetActMotionTime()
+  {
+    float actMotionTime = 0.0f;
+    if ((double) this.actMotionStartTime >= 0.0)
+      actMotionTime = Time.time - this.actMotionStartTime;
+    return actMotionTime;
+  }
+
+  public virtual bool IsChangeableAction(Character.ACTION_ID action_id)
+  {
+    return !this.isLoading && (this.isControllable || this.enableMotionCancel);
+  }
+
+  public virtual void OnActReaction()
+  {
+    if (!Object.op_Inequality((Object) this.controller, (Object) null))
+      return;
+    this.controller.OnActReaction();
+  }
+
+  public virtual void ActIdle(bool is_sync = false, float transitionTime = -1f)
+  {
+    bool flag = false;
+    Character.ACTION_ID lastActionId = this.lastActionID;
+    if (this.actionID == Character.ACTION_ID.IDLE)
+      flag = true;
+    this.EndAction();
+    if (flag)
+      this.lastActionID = lastActionId;
+    this.actionID = Character.ACTION_ID.IDLE;
+    if (!this.IsPlayingMotion(2))
+      this.PlayMotion(2, transitionTime);
+    this.isControllable = true;
+    if (!Object.op_Inequality((Object) this.characterSender, (Object) null))
+      return;
+    this.characterSender.OnActIdle(is_sync);
+  }
+
+  public virtual void SafeActIdle()
+  {
+    if (this.isLoading || this.isDead || !this.CanSafeActIdle())
+      return;
+    this.ActIdle();
+  }
+
+  protected virtual bool CanSafeActIdle() => true;
+
+  public void SetLerpRotation(Vector3 velocity)
+  {
+    velocity.y = 0.0f;
+    this.lerpRotateVec = velocity;
+  }
+
+  public bool IsArrivalPosition(Vector3 pos, float margin = 0.0f)
+  {
+    Vector3 vector3 = Vector3.op_Subtraction(pos, this._position);
+    vector3.y = 0.0f;
+    return (double) ((Vector3) ref vector3).magnitude < (double) this.moveStopRange + (double) margin;
+  }
+
+  public bool IsHittingIceFloor() => this.hittingIceFloor.Count > 0 && !this.isDead;
+
+  public void OnHitEnterIceFloor(GameObject iceFloor)
+  {
+    if (this.hittingIceFloor.Contains(iceFloor))
+      return;
+    this.hittingIceFloor.Add(iceFloor);
+  }
+
+  public void OnHitExitIceFloor(GameObject iceFloor) => this.hittingIceFloor.Remove(iceFloor);
+
+  public void ActMoveInertia(ref Vector3 slideVerocity)
+  {
+    this.SetVelocity(slideVerocity, Character.VELOCITY_TYPE.ACT_MOVE);
+  }
+
+  public virtual void ActMoveVelocity(
+    Vector3 velocity_,
+    float sync_speed,
+    Character.MOTION_ID motion_id = Character.MOTION_ID.WALK)
+  {
+    if (this.actionID != Character.ACTION_ID.MOVE || !this.IsPlayingMotion((int) motion_id))
+    {
+      this.EndAction();
+      this.actionID = Character.ACTION_ID.MOVE;
+      if (!this.IsPlayingMotion((int) motion_id))
+        this.PlayMotion((int) motion_id);
+      if (Object.op_Inequality((Object) this.characterSender, (Object) null))
+        this.characterSender.OnActMoveVelocity((int) motion_id);
+    }
+    this.moveType = Character.MOVE_TYPE.VELOCITY;
+    this.moveSyncSpeed = sync_speed;
+    this.isControllable = true;
+    if (!Vector3.op_Inequality(this.GetVelocity(), velocity_) || !Vector3.op_Inequality(velocity_, Vector3.zero))
+      return;
+    this.SetVelocity(velocity_, Character.VELOCITY_TYPE.ACT_MOVE);
+  }
+
+  public virtual void ActMoveSyncVelocity(float time, Vector3 pos, int motion_id)
+  {
+    if (this.actionID != Character.ACTION_ID.MOVE || !this.IsPlayingMotion(motion_id))
+    {
+      this.EndAction();
+      this.actionID = Character.ACTION_ID.MOVE;
+      this.PlayMotion(motion_id);
+    }
+    this.moveType = Character.MOVE_TYPE.SYNC_VELOCITY;
+    this.enableRootMotion = false;
+    this.moveSyncTime = time;
+    this.moveTargetPos = pos;
+    this.moveSyncEnd = false;
+    this.moveSyncMotionID = motion_id;
+    Vector3 vector3 = Vector3.op_Subtraction(this.moveTargetPos, this._position);
+    vector3.y = 0.0f;
+    if ((double) this.moveSyncTime > 0.0)
+      this.SetVelocity(Vector3.op_Multiply(((Vector3) ref vector3).normalized, ((Vector3) ref vector3).magnitude / this.moveSyncTime), Character.VELOCITY_TYPE.ACT_MOVE);
+    if (Vector3.op_Equality(vector3, Vector3.zero))
+    {
+      this.moveSyncDirection = float.MinValue;
+    }
+    else
+    {
+      Quaternion quaternion = Quaternion.LookRotation(vector3);
+      this.moveSyncDirection = ((Quaternion) ref quaternion).eulerAngles.y;
+    }
+    this.moveSyncDirectionTime = this.charaParameter.moveSyncRotateTime;
+    this.StartWaitingPacket(StageObject.WAITING_PACKET.CHARACTER_MOVE_VELOCITY, false, this.charaParameter.moveSendInterval);
+  }
+
+  public virtual void SetMoveSyncVelocityEnd(
+    float time,
+    Vector3 pos,
+    float direction,
+    float sync_speed,
+    int motion_id)
+  {
+    this.moveSyncTime += time;
+    this.moveTargetPos = pos;
+    this.moveSyncEnd = true;
+    this.moveSyncEndDirection = direction;
+    this.moveSyncSpeed = sync_speed;
+    this.moveSyncMotionID = motion_id;
+    Vector3 vector3 = Vector3.op_Subtraction(this.moveTargetPos, this._position);
+    vector3.y = 0.0f;
+    if ((double) this.moveSyncSpeed > 0.0)
+    {
+      float num = ((Vector3) ref vector3).magnitude / sync_speed;
+      if ((double) num < (double) this.moveSyncTime)
+        this.moveSyncTime = num;
+    }
+    if ((double) this.moveSyncTime > 0.0)
+      this.SetVelocity(Vector3.op_Multiply(((Vector3) ref vector3).normalized, ((Vector3) ref vector3).magnitude / this.moveSyncTime), Character.VELOCITY_TYPE.ACT_MOVE);
+    if (Vector3.op_Equality(vector3, Vector3.zero))
+    {
+      this.moveSyncDirection = float.MinValue;
+    }
+    else
+    {
+      Quaternion quaternion = Quaternion.LookRotation(vector3);
+      this.moveSyncDirection = ((Quaternion) ref quaternion).eulerAngles.y;
+    }
+    this.moveSyncDirectionTime = this.charaParameter.moveSyncRotateTime;
+    this.EndWaitingPacket(StageObject.WAITING_PACKET.CHARACTER_MOVE_VELOCITY);
+  }
+
+  public virtual bool ActMoveToTarget(float max_length = 0.0f, bool fix_rotate = false)
+  {
+    if (Object.op_Equality((Object) this.actionTarget, (Object) null))
+      return false;
+    Vector3 vector3 = Vector3.op_Subtraction(this.GetTargetPosition(this.actionTarget), this._position);
+    vector3.y = 0.0f;
+    if ((double) max_length > 0.0)
+    {
+      float magnitude = ((Vector3) ref vector3).magnitude;
+      if ((double) magnitude > (double) max_length)
+        vector3 = Vector3.op_Multiply(vector3, max_length / magnitude);
+    }
+    return this.ActMoveToPosition(Vector3.op_Addition(this._position, vector3), fix_rotate);
+  }
+
+  public virtual bool ActMoveToPosition(Vector3 target_pos, bool fix_rotate = false)
+  {
+    if (this.IsArrivalPosition(target_pos))
+      return false;
+    this.EndAction();
+    this.actionID = Character.ACTION_ID.MOVE;
+    this.PlayMotion(3);
+    this.moveTargetPos = target_pos;
+    this.moveType = Character.MOVE_TYPE.TO_POSITION;
+    if (fix_rotate)
+      this.LookAt(this.moveTargetPos, true);
+    if (Object.op_Inequality((Object) this.characterSender, (Object) null))
+      this.characterSender.OnActMoveToPosition(target_pos);
+    return true;
+  }
+
+  public virtual bool ActMoveHoming(float max_length = 0.0f)
+  {
+    if ((this.IsCoopNone() || this.IsOriginal()) && Object.op_Equality((Object) this.actionTarget, (Object) null))
+      return false;
+    this.EndAction();
+    if (this.IsCoopNone() || this.IsOriginal())
+      this.SetAttackActionPosition();
+    this.actionID = Character.ACTION_ID.MOVE;
+    this.PlayMotion(3);
+    this.moveType = Character.MOVE_TYPE.HOMING;
+    this.periodicSyncActionPositionLastTime = this.GetActMotionTime();
+    this.periodicSyncActionPositionFlag = true;
+    this.SetPeriodicSyncTarget(this.actionTarget);
+    this.moveBeforePos = this._position;
+    this.moveMaxDistance = max_length;
+    if (Object.op_Inequality((Object) this.characterSender, (Object) null))
+      this.characterSender.OnActMoveHoming(max_length);
+    return true;
+  }
+
+  public virtual bool ActRotateToTarget()
+  {
+    if (Object.op_Equality((Object) this.actionTarget, (Object) null))
+      return false;
+    Vector3 vector3 = Vector3.op_Subtraction(this.GetTargetPosition(this.actionTarget), this._position);
+    vector3.y = 0.0f;
+    if (Vector3.op_Equality(vector3, Vector3.zero))
+      return false;
+    Quaternion quaternion = Quaternion.LookRotation(vector3);
+    return this.ActRotateToDirection(((Quaternion) ref quaternion).eulerAngles.y);
+  }
+
+  public virtual bool ActRotateToDirection(float direction)
+  {
+    float diff_angle = 0.0f;
+    int num = this.CalcDiffAngle(direction, ref diff_angle);
+    if ((double) diff_angle < 1.0)
+      return false;
+    this.EndAction();
+    this.actionID = Character.ACTION_ID.ROTATE;
+    if (!this.rotateDisableMotion)
+    {
+      if (num > 0)
+        this.PlayMotion(5);
+      else
+        this.PlayMotion(4);
+    }
+    this.enableRootMotion = false;
+    this.rotateType = Character.ROTATE_TYPE.TO_DIRECTION;
+    this.rotateDirection = direction;
+    this.rotateSign = num;
+    this.rotateVelocity = 0.0f;
+    if (Object.op_Inequality((Object) this.characterSender, (Object) null))
+      this.characterSender.OnActRotate(this.rotateDirection);
+    return true;
+  }
+
+  public virtual bool ActRotateMotionToTarget(bool keep_rotate = false)
+  {
+    if (Object.op_Equality((Object) this.actionTarget, (Object) null))
+      return false;
+    Vector3 vector3 = Vector3.op_Subtraction(this.GetTargetPosition(this.actionTarget), this._position);
+    vector3.y = 0.0f;
+    ((Vector3) ref vector3).Normalize();
+    if (Vector3.op_Equality(vector3, Vector3.zero))
+      return false;
+    Quaternion quaternion = Quaternion.LookRotation(vector3);
+    float y = ((Quaternion) ref quaternion).eulerAngles.y;
+    float diff_angle = 0.0f;
+    int num1 = this.CalcDiffAngle(y, ref diff_angle);
+    double num2 = (double) this.CalcRotateMotionRate(diff_angle);
+    int num3 = 0;
+    if (keep_rotate)
+      num3 = this.rotateTargetCnt + 1;
+    bool flag = false;
+    float direction = y;
+    if (num2 == 1.0 && num3 < this.charaParameter.rotateTargetMaxNum - 1)
+    {
+      Quaternion rotation = this._rotation;
+      direction = ((Quaternion) ref rotation).eulerAngles.y + (float) num1 * 90f;
+    }
+    else
+      flag = true;
+    int num4 = this.ActRotateMotionToDirection(direction) ? 1 : 0;
+    if (num4 == 0)
+      return num4 != 0;
+    this.rotateType = Character.ROTATE_TYPE.MOTION_TO_TARGET;
+    this.rotateTargetEnd = flag;
+    this.rotateTargetCnt = num3;
+    return num4 != 0;
+  }
+
+  public virtual bool ActRotateMotionToDirection(float direction)
+  {
+    float diff_angle = 0.0f;
+    int num = this.CalcDiffAngle(direction, ref diff_angle);
+    if ((double) diff_angle < 1.0)
+      return false;
+    this.EndAction();
+    this.actionID = Character.ACTION_ID.ROTATE;
+    if (num > 0)
+      this.PlayMotion(5);
+    else
+      this.PlayMotion(4);
+    this.rotateDirection = direction;
+    this.rotateSign = num;
+    this.rootRotationRate = this.CalcRotateMotionRate(diff_angle);
+    this.rotateType = Character.ROTATE_TYPE.MOTION_TO_DIRECTION;
+    if (Object.op_Inequality((Object) this.characterSender, (Object) null))
+      this.characterSender.OnActRotateMotion(direction);
+    return true;
+  }
+
+  protected float CalcRotateMotionRate(float diff_angle)
+  {
+    float num = Mathf.Abs(diff_angle) / 90f;
+    if ((double) num > 1.2000000476837158)
+      num = 1f;
+    return num;
+  }
+
+  protected int CalcDiffAngle(float direction, ref float diff_angle)
+  {
+    Vector3 forward = this._forward;
+    forward.y = 0.0f;
+    ((Vector3) ref forward).Normalize();
+    Vector3 vector3 = Quaternion.op_Multiply(Quaternion.AngleAxis(direction, Vector3.up), Vector3.forward);
+    diff_angle = Vector3.Angle(forward, vector3);
+    return (double) Vector3.Cross(forward, vector3).y < 0.0 ? -1 : 1;
+  }
+
+  public virtual void ActDamage()
+  {
+    this.EndAction();
+    this.actionID = Character.ACTION_ID.DAMAGE;
+    this.PlayMotion(6);
+    this.OnActReaction();
+  }
+
+  public virtual void ActDead(bool force_sync = false, bool recieve = false)
+  {
+    this.EndAction();
+    this.actionID = Character.ACTION_ID.DEAD;
+    this.PlayMotion(7);
+    this.Die();
+    this.OnActReaction();
+    if (!(Object.op_Inequality((Object) this.characterSender, (Object) null) & force_sync))
+      return;
+    this.characterSender.OnActDead();
+  }
+
+  public void Die()
+  {
+    this.hp = 0;
+    this.isDead = true;
+    this.hitOffFlag |= StageObject.HIT_OFF_FLAG.DEAD;
+    this._collider.enabled = false;
+    this.buffParam.AllBuffEnd(false);
+    this.continusAttackParam.RemoveAll();
+  }
+
+  public virtual void VanishLocal() => this.PrepareVanishLocal();
+
+  public virtual void PrepareVanishLocal()
+  {
+    this.EndAction();
+    int hp = this.hp;
+    this.Die();
+    this.hp = hp;
+  }
+
+  public virtual void OnDeadEnd()
+  {
+  }
+
+  public virtual void ActParalyze()
+  {
+    if (this.IsDebuffShadowSealing())
+    {
+      if (this.shadowSealingStackDebuff.Contains(Character.ACTION_ID.PARALYZE))
+        return;
+      this.shadowSealingStackDebuff.Add(Character.ACTION_ID.PARALYZE);
+      if (this.paralyzeEffectTrans == null)
+        this.paralyzeEffectTrans = AnimEventFormat.EffectEventExec(AnimEventFormat.ID.EFFECT, new AnimEventData.EventData()
+        {
+          intArgs = new int[0],
+          floatArgs = new float[1]
+          {
+            this.paralyzeEffectScale
+          },
+          stringArgs = new string[2]
+          {
+            this.paralyzeEffectName,
+            ""
+          }
+        }, this._transform, true, new AnimEventFormat.EffectNameAnalyzer(this.EffectNameAnalyzer), new AnimEventFormat.NodeFinder(((StageObject) this).FindNode), this);
+    }
+    else
+    {
+      this.EndAction();
+      this.actionID = Character.ACTION_ID.PARALYZE;
+      this.PlayMotion(8);
+    }
+    this.OnActReaction();
+  }
+
+  protected bool UpdateParalyzeAction()
+  {
+    if ((double) this.paralyzeTime - (double) Time.time > 0.0)
+      return false;
+    this.ActParalyzeEnd();
+    if (!this.IsDebuffShadowSealing())
+      this.SetNextTrigger();
+    return true;
+  }
+
+  protected virtual void ActParalyzeEnd()
+  {
+    this.badStatusTotal.paralyze = 0.0f;
+    if (!this.IsDebuffShadowSealing())
+      return;
+    this._EndDebuffAction(Character.ACTION_ID.PARALYZE);
+    if (this.paralyzeEffectTrans != null)
+    {
+      EffectManager.ReleaseEffect(((Component) this.paralyzeEffectTrans).gameObject);
+      this.paralyzeEffectTrans = (Transform) null;
+    }
+    if (!this.shadowSealingStackDebuff.Contains(Character.ACTION_ID.PARALYZE))
+      return;
+    this.shadowSealingStackDebuff.Remove(Character.ACTION_ID.PARALYZE);
+  }
+
+  public bool IsParalyze()
+  {
+    return this.actionID == Character.ACTION_ID.PARALYZE || this.shadowSealingStackDebuff.Contains(Character.ACTION_ID.PARALYZE);
+  }
+
+  public virtual void ActFreezeStart()
+  {
+    if (this.IsFreeze())
+      return;
+    if (this.IsDebuffShadowSealing())
+    {
+      if (!this.shadowSealingStackDebuff.Contains(Character.ACTION_ID.FREEZE))
+        this.shadowSealingStackDebuff.Add(Character.ACTION_ID.FREEZE);
+    }
+    else
+    {
+      this.EndAction();
+      this.actionID = Character.ACTION_ID.FREEZE;
+      this.PlayMotion(6, (double) this.stopMotionByDebuffNormalizedTime < 0.0 ? -1f : 0.0f);
+    }
+    this.CreateFreezeEffect();
+    this.SwitchFreezeShader();
+    this.m_freezeTimer = MonoBehaviourSingleton<InGameSettingsManager>.I.debuff.freezeParam.duration;
+    this.m_freezeHeight = 0.0f;
+    if (Object.op_Inequality((Object) this._rigidbody, (Object) null))
+      this._rigidbody.velocity = Vector3.zero;
+    this.rotateEventKeep = false;
+    this.rotateToTargetFlag = false;
+    this.rotateEventSpeed = 0.0f;
+    this.OnActReaction();
+  }
+
+  protected virtual void ActFreezeEnd()
+  {
+    if (!this.IsFreeze())
+      return;
+    if (Object.op_Inequality((Object) this.m_effectFreeze, (Object) null))
+    {
+      EffectManager.ReleaseEffect(this.m_effectFreeze);
+      this.m_effectFreeze = (GameObject) null;
+    }
+    this.RestoreShader();
+    this.badStatusTotal.freeze = 0.0f;
+    if (this.IsDebuffShadowSealing())
+    {
+      this._EndDebuffAction(Character.ACTION_ID.FREEZE);
+      if (!this.shadowSealingStackDebuff.Contains(Character.ACTION_ID.FREEZE))
+        return;
+      this.shadowSealingStackDebuff.Remove(Character.ACTION_ID.FREEZE);
+    }
+    else
+    {
+      this.setPause(false);
+      this.m_isStopMotionByDebuff = false;
+    }
+  }
+
+  protected bool UpdateFreezeAction()
+  {
+    if (!this.IsFreeze())
+      return false;
+    this.UpdateFreezeShader();
+    this.m_freezeTimer -= Time.deltaTime;
+    if ((double) this.m_freezeTimer <= 0.0)
+    {
+      this.ActFreezeEnd();
+      return true;
+    }
+    float num = 0.1f;
+    if ((double) this.stopMotionByDebuffNormalizedTime >= 0.0)
+      num = this.stopMotionByDebuffNormalizedTime;
+    AnimatorStateInfo animatorStateInfo = this.animator.GetCurrentAnimatorStateInfo(0);
+    if ((double) ((AnimatorStateInfo) ref animatorStateInfo).normalizedTime < (double) num || ((AnimatorStateInfo) ref animatorStateInfo).fullPathHash != Animator.StringToHash("Base Layer.damage") || this.m_isStopMotionByDebuff)
+      return false;
+    this.setPause(true);
+    this.m_isStopMotionByDebuff = true;
+    return false;
+  }
+
+  private void SwitchFreezeShader()
+  {
+    if (this.m_rendererList == null)
+      return;
+    Utility.MaterialForEach(this.m_rendererList, (Action<Material>) (material =>
+    {
+      Shader shader = ResourceUtility.FindShader(((Object) material.shader).name.Replace("enemy_", "freeze_enemy_"));
+      if (!Object.op_Inequality((Object) shader, (Object) null))
+        return;
+      material.shader = shader;
+      if (!material.HasProperty("_Height"))
+        return;
+      material.SetFloat("_Height", 0.0f);
+    }));
+  }
+
+  private void RestoreShader()
+  {
+    if (this.m_rendererList == null)
+      return;
+    Utility.MaterialForEach(this.m_rendererList, (Action<Material>) (material =>
+    {
+      Shader shader = ResourceUtility.FindShader(((Object) material.shader).name.Replace("freeze_", ""));
+      if (!Object.op_Inequality((Object) shader, (Object) null))
+        return;
+      material.shader = shader;
+    }));
+  }
+
+  private void UpdateFreezeShader()
+  {
+    if (this.m_rendererList == null)
+      return;
+    this.m_freezeHeight += 5f * Time.deltaTime;
+    if ((double) this.m_freezeHeight > 30.0)
+      this.m_freezeHeight = 30f;
+    Utility.MaterialForEach(this.m_rendererList, (Action<Material>) (material =>
+    {
+      if (!material.HasProperty("_Height"))
+        return;
+      material.SetFloat("_Height", this.m_freezeHeight);
+    }));
+  }
+
+  private void CreateFreezeEffect()
+  {
+    Transform effect = EffectManager.GetEffect("ef_btl_pl_frozen_01", this._transform);
+    if (!Object.op_Inequality((Object) effect, (Object) null))
+      return;
+    ParticleSystem[] componentsInChildren = ((Component) effect).GetComponentsInChildren<ParticleSystem>(true);
+    if (componentsInChildren != null)
+    {
+      this.CalcFreezeEffectEmissionRadius();
+      for (int index = 0; index < componentsInChildren.Length; ++index)
+      {
+        ParticleSystem.ShapeModule shape = componentsInChildren[index].shape;
+        ((ParticleSystem.ShapeModule) ref shape).radius = this.m_emissionRadius;
+      }
+    }
+    Transform transform = effect;
+    transform.localPosition = Vector3.op_Addition(transform.localPosition, Vector3.op_Multiply(Vector3.up, this.m_emissionRadius));
+    this.m_effectFreeze = ((Component) effect).gameObject;
+  }
+
+  protected void CalcFreezeEffectEmissionRadius()
+  {
+    if ((double) this.m_emissionRadius > 0.0)
+      return;
+    this.m_emissionRadius = this._transform.localScale.x;
+    if (Object.op_Equality((Object) this._collider, (Object) null))
+      return;
+    this.m_emissionRadius *= this.GetFreezeEffectRadiusRate();
+  }
+
+  protected virtual float GetFreezeEffectRadiusRate()
+  {
+    SphereCollider collider1 = this._collider as SphereCollider;
+    if (Object.op_Inequality((Object) collider1, (Object) null))
+      return collider1.radius;
+    CapsuleCollider collider2 = this._collider as CapsuleCollider;
+    return Object.op_Inequality((Object) collider2, (Object) null) ? collider2.radius : 1f;
+  }
+
+  public bool IsFreeze() => Object.op_Inequality((Object) this.m_effectFreeze, (Object) null);
+
+  protected float GetEmittionRadius() => this.m_emissionRadius;
+
+  public virtual bool IsDebuffShadowSealing() => false;
+
+  public virtual bool IsConcussion() => false;
+
+  public virtual bool IsLightRing() => false;
+
+  protected void CreateElectricShockEffect()
+  {
+    Transform effect = EffectManager.GetEffect("ef_btl_enm_shock_01", this._transform);
+    if (!Object.op_Inequality((Object) effect, (Object) null))
+      return;
+    ParticleSystem[] componentsInChildren = ((Component) effect).GetComponentsInChildren<ParticleSystem>(true);
+    if (componentsInChildren != null)
+    {
+      this.CalcFreezeEffectEmissionRadius();
+      for (int index = 0; index < componentsInChildren.Length; ++index)
+      {
+        ParticleSystem.ShapeModule shape = componentsInChildren[index].shape;
+        ((ParticleSystem.ShapeModule) ref shape).radius = this.m_emissionRadius;
+      }
+    }
+    Transform transform = effect;
+    transform.localPosition = Vector3.op_Addition(transform.localPosition, Vector3.op_Multiply(Vector3.up, this.m_emissionRadius));
+    this.m_effectElectricShock = ((Component) effect).gameObject;
+  }
+
+  public virtual bool IsInkSplash() => false;
+
+  public virtual bool IsStone() => false;
+
+  public virtual void ActAttack(
+    int id,
+    bool send_packet = true,
+    bool sync_immediately = false,
+    string _motionLayerName = "",
+    string _motionStateName = "")
+  {
+    this.EndAction();
+    this.isControllable = false;
+    this.actionID = Character.ACTION_ID.ATTACK;
+    this.attackID = id;
+    Character.PlayMotionParam playMotionParam = new Character.PlayMotionParam();
+    playMotionParam.MotionID = 15 + id;
+    playMotionParam.MotionLayerName = string.IsNullOrEmpty(_motionLayerName) ? "Base Layer." : _motionLayerName;
+    if (_motionStateName.IsNullOrWhiteSpace())
+      this.PlayMotion(playMotionParam);
+    else
+      this.PlayMotionImmidate((string) null, _motionStateName, 0.0f);
+    if (this.IsCoopNone() || this.IsOriginal())
+    {
+      this.SyncRandomSeed = Random.Range(int.MinValue, int.MaxValue);
+      this.SetAttackActionPosition();
+    }
+    this.attackStartTarget = this.actionTarget;
+    if (!send_packet || !Object.op_Inequality((Object) this.characterSender, (Object) null))
+      return;
+    this.characterSender.OnActAttack(id, sync_immediately, this.SyncRandomSeed, playMotionParam.MotionLayerName, _motionStateName);
+  }
+
+  public virtual void SetAttackActionPosition()
+  {
+    if (Object.op_Inequality((Object) this.actionTarget, (Object) null))
+      this.SetActionPosition(this.GetTargetPosition(this.actionTarget), true);
+    else
+      this.SetActionPosition(Vector3.zero, false);
+  }
+
+  protected virtual void UpdateAction()
+  {
+    switch (this.actionID)
+    {
+      case Character.ACTION_ID.MOVE:
+        if (this.moveType == Character.MOVE_TYPE.TO_POSITION || this.moveType == Character.MOVE_TYPE.HOMING)
+        {
+          if (this.moveType == Character.MOVE_TYPE.HOMING)
+          {
+            if (!this.actionPositionFlag)
+            {
+              this.ActIdle();
+              break;
+            }
+            if ((double) this.moveMaxDistance > 0.0)
+            {
+              Vector3 vector3 = Vector3.op_Subtraction(this._position, this.moveBeforePos);
+              vector3.y = 0.0f;
+              this.moveNowDistance += ((Vector3) ref vector3).magnitude;
+              this.moveBeforePos = this._position;
+              if ((double) this.moveNowDistance >= (double) this.moveMaxDistance)
+              {
+                this.ActIdle();
+                break;
+              }
+            }
+            this.moveTargetPos = this.actionPosition;
+          }
+          if (this.IsWallStay())
+          {
+            this.ActIdle(true);
+            break;
+          }
+          if (this.IsArrivalPosition(this.moveTargetPos))
+          {
+            this.ActIdle();
+            break;
+          }
+          Vector3 vector3_1 = Vector3.op_Subtraction(this.moveTargetPos, this._position);
+          vector3_1.y = 0.0f;
+          ((Vector3) ref vector3_1).Normalize();
+          Vector3 forward = this._forward;
+          forward.y = 0.0f;
+          ((Vector3) ref forward).Normalize();
+          float num1 = Vector3.Angle(forward, vector3_1);
+          if ((double) num1 > 90.0)
+          {
+            this.ActIdle();
+            break;
+          }
+          int num2 = (double) Vector3.Cross(forward, vector3_1).y >= 0.0 ? 1 : -1;
+          Quaternion rotation = this._rotation;
+          Vector3 eulerAngles = ((Quaternion) ref rotation).eulerAngles;
+          float num3 = Mathf.SmoothDampAngle(0.0f, num1 * (float) num2, ref this.rotateVelocity, this.moveRotateMinimumTime, this.moveRotateMaxSpeed, Time.deltaTime);
+          this._rotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y + num3, eulerAngles.z);
+          break;
+        }
+        if (this.moveType == Character.MOVE_TYPE.SYNC_VELOCITY)
+        {
+          if ((double) this.moveSyncDirection != -3.4028234663852886E+38)
+          {
+            if ((double) this.moveSyncDirectionTime > 0.0)
+              this._rotation = Quaternion.Slerp(this._rotation, Quaternion.AngleAxis(this.moveSyncDirection, Vector3.up), Time.deltaTime / this.moveSyncDirectionTime);
+            else
+              this._rotation = Quaternion.AngleAxis(this.moveSyncDirection, Vector3.up);
+          }
+          this.moveSyncTime -= Time.deltaTime;
+          this.moveSyncDirectionTime -= Time.deltaTime;
+          if ((double) this.moveSyncTime <= 0.0)
+          {
+            this._position = this.moveTargetPos;
+            if (this.moveSyncEnd)
+            {
+              this._rotation = Quaternion.AngleAxis(this.moveSyncEndDirection, Vector3.up);
+              this.ActIdle();
+              break;
+            }
+            break;
+          }
+          break;
+        }
+        if (this.moveType == Character.MOVE_TYPE.SIDEWAYS)
+        {
+          this.UpdateMoveSideAction();
+          break;
+        }
+        break;
+      case Character.ACTION_ID.ROTATE:
+        if (this.rotateType == Character.ROTATE_TYPE.TO_DIRECTION)
+        {
+          float diff_angle = 0.0f;
+          if (this.CalcDiffAngle(this.rotateDirection, ref diff_angle) != this.rotateSign)
+          {
+            this.ActIdle();
+            return;
+          }
+          if ((double) diff_angle < 0.10000000149011612)
+          {
+            this.ActIdle();
+            return;
+          }
+          Quaternion rotation = this._rotation;
+          Vector3 eulerAngles = ((Quaternion) ref rotation).eulerAngles;
+          float num = Mathf.SmoothDampAngle(0.0f, diff_angle * (float) this.rotateSign, ref this.rotateVelocity, this.rotateMinimumTime, this.rotateMaxSpeed, Time.deltaTime);
+          this._rotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y + num, eulerAngles.z);
+          break;
+        }
+        break;
+      case Character.ACTION_ID.PARALYZE:
+        this.UpdateParalyzeAction();
+        break;
+      case Character.ACTION_ID.FREEZE:
+        this.UpdateFreezeAction();
+        break;
+      case Character.ACTION_ID.MOVE_POINT:
+        this.UpdateMovePointAction();
+        break;
+      case Character.ACTION_ID.MOVE_LOOKAT:
+        this.UpdateMoveLookAtAction();
+        break;
+    }
+    if (!this.IsPlayingMotion(1))
+      return;
+    this.OnPlayingEndMotion();
+  }
+
+  public float moveAngle_deg
+  {
+    get => this.m_moveAngle_deg;
+    set => this.m_moveAngle_deg = value;
+  }
+
+  public float moveAngleSpeed_deg
+  {
+    get => this.m_moveAngleSpeed_deg;
+    set => this.m_moveAngleSpeed_deg = value;
+  }
+
+  public virtual bool ActMoveSideways(int moveAngleSign = 0, bool isPacket = false)
+  {
+    if ((this.IsCoopNone() || this.IsOriginal()) && Object.op_Equality((Object) this.actionTarget, (Object) null))
+      return false;
+    this.EndAction();
+    if (this.IsCoopNone() || this.IsOriginal())
+      this.SetAttackActionPosition();
+    this.actionID = Character.ACTION_ID.MOVE;
+    Character.MOTION_ID motion_id = Character.MOTION_ID.MOVE_SIDE_R;
+    if (isPacket)
+    {
+      if (moveAngleSign == 0 || moveAngleSign == 1 || moveAngleSign == -1)
+        this.m_moveAngleSign = moveAngleSign;
+    }
+    else
+    {
+      switch (moveAngleSign)
+      {
+        case -1:
+        case 1:
+          this.m_moveAngleSign = moveAngleSign;
+          break;
+        case 0:
+          Vector3 vector3 = Vector3.op_Subtraction(this._position, this.actionPosition);
+          vector3.y = 0.0f;
+          Vector3 target_pos1 = Vector3.op_Addition(this.actionPosition, Quaternion.op_Multiply(Quaternion.AngleAxis(-this.moveAngle_deg, Vector3.up), vector3));
+          Vector3 target_pos2 = Vector3.op_Addition(this.actionPosition, Quaternion.op_Multiply(Quaternion.AngleAxis(this.moveAngle_deg, Vector3.up), vector3));
+          RaycastHit hit1 = new RaycastHit();
+          RaycastHit hit2 = new RaycastHit();
+          bool flag1 = AIUtility.RaycastObstacle((StageObject) this, target_pos1, out hit1);
+          bool flag2 = AIUtility.RaycastObstacle((StageObject) this, target_pos2, out hit2);
+          this.m_moveAngleSign = !(flag1 & flag2) ? (!flag1 ? (!flag2 ? (Random.Range(0, 2) == 0 ? 1 : -1) : -1) : 1) : 0;
+          break;
+      }
+    }
+    switch (this.m_moveAngleSign)
+    {
+      case -1:
+        motion_id = Character.MOTION_ID.MOVE_SIDE_R;
+        break;
+      case 1:
+        motion_id = Character.MOTION_ID.MOVE_SIDE_L;
+        break;
+    }
+    this.PlayMotion((int) motion_id);
+    this.moveType = Character.MOVE_TYPE.SIDEWAYS;
+    if (Object.op_Inequality((Object) this.characterSender, (Object) null))
+      this.characterSender.OnActMoveSideways(this.m_moveAngleSign);
+    return true;
+  }
+
+  private void UpdateMoveSideAction()
+  {
+    if (this.m_moveAngleSign == 0)
+    {
+      this.ActIdle();
+    }
+    else
+    {
+      Vector3 vector3_1 = Vector3.op_Subtraction(this.actionPosition, this._position);
+      vector3_1.y = 0.0f;
+      ((Vector3) ref vector3_1).Normalize();
+      Vector3 forward = this._forward;
+      forward.y = 0.0f;
+      ((Vector3) ref forward).Normalize();
+      this.m_diffAngle_deg = Vector3.Angle(forward, vector3_1);
+      if ((double) this.m_diffAngle_deg > 90.0)
+      {
+        this.ActIdle();
+      }
+      else
+      {
+        this.m_diffAngle_deg *= (double) Vector3.Cross(forward, vector3_1).y >= 0.0 ? 1f : -1f;
+        Quaternion rotation = this._rotation;
+        Vector3 eulerAngles = ((Quaternion) ref rotation).eulerAngles;
+        float num1 = Mathf.SmoothDampAngle(0.0f, this.m_diffAngle_deg, ref this.rotateVelocity, this.rotateMinimumTime, this.rotateMaxSpeed, Time.deltaTime);
+        this._rotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y + num1, eulerAngles.z);
+        Vector3 vector3_2 = Vector3.op_Subtraction(this._position, this.actionPosition);
+        ((Vector3) ref vector3_2).Normalize();
+        Vector3 vector3_3 = Vector3.op_Multiply(vector3_2, AIUtility.GetLengthWithBetweenPosition(this._position, this.actionPosition));
+        float num2 = this.moveAngle_deg * Time.deltaTime;
+        float num3 = this.moveAngleSpeed_deg * Time.deltaTime;
+        if ((double) num2 > (double) num3)
+          num2 = num3;
+        this._position = Vector3.op_Addition(this._position, Vector3.op_Subtraction(Vector3.op_Addition(this.actionPosition, Quaternion.op_Multiply(Quaternion.AngleAxis(num2 * (float) this.m_moveAngleSign, Vector3.up), vector3_3)), this._position));
+        this.m_movedAngle_deg += num2;
+        if ((double) this.moveAngle_deg > (double) this.m_movedAngle_deg)
+          return;
+        this.SetNextTrigger();
+      }
+    }
+  }
+
+  public Vector3 movePointPos { get; set; }
+
+  protected Character.STATE_MOVE_POINT stateMovePoint { get; private set; }
+
+  protected void SetStateMovePoint(Character.STATE_MOVE_POINT state) => this.stateMovePoint = state;
+
+  public virtual void ActMovePoint(Vector3 targetPos)
+  {
+  }
+
+  protected virtual void UpdateMovePointAction()
+  {
+  }
+
+  protected bool IsNeedToRotate(Vector3 targetDir)
+  {
+    return (double) Vector3.Dot(this._forward, targetDir) < 1.0;
+  }
+
+  public Vector3 moveLookAtPos { get; set; }
+
+  public float moveLookAtAngle { get; set; }
+
+  protected Character.STATE_MOVE_LOOKAT stateMoveLookAt { get; private set; }
+
+  protected void SetStateMoveLookAt(Character.STATE_MOVE_LOOKAT state)
+  {
+    this.stateMoveLookAt = state;
+  }
+
+  public virtual void ActMoveLookAt(Vector3 moveLookAtPos, bool isPacket = false)
+  {
+  }
+
+  protected virtual void UpdateMoveLookAtAction()
+  {
+  }
+
+  protected virtual void OnPlayingEndMotion()
+  {
+    bool flag = false;
+    if (this.actionID == Character.ACTION_ID.ROTATE)
+    {
+      if (this.rotateType == Character.ROTATE_TYPE.MOTION_TO_TARGET)
+      {
+        if (this.rotateTargetEnd)
+        {
+          this.ActIdle();
+          return;
+        }
+        if (Object.op_Equality((Object) this.actionTarget, (Object) null))
+        {
+          this.ActIdle();
+          return;
+        }
+        Vector3 vector3 = Vector3.op_Subtraction(this.GetTargetPosition(this.actionTarget), this._position);
+        vector3.y = 0.0f;
+        ((Vector3) ref vector3).Normalize();
+        if (Vector3.op_Equality(vector3, Vector3.zero))
+        {
+          this.ActIdle();
+          return;
+        }
+        Quaternion quaternion = Quaternion.LookRotation(vector3);
+        float y = ((Quaternion) ref quaternion).eulerAngles.y;
+        float diff_angle = 0.0f;
+        if (this.CalcDiffAngle(y, ref diff_angle) != this.rotateSign)
+        {
+          this.ActIdle();
+          return;
+        }
+        if ((double) diff_angle < 10.0)
+        {
+          this.ActIdle();
+          return;
+        }
+        this.ActRotateMotionToTarget(true);
+      }
+      else if (this.rotateType == Character.ROTATE_TYPE.MOTION_TO_DIRECTION)
+      {
+        float diff_angle = 0.0f;
+        if (this.CalcDiffAngle(this.rotateDirection, ref diff_angle) != this.rotateSign)
+        {
+          this.ActIdle();
+          return;
+        }
+        if ((double) diff_angle < 10.0)
+        {
+          this.ActIdle();
+          return;
+        }
+        this.rootRotationRate = this.CalcRotateMotionRate(diff_angle);
+        if (this.rotateSign > 0)
+          this.PlayMotion(5);
+        else
+          this.PlayMotion(4);
+      }
+      else
+        flag = true;
+    }
+    else
+      flag = true;
+    if (!flag)
+      return;
+    this.isPlayingEndMotion = true;
+    this.ActIdle();
+  }
+
+  protected virtual void EndAction()
+  {
+    if (!this.isInitialized)
+      return;
+    if (this.animEventProcessor != null)
+      this.animEventProcessor.ExecuteLastEvent();
+    if (Object.op_Inequality((Object) this.characterSender, (Object) null))
+      this.characterSender.OnEndAction();
+    if (Object.op_Inequality((Object) this.controller, (Object) null))
+      this.controller.OnCharacterEndAction((int) this.actionID);
+    switch (this.actionID)
+    {
+      case Character.ACTION_ID.MOVE:
+        this.moveType = Character.MOVE_TYPE.NONE;
+        this.rotateVelocity = 0.0f;
+        this.moveTargetPos = Vector3.zero;
+        this.moveSyncDirection = 0.0f;
+        this.moveSyncDirectionTime = 0.0f;
+        this.moveSyncTime = 0.0f;
+        this.moveSyncEnd = false;
+        this.moveSyncEndDirection = 0.0f;
+        this.moveSyncSpeed = 0.0f;
+        this.moveSyncMotionID = 0;
+        this.moveBeforePos = Vector3.zero;
+        this.moveNowDistance = 0.0f;
+        this.moveMaxDistance = 0.0f;
+        this.m_movedAngle_deg = 0.0f;
+        this.m_diffAngle_deg = 0.0f;
+        this.m_moveAngleSign = 0;
+        break;
+      case Character.ACTION_ID.ROTATE:
+        this.rotateDirection = 0.0f;
+        this.rotateSign = 0;
+        this.rotateVelocity = 0.0f;
+        this.rootRotationRate = 1f;
+        this.rotateTargetEnd = false;
+        this.rotateTargetCnt = 0;
+        break;
+      case Character.ACTION_ID.ATTACK:
+        this.attackID = 0;
+        break;
+      case Character.ACTION_ID.PARALYZE:
+        this.ActParalyzeEnd();
+        break;
+      case Character.ACTION_ID.FREEZE:
+        this.ActFreezeEnd();
+        break;
+    }
+    this.EndWaitingPacket(StageObject.WAITING_PACKET.CHARACTER_MOVE_VELOCITY);
+    this.EndWaitingPacket(StageObject.WAITING_PACKET.CHARACTER_UPDATE_ACTION_POSITION);
+    this.EndWaitingPacket(StageObject.WAITING_PACKET.CHARACTER_UPDATE_DIRECTION);
+    int type = 0;
+    for (int count = this.objectList.Count; type < count; ++type)
+    {
+      if (this.objectTypeAutoDelete[type])
+        this.DestroyObjectList((Character.OBJECT_LIST_TYPE) type);
+    }
+    if (Object.op_Inequality((Object) this.animator, (Object) null))
+    {
+      int index = 0;
+      for (int count = this.changeTriggerList.Count; index < count; ++index)
+        this.animator.ResetTrigger(this.changeTriggerList[index]);
+      this.changeTriggerList.Clear();
+    }
+    if (Object.op_Inequality((Object) this.animator, (Object) null))
+    {
+      int index = 0;
+      for (int count = this.animatorBoolList.Count; index < count; ++index)
+        this.animator.SetBool(this.animatorBoolList[index], false);
+      this.animatorBoolList.Clear();
+    }
+    int index1 = 0;
+    for (int count = this.animEventColliderList.Count; index1 < count; ++index1)
+    {
+      if (!this.animEventColliderList[index1].isReleased)
+        this.animEventColliderList[index1].ReserveRelease();
+    }
+    if (this.hideRendererList.Count > 0 && !this.IsCarrying())
+    {
+      List<string> range = this.hideRendererList.GetRange(0, this.hideRendererList.Count);
+      int index2 = 0;
+      for (int count = range.Count; index2 < count; ++index2)
+        this.SetEnableNodeRenderer(range[index2], true);
+    }
+    if (this.referenceCheckerFlag)
+    {
+      this.attackHitChecker = new AttackHitChecker();
+      this.referenceCheckerFlag = false;
+    }
+    int index3 = 0;
+    for (int count = this.loopSeForceEndList.Count; index3 < count; ++index3)
+    {
+      if (this.loopSeForceEndList[index3] >= 0)
+        SoundManager.LoopOff(this.loopSeForceEndList[index3], (DisableNotifyMonoBehaviour) this);
+    }
+    this.loopSeForceEndList.Clear();
+    this.wallStayTimer = 0.0f;
+    this.isControllable = false;
+    this.enableMotionCancel = false;
+    this.enableMoveSuppress = false;
+    this.SetVelocity(Vector3.zero);
+    this.addForce = Vector3.zero;
+    this.actionMoveRate = 1f;
+    this.rootMotionMoveRate = 1f;
+    if (Object.op_Inequality((Object) this.animator, (Object) null))
+      this.animator.applyRootMotion = true;
+    this.enableRootMotion = true;
+    this.rotateEventSpeed = 0.0f;
+    this.rotateEventDirection = 0.0f;
+    this.rotateEventKeep = false;
+    this.rotateToTargetFlag = false;
+    this.rotateToTargetDiffAngle = 0.0f;
+    this.rotateSafeMode = false;
+    this.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.INVICIBLE;
+    this.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.DEAD;
+    this.hitOffFlag &= ~StageObject.HIT_OFF_FLAG.DEAD_REVIVE;
+    this.enableEventMove = false;
+    this.eventMoveVelocity = Vector3.zero;
+    this.eventMoveTimeCount = 0.0f;
+    this.enableAddForce = false;
+    this.addForceBeforePos = Vector3.zero;
+    this.waitAddForce = false;
+    this.lastActionID = this.actionID;
+    this.actionID = Character.ACTION_ID.NONE;
+    this.actionPosition = Vector3.zero;
+    this.targetPointPos = Vector3.zero;
+    this.actionPositionFlag = false;
+    this.actionPositionThroughFlag = false;
+    this.actionPositionWaitSync = false;
+    this.actionPositionWaitTrigger = (string) null;
+    this.directionWaitSync = false;
+    this.directionWaitTrigger = (string) null;
+    this.periodicSyncActionPositionFlag = false;
+    this.periodicSyncActionPositionLastTime = 0.0f;
+    this.periodicSyncActionPositionList.Clear();
+    this.attackStartTarget = (StageObject) null;
+    this.isDead = false;
+    this.lerpRotateVec = Vector3.zero;
+    this.enableReactionDelay = false;
+    this.isPlayingEndMotion = false;
+    this.actionRendererModel = (GameObject) null;
+    this.actionRendererNodeName = (string) null;
+    this.actMotionStartTime = -1f;
+    this.actionReceiveDamageRate = 1f;
+    this.isWallStay = false;
+    this.wallStayTimer = 0.0f;
+    this.SetPeriodicSyncTarget((StageObject) null);
+    if (Object.op_Inequality((Object) this.stepCtrl, (Object) null))
+      this.stepCtrl.enableAutoStampEffect = true;
+    if (Object.op_Inequality((Object) this._collider, (Object) null))
+      this._collider.enabled = true;
+    if (Object.op_Inequality((Object) this.damegeRemainEffect, (Object) null))
+    {
+      EffectManager.ReleaseEffect(this.damegeRemainEffect);
+      this.damegeRemainEffect = (GameObject) null;
+    }
+    if (this.animEventProcessor != null)
+      this.animEventProcessor.IgnoreEventByNextAnim();
+    if (Object.op_Inequality((Object) this.actionRendererInstance, (Object) null))
+    {
+      Object.Destroy((Object) ((Component) this.actionRendererInstance).gameObject);
+      this.actionRendererInstance = (Transform) null;
+    }
+    this.DeleteExAtkColliderAll();
+  }
+
+  protected virtual void _EndDebuffAction(Character.ACTION_ID beforeActId)
+  {
+  }
+
+  private static string _GetMotionStateName(int motion_id, string _layerName)
+  {
+    string str = string.IsNullOrEmpty(_layerName) ? "Base Layer." : _layerName;
+    if (motion_id >= 115)
+      return (string) null;
+    Character.stateNameBuilder.Length = 0;
+    Character.stateNameBuilder.Append(str);
+    if (motion_id >= 15 && motion_id <= 114)
+      Character.stateNameBuilder.AppendFormat(Character.motionStateName[15], (object) (motion_id - 15));
+    else
+      Character.stateNameBuilder.Append(Character.motionStateName[motion_id]);
+    return Character.stateNameBuilder.ToString();
+  }
+
+  protected virtual string GetMotionStateName(int motion_id, string _layerName = "")
+  {
+    return motion_id < 115 ? Character._GetMotionStateName(motion_id, _layerName) : (string) null;
+  }
+
+  public int GetMotionHash(int motion_id)
+  {
+    string motionStateName = this.GetMotionStateName(motion_id, this.ReplaceMotionLayer(motion_id));
+    if (motionStateName == null)
+      return 0;
+    int cachedHash = this._GetCachedHash(motionStateName);
+    if (cachedHash != 0)
+      return cachedHash;
+    int motionHash = this.GetMotionHash(motionStateName);
+    this._CacheHash(motionStateName, motionHash);
+    return motionHash;
+  }
+
+  protected int _GetCachedHash(string motionName)
+  {
+    return !Character.motionHashCaches.ContainsKey(motionName) ? 0 : Character.motionHashCaches[motionName];
+  }
+
+  protected void _CacheHash(string motionName, int hash)
+  {
+    Character.motionHashCaches[motionName] = hash;
+  }
+
+  public int GetMotionHash(string state_name)
+  {
+    object obj = Character.motionHash.Get(state_name);
+    int motionHash;
+    if (obj == null)
+    {
+      motionHash = Animator.StringToHash(state_name);
+      Character.motionHash.Add(state_name, motionHash);
+    }
+    else
+      motionHash = (int) obj;
+    return motionHash;
+  }
+
+  public bool PlayMotion(Character.PlayMotionParam _param)
+  {
+    _param.MotionLayerName = this.ReplaceMotionLayer(_param.MotionID, _param.MotionLayerName);
+    string motionStateName = this.GetMotionStateName(_param.MotionID, _param.MotionLayerName);
+    if (string.IsNullOrEmpty(motionStateName))
+    {
+      Log.Warning(LOG.INGAME, "Character::PlayMotion motion_id is none");
+      return false;
+    }
+    int num = this._PlayMotion(motionStateName, _transition_time: _param.TransitionTime) ? 1 : 0;
+    if (!Object.op_Inequality((Object) this.controller, (Object) null))
+      return num != 0;
+    this.controller.OnCharacterPlayMotion(_param.MotionID);
+    return num != 0;
+  }
+
+  public bool PlayMotion(int motion_id, float transition_time = -1f)
+  {
+    string motionStateName = this.GetMotionStateName(motion_id, this.ReplaceMotionLayer(motion_id));
+    if (string.IsNullOrEmpty(motionStateName))
+    {
+      Log.Warning(LOG.INGAME, "Character::PlayMotion motion_id is none");
+      return false;
+    }
+    int num = this._PlayMotion(motionStateName, _transition_time: transition_time) ? 1 : 0;
+    if (!Object.op_Inequality((Object) this.controller, (Object) null))
+      return num != 0;
+    this.controller.OnCharacterPlayMotion(motion_id);
+    return num != 0;
+  }
+
+  protected virtual string ReplaceMotionLayer(int motionId, string layerName = "Base Layer.")
+  {
+    return layerName;
+  }
+
+  public bool PlayMotion(string anim_format_name, float _transition_time = -1f)
+  {
+    if (string.IsNullOrEmpty(anim_format_name))
+    {
+      Log.Warning(LOG.INGAME, "Character::PlayMotion anim_format_name is null or empty");
+      return false;
+    }
+    string ctrl_name;
+    string state_name;
+    Character.SeparateAnimFormatName(anim_format_name, out ctrl_name, out state_name);
+    if (!string.IsNullOrEmpty(state_name))
+      return this._PlayMotion("Base Layer." + state_name, ctrl_name, _transition_time);
+    Log.Warning(LOG.INGAME, "Character::PlayMotion state_name is null or empty");
+    return false;
+  }
+
+  public static void SeparateAnimFormatName(
+    string anim_format_name,
+    out string ctrl_name,
+    out string state_name)
+  {
+    ctrl_name = (string) null;
+    state_name = (string) null;
+    if (string.IsNullOrEmpty(anim_format_name))
+      return;
+    int length = anim_format_name.IndexOf("@");
+    if (length < 0)
+    {
+      state_name = anim_format_name;
+    }
+    else
+    {
+      ctrl_name = anim_format_name.Substring(0, length);
+      state_name = anim_format_name.Substring(length + 1, anim_format_name.Length - (length + 1));
+      if (!(ctrl_name == ""))
+        return;
+      ctrl_name = state_name.ToUpper();
+    }
+  }
+
+  public static string GetCtrlNameFromAnimFormatName(string anim_format_name)
+  {
+    string ctrl_name;
+    Character.SeparateAnimFormatName(anim_format_name, out ctrl_name, out string _);
+    return ctrl_name;
+  }
+
+  public bool PlayMotionImmidate(string ctrlName, string stateName, float _transition_time = -1f)
+  {
+    return this._PlayMotion("Base Layer." + stateName, ctrlName, _transition_time);
+  }
+
+  protected bool _PlayMotion(string state_name, string controller_name = null, float _transition_time = -1f)
+  {
+    if (string.IsNullOrEmpty(state_name))
+    {
+      Log.Warning(LOG.INGAME, "Character::_PlayMotion state_name is null or empty");
+      return false;
+    }
+    this.nextAnimCtrlName = controller_name;
+    this.nextMotionHash = this.GetMotionHash(state_name);
+    this.nextMotionTransitionTime = _transition_time;
+    if (this.charaName == "Hellish Zaark" && this.nextMotionHash == 423958061)
+      Debug.Log((object) $"hash: {(object) this.nextMotionHash} state name: {state_name}");
+    this.hitOffFlag |= StageObject.HIT_OFF_FLAG.PLAY_MOTION;
+    return true;
+  }
+
+  public virtual RuntimeAnimatorController GetAnimCtrl(string ctrl_name)
+  {
+    return (RuntimeAnimatorController) null;
+  }
+
+  public virtual AnimEventData GetAnimEvent(string ctrl_name) => (AnimEventData) null;
+
+  public int GetPlayingMotionHash()
+  {
+    if (Object.op_Equality((Object) this.animator, (Object) null))
+      return 0;
+    int fullPathHash;
+    if (this.animator.IsInTransition(0))
+    {
+      AnimatorStateInfo animatorStateInfo = this.animator.GetNextAnimatorStateInfo(0);
+      fullPathHash = ((AnimatorStateInfo) ref animatorStateInfo).fullPathHash;
+    }
+    else
+    {
+      AnimatorStateInfo animatorStateInfo = this.animator.GetCurrentAnimatorStateInfo(0);
+      fullPathHash = ((AnimatorStateInfo) ref animatorStateInfo).fullPathHash;
+    }
+    return fullPathHash;
+  }
+
+  public bool IsPlayingMotion(int motion_id, bool check_next = true)
+  {
+    int motionHash = this.GetMotionHash(motion_id);
+    if (check_next)
+    {
+      if (this.nextMotionHash != 0)
+        return this.nextMotionHash == motionHash;
+      int num = 0;
+      if (this.animEventProcessor != null)
+        num = this.animEventProcessor.GetWaitMotionHash();
+      if (num != 0)
+        return num == motionHash;
+    }
+    return this.GetPlayingMotionHash() == motionHash;
+  }
+
+  public void SetNextTrigger(int index = 0)
+  {
+    string str = "";
+    if (index > 0)
+      str = (index + 1).ToString();
+    this.SetChangeTrigger("next" + str);
+  }
+
+  public void SetChangeTrigger(string motion_trigger)
+  {
+    if (Object.op_Equality((Object) this.animator, (Object) null))
+      return;
+    this.animator.SetTrigger(motion_trigger);
+    this.changeTriggerList.Add(motion_trigger);
+  }
+
+  public void SendBuffSync(BuffParam.BUFFTYPE nowBuffType = BuffParam.BUFFTYPE.NONE)
+  {
+    if (!this.IsOriginal())
+      return;
+    BuffParam.BuffSyncParam syncParam = this.buffParam.CreateSyncParam(nowBuffType);
+    if (Object.op_Inequality((Object) this.characterSender, (Object) null))
+      this.characterSender.OnSendBuffSync(syncParam);
+    this.buffSyncLastTime = Time.time;
+  }
+
+  public void OnBuffReceive(BuffParam.BuffData buffData)
+  {
+    if (this.IsCoopNone() || this.IsOriginal())
+    {
+      this.OnBuffStart(buffData);
+    }
+    else
+    {
+      if (!Object.op_Inequality((Object) this.characterSender, (Object) null))
+        return;
+      this.characterSender.OnBuffReceive(buffData.type, buffData.value, buffData.time);
+    }
+  }
+
+  public virtual bool OnBuffStart(BuffParam.BuffData buffData)
+  {
+    if (!this.buffParam.BuffStart(buffData))
+      return false;
+    this.UpdateAnimatorSpeed();
+    if (buffData.sync)
+      this.SendBuffSync();
+    return true;
+  }
+
+  protected virtual void OnUIBuffRoutine(BuffParam.BUFFTYPE type, int value)
+  {
+  }
+
+  public virtual void OnBuffRoutine(BuffParam.BuffData buffData, bool packet = false)
+  {
+    BuffParam.BUFFTYPE type = buffData.type;
+    int damage = buffData.value;
+    if ((type == BuffParam.BUFFTYPE.ELECTRIC_SHOCK || type == BuffParam.BUFFTYPE.SOIL_SHOCK) && !packet)
+      damage = buffData.damage;
+    this.OnBuffRoutine(type, damage, packet);
+    if (!Object.op_Inequality((Object) this.characterSender, (Object) null) || packet)
+      return;
+    this.characterSender.OnBuffRoutine(buffData.type, damage, buffData.fromObjectID, buffData.fromEquipIndex, buffData.fromSkillIndex);
+  }
+
+  private void OnBuffRoutine(BuffParam.BUFFTYPE type, int value, bool packet = false)
+  {
+    switch (type)
+    {
+      case BuffParam.BUFFTYPE.INVINCIBLECOUNT:
+      case BuffParam.BUFFTYPE.INVINCIBLE_BADSTATUS:
+      case BuffParam.BUFFTYPE.SUBSTITUTE:
+      case BuffParam.BUFFTYPE.ORACLE_OHS_PROTECTION:
+      case BuffParam.BUFFTYPE.ORACLE_SPEAR_GUTS:
+        this.buffParam.ResetInterval(type);
+        break;
+      case BuffParam.BUFFTYPE.REGENERATE:
+        if (this.buffParam.IsValidBuff(BuffParam.BUFFTYPE.CANT_HEAL_HP))
+          return;
+        value = (int) ((double) value * (double) this.buffParam.GetHealUp());
+        if (value <= 0)
+          value = 1;
+        this.RecoverHp(value, false);
+        EffectManager.GetEffect("ef_btl_sk_heal_02", this.FindNode("Hip"));
+        break;
+      case BuffParam.BUFFTYPE.POISON:
+      case BuffParam.BUFFTYPE.DEADLY_POISON:
+        float poisonDamageDownRate = this.buffParam.GetPoisonDamageDownRate();
+        if ((double) poisonDamageDownRate > 0.0)
+        {
+          float num = Mathf.Clamp(1f - poisonDamageDownRate, 0.0f, 1f);
+          value = (int) ((double) value * (double) num);
+          if (value <= 0)
+            value = 1;
+        }
+        this.hp -= value;
+        if (this.hp <= 1)
+        {
+          this.hp = 1;
+          break;
+        }
+        break;
+      case BuffParam.BUFFTYPE.BURNING:
+        float burnDamageDownRate = this.buffParam.GetBurnDamageDownRate();
+        if ((double) burnDamageDownRate > 0.0)
+        {
+          float num = Mathf.Clamp(1f - burnDamageDownRate, 0.0f, 1f);
+          value = (int) ((double) value * (double) num);
+          if (value <= 0)
+            value = 1;
+        }
+        this.hp -= value;
+        if (this.hp <= 1)
+        {
+          this.hp = 1;
+          break;
+        }
+        break;
+      case BuffParam.BUFFTYPE.ELECTRIC_SHOCK:
+      case BuffParam.BUFFTYPE.EROSION:
+      case BuffParam.BUFFTYPE.SOIL_SHOCK:
+      case BuffParam.BUFFTYPE.ACID:
+      case BuffParam.BUFFTYPE.CORRUPTION:
+      case BuffParam.BUFFTYPE.STIGMATA:
+      case BuffParam.BUFFTYPE.CYCLONIC_THUNDERSTORM:
+        this.hp -= value;
+        if (this.hp <= 1)
+        {
+          this.hp = 1;
+          break;
+        }
+        break;
+      case BuffParam.BUFFTYPE.REGENERATE_PROPORTION:
+        if (this.buffParam.IsValidBuff(BuffParam.BUFFTYPE.CANT_HEAL_HP))
+          return;
+        value = (int) ((double) this.hpMax * (double) (Mathf.Clamp((float) value, 0.0f, 100f) / 100f));
+        this.RecoverHp(value, false);
+        EffectManager.GetEffect("ef_btl_sk_heal_02", this.FindNode("Hip"));
+        break;
+    }
+    this.OnUIBuffRoutine(type, value);
+  }
+
+  public virtual bool OnBuffEnd(BuffParam.BUFFTYPE type, bool sync, bool isPlayEndEffect = true)
+  {
+    if (!this.buffParam.BuffEnd(type, isPlayEndEffect))
+      return false;
+    switch (type)
+    {
+      case BuffParam.BUFFTYPE.MOVE_SPEED_DOWN:
+        this.badStatusTotal.speedDown = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.POISON:
+        this.badStatusTotal.poison = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.BURNING:
+        this.badStatusTotal.burning = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.DEADLY_POISON:
+        this.badStatusTotal.deadlyPoison = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.INK_SPLASH:
+        this.badStatusTotal.inkSplash = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.SHIELD:
+        this.OnBuffEnd(BuffParam.BUFFTYPE.SHIELD_SUPER_ARMOR, false);
+        this.OnBuffEnd(BuffParam.BUFFTYPE.SHIELD_REFLECT, false);
+        this.OnBuffEnd(BuffParam.BUFFTYPE.SHIELD_REFLECT_DAMAGE_UP, false);
+        this.ShieldHp = (XorInt) 0;
+        break;
+      case BuffParam.BUFFTYPE.SLIDE:
+        this.badStatusTotal.slide = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.SILENCE:
+        this.badStatusTotal.silence = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.ATTACK_SPEED_DOWN:
+        this.badStatusTotal.attackSpeedDown = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.CANT_HEAL_HP:
+        this.badStatusTotal.cantHealHp = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.BLIND:
+        this.badStatusTotal.blind = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.EROSION:
+        this.badStatusTotal.erosion = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.STONE:
+        this.badStatusTotal.stone = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.BLEEDING:
+        this.badStatusTotal.bleeding = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.ACID:
+        this.badStatusTotal.acid = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.DAMAGE_MOTION_STOP:
+        this.badStatusTotal.damageMotionStop = 0.0f;
+        break;
+      case BuffParam.BUFFTYPE.CORRUPTION:
+        this.badStatusTotal.corruption = 0.0f;
+        break;
+    }
+    this.UpdateAnimatorSpeed();
+    if (sync)
+      this.SendBuffSync();
+    return true;
+  }
+
+  public virtual void OnPoisonStart(int fromObjectID = 0)
+  {
+  }
+
+  public virtual void OnBurningStart()
+  {
+  }
+
+  public virtual void OnBleedingStart()
+  {
+  }
+
+  public virtual void OnSpeedDown()
+  {
+  }
+
+  public virtual void OnAttackSpeedDown()
+  {
+  }
+
+  public virtual void OnDeadlyPoisonStart()
+  {
+  }
+
+  public virtual void OnInkSplash(InkSplashInfo info)
+  {
+  }
+
+  public virtual void OnSlideStart()
+  {
+  }
+
+  public virtual void OnSilenceStart()
+  {
+  }
+
+  public virtual void OnCantHealHpStart()
+  {
+  }
+
+  public virtual void OnBlindStart()
+  {
+  }
+
+  public virtual void OnBuffCancellation()
+  {
+  }
+
+  public virtual bool IsValidLightRing() => false;
+
+  public virtual void OnStoneStart()
+  {
+  }
+
+  public virtual void OnAcidStart()
+  {
+  }
+
+  public virtual void OnDamageMotionStopStart(float time)
+  {
+  }
+
+  public virtual void OnCorruptionStart()
+  {
+  }
+
+  public virtual bool IsValidBuff(BuffParam.BUFFTYPE targetType)
+  {
+    return this.buffParam.IsValidBuff(targetType);
+  }
+
+  public bool IsValidBuffByAbility(BuffParam.BUFFTYPE targetType)
+  {
+    return this.buffParam.IsValidBuffByAbility(targetType);
+  }
+
+  public bool IsValidBuffBlind() => this.IsValidBuff(BuffParam.BUFFTYPE.BLIND);
+
+  public virtual void RecoverHp(int recoverValue, bool isSend)
+  {
+    this.hp += recoverValue;
+    if (this.hp > this.hpMax)
+      this.hp = this.hpMax;
+    if (recoverValue <= 0)
+      return;
+    this.OnBuffEnd(BuffParam.BUFFTYPE.BLEEDING, false);
+  }
+
+  public override bool CheckHitAttack(
+    AttackHitInfo info,
+    Collider to_collider,
+    StageObject to_object)
+  {
+    if (info.canAttackGrabbedPlayer)
+    {
+      if ((to_object.hitOffFlag & ~StageObject.HIT_OFF_FLAG.GRAB) != StageObject.HIT_OFF_FLAG.NONE)
+        return false;
+    }
+    else if (info.attackType == AttackHitInfo.ATTACK_TYPE.SNATCH)
+    {
+      if (to_object.hitOffFlag != StageObject.HIT_OFF_FLAG.NONE && (to_object.hitOffFlag & (StageObject.HIT_OFF_FLAG.INVICIBLE | StageObject.HIT_OFF_FLAG.DEAD)) == StageObject.HIT_OFF_FLAG.NONE)
+        return false;
+    }
+    else if (to_object.hitOffFlag != StageObject.HIT_OFF_FLAG.NONE)
+      return false;
+    return base.CheckHitAttack(info, to_collider, to_object);
+  }
+
+  public override void OnAttackedHit(
+    AttackHitInfo info,
+    AttackHitColliderProcessor.HitParam hit_param)
+  {
+    base.OnAttackedHit(info, hit_param);
+    if (!this.IsValidAttackedHit(hit_param.fromObject) || this.IsPuppet() || hit_param.fromObject.IsPuppet() || !this.IsMirror() && !this.IsPuppet() || !this.isLocalDamageApply || this.hp - this.localDamage > 0)
+      return;
+    this.ActDead(true);
+  }
+
+  protected override bool IsValidAttackedHit(StageObject from_object)
+  {
+    return !this.isDead && base.IsValidAttackedHit(from_object);
+  }
+
+  protected override void OnAttackedHitDirection(AttackedHitStatusDirection status)
+  {
+    if (status.hitParam.processor != null)
+    {
+      BulletObject colliderInterface = status.hitParam.processor.colliderInterface as BulletObject;
+      if (Object.op_Inequality((Object) colliderInterface, (Object) null))
+      {
+        status.atk = colliderInterface.masterAtk;
+        status.skillParam = colliderInterface.masterSkill;
+      }
+      else
+      {
+        AtkAttribute atk = new AtkAttribute();
+        status.fromObject.GetAtk(status.attackInfo, ref atk);
+        status.atk = atk;
+        Player fromObject = status.fromObject as Player;
+        if (Object.op_Inequality((Object) fromObject, (Object) null))
+          status.skillParam = fromObject.skillInfo.actSkillParam;
+      }
+    }
+    if (this.IsDamageValid(status))
+    {
+      status.validDamage = true;
+      status.badStatusAdd.Copy(this.CalcBadStatus(status));
+    }
+    base.OnAttackedHitDirection(status);
+  }
+
+  protected virtual bool IsDamageValid(AttackedHitStatusDirection status) => false;
+
+  protected virtual BadStatus CalcBadStatus(AttackedHitStatusDirection status)
+  {
+    BadStatus targetBadStatus = new BadStatus();
+    if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.CANNON_BALL)
+      return targetBadStatus;
+    targetBadStatus.Copy(status.attackInfo.badStatus);
+    if (status.attackInfo.isSkillReference && status.skillParam != null)
+    {
+      for (int index = 0; index < 3; ++index)
+      {
+        switch (status.skillParam.tableData.supportType[index])
+        {
+          case BuffParam.BUFFTYPE.HIT_PARALYZE:
+            targetBadStatus.paralyze += (float) status.skillParam.supportValue[index];
+            break;
+          case BuffParam.BUFFTYPE.HIT_POISON:
+            targetBadStatus.poison += (float) status.skillParam.supportValue[index];
+            break;
+        }
+      }
+    }
+    Character fromObject = status.fromObject as Character;
+    if (Object.op_Implicit((Object) fromObject))
+    {
+      targetBadStatus.Add(fromObject.atkBadStatus);
+      targetBadStatus.paralyze += (float) fromObject.buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_PARALYZE);
+      targetBadStatus.poison += (float) fromObject.buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_POISON);
+      targetBadStatus.freeze += (float) fromObject.buffParam.GetValue(BuffParam.BUFFTYPE.ATTACK_FREEZE);
+      if ((double) targetBadStatus.paralyze > 0.0)
+      {
+        targetBadStatus.paralyze *= fromObject.buffParam.GetBadStatusRateUp(BuffParam.BAD_STATUS_UP.PARALYZE);
+        targetBadStatus.paralyze += fromObject.buffParam.GetBadStatusUp(BuffParam.BAD_STATUS_UP.PARALYZE);
+      }
+      if ((double) targetBadStatus.poison > 0.0)
+      {
+        targetBadStatus.poison *= fromObject.buffParam.GetBadStatusRateUp(BuffParam.BAD_STATUS_UP.POISON);
+        targetBadStatus.poison += fromObject.buffParam.GetBadStatusUp(BuffParam.BAD_STATUS_UP.POISON);
+      }
+      if ((double) targetBadStatus.freeze > 0.0)
+      {
+        targetBadStatus.freeze *= fromObject.buffParam.GetBadStatusRateUp(BuffParam.BAD_STATUS_UP.FREEZE);
+        targetBadStatus.freeze += fromObject.buffParam.GetBadStatusUp(BuffParam.BAD_STATUS_UP.FREEZE);
+      }
+    }
+    targetBadStatus.Mul(status.attackInfo.atkRate);
+    this.buffParam.ApplyBadStatusGuard(ref targetBadStatus);
+    return targetBadStatus;
+  }
+
+  protected override void OnAttackedHitLocal(AttackedHitStatusLocal status)
+  {
+    if (this.buffParam.IsValidInvincibleCountBuff())
+      return;
+    base.OnAttackedHitLocal(status);
+    if (!status.validDamage)
+      return;
+    AtkAttribute damage_details = new AtkAttribute();
+    status.damage = this.CalcDamage(status, ref damage_details);
+    status.damageDetails = damage_details;
+    StageObject fromObject = status.fromObject;
+    if (Object.op_Inequality((Object) fromObject, (Object) null))
+    {
+      fromObject.AbsorptionProc(this, status);
+      fromObject.AbsorptionProcByBuff(status);
+    }
+    int num = this.CutAndAbsorbDamageByBuff(this, status) ? 1 : 0;
+    bool flag = false;
+    if (num == 0)
+      flag = this.InvincibleDamageByBuff(this, status);
+    if (num == 0 && !flag)
+      this.ChargeSkillWhenDamagedByBuff();
+    if (!this.isLocalDamageApply || !this.IsPuppet() && !this.IsMirror())
+      return;
+    this.localDamage += status.damage;
+  }
+
+  protected virtual int CalcDamage(AttackedHitStatusLocal status, ref AtkAttribute damage_details)
+  {
+    return 0;
+  }
+
+  protected AtkAttribute GetInvinsibleMulRate()
+  {
+    AtkAttribute invinsibleMulRate = new AtkAttribute();
+    invinsibleMulRate.Set(1f);
+    List<BuffParam.BuffData> invincibleBuffDataList = this.buffParam.GetInvincibleBuffDataList();
+    if (invincibleBuffDataList.IsNullOrEmpty<BuffParam.BuffData>())
+      return invinsibleMulRate;
+    for (int index = 0; index < invincibleBuffDataList.Count; ++index)
+    {
+      switch (invincibleBuffDataList[index].type)
+      {
+        case BuffParam.BUFFTYPE.INVINCIBLE_NORMAL:
+          invinsibleMulRate.normal = 0.0f;
+          break;
+        case BuffParam.BUFFTYPE.INVINCIBLE_FIRE:
+          invinsibleMulRate.SetTargetElement(ELEMENT_TYPE.FIRE, 0.0f);
+          break;
+        case BuffParam.BUFFTYPE.INVINCIBLE_WATER:
+          invinsibleMulRate.SetTargetElement(ELEMENT_TYPE.WATER, 0.0f);
+          break;
+        case BuffParam.BUFFTYPE.INVINCIBLE_THUNDER:
+          invinsibleMulRate.SetTargetElement(ELEMENT_TYPE.THUNDER, 0.0f);
+          break;
+        case BuffParam.BUFFTYPE.INVINCIBLE_SOIL:
+          invinsibleMulRate.SetTargetElement(ELEMENT_TYPE.SOIL, 0.0f);
+          break;
+        case BuffParam.BUFFTYPE.INVINCIBLE_ALL:
+          invinsibleMulRate.normal = 0.0f;
+          invinsibleMulRate.SetTargetElemetAll(0.0f);
+          break;
+        case BuffParam.BUFFTYPE.INVINCIBLE_LIGHT:
+          invinsibleMulRate.SetTargetElement(ELEMENT_TYPE.LIGHT, 0.0f);
+          break;
+        case BuffParam.BUFFTYPE.INVINCIBLE_DARK:
+          invinsibleMulRate.SetTargetElement(ELEMENT_TYPE.DARK, 0.0f);
+          break;
+        case BuffParam.BUFFTYPE.INVINCIBLE_ALL_ELEMENT:
+          invinsibleMulRate.SetTargetElemetAll(0.0f);
+          break;
+      }
+    }
+    return invinsibleMulRate;
+  }
+
+  protected virtual AtkAttribute CalcAtk(AttackedHitStatusLocal status)
+  {
+    AtkAttribute atkAttribute = new AtkAttribute();
+    atkAttribute.Add(status.atk);
+    atkAttribute.Mul(status.attackInfo.atkRate);
+    if (status.damageDistanceData != null)
+    {
+      float rate = status.damageDistanceData.GetRate(status.distanceXZ);
+      atkAttribute.Mul(rate);
+    }
+    return atkAttribute;
+  }
+
+  protected virtual AtkAttribute CalcTolerance(AttackedHitStatusLocal status)
+  {
+    AtkAttribute _tolerance = new AtkAttribute();
+    _tolerance.Add(this.tolerance);
+    AtkAttribute val = new AtkAttribute();
+    val.Set(0.0f);
+    val.AddElementOnly(1f);
+    val.Add(this.buffParam.passive.tolUpRate);
+    val.Sub(this.buffParam.passive.tolDownRate);
+    _tolerance.Mul(val);
+    _tolerance.fire += (float) this.buffParam.passive.tolList[0];
+    _tolerance.water += (float) this.buffParam.passive.tolList[1];
+    _tolerance.thunder += (float) this.buffParam.passive.tolList[2];
+    _tolerance.soil += (float) this.buffParam.passive.tolList[3];
+    _tolerance.light += (float) this.buffParam.passive.tolList[4];
+    _tolerance.dark += (float) this.buffParam.passive.tolList[5];
+    _tolerance.CheckMinus();
+    val.Set(0.0f);
+    val.AddElementOnly(1f);
+    val.Add(this.buffParam.GetBuffToleranceRate());
+    _tolerance.Mul(val);
+    this.AddToleranceBuff(ref _tolerance);
+    _tolerance.CheckMinus();
+    return _tolerance;
+  }
+
+  public void AddToleranceBuff(ref AtkAttribute _tolerance)
+  {
+    float num = (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT);
+    _tolerance.fire += (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_FIRE) + num;
+    _tolerance.water += (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_WATER) + num;
+    _tolerance.thunder += (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_THUNDER) + num;
+    _tolerance.soil += (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_SOIL) + num;
+    _tolerance.light += (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_LIGHT) + num;
+    _tolerance.dark += (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_DARK) + num;
+  }
+
+  protected virtual AtkAttribute CalcDefense(AttackedHitStatusLocal status) => this.defense;
+
+  public void AddDefenceBuff(ref AtkAttribute _defence)
+  {
+    float rate = (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_NORMAL);
+    _defence.AddRate(rate);
+  }
+
+  public void AddElementDefenceBuff(ref AtkAttribute _defence)
+  {
+    float num1 = (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_ALLELEMENT);
+    float num2 = (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_FIRE);
+    _defence.AddTargetElement(ELEMENT_TYPE.FIRE, num2 + num1);
+    float num3 = (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_WATER);
+    _defence.AddTargetElement(ELEMENT_TYPE.WATER, num3 + num1);
+    float num4 = (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_THUNDER);
+    _defence.AddTargetElement(ELEMENT_TYPE.THUNDER, num4 + num1);
+    float num5 = (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_SOIL);
+    _defence.AddTargetElement(ELEMENT_TYPE.SOIL, num5 + num1);
+    float num6 = (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_LIGHT);
+    _defence.AddTargetElement(ELEMENT_TYPE.LIGHT, num6 + num1);
+    float num7 = (float) this.buffParam.GetValue(BuffParam.BUFFTYPE.DEFENCE_DARK);
+    _defence.AddTargetElement(ELEMENT_TYPE.DARK, num7 + num1);
+  }
+
+  public override void OnAttackedHitOwner(AttackedHitStatusOwner status)
+  {
+    if (Object.op_Inequality((Object) this.controller, (Object) null))
+      this.controller.OnCharacterAttackedHitOwner(status);
+    bool flag = false;
+    if (status.attackInfo != null && status.attackInfo.isImmediateDeath)
+    {
+      status.damage = this.hpMax;
+      flag = true;
+    }
+    status.afterHP = this.hp;
+    status.afterShieldHp = (int) this.ShieldHp;
+    if (status.validDamage && !status.aegisParam.isChange)
+    {
+      if (!status.isDamageRegionOnly)
+      {
+        status.afterHP -= status.damage;
+        if (this.IsNarrowEscape(status))
+        {
+          this.UseNarrowEscape(status);
+          status.afterHP = 1;
+        }
+        if (status.afterHP < 0)
+          status.afterHP = 0;
+      }
+      status.afterShieldHp -= status.shieldDamage;
+      if (status.afterShieldHp < 0)
+        status.afterShieldHp = 0;
+    }
+    status.badStatusTotal.Copy(this.badStatusTotal);
+    status.badStatusTotal.Add(status.badStatusAdd);
+    if ((double) status.badStatusAdd.paralyze > 0.0 && (double) status.badStatusTotal.paralyze >= (double) this.badStatusMax.paralyze && this.actionID != Character.ACTION_ID.PARALYZE)
+    {
+      if (!this.buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.PARALYZE))
+        status.reactionType = 10;
+      else
+        status.badStatusTotal.paralyze = 0.0f;
+    }
+    if ((double) status.badStatusAdd.freeze > 0.0 && (double) status.badStatusTotal.freeze >= (double) this.badStatusMax.freeze && !this.IsFreeze())
+    {
+      if (!this.buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.FREEZE))
+        status.reactionType = 12;
+      else
+        status.badStatusTotal.freeze = 0.0f;
+    }
+    if ((double) status.badStatusAdd.lightRing > 0.0 && (double) status.badStatusTotal.lightRing >= (double) this.badStatusMax.lightRing && !this.IsLightRing() && this.IsValidLightRing())
+      status.reactionType = 19;
+    if ((double) status.badStatusAdd.poison > 0.0 && (double) status.badStatusTotal.poison >= (double) this.badStatusMax.poison)
+      this.OnPoisonStart(status.fromObjectID);
+    if ((double) status.badStatusAdd.deadlyPoison > 0.0 && (double) status.badStatusTotal.deadlyPoison >= (double) this.badStatusMax.deadlyPoison)
+      this.OnDeadlyPoisonStart();
+    if ((double) status.badStatusAdd.burning > 0.0 && (double) status.badStatusTotal.burning >= (double) this.badStatusMax.burning)
+      this.OnBurningStart();
+    if ((double) status.badStatusAdd.speedDown > 0.0 && (double) status.badStatusTotal.speedDown >= (double) this.badStatusMax.speedDown)
+      this.OnSpeedDown();
+    if ((double) status.badStatusAdd.bleeding > 0.0 && (double) status.badStatusTotal.bleeding >= (double) this.badStatusMax.bleeding)
+      this.OnBleedingStart();
+    if ((double) status.badStatusAdd.attackSpeedDown > 0.0 && (double) status.badStatusTotal.attackSpeedDown >= (double) this.badStatusMax.attackSpeedDown)
+      this.OnAttackSpeedDown();
+    if ((double) status.badStatusAdd.inkSplash > 0.0 && (double) status.badStatusTotal.inkSplash >= (double) this.badStatusMax.inkSplash && !this.IsInkSplash())
+      this.OnInkSplash(status.attackInfo.inkSplashInfo);
+    if ((double) status.badStatusAdd.slide > 0.0 && (double) status.badStatusTotal.slide >= (double) this.badStatusMax.slide)
+      this.OnSlideStart();
+    if ((double) status.badStatusAdd.silence > 0.0 && (double) status.badStatusTotal.silence >= (double) this.badStatusMax.silence)
+      this.OnSilenceStart();
+    if ((double) status.badStatusAdd.cantHealHp > 0.0 && (double) status.badStatusTotal.cantHealHp >= (double) this.badStatusMax.cantHealHp)
+      this.OnCantHealHpStart();
+    if ((double) status.badStatusAdd.blind > 0.0 && (double) status.badStatusTotal.blind >= (double) this.badStatusMax.blind)
+      this.OnBlindStart();
+    if ((double) status.badStatusTotal.stone >= (double) this.badStatusMax.stone && !this.IsStone())
+    {
+      if (!this.buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.STONE))
+        status.reactionType = 21;
+      else
+        status.badStatusTotal.stone = 0.0f;
+    }
+    if ((double) status.badStatusAdd.acid > 0.0 && (double) status.badStatusTotal.acid >= (double) this.badStatusMax.acid)
+      this.OnAcidStart();
+    if ((double) status.badStatusAdd.damageMotionStop > 0.0 && (double) status.badStatusTotal.damageMotionStop >= (double) this.badStatusMax.damageMotionStop)
+      this.OnDamageMotionStopStart(status.attackInfo.motionStopTime);
+    if ((double) status.badStatusAdd.corruption > 0.0 && (double) status.badStatusTotal.corruption >= (double) this.badStatusMax.corruption)
+      this.OnCorruptionStart();
+    Quaternion rotation1 = this._rotation;
+    float y1 = ((Quaternion) ref rotation1).eulerAngles.y;
+    if (status.afterHP <= 0)
+    {
+      int deadReviveCount = this.GetDeadReviveCount();
+      if (0 < deadReviveCount)
+      {
+        status.afterHP = 1;
+        status.reactionType = 22;
+        status.deadReviveCount = deadReviveCount;
+        status.badStatusAdd.Reset();
+        status.downTotal = 0.0f;
+        status.downAddBase = 0.0f;
+        status.downAddWeak = 0.0f;
+        status.concussionTotal = 0.0f;
+        status.concussionAdd = 0.0f;
+        status.isArrowBleed = false;
+        status.isShadowSealing = false;
+        status.isArrowBomb = false;
+      }
+      else
+        status.reactionType = 8;
+      if (flag)
+        this.PlayImmediateDeathEffect();
+    }
+    else if (status.reactionType == 0 && !this.isDead)
+    {
+      Character.REACTION_TYPE reactionType = Character.REACTION_TYPE.NONE;
+      if (this.IsHitReactionValid(status))
+        reactionType = this.OnHitReaction(status);
+      status.reactionType = (int) reactionType;
+    }
+    if (status.reactionType != 0)
+    {
+      status.reactionType = (int) this.CheckReActionTolerance(status);
+      if (status.reactionType == 0)
+        this._rotation = Quaternion.AngleAxis(y1, Vector3.up);
+    }
+    if (this.enableReactionDelay && this.IsReactionDelayType(status.reactionType))
+    {
+      this.RegisterReacionDelayInfo(new Character.DelayReactionInfo()
+      {
+        type = (Character.REACTION_TYPE) status.reactionType,
+        targetId = status.fromObjectID,
+        reactionLoopTime = status.attackInfo.toEnemy.reactionInfo.reactionLoopTime
+      });
+      status.reactionType = 0;
+      this.isReactionDelaySet = true;
+    }
+    status.hostPos = this._position;
+    AttackedHitStatusOwner attackedHitStatusOwner = status;
+    Quaternion rotation2 = this._rotation;
+    double y2 = (double) ((Quaternion) ref rotation2).eulerAngles.y;
+    attackedHitStatusOwner.hostDir = (float) y2;
+    status.damageHpRate = (float) ((1.0 - (double) status.afterHP / (double) this.hpMax) * 100.0);
+    if (status.validDamage)
+      this.buffParam.DecreaseInvincibleCount();
+    base.OnAttackedHitOwner(status);
+  }
+
+  protected void ApplyInvicibleCount(AttackedHitStatusOwner status)
+  {
+    if (!this.buffParam.IsValidInvincibleCountBuff())
+      return;
+    status.damage = 0;
+    status.damageDetails.Set(0.0f);
+    status.badStatusAdd.Reset();
+  }
+
+  protected virtual bool ApplyInvicibleBadStatus(AttackedHitStatusOwner status)
+  {
+    if (!this.buffParam.IsValidBuff(BuffParam.BUFFTYPE.INVINCIBLE_BADSTATUS) || !status.badStatusAdd.isExist())
+      return false;
+    status.badStatusAdd.Reset();
+    return true;
+  }
+
+  protected void PlayImmediateDeathEffect()
+  {
+    if (Object.op_Equality((Object) this.effectPlayProcessor, (Object) null))
+      return;
+    List<EffectPlayProcessor.EffectSetting> settings = this.effectPlayProcessor.GetSettings("IMMEDIATE_DEATH_EFFECT");
+    if (settings == null)
+      return;
+    for (int index = 0; index < settings.Count; ++index)
+    {
+      if (settings[index] != null)
+        this.effectPlayProcessor.PlayEffect(settings[index], this._transform);
+    }
+  }
+
+  protected virtual bool IsNarrowEscape(AttackedHitStatusOwner status) => false;
+
+  protected virtual void UseNarrowEscape(AttackedHitStatusOwner status)
+  {
+  }
+
+  protected virtual bool IsHitReactionValid(AttackedHitStatusOwner status) => true;
+
+  protected virtual int GetDeadReviveCount() => 0;
+
+  protected virtual bool IsReactionDelayType(int type)
+  {
+    switch ((Character.REACTION_TYPE) type)
+    {
+      case Character.REACTION_TYPE.PARALYZE:
+      case Character.REACTION_TYPE.FREEZE:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  protected virtual Character.REACTION_TYPE OnHitReaction(AttackedHitStatusOwner status)
+  {
+    return Character.REACTION_TYPE.NONE;
+  }
+
+  protected virtual Character.REACTION_TYPE CheckReActionTolerance(AttackedHitStatusOwner status)
+  {
+    Character.REACTION_TYPE reactionType = (Character.REACTION_TYPE) status.reactionType;
+    if (reactionType == Character.REACTION_TYPE.GUARD_DAMAGE)
+      return reactionType;
+    if (status.attackInfo.attackType == AttackHitInfo.ATTACK_TYPE.SOUNDWAVE)
+    {
+      if (this.buffParam.IsHalfReaction(BuffParam.TOLERANCETYPE.SOUNDWAVE))
+        reactionType = Character.REACTION_TYPE.DAMAGE;
+      else if (this.buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.SOUNDWAVE))
+        reactionType = Character.REACTION_TYPE.NONE;
+    }
+    if (reactionType == Character.REACTION_TYPE.STUNNED_BLOW && this.buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.STUMBLE))
+      reactionType = Character.REACTION_TYPE.BLOW;
+    if (reactionType == Character.REACTION_TYPE.SHAKE && this.buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.SHAKE))
+      reactionType = Character.REACTION_TYPE.NONE;
+    if (reactionType == Character.REACTION_TYPE.CHARM_BLOW && this.buffParam.IsInvalidReaction(BuffParam.TOLERANCETYPE.CHARM))
+      reactionType = Character.REACTION_TYPE.BLOW;
+    return reactionType;
+  }
+
+  public override void OnAttackedHitFix(AttackedHitStatusFix status)
+  {
+    base.OnAttackedHitFix(status);
+    if (MonoBehaviourSingleton<InGameProgress>.IsValid())
+      MonoBehaviourSingleton<InGameProgress>.I.OnDamage(status, this);
+    if (this.isDead)
+      return;
+    if (this.isLocalDamageApply && MonoBehaviourSingleton<CoopManager>.IsValid() && MonoBehaviourSingleton<CoopManager>.I.coopMyClient.clientId == status.fromClientID)
+    {
+      this.localDamage -= status.damage;
+      if (this.localDamage <= 0)
+        this.localDamage = 0;
+    }
+    this.hp = status.afterHP;
+    this.ShieldHp = (XorInt) status.afterShieldHp;
+    this.badStatusTotal = status.badStatusTotal;
+    Character.ReactionInfo reactionInfo;
+    this.MakeReactionInfo(status, out reactionInfo);
+    if (reactionInfo.reactionType != Character.REACTION_TYPE.NONE)
+      this.ApplySyncPosition(status.hostPos, status.hostDir);
+    this.ActReaction(reactionInfo);
+    if (string.IsNullOrEmpty(status.attackInfo.remainEffectName) || this.IsIgnoreHitEffect(status.attackInfo))
+      return;
+    Transform effect = EffectManager.GetEffect(status.attackInfo.remainEffectName, this.rootNode);
+    if (!Object.op_Inequality((Object) effect, (Object) null))
+      return;
+    this.damegeRemainEffect = ((Component) effect).gameObject;
+  }
+
+  protected virtual void MakeReactionInfo(
+    AttackedHitStatusFix status,
+    out Character.ReactionInfo reactionInfo)
+  {
+    reactionInfo = new Character.ReactionInfo();
+    reactionInfo.reactionType = (Character.REACTION_TYPE) status.reactionType;
+    reactionInfo.blowForce = status.blowForce;
+    reactionInfo.loopTime = status.attackInfo.toPlayer.reactionLoopTime;
+    reactionInfo.targetId = status.fromObjectID;
+  }
+
+  private bool IsIgnoreHitEffect(AttackHitInfo _info)
+  {
+    if (_info == null)
+      return false;
+    switch (_info.attackType)
+    {
+      case AttackHitInfo.ATTACK_TYPE.BURST_THS_SINGLE_SHOT:
+      case AttackHitInfo.ATTACK_TYPE.BURST_THS_FULL_BURST:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  public virtual void ActReaction(Character.ReactionInfo info, bool isSync = false)
+  {
+    switch (info.reactionType)
+    {
+      case Character.REACTION_TYPE.DAMAGE:
+        this.ActDamage();
+        break;
+      case Character.REACTION_TYPE.DEAD:
+        this.ActDead();
+        break;
+      case Character.REACTION_TYPE.PARALYZE:
+        this.ActParalyze();
+        break;
+      case Character.REACTION_TYPE.FREEZE:
+        this.ActFreezeStart();
+        break;
+    }
+    if (!Object.op_Inequality((Object) this.characterSender, (Object) null) || info.reactionType == Character.REACTION_TYPE.NONE)
+      return;
+    this.characterSender.OnActReaction(info, isSync);
+  }
+
+  protected void RegisterReacionDelayInfo(Character.DelayReactionInfo newInfo)
+  {
+    if (this.SearchReactionDelayInfo(newInfo.type) != null)
+      return;
+    this.m_reactionDelayList.Add(newInfo);
+  }
+
+  protected Character.DelayReactionInfo SearchReactionDelayInfo(Character.REACTION_TYPE targetType)
+  {
+    int count = this.m_reactionDelayList.Count;
+    for (int index = 0; index < count; ++index)
+    {
+      if (this.m_reactionDelayList[index].type == targetType)
+        return this.m_reactionDelayList[index];
+    }
+    return (Character.DelayReactionInfo) null;
+  }
+
+  private void UpdateReactionDelay()
+  {
+    if (!this.isReactionDelaySet || this.enableReactionDelay || !this.IsCoopNone() && !this.IsOriginal())
+      return;
+    this.OnReactionDelay(this.m_reactionDelayList);
+    this.m_reactionDelayList.Clear();
+    this.isReactionDelaySet = false;
+  }
+
+  public virtual void OnReactionDelay(
+    List<Character.DelayReactionInfo> reactionDelayList)
+  {
+    int count = reactionDelayList.Count;
+    if (count <= 0)
+      return;
+    for (int index = 0; index < count; ++index)
+    {
+      switch (reactionDelayList[index].type)
+      {
+        case Character.REACTION_TYPE.PARALYZE:
+          this.ActParalyze();
+          break;
+        case Character.REACTION_TYPE.FREEZE:
+          this.ActFreezeStart();
+          break;
+      }
+    }
+    if (!Object.op_Inequality((Object) this.characterSender, (Object) null))
+      return;
+    this.characterSender.OnReactionDelay(reactionDelayList);
+  }
+
+  protected override void OnAttackedContinuationFixedUpdate(
+    StageObject.AttackedContinuationStatus status)
+  {
+    base.OnAttackedContinuationFixedUpdate(status);
+    if (this.isDead)
+      return;
+    float continuationTimeChangeRate = this.GetContinuationTimeChangeRate(status);
+    if (status.attackInfo.type != AttackContinuationInfo.CONTINUATION_TYPE.INHALE || this.actionID == Character.ACTION_ID.MOVE && this.moveType == Character.MOVE_TYPE.SYNC_VELOCITY || status.fromCollider == null)
+      return;
+    Bounds bounds = status.fromCollider.bounds;
+    Vector3 vector3 = Vector3.op_Subtraction(((Bounds) ref bounds).center, this._position);
+    vector3.y = 0.0f;
+    float num = status.attackInfo.inhale.speed * continuationTimeChangeRate;
+    float magnitude = ((Vector3) ref vector3).magnitude;
+    if ((double) num * (double) Time.fixedDeltaTime > (double) magnitude)
+      num = magnitude / Time.fixedDeltaTime;
+    ((Vector3) ref vector3).Normalize();
+    this.externalVelocity = Vector3.op_Multiply(vector3, num);
+  }
+
+  public virtual Vector3 GetTransformForward()
+  {
+    Vector3 transformForward = this._forward;
+    if (Vector3.op_Inequality(this.lerpRotateVec, Vector3.zero))
+      transformForward = this.lerpRotateVec;
+    transformForward.y = 0.0f;
+    return transformForward;
+  }
+
+  public virtual void AddObjectList(GameObject game_object, Character.OBJECT_LIST_TYPE type = Character.OBJECT_LIST_TYPE.DEFAULT)
+  {
+    if (type < Character.OBJECT_LIST_TYPE.DEFAULT || type >= Character.OBJECT_LIST_TYPE.NUM)
+      return;
+    game_object.AddComponent<DisableNotifyMonoBehaviour>().SetNotifyMaster((DisableNotifyMonoBehaviour) this);
+    this.objectList[(int) type].Add(game_object);
+  }
+
+  public virtual void DestroyObjectList(Character.OBJECT_LIST_TYPE type)
+  {
+    List<GameObject> gameObjectList = this.objectList[(int) type];
+    gameObjectList.GetRange(0, gameObjectList.Count).ForEach((Action<GameObject>) (o => EffectManager.ReleaseEffect(o)));
+    gameObjectList.Clear();
+  }
+
+  protected override void OnDetachServant(DisableNotifyMonoBehaviour servant)
+  {
+    this.objectList.ForEach((Action<List<GameObject>>) (o => o.Remove(((Component) servant).gameObject)));
+    this.buffParam.OnDetachServant(servant);
+  }
+
+  public virtual string EffectNameAnalyzer(string effect_name) => effect_name;
+
+  public override Transform FindNode(string name)
+  {
+    return name == "BODY" && Object.op_Inequality((Object) this.body, (Object) null) ? this.body : base.FindNode(name);
+  }
+
+  public virtual bool CanPlayEffectEvent() => true;
+
+  private void EventExAtkColliderStart(AnimEventData.EventData data)
+  {
+    float[] floatArgs = data.floatArgs;
+    Vector3 pos;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref pos).\u002Ector(floatArgs[0], floatArgs[1], floatArgs[2]);
+    Vector3 rot;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref rot).\u002Ector(floatArgs[3], floatArgs[4], floatArgs[5]);
+    float radius = floatArgs[6];
+    float height = floatArgs[7];
+    string stringArg1 = data.stringArgs[0];
+    string stringArg2 = data.stringArgs[1];
+    int intArg = data.intArgs[0];
+    AttackInfo attackInfo = this.FindAttackInfo(stringArg1);
+    if (attackInfo == null)
+      return;
+    Transform node = this.FindNode(stringArg2);
+    if (Object.op_Equality((Object) node, (Object) null))
+      return;
+    int attackLayer = this.objectType == StageObject.OBJECT_TYPE.ENEMY ? 15 : 14;
+    AttackColliderObject attackColliderObject = new GameObject("AttackColliderObject").AddComponent<AttackColliderObject>();
+    attackColliderObject.InitializeForExAtkCollider((StageObject) this, node, attackInfo, pos, rot, radius, height, attackLayer);
+    attackColliderObject.UniqueID = intArg;
+    attackColliderObject.DetachRigidbody();
+    this.m_exAtkColliderObjectList.Add(attackColliderObject);
+  }
+
+  private void EventExAtkColliderEnd(AnimEventData.EventData data)
+  {
+    int intArg = data.intArgs[0];
+    for (int index = this.m_exAtkColliderObjectList.Count - 1; index >= 0; --index)
+    {
+      if (this.m_exAtkColliderObjectList[index].UniqueID == intArg)
+      {
+        Object.Destroy((Object) ((Component) this.m_exAtkColliderObjectList[index]).gameObject);
+        this.m_exAtkColliderObjectList.RemoveAt(index);
+      }
+    }
+  }
+
+  private void DeleteExAtkColliderAll()
+  {
+    for (int index = 0; index < this.m_exAtkColliderObjectList.Count; ++index)
+      Object.Destroy((Object) ((Component) this.m_exAtkColliderObjectList[index]).gameObject);
+    this.m_exAtkColliderObjectList.Clear();
+  }
+
+  private void EventRootMotionON(AnimEventData.EventData data)
+  {
+    this.animator.applyRootMotion = true;
+  }
+
+  private void EventRootMotionOFF(AnimEventData.EventData data)
+  {
+    this.animator.applyRootMotion = false;
+    if (this.velocityType != Character.VELOCITY_TYPE.ROOT_MOTION)
+      return;
+    this.SetVelocity(Vector3.zero);
+  }
+
+  private void EventRootMotionMoveRate(AnimEventData.EventData data)
+  {
+    this.rootMotionMoveRate = data.floatArgs[0];
+  }
+
+  private void EventHideRendererON(AnimEventData.EventData data)
+  {
+    this.SetEnableNodeRenderer(data.stringArgs[0], false);
+  }
+
+  private void EventHideRendererOFF(AnimEventData.EventData data)
+  {
+    this.SetEnableNodeRenderer(data.stringArgs[0], true);
+  }
+
+  public void EventActionRendererON(AnimEventData.EventData data)
+  {
+    if (!Object.op_Inequality((Object) this.actionRendererModel, (Object) null))
+      return;
+    Transform node = this.FindNode(this.actionRendererNodeName);
+    if (!Object.op_Inequality((Object) node, (Object) null))
+      return;
+    this.actionRendererInstance = ResourceUtility.Realizes((Object) this.actionRendererModel, node);
+  }
+
+  private void EventActionRendererOFF(AnimEventData.EventData data)
+  {
+    if (!Object.op_Inequality((Object) this.actionRendererInstance, (Object) null))
+      return;
+    Object.Destroy((Object) ((Component) this.actionRendererInstance).gameObject);
+    this.actionRendererInstance = (Transform) null;
+  }
+
+  private void EventEffectDelete(AnimEventData.EventData data)
+  {
+    string str = this.EffectNameAnalyzer(data.stringArgs[0]);
+    bool immediate = !((IList<int>) data.intArgs).IsNullOrEmpty<int>() && data.intArgs[0] > 0;
+    int count = this.objectList[2].Count;
+    List<GameObject> range = this.objectList[2].GetRange(0, count);
+    for (int index = 0; index < count; ++index)
+    {
+      if (string.IsNullOrEmpty(str) || ((Object) range[index]).name.StartsWith(str))
+      {
+        EffectManager.ReleaseEffect(range[index], !immediate, immediate);
+        this.objectList[2].Remove(range[index]);
+      }
+    }
+  }
+
+  private void EventUpdateActionPosition(AnimEventData.EventData data)
+  {
+    string trigger = data.stringArgs.Length != 0 ? data.stringArgs[0] : (string) null;
+    if (string.IsNullOrEmpty(trigger))
+      trigger = "next";
+    if (this.IsCoopNone() || this.IsOriginal())
+      this.UpdateActionPosition(trigger);
+    else if (this.actionPositionWaitSync)
+    {
+      Log.Error(LOG.INGAME, "Character UPDATE_ACTION_POSITION Err. ( WaitSync already. ) trigger : " + trigger);
+    }
+    else
+    {
+      this.actionPositionWaitSync = true;
+      this.actionPositionWaitTrigger = trigger;
+      this.StartWaitingPacket(StageObject.WAITING_PACKET.CHARACTER_UPDATE_ACTION_POSITION, false);
+    }
+  }
+
+  private void EventUpdateDirection(AnimEventData.EventData data)
+  {
+    string trigger = data.stringArgs.Length != 0 ? data.stringArgs[0] : (string) null;
+    if (string.IsNullOrEmpty(trigger))
+      trigger = "next";
+    if (this.IsCoopNone() || this.IsOriginal())
+      this.UpdateDirection(trigger);
+    else if (this.directionWaitSync)
+    {
+      Log.Error(LOG.INGAME, "Character UPDATE_DIRECTION Err. ( WaitSync already. ) trigger : " + trigger);
+    }
+    else
+    {
+      this.directionWaitSync = true;
+      this.directionWaitTrigger = trigger;
+      this.StartWaitingPacket(StageObject.WAITING_PACKET.CHARACTER_UPDATE_DIRECTION, false);
+    }
+  }
+
+  private void EventPeriodicSyncActionPositionStart(AnimEventData.EventData data)
+  {
+    this.periodicSyncActionPositionLastTime = this.GetActMotionTime();
+    this.periodicSyncActionPositionFlag = true;
+    this.SetPeriodicSyncTarget(this.actionTarget);
+  }
+
+  private void EventPeriodicSyncActionPositionEnd(AnimEventData.EventData data)
+  {
+    this.periodicSyncActionPositionFlag = false;
+    this.periodicSyncActionPositionLastTime = 0.0f;
+    this.SetPeriodicSyncTarget((StageObject) null);
+  }
+
+  protected virtual void EventMoveStart(AnimEventData.EventData data, Vector3 targetDir)
+  {
+    float floatArg = data.floatArgs[0];
+    this.EventMoveEnd();
+    this.enableEventMove = true;
+    this.enableAddForce = false;
+    this.eventMoveVelocity = Vector3.op_Multiply(targetDir, floatArg);
+    this.SetVelocity(Quaternion.op_Multiply(Quaternion.LookRotation(this.GetTransformForward()), this.eventMoveVelocity), Character.VELOCITY_TYPE.EVENT_MOVE);
+    this.eventMoveTimeCount = 0.0f;
+  }
+
+  private void EventMoveForwardToTarget(AnimEventData.EventData data)
+  {
+    float floatArg = data.floatArgs[0];
+    float num1 = data.floatArgs.Length > 1 ? data.floatArgs[1] : 0.0f;
+    float num2 = data.floatArgs.Length > 2 ? data.floatArgs[2] : 0.0f;
+    this.EventMoveEnd();
+    if (!this.actionPositionFlag || (double) floatArg <= 0.0)
+      return;
+    Vector3 vector3 = Vector3.op_Subtraction(this.actionPosition, this._position);
+    float num3 = ((Vector3) ref vector3).magnitude - num1;
+    if ((double) num2 != 0.0 && (double) num3 > (double) num2)
+      num3 = num2;
+    float num4 = num3 / floatArg;
+    this.enableEventMove = true;
+    this.enableAddForce = false;
+    this.eventMoveVelocity = Vector3.op_Multiply(Vector3.forward, num4);
+    this.SetVelocity(Quaternion.op_Multiply(Quaternion.LookRotation(this.GetTransformForward()), this.eventMoveVelocity), Character.VELOCITY_TYPE.EVENT_MOVE);
+    this.eventMoveTimeCount = floatArg;
+  }
+
+  private void EventMoveToWorldPos(AnimEventData.EventData data)
+  {
+    float floatArg = data.floatArgs[0];
+    Vector3 vector3_1;
+    vector3_1.x = data.floatArgs[1];
+    vector3_1.y = data.floatArgs[2];
+    vector3_1.z = data.floatArgs[3];
+    this.EventMoveEnd();
+    Vector3 vector3_2 = Vector3.op_Subtraction(vector3_1, this._position);
+    float magnitude = ((Vector3) ref vector3_2).magnitude;
+    if ((double) floatArg <= 1.0000000116860974E-07)
+      return;
+    float num = magnitude / floatArg;
+    if ((double) num <= 0.0)
+      return;
+    Vector3 vector3_3 = Vector3.op_Subtraction(vector3_1, this._position);
+    Vector3 normalized = ((Vector3) ref vector3_3).normalized;
+    this.enableEventMove = false;
+    this.enableAddForce = false;
+    this.enableRootMotion = false;
+    this.eventMoveVelocity = Vector3.op_Multiply(normalized, floatArg);
+    this.SetVelocity(this.eventMoveVelocity, Character.VELOCITY_TYPE.EVENT_MOVE);
+    this.eventMoveTimeCount = num;
+  }
+
+  private void EventMoveSidewaysLookTarget(AnimEventData.EventData data)
+  {
+    if (data.floatArgs.Length < 2)
+      return;
+    this.moveAngle_deg = data.floatArgs[0];
+    this.moveAngleSpeed_deg = data.floatArgs[1];
+  }
+
+  private void EventMoveLookAtPosition(AnimEventData.EventData data)
+  {
+    double floatArg1 = (double) data.floatArgs[0];
+    float floatArg2 = data.floatArgs[1];
+    Vector3 vector3;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref vector3).\u002Ector(data.floatArgs[2], 0.0f, data.floatArgs[3]);
+    if (floatArg1 <= 0.0)
+      return;
+    this.moveLookAtAngle = floatArg2;
+    this.moveLookAtPos = vector3;
+  }
+
+  private void EventRotateToTargetStart(AnimEventData.EventData data)
+  {
+    float floatArg = data.floatArgs[0];
+    float num = data.floatArgs.Length > 1 ? data.floatArgs[1] : 0.0f;
+    this.EndRotate();
+    this.rotateToTargetFlag = true;
+    this.rotateEventSpeed = floatArg;
+    this.rotateToTargetDiffAngle = num;
+  }
+
+  private void EventRotateKeepToTargetStart(AnimEventData.EventData data)
+  {
+    float floatArg = data.floatArgs[0];
+    this.EndRotate();
+    this.rotateEventSpeed = floatArg;
+    this.rotateEventKeep = true;
+  }
+
+  private void EventRotateToAngleStart(AnimEventData.EventData data)
+  {
+    float floatArg1 = data.floatArgs[0];
+    float floatArg2 = data.floatArgs[1];
+    this.EndRotate();
+    Quaternion rotation = this._rotation;
+    this.rotateEventDirection = ((Quaternion) ref rotation).eulerAngles.y + floatArg2 * this.rootRotationRate;
+    if ((double) floatArg1 > 0.0)
+      this.rotateEventSpeed = floatArg1;
+    else
+      this._rotation = Quaternion.AngleAxis(this.rotateEventDirection, Vector3.up);
+  }
+
+  private void EventRotateToTargetOffset(AnimEventData.EventData data)
+  {
+    float floatArg = data.floatArgs[0];
+    this.EndRotate();
+    bool flag = data.intArgs[0] != 0;
+    Vector3 vector3_1;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref vector3_1).\u002Ector(0.0f, 0.0f, data.floatArgs[1]);
+    Vector3 pos = this._position;
+    Quaternion quaternion;
+    if (MonoBehaviourSingleton<StageObjectManager>.IsValid() && Object.op_Inequality((Object) MonoBehaviourSingleton<StageObjectManager>.I.boss, (Object) null))
+    {
+      pos = MonoBehaviourSingleton<StageObjectManager>.I.boss._position;
+      if (flag)
+      {
+        quaternion = MonoBehaviourSingleton<StageObjectManager>.I.boss._rotation;
+        vector3_1 = Quaternion.op_Multiply(Quaternion.Euler(((Quaternion) ref quaternion).eulerAngles), vector3_1);
+      }
+    }
+    else
+      this.GetTargetPos(out pos);
+    pos.y = 0.0f;
+    if (!flag)
+      vector3_1 = Quaternion.op_Multiply(Quaternion.LookRotation(Vector3.op_Subtraction(this._position, pos)), vector3_1);
+    Vector3 vector3_2 = pos;
+    if (Vector3.op_Inequality(vector3_2, this._position))
+      vector3_2 = Vector3.op_Addition(vector3_2, vector3_1);
+    quaternion = Quaternion.LookRotation(Vector3.op_Subtraction(vector3_2, this._position));
+    this.rotateEventDirection = ((Quaternion) ref quaternion).eulerAngles.y;
+    if ((double) floatArg > 0.0)
+      this.rotateEventSpeed = floatArg;
+    else
+      this._rotation = Quaternion.AngleAxis(this.rotateEventDirection, Vector3.up);
+  }
+
+  private void EventAnimatorBoolON(AnimEventData.EventData data)
+  {
+    string stringArg = data.stringArgs[0];
+    this.animator.SetBool(stringArg, true);
+    if (this.animatorBoolList.IndexOf(stringArg) >= 0)
+      return;
+    this.animatorBoolList.Add(stringArg);
+  }
+
+  private void EventAnimatorBoolOFF(AnimEventData.EventData data)
+  {
+    string stringArg = data.stringArgs[0];
+    this.animator.SetBool(stringArg, false);
+    this.animatorBoolList.Remove(stringArg);
+  }
+
+  protected void EventShotGeneric(AnimEventData.EventData data)
+  {
+    AttackInfo attackInfo = this.FindAttackInfo(data.stringArgs[0]);
+    if (attackInfo == null)
+      return;
+    Vector3 offset;
+    // ISSUE: explicit constructor call
+    ((Vector3) ref offset).\u002Ector(0.0f, 0.0f, 0.0f);
+    if (data.intArgs.Length > 1 && data.intArgs[1] != 0)
+    {
+      if (Object.op_Inequality((Object) this.actionTarget, (Object) null) && !this.IsValidBuffBlind())
+      {
+        Vector3 vector3;
+        // ISSUE: explicit constructor call
+        ((Vector3) ref vector3).\u002Ector(data.floatArgs[0], data.floatArgs[1], data.floatArgs[2]);
+        Quaternion rot = Quaternion.op_Multiply(this._rotation, Quaternion.Euler(new Vector3(data.floatArgs[3], data.floatArgs[4], data.floatArgs[5])));
+        Vector3 localScale = this.actionTarget._transform.localScale;
+        // ISSUE: explicit constructor call
+        ((Vector3) ref vector3).\u002Ector(vector3.x / localScale.x, vector3.y / localScale.y, vector3.z / localScale.z);
+        Matrix4x4 localToWorldMatrix = this.actionTarget._transform.localToWorldMatrix;
+        Vector3 pos = ((Matrix4x4) ref localToWorldMatrix).MultiplyPoint3x4(vector3);
+        AnimEventShot.Create((StageObject) this, attackInfo, pos, rot);
+        return;
+      }
+      offset.z += 2f;
+    }
+    AnimEventShot.Create((StageObject) this, data, attackInfo, offset);
+  }
+
+  protected virtual void EventShotPresent(AnimEventData.EventData data)
+  {
+  }
+
+  protected virtual void EventShotZone(AnimEventData.EventData data)
+  {
+  }
+
+  public virtual void EventShotDecoy(AnimEventData.EventData data)
+  {
+  }
+
+  private void EventGenerateTrackingAttack(AnimEventData.EventData data)
+  {
+    if (data.stringArgs == null || data.stringArgs.Length == 0)
+    {
+      Log.Error(LOG.INGAME, "String Data is Empty. Check AnimEvent ( GENERATE_TRACKING ). ");
+    }
+    else
+    {
+      AttackTrackingTarget attackTrackingTarget = new GameObject("AttackTrackingTarget").AddComponent<AttackTrackingTarget>();
+      attackTrackingTarget.Initialize((StageObject) this, this.IsValidBuffBlind() ? (StageObject) null : this.actionTarget, this.FindAttackInfo(data.stringArgs[0]));
+      this.TrackingTargetBullet = attackTrackingTarget;
+    }
+  }
+
+  private void EventTrackingBulletOff()
+  {
+    if (Object.op_Equality((Object) this.TrackingTargetBullet, (Object) null))
+      return;
+    this.TrackingTargetBullet.TrackOff();
+  }
+
+  protected virtual void EventStatusUpDefenceON(AnimEventData.EventData data)
+  {
+  }
+
+  protected virtual void EventStatusUpDefenceOFF()
+  {
+  }
+
+  protected virtual void EventCameraTargetOffsetOn(AnimEventData.EventData data)
+  {
+  }
+
+  protected virtual void EventCameraTargetOffsetOff()
+  {
+  }
+
+  public virtual void EventCameraTargetRotateOn(AnimEventData.EventData data)
+  {
+  }
+
+  public virtual void EventCameraTargetRotateOff()
+  {
+  }
+
+  protected virtual void EventExecuteEvolve(AnimEventData.EventData data)
+  {
+  }
+
+  protected virtual void EventCameraStopOn(AnimEventData.EventData data)
+  {
+  }
+
+  protected virtual void EventCameraStopOff()
+  {
+  }
+
+  protected virtual void EventCameraCutOn(AnimEventData.EventData data)
+  {
+  }
+
+  protected virtual void EventCameraCutOff()
+  {
+  }
+
+  public override void OnAnimEvent(AnimEventData.EventData data)
+  {
+    if (this.CanPlayEffectEvent())
+    {
+      bool beforeTrailSetting = this.SetTrailSetting();
+      bool is_oneshot_priority = this.IsOneShotPriority();
+      bool isExecEffect = true;
+      if ((data.id == AnimEventFormat.ID.EFFECT || data.id == AnimEventFormat.ID.EFFECT_LOOP_CUSTOM || data.id == AnimEventFormat.ID.EFFECT_ONESHOT || data.id == AnimEventFormat.ID.EFFECT_STATIC || data.id == AnimEventFormat.ID.EFFECT_DEPEND_SP_ATTACK_TYPE || data.id == AnimEventFormat.ID.EFFECT_DEPEND_WEAPON_ELEMENT || data.id == AnimEventFormat.ID.EFFECT_SCALE_DEPEND_VALUE || data.id == AnimEventFormat.ID.CAMERA_EFFECT || data.id == AnimEventFormat.ID.EFFECT_SWITCH_OBJECT_BY_CONDITION || data.id == AnimEventFormat.ID.EFFECT_TILING || data.id == AnimEventFormat.ID.EFFECT_ONESHOT_ON_RAIN_SHOT_POS) && data.intArgs != null && data.intArgs.Length > 1)
+      {
+        switch (data.intArgs[0])
+        {
+          case 0:
+            isExecEffect = true;
+            break;
+          case 1:
+            isExecEffect = !this.buffParam.IsEnableBuff((BuffParam.BUFFTYPE) data.intArgs[1]);
+            break;
+          default:
+            Log.Error(LOG.EFFECT, "Not Defined EFFECT_EXEC_CONDITION");
+            break;
+        }
+      }
+      if (this.ShotAnimEvent(data, beforeTrailSetting, is_oneshot_priority, isExecEffect))
+        return;
+    }
+    else if ((data.id == AnimEventFormat.ID.EFFECT || data.id == AnimEventFormat.ID.EFFECT_LOOP_CUSTOM || data.id == AnimEventFormat.ID.EFFECT_ONESHOT || data.id == AnimEventFormat.ID.EFFECT_STATIC || data.id == AnimEventFormat.ID.EFFECT_DEPEND_SP_ATTACK_TYPE || data.id == AnimEventFormat.ID.EFFECT_DEPEND_WEAPON_ELEMENT || data.id == AnimEventFormat.ID.EFFECT_SCALE_DEPEND_VALUE || data.id == AnimEventFormat.ID.EFFECT_ONESHOT_ON_RAIN_SHOT_POS) && data.intArgs != null && data.intArgs.Length > 2 && data.intArgs[2] == 1)
+    {
+      bool beforeTrailSetting = this.SetTrailSetting();
+      bool is_oneshot_priority = this.IsOneShotPriority();
+      bool isExecEffect = true;
+      switch (data.intArgs[0])
+      {
+        case 0:
+          isExecEffect = true;
+          break;
+        case 1:
+          isExecEffect = !this.buffParam.IsEnableBuff((BuffParam.BUFFTYPE) data.intArgs[1]);
+          break;
+        default:
+          Log.Error(LOG.EFFECT, "Not Defined EFFECT_EXEC_CONDITION");
+          break;
+      }
+      if (this.ShotAnimEvent(data, beforeTrailSetting, is_oneshot_priority, isExecEffect))
+        return;
+    }
+    if (Object.op_Inequality((Object) this.stepCtrl, (Object) null) && this.stepCtrl.OnAnimEvent(data))
+      return;
+    switch (data.id)
+    {
+      case AnimEventFormat.ID.ROOT_MOTION_ON:
+        this.EventRootMotionON(data);
+        break;
+      case AnimEventFormat.ID.ROOT_MOTION_OFF:
+        this.EventRootMotionOFF(data);
+        break;
+      case AnimEventFormat.ID.ROOT_MOTION_MOVE_RATE:
+        this.EventRootMotionMoveRate(data);
+        break;
+      case AnimEventFormat.ID.HIDE_RENDERER_ON:
+        this.EventHideRendererON(data);
+        break;
+      case AnimEventFormat.ID.HIDE_RENDERER_OFF:
+        this.EventHideRendererOFF(data);
+        break;
+      case AnimEventFormat.ID.ACTION_RENDERER_ON:
+        this.EventActionRendererON(data);
+        break;
+      case AnimEventFormat.ID.ACTION_RENDERER_OFF:
+        this.EventActionRendererOFF(data);
+        break;
+      case AnimEventFormat.ID.EFFECT:
+        break;
+      case AnimEventFormat.ID.EFFECT_ONESHOT:
+        break;
+      case AnimEventFormat.ID.EFFECT_STATIC:
+        break;
+      case AnimEventFormat.ID.EFFECT_DELETE:
+        this.EventEffectDelete(data);
+        break;
+      case AnimEventFormat.ID.EFFECT_LOOP_CUSTOM:
+        break;
+      case AnimEventFormat.ID.CAMERA_EFFECT:
+        break;
+      case AnimEventFormat.ID.UPDATE_ACTION_POSITION:
+        this.EventUpdateActionPosition(data);
+        break;
+      case AnimEventFormat.ID.UPDATE_DIRECTION:
+        this.EventUpdateDirection(data);
+        break;
+      case AnimEventFormat.ID.PERIODIC_SYNC_ACTION_POSITION_START:
+        this.EventPeriodicSyncActionPositionStart(data);
+        break;
+      case AnimEventFormat.ID.PERIODIC_SYNC_ACTION_POSITION_END:
+        this.EventPeriodicSyncActionPositionEnd(data);
+        break;
+      case AnimEventFormat.ID.MOVE_FORWARD_START:
+        this.EventMoveStart(data, Vector3.forward);
+        break;
+      case AnimEventFormat.ID.MOVE_LEFT_START:
+        this.EventMoveStart(data, Vector3.op_UnaryNegation(Vector3.right));
+        break;
+      case AnimEventFormat.ID.MOVE_RIGHT_START:
+        this.EventMoveStart(data, Vector3.right);
+        break;
+      case AnimEventFormat.ID.MOVE_FORWARD_TO_TARGET:
+        this.EventMoveForwardToTarget(data);
+        break;
+      case AnimEventFormat.ID.MOVE_END:
+        this.EventMoveEnd();
+        break;
+      case AnimEventFormat.ID.ROTATE_TO_TARGET_START:
+        this.EventRotateToTargetStart(data);
+        break;
+      case AnimEventFormat.ID.ROTATE_KEEP_TO_TARGET_START:
+        this.EventRotateKeepToTargetStart(data);
+        break;
+      case AnimEventFormat.ID.ROTATE_TO_ANGLE_START:
+        this.EventRotateToAngleStart(data);
+        break;
+      case AnimEventFormat.ID.ROTATE_END:
+        this.EndRotate();
+        break;
+      case AnimEventFormat.ID.MOTION_CANCEL_ON:
+        this.enableMotionCancel = true;
+        break;
+      case AnimEventFormat.ID.MOTION_CANCEL_OFF:
+        this.enableMotionCancel = false;
+        break;
+      case AnimEventFormat.ID.ANIMATOR_BOOL_ON:
+        this.EventAnimatorBoolON(data);
+        break;
+      case AnimEventFormat.ID.ANIMATOR_BOOL_OFF:
+        this.EventAnimatorBoolOFF(data);
+        break;
+      case AnimEventFormat.ID.ATK_COLLIDER_CAPSULE:
+      case AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_START:
+        this.CreateAttackCollider(data);
+        break;
+      case AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_END:
+        this.RemoveEventCollider(data.stringArgs[0]);
+        break;
+      case AnimEventFormat.ID.SHOT_GENERIC:
+        this.EventShotGeneric(data);
+        break;
+      case AnimEventFormat.ID.MOVE_SUPPRESS_ON:
+        this.enableMoveSuppress = true;
+        break;
+      case AnimEventFormat.ID.MOVE_SUPPRESS_OFF:
+        this.enableMoveSuppress = false;
+        break;
+      case AnimEventFormat.ID.REACTON_DELAY_ON:
+        this.enableReactionDelay = true;
+        break;
+      case AnimEventFormat.ID.REACTON_DELAY_OFF:
+        this.enableReactionDelay = false;
+        break;
+      case AnimEventFormat.ID.DELETE_REMAIN_DMG_EFFECT:
+        if (!Object.op_Inequality((Object) this.damegeRemainEffect, (Object) null))
+          break;
+        EffectManager.ReleaseEffect(this.damegeRemainEffect);
+        this.damegeRemainEffect = (GameObject) null;
+        break;
+      case AnimEventFormat.ID.BUFF_START:
+        if (!this.IsCoopNone() && !this.IsOriginal())
+          break;
+        if (data.intArgs.Length == 0 || data.floatArgs.Length == 0)
+          Log.Error(LOG.INGAME, "No data. Check AnimEvent ( BUFF_START ).");
+        float num1 = data.floatArgs[0];
+        if ((double) num1 <= 0.0)
+        {
+          Log.Error(LOG.INGAME, "Not set Buff time. Check AnimEvent ( BUFF_START ).");
+          break;
+        }
+        float num2 = 0.0f;
+        if (data.floatArgs.Length > 1)
+          num2 = data.floatArgs[1];
+        float num3 = 0.0f;
+        if (data.floatArgs.Length > 2)
+          num3 = data.floatArgs[2];
+        int intArg = data.intArgs[0];
+        if (intArg <= -1 || intArg >= 221)
+        {
+          Log.Error(LOG.INGAME, "Not set valid BUFFTYPE. CHECK AnimEvent ( BUFF_START ).");
+          break;
+        }
+        BuffParam.VALUE_TYPE valueType = BuffParam.VALUE_TYPE.CONSTANT;
+        if (data.intArgs.Length >= 3)
+          valueType = (BuffParam.VALUE_TYPE) data.intArgs[2];
+        bool flag = false;
+        if (data.intArgs.Length >= 4)
+        {
+          flag = data.intArgs[3] > 0;
+          if (flag)
+            num1 = -1f;
+        }
+        BuffParam.BuffData data1 = new BuffParam.BuffData();
+        data1.type = (BuffParam.BUFFTYPE) intArg;
+        data1.time = (double) num3 == 0.0 ? num1 : num3;
+        data1.interval = num2;
+        data1.endless = new bool?(flag);
+        data1.valueType = valueType;
+        data1.value = data.intArgs[1];
+        this.SetFromInfo(ref data1);
+        this.OnBuffStart(data1);
+        break;
+      case AnimEventFormat.ID.BUFF_END:
+        if (!this.IsCoopNone() && !this.IsOriginal())
+          break;
+        this.OnBuffEnd((BuffParam.BUFFTYPE) data.intArgs[0], true);
+        break;
+      case AnimEventFormat.ID.CONTINUS_ATTACK:
+        if (!this.IsCoopNone() && !this.IsOriginal())
+          break;
+        this.CreateContinusAttack(data, true);
+        break;
+      case AnimEventFormat.ID.NWAY_LASER_ATTACK:
+        this.EventNWayLaserAttack(data);
+        break;
+      case AnimEventFormat.ID.CHANGE_SHADER_PARAM:
+        this.EventChangeShaderParam(data);
+        break;
+      case AnimEventFormat.ID.PLAYER_DISABLE_MOVE:
+        if (!MonoBehaviourSingleton<InputManager>.IsValid() || (MonoBehaviourSingleton<InputManager>.I.disableFlags & INPUT_DISABLE_FACTOR.INGAME_COMMAND) != (INPUT_DISABLE_FACTOR) 0)
+          break;
+        MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_COMMAND, true);
+        this.StartCoroutine(this.SetEnableInputAfterSeconds(data.floatArgs[0]));
+        break;
+      case AnimEventFormat.ID.EXATK_COLLIDER_START:
+        this.EventExAtkColliderStart(data);
+        break;
+      case AnimEventFormat.ID.EXATK_COLLIDER_END:
+        this.EventExAtkColliderEnd(data);
+        break;
+      case AnimEventFormat.ID.GENERATE_TRACKING:
+        this.EventGenerateTrackingAttack(data);
+        break;
+      case AnimEventFormat.ID.MOVE_SIDEWAYS_LOOK_TARGET:
+        this.EventMoveSidewaysLookTarget(data);
+        break;
+      case AnimEventFormat.ID.ACTION_MINE_ATTACK:
+        this.EventActionMineAttack(data);
+        break;
+      case AnimEventFormat.ID.SHOT_REFLECT_BULLET:
+        this.EventReflectBulletAttack(data);
+        break;
+      case AnimEventFormat.ID.SHOT_PRESENT:
+        if (!this.IsCoopNone() && !this.IsOriginal())
+          break;
+        this.EventShotPresent(data);
+        break;
+      case AnimEventFormat.ID.MOVE_POINT_DATA:
+        break;
+      case AnimEventFormat.ID.STATUS_UP_DEFENCE_ON:
+        this.EventStatusUpDefenceON(data);
+        break;
+      case AnimEventFormat.ID.STATUS_UP_DEFENCE_OFF:
+        this.EventStatusUpDefenceOFF();
+        break;
+      case AnimEventFormat.ID.EFFECT_DEPEND_SP_ATTACK_TYPE:
+        break;
+      case AnimEventFormat.ID.SHOT_ZONE:
+        if (!this.IsCoopNone() && !this.IsOriginal())
+          break;
+        this.EventShotZone(data);
+        break;
+      case AnimEventFormat.ID.EFFECT_DEPEND_WEAPON_ELEMENT:
+        break;
+      case AnimEventFormat.ID.ATTACKHIT_CLEAR_ALL:
+        this.AttackHitCheckerClearAll();
+        break;
+      case AnimEventFormat.ID.ATTACKHIT_CLEAR_INFO:
+        this.AttackHitCheckerClearInfo(data);
+        break;
+      case AnimEventFormat.ID.EFFECT_SCALE_DEPEND_VALUE:
+        break;
+      case AnimEventFormat.ID.ROOT_COLLIDER_ON:
+        this._collider.enabled = true;
+        break;
+      case AnimEventFormat.ID.ROOT_COLLIDER_OFF:
+        this._collider.enabled = false;
+        break;
+      case AnimEventFormat.ID.SHOT_DECOY:
+        if (!this.IsCoopNone() && !this.IsOriginal())
+          break;
+        this.EventShotDecoy(data);
+        break;
+      case AnimEventFormat.ID.CAMERA_TARGET_OFFSET_ON:
+        this.EventCameraTargetOffsetOn(data);
+        break;
+      case AnimEventFormat.ID.CAMERA_TARGET_OFFSET_OFF:
+        this.EventCameraTargetOffsetOff();
+        break;
+      case AnimEventFormat.ID.MOVE_LOOKAT_DATA:
+        break;
+      case AnimEventFormat.ID.MOVE_TO_WORLDPOS_START:
+        this.EventMoveToWorldPos(data);
+        break;
+      case AnimEventFormat.ID.EXECUTE_EVOLVE:
+        this.EventExecuteEvolve(data);
+        break;
+      case AnimEventFormat.ID.DBG_TIME_START:
+        this.DbgTimeCount(true);
+        break;
+      case AnimEventFormat.ID.DBG_TIME_END:
+        this.DbgTimeCount(false);
+        break;
+      case AnimEventFormat.ID.CAMERA_STOP_ON:
+        this.EventCameraStopOn(data);
+        break;
+      case AnimEventFormat.ID.CAMERA_STOP_OFF:
+        this.EventCameraStopOff();
+        break;
+      case AnimEventFormat.ID.CAMERA_CUT_ON:
+        this.EventCameraCutOn(data);
+        break;
+      case AnimEventFormat.ID.CAMERA_CUT_OFF:
+        this.EventCameraCutOff();
+        break;
+      case AnimEventFormat.ID.EFFECT_SWITCH_OBJECT_BY_CONDITION:
+      case AnimEventFormat.ID.EFFECT_TILING:
+        break;
+      case AnimEventFormat.ID.LOAD_BULLET:
+        break;
+      case AnimEventFormat.ID.TRACKING_BULLET_OFF:
+        this.EventTrackingBulletOff();
+        break;
+      case AnimEventFormat.ID.EFFECT_ONESHOT_ON_RAIN_SHOT_POS:
+        break;
+      case AnimEventFormat.ID.ROTATE_TO_TARGET_OFFSET:
+        this.EventRotateToTargetOffset(data);
+        break;
+      case AnimEventFormat.ID.CAMERA_TARGET_ROTATE_ON:
+        this.EventCameraTargetRotateOn(data);
+        break;
+      case AnimEventFormat.ID.CAMERA_TARGET_ROTATE_OFF:
+        this.EventCameraTargetRotateOff();
+        break;
+      case AnimEventFormat.ID.ACTION_RECEIVE_DAMAGE_RATE:
+        if (data.floatArgs.Length != 0)
+        {
+          this.actionReceiveDamageRate = data.floatArgs[0];
+          break;
+        }
+        this.actionReceiveDamageRate = 1f;
+        break;
+      default:
+        base.OnAnimEvent(data);
+        break;
+    }
+  }
+
+  private bool SetTrailSetting()
+  {
+    bool flag = false;
+    if (!this.animUpdatePhysics)
+    {
+      flag = Trail.settingFixedUpdate;
+      Trail.settingFixedUpdate = false;
+    }
+    return flag;
+  }
+
+  private bool IsOneShotPriority()
+  {
+    bool flag = this is Self;
+    Enemy enemy = this as Enemy;
+    if (Object.op_Inequality((Object) enemy, (Object) null))
+      flag = enemy.isBoss;
+    return flag;
+  }
+
+  private bool ShotAnimEvent(
+    AnimEventData.EventData data,
+    bool beforeTrailSetting,
+    bool is_oneshot_priority,
+    bool isExecEffect)
+  {
+    Transform transform = (Transform) null;
+    if (isExecEffect && data.id != AnimEventFormat.ID.EFFECT_TILING)
+      transform = AnimEventFormat.EffectEventExec(data.id, data, this._transform, is_oneshot_priority, new AnimEventFormat.EffectNameAnalyzer(this.EffectNameAnalyzer), new AnimEventFormat.NodeFinder(((StageObject) this).FindNode), this);
+    if (!this.animUpdatePhysics)
+      Trail.settingFixedUpdate = beforeTrailSetting;
+    if (Object.op_Inequality((Object) transform, (Object) null))
+    {
+      if (data.id == AnimEventFormat.ID.EFFECT || data.id == AnimEventFormat.ID.EFFECT_DEPEND_SP_ATTACK_TYPE || data.id == AnimEventFormat.ID.EFFECT_DEPEND_WEAPON_ELEMENT || data.id == AnimEventFormat.ID.EFFECT_SCALE_DEPEND_VALUE || data.id == AnimEventFormat.ID.EFFECT_SWITCH_OBJECT_BY_CONDITION)
+        this.AddObjectList(((Component) transform).gameObject, Character.OBJECT_LIST_TYPE.ANIM_EVENT);
+      return true;
+    }
+    if (!(data.id == AnimEventFormat.ID.EFFECT_TILING & isExecEffect))
+      return false;
+    Transform[] transformArray = AnimEventFormat.EffectsEventExec(data.id, data, this._transform, is_oneshot_priority, new AnimEventFormat.EffectNameAnalyzer(this.EffectNameAnalyzer), new AnimEventFormat.NodeFinder(((StageObject) this).FindNode), this);
+    if (transformArray != null)
+    {
+      int index = 0;
+      for (int length = transformArray.Length; index < length; ++index)
+        this.AddObjectList(((Component) transformArray[index]).gameObject, Character.OBJECT_LIST_TYPE.ANIM_EVENT);
+    }
+    return true;
+  }
+
+  protected virtual void SetFromInfo(ref BuffParam.BuffData data)
+  {
+  }
+
+  protected virtual void EventActionMineAttack(AnimEventData.EventData data)
+  {
+  }
+
+  protected virtual void EventReflectBulletAttack(AnimEventData.EventData data)
+  {
+  }
+
+  protected virtual void EventNWayLaserAttack(AnimEventData.EventData data)
+  {
+  }
+
+  private IEnumerator SetEnableInputAfterSeconds(float seconds)
+  {
+    yield return (object) new WaitForSeconds(seconds);
+    MonoBehaviourSingleton<InputManager>.I.SetDisable(INPUT_DISABLE_FACTOR.INGAME_COMMAND, false);
+  }
+
+  public void CreateContinusAttack(AnimEventData.EventData eventData, bool isSync, float exEndTime = 0.0f)
+  {
+    if (eventData == null)
+      return;
+    float endTime = (float) eventData.intArgs[1];
+    if ((double) exEndTime > 0.0)
+      endTime = exEndTime;
+    int eventIndex = -1;
+    int count = this.continusAtkEventDataList.Count;
+    for (int index = 0; index < count; ++index)
+    {
+      if (this.continusAtkEventDataList[index] == eventData)
+      {
+        eventIndex = index;
+        break;
+      }
+    }
+    AnimEventCollider attackCollider = this.CreateAttackCollider(eventData, false);
+    attackCollider.SetFixedUpdateFlag(false);
+    attackCollider.SetFixTransformUpdateFlag(false);
+    attackCollider.ValidTriggerStay();
+    Transform effectTrans = (Transform) null;
+    string stringArg1 = eventData.stringArgs[2];
+    string stringArg2 = eventData.stringArgs[3];
+    if (!string.IsNullOrEmpty(stringArg1) && !string.IsNullOrEmpty(stringArg2))
+    {
+      Vector3 zero = Vector3.zero;
+      Quaternion quaternion = Quaternion.identity;
+      float[] floatArgs = eventData.floatArgs;
+      if (floatArgs.Length > 8)
+      {
+        // ISSUE: explicit constructor call
+        ((Vector3) ref zero).\u002Ector(floatArgs[8], floatArgs[9], floatArgs[10]);
+        quaternion = Quaternion.Euler(floatArgs[11], floatArgs[12], floatArgs[13]);
+      }
+      Transform parent = Utility.Find(this._transform, stringArg2);
+      effectTrans = EffectManager.GetEffect(stringArg1, parent);
+      effectTrans.localPosition = zero;
+      effectTrans.localRotation = quaternion;
+    }
+    this.continusAttackParam.Register(eventIndex, endTime, attackCollider, effectTrans);
+    if (!isSync)
+      return;
+    this.SendContinusAttackSync();
+  }
+
+  public void CreateContinusAttackBySyncData(ContinusAttackParam.SyncData syncData)
+  {
+    int eventIndex = syncData.eventIndex;
+    if (eventIndex < 0 || eventIndex >= this.continusAtkEventDataList.Count)
+      return;
+    this.CreateContinusAttack(this.continusAtkEventDataList[syncData.eventIndex], false, syncData.endTime);
+  }
+
+  public void SendContinusAttackSync()
+  {
+    if (!this.IsOriginal())
+      return;
+    ContinusAttackParam.SyncParam syncParam = this.continusAttackParam.CreateSyncParam();
+    if (!Object.op_Inequality((Object) this.characterSender, (Object) null))
+      return;
+    this.characterSender.OnSendContinusAttackSync(syncParam);
+  }
+
+  public void ReceiveContinusAttackParam(ContinusAttackParam.SyncParam syncParam)
+  {
+    this.continusAttackParam.ApplySyncParam(syncParam);
+  }
+
+  protected AnimEventCollider CreateAttackCollider(
+    AnimEventData.EventData eventData,
+    bool isUseColliderList = true)
+  {
+    bool flag = true;
+    AnimEventCollider attackCollider = (AnimEventCollider) null;
+    if (isUseColliderList)
+    {
+      int index = 0;
+      for (int count = this.animEventColliderList.Count; index < count; ++index)
+      {
+        if (this.animEventColliderList[index].isReleased)
+        {
+          attackCollider = this.animEventColliderList[index];
+          flag = false;
+          break;
+        }
+      }
+    }
+    if (flag)
+    {
+      attackCollider = new AnimEventCollider();
+      if (isUseColliderList)
+        this.animEventColliderList.Add(attackCollider);
+    }
+    attackCollider.Initialize((StageObject) this, eventData, this.FindAttackInfo(eventData.stringArgs[0]));
+    if (eventData.id == AnimEventFormat.ID.ATK_COLLIDER_CAPSULE || eventData.id == AnimEventFormat.ID.ATK_COLLIDER_CAPSULE_DEPEND_VALUE)
+      attackCollider.ReserveRelease();
+    return attackCollider;
+  }
+
+  public IEnumerator CreateMultiAttackCollider(
+    AnimEventData.EventData eventData,
+    bool isUseColliderList = true)
+  {
+    int generateCount = this.GetColliderGenerateCount(eventData);
+    AnimEventCollider[] event_colliders = new AnimEventCollider[generateCount];
+    List<AnimEventCollider> colList = new List<AnimEventCollider>((IEnumerable<AnimEventCollider>) this.animEventColliderList);
+    for (int colIdx = 0; colIdx < generateCount; ++colIdx)
+    {
+      AnimEventCollider animEventCollider1 = event_colliders[colIdx];
+      AnimEventCollider animEventCollider2 = (AnimEventCollider) null;
+      if (isUseColliderList)
+      {
+        int index = 0;
+        for (int count = colList.Count; index < count; ++index)
+        {
+          if (colList[index].isReleased)
+          {
+            animEventCollider2 = colList[index];
+            colList.RemoveAt(index);
+            break;
+          }
+        }
+      }
+      if (animEventCollider2 == null)
+      {
+        animEventCollider2 = new AnimEventCollider();
+        if (isUseColliderList)
+          this.animEventColliderList.Add(animEventCollider2);
+      }
+      animEventCollider2.Initialize((StageObject) this, eventData, this.FindAttackInfo(eventData.stringArgs[0]));
+      animEventCollider2.InitTransformSettings((StageObject) this, eventData);
+      if (12 != eventData.intArgs[2])
+        animEventCollider2.OverwriteObjectLayer(eventData.intArgs[2]);
+      animEventCollider2.ReserveRelease();
+      yield return (object) null;
+    }
+    yield return (object) null;
+  }
+
+  protected virtual int GetColliderGenerateCount(AnimEventData.EventData eventData)
+  {
+    return eventData.intArgs == null || eventData.intArgs.Length < 2 ? 1 : eventData.intArgs[1];
+  }
+
+  protected void RemoveEventCollider(string targetName)
+  {
+    int count = this.animEventColliderList.Count;
+    for (int index = 0; index < count; ++index)
+    {
+      if (!this.animEventColliderList[index].isReleased)
+      {
+        AttackInfo attackInfo = this.animEventColliderList[index].attackInfo;
+        if (attackInfo != null && attackInfo.name == targetName)
+          this.animEventColliderList[index].ReserveRelease();
+      }
+    }
+  }
+
+  public void EventMoveEnd()
+  {
+    this.enableEventMove = false;
+    this.enableAddForce = false;
+    if (this.velocityType == Character.VELOCITY_TYPE.EVENT_MOVE)
+      this.SetVelocity(Vector3.zero);
+    this.eventMoveVelocity = Vector3.zero;
+    this.eventMoveTimeCount = 0.0f;
+  }
+
+  protected virtual void EndRotate()
+  {
+    this.rotateEventSpeed = 0.0f;
+    this.rotateEventDirection = 0.0f;
+    this.rotateEventKeep = false;
+    this.rotateToTargetFlag = false;
+    this.rotateToTargetDiffAngle = 0.0f;
+  }
+
+  protected void SetPeriodicSyncTarget(StageObject target)
+  {
+    Character periodicSyncTarget1 = this.periodicSyncTarget as Character;
+    if (Object.op_Inequality((Object) periodicSyncTarget1, (Object) null))
+      periodicSyncTarget1.periodicSyncOwnerList.Remove(this);
+    this.periodicSyncTarget = (StageObject) null;
+    this.periodicSyncTarget = target;
+    Character periodicSyncTarget2 = this.periodicSyncTarget as Character;
+    if (!Object.op_Inequality((Object) periodicSyncTarget2, (Object) null))
+      return;
+    periodicSyncTarget2.periodicSyncOwnerList.Add(this);
+  }
+
+  public override AttackInfo[] GetAttackInfos() => this.attackInfos;
+
+  public void SetEnableNodeRenderer(string node_name, bool enable)
+  {
+    Transform node = this.FindNode(node_name);
+    if (Object.op_Equality((Object) node, (Object) null))
+      return;
+    ((Component) node).GetComponentsInChildren<Renderer>(Temporary.rendererList);
+    int index1 = 0;
+    for (int count = Temporary.rendererList.Count; index1 < count; ++index1)
+      Temporary.rendererList[index1].enabled = enable;
+    Temporary.rendererList.Clear();
+    ((Component) node).GetComponentsInChildren<ParticleSystemRenderer>(Temporary.particleRenderList);
+    int index2 = 0;
+    for (int count = Temporary.particleRenderList.Count; index2 < count; ++index2)
+      ((Renderer) Temporary.particleRenderList[index2]).enabled = enable;
+    Temporary.particleRenderList.Clear();
+    ((Component) node).GetComponentsInChildren<rymFX>(Temporary.fxList);
+    int index3 = 0;
+    for (int count = Temporary.fxList.Count; index3 < count; ++index3)
+      ((Behaviour) Temporary.fxList[index3]).enabled = enable;
+    Temporary.fxList.Clear();
+    ((Component) node).GetComponentsInChildren<TargetPoint>(Temporary.targetPointList);
+    int index4 = 0;
+    for (int count = Temporary.targetPointList.Count; index4 < count; ++index4)
+      ((Behaviour) Temporary.targetPointList[index4]).enabled = enable;
+    Temporary.targetPointList.Clear();
+    if (enable)
+    {
+      this.hideRendererList.Remove(node_name);
+    }
+    else
+    {
+      if (this.hideRendererList.Contains(node_name))
+        return;
+      this.hideRendererList.Add(node_name);
+    }
+  }
+
+  public void SetEnableNodeTrailRenderer(string node_name)
+  {
+    Transform node = this.FindNode(node_name);
+    if (Object.op_Equality((Object) node, (Object) null))
+      return;
+    ((Component) node).GetComponentsInChildren<Trail>(Temporary.trailList);
+    for (int index = 0; index < Temporary.trailList.Count; ++index)
+      Temporary.trailList[index].Reset();
+    Temporary.trailList.Clear();
+  }
+
+  public virtual void ChatSay(int chatID)
+  {
+    if (this.IsOriginal() && MonoBehaviourSingleton<CoopManager>.IsValid())
+      MonoBehaviourSingleton<CoopManager>.I.coopStage.StageChat(this.id, chatID);
+    SoundManager.PlaySystemSE(SoundID.UISE.CHAT_BALOON);
+  }
+
+  public virtual void ChatSay(string message)
+  {
+    if (this.IsOriginal() && MonoBehaviourSingleton<CoopManager>.IsValid())
+      MonoBehaviourSingleton<CoopManager>.I.coopStage.SendChatMessage(this.id, message);
+    SoundManager.PlaySystemSE(SoundID.UISE.CHAT_BALOON);
+  }
+
+  public virtual void ChatSayStamp(int stamp_id)
+  {
+    if (this.IsOriginal() && MonoBehaviourSingleton<CoopManager>.IsValid())
+    {
+      if (QuestManager.IsValidInGameExplore())
+        MonoBehaviourSingleton<CoopManager>.I.coopRoom.SendChatStamp(stamp_id);
+      else
+        MonoBehaviourSingleton<CoopManager>.I.coopStage.SendChatStamp(this.id, stamp_id);
+    }
+    SoundManager.PlaySystemSE(SoundID.UISE.CHAT_BALOON);
+  }
+
+  protected void ResetStatusParam()
+  {
+    this.attack.Set(0.0f);
+    this.defense.Set(0.0f);
+    this.tolerance.Set(0.0f);
+  }
+
+  public override void OnFailedWaitingPacket(StageObject.WAITING_PACKET type)
+  {
+    switch (type)
+    {
+      case StageObject.WAITING_PACKET.CHARACTER_MOVE_VELOCITY:
+        this.ActIdle();
+        break;
+      case StageObject.WAITING_PACKET.CHARACTER_UPDATE_ACTION_POSITION:
+        this.UpdateActionPosition(this.actionPositionWaitTrigger);
+        break;
+      case StageObject.WAITING_PACKET.CHARACTER_UPDATE_DIRECTION:
+        this.UpdateDirection(this.directionWaitTrigger);
+        break;
+      case StageObject.WAITING_PACKET.PLAYER_APPLY_CHANGE_WEAPON:
+        this.ActIdle();
+        break;
+    }
+    base.OnFailedWaitingPacket(type);
+  }
+
+  public override Vector3 GetPredictivePosition()
+  {
+    if (this.IsPuppet() || this.IsMirror())
+    {
+      Vector3 pos;
+      if (Object.op_Inequality((Object) this.packetReceiver, (Object) null) && this.packetReceiver.GetPredictivePosition(out pos))
+        return pos;
+      if (this.actionID == Character.ACTION_ID.MOVE && this.moveType == Character.MOVE_TYPE.SYNC_VELOCITY)
+        return this.moveTargetPos;
+    }
+    return base.GetPredictivePosition();
+  }
+
+  public virtual void SetAppearPos(Vector3 pos)
+  {
+    this.isSetAppearPos = true;
+    this.appearPos = pos;
+  }
+
+  public virtual void SetAppearRandomPosFixDistance(
+    Vector3 center_pos,
+    float distance,
+    int try_count)
+  {
+    int capacity = try_count;
+    List<int> intList = new List<int>(capacity);
+    for (int index = 0; index < capacity; ++index)
+      intList.Add(index);
+    float num1 = 360f / (float) capacity;
+    float num2 = num1 * Random.value;
+    Vector3 pos = Vector3.zero;
+    for (int index1 = 0; index1 < capacity; ++index1)
+    {
+      int index2 = (int) ((double) intList.Count * (double) Random.value);
+      int num3 = intList[index2];
+      intList.RemoveAt(index2);
+      float num4 = num2 + num1 * (float) num3;
+      if ((double) num4 >= 360.0)
+        num4 -= 360f;
+      Vector3 check_pos = Vector3.op_Addition(center_pos, Vector3.op_Multiply(Quaternion.op_Multiply(Quaternion.Euler(0.0f, num4, 0.0f), Vector3.forward), distance));
+      if (MonoBehaviourSingleton<StageManager>.I.CheckPosInside(check_pos))
+      {
+        pos = check_pos;
+        break;
+      }
+    }
+    this._position = pos;
+    this._rotation = Quaternion.AngleAxis(Random.value * 360f, Vector3.up);
+    this.SetAppearPos(pos);
+  }
+
+  public override AttackHitChecker ReferenceAttackHitChecker()
+  {
+    this.referenceCheckerFlag = true;
+    return this.attackHitChecker;
+  }
+
+  public void AttackHitCheckerClearAll()
+  {
+    if (this.attackHitChecker == null)
+      return;
+    this.attackHitChecker.ClearAll();
+  }
+
+  public void AttackHitCheckerClearInfo(AnimEventData.EventData evData)
+  {
+    if (this.attackHitChecker == null || evData.stringArgs.Length == 0)
+      return;
+    this.attackHitChecker.ClearHitInfo(evData.stringArgs[0]);
+  }
+
+  private void EventChangeShaderParam(AnimEventData.EventData evData)
+  {
+    if (evData == null)
+      return;
+    int length = evData.stringArgs.Length;
+    if (length < 2)
+      return;
+    string stringArg = evData.stringArgs[0];
+    if (string.IsNullOrEmpty(stringArg))
+      return;
+    Transform transform = Utility.Find(this._transform, stringArg);
+    if (Object.op_Equality((Object) transform, (Object) null))
+      return;
+    Renderer component = ((Component) transform).GetComponent<Renderer>();
+    if (Object.op_Equality((Object) component, (Object) null))
+      return;
+    Material material = component.material;
+    if (Object.op_Equality((Object) material, (Object) null))
+      return;
+    int result1 = 0;
+    float result2 = 0.0f;
+    Color white = Color.white;
+    for (int index = 1; index < length; ++index)
+    {
+      string[] strArray = evData.stringArgs[index].Split(':');
+      string str1 = strArray[0];
+      string str2 = strArray[1];
+      string s = strArray[2];
+      if (material.HasProperty(str2))
+      {
+        switch (str1)
+        {
+          case "F":
+            if (float.TryParse(s, out result2))
+            {
+              material.SetFloat(str2, result2);
+              continue;
+            }
+            continue;
+          case "I":
+            if (int.TryParse(s, out result1))
+            {
+              material.SetInt(str2, result1);
+              continue;
+            }
+            continue;
+          case "C":
+            if (ColorUtility.TryParseHtmlString("#" + s, ref white))
+            {
+              material.SetColor(str2, white);
+              continue;
+            }
+            continue;
+          default:
+            continue;
+        }
+      }
+    }
+  }
+
+  protected void SetShader(string shaderName, string containsString)
+  {
+    if (string.IsNullOrEmpty(shaderName) || this.m_rendererList == null)
+      return;
+    Utility.MaterialForEach(this.m_rendererList, (Action<Material>) (material =>
+    {
+      if (!((Object) material.shader).name.Contains(containsString))
+        return;
+      Shader shader = ResourceUtility.FindShader(shaderName);
+      if (!Object.op_Inequality((Object) shader, (Object) null))
+        return;
+      material.shader = shader;
+    }));
+  }
+
+  protected void ChangeGhostShaderParam(float endParam, float duration)
+  {
+    if (this.m_rendererList == null || this.m_rendererList.Length == 0)
+      return;
+    string SHADER_PARAM_ALPHA = "_Alpha";
+    string SHADER_PARAM_ALPHA_BLUR = "_Blend";
+    Utility.MaterialForEach(this.m_rendererList, (Action<Material>) (material =>
+    {
+      if (material.HasProperty(SHADER_PARAM_ALPHA_BLUR))
+        this.StartCoroutine(this.ChangeShaderParam(material, SHADER_PARAM_ALPHA_BLUR, endParam, duration));
+      if (!material.HasProperty(SHADER_PARAM_ALPHA) || !((Object) material.shader).name.Contains("enemy_"))
+        return;
+      this.StartCoroutine(this.ChangeShaderParam(material, SHADER_PARAM_ALPHA, endParam, duration));
+    }));
+  }
+
+  private IEnumerator ChangeShaderParam(
+    Material mat,
+    string propertyName,
+    float endParam,
+    float duration)
+  {
+    if (!Object.op_Equality((Object) mat, (Object) null))
+    {
+      float timer = duration;
+      float inputParam = mat.GetFloat(propertyName);
+      bool isPlus = (double) endParam >= (double) inputParam;
+      bool isFinish = false;
+      while (!isFinish)
+      {
+        timer -= duration * Time.deltaTime;
+        if ((double) duration <= 0.0)
+          inputParam = endParam;
+        else if (isPlus)
+          inputParam += endParam / duration * Time.deltaTime;
+        else
+          inputParam -= inputParam / duration * Time.deltaTime;
+        if (isPlus && (double) inputParam >= (double) endParam || !isPlus && (double) inputParam <= (double) endParam)
+          inputParam = endParam;
+        mat.SetFloat(propertyName, inputParam);
+        if ((double) timer <= 0.0)
+          isFinish = true;
+        yield return (object) null;
+      }
+    }
+  }
+
+  public bool IsValidShield() => (int) this.m_shieldHpMax > 0 && (int) this.m_shieldHp > 0;
+
+  private void DbgTimeCount(bool start)
+  {
+  }
+
+  protected virtual bool GetTargetPos(out Vector3 pos)
+  {
+    pos = Vector3.zero;
+    return false;
+  }
+
+  public virtual bool IsCarrying() => false;
+
+  public void OnCheckAndResizeColliderOsMapByWeapon(int weapontId) => this.OnResizeColliderOfMap();
+
+  private void OnResizeColliderOfMap()
+  {
+    Vector3 colliderOfMapScale = MonoBehaviourSingleton<GoGameSettingsManager>.I.colliderOfMapScale;
+    MonoBehaviourSingleton<SceneSettingsManager>.I.OnResizeGObjContainColliders(MonoBehaviourSingleton<GoGameSettingsManager>.I.colliderOfMapScale);
+  }
+
+  public void OnCheckAndResizeColliderOsMapByEnemy(int enemyId)
+  {
+  }
+
+  public enum ACTION_ID
+  {
+    NONE,
+    IDLE,
+    MOVE,
+    ROTATE,
+    DAMAGE,
+    DEAD,
+    ATTACK,
+    PARALYZE,
+    FREEZE,
+    HIDE,
+    MOVE_POINT,
+    MOVE_LOOKAT,
+    POSE,
+    MAX,
+  }
+
+  public enum MOTION_ID
+  {
+    NONE = 0,
+    END = 1,
+    IDLE = 2,
+    WALK = 3,
+    ROTATE_L = 4,
+    ROTATE_R = 5,
+    DAMAGE = 6,
+    DEAD = 7,
+    PARALYZE = 8,
+    MOVE_SIDE_R = 9,
+    MOVE_SIDE_L = 10, // 0x0000000A
+    HIDE = 11, // 0x0000000B
+    HIDE_END = 12, // 0x0000000C
+    MOVE_POINT = 13, // 0x0000000D
+    MOVE_LOOKAT = 14, // 0x0000000E
+    ATTACK_ID_BEGIN = 15, // 0x0000000F
+    ATTACK_ID_NUM = 100, // 0x00000064
+    ATTACK_ID_END = 114, // 0x00000072
+    MAX = 115, // 0x00000073
+  }
+
+  protected class MotionHashTable : StringKeyTableBase
+  {
+    public void Add(string key, int value) => this._Add(key, (object) value);
+
+    public object Get(string key) => this._Get(key);
+  }
+
+  [Serializable]
+  public class PeriodicSyncActionPositionInfo
+  {
+    public float applyTime;
+    public Vector3 actionPosition = Vector3.zero;
+    public Vector3 targetPointPos = Vector3.zero;
+    public bool actionPositionFlag;
+  }
+
+  public enum MOVE_TYPE
+  {
+    NONE,
+    VELOCITY,
+    SYNC_VELOCITY,
+    TO_POSITION,
+    HOMING,
+    SIDEWAYS,
+  }
+
+  public enum ROTATE_TYPE
+  {
+    NONE,
+    TO_DIRECTION,
+    MOTION_TO_TARGET,
+    MOTION_TO_DIRECTION,
+  }
+
+  public enum VELOCITY_TYPE
+  {
+    NONE,
+    ROOT_MOTION,
+    EVENT_MOVE,
+    ACT_MOVE,
+  }
+
+  public enum OBJECT_LIST_TYPE
+  {
+    DEFAULT,
+    STATIC,
+    ANIM_EVENT,
+    CHANGE_WEAPON,
+    NUM,
+  }
+
+  public enum REACTION_TYPE
+  {
+    NONE,
+    DAMAGE,
+    BLOW,
+    STUNNED_BLOW,
+    STUMBLE,
+    FALL_BLOW,
+    SHAKE,
+    DOWN,
+    DEAD,
+    GUARD_DAMAGE,
+    PARALYZE,
+    ANGRY,
+    FREEZE,
+    COUNTER,
+    ELECTRIC_SHOCK,
+    INK_SPLASH,
+    DIZZY,
+    SHADOWSEALING,
+    MAD_MODE,
+    LIGHT_RING,
+    BIND,
+    STONE,
+    DEAD_REVIVE,
+    SOIL_SHOCK,
+    CONCUSSION,
+    CHARM_BLOW,
+  }
+
+  public class ReactionInfo
+  {
+    public Character.REACTION_TYPE reactionType;
+    public Vector3 blowForce = Vector3.zero;
+    public float loopTime;
+    public int targetId;
+    public int deadReviveCount;
+  }
+
+  [Serializable]
+  public class DelayReactionInfo
+  {
+    public Character.REACTION_TYPE type;
+    public int targetId;
+    public float reactionLoopTime;
+  }
+
+  public enum STATE_MOVE_POINT
+  {
+    NONE,
+    INIT,
+    ROTATE,
+    CHECK,
+    FINISH,
+  }
+
+  protected enum STATE_MOVE_LOOKAT
+  {
+    NONE,
+    INIT,
+    MOVE,
+    FINISH,
+  }
+
+  public class PlayMotionParam
+  {
+    public int MotionID;
+    public string MotionLayerName = "Base Layer.";
+    public float TransitionTime = -1f;
+  }
+
+  public class HealData
+  {
+    public int healHp;
+    public HEAL_TYPE healType;
+    public HEAL_EFFECT_TYPE effectType;
+    public List<int> applyAbilityTypeList = new List<int>();
+
+    public HealData(
+      int healHp,
+      HEAL_TYPE healType,
+      HEAL_EFFECT_TYPE healEffectType,
+      List<int> applyAbilityTypeList)
+    {
+      this.healHp = healHp;
+      this.healType = healType;
+      this.effectType = healEffectType;
+      this.applyAbilityTypeList = applyAbilityTypeList;
+    }
+
+    public override string ToString()
+    {
+      return $"HealData( healHp: {this.healHp}, healType: {this.healType}, effectType: {this.effectType}, applyAbilityTypeList: {this.applyAbilityTypeList.ToJoinString<int>()}";
+    }
+  }
 }

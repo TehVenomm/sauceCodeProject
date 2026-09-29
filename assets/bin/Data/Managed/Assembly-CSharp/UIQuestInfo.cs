@@ -1,48 +1,46 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIQuestInfo
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class UIQuestInfo : MonoBehaviourSingleton<UIQuestInfo>
 {
-	[SerializeField]
-	protected UILabel questName;
+  [SerializeField]
+  protected UILabel questName;
+  [SerializeField]
+  protected UILabel timeLabel;
 
-	[SerializeField]
-	protected UILabel timeLabel;
+  private void Start()
+  {
+    if (MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo() || QuestManager.IsValidInGameWaveMatch() || QuestManager.IsValidInGameSeries() || QuestManager.IsValidInGameSeriesArena())
+    {
+      ((Component) this).gameObject.SetActive(false);
+    }
+    else
+    {
+      if (QuestManager.IsValidInGame() && !MonoBehaviourSingleton<InGameManager>.I.IsRush())
+      {
+        if (Object.op_Inequality((Object) this.questName, (Object) null))
+        {
+          string currentQuestName = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestName();
+          if (!string.IsNullOrEmpty(currentQuestName))
+            this.questName.text = currentQuestName;
+        }
+      }
+      else
+        ((Component) this).gameObject.SetActive(false);
+      if (!MonoBehaviourSingleton<QuestManager>.I.IsExplore() && !MonoBehaviourSingleton<InGameManager>.I.IsRush())
+        return;
+      ((Component) this).gameObject.SetActive(false);
+    }
+  }
 
-	private void Start()
-	{
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<InGameManager>.I.HasArenaInfo() || QuestManager.IsValidInGameWaveMatch())
-		{
-			this.get_gameObject().SetActive(false);
-		}
-		else
-		{
-			if (QuestManager.IsValidInGame() && !MonoBehaviourSingleton<InGameManager>.I.IsRush())
-			{
-				if (questName != null)
-				{
-					string currentQuestName = MonoBehaviourSingleton<QuestManager>.I.GetCurrentQuestName();
-					if (!string.IsNullOrEmpty(currentQuestName))
-					{
-						questName.text = currentQuestName;
-					}
-				}
-			}
-			else
-			{
-				this.get_gameObject().SetActive(false);
-			}
-			if (MonoBehaviourSingleton<QuestManager>.I.IsExplore() || MonoBehaviourSingleton<InGameManager>.I.IsRush())
-			{
-				this.get_gameObject().SetActive(false);
-			}
-		}
-	}
-
-	private void LateUpdate()
-	{
-		timeLabel.text = MonoBehaviourSingleton<InGameProgress>.I.GetRemainTime();
-	}
+  private void LateUpdate()
+  {
+    this.timeLabel.text = MonoBehaviourSingleton<InGameProgress>.I.GetRemainTime();
+  }
 }

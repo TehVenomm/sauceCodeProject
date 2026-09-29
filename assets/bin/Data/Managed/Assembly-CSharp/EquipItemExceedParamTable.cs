@@ -1,289 +1,267 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: EquipItemExceedParamTable
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
+#nullable disable
 public class EquipItemExceedParamTable : Singleton<EquipItemExceedParamTable>, IDataTable
 {
-	public class EquipItemExceedParamBase : EquipItemTable.EquipItemDataUtil
-	{
-		public XorInt atk = 0;
+  private DoubleUIntKeyTable<EquipItemExceedParamTable.EquipItemExceedParam> tableData;
 
-		public XorInt def = 0;
+  public void CreateTable(string csv_text)
+  {
+    this.tableData = TableUtility.CreateDoubleUIntKeyTable<EquipItemExceedParamTable.EquipItemExceedParam>(csv_text, new TableUtility.CallBackDoubleUIntKeyReadCSV<EquipItemExceedParamTable.EquipItemExceedParam>(EquipItemExceedParamTable.EquipItemExceedParam.cb), "exceedId,cnt,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType,abilityId,abilityPoint", (TableUtility.CallBackDoubleUIntSecondKey) null);
+    this.tableData.TrimExcess();
+  }
 
-		public XorInt hp = 0;
+  public void AddTable(string csv_text)
+  {
+    TableUtility.AddDoubleUIntKeyTable<EquipItemExceedParamTable.EquipItemExceedParam>(this.tableData, csv_text, new TableUtility.CallBackDoubleUIntKeyReadCSV<EquipItemExceedParamTable.EquipItemExceedParam>(EquipItemExceedParamTable.EquipItemExceedParam.cb), "exceedId,cnt,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType,abilityId,abilityPoint", (TableUtility.CallBackDoubleUIntSecondKey) null);
+  }
 
-		public int[] atkElement;
+  public EquipItemExceedParamTable.EquipItemExceedParam GetEquipItemExceedParam(
+    uint exceedId,
+    uint exceedCnt)
+  {
+    if (this.tableData == null)
+      return (EquipItemExceedParamTable.EquipItemExceedParam) null;
+    UIntKeyTable<EquipItemExceedParamTable.EquipItemExceedParam> uintKeyTable = this.tableData.Get(exceedId);
+    if (uintKeyTable == null)
+      return (EquipItemExceedParamTable.EquipItemExceedParam) null;
+    EquipItemExceedParamTable.EquipItemExceedParam equipItemExceedParam = uintKeyTable.Get(exceedCnt);
+    if (equipItemExceedParam == null)
+      Log.Warning("EquipItemExceedParamTable is NULL :: exceedID = {0}, exceedCount = {1}", (object) exceedId, (object) exceedCnt);
+    return equipItemExceedParam;
+  }
 
-		public int[] defElement;
+  public EquipItemExceedParamTable.EquipItemExceedParamAll GetEquipItemExceedParamAll(
+    uint exceedId,
+    uint exceedCnt)
+  {
+    if (this.tableData == null)
+      return (EquipItemExceedParamTable.EquipItemExceedParamAll) null;
+    UIntKeyTable<EquipItemExceedParamTable.EquipItemExceedParam> uintKeyTable = this.tableData.Get(exceedId);
+    if (uintKeyTable == null)
+      return (EquipItemExceedParamTable.EquipItemExceedParamAll) null;
+    EquipItemExceedParamTable.EquipItemExceedParamAll result = new EquipItemExceedParamTable.EquipItemExceedParamAll();
+    List<SkillItemTable.SkillSlotData> slotList = new List<SkillItemTable.SkillSlotData>();
+    List<EquipItem.Ability> abilityList = new List<EquipItem.Ability>();
+    uintKeyTable.ForEach((Action<EquipItemExceedParamTable.EquipItemExceedParam>) (param =>
+    {
+      if ((long) param.cnt > (long) (int) exceedCnt)
+        return;
+      EquipItemExceedParamTable.EquipItemExceedParamAll itemExceedParamAll1 = result;
+      itemExceedParamAll1.atk = (XorInt) ((int) itemExceedParamAll1.atk + (int) param.atk);
+      EquipItemExceedParamTable.EquipItemExceedParamAll itemExceedParamAll2 = result;
+      itemExceedParamAll2.def = (XorInt) ((int) itemExceedParamAll2.def + (int) param.def);
+      EquipItemExceedParamTable.EquipItemExceedParamAll itemExceedParamAll3 = result;
+      itemExceedParamAll3.hp = (XorInt) ((int) itemExceedParamAll3.hp + (int) param.hp);
+      for (int index = 0; index < 6; ++index)
+      {
+        result.atkElement[index] += param.atkElement[index];
+        result.defElement[index] += param.defElement[index];
+      }
+      if (param.skillSlot.slotType != SKILL_SLOT_TYPE.NONE)
+        slotList.Add(param.skillSlot);
+      if (param.ability.id <= 0)
+        return;
+      abilityList.Add(param.ability);
+    }));
+    result.skillSlot = slotList.ToArray();
+    result.ability = abilityList.ToArray();
+    return result;
+  }
 
-		public int GetElemAtk(int[] base_elem)
-		{
-			int elemAtkType = GetElemAtkType(base_elem);
-			switch (elemAtkType)
-			{
-			case -1:
-				return atkElement[0];
-			case 6:
-				return 0;
-			default:
-				return atkElement[elemAtkType] + base_elem[elemAtkType];
-			}
-		}
+  public class EquipItemExceedParamBase : EquipItemTable.EquipItemDataUtil
+  {
+    public XorInt atk = (XorInt) 0;
+    public XorInt def = (XorInt) 0;
+    public XorInt hp = (XorInt) 0;
+    public int[] atkElement;
+    public int[] defElement;
 
-		public int GetElemDef(int[] base_elem)
-		{
-			int elemDefType = GetElemDefType(base_elem);
-			switch (elemDefType)
-			{
-			case -1:
-				return defElement[0];
-			case 6:
-				return 0;
-			default:
-				return defElement[elemDefType] + base_elem[elemDefType];
-			}
-		}
+    public int GetElemAtk(int[] base_elem)
+    {
+      int elemAtkType = this.GetElemAtkType(base_elem);
+      switch (elemAtkType)
+      {
+        case -1:
+          return this.atkElement[0];
+        case 6:
+          return 0;
+        default:
+          return this.atkElement[elemAtkType] + base_elem[elemAtkType];
+      }
+    }
 
-		public int GetElemAtkType(int[] base_elem)
-		{
-			if (base_elem == null)
-			{
-				return 6;
-			}
-			int[] array = new int[base_elem.Length];
-			int i = 0;
-			for (int num = array.Length; i < num; i++)
-			{
-				array[i] = base_elem[i] + atkElement[i];
-			}
-			return GetElemType(array);
-		}
+    public int GetElemDef(int[] base_elem)
+    {
+      int elemDefType = this.GetElemDefType(base_elem);
+      switch (elemDefType)
+      {
+        case -1:
+          return this.defElement[0];
+        case 6:
+          return 0;
+        default:
+          return this.defElement[elemDefType] + base_elem[elemDefType];
+      }
+    }
 
-		public int GetElemDefType(int[] base_elem)
-		{
-			if (base_elem == null)
-			{
-				return 6;
-			}
-			int[] array = new int[base_elem.Length];
-			int i = 0;
-			for (int num = array.Length; i < num; i++)
-			{
-				array[i] = base_elem[i] + defElement[i];
-			}
-			return GetElemType(array);
-		}
-	}
+    public int GetElemAtkType(int[] base_elem)
+    {
+      if (base_elem == null)
+        return 6;
+      int[] elem = new int[base_elem.Length];
+      int index = 0;
+      for (int length = elem.Length; index < length; ++index)
+        elem[index] = base_elem[index] + this.atkElement[index];
+      return this.GetElemType(elem);
+    }
 
-	public class EquipItemExceedParam : EquipItemExceedParamBase
-	{
-		public const string NT = "exceedId,cnt,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType,abilityId,abilityPoint";
+    public int GetElemDefType(int[] base_elem)
+    {
+      if (base_elem == null)
+        return 6;
+      int[] elem = new int[base_elem.Length];
+      int index = 0;
+      for (int length = elem.Length; index < length; ++index)
+        elem[index] = base_elem[index] + this.defElement[index];
+      return this.GetElemType(elem);
+    }
+  }
 
-		public uint exceedId;
+  public class EquipItemExceedParam : EquipItemExceedParamTable.EquipItemExceedParamBase
+  {
+    public uint exceedId;
+    public uint cnt;
+    public SkillItemTable.SkillSlotData skillSlot;
+    public EquipItem.Ability ability;
+    private string paramName;
+    public const string NT = "exceedId,cnt,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType,abilityId,abilityPoint";
 
-		public uint cnt;
+    public EquipItemExceedParam()
+    {
+      this.atk = (XorInt) 0;
+      this.def = (XorInt) 0;
+      this.hp = (XorInt) 0;
+      this.atkElement = new int[6];
+      this.defElement = new int[6];
+      for (int index = 0; index < 6; ++index)
+      {
+        this.atkElement[index] = 0;
+        this.defElement[index] = 0;
+      }
+      this.skillSlot = new SkillItemTable.SkillSlotData();
+      this.skillSlot.slotType = SKILL_SLOT_TYPE.NONE;
+      this.skillSlot.skill_id = 0U;
+      this.ability = new EquipItem.Ability();
+      this.ability.id = 0;
+      this.ability.pt = 0;
+    }
 
-		public SkillItemTable.SkillSlotData skillSlot;
+    public string GetExceedParamName()
+    {
+      if (this.paramName != null)
+        return this.paramName;
+      StringBuilder stringBuilder = new StringBuilder(string.Empty);
+      if ((int) this.atk > 0)
+      {
+        stringBuilder.Append(StringTable.Format(STRING_CATEGORY.SMITH, 1U, (object) this.atk));
+        stringBuilder.Append(" ");
+      }
+      if ((int) this.def > 0)
+      {
+        stringBuilder.Append(StringTable.Format(STRING_CATEGORY.SMITH, 2U, (object) this.def));
+        stringBuilder.Append(" ");
+      }
+      if ((int) this.hp > 0)
+      {
+        stringBuilder.Append(StringTable.Format(STRING_CATEGORY.SMITH, 3U, (object) this.hp));
+        stringBuilder.Append(" ");
+      }
+      int id1 = 0;
+      for (int length = this.atkElement.Length; id1 < length; ++id1)
+      {
+        if (this.atkElement[id1] > 0)
+        {
+          stringBuilder.Append(StringTable.Format(STRING_CATEGORY.SMITH, 4U, (object) StringTable.Get(STRING_CATEGORY.ELEMENT, (uint) id1), (object) this.atkElement[id1]));
+          stringBuilder.Append(" ");
+        }
+      }
+      int id2 = 0;
+      for (int length = this.defElement.Length; id2 < length; ++id2)
+      {
+        if (this.defElement[id2] > 0)
+        {
+          stringBuilder.Append(StringTable.Format(STRING_CATEGORY.SMITH, 5U, (object) StringTable.Get(STRING_CATEGORY.ELEMENT, (uint) id2), (object) this.defElement[id2]));
+          stringBuilder.Append(" ");
+        }
+      }
+      if (this.skillSlot.slotType != SKILL_SLOT_TYPE.NONE)
+      {
+        stringBuilder.Append(StringTable.Format(STRING_CATEGORY.SMITH, 6U, (object) StringTable.Get(STRING_CATEGORY.SKILL, (uint) this.skillSlot.slotType)));
+        stringBuilder.Append(" ");
+      }
+      if (this.ability.id != 0)
+      {
+        AbilityTable.Ability ability = Singleton<AbilityTable>.I.GetAbility((uint) this.ability.id);
+        stringBuilder.Append(StringTable.Format(STRING_CATEGORY.SMITH, 7U, (object) ability.name, (object) this.ability.pt));
+      }
+      this.paramName = stringBuilder.ToString();
+      return this.paramName;
+    }
 
-		public EquipItem.Ability ability;
+    public static bool cb(
+      CSVReader csv_reader,
+      EquipItemExceedParamTable.EquipItemExceedParam data,
+      ref uint key1,
+      ref uint key2)
+    {
+      data.exceedId = key1;
+      data.cnt = key2;
+      csv_reader.Pop(ref data.atk);
+      csv_reader.Pop(ref data.def);
+      csv_reader.Pop(ref data.hp);
+      data.atkElement = new int[6];
+      data.defElement = new int[6];
+      for (int index = 0; index < 6; ++index)
+        csv_reader.Pop(ref data.atkElement[index]);
+      for (int index = 0; index < 6; ++index)
+        csv_reader.Pop(ref data.defElement[index]);
+      data.skillSlot = new SkillItemTable.SkillSlotData();
+      csv_reader.Pop<SKILL_SLOT_TYPE>(ref data.skillSlot.slotType);
+      csv_reader.Pop(ref data.ability.id);
+      csv_reader.Pop(ref data.ability.pt);
+      return true;
+    }
+  }
 
-		private string paramName;
+  public class EquipItemExceedParamAll : EquipItemExceedParamTable.EquipItemExceedParamBase
+  {
+    public SkillItemTable.SkillSlotData[] skillSlot;
+    public EquipItem.Ability[] ability;
 
-		public EquipItemExceedParam()
-		{
-			atk = 0;
-			def = 0;
-			hp = 0;
-			atkElement = new int[6];
-			defElement = new int[6];
-			for (int i = 0; i < 6; i++)
-			{
-				atkElement[i] = 0;
-				defElement[i] = 0;
-			}
-			skillSlot = new SkillItemTable.SkillSlotData();
-			skillSlot.slotType = SKILL_SLOT_TYPE.NONE;
-			skillSlot.skill_id = 0u;
-			ability = new EquipItem.Ability();
-			ability.id = 0;
-			ability.pt = 0;
-		}
-
-		public string GetExceedParamName()
-		{
-			if (paramName != null)
-			{
-				return paramName;
-			}
-			StringBuilder stringBuilder = new StringBuilder(string.Empty);
-			if ((int)atk > 0)
-			{
-				stringBuilder.Append(StringTable.Format(STRING_CATEGORY.SMITH, 1u, atk));
-				stringBuilder.Append(" ");
-			}
-			if ((int)def > 0)
-			{
-				stringBuilder.Append(StringTable.Format(STRING_CATEGORY.SMITH, 2u, def));
-				stringBuilder.Append(" ");
-			}
-			if ((int)hp > 0)
-			{
-				stringBuilder.Append(StringTable.Format(STRING_CATEGORY.SMITH, 3u, hp));
-				stringBuilder.Append(" ");
-			}
-			int i = 0;
-			for (int num = atkElement.Length; i < num; i++)
-			{
-				if (atkElement[i] > 0)
-				{
-					stringBuilder.Append(StringTable.Format(STRING_CATEGORY.SMITH, 4u, StringTable.Get(STRING_CATEGORY.ELEMENT, (uint)i), atkElement[i]));
-					stringBuilder.Append(" ");
-				}
-			}
-			int j = 0;
-			for (int num2 = defElement.Length; j < num2; j++)
-			{
-				if (defElement[j] > 0)
-				{
-					stringBuilder.Append(StringTable.Format(STRING_CATEGORY.SMITH, 5u, StringTable.Get(STRING_CATEGORY.ELEMENT, (uint)j), defElement[j]));
-					stringBuilder.Append(" ");
-				}
-			}
-			if (skillSlot.slotType != 0)
-			{
-				stringBuilder.Append(StringTable.Format(STRING_CATEGORY.SMITH, 6u, StringTable.Get(STRING_CATEGORY.SKILL, (uint)skillSlot.slotType)));
-				stringBuilder.Append(" ");
-			}
-			if (this.ability.id != 0)
-			{
-				AbilityTable.Ability ability = Singleton<AbilityTable>.I.GetAbility((uint)this.ability.id);
-				stringBuilder.Append(StringTable.Format(STRING_CATEGORY.SMITH, 7u, ability.name, this.ability.pt));
-			}
-			paramName = stringBuilder.ToString();
-			return paramName;
-		}
-
-		public static bool cb(CSVReader csv_reader, EquipItemExceedParam data, ref uint key1, ref uint key2)
-		{
-			data.exceedId = key1;
-			data.cnt = key2;
-			csv_reader.Pop(ref data.atk);
-			csv_reader.Pop(ref data.def);
-			csv_reader.Pop(ref data.hp);
-			data.atkElement = new int[6];
-			data.defElement = new int[6];
-			for (int i = 0; i < 6; i++)
-			{
-				csv_reader.Pop(ref data.atkElement[i]);
-			}
-			for (int j = 0; j < 6; j++)
-			{
-				csv_reader.Pop(ref data.defElement[j]);
-			}
-			data.skillSlot = new SkillItemTable.SkillSlotData();
-			csv_reader.Pop(ref data.skillSlot.slotType);
-			csv_reader.Pop(ref data.ability.id);
-			csv_reader.Pop(ref data.ability.pt);
-			return true;
-		}
-	}
-
-	public class EquipItemExceedParamAll : EquipItemExceedParamBase
-	{
-		public SkillItemTable.SkillSlotData[] skillSlot;
-
-		public EquipItem.Ability[] ability;
-
-		public EquipItemExceedParamAll()
-		{
-			atk = 0;
-			def = 0;
-			hp = 0;
-			atkElement = new int[6];
-			defElement = new int[6];
-			for (int i = 0; i < 6; i++)
-			{
-				atkElement[i] = 0;
-				defElement[i] = 0;
-			}
-			skillSlot = new SkillItemTable.SkillSlotData[0];
-			ability = new EquipItem.Ability[0];
-		}
-	}
-
-	private DoubleUIntKeyTable<EquipItemExceedParam> tableData;
-
-	public void CreateTable(string csv_text)
-	{
-		tableData = TableUtility.CreateDoubleUIntKeyTable<EquipItemExceedParam>(csv_text, EquipItemExceedParam.cb, "exceedId,cnt,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType,abilityId,abilityPoint", null, null, null, null);
-		tableData.TrimExcess();
-	}
-
-	public void AddTable(string csv_text)
-	{
-		TableUtility.AddDoubleUIntKeyTable(tableData, csv_text, EquipItemExceedParam.cb, "exceedId,cnt,atk,def,hp,fireAtk,waterAtk,thunderAtk,earthAtk,lightAtk,darkAtk,fireDef,waterDef,thunderDef,earthDef,lightDef,darkDef,skillType,abilityId,abilityPoint", null, null, null);
-	}
-
-	public EquipItemExceedParam GetEquipItemExceedParam(uint exceedId, uint exceedCnt)
-	{
-		if (tableData == null)
-		{
-			return null;
-		}
-		UIntKeyTable<EquipItemExceedParam> uIntKeyTable = tableData.Get(exceedId);
-		if (uIntKeyTable == null)
-		{
-			return null;
-		}
-		EquipItemExceedParam equipItemExceedParam = uIntKeyTable.Get(exceedCnt);
-		if (equipItemExceedParam == null)
-		{
-			Log.Warning("EquipItemExceedParamTable is NULL :: exceedID = {0}, exceedCount = {1}", exceedId, exceedCnt);
-		}
-		return equipItemExceedParam;
-	}
-
-	public EquipItemExceedParamAll GetEquipItemExceedParamAll(uint exceedId, uint exceedCnt)
-	{
-		if (tableData == null)
-		{
-			return null;
-		}
-		UIntKeyTable<EquipItemExceedParam> uIntKeyTable = tableData.Get(exceedId);
-		if (uIntKeyTable == null)
-		{
-			return null;
-		}
-		EquipItemExceedParamAll result = new EquipItemExceedParamAll();
-		List<SkillItemTable.SkillSlotData> slotList = new List<SkillItemTable.SkillSlotData>();
-		List<EquipItem.Ability> abilityList = new List<EquipItem.Ability>();
-		uIntKeyTable.ForEach(delegate(EquipItemExceedParam param)
-		{
-			if (param.cnt <= (int)exceedCnt)
-			{
-				EquipItemExceedParamAll equipItemExceedParamAll = result;
-				equipItemExceedParamAll.atk = (int)equipItemExceedParamAll.atk + (int)param.atk;
-				EquipItemExceedParamAll equipItemExceedParamAll2 = result;
-				equipItemExceedParamAll2.def = (int)equipItemExceedParamAll2.def + (int)param.def;
-				EquipItemExceedParamAll equipItemExceedParamAll3 = result;
-				equipItemExceedParamAll3.hp = (int)equipItemExceedParamAll3.hp + (int)param.hp;
-				for (int i = 0; i < 6; i++)
-				{
-					result.atkElement[i] += param.atkElement[i];
-					result.defElement[i] += param.defElement[i];
-				}
-				if (param.skillSlot.slotType != 0)
-				{
-					slotList.Add(param.skillSlot);
-				}
-				if (param.ability.id > 0)
-				{
-					abilityList.Add(param.ability);
-				}
-			}
-		});
-		result.skillSlot = slotList.ToArray();
-		result.ability = abilityList.ToArray();
-		return result;
-	}
+    public EquipItemExceedParamAll()
+    {
+      this.atk = (XorInt) 0;
+      this.def = (XorInt) 0;
+      this.hp = (XorInt) 0;
+      this.atkElement = new int[6];
+      this.defElement = new int[6];
+      for (int index = 0; index < 6; ++index)
+      {
+        this.atkElement[index] = 0;
+        this.defElement[index] = 0;
+      }
+      this.skillSlot = new SkillItemTable.SkillSlotData[0];
+      this.ability = new EquipItem.Ability[0];
+    }
+  }
 }

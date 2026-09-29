@@ -1,137 +1,109 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SoulEnergy
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class SoulEnergy
 {
-	public enum eState
-	{
-		None,
-		CanTap,
-		CannotTap,
-		Sleep
-	}
+  private Vector3 kStartScale;
+  private Vector3 kJustScale;
+  private float kJustTapSec;
+  private SoulEnergy.eState state;
+  private Player cacheOwner;
+  private Transform effectTrans;
+  private float counter;
+  private float baseValue;
+  private bool isJustTap;
 
-	private Vector3 kStartScale;
+  public bool canWork()
+  {
+    return this.state == SoulEnergy.eState.None || this.state == SoulEnergy.eState.Sleep;
+  }
 
-	private Vector3 kJustScale;
+  public void Init()
+  {
+    InGameSettingsManager.Player.TwoHandSwordActionInfo handSwordActionInfo = MonoBehaviourSingleton<InGameSettingsManager>.I.player.twoHandSwordActionInfo;
+    this.kStartScale = new Vector3(handSwordActionInfo.soulSoulEnergyNormalScale, handSwordActionInfo.soulSoulEnergyNormalScale, handSwordActionInfo.soulSoulEnergyNormalScale);
+    this.kJustScale = new Vector3(handSwordActionInfo.soulSoulEnergyJustTapScale, handSwordActionInfo.soulSoulEnergyJustTapScale, handSwordActionInfo.soulSoulEnergyJustTapScale);
+    this.kJustTapSec = handSwordActionInfo.soulJustTapEnableSec;
+  }
 
-	private float kJustTapSec;
+  public void Exec(Player owner, float value)
+  {
+    this.cacheOwner = owner;
+    this.baseValue = value;
+    this.isJustTap = false;
+    this.counter = this.kJustTapSec;
+    this.state = SoulEnergy.eState.CanTap;
+  }
 
-	private eState state;
+  public Transform GetEffectTrans(Transform parent)
+  {
+    if (this.effectTrans == null)
+      this.effectTrans = EffectManager.GetUIEffect("ef_btl_soul_energy_01", parent);
+    if (this.effectTrans != null)
+      this.effectTrans.localScale = this.isJustTap ? this.kJustScale : this.kStartScale;
+    else
+      this.Absorbed();
+    return this.effectTrans;
+  }
 
-	private Player cacheOwner;
+  public void Tap()
+  {
+    if (this.state != SoulEnergy.eState.CanTap)
+      return;
+    if (this.effectTrans != null)
+      ((Component) this.effectTrans).transform.localScale = this.kJustScale;
+    this.isJustTap = true;
+    this.state = SoulEnergy.eState.CannotTap;
+  }
 
-	private Transform effectTrans;
+  public void Absorbed()
+  {
+    if (this.canWork())
+      return;
+    if (this.cacheOwner != null)
+      this.cacheOwner.IncreaseSoulGauge(this.baseValue, this.isJustTap);
+    this.Sleep();
+  }
 
-	private float counter;
+  public void Sleep()
+  {
+    if (this.effectTrans != null)
+    {
+      EffectManager.ReleaseEffect(((Component) this.effectTrans).gameObject);
+      this.effectTrans = (Transform) null;
+    }
+    this.state = SoulEnergy.eState.Sleep;
+  }
 
-	private float baseValue;
+  private void OnDestroy()
+  {
+    if (this.effectTrans == null)
+      return;
+    EffectManager.ReleaseEffect(((Component) this.effectTrans).gameObject);
+    this.effectTrans = (Transform) null;
+  }
 
-	private bool isJustTap;
+  private void Update()
+  {
+    if (this.state != SoulEnergy.eState.CanTap)
+      return;
+    this.counter -= Time.deltaTime;
+    if ((double) this.counter > 0.0)
+      return;
+    this.state = SoulEnergy.eState.CannotTap;
+  }
 
-	public bool canWork()
-	{
-		return state == eState.None || state == eState.Sleep;
-	}
-
-	public void Init()
-	{
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		InGameSettingsManager.Player.TwoHandSwordActionInfo twoHandSwordActionInfo = MonoBehaviourSingleton<InGameSettingsManager>.I.player.twoHandSwordActionInfo;
-		kStartScale = new Vector3(twoHandSwordActionInfo.soulSoulEnergyNormalScale, twoHandSwordActionInfo.soulSoulEnergyNormalScale, twoHandSwordActionInfo.soulSoulEnergyNormalScale);
-		kJustScale = new Vector3(twoHandSwordActionInfo.soulSoulEnergyJustTapScale, twoHandSwordActionInfo.soulSoulEnergyJustTapScale, twoHandSwordActionInfo.soulSoulEnergyJustTapScale);
-		kJustTapSec = twoHandSwordActionInfo.soulJustTapEnableSec;
-	}
-
-	public void Exec(Player owner, float value)
-	{
-		cacheOwner = owner;
-		baseValue = value;
-		isJustTap = false;
-		counter = kJustTapSec;
-		state = eState.CanTap;
-	}
-
-	public Transform GetEffectTrans(Transform parent)
-	{
-		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		if (object.ReferenceEquals(effectTrans, null))
-		{
-			effectTrans = EffectManager.GetUIEffect("ef_btl_soul_energy_01", parent, -0.001f, 0, null);
-		}
-		if (!object.ReferenceEquals(effectTrans, null))
-		{
-			effectTrans.set_localScale((!isJustTap) ? kStartScale : kJustScale);
-		}
-		else
-		{
-			Absorbed();
-		}
-		return effectTrans;
-	}
-
-	public void Tap()
-	{
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-		if (state == eState.CanTap)
-		{
-			if (!object.ReferenceEquals(effectTrans, null))
-			{
-				effectTrans.get_transform().set_localScale(kJustScale);
-			}
-			isJustTap = true;
-			state = eState.CannotTap;
-		}
-	}
-
-	public void Absorbed()
-	{
-		if (!canWork())
-		{
-			if (!object.ReferenceEquals(cacheOwner, null))
-			{
-				cacheOwner.IncreaseSoulGauge(baseValue, isJustTap);
-			}
-			Sleep();
-		}
-	}
-
-	public void Sleep()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
-		if (!object.ReferenceEquals(effectTrans, null))
-		{
-			EffectManager.ReleaseEffect(effectTrans.get_gameObject(), true, false);
-			effectTrans = null;
-		}
-		state = eState.Sleep;
-	}
-
-	private void OnDestroy()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001e: Expected O, but got Unknown
-		if (!object.ReferenceEquals(effectTrans, null))
-		{
-			EffectManager.ReleaseEffect(effectTrans.get_gameObject(), true, false);
-			effectTrans = null;
-		}
-	}
-
-	private void Update()
-	{
-		if (state == eState.CanTap)
-		{
-			counter -= Time.get_deltaTime();
-			if (counter <= 0f)
-			{
-				state = eState.CannotTap;
-			}
-		}
-	}
+  public enum eState
+  {
+    None,
+    CanTap,
+    CannotTap,
+    Sleep,
+  }
 }

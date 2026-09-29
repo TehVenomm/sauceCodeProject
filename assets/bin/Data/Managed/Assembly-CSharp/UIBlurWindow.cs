@@ -1,40 +1,33 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIBlurWindow
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class UIBlurWindow
+#nullable disable
+public class UIBlurWindow : MonoBehaviour
 {
-	private Material mat;
+  private Material mat;
 
-	public UIBlurWindow()
-		: this()
-	{
-	}
+  private void Start()
+  {
+    if (Object.op_Equality((Object) this.mat, (Object) null))
+    {
+      Renderer component = ((Component) this).GetComponent<Renderer>();
+      if (Object.op_Equality((Object) component, (Object) null))
+        return;
+      this.mat = component.material;
+    }
+    Camera mainCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
+    if (Object.op_Equality((Object) mainCamera, (Object) null))
+      return;
+    RenderTargetCacher component1 = ((Component) mainCamera).GetComponent<RenderTargetCacher>();
+    if (Object.op_Equality((Object) component1, (Object) null))
+      return;
+    this.mat.mainTexture = (Texture) component1.GetTexture();
+  }
 
-	private void Start()
-	{
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Expected O, but got Unknown
-		if (mat == null)
-		{
-			Renderer component = this.GetComponent<Renderer>();
-			if (component == null)
-			{
-				return;
-			}
-			mat = component.get_material();
-		}
-		Camera mainCamera = MonoBehaviourSingleton<AppMain>.I.mainCamera;
-		if (!(mainCamera == null))
-		{
-			RenderTargetCacher component2 = mainCamera.GetComponent<RenderTargetCacher>();
-			if (!(component2 == null))
-			{
-				mat.set_mainTexture(component2.GetTexture());
-			}
-		}
-	}
-
-	private void Update()
-	{
-		Start();
-	}
+  private void Update() => this.Start();
 }

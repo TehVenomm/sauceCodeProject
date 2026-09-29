@@ -1,163 +1,117 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIntKeyTableBase
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 
+#nullable disable
 public abstract class UIntKeyTableBase
 {
-	public class Item
-	{
-		public uint key;
+  protected List<UIntKeyTableBase.Item>[] lists;
+  protected bool useHashDivision = true;
 
-		public object value;
+  public UIntKeyTableBase() => this.useHashDivision = true;
 
-		public Item(uint _key, object _value)
-		{
-			key = _key;
-			value = _value;
-		}
-	}
+  public UIntKeyTableBase(bool useHashDivision) => this.useHashDivision = useHashDivision;
 
-	protected List<Item>[] lists;
+  private List<UIntKeyTableBase.Item> GetList(uint key)
+  {
+    return this.lists == null ? (List<UIntKeyTableBase.Item>) null : this.lists[(int) this.GetHash(key)];
+  }
 
-	protected bool useHashDivision = true;
+  private UIntKeyTableBase.Item GetItem(List<UIntKeyTableBase.Item> list, uint key)
+  {
+    if (list == null)
+      return (UIntKeyTableBase.Item) null;
+    List<UIntKeyTableBase.Item>.Enumerator enumerator = list.GetEnumerator();
+    while (enumerator.MoveNext())
+    {
+      if ((int) enumerator.Current.key == (int) key)
+        return enumerator.Current;
+    }
+    return (UIntKeyTableBase.Item) null;
+  }
 
-	public UIntKeyTableBase()
-	{
-		useHashDivision = true;
-	}
+  protected bool _Add(uint key, object value)
+  {
+    if (this.lists == null)
+      this.lists = !this.useHashDivision ? new List<UIntKeyTableBase.Item>[1] : new List<UIntKeyTableBase.Item>[256 /*0x0100*/];
+    uint hash = this.GetHash(key);
+    List<UIntKeyTableBase.Item> objList = this.lists[(int) hash];
+    if (objList == null)
+    {
+      objList = new List<UIntKeyTableBase.Item>();
+      this.lists[(int) hash] = objList;
+    }
+    objList.Add(new UIntKeyTableBase.Item(key, value));
+    return true;
+  }
 
-	public UIntKeyTableBase(bool useHashDivision)
-	{
-		this.useHashDivision = useHashDivision;
-	}
+  protected void _AddRange(UIntKeyTableBase table)
+  {
+    if (table.lists == null)
+      return;
+    if (this.lists == null)
+      this.lists = !this.useHashDivision ? new List<UIntKeyTableBase.Item>[1] : new List<UIntKeyTableBase.Item>[256 /*0x0100*/];
+    int index = 0;
+    for (int length = table.lists.Length; index < length; ++index)
+    {
+      List<UIntKeyTableBase.Item> list = table.lists[index];
+      if (list != null)
+      {
+        if (this.lists[index] == null)
+          this.lists[index] = new List<UIntKeyTableBase.Item>((IEnumerable<UIntKeyTableBase.Item>) list);
+        else
+          this.lists[index].AddRange((IEnumerable<UIntKeyTableBase.Item>) list);
+      }
+    }
+  }
 
-	private List<Item> GetList(uint key)
-	{
-		if (lists == null)
-		{
-			return null;
-		}
-		return lists[GetHash(key)];
-	}
+  protected object _Get(uint key)
+  {
+    List<UIntKeyTableBase.Item> list = this.GetList(key);
+    if (list == null)
+      return (object) null;
+    return this.GetItem(list, key)?.value;
+  }
 
-	private Item GetItem(List<Item> list, uint key)
-	{
-		if (list == null)
-		{
-			return null;
-		}
-		List<Item>.Enumerator enumerator = list.GetEnumerator();
-		while (enumerator.MoveNext())
-		{
-			if (enumerator.Current.key == key)
-			{
-				return enumerator.Current;
-			}
-		}
-		return null;
-	}
+  public void Remove(uint key)
+  {
+    List<UIntKeyTableBase.Item> list = this.GetList(key);
+    if (list == null)
+      return;
+    UIntKeyTableBase.Item obj = this.GetItem(list, key);
+    if (obj == null)
+      return;
+    list.Remove(obj);
+  }
 
-	protected bool _Add(uint key, object value)
-	{
-		if (lists == null)
-		{
-			if (useHashDivision)
-			{
-				lists = new List<Item>[256];
-			}
-			else
-			{
-				lists = new List<Item>[1];
-			}
-		}
-		uint hash = GetHash(key);
-		List<Item> list = lists[hash];
-		if (list == null)
-		{
-			list = new List<Item>();
-			lists[hash] = list;
-		}
-		list.Add(new Item(key, value));
-		return true;
-	}
+  public virtual void Clear() => this.lists = (List<UIntKeyTableBase.Item>[]) null;
 
-	protected void _AddRange(UIntKeyTableBase table)
-	{
-		if (table.lists != null)
-		{
-			if (lists == null)
-			{
-				if (useHashDivision)
-				{
-					lists = new List<Item>[256];
-				}
-				else
-				{
-					lists = new List<Item>[1];
-				}
-			}
-			int i = 0;
-			for (int num = table.lists.Length; i < num; i++)
-			{
-				List<Item> list = table.lists[i];
-				if (list != null)
-				{
-					if (lists[i] == null)
-					{
-						lists[i] = new List<Item>(list);
-					}
-					else
-					{
-						lists[i].AddRange(list);
-					}
-				}
-			}
-		}
-	}
+  public uint GetHash(uint key)
+  {
+    return this.useHashDivision ? (uint) (((int) key & (int) byte.MaxValue) + (int) ((key & 65280U) >> 8) + (int) ((key & 16711680U /*0xFF0000*/) >> 16 /*0x10*/) + (int) ((key & 4278190080U /*0xFF000000*/) >> 24) & (int) byte.MaxValue) : 0U;
+  }
 
-	protected object _Get(uint key)
-	{
-		List<Item> list = GetList(key);
-		if (list == null)
-		{
-			return null;
-		}
-		return GetItem(list, key)?.value;
-	}
+  public virtual void TrimExcess()
+  {
+    if (this.lists == null)
+      return;
+    for (int index = 0; index < this.lists.Length; ++index)
+      this.lists[index]?.TrimExcess();
+  }
 
-	public void Remove(uint key)
-	{
-		List<Item> list = GetList(key);
-		if (list != null)
-		{
-			Item item = GetItem(list, key);
-			if (item != null)
-			{
-				list.Remove(item);
-			}
-		}
-	}
+  public class Item
+  {
+    public uint key;
+    public object value;
 
-	public virtual void Clear()
-	{
-		lists = null;
-	}
-
-	public uint GetHash(uint key)
-	{
-		if (useHashDivision)
-		{
-			return ((key & 0xFF) + ((key & 0xFF00) >> 8) + ((key & 0xFF0000) >> 16) + ((uint)((int)key & -16777216) >> 24)) & 0xFF;
-		}
-		return 0u;
-	}
-
-	public virtual void TrimExcess()
-	{
-		if (lists != null)
-		{
-			for (int i = 0; i < lists.Length; i++)
-			{
-				lists[i]?.TrimExcess();
-			}
-		}
-	}
+    public Item(uint _key, object _value)
+    {
+      this.key = _key;
+      this.value = _value;
+    }
+  }
 }

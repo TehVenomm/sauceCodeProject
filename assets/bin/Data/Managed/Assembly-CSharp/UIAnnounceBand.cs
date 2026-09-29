@@ -1,162 +1,141 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIAnnounceBand
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class UIAnnounceBand : MonoBehaviourSingleton<UIAnnounceBand>
 {
-	[SerializeField]
-	protected UIStaticPanelChanger panelChange;
+  [SerializeField]
+  protected UIStaticPanelChanger panelChange;
+  [SerializeField]
+  protected UILabel label;
+  [SerializeField]
+  protected UILabel conditionLabel;
+  [SerializeField]
+  protected float dispTime = 3f;
+  [SerializeField]
+  protected UITweener[] animStart;
+  [SerializeField]
+  protected UITweener[] animEnd;
+  [SerializeField]
+  protected GameObject animRoot;
+  private bool isDone;
+  public bool isWait;
+  private List<string> announceQueue = new List<string>();
 
-	[SerializeField]
-	protected UILabel label;
+  private bool isStartable => !this.isDone && !this.isWait;
 
-	[SerializeField]
-	protected UILabel conditionLabel;
+  protected override void Awake()
+  {
+    base.Awake();
+    this.InitAnim();
+  }
 
-	[SerializeField]
-	protected float dispTime = 3f;
+  private void InitAnim()
+  {
+    int index1 = 0;
+    for (int length = this.animStart.Length; index1 < length; ++index1)
+    {
+      ((Behaviour) this.animStart[index1]).enabled = false;
+      this.animStart[index1].Sample(1f, true);
+    }
+    int index2 = 0;
+    for (int length = this.animEnd.Length; index2 < length; ++index2)
+      ((Behaviour) this.animEnd[index2]).enabled = false;
+    ((Component) this).gameObject.SetActive(false);
+    this.animRoot.SetActive(false);
+  }
 
-	[SerializeField]
-	protected UITweener[] animStart;
+  protected override void OnDisable()
+  {
+    base.OnDisable();
+    if (!this.isDone)
+      return;
+    this.InitAnim();
+    this.announceQueue.Clear();
+    this.isDone = false;
+    this.panelChange.Lock();
+  }
 
-	[SerializeField]
-	protected UITweener[] animEnd;
+  private void LateUpdate()
+  {
+    if (!this.isStartable)
+      return;
+    this.PlayAnnounce();
+  }
 
-	[SerializeField]
-	protected GameObject animRoot;
+  public void SetAnnounce(string messeage, string conditionTitle)
+  {
+    ((Component) this).gameObject.SetActive(true);
+    this.announceQueue.Add(messeage);
+    this.announceQueue.Add(conditionTitle);
+  }
 
-	private bool isDone;
+  private bool PlayAnnounce()
+  {
+    if (!((Component) this).gameObject.activeInHierarchy)
+    {
+      ((Component) this).gameObject.SetActive(false);
+      return false;
+    }
+    if (this.announceQueue.Count <= 0)
+      return false;
+    this.animRoot.SetActive(true);
+    this.label.text = this.announceQueue[0];
+    this.label.supportEncoding = true;
+    this.announceQueue.RemoveAt(0);
+    this.conditionLabel.text = this.announceQueue[0];
+    this.announceQueue.RemoveAt(0);
+    this.isDone = true;
+    this.panelChange.UnLock();
+    this.StartCoroutine(this.Direction());
+    return true;
+  }
 
-	public bool isWait;
+  private void FinishAnnounce()
+  {
+    if (this.PlayAnnounce())
+      return;
+    this.animRoot.SetActive(false);
+    ((Component) this).gameObject.SetActive(false);
+    this.panelChange.Lock();
+    this.isDone = false;
+  }
 
-	private List<string> announceQueue = new List<string>();
-
-	private bool isStartable => !isDone && !isWait;
-
-	protected override void Awake()
-	{
-		base.Awake();
-		InitAnim();
-	}
-
-	private void InitAnim()
-	{
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		int i = 0;
-		for (int num = animStart.Length; i < num; i++)
-		{
-			animStart[i].set_enabled(false);
-			animStart[i].Sample(1f, true);
-		}
-		int j = 0;
-		for (int num2 = animEnd.Length; j < num2; j++)
-		{
-			animEnd[j].set_enabled(false);
-		}
-		this.get_gameObject().SetActive(false);
-		animRoot.SetActive(false);
-	}
-
-	protected override void OnDisable()
-	{
-		base.OnDisable();
-		if (isDone)
-		{
-			InitAnim();
-			announceQueue.Clear();
-			isDone = false;
-			panelChange.Lock();
-		}
-	}
-
-	private void LateUpdate()
-	{
-		if (isStartable)
-		{
-			PlayAnnounce();
-		}
-	}
-
-	public void SetAnnounce(string messeage, string conditionTitle)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().SetActive(true);
-		announceQueue.Add(messeage);
-		announceQueue.Add(conditionTitle);
-	}
-
-	private bool PlayAnnounce()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-		if (!this.get_gameObject().get_activeInHierarchy())
-		{
-			this.get_gameObject().SetActive(false);
-			return false;
-		}
-		if (announceQueue.Count > 0)
-		{
-			animRoot.SetActive(true);
-			label.text = announceQueue[0];
-			announceQueue.RemoveAt(0);
-			conditionLabel.text = announceQueue[0];
-			announceQueue.RemoveAt(0);
-			isDone = true;
-			panelChange.UnLock();
-			this.StartCoroutine(Direction());
-			return true;
-		}
-		return false;
-	}
-
-	private void FinishAnnounce()
-	{
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		if (!PlayAnnounce())
-		{
-			animRoot.SetActive(false);
-			this.get_gameObject().SetActive(false);
-			panelChange.Lock();
-			isDone = false;
-		}
-	}
-
-	protected IEnumerator Direction()
-	{
-		int i3 = 0;
-		for (int n3 = animEnd.Length; i3 < n3; i3++)
-		{
-			animEnd[i3].ResetToBeginning();
-		}
-		int i2 = 0;
-		for (int n2 = animStart.Length; i2 < n2; i2++)
-		{
-			animStart[i2].ResetToBeginning();
-			animStart[i2].PlayForward();
-		}
-		int n = 0;
-		for (int m = animStart.Length; n < m; n++)
-		{
-			while (animStart[n].get_enabled())
-			{
-				yield return (object)null;
-			}
-		}
-		yield return (object)new WaitForSeconds(dispTime);
-		int l = 0;
-		for (int k = animEnd.Length; l < k; l++)
-		{
-			animEnd[l].PlayForward();
-		}
-		int j = 0;
-		for (int i = animEnd.Length; j < i; j++)
-		{
-			while (animEnd[j].get_enabled())
-			{
-				yield return (object)null;
-			}
-		}
-		FinishAnnounce();
-	}
+  protected IEnumerator Direction()
+  {
+    int index1 = 0;
+    for (int length = this.animEnd.Length; index1 < length; ++index1)
+      this.animEnd[index1].ResetToBeginning();
+    int index2 = 0;
+    for (int length = this.animStart.Length; index2 < length; ++index2)
+    {
+      this.animStart[index2].ResetToBeginning();
+      this.animStart[index2].PlayForward();
+    }
+    int i = 0;
+    int n;
+    for (n = this.animStart.Length; i < n; ++i)
+    {
+      while (((Behaviour) this.animStart[i]).enabled)
+        yield return (object) null;
+    }
+    yield return (object) new WaitForSeconds(this.dispTime);
+    int index3 = 0;
+    for (int length = this.animEnd.Length; index3 < length; ++index3)
+      this.animEnd[index3].PlayForward();
+    n = 0;
+    for (i = this.animEnd.Length; n < i; ++n)
+    {
+      while (((Behaviour) this.animEnd[n]).enabled)
+        yield return (object) null;
+    }
+    this.FinishAnnounce();
+  }
 }

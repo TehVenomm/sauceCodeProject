@@ -1,173 +1,131 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ChatChannelInputPanel
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class ChatChannelInputPanel
 {
-	private ChatUITweenGroup rootPanelTween;
+  private ChatUITweenGroup rootPanelTween;
+  private UILabel[] numberLabels;
+  private UIButton okButton;
+  private int currentPosition;
+  private int[] number;
+  private Action<int> onOK;
+  private System.Action onClose;
+  private static string NONE = "-";
 
-	private UILabel[] numberLabels;
+  public bool isOpened => this.rootPanelTween.isOpened;
 
-	private UIButton okButton;
+  public ChatChannelInputPanel(ChatUITweenGroup root) => this.rootPanelTween = root;
 
-	private int currentPosition;
+  public void SetNumLabels(params UILabel[] labels)
+  {
+    this.numberLabels = labels;
+    this.number = new int[this.numberLabels.Length];
+    this.ClearNumbers();
+  }
 
-	private int[] number;
+  public void SetNumButtons(params UIButton[] buttons)
+  {
+    for (int num = 0; num < buttons.Length; ++num)
+      buttons[num].onClick.Add(this.CreateNumButtonEvent(num));
+  }
 
-	private Action<int> onOK;
+  private EventDelegate CreateNumButtonEvent(int num)
+  {
+    return new EventDelegate((EventDelegate.Callback) (() => this.OnNumber(num)));
+  }
 
-	private Action onClose;
+  public void SetOKButton(UIButton button)
+  {
+    button.onClick.Add(new EventDelegate(new EventDelegate.Callback(this.OnOK)));
+    this.okButton = button;
+  }
 
-	private static string NONE = "-";
+  public void SetClearButton(UIButton button)
+  {
+    button.onClick.Add(new EventDelegate(new EventDelegate.Callback(this.OnClear)));
+  }
 
-	public bool isOpened => rootPanelTween.isOpened;
+  public void SetCloseButton(UIButton button)
+  {
+    button.onClick.Add(new EventDelegate((EventDelegate.Callback) (() =>
+    {
+      SoundManager.PlaySystemSE(SoundID.UISE.CANCEL);
+      this.OnClose();
+    })));
+  }
 
-	public ChatChannelInputPanel(ChatUITweenGroup root)
-	{
-		rootPanelTween = root;
-	}
+  public void SetOnOKDelegate(Action<int> onOK) => this.onOK = onOK;
 
-	public void SetNumLabels(params UILabel[] labels)
-	{
-		numberLabels = labels;
-		number = new int[numberLabels.Length];
-		ClearNumbers();
-	}
+  public void SetOnCloseButtonDelegate(System.Action onClose) => this.onClose = onClose;
 
-	public void SetNumButtons(params UIButton[] buttons)
-	{
-		for (int i = 0; i < buttons.Length; i++)
-		{
-			buttons[i].onClick.Add(CreateNumButtonEvent(i));
-		}
-	}
+  public void Open()
+  {
+    this.UpdateOKButton();
+    this.UpdateNumberLabels();
+    this.rootPanelTween.Open((System.Action) (() => { }));
+  }
 
-	private EventDelegate CreateNumButtonEvent(int num)
-	{
-		return new EventDelegate(delegate
-		{
-			OnNumber(num);
-		});
-	}
+  public void Close() => this.rootPanelTween.Close((System.Action) (() => this.ClearNumbers()));
 
-	public void SetOKButton(UIButton button)
-	{
-		button.onClick.Add(new EventDelegate(OnOK));
-		okButton = button;
-	}
+  private void OnNumber(int num)
+  {
+    SoundManager.PlaySystemSE(SoundID.UISE.CLICK);
+    if (this.currentPosition < 0)
+      return;
+    this.number[this.currentPosition] = num;
+    --this.currentPosition;
+    this.UpdateOKButton();
+    this.UpdateNumberLabels();
+  }
 
-	public void SetClearButton(UIButton button)
-	{
-		button.onClick.Add(new EventDelegate(OnClear));
-	}
+  private void OnOK()
+  {
+    SoundManager.PlaySystemSE(SoundID.UISE.OK);
+    int num = 0;
+    for (int index = 0; index < this.number.Length; ++index)
+    {
+      if (this.number[index] >= 0)
+        num += Mathf.RoundToInt((float) this.number[index] * Mathf.Pow(10f, (float) index));
+    }
+    if (this.onOK == null)
+      return;
+    this.onOK(num);
+  }
 
-	public void SetCloseButton(UIButton button)
-	{
-		button.onClick.Add(new EventDelegate(delegate
-		{
-			SoundManager.PlaySystemSE(SoundID.UISE.CANCEL, 1f);
-			OnClose();
-		}));
-	}
+  private void OnClear()
+  {
+    SoundManager.PlaySystemSE(SoundID.UISE.CANCEL);
+    this.ClearNumbers();
+    this.UpdateOKButton();
+    this.UpdateNumberLabels();
+  }
 
-	public void SetOnOKDelegate(Action<int> onOK)
-	{
-		this.onOK = onOK;
-	}
+  private void OnClose()
+  {
+    if (this.onClose != null)
+      this.onClose();
+    this.Close();
+  }
 
-	public void SetOnCloseButtonDelegate(Action onClose)
-	{
-		this.onClose = onClose;
-	}
+  private void ClearNumbers()
+  {
+    this.currentPosition = this.number.Length - 1;
+    for (int index = 0; index < this.number.Length; ++index)
+      this.number[index] = -1;
+  }
 
-	public void Open()
-	{
-		UpdateOKButton();
-		UpdateNumberLabels();
-		rootPanelTween.Open(delegate
-		{
-		});
-	}
+  private void UpdateOKButton() => this.okButton.isEnabled = this.currentPosition < 0;
 
-	public void Close()
-	{
-		rootPanelTween.Close(delegate
-		{
-			ClearNumbers();
-		});
-	}
-
-	private void OnNumber(int num)
-	{
-		SoundManager.PlaySystemSE(SoundID.UISE.CLICK, 1f);
-		if (currentPosition >= 0)
-		{
-			number[currentPosition] = num;
-			currentPosition--;
-			UpdateOKButton();
-			UpdateNumberLabels();
-		}
-	}
-
-	private void OnOK()
-	{
-		SoundManager.PlaySystemSE(SoundID.UISE.OK, 1f);
-		int num = 0;
-		for (int i = 0; i < number.Length; i++)
-		{
-			if (number[i] >= 0)
-			{
-				num += Mathf.RoundToInt((float)number[i] * Mathf.Pow(10f, (float)i));
-			}
-		}
-		if (onOK != null)
-		{
-			onOK(num);
-		}
-	}
-
-	private void OnClear()
-	{
-		SoundManager.PlaySystemSE(SoundID.UISE.CANCEL, 1f);
-		ClearNumbers();
-		UpdateOKButton();
-		UpdateNumberLabels();
-	}
-
-	private void OnClose()
-	{
-		if (onClose != null)
-		{
-			onClose();
-		}
-		Close();
-	}
-
-	private void ClearNumbers()
-	{
-		currentPosition = number.Length - 1;
-		for (int i = 0; i < number.Length; i++)
-		{
-			number[i] = -1;
-		}
-	}
-
-	private void UpdateOKButton()
-	{
-		okButton.isEnabled = (currentPosition < 0);
-	}
-
-	private void UpdateNumberLabels()
-	{
-		for (int i = 0; i < numberLabels.Length; i++)
-		{
-			if (number[i] >= 0)
-			{
-				numberLabels[i].text = number[i].ToString();
-			}
-			else
-			{
-				numberLabels[i].text = NONE;
-			}
-		}
-	}
+  private void UpdateNumberLabels()
+  {
+    for (int index = 0; index < this.numberLabels.Length; ++index)
+      this.numberLabels[index].text = this.number[index] < 0 ? ChatChannelInputPanel.NONE : this.number[index].ToString();
+  }
 }

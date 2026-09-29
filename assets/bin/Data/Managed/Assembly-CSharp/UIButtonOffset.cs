@@ -1,147 +1,92 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIButtonOffset
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 [AddComponentMenu("NGUI/Interaction/Button Offset")]
-public class UIButtonOffset
+public class UIButtonOffset : MonoBehaviour
 {
-	public Transform tweenTarget;
+  public Transform tweenTarget;
+  public Vector3 hover = Vector3.zero;
+  public Vector3 pressed = new Vector3(2f, -2f);
+  public float duration = 0.2f;
+  [NonSerialized]
+  private Vector3 mPos;
+  [NonSerialized]
+  private bool mStarted;
+  [NonSerialized]
+  private bool mPressed;
 
-	public Vector3 hover = Vector3.get_zero();
+  private void Start()
+  {
+    if (this.mStarted)
+      return;
+    this.mStarted = true;
+    if (Object.op_Equality((Object) this.tweenTarget, (Object) null))
+      this.tweenTarget = ((Component) this).transform;
+    this.mPos = this.tweenTarget.localPosition;
+  }
 
-	public Vector3 pressed = new Vector3(2f, -2f);
+  private void OnEnable()
+  {
+    if (!this.mStarted)
+      return;
+    this.OnHover(UICamera.IsHighlighted(((Component) this).gameObject));
+  }
 
-	public float duration = 0.2f;
+  private void OnDisable()
+  {
+    if (!this.mStarted || !Object.op_Inequality((Object) this.tweenTarget, (Object) null))
+      return;
+    TweenPosition component = ((Component) this.tweenTarget).GetComponent<TweenPosition>();
+    if (!Object.op_Inequality((Object) component, (Object) null))
+      return;
+    component.value = this.mPos;
+    ((Behaviour) component).enabled = false;
+  }
 
-	[NonSerialized]
-	private Vector3 mPos;
+  private void OnPress(bool isPressed)
+  {
+    this.mPressed = isPressed;
+    if (!((Behaviour) this).enabled)
+      return;
+    if (!this.mStarted)
+      this.Start();
+    TweenPosition.Begin(((Component) this.tweenTarget).gameObject, this.duration, isPressed ? Vector3.op_Addition(this.mPos, this.pressed) : (UICamera.IsHighlighted(((Component) this).gameObject) ? Vector3.op_Addition(this.mPos, this.hover) : this.mPos)).method = UITweener.Method.EaseInOut;
+  }
 
-	[NonSerialized]
-	private bool mStarted;
+  private void OnHover(bool isOver)
+  {
+    if (!((Behaviour) this).enabled)
+      return;
+    if (!this.mStarted)
+      this.Start();
+    TweenPosition.Begin(((Component) this.tweenTarget).gameObject, this.duration, isOver ? Vector3.op_Addition(this.mPos, this.hover) : this.mPos).method = UITweener.Method.EaseInOut;
+  }
 
-	[NonSerialized]
-	private bool mPressed;
+  private void OnDragOver()
+  {
+    if (!this.mPressed)
+      return;
+    TweenPosition.Begin(((Component) this.tweenTarget).gameObject, this.duration, Vector3.op_Addition(this.mPos, this.hover)).method = UITweener.Method.EaseInOut;
+  }
 
-	public UIButtonOffset()
-		: this()
-	{
-	}//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-	//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+  private void OnDragOut()
+  {
+    if (!this.mPressed)
+      return;
+    TweenPosition.Begin(((Component) this.tweenTarget).gameObject, this.duration, this.mPos).method = UITweener.Method.EaseInOut;
+  }
 
-
-	private void Start()
-	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002a: Expected O, but got Unknown
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		if (!mStarted)
-		{
-			mStarted = true;
-			if (tweenTarget == null)
-			{
-				tweenTarget = this.get_transform();
-			}
-			mPos = tweenTarget.get_localPosition();
-		}
-	}
-
-	private void OnEnable()
-	{
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Expected O, but got Unknown
-		if (mStarted)
-		{
-			OnHover(UICamera.IsHighlighted(this.get_gameObject()));
-		}
-	}
-
-	private void OnDisable()
-	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		if (mStarted && tweenTarget != null)
-		{
-			TweenPosition component = tweenTarget.GetComponent<TweenPosition>();
-			if (component != null)
-			{
-				component.value = mPos;
-				component.set_enabled(false);
-			}
-		}
-	}
-
-	private void OnPress(bool isPressed)
-	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Expected O, but got Unknown
-		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-		//IL_007c: Expected O, but got Unknown
-		mPressed = isPressed;
-		if (this.get_enabled())
-		{
-			if (!mStarted)
-			{
-				Start();
-			}
-			TweenPosition.Begin(tweenTarget.get_gameObject(), duration, isPressed ? (mPos + pressed) : ((!UICamera.IsHighlighted(this.get_gameObject())) ? mPos : (mPos + hover))).method = UITweener.Method.EaseInOut;
-		}
-	}
-
-	private void OnHover(bool isOver)
-	{
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Expected O, but got Unknown
-		if (this.get_enabled())
-		{
-			if (!mStarted)
-			{
-				Start();
-			}
-			TweenPosition.Begin(tweenTarget.get_gameObject(), duration, (!isOver) ? mPos : (mPos + hover)).method = UITweener.Method.EaseInOut;
-		}
-	}
-
-	private void OnDragOver()
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Expected O, but got Unknown
-		if (mPressed)
-		{
-			TweenPosition.Begin(tweenTarget.get_gameObject(), duration, mPos + hover).method = UITweener.Method.EaseInOut;
-		}
-	}
-
-	private void OnDragOut()
-	{
-		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Expected O, but got Unknown
-		if (mPressed)
-		{
-			TweenPosition.Begin(tweenTarget.get_gameObject(), duration, mPos).method = UITweener.Method.EaseInOut;
-		}
-	}
-
-	private void OnSelect(bool isSelected)
-	{
-		if (this.get_enabled() && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
-		{
-			OnHover(isSelected);
-		}
-	}
+  private void OnSelect(bool isSelected)
+  {
+    if (!((Behaviour) this).enabled || isSelected && UICamera.currentScheme != UICamera.ControlScheme.Controller)
+      return;
+    this.OnHover(isSelected);
+  }
 }

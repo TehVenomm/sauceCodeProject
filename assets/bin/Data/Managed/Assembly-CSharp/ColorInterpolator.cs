@@ -1,62 +1,37 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ColorInterpolator
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 [Serializable]
 public class ColorInterpolator : InterpolatorBase<Color>
 {
-	protected override void Calc(float t, float r)
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-		Color val = (endValue - beginValue) * r + beginValue;
-		if (addCurve != null && addCurve.get_length() > 0)
-		{
-			val = addValue * addCurve.Evaluate(t) + val;
-		}
-		if (val.r < 0f)
-		{
-			val.r = 0f;
-		}
-		else if (val.r > 1f)
-		{
-			val.r = 1f;
-		}
-		if (val.g < 0f)
-		{
-			val.g = 0f;
-		}
-		else if (val.g > 1f)
-		{
-			val.g = 1f;
-		}
-		if (val.b < 0f)
-		{
-			val.b = 0f;
-		}
-		else if (val.b > 1f)
-		{
-			val.b = 1f;
-		}
-		if (val.a < 0f)
-		{
-			val.a = 0f;
-		}
-		else if (val.a > 1f)
-		{
-			val.a = 1f;
-		}
-		nowValue = val;
-	}
+  protected override void Calc(float t, float r)
+  {
+    Color color = Color.op_Addition(Color.op_Multiply(Color.op_Subtraction(this.endValue, this.beginValue), r), this.beginValue);
+    if (this.addCurve != null && this.addCurve.length > 0)
+      color = Color.op_Addition(Color.op_Multiply(this.addValue, this.addCurve.Evaluate(t)), color);
+    if ((double) color.r < 0.0)
+      color.r = 0.0f;
+    else if ((double) color.r > 1.0)
+      color.r = 1f;
+    if ((double) color.g < 0.0)
+      color.g = 0.0f;
+    else if ((double) color.g > 1.0)
+      color.g = 1f;
+    if ((double) color.b < 0.0)
+      color.b = 0.0f;
+    else if ((double) color.b > 1.0)
+      color.b = 1f;
+    if ((double) color.a < 0.0)
+      color.a = 0.0f;
+    else if ((double) color.a > 1.0)
+      color.a = 1f;
+    this.nowValue = color;
+  }
 }

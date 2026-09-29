@@ -1,66 +1,51 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIToggledComponents
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Interaction/Toggled Components")]
+#nullable disable
 [ExecuteInEditMode]
-[RequireComponent(typeof(UIToggle))]
-public class UIToggledComponents
+[RequireComponent(typeof (UIToggle))]
+[AddComponentMenu("NGUI/Interaction/Toggled Components")]
+public class UIToggledComponents : MonoBehaviour
 {
-	public List<MonoBehaviour> activate;
+  public List<MonoBehaviour> activate;
+  public List<MonoBehaviour> deactivate;
+  [HideInInspector]
+  [SerializeField]
+  private MonoBehaviour target;
+  [HideInInspector]
+  [SerializeField]
+  private bool inverse;
 
-	public List<MonoBehaviour> deactivate;
+  private void Awake()
+  {
+    if (Object.op_Inequality((Object) this.target, (Object) null))
+    {
+      if (this.activate.Count == 0 && this.deactivate.Count == 0)
+      {
+        if (this.inverse)
+          this.deactivate.Add(this.target);
+        else
+          this.activate.Add(this.target);
+      }
+      else
+        this.target = (MonoBehaviour) null;
+    }
+    EventDelegate.Add(((Component) this).GetComponent<UIToggle>().onChange, new EventDelegate.Callback(this.Toggle));
+  }
 
-	[SerializeField]
-	[HideInInspector]
-	private MonoBehaviour target;
-
-	[HideInInspector]
-	[SerializeField]
-	private bool inverse;
-
-	public UIToggledComponents()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		if (target != null)
-		{
-			if (activate.Count == 0 && deactivate.Count == 0)
-			{
-				if (inverse)
-				{
-					deactivate.Add(target);
-				}
-				else
-				{
-					activate.Add(target);
-				}
-			}
-			else
-			{
-				target = null;
-			}
-		}
-		UIToggle component = this.GetComponent<UIToggle>();
-		EventDelegate.Add(component.onChange, Toggle);
-	}
-
-	public void Toggle()
-	{
-		if (this.get_enabled())
-		{
-			for (int i = 0; i < activate.Count; i++)
-			{
-				MonoBehaviour val = activate[i];
-				val.set_enabled(UIToggle.current.value);
-			}
-			for (int j = 0; j < deactivate.Count; j++)
-			{
-				MonoBehaviour val2 = deactivate[j];
-				val2.set_enabled(!UIToggle.current.value);
-			}
-		}
-	}
+  public void Toggle()
+  {
+    if (!((Behaviour) this).enabled)
+      return;
+    for (int index = 0; index < this.activate.Count; ++index)
+      ((Behaviour) this.activate[index]).enabled = UIToggle.current.value;
+    for (int index = 0; index < this.deactivate.Count; ++index)
+      ((Behaviour) this.deactivate[index]).enabled = !UIToggle.current.value;
+  }
 }

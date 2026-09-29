@@ -1,133 +1,102 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIHGauge
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class UIHGauge
+#nullable disable
+public class UIHGauge : MonoBehaviour
 {
-	public enum ANIM_PHASE
-	{
-		NONE,
-		WAIT,
-		MOVE
-	}
+  protected const float ANIM_WAIT_TIME = 3f;
+  protected const float ANIM_MOVE_TIME = 0.5f;
+  [SerializeField]
+  protected UISlider gaugeUI;
+  [SerializeField]
+  protected UISlider gaugeEffectUI;
+  protected bool initialized;
+  protected float oldPercent = 1f;
+  protected UIHGauge.ANIM_PHASE animPhase;
+  protected float animTime;
 
-	protected const float ANIM_WAIT_TIME = 3f;
+  public float nowPercent { get; protected set; }
 
-	protected const float ANIM_MOVE_TIME = 0.5f;
+  public UIHGauge() => this.nowPercent = 1f;
 
-	[SerializeField]
-	protected UISlider gaugeUI;
+  private void Awake()
+  {
+    if (!Object.op_Inequality((Object) this.gaugeUI, (Object) null))
+      return;
+    this.initialized = true;
+  }
 
-	[SerializeField]
-	protected UISlider gaugeEffectUI;
+  public void SetPercent(float percent, bool anim = true)
+  {
+    if ((double) percent < 0.0)
+      percent = 0.0f;
+    if ((double) percent > 1.0)
+      percent = 1f;
+    float nowPercent = this.nowPercent;
+    this.nowPercent = percent;
+    this.oldPercent = percent;
+    if (anim)
+    {
+      this.oldPercent = nowPercent;
+      this.animPhase = UIHGauge.ANIM_PHASE.WAIT;
+      this.animTime = 3f;
+    }
+    else
+      this.animPhase = UIHGauge.ANIM_PHASE.NONE;
+  }
 
-	protected bool initialized;
+  private void LateUpdate()
+  {
+    if (this.animPhase == UIHGauge.ANIM_PHASE.WAIT)
+    {
+      this.animTime -= Time.deltaTime;
+      if ((double) this.animTime <= 0.0)
+      {
+        this.animPhase = UIHGauge.ANIM_PHASE.MOVE;
+        this.animTime = 0.5f;
+      }
+    }
+    else if (this.animPhase == UIHGauge.ANIM_PHASE.MOVE)
+    {
+      this.animTime -= Time.deltaTime;
+      if ((double) this.animTime <= 0.0)
+      {
+        this.animPhase = UIHGauge.ANIM_PHASE.NONE;
+        this.animTime = 0.0f;
+      }
+    }
+    this.UpdateGauge();
+  }
 
-	protected float oldPercent = 1f;
+  protected virtual void UpdateGauge()
+  {
+    if (!Object.op_Implicit((Object) this.gaugeUI))
+      return;
+    this.gaugeUI.value = this.nowPercent;
+    if (!Object.op_Inequality((Object) this.gaugeEffectUI, (Object) null))
+      return;
+    float num = this.nowPercent;
+    if (this.animPhase == UIHGauge.ANIM_PHASE.WAIT)
+      num = this.oldPercent;
+    else if (this.animPhase == UIHGauge.ANIM_PHASE.MOVE)
+      num = this.nowPercent + (float) (((double) this.oldPercent - (double) this.nowPercent) * ((double) this.animTime / 0.5));
+    this.gaugeEffectUI.value = num;
+  }
 
-	protected ANIM_PHASE animPhase;
+  public Transform GetGaugeTransform()
+  {
+    return Object.op_Implicit((Object) this.gaugeUI) ? ((Component) this.gaugeUI).gameObject.transform : ((Component) this).gameObject.transform;
+  }
 
-	protected float animTime;
-
-	public float nowPercent
-	{
-		get;
-		protected set;
-	}
-
-	public UIHGauge()
-		: this()
-	{
-		nowPercent = 1f;
-	}
-
-	private void Awake()
-	{
-		if (gaugeUI != null)
-		{
-			initialized = true;
-		}
-	}
-
-	public void SetPercent(float percent, bool anim = true)
-	{
-		if (percent < 0f)
-		{
-			percent = 0f;
-		}
-		if (percent > 1f)
-		{
-			percent = 1f;
-		}
-		float nowPercent = this.nowPercent;
-		this.nowPercent = percent;
-		oldPercent = percent;
-		if (anim)
-		{
-			oldPercent = nowPercent;
-			animPhase = ANIM_PHASE.WAIT;
-			animTime = 3f;
-		}
-		else
-		{
-			animPhase = ANIM_PHASE.NONE;
-		}
-	}
-
-	private void LateUpdate()
-	{
-		if (animPhase == ANIM_PHASE.WAIT)
-		{
-			animTime -= Time.get_deltaTime();
-			if (animTime <= 0f)
-			{
-				animPhase = ANIM_PHASE.MOVE;
-				animTime = 0.5f;
-			}
-		}
-		else if (animPhase == ANIM_PHASE.MOVE)
-		{
-			animTime -= Time.get_deltaTime();
-			if (animTime <= 0f)
-			{
-				animPhase = ANIM_PHASE.NONE;
-				animTime = 0f;
-			}
-		}
-		UpdateGauge();
-	}
-
-	protected virtual void UpdateGauge()
-	{
-		if (Object.op_Implicit(gaugeUI))
-		{
-			gaugeUI.value = nowPercent;
-			if (gaugeEffectUI != null)
-			{
-				float value = nowPercent;
-				if (animPhase == ANIM_PHASE.WAIT)
-				{
-					value = oldPercent;
-				}
-				else if (animPhase == ANIM_PHASE.MOVE)
-				{
-					value = nowPercent + (oldPercent - nowPercent) * (animTime / 0.5f);
-				}
-				gaugeEffectUI.value = value;
-			}
-		}
-	}
-
-	public Transform GetGaugeTransform()
-	{
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0020: Expected O, but got Unknown
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Expected O, but got Unknown
-		if (Object.op_Implicit(gaugeUI))
-		{
-			return gaugeUI.get_gameObject().get_transform();
-		}
-		return this.get_gameObject().get_transform();
-	}
+  public enum ANIM_PHASE
+  {
+    NONE,
+    WAIT,
+    MOVE,
+  }
 }

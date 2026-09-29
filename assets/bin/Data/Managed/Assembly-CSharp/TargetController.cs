@@ -1,340 +1,239 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: TargetController
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class TargetController
 {
-	private Brain brain;
+  private Brain brain;
+  private StageObject allyTarget;
 
-	private StageObject allyTarget;
+  public TargetController(Brain brain) => this.brain = brain;
 
-	public TargetController(Brain brain)
-	{
-		this.brain = brain;
-	}
+  public StageObject GetAllyTarget() => this.allyTarget;
 
-	public StageObject GetAllyTarget()
-	{
-		return allyTarget;
-	}
+  public void SetAllyTarget(StageObject ally) => this.allyTarget = ally;
 
-	public void SetAllyTarget(StageObject ally)
-	{
-		allyTarget = ally;
-	}
+  public bool IsTargetingOfAlly()
+  {
+    return Object.op_Inequality((Object) this.GetAllyTarget(), (Object) null);
+  }
 
-	public bool IsTargetingOfAlly()
-	{
-		return GetAllyTarget() != null;
-	}
+  public bool IsAliveTargetOfAlly() => AIUtility.IsAlive(this.GetAllyTarget());
 
-	public bool IsAliveTargetOfAlly()
-	{
-		return AIUtility.IsAlive(GetAllyTarget());
-	}
+  public bool CanRescueOfTargetAlly()
+  {
+    StageObject allyTarget = this.GetAllyTarget();
+    if (Object.op_Equality((Object) allyTarget, (Object) null))
+      return false;
+    switch (allyTarget)
+    {
+      case Player _:
+        Player player = allyTarget as Player;
+        if (player.isDead && (double) player.rescueTime > 0.0)
+          return true;
+        return player.IsStone() && (double) player.stoneRescueTime > 0.0;
+      case Character _:
+        Character character = allyTarget as Character;
+        return character.isDead || character.IsStone();
+      default:
+        return false;
+    }
+  }
 
-	public bool CanReviveOfTargetAlly()
-	{
-		StageObject stageObject = GetAllyTarget();
-		if (stageObject == null)
-		{
-			return false;
-		}
-		if (stageObject is Player)
-		{
-			Player player = stageObject as Player;
-			return player.isDead && player.rescueTime > 0f;
-		}
-		if (stageObject is Character)
-		{
-			return (stageObject as Character).isDead;
-		}
-		return false;
-	}
+  public bool IsOtherPlayerReviveOfTarget()
+  {
+    Player allyTarget = this.GetAllyTarget() as Player;
+    if (Object.op_Inequality((Object) allyTarget, (Object) null))
+    {
+      for (int index = 0; index < allyTarget.prayerIds.Count; ++index)
+      {
+        if (allyTarget.prayerIds[index] != this.brain.owner.id && !(MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(allyTarget.prayerIds[index]) as Player).isNpc)
+          return true;
+      }
+    }
+    return false;
+  }
 
-	public bool IsOtherPlayerReviveOfTarget()
-	{
-		Player player = GetAllyTarget() as Player;
-		if (player != null)
-		{
-			for (int i = 0; i < player.prayerIds.Count; i++)
-			{
-				if (player.prayerIds[i] != brain.owner.id)
-				{
-					Player player2 = MonoBehaviourSingleton<StageObjectManager>.I.FindPlayer(player.prayerIds[i]) as Player;
-					if (!player2.isNpc)
-					{
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
+  public StageObject GetCurrentTarget()
+  {
+    if (Object.op_Equality((Object) this.brain.owner.actionTarget, (Object) null))
+    {
+      Self owner = this.brain.owner as Self;
+      if (Object.op_Inequality((Object) owner, (Object) null) && owner.isAutoMode)
+        return this.GetTargetObjectOfNearest();
+    }
+    return this.brain.owner.actionTarget;
+  }
 
-	public StageObject GetCurrentTarget()
-	{
-		if (brain.owner.actionTarget == null)
-		{
-			Self self = brain.owner as Self;
-			if (self != null && self.isAutoMode)
-			{
-				return GetTargetObjectOfNearest();
-			}
-		}
-		return brain.owner.actionTarget;
-	}
+  public void MissCurrentTarget() => this.brain.owner.SetActionTarget((StageObject) null, false);
 
-	public void MissCurrentTarget()
-	{
-		brain.owner.SetActionTarget(null, false);
-	}
+  public void SetCurrentTarget(StageObject target_obj)
+  {
+    StageObject currentTarget = this.GetCurrentTarget();
+    this.brain.owner.SetActionTarget(target_obj);
+    this.brain.opponentMem.OnTargetOpponent(target_obj, currentTarget);
+  }
 
-	public void SetCurrentTarget(StageObject target_obj)
-	{
-		StageObject currentTarget = GetCurrentTarget();
-		brain.owner.SetActionTarget(target_obj, true);
-		brain.opponentMem.OnTargetOpponent(target_obj, currentTarget);
-	}
+  public bool IsTargeting()
+  {
+    return Object.op_Inequality((Object) this.GetCurrentTarget(), (Object) null);
+  }
 
-	public bool IsTargeting()
-	{
-		return GetCurrentTarget() != null;
-	}
+  public void UpdateTarget()
+  {
+    StageObject target_obj = this.GetCurrentTarget();
+    if (this.brain.opponentMem.haveHateControl)
+    {
+      if (this.IsTargetInterestLoseOfHate())
+        target_obj = this.GetTargetObjectOfHate();
+    }
+    else if (!this.IsTargeting())
+      target_obj = this.GetTargetObjectOfNearest();
+    this.SetCurrentTarget(target_obj);
+  }
 
-	public void UpdateTarget()
-	{
-		StageObject currentTarget = GetCurrentTarget();
-		if (brain.opponentMem.haveHateControl)
-		{
-			if (IsTargetInterestLoseOfHate())
-			{
-				currentTarget = GetTargetObjectOfHate();
-			}
-		}
-		else if (!IsTargeting())
-		{
-			currentTarget = GetTargetObjectOfNearest();
-		}
-		SetCurrentTarget(currentTarget);
-	}
+  public StageObject GetTargetObjectOfNearest()
+  {
+    StageObject obj = (StageObject) null;
+    double len = double.MaxValue;
+    this.brain.opponentMem.GetListOfSensedOpponent().ForEach((Action<OpponentMemory.OpponentRecord>) (t =>
+    {
+      if ((double) t.record.distance >= len)
+        return;
+      obj = t.obj;
+      len = (double) t.record.distance;
+    }));
+    return obj;
+  }
 
-	public StageObject GetTargetObjectOfNearest()
-	{
-		StageObject obj = null;
-		double len = 1.7976931348623157E+308;
-		List<OpponentMemory.OpponentRecord> listOfSensedOpponent = brain.opponentMem.GetListOfSensedOpponent();
-		listOfSensedOpponent.ForEach(delegate(OpponentMemory.OpponentRecord t)
-		{
-			if ((double)t.record.distance < len)
-			{
-				obj = t.obj;
-				len = (double)t.record.distance;
-			}
-		});
-		return obj;
-	}
+  public StageObject GetTargetObjectOfScountingParam()
+  {
+    BrainParam.ScountingParam scoutParam = this.brain.param.scoutParam;
+    if (scoutParam == null)
+      return (StageObject) null;
+    List<StageObject> targetObjectList = this.brain.GetTargetObjectList();
+    for (int index = 0; index < targetObjectList.Count; ++index)
+    {
+      if (scoutParam.IsScouted(this.brain.owner._transform, targetObjectList[index]._transform))
+        return targetObjectList[index];
+    }
+    return (StageObject) null;
+  }
 
-	public StageObject GetTargetObjectOfScountingParam()
-	{
-		BrainParam.ScountingParam scoutParam = brain.param.scoutParam;
-		if (scoutParam == null)
-		{
-			return null;
-		}
-		List<StageObject> targetObjectList = brain.GetTargetObjectList();
-		for (int i = 0; i < targetObjectList.Count; i++)
-		{
-			if (scoutParam.IsScouted(brain.owner._transform, targetObjectList[i]._transform))
-			{
-				return targetObjectList[i];
-			}
-		}
-		return null;
-	}
+  public StageObject GetTargetObjectOfHate()
+  {
+    if (this.brain.opponentMem.IsHateCycleLastTurn())
+    {
+      OpponentMemory.OpponentRecord targetInHateCycle = this.brain.opponentMem.GetOpponentWithNotTargetInHateCycle();
+      if (targetInHateCycle != null)
+        return targetInHateCycle.obj;
+    }
+    OpponentMemory.OpponentRecord opponentWithHigherHate = this.brain.opponentMem.GetOpponentWithHigherHate();
+    if (opponentWithHigherHate != null)
+      return opponentWithHigherHate.obj;
+    List<OpponentMemory.OpponentRecord> ofSensedOpponent = this.brain.opponentMem.GetListOfSensedOpponent();
+    if (ofSensedOpponent.Count <= 0)
+      return (StageObject) null;
+    int index = Utility.Random(ofSensedOpponent.Count);
+    return ofSensedOpponent[index].obj;
+  }
 
-	public StageObject GetTargetObjectOfHate()
-	{
-		if (brain.opponentMem.IsHateCycleLastTurn())
-		{
-			OpponentMemory.OpponentRecord opponentWithNotTargetInHateCycle = brain.opponentMem.GetOpponentWithNotTargetInHateCycle();
-			if (opponentWithNotTargetInHateCycle != null)
-			{
-				return opponentWithNotTargetInHateCycle.obj;
-			}
-		}
-		OpponentMemory.OpponentRecord opponentWithHigherHate = brain.opponentMem.GetOpponentWithHigherHate();
-		if (opponentWithHigherHate != null)
-		{
-			return opponentWithHigherHate.obj;
-		}
-		List<OpponentMemory.OpponentRecord> listOfSensedOpponent = brain.opponentMem.GetListOfSensedOpponent();
-		if (listOfSensedOpponent.Count <= 0)
-		{
-			return null;
-		}
-		int index = Utility.Random(listOfSensedOpponent.Count);
-		OpponentMemory.OpponentRecord opponentRecord = listOfSensedOpponent[index];
-		return opponentRecord.obj;
-	}
+  public OpponentMemory.OpponentRecord GetOpponent()
+  {
+    return this.brain.opponentMem.FindOrEmpty(this.GetCurrentTarget());
+  }
 
-	public OpponentMemory.OpponentRecord GetOpponent()
-	{
-		return brain.opponentMem.FindOrEmpty(GetCurrentTarget());
-	}
+  public bool IsAliveTarget() => AIUtility.IsAlive(this.GetCurrentTarget());
 
-	public bool IsAliveTarget()
-	{
-		return AIUtility.IsAlive(GetCurrentTarget());
-	}
+  public bool IsNearTarget() => this.GetOpponent().record.isNearPlace;
 
-	public bool IsNearTarget()
-	{
-		return GetOpponent().record.isNearPlace;
-	}
+  public bool IsPlaceTarget(PLACE place)
+  {
+    StageObject currentTarget = this.GetCurrentTarget();
+    return !Object.op_Equality((Object) currentTarget, (Object) null) && this.brain.opponentMem.IsPlaceOpponent(currentTarget, place);
+  }
 
-	public bool IsPlaceTarget(PLACE place)
-	{
-		StageObject currentTarget = GetCurrentTarget();
-		if (currentTarget == null)
-		{
-			return false;
-		}
-		return brain.opponentMem.IsPlaceOpponent(currentTarget, place);
-	}
+  public bool CanAttackTarget()
+  {
+    return this.brain.targetCtrl.IsSpecialAttackableTarget() || this.brain.targetCtrl.IsAttackableTarget() || this.brain.targetCtrl.IsArrivalAttackPosition() || this.brain.targetCtrl.IsAvoidAttackableTarget();
+  }
 
-	public bool CanAttackTarget()
-	{
-		if (brain.targetCtrl.IsSpecialAttackableTarget() || brain.targetCtrl.IsAttackableTarget() || brain.targetCtrl.IsArrivalAttackPosition() || brain.targetCtrl.IsAvoidAttackableTarget())
-		{
-			return true;
-		}
-		return false;
-	}
+  public bool IsAttackableTarget()
+  {
+    StageObject currentTarget = this.GetCurrentTarget();
+    if (Object.op_Equality((Object) currentTarget, (Object) null))
+      return false;
+    if (this.brain.owner is Player)
+    {
+      Player owner = this.brain.owner as Player;
+      if (owner.CheckAttackModeAndSpType(Player.ATTACK_MODE.ONE_HAND_SWORD, SP_ATTACK_TYPE.SOUL) && owner.actionID == Character.ACTION_ID.ATTACK && owner.enableInputCombo)
+        return true;
+    }
+    return this.brain.opponentMem.IsAttackableOpponent(currentTarget);
+  }
 
-	public bool IsAttackableTarget()
-	{
-		StageObject currentTarget = GetCurrentTarget();
-		if (currentTarget == null)
-		{
-			return false;
-		}
-		if (brain.owner is Player)
-		{
-			Player player = brain.owner as Player;
-			if (player.CheckAttackModeAndSpType(Player.ATTACK_MODE.ONE_HAND_SWORD, SP_ATTACK_TYPE.SOUL) && player.actionID == Character.ACTION_ID.ATTACK && player.enableInputCombo)
-			{
-				return true;
-			}
-		}
-		return brain.opponentMem.IsAttackableOpponent(currentTarget);
-	}
+  public bool IsSpecialAttackableTarget()
+  {
+    StageObject currentTarget = this.GetCurrentTarget();
+    return !Object.op_Equality((Object) currentTarget, (Object) null) && this.brain.opponentMem.IsSpecialAttackableOpponent(currentTarget);
+  }
 
-	public bool IsSpecialAttackableTarget()
-	{
-		StageObject currentTarget = GetCurrentTarget();
-		if (currentTarget == null)
-		{
-			return false;
-		}
-		return brain.opponentMem.IsSpecialAttackableOpponent(currentTarget);
-	}
+  public bool IsAvoidAttackableTarget()
+  {
+    StageObject currentTarget = this.GetCurrentTarget();
+    if (Object.op_Equality((Object) currentTarget, (Object) null) || !(this.brain.owner is Player))
+      return false;
+    Player owner = this.brain.owner as Player;
+    if (!owner.CheckAttackMode(Player.ATTACK_MODE.TWO_HAND_SWORD) || owner.CheckSpAttackType(SP_ATTACK_TYPE.SOUL))
+      return false;
+    if (this.brain.canAvoidAttack)
+      return true;
+    if (!this.brain.canCheckAvoidAttack || !owner.playerParameter.twoHandSwordActionInfo.avoidAttackEnable || !this.brain.opponentMem.IsAvoidAttackableOpponent(currentTarget))
+      return false;
+    this.brain.canCheckAvoidAttack = false;
+    if (Utility.Dice100(80 /*0x50*/))
+    {
+      this.brain.canAvoidAttack = true;
+      return true;
+    }
+    this.brain.canAvoidAttack = false;
+    return false;
+  }
 
-	public bool IsAvoidAttackableTarget()
-	{
-		StageObject currentTarget = GetCurrentTarget();
-		if (currentTarget == null)
-		{
-			return false;
-		}
-		if (brain.owner is Player)
-		{
-			Player player = brain.owner as Player;
-			if (!player.CheckAttackMode(Player.ATTACK_MODE.TWO_HAND_SWORD))
-			{
-				return false;
-			}
-			if (player.CheckSpAttackType(SP_ATTACK_TYPE.SOUL))
-			{
-				return false;
-			}
-			if (brain.canAvoidAttack)
-			{
-				return true;
-			}
-			if (!brain.canCheckAvoidAttack)
-			{
-				return false;
-			}
-			if (player.playerParameter.twoHandSwordActionInfo.avoidAttackEnable && brain.opponentMem.IsAvoidAttackableOpponent(currentTarget))
-			{
-				brain.canCheckAvoidAttack = false;
-				if (Utility.Dice100(80))
-				{
-					brain.canAvoidAttack = true;
-					return true;
-				}
-				brain.canAvoidAttack = false;
-				return false;
-			}
-		}
-		return false;
-	}
+  public bool IsArrivalTarget()
+  {
+    StageObject currentTarget = this.GetCurrentTarget();
+    return !Object.op_Equality((Object) currentTarget, (Object) null) && this.brain.opponentMem.IsArrivalPosition(currentTarget);
+  }
 
-	public bool IsArrivalTarget()
-	{
-		StageObject currentTarget = GetCurrentTarget();
-		if (currentTarget == null)
-		{
-			return false;
-		}
-		return brain.opponentMem.IsArrivalPosition(currentTarget);
-	}
+  public bool IsArrivalAttackPosition()
+  {
+    StageObject currentTarget = this.GetCurrentTarget();
+    return !Object.op_Equality((Object) currentTarget, (Object) null) && this.brain.opponentMem.IsArrivalAttackPosition(currentTarget);
+  }
 
-	public bool IsArrivalAttackPosition()
-	{
-		StageObject currentTarget = GetCurrentTarget();
-		if (currentTarget == null)
-		{
-			return false;
-		}
-		return brain.opponentMem.IsArrivalAttackPosition(currentTarget);
-	}
+  public float GetDistance() => this.GetOpponent().record.distance;
 
-	public float GetDistance()
-	{
-		return GetOpponent().record.distance;
-	}
+  public Vector3 GetTargetPosition() => this.GetOpponent().record.pos;
 
-	public Vector3 GetTargetPosition()
-	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		return GetOpponent().record.pos;
-	}
+  public Vector3 GetAttackPosition() => this.GetOpponent().record.attackPos;
 
-	public Vector3 GetAttackPosition()
-	{
-		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-		return GetOpponent().record.attackPos;
-	}
+  public float GetLengthWithAttackPos(Vector3 check_pos)
+  {
+    StageObject currentTarget = this.GetCurrentTarget();
+    return Object.op_Equality((Object) currentTarget, (Object) null) ? 0.0f : this.brain.opponentMem.GetLengthWithAttackPos(currentTarget, check_pos);
+  }
 
-	public float GetLengthWithAttackPos(Vector3 check_pos)
-	{
-		//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-		StageObject currentTarget = GetCurrentTarget();
-		if (currentTarget == null)
-		{
-			return 0f;
-		}
-		return brain.opponentMem.GetLengthWithAttackPos(currentTarget, check_pos);
-	}
-
-	public bool IsTargetInterestLoseOfHate()
-	{
-		StageObject currentTarget = GetCurrentTarget();
-		if (currentTarget == null)
-		{
-			return true;
-		}
-		return brain.opponentMem.IsOpponentInterestLoseOfHate(currentTarget);
-	}
+  public bool IsTargetInterestLoseOfHate()
+  {
+    StageObject currentTarget = this.GetCurrentTarget();
+    return Object.op_Equality((Object) currentTarget, (Object) null) || this.brain.opponentMem.IsOpponentInterestLoseOfHate(currentTarget);
+  }
 }

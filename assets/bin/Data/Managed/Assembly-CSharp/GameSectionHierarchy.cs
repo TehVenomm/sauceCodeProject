@@ -1,329 +1,261 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: GameSectionHierarchy
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class GameSectionHierarchy
 {
-	public class HierarchyData
-	{
-		public GameSection section;
+  private List<GameSectionHierarchy.HierarchyData> hierarchyList = new List<GameSectionHierarchy.HierarchyData>();
+  private GameSectionHierarchy.HierarchyData[] typedDatas = new GameSectionHierarchy.HierarchyData[7];
 
-		public GameSceneTables.SectionData data;
-	}
+  private int GetPrefabUIDepth(GAME_SECTION_TYPE type)
+  {
+    if (MonoBehaviourSingleton<GameSceneManager>.I.isOpenImportantDialog)
+      return 9999;
+    return type.IsDialog() ? 5000 + this.hierarchyList.Count * 10 : 1000 + this.hierarchyList.Count * 10;
+  }
 
-	private List<HierarchyData> hierarchyList = new List<HierarchyData>();
+  public void DestroyHierarchy(GameSectionHierarchy.HierarchyData hierarchy_data)
+  {
+    int type = (int) hierarchy_data.data.type;
+    if (this.typedDatas[type] == hierarchy_data)
+      this.typedDatas[type] = (GameSectionHierarchy.HierarchyData) null;
+    Object.DestroyImmediate((Object) ((Component) hierarchy_data.section).gameObject);
+    this.hierarchyList.Remove(hierarchy_data);
+  }
 
-	private HierarchyData[] typedDatas = new HierarchyData[7];
+  public void DestroyHierarchy(List<GameSectionHierarchy.HierarchyData> list)
+  {
+    if (AppMain.isApplicationQuit)
+      return;
+    list.ForEach((Action<GameSectionHierarchy.HierarchyData>) (o => this.DestroyHierarchy(o)));
+    list.Clear();
+  }
 
-	private int GetPrefabUIDepth(GAME_SECTION_TYPE type)
-	{
-		if (MonoBehaviourSingleton<GameSceneManager>.I.isOpenImportantDialog)
-		{
-			return 9999;
-		}
-		if (type.IsDialog())
-		{
-			return 5000 + hierarchyList.Count * 10;
-		}
-		return 1000 + hierarchyList.Count * 10;
-	}
+  public List<GameSectionHierarchy.HierarchyData> GetExclusiveList(GAME_SECTION_TYPE type)
+  {
+    List<GameSectionHierarchy.HierarchyData> exclusiveList = new List<GameSectionHierarchy.HierarchyData>();
+    int num = !type.IsSingle() ? this.hierarchyList.FindLastIndex((Predicate<GameSectionHierarchy.HierarchyData>) (o => o.data.type == type)) : this.hierarchyList.FindLastIndex((Predicate<GameSectionHierarchy.HierarchyData>) (o => o.data.type.IsSingle()));
+    if (num == -1)
+    {
+      if (type == GAME_SECTION_TYPE.SCREEN)
+      {
+        for (int index = this.hierarchyList.Count - 1; index >= 0 && this.hierarchyList[index].data.type != GAME_SECTION_TYPE.SCENE; --index)
+          exclusiveList.Add(this.hierarchyList[index]);
+      }
+      else
+      {
+        for (int index = this.hierarchyList.Count - 1; index >= 0 && this.hierarchyList[index].data.type.IsSingle(); --index)
+          exclusiveList.Add(this.hierarchyList[index]);
+      }
+      return exclusiveList;
+    }
+    if (type == GAME_SECTION_TYPE.DIALOG)
+      ++num;
+    for (int index = this.hierarchyList.Count - 1; index >= num; --index)
+      exclusiveList.Add(this.hierarchyList[index]);
+    return exclusiveList;
+  }
 
-	public void DestroyHierarchy(HierarchyData hierarchy_data)
-	{
-		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-		int type = (int)hierarchy_data.data.type;
-		if (typedDatas[type] == hierarchy_data)
-		{
-			typedDatas[type] = null;
-		}
-		Object.DestroyImmediate(hierarchy_data.section.get_gameObject());
-		hierarchyList.Remove(hierarchy_data);
-	}
+  public List<GameSectionHierarchy.HierarchyData> GetCutList(
+    GameSectionHierarchy.HierarchyData hierarchy_data)
+  {
+    List<GameSectionHierarchy.HierarchyData> cutList = new List<GameSectionHierarchy.HierarchyData>();
+    for (int index = this.hierarchyList.Count - 1; index >= 0 && this.hierarchyList[index] != hierarchy_data; --index)
+      cutList.Add(this.hierarchyList[index]);
+    return cutList;
+  }
 
-	public void DestroyHierarchy(List<HierarchyData> list)
-	{
-		if (!AppMain.isApplicationQuit)
-		{
-			list.ForEach(delegate(HierarchyData o)
-			{
-				DestroyHierarchy(o);
-			});
-			list.Clear();
-		}
-	}
+  public GameSection CreateSection(
+    GameSceneTables.SectionData section_data,
+    LoadObject[] use_objects)
+  {
+    GameSection section = (GameSection) null;
+    GameSectionHierarchy.HierarchyData last = this.GetLast();
+    Transform parent = last == null ? ((Component) MonoBehaviourSingleton<UIManager>.I.uiCamera).transform : last.section._transform;
+    if (section_data.type == GAME_SECTION_TYPE.COMMON_DIALOG)
+    {
+      section = Utility.CreateGameObjectAndComponent(section_data.typeParams[0], parent, 5) as GameSection;
+      section.baseDepth = this.GetPrefabUIDepth(section_data.type);
+      ((Object) section).name = section_data.sectionName;
+      parent = section._transform;
+    }
+    int index = 0;
+    for (int length = use_objects.Length; index < length; ++index)
+    {
+      LoadObject useObject = use_objects[index];
+      if (useObject != null)
+      {
+        GameObject loadedObject = useObject.loadedObject as GameObject;
+        if (Object.op_Inequality((Object) loadedObject, (Object) null))
+        {
+          if (Object.op_Inequality((Object) loadedObject.GetComponent<UIVirtualScreen>(), (Object) null))
+          {
+            System.Type add_component_type = (System.Type) null;
+            if (Object.op_Equality((Object) section, (Object) null))
+              add_component_type = System.Type.GetType(section_data.sectionName);
+            UIBehaviour prefabUi = UIManager.CreatePrefabUI((Object) loadedObject, useObject.PopInstantiatedGameObject(), add_component_type, false, parent, this.GetPrefabUIDepth(section_data.type), section_data);
+            if (Object.op_Equality((Object) section, (Object) null) && section_data.type == GAME_SECTION_TYPE.COMMON_DIALOG)
+            {
+              section = ((Component) prefabUi).gameObject.AddComponent(System.Type.GetType(section_data.typeParams[0])) as GameSection;
+              parent = section._transform;
+            }
+            else if (Object.op_Equality((Object) section, (Object) null) && add_component_type != (System.Type) null)
+            {
+              section = ((Component) prefabUi).GetComponent<UIBehaviour>() as GameSection;
+              parent = section._transform;
+            }
+            else
+            {
+              if (Object.op_Equality((Object) section, (Object) null))
+                section = ((Component) prefabUi).GetComponent<UIBehaviour>() as GameSection;
+              if (Object.op_Equality((Object) section, (Object) null))
+              {
+                section = Utility.CreateGameObjectAndComponent(section_data.sectionName, parent, 5) as GameSection;
+                section.baseDepth = this.GetPrefabUIDepth(section_data.type);
+                parent = section._transform;
+              }
+              if (section_data.type != GAME_SECTION_TYPE.COMMON_DIALOG)
+                prefabUi.Open();
+            }
+          }
+          else if (Object.op_Inequality((Object) section, (Object) null))
+            section.AddPrefab(loadedObject, useObject.PopInstantiatedGameObject());
+          else
+            Log.Warning(LOG.GAMESCENE, "[{0}] is not used.", (object) ((Object) loadedObject).name);
+        }
+      }
+    }
+    if (Object.op_Equality((Object) section, (Object) null))
+    {
+      section = Utility.CreateGameObjectAndComponent(section_data.sectionName, parent, 5) as GameSection;
+      section.baseDepth = this.GetPrefabUIDepth(section_data.type);
+    }
+    GameSectionHierarchy.HierarchyData hierarchyData = new GameSectionHierarchy.HierarchyData();
+    hierarchyData.section = section;
+    hierarchyData.data = section_data;
+    this.hierarchyList.Add(hierarchyData);
+    int type = (int) section_data.type;
+    if (this.typedDatas[type] == null)
+      this.typedDatas[type] = hierarchyData;
+    return section;
+  }
 
-	public List<HierarchyData> GetExclusiveList(GAME_SECTION_TYPE type)
-	{
-		List<HierarchyData> list = new List<HierarchyData>();
-		int num = (!type.IsSingle()) ? hierarchyList.FindLastIndex((HierarchyData o) => o.data.type == type) : hierarchyList.FindLastIndex((HierarchyData o) => o.data.type.IsSingle());
-		if (num == -1)
-		{
-			if (type == GAME_SECTION_TYPE.SCREEN)
-			{
-				int num2 = hierarchyList.Count - 1;
-				while (num2 >= 0 && hierarchyList[num2].data.type != 0)
-				{
-					list.Add(hierarchyList[num2]);
-					num2--;
-				}
-			}
-			else
-			{
-				int num3 = hierarchyList.Count - 1;
-				while (num3 >= 0 && hierarchyList[num3].data.type.IsSingle())
-				{
-					list.Add(hierarchyList[num3]);
-					num3--;
-				}
-			}
-			return list;
-		}
-		if (type == GAME_SECTION_TYPE.DIALOG)
-		{
-			num++;
-		}
-		for (int num4 = hierarchyList.Count - 1; num4 >= num; num4--)
-		{
-			list.Add(hierarchyList[num4]);
-		}
-		return list;
-	}
+  public GameSectionHierarchy.HierarchyData GetLast()
+  {
+    int index = this.hierarchyList.Count - 1;
+    return index < 0 ? (GameSectionHierarchy.HierarchyData) null : this.hierarchyList[index];
+  }
 
-	public List<HierarchyData> GetCutList(HierarchyData hierarchy_data)
-	{
-		List<HierarchyData> list = new List<HierarchyData>();
-		int num = hierarchyList.Count - 1;
-		while (num >= 0 && hierarchyList[num] != hierarchy_data)
-		{
-			list.Add(hierarchyList[num]);
-			num--;
-		}
-		return list;
-	}
+  public GameSectionHierarchy.HierarchyData GetOpendLast()
+  {
+    for (int index = this.hierarchyList.Count - 1; index >= 0; --index)
+    {
+      GameSectionHierarchy.HierarchyData hierarchy = this.hierarchyList[index];
+      if (hierarchy.section.state == UIBehaviour.STATE.OPEN || hierarchy.section.state == UIBehaviour.STATE.TO_OPEN)
+        return hierarchy;
+    }
+    return (GameSectionHierarchy.HierarchyData) null;
+  }
 
-	public GameSection CreateSection(GameSceneTables.SectionData section_data, LoadObject[] use_objects)
-	{
-		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0128: Expected O, but got Unknown
-		GameSection gameSection = null;
-		HierarchyData last = GetLast();
-		Transform parent = (last != null) ? last.section._transform : MonoBehaviourSingleton<UIManager>.I.uiCamera.get_transform();
-		if (section_data.type == GAME_SECTION_TYPE.COMMON_DIALOG)
-		{
-			gameSection = (Utility.CreateGameObjectAndComponent(section_data.typeParams[0], parent, 5) as GameSection);
-			gameSection.baseDepth = GetPrefabUIDepth(section_data.type);
-			gameSection.set_name(section_data.sectionName);
-			parent = gameSection._transform;
-		}
-		int i = 0;
-		for (int num = use_objects.Length; i < num; i++)
-		{
-			LoadObject loadObject = use_objects[i];
-			if (loadObject != null)
-			{
-				GameObject val = loadObject.loadedObject as GameObject;
-				if (val != null)
-				{
-					if (val.GetComponent<UIVirtualScreen>() != null)
-					{
-						Type type = null;
-						if (gameSection == null)
-						{
-							type = Type.GetType(section_data.sectionName);
-						}
-						UIBehaviour uIBehaviour = UIManager.CreatePrefabUI(val, loadObject.PopInstantiatedGameObject(), type, false, parent, GetPrefabUIDepth(section_data.type), section_data);
-						if (gameSection == null && section_data.type == GAME_SECTION_TYPE.COMMON_DIALOG)
-						{
-							gameSection = (uIBehaviour.get_gameObject().AddComponent(Type.GetType(section_data.typeParams[0])) as GameSection);
-							parent = gameSection._transform;
-						}
-						else if (gameSection == null && type != null)
-						{
-							gameSection = (uIBehaviour.GetComponent<UIBehaviour>() as GameSection);
-							parent = gameSection._transform;
-						}
-						else
-						{
-							if (gameSection == null)
-							{
-								gameSection = (uIBehaviour.GetComponent<UIBehaviour>() as GameSection);
-							}
-							if (gameSection == null)
-							{
-								gameSection = (Utility.CreateGameObjectAndComponent(section_data.sectionName, parent, 5) as GameSection);
-								gameSection.baseDepth = GetPrefabUIDepth(section_data.type);
-								parent = gameSection._transform;
-							}
-							if (section_data.type != GAME_SECTION_TYPE.COMMON_DIALOG)
-							{
-								uIBehaviour.Open(UITransition.TYPE.OPEN);
-							}
-						}
-					}
-					else if (gameSection != null)
-					{
-						gameSection.AddPrefab(val, loadObject.PopInstantiatedGameObject());
-					}
-					else
-					{
-						Log.Warning(LOG.GAMESCENE, "[{0}] is not used.", val.get_name());
-					}
-				}
-			}
-		}
-		if (gameSection == null)
-		{
-			gameSection = (Utility.CreateGameObjectAndComponent(section_data.sectionName, parent, 5) as GameSection);
-			gameSection.baseDepth = GetPrefabUIDepth(section_data.type);
-		}
-		HierarchyData hierarchyData = new HierarchyData();
-		hierarchyData.section = gameSection;
-		hierarchyData.data = section_data;
-		hierarchyList.Add(hierarchyData);
-		int type2 = (int)section_data.type;
-		if (typedDatas[type2] == null)
-		{
-			typedDatas[type2] = hierarchyData;
-		}
-		return gameSection;
-	}
+  public int GetDialogDialogBlockerDepth(GameSceneTables.SectionData new_section_data)
+  {
+    if (new_section_data != (GameSceneTables.SectionData) null && new_section_data.type.IsDialog())
+    {
+      GameSectionHierarchy.HierarchyData hierarchyData = this.Find(new_section_data);
+      if (hierarchyData != null)
+        return hierarchyData.section.baseDepth - 2;
+      GameSectionHierarchy.HierarchyData opendLast = this.GetOpendLast();
+      return opendLast != null && opendLast.data.type.IsDialog() ? opendLast.section.baseDepth - 2 : 3002;
+    }
+    GameSectionHierarchy.HierarchyData opendLast1 = this.GetOpendLast();
+    return opendLast1 != null && opendLast1.data.type.IsDialog() ? opendLast1.section.baseDepth - 2 : -1;
+  }
 
-	public HierarchyData GetLast()
-	{
-		int num = hierarchyList.Count - 1;
-		if (num < 0)
-		{
-			return null;
-		}
-		return hierarchyList[num];
-	}
+  public GameSectionHierarchy.HierarchyData GetLastExcludeDialog()
+  {
+    for (int index = this.hierarchyList.Count - 1; index >= 0; --index)
+    {
+      GameSectionHierarchy.HierarchyData hierarchy = this.hierarchyList[index];
+      if (!hierarchy.data.type.IsDialog())
+        return hierarchy;
+    }
+    return (GameSectionHierarchy.HierarchyData) null;
+  }
 
-	public HierarchyData GetOpendLast()
-	{
-		for (int num = hierarchyList.Count - 1; num >= 0; num--)
-		{
-			HierarchyData hierarchyData = hierarchyList[num];
-			if (hierarchyData.section.state == UIBehaviour.STATE.OPEN || hierarchyData.section.state == UIBehaviour.STATE.TO_OPEN)
-			{
-				return hierarchyData;
-			}
-		}
-		return null;
-	}
+  public GameSectionHierarchy.HierarchyData GetLastExcludeCommonDialog()
+  {
+    for (int index = this.hierarchyList.Count - 1; index >= 0; --index)
+    {
+      GameSectionHierarchy.HierarchyData hierarchy = this.hierarchyList[index];
+      if (hierarchy.data.type != GAME_SECTION_TYPE.COMMON_DIALOG)
+        return hierarchy;
+    }
+    return (GameSectionHierarchy.HierarchyData) null;
+  }
 
-	public int GetDialogDialogBlockerDepth(GameSceneTables.SectionData new_section_data)
-	{
-		HierarchyData hierarchyData = null;
-		if (new_section_data != (GameSceneTables.SectionData)null && new_section_data.type.IsDialog())
-		{
-			hierarchyData = Find(new_section_data);
-			if (hierarchyData != null)
-			{
-				return hierarchyData.section.baseDepth - 2;
-			}
-			hierarchyData = GetOpendLast();
-			if (hierarchyData != null && hierarchyData.data.type.IsDialog())
-			{
-				return hierarchyData.section.baseDepth - 2;
-			}
-			return 3002;
-		}
-		hierarchyData = GetOpendLast();
-		if (hierarchyData != null && hierarchyData.data.type.IsDialog())
-		{
-			return hierarchyData.section.baseDepth - 2;
-		}
-		return -1;
-	}
+  public GameSectionHierarchy.HierarchyData GetTyped(GAME_SECTION_TYPE type)
+  {
+    return this.typedDatas[(int) type];
+  }
 
-	public HierarchyData GetLastExcludeDialog()
-	{
-		for (int num = hierarchyList.Count - 1; num >= 0; num--)
-		{
-			HierarchyData hierarchyData = hierarchyList[num];
-			if (!hierarchyData.data.type.IsDialog())
-			{
-				return hierarchyData;
-			}
-		}
-		return null;
-	}
+  public GameSectionHierarchy.HierarchyData Find(string section_name)
+  {
+    int index = 0;
+    for (int count = this.hierarchyList.Count; index < count; ++index)
+    {
+      if (this.hierarchyList[index].data.sectionName == section_name)
+        return this.hierarchyList[index];
+    }
+    return (GameSectionHierarchy.HierarchyData) null;
+  }
 
-	public HierarchyData GetLastExcludeCommonDialog()
-	{
-		for (int num = hierarchyList.Count - 1; num >= 0; num--)
-		{
-			HierarchyData hierarchyData = hierarchyList[num];
-			if (hierarchyData.data.type != GAME_SECTION_TYPE.COMMON_DIALOG)
-			{
-				return hierarchyData;
-			}
-		}
-		return null;
-	}
+  public GameSectionHierarchy.HierarchyData Find(GameSceneTables.SectionData section_data)
+  {
+    int index = 0;
+    for (int count = this.hierarchyList.Count; index < count; ++index)
+    {
+      if (this.hierarchyList[index].data == section_data)
+        return this.hierarchyList[index];
+    }
+    return (GameSectionHierarchy.HierarchyData) null;
+  }
 
-	public HierarchyData GetTyped(GAME_SECTION_TYPE type)
-	{
-		return typedDatas[(int)type];
-	}
+  public GameSectionHierarchy.HierarchyData FindIgnoreSingle(
+    GameSceneTables.SectionData section_data)
+  {
+    int index = 0;
+    for (int count = this.hierarchyList.Count; index < count; ++index)
+    {
+      GameSectionHierarchy.HierarchyData hierarchy = this.hierarchyList[index];
+      if (hierarchy.data == section_data && !hierarchy.data.type.IsSingle())
+        return hierarchy;
+    }
+    return (GameSectionHierarchy.HierarchyData) null;
+  }
 
-	public HierarchyData Find(string section_name)
-	{
-		int i = 0;
-		for (int count = hierarchyList.Count; i < count; i++)
-		{
-			if (hierarchyList[i].data.sectionName == section_name)
-			{
-				return hierarchyList[i];
-			}
-		}
-		return null;
-	}
+  public void DoNotify(GameSection.NOTIFY_FLAG flags)
+  {
+    int index = 0;
+    for (int count = this.hierarchyList.Count; index < count; ++index)
+    {
+      GameSectionHierarchy.HierarchyData hierarchy = this.hierarchyList[index];
+      if (hierarchy.section.isInitialized)
+        hierarchy.section.OnNotify(flags);
+    }
+  }
 
-	public HierarchyData Find(GameSceneTables.SectionData section_data)
-	{
-		int i = 0;
-		for (int count = hierarchyList.Count; i < count; i++)
-		{
-			if (hierarchyList[i].data == section_data)
-			{
-				return hierarchyList[i];
-			}
-		}
-		return null;
-	}
+  public List<GameSectionHierarchy.HierarchyData> GetHierarchyList() => this.hierarchyList;
 
-	public HierarchyData FindIgnoreSingle(GameSceneTables.SectionData section_data)
-	{
-		int i = 0;
-		for (int count = hierarchyList.Count; i < count; i++)
-		{
-			HierarchyData hierarchyData = hierarchyList[i];
-			if (hierarchyData.data == section_data && !hierarchyData.data.type.IsSingle())
-			{
-				return hierarchyData;
-			}
-		}
-		return null;
-	}
-
-	public void DoNotify(GameSection.NOTIFY_FLAG flags)
-	{
-		int i = 0;
-		for (int count = hierarchyList.Count; i < count; i++)
-		{
-			HierarchyData hierarchyData = hierarchyList[i];
-			if (hierarchyData.section.isInitialized)
-			{
-				hierarchyData.section.OnNotify(flags);
-			}
-		}
-	}
-
-	public List<HierarchyData> GetHierarchyList()
-	{
-		return hierarchyList;
-	}
+  public class HierarchyData
+  {
+    public GameSection section;
+    public GameSceneTables.SectionData data;
+  }
 }

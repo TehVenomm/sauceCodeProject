@@ -1,159 +1,107 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UISonarGizmo
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
+#nullable disable
 public class UISonarGizmo : UIStatusGizmoBase
 {
-	[SerializeField]
-	protected GameObject arrow;
+  [SerializeField]
+  protected GameObject arrow;
+  [SerializeField]
+  protected UISprite statusSprite;
+  [SerializeField]
+  protected Vector3 offset;
+  [SerializeField]
+  [Tooltip("スクリーン横オフセット")]
+  protected float screenSideOffset = 22f;
+  [SerializeField]
+  [Tooltip("スクリーン下オフセット")]
+  protected float screenBottomOffset = 112f;
+  private FieldSonarObject _sonar;
+  protected Transform portalTransform;
+  protected Transform arrowTransform;
 
-	[SerializeField]
-	protected UISprite statusSprite;
+  public FieldSonarObject sonar
+  {
+    get => this._sonar;
+    set
+    {
+      this._sonar = value;
+      if (Object.op_Inequality((Object) this._sonar, (Object) null))
+      {
+        ((Component) this).gameObject.SetActive(true);
+        this.portalTransform = ((Component) value).transform;
+        this.UpdateParam();
+      }
+      else
+        ((Component) this).gameObject.SetActive(false);
+    }
+  }
 
-	[SerializeField]
-	protected Vector3 offset;
+  protected override void OnEnable()
+  {
+    base.OnEnable();
+    if (!Object.op_Inequality((Object) this.arrow, (Object) null))
+      return;
+    this.arrowTransform = this.arrow.transform;
+  }
 
-	[SerializeField]
-	[Tooltip("スクリ\u30fcン横オフセット")]
-	protected float screenSideOffset = 22f;
-
-	[Tooltip("スクリ\u30fcン下オフセット")]
-	[SerializeField]
-	protected float screenBottomOffset = 112f;
-
-	private FieldSonarObject _sonar;
-
-	protected Transform portalTransform;
-
-	protected Transform arrowTransform;
-
-	public FieldSonarObject sonar
-	{
-		get
-		{
-			return _sonar;
-		}
-		set
-		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Expected O, but got Unknown
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			_sonar = value;
-			if (_sonar != null)
-			{
-				this.get_gameObject().SetActive(true);
-				portalTransform = value.get_transform();
-				UpdateParam();
-			}
-			else
-			{
-				this.get_gameObject().SetActive(false);
-			}
-		}
-	}
-
-	protected override void OnEnable()
-	{
-		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0023: Expected O, but got Unknown
-		base.OnEnable();
-		if (arrow != null)
-		{
-			arrowTransform = arrow.get_transform();
-		}
-	}
-
-	protected override void UpdateParam()
-	{
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Expected O, but got Unknown
-		//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-		//IL_013e: Expected O, but got Unknown
-		//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0162: Expected O, but got Unknown
-		//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-		//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-		//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-		//IL_020a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-		if (sonar == null || !sonar.get_gameObject().get_activeSelf())
-		{
-			SetActiveSafe(statusSprite.get_gameObject(), false);
-			SetActiveSafe(arrow, false);
-		}
-		else
-		{
-			Vector3 screenUIPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, portalTransform.get_position() + offset);
-			screenZ = screenUIPosition.z;
-			screenUIPosition.z = 0f;
-			float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
-			Vector3 val = screenUIPosition;
-			bool flag = false;
-			float num2 = (float)Screen.get_width();
-			if (screenUIPosition.x < screenSideOffset * num)
-			{
-				screenUIPosition.x = screenSideOffset * num;
-				flag = true;
-			}
-			else if (screenUIPosition.x > num2 - screenSideOffset * num)
-			{
-				screenUIPosition.x = num2 - screenSideOffset * num;
-				flag = true;
-			}
-			if (screenUIPosition.y < screenBottomOffset * num)
-			{
-				screenUIPosition.y = screenBottomOffset * num;
-				flag = true;
-			}
-			if (flag)
-			{
-				SetActiveSafe(statusSprite.get_gameObject(), true);
-				SetActiveSafe(arrow, true);
-				Vector3 val2 = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUIPosition);
-				Vector3 val3 = transform.get_position() - val2;
-				if (val3.get_sqrMagnitude() >= 2E-05f)
-				{
-					transform.set_position(val2);
-				}
-				if (arrowTransform != null)
-				{
-					Vector3 val4 = val - screenUIPosition;
-					if (val4 != Vector3.get_zero())
-					{
-						float num3 = 90f - Vector3.Angle(Vector3.get_right(), val4);
-						arrowTransform.set_eulerAngles(new Vector3(0f, 0f, num3));
-					}
-					else
-					{
-						arrowTransform.set_eulerAngles(new Vector3(0f, 0f, 0f));
-					}
-				}
-			}
-			else
-			{
-				SetActiveSafe(statusSprite.get_gameObject(), false);
-				SetActiveSafe(arrow, false);
-			}
-		}
-	}
+  protected override void UpdateParam()
+  {
+    if (Object.op_Equality((Object) this.sonar, (Object) null) || !((Component) this.sonar).gameObject.activeSelf)
+    {
+      this.SetActiveSafe(((Component) this.statusSprite).gameObject, false);
+      this.SetActiveSafe(this.arrow, false);
+    }
+    else
+    {
+      Vector3 screenUiPosition = Utility.GetScreenUIPosition(MonoBehaviourSingleton<AppMain>.I.mainCamera, MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, Vector3.op_Addition(this.portalTransform.position, this.offset));
+      this.screenZ = screenUiPosition.z;
+      screenUiPosition.z = 0.0f;
+      float num = 1f / MonoBehaviourSingleton<UIManager>.I.uiRoot.pixelSizeAdjustment;
+      Vector3 vector3_1 = screenUiPosition;
+      bool flag = false;
+      float width = (float) Screen.width;
+      if ((double) screenUiPosition.x < (double) this.screenSideOffset * (double) num)
+      {
+        screenUiPosition.x = this.screenSideOffset * num;
+        flag = true;
+      }
+      else if ((double) screenUiPosition.x > (double) width - (double) this.screenSideOffset * (double) num)
+      {
+        screenUiPosition.x = width - this.screenSideOffset * num;
+        flag = true;
+      }
+      if ((double) screenUiPosition.y < (double) this.screenBottomOffset * (double) num)
+      {
+        screenUiPosition.y = this.screenBottomOffset * num;
+        flag = true;
+      }
+      if (flag)
+      {
+        this.SetActiveSafe(((Component) this.statusSprite).gameObject, true);
+        this.SetActiveSafe(this.arrow, true);
+        Vector3 worldPoint = MonoBehaviourSingleton<UIManager>.I.uiCamera.ScreenToWorldPoint(screenUiPosition);
+        Vector3 vector3_2 = Vector3.op_Subtraction(this.transform.position, worldPoint);
+        if ((double) ((Vector3) ref vector3_2).sqrMagnitude >= 1.9999999494757503E-05)
+          this.transform.position = worldPoint;
+        if (!Object.op_Inequality((Object) this.arrowTransform, (Object) null))
+          return;
+        Vector3 vector3_3 = Vector3.op_Subtraction(vector3_1, screenUiPosition);
+        if (Vector3.op_Inequality(vector3_3, Vector3.zero))
+          this.arrowTransform.eulerAngles = new Vector3(0.0f, 0.0f, 90f - Vector3.Angle(Vector3.right, vector3_3));
+        else
+          this.arrowTransform.eulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
+      }
+      else
+      {
+        this.SetActiveSafe(((Component) this.statusSprite).gameObject, false);
+        this.SetActiveSafe(this.arrow, false);
+      }
+    }
+  }
 }

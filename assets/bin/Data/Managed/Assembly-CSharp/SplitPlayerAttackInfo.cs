@@ -1,12 +1,16 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SplitPlayerAttackInfo
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class SplitPlayerAttackInfo
+#nullable disable
+public class SplitPlayerAttackInfo : MonoBehaviour
 {
-	[Tooltip("攻撃情報")]
-	public AttackHitInfo attackHitInfo;
-
-	public SplitPlayerAttackInfo()
-		: this()
-	{
-	}
+  [Tooltip("攻撃情報")]
+  public AttackHitInfo attackHitInfo;
+  [Tooltip("攻撃継続効果情報")]
+  public AttackContinuationInfo attackContinuationInfo;
 }

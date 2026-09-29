@@ -1,101 +1,79 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UISpriteShaderReplacer
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UISpriteShaderReplacer
+#nullable disable
+public class UISpriteShaderReplacer : MonoBehaviour
 {
-	private class AtlasEntry
-	{
-		public UIAtlas atlas;
+  private UISprite sprite;
+  private UISpriteShaderReplacer.AtlasEntry entry;
+  private static Dictionary<UIAtlas, UISpriteShaderReplacer.AtlasEntry> atlases = new Dictionary<UIAtlas, UISpriteShaderReplacer.AtlasEntry>();
 
-		public int refCount;
+  private void Awake() => this.sprite = ((Component) this).GetComponent<UISprite>();
 
-		public AtlasEntry(UIAtlas atlas)
-		{
-			this.atlas = atlas;
-		}
-	}
+  public void Replace(string shaderName)
+  {
+    if (!Object.op_Implicit((Object) this.sprite))
+    {
+      this.Awake();
+      if (!Object.op_Implicit((Object) this.sprite))
+        return;
+    }
+    if (this.entry != null)
+    {
+      --this.entry.refCount;
+      this.entry = (UISpriteShaderReplacer.AtlasEntry) null;
+    }
+    if (UISpriteShaderReplacer.atlases.TryGetValue(this.sprite.atlas, out this.entry) && !Object.op_Implicit((Object) this.entry.atlas))
+    {
+      UISpriteShaderReplacer.atlases.Remove(this.sprite.atlas);
+      this.entry = (UISpriteShaderReplacer.AtlasEntry) null;
+    }
+    if (this.entry == null)
+    {
+      UIAtlas atlas = ResourceUtility.Instantiate<UIAtlas>(this.sprite.atlas);
+      atlas.spriteMaterial = new Material(atlas.spriteMaterial);
+      atlas.spriteMaterial.shader = ResourceUtility.FindShader(shaderName);
+      this.entry = new UISpriteShaderReplacer.AtlasEntry(atlas);
+      UISpriteShaderReplacer.atlases.Add(this.sprite.atlas, this.entry);
+      if (MonoBehaviourSingleton<AppMain>.IsValid())
+        ((Component) atlas).transform.parent = MonoBehaviourSingleton<AppMain>.I._transform;
+    }
+    ++this.entry.refCount;
+    this.sprite.atlas = this.entry.atlas;
+  }
 
-	private UISprite sprite;
+  private void OnDestroy()
+  {
+    if (AppMain.isApplicationQuit || this.entry == null)
+      return;
+    --this.entry.refCount;
+    if (this.entry.refCount > 0)
+      return;
+    UIAtlas key = (UIAtlas) null;
+    foreach (KeyValuePair<UIAtlas, UISpriteShaderReplacer.AtlasEntry> atlase in UISpriteShaderReplacer.atlases)
+    {
+      if (atlase.Value == this.entry)
+        key = atlase.Key;
+    }
+    if (Object.op_Inequality((Object) null, (Object) key))
+      UISpriteShaderReplacer.atlases.Remove(key);
+    if (!Object.op_Implicit((Object) this.entry.atlas))
+      return;
+    Object.Destroy((Object) this.entry.atlas.spriteMaterial);
+    Object.Destroy((Object) ((Component) this.entry.atlas).gameObject);
+  }
 
-	private AtlasEntry entry;
+  private class AtlasEntry
+  {
+    public UIAtlas atlas;
+    public int refCount;
 
-	private static Dictionary<UIAtlas, AtlasEntry> atlases = new Dictionary<UIAtlas, AtlasEntry>();
-
-	public UISpriteShaderReplacer()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		sprite = this.GetComponent<UISprite>();
-	}
-
-	public void Replace(string shaderName)
-	{
-		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00c6: Expected O, but got Unknown
-		//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-		if (!Object.op_Implicit(sprite))
-		{
-			Awake();
-			if (!Object.op_Implicit(sprite))
-			{
-				return;
-			}
-		}
-		if (entry != null)
-		{
-			entry.refCount--;
-			entry = null;
-		}
-		if (atlases.TryGetValue(sprite.atlas, out entry) && !Object.op_Implicit(entry.atlas))
-		{
-			atlases.Remove(sprite.atlas);
-			entry = null;
-		}
-		if (entry == null)
-		{
-			UIAtlas uIAtlas = ResourceUtility.Instantiate<UIAtlas>(sprite.atlas);
-			uIAtlas.spriteMaterial = new Material(uIAtlas.spriteMaterial);
-			uIAtlas.spriteMaterial.set_shader(ResourceUtility.FindShader(shaderName));
-			entry = new AtlasEntry(uIAtlas);
-			atlases.Add(sprite.atlas, entry);
-			if (MonoBehaviourSingleton<AppMain>.IsValid())
-			{
-				uIAtlas.get_transform().set_parent(MonoBehaviourSingleton<AppMain>.I._transform);
-			}
-		}
-		entry.refCount++;
-		sprite.atlas = entry.atlas;
-	}
-
-	private void OnDestroy()
-	{
-		//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-		if (!AppMain.isApplicationQuit && entry != null)
-		{
-			entry.refCount--;
-			if (entry.refCount <= 0)
-			{
-				UIAtlas uIAtlas = null;
-				foreach (KeyValuePair<UIAtlas, AtlasEntry> atlase in atlases)
-				{
-					if (atlase.Value == entry)
-					{
-						uIAtlas = atlase.Key;
-					}
-				}
-				if (null != uIAtlas)
-				{
-					atlases.Remove(uIAtlas);
-				}
-				if (Object.op_Implicit(entry.atlas))
-				{
-					Object.Destroy(entry.atlas.spriteMaterial);
-					Object.Destroy(entry.atlas.get_gameObject());
-				}
-			}
-		}
-	}
+    public AtlasEntry(UIAtlas atlas) => this.atlas = atlas;
+  }
 }

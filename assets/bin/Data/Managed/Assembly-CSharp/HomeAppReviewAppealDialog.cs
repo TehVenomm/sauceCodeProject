@@ -1,83 +1,81 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: HomeAppReviewAppealDialog
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class HomeAppReviewAppealDialog : HomeAppReviewAppealDialogBase
 {
-	protected new enum UI
-	{
-		LBL_ITEM_TEXT,
-		SPR_BTN_YES,
-		LBL_BTN_YES,
-		BTN_STAR1,
-		BTN_STAR2,
-		BTN_STAR3,
-		BTN_STAR4,
-		BTN_STAR5,
-		OBJ_ON,
-		OBJ_OFF
-	}
+  private UIButton yesButton;
+  private string itemString;
 
-	private UIButton yesButton;
+  public override void Initialize()
+  {
+    base.Initialize();
+    this.yesButton = ((Component) this.GetCtrl((Enum) HomeAppReviewAppealDialog.UI.SPR_BTN_YES)).GetComponent<UIButton>();
+    this.SetStarsEvent();
+    this.itemString = StringTable.Get(STRING_CATEGORY.APP_REVIEW, 3U);
+  }
 
-	private string itemString;
+  public override void UpdateUI()
+  {
+    this.SetLabelText((Enum) HomeAppReviewAppealDialog.UI.LBL_ITEM_TEXT, this.itemString);
+    if (this.starValue == 0)
+    {
+      MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce("Received: " + this.itemString, "");
+      this.SetEnableYesButton(false);
+      this.yesButton.UpdateColor(true);
+    }
+    base.UpdateUI();
+  }
 
-	public override void Initialize()
-	{
-		base.Initialize();
-		yesButton = GetCtrl(UI.SPR_BTN_YES).GetComponent<UIButton>();
-		SetStarsEvent();
-		itemString = StringTable.Get(STRING_CATEGORY.APP_REVIEW, 3u);
-	}
+  protected override void OnQuery_YES()
+  {
+    if (this.starValue >= 5)
+    {
+      GameSection.ChangeEvent("OPEN_MAX", (object) this.starValue);
+    }
+    else
+    {
+      if (this.starValue < 1)
+        return;
+      GameSection.ChangeEvent("OPEN_SOME", (object) this.starValue);
+    }
+  }
 
-	public override void UpdateUI()
-	{
-		SetLabelText((Enum)UI.LBL_ITEM_TEXT, itemString);
-		if (starValue == 0)
-		{
-			MonoBehaviourSingleton<UIAnnounceBand>.I.SetAnnounce("Received: " + itemString, string.Empty);
-			SetEnableYesButton(false);
-			yesButton.UpdateColor(true);
-		}
-		base.UpdateUI();
-	}
+  protected override void OnQuery_NO() => this.SendInfo(0);
 
-	protected override void OnQuery_YES()
-	{
-		if (starValue >= 5)
-		{
-			GameSection.ChangeEvent("OPEN_MAX", starValue);
-		}
-		else if (starValue >= 1)
-		{
-			GameSection.ChangeEvent("OPEN_SOME", starValue);
-		}
-	}
+  private void OnQuery_STAR()
+  {
+    this.starValue = (int) GameSection.GetEventData() + 1;
+    this.SetEnableYesButton(true);
+    this.UpdateStarUI();
+    GameSection.StopEvent();
+  }
 
-	protected override void OnQuery_NO()
-	{
-		int replyAction = 0;
-		SendInfo(replyAction, null);
-	}
+  private void SetEnableYesButton(bool isEnable)
+  {
+    this.yesButton.isEnabled = isEnable;
+    Color color = !isEnable ? Color.gray : Color.white;
+    ((Component) this.GetCtrl((Enum) HomeAppReviewAppealDialog.UI.LBL_BTN_YES)).GetComponent<UILabel>().color = color;
+    ((Component) this.yesButton).GetComponent<UISprite>().color = color;
+  }
 
-	private void OnQuery_STAR()
-	{
-		starValue = (int)GameSection.GetEventData() + 1;
-		SetEnableYesButton(true);
-		UpdateStarUI();
-		GameSection.StopEvent();
-	}
-
-	private void SetEnableYesButton(bool isEnable)
-	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		yesButton.isEnabled = isEnable;
-		Color color = (!isEnable) ? Color.get_gray() : Color.get_white();
-		GetCtrl(UI.LBL_BTN_YES).GetComponent<UILabel>().color = color;
-		yesButton.GetComponent<UISprite>().color = color;
-	}
+  protected new enum UI
+  {
+    LBL_ITEM_TEXT,
+    SPR_BTN_YES,
+    LBL_BTN_YES,
+    BTN_STAR1,
+    BTN_STAR2,
+    BTN_STAR3,
+    BTN_STAR4,
+    BTN_STAR5,
+    OBJ_ON,
+    OBJ_OFF,
+  }
 }

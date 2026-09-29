@@ -1,147 +1,98 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ColliderWeightCtl
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class ColliderWeightCtl
+#nullable disable
+public class ColliderWeightCtl : MonoBehaviour
 {
-	public enum COLLIDER_TYPE
-	{
-		CAPSULE,
-		SPHERE,
-		BOX
-	}
+  public Collider collider;
+  public ColliderWeightCtl.COLLIDER_TYPE colliderType;
+  public int layerIndex = 1;
+  public Vector3 startCenter;
+  public Vector3 endCenter;
+  public float startRadius;
+  public float endRadius;
+  public float startHeight;
+  public float endHeight;
+  public Vector3 startSize;
+  public Vector3 endSize;
+  private float currentWeight;
+  private Vector3 diffCenter;
+  private float diffRadius;
+  private float diffHeight;
+  private Vector3 diffSize;
+  private Animator animator;
 
-	public Collider collider;
+  private void Awake()
+  {
+    this.diffCenter = Vector3.op_Subtraction(this.endCenter, this.startCenter);
+    this.diffRadius = this.endRadius - this.startRadius;
+    this.diffHeight = this.endHeight - this.startHeight;
+    this.diffSize = Vector3.op_Subtraction(this.endSize, this.startSize);
+    this.currentWeight = 0.0f;
+  }
 
-	public COLLIDER_TYPE colliderType;
+  public void SetAnimator(Animator _animator)
+  {
+    this.animator = _animator;
+    this.currentWeight = this.animator.GetLayerWeight(this.layerIndex);
+    if (!Object.op_Inequality((Object) this.collider, (Object) null))
+      return;
+    this.calc();
+  }
 
-	public int layerIndex = 1;
+  private float GetAnimatorLayerWeight()
+  {
+    return Object.op_Equality((Object) this.animator, (Object) null) ? 0.0f : this.animator.GetLayerWeight(this.layerIndex);
+  }
 
-	public Vector3 startCenter;
+  private void Update()
+  {
+    if (Object.op_Equality((Object) this.collider, (Object) null) || Object.op_Equality((Object) this.animator, (Object) null))
+      return;
+    float layerWeight = this.animator.GetLayerWeight(this.layerIndex);
+    if ((double) this.currentWeight == (double) layerWeight)
+      return;
+    this.currentWeight = layerWeight;
+    this.calc();
+  }
 
-	public Vector3 endCenter;
+  private void calc()
+  {
+    Vector3 vector3_1 = Vector3.op_Addition(Vector3.op_Multiply(this.diffCenter, this.currentWeight), this.startCenter);
+    switch (this.colliderType)
+    {
+      case ColliderWeightCtl.COLLIDER_TYPE.CAPSULE:
+        float num1 = this.diffRadius * this.currentWeight + this.startRadius;
+        float num2 = this.diffHeight * this.currentWeight + this.startHeight;
+        CapsuleCollider collider1 = this.collider as CapsuleCollider;
+        collider1.center = vector3_1;
+        collider1.radius = num1;
+        collider1.height = num2;
+        break;
+      case ColliderWeightCtl.COLLIDER_TYPE.SPHERE:
+        float num3 = this.diffRadius * this.currentWeight + this.startRadius;
+        SphereCollider collider2 = this.collider as SphereCollider;
+        collider2.center = vector3_1;
+        collider2.radius = num3;
+        break;
+      case ColliderWeightCtl.COLLIDER_TYPE.BOX:
+        Vector3 vector3_2 = Vector3.op_Addition(Vector3.op_Multiply(this.diffSize, this.currentWeight), this.startSize);
+        BoxCollider collider3 = this.collider as BoxCollider;
+        collider3.center = vector3_1;
+        collider3.size = vector3_2;
+        break;
+    }
+  }
 
-	public float startRadius;
-
-	public float endRadius;
-
-	public float startHeight;
-
-	public float endHeight;
-
-	public Vector3 startSize;
-
-	public Vector3 endSize;
-
-	private float currentWeight;
-
-	private Vector3 diffCenter;
-
-	private float diffRadius;
-
-	private float diffHeight;
-
-	private Vector3 diffSize;
-
-	private Animator animator;
-
-	public ColliderWeightCtl()
-		: this()
-	{
-	}
-
-	private void Awake()
-	{
-		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		diffCenter = endCenter - startCenter;
-		diffRadius = endRadius - startRadius;
-		diffHeight = endHeight - startHeight;
-		diffSize = endSize - startSize;
-		currentWeight = 0f;
-	}
-
-	public void SetAnimator(Animator _animator)
-	{
-		animator = _animator;
-		currentWeight = animator.GetLayerWeight(layerIndex);
-		if (collider != null)
-		{
-			calc();
-		}
-	}
-
-	private float GetAnimatorLayerWeight()
-	{
-		if (animator == null)
-		{
-			return 0f;
-		}
-		return animator.GetLayerWeight(layerIndex);
-	}
-
-	private void Update()
-	{
-		if (!(collider == null) && !(animator == null))
-		{
-			float layerWeight = animator.GetLayerWeight(layerIndex);
-			if (currentWeight != layerWeight)
-			{
-				currentWeight = layerWeight;
-				calc();
-			}
-		}
-	}
-
-	private void calc()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-		Vector3 center = diffCenter * currentWeight + startCenter;
-		switch (colliderType)
-		{
-		case COLLIDER_TYPE.BOX:
-		{
-			Vector3 size = diffSize * currentWeight + startSize;
-			BoxCollider val3 = collider as BoxCollider;
-			val3.set_center(center);
-			val3.set_size(size);
-			break;
-		}
-		case COLLIDER_TYPE.CAPSULE:
-		{
-			float radius2 = diffRadius * currentWeight + startRadius;
-			float height = diffHeight * currentWeight + startHeight;
-			CapsuleCollider val2 = collider as CapsuleCollider;
-			val2.set_center(center);
-			val2.set_radius(radius2);
-			val2.set_height(height);
-			break;
-		}
-		case COLLIDER_TYPE.SPHERE:
-		{
-			float radius = diffRadius * currentWeight + startRadius;
-			SphereCollider val = collider as SphereCollider;
-			val.set_center(center);
-			val.set_radius(radius);
-			break;
-		}
-		}
-	}
+  public enum COLLIDER_TYPE
+  {
+    CAPSULE,
+    SPHERE,
+    BOX,
+  }
 }

@@ -1,143 +1,117 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: AudioListenerManager
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
+#nullable disable
 public class AudioListenerManager : MonoBehaviourSingleton<AudioListenerManager>
 {
-	[Flags]
-	public enum STATUS_FLAGS
-	{
-		INITIALIZE = 0x1,
-		CAMERA_MAIN_ACTIVE = 0x2,
-		CAMERA_INGAME_ACTIVE = 0x4,
-		TARGET_OBJECT_ACTIVE = 0x20
-	}
+  private AudioListenerManager.STATUS_FLAGS Status = AudioListenerManager.STATUS_FLAGS.INITIALIZE;
+  private const AudioListenerManager.TRACE_FLAGS TRACE_BOTH = AudioListenerManager.TRACE_FLAGS.POSITION | AudioListenerManager.TRACE_FLAGS.ROTATION;
+  private StageObject m_target;
 
-	[Flags]
-	public enum TRACE_FLAGS
-	{
-		POSITION = 0x1,
-		ROTATION = 0x2
-	}
+  public bool HasFlag(AudioListenerManager.STATUS_FLAGS flg) => (this.Status & flg) == flg;
 
-	private const TRACE_FLAGS TRACE_BOTH = TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION;
+  public void SetFlag(AudioListenerManager.STATUS_FLAGS flg, bool isEnable)
+  {
+    if (isEnable)
+      this.Status |= flg;
+    else
+      this.Status &= ~flg;
+  }
 
-	private STATUS_FLAGS Status = STATUS_FLAGS.INITIALIZE;
+  public void SetTargetObject(StageObject obj)
+  {
+    if (Object.op_Equality((Object) obj, (Object) null))
+      return;
+    this.m_target = obj;
+    this.SetFlag(AudioListenerManager.STATUS_FLAGS.TARGET_OBJECT_ACTIVE, true);
+  }
 
-	private StageObject m_target;
+  public void ReSetTargetObject()
+  {
+    this.m_target = (StageObject) null;
+    this.SetFlag(AudioListenerManager.STATUS_FLAGS.TARGET_OBJECT_ACTIVE, false);
+  }
 
-	public bool HasFlag(STATUS_FLAGS flg)
-	{
-		return (Status & flg) == flg;
-	}
+  protected override void Awake()
+  {
+    ((Component) this).gameObject.AddComponent<AudioListener>();
+    base.Awake();
+  }
 
-	public void SetFlag(STATUS_FLAGS flg, bool isEnable)
-	{
-		if (isEnable)
-		{
-			Status |= flg;
-		}
-		else
-		{
-			Status &= ~flg;
-		}
-	}
+  private void LateUpdate() => this.UpdateListener();
 
-	public void SetTargetObject(StageObject obj)
-	{
-		if (!(obj == null))
-		{
-			m_target = obj;
-			SetFlag(STATUS_FLAGS.TARGET_OBJECT_ACTIVE, true);
-		}
-	}
+  private void UpdateListener()
+  {
+    if (this.Status == (AudioListenerManager.STATUS_FLAGS) 0)
+      return;
+    if (this.HasFlag(AudioListenerManager.STATUS_FLAGS.CAMERA_INGAME_ACTIVE))
+      this.TraceIngameCamera();
+    else if (this.HasFlag(AudioListenerManager.STATUS_FLAGS.TARGET_OBJECT_ACTIVE))
+    {
+      this.TraceObject();
+    }
+    else
+    {
+      if (!this.HasFlag(AudioListenerManager.STATUS_FLAGS.CAMERA_MAIN_ACTIVE))
+        return;
+      this.TraceMainCamera();
+    }
+  }
 
-	public void ReSetTargetObject()
-	{
-		m_target = null;
-		SetFlag(STATUS_FLAGS.TARGET_OBJECT_ACTIVE, false);
-	}
+  private void Trace(Transform t, AudioListenerManager.TRACE_FLAGS flag)
+  {
+    if (!Object.op_Inequality((Object) t, (Object) null))
+      return;
+    if ((flag & AudioListenerManager.TRACE_FLAGS.POSITION) != (AudioListenerManager.TRACE_FLAGS) 0)
+      this._transform.position = t.position;
+    if ((flag & AudioListenerManager.TRACE_FLAGS.ROTATION) == (AudioListenerManager.TRACE_FLAGS) 0)
+      return;
+    this._transform.rotation = Quaternion.LookRotation(Vector3.Cross(Vector3.up, t.right));
+  }
 
-	protected override void Awake()
-	{
-		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		this.get_gameObject().AddComponent<AudioListener>();
-		base.Awake();
-	}
+  private void TraceMainCamera(AudioListenerManager.TRACE_FLAGS flags = AudioListenerManager.TRACE_FLAGS.POSITION | AudioListenerManager.TRACE_FLAGS.ROTATION)
+  {
+    if (!MonoBehaviourSingleton<AppMain>.IsValid() || !Object.op_Inequality((Object) MonoBehaviourSingleton<AppMain>.I.mainCameraTransform, (Object) null))
+      return;
+    this.Trace(MonoBehaviourSingleton<AppMain>.I.mainCameraTransform, AudioListenerManager.TRACE_FLAGS.POSITION | AudioListenerManager.TRACE_FLAGS.ROTATION);
+  }
 
-	private void LateUpdate()
-	{
-		UpdateListener();
-	}
+  private void TraceObject()
+  {
+    this.TraceMainCamera(AudioListenerManager.TRACE_FLAGS.ROTATION);
+    if (Object.op_Equality((Object) this.m_target, (Object) null) || Object.op_Equality((Object) this.m_target._transform, (Object) null))
+      this.SetFlag(AudioListenerManager.STATUS_FLAGS.TARGET_OBJECT_ACTIVE, false);
+    else
+      this.Trace(this.m_target._transform, AudioListenerManager.TRACE_FLAGS.POSITION);
+  }
 
-	private void UpdateListener()
-	{
-		if (Status != 0)
-		{
-			if (HasFlag(STATUS_FLAGS.CAMERA_INGAME_ACTIVE))
-			{
-				TraceIngameCamera(TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION);
-			}
-			else if (HasFlag(STATUS_FLAGS.TARGET_OBJECT_ACTIVE))
-			{
-				TraceObject();
-			}
-			else if (HasFlag(STATUS_FLAGS.CAMERA_MAIN_ACTIVE))
-			{
-				TraceMainCamera(TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION);
-			}
-		}
-	}
+  private void TraceIngameCamera(AudioListenerManager.TRACE_FLAGS flags = AudioListenerManager.TRACE_FLAGS.POSITION | AudioListenerManager.TRACE_FLAGS.ROTATION)
+  {
+    if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && Object.op_Inequality((Object) MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, (Object) null))
+      this.Trace(MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, AudioListenerManager.TRACE_FLAGS.POSITION | AudioListenerManager.TRACE_FLAGS.ROTATION);
+    else
+      this.SetFlag(AudioListenerManager.STATUS_FLAGS.CAMERA_INGAME_ACTIVE, false);
+  }
 
-	private void Trace(Transform t, TRACE_FLAGS flag)
-	{
-		//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-		if (t != null)
-		{
-			if ((flag & TRACE_FLAGS.POSITION) != 0)
-			{
-				base._transform.set_position(t.get_position());
-			}
-			if ((flag & TRACE_FLAGS.ROTATION) != 0)
-			{
-				base._transform.set_rotation(Quaternion.LookRotation(Vector3.Cross(Vector3.get_up(), t.get_right())));
-			}
-		}
-	}
+  [Flags]
+  public enum STATUS_FLAGS
+  {
+    INITIALIZE = 1,
+    CAMERA_MAIN_ACTIVE = 2,
+    CAMERA_INGAME_ACTIVE = 4,
+    TARGET_OBJECT_ACTIVE = 32, // 0x00000020
+  }
 
-	private void TraceMainCamera(TRACE_FLAGS flags = TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION)
-	{
-		if (MonoBehaviourSingleton<AppMain>.IsValid() && MonoBehaviourSingleton<AppMain>.I.mainCameraTransform != null)
-		{
-			Trace(MonoBehaviourSingleton<AppMain>.I.mainCameraTransform, TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION);
-		}
-	}
-
-	private void TraceObject()
-	{
-		TraceMainCamera(TRACE_FLAGS.ROTATION);
-		if (m_target == null || m_target._transform == null)
-		{
-			SetFlag(STATUS_FLAGS.TARGET_OBJECT_ACTIVE, false);
-		}
-		else
-		{
-			Trace(m_target._transform, TRACE_FLAGS.POSITION);
-		}
-	}
-
-	private void TraceIngameCamera(TRACE_FLAGS flags = TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION)
-	{
-		if (MonoBehaviourSingleton<InGameCameraManager>.IsValid() && MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform != null)
-		{
-			Trace(MonoBehaviourSingleton<InGameCameraManager>.I.cameraTransform, TRACE_FLAGS.POSITION | TRACE_FLAGS.ROTATION);
-		}
-		else
-		{
-			SetFlag(STATUS_FLAGS.CAMERA_INGAME_ACTIVE, false);
-		}
-	}
+  [Flags]
+  public enum TRACE_FLAGS
+  {
+    POSITION = 1,
+    ROTATION = 2,
+  }
 }

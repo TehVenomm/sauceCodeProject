@@ -1,560 +1,487 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: ClanChatWebSocketConnection
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using Network;
 using System;
 using System.Collections;
 using UnityEngine;
 
-public class ClanChatWebSocketConnection : IClanChatConnection
+#nullable disable
+public class ClanChatWebSocketConnection : MonoBehaviour, IClanChatConnection
 {
-	private static readonly string STAMP_SYMBOL_BEGIN = "[STMP]";
+  private static readonly string STAMP_SYMBOL_BEGIN = "[STMP]";
+  private bool established;
+  private bool joined;
+  private string uri;
+  private string roomId;
+  private string userName;
+  private Coroutine m_ConnectProcess;
+  private bool autoReconnect;
+  private float RECONNECT_WAIT_SEC = 1f;
+  private int RECONNECT_RETRY_LIMIT = 1;
+  private bool reconnecting;
+  private bool isConnectProcessing;
+  private float CONNECTION_TRY_TIMEOUT = 15f;
 
-	private bool established;
+  public event ClanChatRoom.OnJoin onJoin;
 
-	private bool joined;
+  public event ClanChatRoom.OnLeave onLeave;
 
-	private string uri;
+  public event ClanChatRoom.OnReceiveText onReceiveText;
 
-	private string roomId;
+  public event ClanChatRoom.OnReceiveStamp onReceiveStamp;
 
-	private string userName;
+  public event ClanChatRoom.OnReceiveText onReceivePrivateText;
 
-	private Coroutine m_ConnectProcess;
+  public event ClanChatRoom.OnReceiveStamp onReceivePrivateStamp;
 
-	private bool autoReconnect;
+  public event ClanChatRoom.OnReceiveNotification onReceiveNotification;
 
-	private float RECONNECT_WAIT_SEC = 1f;
+  public event ClanChatRoom.OnDisconnect onDisconnect;
 
-	private int RECONNECT_RETRY_LIMIT = 1;
+  public event ClanChatRoom.OnReceiveUpdateStatus onReceiveUpdateStatus;
 
-	private bool reconnecting;
+  public bool isEstablished => this.established;
 
-	private bool isConnectProcessing;
+  public bool isReadyToChat => this.joined;
 
-	private float CONNECTION_TRY_TIMEOUT = 15f;
+  public bool isConnecting => this.isConnectProcessing;
 
-	public bool isEstablished => established;
+  public ClanChatWebSocket chatWebSocket { get; private set; }
 
-	public bool isReadyToChat => joined;
+  public void Setup(string host, int port, string path, bool autoReconnect = true)
+  {
+    this.uri = new UriBuilder("ws", host, port, path).Uri.ToString();
+    this.autoReconnect = autoReconnect;
+    this.chatWebSocket = Utility.CreateGameObjectAndComponent("ClanChatWebSocket", ((Component) this).transform) as ClanChatWebSocket;
+  }
 
-	public bool isConnecting => isConnectProcessing;
+  private void OnWebSocketClosed()
+  {
+    this.chatWebSocket.OnClosed -= new System.Action(this.OnWebSocketClosed);
+    this.established = false;
+    this.joined = false;
+    if (this.autoReconnect && !this.reconnecting)
+      this.Reconnect(this.RECONNECT_RETRY_LIMIT);
+    if (this.onDisconnect == null)
+      return;
+    this.onDisconnect();
+  }
 
-	public ClanChatWebSocket chatWebSocket
-	{
-		get;
-		private set;
-	}
+  private void Reconnect(int count)
+  {
+    this.reconnecting = true;
+    this.StartCoroutine(this.TryReconnect(count));
+  }
 
-	public event ClanChatRoom.OnJoin onJoin;
+  private IEnumerator TryReconnect(int count)
+  {
+    for (float time = this.RECONNECT_WAIT_SEC * (float) (this.RECONNECT_RETRY_LIMIT - count + 1); (double) time > 0.0; time -= Time.deltaTime)
+      yield return (object) null;
+    this.TryConnect((Action<bool>) (success =>
+    {
+      this.reconnecting = false;
+      if (!success)
+      {
+        if (count <= 0)
+          return;
+        this.Reconnect(count - 1);
+      }
+      else
+        this.Join(this.roomId, this.userName);
+    }));
+  }
 
-	public event ClanChatRoom.OnLeave onLeave;
+  public void Connect() => this.TryConnect((Action<bool>) (x => { }));
 
-	public event ClanChatRoom.OnReceiveText onReceiveText;
+  private void TryConnect(Action<bool> onFinished)
+  {
+    if (this.isEstablished)
+    {
+      if (onFinished == null)
+        return;
+      onFinished(true);
+    }
+    else if (this.isConnectProcessing)
+    {
+      this.StartCoroutine(this.WaitConnectProcess(onFinished));
+    }
+    else
+    {
+      this.chatWebSocket.ReceivePacketAction = new Action<ChatPacket>(this.OnReceivePacket);
+      this.m_ConnectProcess = this.StartCoroutine(this.ConnectProcess(onFinished));
+    }
+  }
 
-	public event ClanChatRoom.OnReceiveStamp onReceiveStamp;
+  public void Disconnect(System.Action onFinished = null)
+  {
+    if (this.isEstablished)
+    {
+      this.chatWebSocket.OnClosed -= new System.Action(this.OnWebSocketClosed);
+      this.chatWebSocket.Send<Chat_Model_LeaveRoom_Request>(Chat_Model_LeaveRoom_Request.Create(this.roomId), 0);
+      this.chatWebSocket.Close();
+      this.established = false;
+      this.joined = false;
+      if (onFinished == null && this.onDisconnect == null || AppMain.isApplicationQuit)
+        return;
+      this.StartCoroutine(this.WaitClose(onFinished));
+    }
+    else
+    {
+      this.StopConnectProcess();
+      if (onFinished != null)
+        onFinished();
+      if (this.onDisconnect == null)
+        return;
+      this.onDisconnect();
+    }
+  }
 
-	public event ClanChatRoom.OnReceiveText onReceivePrivateText;
+  private IEnumerator WaitClose(System.Action onFinished = null)
+  {
+    while (this.chatWebSocket.IsOpen())
+      yield return (object) null;
+    if (onFinished != null)
+      onFinished();
+    if (this.onDisconnect != null)
+      this.onDisconnect();
+  }
 
-	public event ClanChatRoom.OnReceiveStamp onReceivePrivateStamp;
+  public void Join(int roomNo, string userName)
+  {
+    this.roomId = roomNo.ToString();
+    this.Join(this.roomId, userName);
+  }
 
-	public event ClanChatRoom.OnReceiveNotification onReceiveNotification;
+  private void Join(string roomId, string userName)
+  {
+    this.roomId = roomId;
+    this.userName = userName.Replace(":", "：");
+    this.TryConnect((Action<bool>) (result =>
+    {
+      if (result)
+        this.chatWebSocket.Send<Chat_Model_JoinClanRoom>(Chat_Model_JoinClanRoom.Create(this.roomId, this.userName), 0);
+      else
+        Log.Error("I failed to enter chat");
+    }));
+  }
 
-	public event ClanChatRoom.OnDisconnect onDisconnect;
+  public void Leave(int roomNo, string userName)
+  {
+    this.roomId = roomNo.ToString();
+    this.Leave(this.roomId, userName);
+  }
 
-	public event ClanChatRoom.OnReceiveUpdateStatus onReceiveUpdateStatus;
+  private void Leave(string roomId, string userName)
+  {
+    this.roomId = roomId;
+    this.userName = userName.Replace(":", "：");
+    this.TryConnect((Action<bool>) (result =>
+    {
+      if (result)
+        this.chatWebSocket.Send<Chat_Model_LeaveClanRoom>(Chat_Model_LeaveClanRoom.Create(this.roomId, this.userName), 0);
+      else
+        Log.Error("I failed to leave chat");
+    }));
+  }
 
-	public ClanChatWebSocketConnection()
-		: this()
-	{
-	}
+  public void SendText(string message)
+  {
+    if (!this.isEstablished)
+      return;
+    string str = message.Replace(":", "：");
+    int id = ClanChatWebSocketConnection.PickStampId(str);
+    if (id > 0 && !MonoBehaviourSingleton<UIManager>.I.mainChat.CanIPostTheStamp(id))
+      return;
+    this.Send(str);
+  }
 
-	public void Setup(string host, int port, string path, bool autoReconnect = true)
-	{
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Expected O, but got Unknown
-		UriBuilder uriBuilder = new UriBuilder("ws", host, port, path);
-		uri = uriBuilder.Uri.ToString();
-		this.autoReconnect = autoReconnect;
-		chatWebSocket = (Utility.CreateGameObjectAndComponent("ClanChatWebSocket", this.get_transform(), -1) as ClanChatWebSocket);
-	}
+  public void SendStamp(int stampId)
+  {
+    if (!this.isEstablished)
+      return;
+    this.Send($"{ClanChatWebSocketConnection.STAMP_SYMBOL_BEGIN}{stampId:D8}");
+  }
 
-	private void OnWebSocketClosed()
-	{
-		chatWebSocket.OnClosed -= OnWebSocketClosed;
-		established = false;
-		joined = false;
-		if (autoReconnect && !reconnecting)
-		{
-			Reconnect(RECONNECT_RETRY_LIMIT);
-		}
-		if (this.onDisconnect != null)
-		{
-			this.onDisconnect();
-		}
-	}
+  private void Send(string message)
+  {
+    this.chatWebSocket.Send<Chat_Model_BroadcastClanMessage_Request>(Chat_Model_BroadcastClanMessage_Request.Create(this.roomId, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, message), 0);
+  }
 
-	private void Reconnect(int count)
-	{
-		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-		reconnecting = true;
-		this.StartCoroutine(TryReconnect(count));
-	}
+  public void SendPrivateText(string target_id, string message)
+  {
+    if (!this.isEstablished)
+      return;
+    string str = message.Replace(":", "：");
+    int id = ClanChatWebSocketConnection.PickStampId(str);
+    if (id > 0 && !MonoBehaviourSingleton<UIManager>.I.mainChat.CanIPostTheStamp(id))
+      return;
+    this.SendPrivate(target_id, str);
+  }
 
-	private IEnumerator TryReconnect(int count)
-	{
-		for (float time = RECONNECT_WAIT_SEC * (float)(RECONNECT_RETRY_LIMIT - count + 1); time > 0f; time -= Time.get_deltaTime())
-		{
-			yield return (object)null;
-		}
-		TryConnect(delegate(bool success)
-		{
-			((_003CTryReconnect_003Ec__Iterator1DA)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.reconnecting = false;
-			if (!success)
-			{
-				if (((_003CTryReconnect_003Ec__Iterator1DA)/*Error near IL_0088: stateMachine*/).count > 0)
-				{
-					((_003CTryReconnect_003Ec__Iterator1DA)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.Reconnect(((_003CTryReconnect_003Ec__Iterator1DA)/*Error near IL_0088: stateMachine*/).count - 1);
-				}
-			}
-			else
-			{
-				((_003CTryReconnect_003Ec__Iterator1DA)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.Join(((_003CTryReconnect_003Ec__Iterator1DA)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.roomId, ((_003CTryReconnect_003Ec__Iterator1DA)/*Error near IL_0088: stateMachine*/)._003C_003Ef__this.userName);
-			}
-		});
-	}
+  public void SendPrivateStamp(string target_id, int stampId)
+  {
+    if (!this.isEstablished)
+      return;
+    string message = $"{ClanChatWebSocketConnection.STAMP_SYMBOL_BEGIN}{stampId:D8}";
+    this.SendPrivate(target_id, message);
+  }
 
-	public void Connect()
-	{
-		TryConnect(delegate
-		{
-		});
-	}
+  private void SendPrivate(string target_id, string message)
+  {
+    this.chatWebSocket.Send<Chat_Model_SendToClanMessage_Request>(Chat_Model_SendToClanMessage_Request.Create(target_id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, this.roomId, message), 0);
+  }
 
-	private void TryConnect(Action<bool> onFinished)
-	{
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-		//IL_005c: Expected O, but got Unknown
-		if (isEstablished)
-		{
-			onFinished?.Invoke(true);
-		}
-		else if (isConnectProcessing)
-		{
-			this.StartCoroutine(WaitConnectProcess(onFinished));
-		}
-		else
-		{
-			chatWebSocket.ReceivePacketAction = OnReceivePacket;
-			m_ConnectProcess = this.StartCoroutine(ConnectProcess(onFinished));
-		}
-	}
+  private void OnReceivePacket(ChatPacket packet)
+  {
+    if (packet == null)
+      return;
+    switch (packet.model.packetType)
+    {
+      case CHAT_PACKET_TYPE.CLAN_JOIN_ROOM:
+        this.OnJoin(packet);
+        break;
+      case CHAT_PACKET_TYPE.CLAN_LEAVE_ROOM:
+        this.OnLeave(packet);
+        break;
+      case CHAT_PACKET_TYPE.CLAN_BROADCAST_ROOM:
+        this.OnReceiveMessage(packet);
+        break;
+      case CHAT_PACKET_TYPE.CLAN_BROADCAST_STATUS:
+        this.OnReceiveUpdateStatus(packet);
+        break;
+      case CHAT_PACKET_TYPE.CLAN_SENDTO:
+        this.OnReceivePrivateMessage(packet);
+        break;
+    }
+  }
 
-	public void Disconnect(Action onFinished = null)
-	{
-		//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-		if (isEstablished)
-		{
-			chatWebSocket.OnClosed -= OnWebSocketClosed;
-			chatWebSocket.Send(Chat_Model_LeaveRoom_Request.Create(roomId), 0, true);
-			chatWebSocket.Close(1000, "Bye!");
-			established = false;
-			joined = false;
-			if ((onFinished != null || this.onDisconnect != null) && !AppMain.isApplicationQuit)
-			{
-				this.StartCoroutine(WaitClose(onFinished));
-			}
-		}
-		else
-		{
-			StopConnectProcess();
-			onFinished?.Invoke();
-			if (this.onDisconnect != null)
-			{
-				this.onDisconnect();
-			}
-		}
-	}
+  private void OnJoin(ChatPacket packet)
+  {
+    if (!(packet.model is Chat_Model_JoinClanRoom model) || model.errorType != CHAT_ERROR_TYPE.NO_ERROR)
+      return;
+    long result1 = 0;
+    long.TryParse(packet.header.fromId, out result1);
+    long result2 = 0;
+    long.TryParse(this.chatWebSocket.fromId, out result2);
+    if (result1 != result2)
+      return;
+    if (string.IsNullOrEmpty(model.UserId))
+      this.joined = true;
+    if (this.onJoin == null)
+      return;
+    this.onJoin(model.errorType, model.UserId);
+  }
 
-	private IEnumerator WaitClose(Action onFinished = null)
-	{
-		while (chatWebSocket.IsOpen())
-		{
-			yield return (object)null;
-		}
-		onFinished?.Invoke();
-		if (this.onDisconnect != null)
-		{
-			this.onDisconnect();
-		}
-	}
+  private void OnLeave(ChatPacket packet)
+  {
+    if (!(packet.model is Chat_Model_LeaveClanRoom model) || model.errorType != CHAT_ERROR_TYPE.NO_ERROR)
+      return;
+    long result1 = 0;
+    long.TryParse(packet.header.fromId, out result1);
+    long result2 = 0;
+    long.TryParse(this.chatWebSocket.fromId, out result2);
+    if (result1 != result2)
+      return;
+    if (model.Owner == 1)
+      this.joined = false;
+    if (this.onLeave == null)
+      return;
+    this.onLeave(model.errorType, model.UserId);
+  }
 
-	public void Join(int roomNo, string userName)
-	{
-		roomId = roomNo.ToString();
-		Join(roomId, userName);
-	}
+  private void OnReceiveUpdateStatus(ChatPacket packet)
+  {
+    Chat_Model_BroadcastClanStatus_Response model = packet.model as Chat_Model_BroadcastClanStatus_Response;
+    int result1 = 0;
+    int result2 = 0;
+    int result3 = 0;
+    int result4 = 0;
+    int result5 = 0;
+    int.TryParse(model.Type, out result1);
+    int.TryParse(model.RoomId, out result2);
+    int.TryParse(model.Result, out result3);
+    int.TryParse(model.Status, out result4);
+    int.TryParse(model.Id, out result5);
+    ClanUpdateStatusData statusData = new ClanUpdateStatusData();
+    statusData.id = result5;
+    statusData.type = result1;
+    statusData.roomId = result2;
+    statusData.result = result3;
+    statusData.status = result4;
+    switch (result1)
+    {
+      case 2:
+        if (this.onReceiveUpdateStatus == null)
+          break;
+        this.onReceiveUpdateStatus(statusData);
+        break;
+      case 3:
+        if (this.onReceiveUpdateStatus == null)
+          break;
+        this.onReceiveUpdateStatus(statusData);
+        break;
+    }
+  }
 
-	private void Join(string roomId, string userName)
-	{
-		this.roomId = roomId;
-		this.userName = userName.Replace(":", "：");
-		TryConnect(delegate(bool result)
-		{
-			if (result)
-			{
-				chatWebSocket.Send(Chat_Model_JoinClanRoom.Create(this.roomId, this.userName), 0, true);
-			}
-			else
-			{
-				Log.Error("I failed to enter chat");
-			}
-		});
-	}
+  private void OnReceiveMessage(ChatPacket packet)
+  {
+    Chat_Model_BroadcastClanMessage_Response model = packet.model as Chat_Model_BroadcastClanMessage_Response;
+    int result1 = 0;
+    int result2 = 0;
+    int.TryParse(model.SenderId, out result1);
+    int.TryParse(model.Id, out result2);
+    if (result1 == 0)
+    {
+      if (this.onReceiveNotification == null)
+        return;
+      this.onReceiveNotification(model.Message);
+    }
+    else if (model.Message.Contains(ClanChatWebSocketConnection.STAMP_SYMBOL_BEGIN))
+    {
+      string s = model.Message.Substring(ClanChatWebSocketConnection.STAMP_SYMBOL_BEGIN.Length, 8);
+      int num = -1;
+      ref int local = ref num;
+      int.TryParse(s, out local);
+      if (this.onReceiveStamp == null)
+        return;
+      this.onReceiveStamp(new ClanChatLogMessageData()
+      {
+        uuid = model.Uuid,
+        id = result2,
+        fromUserId = result1,
+        senderName = model.SenderName,
+        stampId = num
+      });
+    }
+    else
+    {
+      if (this.onReceiveText == null)
+        return;
+      this.onReceiveText(new ClanChatLogMessageData()
+      {
+        uuid = model.Uuid,
+        id = result2,
+        fromUserId = result1,
+        senderName = model.SenderName,
+        message = model.Message
+      });
+    }
+  }
 
-	public void Leave(int roomNo, string userName)
-	{
-		roomId = roomNo.ToString();
-		Leave(roomId, userName);
-	}
+  private void OnReceivePrivateMessage(ChatPacket packet)
+  {
+    Chat_Model_SendToClanMessage_Response model = packet.model as Chat_Model_SendToClanMessage_Response;
+    int result1 = 0;
+    int result2 = 0;
+    int result3 = 0;
+    int.TryParse(model.SenderId, out result1);
+    int.TryParse(model.ReceiveId, out result2);
+    int.TryParse(model.Id, out result3);
+    if (model.Message.Contains(ClanChatWebSocketConnection.STAMP_SYMBOL_BEGIN))
+    {
+      string s = model.Message.Substring(ClanChatWebSocketConnection.STAMP_SYMBOL_BEGIN.Length, 8);
+      int num = -1;
+      ref int local = ref num;
+      int.TryParse(s, out local);
+      if (this.onReceivePrivateStamp == null)
+        return;
+      this.onReceivePrivateStamp(new ClanChatLogMessageData()
+      {
+        uuid = model.Uuid,
+        id = result3,
+        fromUserId = result1,
+        toUserId = result2,
+        senderName = model.SenderName,
+        stampId = num
+      });
+    }
+    else
+    {
+      if (this.onReceivePrivateText == null)
+        return;
+      this.onReceivePrivateText(new ClanChatLogMessageData()
+      {
+        uuid = model.Uuid,
+        id = result3,
+        fromUserId = result1,
+        toUserId = result2,
+        senderName = model.SenderName,
+        message = model.Message
+      });
+    }
+  }
 
-	private void Leave(string roomId, string userName)
-	{
-		this.roomId = roomId;
-		this.userName = userName.Replace(":", "：");
-		TryConnect(delegate(bool result)
-		{
-			if (result)
-			{
-				chatWebSocket.Send(Chat_Model_LeaveClanRoom.Create(this.roomId, this.userName), 0, true);
-			}
-			else
-			{
-				Log.Error("I failed to leave chat");
-			}
-		});
-	}
+  private IEnumerator ConnectProcess(Action<bool> onFinished)
+  {
+    if (!MonoBehaviourSingleton<UserInfoManager>.IsValid())
+    {
+      onFinished(false);
+    }
+    else
+    {
+      this.isConnectProcessing = true;
+      this.chatWebSocket.Connect(this.uri, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id.ToString(), 0);
+      float waitTimeRest = this.CONNECTION_TRY_TIMEOUT;
+      while (!this.chatWebSocket.IsConnected() && this.chatWebSocket.CurrentConnectionStatus != ClanChatWebSocket.CONNECTION_STATUS.ERROR && (double) waitTimeRest > 0.0)
+      {
+        waitTimeRest -= Time.deltaTime;
+        yield return (object) null;
+      }
+      this.m_ConnectProcess = (Coroutine) null;
+      this.established = this.chatWebSocket.IsConnected();
+      if (this.established)
+        this.chatWebSocket.OnClosed += new System.Action(this.OnWebSocketClosed);
+      if (onFinished != null)
+        onFinished(this.isEstablished);
+      this.isConnectProcessing = false;
+    }
+  }
 
-	public void SendText(string message)
-	{
-		if (isEstablished)
-		{
-			string text = message.Replace(":", "：");
-			int num = PickStampId(text);
-			if (num <= 0 || MonoBehaviourSingleton<UIManager>.I.mainChat.CanIPostTheStamp(num))
-			{
-				Send(text);
-			}
-		}
-	}
+  private IEnumerator WaitConnectProcess(Action<bool> onFinished)
+  {
+    while (this.isConnectProcessing)
+      yield return (object) null;
+    if (onFinished != null)
+      onFinished(this.isEstablished);
+  }
 
-	public void SendStamp(int stampId)
-	{
-		if (isEstablished)
-		{
-			string message = $"{STAMP_SYMBOL_BEGIN}{stampId:D8}";
-			Send(message);
-		}
-	}
+  private void StopConnectProcess()
+  {
+    if (this.m_ConnectProcess != null)
+      this.StopCoroutine(this.m_ConnectProcess);
+    this.m_ConnectProcess = (Coroutine) null;
+    this.isConnectProcessing = false;
+  }
 
-	private void Send(string message)
-	{
-		chatWebSocket.Send(Chat_Model_BroadcastClanMessage_Request.Create(roomId, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, message), 0, true);
-	}
+  private static int PickStampId(string msg)
+  {
+    int result = -1;
+    if (msg.Contains(ClanChatWebSocketConnection.STAMP_SYMBOL_BEGIN))
+      int.TryParse(msg.Substring(ClanChatWebSocketConnection.STAMP_SYMBOL_BEGIN.Length, 8), out result);
+    return result;
+  }
 
-	public void SendPrivateText(string target_id, string message)
-	{
-		if (isEstablished)
-		{
-			string text = message.Replace(":", "：");
-			int num = PickStampId(text);
-			if (num <= 0 || MonoBehaviourSingleton<UIManager>.I.mainChat.CanIPostTheStamp(num))
-			{
-				SendPrivate(target_id, text);
-			}
-		}
-	}
+  private void OnDestroy()
+  {
+    this.Disconnect((System.Action) null);
+    if (!Object.op_Implicit((Object) this.chatWebSocket))
+      return;
+    Object.Destroy((Object) ((Component) this.chatWebSocket).gameObject);
+  }
 
-	public void SendPrivateStamp(string target_id, int stampId)
-	{
-		if (isEstablished)
-		{
-			string message = $"{STAMP_SYMBOL_BEGIN}{stampId:D8}";
-			SendPrivate(target_id, message);
-		}
-	}
-
-	private void SendPrivate(string target_id, string message)
-	{
-		chatWebSocket.Send(Chat_Model_SendToClanMessage_Request.Create(target_id, MonoBehaviourSingleton<UserInfoManager>.I.userInfo.name, roomId, message), 0, true);
-	}
-
-	private void OnReceivePacket(ChatPacket packet)
-	{
-		if (packet != null)
-		{
-			switch (packet.model.packetType)
-			{
-			case CHAT_PACKET_TYPE.CLAN_JOIN_ROOM:
-				OnJoin(packet);
-				break;
-			case CHAT_PACKET_TYPE.CLAN_LEAVE_ROOM:
-				OnLeave(packet);
-				break;
-			case CHAT_PACKET_TYPE.CLAN_BROADCAST_ROOM:
-				OnReceiveMessage(packet);
-				break;
-			case CHAT_PACKET_TYPE.CLAN_SENDTO:
-				OnReceivePrivateMessage(packet);
-				break;
-			case CHAT_PACKET_TYPE.CLAN_BROADCAST_STATUS:
-				OnReceiveUpdateStatus(packet);
-				break;
-			}
-		}
-	}
-
-	private void OnJoin(ChatPacket packet)
-	{
-		Chat_Model_JoinClanRoom chat_Model_JoinClanRoom = packet.model as Chat_Model_JoinClanRoom;
-		if (chat_Model_JoinClanRoom != null && chat_Model_JoinClanRoom.errorType == CHAT_ERROR_TYPE.NO_ERROR)
-		{
-			long result = 0L;
-			long.TryParse(packet.header.fromId, out result);
-			long result2 = 0L;
-			long.TryParse(chatWebSocket.fromId, out result2);
-			if (result == result2)
-			{
-				if (string.IsNullOrEmpty(chat_Model_JoinClanRoom.UserId))
-				{
-					joined = true;
-				}
-				if (this.onJoin != null)
-				{
-					this.onJoin(chat_Model_JoinClanRoom.errorType, chat_Model_JoinClanRoom.UserId);
-				}
-			}
-		}
-	}
-
-	private void OnLeave(ChatPacket packet)
-	{
-		Chat_Model_LeaveClanRoom chat_Model_LeaveClanRoom = packet.model as Chat_Model_LeaveClanRoom;
-		if (chat_Model_LeaveClanRoom != null && chat_Model_LeaveClanRoom.errorType == CHAT_ERROR_TYPE.NO_ERROR)
-		{
-			long result = 0L;
-			long.TryParse(packet.header.fromId, out result);
-			long result2 = 0L;
-			long.TryParse(chatWebSocket.fromId, out result2);
-			if (result == result2)
-			{
-				if (chat_Model_LeaveClanRoom.Owner == 1)
-				{
-					joined = false;
-				}
-				if (this.onLeave != null)
-				{
-					this.onLeave(chat_Model_LeaveClanRoom.errorType, chat_Model_LeaveClanRoom.UserId);
-				}
-			}
-		}
-	}
-
-	private void OnReceiveUpdateStatus(ChatPacket packet)
-	{
-		Chat_Model_BroadcastClanStatus_Response chat_Model_BroadcastClanStatus_Response = packet.model as Chat_Model_BroadcastClanStatus_Response;
-		int result = 0;
-		int result2 = 0;
-		int result3 = 0;
-		int result4 = 0;
-		int result5 = 0;
-		int.TryParse(chat_Model_BroadcastClanStatus_Response.Type, out result);
-		int.TryParse(chat_Model_BroadcastClanStatus_Response.RoomId, out result2);
-		int.TryParse(chat_Model_BroadcastClanStatus_Response.Result, out result3);
-		int.TryParse(chat_Model_BroadcastClanStatus_Response.Status, out result4);
-		int.TryParse(chat_Model_BroadcastClanStatus_Response.Id, out result5);
-		ClanUpdateStatusData clanUpdateStatusData = new ClanUpdateStatusData();
-		clanUpdateStatusData.id = result5;
-		clanUpdateStatusData.type = result;
-		clanUpdateStatusData.roomId = result2;
-		clanUpdateStatusData.result = result3;
-		clanUpdateStatusData.status = result4;
-		switch (result)
-		{
-		case 2:
-			if (this.onReceiveUpdateStatus != null)
-			{
-				this.onReceiveUpdateStatus(clanUpdateStatusData);
-			}
-			break;
-		case 3:
-			if (this.onReceiveUpdateStatus != null)
-			{
-				this.onReceiveUpdateStatus(clanUpdateStatusData);
-			}
-			break;
-		}
-	}
-
-	private void OnReceiveMessage(ChatPacket packet)
-	{
-		Chat_Model_BroadcastClanMessage_Response chat_Model_BroadcastClanMessage_Response = packet.model as Chat_Model_BroadcastClanMessage_Response;
-		int result = 0;
-		int result2 = 0;
-		int.TryParse(chat_Model_BroadcastClanMessage_Response.SenderId, out result);
-		int.TryParse(chat_Model_BroadcastClanMessage_Response.Id, out result2);
-		if (result == 0)
-		{
-			if (this.onReceiveNotification != null)
-			{
-				this.onReceiveNotification(chat_Model_BroadcastClanMessage_Response.Message);
-			}
-		}
-		else if (chat_Model_BroadcastClanMessage_Response.Message.Contains(STAMP_SYMBOL_BEGIN))
-		{
-			string s = chat_Model_BroadcastClanMessage_Response.Message.Substring(STAMP_SYMBOL_BEGIN.Length, 8);
-			int result3 = -1;
-			int.TryParse(s, out result3);
-			if (this.onReceiveStamp != null)
-			{
-				ClanChatLogMessageData clanChatLogMessageData = new ClanChatLogMessageData();
-				clanChatLogMessageData.uuid = chat_Model_BroadcastClanMessage_Response.Uuid;
-				clanChatLogMessageData.id = result2;
-				clanChatLogMessageData.fromUserId = result;
-				clanChatLogMessageData.senderName = chat_Model_BroadcastClanMessage_Response.SenderName;
-				clanChatLogMessageData.stampId = result3;
-				this.onReceiveStamp(clanChatLogMessageData);
-			}
-		}
-		else if (this.onReceiveText != null)
-		{
-			ClanChatLogMessageData clanChatLogMessageData2 = new ClanChatLogMessageData();
-			clanChatLogMessageData2.uuid = chat_Model_BroadcastClanMessage_Response.Uuid;
-			clanChatLogMessageData2.id = result2;
-			clanChatLogMessageData2.fromUserId = result;
-			clanChatLogMessageData2.senderName = chat_Model_BroadcastClanMessage_Response.SenderName;
-			clanChatLogMessageData2.message = chat_Model_BroadcastClanMessage_Response.Message;
-			this.onReceiveText(clanChatLogMessageData2);
-		}
-	}
-
-	private void OnReceivePrivateMessage(ChatPacket packet)
-	{
-		Chat_Model_SendToClanMessage_Response chat_Model_SendToClanMessage_Response = packet.model as Chat_Model_SendToClanMessage_Response;
-		int result = 0;
-		int result2 = 0;
-		int result3 = 0;
-		int.TryParse(chat_Model_SendToClanMessage_Response.SenderId, out result);
-		int.TryParse(chat_Model_SendToClanMessage_Response.ReceiveId, out result2);
-		int.TryParse(chat_Model_SendToClanMessage_Response.Id, out result3);
-		if (chat_Model_SendToClanMessage_Response.Message.Contains(STAMP_SYMBOL_BEGIN))
-		{
-			string s = chat_Model_SendToClanMessage_Response.Message.Substring(STAMP_SYMBOL_BEGIN.Length, 8);
-			int result4 = -1;
-			int.TryParse(s, out result4);
-			if (this.onReceivePrivateStamp != null)
-			{
-				ClanChatLogMessageData clanChatLogMessageData = new ClanChatLogMessageData();
-				clanChatLogMessageData.uuid = chat_Model_SendToClanMessage_Response.Uuid;
-				clanChatLogMessageData.id = result3;
-				clanChatLogMessageData.fromUserId = result;
-				clanChatLogMessageData.toUserId = result2;
-				clanChatLogMessageData.senderName = chat_Model_SendToClanMessage_Response.SenderName;
-				clanChatLogMessageData.stampId = result4;
-				this.onReceivePrivateStamp(clanChatLogMessageData);
-			}
-		}
-		else if (this.onReceivePrivateText != null)
-		{
-			ClanChatLogMessageData clanChatLogMessageData2 = new ClanChatLogMessageData();
-			clanChatLogMessageData2.uuid = chat_Model_SendToClanMessage_Response.Uuid;
-			clanChatLogMessageData2.id = result3;
-			clanChatLogMessageData2.fromUserId = result;
-			clanChatLogMessageData2.toUserId = result2;
-			clanChatLogMessageData2.senderName = chat_Model_SendToClanMessage_Response.SenderName;
-			clanChatLogMessageData2.message = chat_Model_SendToClanMessage_Response.Message;
-			this.onReceivePrivateText(clanChatLogMessageData2);
-		}
-	}
-
-	private IEnumerator ConnectProcess(Action<bool> onFinished)
-	{
-		if (!MonoBehaviourSingleton<UserInfoManager>.IsValid())
-		{
-			onFinished(false);
-		}
-		else
-		{
-			isConnectProcessing = true;
-			string fromId = MonoBehaviourSingleton<UserInfoManager>.I.userInfo.id.ToString();
-			chatWebSocket.Connect(uri, fromId, 0);
-			float waitTimeRest = CONNECTION_TRY_TIMEOUT;
-			while (!chatWebSocket.IsConnected() && chatWebSocket.CurrentConnectionStatus != ClanChatWebSocket.CONNECTION_STATUS.ERROR && waitTimeRest > 0f)
-			{
-				waitTimeRest -= Time.get_deltaTime();
-				yield return (object)null;
-			}
-			m_ConnectProcess = null;
-			established = chatWebSocket.IsConnected();
-			if (established)
-			{
-				chatWebSocket.OnClosed += OnWebSocketClosed;
-			}
-			onFinished?.Invoke(isEstablished);
-			isConnectProcessing = false;
-		}
-	}
-
-	private IEnumerator WaitConnectProcess(Action<bool> onFinished)
-	{
-		while (isConnectProcessing)
-		{
-			yield return (object)null;
-		}
-		onFinished?.Invoke(isEstablished);
-	}
-
-	private void StopConnectProcess()
-	{
-		if (m_ConnectProcess != null)
-		{
-			this.StopCoroutine(m_ConnectProcess);
-		}
-		m_ConnectProcess = null;
-		isConnectProcessing = false;
-	}
-
-	private static int PickStampId(string msg)
-	{
-		int result = -1;
-		if (msg.Contains(STAMP_SYMBOL_BEGIN))
-		{
-			string s = msg.Substring(STAMP_SYMBOL_BEGIN.Length, 8);
-			int.TryParse(s, out result);
-		}
-		return result;
-	}
-
-	private void OnDestroy()
-	{
-		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-		Disconnect(null);
-		if (Object.op_Implicit(chatWebSocket))
-		{
-			Object.Destroy(chatWebSocket.get_gameObject());
-		}
-	}
-
-	private void OnApplicationPause(bool pause)
-	{
-		if (pause)
-		{
-			if (chatWebSocket != null)
-			{
-				Disconnect(null);
-			}
-		}
-		else
-		{
-			Reconnect(RECONNECT_RETRY_LIMIT);
-		}
-	}
+  private void OnApplicationPause(bool pause)
+  {
+    if (pause)
+    {
+      if (!Object.op_Inequality((Object) this.chatWebSocket, (Object) null))
+        return;
+      this.Disconnect((System.Action) null);
+    }
+    else
+      this.Reconnect(this.RECONNECT_RETRY_LIMIT);
+  }
 }

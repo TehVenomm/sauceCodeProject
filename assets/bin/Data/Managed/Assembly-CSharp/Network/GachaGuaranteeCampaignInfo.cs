@@ -1,127 +1,88 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: Network.GachaGuaranteeCampaignInfo
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using UnityEngine;
 
-namespace Network
+#nullable disable
+namespace Network;
+
+[Serializable]
+public class GachaGuaranteeCampaignInfo
 {
-	[Serializable]
-	public class GachaGuaranteeCampaignInfo
-	{
-		public int gachaId;
+  public int gachaId;
+  public int guaranteeCampaignId;
+  public int campaignType;
+  public bool completeStatus;
+  public int count;
+  public int remainCount;
+  public int type;
+  public int itemId;
+  public int param_0;
+  public int param_1;
+  public string buttonImg;
+  public string startAt;
+  public string endAt;
+  public string description = "";
+  public string detailButtonImg = "";
+  public string link = "";
+  public int userCount;
+  public int probabilityChange;
+  public int probabilityRarity;
+  public int freeGachaReward;
+  public bool hasFreeGachaReward;
+  public string campaignDetailImg;
+  public int crystalNum;
 
-		public int guaranteeCampaignId;
+  public bool IsValid()
+  {
+    return this.gachaId > 0 && this.guaranteeCampaignId > 0 && !this.IsGetInsentive();
+  }
 
-		public int campaignType;
+  public bool IsNextGuaranteed() => this.remainCount == 1;
 
-		public bool completeStatus;
+  public bool IsGetInsentive()
+  {
+    return (this.IsSSConfirmed() || this.IsItemConfirmed()) && this.completeStatus;
+  }
 
-		public int count;
+  public string GetButtonImageName()
+  {
+    return (this.IsSSConfirmed() || this.IsItemConfirmed()) && this.IsNextGuaranteed() && this.buttonImg != "" || this.IsChangeableButtonAndOpenInfo() ? this.buttonImg : "";
+  }
 
-		public int remainCount;
+  public int GetStep() => Mathf.Min(this.userCount + 1, this.count);
 
-		public int type;
+  public int GetImageCount()
+  {
+    return this.IsStepUp() || this.IsFever() ? this.GetStep() : this.remainCount;
+  }
 
-		public int itemId;
+  public string GetTitleImageName()
+  {
+    int imageCount = this.GetImageCount();
+    if (this.detailButtonImg == "")
+      this.detailButtonImg = "GGC_000000000";
+    return $"{this.detailButtonImg}_{(object) imageCount}";
+  }
 
-		public int param_0;
+  public DateTime GetStartDateTime() => DateTime.Parse(this.startAt);
 
-		public int param_1;
+  public bool IsSSConfirmed() => this.campaignType == 0;
 
-		public string buttonImg;
+  public bool IsItemConfirmed() => this.campaignType == 1;
 
-		public string startAt;
+  public bool IsStepUp() => this.campaignType == 2;
 
-		public string endAt;
+  public bool IsFever() => this.campaignType == 3;
 
-		public string description = string.Empty;
+  public bool IsStepUpWithPresent() => this.campaignType == 4;
 
-		public string detailButtonImg = string.Empty;
-
-		public string link = string.Empty;
-
-		public int userCount;
-
-		public int probabilityChange;
-
-		public int probabilityRarity;
-
-		public int freeGachaReward;
-
-		public bool hasFreeGachaReward;
-
-		public string campaignDetailImg;
-
-		public int crystalNum;
-
-		public bool IsValid()
-		{
-			return gachaId > 0 && guaranteeCampaignId > 0 && !IsGetInsentive();
-		}
-
-		public bool IsNextGuaranteed()
-		{
-			return remainCount == 1;
-		}
-
-		public bool IsGetInsentive()
-		{
-			return (IsSSConfirmed() || IsItemConfirmed()) && completeStatus;
-		}
-
-		public string GetButtonImageName()
-		{
-			if ((IsSSConfirmed() || IsItemConfirmed()) && IsNextGuaranteed() && buttonImg != string.Empty)
-			{
-				return buttonImg;
-			}
-			if (IsStepUp())
-			{
-				return buttonImg;
-			}
-			return string.Empty;
-		}
-
-		public int GetStep()
-		{
-			return Mathf.Min(userCount + 1, count);
-		}
-
-		public int GetImageCount()
-		{
-			if (IsStepUp())
-			{
-				return GetStep();
-			}
-			return remainCount;
-		}
-
-		public string GetTitleImageName()
-		{
-			int imageCount = GetImageCount();
-			if (detailButtonImg == string.Empty)
-			{
-				detailButtonImg = "GGC_000000000";
-			}
-			return detailButtonImg + "_" + imageCount;
-		}
-
-		public DateTime GetStartDateTime()
-		{
-			return DateTime.Parse(startAt);
-		}
-
-		public bool IsSSConfirmed()
-		{
-			return campaignType == 0;
-		}
-
-		public bool IsItemConfirmed()
-		{
-			return campaignType == 1;
-		}
-
-		public bool IsStepUp()
-		{
-			return campaignType == 2;
-		}
-	}
+  public bool IsChangeableButtonAndOpenInfo()
+  {
+    return this.IsStepUp() || this.IsFever() || this.IsStepUpWithPresent();
+  }
 }

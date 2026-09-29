@@ -1,208 +1,171 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: UIInGameMessageBar
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable disable
 public class UIInGameMessageBar : MonoBehaviourSingleton<UIInGameMessageBar>
 {
-	public class AnnounceInfo
-	{
-		public string name;
+  [SerializeField]
+  protected Transform tweenCtrl;
+  [SerializeField]
+  protected UIStaticPanelChanger panelChange;
+  [SerializeField]
+  protected UILabel nameLabel;
+  [SerializeField]
+  protected UILabel messeageLabel;
+  [SerializeField]
+  protected float dispTime = 2f;
+  [SerializeField]
+  private UITexture texStamp;
+  [SerializeField]
+  private UIWidget anchor;
+  private bool isOpen;
+  private bool isLock;
+  private float lockTimer;
+  private List<UIInGameMessageBar.AnnounceInfo> announceQueue = new List<UIInGameMessageBar.AnnounceInfo>();
+  private List<UIInGameMessageBar.AnnounceInfo> announceStock = new List<UIInGameMessageBar.AnnounceInfo>();
+  private IEnumerator coroutineLoadStamp;
 
-		public string messeage;
+  protected override void Awake()
+  {
+    base.Awake();
+    if (!MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += new ScreenOrientationManager.OnScreenRotateDelegate(this.OnScreenRotate);
+  }
 
-		public int stampId;
-	}
+  protected override void _OnDestroy()
+  {
+    if (!MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= new ScreenOrientationManager.OnScreenRotateDelegate(this.OnScreenRotate);
+  }
 
-	[SerializeField]
-	protected Transform tweenCtrl;
+  private void _AnnounceStart()
+  {
+    UITweenCtrl.Reset(this.tweenCtrl);
+    UITweenCtrl.Play(this.tweenCtrl, callback: (EventDelegate.Callback) (() => this.isLock = true), is_input_block: false);
+    this.lockTimer = this.dispTime;
+    this.isOpen = true;
+  }
 
-	[SerializeField]
-	protected UIStaticPanelChanger panelChange;
+  private void _Announce(string name, string messeage, int stamp_id)
+  {
+    if (this.isOpen || this.announceQueue.Count > 0)
+    {
+      UIInGameMessageBar.AnnounceInfo announceInfo;
+      if (this.announceStock.Count > 0)
+      {
+        announceInfo = this.announceStock[0];
+        this.announceStock.RemoveAt(0);
+      }
+      else
+        announceInfo = new UIInGameMessageBar.AnnounceInfo();
+      announceInfo.name = name;
+      announceInfo.messeage = messeage;
+      announceInfo.stampId = stamp_id;
+      this.announceQueue.Add(announceInfo);
+    }
+    else
+    {
+      if (stamp_id != 0)
+        this._AnnounceStamp(name, stamp_id);
+      else
+        this._AnnounceMesseage(name, messeage);
+      this.panelChange.UnLock();
+    }
+  }
 
-	[SerializeField]
-	protected UILabel nameLabel;
+  private void _AnnounceMesseage(string name, string messeage)
+  {
+    this.nameLabel.text = name;
+    ((Component) this.messeageLabel).gameObject.SetActive(true);
+    this.messeageLabel.text = messeage;
+    ((Component) this.texStamp).gameObject.SetActive(false);
+    this._AnnounceStart();
+  }
 
-	[SerializeField]
-	protected UILabel messeageLabel;
+  private void _AnnounceStamp(string name, int stamp_id)
+  {
+    this.coroutineLoadStamp = this.CoroutineLoadStamp(name, stamp_id);
+    this.StartCoroutine(this.coroutineLoadStamp);
+  }
 
-	[SerializeField]
-	protected float dispTime = 2f;
+  private IEnumerator CoroutineLoadStamp(string name, int stampId)
+  {
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject lo_stamp = loadingQueue.LoadChatStamp(stampId);
+    yield return (object) loadingQueue.Wait();
+    if (!Object.op_Equality(lo_stamp.loadedObject, (Object) null))
+    {
+      Texture2D loadedObject = lo_stamp.loadedObject as Texture2D;
+      ((Component) this.texStamp).gameObject.SetActive(true);
+      this.texStamp.mainTexture = (Texture) loadedObject;
+      this.nameLabel.text = name;
+      ((Component) this.messeageLabel).gameObject.SetActive(false);
+      this.coroutineLoadStamp = (IEnumerator) null;
+      this._AnnounceStart();
+    }
+  }
 
-	[SerializeField]
-	private UITexture texStamp;
+  public void Announce(string name, string messeage)
+  {
+    this._Announce(name, messeage, 0);
+    this.panelChange.UnLock();
+  }
 
-	[SerializeField]
-	private UIWidget anchor;
+  public void Announce(string name, int stamp_id)
+  {
+    this._Announce(name, (string) null, stamp_id);
+    this.panelChange.UnLock();
+  }
 
-	private bool isOpen;
+  private void LateUpdate()
+  {
+    if (this.coroutineLoadStamp != null || !this.isLock)
+      return;
+    this.lockTimer -= Time.deltaTime;
+    if ((double) this.lockTimer > 0.0)
+      return;
+    if (this.isOpen)
+    {
+      if (!this.NextAnnounce())
+      {
+        this.isOpen = false;
+        UITweenCtrl.Play(this.tweenCtrl, false, (EventDelegate.Callback) (() => this.isLock = true), false);
+        this.lockTimer = 0.1f;
+      }
+    }
+    else if (!this.NextAnnounce())
+      this.panelChange.Lock();
+    this.isLock = false;
+  }
 
-	private bool isLock;
+  private bool NextAnnounce()
+  {
+    if (this.announceQueue.Count <= 0)
+      return false;
+    if (this.announceQueue[0].stampId != 0)
+      this._AnnounceStamp(this.announceQueue[0].name, this.announceQueue[0].stampId);
+    else
+      this._AnnounceMesseage(this.announceQueue[0].name, this.announceQueue[0].messeage);
+    this.announceStock.Add(this.announceQueue[0]);
+    this.announceQueue.RemoveAt(0);
+    return true;
+  }
 
-	private float lockTimer;
+  private void OnScreenRotate(bool isPortrait) => this.anchor.UpdateAnchors();
 
-	private List<AnnounceInfo> announceQueue = new List<AnnounceInfo>();
-
-	private List<AnnounceInfo> announceStock = new List<AnnounceInfo>();
-
-	private IEnumerator coroutineLoadStamp;
-
-	protected override void Awake()
-	{
-		base.Awake();
-		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
-		{
-			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate += OnScreenRotate;
-		}
-	}
-
-	protected override void _OnDestroy()
-	{
-		if (MonoBehaviourSingleton<ScreenOrientationManager>.IsValid())
-		{
-			MonoBehaviourSingleton<ScreenOrientationManager>.I.OnScreenRotate -= OnScreenRotate;
-		}
-	}
-
-	private void _AnnounceStart()
-	{
-		UITweenCtrl.Reset(tweenCtrl, 0);
-		UITweenCtrl.Play(tweenCtrl, true, delegate
-		{
-			isLock = true;
-		}, false, 0);
-		lockTimer = dispTime;
-		isOpen = true;
-	}
-
-	private void _Announce(string name, string messeage, int stamp_id)
-	{
-		if (isOpen || announceQueue.Count > 0)
-		{
-			AnnounceInfo announceInfo = null;
-			if (announceStock.Count > 0)
-			{
-				announceInfo = announceStock[0];
-				announceStock.RemoveAt(0);
-			}
-			else
-			{
-				announceInfo = new AnnounceInfo();
-			}
-			announceInfo.name = name;
-			announceInfo.messeage = messeage;
-			announceInfo.stampId = stamp_id;
-			announceQueue.Add(announceInfo);
-		}
-		else
-		{
-			if (stamp_id != 0)
-			{
-				_AnnounceStamp(name, stamp_id);
-			}
-			else
-			{
-				_AnnounceMesseage(name, messeage);
-			}
-			panelChange.UnLock();
-		}
-	}
-
-	private void _AnnounceMesseage(string name, string messeage)
-	{
-		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-		nameLabel.text = name;
-		messeageLabel.get_gameObject().SetActive(true);
-		messeageLabel.text = messeage;
-		texStamp.get_gameObject().SetActive(false);
-		_AnnounceStart();
-	}
-
-	private void _AnnounceStamp(string name, int stamp_id)
-	{
-		//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		coroutineLoadStamp = CoroutineLoadStamp(name, stamp_id);
-		this.StartCoroutine(coroutineLoadStamp);
-	}
-
-	private IEnumerator CoroutineLoadStamp(string name, int stampId)
-	{
-		LoadingQueue load_queue = new LoadingQueue(this);
-		LoadObject lo_stamp = load_queue.LoadChatStamp(stampId, false);
-		yield return (object)load_queue.Wait();
-		if (!(lo_stamp.loadedObject == null))
-		{
-			Texture2D stamp = lo_stamp.loadedObject as Texture2D;
-			texStamp.get_gameObject().SetActive(true);
-			texStamp.mainTexture = stamp;
-			nameLabel.text = name;
-			messeageLabel.get_gameObject().SetActive(false);
-			coroutineLoadStamp = null;
-			_AnnounceStart();
-		}
-	}
-
-	public void Announce(string name, string messeage)
-	{
-		_Announce(name, messeage, 0);
-		panelChange.UnLock();
-	}
-
-	public void Announce(string name, int stamp_id)
-	{
-		_Announce(name, null, stamp_id);
-		panelChange.UnLock();
-	}
-
-	private void LateUpdate()
-	{
-		if (coroutineLoadStamp == null && isLock)
-		{
-			lockTimer -= Time.get_deltaTime();
-			if (!(lockTimer > 0f))
-			{
-				if (isOpen)
-				{
-					if (!NextAnnounce())
-					{
-						isOpen = false;
-						UITweenCtrl.Play(tweenCtrl, false, delegate
-						{
-							isLock = true;
-						}, false, 0);
-						lockTimer = 0.1f;
-					}
-				}
-				else if (!NextAnnounce())
-				{
-					panelChange.Lock();
-				}
-				isLock = false;
-			}
-		}
-	}
-
-	private bool NextAnnounce()
-	{
-		if (announceQueue.Count <= 0)
-		{
-			return false;
-		}
-		if (announceQueue[0].stampId != 0)
-		{
-			_AnnounceStamp(announceQueue[0].name, announceQueue[0].stampId);
-		}
-		else
-		{
-			_AnnounceMesseage(announceQueue[0].name, announceQueue[0].messeage);
-		}
-		announceStock.Add(announceQueue[0]);
-		announceQueue.RemoveAt(0);
-		return true;
-	}
-
-	private void OnScreenRotate(bool isPortrait)
-	{
-		anchor.UpdateAnchors();
-	}
+  public class AnnounceInfo
+  {
+    public string name;
+    public string messeage;
+    public int stampId;
+  }
 }

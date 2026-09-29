@@ -1,140 +1,115 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SmithPerformanceBase
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using System;
 using System.Collections;
 using UnityEngine;
 
+#nullable disable
 public class SmithPerformanceBase : GameSection
 {
-	private enum UI
-	{
-		TGL_DIRECTION
-	}
+  private object resultData;
+  protected SmithEquipDirector director;
 
-	private object resultData;
+  public override void Initialize()
+  {
+    if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
+      MonoBehaviourSingleton<StatusStageManager>.I.SetUITextureActive(false);
+    this.resultData = GameSection.GetEventData();
+    this.SetToggle((Enum) SmithPerformanceBase.UI.TGL_DIRECTION, true);
+    this.StartCoroutine(this.DoInitialize());
+  }
 
-	protected SmithEquipDirector director;
+  private IEnumerator DoInitialize()
+  {
+    LoadingQueue loadingQueue = new LoadingQueue((MonoBehaviour) this);
+    LoadObject lo_direction = loadingQueue.Load(RESOURCE_CATEGORY.UI, "SmithEquipDirection");
+    int wait = 0;
+    ++wait;
+    int npc_id = StatusManager.IsUnique() ? 36 : 4;
+    NPCTable.NPCData npcData1 = Singleton<NPCTable>.I.GetNPCData(npc_id);
+    GameObject npcRoot004 = new GameObject("NPC");
+    GameObject go1 = npcRoot004;
+    Action<Animator> on_complete1 = (Action<Animator>) (animator => --wait);
+    npcData1.LoadModel(go1, false, true, on_complete1, false);
+    GameObject npcRoot003 = (GameObject) null;
+    if ((this is SmithAbilityChangePerformance ? 1 : (this is SmithAbilityItemPerformance ? 1 : 0)) != 0)
+    {
+      ++wait;
+      NPCTable.NPCData npcData2 = Singleton<NPCTable>.I.GetNPCData(3);
+      npcRoot003 = new GameObject("NPC003");
+      GameObject go2 = npcRoot003;
+      Action<Animator> on_complete2 = (Action<Animator>) (animator => --wait);
+      npcData2.LoadModel(go2, false, true, on_complete2, false);
+    }
+    foreach (int se_id in (int[]) Enum.GetValues(typeof (SmithEquipDirector.AUDIO)))
+      loadingQueue.CacheSE(se_id);
+    foreach (int se_id in (int[]) Enum.GetValues(typeof (EquipResultBase.AUDIO)))
+      loadingQueue.CacheSE(se_id);
+    yield return (object) loadingQueue.Wait();
+    while (wait > 0)
+      yield return (object) null;
+    this.director = ((Component) ResourceUtility.Realizes(lo_direction.loadedObject, MonoBehaviourSingleton<StageManager>.I.stageObject)).GetComponent<SmithEquipDirector>();
+    this.director.SetNPC004(npcRoot004);
+    this.director.SetNPC003(npcRoot003);
+    base.Initialize();
+  }
 
-	public override void Initialize()
-	{
-		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
-		{
-			MonoBehaviourSingleton<StatusStageManager>.I.SetUITextureActive(false);
-		}
-		object obj = resultData = GameSection.GetEventData();
-		SetToggle((Enum)UI.TGL_DIRECTION, true);
-		this.StartCoroutine(DoInitialize());
-	}
+  public override void UpdateUI() => base.UpdateUI();
 
-	private IEnumerator DoInitialize()
-	{
-		LoadingQueue loadingQueue = new LoadingQueue(this);
-		LoadObject lo_direction = loadingQueue.Load(RESOURCE_CATEGORY.UI, "SmithEquipDirection", false);
-		int wait2 = 0;
-		wait2++;
-		NPCTable.NPCData npcData4 = Singleton<NPCTable>.I.GetNPCData(4);
-		GameObject npcRoot4 = new GameObject("NPC");
-		npcData4.LoadModel(npcRoot4, false, true, delegate
-		{
-			((_003CDoInitialize_003Ec__Iterator133)/*Error near IL_0093: stateMachine*/)._003Cwait_003E__2--;
-		}, false);
-		GameObject npcRoot3 = null;
-		if (this is SmithAbilityChangePerformance || this is SmithAbilityItemPerformance)
-		{
-			wait2++;
-			NPCTable.NPCData npcData3 = Singleton<NPCTable>.I.GetNPCData(3);
-			npcRoot3 = new GameObject("NPC003");
-			npcData3.LoadModel(npcRoot3, false, true, delegate
-			{
-				((_003CDoInitialize_003Ec__Iterator133)/*Error near IL_011c: stateMachine*/)._003Cwait_003E__2--;
-			}, false);
-		}
-		int[] seIds2 = (int[])Enum.GetValues(typeof(SmithEquipDirector.AUDIO));
-		int[] array = seIds2;
-		foreach (int seId in array)
-		{
-			loadingQueue.CacheSE(seId, null);
-		}
-		seIds2 = (int[])Enum.GetValues(typeof(EquipResultBase.AUDIO));
-		int[] array2 = seIds2;
-		foreach (int seId2 in array2)
-		{
-			loadingQueue.CacheSE(seId2, null);
-		}
-		yield return (object)loadingQueue.Wait();
-		while (wait2 > 0)
-		{
-			yield return (object)null;
-		}
-		Object directionObject = lo_direction.loadedObject;
-		Transform directionTransform = ResourceUtility.Realizes(directionObject, MonoBehaviourSingleton<StageManager>.I.stageObject, -1);
-		director = directionTransform.GetComponent<SmithEquipDirector>();
-		director.SetNPC004(npcRoot4);
-		director.SetNPC003(npcRoot3);
-		base.Initialize();
-	}
+  public override void Exit()
+  {
+    base.Exit();
+    if (!MonoBehaviourSingleton<StatusStageManager>.IsValid())
+      return;
+    MonoBehaviourSingleton<StatusStageManager>.I.SetUITextureActive(true);
+  }
 
-	public override void UpdateUI()
-	{
-		base.UpdateUI();
-	}
+  protected void OnQuery_SKIP()
+  {
+    if (this.director.isPlaying)
+      this.director.Skip();
+    GameSection.SetEventData(this.resultData);
+  }
 
-	public override void Exit()
-	{
-		base.Exit();
-		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
-		{
-			MonoBehaviourSingleton<StatusStageManager>.I.SetUITextureActive(true);
-		}
-	}
+  protected virtual void OnEndDirection() => this.StartCoroutine(this.DoEnd());
 
-	protected void OnQuery_SKIP()
-	{
-		if (director.isPlaying)
-		{
-			director.Skip();
-		}
-		GameSection.SetEventData(resultData);
-	}
+  protected void EndDirectionUI()
+  {
+    this.SetToggle((Enum) SmithPerformanceBase.UI.TGL_DIRECTION, false);
+  }
 
-	protected virtual void OnEndDirection()
-	{
-		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-		this.StartCoroutine(DoEnd());
-	}
+  private IEnumerator DoEnd()
+  {
+    yield return (object) MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.WHITE);
+    if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
+      MonoBehaviourSingleton<StatusStageManager>.I.SetEnableSmithCharacterActivate(true);
+    this.EndDirectionUI();
+    this.DispatchEvent("SKIP");
+    if (Object.op_Implicit((Object) this.director))
+    {
+      this.director.Reset();
+      Object.Destroy((Object) ((Component) this.director).gameObject);
+    }
+  }
 
-	protected void EndDirectionUI()
-	{
-		SetToggle((Enum)UI.TGL_DIRECTION, false);
-	}
+  protected override void OnDestroy()
+  {
+    if (Object.op_Implicit((Object) this.director))
+    {
+      this.director.Reset();
+      Object.Destroy((Object) ((Component) this.director).gameObject);
+    }
+    if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
+      MonoBehaviourSingleton<StatusStageManager>.I.SetUITextureActive(true);
+    base.OnDestroy();
+  }
 
-	private IEnumerator DoEnd()
-	{
-		yield return (object)MonoBehaviourSingleton<TransitionManager>.I.Out(TransitionManager.TYPE.WHITE);
-		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
-		{
-			MonoBehaviourSingleton<StatusStageManager>.I.SetSmithCharacterActivateFlag(true);
-		}
-		EndDirectionUI();
-		DispatchEvent("SKIP", null);
-		if (Object.op_Implicit(director))
-		{
-			director.Reset();
-			Object.Destroy(director.get_gameObject());
-		}
-	}
-
-	protected override void OnDestroy()
-	{
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		if (Object.op_Implicit(director))
-		{
-			director.Reset();
-			Object.Destroy(director.get_gameObject());
-		}
-		if (MonoBehaviourSingleton<StatusStageManager>.IsValid())
-		{
-			MonoBehaviourSingleton<StatusStageManager>.I.SetUITextureActive(true);
-		}
-		base.OnDestroy();
-	}
+  private enum UI
+  {
+    TGL_DIRECTION,
+  }
 }

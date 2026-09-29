@@ -1,159 +1,127 @@
+﻿// Decompiled with JetBrains decompiler
+// Type: SimplePingPongAlpha
+// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 6956D195-24FE-45FD-BE54-16E1761063F1
+// Assembly location: K:\Project\Dragon Project\ReverseEngineering\DumbServer\dragon1.8.9apk_decoded\assets\bin\Data\Managed\Assembly-CSharp.dll
+
 using UnityEngine;
 
-public class SimplePingPongAlpha
+#nullable disable
+public class SimplePingPongAlpha : MonoBehaviour
 {
-	private enum eState
-	{
-		None,
-		Idle,
-		Forward,
-		Back
-	}
+  [SerializeField]
+  private UISprite target;
+  [SerializeField]
+  private float from;
+  [SerializeField]
+  private float to;
+  [SerializeField]
+  private float sec;
+  [SerializeField]
+  private int endCount;
+  [SerializeField]
+  private bool endDisable;
+  private SimplePingPongAlpha.eState state;
+  private int nowCount;
+  private float addValue;
+  private Color color;
 
-	[SerializeField]
-	private UISprite target;
+  public void Initialize()
+  {
+    if (this.state != SimplePingPongAlpha.eState.None)
+      return;
+    this.from = this.LimitValue(this.from);
+    this.to = this.LimitValue(this.to);
+    this.addValue = (double) this.sec == 0.0 ? 0.0f : (this.to - this.from) / this.sec;
+    this.color = this.target.color;
+    this.state = SimplePingPongAlpha.eState.Idle;
+  }
 
-	[SerializeField]
-	private float from;
+  public void Play(bool startDefaultValue)
+  {
+    if (this.state == SimplePingPongAlpha.eState.None)
+      this.Initialize();
+    else if (this.state == SimplePingPongAlpha.eState.Forward || this.state == SimplePingPongAlpha.eState.Back)
+      return;
+    if (startDefaultValue)
+      this.SetValue(this.from);
+    this.nowCount = 0;
+    this.state = SimplePingPongAlpha.eState.Forward;
+    ((Component) this.target).gameObject.SetActive(true);
+  }
 
-	[SerializeField]
-	private float to;
+  private void Update()
+  {
+    if (this.state == SimplePingPongAlpha.eState.None || this.state == SimplePingPongAlpha.eState.Idle)
+      return;
+    float num = this.addValue * Time.deltaTime;
+    if (this.state == SimplePingPongAlpha.eState.Forward)
+    {
+      if (!this.AddValue(num))
+        return;
+      this.state = SimplePingPongAlpha.eState.Back;
+    }
+    else
+    {
+      if (this.state != SimplePingPongAlpha.eState.Back || !this.SubValue(num))
+        return;
+      if (++this.nowCount >= this.endCount)
+      {
+        if (this.endDisable)
+          ((Component) this.target).gameObject.SetActive(false);
+        this.state = SimplePingPongAlpha.eState.Idle;
+      }
+      else
+        this.state = SimplePingPongAlpha.eState.Forward;
+    }
+  }
 
-	[SerializeField]
-	private float sec;
+  private void SetValue(float value)
+  {
+    this.color.a = value;
+    this.target.color = this.color;
+  }
 
-	[SerializeField]
-	private int endCount;
+  private bool AddValue(float value)
+  {
+    bool flag = false;
+    this.color.a += value;
+    if ((double) this.color.a >= (double) this.to)
+    {
+      this.color.a = this.to;
+      flag = true;
+    }
+    this.target.color = this.color;
+    return flag;
+  }
 
-	[SerializeField]
-	private bool endDisable;
+  private bool SubValue(float value)
+  {
+    bool flag = false;
+    this.color.a -= value;
+    if ((double) this.color.a <= (double) this.from)
+    {
+      this.color.a = this.from;
+      flag = true;
+    }
+    this.target.color = this.color;
+    return flag;
+  }
 
-	private eState state;
+  private float LimitValue(float value)
+  {
+    if ((double) value < 0.0)
+      value = 0.0f;
+    if ((double) value > 1.0)
+      value = 1f;
+    return value;
+  }
 
-	private int nowCount;
-
-	private float addValue;
-
-	private Color color = default(Color);
-
-	public SimplePingPongAlpha()
-		: this()
-	{
-	}//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-	//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-	//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-
-
-	public void Initialize()
-	{
-		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-		if (state == eState.None)
-		{
-			from = LimitValue(from);
-			to = LimitValue(to);
-			addValue = ((sec != 0f) ? ((to - from) / sec) : 0f);
-			color = target.color;
-			state = eState.Idle;
-		}
-	}
-
-	public void Play(bool startDefaultValue)
-	{
-		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-		if (state == eState.None)
-		{
-			Initialize();
-		}
-		else if (state == eState.Forward || state == eState.Back)
-		{
-			return;
-		}
-		if (startDefaultValue)
-		{
-			SetValue(from);
-		}
-		nowCount = 0;
-		state = eState.Forward;
-		target.get_gameObject().SetActive(true);
-	}
-
-	private void Update()
-	{
-		//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-		if (state != 0 && state != eState.Idle)
-		{
-			float value = addValue * Time.get_deltaTime();
-			if (state == eState.Forward)
-			{
-				if (AddValue(value))
-				{
-					state = eState.Back;
-				}
-			}
-			else if (state == eState.Back && SubValue(value))
-			{
-				if (++nowCount >= endCount)
-				{
-					if (endDisable)
-					{
-						target.get_gameObject().SetActive(false);
-					}
-					state = eState.Idle;
-				}
-				else
-				{
-					state = eState.Forward;
-				}
-			}
-		}
-	}
-
-	private void SetValue(float value)
-	{
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		color.a = value;
-		target.color = color;
-	}
-
-	private bool AddValue(float value)
-	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		bool result = false;
-		color.a += value;
-		if (color.a >= to)
-		{
-			color.a = to;
-			result = true;
-		}
-		target.color = color;
-		return result;
-	}
-
-	private bool SubValue(float value)
-	{
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		bool result = false;
-		color.a -= value;
-		if (color.a <= from)
-		{
-			color.a = from;
-			result = true;
-		}
-		target.color = color;
-		return result;
-	}
-
-	private float LimitValue(float value)
-	{
-		if (value < 0f)
-		{
-			value = 0f;
-		}
-		if (value > 1f)
-		{
-			value = 1f;
-		}
-		return value;
-	}
+  private enum eState
+  {
+    None,
+    Idle,
+    Forward,
+    Back,
+  }
 }

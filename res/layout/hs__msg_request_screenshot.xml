@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:paddingTop="@dimen/hs__listPreferredItemPaddingTop" android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:gravity="start" android:orientation="vertical" android:id="@id/agent_screenshot_request_message_layout" android:focusable="true" android:layout_width="0.0dp" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/hs__chatBubbleMargin" android:layout_weight="4.0" android:layout_marginStart="@dimen/hs__chatBubbleMargin">
+        <LinearLayout android:id="@id/admin_message" style="@style/Helpshift.Style.AdminTextMessageContainer">
+            <com.helpshift.views.HSTextView android:id="@id/admin_attachment_request_text" style="@style/Helpshift.Style.AdminTextMessage" />
+            <com.helpshift.views.HSButton android:id="@id/admin_attach_screenshot_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="4.0dp" android:layout_marginTop="-8.0dp" android:text="@string/hs__attach_screenshot_btn" android:layout_marginStart="4.0dp" style="@style/Helpshift.Style.BorderlessButton" />
+        </LinearLayout>
+        <com.helpshift.views.HSTextView android:id="@id/admin_date_text" style="@style/Helpshift.Style.AdminMessageDate" />
+    </LinearLayout>
+    <View android:layout_width="0.0dp" android:layout_height="wrap_content" android:layout_weight="1.0" />
+</LinearLayout>
